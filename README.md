@@ -1,0 +1,179 @@
+OpenPose
+====================================
+
+## Introduction
+
+OpenPose is a **library for real-time multi-person key-point detection and multi-threading written in C++** using OpenCV and Caffe, authored by [Gines Hidalgo](https://www.linkedin.com/in/gineshidalgo/), [Zhe Cao](http://www.andrew.cmu.edu/user/zhecao), [Tomas Simon](http://www.cs.cmu.edu/~tsimon/), [Shih-En Wei](https://scholar.google.com/citations?user=sFQD3k4AAAAJ&hl=en), [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/).
+
+OpenPose is freely available for free non-commercial use, and may be redistributed under these conditions. Please, see the [license](LICENSE) for further details. Contact us for commercial purposes.
+
+
+
+Library main functionality:
+
+* Multi-person 18-body-part pose estimation and rendering.
+
+* Flexible and easy-to-configure multi-threading module.
+
+* Image, video and webcam reader.
+
+* Able to store the results on disk and read them later.
+
+* Small display and GUI for simple result visualization.
+
+* All the functionality is wrapped into a simple-to-use OpenPose::Wrapper class.
+
+This work is based on the C++ code from [C++ real-time ECCV 2016 demo](https://github.com/CMU-Perceptual-Computing-Lab/caffe_rtpose), "Realtime Multiperson Pose Estimation", [Zhe Cao](http://www.andrew.cmu.edu/user/zhecao), [Tomas Simon](http://www.cs.cmu.edu/~tsimon/), [Shih-En Wei](https://scholar.google.com/citations?user=sFQD3k4AAAAJ&hl=en), [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/). The [full project repo](https://github.com/ZheC/Multi-Person-Pose-Estimation) includes Matlab and Python version, as well as training code.
+
+
+
+## Results
+<p align="center">
+    <img src="https://github.com/CMU-Perceptual-Computing-Lab/openpose_private/blob/master/doc/media/dance.gif", width="720">
+</p>
+
+<p align="center">
+    <img src="https://github.com/CMU-Perceptual-Computing-Lab/openpose_private/blob/master/doc/media/shake.gif", width="720">
+</p>
+
+
+
+## Contents
+1. [Installation](#installation)
+2. [Quick Start](#quick-start)
+    1. [Demo](#demo)
+    2. [OpenPose Wrapper](#openpose-wrapper)
+    3. [OpenPose Library](#openpose-library)
+3. [Output](#output)
+    1. [Output Format](#output-format)
+    2. [Reading Saved Results](#reading-saved-results)
+4. [Send Us your Feed-Back!](#send-us-your-feed-back)
+5. [Citation](#citation)
+
+
+
+## Installation
+Installation steps on [installation.md](doc/installation.md).
+
+
+
+## Quick Start
+Most users cases should not need to dive deep into the library, they might just be able to use the [Demo](#demo) or the simple [OpenPose Wrapper](#openpose-wrapper). So you can most probably skip the library details on [OpenPose Library](#openpose-library).
+
+
+
+#### Demo
+Your case if you just want to process a folder of images or video or webcam and display or save the pose results.
+
+Forget about the OpenPose library details and just read the [demo_overview.md](doc/demo_overview.md) 1-page section.
+
+#### OpenPose Wrapper
+Your case if you want to read a specific format of image source and/or add a specific post-processing function and/or implement your own display/saving.
+
+(Almost) forget about the library, just take a look to the `Wrapper` tutorial on [examples/tutorial_wrapper/](examples/tutorial_wrapper/).
+
+Note: you should not need to modify OpenPose source code or examples, so that you can directly upgrade the OpenPose library anytime in the future without changing your code. You might create your custom code on [examples/user_code/](examples/user_code/) and compile it by using `make all` in the OpenPose folder.
+
+#### OpenPose Library
+Your case if you want to change internal functions and/or extend its functionality. First, take a look to the [Demo](#demo) and [OpenPose Wrapper](#openpose-wrapper). Secondly, read the 2 following subsections: OpenPose Overview and Extending Functionality.
+
+1. OpenPose Overview: Learn the basics about our library source code on [library_overview.md](doc/library_overview.md).
+
+2. Extending Functionality: Learn how to extend our library on [library_extend_functionality.md](doc/library_extend_functionality.md).
+
+3. Adding An Extra Module: Learn how to add an extra module on [library_add_new_module.md](doc/library_add_new_module.md).
+
+#### Doxygen Documentation Autogeneration
+You can generate the documentation by running the following command. The documentation will be generated on `doc/doxygen/html/index.html`. You can simply open it with double click and your favourite browser will display it.
+```
+doxygen doc/doc_autogeneration.doxygen
+```
+
+
+
+## Output
+#### Output Format
+There are 2 alternatives to save the **(x,y,score) body part locations**. The `write_pose` flag uses the OpenCV cv::FileStorage default formats (JSON, XML and YML). However, the JSON format is only available after OpenCV 3.0. Hence, `write_pose_json` saves the people pose data as a custom JSON file. For the later, each JSON file has a `people` array of objects, where each object has an array `body_parts` containing the body part locations and detection confidence formatted as `x1,y1,c1,x2,y2,c2,...`. The coordinates `x` and `y` can be normalized to the range [0,1], [-1,1], [0, source size], [0, output size], etc., depending on the flag `scale_mode`. In addition, `c` is the confidence in the range [0,1].
+
+```
+{
+    "version":0.1,
+    "people":[
+        {"body_parts":[1114.15,160.396,0.846207,...]},
+        {"body_parts":[...]},
+    ]
+}
+```
+
+The body part order of the COCO (18 body parts) and MPI (15 body parts) keypoints is described for `POSE_BODY_PART_MAPPING` in [include/openpose/pose/poseParameters.hpp](include/openpose/pose/poseParameters.hpp). E.g. for COCO:
+```
+    POSE_COCO_BODY_PARTS {
+        {0,  "Nose"},
+        {1,  "Neck"},
+        {2,  "RShoulder"},
+        {3,  "RElbow"},
+        {4,  "RWrist"},
+        {5,  "LShoulder"},
+        {6,  "LElbow"},
+        {7,  "LWrist"},
+        {8,  "RHip"},
+        {9,  "RKnee"},
+        {10, "RAnkle"},
+        {11, "LHip"},
+        {12, "LKnee"},
+        {13, "LAnkle"},
+        {14, "REye"},
+        {15, "LEye"},
+        {16, "REar"},
+        {17, "LEar"},
+        {18, "Bkg"},
+    }
+```
+
+For the **heat maps storing format**, instead of individually saving each of the 67 heatmaps (18 body parts + background + 2 x 19 PAFs) individually, the library concatenate them vertically into a huge (width x #heat maps) x (height) matrix, i.e. it concats the heat maps by columns. E.g. columns [0, individual heat map width] contains the first heat map, columns [individual heat map width + 1, 2 * individual heat map width] contains the second heat map, etc. Note that some displayers are not able to display the resulting images given its size. However, Chrome and Firefox are able to properly open them.
+
+The saving order is body parts + background + PAFs. Any of them can be disabled with the program flags. If background is disabled, then the final image will be body parts + PAFs. The body parts and background follow the order of `POSE_COCO_BODY_PARTS` or `POSE_MPI_BODY_PARTS`, while the PAFs follow the order specified on POSE_BODY_PART_PAIRS in `poseParameters.hpp`. E.g. for COCO:
+```
+    POSE_COCO_PAIRS    {1,2,   1,5,   2,3,   3,4,   5,6,   6,7,   1,8,   8,9,   9,10, 1,11,  11,12, 12,13,  1,0,   0,14, 14,16,  0,15, 15,17,   2,16,  5,17};
+```
+
+Where each index is the key value corresponding with each body part on `POSE_COCO_BODY_PARTS`, e.g. 0 for "Neck", 1 for "RShoulder", etc.
+
+#### Reading Saved Results
+We use standard formats (JSON, XML, PNG, JPG, ...) to save our results, so there will be lots of frameworks to read them later, but you might also directly use our functions on [include/openpose/filestream.hpp](include/openpose/filestream.hpp). In particular, `loadData` (for JSON, XML and YML files) and `loadImage` (for image formats such as PNG or JPG) to load the data into cv::Mat format.
+
+
+
+## Send Us your Feed-Back!
+Our library is open source for research purposes, and we want to continuously improve it! So please, let us know if...
+
+1. ... you find any bug (in functionality or speed).
+
+2. ... you added some functionality to some class or some new Worker<T> subclass which we might potentially incorporate to our library.
+
+3. ... you know how to speed up or make more clear any part of the library.
+
+4. ... you have request about possible functionality.
+
+5. ... etc.
+
+Just comment on GibHub or make a pull request! We will answer you back as soon as possible!
+
+
+
+## Citation
+Please cite the paper in your publications if it helps your research:
+
+    @inproceedings{cao2017realtime,
+      author = {Zhe Cao and Tomas Simon and Shih-En Wei and Yaser Sheikh},
+      booktitle = {CVPR},
+      title = {Realtime Multi-Person 2D Pose Estimation using Part Affinity Fields},
+      year = {2017}
+      }
+
+    @inproceedings{wei2016cpm,
+      author = {Shih-En Wei and Varun Ramakrishna and Takeo Kanade and Yaser Sheikh},
+      booktitle = {CVPR},
+      title = {Convolutional pose machines},
+      year = {2016}
+      }

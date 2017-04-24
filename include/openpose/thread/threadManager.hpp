@@ -1,0 +1,504 @@
+#ifndef OPENPOSE__THREAD__THREAD_MANAGER_HPP
+#define OPENPOSE__THREAD__THREAD_MANAGER_HPP
+
+#include <atomic>
+#include <memory> // std::unique_ptr<> & std::shared_ptr<>
+#include <set> // std::multiset
+#include <tuple>
+#include <vector>
+#include "../utilities/macros.hpp"
+#include "enumClasses.hpp"
+#include "queue.hpp"
+#include "thread.hpp"
+#include "worker.hpp"
+
+namespace op
+{
+    template<typename TDatums, typename TWorker = std::shared_ptr<Worker<TDatums>>, typename TQueue = Queue<TDatums>>
+    class ThreadManager
+    {
+    public:
+        // Completely customizable case
+        explicit ThreadManager(const ThreadMode threadMode = ThreadMode::Synchronous);
+
+        void setDefaultMaxSizeQueues(const long long defaultMaxSizeQueues = -1);
+
+        void add(const unsigned long long threadId, const std::vector<TWorker>& tWorkers, const unsigned long long queueInId, const unsigned long long queueOutId);
+
+        void add(const unsigned long long threadId, const TWorker& tWorker, const unsigned long long queueInId, const unsigned long long queueOutId);
+
+        void reset();
+
+        void exec();
+
+        void start();
+
+        void stop();
+
+        inline std::shared_ptr<std::atomic<bool>> getIsRunningSharedPtr()
+        {
+            return spIsRunning;
+        }
+
+        inline bool isRunning() const
+        {
+            return *spIsRunning;
+        }
+
+        bool tryEmplace(TDatums& tDatums);
+
+        bool waitAndEmplace(TDatums& tDatums);
+
+        bool tryPush(const TDatums& tDatums);
+
+        bool waitAndPush(const TDatums& tDatums);
+
+        bool tryPop(TDatums& tDatums);
+
+        bool waitAndPop(TDatums& tDatums);
+
+    private:
+        const ThreadMode mThreadMode;
+        std::shared_ptr<std::atomic<bool>> spIsRunning;
+        long long mDefaultMaxSizeQueues;
+        std::multiset<std::tuple<unsigned long long, std::vector<TWorker>, unsigned long long, unsigned long long>> mThreadWorkerQueues;
+        std::vector<std::shared_ptr<Thread<TDatums, TWorker>>> mThreads;
+        std::vector<std::shared_ptr<TQueue>> mTQueues;
+
+        void add(const std::vector<std::tuple<unsigned long long, std::vector<TWorker>, unsigned long long, unsigned long long>>& threadWorkerQueues);
+
+        void add(const std::vector<std::tuple<unsigned long long, TWorker, unsigned long long, unsigned long long>>& threadWorkerQueues);
+
+        void multisetToThreads();
+
+        void checkAndCreateEmptyThreads();
+
+        void checkAndCreateQueues();
+
+        DELETE_COPY(ThreadManager);
+    };
+}
+
+
+
+
+
+// Implementation
+#include <utility> // std::pair
+#include "../utilities/errorAndLog.hpp"
+#include "../utilities/fastMath.hpp"
+#include "subThread.hpp"
+#include "subThreadNoQueue.hpp"
+#include "subThreadQueueIn.hpp"
+#include "subThreadQueueInOut.hpp"
+#include "subThreadQueueOut.hpp"
+namespace op
+{
+    template<typename TDatums, typename TWorker, typename TQueue>
+    ThreadManager<TDatums, TWorker, TQueue>::ThreadManager(const ThreadMode threadMode) :
+        mThreadMode{threadMode},
+        spIsRunning{std::make_shared<std::atomic<bool>>(false)},
+        mDefaultMaxSizeQueues{-1ll}
+    {
+    }
+
+    template<typename TDatums, typename TWorker, typename TQueue>
+    void ThreadManager<TDatums, TWorker, TQueue>::setDefaultMaxSizeQueues(const long long defaultMaxSizeQueues)
+    {
+        try
+        {
+            mDefaultMaxSizeQueues = {defaultMaxSizeQueues};
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    template<typename TDatums, typename TWorker, typename TQueue>
+    void ThreadManager<TDatums, TWorker, TQueue>::add(const unsigned long long threadId, const std::vector<TWorker>& tWorkers, const unsigned long long queueInId,
+                                                      const unsigned long long queueOutId)
+    {
+        try
+        {
+            add({std::make_tuple(threadId, tWorkers, queueInId, queueOutId)});
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    template<typename TDatums, typename TWorker, typename TQueue>
+    void ThreadManager<TDatums, TWorker, TQueue>::add(const unsigned long long threadId, const TWorker& tWorker, const unsigned long long queueInId, const unsigned long long queueOutId)
+    {
+        try
+        {
+            add({std::make_tuple(threadId, std::vector<TWorker>{tWorker}, queueInId, queueOutId)});
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    template<typename TDatums, typename TWorker, typename TQueue>
+    void ThreadManager<TDatums, TWorker, TQueue>::reset()
+    {
+        try
+        {
+            mThreadWorkerQueues.clear();
+            mThreads.clear();
+            mTQueues.clear();
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    template<typename TDatums, typename TWorker, typename TQueue>
+    void ThreadManager<TDatums, TWorker, TQueue>::exec()
+    {
+        try
+        {
+            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            // Set threads
+            multisetToThreads();
+            if (!mThreads.empty())
+            {
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                // Start threads
+                for (auto i = 0u; i < mThreads.size() - 1; i++)
+                    mThreads.at(i)->startInThread();
+                (*mThreads.rbegin())->exec(spIsRunning);
+                // Stop threads - It will arrive here when the exec() command has finished
+                stop();
+            }
+            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    template<typename TDatums, typename TWorker, typename TQueue>
+    void ThreadManager<TDatums, TWorker, TQueue>::start()
+    {
+        try
+        {
+            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            // Set threads
+            multisetToThreads();
+            // Start threads
+            for (auto& thread : mThreads)
+                thread->startInThread();
+            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    template<typename TDatums, typename TWorker, typename TQueue>
+    void ThreadManager<TDatums, TWorker, TQueue>::stop()
+    {
+        try
+        {
+            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            for (auto& tQueue : mTQueues)
+                tQueue->stop();
+            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            *spIsRunning = false;
+            for (auto& thread : mThreads)
+                thread->stopAndJoin();
+            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    template<typename TDatums, typename TWorker, typename TQueue>
+    bool ThreadManager<TDatums, TWorker, TQueue>::tryEmplace(TDatums& tDatums)
+    {
+        try
+        {
+            if (mThreadMode != ThreadMode::Asynchronous && mThreadMode != ThreadMode::AsynchronousIn)
+                error("Not available for this ThreadMode.", __LINE__, __FUNCTION__, __FILE__);
+            if (mTQueues.empty())
+                error("ThreadManager already stopped or not started yet.", __LINE__, __FUNCTION__, __FILE__);
+            return mTQueues[0]->tryEmplace(tDatums);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return false;
+        }
+    }
+
+    template<typename TDatums, typename TWorker, typename TQueue>
+    bool ThreadManager<TDatums, TWorker, TQueue>::waitAndEmplace(TDatums& tDatums)
+    {
+        try
+        {
+            if (mThreadMode != ThreadMode::Asynchronous && mThreadMode != ThreadMode::AsynchronousIn)
+                error("Not available for this ThreadMode.", __LINE__, __FUNCTION__, __FILE__);
+            if (mTQueues.empty())
+                error("ThreadManager already stopped or not started yet.", __LINE__, __FUNCTION__, __FILE__);
+            return mTQueues[0]->waitAndEmplace(tDatums);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return false;
+        }
+    }
+
+    template<typename TDatums, typename TWorker, typename TQueue>
+    bool ThreadManager<TDatums, TWorker, TQueue>::tryPush(const TDatums& tDatums)
+    {
+        try
+        {
+            if (mThreadMode != ThreadMode::Asynchronous && mThreadMode != ThreadMode::AsynchronousIn)
+                error("Not available for this ThreadMode.", __LINE__, __FUNCTION__, __FILE__);
+            if (mTQueues.empty())
+                error("ThreadManager already stopped or not started yet.", __LINE__, __FUNCTION__, __FILE__);
+            return mTQueues[0]->tryPush(tDatums);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return false;
+        }
+    }
+
+    template<typename TDatums, typename TWorker, typename TQueue>
+    bool ThreadManager<TDatums, TWorker, TQueue>::waitAndPush(const TDatums& tDatums)
+    {
+        try
+        {
+            if (mThreadMode != ThreadMode::Asynchronous && mThreadMode != ThreadMode::AsynchronousIn)
+                error("Not available for this ThreadMode.", __LINE__, __FUNCTION__, __FILE__);
+            if (mTQueues.empty())
+                error("ThreadManager already stopped or not started yet.", __LINE__, __FUNCTION__, __FILE__);
+            return mTQueues[0]->waitAndPush(tDatums);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return false;
+        }
+    }
+
+    template<typename TDatums, typename TWorker, typename TQueue>
+    bool ThreadManager<TDatums, TWorker, TQueue>::tryPop(TDatums& tDatums)
+    {
+        try
+        {
+            if (mThreadMode != ThreadMode::Asynchronous && mThreadMode != ThreadMode::AsynchronousOut)
+                error("Not available for this ThreadMode.", __LINE__, __FUNCTION__, __FILE__);
+            if (mTQueues.empty())
+                error("ThreadManager already stopped or not started yet.", __LINE__, __FUNCTION__, __FILE__);
+            return (*mTQueues.rbegin())->tryPop(tDatums);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return false;
+        }
+    }
+
+    template<typename TDatums, typename TWorker, typename TQueue>
+    bool ThreadManager<TDatums, TWorker, TQueue>::waitAndPop(TDatums& tDatums)
+    {
+        try
+        {
+            if (mThreadMode != ThreadMode::Asynchronous && mThreadMode != ThreadMode::AsynchronousOut)
+                error("Not available for this ThreadMode.", __LINE__, __FUNCTION__, __FILE__);
+            if (mTQueues.empty())
+                error("ThreadManager already stopped or not started yet.", __LINE__, __FUNCTION__, __FILE__);
+            return (*mTQueues.rbegin())->waitAndPop(tDatums);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return false;
+        }
+    }
+
+    template<typename TDatums, typename TWorker, typename TQueue>
+    void ThreadManager<TDatums, TWorker, TQueue>::add(const std::vector<std::tuple<unsigned long long, std::vector<TWorker>, unsigned long long, unsigned long long>>& threadWorkerQueues)
+    {
+        try
+        {
+            for (const auto& threadWorkerQueue : threadWorkerQueues)
+                mThreadWorkerQueues.insert(threadWorkerQueue);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    template<typename TDatums, typename TWorker, typename TQueue>
+    void ThreadManager<TDatums, TWorker, TQueue>::add(const std::vector<std::tuple<unsigned long long, TWorker, unsigned long long, unsigned long long>>& threadWorkerQueues)
+    {
+        try
+        {
+            for (const auto& threadWorkerQueue : threadWorkerQueues)
+                add({std::make_tuple(std::get<0>(threadWorkerQueue), std::vector<TWorker>{std::get<1>(threadWorkerQueue)}, std::get<2>(threadWorkerQueue), std::get<3>(threadWorkerQueue))});
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    template<typename TDatums, typename TWorker, typename TQueue>
+    void ThreadManager<TDatums, TWorker, TQueue>::multisetToThreads()
+    {
+        try
+        {
+            if (!mThreadWorkerQueues.empty())
+            {
+                // Check threads
+                checkAndCreateEmptyThreads();
+
+                // Check and create queues
+                checkAndCreateQueues();
+
+                // Data
+                const auto maxQueueIdSynchronous = mTQueues.size()+1;
+
+                // Set up threads
+                for (const auto& threadWorkerQueue : mThreadWorkerQueues)
+                {
+                    auto& thread = mThreads[std::get<0>(threadWorkerQueue)];
+                    const auto& tWorkers = std::get<1>(threadWorkerQueue);
+                    const auto queueInId = std::get<2>(threadWorkerQueue);
+                    const auto queueOutId = std::get<3>(threadWorkerQueue);
+                    std::shared_ptr<SubThread<TDatums, TWorker>> subThread;
+                    // If AsynchronousIn -> queue indexes are OK
+                    if (mThreadMode == ThreadMode::Asynchronous || mThreadMode == ThreadMode::AsynchronousIn)
+                    {
+                        if (mThreadMode == ThreadMode::AsynchronousIn && queueOutId == mTQueues.size())
+                            subThread = {std::make_shared<SubThreadQueueIn<TDatums, TWorker, TQueue>>(tWorkers, mTQueues.at(queueInId))};
+                        else
+                            subThread = {std::make_shared<SubThreadQueueInOut<TDatums, TWorker, TQueue>>(tWorkers, mTQueues.at(queueInId), mTQueues.at(queueOutId))};
+                    }
+                    // If !AsynchronousIn -> queue indexes - 1
+                    else if (queueOutId != maxQueueIdSynchronous || mThreadMode == ThreadMode::AsynchronousOut)
+                    {
+                        // Queue in + out
+                        if (queueInId != 0)
+                            subThread = {std::make_shared<SubThreadQueueInOut<TDatums, TWorker, TQueue>>(tWorkers, mTQueues.at(queueInId-1), mTQueues.at(queueOutId-1))};
+                        // Case queue out (first TWorker(s))
+                        else
+                            subThread = {std::make_shared<SubThreadQueueOut<TDatums, TWorker, TQueue>>(tWorkers, mTQueues.at(queueOutId-1))};
+                    }
+                    // Case queue in (last TWorker(s))
+                    else if (queueInId != 0) // && queueOutId == maxQueueIdSynchronous
+                        subThread = {std::make_shared<SubThreadQueueIn<TDatums, TWorker, TQueue>>(tWorkers, mTQueues.at(queueInId-1))};
+                    // Case no queue
+                    else // if (queueInId == 0 && queueOutId == maxQueueIdSynchronous)
+                        subThread = {std::make_shared<SubThreadNoQueue<TDatums, TWorker>>(tWorkers)};
+                    thread->add(subThread);
+                }
+            }
+            else
+                error("Empty, no TWorker(s) added.", __LINE__);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    template<typename TDatums, typename TWorker, typename TQueue>
+    void ThreadManager<TDatums, TWorker, TQueue>::checkAndCreateEmptyThreads()
+    {
+        try
+        {
+            // Check all thread ids from 0-maxThreadId are present
+            const auto maxThreadId = std::get<0>(*mThreadWorkerQueues.crbegin());
+            auto previousThreadId = std::get<0>(*mThreadWorkerQueues.cbegin());
+            for (const auto& threadWorkerQueue : mThreadWorkerQueues)
+            {
+                const auto currentThreadId = std::get<0>(threadWorkerQueue);
+                if (currentThreadId - previousThreadId > 1)
+                    error("Missing thread id " + std::to_string(currentThreadId) + " (of " + std::to_string(maxThreadId) + ").", __LINE__, __FUNCTION__, __FILE__);
+                previousThreadId = currentThreadId;
+            }
+
+            // Create Threads
+            // #threads = maxThreadId+1
+            mThreads.resize(maxThreadId);
+            for (auto& thread : mThreads)
+                thread = {std::make_shared<Thread<TDatums, TWorker>>()};
+            mThreads.emplace_back(std::make_shared<Thread<TDatums, TWorker>>(spIsRunning));
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    template<typename TDatums, typename TWorker, typename TQueue>
+    void ThreadManager<TDatums, TWorker, TQueue>::checkAndCreateQueues()
+    {
+        try
+        {
+            if (!mThreadWorkerQueues.empty())
+            {
+                // Get max queue id to get queue size
+                auto maxQueueId = std::get<3>(*mThreadWorkerQueues.cbegin());
+                for (const auto& threadWorkerQueue : mThreadWorkerQueues)
+                    maxQueueId = fastMax(maxQueueId, fastMax(std::get<2>(threadWorkerQueue), std::get<3>(threadWorkerQueue)));
+
+                // Check each queue id has at least a worker that uses it as input and another one as output. Special cases:
+                std::vector<std::pair<bool, bool>> usedQueueIds(maxQueueId, {false, false});
+                for (const auto& threadWorkerQueue : mThreadWorkerQueues)
+                {
+                    usedQueueIds[std::get<2>(threadWorkerQueue)].first = true;
+                    usedQueueIds[std::get<3>(threadWorkerQueue)].second = true;
+                }
+                // Id 0 must only needs a worker using it as input.
+                usedQueueIds.begin()->second = true;
+                // Id maxQueueId only needs a worker using it as output.
+                usedQueueIds.rbegin()->first = true;
+                // Error if missing queue id
+                for (auto i = 0ull ; i < usedQueueIds.size() ; i++)
+                {
+                    if (!usedQueueIds[i].first)
+                        error("Missing queue id " + std::to_string(i) + " (of " + std::to_string(maxQueueId) + ") as input.", __LINE__, __FUNCTION__, __FILE__);
+                    if (!usedQueueIds[i].second)
+                        error("Missing queue id " + std::to_string(i) + " (of " + std::to_string(maxQueueId) + ") as output.", __LINE__, __FUNCTION__, __FILE__);
+                }
+
+                // Create Queues
+                if (mThreadMode == ThreadMode::Asynchronous)
+                    mTQueues.resize(maxQueueId+1);   // First and last one are queues
+                else if (mThreadMode == ThreadMode::Synchronous)
+                    mTQueues.resize(maxQueueId-1);   // First and last one are not actually queues
+                else if (mThreadMode == ThreadMode::AsynchronousIn || mThreadMode == ThreadMode::AsynchronousOut)
+                    mTQueues.resize(maxQueueId);   // First or last one is queue
+                else
+                    error("Unknown ThreadMode", __LINE__, __FUNCTION__, __FILE__);
+                for (auto& tQueue : mTQueues)
+                    tQueue = {std::make_shared<TQueue>(mDefaultMaxSizeQueues)};
+            }
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    COMPILE_TEMPLATE_DATUM(ThreadManager);
+}
+
+#endif // OPENPOSE__THREAD__THREAD_MANAGER_HPP

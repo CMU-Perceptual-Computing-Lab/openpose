@@ -1,0 +1,107 @@
+######################### Binary Files #########################
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.cuo
+
+# Compiled Dynamic libraries
+*.so*
+*.dylib
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+
+# Compiled protocol buffers
+*.pb.h
+*.pb.cc
+*_pb2.py
+
+# Compiled python
+*__init__.py
+*.pyc
+
+# Compiled MATLAB
+*.mex*
+
+# IPython notebook checkpoints
+.ipynb_checkpoints
+
+# LevelDB files
+*.sst
+*.ldb
+LOCK
+LOG*
+CURRENT
+MANIFEST-*
+
+######################### IDEs Files #########################
+# Editor temporaries
+*.swp
+*~
+
+# Sublime Text settings
+*.sublime-workspace
+*.sublime-project
+
+# Eclipse Project settings
+*.*project
+.settings
+
+# QtCreator files
+*.user
+
+# PyCharm files
+.idea
+
+# OSX dir files
+.DS_Store
+
+######################### Caffe Files / Folders #########################
+# User's build configuration
+Makefile.config
+
+# Data and models are either
+	# 1. reference, and not casually committed
+	# 2. custom, and live on their own unless they're deliberated contributed
+3rdparty/caffe/.*
+distribute/
+.build_release/
+.build_debug/
+*.caffemodel
+*.caffemodel.h5
+*.solverstate
+*.solverstate.h5
+*.binaryproto
+*leveldb
+*lmdb
+
+######################### Compilation (build, distribute & bins) Files / Folders #########################
+*.bin
+*.testbin
+build
+*build_debug/
+*build_release/
+*cmake_build
+distribute/*
+python/caffe/proto/
+
+######################### Generated Documentation #########################
+_site
+docs/_site
+docs/dev
+docs/gathered
+doxygen
+html/
+
+######################### Video Files #########################
+# Testing videos
+*.mp4
+*.mov
+
+######################### Validation Scripts & Testing #########################
+*validation.sh
+validation*.sh
+output*/
