@@ -5,7 +5,7 @@ OpenPose Library - Basic Overview
 
 ## Modules Diagram
 <p align="center">
-    <img src="https://github.com/CMU-Perceptual-Computing-Lab/openpose_private/blob/master/doc/UML/1_0_0rc1/UML.png", width="720">
+    <img src="../doc/UML/1_0_0rc1/UML.png", width="720">
 </p>
 
 

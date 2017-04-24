@@ -29,11 +29,11 @@ This work is based on the C++ code from [C++ real-time ECCV 2016 demo](https://g
 
 ## Results
 <p align="center">
-    <img src="https://github.com/CMU-Perceptual-Computing-Lab/openpose_private/blob/master/doc/media/dance.gif", width="720">
+    <img src="doc/media/dance.gif", width="720">
 </p>
 
 <p align="center">
-    <img src="https://github.com/CMU-Perceptual-Computing-Lab/openpose_private/blob/master/doc/media/shake.gif", width="720">
+    <img src="doc/media/shake.gif", width="720">
 </p>
 
 
