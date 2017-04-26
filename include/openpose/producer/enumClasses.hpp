@@ -18,7 +18,8 @@ namespace op
     };
 
     /**
-     * A class enum in which all the possible type of Producer are included. In order to add a new Producer,
+     * Type of producers
+     * An enum class in which all the possible type of Producer are included. In order to add a new Producer,
      * include its name in this enum and add a new 'else if' statement inside ProducerFactory::createProducer().
      */
     enum class ProducerType : unsigned char

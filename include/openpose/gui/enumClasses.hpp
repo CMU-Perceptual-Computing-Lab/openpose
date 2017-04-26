@@ -4,7 +4,8 @@
 namespace op
 {
     /** 
-     * A class enum with the different output screen options (e.g. full screen, windored or disabling the display).
+     * GUI display modes.
+     * An enum class with the different output screen options (e.g. full screen, windored or disabling the display).
      */
     enum class GuiDisplayMode : bool
     {

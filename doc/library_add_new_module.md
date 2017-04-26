@@ -16,7 +16,7 @@ In order to add a new module, these are the recommended steps in order to develo
 
         2. Use the whole op::Datum as unique argument of your auxiliary functions.
 
-        3. Use the OpenPose Wrapper in ThreadMode::SingleThread mode (e.g. it allows you to directly use cv::imshow).
+        3. Use the OpenPose Wrapper in ThreadManagerMode::SingleThread mode (e.g. it allows you to directly use cv::imshow).
 
         4. If you are using your own custom Caffe -> initially change the Caffe for your version. It should directly work.
 

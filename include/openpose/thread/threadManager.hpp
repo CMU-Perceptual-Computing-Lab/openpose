@@ -19,7 +19,7 @@ namespace op
     {
     public:
         // Completely customizable case
-        explicit ThreadManager(const ThreadMode threadMode = ThreadMode::Synchronous);
+        explicit ThreadManager(const ThreadManagerMode threadManagerMode = ThreadManagerMode::Synchronous);
 
         void setDefaultMaxSizeQueues(const long long defaultMaxSizeQueues = -1);
 
@@ -58,7 +58,7 @@ namespace op
         bool waitAndPop(TDatums& tDatums);
 
     private:
-        const ThreadMode mThreadMode;
+        const ThreadManagerMode mThreadManagerMode;
         std::shared_ptr<std::atomic<bool>> spIsRunning;
         long long mDefaultMaxSizeQueues;
         std::multiset<std::tuple<unsigned long long, std::vector<TWorker>, unsigned long long, unsigned long long>> mThreadWorkerQueues;
@@ -95,8 +95,8 @@ namespace op
 namespace op
 {
     template<typename TDatums, typename TWorker, typename TQueue>
-    ThreadManager<TDatums, TWorker, TQueue>::ThreadManager(const ThreadMode threadMode) :
-        mThreadMode{threadMode},
+    ThreadManager<TDatums, TWorker, TQueue>::ThreadManager(const ThreadManagerMode threadManagerMode) :
+        mThreadManagerMode{threadManagerMode},
         spIsRunning{std::make_shared<std::atomic<bool>>(false)},
         mDefaultMaxSizeQueues{-1ll}
     {
@@ -130,7 +130,8 @@ namespace op
     }
 
     template<typename TDatums, typename TWorker, typename TQueue>
-    void ThreadManager<TDatums, TWorker, TQueue>::add(const unsigned long long threadId, const TWorker& tWorker, const unsigned long long queueInId, const unsigned long long queueOutId)
+    void ThreadManager<TDatums, TWorker, TQueue>::add(const unsigned long long threadId, const TWorker& tWorker, const unsigned long long queueInId,
+                                                      const unsigned long long queueOutId)
     {
         try
         {
@@ -227,8 +228,8 @@ namespace op
     {
         try
         {
-            if (mThreadMode != ThreadMode::Asynchronous && mThreadMode != ThreadMode::AsynchronousIn)
-                error("Not available for this ThreadMode.", __LINE__, __FUNCTION__, __FILE__);
+            if (mThreadManagerMode != ThreadManagerMode::Asynchronous && mThreadManagerMode != ThreadManagerMode::AsynchronousIn)
+                error("Not available for this ThreadManagerMode.", __LINE__, __FUNCTION__, __FILE__);
             if (mTQueues.empty())
                 error("ThreadManager already stopped or not started yet.", __LINE__, __FUNCTION__, __FILE__);
             return mTQueues[0]->tryEmplace(tDatums);
@@ -245,8 +246,8 @@ namespace op
     {
         try
         {
-            if (mThreadMode != ThreadMode::Asynchronous && mThreadMode != ThreadMode::AsynchronousIn)
-                error("Not available for this ThreadMode.", __LINE__, __FUNCTION__, __FILE__);
+            if (mThreadManagerMode != ThreadManagerMode::Asynchronous && mThreadManagerMode != ThreadManagerMode::AsynchronousIn)
+                error("Not available for this ThreadManagerMode.", __LINE__, __FUNCTION__, __FILE__);
             if (mTQueues.empty())
                 error("ThreadManager already stopped or not started yet.", __LINE__, __FUNCTION__, __FILE__);
             return mTQueues[0]->waitAndEmplace(tDatums);
@@ -263,8 +264,8 @@ namespace op
     {
         try
         {
-            if (mThreadMode != ThreadMode::Asynchronous && mThreadMode != ThreadMode::AsynchronousIn)
-                error("Not available for this ThreadMode.", __LINE__, __FUNCTION__, __FILE__);
+            if (mThreadManagerMode != ThreadManagerMode::Asynchronous && mThreadManagerMode != ThreadManagerMode::AsynchronousIn)
+                error("Not available for this ThreadManagerMode.", __LINE__, __FUNCTION__, __FILE__);
             if (mTQueues.empty())
                 error("ThreadManager already stopped or not started yet.", __LINE__, __FUNCTION__, __FILE__);
             return mTQueues[0]->tryPush(tDatums);
@@ -281,8 +282,8 @@ namespace op
     {
         try
         {
-            if (mThreadMode != ThreadMode::Asynchronous && mThreadMode != ThreadMode::AsynchronousIn)
-                error("Not available for this ThreadMode.", __LINE__, __FUNCTION__, __FILE__);
+            if (mThreadManagerMode != ThreadManagerMode::Asynchronous && mThreadManagerMode != ThreadManagerMode::AsynchronousIn)
+                error("Not available for this ThreadManagerMode.", __LINE__, __FUNCTION__, __FILE__);
             if (mTQueues.empty())
                 error("ThreadManager already stopped or not started yet.", __LINE__, __FUNCTION__, __FILE__);
             return mTQueues[0]->waitAndPush(tDatums);
@@ -299,8 +300,8 @@ namespace op
     {
         try
         {
-            if (mThreadMode != ThreadMode::Asynchronous && mThreadMode != ThreadMode::AsynchronousOut)
-                error("Not available for this ThreadMode.", __LINE__, __FUNCTION__, __FILE__);
+            if (mThreadManagerMode != ThreadManagerMode::Asynchronous && mThreadManagerMode != ThreadManagerMode::AsynchronousOut)
+                error("Not available for this ThreadManagerMode.", __LINE__, __FUNCTION__, __FILE__);
             if (mTQueues.empty())
                 error("ThreadManager already stopped or not started yet.", __LINE__, __FUNCTION__, __FILE__);
             return (*mTQueues.rbegin())->tryPop(tDatums);
@@ -317,8 +318,8 @@ namespace op
     {
         try
         {
-            if (mThreadMode != ThreadMode::Asynchronous && mThreadMode != ThreadMode::AsynchronousOut)
-                error("Not available for this ThreadMode.", __LINE__, __FUNCTION__, __FILE__);
+            if (mThreadManagerMode != ThreadManagerMode::Asynchronous && mThreadManagerMode != ThreadManagerMode::AsynchronousOut)
+                error("Not available for this ThreadManagerMode.", __LINE__, __FUNCTION__, __FILE__);
             if (mTQueues.empty())
                 error("ThreadManager already stopped or not started yet.", __LINE__, __FUNCTION__, __FILE__);
             return (*mTQueues.rbegin())->waitAndPop(tDatums);
@@ -331,7 +332,8 @@ namespace op
     }
 
     template<typename TDatums, typename TWorker, typename TQueue>
-    void ThreadManager<TDatums, TWorker, TQueue>::add(const std::vector<std::tuple<unsigned long long, std::vector<TWorker>, unsigned long long, unsigned long long>>& threadWorkerQueues)
+    void ThreadManager<TDatums, TWorker, TQueue>::add(const std::vector<std::tuple<unsigned long long, std::vector<TWorker>,
+                                                                                   unsigned long long, unsigned long long>>& threadWorkerQueues)
     {
         try
         {
@@ -345,12 +347,14 @@ namespace op
     }
 
     template<typename TDatums, typename TWorker, typename TQueue>
-    void ThreadManager<TDatums, TWorker, TQueue>::add(const std::vector<std::tuple<unsigned long long, TWorker, unsigned long long, unsigned long long>>& threadWorkerQueues)
+    void ThreadManager<TDatums, TWorker, TQueue>::add(const std::vector<std::tuple<unsigned long long, TWorker, unsigned long long,
+                                                                                   unsigned long long>>& threadWorkerQueues)
     {
         try
         {
             for (const auto& threadWorkerQueue : threadWorkerQueues)
-                add({std::make_tuple(std::get<0>(threadWorkerQueue), std::vector<TWorker>{std::get<1>(threadWorkerQueue)}, std::get<2>(threadWorkerQueue), std::get<3>(threadWorkerQueue))});
+                add({std::make_tuple(std::get<0>(threadWorkerQueue), std::vector<TWorker>{std::get<1>(threadWorkerQueue)},
+                                     std::get<2>(threadWorkerQueue), std::get<3>(threadWorkerQueue))});
         }
         catch (const std::exception& e)
         {
@@ -379,32 +383,32 @@ namespace op
                 {
                     auto& thread = mThreads[std::get<0>(threadWorkerQueue)];
                     const auto& tWorkers = std::get<1>(threadWorkerQueue);
-                    const auto queueInId = std::get<2>(threadWorkerQueue);
-                    const auto queueOutId = std::get<3>(threadWorkerQueue);
+                    const auto queueIn = std::get<2>(threadWorkerQueue);
+                    const auto queueOut = std::get<3>(threadWorkerQueue);
                     std::shared_ptr<SubThread<TDatums, TWorker>> subThread;
                     // If AsynchronousIn -> queue indexes are OK
-                    if (mThreadMode == ThreadMode::Asynchronous || mThreadMode == ThreadMode::AsynchronousIn)
+                    if (mThreadManagerMode == ThreadManagerMode::Asynchronous || mThreadManagerMode == ThreadManagerMode::AsynchronousIn)
                     {
-                        if (mThreadMode == ThreadMode::AsynchronousIn && queueOutId == mTQueues.size())
-                            subThread = {std::make_shared<SubThreadQueueIn<TDatums, TWorker, TQueue>>(tWorkers, mTQueues.at(queueInId))};
+                        if (mThreadManagerMode == ThreadManagerMode::AsynchronousIn && queueOut == mTQueues.size())
+                            subThread = {std::make_shared<SubThreadQueueIn<TDatums, TWorker, TQueue>>(tWorkers, mTQueues.at(queueIn))};
                         else
-                            subThread = {std::make_shared<SubThreadQueueInOut<TDatums, TWorker, TQueue>>(tWorkers, mTQueues.at(queueInId), mTQueues.at(queueOutId))};
+                            subThread = {std::make_shared<SubThreadQueueInOut<TDatums, TWorker, TQueue>>(tWorkers, mTQueues.at(queueIn), mTQueues.at(queueOut))};
                     }
                     // If !AsynchronousIn -> queue indexes - 1
-                    else if (queueOutId != maxQueueIdSynchronous || mThreadMode == ThreadMode::AsynchronousOut)
+                    else if (queueOut != maxQueueIdSynchronous || mThreadManagerMode == ThreadManagerMode::AsynchronousOut)
                     {
                         // Queue in + out
-                        if (queueInId != 0)
-                            subThread = {std::make_shared<SubThreadQueueInOut<TDatums, TWorker, TQueue>>(tWorkers, mTQueues.at(queueInId-1), mTQueues.at(queueOutId-1))};
+                        if (queueIn != 0)
+                            subThread = {std::make_shared<SubThreadQueueInOut<TDatums, TWorker, TQueue>>(tWorkers, mTQueues.at(queueIn-1), mTQueues.at(queueOut-1))};
                         // Case queue out (first TWorker(s))
                         else
-                            subThread = {std::make_shared<SubThreadQueueOut<TDatums, TWorker, TQueue>>(tWorkers, mTQueues.at(queueOutId-1))};
+                            subThread = {std::make_shared<SubThreadQueueOut<TDatums, TWorker, TQueue>>(tWorkers, mTQueues.at(queueOut-1))};
                     }
                     // Case queue in (last TWorker(s))
-                    else if (queueInId != 0) // && queueOutId == maxQueueIdSynchronous
-                        subThread = {std::make_shared<SubThreadQueueIn<TDatums, TWorker, TQueue>>(tWorkers, mTQueues.at(queueInId-1))};
+                    else if (queueIn != 0) // && queueOut == maxQueueIdSynchronous
+                        subThread = {std::make_shared<SubThreadQueueIn<TDatums, TWorker, TQueue>>(tWorkers, mTQueues.at(queueIn-1))};
                     // Case no queue
-                    else // if (queueInId == 0 && queueOutId == maxQueueIdSynchronous)
+                    else // if (queueIn == 0 && queueOut == maxQueueIdSynchronous)
                         subThread = {std::make_shared<SubThreadNoQueue<TDatums, TWorker>>(tWorkers)};
                     thread->add(subThread);
                 }
@@ -430,7 +434,7 @@ namespace op
             {
                 const auto currentThreadId = std::get<0>(threadWorkerQueue);
                 if (currentThreadId - previousThreadId > 1)
-                    error("Missing thread id " + std::to_string(currentThreadId) + " (of " + std::to_string(maxThreadId) + ").", __LINE__, __FUNCTION__, __FILE__);
+                    error("Missing thread id " + std::to_string(currentThreadId) + " of " + std::to_string(maxThreadId) + ".", __LINE__, __FUNCTION__, __FILE__);
                 previousThreadId = currentThreadId;
             }
 
@@ -480,14 +484,14 @@ namespace op
                 }
 
                 // Create Queues
-                if (mThreadMode == ThreadMode::Asynchronous)
+                if (mThreadManagerMode == ThreadManagerMode::Asynchronous)
                     mTQueues.resize(maxQueueId+1);   // First and last one are queues
-                else if (mThreadMode == ThreadMode::Synchronous)
+                else if (mThreadManagerMode == ThreadManagerMode::Synchronous)
                     mTQueues.resize(maxQueueId-1);   // First and last one are not actually queues
-                else if (mThreadMode == ThreadMode::AsynchronousIn || mThreadMode == ThreadMode::AsynchronousOut)
+                else if (mThreadManagerMode == ThreadManagerMode::AsynchronousIn || mThreadManagerMode == ThreadManagerMode::AsynchronousOut)
                     mTQueues.resize(maxQueueId);   // First or last one is queue
                 else
-                    error("Unknown ThreadMode", __LINE__, __FUNCTION__, __FILE__);
+                    error("Unknown ThreadManagerMode", __LINE__, __FUNCTION__, __FILE__);
                 for (auto& tQueue : mTQueues)
                     tQueue = {std::make_shared<TQueue>(mDefaultMaxSizeQueues)};
             }

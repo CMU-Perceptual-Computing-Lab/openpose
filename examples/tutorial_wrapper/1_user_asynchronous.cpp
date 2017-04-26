@@ -282,22 +282,22 @@ int openPoseTutorialWrapper1()
     op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
     // Configure OpenPose
-    op::Wrapper<std::vector<UserDatum>> opWrapper{op::ThreadMode::Asynchronous};
+    op::Wrapper<std::vector<UserDatum>> opWrapper{op::ThreadManagerMode::Asynchronous};
     const bool displayGui = false;
     const bool guiVerbose = false;
     const bool fullScreen = false;
-    const op::WrapperPoseStruct wrapperPoseStruct{netInputSize, outputSize, scaleMode, FLAGS_num_gpu, FLAGS_num_gpu_start, FLAGS_num_scales, (float)FLAGS_scale_gap,
+    const op::WrapperStructPose wrapperStructPose{netInputSize, outputSize, scaleMode, FLAGS_num_gpu, FLAGS_num_gpu_start, FLAGS_num_scales, (float)FLAGS_scale_gap,
                                                   !FLAGS_no_render_output, poseModel, !FLAGS_disable_blending, (float)FLAGS_alpha_pose, (float)FLAGS_alpha_heatmap,
                                                   FLAGS_part_to_show, FLAGS_model_folder, heatMapTypes, heatMapsScaleMode};
-    const op::WrapperOutputStruct wrapperOutputStruct{displayGui, guiVerbose, fullScreen, FLAGS_write_pose, op::stringToDataFormat(FLAGS_write_pose_format),
+    const op::WrapperStructOutput wrapperStructOutput{displayGui, guiVerbose, fullScreen, FLAGS_write_pose, op::stringToDataFormat(FLAGS_write_pose_format),
                                                       FLAGS_write_pose_json, FLAGS_write_coco_json, FLAGS_write_images, FLAGS_write_images_format, FLAGS_write_video,
                                                       FLAGS_write_heatmaps, FLAGS_write_heatmaps_format};
-    // Pose configuration (use WrapperPoseStruct{} for default and recommended configuration)
+    // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
     // Producer (use default to disable any input)
     // Consumer (comment or use default argument to disable any output)
-    opWrapper.configure(wrapperPoseStruct, op::WrapperInputStruct{}, wrapperOutputStruct);
+    opWrapper.configure(wrapperStructPose, op::WrapperStructInput{}, wrapperStructOutput);
     // Set to single-thread running (for debugging purposes)
-    // opWrapper.setWrapperMode(op::WrapperMode::SingleThread);
+    // opWrapper.disableMultiThreading();
 
     op::log("Starting thread(s)", op::Priority::Max);
     opWrapper.start();

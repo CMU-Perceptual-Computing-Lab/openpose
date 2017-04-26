@@ -3,7 +3,7 @@ OpenPose
 
 ## Introduction
 
-OpenPose is a **library for real-time multi-person key-point detection and multi-threading written in C++** using OpenCV and Caffe, authored by [Gines Hidalgo](https://www.linkedin.com/in/gineshidalgo/), [Zhe Cao](http://www.andrew.cmu.edu/user/zhecao), [Tomas Simon](http://www.cs.cmu.edu/~tsimon/), [Shih-En Wei](https://scholar.google.com/citations?user=sFQD3k4AAAAJ&hl=en), [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/).
+OpenPose is a **library for real-time multi-person key-point detection and multi-threading written in C++** using OpenCV and Caffe, authored by [Gines Hidalgo](https://www.linkedin.com/in/gineshidalgo/), [Zhe Cao](http://www.andrew.cmu.edu/user/zhecao), [Tomas Simon](http://www.cs.cmu.edu/~tsimon/), [Shih-En Wei](https://scholar.google.com/citations?user=sFQD3k4AAAAJ&hl=en) and [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/).
 
 OpenPose is freely available for free non-commercial use, and may be redistributed under these conditions. Please, see the [license](LICENSE) for further details. Contact us for commercial purposes.
 
@@ -53,7 +53,7 @@ This work is based on the C++ code from [C++ real-time ECCV 2016 demo](https://g
 
 
 ## Installation
-Installation steps on [installation.md](doc/installation.md).
+Installation steps on [doc/installation.md](doc/installation.md).
 
 
 
@@ -65,7 +65,7 @@ Most users cases should not need to dive deep into the library, they might just 
 #### Demo
 Your case if you just want to process a folder of images or video or webcam and display or save the pose results.
 
-Forget about the OpenPose library details and just read the [demo_overview.md](doc/demo_overview.md) 1-page section.
+Forget about the OpenPose library details and just read the [doc/demo_overview.md](doc/demo_overview.md) 1-page section.
 
 #### OpenPose Wrapper
 Your case if you want to read a specific format of image source and/or add a specific post-processing function and/or implement your own display/saving.
@@ -77,16 +77,17 @@ Note: you should not need to modify OpenPose source code or examples, so that yo
 #### OpenPose Library
 Your case if you want to change internal functions and/or extend its functionality. First, take a look to the [Demo](#demo) and [OpenPose Wrapper](#openpose-wrapper). Secondly, read the 2 following subsections: OpenPose Overview and Extending Functionality.
 
-1. OpenPose Overview: Learn the basics about our library source code on [library_overview.md](doc/library_overview.md).
+1. OpenPose Overview: Learn the basics about our library source code on [doc/library_overview.md](doc/library_overview.md).
 
-2. Extending Functionality: Learn how to extend our library on [library_extend_functionality.md](doc/library_extend_functionality.md).
+2. Extending Functionality: Learn how to extend our library on [doc/library_extend_functionality.md](doc/library_extend_functionality.md).
 
-3. Adding An Extra Module: Learn how to add an extra module on [library_add_new_module.md](doc/library_add_new_module.md).
+3. Adding An Extra Module: Learn how to add an extra module on [doc/library_add_new_module.md](doc/library_add_new_module.md).
 
 #### Doxygen Documentation Autogeneration
-You can generate the documentation by running the following command. The documentation will be generated on `doc/doxygen/html/index.html`. You can simply open it with double click and your favourite browser will display it.
+You can generate the documentation by running the following command. The documentation will be generated on `doc/doxygen/html/index.html`. You can simply open it with double click (your default browser should automatically display it).
 ```
-doxygen doc/doc_autogeneration.doxygen
+cd doc/
+doxygen doc_autogeneration.doxygen
 ```
 
 

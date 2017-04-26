@@ -1,158 +1,177 @@
 #ifndef OPENPOSE__WRAPPER__WRAPPER_HPP
 #define OPENPOSE__WRAPPER__WRAPPER_HPP
 
-#include "../core/headers.hpp"
-#include "../experimental/hands/headers.hpp"
-#include "../filestream/headers.hpp"
-#include "../pose/headers.hpp"
-#include "../producer/headers.hpp"
 #include "../thread/headers.hpp"
-#include "enumClasses.hpp"
+#include "wrapperStructPose.hpp"
+#include "wrapperStructHands.hpp"
+#include "wrapperStructInput.hpp"
+#include "wrapperStructOutput.hpp"
 
 namespace op
 {
-    struct WrapperPoseStruct
-    {
-        cv::Size netInputSize;
-        cv::Size outputSize;
-        ScaleMode scaleMode;
-        int gpuNumber;
-        int gpuNumberStart;
-        int scalesNumber;
-        float scaleGap;
-        bool renderOutput;
-        PoseModel poseModel;
-        bool blendOriginalFrame;
-        float alphaPose;
-        float alphaHeatMap;
-        int defaultPartToRender;
-        std::string modelFolder;
-        std::vector<HeatMapType> heatMapTypes;
-        ScaleMode heatMapScaleMode;
-
-        WrapperPoseStruct(const cv::Size& netInputSize = cv::Size{656, 368}, const cv::Size& outputSize = cv::Size{1280, 720},
-                          const ScaleMode scaleMode = ScaleMode::InputResolution, const int gpuNumber = 1, const int gpuNumberStart = 0, const int scalesNumber = 1,
-                          const float scaleGap = 0.15f, const bool renderOutput = false, const PoseModel poseModel = PoseModel::COCO_18,
-                          const bool blendOriginalFrame = true, const float alphaPose = POSE_DEFAULT_ALPHA_POSE, const float alphaHeatMap = POSE_DEFAULT_ALPHA_HEATMAP,
-                          const int defaultPartToRender = 0, const std::string& modelFolder = "models/",
-                          const std::vector<HeatMapType>& heatMapTypes = {}, const ScaleMode heatMapScaleMode = ScaleMode::ZeroToOne);
-    };
-
-    namespace experimental
-    {
-        struct WrapperHandsStruct
-        {
-            bool extractAndRenderHands;
-
-            WrapperHandsStruct(const bool extractAndRenderHands = false);
-        };
-    }
-
-    struct WrapperInputStruct
-    {
-        std::shared_ptr<Producer> producerSharedPtr;
-        unsigned long long frameFirst;
-        unsigned long long frameLast;
-        bool realTimeProcessing;
-        bool frameFlip;
-        int frameRotate;
-        bool framesRepeat;
-
-        WrapperInputStruct(const std::shared_ptr<Producer> producerSharedPtr = nullptr, const unsigned long long frameFirst = 0,
-                           const unsigned long long frameLast = -1, const bool realTimeProcessing = false, const bool frameFlip = false,
-                           const int frameRotate = 0, const bool framesRepeat = false);
-    };
-
-    struct WrapperOutputStruct
-    {
-        bool displayGui;
-        bool guiVerbose;
-        bool fullScreen;
-        std::string writePose;
-        DataFormat dataFormat;
-        std::string writePoseJson;
-        std::string writeCocoJson;
-        std::string writeImages;
-        std::string writeImagesFormat;
-        std::string writeVideo;
-        std::string writeHeatMaps;
-        std::string writeHeatMapsFormat;
-
-        WrapperOutputStruct(const bool displayGui = false, const bool guiVerbose = false, const bool fullScreen = false, const std::string& writePose = "",
-                            const DataFormat dataFormat = DataFormat::Json, const std::string& writePoseJson = "", const std::string& writeCocoJson = "",
-                            const std::string& writeImages = "", const std::string& writeImagesFormat = "", const std::string& writeVideo = "",
-                            const std::string& writeHeatMaps = "", const std::string& writeHeatMapsFormat = "");
-    };
-
-    // This function can be used in 2 ways:
-        // - Synchronous mode: call the full constructor with your desired input and output workers
-        // - Asynchronous mode: call the empty constructor Wrapper() + use the emplace and pop functions to push the original frames and retrieve the processed ones
-        // - Mix of them:
-            // Synchronous input + asynchronous output: call the constructor Wrapper(ThreadMode::Synchronous, workersInput, {}, true)
-            // Asynchronous input + synchronous output: call the constructor Wrapper(ThreadMode::Synchronous, nullptr, workersOutput, irrelevantBoolean, true)
+    /**
+     * Wrapper: OpenPose all-in-one wrapper template class.
+     * Wrapper allows the user to set up the input (video, webcam, custom input, etc.), pose, face and/or hands estimation and rendering,
+     * and output (integrated small GUI, custom output, etc.).
+     *
+     * This function can be used in 2 ways:
+     *     - Synchronous mode: call the full constructor with your desired input and output workers.
+     *     - Asynchronous mode: call the empty constructor Wrapper() + use the emplace and pop functions to push the original frames and
+     *       retrieve the processed ones.
+     *     - Mix of them:
+     *         - Synchronous input + asynchronous output: call the constructor Wrapper(ThreadManagerMode::Synchronous, workersInput, {}, true)
+     *         - Asynchronous input + synchronous output: call the constructor
+     *           Wrapper(ThreadManagerMode::Synchronous, nullptr, workersOutput, irrelevantBoolean, true)
+     */
     template<typename TDatums, typename TWorker = std::shared_ptr<Worker<std::shared_ptr<TDatums>>>, typename TQueue = Queue<std::shared_ptr<TDatums>>>
     class Wrapper
     {
     public:
-        explicit Wrapper(const ThreadMode threadMode = ThreadMode::Synchronous);
+        /**
+         * Constructor.
+         * @param threadManagerMode Thread syncronization mode. If set to ThreadManagerMode::Synchronous, everything will run inside the Wrapper. If
+         * ThreadManagerMode::Synchronous(In/Out), then input (frames producer) and/or output (GUI, writing results, etc.) will be controlled
+         * outside the Wrapper class by the user. See ThreadManagerMode for a detailed explanation of when to use each one.
+         */
+        explicit Wrapper(const ThreadManagerMode threadManagerMode = ThreadManagerMode::Synchronous);
 
+        /**
+         * Destructor.
+         * It automatically frees resources.
+         */
         ~Wrapper();
 
-        // Useful for debugging -> all the Workers will run in the same thread (workerOnNewThread will not make any effect)
-        void setWrapperMode(const WrapperMode wrapperMode);
+        /**
+         * Disable multi-threading.
+         * Useful for debugging and logging, all the Workers will run in the same thread.
+         * Note that workerOnNewThread (argument for setWorkerInput, setWorkerPostProcessing and setWorkerOutput) will not make any effect.
+         */
+        void disableMultiThreading();
 
+        /**
+         * Add an user-defined extra Worker as frames generator.
+         * @param worker TWorker to be added.
+         * @param workerOnNewThread Whether to add this TWorker on a new thread (if it is computationally demanding) or simply reuse
+         * existing threads (for light functions). Set to true if the performance time is unknown.
+         */
         void setWorkerInput(const TWorker& worker, const bool workerOnNewThread = true);
 
+        /**
+         * Add an user-defined extra Worker as frames post-processor.
+         * @param worker TWorker to be added.
+         * @param workerOnNewThread Whether to add this TWorker on a new thread (if it is computationally demanding) or simply reuse
+         * existing threads (for light functions). Set to true if the performance time is unknown.
+         */
         void setWorkerPostProcessing(const TWorker& worker, const bool workerOnNewThread = true);
 
+        /**
+         * Add an user-defined extra Worker as frames consumer (custom display and/or saving).
+         * @param worker TWorker to be added.
+         * @param workerOnNewThread Whether to add this TWorker on a new thread (if it is computationally demanding) or simply reuse
+         * existing threads (for light functions). Set to true if the performance time is unknown.
+         */
         void setWorkerOutput(const TWorker& worker, const bool workerOnNewThread = true);
 
-        // If output is not required, just use this function until the renderOutput argument. Keep the default values for the other parameters in order not to display/save any output.
-        void configure(const WrapperPoseStruct& wrapperPoseStruct,
-                       // Producer (set producerSharedPtr = nullptr or use the default WrapperInputStruct{} to disable any input)
-                       const WrapperInputStruct& wrapperInputStruct = WrapperInputStruct{},
+        // If output is not required, just use this function until the renderOutput argument. Keep the default values for the other parameters
+        // in order not to display/save any output.
+        void configure(const WrapperStructPose& wrapperStructPose,
+                       // Producer (set producerSharedPtr = nullptr or use the default WrapperStructInput{} to disable any input)
+                       const WrapperStructInput& wrapperStructInput = WrapperStructInput{},
                        // Consumer (keep default values to disable any output)
-                       const WrapperOutputStruct& wrapperOutputStruct = WrapperOutputStruct{});
+                       const WrapperStructOutput& wrapperStructOutput = WrapperStructOutput{});
 
         // Similar to the previos configure, but it includes hand extraction and rendering
-        void configure(const WrapperPoseStruct& wrapperPoseStruct = WrapperPoseStruct{},
-                       // Hand (use the default WrapperHandsStruct{} to disable any hand detector)
-                       const experimental::WrapperHandsStruct& wrapperHandStruct = experimental::WrapperHandsStruct{},
-                       // Producer (set producerSharedPtr = nullptr or use the default WrapperInputStruct{} to disable any input)
-                       const WrapperInputStruct& wrapperInputStruct = WrapperInputStruct{},
+        void configure(const WrapperStructPose& wrapperStructPose = WrapperStructPose{},
+                       // Hand (use the default WrapperStructHands{} to disable any hand detector)
+                       const experimental::WrapperStructHands& wrapperHandStruct = experimental::WrapperStructHands{},
+                       // Producer (set producerSharedPtr = nullptr or use the default WrapperStructInput{} to disable any input)
+                       const WrapperStructInput& wrapperStructInput = WrapperStructInput{},
                        // Consumer (keep default values to disable any output)
-                       const WrapperOutputStruct& wrapperOutputStruct = WrapperOutputStruct{});
+                       const WrapperStructOutput& wrapperStructOutput = WrapperStructOutput{});
 
+        /**
+         * Function to start multi-threading.
+         * Similar to start(), but exec() blocks the thread that calls the function (it saves 1 thread). Use exec() instead of
+         * start() if the calling thread will otherwise be waiting for the Wrapper to end.
+         */
         void exec();
 
+        /**
+         * Function to start multi-threading.
+         * Similar to exec(), but start() does not block the thread that calls the function. It just opens new threads, so it
+         * lets the user perform other tasks meanwhile on the calling thread.
+         */
         void start();
 
+        /**
+         * Function to stop multi-threading.
+         * It can be called internally or externally.
+         */
         void stop();
 
-        void reset();
-
+        /**
+         * Whether the Wrapper is running.
+         * It will return true after exec() or start() and before stop(), and false otherwise.
+         * @return Boolean specifying whether the Wrapper is running.
+         */
         bool isRunning() const;
 
-        // Asynchronous(In) mode
+        /**
+         * Emplace (move) an element on the first (input) queue.
+         * Only valid if ThreadManagerMode::Asynchronous or ThreadManagerMode::AsynchronousIn.
+         * If the input queue is full or the Wrapper was stopped, it will return false and not emplace it.
+         * @param tDatums std::shared_ptr<TDatums> element to be emplaced.
+         * @return Boolean specifying whether the tDatums could be emplaced.
+         */
         bool tryEmplace(std::shared_ptr<TDatums>& tDatums);
 
-        // Asynchronous(In) mode
+        /**
+         * Emplace (move) an element on the first (input) queue.
+         * Similar to tryEmplace.
+         * However, if the input queue is full, it will wait until it can emplace it.
+         * If the Wrapper class is stopped before adding the element, it will return false and not emplace it.
+         * @param tDatums std::shared_ptr<TDatums> element to be emplaced.
+         * @return Boolean specifying whether the tDatums could be emplaced.
+         */
         bool waitAndEmplace(std::shared_ptr<TDatums>& tDatums);
 
-        // Asynchronous(In) mode
+        /**
+         * Push (copy) an element on the first (input) queue.
+         * Same as tryEmplace, but it copies the data instead of moving it.
+         * @param tDatums std::shared_ptr<TDatums> element to be pushed.
+         * @return Boolean specifying whether the tDatums could be pushed.
+         */
         bool tryPush(const std::shared_ptr<TDatums>& tDatums);
 
-        // Asynchronous(In) mode
+        /**
+         * Push (copy) an element on the first (input) queue.
+         * Same as waitAndEmplace, but it copies the data instead of moving it.
+         * @param tDatums std::shared_ptr<TDatums> element to be pushed.
+         * @return Boolean specifying whether the tDatums could be pushed.
+         */
         bool waitAndPush(const std::shared_ptr<TDatums>& tDatums);
 
-        // Asynchronous(Out) mode
+        /**
+         * Pop (retrieve) an element from the last (output) queue.
+         * Only valid if ThreadManagerMode::Asynchronous or ThreadManagerMode::AsynchronousOut.
+         * If the output queue is empty or the Wrapper was stopped, it will return false and not retrieve it.
+         * @param tDatums std::shared_ptr<TDatums> element where the retrieved element will be placed.
+         * @return Boolean specifying whether the tDatums could be retrieved.
+         */
         bool tryPop(std::shared_ptr<TDatums>& tDatums);
 
-        // Asynchronous(Out) mode
+        /**
+         * Pop (retrieve) an element from the last (output) queue.
+         * Similar to tryPop.
+         * However, if the output queue is empty, it will wait until it can pop an element.
+         * If the Wrapper class is stopped before popping the element, it will return false and not retrieve it.
+         * @param tDatums std::shared_ptr<TDatums> element where the retrieved element will be placed.
+         * @return Boolean specifying whether the tDatums could be retrieved.
+         */
         bool waitAndPop(std::shared_ptr<TDatums>& tDatums);
 
     private:
-        const ThreadMode mThreadMode;
+        const ThreadManagerMode mThreadManagerMode;
         const std::shared_ptr<std::pair<std::atomic<bool>, std::atomic<int>>> spVideoSeek;
         ThreadManager<std::shared_ptr<TDatums>> mThreadManager;
         int mGpuNumber;
@@ -160,7 +179,7 @@ namespace op
         bool mUserPostProcessingWsOnNewThread;
         bool mUserOutputWsOnNewThread;
         unsigned int mThreadId;
-        WrapperMode mWrapperMode;
+        bool mMultiThreadEnabled;
         // Workers
         std::vector<TWorker> mUserInputWs;
         TWorker wDatumProducer;
@@ -174,10 +193,38 @@ namespace op
         TWorker spWGui;
         std::vector<TWorker> mUserOutputWs;
 
+        /**
+         * Frees TWorker variables (private internal function).
+         * For most cases, this class is non-necessary, since std::shared_ptr are automatically cleaned on destruction of each class.
+         * However, it might be useful if the same Wrapper is gonna be started twice (not recommended on most cases).
+         */
+        void reset();
+
+        /**
+         * Set ThreadManager from TWorkers (private internal function).
+         * After any configure() has been called, the TWorkers are initialized. This function resets the ThreadManager and adds them. 
+         * Common code for start() and exec().
+         */
         void configureThreadManager();
 
+        /**
+         * Thread ID increase (private internal function).
+         * If multi-threading mode, it increases the thread ID.
+         * If single-threading mode (for debugging), it does not modify it.
+         * Note that mThreadId must be re-initialized to 0 before starting a new Wrapper configuration.
+         * @return unsigned int with the next thread id value.
+         */
         unsigned int threadIdPP();
 
+        /**
+         * TWorker concatenator (private internal function).
+         * Auxiliary function that concatenate std::vectors of TWorker. Since TWorker is some kind of smart pointer (usually
+         * std::shared_ptr), its copy still shares the same internal data. It will not work for TWorker classes that do not share
+         * the data when moved.
+         * @param workersA First std::shared_ptr<TDatums> element to be concatenated.
+         * @param workersB Second std::shared_ptr<TDatums> element to be concatenated.
+         * @return Concatenated std::vector<TWorker> of both workersA and workersB.
+         */
         std::vector<TWorker> mergeWorkers(const std::vector<TWorker>& workersA, const std::vector<TWorker>& workersB);
 
         DELETE_COPY(Wrapper);
@@ -189,18 +236,22 @@ namespace op
 
 
 // Implementation
+#include "../core/headers.hpp"
 #include "../experimental/headers.hpp"
+#include "../filestream/headers.hpp"
 #include "../gui/headers.hpp"
+#include "../pose/headers.hpp"
+#include "../producer/headers.hpp"
 #include "../utilities/errorAndLog.hpp"
 #include "../utilities/fileSystem.hpp"
 namespace op
 {
     template<typename TDatums, typename TWorker, typename TQueue>
-    Wrapper<TDatums, TWorker, TQueue>::Wrapper(const ThreadMode threadMode) :
-        mThreadMode{threadMode},
+    Wrapper<TDatums, TWorker, TQueue>::Wrapper(const ThreadManagerMode threadManagerMode) :
+        mThreadManagerMode{threadManagerMode},
         spVideoSeek{std::make_shared<std::pair<std::atomic<bool>, std::atomic<int>>>()},
-        mThreadManager{threadMode},
-        mWrapperMode{WrapperMode::MultiThread}
+        mThreadManager{threadManagerMode},
+        mMultiThreadEnabled{true}
     {
         try
         {
@@ -229,11 +280,11 @@ namespace op
     }
 
     template<typename TDatums, typename TWorker, typename TQueue>
-    void Wrapper<TDatums, TWorker, TQueue>::setWrapperMode(const WrapperMode wrapperMode)
+    void Wrapper<TDatums, TWorker, TQueue>::disableMultiThreading()
     {
         try
         {
-            mWrapperMode = {wrapperMode};
+            mMultiThreadEnabled = false;
         }
         catch (const std::exception& e)
         {
@@ -293,12 +344,12 @@ namespace op
     }
 
     template<typename TDatums, typename TWorker, typename TQueue>
-    void Wrapper<TDatums, TWorker, TQueue>::configure(const WrapperPoseStruct& wrapperPoseStruct, const WrapperInputStruct& wrapperInputStruct,
-                                                      const WrapperOutputStruct& wrapperOutputStruct)
+    void Wrapper<TDatums, TWorker, TQueue>::configure(const WrapperStructPose& wrapperStructPose, const WrapperStructInput& wrapperStructInput,
+                                                      const WrapperStructOutput& wrapperStructOutput)
     {
         try
         {
-            configure(wrapperPoseStruct, experimental::WrapperHandsStruct{}, wrapperInputStruct, wrapperOutputStruct);
+            configure(wrapperStructPose, experimental::WrapperStructHands{}, wrapperStructInput, wrapperStructOutput);
         }
         catch (const std::exception& e)
         {
@@ -307,8 +358,8 @@ namespace op
     }
 
     template<typename TDatums, typename TWorker, typename TQueue>
-    void Wrapper<TDatums, TWorker, TQueue>::configure(const WrapperPoseStruct& wrapperPoseStruct, const experimental::WrapperHandsStruct& wrapperHandStruct,
-                                                      const WrapperInputStruct& wrapperInputStruct, const WrapperOutputStruct& wrapperOutputStruct)
+    void Wrapper<TDatums, TWorker, TQueue>::configure(const WrapperStructPose& wrapperStructPose, const experimental::WrapperStructHands& wrapperHandStruct,
+                                                      const WrapperStructInput& wrapperStructInput, const WrapperStructOutput& wrapperStructOutput)
     {
         try
         {
@@ -318,119 +369,145 @@ namespace op
             typedef std::shared_ptr<TDatums> TDatumsPtr;
 
             // Check no contradictory flags enabled
-            if (wrapperPoseStruct.alphaPose < 0. || wrapperPoseStruct.alphaPose > 1. || wrapperPoseStruct.alphaHeatMap < 0. || wrapperPoseStruct.alphaHeatMap > 1.)
+            if (wrapperStructPose.alphaPose < 0. || wrapperStructPose.alphaPose > 1. || wrapperStructPose.alphaHeatMap < 0.
+                || wrapperStructPose.alphaHeatMap > 1.)
                 error("Alpha value for blending must be in the range [0,1].", __LINE__, __FUNCTION__, __FILE__);
-            if (wrapperPoseStruct.scaleGap <= 0.f && wrapperPoseStruct.scalesNumber > 1)
+            if (wrapperStructPose.scaleGap <= 0.f && wrapperStructPose.scalesNumber > 1)
                 error("The scale gap must be greater than 0 (it has no effect if the number of scales is 1).", __LINE__, __FUNCTION__, __FILE__);
-            if (!wrapperPoseStruct.renderOutput && (!wrapperOutputStruct.writeImages.empty() || !wrapperOutputStruct.writeVideo.empty()))
-                error("In order to save the rendered frames (`write_images` or `write_video`), you must set `render_output` to true.", __LINE__, __FUNCTION__, __FILE__);
-            if (!wrapperOutputStruct.writeHeatMaps.empty() && wrapperPoseStruct.heatMapTypes.empty())
+            if (!wrapperStructPose.renderOutput && (!wrapperStructOutput.writeImages.empty() || !wrapperStructOutput.writeVideo.empty()))
             {
-                const auto message = "In order to save the heatmaps (`write_heatmaps`), you need to pick which heat maps you want to save: `heatmaps_add_X`"
-                                     " flags or fill the wrapperPoseStruct.heatMapTypes.";
+                const auto message = "In order to save the rendered frames (`write_images` or `write_video`), you must set `render_output` to true.";
                 error(message, __LINE__, __FUNCTION__, __FILE__);
             }
-            if (!wrapperOutputStruct.writeHeatMaps.empty() && wrapperPoseStruct.heatMapScaleMode != ScaleMode::UnsignedChar)
-                error("In order to save the heatmaps, you must set wrapperPoseStruct.heatMapScaleMode to ScaleMode::UnsignedChar, i.e. range [0, 255].", __LINE__, __FUNCTION__, __FILE__);
-            if (mUserOutputWs.empty() && mThreadMode != ThreadMode::Asynchronous && mThreadMode != ThreadMode::AsynchronousOut)
+            if (!wrapperStructOutput.writeHeatMaps.empty() && wrapperStructPose.heatMapTypes.empty())
             {
-                const std::string additionalMessage = " You could also set mThreadMode = mThreadMode::Asynchronous(Out) and/or add your own output worker class"
-                                                      " before calling this function.";
-                const auto savingSomething = (!wrapperOutputStruct.writeImages.empty() || !wrapperOutputStruct.writeVideo.empty() || !wrapperOutputStruct.writePose.empty()
-                                              || !wrapperOutputStruct.writePoseJson.empty() || !wrapperOutputStruct.writeCocoJson.empty()
-                                              || !wrapperOutputStruct.writeHeatMaps.empty());
-                if (!wrapperOutputStruct.displayGui && !savingSomething)
+                const auto message = "In order to save the heatmaps (`write_heatmaps`), you need to pick which heat maps you want to save: `heatmaps_add_X`"
+                                     " flags or fill the wrapperStructPose.heatMapTypes.";
+                error(message, __LINE__, __FUNCTION__, __FILE__);
+            }
+            if (!wrapperStructOutput.writeHeatMaps.empty() && wrapperStructPose.heatMapScaleMode != ScaleMode::UnsignedChar)
+            {
+                const auto message = "In order to save the heatmaps, you must set wrapperStructPose.heatMapScaleMode to ScaleMode::UnsignedChar,"
+                                     " i.e. range [0, 255].";
+                error(message, __LINE__, __FUNCTION__, __FILE__);
+            }
+            if (mUserOutputWs.empty() && mThreadManagerMode != ThreadManagerMode::Asynchronous && mThreadManagerMode != ThreadManagerMode::AsynchronousOut)
+            {
+                const std::string additionalMessage = " You could also set mThreadManagerMode = mThreadManagerMode::Asynchronous(Out) and/or add your own output worker"
+                                                      " class before calling this function.";
+                const auto savingSomething = (!wrapperStructOutput.writeImages.empty() || !wrapperStructOutput.writeVideo.empty()
+                                              || !wrapperStructOutput.writePose.empty() || !wrapperStructOutput.writePoseJson.empty()
+                                              || !wrapperStructOutput.writeCocoJson.empty() || !wrapperStructOutput.writeHeatMaps.empty());
+                if (!wrapperStructOutput.displayGui && !savingSomething)
                 {
-                    const auto message = "No output is selected (`no_display`) and no results are generated (no `write_X` flags enabled). Thus, no output would be "
-                                         "generated." + additionalMessage;
+                    const auto message = "No output is selected (`no_display`) and no results are generated (no `write_X` flags enabled). Thus,"
+                                         " no output would be generated." + additionalMessage;
                     error(message, __LINE__, __FUNCTION__, __FILE__);
                 }
 
-                if ((wrapperOutputStruct.displayGui && wrapperOutputStruct.guiVerbose) && !wrapperPoseStruct.renderOutput)
+                if ((wrapperStructOutput.displayGui && wrapperStructOutput.guiVerbose) && !wrapperStructPose.renderOutput)
                 {
-                    const auto message = "No render is enabled (`no_render_output`), so you should also remove the display (set `no_display` or `no_gui_verbose`)."
-                                       + additionalMessage;
+                    const auto message = "No render is enabled (`no_render_output`), so you should also remove the display (set `no_display`"
+                                         " or `no_gui_verbose`)." + additionalMessage;
                     error(message, __LINE__, __FUNCTION__, __FILE__);
                 }
-                if (wrapperInputStruct.framesRepeat && savingSomething)
+                if (wrapperStructInput.framesRepeat && savingSomething)
                 {
                     const auto message = "Frames repetition (`frames_repeat`) is enabled as well as some writing function (`write_X`). This program would"
                                          " never stop recording the same frames over and over. Please, disable repetition or remove writing.";
                     error(message, __LINE__, __FUNCTION__, __FILE__);
                 }
-                if (wrapperInputStruct.realTimeProcessing && savingSomething)
+                if (wrapperStructInput.realTimeProcessing && savingSomething)
                 {
-                    const auto message = "Real time processing is enabled as well as some writing function. Thus, some frames might be skipped. Consider disabling"
-                                         " real time processing if you intend to save any results.";
+                    const auto message = "Real time processing is enabled as well as some writing function. Thus, some frames might be skipped. Consider"
+                                         " disabling real time processing if you intend to save any results.";
                     log(message, Priority::Max, __LINE__, __FUNCTION__, __FILE__);
                 }
             }
-            if (!wrapperOutputStruct.writeVideo.empty() && wrapperInputStruct.producerSharedPtr == nullptr)
-                error("Writting video is only available if the OpenPose producer is used (i.e. wrapperInputStruct.producerSharedPtr cannot be a nullptr).");
+            if (!wrapperStructOutput.writeVideo.empty() && wrapperStructInput.producerSharedPtr == nullptr)
+                error("Writting video is only available if the OpenPose producer is used (i.e. wrapperStructInput.producerSharedPtr cannot be a nullptr).");
 
             // Proper format
-            const auto writeImagesCleaned = formatAsDirectory(wrapperOutputStruct.writeImages);
-            const auto writePoseCleaned = formatAsDirectory(wrapperOutputStruct.writePose);
-            const auto writePoseJsonCleaned = formatAsDirectory(wrapperOutputStruct.writePoseJson);
-            const auto writeHeatMapsCleaned = formatAsDirectory(wrapperOutputStruct.writeHeatMaps);
+            const auto writeImagesCleaned = formatAsDirectory(wrapperStructOutput.writeImages);
+            const auto writePoseCleaned = formatAsDirectory(wrapperStructOutput.writePose);
+            const auto writePoseJsonCleaned = formatAsDirectory(wrapperStructOutput.writePoseJson);
+            const auto writeHeatMapsCleaned = formatAsDirectory(wrapperStructOutput.writeHeatMaps);
 
             // Common parameters
-            auto finalOutputSize = wrapperPoseStruct.outputSize;
+            auto finalOutputSize = wrapperStructPose.outputSize;
             cv::Size producerSize{-1,-1};
-            if (wrapperInputStruct.producerSharedPtr != nullptr)
+            if (wrapperStructInput.producerSharedPtr != nullptr)
             {
                 // 1. Set producer properties
-                const auto displayProducerFpsMode = (wrapperInputStruct.realTimeProcessing ? ProducerFpsMode::OriginalFps : ProducerFpsMode::RetrievalFps);
-                wrapperInputStruct.producerSharedPtr->setProducerFpsMode(displayProducerFpsMode);
-                wrapperInputStruct.producerSharedPtr->set(ProducerProperty::Flip, wrapperInputStruct.frameFlip);
-                wrapperInputStruct.producerSharedPtr->set(ProducerProperty::Rotation, wrapperInputStruct.frameRotate);
-                wrapperInputStruct.producerSharedPtr->set(ProducerProperty::AutoRepeat, wrapperInputStruct.framesRepeat);
+                const auto displayProducerFpsMode = (wrapperStructInput.realTimeProcessing ? ProducerFpsMode::OriginalFps : ProducerFpsMode::RetrievalFps);
+                wrapperStructInput.producerSharedPtr->setProducerFpsMode(displayProducerFpsMode);
+                wrapperStructInput.producerSharedPtr->set(ProducerProperty::Flip, wrapperStructInput.frameFlip);
+                wrapperStructInput.producerSharedPtr->set(ProducerProperty::Rotation, wrapperStructInput.frameRotate);
+                wrapperStructInput.producerSharedPtr->set(ProducerProperty::AutoRepeat, wrapperStructInput.framesRepeat);
                 // 2. Set finalOutputSize
-                producerSize = cv::Size{(int)wrapperInputStruct.producerSharedPtr->get(CV_CAP_PROP_FRAME_WIDTH), (int)wrapperInputStruct.producerSharedPtr->get(CV_CAP_PROP_FRAME_HEIGHT)};
-                if (wrapperPoseStruct.outputSize.width == -1 || wrapperPoseStruct.outputSize.height == -1)
+                producerSize = cv::Size{(int)wrapperStructInput.producerSharedPtr->get(CV_CAP_PROP_FRAME_WIDTH),
+                                        (int)wrapperStructInput.producerSharedPtr->get(CV_CAP_PROP_FRAME_HEIGHT)};
+                if (wrapperStructPose.outputSize.width == -1 || wrapperStructPose.outputSize.height == -1)
                 {
                     if (producerSize.area() > 0)
                         finalOutputSize = producerSize;
                     else
-                        error("Output resolution = input resolution not valid for image reading (size might change between images).", __LINE__, __FUNCTION__, __FILE__);
+                    {
+                        const auto message = "Output resolution = input resolution not valid for image reading (size might change between images).";
+                        error(message, __LINE__, __FUNCTION__, __FILE__);
+                    }
                 }
             }
             else if (finalOutputSize.width == -1 || finalOutputSize.height == -1)
-                error("Output resolution cannot be (-1 x -1) unless wrapperInputStruct.producerSharedPtr is also set.", __LINE__, __FUNCTION__, __FILE__);
+            {
+                const auto message = "Output resolution cannot be (-1 x -1) unless wrapperStructInput.producerSharedPtr is also set.";
+                error(message, __LINE__, __FUNCTION__, __FILE__);
+            }
 
             // Update global parameter
-            mGpuNumber = wrapperPoseStruct.gpuNumber;
+            mGpuNumber = wrapperStructPose.gpuNumber;
 
             // Producer
-            if (wrapperInputStruct.producerSharedPtr != nullptr)
+            if (wrapperStructInput.producerSharedPtr != nullptr)
             {
-                const auto datumProducer = std::make_shared<DatumProducer<TDatums>>(wrapperInputStruct.producerSharedPtr, wrapperInputStruct.frameFirst, wrapperInputStruct.frameLast, spVideoSeek);
+                const auto datumProducer = std::make_shared<DatumProducer<TDatums>>(
+                    wrapperStructInput.producerSharedPtr, wrapperStructInput.frameFirst, wrapperStructInput.frameLast, spVideoSeek
+                );
                 wDatumProducer = std::make_shared<WDatumProducer<TDatumsPtr, TDatums>>(datumProducer);
             }
             else
                 wDatumProducer = nullptr;
 
             // Pose estimators
-            const cv::Size& netOutputSize = wrapperPoseStruct.netInputSize;
+            const cv::Size& netOutputSize = wrapperStructPose.netInputSize;
             std::vector<std::shared_ptr<PoseExtractor>> poseExtractors;
-            for (auto gpuId = 0; gpuId < wrapperPoseStruct.gpuNumber; gpuId++)
-                poseExtractors.emplace_back(std::make_shared<PoseExtractorCaffe>(wrapperPoseStruct.netInputSize, netOutputSize, finalOutputSize, wrapperPoseStruct.scalesNumber,
-                                                                                 wrapperPoseStruct.scaleGap, wrapperPoseStruct.poseModel, wrapperPoseStruct.modelFolder,
-                                                                                 gpuId + wrapperPoseStruct.gpuNumberStart, wrapperPoseStruct.heatMapTypes,
-                                                                                 wrapperPoseStruct.heatMapScaleMode));
+            for (auto gpuId = 0; gpuId < wrapperStructPose.gpuNumber; gpuId++)
+                poseExtractors.emplace_back(std::make_shared<PoseExtractorCaffe>(
+                    wrapperStructPose.netInputSize, netOutputSize, finalOutputSize, wrapperStructPose.scalesNumber,
+                    wrapperStructPose.scaleGap, wrapperStructPose.poseModel, wrapperStructPose.modelFolder,
+                    gpuId + wrapperStructPose.gpuNumberStart, wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScaleMode
+                ));
             // Pose renderers
             std::vector<std::shared_ptr<PoseRenderer>> poseRenderers;
-            if (wrapperPoseStruct.renderOutput)
+            if (wrapperStructPose.renderOutput)
+            {
                 for (auto gpuId = 0; gpuId < poseExtractors.size(); gpuId++)
-                    poseRenderers.emplace_back(std::make_shared<PoseRenderer>(netOutputSize, finalOutputSize, wrapperPoseStruct.poseModel, poseExtractors[gpuId],
-                                                                              wrapperPoseStruct.blendOriginalFrame, wrapperPoseStruct.alphaPose,
-                                                                              wrapperPoseStruct.alphaHeatMap, wrapperPoseStruct.defaultPartToRender));
+                {
+                    poseRenderers.emplace_back(std::make_shared<PoseRenderer>(
+                        netOutputSize, finalOutputSize, wrapperStructPose.poseModel, poseExtractors[gpuId],
+                        wrapperStructPose.blendOriginalFrame, wrapperStructPose.alphaPose,
+                        wrapperStructPose.alphaHeatMap, wrapperStructPose.defaultPartToRender
+                    ));
+                }
+            }
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
             // Input cvMat to OpenPose format
-            const auto cvMatToOpInput = std::make_shared<CvMatToOpInput>(wrapperPoseStruct.netInputSize, wrapperPoseStruct.scalesNumber, wrapperPoseStruct.scaleGap);
+            const auto cvMatToOpInput = std::make_shared<CvMatToOpInput>(
+                wrapperStructPose.netInputSize, wrapperStructPose.scalesNumber, wrapperStructPose.scaleGap
+            );
             spWCvMatToOpInput = std::make_shared<WCvMatToOpInput<TDatumsPtr>>(cvMatToOpInput);
-            const auto cvMatToOpOutput = std::make_shared<CvMatToOpOutput>(finalOutputSize, wrapperPoseStruct.renderOutput);
+            const auto cvMatToOpOutput = std::make_shared<CvMatToOpOutput>(finalOutputSize, wrapperStructPose.renderOutput);
             spWCvMatToOpOutput = std::make_shared<WCvMatToOpOutput<TDatumsPtr>>(cvMatToOpOutput);
 
             // Pose extractor(s)
@@ -444,8 +521,9 @@ namespace op
             {
                 for (auto gpuId = 0; gpuId < spWPoses.size(); gpuId++)
                 {
-                    const auto handsExtractor = std::make_shared<experimental::HandsExtractor>(wrapperPoseStruct.modelFolder, gpuId + wrapperPoseStruct.gpuNumberStart,
-                                                                                               wrapperPoseStruct.poseModel);
+                    const auto handsExtractor = std::make_shared<experimental::HandsExtractor>(
+                        wrapperStructPose.modelFolder, gpuId + wrapperStructPose.gpuNumberStart, wrapperStructPose.poseModel
+                    );
                     spWPoses.at(gpuId).emplace_back(std::make_shared<experimental::WHandsExtractor<TDatumsPtr>>(handsExtractor));
                 }
             }
@@ -461,7 +539,7 @@ namespace op
                 for (auto i = 0; i < spWPoses.size(); i++)
                 {
                     // Construct hands renderer
-                    const auto handsRenderer = std::make_shared<experimental::HandsRenderer>(wrapperPoseStruct.outputSize);
+                    const auto handsRenderer = std::make_shared<experimental::HandsRenderer>(finalOutputSize);
                     // Performance boost -> share spGpuMemoryPtr for all renderers
                     if (!poseRenderers.empty())
                     {
@@ -479,16 +557,17 @@ namespace op
             if (spWPoses.size() > 1)
                 mPostProcessingWs.emplace_back(std::make_shared<WQueueOrderer<TDatumsPtr>>());
             // Frames processor (OpenPose format -> cv::Mat format)
-            if (wrapperPoseStruct.renderOutput)
+            if (wrapperStructPose.renderOutput)
             {
                 const auto opOutputToCvMat = std::make_shared<OpOutputToCvMat>(finalOutputSize);
                 mPostProcessingWs.emplace_back(std::make_shared<WOpOutputToCvMat<TDatumsPtr>>(opOutputToCvMat));
             }
-            // Resize pose to input size if we want to save any results
-            if (wrapperPoseStruct.scaleMode != ScaleMode::OutputResolution && (wrapperPoseStruct.scaleMode != ScaleMode::InputResolution || (finalOutputSize != producerSize))
-                 && (wrapperPoseStruct.scaleMode != ScaleMode::NetOutputResolution || (finalOutputSize != netOutputSize)))
+            // Re-scale pose if desired
+            if (wrapperStructPose.poseScaleMode != ScaleMode::OutputResolution
+                && (wrapperStructPose.poseScaleMode != ScaleMode::InputResolution || (finalOutputSize != producerSize))
+                && (wrapperStructPose.poseScaleMode != ScaleMode::NetOutputResolution || (finalOutputSize != netOutputSize)))
             {
-                auto arrayScaler = std::make_shared<ArrayScaler>(wrapperPoseStruct.scaleMode);
+                auto arrayScaler = std::make_shared<ArrayScaler>(wrapperStructPose.poseScaleMode);
                 mPostProcessingWs.emplace_back(std::make_shared<WArrayScaler<TDatumsPtr>>(arrayScaler));
             }
 
@@ -496,7 +575,7 @@ namespace op
             // Write people pose data on disk (json for OpenCV >= 3, xml, yml...)
             if (!writePoseCleaned.empty())
             {
-                const auto poseSaver = std::make_shared<PoseSaver>(writePoseCleaned, wrapperOutputStruct.dataFormat);
+                const auto poseSaver = std::make_shared<PoseSaver>(writePoseCleaned, wrapperStructOutput.writePoseDataFormat);
                 mOutputWs.emplace_back(std::make_shared<WPoseSaver<TDatumsPtr>>(poseSaver));
             }
             // Write people pose data on disk (json format)
@@ -506,44 +585,50 @@ namespace op
                 mOutputWs.emplace_back(std::make_shared<WPoseJsonSaver<TDatumsPtr>>(poseJsonSaver));
             }
             // Write people pose data on disk (COCO validation json format)
-            if (!wrapperOutputStruct.writeCocoJson.empty())
+            if (!wrapperStructOutput.writeCocoJson.empty())
             {
                 const auto humanFormat = true; // If true, bigger size (and potentially slower to process), but easier for a human to read it
-                const auto poseJsonCocoSaver = std::make_shared<PoseJsonCocoSaver>(wrapperOutputStruct.writeCocoJson, humanFormat);
+                const auto poseJsonCocoSaver = std::make_shared<PoseJsonCocoSaver>(wrapperStructOutput.writeCocoJson, humanFormat);
                 mOutputWs.emplace_back(std::make_shared<experimental::WPoseJsonCocoSaver<TDatumsPtr>>(poseJsonCocoSaver));
             }
             // Write frames as desired image format on hard disk
             if (!writeImagesCleaned.empty())
             {
-                const auto imageSaver = std::make_shared<ImageSaver>(writeImagesCleaned, wrapperOutputStruct.writeImagesFormat);
+                const auto imageSaver = std::make_shared<ImageSaver>(writeImagesCleaned, wrapperStructOutput.writeImagesFormat);
                 mOutputWs.emplace_back(std::make_shared<WImageSaver<TDatumsPtr>>(imageSaver));
             }
             // Write frames as *.avi video on hard disk
-            if (!wrapperOutputStruct.writeVideo.empty() && wrapperInputStruct.producerSharedPtr != nullptr)
+            if (!wrapperStructOutput.writeVideo.empty() && wrapperStructInput.producerSharedPtr != nullptr)
             {
-                const auto originalVideoFps = (wrapperInputStruct.producerSharedPtr->getType() != ProducerType::Webcam && wrapperInputStruct.producerSharedPtr->get(CV_CAP_PROP_FPS) > 0.
-                                               ? wrapperInputStruct.producerSharedPtr->get(CV_CAP_PROP_FPS) : 30.);
-                const auto videoSaver = std::make_shared<VideoSaver>(wrapperOutputStruct.writeVideo, CV_FOURCC('M','J','P','G'), originalVideoFps, finalOutputSize);
+                const auto originalVideoFps = (wrapperStructInput.producerSharedPtr->getType() != ProducerType::Webcam
+                                               && wrapperStructInput.producerSharedPtr->get(CV_CAP_PROP_FPS) > 0.
+                                               ? wrapperStructInput.producerSharedPtr->get(CV_CAP_PROP_FPS) : 30.);
+                const auto videoSaver = std::make_shared<VideoSaver>(
+                    wrapperStructOutput.writeVideo, CV_FOURCC('M','J','P','G'), originalVideoFps, finalOutputSize
+                );
                 mOutputWs.emplace_back(std::make_shared<WVideoSaver<TDatumsPtr>>(videoSaver));
             }
             // Write heat maps as desired image format on hard disk
             if (!writeHeatMapsCleaned.empty())
             {
-                const auto heatMapSaver = std::make_shared<HeatMapSaver>(writeHeatMapsCleaned, wrapperOutputStruct.writeHeatMapsFormat);
+                const auto heatMapSaver = std::make_shared<HeatMapSaver>(writeHeatMapsCleaned, wrapperStructOutput.writeHeatMapsFormat);
                 mOutputWs.emplace_back(std::make_shared<WHeatMapSaver<TDatumsPtr>>(heatMapSaver));
             }
             // Add frame information for GUI
-            // If this WGuiInfoAdder instance is placed before the WImageSaver or WVideoSaver, then the resulting recorded frames will look exactly as the final displayed image by the GUI
-            if (wrapperOutputStruct.displayGui && wrapperOutputStruct.guiVerbose)
+            // If this WGuiInfoAdder instance is placed before the WImageSaver or WVideoSaver, then the resulting recorded frames will
+            // look exactly as the final displayed image by the GUI
+            if (wrapperStructOutput.displayGui && wrapperStructOutput.guiVerbose)
             {
-                const auto guiInfoAdder = std::make_shared<GuiInfoAdder>(finalOutputSize, wrapperPoseStruct.gpuNumber);
+                const auto guiInfoAdder = std::make_shared<GuiInfoAdder>(finalOutputSize, wrapperStructPose.gpuNumber);
                 mOutputWs.emplace_back(std::make_shared<WGuiInfoAdder<TDatumsPtr>>(guiInfoAdder));
             }
             // Minimal graphical user interface (GUI)
             spWGui = nullptr;
-            if (wrapperOutputStruct.displayGui)
+            if (wrapperStructOutput.displayGui)
             {
-                const auto gui = std::make_shared<Gui>(wrapperOutputStruct.fullScreen, finalOutputSize, mThreadManager.getIsRunningSharedPtr(), spVideoSeek, poseExtractors, poseRenderers);
+                const auto gui = std::make_shared<Gui>(
+                    wrapperStructOutput.fullScreen, finalOutputSize, mThreadManager.getIsRunningSharedPtr(), spVideoSeek, poseExtractors, poseRenderers
+                );
                 spWGui = {std::make_shared<WGui<TDatumsPtr>>(gui)};
             }
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
@@ -588,30 +673,6 @@ namespace op
         try
         {
             mThreadManager.stop();
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-        }
-    }
-
-    template<typename TDatums, typename TWorker, typename TQueue>
-    void Wrapper<TDatums, TWorker, TQueue>::reset()
-    {
-        try
-        {
-            mThreadManager.reset();
-            // Reset 
-            mUserInputWs.clear();
-            wDatumProducer = nullptr;
-            spWCvMatToOpInput = nullptr;
-            spWCvMatToOpOutput = nullptr;
-            spWPoses.clear();
-            mPostProcessingWs.clear();
-            mUserPostProcessingWs.clear();
-            mOutputWs.clear();
-            spWGui = nullptr;
-            mUserOutputWs.clear();
         }
         catch (const std::exception& e)
         {
@@ -730,6 +791,31 @@ namespace op
     }
 
     template<typename TDatums, typename TWorker, typename TQueue>
+    void Wrapper<TDatums, TWorker, TQueue>::reset()
+    {
+        try
+        {
+            mThreadManager.reset();
+            mThreadId = 0ull;
+            // Reset 
+            mUserInputWs.clear();
+            wDatumProducer = nullptr;
+            spWCvMatToOpInput = nullptr;
+            spWCvMatToOpOutput = nullptr;
+            spWPoses.clear();
+            mPostProcessingWs.clear();
+            mUserPostProcessingWs.clear();
+            mOutputWs.clear();
+            spWGui = nullptr;
+            mUserOutputWs.clear();
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    template<typename TDatums, typename TWorker, typename TQueue>
     void Wrapper<TDatums, TWorker, TQueue>::configureThreadManager()
     {
         try
@@ -739,11 +825,19 @@ namespace op
             // Security checks
             if (spWCvMatToOpInput == nullptr || spWCvMatToOpOutput == nullptr)
                 error("Configure the Wrapper class before calling `start()`.", __LINE__, __FUNCTION__, __FILE__);
-            if ((wDatumProducer == nullptr) == (mUserInputWs.empty()) && mThreadMode != ThreadMode::Asynchronous && mThreadMode != ThreadMode::AsynchronousIn)
-                error("You need to have 1 and only 1 producer selected. You can introduce your own producer by using setWorkerInput() or use the OpenPose default"
-                      " producer by configuring it in the configure function) or use the ThreadMode::Asynchronous(In) mode.", __LINE__, __FUNCTION__, __FILE__);
-            if (mOutputWs.empty() && mUserOutputWs.empty() && spWGui == nullptr && mThreadMode != ThreadMode::Asynchronous && mThreadMode != ThreadMode::AsynchronousOut)
+            if ((wDatumProducer == nullptr) == (mUserInputWs.empty())
+                && mThreadManagerMode != ThreadManagerMode::Asynchronous && mThreadManagerMode != ThreadManagerMode::AsynchronousIn)
+            {
+                const auto message = "You need to have 1 and only 1 producer selected. You can introduce your own producer by using setWorkerInput() or"
+                                     " use the OpenPose default producer by configuring it in the configure function) or use the"
+                                     " ThreadManagerMode::Asynchronous(In) mode.";
+                error(message, __LINE__, __FUNCTION__, __FILE__);
+            }
+            if (mOutputWs.empty() && mUserOutputWs.empty() && spWGui == nullptr && mThreadManagerMode != ThreadManagerMode::Asynchronous
+                && mThreadManagerMode != ThreadManagerMode::AsynchronousOut)
+            {
                 error("No output selected.", __LINE__, __FUNCTION__, __FILE__);
+            }
 
             // Thread Manager:
             // Clean previous thread manager (avoid configure to crash the program if used more than once)
@@ -755,9 +849,9 @@ namespace op
             spWIdGenerator = std::make_shared<WIdGenerator<std::shared_ptr<TDatums>>>();
             if (!mUserInputWs.empty() && mUserInputWsOnNewThread)
             {
-                mThreadManager.add(mThreadId, mUserInputWs, queueIn++, queueOut++);                             // Thread 0, queues 0 -> 1
+                mThreadManager.add(mThreadId, mUserInputWs, queueIn++, queueOut++);                     // Thread 0, queues 0 -> 1
                 threadIdPP();
-                mThreadManager.add(mThreadId, {spWIdGenerator, spWCvMatToOpInput, spWCvMatToOpOutput}, queueIn++, queueOut++);   // Thread 1, queues 1 -> 2
+                mThreadManager.add(mThreadId, {spWIdGenerator, spWCvMatToOpInput, spWCvMatToOpOutput}, queueIn++, queueOut++); // Thread 1, queues 1 -> 2
             }
             // If custom user Worker in same thread or producer on same thread
             else
@@ -770,17 +864,17 @@ namespace op
                 else if (wDatumProducer != nullptr)       
                     workersAux = mergeWorkers(workersAux, {wDatumProducer});
                 // Otherwise
-                else if (mThreadMode != ThreadMode::Asynchronous && mThreadMode != ThreadMode::AsynchronousIn)
+                else if (mThreadManagerMode != ThreadManagerMode::Asynchronous && mThreadManagerMode != ThreadManagerMode::AsynchronousIn)
                     error("No input selected.", __LINE__, __FUNCTION__, __FILE__);
 
                 workersAux = mergeWorkers(workersAux, {spWIdGenerator, spWCvMatToOpInput, spWCvMatToOpOutput});
-                mThreadManager.add(mThreadId, workersAux, queueIn++, queueOut++);                               // Thread 0 or 1, queues 0 -> 1
+                mThreadManager.add(mThreadId, workersAux, queueIn++, queueOut++);                       // Thread 0 or 1, queues 0 -> 1
             }
             threadIdPP();
             // Pose estimation & rendering
-            if (!spWPoses.empty())                                                                              // Thread 1 or 2...X, queues 1 -> 2, X = 2 + number GPUs
+            if (!spWPoses.empty())                                                                      // Thread 1 or 2...X, queues 1 -> 2, X = 2 + #GPUs
             {
-                if (mWrapperMode == WrapperMode::MultiThread)
+                if (mMultiThreadEnabled)
                 {
                     for (auto& wPose : spWPoses)
                     {
@@ -789,7 +883,10 @@ namespace op
                     }
                 }
                 else
+                {
+                    log("Debugging activated, only 1 thread running, all spWPoses have been disabled but the first one.");
                     mThreadManager.add(mThreadId, spWPoses.at(0), queueIn, queueOut);
+                }
                 queueIn++;
                 queueOut++;
             }
@@ -799,16 +896,16 @@ namespace op
                 // Post processing workers
                 if (!mPostProcessingWs.empty())
                 {
-                    mThreadManager.add(mThreadId, mPostProcessingWs, queueIn++, queueOut++);                    // Thread 2 or 3, queues 2 -> 3
+                    mThreadManager.add(mThreadId, mPostProcessingWs, queueIn++, queueOut++);                // Thread 2 or 3, queues 2 -> 3
                     threadIdPP();
                 }
                 // User processing workers
-                mThreadManager.add(mThreadId, mUserPostProcessingWs, queueIn++, queueOut++);                    // Thread 3 or 4, queues 3 -> 4
+                mThreadManager.add(mThreadId, mUserPostProcessingWs, queueIn++, queueOut++);                // Thread 3 or 4, queues 3 -> 4
                 threadIdPP();
                 // Output workers
                 if (!mOutputWs.empty())
                 {
-                    mThreadManager.add(mThreadId, mOutputWs, queueIn++, queueOut++);                            // Thread 4 or 5, queues 4 -> 5
+                    mThreadManager.add(mThreadId, mOutputWs, queueIn++, queueOut++);                        // Thread 4 or 5, queues 4 -> 5
                     threadIdPP();
                 }
             }
@@ -820,12 +917,12 @@ namespace op
                 workersAux = mergeWorkers(workersAux, mOutputWs);
                 if (!workersAux.empty())
                 {
-                    mThreadManager.add(mThreadId, workersAux, queueIn++, queueOut++);                           // Thread 2 or 3, queues 2 -> 3
+                    mThreadManager.add(mThreadId, workersAux, queueIn++, queueOut++);                       // Thread 2 or 3, queues 2 -> 3
                     threadIdPP();
                 }
             }
             // User output worker
-            if (!mUserOutputWs.empty())                                                                         // Thread Y, queues Q -> Q+1
+            if (!mUserOutputWs.empty())                                                                     // Thread Y, queues Q -> Q+1
             {
                 if (mUserOutputWsOnNewThread)
                 {
@@ -838,7 +935,7 @@ namespace op
             // OpenPose GUI
             if (spWGui != nullptr)
             {
-                mThreadManager.add(mThreadId, spWGui, queueIn++, queueOut++);                                   // Thread Y+1, queues Q+1 -> Q+2
+                mThreadManager.add(mThreadId, spWGui, queueIn++, queueOut++);                               // Thread Y+1, queues Q+1 -> Q+2
                 threadIdPP();
             }
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
@@ -854,7 +951,7 @@ namespace op
     {
         try
         {
-            if (mWrapperMode == WrapperMode::MultiThread)
+            if (mMultiThreadEnabled)
                 mThreadId++;
             return mThreadId;
         }

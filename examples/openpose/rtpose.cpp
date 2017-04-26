@@ -248,20 +248,20 @@ int opRealTimePoseDemo()
     // OpenPose wrapper
     op::log("Configuring OpenPose wrapper.", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
     op::Wrapper<std::vector<op::Datum>> opWrapper;
-    const op::WrapperPoseStruct wrapperPoseStruct{netInputSize, outputSize, scaleMode, FLAGS_num_gpu, FLAGS_num_gpu_start, FLAGS_num_scales, (float)FLAGS_scale_gap,
+    const op::WrapperStructPose wrapperStructPose{netInputSize, outputSize, scaleMode, FLAGS_num_gpu, FLAGS_num_gpu_start, FLAGS_num_scales, (float)FLAGS_scale_gap,
                                                   !FLAGS_no_render_output, poseModel, !FLAGS_disable_blending, (float)FLAGS_alpha_pose, (float)FLAGS_alpha_heatmap,
                                                   FLAGS_part_to_show, FLAGS_model_folder, heatMapTypes, op::ScaleMode::UnsignedChar};
-    const op::WrapperInputStruct wrapperInputStruct{producerSharedPtr, FLAGS_frame_first, FLAGS_frame_last, FLAGS_process_real_time, FLAGS_frame_flip,
+    const op::WrapperStructInput wrapperStructInput{producerSharedPtr, FLAGS_frame_first, FLAGS_frame_last, FLAGS_process_real_time, FLAGS_frame_flip,
                                                     FLAGS_frame_rotate, FLAGS_frames_repeat};
-    const op::WrapperOutputStruct wrapperOutputStruct{!FLAGS_no_display, !FLAGS_no_gui_verbose, FLAGS_fullscreen, FLAGS_write_pose, op::stringToDataFormat(FLAGS_write_pose_format),
+    const op::WrapperStructOutput wrapperStructOutput{!FLAGS_no_display, !FLAGS_no_gui_verbose, FLAGS_fullscreen, FLAGS_write_pose, op::stringToDataFormat(FLAGS_write_pose_format),
                                                       FLAGS_write_pose_json, FLAGS_write_coco_json, FLAGS_write_images, FLAGS_write_images_format, FLAGS_write_video,
                                                       FLAGS_write_heatmaps, FLAGS_write_heatmaps_format};
-    // Pose configuration (use WrapperPoseStruct{} for default and recommended configuration)
+    // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
     // Producer (use default to disable any input)
     // Consumer (comment or use default argument to disable any output)
-    opWrapper.configure(wrapperPoseStruct, wrapperInputStruct, wrapperOutputStruct);
+    opWrapper.configure(wrapperStructPose, wrapperStructInput, wrapperStructOutput);
     // Set to single-thread running (for debugging purposes)
-    // opWrapper.setWrapperMode(op::WrapperMode::SingleThread);
+    // opWrapper.disableMultiThreading();
 
     // Start processing
     // Two different ways of running the program on multithread enviroment
