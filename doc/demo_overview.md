@@ -23,6 +23,13 @@ Check that the library is working properly by using any of the following command
 ./build/examples/openpose/rtpose.bin --image_dir examples/media/
 ```
 
+The visual GUI should show the original image with the poses blended on it, similarly to the pose of this gif:
+<p align="center">
+    <img src="media/shake.gif", width="720">
+</p>
+
+
+
 ## Other Important Options
 Please, in order to check all the real time pose demo options and their details, run `./build/examples/openpose/rtpose.bin --help`. We describe here some of the most important ones.
 
@@ -60,6 +67,8 @@ The following command will save all the body part heat maps, background heat map
 ```
 ./build/examples/openpose/rtpose.bin --video examples/media/video.avi --heatmaps_add_parts --heatmaps_add_bkg --heatmaps_add_PAFs --write_heatmaps output_heatmaps_folder/
 ```
+
+
 
 ## Example
 The following example runs the video `vid.mp4`, renders image frames on `output/result.avi`, and outputs JSON files as `output/%12d.json`, parallelizing over 2 GPUs:

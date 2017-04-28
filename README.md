@@ -3,7 +3,9 @@ OpenPose
 
 ## Introduction
 
-OpenPose is a **library for real-time multi-person key-point detection and multi-threading written in C++** using OpenCV and Caffe, authored by [Gines Hidalgo](https://www.linkedin.com/in/gineshidalgo/), [Zhe Cao](http://www.andrew.cmu.edu/user/zhecao), [Tomas Simon](http://www.cs.cmu.edu/~tsimon/), [Shih-En Wei](https://scholar.google.com/citations?user=sFQD3k4AAAAJ&hl=en) and [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/).
+OpenPose is a **library for real-time multi-person key-point detection and multi-threading written in C++** using OpenCV and Caffe*, authored by [Gines Hidalgo](https://www.linkedin.com/in/gineshidalgo/), [Zhe Cao](http://www.andrew.cmu.edu/user/zhecao), [Tomas Simon](http://www.cs.cmu.edu/~tsimon/), [Shih-En Wei](https://scholar.google.com/citations?user=sFQD3k4AAAAJ&hl=en), [Hanbyul Joo](http://www.cs.cmu.edu/~hanbyulj/) and [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/).
+
+* It uses Caffe, but the code is ready to be ported to other frameworks (e.g. Tensorflow or Torch). If you implement any of those, please, make a pull request and we will add it!
 
 OpenPose is freely available for free non-commercial use, and may be redistributed under these conditions. Please, see the [license](LICENSE) for further details. Contact us for commercial purposes.
 
@@ -11,9 +13,13 @@ OpenPose is freely available for free non-commercial use, and may be redistribut
 
 Library main functionality:
 
-* Multi-person 18-body-part pose estimation and rendering.
+* Multi-person 15 or **18-key-point body pose** estimation and rendering.
 
-* Flexible and easy-to-configure multi-threading module.
+* Multi-person **2x21-key-point hand** estimation and rendering (coming soon in ~1 month!).
+
+* Multi-person **70-key-point face** estimation and rendering (coming soon in ~1.5 months!).
+
+* Flexible and easy-to-configure **multi-threading** module.
 
 * Image, video and webcam reader.
 
@@ -21,19 +27,34 @@ Library main functionality:
 
 * Small display and GUI for simple result visualization.
 
-* All the functionality is wrapped into a simple-to-use OpenPose::Wrapper class.
+* All the functionality is wrapped into a **simple-to-use OpenPose Wrapper class**.
 
-This work is based on the C++ code from [C++ real-time ECCV 2016 demo](https://github.com/CMU-Perceptual-Computing-Lab/caffe_rtpose), "Realtime Multiperson Pose Estimation", [Zhe Cao](http://www.andrew.cmu.edu/user/zhecao), [Tomas Simon](http://www.cs.cmu.edu/~tsimon/), [Shih-En Wei](https://scholar.google.com/citations?user=sFQD3k4AAAAJ&hl=en), [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/). The [full project repo](https://github.com/ZheC/Multi-Person-Pose-Estimation) includes Matlab and Python version, as well as training code.
+The pose estimation work is based on the C++ code from [C++ real-time ECCV 2016 demo](https://github.com/CMU-Perceptual-Computing-Lab/caffe_rtpose), "Realtime Multiperson Pose Estimation", [Zhe Cao](http://www.andrew.cmu.edu/user/zhecao), [Tomas Simon](http://www.cs.cmu.edu/~tsimon/), [Shih-En Wei](https://scholar.google.com/citations?user=sFQD3k4AAAAJ&hl=en), [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/). The [full project repo](https://github.com/ZheC/Multi-Person-Pose-Estimation) includes Matlab and Python version, as well as training code.
 
 
 
 ## Results
+### Body Estimation
+
 <p align="center">
     <img src="doc/media/dance.gif", width="720">
 </p>
 
+## Coming Soon (But Already Working!)
+### Body + Hands
+
 <p align="center">
-    <img src="doc/media/shake.gif", width="720">
+    <img src="doc/media/pose_hands.gif", width="720">
+</p>
+
+### Body + Face Estimation
+<p align="center">
+    <img src="doc/media/pose_face.gif", width="720">
+</p>
+
+### Body + Hands + Face Estimation
+<p align="center">
+    <img src="doc/media/pose_face_hands.gif", width="720">
 </p>
 
 
@@ -165,10 +186,19 @@ Just comment on GibHub or make a pull request! We will answer you back as soon a
 ## Citation
 Please cite the paper in your publications if it helps your research:
 
+### Pose Estimation
+
     @inproceedings{cao2017realtime,
       author = {Zhe Cao and Tomas Simon and Shih-En Wei and Yaser Sheikh},
       booktitle = {CVPR},
       title = {Realtime Multi-Person 2D Pose Estimation using Part Affinity Fields},
+      year = {2017}
+      }
+
+    @inproceedings{simon2017hand,
+      author = {Tomas Simon and Hanbyul Joo and Iain Matthews and Yaser Sheikh},
+      booktitle = {CVPR},
+      title = {Hand Keypoint Detection in Single Images using Multiview Bootstrapping},
       year = {2017}
       }
 
