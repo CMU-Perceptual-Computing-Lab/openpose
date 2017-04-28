@@ -25,14 +25,14 @@ namespace op
         /**
          * Output size of the final rendered image.
          * It barely affects performance compared to netInputSize.
-         * The final Datum.pose can be scaled with respect to outputSize if `poseScaleMode` is set to ScaleMode::OutputResolution, even if the
+         * The final Datum.poseKeyPoints can be scaled with respect to outputSize if `poseScaleMode` is set to ScaleMode::OutputResolution, even if the
          * rendering is disabled.
          */
         cv::Size outputSize;
 
         /**
-         * Final scale of the Array<float> Datum.pose and the writen pose data.
-         * The final Datum.pose can be scaled with respect to input size (ScaleMode::InputResolution), net output size (ScaleMode::NetOutputResolution),
+         * Final scale of the Array<float> Datum.poseKeyPoints and the writen pose data.
+         * The final Datum.poseKeyPoints can be scaled with respect to input size (ScaleMode::InputResolution), net output size (ScaleMode::NetOutputResolution),
          * output rendering size (ScaleMode::OutputResolution), from 0 to 1 (ScaleMode::ZeroToOne), and -1 to 1 (ScaleMode::PlusMinusOne).
          */
         ScaleMode poseScaleMode;

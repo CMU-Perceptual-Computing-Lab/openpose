@@ -3,6 +3,7 @@
 #include "openpose/utilities/errorAndLog.hpp"
 #include "openpose/utilities/cuda.hpp"
 #include "openpose/utilities/cuda.hu"
+#include "openpose/utilities/render.hu"
 #include "openpose/pose/poseRenderGpu.hpp"
 
 namespace op
@@ -141,162 +142,29 @@ namespace op
         colorPtr.z *= rad;
     }
 
-    __global__ void renderPoseCoco(float* targetPtr, const int targetWidth, const int targetHeight, const float* const posePtr,
-                                   const int numberPeople, const float threshold, const bool googlyEyes, const float blendOriginalFrame, const float alphaColorToAdd)
+    __global__ void renderPoseCoco(float* targetPtr, const int targetWidth, const int targetHeight, const float* const posePtr, const int numberPeople,
+                                   const float threshold, const bool googlyEyes, const float blendOriginalFrame, const float alphaColorToAdd)
     {
-        //posePtr has length 3 * 18 * numberPeople
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
         const auto globalIdx = threadIdx.y * blockDim.x + threadIdx.x;
 
-        __shared__ float sharedPoses[POSE_COCO_NUMBER_PARTS*3*POSE_MAX_PEOPLE];
+        // Shared parameters
         __shared__ float2 sharedMins[POSE_MAX_PEOPLE];
         __shared__ float2 sharedMaxs[POSE_MAX_PEOPLE];
         __shared__ float sharedScaleF[POSE_MAX_PEOPLE];
-        if (globalIdx < numberPeople)
-        {
-            sharedMins[globalIdx].x = targetWidth;
-            sharedMins[globalIdx].y = targetHeight;
-            sharedMaxs[globalIdx].x = 0.f;
-            sharedMaxs[globalIdx].y = 0.f;
-            for (auto part = 0 ; part < POSE_COCO_NUMBER_PARTS ; part++)
-            {
-                const auto index = 3 * (globalIdx*POSE_COCO_NUMBER_PARTS + part);
-                const auto x = posePtr[index];
-                const auto y = posePtr[index+1];
-                const auto score = posePtr[index+2];
-                sharedPoses[index] = x;
-                sharedPoses[index+1] = y;
-                sharedPoses[index+2] = score;
-                if (score > threshold)
-                {
-                    if (x < sharedMins[globalIdx].x)
-                        sharedMins[globalIdx].x = x;
-                    if (x > sharedMaxs[globalIdx].x)
-                        sharedMaxs[globalIdx].x = x;
-                    if (y < sharedMins[globalIdx].y)
-                        sharedMins[globalIdx].y = y;
-                    if (y > sharedMaxs[globalIdx].y)
-                        sharedMaxs[globalIdx].y = y;
-                }
-            }
-            const auto averageX = sharedMaxs[globalIdx].x-sharedMins[globalIdx].x;
-            const auto averageY = sharedMaxs[globalIdx].y-sharedMins[globalIdx].y;
-            sharedScaleF[globalIdx] = fastTruncate((averageX + averageY) / 400.f, 0.33f, 1.f);    // (averageX + averageY) / 2.f / 400.f
-            const auto constantToAdd = 50.f;
-            sharedMaxs[globalIdx].x += constantToAdd;
-            sharedMaxs[globalIdx].y += constantToAdd;
-            sharedMins[globalIdx].x -= constantToAdd;
-            sharedMins[globalIdx].y -= constantToAdd;
-        }
 
-        __syncthreads();
+        // Other parameters
+        const auto numberPartPairs = sizeof(COCO_PAIRS_GPU) / (2*sizeof(COCO_PAIRS_GPU[0]));
+        const auto numberColors = sizeof(COCO_RGB_COLORS) / (3*sizeof(COCO_RGB_COLORS[0]));
+        const auto radius = fastMin(targetWidth, targetHeight) / 100.f;
+        const auto stickwidth = fastMin(targetWidth, targetHeight) / 120.f;
 
-        const auto numberBodyParts = sizeof(COCO_PAIRS_GPU)/(2*sizeof(COCO_PAIRS_GPU[0]));
-        const auto numberColors = sizeof(COCO_RGB_COLORS)/(3*sizeof(COCO_RGB_COLORS[0]));
-        const auto radius = targetHeight / 100.f;
-        const auto stickwidth = targetHeight / 120.f;
-
-        if (x < targetWidth && y < targetHeight)
-        {
-            const auto baseIndex = y * targetWidth + x;
-            auto& b = targetPtr[                                 baseIndex];
-            auto& g = targetPtr[    targetWidth * targetHeight + baseIndex];
-            auto& r = targetPtr[2 * targetWidth * targetHeight + baseIndex];
-            if (!blendOriginalFrame)
-            {
-                b = 0.f;
-                g = 0.f;
-                r = 0.f;
-            }
-
-            for (auto person = 0; person < numberPeople; person++)
-            {
-                if (x <= sharedMaxs[person].x && x >= sharedMins[person].x && y <= sharedMaxs[person].y && y >= sharedMins[person].y)
-                {
-                    // Body part connections
-                    for (auto bodyPart = 0; bodyPart < numberBodyParts; bodyPart++)
-                    {
-                        const auto bSqrt = sharedScaleF[person] * sharedScaleF[person] * stickwidth * stickwidth;
-                        const auto partA = COCO_PAIRS_GPU[2*bodyPart];
-                        const auto partB = COCO_PAIRS_GPU[2*bodyPart+1];
-                        const auto indexA = person*POSE_COCO_NUMBER_PARTS*3 + partA*3;
-                        const auto xA = sharedPoses[indexA];
-                        const auto yA = sharedPoses[indexA + 1];
-                        const auto valueA = sharedPoses[indexA + 2];
-                        const auto indexB = person*POSE_COCO_NUMBER_PARTS*3 + partB*3;
-                        const auto xB = sharedPoses[indexB];
-                        const auto yB = sharedPoses[indexB + 1];
-                        const auto valueB = sharedPoses[indexB + 2];
-
-                        if (valueA > threshold && valueB > threshold)
-                        {
-                            const auto xP = (xA + xB) / 2.f;
-                            const auto yP = (yA + yB) / 2.f;
-                            const auto aSqrt = (xA - xP) * (xA - xP) + (yA - yP) * (yA - yP);
-
-                            const auto angle = atan2f(yB - yA, xB - xA);
-                            const auto sine = sinf(angle);
-                            const auto cosine = cosf(angle);
-                            const auto A = cosine * (x - xP) + sine * (y - yP);
-                            const auto B = sine * (x - xP) - cosine * (y - yP);
-
-                            const auto judge = A * A / aSqrt + B * B / bSqrt;
-                            const auto minV = 0.f;
-                            const auto maxV = 1.f;
-                            if (minV <= judge && judge <= maxV)
-                            {
-                                const auto index = (bodyPart%numberColors)*3;
-                                addColorWeighted(r, g, b, &COCO_RGB_COLORS[index], alphaColorToAdd);
-                            }
-                        }
-                    }
-
-                    // Body part circles
-                    for (unsigned char i = 0; i < POSE_COCO_NUMBER_PARTS; i++)
-                    {
-                        const auto index = 3 * (person*POSE_COCO_NUMBER_PARTS + i);
-                        const auto localX = sharedPoses[index];
-                        const auto localY = sharedPoses[index + 1];
-                        const auto value = sharedPoses[index + 2];
-
-                        if (value > threshold)
-                        {
-                            const auto dist2 = (x - localX) * (x - localX) + (y - localY) * (y - localY);
-
-                            if (googlyEyes && (i==14 || i==15))
-                            {
-                                const auto minr2 = sharedScaleF[person]*sharedScaleF[person]*(2.5*radius-2)*(2.5*radius-2);
-                                const auto maxr2 = sharedScaleF[person]*sharedScaleF[person]*2.5*2.5*radius*radius;
-                                if (dist2 <= maxr2)
-                                {
-                                    float colorToAdd [3] = {0., 0., 0.};
-                                    if (dist2 <= minr2)
-                                        for (auto& color : colorToAdd)
-                                            color = {255.f};
-                                    if (dist2 <= minr2*0.6)
-                                    {
-                                        const auto dist3 = (x-4 - localX) * (x-4 - localX) + (y - localY+4) * (y - localY+4);
-                                        if (dist3 > 3.75f*3.75f)
-                                            for (auto& color : colorToAdd)
-                                                color = {0.f};
-                                    }
-                                    const auto alphaColorToAdd = 0.9f;
-                                    addColorWeighted(r, g, b, colorToAdd, alphaColorToAdd);
-                                }
-                            }
-                            else
-                            {
-                                const auto minr2 = 0.f;
-                                const auto maxr2 = sharedScaleF[person]*sharedScaleF[person]*radius * radius;
-                                if (minr2 <= dist2 && dist2 <= maxr2)
-                                    addColorWeighted(r, g, b, &COCO_RGB_COLORS[(i%numberColors)*3], alphaColorToAdd);
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        // Render key points
+        renderKeyPoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF,
+                        globalIdx, x, y, targetWidth, targetHeight, posePtr, COCO_PAIRS_GPU, numberPeople,
+                        POSE_COCO_NUMBER_PARTS, numberPartPairs, COCO_RGB_COLORS, numberColors,
+                        radius, stickwidth, threshold, alphaColorToAdd);
     }
 
     __global__ void renderPoseMpi29Parts(float* targetPtr, const int targetWidth, const int targetHeight, const float* const posePtr,
@@ -305,25 +173,13 @@ namespace op
         //posePtr has length 3 * 15 * numberPeople
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
-        const auto globalIdx = threadIdx.y * blockDim.x + threadIdx.x;
-
-        __shared__ float sharedPoses[POSE_MPI_NUMBER_PARTS*3*POSE_MAX_PEOPLE];
-        if (globalIdx < numberPeople * POSE_MPI_NUMBER_PARTS)
-        {
-            const auto index = 3*globalIdx;
-            sharedPoses[index] = posePtr[index];
-            sharedPoses[index+1] = posePtr[index+1];
-            sharedPoses[index+2] = posePtr[index+2];
-        }
-
-        __syncthreads();
-
-        const auto numberBodyParts = sizeof(MPI_PAIRS_GPU)/(2*sizeof(MPI_PAIRS_GPU[0]));
-        const auto radius = 3.f*targetHeight / 200.0f;
-        const auto stickwidth = targetHeight / 60.0f;
 
         if (x < targetWidth && y < targetHeight)
         {
+            const auto numberBodyParts = sizeof(MPI_PAIRS_GPU)/(2*sizeof(MPI_PAIRS_GPU[0]));
+            const auto radius = 3.f*targetHeight / 200.0f;
+            const auto stickwidth = targetHeight / 60.0f;
+
             const auto blueIndex = y * targetWidth + x;
             auto& b = targetPtr[                                 blueIndex];
             auto& g = targetPtr[    targetWidth * targetHeight + blueIndex];
@@ -343,12 +199,12 @@ namespace op
                     auto bSqrt = stickwidth * stickwidth; //fixed
                     const auto partA = MPI_PAIRS_GPU[2*bodyPart];
                     const auto partB = MPI_PAIRS_GPU[2*bodyPart+1];
-                    const auto xA = sharedPoses[person*POSE_MPI_NUMBER_PARTS*3 + partA*3];
-                    const auto yA = sharedPoses[person*POSE_MPI_NUMBER_PARTS*3 + partA*3 + 1];
-                    const auto valueA = sharedPoses[person*POSE_MPI_NUMBER_PARTS*3 + partA*3 + 2];
-                    const auto xB = sharedPoses[person*POSE_MPI_NUMBER_PARTS*3 + partB*3];
-                    const auto yB = sharedPoses[person*POSE_MPI_NUMBER_PARTS*3 + partB*3 + 1];
-                    const auto valueB = sharedPoses[person*POSE_MPI_NUMBER_PARTS*3 + partB*3 + 2];
+                    const auto xA = posePtr[person*POSE_MPI_NUMBER_PARTS*3 + partA*3];
+                    const auto yA = posePtr[person*POSE_MPI_NUMBER_PARTS*3 + partA*3 + 1];
+                    const auto valueA = posePtr[person*POSE_MPI_NUMBER_PARTS*3 + partA*3 + 2];
+                    const auto xB = posePtr[person*POSE_MPI_NUMBER_PARTS*3 + partB*3];
+                    const auto yB = posePtr[person*POSE_MPI_NUMBER_PARTS*3 + partB*3 + 1];
+                    const auto valueB = posePtr[person*POSE_MPI_NUMBER_PARTS*3 + partB*3 + 2];
                     if (valueA > threshold && valueB > threshold)
                     {
                         const auto xP = (xA + xB) / 2.f;
@@ -379,9 +235,9 @@ namespace op
                 for (unsigned char i = 0; i < POSE_MPI_NUMBER_PARTS; i++) //for every point
                 {
                     const auto index = 3 * (person*POSE_MPI_NUMBER_PARTS + i);
-                    const auto localX = sharedPoses[index];
-                    const auto localY = sharedPoses[index + 1];
-                    const auto value = sharedPoses[index + 2];
+                    const auto localX = posePtr[index];
+                    const auto localY = posePtr[index + 1];
+                    const auto value = posePtr[index + 2];
 
                     if (value > threshold)
                         if ((x - localX) * (x - localX) + (y - localY) * (y - localY) <= radius * radius)
@@ -548,7 +404,7 @@ namespace op
         }
     }
 
-    inline void gpuRenderPartAffinityAux(float* framePtr, const PoseModel poseModel, const cv::Size& frameSize, const float* const heatMapPtr,
+    inline void renderKeyPointsPartAffinityAux(float* framePtr, const PoseModel poseModel, const cv::Size& frameSize, const float* const heatMapPtr,
                                          const cv::Size& heatMapSize, const float scaleToKeepRatio, const int part, const int partsToRender, const float alphaBlending)
     {
         try
@@ -656,7 +512,7 @@ namespace op
     {
         try
         {
-            gpuRenderPartAffinityAux(framePtr, poseModel, frameSize, heatMapPtr, heatMapSize, scaleToKeepRatio, part, 1, alphaBlending);
+            renderKeyPointsPartAffinityAux(framePtr, poseModel, frameSize, heatMapPtr, heatMapSize, scaleToKeepRatio, part, 1, alphaBlending);
         }
         catch (const std::exception& e)
         {
@@ -670,7 +526,7 @@ namespace op
         try
         {
             const auto numberBodyPartPairs = POSE_BODY_PART_PAIRS[(int)poseModel].size()/2;
-            gpuRenderPartAffinityAux(framePtr, poseModel, frameSize, heatMapPtr, heatMapSize, scaleToKeepRatio, POSE_NUMBER_BODY_PARTS[(int)poseModel]+1,
+            renderKeyPointsPartAffinityAux(framePtr, poseModel, frameSize, heatMapPtr, heatMapSize, scaleToKeepRatio, POSE_NUMBER_BODY_PARTS[(int)poseModel]+1,
                                      numberBodyPartPairs, alphaBlending);
         }
         catch (const std::exception& e)

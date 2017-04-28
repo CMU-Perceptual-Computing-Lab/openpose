@@ -3,11 +3,11 @@
 
 // core module
 #include "array.hpp"
-#include "arrayScaler.hpp"
 #include "cvMatToOpInput.hpp"
 #include "cvMatToOpOutput.hpp"
 #include "datum.hpp"
 #include "enumClasses.hpp"
+#include "keyPointScaler.hpp"
 #include "net.hpp"
 #include "netCaffe.hpp"
 #include "nmsBase.hpp"
@@ -16,10 +16,10 @@
 #include "renderer.hpp"
 #include "resizeAndMergeBase.hpp"
 #include "resizeAndMergeCaffe.hpp"
-#include "scalePose.hpp"
-#include "wArrayScaler.hpp"
+#include "scaleKeyPoints.hpp"
 #include "wCvMatToOpInput.hpp"
 #include "wCvMatToOpOutput.hpp"
+#include "wKeyPointScaler.hpp"
 #include "wOpOutputToCvMat.hpp"
 
 #endif // OPENPOSE__CORE__HEADERS_HPP

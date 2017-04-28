@@ -140,7 +140,7 @@ namespace op
         colorR = addWeighted(colorR, colorToAdd[0], alphaColorToAdd);
         colorG = addWeighted(colorG, colorToAdd[1], alphaColorToAdd);
         colorB = addWeighted(colorB, colorToAdd[2], alphaColorToAdd);
-    }    
+    }
 }
 
 #endif // OPENPOSE__UTILITIES_CUDA_HU

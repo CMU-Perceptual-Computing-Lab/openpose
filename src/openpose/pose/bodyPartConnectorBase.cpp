@@ -7,7 +7,7 @@
 namespace op
 {
     template <typename T>
-    void connectBodyPartsCpu(Array<T>& pose, const T* const heatMapPtr, const T* const peaksPtr, const PoseModel poseModel, const cv::Size& heatMapSize, const int maxPeaks,
+    void connectBodyPartsCpu(Array<T>& poseKeyPoints, const T* const heatMapPtr, const T* const peaksPtr, const PoseModel poseModel, const cv::Size& heatMapSize, const int maxPeaks,
                              const int interMinAboveThreshold, const T interThreshold, const int minSubsetCnt, const T minSubsetScore, const T scaleFactor)
     {
         try
@@ -290,11 +290,11 @@ namespace op
                     error("Bad subsetCounter. Bug in in this function if this happens.", __LINE__, __FUNCTION__, __FILE__);
             }
 
-            // Fill and return pose
+            // Fill and return poseKeyPoints
             if (numberPeople > 0)
-                pose.reset({numberPeople, numberBodyParts, 3});
+                poseKeyPoints.reset({numberPeople, numberBodyParts, 3});
             else
-                pose.reset();
+                poseKeyPoints.reset();
             for (auto person = 0 ; person < validSubsetIndexes.size() ; person++)
             {
                 const auto& subsetI = subset[validSubsetIndexes[person]].first;
@@ -304,15 +304,15 @@ namespace op
                     const auto bodyPartIndex = subsetI[bodyPart];
                     if (bodyPartIndex > 0)
                     {
-                        pose[baseOffset] = peaksPtr[bodyPartIndex-2] * scaleFactor;
-                        pose[baseOffset + 1] = peaksPtr[bodyPartIndex-1] * scaleFactor;
-                        pose[baseOffset + 2] = peaksPtr[bodyPartIndex];
+                        poseKeyPoints[baseOffset] = peaksPtr[bodyPartIndex-2] * scaleFactor;
+                        poseKeyPoints[baseOffset + 1] = peaksPtr[bodyPartIndex-1] * scaleFactor;
+                        poseKeyPoints[baseOffset + 2] = peaksPtr[bodyPartIndex];
                     }
                     else
                     {
-                        pose[baseOffset] = 0.f;
-                        pose[baseOffset + 1] = 0.f;
-                        pose[baseOffset + 2] = 0.f;
+                        poseKeyPoints[baseOffset] = 0.f;
+                        poseKeyPoints[baseOffset + 1] = 0.f;
+                        poseKeyPoints[baseOffset + 2] = 0.f;
                     }
                 }
             }
@@ -323,10 +323,10 @@ namespace op
         }
     }
 
-    template void connectBodyPartsCpu(Array<float>& pose, const float* const heatMapPtr, const float* const peaksPtr, const PoseModel poseModel, const cv::Size& heatMapSize,
+    template void connectBodyPartsCpu(Array<float>& poseKeyPoints, const float* const heatMapPtr, const float* const peaksPtr, const PoseModel poseModel, const cv::Size& heatMapSize,
                                       const int maxPeaks, const int interMinAboveThreshold, const float interThreshold, const int minSubsetCnt,
                                       const float minSubsetScore, const float scaleFactor);
-    template void connectBodyPartsCpu(Array<double>& pose, const double* const heatMapPtr, const double* const peaksPtr, const PoseModel poseModel, const cv::Size& heatMapSize,
+    template void connectBodyPartsCpu(Array<double>& poseKeyPoints, const double* const heatMapPtr, const double* const peaksPtr, const PoseModel poseModel, const cv::Size& heatMapSize,
                                       const int maxPeaks, const int interMinAboveThreshold, const double interThreshold, const int minSubsetCnt,
                                       const double minSubsetScore, const double scaleFactor);
 }

@@ -78,7 +78,7 @@ namespace op
                     if (imageId <= 50006)   // 3559 images ~ 4 min at 15fps // move this to producer as --frame_last 50006
                     {
                         // Record json in COCO format if file within desired range of images
-                        spPoseJsonCocoSaver->record(tDatum.pose, imageId);
+                        spPoseJsonCocoSaver->record(tDatum.poseKeyPoints, imageId);
                         // Profiling speed
                         Profiler::timerEnd(profilerKey);
                         Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__, 1000);

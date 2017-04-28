@@ -1,24 +1,24 @@
-#ifndef OPENPOSE__CORE__W_ARRAYS_SCALER_HPP
-#define OPENPOSE__CORE__W_ARRAYS_SCALER_HPP
+#ifndef OPENPOSE__CORE__W_KEY_POINT_SCALER_HPP
+#define OPENPOSE__CORE__W_KEY_POINT_SCALER_HPP
 
 #include "../thread/worker.hpp"
-#include "arrayScaler.hpp"
-#include "scalePose.hpp"
+#include "keyPointScaler.hpp"
+#include "scaleKeyPoints.hpp"
 
 namespace op
 {
     template<typename TDatums>
-    class WArrayScaler : public Worker<TDatums>
+    class WKeyPointScaler : public Worker<TDatums>
     {
     public:
-        explicit WArrayScaler(const std::shared_ptr<ArrayScaler>& arrayScaler);
+        explicit WKeyPointScaler(const std::shared_ptr<KeyPointScaler>& keyPointScaler);
 
         void initializationOnThread();
 
         void work(TDatums& tDatums);
 
     private:
-        std::shared_ptr<ArrayScaler> spArrayScaler;
+        std::shared_ptr<KeyPointScaler> spKeyPointScaler;
     };
 }
 
@@ -34,18 +34,18 @@ namespace op
 namespace op
 {
     template<typename TDatums>
-    WArrayScaler<TDatums>::WArrayScaler(const std::shared_ptr<ArrayScaler>& arrayScaler) :
-        spArrayScaler{arrayScaler}
+    WKeyPointScaler<TDatums>::WKeyPointScaler(const std::shared_ptr<KeyPointScaler>& keyPointScaler) :
+        spKeyPointScaler{keyPointScaler}
     {
     }
 
     template<typename TDatums>
-    void WArrayScaler<TDatums>::initializationOnThread()
+    void WKeyPointScaler<TDatums>::initializationOnThread()
     {
     }
 
     template<typename TDatums>
-    void WArrayScaler<TDatums>::work(TDatums& tDatums)
+    void WKeyPointScaler<TDatums>::work(TDatums& tDatums)
     {
         try
         {
@@ -58,8 +58,8 @@ namespace op
                 // Rescale pose data
                 for (auto& tDatum : *tDatums)
                 {
-                    std::vector<Array<float>> arrays{tDatum.pose, tDatum.hands};
-                    spArrayScaler->scale(arrays, tDatum.scaleInputToOutput, tDatum.scaleNetToOutput, tDatum.cvInputData.size());
+                    std::vector<Array<float>> arraysToScale{tDatum.poseKeyPoints, tDatum.handKeyPoints, tDatum.faceKeyPoints};
+                    spKeyPointScaler->scale(arraysToScale, tDatum.scaleInputToOutput, tDatum.scaleNetToOutput, tDatum.cvInputData.size());
                 }
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
@@ -76,7 +76,7 @@ namespace op
         }
     }
 
-    COMPILE_TEMPLATE_DATUM(WArrayScaler);
+    COMPILE_TEMPLATE_DATUM(WKeyPointScaler);
 }
 
-#endif // OPENPOSE__CORE__W_ARRAYS_SCALER_HPP
+#endif // OPENPOSE__CORE__W_KEY_POINT_SCALER_HPP

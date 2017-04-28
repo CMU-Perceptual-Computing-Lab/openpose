@@ -22,7 +22,7 @@ namespace op
 
         ~PoseJsonCocoSaver();
 
-        void record(const Array<float>& pose, const int imageId);
+        void record(const Array<float>& poseKeyPoints, const int imageId);
 
     private:
         JsonOfstream mJsonOfstream;

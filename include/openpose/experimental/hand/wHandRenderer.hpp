@@ -1,28 +1,28 @@
-#ifndef OPENPOSE__HANDS__W_HANDS_RENDERER_HPP
-#define OPENPOSE__HANDS__W_HANDS_RENDERER_HPP
+#ifndef OPENPOSE__HAND__W_HAND_RENDERER_HPP
+#define OPENPOSE__HAND__W_HAND_RENDERER_HPP
 
 #include <memory> // std::shared_ptr
 #include "../../thread/worker.hpp"
-#include "handsRenderer.hpp"
+#include "handRenderer.hpp"
 
 namespace op
 {
     namespace experimental
     {
         template<typename TDatums>
-        class WHandsRenderer : public Worker<TDatums>
+        class WHandRenderer : public Worker<TDatums>
         {
         public:
-            explicit WHandsRenderer(const std::shared_ptr<HandsRenderer>& handsRenderer);
+            explicit WHandRenderer(const std::shared_ptr<HandRenderer>& handRenderer);
 
             void initializationOnThread();
 
             void work(TDatums& tDatums);
 
         private:
-            std::shared_ptr<HandsRenderer> spHandsRenderer;
+            std::shared_ptr<HandRenderer> spHandRenderer;
 
-            DELETE_COPY(WHandsRenderer);
+            DELETE_COPY(WHandRenderer);
         };
     }
 }
@@ -41,19 +41,19 @@ namespace op
     namespace experimental
     {
         template<typename TDatums>
-        WHandsRenderer<TDatums>::WHandsRenderer(const std::shared_ptr<HandsRenderer>& handsRenderer) :
-            spHandsRenderer{handsRenderer}
+        WHandRenderer<TDatums>::WHandRenderer(const std::shared_ptr<HandRenderer>& handRenderer) :
+            spHandRenderer{handRenderer}
         {
         }
 
         template<typename TDatums>
-        void WHandsRenderer<TDatums>::initializationOnThread()
+        void WHandRenderer<TDatums>::initializationOnThread()
         {
-            spHandsRenderer->initializationOnThread();
+            spHandRenderer->initializationOnThread();
         }
 
         template<typename TDatums>
-        void WHandsRenderer<TDatums>::work(TDatums& tDatums)
+        void WHandRenderer<TDatums>::work(TDatums& tDatums)
         {
             try
             {
@@ -65,7 +65,7 @@ namespace op
                     const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                     // Render people hands
                     for (auto& tDatum : *tDatums)
-                        spHandsRenderer->renderHands(tDatum.outputData, tDatum.hands);
+                        spHandRenderer->renderHands(tDatum.outputData, tDatum.handKeyPoints);
                     // Profiling speed
                     Profiler::timerEnd(profilerKey);
                     Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__, 1000);
@@ -81,8 +81,8 @@ namespace op
             }
         }
 
-        COMPILE_TEMPLATE_DATUM(WHandsRenderer);
+        COMPILE_TEMPLATE_DATUM(WHandRenderer);
     }
 }
 
-#endif // OPENPOSE__HANDS__W_HANDS_RENDERER_HPP
+#endif // OPENPOSE__HAND__W_HAND_RENDERER_HPP

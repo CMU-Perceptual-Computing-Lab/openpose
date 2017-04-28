@@ -1,28 +1,28 @@
-#ifndef OPENPOSE__HANDS__W_HANDS_EXTRACTOR_HPP
-#define OPENPOSE__HANDS__W_HANDS_EXTRACTOR_HPP
+#ifndef OPENPOSE__FACE__W_FACE_RENDERER_HPP
+#define OPENPOSE__FACE__W_FACE_RENDERER_HPP
 
 #include <memory> // std::shared_ptr
 #include "../../thread/worker.hpp"
-#include "handsRenderer.hpp"
+#include "faceRenderer.hpp"
 
 namespace op
 {
     namespace experimental
     {
         template<typename TDatums>
-        class WHandsExtractor : public Worker<TDatums>
+        class WFaceRenderer : public Worker<TDatums>
         {
         public:
-            explicit WHandsExtractor(const std::shared_ptr<HandsExtractor>& handsExtractor);
+            explicit WFaceRenderer(const std::shared_ptr<FaceRenderer>& faceRenderer);
 
             void initializationOnThread();
 
             void work(TDatums& tDatums);
 
         private:
-            std::shared_ptr<HandsExtractor> spHandsExtractor;
+            std::shared_ptr<FaceRenderer> spFaceRenderer;
 
-            DELETE_COPY(WHandsExtractor);
+            DELETE_COPY(WFaceRenderer);
         };
     }
 }
@@ -41,19 +41,19 @@ namespace op
     namespace experimental
     {
         template<typename TDatums>
-        WHandsExtractor<TDatums>::WHandsExtractor(const std::shared_ptr<HandsExtractor>& handsExtractor) :
-            spHandsExtractor{handsExtractor}
+        WFaceRenderer<TDatums>::WFaceRenderer(const std::shared_ptr<FaceRenderer>& faceRenderer) :
+            spFaceRenderer{faceRenderer}
         {
         }
 
         template<typename TDatums>
-        void WHandsExtractor<TDatums>::initializationOnThread()
+        void WFaceRenderer<TDatums>::initializationOnThread()
         {
-            spHandsExtractor->initializationOnThread();
+            spFaceRenderer->initializationOnThread();
         }
 
         template<typename TDatums>
-        void WHandsExtractor<TDatums>::work(TDatums& tDatums)
+        void WFaceRenderer<TDatums>::work(TDatums& tDatums)
         {
             try
             {
@@ -63,12 +63,9 @@ namespace op
                     dLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     // Profiling speed
                     const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
-                    // Extract people hands
+                    // Render people face
                     for (auto& tDatum : *tDatums)
-                    {
-                        spHandsExtractor->forwardPass(tDatum.pose, tDatum.cvInputData);
-                        tDatum.hands = spHandsExtractor->getHands();
-                    }
+                        spFaceRenderer->renderFace(tDatum.outputData, tDatum.faceKeyPoints);
                     // Profiling speed
                     Profiler::timerEnd(profilerKey);
                     Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__, 1000);
@@ -84,8 +81,8 @@ namespace op
             }
         }
 
-        COMPILE_TEMPLATE_DATUM(WHandsExtractor);
+        COMPILE_TEMPLATE_DATUM(WFaceRenderer);
     }
 }
 
-#endif // OPENPOSE__HANDS__W_HANDS_EXTRACTOR_HPP
+#endif // OPENPOSE__FACE__W_FACE_RENDERER_HPP

@@ -12,7 +12,7 @@ namespace op
     public:
         PoseSaver(const std::string& directoryPath, const DataFormat format);
 
-        void savePoseVector(const std::vector<Array<float>>& poseVector, const std::string& fileName) const;
+        void savePoseKeyPoints(const std::vector<Array<float>>& poseKeyPointsVector, const std::string& fileName) const;
 
     private:
         const DataFormat mFormat;

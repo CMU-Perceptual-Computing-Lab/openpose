@@ -62,11 +62,11 @@ namespace op
                 // T* to T
                 auto& tDatumsNoPtr = *tDatums;
                 // Record people pose data
-                std::vector<Array<float>> poseVector(tDatumsNoPtr.size());
+                std::vector<Array<float>> poseKeyPointsVector(tDatumsNoPtr.size());
                 for (auto i = 0; i < tDatumsNoPtr.size(); i++)
-                    poseVector[i] = tDatumsNoPtr[i].pose;
+                    poseKeyPointsVector[i] = tDatumsNoPtr[i].poseKeyPoints;
                 const auto fileName = (!tDatumsNoPtr[0].name.empty() ? tDatumsNoPtr[0].name : std::to_string(tDatumsNoPtr[0].id));
-                spPoseSaver->savePoseVector(poseVector, fileName);
+                spPoseSaver->savePoseKeyPoints(poseKeyPointsVector, fileName);
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
                 Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__, 1000);

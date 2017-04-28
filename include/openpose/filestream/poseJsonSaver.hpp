@@ -13,7 +13,7 @@ namespace op
     public:
         explicit PoseJsonSaver(const std::string& directoryPath);
 
-        void savePoseVector(const std::vector<Array<float>>& poseVector, const std::string& fileName) const;
+        void savePoseKeyPoints(const std::vector<Array<float>>& poseKeyPointsVector, const std::string& fileName) const;
     };
 }
 

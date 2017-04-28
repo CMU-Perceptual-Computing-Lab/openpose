@@ -163,12 +163,12 @@ namespace op
         }
     }
 
-    Array<float> PoseExtractor::getPose() const
+    Array<float> PoseExtractor::getPoseKeyPoints() const
     {
         try
         {
             checkThread();
-            return mPose;
+            return mPoseKeyPoints;
         }
         catch (const std::exception& e)
         {

@@ -49,7 +49,7 @@ namespace op
     {
     }
 
-    void GuiInfoAdder::addInfo(cv::Mat& cvOutputData, const Array<float>& pose, const unsigned long long id, const std::string& elementRenderedName)
+    void GuiInfoAdder::addInfo(cv::Mat& cvOutputData, const Array<float>& poseKeyPoints, const unsigned long long id, const std::string& elementRenderedName)
     {
         try
         {
@@ -83,7 +83,7 @@ namespace op
             // Frame number
             putTextOnCvMat(cvOutputData, "Frame " + std::to_string(id), {mBorderMargin, (int)(mOutputSize.height - mBorderMargin)}, white, false);
             // Number people
-            const auto textToDisplay = std::to_string(pose.getSize(0)) + " people";
+            const auto textToDisplay = std::to_string(poseKeyPoints.getSize(0)) + " people";
             putTextOnCvMat(cvOutputData, textToDisplay, {(int)(mOutputSize.width - mBorderMargin), (int)(mOutputSize.height - mBorderMargin)}, white, true);
         }
         catch (const std::exception& e)

@@ -1,5 +1,5 @@
-#ifndef OPENPOSE__HANDS__HANDS_EXTRACTOR_HPP
-#define OPENPOSE__HANDS__HANDS_EXTRACTOR_HPP
+#ifndef OPENPOSE__HAND__HAND_EXTRACTOR_HPP
+#define OPENPOSE__HAND__HAND_EXTRACTOR_HPP
 
 #include <array>
 #include <atomic>
@@ -17,16 +17,16 @@ namespace op
 {
     namespace experimental
     {
-        class HandsExtractor
+        class HandExtractor
         {
         public:
-            explicit HandsExtractor(const std::string& modelFolder, const int gpuId, const PoseModel poseModel);
+            explicit HandExtractor(const std::string& modelFolder, const int gpuId, const PoseModel poseModel);
 
             void initializationOnThread();
 
-            void forwardPass(const Array<float>& pose, const cv::Mat& cvInputData);
+            void forwardPass(const Array<float>& poseKeyPoints, const cv::Mat& cvInputData);
 
-            Array<float> getHands() const;
+            Array<float> getHandKeyPoints() const;
 
             double get(const HandsProperty property) const;
 
@@ -60,9 +60,9 @@ namespace op
 
             void checkThread() const;
 
-            DELETE_COPY(HandsExtractor);
+            DELETE_COPY(HandExtractor);
         };
     }
 }
 
-#endif // OPENPOSE__HANDS__HANDS_EXTRACTOR_HPP
+#endif // OPENPOSE__HAND__HAND_EXTRACTOR_HPP

@@ -176,7 +176,7 @@ public:
     {
         // User's displaying/saving/other processing here
             // datum.cvOutputData: rendered frame with pose or heatmaps
-            // datum.pose: Array<float> with the estimated pose
+            // datum.poseKeyPoints: Array<float> with the estimated pose
         if (datumsPtr != nullptr && !datumsPtr->empty())
         {
             cv::imshow("User worker GUI", datumsPtr->at(0).cvOutputData);

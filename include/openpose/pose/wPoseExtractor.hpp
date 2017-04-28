@@ -63,7 +63,7 @@ namespace op
                 {
                     spPoseExtractor->forwardPass(tDatum.inputNetData, tDatum.cvInputData.size());
                     tDatum.poseHeatMaps = spPoseExtractor->getHeatMaps();
-                    tDatum.pose = spPoseExtractor->getPose();
+                    tDatum.poseKeyPoints = spPoseExtractor->getPoseKeyPoints();
                     tDatum.scaleNetToOutput = spPoseExtractor->getScaleNetToOutput();
                 }
                 // Profiling speed

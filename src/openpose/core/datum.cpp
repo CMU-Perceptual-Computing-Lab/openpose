@@ -18,9 +18,10 @@ namespace op
         outputData{datum.outputData},
         cvOutputData{datum.cvOutputData},
         // Resulting Array<float> data
-        pose{datum.pose},
+        poseKeyPoints{datum.poseKeyPoints},
         poseHeatMaps{datum.poseHeatMaps},
-        hands{datum.hands},
+        faceKeyPoints{datum.faceKeyPoints},
+        handKeyPoints{datum.handKeyPoints},
         // Other parameters
         scaleInputToOutput{datum.scaleInputToOutput},
         scaleNetToOutput{datum.scaleNetToOutput},
@@ -42,9 +43,10 @@ namespace op
             outputData = datum.outputData;
             cvOutputData = datum.cvOutputData;
             // Resulting Array<float> data
-            pose = datum.pose;
+            poseKeyPoints = datum.poseKeyPoints;
             poseHeatMaps = datum.poseHeatMaps,
-            hands = datum.hands,
+            faceKeyPoints = datum.faceKeyPoints,
+            handKeyPoints = datum.handKeyPoints,
             // Other parameters
             scaleInputToOutput = datum.scaleInputToOutput;
             scaleNetToOutput = datum.scaleNetToOutput;
@@ -77,9 +79,10 @@ namespace op
             std::swap(outputData, datum.outputData);
             std::swap(cvOutputData, datum.cvOutputData);
             // Resulting Array<float> data
-            std::swap(pose, datum.pose);
+            std::swap(poseKeyPoints, datum.poseKeyPoints);
             std::swap(poseHeatMaps, datum.poseHeatMaps);
-            std::swap(hands, datum.hands);
+            std::swap(faceKeyPoints, datum.faceKeyPoints);
+            std::swap(handKeyPoints, datum.handKeyPoints);
             // Other parameters
             std::swap(elementRendered, datum.elementRendered);
         }
@@ -103,9 +106,10 @@ namespace op
             std::swap(outputData, datum.outputData);
             std::swap(cvOutputData, datum.cvOutputData);
             // Resulting Array<float> data
-            std::swap(pose, datum.pose);
+            std::swap(poseKeyPoints, datum.poseKeyPoints);
             std::swap(poseHeatMaps, datum.poseHeatMaps);
-            std::swap(hands, datum.hands);
+            std::swap(faceKeyPoints, datum.faceKeyPoints);
+            std::swap(handKeyPoints, datum.handKeyPoints);
             // Other parameters
             scaleInputToOutput = datum.scaleInputToOutput;
             scaleNetToOutput = datum.scaleNetToOutput;
@@ -139,9 +143,10 @@ namespace op
             datum.outputData = outputData.clone();
             datum.cvOutputData = cvOutputData.clone();
             // Resulting Array<float> data
-            datum.pose = pose.clone();
+            datum.poseKeyPoints = poseKeyPoints.clone();
             datum.poseHeatMaps = poseHeatMaps.clone();
-            datum.hands = hands.clone();
+            datum.faceKeyPoints = faceKeyPoints.clone();
+            datum.handKeyPoints = handKeyPoints.clone();
             // Other parameters
             datum.scaleInputToOutput = scaleInputToOutput;
             datum.scaleNetToOutput = scaleNetToOutput;

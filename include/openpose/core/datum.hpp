@@ -52,15 +52,15 @@ namespace op
 
         // -------------------------------------------------- Resulting Array<float> data parameters -------------------------------------------------- //
         /**
-         * Pose (x,y,score) locations for each person in the image.
+         * Body pose (x,y,score) locations for each person in the image.
          * It has been resized to the desired output resolution (e.g. `resolution` flag in the demo).
          * If outputData is empty, then cvOutputData will also be empty.
          * Size: #people x #body parts (e.g. 18 for COCO or 15 for MPI) x 3 ((x,y) coordinates + score)
          */
+        Array<float> poseKeyPoints;
 
-        Array<float> pose;
         /**
-         * Pose heatmaps (body parts, background and PAFs) for the whole image.
+         * Body pose heatmaps (body parts, background and/or PAFs) for the whole image.
          * This parameters is by default empty and disabled for performance. Each group (body parts, background and PAFs) can be individually enabled.
          * #heatmaps = #body parts (if enabled) + 1 (if background enabled) + 2 x #PAFs (if enabled). Each PAF has 2 consecutive channels, one for x- and one for y-coordinates.
          * Order heatmaps: body parts + background (as appears in POSE_BODY_PART_MAPPING) + (x,y) channel of each PAF (sorted as appears in POSE_BODY_PART_PAIRS). See `pose/poseParameters.hpp`.
@@ -71,10 +71,17 @@ namespace op
 
         /**
          * Experimental (NOT IMPLEMENTED YET)
-         * Hands code is in development phase. Not included in this version.
-         * Size: 2 (right and left hand) x #hand parts (21) x 3 ((x,y) coordinates + score)
+         * Face code is in development phase. Not included in this version.
+         * Size: #people's faces to render x #face parts (71) x 3 ((x,y) coordinates + score)
          */
-        Array<float> hands;
+        Array<float> faceKeyPoints;
+
+        /**
+         * Experimental (NOT IMPLEMENTED YET)
+         * Hands code is in development phase. Not included in this version.
+         * Size: #people's hands to render x 2 (right and left hand) x #hand parts (21) x 3 ((x,y) coordinates + score)
+         */
+        Array<float> handKeyPoints;
 
         // -------------------------------------------------- Other parameters -------------------------------------------------- //
         double scaleInputToOutput; /**< Scale ratio between the input Datum::cvInputData and the output Datum::cvOutputData. */

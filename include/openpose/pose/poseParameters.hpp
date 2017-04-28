@@ -87,6 +87,10 @@ namespace op
     // Rendering default parameters
     const auto POSE_DEFAULT_ALPHA_POSE = 0.6f;
     const auto POSE_DEFAULT_ALPHA_HEATMAP = 0.7f;
+
+    // Auxiliary functions
+    unsigned char poseBodyPartMapStringToKey(const PoseModel poseModel, const std::string& string);
+    unsigned char poseBodyPartMapStringToKey(const PoseModel poseModel, const std::vector<std::string>& strings);
 }
 
 #endif // OPENPOSE__POSE__POSE_PARAMETERS_HPP

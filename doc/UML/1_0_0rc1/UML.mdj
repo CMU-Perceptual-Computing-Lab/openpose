@@ -5917,7 +5917,7 @@
 									"_parent": {
 										"$ref": "AAAAAAFbHDZmRV10zeE="
 									},
-									"name": "scalePose",
+									"name": "scaleKeyPoints",
 									"ownedElements": [
 										{
 											"_type": "UMLDependency",
@@ -6005,7 +6005,7 @@
 									"_parent": {
 										"$ref": "AAAAAAFbHDZmRV10zeE="
 									},
-									"name": "wArrayScaler.hpp",
+									"name": "wKeyPointScaler.hpp",
 									"ownedElements": [
 										{
 											"_type": "UMLDependency",
@@ -6076,7 +6076,7 @@
 									"_parent": {
 										"$ref": "AAAAAAFbHDZmRV10zeE="
 									},
-									"name": "ArrayScaler",
+									"name": "KeyPointScaler",
 									"ownedElements": [
 										{
 											"_type": "UMLDependency",
@@ -13344,7 +13344,7 @@
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "scalePose",
+											"text": "scaleKeyPoints",
 											"horizontalAlignment": 2,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -13635,7 +13635,7 @@
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "wArrayScaler.hpp",
+											"text": "wKeyPointScaler.hpp",
 											"horizontalAlignment": 2,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -14633,7 +14633,7 @@
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "ArrayScaler",
+											"text": "KeyPointScaler",
 											"horizontalAlignment": 2,
 											"verticalAlignment": 5,
 											"wordWrap": false

@@ -11,27 +11,27 @@ namespace op
     {
     }
 
-    void PoseSaver::savePoseVector(const std::vector<Array<float>>& poseVector, const std::string& fileName) const
+    void PoseSaver::savePoseKeyPoints(const std::vector<Array<float>>& poseKeyPointsVector, const std::string& fileName) const
     {
         try
         {
-            if (!poseVector.empty())
+            if (!poseKeyPointsVector.empty())
             {
                 // File path (no extension)
                 const auto fileNameNoExtension = getNextFileName(fileName) + "_pose";
 
                 // Get vector of people poses
-                std::vector<cv::Mat> cvMatPoses(poseVector.size());
-                for (auto i = 0; i < poseVector.size(); i++)
-                    cvMatPoses[i] = poseVector[i].getConstCvMat();
+                std::vector<cv::Mat> cvMatPoses(poseKeyPointsVector.size());
+                for (auto i = 0; i < poseKeyPointsVector.size(); i++)
+                    cvMatPoses[i] = poseKeyPointsVector[i].getConstCvMat();
 
                 // Get names inside file
-                std::vector<std::string> poseVectorNames(cvMatPoses.size());
+                std::vector<std::string> poseKeyPointsVectorNames(cvMatPoses.size());
                 for (auto i = 0; i < cvMatPoses.size(); i++)
-                    poseVectorNames[i] = {"pose_" + std::to_string(i)};
+                    poseKeyPointsVectorNames[i] = {"pose_" + std::to_string(i)};
 
                 // Record people poses in desired format
-                saveData(cvMatPoses, poseVectorNames, fileNameNoExtension, mFormat);
+                saveData(cvMatPoses, poseKeyPointsVectorNames, fileNameNoExtension, mFormat);
             }
         }
         catch (const std::exception& e)

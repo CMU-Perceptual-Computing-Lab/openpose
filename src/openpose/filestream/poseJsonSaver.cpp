@@ -9,21 +9,21 @@ namespace op
     {
     }
 
-    void PoseJsonSaver::savePoseVector(const std::vector<Array<float>>& poseVector, const std::string& fileName) const
+    void PoseJsonSaver::savePoseKeyPoints(const std::vector<Array<float>>& poseKeyPointsVector, const std::string& fileName) const
     {
         try
         {
             // Record json
-            if (!poseVector.empty())
+            if (!poseKeyPointsVector.empty())
             {
                 // File path (no extension)
                 const auto fileNameNoExtension = getNextFileName(fileName) + "_pose";
 
                 const bool humanReadable = true;
-                for (auto i = 0; i < poseVector.size(); i++)
+                for (auto i = 0; i < poseKeyPointsVector.size(); i++)
                 {
                     const auto fileName = fileNameNoExtension + (i != 0 ? "_" + std::to_string(i) : "") + ".json";
-                    savePoseJson(poseVector[i], fileName, humanReadable);
+                    savePoseJson(poseKeyPointsVector[i], fileName, humanReadable);
                 }
             }
         }

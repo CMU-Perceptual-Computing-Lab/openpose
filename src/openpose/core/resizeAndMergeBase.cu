@@ -82,7 +82,7 @@ namespace op
             }
             else
             {
-                if (scaleGap <= 0.f)
+                if (scaleGap <= 0.f && num != targetSize[0])
                     error("The scale gap must be greater than 0.", __LINE__, __FUNCTION__, __FILE__);
                 const auto sourceNumOffset = channels * sourceChannelOffset;
                 for (auto c = 0; c < channels; c++)

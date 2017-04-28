@@ -126,7 +126,7 @@ public:
     {
         // User's post-processing (after OpenPose processing & before OpenPose outputs) here
             // datum.cvOutputData: rendered frame with pose or heatmaps
-            // datum.pose: Array<float> with the estimated pose
+            // datum.poseKeyPoints: Array<float> with the estimated pose
         try
         {
             if (datumsPtr != nullptr && !datumsPtr->empty())
@@ -154,7 +154,7 @@ public:
         {
             // User's displaying/saving/other processing here
                 // datum.cvOutputData: rendered frame with pose or heatmaps
-                // datum.pose: Array<float> with the estimated pose
+                // datum.poseKeyPoints: Array<float> with the estimated pose
             if (datumsPtr != nullptr && !datumsPtr->empty())
             {
                 cv::imshow("User worker GUI", datumsPtr->at(0).cvOutputData);

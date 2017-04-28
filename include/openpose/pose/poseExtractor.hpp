@@ -30,7 +30,7 @@ namespace op
 
         virtual const float* getPoseGpuConstPtr() const = 0;
 
-        Array<float> getPose() const;
+        Array<float> getPoseKeyPoints() const;
 
         double getScaleNetToOutput() const;
 
@@ -44,7 +44,7 @@ namespace op
         const PoseModel mPoseModel;
         const cv::Size mNetOutputSize;
         const cv::Size mOutputSize;
-        Array<float> mPose;
+        Array<float> mPoseKeyPoints;
         double mScaleNetToOutput;
 
         void checkThread() const;

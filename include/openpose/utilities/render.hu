@@ -1,0 +1,120 @@
+#ifndef OPENPOSE__UTILITIES_RENDER_HU
+#define OPENPOSE__UTILITIES_RENDER_HU
+
+namespace op
+{
+    inline __device__ void renderKeyPoints(float* targetPtr, float2* sharedMaxs, float2* sharedMins, float* sharedScaleF,
+                                           const int globalIdx, const int x, const int y, const int targetWidth, const int targetHeight,
+                                           const float* const facePtr, const unsigned char* const partPairsPtr,
+                                           const int numberFaces, const int numberParts, const int numberPartPairs,
+                                           const float* const rgbColorsPtr, const int numberColors,
+                                           const float radius, const float stickwidth, const float threshold, const float alphaColorToAdd)
+    {
+        // Fill shared parameters
+        if (globalIdx < numberFaces)
+        {
+            sharedMins[globalIdx].x = targetWidth;
+            sharedMins[globalIdx].y = targetHeight;
+            sharedMaxs[globalIdx].x = 0.f;
+            sharedMaxs[globalIdx].y = 0.f;
+            for (auto part = 0 ; part < numberParts ; part++)
+            {
+                const auto index = 3 * (globalIdx*numberParts + part);
+                const auto x = facePtr[index];
+                const auto y = facePtr[index+1];
+                const auto score = facePtr[index+2];
+                if (score > threshold)
+                {
+                    if (x < sharedMins[globalIdx].x)
+                        sharedMins[globalIdx].x = x;
+                    if (x > sharedMaxs[globalIdx].x)
+                        sharedMaxs[globalIdx].x = x;
+                    if (y < sharedMins[globalIdx].y)
+                        sharedMins[globalIdx].y = y;
+                    if (y > sharedMaxs[globalIdx].y)
+                        sharedMaxs[globalIdx].y = y;
+                }
+            }
+            const auto averageX = sharedMaxs[globalIdx].x-sharedMins[globalIdx].x;
+            const auto averageY = sharedMaxs[globalIdx].y-sharedMins[globalIdx].y;
+            sharedScaleF[globalIdx] = fastTruncate((averageX + averageY) / 400.f, 0.33f, 1.f);    // (averageX + averageY) / 2.f / 400.f
+            const auto constantToAdd = 50.f;
+            sharedMaxs[globalIdx].x += constantToAdd;
+            sharedMaxs[globalIdx].y += constantToAdd;
+            sharedMins[globalIdx].x -= constantToAdd;
+            sharedMins[globalIdx].y -= constantToAdd;
+        }
+
+        __syncthreads();
+
+        // Fill each (x,y) target pixel
+        if (x < targetWidth && y < targetHeight)
+        {
+            const auto baseIndex = y * targetWidth + x;
+            auto& b = targetPtr[                                 baseIndex];
+            auto& g = targetPtr[    targetWidth * targetHeight + baseIndex];
+            auto& r = targetPtr[2 * targetWidth * targetHeight + baseIndex];
+
+            for (auto person = 0; person < numberFaces; person++)
+            {
+                if (x <= sharedMaxs[person].x && x >= sharedMins[person].x && y <= sharedMaxs[person].y && y >= sharedMins[person].y)
+                {
+                    // Hand part connections
+                    for (auto facePart = 0; facePart < numberPartPairs; facePart++)
+                    {
+                        const auto bSqrt = sharedScaleF[person] * sharedScaleF[person] * stickwidth * stickwidth;
+                        const auto partA = partPairsPtr[2*facePart];
+                        const auto partB = partPairsPtr[2*facePart+1];
+                        const auto indexA = person*numberParts*3 + partA*3;
+                        const auto xA = facePtr[indexA];
+                        const auto yA = facePtr[indexA + 1];
+                        const auto scoreA = facePtr[indexA + 2];
+                        const auto indexB = person*numberParts*3 + partB*3;
+                        const auto xB = facePtr[indexB];
+                        const auto yB = facePtr[indexB + 1];
+                        const auto scoreB = facePtr[indexB + 2];
+
+                        if (scoreA > threshold && scoreB > threshold)
+                        {
+                            const auto xP = (xA + xB) / 2.f;
+                            const auto yP = (yA + yB) / 2.f;
+                            const auto aSqrt = (xA - xP) * (xA - xP) + (yA - yP) * (yA - yP);
+
+                            const auto angle = atan2f(yB - yA, xB - xA);
+                            const auto sine = sinf(angle);
+                            const auto cosine = cosf(angle);
+                            const auto A = cosine * (x - xP) + sine * (y - yP);
+                            const auto B = sine * (x - xP) - cosine * (y - yP);
+
+                            const auto judge = A * A / aSqrt + B * B / bSqrt;
+                            const auto minV = 0.f;
+                            const auto maxV = 1.f;
+                            if (minV <= judge && judge <= maxV)
+                                addColorWeighted(r, g, b, &rgbColorsPtr[(facePart%numberColors)*3], alphaColorToAdd);
+                        }
+                    }
+
+                    // Hand part circles
+                    for (unsigned char i = 0; i < numberParts; i++)
+                    {
+                        const auto index = 3 * (person*numberParts + i);
+                        const auto localX = facePtr[index];
+                        const auto localY = facePtr[index + 1];
+                        const auto score = facePtr[index + 2];
+
+                        if (score > threshold)
+                        {
+                            const auto dist2 = (x - localX) * (x - localX) + (y - localY) * (y - localY);
+                            const auto minr2 = 0.f;
+                            const auto maxr2 = sharedScaleF[person]*sharedScaleF[person]*radius * radius;
+                            if (minr2 <= dist2 && dist2 <= maxr2)
+                                addColorWeighted(r, g, b, &rgbColorsPtr[(i%numberColors)*3], alphaColorToAdd);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+#endif // OPENPOSE__UTILITIES_RENDER_HU

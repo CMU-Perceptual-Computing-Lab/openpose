@@ -1,10 +1,10 @@
-#include "openpose/wrapper/wrapperStructHands.hpp"
+#include "openpose/wrapper/wrapperStructHand.hpp"
 
 namespace op
 {
     namespace experimental
     {
-        WrapperStructHands::WrapperStructHands(const bool extractAndRenderHands_) :
+        WrapperStructHand::WrapperStructHand(const bool extractAndRenderHands_) :
             extractAndRenderHands{extractAndRenderHands_}
         {
         }

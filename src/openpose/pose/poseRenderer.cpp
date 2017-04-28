@@ -211,7 +211,7 @@ namespace op
         }
     }
 
-    std::pair<int, std::string> PoseRenderer::renderPose(Array<float>& outputData, const Array<float>& pose, const double scaleNetToOutput)
+    std::pair<int, std::string> PoseRenderer::renderPose(Array<float>& outputData, const Array<float>& poseKeyPoints, const double scaleNetToOutput)
     {
         try
         {
@@ -221,7 +221,7 @@ namespace op
 
             const auto elementRendered = mElementToRender.load(); // I prefer std::round(T&) over intRound(T) for std::atomic
             std::string elementRenderedName;
-            const auto numberPeople = pose.getSize(0);
+            const auto numberPeople = poseKeyPoints.getSize(0);
 
             // GPU rendering
             if (numberPeople > 0 || elementRendered != 0 || !mBlendOriginalFrame)
@@ -230,11 +230,11 @@ namespace op
                 cudaCheck(__LINE__, __FUNCTION__, __FILE__);
                 const auto numberBodyParts = POSE_NUMBER_BODY_PARTS[(int)mPoseModel];
                 const auto numberBodyPartsPlusBkg = numberBodyParts+1;
-                // Draw pose
+                // Draw poseKeyPoints
                 if (elementRendered == 0)
                 {
-                    if (!pose.empty())
-                        cudaMemcpy(pGpuPose, pose.getConstPtr(), numberPeople * numberBodyParts * 3 * sizeof(float), cudaMemcpyHostToDevice);
+                    if (!poseKeyPoints.empty())
+                        cudaMemcpy(pGpuPose, poseKeyPoints.getConstPtr(), numberPeople * numberBodyParts * 3 * sizeof(float), cudaMemcpyHostToDevice);
                     renderPoseGpu(*spGpuMemoryPtr, mPoseModel, numberPeople, mOutputSize, pGpuPose, mShowGooglyEyes, mBlendOriginalFrame, mAlphaPose);
                 }
                 else

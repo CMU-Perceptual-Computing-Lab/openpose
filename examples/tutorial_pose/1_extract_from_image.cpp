@@ -117,11 +117,11 @@ int openPoseTutorialPose1()
     double scaleInputToOutput;
     op::Array<float> outputArray;
     std::tie(scaleInputToOutput, outputArray) = cvMatToOpOutput.format(inputImage);
-    // Step 3 - Estimate pose
+    // Step 3 - Estimate poseKeyPoints
     poseExtractorCaffe.forwardPass(netInputArray, inputImage.size());
-    const auto pose = poseExtractorCaffe.getPose();
-    // Step 4 - Render pose
-    poseRenderer.renderPose(outputArray, pose);
+    const auto poseKeyPoints = poseExtractorCaffe.getPoseKeyPoints();
+    // Step 4 - Render poseKeyPoints
+    poseRenderer.renderPose(outputArray, poseKeyPoints);
     // Step 5 - OpenPose output format to cv::Mat
     auto outputImage = opOutputToCvMat.formatToCvMat(outputArray);
 

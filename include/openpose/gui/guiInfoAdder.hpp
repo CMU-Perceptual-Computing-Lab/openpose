@@ -12,7 +12,7 @@ namespace op
     public:
         GuiInfoAdder(const cv::Size& outputSize, const int numberGpus);
 
-        void addInfo(cv::Mat& cvOutputData, const Array<float>& pose, const unsigned long long id, const std::string& elementRenderedName);
+        void addInfo(cv::Mat& cvOutputData, const Array<float>& poseKeyPoints, const unsigned long long id, const std::string& elementRenderedName);
 
     private:
         // Const variables

@@ -3,7 +3,8 @@
 
 // wrapper module
 #include "wrapper.hpp"
-#include "wrapperStructHands.hpp"
+#include "wrapperStructFace.hpp"
+#include "wrapperStructHand.hpp"
 #include "wrapperStructInput.hpp"
 #include "wrapperStructOutput.hpp"
 #include "wrapperStructPose.hpp"

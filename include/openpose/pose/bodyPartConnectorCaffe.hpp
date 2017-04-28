@@ -36,9 +36,9 @@ namespace op
 
         void setScaleNetToOutput(const T scaleNetToOutput);
 
-        virtual void Forward_cpu(const std::vector<caffe::Blob<T>*>& bottom, Array<T>& pose);
+        virtual void Forward_cpu(const std::vector<caffe::Blob<T>*>& bottom, Array<T>& poseKeyPoints);
 
-        virtual void Forward_gpu(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top, Array<T>& pose);
+        virtual void Forward_gpu(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top, Array<T>& poseKeyPoints);
 
         virtual void Backward_cpu(const std::vector<caffe::Blob<T>*>& top, const std::vector<bool>& propagate_down, const std::vector<caffe::Blob<T>*>& bottom);
 

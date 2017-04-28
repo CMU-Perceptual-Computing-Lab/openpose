@@ -2,10 +2,11 @@
 #define OPENPOSE__WRAPPER__WRAPPER_HPP
 
 #include "../thread/headers.hpp"
-#include "wrapperStructPose.hpp"
-#include "wrapperStructHands.hpp"
+#include "wrapperStructFace.hpp"
+#include "wrapperStructHand.hpp"
 #include "wrapperStructInput.hpp"
 #include "wrapperStructOutput.hpp"
+#include "wrapperStructPose.hpp"
 
 namespace op
 {
@@ -72,18 +73,40 @@ namespace op
          */
         void setWorkerOutput(const TWorker& worker, const bool workerOnNewThread = true);
 
-        // If output is not required, just use this function until the renderOutput argument. Keep the default values for the other parameters
-        // in order not to display/save any output.
+        // If output is not required, just use this function until the renderOutput argument. Keep the default values for the other parameters in order not to display/save any output.
         void configure(const WrapperStructPose& wrapperStructPose,
                        // Producer (set producerSharedPtr = nullptr or use the default WrapperStructInput{} to disable any input)
-                       const WrapperStructInput& wrapperStructInput = WrapperStructInput{},
+                       const WrapperStructInput& wrapperStructInput,
                        // Consumer (keep default values to disable any output)
                        const WrapperStructOutput& wrapperStructOutput = WrapperStructOutput{});
 
+        // THIS FUNCTION IS NOT IMPLEMENTED YET -> COMING SOON
+        // Similar to the previos configure, but it includes hand extraction and rendering
+        void configure(const WrapperStructPose& wrapperStructPose,
+                       // Hand (use the default WrapperStructHand{} to disable any hand detector)
+                       const experimental::WrapperStructHand& wrapperHandStruct,
+                       // Producer (set producerSharedPtr = nullptr or use the default WrapperStructInput{} to disable any input)
+                       const WrapperStructInput& wrapperStructInput,
+                       // Consumer (keep default values to disable any output)
+                       const WrapperStructOutput& wrapperStructOutput = WrapperStructOutput{});
+
+        // THIS FUNCTION IS NOT IMPLEMENTED YET -> COMING SOON
+        // Similar to the previos configure, but it includes hand extraction and rendering
+        void configure(const WrapperStructPose& wrapperStructPose,
+                       // Face (use the default WrapperStructFace{} to disable any face detector)
+                       const experimental::WrapperStructFace& wrapperStructFace,
+                       // Producer (set producerSharedPtr = nullptr or use the default WrapperStructInput{} to disable any input)
+                       const WrapperStructInput& wrapperStructInput,
+                       // Consumer (keep default values to disable any output)
+                       const WrapperStructOutput& wrapperStructOutput = WrapperStructOutput{});
+
+        // THIS FUNCTION IS NOT IMPLEMENTED YET -> COMING SOON
         // Similar to the previos configure, but it includes hand extraction and rendering
         void configure(const WrapperStructPose& wrapperStructPose = WrapperStructPose{},
-                       // Hand (use the default WrapperStructHands{} to disable any hand detector)
-                       const experimental::WrapperStructHands& wrapperHandStruct = experimental::WrapperStructHands{},
+                       // Face (use the default WrapperStructFace{} to disable any face detector)
+                       const experimental::WrapperStructFace& wrapperStructFace = experimental::WrapperStructFace{},
+                       // Hand (use the default WrapperStructHand{} to disable any hand detector)
+                       const experimental::WrapperStructHand& wrapperHandStruct = experimental::WrapperStructHand{},
                        // Producer (set producerSharedPtr = nullptr or use the default WrapperStructInput{} to disable any input)
                        const WrapperStructInput& wrapperStructInput = WrapperStructInput{},
                        // Consumer (keep default values to disable any output)
@@ -349,7 +372,7 @@ namespace op
     {
         try
         {
-            configure(wrapperStructPose, experimental::WrapperStructHands{}, wrapperStructInput, wrapperStructOutput);
+            configure(wrapperStructPose, experimental::WrapperStructFace{}, experimental::WrapperStructHand{}, wrapperStructInput, wrapperStructOutput);
         }
         catch (const std::exception& e)
         {
@@ -358,8 +381,37 @@ namespace op
     }
 
     template<typename TDatums, typename TWorker, typename TQueue>
-    void Wrapper<TDatums, TWorker, TQueue>::configure(const WrapperStructPose& wrapperStructPose, const experimental::WrapperStructHands& wrapperHandStruct,
+    void Wrapper<TDatums, TWorker, TQueue>::configure(const WrapperStructPose& wrapperStructPose, const experimental::WrapperStructFace& wrapperStructFace,
                                                       const WrapperStructInput& wrapperStructInput, const WrapperStructOutput& wrapperStructOutput)
+    {
+        try
+        {
+            configure(wrapperStructPose, wrapperStructFace, experimental::WrapperStructHand{}, wrapperStructInput, wrapperStructOutput);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    template<typename TDatums, typename TWorker, typename TQueue>
+    void Wrapper<TDatums, TWorker, TQueue>::configure(const WrapperStructPose& wrapperStructPose, const experimental::WrapperStructHand& wrapperHandStruct,
+                                                      const WrapperStructInput& wrapperStructInput, const WrapperStructOutput& wrapperStructOutput)
+    {
+        try
+        {
+            configure(wrapperStructPose, experimental::WrapperStructFace{}, wrapperHandStruct, wrapperStructInput, wrapperStructOutput);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    template<typename TDatums, typename TWorker, typename TQueue>
+    void Wrapper<TDatums, TWorker, TQueue>::configure(const WrapperStructPose& wrapperStructPose, const experimental::WrapperStructFace& wrapperStructFace,
+                                                      const experimental::WrapperStructHand& wrapperHandStruct, const WrapperStructInput& wrapperStructInput,
+                                                      const WrapperStructOutput& wrapperStructOutput)
     {
         try
         {
@@ -393,8 +445,8 @@ namespace op
             }
             if (mUserOutputWs.empty() && mThreadManagerMode != ThreadManagerMode::Asynchronous && mThreadManagerMode != ThreadManagerMode::AsynchronousOut)
             {
-                const std::string additionalMessage = " You could also set mThreadManagerMode = mThreadManagerMode::Asynchronous(Out) and/or add your own output worker"
-                                                      " class before calling this function.";
+                const std::string additionalMessage = " You could also set mThreadManagerMode = mThreadManagerMode::Asynchronous(Out) and/or add your own"
+                                                      " output worker class before calling this function.";
                 const auto savingSomething = (!wrapperStructOutput.writeImages.empty() || !wrapperStructOutput.writeVideo.empty()
                                               || !wrapperStructOutput.writePose.empty() || !wrapperStructOutput.writePoseJson.empty()
                                               || !wrapperStructOutput.writeCocoJson.empty() || !wrapperStructOutput.writeHeatMaps.empty());
@@ -516,15 +568,27 @@ namespace op
             for (auto i = 0; i < spWPoses.size(); i++)
                 spWPoses.at(i) = {std::make_shared<WPoseExtractor<TDatumsPtr>>(poseExtractors.at(i))};
 
+            // Face extractor(s)
+            if (wrapperStructFace.extractAndRenderFace)
+            {
+                for (auto gpuId = 0; gpuId < spWPoses.size(); gpuId++)
+                {
+                    const auto faceExtractor = std::make_shared<experimental::FaceExtractor>(
+                        wrapperStructPose.modelFolder, gpuId + wrapperStructPose.gpuNumberStart, wrapperStructPose.poseModel
+                    );
+                    spWPoses.at(gpuId).emplace_back(std::make_shared<experimental::WFaceExtractor<TDatumsPtr>>(faceExtractor));
+                }
+            }
+
             // Hand extractor(s)
             if (wrapperHandStruct.extractAndRenderHands)
             {
                 for (auto gpuId = 0; gpuId < spWPoses.size(); gpuId++)
                 {
-                    const auto handsExtractor = std::make_shared<experimental::HandsExtractor>(
+                    const auto handExtractor = std::make_shared<experimental::HandExtractor>(
                         wrapperStructPose.modelFolder, gpuId + wrapperStructPose.gpuNumberStart, wrapperStructPose.poseModel
                     );
-                    spWPoses.at(gpuId).emplace_back(std::make_shared<experimental::WHandsExtractor<TDatumsPtr>>(handsExtractor));
+                    spWPoses.at(gpuId).emplace_back(std::make_shared<experimental::WHandExtractor<TDatumsPtr>>(handExtractor));
                 }
             }
 
@@ -539,15 +603,33 @@ namespace op
                 for (auto i = 0; i < spWPoses.size(); i++)
                 {
                     // Construct hands renderer
-                    const auto handsRenderer = std::make_shared<experimental::HandsRenderer>(finalOutputSize);
+                    const auto handRenderer = std::make_shared<experimental::HandRenderer>(finalOutputSize);
+                    // Performance boost -> share spGpuMemoryPtr for all renderers
+                    if (!poseRenderers.empty())
+                    {
+                        const bool isLastRenderer = (!wrapperStructFace.extractAndRenderFace);
+                        handRenderer->setGpuMemoryAndSetIfLast(poseRenderers.at(i)->getGpuMemoryAndSetAsFirst(), isLastRenderer);
+                    }
+                    // Add worker
+                    spWPoses.at(i).emplace_back(std::make_shared<experimental::WHandRenderer<TDatumsPtr>>(handRenderer));
+                }
+            }
+
+            // Face renderer(s)
+            if (wrapperStructFace.extractAndRenderFace)
+            {
+                for (auto i = 0; i < spWPoses.size(); i++)
+                {
+                    // Construct face renderer
+                    const auto faceRenderer = std::make_shared<experimental::FaceRenderer>(finalOutputSize);
                     // Performance boost -> share spGpuMemoryPtr for all renderers
                     if (!poseRenderers.empty())
                     {
                         const bool isLastRenderer = true;
-                        handsRenderer->setGpuMemoryAndSetIfLast(poseRenderers.at(i)->getGpuMemoryAndSetAsFirst(), isLastRenderer);
+                        faceRenderer->setGpuMemoryAndSetIfLast(poseRenderers.at(i)->getGpuMemoryAndSetAsFirst(), isLastRenderer);
                     }
                     // Add worker
-                    spWPoses.at(i).emplace_back(std::make_shared<experimental::WHandsRenderer<TDatumsPtr>>(handsRenderer));
+                    spWPoses.at(i).emplace_back(std::make_shared<experimental::WFaceRenderer<TDatumsPtr>>(faceRenderer));
                 }
             }
 
@@ -567,8 +649,8 @@ namespace op
                 && (wrapperStructPose.poseScaleMode != ScaleMode::InputResolution || (finalOutputSize != producerSize))
                 && (wrapperStructPose.poseScaleMode != ScaleMode::NetOutputResolution || (finalOutputSize != netOutputSize)))
             {
-                auto arrayScaler = std::make_shared<ArrayScaler>(wrapperStructPose.poseScaleMode);
-                mPostProcessingWs.emplace_back(std::make_shared<WArrayScaler<TDatumsPtr>>(arrayScaler));
+                auto keyPointScaler = std::make_shared<KeyPointScaler>(wrapperStructPose.poseScaleMode);
+                mPostProcessingWs.emplace_back(std::make_shared<WKeyPointScaler<TDatumsPtr>>(keyPointScaler));
             }
 
             mOutputWs.clear();

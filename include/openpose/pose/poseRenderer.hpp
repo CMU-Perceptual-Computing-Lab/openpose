@@ -42,7 +42,7 @@ namespace op
 
         void setShowGooglyEyes(const bool showGooglyEyes);
 
-        std::pair<int, std::string> renderPose(Array<float>& outputData, const Array<float>& pose, const double scaleNetToOutput = -1.);
+        std::pair<int, std::string> renderPose(Array<float>& outputData, const Array<float>& poseKeyPoints, const double scaleNetToOutput = -1.);
 
     private:
         const cv::Size mHeatMapsSize;
