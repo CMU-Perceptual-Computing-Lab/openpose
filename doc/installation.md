@@ -3,7 +3,7 @@ OpenPose Library - Compilation and Installation
 
 ## Requirements
 - Ubuntu (tested on 14 and 16)
-- GPU with at least 2 GB and 1.5 GB available (the `nvidia-smi` command checks the available GPU memory in Ubuntu).
+- GPU with **cuDNN installed** and at least 2 GB and 1.5 GB available (the `nvidia-smi` command checks the available GPU memory in Ubuntu).
 - At least 2 GB of free RAM memory.
 - Highly recommended: A CPU with at least 8 cores. 
 

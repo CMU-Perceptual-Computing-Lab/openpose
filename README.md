@@ -15,9 +15,9 @@ Library main functionality:
 
 * Multi-person 15 or **18-key-point body pose** estimation and rendering.
 
-* Multi-person **2x21-key-point hand** estimation and rendering (coming soon in ~1 month!).
+* Multi-person **2x21-key-point hand** estimation and rendering (coming soon in around 1-2 months!).
 
-* Multi-person **70-key-point face** estimation and rendering (coming soon in ~1.5 months!).
+* Multi-person **70-key-point face** estimation and rendering (coming soon in around 2-3 months!).
 
 * Flexible and easy-to-configure **multi-threading** module.
 
@@ -34,29 +34,28 @@ The pose estimation work is based on the C++ code from [C++ real-time ECCV 2016 
 
 
 ## Results
-### Body Estimation
 
+### Body Estimation
 <p align="center">
-    <img src="doc/media/dance.gif", width="720">
+    <img src="doc/media/dance.gif", width="480">
 </p>
 
 ## Coming Soon (But Already Working!)
-### Body + Hands
 
+### Body + Hands + Face Estimation
 <p align="center">
-    <img src="doc/media/pose_hands.gif", width="720">
+    <img src="doc/media/pose_face_hands.gif", width="480">
 </p>
 
 ### Body + Face Estimation
 <p align="center">
-    <img src="doc/media/pose_face.gif", width="720">
+    <img src="doc/media/pose_face.gif", width="480">
 </p>
 
-### Body + Hands + Face Estimation
+### Body + Hands
 <p align="center">
-    <img src="doc/media/pose_face_hands.gif", width="720">
+    <img src="doc/media/pose_hands.gif", width="480">
 </p>
-
 
 
 ## Contents
