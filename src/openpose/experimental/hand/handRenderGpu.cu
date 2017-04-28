@@ -70,12 +70,9 @@ namespace op
         {
             if (numberHands > 0)
             {
-                //framePtr      =   width * height * 3
-                //handsPtr =   3 (x,y,score) * #Hand parts * # hands
                 const auto threshold = 0.05f;
                 dim3 threadsPerBlock = dim3{THREADS_PER_BLOCK_1D, THREADS_PER_BLOCK_1D};
                 dim3 numBlocks = dim3{getNumberCudaBlocks(frameSize.width, threadsPerBlock.x), getNumberCudaBlocks(frameSize.height, threadsPerBlock.y)};
-                // log("numberHands: " + std::to_string(numberHands), Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 renderHandsParts<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.width, frameSize.height, handsPtr, numberHands, threshold, alphaColorToAdd);
                 cudaCheck(__LINE__, __FUNCTION__, __FILE__);
             }

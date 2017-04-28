@@ -47,12 +47,9 @@ namespace op
         {
             if (numberFaces > 0)
             {
-                //framePtr      =   width * height * 3
-                //facePtr       =   3 (x,y,score) * #Hand parts * # face
-                const auto threshold = 0.4f;
+                const auto threshold = 0.5f;
                 dim3 threadsPerBlock = dim3{THREADS_PER_BLOCK_1D, THREADS_PER_BLOCK_1D};
                 dim3 numBlocks = dim3{getNumberCudaBlocks(frameSize.width, threadsPerBlock.x), getNumberCudaBlocks(frameSize.height, threadsPerBlock.y)};
-                // log("numberFaces: " + std::to_string(numberFaces), Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 renderFaceParts<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.width, frameSize.height, facePtr, numberFaces, threshold, alphaColorToAdd);
                 cudaCheck(__LINE__, __FUNCTION__, __FILE__);
             }
