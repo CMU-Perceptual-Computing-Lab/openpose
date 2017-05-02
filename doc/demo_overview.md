@@ -30,11 +30,11 @@ The visual GUI should show the original image with the poses blended on it, simi
 
 If you choose to visualize a body part or a PAF (Part Affinity Field) heat map, the result should be similar to the following images:
 <p align="center">
-    <img src="media/body_heat_maps.gif", width="720">
+    <img src="media/body_heat_maps.png", width="720">
 </p>
 
 <p align="center">
-    <img src="media/paf_heat_maps.gif", width="720">
+    <img src="media/paf_heat_maps.png", width="720">
 </p>
 
 
