@@ -28,7 +28,7 @@ cp Makefile.config.Ubuntu14.example Makefile.config # Ubuntu 14, cuda 8
 cp Makefile.config.Ubuntu16_cuda_7.example Makefile.config # Ubuntu 16, cuda 7
 cp Makefile.config.Ubuntu16.example Makefile.config # Ubuntu 16, cuda 8
 # Compile Caffe
-make distribute -j${number_of_cpus}
+make all -j${number_of_cpus} && make distribute -j${number_of_cpus}
 
 ### Install OpenPose ###
 cd ../../models/
@@ -49,10 +49,3 @@ Note: These steps only need to be performed once. If you are interested in makin
 make clean
 make all -j$(NUM_CORES)
 ```
-
-## Custom Caffe
-We slightly modified some Caffe compilation flags and minor details. In case you want to use your own Caffe distribution, these are the files we added and modified:
-
-1. Added files: `install_caffe_and_openpose.sh`; as well as `Makefile.config.Ubuntu14.example`, `Makefile.config.Ubuntu16.example`, `Makefile.config.Ubuntu14_cuda_7.example` and `Makefile.config.Ubuntu16_cuda_7.example` (extracted from `Makefile.config.example`).
-2. Optional - deleted Caffe files and folders (only to save space): `Makefile.config.example`, `data/`, `examples/` (editing the Makefile distribute section to avoid using this folder) and `models/`.
-3. Finally, run `make distribute` in your Caffe version and modify the Caffe directory variable in our Makefile config file: `./Makefile.config.UbuntuX.example` (where X is 14 or 16 depending on your Ubuntu version), set the `CAFFE_DIR` parameter to the path where both the `include` and `lib` Caffe folders are located.

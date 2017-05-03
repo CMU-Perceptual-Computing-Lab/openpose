@@ -182,6 +182,16 @@ Just comment on GibHub or make a pull request! We will answer you back as soon a
 
 
 
+## Custom Caffe
+We only modified some Caffe compilation flags and minor details. You can use use your own Caffe distribution, these are the files we added and modified:
+
+1. Added files: `install_caffe.sh`; as well as `Makefile.config.Ubuntu14.example`, `Makefile.config.Ubuntu16.example`, `Makefile.config.Ubuntu14_cuda_7.example` and `Makefile.config.Ubuntu16_cuda_7.example` (extracted from `Makefile.config.example`). Basically, you must enable cuDNN.
+2. Edited file: Makefile. Search for "# OpenPose: " to find the edited code. We basically added the C++11 flag to avoid issues in some old computers.
+3. Optional - deleted Caffe file: `Makefile.config.example`.
+4. Finally, run `make all && make distribute` in your Caffe version and modify the Caffe directory variable in our Makefile config file: `./Makefile.config.UbuntuX.example` (where X is 14 or 16 depending on your Ubuntu version), set the `CAFFE_DIR` parameter to the path where both the `include` and `lib` Caffe folders are located.
+
+
+
 ## Citation
 Please cite the paper in your publications if it helps your research:
 

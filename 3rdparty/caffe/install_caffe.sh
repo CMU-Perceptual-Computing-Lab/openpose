@@ -71,9 +71,9 @@ else
     cp Makefile.config.Ubuntu16.example Makefile.config
 fi
 # make all -j$NUM_CORES
-make distribute -j$NUM_CORES
+make all -j$NUM_CORES && make distribute -j$NUM_CORES
 # make test -j$NUM_CORES
-# make runtest -j$NUM_CORES # This command crashes due to the new added layers
+# make runtest -j$NUM_CORES
 exitIfError
 echo "------------------------- Caffe Compiled -------------------------"
 echo ""

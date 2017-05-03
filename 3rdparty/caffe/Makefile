@@ -40,6 +40,9 @@ DYNAMIC_NAME_SHORT := lib$(LIBRARY_NAME).so
 DYNAMIC_VERSIONED_NAME_SHORT := $(DYNAMIC_NAME_SHORT).$(DYNAMIC_VERSION_MAJOR).$(DYNAMIC_VERSION_MINOR).$(DYNAMIC_VERSION_REVISION)
 DYNAMIC_NAME := $(LIB_BUILD_DIR)/$(DYNAMIC_VERSIONED_NAME_SHORT)
 COMMON_FLAGS += -DCAFFE_VERSION=$(DYNAMIC_VERSION_MAJOR).$(DYNAMIC_VERSION_MINOR).$(DYNAMIC_VERSION_REVISION)
+# OpenPose: added C++11 flag to avoid crashing in some old GCC compilers
+COMMON_FLAGS += -std=c++11
+# OpenPose: end modified
 
 ##############################
 # Get all source files
@@ -319,7 +322,9 @@ ifeq ($(DEBUG), 1)
 	COMMON_FLAGS += -DDEBUG -g -O0
 	NVCCFLAGS += -G
 else
-	COMMON_FLAGS += -DNDEBUG -O2
+	# OpenPose: modified `-O2` by `-O3`
+	COMMON_FLAGS += -DNDEBUG -O3
+	# OpenPose: end modified
 endif
 
 # cuDNN acceleration configuration.
