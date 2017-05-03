@@ -358,7 +358,7 @@ int openPoseTutorialWrapper2()
     // Producer (use default to disable any input)
     // Consumer (comment or use default argument to disable any output)
     opWrapper.configure(wrapperStructPose, op::WrapperStructInput{}, wrapperStructOutput);
-    // Set to single-thread running (for debugging purposes)
+    // Set to single-thread running (e.g. for debugging purposes)
     // opWrapper.disableMultiThreading();
 
     op::log("Starting thread(s)", op::Priority::Max);

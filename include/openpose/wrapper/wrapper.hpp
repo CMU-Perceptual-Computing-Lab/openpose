@@ -966,7 +966,8 @@ namespace op
                 }
                 else
                 {
-                    log("Debugging activated, only 1 thread running, all spWPoses have been disabled but the first one.");
+                    log("Multi-threading disabled, only 1 thread running. All GPUs have been disabled but the first one, which is defined by"
+                        " gpuNumberStart (in the demo, it is set with the `num_gpu_start` flag.");
                     mThreadManager.add(mThreadId, spWPoses.at(0), queueIn, queueOut);
                 }
                 queueIn++;

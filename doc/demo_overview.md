@@ -44,7 +44,7 @@ Please, in order to check all the real time pose demo options and their details,
 
 `--video input.mp4`: Input video. If omitted, it will use the webcam.
 
-`--camera 3`: Choose webcam number (default: 0). If `--camera`, --image_dir` and `--write_video` are omitted, it is equivalent to use `--camera 0`.
+`--camera 3`: Choose webcam number (default: 0). If `--camera`, `--image_dir` and `--write_video` are omitted, it is equivalent to use `--camera 0`.
 
 `--image_dir path_to_images/`: Run on all images (jpg, png, bmp, etc.) in `path_to_images/`. You can test the program with the image directory `examples/media/`.
 

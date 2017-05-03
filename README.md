@@ -23,7 +23,7 @@ Library main functionality:
 
 * Image, video and webcam reader.
 
-* Able to save the results in various format(JSON, XML, PNG, JPG, ...).
+* Able to save and load the results in various formats (JSON, XML, PNG, JPG, ...).
 
 * Small display and GUI for simple result visualization.
 
