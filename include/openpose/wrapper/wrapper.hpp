@@ -703,7 +703,7 @@ namespace op
                                                    || mThreadManagerMode == ThreadManagerMode::Asynchronous
                                                    || mThreadManagerMode == ThreadManagerMode::AsynchronousOut))
             {
-                const auto guiInfoAdder = std::make_shared<GuiInfoAdder>(finalOutputSize, wrapperStructPose.gpuNumber);
+                const auto guiInfoAdder = std::make_shared<GuiInfoAdder>(finalOutputSize, wrapperStructPose.gpuNumber, wrapperStructOutput.displayGui);
                 mOutputWs.emplace_back(std::make_shared<WGuiInfoAdder<TDatumsPtr>>(guiInfoAdder));
             }
             // Minimal graphical user interface (GUI)

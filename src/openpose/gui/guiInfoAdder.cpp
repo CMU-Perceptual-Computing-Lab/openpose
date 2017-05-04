@@ -40,10 +40,11 @@ namespace op
         }
     }
 
-    GuiInfoAdder::GuiInfoAdder(const cv::Size& outputSize, const int numberGpus) :
+    GuiInfoAdder::GuiInfoAdder(const cv::Size& outputSize, const int numberGpus, const bool guiEnabled) :
         mOutputSize{outputSize},
         mBorderMargin{intRound(fastMax(mOutputSize.width, mOutputSize.height) * 0.025)},
         mNumberGpus{numberGpus},
+        mGuiEnabled{guiEnabled},
         mFpsCounter{0u},
         mLastElementRenderedCounter{std::numeric_limits<int>::max()}
     {
@@ -78,8 +79,9 @@ namespace op
             mLastElementRenderedCounter = fastMin(mLastElementRenderedCounter, std::numeric_limits<int>::max() - 5);
             mLastElementRenderedCounter++;
             // Display element to display or help
-            putTextOnCvMat(cvOutputData, (!mLastElementRenderedName.empty() ? mLastElementRenderedName : "'h' for help"),
-                           {intRound(mOutputSize.width - mBorderMargin), mBorderMargin}, white, true);
+            std::string message = (!mLastElementRenderedName.empty() ? mLastElementRenderedName : (mGuiEnabled ? "'h' for help" : ""));
+            if (!message.empty())
+                putTextOnCvMat(cvOutputData, message, {intRound(mOutputSize.width - mBorderMargin), mBorderMargin}, white, true);
             // Frame number
             putTextOnCvMat(cvOutputData, "Frame " + std::to_string(id), {mBorderMargin, (int)(mOutputSize.height - mBorderMargin)}, white, false);
             // Number people
