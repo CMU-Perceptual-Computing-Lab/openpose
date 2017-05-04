@@ -699,7 +699,9 @@ namespace op
             // Add frame information for GUI
             // If this WGuiInfoAdder instance is placed before the WImageSaver or WVideoSaver, then the resulting recorded frames will
             // look exactly as the final displayed image by the GUI
-            if (wrapperStructOutput.displayGui && wrapperStructOutput.guiVerbose)
+            if (wrapperStructOutput.guiVerbose && (wrapperStructOutput.displayGui || !mUserOutputWs.empty()
+                                                   || mThreadManagerMode == ThreadManagerMode::Asynchronous
+                                                   || mThreadManagerMode == ThreadManagerMode::AsynchronousOut))
             {
                 const auto guiInfoAdder = std::make_shared<GuiInfoAdder>(finalOutputSize, wrapperStructPose.gpuNumber);
                 mOutputWs.emplace_back(std::make_shared<WGuiInfoAdder<TDatumsPtr>>(guiInfoAdder));
