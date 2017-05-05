@@ -7,8 +7,7 @@
 
 namespace op
 {
-    const auto THREADS_PER_BLOCK_1D = 32;
-
+    const dim3 THREADS_PER_BLOCK{128, 128, 1};
     __constant__ const unsigned char PART_PAIRS_GPU[] = FACE_PAIRS_TO_RENDER;
     __constant__ const float RGB_COLORS[] = {
         255.f,    255.f,    255.f,
@@ -48,9 +47,8 @@ namespace op
             if (numberFaces > 0)
             {
                 const auto threshold = 0.5f;
-                dim3 threadsPerBlock = dim3{THREADS_PER_BLOCK_1D, THREADS_PER_BLOCK_1D};
-                dim3 numBlocks = dim3{getNumberCudaBlocks(frameSize.width, threadsPerBlock.x), getNumberCudaBlocks(frameSize.height, threadsPerBlock.y)};
-                renderFaceParts<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.width, frameSize.height, facePtr, numberFaces, threshold, alphaColorToAdd);
+                const auto numBlocks = getNumberCudaBlocks(frameSize, THREADS_PER_BLOCK);
+                renderFaceParts<<<THREADS_PER_BLOCK, numBlocks>>>(framePtr, frameSize.width, frameSize.height, facePtr, numberFaces, threshold, alphaColorToAdd);
                 cudaCheck(__LINE__, __FUNCTION__, __FILE__);
             }
         }

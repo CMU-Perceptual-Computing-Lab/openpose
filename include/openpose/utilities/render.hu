@@ -35,8 +35,8 @@ namespace op
                         sharedMaxs[globalIdx].y = y;
                 }
             }
-            const auto averageX = sharedMaxs[globalIdx].x-sharedMins[globalIdx].x;
-            const auto averageY = sharedMaxs[globalIdx].y-sharedMins[globalIdx].y;
+            const auto averageX = sharedMaxs[globalIdx].x - sharedMins[globalIdx].x;
+            const auto averageY = sharedMaxs[globalIdx].y - sharedMins[globalIdx].y;
             sharedScaleF[globalIdx] = fastTruncate((averageX + averageY) / 400.f, 0.33f, 1.f);    // (averageX + averageY) / 2.f / 400.f
             const auto constantToAdd = 50.f;
             sharedMaxs[globalIdx].x += constantToAdd;

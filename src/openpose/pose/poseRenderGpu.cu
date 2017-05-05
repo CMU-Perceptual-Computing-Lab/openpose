@@ -1,4 +1,4 @@
-#include <utility> /// std::pair
+#include <utility> // std::pair
 #include "openpose/pose/poseParameters.hpp"
 #include "openpose/utilities/errorAndLog.hpp"
 #include "openpose/utilities/cuda.hpp"
@@ -8,7 +8,6 @@
 
 namespace op
 {
-    const auto THREADS_PER_BLOCK_1D = 32u;
     __constant__ const unsigned char COCO_PAIRS_GPU[] = POSE_COCO_PAIRS_TO_RENDER;
     __constant__ const unsigned char MPI_PAIRS_GPU[] = POSE_MPI_PAIRS_TO_RENDER;
     __constant__ const float COCO_RGB_COLORS[] = {
@@ -388,24 +387,9 @@ namespace op
         }
     }
 
-    inline std::pair<dim3, dim3> getThreadsAndBlocks(const cv::Size& frameSize)
-    {
-        try
-        {
-            std::pair<dim3, dim3> threadsAndBlocks;
-            threadsAndBlocks.first = dim3{THREADS_PER_BLOCK_1D, THREADS_PER_BLOCK_1D};
-            threadsAndBlocks.second = dim3{getNumberCudaBlocks(frameSize.width, threadsAndBlocks.first.x), getNumberCudaBlocks(frameSize.height, threadsAndBlocks.first.y)};
-            return threadsAndBlocks;
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return std::make_pair(dim3{0,0,0}, dim3{0,0,0});
-        }
-    }
-
-    inline void renderKeyPointsPartAffinityAux(float* framePtr, const PoseModel poseModel, const cv::Size& frameSize, const float* const heatMapPtr,
-                                         const cv::Size& heatMapSize, const float scaleToKeepRatio, const int part, const int partsToRender, const float alphaBlending)
+    inline void renderKeyPointsPartAffinityAux(float* framePtr, const PoseModel poseModel, const cv::Size& frameSize,
+                                               const float* const heatMapPtr, const cv::Size& heatMapSize, const float scaleToKeepRatio,
+                                               const int part, const int partsToRender, const float alphaBlending)
     {
         try
         {
@@ -415,9 +399,9 @@ namespace op
             const auto heatMapOffset = POSE_NUMBER_BODY_PARTS[(int)poseModel] * heatMapSize.area();
             dim3 threadsPerBlock;
             dim3 numBlocks;
-            std::tie(threadsPerBlock, numBlocks) = getThreadsAndBlocks(frameSize);
-            renderPartAffinities<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.width, frameSize.height, heatMapPtr, heatMapSize.width, heatMapSize.height, 
-                                                                 scaleToKeepRatio, partsToRender, part, alphaBlending);
+            std::tie(threadsPerBlock, numBlocks) = getNumberCudaThreadsAndBlocks(frameSize);
+            renderPartAffinities<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.width, frameSize.height, heatMapPtr, heatMapSize.width,
+                                                                 heatMapSize.height, scaleToKeepRatio, partsToRender, part, alphaBlending);
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
         }
         catch (const std::exception& e)
@@ -441,13 +425,15 @@ namespace op
 
                 dim3 threadsPerBlock;
                 dim3 numBlocks;
-                std::tie(threadsPerBlock, numBlocks) = getThreadsAndBlocks(frameSize);
+                std::tie(threadsPerBlock, numBlocks) = getNumberCudaThreadsAndBlocks(frameSize);
                 const auto threshold = getThresholdForPose(poseModel);
 
                 if (poseModel == PoseModel::COCO_18)
-                    renderPoseCoco<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.width, frameSize.height, posePtr, numberPeople, threshold, googlyEyes, blendOriginalFrame, alphaBlending);
+                    renderPoseCoco<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.width, frameSize.height, posePtr, numberPeople, 
+                                                                   threshold, googlyEyes, blendOriginalFrame, alphaBlending);
                 else if (poseModel == PoseModel::MPI_15 || poseModel == PoseModel::MPI_15_4)
-                    renderPoseMpi29Parts<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.width, frameSize.height, posePtr, numberPeople, threshold, blendOriginalFrame, alphaBlending);
+                    renderPoseMpi29Parts<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.width, frameSize.height, posePtr,
+                                                                         numberPeople, threshold, blendOriginalFrame, alphaBlending);
                 else
                     error("Unvalid Model.", __LINE__, __FUNCTION__, __FILE__);
                 cudaCheck(__LINE__, __FUNCTION__, __FILE__);
@@ -469,7 +455,7 @@ namespace op
             checkAlpha(alphaBlending);
             dim3 threadsPerBlock;
             dim3 numBlocks;
-            std::tie(threadsPerBlock, numBlocks) = getThreadsAndBlocks(frameSize);
+            std::tie(threadsPerBlock, numBlocks) = getNumberCudaThreadsAndBlocks(frameSize);
             const auto numberBodyParts = POSE_NUMBER_BODY_PARTS[(int)poseModel];
             const auto heatMapOffset = numberBodyParts * heatMapSize.area();
 
@@ -493,12 +479,12 @@ namespace op
             checkAlpha(alphaBlending);
             dim3 threadsPerBlock;
             dim3 numBlocks;
-            std::tie(threadsPerBlock, numBlocks) = getThreadsAndBlocks(frameSize);
+            std::tie(threadsPerBlock, numBlocks) = getNumberCudaThreadsAndBlocks(frameSize);
             const auto numberBodyParts = POSE_NUMBER_BODY_PARTS[(int)poseModel];
             const auto heatMapOffset = numberBodyParts * heatMapSize.area();
 
             renderBodyPartHeatMaps<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.width, frameSize.height, heatMapPtr, heatMapSize.width, heatMapSize.height,
-                                                                    scaleToKeepRatio, numberBodyParts, alphaBlending);
+                                                                   scaleToKeepRatio, numberBodyParts, alphaBlending);
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
         }
         catch (const std::exception& e)

@@ -7,8 +7,6 @@
 
 namespace op
 {
-    const auto THREADS_PER_BLOCK_1D = 32;
-
     __constant__ const unsigned char PART_PAIRS_GPU[] = HAND_PAIRS_TO_RENDER;
     __constant__ const float RGB_COLORS[] = {
         179.f,    0.f,    0.f,
@@ -71,8 +69,9 @@ namespace op
             if (numberHands > 0)
             {
                 const auto threshold = 0.05f;
-                dim3 threadsPerBlock = dim3{THREADS_PER_BLOCK_1D, THREADS_PER_BLOCK_1D};
-                dim3 numBlocks = dim3{getNumberCudaBlocks(frameSize.width, threadsPerBlock.x), getNumberCudaBlocks(frameSize.height, threadsPerBlock.y)};
+                dim3 threadsPerBlock;
+                dim3 numBlocks;
+                std::tie(threadsPerBlock, numBlocks) = getNumberCudaThreadsAndBlocks(frameSize);
                 renderHandsParts<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.width, frameSize.height, handsPtr, numberHands, threshold, alphaColorToAdd);
                 cudaCheck(__LINE__, __FUNCTION__, __FILE__);
             }
