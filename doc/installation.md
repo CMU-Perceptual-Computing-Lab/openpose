@@ -10,7 +10,9 @@ OpenPose Library - Compilation and Installation
 Note: This requirements assume the default configuration (i.e. `--net_resolution "656x368"` and `num_scales 1`). You might need more (with a greater net resolution and/or number of scales) or less resources (with smaller net resolution and/or using the MPI and MPI_4 models).
 
 ## How to Compile It
-1. Required: CUDA, cuDNN and OpenCV installed on your machine. OpenCV can be easily installed by running `apt-get install libopencv-dev`.
+1. Required: CUDA, cuDNN, OpenCV and Atlas must be already installed on your machine.
+    1. OpenCV can be installed by running `apt-get install libopencv-dev`.
+    2. Atlas with `sudo apt-get install libatlas-base-dev`. Instead of Atlas, you can use OpenBLAS or Intel MKL, just modify the generated `Makefile.config` and `3rdparty/caffe/Makefile.config` and recompile again.
 2. If you have installed OpenCV 2.4 in your system, go to step 3. If you are using OpenCV 3, uncomment the line `# OPENCV_VERSION := 3` on the file `Makefile.config.Ubuntu14.example` (for Ubuntu 14) and/or `Makefile.config.Ubuntu16.example` (for Ubuntu 15 or 16). In addition, OpenCV 3 does not incorporate the `opencv_contrib` module by default. Assuming you have manually installed it and you need to use it, append `opencv_contrib` at the end of the line `LIBRARIES += opencv_core opencv_highgui opencv_imgproc` in the `Makefile` file.
 3. Build Caffe & the OpenPose library + download the required Caffe models for Ubuntu 14.04 or 16.04 and cuda 8:
 ```
@@ -18,7 +20,7 @@ chmod u+x install_caffe_and_openpose.sh
 ./install_caffe_and_openpose.sh
 ```
 
-Alternatively, if you want to use CUDA 7 and/or avoid using sh scripts, install the Caffe prerequisites and then run these lines:
+Alternatively, if you want to use CUDA 7 and/or avoid using sh scripts: 1) Install the [Caffe prerequisites](http://caffe.berkeleyvision.org/installation.html); and 2) Compile Caffe and OpenPose by running these lines:
 ```
 ### Install Caffe ###
 cd 3rdparty/caffe/

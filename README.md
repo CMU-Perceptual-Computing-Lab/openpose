@@ -175,6 +175,11 @@ We only modified some Caffe compilation flags and minor details. You can use use
 
 
 
+## OpenPose Benchmark
+Initial library running time benchmark on [OpenPose Benchmark](https://docs.google.com/spreadsheets/d/1-DynFGvoScvfWDA1P4jDInCkbD4lg0IKOYbXgEq0sK0/edit#gid=0). You can comment in that document with your graphics card model and running time per time for that model, and we will add your results to the benchmark!
+
+
+
 ## Send Us your Feed-Back!
 Our library is open source for research purposes, and we want to continuously improve it! So please, let us know if...
 
