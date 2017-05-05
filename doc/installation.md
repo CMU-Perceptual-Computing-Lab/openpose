@@ -14,6 +14,11 @@ Note: This requirements assume the default configuration (i.e. `--net_resolution
     1. OpenCV can be installed by running `apt-get install libopencv-dev`.
     2. Atlas with `sudo apt-get install libatlas-base-dev`. Instead of Atlas, you can use OpenBLAS or Intel MKL, just modify the generated `Makefile.config` and `3rdparty/caffe/Makefile.config` and recompile again.
 2. If you have installed OpenCV 2.4 in your system, go to step 3. If you are using OpenCV 3, uncomment the line `# OPENCV_VERSION := 3` on the file `Makefile.config.Ubuntu14.example` (for Ubuntu 14) and/or `Makefile.config.Ubuntu16.example` (for Ubuntu 15 or 16). In addition, OpenCV 3 does not incorporate the `opencv_contrib` module by default. Assuming you have manually installed it and you need to use it, append `opencv_contrib` at the end of the line `LIBRARIES += opencv_core opencv_highgui opencv_imgproc` in the `Makefile` file.
+==============================================================================================================
+tips: the files numbuer of "Makefile.config.Ubuntu##.example" is two, openpose & caffe, must both modify them. follow as example:
+./3rdparty/caffe/Makefile.config.Ubuntu16.example
+./Makefile.config.Ubuntu16.example
+===============================================================================================================
 3. Build Caffe & the OpenPose library + download the required Caffe models for Ubuntu 14.04 or 16.04 and cuda 8:
 ```
 chmod u+x install_caffe_and_openpose.sh
