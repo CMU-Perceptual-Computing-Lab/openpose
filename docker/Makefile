@@ -10,10 +10,13 @@ help:
 	@echo ""
 
 build:
-		@docker build --tag=openpose openpose/.
+		@docker build --tag=cmupcl/openpose:gpu gpu
+		# @docker build --tag=cmupcl/openpose:cpu cpu
 
 # pull:
-# 	@docker pull openpose
+# 	@docker pull cmupcl/openpose:gpu
+# 	@docker pull cmupcl/openpose:cpu
 
 # clean:
-# 	@docker rmi -f openpose
+# 	@docker rmi -f cmupcl/openpose:gpu
+# 	@docker rmi -f cmupcl/openpose:cpu
