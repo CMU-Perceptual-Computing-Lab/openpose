@@ -30,8 +30,8 @@ WORKDIR /root
 RUN git clone https://github.com/CMU-Perceptual-Computing-Lab/openpose.git
 
 WORKDIR /root/openpose
-RUN chmod u+x install_caffe_and_openpose.sh && \
-    chmod u+x 3rdparty/caffe/install_caffe.sh && \
-    chmod u+x models/getModels.sh && \
-    chmod u+x install_openpose.sh && \
-    bash install_caffe_and_openpose.sh
+RUN chmod +x install_caffe_and_openpose.sh && \
+    chmod +x 3rdparty/caffe/install_caffe.sh && \
+    chmod +x models/getModels.sh && \
+    chmod +x install_openpose.sh && \
+    bash ./install_caffe_and_openpose.sh
