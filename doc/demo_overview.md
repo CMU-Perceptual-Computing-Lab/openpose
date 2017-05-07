@@ -56,7 +56,7 @@ Please, in order to check all the real time pose demo options and their details,
 
 `--no_display`: Display window not opened. Useful if there is no X server and/or to slightly speed up the processing if visual output is not required.
 
-`--num_gpu 2 --start_gpu 0`: Parallelize over this number of GPUs starting by the desired device id. Default is 1 and 0, respectively.
+`--num_gpu 2 --num_gpu_start 0`: Parallelize over this number of GPUs starting by the desired device id. Default is 1 and 0, respectively.
 
 `--num_scales 3 --scale_gap 0.15`: Use 3 scales, 1, (1-0.15), (1-0.15*2). Default is one scale. If you want to change the initial scale, you actually want to multiply your desired initial scale by the `net_resolution`.
 
