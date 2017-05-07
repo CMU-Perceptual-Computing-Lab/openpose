@@ -5,7 +5,7 @@ OpenPose
 
 OpenPose is a **library for real-time multi-person keypoint detection and multi-threading written in C++** using OpenCV and Caffe*, authored by [Gines Hidalgo](https://www.linkedin.com/in/gineshidalgo/), [Zhe Cao](http://www.andrew.cmu.edu/user/zhecao), [Tomas Simon](http://www.cs.cmu.edu/~tsimon/), [Shih-En Wei](https://scholar.google.com/citations?user=sFQD3k4AAAAJ&hl=en), [Hanbyul Joo](http://www.cs.cmu.edu/~hanbyulj/) and [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/).
 
-* It uses Caffe, but the code is ready to be ported to other frameworks (e.g. Tensorflow or Torch). If you implement any of those, please, make a pull request and we will add it!
+* It uses Caffe, but the code is ready to be ported to other frameworks (e.g., Tensorflow or Torch). If you implement any of those, please, make a pull request and we will add it!
 
 OpenPose is freely available for free non-commercial use, and may be redistributed under these conditions. Please, see the [license](LICENSE) for further details. Contact us for commercial purposes.
 
@@ -21,7 +21,7 @@ Library main functionality:
 
 * Flexible and easy-to-configure **multi-threading** module.
 
-* Image, video and webcam reader.
+* Image, video, and webcam reader.
 
 * Able to save and load the results in various formats (JSON, XML, PNG, JPG, ...).
 
@@ -73,12 +73,12 @@ The pose estimation work is based on the C++ code from [the ECCV 2016 demo](http
 
 
 ## Installation
-Installation steps on [doc/installation.md](doc/installation.md).
+Installation steps: [doc/installation.md](doc/installation.md).
 
 
 
 ## Quick Start
-Most users cases should not need to dive deep into the library, they might just be able to use the [Demo](#demo) or the simple [OpenPose Wrapper](#openpose-wrapper). So you can most probably skip the library details on [OpenPose Library](#openpose-library).
+Most users cases should not need to dive deep into the library, they might just be able to use the [Demo](#demo) or the simple [OpenPose Wrapper](#openpose-wrapper). So you can most probably skip the library details in [OpenPose Library](#openpose-library).
 
 
 
@@ -95,16 +95,16 @@ Your case if you want to read a specific format of image source and/or add a spe
 Note: you should not need to modify OpenPose source code or examples, so that you can directly upgrade the OpenPose library anytime in the future without changing your code. You might create your custom code on [examples/user_code/](examples/user_code/) and compile it by using `make all` in the OpenPose folder.
 
 #### OpenPose Library
-Your case if you want to change internal functions and/or extend its functionality. First, take a look to the [Demo](#demo) and [OpenPose Wrapper](#openpose-wrapper). Secondly, read the 2 following subsections: OpenPose Overview and Extending Functionality.
+Your case if you want to change internal functions and/or extend its functionality. First, take a look at the [Demo](#demo) and [OpenPose Wrapper](#openpose-wrapper). Second, read the 2 following subsections: OpenPose Overview and Extending Functionality.
 
-1. OpenPose Overview: Learn the basics about our library source code on [doc/library_overview.md](doc/library_overview.md).
+1. OpenPose Overview: Learn the basics about the library source code in [doc/library_overview.md](doc/library_overview.md).
 
-2. Extending Functionality: Learn how to extend our library on [doc/library_extend_functionality.md](doc/library_extend_functionality.md).
+2. Extending Functionality: Learn how to extend the library in [doc/library_extend_functionality.md](doc/library_extend_functionality.md).
 
-3. Adding An Extra Module: Learn how to add an extra module on [doc/library_add_new_module.md](doc/library_add_new_module.md).
+3. Adding An Extra Module: Learn how to add an extra module in [doc/library_add_new_module.md](doc/library_add_new_module.md).
 
 #### Doxygen Documentation Autogeneration
-You can generate the documentation by running the following command. The documentation will be generated on `doc/doxygen/html/index.html`. You can simply open it with double click (your default browser should automatically display it).
+You can generate the documentation by running the following command. The documentation will be generated in `doc/doxygen/html/index.html`. You can simply open it with double click (your default browser should automatically display it).
 ```
 cd doc/
 doxygen doc_autogeneration.doxygen
@@ -114,7 +114,7 @@ doxygen doc_autogeneration.doxygen
 
 ## Output
 #### Output Format
-There are 2 alternatives to save the **(x,y,score) body part locations**. The `write_pose` flag uses the OpenCV cv::FileStorage default formats (JSON, XML and YML). However, the JSON format is only available after OpenCV 3.0. Hence, `write_pose_json` saves the people pose data as a custom JSON file. For the later, each JSON file has a `people` array of objects, where each object has an array `body_parts` containing the body part locations and detection confidence formatted as `x1,y1,c1,x2,y2,c2,...`. The coordinates `x` and `y` can be normalized to the range [0,1], [-1,1], [0, source size], [0, output size], etc., depending on the flag `scale_mode`. In addition, `c` is the confidence in the range [0,1].
+There are 2 alternatives to save the **(x,y,score) body part locations**. The `write_pose` flag uses the OpenCV cv::FileStorage default formats (JSON, XML and YML). However, the JSON format is only available after OpenCV 3.0. Hence, `write_pose_json` saves the people pose data using a custom JSON writer. For the latter, each JSON file has a `people` array of objects, where each object has an array `body_parts` containing the body part locations and detection confidence formatted as `x1,y1,c1,x2,y2,c2,...`. The coordinates `x` and `y` can be normalized to the range [0,1], [-1,1], [0, source size], [0, output size], etc., depending on the flag `scale_mode`. In addition, `c` is the confidence in the range [0,1].
 
 ```
 {
@@ -126,7 +126,7 @@ There are 2 alternatives to save the **(x,y,score) body part locations**. The `w
 }
 ```
 
-The body part order of the COCO (18 body parts) and MPI (15 body parts) keypoints is described for `POSE_BODY_PART_MAPPING` in [include/openpose/pose/poseParameters.hpp](include/openpose/pose/poseParameters.hpp). E.g. for COCO:
+The body part order of the COCO (18 body parts) and MPI (15 body parts) keypoints is described in `POSE_BODY_PART_MAPPING` in [include/openpose/pose/poseParameters.hpp](include/openpose/pose/poseParameters.hpp). E.g., for COCO:
 ```
     POSE_COCO_BODY_PARTS {
         {0,  "Nose"},
@@ -151,17 +151,17 @@ The body part order of the COCO (18 body parts) and MPI (15 body parts) keypoint
     }
 ```
 
-For the **heat maps storing format**, instead of individually saving each of the 67 heatmaps (18 body parts + background + 2 x 19 PAFs) individually, the library concatenate them vertically into a huge (width x #heat maps) x (height) matrix, i.e. it concats the heat maps by columns. E.g. columns [0, individual heat map width] contains the first heat map, columns [individual heat map width + 1, 2 * individual heat map width] contains the second heat map, etc. Note that some displayers are not able to display the resulting images given its size. However, Chrome and Firefox are able to properly open them.
+For the **heat maps storing format**, instead of individually saving each of the 67 heatmaps (18 body parts + background + 2 x 19 PAFs) individually, the library concatenates them into a huge (width x #heat maps) x (height) matrix, i.e. it concats the heat maps by columns. E.g., columns [0, individual heat map width] contains the first heat map, columns [individual heat map width + 1, 2 * individual heat map width] contains the second heat map, etc. Note that some image viewers are not able to display the resulting images due to the size. However, Chrome and Firefox are able to properly open them.
 
-The saving order is body parts + background + PAFs. Any of them can be disabled with the program flags. If background is disabled, then the final image will be body parts + PAFs. The body parts and background follow the order of `POSE_COCO_BODY_PARTS` or `POSE_MPI_BODY_PARTS`, while the PAFs follow the order specified on POSE_BODY_PART_PAIRS in `poseParameters.hpp`. E.g. for COCO:
+The saving order is body parts + background + PAFs. Any of them can be disabled with program flags. If background is disabled, then the final image will be body parts + PAFs. The body parts and background follow the order of `POSE_COCO_BODY_PARTS` or `POSE_MPI_BODY_PARTS`, while the PAFs follow the order specified on POSE_BODY_PART_PAIRS in `poseParameters.hpp`. E.g., for COCO:
 ```
     POSE_COCO_PAIRS    {1,2,   1,5,   2,3,   3,4,   5,6,   6,7,   1,8,   8,9,   9,10, 1,11,  11,12, 12,13,  1,0,   0,14, 14,16,  0,15, 15,17,   2,16,  5,17};
 ```
 
-Where each index is the key value corresponding with each body part on `POSE_COCO_BODY_PARTS`, e.g. 0 for "Neck", 1 for "RShoulder", etc.
+Where each index is the key value corresponding to each body part in `POSE_COCO_BODY_PARTS`, e.g., 0 for "Neck", 1 for "RShoulder", etc.
 
 #### Reading Saved Results
-We use standard formats (JSON, XML, PNG, JPG, ...) to save our results, so there will be lots of frameworks to read them later, but you might also directly use our functions on [include/openpose/filestream.hpp](include/openpose/filestream.hpp). In particular, `loadData` (for JSON, XML and YML files) and `loadImage` (for image formats such as PNG or JPG) to load the data into cv::Mat format.
+We use standard formats (JSON, XML, PNG, JPG, ...) to save our results, so there will be lots of frameworks to read them later, but you might also directly use our functions in [include/openpose/filestream.hpp](include/openpose/filestream.hpp). In particular, `loadData` (for JSON, XML and YML files) and `loadImage` (for image formats such as PNG or JPG) to load the data into cv::Mat format.
 
 
 
@@ -176,29 +176,29 @@ We only modified some Caffe compilation flags and minor details. You can use use
 
 
 ## OpenPose Benchmark
-Initial library running time benchmark on [OpenPose Benchmark](https://docs.google.com/spreadsheets/d/1-DynFGvoScvfWDA1P4jDInCkbD4lg0IKOYbXgEq0sK0/edit#gid=0). You can comment in that document with your graphics card model and running time per time for that model, and we will add your results to the benchmark!
+Initial library running time benchmark on [OpenPose Benchmark](https://docs.google.com/spreadsheets/d/1-DynFGvoScvfWDA1P4jDInCkbD4lg0IKOYbXgEq0sK0/edit#gid=0). You can comment in that document with your graphics card model and running time for that model, and we will add your results to the benchmark!
 
 
 
-## Send Us your Feed-Back!
+## Send Us Your Feedback!
 Our library is open source for research purposes, and we want to continuously improve it! So please, let us know if...
 
 1. ... you find any bug (in functionality or speed).
 
-2. ... you added some functionality to some class or some new Worker<T> subclass which we might potentially incorporate to our library.
+2. ... you added some functionality to some class or some new Worker<T> subclass which we might potentially incorporate.
 
-3. ... you know how to speed up or make more clear any part of the library.
+3. ... you know how to speed up or improve any part of the library.
 
-4. ... you have request about possible functionality.
+4. ... you have a request about possible functionality.
 
 5. ... etc.
 
-Just comment on GibHub or make a pull request! We will answer you back as soon as possible!
+Just comment on GibHub or make a pull request and we will answer as soon as possible! Send us an email if you use the library to make a cool demo or YouTube video!
 
 
 
 ## Citation
-Please cite the paper in your publications if it helps your research:
+Please cite the papers in your publications if it helps your research:
 
 ### Pose Estimation
 
