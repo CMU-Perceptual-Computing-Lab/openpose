@@ -7,6 +7,8 @@ OpenPose is a **library for real-time multi-person keypoint detection and multi-
 
 * It uses Caffe, but the code is ready to be ported to other frameworks (e.g., Tensorflow or Torch). If you implement any of those, please, make a pull request and we will add it!
 
+OpenPose represents the **first real-time system to jointly detect human body, hand and facial keypoints (in total 130 keypoints) on single images**. In addition, the system computational performance on body keypoint estimation is invariant to the number of detected people in the image.
+
 OpenPose is freely available for free non-commercial use, and may be redistributed under these conditions. Please, see the [license](LICENSE) for further details. Contact us for commercial purposes.
 
 
