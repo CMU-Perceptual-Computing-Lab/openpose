@@ -123,6 +123,10 @@ namespace op
          * Function to start multi-threading.
          * Similar to exec(), but start() does not block the thread that calls the function. It just opens new threads, so it
          * lets the user perform other tasks meanwhile on the calling thread.
+         * VERY IMPORTANT NOTE: if the GUI is selected and OpenCV is compiled with Qt support, this option will not work. Qt
+         * needs the main thread to plot visual results, so the final GUI (which uses OpenCV) would return an exception
+         * similar to: `QMetaMethod::invoke: Unable to invoke methods with return values in queued connections`. Use exec()
+         * in that case.
          */
         void start();
 

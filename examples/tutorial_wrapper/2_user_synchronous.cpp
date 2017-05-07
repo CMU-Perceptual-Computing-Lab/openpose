@@ -365,22 +365,25 @@ int openPoseTutorialWrapper2()
     // Two different ways of running the program on multithread enviroment
     // // Option a) Recommended - Also using the main thread (this thread) for processing (it saves 1 thread)
     // // Start, run & stop threads
-    // opWrapper.exec();  // It blocks this thread until all threads have finished
+    opWrapper.exec();  // It blocks this thread until all threads have finished
 
     // Option b) Keeping this thread free in case you want to do something else meanwhile, e.g. profiling the GPU memory
-    // Start threads
-    opWrapper.start();
-    // Profile used GPU memory
-        // 1: wait ~10sec so the memory has been totally loaded on GPU
-        // 2: profile the GPU memory
-    std::this_thread::sleep_for(std::chrono::milliseconds{1000});
-    op::log("Random task here...", op::Priority::Max);
-    // Keep program alive while running threads
-    while (opWrapper.isRunning())
-        std::this_thread::sleep_for(std::chrono::milliseconds{33});
-    // Stop and join threads
-    op::log("Stopping thread(s)", op::Priority::Max);
-    opWrapper.stop();
+    // // VERY IMPORTANT NOTE: if OpenCV is compiled with Qt support, this option will not work. Qt needs the main thread to
+    // // plot visual results, so the final GUI (which uses OpenCV) would return an exception similar to:
+    // // `QMetaMethod::invoke: Unable to invoke methods with return values in queued connections`
+    // // Start threads
+    // opWrapper.start();
+    // // Profile used GPU memory
+    //     // 1: wait ~10sec so the memory has been totally loaded on GPU
+    //     // 2: profile the GPU memory
+    // std::this_thread::sleep_for(std::chrono::milliseconds{1000});
+    // op::log("Random task here...", op::Priority::Max);
+    // // Keep program alive while running threads
+    // while (opWrapper.isRunning())
+    //     std::this_thread::sleep_for(std::chrono::milliseconds{33});
+    // // Stop and join threads
+    // op::log("Stopping thread(s)", op::Priority::Max);
+    // opWrapper.stop();
 
     // Measuring total time
     const auto totalTimeSec = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now()-timerBegin).count() * 1e-9;
