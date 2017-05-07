@@ -17,7 +17,7 @@ In order to use and/or slightly extend the OpenPose library, we try to explain t
 
 2. The multi-threading module: `thread`.
 
-3. The multi-person key-point detection module: `pose`.
+3. The multi-person keypoint detection module: `pose`.
 
 
 ## Basic Module: `core`
@@ -186,7 +186,7 @@ In order to be initialized, `PoseExtractorCaffe` has the following constructor a
 
 2. `netOutputSize` is the resolution of the last layer of the deep net. I.e., the resulting heatmaps will have this size. Currently, it must be set to the same size as `netInputSize`.
 
-3. `outputSize` is the final desired resolution to be used. The human pose key-point locations will be scaled to this output size. However, the heat-maps will have the `netOutputSize` size due to performance.
+3. `outputSize` is the final desired resolution to be used. The human pose keypoint locations will be scaled to this output size. However, the heat-maps will have the `netOutputSize` size due to performance.
 
 4. `scaleNumber` and `scaleGap` specify the multi-scale parameters. Explained in the [README.md](../README.md), in the demo section.
 

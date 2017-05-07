@@ -3,7 +3,7 @@ OpenPose
 
 ## Introduction
 
-OpenPose is a **library for real-time multi-person key-point detection and multi-threading written in C++** using OpenCV and Caffe*, authored by [Gines Hidalgo](https://www.linkedin.com/in/gineshidalgo/), [Zhe Cao](http://www.andrew.cmu.edu/user/zhecao), [Tomas Simon](http://www.cs.cmu.edu/~tsimon/), [Shih-En Wei](https://scholar.google.com/citations?user=sFQD3k4AAAAJ&hl=en), [Hanbyul Joo](http://www.cs.cmu.edu/~hanbyulj/) and [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/).
+OpenPose is a **library for real-time multi-person keypoint detection and multi-threading written in C++** using OpenCV and Caffe*, authored by [Gines Hidalgo](https://www.linkedin.com/in/gineshidalgo/), [Zhe Cao](http://www.andrew.cmu.edu/user/zhecao), [Tomas Simon](http://www.cs.cmu.edu/~tsimon/), [Shih-En Wei](https://scholar.google.com/citations?user=sFQD3k4AAAAJ&hl=en), [Hanbyul Joo](http://www.cs.cmu.edu/~hanbyulj/) and [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/).
 
 * It uses Caffe, but the code is ready to be ported to other frameworks (e.g. Tensorflow or Torch). If you implement any of those, please, make a pull request and we will add it!
 
@@ -13,11 +13,11 @@ OpenPose is freely available for free non-commercial use, and may be redistribut
 
 Library main functionality:
 
-* Multi-person 15 or **18-key-point body pose** estimation and rendering.
+* Multi-person 15 or **18-keypoint body pose** estimation and rendering.
 
-* Multi-person **2x21-key-point hand** estimation and rendering (coming soon in around 1-2 months!).
+* Multi-person **2x21-keypoint hand** estimation and rendering (coming soon in around 1-2 months!).
 
-* Multi-person **70-key-point face** estimation and rendering (coming soon in around 2-3 months!).
+* Multi-person **70-keypoint face** estimation and rendering (coming soon in around 2-3 months!).
 
 * Flexible and easy-to-configure **multi-threading** module.
 
