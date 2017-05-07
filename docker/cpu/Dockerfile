@@ -1,6 +1,6 @@
-# TODO: build from BVLC's gpu caffe image instead
-# FROM bvlc/caffe:gpu
-FROM nvidia/cuda:8.0-cudnn6-devel-ubuntu16.04
+# TODO: build from BVLC's cpu caffe image instead
+# FROM bvlc/caffe:cpu
+FROM ubuntu:16.04
 
 # TODO: avoid moving around caffe source build and relinking
 # WORKDIR $CAFFE_ROOT/build
@@ -39,9 +39,6 @@ WORKDIR $OPENPOSE_ROOT
 # TODO: Add ARG for choosing a release
 # RUN git clone https://github.com/CMU-Perceptual-Computing-Lab/openpose.git .
 COPY . $OPENPOSE_ROOT
-
-RUN cp Makefile.config.Ubuntu16_cuda_7.example Makefile.config.Ubuntu16.example
-RUN cp 3rdparty/caffe/Makefile.config.Ubuntu16_cuda_7.example 3rdparty/caffe/Makefile.config.Ubuntu16.example
 
 # TODO: Avoide using nested bash scrips and call cmake directly for transparency
 # also, avoid baking models binaries into docker images
