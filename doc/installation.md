@@ -1,6 +1,8 @@
 OpenPose Library - Compilation and Installation
 ====================================
 
+
+
 ## Requirements
 - Ubuntu (tested on 14 and 16)
 - GPU with at least 2 GB and 1.5 GB available (the `nvidia-smi` command checks the available GPU memory in Ubuntu).
@@ -10,7 +12,10 @@ OpenPose Library - Compilation and Installation
 
 Note: These requirements assume the default configuration (i.e. `--net_resolution "656x368"` and `num_scales 1`). You might need more (with a greater net resolution and/or number of scales) or less resources (with smaller net resolution and/or using the MPI and MPI_4 models).
 
-## Script Compilation
+
+
+## Installation
+### Script Compilation
 **Highly important**: This script only works with CUDA 8 and Ubuntu 14 or 16. Otherwise, check [Manual Compilation](#manual-compilation).
 1. Required: CUDA, cuDNN, OpenCV and Atlas must be already installed on your machine.
     1. OpenCV can be installed with `apt-get install libopencv-dev`. If you have compiled OpenCV 3 by your own, follow [Manual Compilation](#manual-compilation). After both Makefile.config files have been generated, edit them and uncomment the line `# OPENCV_VERSION := 3`. You might alternatively modify all `Makefile.config.UbuntuXX` files and then run the scripts in step 2.
@@ -22,7 +27,7 @@ chmod u+x install_caffe_and_openpose.sh
 ./install_caffe_and_openpose.sh
 ```
 
-## Manual Compilation
+### Manual Compilation
 Alternatively to the script installation, if you want to use CUDA 7, avoid using sh scripts, change some configuration labels (e.g. OpenCV version), etc., then:
 1. Install the [Caffe prerequisites](http://caffe.berkeleyvision.org/installation.html).
 2. Compile Caffe and OpenPose by running these lines:
@@ -59,3 +64,19 @@ Alternatively to the script installation, if you want to use CUDA 7, avoid using
     make all -j$(NUM_CORES)
     ```
 **Highly important**: There are 2 `Makefile.config.Ubuntu##.example` analogous files, one in the main folder and one in [3rdparty/caffe/](../3rdparty/caffe/), corresponding to OpenPose and Caffe configuration files respectively. Any change must be done to both files (e.g. OpenCV 3 flag, Atlab/OpenBLAS/MKL flag, etc.). E.g. for CUDA 8 and Ubuntu16: [3rdparty/caffe/Makefile.config.Ubuntu16.example](../3rdparty/caffe/Makefile.config.Ubuntu16.example) and [Makefile.config.Ubuntu16.example](../Makefile.config.Ubuntu16.example).
+
+
+
+
+## Reinstallation
+If you updated some software that our library or 3rdparty use, or you simply want to reinstall it:
+1. Clean the OpenPose and Caffe compilation folders:
+```
+make clean && cd 3rdparty/caffe && make clean
+```
+2. Repeat the [Installation](#installation) steps.
+
+
+
+## Uninstallation
+You just need to remove the OpenPose folder, by default called `openpose/`. E.g. `rm -rf openpose/`.

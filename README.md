@@ -61,7 +61,7 @@ The pose estimation work is based on the C++ code from [the ECCV 2016 demo](http
 
 
 ## Contents
-1. [Installation](#installation)
+1. [Installation, Reinstallation and Uninstallation](#installation-reinstallation-and-uninstallation)
 2. [Quick Start](#quick-start)
     1. [Demo](#demo)
     2. [OpenPose Wrapper](#openpose-wrapper)
@@ -69,13 +69,13 @@ The pose estimation work is based on the C++ code from [the ECCV 2016 demo](http
 3. [Output](#output)
     1. [Output Format](#output-format)
     2. [Reading Saved Results](#reading-saved-results)
-4. [Send Us your Feed-Back!](#send-us-your-feed-back)
+4. [Send Us Your Feedback!](#send-us-your-feedback)
 5. [Citation](#citation)
 
 
 
-## Installation
-Installation steps: [doc/installation.md](doc/installation.md).
+## Installation, Reinstallation and Uninstallation
+You can find the installation, reinstallation and uninstallation steps on: [doc/installation.md](doc/installation.md).
 
 
 
