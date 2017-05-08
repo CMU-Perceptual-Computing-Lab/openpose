@@ -343,7 +343,7 @@ namespace op
         {
             auto index = 0;
             auto accumulated = 1;
-            for (auto i = 0 ; i < indexes.size() ; i++)
+            for (auto i = (int)indexes.size() - 1 ; i >= 0  ; i--)
             {
                 index += accumulated * indexes[i];
                 accumulated *= mSize[i];
