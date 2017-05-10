@@ -28,7 +28,7 @@ The visual GUI should show the original image with the poses blended on it, simi
     <img src="media/shake.gif", width="720">
 </p>
 
-If you choose to visualize a body part or a PAF (Part Affinity Field) heat map, the result should be similar to the following images:
+If you choose to visualize a body part or a PAF (Part Affinity Field) heat map with the command option `--part_to_show`, the result should be similar to one of the following images:
 <p align="center">
     <img src="media/body_heat_maps.png", width="720">
 </p>
@@ -53,6 +53,8 @@ Please, in order to check all the real time pose demo options and their details,
 `--write_pose path/`: Output JSON, XML or YML files with the people pose data on the `path/` folder.
 
 `--process_real_time`: It might skip frames in order to keep the final output displaying frames on real time.
+
+`--part_to_show` Select the prediction channel to visualize (default: 0). 20 for all the joint's heatmaps, 21 for all the PAFs
 
 `--no_display`: Display window not opened. Useful if there is no X server and/or to slightly speed up the processing if visual output is not required.
 
