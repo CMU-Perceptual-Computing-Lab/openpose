@@ -7,7 +7,7 @@ If you intend to extend the functionality of our library:
 
 2. Check the basic library overview doc on [library_overview.md](library_overview.md).
 
-3. Read, understand and play with the basic real time pose demo source code [examples/openpose/rtpose.cpp](../examples/openpose/rtpose.cpp) and [examples/tutorial_wrapper](../examples/tutorial_wrapper). It includes all the functionality of our library, and it has been properly commented.
+3. Read, understand and play with the basic real time pose demo source code [examples/openpose/openpose.cpp](../examples/openpose/openpose.cpp) and [examples/tutorial_wrapper](../examples/tutorial_wrapper). It includes all the functionality of our library, and it has been properly commented.
 
 4. Read, understand and play with the other tutorials in [examples/](../examples/). It includes more specific examples.
 
