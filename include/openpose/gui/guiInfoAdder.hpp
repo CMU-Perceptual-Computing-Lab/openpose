@@ -26,6 +26,7 @@ namespace op
         unsigned int mFpsCounter;
         std::string mLastElementRenderedName;
         int mLastElementRenderedCounter;
+        unsigned long long mLastId;
     };
 }
 

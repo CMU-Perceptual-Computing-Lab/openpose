@@ -7,7 +7,8 @@
 
 namespace op
 {
-    void getFps(double& fps, unsigned int& fpsCounter, std::queue<std::chrono::high_resolution_clock::time_point>& fpsQueue, const int numberGpus)
+    void updateFps(unsigned long long& lastId, double& fps, unsigned int& fpsCounter, std::queue<std::chrono::high_resolution_clock::time_point>& fpsQueue,
+                   const unsigned long long id, const int numberGpus)
     {
         try
         {
@@ -17,21 +18,25 @@ namespace op
                 // However, we update every frame during the first few frames to have an initial estimator.
             // In any of the previous cases, the fps value is estimated during the last several frames.
             // In this way, a sudden fps drop will be quickly visually identified.
-            fpsQueue.emplace(std::chrono::high_resolution_clock::now());
-            bool updatePrintedFps = true;
-            if (fpsQueue.size() > 5)
+            if (lastId != id)
             {
-                const auto factor = (numberGpus > 1 ? 25u : 15u);
-                updatePrintedFps = (fpsCounter % factor == 0);
-                // updatePrintedFps = (numberGpus == 1 ? true : fpsCounter % (3*numberGpus) == 0);
-                fpsCounter++;
-                if (fpsQueue.size() > factor)
-                    fpsQueue.pop();
-            }
-            if (updatePrintedFps)
-            {
-                const auto timeSec = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(fpsQueue.back()-fpsQueue.front()).count() * 1e-9;
-                fps = (fpsQueue.size()-1) / (timeSec != 0. ? timeSec : 1.);
+                lastId = id;
+                fpsQueue.emplace(std::chrono::high_resolution_clock::now());
+                bool updatePrintedFps = true;
+                if (fpsQueue.size() > 5)
+                {
+                    const auto factor = (numberGpus > 1 ? 25u : 15u);
+                    updatePrintedFps = (fpsCounter % factor == 0);
+                    // updatePrintedFps = (numberGpus == 1 ? true : fpsCounter % (3*numberGpus) == 0);
+                    fpsCounter++;
+                    if (fpsQueue.size() > factor)
+                        fpsQueue.pop();
+                }
+                if (updatePrintedFps)
+                {
+                    const auto timeSec = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(fpsQueue.back()-fpsQueue.front()).count() * 1e-9;
+                    fps = (fpsQueue.size()-1) / (timeSec != 0. ? timeSec : 1.);
+                }
             }
         }
         catch (const std::exception& e)
@@ -46,7 +51,8 @@ namespace op
         mNumberGpus{numberGpus},
         mGuiEnabled{guiEnabled},
         mFpsCounter{0u},
-        mLastElementRenderedCounter{std::numeric_limits<int>::max()}
+        mLastElementRenderedCounter{std::numeric_limits<int>::max()},
+        mLastId{-1u}
     {
     }
 
@@ -57,10 +63,12 @@ namespace op
             // Security checks
             if (cvOutputData.empty())
                 error("Wrong input element (empty cvOutputData).", __LINE__, __FUNCTION__, __FILE__);
-            // Used colors
-            const cv::Scalar white{255,255,255};
+
             // Update fps
-            getFps(mFps, mFpsCounter, mFpsQueue, mNumberGpus);
+            updateFps(mLastId, mFps, mFpsCounter, mFpsQueue, id, mNumberGpus);
+
+            // Used colors
+            const cv::Scalar white{255, 255, 255};
             // Fps or s/gpu
             char charArrayAux[15];
             std::snprintf(charArrayAux, 15, "%4.1f fps", mFps);
