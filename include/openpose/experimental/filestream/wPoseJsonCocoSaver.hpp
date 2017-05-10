@@ -81,7 +81,7 @@ namespace op
                         spPoseJsonCocoSaver->record(tDatum.poseKeyPoints, imageId);
                         // Profiling speed
                         Profiler::timerEnd(profilerKey);
-                        Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__, 1000);
+                        Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__, Profiler::DEFAULT_X);
                     }
                     else
                     {

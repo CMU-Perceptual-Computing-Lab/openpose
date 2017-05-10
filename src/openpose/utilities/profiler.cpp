@@ -11,7 +11,10 @@
 
 namespace op
 {
+    const unsigned long long Profiler::DEFAULT_X = 1000;
+
     #ifdef PROFILER_ENABLED
+
         std::map<std::string, std::tuple<double, unsigned long long, std::chrono::high_resolution_clock::time_point>> sProfilerTuple{
             std::map<std::string, std::tuple<double, unsigned long long, std::chrono::high_resolution_clock::time_point>>()
         };
