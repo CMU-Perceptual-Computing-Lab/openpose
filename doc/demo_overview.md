@@ -54,6 +54,8 @@ Please, in order to check all the real time pose demo options and their details,
 
 `--process_real_time`: It might skip frames in order to keep the final output displaying frames on real time.
 
+`--disable_blending`: If selected, it will only render the pose skeleton or desired heat maps, while blocking the original background. Also related: `part_to_show`, `alpha_pose`, and `alpha_pose`.
+
 `--part_to_show`: Select the prediction channel to visualize (default: 0). 0 to visualize all the body parts, 1-18 for each body part heat map, 19 for the background heat map, 20 for all the body part heat maps together, 21 for all the PAFs, 22-69 for each body part pair PAF.
 
 `--no_display`: Display window not opened. Useful if there is no X server and/or to slightly speed up the processing if visual output is not required.
