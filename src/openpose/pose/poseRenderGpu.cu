@@ -142,7 +142,7 @@ namespace op
     }
 
     __global__ void renderPoseCoco(float* targetPtr, const int targetWidth, const int targetHeight, const float* const posePtr, const int numberPeople,
-                                   const float threshold, const bool googlyEyes, const float blendOriginalFrame, const float alphaColorToAdd)
+                                   const float threshold, const bool googlyEyes, const bool blendOriginalFrame, const float alphaColorToAdd)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -163,11 +163,11 @@ namespace op
         renderKeyPoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF,
                         globalIdx, x, y, targetWidth, targetHeight, posePtr, COCO_PAIRS_GPU, numberPeople,
                         POSE_COCO_NUMBER_PARTS, numberPartPairs, COCO_RGB_COLORS, numberColors,
-                        radius, stickwidth, threshold, alphaColorToAdd);
+                        radius, stickwidth, threshold, alphaColorToAdd, blendOriginalFrame);
     }
 
     __global__ void renderPoseMpi29Parts(float* targetPtr, const int targetWidth, const int targetHeight, const float* const posePtr,
-                                         const int numberPeople, const float threshold, const float blendOriginalFrame, const float alphaColorToAdd)
+                                         const int numberPeople, const float threshold, const bool blendOriginalFrame, const float alphaColorToAdd)
     {
         //posePtr has length 3 * 15 * numberPeople
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;

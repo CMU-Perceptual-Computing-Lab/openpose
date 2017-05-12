@@ -8,7 +8,8 @@ namespace op
                                            const float* const facePtr, const unsigned char* const partPairsPtr,
                                            const int numberFaces, const int numberParts, const int numberPartPairs,
                                            const float* const rgbColorsPtr, const int numberColors,
-                                           const float radius, const float stickwidth, const float threshold, const float alphaColorToAdd)
+                                           const float radius, const float stickwidth, const float threshold, const float alphaColorToAdd,
+                                           const bool blendOriginalFrame = true)
     {
         // Fill shared parameters
         if (globalIdx < numberFaces)
@@ -54,6 +55,12 @@ namespace op
             auto& b = targetPtr[                                 baseIndex];
             auto& g = targetPtr[    targetWidth * targetHeight + baseIndex];
             auto& r = targetPtr[2 * targetWidth * targetHeight + baseIndex];
+            if (!blendOriginalFrame)
+            {
+                b = 0.f;
+                g = 0.f;
+                r = 0.f;
+            }
 
             for (auto person = 0; person < numberFaces; person++)
             {
