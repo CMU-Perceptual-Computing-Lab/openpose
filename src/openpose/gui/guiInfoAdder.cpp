@@ -52,7 +52,7 @@ namespace op
         mGuiEnabled{guiEnabled},
         mFpsCounter{0u},
         mLastElementRenderedCounter{std::numeric_limits<int>::max()},
-        mLastId{-1u}
+        mLastId{~0u}
     {
     }
 

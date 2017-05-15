@@ -1,7 +1,7 @@
 #ifndef OPENPOSE__WRAPPER__WRAPPER_HPP
 #define OPENPOSE__WRAPPER__WRAPPER_HPP
 
-#include "../thread/headers.hpp"
+#include "../thread/threadHeaders.hpp"
 #include "wrapperStructFace.hpp"
 #include "wrapperStructHand.hpp"
 #include "wrapperStructInput.hpp"
@@ -263,12 +263,12 @@ namespace op
 
 
 // Implementation
-#include "../core/headers.hpp"
-#include "../experimental/headers.hpp"
-#include "../filestream/headers.hpp"
-#include "../gui/headers.hpp"
-#include "../pose/headers.hpp"
-#include "../producer/headers.hpp"
+#include "../core/coreHeaders.hpp"
+#include "../experimental/experimentalHeaders.hpp"
+#include "../filestream/filestreamHeaders.hpp"
+#include "../gui/guiHeaders.hpp"
+#include "../pose/poseHeaders.hpp"
+#include "../producer/producerHeaders.hpp"
 #include "../utilities/errorAndLog.hpp"
 #include "../utilities/fileSystem.hpp"
 namespace op

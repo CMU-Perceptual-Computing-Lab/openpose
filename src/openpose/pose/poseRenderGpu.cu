@@ -1,3 +1,5 @@
+#define _USE_MATH_DEFINES
+#include <math.h>
 #include <utility> // std::pair
 #include "openpose/pose/poseParameters.hpp"
 #include "openpose/utilities/errorAndLog.hpp"

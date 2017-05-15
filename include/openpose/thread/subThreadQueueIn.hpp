@@ -35,8 +35,8 @@ namespace op
 {
     template<typename TDatums, typename TWorker, typename TQueue>
     SubThreadQueueIn<TDatums, TWorker, TQueue>::SubThreadQueueIn(const std::vector<TWorker>& tWorkers, const std::shared_ptr<TQueue>& tQueueIn) :
-        SubThread<TDatums, TWorker>{tWorkers},
-        spTQueueIn{tQueueIn}
+        SubThread<TDatums, TWorker>(tWorkers),
+        spTQueueIn(tQueueIn)
     {
         // spTQueueIn->addPopper();
     }

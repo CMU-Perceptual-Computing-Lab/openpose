@@ -6,6 +6,7 @@
 #include <opencv2/highgui/highgui.hpp>      // capProperties of OpenCV
 #include "../utilities/macros.hpp"
 #include "enumClasses.hpp"
+#include <array>
 
 namespace op
 {

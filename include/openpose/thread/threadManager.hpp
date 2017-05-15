@@ -6,6 +6,8 @@
 #include <set> // std::multiset
 #include <tuple>
 #include <vector>
+#include <memory>
+#include <thread>
 #include "../utilities/macros.hpp"
 #include "enumClasses.hpp"
 #include "queue.hpp"
@@ -442,7 +444,7 @@ namespace op
             // #threads = maxThreadId+1
             mThreads.resize(maxThreadId);
             for (auto& thread : mThreads)
-                thread = {std::make_shared<Thread<TDatums, TWorker>>()};
+				thread =  std::make_shared<Thread<TDatums, TWorker>>() ;
             mThreads.emplace_back(std::make_shared<Thread<TDatums, TWorker>>(spIsRunning));
         }
         catch (const std::exception& e)
@@ -493,7 +495,7 @@ namespace op
                 else
                     error("Unknown ThreadManagerMode", __LINE__, __FUNCTION__, __FILE__);
                 for (auto& tQueue : mTQueues)
-                    tQueue = {std::make_shared<TQueue>(mDefaultMaxSizeQueues)};
+					tQueue = std::make_shared<TQueue>(mDefaultMaxSizeQueues);
             }
         }
         catch (const std::exception& e)

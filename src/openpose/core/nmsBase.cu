@@ -121,9 +121,9 @@ namespace op
             const auto imageOffset = height * width;
             const auto offsetTarget = (maxPeaks+1)*targetSize[3];
 
-            const dim3 threadsPerBlock2D{THREADS_PER_BLOCK_1D, THREADS_PER_BLOCK_1D};
+            const dim3 threadsPerBlock2D{(unsigned int)THREADS_PER_BLOCK_1D, (unsigned int)THREADS_PER_BLOCK_1D};
             const dim3 numBlocks2D{getNumberCudaBlocks(width, threadsPerBlock2D.x), getNumberCudaBlocks(height, threadsPerBlock2D.y)};
-            const dim3 threadsPerBlock1D{THREADS_PER_BLOCK};
+            const dim3 threadsPerBlock1D{ (unsigned int)THREADS_PER_BLOCK};
             const dim3 numBlocks1D{getNumberCudaBlocks(imageOffset, threadsPerBlock1D.x)};
             // log("num_b: " + std::to_string(bottom->shape(0)));       // = 1
             // log("channel_b: " + std::to_string(bottom->shape(1)));   // = 57 = 18 body parts + bkg + 19x2 PAFs
