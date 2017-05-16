@@ -41,6 +41,7 @@ namespace op
     WGui<TDatums>::WGui(const std::shared_ptr<Gui>& gui) :
         spGui{gui}
     {
+        spGui->initializationOnThread();
     }
 
     template<typename TDatums>

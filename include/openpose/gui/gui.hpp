@@ -18,6 +18,8 @@ namespace op
             const std::shared_ptr<std::pair<std::atomic<bool>, std::atomic<int>>>& videoSeekSharedPtr = nullptr,
             const std::vector<std::shared_ptr<PoseExtractor>>& poseExtractors = {}, const std::vector<std::shared_ptr<PoseRenderer>>& poseRenderers = {});
 
+        void initializationOnThread();
+
         void update(const cv::Mat& cvOutputData = cv::Mat{});
 
     private:

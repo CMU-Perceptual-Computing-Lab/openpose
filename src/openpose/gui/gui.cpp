@@ -160,6 +160,11 @@ namespace op
     {
     }
 
+    void Gui::initializationOnThread()
+    {
+        mFrameDisplayer.initializationOnThread();
+    }
+
     void Gui::update(const cv::Mat& cvOutputData)
     {
         try

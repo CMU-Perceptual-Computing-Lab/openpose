@@ -21,6 +21,9 @@ namespace op
          */
         FrameDisplayer(const cv::Size& windowedSize, const std::string& windowedName = "OpenPose Display", const bool fullScreen = false);
 
+        // Due to OpenCV visualization issues (all visualization functions must be in the same thread)
+        void initializationOnThread();
+
         /**
          * This function set the new FrameDisplayer::GuiDisplayMode (e.g. full screen).
          * @param displayMode New FrameDisplayer::GuiDisplayMode state.
