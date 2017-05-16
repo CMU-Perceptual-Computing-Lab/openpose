@@ -14,7 +14,7 @@ Note: These requirements assume the default configuration (i.e. `--net_resolutio
 
 
 
-## Installation 
+## Installation (Only available release mode supported)
 **Highly important**: This script only works with CUDA 8 and Visual Studio 2015. Otherwise, check [Manual Compilation](#manual-compilation) from master documentation.
 
 1. Visual Studio 2015
