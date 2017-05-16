@@ -69,8 +69,9 @@ The pose estimation work is based on the C++ code from [the ECCV 2016 demo](http
 3. [Output](#output)
     1. [Output Format](#output-format)
     2. [Reading Saved Results](#reading-saved-results)
-4. [Send Us Your Feedback!](#send-us-your-feedback)
-5. [Citation](#citation)
+4. [OpenPose Benchmark](#openpose-benchmark)
+5. [Send Us Your Feedback!](#send-us-your-feedback)
+6. [Citation](#citation)
 
 
 
@@ -201,8 +202,6 @@ Just comment on GibHub or make a pull request and we will answer as soon as poss
 
 ## Citation
 Please cite the papers in your publications if it helps your research:
-
-### Pose Estimation
 
     @inproceedings{cao2017realtime,
       author = {Zhe Cao and Tomas Simon and Shih-En Wei and Yaser Sheikh},
