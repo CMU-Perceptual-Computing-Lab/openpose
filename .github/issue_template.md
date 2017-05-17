@@ -8,7 +8,7 @@
 
 
 ### Type of issue
-Keep only your type and delete the rest. You might select multiple topics:
+You might select multiple topics, delete the rest:
 - Compilation/installation error
 - Execution error
 - Help wanted
@@ -17,9 +17,10 @@ Keep only your type and delete the rest. You might select multiple topics:
 - Other (type your own type)
 
 ### Your system configuration
-**OpenCV version** (installed with `apt-get install libopencv-dev` or OpenCV 2.X or OpenCV 3.X):
+**OpenCV version**: installed with `apt-get install libopencv-dev` or OpenCV 2.X or OpenCV 3.X.
 **Operating system** (`lsb_release -a` on Ubuntu):
 **CUDA version** (`cat /usr/local/cuda/version.txt` in most cases):
 **cuDNN version**:
 **GPU model** (`nvidia-smi`):
+**Caffe version**: Default from OpenPose or custom version.
 Compiler (`gcc --version` on Ubuntu):
