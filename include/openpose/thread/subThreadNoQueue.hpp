@@ -30,7 +30,7 @@ namespace op
 {
     template<typename TDatums, typename TWorker>
     SubThreadNoQueue<TDatums, TWorker>::SubThreadNoQueue(const std::vector<TWorker>& tWorkers) :
-        SubThread<TDatums, TWorker>{tWorkers}
+        SubThread<TDatums, TWorker>(tWorkers)
     {}
 
     template<typename TDatums, typename TWorker>

@@ -34,7 +34,7 @@ namespace op
 {
     template<typename TDatums, typename TQueue>
     PriorityQueue<TDatums, TQueue>::PriorityQueue(const long long maxSize) :
-        QueueBase<TDatums, TQueue>{maxSize}
+        QueueBase<TDatums, TQueue>(maxSize)
     {
         // Check TDatums = underlying value type of TQueue
         typedef typename TQueue::value_type underlyingValueType;

@@ -37,9 +37,9 @@ namespace op
     template<typename TDatums, typename TWorker, typename TQueue>
     SubThreadQueueInOut<TDatums, TWorker, TQueue>::SubThreadQueueInOut(const std::vector<TWorker>& tWorkers, const std::shared_ptr<TQueue>& tQueueIn,
                                                                        const std::shared_ptr<TQueue>& tQueueOut) :
-        SubThread<TDatums, TWorker>{tWorkers},
-        spTQueueIn{tQueueIn},
-        spTQueueOut{tQueueOut}
+        SubThread<TDatums, TWorker>(tWorkers),
+        spTQueueIn(tQueueIn),
+        spTQueueOut(tQueueOut)
     {
         // spTQueueIn->addPopper();
         spTQueueOut->addPusher();

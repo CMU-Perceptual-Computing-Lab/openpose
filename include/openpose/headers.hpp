@@ -2,30 +2,30 @@
 #define OPENPOSE__HEADERS_HPP
 
 // core module
-#include "core/headers.hpp"
+#include "core/coreHeaders.hpp"
 
 // experimental module
-#include "experimental/headers.hpp"
+#include "experimental/experimentalHeaders.hpp"
 
 // filestream module
-#include "filestream/headers.hpp"
+#include "filestream/filestreamHeaders.hpp"
 
 // gui module
-#include "gui/headers.hpp"
+#include "gui/guiHeaders.hpp"
 
 // pose module
-#include "pose/headers.hpp"
+#include "pose/poseHeaders.hpp"
 
 // producer module
-#include "producer/headers.hpp"
+#include "producer/producerHeaders.hpp"
 
 // threading module
-#include "thread/headers.hpp"
+#include "thread/threadHeaders.hpp"
 
 // utilities module
-#include "utilities/headers.hpp"
+#include "utilities/utilitiesHeaders.hpp"
 
 // wrapper module
-#include "wrapper/headers.hpp"
+#include "wrapper/wrapperHeaders.hpp"
 
 #endif // OPENPOSE__HEADERS_HPP
