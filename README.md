@@ -62,21 +62,35 @@ The pose estimation work is based on the C++ code from [the ECCV 2016 demo](http
 
 ## Contents
 1. [Installation, Reinstallation and Uninstallation](#installation-reinstallation-and-uninstallation)
-2. [Quick Start](#quick-start)
+2. [Custom Caffe](#custom-caffe)
+3. [Quick Start](#quick-start)
     1. [Demo](#demo)
     2. [OpenPose Wrapper](#openpose-wrapper)
     3. [OpenPose Library](#openpose-library)
-3. [Output](#output)
+4. [Output](#output)
     1. [Output Format](#output-format)
     2. [Reading Saved Results](#reading-saved-results)
-4. [OpenPose Benchmark](#openpose-benchmark)
-5. [Send Us Your Feedback!](#send-us-your-feedback)
-6. [Citation](#citation)
+5. [OpenPose Benchmark](#openpose-benchmark)
+6. [Send Us Your Feedback!](#send-us-your-feedback)
+7. [Citation](#citation)
 
 
 
 ## Installation, Reinstallation and Uninstallation
 You can find the installation, reinstallation and uninstallation steps on: [doc/installation.md](doc/installation.md).
+
+
+
+## Custom Caffe
+We only modified some Caffe compilation flags and minor details. You can use use your own Caffe distribution, these are the files we added and modified:
+
+1. Added files: `install_caffe.sh`; as well as `Makefile.config.Ubuntu14.example`, `Makefile.config.Ubuntu16.example`, `Makefile.config.Ubuntu14_cuda_7.example` and `Makefile.config.Ubuntu16_cuda_7.example` (extracted from `Makefile.config.example`). Basically, you must enable cuDNN.
+2. Edited file: Makefile. Search for "# OpenPose: " to find the edited code. We basically added the C++11 flag to avoid issues in some old computers.
+3. Optional - deleted Caffe file: `Makefile.config.example`.
+4. In order to link it to OpenPose:
+    1. Run `make all && make distribute` in your Caffe version.
+    2. Open the OpenPose Makefile config file: `./Makefile.config.UbuntuX.example` (where X depends on your OS and CUDA version).
+    3. Modify the Caffe folder directory variable (`CAFFE_DIR`) to your custom Caffe `distribute` folder location in the previous OpenPose Makefile config file.
 
 
 
@@ -165,16 +179,6 @@ Where each index is the key value corresponding to each body part in `POSE_COCO_
 
 #### Reading Saved Results
 We use standard formats (JSON, XML, PNG, JPG, ...) to save our results, so there will be lots of frameworks to read them later, but you might also directly use our functions in [include/openpose/filestream.hpp](include/openpose/filestream.hpp). In particular, `loadData` (for JSON, XML and YML files) and `loadImage` (for image formats such as PNG or JPG) to load the data into cv::Mat format.
-
-
-
-## Custom Caffe
-We only modified some Caffe compilation flags and minor details. You can use use your own Caffe distribution, these are the files we added and modified:
-
-1. Added files: `install_caffe.sh`; as well as `Makefile.config.Ubuntu14.example`, `Makefile.config.Ubuntu16.example`, `Makefile.config.Ubuntu14_cuda_7.example` and `Makefile.config.Ubuntu16_cuda_7.example` (extracted from `Makefile.config.example`). Basically, you must enable cuDNN.
-2. Edited file: Makefile. Search for "# OpenPose: " to find the edited code. We basically added the C++11 flag to avoid issues in some old computers.
-3. Optional - deleted Caffe file: `Makefile.config.example`.
-4. Finally, run `make all && make distribute` in your Caffe version and modify the Caffe directory variable in our Makefile config file: `./Makefile.config.UbuntuX.example` (where X is 14 or 16 depending on your Ubuntu version), set the `CAFFE_DIR` parameter to the path where both the `include` and `lib` Caffe folders are located.
 
 
 

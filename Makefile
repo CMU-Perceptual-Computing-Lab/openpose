@@ -64,6 +64,8 @@ else ifeq ($(DEEP_NET), torch)
 # Caffe
 else
 	COMMON_FLAGS += -DUSE_CAFFE
+	LIBRARIES += caffe
+	LDFLAGS += -Wl,-rpath=$(CAFFE_DIR)/lib
 endif
 
 ##############################
@@ -138,10 +140,11 @@ INCLUDE_DIRS += $(BUILD_INCLUDE_DIR) ./src ./include
 ifneq ($(CPU_ONLY), 1)
 	INCLUDE_DIRS += $(CUDA_INCLUDE_DIR)
 	LIBRARY_DIRS += $(CUDA_LIB_DIR)
-	LIBRARIES := cudart cublas curand
+	LIBRARIES += cudart cublas curand
 endif
 
-LIBRARIES += glog gflags boost_system boost_filesystem m hdf5_hl hdf5 caffe
+# LIBRARIES += glog gflags boost_system boost_filesystem m hdf5_hl hdf5 caffe
+LIBRARIES += glog gflags boost_system boost_filesystem m hdf5_hl hdf5
 
 # handle IO dependencies
 USE_LEVELDB ?= 1
@@ -377,8 +380,10 @@ ifeq ($(USE_PKG_CONFIG), 1)
 else
 	PKG_CONFIG :=
 endif
+# LDFLAGS += $(foreach librarydir,$(LIBRARY_DIRS),-L$(librarydir)) $(PKG_CONFIG) \
+# 		$(foreach library,$(LIBRARIES),-l$(library)) -Wl,-rpath=$(CAFFE_DIR)/lib
 LDFLAGS += $(foreach librarydir,$(LIBRARY_DIRS),-L$(librarydir)) $(PKG_CONFIG) \
-		$(foreach library,$(LIBRARIES),-l$(library)) -Wl,-rpath=$(CAFFE_DIR)/lib
+		$(foreach library,$(LIBRARIES),-l$(library))
 
 ##############################
 # Define build targets
