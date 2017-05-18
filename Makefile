@@ -66,6 +66,8 @@ else
 	COMMON_FLAGS += -DUSE_CAFFE
 	LIBRARIES += caffe
 	LDFLAGS += -Wl,-rpath=$(CAFFE_DIR)/lib
+	INCLUDE_DIRS += $(CAFFE_DIR)/include
+	LIBRARY_DIRS += $(CAFFE_DIR)/lib
 endif
 
 ##############################

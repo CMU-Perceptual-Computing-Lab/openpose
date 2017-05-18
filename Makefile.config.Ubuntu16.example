@@ -77,8 +77,8 @@ BLAS := atlas
 CAFFE_DIR := 3rdparty/caffe/distribute
 
 # Whatever else you find you need goes here.
-INCLUDE_DIRS := /usr/local/include $(CAFFE_DIR)/include /usr/include/hdf5/serial
-LIBRARY_DIRS := /usr/local/lib /usr/lib $(CAFFE_DIR)/lib /usr/lib/x86_64-linux-gnu /usr/lib/x86_64-linux-gnu/hdf5/serial
+INCLUDE_DIRS := /usr/local/include /usr/include/hdf5/serial
+LIBRARY_DIRS := /usr/local/lib /usr/lib /usr/lib/x86_64-linux-gnu /usr/lib/x86_64-linux-gnu/hdf5/serial
 
 # If Homebrew is installed at a non standard location (for example your home directory) and you use it for general dependencies
 # INCLUDE_DIRS += $(shell brew --prefix)/include
