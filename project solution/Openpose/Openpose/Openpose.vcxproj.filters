@@ -10,79 +10,79 @@
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
     <Filter Include="Source Files\core">
-      <UniqueIdentifier>{084067d0-338e-41cf-925a-c91babf25ee2}</UniqueIdentifier>
+      <UniqueIdentifier>{7de8f05e-741a-41f6-a46b-5a831c0a08fa}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\experimental">
-      <UniqueIdentifier>{9fcd4517-cc0c-45d3-a69f-b02ddf33ef63}</UniqueIdentifier>
+      <UniqueIdentifier>{3de0bd68-72e7-4371-9887-31f13a840ac0}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\filestream">
-      <UniqueIdentifier>{fdc06b17-4269-4f3c-83f2-d8ed0c95bfcf}</UniqueIdentifier>
+      <UniqueIdentifier>{9115a604-a304-4827-af34-a8bd10cfb44f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\gui">
-      <UniqueIdentifier>{cef4bd06-8a58-44e2-8159-31239f828e7b}</UniqueIdentifier>
+      <UniqueIdentifier>{31e599f6-f67f-4055-9d70-909bd4892baf}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\pose">
-      <UniqueIdentifier>{6f946978-ce6b-47cf-aa3c-b8ff394961b7}</UniqueIdentifier>
+      <UniqueIdentifier>{2cc5145d-2e47-4ac4-8964-920f2f6e96c7}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\producer">
-      <UniqueIdentifier>{ce8c9303-4a8b-490a-959b-cc7aeae3063e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\utilities">
-      <UniqueIdentifier>{b87ff46b-f6c2-4d51-b543-be8350bcb4b5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\wrapper">
-      <UniqueIdentifier>{2118105b-133e-4121-a830-006bc6465b38}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\experimental\face">
-      <UniqueIdentifier>{3a47eba9-5e71-4d42-ba21-05921758a321}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\experimental\filestream">
-      <UniqueIdentifier>{7573004e-b47e-4fba-8a54-fc558db71294}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\experimental\hand">
-      <UniqueIdentifier>{a1d13567-98f1-4894-80d5-32d747c7fee1}</UniqueIdentifier>
+      <UniqueIdentifier>{aaaa70bc-b84a-4870-996b-677f93e9a79a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\thread">
-      <UniqueIdentifier>{32280885-fa4f-410c-adca-4e70dd3156fa}</UniqueIdentifier>
+      <UniqueIdentifier>{a2e3dd5c-4bb9-403a-aea7-636eb1271dc7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\utilities">
+      <UniqueIdentifier>{f3af68c7-b0a9-442b-a5cf-f44791093d49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\wrapper">
+      <UniqueIdentifier>{9ea7fd57-5813-47f0-96e5-d7475590579d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\experimental\face">
+      <UniqueIdentifier>{f5d83a38-ab14-4c0e-9ce6-fa4e04ebc4bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\experimental\filestream">
+      <UniqueIdentifier>{4d7a98a1-e939-4f11-86cd-a8c72a34a662}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\experimental\hand">
+      <UniqueIdentifier>{50862e8d-d6e8-4fe3-9d07-0025ec43d514}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\core">
-      <UniqueIdentifier>{2dc510ef-6fbc-4635-95f8-7177730b12a4}</UniqueIdentifier>
+      <UniqueIdentifier>{91940cc2-ef13-4daa-bf65-dbdd8708f10e}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\experimental">
-      <UniqueIdentifier>{a8245782-c624-4a93-abbc-5c2eb424d892}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\experimental\face">
-      <UniqueIdentifier>{2d51e009-b429-40e1-b91a-aad35cbc9e67}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\experimental\filestream">
-      <UniqueIdentifier>{7edda115-e4b1-45f7-91e0-ac5e398fa841}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\experimental\hand">
-      <UniqueIdentifier>{b6451fb2-5d30-4f8f-95a1-b0d0b762fe27}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\experimental\producer">
-      <UniqueIdentifier>{eaa6c6c5-b8cb-4262-bc6d-d946d47a1c0b}</UniqueIdentifier>
+      <UniqueIdentifier>{5ac34103-c7ac-4d23-83e3-3083dfa8412f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\filestream">
-      <UniqueIdentifier>{4a0163af-2e87-49c3-afe1-acd92dde11a2}</UniqueIdentifier>
+      <UniqueIdentifier>{f5831a83-a9b5-4632-b123-167940837ee2}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\gui">
-      <UniqueIdentifier>{77857cc5-6098-498a-a90a-fabe55432e7f}</UniqueIdentifier>
+      <UniqueIdentifier>{8dc19aac-33d3-495c-812a-e3ac7198df29}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\pose">
-      <UniqueIdentifier>{8a1f28c4-ee5f-4995-969f-658fb5ce5843}</UniqueIdentifier>
+      <UniqueIdentifier>{c797a6fe-8791-48ef-9544-aa718bafb747}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\producer">
-      <UniqueIdentifier>{8cbfb6c9-710d-4b3a-9b4d-a3658eb7a52f}</UniqueIdentifier>
+      <UniqueIdentifier>{912f4cc7-f7bf-40b1-8c96-8dec2649d297}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\thread">
-      <UniqueIdentifier>{58b6a342-c3aa-43e1-ae6e-244570cd094b}</UniqueIdentifier>
+      <UniqueIdentifier>{353feb14-f7a8-473e-9325-6490820b039f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\utilities">
-      <UniqueIdentifier>{77fef53f-3f41-44e7-8b04-d99d02bc3755}</UniqueIdentifier>
+      <UniqueIdentifier>{5eed4f7f-8e35-43c0-9f9d-b3a32358d0d5}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\wrapper">
-      <UniqueIdentifier>{00d15e4d-1ab8-4098-92cb-f3da7cbea51d}</UniqueIdentifier>
+      <UniqueIdentifier>{9221efd3-4df7-4a5c-b451-5b7f0332cb7b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\experimental\face">
+      <UniqueIdentifier>{ce85024c-fbfa-474e-9a28-8ee196b5a01a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\experimental\filestream">
+      <UniqueIdentifier>{482fab78-40b0-4b00-8488-e961d19522bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\experimental\hand">
+      <UniqueIdentifier>{1844a0b0-fba7-4e36-bce0-8158fe9d7379}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\experimental\producer">
+      <UniqueIdentifier>{c8cf4a4d-0c51-42df-a421-53171676bf6d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -96,6 +96,9 @@
       <Filter>Source Files\core</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\openpose\core\datum.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\openpose\core\defineTemplatesForCore.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\openpose\core\keyPointScaler.cpp">
@@ -125,16 +128,13 @@
     <ClCompile Include="..\..\..\src\openpose\core\scaleKeyPoints.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\openpose\experimental\face\defineTemplatesForFace.cpp">
+      <Filter>Source Files\experimental\face</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\src\openpose\experimental\face\faceExtractor.cpp">
       <Filter>Source Files\experimental\face</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\openpose\experimental\face\faceRenderer.cpp">
-      <Filter>Source Files\experimental\face</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\openpose\core\defineTemplatesForCore.cpp">
-      <Filter>Source Files\core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\openpose\experimental\face\defineTemplatesForFace.cpp">
       <Filter>Source Files\experimental\face</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\openpose\experimental\filestream\defineTemplatesForFilestreamExp.cpp">
@@ -271,12 +271,24 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\include\openpose\utilities\cuda.hu">
-      <Filter>Header Files\utilities</Filter>
-    </None>
-    <None Include="..\..\..\include\openpose\utilities\render.hu">
-      <Filter>Header Files\utilities</Filter>
-    </None>
+    <CudaCompile Include="..\..\..\src\openpose\core\nmsBase.cu">
+      <Filter>Source Files\core</Filter>
+    </CudaCompile>
+    <CudaCompile Include="..\..\..\src\openpose\core\resizeAndMergeBase.cu">
+      <Filter>Source Files\core</Filter>
+    </CudaCompile>
+    <CudaCompile Include="..\..\..\src\openpose\experimental\face\faceRenderGpu.cu">
+      <Filter>Source Files\experimental\face</Filter>
+    </CudaCompile>
+    <CudaCompile Include="..\..\..\src\openpose\experimental\hand\handRenderGpu.cu">
+      <Filter>Source Files\experimental\hand</Filter>
+    </CudaCompile>
+    <CudaCompile Include="..\..\..\src\openpose\pose\bodyPartConnectorBase.cu">
+      <Filter>Source Files\pose</Filter>
+    </CudaCompile>
+    <CudaCompile Include="..\..\..\src\openpose\pose\poseRenderGpu.cu">
+      <Filter>Source Files\pose</Filter>
+    </CudaCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\include\openpose\core\array.hpp">
@@ -339,6 +351,9 @@
     <ClInclude Include="..\..\..\include\openpose\core\wOpOutputToCvMat.hpp">
       <Filter>Header Files\core</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\openpose\experimental\experimentalHeaders.hpp">
+      <Filter>Header Files\experimental</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\include\openpose\experimental\face\enumClasses.hpp">
       <Filter>Header Files\experimental\face</Filter>
     </ClInclude>
@@ -398,9 +413,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\include\openpose\experimental\producer\wPeoplePoseLoader.hpp">
       <Filter>Header Files\experimental\producer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\openpose\experimental\experimentalHeaders.hpp">
-      <Filter>Header Files\experimental</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\openpose\filestream\enumClasses.hpp">
       <Filter>Header Files\filestream</Filter>
@@ -639,25 +651,16 @@
     <ClInclude Include="..\..\..\include\openpose\pose\wPoseRenderer.hpp">
       <Filter>Header Files\pose</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\openpose\headers.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="..\..\..\src\openpose\experimental\hand\handRenderGpu.cu">
-      <Filter>Source Files\experimental\hand</Filter>
-    </CudaCompile>
-    <CudaCompile Include="..\..\..\src\openpose\core\resizeAndMergeBase.cu">
-      <Filter>Source Files\core</Filter>
-    </CudaCompile>
-    <CudaCompile Include="..\..\..\src\openpose\experimental\face\faceRenderGpu.cu">
-      <Filter>Source Files\experimental\face</Filter>
-    </CudaCompile>
-    <CudaCompile Include="..\..\..\src\openpose\pose\poseRenderGpu.cu">
-      <Filter>Source Files\pose</Filter>
-    </CudaCompile>
-    <CudaCompile Include="..\..\..\src\openpose\pose\bodyPartConnectorBase.cu">
-      <Filter>Source Files\pose</Filter>
-    </CudaCompile>
-    <CudaCompile Include="..\..\..\src\openpose\core\nmsBase.cu">
-      <Filter>Source Files\core</Filter>
-    </CudaCompile>
+    <None Include="..\..\..\include\openpose\utilities\cuda.hu">
+      <Filter>Header Files\utilities</Filter>
+    </None>
+    <None Include="..\..\..\include\openpose\utilities\render.hu">
+      <Filter>Header Files\utilities</Filter>
+    </None>
   </ItemGroup>
 </Project>

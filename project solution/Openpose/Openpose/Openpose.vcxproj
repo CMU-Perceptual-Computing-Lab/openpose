@@ -19,10 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{8709C737-472F-4D8E-8927-62E8E46551DF}</ProjectGuid>
+    <ProjectGuid>{1848F100-6EC5-4F60-9748-062590ADFE5C}</ProjectGuid>
     <RootNamespace>Openpose</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
-    <CudaToolkitCustomDir>$(CudaToolkitIncludeDir)</CudaToolkitCustomDir>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -83,8 +82,6 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;CAFFE_VERSION=1.0.0;BOOST_ALL_NO_LIB;USE_LMDB;USE_LEVELDB;USE_CUDNN;USE_OPENCV;USE_CAFFE;CMAKE_WINDOWS_BUILD;GLOG_NO_ABBREVIATED_SEVERITIES;GOOGLE_GLOG_DLL_DECL=__declspec(dllimport);GOOGLE_GLOG_DLL_DECL_FOR_UNITTESTS=__declspec(dllimport);H5_BUILT_AS_DYNAMIC_LIB=1;CMAKE_INTDIR="Debug";-D_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -107,8 +104,8 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\..\..\3rdparty\caffe\libraries\.caffe\dependencies\libraries_v140_x64_py27_1.1.0\libraries\include\boost-1_61;..\..\..\3rdparty\caffe\libraries\.caffe\dependencies\libraries_v140_x64_py27_1.1.0\libraries\include;..\..\..\3rdparty\caffe\caffe-windows\include;..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CAFFE_VERSION=1.0.0;BOOST_ALL_NO_LIB;USE_LMDB;USE_LEVELDB;USE_CUDNN;USE_OPENCV;USE_CAFFE;CMAKE_WINDOWS_BUILD;GLOG_NO_ABBREVIATED_SEVERITIES;GOOGLE_GLOG_DLL_DECL=__declspec(dllimport);GOOGLE_GLOG_DLL_DECL_FOR_UNITTESTS=__declspec(dllimport);H5_BUILT_AS_DYNAMIC_LIB=1;CMAKE_INTDIR="Release";_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\3rdparty\caffe\caffe-windows\include;..\..\..\3rdparty\caffe\dependencies\libraries_v140_x64_py27_1.1.0\libraries\include;..\..\..\3rdparty\caffe\dependencies\libraries_v140_x64_py27_1.1.0\libraries\include\boost-1_61;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>CAFFE_VERSION=1.0.0;BOOST_ALL_NO_LIB;USE_LMDB;USE_LEVELDB;USE_CUDNN;USE_OPENCV;USE_CAFFE;CMAKE_WINDOWS_BUILD;GLOG_NO_ABBREVIATED_SEVERITIES;GOOGLE_GLOG_DLL_DECL=__declspec(dllimport);GOOGLE_GLOG_DLL_DECL_FOR_UNITTESTS=__declspec(dllimport);H5_BUILT_AS_DYNAMIC_LIB=1;CMAKE_INTDIR="Release";_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -179,8 +176,12 @@
     <ClCompile Include="..\..\..\src\openpose\wrapper\wrapperStructPose.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\include\openpose\utilities\cuda.hu" />
-    <None Include="..\..\..\include\openpose\utilities\render.hu" />
+    <CudaCompile Include="..\..\..\src\openpose\core\nmsBase.cu" />
+    <CudaCompile Include="..\..\..\src\openpose\core\resizeAndMergeBase.cu" />
+    <CudaCompile Include="..\..\..\src\openpose\experimental\face\faceRenderGpu.cu" />
+    <CudaCompile Include="..\..\..\src\openpose\experimental\hand\handRenderGpu.cu" />
+    <CudaCompile Include="..\..\..\src\openpose\pose\bodyPartConnectorBase.cu" />
+    <CudaCompile Include="..\..\..\src\openpose\pose\poseRenderGpu.cu" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\include\openpose\core\array.hpp" />
@@ -247,6 +248,7 @@
     <ClInclude Include="..\..\..\include\openpose\gui\guiInfoAdder.hpp" />
     <ClInclude Include="..\..\..\include\openpose\gui\wGui.hpp" />
     <ClInclude Include="..\..\..\include\openpose\gui\wGuiInfoAdder.hpp" />
+    <ClInclude Include="..\..\..\include\openpose\headers.hpp" />
     <ClInclude Include="..\..\..\include\openpose\pose\bodyPartConnectorBase.hpp" />
     <ClInclude Include="..\..\..\include\openpose\pose\bodyPartConnectorCaffe.hpp" />
     <ClInclude Include="..\..\..\include\openpose\pose\enumClasses.hpp" />
@@ -305,12 +307,8 @@
     <ClInclude Include="..\..\..\include\openpose\wrapper\wrapperStructPose.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="..\..\..\src\openpose\core\nmsBase.cu" />
-    <CudaCompile Include="..\..\..\src\openpose\core\resizeAndMergeBase.cu" />
-    <CudaCompile Include="..\..\..\src\openpose\experimental\face\faceRenderGpu.cu" />
-    <CudaCompile Include="..\..\..\src\openpose\experimental\hand\handRenderGpu.cu" />
-    <CudaCompile Include="..\..\..\src\openpose\pose\bodyPartConnectorBase.cu" />
-    <CudaCompile Include="..\..\..\src\openpose\pose\poseRenderGpu.cu" />
+    <None Include="..\..\..\include\openpose\utilities\cuda.hu" />
+    <None Include="..\..\..\include\openpose\utilities\render.hu" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

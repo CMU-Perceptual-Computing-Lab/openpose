@@ -224,10 +224,13 @@ if %RUN_INSTALL% EQU 1 (
     cmake --build . --target install --config %CMAKE_CONFIG%
 )
 
-set CAFFE_LIB_SOURCE=./build/lib/Release
-set CAFFE_LIB_DST=../../lib/Release
-xcopy "%CAFFE_LIB_SOURCE%"\*.lib "%CAFFE_LIB_DST%" /y
+if NOT EXIST Release mkdir Release
 
+set "CURRENT_DIRECTORY=%cd%"
+set CAFFE_LIB_SOURCE="%CURRENT_DIRECTORY%"\build\lib\Release
+set CAFFE_LIB_DST=%CURRENT_DIRECTORY%\..\..\lib\Release
+echo D|xcopy  "%CAFFE_LIB_SOURCE%"\proto.lib "%CAFFE_LIB_DST%" /Y
+echo D|xcopy "%CAFFE_LIB_SOURCE%"\caffe.lib "%CAFFE_LIB_DST%" /Y
 
 popd
 @endlocal
