@@ -224,13 +224,20 @@ if %RUN_INSTALL% EQU 1 (
     cmake --build . --target install --config %CMAKE_CONFIG%
 )
 
+::Copy caffe libs
 if NOT EXIST Release mkdir Release
 
-set "CURRENT_DIRECTORY=%cd%"
-set CAFFE_LIB_SOURCE="%CURRENT_DIRECTORY%"\build\lib\Release
-set CAFFE_LIB_DST=%CURRENT_DIRECTORY%\..\..\lib\Release
+set BUILD_DIRECTORY=%cd%\build
+set CAFFE_LIB_SOURCE="%BUILD_DIRECTORY%"\lib\Release
+set CAFFE_LIB_DST=%BUILD_DIRECTORY%\..\..\..\lib\Release
 echo D|xcopy  "%CAFFE_LIB_SOURCE%"\proto.lib "%CAFFE_LIB_DST%" /Y
 echo D|xcopy "%CAFFE_LIB_SOURCE%"\caffe.lib "%CAFFE_LIB_DST%" /Y
+
+:: Copy caffe headers
+set CAFFE_INCLUDE_DIR=%BUILD_DIRECTORY%\..\..\include\caffe
+xcopy /e /v "%BUILD_DIRECTORY%"\include\caffe "%CAFFE_INCLUDE_DIR%" /Y
+echo D|xcopy "%BUILD_DIRECTORY%"\caffe\*.hpp "%CAFFE_INCLUDE_DIR%" /Y
+
 
 popd
 @endlocal
