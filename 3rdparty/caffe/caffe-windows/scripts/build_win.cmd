@@ -224,6 +224,8 @@ if %RUN_INSTALL% EQU 1 (
     cmake --build . --target install --config %CMAKE_CONFIG%
 )
 
+popd
+
 ::Copy caffe libs
 if NOT EXIST Release mkdir Release
 
@@ -238,6 +240,4 @@ set CAFFE_INCLUDE_DIR=%BUILD_DIRECTORY%\..\..\include\caffe
 xcopy /e /v "%BUILD_DIRECTORY%"\include\caffe "%CAFFE_INCLUDE_DIR%" /Y
 echo D|xcopy "%BUILD_DIRECTORY%"\caffe\*.hpp "%CAFFE_INCLUDE_DIR%" /Y
 
-
-popd
 @endlocal
