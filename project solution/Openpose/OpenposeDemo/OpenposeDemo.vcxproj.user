@@ -4,4 +4,8 @@
     <LocalDebuggerEnvironment>PATH=%PATH%;..\..\..\3rdparty\caffe\caffe-windows\build\install\bin\;..\..\..\3rdparty\caffe\dependencies\libraries_v140_x64_py27_1.1.0\libraries\x64\vc14\bin</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LocalDebuggerEnvironment>PATH=%PATH%;..\..\..\3rdparty\caffe\caffe-windows\build\install\bin\;..\..\..\3rdparty\caffe\dependencies\libraries_v140_x64_py27_1.1.0\libraries\x64\vc14\bin</LocalDebuggerEnvironment>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
 </Project>
