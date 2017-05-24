@@ -12,9 +12,9 @@ namespace op
     {
         try
         {
-			// POSE_BODY_PART_MAPPING crashes on Windows, replaced by getPoseBodyPartMapping
-			//auto partToName = POSE_BODY_PART_MAPPING[(int)poseModel];
-			auto partToName = getPoseBodyPartMapping(poseModel);
+            // POSE_BODY_PART_MAPPING crashes on Windows, replaced by getPoseBodyPartMapping
+            // auto partToName = POSE_BODY_PART_MAPPING[(int)poseModel];
+            auto partToName = getPoseBodyPartMapping(poseModel);
             const auto& bodyPartPairs = POSE_BODY_PART_PAIRS[(int)poseModel];
             const auto& mapIdx = POSE_MAP_IDX[(int)poseModel];
 
@@ -45,6 +45,7 @@ namespace op
         mPoseModel{poseModel},
         mPartIndexToName{createPartToName(poseModel)},
         // #body elements to render = #body parts (size()) + #body part pair connections + 3 (+whole pose +whole heatmaps +PAFs)
+        // POSE_BODY_PART_MAPPING crashes on Windows, replaced by getPoseBodyPartMapping
         mNumberElementsToRender{(int)(getPoseBodyPartMapping(mPoseModel).size() + POSE_BODY_PART_PAIRS[(int)mPoseModel].size()/2 + 3)},
         spPoseExtractor{poseExtractor},
         mAlphaPose{alphaPose},

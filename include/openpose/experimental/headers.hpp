@@ -11,6 +11,6 @@
 #include "hand/headers.hpp"
 
 // producer module
-// #include "producer/produceHeaders.hpp"
+// #include "producer/headers.hpp"
 
 #endif // OPENPOSE__EXPERIMENTAL__HEADERS_HPP

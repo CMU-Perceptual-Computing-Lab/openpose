@@ -41,12 +41,19 @@ namespace op
     WGui<TDatums>::WGui(const std::shared_ptr<Gui>& gui) :
         spGui{gui}
     {
-        spGui->initializationOnThread();
     }
 
     template<typename TDatums>
     void WGui<TDatums>::initializationOnThread()
     {
+        try
+        {
+            spGui->initializationOnThread();
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
     }
 
     template<typename TDatums>
