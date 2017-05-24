@@ -464,11 +464,11 @@ namespace op
                     maxQueueId = fastMax(maxQueueId, fastMax(std::get<2>(threadWorkerQueue), std::get<3>(threadWorkerQueue)));
 
                 // Check each queue id has at least a worker that uses it as input and another one as output. Special cases:
-                std::vector<std::pair<bool, bool>> usedQueueIds(maxQueueId, {false, false});
+                std::vector<std::pair<bool, bool>> usedQueueIds(maxQueueId+1, {false, false});
                 for (const auto& threadWorkerQueue : mThreadWorkerQueues)
                 {
-                    usedQueueIds[std::get<2>(threadWorkerQueue)].first = true;
-                    usedQueueIds[std::get<3>(threadWorkerQueue)].second = true;
+                    usedQueueIds.at(std::get<2>(threadWorkerQueue)).first = true;
+                    usedQueueIds.at(std::get<3>(threadWorkerQueue)).second = true;
                 }
                 // Id 0 must only needs a worker using it as input.
                 usedQueueIds.begin()->second = true;

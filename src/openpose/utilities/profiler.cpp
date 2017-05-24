@@ -42,7 +42,7 @@ namespace op
             if (sProfilerTuple.count(key) > 0)
                 std::get<2>(sProfilerTuple[key]) = std::chrono::high_resolution_clock::now();
             else
-                sProfilerTuple[key] = {std::make_tuple(0., 0, std::chrono::high_resolution_clock::now())};
+                sProfilerTuple[key] = {std::make_tuple(0., 0ull, std::chrono::high_resolution_clock::now())};
             lock.unlock();
             return key;
         #else
