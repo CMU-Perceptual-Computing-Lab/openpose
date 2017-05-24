@@ -1,4 +1,4 @@
-#include "openpose/gui/guiHeaders.hpp"
+#include "openpose/gui/headers.hpp"
 
 namespace op
 {

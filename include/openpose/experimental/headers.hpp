@@ -2,13 +2,13 @@
 #define OPENPOSE__EXPERIMENTAL__HEADERS_HPP
 
 // face module
-#include "face/faceHeaders.hpp"
+#include "face/headers.hpp"
 
 // filestream module
-#include "filestream/filestreamExpHeaders.hpp"
+#include "filestream/headers.hpp"
 
 // hands module
-#include "hand/handHeaders.hpp"
+#include "hand/headers.hpp"
 
 // producer module
 // #include "producer/produceHeaders.hpp"
