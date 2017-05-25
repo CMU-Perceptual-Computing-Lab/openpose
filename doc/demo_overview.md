@@ -5,38 +5,6 @@ Forget about the OpenPose library code, just compile the library and use the dem
 
 In order to learn how to use it, run `./build/examples/openpose/openpose.bin --help` in your bash and read all the available flags (check only the flags for `examples/openpose/openpose.cpp` itself, i.e. the section `Flags from examples/openpose/openpose.cpp:`). We detail some of them in the following sections.
 
-## Quick Start
-Check that the library is working properly by using any of the following commands. Note that `examples/media/video.avi` and `examples/media` exist, so you do not need to change the paths.
-
-1. Running on Video
-```
-./build/examples/openpose/openpose.bin --video examples/media/video.avi
-```
-
-2. Running on Webcam
-```
-./build/examples/openpose/openpose.bin
-```
-
-3. Running on Images
-```
-./build/examples/openpose/openpose.bin --image_dir examples/media/
-```
-
-The visual GUI should show the original image with the poses blended on it, similarly to the pose of this gif:
-<p align="center">
-    <img src="media/shake.gif", width="720">
-</p>
-
-If you choose to visualize a body part or a PAF (Part Affinity Field) heat map with the command option `--part_to_show`, the result should be similar to one of the following images:
-<p align="center">
-    <img src="media/body_heat_maps.png", width="720">
-</p>
-
-<p align="center">
-    <img src="media/paf_heat_maps.png", width="720">
-</p>
-
 
 
 ## Other Important Options

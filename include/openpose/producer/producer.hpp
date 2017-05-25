@@ -1,6 +1,7 @@
 #ifndef OPENPOSE__PRODUCER__PRODUCER_HPP
 #define OPENPOSE__PRODUCER__PRODUCER_HPP
 
+#include <array>
 #include <chrono>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>      // capProperties of OpenCV

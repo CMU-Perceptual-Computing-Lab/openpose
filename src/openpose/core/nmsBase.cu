@@ -7,8 +7,8 @@
 
 namespace op
 {
-    const auto THREADS_PER_BLOCK_1D = 16;
-    const auto THREADS_PER_BLOCK = 512;
+    const auto THREADS_PER_BLOCK_1D = 16u;
+    const auto THREADS_PER_BLOCK = 512u;
 
     template <typename T>
     __global__ void nmsRegisterKernel(int* kernelPtr, const T* const sourcePtr, const int w, const int h, const T threshold)

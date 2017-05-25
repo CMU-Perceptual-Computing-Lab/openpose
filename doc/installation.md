@@ -5,7 +5,7 @@ OpenPose Library - Compilation and Installation
 
 ## Requirements
 - Ubuntu (tested on 14 and 16)
-- GPU with at least 2 GB and 1.5 GB available (the `nvidia-smi` command checks the available GPU memory in Ubuntu).
+- GPU with at least 1.5 GB available (the `nvidia-smi` command checks the available GPU memory in Ubuntu).
 - CUDA and cuDNN installed.
 - At least 2 GB of free RAM memory.
 - Highly recommended: A CPU with at least 8 cores.
@@ -80,3 +80,43 @@ make clean && cd 3rdparty/caffe && make clean
 
 ## Uninstallation
 You just need to remove the OpenPose folder, by default called `openpose/`. E.g. `rm -rf openpose/`.
+
+
+
+## Quick Start
+Check that the library is working properly by using any of the following commands. Note that `examples/media/video.avi` and `examples/media` exist, so you do not need to change the paths.
+
+1. Running on Video
+```
+./build/examples/openpose/openpose.bin --video examples/media/video.avi
+```
+
+2. Running on Webcam
+```
+./build/examples/openpose/openpose.bin
+```
+
+3. Running on Images
+```
+./build/examples/openpose/openpose.bin --image_dir examples/media/
+```
+
+The visual GUI should show the original image with the poses blended on it, similarly to the pose of this gif:
+<p align="center">
+    <img src="media/shake.gif", width="720">
+</p>
+
+If you choose to visualize a body part or a PAF (Part Affinity Field) heat map with the command option `--part_to_show`, the result should be similar to one of the following images:
+<p align="center">
+    <img src="media/body_heat_maps.png", width="720">
+</p>
+
+<p align="center">
+    <img src="media/paf_heat_maps.png", width="720">
+</p>
+
+
+
+## FAQ
+Q: Out of memory error - After installing OpenPose, I get an out of memory error, similar to: `Check failed: error == cudaSuccess (2 vs. 0)  out of memory`.
+A: Most probably cuDNN is not installed/enabled, the default Caffe model uses >12 GB of GPU memory, cuDNN reduces it to ~1.5 GB.

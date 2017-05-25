@@ -8,6 +8,8 @@
 
 namespace op
 {
+	// PI digits: http://www.piday.org/million/
+	__constant__ const float PI = 3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745f;
     __constant__ const unsigned char COCO_PAIRS_GPU[] = POSE_COCO_PAIRS_TO_RENDER;
     __constant__ const unsigned char MPI_PAIRS_GPU[] = POSE_MPI_PAIRS_TO_RENDER;
     __constant__ const float COCO_RGB_COLORS[] = {
@@ -131,7 +133,7 @@ namespace op
     inline __device__ void getColorXYAffinity(float3& colorPtr, const float x, const float y)
     {
         const auto rad = fastMin(1.f, sqrt( x*x + y*y ) );
-        const float a = atan2(-y,-x)/M_PI;
+        const float a = atan2(-y,-x)/PI;
         auto fk = (a+1.f)/2.f; // 0 to 1
         if (::isnan(fk))
             fk = 0.f;
