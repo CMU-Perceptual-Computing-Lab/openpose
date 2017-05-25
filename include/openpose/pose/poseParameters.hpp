@@ -66,7 +66,6 @@ namespace op
     const std::array<float, (int)PoseModel::Size>               POSE_CCN_DECREASE_FACTOR{   8.f,                    8.f,                    8.f};
     const std::array<unsigned int, (int)PoseModel::Size>        POSE_MAX_PEAKS{             POSE_MAX_PEOPLE,        POSE_MAX_PEOPLE,        POSE_MAX_PEOPLE};
     const std::array<unsigned char, (int)PoseModel::Size>       POSE_NUMBER_BODY_PARTS{     POSE_COCO_NUMBER_PARTS, POSE_MPI_NUMBER_PARTS,  POSE_MPI_NUMBER_PARTS};
-    const std::array<std::map<unsigned char, std::string>, 3>   POSE_BODY_PART_MAPPING{     POSE_COCO_BODY_PARTS,   POSE_MPI_BODY_PARTS,    POSE_MPI_BODY_PARTS};
     const std::array<std::vector<unsigned char>, 3>             POSE_BODY_PART_PAIRS{       POSE_COCO_PAIRS,        POSE_MPI_PAIRS,         POSE_MPI_PAIRS};
     const std::array<std::vector<unsigned char>, 3>             POSE_MAP_IDX{               POSE_COCO_MAP_IDX,      POSE_MPI_MAP_IDX,       POSE_MPI_MAP_IDX};
     const std::array<std::string, (int)PoseModel::Size> POSE_PROTOTXT{  "pose/coco/pose_deploy_linevec.prototxt",
@@ -75,6 +74,10 @@ namespace op
     const std::array<std::string, (int)PoseModel::Size> POSE_TRAINED_MODEL{ "pose/coco/pose_iter_440000.caffemodel",
                                                                             "pose/mpi/pose_iter_160000.caffemodel",
                                                                             "pose/mpi/pose_iter_160000.caffemodel"};
+	// POSE_BODY_PART_MAPPING crashes on Windows at dynamic initialization, to avoid this crash:
+	// POSE_BODY_PART_MAPPING has been moved to poseParameters.cpp and getPoseBodyPartMapping() wraps it
+	//const std::array<std::map<unsigned char, std::string>, 3>   POSE_BODY_PART_MAPPING{     POSE_COCO_BODY_PARTS,   POSE_MPI_BODY_PARTS,    POSE_MPI_BODY_PARTS};
+	const std::map<unsigned char, std::string>& getPoseBodyPartMapping(const PoseModel poseModel);
 
     // Default Model Parameters
     // They might be modified on running time

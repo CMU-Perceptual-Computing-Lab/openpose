@@ -1,4 +1,5 @@
-#include "openpose/pose/poseHeaders.hpp"
+#include "openpose/pose/headers.hpp"
+
 namespace op
 {
     DEFINE_TEMPLATE_DATUM(WPoseExtractor);

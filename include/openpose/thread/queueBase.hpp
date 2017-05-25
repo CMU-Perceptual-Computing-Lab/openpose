@@ -1,5 +1,5 @@
 #ifndef OPENPOSE__THREAD__QUEUE_BASE_HPP
-#define OPENPOSE__THREAD__QUEUE_BASE_HPP 
+#define OPENPOSE__THREAD__QUEUE_BASE_HPP
 
 #include <queue> // std::queue & std::priority_queue
 #include <condition_variable>

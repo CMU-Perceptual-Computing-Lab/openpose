@@ -1,4 +1,4 @@
-#include "openpose/wrapper/wrapperHeaders.hpp"
+#include "openpose/wrapper/headers.hpp"
 
 namespace op
 {

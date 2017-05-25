@@ -98,9 +98,6 @@
     <ClCompile Include="..\..\..\src\openpose\core\datum.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\openpose\core\defineTemplatesForCore.cpp">
-      <Filter>Source Files\core</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\openpose\core\keyPointScaler.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
@@ -128,29 +125,17 @@
     <ClCompile Include="..\..\..\src\openpose\core\scaleKeyPoints.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\openpose\experimental\face\defineTemplatesForFace.cpp">
-      <Filter>Source Files\experimental\face</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\openpose\experimental\face\faceExtractor.cpp">
       <Filter>Source Files\experimental\face</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\openpose\experimental\face\faceRenderer.cpp">
       <Filter>Source Files\experimental\face</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\openpose\experimental\filestream\defineTemplatesForFilestreamExp.cpp">
-      <Filter>Source Files\experimental\filestream</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\openpose\experimental\hand\defineTemplatesForHand.cpp">
-      <Filter>Source Files\experimental\hand</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\openpose\experimental\hand\handExtractor.cpp">
       <Filter>Source Files\experimental\hand</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\openpose\experimental\hand\handRenderer.cpp">
       <Filter>Source Files\experimental\hand</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\openpose\filestream\defineTemplatesForFilestream.cpp">
-      <Filter>Source Files\filestream</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\openpose\filestream\fileSaver.cpp">
       <Filter>Source Files\filestream</Filter>
@@ -179,9 +164,6 @@
     <ClCompile Include="..\..\..\src\openpose\filestream\videoSaver.cpp">
       <Filter>Source Files\filestream</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\openpose\gui\defineTemplatesforGui.cpp">
-      <Filter>Source Files\gui</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\openpose\gui\frameDisplayer.cpp">
       <Filter>Source Files\gui</Filter>
     </ClCompile>
@@ -190,9 +172,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\openpose\gui\guiInfoAdder.cpp">
       <Filter>Source Files\gui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\openpose\wrapper\defineTemplatesForWrapper.cpp">
-      <Filter>Source Files\wrapper</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\openpose\wrapper\wrapperStructFace.cpp">
       <Filter>Source Files\wrapper</Filter>
@@ -227,12 +206,6 @@
     <ClCompile Include="..\..\..\src\openpose\utilities\string.cpp">
       <Filter>Source Files\utilities</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\openpose\thread\defineTemplatesForThread.cpp">
-      <Filter>Source Files\thread</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\openpose\producer\defineTemplatesForProducer.cpp">
-      <Filter>Source Files\producer</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\openpose\producer\imageDirectoryReader.cpp">
       <Filter>Source Files\producer</Filter>
     </ClCompile>
@@ -254,9 +227,6 @@
     <ClCompile Include="..\..\..\src\openpose\pose\bodyPartConnectorCaffe.cpp">
       <Filter>Source Files\pose</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\openpose\pose\defineTemplatesForPose.cpp">
-      <Filter>Source Files\pose</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\openpose\pose\poseExtractor.cpp">
       <Filter>Source Files\pose</Filter>
     </ClCompile>
@@ -268,6 +238,36 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\openpose\pose\poseRenderer.cpp">
       <Filter>Source Files\pose</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\openpose\core\defineTemplates.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\openpose\experimental\face\defineTemplates.cpp">
+      <Filter>Source Files\experimental\face</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\openpose\experimental\filestream\defineTemplates.cpp">
+      <Filter>Source Files\experimental\filestream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\openpose\experimental\hand\defineTemplates.cpp">
+      <Filter>Source Files\experimental\hand</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\openpose\filestream\defineTemplates.cpp">
+      <Filter>Source Files\filestream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\openpose\gui\defineTemplates.cpp">
+      <Filter>Source Files\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\openpose\pose\defineTemplates.cpp">
+      <Filter>Source Files\pose</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\openpose\producer\defineTemplates.cpp">
+      <Filter>Source Files\producer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\openpose\thread\defineTemplates.cpp">
+      <Filter>Source Files\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\openpose\wrapper\defineTemplates.cpp">
+      <Filter>Source Files\wrapper</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -292,9 +292,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\include\openpose\core\array.hpp">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\openpose\core\coreHeaders.hpp">
       <Filter>Header Files\core</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\openpose\core\cvMatToOpInput.hpp">
@@ -351,16 +348,10 @@
     <ClInclude Include="..\..\..\include\openpose\core\wOpOutputToCvMat.hpp">
       <Filter>Header Files\core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\openpose\experimental\experimentalHeaders.hpp">
-      <Filter>Header Files\experimental</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\openpose\experimental\face\enumClasses.hpp">
       <Filter>Header Files\experimental\face</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\openpose\experimental\face\faceExtractor.hpp">
-      <Filter>Header Files\experimental\face</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\openpose\experimental\face\faceHeaders.hpp">
       <Filter>Header Files\experimental\face</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\openpose\experimental\face\faceParameters.hpp">
@@ -378,9 +369,6 @@
     <ClInclude Include="..\..\..\include\openpose\experimental\face\wFaceRenderer.hpp">
       <Filter>Header Files\experimental\face</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\openpose\experimental\filestream\filestreamExpHeaders.hpp">
-      <Filter>Header Files\experimental\filestream</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\openpose\experimental\filestream\wPoseJsonCocoSaver.hpp">
       <Filter>Header Files\experimental\filestream</Filter>
     </ClInclude>
@@ -388,9 +376,6 @@
       <Filter>Header Files\experimental\hand</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\openpose\experimental\hand\handExtractor.hpp">
-      <Filter>Header Files\experimental\hand</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\openpose\experimental\hand\handHeaders.hpp">
       <Filter>Header Files\experimental\hand</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\openpose\experimental\hand\handParameters.hpp">
@@ -408,9 +393,6 @@
     <ClInclude Include="..\..\..\include\openpose\experimental\hand\wHandRenderer.hpp">
       <Filter>Header Files\experimental\hand</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\openpose\experimental\producer\producerExpHeaders.hpp">
-      <Filter>Header Files\experimental\producer</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\openpose\experimental\producer\wPeoplePoseLoader.hpp">
       <Filter>Header Files\experimental\producer</Filter>
     </ClInclude>
@@ -421,9 +403,6 @@
       <Filter>Header Files\filestream</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\openpose\filestream\fileStream.hpp">
-      <Filter>Header Files\filestream</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\openpose\filestream\filestreamHeaders.hpp">
       <Filter>Header Files\filestream</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\openpose\filestream\heatMapSaver.hpp">
@@ -471,9 +450,6 @@
     <ClInclude Include="..\..\..\include\openpose\gui\gui.hpp">
       <Filter>Header Files\gui</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\openpose\gui\guiHeaders.hpp">
-      <Filter>Header Files\gui</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\openpose\gui\guiInfoAdder.hpp">
       <Filter>Header Files\gui</Filter>
     </ClInclude>
@@ -484,9 +460,6 @@
       <Filter>Header Files\gui</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\openpose\wrapper\wrapper.hpp">
-      <Filter>Header Files\wrapper</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\openpose\wrapper\wrapperHeaders.hpp">
       <Filter>Header Files\wrapper</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\openpose\wrapper\wrapperStructFace.hpp">
@@ -537,9 +510,6 @@
     <ClInclude Include="..\..\..\include\openpose\utilities\string.hpp">
       <Filter>Header Files\utilities</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\openpose\utilities\utilitiesHeaders.hpp">
-      <Filter>Header Files\utilities</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\openpose\thread\enumClasses.hpp">
       <Filter>Header Files\thread</Filter>
     </ClInclude>
@@ -568,9 +538,6 @@
       <Filter>Header Files\thread</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\openpose\thread\thread.hpp">
-      <Filter>Header Files\thread</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\openpose\thread\threadHeaders.hpp">
       <Filter>Header Files\thread</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\openpose\thread\threadManager.hpp">
@@ -603,9 +570,6 @@
     <ClInclude Include="..\..\..\include\openpose\producer\producer.hpp">
       <Filter>Header Files\producer</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\openpose\producer\producerHeaders.hpp">
-      <Filter>Header Files\producer</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\openpose\producer\videoCaptureReader.hpp">
       <Filter>Header Files\producer</Filter>
     </ClInclude>
@@ -633,9 +597,6 @@
     <ClInclude Include="..\..\..\include\openpose\pose\poseExtractorCaffe.hpp">
       <Filter>Header Files\pose</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\openpose\pose\poseHeaders.hpp">
-      <Filter>Header Files\pose</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\openpose\pose\poseParameters.hpp">
       <Filter>Header Files\pose</Filter>
     </ClInclude>
@@ -653,6 +614,45 @@
     </ClInclude>
     <ClInclude Include="..\..\..\include\openpose\headers.hpp">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\openpose\core\headers.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\openpose\experimental\face\headers.hpp">
+      <Filter>Header Files\experimental\face</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\openpose\experimental\filestream\headers.hpp">
+      <Filter>Header Files\experimental\filestream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\openpose\experimental\hand\headers.hpp">
+      <Filter>Header Files\experimental\hand</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\openpose\experimental\producer\headers.hpp">
+      <Filter>Header Files\experimental\producer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\openpose\experimental\headers.hpp">
+      <Filter>Header Files\experimental</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\openpose\filestream\headers.hpp">
+      <Filter>Header Files\filestream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\openpose\gui\headers.hpp">
+      <Filter>Header Files\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\openpose\pose\headers.hpp">
+      <Filter>Header Files\pose</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\openpose\producer\headers.hpp">
+      <Filter>Header Files\producer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\openpose\thread\headers.hpp">
+      <Filter>Header Files\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\openpose\utilities\headers.hpp">
+      <Filter>Header Files\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\openpose\wrapper\headers.hpp">
+      <Filter>Header Files\wrapper</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

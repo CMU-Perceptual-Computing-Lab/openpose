@@ -1,4 +1,4 @@
-#include "openpose/core/coreHeaders.hpp"
+#include "openpose/core/headers.hpp"
 
 namespace op
 {

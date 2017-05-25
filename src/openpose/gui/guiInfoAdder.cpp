@@ -1,5 +1,6 @@
 #include <chrono>
 #include <cstdio> // std::snprintf
+#include <limits> // std::numeric_limits
 #include "openpose/utilities/errorAndLog.hpp"
 #include "openpose/utilities/fastMath.hpp"
 #include "openpose/utilities/openCv.hpp"
@@ -52,7 +53,7 @@ namespace op
         mGuiEnabled{guiEnabled},
         mFpsCounter{0u},
         mLastElementRenderedCounter{std::numeric_limits<int>::max()},
-        mLastId{~0u}
+        mLastId{std::numeric_limits<unsigned long long>::max()}
     {
     }
 

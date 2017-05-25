@@ -1,4 +1,4 @@
-#include "openpose/thread/threadHeaders.hpp"
+#include "openpose/thread/headers.hpp"
 
 namespace op
 {
