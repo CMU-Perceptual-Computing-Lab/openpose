@@ -6,11 +6,11 @@
 #include <memory> // std::shared_ptr
 #include <thread>
 #include <opencv2/core/core.hpp>
-#include "../../core/array.hpp"
-#include "../../core/net.hpp"
-#include "../../core/nmsCaffe.hpp"
-#include "../../core/resizeAndMergeCaffe.hpp"
-#include "../../pose/enumClasses.hpp"
+#include <openpose/core/array.hpp>
+#include <openpose/core/net.hpp>
+#include <openpose/core/nmsCaffe.hpp>
+#include <openpose/core/resizeAndMergeCaffe.hpp>
+#include <openpose/pose/enumClasses.hpp>
 #include "enumClasses.hpp"
 
 namespace op
@@ -37,12 +37,12 @@ namespace op
         private:
             const cv::Size mNetOutputSize;
             const cv::Size mOutputSize;
-            const unsigned char mRWrist;
-            const unsigned char mRElbow;
-            const unsigned char mLWrist;
-            const unsigned char mLElbow;
-            const unsigned char mNeck;
-            const unsigned char mHeadNose;
+            const unsigned int mRWrist;
+            const unsigned int mRElbow;
+            const unsigned int mLWrist;
+            const unsigned int mLElbow;
+            const unsigned int mNeck;
+            const unsigned int mHeadNose;
             std::array<std::atomic<double>, (int)HandsProperty::Size> mProperties;
             std::shared_ptr<Net> spNet;
             std::shared_ptr<ResizeAndMergeCaffe<float>> spResizeAndMergeCaffe;

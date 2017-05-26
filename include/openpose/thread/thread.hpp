@@ -5,7 +5,7 @@
 #include <memory>   // std::shared_ptr
 #include <thread>
 #include <vector>
-#include "../utilities/macros.hpp"
+#include <openpose/utilities/macros.hpp>
 #include "subThread.hpp"
 #include "worker.hpp"
 
@@ -63,7 +63,7 @@ namespace op
 
 
 // Implementation
-#include "../utilities/errorAndLog.hpp"
+#include <openpose/utilities/errorAndLog.hpp>
 namespace op
 {
     template<typename TDatums, typename TWorker>

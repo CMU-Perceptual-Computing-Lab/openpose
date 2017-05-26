@@ -1,7 +1,7 @@
 #ifndef OPENPOSE__FILESTREAM__POSE_SAVER_HPP
 #define OPENPOSE__FILESTREAM__POSE_SAVER_HPP
 
-#include "../core/array.hpp"
+#include <openpose/core/array.hpp>
 #include "enumClasses.hpp"
 #include "fileSaver.hpp"
 

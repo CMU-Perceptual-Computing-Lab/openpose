@@ -1,4 +1,4 @@
-#include "openpose/wrapper/wrapperStructHand.hpp"
+#include <openpose/wrapper/wrapperStructHand.hpp>
 
 namespace op
 {

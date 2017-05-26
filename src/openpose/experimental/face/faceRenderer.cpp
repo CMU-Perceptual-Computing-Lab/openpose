@@ -1,10 +1,10 @@
 #include <cuda.h>
 #include <cuda_runtime_api.h>
-#include "openpose/experimental/face/faceParameters.hpp"
-#include "openpose/experimental/face/faceRenderGpu.hpp"
-#include "openpose/utilities/cuda.hpp"
-#include "openpose/utilities/errorAndLog.hpp"
-#include "openpose/experimental/face/faceRenderer.hpp"
+#include <openpose/experimental/face/faceParameters.hpp>
+#include <openpose/experimental/face/faceRenderGpu.hpp>
+#include <openpose/utilities/cuda.hpp>
+#include <openpose/utilities/errorAndLog.hpp>
+#include <openpose/experimental/face/faceRenderer.hpp>
 
 namespace op
 {

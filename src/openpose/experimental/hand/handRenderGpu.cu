@@ -1,9 +1,9 @@
-#include "openpose/experimental/hand/handParameters.hpp"
-#include "openpose/utilities/errorAndLog.hpp"
-#include "openpose/utilities/cuda.hpp"
-#include "openpose/utilities/cuda.hu"
-#include "openpose/utilities/render.hu"
-#include "openpose/experimental/hand/handRenderGpu.hpp"
+#include <openpose/experimental/hand/handParameters.hpp>
+#include <openpose/utilities/errorAndLog.hpp>
+#include <openpose/utilities/cuda.hpp>
+#include <openpose/utilities/cuda.hu>
+#include <openpose/utilities/render.hu>
+#include <openpose/experimental/hand/handRenderGpu.hpp>
 
 namespace op
 {

@@ -4,8 +4,8 @@
 #include <atomic>
 #include <memory> // std::shared_ptr
 #include <opencv2/core/core.hpp>
-#include "../pose/poseExtractor.hpp"
-#include "../pose/poseRenderer.hpp"
+#include <openpose/pose/poseExtractor.hpp>
+#include <openpose/pose/poseRenderer.hpp>
 #include "enumClasses.hpp"
 #include "frameDisplayer.hpp"
 

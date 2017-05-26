@@ -2,9 +2,9 @@
 #define OPENPOSE__WRAPPER__WRAPPER_STRUCT_POSE_HPP
 
 #include <opencv2/core/core.hpp>
-#include "../core/enumClasses.hpp"
-#include "../pose/enumClasses.hpp"
-#include "../pose/poseParameters.hpp"
+#include <openpose/core/enumClasses.hpp>
+#include <openpose/pose/enumClasses.hpp>
+#include <openpose/pose/poseParameters.hpp>
 
 namespace op
 {

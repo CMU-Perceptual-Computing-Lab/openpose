@@ -26,7 +26,7 @@ namespace op
 
 
 // Implementation
-#include "../utilities/macros.hpp"
+#include <openpose/utilities/macros.hpp>
 namespace op
 {
     template<typename TDatums>

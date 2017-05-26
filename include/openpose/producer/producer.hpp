@@ -5,7 +5,7 @@
 #include <chrono>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>      // capProperties of OpenCV
-#include "../utilities/macros.hpp"
+#include <openpose/utilities/macros.hpp>
 #include "enumClasses.hpp"
 
 namespace op

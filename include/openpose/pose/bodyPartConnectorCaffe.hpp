@@ -4,8 +4,8 @@
 
 #include <array>
 #include <caffe/blob.hpp>
-#include "../core/array.hpp"
-#include "../utilities/macros.hpp"
+#include <openpose/core/array.hpp>
+#include <openpose/utilities/macros.hpp>
 #include "enumClasses.hpp"
 
 namespace op

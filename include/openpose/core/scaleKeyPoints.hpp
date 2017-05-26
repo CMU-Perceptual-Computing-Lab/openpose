@@ -5,11 +5,11 @@
 
 namespace op
 {
-    void scaleKeyPoints(Array<float>& keyPoints, const double scale);
+    void scaleKeyPoints(Array<float>& keyPoints, const float scale);
 
-    void scaleKeyPoints(Array<float>& keyPoints, const double scaleX, const double scaleY);
+    void scaleKeyPoints(Array<float>& keyPoints, const float scaleX, const float scaleY);
 
-    void scaleKeyPoints(Array<float>& keyPoints, const double scaleX, const double scaleY, const double offsetX, const double offsetY);
+    void scaleKeyPoints(Array<float>& keyPoints, const float scaleX, const float scaleY, const float offsetX, const float offsetY);
 }
 
 #endif // OPENPOSE__CORE__SCALE_KEY_POINTS_HPP

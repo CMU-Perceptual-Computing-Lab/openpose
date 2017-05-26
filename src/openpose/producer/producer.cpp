@@ -1,8 +1,8 @@
 #include <thread>
-#include "openpose/utilities/check.hpp"
-#include "openpose/utilities/errorAndLog.hpp"
-#include "openpose/utilities/fastMath.hpp"
-#include "openpose/producer/producer.hpp"
+#include <openpose/utilities/check.hpp>
+#include <openpose/utilities/errorAndLog.hpp>
+#include <openpose/utilities/fastMath.hpp>
+#include <openpose/producer/producer.hpp>
 
 namespace op
 {
@@ -107,7 +107,7 @@ namespace op
                 // Individual checks
                 if (property == ProducerProperty::AutoRepeat)
                 {
-                    check(!(bool)value || (mType == ProducerType::ImageDirectory || mType == ProducerType::Video),
+                    check(value != 1. || (mType == ProducerType::ImageDirectory || mType == ProducerType::Video),
                           "ProducerProperty::AutoRepeat only implemented for ProducerType::ImageDirectory and Video.", __LINE__, __FUNCTION__, __FILE__);
                 }
                 else if (property == ProducerProperty::Rotation)
@@ -161,7 +161,7 @@ namespace op
             {
                 // Rotate it if desired
                 const auto rotationAngle = mProperties[(unsigned char)ProducerProperty::Rotation];
-                const auto flipFrame = (bool)mProperties[(unsigned char)ProducerProperty::Flip];
+                const auto flipFrame = (mProperties[(unsigned char)ProducerProperty::Flip] == 1.);
                 if (rotationAngle == 0.)
                 {
                     if (flipFrame)

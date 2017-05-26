@@ -5,11 +5,11 @@
 #include <memory> // std::shared_ptr
 #include <opencv2/core/core.hpp>
 #include <caffe/blob.hpp>
-#include "../core/array.hpp"
-#include "../core/net.hpp"
-#include "../core/nmsCaffe.hpp"
-#include "../core/resizeAndMergeCaffe.hpp"
-#include "../utilities/macros.hpp"
+#include <openpose/core/array.hpp>
+#include <openpose/core/net.hpp>
+#include <openpose/core/nmsCaffe.hpp>
+#include <openpose/core/resizeAndMergeCaffe.hpp>
+#include <openpose/utilities/macros.hpp>
 #include "bodyPartConnectorCaffe.hpp"
 #include "enumClasses.hpp"
 #include "poseExtractor.hpp"
@@ -22,6 +22,8 @@ namespace op
         PoseExtractorCaffe(const cv::Size& netInputSize, const cv::Size& netOutputSize, const cv::Size& outputSize, const int scaleNumber,
                            const float scaleGap, const PoseModel poseModel, const std::string& modelFolder, const int gpuId, const std::vector<HeatMapType>& heatMapTypes = {},
                            const ScaleMode heatMapScaleMode = ScaleMode::ZeroToOne);
+
+        virtual ~PoseExtractorCaffe();
 
         void netInitializationOnThread();
 

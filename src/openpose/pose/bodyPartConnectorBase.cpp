@@ -1,8 +1,8 @@
-#include "openpose/utilities/check.hpp"
-#include "openpose/utilities/errorAndLog.hpp"
-#include "openpose/utilities/fastMath.hpp"
-#include "openpose/pose/poseParameters.hpp"
-#include "openpose/pose/bodyPartConnectorBase.hpp"
+#include <openpose/utilities/check.hpp>
+#include <openpose/utilities/errorAndLog.hpp>
+#include <openpose/utilities/fastMath.hpp>
+#include <openpose/pose/poseParameters.hpp>
+#include <openpose/pose/bodyPartConnectorBase.hpp>
 
 namespace op
 {
@@ -48,7 +48,7 @@ namespace op
                                 const auto indexB = bodyPartB;
                                 for (auto j = 0; j < subset.size(); j++)
                                 {
-                                    const auto off = bodyPartB*peaksOffset + i*3 + 2;
+                                    const auto off = (int)bodyPartB*peaksOffset + i*3 + 2;
                                     if (subset[j].first[indexB] == off)
                                     {
                                         num = true;
@@ -89,7 +89,7 @@ namespace op
                                 const auto indexA = bodyPartA;
                                 for (auto j = 0; j < subset.size(); j++)
                                 {
-                                    const auto off = bodyPartA*peaksOffset + i*3 + 2;
+                                    const auto off = (int)bodyPartA*peaksOffset + i*3 + 2;
                                     if (subset[j].first[indexA] == off)
                                     {
                                         num = true;
@@ -292,13 +292,13 @@ namespace op
 
             // Fill and return poseKeyPoints
             if (numberPeople > 0)
-                poseKeyPoints.reset({numberPeople, numberBodyParts, 3});
+                poseKeyPoints.reset({numberPeople, (int)numberBodyParts, 3});
             else
                 poseKeyPoints.reset();
             for (auto person = 0 ; person < validSubsetIndexes.size() ; person++)
             {
                 const auto& subsetI = subset[validSubsetIndexes[person]].first;
-                for (auto bodyPart = 0; bodyPart < numberBodyParts; bodyPart++)
+                for (auto bodyPart = 0u; bodyPart < numberBodyParts; bodyPart++)
                 {
                     const auto baseOffset = (person*numberBodyParts + bodyPart) * 3;
                     const auto bodyPartIndex = subsetI[bodyPart];

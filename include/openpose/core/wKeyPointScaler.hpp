@@ -1,7 +1,7 @@
 #ifndef OPENPOSE__CORE__W_KEY_POINT_SCALER_HPP
 #define OPENPOSE__CORE__W_KEY_POINT_SCALER_HPP
 
-#include "../thread/worker.hpp"
+#include <openpose/thread/worker.hpp>
 #include "keyPointScaler.hpp"
 #include "scaleKeyPoints.hpp"
 
@@ -27,10 +27,10 @@ namespace op
 
 
 // Implementation
-#include "../utilities/errorAndLog.hpp"
-#include "../utilities/macros.hpp"
-#include "../utilities/pointerContainer.hpp"
-#include "../utilities/profiler.hpp"
+#include <openpose/utilities/errorAndLog.hpp>
+#include <openpose/utilities/macros.hpp>
+#include <openpose/utilities/pointerContainer.hpp>
+#include <openpose/utilities/profiler.hpp>
 namespace op
 {
     template<typename TDatums>
@@ -59,7 +59,7 @@ namespace op
                 for (auto& tDatum : *tDatums)
                 {
                     std::vector<Array<float>> arraysToScale{tDatum.poseKeyPoints, tDatum.handKeyPoints, tDatum.faceKeyPoints};
-                    spKeyPointScaler->scale(arraysToScale, tDatum.scaleInputToOutput, tDatum.scaleNetToOutput, tDatum.cvInputData.size());
+                    spKeyPointScaler->scale(arraysToScale, (float)tDatum.scaleInputToOutput, (float)tDatum.scaleNetToOutput, tDatum.cvInputData.size());
                 }
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);

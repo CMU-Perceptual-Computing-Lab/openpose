@@ -1,13 +1,13 @@
 #include <opencv2/opencv.hpp> // CV_WARP_INVERSE_MAP, CV_INTER_LINEAR
-#include "openpose/core/netCaffe.hpp"
-#include "openpose/experimental/hand/handParameters.hpp"
-#include "openpose/pose/poseParameters.hpp"
-#include "openpose/utilities/cuda.hpp"
-#include "openpose/utilities/errorAndLog.hpp"
-#include "openpose/utilities/fastMath.hpp"
-#include "openpose/utilities/openCv.hpp"
-#include "openpose/experimental/hand/handExtractor.hpp"
-// #include "openpose/experimental/hand/handRenderGpu.hpp" // For commented debugging section
+#include <openpose/core/netCaffe.hpp>
+#include <openpose/experimental/hand/handParameters.hpp>
+#include <openpose/pose/poseParameters.hpp>
+#include <openpose/utilities/cuda.hpp>
+#include <openpose/utilities/errorAndLog.hpp>
+#include <openpose/utilities/fastMath.hpp>
+#include <openpose/utilities/openCv.hpp>
+#include <openpose/experimental/hand/handExtractor.hpp>
+// #include <openpose/experimental/hand/handRenderGpu.hpp> // For commented debugging section
  
 namespace op
 {

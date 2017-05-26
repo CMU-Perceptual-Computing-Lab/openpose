@@ -1,10 +1,10 @@
 #include <cuda.h>
 #include <cuda_runtime_api.h>
-#include "openpose/experimental/hand/handParameters.hpp"
-#include "openpose/experimental/hand/handRenderGpu.hpp"
-#include "openpose/utilities/cuda.hpp"
-#include "openpose/utilities/errorAndLog.hpp"
-#include "openpose/experimental/hand/handRenderer.hpp"
+#include <openpose/experimental/hand/handParameters.hpp>
+#include <openpose/experimental/hand/handRenderGpu.hpp>
+#include <openpose/utilities/cuda.hpp>
+#include <openpose/utilities/errorAndLog.hpp>
+#include <openpose/experimental/hand/handRenderer.hpp>
 
 namespace op
 {

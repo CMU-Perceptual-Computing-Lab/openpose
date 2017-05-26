@@ -1,7 +1,7 @@
 #ifndef OPENPOSE__WRAPPER__WRAPPER_HPP
 #define OPENPOSE__WRAPPER__WRAPPER_HPP
 
-#include "../thread/headers.hpp"
+#include <openpose/thread/headers.hpp>
 #include "wrapperStructFace.hpp"
 #include "wrapperStructHand.hpp"
 #include "wrapperStructInput.hpp"
@@ -263,14 +263,14 @@ namespace op
 
 
 // Implementation
-#include "../core/headers.hpp"
-#include "../experimental/headers.hpp"
-#include "../filestream/headers.hpp"
-#include "../gui/headers.hpp"
-#include "../pose/headers.hpp"
-#include "../producer/headers.hpp"
-#include "../utilities/errorAndLog.hpp"
-#include "../utilities/fileSystem.hpp"
+#include <openpose/core/headers.hpp>
+#include <openpose/experimental/headers.hpp>
+#include <openpose/filestream/headers.hpp>
+#include <openpose/gui/headers.hpp>
+#include <openpose/pose/headers.hpp>
+#include <openpose/producer/headers.hpp>
+#include <openpose/utilities/errorAndLog.hpp>
+#include <openpose/utilities/fileSystem.hpp>
 namespace op
 {
     template<typename TDatums, typename TWorker, typename TQueue>

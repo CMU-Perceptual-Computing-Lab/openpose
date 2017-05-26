@@ -2,7 +2,7 @@
 #define OPENPOSE__FACE__FACE_PARAMETERS_HPP
 
 #include "enumClasses.hpp"
-#include "../../pose/poseParameters.hpp"
+#include <openpose/pose/poseParameters.hpp>
 
 namespace op
 {

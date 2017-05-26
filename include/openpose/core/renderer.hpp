@@ -2,7 +2,7 @@
 #define OPENPOSE__CORE__RENDERER_HPP
 
 #include <memory> // std::shared_ptr
-#include "../utilities/macros.hpp"
+#include <openpose/utilities/macros.hpp>
 
 namespace op
 {

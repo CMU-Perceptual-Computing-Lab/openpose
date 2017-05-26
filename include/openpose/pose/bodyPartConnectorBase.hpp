@@ -1,7 +1,7 @@
 #ifndef OPENPOSE__POSE__BODY_PARTS_CONNECTOR_HPP
 #define OPENPOSE__POSE__BODY_PARTS_CONNECTOR_HPP
 
-#include "../core/array.hpp"
+#include <openpose/core/array.hpp>
 #include "enumClasses.hpp"
 
 namespace op

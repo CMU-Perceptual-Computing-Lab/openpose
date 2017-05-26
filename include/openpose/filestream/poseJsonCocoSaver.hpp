@@ -2,8 +2,8 @@
 #define OPENPOSE__FILESTREAM__POSE_JSON_COCO_SAVER_HPP
 
 #include <string>
-#include "../core/array.hpp"
-#include "../utilities/macros.hpp"
+#include <openpose/core/array.hpp>
+#include <openpose/utilities/macros.hpp>
 #include "jsonOfstream.hpp"
 
 namespace op
@@ -22,7 +22,7 @@ namespace op
 
         ~PoseJsonCocoSaver();
 
-        void record(const Array<float>& poseKeyPoints, const int imageId);
+        void record(const Array<float>& poseKeyPoints, const unsigned long long imageId);
 
     private:
         JsonOfstream mJsonOfstream;

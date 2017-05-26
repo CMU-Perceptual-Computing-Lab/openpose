@@ -1,12 +1,12 @@
 #ifdef USE_CAFFE
-#include "openpose/core/netCaffe.hpp"
-#include "openpose/pose/poseParameters.hpp"
-#include "openpose/utilities/check.hpp"
-#include "openpose/utilities/cuda.hpp"
-#include "openpose/utilities/errorAndLog.hpp"
-#include "openpose/utilities/fastMath.hpp"
-#include "openpose/utilities/openCv.hpp"
-#include "openpose/pose/poseExtractorCaffe.hpp"
+#include <openpose/core/netCaffe.hpp>
+#include <openpose/pose/poseParameters.hpp>
+#include <openpose/utilities/check.hpp>
+#include <openpose/utilities/cuda.hpp>
+#include <openpose/utilities/errorAndLog.hpp>
+#include <openpose/utilities/fastMath.hpp>
+#include <openpose/utilities/openCv.hpp>
+#include <openpose/pose/poseExtractorCaffe.hpp>
 
 namespace op
 {
@@ -29,6 +29,10 @@ namespace op
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
+    }
+
+    PoseExtractorCaffe::~PoseExtractorCaffe()
+    {
     }
 
     void PoseExtractorCaffe::netInitializationOnThread()
@@ -86,7 +90,7 @@ namespace op
             #endif
 
             // 3. Get peaks by Non-Maximum Suppression
-            spNmsCaffe->setThreshold(get(PoseProperty::NMSThreshold));
+            spNmsCaffe->setThreshold((float)get(PoseProperty::NMSThreshold));
             #ifndef CPU_ONLY
                 spNmsCaffe->Forward_gpu({spHeatMapsBlob.get()}, {spPeaksBlob.get()});                           // ~2ms
                 cudaCheck(__LINE__, __FUNCTION__, __FILE__);
@@ -97,7 +101,7 @@ namespace op
             // Get scale net to output
             const auto scaleProducerToNetInput = resizeGetScaleFactor(inputDataSize, mNetOutputSize);
             const cv::Size netSize{intRound(scaleProducerToNetInput*inputDataSize.width), intRound(scaleProducerToNetInput*inputDataSize.height)};
-            mScaleNetToOutput = {resizeGetScaleFactor(netSize, mOutputSize)};
+            mScaleNetToOutput = {(float)resizeGetScaleFactor(netSize, mOutputSize)};
 
             // 4. Connecting body parts
             spBodyPartConnectorCaffe->setScaleNetToOutput(mScaleNetToOutput);

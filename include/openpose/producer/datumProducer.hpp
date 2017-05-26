@@ -5,9 +5,9 @@
 #include <limits> // std::numeric_limits
 #include <memory> // std::shared_ptr
 #include <tuple>
-#include "../core/datum.hpp"
-#include "../producer/producer.hpp"
-#include "../utilities/macros.hpp"
+#include <openpose/core/datum.hpp>
+#include <openpose/producer/producer.hpp>
+#include <openpose/utilities/macros.hpp>
 
 namespace op
 {
@@ -55,7 +55,7 @@ namespace op
         try
         {
             if (spProducer->getType() != ProducerType::Webcam)
-                spProducer->set(CV_CAP_PROP_POS_FRAMES, frameFirst);
+                spProducer->set(CV_CAP_PROP_POS_FRAMES, (double)frameFirst);
         }
         catch (const std::exception& e)
         {

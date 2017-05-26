@@ -5,10 +5,10 @@
 #include <atomic>
 #include <thread>
 #include <opencv2/core/core.hpp>
-#include "../core/array.hpp"
-#include "../utilities/macros.hpp"
+#include <openpose/core/array.hpp>
+#include <openpose/core/enumClasses.hpp>
+#include <openpose/utilities/macros.hpp>
 #include "poseParameters.hpp"
-#include "../core/enumClasses.hpp"
 
 namespace op
 {
@@ -17,6 +17,8 @@ namespace op
     public:
         PoseExtractor(const cv::Size& netOutputSize, const cv::Size& outputSize, const PoseModel poseModel, const std::vector<HeatMapType>& heatMapTypes = {},
                       const ScaleMode heatMapScaleMode = ScaleMode::ZeroToOne);
+
+        virtual ~PoseExtractor();
 
         void initializationOnThread();
 
@@ -45,7 +47,7 @@ namespace op
         const cv::Size mNetOutputSize;
         const cv::Size mOutputSize;
         Array<float> mPoseKeyPoints;
-        double mScaleNetToOutput;
+        float mScaleNetToOutput;
 
         void checkThread() const;
 

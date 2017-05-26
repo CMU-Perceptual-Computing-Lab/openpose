@@ -1,7 +1,7 @@
 #ifndef OPENPOSE__THREAD__WORKER_HPP
 #define OPENPOSE__THREAD__WORKER_HPP
 
-#include "../utilities/macros.hpp"
+#include <openpose/utilities/macros.hpp>
 
 namespace op
 {
@@ -48,7 +48,7 @@ namespace op
 
 
 // Implementation
-#include "../utilities/macros.hpp"
+#include <openpose/utilities/macros.hpp>
 namespace op
 {
     template<typename TDatums>

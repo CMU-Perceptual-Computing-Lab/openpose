@@ -1,6 +1,6 @@
 #include <opencv2/highgui/highgui.hpp> // cv::imshow, cv::waitKey, cv::namedWindow, cv::setWindowProperty
-#include "openpose/utilities/errorAndLog.hpp"
-#include "openpose/gui/frameDisplayer.hpp"
+#include <openpose/utilities/errorAndLog.hpp>
+#include <openpose/gui/frameDisplayer.hpp>
 
 namespace op
 {

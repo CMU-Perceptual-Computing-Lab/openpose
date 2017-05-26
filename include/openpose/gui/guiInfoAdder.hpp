@@ -3,7 +3,7 @@
 
 #include <queue>
 #include <opencv2/core/core.hpp>
-#include "../core/array.hpp"
+#include <openpose/core/array.hpp>
 
 namespace op
 {

@@ -3,7 +3,7 @@
 
 #include <fstream> // std::ofstream
 #include <string>
-#include "../utilities/macros.hpp"
+#include <openpose/utilities/macros.hpp>
 
 namespace op
 {

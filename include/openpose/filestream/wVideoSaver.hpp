@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 #include <opencv2/core/core.hpp>
-#include "../thread/workerConsumer.hpp"
+#include <openpose/thread/workerConsumer.hpp>
 #include "videoSaver.hpp"
 
 namespace op
@@ -32,10 +32,10 @@ namespace op
 
 
 // Implementation
-#include "../utilities/errorAndLog.hpp"
-#include "../utilities/macros.hpp"
-#include "../utilities/pointerContainer.hpp"
-#include "../utilities/profiler.hpp"
+#include <openpose/utilities/errorAndLog.hpp>
+#include <openpose/utilities/macros.hpp>
+#include <openpose/utilities/pointerContainer.hpp>
+#include <openpose/utilities/profiler.hpp>
 namespace op
 {
     template<typename TDatums>

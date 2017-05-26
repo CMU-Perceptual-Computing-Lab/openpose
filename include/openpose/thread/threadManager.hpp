@@ -6,7 +6,7 @@
 #include <set> // std::multiset
 #include <tuple>
 #include <vector>
-#include "../utilities/macros.hpp"
+#include <openpose/utilities/macros.hpp>
 #include "enumClasses.hpp"
 #include "queue.hpp"
 #include "thread.hpp"
@@ -85,8 +85,8 @@ namespace op
 
 // Implementation
 #include <utility> // std::pair
-#include "../utilities/errorAndLog.hpp"
-#include "../utilities/fastMath.hpp"
+#include <openpose/utilities/errorAndLog.hpp>
+#include <openpose/utilities/fastMath.hpp>
 #include "subThread.hpp"
 #include "subThreadNoQueue.hpp"
 #include "subThreadQueueIn.hpp"
@@ -464,7 +464,7 @@ namespace op
                     maxQueueId = fastMax(maxQueueId, fastMax(std::get<2>(threadWorkerQueue), std::get<3>(threadWorkerQueue)));
 
                 // Check each queue id has at least a worker that uses it as input and another one as output. Special cases:
-                std::vector<std::pair<bool, bool>> usedQueueIds(maxQueueId + 1, {false, false});
+                std::vector<std::pair<bool, bool>> usedQueueIds(maxQueueId+1, {false, false});
                 for (const auto& threadWorkerQueue : mThreadWorkerQueues)
                 {
                     usedQueueIds.at(std::get<2>(threadWorkerQueue)).first = true;

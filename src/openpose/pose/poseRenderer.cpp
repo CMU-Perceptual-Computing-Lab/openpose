@@ -1,14 +1,14 @@
 #include <cuda.h>
 #include <cuda_runtime_api.h>
-#include "openpose/pose/poseParameters.hpp"
-#include "openpose/pose/poseRenderGpu.hpp"
-#include "openpose/utilities/cuda.hpp"
-#include "openpose/utilities/errorAndLog.hpp"
-#include "openpose/pose/poseRenderer.hpp"
+#include <openpose/pose/poseParameters.hpp>
+#include <openpose/pose/poseRenderGpu.hpp>
+#include <openpose/utilities/cuda.hpp>
+#include <openpose/utilities/errorAndLog.hpp>
+#include <openpose/pose/poseRenderer.hpp>
 
 namespace op
 {
-    std::map<unsigned char, std::string> createPartToName(const PoseModel poseModel)
+    std::map<unsigned int, std::string> createPartToName(const PoseModel poseModel)
     {
         try
         {
@@ -38,7 +38,7 @@ namespace op
     }
 
     PoseRenderer::PoseRenderer(const cv::Size& heatMapsSize, const cv::Size& outputSize, const PoseModel poseModel, const std::shared_ptr<PoseExtractor>& poseExtractor,
-                               const bool blendOriginalFrame, const float alphaPose, const float alphaHeatMap, const int elementToRender) :
+                               const bool blendOriginalFrame, const float alphaPose, const float alphaHeatMap, const unsigned int elementToRender) :
         Renderer{(unsigned long long)(outputSize.area() * 3)},
         mHeatMapsSize{heatMapsSize},
         mOutputSize{outputSize},
@@ -91,10 +91,12 @@ namespace op
     {
         try
         {
-            mElementToRender = (mElementToRender + increment) % mNumberElementsToRender;
+            auto elementToRender = (((int)mElementToRender + increment) % mNumberElementsToRender);
             // Handling negative increments
-            while (mElementToRender < 0)
-                mElementToRender += mNumberElementsToRender;
+            while (elementToRender < 0)
+                elementToRender += mNumberElementsToRender;
+            // Update final value
+            mElementToRender = elementToRender;
         }
         catch (const std::exception& e)
         {
@@ -214,7 +216,7 @@ namespace op
         }
     }
 
-    std::pair<int, std::string> PoseRenderer::renderPose(Array<float>& outputData, const Array<float>& poseKeyPoints, const double scaleNetToOutput)
+    std::pair<int, std::string> PoseRenderer::renderPose(Array<float>& outputData, const Array<float>& poseKeyPoints, const float scaleNetToOutput)
     {
         try
         {
@@ -242,7 +244,7 @@ namespace op
                 }
                 else
                 {
-                    if (scaleNetToOutput == -1.)
+                    if (scaleNetToOutput == -1.f)
                         error("Non valid scaleNetToOutput.", __LINE__, __FUNCTION__, __FILE__);
                     // Draw specific body part or bkg
                     if (elementRendered <= numberBodyPartsPlusBkg)

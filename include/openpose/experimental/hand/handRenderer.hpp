@@ -2,9 +2,9 @@
 #define OPENPOSE__HAND__HAND_RENDERER_HPP
 
 #include <opencv2/core/core.hpp>
-#include "../../core/array.hpp"
-#include "../../core/renderer.hpp"
-#include "../../thread/worker.hpp"
+#include <openpose/core/array.hpp>
+#include <openpose/core/renderer.hpp>
+#include <openpose/thread/worker.hpp>
 
 namespace op
 {

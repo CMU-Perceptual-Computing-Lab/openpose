@@ -1,6 +1,6 @@
-#include "openpose/utilities/errorAndLog.hpp"
-#include "openpose/filestream/fileStream.hpp"
-#include "openpose/filestream/poseJsonSaver.hpp"
+#include <openpose/utilities/errorAndLog.hpp>
+#include <openpose/filestream/fileStream.hpp>
+#include <openpose/filestream/poseJsonSaver.hpp>
 
 namespace op
 {
@@ -22,8 +22,8 @@ namespace op
                 const bool humanReadable = true;
                 for (auto i = 0; i < poseKeyPointsVector.size(); i++)
                 {
-                    const auto fileName = fileNameNoExtension + (i != 0 ? "_" + std::to_string(i) : "") + ".json";
-                    savePoseJson(poseKeyPointsVector[i], fileName, humanReadable);
+                    const auto finalFileName = fileNameNoExtension + (i != 0 ? "_" + std::to_string(i) : "") + ".json";
+                    savePoseJson(poseKeyPointsVector[i], finalFileName, humanReadable);
                 }
             }
         }

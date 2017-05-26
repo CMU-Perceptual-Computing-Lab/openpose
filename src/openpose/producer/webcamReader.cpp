@@ -1,8 +1,8 @@
 #include <string>
 #include <opencv2/highgui/highgui.hpp>
-#include "openpose/utilities/errorAndLog.hpp"
-#include "openpose/utilities/fastMath.hpp"
-#include "openpose/producer/webcamReader.hpp"
+#include <openpose/utilities/errorAndLog.hpp>
+#include <openpose/utilities/fastMath.hpp>
+#include <openpose/producer/webcamReader.hpp>
 
 namespace op
 {
@@ -67,7 +67,7 @@ namespace op
         try
         {
             if (capProperty == CV_CAP_PROP_POS_FRAMES)
-                return mFrameNameCounter;
+                return (double)mFrameNameCounter;
             else
                 return VideoCaptureReader::get(capProperty);
         }

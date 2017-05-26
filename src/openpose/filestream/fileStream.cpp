@@ -1,7 +1,7 @@
 #include <opencv2/highgui/highgui.hpp> // cv::imread
-#include "openpose/utilities/errorAndLog.hpp"
-#include "openpose/filestream/jsonOfstream.hpp"
-#include "openpose/filestream/fileStream.hpp"
+#include <openpose/utilities/errorAndLog.hpp>
+#include <openpose/filestream/jsonOfstream.hpp>
+#include <openpose/filestream/fileStream.hpp>
 
 namespace op
 {

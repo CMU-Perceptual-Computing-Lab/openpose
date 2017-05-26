@@ -1,7 +1,7 @@
 #include <typeinfo> // typeid
 #include <numeric> // std::accumulate
-#include "openpose/utilities/errorAndLog.hpp"
-#include "openpose/core/array.hpp"
+#include <openpose/utilities/errorAndLog.hpp>
+#include <openpose/core/array.hpp>
 
 namespace op
 {
@@ -248,7 +248,7 @@ namespace op
             {
                 // OpenCV is efficient on copying (AVX, SSE, etc.)
                 if (mCvMatData.first)
-                    mCvMatData.second.setTo(value);
+                    mCvMatData.second.setTo((double)value);
                 else
                     for (auto i = 0 ; i < mVolume ; i++)
                         operator[](i) = value;

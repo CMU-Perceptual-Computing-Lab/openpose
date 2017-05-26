@@ -1,7 +1,7 @@
-#include "openpose/utilities/cuda.hpp"
-#include "openpose/utilities/cuda.hu"
-#include "openpose/utilities/errorAndLog.hpp"
-#include "openpose/core/resizeAndMergeBase.hpp"
+#include <openpose/utilities/cuda.hpp>
+#include <openpose/utilities/cuda.hu>
+#include <openpose/utilities/errorAndLog.hpp>
+#include <openpose/core/resizeAndMergeBase.hpp>
 
 namespace op
 {

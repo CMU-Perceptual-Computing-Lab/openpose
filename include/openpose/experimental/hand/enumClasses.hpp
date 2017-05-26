@@ -11,4 +11,3 @@ namespace op
 }
 
 #endif // OPENPOSE__HAND__ENUM_CLASSES_HPP
-

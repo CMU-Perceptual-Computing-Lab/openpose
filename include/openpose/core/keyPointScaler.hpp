@@ -12,9 +12,9 @@ namespace op
     public:
         explicit KeyPointScaler(const ScaleMode scaleMode);
 
-        void scale(Array<float>& arrayToScale, const double scaleInputToOutput, const double scaleNetToOutput, const cv::Size& producerSize) const;
+        void scale(Array<float>& arrayToScale, const float scaleInputToOutput, const float scaleNetToOutput, const cv::Size& producerSize) const;
 
-        void scale(std::vector<Array<float>>& arraysToScale, const double scaleInputToOutput, const double scaleNetToOutput, const cv::Size& producerSize) const;
+        void scale(std::vector<Array<float>>& arraysToScale, const float scaleInputToOutput, const float scaleNetToOutput, const cv::Size& producerSize) const;
 
     private:
         const ScaleMode mScaleMode;

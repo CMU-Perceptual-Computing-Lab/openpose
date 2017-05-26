@@ -1,4 +1,4 @@
-#include "openpose/wrapper/wrapperStructFace.hpp"
+#include <openpose/wrapper/wrapperStructFace.hpp>
 
 namespace op
 {

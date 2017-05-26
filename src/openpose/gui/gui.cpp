@@ -1,10 +1,10 @@
 #include <chrono>
 #include <thread>
 #include <opencv2/highgui/highgui.hpp> // cv::waitKey
-#include "openpose/filestream/fileStream.hpp"
-#include "openpose/utilities/check.hpp"
-#include "openpose/utilities/errorAndLog.hpp"
-#include "openpose/gui/gui.hpp"
+#include <openpose/filestream/fileStream.hpp>
+#include <openpose/utilities/check.hpp>
+#include <openpose/utilities/errorAndLog.hpp>
+#include <openpose/gui/gui.hpp>
 
 namespace op
 {
@@ -37,7 +37,7 @@ namespace op
             if (key != -1)
             {
                 // Some OpenCV versions has a problem and key must be casted to char
-                const auto castedKey = std::tolower((char)key);
+                const auto castedKey = (char)std::tolower((char)key);
                 // ------------------------- General Commands ------------------------- //
                 // Exit program
                 if (castedKey==27)
@@ -118,7 +118,7 @@ namespace op
                     const auto newElementToRender = key2part.find(castedKey);
                     if (newElementToRender != std::string::npos)
                         for (auto& poseRenderer : mPoseRenderers)
-                            poseRenderer->setElementToRender(newElementToRender);
+                            poseRenderer->setElementToRender((int)newElementToRender);
                 }
             }
         }

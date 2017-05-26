@@ -1,8 +1,8 @@
-#include "openpose/filestream/fileStream.hpp"
-#include "openpose/utilities/errorAndLog.hpp"
-#include "openpose/utilities/fastMath.hpp"
-#include "openpose/utilities/fileSystem.hpp"
-#include "openpose/producer/imageDirectoryReader.hpp"
+#include <openpose/filestream/fileStream.hpp>
+#include <openpose/utilities/errorAndLog.hpp>
+#include <openpose/utilities/fastMath.hpp>
+#include <openpose/utilities/fileSystem.hpp>
+#include <openpose/producer/imageDirectoryReader.hpp>
 
 namespace op
 {
@@ -78,9 +78,9 @@ namespace op
                     return mResolution.width;
             }
             else if (capProperty == CV_CAP_PROP_POS_FRAMES)
-                return mFrameNameCounter;
+                return (double)mFrameNameCounter;
             else if (capProperty == CV_CAP_PROP_FRAME_COUNT)
-                return mFilePaths.size();
+                return (double)mFilePaths.size();
             else if (capProperty == CV_CAP_PROP_FPS)
                 return -1.;
             else

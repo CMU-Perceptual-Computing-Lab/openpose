@@ -2,7 +2,7 @@
 #define OPENPOSE__THREAD__SUB_THREAD_HPP
 
 #include <vector>
-#include "../utilities/macros.hpp"
+#include <openpose/utilities/macros.hpp>
 #include "worker.hpp"
 
 namespace op
@@ -21,7 +21,7 @@ namespace op
         virtual bool work() = 0;
 
     protected:
-        inline int getTWorkersSize() const
+        inline size_t getTWorkersSize() const
         {
             return mTWorkers.size();
         }
@@ -40,8 +40,8 @@ namespace op
 
 
 // Implementation
-#include "../utilities/errorAndLog.hpp"
-#include "../utilities/macros.hpp"
+#include <openpose/utilities/errorAndLog.hpp>
+#include <openpose/utilities/macros.hpp>
 namespace op
 {
     template<typename TDatums, typename TWorker>

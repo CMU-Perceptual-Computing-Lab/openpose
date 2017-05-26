@@ -2,7 +2,7 @@
 #define OPENPOSE__POSE__W_POSE_EXTRACTOR_HPP
 
 #include <memory> // std::shared_ptr
-#include "../thread/worker.hpp"
+#include <openpose/thread/worker.hpp>
 #include "poseExtractor.hpp"
 
 namespace op
@@ -29,10 +29,10 @@ namespace op
 
 
 // Implementation
-#include "../utilities/errorAndLog.hpp"
-#include "../utilities/macros.hpp"
-#include "../utilities/pointerContainer.hpp"
-#include "../utilities/profiler.hpp"
+#include <openpose/utilities/errorAndLog.hpp>
+#include <openpose/utilities/macros.hpp>
+#include <openpose/utilities/pointerContainer.hpp>
+#include <openpose/utilities/profiler.hpp>
 namespace op
 {
     template<typename TDatums>

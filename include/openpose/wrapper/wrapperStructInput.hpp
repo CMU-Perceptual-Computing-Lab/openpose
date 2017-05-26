@@ -2,7 +2,7 @@
 #define OPENPOSE__WRAPPER__WRAPPER_STRUCT_INPUT_HPP
 
 #include <memory>
-#include "../producer/producer.hpp"
+#include <openpose/producer/producer.hpp>
 
 namespace op
 {

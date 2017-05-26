@@ -3,7 +3,7 @@
 
 #include <limits> // std::numeric_limits
 #include <memory> // std::shared_ptr
-#include "../thread/workerProducer.hpp"
+#include <openpose/thread/workerProducer.hpp>
 #include "datumProducer.hpp"
 
 namespace op
@@ -31,10 +31,10 @@ namespace op
 
 // Implementation
 #include <vector>
-#include "../utilities/errorAndLog.hpp"
-#include "../utilities/macros.hpp"
-#include "../utilities/profiler.hpp"
-#include "../core/datum.hpp"
+#include <openpose/utilities/errorAndLog.hpp>
+#include <openpose/utilities/macros.hpp>
+#include <openpose/utilities/profiler.hpp>
+#include <openpose/core/datum.hpp>
 namespace op
 {
     template<typename TDatums, typename TDatumsNoPtr>

@@ -1,8 +1,8 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
-#include "openpose/utilities/errorAndLog.hpp"
-#include "openpose/utilities/fastMath.hpp"
-#include "openpose/utilities/cuda.hpp"
+#include <openpose/utilities/errorAndLog.hpp>
+#include <openpose/utilities/fastMath.hpp>
+#include <openpose/utilities/cuda.hpp>
 
 namespace op
 {
@@ -15,6 +15,21 @@ namespace op
         const auto errorCode = cudaPeekAtLastError();
         if(errorCode != cudaSuccess)
             error("Cuda check failed (" + std::to_string(errorCode) + " vs. " + std::to_string(cudaSuccess) + "): " + cudaGetErrorString(errorCode), line, function, file);
+    }
+
+    dim3 getNumberCudaBlocks(const cv::Size& frameSize, const dim3 numberCudaThreads)
+    {
+        try
+        {
+            return dim3{getNumberCudaBlocks((unsigned int)frameSize.width, numberCudaThreads.x),
+                        getNumberCudaBlocks((unsigned int)frameSize.height, numberCudaThreads.y),
+                        numberCudaThreads.z};
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return dim3{};
+        }
     }
 
     std::pair<dim3, dim3> getNumberCudaThreadsAndBlocks(const cv::Size& frameSize)

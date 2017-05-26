@@ -4,7 +4,7 @@
 #include <vector>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp> // cv::VideoWriter
-#include "../utilities/macros.hpp"
+#include <openpose/utilities/macros.hpp>
 
 namespace op
 {

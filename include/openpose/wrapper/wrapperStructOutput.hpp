@@ -2,7 +2,7 @@
 #define OPENPOSE__WRAPPER__WRAPPER_STRUCT_OUTPUT_HPP
 
 #include <string>
-#include "../filestream/enumClasses.hpp"
+#include <openpose/filestream/enumClasses.hpp>
 
 namespace op
 {

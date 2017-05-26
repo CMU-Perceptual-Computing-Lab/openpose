@@ -4,7 +4,7 @@
 #include <queue> // std::queue & std::priority_queue
 #include <condition_variable>
 #include <mutex>
-#include "../utilities/macros.hpp"
+#include <openpose/utilities/macros.hpp>
 
 namespace op
 {
@@ -66,7 +66,7 @@ namespace op
 
         virtual bool pop(TDatums& tDatums) = 0;
 
-        long long getMaxSize() const;
+        unsigned long long getMaxSize() const;
 
     private:
         const long long mMaxSize;
@@ -90,10 +90,10 @@ namespace op
 // Implementation
 #include <memory> // std::shared_ptr
 #include <vector>
-#include "../core/datum.hpp"
-#include "../utilities/errorAndLog.hpp"
-#include "../utilities/fastMath.hpp"
-#include "../utilities/macros.hpp"
+#include <openpose/core/datum.hpp>
+#include <openpose/utilities/errorAndLog.hpp>
+#include <openpose/utilities/fastMath.hpp>
+#include <openpose/utilities/macros.hpp>
 namespace op
 {
     template<typename TDatums, typename TQueue>
@@ -398,7 +398,7 @@ namespace op
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return -1;
+            return 0;
         }
     }
 
@@ -418,7 +418,7 @@ namespace op
     }
 
     template<typename TDatums, typename TQueue>
-    long long QueueBase<TDatums, TQueue>::getMaxSize() const
+    unsigned long long QueueBase<TDatums, TQueue>::getMaxSize() const
     {
         try
         {

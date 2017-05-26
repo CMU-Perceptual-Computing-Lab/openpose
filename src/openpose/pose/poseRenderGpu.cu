@@ -1,10 +1,10 @@
 #include <utility> // std::pair
-#include "openpose/pose/poseParameters.hpp"
-#include "openpose/utilities/errorAndLog.hpp"
-#include "openpose/utilities/cuda.hpp"
-#include "openpose/utilities/cuda.hu"
-#include "openpose/utilities/render.hu"
-#include "openpose/pose/poseRenderGpu.hpp"
+#include <openpose/pose/poseParameters.hpp>
+#include <openpose/utilities/errorAndLog.hpp>
+#include <openpose/utilities/cuda.hpp>
+#include <openpose/utilities/cuda.hu>
+#include <openpose/utilities/render.hu>
+#include <openpose/pose/poseRenderGpu.hpp>
 
 namespace op
 {
@@ -413,7 +413,7 @@ namespace op
     }
 
     void renderPoseGpu(float* framePtr, const PoseModel poseModel, const int numberPeople, const cv::Size& frameSize, const float* const posePtr,
-                       const bool googlyEyes, const float blendOriginalFrame, const float alphaBlending)
+                       const bool googlyEyes, const bool blendOriginalFrame, const float alphaBlending)
     {
         try
         {
@@ -513,9 +513,9 @@ namespace op
     {
         try
         {
-            const auto numberBodyPartPairs = POSE_BODY_PART_PAIRS[(int)poseModel].size()/2;
+            const auto numberBodyPartPairs = (int)POSE_BODY_PART_PAIRS[(int)poseModel].size()/2;
             renderKeyPointsPartAffinityAux(framePtr, poseModel, frameSize, heatMapPtr, heatMapSize, scaleToKeepRatio, POSE_NUMBER_BODY_PARTS[(int)poseModel]+1,
-                                     numberBodyPartPairs, alphaBlending);
+                                           numberBodyPartPairs, alphaBlending);
         }
         catch (const std::exception& e)
         {

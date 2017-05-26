@@ -5,8 +5,8 @@
 #define OPENPOSE__EXPERIMENTAL__FILESTREAM__W_POSE_JSON_COCO_SAVER_HPP
 
 #include <memory> // std::shared_ptr
-#include "../../filestream/poseJsonCocoSaver.hpp"
-#include "../../thread/workerConsumer.hpp"
+#include <openpose/filestream/poseJsonCocoSaver.hpp>
+#include <openpose/thread/workerConsumer.hpp>
 
 namespace op
 {
@@ -35,10 +35,10 @@ namespace op
 
 
 // Implementation
-#include "../../utilities/errorAndLog.hpp"
-#include "../../utilities/macros.hpp"
-#include "../../utilities/pointerContainer.hpp"
-#include "../../utilities/profiler.hpp"
+#include <openpose/utilities/errorAndLog.hpp>
+#include <openpose/utilities/macros.hpp>
+#include <openpose/utilities/pointerContainer.hpp>
+#include <openpose/utilities/profiler.hpp>
 namespace op
 {
     namespace experimental

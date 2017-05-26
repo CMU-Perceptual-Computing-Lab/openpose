@@ -3,9 +3,9 @@
 
 #include <memory> // std::shared_ptr
 #include <opencv2/core/core.hpp>
-#include "../core/array.hpp"
-#include "../core/renderer.hpp"
-#include "../utilities/macros.hpp"
+#include <openpose/core/array.hpp>
+#include <openpose/core/renderer.hpp>
+#include <openpose/utilities/macros.hpp>
 #include "poseExtractor.hpp"
 #include "poseParameters.hpp"
 
@@ -16,7 +16,7 @@ namespace op
     public:
         explicit PoseRenderer(const cv::Size& heatMapsSize, const cv::Size& outputSize, const PoseModel poseModel, const std::shared_ptr<PoseExtractor>& poseExtractor,
                               const bool blendOriginalFrame = true, const float alphaPose = POSE_DEFAULT_ALPHA_POSE,
-                              const float alphaHeatMap = POSE_DEFAULT_ALPHA_HEATMAP, const int elementToRender = 0);
+                              const float alphaHeatMap = POSE_DEFAULT_ALPHA_HEATMAP, const unsigned int elementToRender = 0u);
 
         ~PoseRenderer();
 
@@ -42,20 +42,20 @@ namespace op
 
         void setShowGooglyEyes(const bool showGooglyEyes);
 
-        std::pair<int, std::string> renderPose(Array<float>& outputData, const Array<float>& poseKeyPoints, const double scaleNetToOutput = -1.);
+        std::pair<int, std::string> renderPose(Array<float>& outputData, const Array<float>& poseKeyPoints, const float scaleNetToOutput = -1.f);
 
     private:
         const cv::Size mHeatMapsSize;
         const cv::Size mOutputSize;
         const PoseModel mPoseModel;
-        const std::map<unsigned char, std::string> mPartIndexToName;
+        const std::map<unsigned int, std::string> mPartIndexToName;
         const int mNumberElementsToRender;
         const std::shared_ptr<PoseExtractor> spPoseExtractor;
         float mAlphaPose;
         float mAlphaHeatMap;
         std::atomic<bool> mBlendOriginalFrame;
         std::atomic<bool> mShowGooglyEyes;
-        std::atomic<int> mElementToRender;
+        std::atomic<unsigned int> mElementToRender;
         // Init with thread
         float* pGpuPose;        // GPU aux memory
 

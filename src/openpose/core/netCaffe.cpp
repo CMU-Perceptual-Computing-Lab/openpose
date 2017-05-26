@@ -1,8 +1,8 @@
 #ifdef USE_CAFFE
 #include <numeric> // std::accumulate
-#include "openpose/utilities/cuda.hpp"
-#include "openpose/utilities/errorAndLog.hpp"
-#include "openpose/core/netCaffe.hpp"
+#include <openpose/utilities/cuda.hpp>
+#include <openpose/utilities/errorAndLog.hpp>
+#include <openpose/core/netCaffe.hpp>
 
 namespace op
 {
@@ -14,6 +14,10 @@ namespace op
         mCaffeProto{caffeProto},
         mCaffeTrainedModel{caffeTrainedModel},
         mLastBlobName{lastBlobName}
+    {
+    }
+
+    NetCaffe::~NetCaffe()
     {
     }
 

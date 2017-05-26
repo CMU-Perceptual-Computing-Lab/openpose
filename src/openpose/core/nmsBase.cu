@@ -1,9 +1,9 @@
 #include <thrust/scan.h>
 #include <thrust/device_ptr.h>
-#include "openpose/utilities/cuda.hpp"
-#include "openpose/utilities/errorAndLog.hpp"
-#include "openpose/utilities/cuda.hpp"
-#include "openpose/core/nmsBase.hpp"
+#include <openpose/utilities/cuda.hpp>
+#include <openpose/utilities/errorAndLog.hpp>
+#include <openpose/utilities/cuda.hpp>
+#include <openpose/core/nmsBase.hpp>
 
 namespace op
 {

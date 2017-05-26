@@ -5,7 +5,7 @@
 #include <vector>
 #include <opencv2/core/core.hpp> // cv::Mat, cv::Size
 #include <opencv2/highgui/highgui.hpp> // CV_LOAD_IMAGE_ANYDEPTH, CV_IMWRITE_PNG_COMPRESSION
-#include "../core/array.hpp"
+#include <openpose/core/array.hpp>
 #include "enumClasses.hpp"
 
 namespace op

@@ -3,7 +3,7 @@
 
 #include <string>
 #include <vector>
-#include "../core/array.hpp"
+#include <openpose/core/array.hpp>
 #include "fileSaver.hpp"
 
 namespace op

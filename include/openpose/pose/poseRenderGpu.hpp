@@ -8,7 +8,7 @@
 namespace op
 {
     void renderPoseGpu(float* framePtr, const PoseModel poseModel, const int numberPeople, const cv::Size& frameSize, const float* const posePtr,
-                       const bool googlyEyes = false, const float blendOriginalFrame = true, const float alphaBlending = POSE_DEFAULT_ALPHA_POSE);
+                       const bool googlyEyes = false, const bool blendOriginalFrame = true, const float alphaBlending = POSE_DEFAULT_ALPHA_POSE);
     void renderBodyPartGpu(float* frame, const PoseModel poseModel, const cv::Size& frameSize, const float* const heatmap, const cv::Size& heatmapSize,
                            const float scaleToKeepRatio, const int part, const float alphaBlending = POSE_DEFAULT_ALPHA_HEATMAP);
     void renderBodyPartsGpu(float* frame, const PoseModel poseModel, const cv::Size& frameSize, const float* const heatmap, const cv::Size& heatmapSize,

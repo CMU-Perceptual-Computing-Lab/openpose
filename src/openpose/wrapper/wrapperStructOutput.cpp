@@ -1,4 +1,4 @@
-#include "openpose/wrapper/wrapperStructOutput.hpp"
+#include <openpose/wrapper/wrapperStructOutput.hpp>
 
 namespace op
 {

@@ -1,4 +1,4 @@
-#include "openpose/wrapper/wrapperStructInput.hpp"
+#include <openpose/wrapper/wrapperStructInput.hpp>
 
 namespace op
 {

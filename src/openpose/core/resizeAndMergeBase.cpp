@@ -1,7 +1,7 @@
 // #include <opencv2/imgproc/imgproc.hpp>
-#include "openpose/utilities/errorAndLog.hpp"
-#include "openpose/utilities/macros.hpp"
-#include "openpose/core/resizeAndMergeBase.hpp"
+#include <openpose/utilities/errorAndLog.hpp>
+#include <openpose/utilities/macros.hpp>
+#include <openpose/core/resizeAndMergeBase.hpp>
 
 namespace op
 {

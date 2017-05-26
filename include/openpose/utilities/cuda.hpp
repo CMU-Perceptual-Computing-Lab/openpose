@@ -18,12 +18,7 @@ namespace op
         return (totalRequired + numberCudaThreads - 1) / numberCudaThreads;
     }
 
-    inline dim3 getNumberCudaBlocks(const cv::Size& frameSize, const dim3 numberCudaThreads = dim3{CUDA_NUM_THREADS, CUDA_NUM_THREADS, 1})
-    {
-        return dim3{getNumberCudaBlocks(frameSize.width, numberCudaThreads.x),
-                    getNumberCudaBlocks(frameSize.height, numberCudaThreads.y),
-                    numberCudaThreads.z};
-    }
+	dim3 getNumberCudaBlocks(const cv::Size& frameSize, const dim3 numberCudaThreads = dim3{ CUDA_NUM_THREADS, CUDA_NUM_THREADS, 1 });
 
     std::pair<dim3, dim3> getNumberCudaThreadsAndBlocks(const cv::Size& frameSize);
 }

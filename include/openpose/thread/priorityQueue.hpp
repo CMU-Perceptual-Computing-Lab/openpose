@@ -2,7 +2,7 @@
 #define OPENPOSE__THREAD__PRIORITY_QUEUE_HPP 
 
 #include <queue> // std::priority_queue
-#include "../utilities/macros.hpp"
+#include <openpose/utilities/macros.hpp>
 #include "queueBase.hpp"
 
 namespace op
@@ -28,8 +28,7 @@ namespace op
 
 // Implementation
 #include <type_traits> // std::is_same
-#include "../utilities/errorAndLog.hpp"
-#include "../utilities/macros.hpp"
+#include <openpose/utilities/errorAndLog.hpp>
 namespace op
 {
     template<typename TDatums, typename TQueue>

@@ -3,7 +3,7 @@
 
 #include <memory> // std::shared_ptr
 #include <vector>
-#include "../core/datum.hpp"
+#include <openpose/core/datum.hpp>
 
 #define DATUM_BASE_NO_PTR std::vector<Datum>
 #define DATUM_BASE std::shared_ptr<DATUM_BASE_NO_PTR>

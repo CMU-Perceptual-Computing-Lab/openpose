@@ -1,10 +1,10 @@
 #include <chrono>
 #include <cstdio> // std::snprintf
 #include <limits> // std::numeric_limits
-#include "openpose/utilities/errorAndLog.hpp"
-#include "openpose/utilities/fastMath.hpp"
-#include "openpose/utilities/openCv.hpp"
-#include "openpose/gui/guiInfoAdder.hpp"
+#include <openpose/utilities/errorAndLog.hpp>
+#include <openpose/utilities/fastMath.hpp>
+#include <openpose/utilities/openCv.hpp>
+#include <openpose/gui/guiInfoAdder.hpp>
 
 namespace op
 {

@@ -1,11 +1,11 @@
-#include "openpose/utilities/errorAndLog.hpp"
-#include "openpose/core/scaleKeyPoints.hpp"
+#include <openpose/utilities/errorAndLog.hpp>
+#include <openpose/core/scaleKeyPoints.hpp>
 
 namespace op
 {
     const std::string errorMessage = "This function is only for array of dimension: [sizeA x sizeB x 3].";
 
-    void scaleKeyPoints(Array<float>& keyPoints, const double scale)
+    void scaleKeyPoints(Array<float>& keyPoints, const float scale)
     {
         try
         {
@@ -17,7 +17,7 @@ namespace op
         }
     }
 
-    void scaleKeyPoints(Array<float>& keyPoints, const double scaleX, const double scaleY)
+    void scaleKeyPoints(Array<float>& keyPoints, const float scaleX, const float scaleY)
     {
         try
         {
@@ -48,7 +48,7 @@ namespace op
         }
     }
 
-    void scaleKeyPoints(Array<float>& keyPoints, const double scaleX, const double scaleY, const double offsetX, const double offsetY)
+    void scaleKeyPoints(Array<float>& keyPoints, const float scaleX, const float scaleY, const float offsetX, const float offsetY)
     {
         try
         {

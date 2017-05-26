@@ -1,5 +1,5 @@
-#include "openpose/utilities/errorAndLog.hpp"
-#include "openpose/filestream/poseJsonCocoSaver.hpp"
+#include <openpose/utilities/errorAndLog.hpp>
+#include <openpose/filestream/poseJsonCocoSaver.hpp>
 
 namespace op
 {
@@ -28,7 +28,7 @@ namespace op
         }
     }
 
-    void PoseJsonCocoSaver::record(const Array<float>& poseKeyPoints, const int imageId)
+    void PoseJsonCocoSaver::record(const Array<float>& poseKeyPoints, const unsigned long long imageId)
     {
         try
         {
