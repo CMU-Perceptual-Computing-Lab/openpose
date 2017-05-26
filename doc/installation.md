@@ -118,5 +118,16 @@ If you choose to visualize a body part or a PAF (Part Affinity Field) heat map w
 
 
 ## FAQ
-Q: Out of memory error - After installing OpenPose, I get an out of memory error, similar to: `Check failed: error == cudaSuccess (2 vs. 0)  out of memory`.
-A: Most probably cuDNN is not installed/enabled, the default Caffe model uses >12 GB of GPU memory, cuDNN reduces it to ~1.5 GB.
+**Q: Out of memory error** - I get an error similar to: `Check failed: error == cudaSuccess (2 vs. 0)  out of memory`.
+
+**A**: Most probably cuDNN is not installed/enabled, the default Caffe model uses >12 GB of GPU memory, cuDNN reduces it to ~1.5 GB.
+
+
+**Q: Low speed** - OpenPose is quite slow, is it normal? How can I speed it up?
+
+**A**: Check the Benchmark to discover the approximate speed of your graphics card: [https://github.com/CMU-Perceptual-Computing-Lab/openpose#openpose-benchmark](https://github.com/CMU-Perceptual-Computing-Lab/openpose#openpose-benchmark). Some speed tips:
+
+    1. Use cuDNN 5.1 (cuDNN 6 is ~10% slower).
+    2. If you have more than 1 GPU, set `--num_gpu`.
+    3. Reduce the `--net_resolution` (e.g. to 320x176) (lower accuracy).
+    4. Use the `MPI_4_layers` model (lower accuracy and lower number of parts).
