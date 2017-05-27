@@ -73,6 +73,7 @@ The pose estimation work is based on the C++ code from [the ECCV 2016 demo](http
 5. [OpenPose Benchmark](#openpose-benchmark)
 6. [Send Us Your Feedback!](#send-us-your-feedback)
 7. [Citation](#citation)
+8. [Other Contributors](#other-contributors)
 
 
 
@@ -227,3 +228,10 @@ Please cite the papers in your publications if it helps your research:
       title = {Convolutional pose machines},
       year = {2016}
       }
+
+
+
+## Other Contributors
+We would like to thank the following people who also contributed to OpenPose:
+
+1. [Helen Medina](https://github.com/helen-medina): For moving OpenPose to Windows (Visual Studio), making it work there and creating the Windows branch.
