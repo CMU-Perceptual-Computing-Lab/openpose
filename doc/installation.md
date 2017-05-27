@@ -1,10 +1,16 @@
 OpenPose Library - Compilation and Installation
 ====================================
 
+## Contents
+1. [Requirements](#requirements)
+2. [Ubuntu](#ubuntu)
+3. [Windows](#windows)
+4. [FAQ](#faq)
+
 
 
 ## Requirements
-- Ubuntu (tested on 14 and 16)
+- Ubuntu (tested on 14 and 16) or Windows (tested on 10). We do not support any other OS but the community has been able to install it on: CentOS, Windows 7, and Windows 8.
 - GPU with at least 1.5 GB available (the `nvidia-smi` command checks the available GPU memory in Ubuntu).
 - CUDA and cuDNN installed.
 - At least 2 GB of free RAM memory.
@@ -14,8 +20,10 @@ Note: These requirements assume the default configuration (i.e. `--net_resolutio
 
 
 
-## Installation
-### Script Compilation
+
+
+## Ubuntu
+### Installation - Script Compilation
 **Highly important**: This script only works with CUDA 8 and Ubuntu 14 or 16. Otherwise, check [Manual Compilation](#manual-compilation).
 1. Required: CUDA, cuDNN, OpenCV and Atlas must be already installed on your machine.
     1. OpenCV can be installed with `apt-get install libopencv-dev`. If you have compiled OpenCV 3 by your own, follow [Manual Compilation](#manual-compilation). After both Makefile.config files have been generated, edit them and uncomment the line `# OPENCV_VERSION := 3`. You might alternatively modify all `Makefile.config.UbuntuXX` files and then run the scripts in step 2.
@@ -27,7 +35,9 @@ chmod u+x install_caffe_and_openpose.sh
 ./install_caffe_and_openpose.sh
 ```
 
-### Manual Compilation
+
+
+### Installation - Manual Compilation
 Alternatively to the script installation, if you want to use CUDA 7, avoid using sh scripts, change some configuration labels (e.g. OpenCV version), etc., then:
 1. Install the [Caffe prerequisites](http://caffe.berkeleyvision.org/installation.html).
 2. Compile Caffe and OpenPose by running these lines:
@@ -67,8 +77,7 @@ Alternatively to the script installation, if you want to use CUDA 7, avoid using
 
 
 
-
-## Reinstallation
+### Reinstallation
 If you updated some software that our library or 3rdparty use, or you simply want to reinstall it:
 1. Clean the OpenPose and Caffe compilation folders:
 ```
@@ -78,12 +87,12 @@ make clean && cd 3rdparty/caffe && make clean
 
 
 
-## Uninstallation
+### Uninstallation
 You just need to remove the OpenPose folder, by default called `openpose/`. E.g. `rm -rf openpose/`.
 
 
 
-## Quick Start
+### Quick Start
 Check that the library is working properly by using any of the following commands. Note that `examples/media/video.avi` and `examples/media` exist, so you do not need to change the paths.
 
 1. Running on Video
@@ -114,6 +123,38 @@ If you choose to visualize a body part or a PAF (Part Affinity Field) heat map w
 <p align="center">
     <img src="media/paf_heat_maps.png", width="720">
 </p>
+
+
+
+
+
+## Windows
+### Installation - Demo
+1. Install the pre-requisites:
+    1. [CUDA 8](https://developer.nvidia.com/cuda-downloads): Install it on the default location, C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0. Otherwise, modify the VS solution accordingly.
+    2. [cuDNN 5.1](https://developer.nvidia.com/cudnn): Once you have downloaded it, just unzip it and copy (merge) the contents on the CUDA folder, C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0.
+2. Download the portable demo from: _link coming soon_.
+
+### Installation - Library
+1. Install the pre-requisites:
+    1. Install all the demo pre-requisites.
+    2. [Python 2.4.13 64 bits - Windows x86-64 MSI installer](https://www.python.org/downloads/release/python-2713/).
+		- Install it on C:\Python27 (default) or D:\Programs\Python27. Otherwise, modify the VS solution accordingly.
+		- In addition, open the Windows cmd (Windows button + X, then A), and install some Python libraries with this command: `pip install numpy protobuf hypothesis`.
+    3. [Cmake](https://cmake.org/download/): Mark the option to add it to the Windows PATH.
+    4. [Ninja](https://ninja-build.org/): Mark the option to add it to the Windows PATH.
+    5. Microsoft Visual Studio 2015.
+2. Install Caffe on Windows:
+    1. Open the Windows cmd (Windows button + X, then A).
+	2. Go to the Caffe directory, assuming OpenPose has been downloaded on `C:\openpose`: `cd C:\openpose\3rdparty\caffe\caffe-windows`.
+	3. Compile Caffe by running: `scripts\build_win.cmd`.
+    4. If you find any problem installing Caffe, check [http://caffe.berkeleyvision.org/](http://caffe.berkeleyvision.org/).
+3. You can now open the Visual Studio sln file located on `{openpose_path}\windows_project\OpenPose.sln`. Do these changes:
+	1. Right click on `OpenPoseDemo` --> `Set as StartUp Project`.
+	2. Change `Debug` by `Release` mode.
+5. Compile and run it by pressing the F5 key or the green play icon.
+
+
 
 
 
