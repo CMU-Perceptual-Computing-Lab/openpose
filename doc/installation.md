@@ -100,6 +100,7 @@ You just need to remove the OpenPose folder, by default called `openpose/`. E.g.
 1. Install the pre-requisites:
     1. [CUDA 8](https://developer.nvidia.com/cuda-downloads): Install it on the default location, C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0. Otherwise, modify the Visual Studio project solution accordingly.
     2. [cuDNN 5.1](https://developer.nvidia.com/cudnn): Once you have downloaded it, just unzip it and copy (merge) the contents on the CUDA folder, C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0.
+    3. [Microsoft Visual C++ 2015 Redistributable](https://www.microsoft.com/en-us/download/details.aspx?id=53587) (lighter) or Microsoft Visual Studio 2015 (only if you intend to use the library).
 2. Download the portable demo from: _link coming soon_.
 
 ### Installation - Library
@@ -138,7 +139,7 @@ You just need to remove the OpenPose folder, by default called `openpose/`. E.g.
 ## Quick Start
 Check that the library is working properly by using any of the following commands. Note that `examples/media/video.avi` and `examples/media` exist, so you do not need to change the paths. In addition, the following commands assume your terminal (Ubuntu) or cmd (Windows) are located in the OpenPose folder.
 
-1. Running on Video
+**1. Running on Video**
 ```
 # Ubuntu
 ./build/examples/openpose/openpose.bin --video examples/media/video.avi
@@ -152,7 +153,7 @@ bin\OpenPoseDemo.exe --video examples/media/video.avi
 windows_project\x64\Release\OpenPoseDemo.exe --video examples/media/video.avi
 ```
 
-2. Running on Webcam
+**2. Running on Webcam**
 ```
 # Ubuntu
 ./build/examples/openpose/openpose.bin
@@ -166,7 +167,7 @@ bin\OpenPoseDemo.exe
 windows_project\x64\Release\OpenPoseDemo.exe
 ```
 
-3. Running on Images
+**3. Running on Images**
 ```
 # Ubuntu
 ./build/examples/openpose/openpose.bin --image_dir examples/media/
