@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenPose", "OpenPose\OpenPose.vcxproj", "{1848F100-6EC5-4F60-9748-062590ADFE5C}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenPoseDemo", "OpenPoseDemo\OpenPoseDemo.vcxproj", "{DF3983B6-A052-478D-9C59-B353C5F95991}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1848F100-6EC5-4F60-9748-062590ADFE5C} = {1848F100-6EC5-4F60-9748-062590ADFE5C}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1848F100-6EC5-4F60-9748-062590ADFE5C}.Debug|x64.ActiveCfg = Debug|x64
+		{1848F100-6EC5-4F60-9748-062590ADFE5C}.Debug|x64.Build.0 = Debug|x64
+		{1848F100-6EC5-4F60-9748-062590ADFE5C}.Release|x64.ActiveCfg = Release|x64
+		{1848F100-6EC5-4F60-9748-062590ADFE5C}.Release|x64.Build.0 = Release|x64
+		{DF3983B6-A052-478D-9C59-B353C5F95991}.Debug|x64.ActiveCfg = Debug|x64
+		{DF3983B6-A052-478D-9C59-B353C5F95991}.Debug|x64.Build.0 = Debug|x64
+		{DF3983B6-A052-478D-9C59-B353C5F95991}.Release|x64.ActiveCfg = Release|x64
+		{DF3983B6-A052-478D-9C59-B353C5F95991}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

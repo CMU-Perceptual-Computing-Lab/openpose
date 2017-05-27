@@ -59,6 +59,22 @@ MANIFEST-*
 # OSX dir files
 .DS_Store
 
+######################### Windows (Visual Studio) Files #########################
+*.db
+*.deps
+*.obj
+*.opendb
+*.pdb
+
+######################### Windows (Visual Studio) Folders #########################
+*.vs/
+*x64/
+3rdparty/caffe/dependencies/
+3rdparty/caffe/include/
+3rdparty/lib/
+# Allowing this file (removed *.user for Qt)
+!*.vcxproj.user
+
 ######################### Caffe Files / Folders #########################
 # User's build configuration
 Makefile.config
