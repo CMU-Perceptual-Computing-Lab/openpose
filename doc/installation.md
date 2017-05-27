@@ -5,7 +5,8 @@ OpenPose Library - Compilation and Installation
 1. [Requirements](#requirements)
 2. [Ubuntu](#ubuntu)
 3. [Windows](#windows)
-4. [FAQ](#faq)
+4. [Quick Start](#quick-start)
+5. [FAQ](#faq)
 
 
 
@@ -92,22 +93,91 @@ You just need to remove the OpenPose folder, by default called `openpose/`. E.g.
 
 
 
-### Quick Start
-Check that the library is working properly by using any of the following commands. Note that `examples/media/video.avi` and `examples/media` exist, so you do not need to change the paths.
+
+
+## Windows
+### Installation - Demo
+1. Install the pre-requisites:
+    1. [CUDA 8](https://developer.nvidia.com/cuda-downloads): Install it on the default location, C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0. Otherwise, modify the Visual Studio project solution accordingly.
+    2. [cuDNN 5.1](https://developer.nvidia.com/cudnn): Once you have downloaded it, just unzip it and copy (merge) the contents on the CUDA folder, C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0.
+2. Download the portable demo from: _link coming soon_.
+
+### Installation - Library
+1. Install the pre-requisites:
+    1. Install all the demo pre-requisites.
+    2. [Python 2.4.13 64 bits - Windows x86-64 MSI installer](https://www.python.org/downloads/release/python-2713/).
+        - Install it on C:\Python27 (default) or D:\Programs\Python27. Otherwise, modify the VS solution accordingly.
+        - In addition, open the Windows cmd (Windows button + X, then A), and install some Python libraries with this command: `pip install numpy protobuf hypothesis`.
+    3. [Cmake](https://cmake.org/download/): Select the option to add it to the Windows PATH.
+    4. [Ninja](https://ninja-build.org/): Select the option to add it to the Windows PATH.
+    5. Microsoft Visual Studio 2015.
+2. Download the `Windows` branch of Openpose by either cliking on `Download ZIP` or cloning the repository: `git clone https://github.com/CMU-Perceptual-Computing-Lab/openpose/ && git checkout windows`.
+3. Install Caffe on Windows:
+    1. Open the Windows cmd (Windows button + X, then A).
+    2. Go to the Caffe directory, assuming OpenPose has been downloaded on `C:\openpose`: `cd C:\openpose\3rdparty\caffe\caffe-windows`.
+    3. Compile Caffe by running: `scripts\build_win.cmd`. It will take several minutes.
+        - Note: If Caffe asks you: `Does D:\openpose\3rdparty\caffe\caffe-windows\build\..\..\include\caffe specify a file name or directory name on the target (F = file, D = directory)?`, select `D`.
+    4. If you find any problem installing Caffe, check [http://caffe.berkeleyvision.org/](http://caffe.berkeleyvision.org/).
+4. You can now open the Visual Studio sln file located on `{openpose_path}\windows_project\OpenPose.sln`.
+5. In order to verify OpenPose is working, try compiling and executing the demo:
+    1. Right click on `OpenPoseDemo` --> `Set as StartUp Project`.
+    2. Change `Debug` by `Release` mode.
+    3. You can now compile it.
+6. Download the body pose models:
+    1. Download the [COCO model (18 key-points)](http://posefs1.perception.cs.cmu.edu/Users/tsimon/Projects/coco/data/models/coco/pose_iter_440000.caffemodel) as `{openpose_folder}\models\pose\coco\pose_iter_440000.caffemodel`.
+    2. (Optionally) download the [MPI model (15 key-points, faster and less memory than COCO)](http://posefs1.perception.cs.cmu.edu/Users/tsimon/Projects/coco/data/models/mpi/pose_iter_160000.caffemodel) as `{openpose_folder}\models\pose\mpi\pose_iter_160000.caffemodel`.
+7. If you have a webcam connected, you can test it by pressing the F5 key or the green play icon.
+8. Otherwise, check [Quick Start](#quick-start) to verify OpenPose was properly compiled. In order to use the created exe from the command line, you have to:
+    1. Copy all the DLLs located on `{openpose_folder}\3rdparty\caffe\caffe-windows\build\install\bin\` on the exe folder: `{openpose_folder}\windows_project\x64\Release`.
+    2. Copy `opencv_ffmpeg310_64.dll`, `opencv_video310.dll` and `opencv_videoio310.dll` from `{openpose_folder}\3rdparty\caffe\dependencies\libraries_v140_x64_py27_1.1.0\libraries\x64\vc14\bin\` on the exe folder: `{openpose_folder}\windows_project\x64\Release`.
+
+
+
+
+
+## Quick Start
+Check that the library is working properly by using any of the following commands. Note that `examples/media/video.avi` and `examples/media` exist, so you do not need to change the paths. In addition, the following commands assume your terminal (Ubuntu) or cmd (Windows) are located in the OpenPose folder.
 
 1. Running on Video
 ```
+# Ubuntu
 ./build/examples/openpose/openpose.bin --video examples/media/video.avi
+```
+```
+:: Windows - Demo
+bin\OpenPoseDemo.exe --video examples/media/video.avi
+```
+```
+:: Windows - Library
+windows_project\x64\Release\OpenPoseDemo.exe --video examples/media/video.avi
 ```
 
 2. Running on Webcam
 ```
+# Ubuntu
 ./build/examples/openpose/openpose.bin
+```
+```
+:: Windows - Demo
+bin\OpenPoseDemo.exe
+```
+```
+:: Windows - Library
+windows_project\x64\Release\OpenPoseDemo.exe
 ```
 
 3. Running on Images
 ```
+# Ubuntu
 ./build/examples/openpose/openpose.bin --image_dir examples/media/
+```
+```
+:: Windows - Demo
+bin\OpenPoseDemo.exe --image_dir examples/media/
+```
+```
+:: Windows - Library
+windows_project\x64\Release\OpenPoseDemo.exe --image_dir examples/media/
 ```
 
 The visual GUI should show the original image with the poses blended on it, similarly to the pose of this gif:
@@ -123,36 +193,6 @@ If you choose to visualize a body part or a PAF (Part Affinity Field) heat map w
 <p align="center">
     <img src="media/paf_heat_maps.png", width="720">
 </p>
-
-
-
-
-
-## Windows
-### Installation - Demo
-1. Install the pre-requisites:
-    1. [CUDA 8](https://developer.nvidia.com/cuda-downloads): Install it on the default location, C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0. Otherwise, modify the VS solution accordingly.
-    2. [cuDNN 5.1](https://developer.nvidia.com/cudnn): Once you have downloaded it, just unzip it and copy (merge) the contents on the CUDA folder, C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0.
-2. Download the portable demo from: _link coming soon_.
-
-### Installation - Library
-1. Install the pre-requisites:
-    1. Install all the demo pre-requisites.
-    2. [Python 2.4.13 64 bits - Windows x86-64 MSI installer](https://www.python.org/downloads/release/python-2713/).
-		- Install it on C:\Python27 (default) or D:\Programs\Python27. Otherwise, modify the VS solution accordingly.
-		- In addition, open the Windows cmd (Windows button + X, then A), and install some Python libraries with this command: `pip install numpy protobuf hypothesis`.
-    3. [Cmake](https://cmake.org/download/): Mark the option to add it to the Windows PATH.
-    4. [Ninja](https://ninja-build.org/): Mark the option to add it to the Windows PATH.
-    5. Microsoft Visual Studio 2015.
-2. Install Caffe on Windows:
-    1. Open the Windows cmd (Windows button + X, then A).
-	2. Go to the Caffe directory, assuming OpenPose has been downloaded on `C:\openpose`: `cd C:\openpose\3rdparty\caffe\caffe-windows`.
-	3. Compile Caffe by running: `scripts\build_win.cmd`.
-    4. If you find any problem installing Caffe, check [http://caffe.berkeleyvision.org/](http://caffe.berkeleyvision.org/).
-3. You can now open the Visual Studio sln file located on `{openpose_path}\windows_project\OpenPose.sln`. Do these changes:
-	1. Right click on `OpenPoseDemo` --> `Set as StartUp Project`.
-	2. Change `Debug` by `Release` mode.
-5. Compile and run it by pressing the F5 key or the green play icon.
 
 
 
