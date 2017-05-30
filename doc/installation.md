@@ -101,7 +101,7 @@ You just need to remove the OpenPose folder, by default called `openpose/`. E.g.
     1. [CUDA 8](https://developer.nvidia.com/cuda-downloads): Install it on the default location, C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0. Otherwise, modify the Visual Studio project solution accordingly.
     2. [cuDNN 5.1](https://developer.nvidia.com/cudnn): Once you have downloaded it, just unzip it and copy (merge) the contents on the CUDA folder, C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0.
     3. [Microsoft Visual C++ 2015 Redistributable](https://www.microsoft.com/en-us/download/details.aspx?id=53587) (lighter) or Microsoft Visual Studio 2015 (only if you intend to use the library).
-2. Download the portable demo from: _link coming soon_.
+2. Download the portable demo from: [posefs1.perception.cs.cmu.edu/OpenPose/openpose_1.0.0rc2.zip](http://posefs1.perception.cs.cmu.edu/OpenPose/openpose_1.0.0rc2.zip).
 
 ### Installation - Library
 1. Install the pre-requisites:
@@ -112,7 +112,7 @@ You just need to remove the OpenPose folder, by default called `openpose/`. E.g.
     3. [Cmake](https://cmake.org/download/): Select the option to add it to the Windows PATH.
     4. [Ninja](https://ninja-build.org/): Select the option to add it to the Windows PATH.
     5. Microsoft Visual Studio 2015.
-2. Download the `Windows` branch of Openpose by either cliking on `Download ZIP` or cloning the repository: `git clone https://github.com/CMU-Perceptual-Computing-Lab/openpose/ && git checkout windows`.
+2. Download the `Windows` branch of Openpose by either cliking on `Download ZIP` on [openpose/tree/windows](https://github.com/CMU-Perceptual-Computing-Lab/openpose/tree/windows) or cloning the repository: `git clone https://github.com/CMU-Perceptual-Computing-Lab/openpose/ && git checkout windows`.
 3. Install Caffe on Windows:
     1. Open the Windows cmd (Windows button + X, then A).
     2. Go to the Caffe directory, assuming OpenPose has been downloaded on `C:\openpose`: `cd C:\openpose\3rdparty\caffe\caffe-windows`.
