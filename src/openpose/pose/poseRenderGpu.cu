@@ -32,16 +32,22 @@ namespace op
         255.f,     0.f,   170.f,
         255.f,     0.f,    85.f,
     };
-    __constant__ const float MPI_RGB_COLORS[] = {
-        255.f,   0.f,   0.f,
-        255.f, 170.f,   0.f,
-        170.f, 255.f,   0.f,
-          0.f, 255.f,   0.f,
-          0.f, 255.f, 170.f,
-        170.f,   0.f, 255.f,
-        255.f,   0.f, 170.f,
-          0.f, 170.f, 255.f,
-          0.f,   0.f, 255.f,
+    __constant__ const float MPI_RGB_COLORS[] = { // MPI colors chosen such that they are closed to COCO colors
+        255.f,     0.f,    85.f,
+        255.f,     0.f,     0.f,
+        255.f,    85.f,     0.f,
+        255.f,   170.f,     0.f,
+        255.f,   255.f,     0.f,
+        170.f,   255.f,     0.f,
+         85.f,   255.f,     0.f,
+          43.f,   255.f,     0.f,
+          0.f,   255.f,     0.f,
+          0.f,   255.f,    85.f,
+          0.f,   255.f,   170.f,
+          0.f,   255.f,   255.f,
+          0.f,   170.f,   255.f,
+          0.f,    85.f,   255.f,
+          0.f,     0.f,   255.f,
     };
     __constant__ const float RGB_COLORS_BACKGROUND[] = {
         255.f,     0.f,     0.f,
@@ -165,87 +171,32 @@ namespace op
         renderKeyPoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF,
                         globalIdx, x, y, targetWidth, targetHeight, posePtr, COCO_PAIRS_GPU, numberPeople,
                         POSE_COCO_NUMBER_PARTS, numberPartPairs, COCO_RGB_COLORS, numberColors,
-                        radius, stickwidth, threshold, alphaColorToAdd, blendOriginalFrame);
+                        radius, stickwidth, threshold, alphaColorToAdd, blendOriginalFrame, (googlyEyes ? 14 : -1), (googlyEyes ? 15 : -1));
     }
 
     __global__ void renderPoseMpi29Parts(float* targetPtr, const int targetWidth, const int targetHeight, const float* const posePtr,
                                          const int numberPeople, const float threshold, const bool blendOriginalFrame, const float alphaColorToAdd)
     {
-        //posePtr has length 3 * 15 * numberPeople
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
+        const auto globalIdx = threadIdx.y * blockDim.x + threadIdx.x;
 
-        if (x < targetWidth && y < targetHeight)
-        {
-            const auto numberBodyParts = sizeof(MPI_PAIRS_GPU)/(2*sizeof(MPI_PAIRS_GPU[0]));
-            const auto radius = 3.f*targetHeight / 200.0f;
-            const auto stickwidth = targetHeight / 60.0f;
+        // Shared parameters
+        __shared__ float2 sharedMins[POSE_MAX_PEOPLE];
+        __shared__ float2 sharedMaxs[POSE_MAX_PEOPLE];
+        __shared__ float sharedScaleF[POSE_MAX_PEOPLE];
 
-            const auto blueIndex = y * targetWidth + x;
-            auto& b = targetPtr[                                 blueIndex];
-            auto& g = targetPtr[    targetWidth * targetHeight + blueIndex];
-            auto& r = targetPtr[2 * targetWidth * targetHeight + blueIndex];
-            if (!blendOriginalFrame)
-            {
-                b = 0.f;
-                g = 0.f;
-                r = 0.f;
-            }
+        // Other parameters
+        const auto numberPartPairs = sizeof(MPI_PAIRS_GPU) / (2*sizeof(MPI_PAIRS_GPU[0]));
+        const auto numberColors = sizeof(MPI_RGB_COLORS) / (3*sizeof(MPI_RGB_COLORS[0]));
+        const auto radius = fastMin(targetWidth, targetHeight) / 100.f;
+        const auto stickwidth = fastMin(targetWidth, targetHeight) / 120.f;
 
-            for (auto person = 0; person < numberPeople; person++)
-            {
-                // Body part body part connections
-                for (auto bodyPart = 0; bodyPart < numberBodyParts; bodyPart++)
-                {
-                    auto bSqrt = stickwidth * stickwidth; //fixed
-                    const auto partA = MPI_PAIRS_GPU[2*bodyPart];
-                    const auto partB = MPI_PAIRS_GPU[2*bodyPart+1];
-                    const auto xA = posePtr[person*POSE_MPI_NUMBER_PARTS*3 + partA*3];
-                    const auto yA = posePtr[person*POSE_MPI_NUMBER_PARTS*3 + partA*3 + 1];
-                    const auto valueA = posePtr[person*POSE_MPI_NUMBER_PARTS*3 + partA*3 + 2];
-                    const auto xB = posePtr[person*POSE_MPI_NUMBER_PARTS*3 + partB*3];
-                    const auto yB = posePtr[person*POSE_MPI_NUMBER_PARTS*3 + partB*3 + 1];
-                    const auto valueB = posePtr[person*POSE_MPI_NUMBER_PARTS*3 + partB*3 + 2];
-                    if (valueA > threshold && valueB > threshold)
-                    {
-                        const auto xP = (xA + xB) / 2.f;
-                        const auto yP = (yA + yB) / 2.f;
-                        const auto angle = atan2f(yB - yA, xB - xA);
-                        const auto sine = sinf(angle);
-                        const auto cosine = cosf(angle);
-                        auto aSqrt = (xA - xP) * (xA - xP) + (yA - yP) * (yA - yP);
-
-                        if (bodyPart==0)
-                        {
-                            aSqrt *= 1.2f;
-                            bSqrt = aSqrt;
-                        }
-
-                        const auto A = cosine * (x - xP) + sine * (y - yP);
-                        const auto B = sine * (x - xP) - cosine * (y - yP);
-                        const auto judge = A * A / aSqrt + B * B / bSqrt;
-                        auto minV = 0.f;
-                        if (bodyPart == 0)
-                            minV = 0.8f;
-                        if (judge>= minV && judge <= 1)
-                            addColorWeighted(r, g, b, &MPI_RGB_COLORS[3*bodyPart], alphaColorToAdd);
-                    }
-                }
-
-                // Body part circles
-                for (unsigned char i = 0; i < POSE_MPI_NUMBER_PARTS; i++) //for every point
-                {
-                    const auto index = 3 * (person*POSE_MPI_NUMBER_PARTS + i);
-                    const auto localX = posePtr[index];
-                    const auto localY = posePtr[index + 1];
-                    const auto value = posePtr[index + 2];
-
-                    if (value > threshold)
-                        if ((x - localX) * (x - localX) + (y - localY) * (y - localY) <= radius * radius)
-                            addColorWeighted(r, g, b, &MPI_RGB_COLORS[(i%9)*3], alphaColorToAdd);
-                }
-            }
-        }
+        // Render key points
+        renderKeyPoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF,
+                        globalIdx, x, y, targetWidth, targetHeight, posePtr, MPI_PAIRS_GPU, numberPeople,
+                        POSE_MPI_NUMBER_PARTS, numberPartPairs, MPI_RGB_COLORS, numberColors,
+                        radius, stickwidth, threshold, alphaColorToAdd, blendOriginalFrame);
     }
 
     __global__ void renderBodyPartHeatMaps(float* targetPtr, const int targetWidth, const int targetHeight, const float* const heatMapPtr, const int widthHeatMap,

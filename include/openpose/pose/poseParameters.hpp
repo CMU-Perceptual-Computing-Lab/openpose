@@ -33,8 +33,8 @@ namespace op
     };
     const unsigned int POSE_COCO_NUMBER_PARTS           = 18u; // Equivalent to size of std::map POSE_COCO_BODY_PARTS - 1 (removing background)
     const std::vector<unsigned int> POSE_COCO_MAP_IDX   {31,32, 39,40, 33,34, 35,36, 41,42, 43,44, 19,20, 21,22, 23,24, 25,26, 27,28, 29,30, 47,48, 49,50, 53,54, 51,52, 55,56, 37,38, 45,46};
-    const std::vector<unsigned int> POSE_COCO_PAIRS     {1,2,   1,5,   2,3,   3,4,   5,6,   6,7,   1,8,   8,9,   9,10, 1,11,  11,12, 12,13,  1,0,   0,14, 14,16,  0,15, 15,17,   2,16,  5,17};
     #define POSE_COCO_PAIRS_TO_RENDER                   {1,2,   1,5,   2,3,   3,4,   5,6,   6,7,   1,8,   8,9,   9,10, 1,11,  11,12, 12,13,  1,0,   0,14, 14,16,  0,15, 15,17}
+    const std::vector<unsigned int> POSE_COCO_PAIRS     {1,2,   1,5,   2,3,   3,4,   5,6,   6,7,   1,8,   8,9,   9,10, 1,11,  11,12, 12,13,  1,0,   0,14, 14,16,  0,15, 15,17,   2,16,  5,17};
 
     const std::map<unsigned int, std::string> POSE_MPI_BODY_PARTS{
         {0,  "Head"},
@@ -55,9 +55,9 @@ namespace op
         {15, "Background"}
     };
     const unsigned int POSE_MPI_NUMBER_PARTS            = 15; // Equivalent to size of std::map POSE_MPI_NUMBER_PARTS - 1 (removing background)
-    const std::vector<unsigned int> POSE_MPI_MAP_IDX    {16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 38, 39, 40, 41, 42, 43, 32, 33, 34, 35, 36, 37};
-    const std::vector<unsigned int> POSE_MPI_PAIRS      {0,1, 1,2, 2,3, 3,4, 1,5, 5,6, 6,7, 1,14, 14,11, 11,12, 12,13, 14,8, 8,9, 9,10};
-    #define POSE_MPI_PAIRS_TO_RENDER                    {0,1,      2,3, 3,4,      5,6, 6,7,              11,12, 12,13,       8,9, 9,10}
+    const std::vector<unsigned int> POSE_MPI_MAP_IDX    {16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43};
+    #define POSE_MPI_PAIRS_TO_RENDER                    { 0,1,    1,2,    2,3,     3,4,   1,5,    5,6,    6,7,    1,14,  14,8,    8,9,   9,10,  14,11,   11,12,  12,13}
+    const std::vector<unsigned int> POSE_MPI_PAIRS      POSE_MPI_PAIRS_TO_RENDER;
 
     // Constant Global Parameters
     const unsigned int POSE_MAX_PEOPLE = 96u;
