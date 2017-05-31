@@ -100,6 +100,9 @@ namespace op
             // Check producer is running
             if (!datumProducerRunning)
                 datums = nullptr;
+            // Increase counter if successful image
+            if (datums != nullptr)
+                mGlobalCounter++;
             // Return result
             return std::make_pair(datumProducerRunning, datums);
         }
