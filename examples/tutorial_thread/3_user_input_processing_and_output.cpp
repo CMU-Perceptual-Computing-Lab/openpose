@@ -146,7 +146,7 @@ public:
             if (datumsPtr != nullptr && !datumsPtr->empty())
             {
                 cv::imshow("User worker GUI", datumsPtr->at(0).cvOutputData);
-                cv::waitKey(500); // It sleeps 500 ms just to let the user see the output. Change to 33ms for normal 30 fps display
+                cv::waitKey(1); // It displays the image and sleeps at least 1 ms (it usually sleeps ~5-10 msec to display the image)
             }
         }
         catch (const std::exception& e)

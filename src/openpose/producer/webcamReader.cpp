@@ -100,7 +100,7 @@ namespace op
                 else
                 {
                     lock.unlock();
-                    std::this_thread::sleep_for(std::chrono::microseconds{500});
+                    std::this_thread::sleep_for(std::chrono::microseconds{10});
                 }
             }
             return cvMat;
