@@ -221,9 +221,9 @@ If you choose to visualize a body part or a PAF (Part Affinity Field) heat map w
 
 **Q: Low speed** - OpenPose is quite slow, is it normal? How can I speed it up?
 
-**A**: Check the Benchmark to discover the approximate speed of your graphics card: [https://github.com/CMU-Perceptual-Computing-Lab/openpose#openpose-benchmark](https://github.com/CMU-Perceptual-Computing-Lab/openpose#openpose-benchmark). Some speed tips:
+**A**: Check the [OpenPose Benchmark](https://docs.google.com/spreadsheets/d/1-DynFGvoScvfWDA1P4jDInCkbD4lg0IKOYbXgEq0sK0/edit#gid=0) to discover the approximate speed of your graphics card. Some speed tips:
 
     1. Use cuDNN 5.1 (cuDNN 6 is ~10% slower).
-    2. If you have more than 1 GPU, set `--num_gpu`.
-    3. Reduce the `--net_resolution` (e.g. to 320x176) (lower accuracy).
+    2. Reduce the `--net_resolution` (e.g. to 320x176) (lower accuracy).
+    3. For face, reduce the `--face_net_resolution`. The resolution 320x320 usually works pretty decently.
     4. Use the `MPI_4_layers` model (lower accuracy and lower number of parts).
