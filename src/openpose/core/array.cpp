@@ -174,7 +174,8 @@ namespace op
                 mSize = {};
                 mVolume = 0;
                 spData.reset();
-                mCvMatData = std::make_pair(false, cv::Mat{});
+                // cv::Mat available but empty
+                mCvMatData = std::make_pair(true, cv::Mat{});
             }
         }
         catch (const std::exception& e)

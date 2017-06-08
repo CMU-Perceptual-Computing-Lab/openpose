@@ -191,12 +191,12 @@ We use standard formats (JSON, XML, PNG, JPG, ...) to save our results, so there
 
 #### Pose Output Format
 <p align="center">
-    <img src="doc/media/keypoints_body.gif", width="480">
+    <img src="doc/media/keypoints_body.png", width="480">
 </p>
 
 #### Face Output Format
 <p align="center">
-    <img src="doc/media/keypoints_face.gif", width="480">
+    <img src="doc/media/keypoints_face.png", width="480">
 </p>
 
 
