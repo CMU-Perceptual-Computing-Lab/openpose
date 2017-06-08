@@ -1,8 +1,7 @@
-#ifndef OPENPOSE__CORE__W_OP_OUTPUT_TO_CV_MAT_HPP
-#define OPENPOSE__CORE__W_OP_OUTPUT_TO_CV_MAT_HPP
+#ifndef OPENPOSE_CORE_W_OP_OUTPUT_TO_CV_MAT_HPP
+#define OPENPOSE_CORE_W_OP_OUTPUT_TO_CV_MAT_HPP
 
 #include <memory> // std::shared_ptr
-#include <opencv2/core/core.hpp>
 #include <openpose/thread/worker.hpp>
 #include "opOutputToCvMat.hpp"
 
@@ -80,4 +79,4 @@ namespace op
     COMPILE_TEMPLATE_DATUM(WOpOutputToCvMat);
 }
 
-#endif // OPENPOSE__CORE__W_OP_OUTPUT_TO_CV_MAT_HPP
+#endif // OPENPOSE_CORE_W_OP_OUTPUT_TO_CV_MAT_HPP

@@ -337,6 +337,37 @@ namespace op
     }
 
     template<typename T>
+    const std::string Array<T>::toString() const
+    {
+        try
+        {
+            // Initial value
+            std::string string{"Array<T>::toString():\n"};
+            // Add each element
+            for (auto i = 0 ; i < mVolume ; i++)
+            {
+                // Adding element sepearted by an space
+                string += std::to_string(spData[i]) + " ";
+                // Introduce an enter for each dimension change
+                // If comented, all values will be printed in the same line
+                auto multiplier = 1u;
+                for (auto dimension = mSize.size() - 1u ; dimension > 0 && ((i/multiplier) % getSize(dimension) == getSize(dimension)-1) ; dimension--)
+                {
+                    string += "\n";
+                    multiplier *= getSize(dimension);
+                }
+            }
+            // Return string
+            return string;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return "";
+        }
+    }
+
+    template<typename T>
     int Array<T>::getIndex(const std::vector<int>& indexes) const
     {
         try

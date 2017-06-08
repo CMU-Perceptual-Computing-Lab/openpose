@@ -1,5 +1,5 @@
-#ifndef OPENPOSE__POSE__POSE_PARAMETERS_HPP
-#define OPENPOSE__POSE__POSE_PARAMETERS_HPP
+#ifndef OPENPOSE_POSE_POSE_PARAMETERS_HPP
+#define OPENPOSE_POSE_POSE_PARAMETERS_HPP
 
 #include <array>
 #include <map>
@@ -88,12 +88,12 @@ namespace op
     const std::array<float, (int)PoseModel::Size>           POSE_DEFAULT_CONNECT_MIN_SUBSET_SCORE{          0.4f,       0.4f,       0.4f};
 
     // Rendering default parameters
-    const auto POSE_DEFAULT_ALPHA_POSE = 0.6f;
-    const auto POSE_DEFAULT_ALPHA_HEATMAP = 0.7f;
+    const auto POSE_DEFAULT_ALPHA_KEYPOINT = 0.6f;
+    const auto POSE_DEFAULT_ALPHA_HEAT_MAP = 0.7f;
 
     // Auxiliary functions
     unsigned int poseBodyPartMapStringToKey(const PoseModel poseModel, const std::string& string);
     unsigned int poseBodyPartMapStringToKey(const PoseModel poseModel, const std::vector<std::string>& strings);
 }
 
-#endif // OPENPOSE__POSE__POSE_PARAMETERS_HPP
+#endif // OPENPOSE_POSE_POSE_PARAMETERS_HPP

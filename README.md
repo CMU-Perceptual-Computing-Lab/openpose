@@ -1,11 +1,19 @@
 OpenPose
 ====================================
 
+## Latest News
+- Apr 2017: Body released!
+- May 2017: Windows version released!
+- Jun 2017: Face released!
+- Check all the [release notes](doc/release_notes.md).
+
+
+
 ## Introduction
 
 OpenPose is a **library for real-time multi-person keypoint detection and multi-threading written in C++** using OpenCV and Caffe*, authored by [Gines Hidalgo](https://www.linkedin.com/in/gineshidalgo/), [Zhe Cao](http://www.andrew.cmu.edu/user/zhecao), [Tomas Simon](http://www.cs.cmu.edu/~tsimon/), [Shih-En Wei](https://scholar.google.com/citations?user=sFQD3k4AAAAJ&hl=en), [Hanbyul Joo](http://www.cs.cmu.edu/~hanbyulj/) and [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/).
 
-* It uses Caffe, but the code is ready to be ported to other frameworks (e.g., Tensorflow or Torch). If you implement any of those, please, make a pull request and we will add it!
+\* It uses Caffe, but the code is ready to be ported to other frameworks (Tensorflow, Torch, etc.). If you implement any of those, feel free to make a pull request!
 
 OpenPose represents the **first real-time system to jointly detect human body, hand and facial keypoints (in total 130 keypoints) on single images**. In addition, the system computational performance on body keypoint estimation is invariant to the number of detected people in the image.
 
@@ -15,11 +23,11 @@ OpenPose is freely available for free non-commercial use, and may be redistribut
 
 Library main functionality:
 
-* Multi-person 15 or **18-keypoint body pose** estimation and rendering.
+* Multi-person 15 or **18-keypoint body pose** estimation and rendering. **Running time invariant of number of people** on the image.
 
-* Multi-person **2x21-keypoint hand** estimation and rendering (coming soon in around 1-2 months!).
+* Multi-person **2x21-keypoint hand** estimation and rendering. Note: In this initial version, **running time** linearly **depends** on the **number of people** on the image. **Coming soon (in around 1-5 weeks)!**
 
-* Multi-person **70-keypoint face** estimation and rendering (coming soon in around 2-3 months!).
+* Multi-person **70-keypoint face** estimation and rendering. Note: In this initial version, **running time** linearly **depends** on the **number of people** on the image.
 
 * Flexible and easy-to-configure **multi-threading** module.
 
@@ -42,16 +50,16 @@ The pose estimation work is based on the C++ code from [the ECCV 2016 demo](http
     <img src="doc/media/dance.gif", width="480">
 </p>
 
+### Body + Face Estimation
+<p align="center">
+    <img src="doc/media/pose_face.gif", width="480">
+</p>
+
 ## Coming Soon (But Already Working!)
 
 ### Body + Hands + Face Estimation
 <p align="center">
     <img src="doc/media/pose_face_hands.gif", width="480">
-</p>
-
-### Body + Face Estimation
-<p align="center">
-    <img src="doc/media/pose_face.gif", width="480">
 </p>
 
 ### Body + Hands
@@ -132,7 +140,7 @@ doxygen doc_autogeneration.doxygen
 
 ## Output
 #### Output Format
-There are 2 alternatives to save the **(x,y,score) body part locations**. The `write_pose` flag uses the OpenCV cv::FileStorage default formats (JSON, XML and YML). However, the JSON format is only available after OpenCV 3.0. Hence, `write_pose_json` saves the people pose data using a custom JSON writer. For the latter, each JSON file has a `people` array of objects, where each object has an array `body_parts` containing the body part locations and detection confidence formatted as `x1,y1,c1,x2,y2,c2,...`. The coordinates `x` and `y` can be normalized to the range [0,1], [-1,1], [0, source size], [0, output size], etc., depending on the flag `scale_mode`. In addition, `c` is the confidence in the range [0,1].
+There are 2 alternatives to save the **(x,y,score) body part locations**. The `write_keypoint` flag uses the OpenCV cv::FileStorage default formats (JSON, XML and YML). However, the JSON format is only available after OpenCV 3.0. Hence, `write_keypoint_json` saves the people pose data using a custom JSON writer. For the latter, each JSON file has a `people` array of objects, where each object has an array `body_parts` containing the body part locations and detection confidence formatted as `x1,y1,c1,x2,y2,c2,...`. The coordinates `x` and `y` can be normalized to the range [0,1], [-1,1], [0, source size], [0, output size], etc., depending on the flag `keypoint_scale`. In addition, `c` is the confidence in the range [0,1].
 
 ```
 {
@@ -180,6 +188,16 @@ Where each index is the key value corresponding to each body part in `POSE_COCO_
 
 #### Reading Saved Results
 We use standard formats (JSON, XML, PNG, JPG, ...) to save our results, so there will be lots of frameworks to read them later, but you might also directly use our functions in [include/openpose/filestream.hpp](include/openpose/filestream.hpp). In particular, `loadData` (for JSON, XML and YML files) and `loadImage` (for image formats such as PNG or JPG) to load the data into cv::Mat format.
+
+#### Pose Output Format
+<p align="center">
+    <img src="doc/media/keypoints_body.gif", width="480">
+</p>
+
+#### Face Output Format
+<p align="center">
+    <img src="doc/media/keypoints_face.gif", width="480">
+</p>
 
 
 

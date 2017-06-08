@@ -2,5 +2,5 @@
 
 namespace op
 {
-    DEFINE_TEMPLATE_DATUM(experimental::WPoseJsonCocoSaver);
+    DEFINE_TEMPLATE_DATUM(experimental::WCocoJsonSaver);
 }

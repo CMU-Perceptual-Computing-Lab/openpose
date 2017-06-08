@@ -1,8 +1,8 @@
-#ifndef OPENPOSE__HAND__HAND_RENDERER_HPP
-#define OPENPOSE__HAND__HAND_RENDERER_HPP
+#ifndef OPENPOSE_HAND_HAND_RENDERER_HPP
+#define OPENPOSE_HAND_HAND_RENDERER_HPP
 
-#include <opencv2/core/core.hpp>
 #include <openpose/core/array.hpp>
+#include <openpose/core/point.hpp>
 #include <openpose/core/renderer.hpp>
 #include <openpose/thread/worker.hpp>
 
@@ -13,16 +13,16 @@ namespace op
         class HandRenderer : public Renderer
         {
         public:
-            explicit HandRenderer(const cv::Size& frameSize);
+            explicit HandRenderer(const Point<int>& frameSize);
 
             ~HandRenderer();
 
             void initializationOnThread();
 
-            void renderHands(Array<float>& outputData, const Array<float>& handKeyPoints);
+            void renderHands(Array<float>& outputData, const Array<float>& handKeypoints);
 
         private:
-            const cv::Size mFrameSize;
+            const Point<int> mFrameSize;
             float* pGpuHands;           // GPU aux memory
 
             DELETE_COPY(HandRenderer);
@@ -30,4 +30,4 @@ namespace op
     }
 }
 
-#endif // OPENPOSE__HAND__HAND_RENDERER_HPP
+#endif // OPENPOSE_HAND_HAND_RENDERER_HPP

@@ -6,19 +6,19 @@
 
 namespace op
 {
-    WebcamReader::WebcamReader(const int webcamIndex, const cv::Size webcamResolution) :
+    WebcamReader::WebcamReader(const int webcamIndex, const Point<int> webcamResolution) :
         VideoCaptureReader{webcamIndex},
         mFrameNameCounter{-1}
     {
         try
         {
-            if (webcamResolution != cv::Size{})
+            if (webcamResolution != Point<int>{})
             {
-                set(CV_CAP_PROP_FRAME_WIDTH, webcamResolution.width);
-                set(CV_CAP_PROP_FRAME_HEIGHT, webcamResolution.height);
-                if ((int)get(CV_CAP_PROP_FRAME_WIDTH) != webcamResolution.width || (int)get(CV_CAP_PROP_FRAME_HEIGHT) != webcamResolution.height)
+                set(CV_CAP_PROP_FRAME_WIDTH, webcamResolution.x);
+                set(CV_CAP_PROP_FRAME_HEIGHT, webcamResolution.y);
+                if ((int)get(CV_CAP_PROP_FRAME_WIDTH) != webcamResolution.x || (int)get(CV_CAP_PROP_FRAME_HEIGHT) != webcamResolution.y)
                 {
-                    const std::string logMessage{ "Desired webcam resolution " + std::to_string(webcamResolution.width) + "x" + std::to_string(webcamResolution.height)
+                    const std::string logMessage{ "Desired webcam resolution " + std::to_string(webcamResolution.x) + "x" + std::to_string(webcamResolution.y)
                                                 + " could not being set. Final resolution: " + std::to_string(intRound(get(CV_CAP_PROP_FRAME_WIDTH))) + "x"
                                                 + std::to_string(intRound(get(CV_CAP_PROP_FRAME_HEIGHT))) };
                     log(logMessage, Priority::Max, __LINE__, __FUNCTION__, __FILE__);

@@ -10,7 +10,7 @@
 
 // 3rdpary depencencies
 #include <gflags/gflags.h> // DEFINE_bool, DEFINE_int32, DEFINE_int64, DEFINE_uint64, DEFINE_double, DEFINE_string
-#include <glog/logging.h> // google::InitGoogleLogging, CHECK, CHECK_EQ, LOG, VLOG, ...
+#include <glog/logging.h> // google::InitGoogleLogging
 // OpenPose dependencies
 // Option a) Importing all modules
 #include <openpose/headers.hpp>
@@ -23,8 +23,9 @@
 // #include <openpose/thread/headers.hpp>
 // #include <openpose/utilities/headers.hpp>
 
-// Gflags in the command line terminal. Check all the options by adding the flag `--help`, e.g. `openpose.bin --help`.
-// Note: This command will show you flags for several files. Check only the flags for the file you are checking. E.g. for `openpose.bin`, look for `Flags from examples/openpose/openpose.cpp:`.
+// See all the available parameter options withe the `--help` flag. E.g. `./build/examples/openpose/openpose.bin --help`.
+// Note: This command will show you flags for other unnecessary 3rdparty files. Check only the flags for the OpenPose
+// executable. E.g. for `openpose.bin`, look for `Flags from examples/openpose/openpose.cpp:`.
 // Debugging
 DEFINE_int32(logging_level,             3,              "The logging level. Integer in the range [0, 255]. 0 will output any log() message, while 255 will not output any."
                                                         " Current OpenPose library messages are in the range 0-4: 1 for low priority messages and 4 for important ones.");
@@ -126,7 +127,7 @@ public:
     {
         // User's post-processing (after OpenPose processing & before OpenPose outputs) here
             // datum.cvOutputData: rendered frame with pose or heatmaps
-            // datum.poseKeyPoints: Array<float> with the estimated pose
+            // datum.poseKeypoints: Array<float> with the estimated pose
         try
         {
             if (datumsPtr != nullptr && !datumsPtr->empty())
@@ -154,7 +155,7 @@ public:
         {
             // User's displaying/saving/other processing here
                 // datum.cvOutputData: rendered frame with pose or heatmaps
-                // datum.poseKeyPoints: Array<float> with the estimated pose
+                // datum.poseKeypoints: Array<float> with the estimated pose
             if (datumsPtr != nullptr && !datumsPtr->empty())
             {
                 cv::imshow("User worker GUI", datumsPtr->at(0).cvOutputData);
@@ -207,7 +208,7 @@ int openPoseTutorialThread4()
 
     // ------------------------- STARTING AND STOPPING THREADING -------------------------
     op::log("Starting thread(s)", op::Priority::Max);
-    // Two different ways of running the program on multithread enviroment
+    // Two different ways of running the program on multithread environment
         // Option a) Using the main thread (this thread) for processing (it saves 1 thread, recommended)
     threadManager.exec();  // It blocks this thread until all threads have finished
         // Option b) Giving to the user the control of this thread

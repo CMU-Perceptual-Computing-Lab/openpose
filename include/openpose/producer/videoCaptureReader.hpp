@@ -1,9 +1,9 @@
-#ifndef OPENPOSE__PRODUCER__VIDEO_CAPTURE_READER_HPP
-#define OPENPOSE__PRODUCER__VIDEO_CAPTURE_READER_HPP
+#ifndef OPENPOSE_PRODUCER_VIDEO_CAPTURE_READER_HPP
+#define OPENPOSE_PRODUCER_VIDEO_CAPTURE_READER_HPP
 
 #include <string>
-#include <opencv2/core/core.hpp>            // cv::Mat
-#include <opencv2/highgui/highgui.hpp>      // cv::VideoCapture
+#include <opencv2/core/core.hpp> // cv::Mat
+#include <opencv2/highgui/highgui.hpp> // cv::VideoCapture
 #include "producer.hpp"
 
 namespace op
@@ -69,4 +69,4 @@ namespace op
     };
 }
 
-#endif // OPENPOSE__PRODUCER__VIDEO_CAPTURE_READER_HPP
+#endif // OPENPOSE_PRODUCER_VIDEO_CAPTURE_READER_HPP

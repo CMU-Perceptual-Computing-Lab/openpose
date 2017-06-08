@@ -1,12 +1,13 @@
-#ifndef OPENPOSE__HAND__HAND_EXTRACTOR_HPP
-#define OPENPOSE__HAND__HAND_EXTRACTOR_HPP
+#ifndef OPENPOSE_HAND_HAND_EXTRACTOR_HPP
+#define OPENPOSE_HAND_HAND_EXTRACTOR_HPP
 
 #include <array>
 #include <atomic>
 #include <memory> // std::shared_ptr
 #include <thread>
-#include <opencv2/core/core.hpp>
+#include <opencv2/core/core.hpp> // cv::Mat
 #include <openpose/core/array.hpp>
+#include <openpose/core/point.hpp>
 #include <openpose/core/net.hpp>
 #include <openpose/core/nmsCaffe.hpp>
 #include <openpose/core/resizeAndMergeCaffe.hpp>
@@ -24,9 +25,9 @@ namespace op
 
             void initializationOnThread();
 
-            void forwardPass(const Array<float>& poseKeyPoints, const cv::Mat& cvInputData);
+            void forwardPass(const Array<float>& poseKeypoints, const cv::Mat& cvInputData);
 
-            Array<float> getHandKeyPoints() const;
+            Array<float> getHandKeypoints() const;
 
             double get(const HandsProperty property) const;
 
@@ -35,8 +36,8 @@ namespace op
             void increase(const HandsProperty property, const double value);
 
         private:
-            const cv::Size mNetOutputSize;
-            const cv::Size mOutputSize;
+            const Point<int> mNetOutputSize;
+            const Point<int> mOutputSize;
             const unsigned int mRWrist;
             const unsigned int mRElbow;
             const unsigned int mLWrist;
@@ -65,4 +66,4 @@ namespace op
     }
 }
 
-#endif // OPENPOSE__HAND__HAND_EXTRACTOR_HPP
+#endif // OPENPOSE_HAND_HAND_EXTRACTOR_HPP

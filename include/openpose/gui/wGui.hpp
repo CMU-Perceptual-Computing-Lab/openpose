@@ -1,8 +1,7 @@
-#ifndef OPENPOSE__GUI__W_GUI_HPP
-#define OPENPOSE__GUI__W_GUI_HPP
+#ifndef OPENPOSE_GUI_W_GUI_HPP
+#define OPENPOSE_GUI_W_GUI_HPP
 
 #include <memory> // std::shared_ptr
-#include <opencv2/core/core.hpp>
 #include <openpose/thread/workerConsumer.hpp>
 #include "enumClasses.hpp"
 #include "gui.hpp"
@@ -95,4 +94,4 @@ namespace op
     COMPILE_TEMPLATE_DATUM(WGui);
 }
 
-#endif // OPENPOSE__GUI__W_GUI_HPP
+#endif // OPENPOSE_GUI_W_GUI_HPP

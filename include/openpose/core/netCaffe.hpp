@@ -1,6 +1,6 @@
 #ifdef USE_CAFFE
-#ifndef OPENPOSE__CORE__NET_CAFFE_HPP
-#define OPENPOSE__CORE__NET_CAFFE_HPP
+#ifndef OPENPOSE_CORE_NET_CAFFE_HPP
+#define OPENPOSE_CORE_NET_CAFFE_HPP
 
 #include <array>
 #include <memory> // std::shared_ptr
@@ -47,5 +47,5 @@ namespace op
     };
 }
 
-#endif // OPENPOSE__CORE__NET_CAFFE_HPP
+#endif // OPENPOSE_CORE_NET_CAFFE_HPP
 #endif

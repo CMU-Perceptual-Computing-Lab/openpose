@@ -22,7 +22,7 @@ namespace op
             mLElbow{poseBodyPartMapStringToKey(poseModel, "LElbow")},
             mNeck{poseBodyPartMapStringToKey(poseModel, "Neck")},
             mHeadNose{poseBodyPartMapStringToKey(poseModel, std::vector<std::string>{"Nose", "Head"})},
-            spNet{std::make_shared<NetCaffe>(std::array<int,4>{2, 3, mNetOutputSize.height, mNetOutputSize.width}, modelFolder + HAND_PROTOTXT, modelFolder + HAND_TRAINED_MODEL, gpuId)},
+            spNet{std::make_shared<NetCaffe>(std::array<int,4>{2, 3, mNetOutputSize.y, mNetOutputSize.x}, modelFolder + HAND_PROTOTXT, modelFolder + HAND_TRAINED_MODEL, gpuId)},
             spResizeAndMergeCaffe{std::make_shared<ResizeAndMergeCaffe<float>>()},
             spNmsCaffe{std::make_shared<NmsCaffe<float>>()},
             mLeftHandCrop{mNetOutputSize.area()*3},
@@ -32,7 +32,7 @@ namespace op
         {
             try
             {
-error("Hands and face extraction is not implemented yet. COMING SOON!", __LINE__, __FUNCTION__, __FILE__);
+error("Hands extraction is not implemented yet. COMING SOON!", __LINE__, __FUNCTION__, __FILE__);
                 // Properties
                 for (auto& property : mProperties)
                     property = 0.;
@@ -66,7 +66,7 @@ error("Hands and face extraction is not implemented yet. COMING SOON!", __LINE__
 
                 // Pose extractor blob and layer
                 spPeaksBlob = {std::make_shared<caffe::Blob<float>>(1,1,1,1)};
-                spNmsCaffe->Reshape({spHeatMapsBlob.get()}, {spPeaksBlob.get()}, HAND_MAX_PEAKS, HAND_NUMBER_PARTS);
+                spNmsCaffe->Reshape({spHeatMapsBlob.get()}, {spPeaksBlob.get()}, HAND_MAX_PEAKS, HAND_NUMBER_PARTS+1);
                 cudaCheck(__LINE__, __FUNCTION__, __FILE__);
      
                 log("Finished initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
@@ -90,7 +90,7 @@ UNUSED(cvInputData);
             }
         }
  
-        Array<float> HandExtractor::getHandKeyPoints() const
+        Array<float> HandExtractor::getHandKeypoints() const
         {
             try
             {

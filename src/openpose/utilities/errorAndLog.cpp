@@ -160,8 +160,8 @@ namespace op
 
 
     // ConfigureError - Private variables
-    std::vector<ErrorMode> sErrorModes              {ErrorMode::StdRuntimeError};
-    // std::vector<ErrorMode> sErrorModes              {ErrorMode::StdCerr, ErrorMode::StdRuntimeError};
+    // std::vector<ErrorMode> sErrorModes              {ErrorMode::StdRuntimeError};
+    std::vector<ErrorMode> sErrorModes              {ErrorMode::StdCerr, ErrorMode::StdRuntimeError};
     std::mutex sErrorModesMutex                     {};
 
     std::vector<ErrorMode> ConfigureError::getErrorModes()

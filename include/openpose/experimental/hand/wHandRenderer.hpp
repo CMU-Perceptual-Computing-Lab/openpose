@@ -1,5 +1,5 @@
-#ifndef OPENPOSE__HAND__W_HAND_RENDERER_HPP
-#define OPENPOSE__HAND__W_HAND_RENDERER_HPP
+#ifndef OPENPOSE_HAND_W_HAND_RENDERER_HPP
+#define OPENPOSE_HAND_W_HAND_RENDERER_HPP
 
 #include <memory> // std::shared_ptr
 #include <openpose/thread/worker.hpp>
@@ -65,7 +65,7 @@ namespace op
                     const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                     // Render people hands
                     for (auto& tDatum : *tDatums)
-                        spHandRenderer->renderHands(tDatum.outputData, tDatum.handKeyPoints);
+                        spHandRenderer->renderHands(tDatum.outputData, tDatum.handKeypoints);
                     // Profiling speed
                     Profiler::timerEnd(profilerKey);
                     Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__, Profiler::DEFAULT_X);
@@ -85,4 +85,4 @@ namespace op
     }
 }
 
-#endif // OPENPOSE__HAND__W_HAND_RENDERER_HPP
+#endif // OPENPOSE_HAND_W_HAND_RENDERER_HPP

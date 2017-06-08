@@ -1,6 +1,6 @@
 #ifdef USE_CAFFE
-#ifndef OPENPOSE__CORE__NMS_CAFFE_HPP
-#define OPENPOSE__CORE__NMS_CAFFE_HPP
+#ifndef OPENPOSE_CORE_NMS_CAFFE_HPP
+#define OPENPOSE_CORE_NMS_CAFFE_HPP
 
 #include <array>
 #include "caffe/blob.hpp"
@@ -39,5 +39,5 @@ namespace op
     };
 }
 
-#endif // OPENPOSE__CORE__NMS_CAFFE_HPP
+#endif // OPENPOSE_CORE_NMS_CAFFE_HPP
 #endif

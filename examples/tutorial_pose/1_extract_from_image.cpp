@@ -10,7 +10,7 @@
 
 // 3rdpary depencencies
 #include <gflags/gflags.h> // DEFINE_bool, DEFINE_int32, DEFINE_int64, DEFINE_uint64, DEFINE_double, DEFINE_string
-#include <glog/logging.h> // google::InitGoogleLogging, CHECK, CHECK_EQ, LOG, VLOG, ...
+#include <glog/logging.h> // google::InitGoogleLogging
 // OpenPose dependencies
 #include <openpose/core/headers.hpp>
 #include <openpose/filestream/headers.hpp>
@@ -18,8 +18,9 @@
 #include <openpose/pose/headers.hpp>
 #include <openpose/utilities/headers.hpp>
 
-// Gflags in the command line terminal. Check all the options by adding the flag `--help`, e.g. `openpose.bin --help`.
-// Note: This command will show you flags for several files. Check only the flags for the file you are checking. E.g. for `openpose.bin`, look for `Flags from examples/openpose/openpose.cpp:`.
+// See all the available parameter options withe the `--help` flag. E.g. `./build/examples/openpose/openpose.bin --help`.
+// Note: This command will show you flags for other unnecessary 3rdparty files. Check only the flags for the OpenPose
+// executable. E.g. for `openpose.bin`, look for `Flags from examples/openpose/openpose.cpp:`.
 // Debugging
 DEFINE_int32(logging_level,             3,              "The logging level. Integer in the range [0, 255]. 0 will output any log() message, while 255 will not output any."
                                                         " Current OpenPose library messages are in the range 0-4: 1 for low priority messages and 4 for important ones.");
@@ -28,7 +29,7 @@ DEFINE_string(image_path,               "examples/media/COCO_val2014_00000000019
 // OpenPose
 DEFINE_string(model_pose,               "COCO",         "Model to be used (e.g. COCO, MPI, MPI_4_layers).");
 DEFINE_string(model_folder,             "models/",      "Folder where the pose models (COCO and MPI) are located.");
-DEFINE_string(net_resolution,           "656x368",      "Multiples of 16.");
+DEFINE_string(net_resolution,           "656x368",      "Multiples of 16. If it is increased, the accuracy usually increases. If it is decreased, the speed increases.");
 DEFINE_string(resolution,               "1280x720",     "The image resolution (display). Use \"-1x-1\" to force the program to use the default images resolution.");
 DEFINE_int32(num_gpu_start,             0,              "GPU device start number.");
 DEFINE_double(scale_gap,                0.3,            "Scale gap between scales. No effect unless num_scales>1. Initial scale is always 1. If you want to change the initial scale, "
@@ -54,16 +55,16 @@ op::PoseModel gflagToPoseModel(const std::string& poseModeString)
 }
 
 // Google flags into program variables
-std::tuple<cv::Size, cv::Size, cv::Size, op::PoseModel> gflagsToOpParameters()
+std::tuple<op::Point<int>, op::Point<int>, op::Point<int>, op::PoseModel> gflagsToOpParameters()
 {
     op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
     // outputSize
-    cv::Size outputSize;
-    auto nRead = sscanf(FLAGS_resolution.c_str(), "%dx%d", &outputSize.width, &outputSize.height);
+    op::Point<int> outputSize;
+    auto nRead = sscanf(FLAGS_resolution.c_str(), "%dx%d", &outputSize.x, &outputSize.y);
     op::checkE(nRead, 2, "Error, resolution format (" +  FLAGS_resolution + ") invalid, should be e.g., 960x540 ", __LINE__, __FUNCTION__, __FILE__);
     // netInputSize
-    cv::Size netInputSize;
-    nRead = sscanf(FLAGS_net_resolution.c_str(), "%dx%d", &netInputSize.width, &netInputSize.height);
+    op::Point<int> netInputSize;
+    nRead = sscanf(FLAGS_net_resolution.c_str(), "%dx%d", &netInputSize.x, &netInputSize.y);
     op::checkE(nRead, 2, "Error, net resolution format (" +  FLAGS_net_resolution + ") invalid, should be e.g., 656x368 (multiples of 16)", __LINE__, __FUNCTION__, __FILE__);
     // netOutputSize
     const auto netOutputSize = netInputSize;
@@ -89,9 +90,9 @@ int openPoseTutorialPose1()
     op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.", __LINE__, __FUNCTION__, __FILE__);
     op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
     // Step 2 - Read Google flags (user defined configuration)
-    cv::Size outputSize;
-    cv::Size netInputSize;
-    cv::Size netOutputSize;
+    op::Point<int> outputSize;
+    op::Point<int> netInputSize;
+    op::Point<int> netOutputSize;
     op::PoseModel poseModel;
     std::tie(outputSize, netInputSize, netOutputSize, poseModel) = gflagsToOpParameters();
     // Step 3 - Initialize all required classes
@@ -101,7 +102,7 @@ int openPoseTutorialPose1()
                                               FLAGS_model_folder, FLAGS_num_gpu_start};
     op::PoseRenderer poseRenderer{netOutputSize, outputSize, poseModel, nullptr, (float)FLAGS_alpha_pose};
     op::OpOutputToCvMat opOutputToCvMat{outputSize};
-    const cv::Size windowedSize = outputSize;
+    const op::Point<int> windowedSize = outputSize;
     op::FrameDisplayer frameDisplayer{windowedSize, "OpenPose Tutorial - Example 1"};
     // Step 4 - Initialize resources on desired thread (in this case single thread, i.e. we init resources here)
     poseExtractorCaffe.initializationOnThread();
@@ -117,11 +118,11 @@ int openPoseTutorialPose1()
     double scaleInputToOutput;
     op::Array<float> outputArray;
     std::tie(scaleInputToOutput, outputArray) = cvMatToOpOutput.format(inputImage);
-    // Step 3 - Estimate poseKeyPoints
-    poseExtractorCaffe.forwardPass(netInputArray, inputImage.size());
-    const auto poseKeyPoints = poseExtractorCaffe.getPoseKeyPoints();
-    // Step 4 - Render poseKeyPoints
-    poseRenderer.renderPose(outputArray, poseKeyPoints);
+    // Step 3 - Estimate poseKeypoints
+    poseExtractorCaffe.forwardPass(netInputArray, {inputImage.cols, inputImage.rows});
+    const auto poseKeypoints = poseExtractorCaffe.getPoseKeypoints();
+    // Step 4 - Render poseKeypoints
+    poseRenderer.renderPose(outputArray, poseKeypoints);
     // Step 5 - OpenPose output format to cv::Mat
     auto outputImage = opOutputToCvMat.formatToCvMat(outputArray);
 

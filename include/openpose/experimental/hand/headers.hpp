@@ -1,5 +1,5 @@
-#ifndef OPENPOSE__HAND__HEADERS_HPP
-#define OPENPOSE__HAND__HEADERS_HPP
+#ifndef OPENPOSE_HAND_HEADERS_HPP
+#define OPENPOSE_HAND_HEADERS_HPP
 
 // hand module
 #include "enumClasses.hpp"
@@ -10,4 +10,4 @@
 #include "wHandExtractor.hpp"
 #include "wHandRenderer.hpp"
 
-#endif // OPENPOSE__HAND__HEADERS_HPP
+#endif // OPENPOSE_HAND_HEADERS_HPP

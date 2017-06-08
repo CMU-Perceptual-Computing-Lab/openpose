@@ -1,8 +1,8 @@
-#ifndef OPENPOSE__CORE__ARRAY_HPP
-#define OPENPOSE__CORE__ARRAY_HPP
+#ifndef OPENPOSE_CORE_ARRAY_HPP
+#define OPENPOSE_CORE_ARRAY_HPP
 
 #include <vector>
-#include <opencv2/core/core.hpp>
+#include <opencv2/core/core.hpp> // cv::Mat
 #include <boost/shared_ptr.hpp> // Note: std::shared_ptr not (fully) supported for array pointers: http://stackoverflow.com/questions/8947579/
 
 namespace op
@@ -327,6 +327,20 @@ namespace op
             return at(getIndexAndCheck(indexes));
         }
 
+        /**
+         * It returns a string with the whole array data. Useful for debugging.
+         * The format is: values separated by a space, and a enter for each dimension. E.g.:
+         * For the Array{2, 2, 3}, it will print:
+         * Array<T>::toString():
+         * x1 x2 x3
+         * x4 x5 x6
+         *
+         * x7 x8 x9
+         * x10 x11 x12
+         * @return A string with the array values in the above format.
+         */
+        const std::string toString() const;
+
     private:
         std::vector<int> mSize;
         size_t mVolume;
@@ -363,4 +377,4 @@ namespace op
     };
 }
 
-#endif // OPENPOSE__CORE__ARRAY_HPP
+#endif // OPENPOSE_CORE_ARRAY_HPP

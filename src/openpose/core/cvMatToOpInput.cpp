@@ -5,10 +5,10 @@
 
 namespace op
 {
-    CvMatToOpInput::CvMatToOpInput(const cv::Size& netInputResolution, const int scaleNumber, const float scaleGap) :
+    CvMatToOpInput::CvMatToOpInput(const Point<int>& netInputResolution, const int scaleNumber, const float scaleGap) :
         mScaleNumber{scaleNumber},
         mScaleGap{scaleGap},
-        mInputNetSize4D{{mScaleNumber, 3, netInputResolution.height, netInputResolution.width}}
+        mInputNetSize4D{{mScaleNumber, 3, netInputResolution.y, netInputResolution.x}}
     {
     }
 
@@ -33,9 +33,9 @@ namespace op
                 const auto targetWidth  = fastTruncate(16 * intRound(netInputWidth * requestedScale / 16.), 1, netInputWidth/16*16);
                 const auto netInputHeight = inputNetData.getSize(2);
                 const auto targetHeight  = fastTruncate(16 * intRound(netInputHeight * requestedScale / 16.), 1, netInputHeight/16*16);
-                const cv::Size targetSize{targetWidth, targetHeight};
-                const auto scale = resizeGetScaleFactor(cvInputData.size(), targetSize);
-                const cv::Mat frameWithNetSize = resizeFixedAspectRatio(cvInputData, scale, cv::Size{netInputWidth, netInputHeight});
+                const Point<int> targetSize{targetWidth, targetHeight};
+                const auto scale = resizeGetScaleFactor(Point<int>{cvInputData.cols, cvInputData.rows}, targetSize);
+                const cv::Mat frameWithNetSize = resizeFixedAspectRatio(cvInputData, scale, Point<int>{netInputWidth, netInputHeight});
                 uCharCvMatToFloatPtr(inputNetData.getPtr() + i * inputNetDataOffset, frameWithNetSize, true);
             }
 

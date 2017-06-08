@@ -2,11 +2,13 @@
 
 namespace op
 {
-    namespace experimental
+    WrapperStructFace::WrapperStructFace(const bool enable_, const Point<int>& netInputSize_, const bool renderOutput_, const float alphaKeypoint_,
+                          				 const float alphaHeatMap_) :
+        enable{enable_},
+        netInputSize{netInputSize_},
+        renderOutput{renderOutput_},
+        alphaKeypoint{alphaKeypoint_},
+        alphaHeatMap{alphaHeatMap_}
     {
-        WrapperStructFace::WrapperStructFace(const bool extractAndRenderFace_) :
-            extractAndRenderFace{extractAndRenderFace_}
-        {
-        }
     }
 }

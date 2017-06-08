@@ -4,7 +4,7 @@
 
 namespace op
 {
-    OpOutputToCvMat::OpOutputToCvMat(const cv::Size& outputResolution) :
+    OpOutputToCvMat::OpOutputToCvMat(const Point<int>& outputResolution) :
         mOutputResolution{outputResolution}
     {
     }

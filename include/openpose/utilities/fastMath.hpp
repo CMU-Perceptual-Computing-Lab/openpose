@@ -1,5 +1,5 @@
-#ifndef OPENPOSE__UTILITIES__MATH_HPP
-#define OPENPOSE__UTILITIES__MATH_HPP
+#ifndef OPENPOSE_UTILITIES_MATH_HPP
+#define OPENPOSE_UTILITIES_MATH_HPP
 
 namespace op
 {
@@ -83,4 +83,4 @@ namespace op
     }
 }
 
-#endif // OPENPOSE__UTILITIES__MATH_HPP
+#endif // OPENPOSE_UTILITIES_MATH_HPP

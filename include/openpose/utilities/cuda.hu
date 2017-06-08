@@ -1,5 +1,5 @@
-#ifndef OPENPOSE__UTILITIES_CUDA_HU
-#define OPENPOSE__UTILITIES_CUDA_HU
+#ifndef OPENPOSE_UTILITIES_CUDA_HU
+#define OPENPOSE_UTILITIES_CUDA_HU
 
 namespace op
 {
@@ -143,4 +143,4 @@ namespace op
     }
 }
 
-#endif // OPENPOSE__UTILITIES_CUDA_HU
+#endif // OPENPOSE_UTILITIES_CUDA_HU

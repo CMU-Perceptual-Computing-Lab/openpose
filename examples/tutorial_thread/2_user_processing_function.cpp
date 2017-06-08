@@ -10,7 +10,7 @@
 
 // 3rdpary depencencies
 #include <gflags/gflags.h> // DEFINE_bool, DEFINE_int32, DEFINE_int64, DEFINE_uint64, DEFINE_double, DEFINE_string
-#include <glog/logging.h> // google::InitGoogleLogging, CHECK, CHECK_EQ, LOG, VLOG, ...
+#include <glog/logging.h> // google::InitGoogleLogging
 // OpenPose dependencies
 #include <openpose/core/headers.hpp>
 #include <openpose/gui/headers.hpp>
@@ -18,8 +18,9 @@
 #include <openpose/thread/headers.hpp>
 #include <openpose/utilities/headers.hpp>
 
-// Gflags in the command line terminal. Check all the options by adding the flag `--help`, e.g. `openpose.bin --help`.
-// Note: This command will show you flags for several files. Check only the flags for the file you are checking. E.g. for `openpose.bin`, look for `Flags from examples/openpose/openpose.cpp:`.
+// See all the available parameter options withe the `--help` flag. E.g. `./build/examples/openpose/openpose.bin --help`.
+// Note: This command will show you flags for other unnecessary 3rdparty files. Check only the flags for the OpenPose
+// executable. E.g. for `openpose.bin`, look for `Flags from examples/openpose/openpose.cpp:`.
 // Debugging
 DEFINE_int32(logging_level,             3,              "The logging level. Integer in the range [0, 255]. 0 will output any log() message, while 255 will not output any."
                                                         " Current OpenPose library messages are in the range 0-4: 1 for low priority messages and 4 for important ones.");
@@ -89,7 +90,7 @@ op::ProducerType gflagsToProducerType(const std::string& imageDirectory, const s
         return op::ProducerType::Webcam;
 }
 
-std::shared_ptr<op::Producer> gflagsToProducer(const std::string& imageDirectory, const std::string& videoPath, const int webcamIndex, const cv::Size webcamResolution)
+std::shared_ptr<op::Producer> gflagsToProducer(const std::string& imageDirectory, const std::string& videoPath, const int webcamIndex, const op::Point<int> webcamResolution)
 {
     op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
     const auto type = gflagsToProducerType(imageDirectory, videoPath, webcamIndex);
@@ -108,16 +109,16 @@ std::shared_ptr<op::Producer> gflagsToProducer(const std::string& imageDirectory
 }
 
 // Google flags into program variables
-std::tuple<cv::Size, cv::Size, std::shared_ptr<op::Producer>> gflagsToOpParameters()
+std::tuple<op::Point<int>, op::Point<int>, std::shared_ptr<op::Producer>> gflagsToOpParameters()
 {
     op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
     // cameraFrameSize
-    cv::Size cameraFrameSize;
-    auto nRead = sscanf(FLAGS_camera_resolution.c_str(), "%dx%d", &cameraFrameSize.width, &cameraFrameSize.height);
+    op::Point<int> cameraFrameSize;
+    auto nRead = sscanf(FLAGS_camera_resolution.c_str(), "%dx%d", &cameraFrameSize.x, &cameraFrameSize.y);
     op::checkE(nRead, 2, "Error, camera resolution format (" +  FLAGS_camera_resolution + ") invalid, should be e.g., 1280x720", __LINE__, __FUNCTION__, __FILE__);
     // outputSize
-    cv::Size outputSize;
-    nRead = sscanf(FLAGS_resolution.c_str(), "%dx%d", &outputSize.width, &outputSize.height);
+    op::Point<int> outputSize;
+    nRead = sscanf(FLAGS_resolution.c_str(), "%dx%d", &outputSize.x, &outputSize.y);
     op::checkE(nRead, 2, "Error, resolution format (" +  FLAGS_resolution + ") invalid, should be e.g., 960x540 ", __LINE__, __FUNCTION__, __FILE__);
 
     // producerType
@@ -139,17 +140,17 @@ int openPoseTutorialThread2()
     op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.", __LINE__, __FUNCTION__, __FILE__);
     op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
     // Step 2 - Read Google flags (user defined configuration)
-    cv::Size cameraFrameSize;
-    cv::Size outputSize;
+    op::Point<int> cameraFrameSize;
+    op::Point<int> outputSize;
     std::shared_ptr<op::Producer> producerSharedPtr;
     std::tie(cameraFrameSize, outputSize, producerSharedPtr) = gflagsToOpParameters();
     // Step 3 - Setting producer
     auto videoSeekSharedPtr = std::make_shared<std::pair<std::atomic<bool>, std::atomic<int>>>();
     videoSeekSharedPtr->first = false;
     videoSeekSharedPtr->second = 0;
-    const cv::Size producerSize{(int)producerSharedPtr->get(CV_CAP_PROP_FRAME_WIDTH),
+    const op::Point<int> producerSize{(int)producerSharedPtr->get(CV_CAP_PROP_FRAME_WIDTH),
                                 (int)producerSharedPtr->get(CV_CAP_PROP_FRAME_HEIGHT)};
-    if (outputSize.width == -1 || outputSize.height == -1)
+    if (outputSize.x == -1 || outputSize.y == -1)
     {
         if (producerSize.area() > 0)
             outputSize = producerSize;
@@ -204,7 +205,7 @@ int openPoseTutorialThread2()
 
     // ------------------------- STARTING AND STOPPING THREADING -------------------------
     op::log("Starting thread(s)", op::Priority::Max);
-    // Two different ways of running the program on multithread enviroment
+    // Two different ways of running the program on multithread environment
         // Option a) Using the main thread (this thread) for processing (it saves 1 thread, recommended)
     threadManager.exec();  // It blocks this thread until all threads have finished
         // Option b) Giving to the user the control of this thread

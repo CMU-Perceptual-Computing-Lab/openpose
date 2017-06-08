@@ -181,6 +181,20 @@ bin\OpenPoseDemo.exe --image_dir examples/media/
 windows_project\x64\Release\OpenPoseDemo.exe --image_dir examples/media/
 ```
 
+**4. Body Pose and Face Keypoint Detector (e.g. on Video)**
+```
+# Ubuntu
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --face
+```
+```
+:: Windows - Demo
+bin\OpenPoseDemo.exe --video examples/media/video.avi --face
+```
+```
+:: Windows - Library
+windows_project\x64\Release\OpenPoseDemo.exe --video examples/media/video.avi --face
+```
+
 The visual GUI should show the original image with the poses blended on it, similarly to the pose of this gif:
 <p align="center">
     <img src="media/shake.gif", width="720">

@@ -1,9 +1,12 @@
-#ifndef OPENPOSE__CORE__DATUM_HPP
-#define OPENPOSE__CORE__DATUM_HPP
+#ifndef OPENPOSE_CORE_DATUM_HPP
+#define OPENPOSE_CORE_DATUM_HPP
 
+#include <memory> // std::shared_ptr
 #include <string> // std::string
 #include <opencv2/core/core.hpp> // cv::Mat
 #include "array.hpp"
+#include "point.hpp"
+#include "rectangle.hpp"
 
 namespace op
 {
@@ -17,7 +20,7 @@ namespace op
         // -------------------------------------------------- ID parameters -------------------------------------------------- //
         unsigned long long id; /**< Datum ID. Internally used to sort the Datums if multi-threading is used. */
 
-        std::string name;      /**< Name used when saving the data to disk (e.g. `write_images` or `write_pose` flags in the demo). */
+        std::string name;      /**< Name used when saving the data to disk (e.g. `write_images` or `write_keypoint` flags in the demo). */
 
         // -------------------------------------------------- Input image and rendered version parameters -------------------------------------------------- //
         /**
@@ -37,7 +40,7 @@ namespace op
         /**
          * Rendered image in Array<float> format.
          * It consists of a blending of the inputNetData and the pose/body part(s) heatmap/PAF(s).
-         * If rendering is disabled (e.g. `no_render_output` flag in the demo), then outputData will be empty.
+         * If rendering is disabled (e.g. `no_render_pose` flag in the demo), then outputData will be empty.
          * Size: 3 x output_net_height x output_net_width
          */
         Array<float> outputData;
@@ -57,31 +60,38 @@ namespace op
          * If outputData is empty, then cvOutputData will also be empty.
          * Size: #people x #body parts (e.g. 18 for COCO or 15 for MPI) x 3 ((x,y) coordinates + score)
          */
-        Array<float> poseKeyPoints;
+        Array<float> poseKeypoints;
 
         /**
          * Body pose heatmaps (body parts, background and/or PAFs) for the whole image.
          * This parameters is by default empty and disabled for performance. Each group (body parts, background and PAFs) can be individually enabled.
          * #heatmaps = #body parts (if enabled) + 1 (if background enabled) + 2 x #PAFs (if enabled). Each PAF has 2 consecutive channels, one for x- and one for y-coordinates.
          * Order heatmaps: body parts + background (as appears in POSE_BODY_PART_MAPPING) + (x,y) channel of each PAF (sorted as appears in POSE_BODY_PART_PAIRS). See `pose/poseParameters.hpp`.
-         * The user can choose the heatmaps normalization: ranges [0, 1], [-1, 1] or [0, 255]. Check the `heatmaps_scale_mode` flag in the examples/tutorial_wrapper/ for more details.
+         * The user can choose the heatmaps normalization: ranges [0, 1], [-1, 1] or [0, 255]. Check the `heatmaps_scale` flag in the examples/tutorial_wrapper/ for more details.
          * Size: #heatmaps x output_net_height x output_net_width
          */
         Array<float> poseHeatMaps;
 
         /**
-         * Experimental (NOT IMPLEMENTED YET)
-         * Face code is in development phase. Not included in this version.
-         * Size: #people's faces to render x #face parts (71) x 3 ((x,y) coordinates + score)
+         * Face detection locations (x,y,width,height) for each person in the image.
+         * It has been resized to the same resolution as `poseKeypoints`.
+         * Size: #people
          */
-        Array<float> faceKeyPoints;
+        std::vector<Rectangle<float>> faceRectangles;
+
+        /**
+         * Face keypoints (x,y,score) locations for each person in the image.
+         * It has been resized to the same resolution as `poseKeypoints`.
+         * Size: #people x #face parts (70) x 3 ((x,y) coordinates + score)
+         */
+        Array<float> faceKeypoints;
 
         /**
          * Experimental (NOT IMPLEMENTED YET)
          * Hands code is in development phase. Not included in this version.
          * Size: #people's hands to render x 2 (right and left hand) x #hand parts (21) x 3 ((x,y) coordinates + score)
          */
-        Array<float> handKeyPoints;
+        Array<float> handKeypoints;
 
         // -------------------------------------------------- Other parameters -------------------------------------------------- //
         double scaleInputToOutput; /**< Scale ratio between the input Datum::cvInputData and the output Datum::cvOutputData. */
@@ -209,4 +219,4 @@ namespace op
     };
 }
 
-#endif // OPENPOSE__CORE__DATUM_HPP
+#endif // OPENPOSE_CORE_DATUM_HPP

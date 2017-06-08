@@ -1,9 +1,9 @@
-#ifndef OPENPOSE__FILESTREAM__FILE_STREAM_HPP
-#define OPENPOSE__FILESTREAM__FILE_STREAM_HPP
+#ifndef OPENPOSE_FILESTREAM_FILE_STREAM_HPP
+#define OPENPOSE_FILESTREAM_FILE_STREAM_HPP
 
 #include <string>
 #include <vector>
-#include <opencv2/core/core.hpp> // cv::Mat, cv::Size
+#include <opencv2/core/core.hpp> // cv::Mat
 #include <opencv2/highgui/highgui.hpp> // CV_LOAD_IMAGE_ANYDEPTH, CV_IMWRITE_PNG_COMPRESSION
 #include <openpose/core/array.hpp>
 #include "enumClasses.hpp"
@@ -30,4 +30,4 @@ namespace op
     cv::Mat loadImage(const std::string& fullFilePath, const int openCvFlags = CV_LOAD_IMAGE_ANYDEPTH);
 }
 
-#endif // OPENPOSE__FILESTREAM__FILE_STREAM_HPP
+#endif // OPENPOSE_FILESTREAM_FILE_STREAM_HPP

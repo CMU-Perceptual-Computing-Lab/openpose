@@ -1,5 +1,5 @@
-#ifndef OPENPOSE__THREAD__W_QUEUE_ORDERER_HPP
-#define OPENPOSE__THREAD__W_QUEUE_ORDERER_HPP
+#ifndef OPENPOSE_THREAD_W_QUEUE_ORDERER_HPP
+#define OPENPOSE_THREAD_W_QUEUE_ORDERER_HPP
 
 #include <queue> // std::priority_queue
 #include <openpose/utilities/pointerContainer.hpp>
@@ -141,4 +141,4 @@ namespace op
     COMPILE_TEMPLATE_DATUM(WQueueOrderer);
 }
 
-#endif // OPENPOSE__THREAD__W_QUEUE_ORDERER_HPP
+#endif // OPENPOSE_THREAD_W_QUEUE_ORDERER_HPP

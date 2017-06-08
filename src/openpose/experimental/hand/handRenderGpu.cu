@@ -7,7 +7,7 @@
 
 namespace op
 {
-    __constant__ const unsigned char PART_PAIRS_GPU[] = HAND_PAIRS_TO_RENDER;
+    __constant__ const unsigned int PART_PAIRS_GPU[] = HAND_PAIRS_TO_RENDER;
     __constant__ const float RGB_COLORS[] = {
         179.f,    0.f,    0.f,
         204.f,    0.f,    0.f,
@@ -45,9 +45,9 @@ namespace op
         const auto globalIdx = threadIdx.y * blockDim.x + threadIdx.x;
 
         // Shared parameters
-        __shared__ float2 sharedMins[HAND_MAX_NUMBER_HANDS];
-        __shared__ float2 sharedMaxs[HAND_MAX_NUMBER_HANDS];
-        __shared__ float sharedScaleF[HAND_MAX_NUMBER_HANDS];
+        __shared__ float2 sharedMins[HAND_MAX_HANDS];
+        __shared__ float2 sharedMaxs[HAND_MAX_HANDS];
+        __shared__ float sharedScaleF[HAND_MAX_HANDS];
 
         // Other parameters
         const auto numberPartPairs = sizeof(PART_PAIRS_GPU) / (2*sizeof(PART_PAIRS_GPU[0]));
@@ -56,13 +56,13 @@ namespace op
         const auto stickwidth = fastMin(targetWidth, targetHeight) / 80.f;
 
         // Render key points
-        renderKeyPoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF,
+        renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF,
                         globalIdx, x, y, targetWidth, targetHeight, handsPtr, PART_PAIRS_GPU, numberHands,
                         HAND_NUMBER_PARTS, numberPartPairs, RGB_COLORS, numberColors,
                         radius, stickwidth, threshold, alphaColorToAdd);
     }
 
-    void renderHandsGpu(float* framePtr, const cv::Size& frameSize, const float* const handsPtr, const int numberHands, const float alphaColorToAdd)
+    void renderHandsGpu(float* framePtr, const Point<int>& frameSize, const float* const handsPtr, const int numberHands, const float alphaColorToAdd)
     {
         try
         {
@@ -72,7 +72,7 @@ namespace op
                 dim3 threadsPerBlock;
                 dim3 numBlocks;
                 std::tie(threadsPerBlock, numBlocks) = getNumberCudaThreadsAndBlocks(frameSize);
-                renderHandsParts<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.width, frameSize.height, handsPtr, numberHands, threshold, alphaColorToAdd);
+                renderHandsParts<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.x, frameSize.y, handsPtr, numberHands, threshold, alphaColorToAdd);
                 cudaCheck(__LINE__, __FUNCTION__, __FILE__);
             }
         }

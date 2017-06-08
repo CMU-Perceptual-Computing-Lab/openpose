@@ -1,5 +1,5 @@
-#ifndef OPENPOSE__HAND__W_HAND_EXTRACTOR_HPP
-#define OPENPOSE__HAND__W_HAND_EXTRACTOR_HPP
+#ifndef OPENPOSE_HAND_W_HAND_EXTRACTOR_HPP
+#define OPENPOSE_HAND_W_HAND_EXTRACTOR_HPP
 
 #include <memory> // std::shared_ptr
 #include <openpose/thread/worker.hpp>
@@ -66,8 +66,8 @@ namespace op
                     // Extract people hands
                     for (auto& tDatum : *tDatums)
                     {
-                        spHandExtractor->forwardPass(tDatum.poseKeyPoints, tDatum.cvInputData);
-                        tDatum.handKeyPoints = spHandExtractor->getHandKeyPoints();
+                        spHandExtractor->forwardPass(tDatum.poseKeypoints, tDatum.cvInputData);
+                        tDatum.handKeypoints = spHandExtractor->getHandKeypoints();
                     }
                     // Profiling speed
                     Profiler::timerEnd(profilerKey);
@@ -88,4 +88,4 @@ namespace op
     }
 }
 
-#endif // OPENPOSE__HAND__W_HAND_EXTRACTOR_HPP
+#endif // OPENPOSE_HAND_W_HAND_EXTRACTOR_HPP

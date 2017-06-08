@@ -46,9 +46,9 @@ namespace op
         }
     }
 
-    GuiInfoAdder::GuiInfoAdder(const cv::Size& outputSize, const int numberGpus, const bool guiEnabled) :
+    GuiInfoAdder::GuiInfoAdder(const Point<int>& outputSize, const int numberGpus, const bool guiEnabled) :
         mOutputSize{outputSize},
-        mBorderMargin{intRound(fastMax(mOutputSize.width, mOutputSize.height) * 0.025)},
+        mBorderMargin{intRound(fastMax(mOutputSize.x, mOutputSize.y) * 0.025)},
         mNumberGpus{numberGpus},
         mGuiEnabled{guiEnabled},
         mFpsCounter{0u},
@@ -57,7 +57,7 @@ namespace op
     {
     }
 
-    void GuiInfoAdder::addInfo(cv::Mat& cvOutputData, const Array<float>& poseKeyPoints, const unsigned long long id, const std::string& elementRenderedName)
+    void GuiInfoAdder::addInfo(cv::Mat& cvOutputData, const Array<float>& poseKeypoints, const unsigned long long id, const std::string& elementRenderedName)
     {
         try
         {
@@ -90,12 +90,12 @@ namespace op
             // Display element to display or help
             std::string message = (!mLastElementRenderedName.empty() ? mLastElementRenderedName : (mGuiEnabled ? "'h' for help" : ""));
             if (!message.empty())
-                putTextOnCvMat(cvOutputData, message, {intRound(mOutputSize.width - mBorderMargin), mBorderMargin}, white, true);
+                putTextOnCvMat(cvOutputData, message, {intRound(mOutputSize.x - mBorderMargin), mBorderMargin}, white, true);
             // Frame number
-            putTextOnCvMat(cvOutputData, "Frame " + std::to_string(id), {mBorderMargin, (int)(mOutputSize.height - mBorderMargin)}, white, false);
+            putTextOnCvMat(cvOutputData, "Frame " + std::to_string(id), {mBorderMargin, (int)(mOutputSize.y - mBorderMargin)}, white, false);
             // Number people
-            const auto textToDisplay = std::to_string(poseKeyPoints.getSize(0)) + " people";
-            putTextOnCvMat(cvOutputData, textToDisplay, {(int)(mOutputSize.width - mBorderMargin), (int)(mOutputSize.height - mBorderMargin)}, white, true);
+            const auto textToDisplay = std::to_string(poseKeypoints.getSize(0)) + " people";
+            putTextOnCvMat(cvOutputData, textToDisplay, {(int)(mOutputSize.x - mBorderMargin), (int)(mOutputSize.y - mBorderMargin)}, white, true);
         }
         catch (const std::exception& e)
         {

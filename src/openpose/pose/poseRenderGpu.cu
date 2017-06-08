@@ -10,8 +10,8 @@ namespace op
 {
 	// PI digits: http://www.piday.org/million/
 	__constant__ const float PI = 3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745f;
-    __constant__ const unsigned char COCO_PAIRS_GPU[] = POSE_COCO_PAIRS_TO_RENDER;
-    __constant__ const unsigned char MPI_PAIRS_GPU[] = POSE_MPI_PAIRS_TO_RENDER;
+    __constant__ const unsigned int COCO_PAIRS_GPU[] = POSE_COCO_PAIRS_TO_RENDER;
+    __constant__ const unsigned int MPI_PAIRS_GPU[] = POSE_MPI_PAIRS_TO_RENDER;
     __constant__ const float COCO_RGB_COLORS[] = {
         255.f,     0.f,     0.f,
         255.f,    85.f,     0.f,
@@ -168,7 +168,7 @@ namespace op
         const auto stickwidth = fastMin(targetWidth, targetHeight) / 120.f;
 
         // Render key points
-        renderKeyPoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF,
+        renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF,
                         globalIdx, x, y, targetWidth, targetHeight, posePtr, COCO_PAIRS_GPU, numberPeople,
                         POSE_COCO_NUMBER_PARTS, numberPartPairs, COCO_RGB_COLORS, numberColors,
                         radius, stickwidth, threshold, alphaColorToAdd, blendOriginalFrame, (googlyEyes ? 14 : -1), (googlyEyes ? 15 : -1));
@@ -193,7 +193,7 @@ namespace op
         const auto stickwidth = fastMin(targetWidth, targetHeight) / 120.f;
 
         // Render key points
-        renderKeyPoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF,
+        renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF,
                         globalIdx, x, y, targetWidth, targetHeight, posePtr, MPI_PAIRS_GPU, numberPeople,
                         POSE_MPI_NUMBER_PARTS, numberPartPairs, MPI_RGB_COLORS, numberColors,
                         radius, stickwidth, threshold, alphaColorToAdd, blendOriginalFrame);
@@ -215,7 +215,7 @@ namespace op
             const auto xHeatMap = fastTruncate(int(xSource + 1e-5), 0, widthHeatMap);
             const auto yHeatMap = fastTruncate(int(ySource + 1e-5), 0, heightHeatMap);
             const auto heatMapArea = widthHeatMap * heightHeatMap;
-            for (unsigned char part = 0 ; part < numberBodyParts ; part++)
+            for (auto part = 0u ; part < numberBodyParts ; part++)
             {
                 const auto offsetOrigin = part * heatMapArea;
                 const auto value = __saturatef(heatMapPtr[offsetOrigin + yHeatMap*widthHeatMap + xHeatMap]); // __saturatef = trucate to [0,1]
@@ -340,21 +340,21 @@ namespace op
         }
     }
 
-    inline void renderKeyPointsPartAffinityAux(float* framePtr, const PoseModel poseModel, const cv::Size& frameSize,
-                                               const float* const heatMapPtr, const cv::Size& heatMapSize, const float scaleToKeepRatio,
+    inline void renderKeypointsPartAffinityAux(float* framePtr, const PoseModel poseModel, const Point<int>& frameSize,
+                                               const float* const heatMapPtr, const Point<int>& heatMapSize, const float scaleToKeepRatio,
                                                const int part, const int partsToRender, const float alphaBlending)
     {
         try
         {
             //framePtr      =   width * height * 3
-            //heatMapPtr    =   heatMapSize.width * heatMapSize.height * #body parts
+            //heatMapPtr    =   heatMapSize.x * heatMapSize.y * #body parts
             checkAlpha(alphaBlending);
             const auto heatMapOffset = POSE_NUMBER_BODY_PARTS[(int)poseModel] * heatMapSize.area();
             dim3 threadsPerBlock;
             dim3 numBlocks;
             std::tie(threadsPerBlock, numBlocks) = getNumberCudaThreadsAndBlocks(frameSize);
-            renderPartAffinities<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.width, frameSize.height, heatMapPtr, heatMapSize.width,
-                                                                 heatMapSize.height, scaleToKeepRatio, partsToRender, part, alphaBlending);
+            renderPartAffinities<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.x, frameSize.y, heatMapPtr, heatMapSize.x,
+                                                                 heatMapSize.y, scaleToKeepRatio, partsToRender, part, alphaBlending);
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
         }
         catch (const std::exception& e)
@@ -363,7 +363,7 @@ namespace op
         }
     }
 
-    void renderPoseGpu(float* framePtr, const PoseModel poseModel, const int numberPeople, const cv::Size& frameSize, const float* const posePtr,
+    void renderPoseGpu(float* framePtr, const PoseModel poseModel, const int numberPeople, const Point<int>& frameSize, const float* const posePtr,
                        const bool googlyEyes, const bool blendOriginalFrame, const float alphaBlending)
     {
         try
@@ -371,8 +371,8 @@ namespace op
             if (numberPeople > 0 || !blendOriginalFrame)
             {
                 //framePtr      =   width * height * 3
-                //heatMapPtr    =   heatMapSize.width * heatMapSize.height * #body parts
-                //posePtr =   3 (x,y,score) * #Body parts * numberPeople
+                //heatMapPtr    =   heatMapSize.x * heatMapSize.y * #body parts
+                //posePtr       =   3 (x,y,score) * #Body parts * numberPeople
                 if (googlyEyes && poseModel != PoseModel::COCO_18)
                     error("Bool googlyEyes only compatible with PoseModel::COCO_18.", __LINE__, __FUNCTION__, __FILE__);
 
@@ -382,10 +382,10 @@ namespace op
                 const auto threshold = getThresholdForPose(poseModel);
 
                 if (poseModel == PoseModel::COCO_18)
-                    renderPoseCoco<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.width, frameSize.height, posePtr, numberPeople, 
+                    renderPoseCoco<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, 
                                                                    threshold, googlyEyes, blendOriginalFrame, alphaBlending);
                 else if (poseModel == PoseModel::MPI_15 || poseModel == PoseModel::MPI_15_4)
-                    renderPoseMpi29Parts<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.width, frameSize.height, posePtr,
+                    renderPoseMpi29Parts<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.x, frameSize.y, posePtr,
                                                                          numberPeople, threshold, blendOriginalFrame, alphaBlending);
                 else
                     error("Unvalid Model.", __LINE__, __FUNCTION__, __FILE__);
@@ -398,13 +398,13 @@ namespace op
         }
     }
 
-    void renderBodyPartGpu(float* framePtr, const PoseModel poseModel, const cv::Size& frameSize, const float* const heatMapPtr,
-                           const cv::Size& heatMapSize, const float scaleToKeepRatio, const int part, const float alphaBlending)
+    void renderBodyPartGpu(float* framePtr, const PoseModel poseModel, const Point<int>& frameSize, const float* const heatMapPtr,
+                           const Point<int>& heatMapSize, const float scaleToKeepRatio, const int part, const float alphaBlending)
     {
         try
         {
             //framePtr      =   width * height * 3
-            //heatMapPtr    =   heatMapSize.width * heatMapSize.height * #body parts
+            //heatMapPtr    =   heatMapSize.x * heatMapSize.y * #body parts
             checkAlpha(alphaBlending);
             dim3 threadsPerBlock;
             dim3 numBlocks;
@@ -412,8 +412,8 @@ namespace op
             const auto numberBodyParts = POSE_NUMBER_BODY_PARTS[(int)poseModel];
             const auto heatMapOffset = numberBodyParts * heatMapSize.area();
 
-            renderBodyPartHeatMap<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.width, frameSize.height, heatMapPtr, heatMapSize.width,
-                                                                  heatMapSize.height, scaleToKeepRatio, part-1, numberBodyParts, alphaBlending);
+            renderBodyPartHeatMap<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.x, frameSize.y, heatMapPtr, heatMapSize.x,
+                                                                  heatMapSize.y, scaleToKeepRatio, part-1, numberBodyParts, alphaBlending);
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
         }
         catch (const std::exception& e)
@@ -422,13 +422,13 @@ namespace op
         }
     }
 
-    void renderBodyPartsGpu(float* framePtr, const PoseModel poseModel, const cv::Size& frameSize, const float* const heatMapPtr,
-                            const cv::Size& heatMapSize, const float scaleToKeepRatio, const float alphaBlending)
+    void renderBodyPartsGpu(float* framePtr, const PoseModel poseModel, const Point<int>& frameSize, const float* const heatMapPtr,
+                            const Point<int>& heatMapSize, const float scaleToKeepRatio, const float alphaBlending)
     {
         try
         {
             //framePtr      =   width * height * 3
-            //heatMapPtr    =   heatMapSize.width * heatMapSize.height * #body parts
+            //heatMapPtr    =   heatMapSize.x * heatMapSize.y * #body parts
             checkAlpha(alphaBlending);
             dim3 threadsPerBlock;
             dim3 numBlocks;
@@ -436,7 +436,7 @@ namespace op
             const auto numberBodyParts = POSE_NUMBER_BODY_PARTS[(int)poseModel];
             const auto heatMapOffset = numberBodyParts * heatMapSize.area();
 
-            renderBodyPartHeatMaps<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.width, frameSize.height, heatMapPtr, heatMapSize.width, heatMapSize.height,
+            renderBodyPartHeatMaps<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.x, frameSize.y, heatMapPtr, heatMapSize.x, heatMapSize.y,
                                                                    scaleToKeepRatio, numberBodyParts, alphaBlending);
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
         }
@@ -446,12 +446,12 @@ namespace op
         }
     }
 
-    void renderPartAffinityFieldGpu(float* framePtr, const PoseModel poseModel, const cv::Size& frameSize, const float* const heatMapPtr,
-                                    const cv::Size& heatMapSize, const float scaleToKeepRatio, const int part, const float alphaBlending)
+    void renderPartAffinityFieldGpu(float* framePtr, const PoseModel poseModel, const Point<int>& frameSize, const float* const heatMapPtr,
+                                    const Point<int>& heatMapSize, const float scaleToKeepRatio, const int part, const float alphaBlending)
     {
         try
         {
-            renderKeyPointsPartAffinityAux(framePtr, poseModel, frameSize, heatMapPtr, heatMapSize, scaleToKeepRatio, part, 1, alphaBlending);
+            renderKeypointsPartAffinityAux(framePtr, poseModel, frameSize, heatMapPtr, heatMapSize, scaleToKeepRatio, part, 1, alphaBlending);
         }
         catch (const std::exception& e)
         {
@@ -459,13 +459,13 @@ namespace op
         }
     }
 
-    void renderPartAffinityFieldsGpu(float* framePtr, const PoseModel poseModel, const cv::Size& frameSize, const float* const heatMapPtr,
-                                     const cv::Size& heatMapSize, const float scaleToKeepRatio, const float alphaBlending)
+    void renderPartAffinityFieldsGpu(float* framePtr, const PoseModel poseModel, const Point<int>& frameSize, const float* const heatMapPtr,
+                                     const Point<int>& heatMapSize, const float scaleToKeepRatio, const float alphaBlending)
     {
         try
         {
             const auto numberBodyPartPairs = (int)POSE_BODY_PART_PAIRS[(int)poseModel].size()/2;
-            renderKeyPointsPartAffinityAux(framePtr, poseModel, frameSize, heatMapPtr, heatMapSize, scaleToKeepRatio, POSE_NUMBER_BODY_PARTS[(int)poseModel]+1,
+            renderKeypointsPartAffinityAux(framePtr, poseModel, frameSize, heatMapPtr, heatMapSize, scaleToKeepRatio, POSE_NUMBER_BODY_PARTS[(int)poseModel]+1,
                                            numberBodyPartPairs, alphaBlending);
         }
         catch (const std::exception& e)

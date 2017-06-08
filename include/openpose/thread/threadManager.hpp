@@ -1,5 +1,5 @@
-#ifndef OPENPOSE__THREAD__THREAD_MANAGER_HPP
-#define OPENPOSE__THREAD__THREAD_MANAGER_HPP
+#ifndef OPENPOSE_THREAD_THREAD_MANAGER_HPP
+#define OPENPOSE_THREAD_THREAD_MANAGER_HPP
 
 #include <atomic>
 #include <memory> // std::unique_ptr<> & std::shared_ptr<>
@@ -505,4 +505,4 @@ namespace op
     COMPILE_TEMPLATE_DATUM(ThreadManager);
 }
 
-#endif // OPENPOSE__THREAD__THREAD_MANAGER_HPP
+#endif // OPENPOSE_THREAD_THREAD_MANAGER_HPP

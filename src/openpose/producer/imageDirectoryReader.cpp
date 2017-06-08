@@ -49,7 +49,7 @@ namespace op
             // Check frame integrity. This function also checks width/height changes. However, if it is performed after setWidth/setHeight this is performed over the new resolution (so they always match).
             checkFrameIntegrity(frame);
             // Update size, since images might have different size between each one of them
-            mResolution = {frame.size()};
+            mResolution = Point<int>{frame.cols, frame.rows};
             return frame;
         }
         catch (const std::exception& e)
@@ -66,16 +66,16 @@ namespace op
             if (capProperty == CV_CAP_PROP_FRAME_WIDTH)
             {
                 if (get(ProducerProperty::Rotation) == 0. || get(ProducerProperty::Rotation) == 180.)
-                    return mResolution.width;
+                    return mResolution.x;
                 else
-                    return mResolution.height;
+                    return mResolution.y;
             }
             else if (capProperty == CV_CAP_PROP_FRAME_HEIGHT)
             {
                 if (get(ProducerProperty::Rotation) == 0. || get(ProducerProperty::Rotation) == 180.)
-                    return mResolution.height;
+                    return mResolution.y;
                 else
-                    return mResolution.width;
+                    return mResolution.x;
             }
             else if (capProperty == CV_CAP_PROP_POS_FRAMES)
                 return (double)mFrameNameCounter;
@@ -101,9 +101,9 @@ namespace op
         try
         {
             if (capProperty == CV_CAP_PROP_FRAME_WIDTH)
-                mResolution.width = {(int)value};
+                mResolution.x = {(int)value};
             else if (capProperty == CV_CAP_PROP_FRAME_HEIGHT)
-                mResolution.height = {(int)value};
+                mResolution.y = {(int)value};
             else if (capProperty == CV_CAP_PROP_POS_FRAMES)
                 mFrameNameCounter = fastTruncate((long long)value, 0ll, (long long)mImageDirectoryPath.size()-1);
             else if (capProperty == CV_CAP_PROP_FRAME_COUNT || capProperty == CV_CAP_PROP_FPS)

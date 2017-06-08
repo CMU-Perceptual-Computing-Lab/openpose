@@ -1,5 +1,5 @@
-#ifndef OPENPOSE__POSE__HEADERS_HPP
-#define OPENPOSE__POSE__HEADERS_HPP
+#ifndef OPENPOSE_POSE_HEADERS_HPP
+#define OPENPOSE_POSE_HEADERS_HPP
 
 // pose module
 #include "bodyPartConnectorBase.hpp"
@@ -13,4 +13,4 @@
 #include "wPoseExtractor.hpp"
 #include "wPoseRenderer.hpp"
 
-#endif // OPENPOSE__POSE__HEADERS_HPP
+#endif // OPENPOSE_POSE_HEADERS_HPP

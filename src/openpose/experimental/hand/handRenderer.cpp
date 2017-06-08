@@ -10,8 +10,8 @@ namespace op
 {
     namespace experimental
     {
-        HandRenderer::HandRenderer(const cv::Size& frameSize) :
-            Renderer{(unsigned long long)(frameSize.area() * 3)},
+        HandRenderer::HandRenderer(const Point<int>& frameSize) :
+            Renderer{(unsigned long long)(frameSize.area() * 3), HAND_DEFAULT_ALPHA_KEYPOINT, HAND_DEFAULT_ALPHA_HEAT_MAP},
             mFrameSize{frameSize}
         {
         }
@@ -34,7 +34,7 @@ namespace op
             try
             {
                 Renderer::initializationOnThread();
-                cudaMalloc((void**)(&pGpuHands), 2*HAND_NUMBER_PARTS * 3 * sizeof(float) );
+                cudaMalloc((void**)(&pGpuHands), 2*HAND_NUMBER_PARTS * 3 * sizeof(float));
             }
             catch (const std::exception& e)
             {
@@ -42,15 +42,20 @@ namespace op
             }
         }
 
-        void HandRenderer::renderHands(Array<float>& outputData, const Array<float>& handKeyPoints)
+        void HandRenderer::renderHands(Array<float>& outputData, const Array<float>& handKeypoints)
         {
             try
             {
-                if (!handKeyPoints.empty())
+                const auto elementRendered = spElementToRender->load(); // I prefer std::round(T&) over intRound(T) for std::atomic
+                const auto numberPeople = handKeypoints.getSize(0);
+                // GPU rendering
+                if (numberPeople > 0 && elementRendered == 0)
                 {
                     cpuToGpuMemoryIfNotCopiedYet(outputData.getPtr());
-                    cudaMemcpy(pGpuHands, handKeyPoints.getConstPtr(), 2*HAND_NUMBER_PARTS*3 * sizeof(float), cudaMemcpyHostToDevice);
-                    renderHandsGpu(*spGpuMemoryPtr, mFrameSize, pGpuHands, handKeyPoints.getSize(0));
+                    // Draw faceKeypoints
+                    cudaMemcpy(pGpuHands, handKeypoints.getConstPtr(), 2*HAND_NUMBER_PARTS*3 * sizeof(float), cudaMemcpyHostToDevice);
+                    renderHandsGpu(*spGpuMemoryPtr, mFrameSize, pGpuHands, handKeypoints.getSize(0));
+                    // CUDA check
                     cudaCheck(__LINE__, __FUNCTION__, __FILE__);
                 }
                 // GPU memory to CPU if last renderer

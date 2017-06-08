@@ -1,8 +1,9 @@
-#ifndef OPENPOSE__PRODUCER__IMAGE_DIRECTORY_READER_HPP
-#define OPENPOSE__PRODUCER__IMAGE_DIRECTORY_READER_HPP
+#ifndef OPENPOSE_PRODUCER_IMAGE_DIRECTORY_READER_HPP
+#define OPENPOSE_PRODUCER_IMAGE_DIRECTORY_READER_HPP
 
 #include <string>
 #include <vector>
+#include <openpose/core/point.hpp>
 #include "producer.hpp"
 
 namespace op
@@ -51,7 +52,7 @@ namespace op
     private:
         const std::string mImageDirectoryPath;
         const std::vector<std::string> mFilePaths;
-        cv::Size mResolution;
+        Point<int> mResolution;
         long long mFrameNameCounter;
 
         cv::Mat getRawFrame();
@@ -60,4 +61,4 @@ namespace op
     };
 }
 
-#endif // OPENPOSE__PRODUCER__IMAGE_DIRECTORY_READER_HPP
+#endif // OPENPOSE_PRODUCER_IMAGE_DIRECTORY_READER_HPP

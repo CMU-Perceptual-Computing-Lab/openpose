@@ -1,5 +1,5 @@
-#ifndef OPENPOSE__GUI__W_ADD_GUI_INFO_HPP
-#define OPENPOSE__GUI__W_ADD_GUI_INFO_HPP
+#ifndef OPENPOSE_GUI_W_ADD_GUI_INFO_HPP
+#define OPENPOSE_GUI_W_ADD_GUI_INFO_HPP
 
 #include "guiInfoAdder.hpp"
 #include <openpose/thread/worker.hpp>
@@ -58,7 +58,7 @@ namespace op
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                 // Add GUI components to frame
                 for (auto& tDatum : *tDatums)
-                    spGuiInfoAdder->addInfo(tDatum.cvOutputData, tDatum.poseKeyPoints, tDatum.id, tDatum.elementRendered.second);
+                    spGuiInfoAdder->addInfo(tDatum.cvOutputData, tDatum.poseKeypoints, tDatum.id, tDatum.elementRendered.second);
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
                 Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__, Profiler::DEFAULT_X);
@@ -77,4 +77,4 @@ namespace op
     COMPILE_TEMPLATE_DATUM(WGuiInfoAdder);
 }
 
-#endif // OPENPOSE__GUI__W_ADD_GUI_INFO_HPP
+#endif // OPENPOSE_GUI_W_ADD_GUI_INFO_HPP

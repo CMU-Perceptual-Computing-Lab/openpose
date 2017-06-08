@@ -1,5 +1,5 @@
-#ifndef OPENPOSE__UTILITIES__CHECK_HPP
-#define OPENPOSE__UTILITIES__CHECK_HPP
+#ifndef OPENPOSE_UTILITIES_CHECK_HPP
+#define OPENPOSE_UTILITIES_CHECK_HPP
 
 #include <string>
 #include "errorAndLog.hpp"
@@ -57,4 +57,4 @@ namespace op
     }
 }
 
-#endif // OPENPOSE__UTILITIES__CHECK_HPP
+#endif // OPENPOSE_UTILITIES_CHECK_HPP

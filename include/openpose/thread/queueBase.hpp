@@ -1,5 +1,5 @@
-#ifndef OPENPOSE__THREAD__QUEUE_BASE_HPP
-#define OPENPOSE__THREAD__QUEUE_BASE_HPP
+#ifndef OPENPOSE_THREAD_QUEUE_BASE_HPP
+#define OPENPOSE_THREAD_QUEUE_BASE_HPP
 
 #include <queue> // std::queue & std::priority_queue
 #include <condition_variable>
@@ -505,4 +505,4 @@ namespace op
     extern template class QueueBase<DATUM_BASE, std::priority_queue<DATUM_BASE, std::vector<DATUM_BASE>, std::greater<DATUM_BASE>>>;
 }
 
-#endif // OPENPOSE__THREAD__QUEUE_BASE_HPP
+#endif // OPENPOSE_THREAD_QUEUE_BASE_HPP

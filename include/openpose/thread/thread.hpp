@@ -1,5 +1,5 @@
-#ifndef OPENPOSE__THREAD__THREAD_HPP
-#define OPENPOSE__THREAD__THREAD_HPP
+#ifndef OPENPOSE_THREAD_THREAD_HPP
+#define OPENPOSE_THREAD_THREAD_HPP
 
 #include <atomic>
 #include <memory>   // std::shared_ptr
@@ -237,4 +237,4 @@ namespace op
     COMPILE_TEMPLATE_DATUM(Thread);
 }
 
-#endif // OPENPOSE__THREAD__THREAD_HPP
+#endif // OPENPOSE_THREAD_THREAD_HPP

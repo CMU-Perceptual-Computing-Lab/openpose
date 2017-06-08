@@ -10,11 +10,11 @@
 
 namespace op
 {
-    PoseExtractorCaffe::PoseExtractorCaffe(const cv::Size& netInputSize, const cv::Size& netOutputSize, const cv::Size& outputSize, const int scaleNumber,
+    PoseExtractorCaffe::PoseExtractorCaffe(const Point<int>& netInputSize, const Point<int>& netOutputSize, const Point<int>& outputSize, const int scaleNumber,
                                            const float scaleGap, const PoseModel poseModel, const std::string& modelFolder, const int gpuId, const std::vector<HeatMapType>& heatMapTypes,
-                                           const ScaleMode heatMapScaleMode) :
-        PoseExtractor{netOutputSize, outputSize, poseModel, heatMapTypes, heatMapScaleMode},
-        spNet{std::make_shared<NetCaffe>(std::array<int,4>{scaleNumber, 3, (int)netInputSize.height, (int)netInputSize.width},
+                                           const ScaleMode heatMapScale) :
+        PoseExtractor{netOutputSize, outputSize, poseModel, heatMapTypes, heatMapScale},
+        spNet{std::make_shared<NetCaffe>(std::array<int,4>{scaleNumber, 3, (int)netInputSize.y, (int)netInputSize.x},
                                          modelFolder + POSE_PROTOTXT[(int)poseModel], modelFolder + POSE_TRAINED_MODEL[(int)poseModel], gpuId)},
         spResizeAndMergeCaffe{std::make_shared<ResizeAndMergeCaffe<float>>()},
         spNmsCaffe{std::make_shared<NmsCaffe<float>>()},
@@ -70,7 +70,7 @@ namespace op
         }
     }
 
-    void PoseExtractorCaffe::forwardPass(const Array<float>& inputNetData, const cv::Size& inputDataSize)
+    void PoseExtractorCaffe::forwardPass(const Array<float>& inputNetData, const Point<int>& inputDataSize)
     {
         try
         {
@@ -100,7 +100,7 @@ namespace op
 
             // Get scale net to output
             const auto scaleProducerToNetInput = resizeGetScaleFactor(inputDataSize, mNetOutputSize);
-            const cv::Size netSize{intRound(scaleProducerToNetInput*inputDataSize.width), intRound(scaleProducerToNetInput*inputDataSize.height)};
+            const Point<int> netSize{intRound(scaleProducerToNetInput*inputDataSize.x), intRound(scaleProducerToNetInput*inputDataSize.y)};
             mScaleNetToOutput = {(float)resizeGetScaleFactor(netSize, mOutputSize)};
 
             // 4. Connecting body parts
@@ -111,8 +111,8 @@ namespace op
             spBodyPartConnectorCaffe->setMinSubsetScore((float)get(PoseProperty::ConnectMinSubsetScore));
 
             // GPU version not implemented yet
-            spBodyPartConnectorCaffe->Forward_cpu({spHeatMapsBlob.get(), spPeaksBlob.get()}, mPoseKeyPoints);
-            // spBodyPartConnectorCaffe->Forward_gpu({spHeatMapsBlob.get(), spPeaksBlob.get()}, {spPoseBlob.get()}, mPoseKeyPoints);
+            spBodyPartConnectorCaffe->Forward_cpu({spHeatMapsBlob.get(), spPeaksBlob.get()}, mPoseKeypoints);
+            // spBodyPartConnectorCaffe->Forward_gpu({spHeatMapsBlob.get(), spPeaksBlob.get()}, {spPoseBlob.get()}, mPoseKeypoints);
         }
         catch (const std::exception& e)
         {

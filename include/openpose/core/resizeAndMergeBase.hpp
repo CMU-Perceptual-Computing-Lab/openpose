@@ -1,5 +1,5 @@
-#ifndef OPENPOSE__CORE__RESIZE_AND_MERGE_BASE_HPP
-#define OPENPOSE__CORE__RESIZE_AND_MERGE_BASE_HPP
+#ifndef OPENPOSE_CORE_RESIZE_AND_MERGE_BASE_HPP
+#define OPENPOSE_CORE_RESIZE_AND_MERGE_BASE_HPP
 
 #include <array>
 
@@ -12,4 +12,4 @@ namespace op
     void resizeAndMergeGpu(T* targetPtr, const T* const sourcePtr, const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize, const T scaleGap = 0.f);
 }
 
-#endif // OPENPOSE__CORE__RESIZE_AND_MERGE_BASE_HPP
+#endif // OPENPOSE_CORE_RESIZE_AND_MERGE_BASE_HPP

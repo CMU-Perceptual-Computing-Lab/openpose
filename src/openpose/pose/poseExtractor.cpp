@@ -7,6 +7,78 @@
 
 namespace op
 {
+    // In case I wanna order the pose keypoints by area
+    // inline int getPersonArea(const float* posePtr, const int numberBodyParts, const float threshold)
+    // {
+    //     try
+    //     {
+    //         if (numberBodyParts < 1)
+    //             error("Number body parts must be > 0", __LINE__, __FUNCTION__, __FILE__);
+
+    //         unsigned int minX = -1;
+    //         unsigned int maxX = 0u;
+    //         unsigned int minY = -1;
+    //         unsigned int maxY = 0u;
+    //         for (auto part = 0 ; part < numberBodyParts ; part++)
+    //         {
+    //             const auto score = posePtr[3*part + 2];
+    //             if (score > threshold)
+    //             {
+    //                 const auto x = posePtr[3*part];
+    //                 const auto y = posePtr[3*part + 1];
+    //                 // Set X
+    //                 if (maxX < x)
+    //                     maxX = x;
+    //                 if (minX > x)
+    //                     minX = x;
+    //                 // Set Y
+    //                 if (maxY < y)
+    //                     maxY = y;
+    //                 if (minY > y)
+    //                     minY = y;
+    //             }
+    //         }
+    //         return (maxX - minX) * (maxY - minY);
+    //     }
+    //     catch (const std::exception& e)
+    //     {
+    //         error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+    //         return 0;
+    //     }
+    // }
+
+    // inline int getPersonWithMaxArea(const Array<float>& poseKeypoints, const float threshold)
+    // {
+    //     try
+    //     {
+    //         if (!poseKeypoints.empty())
+    //         {
+    //             const auto numberPeople = poseKeypoints.getSize(0);
+    //             const auto numberBodyParts = poseKeypoints.getSize(1);
+    //             const auto area = numberBodyParts * poseKeypoints.getSize(2);
+    //             auto biggestPoseIndex = -1;
+    //             auto biggestArea = -1;
+    //             for (auto person = 0 ; person < numberPeople ; person++)
+    //             {
+    //                 const auto newPersonArea = getPersonArea(&poseKeypoints[person*area], numberBodyParts, threshold);
+    //                 if (newPersonArea > biggestArea)
+    //                 {
+    //                     biggestArea = newPersonArea;
+    //                     biggestPoseIndex = person;
+    //                 }
+    //             }
+    //             return biggestPoseIndex;
+    //         }
+    //         else
+    //             return -1;
+    //     }
+    //     catch (const std::exception& e)
+    //     {
+    //         error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+    //         return -1;
+    //     }
+    // }
+
     bool heatMapTypesHas(const std::vector<HeatMapType>& heatMapTypes, const HeatMapType heatMapType)
     {
         try
@@ -43,19 +115,19 @@ namespace op
         }
     }
 
-    PoseExtractor::PoseExtractor(const cv::Size& netOutputSize, const cv::Size& outputSize, const PoseModel poseModel, const std::vector<HeatMapType>& heatMapTypes,
-                                 const ScaleMode heatMapScaleMode) :
+    PoseExtractor::PoseExtractor(const Point<int>& netOutputSize, const Point<int>& outputSize, const PoseModel poseModel, const std::vector<HeatMapType>& heatMapTypes,
+                                 const ScaleMode heatMapScale) :
         mPoseModel{poseModel},
         mNetOutputSize{netOutputSize},
         mOutputSize{outputSize},
         mHeatMapTypes{heatMapTypes},
-        mHeatMapScaleMode{heatMapScaleMode}
+        mHeatMapScaleMode{heatMapScale}
     {
         try
         {
             // Error check
             if (mHeatMapScaleMode != ScaleMode::ZeroToOne && mHeatMapScaleMode != ScaleMode::PlusMinusOne && mHeatMapScaleMode != ScaleMode::UnsignedChar)
-                error("The ScaleMode heatMapScaleMode must be ZeroToOne, PlusMinusOne or UnsignedChar.", __LINE__, __FUNCTION__, __FILE__);
+                error("The ScaleMode heatMapScale must be ZeroToOne, PlusMinusOne or UnsignedChar.", __LINE__, __FUNCTION__, __FILE__);
 
             // Properties
             for (auto& property : mProperties)
@@ -95,7 +167,7 @@ namespace op
             {
                 // Allocate memory
                 const auto numberHeatMapChannels = getNumberHeatMapChannels(mHeatMapTypes, mPoseModel);
-                poseHeatMaps.reset({numberHeatMapChannels, mNetOutputSize.height, mNetOutputSize.width});
+                poseHeatMaps.reset({numberHeatMapChannels, mNetOutputSize.y, mNetOutputSize.x});
 
                 // Copy memory
                 const auto channelOffset = poseHeatMaps.getVolume(1, 2);
@@ -167,12 +239,12 @@ namespace op
         }
     }
 
-    Array<float> PoseExtractor::getPoseKeyPoints() const
+    Array<float> PoseExtractor::getPoseKeypoints() const
     {
         try
         {
             checkThread();
-            return mPoseKeyPoints;
+            return mPoseKeypoints;
         }
         catch (const std::exception& e)
         {

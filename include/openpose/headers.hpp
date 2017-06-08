@@ -1,11 +1,14 @@
-#ifndef OPENPOSE__HEADERS_HPP
-#define OPENPOSE__HEADERS_HPP
+#ifndef OPENPOSE_HEADERS_HPP
+#define OPENPOSE_HEADERS_HPP
 
 // core module
 #include "core/headers.hpp"
 
 // experimental module
 #include "experimental/headers.hpp"
+
+// face module
+#include "face/headers.hpp"
 
 // filestream module
 #include "filestream/headers.hpp"
@@ -28,4 +31,4 @@
 // wrapper module
 #include "wrapper/headers.hpp"
 
-#endif // OPENPOSE__HEADERS_HPP
+#endif // OPENPOSE_HEADERS_HPP

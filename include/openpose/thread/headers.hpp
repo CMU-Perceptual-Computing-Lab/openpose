@@ -1,5 +1,5 @@
-#ifndef OPENPOSE__THREAD__HEADERS_HPP
-#define OPENPOSE__THREAD__HEADERS_HPP
+#ifndef OPENPOSE_THREAD_HEADERS_HPP
+#define OPENPOSE_THREAD_HEADERS_HPP
 
 // thread module
 #include "enumClasses.hpp"
@@ -19,4 +19,4 @@
 #include "wIdGenerator.hpp"
 #include "wQueueOrderer.hpp"
 
-#endif // OPENPOSE__THREAD__HEADERS_HPP
+#endif // OPENPOSE_THREAD_HEADERS_HPP

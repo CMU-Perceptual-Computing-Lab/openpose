@@ -17,7 +17,7 @@ namespace op
             if (!helpCvMat.empty())
             {
                 const auto fullScreen = false;
-                FrameDisplayer frameDisplayer{helpCvMat.size(), "OpenPose - GUI Help", fullScreen};
+                FrameDisplayer frameDisplayer{Point<int>{helpCvMat.cols, helpCvMat.rows}, "OpenPose - GUI Help", fullScreen};
                 frameDisplayer.displayFrame(helpCvMat, 33);
             }
         }
@@ -149,7 +149,7 @@ namespace op
         }
     }
 
-    Gui::Gui(const bool fullScreen, const cv::Size& outputSize, const std::shared_ptr<std::atomic<bool>>& isRunningSharedPtr, 
+    Gui::Gui(const bool fullScreen, const Point<int>& outputSize, const std::shared_ptr<std::atomic<bool>>& isRunningSharedPtr, 
              const std::shared_ptr<std::pair<std::atomic<bool>, std::atomic<int>>>& videoSeekSharedPtr,
              const std::vector<std::shared_ptr<PoseExtractor>>& poseExtractors, const std::vector<std::shared_ptr<PoseRenderer>>& poseRenderers) :
         mFrameDisplayer{outputSize, "OpenPose - GUI", fullScreen},

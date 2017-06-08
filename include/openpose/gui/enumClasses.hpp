@@ -1,5 +1,5 @@
-#ifndef OPENPOSE__GUI__ENUM_CLASSES_HPP
-#define OPENPOSE__GUI__ENUM_CLASSES_HPP
+#ifndef OPENPOSE_GUI_ENUM_CLASSES_HPP
+#define OPENPOSE_GUI_ENUM_CLASSES_HPP
 
 namespace op
 {
@@ -15,4 +15,4 @@ namespace op
     };
 }
 
-#endif // OPENPOSE__GUI__ENUM_CLASSES_HPP
+#endif // OPENPOSE_GUI_ENUM_CLASSES_HPP

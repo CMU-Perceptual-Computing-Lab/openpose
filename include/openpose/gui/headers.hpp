@@ -1,5 +1,5 @@
-#ifndef OPENPOSE__GUI__HEADERS_HPP
-#define OPENPOSE__GUI__HEADERS_HPP
+#ifndef OPENPOSE_GUI_HEADERS_HPP
+#define OPENPOSE_GUI_HEADERS_HPP
 
 // gui module
 #include "enumClasses.hpp"
@@ -9,4 +9,4 @@
 #include "wGui.hpp"
 #include "wGuiInfoAdder.hpp"
 
-#endif // OPENPOSE__GUI__HEADERS_HPP
+#endif // OPENPOSE_GUI_HEADERS_HPP

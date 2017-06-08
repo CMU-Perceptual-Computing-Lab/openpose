@@ -1,5 +1,5 @@
-#ifndef OPENPOSE__THREAD__QUEUE_HPP
-#define OPENPOSE__THREAD__QUEUE_HPP 
+#ifndef OPENPOSE_THREAD_QUEUE_HPP
+#define OPENPOSE_THREAD_QUEUE_HPP 
 
 #include <queue> // std::queue
 #include <openpose/utilities/macros.hpp>
@@ -81,4 +81,4 @@ namespace op
     COMPILE_TEMPLATE_DATUM(Queue);
 }
 
-#endif // OPENPOSE__THREAD__QUEUE_HPP
+#endif // OPENPOSE_THREAD_QUEUE_HPP

@@ -1,21 +1,22 @@
-#ifndef OPENPOSE__CORE__OP_OUTPUT_TO_CV_MAT_HPP
-#define OPENPOSE__CORE__OP_OUTPUT_TO_CV_MAT_HPP
+#ifndef OPENPOSE_CORE_OP_OUTPUT_TO_CV_MAT_HPP
+#define OPENPOSE_CORE_OP_OUTPUT_TO_CV_MAT_HPP
 
-#include <opencv2/core/core.hpp>
+#include <opencv2/core/core.hpp> // cv::Mat
 #include "array.hpp"
+#include "point.hpp"
 
 namespace op
 {
     class OpOutputToCvMat
     {
     public:
-        explicit OpOutputToCvMat(const cv::Size& outputResolution);
+        explicit OpOutputToCvMat(const Point<int>& outputResolution);
 
         cv::Mat formatToCvMat(const Array<float>& outputData) const;
 
     private:
-        const cv::Size mOutputResolution;
+        const Point<int> mOutputResolution;
     };
 }
 
-#endif // OPENPOSE__CORE__OP_OUTPUT_TO_CV_MAT_HPP
+#endif // OPENPOSE_CORE_OP_OUTPUT_TO_CV_MAT_HPP

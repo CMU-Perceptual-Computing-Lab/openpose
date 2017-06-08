@@ -1,22 +1,19 @@
-#ifndef OPENPOSE__HAND__HAND_PARAMETERS_HPP
-#define OPENPOSE__HAND__HAND_PARAMETERS_HPP
+#ifndef OPENPOSE_HAND_HAND_PARAMETERS_HPP
+#define OPENPOSE_HAND_HAND_PARAMETERS_HPP
 
 #include "enumClasses.hpp"
 #include <openpose/pose/poseParameters.hpp>
 
 namespace op
 {
-    const unsigned char HAND_MAX_NUMBER_HANDS = 2;
+    const auto HAND_MAX_HANDS = 2*POSE_MAX_PEOPLE;
 
-    const unsigned char HAND_NUMBER_PARTS = 21;
+    const auto HAND_NUMBER_PARTS = 21u;
     #define HAND_PAIRS_TO_RENDER {0,1,  1,2,  2,3,  3,4,  0,5,  5,6,  6,7,  7,8,  0,9,  9,10,  10,11,  11,12,  0,13,  13,14,  14,15,  15,16,  0,17,  17,18,  18,19,  19,20}
-
-    // Constant Global Parameters
-    // const unsigned char HAND_MAX_PEOPLE = 1;
 
     // Constant parameters
     const auto HAND_CCN_DECREASE_FACTOR = 8.f;
-    const unsigned int HAND_MAX_PEAKS = 64u;
+    const auto HAND_MAX_PEAKS = 64u;
     const std::string HAND_PROTOTXT{"hand/pose_deploy.prototxt"};
     const std::string HAND_TRAINED_MODEL{"hand/pose_iter_120000.caffemodel"};
 
@@ -25,8 +22,8 @@ namespace op
     const auto HAND_DEFAULT_NMS_THRESHOLD = 0.1f;
 
     // Rendering default parameters
-    const auto HAND_DEFAULT_ALPHA_HANDS = POSE_DEFAULT_ALPHA_POSE;
-    // const auto HAND_DEFAULT_ALPHA_HEATMAP = POSE_DEFAULT_ALPHA_HEATMAP;
+    const auto HAND_DEFAULT_ALPHA_KEYPOINT = POSE_DEFAULT_ALPHA_KEYPOINT;
+    const auto HAND_DEFAULT_ALPHA_HEAT_MAP = POSE_DEFAULT_ALPHA_HEAT_MAP;
 }
 
-#endif // OPENPOSE__HAND__HAND_PARAMETERS_HPP
+#endif // OPENPOSE_HAND_HAND_PARAMETERS_HPP
