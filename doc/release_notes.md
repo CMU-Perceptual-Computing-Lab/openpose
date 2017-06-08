@@ -41,3 +41,5 @@ OpenPose Library - Release Notes
 3. Main bugs fixed:
     1. All visualization functions moved to same thread, so it works with most OpenCV custom compiled versions.
     2. Fixed error on debug mode: `Too many resources requested for launch`.
+    3. Bug in Array::getConstCvMat() if mVolume=0, now returning empty cv::Mat.
+    4. Bug: `--process_real_time` threw error with webcam.
