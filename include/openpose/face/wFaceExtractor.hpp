@@ -61,7 +61,7 @@ namespace op
                 // Extract people face
                 for (auto& tDatum : *tDatums)
                 {
-                    spFaceExtractor->forwardPass(tDatum.faceRectangles, tDatum.cvInputData);
+                    spFaceExtractor->forwardPass(tDatum.faceRectangles, tDatum.cvInputData, tDatum.scaleInputToOutput);
                     tDatum.faceKeypoints = spFaceExtractor->getFaceKeypoints();
                 }
                 // Profiling speed

@@ -94,9 +94,9 @@ namespace op
         Array<float> handKeypoints;
 
         // -------------------------------------------------- Other parameters -------------------------------------------------- //
-        double scaleInputToOutput; /**< Scale ratio between the input Datum::cvInputData and the output Datum::cvOutputData. */
+        float scaleInputToOutput; /**< Scale ratio between the input Datum::cvInputData and the output Datum::cvOutputData. */
 
-        double scaleNetToOutput; /**< Scale ratio between the net output and the final output Datum::cvOutputData. */
+        float scaleNetToOutput; /**< Scale ratio between the net output and the final output Datum::cvOutputData. */
 
         std::pair<int, std::string> elementRendered; /**< Pair with the element key id POSE_BODY_PART_MAPPING on `pose/poseParameters.hpp` and its mapped value (e.g. 1 and "Neck"). */
 

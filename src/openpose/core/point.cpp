@@ -91,6 +91,20 @@ namespace op
     }
 
     template<typename T>
+    Point<T> Point<T>::operator+(const Point<T>& point)
+    {
+        try
+        {
+            return Point<T>{T(x + point.x), T(y + point.y)};
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return Point<T>{};
+        }
+    }
+
+    template<typename T>
     Point<T>& Point<T>::operator+=(const T value)
     {
         try
@@ -104,6 +118,20 @@ namespace op
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             return *this;
+        }
+    }
+
+    template<typename T>
+    Point<T> Point<T>::operator+(const T value)
+    {
+        try
+        {
+            return Point<T>{T(x + value), T(y + value)};
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return Point<T>{};
         }
     }
 
@@ -125,6 +153,20 @@ namespace op
     }
 
     template<typename T>
+    Point<T> Point<T>::operator-(const Point<T>& point)
+    {
+        try
+        {
+            return Point<T>{T(x - point.x), T(y - point.y)};
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return Point<T>{};
+        }
+    }
+
+    template<typename T>
     Point<T>& Point<T>::operator-=(const T value)
     {
         try
@@ -138,6 +180,20 @@ namespace op
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             return *this;
+        }
+    }
+
+    template<typename T>
+    Point<T> Point<T>::operator-(const T value)
+    {
+        try
+        {
+            return Point<T>{T(x - value), T(y - value)};
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return Point<T>{};
         }
     }
 
@@ -159,6 +215,20 @@ namespace op
     }
 
     template<typename T>
+    Point<T> Point<T>::operator*(const T value)
+    {
+        try
+        {
+            return Point<T>{T(x * value), T(y * value)};
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return Point<T>{};
+        }
+    }
+
+    template<typename T>
     Point<T>& Point<T>::operator/=(const T value)
     {
         try
@@ -172,6 +242,20 @@ namespace op
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             return *this;
+        }
+    }
+
+    template<typename T>
+    Point<T> Point<T>::operator/(const T value)
+    {
+        try
+        {
+            return Point<T>{T(x / value), T(y / value)};
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return Point<T>{};
         }
     }
 

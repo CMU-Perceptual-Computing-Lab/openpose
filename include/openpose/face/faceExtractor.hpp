@@ -22,7 +22,7 @@ namespace op
 
         void initializationOnThread();
 
-        void forwardPass(const std::vector<Rectangle<float>>& faceRectangles, const cv::Mat& cvInputData);
+        void forwardPass(const std::vector<Rectangle<float>>& faceRectangles, const cv::Mat& cvInputData, const float scaleInputToOutput);
 
         Array<float> getFaceKeypoints() const;
 

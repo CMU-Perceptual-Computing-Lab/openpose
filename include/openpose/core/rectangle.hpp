@@ -60,6 +60,15 @@ namespace op
         {
             return width * height;
         }
+
+        // -------------------------------------------------- Basic Operators -------------------------------------------------- //
+        Rectangle<T>& operator*=(const T value);
+
+        Rectangle<T> operator*(const T value);
+
+        Rectangle<T>& operator/=(const T value);
+
+        Rectangle<T> operator/(const T value);
     };
 }
 

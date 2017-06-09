@@ -124,7 +124,7 @@ namespace op
         }
     }
 
-    std::vector<Rectangle<float>> FaceDetector::detectFaces(const Array<float>& poseKeypoints)
+    std::vector<Rectangle<float>> FaceDetector::detectFaces(const Array<float>& poseKeypoints, const float scaleInputToOutput)
     {
         try
         {
@@ -135,7 +135,7 @@ namespace op
             // Otherwise, get face position(s)
             if (!poseKeypoints.empty())
                 for (auto person = 0 ; person < numberPeople ; person++)
-                    faceRectangles.at(person) = getFaceFromPoseKeypoints(poseKeypoints, person, mNeck, mNose, mLEar, mREar, mLEye, mREye, threshold);
+                    faceRectangles.at(person) = getFaceFromPoseKeypoints(poseKeypoints, person, mNeck, mNose, mLEar, mREar, mLEye, mREye, threshold) / scaleInputToOutput;
             return faceRectangles;
         }
         catch (const std::exception& e)

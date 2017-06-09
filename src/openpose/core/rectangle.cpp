@@ -111,5 +111,71 @@ namespace op
         }
     }
 
+    template<typename T>
+    Rectangle<T>& Rectangle<T>::operator*=(const T value)
+    {
+        try
+        {
+            x *= value;
+            y *= value;
+            width *= value;
+            height *= value;
+            // Return
+            return *this;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return *this;
+        }
+    }
+
+    template<typename T>
+    Rectangle<T> Rectangle<T>::operator*(const T value)
+    {
+        try
+        {
+            return Rectangle<T>{T(x * value), T(y * value), T(width * value), T(height * value)};
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return Rectangle<T>{};
+        }
+    }
+
+    template<typename T>
+    Rectangle<T>& Rectangle<T>::operator/=(const T value)
+    {
+        try
+        {
+            x /= value;
+            y /= value;
+            width /= value;
+            height /= value;
+            // Return
+            return *this;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return *this;
+        }
+    }
+
+    template<typename T>
+    Rectangle<T> Rectangle<T>::operator/(const T value)
+    {
+        try
+        {
+            return Rectangle<T>{T(x / value), T(y / value), T(width / value), T(height / value)};
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return Rectangle<T>{};
+        }
+    }
+
     COMPILE_TEMPLATE_BASIC_TYPES(Rectangle);
 }

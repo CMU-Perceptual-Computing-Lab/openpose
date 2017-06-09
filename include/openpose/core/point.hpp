@@ -9,7 +9,7 @@ namespace op
         T x;
         T y;
 
-        Point(const T x = -1, const T y = -1);
+        Point(const T x = 0, const T y = 0);
 
         /**
          * Copy constructor.
@@ -120,15 +120,27 @@ namespace op
         // -------------------------------------------------- Basic Operators -------------------------------------------------- //
         Point<T>& operator+=(const Point<T>& point);
 
+        Point<T> operator+(const Point<T>& point);
+
         Point<T>& operator+=(const T value);
+
+        Point<T> operator+(const T value);
 
         Point<T>& operator-=(const Point<T>& point);
 
+        Point<T> operator-(const Point<T>& point);
+
         Point<T>& operator-=(const T value);
+
+        Point<T> operator-(const T value);
 
         Point<T>& operator*=(const T value);
 
+        Point<T> operator*(const T value);
+
         Point<T>& operator/=(const T value);
+
+        Point<T> operator/(const T value);
 
     };
 }

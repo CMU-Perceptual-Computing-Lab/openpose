@@ -64,7 +64,7 @@ namespace op
         }
     }
 
-    void FaceExtractor::forwardPass(const std::vector<Rectangle<float>>& faceRectangles, const cv::Mat& cvInputData)
+    void FaceExtractor::forwardPass(const std::vector<Rectangle<float>>& faceRectangles, const cv::Mat& cvInputData, const float scaleInputToOutput)
     {
         try
         {
@@ -77,7 +77,7 @@ namespace op
                 // Set face size
                 const auto numberPeople = (int)faceRectangles.size();
                 mFaceKeypoints.reset({numberPeople, FACE_NUMBER_PARTS, 3}, 0);
-
+// // Commented lines are for debugging
 // log("\nAreas:");
 // cv::Mat cvInputDataCopy = cvInputData.clone();
                 for (auto person = 0 ; person < numberPeople ; person++)
@@ -85,13 +85,13 @@ namespace op
                     // Only consider faces with a minimum pixel area
                     const auto faceAreaSquared = std::sqrt(faceRectangles.at(person).area());
                     // Get parts
-                    if (faceAreaSquared > 60)
+                    if (faceAreaSquared > 50)
                     {
                         const auto& faceRectangle = faceRectangles.at(person);
 // log(faceAreaSquared);
+// log(std::to_string(cvInputData.cols) + " " + std::to_string(cvInputData.rows));
 // cv::rectangle(cvInputDataCopy,
 //               cv::Point{(int)faceRectangle.x, (int)faceRectangle.y},
-//               // cv::Point{(int)(faceRectangle.x + faceRectangle.width), (int)(faceRectangle.y + faceRectangle.height)},
 //               cv::Point{(int)faceRectangle.bottomRight().x, (int)faceRectangle.bottomRight().y},
 //               cv::Scalar{255,0,255}, 2);
                         // Get face position(s)
@@ -111,6 +111,8 @@ namespace op
 
                         // cv::Mat -> float*
                         uCharCvMatToFloatPtr(mFaceImageCrop.getPtr(), faceImage, true);
+// if (person < 5)
+// cv::imshow("faceImage" + std::to_string(person), faceImage);
                         // 1. Caffe deep network
                         auto* inputDataGpuPtr = spNet->getInputDataGpuPtr();
                         cudaMemcpy(inputDataGpuPtr, mFaceImageCrop.getPtr(), mNetOutputSize.area() * 3 * sizeof(float), cudaMemcpyHostToDevice);
@@ -160,8 +162,8 @@ namespace op
                                 const auto y = facePeaksPtr[xyIndex + 1];
                                 const auto score = facePeaksPtr[xyIndex + 2];
                                 const auto baseIndex = (person * FACE_NUMBER_PARTS + part) * 3;
-                                mFaceKeypoints[baseIndex] = Mscaling.at<double>(0,0) * x + Mscaling.at<double>(0,1) * y + Mscaling.at<double>(0,2);
-                                mFaceKeypoints[baseIndex+1] = Mscaling.at<double>(1,0) * x + Mscaling.at<double>(1,1) * y + Mscaling.at<double>(1,2);
+                                mFaceKeypoints[baseIndex] = scaleInputToOutput * (Mscaling.at<double>(0,0) * x + Mscaling.at<double>(0,1) * y + Mscaling.at<double>(0,2));
+                                mFaceKeypoints[baseIndex+1] = scaleInputToOutput * (Mscaling.at<double>(1,0) * x + Mscaling.at<double>(1,1) * y + Mscaling.at<double>(1,2));
                                 mFaceKeypoints[baseIndex+2] = score;
                             }
                         }

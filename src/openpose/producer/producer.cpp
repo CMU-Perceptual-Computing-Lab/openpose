@@ -69,7 +69,12 @@ namespace op
             check(fpsMode == ProducerFpsMode::RetrievalFps || fpsMode == ProducerFpsMode::OriginalFps, "Unknown ProducerFpsMode.", __LINE__, __FUNCTION__, __FILE__);
             // For webcam, ProducerFpsMode::OriginalFps == ProducerFpsMode::RetrievalFps, since the internal webcam cache will overwrite frames after it gets full
             if (mType == ProducerType::Webcam)
+            {
                 mProducerFpsMode = {ProducerFpsMode::RetrievalFps};
+                if (fpsMode == ProducerFpsMode::OriginalFps)
+                    log("The producer fps mode set to `OriginalFps` (flag `process_real_time` on the demo) is not necessary, it is already assumed for webcam.",
+                        Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+            }
             // If no webcam
             else
             {
