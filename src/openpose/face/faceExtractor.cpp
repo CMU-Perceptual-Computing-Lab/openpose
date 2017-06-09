@@ -19,7 +19,8 @@ namespace op
     {
         try
         {
-            checkE(netOutputSize, netInputSize, "Net input and output size must be equal.", __LINE__, __FUNCTION__, __FILE__);
+            checkE(netOutputSize.x, netInputSize.x, "Net input and output size must be equal.", __LINE__, __FUNCTION__, __FILE__);
+            checkE(netOutputSize.y, netInputSize.y, "Net input and output size must be equal.", __LINE__, __FUNCTION__, __FILE__);
             // Properties
             for (auto& property : mProperties)
                 property = 0.;
