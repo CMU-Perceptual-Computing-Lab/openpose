@@ -5,7 +5,7 @@ OpenPose Library - Basic Overview
 
 ## Modules Diagram
 <p align="center">
-    <img src="../doc/UML/1_0_0rc2/UML.png", width="720">
+    <img src="../doc/UML/1_0_0rc3/UML.png", width="720">
 </p>
 
 
