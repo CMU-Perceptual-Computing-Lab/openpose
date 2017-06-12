@@ -57,7 +57,7 @@ namespace op
             if (!directoryPath.empty())
             {
                 std::replace(directoryPath.begin(), directoryPath.end(), '\\', '/'); // replace all '\\' to '/';
-                if (*directoryPath.cend() != '/')
+                if (*(directoryPath.cend() - 1) != '/')
                     directoryPath = directoryPath + "/";
             }
             return directoryPath;
