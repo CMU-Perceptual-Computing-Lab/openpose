@@ -12,8 +12,8 @@ OpenPose Library - Compilation and Installation
 
 ## Requirements
 - Ubuntu (tested on 14 and 16) or Windows (tested on 10). We do not support any other OS but the community has been able to install it on: CentOS, Windows 7, and Windows 8.
-- GPU with at least 1.5 GB available (the `nvidia-smi` command checks the available GPU memory in Ubuntu).
-- CUDA and cuDNN installed.
+- NVIDIA graphics card with at least 1.5 GB available (the `nvidia-smi` command checks the available GPU memory in Ubuntu).
+- CUDA and cuDNN installed. Note: We found OpenPose working with cuDNN 5.1 ~10% faster than with cuDNN 6.
 - At least 2 GB of free RAM memory.
 - Highly recommended: A CPU with at least 8 cores.
 

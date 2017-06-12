@@ -1,6 +1,7 @@
 #ifndef OPENPOSE_CORE_RENDERER_HPP
 #define OPENPOSE_CORE_RENDERER_HPP
 
+#include <atomic>
 #include <tuple>
 #include <memory> // std::shared_ptr
 #include <openpose/utilities/macros.hpp>
