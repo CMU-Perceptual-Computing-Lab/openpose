@@ -15,7 +15,7 @@ include(${PROJECT_SOURCE_DIR}/cmake/RuntimeDependencies.cmake)
 # Packages
 # 
 
-include(packages/pack-template.cmake)
+include(packages/pack-openpose.cmake)
 
 
 #
