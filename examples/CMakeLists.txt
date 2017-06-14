@@ -10,3 +10,4 @@ endif()
 
 # Example applications
 add_subdirectory(openpose)
+add_subdirectory(tutorial_pose)

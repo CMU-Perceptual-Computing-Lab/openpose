@@ -44,8 +44,6 @@ file(GLOB_RECURSE cuda_files
 	"${source_path}/*.cu"
 )
 
-message (STATUS ${headers})
-
 # Group source files
 set(header_group "Header Files (API)")
 set(source_group "Source Files")
