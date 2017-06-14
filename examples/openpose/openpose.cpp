@@ -28,18 +28,18 @@
 
 // OpenPose dependencies
 // Option a) Importing all modules
-#include <openpose/headers.hpp>
+//#include <openpose/headers.hpp>
 // Option b) Manually importing the desired modules. Recommended if you only intend to use a few modules.
-// #include <openpose/core/headers.hpp>
-// #include <openpose/experimental/headers.hpp>
-// #include <openpose/face/headers.hpp>
+ #include <openpose/core/headers.hpp>
+ #include <openpose/experimental/headers.hpp>
+ #include <openpose/face/headers.hpp>
 // #include <openpose/filestream/headers.hpp>
 // #include <openpose/gui/headers.hpp>
-// #include <openpose/pose/headers.hpp>
-// #include <openpose/producer/headers.hpp>
+ #include <openpose/pose/headers.hpp>
+#include <openpose/producer/headers.hpp>
 // #include <openpose/thread/headers.hpp>
-// #include <openpose/utilities/headers.hpp>
-// #include <openpose/wrapper/headers.hpp>
+ #include <openpose/utilities/headers.hpp>
+ #include <openpose/wrapper/headers.hpp>
 
 // See all the available parameter options withe the `--help` flag. E.g. `./build/examples/openpose/openpose.bin --help`.
 // Note: This command will show you flags for other unnecessary 3rdparty files. Check only the flags for the OpenPose

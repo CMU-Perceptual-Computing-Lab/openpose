@@ -4,7 +4,7 @@
 # 
 
 # find_package(THIRDPARTY REQUIRED)
-
+find_package( OpenCV REQUIRED )
 
 # 
 # Library name and options
@@ -139,7 +139,7 @@ target_link_libraries(${target}
 
     PUBLIC
     ${DEFAULT_LIBRARIES}
-
+    ${OpenCV_LIBS}
     INTERFACE
 )
 

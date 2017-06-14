@@ -1,5 +1,5 @@
 if(OPTION_USE_CAFFE)
-    ADD_DEFINITIONS( -DUSE_CAFFE=1 )
+    ADD_DEFINITIONS( -DUSE_CAFFE )
 endif()
 
 add_subdirectory(openpose)

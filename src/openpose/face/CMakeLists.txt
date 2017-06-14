@@ -4,7 +4,8 @@
 # 
 
 # find_package(THIRDPARTY REQUIRED)
-
+#set(CUDA_SEPARABLE_COMPILATION ON)
+find_package(CUDA QUIET REQUIRED)
 
 # 
 # Library name and options
@@ -40,6 +41,12 @@ file(GLOB_RECURSE sources
 	"${source_path}/*.cpp"
 )
 
+file(GLOB_RECURSE cuda_files
+	"${source_path}/*.cu"
+)
+
+
+
 # Group source files
 set(header_group "Header Files (API)")
 set(source_group "Source Files")
@@ -54,10 +61,21 @@ source_group_by_path(${source_path}  "\\\\.cpp$|\\\\.c$|\\\\.h$|\\\\.hpp$"
 # 
 
 # Build library
+if (CUDA_FOUND)
+include_directories( ${CMAKE_SOURCE_DIR}/include )
+list(APPEND CUDA_NVCC_FLAGS "-std=c++11;-O3")
+cuda_add_library(${target}
+    ${sources}
+    ${headers}
+    ${cuda_files}
+)
+else()
 add_library(${target}
     ${sources}
     ${headers}
+    ${cuda_files}
 )
+endif(CUDA_FOUND)
 
 # Create namespaced alias
 add_library(${META_PROJECT_NAME}::${target} ALIAS ${target})
@@ -136,13 +154,14 @@ target_include_directories(${target}
 # 
 
 target_link_libraries(${target}
-    PRIVATE
+#    PRIVATE
 
-    PUBLIC
+#    PUBLIC
     ${DEFAULT_LIBRARIES}
     ${META_PROJECT_NAME}::core
     ${META_PROJECT_NAME}::experimental
-    INTERFACE
+    ${CUDA_LIBRARIES}
+#    INTERFACE
 )
 
 
@@ -180,12 +199,12 @@ target_compile_options(${target}
 # 
 
 target_link_libraries(${target}
-    PRIVATE
+#    PRIVATE
 
-    PUBLIC
+#    PUBLIC
     ${DEFAULT_LINKER_OPTIONS}
 
-    INTERFACE
+#    INTERFACE
 )
 
 

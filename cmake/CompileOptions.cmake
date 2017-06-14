@@ -22,7 +22,7 @@ set(DEFAULT_PROJECT_OPTIONS
     CXX_STANDARD              11 # Not available before CMake 3.1; see below for manual command line argument addition
     LINKER_LANGUAGE           "CXX"
     POSITION_INDEPENDENT_CODE ON
-    CXX_VISIBILITY_PRESET     "hidden"
+    CXX_VISIBILITY_PRESET     "default"
 )
 
 find_package(Caffe REQUIRED)

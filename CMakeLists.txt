@@ -54,7 +54,7 @@ set(META_PROJECT_DESCRIPTION "OpenPose is a library for real-time multi-person k
 set(META_AUTHOR_ORGANIZATION "OpenPose")
 set(META_AUTHOR_DOMAIN       "https://github.com/CMU-Perceptual-Computing-Lab/openpose/")
 set(META_AUTHOR_MAINTAINER   "")
-set(META_VERSION_MAJOR       "0")
+set(META_VERSION_MAJOR       "1")
 set(META_VERSION_MINOR       "0")
 set(META_VERSION_PATCH       "0")
 set(META_VERSION_REVISION    "${GIT_REV}")
@@ -75,7 +75,7 @@ option(BUILD_SHARED_LIBS     "Build shared instead of static libraries."        
 option(OPTION_SELF_CONTAINED "Create a self-contained install with all dependencies." OFF)
 option(OPTION_BUILD_TESTS    "Build tests."                                           ON)
 option(OPTION_BUILD_DOCS     "Build documentation."                                   OFF)
-option(OPTION_BUILD_EXAMPLES "Build examples."                                        OFF)
+option(OPTION_BUILD_EXAMPLES "Build examples."                                        ON)
 option(OPTION_USE_CAFFE      "Build using caffe"                                      ON)
 
 # 
@@ -175,7 +175,6 @@ if(NOT SYSTEM_DIR_INSTALL)
     endif()
 endif()
 
-
 # 
 # Project modules
 # 
@@ -184,6 +183,7 @@ add_subdirectory(3rdparty)
 add_subdirectory(src)
 add_subdirectory(doc)
 add_subdirectory(deploy)
+add_subdirectory(examples)
 
 
 # 
@@ -202,4 +202,4 @@ install(FILES LICENSE   DESTINATION ${INSTALL_ROOT} COMPONENT runtime)
 install(FILES README.md DESTINATION ${INSTALL_ROOT} COMPONENT runtime)
 
 # Install runtime data
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/data DESTINATION ${INSTALL_DATA} COMPONENT runtime)
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/models DESTINATION ${INSTALL_DATA} COMPONENT runtime)
