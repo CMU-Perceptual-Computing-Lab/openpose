@@ -1,0 +1,8 @@
+[submodule "3rdparty/caffe-windows/caffe-windows"]
+	path = 3rdparty/caffe-windows/caffe-windows
+	url = https://github.com/BVLC/caffe.git
+	branch = windows
+[submodule "3rdparty/caffe"]
+	path = 3rdparty/caffe
+	url = https://github.com/BVLC/caffe.git
+	branch = master
