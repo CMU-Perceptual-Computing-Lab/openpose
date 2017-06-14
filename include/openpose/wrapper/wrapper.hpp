@@ -710,7 +710,7 @@ namespace op
             {
                 const auto humanFormat = true; // If true, bigger size (and potentially slower to process), but easier for a human to read it
                 const auto cocoJsonSaver = std::make_shared<CocoJsonSaver>(wrapperStructOutput.writeCocoJson, humanFormat);
-                mOutputWs.emplace_back(std::make_shared<experimental::WCocoJsonSaver<TDatumsPtr>>(cocoJsonSaver));
+                mOutputWs.emplace_back(std::make_shared<WCocoJsonSaver<TDatumsPtr>>(cocoJsonSaver));
             }
             // Write frames as desired image format on hard disk
             if (!writeImagesCleaned.empty())
