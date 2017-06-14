@@ -77,7 +77,7 @@ namespace op
 
                 // Set face size
                 const auto numberPeople = (int)faceRectangles.size();
-                mFaceKeypoints.reset({numberPeople, FACE_NUMBER_PARTS, 3}, 0);
+				mFaceKeypoints.reset({ numberPeople, (int)FACE_NUMBER_PARTS, 3 }, 0);
 // // Commented lines are for debugging
 // log("\nAreas:");
 // cv::Mat cvInputDataCopy = cvInputData.clone();
