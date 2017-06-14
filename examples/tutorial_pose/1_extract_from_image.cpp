@@ -28,7 +28,7 @@ DEFINE_int32(logging_level,             3,              "The logging level. Inte
 DEFINE_string(image_path,               "examples/media/COCO_val2014_000000000192.jpg",     "Process the desired image.");
 // OpenPose
 DEFINE_string(model_pose,               "COCO",         "Model to be used (e.g. COCO, MPI, MPI_4_layers).");
-DEFINE_string(model_folder,             "models/",      "Folder where the pose models (COCO and MPI) are located.");
+DEFINE_string(model_folder,             "models/",      "Folder path (absolute or relative) where the models (pose, face, ...) are located.");
 DEFINE_string(net_resolution,           "656x368",      "Multiples of 16. If it is increased, the accuracy usually increases. If it is decreased, the speed increases.");
 DEFINE_string(resolution,               "1280x720",     "The image resolution (display). Use \"-1x-1\" to force the program to use the default images resolution.");
 DEFINE_int32(num_gpu_start,             0,              "GPU device start number.");
@@ -98,7 +98,7 @@ int openPoseTutorialPose1()
     // Step 3 - Initialize all required classes
     op::CvMatToOpInput cvMatToOpInput{netInputSize, FLAGS_num_scales, (float)FLAGS_scale_gap};
     op::CvMatToOpOutput cvMatToOpOutput{outputSize};
-    op::PoseExtractorCaffe poseExtractorCaffe{netInputSize, netOutputSize, outputSize, FLAGS_num_scales, (float)FLAGS_scale_gap, poseModel,
+    op::PoseExtractorCaffe poseExtractorCaffe{netInputSize, netOutputSize, outputSize, FLAGS_num_scales, poseModel,
                                               FLAGS_model_folder, FLAGS_num_gpu_start};
     op::PoseRenderer poseRenderer{netOutputSize, outputSize, poseModel, nullptr, (float)FLAGS_alpha_pose};
     op::OpOutputToCvMat opOutputToCvMat{outputSize};
@@ -114,12 +114,14 @@ int openPoseTutorialPose1()
     if(inputImage.empty())
         op::error("Could not open or find the image: " + FLAGS_image_path, __LINE__, __FUNCTION__, __FILE__);
     // Step 2 - Format input image to OpenPose input and output formats
-    const auto netInputArray = cvMatToOpInput.format(inputImage);
+    op::Array<float> netInputArray;
+    std::vector<float> scaleRatios;
+    std::tie(netInputArray, scaleRatios) = cvMatToOpInput.format(inputImage);
     double scaleInputToOutput;
     op::Array<float> outputArray;
     std::tie(scaleInputToOutput, outputArray) = cvMatToOpOutput.format(inputImage);
     // Step 3 - Estimate poseKeypoints
-    poseExtractorCaffe.forwardPass(netInputArray, {inputImage.cols, inputImage.rows});
+    poseExtractorCaffe.forwardPass(netInputArray, {inputImage.cols, inputImage.rows}, scaleRatios);
     const auto poseKeypoints = poseExtractorCaffe.getPoseKeypoints();
     // Step 4 - Render poseKeypoints
     poseRenderer.renderPose(outputArray, poseKeypoints);

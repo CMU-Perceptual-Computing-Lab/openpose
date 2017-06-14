@@ -22,10 +22,12 @@ namespace op
         poseHeatMaps{datum.poseHeatMaps},
         faceRectangles{datum.faceRectangles},
         faceKeypoints{datum.faceKeypoints},
+        handRectangles{datum.handRectangles},
         handKeypoints{datum.handKeypoints},
         // Other parameters
         scaleInputToOutput{datum.scaleInputToOutput},
         scaleNetToOutput{datum.scaleNetToOutput},
+        scaleRatios{datum.scaleRatios},
         elementRendered{datum.elementRendered}
     {
     }
@@ -48,10 +50,12 @@ namespace op
             poseHeatMaps = datum.poseHeatMaps,
             faceRectangles = datum.faceRectangles,
             faceKeypoints = datum.faceKeypoints,
+            handRectangles = datum.handRectangles,
             handKeypoints = datum.handKeypoints,
             // Other parameters
             scaleInputToOutput = datum.scaleInputToOutput;
             scaleNetToOutput = datum.scaleNetToOutput;
+            scaleRatios = datum.scaleRatios;
             elementRendered = datum.elementRendered;
             // Return
             return *this;
@@ -85,8 +89,10 @@ namespace op
             std::swap(poseHeatMaps, datum.poseHeatMaps);
             std::swap(faceRectangles, datum.faceRectangles);
             std::swap(faceKeypoints, datum.faceKeypoints);
+            std::swap(handRectangles, datum.handRectangles);
             std::swap(handKeypoints, datum.handKeypoints);
             // Other parameters
+            std::swap(scaleRatios, datum.scaleRatios);
             std::swap(elementRendered, datum.elementRendered);
         }
         catch (const std::exception& e)
@@ -113,10 +119,12 @@ namespace op
             std::swap(poseHeatMaps, datum.poseHeatMaps);
             std::swap(faceRectangles, datum.faceRectangles);
             std::swap(faceKeypoints, datum.faceKeypoints);
+            std::swap(handRectangles, datum.handRectangles);
             std::swap(handKeypoints, datum.handKeypoints);
             // Other parameters
             scaleInputToOutput = datum.scaleInputToOutput;
             scaleNetToOutput = datum.scaleNetToOutput;
+            std::swap(scaleRatios, datum.scaleRatios);
             std::swap(elementRendered, datum.elementRendered);
             // Return
             return *this;
@@ -151,10 +159,12 @@ namespace op
             datum.poseHeatMaps = poseHeatMaps.clone();
             datum.faceRectangles = faceRectangles;
             datum.faceKeypoints = faceKeypoints.clone();
+            datum.handRectangles = datum.handRectangles;
             datum.handKeypoints = handKeypoints.clone();
             // Other parameters
             datum.scaleInputToOutput = scaleInputToOutput;
             datum.scaleNetToOutput = scaleNetToOutput;
+            datum.scaleRatios = scaleRatios;
             datum.elementRendered = elementRendered;
             // Return
             return std::move(datum);

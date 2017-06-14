@@ -552,13 +552,13 @@ namespace op
                 wDatumProducer = nullptr;
 
             // Pose estimators
-            const Point<int>& netOutputSize = wrapperStructPose.netInputSize;
+            const Point<int>& poseNetOutputSize = wrapperStructPose.netInputSize;
             std::vector<std::shared_ptr<PoseExtractor>> poseExtractors;
             for (auto gpuId = 0; gpuId < gpuNumber; gpuId++)
                 poseExtractors.emplace_back(std::make_shared<PoseExtractorCaffe>(
-                    wrapperStructPose.netInputSize, netOutputSize, finalOutputSize, wrapperStructPose.scalesNumber,
-                    wrapperStructPose.scaleGap, wrapperStructPose.poseModel, wrapperStructPose.modelFolder,
-                    gpuId + gpuNumberStart, wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale
+                    wrapperStructPose.netInputSize, poseNetOutputSize, finalOutputSize, wrapperStructPose.scalesNumber,
+                    wrapperStructPose.poseModel, wrapperStructPose.modelFolder, gpuId + gpuNumberStart,
+                    wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale
                 ));
 
             // Pose renderers
@@ -572,7 +572,7 @@ namespace op
                 for (auto gpuId = 0; gpuId < poseExtractors.size(); gpuId++)
                 {
                     poseRenderers.emplace_back(std::make_shared<PoseRenderer>(
-                        netOutputSize, finalOutputSize, wrapperStructPose.poseModel, poseExtractors[gpuId],
+                        poseNetOutputSize, finalOutputSize, wrapperStructPose.poseModel, poseExtractors[gpuId],
                         wrapperStructPose.blendOriginalFrame, alphaKeypoint,
                         alphaHeatMap, wrapperStructPose.defaultPartToRender
                     ));
@@ -678,7 +678,7 @@ namespace op
             // Re-scale pose if desired
             if (wrapperStructPose.keypointScale != ScaleMode::OutputResolution
                 && (wrapperStructPose.keypointScale != ScaleMode::InputResolution || (finalOutputSize != producerSize))
-                && (wrapperStructPose.keypointScale != ScaleMode::NetOutputResolution || (finalOutputSize != netOutputSize)))
+                && (wrapperStructPose.keypointScale != ScaleMode::NetOutputResolution || (finalOutputSize != poseNetOutputSize)))
             {
                 auto keypointScaler = std::make_shared<KeypointScaler>(wrapperStructPose.keypointScale);
                 mPostProcessingWs.emplace_back(std::make_shared<WKeypointScaler<TDatumsPtr>>(keypointScaler));

@@ -244,7 +244,7 @@ namespace op
             const auto ySource = (y + 0.5f) / scaleToKeepRatio - 0.5f;
             const auto heatMapOffset = part * widthHeatMap * heightHeatMap;
             const auto* const heatMapPtrOffsetted = heatMapPtr + heatMapOffset;
-            const auto interpolatedValue = cubicResize(heatMapPtrOffsetted, xSource, ySource, widthHeatMap, heightHeatMap, widthHeatMap);
+            const auto interpolatedValue = bicubicInterpolate(heatMapPtrOffsetted, xSource, ySource, widthHeatMap, heightHeatMap, widthHeatMap);
 
             float rgbColor[3];
             getColorHeatMap(rgbColor, interpolatedValue, 0.f, 1.f);
