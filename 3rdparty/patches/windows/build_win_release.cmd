@@ -232,7 +232,7 @@ if NOT EXIST Release mkdir Release
 set BUILD_DIRECTORY=%cd%\build
 set CAFFE_LIB_SOURCE="%BUILD_DIRECTORY%"\lib\Release
 set CAFFE_LIB_DST=%BUILD_DIRECTORY%\..\..\lib\Release
-echo D|xcopy  "%CAFFE_LIB_SOURCE%"\proto.lib "%CAFFE_LIB_DST%" /Y
+echo D|xcopy  "%CAFFE_LIB_SOURCE%"\caffeproto.lib "%CAFFE_LIB_DST%" /Y
 echo D|xcopy "%CAFFE_LIB_SOURCE%"\caffe.lib "%CAFFE_LIB_DST%" /Y
 
 :: Copy caffe headers

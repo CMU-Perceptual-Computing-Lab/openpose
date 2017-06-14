@@ -232,7 +232,7 @@ if NOT EXIST Debug mkdir Debug
 set BUILD_DIRECTORY=%cd%\build
 set CAFFE_LIB_SOURCE="%BUILD_DIRECTORY%"\lib\Debug
 set CAFFE_LIB_DST=%BUILD_DIRECTORY%\..\..\lib\Debug
-echo D|xcopy  "%CAFFE_LIB_SOURCE%"\proto-d.lib "%CAFFE_LIB_DST%" /Y
+echo D|xcopy  "%CAFFE_LIB_SOURCE%"\caffeproto-d.lib "%CAFFE_LIB_DST%" /Y
 echo D|xcopy "%CAFFE_LIB_SOURCE%"\caffe-d.lib "%CAFFE_LIB_DST%" /Y
 
 :: Copy caffe headers

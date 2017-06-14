@@ -2,9 +2,9 @@
 
 pushd %~dp0
 if exist .\caffe-windows\lib\Release\caffe.lib (
-if exist .\caffe-windows\lib\Release\proto.lib (
+if exist .\caffe-windows\lib\Release\caffeproto.lib (
 if exist .\caffe-windows\lib\Debug\caffe-d.lib (
-if exist .\caffe-windows\lib\Debug\proto-d.lib (
+if exist .\caffe-windows\lib\Debug\caffeproto-d.lib (
 echo ------------------------- Caffe Already Built -------------------------
 exit
 )
@@ -13,8 +13,9 @@ exit
 )
 
 echo ------------------------- Copying Build Script -------------------------
-copy patches\windows\build_win_release.cmd caffe-windows\caffe-windows\scripts
-copy patches\windows\build_win_debug.cmd caffe-windows\caffe-windows\scripts
+copy patches\windows\build_win_release.cmd caffe-windows\caffe-windows\scripts /y
+copy patches\windows\build_win_debug.cmd caffe-windows\caffe-windows\scripts /y
+copy patches\windows\WindowsDownloadPrebuiltDependencies.cmake caffe-windows\caffe-windows\cmake /y
 
 cd caffe-windows\caffe-windows
 
