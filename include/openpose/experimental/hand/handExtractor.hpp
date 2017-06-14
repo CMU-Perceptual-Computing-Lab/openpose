@@ -5,6 +5,7 @@
 #include <atomic>
 #include <memory> // std::shared_ptr
 #include <thread>
+#include <caffe/blob.hpp>
 #include <opencv2/core/core.hpp> // cv::Mat
 #include <openpose/core/array.hpp>
 #include <openpose/core/point.hpp>

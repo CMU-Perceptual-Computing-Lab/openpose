@@ -1,0 +1,38 @@
+language: cpp
+
+sudo: required
+dist: trusty
+
+os:
+  - linux
+  - osx
+
+compiler:
+  - gcc
+  - clang
+
+env:
+  global:
+    - CMAKE_OPTIONS="-DOPTION_BUILD_EXAMPLES=On"
+  matrix:
+    - CMAKE_CONFIGURATION=release BUILD_DIR=build
+    - CMAKE_CONFIGURATION=debug BUILD_DIR=build-debug
+
+matrix:
+  exclude:
+  - os: osx
+    compiler: gcc
+
+before_install:
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install -qq cmake qt5-default cppcheck clang-tidy-3.8; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew install qt5 cppcheck; fi
+
+before_script:
+  - ./configure
+  - if [ $CMAKE_CONFIGURATION == release ]; then ./configure; fi
+  - if [ $CMAKE_CONFIGURATION == debug ]; then ./configure debug; fi
+
+script:
+  - cmake --build $BUILD_DIR
+  - cmake --build $BUILD_DIR --target test
+  - cmake --build $BUILD_DIR --target check-all

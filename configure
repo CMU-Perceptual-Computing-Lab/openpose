@@ -1,0 +1,126 @@
+#!/bin/bash
+
+# Default options
+BUILD_DIR="build"
+CMAKE_GENERATOR="Unix Makefiles"
+BUILD_TYPE="Release"
+CMAKE_OPTIONS="$CMAKE_OPTIONS"
+
+# Create default configs
+if [ ! -d "./.localconfig" ]
+then
+    mkdir ".localconfig"
+
+    touch ".localconfig/default"
+    echo "#!/bin/bash" >> ".localconfig/default"
+    echo "" >> ".localconfig/default"
+    echo "# Default configuration for configure (is always sourced)" >> ".localconfig/default"
+    echo "" >> ".localconfig/default"
+    echo "# CMake generator" >> ".localconfig/default"
+    echo "CMAKE_GENERATOR=\"Unix Makefiles\"" >> ".localconfig/default"
+    echo "" >> ".localconfig/default"
+    echo "# Build directory and build type" >> ".localconfig/default"
+    echo "BUILD_DIR=\"build\"" >> ".localconfig/default"
+    echo "BUILD_TYPE=\"Release\"" >> ".localconfig/default"
+    echo "" >> ".localconfig/default"
+    echo "# Installation directory" >> ".localconfig/default"
+    echo "#CMAKE_OPTIONS=\"\${CMAKE_OPTIONS} -DCMAKE_INSTALL_PREFIX=../install\"" >> ".localconfig/default"
+    echo "" >> ".localconfig/default"
+    echo "# Build static libraries" >> ".localconfig/default"
+    echo "#CMAKE_OPTIONS=\"\${CMAKE_OPTIONS} -DBUILD_SHARED_LIBS:BOOL=OFF\"" >> ".localconfig/default"
+    echo "" >> ".localconfig/default"
+    echo "# Enable examples" >> ".localconfig/default"
+    echo "#CMAKE_OPTIONS=\"\${CMAKE_OPTIONS} -DOPTION_BUILD_EXAMPLES:BOOL=ON\"" >> ".localconfig/default"
+    echo "" >> ".localconfig/default"
+    echo "# Enable documentation" >> ".localconfig/default"
+    echo "#CMAKE_OPTIONS=\"\${CMAKE_OPTIONS} -DOPTION_BUILD_DOCS:BOOL=ON\"" >> ".localconfig/default"
+    echo "" >> ".localconfig/default"
+    echo "# Disable tests" >> ".localconfig/default"
+    echo "#CMAKE_OPTIONS=\"\${CMAKE_OPTIONS} -DOPTION_BUILD_TESTS:BOOL=OFF\"" >> ".localconfig/default"
+    echo "" >> ".localconfig/default"
+    echo "" >> ".localconfig/default"
+    echo "# CMake and environment variables (e.g., search paths for external libraries)" >> ".localconfig/default"
+    echo "" >> ".localconfig/default"
+    echo "# Qt" >> ".localconfig/default"
+    echo "#export CMAKE_PREFIX_PATH=\"\${CMAKE_PREFIX_PATH}:/opt/Qt5.2.1/5.2.1/gcc_64/\"" >> ".localconfig/default"
+
+    touch ".localconfig/debug"
+    echo "#!/bin/bash" >> ".localconfig/debug"
+    echo "" >> ".localconfig/debug"
+    echo "# Configuration for debug builds" >> ".localconfig/debug"
+    echo "" >> ".localconfig/debug"
+    echo "# Build directory and build type" >> ".localconfig/debug"
+    echo "BUILD_DIR=\"\${BUILD_DIR}-debug\"" >> ".localconfig/debug"
+    echo "BUILD_TYPE=\"Debug\"" >> ".localconfig/debug"
+
+    touch ".localconfig/pack"
+    echo "#!/bin/bash" >> ".localconfig/pack"
+    echo "" >> ".localconfig/pack"
+    echo "# Configuration for creating packages" >> ".localconfig/pack"
+    echo "" >> ".localconfig/pack"
+    echo "# Installation directory" >> ".localconfig/pack"
+    echo "CMAKE_OPTIONS=\"\${CMAKE_OPTIONS} -DCMAKE_INSTALL_PREFIX=/usr\"" >> ".localconfig/pack"
+    echo "" >> ".localconfig/pack"
+    echo "# Enable self-contained installation" >> ".localconfig/pack"
+    echo "#CMAKE_OPTIONS=\"\${CMAKE_OPTIONS} -DOPTION_SELF_CONTAINED:BOOL=ON\"" >> ".localconfig/pack"
+    echo "" >> ".localconfig/pack"
+    echo "# Enable all components for the package" >> ".localconfig/pack"
+    echo "CMAKE_OPTIONS=\"\${CMAKE_OPTIONS} -DOPTION_BUILD_EXAMPLES:BOOL=ON\"" >> ".localconfig/pack"
+    echo "CMAKE_OPTIONS=\"\${CMAKE_OPTIONS} -DOPTION_BUILD_DOCS:BOOL=ON\"" >> ".localconfig/pack"
+    echo "CMAKE_OPTIONS=\"\${CMAKE_OPTIONS} -DOPTION_BUILD_TESTS:BOOL=OFF\"" >> ".localconfig/pack"
+
+    echo "Default configuration has been written to .localconfig"
+    echo "Please review and adjust the configuration, then run again"
+    echo ""
+    echo "  ./configure $@"
+    
+    exit
+fi
+
+# Read local default options
+if [ -f "./.localconfig/default" ]
+then
+    . ./.localconfig/default
+fi
+
+# Parse command line arguments
+for ARG in "$@"
+do
+    # Read in configuration for that command-line argument
+    CONFIGFILE="./.localconfig/$ARG"
+    if [ -f "./.localconfig/$ARG" ]
+    then
+        . "./.localconfig/$ARG"
+    elif [ -f "$HOME/.localconfig/$ARG" ]
+    then
+        . "$HOME/.localconfig/$ARG"
+    else
+        echo "Configuration \"$ARG\" not found (searched in ./.localconfig and ~/.localconfig)"
+    fi
+done
+
+# Configure build
+echo "Configuring ..."
+echo ""
+
+# Create build directory
+if [ ! -d "./$BUILD_DIR" ]
+then
+    mkdir $BUILD_DIR
+fi
+
+# Configure project
+cd $BUILD_DIR
+cmake -G "$CMAKE_GENERATOR" "-DCMAKE_BUILD_TYPE=$BUILD_TYPE" $CMAKE_OPTIONS ..
+if [ $? == 0 ]
+then
+    echo ""
+    echo "Project configured. To build the project, use";
+    echo ""
+    echo "  cmake --build $BUILD_DIR"
+else
+    echo ""
+    echo "Configuration failed.";
+fi
+
+cd ..
