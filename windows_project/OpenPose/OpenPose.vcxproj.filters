@@ -9,17 +9,11 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="Source Files\core">
-      <UniqueIdentifier>{7de8f05e-741a-41f6-a46b-5a831c0a08fa}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\experimental">
       <UniqueIdentifier>{3de0bd68-72e7-4371-9887-31f13a840ac0}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\filestream">
       <UniqueIdentifier>{9115a604-a304-4827-af34-a8bd10cfb44f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\gui">
-      <UniqueIdentifier>{31e599f6-f67f-4055-9d70-909bd4892baf}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\pose">
       <UniqueIdentifier>{2cc5145d-2e47-4ac4-8964-920f2f6e96c7}</UniqueIdentifier>
@@ -35,9 +29,6 @@
     </Filter>
     <Filter Include="Source Files\wrapper">
       <UniqueIdentifier>{9ea7fd57-5813-47f0-96e5-d7475590579d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\experimental\face">
-      <UniqueIdentifier>{f5d83a38-ab14-4c0e-9ce6-fa4e04ebc4bd}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\experimental\filestream">
       <UniqueIdentifier>{4d7a98a1-e939-4f11-86cd-a8c72a34a662}</UniqueIdentifier>
@@ -84,6 +75,15 @@
     <Filter Include="Header Files\experimental\producer">
       <UniqueIdentifier>{c8cf4a4d-0c51-42df-a421-53171676bf6d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\face">
+      <UniqueIdentifier>{d2ad50bd-8f1e-4e0a-94f9-72bb02899531}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\gui">
+      <UniqueIdentifier>{31e599f6-f67f-4055-9d70-909bd4892baf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\core">
+      <UniqueIdentifier>{7de8f05e-741a-41f6-a46b-5a831c0a08fa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\openpose\core\array.cpp">
@@ -125,12 +125,6 @@
     <ClCompile Include="..\..\src\openpose\core\scaleKeyPoints.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\openpose\experimental\face\faceExtractor.cpp">
-      <Filter>Source Files\experimental\face</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\openpose\experimental\face\faceRenderer.cpp">
-      <Filter>Source Files\experimental\face</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\openpose\experimental\hand\handExtractor.cpp">
       <Filter>Source Files\experimental\hand</Filter>
     </ClCompile>
@@ -150,15 +144,6 @@
       <Filter>Source Files\filestream</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\openpose\filestream\jsonOfstream.cpp">
-      <Filter>Source Files\filestream</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\openpose\filestream\poseJsonCocoSaver.cpp">
-      <Filter>Source Files\filestream</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\openpose\filestream\poseJsonSaver.cpp">
-      <Filter>Source Files\filestream</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\openpose\filestream\poseSaver.cpp">
       <Filter>Source Files\filestream</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\openpose\filestream\videoSaver.cpp">
@@ -242,9 +227,6 @@
     <ClCompile Include="..\..\src\openpose\core\defineTemplates.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\openpose\experimental\face\defineTemplates.cpp">
-      <Filter>Source Files\experimental\face</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\openpose\experimental\filestream\defineTemplates.cpp">
       <Filter>Source Files\experimental\filestream</Filter>
     </ClCompile>
@@ -269,6 +251,33 @@
     <ClCompile Include="..\..\src\openpose\wrapper\defineTemplates.cpp">
       <Filter>Source Files\wrapper</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\openpose\face\defineTemplates.cpp">
+      <Filter>Source Files\face</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\face\faceDetector.cpp">
+      <Filter>Source Files\face</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\face\faceExtractor.cpp">
+      <Filter>Source Files\face</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\face\faceRenderer.cpp">
+      <Filter>Source Files\face</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\filestream\cocoJsonSaver.cpp">
+      <Filter>Source Files\filestream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\filestream\keypointJsonSaver.cpp">
+      <Filter>Source Files\filestream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\filestream\keypointSaver.cpp">
+      <Filter>Source Files\filestream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\core\point.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\core\rectangle.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\..\src\openpose\core\nmsBase.cu">
@@ -276,9 +285,6 @@
     </CudaCompile>
     <CudaCompile Include="..\..\src\openpose\core\resizeAndMergeBase.cu">
       <Filter>Source Files\core</Filter>
-    </CudaCompile>
-    <CudaCompile Include="..\..\src\openpose\experimental\face\faceRenderGpu.cu">
-      <Filter>Source Files\experimental\face</Filter>
     </CudaCompile>
     <CudaCompile Include="..\..\src\openpose\experimental\hand\handRenderGpu.cu">
       <Filter>Source Files\experimental\hand</Filter>
@@ -288,6 +294,9 @@
     </CudaCompile>
     <CudaCompile Include="..\..\src\openpose\pose\poseRenderGpu.cu">
       <Filter>Source Files\pose</Filter>
+    </CudaCompile>
+    <CudaCompile Include="..\..\src\openpose\face\faceRenderGpu.cu">
+      <Filter>Source Files\face</Filter>
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>

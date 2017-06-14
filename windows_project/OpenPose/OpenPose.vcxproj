@@ -42,20 +42,28 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>EnableAllWarnings</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ObjectFileName>$(IntDir)\obj\obj\obj\%(RelativeDir)\%(Filename)%(Extension).obj</ObjectFileName>
-      <PreprocessorDefinitions>CAFFE_VERSION=1.0.0;BOOST_ALL_NO_LIB;USE_LMDB;USE_LEVELDB;USE_CUDNN;USE_OPENCV;USE_CAFFE;CMAKE_WINDOWS_BUILD;GLOG_NO_ABBREVIATED_SEVERITIES;GOOGLE_GLOG_DLL_DECL=__declspec(dllimport);GOOGLE_GLOG_DLL_DECL_FOR_UNITTESTS=__declspec(dllimport);H5_BUILT_AS_DYNAMIC_LIB=1;CMAKE_INTDIR="Release";_CRT_SECURE_NO_WARNINGS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CAFFE_VERSION=1.0.0;BOOST_ALL_NO_LIB;USE_LMDB;USE_LEVELDB;USE_CUDNN;USE_OPENCV;USE_CAFFE;CMAKE_WINDOWS_BUILD;GLOG_NO_ABBREVIATED_SEVERITIES;GOOGLE_GLOG_DLL_DECL=__declspec(dllimport);GOOGLE_GLOG_DLL_DECL_FOR_UNITTESTS=__declspec(dllimport);H5_BUILT_AS_DYNAMIC_LIB=1;CMAKE_INTDIR="Release";_CRT_SECURE_NO_WARNINGS;_MBCS;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>..\..\include;..\..\3rdparty\caffe-windows\caffe-windows\include;..\..\3rdparty\caffe-windows\include;..\..\3rdparty\caffe-windows\dependencies\libraries_v140_x64_py27_1.1.0\libraries\include;..\..\3rdparty\caffe-windows\dependencies\libraries_v140_x64_py27_1.1.0\libraries\include\boost-1_61;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <CudaCompile>
       <CompileOut>$(IntDir)\obj\obj\obj\%(RelativeDir)\%(Filename)%(Extension).obj</CompileOut>
       <CodeGeneration>compute_30,sm_30;compute_35,sm_35;compute_50,sm_50;compute_52,sm_52;compute_61,sm_61</CodeGeneration>
     </CudaCompile>
+    <CustomBuildStep />
+    <PreBuildEvent>
+      <Command>cmd /c ..\..\3rdparty\install_caffe.cmd</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>--------------------- Building Caffe ---------------------</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -64,7 +72,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\..\include;..\..\3rdparty\caffe-windows\include;..\..\3rdparty\include;..\..\3rdparty\dependencies\libraries_v140_x64_py27_1.1.0\libraries\include;..\..\3rdparty\dependencies\libraries_v140_x64_py27_1.1.0\libraries\include\boost-1_61;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\include;..\..\3rdparty\caffe-windows\caffe-windows\include;..\..\3rdparty\caffe-windows\include;..\..\3rdparty\caffe-windows\dependencies\libraries_v140_x64_py27_1.1.0\libraries\include;..\..\3rdparty\caffe-windows\dependencies\libraries_v140_x64_py27_1.1.0\libraries\include\boost-1_61;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>CAFFE_VERSION=1.0.0;BOOST_ALL_NO_LIB;USE_LMDB;USE_LEVELDB;USE_CUDNN;USE_OPENCV;USE_CAFFE;CMAKE_WINDOWS_BUILD;GLOG_NO_ABBREVIATED_SEVERITIES;GOOGLE_GLOG_DLL_DECL=__declspec(dllimport);GOOGLE_GLOG_DLL_DECL_FOR_UNITTESTS=__declspec(dllimport);H5_BUILT_AS_DYNAMIC_LIB=1;CMAKE_INTDIR="Release";_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)\obj\obj\obj\%(RelativeDir)\%(Filename)%(Extension).obj</ObjectFileName>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -91,26 +99,29 @@
     <ClCompile Include="..\..\src\openpose\core\nmsBase.cpp" />
     <ClCompile Include="..\..\src\openpose\core\nmsCaffe.cpp" />
     <ClCompile Include="..\..\src\openpose\core\opOutputToCvMat.cpp" />
+    <ClCompile Include="..\..\src\openpose\core\point.cpp" />
+    <ClCompile Include="..\..\src\openpose\core\rectangle.cpp" />
     <ClCompile Include="..\..\src\openpose\core\renderer.cpp" />
     <ClCompile Include="..\..\src\openpose\core\resizeAndMergeBase.cpp" />
     <ClCompile Include="..\..\src\openpose\core\resizeAndMergeCaffe.cpp" />
     <ClCompile Include="..\..\src\openpose\core\scaleKeyPoints.cpp" />
-    <ClCompile Include="..\..\src\openpose\experimental\face\defineTemplates.cpp" />
-    <ClCompile Include="..\..\src\openpose\experimental\face\faceExtractor.cpp" />
-    <ClCompile Include="..\..\src\openpose\experimental\face\faceRenderer.cpp" />
     <ClCompile Include="..\..\src\openpose\experimental\filestream\defineTemplates.cpp" />
     <ClCompile Include="..\..\src\openpose\experimental\hand\defineTemplates.cpp" />
     <ClCompile Include="..\..\src\openpose\experimental\hand\handExtractor.cpp" />
     <ClCompile Include="..\..\src\openpose\experimental\hand\handRenderer.cpp" />
+    <ClCompile Include="..\..\src\openpose\face\defineTemplates.cpp" />
+    <ClCompile Include="..\..\src\openpose\face\faceDetector.cpp" />
+    <ClCompile Include="..\..\src\openpose\face\faceExtractor.cpp" />
+    <ClCompile Include="..\..\src\openpose\face\faceRenderer.cpp" />
+    <ClCompile Include="..\..\src\openpose\filestream\cocoJsonSaver.cpp" />
     <ClCompile Include="..\..\src\openpose\filestream\defineTemplates.cpp" />
     <ClCompile Include="..\..\src\openpose\filestream\fileSaver.cpp" />
     <ClCompile Include="..\..\src\openpose\filestream\fileStream.cpp" />
     <ClCompile Include="..\..\src\openpose\filestream\heatMapSaver.cpp" />
     <ClCompile Include="..\..\src\openpose\filestream\imageSaver.cpp" />
     <ClCompile Include="..\..\src\openpose\filestream\jsonOfstream.cpp" />
-    <ClCompile Include="..\..\src\openpose\filestream\poseJsonCocoSaver.cpp" />
-    <ClCompile Include="..\..\src\openpose\filestream\poseJsonSaver.cpp" />
-    <ClCompile Include="..\..\src\openpose\filestream\poseSaver.cpp" />
+    <ClCompile Include="..\..\src\openpose\filestream\keypointJsonSaver.cpp" />
+    <ClCompile Include="..\..\src\openpose\filestream\keypointSaver.cpp" />
     <ClCompile Include="..\..\src\openpose\filestream\videoSaver.cpp" />
     <ClCompile Include="..\..\src\openpose\gui\defineTemplates.cpp" />
     <ClCompile Include="..\..\src\openpose\gui\frameDisplayer.cpp" />
@@ -146,8 +157,8 @@
   <ItemGroup>
     <CudaCompile Include="..\..\src\openpose\core\nmsBase.cu" />
     <CudaCompile Include="..\..\src\openpose\core\resizeAndMergeBase.cu" />
-    <CudaCompile Include="..\..\src\openpose\experimental\face\faceRenderGpu.cu" />
     <CudaCompile Include="..\..\src\openpose\experimental\hand\handRenderGpu.cu" />
+    <CudaCompile Include="..\..\src\openpose\face\faceRenderGpu.cu" />
     <CudaCompile Include="..\..\src\openpose\pose\bodyPartConnectorBase.cu" />
     <CudaCompile Include="..\..\src\openpose\pose\poseRenderGpu.cu" />
   </ItemGroup>
