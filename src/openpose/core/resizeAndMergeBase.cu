@@ -8,7 +8,8 @@ namespace op
     const auto THREADS_PER_BLOCK_1D = 16u;
 
     template <typename T>
-    __global__ void resizeKernel(T* targetPtr, const T* const sourcePtr, const int sourceWidth, const int sourceHeight, const int targetWidth, const int targetHeight)
+    __global__ void resizeKernel(T* targetPtr, const T* const sourcePtr, const int sourceWidth, const int sourceHeight, const int targetWidth,
+                                 const int targetHeight)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -20,12 +21,12 @@ namespace op
             const T xSource = (x + 0.5f) / scaleWidth - 0.5f;
             const T ySource = (y + 0.5f) / scaleHeight - 0.5f;
 
-            targetPtr[y*targetWidth+x] = cubicResize(sourcePtr, xSource, ySource, sourceWidth, sourceHeight, sourceWidth);
+            targetPtr[y*targetWidth+x] = bicubicInterpolate(sourcePtr, xSource, ySource, sourceWidth, sourceHeight, sourceWidth);
         }
     }
 
     template <typename T>
-    __global__ void resizeKernelAndMerge(T* targetPtr, const T* const sourcePtr, const int sourceNumOffset, const int num, const T scaleGap,
+    __global__ void resizeKernelAndMerge(T* targetPtr, const T* const sourcePtr, const int sourceNumOffset, const int num, const T* scaleRatios,
                                          const int sourceWidth, const int sourceHeight, const int targetWidth, const int targetHeight)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
@@ -38,17 +39,17 @@ namespace op
             // targetPixel = -1000.f; // For fastMax
             for (auto n = 0; n < num; n++)
             {
-                const auto numberScale = 1 - n * scaleGap;
-                const auto widthPaddedSource = int(sourceWidth * numberScale);
-                const auto heightPaddedSource = int(sourceHeight * numberScale);
+                const auto currentWidth = sourceWidth * scaleRatios[n];
+                const auto currentHeight = sourceHeight * scaleRatios[n];
 
-                const auto scaleWidth = targetWidth / T(widthPaddedSource);
-                const auto scaleHeight = targetHeight / T(heightPaddedSource);
+                const auto scaleWidth = targetWidth / currentWidth;
+                const auto scaleHeight = targetHeight / currentHeight;
                 const T xSource = (x + 0.5f) / scaleWidth - 0.5f;
                 const T ySource = (y + 0.5f) / scaleHeight - 0.5f;
 
                 const T* const sourcePtrN = sourcePtr + n * sourceNumOffset;
-                const auto interpolated = cubicResize(sourcePtrN, xSource, ySource, widthPaddedSource, heightPaddedSource, sourceWidth);
+                const auto interpolated = bicubicInterpolate(sourcePtrN, xSource, ySource, intRound(currentWidth),
+                                                             intRound(currentHeight), sourceWidth);
                 targetPixel += interpolated;
                 // targetPixel = fastMax(targetPixel, interpolated);
             }
@@ -57,7 +58,8 @@ namespace op
     }
 
     template <typename T>
-    void resizeAndMergeGpu(T* targetPtr, const T* const sourcePtr, const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize, const T scaleGap)
+    void resizeAndMergeGpu(T* targetPtr, const T* const sourcePtr, const std::array<int, 4>& targetSize,
+                           const std::array<int, 4>& sourceSize, const std::vector<T>& scaleRatios)
     {
         try
         {
@@ -73,21 +75,42 @@ namespace op
             const auto sourceChannelOffset = sourceHeight * sourceWidth;
             const auto targetChannelOffset = targetWidth * targetHeight;
 
+            // No multi-scale merging
             if (targetSize[0] > 1)
             {
                 for (auto n = 0; n < num; n++)
-                    for (auto c = 0; c < channels; c++)
-                        resizeKernel<<<numBlocks, threadsPerBlock>>>(targetPtr + (n*channels + c) * targetChannelOffset, sourcePtr + (n*channels + c) * sourceChannelOffset,
+                {
+                    const auto offsetBase = n*channels;
+                    for (auto c = 0 ; c < channels ; c++)
+                    {
+                        const auto offset = offsetBase + c;
+                        resizeKernel<<<numBlocks, threadsPerBlock>>>(targetPtr + offset * targetChannelOffset,
+                                                                     sourcePtr + offset * sourceChannelOffset,
                                                                      sourceWidth, sourceHeight, targetWidth, targetHeight);
+                    }
+                }
             }
+            // Multi-scale merging
             else
             {
-                if (scaleGap <= 0.f && num != targetSize[0])
-                    error("The scale gap must be greater than 0.", __LINE__, __FUNCTION__, __FILE__);
+                // If num_scales > 1 --> scaleRatios must be set
+                if (scaleRatios.size() != num)
+                    error("The scale ratios size must be equal than the number of scales.", __LINE__, __FUNCTION__, __FILE__);
+                const auto maxScales = 10;
+                if (scaleRatios.size() > maxScales)
+                    error("The maximum number of scales is " + std::to_string(maxScales) + ".", __LINE__, __FUNCTION__, __FILE__);
+                // Copy scaleRatios
+                T* scaleRatiosGpuPtr;
+                cudaMalloc((void**)&scaleRatiosGpuPtr, maxScales * sizeof(T));
+                cudaMemcpy(scaleRatiosGpuPtr, scaleRatios.data(), scaleRatios.size() * sizeof(T), cudaMemcpyHostToDevice);
+                // Perform resize + merging
                 const auto sourceNumOffset = channels * sourceChannelOffset;
-                for (auto c = 0; c < channels; c++)
-                    resizeKernelAndMerge<<<numBlocks, threadsPerBlock>>>(targetPtr + c * targetChannelOffset, sourcePtr + c * sourceChannelOffset, sourceNumOffset,
-                                                                         num, scaleGap, sourceWidth, sourceHeight, targetWidth, targetHeight);
+                for (auto c = 0 ; c < channels ; c++)
+                    resizeKernelAndMerge<<<numBlocks, threadsPerBlock>>>(targetPtr + c * targetChannelOffset,
+                                                                         sourcePtr + c * sourceChannelOffset, sourceNumOffset,
+                                                                         num, scaleRatiosGpuPtr, sourceWidth, sourceHeight, targetWidth, targetHeight);
+                // Free memory
+                cudaFree(scaleRatiosGpuPtr);
             }
 
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
@@ -98,6 +121,8 @@ namespace op
         }
     }
 
-    template void resizeAndMergeGpu(float* targetPtr, const float* const sourcePtr, const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize, const float scaleGap);
-    template void resizeAndMergeGpu(double* targetPtr, const double* const sourcePtr, const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize, const double scaleGap);
+    template void resizeAndMergeGpu(float* targetPtr, const float* const sourcePtr, const std::array<int, 4>& targetSize,
+                                    const std::array<int, 4>& sourceSize, const std::vector<float>& scaleRatios);
+    template void resizeAndMergeGpu(double* targetPtr, const double* const sourcePtr, const std::array<int, 4>& targetSize,
+                                    const std::array<int, 4>& sourceSize, const std::vector<double>& scaleRatios);
 }

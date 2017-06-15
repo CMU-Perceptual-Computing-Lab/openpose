@@ -41,5 +41,16 @@ OpenPose Library - Release Notes
 3. Main bugs fixed:
     1. All visualization functions moved to same thread, so it works with most OpenCV custom compiled versions.
     2. Fixed error on debug mode: `Too many resources requested for launch`.
-    3. Bug in Array::getConstCvMat() if mVolume=0, now returning empty cv::Mat.
-    4. Bug: `--process_real_time` threw error with webcam.
+
+
+
+## Current version (future OpenPose 1.0.0rc4)
+1. Main improvements:
+    1. Check() functions give more feedback.
+    2. Improved documentation.
+2. Functions or paremeters renamed:
+    1. `Datum::scaleRatios` to save the relative scale ratio when multi-scale.
+3. Main bugs fixed:
+    1. Fixed bug in Array::getConstCvMat() if mVolume=0, now returning empty cv::Mat.
+    2. Fixed bug: `--process_real_time` threw error with webcam.
+    3. Fixed bug: Face not working with output resolution different to input.

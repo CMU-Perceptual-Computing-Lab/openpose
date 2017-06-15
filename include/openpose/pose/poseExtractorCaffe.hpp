@@ -20,14 +20,14 @@ namespace op
     {
     public:
         PoseExtractorCaffe(const Point<int>& netInputSize, const Point<int>& netOutputSize, const Point<int>& outputSize, const int scaleNumber,
-                           const float scaleGap, const PoseModel poseModel, const std::string& modelFolder, const int gpuId, const std::vector<HeatMapType>& heatMapTypes = {},
+                           const PoseModel poseModel, const std::string& modelFolder, const int gpuId, const std::vector<HeatMapType>& heatMapTypes = {},
                            const ScaleMode heatMapScale = ScaleMode::ZeroToOne);
 
         virtual ~PoseExtractorCaffe();
 
         void netInitializationOnThread();
 
-        void forwardPass(const Array<float>& inputNetData, const Point<int>& inputDataSize);
+        void forwardPass(const Array<float>& inputNetData, const Point<int>& inputDataSize, const std::vector<float>& scaleRatios = {1.f});
 
         const float* getHeatMapCpuConstPtr() const;
 
@@ -36,6 +36,7 @@ namespace op
         const float* getPoseGpuConstPtr() const;
 
     private:
+        const float mResizeScale;
         std::shared_ptr<Net> spNet;
         std::shared_ptr<ResizeAndMergeCaffe<float>> spResizeAndMergeCaffe;
         std::shared_ptr<NmsCaffe<float>> spNmsCaffe;

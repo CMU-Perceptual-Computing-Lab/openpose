@@ -12,6 +12,7 @@
 #include "keypointJsonSaver.hpp"
 #include "keypointSaver.hpp"
 #include "videoSaver.hpp"
+#include "wCocoJsonSaver.hpp"
 #include "wFaceJsonSaver.hpp"
 #include "wFaceSaver.hpp"
 #include "wHandJsonSaver.hpp"

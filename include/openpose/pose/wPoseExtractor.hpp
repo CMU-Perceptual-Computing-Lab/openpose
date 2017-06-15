@@ -61,7 +61,7 @@ namespace op
                 // Extract people pose
                 for (auto& tDatum : *tDatums)
                 {
-                    spPoseExtractor->forwardPass(tDatum.inputNetData, Point<int>{tDatum.cvInputData.cols, tDatum.cvInputData.rows});
+                    spPoseExtractor->forwardPass(tDatum.inputNetData, Point<int>{tDatum.cvInputData.cols, tDatum.cvInputData.rows}, tDatum.scaleRatios);
                     tDatum.poseHeatMaps = spPoseExtractor->getHeatMaps();
                     tDatum.poseKeypoints = spPoseExtractor->getPoseKeypoints();
                     tDatum.scaleNetToOutput = spPoseExtractor->getScaleNetToOutput();

@@ -8,7 +8,8 @@
 namespace op
 {
     template <typename T>
-    ResizeAndMergeCaffe<T>::ResizeAndMergeCaffe()
+    ResizeAndMergeCaffe<T>::ResizeAndMergeCaffe() :
+        mScaleRatios{1}
     {
     }
 
@@ -29,7 +30,8 @@ namespace op
     }
 
     template <typename T>
-    void ResizeAndMergeCaffe<T>::Reshape(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top, const float factor, const bool mergeFirstDimension)
+    void ResizeAndMergeCaffe<T>::Reshape(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top,
+                                         const float factor, const bool mergeFirstDimension)
     {
         try
         {
@@ -54,11 +56,11 @@ namespace op
     }
 
     template <typename T>
-    void ResizeAndMergeCaffe<T>::setScaleGap(const T scaleGap)
+    void ResizeAndMergeCaffe<T>::setScaleRatios(const std::vector<T>& scaleRatios)
     {
         try
         {
-            mScaleGap = {scaleGap};
+            mScaleRatios = {scaleRatios};
         }
         catch (const std::exception& e)
         {
@@ -71,7 +73,7 @@ namespace op
     {
         try
         {
-            resizeAndMergeCpu(top.at(0)->mutable_cpu_data(), bottom.at(0)->cpu_data(), mTopSize, mBottomSize, mScaleGap);
+            resizeAndMergeCpu(top.at(0)->mutable_cpu_data(), bottom.at(0)->cpu_data(), mTopSize, mBottomSize, mScaleRatios);
         }
         catch (const std::exception& e)
         {
@@ -84,7 +86,7 @@ namespace op
     {
         try
         {
-            resizeAndMergeGpu(top.at(0)->mutable_gpu_data(), bottom.at(0)->gpu_data(), mTopSize, mBottomSize, mScaleGap);
+            resizeAndMergeGpu(top.at(0)->mutable_gpu_data(), bottom.at(0)->gpu_data(), mTopSize, mBottomSize, mScaleRatios);
         }
         catch (const std::exception& e)
         {
@@ -93,7 +95,8 @@ namespace op
     }
 
     template <typename T>
-    void ResizeAndMergeCaffe<T>::Backward_cpu(const std::vector<caffe::Blob<T>*>& top, const std::vector<bool>& propagate_down, const std::vector<caffe::Blob<T>*>& bottom)
+    void ResizeAndMergeCaffe<T>::Backward_cpu(const std::vector<caffe::Blob<T>*>& top, const std::vector<bool>& propagate_down,
+                                              const std::vector<caffe::Blob<T>*>& bottom)
     {
         try
         {
@@ -109,7 +112,8 @@ namespace op
     }
 
     template <typename T>
-    void ResizeAndMergeCaffe<T>::Backward_gpu(const std::vector<caffe::Blob<T>*>& top, const std::vector<bool>& propagate_down, const std::vector<caffe::Blob<T>*>& bottom)
+    void ResizeAndMergeCaffe<T>::Backward_gpu(const std::vector<caffe::Blob<T>*>& top, const std::vector<bool>& propagate_down,
+                                              const std::vector<caffe::Blob<T>*>& bottom)
     {
         try
         {
