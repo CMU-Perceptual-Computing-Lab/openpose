@@ -1,6 +1,7 @@
 #ifndef OPENPOSE_WRAPPER_WRAPPER_STRUCT_FACE_HPP
 #define OPENPOSE_WRAPPER_WRAPPER_STRUCT_FACE_HPP
 
+#include <openpose/core/enumClasses.hpp>
 #include <openpose/core/point.hpp>
 #include <openpose/face/faceParameters.hpp>
 
@@ -27,9 +28,10 @@ namespace op
         Point<int> netInputSize;
 
         /**
-         * Whether to render the output (pose locations, face, background or PAF heat maps).
+         * Whether to render the output (pose locations, body, background or PAF heat maps) with CPU or GPU.
+         * Select `None` for no rendering, `Cpu` or `Gpu` por CPU and GPU rendering respectively.
          */
-        bool renderOutput;
+        RenderMode renderMode;
 
         /**
          * Rendering blending alpha value of the pose point locations with respect to the background image.
@@ -49,7 +51,8 @@ namespace op
          * Since all the elements of the struct are public, they can also be manually filled.
          */
         WrapperStructFace(const bool enable = false, const Point<int>& netInputSize = Point<int>{368, 368},
-                          const bool renderOutput = false, const float alphaKeypoint = FACE_DEFAULT_ALPHA_KEYPOINT,
+                          const RenderMode renderMode = RenderMode::None,
+                          const float alphaKeypoint = FACE_DEFAULT_ALPHA_KEYPOINT,
                           const float alphaHeatMap = FACE_DEFAULT_ALPHA_HEAT_MAP);
     };
 }

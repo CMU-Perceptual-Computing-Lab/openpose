@@ -44,13 +44,13 @@ Each flag is divided into flag name, default value, and description.
 - DEFINE_int32(part_to_show,              0,              "Part to show from the start.");
 - DEFINE_bool(disable_blending,           false,          "If blending is enabled, it will merge the results with the original frame. If disabled, it will only display the results.");
 8. OpenPose Rendering Pose
-- DEFINE_bool(no_render_pose,             false,          "If false, it will fill both `outputData` and `cvOutputData` with the original image + desired part to be shown. If true, it will leave them empty.");
-- DEFINE_double(alpha_pose,               0.6,            "Blending factor (range 0-1) for the body part rendering. 1 will show it completely, 0 will hide it.");
-- DEFINE_double(alpha_heatmap,            0.7,            "Blending factor (range 0-1) between heatmap and original frame. 1 will only show the heatmap, 0 will only show the frame.");
+- DEFINE_int32(render_pose,               1,              "Set to 0 for no rendering, 1 for CPU rendering (slightly faster), and 2 for GPU rendering (slower but greater functionality, e.g. `alpha_X` flags). If rendering is enabled, it will render both `outputData` and `cvOutputData` with the original image and desired body part to be shown (i.e. keypoints, heat maps or PAFs).");
+- DEFINE_double(alpha_pose,               0.6,            "Blending factor (range 0-1) for the body part rendering. 1 will show it completely, 0 will hide it. Only valid for GPU rendering.");
+- DEFINE_double(alpha_heatmap,            0.7,            "Blending factor (range 0-1) between heatmap and original frame. 1 will only show the heatmap, 0 will only show the frame. Only valid for GPU rendering.");
 9. OpenPose Rendering Face
-- DEFINE_bool(no_render_face,             false,          "Analogous to `no_render_pose` but applied to the face keypoints and heat maps.");
-- DEFINE_double(alpha_face,               0.6,            "Blending factor (range 0-1) for the body part rendering. 1 will show it completely, 0 will hide it.");
-- DEFINE_double(alpha_heatmap_face,       0.7,            "Blending factor (range 0-1) between heatmap and original frame. 1 will only show the heatmap, 0 will only show the frame.");
+- DEFINE_int32(render_face,               -1,             "Analogous to `render_pose` but applied to the face. Extra option: -1 to use the same configuration that `render_pose` is using.");
+- DEFINE_double(alpha_face,               0.6,            "Analogous to `alpha_pose` but applied to face.");
+- DEFINE_double(alpha_heatmap_face,       0.7,            "Analogous to `alpha_heatmap` but applied to face.");
 10. Display
 - DEFINE_bool(fullscreen,                 false,          "Run in full-screen mode (press f during runtime to toggle).");
 - DEFINE_bool(process_real_time,          false,          "Enable to keep the original source frame rate (e.g. for video). If the processing time is too long, it will skip frames. If it is too fast, it will slow it down.");
@@ -60,11 +60,11 @@ Each flag is divided into flag name, default value, and description.
 - DEFINE_string(write_images,             "",             "Directory to write rendered frames in `write_images_format` image format.");
 - DEFINE_string(write_images_format,      "png",          "File extension and format for `write_images`, e.g. png, jpg or bmp. Check the OpenCV function cv::imwrite for all compatible extensions.");
 - DEFINE_string(write_video,              "",             "Full file path to write rendered frames in motion JPEG video format. It might fail if the final path does not finish in `.avi`. It internally uses cv::VideoWriter.");
-- DEFINE_string(write_keypoint,           "",             "Directory to write the people body pose keypoint data. Desired format on `write_keypoint_format`.");
-- DEFINE_string(write_keypoint_format,    "yml",          "File extension and format for `write_keypoint`: json, xml, yaml and yml. Json not available for OpenCV < 3.0, use `write_keypoint_json` instead.");
-- DEFINE_string(write_keypoint_json,      "",             "Directory to write people pose data with *.json format, compatible with any OpenCV version.");
+- DEFINE_string(write_keypoint,           "",             "Directory to write the people pose keypoint data. Format with `write_keypoint_format`.");
+- DEFINE_string(write_keypoint_format,    "yml",          "File extension and format for `write_keypoint`: json, xml, yaml & yml. Json not available for OpenCV < 3.0, use `write_keypoint_json` instead.");
+- DEFINE_string(write_keypoint_json,      "",             "Directory to write people pose data in *.json format, compatible with any OpenCV version.");
 - DEFINE_string(write_coco_json,          "",             "Full file path to write people pose data with *.json COCO validation format.");
-- DEFINE_string(write_heatmaps,           "",             "Directory to write heatmaps with *.png format. At least 1 `add_heatmaps_X` flag must be enabled.");
+- DEFINE_string(write_heatmaps,           "",             "Directory to write heatmaps in *.png format. At least 1 `add_heatmaps_X` flag must be enabled.");
 - DEFINE_string(write_heatmaps_format,    "png",          "File extension and format for `write_heatmaps`, analogous to `write_images_format`. Recommended `png` or any compressed and lossless format.");
 
 ## Multiple Scales

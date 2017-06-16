@@ -2,9 +2,11 @@
 #define OPENPOSE_HAND_HAND_RENDERER_HPP
 
 #include <openpose/core/array.hpp>
+#include <openpose/core/enumClasses.hpp>
 #include <openpose/core/point.hpp>
 #include <openpose/core/renderer.hpp>
 #include <openpose/thread/worker.hpp>
+#include "handParameters.hpp"
 
 namespace op
 {
@@ -13,17 +15,23 @@ namespace op
         class HandRenderer : public Renderer
         {
         public:
-            explicit HandRenderer(const Point<int>& frameSize);
+            HandRenderer(const Point<int>& frameSize, const float alphaKeypoint = HAND_DEFAULT_ALPHA_KEYPOINT,
+                         const float alphaHeatMap = HAND_DEFAULT_ALPHA_HEAT_MAP, const RenderMode renderMode = RenderMode::Cpu);
 
             ~HandRenderer();
 
             void initializationOnThread();
 
-            void renderHands(Array<float>& outputData, const Array<float>& handKeypoints);
+            void renderHand(Array<float>& outputData, const Array<float>& handKeypoints);
 
         private:
             const Point<int> mFrameSize;
-            float* pGpuHands;           // GPU aux memory
+            const RenderMode mRenderMode;
+            float* pGpuHands; // GPU aux memory
+
+            void renderHandCpu(Array<float>& outputData, const Array<float>& handKeypoints);
+
+            void renderHandGpu(Array<float>& outputData, const Array<float>& handKeypoints);
 
             DELETE_COPY(HandRenderer);
         };

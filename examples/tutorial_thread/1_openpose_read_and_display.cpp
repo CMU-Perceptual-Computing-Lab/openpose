@@ -21,19 +21,23 @@
 // Note: This command will show you flags for other unnecessary 3rdparty files. Check only the flags for the OpenPose
 // executable. E.g. for `openpose.bin`, look for `Flags from examples/openpose/openpose.cpp:`.
 // Debugging
-DEFINE_int32(logging_level,             3,              "The logging level. Integer in the range [0, 255]. 0 will output any log() message, while 255 will not output any."
-                                                        " Current OpenPose library messages are in the range 0-4: 1 for low priority messages and 4 for important ones.");
+DEFINE_int32(logging_level,             3,              "The logging level. Integer in the range [0, 255]. 0 will output any log() message, while"
+                                                        " 255 will not output any. Current OpenPose library messages are in the range 0-4: 1 for"
+                                                        " low priority messages and 4 for important ones.");
 // Producer
 DEFINE_int32(camera,                    0,              "The camera index for cv::VideoCapture. Integer in the range [0, 9].");
 DEFINE_string(camera_resolution,        "1280x720",     "Size of the camera frames to ask for.");
-DEFINE_string(video,                    "",             "Use a video file instead of the camera. Use `examples/media/video.avi` for our default example video.");
-DEFINE_string(image_dir,                "",             "Process a directory of images. Use `examples/media/` for our default example folder with 20 images.");
+DEFINE_string(video,                    "",             "Use a video file instead of the camera. Use `examples/media/video.avi` for our default"
+                                                        " example video.");
+DEFINE_string(image_dir,                "",             "Process a directory of images. Use `examples/media/` for our default example folder with 20"
+                                                        " images.");
 // OpenPose
-DEFINE_string(resolution,               "1280x720",     "The image resolution (display). Use \"-1x-1\" to force the program to use the default images resolution.");
+DEFINE_string(resolution,               "1280x720",     "The image resolution (display and output). Use \"-1x-1\" to force the program to use the"
+                                                        " default images resolution.");
 // Consumer
 DEFINE_bool(fullscreen,                 false,          "Run in full-screen mode (press f during runtime to toggle).");
-DEFINE_bool(process_real_time,          false,          "Enable to keep the original source frame rate (e.g. for video). If the processing time is too long, it will skip frames. If it is"
-                                                        " too fast, it will slow it down.");
+DEFINE_bool(process_real_time,          false,          "Enable to keep the original source frame rate (e.g. for video). If the processing time is"
+                                                        " too long, it will skip frames. If it is too fast, it will slow it down.");
 
 // Determine type of frame source
 op::ProducerType gflagsToProducerType(const std::string& imageDirectory, const std::string& videoPath, const int webcamIndex)
@@ -56,7 +60,8 @@ op::ProducerType gflagsToProducerType(const std::string& imageDirectory, const s
         return op::ProducerType::Webcam;
 }
 
-std::shared_ptr<op::Producer> gflagsToProducer(const std::string& imageDirectory, const std::string& videoPath, const int webcamIndex, const op::Point<int> webcamResolution)
+std::shared_ptr<op::Producer> gflagsToProducer(const std::string& imageDirectory, const std::string& videoPath, const int webcamIndex,
+                                               const op::Point<int> webcamResolution)
 {
     op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
     const auto type = gflagsToProducerType(imageDirectory, videoPath, webcamIndex);
@@ -81,11 +86,13 @@ std::tuple<op::Point<int>, op::Point<int>, std::shared_ptr<op::Producer>> gflags
     // cameraFrameSize
     op::Point<int> cameraFrameSize;
     auto nRead = sscanf(FLAGS_camera_resolution.c_str(), "%dx%d", &cameraFrameSize.x, &cameraFrameSize.y);
-    op::checkE(nRead, 2, "Error, camera resolution format (" +  FLAGS_camera_resolution + ") invalid, should be e.g., 1280x720", __LINE__, __FUNCTION__, __FILE__);
+    op::checkE(nRead, 2, "Error, camera resolution format (" +  FLAGS_camera_resolution + ") invalid, should be e.g., 1280x720",
+               __LINE__, __FUNCTION__, __FILE__);
     // outputSize
     op::Point<int> outputSize;
     nRead = sscanf(FLAGS_resolution.c_str(), "%dx%d", &outputSize.x, &outputSize.y);
-    op::checkE(nRead, 2, "Error, resolution format (" +  FLAGS_resolution + ") invalid, should be e.g., 960x540 ", __LINE__, __FUNCTION__, __FILE__);
+    op::checkE(nRead, 2, "Error, camera resolution format (" +  FLAGS_camera_resolution + ") invalid, should be e.g., 1280x720",
+               __LINE__, __FUNCTION__, __FILE__);
 
     // producerType
     const auto producerSharedPtr = gflagsToProducer(FLAGS_image_dir, FLAGS_video, FLAGS_camera, cameraFrameSize);
@@ -121,7 +128,8 @@ int openPoseTutorialThread1()
         if (producerSize.area() > 0)
             outputSize = producerSize;
         else
-            op::error("Output resolution = input resolution not valid for image reading (size might change between images).", __LINE__, __FUNCTION__, __FILE__);
+            op::error("Output resolution = input resolution not valid for image reading (size might change between images).",
+                      __LINE__, __FUNCTION__, __FILE__);
     }
     // Step 4 - Setting thread workers && manager
     typedef std::vector<op::Datum> TypedefDatumsNoPtr;
@@ -138,7 +146,8 @@ int openPoseTutorialThread1()
     // ------------------------- CONFIGURING THREADING -------------------------
     // In this simple multi-thread example, we will do the following:
         // 3 (virtual) queues: 0, 1, 2
-        // 1 real queue: 1. The first and last queue ids (in this case 0 and 2) are not actual queues, but the beginning and end of the processing sequence
+        // 1 real queue: 1. The first and last queue ids (in this case 0 and 2) are not actual queues, but the beginning and end of the processing
+        // sequence
         // 2 threads: 0, 1
         // wDatumProducer will generate frames (there is no real queue 0) and push them on queue 1
         // wGui will pop frames from queue 1 and process them (there is no real queue 2)

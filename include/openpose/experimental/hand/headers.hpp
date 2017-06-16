@@ -6,7 +6,7 @@
 #include "handExtractor.hpp"
 #include "handParameters.hpp"
 #include "handRenderer.hpp"
-#include "handRenderGpu.hpp"
+#include "renderHand.hpp"
 #include "wHandExtractor.hpp"
 #include "wHandRenderer.hpp"
 

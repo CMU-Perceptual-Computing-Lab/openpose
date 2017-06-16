@@ -2,6 +2,7 @@
 #include <openpose/pose/poseParameters.hpp>
 #include <openpose/utilities/check.hpp>
 #include <openpose/utilities/errorAndLog.hpp>
+#include <openpose/utilities/keypoint.hpp>
 #include <openpose/face/faceDetector.hpp>
  
 namespace op
@@ -14,21 +15,6 @@ namespace op
         mLEye{poseBodyPartMapStringToKey(poseModel, std::vector<std::string>{"LEye", "Head"})},
         mREye{poseBodyPartMapStringToKey(poseModel, std::vector<std::string>{"REye", "Head"})}
     {
-    }
-
-    float getDistance(const float* posePtr, const int elementA, const int elementB)
-    {
-        try
-        {
-            const auto pixelX = posePtr[elementA*3] - posePtr[elementB*3];
-            const auto pixelY = posePtr[elementA*3+1] - posePtr[elementB*3+1];
-            return std::sqrt(pixelX*pixelX+pixelY*pixelY);
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return -1.f;
-        }
     }
 
     inline Rectangle<float> getFaceFromPoseKeypoints(const Array<float>& poseKeypoints, const unsigned int personIndex, const unsigned int neck,
