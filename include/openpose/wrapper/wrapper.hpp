@@ -777,8 +777,7 @@ namespace op
             // Write frames as *.avi video on hard disk
             if (!wrapperStructOutput.writeVideo.empty() && wrapperStructInput.producerSharedPtr != nullptr)
             {
-                const auto originalVideoFps = (wrapperStructInput.producerSharedPtr->getType() != ProducerType::Webcam
-                                               && wrapperStructInput.producerSharedPtr->get(CV_CAP_PROP_FPS) > 0.
+                const auto originalVideoFps = (wrapperStructInput.producerSharedPtr->get(CV_CAP_PROP_FPS) > 0.
                                                ? wrapperStructInput.producerSharedPtr->get(CV_CAP_PROP_FPS) : 30.);
                 const auto videoSaver = std::make_shared<VideoSaver>(
                     wrapperStructOutput.writeVideo, CV_FOURCC('M','J','P','G'), originalVideoFps, finalOutputSize

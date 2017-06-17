@@ -26,6 +26,11 @@ namespace op
             return VideoCaptureReader::get(capProperty);
         }
 
+        inline void set(const int capProperty, const double value)
+        {
+            VideoCaptureReader::set(capProperty, value);
+        }
+
     private:
         const std::string mPathName;
 

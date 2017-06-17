@@ -50,7 +50,8 @@ OpenPose Library - Release Notes
     2. Increased speed ~3-5% by adding CPU rendering and setting it as default rendering.
     3. Check() functions give more feedback.
     4. WCocoJsonSaver finished and removed its 3599-image limit.
-    5. Improved documentation.
+    5. Added `camera_fps` so generated video will use that frame rate.
+    6. Improved documentation.
 2. Functions or parameters renamed:
     1. Render flags renamed in the demo in order to incorporate the CPU/GPU rendering.
 3. Main bugs fixed:

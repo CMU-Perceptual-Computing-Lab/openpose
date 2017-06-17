@@ -51,6 +51,8 @@ DEFINE_int32(logging_level,             3,              "The logging level. Inte
 // Producer
 DEFINE_int32(camera,                    0,              "The camera index for cv::VideoCapture. Integer in the range [0, 9].");
 DEFINE_string(camera_resolution,        "1280x720",     "Size of the camera frames to ask for.");
+DEFINE_double(camera_fps,               30.0,           "Frame rate for the webcam (only used when saving video from webcam). Set this value to the"
+                                                        " minimum value between the OpenPose displayed speed and the webcam real frame rate.");
 DEFINE_string(video,                    "",             "Use a video file instead of the camera. Use `examples/media/video.avi` for our default"
                                                         " example video.");
 DEFINE_string(image_dir,                "",             "Process a directory of images. Use `examples/media/` for our default example folder with 20"
@@ -198,7 +200,7 @@ op::ProducerType gflagsToProducerType(const std::string& imageDirectory, const s
 }
 
 std::shared_ptr<op::Producer> gflagsToProducer(const std::string& imageDirectory, const std::string& videoPath, const int webcamIndex,
-                                               const op::Point<int> webcamResolution)
+                                               const op::Point<int> webcamResolution, const int webcamFps)
 {
     op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
     const auto type = gflagsToProducerType(imageDirectory, videoPath, webcamIndex);
@@ -208,7 +210,7 @@ std::shared_ptr<op::Producer> gflagsToProducer(const std::string& imageDirectory
     else if (type == op::ProducerType::Video)
         return std::make_shared<op::VideoReader>(videoPath);
     else if (type == op::ProducerType::Webcam)
-        return std::make_shared<op::WebcamReader>(webcamIndex, webcamResolution);
+        return std::make_shared<op::WebcamReader>(webcamIndex, webcamResolution, webcamFps);
     else
     {
         op::error("Undefined Producer selected.", __LINE__, __FUNCTION__, __FILE__);
@@ -246,8 +248,8 @@ op::RenderMode gflagToRenderMode(const int renderFlag, const int renderPoseFlag 
 }
 
 // Google flags into program variables
-std::tuple<op::Point<int>, op::Point<int>, op::Point<int>, op::Point<int>, std::shared_ptr<op::Producer>, op::PoseModel,
-           op::ScaleMode, std::vector<op::HeatMapType>> gflagsToOpParameters()
+std::tuple<op::Point<int>, op::Point<int>, op::Point<int>, std::shared_ptr<op::Producer>, op::PoseModel, op::ScaleMode,
+           std::vector<op::HeatMapType>> gflagsToOpParameters()
 {
     op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
     // cameraFrameSize
@@ -271,7 +273,7 @@ std::tuple<op::Point<int>, op::Point<int>, op::Point<int>, op::Point<int>, std::
     op::checkE(nRead, 2, "Error, face net resolution format (" +  FLAGS_face_net_resolution
                + ") invalid, should be e.g., 368x368 (multiples of 16)", __LINE__, __FUNCTION__, __FILE__);
     // producerType
-    const auto producerSharedPtr = gflagsToProducer(FLAGS_image_dir, FLAGS_video, FLAGS_camera, cameraFrameSize);
+    const auto producerSharedPtr = gflagsToProducer(FLAGS_image_dir, FLAGS_video, FLAGS_camera, cameraFrameSize, FLAGS_camera_fps);
     // poseModel
     const auto poseModel = gflagToPoseModel(FLAGS_model_pose);
     // keypointScale
@@ -279,7 +281,7 @@ std::tuple<op::Point<int>, op::Point<int>, op::Point<int>, op::Point<int>, std::
     // heatmaps to add
     const auto heatMapTypes = gflagToHeatMaps(FLAGS_heatmaps_add_parts, FLAGS_heatmaps_add_bkg, FLAGS_heatmaps_add_PAFs);
     // Return
-    return std::make_tuple(cameraFrameSize, outputSize, netInputSize, faceNetInputSize, producerSharedPtr, poseModel, keypointScale, heatMapTypes);
+    return std::make_tuple(outputSize, netInputSize, faceNetInputSize, producerSharedPtr, poseModel, keypointScale, heatMapTypes);
 }
 
 int opRealTimePoseDemo()
@@ -293,7 +295,6 @@ int opRealTimePoseDemo()
     const auto timerBegin = std::chrono::high_resolution_clock::now();
 
     // Applying user defined configuration
-    op::Point<int> cameraFrameSize;
     op::Point<int> outputSize;
     op::Point<int> netInputSize;
     op::Point<int> faceNetInputSize;
@@ -301,8 +302,7 @@ int opRealTimePoseDemo()
     op::PoseModel poseModel;
     op::ScaleMode keypointScale;
     std::vector<op::HeatMapType> heatMapTypes;
-    std::tie(cameraFrameSize, outputSize, netInputSize, faceNetInputSize, producerSharedPtr, poseModel, keypointScale,
-             heatMapTypes) = gflagsToOpParameters();
+    std::tie(outputSize, netInputSize, faceNetInputSize, producerSharedPtr, poseModel, keypointScale, heatMapTypes) = gflagsToOpParameters();
 
     // OpenPose wrapper
     op::log("Configuring OpenPose wrapper.", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
