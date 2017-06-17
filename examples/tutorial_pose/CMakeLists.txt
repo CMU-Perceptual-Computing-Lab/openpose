@@ -88,6 +88,8 @@ target_include_directories(openPoseTutorialPose2
 target_link_libraries(openPoseTutorialPose1
     PRIVATE
     ${DEFAULT_LIBRARIES}
+    ${Caffe_LIBRARIES}
+    ${CUDA_LIBRARIES}
     ${META_PROJECT_NAME}::core
     ${META_PROJECT_NAME}::experimental
     ${META_PROJECT_NAME}::face
@@ -97,6 +99,8 @@ target_link_libraries(openPoseTutorialPose1
 target_link_libraries(openPoseTutorialPose2
     PRIVATE
     ${DEFAULT_LIBRARIES}
+    ${Caffe_LIBRARIES}
+    ${CUDA_LIBRARIES}
     ${META_PROJECT_NAME}::core
     ${META_PROJECT_NAME}::experimental
     ${META_PROJECT_NAME}::face

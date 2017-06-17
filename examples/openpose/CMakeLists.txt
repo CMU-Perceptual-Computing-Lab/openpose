@@ -70,6 +70,8 @@ target_include_directories(${target}
 target_link_libraries(${target}
     PRIVATE
     ${DEFAULT_LIBRARIES}
+    ${Caffe_LIBRARIES}
+    ${CUDA_LIBRARIES}
     ${META_PROJECT_NAME}::core
     ${META_PROJECT_NAME}::experimental
     ${META_PROJECT_NAME}::face

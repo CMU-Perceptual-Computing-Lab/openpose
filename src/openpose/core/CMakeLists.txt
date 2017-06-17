@@ -156,6 +156,7 @@ target_link_libraries(${target}
 #    PUBLIC
     ${DEFAULT_LIBRARIES}
     ${Caffe_LIBRARIES}
+    ${CUDA_LIBRARIES}
     ${META_PROJECT_NAME}::utilities
 #    INTERFACE
 )
