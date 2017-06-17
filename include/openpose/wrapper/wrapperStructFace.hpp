@@ -15,8 +15,7 @@ namespace op
     struct WrapperStructFace
     {
         /**
-         * PROVISIONAL PARAMETER. IT WILL BE CHANGED.
-         * Whether to extract and render face.
+         * Whether to extract face.
          */
         bool enable;
 

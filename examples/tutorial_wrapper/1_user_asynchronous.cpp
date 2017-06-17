@@ -49,7 +49,7 @@ DEFINE_int32(logging_level,             3,              "The logging level. Inte
 // Producer
 DEFINE_string(image_dir,                "examples/media/",      "Process a directory of images.");
 // OpenPose
-DEFINE_string(model_folder,             "models/",      "Folder where the pose models (COCO and MPI) are located.");
+DEFINE_string(model_folder,             "models/",      "Folder path (absolute or relative) where the models (pose, face, ...) are located.");
 DEFINE_string(resolution,               "1280x720",     "The image resolution (display and output). Use \"-1x-1\" to force the program to use the"
                                                         " default images resolution.");
 DEFINE_int32(num_gpu,                   -1,             "The number of GPU devices to use. If negative, it will use all the available GPUs in your"
@@ -86,6 +86,9 @@ DEFINE_string(face_net_resolution,      "368x368",      "Multiples of 16. Analog
                                                         " 320x320 usually works fine while giving a substantial speed up when multiple faces on the"
                                                         " image.");
 // OpenPose Hand
+DEFINE_bool(hand,                       false,          "Enables hand keypoint detection. It will share some parameters from the body pose, e.g."
+                                                        " `model_folder`.");
+DEFINE_string(hand_net_resolution,      "368x368",      "Multiples of 16. Analogous to `net_resolution` but applied to the hand keypoint detector.");
 // OpenPose Rendering
 DEFINE_int32(part_to_show,              0,              "Part to show from the start.");
 DEFINE_bool(disable_blending,           false,          "If blending is enabled, it will merge the results with the original frame. If disabled, it"
@@ -104,13 +107,18 @@ DEFINE_int32(render_face,               -1,             "Analogous to `render_po
                                                         " configuration that `render_pose` is using.");
 DEFINE_double(alpha_face,               0.6,            "Analogous to `alpha_pose` but applied to face.");
 DEFINE_double(alpha_heatmap_face,       0.7,            "Analogous to `alpha_heatmap` but applied to face.");
+// OpenPose Rendering Hand
+DEFINE_int32(render_hand,               -1,             "Analogous to `render_pose` but applied to the hand. Extra option: -1 to use the same"
+                                                        " configuration that `render_pose` is using.");
+DEFINE_double(alpha_hand,               0.6,            "Analogous to `alpha_pose` but applied to hand.");
+DEFINE_double(alpha_heatmap_hand,       0.7,            "Analogous to `alpha_heatmap` but applied to hand.");
 // Result Saving
 DEFINE_string(write_images,             "",             "Directory to write rendered frames in `write_images_format` image format.");
 DEFINE_string(write_images_format,      "png",          "File extension and format for `write_images`, e.g. png, jpg or bmp. Check the OpenCV"
                                                         " function cv::imwrite for all compatible extensions.");
 DEFINE_string(write_video,              "",             "Full file path to write rendered frames in motion JPEG video format. It might fail if the"
                                                         " final path does not finish in `.avi`. It internally uses cv::VideoWriter.");
-DEFINE_string(write_keypoint,           "",             "Directory to write the people pose keypoint data. Format with `write_keypoint_format`.");
+DEFINE_string(write_keypoint,           "",             "Directory to write the people body pose keypoint data. Set format with `write_keypoint_format`.");
 DEFINE_string(write_keypoint_format,    "yml",          "File extension and format for `write_keypoint`: json, xml, yaml & yml. Json not available"
                                                         " for OpenCV < 3.0, use `write_keypoint_json` instead.");
 DEFINE_string(write_keypoint_json,      "",             "Directory to write people pose data in *.json format, compatible with any OpenCV version.");
@@ -281,7 +289,7 @@ op::RenderMode gflagToRenderMode(const int renderFlag, const int renderPoseFlag 
 }
 
 // Google flags into program variables
-std::tuple<op::Point<int>, op::Point<int>, op::Point<int>, op::PoseModel, op::ScaleMode, std::vector<op::HeatMapType>,
+std::tuple<op::Point<int>, op::Point<int>, op::Point<int>, op::Point<int>, op::PoseModel, op::ScaleMode, std::vector<op::HeatMapType>,
            op::ScaleMode> gflagsToOpParameters()
 {
     op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
@@ -300,6 +308,11 @@ std::tuple<op::Point<int>, op::Point<int>, op::Point<int>, op::PoseModel, op::Sc
     nRead = sscanf(FLAGS_face_net_resolution.c_str(), "%dx%d", &faceNetInputSize.x, &faceNetInputSize.y);
     op::checkE(nRead, 2, "Error, face net resolution format (" +  FLAGS_face_net_resolution
                + ") invalid, should be e.g., 368x368 (multiples of 16)", __LINE__, __FUNCTION__, __FILE__);
+    // handNetInputSize
+    op::Point<int> handNetInputSize;
+    nRead = sscanf(FLAGS_hand_net_resolution.c_str(), "%dx%d", &handNetInputSize.x, &handNetInputSize.y);
+    op::checkE(nRead, 2, "Error, hand net resolution format (" +  FLAGS_hand_net_resolution
+               + ") invalid, should be e.g., 368x368 (multiples of 16)", __LINE__, __FUNCTION__, __FILE__);
     // poseModel
     const auto poseModel = gflagToPoseModel(FLAGS_model_pose);
     // keypointScale
@@ -310,7 +323,7 @@ std::tuple<op::Point<int>, op::Point<int>, op::Point<int>, op::PoseModel, op::Sc
     const auto heatMapScale = (FLAGS_heatmaps_scale == 0 ? op::ScaleMode::PlusMinusOne
                                : (FLAGS_heatmaps_scale == 1 ? op::ScaleMode::ZeroToOne : op::ScaleMode::UnsignedChar ));
     // return
-    return std::make_tuple(outputSize, netInputSize, faceNetInputSize, poseModel, keypointScale, heatMapTypes, heatMapScale);
+    return std::make_tuple(outputSize, netInputSize, faceNetInputSize, handNetInputSize, poseModel, keypointScale, heatMapTypes, heatMapScale);
 }
 
 int openPoseTutorialWrapper1()
@@ -327,18 +340,17 @@ int openPoseTutorialWrapper1()
     op::Point<int> outputSize;
     op::Point<int> netInputSize;
     op::Point<int> faceNetInputSize;
+    op::Point<int> handNetInputSize;
     op::PoseModel poseModel;
     op::ScaleMode keypointScale;
     std::vector<op::HeatMapType> heatMapTypes;
     op::ScaleMode heatMapScale;
-    std::tie(outputSize, netInputSize, faceNetInputSize, poseModel, keypointScale, heatMapTypes, heatMapScale) = gflagsToOpParameters();
+    std::tie(outputSize, netInputSize, faceNetInputSize, handNetInputSize, poseModel, keypointScale, heatMapTypes, heatMapScale) = gflagsToOpParameters();
     op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
     // Configure OpenPose
     op::Wrapper<std::vector<UserDatum>> opWrapper{op::ThreadManagerMode::Asynchronous};
-    const bool displayGui = false;
-    const bool guiVerbose = false;
-    const bool fullScreen = false;
+    // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
     const op::WrapperStructPose wrapperStructPose{netInputSize, outputSize, keypointScale, FLAGS_num_gpu, FLAGS_num_gpu_start,
                                                   FLAGS_num_scales, (float)FLAGS_scale_gap, gflagToRenderMode(FLAGS_render_pose), poseModel,
                                                   !FLAGS_disable_blending, (float)FLAGS_alpha_pose, (float)FLAGS_alpha_heatmap,
@@ -347,8 +359,12 @@ int openPoseTutorialWrapper1()
     const op::WrapperStructFace wrapperStructFace{FLAGS_face, faceNetInputSize, gflagToRenderMode(FLAGS_render_face, FLAGS_render_pose),
                                                   (float)FLAGS_alpha_face, (float)FLAGS_alpha_heatmap_face};
     // Hand configuration (use op::WrapperStructHand{} to disable it)
-    const op::experimental::WrapperStructHand wrapperStructHand{false};
+    const op::WrapperStructHand wrapperStructHand{FLAGS_hand, handNetInputSize, gflagToRenderMode(FLAGS_render_hand, FLAGS_render_pose),
+                                                  (float)FLAGS_alpha_hand, (float)FLAGS_alpha_heatmap_hand};
     // Consumer (comment or use default argument to disable any output)
+    const bool displayGui = false;
+    const bool guiVerbose = false;
+    const bool fullScreen = false;
     const op::WrapperStructOutput wrapperStructOutput{displayGui, guiVerbose, fullScreen, FLAGS_write_keypoint,
                                                       op::stringToDataFormat(FLAGS_write_keypoint_format), FLAGS_write_keypoint_json,
                                                       FLAGS_write_coco_json, FLAGS_write_images, FLAGS_write_images_format, FLAGS_write_video,

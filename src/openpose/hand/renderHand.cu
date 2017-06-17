@@ -1,9 +1,9 @@
-#include <openpose/experimental/hand/handParameters.hpp>
+#include <openpose/hand/handParameters.hpp>
 #include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/utilities/cuda.hpp>
 #include <openpose/utilities/cuda.hu>
 #include <openpose/utilities/render.hu>
-#include <openpose/experimental/hand/renderHand.hpp>
+#include <openpose/hand/renderHand.hpp>
 
 namespace op
 {
@@ -12,8 +12,9 @@ namespace op
 
 
 
-    __global__ void renderHandsParts(float* targetPtr, const int targetWidth, const int targetHeight, const float* const handsPtr,
-                                     const int numberHands, const float threshold, const float alphaColorToAdd)
+    __global__ void renderHandsParts(float* targetPtr, const int targetWidth, const int targetHeight,
+                                     const float* const handsPtr, const int numberHands,
+                                     const float threshold, const float alphaColorToAdd)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -48,8 +49,8 @@ namespace op
                 dim3 threadsPerBlock;
                 dim3 numBlocks;
                 std::tie(threadsPerBlock, numBlocks) = getNumberCudaThreadsAndBlocks(frameSize);
-                renderHandsParts<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.x, frameSize.y, handsPtr, numberHands, threshold,
-                                                                 alphaColorToAdd);
+                renderHandsParts<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.x, frameSize.y, handsPtr,
+                                                                 numberHands, threshold, alphaColorToAdd);
                 cudaCheck(__LINE__, __FUNCTION__, __FILE__);
             }
         }

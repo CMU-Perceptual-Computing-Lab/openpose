@@ -78,6 +78,9 @@ namespace op
                 if (cvInputData.empty())
                     error("Empty cvInputData.", __LINE__, __FUNCTION__, __FILE__);
 
+                // Fix parameters
+                const auto netInputSide = fastMin(mNetOutputSize.x, mNetOutputSize.y);
+
                 // Set face size
                 const auto numberPeople = (int)faceRectangles.size();
                 mFaceKeypoints.reset({numberPeople, (int)FACE_NUMBER_PARTS, 3}, 0);
@@ -87,8 +90,9 @@ namespace op
                 // Extract face keypoints for each person
                 for (auto person = 0 ; person < numberPeople ; person++)
                 {
+                    const auto& faceRectangle = faceRectangles.at(person);
                     // Only consider faces with a minimum pixel area
-                    const auto faceAreaSquared = std::sqrt(faceRectangles.at(person).area());
+                    const auto minFaceSize = fastMin(faceRectangle.width, faceRectangle.height);
                     // // Debugging
                     // log(std::to_string(cvInputData.cols) + " " + std::to_string(cvInputData.rows));
                     // cv::rectangle(cvInputDataCopy,
@@ -96,23 +100,26 @@ namespace op
                     //               cv::Point{(int)faceRectangle.bottomRight().x, (int)faceRectangle.bottomRight().y},
                     //               cv::Scalar{0,0,255}, 2);
                     // Get parts
-                    if (faceAreaSquared > 50)
+                    if (minFaceSize > 40)
                     {
-                        const auto& faceRectangle = faceRectangles.at(person);
-                        // Get face position(s)
-                        const Point<float> faceCenterPosition{faceRectangle.topLeft()};
-                        const auto faceSize = fastMax(faceRectangle.width, faceRectangle.height);
-
+                        // // Debugging
+                        // log(std::to_string(cvInputData.cols) + " " + std::to_string(cvInputData.rows));
+                        // cv::rectangle(cvInputDataCopy,
+                        //               cv::Point{(int)faceRectangle.x, (int)faceRectangle.y},
+                        //               cv::Point{(int)faceRectangle.bottomRight().x, (int)faceRectangle.bottomRight().y},
+                        //               cv::Scalar{0,255,0}, 2);
                         // Resize and shift image to face rectangle positions
-                        const double scaleFace = faceSize / (double)fastMin(mNetOutputSize.x, mNetOutputSize.y);
+                        const auto faceSize = fastMax(faceRectangle.width, faceRectangle.height);
+                        const double scaleFace = faceSize / (double)netInputSide;
                         cv::Mat Mscaling = cv::Mat::eye(2, 3, CV_64F);
                         Mscaling.at<double>(0,0) = scaleFace;
                         Mscaling.at<double>(1,1) = scaleFace;
-                        Mscaling.at<double>(0,2) = faceCenterPosition.x;
-                        Mscaling.at<double>(1,2) = faceCenterPosition.y;
+                        Mscaling.at<double>(0,2) = faceRectangle.x;
+                        Mscaling.at<double>(1,2) = faceRectangle.y;
 
                         cv::Mat faceImage;
-                        cv::warpAffine(cvInputData, faceImage, Mscaling, cv::Size{mNetOutputSize.x, mNetOutputSize.y}, CV_INTER_LINEAR | CV_WARP_INVERSE_MAP, cv::BORDER_CONSTANT, cv::Scalar(0,0,0));
+                        cv::warpAffine(cvInputData, faceImage, Mscaling, cv::Size{mNetOutputSize.x, mNetOutputSize.y},
+                                       CV_INTER_LINEAR | CV_WARP_INVERSE_MAP, cv::BORDER_CONSTANT, cv::Scalar(0,0,0));
 
                         // cv::Mat -> float*
                         uCharCvMatToFloatPtr(mFaceImageCrop.getPtr(), faceImage, true);
@@ -146,7 +153,7 @@ namespace op
                         const auto* facePeaksPtr = spPeaksBlob->mutable_cpu_data();
                         const auto facePeaksOffset = (FACE_MAX_PEAKS+1) * 3;
 
-                        for (auto part = 0 ; part < FACE_NUMBER_PARTS ; part++)
+                        for (auto part = 0 ; part < mFaceKeypoints.getSize(1) ; part++)
                         {
                             // Get max peak
                             const int numPeaks = intRound(facePeaksPtr[facePeaksOffset*part]);

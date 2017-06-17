@@ -64,7 +64,7 @@ DEFINE_bool(frame_flip,                 false,          "Flip/mirror each frame 
 DEFINE_int32(frame_rotate,              0,              "Rotate each frame, 4 possible values: 0, 90, 180, 270.");
 DEFINE_bool(frames_repeat,              false,          "Repeat frames when finished.");
 // OpenPose
-DEFINE_string(model_folder,             "models/",      "Folder where the pose models (COCO and MPI) are located.");
+DEFINE_string(model_folder,             "models/",      "Folder path (absolute or relative) where the models (pose, face, ...) are located.");
 DEFINE_string(resolution,               "1280x720",     "The image resolution (display and output). Use \"-1x-1\" to force the program to use the"
                                                         " default images resolution.");
 DEFINE_int32(num_gpu,                   -1,             "The number of GPU devices to use. If negative, it will use all the available GPUs in your"
@@ -99,6 +99,9 @@ DEFINE_string(face_net_resolution,      "368x368",      "Multiples of 16. Analog
                                                         " 320x320 usually works fine while giving a substantial speed up when multiple faces on the"
                                                         " image.");
 // OpenPose Hand
+DEFINE_bool(hand,                       false,          "Enables hand keypoint detection. It will share some parameters from the body pose, e.g."
+                                                        " `model_folder`.");
+DEFINE_string(hand_net_resolution,      "368x368",      "Multiples of 16. Analogous to `net_resolution` but applied to the hand keypoint detector.");
 // OpenPose Rendering
 DEFINE_int32(part_to_show,              0,              "Part to show from the start.");
 DEFINE_bool(disable_blending,           false,          "If blending is enabled, it will merge the results with the original frame. If disabled, it"
@@ -117,6 +120,11 @@ DEFINE_int32(render_face,               -1,             "Analogous to `render_po
                                                         " configuration that `render_pose` is using.");
 DEFINE_double(alpha_face,               0.6,            "Analogous to `alpha_pose` but applied to face.");
 DEFINE_double(alpha_heatmap_face,       0.7,            "Analogous to `alpha_heatmap` but applied to face.");
+// OpenPose Rendering Hand
+DEFINE_int32(render_hand,               -1,             "Analogous to `render_pose` but applied to the hand. Extra option: -1 to use the same"
+                                                        " configuration that `render_pose` is using.");
+DEFINE_double(alpha_hand,               0.6,            "Analogous to `alpha_pose` but applied to hand.");
+DEFINE_double(alpha_heatmap_hand,       0.7,            "Analogous to `alpha_heatmap` but applied to hand.");
 // Display
 DEFINE_bool(fullscreen,                 false,          "Run in full-screen mode (press f during runtime to toggle).");
 DEFINE_bool(process_real_time,          false,          "Enable to keep the original source frame rate (e.g. for video). If the processing time is"
@@ -130,7 +138,7 @@ DEFINE_string(write_images_format,      "png",          "File extension and form
                                                         " function cv::imwrite for all compatible extensions.");
 DEFINE_string(write_video,              "",             "Full file path to write rendered frames in motion JPEG video format. It might fail if the"
                                                         " final path does not finish in `.avi`. It internally uses cv::VideoWriter.");
-DEFINE_string(write_keypoint,           "",             "Directory to write the people pose keypoint data. Format with `write_keypoint_format`.");
+DEFINE_string(write_keypoint,           "",             "Directory to write the people body pose keypoint data. Set format with `write_keypoint_format`.");
 DEFINE_string(write_keypoint_format,    "yml",          "File extension and format for `write_keypoint`: json, xml, yaml & yml. Json not available"
                                                         " for OpenCV < 3.0, use `write_keypoint_json` instead.");
 DEFINE_string(write_keypoint_json,      "",             "Directory to write people pose data in *.json format, compatible with any OpenCV version.");
@@ -248,7 +256,7 @@ op::RenderMode gflagToRenderMode(const int renderFlag, const int renderPoseFlag 
 }
 
 // Google flags into program variables
-std::tuple<op::Point<int>, op::Point<int>, op::Point<int>, std::shared_ptr<op::Producer>, op::PoseModel, op::ScaleMode,
+std::tuple<op::Point<int>, op::Point<int>, op::Point<int>, op::Point<int>, std::shared_ptr<op::Producer>, op::PoseModel, op::ScaleMode,
            std::vector<op::HeatMapType>> gflagsToOpParameters()
 {
     op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
@@ -272,6 +280,11 @@ std::tuple<op::Point<int>, op::Point<int>, op::Point<int>, std::shared_ptr<op::P
     nRead = sscanf(FLAGS_face_net_resolution.c_str(), "%dx%d", &faceNetInputSize.x, &faceNetInputSize.y);
     op::checkE(nRead, 2, "Error, face net resolution format (" +  FLAGS_face_net_resolution
                + ") invalid, should be e.g., 368x368 (multiples of 16)", __LINE__, __FUNCTION__, __FILE__);
+    // handNetInputSize
+    op::Point<int> handNetInputSize;
+    nRead = sscanf(FLAGS_hand_net_resolution.c_str(), "%dx%d", &handNetInputSize.x, &handNetInputSize.y);
+    op::checkE(nRead, 2, "Error, hand net resolution format (" +  FLAGS_hand_net_resolution
+               + ") invalid, should be e.g., 368x368 (multiples of 16)", __LINE__, __FUNCTION__, __FILE__);
     // producerType
     const auto producerSharedPtr = gflagsToProducer(FLAGS_image_dir, FLAGS_video, FLAGS_camera, cameraFrameSize, FLAGS_camera_fps);
     // poseModel
@@ -281,7 +294,7 @@ std::tuple<op::Point<int>, op::Point<int>, op::Point<int>, std::shared_ptr<op::P
     // heatmaps to add
     const auto heatMapTypes = gflagToHeatMaps(FLAGS_heatmaps_add_parts, FLAGS_heatmaps_add_bkg, FLAGS_heatmaps_add_PAFs);
     // Return
-    return std::make_tuple(outputSize, netInputSize, faceNetInputSize, producerSharedPtr, poseModel, keypointScale, heatMapTypes);
+    return std::make_tuple(outputSize, netInputSize, faceNetInputSize, handNetInputSize, producerSharedPtr, poseModel, keypointScale, heatMapTypes);
 }
 
 int opRealTimePoseDemo()
@@ -298,11 +311,13 @@ int opRealTimePoseDemo()
     op::Point<int> outputSize;
     op::Point<int> netInputSize;
     op::Point<int> faceNetInputSize;
+    op::Point<int> handNetInputSize;
     std::shared_ptr<op::Producer> producerSharedPtr;
     op::PoseModel poseModel;
     op::ScaleMode keypointScale;
     std::vector<op::HeatMapType> heatMapTypes;
-    std::tie(outputSize, netInputSize, faceNetInputSize, producerSharedPtr, poseModel, keypointScale, heatMapTypes) = gflagsToOpParameters();
+    std::tie(outputSize, netInputSize, faceNetInputSize, handNetInputSize, producerSharedPtr, poseModel, keypointScale,
+             heatMapTypes) = gflagsToOpParameters();
 
     // OpenPose wrapper
     op::log("Configuring OpenPose wrapper.", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
@@ -316,7 +331,8 @@ int opRealTimePoseDemo()
     const op::WrapperStructFace wrapperStructFace{FLAGS_face, faceNetInputSize, gflagToRenderMode(FLAGS_render_face, FLAGS_render_pose),
                                                   (float)FLAGS_alpha_face, (float)FLAGS_alpha_heatmap_face};
     // Hand configuration (use op::WrapperStructHand{} to disable it)
-    const op::experimental::WrapperStructHand wrapperStructHand{false};
+    const op::WrapperStructHand wrapperStructHand{FLAGS_hand, handNetInputSize, gflagToRenderMode(FLAGS_render_hand, FLAGS_render_pose),
+                                                  (float)FLAGS_alpha_hand, (float)FLAGS_alpha_heatmap_hand};
     // Producer (use default to disable any input)
     const op::WrapperStructInput wrapperStructInput{producerSharedPtr, FLAGS_frame_first, FLAGS_frame_last, FLAGS_process_real_time,
                                                     FLAGS_frame_flip, FLAGS_frame_rotate, FLAGS_frames_repeat};

@@ -24,7 +24,7 @@ Each flag is divided into flag name, default value, and description.
 - DEFINE_int32(frame_rotate,              0,              "Rotate each frame, 4 possible values: 0, 90, 180, 270.");
 - DEFINE_bool(frames_repeat,              false,          "Repeat frames when finished.");
 3. OpenPose
-- DEFINE_string(model_folder,             "models/",      "Folder where the pose models (COCO and MPI) are located.");
+- DEFINE_string(model_folder,             "models/",      "Folder path (absolute or relative) where the models (pose, face, ...) are located.");
 - DEFINE_string(resolution,               "1280x720",     "The image resolution (display and output). Use \"-1x-1\" to force the program to use the default images resolution.");
 - DEFINE_int32(num_gpu,                   -1,             "The number of GPU devices to use. If negative, it will use all the available GPUs in your machine.");
 - DEFINE_int32(num_gpu_start,             0,              "GPU device start number.");
@@ -41,6 +41,8 @@ Each flag is divided into flag name, default value, and description.
 - DEFINE_bool(face,                       false,          "Enables face keypoint detection. It will share some parameters from the body pose, e.g. `model_folder`.");
 - DEFINE_string(face_net_resolution,      "368x368",      "Multiples of 16. Analogous to `net_resolution` but applied to the face keypoint detector. 320x320 usually works fine while giving a substantial speed up when multiple faces on the image.");
 6. OpenPose Hand
+- DEFINE_bool(hand,                       false,          "Enables hand keypoint detection. It will share some parameters from the body pose, e.g. `model_folder`.");
+- DEFINE_string(hand_net_resolution,      "368x368",      "Multiples of 16. Analogous to `net_resolution` but applied to the hand keypoint detector. 320x320 usually works fine while giving a substantial speed up when multiple hands on the image.");
 7. OpenPose Rendering
 - DEFINE_int32(part_to_show,              0,              "Part to show from the start.");
 - DEFINE_bool(disable_blending,           false,          "If blending is enabled, it will merge the results with the original frame. If disabled, it will only display the results.");
@@ -52,16 +54,20 @@ Each flag is divided into flag name, default value, and description.
 - DEFINE_int32(render_face,               -1,             "Analogous to `render_pose` but applied to the face. Extra option: -1 to use the same configuration that `render_pose` is using.");
 - DEFINE_double(alpha_face,               0.6,            "Analogous to `alpha_pose` but applied to face.");
 - DEFINE_double(alpha_heatmap_face,       0.7,            "Analogous to `alpha_heatmap` but applied to face.");
-10. Display
+10. OpenPose Rendering Hand
+- DEFINE_int32(render_hand,               -1,             "Analogous to `render_pose` but applied to the hand. Extra option: -1 to use the same configuration that `render_pose` is using.");
+- DEFINE_double(alpha_hand,               0.6,            "Analogous to `alpha_pose` but applied to hand.");
+- DEFINE_double(alpha_heatmap_hand,       0.7,            "Analogous to `alpha_heatmap` but applied to hand.");
+11. Display
 - DEFINE_bool(fullscreen,                 false,          "Run in full-screen mode (press f during runtime to toggle).");
 - DEFINE_bool(process_real_time,          false,          "Enable to keep the original source frame rate (e.g. for video). If the processing time is too long, it will skip frames. If it is too fast, it will slow it down.");
 - DEFINE_bool(no_gui_verbose,             false,          "Do not write text on output images on GUI (e.g. number of current frame and people). It does not affect the pose rendering.");
 - DEFINE_bool(no_display,                 false,          "Do not open a display window.");
-11. Result Saving
+12. Result Saving
 - DEFINE_string(write_images,             "",             "Directory to write rendered frames in `write_images_format` image format.");
 - DEFINE_string(write_images_format,      "png",          "File extension and format for `write_images`, e.g. png, jpg or bmp. Check the OpenCV function cv::imwrite for all compatible extensions.");
 - DEFINE_string(write_video,              "",             "Full file path to write rendered frames in motion JPEG video format. It might fail if the final path does not finish in `.avi`. It internally uses cv::VideoWriter.");
-- DEFINE_string(write_keypoint,           "",             "Directory to write the people pose keypoint data. Format with `write_keypoint_format`.");
+- DEFINE_string(write_keypoint,           "",             "Directory to write the people body pose keypoint data. Set format with `write_keypoint_format`.");
 - DEFINE_string(write_keypoint_format,    "yml",          "File extension and format for `write_keypoint`: json, xml, yaml & yml. Json not available for OpenCV < 3.0, use `write_keypoint_json` instead.");
 - DEFINE_string(write_keypoint_json,      "",             "Directory to write people pose data in *.json format, compatible with any OpenCV version.");
 - DEFINE_string(write_coco_json,          "",             "Full file path to write people pose data with *.json COCO validation format.");

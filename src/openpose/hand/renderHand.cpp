@@ -1,8 +1,8 @@
-#include <openpose/experimental/hand/handParameters.hpp>
+#include <openpose/hand/handParameters.hpp>
 #include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/keypoint.hpp>
-#include <openpose/experimental/hand/renderHand.hpp>
+#include <openpose/hand/renderHand.hpp>
 
 namespace op
 {
@@ -15,7 +15,7 @@ namespace op
             if (!frameArray.empty())
             {
                 // Parameters
-                const auto thicknessCircleRatio = 1.f/200.f;
+                const auto thicknessCircleRatio = 1.f/50.f;
                 const auto thicknessLineRatioWRTCircle = 0.75f;
                 const auto& pairs = HAND_PAIRS_RENDER;
 

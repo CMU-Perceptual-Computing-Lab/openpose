@@ -7,8 +7,9 @@
 namespace op
 {
     template <typename T>
-    void connectBodyPartsCpu(Array<T>& poseKeypoints, const T* const heatMapPtr, const T* const peaksPtr, const PoseModel poseModel, const Point<int>& heatMapSize, const int maxPeaks,
-                             const int interMinAboveThreshold, const T interThreshold, const int minSubsetCnt, const T minSubsetScore, const T scaleFactor)
+    void connectBodyPartsCpu(Array<T>& poseKeypoints, const T* const heatMapPtr, const T* const peaksPtr, const PoseModel poseModel,
+                             const Point<int>& heatMapSize, const int maxPeaks, const int interMinAboveThreshold,
+                             const T interThreshold, const int minSubsetCnt, const T minSubsetScore, const T scaleFactor)
     {
         try
         {
