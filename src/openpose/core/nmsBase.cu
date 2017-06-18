@@ -76,12 +76,12 @@ namespace op
                         for (auto dy = -3 ; dy < 4 ; dy++)
                         {
                             const auto y = peakLocY + dy;
-                            if (0 <= y && y < height) // 368
+                            if (0 <= y && y < height) // height = 368
                             {
                                 for (auto dx = -3 ; dx < 4 ; dx++)
                                 {
                                     const auto x = peakLocX + dx;
-                                    if (0 <= x && x < width) // 656
+                                    if (0 <= x && x < width) // width = 656
                                     {
                                         const auto score = sourcePtr[y * width + x];
                                         if (score > 0)
