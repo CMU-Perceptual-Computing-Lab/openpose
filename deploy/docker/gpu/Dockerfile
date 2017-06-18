@@ -31,5 +31,5 @@ RUN git clone https://github.com/BVLC/caffe.git && cd caffe && cat python/requir
 RUN cp -R /caffe/build/include/caffe/proto /caffe/include/caffe
 
 RUN git clone https://github.com/chriamue/openpose
-RUN cd openpose && git checkout cmake && rm -rf 3rdparty/caffe && mkdir -p build && cd build \
-    && cmake -DCaffe_DIR=/caffe/build/install .. && make -j"$(nproc)"
+RUN cd openpose && git pull && git checkout cmake && rm -rf 3rdparty/caffe && mkdir -p build && cd build \
+    && cmake -DCaffe_DIR=/caffe/build/install .. && make -j"$(nproc)" || clang --version

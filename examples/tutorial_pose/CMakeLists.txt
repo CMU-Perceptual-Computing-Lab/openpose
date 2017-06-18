@@ -4,7 +4,7 @@
 # 
 
 # find_package(THIRDPARTY REQUIRED)
-
+find_package(CUDA QUIET)
 
 # 
 # Executable name and options
