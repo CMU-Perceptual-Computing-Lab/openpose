@@ -1,4 +1,6 @@
 FROM nvidia/cuda:8.0-cudnn6-devel-ubuntu16.04
+MAINTAINER chriamue@gmail.com
+
 RUN apt-get update && apt-get install -y \
       build-essential \
       cmake \
@@ -31,5 +33,11 @@ RUN git clone https://github.com/BVLC/caffe.git && cd caffe && cat python/requir
 RUN cp -R /caffe/build/include/caffe/proto /caffe/include/caffe
 
 RUN git clone https://github.com/chriamue/openpose
-RUN cd openpose && git pull && git checkout cmake && rm -rf 3rdparty/caffe && mkdir -p build && cd build \
-    && cmake -DCaffe_DIR=/caffe/build/install .. && make -j"$(nproc)" || clang --version
+RUN cd openpose && git checkout cmake && git pull origin cmake && rm -rf 3rdparty/caffe && mkdir -p build && cd build \
+    && cmake -DCaffe_DIR=/caffe/build/install .. && make -j"$(nproc)"
+
+RUN cd openpose/models && ./getModels.sh
+
+WORKDIR /openpose
+
+CMD ./build/openpose
