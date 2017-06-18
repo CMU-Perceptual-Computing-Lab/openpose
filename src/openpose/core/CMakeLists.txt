@@ -40,9 +40,6 @@ file(GLOB_RECURSE sources
 	"${source_path}/*.cpp"
 )
 
-file(GLOB_RECURSE cuda_files
-	"${source_path}/*.cu"
-)
 
 # Group source files
 set(header_group "Header Files (API)")
@@ -58,21 +55,27 @@ source_group_by_path(${source_path}  "\\\\.cpp$|\\\\.c$|\\\\.h$|\\\\.hpp$"
 # 
 
 # Build library
-if (CUDA_FOUND)
+if (CUDA_FOUND AND NOT CPU_ONLY)
+
+file(GLOB_RECURSE cuda_files
+	"${source_path}/*.cu"
+)
+
 include_directories( ${CMAKE_SOURCE_DIR}/include )
+set(cuda_libs ${CUDA_LIBRARIES})
+
 list(APPEND CUDA_NVCC_FLAGS "-std=c++11;-O3")
 cuda_add_library(${target}
     ${sources}
     ${headers}
     ${cuda_files}
 )
-else()
+else(CUDA_FOUND AND NOT CPU_ONLY)
 add_library(${target}
     ${sources}
     ${headers}
-    ${cuda_files}
 )
-endif(CUDA_FOUND)
+endif(CUDA_FOUND AND NOT CPU_ONLY)
 
 # Create namespaced alias
 add_library(${META_PROJECT_NAME}::${target} ALIAS ${target})
@@ -156,7 +159,7 @@ target_link_libraries(${target}
 #    PUBLIC
     ${DEFAULT_LIBRARIES}
     ${Caffe_LIBRARIES}
-    ${CUDA_LIBRARIES}
+    ${cuda_libs}
     ${META_PROJECT_NAME}::utilities
 #    INTERFACE
 )

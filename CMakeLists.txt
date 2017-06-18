@@ -77,6 +77,7 @@ option(OPTION_BUILD_TESTS    "Build tests."                                     
 option(OPTION_BUILD_DOCS     "Build documentation."                                   OFF)
 option(OPTION_BUILD_EXAMPLES "Build examples."                                        ON)
 option(OPTION_USE_CAFFE      "Build using caffe"                                      ON)
+option(CPU_ONLY              "Build only for cpu"                                     OFF)
 
 # 
 # Declare project
