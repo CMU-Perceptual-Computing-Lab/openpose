@@ -2,9 +2,11 @@
 #define OPENPOSE_FACE_FACE_RENDERER_HPP
 
 #include <openpose/core/array.hpp>
+#include <openpose/core/enumClasses.hpp>
 #include <openpose/core/point.hpp>
 #include <openpose/core/renderer.hpp>
 #include <openpose/thread/worker.hpp>
+#include "faceParameters.hpp"
 
 namespace op
 {
@@ -12,7 +14,7 @@ namespace op
     {
     public:
         explicit FaceRenderer(const Point<int>& frameSize, const float alphaKeypoint = FACE_DEFAULT_ALPHA_KEYPOINT,
-                              const float alphaHeatMap = FACE_DEFAULT_ALPHA_HEAT_MAP);
+                              const float alphaHeatMap = FACE_DEFAULT_ALPHA_HEAT_MAP, const RenderMode renderMode = RenderMode::Cpu);
 
         ~FaceRenderer();
 
@@ -22,7 +24,12 @@ namespace op
 
     private:
         const Point<int> mFrameSize;
-        float* pGpuFace;           // GPU aux memory
+        const RenderMode mRenderMode;
+        float* pGpuFace; // GPU aux memory
+
+        void renderFaceCpu(Array<float>& outputData, const Array<float>& faceKeypoints);
+
+        void renderFaceGpu(Array<float>& outputData, const Array<float>& faceKeypoints);
 
         DELETE_COPY(FaceRenderer);
     };

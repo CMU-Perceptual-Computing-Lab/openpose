@@ -19,6 +19,13 @@ namespace op
         Background,
         PAFs,
     };
+
+    enum class RenderMode : unsigned char
+    {
+        None,
+        Cpu,
+        Gpu,
+    };
 }
 
 #endif // OPENPOSE_CORE_ENUM_CLASSES_HPP

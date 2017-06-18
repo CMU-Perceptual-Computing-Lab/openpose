@@ -14,10 +14,10 @@ configure_file(version.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/${META_PROJECT_N
 # Libraries
 set(IDE_FOLDER "")
 add_subdirectory(core)
-add_subdirectory(experimental)
 add_subdirectory(face)
 add_subdirectory(filestream)
 add_subdirectory(gui)
+add_subdirectory(hand)
 add_subdirectory(pose)
 add_subdirectory(producer)
 add_subdirectory(thread)

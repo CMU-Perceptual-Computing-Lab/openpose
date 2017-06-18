@@ -44,10 +44,7 @@ namespace op
 
         virtual double get(const int capProperty) = 0;
 
-        inline void set(const int capProperty, const double value)
-        {
-            mVideoCapture.set(capProperty, value);
-        }
+        virtual void set(const int capProperty, const double value) = 0;
 
         inline double get(const ProducerProperty property)
         {

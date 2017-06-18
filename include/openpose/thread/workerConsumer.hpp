@@ -13,7 +13,7 @@ namespace op
 
         inline void work(TDatums& tDatums)
         {
-        	workConsumer(tDatums);
+            workConsumer(tDatums);
         }
 
     protected:

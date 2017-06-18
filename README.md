@@ -6,6 +6,7 @@ OpenPose
 - May 2017: Windows version released!
 - Jun 2017: Face released!
 - Check all the [release notes](doc/release_notes.md).
+- Interested in an internship on CMU as OpenPose programmer? See [this link](https://docs.google.com/document/d/14SygG39NjIRZfx08clewTdFMGwVdtRu2acyCi3TYcHs/edit?usp=sharing) for details.
 
 
 

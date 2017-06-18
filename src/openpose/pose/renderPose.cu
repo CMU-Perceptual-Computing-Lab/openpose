@@ -1,74 +1,18 @@
-#include <utility> // std::pair
 #include <openpose/pose/poseParameters.hpp>
 #include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/utilities/cuda.hpp>
 #include <openpose/utilities/cuda.hu>
 #include <openpose/utilities/render.hu>
-#include <openpose/pose/poseRenderGpu.hpp>
+#include <openpose/pose/renderPose.hpp>
 
 namespace op
 {
-	// PI digits: http://www.piday.org/million/
-	__constant__ const float PI = 3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745f;
-    __constant__ const unsigned int COCO_PAIRS_GPU[] = POSE_COCO_PAIRS_TO_RENDER;
-    __constant__ const unsigned int MPI_PAIRS_GPU[] = POSE_MPI_PAIRS_TO_RENDER;
-    __constant__ const float COCO_RGB_COLORS[] = {
-        255.f,     0.f,     0.f,
-        255.f,    85.f,     0.f,
-        255.f,   170.f,     0.f,
-        255.f,   255.f,     0.f,
-        170.f,   255.f,     0.f,
-         85.f,   255.f,     0.f,
-          0.f,   255.f,     0.f,
-          0.f,   255.f,    85.f,
-          0.f,   255.f,   170.f,
-          0.f,   255.f,   255.f,
-          0.f,   170.f,   255.f,
-          0.f,    85.f,   255.f,
-          0.f,     0.f,   255.f,
-         85.f,     0.f,   255.f,
-        170.f,     0.f,   255.f,
-        255.f,     0.f,   255.f,
-        255.f,     0.f,   170.f,
-        255.f,     0.f,    85.f,
-    };
-    __constant__ const float MPI_RGB_COLORS[] = { // MPI colors chosen such that they are closed to COCO colors
-        255.f,     0.f,    85.f,
-        255.f,     0.f,     0.f,
-        255.f,    85.f,     0.f,
-        255.f,   170.f,     0.f,
-        255.f,   255.f,     0.f,
-        170.f,   255.f,     0.f,
-         85.f,   255.f,     0.f,
-          43.f,   255.f,     0.f,
-          0.f,   255.f,     0.f,
-          0.f,   255.f,    85.f,
-          0.f,   255.f,   170.f,
-          0.f,   255.f,   255.f,
-          0.f,   170.f,   255.f,
-          0.f,    85.f,   255.f,
-          0.f,     0.f,   255.f,
-    };
-    __constant__ const float RGB_COLORS_BACKGROUND[] = {
-        255.f,     0.f,     0.f,
-        255.f,    85.f,     0.f,
-        255.f,   170.f,     0.f,
-        255.f,   255.f,     0.f,
-        170.f,   255.f,     0.f,
-         85.f,   255.f,     0.f,
-          0.f,   255.f,     0.f,
-          0.f,   255.f,    85.f,
-          0.f,   255.f,   170.f,
-          0.f,   255.f,   255.f,
-          0.f,   170.f,   255.f,
-          0.f,    85.f,   255.f,
-          0.f,     0.f,   255.f,
-         85.f,     0.f,   255.f,
-        170.f,     0.f,   255.f,
-        255.f,     0.f,   255.f,
-        255.f,     0.f,   170.f,
-        255.f,     0.f,    85.f,
-    };
+    // PI digits: http://www.piday.org/million/
+    __constant__ const float PI = 3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745f;
+    __constant__ const unsigned int COCO_PAIRS_GPU[] = POSE_COCO_PAIRS_RENDER_GPU;
+    __constant__ const unsigned int MPI_PAIRS_GPU[] = POSE_MPI_PAIRS_RENDER_GPU;
+    __constant__ const float COCO_COLORS[] = {POSE_COCO_COLORS_RENDER};
+    __constant__ const float MPI_COLORS[] = {POSE_MPI_COLORS_RENDER};
 
 
 
@@ -163,14 +107,14 @@ namespace op
 
         // Other parameters
         const auto numberPartPairs = sizeof(COCO_PAIRS_GPU) / (2*sizeof(COCO_PAIRS_GPU[0]));
-        const auto numberColors = sizeof(COCO_RGB_COLORS) / (3*sizeof(COCO_RGB_COLORS[0]));
+        const auto numberColors = sizeof(COCO_COLORS) / (3*sizeof(COCO_COLORS[0]));
         const auto radius = fastMin(targetWidth, targetHeight) / 100.f;
         const auto stickwidth = fastMin(targetWidth, targetHeight) / 120.f;
 
         // Render key points
         renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF,
                         globalIdx, x, y, targetWidth, targetHeight, posePtr, COCO_PAIRS_GPU, numberPeople,
-                        POSE_COCO_NUMBER_PARTS, numberPartPairs, COCO_RGB_COLORS, numberColors,
+                        POSE_COCO_NUMBER_PARTS, numberPartPairs, COCO_COLORS, numberColors,
                         radius, stickwidth, threshold, alphaColorToAdd, blendOriginalFrame, (googlyEyes ? 14 : -1), (googlyEyes ? 15 : -1));
     }
 
@@ -188,14 +132,14 @@ namespace op
 
         // Other parameters
         const auto numberPartPairs = sizeof(MPI_PAIRS_GPU) / (2*sizeof(MPI_PAIRS_GPU[0]));
-        const auto numberColors = sizeof(MPI_RGB_COLORS) / (3*sizeof(MPI_RGB_COLORS[0]));
+        const auto numberColors = sizeof(MPI_COLORS) / (3*sizeof(MPI_COLORS[0]));
         const auto radius = fastMin(targetWidth, targetHeight) / 100.f;
         const auto stickwidth = fastMin(targetWidth, targetHeight) / 120.f;
 
         // Render key points
         renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF,
                         globalIdx, x, y, targetWidth, targetHeight, posePtr, MPI_PAIRS_GPU, numberPeople,
-                        POSE_MPI_NUMBER_PARTS, numberPartPairs, MPI_RGB_COLORS, numberColors,
+                        POSE_MPI_NUMBER_PARTS, numberPartPairs, MPI_COLORS, numberColors,
                         radius, stickwidth, threshold, alphaColorToAdd, blendOriginalFrame);
     }
 
@@ -205,7 +149,7 @@ namespace op
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
 
-        const auto numberColors = sizeof(RGB_COLORS_BACKGROUND)/(3*sizeof(RGB_COLORS_BACKGROUND[0]));
+        const auto numberColors = sizeof(COCO_COLORS)/(3*sizeof(COCO_COLORS[0]));
 
         if (x < targetWidth && y < targetHeight)
         {
@@ -220,9 +164,9 @@ namespace op
                 const auto offsetOrigin = part * heatMapArea;
                 const auto value = __saturatef(heatMapPtr[offsetOrigin + yHeatMap*widthHeatMap + xHeatMap]); // __saturatef = trucate to [0,1]
                 const auto rgbColorIndex = (part%numberColors)*3;
-                rgbColor[0] += value*RGB_COLORS_BACKGROUND[rgbColorIndex];
-                rgbColor[1] += value*RGB_COLORS_BACKGROUND[rgbColorIndex+1];
-                rgbColor[2] += value*RGB_COLORS_BACKGROUND[rgbColorIndex+2];
+                rgbColor[0] += value*COCO_COLORS[rgbColorIndex];
+                rgbColor[1] += value*COCO_COLORS[rgbColorIndex+1];
+                rgbColor[2] += value*COCO_COLORS[rgbColorIndex+2];
             }
 
             const auto blueIndex = y * targetWidth + x;
@@ -340,9 +284,9 @@ namespace op
         }
     }
 
-    inline void renderKeypointsPartAffinityAux(float* framePtr, const PoseModel poseModel, const Point<int>& frameSize,
-                                               const float* const heatMapPtr, const Point<int>& heatMapSize, const float scaleToKeepRatio,
-                                               const int part, const int partsToRender, const float alphaBlending)
+    inline void renderPosePAFGpuAux(float* framePtr, const PoseModel poseModel, const Point<int>& frameSize,
+                                    const float* const heatMapPtr, const Point<int>& heatMapSize, const float scaleToKeepRatio,
+                                    const int part, const int partsToRender, const float alphaBlending)
     {
         try
         {
@@ -363,8 +307,8 @@ namespace op
         }
     }
 
-    void renderPoseGpu(float* framePtr, const PoseModel poseModel, const int numberPeople, const Point<int>& frameSize, const float* const posePtr,
-                       const bool googlyEyes, const bool blendOriginalFrame, const float alphaBlending)
+    void renderPoseKeypointsGpu(float* framePtr, const PoseModel poseModel, const int numberPeople, const Point<int>& frameSize,
+                                const float* const posePtr, const bool googlyEyes, const bool blendOriginalFrame, const float alphaBlending)
     {
         try
         {
@@ -398,8 +342,8 @@ namespace op
         }
     }
 
-    void renderBodyPartGpu(float* framePtr, const PoseModel poseModel, const Point<int>& frameSize, const float* const heatMapPtr,
-                           const Point<int>& heatMapSize, const float scaleToKeepRatio, const int part, const float alphaBlending)
+    void renderPoseHeatMapGpu(float* framePtr, const PoseModel poseModel, const Point<int>& frameSize, const float* const heatMapPtr,
+                              const Point<int>& heatMapSize, const float scaleToKeepRatio, const int part, const float alphaBlending)
     {
         try
         {
@@ -422,8 +366,8 @@ namespace op
         }
     }
 
-    void renderBodyPartsGpu(float* framePtr, const PoseModel poseModel, const Point<int>& frameSize, const float* const heatMapPtr,
-                            const Point<int>& heatMapSize, const float scaleToKeepRatio, const float alphaBlending)
+    void renderPoseHeatMapsGpu(float* framePtr, const PoseModel poseModel, const Point<int>& frameSize, const float* const heatMapPtr,
+                               const Point<int>& heatMapSize, const float scaleToKeepRatio, const float alphaBlending)
     {
         try
         {
@@ -446,12 +390,12 @@ namespace op
         }
     }
 
-    void renderPartAffinityFieldGpu(float* framePtr, const PoseModel poseModel, const Point<int>& frameSize, const float* const heatMapPtr,
-                                    const Point<int>& heatMapSize, const float scaleToKeepRatio, const int part, const float alphaBlending)
+    void renderPosePAFGpu(float* framePtr, const PoseModel poseModel, const Point<int>& frameSize, const float* const heatMapPtr,
+                          const Point<int>& heatMapSize, const float scaleToKeepRatio, const int part, const float alphaBlending)
     {
         try
         {
-            renderKeypointsPartAffinityAux(framePtr, poseModel, frameSize, heatMapPtr, heatMapSize, scaleToKeepRatio, part, 1, alphaBlending);
+            renderPosePAFGpuAux(framePtr, poseModel, frameSize, heatMapPtr, heatMapSize, scaleToKeepRatio, part, 1, alphaBlending);
         }
         catch (const std::exception& e)
         {
@@ -459,14 +403,14 @@ namespace op
         }
     }
 
-    void renderPartAffinityFieldsGpu(float* framePtr, const PoseModel poseModel, const Point<int>& frameSize, const float* const heatMapPtr,
-                                     const Point<int>& heatMapSize, const float scaleToKeepRatio, const float alphaBlending)
+    void renderPosePAFsGpu(float* framePtr, const PoseModel poseModel, const Point<int>& frameSize, const float* const heatMapPtr,
+                           const Point<int>& heatMapSize, const float scaleToKeepRatio, const float alphaBlending)
     {
         try
         {
             const auto numberBodyPartPairs = (int)POSE_BODY_PART_PAIRS[(int)poseModel].size()/2;
-            renderKeypointsPartAffinityAux(framePtr, poseModel, frameSize, heatMapPtr, heatMapSize, scaleToKeepRatio, POSE_NUMBER_BODY_PARTS[(int)poseModel]+1,
-                                           numberBodyPartPairs, alphaBlending);
+            renderPosePAFGpuAux(framePtr, poseModel, frameSize, heatMapPtr, heatMapSize, scaleToKeepRatio,
+                                POSE_NUMBER_BODY_PARTS[(int)poseModel]+1, numberBodyPartPairs, alphaBlending);
         }
         catch (const std::exception& e)
         {

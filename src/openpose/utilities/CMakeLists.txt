@@ -6,6 +6,7 @@
 # find_package(THIRDPARTY REQUIRED)
 
 find_package(CUDA)
+find_package( OpenCV )
 
 # 
 # Library name and options
@@ -125,7 +126,6 @@ target_include_directories(${target}
 
     PUBLIC
     ${DEFAULT_INCLUDE_DIRECTORIES}
-    ${CUDA_INCLUDE_DIRS}
     INTERFACE
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
@@ -142,7 +142,7 @@ target_link_libraries(${target}
 
     PUBLIC
     ${DEFAULT_LIBRARIES}
-    ${CUDA_LIB_DIRS}
+    ${OpenCV_LIBS}
     INTERFACE
 )
 

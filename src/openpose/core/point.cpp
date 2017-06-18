@@ -91,7 +91,7 @@ namespace op
     }
 
     template<typename T>
-    Point<T> Point<T>::operator+(const Point<T>& point)
+    Point<T> Point<T>::operator+(const Point<T>& point) const
     {
         try
         {
@@ -122,7 +122,7 @@ namespace op
     }
 
     template<typename T>
-    Point<T> Point<T>::operator+(const T value)
+    Point<T> Point<T>::operator+(const T value) const
     {
         try
         {
@@ -153,7 +153,7 @@ namespace op
     }
 
     template<typename T>
-    Point<T> Point<T>::operator-(const Point<T>& point)
+    Point<T> Point<T>::operator-(const Point<T>& point) const
     {
         try
         {
@@ -184,7 +184,7 @@ namespace op
     }
 
     template<typename T>
-    Point<T> Point<T>::operator-(const T value)
+    Point<T> Point<T>::operator-(const T value) const
     {
         try
         {
@@ -215,7 +215,7 @@ namespace op
     }
 
     template<typename T>
-    Point<T> Point<T>::operator*(const T value)
+    Point<T> Point<T>::operator*(const T value) const
     {
         try
         {
@@ -246,7 +246,7 @@ namespace op
     }
 
     template<typename T>
-    Point<T> Point<T>::operator/(const T value)
+    Point<T> Point<T>::operator/(const T value) const
     {
         try
         {

@@ -7,7 +7,7 @@
 
 // namespace op
 // {
-//	   template<typename TDatums>
+//     template<typename TDatums>
 //     class wPoseLoader : public Worker<TDatums>
 //     {
 //     public:

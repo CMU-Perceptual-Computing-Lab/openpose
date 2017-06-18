@@ -64,11 +64,11 @@ namespace op
         // -------------------------------------------------- Basic Operators -------------------------------------------------- //
         Rectangle<T>& operator*=(const T value);
 
-        Rectangle<T> operator*(const T value);
+        Rectangle<T> operator*(const T value) const;
 
         Rectangle<T>& operator/=(const T value);
 
-        Rectangle<T> operator/(const T value);
+        Rectangle<T> operator/(const T value) const;
     };
 }
 

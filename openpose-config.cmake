@@ -8,10 +8,10 @@
 # List of modules
 set(MODULE_NAMES
     core
-    experimental
     face
     filestream
     gui
+    hand
     pose
     producer
     thread

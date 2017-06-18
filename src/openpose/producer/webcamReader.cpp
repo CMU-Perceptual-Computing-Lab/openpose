@@ -6,8 +6,9 @@
 
 namespace op
 {
-    WebcamReader::WebcamReader(const int webcamIndex, const Point<int> webcamResolution) :
+    WebcamReader::WebcamReader(const int webcamIndex, const Point<int> webcamResolution, const double fps) :
         VideoCaptureReader{webcamIndex},
+        mFps{fps},
         mFrameNameCounter{-1}
     {
         try
@@ -68,6 +69,8 @@ namespace op
         {
             if (capProperty == CV_CAP_PROP_POS_FRAMES)
                 return (double)mFrameNameCounter;
+            else if (capProperty == CV_CAP_PROP_FPS)
+                return mFps;
             else
                 return VideoCaptureReader::get(capProperty);
         }
@@ -75,6 +78,21 @@ namespace op
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             return 0.;
+        }
+    }
+
+    void WebcamReader::set(const int capProperty, const double value)
+    {
+        try
+        {
+            if (capProperty == CV_CAP_PROP_FPS)
+                mFps = value;
+            else
+                VideoCaptureReader::set(capProperty, value);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
     }
 
@@ -100,7 +118,7 @@ namespace op
                 else
                 {
                     lock.unlock();
-                    std::this_thread::sleep_for(std::chrono::microseconds{10});
+                    std::this_thread::sleep_for(std::chrono::microseconds{5});
                 }
             }
             return cvMat;

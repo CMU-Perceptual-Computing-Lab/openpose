@@ -140,10 +140,10 @@ target_link_libraries(${target}
     PUBLIC
     ${DEFAULT_LIBRARIES}
     ${META_PROJECT_NAME}::core
-    ${META_PROJECT_NAME}::experimental
     ${META_PROJECT_NAME}::face
     ${META_PROJECT_NAME}::filestream
     ${META_PROJECT_NAME}::gui
+    ${META_PROJECT_NAME}::hand
     ${META_PROJECT_NAME}::pose
     ${META_PROJECT_NAME}::producer
     ${META_PROJECT_NAME}::thread

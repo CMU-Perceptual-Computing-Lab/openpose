@@ -8,6 +8,7 @@
 #include "errorAndLog.hpp"
 #include "fastMath.hpp"
 #include "fileSystem.hpp"
+#include "keypoint.hpp"
 #include "macros.hpp"
 #include "openCv.hpp"
 #include "pointerContainer.hpp"

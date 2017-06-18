@@ -11,8 +11,8 @@ namespace op
     class Renderer
     {
     public:
-        explicit Renderer(const unsigned long long volume, const float alphaKeypoint, const float alphaHeatMap, const unsigned int elementToRender = 0u,
-                          const unsigned int numberElementsToRender = 0u);
+        explicit Renderer(const unsigned long long volume, const float alphaKeypoint, const float alphaHeatMap,
+                          const unsigned int elementToRender = 0u, const unsigned int numberElementsToRender = 0u);
 
         ~Renderer();
 
@@ -22,9 +22,11 @@ namespace op
 
         void setElementToRender(const int elementToRender);
 
-        std::tuple<std::shared_ptr<float*>, std::shared_ptr<bool>, std::shared_ptr<std::atomic<unsigned int>>, std::shared_ptr<const unsigned int>> getSharedParameters();
+        std::tuple<std::shared_ptr<float*>, std::shared_ptr<bool>, std::shared_ptr<std::atomic<unsigned int>>,
+                   std::shared_ptr<const unsigned int>> getSharedParameters();
 
-        void setSharedParametersAndIfLast(const std::tuple<std::shared_ptr<float*>, std::shared_ptr<bool>, std::shared_ptr<std::atomic<unsigned int>>,
+        void setSharedParametersAndIfLast(const std::tuple<std::shared_ptr<float*>, std::shared_ptr<bool>,
+                                                           std::shared_ptr<std::atomic<unsigned int>>,
                                                            std::shared_ptr<const unsigned int>>& tuple, const bool isLast);
 
         float getAlphaKeypoint() const;

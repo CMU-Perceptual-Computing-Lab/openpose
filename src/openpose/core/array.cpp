@@ -322,13 +322,25 @@ namespace op
     {
         try
         {
-            if (mCvMatData.first)
-                return mCvMatData.second;
-            else
-            {
+            if (!mCvMatData.first)
                 error("Array<T>: cv::Mat functions only valid for T types defined by OpenCV: unsigned char, signed char, int, float & double", __LINE__, __FUNCTION__, __FILE__);
-                return mCvMatData.second;
-            }
+            return mCvMatData.second;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return mCvMatData.second;
+        }
+    }
+
+    template<typename T>
+    cv::Mat& Array<T>::getCvMat()
+    {
+        try
+        {
+            if (!mCvMatData.first)
+                error("Array<T>: cv::Mat functions only valid for T types defined by OpenCV: unsigned char, signed char, int, float & double", __LINE__, __FUNCTION__, __FILE__);
+            return mCvMatData.second;
         }
         catch (const std::exception& e)
         {

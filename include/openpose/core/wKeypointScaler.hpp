@@ -3,7 +3,6 @@
 
 #include <openpose/thread/worker.hpp>
 #include "keypointScaler.hpp"
-#include "scaleKeypoints.hpp"
 
 namespace op
 {

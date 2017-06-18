@@ -91,7 +91,6 @@ target_link_libraries(openPoseTutorialPose1
     ${Caffe_LIBRARIES}
     ${CUDA_LIBRARIES}
     ${META_PROJECT_NAME}::core
-    ${META_PROJECT_NAME}::experimental
     ${META_PROJECT_NAME}::face
     ${META_PROJECT_NAME}::producer
     ${META_PROJECT_NAME}::wrapper
@@ -102,7 +101,6 @@ target_link_libraries(openPoseTutorialPose2
     ${Caffe_LIBRARIES}
     ${CUDA_LIBRARIES}
     ${META_PROJECT_NAME}::core
-    ${META_PROJECT_NAME}::experimental
     ${META_PROJECT_NAME}::face
     ${META_PROJECT_NAME}::producer
     ${META_PROJECT_NAME}::wrapper

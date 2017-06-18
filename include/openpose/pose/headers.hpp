@@ -8,8 +8,8 @@
 #include "poseExtractor.hpp"
 #include "poseExtractorCaffe.hpp"
 #include "poseRenderer.hpp"
-#include "poseRenderGpu.hpp"
 #include "poseParameters.hpp"
+#include "renderPose.hpp"
 #include "wPoseExtractor.hpp"
 #include "wPoseRenderer.hpp"
 

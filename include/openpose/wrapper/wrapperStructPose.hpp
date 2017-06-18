@@ -63,9 +63,10 @@ namespace op
         float scaleGap;
 
         /**
-         * Whether to render the output (pose locations, body, background or PAF heat maps).
+         * Whether to render the output (pose locations, body, background or PAF heat maps) with CPU or GPU.
+         * Select `None` for no rendering, `Cpu` or `Gpu` por CPU and GPU rendering respectively.
          */
-        bool renderOutput;
+        RenderMode renderMode;
 
         /**
          * Pose model, it affects the number of body parts to render
@@ -124,7 +125,7 @@ namespace op
          */
         WrapperStructPose(const Point<int>& netInputSize = Point<int>{656, 368}, const Point<int>& outputSize = Point<int>{1280, 720},
                           const ScaleMode keypointScale = ScaleMode::InputResolution, const int gpuNumber = 1, const int gpuNumberStart = 0,
-                          const int scalesNumber = 1, const float scaleGap = 0.15f, const bool renderOutput = false,
+                          const int scalesNumber = 1, const float scaleGap = 0.15f, const RenderMode renderMode = RenderMode::None,
                           const PoseModel poseModel = PoseModel::COCO_18, const bool blendOriginalFrame = true,
                           const float alphaKeypoint = POSE_DEFAULT_ALPHA_KEYPOINT, const float alphaHeatMap = POSE_DEFAULT_ALPHA_HEAT_MAP,
                           const int defaultPartToRender = 0, const std::string& modelFolder = "models/",

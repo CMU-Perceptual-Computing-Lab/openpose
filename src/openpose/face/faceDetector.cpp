@@ -1,7 +1,7 @@
-#include <opencv2/opencv.hpp> // CV_WARP_INVERSE_MAP, CV_INTER_LINEAR
 #include <openpose/pose/poseParameters.hpp>
 #include <openpose/utilities/check.hpp>
 #include <openpose/utilities/errorAndLog.hpp>
+#include <openpose/utilities/keypoint.hpp>
 #include <openpose/face/faceDetector.hpp>
  
 namespace op
@@ -16,23 +16,8 @@ namespace op
     {
     }
 
-    float getDistance(const float* posePtr, const int elementA, const int elementB)
-    {
-        try
-        {
-            const auto pixelX = posePtr[elementA*3] - posePtr[elementB*3];
-            const auto pixelY = posePtr[elementA*3+1] - posePtr[elementB*3+1];
-            return std::sqrt(pixelX*pixelX+pixelY*pixelY);
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return -1.f;
-        }
-    }
-
     inline Rectangle<float> getFaceFromPoseKeypoints(const Array<float>& poseKeypoints, const unsigned int personIndex, const unsigned int neck,
-                                                     const unsigned int nose, const unsigned int lEar, const unsigned int rEar,
+                                                     const unsigned int headNose, const unsigned int lEar, const unsigned int rEar,
                                                      const unsigned int lEye, const unsigned int rEye, const float threshold)
     {
         try
@@ -42,7 +27,7 @@ namespace op
 
             const auto* posePtr = &poseKeypoints.at(personIndex*poseKeypoints.getSize(1)*poseKeypoints.getSize(2));
             const auto neckScoreAbove = (posePtr[neck*3+2] > threshold);
-            const auto noseScoreAbove = (posePtr[nose*3+2] > threshold);
+            const auto headNoseScoreAbove = (posePtr[headNose*3+2] > threshold);
             const auto lEarScoreAbove = (posePtr[lEar*3+2] > threshold);
             const auto rEarScoreAbove = (posePtr[rEar*3+2] > threshold);
             const auto lEyeScoreAbove = (posePtr[lEye*3+2] > threshold);
@@ -50,45 +35,45 @@ namespace op
 
             auto counter = 0;
             // Face and neck given (e.g. MPI)
-            if (nose == lEar && lEar == rEar)
+            if (headNose == lEar && lEar == rEar)
             {
-                if (neckScoreAbove && noseScoreAbove)
+                if (neckScoreAbove && headNoseScoreAbove)
                 {
-                    pointTopLeft.x = posePtr[nose*3];
-                    pointTopLeft.y = posePtr[nose*3+1];
-                    faceSize = 1.33f * getDistance(posePtr, neck, nose);
+                    pointTopLeft.x = posePtr[headNose*3];
+                    pointTopLeft.y = posePtr[headNose*3+1];
+                    faceSize = 1.33f * getDistance(posePtr, neck, headNose);
                 }
             }
             // Face as average between different body keypoints (e.g. COCO)
             else
             {
-                // factor * dist(neck, nose)
-                if (neckScoreAbove && noseScoreAbove)
+                // factor * dist(neck, headNose)
+                if (neckScoreAbove && headNoseScoreAbove)
                 {
-                    // If profile (i.e. only 1 eye and ear visible) --> avg(nose, eye & ear position)
+                    // If profile (i.e. only 1 eye and ear visible) --> avg(headNose, eye & ear position)
                     if ((lEyeScoreAbove) == (lEarScoreAbove)
                         && (rEyeScoreAbove) == (rEarScoreAbove)
                         && (lEyeScoreAbove) != (rEyeScoreAbove))
                     {
                         if (lEyeScoreAbove)
                         {
-                            pointTopLeft.x += (posePtr[lEye*3] + posePtr[lEar*3] + posePtr[nose*3]) / 3.f;
-                            pointTopLeft.y += (posePtr[lEye*3+1] + posePtr[lEar*3+1] + posePtr[nose*3+1]) / 3.f;
-                            faceSize += 0.85 * (getDistance(posePtr, nose, lEye) + getDistance(posePtr, nose, lEar) + getDistance(posePtr, neck, nose));
+                            pointTopLeft.x += (posePtr[lEye*3] + posePtr[lEar*3] + posePtr[headNose*3]) / 3.f;
+                            pointTopLeft.y += (posePtr[lEye*3+1] + posePtr[lEar*3+1] + posePtr[headNose*3+1]) / 3.f;
+                            faceSize += 0.85f * (getDistance(posePtr, headNose, lEye) + getDistance(posePtr, headNose, lEar) + getDistance(posePtr, neck, headNose));
                         }
                         else // if(lEyeScoreAbove)
                         {
-                            pointTopLeft.x += (posePtr[rEye*3] + posePtr[rEar*3] + posePtr[nose*3]) / 3.f;
-                            pointTopLeft.y += (posePtr[rEye*3+1] + posePtr[rEar*3+1] + posePtr[nose*3+1]) / 3.f;
-                            faceSize += 0.85 * (getDistance(posePtr, nose, rEye) + getDistance(posePtr, nose, rEar) + getDistance(posePtr, neck, nose));
+                            pointTopLeft.x += (posePtr[rEye*3] + posePtr[rEar*3] + posePtr[headNose*3]) / 3.f;
+                            pointTopLeft.y += (posePtr[rEye*3+1] + posePtr[rEar*3+1] + posePtr[headNose*3+1]) / 3.f;
+                            faceSize += 0.85f * (getDistance(posePtr, headNose, rEye) + getDistance(posePtr, headNose, rEar) + getDistance(posePtr, neck, headNose));
                         }
                     }
-                    // else --> 2 * dist(neck, nose)
+                    // else --> 2 * dist(neck, headNose)
                     else
                     {
-                        pointTopLeft.x += (posePtr[neck*3] + posePtr[nose*3]) / 2.f;
-                        pointTopLeft.y += (posePtr[neck*3+1] + posePtr[nose*3+1]) / 2.f;
-                        faceSize += 2.f * getDistance(posePtr, neck, nose);
+                        pointTopLeft.x += (posePtr[neck*3] + posePtr[headNose*3]) / 2.f;
+                        pointTopLeft.y += (posePtr[neck*3+1] + posePtr[headNose*3+1]) / 2.f;
+                        faceSize += 2.f * getDistance(posePtr, neck, headNose);
                     }
                     counter++;
                 }
@@ -124,7 +109,7 @@ namespace op
         }
     }
 
-    std::vector<Rectangle<float>> FaceDetector::detectFaces(const Array<float>& poseKeypoints, const float scaleInputToOutput)
+    std::vector<Rectangle<float>> FaceDetector::detectFaces(const Array<float>& poseKeypoints, const float scaleInputToOutput) const
     {
         try
         {

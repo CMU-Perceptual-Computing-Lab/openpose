@@ -18,7 +18,6 @@
 #include "renderer.hpp"
 #include "resizeAndMergeBase.hpp"
 #include "resizeAndMergeCaffe.hpp"
-#include "scaleKeypoints.hpp"
 #include "wCvMatToOpInput.hpp"
 #include "wCvMatToOpOutput.hpp"
 #include "wKeypointScaler.hpp"

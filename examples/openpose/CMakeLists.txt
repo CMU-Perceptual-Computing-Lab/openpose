@@ -73,7 +73,6 @@ target_link_libraries(${target}
     ${Caffe_LIBRARIES}
     ${CUDA_LIBRARIES}
     ${META_PROJECT_NAME}::core
-    ${META_PROJECT_NAME}::experimental
     ${META_PROJECT_NAME}::face
     ${META_PROJECT_NAME}::producer
     ${META_PROJECT_NAME}::wrapper

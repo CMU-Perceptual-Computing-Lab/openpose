@@ -159,7 +159,6 @@ target_link_libraries(${target}
 #    PUBLIC
     ${DEFAULT_LIBRARIES}
     ${META_PROJECT_NAME}::core
-    ${META_PROJECT_NAME}::experimental
     ${CUDA_LIBRARIES}
 #    INTERFACE
 )

@@ -211,12 +211,6 @@ namespace op
             return spData.get();
         }
 
-        // Disabled because people might try to modify it in illegal ways and change the allocated memory (e.g. resizing), leading to huge errors
-        // inline cv::Mat& getCvMat()
-        // {
-        //     return mCvMatData.second;
-        // }
-
         /**
          * Return a cv::Mat wrapper to the data. It forbids the data to be modified.
          * OpenCV only admits unsigned char, signed char, int, float & double. If the T class is not supported by OpenCV, it will throw an error.
@@ -228,6 +222,14 @@ namespace op
          * @return A const cv::Mat pointing to the data.
          */
         const cv::Mat& getConstCvMat() const;
+
+        /**
+         * Analogous to getConstCvMat, but in this case it returns a editable cv::Mat.
+         * Very important: Only allowed functions which do not provoke data reallocation.
+         * E.g. resizing functions will not work and they would provoke an undefined behaviour and/or execution crashes.
+         * @return A cv::Mat pointing to the data.
+         */
+        cv::Mat& getCvMat();
 
         /**
          * [] operator
