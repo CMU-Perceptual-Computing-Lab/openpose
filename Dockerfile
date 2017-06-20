@@ -5,11 +5,9 @@ RUN apt-get install -y \
     libatlas-base-dev \
     libopencv-dev \
     lsb-release \
-    sudo
-
-RUN apt-get install -y \
     python-numpy \
     python3-numpy \
+    sudo
     wget
 
 WORKDIR /usr/local
