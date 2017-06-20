@@ -1,8 +1,8 @@
-#ifndef OPENPOSE__WRAPPER__WRAPPER_STRUCT_POSE_HPP
-#define OPENPOSE__WRAPPER__WRAPPER_STRUCT_POSE_HPP
+#ifndef OPENPOSE_WRAPPER_WRAPPER_STRUCT_POSE_HPP
+#define OPENPOSE_WRAPPER_WRAPPER_STRUCT_POSE_HPP
 
-#include <opencv2/core/core.hpp>
 #include <openpose/core/enumClasses.hpp>
+#include <openpose/core/point.hpp>
 #include <openpose/pose/enumClasses.hpp>
 #include <openpose/pose/poseParameters.hpp>
 
@@ -20,22 +20,22 @@ namespace op
          * The greater, the slower and more memory it will be needed, but it will potentially increase accuracy.
          * Both width and height must be divisible by 16.
          */
-        cv::Size netInputSize;
+        Point<int> netInputSize;
 
         /**
          * Output size of the final rendered image.
          * It barely affects performance compared to netInputSize.
-         * The final Datum.poseKeyPoints can be scaled with respect to outputSize if `poseScaleMode` is set to ScaleMode::OutputResolution, even if the
+         * The final Datum.poseKeypoints can be scaled with respect to outputSize if `keypointScale` is set to ScaleMode::OutputResolution, even if the
          * rendering is disabled.
          */
-        cv::Size outputSize;
+        Point<int> outputSize;
 
         /**
-         * Final scale of the Array<float> Datum.poseKeyPoints and the writen pose data.
-         * The final Datum.poseKeyPoints can be scaled with respect to input size (ScaleMode::InputResolution), net output size (ScaleMode::NetOutputResolution),
+         * Final scale of the Array<float> Datum.poseKeypoints and the writen pose data.
+         * The final Datum.poseKeypoints can be scaled with respect to input size (ScaleMode::InputResolution), net output size (ScaleMode::NetOutputResolution),
          * output rendering size (ScaleMode::OutputResolution), from 0 to 1 (ScaleMode::ZeroToOne), and -1 to 1 (ScaleMode::PlusMinusOne).
          */
-        ScaleMode poseScaleMode;
+        ScaleMode keypointScale;
 
         /**
          * Number of GPUs processing in parallel.
@@ -63,9 +63,10 @@ namespace op
         float scaleGap;
 
         /**
-         * Whether to render the output (pose locations, body, background or PAF heat maps).
+         * Whether to render the output (pose locations, body, background or PAF heat maps) with CPU or GPU.
+         * Select `None` for no rendering, `Cpu` or `Gpu` por CPU and GPU rendering respectively.
          */
-        bool renderOutput;
+        RenderMode renderMode;
 
         /**
          * Pose model, it affects the number of body parts to render
@@ -83,7 +84,7 @@ namespace op
          * Rendering blending alpha value of the pose point locations with respect to the background image.
          * Value in the range [0, 1]. 0 will only render the background, 1 will fully render the pose.
          */
-        float alphaPose;
+        float alphaKeypoint;
 
         /**
          * Rendering blending alpha value of the heat maps (body part, background or PAF) with respect to the background image.
@@ -115,21 +116,21 @@ namespace op
          * Select ScaleMode::ZeroToOne for range [0,1], ScaleMode::PlusMinusOne for [-1,1] and ScaleMode::UnsignedChar for [0, 255]
          * If heatMapTypes.empty(), then this parameters makes no effect.
          */
-        ScaleMode heatMapScaleMode;
+        ScaleMode heatMapScale;
 
         /**
          * Constructor of the struct.
          * It has the recommended and default values we recommend for each element of the struct.
          * Since all the elements of the struct are public, they can also be manually filled.
          */
-        WrapperStructPose(const cv::Size& netInputSize = cv::Size{656, 368}, const cv::Size& outputSize = cv::Size{1280, 720},
-                          const ScaleMode poseScaleMode = ScaleMode::InputResolution, const int gpuNumber = 1, const int gpuNumberStart = 0,
-                          const int scalesNumber = 1, const float scaleGap = 0.15f, const bool renderOutput = false,
+        WrapperStructPose(const Point<int>& netInputSize = Point<int>{656, 368}, const Point<int>& outputSize = Point<int>{1280, 720},
+                          const ScaleMode keypointScale = ScaleMode::InputResolution, const int gpuNumber = 1, const int gpuNumberStart = 0,
+                          const int scalesNumber = 1, const float scaleGap = 0.15f, const RenderMode renderMode = RenderMode::None,
                           const PoseModel poseModel = PoseModel::COCO_18, const bool blendOriginalFrame = true,
-                          const float alphaPose = POSE_DEFAULT_ALPHA_POSE, const float alphaHeatMap = POSE_DEFAULT_ALPHA_HEATMAP,
+                          const float alphaKeypoint = POSE_DEFAULT_ALPHA_KEYPOINT, const float alphaHeatMap = POSE_DEFAULT_ALPHA_HEAT_MAP,
                           const int defaultPartToRender = 0, const std::string& modelFolder = "models/",
-                          const std::vector<HeatMapType>& heatMapTypes = {}, const ScaleMode heatMapScaleMode = ScaleMode::ZeroToOne);
+                          const std::vector<HeatMapType>& heatMapTypes = {}, const ScaleMode heatMapScale = ScaleMode::ZeroToOne);
     };
 }
 
-#endif // OPENPOSE__WRAPPER__WRAPPER_STRUCT_POSE_HPP
+#endif // OPENPOSE_WRAPPER_WRAPPER_STRUCT_POSE_HPP

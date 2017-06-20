@@ -27,7 +27,7 @@ namespace op
     {
         try
         {
-        	return VideoCaptureReader::getRawFrame();
+            return VideoCaptureReader::getRawFrame();
         }
         catch (const std::exception& e)
         {

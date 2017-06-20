@@ -1,5 +1,5 @@
-#ifndef OPENPOSE__UTILITIES__STRING_HPP
-#define OPENPOSE__UTILITIES__STRING_HPP
+#ifndef OPENPOSE_UTILITIES_STRING_HPP
+#define OPENPOSE_UTILITIES_STRING_HPP
 
 #include <string>
 
@@ -16,4 +16,4 @@ namespace op
     std::string toFixedLengthString(const T number, const unsigned long long stringLength = 0);
 }
 
-#endif // OPENPOSE__UTILITIES__STRING_HPP
+#endif // OPENPOSE_UTILITIES_STRING_HPP

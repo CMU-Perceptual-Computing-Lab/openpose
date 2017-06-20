@@ -1,10 +1,11 @@
 #ifdef USE_CAFFE
-#ifndef OPENPOSE__POSE__BODY_PART_CONNECTOR_CAFFE_HPP
-#define OPENPOSE__POSE__BODY_PART_CONNECTOR_CAFFE_HPP
+#ifndef OPENPOSE_POSE_BODY_PART_CONNECTOR_CAFFE_HPP
+#define OPENPOSE_POSE_BODY_PART_CONNECTOR_CAFFE_HPP
 
 #include <array>
 #include <caffe/blob.hpp>
 #include <openpose/core/array.hpp>
+#include <openpose/core/point.hpp>
 #include <openpose/utilities/macros.hpp>
 #include "enumClasses.hpp"
 
@@ -36,9 +37,9 @@ namespace op
 
         void setScaleNetToOutput(const T scaleNetToOutput);
 
-        virtual void Forward_cpu(const std::vector<caffe::Blob<T>*>& bottom, Array<T>& poseKeyPoints);
+        virtual void Forward_cpu(const std::vector<caffe::Blob<T>*>& bottom, Array<T>& poseKeypoints);
 
-        virtual void Forward_gpu(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top, Array<T>& poseKeyPoints);
+        virtual void Forward_gpu(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top, Array<T>& poseKeypoints);
 
         virtual void Backward_cpu(const std::vector<caffe::Blob<T>*>& top, const std::vector<bool>& propagate_down, const std::vector<caffe::Blob<T>*>& bottom);
 
@@ -59,5 +60,5 @@ namespace op
     };
 }
 
-#endif // OPENPOSE__POSE__BODY_PART_CONNECTOR_CAFFE_HPP
+#endif // OPENPOSE_POSE_BODY_PART_CONNECTOR_CAFFE_HPP
 #endif

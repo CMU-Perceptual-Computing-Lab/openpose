@@ -3,16 +3,16 @@
 
 namespace op
 {
-    VideoSaver::VideoSaver(const std::string& videoSaverPath, const int cvFourcc, const double fps, const cv::Size& cvSize) :
+    VideoSaver::VideoSaver(const std::string& videoSaverPath, const int cvFourcc, const double fps, const Point<int>& cvSize) :
         VideoSaver::VideoSaver{std::vector<std::string>{videoSaverPath}, cvFourcc, fps, cvSize}
     {
     }
 
-    VideoSaver::VideoSaver(const std::vector<std::string>& videoSaverPaths, const int cvFourcc, const double fps, const cv::Size& cvSize)
+    VideoSaver::VideoSaver(const std::vector<std::string>& videoSaverPaths, const int cvFourcc, const double fps, const Point<int>& cvSize)
     {
         try
         {
-            if (cvSize.width <= 0 || cvSize.height <= 0)
+            if (cvSize.x <= 0 || cvSize.y <= 0)
                 error("Desired frame size to save frames is <= 0.", __LINE__, __FUNCTION__, __FILE__);
 
             if (fps <= 0.)
@@ -20,7 +20,7 @@ namespace op
 
             for (const auto& videoSaverPath : videoSaverPaths)
             {
-                mVideoWriters.emplace_back(videoSaverPath, cvFourcc, fps, cvSize);
+                mVideoWriters.emplace_back(videoSaverPath, cvFourcc, fps, cv::Size{cvSize.x, cvSize.y});
 
                 if (!mVideoWriters.crbegin()->isOpened())
                 {

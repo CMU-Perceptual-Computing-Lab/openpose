@@ -1,5 +1,5 @@
-#ifndef OPENPOSE__WRAPPER__WRAPPER_HPP
-#define OPENPOSE__WRAPPER__WRAPPER_HPP
+#ifndef OPENPOSE_WRAPPER_WRAPPER_HPP
+#define OPENPOSE_WRAPPER_WRAPPER_HPP
 
 #include <openpose/thread/headers.hpp>
 #include "wrapperStructFace.hpp"
@@ -80,33 +80,30 @@ namespace op
                        // Consumer (keep default values to disable any output)
                        const WrapperStructOutput& wrapperStructOutput = WrapperStructOutput{});
 
-        // THIS FUNCTION IS NOT IMPLEMENTED YET -> COMING SOON
         // Similar to the previos configure, but it includes hand extraction and rendering
         void configure(const WrapperStructPose& wrapperStructPose,
                        // Hand (use the default WrapperStructHand{} to disable any hand detector)
-                       const experimental::WrapperStructHand& wrapperHandStruct,
+                       const WrapperStructHand& wrapperStructHand,
                        // Producer (set producerSharedPtr = nullptr or use the default WrapperStructInput{} to disable any input)
                        const WrapperStructInput& wrapperStructInput,
                        // Consumer (keep default values to disable any output)
                        const WrapperStructOutput& wrapperStructOutput = WrapperStructOutput{});
 
-        // THIS FUNCTION IS NOT IMPLEMENTED YET -> COMING SOON
         // Similar to the previos configure, but it includes hand extraction and rendering
         void configure(const WrapperStructPose& wrapperStructPose,
                        // Face (use the default WrapperStructFace{} to disable any face detector)
-                       const experimental::WrapperStructFace& wrapperStructFace,
+                       const WrapperStructFace& wrapperStructFace,
                        // Producer (set producerSharedPtr = nullptr or use the default WrapperStructInput{} to disable any input)
                        const WrapperStructInput& wrapperStructInput,
                        // Consumer (keep default values to disable any output)
                        const WrapperStructOutput& wrapperStructOutput = WrapperStructOutput{});
 
-        // THIS FUNCTION IS NOT IMPLEMENTED YET -> COMING SOON
         // Similar to the previos configure, but it includes hand extraction and rendering
         void configure(const WrapperStructPose& wrapperStructPose = WrapperStructPose{},
                        // Face (use the default WrapperStructFace{} to disable any face detector)
-                       const experimental::WrapperStructFace& wrapperStructFace = experimental::WrapperStructFace{},
+                       const WrapperStructFace& wrapperStructFace = WrapperStructFace{},
                        // Hand (use the default WrapperStructHand{} to disable any hand detector)
-                       const experimental::WrapperStructHand& wrapperHandStruct = experimental::WrapperStructHand{},
+                       const WrapperStructHand& wrapperStructHand = WrapperStructHand{},
                        // Producer (set producerSharedPtr = nullptr or use the default WrapperStructInput{} to disable any input)
                        const WrapperStructInput& wrapperStructInput = WrapperStructInput{},
                        // Consumer (keep default values to disable any output)
@@ -201,7 +198,6 @@ namespace op
         const ThreadManagerMode mThreadManagerMode;
         const std::shared_ptr<std::pair<std::atomic<bool>, std::atomic<int>>> spVideoSeek;
         ThreadManager<std::shared_ptr<TDatums>> mThreadManager;
-        int mGpuNumber;
         bool mUserInputWsOnNewThread;
         bool mUserPostProcessingWsOnNewThread;
         bool mUserOutputWsOnNewThread;
@@ -264,11 +260,13 @@ namespace op
 
 // Implementation
 #include <openpose/core/headers.hpp>
-#include <openpose/experimental/headers.hpp>
+#include <openpose/face/headers.hpp>
 #include <openpose/filestream/headers.hpp>
 #include <openpose/gui/headers.hpp>
+#include <openpose/hand/headers.hpp>
 #include <openpose/pose/headers.hpp>
 #include <openpose/producer/headers.hpp>
+#include <openpose/utilities/cuda.hpp>
 #include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/utilities/fileSystem.hpp>
 namespace op
@@ -371,12 +369,14 @@ namespace op
     }
 
     template<typename TDatums, typename TWorker, typename TQueue>
-    void Wrapper<TDatums, TWorker, TQueue>::configure(const WrapperStructPose& wrapperStructPose, const WrapperStructInput& wrapperStructInput,
+    void Wrapper<TDatums, TWorker, TQueue>::configure(const WrapperStructPose& wrapperStructPose,
+                                                      const WrapperStructInput& wrapperStructInput,
                                                       const WrapperStructOutput& wrapperStructOutput)
     {
         try
         {
-            configure(wrapperStructPose, experimental::WrapperStructFace{}, experimental::WrapperStructHand{}, wrapperStructInput, wrapperStructOutput);
+            configure(wrapperStructPose, WrapperStructFace{}, WrapperStructHand{},
+                      wrapperStructInput, wrapperStructOutput);
         }
         catch (const std::exception& e)
         {
@@ -385,12 +385,15 @@ namespace op
     }
 
     template<typename TDatums, typename TWorker, typename TQueue>
-    void Wrapper<TDatums, TWorker, TQueue>::configure(const WrapperStructPose& wrapperStructPose, const experimental::WrapperStructFace& wrapperStructFace,
-                                                      const WrapperStructInput& wrapperStructInput, const WrapperStructOutput& wrapperStructOutput)
+    void Wrapper<TDatums, TWorker, TQueue>::configure(const WrapperStructPose& wrapperStructPose,
+                                                      const WrapperStructFace& wrapperStructFace,
+                                                      const WrapperStructInput& wrapperStructInput,
+                                                      const WrapperStructOutput& wrapperStructOutput)
     {
         try
         {
-            configure(wrapperStructPose, wrapperStructFace, experimental::WrapperStructHand{}, wrapperStructInput, wrapperStructOutput);
+            configure(wrapperStructPose, wrapperStructFace, WrapperStructHand{},
+                      wrapperStructInput, wrapperStructOutput);
         }
         catch (const std::exception& e)
         {
@@ -399,12 +402,15 @@ namespace op
     }
 
     template<typename TDatums, typename TWorker, typename TQueue>
-    void Wrapper<TDatums, TWorker, TQueue>::configure(const WrapperStructPose& wrapperStructPose, const experimental::WrapperStructHand& wrapperHandStruct,
-                                                      const WrapperStructInput& wrapperStructInput, const WrapperStructOutput& wrapperStructOutput)
+    void Wrapper<TDatums, TWorker, TQueue>::configure(const WrapperStructPose& wrapperStructPose,
+                                                      const WrapperStructHand& wrapperStructHand,
+                                                      const WrapperStructInput& wrapperStructInput,
+                                                      const WrapperStructOutput& wrapperStructOutput)
     {
         try
         {
-            configure(wrapperStructPose, experimental::WrapperStructFace{}, wrapperHandStruct, wrapperStructInput, wrapperStructOutput);
+            configure(wrapperStructPose, WrapperStructFace{}, wrapperStructHand, 
+                      wrapperStructInput, wrapperStructOutput);
         }
         catch (const std::exception& e)
         {
@@ -413,8 +419,10 @@ namespace op
     }
 
     template<typename TDatums, typename TWorker, typename TQueue>
-    void Wrapper<TDatums, TWorker, TQueue>::configure(const WrapperStructPose& wrapperStructPose, const experimental::WrapperStructFace& wrapperStructFace,
-                                                      const experimental::WrapperStructHand& wrapperHandStruct, const WrapperStructInput& wrapperStructInput,
+    void Wrapper<TDatums, TWorker, TQueue>::configure(const WrapperStructPose& wrapperStructPose,
+                                                      const WrapperStructFace& wrapperStructFace,
+                                                      const WrapperStructHand& wrapperStructHand,
+                                                      const WrapperStructInput& wrapperStructInput,
                                                       const WrapperStructOutput& wrapperStructOutput)
     {
         try
@@ -424,13 +432,23 @@ namespace op
             // Shortcut
             typedef std::shared_ptr<TDatums> TDatumsPtr;
 
-            // Check no contradictory flags enabled
-            if (wrapperStructPose.alphaPose < 0. || wrapperStructPose.alphaPose > 1. || wrapperStructPose.alphaHeatMap < 0.
-                || wrapperStructPose.alphaHeatMap > 1.)
+            // Required parameters
+            const auto renderOutput = wrapperStructPose.renderMode != RenderMode::None || wrapperStructFace.renderMode != RenderMode::None
+                                        || wrapperStructHand.renderMode != RenderMode::None;
+            const auto renderOutputGpu = wrapperStructPose.renderMode == RenderMode::Gpu || wrapperStructFace.renderMode == RenderMode::Gpu
+                                        || wrapperStructHand.renderMode == RenderMode::Gpu;
+            const auto renderFace = wrapperStructFace.enable && wrapperStructFace.renderMode != RenderMode::None;
+            const auto renderHand = wrapperStructHand.enable && wrapperStructHand.renderMode != RenderMode::None;
+            const auto renderHandGpu = wrapperStructHand.enable && wrapperStructHand.renderMode == RenderMode::Gpu;
+
+            // Check no wrong/contradictory flags enabled
+            if (wrapperStructPose.alphaKeypoint < 0. || wrapperStructPose.alphaKeypoint > 1.
+                || wrapperStructFace.alphaHeatMap < 0. || wrapperStructFace.alphaHeatMap > 1.
+                || wrapperStructHand.alphaHeatMap < 0. || wrapperStructHand.alphaHeatMap > 1.)
                 error("Alpha value for blending must be in the range [0,1].", __LINE__, __FUNCTION__, __FILE__);
             if (wrapperStructPose.scaleGap <= 0.f && wrapperStructPose.scalesNumber > 1)
                 error("The scale gap must be greater than 0 (it has no effect if the number of scales is 1).", __LINE__, __FUNCTION__, __FILE__);
-            if (!wrapperStructPose.renderOutput && (!wrapperStructOutput.writeImages.empty() || !wrapperStructOutput.writeVideo.empty()))
+            if (!renderOutput && (!wrapperStructOutput.writeImages.empty() || !wrapperStructOutput.writeVideo.empty()))
             {
                 const auto message = "In order to save the rendered frames (`write_images` or `write_video`), you must set `render_output` to true.";
                 error(message, __LINE__, __FUNCTION__, __FILE__);
@@ -441,9 +459,9 @@ namespace op
                                      " flags or fill the wrapperStructPose.heatMapTypes.";
                 error(message, __LINE__, __FUNCTION__, __FILE__);
             }
-            if (!wrapperStructOutput.writeHeatMaps.empty() && wrapperStructPose.heatMapScaleMode != ScaleMode::UnsignedChar)
+            if (!wrapperStructOutput.writeHeatMaps.empty() && wrapperStructPose.heatMapScale != ScaleMode::UnsignedChar)
             {
-                const auto message = "In order to save the heatmaps, you must set wrapperStructPose.heatMapScaleMode to ScaleMode::UnsignedChar,"
+                const auto message = "In order to save the heatmaps, you must set wrapperStructPose.heatMapScale to ScaleMode::UnsignedChar,"
                                      " i.e. range [0, 255].";
                 error(message, __LINE__, __FUNCTION__, __FILE__);
             }
@@ -452,7 +470,7 @@ namespace op
                 const std::string additionalMessage = " You could also set mThreadManagerMode = mThreadManagerMode::Asynchronous(Out) and/or add your own"
                                                       " output worker class before calling this function.";
                 const auto savingSomething = (!wrapperStructOutput.writeImages.empty() || !wrapperStructOutput.writeVideo.empty()
-                                              || !wrapperStructOutput.writePose.empty() || !wrapperStructOutput.writePoseJson.empty()
+                                              || !wrapperStructOutput.writeKeypoint.empty() || !wrapperStructOutput.writeKeypointJson.empty()
                                               || !wrapperStructOutput.writeCocoJson.empty() || !wrapperStructOutput.writeHeatMaps.empty());
                 if (!wrapperStructOutput.displayGui && !savingSomething)
                 {
@@ -461,9 +479,9 @@ namespace op
                     error(message, __LINE__, __FUNCTION__, __FILE__);
                 }
 
-                if ((wrapperStructOutput.displayGui && wrapperStructOutput.guiVerbose) && !wrapperStructPose.renderOutput)
+                if ((wrapperStructOutput.displayGui && wrapperStructOutput.guiVerbose) && !renderOutput)
                 {
-                    const auto message = "No render is enabled (`no_render_output`), so you should also remove the display (set `no_display`"
+                    const auto message = "No render is enabled (e.g. `no_render_pose`), so you should also remove the display (set `no_display`"
                                          " or `no_gui_verbose`)." + additionalMessage;
                     error(message, __LINE__, __FUNCTION__, __FILE__);
                 }
@@ -481,17 +499,32 @@ namespace op
                 }
             }
             if (!wrapperStructOutput.writeVideo.empty() && wrapperStructInput.producerSharedPtr == nullptr)
-                error("Writting video is only available if the OpenPose producer is used (i.e. wrapperStructInput.producerSharedPtr cannot be a nullptr).");
+                error("Writting video is only available if the OpenPose producer is used (i.e. wrapperStructInput.producerSharedPtr cannot be a nullptr).",
+                      __LINE__, __FUNCTION__, __FILE__);
+
+            // Get number GPUs
+            auto gpuNumber = wrapperStructPose.gpuNumber;
+            auto gpuNumberStart = wrapperStructPose.gpuNumberStart;
+            // If number GPU < 0 --> set it to all the available GPUs
+            if (gpuNumber < 0)
+            {
+                // Get total number GPUs
+                gpuNumber = getGpuNumber();
+                // Reset initial GPU to 0 (we want them all)
+                gpuNumberStart = 0;
+                // Logging message
+                log("Auto-detecting GPUs... Detected " + std::to_string(gpuNumber) + " GPU(s), using them all.", Priority::High);
+            }
 
             // Proper format
             const auto writeImagesCleaned = formatAsDirectory(wrapperStructOutput.writeImages);
-            const auto writePoseCleaned = formatAsDirectory(wrapperStructOutput.writePose);
-            const auto writePoseJsonCleaned = formatAsDirectory(wrapperStructOutput.writePoseJson);
+            const auto writeKeypointCleaned = formatAsDirectory(wrapperStructOutput.writeKeypoint);
+            const auto writeKeypointJsonCleaned = formatAsDirectory(wrapperStructOutput.writeKeypointJson);
             const auto writeHeatMapsCleaned = formatAsDirectory(wrapperStructOutput.writeHeatMaps);
 
             // Common parameters
             auto finalOutputSize = wrapperStructPose.outputSize;
-            cv::Size producerSize{-1,-1};
+            Point<int> producerSize{-1,-1};
             if (wrapperStructInput.producerSharedPtr != nullptr)
             {
                 // 1. Set producer properties
@@ -501,9 +534,9 @@ namespace op
                 wrapperStructInput.producerSharedPtr->set(ProducerProperty::Rotation, wrapperStructInput.frameRotate);
                 wrapperStructInput.producerSharedPtr->set(ProducerProperty::AutoRepeat, wrapperStructInput.framesRepeat);
                 // 2. Set finalOutputSize
-                producerSize = cv::Size{(int)wrapperStructInput.producerSharedPtr->get(CV_CAP_PROP_FRAME_WIDTH),
+                producerSize = Point<int>{(int)wrapperStructInput.producerSharedPtr->get(CV_CAP_PROP_FRAME_WIDTH),
                                         (int)wrapperStructInput.producerSharedPtr->get(CV_CAP_PROP_FRAME_HEIGHT)};
-                if (wrapperStructPose.outputSize.width == -1 || wrapperStructPose.outputSize.height == -1)
+                if (wrapperStructPose.outputSize.x == -1 || wrapperStructPose.outputSize.y == -1)
                 {
                     if (producerSize.area() > 0)
                         finalOutputSize = producerSize;
@@ -514,14 +547,11 @@ namespace op
                     }
                 }
             }
-            else if (finalOutputSize.width == -1 || finalOutputSize.height == -1)
+            else if (finalOutputSize.x == -1 || finalOutputSize.y == -1)
             {
                 const auto message = "Output resolution cannot be (-1 x -1) unless wrapperStructInput.producerSharedPtr is also set.";
                 error(message, __LINE__, __FUNCTION__, __FILE__);
             }
-
-            // Update global parameter
-            mGpuNumber = wrapperStructPose.gpuNumber;
 
             // Producer
             if (wrapperStructInput.producerSharedPtr != nullptr)
@@ -535,25 +565,46 @@ namespace op
                 wDatumProducer = nullptr;
 
             // Pose estimators
-            const cv::Size& netOutputSize = wrapperStructPose.netInputSize;
+            const Point<int>& poseNetOutputSize = wrapperStructPose.netInputSize;
             std::vector<std::shared_ptr<PoseExtractor>> poseExtractors;
-            for (auto gpuId = 0; gpuId < wrapperStructPose.gpuNumber; gpuId++)
+            for (auto gpuId = 0; gpuId < gpuNumber; gpuId++)
                 poseExtractors.emplace_back(std::make_shared<PoseExtractorCaffe>(
-                    wrapperStructPose.netInputSize, netOutputSize, finalOutputSize, wrapperStructPose.scalesNumber,
-                    wrapperStructPose.scaleGap, wrapperStructPose.poseModel, wrapperStructPose.modelFolder,
-                    gpuId + wrapperStructPose.gpuNumberStart, wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScaleMode
+                    wrapperStructPose.netInputSize, poseNetOutputSize, finalOutputSize, wrapperStructPose.scalesNumber,
+                    wrapperStructPose.poseModel, wrapperStructPose.modelFolder, gpuId + gpuNumberStart,
+                    wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale
                 ));
+
             // Pose renderers
             std::vector<std::shared_ptr<PoseRenderer>> poseRenderers;
-            if (wrapperStructPose.renderOutput)
+            std::shared_ptr<PoseRenderer> poseCpuRenderer;
+            std::vector<TWorker> cpuRenderers;
+            if (renderOutputGpu || wrapperStructPose.renderMode == RenderMode::Cpu)
             {
-                for (auto gpuId = 0; gpuId < poseExtractors.size(); gpuId++)
+                // If wrapperStructPose.renderMode != RenderMode::Gpu but renderOutput, then we create an alpha = 0 pose renderer
+                // in order to keep the removing background option
+                const auto alphaKeypoint = (wrapperStructPose.renderMode != RenderMode::None ? wrapperStructPose.alphaKeypoint : 0.f);
+                const auto alphaHeatMap = (wrapperStructPose.renderMode != RenderMode::None ? wrapperStructPose.alphaHeatMap : 0.f);
+                // GPU rendering
+                if (renderOutputGpu)
                 {
-                    poseRenderers.emplace_back(std::make_shared<PoseRenderer>(
-                        netOutputSize, finalOutputSize, wrapperStructPose.poseModel, poseExtractors[gpuId],
-                        wrapperStructPose.blendOriginalFrame, wrapperStructPose.alphaPose,
-                        wrapperStructPose.alphaHeatMap, wrapperStructPose.defaultPartToRender
-                    ));
+                    for (auto gpuId = 0; gpuId < poseExtractors.size(); gpuId++)
+                    {
+                        poseRenderers.emplace_back(std::make_shared<PoseRenderer>(
+                            poseNetOutputSize, finalOutputSize, wrapperStructPose.poseModel, poseExtractors[gpuId],
+                            wrapperStructPose.blendOriginalFrame, alphaKeypoint,
+                            alphaHeatMap, wrapperStructPose.defaultPartToRender, wrapperStructPose.renderMode
+                        ));
+                    }
+                }
+                // CPU rendering
+                if (wrapperStructPose.renderMode == RenderMode::Cpu)
+                {
+                    poseCpuRenderer = std::make_shared<PoseRenderer>(
+                        poseNetOutputSize, finalOutputSize, wrapperStructPose.poseModel, nullptr,
+                        wrapperStructPose.blendOriginalFrame, alphaKeypoint,
+                        alphaHeatMap, wrapperStructPose.defaultPartToRender, wrapperStructPose.renderMode
+                    );
+                    cpuRenderers.emplace_back(std::make_shared<WPoseRenderer<TDatumsPtr>>(poseCpuRenderer));
                 }
             }
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
@@ -563,36 +614,57 @@ namespace op
                 wrapperStructPose.netInputSize, wrapperStructPose.scalesNumber, wrapperStructPose.scaleGap
             );
             spWCvMatToOpInput = std::make_shared<WCvMatToOpInput<TDatumsPtr>>(cvMatToOpInput);
-            const auto cvMatToOpOutput = std::make_shared<CvMatToOpOutput>(finalOutputSize, wrapperStructPose.renderOutput);
+            const auto cvMatToOpOutput = std::make_shared<CvMatToOpOutput>(finalOutputSize, renderOutput);
             spWCvMatToOpOutput = std::make_shared<WCvMatToOpOutput<TDatumsPtr>>(cvMatToOpOutput);
 
             // Pose extractor(s)
-            spWPoses.clear();
             spWPoses.resize(poseExtractors.size());
             for (auto i = 0; i < spWPoses.size(); i++)
                 spWPoses.at(i) = {std::make_shared<WPoseExtractor<TDatumsPtr>>(poseExtractors.at(i))};
 
             // Face extractor(s)
-            if (wrapperStructFace.extractAndRenderFace)
+            if (wrapperStructFace.enable)
             {
+                const auto faceDetector = std::make_shared<FaceDetector>(wrapperStructPose.poseModel);
                 for (auto gpuId = 0; gpuId < spWPoses.size(); gpuId++)
                 {
-                    const auto faceExtractor = std::make_shared<experimental::FaceExtractor>(
-                        wrapperStructPose.modelFolder, gpuId + wrapperStructPose.gpuNumberStart, wrapperStructPose.poseModel
+                    // Face detector
+                    spWPoses.at(gpuId).emplace_back(std::make_shared<WFaceDetector<TDatumsPtr>>(faceDetector));
+                    // Face keypoint extractor
+                    const auto netOutputSize = wrapperStructFace.netInputSize;
+                    const auto faceExtractor = std::make_shared<FaceExtractor>(
+                        wrapperStructFace.netInputSize, netOutputSize, wrapperStructPose.modelFolder, gpuId + gpuNumberStart
                     );
-                    spWPoses.at(gpuId).emplace_back(std::make_shared<experimental::WFaceExtractor<TDatumsPtr>>(faceExtractor));
+                    spWPoses.at(gpuId).emplace_back(std::make_shared<WFaceExtractor<TDatumsPtr>>(faceExtractor));
                 }
             }
 
             // Hand extractor(s)
-            if (wrapperHandStruct.extractAndRenderHands)
+            if (wrapperStructHand.enable)
             {
+                const auto handDetector = std::make_shared<HandDetector>(wrapperStructPose.poseModel);
                 for (auto gpuId = 0; gpuId < spWPoses.size(); gpuId++)
                 {
-                    const auto handExtractor = std::make_shared<experimental::HandExtractor>(
-                        wrapperStructPose.modelFolder, gpuId + wrapperStructPose.gpuNumberStart, wrapperStructPose.poseModel
+                    // Hand detector
+                    // If tracking
+                    if (wrapperStructHand.detectionMode == DetectionMode::Tracking
+                            || wrapperStructHand.detectionMode == DetectionMode::IterativeAndTracking)
+                        spWPoses.at(gpuId).emplace_back(std::make_shared<WHandDetectorTracking<TDatumsPtr>>(handDetector));
+                    // If detection
+                    else
+                        spWPoses.at(gpuId).emplace_back(std::make_shared<WHandDetector<TDatumsPtr>>(handDetector));
+                    // Hand keypoint extractor
+                    const auto netOutputSize = wrapperStructHand.netInputSize;
+                    const auto handExtractor = std::make_shared<HandExtractor>(
+                        wrapperStructHand.netInputSize, netOutputSize, wrapperStructPose.modelFolder, gpuId + gpuNumberStart,
+                        (wrapperStructHand.detectionMode == DetectionMode::Iterative
+                            || wrapperStructHand.detectionMode == DetectionMode::IterativeAndTracking)
                     );
-                    spWPoses.at(gpuId).emplace_back(std::make_shared<experimental::WHandExtractor<TDatumsPtr>>(handExtractor));
+                    spWPoses.at(gpuId).emplace_back(std::make_shared<WHandExtractor<TDatumsPtr>>(handExtractor));
+                    // If tracking
+                    if (wrapperStructHand.detectionMode == DetectionMode::Tracking
+                            || wrapperStructHand.detectionMode == DetectionMode::IterativeAndTracking)
+                        spWPoses.at(gpuId).emplace_back(std::make_shared<WHandDetectorUpdate<TDatumsPtr>>(handDetector));
                 }
             }
 
@@ -601,40 +673,76 @@ namespace op
                 for (auto i = 0; i < spWPoses.size(); i++)
                     spWPoses.at(i).emplace_back(std::make_shared<WPoseRenderer<TDatumsPtr>>(poseRenderers.at(i)));
 
-            // Hands renderer(s)
-            if (wrapperHandStruct.extractAndRenderHands)
-            {
-                for (auto i = 0; i < spWPoses.size(); i++)
-                {
-                    // Construct hands renderer
-                    const auto handRenderer = std::make_shared<experimental::HandRenderer>(finalOutputSize);
-                    // Performance boost -> share spGpuMemoryPtr for all renderers
-                    if (!poseRenderers.empty())
-                    {
-                        const bool isLastRenderer = (!wrapperStructFace.extractAndRenderFace);
-                        handRenderer->setGpuMemoryAndSetIfLast(poseRenderers.at(i)->getGpuMemoryAndSetAsFirst(), isLastRenderer);
-                    }
-                    // Add worker
-                    spWPoses.at(i).emplace_back(std::make_shared<experimental::WHandRenderer<TDatumsPtr>>(handRenderer));
-                }
-            }
-
             // Face renderer(s)
-            if (wrapperStructFace.extractAndRenderFace)
+            if (renderFace)
             {
-                for (auto i = 0; i < spWPoses.size(); i++)
+                // CPU rendering
+                if (wrapperStructFace.renderMode == RenderMode::Cpu)
                 {
                     // Construct face renderer
-                    const auto faceRenderer = std::make_shared<experimental::FaceRenderer>(finalOutputSize);
-                    // Performance boost -> share spGpuMemoryPtr for all renderers
-                    if (!poseRenderers.empty())
-                    {
-                        const bool isLastRenderer = true;
-                        faceRenderer->setGpuMemoryAndSetIfLast(poseRenderers.at(i)->getGpuMemoryAndSetAsFirst(), isLastRenderer);
-                    }
+                    const auto faceRenderer = std::make_shared<FaceRenderer>(finalOutputSize, wrapperStructFace.alphaKeypoint,
+                                                                             wrapperStructFace.alphaHeatMap,
+                                                                             wrapperStructFace.renderMode);
                     // Add worker
-                    spWPoses.at(i).emplace_back(std::make_shared<experimental::WFaceRenderer<TDatumsPtr>>(faceRenderer));
+                    cpuRenderers.emplace_back(std::make_shared<WFaceRenderer<TDatumsPtr>>(faceRenderer));
                 }
+                // GPU rendering
+                else if (wrapperStructFace.renderMode == RenderMode::Gpu)
+                {
+                    for (auto i = 0; i < spWPoses.size(); i++)
+                    {
+                        // Construct face renderer
+                        const auto faceRenderer = std::make_shared<FaceRenderer>(finalOutputSize, wrapperStructFace.alphaKeypoint,
+                                                                                 wrapperStructFace.alphaHeatMap,
+                                                                                 wrapperStructFace.renderMode);
+                        // Performance boost -> share spGpuMemoryPtr for all renderers
+                        if (!poseRenderers.empty())
+                        {
+                            const bool isLastRenderer = !renderHandGpu;
+                            faceRenderer->setSharedParametersAndIfLast(poseRenderers.at(i)->getSharedParameters(), isLastRenderer);
+                        }
+                        // Add worker
+                        spWPoses.at(i).emplace_back(std::make_shared<WFaceRenderer<TDatumsPtr>>(faceRenderer));
+                    }
+                }
+                else
+                    error("Unknown RenderMode.", __LINE__, __FUNCTION__, __FILE__);
+            }
+
+            // Hand renderer(s)
+            if (renderHand)
+            {
+                // CPU rendering
+                if (wrapperStructHand.renderMode == RenderMode::Cpu)
+                {
+                    // Construct hand renderer
+                    const auto handRenderer = std::make_shared<HandRenderer>(finalOutputSize, wrapperStructHand.alphaKeypoint,
+                                                                             wrapperStructHand.alphaHeatMap,
+                                                                             wrapperStructHand.renderMode);
+                    // Add worker
+                    cpuRenderers.emplace_back(std::make_shared<WHandRenderer<TDatumsPtr>>(handRenderer));
+                }
+                // GPU rendering
+                else if (wrapperStructHand.renderMode == RenderMode::Gpu)
+                {
+                    for (auto i = 0; i < spWPoses.size(); i++)
+                    {
+                        // Construct hands renderer
+                        const auto handRenderer = std::make_shared<HandRenderer>(finalOutputSize, wrapperStructHand.alphaKeypoint,
+                                                                                 wrapperStructHand.alphaHeatMap,
+                                                                                 wrapperStructHand.renderMode);
+                        // Performance boost -> share spGpuMemoryPtr for all renderers
+                        if (!poseRenderers.empty())
+                        {
+                            const bool isLastRenderer = true;
+                            handRenderer->setSharedParametersAndIfLast(poseRenderers.at(i)->getSharedParameters(), isLastRenderer);
+                        }
+                        // Add worker
+                        spWPoses.at(i).emplace_back(std::make_shared<WHandRenderer<TDatumsPtr>>(handRenderer));
+                    }
+                }
+                else
+                    error("Unknown RenderMode.", __LINE__, __FUNCTION__, __FILE__);
             }
 
             // Itermediate workers (e.g. OpenPose format to cv::Mat, json & frames recorder, ...)
@@ -643,39 +751,48 @@ namespace op
             if (spWPoses.size() > 1)
                 mPostProcessingWs.emplace_back(std::make_shared<WQueueOrderer<TDatumsPtr>>());
             // Frames processor (OpenPose format -> cv::Mat format)
-            if (wrapperStructPose.renderOutput)
+            if (renderOutput)
             {
+                mPostProcessingWs = mergeWorkers(mPostProcessingWs, cpuRenderers);
                 const auto opOutputToCvMat = std::make_shared<OpOutputToCvMat>(finalOutputSize);
                 mPostProcessingWs.emplace_back(std::make_shared<WOpOutputToCvMat<TDatumsPtr>>(opOutputToCvMat));
             }
             // Re-scale pose if desired
-            if (wrapperStructPose.poseScaleMode != ScaleMode::OutputResolution
-                && (wrapperStructPose.poseScaleMode != ScaleMode::InputResolution || (finalOutputSize != producerSize))
-                && (wrapperStructPose.poseScaleMode != ScaleMode::NetOutputResolution || (finalOutputSize != netOutputSize)))
+            if (wrapperStructPose.keypointScale != ScaleMode::OutputResolution
+                && (wrapperStructPose.keypointScale != ScaleMode::InputResolution || (finalOutputSize != producerSize))
+                && (wrapperStructPose.keypointScale != ScaleMode::NetOutputResolution || (finalOutputSize != poseNetOutputSize)))
             {
-                auto keyPointScaler = std::make_shared<KeyPointScaler>(wrapperStructPose.poseScaleMode);
-                mPostProcessingWs.emplace_back(std::make_shared<WKeyPointScaler<TDatumsPtr>>(keyPointScaler));
+                auto keypointScaler = std::make_shared<KeypointScaler>(wrapperStructPose.keypointScale);
+                mPostProcessingWs.emplace_back(std::make_shared<WKeypointScaler<TDatumsPtr>>(keypointScaler));
             }
 
             mOutputWs.clear();
             // Write people pose data on disk (json for OpenCV >= 3, xml, yml...)
-            if (!writePoseCleaned.empty())
+            if (!writeKeypointCleaned.empty())
             {
-                const auto poseSaver = std::make_shared<PoseSaver>(writePoseCleaned, wrapperStructOutput.writePoseDataFormat);
-                mOutputWs.emplace_back(std::make_shared<WPoseSaver<TDatumsPtr>>(poseSaver));
+                const auto keypointSaver = std::make_shared<KeypointSaver>(writeKeypointCleaned, wrapperStructOutput.writeKeypointFormat);
+                mOutputWs.emplace_back(std::make_shared<WPoseSaver<TDatumsPtr>>(keypointSaver));
+                if (wrapperStructFace.enable)
+                    mOutputWs.emplace_back(std::make_shared<WFaceSaver<TDatumsPtr>>(keypointSaver));
+                if (wrapperStructHand.enable)
+                    mOutputWs.emplace_back(std::make_shared<WHandSaver<TDatumsPtr>>(keypointSaver));
             }
             // Write people pose data on disk (json format)
-            if (!writePoseJsonCleaned.empty())
+            if (!writeKeypointJsonCleaned.empty())
             {
-                const auto poseJsonSaver = std::make_shared<PoseJsonSaver>(writePoseJsonCleaned);
-                mOutputWs.emplace_back(std::make_shared<WPoseJsonSaver<TDatumsPtr>>(poseJsonSaver));
+                const auto keypointJsonSaver = std::make_shared<KeypointJsonSaver>(writeKeypointJsonCleaned);
+                mOutputWs.emplace_back(std::make_shared<WPoseJsonSaver<TDatumsPtr>>(keypointJsonSaver));
+                if (wrapperStructFace.enable)
+                    mOutputWs.emplace_back(std::make_shared<WFaceJsonSaver<TDatumsPtr>>(keypointJsonSaver));
+                if (wrapperStructHand.enable)
+                    mOutputWs.emplace_back(std::make_shared<WHandJsonSaver<TDatumsPtr>>(keypointJsonSaver));
             }
             // Write people pose data on disk (COCO validation json format)
             if (!wrapperStructOutput.writeCocoJson.empty())
             {
                 const auto humanFormat = true; // If true, bigger size (and potentially slower to process), but easier for a human to read it
-                const auto poseJsonCocoSaver = std::make_shared<PoseJsonCocoSaver>(wrapperStructOutput.writeCocoJson, humanFormat);
-                mOutputWs.emplace_back(std::make_shared<experimental::WPoseJsonCocoSaver<TDatumsPtr>>(poseJsonCocoSaver));
+                const auto cocoJsonSaver = std::make_shared<CocoJsonSaver>(wrapperStructOutput.writeCocoJson, humanFormat);
+                mOutputWs.emplace_back(std::make_shared<WCocoJsonSaver<TDatumsPtr>>(cocoJsonSaver));
             }
             // Write frames as desired image format on hard disk
             if (!writeImagesCleaned.empty())
@@ -686,8 +803,7 @@ namespace op
             // Write frames as *.avi video on hard disk
             if (!wrapperStructOutput.writeVideo.empty() && wrapperStructInput.producerSharedPtr != nullptr)
             {
-                const auto originalVideoFps = (wrapperStructInput.producerSharedPtr->getType() != ProducerType::Webcam
-                                               && wrapperStructInput.producerSharedPtr->get(CV_CAP_PROP_FPS) > 0.
+                const auto originalVideoFps = (wrapperStructInput.producerSharedPtr->get(CV_CAP_PROP_FPS) > 0.
                                                ? wrapperStructInput.producerSharedPtr->get(CV_CAP_PROP_FPS) : 30.);
                 const auto videoSaver = std::make_shared<VideoSaver>(
                     wrapperStructOutput.writeVideo, CV_FOURCC('M','J','P','G'), originalVideoFps, finalOutputSize
@@ -707,7 +823,7 @@ namespace op
                                                    || mThreadManagerMode == ThreadManagerMode::Asynchronous
                                                    || mThreadManagerMode == ThreadManagerMode::AsynchronousOut))
             {
-                const auto guiInfoAdder = std::make_shared<GuiInfoAdder>(finalOutputSize, wrapperStructPose.gpuNumber, wrapperStructOutput.displayGui);
+                const auto guiInfoAdder = std::make_shared<GuiInfoAdder>(finalOutputSize, gpuNumber, wrapperStructOutput.displayGui);
                 mOutputWs.emplace_back(std::make_shared<WGuiInfoAdder<TDatumsPtr>>(guiInfoAdder));
             }
             // Minimal graphical user interface (GUI)
@@ -715,7 +831,8 @@ namespace op
             if (wrapperStructOutput.displayGui)
             {
                 const auto gui = std::make_shared<Gui>(
-                    wrapperStructOutput.fullScreen, finalOutputSize, mThreadManager.getIsRunningSharedPtr(), spVideoSeek, poseExtractors, poseRenderers
+                    wrapperStructOutput.fullScreen, finalOutputSize, mThreadManager.getIsRunningSharedPtr(), spVideoSeek, poseExtractors,
+                    (wrapperStructPose.renderMode == RenderMode::Cpu ? std::vector<std::shared_ptr<PoseRenderer>>{poseCpuRenderer} : poseRenderers)
                 );
                 spWGui = {std::make_shared<WGui<TDatumsPtr>>(gui)};
             }
@@ -1070,4 +1187,4 @@ namespace op
     extern template class Wrapper<DATUM_BASE_NO_PTR>;
 }
 
-#endif // OPENPOSE__WRAPPER__WRAPPER_HPP
+#endif // OPENPOSE_WRAPPER_WRAPPER_HPP

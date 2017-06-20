@@ -131,7 +131,7 @@ namespace op
     }
 
     template <typename T>
-    void BodyPartConnectorCaffe<T>::Forward_cpu(const std::vector<caffe::Blob<T>*>& bottom, Array<T>& poseKeyPoints)
+    void BodyPartConnectorCaffe<T>::Forward_cpu(const std::vector<caffe::Blob<T>*>& bottom, Array<T>& poseKeypoints)
     {
         try
         {
@@ -139,7 +139,7 @@ namespace op
             const auto* const heatMapsPtr = heatMapsBlob->cpu_data();                                       // ~8.5ms / 114
             const auto* const peaksPtr = bottom.at(1)->cpu_data();                                          // ~0.02ms
             const auto maxPeaks = mTopSize[1];
-            connectBodyPartsCpu(poseKeyPoints, heatMapsPtr, peaksPtr, mPoseModel, cv::Size{heatMapsBlob->shape(3), heatMapsBlob->shape(2)}, maxPeaks,
+            connectBodyPartsCpu(poseKeypoints, heatMapsPtr, peaksPtr, mPoseModel, Point<int>{heatMapsBlob->shape(3), heatMapsBlob->shape(2)}, maxPeaks,
                                 mInterMinAboveThreshold, mInterThreshold, mMinSubsetCnt, mMinSubsetScore, mScaleNetToOutput);
         }
         catch (const std::exception& e)
@@ -149,7 +149,7 @@ namespace op
     }
 
     template <typename T>
-    void BodyPartConnectorCaffe<T>::Forward_gpu(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top, Array<T>& poseKeyPoints)
+    void BodyPartConnectorCaffe<T>::Forward_gpu(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top, Array<T>& poseKeypoints)
     {
         try
         {
@@ -157,7 +157,7 @@ namespace op
             const auto* const heatMapsPtr = heatMapsBlob->gpu_data();
             const auto* const peaksPtr = bottom.at(1)->gpu_data();
             const auto maxPeaks = mTopSize[1];
-            connectBodyPartsGpu(poseKeyPoints, top.at(0)->mutable_gpu_data(), heatMapsPtr, peaksPtr, mPoseModel, cv::Size{heatMapsBlob->shape(3), heatMapsBlob->shape(2)}, maxPeaks,
+            connectBodyPartsGpu(poseKeypoints, top.at(0)->mutable_gpu_data(), heatMapsPtr, peaksPtr, mPoseModel, Point<int>{heatMapsBlob->shape(3), heatMapsBlob->shape(2)}, maxPeaks,
                                 mInterMinAboveThreshold, mInterThreshold, mMinSubsetCnt, mMinSubsetScore, mScaleNetToOutput);
         }
         catch (const std::exception& e)

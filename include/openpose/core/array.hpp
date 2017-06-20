@@ -1,8 +1,8 @@
-#ifndef OPENPOSE__CORE__ARRAY_HPP
-#define OPENPOSE__CORE__ARRAY_HPP
+#ifndef OPENPOSE_CORE_ARRAY_HPP
+#define OPENPOSE_CORE_ARRAY_HPP
 
 #include <vector>
-#include <opencv2/core/core.hpp>
+#include <opencv2/core/core.hpp> // cv::Mat
 #include <boost/shared_ptr.hpp> // Note: std::shared_ptr not (fully) supported for array pointers: http://stackoverflow.com/questions/8947579/
 
 namespace op
@@ -40,7 +40,7 @@ namespace op
          * @param size Integer with the number of T element to be allocated. E.g. size = 5 is internally similar to: new T[5].
          * @param value Initial value for each component of the Array.
          */
-        explicit Array(const int size, const T value);
+        Array(const int size, const T value);
 
         /**
          * Array constructor.
@@ -48,7 +48,7 @@ namespace op
          * @param sizes Vector with the size of each dimension. E.g. size = {3, 5, 2} is internally similar to: new T[3*5*2].
          * @param value Initial value for each component of the Array.
          */
-        explicit Array(const std::vector<int>& sizes, const T value);
+        Array(const std::vector<int>& sizes, const T value);
 
         /**
          * Copy constructor.
@@ -211,12 +211,6 @@ namespace op
             return spData.get();
         }
 
-        // Disabled because people might try to modify it in illegal ways and change the allocated memory (e.g. resizing), leading to huge errors
-        // inline cv::Mat& getCvMat()
-        // {
-        //     return mCvMatData.second;
-        // }
-
         /**
          * Return a cv::Mat wrapper to the data. It forbids the data to be modified.
          * OpenCV only admits unsigned char, signed char, int, float & double. If the T class is not supported by OpenCV, it will throw an error.
@@ -228,6 +222,14 @@ namespace op
          * @return A const cv::Mat pointing to the data.
          */
         const cv::Mat& getConstCvMat() const;
+
+        /**
+         * Analogous to getConstCvMat, but in this case it returns a editable cv::Mat.
+         * Very important: Only allowed functions which do not provoke data reallocation.
+         * E.g. resizing functions will not work and they would provoke an undefined behaviour and/or execution crashes.
+         * @return A cv::Mat pointing to the data.
+         */
+        cv::Mat& getCvMat();
 
         /**
          * [] operator
@@ -327,6 +329,20 @@ namespace op
             return at(getIndexAndCheck(indexes));
         }
 
+        /**
+         * It returns a string with the whole array data. Useful for debugging.
+         * The format is: values separated by a space, and a enter for each dimension. E.g.:
+         * For the Array{2, 2, 3}, it will print:
+         * Array<T>::toString():
+         * x1 x2 x3
+         * x4 x5 x6
+         *
+         * x7 x8 x9
+         * x10 x11 x12
+         * @return A string with the array values in the above format.
+         */
+        const std::string toString() const;
+
     private:
         std::vector<int> mSize;
         size_t mVolume;
@@ -363,4 +379,4 @@ namespace op
     };
 }
 
-#endif // OPENPOSE__CORE__ARRAY_HPP
+#endif // OPENPOSE_CORE_ARRAY_HPP

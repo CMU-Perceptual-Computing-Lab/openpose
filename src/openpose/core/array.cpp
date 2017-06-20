@@ -174,7 +174,8 @@ namespace op
                 mSize = {};
                 mVolume = 0;
                 spData.reset();
-                mCvMatData = std::make_pair(false, cv::Mat{});
+                // cv::Mat available but empty
+                mCvMatData = std::make_pair(true, cv::Mat{});
             }
         }
         catch (const std::exception& e)
@@ -321,18 +322,61 @@ namespace op
     {
         try
         {
-            if (mCvMatData.first)
-                return mCvMatData.second;
-            else
-            {
+            if (!mCvMatData.first)
                 error("Array<T>: cv::Mat functions only valid for T types defined by OpenCV: unsigned char, signed char, int, float & double", __LINE__, __FUNCTION__, __FILE__);
-                return mCvMatData.second;
-            }
+            return mCvMatData.second;
         }
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             return mCvMatData.second;
+        }
+    }
+
+    template<typename T>
+    cv::Mat& Array<T>::getCvMat()
+    {
+        try
+        {
+            if (!mCvMatData.first)
+                error("Array<T>: cv::Mat functions only valid for T types defined by OpenCV: unsigned char, signed char, int, float & double", __LINE__, __FUNCTION__, __FILE__);
+            return mCvMatData.second;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return mCvMatData.second;
+        }
+    }
+
+    template<typename T>
+    const std::string Array<T>::toString() const
+    {
+        try
+        {
+            // Initial value
+            std::string string{"Array<T>::toString():\n"};
+            // Add each element
+            for (auto i = 0 ; i < mVolume ; i++)
+            {
+                // Adding element sepearted by an space
+                string += std::to_string(spData[i]) + " ";
+                // Introduce an enter for each dimension change
+                // If comented, all values will be printed in the same line
+                auto multiplier = 1u;
+                for (auto dimension = mSize.size() - 1u ; dimension > 0 && ((i/multiplier) % getSize(dimension) == getSize(dimension)-1) ; dimension--)
+                {
+                    string += "\n";
+                    multiplier *= getSize(dimension);
+                }
+            }
+            // Return string
+            return string;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return "";
         }
     }
 

@@ -1,5 +1,5 @@
-#ifndef OPENPOSE__UTILITIES__MACROS_HPP
-#define OPENPOSE__UTILITIES__MACROS_HPP
+#ifndef OPENPOSE_UTILITIES_MACROS_HPP
+#define OPENPOSE_UTILITIES_MACROS_HPP
 
 #include <memory> // std::shared_ptr
 #include <vector>
@@ -32,4 +32,4 @@
     template class className<double>; \
     template class className<long double>
 
-#endif // OPENPOSE__UTILITIES__MACROS_HPP
+#endif // OPENPOSE_UTILITIES_MACROS_HPP

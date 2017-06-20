@@ -12,8 +12,8 @@ OpenPose Library - Compilation and Installation
 
 ## Requirements
 - Ubuntu (tested on 14 and 16) or Windows (tested on 10). We do not support any other OS but the community has been able to install it on: CentOS, Windows 7, and Windows 8.
-- GPU with at least 1.5 GB available (the `nvidia-smi` command checks the available GPU memory in Ubuntu).
-- CUDA and cuDNN installed.
+- NVIDIA graphics card with at least 1.6 GB available (the `nvidia-smi` command checks the available GPU memory in Ubuntu).
+- CUDA and cuDNN installed. Note: We found OpenPose working with cuDNN 5.1 ~10% faster than with cuDNN 6.
 - At least 2 GB of free RAM memory.
 - Highly recommended: A CPU with at least 8 cores.
 
@@ -98,20 +98,20 @@ You just need to remove the OpenPose folder, by default called `openpose/`. E.g.
 ## Windows
 ### Installation - Demo
 1. Install the pre-requisites:
-    1. [CUDA 8](https://developer.nvidia.com/cuda-downloads): Install it on the default location, C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0. Otherwise, modify the Visual Studio project solution accordingly.
-    2. [cuDNN 5.1](https://developer.nvidia.com/cudnn): Once you have downloaded it, just unzip it and copy (merge) the contents on the CUDA folder, C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0.
-    3. [Microsoft Visual C++ 2015 Redistributable](https://www.microsoft.com/en-us/download/details.aspx?id=53587) (lighter) or Microsoft Visual Studio 2015 (only if you intend to use the library).
+    1. [Microsoft Visual C++ 2015 Redistributable](https://www.microsoft.com/en-us/download/details.aspx?id=53587) (lighter) or Microsoft Visual Studio 2015 (in case you intend to install the library).
+    2. [CUDA 8](https://developer.nvidia.com/cuda-downloads): Install it on the default location, C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0. Otherwise, modify the Visual Studio project solution accordingly.
+    3. [cuDNN 5.1](https://developer.nvidia.com/cudnn): Once you have downloaded it, just unzip it and copy (merge) the contents on the CUDA folder, C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0.
 2. Download the portable demo from: [posefs1.perception.cs.cmu.edu/OpenPose/openpose_1.0.0rc2.zip](http://posefs1.perception.cs.cmu.edu/OpenPose/openpose_1.0.0rc2.zip).
 
 ### Installation - Library
 1. Install the pre-requisites:
-    1. Install all the demo pre-requisites.
-    2. [Python 2.4.13 64 bits - Windows x86-64 MSI installer](https://www.python.org/downloads/release/python-2713/).
+    1. Microsoft Visual Studio (VS) 2015. Install CUDA 8.0 after Visual Studio 2015 is installed to assure that the CUDA installation will generate all necessary files for VS. If CUDA was already installed, re-install it after installing VS!
+    2. Install all the demo pre-requisites.
+    3. [Python 2.4.13 64 bits - Windows x86-64 MSI installer](https://www.python.org/downloads/release/python-2713/).
         - Install it on C:\Python27 (default) or D:\Programs\Python27. Otherwise, modify the VS solution accordingly.
         - In addition, open the Windows cmd (Windows button + X, then A), and install some Python libraries with this command: `pip install numpy protobuf hypothesis`.
-    3. [Cmake](https://cmake.org/download/): Select the option to add it to the Windows PATH.
-    4. [Ninja](https://ninja-build.org/): Select the option to add it to the Windows PATH.
-    5. Microsoft Visual Studio 2015.
+    4. [Cmake](https://cmake.org/download/): Select the option to add it to the Windows PATH.
+    5. [Ninja](https://ninja-build.org/): Select the option to add it to the Windows PATH.
 2. Download the `Windows` branch of Openpose by either cliking on `Download ZIP` on [openpose/tree/windows](https://github.com/CMU-Perceptual-Computing-Lab/openpose/tree/windows) or cloning the repository: `git clone https://github.com/CMU-Perceptual-Computing-Lab/openpose/ && git checkout windows`.
 3. Install Caffe on Windows:
     1. Open the Windows cmd (Windows button + X, then A).
@@ -181,6 +181,20 @@ bin\OpenPoseDemo.exe --image_dir examples/media/
 windows_project\x64\Release\OpenPoseDemo.exe --image_dir examples/media/
 ```
 
+**4. Body Pose and Face Keypoint Detector (e.g. on Video)**
+```
+# Ubuntu
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --face
+```
+```
+:: Windows - Demo
+bin\OpenPoseDemo.exe --video examples/media/video.avi --face
+```
+```
+:: Windows - Library
+windows_project\x64\Release\OpenPoseDemo.exe --video examples/media/video.avi --face
+```
+
 The visual GUI should show the original image with the poses blended on it, similarly to the pose of this gif:
 <p align="center">
     <img src="media/shake.gif", width="720">
@@ -207,9 +221,9 @@ If you choose to visualize a body part or a PAF (Part Affinity Field) heat map w
 
 **Q: Low speed** - OpenPose is quite slow, is it normal? How can I speed it up?
 
-**A**: Check the Benchmark to discover the approximate speed of your graphics card: [https://github.com/CMU-Perceptual-Computing-Lab/openpose#openpose-benchmark](https://github.com/CMU-Perceptual-Computing-Lab/openpose#openpose-benchmark). Some speed tips:
+**A**: Check the [OpenPose Benchmark](https://docs.google.com/spreadsheets/d/1-DynFGvoScvfWDA1P4jDInCkbD4lg0IKOYbXgEq0sK0/edit#gid=0) to discover the approximate speed of your graphics card. Some speed tips:
 
     1. Use cuDNN 5.1 (cuDNN 6 is ~10% slower).
-    2. If you have more than 1 GPU, set `--num_gpu`.
-    3. Reduce the `--net_resolution` (e.g. to 320x176) (lower accuracy).
+    2. Reduce the `--net_resolution` (e.g. to 320x176) (lower accuracy).
+    3. For face, reduce the `--face_net_resolution`. The resolution 320x320 usually works pretty decently.
     4. Use the `MPI_4_layers` model (lower accuracy and lower number of parts).

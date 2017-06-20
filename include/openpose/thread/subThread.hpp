@@ -1,5 +1,5 @@
-#ifndef OPENPOSE__THREAD__SUB_THREAD_HPP
-#define OPENPOSE__THREAD__SUB_THREAD_HPP
+#ifndef OPENPOSE_THREAD_SUB_THREAD_HPP
+#define OPENPOSE_THREAD_SUB_THREAD_HPP
 
 #include <vector>
 #include <openpose/utilities/macros.hpp>
@@ -157,4 +157,4 @@ namespace op
     COMPILE_TEMPLATE_DATUM(SubThread);
 }
 
-#endif // OPENPOSE__THREAD__SUB_THREAD_HPP
+#endif // OPENPOSE_THREAD_SUB_THREAD_HPP

@@ -1,5 +1,5 @@
-#ifndef OPENPOSE__SUB_THREAD__THREAD_QUEUE_IN_HPP
-#define OPENPOSE__SUB_THREAD__THREAD_QUEUE_IN_HPP
+#ifndef OPENPOSE_THREAD_THREAD_QUEUE_IN_HPP
+#define OPENPOSE_THREAD_THREAD_QUEUE_IN_HPP
 
 #include <memory> // std::shared_ptr
 #include <vector>
@@ -70,4 +70,4 @@ namespace op
     COMPILE_TEMPLATE_DATUM(SubThreadQueueIn);
 }
 
-#endif // OPENPOSE__SUB_THREAD__THREAD_QUEUE_IN_HPP
+#endif // OPENPOSE_THREAD_THREAD_QUEUE_IN_HPP

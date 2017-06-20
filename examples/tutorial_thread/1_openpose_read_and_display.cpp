@@ -9,7 +9,7 @@
 
 // 3rdpary depencencies
 #include <gflags/gflags.h> // DEFINE_bool, DEFINE_int32, DEFINE_int64, DEFINE_uint64, DEFINE_double, DEFINE_string
-#include <glog/logging.h> // google::InitGoogleLogging, CHECK, CHECK_EQ, LOG, VLOG, ...
+#include <glog/logging.h> // google::InitGoogleLogging
 // OpenPose dependencies
 #include <openpose/core/headers.hpp>
 #include <openpose/gui/headers.hpp>
@@ -17,22 +17,29 @@
 #include <openpose/thread/headers.hpp>
 #include <openpose/utilities/headers.hpp>
 
-// Gflags in the command line terminal. Check all the options by adding the flag `--help`, e.g. `openpose.bin --help`.
-// Note: This command will show you flags for several files. Check only the flags for the file you are checking. E.g. for `openpose.bin`, look for `Flags from examples/openpose/openpose.cpp:`.
+// See all the available parameter options withe the `--help` flag. E.g. `./build/examples/openpose/openpose.bin --help`.
+// Note: This command will show you flags for other unnecessary 3rdparty files. Check only the flags for the OpenPose
+// executable. E.g. for `openpose.bin`, look for `Flags from examples/openpose/openpose.cpp:`.
 // Debugging
-DEFINE_int32(logging_level,             3,              "The logging level. Integer in the range [0, 255]. 0 will output any log() message, while 255 will not output any."
-                                                        " Current OpenPose library messages are in the range 0-4: 1 for low priority messages and 4 for important ones.");
+DEFINE_int32(logging_level,             4,              "The logging level. Integer in the range [0, 255]. 0 will output any log() message, while"
+                                                        " 255 will not output any. Current OpenPose library messages are in the range 0-4: 1 for"
+                                                        " low priority messages and 4 for important ones.");
 // Producer
 DEFINE_int32(camera,                    0,              "The camera index for cv::VideoCapture. Integer in the range [0, 9].");
 DEFINE_string(camera_resolution,        "1280x720",     "Size of the camera frames to ask for.");
-DEFINE_string(video,                    "",             "Use a video file instead of the camera. Use `examples/media/video.avi` for our default example video.");
-DEFINE_string(image_dir,                "",             "Process a directory of images. Use `examples/media/` for our default example folder with 20 images.");
+DEFINE_double(camera_fps,               30.0,           "Frame rate for the webcam (only used when saving video from webcam). Set this value to the"
+                                                        " minimum value between the OpenPose displayed speed and the webcam real frame rate.");
+DEFINE_string(video,                    "",             "Use a video file instead of the camera. Use `examples/media/video.avi` for our default"
+                                                        " example video.");
+DEFINE_string(image_dir,                "",             "Process a directory of images. Use `examples/media/` for our default example folder with 20"
+                                                        " images.");
 // OpenPose
-DEFINE_string(resolution,               "1280x720",     "The image resolution (display). Use \"-1x-1\" to force the program to use the default images resolution.");
+DEFINE_string(resolution,               "1280x720",     "The image resolution (display and output). Use \"-1x-1\" to force the program to use the"
+                                                        " default images resolution.");
 // Consumer
 DEFINE_bool(fullscreen,                 false,          "Run in full-screen mode (press f during runtime to toggle).");
-DEFINE_bool(process_real_time,          false,          "Enable to keep the original source frame rate (e.g. for video). If the processing time is too long, it will skip frames. If it is"
-                                                        " too fast, it will slow it down.");
+DEFINE_bool(process_real_time,          false,          "Enable to keep the original source frame rate (e.g. for video). If the processing time is"
+                                                        " too long, it will skip frames. If it is too fast, it will slow it down.");
 
 // Determine type of frame source
 op::ProducerType gflagsToProducerType(const std::string& imageDirectory, const std::string& videoPath, const int webcamIndex)
@@ -55,7 +62,8 @@ op::ProducerType gflagsToProducerType(const std::string& imageDirectory, const s
         return op::ProducerType::Webcam;
 }
 
-std::shared_ptr<op::Producer> gflagsToProducer(const std::string& imageDirectory, const std::string& videoPath, const int webcamIndex, const cv::Size webcamResolution)
+std::shared_ptr<op::Producer> gflagsToProducer(const std::string& imageDirectory, const std::string& videoPath, const int webcamIndex,
+                                               const op::Point<int> webcamResolution, const int webcamFps)
 {
     op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
     const auto type = gflagsToProducerType(imageDirectory, videoPath, webcamIndex);
@@ -65,7 +73,7 @@ std::shared_ptr<op::Producer> gflagsToProducer(const std::string& imageDirectory
     else if (type == op::ProducerType::Video)
         return std::make_shared<op::VideoReader>(videoPath);
     else if (type == op::ProducerType::Webcam)
-        return std::make_shared<op::WebcamReader>(webcamIndex, webcamResolution);
+        return std::make_shared<op::WebcamReader>(webcamIndex, webcamResolution, webcamFps);
     else
     {
         op::error("Undefined Producer selected.", __LINE__, __FUNCTION__, __FILE__);
@@ -74,20 +82,22 @@ std::shared_ptr<op::Producer> gflagsToProducer(const std::string& imageDirectory
 }
 
 // Google flags into program variables
-std::tuple<cv::Size, cv::Size, std::shared_ptr<op::Producer>> gflagsToOpParameters()
+std::tuple<op::Point<int>, op::Point<int>, std::shared_ptr<op::Producer>> gflagsToOpParameters()
 {
     op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
     // cameraFrameSize
-    cv::Size cameraFrameSize;
-    auto nRead = sscanf(FLAGS_camera_resolution.c_str(), "%dx%d", &cameraFrameSize.width, &cameraFrameSize.height);
-    op::checkE(nRead, 2, "Error, camera resolution format (" +  FLAGS_camera_resolution + ") invalid, should be e.g., 1280x720", __LINE__, __FUNCTION__, __FILE__);
+    op::Point<int> cameraFrameSize;
+    auto nRead = sscanf(FLAGS_camera_resolution.c_str(), "%dx%d", &cameraFrameSize.x, &cameraFrameSize.y);
+    op::checkE(nRead, 2, "Error, camera resolution format (" +  FLAGS_camera_resolution + ") invalid, should be e.g., 1280x720",
+               __LINE__, __FUNCTION__, __FILE__);
     // outputSize
-    cv::Size outputSize;
-    nRead = sscanf(FLAGS_resolution.c_str(), "%dx%d", &outputSize.width, &outputSize.height);
-    op::checkE(nRead, 2, "Error, resolution format (" +  FLAGS_resolution + ") invalid, should be e.g., 960x540 ", __LINE__, __FUNCTION__, __FILE__);
+    op::Point<int> outputSize;
+    nRead = sscanf(FLAGS_resolution.c_str(), "%dx%d", &outputSize.x, &outputSize.y);
+    op::checkE(nRead, 2, "Error, camera resolution format (" +  FLAGS_camera_resolution + ") invalid, should be e.g., 1280x720",
+               __LINE__, __FUNCTION__, __FILE__);
 
     // producerType
-    const auto producerSharedPtr = gflagsToProducer(FLAGS_image_dir, FLAGS_video, FLAGS_camera, cameraFrameSize);
+    const auto producerSharedPtr = gflagsToProducer(FLAGS_image_dir, FLAGS_video, FLAGS_camera, cameraFrameSize, FLAGS_camera_fps);
     const auto displayProducerFpsMode = (FLAGS_process_real_time ? op::ProducerFpsMode::OriginalFps : op::ProducerFpsMode::RetrievalFps);
     producerSharedPtr->setProducerFpsMode(displayProducerFpsMode);
 
@@ -97,7 +107,7 @@ std::tuple<cv::Size, cv::Size, std::shared_ptr<op::Producer>> gflagsToOpParamete
 
 int openPoseTutorialThread1()
 {
-    op::log("OpenPose Library Tutorial - Example 3.", op::Priority::Max);
+    op::log("OpenPose Library Tutorial - Example 3.", op::Priority::High);
     // ------------------------- INITIALIZATION -------------------------
     // Step 1 - Set logging level
         // - 0 will output all the logging messages
@@ -105,22 +115,23 @@ int openPoseTutorialThread1()
     op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.", __LINE__, __FUNCTION__, __FILE__);
     op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
     // Step 2 - Read Google flags (user defined configuration)
-    cv::Size cameraFrameSize;
-    cv::Size outputSize;
+    op::Point<int> cameraFrameSize;
+    op::Point<int> outputSize;
     std::shared_ptr<op::Producer> producerSharedPtr;
     std::tie(cameraFrameSize, outputSize, producerSharedPtr) = gflagsToOpParameters();
     // Step 3 - Setting producer
     auto videoSeekSharedPtr = std::make_shared<std::pair<std::atomic<bool>, std::atomic<int>>>();
     videoSeekSharedPtr->first = false;
     videoSeekSharedPtr->second = 0;
-    const cv::Size producerSize{(int)producerSharedPtr->get(CV_CAP_PROP_FRAME_WIDTH),
+    const op::Point<int> producerSize{(int)producerSharedPtr->get(CV_CAP_PROP_FRAME_WIDTH),
                                 (int)producerSharedPtr->get(CV_CAP_PROP_FRAME_HEIGHT)};
-    if (outputSize.width == -1 || outputSize.height == -1)
+    if (outputSize.x == -1 || outputSize.y == -1)
     {
         if (producerSize.area() > 0)
             outputSize = producerSize;
         else
-            op::error("Output resolution = input resolution not valid for image reading (size might change between images).", __LINE__, __FUNCTION__, __FILE__);
+            op::error("Output resolution = input resolution not valid for image reading (size might change between images).",
+                      __LINE__, __FUNCTION__, __FILE__);
     }
     // Step 4 - Setting thread workers && manager
     typedef std::vector<op::Datum> TypedefDatumsNoPtr;
@@ -137,7 +148,8 @@ int openPoseTutorialThread1()
     // ------------------------- CONFIGURING THREADING -------------------------
     // In this simple multi-thread example, we will do the following:
         // 3 (virtual) queues: 0, 1, 2
-        // 1 real queue: 1. The first and last queue ids (in this case 0 and 2) are not actual queues, but the beginning and end of the processing sequence
+        // 1 real queue: 1. The first and last queue ids (in this case 0 and 2) are not actual queues, but the beginning and end of the processing
+        // sequence
         // 2 threads: 0, 1
         // wDatumProducer will generate frames (there is no real queue 0) and push them on queue 1
         // wGui will pop frames from queue 1 and process them (there is no real queue 2)
@@ -161,8 +173,8 @@ int openPoseTutorialThread1()
     // threadManager.add(threadId, {wDatumProducer, wGui}, queueIn, queueOut);     // Thread 0, queues 0 -> 1
 
     // ------------------------- STARTING AND STOPPING THREADING -------------------------
-    op::log("Starting thread(s)", op::Priority::Max);
-    // Two different ways of running the program on multithread enviroment
+    op::log("Starting thread(s)", op::Priority::High);
+    // Two different ways of running the program on multithread environment
         // Option a) Using the main thread (this thread) for processing (it saves 1 thread, recommended)
     threadManager.exec();  // It blocks this thread until all threads have finished
         // Option b) Giving to the user the control of this thread
@@ -175,12 +187,12 @@ int openPoseTutorialThread1()
     // while (threadManager.isRunning())
     //     std::this_thread::sleep_for(std::chrono::milliseconds{33});
     // // Stop and join threads
-    // op::log("Stopping thread(s)", op::Priority::Max);
+    // op::log("Stopping thread(s)", op::Priority::High);
     // threadManager.stop();
 
     // ------------------------- CLOSING -------------------------
     // Logging information message
-    op::log("Example 3 successfully finished.", op::Priority::Max);
+    op::log("Example 3 successfully finished.", op::Priority::High);
     // Return successful message
     return 0;
 }

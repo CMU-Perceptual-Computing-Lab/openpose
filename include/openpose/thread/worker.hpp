@@ -1,5 +1,5 @@
-#ifndef OPENPOSE__THREAD__WORKER_HPP
-#define OPENPOSE__THREAD__WORKER_HPP
+#ifndef OPENPOSE_THREAD_WORKER_HPP
+#define OPENPOSE_THREAD_WORKER_HPP
 
 #include <openpose/utilities/macros.hpp>
 
@@ -73,4 +73,4 @@ namespace op
     COMPILE_TEMPLATE_DATUM(Worker);
 }
 
-#endif // OPENPOSE__THREAD__WORKER_HPP
+#endif // OPENPOSE_THREAD_WORKER_HPP

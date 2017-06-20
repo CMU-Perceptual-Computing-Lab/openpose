@@ -1,8 +1,7 @@
-#ifndef OPENPOSE__CORE__W_CV_MAT_TO_OP_INPUT_HPP
-#define OPENPOSE__CORE__W_CV_MAT_TO_OP_INPUT_HPP
+#ifndef OPENPOSE_CORE_W_CV_MAT_TO_OP_INPUT_HPP
+#define OPENPOSE_CORE_W_CV_MAT_TO_OP_INPUT_HPP
 
 #include <memory> // std::shared_ptr
-#include <opencv2/core/core.hpp>
 #include <openpose/thread/worker.hpp>
 #include "cvMatToOpInput.hpp"
 
@@ -61,7 +60,7 @@ namespace op
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                 // cv::Mat -> float*
                 for (auto& tDatum : *tDatums)
-                    tDatum.inputNetData = spCvMatToOpInput->format(tDatum.cvInputData);
+                    std::tie(tDatum.inputNetData, tDatum.scaleRatios) = spCvMatToOpInput->format(tDatum.cvInputData);
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
                 Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__, Profiler::DEFAULT_X);
@@ -80,4 +79,4 @@ namespace op
     COMPILE_TEMPLATE_DATUM(WCvMatToOpInput);
 }
 
-#endif // OPENPOSE__CORE__W_CV_MAT_TO_OP_INPUT_HPP
+#endif // OPENPOSE_CORE_W_CV_MAT_TO_OP_INPUT_HPP

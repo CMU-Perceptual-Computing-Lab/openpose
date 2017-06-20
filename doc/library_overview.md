@@ -5,7 +5,7 @@ OpenPose Library - Basic Overview
 
 ## Modules Diagram
 <p align="center">
-    <img src="../doc/UML/1_0_0rc2/UML.png", width="720">
+    <img src="../doc/UML/1_0_0rc3/UML.png", width="720">
 </p>
 
 
@@ -180,7 +180,7 @@ The human body pose detection is wrapped into the `WPoseExtractor<T>` worker and
 Currently, only `PoseExtractorCaffe` is implemented, which uses the Caffe framework. We might add other famous frameworks later (e.g. Torch or TensorFlow). If you compile our library with any other framework, please email us or make a pull request! We are really interested in adding any other Deep Net framework, and the code is mostly prepared for it. Just create the equivalent `PoseExtractorDesiredFramework` and make the pull request!
 
 #### Constructor
-In order to be initialized, `PoseExtractorCaffe` has the following constructor and parameters: `PoseExtractorCaffe(const cv::Size& netInputSize, const cv::Size& netOutputSize, const cv::Size& outputSize, const int scaleNumber, const double scaleGap, const PoseModel poseModel, const std::string& modelsFolder, const int gpuId)`.
+In order to be initialized, `PoseExtractorCaffe` has the following constructor and parameters: `PoseExtractorCaffe(const Point<int>& netInputSize, const Point<int>& netOutputSize, const Point<int>& outputSize, const int scaleNumber, const double scaleGap, const PoseModel poseModel, const std::string& modelsFolder, const int gpuId)`.
 
 1. `netInputSize` is the resolution of the first layer of the deep net. I.e., the frames given to this class must have that size.
 
@@ -199,7 +199,7 @@ In order to be initialized, `PoseExtractorCaffe` has the following constructor a
 #### Detect Human Pose
 In order to detect the human pose:
 
-1. First run the deep net over the desired target image, by using `forwardPass(const Array<float>& inputNetData, const cv::Size& inputDataSize)`. `inputNetData` is the input image scaled to `netInputSize`, while `inputDataSize` indicates the original frame resolution before being rescaled to `netInputSize` (this is required given that we resize the images keeping the original aspect ratio).
+1. First run the deep net over the desired target image, by using `forwardPass(const Array<float>& inputNetData, const Point<int>& inputDataSize)`. `inputNetData` is the input image scaled to `netInputSize`, while `inputDataSize` indicates the original frame resolution before being rescaled to `netInputSize` (this is required given that we resize the images keeping the original aspect ratio).
 
 2. After, you can choose either to get:
     1. The people pose as a op::Array<float>: `Array<float> getPose()`.
@@ -213,13 +213,13 @@ Due to performance reasons, we only copy the people pose data given by `getPose(
 After estimating the pose, you usually desired to visualize it. `PoseRenderer` does this work for you.
 
 #### Constructor
-In order to be initialized, `PoseRenderer` has the following constructor and parameters: `PoseRenderer(const cv::Size& netOutputSize, const cv::Size& outputSize, const PoseModel poseModel, const std::shared_ptr<PoseExtractor>& poseExtractor, const float alphaPose, const float alphaHeatmap)`.
+In order to be initialized, `PoseRenderer` has the following constructor and parameters: `PoseRenderer(const Point<int>& netOutputSize, const Point<int>& outputSize, const PoseModel poseModel, const std::shared_ptr<PoseExtractor>& poseExtractor, const float alphaKeypoint, const float alphaHeatMap)`.
 
 1. `netOutputSize`, `outputSize` and `poseModel` are the same as the ones used for `PoseExtractorCaffe`.
 
 2. `poseExtractor` is the pose extractor used previously. It is only used for heatmap and PAFs rendering, since the GPU data is not copied to `op::Datum` for performance purposes. If any of the heatmaps are gonna be rendered, `PoseRenderer` must be placed in the same thread as `PoseExtractor`. Otherwise, it will throw a runtime exception.
 
-3. `alphaPose` and `alphaHeatMap` controls the blending coefficient between original frame and rendered pose or heatmap/PAF respectively. A value `alphaPose = 1` will render the pose with no transparency at all, while `alphaPose = 0` will not be visible. In addition, `alphaHeatMap = 1` would only show the heatmap, while `alphaHeatMap = 0` would only show the original frame.
+3. `alphaKeypoint` and `alphaHeatMap` controls the blending coefficient between original frame and rendered pose or heatmap/PAF respectively. A value `alphaKeypoint = 1` will render the pose with no transparency at all, while `alphaKeypoint = 0` will not be visible. In addition, `alphaHeatMap = 1` would only show the heatmap, while `alphaHeatMap = 0` would only show the original frame.
 
 #### Render Human Pose
 In order to render the detected human pose, run `std::pair<int, std::string> renderPose(Array<float>& outputData, const Array<float>& pose, const double scaleNetToOutput)`.

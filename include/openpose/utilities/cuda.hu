@@ -1,5 +1,5 @@
-#ifndef OPENPOSE__UTILITIES_CUDA_HU
-#define OPENPOSE__UTILITIES_CUDA_HU
+#ifndef OPENPOSE_UTILITIES_CUDA_HU
+#define OPENPOSE_UTILITIES_CUDA_HU
 
 namespace op
 {
@@ -81,7 +81,8 @@ namespace op
 
     // Cubic interpolation
     template <typename T>
-    inline __device__ void cubicSequentialData(int* xIntArray, int* yIntArray, T& dx, T& dy, const T xSource, const T ySource, const int width, const int height)
+    inline __device__ void cubicSequentialData(int* xIntArray, int* yIntArray, T& dx, T& dy, const T xSource, const T ySource,
+                                               const int width, const int height)
     {
         xIntArray[1] = fastTruncate(int(xSource + 1e-5), 0, width - 1);
         xIntArray[0] = fastMax(0, xIntArray[1] - 1);
@@ -97,7 +98,7 @@ namespace op
     }
 
     template <typename T>
-    inline __device__ T cubicInterpolation(const T v0, const T v1, const T v2, const T v3, const T dx)
+    inline __device__ T cubicInterpolate(const T v0, const T v1, const T v2, const T v3, const T dx)
     {
         // http://www.paulinternet.nl/?page=bicubic
         // const auto a = (-0.5f * v0 + 1.5f * v1 - 1.5f * v2 + 0.5f * v3);
@@ -108,10 +109,12 @@ namespace op
                 + (v0 - 2.5f * v1 + 2.f * v2 - 0.5f * v3) * dx * dx
                 - 0.5f * (v0 - v2) * dx // + (-0.5f * v0 + 0.5f * v2) * dx
                 + v1;
+        // return v1 + 0.5f * dx * (v2 - v0 + dx * (2.f * v0 - 5.f * v1 + 4.f * v2 - v3 + dx * (3.f * (v1 - v2) + v3 - v0)));
     }
 
     template <typename T>
-    inline __device__ T cubicResize(const T* const sourcePtr, const T xSource, const T ySource, const int widthSource, const int heightSource, const int widthSourcePtr)
+    inline __device__ T bicubicInterpolate(const T* const sourcePtr, const T xSource, const T ySource, const int widthSource,
+                                           const int heightSource, const int widthSourcePtr)
     {
         int xIntArray[4];
         int yIntArray[4];
@@ -122,16 +125,17 @@ namespace op
         T temp[4];
         for (unsigned char i = 0; i < 4; i++)
         {
-            const int offset = yIntArray[i]*widthSourcePtr;
-            temp[i] = cubicInterpolation(sourcePtr[offset + xIntArray[0]], sourcePtr[offset + xIntArray[1]], sourcePtr[offset + xIntArray[2]], sourcePtr[offset + xIntArray[3]], dx);
+            const auto offset = yIntArray[i]*widthSourcePtr;
+            temp[i] = cubicInterpolate(sourcePtr[offset + xIntArray[0]], sourcePtr[offset + xIntArray[1]],
+                                       sourcePtr[offset + xIntArray[2]], sourcePtr[offset + xIntArray[3]], dx);
         }
-        return cubicInterpolation(temp[0], temp[1], temp[2], temp[3], dy);
+        return cubicInterpolate(temp[0], temp[1], temp[2], temp[3], dy);
     }
 
     template <typename T>
     inline __device__ T addWeighted(const T value1, const T value2, const T alphaValue2)
     {
-        return (1 - alphaValue2) * value1 + alphaValue2 * value2;
+        return (1.f - alphaValue2) * value1 + alphaValue2 * value2;
     }
 
     template <typename T>
@@ -143,4 +147,4 @@ namespace op
     }
 }
 
-#endif // OPENPOSE__UTILITIES_CUDA_HU
+#endif // OPENPOSE_UTILITIES_CUDA_HU

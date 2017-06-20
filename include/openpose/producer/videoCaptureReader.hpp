@@ -1,9 +1,9 @@
-#ifndef OPENPOSE__PRODUCER__VIDEO_CAPTURE_READER_HPP
-#define OPENPOSE__PRODUCER__VIDEO_CAPTURE_READER_HPP
+#ifndef OPENPOSE_PRODUCER_VIDEO_CAPTURE_READER_HPP
+#define OPENPOSE_PRODUCER_VIDEO_CAPTURE_READER_HPP
 
 #include <string>
-#include <opencv2/core/core.hpp>            // cv::Mat
-#include <opencv2/highgui/highgui.hpp>      // cv::VideoCapture
+#include <opencv2/core/core.hpp> // cv::Mat
+#include <opencv2/highgui/highgui.hpp> // cv::VideoCapture
 #include "producer.hpp"
 
 namespace op
@@ -44,10 +44,7 @@ namespace op
 
         virtual double get(const int capProperty) = 0;
 
-        inline void set(const int capProperty, const double value)
-        {
-            mVideoCapture.set(capProperty, value);
-        }
+        virtual void set(const int capProperty, const double value) = 0;
 
         inline double get(const ProducerProperty property)
         {
@@ -69,4 +66,4 @@ namespace op
     };
 }
 
-#endif // OPENPOSE__PRODUCER__VIDEO_CAPTURE_READER_HPP
+#endif // OPENPOSE_PRODUCER_VIDEO_CAPTURE_READER_HPP

@@ -1,11 +1,11 @@
 #ifdef USE_CAFFE
-#ifndef OPENPOSE__POSE__POSE_EXTRACTOR_CAFFE_HPP
-#define OPENPOSE__POSE__POSE_EXTRACTOR_CAFFE_HPP
+#ifndef OPENPOSE_POSE_POSE_EXTRACTOR_CAFFE_HPP
+#define OPENPOSE_POSE_POSE_EXTRACTOR_CAFFE_HPP
 
 #include <memory> // std::shared_ptr
-#include <opencv2/core/core.hpp>
 #include <caffe/blob.hpp>
 #include <openpose/core/array.hpp>
+#include <openpose/core/point.hpp>
 #include <openpose/core/net.hpp>
 #include <openpose/core/nmsCaffe.hpp>
 #include <openpose/core/resizeAndMergeCaffe.hpp>
@@ -19,15 +19,15 @@ namespace op
     class PoseExtractorCaffe : public PoseExtractor
     {
     public:
-        PoseExtractorCaffe(const cv::Size& netInputSize, const cv::Size& netOutputSize, const cv::Size& outputSize, const int scaleNumber,
-                           const float scaleGap, const PoseModel poseModel, const std::string& modelFolder, const int gpuId, const std::vector<HeatMapType>& heatMapTypes = {},
-                           const ScaleMode heatMapScaleMode = ScaleMode::ZeroToOne);
+        PoseExtractorCaffe(const Point<int>& netInputSize, const Point<int>& netOutputSize, const Point<int>& outputSize, const int scaleNumber,
+                           const PoseModel poseModel, const std::string& modelFolder, const int gpuId, const std::vector<HeatMapType>& heatMapTypes = {},
+                           const ScaleMode heatMapScale = ScaleMode::ZeroToOne);
 
         virtual ~PoseExtractorCaffe();
 
         void netInitializationOnThread();
 
-        void forwardPass(const Array<float>& inputNetData, const cv::Size& inputDataSize);
+        void forwardPass(const Array<float>& inputNetData, const Point<int>& inputDataSize, const std::vector<float>& scaleRatios = {1.f});
 
         const float* getHeatMapCpuConstPtr() const;
 
@@ -36,6 +36,7 @@ namespace op
         const float* getPoseGpuConstPtr() const;
 
     private:
+        const float mResizeScale;
         std::shared_ptr<Net> spNet;
         std::shared_ptr<ResizeAndMergeCaffe<float>> spResizeAndMergeCaffe;
         std::shared_ptr<NmsCaffe<float>> spNmsCaffe;
@@ -50,5 +51,5 @@ namespace op
     };
 }
 
-#endif // OPENPOSE__POSE__POSE_EXTRACTOR_CAFFE_HPP
+#endif // OPENPOSE_POSE_POSE_EXTRACTOR_CAFFE_HPP
 #endif

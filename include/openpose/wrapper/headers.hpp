@@ -1,5 +1,5 @@
-#ifndef OPENPOSE__WRAPPER__HEADERS_HPP
-#define OPENPOSE__WRAPPER__HEADERS_HPP
+#ifndef OPENPOSE_WRAPPER_HEADERS_HPP
+#define OPENPOSE_WRAPPER_HEADERS_HPP
 
 // wrapper module
 #include "wrapper.hpp"
@@ -9,4 +9,4 @@
 #include "wrapperStructOutput.hpp"
 #include "wrapperStructPose.hpp"
 
-#endif // OPENPOSE__WRAPPER__HEADERS_HPP
+#endif // OPENPOSE_WRAPPER_HEADERS_HPP

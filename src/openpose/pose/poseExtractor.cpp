@@ -43,19 +43,19 @@ namespace op
         }
     }
 
-    PoseExtractor::PoseExtractor(const cv::Size& netOutputSize, const cv::Size& outputSize, const PoseModel poseModel, const std::vector<HeatMapType>& heatMapTypes,
-                                 const ScaleMode heatMapScaleMode) :
+    PoseExtractor::PoseExtractor(const Point<int>& netOutputSize, const Point<int>& outputSize, const PoseModel poseModel,
+                                 const std::vector<HeatMapType>& heatMapTypes, const ScaleMode heatMapScale) :
         mPoseModel{poseModel},
         mNetOutputSize{netOutputSize},
         mOutputSize{outputSize},
         mHeatMapTypes{heatMapTypes},
-        mHeatMapScaleMode{heatMapScaleMode}
+        mHeatMapScaleMode{heatMapScale}
     {
         try
         {
             // Error check
             if (mHeatMapScaleMode != ScaleMode::ZeroToOne && mHeatMapScaleMode != ScaleMode::PlusMinusOne && mHeatMapScaleMode != ScaleMode::UnsignedChar)
-                error("The ScaleMode heatMapScaleMode must be ZeroToOne, PlusMinusOne or UnsignedChar.", __LINE__, __FUNCTION__, __FILE__);
+                error("The ScaleMode heatMapScale must be ZeroToOne, PlusMinusOne or UnsignedChar.", __LINE__, __FUNCTION__, __FILE__);
 
             // Properties
             for (auto& property : mProperties)
@@ -95,7 +95,7 @@ namespace op
             {
                 // Allocate memory
                 const auto numberHeatMapChannels = getNumberHeatMapChannels(mHeatMapTypes, mPoseModel);
-                poseHeatMaps.reset({numberHeatMapChannels, mNetOutputSize.height, mNetOutputSize.width});
+                poseHeatMaps.reset({numberHeatMapChannels, mNetOutputSize.y, mNetOutputSize.x});
 
                 // Copy memory
                 const auto channelOffset = poseHeatMaps.getVolume(1, 2);
@@ -167,12 +167,12 @@ namespace op
         }
     }
 
-    Array<float> PoseExtractor::getPoseKeyPoints() const
+    Array<float> PoseExtractor::getPoseKeypoints() const
     {
         try
         {
             checkThread();
-            return mPoseKeyPoints;
+            return mPoseKeypoints;
         }
         catch (const std::exception& e)
         {

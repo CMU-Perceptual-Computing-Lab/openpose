@@ -6,19 +6,20 @@
 
 namespace op
 {
-    WebcamReader::WebcamReader(const int webcamIndex, const cv::Size webcamResolution) :
+    WebcamReader::WebcamReader(const int webcamIndex, const Point<int>& webcamResolution, const double fps) :
         VideoCaptureReader{webcamIndex},
+        mFps{fps},
         mFrameNameCounter{-1}
     {
         try
         {
-            if (webcamResolution != cv::Size{})
+            if (webcamResolution != Point<int>{})
             {
-                set(CV_CAP_PROP_FRAME_WIDTH, webcamResolution.width);
-                set(CV_CAP_PROP_FRAME_HEIGHT, webcamResolution.height);
-                if ((int)get(CV_CAP_PROP_FRAME_WIDTH) != webcamResolution.width || (int)get(CV_CAP_PROP_FRAME_HEIGHT) != webcamResolution.height)
+                set(CV_CAP_PROP_FRAME_WIDTH, webcamResolution.x);
+                set(CV_CAP_PROP_FRAME_HEIGHT, webcamResolution.y);
+                if ((int)get(CV_CAP_PROP_FRAME_WIDTH) != webcamResolution.x || (int)get(CV_CAP_PROP_FRAME_HEIGHT) != webcamResolution.y)
                 {
-                    const std::string logMessage{ "Desired webcam resolution " + std::to_string(webcamResolution.width) + "x" + std::to_string(webcamResolution.height)
+                    const std::string logMessage{ "Desired webcam resolution " + std::to_string(webcamResolution.x) + "x" + std::to_string(webcamResolution.y)
                                                 + " could not being set. Final resolution: " + std::to_string(intRound(get(CV_CAP_PROP_FRAME_WIDTH))) + "x"
                                                 + std::to_string(intRound(get(CV_CAP_PROP_FRAME_HEIGHT))) };
                     log(logMessage, Priority::Max, __LINE__, __FUNCTION__, __FILE__);
@@ -68,6 +69,8 @@ namespace op
         {
             if (capProperty == CV_CAP_PROP_POS_FRAMES)
                 return (double)mFrameNameCounter;
+            else if (capProperty == CV_CAP_PROP_FPS)
+                return mFps;
             else
                 return VideoCaptureReader::get(capProperty);
         }
@@ -75,6 +78,21 @@ namespace op
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             return 0.;
+        }
+    }
+
+    void WebcamReader::set(const int capProperty, const double value)
+    {
+        try
+        {
+            if (capProperty == CV_CAP_PROP_FPS)
+                mFps = value;
+            else
+                VideoCaptureReader::set(capProperty, value);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
     }
 
@@ -100,7 +118,7 @@ namespace op
                 else
                 {
                     lock.unlock();
-                    std::this_thread::sleep_for(std::chrono::microseconds{10});
+                    std::this_thread::sleep_for(std::chrono::microseconds{5});
                 }
             }
             return cvMat;

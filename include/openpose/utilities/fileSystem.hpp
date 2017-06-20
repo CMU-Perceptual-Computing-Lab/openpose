@@ -1,5 +1,5 @@
-#ifndef OPENPOSE__UTILITIES__FILE_SYSTEM_HPP
-#define OPENPOSE__UTILITIES__FILE_SYSTEM_HPP
+#ifndef OPENPOSE_UTILITIES_FILE_SYSTEM_HPP
+#define OPENPOSE_UTILITIES_FILE_SYSTEM_HPP
 
 #include <string>
 
@@ -59,4 +59,4 @@ namespace op
     std::vector<std::string> getFilesOnDirectory(const std::string& directoryPath, const std::string& extension);
 }
 
-#endif // OPENPOSE__UTILITIES__FILE_SYSTEM_HPP
+#endif // OPENPOSE_UTILITIES_FILE_SYSTEM_HPP

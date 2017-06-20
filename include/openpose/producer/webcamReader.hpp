@@ -1,8 +1,9 @@
-#ifndef OPENPOSE__PRODUCER__WEBCAM_READER_HPP
-#define OPENPOSE__PRODUCER__WEBCAM_READER_HPP
+#ifndef OPENPOSE_PRODUCER_WEBCAM_READER_HPP
+#define OPENPOSE_PRODUCER_WEBCAM_READER_HPP
 
 #include <atomic>
 #include <thread>
+#include <openpose/core/point.hpp>
 #include "videoCaptureReader.hpp"
 
 namespace op
@@ -19,9 +20,10 @@ namespace op
          * to indicate the desired resolution.
          * @param webcamIndex const int indicating the camera source (see the OpenCV documentation about
          * cv::VideoCapture for more details), in the range [0, 9].
-         * @param webcamResolution const cv::Size parameter which specifies the desired camera resolution.
+         * @param webcamResolution const Point<int> parameter which specifies the desired camera resolution.
+         * @param fps Double parameter which specifies the desired camera frame rate.
          */
-        explicit WebcamReader(const int webcamIndex = 0, const cv::Size webcamResolution = cv::Size{});
+        explicit WebcamReader(const int webcamIndex = 0, const Point<int>& webcamResolution = Point<int>{}, const double fps = 30.);
 
         ~WebcamReader();
 
@@ -29,7 +31,10 @@ namespace op
 
         double get(const int capProperty);
 
+        void set(const int capProperty, const double value);
+
     private:
+        double mFps;
         long long mFrameNameCounter;
         cv::Mat mBuffer;
         std::mutex mBufferMutex;
@@ -44,4 +49,4 @@ namespace op
     };
 }
 
-#endif // OPENPOSE__PRODUCER__WEBCAM_READER_HPP
+#endif // OPENPOSE_PRODUCER_WEBCAM_READER_HPP

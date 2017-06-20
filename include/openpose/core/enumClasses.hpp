@@ -1,5 +1,5 @@
-#ifndef OPENPOSE__CORE__ENUM_CLASSES_HPP
-#define OPENPOSE__CORE__ENUM_CLASSES_HPP
+#ifndef OPENPOSE_CORE_ENUM_CLASSES_HPP
+#define OPENPOSE_CORE_ENUM_CLASSES_HPP
 
 namespace op
 {
@@ -19,6 +19,21 @@ namespace op
         Background,
         PAFs,
     };
+
+    enum class DetectionMode : unsigned char
+    {
+        Fast,
+        Iterative,
+        Tracking,
+        IterativeAndTracking,
+    };
+
+    enum class RenderMode : unsigned char
+    {
+        None,
+        Cpu,
+        Gpu,
+    };
 }
 
-#endif // OPENPOSE__CORE__ENUM_CLASSES_HPP
+#endif // OPENPOSE_CORE_ENUM_CLASSES_HPP

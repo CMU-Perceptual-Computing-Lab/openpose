@@ -1,9 +1,8 @@
-#ifndef OPENPOSE__FILESTREAM__HEAT_MAP_SAVER_HPP
-#define OPENPOSE__FILESTREAM__HEAT_MAP_SAVER_HPP
+#ifndef OPENPOSE_FILESTREAM_HEAT_MAP_SAVER_HPP
+#define OPENPOSE_FILESTREAM_HEAT_MAP_SAVER_HPP
 
 #include <string>
 #include <vector>
-#include <opencv2/core/core.hpp>
 #include "fileSaver.hpp"
 
 namespace op
@@ -20,4 +19,4 @@ namespace op
     };
 }
 
-#endif // OPENPOSE__FILESTREAM__HEAT_MAP_SAVER_HPP
+#endif // OPENPOSE_FILESTREAM_HEAT_MAP_SAVER_HPP

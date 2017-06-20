@@ -1,11 +1,20 @@
 OpenPose
 ====================================
 
+## Latest News
+- Apr 2017: Body released!
+- May 2017: Windows version released!
+- Jun 2017: Face released!
+- Check all the [release notes](doc/release_notes.md).
+- Interested in an internship on CMU as OpenPose programmer? See [this link](https://docs.google.com/document/d/14SygG39NjIRZfx08clewTdFMGwVdtRu2acyCi3TYcHs/edit?usp=sharing) for details.
+
+
+
 ## Introduction
 
 OpenPose is a **library for real-time multi-person keypoint detection and multi-threading written in C++** using OpenCV and Caffe*, authored by [Gines Hidalgo](https://www.linkedin.com/in/gineshidalgo/), [Zhe Cao](http://www.andrew.cmu.edu/user/zhecao), [Tomas Simon](http://www.cs.cmu.edu/~tsimon/), [Shih-En Wei](https://scholar.google.com/citations?user=sFQD3k4AAAAJ&hl=en), [Hanbyul Joo](http://www.cs.cmu.edu/~hanbyulj/) and [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/).
 
-* It uses Caffe, but the code is ready to be ported to other frameworks (e.g., Tensorflow or Torch). If you implement any of those, please, make a pull request and we will add it!
+\* It uses Caffe, but the code is ready to be ported to other frameworks (Tensorflow, Torch, etc.). If you implement any of those, feel free to make a pull request!
 
 OpenPose represents the **first real-time system to jointly detect human body, hand and facial keypoints (in total 130 keypoints) on single images**. In addition, the system computational performance on body keypoint estimation is invariant to the number of detected people in the image.
 
@@ -15,11 +24,11 @@ OpenPose is freely available for free non-commercial use, and may be redistribut
 
 Library main functionality:
 
-* Multi-person 15 or **18-keypoint body pose** estimation and rendering.
+* Multi-person 15 or **18-keypoint body pose** estimation and rendering. **Running time invariant to number of people** on the image.
 
-* Multi-person **2x21-keypoint hand** estimation and rendering (coming soon in around 1-2 months!).
+* Multi-person **2x21-keypoint hand** estimation and rendering. Note: In this initial version, **running time** linearly **depends** on the **number of people** on the image. **Coming soon (in around 1-5 weeks)!**
 
-* Multi-person **70-keypoint face** estimation and rendering (coming soon in around 2-3 months!).
+* Multi-person **70-keypoint face** estimation and rendering. Note: In this initial version, **running time** linearly **depends** on the **number of people** on the image.
 
 * Flexible and easy-to-configure **multi-threading** module.
 
@@ -42,16 +51,16 @@ The pose estimation work is based on the C++ code from [the ECCV 2016 demo](http
     <img src="doc/media/dance.gif", width="480">
 </p>
 
+### Body + Face Estimation
+<p align="center">
+    <img src="doc/media/pose_face.gif", width="480">
+</p>
+
 ## Coming Soon (But Already Working!)
 
 ### Body + Hands + Face Estimation
 <p align="center">
     <img src="doc/media/pose_face_hands.gif", width="480">
-</p>
-
-### Body + Face Estimation
-<p align="center">
-    <img src="doc/media/pose_face.gif", width="480">
 </p>
 
 ### Body + Hands
@@ -68,8 +77,6 @@ The pose estimation work is based on the C++ code from [the ECCV 2016 demo](http
     2. [OpenPose Wrapper](#openpose-wrapper)
     3. [OpenPose Library](#openpose-library)
 4. [Output](#output)
-    1. [Output Format](#output-format)
-    2. [Reading Saved Results](#reading-saved-results)
 5. [OpenPose Benchmark](#openpose-benchmark)
 6. [Send Us Your Feedback!](#send-us-your-feedback)
 7. [Citation](#citation)
@@ -131,60 +138,12 @@ doxygen doc_autogeneration.doxygen
 
 
 ## Output
-#### Output Format
-There are 2 alternatives to save the **(x,y,score) body part locations**. The `write_pose` flag uses the OpenCV cv::FileStorage default formats (JSON, XML and YML). However, the JSON format is only available after OpenCV 3.0. Hence, `write_pose_json` saves the people pose data using a custom JSON writer. For the latter, each JSON file has a `people` array of objects, where each object has an array `body_parts` containing the body part locations and detection confidence formatted as `x1,y1,c1,x2,y2,c2,...`. The coordinates `x` and `y` can be normalized to the range [0,1], [-1,1], [0, source size], [0, output size], etc., depending on the flag `scale_mode`. In addition, `c` is the confidence in the range [0,1].
-
-```
-{
-    "version":0.1,
-    "people":[
-        {"body_parts":[1114.15,160.396,0.846207,...]},
-        {"body_parts":[...]},
-    ]
-}
-```
-
-The body part order of the COCO (18 body parts) and MPI (15 body parts) keypoints is described in `POSE_BODY_PART_MAPPING` in [include/openpose/pose/poseParameters.hpp](include/openpose/pose/poseParameters.hpp). E.g., for COCO:
-```
-    POSE_COCO_BODY_PARTS {
-        {0,  "Nose"},
-        {1,  "Neck"},
-        {2,  "RShoulder"},
-        {3,  "RElbow"},
-        {4,  "RWrist"},
-        {5,  "LShoulder"},
-        {6,  "LElbow"},
-        {7,  "LWrist"},
-        {8,  "RHip"},
-        {9,  "RKnee"},
-        {10, "RAnkle"},
-        {11, "LHip"},
-        {12, "LKnee"},
-        {13, "LAnkle"},
-        {14, "REye"},
-        {15, "LEye"},
-        {16, "REar"},
-        {17, "LEar"},
-        {18, "Bkg"},
-    }
-```
-
-For the **heat maps storing format**, instead of individually saving each of the 67 heatmaps (18 body parts + background + 2 x 19 PAFs) individually, the library concatenates them into a huge (width x #heat maps) x (height) matrix, i.e. it concats the heat maps by columns. E.g., columns [0, individual heat map width] contains the first heat map, columns [individual heat map width + 1, 2 * individual heat map width] contains the second heat map, etc. Note that some image viewers are not able to display the resulting images due to the size. However, Chrome and Firefox are able to properly open them.
-
-The saving order is body parts + background + PAFs. Any of them can be disabled with program flags. If background is disabled, then the final image will be body parts + PAFs. The body parts and background follow the order of `POSE_COCO_BODY_PARTS` or `POSE_MPI_BODY_PARTS`, while the PAFs follow the order specified on POSE_BODY_PART_PAIRS in `poseParameters.hpp`. E.g., for COCO:
-```
-    POSE_COCO_PAIRS    {1,2,   1,5,   2,3,   3,4,   5,6,   6,7,   1,8,   8,9,   9,10, 1,11,  11,12, 12,13,  1,0,   0,14, 14,16,  0,15, 15,17,   2,16,  5,17};
-```
-
-Where each index is the key value corresponding to each body part in `POSE_COCO_BODY_PARTS`, e.g., 0 for "Neck", 1 for "RShoulder", etc.
-
-#### Reading Saved Results
-We use standard formats (JSON, XML, PNG, JPG, ...) to save our results, so there will be lots of frameworks to read them later, but you might also directly use our functions in [include/openpose/filestream.hpp](include/openpose/filestream.hpp). In particular, `loadData` (for JSON, XML and YML files) and `loadImage` (for image formats such as PNG or JPG) to load the data into cv::Mat format.
+Check the output (format, keypoint index ordering, etc.) in [doc/output.md](doc/output.md).
 
 
 
-## OpenPose Benchmark
-Initial library running time benchmark on [OpenPose Benchmark](https://docs.google.com/spreadsheets/d/1-DynFGvoScvfWDA1P4jDInCkbD4lg0IKOYbXgEq0sK0/edit#gid=0). You can comment in that document with your graphics card model and running time for that model, and we will add your results to the benchmark!
+## Speed Up OpenPose and Benchmark
+Check the OpenPose Benchmark and some hints to speed up OpenPose on [doc/installation.md#faq](doc/installation.md#faq).
 
 
 

@@ -118,4 +118,16 @@ namespace op
             return 0.;
         }
     }
+
+    void VideoCaptureReader::set(const int capProperty, const double value)
+    {
+        try
+        {
+            mVideoCapture.set(capProperty, value);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
 }

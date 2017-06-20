@@ -1,10 +1,10 @@
-#ifndef OPENPOSE__FILESTREAM__W_POSE_JSON_SAVER_HPP
-#define OPENPOSE__FILESTREAM__W_POSE_JSON_SAVER_HPP
+#ifndef OPENPOSE_FILESTREAM_W_POSE_JSON_SAVER_HPP
+#define OPENPOSE_FILESTREAM_W_POSE_JSON_SAVER_HPP
 
 #include <memory> // std::shared_ptr
 #include <string>
 #include <openpose/thread/workerConsumer.hpp>
-#include "poseJsonSaver.hpp"
+#include "keypointJsonSaver.hpp"
 
 namespace op
 {
@@ -12,14 +12,14 @@ namespace op
     class WPoseJsonSaver : public WorkerConsumer<TDatums>
     {
     public:
-        explicit WPoseJsonSaver(const std::shared_ptr<PoseJsonSaver>& poseJsonSaver);
+        explicit WPoseJsonSaver(const std::shared_ptr<KeypointJsonSaver>& keypointJsonSaver);
 
         void initializationOnThread();
 
         void workConsumer(const TDatums& tDatums);
 
     private:
-        const std::shared_ptr<PoseJsonSaver> spPoseJsonSaver;
+        const std::shared_ptr<KeypointJsonSaver> spKeypointJsonSaver;
 
         DELETE_COPY(WPoseJsonSaver);
     };
@@ -37,8 +37,8 @@ namespace op
 namespace op
 {
     template<typename TDatums>
-    WPoseJsonSaver<TDatums>::WPoseJsonSaver(const std::shared_ptr<PoseJsonSaver>& poseJsonSaver) :
-        spPoseJsonSaver{poseJsonSaver}
+    WPoseJsonSaver<TDatums>::WPoseJsonSaver(const std::shared_ptr<KeypointJsonSaver>& keypointJsonSaver) :
+        spKeypointJsonSaver{keypointJsonSaver}
     {
     }
 
@@ -61,11 +61,11 @@ namespace op
                 // T* to T
                 auto& tDatumsNoPtr = *tDatums;
                 // Record people pose data in json format
-                std::vector<Array<float>> poseKeyPointsVector(tDatumsNoPtr.size());
+                std::vector<Array<float>> keypointVector(tDatumsNoPtr.size());
                 for (auto i = 0; i < tDatumsNoPtr.size(); i++)
-                    poseKeyPointsVector[i] = tDatumsNoPtr[i].poseKeyPoints;
+                    keypointVector[i] = tDatumsNoPtr[i].poseKeypoints;
                 const auto fileName = (!tDatumsNoPtr[0].name.empty() ? tDatumsNoPtr[0].name : std::to_string(tDatumsNoPtr[0].id));
-                spPoseJsonSaver->savePoseKeyPoints(poseKeyPointsVector, fileName);
+                spKeypointJsonSaver->save(keypointVector, fileName, "pose_keypoints");
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
                 Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__, Profiler::DEFAULT_X);
@@ -83,4 +83,4 @@ namespace op
     COMPILE_TEMPLATE_DATUM(WPoseJsonSaver);
 }
 
-#endif // OPENPOSE__FILESTREAM__W_POSE_JSON_SAVER_HPP
+#endif // OPENPOSE_FILESTREAM_W_POSE_JSON_SAVER_HPP

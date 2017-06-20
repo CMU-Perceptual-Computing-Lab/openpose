@@ -1,22 +1,23 @@
-#ifndef OPENPOSE__GUI__ADD_GUI_INFO_HPP
-#define OPENPOSE__GUI__ADD_GUI_INFO_HPP
+#ifndef OPENPOSE_GUI_ADD_GUI_INFO_HPP
+#define OPENPOSE_GUI_ADD_GUI_INFO_HPP
 
 #include <queue>
-#include <opencv2/core/core.hpp>
+#include <opencv2/core/core.hpp> // cv::Mat
 #include <openpose/core/array.hpp>
+#include <openpose/core/point.hpp>
 
 namespace op
 {
     class GuiInfoAdder
     {
     public:
-        GuiInfoAdder(const cv::Size& outputSize, const int numberGpus, const bool guiEnabled = false);
+        GuiInfoAdder(const Point<int>& outputSize, const int numberGpus, const bool guiEnabled = false);
 
-        void addInfo(cv::Mat& cvOutputData, const Array<float>& poseKeyPoints, const unsigned long long id, const std::string& elementRenderedName);
+        void addInfo(cv::Mat& cvOutputData, const Array<float>& poseKeypoints, const unsigned long long id, const std::string& elementRenderedName);
 
     private:
         // Const variables
-        const cv::Size mOutputSize;
+        const Point<int> mOutputSize;
         const int mBorderMargin;
         const int mNumberGpus;
         const bool mGuiEnabled;
@@ -30,4 +31,4 @@ namespace op
     };
 }
 
-#endif // OPENPOSE__GUI__ADD_GUI_INFO_HPP
+#endif // OPENPOSE_GUI_ADD_GUI_INFO_HPP

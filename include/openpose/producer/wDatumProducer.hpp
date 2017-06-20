@@ -1,5 +1,5 @@
-#ifndef OPENPOSE__PRODUCER__W_DATUM_PRODUCER_HPP
-#define OPENPOSE__PRODUCER__W_DATUM_PRODUCER_HPP
+#ifndef OPENPOSE_PRODUCER_W_DATUM_PRODUCER_HPP
+#define OPENPOSE_PRODUCER_W_DATUM_PRODUCER_HPP
 
 #include <limits> // std::numeric_limits
 #include <memory> // std::shared_ptr
@@ -81,4 +81,4 @@ namespace op
     extern template class WDatumProducer<DATUM_BASE, DATUM_BASE_NO_PTR>;
 }
 
-#endif // OPENPOSE__PRODUCER__W_DATUM_PRODUCER_HPP
+#endif // OPENPOSE_PRODUCER_W_DATUM_PRODUCER_HPP

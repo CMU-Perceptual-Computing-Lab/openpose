@@ -1,10 +1,10 @@
-#ifndef OPENPOSE__PRODUCER__PRODUCER_HPP
-#define OPENPOSE__PRODUCER__PRODUCER_HPP
+#ifndef OPENPOSE_PRODUCER_PRODUCER_HPP
+#define OPENPOSE_PRODUCER_PRODUCER_HPP
 
 #include <array>
 #include <chrono>
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>      // capProperties of OpenCV
+#include <opencv2/core/core.hpp> // cv::Mat
+#include <opencv2/highgui/highgui.hpp> // capProperties of OpenCV
 #include <openpose/utilities/macros.hpp>
 #include "enumClasses.hpp"
 
@@ -142,4 +142,4 @@ namespace op
     };
 }
 
-#endif // OPENPOSE__PRODUCER__PRODUCER_HPP
+#endif // OPENPOSE_PRODUCER_PRODUCER_HPP

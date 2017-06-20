@@ -1,11 +1,11 @@
-#ifndef OPENPOSE__UTILITIES_RENDER_HU
-#define OPENPOSE__UTILITIES_RENDER_HU
+#ifndef OPENPOSE_UTILITIES_RENDER_HU
+#define OPENPOSE_UTILITIES_RENDER_HU
 
 namespace op
 {
-    inline __device__ void renderKeyPoints(float* targetPtr, float2* sharedMaxs, float2* sharedMins, float* sharedScaleF,
+    inline __device__ void renderKeypoints(float* targetPtr, float2* sharedMaxs, float2* sharedMins, float* sharedScaleF,
                                            const int globalIdx, const int x, const int y, const int targetWidth, const int targetHeight,
-                                           const float* const keypointsPtr, const unsigned char* const partPairsPtr,
+                                           const float* const keypointsPtr, const unsigned int* const partPairsPtr,
                                            const int numberPeople, const int numberParts, const int numberPartPairs,
                                            const float* const rgbColorsPtr, const int numberColors,
                                            const float radius, const float stickwidth, const float threshold, const float alphaColorToAdd,
@@ -36,14 +36,17 @@ namespace op
                         sharedMaxs[globalIdx].y = y;
                 }
             }
-            const auto averageX = sharedMaxs[globalIdx].x - sharedMins[globalIdx].x;
-            const auto averageY = sharedMaxs[globalIdx].y - sharedMins[globalIdx].y;
-            sharedScaleF[globalIdx] = fastTruncate((averageX + averageY) / 400.f, 0.33f, 1.f);    // (averageX + averageY) / 2.f / 400.f
-            const auto constantToAdd = 50.f;
-            sharedMaxs[globalIdx].x += constantToAdd;
-            sharedMaxs[globalIdx].y += constantToAdd;
-            sharedMins[globalIdx].x -= constantToAdd;
-            sharedMins[globalIdx].y -= constantToAdd;
+            if (sharedMaxs[globalIdx].x != 0.f && sharedMaxs[globalIdx].y != 0.f)
+            {
+                const auto averageX = sharedMaxs[globalIdx].x - sharedMins[globalIdx].x;
+                const auto averageY = sharedMaxs[globalIdx].y - sharedMins[globalIdx].y;
+                sharedScaleF[globalIdx] = fastTruncate((averageX + averageY) / 400.f, 0.33f, 1.f);    // (averageX + averageY) / 2.f / 400.f
+                const auto constantToAdd = 50.f;
+                sharedMaxs[globalIdx].x += constantToAdd;
+                sharedMaxs[globalIdx].y += constantToAdd;
+                sharedMins[globalIdx].x -= constantToAdd;
+                sharedMins[globalIdx].y -= constantToAdd;
+            }
         }
 
         __syncthreads();
@@ -64,9 +67,12 @@ namespace op
 
             for (auto person = 0; person < numberPeople; person++)
             {
+                // Make sure person x,y in the limits
+                // Make sure person is not empty. Assume all joints are below threshold. Then
+                // maxs = 0 and mins = width/height. So if statement would be false
                 if (x <= sharedMaxs[person].x && x >= sharedMins[person].x && y <= sharedMaxs[person].y && y >= sharedMins[person].y)
                 {
-                    // Hand part connections
+                    // Part pair connections
                     for (auto partPair = 0; partPair < numberPartPairs; partPair++)
                     {
                         const auto bSqrt = sharedScaleF[person] * sharedScaleF[person] * stickwidth * stickwidth;
@@ -101,8 +107,8 @@ namespace op
                         }
                     }
 
-                    // Hand part circles
-                    for (unsigned char i = 0; i < numberParts; i++)
+                    // Part circles
+                    for (auto i = 0u; i < numberParts; i++)
                     {
                         const auto index = 3 * (person*numberParts + i);
                         const auto localX = keypointsPtr[index];
@@ -116,8 +122,8 @@ namespace op
                             if (googlyEye1 == i || googlyEye2 == i)
                             {
                                 const auto ratio = 2.5f * radius;
-                                const auto minr2 = sharedScaleF[person]*sharedScaleF[person] * (ratio - 2) * (ratio - 2);
-                                const auto maxr2 = sharedScaleF[person]*sharedScaleF[person] * ratio * ratio;
+                                const auto minr2 = sharedScaleF[person] * sharedScaleF[person] * (ratio - 2) * (ratio - 2);
+                                const auto maxr2 = sharedScaleF[person] * sharedScaleF[person] * ratio * ratio;
                                 if (dist2 <= maxr2)
                                 {
                                     float colorToAdd [3] = {0., 0., 0.};
@@ -135,11 +141,11 @@ namespace op
                                     addColorWeighted(r, g, b, colorToAdd, alphaColorToAdd);
                                 }
                             }
-                            // Other limbs
+                            // Other parts
                             else
                             {
                                 const auto minr2 = 0.f;
-                                const auto maxr2 = sharedScaleF[person]*sharedScaleF[person]*radius * radius;
+                                const auto maxr2 = sharedScaleF[person] * sharedScaleF[person] * radius * radius;
                                 if (minr2 <= dist2 && dist2 <= maxr2)
                                     addColorWeighted(r, g, b, &rgbColorsPtr[(i%numberColors)*3], alphaColorToAdd);
                             }
@@ -151,4 +157,4 @@ namespace op
     }
 }
 
-#endif // OPENPOSE__UTILITIES_RENDER_HU
+#endif // OPENPOSE_UTILITIES_RENDER_HU

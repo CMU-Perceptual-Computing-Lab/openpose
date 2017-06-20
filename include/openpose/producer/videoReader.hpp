@@ -1,5 +1,5 @@
-#ifndef OPENPOSE__PRODUCER__VIDEO_READER_HPP
-#define OPENPOSE__PRODUCER__VIDEO_READER_HPP
+#ifndef OPENPOSE_PRODUCER_VIDEO_READER_HPP
+#define OPENPOSE_PRODUCER_VIDEO_READER_HPP
 
 #include "videoCaptureReader.hpp"
 
@@ -26,6 +26,11 @@ namespace op
             return VideoCaptureReader::get(capProperty);
         }
 
+        inline void set(const int capProperty, const double value)
+        {
+            VideoCaptureReader::set(capProperty, value);
+        }
+
     private:
         const std::string mPathName;
 
@@ -35,4 +40,4 @@ namespace op
     };
 }
 
-#endif // OPENPOSE__PRODUCER__VIDEO_READER_HPP
+#endif // OPENPOSE_PRODUCER_VIDEO_READER_HPP
