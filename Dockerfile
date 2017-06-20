@@ -7,7 +7,7 @@ RUN apt-get install -y \
     lsb-release \
     python-numpy \
     python3-numpy \
-    sudo
+    sudo \
     wget
 
 WORKDIR /usr/local
