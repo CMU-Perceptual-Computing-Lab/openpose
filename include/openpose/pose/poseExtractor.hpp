@@ -22,7 +22,7 @@ namespace op
 
         void initializationOnThread();
 
-        virtual void forwardPass(const Array<float>& inputNetData, const Point<int>& inputDataSize) = 0;
+        virtual void forwardPass(const Array<float>& inputNetData, const Point<int>& inputDataSize, const std::vector<float>& scaleRatios = {1.f}) = 0;
 
         virtual const float* getHeatMapCpuConstPtr() const = 0;
 

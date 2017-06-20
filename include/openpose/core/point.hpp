@@ -120,27 +120,27 @@ namespace op
         // -------------------------------------------------- Basic Operators -------------------------------------------------- //
         Point<T>& operator+=(const Point<T>& point);
 
-        Point<T> operator+(const Point<T>& point);
+        Point<T> operator+(const Point<T>& point) const;
 
         Point<T>& operator+=(const T value);
 
-        Point<T> operator+(const T value);
+        Point<T> operator+(const T value) const;
 
         Point<T>& operator-=(const Point<T>& point);
 
-        Point<T> operator-(const Point<T>& point);
+        Point<T> operator-(const Point<T>& point) const;
 
         Point<T>& operator-=(const T value);
 
-        Point<T> operator-(const T value);
+        Point<T> operator-(const T value) const;
 
         Point<T>& operator*=(const T value);
 
-        Point<T> operator*(const T value);
+        Point<T> operator*(const T value) const;
 
         Point<T>& operator/=(const T value);
 
-        Point<T> operator/(const T value);
+        Point<T> operator/(const T value) const;
 
     };
 }

@@ -3,7 +3,7 @@
 
 namespace op
 {
-    enum class HandsProperty : bool
+    enum class HandProperty : bool
     {
         NMSThreshold = 0,
         Size,

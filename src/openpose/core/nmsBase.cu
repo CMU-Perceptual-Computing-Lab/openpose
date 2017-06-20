@@ -45,17 +45,17 @@ namespace op
     }
 
     template <typename T>
-    __global__ void writeResultKernel(T* output, const int length, const int* const input, const T* const sourcePtr, const int width, const int maxPeaks)
+    __global__ void writeResultKernel(T* output, const int length, const int* const kernelPtr, const T* const sourcePtr, const int width, const int height, const int maxPeaks)
     {
         __shared__ int local[THREADS_PER_BLOCK+1]; // one more
         const auto globalIdx = blockIdx.x * blockDim.x + threadIdx.x;
 
         if (globalIdx < length)
         {
-            local[threadIdx.x] = input[globalIdx];
+            local[threadIdx.x] = kernelPtr[globalIdx];
             //last thread in the block but not globally last, load one more
             if (threadIdx.x == THREADS_PER_BLOCK - 1 && globalIdx != length - 1)
-                local[threadIdx.x+1] = input[globalIdx+1];
+                local[threadIdx.x+1] = kernelPtr[globalIdx+1];
 
             __syncthreads();
             // see difference, except the globally last one
@@ -63,10 +63,10 @@ namespace op
             {
                 if (local[threadIdx.x] != local[threadIdx.x + 1])
                 {
-                    //means A[globalIdx] == A[globalIdx + 1] as the input[globalIdx]-th repeat
-                    const auto peakIndex = input[globalIdx]; //0-index
-                    const auto peakLocX = globalIdx % width;
-                    const auto peakLocY = globalIdx / width;
+                    //means A[globalIdx] == A[globalIdx + 1] as the kernelPtr[globalIdx]-th repeat
+                    const auto peakIndex = kernelPtr[globalIdx]; //0-index
+                    const auto peakLocX = (int)(globalIdx % width);
+                    const auto peakLocY = (int)(globalIdx / width);
 
                     if (peakIndex < maxPeaks) // limitation
                     {
@@ -75,16 +75,16 @@ namespace op
                         T scoreAcc = 0.f;
                         for (auto dy = -3 ; dy < 4 ; dy++)
                         {
-                            if (0 < (peakLocY+dy) && (peakLocY+dy) < width)
+                            const auto y = peakLocY + dy;
+                            if (0 <= y && y < height) // height = 368
                             {
                                 for (auto dx = -3 ; dx < 4 ; dx++)
                                 {
-                                    if (0 < (peakLocX+dx) && (peakLocX+dx) < width)
+                                    const auto x = peakLocX + dx;
+                                    if (0 <= x && x < width) // width = 656
                                     {
-                                        const auto score = sourcePtr[(peakLocY+dy)*width + peakLocX+dx];
-                                        const auto x = peakLocX+dx;
-                                        const auto y = peakLocY+dy;
-                                        if (score>0)
+                                        const auto score = sourcePtr[y * width + x];
+                                        if (score > 0)
                                         {
                                             xAcc += x*score;
                                             yAcc += y*score;
@@ -95,15 +95,15 @@ namespace op
                             }
                         }
 
-                        const auto output_index = (peakIndex + 1) * 3;
-                        output[output_index] = xAcc / scoreAcc;
-                        output[output_index + 1] = yAcc / scoreAcc;
-                        output[output_index + 2] = sourcePtr[peakLocY*width + peakLocX];
+                        const auto outputIndex = (peakIndex + 1) * 3;
+                        output[outputIndex] = xAcc / scoreAcc;
+                        output[outputIndex + 1] = yAcc / scoreAcc;
+                        output[outputIndex + 2] = sourcePtr[peakLocY*width + peakLocX];
                     }
                 }
             }
             else
-                output[0] = input[globalIdx]; //number of peaks
+                output[0] = kernelPtr[globalIdx]; //number of peaks
         }
     }
 
@@ -166,7 +166,7 @@ namespace op
                     thrust::exclusive_scan(kernelThrustPtr, kernelThrustPtr + imageOffset, kernelThrustPtr); //[0,0,0,0,0,1,1,1,1,1,2,2,2,2]
 
                     // This returns targetPtrOffsetted, with the NMS applied over it
-                    writeResultKernel<<<numBlocks1D, threadsPerBlock1D>>>(targetPtrOffsetted, imageOffset, kernelPtrOffsetted, sourcePtrOffsetted, width, maxPeaks);
+                    writeResultKernel<<<numBlocks1D, threadsPerBlock1D>>>(targetPtrOffsetted, imageOffset, kernelPtrOffsetted, sourcePtrOffsetted, width, height, maxPeaks);
                 }
             }
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);

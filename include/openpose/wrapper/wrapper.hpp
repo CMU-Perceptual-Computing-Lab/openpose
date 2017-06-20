@@ -80,17 +80,15 @@ namespace op
                        // Consumer (keep default values to disable any output)
                        const WrapperStructOutput& wrapperStructOutput = WrapperStructOutput{});
 
-        // THIS FUNCTION IS NOT IMPLEMENTED YET -> COMING SOON
         // Similar to the previos configure, but it includes hand extraction and rendering
         void configure(const WrapperStructPose& wrapperStructPose,
                        // Hand (use the default WrapperStructHand{} to disable any hand detector)
-                       const experimental::WrapperStructHand& wrapperHandStruct,
+                       const WrapperStructHand& wrapperStructHand,
                        // Producer (set producerSharedPtr = nullptr or use the default WrapperStructInput{} to disable any input)
                        const WrapperStructInput& wrapperStructInput,
                        // Consumer (keep default values to disable any output)
                        const WrapperStructOutput& wrapperStructOutput = WrapperStructOutput{});
 
-        // THIS FUNCTION IS NOT IMPLEMENTED YET -> COMING SOON
         // Similar to the previos configure, but it includes hand extraction and rendering
         void configure(const WrapperStructPose& wrapperStructPose,
                        // Face (use the default WrapperStructFace{} to disable any face detector)
@@ -100,13 +98,12 @@ namespace op
                        // Consumer (keep default values to disable any output)
                        const WrapperStructOutput& wrapperStructOutput = WrapperStructOutput{});
 
-        // THIS FUNCTION IS NOT IMPLEMENTED YET -> COMING SOON
         // Similar to the previos configure, but it includes hand extraction and rendering
         void configure(const WrapperStructPose& wrapperStructPose = WrapperStructPose{},
                        // Face (use the default WrapperStructFace{} to disable any face detector)
                        const WrapperStructFace& wrapperStructFace = WrapperStructFace{},
                        // Hand (use the default WrapperStructHand{} to disable any hand detector)
-                       const experimental::WrapperStructHand& wrapperHandStruct = experimental::WrapperStructHand{},
+                       const WrapperStructHand& wrapperStructHand = WrapperStructHand{},
                        // Producer (set producerSharedPtr = nullptr or use the default WrapperStructInput{} to disable any input)
                        const WrapperStructInput& wrapperStructInput = WrapperStructInput{},
                        // Consumer (keep default values to disable any output)
@@ -263,10 +260,10 @@ namespace op
 
 // Implementation
 #include <openpose/core/headers.hpp>
-#include <openpose/experimental/headers.hpp>
 #include <openpose/face/headers.hpp>
 #include <openpose/filestream/headers.hpp>
 #include <openpose/gui/headers.hpp>
+#include <openpose/hand/headers.hpp>
 #include <openpose/pose/headers.hpp>
 #include <openpose/producer/headers.hpp>
 #include <openpose/utilities/cuda.hpp>
@@ -372,12 +369,14 @@ namespace op
     }
 
     template<typename TDatums, typename TWorker, typename TQueue>
-    void Wrapper<TDatums, TWorker, TQueue>::configure(const WrapperStructPose& wrapperStructPose, const WrapperStructInput& wrapperStructInput,
+    void Wrapper<TDatums, TWorker, TQueue>::configure(const WrapperStructPose& wrapperStructPose,
+                                                      const WrapperStructInput& wrapperStructInput,
                                                       const WrapperStructOutput& wrapperStructOutput)
     {
         try
         {
-            configure(wrapperStructPose, WrapperStructFace{}, experimental::WrapperStructHand{}, wrapperStructInput, wrapperStructOutput);
+            configure(wrapperStructPose, WrapperStructFace{}, WrapperStructHand{},
+                      wrapperStructInput, wrapperStructOutput);
         }
         catch (const std::exception& e)
         {
@@ -386,12 +385,15 @@ namespace op
     }
 
     template<typename TDatums, typename TWorker, typename TQueue>
-    void Wrapper<TDatums, TWorker, TQueue>::configure(const WrapperStructPose& wrapperStructPose, const WrapperStructFace& wrapperStructFace,
-                                                      const WrapperStructInput& wrapperStructInput, const WrapperStructOutput& wrapperStructOutput)
+    void Wrapper<TDatums, TWorker, TQueue>::configure(const WrapperStructPose& wrapperStructPose,
+                                                      const WrapperStructFace& wrapperStructFace,
+                                                      const WrapperStructInput& wrapperStructInput,
+                                                      const WrapperStructOutput& wrapperStructOutput)
     {
         try
         {
-            configure(wrapperStructPose, wrapperStructFace, experimental::WrapperStructHand{}, wrapperStructInput, wrapperStructOutput);
+            configure(wrapperStructPose, wrapperStructFace, WrapperStructHand{},
+                      wrapperStructInput, wrapperStructOutput);
         }
         catch (const std::exception& e)
         {
@@ -400,12 +402,15 @@ namespace op
     }
 
     template<typename TDatums, typename TWorker, typename TQueue>
-    void Wrapper<TDatums, TWorker, TQueue>::configure(const WrapperStructPose& wrapperStructPose, const experimental::WrapperStructHand& wrapperHandStruct,
-                                                      const WrapperStructInput& wrapperStructInput, const WrapperStructOutput& wrapperStructOutput)
+    void Wrapper<TDatums, TWorker, TQueue>::configure(const WrapperStructPose& wrapperStructPose,
+                                                      const WrapperStructHand& wrapperStructHand,
+                                                      const WrapperStructInput& wrapperStructInput,
+                                                      const WrapperStructOutput& wrapperStructOutput)
     {
         try
         {
-            configure(wrapperStructPose, WrapperStructFace{}, wrapperHandStruct, wrapperStructInput, wrapperStructOutput);
+            configure(wrapperStructPose, WrapperStructFace{}, wrapperStructHand, 
+                      wrapperStructInput, wrapperStructOutput);
         }
         catch (const std::exception& e)
         {
@@ -414,8 +419,10 @@ namespace op
     }
 
     template<typename TDatums, typename TWorker, typename TQueue>
-    void Wrapper<TDatums, TWorker, TQueue>::configure(const WrapperStructPose& wrapperStructPose, const WrapperStructFace& wrapperStructFace,
-                                                      const experimental::WrapperStructHand& wrapperHandStruct, const WrapperStructInput& wrapperStructInput,
+    void Wrapper<TDatums, TWorker, TQueue>::configure(const WrapperStructPose& wrapperStructPose,
+                                                      const WrapperStructFace& wrapperStructFace,
+                                                      const WrapperStructHand& wrapperStructHand,
+                                                      const WrapperStructInput& wrapperStructInput,
                                                       const WrapperStructOutput& wrapperStructOutput)
     {
         try
@@ -426,12 +433,18 @@ namespace op
             typedef std::shared_ptr<TDatums> TDatumsPtr;
 
             // Required parameters
-            const auto renderOutput = wrapperStructPose.renderOutput || wrapperStructFace.renderOutput;
-            const auto renderFace = wrapperStructFace.enable && wrapperStructFace.renderOutput;
+            const auto renderOutput = wrapperStructPose.renderMode != RenderMode::None || wrapperStructFace.renderMode != RenderMode::None
+                                        || wrapperStructHand.renderMode != RenderMode::None;
+            const auto renderOutputGpu = wrapperStructPose.renderMode == RenderMode::Gpu || wrapperStructFace.renderMode == RenderMode::Gpu
+                                        || wrapperStructHand.renderMode == RenderMode::Gpu;
+            const auto renderFace = wrapperStructFace.enable && wrapperStructFace.renderMode != RenderMode::None;
+            const auto renderHand = wrapperStructHand.enable && wrapperStructHand.renderMode != RenderMode::None;
+            const auto renderHandGpu = wrapperStructHand.enable && wrapperStructHand.renderMode == RenderMode::Gpu;
 
             // Check no wrong/contradictory flags enabled
             if (wrapperStructPose.alphaKeypoint < 0. || wrapperStructPose.alphaKeypoint > 1.
-                || wrapperStructFace.alphaHeatMap < 0. || wrapperStructFace.alphaHeatMap > 1.)
+                || wrapperStructFace.alphaHeatMap < 0. || wrapperStructFace.alphaHeatMap > 1.
+                || wrapperStructHand.alphaHeatMap < 0. || wrapperStructHand.alphaHeatMap > 1.)
                 error("Alpha value for blending must be in the range [0,1].", __LINE__, __FUNCTION__, __FILE__);
             if (wrapperStructPose.scaleGap <= 0.f && wrapperStructPose.scalesNumber > 1)
                 error("The scale gap must be greater than 0 (it has no effect if the number of scales is 1).", __LINE__, __FUNCTION__, __FILE__);
@@ -552,30 +565,46 @@ namespace op
                 wDatumProducer = nullptr;
 
             // Pose estimators
-            const Point<int>& netOutputSize = wrapperStructPose.netInputSize;
+            const Point<int>& poseNetOutputSize = wrapperStructPose.netInputSize;
             std::vector<std::shared_ptr<PoseExtractor>> poseExtractors;
             for (auto gpuId = 0; gpuId < gpuNumber; gpuId++)
                 poseExtractors.emplace_back(std::make_shared<PoseExtractorCaffe>(
-                    wrapperStructPose.netInputSize, netOutputSize, finalOutputSize, wrapperStructPose.scalesNumber,
-                    wrapperStructPose.scaleGap, wrapperStructPose.poseModel, wrapperStructPose.modelFolder,
-                    gpuId + gpuNumberStart, wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale
+                    wrapperStructPose.netInputSize, poseNetOutputSize, finalOutputSize, wrapperStructPose.scalesNumber,
+                    wrapperStructPose.poseModel, wrapperStructPose.modelFolder, gpuId + gpuNumberStart,
+                    wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale
                 ));
 
             // Pose renderers
             std::vector<std::shared_ptr<PoseRenderer>> poseRenderers;
-            if (wrapperStructPose.renderOutput || renderOutput)
+            std::shared_ptr<PoseRenderer> poseCpuRenderer;
+            std::vector<TWorker> cpuRenderers;
+            if (renderOutputGpu || wrapperStructPose.renderMode == RenderMode::Cpu)
             {
-                // If !wrapperStructPose.renderOutput but renderOutput, then we create an alpha = 0 pose renderer
+                // If wrapperStructPose.renderMode != RenderMode::Gpu but renderOutput, then we create an alpha = 0 pose renderer
                 // in order to keep the removing background option
-                const auto alphaKeypoint = (wrapperStructPose.renderOutput ? wrapperStructPose.alphaKeypoint : 0.f);
-                const auto alphaHeatMap = (wrapperStructPose.renderOutput ? wrapperStructPose.alphaHeatMap : 0.f);
-                for (auto gpuId = 0; gpuId < poseExtractors.size(); gpuId++)
+                const auto alphaKeypoint = (wrapperStructPose.renderMode != RenderMode::None ? wrapperStructPose.alphaKeypoint : 0.f);
+                const auto alphaHeatMap = (wrapperStructPose.renderMode != RenderMode::None ? wrapperStructPose.alphaHeatMap : 0.f);
+                // GPU rendering
+                if (renderOutputGpu)
                 {
-                    poseRenderers.emplace_back(std::make_shared<PoseRenderer>(
-                        netOutputSize, finalOutputSize, wrapperStructPose.poseModel, poseExtractors[gpuId],
+                    for (auto gpuId = 0; gpuId < poseExtractors.size(); gpuId++)
+                    {
+                        poseRenderers.emplace_back(std::make_shared<PoseRenderer>(
+                            poseNetOutputSize, finalOutputSize, wrapperStructPose.poseModel, poseExtractors[gpuId],
+                            wrapperStructPose.blendOriginalFrame, alphaKeypoint,
+                            alphaHeatMap, wrapperStructPose.defaultPartToRender, wrapperStructPose.renderMode
+                        ));
+                    }
+                }
+                // CPU rendering
+                if (wrapperStructPose.renderMode == RenderMode::Cpu)
+                {
+                    poseCpuRenderer = std::make_shared<PoseRenderer>(
+                        poseNetOutputSize, finalOutputSize, wrapperStructPose.poseModel, nullptr,
                         wrapperStructPose.blendOriginalFrame, alphaKeypoint,
-                        alphaHeatMap, wrapperStructPose.defaultPartToRender
-                    ));
+                        alphaHeatMap, wrapperStructPose.defaultPartToRender, wrapperStructPose.renderMode
+                    );
+                    cpuRenderers.emplace_back(std::make_shared<WPoseRenderer<TDatumsPtr>>(poseCpuRenderer));
                 }
             }
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
@@ -589,7 +618,6 @@ namespace op
             spWCvMatToOpOutput = std::make_shared<WCvMatToOpOutput<TDatumsPtr>>(cvMatToOpOutput);
 
             // Pose extractor(s)
-            spWPoses.clear();
             spWPoses.resize(poseExtractors.size());
             for (auto i = 0; i < spWPoses.size(); i++)
                 spWPoses.at(i) = {std::make_shared<WPoseExtractor<TDatumsPtr>>(poseExtractors.at(i))};
@@ -612,14 +640,19 @@ namespace op
             }
 
             // Hand extractor(s)
-            if (wrapperHandStruct.extractAndRenderHands)
+            if (wrapperStructHand.enable)
             {
                 for (auto gpuId = 0; gpuId < spWPoses.size(); gpuId++)
                 {
-                    const auto handExtractor = std::make_shared<experimental::HandExtractor>(
-                        wrapperStructPose.modelFolder, gpuId + gpuNumberStart, wrapperStructPose.poseModel
+                    // Hand detector
+                    const auto handDetector = std::make_shared<HandDetector>(wrapperStructPose.poseModel);
+                    spWPoses.at(gpuId).emplace_back(std::make_shared<WHandDetector<TDatumsPtr>>(handDetector));
+                    // Hand keypoint extractor
+                    const auto netOutputSize = wrapperStructHand.netInputSize;
+                    const auto handExtractor = std::make_shared<HandExtractor>(
+                        wrapperStructHand.netInputSize, netOutputSize, wrapperStructPose.modelFolder, gpuId + gpuNumberStart
                     );
-                    spWPoses.at(gpuId).emplace_back(std::make_shared<experimental::WHandExtractor<TDatumsPtr>>(handExtractor));
+                    spWPoses.at(gpuId).emplace_back(std::make_shared<WHandExtractor<TDatumsPtr>>(handExtractor));
                 }
             }
 
@@ -628,40 +661,73 @@ namespace op
                 for (auto i = 0; i < spWPoses.size(); i++)
                     spWPoses.at(i).emplace_back(std::make_shared<WPoseRenderer<TDatumsPtr>>(poseRenderers.at(i)));
 
-            // Hands renderer(s)
-            if (wrapperHandStruct.extractAndRenderHands)
-            {
-                for (auto i = 0; i < spWPoses.size(); i++)
-                {
-                    // Construct hands renderer
-                    const auto handRenderer = std::make_shared<experimental::HandRenderer>(finalOutputSize);
-                    // Performance boost -> share spGpuMemoryPtr for all renderers
-                    if (!poseRenderers.empty())
-                    {
-                        const bool isLastRenderer = (!renderFace);
-                        handRenderer->setSharedParametersAndIfLast(poseRenderers.at(i)->getSharedParameters(), isLastRenderer);
-                    }
-                    // Add worker
-                    spWPoses.at(i).emplace_back(std::make_shared<experimental::WHandRenderer<TDatumsPtr>>(handRenderer));
-                }
-            }
-
             // Face renderer(s)
             if (renderFace)
             {
-                for (auto i = 0; i < spWPoses.size(); i++)
+                // CPU rendering
+                if (wrapperStructFace.renderMode == RenderMode::Cpu)
                 {
                     // Construct face renderer
-                    const auto faceRenderer = std::make_shared<FaceRenderer>(finalOutputSize, wrapperStructFace.alphaKeypoint, wrapperStructFace.alphaHeatMap);
-                    // Performance boost -> share spGpuMemoryPtr for all renderers
-                    if (!poseRenderers.empty())
-                    {
-                        const bool isLastRenderer = true;
-                        faceRenderer->setSharedParametersAndIfLast(poseRenderers.at(i)->getSharedParameters(), isLastRenderer);
-                    }
+                    const auto faceRenderer = std::make_shared<FaceRenderer>(finalOutputSize, wrapperStructFace.alphaKeypoint,
+                                                                             wrapperStructFace.alphaHeatMap,
+                                                                             wrapperStructFace.renderMode);
                     // Add worker
-                    spWPoses.at(i).emplace_back(std::make_shared<WFaceRenderer<TDatumsPtr>>(faceRenderer));
+                    cpuRenderers.emplace_back(std::make_shared<WFaceRenderer<TDatumsPtr>>(faceRenderer));
                 }
+                // GPU rendering
+                else if (wrapperStructFace.renderMode == RenderMode::Gpu)
+                {
+                    for (auto i = 0; i < spWPoses.size(); i++)
+                    {
+                        // Construct face renderer
+                        const auto faceRenderer = std::make_shared<FaceRenderer>(finalOutputSize, wrapperStructFace.alphaKeypoint,
+                                                                                 wrapperStructFace.alphaHeatMap,
+                                                                                 wrapperStructFace.renderMode);
+                        // Performance boost -> share spGpuMemoryPtr for all renderers
+                        if (!poseRenderers.empty())
+                        {
+                            const bool isLastRenderer = !renderHandGpu;
+                            faceRenderer->setSharedParametersAndIfLast(poseRenderers.at(i)->getSharedParameters(), isLastRenderer);
+                        }
+                        // Add worker
+                        spWPoses.at(i).emplace_back(std::make_shared<WFaceRenderer<TDatumsPtr>>(faceRenderer));
+                    }
+                }
+                else
+                    error("Unknown RenderMode.", __LINE__, __FUNCTION__, __FILE__);
+            }
+
+            // Hands renderer(s)
+            if (renderHand)
+            {
+                // CPU rendering
+                if (wrapperStructHand.renderMode == RenderMode::Cpu)
+                {
+                    // Construct hand renderer
+                    const auto handRenderer = std::make_shared<HandRenderer>(finalOutputSize);
+                    // Add worker
+                    cpuRenderers.emplace_back(std::make_shared<WHandRenderer<TDatumsPtr>>(handRenderer));
+                }
+                // GPU rendering
+                else if (wrapperStructHand.renderMode == RenderMode::Gpu)
+                {
+                    for (auto i = 0; i < spWPoses.size(); i++)
+                    {
+                        // Construct hands renderer
+                        const auto handRenderer = std::make_shared<HandRenderer>(finalOutputSize, wrapperStructFace.alphaKeypoint,
+                                                                                 wrapperStructFace.alphaHeatMap);
+                        // Performance boost -> share spGpuMemoryPtr for all renderers
+                        if (!poseRenderers.empty())
+                        {
+                            const bool isLastRenderer = true;
+                            handRenderer->setSharedParametersAndIfLast(poseRenderers.at(i)->getSharedParameters(), isLastRenderer);
+                        }
+                        // Add worker
+                        spWPoses.at(i).emplace_back(std::make_shared<WHandRenderer<TDatumsPtr>>(handRenderer));
+                    }
+                }
+                else
+                    error("Unknown RenderMode.", __LINE__, __FUNCTION__, __FILE__);
             }
 
             // Itermediate workers (e.g. OpenPose format to cv::Mat, json & frames recorder, ...)
@@ -672,13 +738,14 @@ namespace op
             // Frames processor (OpenPose format -> cv::Mat format)
             if (renderOutput)
             {
+                mPostProcessingWs = mergeWorkers(mPostProcessingWs, cpuRenderers);
                 const auto opOutputToCvMat = std::make_shared<OpOutputToCvMat>(finalOutputSize);
                 mPostProcessingWs.emplace_back(std::make_shared<WOpOutputToCvMat<TDatumsPtr>>(opOutputToCvMat));
             }
             // Re-scale pose if desired
             if (wrapperStructPose.keypointScale != ScaleMode::OutputResolution
                 && (wrapperStructPose.keypointScale != ScaleMode::InputResolution || (finalOutputSize != producerSize))
-                && (wrapperStructPose.keypointScale != ScaleMode::NetOutputResolution || (finalOutputSize != netOutputSize)))
+                && (wrapperStructPose.keypointScale != ScaleMode::NetOutputResolution || (finalOutputSize != poseNetOutputSize)))
             {
                 auto keypointScaler = std::make_shared<KeypointScaler>(wrapperStructPose.keypointScale);
                 mPostProcessingWs.emplace_back(std::make_shared<WKeypointScaler<TDatumsPtr>>(keypointScaler));
@@ -692,7 +759,7 @@ namespace op
                 mOutputWs.emplace_back(std::make_shared<WPoseSaver<TDatumsPtr>>(keypointSaver));
                 if (wrapperStructFace.enable)
                     mOutputWs.emplace_back(std::make_shared<WFaceSaver<TDatumsPtr>>(keypointSaver));
-                if (wrapperHandStruct.extractAndRenderHands)
+                if (wrapperStructHand.enable)
                     mOutputWs.emplace_back(std::make_shared<WHandSaver<TDatumsPtr>>(keypointSaver));
             }
             // Write people pose data on disk (json format)
@@ -702,7 +769,7 @@ namespace op
                 mOutputWs.emplace_back(std::make_shared<WPoseJsonSaver<TDatumsPtr>>(keypointJsonSaver));
                 if (wrapperStructFace.enable)
                     mOutputWs.emplace_back(std::make_shared<WFaceJsonSaver<TDatumsPtr>>(keypointJsonSaver));
-                if (wrapperHandStruct.extractAndRenderHands)
+                if (wrapperStructHand.enable)
                     mOutputWs.emplace_back(std::make_shared<WHandJsonSaver<TDatumsPtr>>(keypointJsonSaver));
             }
             // Write people pose data on disk (COCO validation json format)
@@ -710,7 +777,7 @@ namespace op
             {
                 const auto humanFormat = true; // If true, bigger size (and potentially slower to process), but easier for a human to read it
                 const auto cocoJsonSaver = std::make_shared<CocoJsonSaver>(wrapperStructOutput.writeCocoJson, humanFormat);
-                mOutputWs.emplace_back(std::make_shared<experimental::WCocoJsonSaver<TDatumsPtr>>(cocoJsonSaver));
+                mOutputWs.emplace_back(std::make_shared<WCocoJsonSaver<TDatumsPtr>>(cocoJsonSaver));
             }
             // Write frames as desired image format on hard disk
             if (!writeImagesCleaned.empty())
@@ -721,8 +788,7 @@ namespace op
             // Write frames as *.avi video on hard disk
             if (!wrapperStructOutput.writeVideo.empty() && wrapperStructInput.producerSharedPtr != nullptr)
             {
-                const auto originalVideoFps = (wrapperStructInput.producerSharedPtr->getType() != ProducerType::Webcam
-                                               && wrapperStructInput.producerSharedPtr->get(CV_CAP_PROP_FPS) > 0.
+                const auto originalVideoFps = (wrapperStructInput.producerSharedPtr->get(CV_CAP_PROP_FPS) > 0.
                                                ? wrapperStructInput.producerSharedPtr->get(CV_CAP_PROP_FPS) : 30.);
                 const auto videoSaver = std::make_shared<VideoSaver>(
                     wrapperStructOutput.writeVideo, CV_FOURCC('M','J','P','G'), originalVideoFps, finalOutputSize
@@ -750,7 +816,8 @@ namespace op
             if (wrapperStructOutput.displayGui)
             {
                 const auto gui = std::make_shared<Gui>(
-                    wrapperStructOutput.fullScreen, finalOutputSize, mThreadManager.getIsRunningSharedPtr(), spVideoSeek, poseExtractors, poseRenderers
+                    wrapperStructOutput.fullScreen, finalOutputSize, mThreadManager.getIsRunningSharedPtr(), spVideoSeek, poseExtractors,
+                    (wrapperStructPose.renderMode == RenderMode::Cpu ? std::vector<std::shared_ptr<PoseRenderer>>{poseCpuRenderer} : poseRenderers)
                 );
                 spWGui = {std::make_shared<WGui<TDatumsPtr>>(gui)};
             }

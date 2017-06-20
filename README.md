@@ -6,6 +6,7 @@ OpenPose
 - May 2017: Windows version released!
 - Jun 2017: Face released!
 - Check all the [release notes](doc/release_notes.md).
+- Interested in an internship on CMU as OpenPose programmer? See [this link](https://docs.google.com/document/d/14SygG39NjIRZfx08clewTdFMGwVdtRu2acyCi3TYcHs/edit?usp=sharing) for details.
 
 
 
@@ -23,7 +24,7 @@ OpenPose is freely available for free non-commercial use, and may be redistribut
 
 Library main functionality:
 
-* Multi-person 15 or **18-keypoint body pose** estimation and rendering. **Running time invariant of number of people** on the image.
+* Multi-person 15 or **18-keypoint body pose** estimation and rendering. **Running time invariant to number of people** on the image.
 
 * Multi-person **2x21-keypoint hand** estimation and rendering. Note: In this initial version, **running time** linearly **depends** on the **number of people** on the image. **Coming soon (in around 1-5 weeks)!**
 
@@ -76,8 +77,6 @@ The pose estimation work is based on the C++ code from [the ECCV 2016 demo](http
     2. [OpenPose Wrapper](#openpose-wrapper)
     3. [OpenPose Library](#openpose-library)
 4. [Output](#output)
-    1. [Output Format](#output-format)
-    2. [Reading Saved Results](#reading-saved-results)
 5. [OpenPose Benchmark](#openpose-benchmark)
 6. [Send Us Your Feedback!](#send-us-your-feedback)
 7. [Citation](#citation)

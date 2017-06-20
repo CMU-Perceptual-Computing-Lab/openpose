@@ -39,12 +39,11 @@ namespace op
                 const auto offsetChannelC = c*offsetBetweenChannels;
                 for (auto y = 0; y < resolutionSize.y; y++)
                 {
-                    const auto cvMatOffsetY = y*resolutionSize.x;
                     const auto floatImageOffsetY = offsetChannelC + y*resolutionSize.x;
                     for (auto x = 0; x < resolutionSize.x; x++)
                     {
                         const auto value = uchar(   fastTruncate(intRound(floatImage[floatImageOffsetY + x]), 0, 255)   );
-                        cvMat.at<uchar>(resolutionChannels*(cvMatOffsetY + x) + c) = value;
+                        *(cvMat.ptr<uchar>(y) + x*resolutionChannels + c) = value;
                     }
                 }
             }

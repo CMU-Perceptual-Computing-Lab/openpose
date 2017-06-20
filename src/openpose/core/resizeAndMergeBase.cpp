@@ -6,13 +6,14 @@
 namespace op
 {
     template <typename T>
-    void resizeAndMergeCpu(T* targetPtr, const T* const sourcePtr, const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize, const T scaleGap)
+    void resizeAndMergeCpu(T* targetPtr, const T* const sourcePtr, const std::array<int, 4>& targetSize,
+                           const std::array<int, 4>& sourceSize, const std::vector<T>& scaleRatios)
     {
         try
         {
             UNUSED(targetPtr);
             UNUSED(sourcePtr);
-            UNUSED(scaleGap);
+            UNUSED(scaleRatios);
             UNUSED(targetSize);
             UNUSED(sourceSize);
             error("CPU version not completely implemented.", __LINE__, __FUNCTION__, __FILE__);
@@ -61,6 +62,8 @@ namespace op
         }
     }
 
-    template void resizeAndMergeCpu(float* targetPtr, const float* const sourcePtr, const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize, const float scaleGap);
-    template void resizeAndMergeCpu(double* targetPtr, const double* const sourcePtr, const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize, const double scaleGap);
+    template void resizeAndMergeCpu(float* targetPtr, const float* const sourcePtr, const std::array<int, 4>& targetSize,
+                                    const std::array<int, 4>& sourceSize, const std::vector<float>& scaleRatios);
+    template void resizeAndMergeCpu(double* targetPtr, const double* const sourcePtr, const std::array<int, 4>& targetSize,
+                                    const std::array<int, 4>& sourceSize, const std::vector<double>& scaleRatios);
 }

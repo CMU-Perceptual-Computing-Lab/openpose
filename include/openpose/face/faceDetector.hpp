@@ -15,7 +15,7 @@ namespace op
     public:
         explicit FaceDetector(const PoseModel poseModel);
 
-        std::vector<Rectangle<float>> detectFaces(const Array<float>& poseKeypoints, const float scaleInputToOutput);
+        std::vector<Rectangle<float>> detectFaces(const Array<float>& poseKeypoints, const float scaleInputToOutput) const;
 
     private:
         const unsigned int mNeck;

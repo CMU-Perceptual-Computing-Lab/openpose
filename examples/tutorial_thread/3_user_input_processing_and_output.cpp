@@ -27,8 +27,9 @@
 // Note: This command will show you flags for other unnecessary 3rdparty files. Check only the flags for the OpenPose
 // executable. E.g. for `openpose.bin`, look for `Flags from examples/openpose/openpose.cpp:`.
 // Debugging
-DEFINE_int32(logging_level,             3,              "The logging level. Integer in the range [0, 255]. 0 will output any log() message, while 255 will not output any."
-                                                        " Current OpenPose library messages are in the range 0-4: 1 for low priority messages and 4 for important ones.");
+DEFINE_int32(logging_level,             3,              "The logging level. Integer in the range [0, 255]. 0 will output any log() message, while"
+                                                        " 255 will not output any. Current OpenPose library messages are in the range 0-4: 1 for"
+                                                        " low priority messages and 4 for important ones.");
 // Producer
 DEFINE_string(image_dir,                "examples/media/",      "Process a directory of images.");
 // Consumer
@@ -183,7 +184,8 @@ int openPoseTutorialThread3()
     // ------------------------- CONFIGURING THREADING -------------------------
     // In this simple multi-thread example, we will do the following:
         // 3 (virtual) queues: 0, 1, 2
-        // 1 real queue: 1. The first and last queue ids (in this case 0 and 2) are not actual queues, but the beginning and end of the processing sequence
+        // 1 real queue: 1. The first and last queue ids (in this case 0 and 2) are not actual queues, but the beginning and end of the processing
+        // sequence
         // 2 threads: 0, 1
         // wUserInput will generate frames (there is no real queue 0) and push them on queue 1
         // wGui will pop frames from queue 1 and process them (there is no real queue 2)

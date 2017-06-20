@@ -10,9 +10,11 @@
  
 namespace op
 {
-    FaceExtractor::FaceExtractor(const Point<int>& netInputSize, const Point<int>& netOutputSize, const std::string& modelFolder, const int gpuId) :
+    FaceExtractor::FaceExtractor(const Point<int>& netInputSize, const Point<int>& netOutputSize, const std::string& modelFolder,
+                                 const int gpuId) :
         mNetOutputSize{netOutputSize},
-        spNet{std::make_shared<NetCaffe>(std::array<int,4>{1, 3, mNetOutputSize.y, mNetOutputSize.x}, modelFolder + FACE_PROTOTXT, modelFolder + FACE_TRAINED_MODEL, gpuId)},
+        spNet{std::make_shared<NetCaffe>(std::array<int,4>{1, 3, mNetOutputSize.y, mNetOutputSize.x}, modelFolder + FACE_PROTOTXT,
+                                         modelFolder + FACE_TRAINED_MODEL, gpuId)},
         spResizeAndMergeCaffe{std::make_shared<ResizeAndMergeCaffe<float>>()},
         spNmsCaffe{std::make_shared<NmsCaffe<float>>()},
         mFaceImageCrop{mNetOutputSize.area()*3}
@@ -21,6 +23,7 @@ namespace op
         {
             checkE(netOutputSize.x, netInputSize.x, "Net input and output size must be equal.", __LINE__, __FUNCTION__, __FILE__);
             checkE(netOutputSize.y, netInputSize.y, "Net input and output size must be equal.", __LINE__, __FUNCTION__, __FILE__);
+            checkE(netInputSize.x, netInputSize.y, "Net input size must be squared.", __LINE__, __FUNCTION__, __FILE__);
             // Properties
             for (auto& property : mProperties)
                 property = 0.;
@@ -75,45 +78,56 @@ namespace op
                 if (cvInputData.empty())
                     error("Empty cvInputData.", __LINE__, __FUNCTION__, __FILE__);
 
+                // Fix parameters
+                const auto netInputSide = fastMin(mNetOutputSize.x, mNetOutputSize.y);
+
                 // Set face size
                 const auto numberPeople = (int)faceRectangles.size();
-				mFaceKeypoints.reset({ numberPeople, (int)FACE_NUMBER_PARTS, 3 }, 0);
-// // Commented lines are for debugging
-// log("\nAreas:");
-// cv::Mat cvInputDataCopy = cvInputData.clone();
+                mFaceKeypoints.reset({numberPeople, (int)FACE_NUMBER_PARTS, 3}, 0);
+
+                // // Debugging
+                // cv::Mat cvInputDataCopy = cvInputData.clone();
+                // Extract face keypoints for each person
                 for (auto person = 0 ; person < numberPeople ; person++)
                 {
+                    const auto& faceRectangle = faceRectangles.at(person);
                     // Only consider faces with a minimum pixel area
-                    const auto faceAreaSquared = std::sqrt(faceRectangles.at(person).area());
+                    const auto minFaceSize = fastMin(faceRectangle.width, faceRectangle.height);
+                    // // Debugging
+                    // log(std::to_string(cvInputData.cols) + " " + std::to_string(cvInputData.rows));
+                    // cv::rectangle(cvInputDataCopy,
+                    //               cv::Point{(int)faceRectangle.x, (int)faceRectangle.y},
+                    //               cv::Point{(int)faceRectangle.bottomRight().x, (int)faceRectangle.bottomRight().y},
+                    //               cv::Scalar{0,0,255}, 2);
                     // Get parts
-                    if (faceAreaSquared > 50)
+                    if (minFaceSize > 40)
                     {
-                        const auto& faceRectangle = faceRectangles.at(person);
-// log(faceAreaSquared);
-// log(std::to_string(cvInputData.cols) + " " + std::to_string(cvInputData.rows));
-// cv::rectangle(cvInputDataCopy,
-//               cv::Point{(int)faceRectangle.x, (int)faceRectangle.y},
-//               cv::Point{(int)faceRectangle.bottomRight().x, (int)faceRectangle.bottomRight().y},
-//               cv::Scalar{255,0,255}, 2);
-                        // Get face position(s)
-                        const Point<float> faceCenterPosition{faceRectangle.topLeft()};
-                        const auto faceSize = fastMax(faceRectangle.width, faceRectangle.height);
-
+                        // // Debugging
+                        // log(std::to_string(cvInputData.cols) + " " + std::to_string(cvInputData.rows));
+                        // cv::rectangle(cvInputDataCopy,
+                        //               cv::Point{(int)faceRectangle.x, (int)faceRectangle.y},
+                        //               cv::Point{(int)faceRectangle.bottomRight().x, (int)faceRectangle.bottomRight().y},
+                        //               cv::Scalar{0,255,0}, 2);
                         // Resize and shift image to face rectangle positions
-                        const double scaleFace = faceSize / (double)fastMin(mNetOutputSize.x, mNetOutputSize.y);
+                        const auto faceSize = fastMax(faceRectangle.width, faceRectangle.height);
+                        const double scaleFace = faceSize / (double)netInputSide;
                         cv::Mat Mscaling = cv::Mat::eye(2, 3, CV_64F);
                         Mscaling.at<double>(0,0) = scaleFace;
                         Mscaling.at<double>(1,1) = scaleFace;
-                        Mscaling.at<double>(0,2) = faceCenterPosition.x;
-                        Mscaling.at<double>(1,2) = faceCenterPosition.y;
+                        Mscaling.at<double>(0,2) = faceRectangle.x;
+                        Mscaling.at<double>(1,2) = faceRectangle.y;
 
                         cv::Mat faceImage;
-                        cv::warpAffine(cvInputData, faceImage, Mscaling, cv::Size{mNetOutputSize.x, mNetOutputSize.y}, CV_INTER_LINEAR | CV_WARP_INVERSE_MAP, cv::BORDER_CONSTANT, cv::Scalar(0,0,0));
+                        cv::warpAffine(cvInputData, faceImage, Mscaling, cv::Size{mNetOutputSize.x, mNetOutputSize.y},
+                                       CV_INTER_LINEAR | CV_WARP_INVERSE_MAP, cv::BORDER_CONSTANT, cv::Scalar(0,0,0));
 
                         // cv::Mat -> float*
                         uCharCvMatToFloatPtr(mFaceImageCrop.getPtr(), faceImage, true);
-// if (person < 5)
-// cv::imshow("faceImage" + std::to_string(person), faceImage);
+
+                        // // Debugging
+                        // if (person < 5)
+                        // cv::imshow("faceImage" + std::to_string(person), faceImage);
+
                         // 1. Caffe deep network
                         auto* inputDataGpuPtr = spNet->getInputDataGpuPtr();
                         cudaMemcpy(inputDataGpuPtr, mFaceImageCrop.getPtr(), mNetOutputSize.area() * 3 * sizeof(float), cudaMemcpyHostToDevice);
@@ -139,7 +153,7 @@ namespace op
                         const auto* facePeaksPtr = spPeaksBlob->mutable_cpu_data();
                         const auto facePeaksOffset = (FACE_MAX_PEAKS+1) * 3;
 
-                        for (auto part = 0 ; part < FACE_NUMBER_PARTS ; part++)
+                        for (auto part = 0 ; part < mFaceKeypoints.getSize(1) ; part++)
                         {
                             // Get max peak
                             const int numPeaks = intRound(facePeaksPtr[facePeaksOffset*part]);
@@ -162,7 +176,7 @@ namespace op
                                 const auto x = facePeaksPtr[xyIndex];
                                 const auto y = facePeaksPtr[xyIndex + 1];
                                 const auto score = facePeaksPtr[xyIndex + 2];
-                                const auto baseIndex = (person * FACE_NUMBER_PARTS + part) * 3;
+                                const auto baseIndex = mFaceKeypoints.getSize(2) * (person * mFaceKeypoints.getSize(1) + part);
                                 mFaceKeypoints[baseIndex] = scaleInputToOutput * (Mscaling.at<double>(0,0) * x + Mscaling.at<double>(0,1) * y + Mscaling.at<double>(0,2));
                                 mFaceKeypoints[baseIndex+1] = scaleInputToOutput * (Mscaling.at<double>(1,0) * x + Mscaling.at<double>(1,1) * y + Mscaling.at<double>(1,2));
                                 mFaceKeypoints[baseIndex+2] = score;
@@ -170,7 +184,8 @@ namespace op
                         }
                     }
                 }
-// cv::imshow("AcvInputDataCopy", cvInputDataCopy);
+                // // Debugging
+                // cv::imshow("AcvInputDataCopy", cvInputDataCopy);
             }
             else
                 mFaceKeypoints.reset();

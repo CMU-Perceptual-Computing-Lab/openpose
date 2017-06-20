@@ -7,7 +7,7 @@
 #include "faceExtractor.hpp"
 #include "faceParameters.hpp"
 #include "faceRenderer.hpp"
-#include "faceRenderGpu.hpp"
+#include "renderFace.hpp"
 #include "wFaceDetector.hpp"
 #include "wFaceExtractor.hpp"
 #include "wFaceRenderer.hpp"

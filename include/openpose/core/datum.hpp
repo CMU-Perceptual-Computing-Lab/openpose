@@ -2,7 +2,7 @@
 #define OPENPOSE_CORE_DATUM_HPP
 
 #include <memory> // std::shared_ptr
-#include <string> // std::string
+#include <string>
 #include <opencv2/core/core.hpp> // cv::Mat
 #include "array.hpp"
 #include "point.hpp"
@@ -74,7 +74,7 @@ namespace op
 
         /**
          * Face detection locations (x,y,width,height) for each person in the image.
-         * It has been resized to the same resolution as `poseKeypoints`.
+         * It is resized to cvInputData.size().
          * Size: #people
          */
         std::vector<Rectangle<float>> faceRectangles;
@@ -87,6 +87,13 @@ namespace op
         Array<float> faceKeypoints;
 
         /**
+         * Hand detection locations (x,y,width,height) for each person in the image.
+         * It is resized to cvInputData.size().
+         * Size: #people
+         */
+        std::vector<std::array<Rectangle<float>, 2>> handRectangles;
+
+        /**
          * Experimental (NOT IMPLEMENTED YET)
          * Hands code is in development phase. Not included in this version.
          * Size: #people's hands to render x 2 (right and left hand) x #hand parts (21) x 3 ((x,y) coordinates + score)
@@ -97,6 +104,8 @@ namespace op
         float scaleInputToOutput; /**< Scale ratio between the input Datum::cvInputData and the output Datum::cvOutputData. */
 
         float scaleNetToOutput; /**< Scale ratio between the net output and the final output Datum::cvOutputData. */
+
+        std::vector<float> scaleRatios; /**< Scale ratios between each scale (e.g. flag `num_scales`). Used to resize the different scales. */
 
         std::pair<int, std::string> elementRendered; /**< Pair with the element key id POSE_BODY_PART_MAPPING on `pose/poseParameters.hpp` and its mapped value (e.g. 1 and "Neck"). */
 
@@ -167,7 +176,7 @@ namespace op
          * @param datum Datum to be compared.
          * @result Whether the instance satisfies the condition with respect to datum.
          */
-        inline bool operator <(const Datum& datum) const
+        inline bool operator<(const Datum& datum) const
         {
             return id < datum.id;
         }
@@ -176,7 +185,7 @@ namespace op
          * @param datum Datum to be compared.
          * @result Whether the instance satisfies the condition with respect to datum.
          */
-        inline bool operator >(const Datum& datum) const
+        inline bool operator>(const Datum& datum) const
         {
             return id > datum.id;
         }
@@ -185,7 +194,7 @@ namespace op
          * @param datum Datum to be compared.
          * @result Whether the instance satisfies the condition with respect to datum.
          */
-        inline bool operator <=(const Datum& datum) const
+        inline bool operator<=(const Datum& datum) const
         {
             return id <= datum.id;
         }
@@ -194,7 +203,7 @@ namespace op
          * @param datum Datum to be compared.
          * @result Whether the instance satisfies the condition with respect to datum.
          */
-        inline bool operator >=(const Datum& datum) const
+        inline bool operator>=(const Datum& datum) const
         {
             return id >= datum.id;
         }
@@ -203,7 +212,7 @@ namespace op
          * @param datum Datum to be compared.
          * @result Whether the instance satisfies the condition with respect to datum.
          */
-        inline bool operator ==(const Datum& datum) const
+        inline bool operator==(const Datum& datum) const
         {
             return id == datum.id;
         }
@@ -212,7 +221,7 @@ namespace op
          * @param datum Datum to be compared.
          * @result Whether the instance satisfies the condition with respect to datum.
          */
-        inline bool operator !=(const Datum& datum) const
+        inline bool operator!=(const Datum& datum) const
         {
             return id != datum.id;
         }

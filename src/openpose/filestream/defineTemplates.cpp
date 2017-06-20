@@ -2,6 +2,7 @@
 
 namespace op
 {
+    DEFINE_TEMPLATE_DATUM(WCocoJsonSaver);
     DEFINE_TEMPLATE_DATUM(WFaceJsonSaver);
     DEFINE_TEMPLATE_DATUM(WFaceSaver);
     DEFINE_TEMPLATE_DATUM(WHandJsonSaver);

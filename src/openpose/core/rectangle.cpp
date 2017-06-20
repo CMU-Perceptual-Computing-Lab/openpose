@@ -131,7 +131,7 @@ namespace op
     }
 
     template<typename T>
-    Rectangle<T> Rectangle<T>::operator*(const T value)
+    Rectangle<T> Rectangle<T>::operator*(const T value) const
     {
         try
         {
@@ -164,7 +164,7 @@ namespace op
     }
 
     template<typename T>
-    Rectangle<T> Rectangle<T>::operator/(const T value)
+    Rectangle<T> Rectangle<T>::operator/(const T value) const
     {
         try
         {
