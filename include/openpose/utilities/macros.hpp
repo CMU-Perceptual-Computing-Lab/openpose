@@ -16,20 +16,24 @@
     className(const className&) = delete; \
     className& operator=(const className&) = delete
 
-#define COMPILE_TEMPLATE_BASIC_TYPES(className) \
-    template class className<char>; \
-    template class className<signed char>; \
-    template class className<short>; \
-    template class className<int>; \
-    template class className<long>; \
-    template class className<long long>; \
-    template class className<unsigned char>; \
-    template class className<unsigned short>; \
-    template class className<unsigned int>; \
-    template class className<unsigned long>; \
-    template class className<unsigned long long>; \
-    template class className<float>; \
-    template class className<double>; \
-    template class className<long double>
+#define COMPILE_TEMPLATE_BASIC_TYPES_CLASS(className) COMPILE_TEMPLATE_BASIC_TYPES(className, class)
+
+#define COMPILE_TEMPLATE_BASIC_TYPES_STRUCT(className) COMPILE_TEMPLATE_BASIC_TYPES(className, struct)
+
+#define COMPILE_TEMPLATE_BASIC_TYPES(className, classType) \
+    template classType className<char>; \
+    template classType className<signed char>; \
+    template classType className<short>; \
+    template classType className<int>; \
+    template classType className<long>; \
+    template classType className<long long>; \
+    template classType className<unsigned char>; \
+    template classType className<unsigned short>; \
+    template classType className<unsigned int>; \
+    template classType className<unsigned long>; \
+    template classType className<unsigned long long>; \
+    template classType className<float>; \
+    template classType className<double>; \
+    template classType className<long double>
 
 #endif // OPENPOSE_UTILITIES_MACROS_HPP

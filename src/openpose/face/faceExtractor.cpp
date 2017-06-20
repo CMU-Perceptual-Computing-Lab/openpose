@@ -142,7 +142,7 @@ namespace op
                         #endif
      
                         // 3. Get peaks by Non-Maximum Suppression
-                        spNmsCaffe->setThreshold(get(FaceProperty::NMSThreshold));
+                        spNmsCaffe->setThreshold((float)get(FaceProperty::NMSThreshold));
                         #ifndef CPU_ONLY
                             spNmsCaffe->Forward_gpu({spHeatMapsBlob.get()}, {spPeaksBlob.get()});
                             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
@@ -177,8 +177,12 @@ namespace op
                                 const auto y = facePeaksPtr[xyIndex + 1];
                                 const auto score = facePeaksPtr[xyIndex + 2];
                                 const auto baseIndex = mFaceKeypoints.getSize(2) * (person * mFaceKeypoints.getSize(1) + part);
-                                mFaceKeypoints[baseIndex] = scaleInputToOutput * (Mscaling.at<double>(0,0) * x + Mscaling.at<double>(0,1) * y + Mscaling.at<double>(0,2));
-                                mFaceKeypoints[baseIndex+1] = scaleInputToOutput * (Mscaling.at<double>(1,0) * x + Mscaling.at<double>(1,1) * y + Mscaling.at<double>(1,2));
+                                mFaceKeypoints[baseIndex] = (float)(scaleInputToOutput * (Mscaling.at<double>(0,0) * x
+                                                                                          + Mscaling.at<double>(0,1) * y
+                                                                                          + Mscaling.at<double>(0,2)));
+                                mFaceKeypoints[baseIndex+1] = (float)(scaleInputToOutput * (Mscaling.at<double>(1,0) * x
+                                                                                          + Mscaling.at<double>(1,1) * y
+                                                                                          + Mscaling.at<double>(1,2)));
                                 mFaceKeypoints[baseIndex+2] = score;
                             }
                         }

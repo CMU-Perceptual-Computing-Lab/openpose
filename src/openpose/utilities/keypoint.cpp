@@ -123,7 +123,7 @@ namespace op
                 // Parameters
                 const auto lineType = 8;
                 const auto shift = 0;
-                const auto thresholdRectangle = 0.1;
+                const auto thresholdRectangle = 0.1f;
                 const auto numberColors = colors.size();
                 const auto numberKeypoints = keypoints.getSize(1);
                 const auto areaKeypoints = numberKeypoints * keypoints.getSize(2);
@@ -224,7 +224,7 @@ namespace op
         }
     }
 
-    int getKeypointsArea(const float* keypointPtr, const int numberKeypoints, const float threshold)
+    float getKeypointsArea(const float* keypointPtr, const int numberKeypoints, const float threshold)
     {
         try
         {
@@ -233,7 +233,7 @@ namespace op
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return 0;
+            return 0.f;
         }
     }
 
@@ -247,7 +247,7 @@ namespace op
                 const auto numberKeypoints = keypoints.getSize(1);
                 const auto area = numberKeypoints * keypoints.getSize(2);
                 auto biggestPoseIndex = -1;
-                auto biggestArea = -1;
+                auto biggestArea = -1.f;
                 for (auto person = 0 ; person < numberPeople ; person++)
                 {
                     const auto newPersonArea = getKeypointsArea(&keypoints[person*area], numberKeypoints, threshold);

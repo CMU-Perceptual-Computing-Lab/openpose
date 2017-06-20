@@ -34,7 +34,7 @@ namespace op
 
         Array<float> getPoseKeypoints() const;
 
-        double getScaleNetToOutput() const;
+        float getScaleNetToOutput() const;
 
         double get(const PoseProperty property) const;
 

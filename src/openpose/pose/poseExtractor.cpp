@@ -181,7 +181,7 @@ namespace op
         }
     }
 
-    double PoseExtractor::getScaleNetToOutput() const
+    float PoseExtractor::getScaleNetToOutput() const
     {
         try
         {

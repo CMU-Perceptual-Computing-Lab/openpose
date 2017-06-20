@@ -363,8 +363,8 @@ namespace op
                 string += std::to_string(spData[i]) + " ";
                 // Introduce an enter for each dimension change
                 // If comented, all values will be printed in the same line
-                auto multiplier = 1u;
-                for (auto dimension = mSize.size() - 1u ; dimension > 0 && ((i/multiplier) % getSize(dimension) == getSize(dimension)-1) ; dimension--)
+                auto multiplier = 1;
+                for (auto dimension = (int)(mSize.size() - 1u) ; dimension > 0 && ((i/multiplier) % getSize(dimension) == getSize(dimension)-1) ; dimension--)
                 {
                     string += "\n";
                     multiplier *= getSize(dimension);
@@ -469,5 +469,5 @@ namespace op
         }
     }
 
-    COMPILE_TEMPLATE_BASIC_TYPES(Array);
+    COMPILE_TEMPLATE_BASIC_TYPES_CLASS(Array);
 }
