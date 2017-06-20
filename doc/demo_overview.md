@@ -89,6 +89,7 @@ The following command will save all the body part heat maps, background heat map
 Please, in order to check all the real time pose demo options and their details, run `./build/examples/openpose/openpose.bin --help`. We describe here some of the most important ones.
 
 - `--face`: If enabled, it will also detect the faces on the image. Note that this will considerable slow down the performance and increse the required GPU memory. In addition, the greater number of people on the image, the slower OpenPose will be.
+- `--hand`: Analogously to `--face`, but applied to hands. Note that this will also slow down the performance, increse the required GPU memory and its speed depends on the number of people.
 - `--video input.mp4`: Input video. If omitted, it will use the webcam.
 - `--camera 3`: Choose webcam number (default: 0). If `--camera`, `--image_dir` and `--write_video` are omitted, it is equivalent to use `--camera 0`.
 - `--image_dir path_to_images/`: Run on all images (jpg, png, bmp, etc.) in `path_to_images/`. You can test the program with the image directory `examples/media/`.
@@ -99,7 +100,7 @@ Please, in order to check all the real time pose demo options and their details,
 - `--disable_blending`: If selected, it will only render the pose skeleton or desired heat maps, while blocking the original background. Also related: `part_to_show`, `alpha_pose`, and `alpha_pose`.
 - `--part_to_show`: Select the prediction channel to visualize (default: 0). 0 to visualize all the body parts, 1-18 for each body part heat map, 19 for the background heat map, 20 for all the body part heat maps together, 21 for all the PAFs, 22-69 for each body part pair PAF.
 - `--no_display`: Display window not opened. Useful if there is no X server and/or to slightly speed up the processing if visual output is not required.
-- `--num_gpu 2 --num_gpu_start 0`: Parallelize over this number of GPUs starting by the desired device id. Default is 1 and 0, respectively.
+- `--num_gpu 2 --num_gpu_start 1`: Parallelize over this number of GPUs starting by the desired device id. Default `num_gpu` is -1, which will use all the available GPUs.
 - `--num_scales 3 --scale_gap 0.15`: Use 3 scales, 1, (1-0.15), (1-0.15*2). Default is one scale. If you want to change the initial scale, you actually want to multiply your desired initial scale by the `net_resolution`.
 - `--net_resolution 656x368 --resolution 1280x720`: For HD images and video (default values).
 - `--net_resolution 496x368 --resolution 640x480`: For VGA images and video.
@@ -110,13 +111,13 @@ Please, in order to check all the real time pose demo options and their details,
 
 ## Rendering Face without Pose
 ```
-./build/examples/openpose/openpose.bin --face --no_render_pose
+./build/examples/openpose/openpose.bin --face --render_pose 0 --render_face 1
 ```
 
 
 
 ## Example
-The following example runs the video `vid.mp4`, renders image frames on `output/result.avi`, and outputs JSON files as `output/%12d.json`, parallelizing over 2 GPUs:
+The following example runs the demo video `video.avi`, renders image frames on `output/result.avi`, and outputs JSON files in `output/`. It parallelizes over 2 GPUs, GPUs 1 and 2. Note that it will skip GPU 0:
 ```
-./build/examples/openpose/openpose.bin --video examples/media/video.avi --num_gpu 2 --write_video output/result.avi --write_json output/
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --num_gpu 2 --num_gpu_start 1 --write_video output/result.avi --write_keypoint_json output/
 ```

@@ -40,6 +40,8 @@ DEFINE_double(scale_gap,                0.3,            "Scale gap between scale
                                                         " your desired initial scale.");
 DEFINE_int32(num_scales,                1,              "Number of scales to average.");
 // OpenPose Rendering
+DEFINE_bool(disable_blending,           false,          "If blending is enabled, it will merge the results with the original frame. If disabled, it"
+                                                        " will only display the results.");
 DEFINE_double(alpha_pose,               0.6,            "Blending factor (range 0-1) for the body part rendering. 1 will show it completely, 0 will"
                                                         " hide it. Only valid for GPU rendering.");
 
@@ -107,7 +109,7 @@ int openPoseTutorialPose1()
     op::CvMatToOpOutput cvMatToOpOutput{outputSize};
     op::PoseExtractorCaffe poseExtractorCaffe{netInputSize, netOutputSize, outputSize, FLAGS_num_scales, poseModel,
                                               FLAGS_model_folder, FLAGS_num_gpu_start};
-    op::PoseRenderer poseRenderer{netOutputSize, outputSize, poseModel, nullptr, (float)FLAGS_alpha_pose};
+    op::PoseRenderer poseRenderer{netOutputSize, outputSize, poseModel, nullptr, !FLAGS_disable_blending, (float)FLAGS_alpha_pose};
     op::OpOutputToCvMat opOutputToCvMat{outputSize};
     const op::Point<int> windowedSize = outputSize;
     op::FrameDisplayer frameDisplayer{windowedSize, "OpenPose Tutorial - Example 1"};

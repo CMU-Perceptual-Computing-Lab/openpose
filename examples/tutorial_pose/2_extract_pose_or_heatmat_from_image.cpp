@@ -41,6 +41,8 @@ DEFINE_double(scale_gap,                0.3,            "Scale gap between scale
 DEFINE_int32(num_scales,                1,              "Number of scales to average.");
 // OpenPose Rendering
 DEFINE_int32(part_to_show,              19,             "Part to show from the start.");
+DEFINE_bool(disable_blending,           false,          "If blending is enabled, it will merge the results with the original frame. If disabled, it"
+                                                        " will only display the results.");
 DEFINE_double(alpha_pose,               0.6,            "Blending factor (range 0-1) for the body part rendering. 1 will show it completely, 0 will"
                                                         " hide it. Only valid for GPU rendering.");
 DEFINE_double(alpha_heatmap,            0.7,            "Blending factor (range 0-1) between heatmap and original frame. 1 will only show the"
@@ -111,7 +113,8 @@ int openPoseTutorialPose2()
     std::shared_ptr<op::PoseExtractor> poseExtractorPtr = std::make_shared<op::PoseExtractorCaffe>(netInputSize, netOutputSize, outputSize,
                                                                                                    FLAGS_num_scales, poseModel,
                                                                                                    FLAGS_model_folder, FLAGS_num_gpu_start);
-    op::PoseRenderer poseRenderer{netOutputSize, outputSize, poseModel, poseExtractorPtr, (float)FLAGS_alpha_pose, (float)FLAGS_alpha_heatmap};
+    op::PoseRenderer poseRenderer{netOutputSize, outputSize, poseModel, poseExtractorPtr, !FLAGS_disable_blending, (float)FLAGS_alpha_pose,
+                                 (float)FLAGS_alpha_heatmap};
     poseRenderer.setElementToRender(FLAGS_part_to_show);
     op::OpOutputToCvMat opOutputToCvMat{outputSize};
     const op::Point<int> windowedSize = outputSize;

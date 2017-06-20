@@ -68,3 +68,10 @@ We use standard formats (JSON, XML, PNG, JPG, ...) to save our results, so there
 <p align="center">
     <img src="media/keypoints_face.png", width="480">
 </p>
+
+
+
+## Hand Output Format
+<p align="center">
+    <img src="media/keypoints_hand.png", width="480">
+</p>
