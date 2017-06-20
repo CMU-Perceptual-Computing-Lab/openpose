@@ -98,7 +98,7 @@ error("Hands extraction is not implemented yet. COMING SOON!", __LINE__, __FUNCT
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return std::array<Array<float>, 2>{};
+            return std::array<Array<float>, 2>(); // Parentheses instead of braces to avoid error in GCC 4.8
         }
     }
 

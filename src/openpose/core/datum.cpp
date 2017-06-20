@@ -23,7 +23,7 @@ namespace op
         faceRectangles{datum.faceRectangles},
         faceKeypoints{datum.faceKeypoints},
         handRectangles{datum.handRectangles},
-        handKeypoints{datum.handKeypoints},
+        handKeypoints(datum.handKeypoints), // Parentheses instead of braces to avoid error in GCC 4.8
         // Other parameters
         scaleInputToOutput{datum.scaleInputToOutput},
         scaleNetToOutput{datum.scaleNetToOutput},
