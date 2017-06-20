@@ -191,5 +191,5 @@ namespace op
         }
     }
 
-    COMPILE_TEMPLATE_BASIC_TYPES(Rectangle);
+    COMPILE_TEMPLATE_BASIC_TYPES_STRUCT(Rectangle);
 }

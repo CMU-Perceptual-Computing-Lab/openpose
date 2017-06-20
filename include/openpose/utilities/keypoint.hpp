@@ -21,7 +21,7 @@ namespace op
 
     Rectangle<float> getKeypointsRectangle(const float* keypointPtr, const int numberKeypoints, const float threshold);
 
-    int getKeypointsArea(const float* keypointPtr, const int numberKeypoints, const float threshold);
+    float getKeypointsArea(const float* keypointPtr, const int numberKeypoints, const float threshold);
 
     int getBiggestPerson(const Array<float>& keypoints, const float threshold);
 }

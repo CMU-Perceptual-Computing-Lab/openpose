@@ -273,5 +273,5 @@ namespace op
         }
     }
 
-    COMPILE_TEMPLATE_BASIC_TYPES(Point);
+    COMPILE_TEMPLATE_BASIC_TYPES_STRUCT(Point);
 }
