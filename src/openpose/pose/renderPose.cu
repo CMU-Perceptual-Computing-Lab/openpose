@@ -263,27 +263,6 @@ namespace op
             error("Alpha must be in the range [0, 1].", __LINE__, __FUNCTION__, __FILE__);
     }
 
-    inline float getThresholdForPose(const PoseModel type)
-    {
-        try
-        {
-            if (type == PoseModel::COCO_18)
-                return 0.01f;
-            else if (type == PoseModel::MPI_15 || type == PoseModel::MPI_15_4)
-                return 0.f;
-            else
-            {
-                error("Unvalid Model", __LINE__, __FUNCTION__, __FILE__);
-                return 0.f;
-            }
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return 0.f;
-        }
-    }
-
     inline void renderPosePAFGpuAux(float* framePtr, const PoseModel poseModel, const Point<int>& frameSize,
                                     const float* const heatMapPtr, const Point<int>& heatMapSize, const float scaleToKeepRatio,
                                     const int part, const int partsToRender, const float alphaBlending)
@@ -323,14 +302,13 @@ namespace op
                 dim3 threadsPerBlock;
                 dim3 numBlocks;
                 std::tie(threadsPerBlock, numBlocks) = getNumberCudaThreadsAndBlocks(frameSize);
-                const auto threshold = getThresholdForPose(poseModel);
 
                 if (poseModel == PoseModel::COCO_18)
                     renderPoseCoco<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, 
-                                                                   threshold, googlyEyes, blendOriginalFrame, alphaBlending);
+                                                                   POSE_RENDER_THRESHOLD, googlyEyes, blendOriginalFrame, alphaBlending);
                 else if (poseModel == PoseModel::MPI_15 || poseModel == PoseModel::MPI_15_4)
                     renderPoseMpi29Parts<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.x, frameSize.y, posePtr,
-                                                                         numberPeople, threshold, blendOriginalFrame, alphaBlending);
+                                                                         numberPeople, POSE_RENDER_THRESHOLD, blendOriginalFrame, alphaBlending);
                 else
                     error("Unvalid Model.", __LINE__, __FUNCTION__, __FILE__);
                 cudaCheck(__LINE__, __FUNCTION__, __FILE__);

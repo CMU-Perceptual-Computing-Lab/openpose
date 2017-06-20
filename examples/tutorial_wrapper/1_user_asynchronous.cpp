@@ -43,7 +43,7 @@
 // Note: This command will show you flags for other unnecessary 3rdparty files. Check only the flags for the OpenPose
 // executable. E.g. for `openpose.bin`, look for `Flags from examples/openpose/openpose.cpp:`.
 // Debugging
-DEFINE_int32(logging_level,             3,              "The logging level. Integer in the range [0, 255]. 0 will output any log() message, while"
+DEFINE_int32(logging_level,             4,              "The logging level. Integer in the range [0, 255]. 0 will output any log() message, while"
                                                         " 255 will not output any. Current OpenPose library messages are in the range 0-4: 1 for"
                                                         " low priority messages and 4 for important ones.");
 // Producer
@@ -89,6 +89,13 @@ DEFINE_string(face_net_resolution,      "368x368",      "Multiples of 16. Analog
 DEFINE_bool(hand,                       false,          "Enables hand keypoint detection. It will share some parameters from the body pose, e.g."
                                                         " `model_folder`.");
 DEFINE_string(hand_net_resolution,      "368x368",      "Multiples of 16. Analogous to `net_resolution` but applied to the hand keypoint detector.");
+DEFINE_int32(hand_detection_mode,       0,              "Set to 0 to perform 1-time keypoint detection (fastest), 1 for iterative detection"
+                                                        " (recommended for images and fast videos, slow method), 2 for tracking (recommended for"
+                                                        " webcam if the frame rate is >10 FPS per GPU used and for video, in practice as fast as"
+                                                        " 1-time detection), 3 for both iterative and tracking (recommended for webcam if the"
+                                                        " resulting frame rate is still >10 FPS and for video, ideally best result but slower), or"
+                                                        " -1 (default) for automatic selection (fast method for webcam, tracking for video and"
+                                                        " iterative for images).");
 // OpenPose Rendering
 DEFINE_int32(part_to_show,              0,              "Part to show from the start.");
 DEFINE_bool(disable_blending,           false,          "If blending is enabled, it will merge the results with the original frame. If disabled, it"
@@ -164,7 +171,7 @@ public:
         // Close program when empty frame
         if (mClosed || mImageFiles.size() <= mCounter)
         {
-            op::log("Last frame read and added to queue. Closing program after it is processed.", op::Priority::Max);
+            op::log("Last frame read and added to queue. Closing program after it is processed.", op::Priority::High);
             // This funtion stops this worker, which will eventually stop the whole thread system once all the frames have been processed
             mClosed = true;
             return nullptr;
@@ -182,7 +189,7 @@ public:
             // If empty frame -> return nullptr
             if (datum.cvInputData.empty())
             {
-                op::log("Empty frame detected on path: " + mImageFiles.at(mCounter-1) + ". Closing program.", op::Priority::Max);
+                op::log("Empty frame detected on path: " + mImageFiles.at(mCounter-1) + ". Closing program.", op::Priority::High);
                 mClosed = true;
                 datumsPtr = nullptr;
             }
@@ -217,7 +224,7 @@ public:
             cv::waitKey(1); // It displays the image and sleeps at least 1 ms (it usually sleeps ~5-10 msec to display the image)
         }
         else
-            op::log("Nullptr or empty datumsPtr found.", op::Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+            op::log("Nullptr or empty datumsPtr found.", op::Priority::High, __LINE__, __FUNCTION__, __FILE__);
     }
 };
 
@@ -269,6 +276,34 @@ std::vector<op::HeatMapType> gflagToHeatMaps(const bool heatMapsAddParts, const 
     if (heatMapsAddPAFs)
         heatMapTypes.emplace_back(op::HeatMapType::PAFs);
     return heatMapTypes;
+}
+
+op::DetectionMode gflagToDetectionMode(const int handDetectionModeFlag, const std::shared_ptr<op::Producer>& producer = nullptr)
+{
+    if (handDetectionModeFlag == -1)
+    {
+        if (producer == nullptr)
+            op::error("Since there is no default producer, `hand_detection_mode` must be set.", __LINE__, __FUNCTION__, __FILE__);
+        const auto producerType = producer->getType();
+        if (producerType == op::ProducerType::Webcam)
+            return op::DetectionMode::Fast;
+        else if (producerType == op::ProducerType::ImageDirectory)
+            return op::DetectionMode::Iterative;
+        else if (producerType == op::ProducerType::Video)
+            return op::DetectionMode::Tracking;
+
+    }
+    else if (handDetectionModeFlag == 0)
+        return op::DetectionMode::Fast;
+    else if (handDetectionModeFlag == 1)
+        return op::DetectionMode::Iterative;
+    else if (handDetectionModeFlag == 2)
+        return op::DetectionMode::Tracking;
+    else if (handDetectionModeFlag == 3)
+        return op::DetectionMode::IterativeAndTracking;
+    // else
+    op::error("Undefined DetectionMode selected.", __LINE__, __FUNCTION__, __FILE__);
+    return op::DetectionMode::Fast;
 }
 
 op::RenderMode gflagToRenderMode(const int renderFlag, const int renderPoseFlag = -2)
@@ -333,7 +368,7 @@ int openPoseTutorialWrapper1()
     op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
     // op::ConfigureLog::setPriorityThreshold(op::Priority::None); // To print all logging messages
 
-    op::log("Starting pose estimation demo.", op::Priority::Max);
+    op::log("Starting pose estimation demo.", op::Priority::High);
     const auto timerBegin = std::chrono::high_resolution_clock::now();
 
     // Applying user defined configuration
@@ -359,8 +394,9 @@ int openPoseTutorialWrapper1()
     const op::WrapperStructFace wrapperStructFace{FLAGS_face, faceNetInputSize, gflagToRenderMode(FLAGS_render_face, FLAGS_render_pose),
                                                   (float)FLAGS_alpha_face, (float)FLAGS_alpha_heatmap_face};
     // Hand configuration (use op::WrapperStructHand{} to disable it)
-    const op::WrapperStructHand wrapperStructHand{FLAGS_hand, handNetInputSize, gflagToRenderMode(FLAGS_render_hand, FLAGS_render_pose),
-                                                  (float)FLAGS_alpha_hand, (float)FLAGS_alpha_heatmap_hand};
+    const op::WrapperStructHand wrapperStructHand{FLAGS_hand, handNetInputSize, gflagToDetectionMode(FLAGS_hand_detection_mode),
+                                                  gflagToRenderMode(FLAGS_render_hand, FLAGS_render_pose), (float)FLAGS_alpha_hand,
+                                                  (float)FLAGS_alpha_heatmap_hand};
     // Consumer (comment or use default argument to disable any output)
     const bool displayGui = false;
     const bool guiVerbose = false;
@@ -374,7 +410,7 @@ int openPoseTutorialWrapper1()
     // Set to single-thread running (e.g. for debugging purposes)
     // opWrapper.disableMultiThreading();
 
-    op::log("Starting thread(s)", op::Priority::Max);
+    op::log("Starting thread(s)", op::Priority::High);
     opWrapper.start();
 
     // User processing
@@ -392,18 +428,18 @@ int openPoseTutorialWrapper1()
             if (successfullyEmplaced && opWrapper.waitAndPop(datumProcessed))
                 userOutputClass.display(datumProcessed);
             else
-                op::log("Processed datum could not be emplaced.", op::Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                op::log("Processed datum could not be emplaced.", op::Priority::High, __LINE__, __FUNCTION__, __FILE__);
         }
     }
 
-    op::log("Stopping thread(s)", op::Priority::Max);
+    op::log("Stopping thread(s)", op::Priority::High);
     opWrapper.stop();
 
     // Measuring total time
     const auto now = std::chrono::high_resolution_clock::now();
     const auto totalTimeSec = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(now-timerBegin).count() * 1e-9;
     const auto message = "Real-time pose estimation demo successfully finished. Total time: " + std::to_string(totalTimeSec) + " seconds.";
-    op::log(message, op::Priority::Max);
+    op::log(message, op::Priority::High);
 
     return 0;
 }

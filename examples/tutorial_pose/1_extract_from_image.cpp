@@ -22,7 +22,7 @@
 // Note: This command will show you flags for other unnecessary 3rdparty files. Check only the flags for the OpenPose
 // executable. E.g. for `openpose.bin`, look for `Flags from examples/openpose/openpose.cpp:`.
 // Debugging
-DEFINE_int32(logging_level,             3,              "The logging level. Integer in the range [0, 255]. 0 will output any log() message, while"
+DEFINE_int32(logging_level,             4,              "The logging level. Integer in the range [0, 255]. 0 will output any log() message, while"
                                                         " 255 will not output any. Current OpenPose library messages are in the range 0-4: 1 for"
                                                         " low priority messages and 4 for important ones.");
 // Producer
@@ -91,7 +91,7 @@ std::tuple<op::Point<int>, op::Point<int>, op::Point<int>, op::PoseModel> gflags
 
 int openPoseTutorialPose1()
 {
-    op::log("OpenPose Library Tutorial - Example 1.", op::Priority::Max);
+    op::log("OpenPose Library Tutorial - Example 1.", op::Priority::High);
     // ------------------------- INITIALIZATION -------------------------
     // Step 1 - Set logging level
         // - 0 will output all the logging messages
@@ -141,7 +141,7 @@ int openPoseTutorialPose1()
     // Step 1 - Show results
     frameDisplayer.displayFrame(outputImage, 0); // Alternative: cv::imshow(outputImage) + cv::waitKey(0)
     // Step 2 - Logging information message
-    op::log("Example 1 successfully finished.", op::Priority::Max);
+    op::log("Example 1 successfully finished.", op::Priority::High);
     // Return successful message
     return 0;
 }

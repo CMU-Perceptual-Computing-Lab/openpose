@@ -27,6 +27,12 @@ namespace op
         Point<int> netInputSize;
 
         /**
+         * Whether to perform 1-time keypoint detection (fastest), iterative detection (recommended for images and fast videos, slowest method), or
+         * tracking (recommended for video and webcam, in practice as fast as 1-time detection).
+         */
+        DetectionMode detectionMode;
+
+        /**
          * Whether to render the output (pose locations, body, background or PAF heat maps) with CPU or GPU.
          * Select `None` for no rendering, `Cpu` or `Gpu` por CPU and GPU rendering respectively.
          */
@@ -50,6 +56,7 @@ namespace op
          * Since all the elements of the struct are public, they can also be manually filled.
          */
         WrapperStructHand(const bool enable = false, const Point<int>& netInputSize = Point<int>{368, 368},
+                          const DetectionMode detectionMode = DetectionMode::Fast,
                           const RenderMode renderMode = RenderMode::None,
                           const float alphaKeypoint = HAND_DEFAULT_ALPHA_KEYPOINT,
                           const float alphaHeatMap = HAND_DEFAULT_ALPHA_HEAT_MAP);

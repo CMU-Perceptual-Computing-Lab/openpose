@@ -160,7 +160,8 @@ namespace op
             datum.faceRectangles = faceRectangles;
             datum.faceKeypoints = faceKeypoints.clone();
             datum.handRectangles = datum.handRectangles;
-            datum.handKeypoints = handKeypoints.clone();
+            datum.handKeypoints[0] = handKeypoints[0].clone();
+            datum.handKeypoints[1] = handKeypoints[1].clone();
             // Other parameters
             datum.scaleInputToOutput = scaleInputToOutput;
             datum.scaleNetToOutput = scaleNetToOutput;

@@ -26,9 +26,10 @@ namespace op
     // They might be modified on running time
     const auto FACE_DEFAULT_NMS_THRESHOLD = 0.1f;
 
-    // Rendering default parameters
+    // Rendering parameters
     const auto FACE_DEFAULT_ALPHA_KEYPOINT = POSE_DEFAULT_ALPHA_KEYPOINT;
     const auto FACE_DEFAULT_ALPHA_HEAT_MAP = POSE_DEFAULT_ALPHA_HEAT_MAP;
+    const auto FACE_RENDER_THRESHOLD = 0.4f;
 }
 
 #endif // OPENPOSE_FACE_FACE_PARAMETERS_HPP

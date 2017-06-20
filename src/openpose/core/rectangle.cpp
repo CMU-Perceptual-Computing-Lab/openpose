@@ -112,6 +112,20 @@ namespace op
     }
 
     template<typename T>
+    std::string Rectangle<T>::toString() const
+    {
+        try
+        {
+            return '[' + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(width) + ", " + std::to_string(height) + ']';
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return "";
+        }
+    }
+
+    template<typename T>
     Rectangle<T>& Rectangle<T>::operator*=(const T value)
     {
         try

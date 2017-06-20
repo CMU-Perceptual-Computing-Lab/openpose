@@ -9,6 +9,8 @@
 #include "handRenderer.hpp"
 #include "renderHand.hpp"
 #include "wHandDetector.hpp"
+#include "wHandDetectorTracking.hpp"
+#include "wHandDetectorUpdate.hpp"
 #include "wHandExtractor.hpp"
 #include "wHandRenderer.hpp"
 

@@ -1,3 +1,5 @@
+#include <limits> // std::numeric_limits
+#include <opencv2/imgproc/imgproc.hpp> // cv::line, cv::circle
 #include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/keypoint.hpp>
@@ -96,7 +98,8 @@ namespace op
     }
 
     void renderKeypointsCpu(Array<float>& frameArray, const Array<float>& keypoints, const std::vector<unsigned int>& pairs,
-                            const std::vector<float> colors, const float thicknessCircleRatio, const float thicknessLineRatioWRTCircle)
+                            const std::vector<float> colors, const float thicknessCircleRatio, const float thicknessLineRatioWRTCircle,
+                            const float threshold)
     {
         try
         {
@@ -120,15 +123,15 @@ namespace op
                 // Parameters
                 const auto lineType = 8;
                 const auto shift = 0;
-                const auto threshold = 0.1;
+                const auto thresholdRectangle = 0.1;
                 const auto numberColors = colors.size();
-                const auto numberBodyParts = keypoints.getSize(1);
-                const auto areaKeypoints = numberBodyParts * keypoints.getSize(2);
+                const auto numberKeypoints = keypoints.getSize(1);
+                const auto areaKeypoints = numberKeypoints * keypoints.getSize(2);
 
                 // Keypoints
                 for (auto person = 0 ; person < keypoints.getSize(0) ; person++)
                 {
-                    const auto personRectangle = getKeypointsRectangle(&keypoints[person*areaKeypoints], keypoints.getSize(1), threshold);
+                    const auto personRectangle = getKeypointsRectangle(&keypoints[person*areaKeypoints], keypoints.getSize(1), thresholdRectangle);
                     const auto ratioAreas = fastMin(1.f, fastMax(personRectangle.width/(float)width, personRectangle.height/(float)height));
                     // Size-dependent variables
                     const auto thicknessCircle = fastMax(intRound(std::sqrt(area)*thicknessCircleRatio * ratioAreas), 2);
@@ -179,18 +182,18 @@ namespace op
         }
     }
 
-    Rectangle<unsigned int> getKeypointsRectangle(const float* keypointPtr, const int numberBodyParts, const float threshold)
+    Rectangle<float> getKeypointsRectangle(const float* keypointPtr, const int numberKeypoints, const float threshold)
     {
         try
         {
-            if (numberBodyParts < 1)
+            if (numberKeypoints < 1)
                 error("Number body parts must be > 0", __LINE__, __FUNCTION__, __FILE__);
 
-            unsigned int minX = -1;
-            unsigned int maxX = 0u;
-            unsigned int minY = -1;
-            unsigned int maxY = 0u;
-            for (auto part = 0 ; part < numberBodyParts ; part++)
+            float minX = std::numeric_limits<float>::max();
+            float maxX = 0.f;
+            float minY = minX;
+            float maxY = maxX;
+            for (auto part = 0 ; part < numberKeypoints ; part++)
             {
                 const auto score = keypointPtr[3*part + 2];
                 if (score > threshold)
@@ -209,20 +212,23 @@ namespace op
                         minY = y;
                 }
             }
-            return Rectangle<unsigned int>{minX, minY, maxX-minX, maxY-minY};
+            if (maxX >= minX && maxY >= minY)
+                return Rectangle<float>{minX, minY, maxX-minX, maxY-minY};
+            else
+                return Rectangle<float>{};
         }
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return Rectangle<unsigned int>{};
+            return Rectangle<float>{};
         }
     }
 
-    int getKeypointsArea(const float* keypointPtr, const int numberBodyParts, const float threshold)
+    int getKeypointsArea(const float* keypointPtr, const int numberKeypoints, const float threshold)
     {
         try
         {
-            return getKeypointsRectangle(keypointPtr, numberBodyParts, threshold).area();
+            return getKeypointsRectangle(keypointPtr, numberKeypoints, threshold).area();
         }
         catch (const std::exception& e)
         {
@@ -238,13 +244,13 @@ namespace op
             if (!keypoints.empty())
             {
                 const auto numberPeople = keypoints.getSize(0);
-                const auto numberBodyParts = keypoints.getSize(1);
-                const auto area = numberBodyParts * keypoints.getSize(2);
+                const auto numberKeypoints = keypoints.getSize(1);
+                const auto area = numberKeypoints * keypoints.getSize(2);
                 auto biggestPoseIndex = -1;
                 auto biggestArea = -1;
                 for (auto person = 0 ; person < numberPeople ; person++)
                 {
-                    const auto newPersonArea = getKeypointsArea(&keypoints[person*area], numberBodyParts, threshold);
+                    const auto newPersonArea = getKeypointsArea(&keypoints[person*area], numberKeypoints, threshold);
                     if (newPersonArea > biggestArea)
                     {
                         biggestArea = newPersonArea;

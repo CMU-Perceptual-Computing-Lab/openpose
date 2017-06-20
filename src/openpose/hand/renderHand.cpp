@@ -8,20 +8,19 @@ namespace op
 {
     const std::vector<float> COLORS{HAND_COLORS_RENDER};
 
-    void renderHandKeypointsCpu(Array<float>& frameArray, const Array<float>& handKeypoints)
+    void renderHandKeypointsCpu(Array<float>& frameArray, const std::array<Array<float>, 2>& handKeypoints)
     {
         try
         {
+            // Parameters
+            const auto thicknessCircleRatio = 1.f/50.f;
+            const auto thicknessLineRatioWRTCircle = 0.75f;
+            const auto& pairs = HAND_PAIRS_RENDER;
+            // Render keypoints
             if (!frameArray.empty())
-            {
-                // Parameters
-                const auto thicknessCircleRatio = 1.f/50.f;
-                const auto thicknessLineRatioWRTCircle = 0.75f;
-                const auto& pairs = HAND_PAIRS_RENDER;
-
-                // Render keypoints
-                renderKeypointsCpu(frameArray, handKeypoints, pairs, COLORS, thicknessCircleRatio, thicknessLineRatioWRTCircle);
-            }
+                renderKeypointsCpu(frameArray, handKeypoints[0], pairs, COLORS, thicknessCircleRatio, thicknessLineRatioWRTCircle, HAND_RENDER_THRESHOLD);
+            if (!frameArray.empty())
+                renderKeypointsCpu(frameArray, handKeypoints[1], pairs, COLORS, thicknessCircleRatio, thicknessLineRatioWRTCircle, HAND_RENDER_THRESHOLD);
         }
         catch (const std::exception& e)
         {

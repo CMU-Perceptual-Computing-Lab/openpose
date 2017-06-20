@@ -20,7 +20,7 @@ namespace op
                 const auto& pairs = FACE_PAIRS_RENDER;
 
                 // Render keypoints
-                renderKeypointsCpu(frameArray, faceKeypoints, pairs, COLORS, thicknessCircleRatio, thicknessLineRatioWRTCircle);
+                renderKeypointsCpu(frameArray, faceKeypoints, pairs, COLORS, thicknessCircleRatio, thicknessLineRatioWRTCircle, FACE_RENDER_THRESHOLD);
             }
         }
         catch (const std::exception& e)

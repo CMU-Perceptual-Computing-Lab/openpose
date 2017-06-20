@@ -1,23 +1,26 @@
-#ifndef OPENPOSE_CORE_W_KEYPOINT_SCALER_HPP
-#define OPENPOSE_CORE_W_KEYPOINT_SCALER_HPP
+#ifndef OPENPOSE_HAND_W_HAND_DETECTOR_UPDATE_HPP
+#define OPENPOSE_HAND_W_HAND_DETECTOR_UPDATE_HPP
 
+#include <memory> // std::shared_ptr
 #include <openpose/thread/worker.hpp>
-#include "keypointScaler.hpp"
+#include "handRenderer.hpp"
 
 namespace op
 {
     template<typename TDatums>
-    class WKeypointScaler : public Worker<TDatums>
+    class WHandDetectorUpdate : public Worker<TDatums>
     {
     public:
-        explicit WKeypointScaler(const std::shared_ptr<KeypointScaler>& keypointScaler);
+        explicit WHandDetectorUpdate(const std::shared_ptr<HandDetector>& handDetector);
 
         void initializationOnThread();
 
         void work(TDatums& tDatums);
 
     private:
-        std::shared_ptr<KeypointScaler> spKeypointScaler;
+        std::shared_ptr<HandDetector> spHandDetector;
+
+        DELETE_COPY(WHandDetectorUpdate);
     };
 }
 
@@ -33,18 +36,18 @@ namespace op
 namespace op
 {
     template<typename TDatums>
-    WKeypointScaler<TDatums>::WKeypointScaler(const std::shared_ptr<KeypointScaler>& keypointScaler) :
-        spKeypointScaler{keypointScaler}
+    WHandDetectorUpdate<TDatums>::WHandDetectorUpdate(const std::shared_ptr<HandDetector>& handDetector) :
+        spHandDetector{handDetector}
     {
     }
 
     template<typename TDatums>
-    void WKeypointScaler<TDatums>::initializationOnThread()
+    void WHandDetectorUpdate<TDatums>::initializationOnThread()
     {
     }
 
     template<typename TDatums>
-    void WKeypointScaler<TDatums>::work(TDatums& tDatums)
+    void WHandDetectorUpdate<TDatums>::work(TDatums& tDatums)
     {
         try
         {
@@ -54,12 +57,9 @@ namespace op
                 dLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 // Profiling speed
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
-                // Rescale pose data
+                // Detect people hand
                 for (auto& tDatum : *tDatums)
-                {
-                    std::vector<Array<float>> arraysToScale{tDatum.poseKeypoints, tDatum.handKeypoints[0], tDatum.handKeypoints[1], tDatum.faceKeypoints};
-                    spKeypointScaler->scale(arraysToScale, (float)tDatum.scaleInputToOutput, (float)tDatum.scaleNetToOutput, Point<int>{tDatum.cvInputData.cols, tDatum.cvInputData.rows});
-                }
+                    spHandDetector->updateTracker(tDatum.poseKeypoints, tDatum.handKeypoints);
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
                 Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__, Profiler::DEFAULT_X);
@@ -75,7 +75,7 @@ namespace op
         }
     }
 
-    COMPILE_TEMPLATE_DATUM(WKeypointScaler);
+    COMPILE_TEMPLATE_DATUM(WHandDetectorUpdate);
 }
 
-#endif // OPENPOSE_CORE_W_KEYPOINT_SCALER_HPP
+#endif // OPENPOSE_HAND_W_HAND_DETECTOR_UPDATE_HPP

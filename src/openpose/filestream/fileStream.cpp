@@ -134,7 +134,7 @@ namespace op
         }
     }
 
-    void savePoseJson(const Array<float>& pose, const std::string& fileName, const bool humanReadable)
+    void saveKeypointsJson(const Array<float>& pose, const std::string& fileName, const bool humanReadable, const std::string& keypointName)
     {
         try
         {
@@ -159,7 +159,7 @@ namespace op
             for (auto person = 0 ; person < numberPeople ; person++)
             {
                 jsonOfstream.objectOpen();
-                jsonOfstream.key("body_parts");
+                jsonOfstream.key(keypointName);
                 jsonOfstream.arrayOpen();
                 // Body parts
                 for (auto bodyPart = 0 ; bodyPart < numberBodyParts ; bodyPart++)

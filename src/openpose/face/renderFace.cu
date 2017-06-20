@@ -45,9 +45,8 @@ namespace op
         {
             if (numberFaces > 0)
             {
-                const auto threshold = 0.4f;
                 const auto numBlocks = getNumberCudaBlocks(frameSize, THREADS_PER_BLOCK);
-                renderFaceParts<<<THREADS_PER_BLOCK, numBlocks>>>(framePtr, frameSize.x, frameSize.y, facePtr, numberFaces, threshold,
+                renderFaceParts<<<THREADS_PER_BLOCK, numBlocks>>>(framePtr, frameSize.x, frameSize.y, facePtr, numberFaces, FACE_RENDER_THRESHOLD,
                                                                   alphaColorToAdd);
                 cudaCheck(__LINE__, __FUNCTION__, __FILE__);
             }

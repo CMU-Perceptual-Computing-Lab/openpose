@@ -45,12 +45,11 @@ namespace op
         {
             if (numberHands > 0)
             {
-                const auto threshold = 0.05f;
                 dim3 threadsPerBlock;
                 dim3 numBlocks;
                 std::tie(threadsPerBlock, numBlocks) = getNumberCudaThreadsAndBlocks(frameSize);
                 renderHandsParts<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.x, frameSize.y, handsPtr,
-                                                                 numberHands, threshold, alphaColorToAdd);
+                                                                 numberHands, HAND_RENDER_THRESHOLD, alphaColorToAdd);
                 cudaCheck(__LINE__, __FUNCTION__, __FILE__);
             }
         }

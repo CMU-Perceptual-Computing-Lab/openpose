@@ -93,7 +93,7 @@ namespace op
                     const auto& faceRectangle = faceRectangles.at(person);
                     // Only consider faces with a minimum pixel area
                     const auto minFaceSize = fastMin(faceRectangle.width, faceRectangle.height);
-                    // // Debugging
+                    // // Debugging -> red rectangle
                     // log(std::to_string(cvInputData.cols) + " " + std::to_string(cvInputData.rows));
                     // cv::rectangle(cvInputDataCopy,
                     //               cv::Point{(int)faceRectangle.x, (int)faceRectangle.y},
@@ -102,7 +102,7 @@ namespace op
                     // Get parts
                     if (minFaceSize > 40)
                     {
-                        // // Debugging
+                        // // Debugging -> green rectangle overwriting red one
                         // log(std::to_string(cvInputData.cols) + " " + std::to_string(cvInputData.rows));
                         // cv::rectangle(cvInputDataCopy,
                         //               cv::Point{(int)faceRectangle.x, (int)faceRectangle.y},

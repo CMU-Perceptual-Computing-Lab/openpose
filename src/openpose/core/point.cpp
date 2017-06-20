@@ -74,6 +74,20 @@ namespace op
     }
 
     template<typename T>
+    std::string Point<T>::toString() const
+    {
+        try
+        {
+            return '[' + std::to_string(x) + ", " + std::to_string(y) + ']';
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return "";
+        }
+    }
+
+    template<typename T>
     Point<T>& Point<T>::operator+=(const Point<T>& point)
     {
         try

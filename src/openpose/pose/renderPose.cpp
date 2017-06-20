@@ -29,7 +29,7 @@ namespace op
                 const auto& colors = (poseModel == PoseModel::COCO_18 ? COCO_COLORS : MPI_COLORS);
 
                 // Render keypoints
-                renderKeypointsCpu(frameArray, poseKeypoints, pairs, colors, thicknessCircleRatio, thicknessLineRatioWRTCircle);
+                renderKeypointsCpu(frameArray, poseKeypoints, pairs, colors, thicknessCircleRatio, thicknessLineRatioWRTCircle, POSE_RENDER_THRESHOLD);
             }
         }
         catch (const std::exception& e)
