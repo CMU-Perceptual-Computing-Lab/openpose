@@ -20,13 +20,15 @@ namespace op
     class HandExtractor
     {
     public:
-        explicit HandExtractor(const Point<int>& netInputSize, const Point<int>& netOutputSize, const std::string& modelFolder, const int gpuId);
+        explicit HandExtractor(const Point<int>& netInputSize, const Point<int>& netOutputSize, const std::string& modelFolder, const int gpuId,
+                               const bool iterativeDetection = false);
 
         void initializationOnThread();
 
-        void forwardPass(const std::vector<std::array<Rectangle<float>, 2>> handRectangles, const cv::Mat& cvInputData, const float scaleInputToOutput);
+        void forwardPass(const std::vector<std::array<Rectangle<float>, 2>> handRectangles, const cv::Mat& cvInputData,
+                         const float scaleInputToOutput);
 
-        Array<float> getHandKeypoints() const;
+        std::array<Array<float>, 2> getHandKeypoints() const;
 
         double get(const HandProperty property) const;
 
@@ -35,13 +37,14 @@ namespace op
         void increase(const HandProperty property, const double value);
 
     private:
+        const bool mIterativeDetection;
         const Point<int> mNetOutputSize;
         std::array<std::atomic<double>, (int)HandProperty::Size> mProperties;
         std::shared_ptr<Net> spNet;
         std::shared_ptr<ResizeAndMergeCaffe<float>> spResizeAndMergeCaffe;
         std::shared_ptr<NmsCaffe<float>> spNmsCaffe;
         Array<float> mHandImageCrop;
-        Array<float> mHandKeypoints;
+        std::array<Array<float>, 2> mHandKeypoints;
         // Init with thread
         boost::shared_ptr<caffe::Blob<float>> spCaffeNetOutputBlob;
         std::shared_ptr<caffe::Blob<float>> spHeatMapsBlob;
@@ -49,6 +52,9 @@ namespace op
         std::thread::id mThreadId;
 
         void checkThread() const;
+
+        void detectHandKeypoints(Array<float>& handCurrent, const float scaleInputToOutput, const int person, const cv::Mat& affineMatrix,
+                                 const unsigned int handPeaksOffset);
 
         DELETE_COPY(HandExtractor);
     };

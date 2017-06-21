@@ -23,7 +23,7 @@ namespace op
         faceRectangles{datum.faceRectangles},
         faceKeypoints{datum.faceKeypoints},
         handRectangles{datum.handRectangles},
-        handKeypoints{datum.handKeypoints},
+        handKeypoints(datum.handKeypoints), // Parentheses instead of braces to avoid error in GCC 4.8
         // Other parameters
         scaleInputToOutput{datum.scaleInputToOutput},
         scaleNetToOutput{datum.scaleNetToOutput},
@@ -160,7 +160,8 @@ namespace op
             datum.faceRectangles = faceRectangles;
             datum.faceKeypoints = faceKeypoints.clone();
             datum.handRectangles = datum.handRectangles;
-            datum.handKeypoints = handKeypoints.clone();
+            datum.handKeypoints[0] = handKeypoints[0].clone();
+            datum.handKeypoints[1] = handKeypoints[1].clone();
             // Other parameters
             datum.scaleInputToOutput = scaleInputToOutput;
             datum.scaleNetToOutput = scaleNetToOutput;

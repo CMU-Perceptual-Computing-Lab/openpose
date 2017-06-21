@@ -1,6 +1,7 @@
 #ifndef OPENPOSE_CORE_DATUM_HPP
 #define OPENPOSE_CORE_DATUM_HPP
 
+#include <array>
 #include <memory> // std::shared_ptr
 #include <string>
 #include <opencv2/core/core.hpp> // cv::Mat
@@ -94,11 +95,12 @@ namespace op
         std::vector<std::array<Rectangle<float>, 2>> handRectangles;
 
         /**
-         * Experimental (NOT IMPLEMENTED YET)
-         * Hands code is in development phase. Not included in this version.
-         * Size: #people's hands to render x 2 (right and left hand) x #hand parts (21) x 3 ((x,y) coordinates + score)
+         * Hand keypoints (x,y,score) locations for each person in the image.
+         * It has been resized to the same resolution as `poseKeypoints`.
+         * handKeypoints[0] corresponds to left hands, and handKeypoints[1] to right ones.
+         * Size: #people x #hand parts (20) x 3 ((x,y) coordinates + score)
          */
-        Array<float> handKeypoints;
+        std::array<Array<float>, 2> handKeypoints;
 
         // -------------------------------------------------- Other parameters -------------------------------------------------- //
         float scaleInputToOutput; /**< Scale ratio between the input Datum::cvInputData and the output Datum::cvOutputData. */

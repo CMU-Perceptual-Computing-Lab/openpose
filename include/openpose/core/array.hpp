@@ -40,7 +40,7 @@ namespace op
          * @param size Integer with the number of T element to be allocated. E.g. size = 5 is internally similar to: new T[5].
          * @param value Initial value for each component of the Array.
          */
-        explicit Array(const int size, const T value);
+        Array(const int size, const T value);
 
         /**
          * Array constructor.
@@ -48,7 +48,7 @@ namespace op
          * @param sizes Vector with the size of each dimension. E.g. size = {3, 5, 2} is internally similar to: new T[3*5*2].
          * @param value Initial value for each component of the Array.
          */
-        explicit Array(const std::vector<int>& sizes, const T value);
+        Array(const std::vector<int>& sizes, const T value);
 
         /**
          * Copy constructor.

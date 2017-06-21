@@ -22,7 +22,7 @@
 // Note: This command will show you flags for other unnecessary 3rdparty files. Check only the flags for the OpenPose
 // executable. E.g. for `openpose.bin`, look for `Flags from examples/openpose/openpose.cpp:`.
 // Debugging
-DEFINE_int32(logging_level,             3,              "The logging level. Integer in the range [0, 255]. 0 will output any log() message, while"
+DEFINE_int32(logging_level,             4,              "The logging level. Integer in the range [0, 255]. 0 will output any log() message, while"
                                                         " 255 will not output any. Current OpenPose library messages are in the range 0-4: 1 for"
                                                         " low priority messages and 4 for important ones.");
 // Producer
@@ -141,7 +141,7 @@ std::tuple<op::Point<int>, op::Point<int>, std::shared_ptr<op::Producer>> gflags
 
 int openPoseTutorialThread2()
 {
-    op::log("OpenPose Library Tutorial - Example 3.", op::Priority::Max);
+    op::log("OpenPose Library Tutorial - Example 3.", op::Priority::High);
     // ------------------------- INITIALIZATION -------------------------
     // Step 1 - Set logging level
         // - 0 will output all the logging messages
@@ -215,7 +215,7 @@ int openPoseTutorialThread2()
     // threadManager.add(threadId, wGui, queueIn++, queueOut++);               // Thread 0, queues 2 -> 3
 
     // ------------------------- STARTING AND STOPPING THREADING -------------------------
-    op::log("Starting thread(s)", op::Priority::Max);
+    op::log("Starting thread(s)", op::Priority::High);
     // Two different ways of running the program on multithread environment
         // Option a) Using the main thread (this thread) for processing (it saves 1 thread, recommended)
     threadManager.exec();  // It blocks this thread until all threads have finished
@@ -229,12 +229,12 @@ int openPoseTutorialThread2()
     // while (threadManager.isRunning())
     //     std::this_thread::sleep_for(std::chrono::milliseconds{33});
     // // Stop and join threads
-    // op::log("Stopping thread(s)", op::Priority::Max);
+    // op::log("Stopping thread(s)", op::Priority::High);
     // threadManager.stop();
 
     // ------------------------- CLOSING -------------------------
     // Logging information message
-    op::log("Example 3 successfully finished.", op::Priority::Max);
+    op::log("Example 3 successfully finished.", op::Priority::High);
     // Return successful message
     return 0;
 }

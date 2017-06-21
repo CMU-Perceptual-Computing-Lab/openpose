@@ -61,11 +61,16 @@ namespace op
                 // T* to T
                 auto& tDatumsNoPtr = *tDatums;
                 // Record people hand data in json format
-                std::vector<Array<float>> keypointVector(tDatumsNoPtr.size());
-                for (auto i = 0; i < tDatumsNoPtr.size(); i++)
-                    keypointVector[i] = tDatumsNoPtr[i].handKeypoints;
                 const auto fileName = (!tDatumsNoPtr[0].name.empty() ? tDatumsNoPtr[0].name : std::to_string(tDatumsNoPtr[0].id));
-                spKeypointJsonSaver->saveKeypoints(keypointVector, fileName, "hand");
+                std::vector<Array<float>> keypointVector(tDatumsNoPtr.size());
+                // Left hand
+                for (auto i = 0; i < tDatumsNoPtr.size(); i++)
+                    keypointVector[i] = tDatumsNoPtr[i].handKeypoints[0];
+                spKeypointJsonSaver->save(keypointVector, fileName, "hand_left_keypoints");
+                // Right hand
+                for (auto i = 0; i < tDatumsNoPtr.size(); i++)
+                    keypointVector[i] = tDatumsNoPtr[i].handKeypoints[1];
+                spKeypointJsonSaver->save(keypointVector, fileName, "hand_right_keypoints");
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
                 Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__, Profiler::DEFAULT_X);

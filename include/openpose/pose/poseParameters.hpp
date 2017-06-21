@@ -125,9 +125,10 @@ namespace op
     const std::array<unsigned int, (int)PoseModel::Size>    POSE_DEFAULT_CONNECT_MIN_SUBSET_CNT{            3,          3,          3};
     const std::array<float, (int)PoseModel::Size>           POSE_DEFAULT_CONNECT_MIN_SUBSET_SCORE{          0.4f,       0.4f,       0.4f};
 
-    // Rendering default parameters
+    // Rendering parameters
     const auto POSE_DEFAULT_ALPHA_KEYPOINT = 0.6f;
     const auto POSE_DEFAULT_ALPHA_HEAT_MAP = 0.7f;
+    const auto POSE_RENDER_THRESHOLD = 0.01f;
 
     // Auxiliary functions
     unsigned int poseBodyPartMapStringToKey(const PoseModel poseModel, const std::string& string);

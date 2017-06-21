@@ -6,7 +6,7 @@
 
 namespace op
 {
-    WebcamReader::WebcamReader(const int webcamIndex, const Point<int> webcamResolution, const double fps) :
+    WebcamReader::WebcamReader(const int webcamIndex, const Point<int>& webcamResolution, const double fps) :
         VideoCaptureReader{webcamIndex},
         mFps{fps},
         mFrameNameCounter{-1}

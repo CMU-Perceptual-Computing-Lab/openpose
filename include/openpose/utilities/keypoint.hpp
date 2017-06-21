@@ -16,11 +16,12 @@ namespace op
     void scaleKeypoints(Array<float>& keypoints, const float scaleX, const float scaleY, const float offsetX, const float offsetY);
 
     void renderKeypointsCpu(Array<float>& frameArray, const Array<float>& keypoints, const std::vector<unsigned int>& pairs,
-                            const std::vector<float> colors, const float thicknessCircleRatio, const float thicknessLineRatioWRTCircle);
+                            const std::vector<float> colors, const float thicknessCircleRatio, const float thicknessLineRatioWRTCircle,
+                            const float threshold);
 
-    Rectangle<unsigned int> getKeypointsRectangle(const float* keypointPtr, const int numberBodyParts, const float threshold);
+    Rectangle<float> getKeypointsRectangle(const float* keypointPtr, const int numberKeypoints, const float threshold);
 
-    int getKeypointsArea(const float* keypointPtr, const int numberBodyParts, const float threshold);
+    float getKeypointsArea(const float* keypointPtr, const int numberKeypoints, const float threshold);
 
     int getBiggestPerson(const Array<float>& keypoints, const float threshold);
 }

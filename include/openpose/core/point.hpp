@@ -1,6 +1,8 @@
 #ifndef OPENPOSE_CORE_POINT_HPP
 #define OPENPOSE_CORE_POINT_HPP
 
+#include <string>
+
 namespace op
 {
     template<typename T>
@@ -47,6 +49,13 @@ namespace op
         {
             return x * y;
         }
+
+        /**
+         * It returns a string with the whole Point<T> data. Useful for debugging.
+         * The format is: `[x, y]`
+         * @return A string with the Point<T> values in the above format.
+         */
+        std::string toString() const;
 
 
 
@@ -141,7 +150,6 @@ namespace op
         Point<T>& operator/=(const T value);
 
         Point<T> operator/(const T value) const;
-
     };
 }
 

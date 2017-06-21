@@ -1,3 +1,4 @@
+#include <limits> // std::numeric_limits
 #include <opencv2/opencv.hpp> // CV_WARP_INVERSE_MAP, CV_INTER_LINEAR
 #include <openpose/core/netCaffe.hpp>
 #include <openpose/hand/handParameters.hpp>
@@ -5,14 +6,18 @@
 #include <openpose/utilities/cuda.hpp>
 #include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/utilities/fastMath.hpp>
+#include <openpose/utilities/keypoint.hpp>
 #include <openpose/utilities/openCv.hpp>
 #include <openpose/hand/handExtractor.hpp>
  
 namespace op
 {
-    HandExtractor::HandExtractor(const Point<int>& netInputSize, const Point<int>& netOutputSize, const std::string& modelFolder, const int gpuId) :
+    HandExtractor::HandExtractor(const Point<int>& netInputSize, const Point<int>& netOutputSize, const std::string& modelFolder, const int gpuId,
+                                 const bool iterativeDetection) :
+        mIterativeDetection{iterativeDetection},
         mNetOutputSize{netOutputSize},
-        spNet{std::make_shared<NetCaffe>(std::array<int,4>{1, 3, mNetOutputSize.y, mNetOutputSize.x}, modelFolder + HAND_PROTOTXT, modelFolder + HAND_TRAINED_MODEL, gpuId)},
+        spNet{std::make_shared<NetCaffe>(std::array<int,4>{1, 3, mNetOutputSize.y, mNetOutputSize.x}, modelFolder + HAND_PROTOTXT,
+                                         modelFolder + HAND_TRAINED_MODEL, gpuId)},
         spResizeAndMergeCaffe{std::make_shared<ResizeAndMergeCaffe<float>>()},
         spNmsCaffe{std::make_shared<NmsCaffe<float>>()},
         mHandImageCrop{mNetOutputSize.area()*3}
@@ -67,7 +72,8 @@ error("Hands extraction is not implemented yet. COMING SOON!", __LINE__, __FUNCT
         }
     }
 
-    void HandExtractor::forwardPass(const std::vector<std::array<Rectangle<float>, 2>> handRectangles, const cv::Mat& cvInputData, const float scaleInputToOutput)
+    void HandExtractor::forwardPass(const std::vector<std::array<Rectangle<float>, 2>> handRectangles, const cv::Mat& cvInputData,
+                                    const float scaleInputToOutput)
     {
         try
         {
@@ -82,7 +88,7 @@ error("Hands extraction is not implemented yet. COMING SOON!", __LINE__, __FUNCT
         }
     }
 
-    Array<float> HandExtractor::getHandKeypoints() const
+    std::array<Array<float>, 2> HandExtractor::getHandKeypoints() const
     {
         try
         {
@@ -92,7 +98,7 @@ error("Hands extraction is not implemented yet. COMING SOON!", __LINE__, __FUNCT
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return Array<float>{};
+            return std::array<Array<float>, 2>(); // Parentheses instead of braces to avoid error in GCC 4.8
         }
     }
 
@@ -139,6 +145,24 @@ error("Hands extraction is not implemented yet. COMING SOON!", __LINE__, __FUNCT
         {
             if(mThreadId != std::this_thread::get_id())
                 error("The CPU/GPU pointer data cannot be accessed from a different thread.", __LINE__, __FUNCTION__, __FILE__);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    void HandExtractor::detectHandKeypoints(Array<float>& handCurrent, const float scaleInputToOutput, const int person,
+                                            const cv::Mat& affineMatrix, const unsigned int handPeaksOffset)
+    {
+        try
+        {
+error("Hands extraction is not implemented yet. COMING SOON!", __LINE__, __FUNCTION__, __FILE__);
+            UNUSED(handCurrent);
+            UNUSED(scaleInputToOutput);
+            UNUSED(person);
+            UNUSED(affineMatrix);
+            UNUSED(handPeaksOffset);
         }
         catch (const std::exception& e)
         {

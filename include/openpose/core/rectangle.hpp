@@ -1,6 +1,7 @@
 #ifndef OPENPOSE_CORE_RECTANGLE_HPP
 #define OPENPOSE_CORE_RECTANGLE_HPP
 
+#include <string>
 #include "point.hpp"
 
 namespace op
@@ -60,6 +61,13 @@ namespace op
         {
             return width * height;
         }
+
+        /**
+         * It returns a string with the whole Rectangle<T> data. Useful for debugging.
+         * The format is: `[x, y, width, height]`
+         * @return A string with the Rectangle<T> values in the above format.
+         */
+        std::string toString() const;
 
         // -------------------------------------------------- Basic Operators -------------------------------------------------- //
         Rectangle<T>& operator*=(const T value);

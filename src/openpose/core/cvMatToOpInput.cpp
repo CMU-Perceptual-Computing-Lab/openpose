@@ -50,7 +50,7 @@ namespace op
                 // Fill inputNetData
                 uCharCvMatToFloatPtr(inputNetData.getPtr() + i * inputNetDataOffset, frameWithNetSize, true);
                 // Fill scaleRatios
-                scaleRatios[i] = scale;
+                scaleRatios[i] = {(float)scale};
                 if (i > 0)
                     scaleRatios[i] /= scaleRatios[0];
             }

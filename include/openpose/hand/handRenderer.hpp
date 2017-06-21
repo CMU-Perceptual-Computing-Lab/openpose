@@ -1,6 +1,7 @@
 #ifndef OPENPOSE_HAND_HAND_RENDERER_HPP
 #define OPENPOSE_HAND_HAND_RENDERER_HPP
 
+#include <array>
 #include <openpose/core/array.hpp>
 #include <openpose/core/enumClasses.hpp>
 #include <openpose/core/point.hpp>
@@ -20,16 +21,16 @@ namespace op
 
         void initializationOnThread();
 
-        void renderHand(Array<float>& outputData, const Array<float>& handKeypoints);
+        void renderHand(Array<float>& outputData, const std::array<Array<float>, 2>& handKeypoints);
 
     private:
         const Point<int> mFrameSize;
         const RenderMode mRenderMode;
         float* pGpuHand; // GPU aux memory
 
-        void renderHandCpu(Array<float>& outputData, const Array<float>& handKeypoints);
+        void renderHandCpu(Array<float>& outputData, const std::array<Array<float>, 2>& handKeypoints) const;
 
-        void renderHandGpu(Array<float>& outputData, const Array<float>& handKeypoints);
+        void renderHandGpu(Array<float>& outputData, const std::array<Array<float>, 2>& handKeypoints);
 
         DELETE_COPY(HandRenderer);
     };

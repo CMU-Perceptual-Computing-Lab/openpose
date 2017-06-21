@@ -23,7 +23,7 @@ namespace op
          * @param webcamResolution const Point<int> parameter which specifies the desired camera resolution.
          * @param fps Double parameter which specifies the desired camera frame rate.
          */
-        explicit WebcamReader(const int webcamIndex = 0, const Point<int> webcamResolution = Point<int>{}, const double fps = 30.);
+        explicit WebcamReader(const int webcamIndex = 0, const Point<int>& webcamResolution = Point<int>{}, const double fps = 30.);
 
         ~WebcamReader();
 
