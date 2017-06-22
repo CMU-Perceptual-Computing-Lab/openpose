@@ -114,7 +114,7 @@ DEFINE_int32(part_to_show,              0,              "Part to show from the s
 DEFINE_bool(disable_blending,           false,          "If blending is enabled, it will merge the results with the original frame. If disabled, it"
                                                         " will only display the results.");
 // OpenPose Rendering Pose
-DEFINE_int32(render_pose,               1,              "Set to 0 for no rendering, 1 for CPU rendering (slightly faster), and 2 for GPU rendering"
+DEFINE_int32(render_pose,               2,              "Set to 0 for no rendering, 1 for CPU rendering (slightly faster), and 2 for GPU rendering"
                                                         " (slower but greater functionality, e.g. `alpha_X` flags). If rendering is enabled, it will"
                                                         " render both `outputData` and `cvOutputData` with the original image and desired body part"
                                                         " to be shown (i.e. keypoints, heat maps or PAFs).");
@@ -215,7 +215,7 @@ op::ProducerType gflagsToProducerType(const std::string& imageDirectory, const s
 }
 
 std::shared_ptr<op::Producer> gflagsToProducer(const std::string& imageDirectory, const std::string& videoPath, const int webcamIndex,
-                                               const op::Point<int> webcamResolution, const int webcamFps)
+                                               const op::Point<int> webcamResolution, const double webcamFps)
 {
     op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
     const auto type = gflagsToProducerType(imageDirectory, videoPath, webcamIndex);

@@ -227,3 +227,4 @@ If you choose to visualize a body part or a PAF (Part Affinity Field) heat map w
     2. Reduce the `--net_resolution` (e.g. to 320x176) (lower accuracy).
     3. For face, reduce the `--face_net_resolution`. The resolution 320x320 usually works pretty decently.
     4. Use the `MPI_4_layers` model (lower accuracy and lower number of parts).
+    5. Change GPU rendering by CPU rendering to get approximately +0.5 FPS (`--render_pose 1`).

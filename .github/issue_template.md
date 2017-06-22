@@ -13,6 +13,7 @@ Issues/comments that do not follow this will be **ignored or removed** with no f
 
 
 ### Executed command (if any)
+Note: add `--logging_level 0` to get higher debug information.
 
 
 
