@@ -5,6 +5,7 @@
 
 # find_package(THIRDPARTY REQUIRED)
 find_package(CUDA QUIET)
+find_package(Caffe QUIET)
 
 # 
 # Library name and options

@@ -25,7 +25,7 @@ set(DEFAULT_PROJECT_OPTIONS
     CXX_VISIBILITY_PRESET     "default"
 )
 
-find_package(Caffe REQUIRED)
+find_package(Caffe QUIET)
 
 if( ${Caffe_INCLUDE_DIRS} )
 else()

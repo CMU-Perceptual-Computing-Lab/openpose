@@ -28,12 +28,9 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 RUN pip install --upgrade pip
 
-RUN git clone https://github.com/BVLC/caffe.git && cd caffe && cat python/requirements.txt | xargs -n1 pip install \
-    && mkdir build && cd build && cmake .. && make -j"$(nproc)" all && make install && cd .. && rm -rf caffe
-RUN cp -R /caffe/build/include/caffe/proto /caffe/include/caffe
-
 RUN git clone https://github.com/chriamue/openpose
-RUN cd openpose && git checkout cmake && git pull origin cmake && rm -rf 3rdparty/caffe && mkdir -p build && cd build \
+RUN cd openpose && git checkout cmake && git pull origin cmake && cd 3rdparty/caffe && \
+    cat python/requirements.txt | xargs -n1 pip install && cd ../.. && mkdir -p build && cd build \
     && cmake -DCaffe_DIR=/caffe/build/install .. && make -j"$(nproc)"
 
 RUN cd openpose/models && ./getModels.sh
