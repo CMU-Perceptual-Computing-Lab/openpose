@@ -9,8 +9,9 @@ namespace op
     enum class PoseModel : unsigned char
     {
         COCO_18 = 0,    /**< COCO model, with 18+1 components (see poseParameters.hpp for details). */
-        MPI_15,         /**< MPI model, with 15+1 components (see poseParameters.hpp for details). */
-        MPI_15_4,       /**< Same MPI model, but reducing the number of CNN stages to 4 (see poseModel.cpp for details). It should increase speed and reduce accuracy.*/
+        MPI_15 = 1,     /**< MPI model, with 15+1 components (see poseParameters.hpp for details). */
+        MPI_15_4 = 2,   /**< Variation of the MPI model, reduced number of CNN stages to 4: faster but less accurate.*/
+        BODY_22 = 3,    /**< Experimental. Do not use. */
         Size,
     };
 

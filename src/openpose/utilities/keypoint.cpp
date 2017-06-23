@@ -123,54 +123,59 @@ namespace op
                 // Parameters
                 const auto lineType = 8;
                 const auto shift = 0;
-                const auto thresholdRectangle = 0.1f;
                 const auto numberColors = colors.size();
+                const auto thresholdRectangle = 0.1f;
                 const auto numberKeypoints = keypoints.getSize(1);
                 const auto areaKeypoints = numberKeypoints * keypoints.getSize(2);
 
                 // Keypoints
                 for (auto person = 0 ; person < keypoints.getSize(0) ; person++)
                 {
-                    const auto personRectangle = getKeypointsRectangle(&keypoints[person*areaKeypoints], keypoints.getSize(1), thresholdRectangle);
-                    const auto ratioAreas = fastMin(1.f, fastMax(personRectangle.width/(float)width, personRectangle.height/(float)height));
-                    // Size-dependent variables
-                    const auto thicknessCircle = fastMax(intRound(std::sqrt(area)*thicknessCircleRatio * ratioAreas), 2);
-                    const auto thicknessLine = intRound(thicknessCircle * thicknessLineRatioWRTCircle);
-                    const auto radius = thicknessCircle / 2;
-
-                    // Draw lines
-                    for (auto pair = 0 ; pair < pairs.size() ; pair+=2)
+                    const auto personRectangle = getKeypointsRectangle(&keypoints[person*areaKeypoints], numberKeypoints, thresholdRectangle);
+                    if (personRectangle.area() > 0)
                     {
-                        const auto index1 = (person * keypoints.getSize(1) + pairs[pair]) * keypoints.getSize(2);
-                        const auto index2 = (person * keypoints.getSize(1) + pairs[pair+1]) * keypoints.getSize(2);
-                        if (keypoints[index1+2] > threshold && keypoints[index2+2] > threshold)
+                        const auto ratioAreas = fastMin(1.f, fastMax(personRectangle.width/(float)width, personRectangle.height/(float)height));
+                        // Size-dependent variables
+                        const auto thicknessRatio = fastMax(intRound(std::sqrt(area)*thicknessCircleRatio * ratioAreas), 2);
+                        // Negative thickness in cv::circle means that a filled circle is to be drawn.
+                        const auto thicknessCircle = (ratioAreas > 0.05 ? thicknessRatio : -1);
+                        const auto thicknessLine = intRound(thicknessRatio * thicknessLineRatioWRTCircle);
+                        const auto radius = thicknessRatio / 2;
+
+                        // Draw lines
+                        for (auto pair = 0 ; pair < pairs.size() ; pair+=2)
                         {
-                            const auto colorIndex = pair/2*3;
-                            const cv::Scalar color{colors[colorIndex % numberColors],
-                                                   colors[(colorIndex+1) % numberColors],
-                                                   colors[(colorIndex+2) % numberColors]};
-                            const cv::Point keypoint1{intRound(keypoints[index1]), intRound(keypoints[index1+1])};
-                            const cv::Point keypoint2{intRound(keypoints[index2]), intRound(keypoints[index2+1])};
-                            cv::line(frameR, keypoint1, keypoint2, color[0], thicknessLine, lineType, shift);
-                            cv::line(frameG, keypoint1, keypoint2, color[1], thicknessLine, lineType, shift);
-                            cv::line(frameB, keypoint1, keypoint2, color[2], thicknessLine, lineType, shift);
+                            const auto index1 = (person * numberKeypoints + pairs[pair]) * keypoints.getSize(2);
+                            const auto index2 = (person * numberKeypoints + pairs[pair+1]) * keypoints.getSize(2);
+                            if (keypoints[index1+2] > threshold && keypoints[index2+2] > threshold)
+                            {
+                                const auto colorIndex = pair/2*3;
+                                const cv::Scalar color{colors[colorIndex % numberColors],
+                                                       colors[(colorIndex+1) % numberColors],
+                                                       colors[(colorIndex+2) % numberColors]};
+                                const cv::Point keypoint1{intRound(keypoints[index1]), intRound(keypoints[index1+1])};
+                                const cv::Point keypoint2{intRound(keypoints[index2]), intRound(keypoints[index2+1])};
+                                cv::line(frameR, keypoint1, keypoint2, color[0], thicknessLine, lineType, shift);
+                                cv::line(frameG, keypoint1, keypoint2, color[1], thicknessLine, lineType, shift);
+                                cv::line(frameB, keypoint1, keypoint2, color[2], thicknessLine, lineType, shift);
+                            }
                         }
-                    }
 
-                    // Draw circles
-                    for (auto part = 0 ; part < keypoints.getSize(1) ; part++)
-                    {
-                        const auto faceIndex = (person * keypoints.getSize(1) + part) * keypoints.getSize(2);
-                        if (keypoints[faceIndex+2] > threshold)
+                        // Draw circles
+                        for (auto part = 0 ; part < numberKeypoints ; part++)
                         {
-                            const auto colorIndex = part*3;
-                            const cv::Scalar color{colors[colorIndex % numberColors],
-                                                   colors[(colorIndex+1) % numberColors],
-                                                   colors[(colorIndex+2) % numberColors]};
-                            const cv::Point center{intRound(keypoints[faceIndex]), intRound(keypoints[faceIndex+1])};
-                            cv::circle(frameR, center, radius, color[0], thicknessCircle, lineType, shift);
-                            cv::circle(frameG, center, radius, color[1], thicknessCircle, lineType, shift);
-                            cv::circle(frameB, center, radius, color[2], thicknessCircle, lineType, shift);
+                            const auto faceIndex = (person * numberKeypoints + part) * keypoints.getSize(2);
+                            if (keypoints[faceIndex+2] > threshold)
+                            {
+                                const auto colorIndex = part*3;
+                                const cv::Scalar color{colors[colorIndex % numberColors],
+                                                       colors[(colorIndex+1) % numberColors],
+                                                       colors[(colorIndex+2) % numberColors]};
+                                const cv::Point center{intRound(keypoints[faceIndex]), intRound(keypoints[faceIndex+1])};
+                                cv::circle(frameR, center, radius, color[0], thicknessCircle, lineType, shift);
+                                cv::circle(frameG, center, radius, color[1], thicknessCircle, lineType, shift);
+                                cv::circle(frameB, center, radius, color[2], thicknessCircle, lineType, shift);
+                            }
                         }
                     }
                 }

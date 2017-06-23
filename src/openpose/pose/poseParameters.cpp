@@ -3,7 +3,9 @@
  
 namespace op
 {
-    const std::array<std::map<unsigned int, std::string>, 3>   POSE_BODY_PART_MAPPING{ POSE_COCO_BODY_PARTS,   POSE_MPI_BODY_PARTS,    POSE_MPI_BODY_PARTS };
+    const std::array<std::map<unsigned int, std::string>, (int)PoseModel::Size>   POSE_BODY_PART_MAPPING{
+        POSE_COCO_BODY_PARTS,   POSE_MPI_BODY_PARTS,    POSE_MPI_BODY_PARTS,    POSE_BODY_22_BODY_PARTS
+    };
 
     unsigned int poseBodyPartMapStringToKey(const PoseModel poseModel, const std::vector<std::string>& strings)
     {
