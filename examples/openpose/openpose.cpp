@@ -164,6 +164,8 @@ op::PoseModel gflagToPoseModel(const std::string& poseModeString)
         return op::PoseModel::MPI_15;
     else if (poseModeString == "MPI_4_layers")
         return op::PoseModel::MPI_15_4;
+    else if (poseModeString == "BODY_22")
+        return op::PoseModel::BODY_22;
     else
     {
         op::error("String does not correspond to any model (COCO, MPI, MPI_4_layers)", __LINE__, __FUNCTION__, __FILE__);
