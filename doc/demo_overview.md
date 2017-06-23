@@ -11,7 +11,7 @@ In order to learn how to use it, run `./build/examples/openpose/openpose.bin --h
 Each flag is divided into flag name, default value, and description.
 
 1. Debugging
-- DEFINE_int32(logging_level,             3,              "The logging level. Integer in the range [0, 255]. 0 will output any log() message, while 255 will not output any. Current OpenPose library messages are in the range 0-4: 1 for low priority messages and 4 for important ones.");
+- DEFINE_int32(logging_level,             4,              "The logging level. Integer in the range [0, 255]. 0 will output any log() message, while 255 will not output any. Current OpenPose library messages are in the range 0-4: 1 for low priority messages and 4 for important ones.");
 2. Producer
 - DEFINE_int32(camera,                    0,              "The camera index for cv::VideoCapture. Integer in the range [0, 9].");
 - DEFINE_string(camera_resolution,        "1280x720",     "Size of the camera frames to ask for.");
@@ -42,12 +42,13 @@ Each flag is divided into flag name, default value, and description.
 - DEFINE_string(face_net_resolution,      "368x368",      "Multiples of 16. Analogous to `net_resolution` but applied to the face keypoint detector. 320x320 usually works fine while giving a substantial speed up when multiple faces on the image.");
 6. OpenPose Hand
 - DEFINE_bool(hand,                       false,          "Enables hand keypoint detection. It will share some parameters from the body pose, e.g. `model_folder`.");
-- DEFINE_string(hand_net_resolution,      "368x368",      "Multiples of 16. Analogous to `net_resolution` but applied to the hand keypoint detector. 320x320 usually works fine while giving a substantial speed up when multiple hands on the image.");
+- DEFINE_string(hand_net_resolution,      "368x368",      "Multiples of 16. Analogous to `net_resolution` but applied to the hand keypoint detector. 320x320 usually works fine while giving a substantial speed up when multiple hands on the image.");t_resolution` but applied to the hand keypoint detector.");
+- DEFINE_int32(hand_detection_mode,       -1,             "Set to 0 to perform 1-time keypoint detection (fastest), 1 for iterative detection (recommended for images and fast videos, slow method), 2 for tracking (recommended for webcam if the frame rate is >10 FPS per GPU used and for video, in practice as fast as 1-time detection), 3 for both iterative and tracking (recommended for webcam if the resulting frame rate is still >10 FPS and for video, ideally best result but slower), or -1 (default) for automatic selection (fast method for webcam, tracking for video and iterative for images).");
 7. OpenPose Rendering
 - DEFINE_int32(part_to_show,              0,              "Part to show from the start.");
 - DEFINE_bool(disable_blending,           false,          "If blending is enabled, it will merge the results with the original frame. If disabled, it will only display the results.");
 8. OpenPose Rendering Pose
-- DEFINE_int32(render_pose,               1,              "Set to 0 for no rendering, 1 for CPU rendering (slightly faster), and 2 for GPU rendering (slower but greater functionality, e.g. `alpha_X` flags). If rendering is enabled, it will render both `outputData` and `cvOutputData` with the original image and desired body part to be shown (i.e. keypoints, heat maps or PAFs).");
+- DEFINE_int32(render_pose,               2,              "Set to 0 for no rendering, 1 for CPU rendering (slightly faster), and 2 for GPU rendering (slower but greater functionality, e.g. `alpha_X` flags). If rendering is enabled, it will render both `outputData` and `cvOutputData` with the original image and desired body part to be shown (i.e. keypoints, heat maps or PAFs).");
 - DEFINE_double(alpha_pose,               0.6,            "Blending factor (range 0-1) for the body part rendering. 1 will show it completely, 0 will hide it. Only valid for GPU rendering.");
 - DEFINE_double(alpha_heatmap,            0.7,            "Blending factor (range 0-1) between heatmap and original frame. 1 will only show the heatmap, 0 will only show the frame. Only valid for GPU rendering.");
 9. OpenPose Rendering Face
@@ -109,15 +110,63 @@ Please, in order to check all the real time pose demo options and their details,
 
 
 
+## Hands
+Very important note, use `hand_detection_mode` accordingly.
+```
+# Images
+# Fast method for speed
+./build/examples/openpose/openpose.bin --hand --hand_detection_mode 0
+# Iterative for higher accuracy
+./build/examples/openpose/openpose.bin --hand --hand_detection_mode 1
+
+# Video
+# Iterative tracking for higher accuracy
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --hand --hand_detection_mode 3
+# Tracking for speed
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --hand --hand_detection_mode 2
+
+# Webcam
+# Fast method for speed if the frame rate is low
+./build/examples/openpose/openpose.bin --hand --hand_detection_mode 0
+# Iterative for higher accuracy (but the frame rate will be reduced)
+./build/examples/openpose/openpose.bin --hand --hand_detection_mode 1
+# Tracking for higher accuracy if the frame rate is high enough. Worse results than fast method if frame rate is low
+./build/examples/openpose/openpose.bin --hand --hand_detection_mode 2
+# Iterative + tracking for best accuracy if frame rate is high enough. Worse results than fast method if frame rate is low
+./build/examples/openpose/openpose.bin --hand --hand_detection_mode 3
+```
+
+
+
+## Debugging Information
+```
+# Basic information
+./build/examples/openpose/openpose.bin --logging_level 3
+# Showing all messages
+./build/examples/openpose/openpose.bin --logging_level 0
+```
+
+
+
+## Pose + Face + Hands
+```
+./build/examples/openpose/openpose.bin --face --hand
+```
+
+
+
 ## Rendering Face without Pose
 ```
+# CPU rendering (faster)
 ./build/examples/openpose/openpose.bin --face --render_pose 0 --render_face 1
+# GPU rendering
+./build/examples/openpose/openpose.bin --face --render_pose 0 --render_face 2
 ```
 
 
 
-## Example
-The following example runs the demo video `video.avi`, renders image frames on `output/result.avi`, and outputs JSON files in `output/`. It parallelizes over 2 GPUs, GPUs 1 and 2. Note that it will skip GPU 0:
+## Basic Output Saving
+The following example runs the demo video `video.avi`, renders image frames on `output/result.avi`, and outputs JSON files in `output/`. It parallelizes over 2 GPUs, GPUs 1 and 2 (note that it will skip GPU 0):
 ```
 ./build/examples/openpose/openpose.bin --video examples/media/video.avi --num_gpu 2 --num_gpu_start 1 --write_video output/result.avi --write_keypoint_json output/
 ```
