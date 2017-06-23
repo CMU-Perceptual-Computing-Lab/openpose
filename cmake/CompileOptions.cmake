@@ -32,7 +32,7 @@ else()
 set (Caffe_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/3rdparty/caffe/include")
 endif()
 
-message( STATUS "Found Caffe: ${Caffe_INCLUDE_DIRS} ${Caffe_LIBRARIES}")
+message( STATUS "Found Caffe: ${Caffe_DIR} ${Caffe_INCLUDE_DIRS} ${Caffe_LIBRARIES}")
 
 # 
 # Include directories
