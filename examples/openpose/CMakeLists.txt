@@ -4,7 +4,6 @@
 # 
 
 # find_package(THIRDPARTY REQUIRED)
-find_package(CUDA QUIET)
 
 # 
 # Executable name and options
@@ -59,7 +58,6 @@ target_include_directories(${target}
     PRIVATE
     ${DEFAULT_INCLUDE_DIRECTORIES}
     ${PROJECT_SOURCE_DIR}/include
-    ${Caffe_INCLUDE_DIRS}
 )
 
 
@@ -70,11 +68,6 @@ target_include_directories(${target}
 target_link_libraries(${target}
     PRIVATE
     ${DEFAULT_LIBRARIES}
-    ${Caffe_LIBRARIES}
-    ${CUDA_LIBRARIES}
-    ${META_PROJECT_NAME}::core
-    ${META_PROJECT_NAME}::face
-    ${META_PROJECT_NAME}::producer
     ${META_PROJECT_NAME}::wrapper
 )
 

@@ -137,7 +137,6 @@ target_include_directories(${target}
     ${PROJECT_BINARY_DIR}/source/include
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_CURRENT_BINARY_DIR}/include
-    ${Caffe_INCLUDE_DIRS}
     
     PUBLIC
     ${DEFAULT_INCLUDE_DIRECTORIES}
@@ -158,7 +157,6 @@ target_link_libraries(${target}
 
 #    PUBLIC
     ${DEFAULT_LIBRARIES}
-    ${Caffe_LIBRARIES}
     ${cuda_libs}
     ${META_PROJECT_NAME}::utilities
 #    INTERFACE

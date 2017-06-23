@@ -5,7 +5,7 @@
 
 # find_package(THIRDPARTY REQUIRED)
 
-find_package(CUDA)
+find_package( CUDA QUIET )
 find_package( OpenCV )
 
 # 
@@ -122,10 +122,11 @@ target_include_directories(${target}
     ${PROJECT_BINARY_DIR}/source/include
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_CURRENT_BINARY_DIR}/include
-    ${Caffe_INCLUDE_DIRS}
 
     PUBLIC
     ${DEFAULT_INCLUDE_DIRECTORIES}
+    ${CUDA_INCLUDE_DIRS}
+    
     INTERFACE
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>

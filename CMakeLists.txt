@@ -141,7 +141,7 @@ if(UNIX AND SYSTEM_DIR_INSTALL)
     set(INSTALL_BIN       "bin")                    # /usr/[local]/bin
     set(INSTALL_SHARED    "lib")                    # /usr/[local]/lib
     set(INSTALL_LIB       "lib")                    # /usr/[local]/lib
-    set(INSTALL_INCLUDE   "include")                # /usr/[local]/include
+    set(INSTALL_INCLUDE   "include/${project}")     # /usr/[local]/include
     set(INSTALL_DOC       "share/doc/${project}")   # /usr/[local]/share/doc/<project>
     set(INSTALL_SHORTCUTS "share/applications")     # /usr/[local]/share/applications
     set(INSTALL_ICONS     "share/pixmaps")          # /usr/[local]/share/pixmaps
@@ -155,7 +155,7 @@ else()
     set(INSTALL_BIN       ".")                      # ./
     set(INSTALL_SHARED    "lib")                    # ./lib
     set(INSTALL_LIB       "lib")                    # ./lib
-    set(INSTALL_INCLUDE   "include")                # ./include
+    set(INSTALL_INCLUDE   "include/${project}")     # ./include
     set(INSTALL_DOC       "doc")                    # ./doc
     set(INSTALL_SHORTCUTS "misc")                   # ./misc
     set(INSTALL_ICONS     "misc")                   # ./misc
@@ -196,6 +196,7 @@ install(FILES "${PROJECT_BINARY_DIR}/VERSION" DESTINATION ${INSTALL_ROOT} COMPON
 
 # Install cmake find script for the project
 install(FILES ${META_PROJECT_NAME}-config.cmake DESTINATION ${INSTALL_ROOT} COMPONENT dev)
+install(FILES include/${META_PROJECT_NAME}/headers.hpp DESTINATION ${INSTALL_INCLUDE} COMPONENT dev)
 
 # Install the project meta files
 install(FILES LICENSE   DESTINATION ${INSTALL_ROOT} COMPONENT runtime)
