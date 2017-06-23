@@ -232,7 +232,7 @@ install(TARGETS ${target}
 
 # Header files
 install(DIRECTORY
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/${target} DESTINATION ${INSTALL_INCLUDE}
+    ${CMAKE_SOURCE_DIR}/include/${META_PROJECT_NAME}/${target} DESTINATION ${INSTALL_INCLUDE}
     COMPONENT dev
 )
 
