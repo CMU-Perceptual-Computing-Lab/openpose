@@ -39,7 +39,7 @@ add_executable(openPoseTutorialPose1
 )
 add_executable(openPoseTutorialPose2
     MACOSX_BUNDLE
-    ${openPoseTutorialPose1sources}
+    ${openPoseTutorialPose2sources}
 )
 
 # Create namespaced alias
