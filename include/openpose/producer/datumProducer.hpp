@@ -98,7 +98,7 @@ namespace op
                 checkIfTooManyConsecutiveEmptyFrames(mNumberConsecutiveEmptyFrames, datum.cvInputData.empty());
             }
             // Check producer is running
-            if (!datumProducerRunning)
+            if (!datumProducerRunning || datum.cvInputData.empty())
                 datums = nullptr;
             // Increase counter if successful image
             if (datums != nullptr)
