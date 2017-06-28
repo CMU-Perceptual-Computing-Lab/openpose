@@ -8,7 +8,7 @@
     // 1. `core` module: for the Array<float> class that the `pose` module needs
     // 2. `utilities` module: for the error & logging functions, i.e. op::error & op::log respectively
 
-// 3rdpary depencencies
+// 3rdparty dependencies
 #include <gflags/gflags.h> // DEFINE_bool, DEFINE_int32, DEFINE_int64, DEFINE_uint64, DEFINE_double, DEFINE_string
 #include <glog/logging.h> // google::InitGoogleLogging
 // OpenPose dependencies
