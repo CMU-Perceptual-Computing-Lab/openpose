@@ -149,7 +149,8 @@ namespace op
                             const auto index2 = (person * numberKeypoints + pairs[pair+1]) * keypoints.getSize(2);
                             if (keypoints[index1+2] > threshold && keypoints[index2+2] > threshold)
                             {
-                                const auto colorIndex = pair/2*3;
+                                // const auto colorIndex = pair/2*3;
+                                const auto colorIndex = pairs[pair+1]*3;
                                 const cv::Scalar color{colors[colorIndex % numberColors],
                                                        colors[(colorIndex+1) % numberColors],
                                                        colors[(colorIndex+2) % numberColors]};
