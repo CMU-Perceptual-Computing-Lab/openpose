@@ -86,7 +86,7 @@ std::tuple<op::Point<int>, op::Point<int>, op::Point<int>, op::PoseModel> gflags
     if (FLAGS_alpha_pose < 0. || FLAGS_alpha_pose > 1.)
         op::error("Alpha value for blending must be in the range [0,1].", __LINE__, __FUNCTION__, __FILE__);
     if (FLAGS_scale_gap <= 0. && FLAGS_num_scales > 1)
-        op::error("Uncompatible flag configuration: scale_gap must be greater than 0 or num_scales = 1.", __LINE__, __FUNCTION__, __FILE__);
+        op::error("Incompatible flag configuration: scale_gap must be greater than 0 or num_scales = 1.", __LINE__, __FUNCTION__, __FILE__);
     // Logging and return result
     op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
     return std::make_tuple(outputSize, netInputSize, netOutputSize, poseModel);
