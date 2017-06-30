@@ -2,6 +2,7 @@
 #define OPENPOSE_PRODUCER_WEBCAM_READER_HPP
 
 #include <atomic>
+#include <mutex>
 #include <thread>
 #include <openpose/core/point.hpp>
 #include "videoCaptureReader.hpp"
