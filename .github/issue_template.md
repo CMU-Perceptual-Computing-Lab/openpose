@@ -1,6 +1,6 @@
 ### Posting rules
 1. **No duplicated** posts.
-2. **No** posts about **questions already answered in** the **documentation** (e.g. **no more low-speed nor out-of-memory questions**).
+2. **No** posts about **questions already answered / clearly explained in** the **documentation** (e.g. **no more low-speed nor out-of-memory questions**).
 3. **Add** the **system configuration (all of it!), command and output** if you have some kind of error or performance question.
 4. Set a **proper issue title**: add the Ubuntu/Windows word and be specific (e.g. do not simple call it: `Compile error`).
 5. Only English comments.
@@ -13,6 +13,7 @@ Issues/comments that do not follow this will be **ignored or removed** with no f
 
 
 ### Executed command (if any)
+Note: add `--logging_level 0` to get higher debug information.
 
 
 

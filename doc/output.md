@@ -4,14 +4,14 @@ OpenPose Demo - Output
 
 
 ## Output Format
-There are 2 alternatives to save the **(x,y,score) body part locations**. The `write_keypoint` flag uses the OpenCV cv::FileStorage default formats (JSON, XML and YML). However, the JSON format is only available after OpenCV 3.0. Hence, `write_keypoint_json` saves the people pose data using a custom JSON writer. For the latter, each JSON file has a `people` array of objects, where each object has an array `body_parts` containing the body part locations and detection confidence formatted as `x1,y1,c1,x2,y2,c2,...`. The coordinates `x` and `y` can be normalized to the range [0,1], [-1,1], [0, source size], [0, output size], etc., depending on the flag `keypoint_scale`. In addition, `c` is the confidence in the range [0,1].
+There are 2 alternatives to save the **(x,y,score) body part locations**. The `write_keypoint` flag uses the OpenCV cv::FileStorage default formats (JSON, XML and YML). However, the JSON format is only available after OpenCV 3.0. Hence, `write_keypoint_json` saves the people pose data using a custom JSON writer. For the latter, each JSON file has a `people` array of objects, where each object has an array `pose_keypoints` containing the body part locations and detection confidence formatted as `x1,y1,c1,x2,y2,c2,...`. The coordinates `x` and `y` can be normalized to the range [0,1], [-1,1], [0, source size], [0, output size], etc., depending on the flag `keypoint_scale`. In addition, `c` is the confidence in the range [0,1].
 
 ```
 {
     "version":0.1,
     "people":[
-        {"body_parts":[1114.15,160.396,0.846207,...]},
-        {"body_parts":[...]},
+        {"pose_keypoints":[1114.15,160.396,0.846207,...]},
+        {"pose_keypoints":[...]},
     ]
 }
 ```
@@ -49,6 +49,9 @@ The saving order is body parts + background + PAFs. Any of them can be disabled 
 ```
 
 Where each index is the key value corresponding to each body part in `POSE_COCO_BODY_PARTS`, e.g., 0 for "Neck", 1 for "RShoulder", etc.
+
+### Face and Hands
+The output format is analogous for hand (`hand_left_keypoints` and `hand_right_keypoints`) and face (`face_keypoints`) JSON files.
 
 
 

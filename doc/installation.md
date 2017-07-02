@@ -112,7 +112,7 @@ You just need to remove the OpenPose folder, by default called `openpose/`. E.g.
         - In addition, open the Windows cmd (Windows button + X, then A), and install some Python libraries with this command: `pip install numpy protobuf hypothesis`.
     4. [Cmake](https://cmake.org/download/): Select the option to add it to the Windows PATH.
     5. [Ninja](https://ninja-build.org/): Select the option to add it to the Windows PATH.
-2. Download the `Windows` branch of Openpose by either cliking on `Download ZIP` on [openpose/tree/windows](https://github.com/CMU-Perceptual-Computing-Lab/openpose/tree/windows) or cloning the repository: `git clone https://github.com/CMU-Perceptual-Computing-Lab/openpose/ && git checkout windows`.
+2. Download the `Windows` branch of Openpose by either cliking on `Download ZIP` on [openpose/tree/windows](https://github.com/CMU-Perceptual-Computing-Lab/openpose/tree/windows) or cloning the repository: `git clone https://github.com/CMU-Perceptual-Computing-Lab/openpose/ && cd openpose && git checkout windows`.
 3. Install Caffe on Windows:
     1. Open the Windows cmd (Windows button + X, then A).
     2. Go to the Caffe directory, assuming OpenPose has been downloaded on `C:\openpose`: `cd C:\openpose\3rdparty\caffe\caffe-windows`.
@@ -227,3 +227,4 @@ If you choose to visualize a body part or a PAF (Part Affinity Field) heat map w
     2. Reduce the `--net_resolution` (e.g. to 320x176) (lower accuracy).
     3. For face, reduce the `--face_net_resolution`. The resolution 320x320 usually works pretty decently.
     4. Use the `MPI_4_layers` model (lower accuracy and lower number of parts).
+    5. Change GPU rendering by CPU rendering to get approximately +0.5 FPS (`--render_pose 1`).

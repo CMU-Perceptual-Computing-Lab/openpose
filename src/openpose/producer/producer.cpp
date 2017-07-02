@@ -144,7 +144,9 @@ namespace op
             // Process wrong frames
             if (frame.empty())
             {
-                log("Empty frame detected.", Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                log("Empty frame detected, frame number " + std::to_string((int)get(CV_CAP_PROP_POS_FRAMES))
+                    + " of " + std::to_string((int)get(CV_CAP_PROP_FRAME_COUNT)) + ".",
+                    Priority::Max, __LINE__, __FUNCTION__, __FILE__);
                 mNumberEmptyFrames++;
             }
             else
