@@ -10,9 +10,12 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\examples\tutorial_pose\2_extract_pose_or_heatmat_from_image.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{DF3983B6-A052-478D-9C59-B353C5F95991}</ProjectGuid>
-    <RootNamespace>OpenPoseDemo</RootNamespace>
+    <ProjectGuid>{D1E5B5FC-A447-4BCC-8024-C6B6B8061A7D}</ProjectGuid>
+    <RootNamespace>1_user_asynchronous</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -81,9 +84,6 @@
       <AdditionalDependencies>..\x64\Release\OpenPose.lib;..\..\3rdparty\lib\Release\caffe.lib;..\..\3rdparty\lib\Release\proto.lib;..\..\3rdparty\caffe\dependencies\libraries_v140_x64_py27_1.1.0\libraries\lib\boost_atomic-vc140-mt-1_61.lib;..\..\3rdparty\caffe\dependencies\libraries_v140_x64_py27_1.1.0\libraries\lib\boost_chrono-vc140-mt-1_61.lib;..\..\3rdparty\caffe\dependencies\libraries_v140_x64_py27_1.1.0\libraries\lib\boost_date_time-vc140-mt-1_61.lib;..\..\3rdparty\caffe\dependencies\libraries_v140_x64_py27_1.1.0\libraries\lib\boost_filesystem-vc140-mt-1_61.lib;..\..\3rdparty\caffe\dependencies\libraries_v140_x64_py27_1.1.0\libraries\lib\boost_python-vc140-mt-1_61.lib;..\..\3rdparty\caffe\dependencies\libraries_v140_x64_py27_1.1.0\libraries\lib\boost_system-vc140-mt-1_61.lib;..\..\3rdparty\caffe\dependencies\libraries_v140_x64_py27_1.1.0\libraries\lib\boost_thread-vc140-mt-1_61.lib;..\..\3rdparty\caffe\dependencies\libraries_v140_x64_py27_1.1.0\libraries\lib\caffehdf5.lib;..\..\3rdparty\caffe\dependencies\libraries_v140_x64_py27_1.1.0\libraries\lib\caffehdf5_hl.lib;..\..\3rdparty\caffe\dependencies\libraries_v140_x64_py27_1.1.0\libraries\lib\caffezlib.lib;..\..\3rdparty\caffe\dependencies\libraries_v140_x64_py27_1.1.0\libraries\lib\gflags.lib;..\..\3rdparty\caffe\dependencies\libraries_v140_x64_py27_1.1.0\libraries\lib\glog.lib;..\..\3rdparty\caffe\dependencies\libraries_v140_x64_py27_1.1.0\libraries\lib\leveldb.lib;..\..\3rdparty\caffe\dependencies\libraries_v140_x64_py27_1.1.0\libraries\lib\libopenblas.dll.a;..\..\3rdparty\caffe\dependencies\libraries_v140_x64_py27_1.1.0\libraries\lib\libprotobuf.lib;..\..\3rdparty\caffe\dependencies\libraries_v140_x64_py27_1.1.0\libraries\lib\lmdb.lib;..\..\3rdparty\caffe\dependencies\libraries_v140_x64_py27_1.1.0\libraries\lib\snappy_static.lib;..\..\3rdparty\caffe\dependencies\libraries_v140_x64_py27_1.1.0\libraries\x64\vc14\lib\opencv_calib3d310.lib;..\..\3rdparty\caffe\dependencies\libraries_v140_x64_py27_1.1.0\libraries\x64\vc14\lib\opencv_core310.lib;..\..\3rdparty\caffe\dependencies\libraries_v140_x64_py27_1.1.0\libraries\x64\vc14\lib\opencv_highgui310.lib;..\..\3rdparty\caffe\dependencies\libraries_v140_x64_py27_1.1.0\libraries\x64\vc14\lib\opencv_imgcodecs310.lib;..\..\3rdparty\caffe\dependencies\libraries_v140_x64_py27_1.1.0\libraries\x64\vc14\lib\opencv_imgproc310.lib;..\..\3rdparty\caffe\dependencies\libraries_v140_x64_py27_1.1.0\libraries\x64\vc14\lib\opencv_videoio310.lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0\lib\x64\cublas.lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0\lib\x64\cublas_device.lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0\lib\x64\cudart.lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0\lib\x64\cudnn.lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0\lib\x64\curand.lib;shlwapi.lib;ntdll.lib;python27.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\examples\openpose\openpose.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
