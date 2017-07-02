@@ -473,6 +473,9 @@
     <ClInclude Include="..\..\include\openpose\hand\wHandRenderer.hpp">
       <Filter>Header Files\hand</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\openpose\utilities\flagsToOpenPose.hpp">
+      <Filter>Header Files\utilities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\openpose\wrapper\defineTemplates.cpp">
@@ -675,6 +678,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\openpose\hand\renderHand.cpp">
       <Filter>Source Files\hand</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\utilities\flagsToOpenPose.cpp">
+      <Filter>Source Files\utilities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

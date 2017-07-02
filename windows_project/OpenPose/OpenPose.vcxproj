@@ -199,6 +199,7 @@
     <ClInclude Include="..\..\include\openpose\utilities\errorAndLog.hpp" />
     <ClInclude Include="..\..\include\openpose\utilities\fastMath.hpp" />
     <ClInclude Include="..\..\include\openpose\utilities\fileSystem.hpp" />
+    <ClInclude Include="..\..\include\openpose\utilities\flagsToOpenPose.hpp" />
     <ClInclude Include="..\..\include\openpose\utilities\headers.hpp" />
     <ClInclude Include="..\..\include\openpose\utilities\keypoint.hpp" />
     <ClInclude Include="..\..\include\openpose\utilities\macros.hpp" />
@@ -272,6 +273,7 @@
     <ClCompile Include="..\..\src\openpose\utilities\cuda.cpp" />
     <ClCompile Include="..\..\src\openpose\utilities\errorAndLog.cpp" />
     <ClCompile Include="..\..\src\openpose\utilities\fileSystem.cpp" />
+    <ClCompile Include="..\..\src\openpose\utilities\flagsToOpenPose.cpp" />
     <ClCompile Include="..\..\src\openpose\utilities\keypoint.cpp" />
     <ClCompile Include="..\..\src\openpose\utilities\openCv.cpp" />
     <ClCompile Include="..\..\src\openpose\utilities\profiler.cpp" />
