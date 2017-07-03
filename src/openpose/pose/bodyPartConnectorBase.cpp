@@ -288,7 +288,7 @@ namespace op
                         break;
                 }
                 else if (subsetCounter < 1)
-                    error("Bad subsetCounter. Bug in in this function if this happens.", __LINE__, __FUNCTION__, __FILE__);
+                    error("Bad subsetCounter. Bug in this function if this happens.", __LINE__, __FUNCTION__, __FILE__);
             }
 
             // Fill and return poseKeypoints
