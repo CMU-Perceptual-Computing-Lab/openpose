@@ -75,70 +75,6 @@ public:
     }
 };
 
-// Determine type of frame source
-op::ProducerType gflagsToProducerType(const std::string& imageDirectory, const std::string& videoPath, const int webcamIndex)
-{
-    op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-    // Avoid duplicates (e.g. selecting at the time camera & video)
-    if (!imageDirectory.empty() && !videoPath.empty())
-        op::error("Selected simultaneously image directory and video. Please, select only one.", __LINE__, __FUNCTION__, __FILE__);
-    else if (!imageDirectory.empty() && webcamIndex != 0)
-        op::error("Selected simultaneously image directory and webcam. Please, select only one.", __LINE__, __FUNCTION__, __FILE__);
-    else if (!videoPath.empty() && webcamIndex != 0)
-        op::error("Selected simultaneously video and webcam. Please, select only one.", __LINE__, __FUNCTION__, __FILE__);
-
-    // Get desired op::ProducerType
-    if (!imageDirectory.empty())
-        return op::ProducerType::ImageDirectory;
-    else if (!videoPath.empty())
-        return op::ProducerType::Video;
-    else
-        return op::ProducerType::Webcam;
-}
-
-std::shared_ptr<op::Producer> gflagsToProducer(const std::string& imageDirectory, const std::string& videoPath, const int webcamIndex,
-                                               const op::Point<int> webcamResolution, const int webcamFps)
-{
-    op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-    const auto type = gflagsToProducerType(imageDirectory, videoPath, webcamIndex);
-
-    if (type == op::ProducerType::ImageDirectory)
-        return std::make_shared<op::ImageDirectoryReader>(imageDirectory);
-    else if (type == op::ProducerType::Video)
-        return std::make_shared<op::VideoReader>(videoPath);
-    else if (type == op::ProducerType::Webcam)
-        return std::make_shared<op::WebcamReader>(webcamIndex, webcamResolution, webcamFps);
-    else
-    {
-        op::error("Undefined Producer selected.", __LINE__, __FUNCTION__, __FILE__);
-        return std::shared_ptr<op::Producer>{};
-    }
-}
-
-// Google flags into program variables
-std::tuple<op::Point<int>, op::Point<int>, std::shared_ptr<op::Producer>> gflagsToOpParameters()
-{
-    op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-    // cameraFrameSize
-    op::Point<int> cameraFrameSize;
-    auto nRead = sscanf(FLAGS_camera_resolution.c_str(), "%dx%d", &cameraFrameSize.x, &cameraFrameSize.y);
-    op::checkE(nRead, 2, "Error, camera resolution format (" +  FLAGS_camera_resolution + ") invalid, should be e.g., 1280x720",
-               __LINE__, __FUNCTION__, __FILE__);
-    // outputSize
-    op::Point<int> outputSize;
-    nRead = sscanf(FLAGS_resolution.c_str(), "%dx%d", &outputSize.x, &outputSize.y);
-    op::checkE(nRead, 2, "Error, camera resolution format (" +  FLAGS_camera_resolution + ") invalid, should be e.g., 1280x720",
-               __LINE__, __FUNCTION__, __FILE__);
-
-    // producerType
-    const auto producerSharedPtr = gflagsToProducer(FLAGS_image_dir, FLAGS_video, FLAGS_camera, cameraFrameSize, FLAGS_camera_fps);
-    const auto displayProducerFpsMode = (FLAGS_process_real_time ? op::ProducerFpsMode::OriginalFps : op::ProducerFpsMode::RetrievalFps);
-    producerSharedPtr->setProducerFpsMode(displayProducerFpsMode);
-
-    op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-    return std::make_tuple(cameraFrameSize, outputSize, producerSharedPtr);
-}
-
 int openPoseTutorialThread2()
 {
     op::log("OpenPose Library Tutorial - Example 3.", op::Priority::High);
@@ -149,10 +85,13 @@ int openPoseTutorialThread2()
     op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.", __LINE__, __FUNCTION__, __FILE__);
     op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
     // Step 2 - Read Google flags (user defined configuration)
-    op::Point<int> cameraFrameSize;
-    op::Point<int> outputSize;
-    std::shared_ptr<op::Producer> producerSharedPtr;
-    std::tie(cameraFrameSize, outputSize, producerSharedPtr) = gflagsToOpParameters();
+    // outputSize
+    auto outputSize = op::flagsToPoint(FLAGS_resolution, "1280x720");
+    // producerType
+    const auto producerSharedPtr = op::flagsToProducer(FLAGS_image_dir, FLAGS_video, FLAGS_camera, FLAGS_camera_resolution, FLAGS_camera_fps);
+    const auto displayProducerFpsMode = (FLAGS_process_real_time ? op::ProducerFpsMode::OriginalFps : op::ProducerFpsMode::RetrievalFps);
+    producerSharedPtr->setProducerFpsMode(displayProducerFpsMode);
+    op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
     // Step 3 - Setting producer
     auto videoSeekSharedPtr = std::make_shared<std::pair<std::atomic<bool>, std::atomic<int>>>();
     videoSeekSharedPtr->first = false;

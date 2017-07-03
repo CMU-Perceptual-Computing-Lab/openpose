@@ -42,6 +42,7 @@ namespace op
     const std::vector<unsigned int> POSE_COCO_PAIRS_RENDER  {POSE_COCO_PAIRS_RENDER_GPU};
     const std::vector<unsigned int> POSE_COCO_PAIRS         {1,2,   1,5,   2,3,   3,4,   5,6,   6,7,   1,8,   8,9,   9,10,  1,11,  11,12, 12,13,  1,0,   0,14, 14,16,  0,15, 15,17,   2,16,  5,17};
     #define POSE_COCO_COLORS_RENDER \
+        255.f,     0.f,    85.f, \
         255.f,     0.f,     0.f, \
         255.f,    85.f,     0.f, \
         255.f,   170.f,     0.f, \
@@ -55,11 +56,10 @@ namespace op
           0.f,   170.f,   255.f, \
           0.f,    85.f,   255.f, \
           0.f,     0.f,   255.f, \
-         85.f,     0.f,   255.f, \
+        255.f,     0.f,   170.f, \
         170.f,     0.f,   255.f, \
         255.f,     0.f,   255.f, \
-        255.f,     0.f,   170.f, \
-        255.f,     0.f,    85.f
+         85.f,     0.f,   255.f
     // MPI
     const std::map<unsigned int, std::string> POSE_MPI_BODY_PARTS{
         {0,  "Head"},
@@ -120,13 +120,17 @@ namespace op
         {15, "LEye"},
         {16, "REar"},
         {17, "LEar"},
+        {18, "RTest1"},
+        {19, "LTest1"},
+        {20, "RTest2"},
+        {21, "LTest2"},
         {22, "Background"},
     };
-    const unsigned int POSE_BODY_22_NUMBER_PARTS               = 2u; // Equivalent to size of std::map POSE_BODY_22_BODY_PARTS - 1 (removing background)
-    const std::vector<unsigned int> POSE_BODY_22_MAP_IDX       {35,36, 43,45};
-    #define POSE_BODY_22_PAIRS_RENDER_GPU                      {1,2,   1,5}
+    const unsigned int POSE_BODY_22_NUMBER_PARTS               = 22u; // Equivalent to size of std::map POSE_BODY_22_BODY_PARTS - 1 (removing background)
+    const std::vector<unsigned int> POSE_BODY_22_MAP_IDX       {35,36, 43,45, 37,38, 39,40, 45,46, 47,48, 23,24, 25,26, 27,28, 29,30, 31,32, 33,34, 51,52};
+    #define POSE_BODY_22_PAIRS_RENDER_GPU                      {1,2,   1,5,   2,3,   3,4,   5,6,   6,7,   1,8,   8,9,   9,10,  1,11,  11,12}
     const std::vector<unsigned int> POSE_BODY_22_PAIRS_RENDER  {POSE_BODY_22_PAIRS_RENDER_GPU};
-    const std::vector<unsigned int> POSE_BODY_22_PAIRS         {1,2};
+    const std::vector<unsigned int> POSE_BODY_22_PAIRS         {1,2,   1,5,   2,3,   3,4,   5,6,   6,7,   1,8,   8,9,   9,10,  1,11,  11,12, 12,13,  1,0};
     #define POSE_BODY_22_COLORS_RENDER \
         255.f,     0.f,     0.f, \
         255.f,    85.f,     0.f, \
