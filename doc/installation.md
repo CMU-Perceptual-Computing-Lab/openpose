@@ -126,7 +126,8 @@ You just need to remove the OpenPose folder, by default called `openpose/`. E.g.
     3. You can now compile it.
 6. Download the body pose models:
     1. Download the [COCO model (18 key-points)](http://posefs1.perception.cs.cmu.edu/Users/tsimon/Projects/coco/data/models/coco/pose_iter_440000.caffemodel) as `{openpose_folder}\models\pose\coco\pose_iter_440000.caffemodel`.
-    2. (Optionally) download the [MPI model (15 key-points, faster and less memory than COCO)](http://posefs1.perception.cs.cmu.edu/Users/tsimon/Projects/coco/data/models/mpi/pose_iter_160000.caffemodel) as `{openpose_folder}\models\pose\mpi\pose_iter_160000.caffemodel`.
+    2. Download the [face model (70 key-points)](http://posefs1.perception.cs.cmu.edu/OpenPose/models/face/pose_iter_116000.caffemodel) as `{openpose_folder}\models\face\pose_iter_116000.caffemodel`.
+    3. (Optionally) download the [MPI model (15 key-points, faster and less memory than COCO)](http://posefs1.perception.cs.cmu.edu/Users/tsimon/Projects/coco/data/models/mpi/pose_iter_160000.caffemodel) as `{openpose_folder}\models\pose\mpi\pose_iter_160000.caffemodel`.
 7. If you have a webcam connected, you can test it by pressing the F5 key or the green play icon.
 8. Otherwise, check [Quick Start](#quick-start) to verify OpenPose was properly compiled. In order to use the created exe from the command line, you have to:
     1. Copy all the DLLs located on `{openpose_folder}\3rdparty\caffe\caffe-windows\build\install\bin\` on the exe folder: `{openpose_folder}\windows_project\x64\Release`.

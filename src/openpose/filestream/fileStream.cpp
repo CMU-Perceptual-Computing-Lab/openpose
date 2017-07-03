@@ -134,15 +134,26 @@ namespace op
         }
     }
 
-    void saveKeypointsJson(const Array<float>& pose, const std::string& fileName, const bool humanReadable, const std::string& keypointName)
+    void saveKeypointsJson(const Array<float>& keypoints, const std::string& keypointName, const std::string& fileName, const bool humanReadable)
     {
         try
         {
-            if (!pose.empty() && pose.getNumberDimensions() != 3)
-                error("pose.getNumberDimensions() != 3.", __LINE__, __FUNCTION__, __FILE__);
+            saveKeypointsJson(std::vector<std::pair<Array<float>, std::string>>{std::make_pair(keypoints, keypointName)}, fileName, humanReadable);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
 
-            const auto numberPeople = pose.getSize(0);
-            const auto numberBodyParts = pose.getSize(1);
+    void saveKeypointsJson(const std::vector<std::pair<Array<float>, std::string>>& keypointVector, const std::string& fileName, const bool humanReadable)
+    {
+        try
+        {
+            // Security checks
+            for (const auto& keypointPair : keypointVector)
+                if (!keypointPair.first.empty() && keypointPair.first.getNumberDimensions() != 3 )
+                    error("keypointVector.getNumberDimensions() != 3.", __LINE__, __FUNCTION__, __FILE__);
 
             // Record frame on desired path
             JsonOfstream jsonOfstream{fileName, humanReadable};
@@ -150,30 +161,40 @@ namespace op
 
             // Version
             jsonOfstream.key("version");
-            jsonOfstream.plainText("0.1");
+            jsonOfstream.plainText("1.0");
             jsonOfstream.comma();
 
             // Bodies
             jsonOfstream.key("people");
             jsonOfstream.arrayOpen();
+
+            const auto numberPeople = (keypointVector.size() > 0 ? keypointVector[0].first.getSize(0) : 0);
             for (auto person = 0 ; person < numberPeople ; person++)
             {
                 jsonOfstream.objectOpen();
-                jsonOfstream.key(keypointName);
-                jsonOfstream.arrayOpen();
-                // Body parts
-                for (auto bodyPart = 0 ; bodyPart < numberBodyParts ; bodyPart++)
+                for (auto vectorIndex = 0 ; vectorIndex < keypointVector.size() ; vectorIndex++)
                 {
-                    const auto finalIndex = 3*(person*numberBodyParts + bodyPart);
-                    jsonOfstream.plainText(pose[finalIndex]);
-                    jsonOfstream.comma();
-                    jsonOfstream.plainText(pose[finalIndex+1]);
-                    jsonOfstream.comma();
-                    jsonOfstream.plainText(pose[finalIndex+2]);
-                    if (bodyPart < numberBodyParts-1)
+                    const auto& keypoints = keypointVector[vectorIndex].first;
+                    const auto& keypointName = keypointVector[vectorIndex].second;
+                    const auto numberBodyParts = keypoints.getSize(1);
+                    jsonOfstream.key(keypointName);
+                    jsonOfstream.arrayOpen();
+                    // Body parts
+                    for (auto bodyPart = 0 ; bodyPart < numberBodyParts ; bodyPart++)
+                    {
+                        const auto finalIndex = 3*(person*numberBodyParts + bodyPart);
+                        jsonOfstream.plainText(keypoints[finalIndex]);
+                        jsonOfstream.comma();
+                        jsonOfstream.plainText(keypoints[finalIndex+1]);
+                        jsonOfstream.comma();
+                        jsonOfstream.plainText(keypoints[finalIndex+2]);
+                        if (bodyPart < numberBodyParts-1)
+                            jsonOfstream.comma();
+                    }
+                    jsonOfstream.arrayClose();
+                    if (vectorIndex < keypointVector.size()-1)
                         jsonOfstream.comma();
                 }
-                jsonOfstream.arrayClose();
                 jsonOfstream.objectClose();
                 if (person < numberPeople-1)
                 {

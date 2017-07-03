@@ -781,11 +781,7 @@ namespace op
             if (!writeKeypointJsonCleaned.empty())
             {
                 const auto keypointJsonSaver = std::make_shared<KeypointJsonSaver>(writeKeypointJsonCleaned);
-                mOutputWs.emplace_back(std::make_shared<WPoseJsonSaver<TDatumsPtr>>(keypointJsonSaver));
-                if (wrapperStructFace.enable)
-                    mOutputWs.emplace_back(std::make_shared<WFaceJsonSaver<TDatumsPtr>>(keypointJsonSaver));
-                if (wrapperStructHand.enable)
-                    mOutputWs.emplace_back(std::make_shared<WHandJsonSaver<TDatumsPtr>>(keypointJsonSaver));
+                mOutputWs.emplace_back(std::make_shared<WKeypointJsonSaver<TDatumsPtr>>(keypointJsonSaver));
             }
             // Write people pose data on disk (COCO validation json format)
             if (!wrapperStructOutput.writeCocoJson.empty())

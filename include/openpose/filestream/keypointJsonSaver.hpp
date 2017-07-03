@@ -13,7 +13,8 @@ namespace op
     public:
         KeypointJsonSaver(const std::string& directoryPath);
 
-        void save(const std::vector<Array<float>>& keypointVector, const std::string& fileName, const std::string& keypointName) const;
+        void save(const std::vector<std::pair<Array<float>, std::string>>& keypointVector,
+                  const std::string& fileName, const bool humanReadable = true) const;
     };
 }
 

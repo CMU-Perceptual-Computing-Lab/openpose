@@ -154,7 +154,7 @@ DEFINE_string(write_heatmaps,           "",             "Directory to write heat
 DEFINE_string(write_heatmaps_format,    "png",          "File extension and format for `write_heatmaps`, analogous to `write_images_format`."
                                                         " Recommended `png` or any compressed and lossless format.");
 
-int opRealTimePoseDemo()
+int openPoseDemo()
 {
     // logging_level
     op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.", __LINE__, __FUNCTION__, __FILE__);
@@ -250,11 +250,11 @@ int opRealTimePoseDemo()
 int main(int argc, char *argv[])
 {
     // Initializing google logging (Caffe uses it for logging)
-    google::InitGoogleLogging("opRealTimePoseDemo");
+    google::InitGoogleLogging("openPoseDemo");
 
     // Parsing command line flags
     gflags::ParseCommandLineFlags(&argc, &argv, true);
 
-    // Running opRealTimePoseDemo
-    return opRealTimePoseDemo();
+    // Running openPoseDemo
+    return openPoseDemo();
 }

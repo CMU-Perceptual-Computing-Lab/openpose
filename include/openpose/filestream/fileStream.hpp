@@ -22,7 +22,10 @@ namespace op
     cv::Mat loadData(const std::string& cvMatName, const std::string& fileNameNoExtension, const DataFormat format);
 
     // Json - Saving as *.json not available in OpenCV verions < 3.0, this function is a quick fix
-    void saveKeypointsJson(const Array<float>& pose, const std::string& fileName, const bool humanReadable, const std::string& keypointName);
+    void saveKeypointsJson(const Array<float>& keypoints, const std::string& keypointName, const std::string& fileName, const bool humanReadable);
+
+    // It will save a bunch of Array<float> elements
+    void saveKeypointsJson(const std::vector<std::pair<Array<float>, std::string>>& keypointVector, const std::string& fileName, const bool humanReadable);
 
     // Save/load image
     void saveImage(const cv::Mat& cvMat, const std::string& fullFilePath, const std::vector<int>& openCvCompressionParams = {CV_IMWRITE_JPEG_QUALITY, 100, CV_IMWRITE_PNG_COMPRESSION, 9});
