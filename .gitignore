@@ -121,3 +121,5 @@ html/
 *validation.sh
 validation*.sh
 output*/
+
+cmake-build-debug
