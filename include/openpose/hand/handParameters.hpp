@@ -1,7 +1,6 @@
 #ifndef OPENPOSE_HAND_HAND_PARAMETERS_HPP
 #define OPENPOSE_HAND_HAND_PARAMETERS_HPP
 
-#include "enumClasses.hpp"
 #include <openpose/pose/poseParameters.hpp>
 
 namespace op
@@ -36,13 +35,8 @@ namespace op
 
     // Constant parameters
     const auto HAND_CCN_DECREASE_FACTOR = 8.f;
-    const auto HAND_MAX_PEAKS = 64u;
     const std::string HAND_PROTOTXT{"hand/pose_deploy.prototxt"};
     const std::string HAND_TRAINED_MODEL{"hand/pose_iter_120000.caffemodel"};
-
-    // Default Model Parameters
-    // They might be modified on running time
-    const auto HAND_DEFAULT_NMS_THRESHOLD = 0.1f;
 
     // Rendering parameters
     const auto HAND_DEFAULT_ALPHA_KEYPOINT = POSE_DEFAULT_ALPHA_KEYPOINT;

@@ -8,12 +8,11 @@
 #include <opencv2/core/core.hpp> // cv::Mat
 #include <openpose/core/array.hpp>
 #include <openpose/core/point.hpp>
+#include <openpose/core/maximumCaffe.hpp>
 #include <openpose/core/net.hpp>
-#include <openpose/core/nmsCaffe.hpp>
 #include <openpose/core/rectangle.hpp>
 #include <openpose/core/resizeAndMergeCaffe.hpp>
 #include <openpose/utilities/macros.hpp>
-#include "enumClasses.hpp"
 
 namespace op
 {
@@ -30,19 +29,12 @@ namespace op
 
         std::array<Array<float>, 2> getHandKeypoints() const;
 
-        double get(const HandProperty property) const;
-
-        void set(const HandProperty property, const double value);
-
-        void increase(const HandProperty property, const double value);
-
     private:
         const bool mIterativeDetection;
         const Point<int> mNetOutputSize;
-        std::array<std::atomic<double>, (int)HandProperty::Size> mProperties;
         std::shared_ptr<Net> spNet;
         std::shared_ptr<ResizeAndMergeCaffe<float>> spResizeAndMergeCaffe;
-        std::shared_ptr<NmsCaffe<float>> spNmsCaffe;
+        std::shared_ptr<MaximumCaffe<float>> spMaximumCaffe;
         Array<float> mHandImageCrop;
         std::array<Array<float>, 2> mHandKeypoints;
         // Init with thread
@@ -53,8 +45,7 @@ namespace op
 
         void checkThread() const;
 
-        void detectHandKeypoints(Array<float>& handCurrent, const float scaleInputToOutput, const int person, const cv::Mat& affineMatrix,
-                                 const unsigned int handPeaksOffset);
+        void detectHandKeypoints(Array<float>& handCurrent, const float scaleInputToOutput, const int person, const cv::Mat& affineMatrix);
 
         DELETE_COPY(HandExtractor);
     };

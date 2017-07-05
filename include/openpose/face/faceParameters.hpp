@@ -1,7 +1,6 @@
 #ifndef OPENPOSE_FACE_FACE_PARAMETERS_HPP
 #define OPENPOSE_FACE_FACE_PARAMETERS_HPP
 
-#include "enumClasses.hpp"
 #include <openpose/pose/poseParameters.hpp>
 
 namespace op
@@ -18,13 +17,8 @@ namespace op
 
     // Constant parameters
     const auto FACE_CCN_DECREASE_FACTOR = 8.f;
-    const auto FACE_MAX_PEAKS = 64u;
     const std::string FACE_PROTOTXT{"face/pose_deploy.prototxt"};
     const std::string FACE_TRAINED_MODEL{"face/pose_iter_116000.caffemodel"};
-
-    // Default Model Parameters
-    // They might be modified on running time
-    const auto FACE_DEFAULT_NMS_THRESHOLD = 0.1f;
 
     // Rendering parameters
     const auto FACE_DEFAULT_ALPHA_KEYPOINT = POSE_DEFAULT_ALPHA_KEYPOINT;

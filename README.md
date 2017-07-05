@@ -18,7 +18,7 @@ OpenPose is a **library for real-time multi-person keypoint detection and multi-
 
 OpenPose represents the **first real-time system to jointly detect human body, hand and facial keypoints (in total 130 keypoints) on single images**. In addition, the system computational performance on body keypoint estimation is invariant to the number of detected people in the image.
 
-OpenPose is freely available for free non-commercial use, and may be redistributed under these conditions. Please, see the [license](LICENSE) for further details. Contact us for commercial purposes.
+OpenPose is freely available for free non-commercial use, and may be redistributed under these conditions. Please, see the [license](LICENSE) for further details. Contact [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/) for commercial purposes.
 
 
 
@@ -77,7 +77,7 @@ The pose estimation work is based on the C++ code from [the ECCV 2016 demo](http
     2. [OpenPose Wrapper](#openpose-wrapper)
     3. [OpenPose Library](#openpose-library)
 4. [Output](#output)
-5. [OpenPose Benchmark](#openpose-benchmark)
+5. [Speed Up Openpose And Benchmark](#speed-up-openpose-and-benchmark)
 6. [Send Us Your Feedback!](#send-us-your-feedback)
 7. [Citation](#citation)
 8. [Other Contributors](#other-contributors)
@@ -191,6 +191,4 @@ Please cite the papers in your publications if it helps your research:
 
 
 ## Other Contributors
-We would like to thank the following people who also contributed to OpenPose:
-
-1. [Helen Medina](https://github.com/helen-medina): For moving OpenPose to Windows (Visual Studio), making it work there and creating the Windows branch.
+We would like to thank all the people who helped OpenPose in any way. The main contributors are listed in [doc/contributors.md](doc/contributors.md).

@@ -118,6 +118,4 @@ html/
 *.mov
 
 ######################### Validation Scripts & Testing #########################
-*validation.sh
-validation*.sh
 output*/

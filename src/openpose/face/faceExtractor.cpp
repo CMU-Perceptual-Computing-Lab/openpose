@@ -16,7 +16,7 @@ namespace op
         spNet{std::make_shared<NetCaffe>(std::array<int,4>{1, 3, mNetOutputSize.y, mNetOutputSize.x}, modelFolder + FACE_PROTOTXT,
                                          modelFolder + FACE_TRAINED_MODEL, gpuId)},
         spResizeAndMergeCaffe{std::make_shared<ResizeAndMergeCaffe<float>>()},
-        spNmsCaffe{std::make_shared<NmsCaffe<float>>()},
+        spMaximumCaffe{std::make_shared<MaximumCaffe<float>>()},
         mFaceImageCrop{mNetOutputSize.area()*3}
     {
         try
@@ -24,10 +24,6 @@ namespace op
             checkE(netOutputSize.x, netInputSize.x, "Net input and output size must be equal.", __LINE__, __FUNCTION__, __FILE__);
             checkE(netOutputSize.y, netInputSize.y, "Net input and output size must be equal.", __LINE__, __FUNCTION__, __FILE__);
             checkE(netInputSize.x, netInputSize.y, "Net input size must be squared.", __LINE__, __FUNCTION__, __FILE__);
-            // Properties
-            for (auto& property : mProperties)
-                property = 0.;
-            mProperties[(int)FaceProperty::NMSThreshold] = FACE_DEFAULT_NMS_THRESHOLD;
         }
         catch (const std::exception& e)
         {
@@ -57,7 +53,7 @@ namespace op
  
             // Pose extractor blob and layer
             spPeaksBlob = {std::make_shared<caffe::Blob<float>>(1,1,1,1)};
-            spNmsCaffe->Reshape({spHeatMapsBlob.get()}, {spPeaksBlob.get()}, FACE_MAX_PEAKS, FACE_NUMBER_PARTS+1);
+            spMaximumCaffe->Reshape({spHeatMapsBlob.get()}, {spPeaksBlob.get()});
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
  
             log("Finished initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
@@ -142,49 +138,28 @@ namespace op
                         #endif
      
                         // 3. Get peaks by Non-Maximum Suppression
-                        spNmsCaffe->setThreshold((float)get(FaceProperty::NMSThreshold));
                         #ifndef CPU_ONLY
-                            spNmsCaffe->Forward_gpu({spHeatMapsBlob.get()}, {spPeaksBlob.get()});
+                            spMaximumCaffe->Forward_gpu({spHeatMapsBlob.get()}, {spPeaksBlob.get()});
                             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
                         #else
-                            spNmsCaffe->Forward_cpu({spHeatMapsBlob.get()}, {spPeaksBlob.get()});
+                            spMaximumCaffe->Forward_cpu({spHeatMapsBlob.get()}, {spPeaksBlob.get()});
                         #endif
      
                         const auto* facePeaksPtr = spPeaksBlob->mutable_cpu_data();
-                        const auto facePeaksOffset = (FACE_MAX_PEAKS+1) * 3;
-
                         for (auto part = 0 ; part < mFaceKeypoints.getSize(1) ; part++)
                         {
-                            // Get max peak
-                            const int numPeaks = intRound(facePeaksPtr[facePeaksOffset*part]);
-                            auto maxScore = -1.f;
-                            auto maxPeak = -1;
-                            for (auto peak = 0 ; peak < numPeaks ; peak++)
-                            {
-                                const auto xyIndex = facePeaksOffset * part + (1 + peak) * 3;
-                                const auto score = facePeaksPtr[xyIndex + 2];
-                                if (score > maxScore)
-                                {
-                                    maxScore = score;
-                                    maxPeak = peak;
-                                }
-                            }
-                            // Fill face keypoints
-                            if (maxPeak >= 0)
-                            {
-                                const auto xyIndex = facePeaksOffset * part + (1 + maxPeak) * 3;
-                                const auto x = facePeaksPtr[xyIndex];
-                                const auto y = facePeaksPtr[xyIndex + 1];
-                                const auto score = facePeaksPtr[xyIndex + 2];
-                                const auto baseIndex = mFaceKeypoints.getSize(2) * (person * mFaceKeypoints.getSize(1) + part);
-                                mFaceKeypoints[baseIndex] = (float)(scaleInputToOutput * (Mscaling.at<double>(0,0) * x
-                                                                                          + Mscaling.at<double>(0,1) * y
-                                                                                          + Mscaling.at<double>(0,2)));
-                                mFaceKeypoints[baseIndex+1] = (float)(scaleInputToOutput * (Mscaling.at<double>(1,0) * x
-                                                                                          + Mscaling.at<double>(1,1) * y
-                                                                                          + Mscaling.at<double>(1,2)));
-                                mFaceKeypoints[baseIndex+2] = score;
-                            }
+                            const auto xyIndex = part * mFaceKeypoints.getSize(2);
+                            const auto x = facePeaksPtr[xyIndex];
+                            const auto y = facePeaksPtr[xyIndex + 1];
+                            const auto score = facePeaksPtr[xyIndex + 2];
+                            const auto baseIndex = mFaceKeypoints.getSize(2) * (part + person * mFaceKeypoints.getSize(1));
+                            mFaceKeypoints[baseIndex] = (float)(scaleInputToOutput * (Mscaling.at<double>(0,0) * x
+                                                                                      + Mscaling.at<double>(0,1) * y
+                                                                                      + Mscaling.at<double>(0,2)));
+                            mFaceKeypoints[baseIndex+1] = (float)(scaleInputToOutput * (Mscaling.at<double>(1,0) * x
+                                                                                      + Mscaling.at<double>(1,1) * y
+                                                                                      + Mscaling.at<double>(1,2)));
+                            mFaceKeypoints[baseIndex+2] = score;
                         }
                     }
                 }
@@ -211,43 +186,6 @@ namespace op
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             return Array<float>{};
-        }
-    }
-
-    double FaceExtractor::get(const FaceProperty property) const
-    {
-        try
-        {
-            return mProperties.at((int)property);
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return 0.;
-        }
-    }
-
-    void FaceExtractor::set(const FaceProperty property, const double value)
-    {
-        try
-        {
-            mProperties.at((int)property) = {value};
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-        }
-    }
-
-    void FaceExtractor::increase(const FaceProperty property, const double value)
-    {
-        try
-        {
-            mProperties[(int)property] = mProperties.at((int)property) + value;
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
     }
 

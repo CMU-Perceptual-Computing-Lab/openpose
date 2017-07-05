@@ -7,11 +7,10 @@
 #include <thread>
 #include <opencv2/core/core.hpp> // cv::Mat
 #include <openpose/core/array.hpp>
+#include <openpose/core/maximumCaffe.hpp>
 #include <openpose/core/net.hpp>
-#include <openpose/core/nmsCaffe.hpp>
 #include <openpose/core/rectangle.hpp>
 #include <openpose/core/resizeAndMergeCaffe.hpp>
-#include "enumClasses.hpp"
 
 namespace op
 {
@@ -26,19 +25,12 @@ namespace op
 
         Array<float> getFaceKeypoints() const;
 
-        double get(const FaceProperty property) const;
-
-        void set(const FaceProperty property, const double value);
-
-        void increase(const FaceProperty property, const double value);
-
     private:
         const Point<int> mNetOutputSize;
         const Point<int> mOutputSize;
-        std::array<std::atomic<double>, (int)FaceProperty::Size> mProperties;
         std::shared_ptr<Net> spNet;
         std::shared_ptr<ResizeAndMergeCaffe<float>> spResizeAndMergeCaffe;
-        std::shared_ptr<NmsCaffe<float>> spNmsCaffe;
+        std::shared_ptr<MaximumCaffe<float>> spMaximumCaffe;
         Array<float> mFaceImageCrop;
         Array<float> mFaceKeypoints;
         // Init with thread

@@ -16,7 +16,6 @@
 // This file should only be used for the user to take specific examples.
 
 // C++ std library dependencies
-#include <atomic>
 #include <chrono> // `std::chrono::` functions and classes, e.g. std::chrono::milliseconds
 #include <string>
 #include <thread> // std::this_thread
@@ -187,10 +186,12 @@ int openPoseDemo()
     op::log("Configuring OpenPose wrapper.", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
     op::Wrapper<std::vector<op::Datum>> opWrapper;
     // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
-    const op::WrapperStructPose wrapperStructPose{netInputSize, outputSize, keypointScale, FLAGS_num_gpu, FLAGS_num_gpu_start,
-                                                  FLAGS_num_scales, (float)FLAGS_scale_gap, op::flagsToRenderMode(FLAGS_render_pose), poseModel,
-                                                  !FLAGS_disable_blending, (float)FLAGS_alpha_pose, (float)FLAGS_alpha_heatmap,
-                                                  FLAGS_part_to_show, FLAGS_model_folder, heatMapTypes, op::ScaleMode::UnsignedChar};
+    const op::WrapperStructPose wrapperStructPose{netInputSize, outputSize, keypointScale, FLAGS_num_gpu,
+                                                  FLAGS_num_gpu_start, FLAGS_num_scales, (float)FLAGS_scale_gap,
+                                                  op::flagsToRenderMode(FLAGS_render_pose), poseModel,
+                                                  !FLAGS_disable_blending, (float)FLAGS_alpha_pose,
+                                                  (float)FLAGS_alpha_heatmap, FLAGS_part_to_show, FLAGS_model_folder,
+                                                  heatMapTypes, op::ScaleMode::UnsignedChar};
     // Face configuration (use op::WrapperStructFace{} to disable it)
     const op::WrapperStructFace wrapperStructFace{FLAGS_face, faceNetInputSize, op::flagsToRenderMode(FLAGS_render_face, FLAGS_render_pose),
                                                   (float)FLAGS_alpha_face, (float)FLAGS_alpha_heatmap_face};

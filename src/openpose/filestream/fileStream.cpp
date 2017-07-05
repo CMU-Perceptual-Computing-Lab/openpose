@@ -1,5 +1,9 @@
+#include <fstream> // std::ifstream
 #include <opencv2/highgui/highgui.hpp> // cv::imread
 #include <openpose/utilities/errorAndLog.hpp>
+#include <openpose/utilities/fastMath.hpp>
+#include <openpose/utilities/fileSystem.hpp>
+#include <openpose/utilities/string.hpp>
 #include <openpose/filestream/jsonOfstream.hpp>
 #include <openpose/filestream/fileStream.hpp>
 
@@ -154,21 +158,20 @@ namespace op
             for (const auto& keypointPair : keypointVector)
                 if (!keypointPair.first.empty() && keypointPair.first.getNumberDimensions() != 3 )
                     error("keypointVector.getNumberDimensions() != 3.", __LINE__, __FUNCTION__, __FILE__);
-
             // Record frame on desired path
             JsonOfstream jsonOfstream{fileName, humanReadable};
             jsonOfstream.objectOpen();
-
             // Version
             jsonOfstream.key("version");
             jsonOfstream.plainText("1.0");
             jsonOfstream.comma();
-
             // Bodies
             jsonOfstream.key("people");
             jsonOfstream.arrayOpen();
-
-            const auto numberPeople = (keypointVector.size() > 0 ? keypointVector[0].first.getSize(0) : 0);
+            // Ger max numberPeople
+            auto numberPeople = 0;
+            for (auto vectorIndex = 0 ; vectorIndex < keypointVector.size() ; vectorIndex++)
+                numberPeople = fastMax(numberPeople, keypointVector[vectorIndex].first.getSize(0));
             for (auto person = 0 ; person < numberPeople ; person++)
             {
                 jsonOfstream.objectOpen();
@@ -202,8 +205,9 @@ namespace op
                     jsonOfstream.enter();
                 }
             }
+            // Close array
             jsonOfstream.arrayClose();
-
+            // Close object
             jsonOfstream.objectClose();
         }
         catch (const std::exception& e)
@@ -238,6 +242,46 @@ namespace op
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             return cv::Mat{};
+        }
+    }
+
+    std::vector<std::array<Rectangle<float>, 2>> loadHandDetectorTxt(const std::string& txtFilePath)
+    {
+        try
+        {
+            std::vector<std::array<Rectangle<float>, 2>> handRectangles;
+
+            std::string line;
+            std::ifstream jsonFile{txtFilePath};
+            if (jsonFile.is_open())
+            {
+                while (std::getline(jsonFile, line))
+                {
+                    const auto splittedStrings = splitString(line, " ");
+                    std::vector<float> splittedInts;
+                    for (auto splittedString : splittedStrings)
+                        splittedInts.emplace_back(std::stof(splittedString));
+                    if (splittedInts.size() != 4)
+                        error("splittedInts.size() != 4, but splittedInts.size() = "
+                              + std::to_string(splittedInts.size()) + ".", __LINE__, __FUNCTION__, __FILE__);
+                    const Rectangle<float> handRectangleZero;
+                    const Rectangle<float> handRectangle{splittedInts[0], splittedInts[1], splittedInts[2], splittedInts[3]};
+                    if (getFileNameNoExtension(txtFilePath).back() == 'l')
+                        handRectangles.emplace_back(std::array<Rectangle<float>, 2>{handRectangle, handRectangleZero});
+                    else
+                        handRectangles.emplace_back(std::array<Rectangle<float>, 2>{handRectangleZero, handRectangle});
+                }
+                jsonFile.close();
+            }
+            else
+                error("Unable to open file " + txtFilePath + ".", __LINE__, __FUNCTION__, __FILE__);
+
+            return handRectangles;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return {};
         }
     }
 }
