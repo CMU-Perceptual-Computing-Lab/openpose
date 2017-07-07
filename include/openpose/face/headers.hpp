@@ -2,7 +2,6 @@
 #define OPENPOSE_FACE_HEADERS_HPP
 
 // face module
-#include "enumClasses.hpp"
 #include "faceDetector.hpp"
 #include "faceExtractor.hpp"
 #include "faceParameters.hpp"

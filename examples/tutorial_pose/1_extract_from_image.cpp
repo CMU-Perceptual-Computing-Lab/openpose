@@ -45,50 +45,6 @@ DEFINE_bool(disable_blending,           false,          "If blending is enabled,
 DEFINE_double(alpha_pose,               0.6,            "Blending factor (range 0-1) for the body part rendering. 1 will show it completely, 0 will"
                                                         " hide it. Only valid for GPU rendering.");
 
-op::PoseModel gflagToPoseModel(const std::string& poseModeString)
-{
-    op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-    if (poseModeString == "COCO")
-        return op::PoseModel::COCO_18;
-    else if (poseModeString == "MPI")
-        return op::PoseModel::MPI_15;
-    else if (poseModeString == "MPI_4_layers")
-        return op::PoseModel::MPI_15_4;
-    else
-    {
-        op::error("String does not correspond to any model (COCO, MPI, MPI_4_layers)", __LINE__, __FUNCTION__, __FILE__);
-        return op::PoseModel::COCO_18;
-    }
-}
-
-// Google flags into program variables
-std::tuple<op::Point<int>, op::Point<int>, op::Point<int>, op::PoseModel> gflagsToOpParameters()
-{
-    op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-    // outputSize
-    op::Point<int> outputSize;
-    auto nRead = sscanf(FLAGS_resolution.c_str(), "%dx%d", &outputSize.x, &outputSize.y);
-    op::checkE(nRead, 2, "Error, resolution format (" +  FLAGS_resolution + ") invalid, should be e.g., 960x540 ",
-               __LINE__, __FUNCTION__, __FILE__);
-    // netInputSize
-    op::Point<int> netInputSize;
-    nRead = sscanf(FLAGS_net_resolution.c_str(), "%dx%d", &netInputSize.x, &netInputSize.y);
-    op::checkE(nRead, 2, "Error, net resolution format (" +  FLAGS_net_resolution + ") invalid, should be e.g., 656x368 (multiples of 16)",
-               __LINE__, __FUNCTION__, __FILE__);
-    // netOutputSize
-    const auto netOutputSize = netInputSize;
-    // poseModel
-    const auto poseModel = gflagToPoseModel(FLAGS_model_pose);
-    // Check no contradictory flags enabled
-    if (FLAGS_alpha_pose < 0. || FLAGS_alpha_pose > 1.)
-        op::error("Alpha value for blending must be in the range [0,1].", __LINE__, __FUNCTION__, __FILE__);
-    if (FLAGS_scale_gap <= 0. && FLAGS_num_scales > 1)
-        op::error("Uncompatible flag configuration: scale_gap must be greater than 0 or num_scales = 1.", __LINE__, __FUNCTION__, __FILE__);
-    // Logging and return result
-    op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-    return std::make_tuple(outputSize, netInputSize, netOutputSize, poseModel);
-}
-
 int openPoseTutorialPose1()
 {
     op::log("OpenPose Library Tutorial - Example 1.", op::Priority::High);
@@ -98,12 +54,23 @@ int openPoseTutorialPose1()
         // - 255 will output nothing
     op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.", __LINE__, __FUNCTION__, __FILE__);
     op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
+    op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
     // Step 2 - Read Google flags (user defined configuration)
-    op::Point<int> outputSize;
-    op::Point<int> netInputSize;
-    op::Point<int> netOutputSize;
-    op::PoseModel poseModel;
-    std::tie(outputSize, netInputSize, netOutputSize, poseModel) = gflagsToOpParameters();
+    // outputSize
+    const auto outputSize = op::flagsToPoint(FLAGS_resolution, "1280x720");
+    // netInputSize
+    const auto netInputSize = op::flagsToPoint(FLAGS_net_resolution, "656x368");
+    // netOutputSize
+    const auto netOutputSize = netInputSize;
+    // poseModel
+    const auto poseModel = op::flagsToPoseModel(FLAGS_model_pose);
+    // Check no contradictory flags enabled
+    if (FLAGS_alpha_pose < 0. || FLAGS_alpha_pose > 1.)
+        op::error("Alpha value for blending must be in the range [0,1].", __LINE__, __FUNCTION__, __FILE__);
+    if (FLAGS_scale_gap <= 0. && FLAGS_num_scales > 1)
+        op::error("Incompatible flag configuration: scale_gap must be greater than 0 or num_scales = 1.", __LINE__, __FUNCTION__, __FILE__);
+    // Logging
+    op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
     // Step 3 - Initialize all required classes
     op::CvMatToOpInput cvMatToOpInput{netInputSize, FLAGS_num_scales, (float)FLAGS_scale_gap};
     op::CvMatToOpOutput cvMatToOpOutput{outputSize};

@@ -28,7 +28,7 @@ namespace op
     }
 
     template <typename T>
-    void NmsCaffe<T>::Reshape(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top, const int maxPeaks, const int numberParts)
+    void NmsCaffe<T>::Reshape(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top, const int maxPeaks)
     {
         try
         {
@@ -39,11 +39,11 @@ namespace op
             std::vector<int> bottomShape = bottomBlob->shape();
 
             // Top shape
-            std::vector<int> top_shape{bottomShape};
-            top_shape[1] = numberParts;
-            top_shape[2] = maxPeaks+1; // # maxPeaks + 1
-            top_shape[3] = 3;  // X, Y, score
-            topBlob->Reshape(top_shape);
+            std::vector<int> topShape{bottomShape};
+            topShape[1] = bottomShape[1]-1; // Number parts + bck - 1
+            topShape[2] = maxPeaks+1; // # maxPeaks + 1
+            topShape[3] = 3;  // X, Y, score
+            topBlob->Reshape(topShape);
             mKernelBlob.Reshape(bottomShape);
 
             // Array sizes

@@ -19,7 +19,7 @@ namespace op
         spNet{std::make_shared<NetCaffe>(std::array<int,4>{1, 3, mNetOutputSize.y, mNetOutputSize.x}, modelFolder + HAND_PROTOTXT,
                                          modelFolder + HAND_TRAINED_MODEL, gpuId)},
         spResizeAndMergeCaffe{std::make_shared<ResizeAndMergeCaffe<float>>()},
-        spNmsCaffe{std::make_shared<NmsCaffe<float>>()},
+        spMaximumCaffe{std::make_shared<MaximumCaffe<float>>()},
         mHandImageCrop{mNetOutputSize.area()*3}
     {
         try
@@ -28,10 +28,6 @@ error("Hands extraction is not implemented yet. COMING SOON!", __LINE__, __FUNCT
             checkE(netOutputSize.x, netInputSize.x, "Net input and output size must be equal.", __LINE__, __FUNCTION__, __FILE__);
             checkE(netOutputSize.y, netInputSize.y, "Net input and output size must be equal.", __LINE__, __FUNCTION__, __FILE__);
             checkE(netInputSize.x, netInputSize.y, "Net input size must be squared.", __LINE__, __FUNCTION__, __FILE__);
-            // Properties
-            for (auto& property : mProperties)
-                property = 0.;
-            mProperties[(int)HandProperty::NMSThreshold] = HAND_DEFAULT_NMS_THRESHOLD;
         }
         catch (const std::exception& e)
         {
@@ -61,7 +57,7 @@ error("Hands extraction is not implemented yet. COMING SOON!", __LINE__, __FUNCT
 
             // Pose extractor blob and layer
             spPeaksBlob = {std::make_shared<caffe::Blob<float>>(1,1,1,1)};
-            spNmsCaffe->Reshape({spHeatMapsBlob.get()}, {spPeaksBlob.get()}, HAND_MAX_PEAKS, HAND_NUMBER_PARTS+1);
+            spMaximumCaffe->Reshape({spHeatMapsBlob.get()}, {spPeaksBlob.get()});
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
  
             log("Finished initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
@@ -102,43 +98,6 @@ error("Hands extraction is not implemented yet. COMING SOON!", __LINE__, __FUNCT
         }
     }
 
-    double HandExtractor::get(const HandProperty property) const
-    {
-        try
-        {
-            return mProperties.at((int)property);
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return 0.;
-        }
-    }
-
-    void HandExtractor::set(const HandProperty property, const double value)
-    {
-        try
-        {
-            mProperties.at((int)property) = {value};
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-        }
-    }
-
-    void HandExtractor::increase(const HandProperty property, const double value)
-    {
-        try
-        {
-            mProperties[(int)property] = mProperties.at((int)property) + value;
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-        }
-    }
-
     void HandExtractor::checkThread() const
     {
         try
@@ -153,7 +112,7 @@ error("Hands extraction is not implemented yet. COMING SOON!", __LINE__, __FUNCT
     }
 
     void HandExtractor::detectHandKeypoints(Array<float>& handCurrent, const float scaleInputToOutput, const int person,
-                                            const cv::Mat& affineMatrix, const unsigned int handPeaksOffset)
+                                            const cv::Mat& affineMatrix)
     {
         try
         {
@@ -162,7 +121,6 @@ error("Hands extraction is not implemented yet. COMING SOON!", __LINE__, __FUNCT
             UNUSED(scaleInputToOutput);
             UNUSED(person);
             UNUSED(affineMatrix);
-            UNUSED(handPeaksOffset);
         }
         catch (const std::exception& e)
         {

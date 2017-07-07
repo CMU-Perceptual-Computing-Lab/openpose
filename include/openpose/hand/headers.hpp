@@ -2,13 +2,14 @@
 #define OPENPOSE_HAND_HEADERS_HPP
 
 // hand module
-#include "enumClasses.hpp"
 #include "handDetector.hpp"
+#include "handDetectorFromTxt.hpp"
 #include "handExtractor.hpp"
 #include "handParameters.hpp"
 #include "handRenderer.hpp"
 #include "renderHand.hpp"
 #include "wHandDetector.hpp"
+#include "wHandDetectorFromTxt.hpp"
 #include "wHandDetectorTracking.hpp"
 #include "wHandDetectorUpdate.hpp"
 #include "wHandExtractor.hpp"

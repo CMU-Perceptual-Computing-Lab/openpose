@@ -1,7 +1,7 @@
 #ifndef OPENPOSE_FILESTREAM_HEADERS_HPP
 #define OPENPOSE_FILESTREAM_HEADERS_HPP
 
-// storage module
+// fileStream module
 #include "cocoJsonSaver.hpp"
 #include "enumClasses.hpp"
 #include "fileSaver.hpp"
@@ -13,13 +13,11 @@
 #include "keypointSaver.hpp"
 #include "videoSaver.hpp"
 #include "wCocoJsonSaver.hpp"
-#include "wFaceJsonSaver.hpp"
 #include "wFaceSaver.hpp"
-#include "wHandJsonSaver.hpp"
 #include "wHandSaver.hpp"
 #include "wImageSaver.hpp"
 #include "wHeatMapSaver.hpp"
-#include "wPoseJsonSaver.hpp"
+#include "wKeypointJsonSaver.hpp"
 #include "wPoseSaver.hpp"
 #include "wVideoSaver.hpp"
 

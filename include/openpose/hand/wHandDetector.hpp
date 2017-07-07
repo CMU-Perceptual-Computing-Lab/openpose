@@ -3,7 +3,7 @@
 
 #include <memory> // std::shared_ptr
 #include <openpose/thread/worker.hpp>
-#include "handRenderer.hpp"
+#include "handDetector.hpp"
 
 namespace op
 {

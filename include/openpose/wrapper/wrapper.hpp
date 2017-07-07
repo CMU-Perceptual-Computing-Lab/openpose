@@ -24,7 +24,9 @@ namespace op
      *         - Asynchronous input + synchronous output: call the constructor
      *           Wrapper(ThreadManagerMode::Synchronous, nullptr, workersOutput, irrelevantBoolean, true)
      */
-    template<typename TDatums, typename TWorker = std::shared_ptr<Worker<std::shared_ptr<TDatums>>>, typename TQueue = Queue<std::shared_ptr<TDatums>>>
+    template<typename TDatums,
+             typename TWorker = std::shared_ptr<Worker<std::shared_ptr<TDatums>>>,
+             typename TQueue = Queue<std::shared_ptr<TDatums>>>
     class Wrapper
     {
     public:
@@ -201,7 +203,7 @@ namespace op
         bool mUserInputWsOnNewThread;
         bool mUserPostProcessingWsOnNewThread;
         bool mUserOutputWsOnNewThread;
-        unsigned int mThreadId;
+        unsigned long long mThreadId;
         bool mMultiThreadEnabled;
         // Workers
         std::vector<TWorker> mUserInputWs;
@@ -535,7 +537,7 @@ namespace op
                 wrapperStructInput.producerSharedPtr->set(ProducerProperty::AutoRepeat, wrapperStructInput.framesRepeat);
                 // 2. Set finalOutputSize
                 producerSize = Point<int>{(int)wrapperStructInput.producerSharedPtr->get(CV_CAP_PROP_FRAME_WIDTH),
-                                        (int)wrapperStructInput.producerSharedPtr->get(CV_CAP_PROP_FRAME_HEIGHT)};
+                                          (int)wrapperStructInput.producerSharedPtr->get(CV_CAP_PROP_FRAME_HEIGHT)};
                 if (wrapperStructPose.outputSize.x == -1 || wrapperStructPose.outputSize.y == -1)
                 {
                     if (producerSize.area() > 0)
@@ -781,11 +783,7 @@ namespace op
             if (!writeKeypointJsonCleaned.empty())
             {
                 const auto keypointJsonSaver = std::make_shared<KeypointJsonSaver>(writeKeypointJsonCleaned);
-                mOutputWs.emplace_back(std::make_shared<WPoseJsonSaver<TDatumsPtr>>(keypointJsonSaver));
-                if (wrapperStructFace.enable)
-                    mOutputWs.emplace_back(std::make_shared<WFaceJsonSaver<TDatumsPtr>>(keypointJsonSaver));
-                if (wrapperStructHand.enable)
-                    mOutputWs.emplace_back(std::make_shared<WHandJsonSaver<TDatumsPtr>>(keypointJsonSaver));
+                mOutputWs.emplace_back(std::make_shared<WKeypointJsonSaver<TDatumsPtr>>(keypointJsonSaver));
             }
             // Write people pose data on disk (COCO validation json format)
             if (!wrapperStructOutput.writeCocoJson.empty())

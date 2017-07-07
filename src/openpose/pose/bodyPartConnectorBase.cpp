@@ -41,7 +41,7 @@ namespace op
                     // Change w.r.t. other
                     if (nB != 0)
                     {
-                        if (poseModel == PoseModel::COCO_18)
+                        if (poseModel == PoseModel::COCO_18 || poseModel == PoseModel::BODY_22)
                         {
                             for (auto i = 1; i <= nB; i++)
                             {
@@ -82,7 +82,7 @@ namespace op
                     }
                     else if (nA != 0)
                     {
-                        if (poseModel == PoseModel::COCO_18)
+                        if (poseModel == PoseModel::COCO_18 || poseModel == PoseModel::BODY_22)
                         {
                             for (auto i = 1; i <= nA; i++)
                             {
@@ -288,7 +288,7 @@ namespace op
                         break;
                 }
                 else if (subsetCounter < 1)
-                    error("Bad subsetCounter. Bug in in this function if this happens.", __LINE__, __FUNCTION__, __FILE__);
+                    error("Bad subsetCounter. Bug in this function if this happens.", __LINE__, __FUNCTION__, __FILE__);
             }
 
             // Fill and return poseKeypoints

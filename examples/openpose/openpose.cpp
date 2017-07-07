@@ -16,9 +16,7 @@
 // This file should only be used for the user to take specific examples.
 
 // C++ std library dependencies
-#include <atomic>
 #include <chrono> // `std::chrono::` functions and classes, e.g. std::chrono::milliseconds
-#include <cstdio> // sscanf
 #include <string>
 #include <thread> // std::this_thread
 #include <vector>
@@ -154,185 +152,7 @@ DEFINE_string(write_heatmaps,           "",             "Directory to write heat
 DEFINE_string(write_heatmaps_format,    "png",          "File extension and format for `write_heatmaps`, analogous to `write_images_format`."
                                                         " Recommended `png` or any compressed and lossless format.");
 
-op::PoseModel gflagToPoseModel(const std::string& poseModeString)
-{
-    op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-    if (poseModeString == "COCO")
-        return op::PoseModel::COCO_18;
-    else if (poseModeString == "MPI")
-        return op::PoseModel::MPI_15;
-    else if (poseModeString == "MPI_4_layers")
-        return op::PoseModel::MPI_15_4;
-    else if (poseModeString == "BODY_22")
-        return op::PoseModel::BODY_22;
-    else
-    {
-        op::error("String does not correspond to any model (COCO, MPI, MPI_4_layers)", __LINE__, __FUNCTION__, __FILE__);
-        return op::PoseModel::COCO_18;
-    }
-}
-
-op::ScaleMode gflagToScaleMode(const int keypointScale)
-{
-    op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-    if (keypointScale == 0)
-        return op::ScaleMode::InputResolution;
-    else if (keypointScale == 1)
-        return op::ScaleMode::NetOutputResolution;
-    else if (keypointScale == 2)
-        return op::ScaleMode::OutputResolution;
-    else if (keypointScale == 3)
-        return op::ScaleMode::ZeroToOne;
-    else if (keypointScale == 4)
-        return op::ScaleMode::PlusMinusOne;
-    else
-    {
-        const std::string message = "String does not correspond to any scale mode: (0, 1, 2, 3, 4) for (InputResolution,"
-                                    " NetOutputResolution, OutputResolution, ZeroToOne, PlusMinusOne).";
-        op::error(message, __LINE__, __FUNCTION__, __FILE__);
-        return op::ScaleMode::InputResolution;
-    }
-}
-
-// Determine type of frame source
-op::ProducerType gflagsToProducerType(const std::string& imageDirectory, const std::string& videoPath, const int webcamIndex)
-{
-    op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-    // Avoid duplicates (e.g. selecting at the time camera & video)
-    if (!imageDirectory.empty() && !videoPath.empty())
-        op::error("Selected simultaneously image directory and video. Please, select only one.", __LINE__, __FUNCTION__, __FILE__);
-    else if (!imageDirectory.empty() && webcamIndex != 0)
-        op::error("Selected simultaneously image directory and webcam. Please, select only one.", __LINE__, __FUNCTION__, __FILE__);
-    else if (!videoPath.empty() && webcamIndex != 0)
-        op::error("Selected simultaneously video and webcam. Please, select only one.", __LINE__, __FUNCTION__, __FILE__);
-
-    // Get desired op::ProducerType
-    if (!imageDirectory.empty())
-        return op::ProducerType::ImageDirectory;
-    else if (!videoPath.empty())
-        return op::ProducerType::Video;
-    else
-        return op::ProducerType::Webcam;
-}
-
-std::shared_ptr<op::Producer> gflagsToProducer(const std::string& imageDirectory, const std::string& videoPath, const int webcamIndex,
-                                               const op::Point<int> webcamResolution, const double webcamFps)
-{
-    op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-    const auto type = gflagsToProducerType(imageDirectory, videoPath, webcamIndex);
-
-    if (type == op::ProducerType::ImageDirectory)
-        return std::make_shared<op::ImageDirectoryReader>(imageDirectory);
-    else if (type == op::ProducerType::Video)
-        return std::make_shared<op::VideoReader>(videoPath);
-    else if (type == op::ProducerType::Webcam)
-        return std::make_shared<op::WebcamReader>(webcamIndex, webcamResolution, webcamFps);
-    else
-    {
-        op::error("Undefined Producer selected.", __LINE__, __FUNCTION__, __FILE__);
-        return std::shared_ptr<op::Producer>{};
-    }
-}
-
-std::vector<op::HeatMapType> gflagToHeatMaps(const bool heatMapsAddParts, const bool heatMapsAddBkg, const bool heatMapsAddPAFs)
-{
-    std::vector<op::HeatMapType> heatMapTypes;
-    if (heatMapsAddParts)
-        heatMapTypes.emplace_back(op::HeatMapType::Parts);
-    if (heatMapsAddBkg)
-        heatMapTypes.emplace_back(op::HeatMapType::Background);
-    if (heatMapsAddPAFs)
-        heatMapTypes.emplace_back(op::HeatMapType::PAFs);
-    return heatMapTypes;
-}
-
-op::DetectionMode gflagToDetectionMode(const int handDetectionModeFlag, const std::shared_ptr<op::Producer>& producer = nullptr)
-{
-    if (handDetectionModeFlag == -1)
-    {
-        if (producer == nullptr)
-            op::error("Since there is no default producer, `hand_detection_mode` must be set.", __LINE__, __FUNCTION__, __FILE__);
-        const auto producerType = producer->getType();
-        if (producerType == op::ProducerType::Webcam)
-            return op::DetectionMode::Fast;
-        else if (producerType == op::ProducerType::ImageDirectory)
-            return op::DetectionMode::Iterative;
-        else if (producerType == op::ProducerType::Video)
-            return op::DetectionMode::Tracking;
-    }
-    else if (handDetectionModeFlag == 0)
-        return op::DetectionMode::Fast;
-    else if (handDetectionModeFlag == 1)
-        return op::DetectionMode::Iterative;
-    else if (handDetectionModeFlag == 2)
-        return op::DetectionMode::Tracking;
-    else if (handDetectionModeFlag == 3)
-        return op::DetectionMode::IterativeAndTracking;
-    // else
-    op::error("Undefined DetectionMode selected.", __LINE__, __FUNCTION__, __FILE__);
-    return op::DetectionMode::Fast;
-}
-
-op::RenderMode gflagToRenderMode(const int renderFlag, const int renderPoseFlag = -2)
-{
-    if (renderFlag == -1 && renderPoseFlag != -2)
-        return gflagToRenderMode(renderPoseFlag, -2);
-    else if (renderFlag == 0)
-        return op::RenderMode::None;
-    else if (renderFlag == 1)
-        return op::RenderMode::Cpu;
-    else if (renderFlag == 2)
-        return op::RenderMode::Gpu;
-    else
-    {
-        op::error("Undefined RenderMode selected.", __LINE__, __FUNCTION__, __FILE__);
-        return op::RenderMode::None;
-    }
-}
-
-// Google flags into program variables
-std::tuple<op::Point<int>, op::Point<int>, op::Point<int>, op::Point<int>, std::shared_ptr<op::Producer>, op::PoseModel, op::ScaleMode,
-           std::vector<op::HeatMapType>> gflagsToOpParameters()
-{
-    op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-    // cameraFrameSize
-    op::Point<int> cameraFrameSize;
-    auto nRead = sscanf(FLAGS_camera_resolution.c_str(), "%dx%d", &cameraFrameSize.x, &cameraFrameSize.y);
-    op::checkE(nRead, 2, "Error, camera resolution format (" +  FLAGS_camera_resolution + ") invalid, should be e.g., 1280x720",
-               __LINE__, __FUNCTION__, __FILE__);
-    // outputSize
-    op::Point<int> outputSize;
-    nRead = sscanf(FLAGS_resolution.c_str(), "%dx%d", &outputSize.x, &outputSize.y);
-    op::checkE(nRead, 2, "Error, resolution format (" +  FLAGS_resolution + ") invalid, should be e.g., 960x540 ",
-               __LINE__, __FUNCTION__, __FILE__);
-    // netInputSize
-    op::Point<int> netInputSize;
-    nRead = sscanf(FLAGS_net_resolution.c_str(), "%dx%d", &netInputSize.x, &netInputSize.y);
-    op::checkE(nRead, 2, "Error, net resolution format (" +  FLAGS_net_resolution + ") invalid, should be e.g., 656x368 (multiples of 16)",
-               __LINE__, __FUNCTION__, __FILE__);
-    // faceNetInputSize
-    op::Point<int> faceNetInputSize;
-    nRead = sscanf(FLAGS_face_net_resolution.c_str(), "%dx%d", &faceNetInputSize.x, &faceNetInputSize.y);
-    op::checkE(nRead, 2, "Error, face net resolution format (" +  FLAGS_face_net_resolution
-               + ") invalid, should be e.g., 368x368 (multiples of 16)", __LINE__, __FUNCTION__, __FILE__);
-    // handNetInputSize
-    op::Point<int> handNetInputSize;
-    nRead = sscanf(FLAGS_hand_net_resolution.c_str(), "%dx%d", &handNetInputSize.x, &handNetInputSize.y);
-    op::checkE(nRead, 2, "Error, hand net resolution format (" +  FLAGS_hand_net_resolution
-               + ") invalid, should be e.g., 368x368 (multiples of 16)", __LINE__, __FUNCTION__, __FILE__);
-    // producerType
-    const auto producerSharedPtr = gflagsToProducer(FLAGS_image_dir, FLAGS_video, FLAGS_camera, cameraFrameSize, FLAGS_camera_fps);
-    // poseModel
-    const auto poseModel = gflagToPoseModel(FLAGS_model_pose);
-    // keypointScale
-    const auto keypointScale = gflagToScaleMode(FLAGS_keypoint_scale);
-    // heatmaps to add
-    const auto heatMapTypes = gflagToHeatMaps(FLAGS_heatmaps_add_parts, FLAGS_heatmaps_add_bkg, FLAGS_heatmaps_add_PAFs);
-    // Return
-    return std::make_tuple(outputSize, netInputSize, faceNetInputSize, handNetInputSize, producerSharedPtr, poseModel, keypointScale, heatMapTypes);
-}
-
-int opRealTimePoseDemo()
+int openPoseDemo()
 {
     // logging_level
     op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.", __LINE__, __FUNCTION__, __FILE__);
@@ -342,32 +162,41 @@ int opRealTimePoseDemo()
     op::log("Starting pose estimation demo.", op::Priority::High);
     const auto timerBegin = std::chrono::high_resolution_clock::now();
 
-    // Applying user defined configuration
-    op::Point<int> outputSize;
-    op::Point<int> netInputSize;
-    op::Point<int> faceNetInputSize;
-    op::Point<int> handNetInputSize;
-    std::shared_ptr<op::Producer> producerSharedPtr;
-    op::PoseModel poseModel;
-    op::ScaleMode keypointScale;
-    std::vector<op::HeatMapType> heatMapTypes;
-    std::tie(outputSize, netInputSize, faceNetInputSize, handNetInputSize, producerSharedPtr, poseModel, keypointScale,
-             heatMapTypes) = gflagsToOpParameters();
+    // Applying user defined configuration - Google flags to program variables
+    // outputSize
+    const auto outputSize = op::flagsToPoint(FLAGS_resolution, "1280x720");
+    // netInputSize
+    const auto netInputSize = op::flagsToPoint(FLAGS_net_resolution, "656x368");
+    // faceNetInputSize
+    const auto faceNetInputSize = op::flagsToPoint(FLAGS_face_net_resolution, "368x368 (multiples of 16)");
+    // handNetInputSize
+    const auto handNetInputSize = op::flagsToPoint(FLAGS_hand_net_resolution, "368x368 (multiples of 16)");
+    // producerType
+    const auto producerSharedPtr = op::flagsToProducer(FLAGS_image_dir, FLAGS_video, FLAGS_camera, FLAGS_camera_resolution, FLAGS_camera_fps);
+    // poseModel
+    const auto poseModel = op::flagsToPoseModel(FLAGS_model_pose);
+    // keypointScale
+    const auto keypointScale = op::flagsToScaleMode(FLAGS_keypoint_scale);
+    // heatmaps to add
+    const auto heatMapTypes = op::flagsToHeatMaps(FLAGS_heatmaps_add_parts, FLAGS_heatmaps_add_bkg, FLAGS_heatmaps_add_PAFs);
+    op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
     // OpenPose wrapper
     op::log("Configuring OpenPose wrapper.", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
     op::Wrapper<std::vector<op::Datum>> opWrapper;
     // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
-    const op::WrapperStructPose wrapperStructPose{netInputSize, outputSize, keypointScale, FLAGS_num_gpu, FLAGS_num_gpu_start,
-                                                  FLAGS_num_scales, (float)FLAGS_scale_gap, gflagToRenderMode(FLAGS_render_pose), poseModel,
-                                                  !FLAGS_disable_blending, (float)FLAGS_alpha_pose, (float)FLAGS_alpha_heatmap,
-                                                  FLAGS_part_to_show, FLAGS_model_folder, heatMapTypes, op::ScaleMode::UnsignedChar};
+    const op::WrapperStructPose wrapperStructPose{netInputSize, outputSize, keypointScale, FLAGS_num_gpu,
+                                                  FLAGS_num_gpu_start, FLAGS_num_scales, (float)FLAGS_scale_gap,
+                                                  op::flagsToRenderMode(FLAGS_render_pose), poseModel,
+                                                  !FLAGS_disable_blending, (float)FLAGS_alpha_pose,
+                                                  (float)FLAGS_alpha_heatmap, FLAGS_part_to_show, FLAGS_model_folder,
+                                                  heatMapTypes, op::ScaleMode::UnsignedChar};
     // Face configuration (use op::WrapperStructFace{} to disable it)
-    const op::WrapperStructFace wrapperStructFace{FLAGS_face, faceNetInputSize, gflagToRenderMode(FLAGS_render_face, FLAGS_render_pose),
+    const op::WrapperStructFace wrapperStructFace{FLAGS_face, faceNetInputSize, op::flagsToRenderMode(FLAGS_render_face, FLAGS_render_pose),
                                                   (float)FLAGS_alpha_face, (float)FLAGS_alpha_heatmap_face};
     // Hand configuration (use op::WrapperStructHand{} to disable it)
-    const op::WrapperStructHand wrapperStructHand{FLAGS_hand, handNetInputSize, gflagToDetectionMode(FLAGS_hand_detection_mode, producerSharedPtr),
-                                                  gflagToRenderMode(FLAGS_render_hand, FLAGS_render_pose), (float)FLAGS_alpha_hand,
+    const op::WrapperStructHand wrapperStructHand{FLAGS_hand, handNetInputSize, op::flagsToDetectionMode(FLAGS_hand_detection_mode, producerSharedPtr),
+                                                  op::flagsToRenderMode(FLAGS_render_hand, FLAGS_render_pose), (float)FLAGS_alpha_hand,
                                                   (float)FLAGS_alpha_heatmap_hand};
     // Producer (use default to disable any input)
     const op::WrapperStructInput wrapperStructInput{producerSharedPtr, FLAGS_frame_first, FLAGS_frame_last, FLAGS_process_real_time,
@@ -421,11 +250,11 @@ int opRealTimePoseDemo()
 int main(int argc, char *argv[])
 {
     // Initializing google logging (Caffe uses it for logging)
-    google::InitGoogleLogging("opRealTimePoseDemo");
+    google::InitGoogleLogging("openPoseDemo");
 
     // Parsing command line flags
     gflags::ParseCommandLineFlags(&argc, &argv, true);
 
-    // Running opRealTimePoseDemo
-    return opRealTimePoseDemo();
+    // Running openPoseDemo
+    return openPoseDemo();
 }

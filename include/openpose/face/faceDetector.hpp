@@ -6,7 +6,6 @@
 #include <openpose/core/rectangle.hpp>
 #include <openpose/pose/enumClasses.hpp>
 #include <openpose/utilities/macros.hpp>
-#include "enumClasses.hpp"
 
 namespace op
 {

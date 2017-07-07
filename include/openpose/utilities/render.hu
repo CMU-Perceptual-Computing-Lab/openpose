@@ -103,7 +103,7 @@ namespace op
                             const auto minV = 0.f;
                             const auto maxV = 1.f;
                             if (minV <= judge && judge <= maxV)
-                                addColorWeighted(r, g, b, &rgbColorsPtr[(partPair%numberColors)*3], alphaColorToAdd);
+                                addColorWeighted(r, g, b, &rgbColorsPtr[(partB%numberColors)*3], alphaColorToAdd); // Before used partPair vs partB
                         }
                     }
 
