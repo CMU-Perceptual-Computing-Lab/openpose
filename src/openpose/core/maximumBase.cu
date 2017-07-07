@@ -20,7 +20,7 @@ namespace op
     // {
     //     const auto sourceThrustPtr = thrust::device_pointer_cast(sourcePtrOffsetted);
     //     const auto sourceIndexIterator = thrust::max_element(thrust::device, sourceThrustPtr, sourceThrustPtr + imageOffset);
-    //     const auto sourceIndex = sourceIndexIterator - sourceThrustPtr;
+    //     const auto sourceIndex = (int)(sourceIndexIterator - sourceThrustPtr);
     //     targetPtrOffsetted[0] = sourceIndex % width;
     //     targetPtrOffsetted[1] = sourceIndex / width;
     //     targetPtrOffsetted[2] = sourcePtrOffsetted[sourceIndex];
@@ -40,7 +40,7 @@ namespace op
     //         const auto* const sourcePtrOffsetted = sourcePtr + (offsetChannel + part) * imageOffset;
     //         auto sourceThrustPtr = thrust::device_pointer_cast(sourcePtrOffsetted);
     //         const auto sourceIndexIterator = thrust::max_element(thrust::device, sourceThrustPtr, sourceThrustPtr + imageOffset);
-    //         const auto sourceIndex = sourceIndexIterator - sourceThrustPtr;
+    //         const auto sourceIndex = (int)(sourceIndexIterator - sourceThrustPtr);
     //         targetPtrOffsetted[0] = sourceIndex % width;
     //         targetPtrOffsetted[1] = sourceIndex / width;
     //         targetPtrOffsetted[2] = sourcePtrOffsetted[sourceIndex];
@@ -82,7 +82,7 @@ namespace op
                         // Option a - 6.3 fps
                         const auto sourceThrustPtr = thrust::device_pointer_cast(sourcePtrOffsetted);
                         const auto sourceIndexIterator = thrust::max_element(thrust::device, sourceThrustPtr, sourceThrustPtr + imageOffset);
-                        const auto sourceIndex = sourceIndexIterator - sourceThrustPtr;
+                        const auto sourceIndex = (int)(sourceIndexIterator - sourceThrustPtr);
                         fillTargetPtrPart<<<1, 1>>>(targetPtrOffsetted, sourcePtrOffsetted, sourceIndex, sourceIndex % width, sourceIndex / width);
                         // // Option b - <1 fps
                         // fillTargetPtrChannel<<<1, 1>>>(targetPtrOffsetted, sourcePtrOffsetted, width, imageOffset);
