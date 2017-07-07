@@ -1,26 +1,26 @@
-#ifndef OPENPOSE_HAND_W_HAND_DETECTOR_HPP
-#define OPENPOSE_HAND_W_HAND_DETECTOR_HPP
+#ifndef OPENPOSE_HAND_W_HAND_DETECTOR_FROM_JSON_HPP
+#define OPENPOSE_HAND_W_HAND_DETECTOR_FROM_JSON_HPP
 
 #include <memory> // std::shared_ptr
 #include <openpose/thread/worker.hpp>
-#include "handDetector.hpp"
+#include "handDetectorFromTxt.hpp"
 
 namespace op
 {
     template<typename TDatums>
-    class WHandDetector : public Worker<TDatums>
+    class WHandDetectorFromTxt : public Worker<TDatums>
     {
     public:
-        explicit WHandDetector(const std::shared_ptr<HandDetector>& handDetector);
+        explicit WHandDetectorFromTxt(const std::shared_ptr<HandDetectorFromTxt>& handDetectorFromTxt);
 
         void initializationOnThread();
 
         void work(TDatums& tDatums);
 
     private:
-        std::shared_ptr<HandDetector> spHandDetector;
+        std::shared_ptr<HandDetectorFromTxt> spHandDetectorFromTxt;
 
-        DELETE_COPY(WHandDetector);
+        DELETE_COPY(WHandDetectorFromTxt);
     };
 }
 
@@ -36,18 +36,18 @@ namespace op
 namespace op
 {
     template<typename TDatums>
-    WHandDetector<TDatums>::WHandDetector(const std::shared_ptr<HandDetector>& handDetector) :
-        spHandDetector{handDetector}
+    WHandDetectorFromTxt<TDatums>::WHandDetectorFromTxt(const std::shared_ptr<HandDetectorFromTxt>& handDetectorFromTxt) :
+        spHandDetectorFromTxt{handDetectorFromTxt}
     {
     }
 
     template<typename TDatums>
-    void WHandDetector<TDatums>::initializationOnThread()
+    void WHandDetectorFromTxt<TDatums>::initializationOnThread()
     {
     }
 
     template<typename TDatums>
-    void WHandDetector<TDatums>::work(TDatums& tDatums)
+    void WHandDetectorFromTxt<TDatums>::work(TDatums& tDatums)
     {
         try
         {
@@ -59,7 +59,7 @@ namespace op
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                 // Detect people hand
                 for (auto& tDatum : *tDatums)
-                    tDatum.handRectangles = spHandDetector->detectHands(tDatum.poseKeypoints, tDatum.scaleInputToOutput);
+                    tDatum.handRectangles = spHandDetectorFromTxt->detectHands();
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
                 Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__, Profiler::DEFAULT_X);
@@ -75,7 +75,7 @@ namespace op
         }
     }
 
-    COMPILE_TEMPLATE_DATUM(WHandDetector);
+    COMPILE_TEMPLATE_DATUM(WHandDetectorFromTxt);
 }
 
-#endif // OPENPOSE_HAND_W_HAND_DETECTOR_HPP
+#endif // OPENPOSE_HAND_W_HAND_DETECTOR_FROM_JSON_HPP

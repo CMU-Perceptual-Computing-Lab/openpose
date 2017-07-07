@@ -1,5 +1,5 @@
-#ifndef OPENPOSE_UTILITIES_G_FLAGS_TO_OPEN_POSE_HPP
-#define OPENPOSE_UTILITIES_G_FLAGS_TO_OPEN_POSE_HPP
+#ifndef OPENPOSE_UTILITIES_FLAGS_TO_OPEN_POSE_HPP
+#define OPENPOSE_UTILITIES_FLAGS_TO_OPEN_POSE_HPP
 
 #include <memory> // std::shared_ptr
 #include <string>
@@ -19,9 +19,11 @@ namespace op
     ProducerType flagsToProducerType(const std::string& imageDirectory, const std::string& videoPath, const int webcamIndex);
 
     std::shared_ptr<Producer> flagsToProducer(const std::string& imageDirectory, const std::string& videoPath,
-                                              const int webcamIndex, const std::string& webcamResolution, const double webcamFps);
+                                              const int webcamIndex, const std::string& webcamResolution = "1280x720",
+                                              const double webcamFps = 30.);
 
-    std::vector<HeatMapType> flagsToHeatMaps(const bool heatMapsAddParts, const bool heatMapsAddBkg, const bool heatMapsAddPAFs);
+    std::vector<HeatMapType> flagsToHeatMaps(const bool heatMapsAddParts = false, const bool heatMapsAddBkg = false,
+                                             const bool heatMapsAddPAFs = false);
 
     DetectionMode flagsToDetectionMode(const int handDetectionModeFlag, const std::shared_ptr<Producer>& producer = nullptr);
 
@@ -30,4 +32,4 @@ namespace op
     Point<int> flagsToPoint(const std::string& pointString, const std::string& pointExample = "1280x720");
 }
 
-#endif // OPENPOSE_UTILITIES_G_FLAGS_TO_OPEN_POSE_HPP
+#endif // OPENPOSE_UTILITIES_FLAGS_TO_OPEN_POSE_HPP

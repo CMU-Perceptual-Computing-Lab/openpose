@@ -16,7 +16,6 @@
 // This file should only be used for the user to take specific examples.
 
 // C++ std library dependencies
-#include <atomic>
 #include <chrono> // `std::chrono::` functions and classes, e.g. std::chrono::milliseconds
 #include <string>
 #include <thread> // std::this_thread
@@ -154,7 +153,7 @@ DEFINE_string(write_heatmaps,           "",             "Directory to write heat
 DEFINE_string(write_heatmaps_format,    "png",          "File extension and format for `write_heatmaps`, analogous to `write_images_format`."
                                                         " Recommended `png` or any compressed and lossless format.");
 
-int opRealTimePoseDemo()
+int openPoseDemo()
 {
     // logging_level
     op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.", __LINE__, __FUNCTION__, __FILE__);
@@ -187,10 +186,12 @@ int opRealTimePoseDemo()
     op::log("Configuring OpenPose wrapper.", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
     op::Wrapper<std::vector<op::Datum>> opWrapper;
     // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
-    const op::WrapperStructPose wrapperStructPose{netInputSize, outputSize, keypointScale, FLAGS_num_gpu, FLAGS_num_gpu_start,
-                                                  FLAGS_num_scales, (float)FLAGS_scale_gap, op::flagsToRenderMode(FLAGS_render_pose), poseModel,
-                                                  !FLAGS_disable_blending, (float)FLAGS_alpha_pose, (float)FLAGS_alpha_heatmap,
-                                                  FLAGS_part_to_show, FLAGS_model_folder, heatMapTypes, op::ScaleMode::UnsignedChar};
+    const op::WrapperStructPose wrapperStructPose{netInputSize, outputSize, keypointScale, FLAGS_num_gpu,
+                                                  FLAGS_num_gpu_start, FLAGS_num_scales, (float)FLAGS_scale_gap,
+                                                  op::flagsToRenderMode(FLAGS_render_pose), poseModel,
+                                                  !FLAGS_disable_blending, (float)FLAGS_alpha_pose,
+                                                  (float)FLAGS_alpha_heatmap, FLAGS_part_to_show, FLAGS_model_folder,
+                                                  heatMapTypes, op::ScaleMode::UnsignedChar};
     // Face configuration (use op::WrapperStructFace{} to disable it)
     const op::WrapperStructFace wrapperStructFace{FLAGS_face, faceNetInputSize, op::flagsToRenderMode(FLAGS_render_face, FLAGS_render_pose),
                                                   (float)FLAGS_alpha_face, (float)FLAGS_alpha_heatmap_face};
@@ -250,11 +251,11 @@ int opRealTimePoseDemo()
 int main(int argc, char *argv[])
 {
     // Initializing google logging (Caffe uses it for logging)
-    google::InitGoogleLogging("opRealTimePoseDemo");
+    google::InitGoogleLogging("openPoseDemo");
 
     // Parsing command line flags
     gflags::ParseCommandLineFlags(&argc, &argv, true);
 
-    // Running opRealTimePoseDemo
-    return opRealTimePoseDemo();
+    // Running openPoseDemo
+    return openPoseDemo();
 }

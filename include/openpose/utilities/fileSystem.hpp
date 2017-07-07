@@ -2,6 +2,7 @@
 #define OPENPOSE_UTILITIES_FILE_SYSTEM_HPP
 
 #include <string>
+#include <vector>
 
 namespace op
 {

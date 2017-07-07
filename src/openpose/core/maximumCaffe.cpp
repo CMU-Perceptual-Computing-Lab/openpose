@@ -1,18 +1,18 @@
 #ifdef USE_CAFFE
-#include <openpose/core/nmsBase.hpp>
+#include <openpose/core/maximumBase.hpp>
 #include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/utilities/macros.hpp>
-#include <openpose/core/nmsCaffe.hpp>
+#include <openpose/core/maximumCaffe.hpp>
 
 namespace op
 {
     template <typename T>
-    NmsCaffe<T>::NmsCaffe()
+    MaximumCaffe<T>::MaximumCaffe()
     {
     }
 
     template <typename T>
-    void NmsCaffe<T>::LayerSetUp(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top)
+    void MaximumCaffe<T>::LayerSetUp(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top)
     {
         try
         {
@@ -28,7 +28,7 @@ namespace op
     }
 
     template <typename T>
-    void NmsCaffe<T>::Reshape(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top, const int maxPeaks)
+    void MaximumCaffe<T>::Reshape(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top)
     {
         try
         {
@@ -40,11 +40,10 @@ namespace op
 
             // Top shape
             std::vector<int> topShape{bottomShape};
-            topShape[1] = bottomShape[1]-1; // Number parts + bck - 1
-            topShape[2] = maxPeaks+1; // # maxPeaks + 1
+            topShape[1] = 1; // Unnecessary
+            topShape[2] = bottomShape[1]-1; // Number parts + bck - 1
             topShape[3] = 3;  // X, Y, score
             topBlob->Reshape(topShape);
-            mKernelBlob.Reshape(bottomShape);
 
             // Array sizes
             mTopSize = std::array<int, 4>{topBlob->shape(0), topBlob->shape(1), topBlob->shape(2), topBlob->shape(3)};
@@ -57,11 +56,11 @@ namespace op
     }
 
     template <typename T>
-    void NmsCaffe<T>::setThreshold(const T threshold)
+    void MaximumCaffe<T>::Forward_cpu(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top)
     {
         try
         {
-            mThreshold = {threshold};
+            maximumGpu(top.at(0)->mutable_cpu_data(), bottom.at(0)->cpu_data(), mTopSize, mBottomSize);
         }
         catch (const std::exception& e)
         {
@@ -70,11 +69,11 @@ namespace op
     }
 
     template <typename T>
-    void NmsCaffe<T>::Forward_cpu(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top)
+    void MaximumCaffe<T>::Forward_gpu(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top)
     {
         try
         {
-            nmsGpu(top.at(0)->mutable_cpu_data(), mKernelBlob.mutable_cpu_data(), bottom.at(0)->cpu_data(), mThreshold, mTopSize, mBottomSize);
+            maximumGpu(top.at(0)->mutable_gpu_data(), bottom.at(0)->gpu_data(), mTopSize, mBottomSize);
         }
         catch (const std::exception& e)
         {
@@ -83,20 +82,7 @@ namespace op
     }
 
     template <typename T>
-    void NmsCaffe<T>::Forward_gpu(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top)
-    {
-        try
-        {
-            nmsGpu(top.at(0)->mutable_gpu_data(), mKernelBlob.mutable_gpu_data(), bottom.at(0)->gpu_data(), mThreshold, mTopSize, mBottomSize);
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-        }
-    }
-
-    template <typename T>
-    void NmsCaffe<T>::Backward_cpu(const std::vector<caffe::Blob<T>*>& top, const std::vector<bool>& propagate_down, const std::vector<caffe::Blob<T>*>& bottom)
+    void MaximumCaffe<T>::Backward_cpu(const std::vector<caffe::Blob<T>*>& top, const std::vector<bool>& propagate_down, const std::vector<caffe::Blob<T>*>& bottom)
     {
         try
         {
@@ -112,7 +98,7 @@ namespace op
     }
 
     template <typename T>
-    void NmsCaffe<T>::Backward_gpu(const std::vector<caffe::Blob<T>*>& top, const std::vector<bool>& propagate_down, const std::vector<caffe::Blob<T>*>& bottom)
+    void MaximumCaffe<T>::Backward_gpu(const std::vector<caffe::Blob<T>*>& top, const std::vector<bool>& propagate_down, const std::vector<caffe::Blob<T>*>& bottom)
     {
         try
         {
@@ -127,7 +113,7 @@ namespace op
         }
     }
 
-    INSTANTIATE_CLASS(NmsCaffe);
+    INSTANTIATE_CLASS(MaximumCaffe);
 }
 
 #endif

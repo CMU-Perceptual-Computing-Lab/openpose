@@ -56,7 +56,7 @@ namespace op
 
             // Pose extractor blob and layer
             spPeaksBlob = {std::make_shared<caffe::Blob<float>>(1,1,1,1)};
-            spNmsCaffe->Reshape({spHeatMapsBlob.get()}, {spPeaksBlob.get()}, POSE_MAX_PEAKS[(int)mPoseModel], POSE_NUMBER_BODY_PARTS[(int)mPoseModel]);
+            spNmsCaffe->Reshape({spHeatMapsBlob.get()}, {spPeaksBlob.get()}, POSE_MAX_PEAKS[(int)mPoseModel]);
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
 
             // Pose extractor blob and layer

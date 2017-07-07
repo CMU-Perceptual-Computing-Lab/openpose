@@ -44,18 +44,30 @@ OpenPose Library - Release Notes
 
 
 
-## Current version (future OpenPose 1.0.0rc4)
+## OpenPose 1.0.0
 1. Main improvements:
-    1. Increased accuracy on multi-scale (added `Datum::scaleRatios` to save the relative scale ratio when multi-scale).
-    2. Increased speed ~3-5% by adding CPU rendering and setting it as default rendering.
-    3. Check() functions give more feedback.
-    4. WCocoJsonSaver finished and removed its 3599-image limit.
-    5. Added `camera_fps` so generated video will use that frame rate.
-    6. Improved documentation.
+    1. Hands and face now use `Maximum` instead of `Nms`, since there is only 1 person / detection.
+    2. Increased accuracy on multi-scale (added `Datum::scaleRatios` to save the relative scale ratio when multi-scale).
+    3. Increased speed ~5% by adding CPU rendering (but GPU is the default rendering).
+    4. Rendering colors modified, visually better results.
+    5. Check() functions give more feedback.
+    6. WCocoJsonSaver finished and removed its 3599-image limit.
+    7. Added `camera_fps` so generated video will use that frame rate.
+    8. Reduced the number of printed information messages. Default logging priority threshold increased to Priority::Max.
+    9. Google flags to OpenPose configuration parameters reader moved from each demo to utilities/flagsToOpenPose.
+    10. Nms classes do not use `numberParts` for `Reshape`, they deduce the value.
+    11. Improved documentation.
 2. Functions or parameters renamed:
     1. Render flags renamed in the demo in order to incorporate the CPU/GPU rendering.
+    2. Keypoints saved in JSON files (`write_keypoint_json`) are now saved as `pose_keypoints`, `face_keypoints`, `hand_left_keypoints`, and `hand_right_keypoints`. They all were previously saved as `body_parts`.
 3. Main bugs fixed:
     1. Fixed bug in Array::getConstCvMat() if mVolume=0, now returning empty cv::Mat.
     2. Fixed bug: `--process_real_time` threw error with webcam.
     3. Fixed bug: Face not working when input and output resolutions are different.
     4. Fixed some bugs that prevented debug version to run.
+    5. Face saved in JSON files were called `body_parts`. Now they are called `face_keypoints`.
+
+
+
+## Current version (future OpenPose 1.0.1)
+1. No changes yet.

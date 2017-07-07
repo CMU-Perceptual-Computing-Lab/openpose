@@ -9,23 +9,14 @@ namespace op
     {
     }
 
-    void KeypointJsonSaver::save(const std::vector<Array<float>>& keypointVector, const std::string& fileName, const std::string& keypointName) const
+    void KeypointJsonSaver::save(const std::vector<std::pair<Array<float>, std::string>>& keypointVector,
+                                 const std::string& fileName, const bool humanReadable) const
     {
         try
         {
             // Record json
-            if (!keypointVector.empty())
-            {
-                // File path (no extension)
-                const auto fileNameNoExtension = getNextFileName(fileName) + "_" + keypointName;
-
-                const bool humanReadable = true;
-                for (auto i = 0; i < keypointVector.size(); i++)
-                {
-                    const auto finalFileName = fileNameNoExtension + (i != 0 ? "_" + std::to_string(i) : "") + ".json";
-                    saveKeypointsJson(keypointVector[i], finalFileName, humanReadable, keypointName);
-                }
-            }
+            const auto finalFileName = getNextFileName(fileName) + ".json";
+            saveKeypointsJson(keypointVector, finalFileName, humanReadable);
         }
         catch (const std::exception& e)
         {
