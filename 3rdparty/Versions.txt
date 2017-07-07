@@ -2,3 +2,6 @@ Caffe:
     - Version 1.0.0, extracted from GitHub on 14/05/2017 from the current master branch.
     - Link: https://github.com/BVLC/caffe/tree/windows
 
+Wget:
+    - Version wget-1.19.1-win64.
+    - Link: https://eternallybored.org/misc/wget/

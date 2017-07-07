@@ -335,69 +335,6 @@
     <ClInclude Include="..\..\include\openpose\gui\wGuiInfoAdder.hpp">
       <Filter>Header Files\gui</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\openpose\filestream\cocoJsonSaver.hpp">
-      <Filter>Header Files\filestream</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\filestream\enumClasses.hpp">
-      <Filter>Header Files\filestream</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\filestream\fileSaver.hpp">
-      <Filter>Header Files\filestream</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\filestream\fileStream.hpp">
-      <Filter>Header Files\filestream</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\filestream\headers.hpp">
-      <Filter>Header Files\filestream</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\filestream\heatMapSaver.hpp">
-      <Filter>Header Files\filestream</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\filestream\imageSaver.hpp">
-      <Filter>Header Files\filestream</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\filestream\jsonOfstream.hpp">
-      <Filter>Header Files\filestream</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\filestream\keypointJsonSaver.hpp">
-      <Filter>Header Files\filestream</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\filestream\keypointSaver.hpp">
-      <Filter>Header Files\filestream</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\filestream\videoSaver.hpp">
-      <Filter>Header Files\filestream</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\filestream\wCocoJsonSaver.hpp">
-      <Filter>Header Files\filestream</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\filestream\wFaceJsonSaver.hpp">
-      <Filter>Header Files\filestream</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\filestream\wFaceSaver.hpp">
-      <Filter>Header Files\filestream</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\filestream\wHandJsonSaver.hpp">
-      <Filter>Header Files\filestream</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\filestream\wHandSaver.hpp">
-      <Filter>Header Files\filestream</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\filestream\wHeatMapSaver.hpp">
-      <Filter>Header Files\filestream</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\filestream\wImageSaver.hpp">
-      <Filter>Header Files\filestream</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\filestream\wPoseJsonSaver.hpp">
-      <Filter>Header Files\filestream</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\filestream\wPoseSaver.hpp">
-      <Filter>Header Files\filestream</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\filestream\wVideoSaver.hpp">
-      <Filter>Header Files\filestream</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\openpose\experimental\headers.hpp">
       <Filter>Header Files\experimental</Filter>
     </ClInclude>
@@ -406,9 +343,6 @@
     </ClInclude>
     <ClInclude Include="..\..\include\openpose\experimental\producer\wPeoplePoseLoader.hpp">
       <Filter>Header Files\experimental\producer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\face\enumClasses.hpp">
-      <Filter>Header Files\face</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\openpose\face\faceDetector.hpp">
       <Filter>Header Files\face</Filter>
@@ -436,9 +370,6 @@
     </ClInclude>
     <ClInclude Include="..\..\include\openpose\face\wFaceRenderer.hpp">
       <Filter>Header Files\face</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\hand\enumClasses.hpp">
-      <Filter>Header Files\hand</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\openpose\hand\handDetector.hpp">
       <Filter>Header Files\hand</Filter>
@@ -475,6 +406,75 @@
     </ClInclude>
     <ClInclude Include="..\..\include\openpose\utilities\flagsToOpenPose.hpp">
       <Filter>Header Files\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\core\maximumBase.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\core\maximumCaffe.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\filestream\cocoJsonSaver.hpp">
+      <Filter>Header Files\filestream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\filestream\enumClasses.hpp">
+      <Filter>Header Files\filestream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\filestream\fileSaver.hpp">
+      <Filter>Header Files\filestream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\filestream\fileStream.hpp">
+      <Filter>Header Files\filestream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\filestream\headers.hpp">
+      <Filter>Header Files\filestream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\filestream\heatMapSaver.hpp">
+      <Filter>Header Files\filestream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\filestream\imageSaver.hpp">
+      <Filter>Header Files\filestream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\filestream\jsonOfstream.hpp">
+      <Filter>Header Files\filestream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\filestream\keypointJsonSaver.hpp">
+      <Filter>Header Files\filestream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\filestream\keypointSaver.hpp">
+      <Filter>Header Files\filestream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\filestream\videoSaver.hpp">
+      <Filter>Header Files\filestream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\filestream\wCocoJsonSaver.hpp">
+      <Filter>Header Files\filestream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\filestream\wFaceSaver.hpp">
+      <Filter>Header Files\filestream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\filestream\wHandSaver.hpp">
+      <Filter>Header Files\filestream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\filestream\wHeatMapSaver.hpp">
+      <Filter>Header Files\filestream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\filestream\wImageSaver.hpp">
+      <Filter>Header Files\filestream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\filestream\wKeypointJsonSaver.hpp">
+      <Filter>Header Files\filestream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\filestream\wPoseSaver.hpp">
+      <Filter>Header Files\filestream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\filestream\wVideoSaver.hpp">
+      <Filter>Header Files\filestream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\hand\handDetectorFromTxt.hpp">
+      <Filter>Header Files\hand</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\hand\wHandDetectorFromTxt.hpp">
+      <Filter>Header Files\hand</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -574,36 +574,6 @@
     <ClCompile Include="..\..\src\openpose\gui\guiInfoAdder.cpp">
       <Filter>Source Files\gui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\openpose\filestream\cocoJsonSaver.cpp">
-      <Filter>Source Files\filestream</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\openpose\filestream\defineTemplates.cpp">
-      <Filter>Source Files\filestream</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\openpose\filestream\fileSaver.cpp">
-      <Filter>Source Files\filestream</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\openpose\filestream\fileStream.cpp">
-      <Filter>Source Files\filestream</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\openpose\filestream\heatMapSaver.cpp">
-      <Filter>Source Files\filestream</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\openpose\filestream\imageSaver.cpp">
-      <Filter>Source Files\filestream</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\openpose\filestream\jsonOfstream.cpp">
-      <Filter>Source Files\filestream</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\openpose\filestream\keypointJsonSaver.cpp">
-      <Filter>Source Files\filestream</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\openpose\filestream\keypointSaver.cpp">
-      <Filter>Source Files\filestream</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\openpose\filestream\videoSaver.cpp">
-      <Filter>Source Files\filestream</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\openpose\core\array.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
@@ -682,6 +652,45 @@
     <ClCompile Include="..\..\src\openpose\utilities\flagsToOpenPose.cpp">
       <Filter>Source Files\utilities</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\openpose\core\maximumBase.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\core\maximumCaffe.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\filestream\cocoJsonSaver.cpp">
+      <Filter>Source Files\filestream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\filestream\defineTemplates.cpp">
+      <Filter>Source Files\filestream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\filestream\fileSaver.cpp">
+      <Filter>Source Files\filestream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\filestream\fileStream.cpp">
+      <Filter>Source Files\filestream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\filestream\heatMapSaver.cpp">
+      <Filter>Source Files\filestream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\filestream\imageSaver.cpp">
+      <Filter>Source Files\filestream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\filestream\jsonOfstream.cpp">
+      <Filter>Source Files\filestream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\filestream\keypointJsonSaver.cpp">
+      <Filter>Source Files\filestream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\filestream\keypointSaver.cpp">
+      <Filter>Source Files\filestream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\filestream\videoSaver.cpp">
+      <Filter>Source Files\filestream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\hand\handDetectorFromTxt.cpp">
+      <Filter>Source Files\hand</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\..\src\openpose\pose\bodyPartConnectorBase.cu">
@@ -701,6 +710,9 @@
     </CudaCompile>
     <CudaCompile Include="..\..\src\openpose\hand\renderHand.cu">
       <Filter>Source Files\hand</Filter>
+    </CudaCompile>
+    <CudaCompile Include="..\..\src\openpose\core\maximumBase.cu">
+      <Filter>Source Files\core</Filter>
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>
