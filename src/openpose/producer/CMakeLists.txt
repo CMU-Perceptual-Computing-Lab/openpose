@@ -140,6 +140,7 @@ target_link_libraries(${target}
     PUBLIC
     ${DEFAULT_LIBRARIES}
     ${OpenCV_LIBS}
+    ${META_PROJECT_NAME}::filestream
     INTERFACE
 )
 
