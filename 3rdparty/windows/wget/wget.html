@@ -1,0 +1,3618 @@
+<!-- Creator     : groff version 1.22.2 -->
+<!-- CreationDate: Sat Feb 25 23:28:43 2017 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p       { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       pre     { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       table   { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       h1      { text-align: center }
+</style>
+<title>WGET</title>
+
+</head>
+<body>
+
+<h1 align="center">WGET</h1>
+
+<a href="#NAME">NAME</a><br>
+<a href="#SYNOPSIS">SYNOPSIS</a><br>
+<a href="#DESCRIPTION">DESCRIPTION</a><br>
+<a href="#OPTIONS">OPTIONS</a><br>
+<a href="#ENVIRONMENT">ENVIRONMENT</a><br>
+<a href="#EXIT STATUS">EXIT STATUS</a><br>
+<a href="#FILES">FILES</a><br>
+<a href="#BUGS">BUGS</a><br>
+<a href="#SEE ALSO">SEE ALSO</a><br>
+<a href="#AUTHOR">AUTHOR</a><br>
+<a href="#COPYRIGHT">COPYRIGHT</a><br>
+
+<hr>
+
+
+<h2>NAME
+<a name="NAME"></a>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Wget &minus;
+The non&minus;interactive network downloader.</p>
+
+<h2>SYNOPSIS
+<a name="SYNOPSIS"></a>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">wget
+[<i>option</i>]... [ <i><small>URL</small></i> ]...</p>
+
+<h2>DESCRIPTION
+<a name="DESCRIPTION"></a>
+</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><small>GNU</small>
+Wget is a free utility for non-interactive download of files
+from the Web. It supports <small>HTTP, HTTPS,</small> and
+<small>FTP</small> protocols, as well as retrieval through
+<small>HTTP</small> proxies.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Wget is
+non-interactive, meaning that it can work in the background,
+while the user is not logged on. This allows you to start a
+retrieval and disconnect from the system, letting Wget
+finish the work. By contrast, most of the Web browsers
+require constant user&rsquo;s presence, which can be a great
+hindrance when transferring a lot of data.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Wget can follow
+links in <small>HTML, XHTML,</small> and <small>CSS</small>
+pages, to create local versions of remote web sites, fully
+recreating the directory structure of the original site.
+This is sometimes referred to as &quot;recursive
+downloading.&quot; While doing that, Wget respects the Robot
+Exclusion Standard (<i>/robots.txt</i>). Wget can be
+instructed to convert the links in downloaded files to point
+at the local files, for offline viewing.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Wget has been
+designed for robustness over slow or unstable network
+connections; if a download fails due to a network problem,
+it will keep retrying until the whole file has been
+retrieved. If the server supports regetting, it will
+instruct the server to continue the download from where it
+left off.</p>
+
+<h2>OPTIONS
+<a name="OPTIONS"></a>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>Option
+Syntax</b> <br>
+Since Wget uses <small>GNU</small> getopt to process
+command-line arguments, every option has a long form along
+with the short one. Long options are more convenient to
+remember, but take time to type. You may freely mix
+different option styles, or specify options after the
+command-line arguments. Thus you may write:</p>
+
+<pre style="margin-left:11%; margin-top: 1em">        wget &minus;r &minus;&minus;tries=10 http://fly.srk.fer.hr/ &minus;o log</pre>
+
+
+<p style="margin-left:11%; margin-top: 1em">The space
+between the option accepting an argument and the argument
+may be omitted. Instead of <b>&minus;o log</b> you can write
+<b>&minus;olog</b>.</p>
+
+<p style="margin-left:11%; margin-top: 1em">You may put
+several options that do not require arguments together,
+like:</p>
+
+<pre style="margin-left:11%; margin-top: 1em">        wget &minus;drc &lt;URL&gt;</pre>
+
+
+<p style="margin-left:11%; margin-top: 1em">This is
+completely equivalent to:</p>
+
+<pre style="margin-left:11%; margin-top: 1em">        wget &minus;d &minus;r &minus;c &lt;URL&gt;</pre>
+
+
+<p style="margin-left:11%; margin-top: 1em">Since the
+options can be specified after the arguments, you may
+terminate them with <b>&minus;&minus;</b>. So the following
+will try to download <small>URL</small> <b>&minus;x</b>,
+reporting failure to <i>log</i>:</p>
+
+<pre style="margin-left:11%; margin-top: 1em">        wget &minus;o log &minus;&minus; &minus;x</pre>
+
+
+<p style="margin-left:11%; margin-top: 1em">The options
+that accept comma-separated lists all respect the convention
+that specifying an empty list clears its value. This can be
+useful to clear the <i>.wgetrc</i> settings. For instance,
+if your <i>.wgetrc</i> sets
+<tt>&quot;exclude_directories&quot;</tt> to
+<i>/cgi&minus;bin</i>, the following example will first
+reset it, and then set it to exclude <i>/~nobody</i> and
+<i>/~somebody</i>. You can also clear the lists in
+<i>.wgetrc</i>.</p>
+
+<pre style="margin-left:11%; margin-top: 1em">        wget &minus;X &quot; &minus;X /~nobody,/~somebody</pre>
+
+
+<p style="margin-left:11%; margin-top: 1em">Most options
+that do not accept arguments are <i>boolean</i> options, so
+named because their state can be captured with a yes-or-no
+(&quot;boolean&quot;) variable. For example,
+<b>&minus;&minus;follow&minus;ftp</b> tells Wget to follow
+<small>FTP</small> links from <small>HTML</small> files and,
+on the other hand, <b>&minus;&minus;no&minus;glob</b> tells
+it not to perform file globbing on <small>FTP</small> URLs.
+A boolean option is either <i>affirmative</i> or
+<i>negative</i> (beginning with <b>&minus;&minus;no</b>).
+All such options share several properties.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Unless stated
+otherwise, it is assumed that the default behavior is the
+opposite of what the option accomplishes. For example, the
+documented existence of
+<b>&minus;&minus;follow&minus;ftp</b> assumes that the
+default is to <i>not</i> follow <small>FTP</small> links
+from <small>HTML</small> pages.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Affirmative
+options can be negated by prepending the
+<b>&minus;&minus;no&minus;</b> to the option name; negative
+options can be negated by omitting the
+<b>&minus;&minus;no&minus;</b> prefix. This might seem
+superfluous&minus;&minus;&minus;if the default for an
+affirmative option is to not do something, then why provide
+a way to explicitly turn it off? But the startup file may in
+fact change the default. For instance, using
+<tt>&quot;follow_ftp = on&quot;</tt> in <i>.wgetrc</i> makes
+Wget <i>follow</i> <small>FTP</small> links by default, and
+using <b>&minus;&minus;no&minus;follow&minus;ftp</b> is the
+only way to restore the factory default from the command
+line.</p>
+
+<p style="margin-left:11%; margin-top: 1em"><b>Basic
+Startup Options</b></p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="3%">
+
+
+<p><b>&minus;V</b></p></td>
+<td width="86%">
+</td></tr>
+</table>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;version</b></p>
+
+<p style="margin-left:17%;">Display the version of
+Wget.</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="3%">
+
+
+<p><b>&minus;h</b></p></td>
+<td width="86%">
+</td></tr>
+</table>
+
+<p style="margin-left:11%;"><b>&minus;&minus;help</b></p>
+
+<p style="margin-left:17%;">Print a help message describing
+all of Wget&rsquo;s command-line options.</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="3%">
+
+
+<p><b>&minus;b</b></p></td>
+<td width="86%">
+</td></tr>
+</table>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;background</b></p>
+
+<p style="margin-left:17%;">Go to background immediately
+after startup. If no output file is specified via the
+<b>&minus;o</b>, output is redirected to
+<i>wget-log</i>.</p>
+
+<p style="margin-left:11%;"><b>&minus;e</b> <i>command</i>
+<b><br>
+&minus;&minus;execute</b> <i>command</i></p>
+
+<p style="margin-left:17%;">Execute <i>command</i> as if it
+were a part of <i>.wgetrc</i>. A command thus invoked will
+be executed <i>after</i> the commands in <i>.wgetrc</i>,
+thus taking precedence over them. If you need to specify
+more than one wgetrc command, use multiple instances of
+<b>&minus;e</b>.</p>
+
+<p style="margin-left:11%; margin-top: 1em"><b>Logging and
+Input File Options <br>
+&minus;o</b> <i>logfile</i> <b><br>
+&minus;&minus;output&minus;file=</b><i>logfile</i></p>
+
+<p style="margin-left:17%;">Log all messages to
+<i>logfile</i>. The messages are normally reported to
+standard error.</p>
+
+<p style="margin-left:11%;"><b>&minus;a</b> <i>logfile</i>
+<b><br>
+&minus;&minus;append&minus;output=</b><i>logfile</i></p>
+
+<p style="margin-left:17%;">Append to <i>logfile</i>. This
+is the same as <b>&minus;o</b>, only it appends to
+<i>logfile</i> instead of overwriting the old log file. If
+<i>logfile</i> does not exist, a new file is created.</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="3%">
+
+
+<p><b>&minus;d</b></p></td>
+<td width="86%">
+</td></tr>
+</table>
+
+<p style="margin-left:11%;"><b>&minus;&minus;debug</b></p>
+
+<p style="margin-left:17%;">Turn on debug output, meaning
+various information important to the developers of Wget if
+it does not work properly. Your system administrator may
+have chosen to compile Wget without debug support, in which
+case <b>&minus;d</b> will not work. Please note that
+compiling with debug support is always
+safe&minus;&minus;&minus;Wget compiled with the debug
+support will <i>not</i> print any debug info unless
+requested with <b>&minus;d</b>.</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="3%">
+
+
+<p><b>&minus;q</b></p></td>
+<td width="86%">
+</td></tr>
+</table>
+
+<p style="margin-left:11%;"><b>&minus;&minus;quiet</b></p>
+
+<p style="margin-left:17%;">Turn off Wget&rsquo;s
+output.</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="3%">
+
+
+<p><b>&minus;v</b></p></td>
+<td width="86%">
+</td></tr>
+</table>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;verbose</b></p>
+
+<p style="margin-left:17%;">Turn on verbose output, with
+all the available data. The default output is verbose.</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="4%">
+
+
+<p><b>&minus;nv</b></p></td>
+<td width="85%">
+</td></tr>
+</table>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;no&minus;verbose</b></p>
+
+<p style="margin-left:17%;">Turn off verbose without being
+completely quiet (use <b>&minus;q</b> for that), which means
+that error messages and basic information still get
+printed.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;report&minus;speed=</b><i>type</i></p>
+
+<p style="margin-left:17%;">Output bandwidth as
+<i>type</i>. The only accepted value is <b>bits</b>.</p>
+
+<p style="margin-left:11%;"><b>&minus;i</b> <i>file</i>
+<b><br>
+&minus;&minus;input&minus;file=</b><i>file</i></p>
+
+<p style="margin-left:17%;">Read URLs from a local or
+external <i>file</i>. If <b>&minus;</b> is specified as
+<i>file</i>, URLs are read from the standard input. (Use
+<b>./&minus;</b> to read from a file literally named
+<b>&minus;</b>.)</p>
+
+<p style="margin-left:17%; margin-top: 1em">If this
+function is used, no URLs need be present on the command
+line. If there are URLs both on the command line and in an
+input file, those on the command lines will be the first
+ones to be retrieved. If
+<b>&minus;&minus;force&minus;html</b> is not specified, then
+<i>file</i> should consist of a series of URLs, one per
+line.</p>
+
+<p style="margin-left:17%; margin-top: 1em">However, if you
+specify <b>&minus;&minus;force&minus;html</b>, the document
+will be regarded as <b>html</b>. In that case you may have
+problems with relative links, which you can solve either by
+adding <tt>&quot;&lt;base
+href=&quot;</tt><i>url</i><tt>&quot;&gt;&quot;</tt> to the
+documents or by specifying
+<b>&minus;&minus;base=</b><i>url</i> on the command
+line.</p>
+
+<p style="margin-left:17%; margin-top: 1em">If the
+<i>file</i> is an external one, the document will be
+automatically treated as <b>html</b> if the Content-Type
+matches <b>text/html</b>. Furthermore, the
+<i>file</i>&rsquo;s location will be implicitly used as base
+href if none was specified.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;input&minus;metalink=</b><i>file</i></p>
+
+<p style="margin-left:17%;">Downloads files covered in
+local Metalink <i>file</i>. Metalink version 3 and 4 are
+supported.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;keep&minus;badhash</b></p>
+
+<p style="margin-left:17%;">Keeps downloaded
+Metalink&rsquo;s files with a bad hash. It appends .badhash
+to the name of Metalink&rsquo;s files which have a checksum
+mismatch, except without overwriting existing files.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;metalink&minus;over&minus;http</b></p>
+
+<p style="margin-left:17%;">Issues <small>HTTP HEAD</small>
+request instead of <small>GET</small> and extracts Metalink
+metadata from response headers. Then it switches to Metalink
+download. If no valid Metalink metadata is found, it falls
+back to ordinary <small>HTTP</small> download. Enables
+<b>Content-Type: application/metalink4+xml</b> files
+download/processing.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;metalink&minus;index=</b><i>number</i></p>
+
+<p style="margin-left:17%;">Set the Metalink
+<b>application/metalink4+xml</b> metaurl ordinal
+<small>NUMBER.</small> From 1 to the total number of
+&quot;application/metalink4+xml&quot; available. Specify 0
+or <b>inf</b> to choose the first good one. Metaurls, such
+as those from a
+<b>&minus;&minus;metalink&minus;over&minus;http</b>, may
+have been sorted by priority key&rsquo;s value; keep this in
+mind to choose the right <small>NUMBER.</small></p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;preferred&minus;location</b></p>
+
+<p style="margin-left:17%;">Set preferred location for
+Metalink resources. This has effect if multiple resources
+with same priority are available.</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="3%">
+
+
+<p><b>&minus;F</b></p></td>
+<td width="86%">
+</td></tr>
+</table>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;force&minus;html</b></p>
+
+<p style="margin-left:17%;">When input is read from a file,
+force it to be treated as an <small>HTML</small> file. This
+enables you to retrieve relative links from existing
+<small>HTML</small> files on your local disk, by adding
+<tt>&quot;&lt;base
+href=&quot;</tt><i>url</i><tt>&quot;&gt;&quot;</tt> to
+<small>HTML,</small> or using the <b>&minus;&minus;base</b>
+command-line option.</p>
+
+<p style="margin-left:11%;"><b>&minus;B</b>
+<i><small>URL</small></i> <b><br>
+&minus;&minus;base=</b> <i><small>URL</small></i></p>
+
+<p style="margin-left:17%;">Resolves relative links using
+<i><small>URL</small></i> as the point of reference, when
+reading links from an <small>HTML</small> file specified via
+the <b>&minus;i</b>/<b>&minus;&minus;input&minus;file</b>
+option (together with <b>&minus;&minus;force&minus;html</b>,
+or when the input file was fetched remotely from a server
+describing it as <small>HTML</small> ). This is equivalent
+to the presence of a <tt>&quot;BASE&quot;</tt> tag in the
+<small>HTML</small> input file, with
+<i><small>URL</small></i> as the value for the
+<tt>&quot;href&quot;</tt> attribute.</p>
+
+<p style="margin-left:17%; margin-top: 1em">For instance,
+if you specify <b>http://foo/bar/a.html</b> for
+<i><small>URL</small></i> , and Wget reads
+<b>../baz/b.html</b> from the input file, it would be
+resolved to <b>http://foo/baz/b.html</b>.</p>
+
+<p style="margin-left:11%;"><b>&minus;&minus;config=</b>
+<i><small>FILE</small></i></p>
+
+<p style="margin-left:17%;">Specify the location of a
+startup file you wish to use.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;rejected&minus;log=</b><i>logfile</i></p>
+
+<p style="margin-left:17%;">Logs all <small>URL</small>
+rejections to <i>logfile</i> as comma separated values. The
+values include the reason of rejection, the
+<small>URL</small> and the parent <small>URL</small> it was
+found in.</p>
+
+<p style="margin-left:11%; margin-top: 1em"><b>Download
+Options <br>
+&minus;&minus;bind&minus;address=</b>
+<i><small>ADDRESS</small></i></p>
+
+<p style="margin-left:17%;">When making client
+<small>TCP/IP</small> connections, bind to
+<i><small>ADDRESS</small></i> on the local machine.
+<i><small>ADDRESS</small></i> may be specified as a hostname
+or <small>IP</small> address. This option can be useful if
+your machine is bound to multiple IPs.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;bind&minus;dns&minus;address=</b>
+<i><small>ADDRESS</small></i></p>
+
+<p style="margin-left:17%;">[libcares only] This address
+overrides the route for <small>DNS</small> requests. If you
+ever need to circumvent the standard settings from
+/etc/resolv.conf, this option together with
+<b>&minus;&minus;dns&minus;servers</b> is your friend.
+<i><small>ADDRESS</small></i> must be specified either as
+IPv4 or IPv6 address. Wget needs to be built with libcares
+for this option to be available.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;dns&minus;servers=</b>
+<i><small>ADDRESSES</small></i></p>
+
+<p style="margin-left:17%;">[libcares only] The given
+address(es) override the standard nameserver addresses, e.g.
+as configured in /etc/resolv.conf.
+<i><small>ADDRESSES</small></i> may be specified either as
+IPv4 or IPv6 addresses, comma-separated. Wget needs to be
+built with libcares for this option to be available.</p>
+
+<p style="margin-left:11%;"><b>&minus;t</b> <i>number</i>
+<b><br>
+&minus;&minus;tries=</b><i>number</i></p>
+
+<p style="margin-left:17%;">Set number of tries to
+<i>number</i>. Specify 0 or <b>inf</b> for infinite
+retrying. The default is to retry 20 times, with the
+exception of fatal errors like &quot;connection
+refused&quot; or &quot;not found&quot; (404), which are not
+retried.</p>
+
+<p style="margin-left:11%;"><b>&minus;O</b> <i>file</i>
+<b><br>
+&minus;&minus;output&minus;document=</b><i>file</i></p>
+
+<p style="margin-left:17%;">The documents will not be
+written to the appropriate files, but all will be
+concatenated together and written to <i>file</i>. If
+<b>&minus;</b> is used as <i>file</i>, documents will be
+printed to standard output, disabling link conversion. (Use
+<b>./&minus;</b> to print to a file literally named
+<b>&minus;</b>.)</p>
+
+<p style="margin-left:17%; margin-top: 1em">Use of
+<b>&minus;O</b> is <i>not</i> intended to mean simply
+&quot;use the name <i>file</i> instead of the one in the
+<small>URL</small> ;&quot; rather, it is analogous to shell
+redirection: <b>wget &minus;O file http://foo</b> is
+intended to work like <b>wget &minus;O &minus; http://foo
+&gt; file</b>; <i>file</i> will be truncated immediately,
+and <i>all</i> downloaded content will be written there.</p>
+
+<p style="margin-left:17%; margin-top: 1em">For this
+reason, <b>&minus;N</b> (for timestamp-checking) is not
+supported in combination with <b>&minus;O</b>: since
+<i>file</i> is always newly created, it will always have a
+very new timestamp. A warning will be issued if this
+combination is used.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Similarly,
+using <b>&minus;r</b> or <b>&minus;p</b> with
+<b>&minus;O</b> may not work as you expect: Wget won&rsquo;t
+just download the first file to <i>file</i> and then
+download the rest to their normal names: <i>all</i>
+downloaded content will be placed in <i>file</i>. This was
+disabled in version 1.11, but has been reinstated (with a
+warning) in 1.11.2, as there are some cases where this
+behavior can actually have some use.</p>
+
+<p style="margin-left:17%; margin-top: 1em">A combination
+with <b>&minus;nc</b> is only accepted if the given output
+file does not exist.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Note that a
+combination with <b>&minus;k</b> is only permitted when
+downloading a single document, as in that case it will just
+convert all relative URIs to external ones; <b>&minus;k</b>
+makes no sense for multiple URIs when they&rsquo;re all
+being downloaded to a single file; <b>&minus;k</b> can be
+used only when the output is a regular file.</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="4%">
+
+
+<p><b>&minus;nc</b></p></td>
+<td width="85%">
+</td></tr>
+</table>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;no&minus;clobber</b></p>
+
+<p style="margin-left:17%;">If a file is downloaded more
+than once in the same directory, Wget&rsquo;s behavior
+depends on a few options, including <b>&minus;nc</b>. In
+certain cases, the local file will be <i>clobbered</i>, or
+overwritten, upon repeated download. In other cases it will
+be preserved.</p>
+
+<p style="margin-left:17%; margin-top: 1em">When running
+Wget without <b>&minus;N</b>, <b>&minus;nc</b>,
+<b>&minus;r</b>, or <b>&minus;p</b>, downloading the same
+file in the same directory will result in the original copy
+of <i>file</i> being preserved and the second copy being
+named <i>file</i><b>.1</b>. If that file is downloaded yet
+again, the third copy will be named <i>file</i><b>.2</b>,
+and so on. (This is also the behavior with <b>&minus;nd</b>,
+even if <b>&minus;r</b> or <b>&minus;p</b> are in effect.)
+When <b>&minus;nc</b> is specified, this behavior is
+suppressed, and Wget will refuse to download newer copies of
+<i>file</i>. Therefore,
+&quot;<tt>&quot;no&minus;clobber&quot;</tt>&quot; is
+actually a misnomer in this
+mode&minus;&minus;&minus;it&rsquo;s not clobbering
+that&rsquo;s prevented (as the numeric suffixes were already
+preventing clobbering), but rather the multiple version
+saving that&rsquo;s prevented.</p>
+
+<p style="margin-left:17%; margin-top: 1em">When running
+Wget with <b>&minus;r</b> or <b>&minus;p</b>, but without
+<b>&minus;N</b>, <b>&minus;nd</b>, or <b>&minus;nc</b>,
+re-downloading a file will result in the new copy simply
+overwriting the old. Adding <b>&minus;nc</b> will prevent
+this behavior, instead causing the original version to be
+preserved and any newer copies on the server to be
+ignored.</p>
+
+<p style="margin-left:17%; margin-top: 1em">When running
+Wget with <b>&minus;N</b>, with or without <b>&minus;r</b>
+or <b>&minus;p</b>, the decision as to whether or not to
+download a newer copy of a file depends on the local and
+remote timestamp and size of the file. <b>&minus;nc</b> may
+not be specified at the same time as <b>&minus;N</b>.</p>
+
+<p style="margin-left:17%; margin-top: 1em">A combination
+with
+<b>&minus;O</b>/<b>&minus;&minus;output&minus;document</b>
+is only accepted if the given output file does not
+exist.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Note that when
+<b>&minus;nc</b> is specified, files with the suffixes
+<b>.html</b> or <b>.htm</b> will be loaded from the local
+disk and parsed as if they had been retrieved from the
+Web.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;backups=</b><i>backups</i></p>
+
+<p style="margin-left:17%;">Before (over)writing a file,
+back up an existing file by adding a <b>.1</b> suffix
+(<b>_1</b> on <small>VMS</small> ) to the file name. Such
+backup files are rotated to <b>.2</b>, <b>.3</b>, and so on,
+up to <i>backups</i> (and lost beyond that).</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="3%">
+
+
+<p><b>&minus;c</b></p></td>
+<td width="86%">
+</td></tr>
+</table>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;continue</b></p>
+
+<p style="margin-left:17%;">Continue getting a
+partially-downloaded file. This is useful when you want to
+finish up a download started by a previous instance of Wget,
+or by another program. For instance:</p>
+
+<pre style="margin-left:17%; margin-top: 1em">        wget &minus;c ftp://sunsite.doc.ic.ac.uk/ls&minus;lR.Z</pre>
+
+
+<p style="margin-left:17%; margin-top: 1em">If there is a
+file named <i>ls&minus;lR.Z</i> in the current directory,
+Wget will assume that it is the first portion of the remote
+file, and will ask the server to continue the retrieval from
+an offset equal to the length of the local file.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Note that you
+don&rsquo;t need to specify this option if you just want the
+current invocation of Wget to retry downloading a file
+should the connection be lost midway through. This is the
+default behavior. <b>&minus;c</b> only affects resumption of
+downloads started <i>prior</i> to this invocation of Wget,
+and whose local files are still sitting around.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Without
+<b>&minus;c</b>, the previous example would just download
+the remote file to <i>ls&minus;lR.Z.1</i>, leaving the
+truncated <i>ls&minus;lR.Z</i> file alone.</p>
+
+<p style="margin-left:17%; margin-top: 1em">If you use
+<b>&minus;c</b> on a non-empty file, and the server does not
+support continued downloading, Wget will restart the
+download from scratch and overwrite the existing file
+entirely.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Beginning with
+Wget 1.7, if you use <b>&minus;c</b> on a file which is of
+equal size as the one on the server, Wget will refuse to
+download the file and print an explanatory message. The same
+happens when the file is smaller on the server than locally
+(presumably because it was changed on the server since your
+last download attempt)&minus;&minus;&minus;because
+&quot;continuing&quot; is not meaningful, no download
+occurs.</p>
+
+<p style="margin-left:17%; margin-top: 1em">On the other
+side of the coin, while using <b>&minus;c</b>, any file
+that&rsquo;s bigger on the server than locally will be
+considered an incomplete download and only
+<tt>&quot;(length(remote) &minus; length(local))&quot;</tt>
+bytes will be downloaded and tacked onto the end of the
+local file. This behavior can be desirable in certain
+cases&minus;&minus;&minus;for instance, you can use <b>wget
+&minus;c</b> to download just the new portion that&rsquo;s
+been appended to a data collection or log file.</p>
+
+<p style="margin-left:17%; margin-top: 1em">However, if the
+file is bigger on the server because it&rsquo;s been
+<i>changed</i>, as opposed to just <i>appended</i> to,
+you&rsquo;ll end up with a garbled file. Wget has no way of
+verifying that the local file is really a valid prefix of
+the remote file. You need to be especially careful of this
+when using <b>&minus;c</b> in conjunction with
+<b>&minus;r</b>, since every file will be considered as an
+&quot;incomplete download&quot; candidate.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Another
+instance where you&rsquo;ll get a garbled file if you try to
+use <b>&minus;c</b> is if you have a lame
+<small>HTTP</small> proxy that inserts a &quot;transfer
+interrupted&quot; string into the local file. In the future
+a &quot;rollback&quot; option may be added to deal with this
+case.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Note that
+<b>&minus;c</b> only works with <small>FTP</small> servers
+and with <small>HTTP</small> servers that support the
+<tt>&quot;Range&quot;</tt> header.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;start&minus;pos=</b>
+<i><small>OFFSET</small></i></p>
+
+<p style="margin-left:17%;">Start downloading at zero-based
+position <i><small>OFFSET</small></i> . Offset may be
+expressed in bytes, kilobytes with the &lsquo;k&rsquo;
+suffix, or megabytes with the &lsquo;m&rsquo; suffix,
+etc.</p>
+
+
+<p style="margin-left:17%; margin-top: 1em"><b>&minus;&minus;start&minus;pos</b>
+has higher precedence over <b>&minus;&minus;continue</b>.
+When <b>&minus;&minus;start&minus;pos</b> and
+<b>&minus;&minus;continue</b> are both specified, wget will
+emit a warning then proceed as if
+<b>&minus;&minus;continue</b> was absent.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Server support
+for continued download is required, otherwise
+<b>&minus;&minus;start&minus;pos</b> cannot help. See
+<b>&minus;c</b> for details.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;progress=</b><i>type</i></p>
+
+<p style="margin-left:17%;">Select the type of the progress
+indicator you wish to use. Legal indicators are
+&quot;dot&quot; and &quot;bar&quot;.</p>
+
+<p style="margin-left:17%; margin-top: 1em">The
+&quot;bar&quot; indicator is used by default. It draws an
+<small>ASCII</small> progress bar graphics (a.k.a
+&quot;thermometer&quot; display) indicating the status of
+retrieval. If the output is not a <small>TTY,</small> the
+&quot;dot&quot; bar will be used by default.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Use
+<b>&minus;&minus;progress=dot</b> to switch to the
+&quot;dot&quot; display. It traces the retrieval by printing
+dots on the screen, each dot representing a fixed amount of
+downloaded data.</p>
+
+<p style="margin-left:17%; margin-top: 1em">The progress
+<i>type</i> can also take one or more parameters. The
+parameters vary based on the <i>type</i> selected.
+Parameters to <i>type</i> are passed by appending them to
+the type sperated by a colon (:) like this:
+<b>&minus;&minus;progress=</b><i>type</i><b>:</b><i>parameter1</i><b>:</b><i>parameter2</i>.</p>
+
+<p style="margin-left:17%; margin-top: 1em">When using the
+dotted retrieval, you may set the <i>style</i> by specifying
+the type as <b>dot:</b><i>style</i>. Different styles assign
+different meaning to one dot. With the
+<tt>&quot;default&quot;</tt> style each dot represents 1K,
+there are ten dots in a cluster and 50 dots in a line. The
+<tt>&quot;binary&quot;</tt> style has a more
+&quot;computer&quot;&minus;like
+orientation&minus;&minus;&minus;8K dots, 16&minus;dots
+clusters and 48 dots per line (which makes for 384K lines).
+The <tt>&quot;mega&quot;</tt> style is suitable for
+downloading large files&minus;&minus;&minus;each dot
+represents 64K retrieved, there are eight dots in a cluster,
+and 48 dots on each line (so each line contains 3M). If
+<tt>&quot;mega&quot;</tt> is not enough then you can use the
+<tt>&quot;giga&quot;</tt> style&minus;&minus;&minus;each dot
+represents 1M retrieved, there are eight dots in a cluster,
+and 32 dots on each line (so each line contains 32M).</p>
+
+<p style="margin-left:17%; margin-top: 1em">With
+<b>&minus;&minus;progress=bar</b>, there are currently two
+possible parameters, <i>force</i> and <i>noscroll</i>.</p>
+
+<p style="margin-left:17%; margin-top: 1em">When the output
+is not a <small>TTY,</small> the progress bar always falls
+back to &quot;dot&quot;, even if
+<b>&minus;&minus;progress=bar</b> was passed to Wget during
+invocation. This behaviour can be overridden and the
+&quot;bar&quot; output forced by using the &quot;force&quot;
+parameter as <b>&minus;&minus;progress=bar:force</b>.</p>
+
+<p style="margin-left:17%; margin-top: 1em">By default, the
+<b>bar</b> style progress bar scroll the name of the file
+from left to right for the file being downloaded if the
+filename exceeds the maximum length allotted for its
+display. In certain cases, such as with
+<b>&minus;&minus;progress=bar:force</b>, one may not want
+the scrolling filename in the progress bar. By passing the
+&quot;noscroll&quot; parameter, Wget can be forced to
+display as much of the filename as possible without
+scrolling through it.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Note that you
+can set the default style using the
+<tt>&quot;progress&quot;</tt> command in <i>.wgetrc</i>.
+That setting may be overridden from the command line. For
+example, to force the bar output without scrolling, use
+<b>&minus;&minus;progress=bar:force:noscroll</b>.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;show&minus;progress</b></p>
+
+<p style="margin-left:17%;">Force wget to display the
+progress bar in any verbosity.</p>
+
+<p style="margin-left:17%; margin-top: 1em">By default,
+wget only displays the progress bar in verbose mode. One may
+however, want wget to display the progress bar on screen in
+conjunction with any other verbosity modes like
+<b>&minus;&minus;no&minus;verbose</b> or
+<b>&minus;&minus;quiet</b>. This is often a desired a
+property when invoking wget to download several small/large
+files. In such a case, wget could simply be invoked with
+this parameter to get a much cleaner output on the
+screen.</p>
+
+<p style="margin-left:17%; margin-top: 1em">This option
+will also force the progress bar to be printed to
+<i>stderr</i> when used alongside the
+<b>&minus;&minus;logfile</b> option.</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="3%">
+
+
+<p><b>&minus;N</b></p></td>
+<td width="86%">
+</td></tr>
+</table>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;timestamping</b></p>
+
+<p style="margin-left:17%;">Turn on time-stamping.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;no&minus;if&minus;modified&minus;since</b></p>
+
+<p style="margin-left:17%;">Do not send If-Modified-Since
+header in <b>&minus;N</b> mode. Send preliminary
+<small>HEAD</small> request instead. This has only effect in
+<b>&minus;N</b> mode.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;no&minus;use&minus;server&minus;timestamps</b></p>
+
+<p style="margin-left:17%;">Don&rsquo;t set the local
+file&rsquo;s timestamp by the one on the server.</p>
+
+<p style="margin-left:17%; margin-top: 1em">By default,
+when a file is downloaded, its timestamps are set to match
+those from the remote file. This allows the use of
+<b>&minus;&minus;timestamping</b> on subsequent invocations
+of wget. However, it is sometimes useful to base the local
+file&rsquo;s timestamp on when it was actually downloaded;
+for that purpose, the
+<b>&minus;&minus;no&minus;use&minus;server&minus;timestamps</b>
+option has been provided.</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="3%">
+
+
+<p><b>&minus;S</b></p></td>
+<td width="86%">
+</td></tr>
+</table>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;server&minus;response</b></p>
+
+<p style="margin-left:17%;">Print the headers sent by
+<small>HTTP</small> servers and responses sent by
+<small>FTP</small> servers.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;spider</b></p>
+
+<p style="margin-left:17%;">When invoked with this option,
+Wget will behave as a Web <i>spider</i>, which means that it
+will not download the pages, just check that they are there.
+For example, you can use Wget to check your bookmarks:</p>
+
+<pre style="margin-left:17%; margin-top: 1em">        wget &minus;&minus;spider &minus;&minus;force&minus;html &minus;i bookmarks.html</pre>
+
+
+<p style="margin-left:17%; margin-top: 1em">This feature
+needs much more work for Wget to get close to the
+functionality of real web spiders.</p>
+
+<p style="margin-left:11%;"><b>&minus;T seconds <br>
+&minus;&minus;timeout=</b><i>seconds</i></p>
+
+<p style="margin-left:17%;">Set the network timeout to
+<i>seconds</i> seconds. This is equivalent to specifying
+<b>&minus;&minus;dns&minus;timeout</b>,
+<b>&minus;&minus;connect&minus;timeout</b>, and
+<b>&minus;&minus;read&minus;timeout</b>, all at the same
+time.</p>
+
+<p style="margin-left:17%; margin-top: 1em">When
+interacting with the network, Wget can check for timeout and
+abort the operation if it takes too long. This prevents
+anomalies like hanging reads and infinite connects. The only
+timeout enabled by default is a 900&minus;second read
+timeout. Setting a timeout to 0 disables it altogether.
+Unless you know what you are doing, it is best not to change
+the default timeout settings.</p>
+
+<p style="margin-left:17%; margin-top: 1em">All
+timeout-related options accept decimal values, as well as
+subsecond values. For example, <b>0.1</b> seconds is a legal
+(though unwise) choice of timeout. Subsecond timeouts are
+useful for checking server response times or for testing
+network latency.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;dns&minus;timeout=</b><i>seconds</i></p>
+
+<p style="margin-left:17%;">Set the <small>DNS</small>
+lookup timeout to <i>seconds</i> seconds. <small>DNS</small>
+lookups that don&rsquo;t complete within the specified time
+will fail. By default, there is no timeout on
+<small>DNS</small> lookups, other than that implemented by
+system libraries.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;connect&minus;timeout=</b><i>seconds</i></p>
+
+<p style="margin-left:17%;">Set the connect timeout to
+<i>seconds</i> seconds. <small>TCP</small> connections that
+take longer to establish will be aborted. By default, there
+is no connect timeout, other than that implemented by system
+libraries.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;read&minus;timeout=</b><i>seconds</i></p>
+
+<p style="margin-left:17%;">Set the read (and write)
+timeout to <i>seconds</i> seconds. The &quot;time&quot; of
+this timeout refers to <i>idle time</i>: if, at any point in
+the download, no data is received for more than the
+specified number of seconds, reading fails and the download
+is restarted. This option does not directly affect the
+duration of the entire download.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Of course, the
+remote server may choose to terminate the connection sooner
+than this option requires. The default read timeout is 900
+seconds.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;limit&minus;rate=</b><i>amount</i></p>
+
+<p style="margin-left:17%;">Limit the download speed to
+<i>amount</i> bytes per second. Amount may be expressed in
+bytes, kilobytes with the <b>k</b> suffix, or megabytes with
+the <b>m</b> suffix. For example,
+<b>&minus;&minus;limit&minus;rate=20k</b> will limit the
+retrieval rate to 20KB/s. This is useful when, for whatever
+reason, you don&rsquo;t want Wget to consume the entire
+available bandwidth.</p>
+
+<p style="margin-left:17%; margin-top: 1em">This option
+allows the use of decimal numbers, usually in conjunction
+with power suffixes; for example,
+<b>&minus;&minus;limit&minus;rate=2.5k</b> is a legal
+value.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Note that Wget
+implements the limiting by sleeping the appropriate amount
+of time after a network read that took less time than
+specified by the rate. Eventually this strategy causes the
+<small>TCP</small> transfer to slow down to approximately
+the specified rate. However, it may take some time for this
+balance to be achieved, so don&rsquo;t be surprised if
+limiting the rate doesn&rsquo;t work well with very small
+files.</p>
+
+<p style="margin-left:11%;"><b>&minus;w</b> <i>seconds</i>
+<b><br>
+&minus;&minus;wait=</b><i>seconds</i></p>
+
+<p style="margin-left:17%;">Wait the specified number of
+seconds between the retrievals. Use of this option is
+recommended, as it lightens the server load by making the
+requests less frequent. Instead of in seconds, the time can
+be specified in minutes using the <tt>&quot;m&quot;</tt>
+suffix, in hours using <tt>&quot;h&quot;</tt> suffix, or in
+days using <tt>&quot;d&quot;</tt> suffix.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Specifying a
+large value for this option is useful if the network or the
+destination host is down, so that Wget can wait long enough
+to reasonably expect the network error to be fixed before
+the retry. The waiting interval specified by this function
+is influenced by
+<tt>&quot;&minus;&minus;random&minus;wait&quot;</tt>, which
+see.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;waitretry=</b><i>seconds</i></p>
+
+<p style="margin-left:17%;">If you don&rsquo;t want Wget to
+wait between <i>every</i> retrieval, but only between
+retries of failed downloads, you can use this option. Wget
+will use <i>linear backoff</i>, waiting 1 second after the
+first failure on a given file, then waiting 2 seconds after
+the second failure on that file, up to the maximum number of
+<i>seconds</i> you specify.</p>
+
+<p style="margin-left:17%; margin-top: 1em">By default,
+Wget will assume a value of 10 seconds.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;random&minus;wait</b></p>
+
+<p style="margin-left:17%;">Some web sites may perform log
+analysis to identify retrieval programs such as Wget by
+looking for statistically significant similarities in the
+time between requests. This option causes the time between
+requests to vary between 0.5 and 1.5 * <i>wait</i> seconds,
+where <i>wait</i> was specified using the
+<b>&minus;&minus;wait</b> option, in order to mask
+Wget&rsquo;s presence from such analysis.</p>
+
+<p style="margin-left:17%; margin-top: 1em">A 2001 article
+in a publication devoted to development on a popular
+consumer platform provided code to perform this analysis on
+the fly. Its author suggested blocking at the class C
+address level to ensure automated retrieval programs were
+blocked despite changing DHCP-supplied addresses.</p>
+
+<p style="margin-left:17%; margin-top: 1em">The
+<b>&minus;&minus;random&minus;wait</b> option was inspired
+by this ill-advised recommendation to block many unrelated
+users from a web site due to the actions of one.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;no&minus;proxy</b></p>
+
+<p style="margin-left:17%;">Don&rsquo;t use proxies, even
+if the appropriate <tt>*_proxy</tt> environment variable is
+defined.</p>
+
+<p style="margin-left:11%;"><b>&minus;Q</b> <i>quota</i>
+<b><br>
+&minus;&minus;quota=</b><i>quota</i></p>
+
+<p style="margin-left:17%;">Specify download quota for
+automatic retrievals. The value can be specified in bytes
+(default), kilobytes (with <b>k</b> suffix), or megabytes
+(with <b>m</b> suffix).</p>
+
+<p style="margin-left:17%; margin-top: 1em">Note that quota
+will never affect downloading a single file. So if you
+specify <b>wget &minus;Q10k
+https://example.com/ls&minus;lR.gz</b>, all of the
+<i>ls&minus;lR.gz</i> will be downloaded. The same goes even
+when several URLs are specified on the command-line.
+However, quota is respected when retrieving either
+recursively, or from an input file. Thus you may safely type
+<b>wget &minus;Q2m &minus;i
+sites</b>&minus;&minus;&minus;download will be aborted when
+the quota is exceeded.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Setting quota
+to 0 or to <b>inf</b> unlimits the download quota.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;no&minus;dns&minus;cache</b></p>
+
+<p style="margin-left:17%;">Turn off caching of
+<small>DNS</small> lookups. Normally, Wget remembers the
+<small>IP</small> addresses it looked up from
+<small>DNS</small> so it doesn&rsquo;t have to repeatedly
+contact the <small>DNS</small> server for the same
+(typically small) set of hosts it retrieves from. This cache
+exists in memory only; a new Wget run will contact
+<small>DNS</small> again.</p>
+
+<p style="margin-left:17%; margin-top: 1em">However, it has
+been reported that in some situations it is not desirable to
+cache host names, even for the duration of a short-running
+application like Wget. With this option Wget issues a new
+<small>DNS</small> lookup (more precisely, a new call to
+<tt>&quot;gethostbyname&quot;</tt> or
+<tt>&quot;getaddrinfo&quot;</tt>) each time it makes a new
+connection. Please note that this option will <i>not</i>
+affect caching that might be performed by the resolving
+library or by an external caching layer, such as
+<small>NSCD.</small></p>
+
+<p style="margin-left:17%; margin-top: 1em">If you
+don&rsquo;t understand exactly what this option does, you
+probably won&rsquo;t need it.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;restrict&minus;file&minus;names=</b><i>modes</i></p>
+
+<p style="margin-left:17%;">Change which characters found
+in remote URLs must be escaped during generation of local
+filenames. Characters that are <i>restricted</i> by this
+option are escaped, i.e. replaced with <b>%HH</b>, where
+<b><small>HH</small></b> is the hexadecimal number that
+corresponds to the restricted character. This option may
+also be used to force all alphabetical cases to be either
+lower&minus; or uppercase.</p>
+
+<p style="margin-left:17%; margin-top: 1em">By default,
+Wget escapes the characters that are not valid or safe as
+part of file names on your operating system, as well as
+control characters that are typically unprintable. This
+option is useful for changing these defaults, perhaps
+because you are downloading to a non-native partition, or
+because you want to disable escaping of the control
+characters, or you want to further restrict characters to
+only those in the <small>ASCII</small> range of values.</p>
+
+<p style="margin-left:17%; margin-top: 1em">The
+<i>modes</i> are a comma-separated set of text values. The
+acceptable values are <b>unix</b>, <b>windows</b>,
+<b>nocontrol</b>, <b>ascii</b>, <b>lowercase</b>, and
+<b>uppercase</b>. The values <b>unix</b> and <b>windows</b>
+are mutually exclusive (one will override the other), as are
+<b>lowercase</b> and <b>uppercase</b>. Those last are
+special cases, as they do not change the set of characters
+that would be escaped, but rather force local file paths to
+be converted either to lower&minus; or uppercase.</p>
+
+<p style="margin-left:17%; margin-top: 1em">When
+&quot;unix&quot; is specified, Wget escapes the character
+<b>/</b> and the control characters in the ranges
+0&minus;&minus;31 and 128&minus;&minus;159. This is the
+default on Unix-like operating systems.</p>
+
+<p style="margin-left:17%; margin-top: 1em">When
+&quot;windows&quot; is given, Wget escapes the characters
+<b>\</b>, <b>|</b>, <b>/</b>, <b>:</b>, <b>?</b>,
+<b>&quot;</b>, <b>*</b>, <b>&lt;</b>, <b>&gt;</b>, and the
+control characters in the ranges 0&minus;&minus;31 and
+128&minus;&minus;159. In addition to this, Wget in Windows
+mode uses <b>+</b> instead of <b>:</b> to separate host and
+port in local file names, and uses <b>@</b> instead of
+<b>?</b> to separate the query portion of the file name from
+the rest. Therefore, a <small>URL</small> that would be
+saved as <b>www.xemacs.org:4300/search.pl?input=blah</b> in
+Unix mode would be saved as
+<b>www.xemacs.org+4300/search.pl@input=blah</b> in Windows
+mode. This mode is the default on Windows.</p>
+
+<p style="margin-left:17%; margin-top: 1em">If you specify
+<b>nocontrol</b>, then the escaping of the control
+characters is also switched off. This option may make sense
+when you are downloading URLs whose names contain
+<small>UTF&minus;8</small> characters, on a system which can
+save and display filenames in <small>UTF&minus;8</small>
+(some possible byte values used in
+<small>UTF&minus;8</small> byte sequences fall in the range
+of values designated by Wget as &quot;controls&quot;).</p>
+
+<p style="margin-left:17%; margin-top: 1em">The
+<b>ascii</b> mode is used to specify that any bytes whose
+values are outside the range of <small>ASCII</small>
+characters (that is, greater than 127) shall be escaped.
+This can be useful when saving filenames whose encoding does
+not match the one used locally.</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="3%">
+
+
+<p><b>&minus;4</b></p></td>
+<td width="86%">
+</td></tr>
+</table>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;inet4&minus;only</b></p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="3%">
+
+
+<p><b>&minus;6</b></p></td>
+<td width="86%">
+</td></tr>
+</table>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;inet6&minus;only</b></p>
+
+<p style="margin-left:17%;">Force connecting to IPv4 or
+IPv6 addresses. With <b>&minus;&minus;inet4&minus;only</b>
+or <b>&minus;4</b>, Wget will only connect to IPv4 hosts,
+ignoring <small>AAAA</small> records in <small>DNS,</small>
+and refusing to connect to IPv6 addresses specified in URLs.
+Conversely, with <b>&minus;&minus;inet6&minus;only</b> or
+<b>&minus;6</b>, Wget will only connect to IPv6 hosts and
+ignore A records and IPv4 addresses.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Neither options
+should be needed normally. By default, an IPv6&minus;aware
+Wget will use the address family specified by the
+host&rsquo;s <small>DNS</small> record. If the
+<small>DNS</small> responds with both IPv4 and IPv6
+addresses, Wget will try them in sequence until it finds one
+it can connect to. (Also see
+<tt>&quot;&minus;&minus;prefer&minus;family&quot;</tt>
+option described below.)</p>
+
+<p style="margin-left:17%; margin-top: 1em">These options
+can be used to deliberately force the use of IPv4 or IPv6
+address families on dual family systems, usually to aid
+debugging or to deal with broken network configuration. Only
+one of <b>&minus;&minus;inet6&minus;only</b> and
+<b>&minus;&minus;inet4&minus;only</b> may be specified at
+the same time. Neither option is available in Wget compiled
+without IPv6 support.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;prefer&minus;family=none/IPv4/IPv6</b></p>
+
+<p style="margin-left:17%;">When given a choice of several
+addresses, connect to the addresses with specified address
+family first. The address order returned by
+<small>DNS</small> is used without change by default.</p>
+
+<p style="margin-left:17%; margin-top: 1em">This avoids
+spurious errors and connect attempts when accessing hosts
+that resolve to both IPv6 and IPv4 addresses from IPv4
+networks. For example, <b>www.kame.net</b> resolves to
+<b>2001:200:0:8002:203:47ff:fea5:3085</b> and to
+<b>203.178.141.194</b>. When the preferred family is
+<tt>&quot;IPv4&quot;</tt>, the IPv4 address is used first;
+when the preferred family is <tt>&quot;IPv6&quot;</tt>, the
+IPv6 address is used first; if the specified value is
+<tt>&quot;none&quot;</tt>, the address order returned by
+<small>DNS</small> is used without change.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Unlike
+<b>&minus;4</b> and <b>&minus;6</b>, this option
+doesn&rsquo;t inhibit access to any address family, it only
+changes the <i>order</i> in which the addresses are
+accessed. Also note that the reordering performed by this
+option is <i>stable</i>&minus;&minus;&minus;it doesn&rsquo;t
+affect order of addresses of the same family. That is, the
+relative order of all IPv4 addresses and of all IPv6
+addresses remains intact in all cases.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;retry&minus;connrefused</b></p>
+
+<p style="margin-left:17%;">Consider &quot;connection
+refused&quot; a transient error and try again. Normally Wget
+gives up on a <small>URL</small> when it is unable to
+connect to the site because failure to connect is taken as a
+sign that the server is not running at all and that retries
+would not help. This option is for mirroring unreliable
+sites whose servers tend to disappear for short periods of
+time.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;user=</b><i>user</i>
+<b><br>
+&minus;&minus;password=</b><i>password</i></p>
+
+<p style="margin-left:17%;">Specify the username
+<i>user</i> and password <i>password</i> for both
+<small>FTP</small> and <small>HTTP</small> file retrieval.
+These parameters can be overridden using the
+<b>&minus;&minus;ftp&minus;user</b> and
+<b>&minus;&minus;ftp&minus;password</b> options for
+<small>FTP</small> connections and the
+<b>&minus;&minus;http&minus;user</b> and
+<b>&minus;&minus;http&minus;password</b> options for
+<small>HTTP</small> connections.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;ask&minus;password</b></p>
+
+<p style="margin-left:17%;">Prompt for a password for each
+connection established. Cannot be specified when
+<b>&minus;&minus;password</b> is being used, because they
+are mutually exclusive.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;use&minus;askpass=</b><i>command</i></p>
+
+<p style="margin-left:17%;">Prompt for a user and password
+using the specified command. If no command is specified then
+the command in the environment variable
+<small>WGET_ASKPASS</small> is used. If
+<small>WGET_ASKPASS</small> is not set then the command in
+the environment variable <small>SSH_ASKPASS</small> is
+used.</p>
+
+<p style="margin-left:17%; margin-top: 1em">You can set the
+default command for use-askpass in the <i>.wgetrc</i>. That
+setting may be overridden from the command line.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;no&minus;iri</b></p>
+
+<p style="margin-left:17%;">Turn off internationalized
+<small>URI</small> ( <small>IRI</small> ) support. Use
+<b>&minus;&minus;iri</b> to turn it on. <small>IRI</small>
+support is activated by default.</p>
+
+<p style="margin-left:17%; margin-top: 1em">You can set the
+default state of <small>IRI</small> support using the
+<tt>&quot;iri&quot;</tt> command in <i>.wgetrc</i>. That
+setting may be overridden from the command line.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;local&minus;encoding=</b><i>encoding</i></p>
+
+<p style="margin-left:17%;">Force Wget to use
+<i>encoding</i> as the default system encoding. That affects
+how Wget converts URLs specified as arguments from locale to
+<small>UTF&minus;8</small> for <small>IRI</small>
+support.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Wget use the
+function <tt>&quot;nl_langinfo()&quot;</tt> and then the
+<tt>&quot;CHARSET&quot;</tt> environment variable to get the
+locale. If it fails, <small>ASCII</small> is used.</p>
+
+<p style="margin-left:17%; margin-top: 1em">You can set the
+default local encoding using the
+<tt>&quot;local_encoding&quot;</tt> command in
+<i>.wgetrc</i>. That setting may be overridden from the
+command line.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;remote&minus;encoding=</b><i>encoding</i></p>
+
+<p style="margin-left:17%;">Force Wget to use
+<i>encoding</i> as the default remote server encoding. That
+affects how Wget converts URIs found in files from remote
+encoding to <small>UTF&minus;8</small> during a recursive
+fetch. This options is only useful for <small>IRI</small>
+support, for the interpretation of non-ASCII characters.</p>
+
+<p style="margin-left:17%; margin-top: 1em">For
+<small>HTTP,</small> remote encoding can be found in
+<small>HTTP</small> <tt>&quot;Content&minus;Type&quot;</tt>
+header and in <small>HTML</small>
+<tt>&quot;Content&minus;Type http&minus;equiv&quot;</tt>
+meta tag.</p>
+
+<p style="margin-left:17%; margin-top: 1em">You can set the
+default encoding using the
+<tt>&quot;remoteencoding&quot;</tt> command in
+<i>.wgetrc</i>. That setting may be overridden from the
+command line.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;unlink</b></p>
+
+<p style="margin-left:17%;">Force Wget to unlink file
+instead of clobbering existing file. This option is useful
+for downloading to the directory with hardlinks.</p>
+
+<p style="margin-left:11%; margin-top: 1em"><b>Directory
+Options</b></p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="4%">
+
+
+<p><b>&minus;nd</b></p></td>
+<td width="85%">
+</td></tr>
+</table>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;no&minus;directories</b></p>
+
+<p style="margin-left:17%;">Do not create a hierarchy of
+directories when retrieving recursively. With this option
+turned on, all files will get saved to the current
+directory, without clobbering (if a name shows up more than
+once, the filenames will get extensions <b>.n</b>).</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="3%">
+
+
+<p><b>&minus;x</b></p></td>
+<td width="86%">
+</td></tr>
+</table>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;force&minus;directories</b></p>
+
+<p style="margin-left:17%;">The opposite of
+<b>&minus;nd</b>&minus;&minus;&minus;create a hierarchy of
+directories, even if one would not have been created
+otherwise. E.g. <b>wget &minus;x
+http://fly.srk.fer.hr/robots.txt</b> will save the
+downloaded file to <i>fly.srk.fer.hr/robots.txt</i>.</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="4%">
+
+
+<p><b>&minus;nH</b></p></td>
+<td width="85%">
+</td></tr>
+</table>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;no&minus;host&minus;directories</b></p>
+
+<p style="margin-left:17%;">Disable generation of
+host-prefixed directories. By default, invoking Wget with
+<b>&minus;r http://fly.srk.fer.hr/</b> will create a
+structure of directories beginning with
+<i>fly.srk.fer.hr/</i>. This option disables such
+behavior.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;protocol&minus;directories</b></p>
+
+<p style="margin-left:17%;">Use the protocol name as a
+directory component of local file names. For example, with
+this option, <b>wget &minus;r http://</b><i>host</i> will
+save to <b>http/</b><i>host</i><b>/...</b> rather than just
+to <i>host</i><b>/...</b>.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;cut&minus;dirs=</b><i>number</i></p>
+
+<p style="margin-left:17%;">Ignore <i>number</i> directory
+components. This is useful for getting a fine-grained
+control over the directory where recursive retrieval will be
+saved.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Take, for
+example, the directory at
+<b>ftp://ftp.xemacs.org/pub/xemacs/</b>. If you retrieve it
+with <b>&minus;r</b>, it will be saved locally under
+<i>ftp.xemacs.org/pub/xemacs/</i>. While the
+<b>&minus;nH</b> option can remove the
+<i>ftp.xemacs.org/</i> part, you are still stuck with
+<i>pub/xemacs</i>. This is where
+<b>&minus;&minus;cut&minus;dirs</b> comes in handy; it makes
+Wget not &quot;see&quot; <i>number</i> remote directory
+components. Here are several examples of how
+<b>&minus;&minus;cut&minus;dirs</b> option works.</p>
+
+<pre style="margin-left:17%; margin-top: 1em">        No options        &minus;&gt; ftp.xemacs.org/pub/xemacs/
+        &minus;nH               &minus;&gt; pub/xemacs/
+        &minus;nH &minus;&minus;cut&minus;dirs=1  &minus;&gt; xemacs/
+        &minus;nH &minus;&minus;cut&minus;dirs=2  &minus;&gt; .
+        &minus;&minus;cut&minus;dirs=1      &minus;&gt; ftp.xemacs.org/xemacs/
+        ...</pre>
+
+
+<p style="margin-left:17%; margin-top: 1em">If you just
+want to get rid of the directory structure, this option is
+similar to a combination of <b>&minus;nd</b> and
+<b>&minus;P</b>. However, unlike <b>&minus;nd</b>,
+<b>&minus;&minus;cut&minus;dirs</b> does not lose with
+subdirectories&minus;&minus;&minus;for instance, with
+<b>&minus;nH &minus;&minus;cut&minus;dirs=1</b>, a
+<i>beta/</i> subdirectory will be placed to
+<i>xemacs/beta</i>, as one would expect.</p>
+
+<p style="margin-left:11%;"><b>&minus;P</b> <i>prefix</i>
+<b><br>
+&minus;&minus;directory&minus;prefix=</b><i>prefix</i></p>
+
+<p style="margin-left:17%;">Set directory prefix to
+<i>prefix</i>. The <i>directory prefix</i> is the directory
+where all other files and subdirectories will be saved to,
+i.e. the top of the retrieval tree. The default is <b>.</b>
+(the current directory).</p>
+
+
+<p style="margin-left:11%; margin-top: 1em"><b><small>HTTP</small>
+Options <br>
+&minus;&minus;default&minus;page=</b><i>name</i></p>
+
+<p style="margin-left:17%;">Use <i>name</i> as the default
+file name when it isn&rsquo;t known (i.e., for URLs that end
+in a slash), instead of <i>index.html</i>.</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="3%">
+
+
+<p><b>&minus;E</b></p></td>
+<td width="86%">
+</td></tr>
+</table>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;adjust&minus;extension</b></p>
+
+<p style="margin-left:17%;">If a file of type
+<b>application/xhtml+xml</b> or <b>text/html</b> is
+downloaded and the <small>URL</small> does not end with the
+regexp <b>\.[Hh][Tt][Mm][Ll]?</b>, this option will cause
+the suffix <b>.html</b> to be appended to the local
+filename. This is useful, for instance, when you&rsquo;re
+mirroring a remote site that uses <b>.asp</b> pages, but you
+want the mirrored pages to be viewable on your stock Apache
+server. Another good use for this is when you&rsquo;re
+downloading CGI-generated materials. A <small>URL</small>
+like <b>http://site.com/article.cgi?25</b> will be saved as
+<i>article.cgi?25.html</i>.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Note that
+filenames changed in this way will be re-downloaded every
+time you re-mirror a site, because Wget can&rsquo;t tell
+that the local <i>X.html</i> file corresponds to remote
+<small>URL</small> <i>X</i> (since it doesn&rsquo;t yet know
+that the <small>URL</small> produces output of type
+<b>text/html</b> or <b>application/xhtml+xml</b>.</p>
+
+<p style="margin-left:17%; margin-top: 1em">As of version
+1.12, Wget will also ensure that any downloaded files of
+type <b>text/css</b> end in the suffix <b>.css</b>, and the
+option was renamed from
+<b>&minus;&minus;html&minus;extension</b>, to better reflect
+its new behavior. The old option name is still acceptable,
+but should now be considered deprecated.</p>
+
+<p style="margin-left:17%; margin-top: 1em">At some point
+in the future, this option may well be expanded to include
+suffixes for other types of content, including content types
+that are not parsed by Wget.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;http&minus;user=</b><i>user</i>
+<b><br>
+&minus;&minus;http&minus;password=</b><i>password</i></p>
+
+<p style="margin-left:17%;">Specify the username
+<i>user</i> and password <i>password</i> on an
+<small>HTTP</small> server. According to the type of the
+challenge, Wget will encode them using either the
+<tt>&quot;basic&quot;</tt> (insecure), the
+<tt>&quot;digest&quot;</tt>, or the Windows
+<tt>&quot;NTLM&quot;</tt> authentication scheme.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Another way to
+specify username and password is in the <small>URL</small>
+itself. Either method reveals your password to anyone who
+bothers to run <tt>&quot;ps&quot;</tt>. To prevent the
+passwords from being seen, use the
+<b>&minus;&minus;use&minus;askpass</b> or store them in
+<i>.wgetrc</i> or <i>.netrc</i>, and make sure to protect
+those files from other users with
+<tt>&quot;chmod&quot;</tt>. If the passwords are really
+important, do not leave them lying in those files
+either&minus;&minus;&minus;edit the files and delete them
+after Wget has started the download.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;no&minus;http&minus;keep&minus;alive</b></p>
+
+<p style="margin-left:17%;">Turn off the
+&quot;keep-alive&quot; feature for <small>HTTP</small>
+downloads. Normally, Wget asks the server to keep the
+connection open so that, when you download more than one
+document from the same server, they get transferred over the
+same <small>TCP</small> connection. This saves time and at
+the same time reduces the load on the server.</p>
+
+<p style="margin-left:17%; margin-top: 1em">This option is
+useful when, for some reason, persistent (keep-alive)
+connections don&rsquo;t work for you, for example due to a
+server bug or due to the inability of server-side scripts to
+cope with the connections.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;no&minus;cache</b></p>
+
+<p style="margin-left:17%;">Disable server-side cache. In
+this case, Wget will send the remote server an appropriate
+directive (<b>Pragma: no-cache</b>) to get the file from the
+remote service, rather than returning the cached version.
+This is especially useful for retrieving and flushing
+out-of-date documents on proxy servers.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Caching is
+allowed by default.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;no&minus;cookies</b></p>
+
+<p style="margin-left:17%;">Disable the use of cookies.
+Cookies are a mechanism for maintaining server-side state.
+The server sends the client a cookie using the
+<tt>&quot;Set&minus;Cookie&quot;</tt> header, and the client
+responds with the same cookie upon further requests. Since
+cookies allow the server owners to keep track of visitors
+and for sites to exchange this information, some consider
+them a breach of privacy. The default is to use cookies;
+however, <i>storing</i> cookies is not on by default.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;load&minus;cookies</b>
+<i>file</i></p>
+
+<p style="margin-left:17%;">Load cookies from <i>file</i>
+before the first <small>HTTP</small> retrieval. <i>file</i>
+is a textual file in the format originally used by
+Netscape&rsquo;s <i>cookies.txt</i> file.</p>
+
+<p style="margin-left:17%; margin-top: 1em">You will
+typically use this option when mirroring sites that require
+that you be logged in to access some or all of their
+content. The login process typically works by the web server
+issuing an <small>HTTP</small> cookie upon receiving and
+verifying your credentials. The cookie is then resent by the
+browser when accessing that part of the site, and so proves
+your identity.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Mirroring such
+a site requires Wget to send the same cookies your browser
+sends when communicating with the site. This is achieved by
+<b>&minus;&minus;load&minus;cookies</b>&minus;&minus;&minus;simply
+point Wget to the location of the <i>cookies.txt</i> file,
+and it will send the same cookies your browser would send in
+the same situation. Different browsers keep textual cookie
+files in different locations: <br>
+&quot;Netscape 4.x.&quot;</p>
+
+<p style="margin-left:23%;">The cookies are in
+<i>~/.netscape/cookies.txt</i>.</p>
+
+<p style="margin-left:17%;">&quot;Mozilla and Netscape
+6.x.&quot;</p>
+
+<p style="margin-left:23%;">Mozilla&rsquo;s cookie file is
+also named <i>cookies.txt</i>, located somewhere under
+<i>~/.mozilla</i>, in the directory of your profile. The
+full path usually ends up looking somewhat like
+<i>~/.mozilla/default/some-weird-string/cookies.txt</i>.</p>
+
+<p style="margin-left:17%;">&quot;Internet
+Explorer.&quot;</p>
+
+<p style="margin-left:23%;">You can produce a cookie file
+Wget can use by using the File menu, Import and Export,
+Export Cookies. This has been tested with Internet Explorer
+5; it is not guaranteed to work with earlier versions.</p>
+
+<p style="margin-left:17%;">&quot;Other browsers.&quot;</p>
+
+<p style="margin-left:23%;">If you are using a different
+browser to create your cookies,
+<b>&minus;&minus;load&minus;cookies</b> will only work if
+you can locate or produce a cookie file in the Netscape
+format that Wget expects.</p>
+
+<p style="margin-left:17%; margin-top: 1em">If you cannot
+use <b>&minus;&minus;load&minus;cookies</b>, there might
+still be an alternative. If your browser supports a
+&quot;cookie manager&quot;, you can use it to view the
+cookies used when accessing the site you&rsquo;re mirroring.
+Write down the name and value of the cookie, and manually
+instruct Wget to send those cookies, bypassing the
+&quot;official&quot; cookie support:</p>
+
+<pre style="margin-left:17%; margin-top: 1em">        wget &minus;&minus;no&minus;cookies &minus;&minus;header &quot;Cookie: &lt;name&gt;=&lt;value&gt;&quot;</pre>
+
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;save&minus;cookies</b>
+<i>file</i></p>
+
+<p style="margin-left:17%;">Save cookies to <i>file</i>
+before exiting. This will not save cookies that have expired
+or that have no expiry time (so-called &quot;session
+cookies&quot;), but also see
+<b>&minus;&minus;keep&minus;session&minus;cookies</b>.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;keep&minus;session&minus;cookies</b></p>
+
+<p style="margin-left:17%;">When specified, causes
+<b>&minus;&minus;save&minus;cookies</b> to also save session
+cookies. Session cookies are normally not saved because they
+are meant to be kept in memory and forgotten when you exit
+the browser. Saving them is useful on sites that require you
+to log in or to visit the home page before you can access
+some pages. With this option, multiple Wget runs are
+considered a single browser session as far as the site is
+concerned.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Since the
+cookie file format does not normally carry session cookies,
+Wget marks them with an expiry timestamp of 0. Wget&rsquo;s
+<b>&minus;&minus;load&minus;cookies</b> recognizes those as
+session cookies, but it might confuse other browsers. Also
+note that cookies so loaded will be treated as other session
+cookies, which means that if you want
+<b>&minus;&minus;save&minus;cookies</b> to preserve them
+again, you must use
+<b>&minus;&minus;keep&minus;session&minus;cookies</b>
+again.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;ignore&minus;length</b></p>
+
+<p style="margin-left:17%;">Unfortunately, some
+<small>HTTP</small> servers ( <small>CGI</small> programs,
+to be more precise) send out bogus
+<tt>&quot;Content&minus;Length&quot;</tt> headers, which
+makes Wget go wild, as it thinks not all the document was
+retrieved. You can spot this syndrome if Wget retries
+getting the same document again and again, each time
+claiming that the (otherwise normal) connection has closed
+on the very same byte.</p>
+
+<p style="margin-left:17%; margin-top: 1em">With this
+option, Wget will ignore the
+<tt>&quot;Content&minus;Length&quot;</tt>
+header&minus;&minus;&minus;as if it never existed.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;header=</b><i>header-line</i></p>
+
+<p style="margin-left:17%;">Send <i>header-line</i> along
+with the rest of the headers in each <small>HTTP</small>
+request. The supplied header is sent as-is, which means it
+must contain name and value separated by colon, and must not
+contain newlines.</p>
+
+<p style="margin-left:17%; margin-top: 1em">You may define
+more than one additional header by specifying
+<b>&minus;&minus;header</b> more than once.</p>
+
+<pre style="margin-left:17%; margin-top: 1em">        wget &minus;&minus;header='Accept&minus;Charset: iso&minus;8859&minus;2' \
+             &minus;&minus;header='Accept&minus;Language: hr'        \
+               http://fly.srk.fer.hr/</pre>
+
+
+<p style="margin-left:17%; margin-top: 1em">Specification
+of an empty string as the header value will clear all
+previous user-defined headers.</p>
+
+<p style="margin-left:17%; margin-top: 1em">As of Wget
+1.10, this option can be used to override headers otherwise
+generated automatically. This example instructs Wget to
+connect to localhost, but to specify <b>foo.bar</b> in the
+<tt>&quot;Host&quot;</tt> header:</p>
+
+<pre style="margin-left:17%; margin-top: 1em">        wget &minus;&minus;header=&quot;Host: foo.bar&quot; http://localhost/</pre>
+
+
+<p style="margin-left:17%; margin-top: 1em">In versions of
+Wget prior to 1.10 such use of <b>&minus;&minus;header</b>
+caused sending of duplicate headers.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;max&minus;redirect=</b><i>number</i></p>
+
+<p style="margin-left:17%;">Specifies the maximum number of
+redirections to follow for a resource. The default is 20,
+which is usually far more than necessary. However, on those
+occasions where you want to allow more (or fewer), this is
+the option to use.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;proxy&minus;user=</b><i>user</i>
+<b><br>
+&minus;&minus;proxy&minus;password=</b><i>password</i></p>
+
+<p style="margin-left:17%;">Specify the username
+<i>user</i> and password <i>password</i> for authentication
+on a proxy server. Wget will encode them using the
+<tt>&quot;basic&quot;</tt> authentication scheme.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Security
+considerations similar to those with
+<b>&minus;&minus;http&minus;password</b> pertain here as
+well.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;referer=</b><i>url</i></p>
+
+<p style="margin-left:17%;">Include &lsquo;Referer:
+<i>url</i>&rsquo; header in <small>HTTP</small> request.
+Useful for retrieving documents with server-side processing
+that assume they are always being retrieved by interactive
+web browsers and only come out properly when Referer is set
+to one of the pages that point to them.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;save&minus;headers</b></p>
+
+<p style="margin-left:17%;">Save the headers sent by the
+<small>HTTP</small> server to the file, preceding the actual
+contents, with an empty line as the separator.</p>
+
+<p style="margin-left:11%;"><b>&minus;U</b>
+<i>agent-string</i> <b><br>
+&minus;&minus;user&minus;agent=</b><i>agent-string</i></p>
+
+<p style="margin-left:17%;">Identify as <i>agent-string</i>
+to the <small>HTTP</small> server.</p>
+
+<p style="margin-left:17%; margin-top: 1em">The
+<small>HTTP</small> protocol allows the clients to identify
+themselves using a <tt>&quot;User&minus;Agent&quot;</tt>
+header field. This enables distinguishing the
+<small>WWW</small> software, usually for statistical
+purposes or for tracing of protocol violations. Wget
+normally identifies as <b>Wget/</b><i>version</i>,
+<i>version</i> being the current version number of Wget.</p>
+
+<p style="margin-left:17%; margin-top: 1em">However, some
+sites have been known to impose the policy of tailoring the
+output according to the
+<tt>&quot;User&minus;Agent&quot;</tt>&minus;supplied
+information. While this is not such a bad idea in theory, it
+has been abused by servers denying information to clients
+other than (historically) Netscape or, more frequently,
+Microsoft Internet Explorer. This option allows you to
+change the <tt>&quot;User&minus;Agent&quot;</tt> line issued
+by Wget. Use of this option is discouraged, unless you
+really know what you are doing.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Specifying
+empty user agent with
+<b>&minus;&minus;user&minus;agent=&quot;&quot;</b> instructs
+Wget not to send the <tt>&quot;User&minus;Agent&quot;</tt>
+header in <small>HTTP</small> requests.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;post&minus;data=</b><i>string</i>
+<b><br>
+&minus;&minus;post&minus;file=</b><i>file</i></p>
+
+<p style="margin-left:17%;">Use <small>POST</small> as the
+method for all <small>HTTP</small> requests and send the
+specified data in the request body.
+<b>&minus;&minus;post&minus;data</b> sends <i>string</i> as
+data, whereas <b>&minus;&minus;post&minus;file</b> sends the
+contents of <i>file</i>. Other than that, they work in
+exactly the same way. In particular, they <i>both</i> expect
+content of the form
+<tt>&quot;key1=value1&amp;key2=value2&quot;</tt>, with
+percent-encoding for special characters; the only difference
+is that one expects its content as a command-line parameter
+and the other accepts its content from a file. In
+particular, <b>&minus;&minus;post&minus;file</b> is
+<i>not</i> for transmitting files as form attachments: those
+must appear as <tt>&quot;key=value&quot;</tt> data (with
+appropriate percent-coding) just like everything else. Wget
+does not currently support
+<tt>&quot;multipart/form&minus;data&quot;</tt> for
+transmitting <small>POST</small> data; only
+<tt>&quot;application/x&minus;www&minus;form&minus;urlencoded&quot;</tt>.
+Only one of <b>&minus;&minus;post&minus;data</b> and
+<b>&minus;&minus;post&minus;file</b> should be
+specified.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Please note
+that wget does not require the content to be of the form
+<tt>&quot;key1=value1&amp;key2=value2&quot;</tt>, and
+neither does it test for it. Wget will simply transmit
+whatever data is provided to it. Most servers however expect
+the <small>POST</small> data to be in the above format when
+processing <small>HTML</small> Forms.</p>
+
+<p style="margin-left:17%; margin-top: 1em">When sending a
+<small>POST</small> request using the
+<b>&minus;&minus;post&minus;file</b> option, Wget treats the
+file as a binary file and will send every character in the
+<small>POST</small> request without stripping trailing
+newline or formfeed characters. Any other control characters
+in the text will also be sent as-is in the
+<small>POST</small> request.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Please be aware
+that Wget needs to know the size of the <small>POST</small>
+data in advance. Therefore the argument to
+<tt>&quot;&minus;&minus;post&minus;file&quot;</tt> must be a
+regular file; specifying a <small>FIFO</small> or something
+like <i>/dev/stdin</i> won&rsquo;t work. It&rsquo;s not
+quite clear how to work around this limitation inherent in
+<small>HTTP/1.0.</small> Although <small>HTTP/1.1</small>
+introduces <i>chunked</i> transfer that doesn&rsquo;t
+require knowing the request length in advance, a client
+can&rsquo;t use chunked unless it knows it&rsquo;s talking
+to an <small>HTTP/1.1</small> server. And it can&rsquo;t
+know that until it receives a response, which in turn
+requires the request to have been completed -- a
+chicken-and-egg problem.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Note: As of
+version 1.15 if Wget is redirected after the
+<small>POST</small> request is completed, its behaviour will
+depend on the response code returned by the server. In case
+of a 301 Moved Permanently, 302 Moved Temporarily or 307
+Temporary Redirect, Wget will, in accordance with
+<small>RFC2616,</small> continue to send a
+<small>POST</small> request. In case a server wants the
+client to change the Request method upon redirection, it
+should send a 303 See Other response code.</p>
+
+<p style="margin-left:17%; margin-top: 1em">This example
+shows how to log in to a server using <small>POST</small>
+and then proceed to download the desired pages, presumably
+only accessible to authorized users:</p>
+
+<pre style="margin-left:17%; margin-top: 1em">        # Log in to the server.  This can be done only once.
+        wget &minus;&minus;save&minus;cookies cookies.txt \
+             &minus;&minus;post&minus;data 'user=foo&amp;password=bar' \
+             http://example.com/auth.php
+        # Now grab the page or pages we care about.
+        wget &minus;&minus;load&minus;cookies cookies.txt \
+             &minus;p http://example.com/interesting/article.php</pre>
+
+
+<p style="margin-left:17%; margin-top: 1em">If the server
+is using session cookies to track user authentication, the
+above will not work because
+<b>&minus;&minus;save&minus;cookies</b> will not save them
+(and neither will browsers) and the <i>cookies.txt</i> file
+will be empty. In that case use
+<b>&minus;&minus;keep&minus;session&minus;cookies</b> along
+with <b>&minus;&minus;save&minus;cookies</b> to force saving
+of session cookies.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;method=</b><i>HTTP-Method</i></p>
+
+<p style="margin-left:17%;">For the purpose of RESTful
+scripting, Wget allows sending of other <small>HTTP</small>
+Methods without the need to explicitly set them using
+<b>&minus;&minus;header=Header&minus;Line</b>. Wget will use
+whatever string is passed to it after
+<b>&minus;&minus;method</b> as the <small>HTTP</small>
+Method to the server.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;body&minus;data=</b><i>Data-String</i>
+<b><br>
+&minus;&minus;body&minus;file=</b><i>Data-File</i></p>
+
+<p style="margin-left:17%;">Must be set when additional
+data needs to be sent to the server along with the Method
+specified using <b>&minus;&minus;method</b>.
+<b>&minus;&minus;body&minus;data</b> sends <i>string</i> as
+data, whereas <b>&minus;&minus;body&minus;file</b> sends the
+contents of <i>file</i>. Other than that, they work in
+exactly the same way.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Currently,
+<b>&minus;&minus;body&minus;file</b> is <i>not</i> for
+transmitting files as a whole. Wget does not currently
+support <tt>&quot;multipart/form&minus;data&quot;</tt> for
+transmitting data; only
+<tt>&quot;application/x&minus;www&minus;form&minus;urlencoded&quot;</tt>.
+In the future, this may be changed so that wget sends the
+<b>&minus;&minus;body&minus;file</b> as a complete file
+instead of sending its contents to the server. Please be
+aware that Wget needs to know the contents of
+<small>BODY</small> Data in advance, and hence the argument
+to <b>&minus;&minus;body&minus;file</b> should be a regular
+file. See <b>&minus;&minus;post&minus;file</b> for a more
+detailed explanation. Only one of
+<b>&minus;&minus;body&minus;data</b> and
+<b>&minus;&minus;body&minus;file</b> should be
+specified.</p>
+
+<p style="margin-left:17%; margin-top: 1em">If Wget is
+redirected after the request is completed, Wget will suspend
+the current method and send a <small>GET</small> request
+till the redirection is completed. This is true for all
+redirection response codes except 307 Temporary Redirect
+which is used to explicitly specify that the request method
+should <i>not</i> change. Another exception is when the
+method is set to <tt>&quot;POST&quot;</tt>, in which case
+the redirection rules specified under
+<b>&minus;&minus;post&minus;data</b> are followed.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;content&minus;disposition</b></p>
+
+<p style="margin-left:17%;">If this is set to on,
+experimental (not fully-functional) support for
+<tt>&quot;Content&minus;Disposition&quot;</tt> headers is
+enabled. This can currently result in extra round-trips to
+the server for a <tt>&quot;HEAD&quot;</tt> request, and is
+known to suffer from a few bugs, which is why it is not
+currently enabled by default.</p>
+
+<p style="margin-left:17%; margin-top: 1em">This option is
+useful for some file-downloading <small>CGI</small> programs
+that use <tt>&quot;Content&minus;Disposition&quot;</tt>
+headers to describe what the name of a downloaded file
+should be.</p>
+
+<p style="margin-left:17%; margin-top: 1em">When combined
+with <b>&minus;&minus;metalink&minus;over&minus;http</b> and
+<b>&minus;&minus;trust&minus;server&minus;names</b>, a
+<b>Content-Type: application/metalink4+xml</b> file is named
+using the <tt>&quot;Content&minus;Disposition&quot;</tt>
+filename field, if available.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;content&minus;on&minus;error</b></p>
+
+<p style="margin-left:17%;">If this is set to on, wget will
+not skip the content when the server responds with a http
+status code that indicates error.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;trust&minus;server&minus;names</b></p>
+
+<p style="margin-left:17%;">If this is set, on a redirect,
+the local file name will be based on the redirection
+<small>URL.</small> By default the local file name is based
+on the original <small>URL.</small> When doing recursive
+retrieving this can be helpful because in many web sites
+redirected URLs correspond to an underlying file structure,
+while link URLs do not.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;auth&minus;no&minus;challenge</b></p>
+
+<p style="margin-left:17%;">If this option is given, Wget
+will send Basic <small>HTTP</small> authentication
+information (plaintext username and password) for all
+requests, just like Wget 1.10.2 and prior did by
+default.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Use of this
+option is not recommended, and is intended only to support
+some few obscure servers, which never send
+<small>HTTP</small> authentication challenges, but accept
+unsolicited auth info, say, in addition to form-based
+authentication.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;retry&minus;on&minus;http&minus;error=</b><i>code[,code,...]</i></p>
+
+<p style="margin-left:17%;">Consider given
+<small>HTTP</small> response codes as non-fatal, transient
+errors. Supply a comma-separated list of 3&minus;digit
+<small>HTTP</small> response codes as argument. Useful to
+work around special circumstances where retries are
+required, but the server responds with an error code
+normally not retried by Wget. Such errors might be 503
+(Service Unavailable) and 429 (Too Many Requests). Retries
+enabled by this option are performed subject to the normal
+retry timing and retry count limitations of Wget.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Using this
+option is intended to support special use cases only and is
+generally not recommended, as it can force retries even in
+cases where the server is actually trying to decrease its
+load. Please use wisely and only if you know what you are
+doing.</p>
+
+
+<p style="margin-left:11%; margin-top: 1em"><b><small>HTTPS</small>
+( <small>SSL/TLS</small> ) Options</b> <br>
+To support encrypted <small>HTTP</small> (
+<small>HTTPS</small> ) downloads, Wget must be compiled with
+an external <small>SSL</small> library. The current default
+is GnuTLS. In addition, Wget also supports
+<small>HSTS</small> ( <small>HTTP</small> Strict Transport
+Security). If Wget is compiled without <small>SSL</small>
+support, none of these options are available. <b><br>
+&minus;&minus;secure&minus;protocol=</b><i>protocol</i></p>
+
+<p style="margin-left:17%;">Choose the secure protocol to
+be used. Legal values are <b>auto</b>, <b>SSLv2</b>,
+<b>SSLv3</b>, <b>TLSv1</b>, <b>TLSv1_1</b>, <b>TLSv1_2</b>
+and <b><small>PFS</small></b> . If <b>auto</b> is used, the
+<small>SSL</small> library is given the liberty of choosing
+the appropriate protocol automatically, which is achieved by
+sending a TLSv1 greeting. This is the default.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Specifying
+<b>SSLv2</b>, <b>SSLv3</b>, <b>TLSv1</b>, <b>TLSv1_1</b> or
+<b>TLSv1_2</b> forces the use of the corresponding protocol.
+This is useful when talking to old and buggy
+<small>SSL</small> server implementations that make it hard
+for the underlying <small>SSL</small> library to choose the
+correct protocol version. Fortunately, such servers are
+quite rare.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Specifying
+<b><small>PFS</small></b> enforces the use of the so-called
+Perfect Forward Security cipher suites. In short,
+<small>PFS</small> adds security by creating a one-time key
+for each <small>SSL</small> connection. It has a bit more
+<small>CPU</small> impact on client and server. We use known
+to be secure ciphers (e.g. no <small>MD4</small> ) and the
+<small>TLS</small> protocol.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;https&minus;only</b></p>
+
+<p style="margin-left:17%;">When in recursive mode, only
+<small>HTTPS</small> links are followed.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;no&minus;check&minus;certificate</b></p>
+
+<p style="margin-left:17%;">Don&rsquo;t check the server
+certificate against the available certificate authorities.
+Also don&rsquo;t require the <small>URL</small> host name to
+match the common name presented by the certificate.</p>
+
+<p style="margin-left:17%; margin-top: 1em">As of Wget
+1.10, the default is to verify the server&rsquo;s
+certificate against the recognized certificate authorities,
+breaking the <small>SSL</small> handshake and aborting the
+download if the verification fails. Although this provides
+more secure downloads, it does break interoperability with
+some sites that worked with previous Wget versions,
+particularly those using self-signed, expired, or otherwise
+invalid certificates. This option forces an
+&quot;insecure&quot; mode of operation that turns the
+certificate verification errors into warnings and allows you
+to proceed.</p>
+
+<p style="margin-left:17%; margin-top: 1em">If you
+encounter &quot;certificate verification&quot; errors or
+ones saying that &quot;common name doesn&rsquo;t match
+requested host name&quot;, you can use this option to bypass
+the verification and proceed with the download. <i>Only use
+this option if you are otherwise convinced of the
+site&rsquo;s authenticity, or if you really don&rsquo;t care
+about the validity of its certificate.</i> It is almost
+always a bad idea not to check the certificates when
+transmitting confidential or important data. For
+self&minus;signed/internal certificates, you should download
+the certificate and verify against that instead of forcing
+this insecure mode. If you are really sure of not desiring
+any certificate verification, you can specify
+&minus;&minus;check&minus;certificate=quiet to tell wget to
+not print any warning about invalid certificates, albeit in
+most cases this is the wrong thing to do.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;certificate=</b><i>file</i></p>
+
+<p style="margin-left:17%;">Use the client certificate
+stored in <i>file</i>. This is needed for servers that are
+configured to require certificates from the clients that
+connect to them. Normally a certificate is not required and
+this switch is optional.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;certificate&minus;type=</b><i>type</i></p>
+
+<p style="margin-left:17%;">Specify the type of the client
+certificate. Legal values are <b><small>PEM</small></b>
+(assumed by default) and <b><small>DER</small></b> , also
+known as <b><small>ASN1</small></b> .</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;private&minus;key=</b><i>file</i></p>
+
+<p style="margin-left:17%;">Read the private key from
+<i>file</i>. This allows you to provide the private key in a
+file separate from the certificate.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;private&minus;key&minus;type=</b><i>type</i></p>
+
+<p style="margin-left:17%;">Specify the type of the private
+key. Accepted values are <b><small>PEM</small></b> (the
+default) and <b><small>DER</small></b> .</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;ca&minus;certificate=</b><i>file</i></p>
+
+<p style="margin-left:17%;">Use <i>file</i> as the file
+with the bundle of certificate authorities (&quot;
+<small>CA&quot;</small> ) to verify the peers. The
+certificates must be in <small>PEM</small> format.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Without this
+option Wget looks for <small>CA</small> certificates at the
+system-specified locations, chosen at OpenSSL installation
+time.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;ca&minus;directory=</b><i>directory</i></p>
+
+<p style="margin-left:17%;">Specifies directory containing
+<small>CA</small> certificates in <small>PEM</small> format.
+Each file contains one <small>CA</small> certificate, and
+the file name is based on a hash value derived from the
+certificate. This is achieved by processing a certificate
+directory with the <tt>&quot;c_rehash&quot;</tt> utility
+supplied with OpenSSL. Using
+<b>&minus;&minus;ca&minus;directory</b> is more efficient
+than <b>&minus;&minus;ca&minus;certificate</b> when many
+certificates are installed because it allows Wget to fetch
+certificates on demand.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Without this
+option Wget looks for <small>CA</small> certificates at the
+system-specified locations, chosen at OpenSSL installation
+time.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;crl&minus;file=</b><i>file</i></p>
+
+<p style="margin-left:17%;">Specifies a <small>CRL</small>
+file in <i>file</i>. This is needed for certificates that
+have been revocated by the CAs.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;pinnedpubkey=file/hashes</b></p>
+
+<p style="margin-left:17%;">Tells wget to use the specified
+public key file (or hashes) to verify the peer. This can be
+a path to a file which contains a single public key in
+<small>PEM</small> or <small>DER</small> format, or any
+number of base64 encoded sha256 hashes preceded by
+&quot;sha256//&quot; and separated by &quot;;&quot;</p>
+
+<p style="margin-left:17%; margin-top: 1em">When
+negotiating a <small>TLS</small> or <small>SSL</small>
+connection, the server sends a certificate indicating its
+identity. A public key is extracted from this certificate
+and if it does not exactly match the public key(s) provided
+to this option, wget will abort the connection before
+sending or receiving any data.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;random&minus;file=</b><i>file</i></p>
+
+<p style="margin-left:17%;">[OpenSSL and LibreSSL only] Use
+<i>file</i> as the source of random data for seeding the
+pseudo-random number generator on systems without
+<i>/dev/urandom</i>.</p>
+
+<p style="margin-left:17%; margin-top: 1em">On such systems
+the <small>SSL</small> library needs an external source of
+randomness to initialize. Randomness may be provided by
+<small>EGD</small> (see <b>&minus;&minus;egd&minus;file</b>
+below) or read from an external source specified by the
+user. If this option is not specified, Wget looks for random
+data in <tt>$RANDFILE</tt> or, if that is unset, in
+<i>$HOME/.rnd</i>.</p>
+
+<p style="margin-left:17%; margin-top: 1em">If you&rsquo;re
+getting the &quot;Could not seed OpenSSL <small>PRNG</small>
+; disabling <small>SSL.&quot;</small> error, you should
+provide random data using some of the methods described
+above.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;egd&minus;file=</b><i>file</i></p>
+
+<p style="margin-left:17%;">[OpenSSL only] Use <i>file</i>
+as the <small>EGD</small> socket. <small>EGD</small> stands
+for <i>Entropy Gathering Daemon</i>, a user-space program
+that collects data from various unpredictable system sources
+and makes it available to other programs that might need it.
+Encryption software, such as the <small>SSL</small> library,
+needs sources of non-repeating randomness to seed the random
+number generator used to produce cryptographically strong
+keys.</p>
+
+<p style="margin-left:17%; margin-top: 1em">OpenSSL allows
+the user to specify his own source of entropy using the
+<tt>&quot;RAND_FILE&quot;</tt> environment variable. If this
+variable is unset, or if the specified file does not produce
+enough randomness, OpenSSL will read random data from
+<small>EGD</small> socket specified using this option.</p>
+
+<p style="margin-left:17%; margin-top: 1em">If this option
+is not specified (and the equivalent startup command is not
+used), <small>EGD</small> is never contacted.
+<small>EGD</small> is not needed on modern Unix systems that
+support <i>/dev/urandom</i>.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;no&minus;hsts</b></p>
+
+<p style="margin-left:17%;">Wget supports
+<small>HSTS</small> ( <small>HTTP</small> Strict Transport
+Security, <small>RFC 6797</small> ) by default. Use
+<b>&minus;&minus;no&minus;hsts</b> to make Wget act as a
+non-HSTS-compliant <small>UA.</small> As a consequence, Wget
+would ignore all the
+<tt>&quot;Strict&minus;Transport&minus;Security&quot;</tt>
+headers, and would not enforce any existing
+<small>HSTS</small> policy.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;hsts&minus;file=</b><i>file</i></p>
+
+<p style="margin-left:17%;">By default, Wget stores its
+<small>HSTS</small> database in <i>~/.wget&minus;hsts</i>.
+You can use <b>&minus;&minus;hsts&minus;file</b> to override
+this. Wget will use the supplied file as the
+<small>HSTS</small> database. Such file must conform to the
+correct <small>HSTS</small> database format used by Wget. If
+Wget cannot parse the provided file, the behaviour is
+unspecified.</p>
+
+<p style="margin-left:17%; margin-top: 1em">The
+Wget&rsquo;s <small>HSTS</small> database is a plain text
+file. Each line contains an <small>HSTS</small> entry (ie. a
+site that has issued a
+<tt>&quot;Strict&minus;Transport&minus;Security&quot;</tt>
+header and that therefore has specified a concrete
+<small>HSTS</small> policy to be applied). Lines starting
+with a dash (<tt>&quot;#&quot;</tt>) are ignored by Wget.
+Please note that in spite of this convenient
+human-readability hand-hacking the <small>HSTS</small>
+database is generally not a good idea.</p>
+
+<p style="margin-left:17%; margin-top: 1em">An
+<small>HSTS</small> entry line consists of several fields
+separated by one or more whitespace:</p>
+
+
+<p style="margin-left:17%; margin-top: 1em"><tt>&quot;&lt;hostname&gt;
+SP [&lt;port&gt;] SP &lt;include subdomains&gt; SP
+&lt;created&gt; SP &lt;max&minus;age&gt;&quot;</tt></p>
+
+<p style="margin-left:17%; margin-top: 1em">The
+<i>hostname</i> and <i>port</i> fields indicate the hostname
+and port to which the given <small>HSTS</small> policy
+applies. The <i>port</i> field may be zero, and it will, in
+most of the cases. That means that the port number will not
+be taken into account when deciding whether such
+<small>HSTS</small> policy should be applied on a given
+request (only the hostname will be evaluated). When
+<i>port</i> is different to zero, both the target hostname
+and the port will be evaluated and the <small>HSTS</small>
+policy will only be applied if both of them match. This
+feature has been included for testing/development purposes
+only. The Wget testsuite (in <i>testenv/</i>) creates
+<small>HSTS</small> databases with explicit ports with the
+purpose of ensuring Wget&rsquo;s correct behaviour. Applying
+<small>HSTS</small> policies to ports other than the default
+ones is discouraged by <small>RFC 6797</small> (see Appendix
+B &quot;Differences between <small>HSTS</small> Policy and
+Same-Origin Policy&quot;). Thus, this functionality should
+not be used in production environments and <i>port</i> will
+typically be zero. The last three fields do what they are
+expected to. The field <i>include_subdomains</i> can either
+be <tt>1</tt> or <tt>0</tt> and it signals whether the
+subdomains of the target domain should be part of the given
+<small>HSTS</small> policy as well. The <i>created</i> and
+<i>max-age</i> fields hold the timestamp values of when such
+entry was created (first seen by Wget) and the HSTS-defined
+value &rsquo;max&minus;age&rsquo;, which states how long
+should that <small>HSTS</small> policy remain active,
+measured in seconds elapsed since the timestamp stored in
+<i>created</i>. Once that time has passed, that
+<small>HSTS</small> policy will no longer be valid and will
+eventually be removed from the database.</p>
+
+<p style="margin-left:17%; margin-top: 1em">If you supply
+your own <small>HSTS</small> database via
+<b>&minus;&minus;hsts&minus;file</b>, be aware that Wget may
+modify the provided file if any change occurs between the
+<small>HSTS</small> policies requested by the remote servers
+and those in the file. When Wget exists, it effectively
+updates the <small>HSTS</small> database by rewriting the
+database file with the new entries.</p>
+
+<p style="margin-left:17%; margin-top: 1em">If the supplied
+file does not exist, Wget will create one. This file will
+contain the new <small>HSTS</small> entries. If no
+<small>HSTS</small> entries were generated (no
+<tt>&quot;Strict&minus;Transport&minus;Security&quot;</tt>
+headers were sent by any of the servers) then no file will
+be created, not even an empty one. This behaviour applies to
+the default database file (<i>~/.wget&minus;hsts</i>) as
+well: it will not be created until some server enforces an
+<small>HSTS</small> policy.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Care is taken
+not to override possible changes made by other Wget
+processes at the same time over the <small>HSTS</small>
+database. Before dumping the updated <small>HSTS</small>
+entries on the file, Wget will re-read it and merge the
+changes.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Using a custom
+<small>HSTS</small> database and/or modifying an existing
+one is discouraged. For more information about the potential
+security threats arised from such practice, see section 14
+&quot;Security Considerations&quot; of <small>RFC
+6797,</small> specially section 14.9 &quot;Creative
+Manipulation of <small>HSTS</small> Policy Store&quot;.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;warc&minus;file=</b><i>file</i></p>
+
+<p style="margin-left:17%;">Use <i>file</i> as the
+destination <small>WARC</small> file.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;warc&minus;header=</b><i>string</i></p>
+
+<p style="margin-left:17%;">Use <i>string</i> into as the
+warcinfo record.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;warc&minus;max&minus;size=</b><i>size</i></p>
+
+<p style="margin-left:17%;">Set the maximum size of the
+<small>WARC</small> files to <i>size</i>.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;warc&minus;cdx</b></p>
+
+<p style="margin-left:17%;">Write <small>CDX</small> index
+files.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;warc&minus;dedup=</b><i>file</i></p>
+
+<p style="margin-left:17%;">Do not store records listed in
+this <small>CDX</small> file.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;no&minus;warc&minus;compression</b></p>
+
+<p style="margin-left:17%;">Do not compress
+<small>WARC</small> files with <small>GZIP.</small></p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;no&minus;warc&minus;digests</b></p>
+
+<p style="margin-left:17%;">Do not calculate
+<small>SHA1</small> digests.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;no&minus;warc&minus;keep&minus;log</b></p>
+
+<p style="margin-left:17%;">Do not store the log file in a
+<small>WARC</small> record.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;warc&minus;tempdir=</b><i>dir</i></p>
+
+<p style="margin-left:17%;">Specify the location for
+temporary files created by the <small>WARC</small>
+writer.</p>
+
+
+<p style="margin-left:11%; margin-top: 1em"><b><small>FTP</small>
+Options <br>
+&minus;&minus;ftp&minus;user=</b><i>user</i> <b><br>
+&minus;&minus;ftp&minus;password=</b><i>password</i></p>
+
+<p style="margin-left:17%;">Specify the username
+<i>user</i> and password <i>password</i> on an
+<small>FTP</small> server. Without this, or the
+corresponding startup option, the password defaults to
+<b>&minus;wget@</b>, normally used for anonymous
+<small>FTP.</small></p>
+
+<p style="margin-left:17%; margin-top: 1em">Another way to
+specify username and password is in the <small>URL</small>
+itself. Either method reveals your password to anyone who
+bothers to run <tt>&quot;ps&quot;</tt>. To prevent the
+passwords from being seen, store them in <i>.wgetrc</i> or
+<i>.netrc</i>, and make sure to protect those files from
+other users with <tt>&quot;chmod&quot;</tt>. If the
+passwords are really important, do not leave them lying in
+those files either&minus;&minus;&minus;edit the files and
+delete them after Wget has started the download.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;no&minus;remove&minus;listing</b></p>
+
+<p style="margin-left:17%;">Don&rsquo;t remove the
+temporary <i>.listing</i> files generated by
+<small>FTP</small> retrievals. Normally, these files contain
+the raw directory listings received from <small>FTP</small>
+servers. Not removing them can be useful for debugging
+purposes, or when you want to be able to easily check on the
+contents of remote server directories (e.g. to verify that a
+mirror you&rsquo;re running is complete).</p>
+
+<p style="margin-left:17%; margin-top: 1em">Note that even
+though Wget writes to a known filename for this file, this
+is not a security hole in the scenario of a user making
+<i>.listing</i> a symbolic link to <i>/etc/passwd</i> or
+something and asking <tt>&quot;root&quot;</tt> to run Wget
+in his or her directory. Depending on the options used,
+either Wget will refuse to write to <i>.listing</i>, making
+the globbing/recursion/time&minus;stamping operation fail,
+or the symbolic link will be deleted and replaced with the
+actual <i>.listing</i> file, or the listing will be written
+to a <i>.listing.number</i> file.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Even though
+this situation isn&rsquo;t a problem, though,
+<tt>&quot;root&quot;</tt> should never run Wget in a
+non-trusted user&rsquo;s directory. A user could do
+something as simple as linking <i>index.html</i> to
+<i>/etc/passwd</i> and asking <tt>&quot;root&quot;</tt> to
+run Wget with <b>&minus;N</b> or <b>&minus;r</b> so the file
+will be overwritten.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;no&minus;glob</b></p>
+
+<p style="margin-left:17%;">Turn off <small>FTP</small>
+globbing. Globbing refers to the use of shell-like special
+characters (<i>wildcards</i>), like <b>*</b>, <b>?</b>,
+<b>[</b> and <b>]</b> to retrieve more than one file from
+the same directory at once, like:</p>
+
+<pre style="margin-left:17%; margin-top: 1em">        wget ftp://gnjilux.srk.fer.hr/*.msg</pre>
+
+
+<p style="margin-left:17%; margin-top: 1em">By default,
+globbing will be turned on if the <small>URL</small>
+contains a globbing character. This option may be used to
+turn globbing on or off permanently.</p>
+
+<p style="margin-left:17%; margin-top: 1em">You may have to
+quote the <small>URL</small> to protect it from being
+expanded by your shell. Globbing makes Wget look for a
+directory listing, which is system-specific. This is why it
+currently works only with Unix <small>FTP</small> servers
+(and the ones emulating Unix <tt>&quot;ls&quot;</tt>
+output).</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;no&minus;passive&minus;ftp</b></p>
+
+<p style="margin-left:17%;">Disable the use of the
+<i>passive</i> <small>FTP</small> transfer mode. Passive
+<small>FTP</small> mandates that the client connect to the
+server to establish the data connection rather than the
+other way around.</p>
+
+<p style="margin-left:17%; margin-top: 1em">If the machine
+is connected to the Internet directly, both passive and
+active <small>FTP</small> should work equally well. Behind
+most firewall and <small>NAT</small> configurations passive
+<small>FTP</small> has a better chance of working. However,
+in some rare firewall configurations, active
+<small>FTP</small> actually works when passive
+<small>FTP</small> doesn&rsquo;t. If you suspect this to be
+the case, use this option, or set
+<tt>&quot;passive_ftp=off&quot;</tt> in your init file.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;preserve&minus;permissions</b></p>
+
+<p style="margin-left:17%;">Preserve remote file
+permissions instead of permissions set by umask.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;retr&minus;symlinks</b></p>
+
+<p style="margin-left:17%;">By default, when retrieving
+<small>FTP</small> directories recursively and a symbolic
+link is encountered, the symbolic link is traversed and the
+pointed-to files are retrieved. Currently, Wget does not
+traverse symbolic links to directories to download them
+recursively, though this feature may be added in the
+future.</p>
+
+<p style="margin-left:17%; margin-top: 1em">When
+<b>&minus;&minus;retr&minus;symlinks=no</b> is specified,
+the linked-to file is not downloaded. Instead, a matching
+symbolic link is created on the local filesystem. The
+pointed-to file will not be retrieved unless this recursive
+retrieval would have encountered it separately and
+downloaded it anyway. This option poses a security risk
+where a malicious <small>FTP</small> Server may cause Wget
+to write to files outside of the intended directories
+through a specially crafted .LISTING file.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Note that when
+retrieving a file (not a directory) because it was specified
+on the command-line, rather than because it was recursed to,
+this option has no effect. Symbolic links are always
+traversed in this case.</p>
+
+
+<p style="margin-left:11%; margin-top: 1em"><b><small>FTPS</small>
+Options <br>
+&minus;&minus;ftps&minus;implicit</b></p>
+
+<p style="margin-left:17%;">This option tells Wget to use
+<small>FTPS</small> implicitly. Implicit <small>FTPS</small>
+consists of initializing <small>SSL/TLS</small> from the
+very beginning of the control connection. This option does
+not send an <tt>&quot;AUTH TLS&quot;</tt> command: it
+assumes the server speaks <small>FTPS</small> and directly
+starts an <small>SSL/TLS</small> connection. If the attempt
+is successful, the session continues just like regular
+<small>FTPS</small> (<tt>&quot;PBSZ&quot;</tt> and
+<tt>&quot;PROT&quot;</tt> are sent, etc.). Implicit
+<small>FTPS</small> is no longer a requirement for
+<small>FTPS</small> implementations, and thus many servers
+may not support it. If
+<b>&minus;&minus;ftps&minus;implicit</b> is passed and no
+explicit port number specified, the default port for
+implicit <small>FTPS, 990,</small> will be used, instead of
+the default port for the &quot;normal&quot; (explicit)
+<small>FTPS</small> which is the same as that of <small>FTP,
+21.</small></p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;no&minus;ftps&minus;resume&minus;ssl</b></p>
+
+<p style="margin-left:17%;">Do not resume the
+<small>SSL/TLS</small> session in the data channel. When
+starting a data connection, Wget tries to resume the
+<small>SSL/TLS</small> session previously started in the
+control connection. <small>SSL/TLS</small> session
+resumption avoids performing an entirely new handshake by
+reusing the <small>SSL/TLS</small> parameters of a previous
+session. Typically, the <small>FTPS</small> servers want it
+that way, so Wget does this by default. Under rare
+circumstances however, one might want to start an entirely
+new <small>SSL/TLS</small> session in every data connection.
+This is what
+<b>&minus;&minus;no&minus;ftps&minus;resume&minus;ssl</b> is
+for.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;ftps&minus;clear&minus;data&minus;connection</b></p>
+
+<p style="margin-left:17%;">All the data connections will
+be in plain text. Only the control connection will be under
+<small>SSL/TLS.</small> Wget will send a <tt>&quot;PROT
+C&quot;</tt> command to achieve this, which must be approved
+by the server.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;ftps&minus;fallback&minus;to&minus;ftp</b></p>
+
+<p style="margin-left:17%;">Fall back to <small>FTP</small>
+if <small>FTPS</small> is not supported by the target
+server. For security reasons, this option is not asserted by
+default. The default behaviour is to exit with an error. If
+a server does not successfully reply to the initial
+<tt>&quot;AUTH TLS&quot;</tt> command, or in the case of
+implicit <small>FTPS,</small> if the initial
+<small>SSL/TLS</small> connection attempt is rejected, it is
+considered that such server does not support
+<small>FTPS.</small></p>
+
+<p style="margin-left:11%; margin-top: 1em"><b>Recursive
+Retrieval Options</b></p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="3%">
+
+
+<p><b>&minus;r</b></p></td>
+<td width="86%">
+</td></tr>
+</table>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;recursive</b></p>
+
+<p style="margin-left:17%;">Turn on recursive retrieving.
+The default maximum depth is 5.</p>
+
+<p style="margin-left:11%;"><b>&minus;l</b> <i>depth</i>
+<b><br>
+&minus;&minus;level=</b><i>depth</i></p>
+
+<p style="margin-left:17%;">Specify recursion maximum depth
+level <i>depth</i>.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;delete&minus;after</b></p>
+
+<p style="margin-left:17%;">This option tells Wget to
+delete every single file it downloads, <i>after</i> having
+done so. It is useful for pre-fetching popular pages through
+a proxy, e.g.:</p>
+
+<pre style="margin-left:17%; margin-top: 1em">        wget &minus;r &minus;nd &minus;&minus;delete&minus;after http://whatever.com/~popular/page/</pre>
+
+
+<p style="margin-left:17%; margin-top: 1em">The
+<b>&minus;r</b> option is to retrieve recursively, and
+<b>&minus;nd</b> to not create directories.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Note that
+<b>&minus;&minus;delete&minus;after</b> deletes files on the
+local machine. It does not issue the
+<b><small>DELE</small></b> command to remote
+<small>FTP</small> sites, for instance. Also note that when
+<b>&minus;&minus;delete&minus;after</b> is specified,
+<b>&minus;&minus;convert&minus;links</b> is ignored, so
+<b>.orig</b> files are simply not created in the first
+place.</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="3%">
+
+
+<p><b>&minus;k</b></p></td>
+<td width="86%">
+</td></tr>
+</table>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;convert&minus;links</b></p>
+
+<p style="margin-left:17%;">After the download is complete,
+convert the links in the document to make them suitable for
+local viewing. This affects not only the visible hyperlinks,
+but any part of the document that links to external content,
+such as embedded images, links to style sheets, hyperlinks
+to non-HTML content, etc.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Each link will
+be changed in one of the two ways:</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="17%"></td>
+<td width="1%">
+
+
+<p>&bull;</p></td>
+<td width="5%"></td>
+<td width="77%">
+
+
+<p>The links to files that have been downloaded by Wget
+will be changed to refer to the file they point to as a
+relative link.</p></td></tr>
+</table>
+
+<p style="margin-left:23%; margin-top: 1em">Example: if the
+downloaded file <i>/foo/doc.html</i> links to
+<i>/bar/img.gif</i>, also downloaded, then the link in
+<i>doc.html</i> will be modified to point to
+<b>../bar/img.gif</b>. This kind of transformation works
+reliably for arbitrary combinations of directories.</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="17%"></td>
+<td width="1%">
+
+
+<p style="margin-top: 1em">&bull;</p></td>
+<td width="5%"></td>
+<td width="77%">
+
+
+<p style="margin-top: 1em">The links to files that have not
+been downloaded by Wget will be changed to include host name
+and absolute path of the location they point to.</p></td></tr>
+</table>
+
+<p style="margin-left:23%; margin-top: 1em">Example: if the
+downloaded file <i>/foo/doc.html</i> links to
+<i>/bar/img.gif</i> (or to <i>../bar/img.gif</i>), then the
+link in <i>doc.html</i> will be modified to point to
+<i>http://hostname/bar/img.gif</i>.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Because of
+this, local browsing works reliably: if a linked file was
+downloaded, the link will refer to its local name; if it was
+not downloaded, the link will refer to its full Internet
+address rather than presenting a broken link. The fact that
+the former links are converted to relative links ensures
+that you can move the downloaded hierarchy to another
+directory.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Note that only
+at the end of the download can Wget know which links have
+been downloaded. Because of that, the work done by
+<b>&minus;k</b> will be performed at the end of all the
+downloads.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;convert&minus;file&minus;only</b></p>
+
+<p style="margin-left:17%;">This option converts only the
+filename part of the URLs, leaving the rest of the URLs
+untouched. This filename part is sometimes referred to as
+the &quot;basename&quot;, although we avoid that term here
+in order not to cause confusion.</p>
+
+<p style="margin-left:17%; margin-top: 1em">It works
+particularly well in conjunction with
+<b>&minus;&minus;adjust&minus;extension</b>, although this
+coupling is not enforced. It proves useful to populate
+Internet caches with files downloaded from different
+hosts.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Example: if
+some link points to <i>//foo.com/bar.cgi?xyz</i> with
+<b>&minus;&minus;adjust&minus;extension</b> asserted and its
+local destination is intended to be
+<i>./foo.com/bar.cgi?xyz.css</i>, then the link would be
+converted to <i>//foo.com/bar.cgi?xyz.css</i>. Note that
+only the filename part has been modified. The rest of the
+<small>URL</small> has been left untouched, including the
+net path (<tt>&quot;//&quot;</tt>) which would otherwise be
+processed by Wget and converted to the effective scheme (ie.
+<tt>&quot;http://&quot;</tt>).</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="3%">
+
+
+<p><b>&minus;K</b></p></td>
+<td width="86%">
+</td></tr>
+</table>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;backup&minus;converted</b></p>
+
+<p style="margin-left:17%;">When converting a file, back up
+the original version with a <b>.orig</b> suffix. Affects the
+behavior of <b>&minus;N</b>.</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="3%">
+
+
+<p><b>&minus;m</b></p></td>
+<td width="86%">
+</td></tr>
+</table>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;mirror</b></p>
+
+<p style="margin-left:17%;">Turn on options suitable for
+mirroring. This option turns on recursion and time-stamping,
+sets infinite recursion depth and keeps <small>FTP</small>
+directory listings. It is currently equivalent to
+<b>&minus;r &minus;N &minus;l inf
+&minus;&minus;no&minus;remove&minus;listing</b>.</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="3%">
+
+
+<p><b>&minus;p</b></p></td>
+<td width="86%">
+</td></tr>
+</table>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;page&minus;requisites</b></p>
+
+<p style="margin-left:17%;">This option causes Wget to
+download all the files that are necessary to properly
+display a given <small>HTML</small> page. This includes such
+things as inlined images, sounds, and referenced
+stylesheets.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Ordinarily,
+when downloading a single <small>HTML</small> page, any
+requisite documents that may be needed to display it
+properly are not downloaded. Using <b>&minus;r</b> together
+with <b>&minus;l</b> can help, but since Wget does not
+ordinarily distinguish between external and inlined
+documents, one is generally left with &quot;leaf
+documents&quot; that are missing their requisites.</p>
+
+<p style="margin-left:17%; margin-top: 1em">For instance,
+say document <i>1.html</i> contains an
+<tt>&quot;&lt;IMG&gt;&quot;</tt> tag referencing
+<i>1.gif</i> and an <tt>&quot;&lt;A&gt;&quot;</tt> tag
+pointing to external document <i>2.html</i>. Say that
+<i>2.html</i> is similar but that its image is <i>2.gif</i>
+and it links to <i>3.html</i>. Say this continues up to some
+arbitrarily high number.</p>
+
+<p style="margin-left:17%; margin-top: 1em">If one executes
+the command:</p>
+
+<pre style="margin-left:17%; margin-top: 1em">        wget &minus;r &minus;l 2 http://&lt;site&gt;/1.html</pre>
+
+
+<p style="margin-left:17%; margin-top: 1em">then
+<i>1.html</i>, <i>1.gif</i>, <i>2.html</i>, <i>2.gif</i>,
+and <i>3.html</i> will be downloaded. As you can see,
+<i>3.html</i> is without its requisite <i>3.gif</i> because
+Wget is simply counting the number of hops (up to 2) away
+from <i>1.html</i> in order to determine where to stop the
+recursion. However, with this command:</p>
+
+<pre style="margin-left:17%; margin-top: 1em">        wget &minus;r &minus;l 2 &minus;p http://&lt;site&gt;/1.html</pre>
+
+
+<p style="margin-left:17%; margin-top: 1em">all the above
+files <i>and 3.html</i>&rsquo;s requisite <i>3.gif</i> will
+be downloaded. Similarly,</p>
+
+<pre style="margin-left:17%; margin-top: 1em">        wget &minus;r &minus;l 1 &minus;p http://&lt;site&gt;/1.html</pre>
+
+
+<p style="margin-left:17%; margin-top: 1em">will cause
+<i>1.html</i>, <i>1.gif</i>, <i>2.html</i>, and <i>2.gif</i>
+to be downloaded. One might think that:</p>
+
+<pre style="margin-left:17%; margin-top: 1em">        wget &minus;r &minus;l 0 &minus;p http://&lt;site&gt;/1.html</pre>
+
+
+<p style="margin-left:17%; margin-top: 1em">would download
+just <i>1.html</i> and <i>1.gif</i>, but unfortunately this
+is not the case, because <b>&minus;l 0</b> is equivalent to
+<b>&minus;l inf</b>&minus;&minus;&minus;that is, infinite
+recursion. To download a single <small>HTML</small> page (or
+a handful of them, all specified on the command-line or in a
+<b>&minus;i</b> <small>URL</small> input file) and its (or
+their) requisites, simply leave off <b>&minus;r</b> and
+<b>&minus;l</b>:</p>
+
+<pre style="margin-left:17%; margin-top: 1em">        wget &minus;p http://&lt;site&gt;/1.html</pre>
+
+
+<p style="margin-left:17%; margin-top: 1em">Note that Wget
+will behave as if <b>&minus;r</b> had been specified, but
+only that single page and its requisites will be downloaded.
+Links from that page to external documents will not be
+followed. Actually, to download a single page and all its
+requisites (even if they exist on separate websites), and
+make sure the lot displays properly locally, this author
+likes to use a few options in addition to
+<b>&minus;p</b>:</p>
+
+<pre style="margin-left:17%; margin-top: 1em">        wget &minus;E &minus;H &minus;k &minus;K &minus;p http://&lt;site&gt;/&lt;document&gt;</pre>
+
+
+<p style="margin-left:17%; margin-top: 1em">To finish off
+this topic, it&rsquo;s worth knowing that Wget&rsquo;s idea
+of an external document link is any <small>URL</small>
+specified in an <tt>&quot;&lt;A&gt;&quot;</tt> tag, an
+<tt>&quot;&lt;AREA&gt;&quot;</tt> tag, or a
+<tt>&quot;&lt;LINK&gt;&quot;</tt> tag other than
+<tt>&quot;&lt;LINK
+REL=&quot;stylesheet&quot;&gt;&quot;</tt>.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;strict&minus;comments</b></p>
+
+<p style="margin-left:17%;">Turn on strict parsing of
+<small>HTML</small> comments. The default is to terminate
+comments at the first occurrence of
+<b>&minus;&minus;&gt;</b>.</p>
+
+<p style="margin-left:17%; margin-top: 1em">According to
+specifications, <small>HTML</small> comments are expressed
+as <small>SGML</small> <i>declarations</i>. Declaration is
+special markup that begins with <b>&lt;!</b> and ends with
+<b>&gt;</b>, such as <b>&lt;!DOCTYPE ...&gt;</b>, that may
+contain comments between a pair of <b>&minus;&minus;</b>
+delimiters. <small>HTML</small> comments are &quot;empty
+declarations&quot;, <small>SGML</small> declarations without
+any non-comment text. Therefore,
+<b>&lt;!&minus;&minus;foo&minus;&minus;&gt;</b> is a valid
+comment, and so is <b>&lt;!&minus;&minus;one--
+&minus;&minus;two&minus;&minus;&gt;</b>, but
+<b>&lt;!&minus;&minus;1&minus;&minus;2&minus;&minus;&gt;</b>
+is not.</p>
+
+<p style="margin-left:17%; margin-top: 1em">On the other
+hand, most <small>HTML</small> writers don&rsquo;t perceive
+comments as anything other than text delimited with
+<b>&lt;!&minus;&minus;</b> and <b>&minus;&minus;&gt;</b>,
+which is not quite the same. For example, something like
+<b>&lt;!&minus;&minus;&minus;&minus;&minus;&minus;&minus;&minus;&minus;&minus;&minus;&minus;&gt;</b>
+works as a valid comment as long as the number of dashes is
+a multiple of four (!). If not, the comment technically
+lasts until the next <b>&minus;&minus;</b>, which may be at
+the other end of the document. Because of this, many popular
+browsers completely ignore the specification and implement
+what users have come to expect: comments delimited with
+<b>&lt;!&minus;&minus;</b> and
+<b>&minus;&minus;&gt;</b>.</p>
+
+<p style="margin-left:17%; margin-top: 1em">Until version
+1.9, Wget interpreted comments strictly, which resulted in
+missing links in many web pages that displayed fine in
+browsers, but had the misfortune of containing non-compliant
+comments. Beginning with version 1.9, Wget has joined the
+ranks of clients that implements &quot;naive&quot; comments,
+terminating each comment at the first occurrence of
+<b>&minus;&minus;&gt;</b>.</p>
+
+<p style="margin-left:17%; margin-top: 1em">If, for
+whatever reason, you want strict comment parsing, use this
+option to turn it on.</p>
+
+<p style="margin-left:11%; margin-top: 1em"><b>Recursive
+Accept/Reject Options <br>
+&minus;A</b> <i>acclist</i> <b>&minus;&minus;accept</b>
+<i>acclist</i> <b><br>
+&minus;R</b> <i>rejlist</i> <b>&minus;&minus;reject</b>
+<i>rejlist</i></p>
+
+<p style="margin-left:17%;">Specify comma-separated lists
+of file name suffixes or patterns to accept or reject. Note
+that if any of the wildcard characters, <b>*</b>, <b>?</b>,
+<b>[</b> or <b>]</b>, appear in an element of <i>acclist</i>
+or <i>rejlist</i>, it will be treated as a pattern, rather
+than a suffix. In this case, you have to enclose the pattern
+into quotes to prevent your shell from expanding it, like in
+<b>&minus;A &quot;*.mp3&quot;</b> or <b>&minus;A
+&rsquo;*.mp3&rsquo;</b>.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;accept&minus;regex</b>
+<i>urlregex</i> <b><br>
+&minus;&minus;reject&minus;regex</b> <i>urlregex</i></p>
+
+<p style="margin-left:17%;">Specify a regular expression to
+accept or reject the complete <small>URL.</small></p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;regex&minus;type</b>
+<i>regextype</i></p>
+
+<p style="margin-left:17%;">Specify the regular expression
+type. Possible types are <b>posix</b> or <b>pcre</b>. Note
+that to be able to use <b>pcre</b> type, wget has to be
+compiled with libpcre support.</p>
+
+<p style="margin-left:11%;"><b>&minus;D</b>
+<i>domain-list</i> <b><br>
+&minus;&minus;domains=</b><i>domain-list</i></p>
+
+<p style="margin-left:17%;">Set domains to be followed.
+<i>domain-list</i> is a comma-separated list of domains.
+Note that it does <i>not</i> turn on <b>&minus;H</b>.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;exclude&minus;domains</b>
+<i>domain-list</i></p>
+
+<p style="margin-left:17%;">Specify the domains that are
+<i>not</i> to be followed.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;follow&minus;ftp</b></p>
+
+<p style="margin-left:17%;">Follow <small>FTP</small> links
+from <small>HTML</small> documents. Without this option,
+Wget will ignore all the <small>FTP</small> links.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;follow&minus;tags=</b><i>list</i></p>
+
+<p style="margin-left:17%;">Wget has an internal table of
+<small>HTML</small> tag / attribute pairs that it considers
+when looking for linked documents during a recursive
+retrieval. If a user wants only a subset of those tags to be
+considered, however, he or she should be specify such tags
+in a comma-separated <i>list</i> with this option.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;ignore&minus;tags=</b><i>list</i></p>
+
+<p style="margin-left:17%;">This is the opposite of the
+<b>&minus;&minus;follow&minus;tags</b> option. To skip
+certain <small>HTML</small> tags when recursively looking
+for documents to download, specify them in a comma-separated
+<i>list</i>.</p>
+
+<p style="margin-left:17%; margin-top: 1em">In the past,
+this option was the best bet for downloading a single page
+and its requisites, using a command-line like:</p>
+
+<pre style="margin-left:17%; margin-top: 1em">        wget &minus;&minus;ignore&minus;tags=a,area &minus;H &minus;k &minus;K &minus;r http://&lt;site&gt;/&lt;document&gt;</pre>
+
+
+<p style="margin-left:17%; margin-top: 1em">However, the
+author of this option came across a page with tags like
+<tt>&quot;&lt;LINK REL=&quot;home&quot;
+HREF=&quot;/&quot;&gt;&quot;</tt> and came to the
+realization that specifying tags to ignore was not enough.
+One can&rsquo;t just tell Wget to ignore
+<tt>&quot;&lt;LINK&gt;&quot;</tt>, because then stylesheets
+will not be downloaded. Now the best bet for downloading a
+single page and its requisites is the dedicated
+<b>&minus;&minus;page&minus;requisites</b> option.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;ignore&minus;case</b></p>
+
+<p style="margin-left:17%;">Ignore case when matching files
+and directories. This influences the behavior of &minus;R,
+&minus;A, &minus;I, and &minus;X options, as well as
+globbing implemented when downloading from
+<small>FTP</small> sites. For example, with this option,
+<b>&minus;A &quot;*.txt&quot;</b> will match
+<b>file1.txt</b>, but also <b>file2.TXT</b>,
+<b>file3.TxT</b>, and so on. The quotes in the example are
+to prevent the shell from expanding the pattern.</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="3%">
+
+
+<p><b>&minus;H</b></p></td>
+<td width="86%">
+</td></tr>
+</table>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;span&minus;hosts</b></p>
+
+<p style="margin-left:17%;">Enable spanning across hosts
+when doing recursive retrieving.</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="3%">
+
+
+<p><b>&minus;L</b></p></td>
+<td width="86%">
+</td></tr>
+</table>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;relative</b></p>
+
+<p style="margin-left:17%;">Follow relative links only.
+Useful for retrieving a specific home page without any
+distractions, not even those from the same hosts.</p>
+
+<p style="margin-left:11%;"><b>&minus;I</b> <i>list</i>
+<b><br>
+&minus;&minus;include&minus;directories=</b><i>list</i></p>
+
+<p style="margin-left:17%;">Specify a comma-separated list
+of directories you wish to follow when downloading. Elements
+of <i>list</i> may contain wildcards.</p>
+
+<p style="margin-left:11%;"><b>&minus;X</b> <i>list</i>
+<b><br>
+&minus;&minus;exclude&minus;directories=</b><i>list</i></p>
+
+<p style="margin-left:17%;">Specify a comma-separated list
+of directories you wish to exclude from download. Elements
+of <i>list</i> may contain wildcards.</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="4%">
+
+
+<p><b>&minus;np</b></p></td>
+<td width="85%">
+</td></tr>
+</table>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;no&minus;parent</b></p>
+
+<p style="margin-left:17%;">Do not ever ascend to the
+parent directory when retrieving recursively. This is a
+useful option, since it guarantees that only the files
+<i>below</i> a certain hierarchy will be downloaded.</p>
+
+<h2>ENVIRONMENT
+<a name="ENVIRONMENT"></a>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Wget supports
+proxies for both <small>HTTP</small> and <small>FTP</small>
+retrievals. The standard way to specify proxy location,
+which Wget recognizes, is using the following environment
+variables: <b><br>
+http_proxy <br>
+https_proxy</b></p>
+
+<p style="margin-left:17%;">If set, the <b>http_proxy</b>
+and <b>https_proxy</b> variables should contain the URLs of
+the proxies for <small>HTTP</small> and <small>HTTPS</small>
+connections respectively.</p>
+
+<p style="margin-left:11%;"><b>ftp_proxy</b></p>
+
+<p style="margin-left:17%;">This variable should contain
+the <small>URL</small> of the proxy for <small>FTP</small>
+connections. It is quite common that <b>http_proxy</b> and
+<b>ftp_proxy</b> are set to the same <small>URL.</small></p>
+
+<p style="margin-left:11%;"><b>no_proxy</b></p>
+
+<p style="margin-left:17%;">This variable should contain a
+comma-separated list of domain extensions proxy should
+<i>not</i> be used for. For instance, if the value of
+<b>no_proxy</b> is <b>.mit.edu</b>, proxy will not be used
+to retrieve documents from <small>MIT.</small></p>
+
+<h2>EXIT STATUS
+<a name="EXIT STATUS"></a>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Wget may return
+one of several error codes if it encounters problems.</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="1%">
+
+
+<p>0</p></td>
+<td width="5%"></td>
+<td width="83%">
+
+
+<p>No problems occurred.</p></td></tr>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="1%">
+
+
+<p>1</p></td>
+<td width="5%"></td>
+<td width="83%">
+
+
+<p>Generic error code.</p></td></tr>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="1%">
+
+
+<p>2</p></td>
+<td width="5%"></td>
+<td width="83%">
+
+
+<p>Parse error&minus;&minus;&minus;for instance, when
+parsing command-line options, the <b>.wgetrc</b> or
+<b>.netrc</b>...</p> </td></tr>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="1%">
+
+
+<p>3</p></td>
+<td width="5%"></td>
+<td width="83%">
+
+
+<p>File I/O error.</p></td></tr>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="1%">
+
+
+<p>4</p></td>
+<td width="5%"></td>
+<td width="83%">
+
+
+<p>Network failure.</p></td></tr>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="1%">
+
+
+<p>5</p></td>
+<td width="5%"></td>
+<td width="83%">
+
+
+<p><small>SSL</small> verification failure.</p></td></tr>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="1%">
+
+
+<p>6</p></td>
+<td width="5%"></td>
+<td width="83%">
+
+
+<p>Username/password authentication failure.</p></td></tr>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="1%">
+
+
+<p>7</p></td>
+<td width="5%"></td>
+<td width="83%">
+
+
+<p>Protocol errors.</p></td></tr>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="1%">
+
+
+<p>8</p></td>
+<td width="5%"></td>
+<td width="83%">
+
+
+<p>Server issued an error response.</p></td></tr>
+</table>
+
+<p style="margin-left:11%; margin-top: 1em">With the
+exceptions of 0 and 1, the lower-numbered exit codes take
+precedence over higher-numbered ones, when multiple types of
+errors are encountered.</p>
+
+<p style="margin-left:11%; margin-top: 1em">In versions of
+Wget prior to 1.12, Wget&rsquo;s exit status tended to be
+unhelpful and inconsistent. Recursive downloads would
+virtually always return 0 (success), regardless of any
+issues encountered, and non-recursive fetches only returned
+the status corresponding to the most recently-attempted
+download.</p>
+
+<h2>FILES
+<a name="FILES"></a>
+</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>/usr/local/etc/wgetrc</b></p>
+
+<p style="margin-left:17%;">Default location of the
+<i>global</i> startup file.</p>
+
+<p style="margin-left:11%;"><b>.wgetrc</b></p>
+
+<p style="margin-left:17%;">User startup file.</p>
+
+<h2>BUGS
+<a name="BUGS"></a>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">You are welcome
+to submit bug reports via the <small>GNU</small> Wget bug
+tracker (see
+&lt;<b>https://savannah.gnu.org/bugs/?func=additem&amp;group=wget</b>&gt;).</p>
+
+<p style="margin-left:11%; margin-top: 1em">Before actually
+submitting a bug report, please try to follow a few simple
+guidelines.</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="3%">
+
+
+<p>1.</p></td>
+<td width="3%"></td>
+<td width="83%">
+
+
+<p>Please try to ascertain that the behavior you see really
+is a bug. If Wget crashes, it&rsquo;s a bug. If Wget does
+not behave as documented, it&rsquo;s a bug. If things work
+strange, but you are not sure about the way they are
+supposed to work, it might well be a bug, but you might want
+to double-check the documentation and the mailing lists.</p></td></tr>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="3%">
+
+
+<p>2.</p></td>
+<td width="3%"></td>
+<td width="83%">
+
+
+<p>Try to repeat the bug in as simple circumstances as
+possible. E.g. if Wget crashes while downloading <b>wget
+&minus;rl0 &minus;kKE &minus;t5 &minus;&minus;no&minus;proxy
+http://example.com &minus;o /tmp/log</b>, you should try to
+see if the crash is repeatable, and if will occur with a
+simpler set of options. You might even try to start the
+download at the page where the crash occurred to see if that
+page somehow triggered the crash.</p></td></tr>
+</table>
+
+<p style="margin-left:17%; margin-top: 1em">Also, while I
+will probably be interested to know the contents of your
+<i>.wgetrc</i> file, just dumping it into the debug message
+is probably a bad idea. Instead, you should first try to see
+if the bug repeats with <i>.wgetrc</i> moved out of the way.
+Only if it turns out that <i>.wgetrc</i> settings affect the
+bug, mail me the relevant parts of the file.</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="3%">
+
+
+<p style="margin-top: 1em">3.</p></td>
+<td width="3%"></td>
+<td width="83%">
+
+
+<p style="margin-top: 1em">Please start Wget with
+<b>&minus;d</b> option and send us the resulting output (or
+relevant parts thereof). If Wget was compiled without debug
+support, recompile it&minus;&minus;&minus;it is <i>much</i>
+easier to trace bugs with debug support on.</p></td></tr>
+</table>
+
+<p style="margin-left:17%; margin-top: 1em">Note: please
+make sure to remove any potentially sensitive information
+from the debug log before sending it to the bug address. The
+<tt>&quot;&minus;d&quot;</tt> won&rsquo;t go out of its way
+to collect sensitive information, but the log <i>will</i>
+contain a fairly complete transcript of Wget&rsquo;s
+communication with the server, which may include passwords
+and pieces of downloaded data. Since the bug address is
+publically archived, you may assume that all bug reports are
+visible to the public.</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="3%">
+
+
+<p style="margin-top: 1em">4.</p></td>
+<td width="3%"></td>
+<td width="83%">
+
+
+<p style="margin-top: 1em">If Wget has crashed, try to run
+it in a debugger, e.g. <tt>&quot;gdb `which wget`
+core&quot;</tt> and type <tt>&quot;where&quot;</tt> to get
+the backtrace. This may not work if the system administrator
+has disabled core files, but it is safe to try.</p></td></tr>
+</table>
+
+<h2>SEE ALSO
+<a name="SEE ALSO"></a>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">This is
+<b>not</b> the complete manual for <small>GNU</small> Wget.
+For more complete information, including more detailed
+explanations of some of the options, and a number of
+commands available for use with <i>.wgetrc</i> files and the
+<b>&minus;e</b> option, see the <small>GNU</small> Info
+entry for <i>wget</i>.</p>
+
+<h2>AUTHOR
+<a name="AUTHOR"></a>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Originally
+written by Hrvoje Nik&Aring;&iexcl;i&Auml;
+&lt;hniksic@xemacs.org&gt;.</p>
+
+<h2>COPYRIGHT
+<a name="COPYRIGHT"></a>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Copyright (c)
+1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
+2006, 2007, 2008, 2009, 2010, 2011, 2015 Free Software
+Foundation, Inc.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Permission is
+granted to copy, distribute and/or modify this document
+under the terms of the <small>GNU</small> Free Documentation
+License, Version 1.3 or any later version published by the
+Free Software Foundation; with no Invariant Sections, with
+no Front-Cover Texts, and with no Back-Cover Texts. A copy
+of the license is included in the section entitled &quot;
+<small>GNU</small> Free Documentation License&quot;.</p>
+<hr>
+</body>
+</html>

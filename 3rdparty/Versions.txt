@@ -1,4 +1,21 @@
-Caffe:
-    - Version 1.0.0, extracted from GitHub on 05/09/2017 from the current master branch.
-    - Link: https://github.com/BVLC/caffe
+Unix:
+    - Caffe:
+        - Version 1.0.0, extracted from GitHub on 05/09/2017 from the current master branch.
+        - Link: https://github.com/BVLC/caffe
 
+Windows:
+    - Caffe & Caffe dependencies (caffe3rdparty):
+        - Version 1.0.0, extracted from GitHub on 14/05/2017 from the current master branch.
+        - Link: https://github.com/BVLC/caffe/tree/windows
+
+    - OpenCV:
+        - Version 3.1.0, extracted from their oficial website, section releases/3.1.0/Win pack
+        - Link: http://opencv.org/releases.html
+
+    - Unzip:
+        - Version 5.52
+        - Link: http://stahlworks.com/dev/?tool=zipunzip
+
+    - Wget:
+        - Version wget-1.19.1-win64.
+        - Link: https://eternallybored.org/misc/wget/

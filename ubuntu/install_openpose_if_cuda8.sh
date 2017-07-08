@@ -2,7 +2,7 @@
 
 
 
-echo "------------------------- Installing Caffe -------------------------"
+echo "------------------------- Installing OpenPose -------------------------"
 echo "NOTE: This script assumes that CUDA and cuDNN are already installed on your machine. Otherwise, it might fail."
 
 
@@ -15,6 +15,22 @@ function exitIfError {
         echo "------------------------- -------------------------"
         exit 1
     fi
+}
+
+
+
+function executeShInItsFolder {
+    # $1 = sh file name
+    # $2 = folder where the sh file is
+    # $3 = folder to go back
+    cd $2
+    exitIfError
+    sudo chmod +x $1
+    exitIfError
+    ./$1
+    exitIfError
+    cd $3
+    exitIfError
 }
 
 
@@ -45,40 +61,27 @@ echo ""
 
 
 
-echo "------------------------- Installing some Caffe Dependencies -------------------------"
-# Basic
-sudo apt-get --assume-yes update
-sudo apt-get --assume-yes install build-essential
-# General dependencies
-sudo apt-get --assume-yes install libprotobuf-dev libleveldb-dev libsnappy-dev libhdf5-serial-dev protobuf-compiler
-sudo apt-get --assume-yes install --no-install-recommends libboost-all-dev
-# Remaining dependencies, 14.04
-# if [[ $ubuntu_le_14 == true ]]; then
-    sudo apt-get --assume-yes install libgflags-dev libgoogle-glog-dev liblmdb-dev
-# fi
-# OpenCV 2.4
-# sudo apt-get --assume-yes install libopencv-dev
-exitIfError
-echo "------------------------- Some Caffe Dependencies Installed -------------------------"
-echo ""
-
-
-
-echo "------------------------- Compiling Caffe -------------------------"
+echo "------------------------- Compiling OpenPose -------------------------"
 if [[ $ubuntu_le_14 == true ]]; then
-    cp Makefile.config.Ubuntu14.example Makefile.config
+    cp ubuntu/Makefile.config.Ubuntu14_cuda8.example Makefile.config
 else
-    cp Makefile.config.Ubuntu16.example Makefile.config
+    cp ubuntu/Makefile.config.Ubuntu16_cuda8.example Makefile.config
 fi
-# make all -j$NUM_CORES
-make all -j$NUM_CORES && make distribute -j$NUM_CORES
-# make test -j$NUM_CORES
-# make runtest -j$NUM_CORES
+make all -j$NUM_CORES
 exitIfError
-echo "------------------------- Caffe Compiled -------------------------"
+echo "------------------------- OpenPose Compiled -------------------------"
 echo ""
 
 
 
-echo "------------------------- Caffe Installed -------------------------"
+echo "------------------------- Downloading OpenPose Models -------------------------"
+executeShInItsFolder "getModels.sh" "./models" ".."
+exitIfError
+echo "Models downloaded"
+echo "------------------------- OpenPose Models Downloaded -------------------------"
+echo ""
+
+
+
+echo "------------------------- OpenPose Installed -------------------------"
 echo ""

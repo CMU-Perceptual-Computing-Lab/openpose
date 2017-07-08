@@ -239,7 +239,7 @@ namespace op
          * Note that mThreadId must be re-initialized to 0 before starting a new Wrapper configuration.
          * @return unsigned int with the next thread id value.
          */
-        unsigned int threadIdPP();
+        unsigned long long threadIdPP();
 
         /**
          * TWorker concatenator (private internal function).
@@ -1151,7 +1151,7 @@ namespace op
     }
 
     template<typename TDatums, typename TWorker, typename TQueue>
-    unsigned int Wrapper<TDatums, TWorker, TQueue>::threadIdPP()
+    unsigned long long Wrapper<TDatums, TWorker, TQueue>::threadIdPP()
     {
         try
         {
@@ -1162,6 +1162,7 @@ namespace op
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return 0ull;
         }
     }
 

@@ -74,9 +74,9 @@ CMakeLists.txt.user.*
 ######################### Windows (Visual Studio) Folders #########################
 *.vs/
 *x64/
-3rdparty/caffe/dependencies/
-3rdparty/caffe/include/
-3rdparty/lib/
+3rdparty/windows/caffe/
+3rdparty/windows/caffe3rdparty/
+3rdparty/windows/opencv/
 # Allowing this file (removed *.user for Qt)
 !*.vcxproj.user
 
