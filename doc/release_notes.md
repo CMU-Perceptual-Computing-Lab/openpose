@@ -46,17 +46,18 @@ OpenPose Library - Release Notes
 
 ## OpenPose 1.0.0
 1. Main improvements:
-    1. Hands and face now use `Maximum` instead of `Nms`, since there is only 1 person / detection.
-    2. Increased accuracy on multi-scale (added `Datum::scaleRatios` to save the relative scale ratio when multi-scale).
-    3. Increased speed ~5% by adding CPU rendering (but GPU is the default rendering).
-    4. Rendering colors modified, visually better results.
-    5. Check() functions give more feedback.
-    6. WCocoJsonSaver finished and removed its 3599-image limit.
-    7. Added `camera_fps` so generated video will use that frame rate.
-    8. Reduced the number of printed information messages. Default logging priority threshold increased to Priority::Max.
-    9. Google flags to OpenPose configuration parameters reader moved from each demo to utilities/flagsToOpenPose.
-    10. Nms classes do not use `numberParts` for `Reshape`, they deduce the value.
-    11. Improved documentation.
+    1. Windows branch merged to master branch.
+    2. Face and hands use `Maximum` instead of `Nms`, since there is only 1 person / detection.
+    3. Increased accuracy on multi-scale (added `Datum::scaleRatios` to save the relative scale ratio when multi-scale).
+    4. Increased speed ~5% by adding CPU rendering (but GPU is the default rendering).
+    5. Rendering colors modified, visually better results.
+    6. Check() functions give more feedback.
+    7. WCocoJsonSaver finished and removed its 3599-image limit.
+    8. Added `camera_fps` so generated video will use that frame rate.
+    9. Reduced the number of printed information messages. Default logging priority threshold increased to Priority::Max.
+    10. Google flags to OpenPose configuration parameters reader moved from each demo to utilities/flagsToOpenPose.
+    11. Nms classes do not use `numberParts` for `Reshape`, they deduce the value.
+    12. Improved documentation.
 2. Functions or parameters renamed:
     1. Render flags renamed in the demo in order to incorporate the CPU/GPU rendering.
     2. Keypoints saved in JSON files (`write_keypoint_json`) are now saved as `pose_keypoints`, `face_keypoints`, `hand_left_keypoints`, and `hand_right_keypoints`. They all were previously saved as `body_parts`.

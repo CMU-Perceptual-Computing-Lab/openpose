@@ -32,7 +32,7 @@ namespace op
         void setGuiDisplayMode(const GuiDisplayMode displayMode);
 
         /**
-         * This function switch between full screen and windowed modes (e.g. when double click on video players or Ctrt+Enter are presed).
+         * This function switch between full screen and windowed modes (e.g. when double-click on video players or Ctrt+Enter are presed).
          */
         void switchGuiDisplayMode();
 

@@ -55,6 +55,70 @@ The output format is analogous for hand (`hand_left_keypoints` and `hand_right_k
 
 
 
+## Keypoint Format on the op::Datum Class
+There are 3 different keypoint Array<float> elements on this class:
+
+1. Array<float> **poseKeypoints**: In order to access person `person` and body part `part` (where the index matches `POSE_COCO_BODY_PARTS` or `POSE_MPI_BODY_PARTS`), you can simply output:
+```
+    // Common parameters needed
+    const auto numberPeopleDetected = poseKeypoints.getSize(0);
+    const auto numberBodyParts = poseKeypoints.getSize(1);
+    // Easy version
+    const auto x = poseKeypoints[{person, part, 0}];
+    const auto y = poseKeypoints[{person, part, 1}];
+    const auto score = poseKeypoints[{person, part, 2}];
+    // Slightly more efficient version
+    // If you want to access these elements on a huge loop, it is slightly faster (but usually not faster enough to be worthy) to get the index by your own
+    const auto baseIndex = poseKeypoints.getSize(2)*(person*numberBodyParts + part);
+    const auto x = poseKeypoints[baseIndex];
+    const auto y = poseKeypoints[baseIndex + 1];
+    const auto score = poseKeypoints[baseIndex + 2];
+```
+2. Array<float> **faceKeypoints**: It is completely analogous to poseKeypoints.
+```
+    // Common parameters needed
+    const auto numberPeopleDetected = faceKeypoints.getSize(0);
+    const auto numberFaceParts = faceKeypoints.getSize(1);
+    // Easy version
+    const auto x = faceKeypoints[{person, part, 0}];
+    const auto y = faceKeypoints[{person, part, 1}];
+    const auto score = faceKeypoints[{person, part, 2}];
+    // Slightly more efficient version
+    const auto baseIndex = faceKeypoints.getSize(2)*(person*numberFaceParts + part);
+    const auto x = faceKeypoints[baseIndex];
+    const auto y = faceKeypoints[baseIndex + 1];
+    const auto score = faceKeypoints[baseIndex + 2];
+```
+3. std::array<Array<float>, 2> **handKeypoints**, where handKeypoints[0] corresponds to the left hand and handKeypoints[1] to the right one. Each handKeypoints[i] is analogous to poseKeypoints and faceKeypoints:
+```
+    // Common parameters needed
+    const auto numberPeopleDetected = handKeypoints[0].getSize(0); // = handKeypoints[1].getSize(0)
+    const auto numberHandParts = handKeypoints[0].getSize(1); // = handKeypoints[1].getSize(1)
+
+    // Easy version
+    // Left Hand
+    const auto xL = handKeypoints[0][{person, part, 0}];
+    const auto yL = handKeypoints[0][{person, part, 1}];
+    const auto scoreL = handKeypoints[0][{person, part, 2}];
+    // Right Hand
+    const auto xR = handKeypoints[1][{person, part, 0}];
+    const auto yR = handKeypoints[1][{person, part, 1}];
+    const auto scoreR = handKeypoints[1][{person, part, 2}];
+
+    // Slightly more efficient version
+    const auto baseIndex = handKeypoints[0].getSize(2)*(person*numberHandParts + part);
+    // Left Hand
+    const auto xL = handKeypoints[0][baseIndex];
+    const auto yL = handKeypoints[0][baseIndex + 1];
+    const auto scoreL = handKeypoints[0][baseIndex + 2];
+    // Right Hand
+    const auto xR = handKeypoints[1][baseIndex];
+    const auto yR = handKeypoints[1][baseIndex + 1];
+    const auto scoreR = handKeypoints[1][baseIndex + 2];
+```
+
+
+
 ## Reading Saved Results
 We use standard formats (JSON, XML, PNG, JPG, ...) to save our results, so there will be lots of frameworks to read them later, but you might also directly use our functions in [include/openpose/filestream.hpp](../include/openpose/filestream.hpp). In particular, `loadData` (for JSON, XML and YML files) and `loadImage` (for image formats such as PNG or JPG) to load the data into cv::Mat format.
 

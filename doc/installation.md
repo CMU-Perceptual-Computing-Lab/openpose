@@ -131,7 +131,7 @@ You just need to remove the OpenPose folder, by default called `openpose/`. E.g.
 
 
 
-### Installation - Library - Deprecated Old Version
+### Installation - Library - Old Deprecated Version
 Note: This version will not be updated anymore and removed in the future.
 
 1. Install the pre-requisites:
@@ -142,7 +142,7 @@ Note: This version will not be updated anymore and removed in the future.
         - In addition, open the Windows cmd (Windows button + X, then A), and install some Python libraries with this command: `pip install numpy protobuf hypothesis`.
     4. [Cmake](https://cmake.org/download/): Select the option to add it to the Windows PATH.
     5. [Ninja](https://ninja-build.org/): Select the option to add it to the Windows PATH.
-2. Download the `Windows` branch of Openpose by either cliking on `Download ZIP` on [openpose/tree/windows](https://github.com/CMU-Perceptual-Computing-Lab/openpose/tree/windows) or cloning the repository: `git clone https://github.com/CMU-Perceptual-Computing-Lab/openpose/ && cd openpose && git checkout windows`.
+2. Download the `Windows` branch of Openpose by either cliking on `Download ZIP` on [openpose/tree/windows](https://github.com/CMU-Perceptual-Computing-Lab/openpose/tree/windows) or cloning the repository: `git clone https://github.com/CMU-Perceptual-Computing-Lab/openpose/ && cd openpose && git checkout old_deprecated_windows`.
 3. Install Caffe on Windows:
     1. Open the Windows cmd (Windows button + X, then A).
     2. Go to the Caffe directory, assuming OpenPose has been downloaded on `C:\openpose`: `cd C:\openpose\3rdparty\caffe\caffe-windows`.
@@ -177,11 +177,11 @@ Check that the library is working properly by using any of the following command
 ```
 ```
 :: Windows - Demo
-bin\OpenPoseDemo.exe --video examples/media/video.avi
+bin\OpenPoseDemo.exe --video examples\media\video.avi
 ```
 ```
 :: Windows - Library
-windows_project\x64\Release\OpenPoseDemo.exe --video examples/media/video.avi
+windows_project\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi
 ```
 
 **2. Running on Webcam**
@@ -205,11 +205,11 @@ windows_project\x64\Release\OpenPoseDemo.exe
 ```
 ```
 :: Windows - Demo
-bin\OpenPoseDemo.exe --image_dir examples/media/
+bin\OpenPoseDemo.exe --image_dir examples\media\
 ```
 ```
 :: Windows - Library
-windows_project\x64\Release\OpenPoseDemo.exe --image_dir examples/media/
+windows_project\x64\Release\OpenPoseDemo.exe --image_dir examples\media\
 ```
 
 **4. Body Pose and Face Keypoint Detector (e.g. on Video)**
@@ -219,12 +219,11 @@ windows_project\x64\Release\OpenPoseDemo.exe --image_dir examples/media/
 ```
 ```
 :: Windows - Demo
-bin\OpenPoseDemo.exe --video examples/media/video.avi --face
+bin\OpenPoseDemo.exe --video examples\media\video.avi --face
 ```
 ```
 :: Windows - Library
-windows_project\x64\Release\OpenPoseDemo.exe --video examples/media/video.avi --face
-```
+windows_project\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi --face
 
 The visual GUI should show the original image with the poses blended on it, similarly to the pose of this gif:
 <p align="center">
