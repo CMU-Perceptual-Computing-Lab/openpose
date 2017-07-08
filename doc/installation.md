@@ -32,8 +32,7 @@ Note: These requirements assume the default configuration (i.e. `--net_resolutio
     3. Atlas can be installed with `sudo apt-get install libatlas-base-dev`. Instead of Atlas, you can use OpenBLAS or Intel MKL by modifying the line `BLAS := atlas` in the same way as previosuly mentioned for the OpenCV version selection.
 2. Build Caffe & the OpenPose library + download the required Caffe models for Ubuntu 14.04 or 16.04 (auto-detected for the script) and CUDA 8:
 ```
-chmod u+x install_caffe_and_openpose.sh
-./install_caffe_and_openpose.sh
+bash ./ubuntu/install_caffe_and_openpose_if_cuda8.sh
 ```
 
 
@@ -46,35 +45,34 @@ Alternatively to the script installation, if you want to use CUDA 7, avoid using
     ### Install Caffe ###
     cd 3rdparty/caffe/
     # Select your desired Makefile file (run only one of the next 4 commands)
-    cp Makefile.config.Ubuntu14_cuda_7.example Makefile.config # Ubuntu 14, cuda 7
-    cp Makefile.config.Ubuntu14.example Makefile.config # Ubuntu 14, cuda 8
-    cp Makefile.config.Ubuntu16_cuda_7.example Makefile.config # Ubuntu 16, cuda 7
-    cp Makefile.config.Ubuntu16.example Makefile.config # Ubuntu 16, cuda 8
+    cp Makefile.config.Ubuntu14_cuda7.example Makefile.config # Ubuntu 14, cuda 7
+    cp Makefile.config.Ubuntu14_cuda8.example Makefile.config # Ubuntu 14, cuda 8
+    cp Makefile.config.Ubuntu16_cuda7.example Makefile.config # Ubuntu 16, cuda 7
+    cp Makefile.config.Ubuntu16_cuda8.example Makefile.config # Ubuntu 16, cuda 8
     # Change any custom flag from the resulting Makefile.config (e.g. OpenCV 3, Atlas/OpenBLAS/MKL, etc.)
     # Compile Caffe
     make all -j${number_of_cpus} && make distribute -j${number_of_cpus}
 
     ### Install OpenPose ###
     cd ../../models/
-    ./getModels.sh # It just downloads the Caffe trained models
+    bash ./getModels.sh # It just downloads the Caffe trained models
     cd ..
     # Same file cp command as the one used for Caffe
-    cp Makefile.config.Ubuntu14_cuda_7.example Makefile.config
+    cp ubuntu/Makefile.config.Ubuntu14_cuda7.example Makefile.config
     # Change any custom flag from the resulting Makefile.config (e.g. OpenCV 3, Atlas/OpenBLAS/MKL, etc.)
     make all -j${number_of_cpus}
     ```
 
     NOTE: If you want to use your own Caffe distribution, follow the steps on `Custom Caffe` section and later re-compile the OpenPose library:
     ```
-    chmod u+x install_openpose.sh
-    ./install_openpose.sh
+    bash ./install_openpose_if_cuda8.sh
     ```
     Note: These steps only need to be performed once. If you are interested in making changes to the OpenPose library, you can simply recompile it with:
     ```
     make clean
     make all -j$(NUM_CORES)
     ```
-**Highly important**: There are 2 `Makefile.config.Ubuntu##.example` analogous files, one in the main folder and one in [3rdparty/caffe/](../3rdparty/caffe/), corresponding to OpenPose and Caffe configuration files respectively. Any change must be done to both files (e.g. OpenCV 3 flag, Atlab/OpenBLAS/MKL flag, etc.). E.g. for CUDA 8 and Ubuntu16: [3rdparty/caffe/Makefile.config.Ubuntu16.example](../3rdparty/caffe/Makefile.config.Ubuntu16.example) and [Makefile.config.Ubuntu16.example](../Makefile.config.Ubuntu16.example).
+**Highly important**: There are 2 `Makefile.config.Ubuntu##.example` analogous files, one in the main folder and one in [3rdparty/caffe/](../3rdparty/caffe/), corresponding to OpenPose and Caffe configuration files respectively. Any change must be done to both files (e.g. OpenCV 3 flag, Atlab/OpenBLAS/MKL flag, etc.). E.g. for CUDA 8 and Ubuntu16: [3rdparty/caffe/Makefile.config.Ubuntu16_cuda8.example](../3rdparty/caffe/Makefile.config.Ubuntu16.example) and [ubuntu/Makefile.config.Ubuntu16_cuda8.example](../ubuntu/Makefile.config.Ubuntu16_cuda8.example).
 
 
 
@@ -101,9 +99,41 @@ You just need to remove the OpenPose folder, by default called `openpose/`. E.g.
     1. [Microsoft Visual C++ 2015 Redistributable](https://www.microsoft.com/en-us/download/details.aspx?id=53587) (lighter) or Microsoft Visual Studio 2015 (in case you intend to install the library).
     2. [CUDA 8](https://developer.nvidia.com/cuda-downloads): Install it on the default location, C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0. Otherwise, modify the Visual Studio project solution accordingly.
     3. [cuDNN 5.1](https://developer.nvidia.com/cudnn): Once you have downloaded it, just unzip it and copy (merge) the contents on the CUDA folder, C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0.
-2. Download the portable demo from: [posefs1.perception.cs.cmu.edu/OpenPose/openpose_1.0.0rc2.zip](http://posefs1.perception.cs.cmu.edu/OpenPose/openpose_1.0.0rc2.zip).
+2. Download the portable demo from: _link coming soon_.
+
+
 
 ### Installation - Library
+1. Install the pre-requisites:
+    1. Microsoft Visual Studio (VS) 2015. Install CUDA 8.0 after Visual Studio 2015 is installed to assure that the CUDA installation will generate all necessary files for VS. If CUDA was already installed, re-install it after installing VS!
+    2. Install all the demo pre-requisites.
+    3. [Python 2.4.13 64 bits - Windows x86-64 MSI installer](https://www.python.org/downloads/release/python-2713/).
+        - Install it on C:\Python27 (default) or D:\Programs\Python27. Otherwise, modify the VS solution accordingly.
+        - In addition, open the Windows cmd (Windows button + X, then A), and install some Python libraries with this command: `pip install numpy protobuf hypothesis`.
+    4. [Cmake](https://cmake.org/download/): Select the option to add it to the Windows PATH.
+    5. [Ninja](https://ninja-build.org/): Select the option to add it to the Windows PATH.
+2. Download the OpenPose dependencies and models (body, face and hand models):
+    1. Open the Windows cmd (Windows button + X, then A).
+    2. Go to the OpenPose directory, assuming OpenPose has been downloaded on `C:\openpose`: `cd C:\openpose\`.
+    3. Run `windows\download_3rdparty_and_models.bat`.
+3. You can now open the Visual Studio sln file located on `{openpose_path}\windows\OpenPose.sln`.
+4. In order to verify OpenPose is working, try compiling and executing the demo:
+    1. Right click on `OpenPoseDemo` --> `Set as StartUp Project`.
+    2. Change `Debug` by `Release` mode.
+    3. You can now compile it.
+5. If you have a webcam connected, you can test it by pressing the F5 key or the green play icon.
+6. Otherwise, check [Quick Start](#quick-start) to verify OpenPose was properly compiled. In order to use the created exe from the command line, you have to:
+    1. Copy all the DLLs located on `{openpose_folder}\3rdparty\windows\caffe\bin\` on the exe folder: `{openpose_folder}\windows_project\x64\Release`.
+    2. Copy all the DLLs located on `{openpose_folder}\3rdparty\windows\opencv\x64\vc14\bin\` on the exe folder: `{openpose_folder}\windows_project\x64\Release`.
+    3. Open the Windows cmd (Windows button + X, then A).
+    4. Go to the OpenPose directory, assuming OpenPose has been downloaded on `C:\openpose`: `cd C:\openpose\`.
+    5. Run the tutorial commands.
+
+
+
+### Installation - Library - Deprecated Old Version
+Note: This version will not be updated anymore and removed in the future.
+
 1. Install the pre-requisites:
     1. Microsoft Visual Studio (VS) 2015. Install CUDA 8.0 after Visual Studio 2015 is installed to assure that the CUDA installation will generate all necessary files for VS. If CUDA was already installed, re-install it after installing VS!
     2. Install all the demo pre-requisites.

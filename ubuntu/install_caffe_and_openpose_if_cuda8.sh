@@ -35,12 +35,12 @@ function executeShInItsFolder {
 
 
 
-executeShInItsFolder "install_caffe.sh" "./3rdparty/caffe" "../.."
+executeShInItsFolder "install_caffe_if_cuda8.sh" "./3rdparty/caffe" "../.."
 exitIfError
 
 
 
-executeShInItsFolder "install_openpose.sh" "./" "./"
+executeShInItsFolder "./ubuntu/install_openpose_if_cuda8.sh" "./" "./"
 exitIfError
 
 
