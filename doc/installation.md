@@ -217,6 +217,7 @@ bin\OpenPoseDemo.exe --video examples\media\video.avi --face
 ```
 :: Windows - Library
 windows\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi --face
+```
 
 The visual GUI should show the original image with the poses blended on it, similarly to the pose of this gif:
 <p align="center">
