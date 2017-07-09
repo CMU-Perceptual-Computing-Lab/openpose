@@ -68,7 +68,8 @@ There are 3 different keypoint Array<float> elements on this class:
     const auto y = poseKeypoints[{person, part, 1}];
     const auto score = poseKeypoints[{person, part, 2}];
     // Slightly more efficient version
-    // If you want to access these elements on a huge loop, it is slightly faster (but usually not faster enough to be worthy) to get the index by your own
+    // If you want to access these elements on a huge loop, you can get the index
+    // by your own, but it is usually not faster enough to be worthy
     const auto baseIndex = poseKeypoints.getSize(2)*(person*numberBodyParts + part);
     const auto x = poseKeypoints[baseIndex];
     const auto y = poseKeypoints[baseIndex + 1];

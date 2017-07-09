@@ -119,6 +119,13 @@ namespace op
         ScaleMode heatMapScale;
 
         /**
+         * Rendering threshold. Only estimated keypoints whose score confidences are higher than this value will be rendered. Generally, a
+         * high threshold (> 0.5) will only render very clear body parts; while small thresholds (~0.1) will also output guessed and occluded
+         * keypoints, but also more false positives (i.e. wrong detections).
+         */
+        float renderThreshold;
+
+        /**
          * Constructor of the struct.
          * It has the recommended and default values we recommend for each element of the struct.
          * Since all the elements of the struct are public, they can also be manually filled.
@@ -133,7 +140,8 @@ namespace op
                           const float alphaHeatMap = POSE_DEFAULT_ALPHA_HEAT_MAP,
                           const int defaultPartToRender = 0, const std::string& modelFolder = "models/",
                           const std::vector<HeatMapType>& heatMapTypes = {},
-                          const ScaleMode heatMapScale = ScaleMode::ZeroToOne);
+                          const ScaleMode heatMapScale = ScaleMode::ZeroToOne,
+                          const float renderThreshold = 0.05f);
     };
 }
 

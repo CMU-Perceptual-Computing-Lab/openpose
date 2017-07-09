@@ -6,6 +6,7 @@ OpenPose
 - May 2017: Windows version released!
 - Jun 2017: Face released!
 - Jul 2017: Easier Windows installation!
+- Jul 2017: Hands released!
 - Check all the [release notes](doc/release_notes.md).
 - Interested in an internship on CMU as OpenPose programmer? See [this link](https://docs.google.com/document/d/14SygG39NjIRZfx08clewTdFMGwVdtRu2acyCi3TYcHs/edit?usp=sharing) for details.
 
@@ -14,7 +15,7 @@ OpenPose
 ## Operating Systems
 1. **Ubuntu** 14 and 16.
 2. **Windows** 10.
-3. Other people have been able to install it on **Windows 7 and 8**, **Mac**, **CentOS**, and **Nvidia Jetson (TK1 and TX1)** embedded systems. However, we do not support them at the moment.
+3. Other people have been able to install it on **Windows 7 and 8**, **Mac**, **CentOS**, and **Nvidia Jetson (TK1 and TX1)** embedded systems. However, we do not officially support them at the moment.
 
 
 
@@ -25,7 +26,7 @@ OpenPose is a **library for real-time multi-person keypoint detection and multi-
 
 OpenPose represents the **first real-time system to jointly detect human body, hand and facial keypoints (in total 130 keypoints) on single images**. In addition, the system computational performance on body keypoint estimation is invariant to the number of detected people in the image.
 
-OpenPose is freely available for free non-commercial use, and may be redistributed under these conditions. Please, see the [license](LICENSE) for further details. Contact [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/) for commercial purposes.
+OpenPose is freely available for free non-commercial use, and may be redistributed under these conditions. Please, see the [license](LICENSE) for further details. For commercial purposes, contact [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/).
 
 In addition, OpenPose would not be possible without the [CMU Panoptic Studio](http://domedb.perception.cs.cmu.edu/).
 
@@ -54,6 +55,11 @@ The pose estimation work is based on the C++ code from [the ECCV 2016 demo](http
 
 
 ## Results
+### Body + Hands + Face Estimation
+<p align="center">
+    <img src="doc/media/pose_face_hands.gif", width="480">
+</p>
+
 ### Body Estimation
 <p align="center">
     <img src="doc/media/dance.gif", width="480">
@@ -62,13 +68,6 @@ The pose estimation work is based on the C++ code from [the ECCV 2016 demo](http
 ### Body + Face Estimation
 <p align="center">
     <img src="doc/media/pose_face.gif", width="480">
-</p>
-
-## Coming Soon (But Already Working!)
-
-### Body + Hands + Face Estimation
-<p align="center">
-    <img src="doc/media/pose_face_hands.gif", width="480">
 </p>
 
 ### Body + Hands

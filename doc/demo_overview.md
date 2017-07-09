@@ -28,12 +28,12 @@ Each flag is divided into flag name, default value, and description.
 - DEFINE_string(resolution,               "1280x720",     "The image resolution (display and output). Use \"-1x-1\" to force the program to use the default images resolution.");
 - DEFINE_int32(num_gpu,                   -1,             "The number of GPU devices to use. If negative, it will use all the available GPUs in your machine.");
 - DEFINE_int32(num_gpu_start,             0,              "GPU device start number.");
-- DEFINE_int32(keypoint_scale,            0,              "Scaling of the (x,y) coordinates of the final pose data array, i.e. the scale of the (x,y) coordinates that will be saved with the `write_keypoint` & `write_keypoint_json` flags. Select `0` to scale it to the original source resolution, `1`to scale it to the net output size (set with `net_resolution`), `2` to scale it to the final output size (set with `resolution`), `3` to scale it in the range [0,1], and 4 for range [-1,1]. Non related with `num_scales` and `scale_gap`.");
+- DEFINE_int32(keypoint_scale,            0,              "Scaling of the (x,y) coordinates of the final pose data array, i.e. the scale of the (x,y) coordinates that will be saved with the `write_keypoint` & `write_keypoint_json` flags. Select `0` to scale it to the original source resolution, `1`to scale it to the net output size (set with `net_resolution`), `2` to scale it to the final output size (set with `resolution`), `3` to scale it in the range [0,1], and 4 for range [-1,1]. Non related with `scale_number` and `scale_gap`.");
 4. OpenPose Body Pose
 - DEFINE_string(model_pose,               "COCO",         "Model to be used (e.g. COCO, MPI, MPI_4_layers).");
 - DEFINE_string(net_resolution,           "656x368",      "Multiples of 16. If it is increased, the accuracy usually increases. If it is decreased, the speed increases.");
-- DEFINE_int32(num_scales,                1,              "Number of scales to average.");
-- DEFINE_double(scale_gap,                0.3,            "Scale gap between scales. No effect unless num_scales>1. Initial scale is always 1. If you want to change the initial scale, you actually want to multiply the `net_resolution` by your desired initial scale.");
+- DEFINE_int32(scale_number,              1,              "Number of scales to average.");
+- DEFINE_double(scale_gap,                0.3,            "Scale gap between scales. No effect unless scale_number > 1. Initial scale is always 1. If you want to change the initial scale, you actually want to multiply the `net_resolution` by your desired initial scale.");
 - DEFINE_bool(heatmaps_add_parts,         false,          "If true, it will add the body part heatmaps to the final op::Datum::poseHeatMaps array (program speed will decrease). Not required for our library, enable it only if you intend to process this information later. If more than one `add_heatmaps_X` flag is enabled, it will place then in sequential memory order: body parts + bkg + PAFs. It will follow the order on POSE_BODY_PART_MAPPING in `include/openpose/pose/poseParameters.hpp`.");
 - DEFINE_bool(heatmaps_add_bkg,           false,          "Same functionality as `add_heatmaps_parts`, but adding the heatmap corresponding to background.");
 - DEFINE_bool(heatmaps_add_PAFs,          false,          "Same functionality as `add_heatmaps_parts`, but adding the PAFs.");
@@ -42,23 +42,28 @@ Each flag is divided into flag name, default value, and description.
 - DEFINE_string(face_net_resolution,      "368x368",      "Multiples of 16. Analogous to `net_resolution` but applied to the face keypoint detector. 320x320 usually works fine while giving a substantial speed up when multiple faces on the image.");
 6. OpenPose Hand
 - DEFINE_bool(hand,                       false,          "Enables hand keypoint detection. It will share some parameters from the body pose, e.g. `model_folder`.");
-- DEFINE_string(hand_net_resolution,      "368x368",      "Multiples of 16. Analogous to `net_resolution` but applied to the hand keypoint detector. 320x320 usually works fine while giving a substantial speed up when multiple hands on the image.");t_resolution` but applied to the hand keypoint detector.");
-- DEFINE_int32(hand_detection_mode,       -1,             "Set to 0 to perform 1-time keypoint detection (fastest), 1 for iterative detection (recommended for images and fast videos, slow method), 2 for tracking (recommended for webcam if the frame rate is >10 FPS per GPU used and for video, in practice as fast as 1-time detection), 3 for both iterative and tracking (recommended for webcam if the resulting frame rate is still >10 FPS and for video, ideally best result but slower), or -1 (default) for automatic selection (fast method for webcam, tracking for video and iterative for images).");
+- DEFINE_string(hand_net_resolution,      "368x368",      "Multiples of 16. Analogous to `net_resolution` but applied to the hand keypoint detector.");
+- DEFINE_int32(hand_scale_number,         1,              "Analogous to `scale_number` but applied to the hand keypoint detector. Our best results were found with `hand_scale_number` = 6 and `hand_scale_range` = 0.4");
+- DEFINE_double(hand_scale_range,         0.4,            "Analogous purpose than `scale_gap` but applied to the hand keypoint detector. Total range between smallest and biggest scale. The scales will be centered in ratio 1. E.g. if scaleRange = 0.4 and scalesNumber = 2, then there will be 2 scales, 0.8 and 1.2.");
+- DEFINE_bool(hand_tracking,              false,          "Adding hand tracking might improve hand keypoints detection for webcam (if the frame rate is high enough, i.e. >7 FPS per GPU) and video. This is not person ID tracking, it simply looks for hands in positions at which hands were located in previous frames, but it does not guarantee the same person ID among frames");
 7. OpenPose Rendering
 - DEFINE_int32(part_to_show,              0,              "Part to show from the start.");
 - DEFINE_bool(disable_blending,           false,          "If blending is enabled, it will merge the results with the original frame. If disabled, it will only display the results.");
 8. OpenPose Rendering Pose
+- DEFINE_double(render_threshold,         0.05,           "Only estimated keypoints whose score confidences are higher than this threshold will be rendered. Generally, a high threshold (> 0.5) will only render very clear body parts; while small thresholds (~0.1) will also output guessed and occluded keypoints, but also more false positives (i.e. wrong detections).");
 - DEFINE_int32(render_pose,               2,              "Set to 0 for no rendering, 1 for CPU rendering (slightly faster), and 2 for GPU rendering (slower but greater functionality, e.g. `alpha_X` flags). If rendering is enabled, it will render both `outputData` and `cvOutputData` with the original image and desired body part to be shown (i.e. keypoints, heat maps or PAFs).");
 - DEFINE_double(alpha_pose,               0.6,            "Blending factor (range 0-1) for the body part rendering. 1 will show it completely, 0 will hide it. Only valid for GPU rendering.");
 - DEFINE_double(alpha_heatmap,            0.7,            "Blending factor (range 0-1) between heatmap and original frame. 1 will only show the heatmap, 0 will only show the frame. Only valid for GPU rendering.");
 9. OpenPose Rendering Face
-- DEFINE_int32(render_face,               -1,             "Analogous to `render_pose` but applied to the face. Extra option: -1 to use the same configuration that `render_pose` is using.");
-- DEFINE_double(alpha_face,               0.6,            "Analogous to `alpha_pose` but applied to face.");
-- DEFINE_double(alpha_heatmap_face,       0.7,            "Analogous to `alpha_heatmap` but applied to face.");
+- DEFINE_double(face_render_threshold,    0.4,            "Analogous to `render_threshold`, but applied to the face keypoints.");
+- DEFINE_int32(face_render,               -1,             "Analogous to `render_pose` but applied to the face. Extra option: -1 to use the same configuration that `render_pose` is using.");
+- DEFINE_double(face_alpha_pose,          0.6,            "Analogous to `alpha_pose` but applied to face.");
+- DEFINE_double(face_alpha_heatmap,       0.7,            "Analogous to `alpha_heatmap` but applied to face.");
 10. OpenPose Rendering Hand
-- DEFINE_int32(render_hand,               -1,             "Analogous to `render_pose` but applied to the hand. Extra option: -1 to use the same configuration that `render_pose` is using.");
-- DEFINE_double(alpha_hand,               0.6,            "Analogous to `alpha_pose` but applied to hand.");
-- DEFINE_double(alpha_heatmap_hand,       0.7,            "Analogous to `alpha_heatmap` but applied to hand.");
+- DEFINE_double(hand_render_threshold,    0.2,            "Analogous to `render_threshold`, but applied to the hand keypoints.");
+- DEFINE_int32(hand_render,               -1,             "Analogous to `render_pose` but applied to the hand. Extra option: -1 to use the same configuration that `render_pose` is using.");
+- DEFINE_double(hand_alpha_pose,          0.6,            "Analogous to `alpha_pose` but applied to hand.");
+- DEFINE_double(hand_alpha_heatmap,       0.7,            "Analogous to `alpha_heatmap` but applied to hand.");
 11. Display
 - DEFINE_bool(fullscreen,                 false,          "Run in full-screen mode (press f during runtime to toggle).");
 - DEFINE_bool(process_real_time,          false,          "Enable to keep the original source frame rate (e.g. for video). If the processing time is too long, it will skip frames. If it is too fast, it will slow it down.");
@@ -76,7 +81,7 @@ Each flag is divided into flag name, default value, and description.
 - DEFINE_string(write_heatmaps_format,    "png",          "File extension and format for `write_heatmaps`, analogous to `write_images_format`. Recommended `png` or any compressed and lossless format.");
 
 ## Multiple Scales
-Running at multiple scales might drastically slow down the speed, but it will increase the accuracy. Given the CNN input size (set with `net_resolution`), `num_scales` and `scale_gap` configure the number of scales to use and the gap between them, respectively. For instance, `--num_scales 3 --scale_gap 0.15` means using 3 scales at resolution: (1), (1-0.15) and (1-2*0.15) times the `net_resolution`.
+Running at multiple scales might drastically slow down the speed, but it will increase the accuracy. Given the CNN input size (set with `net_resolution`), `scale_number` and `scale_gap` configure the number of scales to use and the gap between them, respectively. For instance, `--scale_number 3 --scale_gap 0.15` means using 3 scales at resolution: (1), (1-0.15) and (1-2*0.15) times the `net_resolution`.
 
 ## Heat Maps Storing
 The following command will save all the body part heat maps, background heat map and Part Affinity Fields (PAFs) in the folder `output_heatmaps_folder`. It will save them on PNG format. Instead of individually saving each of the 67 heatmaps (18 body parts + background + 2 x 19 PAFs) individually, the library concatenate them vertically into a huge (width x #heatmaps) x (height) matrix. The PAFs channels are multiplied by 2 because there is one heatmpa for the x-coordinates and one for the y-coordinates. The order is body parts + bkg + PAFs. It will follow the sequence on POSE_BODY_PART_MAPPING in [include/openpose/pose/poseParameters.hpp](../include/openpose/pose/poseParameters.hpp).
@@ -102,7 +107,7 @@ Please, in order to check all the real time pose demo options and their details,
 - `--part_to_show`: Select the prediction channel to visualize (default: 0). 0 to visualize all the body parts, 1-18 for each body part heat map, 19 for the background heat map, 20 for all the body part heat maps together, 21 for all the PAFs, 22-69 for each body part pair PAF.
 - `--no_display`: Display window not opened. Useful if there is no X server and/or to slightly speed up the processing if visual output is not required.
 - `--num_gpu 2 --num_gpu_start 1`: Parallelize over this number of GPUs starting by the desired device id. Default `num_gpu` is -1, which will use all the available GPUs.
-- `--num_scales 3 --scale_gap 0.15`: Use 3 scales, 1, (1-0.15), (1-0.15*2). Default is one scale. If you want to change the initial scale, you actually want to multiply your desired initial scale by the `net_resolution`.
+- `--scale_number 3 --scale_gap 0.15`: Use 3 scales, 1, (1-0.15), (1-0.15*2). Default is one scale. If you want to change the initial scale, you actually want to multiply your desired initial scale by the `net_resolution`.
 - `--net_resolution 656x368 --resolution 1280x720`: For HD images and video (default values).
 - `--net_resolution 496x368 --resolution 640x480`: For VGA images and video.
 - `--model_pose MPI`: It will use MPI (15 body keypoints). Default: COCO (18 body keypoints). MPI is slightly faster. The variation `MPI_4_layers` sacrifies accuracy in order to further increase speed.
@@ -111,29 +116,15 @@ Please, in order to check all the real time pose demo options and their details,
 
 
 ## Hands
-Very important note, use `hand_detection_mode` accordingly.
 ```
-# Images
 # Fast method for speed
-./build/examples/openpose/openpose.bin --hand --hand_detection_mode 0
-# Iterative for higher accuracy
-./build/examples/openpose/openpose.bin --hand --hand_detection_mode 1
-
-# Video
-# Iterative tracking for higher accuracy
-./build/examples/openpose/openpose.bin --video examples/media/video.avi --hand --hand_detection_mode 3
-# Tracking for speed
-./build/examples/openpose/openpose.bin --video examples/media/video.avi --hand --hand_detection_mode 2
-
-# Webcam
-# Fast method for speed if the frame rate is low
-./build/examples/openpose/openpose.bin --hand --hand_detection_mode 0
-# Iterative for higher accuracy (but the frame rate will be reduced)
-./build/examples/openpose/openpose.bin --hand --hand_detection_mode 1
-# Tracking for higher accuracy if the frame rate is high enough. Worse results than fast method if frame rate is low
-./build/examples/openpose/openpose.bin --hand --hand_detection_mode 2
-# Iterative + tracking for best accuracy if frame rate is high enough. Worse results than fast method if frame rate is low
-./build/examples/openpose/openpose.bin --hand --hand_detection_mode 3
+./build/examples/openpose/openpose.bin --hand
+# Best results found with 6 scales
+./build/examples/openpose/openpose.bin --hand --hand_scale_number 6 --hand_scale_range 0.4
+# Adding tracking to Webcam (if FPS per GPU > 10 FPS) and Video
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --hand --hand_tracking
+# Multi-scale + tracking is also possible
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --hand --hand_scale_number 6 --hand_scale_range 0.4 --hand_tracking
 ```
 
 
@@ -158,9 +149,9 @@ Very important note, use `hand_detection_mode` accordingly.
 ## Rendering Face without Pose
 ```
 # CPU rendering (faster)
-./build/examples/openpose/openpose.bin --face --render_pose 0 --render_face 1
+./build/examples/openpose/openpose.bin --face --render_pose 0 --face_render 1
 # GPU rendering
-./build/examples/openpose/openpose.bin --face --render_pose 0 --render_face 2
+./build/examples/openpose/openpose.bin --face --render_pose 0 --face_render 2
 ```
 
 

@@ -8,10 +8,12 @@
 
 namespace op
 {
-    void renderHandKeypointsCpu(Array<float>& frameArray, const std::array<Array<float>, 2>& handKeypoints);
+    void renderHandKeypointsCpu(Array<float>& frameArray, const std::array<Array<float>, 2>& handKeypoints,
+    						    const float renderThreshold);
 
-    void renderHandKeypointsGpu(float* framePtr, const Point<int>& frameSize, const float* const handsPtr, const int numberHands,
-                                const float alphaColorToAdd = HAND_DEFAULT_ALPHA_KEYPOINT);
+    void renderHandKeypointsGpu(float* framePtr, const Point<int>& frameSize, const float* const handsPtr,
+    							const int numberHands, const float renderThreshold,
+    							const float alphaColorToAdd = HAND_DEFAULT_ALPHA_KEYPOINT);
 }
 
 #endif // OPENPOSE_HAND_GPU_HAND_RENDER_HPP

@@ -40,13 +40,14 @@ namespace op
     }
 
     PoseRenderer::PoseRenderer(const Point<int>& heatMapsSize, const Point<int>& outputSize, const PoseModel poseModel,
-                               const std::shared_ptr<PoseExtractor>& poseExtractor, const bool blendOriginalFrame,
-                               const float alphaKeypoint, const float alphaHeatMap, const unsigned int elementToRender,
-                               const RenderMode renderMode) :
+                               const std::shared_ptr<PoseExtractor>& poseExtractor, const float renderThreshold,
+                               const bool blendOriginalFrame, const float alphaKeypoint, const float alphaHeatMap,
+                               const unsigned int elementToRender, const RenderMode renderMode) :
         // #body elements to render = #body parts (size()) + #body part pair connections + 3 (+whole pose +whole heatmaps +PAFs)
         // POSE_BODY_PART_MAPPING crashes on Windows, replaced by getPoseBodyPartMapping
         Renderer{(unsigned long long)(outputSize.area() * 3), alphaKeypoint, alphaHeatMap, elementToRender,
                  (unsigned int)(getPoseBodyPartMapping(poseModel).size() + POSE_BODY_PART_PAIRS[(int)poseModel].size()/2 + 3)}, // mNumberElementsToRender
+        mRenderThreshold{renderThreshold},
         mHeatMapsSize{heatMapsSize},
         mOutputSize{outputSize},
         mPoseModel{poseModel},
@@ -178,7 +179,7 @@ namespace op
             // CPU rendering
             // Draw poseKeypoints
             if (elementRendered == 0)
-                renderPoseKeypointsCpu(outputData, poseKeypoints, mPoseModel, mBlendOriginalFrame);
+                renderPoseKeypointsCpu(outputData, poseKeypoints, mPoseModel, mRenderThreshold, mBlendOriginalFrame);
             // Draw heat maps / PAFs
             else
             {
@@ -219,7 +220,7 @@ namespace op
                             cudaMemcpy(pGpuPose, poseKeypoints.getConstPtr(), numberPeople * numberBodyParts * 3 * sizeof(float),
                                        cudaMemcpyHostToDevice);
                         renderPoseKeypointsGpu(*spGpuMemoryPtr, mPoseModel, numberPeople, mOutputSize, pGpuPose,
-                                               mShowGooglyEyes, mBlendOriginalFrame, getAlphaKeypoint());
+                                               mRenderThreshold, mShowGooglyEyes, mBlendOriginalFrame, getAlphaKeypoint());
                     }
                     else
                     {

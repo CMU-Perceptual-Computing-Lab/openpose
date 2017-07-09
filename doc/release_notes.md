@@ -46,21 +46,25 @@ OpenPose Library - Release Notes
 
 ## OpenPose 1.0.0
 1. Main improvements:
-    1. Windows branch merged to master branch.
-    2. Face and hands use `Maximum` instead of `Nms`, since there is only 1 person / detection.
-    3. Increased accuracy on multi-scale (added `Datum::scaleRatios` to save the relative scale ratio when multi-scale).
-    4. Increased speed ~5% by adding CPU rendering (but GPU is the default rendering).
-    5. Rendering colors modified, visually better results.
-    6. Check() functions give more feedback.
-    7. WCocoJsonSaver finished and removed its 3599-image limit.
-    8. Added `camera_fps` so generated video will use that frame rate.
-    9. Reduced the number of printed information messages. Default logging priority threshold increased to Priority::Max.
-    10. Google flags to OpenPose configuration parameters reader moved from each demo to utilities/flagsToOpenPose.
-    11. Nms classes do not use `numberParts` for `Reshape`, they deduce the value.
-    12. Improved documentation.
+    1. Added hand keypoint detection.
+    2. Windows branch merged to master branch.
+    3. Face and hands use `Maximum` instead of `Nms`, since there is only 1 person / detection.
+    4. Increased accuracy on multi-scale (added `Datum::scaleRatios` to save the relative scale ratio when multi-scale).
+    5. Increased speed ~5% by adding CPU rendering (but GPU is the default rendering).
+    6. Rendering colors modified, visually better results.
+    7. Rendering threshold for pose, face and hands becomes user-configurable.
+    8. Check() functions give more feedback.
+    9. WCocoJsonSaver finished and removed its 3599-image limit.
+    10. Added `camera_fps` so generated video will use that frame rate.
+    11. Reduced the number of printed information messages. Default logging priority threshold increased to Priority::Max.
+    12. Google flags to OpenPose configuration parameters reader moved from each demo to utilities/flagsToOpenPose.
+    13. Nms classes do not use `numberParts` for `Reshape`, they deduce the value.
+    14. Improved documentation.
 2. Functions or parameters renamed:
     1. Render flags renamed in the demo in order to incorporate the CPU/GPU rendering.
     2. Keypoints saved in JSON files (`write_keypoint_json`) are now saved as `pose_keypoints`, `face_keypoints`, `hand_left_keypoints`, and `hand_right_keypoints`. They all were previously saved as `body_parts`.
+    3. Flag `num_scales` renamed as `scale_number`.
+    4. All hand and pose flags renamed such as they start by `hand_` and `face_` respectively.
 3. Main bugs fixed:
     1. Fixed bug in Array::getConstCvMat() if mVolume=0, now returning empty cv::Mat.
     2. Fixed bug: `--process_real_time` threw error with webcam.

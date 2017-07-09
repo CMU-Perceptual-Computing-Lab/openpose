@@ -14,8 +14,10 @@ namespace op
     class HandRenderer : public Renderer
     {
     public:
-        HandRenderer(const Point<int>& frameSize, const float alphaKeypoint = HAND_DEFAULT_ALPHA_KEYPOINT,
-                     const float alphaHeatMap = HAND_DEFAULT_ALPHA_HEAT_MAP, const RenderMode renderMode = RenderMode::Cpu);
+        HandRenderer(const Point<int>& frameSize, const float renderThreshold,
+                     const float alphaKeypoint = HAND_DEFAULT_ALPHA_KEYPOINT,
+                     const float alphaHeatMap = HAND_DEFAULT_ALPHA_HEAT_MAP,
+                     const RenderMode renderMode = RenderMode::Cpu);
 
         ~HandRenderer();
 
@@ -24,6 +26,7 @@ namespace op
         void renderHand(Array<float>& outputData, const std::array<Array<float>, 2>& handKeypoints);
 
     private:
+        const float mRenderThreshold;
         const Point<int> mFrameSize;
         const RenderMode mRenderMode;
         float* pGpuHand; // GPU aux memory

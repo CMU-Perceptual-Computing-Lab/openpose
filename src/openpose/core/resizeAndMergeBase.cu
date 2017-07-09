@@ -93,7 +93,7 @@ namespace op
             // Multi-scale merging
             else
             {
-                // If num_scales > 1 --> scaleRatios must be set
+                // If scale_number > 1 --> scaleRatios must be set
                 if (scaleRatios.size() != num)
                     error("The scale ratios size must be equal than the number of scales.", __LINE__, __FUNCTION__, __FILE__);
                 const auto maxScales = 10;

@@ -38,8 +38,8 @@ namespace op
                         radius, stickwidth, threshold, alphaColorToAdd);
     }
 
-    void renderHandKeypointsGpu(float* framePtr, const Point<int>& frameSize, const float* const handsPtr, const int numberHands,
-                                const float alphaColorToAdd)
+    void renderHandKeypointsGpu(float* framePtr, const Point<int>& frameSize, const float* const handsPtr,
+                                const int numberHands, const float renderThreshold, const float alphaColorToAdd)
     {
         try
         {
@@ -49,7 +49,7 @@ namespace op
                 dim3 numBlocks;
                 std::tie(threadsPerBlock, numBlocks) = getNumberCudaThreadsAndBlocks(frameSize);
                 renderHandsParts<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.x, frameSize.y, handsPtr,
-                                                                 numberHands, HAND_RENDER_THRESHOLD, alphaColorToAdd);
+                                                                 numberHands, renderThreshold, alphaColorToAdd);
                 cudaCheck(__LINE__, __FUNCTION__, __FILE__);
             }
         }

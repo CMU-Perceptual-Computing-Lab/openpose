@@ -17,7 +17,7 @@ OpenPose Library - Compilation and Installation
 - At least 2 GB of free RAM memory.
 - Highly recommended: A CPU with at least 8 cores.
 
-Note: These requirements assume the default configuration (i.e. `--net_resolution "656x368"` and `num_scales 1`). You might need more (with a greater net resolution and/or number of scales) or less resources (with smaller net resolution and/or using the MPI and MPI_4 models).
+Note: These requirements assume the default configuration (i.e. `--net_resolution "656x368"` and `scale_number 1`). You might need more (with a greater net resolution and/or number of scales) or less resources (with smaller net resolution and/or using the MPI and MPI_4 models).
 
 
 

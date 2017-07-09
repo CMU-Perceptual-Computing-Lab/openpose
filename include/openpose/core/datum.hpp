@@ -107,7 +107,7 @@ namespace op
 
         float scaleNetToOutput; /**< Scale ratio between the net output and the final output Datum::cvOutputData. */
 
-        std::vector<float> scaleRatios; /**< Scale ratios between each scale (e.g. flag `num_scales`). Used to resize the different scales. */
+        std::vector<float> scaleRatios; /**< Scale ratios between each scale (e.g. flag `scale_number`). Used to resize the different scales. */
 
         std::pair<int, std::string> elementRendered; /**< Pair with the element key id POSE_BODY_PART_MAPPING on `pose/poseParameters.hpp` and its mapped value (e.g. 1 and "Neck"). */
 

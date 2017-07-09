@@ -137,41 +137,6 @@ namespace op
         }
     }
 
-    DetectionMode flagsToDetectionMode(const int handDetectionModeFlag, const std::shared_ptr<Producer>& producer)
-    {
-        try
-        {
-            if (handDetectionModeFlag == -1)
-            {
-                if (producer == nullptr)
-                    error("Since there is no default producer, `hand_detection_mode` must be set.", __LINE__, __FUNCTION__, __FILE__);
-                const auto producerType = producer->getType();
-                if (producerType == ProducerType::Webcam)
-                    return DetectionMode::Fast;
-                else if (producerType == ProducerType::ImageDirectory)
-                    return DetectionMode::Iterative;
-                else if (producerType == ProducerType::Video)
-                    return DetectionMode::Tracking;
-            }
-            else if (handDetectionModeFlag == 0)
-                return DetectionMode::Fast;
-            else if (handDetectionModeFlag == 1)
-                return DetectionMode::Iterative;
-            else if (handDetectionModeFlag == 2)
-                return DetectionMode::Tracking;
-            else if (handDetectionModeFlag == 3)
-                return DetectionMode::IterativeAndTracking;
-            // else
-            error("Undefined DetectionMode selected.", __LINE__, __FUNCTION__, __FILE__);
-            return DetectionMode::Fast;
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return DetectionMode::Fast;
-        }
-    }
-
     RenderMode flagsToRenderMode(const int renderFlag, const int renderPoseFlag)
     {
         try

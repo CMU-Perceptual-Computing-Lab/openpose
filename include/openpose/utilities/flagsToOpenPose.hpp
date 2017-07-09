@@ -25,8 +25,6 @@ namespace op
     std::vector<HeatMapType> flagsToHeatMaps(const bool heatMapsAddParts = false, const bool heatMapsAddBkg = false,
                                              const bool heatMapsAddPAFs = false);
 
-    DetectionMode flagsToDetectionMode(const int handDetectionModeFlag, const std::shared_ptr<Producer>& producer = nullptr);
-
     RenderMode flagsToRenderMode(const int renderFlag, const int renderPoseFlag = -2);
 
     Point<int> flagsToPoint(const std::string& pointString, const std::string& pointExample = "1280x720");
