@@ -165,7 +165,7 @@ namespace op
 
                 // Set hand size
                 const auto numberPeople = (int)handRectangles.size();
-                mHandKeypoints[0].reset({numberPeople, HAND_NUMBER_PARTS, 3}, 0);
+                mHandKeypoints[0].reset({numberPeople, (int)HAND_NUMBER_PARTS, 3}, 0);
                 mHandKeypoints[1].reset(mHandKeypoints[0].getSize(), 0);
 
                 // // Debugging
