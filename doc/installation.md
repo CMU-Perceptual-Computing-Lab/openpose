@@ -106,23 +106,21 @@ You just need to remove the OpenPose folder, by default called `openpose/`. E.g.
 ### Installation - Library
 1. Install the pre-requisites:
     1. Microsoft Visual Studio (VS) 2015. Install CUDA 8.0 after Visual Studio 2015 is installed to assure that the CUDA installation will generate all necessary files for VS. If CUDA was already installed, re-install it after installing VS!
-    2. Install all the demo pre-requisites.
-2. Download the OpenPose dependencies and models (body, face and hand models):
-    1. Open the Windows cmd (Windows button + X, then A).
-    2. Go to the OpenPose directory, assuming OpenPose has been downloaded on `C:\openpose`: `cd C:\openpose\`.
-    3. Run `windows\download_3rdparty_and_models.bat`.
-3. You can now open the Visual Studio sln file located on `{openpose_path}\windows\OpenPose.sln`.
+    2. Install all the demo pre-requisites from the section `Installation - Demo`.
+2. Download the OpenPose dependencies and models (body, face and hand models) by double-clicking on `{openpose_path}\windows\download_3rdparty_and_models.bat`.
+3. Open the Visual Studio project sln file by double-cliking on `{openpose_path}\windows\OpenPose.sln`.
 4. In order to verify OpenPose is working, try compiling and executing the demo:
     1. Right click on `OpenPoseDemo` --> `Set as StartUp Project`.
     2. Change `Debug` by `Release` mode.
-    3. You can now compile it.
-5. If you have a webcam connected, you can test it by pressing the F5 key or the green play icon.
-6. Otherwise, check [Quick Start](#quick-start) to verify OpenPose was properly compiled. In order to use the created exe from the command line, you have to:
+    3. Compile it and run it with F5 or the green play icon.
+5. If you have a webcam connected, OpenPose will automatically starts after being compiled.
+6. In order to use the created exe file from the command line (i.e. outside Visual Studio), you have to:
     1. Copy all the DLLs located on `{openpose_folder}\3rdparty\windows\caffe\bin\` on the exe folder: `{openpose_folder}\windows_project\x64\Release`.
     2. Copy all the DLLs located on `{openpose_folder}\3rdparty\windows\opencv\x64\vc14\bin\` on the exe folder: `{openpose_folder}\windows_project\x64\Release`.
     3. Open the Windows cmd (Windows button + X, then A).
     4. Go to the OpenPose directory, assuming OpenPose has been downloaded on `C:\openpose`: `cd C:\openpose\`.
     5. Run the tutorial commands.
+7. Check [Quick Start](#quick-start) to test video, webcam and a folder with images, in order to verify OpenPose was properly installed.
 
 
 
