@@ -115,8 +115,8 @@ You just need to remove the OpenPose folder, by default called `openpose/`. E.g.
     3. Compile it and run it with F5 or the green play icon.
 5. If you have a webcam connected, OpenPose will automatically starts after being compiled.
 6. In order to use the created exe file from the command line (i.e. outside Visual Studio), you have to:
-    1. Copy all the DLLs located on `{openpose_folder}\3rdparty\windows\caffe\bin\` on the exe folder: `{openpose_folder}\windows_project\x64\Release`.
-    2. Copy all the DLLs located on `{openpose_folder}\3rdparty\windows\opencv\x64\vc14\bin\` on the exe folder: `{openpose_folder}\windows_project\x64\Release`.
+    1. Copy all the DLLs located on `{openpose_folder}\3rdparty\windows\caffe\bin\` on the exe folder: `{openpose_folder}\windows\x64\Release`.
+    2. Copy all the DLLs located on `{openpose_folder}\3rdparty\windows\opencv\x64\vc14\bin\` on the exe folder: `{openpose_folder}\windows\x64\Release`.
     3. Open the Windows cmd (Windows button + X, then A).
     4. Go to the OpenPose directory, assuming OpenPose has been downloaded on `C:\openpose`: `cd C:\openpose\`.
     5. Run the tutorial commands.
@@ -174,7 +174,7 @@ bin\OpenPoseDemo.exe --video examples\media\video.avi
 ```
 ```
 :: Windows - Library
-windows_project\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi
+windows\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi
 ```
 
 **2. Running on Webcam**
@@ -188,7 +188,7 @@ bin\OpenPoseDemo.exe
 ```
 ```
 :: Windows - Library
-windows_project\x64\Release\OpenPoseDemo.exe
+windows\x64\Release\OpenPoseDemo.exe
 ```
 
 **3. Running on Images**
@@ -202,7 +202,7 @@ bin\OpenPoseDemo.exe --image_dir examples\media\
 ```
 ```
 :: Windows - Library
-windows_project\x64\Release\OpenPoseDemo.exe --image_dir examples\media\
+windows\x64\Release\OpenPoseDemo.exe --image_dir examples\media\
 ```
 
 **4. Body Pose and Face Keypoint Detector (e.g. on Video)**
@@ -216,7 +216,7 @@ bin\OpenPoseDemo.exe --video examples\media\video.avi --face
 ```
 ```
 :: Windows - Library
-windows_project\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi --face
+windows\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi --face
 
 The visual GUI should show the original image with the poses blended on it, similarly to the pose of this gif:
 <p align="center">
