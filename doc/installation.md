@@ -107,11 +107,6 @@ You just need to remove the OpenPose folder, by default called `openpose/`. E.g.
 1. Install the pre-requisites:
     1. Microsoft Visual Studio (VS) 2015. Install CUDA 8.0 after Visual Studio 2015 is installed to assure that the CUDA installation will generate all necessary files for VS. If CUDA was already installed, re-install it after installing VS!
     2. Install all the demo pre-requisites.
-    3. [Python 2.4.13 64 bits - Windows x86-64 MSI installer](https://www.python.org/downloads/release/python-2713/).
-        - Install it on C:\Python27 (default) or D:\Programs\Python27. Otherwise, modify the VS solution accordingly.
-        - In addition, open the Windows cmd (Windows button + X, then A), and install some Python libraries with this command: `pip install numpy protobuf hypothesis`.
-    4. [Cmake](https://cmake.org/download/): Select the option to add it to the Windows PATH.
-    5. [Ninja](https://ninja-build.org/): Select the option to add it to the Windows PATH.
 2. Download the OpenPose dependencies and models (body, face and hand models):
     1. Open the Windows cmd (Windows button + X, then A).
     2. Go to the OpenPose directory, assuming OpenPose has been downloaded on `C:\openpose`: `cd C:\openpose\`.
