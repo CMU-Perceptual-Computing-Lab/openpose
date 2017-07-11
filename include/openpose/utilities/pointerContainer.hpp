@@ -1,6 +1,8 @@
 #ifndef OPENPOSE_UTILITIES_POINTER_CONTAINER_HPP
 #define OPENPOSE_UTILITIES_POINTER_CONTAINER_HPP
 
+#include <openpose/core/macros.hpp>
+
 namespace op
 {
     template<typename TPointerContainer>
@@ -10,7 +12,7 @@ namespace op
     }
 
     template<typename TDatums>
-    class PointerContainerGreater
+    class OP_API PointerContainerGreater
     {
     public:
         bool operator() (TDatums& a, TDatums& b)
@@ -25,7 +27,7 @@ namespace op
     };
 
     template<typename TDatums>
-    class PointerContainerLess
+    class OP_API PointerContainerLess
     {
     public:
         bool operator() (TDatums& a, TDatums& b)

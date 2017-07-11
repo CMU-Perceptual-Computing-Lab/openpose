@@ -6,11 +6,11 @@
 #include <vector>
 #include <openpose/core/array.hpp>
 #include <openpose/pose/enumClasses.hpp>
-#include <openpose/utilities/macros.hpp>
+#include <openpose/core/macros.hpp>
 
 namespace op
 {
-    class HandDetectorFromTxt
+    class OP_API HandDetectorFromTxt
     {
     public:
         explicit HandDetectorFromTxt(const std::string& txtDirectoryPath);

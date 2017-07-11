@@ -5,6 +5,7 @@
 #include <openpose/core/point.hpp>
 #include <openpose/pose/enumClasses.hpp>
 #include <openpose/pose/poseParameters.hpp>
+#include <openpose/core/macros.hpp>
 
 namespace op
 {
@@ -13,7 +14,7 @@ namespace op
      * WrapperStructPose allows the user to set up the pose estimation and rendering parameters that will be used for the OpenPose Wrapper
      * class.
      */
-    struct WrapperStructPose
+    struct OP_API WrapperStructPose
     {
         /**
          * CCN (Conv Net) input size.

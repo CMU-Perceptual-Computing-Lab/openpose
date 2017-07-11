@@ -5,10 +5,11 @@
 #include <opencv2/core/core.hpp> // cv::Mat
 #include <openpose/core/array.hpp>
 #include <openpose/core/point.hpp>
+#include <openpose/core/macros.hpp>
 
 namespace op
 {
-    class GuiInfoAdder
+    class OP_API GuiInfoAdder
     {
     public:
         GuiInfoAdder(const Point<int>& outputSize, const int numberGpus, const bool guiEnabled = false);

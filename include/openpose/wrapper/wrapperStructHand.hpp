@@ -4,6 +4,7 @@
 #include <openpose/core/enumClasses.hpp>
 #include <openpose/core/point.hpp>
 #include <openpose/hand/handParameters.hpp>
+#include <openpose/core/macros.hpp>
 
 namespace op
 {
@@ -12,7 +13,7 @@ namespace op
      * WrapperStructHand allows the user to set up the hand estimation and rendering parameters that will be used for the OpenPose Wrapper
      * class.
      */
-    struct WrapperStructHand
+    struct OP_API WrapperStructHand
     {
         /**
          * Whether to extract hand.

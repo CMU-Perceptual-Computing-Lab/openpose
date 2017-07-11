@@ -4,11 +4,11 @@
 #include <atomic>
 #include <tuple>
 #include <memory> // std::shared_ptr
-#include <openpose/utilities/macros.hpp>
+#include "common.hpp"
 
 namespace op
 {
-    class Renderer
+    class OP_API Renderer
     {
     public:
         explicit Renderer(const unsigned long long volume, const float alphaKeypoint, const float alphaHeatMap,

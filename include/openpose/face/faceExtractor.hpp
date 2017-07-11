@@ -11,10 +11,11 @@
 #include <openpose/core/net.hpp>
 #include <openpose/core/rectangle.hpp>
 #include <openpose/core/resizeAndMergeCaffe.hpp>
+#include <openpose/core/macros.hpp>
 
 namespace op
 {
-    class FaceExtractor
+    class OP_API FaceExtractor
     {
     public:
         explicit FaceExtractor(const Point<int>& netInputSize, const Point<int>& netOutputSize, const std::string& modelFolder, const int gpuId);

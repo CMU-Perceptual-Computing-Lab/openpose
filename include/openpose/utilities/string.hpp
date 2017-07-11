@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <openpose/core/macros.hpp>
 
 namespace op
 {
@@ -14,9 +15,9 @@ namespace op
      * @return std::string with the formatted value.
      */
     template<typename T>
-    std::string toFixedLengthString(const T number, const unsigned long long stringLength = 0);
+    OP_API std::string toFixedLengthString(const T number, const unsigned long long stringLength = 0);
 
-    std::vector<std::string> splitString(const std::string& stringToSplit, const std::string& delimiter);
+    OP_API std::vector<std::string> splitString(const std::string& stringToSplit, const std::string& delimiter);
 }
 
 #endif // OPENPOSE_UTILITIES_STRING_HPP

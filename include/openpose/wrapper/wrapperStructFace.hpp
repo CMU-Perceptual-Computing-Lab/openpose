@@ -4,6 +4,7 @@
 #include <openpose/core/enumClasses.hpp>
 #include <openpose/core/point.hpp>
 #include <openpose/face/faceParameters.hpp>
+#include <openpose/core/macros.hpp>
 
 namespace op
 {
@@ -12,7 +13,7 @@ namespace op
      * WrapperStructFace allows the user to set up the face estimation and rendering parameters that will be used for the OpenPose Wrapper
      * class.
      */
-    struct WrapperStructFace
+    struct OP_API WrapperStructFace
     {
         /**
          * Whether to extract face.

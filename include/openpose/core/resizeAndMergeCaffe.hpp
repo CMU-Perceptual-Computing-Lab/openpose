@@ -5,7 +5,7 @@
 #include <array>
 #include <vector>
 #include <caffe/blob.hpp>
-#include <openpose/utilities/macros.hpp>
+#include "common.hpp"
 
 namespace op
 {
@@ -13,7 +13,7 @@ namespace op
     // compatibility with any generic Caffe version,
     // we keep this 'layer' inside our library rather than in the Caffe code.
     template <typename T>
-    class ResizeAndMergeCaffe
+    class OP_API ResizeAndMergeCaffe
     {
     public:
         explicit ResizeAndMergeCaffe();

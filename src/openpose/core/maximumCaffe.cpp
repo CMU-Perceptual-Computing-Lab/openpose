@@ -1,7 +1,6 @@
 #ifdef USE_CAFFE
 #include <openpose/core/maximumBase.hpp>
 #include <openpose/utilities/errorAndLog.hpp>
-#include <openpose/utilities/macros.hpp>
 #include <openpose/core/maximumCaffe.hpp>
 
 namespace op

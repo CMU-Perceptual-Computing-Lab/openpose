@@ -4,11 +4,12 @@
 #include <string>
 #include <vector>
 #include <opencv2/core/core.hpp> // cv::Mat
+#include <openpose/core/macros.hpp>
 #include "fileSaver.hpp"
 
 namespace op
 {
-    class ImageSaver : public FileSaver
+    class OP_API ImageSaver : public FileSaver
     {
     public:
         ImageSaver(const std::string& directoryPath, const std::string& imageFormat);

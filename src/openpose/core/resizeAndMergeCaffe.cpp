@@ -2,7 +2,6 @@
 #include <openpose/core/resizeAndMergeBase.hpp>
 #include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/utilities/fastMath.hpp>
-#include <openpose/utilities/macros.hpp>
 #include <openpose/core/resizeAndMergeCaffe.hpp>
 
 namespace op

@@ -3,7 +3,7 @@
 
 #include <string>
 #include <openpose/core/array.hpp>
-#include <openpose/utilities/macros.hpp>
+#include <openpose/core/macros.hpp>
 #include "jsonOfstream.hpp"
 
 namespace op
@@ -11,7 +11,7 @@ namespace op
     /**
      *  The CocoJsonSaver class creates a COCO validation json file with details about the processed images. It inherits from Recorder.
      */
-    class CocoJsonSaver
+    class OP_API CocoJsonSaver
     {
     public:
         /**

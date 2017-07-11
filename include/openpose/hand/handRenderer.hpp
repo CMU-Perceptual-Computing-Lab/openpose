@@ -7,11 +7,12 @@
 #include <openpose/core/point.hpp>
 #include <openpose/core/renderer.hpp>
 #include <openpose/thread/worker.hpp>
+#include <openpose/core/macros.hpp>
 #include "handParameters.hpp"
 
 namespace op
 {
-    class HandRenderer : public Renderer
+    class OP_API HandRenderer : public Renderer
     {
     public:
         HandRenderer(const Point<int>& frameSize, const float renderThreshold,

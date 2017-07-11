@@ -8,13 +8,13 @@
 #include <openpose/core/point.hpp>
 #include <openpose/core/rectangle.hpp>
 #include <openpose/pose/enumClasses.hpp>
-#include <openpose/utilities/macros.hpp>
+#include <openpose/core/macros.hpp>
 
 namespace op
 {
     // Note: This class is thread-safe, so several GPUs can be running hands and using `updateTracker`, and updateTracker will keep the latest known
     // tracking
-    class HandDetector
+    class OP_API HandDetector
     {
     public:
         explicit HandDetector(const PoseModel poseModel);

@@ -4,6 +4,7 @@
 #include <string>
 #include <opencv2/core/core.hpp> // cv::Mat
 #include <opencv2/highgui/highgui.hpp> // cv::VideoCapture
+#include <openpose/core/macros.hpp>
 #include "producer.hpp"
 
 namespace op
@@ -12,7 +13,7 @@ namespace op
      *  VideoCaptureReader is an abstract class to extract frames from a cv::VideoCapture source (video file,
      * webcam stream, etc.). It has the basic and common functions of the cv::VideoCapture class (e.g. get, set, etc.).
      */
-    class VideoCaptureReader : public Producer
+    class OP_API VideoCaptureReader : public Producer
     {
     public:
         /**

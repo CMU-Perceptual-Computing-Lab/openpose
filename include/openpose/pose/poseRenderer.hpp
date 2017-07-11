@@ -6,13 +6,13 @@
 #include <openpose/core/enumClasses.hpp>
 #include <openpose/core/point.hpp>
 #include <openpose/core/renderer.hpp>
-#include <openpose/utilities/macros.hpp>
+#include <openpose/core/macros.hpp>
 #include "poseExtractor.hpp"
 #include "poseParameters.hpp"
 
 namespace op
 {
-    class PoseRenderer : public Renderer
+    class OP_API PoseRenderer : public Renderer
     {
     public:
         PoseRenderer(const Point<int>& heatMapsSize, const Point<int>& outputSize, const PoseModel poseModel,

@@ -6,11 +6,12 @@
 #include <openpose/core/point.hpp>
 #include <openpose/core/renderer.hpp>
 #include <openpose/thread/worker.hpp>
+#include <openpose/core/macros.hpp>
 #include "faceParameters.hpp"
 
 namespace op
 {
-    class FaceRenderer : public Renderer
+    class OP_API FaceRenderer : public Renderer
     {
     public:
         FaceRenderer(const Point<int>& frameSize, const float renderThreshold,

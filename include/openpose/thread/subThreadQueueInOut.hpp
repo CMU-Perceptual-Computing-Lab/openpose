@@ -31,7 +31,7 @@ namespace op
 
 // Implementation
 #include <openpose/utilities/errorAndLog.hpp>
-#include <openpose/utilities/macros.hpp>
+#include <openpose/core/macros.hpp>
 namespace op
 {
     template<typename TDatums, typename TWorker, typename TQueue>

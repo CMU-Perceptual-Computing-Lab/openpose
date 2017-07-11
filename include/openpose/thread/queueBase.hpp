@@ -4,7 +4,7 @@
 #include <queue> // std::queue & std::priority_queue
 #include <condition_variable>
 #include <mutex>
-#include <openpose/utilities/macros.hpp>
+#include <openpose/core/macros.hpp>
 
 namespace op
 {
@@ -93,7 +93,7 @@ namespace op
 #include <openpose/core/datum.hpp>
 #include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/utilities/fastMath.hpp>
-#include <openpose/utilities/macros.hpp>
+#include <openpose/core/macros.hpp>
 namespace op
 {
     template<typename TDatums, typename TQueue>

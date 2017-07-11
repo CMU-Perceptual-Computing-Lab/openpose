@@ -4,6 +4,7 @@
 #include <string>
 #include <opencv2/core/core.hpp> // cv::Mat
 #include <openpose/core/point.hpp>
+#include <openpose/core/macros.hpp>
 #include "enumClasses.hpp"
 
 namespace op
@@ -11,7 +12,7 @@ namespace op
     /**
      *  The FrameDisplayer class is the one presenting visually the processed frame to the user.
      */
-    class FrameDisplayer
+    class OP_API FrameDisplayer
     {
     public:
         /**

@@ -2,13 +2,12 @@
 #define OPENPOSE_CORE_KEYPOINT_SCALER_HPP
 
 #include <vector>
-#include "array.hpp"
-#include "point.hpp"
+#include "common.hpp"
 #include "enumClasses.hpp"
 
 namespace op
 {
-    class KeypointScaler
+    class OP_API KeypointScaler
     {
     public:
         explicit KeypointScaler(const ScaleMode scaleMode);

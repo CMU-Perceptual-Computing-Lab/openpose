@@ -74,5 +74,14 @@ OpenPose Library - Release Notes
 
 
 
-## Current version (future OpenPose 1.0.1)
+## OpenPose 1.0.1
+1. Main improvements:
+    1. Windows library turned into DLL dynamic library (i.e. portable).
+    2. Improved documentation.
+2. Functions or parameters renamed:
+    1. `openpose/utilities/macros.hpp` moved to `openpose/utilities/macros.hpp`.
+
+
+
+## Current version (future OpenPose 1.0.2)
 1. No changes yet.

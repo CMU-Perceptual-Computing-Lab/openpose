@@ -2,12 +2,13 @@
 #define OPENPOSE_FILESTREAM_KEYPOINT_SAVER_HPP
 
 #include <openpose/core/array.hpp>
+#include <openpose/core/macros.hpp>
 #include "enumClasses.hpp"
 #include "fileSaver.hpp"
 
 namespace op
 {
-    class KeypointSaver : public FileSaver
+    class OP_API KeypointSaver : public FileSaver
     {
     public:
         KeypointSaver(const std::string& directoryPath, const DataFormat format);

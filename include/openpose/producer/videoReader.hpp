@@ -1,6 +1,7 @@
 #ifndef OPENPOSE_PRODUCER_VIDEO_READER_HPP
 #define OPENPOSE_PRODUCER_VIDEO_READER_HPP
 
+#include <openpose/core/macros.hpp>
 #include "videoCaptureReader.hpp"
 
 namespace op
@@ -9,7 +10,7 @@ namespace op
      * VideoReader is a wrapper of the cv::VideoCapture class for video. It allows controlling a webcam (extracting frames,
      * setting resolution & fps, etc).
      */
-    class VideoReader : public VideoCaptureReader
+    class OP_API VideoReader : public VideoCaptureReader
     {
     public:
         /**

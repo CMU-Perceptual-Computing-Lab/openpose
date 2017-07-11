@@ -3,14 +3,15 @@
 #define OPENPOSE_CORE_MAXIMUM_CAFFE_HPP
 
 #include <array>
-#include "caffe/blob.hpp"
+#include <caffe/blob.hpp>
+#include "common.hpp"
 
 namespace op
 {
     // It mostly follows the Caffe::layer implementation, so Caffe users can easily use it. However, in order to keep the compatibility with any generic Caffe version,
     // we keep this 'layer' inside our library rather than in the Caffe code.
     template <typename T>
-    class MaximumCaffe
+    class OP_API MaximumCaffe
     {
     public:
         explicit MaximumCaffe();

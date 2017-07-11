@@ -7,12 +7,12 @@
 #include <openpose/core/array.hpp>
 #include <openpose/core/point.hpp>
 #include <openpose/core/enumClasses.hpp>
-#include <openpose/utilities/macros.hpp>
+#include <openpose/core/macros.hpp>
 #include "poseParameters.hpp"
 
 namespace op
 {
-    class PoseExtractor
+    class OP_API PoseExtractor
     {
     public:
         PoseExtractor(const Point<int>& netOutputSize, const Point<int>& outputSize, const PoseModel poseModel, const std::vector<HeatMapType>& heatMapTypes = {},

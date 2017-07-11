@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <openpose/core/point.hpp>
+#include <openpose/core/macros.hpp>
 #include "producer.hpp"
 
 namespace op
@@ -13,7 +14,7 @@ namespace op
      * cv::VideoCapture class, so it can be used quite similarly to the cv::VideoCapture class. Thus,
      * it is quite similar to VideoReader and WebcamReader.
      */
-    class ImageDirectoryReader : public Producer
+    class OP_API ImageDirectoryReader : public Producer
     {
     public:
         /**

@@ -2,6 +2,7 @@
 #define OPENPOSE_UTILITIES_PROFILER_HPP
 
 #include <string>
+#include <openpose/core/macros.hpp>
 
 // Enable PROFILER_ENABLED on Makefile.config in order to use this function. Otherwise nothing will be outputted.
 
@@ -17,7 +18,7 @@
 
 namespace op
 {
-    class Profiler
+    class OP_API Profiler
     {
     public:
         static const unsigned long long DEFAULT_X;

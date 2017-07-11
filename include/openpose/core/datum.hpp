@@ -5,9 +5,7 @@
 #include <memory> // std::shared_ptr
 #include <string>
 #include <opencv2/core/core.hpp> // cv::Mat
-#include "array.hpp"
-#include "point.hpp"
-#include "rectangle.hpp"
+#include "common.hpp"
 
 namespace op
 {
@@ -16,7 +14,7 @@ namespace op
      * Datum is one the main OpenPose classes/structs. The workers and threads share by default a std::shared_ptr<std::vector<Datum>>. It contains
      * all the parameters that the different workers and threads need to exchange.
      */
-    struct Datum
+    struct OP_API Datum
     {
         // -------------------------------------------------- ID parameters -------------------------------------------------- //
         unsigned long long id; /**< Datum ID. Internally used to sort the Datums if multi-threading is used. */
