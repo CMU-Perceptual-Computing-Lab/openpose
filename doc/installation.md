@@ -104,7 +104,6 @@ You just need to remove the OpenPose folder, by default called `openpose/`. E.g.
     1. Microsoft Visual Studio (VS) 2015.
     2. [CUDA 8](https://developer.nvidia.com/cuda-downloads): Install it on the default location, `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0`. Otherwise, modify the Visual Studio project solution accordingly. Install CUDA 8.0 after Visual Studio 2015 is installed to assure that the CUDA installation will generate all necessary files for VS. If CUDA was already installed, re-install it after installing VS!
     3. [cuDNN 5.1](https://developer.nvidia.com/cudnn): Once you have downloaded it, just unzip it and copy (merge) the contents on the CUDA folder, `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0`.
-    4. Install all the demo pre-requisites from the section `Installation - Demo`.
 2. Download the OpenPose dependencies and models (body, face and hand models) by double-clicking on `{openpose_path}\windows\download_3rdparty_and_models.bat`.
 3. Open the Visual Studio project sln file by double-cliking on `{openpose_path}\windows\OpenPose.sln`.
 4. In order to verify OpenPose is working, try compiling and executing the demo:
