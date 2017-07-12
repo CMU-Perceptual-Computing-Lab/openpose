@@ -84,4 +84,8 @@ OpenPose Library - Release Notes
 
 
 ## Current version (future OpenPose 1.0.2)
-1. No changes yet.
+1. Main improvements:
+    1. Caffe turned into DLL library.
+    2. Added OpenPose 1.0.1 portable demo.
+2. Main bugs fixed:
+    1. Pycaffe can now be imported from Python.

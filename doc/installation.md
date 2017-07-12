@@ -13,7 +13,6 @@ OpenPose Library - Compilation and Installation
 ## Requirements
 - Ubuntu (tested on 14 and 16) or Windows (tested on 10). We do not support any other OS but the community has been able to install it on: CentOS, Windows 7, and Windows 8.
 - NVIDIA graphics card with at least 1.6 GB available (the `nvidia-smi` command checks the available GPU memory in Ubuntu).
-- CUDA and cuDNN installed. Note: We found OpenPose working with cuDNN 5.1 ~10% faster than with cuDNN 6.
 - At least 2 GB of free RAM memory.
 - Highly recommended: A CPU with at least 8 cores.
 
@@ -27,9 +26,10 @@ Note: These requirements assume the default configuration (i.e. `--net_resolutio
 ### Installation - Script Compilation
 **Highly important**: This script only works with CUDA 8 and Ubuntu 14 or 16. Otherwise, check [Manual Compilation](#manual-compilation).
 1. Required: CUDA, cuDNN, OpenCV and Atlas must be already installed on your machine.
-    1. OpenCV can be installed with `apt-get install libopencv-dev`. If you have compiled OpenCV 3 by your own, follow [Manual Compilation](#manual-compilation). After both Makefile.config files have been generated, edit them and uncomment the line `# OPENCV_VERSION := 3`. You might alternatively modify all `Makefile.config.UbuntuXX` files and then run the scripts in step 2.
-    2. In addition, OpenCV 3 does not incorporate the `opencv_contrib` module by default. Assuming you have OpenCV 3 compiled with the contrib module and you want to use it, append `opencv_contrib` at the end of the line `LIBRARIES += opencv_core opencv_highgui opencv_imgproc` in the `Makefile` file.
-    3. Atlas can be installed with `sudo apt-get install libatlas-base-dev`. Instead of Atlas, you can use OpenBLAS or Intel MKL by modifying the line `BLAS := atlas` in the same way as previosuly mentioned for the OpenCV version selection.
+    1. [CUDA](https://developer.nvidia.com/cuda-downloads) and [cuDNN](https://developer.nvidia.com/cudnn) must be installed. Note: We found OpenPose working ~10% faster with cuDNN 5.1 compared to cuDNN 6.
+    2. OpenCV can be installed with `apt-get install libopencv-dev`. If you have compiled OpenCV 3 by your own, follow [Manual Compilation](#manual-compilation). After both Makefile.config files have been generated, edit them and uncomment the line `# OPENCV_VERSION := 3`. You might alternatively modify all `Makefile.config.UbuntuXX` files and then run the scripts in step 2.
+    3. In addition, OpenCV 3 does not incorporate the `opencv_contrib` module by default. Assuming you have OpenCV 3 compiled with the contrib module and you want to use it, append `opencv_contrib` at the end of the line `LIBRARIES += opencv_core opencv_highgui opencv_imgproc` in the `Makefile` file.
+    4. Atlas can be installed with `sudo apt-get install libatlas-base-dev`. Instead of Atlas, you can use OpenBLAS or Intel MKL by modifying the line `BLAS := atlas` in the same way as previosuly mentioned for the OpenCV version selection.
 2. Build Caffe & the OpenPose library + download the required Caffe models for Ubuntu 14.04 or 16.04 (auto-detected for the script) and CUDA 8:
 ```
 bash ./ubuntu/install_caffe_and_openpose_if_cuda8.sh
@@ -95,18 +95,15 @@ You just need to remove the OpenPose folder, by default called `openpose/`. E.g.
 
 ## Windows
 ### Installation - Demo
-1. Install the pre-requisites:
-    1. [Microsoft Visual C++ 2015 Redistributable](https://www.microsoft.com/en-us/download/details.aspx?id=53587) (lighter) or Microsoft Visual Studio 2015 (in case you intend to install the library).
-    2. [CUDA 8](https://developer.nvidia.com/cuda-downloads): Install it on the default location, C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0. Otherwise, modify the Visual Studio project solution accordingly.
-    3. [cuDNN 5.1](https://developer.nvidia.com/cudnn): Once you have downloaded it, just unzip it and copy (merge) the contents on the CUDA folder, C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0.
-2. Download the portable demo from: _link coming soon_.
+1. Download and unzip the [portable OpenPose demo 1.0.1](http://posefs1.perception.cs.cmu.edu/OpenPose/OpenPose_demo_1.0.1.zip).
 
 
 
 ### Installation - Library
 1. Install the pre-requisites:
-    1. Microsoft Visual Studio (VS) 2015. Install CUDA 8.0 after Visual Studio 2015 is installed to assure that the CUDA installation will generate all necessary files for VS. If CUDA was already installed, re-install it after installing VS!
-    2. Install all the demo pre-requisites from the section `Installation - Demo`.
+    1. Microsoft Visual Studio (VS) 2015.
+    2. [CUDA 8](https://developer.nvidia.com/cuda-downloads): Install it on the default location, `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0`. Otherwise, modify the Visual Studio project solution accordingly. Install CUDA 8.0 after Visual Studio 2015 is installed to assure that the CUDA installation will generate all necessary files for VS. If CUDA was already installed, re-install it after installing VS!
+    3. [cuDNN 5.1](https://developer.nvidia.com/cudnn): Once you have downloaded it, just unzip it and copy (merge) the contents on the CUDA folder, `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0`.
 2. Download the OpenPose dependencies and models (body, face and hand models) by double-clicking on `{openpose_path}\windows\download_3rdparty_and_models.bat`.
 3. Open the Visual Studio project sln file by double-cliking on `{openpose_path}\windows\OpenPose.sln`.
 4. In order to verify OpenPose is working, try compiling and executing the demo:
@@ -124,37 +121,8 @@ You just need to remove the OpenPose folder, by default called `openpose/`. E.g.
 
 
 
-### Installation - Library - Old Deprecated Version
-Note: This version will not be updated anymore and removed in the future.
-
-1. Install the pre-requisites:
-    1. Microsoft Visual Studio (VS) 2015. Install CUDA 8.0 after Visual Studio 2015 is installed to assure that the CUDA installation will generate all necessary files for VS. If CUDA was already installed, re-install it after installing VS!
-    2. Install all the demo pre-requisites.
-    3. [Python 2.4.13 64 bits - Windows x86-64 MSI installer](https://www.python.org/downloads/release/python-2713/).
-        - Install it on C:\Python27 (default) or D:\Programs\Python27. Otherwise, modify the VS solution accordingly.
-        - In addition, open the Windows cmd (Windows button + X, then A), and install some Python libraries with this command: `pip install numpy protobuf hypothesis`.
-    4. [Cmake](https://cmake.org/download/): Select the option to add it to the Windows PATH.
-    5. [Ninja](https://ninja-build.org/): Select the option to add it to the Windows PATH.
-2. Download the `Windows` branch of Openpose by either cliking on `Download ZIP` on [openpose/tree/windows](https://github.com/CMU-Perceptual-Computing-Lab/openpose/tree/windows) or cloning the repository: `git clone https://github.com/CMU-Perceptual-Computing-Lab/openpose/ && cd openpose && git checkout old_deprecated_windows`.
-3. Install Caffe on Windows:
-    1. Open the Windows cmd (Windows button + X, then A).
-    2. Go to the Caffe directory, assuming OpenPose has been downloaded on `C:\openpose`: `cd C:\openpose\3rdparty\caffe\caffe-windows`.
-    3. Compile Caffe by running: `scripts\build_win.cmd`. It will take several minutes.
-        - Note: If Caffe asks you: `Does D:\openpose\3rdparty\caffe\caffe-windows\build\..\..\include\caffe specify a file name or directory name on the target (F = file, D = directory)?`, select `D`.
-    4. If you find any problem installing Caffe, check [http://caffe.berkeleyvision.org/](http://caffe.berkeleyvision.org/).
-4. You can now open the Visual Studio sln file located on `{openpose_path}\windows_project\OpenPose.sln`.
-5. In order to verify OpenPose is working, try compiling and executing the demo:
-    1. Right click on `OpenPoseDemo` --> `Set as StartUp Project`.
-    2. Change `Debug` by `Release` mode.
-    3. You can now compile it.
-6. Download the body pose models:
-    1. Download the [COCO model (18 key-points)](http://posefs1.perception.cs.cmu.edu/Users/tsimon/Projects/coco/data/models/coco/pose_iter_440000.caffemodel) as `{openpose_folder}\models\pose\coco\pose_iter_440000.caffemodel`.
-    2. Download the [face model (70 key-points)](http://posefs1.perception.cs.cmu.edu/OpenPose/models/face/pose_iter_116000.caffemodel) as `{openpose_folder}\models\face\pose_iter_116000.caffemodel`.
-    3. (Optionally) download the [MPI model (15 key-points, faster and less memory than COCO)](http://posefs1.perception.cs.cmu.edu/Users/tsimon/Projects/coco/data/models/mpi/pose_iter_160000.caffemodel) as `{openpose_folder}\models\pose\mpi\pose_iter_160000.caffemodel`.
-7. If you have a webcam connected, you can test it by pressing the F5 key or the green play icon.
-8. Otherwise, check [Quick Start](#quick-start) to verify OpenPose was properly compiled. In order to use the created exe from the command line, you have to:
-    1. Copy all the DLLs located on `{openpose_folder}\3rdparty\caffe\caffe-windows\build\install\bin\` on the exe folder: `{openpose_folder}\windows_project\x64\Release`.
-    2. Copy `opencv_ffmpeg310_64.dll`, `opencv_video310.dll` and `opencv_videoio310.dll` from `{openpose_folder}\3rdparty\caffe\dependencies\libraries_v140_x64_py27_1.1.0\libraries\x64\vc14\bin\` on the exe folder: `{openpose_folder}\windows_project\x64\Release`.
+### Uninstallation
+You just need to remove the OpenPose or portable demo folder.
 
 
 

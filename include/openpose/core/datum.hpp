@@ -96,7 +96,7 @@ namespace op
          * Hand keypoints (x,y,score) locations for each person in the image.
          * It has been resized to the same resolution as `poseKeypoints`.
          * handKeypoints[0] corresponds to left hands, and handKeypoints[1] to right ones.
-         * Size: #people x #hand parts (20) x 3 ((x,y) coordinates + score)
+         * Size: #people x #hand parts (21) x 3 ((x,y) coordinates + score)
          */
         std::array<Array<float>, 2> handKeypoints;
 
