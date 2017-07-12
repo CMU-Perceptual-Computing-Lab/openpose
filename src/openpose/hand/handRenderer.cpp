@@ -10,8 +10,10 @@
 
 namespace op
 {
-    HandRenderer::HandRenderer(const Point<int>& frameSize, const float alphaKeypoint, const float alphaHeatMap, const RenderMode renderMode) :
+    HandRenderer::HandRenderer(const Point<int>& frameSize,  const float renderThreshold, const float alphaKeypoint,
+                               const float alphaHeatMap, const RenderMode renderMode) :
         Renderer{(unsigned long long)(frameSize.area() * 3), alphaKeypoint, alphaHeatMap},
+        mRenderThreshold{renderThreshold},
         mFrameSize{frameSize},
         mRenderMode{renderMode}
     {
@@ -40,7 +42,7 @@ namespace op
             Renderer::initializationOnThread();
             // GPU memory allocation for rendering
             #ifndef CPU_ONLY
-                cudaMalloc((void**)(&pGpuHand), 2 * HAND_MAX_HANDS * HAND_NUMBER_PARTS * 3 * sizeof(float));
+                cudaMalloc((void**)(&pGpuHand), HAND_MAX_HANDS * HAND_NUMBER_PARTS * 3 * sizeof(float));
             #endif
             log("Finished initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
         }
@@ -78,7 +80,7 @@ namespace op
     {
         try
         {
-            renderHandKeypointsCpu(outputData, handKeypoints);
+            renderHandKeypointsCpu(outputData, handKeypoints, mRenderThreshold);
         }
         catch (const std::exception& e)
         {
@@ -103,7 +105,7 @@ namespace op
                     const auto handVolume = numberPeople * handArea;
                     cudaMemcpy(pGpuHand, handKeypoints[0].getConstPtr(), handVolume * sizeof(float), cudaMemcpyHostToDevice);
                     cudaMemcpy(pGpuHand + handVolume, handKeypoints[1].getConstPtr(), handVolume * sizeof(float), cudaMemcpyHostToDevice);
-                    renderHandKeypointsGpu(*spGpuMemoryPtr, mFrameSize, pGpuHand, 2 * numberPeople);
+                    renderHandKeypointsGpu(*spGpuMemoryPtr, mFrameSize, pGpuHand, 2 * numberPeople, mRenderThreshold);
                     // CUDA check
                     cudaCheck(__LINE__, __FUNCTION__, __FILE__);
                 }

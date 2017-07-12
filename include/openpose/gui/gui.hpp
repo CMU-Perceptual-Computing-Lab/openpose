@@ -7,12 +7,13 @@
 #include <openpose/core/point.hpp>
 #include <openpose/pose/poseExtractor.hpp>
 #include <openpose/pose/poseRenderer.hpp>
+#include <openpose/core/macros.hpp>
 #include "enumClasses.hpp"
 #include "frameDisplayer.hpp"
 
 namespace op
 {
-    class Gui
+    class OP_API Gui
     {
     public:
         Gui(const bool fullScreen, const Point<int>& outputSize, const std::shared_ptr<std::atomic<bool>>& isRunningSharedPtr,

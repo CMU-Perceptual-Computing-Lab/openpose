@@ -5,6 +5,7 @@
 #include <mutex>
 #include <thread>
 #include <openpose/core/point.hpp>
+#include <openpose/core/macros.hpp>
 #include "videoCaptureReader.hpp"
 
 namespace op
@@ -13,7 +14,7 @@ namespace op
      *  WebcamReader is a wrapper of the cv::VideoCapture class for webcam. It allows controlling a video (extracting
      * frames, setting resolution & fps, seeking to a particular frame, etc).
      */
-    class WebcamReader : public VideoCaptureReader
+    class OP_API WebcamReader : public VideoCaptureReader
     {
     public:
         /**

@@ -9,8 +9,10 @@
 
 namespace op
 {
-    FaceRenderer::FaceRenderer(const Point<int>& frameSize, const float alphaKeypoint, const float alphaHeatMap, const RenderMode renderMode) :
+    FaceRenderer::FaceRenderer(const Point<int>& frameSize, const float renderThreshold, const float alphaKeypoint,
+                               const float alphaHeatMap, const RenderMode renderMode) :
         Renderer{(unsigned long long)(frameSize.area() * 3), alphaKeypoint, alphaHeatMap},
+        mRenderThreshold{renderThreshold},
         mFrameSize{frameSize},
         mRenderMode{renderMode}
     {
@@ -75,7 +77,7 @@ namespace op
     {
         try
         {
-            renderFaceKeypointsCpu(outputData, faceKeypoints);
+            renderFaceKeypointsCpu(outputData, faceKeypoints, mRenderThreshold);
         }
         catch (const std::exception& e)
         {
@@ -95,9 +97,11 @@ namespace op
                 {
                     cpuToGpuMemoryIfNotCopiedYet(outputData.getPtr());
                     // Draw faceKeypoints
-                    cudaMemcpy(pGpuFace, faceKeypoints.getConstPtr(), faceKeypoints.getSize(0) * FACE_NUMBER_PARTS * 3 * sizeof(float),
+                    cudaMemcpy(pGpuFace, faceKeypoints.getConstPtr(),
+                               faceKeypoints.getSize(0) * FACE_NUMBER_PARTS * 3 * sizeof(float),
                                cudaMemcpyHostToDevice);
-                    renderFaceKeypointsGpu(*spGpuMemoryPtr, mFrameSize, pGpuFace, faceKeypoints.getSize(0), getAlphaKeypoint());
+                    renderFaceKeypointsGpu(*spGpuMemoryPtr, mFrameSize, pGpuFace, faceKeypoints.getSize(0),
+                                           mRenderThreshold, getAlphaKeypoint());
                     // CUDA check
                     cudaCheck(__LINE__, __FUNCTION__, __FILE__);
                 }

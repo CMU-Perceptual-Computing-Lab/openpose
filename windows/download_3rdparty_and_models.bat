@@ -1,4 +1,3 @@
-cls
 :: Avoid printing all the comments in the Windows cmd
 @echo off
 
@@ -6,6 +5,11 @@ cls
 
 echo ------------------------- Downloading Caffe and OpenCV -------------------------
 echo NOTE: This script assumes that CUDA, cuDNN and Visual Studio are already installed on your machine. Otherwise, it might fail.
+
+
+
+:: Go back to main OpenPose folder
+cd ..
 
 
 
@@ -42,3 +46,6 @@ echo ------------------------ Models Downloaded ------------------------
 
 echo:
 echo ------------------------- Caffe and OpenCV Downloaded -------------------------
+
+:: Pause until user manually closes it
+pause

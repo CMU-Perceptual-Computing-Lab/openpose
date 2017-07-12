@@ -12,15 +12,15 @@
 #include <openpose/core/net.hpp>
 #include <openpose/core/rectangle.hpp>
 #include <openpose/core/resizeAndMergeCaffe.hpp>
-#include <openpose/utilities/macros.hpp>
+#include <openpose/core/macros.hpp>
 
 namespace op
 {
-    class HandExtractor
+    class OP_API HandExtractor
     {
     public:
         explicit HandExtractor(const Point<int>& netInputSize, const Point<int>& netOutputSize, const std::string& modelFolder, const int gpuId,
-                               const bool iterativeDetection = false);
+                               const unsigned short numberScales = 1, const float rangeScales = 0.4f);
 
         void initializationOnThread();
 
@@ -30,7 +30,8 @@ namespace op
         std::array<Array<float>, 2> getHandKeypoints() const;
 
     private:
-        const bool mIterativeDetection;
+        // const bool mMultiScaleDetection;
+        const std::pair<unsigned short, float> mMultiScaleNumberAndRange;
         const Point<int> mNetOutputSize;
         std::shared_ptr<Net> spNet;
         std::shared_ptr<ResizeAndMergeCaffe<float>> spResizeAndMergeCaffe;

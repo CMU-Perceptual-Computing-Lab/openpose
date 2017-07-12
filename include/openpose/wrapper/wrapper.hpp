@@ -593,7 +593,7 @@ namespace op
                     {
                         poseRenderers.emplace_back(std::make_shared<PoseRenderer>(
                             poseNetOutputSize, finalOutputSize, wrapperStructPose.poseModel, poseExtractors[gpuId],
-                            wrapperStructPose.blendOriginalFrame, alphaKeypoint,
+                            wrapperStructPose.renderThreshold, wrapperStructPose.blendOriginalFrame, alphaKeypoint,
                             alphaHeatMap, wrapperStructPose.defaultPartToRender, wrapperStructPose.renderMode
                         ));
                     }
@@ -603,7 +603,7 @@ namespace op
                 {
                     poseCpuRenderer = std::make_shared<PoseRenderer>(
                         poseNetOutputSize, finalOutputSize, wrapperStructPose.poseModel, nullptr,
-                        wrapperStructPose.blendOriginalFrame, alphaKeypoint,
+                        wrapperStructPose.renderThreshold, wrapperStructPose.blendOriginalFrame, alphaKeypoint,
                         alphaHeatMap, wrapperStructPose.defaultPartToRender, wrapperStructPose.renderMode
                     );
                     cpuRenderers.emplace_back(std::make_shared<WPoseRenderer<TDatumsPtr>>(poseCpuRenderer));
@@ -649,8 +649,7 @@ namespace op
                 {
                     // Hand detector
                     // If tracking
-                    if (wrapperStructHand.detectionMode == DetectionMode::Tracking
-                            || wrapperStructHand.detectionMode == DetectionMode::IterativeAndTracking)
+                    if (wrapperStructHand.tracking)
                         spWPoses.at(gpuId).emplace_back(std::make_shared<WHandDetectorTracking<TDatumsPtr>>(handDetector));
                     // If detection
                     else
@@ -658,14 +657,12 @@ namespace op
                     // Hand keypoint extractor
                     const auto netOutputSize = wrapperStructHand.netInputSize;
                     const auto handExtractor = std::make_shared<HandExtractor>(
-                        wrapperStructHand.netInputSize, netOutputSize, wrapperStructPose.modelFolder, gpuId + gpuNumberStart,
-                        (wrapperStructHand.detectionMode == DetectionMode::Iterative
-                            || wrapperStructHand.detectionMode == DetectionMode::IterativeAndTracking)
+                        wrapperStructHand.netInputSize, netOutputSize, wrapperStructPose.modelFolder,
+                        gpuId + gpuNumberStart, wrapperStructHand.scalesNumber, wrapperStructHand.scaleRange
                     );
                     spWPoses.at(gpuId).emplace_back(std::make_shared<WHandExtractor<TDatumsPtr>>(handExtractor));
                     // If tracking
-                    if (wrapperStructHand.detectionMode == DetectionMode::Tracking
-                            || wrapperStructHand.detectionMode == DetectionMode::IterativeAndTracking)
+                    if (wrapperStructHand.tracking)
                         spWPoses.at(gpuId).emplace_back(std::make_shared<WHandDetectorUpdate<TDatumsPtr>>(handDetector));
                 }
             }
@@ -682,7 +679,8 @@ namespace op
                 if (wrapperStructFace.renderMode == RenderMode::Cpu)
                 {
                     // Construct face renderer
-                    const auto faceRenderer = std::make_shared<FaceRenderer>(finalOutputSize, wrapperStructFace.alphaKeypoint,
+                    const auto faceRenderer = std::make_shared<FaceRenderer>(finalOutputSize, wrapperStructFace.renderThreshold,
+                                                                             wrapperStructFace.alphaKeypoint,
                                                                              wrapperStructFace.alphaHeatMap,
                                                                              wrapperStructFace.renderMode);
                     // Add worker
@@ -694,7 +692,8 @@ namespace op
                     for (auto i = 0; i < spWPoses.size(); i++)
                     {
                         // Construct face renderer
-                        const auto faceRenderer = std::make_shared<FaceRenderer>(finalOutputSize, wrapperStructFace.alphaKeypoint,
+                        const auto faceRenderer = std::make_shared<FaceRenderer>(finalOutputSize, wrapperStructFace.renderThreshold,
+                                                                                 wrapperStructFace.alphaKeypoint,
                                                                                  wrapperStructFace.alphaHeatMap,
                                                                                  wrapperStructFace.renderMode);
                         // Performance boost -> share spGpuMemoryPtr for all renderers
@@ -718,7 +717,8 @@ namespace op
                 if (wrapperStructHand.renderMode == RenderMode::Cpu)
                 {
                     // Construct hand renderer
-                    const auto handRenderer = std::make_shared<HandRenderer>(finalOutputSize, wrapperStructHand.alphaKeypoint,
+                    const auto handRenderer = std::make_shared<HandRenderer>(finalOutputSize, wrapperStructHand.renderThreshold,
+                                                                             wrapperStructHand.alphaKeypoint,
                                                                              wrapperStructHand.alphaHeatMap,
                                                                              wrapperStructHand.renderMode);
                     // Add worker
@@ -730,7 +730,8 @@ namespace op
                     for (auto i = 0; i < spWPoses.size(); i++)
                     {
                         // Construct hands renderer
-                        const auto handRenderer = std::make_shared<HandRenderer>(finalOutputSize, wrapperStructHand.alphaKeypoint,
+                        const auto handRenderer = std::make_shared<HandRenderer>(finalOutputSize, wrapperStructHand.renderThreshold,
+                                                                                 wrapperStructHand.alphaKeypoint,
                                                                                  wrapperStructHand.alphaHeatMap,
                                                                                  wrapperStructHand.renderMode);
                         // Performance boost -> share spGpuMemoryPtr for all renderers

@@ -3,12 +3,11 @@
 
 #include <vector>
 #include <opencv2/core/core.hpp> // cv::Mat
-#include "array.hpp"
-#include "point.hpp"
+#include "common.hpp"
 
 namespace op
 {
-    class CvMatToOpOutput
+    class OP_API CvMatToOpOutput
     {
     public:
         CvMatToOpOutput(const Point<int>& outputResolution, const bool generateOutput = true);

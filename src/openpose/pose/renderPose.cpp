@@ -9,7 +9,8 @@ namespace op
     const std::vector<float> COCO_COLORS{POSE_COCO_COLORS_RENDER};
     const std::vector<float> MPI_COLORS{POSE_MPI_COLORS_RENDER};
 
-    void renderPoseKeypointsCpu(Array<float>& frameArray, const Array<float>& poseKeypoints, const PoseModel poseModel, const bool blendOriginalFrame)
+    void renderPoseKeypointsCpu(Array<float>& frameArray, const Array<float>& poseKeypoints, const PoseModel poseModel,
+                                const float renderThreshold, const bool blendOriginalFrame)
     {
         try
         {
@@ -29,7 +30,8 @@ namespace op
                 const auto& colors = (poseModel == PoseModel::COCO_18 ? COCO_COLORS : MPI_COLORS);
 
                 // Render keypoints
-                renderKeypointsCpu(frameArray, poseKeypoints, pairs, colors, thicknessCircleRatio, thicknessLineRatioWRTCircle, POSE_RENDER_THRESHOLD);
+                renderKeypointsCpu(frameArray, poseKeypoints, pairs, colors, thicknessCircleRatio,
+                                   thicknessLineRatioWRTCircle, renderThreshold);
             }
         }
         catch (const std::exception& e)

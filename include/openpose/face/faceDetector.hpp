@@ -5,11 +5,11 @@
 #include <openpose/core/array.hpp>
 #include <openpose/core/rectangle.hpp>
 #include <openpose/pose/enumClasses.hpp>
-#include <openpose/utilities/macros.hpp>
+#include <openpose/core/macros.hpp>
 
 namespace op
 {
-    class FaceDetector
+    class OP_API FaceDetector
     {
     public:
         explicit FaceDetector(const PoseModel poseModel);

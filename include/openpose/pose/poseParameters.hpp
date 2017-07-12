@@ -4,6 +4,7 @@
 #include <array>
 #include <map>
 #include <vector>
+#include <openpose/core/macros.hpp>
 #include "enumClasses.hpp"
 
 namespace op
@@ -210,11 +211,10 @@ namespace op
     // Rendering parameters
     const auto POSE_DEFAULT_ALPHA_KEYPOINT = 0.6f;
     const auto POSE_DEFAULT_ALPHA_HEAT_MAP = 0.7f;
-    const auto POSE_RENDER_THRESHOLD = 0.01f;
 
     // Auxiliary functions
-    unsigned int poseBodyPartMapStringToKey(const PoseModel poseModel, const std::string& string);
-    unsigned int poseBodyPartMapStringToKey(const PoseModel poseModel, const std::vector<std::string>& strings);
+    OP_API unsigned int poseBodyPartMapStringToKey(const PoseModel poseModel, const std::string& string);
+    OP_API unsigned int poseBodyPartMapStringToKey(const PoseModel poseModel, const std::vector<std::string>& strings);
 }
 
 #endif // OPENPOSE_POSE_POSE_PARAMETERS_HPP

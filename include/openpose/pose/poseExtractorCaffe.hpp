@@ -9,14 +9,14 @@
 #include <openpose/core/net.hpp>
 #include <openpose/core/nmsCaffe.hpp>
 #include <openpose/core/resizeAndMergeCaffe.hpp>
-#include <openpose/utilities/macros.hpp>
+#include <openpose/core/macros.hpp>
 #include "bodyPartConnectorCaffe.hpp"
 #include "enumClasses.hpp"
 #include "poseExtractor.hpp"
 
 namespace op
 {
-    class PoseExtractorCaffe : public PoseExtractor
+    class OP_API PoseExtractorCaffe : public PoseExtractor
     {
     public:
         PoseExtractorCaffe(const Point<int>& netInputSize, const Point<int>& netOutputSize, const Point<int>& outputSize, const int scaleNumber,

@@ -35,14 +35,18 @@ DEFINE_string(net_resolution,           "656x368",      "Multiples of 16. If it 
 DEFINE_string(resolution,               "1280x720",     "The image resolution (display and output). Use \"-1x-1\" to force the program to use the"
                                                         " default images resolution.");
 DEFINE_int32(num_gpu_start,             0,              "GPU device start number.");
-DEFINE_double(scale_gap,                0.3,            "Scale gap between scales. No effect unless num_scales>1. Initial scale is always 1. If you"
-                                                        " want to change the initial scale, you actually want to multiply the `net_resolution` by"
-                                                        " your desired initial scale.");
-DEFINE_int32(num_scales,                1,              "Number of scales to average.");
+DEFINE_double(scale_gap,                0.3,            "Scale gap between scales. No effect unless scale_number > 1. Initial scale is always 1."
+                                                        " If you want to change the initial scale, you actually want to multiply the"
+                                                        " `net_resolution` by your desired initial scale.");
+DEFINE_int32(scale_number,              1,              "Number of scales to average.");
 // OpenPose Rendering
 DEFINE_int32(part_to_show,              19,             "Part to show from the start.");
 DEFINE_bool(disable_blending,           false,          "If blending is enabled, it will merge the results with the original frame. If disabled, it"
                                                         " will only display the results.");
+DEFINE_double(render_threshold,         0.05,           "Only estimated keypoints whose score confidences are higher than this threshold will be"
+                                                        " rendered. Generally, a high threshold (> 0.5) will only render very clear body parts;"
+                                                        " while small thresholds (~0.1) will also output guessed and occluded keypoints, but also"
+                                                        " more false positives (i.e. wrong detections).");
 DEFINE_double(alpha_pose,               0.6,            "Blending factor (range 0-1) for the body part rendering. 1 will show it completely, 0 will"
                                                         " hide it. Only valid for GPU rendering.");
 DEFINE_double(alpha_heatmap,            0.7,            "Blending factor (range 0-1) between heatmap and original frame. 1 will only show the"
@@ -70,18 +74,18 @@ int openPoseTutorialPose2()
     // Check no contradictory flags enabled
     if (FLAGS_alpha_pose < 0. || FLAGS_alpha_pose > 1.)
         op::error("Alpha value for blending must be in the range [0,1].", __LINE__, __FUNCTION__, __FILE__);
-    if (FLAGS_scale_gap <= 0. && FLAGS_num_scales > 1)
-        op::error("Incompatible flag configuration: scale_gap must be greater than 0 or num_scales = 1.", __LINE__, __FUNCTION__, __FILE__);
+    if (FLAGS_scale_gap <= 0. && FLAGS_scale_number > 1)
+        op::error("Incompatible flag configuration: scale_gap must be greater than 0 or scale_number = 1.", __LINE__, __FUNCTION__, __FILE__);
     // Logging
     op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
     // Step 3 - Initialize all required classes
-    op::CvMatToOpInput cvMatToOpInput{netInputSize, FLAGS_num_scales, (float)FLAGS_scale_gap};
+    op::CvMatToOpInput cvMatToOpInput{netInputSize, FLAGS_scale_number, (float)FLAGS_scale_gap};
     op::CvMatToOpOutput cvMatToOpOutput{outputSize};
     std::shared_ptr<op::PoseExtractor> poseExtractorPtr = std::make_shared<op::PoseExtractorCaffe>(netInputSize, netOutputSize, outputSize,
-                                                                                                   FLAGS_num_scales, poseModel,
+                                                                                                   FLAGS_scale_number, poseModel,
                                                                                                    FLAGS_model_folder, FLAGS_num_gpu_start);
-    op::PoseRenderer poseRenderer{netOutputSize, outputSize, poseModel, poseExtractorPtr, !FLAGS_disable_blending, (float)FLAGS_alpha_pose,
-                                 (float)FLAGS_alpha_heatmap};
+    op::PoseRenderer poseRenderer{netOutputSize, outputSize, poseModel, poseExtractorPtr, (float)FLAGS_render_threshold,
+                                  !FLAGS_disable_blending, (float)FLAGS_alpha_pose, (float)FLAGS_alpha_heatmap};
     poseRenderer.setElementToRender(FLAGS_part_to_show);
     op::OpOutputToCvMat opOutputToCvMat{outputSize};
     const op::Point<int> windowedSize = outputSize;

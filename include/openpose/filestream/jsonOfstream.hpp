@@ -3,11 +3,11 @@
 
 #include <fstream> // std::ofstream
 #include <string>
-#include <openpose/utilities/macros.hpp>
+#include <openpose/core/macros.hpp>
 
 namespace op
 {
-    class JsonOfstream
+    class OP_API JsonOfstream
     {
     public:
         explicit JsonOfstream(const std::string& filePath, const bool humanReadable = true);

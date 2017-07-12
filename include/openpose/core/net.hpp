@@ -1,9 +1,11 @@
 #ifndef OPENPOSE_CORE_NET_HPP
 #define OPENPOSE_CORE_NET_HPP
 
+#include "common.hpp"
+
 namespace op
 {
-    class Net
+    class OP_API Net
     {
     public:
         virtual void initializationOnThread() = 0;

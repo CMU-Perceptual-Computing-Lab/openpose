@@ -10,7 +10,7 @@ namespace op
                                          const float alphaHeatMap_, const int defaultPartToRender_,
                                          const std::string& modelFolder_,
                                          const std::vector<HeatMapType>& heatMapTypes_,
-                                         const ScaleMode heatMapScale_) :
+                                         const ScaleMode heatMapScale_, const float renderThreshold_) :
         netInputSize{netInputSize_},
         outputSize{outputSize_},
         keypointScale{keypointScale_},
@@ -26,7 +26,8 @@ namespace op
         defaultPartToRender{defaultPartToRender_},
         modelFolder{modelFolder_},
         heatMapTypes{heatMapTypes_},
-        heatMapScale{heatMapScale_}
+        heatMapScale{heatMapScale_},
+        renderThreshold{renderThreshold_}
     {
     }
 }

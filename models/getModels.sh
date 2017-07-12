@@ -3,6 +3,7 @@
 OPENPOSE_URL="http://posefs1.perception.cs.cmu.edu/OpenPose/models/"
 POSE_FOLDER="pose/"
 FACE_FOLDER="face/"
+HAND_FOLDER="hand/"
 
 # ------------------------- POSE MODELS -------------------------
 # Body (COCO)
@@ -23,3 +24,8 @@ wget -c ${OPENPOSE_URL}${MPI_MODEL} -P ${MPI_FOLDER}
 # Face
 FACE_MODEL=${FACE_FOLDER}"pose_iter_116000.caffemodel"
 wget -c ${OPENPOSE_URL}${FACE_MODEL} -P ${FACE_FOLDER}
+
+# "------------------------- HAND MODELS -------------------------"
+# Hand
+HAND_MODEL=$HAND_FOLDER"pose_iter_102000.caffemodel"
+wget -c ${OPENPOSE_URL}${HAND_MODEL} -P ${HAND_FOLDER}

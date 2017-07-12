@@ -4,6 +4,7 @@
 #include <string>
 #include <opencv2/core/core.hpp> // cv::Mat
 #include <openpose/core/point.hpp>
+#include <openpose/core/macros.hpp>
 #include "enumClasses.hpp"
 
 namespace op
@@ -11,7 +12,7 @@ namespace op
     /**
      *  The FrameDisplayer class is the one presenting visually the processed frame to the user.
      */
-    class FrameDisplayer
+    class OP_API FrameDisplayer
     {
     public:
         /**
@@ -32,7 +33,7 @@ namespace op
         void setGuiDisplayMode(const GuiDisplayMode displayMode);
 
         /**
-         * This function switch between full screen and windowed modes (e.g. when double click on video players or Ctrt+Enter are presed).
+         * This function switch between full screen and windowed modes (e.g. when double-click on video players or Ctrt+Enter are presed).
          */
         void switchGuiDisplayMode();
 

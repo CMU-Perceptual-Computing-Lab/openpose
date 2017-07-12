@@ -4,11 +4,12 @@
 #include <string>
 #include <vector>
 #include <openpose/core/array.hpp>
+#include <openpose/core/macros.hpp>
 #include "fileSaver.hpp"
 
 namespace op
 {
-    class KeypointJsonSaver : public FileSaver
+    class OP_API KeypointJsonSaver : public FileSaver
     {
     public:
         KeypointJsonSaver(const std::string& directoryPath);

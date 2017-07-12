@@ -6,19 +6,20 @@
 #include <openpose/core/enumClasses.hpp>
 #include <openpose/core/point.hpp>
 #include <openpose/core/renderer.hpp>
-#include <openpose/utilities/macros.hpp>
+#include <openpose/core/macros.hpp>
 #include "poseExtractor.hpp"
 #include "poseParameters.hpp"
 
 namespace op
 {
-    class PoseRenderer : public Renderer
+    class OP_API PoseRenderer : public Renderer
     {
     public:
-        explicit PoseRenderer(const Point<int>& heatMapsSize, const Point<int>& outputSize, const PoseModel poseModel,
-                              const std::shared_ptr<PoseExtractor>& poseExtractor, const bool blendOriginalFrame = true,
-                              const float alphaKeypoint = POSE_DEFAULT_ALPHA_KEYPOINT, const float alphaHeatMap = POSE_DEFAULT_ALPHA_HEAT_MAP,
-                              const unsigned int elementToRender = 0u, const RenderMode renderMode = RenderMode::Cpu);
+        PoseRenderer(const Point<int>& heatMapsSize, const Point<int>& outputSize, const PoseModel poseModel,
+                     const std::shared_ptr<PoseExtractor>& poseExtractor, const float renderThreshold,
+                     const bool blendOriginalFrame = true, const float alphaKeypoint = POSE_DEFAULT_ALPHA_KEYPOINT,
+                     const float alphaHeatMap = POSE_DEFAULT_ALPHA_HEAT_MAP, const unsigned int elementToRender = 0u,
+                     const RenderMode renderMode = RenderMode::Cpu);
 
         ~PoseRenderer();
 
@@ -35,6 +36,7 @@ namespace op
         std::pair<int, std::string> renderPose(Array<float>& outputData, const Array<float>& poseKeypoints, const float scaleNetToOutput = -1.f);
 
     private:
+        const float mRenderThreshold;
         const Point<int> mHeatMapsSize;
         const Point<int> mOutputSize;
         const PoseModel mPoseModel;

@@ -188,9 +188,6 @@
     <ClInclude Include="..\..\include\openpose\utilities\keypoint.hpp">
       <Filter>Header Files\utilities</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\openpose\utilities\macros.hpp">
-      <Filter>Header Files\utilities</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\openpose\utilities\openCv.hpp">
       <Filter>Header Files\utilities</Filter>
     </ClInclude>
@@ -475,6 +472,12 @@
     </ClInclude>
     <ClInclude Include="..\..\include\openpose\hand\wHandDetectorFromTxt.hpp">
       <Filter>Header Files\hand</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\core\macros.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\core\common.hpp">
+      <Filter>Header Files\core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

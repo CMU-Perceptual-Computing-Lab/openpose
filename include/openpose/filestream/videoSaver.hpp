@@ -4,11 +4,11 @@
 #include <vector>
 #include <opencv2/core/core.hpp> // cv::Mat
 #include <opencv2/highgui/highgui.hpp> // cv::VideoWriter
-#include <openpose/utilities/macros.hpp>
+#include <openpose/core/macros.hpp>
 
 namespace op
 {
-    class VideoSaver
+    class OP_API VideoSaver
     {
     public:
         VideoSaver(const std::string& videoSaverPath, const int cvFourcc, const double fps, const Point<int>& cvSize);

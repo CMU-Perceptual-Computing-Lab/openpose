@@ -7,7 +7,7 @@
 #include <tuple>
 #include <openpose/core/datum.hpp>
 #include <openpose/producer/producer.hpp>
-#include <openpose/utilities/macros.hpp>
+#include <openpose/core/macros.hpp>
 
 namespace op
 {
@@ -38,7 +38,7 @@ namespace op
 
 
 
-// Implemenetation
+// Implementation
 #include "openpose/utilities/errorAndLog.hpp"
 #include "openpose/producer/datumProducer.hpp"
 namespace op

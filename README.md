@@ -5,20 +5,23 @@ OpenPose
 - Apr 2017: Body released!
 - May 2017: Windows version released!
 - Jun 2017: Face released!
+- Jul 2017: Easier Windows installation!
+- Jul 2017: Hands released!
 - Check all the [release notes](doc/release_notes.md).
 - Interested in an internship on CMU as OpenPose programmer? See [this link](https://docs.google.com/document/d/14SygG39NjIRZfx08clewTdFMGwVdtRu2acyCi3TYcHs/edit?usp=sharing) for details.
 
 
 
 ## Introduction
-
 OpenPose is a **library for real-time multi-person keypoint detection and multi-threading written in C++** using OpenCV and Caffe*, authored by [Gines Hidalgo](https://www.linkedin.com/in/gineshidalgo/), [Zhe Cao](http://www.andrew.cmu.edu/user/zhecao), [Tomas Simon](http://www.cs.cmu.edu/~tsimon/), [Shih-En Wei](https://scholar.google.com/citations?user=sFQD3k4AAAAJ&hl=en), [Hanbyul Joo](http://www.cs.cmu.edu/~hanbyulj/) and [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/).
 
 \* It uses Caffe, but the code is ready to be ported to other frameworks (Tensorflow, Torch, etc.). If you implement any of those, feel free to make a pull request!
 
 OpenPose represents the **first real-time system to jointly detect human body, hand and facial keypoints (in total 130 keypoints) on single images**. In addition, the system computational performance on body keypoint estimation is invariant to the number of detected people in the image.
 
-OpenPose is freely available for free non-commercial use, and may be redistributed under these conditions. Please, see the [license](LICENSE) for further details. Contact [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/) for commercial purposes.
+OpenPose is freely available for free non-commercial use, and may be redistributed under these conditions. Please, see the [license](LICENSE) for further details. For commercial purposes, contact [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/).
+
+In addition, OpenPose would not be possible without the [CMU Panoptic Studio](http://domedb.perception.cs.cmu.edu/).
 
 
 
@@ -26,7 +29,7 @@ Library main functionality:
 
 * Multi-person 15 or **18-keypoint body pose** estimation and rendering. **Running time invariant to number of people** on the image.
 
-* Multi-person **2x21-keypoint hand** estimation and rendering. Note: In this initial version, **running time** linearly **depends** on the **number of people** on the image. **Coming soon (in around 1-5 weeks)!**
+* Multi-person **2x21-keypoint hand** estimation and rendering. Note: In this initial version, **running time** linearly **depends** on the **number of people** on the image. **Coming soon (in around 1-5 days)!**
 
 * Multi-person **70-keypoint face** estimation and rendering. Note: In this initial version, **running time** linearly **depends** on the **number of people** on the image.
 
@@ -44,7 +47,18 @@ The pose estimation work is based on the C++ code from [the ECCV 2016 demo](http
 
 
 
+## Operating Systems
+1. **Ubuntu** 14 and 16.
+2. **Windows** 10.
+3. Other people have been able to install it on **Windows 7 and 8**, **Mac**, **CentOS**, and **Nvidia Jetson (TK1 and TX1)** embedded systems. However, we do not officially support them at the moment.
+
+
+
 ## Results
+### Body + Hands + Face Estimation
+<p align="center">
+    <img src="doc/media/pose_face_hands.gif", width="480">
+</p>
 
 ### Body Estimation
 <p align="center">
@@ -54,13 +68,6 @@ The pose estimation work is based on the C++ code from [the ECCV 2016 demo](http
 ### Body + Face Estimation
 <p align="center">
     <img src="doc/media/pose_face.gif", width="480">
-</p>
-
-## Coming Soon (But Already Working!)
-
-### Body + Hands + Face Estimation
-<p align="center">
-    <img src="doc/media/pose_face_hands.gif", width="480">
 </p>
 
 ### Body + Hands
@@ -90,7 +97,7 @@ You can find the installation, reinstallation and uninstallation steps on: [doc/
 
 
 ## Custom Caffe
-We only modified some Caffe compilation flags and minor details. You can use use your own Caffe distribution, these are the files we added and modified:
+We only modified some Caffe compilation flags and minor details. You can use your own Caffe distribution, these are the files we added and modified:
 
 1. Added files: `install_caffe.sh`; as well as `Makefile.config.Ubuntu14.example`, `Makefile.config.Ubuntu16.example`, `Makefile.config.Ubuntu14_cuda_7.example` and `Makefile.config.Ubuntu16_cuda_7.example` (extracted from `Makefile.config.example`). Basically, you must enable cuDNN.
 2. Edited file: Makefile. Search for "# OpenPose: " to find the edited code. We basically added the C++11 flag to avoid issues in some old computers.
@@ -117,7 +124,7 @@ Your case if you want to read a specific format of image source and/or add a spe
 
 (Almost) forget about the library, just take a look to the `Wrapper` tutorial on [examples/tutorial_wrapper/](examples/tutorial_wrapper/).
 
-Note: you should not need to modify OpenPose source code or examples, so that you can directly upgrade the OpenPose library anytime in the future without changing your code. You might create your custom code on [examples/user_code/](examples/user_code/) and compile it by using `make all` in the OpenPose folder.
+Note: you should not need to modify the OpenPose source code nor examples. In this way, you are able to directly upgrade OpenPose anytime in the future without changing your code. You might create your custom code on [examples/user_code/](examples/user_code/) and compile it by using `make all` in the OpenPose folder.
 
 #### OpenPose Library
 Your case if you want to change internal functions and/or extend its functionality. First, take a look at the [Demo](#demo) and [OpenPose Wrapper](#openpose-wrapper). Second, read the 2 following subsections: OpenPose Overview and Extending Functionality.
@@ -129,7 +136,7 @@ Your case if you want to change internal functions and/or extend its functionali
 3. Adding An Extra Module: Learn how to add an extra module in [doc/library_add_new_module.md](doc/library_add_new_module.md).
 
 #### Doxygen Documentation Autogeneration
-You can generate the documentation by running the following command. The documentation will be generated in `doc/doxygen/html/index.html`. You can simply open it with double click (your default browser should automatically display it).
+You can generate the documentation by running the following command. The documentation will be generated in `doc/doxygen/html/index.html`. You can simply open it with double-click (your default browser should automatically display it).
 ```
 cd doc/
 doxygen doc_autogeneration.doxygen

@@ -315,8 +315,9 @@ namespace op
         }
     }
 
-    void renderPoseKeypointsGpu(float* framePtr, const PoseModel poseModel, const int numberPeople, const Point<int>& frameSize,
-                                const float* const posePtr, const bool googlyEyes, const bool blendOriginalFrame, const float alphaBlending)
+    void renderPoseKeypointsGpu(float* framePtr, const PoseModel poseModel, const int numberPeople,
+                                const Point<int>& frameSize, const float* const posePtr, const float renderThreshold,
+                                const bool googlyEyes, const bool blendOriginalFrame, const float alphaBlending)
     {
         try
         {
@@ -334,13 +335,13 @@ namespace op
 
                 if (poseModel == PoseModel::COCO_18)
                     renderPoseCoco<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, 
-                                                                   POSE_RENDER_THRESHOLD, googlyEyes, blendOriginalFrame, alphaBlending);
+                                                                   renderThreshold, googlyEyes, blendOriginalFrame, alphaBlending);
                 else if (poseModel == PoseModel::BODY_22)
                     renderPoseBody22<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, 
-                                                                   POSE_RENDER_THRESHOLD, googlyEyes, blendOriginalFrame, alphaBlending);
+                                                                   renderThreshold, googlyEyes, blendOriginalFrame, alphaBlending);
                 else if (poseModel == PoseModel::MPI_15 || poseModel == PoseModel::MPI_15_4)
                     renderPoseMpi29Parts<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.x, frameSize.y, posePtr,
-                                                                         numberPeople, POSE_RENDER_THRESHOLD, blendOriginalFrame, alphaBlending);
+                                                                         numberPeople, renderThreshold, blendOriginalFrame, alphaBlending);
                 else
                     error("Invalid Model.", __LINE__, __FUNCTION__, __FILE__);
                 cudaCheck(__LINE__, __FUNCTION__, __FILE__);

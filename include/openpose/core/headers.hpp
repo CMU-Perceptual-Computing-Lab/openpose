@@ -3,11 +3,13 @@
 
 // core module
 #include "array.hpp"
+#include "common.hpp"
 #include "cvMatToOpInput.hpp"
 #include "cvMatToOpOutput.hpp"
 #include "datum.hpp"
 #include "enumClasses.hpp"
 #include "keypointScaler.hpp"
+#include "macros.hpp"
 #include "net.hpp"
 #include "netCaffe.hpp"
 #include "nmsBase.hpp"

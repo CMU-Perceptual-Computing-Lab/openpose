@@ -4,8 +4,8 @@ namespace op
 {
     DEFINE_TEMPLATE_DATUM(PriorityQueue);
     DEFINE_TEMPLATE_DATUM(Queue);
-    template class QueueBase<DATUM_BASE, std::queue<DATUM_BASE>>;
-    template class QueueBase<DATUM_BASE, std::priority_queue<DATUM_BASE, std::vector<DATUM_BASE>, std::greater<DATUM_BASE>>>;
+    template class OP_API QueueBase<DATUM_BASE, std::queue<DATUM_BASE>>;
+    template class OP_API QueueBase<DATUM_BASE, std::priority_queue<DATUM_BASE, std::vector<DATUM_BASE>, std::greater<DATUM_BASE>>>;
     DEFINE_TEMPLATE_DATUM(SubThread);
     DEFINE_TEMPLATE_DATUM(SubThreadNoQueue);
     DEFINE_TEMPLATE_DATUM(SubThreadQueueIn);

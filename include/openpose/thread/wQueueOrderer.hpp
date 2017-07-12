@@ -37,7 +37,7 @@ namespace op
 #include <chrono>
 #include <thread>
 #include <openpose/utilities/errorAndLog.hpp>
-#include <openpose/utilities/macros.hpp>
+#include <openpose/core/macros.hpp>
 #include <openpose/utilities/profiler.hpp>
 namespace op
 {

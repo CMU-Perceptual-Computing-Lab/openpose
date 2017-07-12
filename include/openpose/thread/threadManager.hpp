@@ -6,7 +6,7 @@
 #include <set> // std::multiset
 #include <tuple>
 #include <vector>
-#include <openpose/utilities/macros.hpp>
+#include <openpose/core/macros.hpp>
 #include "enumClasses.hpp"
 #include "queue.hpp"
 #include "thread.hpp"

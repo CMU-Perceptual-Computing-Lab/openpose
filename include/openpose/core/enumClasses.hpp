@@ -20,14 +20,6 @@ namespace op
         PAFs,
     };
 
-    enum class DetectionMode : unsigned char
-    {
-        Fast,
-        Iterative,
-        Tracking,
-        IterativeAndTracking,
-    };
-
     enum class RenderMode : unsigned char
     {
         None,

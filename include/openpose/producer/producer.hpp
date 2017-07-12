@@ -5,7 +5,7 @@
 #include <chrono>
 #include <opencv2/core/core.hpp> // cv::Mat
 #include <opencv2/highgui/highgui.hpp> // capProperties of OpenCV
-#include <openpose/utilities/macros.hpp>
+#include <openpose/core/macros.hpp>
 #include "enumClasses.hpp"
 
 namespace op
@@ -14,7 +14,7 @@ namespace op
      * Producer is an abstract class to extract frames from a source (image directory, video file,
      * webcam stream, etc.). It has the basic and common functions (e.g. getFrame, release & isOpened).
      */
-    class Producer
+    class OP_API Producer
     {
     public:
         /**

@@ -17,13 +17,13 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -42,20 +42,30 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64;D:\Programs\Python27\libs;C:\Python27\libs</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64;D:\Programs\Python27\libs;C:\Python27\libs</LibraryPath>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>EnableAllWarnings</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ObjectFileName>$(IntDir)\obj\obj\obj\%(RelativeDir)\%(Filename)%(Extension).obj</ObjectFileName>
-      <PreprocessorDefinitions>CAFFE_VERSION=1.0.0;BOOST_ALL_NO_LIB;USE_LMDB;USE_LEVELDB;USE_CUDNN;USE_OPENCV;USE_CAFFE;CMAKE_WINDOWS_BUILD;GLOG_NO_ABBREVIATED_SEVERITIES;GOOGLE_GLOG_DLL_DECL=__declspec(dllimport);GOOGLE_GLOG_DLL_DECL_FOR_UNITTESTS=__declspec(dllimport);H5_BUILT_AS_DYNAMIC_LIB=1;CMAKE_INTDIR="Release";_CRT_SECURE_NO_WARNINGS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>OP_EXPORTS;BOOST_ALL_NO_LIB;CAFFE_VERSION=1.0.0;CMAKE_INTDIR="Release";CMAKE_WINDOWS_BUILD;GLOG_NO_ABBREVIATED_SEVERITIES;GOOGLE_GLOG_DLL_DECL=__declspec(dllimport);GOOGLE_GLOG_DLL_DECL_FOR_UNITTESTS=__declspec(dllimport);H5_BUILT_AS_DYNAMIC_LIB=1;USE_CAFFE;USE_CUDNN;USE_OPENCV;USE_LEVELDB;USE_LMDB;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <CudaCompile>
       <CompileOut>$(IntDir)\obj\obj\obj\%(RelativeDir)\%(Filename)%(Extension).obj</CompileOut>
       <CodeGeneration>compute_30,sm_30;compute_35,sm_35;compute_50,sm_50;compute_52,sm_52;compute_61,sm_61</CodeGeneration>
     </CudaCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(CUDA_PATH_V8_0)\lib\x64\;$(PYTHON_LIB);$(CudaToolkitLibDir);%(AdditionalLibraryDirectories);%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
+      <Version>1.0.1</Version>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -65,7 +75,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>..\..\include;..\..\3rdparty\windows\opencv\include;..\..\3rdparty\windows\caffe\include;..\..\3rdparty\windows\caffe\include2;..\..\3rdparty\windows\caffe3rdparty\include;..\..\3rdparty\windows\caffe3rdparty\include\boost-1_61;$(CUDA_PATH_V8_0)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BOOST_ALL_NO_LIB;CAFFE_VERSION=1.0.0;CMAKE_INTDIR="Release";CMAKE_WINDOWS_BUILD;GLOG_NO_ABBREVIATED_SEVERITIES;GOOGLE_GLOG_DLL_DECL=__declspec(dllimport);GOOGLE_GLOG_DLL_DECL_FOR_UNITTESTS=__declspec(dllimport);H5_BUILT_AS_DYNAMIC_LIB=1;USE_CAFFE;USE_CUDNN;USE_OPENCV;USE_LEVELDB;USE_LMDB;_CRT_SECURE_NO_WARNINGS;-D_SCL_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>OP_EXPORTS;BOOST_ALL_NO_LIB;CAFFE_VERSION=1.0.0;CMAKE_INTDIR="Release";CMAKE_WINDOWS_BUILD;GLOG_NO_ABBREVIATED_SEVERITIES;GOOGLE_GLOG_DLL_DECL=__declspec(dllimport);GOOGLE_GLOG_DLL_DECL_FOR_UNITTESTS=__declspec(dllimport);H5_BUILT_AS_DYNAMIC_LIB=1;USE_CAFFE;USE_CUDNN;USE_OPENCV;USE_LEVELDB;USE_LMDB;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)\obj\obj\obj\%(RelativeDir)\%(Filename)%(Extension).obj</ObjectFileName>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -74,6 +84,8 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>..\..\3rdparty\windows\caffe\lib\Release\caffe.lib;..\..\3rdparty\windows\caffe\lib\Release\proto.lib;..\..\3rdparty\windows\caffe3rdparty\lib\boost_atomic-vc140-mt-1_61.lib;..\..\3rdparty\windows\caffe3rdparty\lib\boost_chrono-vc140-mt-1_61.lib;..\..\3rdparty\windows\caffe3rdparty\lib\boost_date_time-vc140-mt-1_61.lib;..\..\3rdparty\windows\caffe3rdparty\lib\boost_filesystem-vc140-mt-1_61.lib;..\..\3rdparty\windows\caffe3rdparty\lib\boost_python-vc140-mt-1_61.lib;..\..\3rdparty\windows\caffe3rdparty\lib\boost_system-vc140-mt-1_61.lib;..\..\3rdparty\windows\caffe3rdparty\lib\boost_thread-vc140-mt-1_61.lib;..\..\3rdparty\windows\caffe3rdparty\lib\caffehdf5.lib;..\..\3rdparty\windows\caffe3rdparty\lib\caffehdf5_hl.lib;..\..\3rdparty\windows\caffe3rdparty\lib\caffezlib.lib;..\..\3rdparty\windows\caffe3rdparty\lib\gflags.lib;..\..\3rdparty\windows\caffe3rdparty\lib\glog.lib;..\..\3rdparty\windows\caffe3rdparty\lib\leveldb.lib;..\..\3rdparty\windows\caffe3rdparty\lib\libopenblas.dll.a;..\..\3rdparty\windows\caffe3rdparty\lib\libprotobuf.lib;..\..\3rdparty\windows\caffe3rdparty\lib\lmdb.lib;..\..\3rdparty\windows\caffe3rdparty\lib\snappy.lib;..\..\3rdparty\windows\opencv\x64\vc14\lib\opencv_world310.lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0\lib\x64\cublas.lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0\lib\x64\cublas_device.lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0\lib\x64\cudart.lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0\lib\x64\cudnn.lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0\lib\x64\curand.lib;ntdll.lib;python27.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(CUDA_PATH_V8_0)\lib\x64\;$(PYTHON_LIB);$(CudaToolkitLibDir);%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
     </Link>
     <CudaCompile>
       <CompileOut>$(IntDir)\obj\obj\obj\%(RelativeDir)\%(Filename)%(Extension).obj</CompileOut>
@@ -83,12 +95,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\openpose\core\array.hpp" />
+    <ClInclude Include="..\..\include\openpose\core\common.hpp" />
     <ClInclude Include="..\..\include\openpose\core\cvMatToOpInput.hpp" />
     <ClInclude Include="..\..\include\openpose\core\cvMatToOpOutput.hpp" />
     <ClInclude Include="..\..\include\openpose\core\datum.hpp" />
     <ClInclude Include="..\..\include\openpose\core\enumClasses.hpp" />
     <ClInclude Include="..\..\include\openpose\core\headers.hpp" />
     <ClInclude Include="..\..\include\openpose\core\keypointScaler.hpp" />
+    <ClInclude Include="..\..\include\openpose\core\macros.hpp" />
     <ClInclude Include="..\..\include\openpose\core\maximumBase.hpp" />
     <ClInclude Include="..\..\include\openpose\core\maximumCaffe.hpp" />
     <ClInclude Include="..\..\include\openpose\core\net.hpp" />
@@ -203,7 +217,6 @@
     <ClInclude Include="..\..\include\openpose\utilities\flagsToOpenPose.hpp" />
     <ClInclude Include="..\..\include\openpose\utilities\headers.hpp" />
     <ClInclude Include="..\..\include\openpose\utilities\keypoint.hpp" />
-    <ClInclude Include="..\..\include\openpose\utilities\macros.hpp" />
     <ClInclude Include="..\..\include\openpose\utilities\openCv.hpp" />
     <ClInclude Include="..\..\include\openpose\utilities\pointerContainer.hpp" />
     <ClInclude Include="..\..\include\openpose\utilities\profiler.hpp" />

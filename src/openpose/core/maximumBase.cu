@@ -19,7 +19,10 @@ namespace op
     // __global__ void fillTargetPtrChannel(T* targetPtrOffsetted, const T* sourcePtrOffsetted, const int width, const int imageOffset)
     // {
     //     const auto sourceThrustPtr = thrust::device_pointer_cast(sourcePtrOffsetted);
-    //     const auto sourceIndexIterator = thrust::max_element(thrust::device, sourceThrustPtr, sourceThrustPtr + imageOffset);
+    //     // Ideal option (not working for CUDA < 8)
+    //     // const auto sourceIndexIterator = thrust::max_element(thrust::device, sourceThrustPtr, sourceThrustPtr + imageOffset);
+    //     // Workaround to make it work for CUDA 7.5
+    //     const auto sourceIndexIterator = thrust::max_element(sourceThrustPtr, sourceThrustPtr + imageOffset);
     //     const auto sourceIndex = (int)(sourceIndexIterator - sourceThrustPtr);
     //     targetPtrOffsetted[0] = sourceIndex % width;
     //     targetPtrOffsetted[1] = sourceIndex / width;
@@ -40,6 +43,10 @@ namespace op
     //         const auto* const sourcePtrOffsetted = sourcePtr + (offsetChannel + part) * imageOffset;
     //         auto sourceThrustPtr = thrust::device_pointer_cast(sourcePtrOffsetted);
     //         const auto sourceIndexIterator = thrust::max_element(thrust::device, sourceThrustPtr, sourceThrustPtr + imageOffset);
+    //         // Ideal option (not working for CUDA < 8)
+    //         // const auto sourceIndexIterator = thrust::max_element(thrust::device, sourceThrustPtr, sourceThrustPtr + imageOffset);
+    //         // Workaround to make it work for CUDA 7.5
+    //         const auto sourceIndexIterator = thrust::max_element(sourceThrustPtr, sourceThrustPtr + imageOffset);
     //         const auto sourceIndex = (int)(sourceIndexIterator - sourceThrustPtr);
     //         targetPtrOffsetted[0] = sourceIndex % width;
     //         targetPtrOffsetted[1] = sourceIndex / width;
@@ -81,7 +88,10 @@ namespace op
                         const auto* const sourcePtrOffsetted = sourcePtr + (offsetChannel + part) * imageOffset;
                         // Option a - 6.3 fps
                         const auto sourceThrustPtr = thrust::device_pointer_cast(sourcePtrOffsetted);
-                        const auto sourceIndexIterator = thrust::max_element(thrust::device, sourceThrustPtr, sourceThrustPtr + imageOffset);
+                        // Ideal option (not working for CUDA < 8)
+                        // const auto sourceIndexIterator = thrust::max_element(thrust::device, sourceThrustPtr, sourceThrustPtr + imageOffset);
+                        // Workaround to make it work for CUDA 7.5
+                        const auto sourceIndexIterator = thrust::max_element(sourceThrustPtr, sourceThrustPtr + imageOffset);
                         const auto sourceIndex = (int)(sourceIndexIterator - sourceThrustPtr);
                         fillTargetPtrPart<<<1, 1>>>(targetPtrOffsetted, sourcePtrOffsetted, sourceIndex, sourceIndex % width, sourceIndex / width);
                         // // Option b - <1 fps

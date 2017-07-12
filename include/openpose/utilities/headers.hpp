@@ -10,7 +10,6 @@
 #include "fileSystem.hpp"
 #include "flagsToOpenPose.hpp"
 #include "keypoint.hpp"
-#include "macros.hpp"
 #include "openCv.hpp"
 #include "pointerContainer.hpp"
 #include "profiler.hpp"

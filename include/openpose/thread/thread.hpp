@@ -5,7 +5,7 @@
 #include <memory>   // std::shared_ptr
 #include <thread>
 #include <vector>
-#include <openpose/utilities/macros.hpp>
+#include <openpose/core/macros.hpp>
 #include "subThread.hpp"
 #include "worker.hpp"
 

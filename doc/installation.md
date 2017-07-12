@@ -17,7 +17,7 @@ OpenPose Library - Compilation and Installation
 - At least 2 GB of free RAM memory.
 - Highly recommended: A CPU with at least 8 cores.
 
-Note: These requirements assume the default configuration (i.e. `--net_resolution "656x368"` and `num_scales 1`). You might need more (with a greater net resolution and/or number of scales) or less resources (with smaller net resolution and/or using the MPI and MPI_4 models).
+Note: These requirements assume the default configuration (i.e. `--net_resolution "656x368"` and `scale_number 1`). You might need more (with a greater net resolution and/or number of scales) or less resources (with smaller net resolution and/or using the MPI and MPI_4 models).
 
 
 
@@ -106,32 +106,25 @@ You just need to remove the OpenPose folder, by default called `openpose/`. E.g.
 ### Installation - Library
 1. Install the pre-requisites:
     1. Microsoft Visual Studio (VS) 2015. Install CUDA 8.0 after Visual Studio 2015 is installed to assure that the CUDA installation will generate all necessary files for VS. If CUDA was already installed, re-install it after installing VS!
-    2. Install all the demo pre-requisites.
-    3. [Python 2.4.13 64 bits - Windows x86-64 MSI installer](https://www.python.org/downloads/release/python-2713/).
-        - Install it on C:\Python27 (default) or D:\Programs\Python27. Otherwise, modify the VS solution accordingly.
-        - In addition, open the Windows cmd (Windows button + X, then A), and install some Python libraries with this command: `pip install numpy protobuf hypothesis`.
-    4. [Cmake](https://cmake.org/download/): Select the option to add it to the Windows PATH.
-    5. [Ninja](https://ninja-build.org/): Select the option to add it to the Windows PATH.
-2. Download the OpenPose dependencies and models (body, face and hand models):
-    1. Open the Windows cmd (Windows button + X, then A).
-    2. Go to the OpenPose directory, assuming OpenPose has been downloaded on `C:\openpose`: `cd C:\openpose\`.
-    3. Run `windows\download_3rdparty_and_models.bat`.
-3. You can now open the Visual Studio sln file located on `{openpose_path}\windows\OpenPose.sln`.
+    2. Install all the demo pre-requisites from the section `Installation - Demo`.
+2. Download the OpenPose dependencies and models (body, face and hand models) by double-clicking on `{openpose_path}\windows\download_3rdparty_and_models.bat`.
+3. Open the Visual Studio project sln file by double-cliking on `{openpose_path}\windows\OpenPose.sln`.
 4. In order to verify OpenPose is working, try compiling and executing the demo:
     1. Right click on `OpenPoseDemo` --> `Set as StartUp Project`.
     2. Change `Debug` by `Release` mode.
-    3. You can now compile it.
-5. If you have a webcam connected, you can test it by pressing the F5 key or the green play icon.
-6. Otherwise, check [Quick Start](#quick-start) to verify OpenPose was properly compiled. In order to use the created exe from the command line, you have to:
-    1. Copy all the DLLs located on `{openpose_folder}\3rdparty\windows\caffe\bin\` on the exe folder: `{openpose_folder}\windows_project\x64\Release`.
-    2. Copy all the DLLs located on `{openpose_folder}\3rdparty\windows\opencv\x64\vc14\bin\` on the exe folder: `{openpose_folder}\windows_project\x64\Release`.
+    3. Compile it and run it with F5 or the green play icon.
+5. If you have a webcam connected, OpenPose will automatically starts after being compiled.
+6. In order to use the created exe file from the command line (i.e. outside Visual Studio), you have to:
+    1. Copy all the DLLs located on `{openpose_folder}\3rdparty\windows\caffe\bin\` on the exe folder: `{openpose_folder}\windows\x64\Release`.
+    2. Copy all the DLLs located on `{openpose_folder}\3rdparty\windows\opencv\x64\vc14\bin\` on the exe folder: `{openpose_folder}\windows\x64\Release`.
     3. Open the Windows cmd (Windows button + X, then A).
     4. Go to the OpenPose directory, assuming OpenPose has been downloaded on `C:\openpose`: `cd C:\openpose\`.
     5. Run the tutorial commands.
+7. Check [Quick Start](#quick-start) to test video, webcam and a folder with images, in order to verify OpenPose was properly installed.
 
 
 
-### Installation - Library - Deprecated Old Version
+### Installation - Library - Old Deprecated Version
 Note: This version will not be updated anymore and removed in the future.
 
 1. Install the pre-requisites:
@@ -142,7 +135,7 @@ Note: This version will not be updated anymore and removed in the future.
         - In addition, open the Windows cmd (Windows button + X, then A), and install some Python libraries with this command: `pip install numpy protobuf hypothesis`.
     4. [Cmake](https://cmake.org/download/): Select the option to add it to the Windows PATH.
     5. [Ninja](https://ninja-build.org/): Select the option to add it to the Windows PATH.
-2. Download the `Windows` branch of Openpose by either cliking on `Download ZIP` on [openpose/tree/windows](https://github.com/CMU-Perceptual-Computing-Lab/openpose/tree/windows) or cloning the repository: `git clone https://github.com/CMU-Perceptual-Computing-Lab/openpose/ && cd openpose && git checkout windows`.
+2. Download the `Windows` branch of Openpose by either cliking on `Download ZIP` on [openpose/tree/windows](https://github.com/CMU-Perceptual-Computing-Lab/openpose/tree/windows) or cloning the repository: `git clone https://github.com/CMU-Perceptual-Computing-Lab/openpose/ && cd openpose && git checkout old_deprecated_windows`.
 3. Install Caffe on Windows:
     1. Open the Windows cmd (Windows button + X, then A).
     2. Go to the Caffe directory, assuming OpenPose has been downloaded on `C:\openpose`: `cd C:\openpose\3rdparty\caffe\caffe-windows`.
@@ -177,11 +170,11 @@ Check that the library is working properly by using any of the following command
 ```
 ```
 :: Windows - Demo
-bin\OpenPoseDemo.exe --video examples/media/video.avi
+bin\OpenPoseDemo.exe --video examples\media\video.avi
 ```
 ```
 :: Windows - Library
-windows_project\x64\Release\OpenPoseDemo.exe --video examples/media/video.avi
+windows\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi
 ```
 
 **2. Running on Webcam**
@@ -195,7 +188,7 @@ bin\OpenPoseDemo.exe
 ```
 ```
 :: Windows - Library
-windows_project\x64\Release\OpenPoseDemo.exe
+windows\x64\Release\OpenPoseDemo.exe
 ```
 
 **3. Running on Images**
@@ -205,11 +198,11 @@ windows_project\x64\Release\OpenPoseDemo.exe
 ```
 ```
 :: Windows - Demo
-bin\OpenPoseDemo.exe --image_dir examples/media/
+bin\OpenPoseDemo.exe --image_dir examples\media\
 ```
 ```
 :: Windows - Library
-windows_project\x64\Release\OpenPoseDemo.exe --image_dir examples/media/
+windows\x64\Release\OpenPoseDemo.exe --image_dir examples\media\
 ```
 
 **4. Body Pose and Face Keypoint Detector (e.g. on Video)**
@@ -219,11 +212,11 @@ windows_project\x64\Release\OpenPoseDemo.exe --image_dir examples/media/
 ```
 ```
 :: Windows - Demo
-bin\OpenPoseDemo.exe --video examples/media/video.avi --face
+bin\OpenPoseDemo.exe --video examples\media\video.avi --face
 ```
 ```
 :: Windows - Library
-windows_project\x64\Release\OpenPoseDemo.exe --video examples/media/video.avi --face
+windows\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi --face
 ```
 
 The visual GUI should show the original image with the poses blended on it, similarly to the pose of this gif:

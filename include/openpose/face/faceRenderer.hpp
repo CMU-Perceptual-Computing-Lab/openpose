@@ -6,15 +6,18 @@
 #include <openpose/core/point.hpp>
 #include <openpose/core/renderer.hpp>
 #include <openpose/thread/worker.hpp>
+#include <openpose/core/macros.hpp>
 #include "faceParameters.hpp"
 
 namespace op
 {
-    class FaceRenderer : public Renderer
+    class OP_API FaceRenderer : public Renderer
     {
     public:
-        explicit FaceRenderer(const Point<int>& frameSize, const float alphaKeypoint = FACE_DEFAULT_ALPHA_KEYPOINT,
-                              const float alphaHeatMap = FACE_DEFAULT_ALPHA_HEAT_MAP, const RenderMode renderMode = RenderMode::Cpu);
+        FaceRenderer(const Point<int>& frameSize, const float renderThreshold,
+                     const float alphaKeypoint = FACE_DEFAULT_ALPHA_KEYPOINT,
+                     const float alphaHeatMap = FACE_DEFAULT_ALPHA_HEAT_MAP,
+                     const RenderMode renderMode = RenderMode::Cpu);
 
         ~FaceRenderer();
 
@@ -23,6 +26,7 @@ namespace op
         void renderFace(Array<float>& outputData, const Array<float>& faceKeypoints);
 
     private:
+        const float mRenderThreshold;
         const Point<int> mFrameSize;
         const RenderMode mRenderMode;
         float* pGpuFace; // GPU aux memory

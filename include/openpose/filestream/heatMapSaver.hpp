@@ -3,11 +3,12 @@
 
 #include <string>
 #include <vector>
+#include <openpose/core/macros.hpp>
 #include "fileSaver.hpp"
 
 namespace op
 {
-    class HeatMapSaver : public FileSaver
+    class OP_API HeatMapSaver : public FileSaver
     {
     public:
         HeatMapSaver(const std::string& directoryPath, const std::string& imageFormat);
