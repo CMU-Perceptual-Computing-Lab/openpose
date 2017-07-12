@@ -2,11 +2,11 @@ OpenPose
 ====================================
 
 ## Latest News
-- Apr 2017: Body released!
-- May 2017: Windows version released!
-- Jun 2017: Face released!
-- Jul 2017: Hands released!
-- Jul 2017: Windows: New non-installation-required [portable demo](doc/installation.md#installation---demo) and [easier library installation](doc/installation.md#installation---library)!
+- Apr 2017: **Body** released!
+- May 2017: **Windows** version released!
+- Jun 2017: **Face** released!
+- Jul 2017: **Hands** released!
+- Jul 2017: **Windows**, New [**portable demo**](doc/installation.md#installation---demo) **and** [**easier library installation**](doc/installation.md#installation---library)!
 - Check all the [release notes](doc/release_notes.md).
 - Interested in an internship on CMU as OpenPose programmer? See [this link](https://docs.google.com/document/d/14SygG39NjIRZfx08clewTdFMGwVdtRu2acyCi3TYcHs/edit?usp=sharing) for details.
 

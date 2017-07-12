@@ -8,6 +8,8 @@
 
 namespace op
 {
+    const std::string OPEN_POSE_TEXT{"OpenPose 1.0.1"};
+
     inline void showGuiHelp()
     {
         try
@@ -17,7 +19,7 @@ namespace op
             if (!helpCvMat.empty())
             {
                 const auto fullScreen = false;
-                FrameDisplayer frameDisplayer{Point<int>{helpCvMat.cols, helpCvMat.rows}, "OpenPose - GUI Help", fullScreen};
+                FrameDisplayer frameDisplayer{Point<int>{helpCvMat.cols, helpCvMat.rows}, OPEN_POSE_TEXT + " - GUI Help", fullScreen};
                 frameDisplayer.displayFrame(helpCvMat, 33);
             }
         }
@@ -152,7 +154,7 @@ namespace op
     Gui::Gui(const bool fullScreen, const Point<int>& outputSize, const std::shared_ptr<std::atomic<bool>>& isRunningSharedPtr, 
              const std::shared_ptr<std::pair<std::atomic<bool>, std::atomic<int>>>& videoSeekSharedPtr,
              const std::vector<std::shared_ptr<PoseExtractor>>& poseExtractors, const std::vector<std::shared_ptr<PoseRenderer>>& poseRenderers) :
-        mFrameDisplayer{outputSize, "OpenPose - GUI", fullScreen},
+        mFrameDisplayer{outputSize, OPEN_POSE_TEXT, fullScreen},
         mPoseExtractors{poseExtractors},
         mPoseRenderers{poseRenderers},
         spIsRunning{isRunningSharedPtr},
