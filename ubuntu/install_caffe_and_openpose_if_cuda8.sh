@@ -23,11 +23,11 @@ function executeShInItsFolder {
     # $1 = sh file name
     # $2 = folder where the sh file is
     # $3 = folder to go back
-    cd $2
+    cd $2   
     exitIfError
     sudo chmod +x $1
     exitIfError
-    ./$1
+    bash ./$1
     exitIfError
     cd $3
     exitIfError
@@ -40,7 +40,7 @@ exitIfError
 
 
 
-executeShInItsFolder "./ubuntu/install_openpose_if_cuda8.sh" "./" "./"
+executeShInItsFolder "install_openpose_if_cuda8.sh" "./ubuntu" "./"
 exitIfError
 
 

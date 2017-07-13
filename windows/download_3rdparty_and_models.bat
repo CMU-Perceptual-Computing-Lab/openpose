@@ -19,6 +19,9 @@ cd 3rdparty\windows\
 echo Downloading Caffe...
 call getCaffe.bat
 
+echo Downloading Caffe dependencies...
+call getCaffe3rdparty.bat
+
 echo:
 echo Downloading OpenCV...
 call getOpenCV.bat

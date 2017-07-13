@@ -76,14 +76,16 @@ namespace op
     {
         try
         {
+            // Security checks
             if (format == DataFormat::Json && CV_MAJOR_VERSION < 3)
                 error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
             if (cvMats.size() != cvMatNames.size())
                 error("cvMats.size() != cvMatNames.size()", __LINE__, __FUNCTION__, __FILE__);
-
+            // Save cv::Mat data
             cv::FileStorage fileStorage{getFullName(fileNameNoExtension, format), cv::FileStorage::WRITE};
             for (auto i = 0 ; i < cvMats.size() ; i++)
-                fileStorage << cvMatNames[i] << cvMats[i];
+                fileStorage << cvMatNames[i] << (cvMats[i].empty() ? cv::Mat{} : cvMats[i]);
+            // Release file
             fileStorage.release();
         }
         catch (const std::exception& e)

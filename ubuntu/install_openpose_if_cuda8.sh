@@ -62,11 +62,15 @@ echo ""
 
 
 echo "------------------------- Compiling OpenPose -------------------------"
+# Go back to main folder
+cd ..
+# Copy Makefile.config
 if [[ $ubuntu_le_14 == true ]]; then
     cp ubuntu/Makefile.config.Ubuntu14_cuda8.example Makefile.config
 else
     cp ubuntu/Makefile.config.Ubuntu16_cuda8.example Makefile.config
 fi
+# Compile OpenPose
 make all -j$NUM_CORES
 exitIfError
 echo "------------------------- OpenPose Compiled -------------------------"

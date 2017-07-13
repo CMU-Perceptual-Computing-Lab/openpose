@@ -6,7 +6,8 @@ OpenPose Library - Compilation and Installation
 2. [Ubuntu](#ubuntu)
 3. [Windows](#windows)
 4. [Quick Start](#quick-start)
-5. [FAQ](#faq)
+5. [Expected Visual Results](#expected-visual-results)
+6. [FAQ](#faq)
 
 
 
@@ -135,58 +136,67 @@ Check that the library is working properly by using any of the following command
 ```
 # Ubuntu
 ./build/examples/openpose/openpose.bin --video examples/media/video.avi
+# With face and hands
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --face --hand
 ```
 ```
 :: Windows - Demo
 bin\OpenPoseDemo.exe --video examples\media\video.avi
+:: With face and hands
+bin\OpenPoseDemo.exe --video examples\media\video.avi --face --hand
 ```
 ```
 :: Windows - Library
 windows\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi
+:: With face and hands
+windows\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi --face --hand
 ```
 
 **2. Running on Webcam**
 ```
 # Ubuntu
 ./build/examples/openpose/openpose.bin
+# With face and hands
+./build/examples/openpose/openpose.bin --face --hand
 ```
 ```
 :: Windows - Demo
 bin\OpenPoseDemo.exe
+:: With face and hands
+bin\OpenPoseDemo.exe --face --hand
 ```
 ```
 :: Windows - Library
 windows\x64\Release\OpenPoseDemo.exe
+:: With face and hands
+windows\x64\Release\OpenPoseDemo.exe --face --hand
 ```
 
 **3. Running on Images**
 ```
 # Ubuntu
 ./build/examples/openpose/openpose.bin --image_dir examples/media/
+# With face and hands
+./build/examples/openpose/openpose.bin --image_dir examples/media/ --face --hand
 ```
 ```
 :: Windows - Demo
 bin\OpenPoseDemo.exe --image_dir examples\media\
+:: With face and hands
+bin\OpenPoseDemo.exe --image_dir examples\media\ --face --hand
 ```
 ```
 :: Windows - Library
 windows\x64\Release\OpenPoseDemo.exe --image_dir examples\media\
+:: With face and hands
+windows\x64\Release\OpenPoseDemo.exe --image_dir examples\media\ --face --hand
 ```
 
-**4. Body Pose and Face Keypoint Detector (e.g. on Video)**
-```
-# Ubuntu
-./build/examples/openpose/openpose.bin --video examples/media/video.avi --face
-```
-```
-:: Windows - Demo
-bin\OpenPoseDemo.exe --video examples\media\video.avi --face
-```
-```
-:: Windows - Library
-windows\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi --face
-```
 
+
+
+
+## Expected Visual Results
 The visual GUI should show the original image with the poses blended on it, similarly to the pose of this gif:
 <p align="center">
     <img src="media/shake.gif", width="720">
