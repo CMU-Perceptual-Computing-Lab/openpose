@@ -111,7 +111,7 @@ You just need to remove the OpenPose folder, by default called `openpose/`. E.g.
     1. Right click on `OpenPoseDemo` --> `Set as StartUp Project`.
     2. Change `Debug` by `Release` mode.
     3. Compile it and run it with F5 or the green play icon.
-5. If you have a webcam connected, OpenPose will automatically starts after being compiled.
+5. If you have a webcam connected, OpenPose will automatically start after being compiled.
 6. In order to use the created exe file from the command line (i.e. outside Visual Studio), you have to:
     1. Copy all the DLLs located on `{openpose_folder}\3rdparty\windows\caffe\bin\` on the exe folder: `{openpose_folder}\windows\x64\Release`.
     2. Copy all the DLLs located on `{openpose_folder}\3rdparty\windows\opencv\x64\vc14\bin\` on the exe folder: `{openpose_folder}\windows\x64\Release`.
@@ -221,6 +221,7 @@ If you choose to visualize a body part or a PAF (Part Affinity Field) heat map w
 **A**: Most probably cuDNN is not installed/enabled, the default Caffe model uses >12 GB of GPU memory, cuDNN reduces it to ~1.5 GB.
 
 
+
 **Q: Low speed** - OpenPose is quite slow, is it normal? How can I speed it up?
 
 **A**: Check the [OpenPose Benchmark](https://docs.google.com/spreadsheets/d/1-DynFGvoScvfWDA1P4jDInCkbD4lg0IKOYbXgEq0sK0/edit#gid=0) to discover the approximate speed of your graphics card. Some speed tips:
@@ -230,3 +231,15 @@ If you choose to visualize a body part or a PAF (Part Affinity Field) heat map w
     3. For face, reduce the `--face_net_resolution`. The resolution 320x320 usually works pretty decently.
     4. Use the `MPI_4_layers` model (lower accuracy and lower number of parts).
     5. Change GPU rendering by CPU rendering to get approximately +0.5 FPS (`--render_pose 1`).
+
+
+
+**Q: Webcam is slow** - Using a folder with images matches the speed FPS benchmarks, but the webcam has lower FPS. Note: often on Windows.
+
+**A**: OpenCV has some issues with some camera drivers (specially on Windows). The first step should be to compile OpenCV by your own and re-compile OpenPose after that (following the `Reinstallation` section in Ubuntu or cleaning the project on Windows). If the speed is still slower, you can better debug it by running a webcam OpenCV example (e.g. [this C++ example](http://answers.opencv.org/question/1/how-can-i-get-frames-from-my-webcam/)). If you are able to get the proper FPS with the OpenCV demo but OpenPose is still low, then let us know!
+
+
+
+**Q: Video and/or webcam are not working** - Using a folder with images does work, but the video and/or the webcam do not. Note: often on Windows.
+
+**A**: OpenCV has some issues with some camera drivers and video codecs (specially on Windows). Follow the same steps as the `Webcam is slow` question to test the webcam is working. After re-compiling OpenCV, you can also try this [OpenCV example for video](http://docs.opencv.org/3.0-beta/modules/videoio/doc/reading_and_writing_video.html).

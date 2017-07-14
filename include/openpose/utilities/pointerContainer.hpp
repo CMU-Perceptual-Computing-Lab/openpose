@@ -12,7 +12,7 @@ namespace op
     }
 
     template<typename TDatums>
-    class OP_API PointerContainerGreater
+    class PointerContainerGreater
     {
     public:
         bool operator() (TDatums& a, TDatums& b)
@@ -27,7 +27,7 @@ namespace op
     };
 
     template<typename TDatums>
-    class OP_API PointerContainerLess
+    class PointerContainerLess
     {
     public:
         bool operator() (TDatums& a, TDatums& b)
