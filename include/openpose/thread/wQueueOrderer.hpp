@@ -2,8 +2,9 @@
 #define OPENPOSE_THREAD_W_QUEUE_ORDERER_HPP
 
 #include <queue> // std::priority_queue
+#include <openpose/core/common.hpp>
+#include <openpose/thread/worker.hpp>
 #include <openpose/utilities/pointerContainer.hpp>
-#include "worker.hpp"
 
 namespace op
 {
@@ -36,9 +37,6 @@ namespace op
 // Implementation
 #include <chrono>
 #include <thread>
-#include <openpose/utilities/errorAndLog.hpp>
-#include <openpose/core/macros.hpp>
-#include <openpose/utilities/profiler.hpp>
 namespace op
 {
     template<typename TDatums>

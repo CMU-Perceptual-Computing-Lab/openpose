@@ -1,5 +1,4 @@
 #include <openpose/hand/handParameters.hpp>
-#include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/keypoint.hpp>
 #include <openpose/hand/renderHand.hpp>

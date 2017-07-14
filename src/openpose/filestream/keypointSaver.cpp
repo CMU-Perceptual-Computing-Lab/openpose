@@ -1,4 +1,3 @@
-#include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/filestream/fileStream.hpp>
 #include <openpose/filestream/keypointSaver.hpp>
 

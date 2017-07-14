@@ -2,8 +2,7 @@
 #define OPENPOSE_FILESTREAM_JSON_OFSTREAM_HPP
 
 #include <fstream> // std::ofstream
-#include <string>
-#include <openpose/core/macros.hpp>
+#include <openpose/core/common.hpp>
 
 namespace op
 {

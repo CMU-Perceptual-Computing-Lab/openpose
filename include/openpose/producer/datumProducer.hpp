@@ -3,11 +3,10 @@
 
 #include <atomic>
 #include <limits> // std::numeric_limits
-#include <memory> // std::shared_ptr
 #include <tuple>
+#include <openpose/core/common.hpp>
 #include <openpose/core/datum.hpp>
 #include <openpose/producer/producer.hpp>
-#include <openpose/core/macros.hpp>
 
 namespace op
 {
@@ -39,8 +38,7 @@ namespace op
 
 
 // Implementation
-#include "openpose/utilities/errorAndLog.hpp"
-#include "openpose/producer/datumProducer.hpp"
+#include <openpose/producer/datumProducer.hpp>
 namespace op
 {
     template<typename TDatumsNoPtr>

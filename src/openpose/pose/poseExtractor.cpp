@@ -1,7 +1,5 @@
-#include <memory> // std::shared_ptr
 #include <cuda_runtime_api.h>
 #include <openpose/core/enumClasses.hpp>
-#include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/pose/poseExtractor.hpp>
 

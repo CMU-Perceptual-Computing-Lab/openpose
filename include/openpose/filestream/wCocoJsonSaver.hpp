@@ -1,7 +1,7 @@
 #ifndef OPENPOSE_FILESTREAM_W_COCO_JSON_SAVER_HPP
 #define OPENPOSE_FILESTREAM_W_COCO_JSON_SAVER_HPP
 
-#include <memory> // std::shared_ptr
+#include <openpose/core/common.hpp>
 #include <openpose/filestream/cocoJsonSaver.hpp>
 #include <openpose/thread/workerConsumer.hpp>
 
@@ -29,10 +29,7 @@ namespace op
 
 
 // Implementation
-#include <openpose/utilities/errorAndLog.hpp>
-#include <openpose/core/macros.hpp>
 #include <openpose/utilities/pointerContainer.hpp>
-#include <openpose/utilities/profiler.hpp>
 namespace op
 {
     template<typename TDatums>

@@ -1,7 +1,8 @@
 #ifndef OPENPOSE_GUI_W_ADD_GUI_INFO_HPP
 #define OPENPOSE_GUI_W_ADD_GUI_INFO_HPP
 
-#include "guiInfoAdder.hpp"
+#include <openpose/core/common.hpp>
+#include <openpose/gui/guiInfoAdder.hpp>
 #include <openpose/thread/worker.hpp>
 
 namespace op
@@ -28,10 +29,7 @@ namespace op
 
 
 // Implementation
-#include <openpose/utilities/errorAndLog.hpp>
-#include <openpose/core/macros.hpp>
 #include <openpose/utilities/pointerContainer.hpp>
-#include <openpose/utilities/profiler.hpp>
 namespace op
 {
     template<typename TDatums>

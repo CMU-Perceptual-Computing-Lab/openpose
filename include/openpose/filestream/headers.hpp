@@ -2,23 +2,23 @@
 #define OPENPOSE_FILESTREAM_HEADERS_HPP
 
 // fileStream module
-#include "cocoJsonSaver.hpp"
-#include "enumClasses.hpp"
-#include "fileSaver.hpp"
-#include "fileStream.hpp"
-#include "heatMapSaver.hpp"
-#include "imageSaver.hpp"
-#include "jsonOfstream.hpp"
-#include "keypointJsonSaver.hpp"
-#include "keypointSaver.hpp"
-#include "videoSaver.hpp"
-#include "wCocoJsonSaver.hpp"
-#include "wFaceSaver.hpp"
-#include "wHandSaver.hpp"
-#include "wImageSaver.hpp"
-#include "wHeatMapSaver.hpp"
-#include "wKeypointJsonSaver.hpp"
-#include "wPoseSaver.hpp"
-#include "wVideoSaver.hpp"
+#include <openpose/fileStream/cocoJsonSaver.hpp>
+#include <openpose/fileStream/enumClasses.hpp>
+#include <openpose/fileStream/fileSaver.hpp>
+#include <openpose/fileStream/fileStream.hpp>
+#include <openpose/fileStream/heatMapSaver.hpp>
+#include <openpose/fileStream/imageSaver.hpp>
+#include <openpose/fileStream/jsonOfstream.hpp>
+#include <openpose/fileStream/keypointJsonSaver.hpp>
+#include <openpose/fileStream/keypointSaver.hpp>
+#include <openpose/fileStream/videoSaver.hpp>
+#include <openpose/fileStream/wCocoJsonSaver.hpp>
+#include <openpose/fileStream/wFaceSaver.hpp>
+#include <openpose/fileStream/wHandSaver.hpp>
+#include <openpose/fileStream/wImageSaver.hpp>
+#include <openpose/fileStream/wHeatMapSaver.hpp>
+#include <openpose/fileStream/wKeypointJsonSaver.hpp>
+#include <openpose/fileStream/wPoseSaver.hpp>
+#include <openpose/fileStream/wVideoSaver.hpp>
 
 #endif // OPENPOSE_FILESTREAM_HEADERS_HPP

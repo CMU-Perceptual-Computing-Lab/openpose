@@ -1,11 +1,10 @@
 #ifndef OPENPOSE_PRODUCER_VIDEO_CAPTURE_READER_HPP
 #define OPENPOSE_PRODUCER_VIDEO_CAPTURE_READER_HPP
 
-#include <string>
 #include <opencv2/core/core.hpp> // cv::Mat
 #include <opencv2/highgui/highgui.hpp> // cv::VideoCapture
-#include <openpose/core/macros.hpp>
-#include "producer.hpp"
+#include <openpose/core/common.hpp>
+#include <openpose/producer/producer.hpp>
 
 namespace op
 {

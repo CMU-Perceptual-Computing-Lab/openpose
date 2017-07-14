@@ -1,12 +1,13 @@
 #ifndef OPENPOSE_WRAPPER_WRAPPER_HPP
 #define OPENPOSE_WRAPPER_WRAPPER_HPP
 
+#include <openpose/core/common.hpp>
 #include <openpose/thread/headers.hpp>
-#include "wrapperStructFace.hpp"
-#include "wrapperStructHand.hpp"
-#include "wrapperStructInput.hpp"
-#include "wrapperStructOutput.hpp"
-#include "wrapperStructPose.hpp"
+#include <openpose/wrapper/wrapperStructFace.hpp>
+#include <openpose/wrapper/wrapperStructHand.hpp>
+#include <openpose/wrapper/wrapperStructInput.hpp>
+#include <openpose/wrapper/wrapperStructOutput.hpp>
+#include <openpose/wrapper/wrapperStructPose.hpp>
 
 namespace op
 {
@@ -269,7 +270,6 @@ namespace op
 #include <openpose/pose/headers.hpp>
 #include <openpose/producer/headers.hpp>
 #include <openpose/utilities/cuda.hpp>
-#include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/utilities/fileSystem.hpp>
 namespace op
 {

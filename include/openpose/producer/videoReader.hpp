@@ -1,8 +1,8 @@
 #ifndef OPENPOSE_PRODUCER_VIDEO_READER_HPP
 #define OPENPOSE_PRODUCER_VIDEO_READER_HPP
 
-#include <openpose/core/macros.hpp>
-#include "videoCaptureReader.hpp"
+#include <openpose/core/common.hpp>
+#include <openpose/producer/videoCaptureReader.hpp>
 
 namespace op
 {

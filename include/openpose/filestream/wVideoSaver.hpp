@@ -1,11 +1,9 @@
 #ifndef OPENPOSE_FILESTREAM_W_VIDEO_SAVER_HPP
 #define OPENPOSE_FILESTREAM_W_VIDEO_SAVER_HPP
 
-#include <memory> // std::shared_ptr
-#include <string>
-#include <vector>
+#include <openpose/core/common.hpp>
+#include <openpose/fileStream/videoSaver.hpp>
 #include <openpose/thread/workerConsumer.hpp>
-#include "videoSaver.hpp"
 
 namespace op
 {
@@ -31,10 +29,7 @@ namespace op
 
 
 // Implementation
-#include <openpose/utilities/errorAndLog.hpp>
-#include <openpose/core/macros.hpp>
 #include <openpose/utilities/pointerContainer.hpp>
-#include <openpose/utilities/profiler.hpp>
 namespace op
 {
     template<typename TDatums>

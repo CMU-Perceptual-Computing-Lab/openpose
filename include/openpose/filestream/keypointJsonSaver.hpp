@@ -1,11 +1,8 @@
 #ifndef OPENPOSE_FILESTREAM_KEYPOINT_JSON_SAVER_HPP
 #define OPENPOSE_FILESTREAM_KEYPOINT_JSON_SAVER_HPP
 
-#include <string>
-#include <vector>
-#include <openpose/core/array.hpp>
-#include <openpose/core/macros.hpp>
-#include "fileSaver.hpp"
+#include <openpose/core/common.hpp>
+#include <openpose/fileStream/fileSaver.hpp>
 
 namespace op
 {

@@ -1,13 +1,11 @@
 #ifndef OPENPOSE_FACE_FACE_RENDERER_HPP
 #define OPENPOSE_FACE_FACE_RENDERER_HPP
 
-#include <openpose/core/array.hpp>
+#include <openpose/core/common.hpp>
 #include <openpose/core/enumClasses.hpp>
-#include <openpose/core/point.hpp>
 #include <openpose/core/renderer.hpp>
+#include <openpose/face/faceParameters.hpp>
 #include <openpose/thread/worker.hpp>
-#include <openpose/core/macros.hpp>
-#include "faceParameters.hpp"
 
 namespace op
 {

@@ -2,6 +2,6 @@
 #define OPENPOSE_EXPERIMENTAL_PRODUCER_HEADERS_HPP
 
 // producer module
-// #include "wPoseLoader.hpp"
+// #include <openpose/experimental/producer/wPoseLoader.hpp>
 
 #endif // OPENPOSE_EXPERIMENTAL_PRODUCER_HEADERS_HPP

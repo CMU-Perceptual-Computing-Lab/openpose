@@ -1,9 +1,7 @@
 #ifndef OPENPOSE_CORE_RESIZE_AND_MERGE_BASE_HPP
 #define OPENPOSE_CORE_RESIZE_AND_MERGE_BASE_HPP
 
-#include <array>
-#include <vector>
-#include "common.hpp"
+#include <openpose/core/common.hpp>
 
 namespace op
 {

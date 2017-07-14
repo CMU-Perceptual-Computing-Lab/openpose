@@ -1,11 +1,8 @@
 #ifndef OPENPOSE_CORE_DATUM_HPP
 #define OPENPOSE_CORE_DATUM_HPP
 
-#include <array>
-#include <memory> // std::shared_ptr
-#include <string>
 #include <opencv2/core/core.hpp> // cv::Mat
-#include "common.hpp"
+#include <openpose/core/common.hpp>
 
 namespace op
 {

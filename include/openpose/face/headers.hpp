@@ -2,13 +2,13 @@
 #define OPENPOSE_FACE_HEADERS_HPP
 
 // face module
-#include "faceDetector.hpp"
-#include "faceExtractor.hpp"
-#include "faceParameters.hpp"
-#include "faceRenderer.hpp"
-#include "renderFace.hpp"
-#include "wFaceDetector.hpp"
-#include "wFaceExtractor.hpp"
-#include "wFaceRenderer.hpp"
+#include <openpose/face/faceDetector.hpp>
+#include <openpose/face/faceExtractor.hpp>
+#include <openpose/face/faceParameters.hpp>
+#include <openpose/face/faceRenderer.hpp>
+#include <openpose/face/renderFace.hpp>
+#include <openpose/face/wFaceDetector.hpp>
+#include <openpose/face/wFaceExtractor.hpp>
+#include <openpose/face/wFaceRenderer.hpp>
 
 #endif // OPENPOSE_FACE_HEADERS_HPP

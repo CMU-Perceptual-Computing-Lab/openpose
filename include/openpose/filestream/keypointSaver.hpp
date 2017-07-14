@@ -1,10 +1,9 @@
 #ifndef OPENPOSE_FILESTREAM_KEYPOINT_SAVER_HPP
 #define OPENPOSE_FILESTREAM_KEYPOINT_SAVER_HPP
 
-#include <openpose/core/array.hpp>
-#include <openpose/core/macros.hpp>
-#include "enumClasses.hpp"
-#include "fileSaver.hpp"
+#include <openpose/core/common.hpp>
+#include <openpose/fileStream/enumClasses.hpp>
+#include <openpose/fileStream/fileSaver.hpp>
 
 namespace op
 {

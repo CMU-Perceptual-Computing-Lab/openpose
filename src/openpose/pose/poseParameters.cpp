@@ -1,4 +1,3 @@
-#include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/pose/poseParameters.hpp>
  
 namespace op

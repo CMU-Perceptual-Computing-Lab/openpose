@@ -1,9 +1,8 @@
 #ifndef OPENPOSE_WRAPPER_WRAPPER_STRUCT_OUTPUT_HPP
 #define OPENPOSE_WRAPPER_WRAPPER_STRUCT_OUTPUT_HPP
 
-#include <string>
+#include <openpose/core/common.hpp>
 #include <openpose/filestream/enumClasses.hpp>
-#include <openpose/core/macros.hpp>
 
 namespace op
 {

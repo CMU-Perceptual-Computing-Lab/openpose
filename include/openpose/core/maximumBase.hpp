@@ -1,8 +1,7 @@
 #ifndef OPENPOSE_CORE_MAXIMUM_BASE_HPP
 #define OPENPOSE_CORE_MAXIMUM_BASE_HPP
 
-#include <array>
-#include "common.hpp"
+#include <openpose/core/common.hpp>
 
 namespace op
 {

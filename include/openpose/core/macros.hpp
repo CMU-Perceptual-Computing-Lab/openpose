@@ -1,5 +1,5 @@
-#ifndef OPENPOSE_UTILITIES_MACROS_HPP
-#define OPENPOSE_UTILITIES_MACROS_HPP
+#ifndef OPENPOSE_CORE_MACROS_HPP
+#define OPENPOSE_CORE_MACROS_HPP
 
 #ifndef _WIN32
     #define OP_API
@@ -47,6 +47,5 @@
 #include <openpose/core/datum.hpp>
 #include <openpose/core/point.hpp>
 #include <openpose/core/rectangle.hpp>
-#include <openpose/core/macros.hpp>
 
-#endif // OPENPOSE_UTILITIES_MACROS_HPP
+#endif // OPENPOSE_CORE_MACROS_HPP

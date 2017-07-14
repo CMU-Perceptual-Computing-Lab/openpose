@@ -2,9 +2,8 @@
 #ifndef OPENPOSE_CORE_NMS_CAFFE_HPP
 #define OPENPOSE_CORE_NMS_CAFFE_HPP
 
-#include <array>
 #include <caffe/blob.hpp>
-#include "common.hpp"
+#include <openpose/core/common.hpp>
 
 namespace op
 {

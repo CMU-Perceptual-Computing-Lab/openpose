@@ -1,11 +1,10 @@
 #ifndef OPENPOSE_WRAPPER_WRAPPER_STRUCT_POSE_HPP
 #define OPENPOSE_WRAPPER_WRAPPER_STRUCT_POSE_HPP
 
+#include <openpose/core/common.hpp>
 #include <openpose/core/enumClasses.hpp>
-#include <openpose/core/point.hpp>
 #include <openpose/pose/enumClasses.hpp>
 #include <openpose/pose/poseParameters.hpp>
-#include <openpose/core/macros.hpp>
 
 namespace op
 {

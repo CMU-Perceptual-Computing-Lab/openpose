@@ -5,7 +5,6 @@
 #include <openpose/hand/handParameters.hpp>
 #include <openpose/hand/renderHand.hpp>
 #include <openpose/utilities/cuda.hpp>
-#include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/hand/handRenderer.hpp>
 
 namespace op

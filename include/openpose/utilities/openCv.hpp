@@ -3,9 +3,7 @@
 
 #include <opencv2/core/core.hpp> // cv::Mat
 #include <opencv2/imgproc/imgproc.hpp> // cv::warpAffine, cv::BORDER_CONSTANT
-#include <openpose/core/array.hpp>
-#include <openpose/core/macros.hpp>
-#include <openpose/core/point.hpp>
+#include <openpose/core/common.hpp>
 
 namespace op
 {

@@ -1,6 +1,5 @@
 #include <boost/filesystem.hpp>
 #include <boost/range/iterator_range_core.hpp>
-#include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/utilities/fileSystem.hpp>
 
 namespace op

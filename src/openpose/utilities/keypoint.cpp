@@ -1,6 +1,5 @@
 #include <limits> // std::numeric_limits
 #include <opencv2/imgproc/imgproc.hpp> // cv::line, cv::circle
-#include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/keypoint.hpp>
 

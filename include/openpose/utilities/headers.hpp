@@ -2,17 +2,17 @@
 #define OPENPOSE_UTILITIES_HEADERS_HPP
 
 // utilities module
-#include "check.hpp"
-#include "cuda.hpp"
-#include "enumClasses.hpp"
-#include "errorAndLog.hpp"
-#include "fastMath.hpp"
-#include "fileSystem.hpp"
-#include "flagsToOpenPose.hpp"
-#include "keypoint.hpp"
-#include "openCv.hpp"
-#include "pointerContainer.hpp"
-#include "profiler.hpp"
-#include "string.hpp"
+#include <openpose/utilities/check.hpp>
+#include <openpose/utilities/cuda.hpp>
+#include <openpose/utilities/enumClasses.hpp>
+#include <openpose/utilities/errorAndLog.hpp>
+#include <openpose/utilities/fastMath.hpp>
+#include <openpose/utilities/fileSystem.hpp>
+#include <openpose/utilities/flagsToOpenPose.hpp>
+#include <openpose/utilities/keypoint.hpp>
+#include <openpose/utilities/openCv.hpp>
+#include <openpose/utilities/pointerContainer.hpp>
+#include <openpose/utilities/profiler.hpp>
+#include <openpose/utilities/string.hpp>
 
 #endif // OPENPOSE_UTILITIES_HEADERS_HPP

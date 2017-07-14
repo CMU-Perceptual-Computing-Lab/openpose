@@ -1,14 +1,11 @@
 #ifndef OPENPOSE_POSE_POSE_EXTRACTOR_HPP
 #define OPENPOSE_POSE_POSE_EXTRACTOR_HPP
 
-#include <array>
 #include <atomic>
 #include <thread>
-#include <openpose/core/array.hpp>
-#include <openpose/core/point.hpp>
+#include <openpose/core/common.hpp>
 #include <openpose/core/enumClasses.hpp>
-#include <openpose/core/macros.hpp>
-#include "poseParameters.hpp"
+#include <openpose/pose/poseParameters.hpp>
 
 namespace op
 {

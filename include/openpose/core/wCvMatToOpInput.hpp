@@ -1,9 +1,9 @@
 #ifndef OPENPOSE_CORE_W_CV_MAT_TO_OP_INPUT_HPP
 #define OPENPOSE_CORE_W_CV_MAT_TO_OP_INPUT_HPP
 
-#include <memory> // std::shared_ptr
+#include <openpose/core/common.hpp>
+#include <openpose/core/cvMatToOpInput.hpp>
 #include <openpose/thread/worker.hpp>
-#include "cvMatToOpInput.hpp"
 
 namespace op
 {
@@ -29,11 +29,8 @@ namespace op
 
 
 // Implementation
-#include <openpose/utilities/errorAndLog.hpp>
-#include <openpose/core/macros.hpp>
 #include <openpose/utilities/openCv.hpp>
 #include <openpose/utilities/pointerContainer.hpp>
-#include <openpose/utilities/profiler.hpp>
 namespace op
 {
     template<typename TDatums>

@@ -4,7 +4,6 @@
 #endif
 #include <openpose/face/renderFace.hpp>
 #include <openpose/utilities/cuda.hpp>
-#include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/face/faceRenderer.hpp>
 
 namespace op

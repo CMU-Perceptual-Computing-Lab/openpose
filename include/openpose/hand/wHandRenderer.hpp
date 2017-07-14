@@ -1,9 +1,9 @@
 #ifndef OPENPOSE_HAND_W_HAND_RENDERER_HPP
 #define OPENPOSE_HAND_W_HAND_RENDERER_HPP
 
-#include <memory> // std::shared_ptr
+#include <openpose/core/common.hpp>
+#include <openpose/hand/handRenderer.hpp>
 #include <openpose/thread/worker.hpp>
-#include "handRenderer.hpp"
 
 namespace op
 {
@@ -29,10 +29,7 @@ namespace op
 
 
 // Implementation
-#include <openpose/utilities/errorAndLog.hpp>
-#include <openpose/core/macros.hpp>
 #include <openpose/utilities/pointerContainer.hpp>
-#include <openpose/utilities/profiler.hpp>
 namespace op
 {
     template<typename TDatums>

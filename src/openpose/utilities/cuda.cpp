@@ -1,6 +1,5 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
-#include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/cuda.hpp>
 

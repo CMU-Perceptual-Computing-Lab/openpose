@@ -1,9 +1,8 @@
 #ifndef OPENPOSE_WRAPPER_WRAPPER_STRUCT_INPUT_HPP
 #define OPENPOSE_WRAPPER_WRAPPER_STRUCT_INPUT_HPP
 
-#include <memory>
+#include <openpose/core/common.hpp>
 #include <openpose/producer/producer.hpp>
-#include <openpose/core/macros.hpp>
 
 namespace op
 {

@@ -1,6 +1,5 @@
 #ifdef USE_CAFFE
 #include <openpose/core/nmsBase.hpp>
-#include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/core/nmsCaffe.hpp>
 
 namespace op

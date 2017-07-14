@@ -1,5 +1,4 @@
 #include <openpose/utilities/cuda.hpp>
-#include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/pose/bodyPartConnectorBase.hpp>
 
 namespace op

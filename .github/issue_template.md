@@ -39,5 +39,5 @@ You might select multiple topics, delete the rest:
 **GPU model** (`nvidia-smi`):
 **Caffe version**: Default from OpenPose or custom version.
 **OpenCV version**: installed with `apt-get install libopencv-dev` or OpenCV 2.X or OpenCV 3.X.
-Generation mode (only for Ubuntu): Makefile + Makefile.config or CMake.
+Generation mode (only for Ubuntu): Makefile + Makefile.config (default) or CMake.
 Compiler (`gcc --version` on Ubuntu):

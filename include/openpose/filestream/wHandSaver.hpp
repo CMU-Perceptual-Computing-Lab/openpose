@@ -1,11 +1,10 @@
 #ifndef OPENPOSE_FILESTREAM_W_HAND_SAVER_HPP
 #define OPENPOSE_FILESTREAM_W_HAND_SAVER_HPP
 
-#include <memory> // std::shared_ptr
-#include <string>
+#include <openpose/core/common.hpp>
+#include <openpose/fileStream/enumClasses.hpp>
+#include <openpose/fileStream/keypointSaver.hpp>
 #include <openpose/thread/workerConsumer.hpp>
-#include "enumClasses.hpp"
-#include "keypointSaver.hpp"
 
 namespace op
 {
@@ -31,10 +30,7 @@ namespace op
 
 
 // Implementation
-#include <openpose/utilities/errorAndLog.hpp>
-#include <openpose/core/macros.hpp>
 #include <openpose/utilities/pointerContainer.hpp>
-#include <openpose/utilities/profiler.hpp>
 namespace op
 {
     template<typename TDatums>

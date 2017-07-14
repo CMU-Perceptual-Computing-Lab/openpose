@@ -45,14 +45,14 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64;D:\Programs\Python27\libs;C:\Python27\libs</LibraryPath>
+    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
     <ExecutablePath>$(VC_ExecutablePath_x64);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(FxCopDir);$(PATH);</ExecutablePath>
     <ReferencePath>$(VC_ReferencesPath_x64);</ReferencePath>
     <IntDir>$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64;D:\Programs\Python27\libs;C:\Python27\libs</LibraryPath>
+    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
     <IntDir>$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -82,7 +82,7 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(CUDA_PATH_V8_0)\lib\x64\;$(PYTHON_LIB);</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(CUDA_PATH_V8_0)\lib\x64\;</AdditionalLibraryDirectories>
       <AdditionalDependencies>..\..\3rdparty\windows\caffe\lib\caffe.lib;..\..\3rdparty\windows\caffe\lib\caffeproto.lib;..\..\3rdparty\windows\caffe3rdparty\lib\boost_filesystem-vc140-mt-1_61.lib;..\..\3rdparty\windows\caffe3rdparty\lib\boost_system-vc140-mt-1_61.lib;..\..\3rdparty\windows\caffe3rdparty\lib\caffehdf5.lib;..\..\3rdparty\windows\caffe3rdparty\lib\caffehdf5_hl.lib;..\..\3rdparty\windows\caffe3rdparty\lib\caffezlib.lib;..\..\3rdparty\windows\caffe3rdparty\lib\gflags.lib;..\..\3rdparty\windows\caffe3rdparty\lib\glog.lib;..\..\3rdparty\windows\caffe3rdparty\lib\leveldb.lib;..\..\3rdparty\windows\caffe3rdparty\lib\libopenblas.dll.a;..\..\3rdparty\windows\caffe3rdparty\lib\libprotobuf.lib;..\..\3rdparty\windows\caffe3rdparty\lib\lmdb.lib;..\..\3rdparty\windows\caffe3rdparty\lib\snappy.lib;..\..\3rdparty\windows\opencv\x64\vc14\lib\opencv_world310.lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0\lib\x64\cublas.lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0\lib\x64\cublas_device.lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0\lib\x64\cudart.lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0\lib\x64\cudnn.lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0\lib\x64\curand.lib;ntdll.lib;shlwapi.lib;..\x64\Release\OpenPose.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

@@ -3,7 +3,6 @@
 #include <mutex>
 #include <thread>
 #include <openpose/utilities/errorAndLog.hpp>
-#include <openpose/core/macros.hpp>
 #include <openpose/utilities/profiler.hpp>
 
 // First, I apologize for the ugliness of the code of this function. Nevertheless, it has been made

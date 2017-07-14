@@ -1,4 +1,3 @@
-#include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/filestream/cocoJsonSaver.hpp>
 
 namespace op

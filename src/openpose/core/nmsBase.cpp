@@ -1,4 +1,3 @@
-#include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/core/nmsBase.hpp>
 
 namespace op

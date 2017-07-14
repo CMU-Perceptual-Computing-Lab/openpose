@@ -89,6 +89,7 @@ OpenPose Library - Release Notes
     2. OpenPose is now completely portable across Windows 10 computers (with Nvidia graphic card).
     3. Added OpenPose 1.0.1 portable demo.
     4. Removed Python and some unnecessary boost dependencies on the VS project.
+    5. Replaced all double quotes by angle brackets in include statements (issue #61).
 2. Main bugs fixed:
     1. Pycaffe can now be imported from Python.
     2. Fixed `Tutorial/Wrapper` VS linking errors.

@@ -2,12 +2,9 @@
 #ifndef OPENPOSE_CORE_NET_CAFFE_HPP
 #define OPENPOSE_CORE_NET_CAFFE_HPP
 
-#include <array>
-#include <memory> // std::shared_ptr
-#include <string>
 #include <caffe/net.hpp>
-#include "common.hpp"
-#include "net.hpp"
+#include <openpose/core/common.hpp>
+#include <openpose/core/net.hpp>
 
 namespace op
 {

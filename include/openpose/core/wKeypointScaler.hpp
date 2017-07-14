@@ -1,8 +1,9 @@
 #ifndef OPENPOSE_CORE_W_KEYPOINT_SCALER_HPP
 #define OPENPOSE_CORE_W_KEYPOINT_SCALER_HPP
 
+#include <openpose/core/common.hpp>
+#include <openpose/core/keypointScaler.hpp>
 #include <openpose/thread/worker.hpp>
-#include "keypointScaler.hpp"
 
 namespace op
 {
@@ -26,10 +27,7 @@ namespace op
 
 
 // Implementation
-#include <openpose/utilities/errorAndLog.hpp>
-#include <openpose/core/macros.hpp>
 #include <openpose/utilities/pointerContainer.hpp>
-#include <openpose/utilities/profiler.hpp>
 namespace op
 {
     template<typename TDatums>

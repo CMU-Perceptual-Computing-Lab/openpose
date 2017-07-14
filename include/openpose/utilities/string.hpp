@@ -1,9 +1,7 @@
 #ifndef OPENPOSE_UTILITIES_STRING_HPP
 #define OPENPOSE_UTILITIES_STRING_HPP
 
-#include <string>
-#include <vector>
-#include <openpose/core/macros.hpp>
+#include <openpose/core/common.hpp>
 
 namespace op
 {

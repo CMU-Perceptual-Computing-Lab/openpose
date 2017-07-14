@@ -1,9 +1,8 @@
 #ifndef OPENPOSE_THREAD_SUB_THREAD_HPP
 #define OPENPOSE_THREAD_SUB_THREAD_HPP
 
-#include <vector>
-#include <openpose/core/macros.hpp>
-#include "worker.hpp"
+#include <openpose/core/common.hpp>
+#include <openpose/thread/worker.hpp>
 
 namespace op
 {
@@ -40,8 +39,6 @@ namespace op
 
 
 // Implementation
-#include <openpose/utilities/errorAndLog.hpp>
-#include <openpose/core/macros.hpp>
 namespace op
 {
     template<typename TDatums, typename TWorker>

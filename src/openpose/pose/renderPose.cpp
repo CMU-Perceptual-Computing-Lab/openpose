@@ -1,5 +1,4 @@
 #include <openpose/pose/poseParameters.hpp>
-#include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/keypoint.hpp>
 #include <openpose/pose/renderPose.hpp>
