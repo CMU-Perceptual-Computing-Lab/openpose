@@ -2,8 +2,8 @@
 #define OPENPOSE_FILESTREAM_W_POSE_SAVER_HPP
 
 #include <openpose/core/common.hpp>
-#include <openpose/fileStream/enumClasses.hpp>
-#include <openpose/fileStream/keypointSaver.hpp>
+#include <openpose/filestream/enumClasses.hpp>
+#include <openpose/filestream/keypointSaver.hpp>
 #include <openpose/thread/workerConsumer.hpp>
 
 namespace op

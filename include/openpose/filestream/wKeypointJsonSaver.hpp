@@ -2,7 +2,7 @@
 #define OPENPOSE_FILESTREAM_W_KEYPOINT_JSON_SAVER_HPP
 
 #include <openpose/core/common.hpp>
-#include <openpose/fileStream/keypointJsonSaver.hpp>
+#include <openpose/filestream/keypointJsonSaver.hpp>
 #include <openpose/thread/workerConsumer.hpp>
 
 namespace op

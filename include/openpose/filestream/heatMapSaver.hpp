@@ -2,7 +2,7 @@
 #define OPENPOSE_FILESTREAM_HEAT_MAP_SAVER_HPP
 
 #include <openpose/core/common.hpp>
-#include <openpose/fileStream/fileSaver.hpp>
+#include <openpose/filestream/fileSaver.hpp>
 
 namespace op
 {

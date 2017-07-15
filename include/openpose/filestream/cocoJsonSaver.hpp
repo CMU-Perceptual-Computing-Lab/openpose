@@ -2,7 +2,7 @@
 #define OPENPOSE_FILESTREAM_POSE_JSON_COCO_SAVER_HPP
 
 #include <openpose/core/common.hpp>
-#include <openpose/fileStream/jsonOfstream.hpp>
+#include <openpose/filestream/jsonOfstream.hpp>
 
 namespace op
 {

@@ -2,7 +2,7 @@
 #define OPENPOSE_FILESTREAM_W_IMAGE_SAVER_HPP
 
 #include <openpose/core/common.hpp>
-#include <openpose/fileStream/imageSaver.hpp>
+#include <openpose/filestream/imageSaver.hpp>
 #include <openpose/thread/workerConsumer.hpp>
 
 namespace op

@@ -4,7 +4,7 @@
 #include <opencv2/core/core.hpp> // cv::Mat
 #include <opencv2/highgui/highgui.hpp> // CV_LOAD_IMAGE_ANYDEPTH, CV_IMWRITE_PNG_COMPRESSION
 #include <openpose/core/common.hpp>
-#include <openpose/fileStream/enumClasses.hpp>
+#include <openpose/filestream/enumClasses.hpp>
 
 namespace op
 {

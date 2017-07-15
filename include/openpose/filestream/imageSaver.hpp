@@ -3,7 +3,7 @@
 
 #include <opencv2/core/core.hpp> // cv::Mat
 #include <openpose/core/common.hpp>
-#include <openpose/fileStream/fileSaver.hpp>
+#include <openpose/filestream/fileSaver.hpp>
 
 namespace op
 {
