@@ -1,6 +1,5 @@
 #include <openpose/filestream/fileStream.hpp>
 #include <openpose/utilities/fileSystem.hpp>
-#include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/hand/handDetectorFromTxt.hpp>
  
 namespace op

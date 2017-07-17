@@ -6,8 +6,8 @@
 #include <sstream> // std::stringstream
 #include <string>
 #include <vector>
-#include <openpose/core/common.hpp>
-#include "enumClasses.hpp"
+#include <openpose/core/macros.hpp>
+#include <openpose/utilities/enumClasses.hpp>
 
 namespace op
 {

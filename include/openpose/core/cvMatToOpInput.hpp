@@ -2,9 +2,8 @@
 #define OPENPOSE_CORE_CV_MAT_TO_OP_INPUT_HPP
 
 #include <utility> // std::pair
-#include <vector>
 #include <opencv2/core/core.hpp> // cv::Mat
-#include "common.hpp"
+#include <openpose/core/common.hpp>
 
 namespace op
 {

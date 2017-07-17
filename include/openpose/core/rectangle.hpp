@@ -2,7 +2,7 @@
 #define OPENPOSE_CORE_RECTANGLE_HPP
 
 #include <string>
-#include "point.hpp"
+#include <openpose/core/point.hpp>
 
 namespace op
 {

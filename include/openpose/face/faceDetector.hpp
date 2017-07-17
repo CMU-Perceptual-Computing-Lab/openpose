@@ -1,11 +1,8 @@
 #ifndef OPENPOSE_FACE_FACE_DETECTOR_HPP
 #define OPENPOSE_FACE_FACE_DETECTOR_HPP
 
-#include <vector>
-#include <openpose/core/array.hpp>
-#include <openpose/core/rectangle.hpp>
+#include <openpose/core/common.hpp>
 #include <openpose/pose/enumClasses.hpp>
-#include <openpose/core/macros.hpp>
 
 namespace op
 {

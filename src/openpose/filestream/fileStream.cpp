@@ -1,6 +1,5 @@
 #include <fstream> // std::ifstream
 #include <opencv2/highgui/highgui.hpp> // cv::imread
-#include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/fileSystem.hpp>
 #include <openpose/utilities/string.hpp>

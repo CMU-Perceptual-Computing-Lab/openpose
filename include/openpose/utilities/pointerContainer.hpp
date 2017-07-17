@@ -1,8 +1,6 @@
 #ifndef OPENPOSE_UTILITIES_POINTER_CONTAINER_HPP
 #define OPENPOSE_UTILITIES_POINTER_CONTAINER_HPP
 
-#include <openpose/core/macros.hpp>
-
 namespace op
 {
     template<typename TPointerContainer>

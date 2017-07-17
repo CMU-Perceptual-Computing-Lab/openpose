@@ -1,5 +1,4 @@
 // #include <opencv2/imgproc/imgproc.hpp>
-#include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/core/resizeAndMergeBase.hpp>
 
 namespace op

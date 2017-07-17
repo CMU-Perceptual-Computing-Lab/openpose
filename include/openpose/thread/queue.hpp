@@ -2,8 +2,8 @@
 #define OPENPOSE_THREAD_QUEUE_HPP 
 
 #include <queue> // std::queue
-#include <openpose/core/macros.hpp>
-#include "queueBase.hpp"
+#include <openpose/core/common.hpp>
+#include <openpose/thread/queueBase.hpp>
 
 namespace op
 {
@@ -28,9 +28,6 @@ namespace op
 
 // Implementation
 #include <type_traits> // std::is_same
-#include <vector>
-#include <openpose/utilities/errorAndLog.hpp>
-#include <openpose/core/macros.hpp>
 namespace op
 {
     template<typename TDatums, typename TQueue>

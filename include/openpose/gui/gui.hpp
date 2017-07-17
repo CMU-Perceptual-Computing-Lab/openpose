@@ -2,14 +2,12 @@
 #define OPENPOSE_GUI_GUI_HPP
 
 #include <atomic>
-#include <memory> // std::shared_ptr
 #include <opencv2/core/core.hpp> // cv::Mat
-#include <openpose/core/point.hpp>
+#include <openpose/core/common.hpp>
+#include <openpose/gui/enumClasses.hpp>
+#include <openpose/gui/frameDisplayer.hpp>
 #include <openpose/pose/poseExtractor.hpp>
 #include <openpose/pose/poseRenderer.hpp>
-#include <openpose/core/macros.hpp>
-#include "enumClasses.hpp"
-#include "frameDisplayer.hpp"
 
 namespace op
 {

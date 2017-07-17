@@ -2,10 +2,8 @@
 #ifndef OPENPOSE_CORE_RESIZE_AND_MERGE_CAFFE_HPP
 #define OPENPOSE_CORE_RESIZE_AND_MERGE_CAFFE_HPP
 
-#include <array>
-#include <vector>
 #include <caffe/blob.hpp>
-#include "common.hpp"
+#include <openpose/core/common.hpp>
 
 namespace op
 {

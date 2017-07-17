@@ -1,8 +1,7 @@
 #ifndef OPENPOSE_FILESTREAM_DATA_SAVER_HPP
 #define OPENPOSE_FILESTREAM_DATA_SAVER_HPP
 
-#include <string>
-#include <openpose/core/macros.hpp>
+#include <openpose/core/common.hpp>
 #include <openpose/utilities/string.hpp>
 
 namespace op

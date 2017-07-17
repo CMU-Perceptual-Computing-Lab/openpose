@@ -1,14 +1,10 @@
 #ifndef OPENPOSE_UTILITIES_FLAGS_TO_OPEN_POSE_HPP
 #define OPENPOSE_UTILITIES_FLAGS_TO_OPEN_POSE_HPP
 
-#include <memory> // std::shared_ptr
-#include <string>
-#include <vector>
+#include <openpose/core/common.hpp>
 #include <openpose/core/enumClasses.hpp>
-#include <openpose/core/point.hpp>
 #include <openpose/pose/enumClasses.hpp>
 #include <openpose/producer/producer.hpp>
-#include <openpose/core/macros.hpp>
 
 namespace op
 {

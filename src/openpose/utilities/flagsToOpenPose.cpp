@@ -3,7 +3,6 @@
 #include <openpose/producer/videoReader.hpp>
 #include <openpose/producer/webcamReader.hpp>
 #include <openpose/utilities/check.hpp>
-#include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/utilities/flagsToOpenPose.hpp>
 
 namespace op

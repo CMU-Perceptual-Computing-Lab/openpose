@@ -1,11 +1,9 @@
 #ifndef OPENPOSE_GUI_FRAMES_DISPLAY_HPP
 #define OPENPOSE_GUI_FRAMES_DISPLAY_HPP
 
-#include <string>
 #include <opencv2/core/core.hpp> // cv::Mat
-#include <openpose/core/point.hpp>
-#include <openpose/core/macros.hpp>
-#include "enumClasses.hpp"
+#include <openpose/core/common.hpp>
+#include <openpose/gui/enumClasses.hpp>
 
 namespace op
 {

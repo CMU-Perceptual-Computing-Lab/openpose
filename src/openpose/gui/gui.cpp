@@ -3,7 +3,6 @@
 #include <opencv2/highgui/highgui.hpp> // cv::waitKey
 #include <openpose/filestream/fileStream.hpp>
 #include <openpose/utilities/check.hpp>
-#include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/gui/gui.hpp>
 
 namespace op

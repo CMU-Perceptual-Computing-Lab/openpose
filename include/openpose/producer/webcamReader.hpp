@@ -4,9 +4,8 @@
 #include <atomic>
 #include <mutex>
 #include <thread>
-#include <openpose/core/point.hpp>
-#include <openpose/core/macros.hpp>
-#include "videoCaptureReader.hpp"
+#include <openpose/core/common.hpp>
+#include <openpose/producer/videoCaptureReader.hpp>
 
 namespace op
 {

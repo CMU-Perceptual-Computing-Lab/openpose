@@ -2,10 +2,9 @@
 #define OPENPOSE_POSE_RENDER_POSE_HPP
 
 #include <opencv2/core/core.hpp> // cv::Mat
-#include <openpose/core/array.hpp>
-#include <openpose/core/point.hpp>
-#include "enumClasses.hpp"
-#include "poseParameters.hpp"
+#include <openpose/core/common.hpp>
+#include <openpose/pose/enumClasses.hpp>
+#include <openpose/pose/poseParameters.hpp>
 
 namespace op
 {

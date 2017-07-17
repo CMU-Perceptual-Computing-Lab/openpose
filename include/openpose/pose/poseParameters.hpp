@@ -1,11 +1,9 @@
 #ifndef OPENPOSE_POSE_POSE_PARAMETERS_HPP
 #define OPENPOSE_POSE_POSE_PARAMETERS_HPP
 
-#include <array>
 #include <map>
-#include <vector>
-#include <openpose/core/macros.hpp>
-#include "enumClasses.hpp"
+#include <openpose/core/common.hpp>
+#include <openpose/pose/enumClasses.hpp>
 
 namespace op
 {

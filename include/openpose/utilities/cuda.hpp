@@ -1,12 +1,10 @@
 #ifndef OPENPOSE_UTILITIES_CUDA_HPP
 #define OPENPOSE_UTILITIES_CUDA_HPP
 
-#include <string>
 #include <utility> // std::pair
 #include <cuda.h>
 #include <cuda_runtime.h>
-#include <openpose/core/point.hpp>
-#include <openpose/core/macros.hpp>
+#include <openpose/core/common.hpp>
 
 namespace op
 {

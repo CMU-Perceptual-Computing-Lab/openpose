@@ -1,14 +1,12 @@
 #ifndef OPENPOSE_POSE_POSE_RENDERER_HPP
 #define OPENPOSE_POSE_POSE_RENDERER_HPP
 
-#include <memory> // std::shared_ptr
-#include <openpose/core/array.hpp>
+#include <openpose/core/common.hpp>
 #include <openpose/core/enumClasses.hpp>
-#include <openpose/core/point.hpp>
 #include <openpose/core/renderer.hpp>
-#include <openpose/core/macros.hpp>
-#include "poseExtractor.hpp"
-#include "poseParameters.hpp"
+#include <openpose/pose/enumClasses.hpp>
+#include <openpose/pose/poseExtractor.hpp>
+#include <openpose/pose/poseParameters.hpp>
 
 namespace op
 {

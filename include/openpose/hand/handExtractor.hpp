@@ -1,18 +1,13 @@
 #ifndef OPENPOSE_HAND_HAND_EXTRACTOR_HPP
 #define OPENPOSE_HAND_HAND_EXTRACTOR_HPP
 
-#include <array>
 #include <atomic>
-#include <memory> // std::shared_ptr
 #include <thread>
 #include <opencv2/core/core.hpp> // cv::Mat
-#include <openpose/core/array.hpp>
-#include <openpose/core/point.hpp>
+#include <openpose/core/common.hpp>
 #include <openpose/core/maximumCaffe.hpp>
 #include <openpose/core/net.hpp>
-#include <openpose/core/rectangle.hpp>
 #include <openpose/core/resizeAndMergeCaffe.hpp>
-#include <openpose/core/macros.hpp>
 
 namespace op
 {

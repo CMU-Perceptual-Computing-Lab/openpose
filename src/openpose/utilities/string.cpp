@@ -1,4 +1,3 @@
-#include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/utilities/string.hpp>
 
 namespace op

@@ -1,5 +1,4 @@
 #include <openpose/filestream/fileStream.hpp>
-#include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/fileSystem.hpp>
 #include <openpose/producer/imageDirectoryReader.hpp>

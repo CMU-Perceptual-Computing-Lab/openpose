@@ -1,10 +1,8 @@
 #ifndef OPENPOSE_FACE_RENDER_FACE_HPP
 #define OPENPOSE_FACE_RENDER_FACE_HPP
 
-#include <openpose/core/array.hpp>
-#include <openpose/core/point.hpp>
-#include <openpose/core/macros.hpp>
-#include "faceParameters.hpp"
+#include <openpose/core/common.hpp>
+#include <openpose/face/faceParameters.hpp>
 
 namespace op
 {

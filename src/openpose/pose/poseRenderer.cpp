@@ -5,7 +5,6 @@
 #include <openpose/pose/poseParameters.hpp>
 #include <openpose/pose/renderPose.hpp>
 #include <openpose/utilities/cuda.hpp>
-#include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/pose/poseRenderer.hpp>
 
 namespace op

@@ -1,11 +1,8 @@
 #ifndef OPENPOSE_PRODUCER_IMAGE_DIRECTORY_READER_HPP
 #define OPENPOSE_PRODUCER_IMAGE_DIRECTORY_READER_HPP
 
-#include <string>
-#include <vector>
-#include <openpose/core/point.hpp>
-#include <openpose/core/macros.hpp>
-#include "producer.hpp"
+#include <openpose/core/common.hpp>
+#include <openpose/producer/producer.hpp>
 
 namespace op
 {

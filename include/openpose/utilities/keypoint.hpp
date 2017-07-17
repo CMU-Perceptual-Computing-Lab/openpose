@@ -1,10 +1,7 @@
 #ifndef OPENPOSE_UTILITIES_KEYPOINT_HPP
 #define OPENPOSE_UTILITIES_KEYPOINT_HPP
 
-#include <vector>
-#include <openpose/core/array.hpp>
-#include <openpose/core/rectangle.hpp>
-#include <openpose/core/macros.hpp>
+#include <openpose/core/common.hpp>
 
 namespace op
 {

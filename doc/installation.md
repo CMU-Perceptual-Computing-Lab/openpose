@@ -5,9 +5,10 @@ OpenPose Library - Compilation and Installation
 1. [Requirements](#requirements)
 2. [Ubuntu](#ubuntu)
 3. [Windows](#windows)
-4. [Quick Start](#quick-start)
-5. [Expected Visual Results](#expected-visual-results)
-6. [FAQ](#faq)
+4. [OpenPose 3D Demo](#openpose-3d-demo)
+5. [Quick Start](#quick-start)
+6. [Expected Visual Results](#expected-visual-results)
+7. [FAQ](#faq)
 
 
 
@@ -124,6 +125,16 @@ You just need to remove the OpenPose folder, by default called `openpose/`. E.g.
 
 ### Uninstallation
 You just need to remove the OpenPose or portable demo folder.
+
+
+
+
+
+## OpenPose 3D Demo
+This is a beta version that makes body pose 3-D reconstruction and rendering. We will not keep updating it nor solving questions/issues about it at the moment. It requires the user to be familiar with camera calibration, i.e. extraction of intrinsic and extrinsic parameters. The Windows steps were tested and worked in the OpenPose 1.0.1 version from the first GitHub commit on July 17th, 2017 in the [oficial repository](https://github.com/CMU-Perceptual-Computing-Lab/openpose).
+
+If you still wanna try our OpenPose 3-D reconstruction demo, see [doc/openpose_3d_reconstruction_demo.md](./openpose_3d_reconstruction_demo.md). 
+
 
 
 

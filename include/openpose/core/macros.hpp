@@ -1,5 +1,5 @@
-#ifndef OPENPOSE_UTILITIES_MACROS_HPP
-#define OPENPOSE_UTILITIES_MACROS_HPP
+#ifndef OPENPOSE_CORE_MACROS_HPP
+#define OPENPOSE_CORE_MACROS_HPP
 
 #ifndef _WIN32
     #define OP_API
@@ -7,6 +7,12 @@
     #define OP_API __declspec(dllexport)
 #else
     #define OP_API __declspec(dllimport)
+#endif
+
+//Disable some Windows Warnings
+#ifdef _WIN32
+    #pragma warning ( disable : 4251 ) // XXX needs to have dll-interface to be used by clients of class YYY
+    #pragma warning( disable: 4275 ) // non dll-interface structXXX used as base
 #endif
 
 #define DATUM_BASE_NO_PTR std::vector<Datum>
@@ -47,6 +53,5 @@
 #include <openpose/core/datum.hpp>
 #include <openpose/core/point.hpp>
 #include <openpose/core/rectangle.hpp>
-#include <openpose/core/macros.hpp>
 
-#endif // OPENPOSE_UTILITIES_MACROS_HPP
+#endif // OPENPOSE_CORE_MACROS_HPP

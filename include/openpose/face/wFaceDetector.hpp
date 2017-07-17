@@ -1,9 +1,9 @@
 #ifndef OPENPOSE_FACE_W_FACE_EXTRACTOR_HPP
 #define OPENPOSE_FACE_W_FACE_EXTRACTOR_HPP
 
-#include <memory> // std::shared_ptr
+#include <openpose/core/common.hpp>
+#include <openpose/face/faceRenderer.hpp>
 #include <openpose/thread/worker.hpp>
-#include "faceRenderer.hpp"
 
 namespace op
 {
@@ -29,10 +29,7 @@ namespace op
 
 
 // Implementation
-#include <openpose/utilities/errorAndLog.hpp>
-#include <openpose/core/macros.hpp>
 #include <openpose/utilities/pointerContainer.hpp>
-#include <openpose/utilities/profiler.hpp>
 namespace op
 {
     template<typename TDatums>

@@ -1,9 +1,8 @@
 #ifndef OPENPOSE_CORE_KEYPOINT_SCALER_HPP
 #define OPENPOSE_CORE_KEYPOINT_SCALER_HPP
 
-#include <vector>
-#include "common.hpp"
-#include "enumClasses.hpp"
+#include <openpose/core/common.hpp>
+#include <openpose/core/enumClasses.hpp>
 
 namespace op
 {

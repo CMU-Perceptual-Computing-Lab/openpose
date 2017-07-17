@@ -1,14 +1,11 @@
 #ifndef OPENPOSE_HAND_HAND_RENDERER_HPP
 #define OPENPOSE_HAND_HAND_RENDERER_HPP
 
-#include <array>
-#include <openpose/core/array.hpp>
+#include <openpose/core/common.hpp>
 #include <openpose/core/enumClasses.hpp>
-#include <openpose/core/point.hpp>
 #include <openpose/core/renderer.hpp>
+#include <openpose/hand/handParameters.hpp>
 #include <openpose/thread/worker.hpp>
-#include <openpose/core/macros.hpp>
-#include "handParameters.hpp"
 
 namespace op
 {

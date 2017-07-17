@@ -3,7 +3,6 @@
 #include <openpose/pose/poseParameters.hpp>
 #include <openpose/utilities/check.hpp>
 #include <openpose/utilities/cuda.hpp>
-#include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/openCv.hpp>
 #include <openpose/pose/poseExtractorCaffe.hpp>

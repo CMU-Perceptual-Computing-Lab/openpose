@@ -1,14 +1,9 @@
 #ifndef OPENPOSE_HAND_HAND_DETECTOR_HPP
 #define OPENPOSE_HAND_HAND_DETECTOR_HPP
 
-#include <array>
 #include <mutex>
-#include <vector>
-#include <openpose/core/array.hpp>
-#include <openpose/core/point.hpp>
-#include <openpose/core/rectangle.hpp>
+#include <openpose/core/common.hpp>
 #include <openpose/pose/enumClasses.hpp>
-#include <openpose/core/macros.hpp>
 
 namespace op
 {

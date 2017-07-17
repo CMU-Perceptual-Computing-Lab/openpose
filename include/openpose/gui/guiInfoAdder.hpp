@@ -3,9 +3,7 @@
 
 #include <queue>
 #include <opencv2/core/core.hpp> // cv::Mat
-#include <openpose/core/array.hpp>
-#include <openpose/core/point.hpp>
-#include <openpose/core/macros.hpp>
+#include <openpose/core/common.hpp>
 
 namespace op
 {

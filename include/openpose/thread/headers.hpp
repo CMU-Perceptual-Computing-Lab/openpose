@@ -2,21 +2,21 @@
 #define OPENPOSE_THREAD_HEADERS_HPP
 
 // thread module
-#include "enumClasses.hpp"
-#include "priorityQueue.hpp"
-#include "queue.hpp"
-#include "queueBase.hpp"
-#include "subThread.hpp"
-#include "subThreadNoQueue.hpp"
-#include "subThreadQueueIn.hpp"
-#include "subThreadQueueInOut.hpp"
-#include "subThreadQueueOut.hpp"
-#include "thread.hpp"
-#include "threadManager.hpp"
-#include "worker.hpp"
-#include "workerProducer.hpp"
-#include "workerConsumer.hpp"
-#include "wIdGenerator.hpp"
-#include "wQueueOrderer.hpp"
+#include <openpose/thread/enumClasses.hpp>
+#include <openpose/thread/priorityQueue.hpp>
+#include <openpose/thread/queue.hpp>
+#include <openpose/thread/queueBase.hpp>
+#include <openpose/thread/subThread.hpp>
+#include <openpose/thread/subThreadNoQueue.hpp>
+#include <openpose/thread/subThreadQueueIn.hpp>
+#include <openpose/thread/subThreadQueueInOut.hpp>
+#include <openpose/thread/subThreadQueueOut.hpp>
+#include <openpose/thread/thread.hpp>
+#include <openpose/thread/threadManager.hpp>
+#include <openpose/thread/worker.hpp>
+#include <openpose/thread/workerProducer.hpp>
+#include <openpose/thread/workerConsumer.hpp>
+#include <openpose/thread/wIdGenerator.hpp>
+#include <openpose/thread/wQueueOrderer.hpp>
 
 #endif // OPENPOSE_THREAD_HEADERS_HPP

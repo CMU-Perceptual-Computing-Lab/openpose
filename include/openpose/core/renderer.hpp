@@ -3,8 +3,7 @@
 
 #include <atomic>
 #include <tuple>
-#include <memory> // std::shared_ptr
-#include "common.hpp"
+#include <openpose/core/common.hpp>
 
 namespace op
 {

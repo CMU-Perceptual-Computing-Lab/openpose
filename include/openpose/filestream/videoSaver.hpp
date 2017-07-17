@@ -1,10 +1,9 @@
 #ifndef OPENPOSE_FILESTREAM_VIDEO_SAVER_HPP
 #define OPENPOSE_FILESTREAM_VIDEO_SAVER_HPP
 
-#include <vector>
 #include <opencv2/core/core.hpp> // cv::Mat
 #include <opencv2/highgui/highgui.hpp> // cv::VideoWriter
-#include <openpose/core/macros.hpp>
+#include <openpose/core/common.hpp>
 
 namespace op
 {

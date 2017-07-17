@@ -1,7 +1,7 @@
 #ifndef OPENPOSE_CORE_NET_HPP
 #define OPENPOSE_CORE_NET_HPP
 
-#include "common.hpp"
+#include <openpose/core/common.hpp>
 
 namespace op
 {

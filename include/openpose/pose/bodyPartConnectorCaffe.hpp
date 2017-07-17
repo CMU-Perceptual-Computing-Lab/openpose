@@ -2,12 +2,9 @@
 #ifndef OPENPOSE_POSE_BODY_PART_CONNECTOR_CAFFE_HPP
 #define OPENPOSE_POSE_BODY_PART_CONNECTOR_CAFFE_HPP
 
-#include <array>
 #include <caffe/blob.hpp>
-#include <openpose/core/array.hpp>
-#include <openpose/core/point.hpp>
-#include <openpose/core/macros.hpp>
-#include "enumClasses.hpp"
+#include <openpose/core/common.hpp>
+#include <openpose/pose/enumClasses.hpp>
 
 namespace op
 {

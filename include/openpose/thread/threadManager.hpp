@@ -2,15 +2,13 @@
 #define OPENPOSE_THREAD_THREAD_MANAGER_HPP
 
 #include <atomic>
-#include <memory> // std::unique_ptr<> & std::shared_ptr<>
 #include <set> // std::multiset
 #include <tuple>
-#include <vector>
-#include <openpose/core/macros.hpp>
-#include "enumClasses.hpp"
-#include "queue.hpp"
-#include "thread.hpp"
-#include "worker.hpp"
+#include <openpose/core/common.hpp>
+#include <openpose/thread/enumClasses.hpp>
+#include <openpose/thread/queue.hpp>
+#include <openpose/thread/thread.hpp>
+#include <openpose/thread/worker.hpp>
 
 namespace op
 {
@@ -85,13 +83,12 @@ namespace op
 
 // Implementation
 #include <utility> // std::pair
-#include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/utilities/fastMath.hpp>
-#include "subThread.hpp"
-#include "subThreadNoQueue.hpp"
-#include "subThreadQueueIn.hpp"
-#include "subThreadQueueInOut.hpp"
-#include "subThreadQueueOut.hpp"
+#include <openpose/thread/subThread.hpp>
+#include <openpose/thread/subThreadNoQueue.hpp>
+#include <openpose/thread/subThreadQueueIn.hpp>
+#include <openpose/thread/subThreadQueueInOut.hpp>
+#include <openpose/thread/subThreadQueueOut.hpp>
 namespace op
 {
     template<typename TDatums, typename TWorker, typename TQueue>

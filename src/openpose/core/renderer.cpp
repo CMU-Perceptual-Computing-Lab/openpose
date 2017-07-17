@@ -2,7 +2,6 @@
     #include <cuda.h>
     #include <cuda_runtime_api.h>
 #endif
-#include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/core/renderer.hpp>
 
 namespace op

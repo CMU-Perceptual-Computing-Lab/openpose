@@ -2,7 +2,7 @@
 #define OPENPOSE_CORE_OP_OUTPUT_TO_CV_MAT_HPP
 
 #include <opencv2/core/core.hpp> // cv::Mat
-#include "common.hpp"
+#include <openpose/core/common.hpp>
 
 namespace op
 {

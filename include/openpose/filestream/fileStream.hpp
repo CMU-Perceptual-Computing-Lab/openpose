@@ -1,15 +1,10 @@
 #ifndef OPENPOSE_FILESTREAM_FILE_STREAM_HPP
 #define OPENPOSE_FILESTREAM_FILE_STREAM_HPP
 
-#include <array>
-#include <string>
-#include <vector>
 #include <opencv2/core/core.hpp> // cv::Mat
 #include <opencv2/highgui/highgui.hpp> // CV_LOAD_IMAGE_ANYDEPTH, CV_IMWRITE_PNG_COMPRESSION
-#include <openpose/core/array.hpp>
-#include <openpose/core/rectangle.hpp>
-#include <openpose/core/macros.hpp>
-#include "enumClasses.hpp"
+#include <openpose/core/common.hpp>
+#include <openpose/filestream/enumClasses.hpp>
 
 namespace op
 {

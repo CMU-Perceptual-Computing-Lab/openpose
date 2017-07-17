@@ -2,9 +2,9 @@
 #define OPENPOSE_PRODUCER_W_DATUM_PRODUCER_HPP
 
 #include <limits> // std::numeric_limits
-#include <memory> // std::shared_ptr
+#include <openpose/core/common.hpp>
+#include <openpose/producer/datumProducer.hpp>
 #include <openpose/thread/workerProducer.hpp>
-#include "datumProducer.hpp"
 
 namespace op
 {
@@ -30,10 +30,6 @@ namespace op
 
 
 // Implementation
-#include <vector>
-#include <openpose/utilities/errorAndLog.hpp>
-#include <openpose/core/macros.hpp>
-#include <openpose/utilities/profiler.hpp>
 #include <openpose/core/datum.hpp>
 namespace op
 {

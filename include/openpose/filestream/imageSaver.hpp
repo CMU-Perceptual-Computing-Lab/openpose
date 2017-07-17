@@ -1,11 +1,9 @@
 #ifndef OPENPOSE_FILESTREAM_IMAGE_SAVER_HPP
 #define OPENPOSE_FILESTREAM_IMAGE_SAVER_HPP
 
-#include <string>
-#include <vector>
 #include <opencv2/core/core.hpp> // cv::Mat
-#include <openpose/core/macros.hpp>
-#include "fileSaver.hpp"
+#include <openpose/core/common.hpp>
+#include <openpose/filestream/fileSaver.hpp>
 
 namespace op
 {

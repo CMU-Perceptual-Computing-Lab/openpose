@@ -1,11 +1,8 @@
 #ifndef OPENPOSE_HAND_GPU_HAND_RENDER_HPP
 #define OPENPOSE_HAND_GPU_HAND_RENDER_HPP
 
-#include <array>
-#include <openpose/core/array.hpp>
-#include <openpose/core/point.hpp>
-#include <openpose/core/macros.hpp>
-#include "handParameters.hpp"
+#include <openpose/core/common.hpp>
+#include <openpose/hand/handParameters.hpp>
 
 namespace op
 {

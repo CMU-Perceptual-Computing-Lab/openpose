@@ -1,7 +1,6 @@
 #include <thrust/device_ptr.h>
 #include <thrust/extrema.h>
 #include <openpose/utilities/cuda.hpp>
-#include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/utilities/cuda.hpp>
 #include <openpose/core/maximumBase.hpp>
 
