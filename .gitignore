@@ -71,6 +71,8 @@ MANIFEST-*
 3rdparty/windows/caffe/
 3rdparty/windows/caffe3rdparty/
 3rdparty/windows/opencv/
+3rdparty/windows/freeglut/
+3rdparty/windows/spinnaker/
 # Allowing this file (removed *.user for Qt)
 !*.vcxproj.user
 

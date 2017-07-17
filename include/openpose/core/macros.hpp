@@ -9,6 +9,12 @@
     #define OP_API __declspec(dllimport)
 #endif
 
+//Disable some Windows Warnings
+#ifdef _WIN32
+    #pragma warning ( disable : 4251 ) // XXX needs to have dll-interface to be used by clients of class YYY
+    #pragma warning( disable: 4275 ) // non dll-interface structXXX used as base
+#endif
+
 #define DATUM_BASE_NO_PTR std::vector<Datum>
 #define DATUM_BASE std::shared_ptr<DATUM_BASE_NO_PTR>
 #define DEFINE_TEMPLATE_DATUM(templateName) template class OP_API templateName<DATUM_BASE>
