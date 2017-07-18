@@ -146,6 +146,7 @@ target_link_libraries(${target}
     ${META_PROJECT_NAME}::pose
     ${META_PROJECT_NAME}::producer
     ${META_PROJECT_NAME}::thread
+    ${META_PROJECT_NAME}::utilities
     INTERFACE
 )
 

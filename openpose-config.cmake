@@ -7,15 +7,15 @@
 
 # List of modules
 set(MODULE_NAMES
+    filestream
+    producer
+    utilities
     core
     face
-    filestream
     gui
     hand
     pose
-    producer
     thread
-    utilities
     wrapper
 )
 
