@@ -11,18 +11,18 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\openpose3d.cpp" />
-    <ClCompile Include="src\pointGrey.cpp" />
-    <ClCompile Include="src\reconstruction3D.cpp" />
-    <ClCompile Include="src\renderer.cpp" />
+    <ClCompile Include="..\..\examples_beta\openpose3d\openpose3d.cpp" />
+    <ClCompile Include="..\..\examples_beta\openpose3d\src\pointGrey.cpp" />
+    <ClCompile Include="..\..\examples_beta\openpose3d\src\reconstruction3D.cpp" />
+    <ClCompile Include="..\..\examples_beta\openpose3d\src\renderer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\openpose3d\cameraParameters.hpp" />
-    <ClInclude Include="include\openpose3d\datum3D.hpp" />
-    <ClInclude Include="include\openpose3d\headers.hpp" />
-    <ClInclude Include="include\openpose3d\pointGrey.hpp" />
-    <ClInclude Include="include\openpose3d\reconstruction3D.hpp" />
-    <ClInclude Include="include\openpose3d\renderer.hpp" />
+    <ClInclude Include="..\..\examples_beta\openpose3d\include\openpose3d\cameraParameters.hpp" />
+    <ClInclude Include="..\..\examples_beta\openpose3d\include\openpose3d\datum3D.hpp" />
+    <ClInclude Include="..\..\examples_beta\openpose3d\include\openpose3d\headers.hpp" />
+    <ClInclude Include="..\..\examples_beta\openpose3d\include\openpose3d\pointGrey.hpp" />
+    <ClInclude Include="..\..\examples_beta\openpose3d\include\openpose3d\reconstruction3D.hpp" />
+    <ClInclude Include="..\..\examples_beta\openpose3d\include\openpose3d\renderer.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F31BEEF2-37B0-4B0F-85D3-AD427C56AD72}</ProjectGuid>
@@ -83,7 +83,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\..\include;..\..\3rdparty\windows\opencv\include;..\..\3rdparty\windows\caffe\include;..\..\3rdparty\windows\caffe\include2;..\..\3rdparty\windows\caffe3rdparty\include;..\..\3rdparty\windows\caffe3rdparty\include\boost-1_61;$(CUDA_PATH_V8_0)\include;include;..\..\3rdparty\windows\freeglut\include;..\..\3rdparty\windows\spinnaker\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\include;..\..\3rdparty\windows\opencv\include;..\..\3rdparty\windows\caffe\include;..\..\3rdparty\windows\caffe\include2;..\..\3rdparty\windows\caffe3rdparty\include;..\..\3rdparty\windows\caffe3rdparty\include\boost-1_61;$(CUDA_PATH_V8_0)\include;..\..\examples_beta\openpose3d\include;..\..\3rdparty\windows\freeglut\include;..\..\3rdparty\windows\spinnaker\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;CAFFE_VERSION=1.0.0;CMAKE_WINDOWS_BUILD;GLOG_NO_ABBREVIATED_SEVERITIES;GOOGLE_GLOG_DLL_DECL=__declspec(dllimport);GOOGLE_GLOG_DLL_DECL_FOR_UNITTESTS=__declspec(dllimport);H5_BUILT_AS_DYNAMIC_LIB=1;USE_CAFFE;USE_CUDNN;USE_OPENCV;USE_LEVELDB;USE_LMDB;CMAKE_INTDIR="Release";NDEBUG</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)\obj\relDir\relDir\%(RelativeDir)\%(Filename)%(Extension).obj</ObjectFileName>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>

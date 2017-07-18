@@ -70,7 +70,7 @@ We did not create an Ubuntu version. We did an very first version for Ubuntu 16 
 4. Copy the `include` and `lib` folders from {OpenPose path}/3rdparty/caffe/distribute/ into your custom `3rdparty/caffe/`.
 5. Copy your Spinnaker desired version `include` and `lib` folders in your custom `3rdparty/spinnaker/`.
 7. From the Spinnaker `bin` folder, copy all the *.xml files to the generated build folder of your project.
-8. Get the required files from the `include` and `src` folders placed in `{OpenPose path}/windows/OpenPose3DReconstruction/`. Check the Windows VS solution for more details.
+8. Get the required files from `{OpenPose path}/examples_beta/openpose3d/`. Check the Windows VS solution for more details.
 9. Create a proper Makefile or CMake file to run it. The following code is part of an old QMake (Qt) file generated for the old version, you can ideally get all the flags and includes from it:
 ```
 DEFINES += USE_CAFFE USE_CUDNN
