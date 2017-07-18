@@ -10,7 +10,7 @@ namespace op
     const auto HAND_NUMBER_PARTS = 21u;
     #define HAND_PAIRS_RENDER_GPU {0,1,  1,2,  2,3,  3,4,  0,5,  5,6,  6,7,  7,8,  0,9,  9,10,  10,11,  11,12,  0,13,  13,14,  14,15,  15,16,  0,17,  17,18,  18,19,  19,20}
     const std::vector<unsigned int> HAND_PAIRS_RENDER {HAND_PAIRS_RENDER_GPU};
-    #define HAND_COLORS_RENDER \
+    #define HAND_COLORS_RENDER_GPU \
         100.f,  100.f,  100.f, \
         100.f,    0.f,    0.f, \
         150.f,    0.f,    0.f, \
@@ -32,6 +32,8 @@ namespace op
         150.f,    0.f,  150.f, \
         200.f,    0.f,  200.f, \
         255.f,    0.f,  255.f
+    const std::vector<float> HAND_COLORS_RENDER{HAND_COLORS_RENDER_GPU};
+
 
     // Constant parameters
     const auto HAND_CCN_DECREASE_FACTOR = 8.f;

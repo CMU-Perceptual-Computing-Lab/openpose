@@ -7,7 +7,7 @@
 namespace op
 {
     __constant__ const unsigned int PART_PAIRS_GPU[] = HAND_PAIRS_RENDER_GPU;
-    __constant__ const float COLORS[] = {HAND_COLORS_RENDER};
+    __constant__ const float COLORS[] = {HAND_COLORS_RENDER_GPU};
 
 
 

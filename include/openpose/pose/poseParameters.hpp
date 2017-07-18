@@ -40,7 +40,7 @@ namespace op
     #define POSE_COCO_PAIRS_RENDER_GPU                      {1,2,   1,5,   2,3,   3,4,   5,6,   6,7,   1,8,   8,9,   9,10,  1,11,  11,12, 12,13,  1,0,   0,14, 14,16,  0,15, 15,17}
     const std::vector<unsigned int> POSE_COCO_PAIRS_RENDER  {POSE_COCO_PAIRS_RENDER_GPU};
     const std::vector<unsigned int> POSE_COCO_PAIRS         {1,2,   1,5,   2,3,   3,4,   5,6,   6,7,   1,8,   8,9,   9,10,  1,11,  11,12, 12,13,  1,0,   0,14, 14,16,  0,15, 15,17,   2,16,  5,17};
-    #define POSE_COCO_COLORS_RENDER \
+    #define POSE_COCO_COLORS_RENDER_GPU \
         255.f,     0.f,    85.f, \
         255.f,     0.f,     0.f, \
         255.f,    85.f,     0.f, \
@@ -59,6 +59,7 @@ namespace op
         170.f,     0.f,   255.f, \
         255.f,     0.f,   255.f, \
          85.f,     0.f,   255.f
+    const std::vector<float> POSE_COCO_COLORS_RENDER{POSE_COCO_COLORS_RENDER_GPU};
     // MPI
     const std::map<unsigned int, std::string> POSE_MPI_BODY_PARTS{
         {0,  "Head"},
@@ -83,7 +84,7 @@ namespace op
     #define POSE_MPI_PAIRS_RENDER_GPU                   { 0,1,   1,2,   2,3,   3,4,   1,5,   5,6,   6,7,   1,14,  14,8,  8,9,  9,10,  14,11, 11,12, 12,13}
     const std::vector<unsigned int> POSE_MPI_PAIRS      POSE_MPI_PAIRS_RENDER_GPU;
     // MPI colors chosen such that they are closed to COCO colors
-    #define POSE_MPI_COLORS_RENDER \
+    #define POSE_MPI_COLORS_RENDER_GPU \
         255.f,     0.f,    85.f, \
         255.f,     0.f,     0.f, \
         255.f,    85.f,     0.f, \
@@ -99,6 +100,7 @@ namespace op
           0.f,   170.f,   255.f, \
           0.f,    85.f,   255.f, \
           0.f,     0.f,   255.f
+    const std::vector<float> POSE_MPI_COLORS_RENDER{POSE_MPI_COLORS_RENDER_GPU};
     // BODY_22 (experimental, do not use)
     const std::map<unsigned int, std::string> POSE_BODY_22_BODY_PARTS {
         {0,  "Nose"},
@@ -130,7 +132,7 @@ namespace op
     #define POSE_BODY_22_PAIRS_RENDER_GPU                      {1,2,   1,5,   2,3,   3,4,   5,6,   6,7,   1,8,   8,9,   9,10,  1,11,  11,12}
     const std::vector<unsigned int> POSE_BODY_22_PAIRS_RENDER  {POSE_BODY_22_PAIRS_RENDER_GPU};
     const std::vector<unsigned int> POSE_BODY_22_PAIRS         {1,2,   1,5,   2,3,   3,4,   5,6,   6,7,   1,8,   8,9,   9,10,  1,11,  11,12, 12,13,  1,0};
-    #define POSE_BODY_22_COLORS_RENDER \
+    #define POSE_BODY_22_COLORS_RENDER_GPU \
         255.f,     0.f,     0.f, \
         255.f,    85.f,     0.f, \
         255.f,   170.f,     0.f, \
@@ -149,6 +151,7 @@ namespace op
         255.f,     0.f,   255.f, \
         255.f,     0.f,   170.f, \
         255.f,     0.f,    85.f
+    const std::vector<float> POSE_BODY_22_COLORS_RENDER{POSE_BODY_22_COLORS_RENDER_GPU};
 
     // Constant Array Parameters
     const std::array<float, (int)PoseModel::Size> POSE_CCN_DECREASE_FACTOR{
@@ -168,6 +171,9 @@ namespace op
     };
     const std::array<std::vector<unsigned int>, (int)PoseModel::Size> POSE_MAP_IDX{
         POSE_COCO_MAP_IDX,      POSE_MPI_MAP_IDX,       POSE_MPI_MAP_IDX,       POSE_BODY_22_MAP_IDX
+    };
+    const std::array<std::vector<float>, (int)PoseModel::Size> POSE_COLORS{
+        POSE_COCO_COLORS_RENDER,POSE_MPI_COLORS_RENDER, POSE_MPI_COLORS_RENDER, POSE_BODY_22_COLORS_RENDER
     };
     const std::array<std::string, (int)PoseModel::Size> POSE_PROTOTXT{
         "pose/coco/pose_deploy_linevec.prototxt",

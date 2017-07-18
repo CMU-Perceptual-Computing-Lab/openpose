@@ -131,10 +131,7 @@ You just need to remove the OpenPose or portable demo folder.
 
 
 ## OpenPose 3D Demo
-This is a beta version that makes body pose 3-D reconstruction and rendering. We will not keep updating it nor solving questions/issues about it at the moment. It requires the user to be familiar with camera calibration, i.e. extraction of intrinsic and extrinsic parameters. The Windows steps were tested and worked in the OpenPose 1.0.1 version from the first GitHub commit on July 17th, 2017 in the [oficial repository](https://github.com/CMU-Perceptual-Computing-Lab/openpose).
-
-If you still wanna try our OpenPose 3-D reconstruction demo, see [doc/openpose_3d_reconstruction_demo.md](./openpose_3d_reconstruction_demo.md). 
-
+If you want to try our OpenPose 3-D reconstruction demo, see [doc/openpose_3d_reconstruction_demo.md](./openpose_3d_reconstruction_demo.md).
 
 
 
@@ -201,6 +198,23 @@ bin\OpenPoseDemo.exe --image_dir examples\media\ --face --hand
 windows\x64\Release\OpenPoseDemo.exe --image_dir examples\media\
 :: With face and hands
 windows\x64\Release\OpenPoseDemo.exe --image_dir examples\media\ --face --hand
+```
+
+
+
+**4. Maximum Accuracy Configuration**
+
+This command provides the most accurate results we have been able to achieve for body, hand and face keypoint detection. However, this command will need around 8 GB of GPU memory and runs around 1 FPS on a Titan X.
+```
+# Ubuntu
+./build/examples/openpose/openpose.bin --net_resolution "1312x736" --scale_number 4 --scale_gap 0.25 --hand --hand_scale_number 6 --hand_scale_range 0.4 --face
+```
+```
+:: Windows - Demo
+bin\OpenPoseDemo.exe --net_resolution "1312x736" --scale_number 4 --scale_gap 0.25 --hand --hand_scale_number 6 --hand_scale_range 0.4 --face
+```
+:: Windows - Library
+windows\x64\Release\OpenPoseDemo.exe --net_resolution "1312x736" --scale_number 4 --scale_gap 0.25 --hand --hand_scale_number 6 --hand_scale_range 0.4 --face
 ```
 
 

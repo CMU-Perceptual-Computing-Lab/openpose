@@ -49,8 +49,8 @@ The pose estimation work is based on the C++ code from [the ECCV 2016 demo](http
 
 ## Operating Systems
 1. **Ubuntu** 14 and 16.
-2. **Windows** 10.
-3. Other people have been able to install it on **Windows 7 and 8**, **Mac**, **CentOS**, and **Nvidia Jetson (TK1 and TX1)** embedded systems. However, we do not officially support them at the moment.
+2. **Windows** 8 and 10.
+3. OpenPose has also been used on **Windows 7**, **Mac**, **CentOS**, and **Nvidia Jetson (TK1 and TX1)** embedded systems. However, we do not officially support them at the moment.
 
 
 

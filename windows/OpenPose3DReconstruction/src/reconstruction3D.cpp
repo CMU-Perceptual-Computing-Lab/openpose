@@ -54,61 +54,79 @@ double triangulateWithOptimization(cv::Mat& X, const std::vector<cv::Mat>& matri
 
 void reconstructArray(op::Array<float>& keypoints3D, const std::vector<op::Array<float>>& keypointsVector)
 {
-	const auto& keypoints0 = keypointsVector.at(0);
-	const auto& keypoints1 = keypointsVector.at(1);
-	const auto& keypoints2 = keypointsVector.at(2);
-	if (keypoints0.getSize(0) > 0 && keypoints1.getSize(0) > 0 && keypoints2.getSize(0) > 0)
-	{
-		// Count #correspondences
-		const auto threshold = 0.1f;
-		const auto numberBodyParts = keypoints0.getSize(1);
-		std::vector<int> indexesUsed;
-		std::vector<std::vector<cv::Point2d>> xyPoints;
-		for (auto part = 0; part < numberBodyParts; part++)
-		{
-			if (keypoints0[{0, part, 2}] > threshold && keypoints1[{0, part, 2}] > threshold && keypoints2[{0, part, 2}] > threshold)
-			{
-				indexesUsed.emplace_back(part);
-				xyPoints.emplace_back(std::vector<cv::Point2d>{
-					cv::Point2d{ keypoints0[{0, part, 0}], keypoints0[{0, part, 1}] },
-						cv::Point2d{ keypoints1[{0, part, 0}], keypoints1[{0, part, 1}] },
-						cv::Point2d{ keypoints2[{0, part, 0}], keypoints2[{0, part, 1}] }
-				});
-			}
-		}
-		if (!xyPoints.empty())
-		{
-			// Do 3D reconstruction
-			std::vector<cv::Point3f> xyzPoints(xyPoints.size());
-			for (auto i = 0u; i < xyPoints.size(); i++)
-			{
-				cv::Mat X;
-				triangulateWithOptimization(X, M_EACH_CAMERA, xyPoints[i]);
-				xyzPoints[i] = cv::Point3d{ X.at<double>(0), X.at<double>(1), X.at<double>(2) };
-			}
+    // Get number body parts
+    auto detectionMissed = false;
+    for (auto& keypoints : keypointsVector)
+    {
+        if (keypoints.empty())
+        {
+            detectionMissed = true;
+            break;
+        }
+    }
+    // If at least one keypoints element not empty
+    if (!detectionMissed)
+    {
+        const auto numberBodyParts = keypointsVector.at(0).getSize(1);
+        // Create x-y vector from high score results
+        const auto threshold = 0.2f;
+        std::vector<int> indexesUsed;
+        std::vector<std::vector<cv::Point2d>> xyPoints;
+        for (auto part = 0; part < numberBodyParts; part++)
+        {
+            // Create vector of points
+            auto missedPoint = false;
+            std::vector<cv::Point2d> xyPointsElement;
+            for (auto& keypoints : keypointsVector)
+            {
+                if (keypoints[{0, part, 2}] > threshold)
+                    xyPointsElement.emplace_back(cv::Point2d{ keypoints[{0, part, 0}], keypoints[{0, part, 1}]});
+                else
+                {
+                    missedPoint = true;
+                    break;
+                }
+            }
+            if (!missedPoint)
+            {
+                indexesUsed.emplace_back(part);
+                xyPoints.emplace_back(xyPointsElement);
+            }
+        }
+        // 3D reconstruction
+        if (!xyPoints.empty())
+        {
+            // Do 3D reconstruction
+            std::vector<cv::Point3f> xyzPoints(xyPoints.size());
+            for (auto i = 0u; i < xyPoints.size(); i++)
+            {
+                cv::Mat X;
+                triangulateWithOptimization(X, M_EACH_CAMERA, xyPoints[i]);
+                xyzPoints[i] = cv::Point3d{ X.at<double>(0), X.at<double>(1), X.at<double>(2) };
+            }
 
-			// 3D points to pose
-			// OpenCV alternative:
-			// // http://docs.opencv.org/2.4/modules/calib3d/doc/camera_calibration_and_3d_reconstruction.html#triangulatepoints
-			// cv::Mat reconstructedcv::Points{4, firstcv::Points.size(), CV_64F};
-			// cv::triangulatecv::Points(cv::Mat::eye(3,4, CV_64F), M_3_1, firstcv::Points, secondcv::Points, reconstructedcv::Points);
-			keypoints3D = op::Array<float>{ { 1, numberBodyParts, 4 }, 0 };
-			for (auto index = 0u; index < indexesUsed.size(); index++)
-			{
-				auto& xValue = keypoints3D[{0, indexesUsed[index], 0}];
-				auto& yValue = keypoints3D[{0, indexesUsed[index], 1}];
-				auto& zValue = keypoints3D[{0, indexesUsed[index], 2}];
-				auto& scoreValue = keypoints3D[{0, indexesUsed[index], 3}];
-				if (std::isfinite(xyzPoints[index].x) && std::isfinite(xyzPoints[index].y) && std::isfinite(xyzPoints[index].z))
-				{
-					xValue = xyzPoints[index].x;
-					yValue = xyzPoints[index].y;
-					zValue = xyzPoints[index].z;
-					scoreValue = 1.f;
-				}
-			}
-		}
-	}
+            // 3D points to pose
+            // OpenCV alternative:
+            // // http://docs.opencv.org/2.4/modules/calib3d/doc/camera_calibration_and_3d_reconstruction.html#triangulatepoints
+            // cv::Mat reconstructedcv::Points{4, firstcv::Points.size(), CV_64F};
+            // cv::triangulatecv::Points(cv::Mat::eye(3,4, CV_64F), M_3_1, firstcv::Points, secondcv::Points, reconstructedcv::Points);
+            keypoints3D = op::Array<float>{ { 1, numberBodyParts, 4 }, 0 };
+            for (auto index = 0u; index < indexesUsed.size(); index++)
+            {
+                auto& xValue = keypoints3D[{0, indexesUsed[index], 0}];
+                auto& yValue = keypoints3D[{0, indexesUsed[index], 1}];
+                auto& zValue = keypoints3D[{0, indexesUsed[index], 2}];
+                auto& scoreValue = keypoints3D[{0, indexesUsed[index], 3}];
+                if (std::isfinite(xyzPoints[index].x) && std::isfinite(xyzPoints[index].y) && std::isfinite(xyzPoints[index].z))
+                {
+                    xValue = xyzPoints[index].x;
+                    yValue = xyzPoints[index].y;
+                    zValue = xyzPoints[index].z;
+                    scoreValue = 1.f;
+                }
+            }
+        }
+    }
 }
 
 void WReconstruction3D::work(std::shared_ptr<std::vector<Datum3D>>& datumsPtr)
@@ -122,23 +140,25 @@ void WReconstruction3D::work(std::shared_ptr<std::vector<Datum3D>>& datumsPtr)
         const auto profilerKey = op::Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
         if (datumsPtr != nullptr && /*!datumsPtr->empty() &&*/ datumsPtr->size() == 3)
         {
-			// Pose
-			reconstructArray(datumsPtr->at(0).poseKeypoints3D, std::vector<op::Array<float>>{
-				datumsPtr->at(0).poseKeypoints, datumsPtr->at(1).poseKeypoints, datumsPtr->at(2).poseKeypoints
-			});
-			// Face
-			reconstructArray(datumsPtr->at(0).faceKeypoints3D, std::vector<op::Array<float>>{
-				datumsPtr->at(0).faceKeypoints, datumsPtr->at(1).faceKeypoints, datumsPtr->at(2).faceKeypoints
-			});
-			// Left hand
-			reconstructArray(datumsPtr->at(0).leftHandKeypoints3D, std::vector<op::Array<float>>{
-				datumsPtr->at(0).handKeypoints[0], datumsPtr->at(1).handKeypoints[0], datumsPtr->at(2).handKeypoints[0]
-			});
-			// Right hand
-			reconstructArray(datumsPtr->at(0).rightHandKeypoints3D, std::vector<op::Array<float>>{
-				datumsPtr->at(0).handKeypoints[1], datumsPtr->at(1).handKeypoints[1], datumsPtr->at(2).handKeypoints[1]
-			});
-
+            std::vector<op::Array<float>> poseKeypointVector;
+            std::vector<op::Array<float>> faceKeypointVector;
+            std::vector<op::Array<float>> leftHandKeypointVector;
+            std::vector<op::Array<float>> rightHandKeypointVector;
+            for (auto& datumsElement : *datumsPtr)
+            {
+                poseKeypointVector.emplace_back(datumsElement.poseKeypoints);
+                faceKeypointVector.emplace_back(datumsElement.faceKeypoints);
+                leftHandKeypointVector.emplace_back(datumsElement.handKeypoints[0]);
+                rightHandKeypointVector.emplace_back(datumsElement.handKeypoints[1]);
+            }
+			// Pose 3-D reconstruction
+			reconstructArray(datumsPtr->at(0).poseKeypoints3D, poseKeypointVector);
+			// Face 3-D reconstruction
+			reconstructArray(datumsPtr->at(0).faceKeypoints3D, faceKeypointVector);
+			// Left hand 3-D reconstruction
+			reconstructArray(datumsPtr->at(0).leftHandKeypoints3D, leftHandKeypointVector);
+			// Right hand 3-D reconstruction
+			reconstructArray(datumsPtr->at(0).rightHandKeypoints3D, rightHandKeypointVector);
             // Profiling speed
             op::Profiler::timerEnd(profilerKey);
             op::Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__, 100);
