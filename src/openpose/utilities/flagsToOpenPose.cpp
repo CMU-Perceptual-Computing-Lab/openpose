@@ -67,9 +67,9 @@ namespace op
             // Avoid duplicates (e.g. selecting at the time camera & video)
             if (!imageDirectory.empty() && !videoPath.empty())
                 error("Selected simultaneously image directory and video. Please, select only one.", __LINE__, __FUNCTION__, __FILE__);
-            else if (!imageDirectory.empty() && webcamIndex != 0)
+            else if (!imageDirectory.empty() && webcamIndex > 0)
                 error("Selected simultaneously image directory and webcam. Please, select only one.", __LINE__, __FUNCTION__, __FILE__);
-            else if (!videoPath.empty() && webcamIndex != 0)
+            else if (!videoPath.empty() && webcamIndex > 0)
                 error("Selected simultaneously video and webcam. Please, select only one.", __LINE__, __FUNCTION__, __FILE__);
 
             // Get desired ProducerType

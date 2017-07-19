@@ -90,6 +90,8 @@ OpenPose Library - Release Notes
     3. Added OpenPose 1.0.1 portable demo.
     4. Removed Python and some unnecessary boost dependencies on the VS project.
     5. Replaced all double quotes by angle brackets in include statements (issue #61).
+    6. Added 3-D reconstruction demo.
+    7. Auto-detection of the camera index.
 2. Main bugs fixed:
     1. Pycaffe can now be imported from Python.
     2. Fixed `Tutorial/Wrapper` VS linking errors.
