@@ -19,7 +19,7 @@ namespace op
          * This constructor of VideoCaptureReader wraps cv::VideoCapture(const int).
          * @param index const int indicating the cv::VideoCapture constructor int argument, in the range [0, 9].
          */
-        explicit VideoCaptureReader(const int index);
+        explicit VideoCaptureReader(const int index, const bool throwExceptionIfNoOpened);
 
         /**
          * This constructor of VideoCaptureReader wraps cv::VideoCapture(const std::string).

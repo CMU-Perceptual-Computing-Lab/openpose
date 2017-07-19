@@ -28,10 +28,11 @@ Note: These requirements assume the default configuration (i.e. `--net_resolutio
 ### Installation - Script Compilation
 **Highly important**: This script only works with CUDA 8 and Ubuntu 14 or 16. Otherwise, check [Manual Compilation](#manual-compilation).
 1. Required: CUDA, cuDNN, OpenCV and Atlas must be already installed on your machine.
-    1. [CUDA](https://developer.nvidia.com/cuda-downloads) and [cuDNN](https://developer.nvidia.com/cudnn) must be installed. Note: We found OpenPose working ~10% faster with cuDNN 5.1 compared to cuDNN 6.
-    2. OpenCV can be installed with `apt-get install libopencv-dev`. If you have compiled OpenCV 3 by your own, follow [Manual Compilation](#manual-compilation). After both Makefile.config files have been generated, edit them and uncomment the line `# OPENCV_VERSION := 3`. You might alternatively modify all `Makefile.config.UbuntuXX` files and then run the scripts in step 2.
-    3. In addition, OpenCV 3 does not incorporate the `opencv_contrib` module by default. Assuming you have OpenCV 3 compiled with the contrib module and you want to use it, append `opencv_contrib` at the end of the line `LIBRARIES += opencv_core opencv_highgui opencv_imgproc` in the `Makefile` file.
-    4. Atlas can be installed with `sudo apt-get install libatlas-base-dev`. Instead of Atlas, you can use OpenBLAS or Intel MKL by modifying the line `BLAS := atlas` in the same way as previosuly mentioned for the OpenCV version selection.
+    1. [CUDA](https://developer.nvidia.com/cuda-downloads) must be installed. You should reboot your machine after installing CUDA.
+    2. [cuDNN](https://developer.nvidia.com/cudnn): Once you have downloaded it, just unzip it and copy (merge) the contents on the CUDA folder, e.g. `/usr/local/cuda-8.0/`. Note: We found OpenPose working ~10% faster with cuDNN 5.1 compared to cuDNN 6.
+    3. OpenCV can be installed with `apt-get install libopencv-dev`. If you have compiled OpenCV 3 by your own, follow [Manual Compilation](#manual-compilation). After both Makefile.config files have been generated, edit them and uncomment the line `# OPENCV_VERSION := 3`. You might alternatively modify all `Makefile.config.UbuntuXX` files and then run the scripts in step 2.
+    4. In addition, OpenCV 3 does not incorporate the `opencv_contrib` module by default. Assuming you have OpenCV 3 compiled with the contrib module and you want to use it, append `opencv_contrib` at the end of the line `LIBRARIES += opencv_core opencv_highgui opencv_imgproc` in the `Makefile` file.
+    5. Atlas can be installed with `sudo apt-get install libatlas-base-dev`. Instead of Atlas, you can use OpenBLAS or Intel MKL by modifying the line `BLAS := atlas` in the same way as previosuly mentioned for the OpenCV version selection.
 2. Build Caffe & the OpenPose library + download the required Caffe models for Ubuntu 14.04 or 16.04 (auto-detected for the script) and CUDA 8:
 ```
 bash ./ubuntu/install_caffe_and_openpose_if_cuda8.sh
@@ -130,6 +131,17 @@ You just need to remove the OpenPose or portable demo folder.
 
 
 
+## Compiling without cuDNN
+The [cuDNN](https://developer.nvidia.com/cudnn) library is not mandatory, but required for full keypoint detection accuracy. In case your graphics card is not compatible with cuDNN, you can disable it by:
+
+- Ubuntu: Modifying the `Makefile.config` files in both the OpenPose and `3rdparty/caffe` folders.
+- Windows: Modifying the `Makefile.config` files in both the OpenPose and `3rdparty/caffe` folders.
+
+Then, you would have to reduce the `--net_resolution` flag to fit the model into the GPU memory. You can try values like "640x320", "320x240", "320x160", or "160x80" to see your GPU memory capabilities. After finding the maximum approximate resolution that your GPU can handle without throwing an out-of-memory error, adjust the `net_resolution` ratio to your image or video to be processed (see the `--net_resolution` explanation from [doc/demo_overview.md](./demo_overview.md)).
+
+
+
+
 ## OpenPose 3D Demo
 If you want to try our OpenPose 3-D reconstruction demo, see [doc/openpose_3d_reconstruction_demo.md](./openpose_3d_reconstruction_demo.md).
 
@@ -160,6 +172,8 @@ windows\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi
 windows\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi --face --hand
 ```
 
+
+
 **2. Running on Webcam**
 ```
 # Ubuntu
@@ -179,6 +193,8 @@ windows\x64\Release\OpenPoseDemo.exe
 :: With face and hands
 windows\x64\Release\OpenPoseDemo.exe --face --hand
 ```
+
+
 
 **3. Running on Images**
 ```

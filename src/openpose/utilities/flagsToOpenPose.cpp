@@ -103,7 +103,26 @@ namespace op
             {
                 // cameraFrameSize
                 const auto webcamFrameSize = op::flagsToPoint(webcamResolution, "1280x720");
-                return std::make_shared<WebcamReader>(webcamIndex, webcamFrameSize, webcamFps);
+                if (webcamIndex >= 0)
+                {
+                    const auto throwExceptionIfNoOpened = true;
+                    return std::make_shared<WebcamReader>(webcamIndex, webcamFrameSize, webcamFps, throwExceptionIfNoOpened);
+                }
+                else
+                {
+                    const auto throwExceptionIfNoOpened = false;
+                    std::shared_ptr<WebcamReader> webcamReader;
+                    for (auto index = 0 ; index < 10 ; index++)
+                    {
+                        webcamReader = std::make_shared<WebcamReader>(index, webcamFrameSize, webcamFps, throwExceptionIfNoOpened);
+                        if (webcamReader->isOpened())
+                        {
+                            log("Auto-detecting camera index... Detected and opened camera " + std::to_string(index) + ".", Priority::High);
+                            return webcamReader;
+                        }
+                    }
+                    error("No camera found.", __LINE__, __FUNCTION__, __FILE__);
+                }
             }
             // else
             error("Undefined Producer selected.", __LINE__, __FUNCTION__, __FILE__);

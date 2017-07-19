@@ -30,8 +30,10 @@ DEFINE_string(image_path,               "examples/media/COCO_val2014_00000000019
 // OpenPose
 DEFINE_string(model_pose,               "COCO",         "Model to be used (e.g. COCO, MPI, MPI_4_layers).");
 DEFINE_string(model_folder,             "models/",      "Folder path (absolute or relative) where the models (pose, face, ...) are located.");
-DEFINE_string(net_resolution,           "656x368",      "Multiples of 16. If it is increased, the accuracy usually increases. If it is decreased,"
-                                                        " the speed increases.");
+DEFINE_string(net_resolution,           "656x368",      "Multiples of 16. If it is increased, the accuracy potentially increases. If it is decreased,"
+                                                        " the speed increases. For maximum speed-accuracy balance, it should keep the closest aspect"
+                                                        " ratio possible to the images or videos to be processed. E.g. the default `656x368` is"
+                                                        " optimal for 16:9 videos, e.g. full HD (1980x1080) and HD (1280x720) videos.");
 DEFINE_string(resolution,               "1280x720",     "The image resolution (display and output). Use \"-1x-1\" to force the program to use the"
                                                         " default images resolution.");
 DEFINE_int32(num_gpu_start,             0,              "GPU device start number.");

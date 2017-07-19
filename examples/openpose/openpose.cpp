@@ -47,7 +47,8 @@ DEFINE_int32(logging_level,             3,              "The logging level. Inte
                                                         " 255 will not output any. Current OpenPose library messages are in the range 0-4: 1 for"
                                                         " low priority messages and 4 for important ones.");
 // Producer
-DEFINE_int32(camera,                    0,              "The camera index for cv::VideoCapture. Integer in the range [0, 9].");
+DEFINE_int32(camera,                    -1,             "The camera index for cv::VideoCapture. Integer in the range [0, 9]. Select a negative"
+                                                        " number (by default), to auto-detect and open the first available camera.");
 DEFINE_string(camera_resolution,        "1280x720",     "Size of the camera frames to ask for.");
 DEFINE_double(camera_fps,               30.0,           "Frame rate for the webcam (only used when saving video from webcam). Set this value to the"
                                                         " minimum value between the OpenPose displayed speed and the webcam real frame rate.");
@@ -76,8 +77,10 @@ DEFINE_int32(keypoint_scale,            0,              "Scaling of the (x,y) co
                                                         " with `scale_number` and `scale_gap`.");
 // OpenPose Body Pose
 DEFINE_string(model_pose,               "COCO",         "Model to be used (e.g. COCO, MPI, MPI_4_layers).");
-DEFINE_string(net_resolution,           "656x368",      "Multiples of 16. If it is increased, the accuracy usually increases. If it is decreased,"
-                                                        " the speed increases.");
+DEFINE_string(net_resolution,           "656x368",      "Multiples of 16. If it is increased, the accuracy potentially increases. If it is decreased,"
+                                                        " the speed increases. For maximum speed-accuracy balance, it should keep the closest aspect"
+                                                        " ratio possible to the images or videos to be processed. E.g. the default `656x368` is"
+                                                        " optimal for 16:9 videos, e.g. full HD (1980x1080) and HD (1280x720) videos.");
 DEFINE_int32(scale_number,              1,              "Number of scales to average.");
 DEFINE_double(scale_gap,                0.3,            "Scale gap between scales. No effect unless scale_number > 1. Initial scale is always 1."
                                                         " If you want to change the initial scale, you actually want to multiply the"
@@ -93,13 +96,14 @@ DEFINE_bool(heatmaps_add_PAFs,          false,          "Same functionality as `
 // OpenPose Face
 DEFINE_bool(face,                       false,          "Enables face keypoint detection. It will share some parameters from the body pose, e.g."
                                                         " `model_folder`.");
-DEFINE_string(face_net_resolution,      "368x368",      "Multiples of 16. Analogous to `net_resolution` but applied to the face keypoint detector."
-                                                        " 320x320 usually works fine while giving a substantial speed up when multiple faces on the"
-                                                        " image.");
+DEFINE_string(face_net_resolution,      "368x368",      "Multiples of 16 and squared. Analogous to `net_resolution` but applied to the face keypoint"
+                                                        " detector. 320x320 usually works fine while giving a substantial speed up when multiple"
+                                                        " faces on the image.");
 // OpenPose Hand
 DEFINE_bool(hand,                       false,          "Enables hand keypoint detection. It will share some parameters from the body pose, e.g."
                                                         " `model_folder`.");
-DEFINE_string(hand_net_resolution,      "368x368",      "Multiples of 16. Analogous to `net_resolution` but applied to the hand keypoint detector.");
+DEFINE_string(hand_net_resolution,      "368x368",      "Multiples of 16 and squared. Analogous to `net_resolution` but applied to the hand keypoint"
+                                                        " detector.");
 DEFINE_int32(hand_scale_number,         1,              "Analogous to `scale_number` but applied to the hand keypoint detector. Our best results"
                                                         " were found with `hand_scale_number` = 6 and `hand_scale_range` = 0.4");
 DEFINE_double(hand_scale_range,         0.4,            "Analogous purpose than `scale_gap` but applied to the hand keypoint detector. Total range"
