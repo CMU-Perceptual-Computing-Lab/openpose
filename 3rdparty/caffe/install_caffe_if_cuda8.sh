@@ -56,6 +56,8 @@ sudo apt-get --assume-yes install --no-install-recommends libboost-all-dev
 # if [[ $ubuntu_le_14 == true ]]; then
     sudo apt-get --assume-yes install libgflags-dev libgoogle-glog-dev liblmdb-dev
 # fi
+# Python libs
+sudo -h pip install numpy protobuf
 # OpenCV 2.4
 # sudo apt-get --assume-yes install libopencv-dev
 exitIfError
