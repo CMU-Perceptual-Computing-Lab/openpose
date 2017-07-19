@@ -116,5 +116,5 @@ LIBS += -Wpedantic -Wall -Wextra -Wfatal-errors
 ## Expected Visual Results
 The visual GUI should show 3 screens, the Windows command line or Ubuntu bash terminal, the different cameras 2-D keypoint estimations, and the final 3-D reconstruction, similarly to the following image:
 <p align="center">
-    <img src="media/openpose3d.png", width="720">
+    <img src="media/openpose3d.png">
 </p>

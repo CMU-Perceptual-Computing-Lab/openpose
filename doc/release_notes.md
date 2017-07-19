@@ -5,7 +5,7 @@ OpenPose Library - Release Notes
 
 ## OpenPose 1.0.0rc1
 1. Initial version, main functionality:
-    1. Body keypoint detection and rendering on Ubuntu 14 and 16.
+    1. Body keypoint detection and rendering in Ubuntu 14 and 16.
     2. It can read an image directory, video or webcam.
     3. It can display the results or storing them on disk.
 

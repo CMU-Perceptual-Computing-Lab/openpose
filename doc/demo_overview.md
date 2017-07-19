@@ -11,7 +11,7 @@ In order to learn how to use it, run `./build/examples/openpose/openpose.bin --h
 Each flag is divided into flag name, default value, and description.
 
 1. Debugging
-- DEFINE_int32(logging_level,             4,              "The logging level. Integer in the range [0, 255]. 0 will output any log() message, while 255 will not output any. Current OpenPose library messages are in the range 0-4: 1 for low priority messages and 4 for important ones.");
+- DEFINE_int32(logging_level,             3,              "The logging level. Integer in the range [0, 255]. 0 will output any log() message, while 255 will not output any. Current OpenPose library messages are in the range 0-4: 1 for low priority messages and 4 for important ones.");
 2. Producer
 - DEFINE_int32(camera,                    0,              "The camera index for cv::VideoCapture. Integer in the range [0, 9].");
 - DEFINE_string(camera_resolution,        "1280x720",     "Size of the camera frames to ask for.");

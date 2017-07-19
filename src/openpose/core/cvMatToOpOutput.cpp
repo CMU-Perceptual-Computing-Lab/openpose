@@ -16,6 +16,8 @@ namespace op
             // Security checks
             if (cvInputData.empty())
                 error("Wrong input element (empty cvInputData).", __LINE__, __FUNCTION__, __FILE__);
+            if (cvInputData.channels() != 3)
+                error("Input images must be 3-channel BGR.", __LINE__, __FUNCTION__, __FILE__);
 
             // outputData - Reescale keeping aspect ratio and transform to float the output image
             const Point<int> outputResolution{mOutputSize3D[2], mOutputSize3D[1]};
