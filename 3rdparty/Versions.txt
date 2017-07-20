@@ -1,6 +1,6 @@
 Unix:
     - Caffe:
-        - Version 1.0.0, extracted from GitHub on 05/09/2017 from the current master branch.
+        - Version 1.0.0, extracted from GitHub on 07/19/2017 from the current master branch.
         - Link: https://github.com/BVLC/caffe
 
 Windows:

@@ -5,8 +5,6 @@
 
 namespace op
 {
-    const std::vector<float> COLORS{FACE_COLORS_RENDER};
-
     void renderFaceKeypointsCpu(Array<float>& frameArray, const Array<float>& faceKeypoints, const float renderThreshold)
     {
         try
@@ -19,7 +17,7 @@ namespace op
                 const auto& pairs = FACE_PAIRS_RENDER;
 
                 // Render keypoints
-                renderKeypointsCpu(frameArray, faceKeypoints, pairs, COLORS, thicknessCircleRatio, thicknessLineRatioWRTCircle, renderThreshold);
+                renderKeypointsCpu(frameArray, faceKeypoints, pairs, FACE_COLORS_RENDER, thicknessCircleRatio, thicknessLineRatioWRTCircle, renderThreshold);
             }
         }
         catch (const std::exception& e)

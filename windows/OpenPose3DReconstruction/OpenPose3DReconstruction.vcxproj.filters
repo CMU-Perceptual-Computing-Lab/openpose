@@ -12,36 +12,36 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\pointGrey.cpp">
+    <ClCompile Include="..\..\examples_beta\openpose3d\src\pointGrey.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\reconstruction3D.cpp">
+    <ClCompile Include="..\..\examples_beta\openpose3d\src\reconstruction3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\renderer.cpp">
+    <ClCompile Include="..\..\examples_beta\openpose3d\src\renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\openpose3d.cpp">
+    <ClCompile Include="..\..\examples_beta\openpose3d\openpose3d.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\openpose3d\datum3D.hpp">
+    <ClInclude Include="..\..\examples_beta\openpose3d\include\openpose3d\cameraParameters.hpp">
       <Filter>Header Files\openpose3d</Filter>
     </ClInclude>
-    <ClInclude Include="include\openpose3d\pointGrey.hpp">
+    <ClInclude Include="..\..\examples_beta\openpose3d\include\openpose3d\datum3D.hpp">
       <Filter>Header Files\openpose3d</Filter>
     </ClInclude>
-    <ClInclude Include="include\openpose3d\reconstruction3D.hpp">
+    <ClInclude Include="..\..\examples_beta\openpose3d\include\openpose3d\headers.hpp">
       <Filter>Header Files\openpose3d</Filter>
     </ClInclude>
-    <ClInclude Include="include\openpose3d\renderer.hpp">
+    <ClInclude Include="..\..\examples_beta\openpose3d\include\openpose3d\pointGrey.hpp">
       <Filter>Header Files\openpose3d</Filter>
     </ClInclude>
-    <ClInclude Include="include\openpose3d\cameraParameters.hpp">
+    <ClInclude Include="..\..\examples_beta\openpose3d\include\openpose3d\reconstruction3D.hpp">
       <Filter>Header Files\openpose3d</Filter>
     </ClInclude>
-    <ClInclude Include="include\openpose3d\headers.hpp">
+    <ClInclude Include="..\..\examples_beta\openpose3d\include\openpose3d\renderer.hpp">
       <Filter>Header Files\openpose3d</Filter>
     </ClInclude>
   </ItemGroup>

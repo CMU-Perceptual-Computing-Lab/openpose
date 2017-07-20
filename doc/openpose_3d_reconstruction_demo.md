@@ -1,12 +1,25 @@
-﻿# Running OpenPose 3-D Reconstruction Demo - Windows
-This is a beta version that makes body pose 3-D reconstruction and rendering. We will not keep updating it nor solving questions/issues about it at the moment. It requires the user to be familiar with computer vision, in particular with camera calibration, i.e. extraction of intrinsic and extrinsic parameters.
+﻿Running OpenPose 3-D Reconstruction Demo
+====================================
 
-The Windows steps were tested and worked in the OpenPose 1.0.1 version from the last GitHub commit on July 7th, 2017 in the [oficial repository](https://github.com/CMU-Perceptual-Computing-Lab/openpose).
+This is a beta version that makes body + face + hand keypoint 3-D reconstruction and rendering for 1 person. We will not keep updating it nor solving questions/issues about it at the moment. It requires the user to be familiar with computer vision, in particular with camera calibration, i.e. extraction of intrinsic and extrinsic parameters.
+
+The Windows steps were tested and worked in the OpenPose 1.0.1 version from the last GitHub commit on July 18th, 2017 in the [official repository](https://github.com/CMU-Perceptual-Computing-Lab/openpose).
+
+
+
+### Description of this demo:
+- Auto detection of all the FLIR cameras, and extraction of images from each one of them.
+- Hardware trigger and buffer `NewestFirstOverwrite` modes enabled. Hence, the algorithm will always get the last synchronized frame from each camera, deleting the rest.
+- 3-D reconstruction of body, face and hands for 1 person.
+- If more than 1 person is detected per camera, the algorithm will just try to match person 0 on each camera, which will potentially correspond to different people in the scene. Thus, the 3-D reconstruction will completely fail.
+- Only points with high threshold with respect to each one of the cameras are reprojected (and later rendered). An alternative for > 4 cameras could be to do 3-D reprojection and render all points with good views in more than N different cameras (not implemented here).
+- Only Direct linear transformation (DLT) applied. Non-linear optimization methods (e.g. from Ceres Solver) will potentially improve results (not implemented).
+- Basic OpenGL rendering with the `freeglut` library.
 
 
 
 ### Hardware
-This demo assumes 3 stereo cameras, FLIR company (former Point Grey). Ideally any USB-3 FLIR model should work, but we have only used the following specific specifications:
+This demo assumes n arbitrary stereo cameras, FLIR company (former Point Grey). Ideally any USB-3 FLIR model should work, but we have only used the following specific specifications:
 
 1. Camera details:
     - Blackfly S Color 1.3 MP USB3 Vision (ON Semi PYTHON 1300)
@@ -26,7 +39,7 @@ This demo assumes 3 stereo cameras, FLIR company (former Point Grey). Ideally an
 
 
 ### Calibrate Cameras
-You must manually get the intrinsic and extrinsic parameters of your cameras and introduce them on: `openpose3d\cameraParameters.hpp`. We used the 8-distortion-parameter version of OpenCV.
+You must manually get the intrinsic and extrinsic parameters of your cameras and introduce them on: `openpose3d\cameraParameters.hpp`. We used the 8-distortion-parameter version of OpenCV. By default, the program uses 3 cameras, but you can add or remove cameras from `cameraParameters.hpp` by adding or removing elements to `INTRINSICS`, `DISTORTIONS` and `M_EACH_CAMERA`. `INTRINSICS` corresponds to the intrinsic parameters, `DISTORTIONS` to the distortion coefficients, and `M_EACH_CAMERA` corresponds to the extrinsic parameters of the cameras with respect to camera 1 as origin.
 
 
 
@@ -49,13 +62,59 @@ You must manually get the intrinsic and extrinsic parameters of your cameras and
 
 
 ### Ubuntu
-We do not support Ubuntu at all for this demo. We did an original and very initial version long ago, but it was highly changed later. In case you need Ubuntu, these are the steps we used for our that original version in Ubuntu 16. Note that they might be several differences to make it work in the current version. Feel free to send us or make a pull request with the updated steps and we will update them, but we will not answer any kind of questions about it.
+We did not create an Ubuntu version. We did an very first version for Ubuntu 16 long ago, but it was highly changed later. These are the steps we used for that one. Note that there might be needed some changes to make it work. Feel free to send us or make a pull request with any updated steps.
 
-1. `sudo apt-get install freeglut3-dev`.
-2. Compile OpenPose by your own [from https://github.com/CMU-Perceptual-Computing-Lab/openpose](from https://github.com/CMU-Perceptual-Computing-Lab/openpose).
-3. Perform `make distribute` on OpenPose, and copy the `include` and `lib` files in [3rdparty/openpose/](3rdparty/openpose/).
-4. Copy the `include` and `lib` folders from {OpenPose path}/3rdparty/caffe/distribute/ to [3rdparty/caffe/](3rdparty/caffe/).
-5. Copy your Spinnaker desired version `include` and `lib` folders on [3rdparty/spinnaker/](3rdparty/spinnaker/).
-6. Open the [rtstereo.pro](rtstereo.pro) file with Qt to have the project ready-to-compile-and-go. If you prefer using your own Makefile file, you can take a look to this Qt file to know which files (basically [src/](src/) and [include/](include/)) and compiler flags used.
-	1. If using Qt, you will have to manually copy the {OpenPose path}/models folder inside the generated build folder.
-7. You must copy the contents of [add_to_bin_file/](add_to_bin_file/) where the final binary file is generated.
+1. Install the OpenGL rendering library: `sudo apt-get install freeglut3-dev`.
+2. Compile the standard OpenPose [from https://github.com/CMU-Perceptual-Computing-Lab/openpose](from https://github.com/CMU-Perceptual-Computing-Lab/openpose).
+3. Perform `make distribute` on OpenPose, and copy the `include` and `lib` files from `distribute` into your custom `3rdparty/openpose/`.
+4. Copy the `include` and `lib` folders from {OpenPose path}/3rdparty/caffe/distribute/ into your custom `3rdparty/caffe/`.
+5. Copy your Spinnaker desired version `include` and `lib` folders in your custom `3rdparty/spinnaker/`.
+7. From the Spinnaker `bin` folder, copy all the *.xml files to the generated build folder of your project.
+8. Get the required files from `{OpenPose path}/examples_beta/openpose3d/`. Check the Windows VS solution for more details.
+9. Create a proper Makefile or CMake file to run it. The following code is part of an old QMake (Qt) file generated for the old version, you can ideally get all the flags and includes from it:
+```
+DEFINES += USE_CAFFE USE_CUDNN
+INCLUDEPATH += \
+    $$PWD/include \
+    $$PWD/3rdparty/caffe/include \
+    $$PWD/3rdparty/openpose/include \
+    $$PWD/3rdparty/spinnaker/include \
+    /usr/include \
+    /usr/local/include \
+    /usr/local/cuda-8.0/include
+}
+# Generic
+LIBS += -L/usr/lib/ -L/usr/local/lib/ -L/usr/lib/x86_64-linux-gnu
+# OpenPose
+LIBS += -Wl,-rpath=$$PWD/3rdparty/openpose/lib
+LIBS += -Wl,-Bdynamic -L$$PWD/3rdparty/openpose/lib/ -lopenpose
+# Caffe
+LIBS += -Wl,-rpath=$$PWD/3rdparty/caffe/lib
+LIBS += -Wl,-Bdynamic -L$$PWD/3rdparty/caffe/lib/ -lcaffe
+# Spinnaker
+LIBS += -Wl,-rpath=$$PWD/3rdparty/spinnaker/lib
+LIBS += -Wl,-Bdynamic -L$$PWD/3rdparty/spinnaker/lib/ -lSpinnaker
+# OpenCV
+LIBS += -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_contrib -lopencv_calib3d
+# CUDA
+LIBS += -I/usr/local/cuda-8.0/include/
+LIBS += -L/usr/local/cuda-8.0/lib64 -lcudart -lcublas -lcurand
+# OpenGL
+LIBS += -lGLU -lGL -lglut
+# Other 3rdparty
+LIBS += -lcudnn -lglog -lgflags -lboost_system -lboost_filesystem -lm -lboost_thread
+LIBS += -pthread -fPIC -std=c++11 -fopenmp
+# Optimization flags
+LIBS += -DNDEBUG -O3 -march=native
+# Debug flags
+LIBS += -Wpedantic -Wall -Wextra -Wfatal-errors
+```
+10. If you find any error/difference, feel free to add a pull request to help other users.
+
+
+
+## Expected Visual Results
+The visual GUI should show 3 screens, the Windows command line or Ubuntu bash terminal, the different cameras 2-D keypoint estimations, and the final 3-D reconstruction, similarly to the following image:
+<p align="center">
+    <img src="media/openpose3d.png">
+</p>

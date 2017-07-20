@@ -4,28 +4,31 @@
 
 namespace op
 {
-    WebcamReader::WebcamReader(const int webcamIndex, const Point<int>& webcamResolution, const double fps) :
-        VideoCaptureReader{webcamIndex},
+    WebcamReader::WebcamReader(const int webcamIndex, const Point<int>& webcamResolution, const double fps, const bool throwExceptionIfNoOpened) :
+        VideoCaptureReader{webcamIndex, throwExceptionIfNoOpened},
         mFps{fps},
-        mFrameNameCounter{-1}
+        mFrameNameCounter{-1},
+        mThreadOpened{false}
     {
         try
         {
-            if (webcamResolution != Point<int>{})
+            if (isOpened())
             {
-                set(CV_CAP_PROP_FRAME_WIDTH, webcamResolution.x);
-                set(CV_CAP_PROP_FRAME_HEIGHT, webcamResolution.y);
-                if ((int)get(CV_CAP_PROP_FRAME_WIDTH) != webcamResolution.x || (int)get(CV_CAP_PROP_FRAME_HEIGHT) != webcamResolution.y)
+                if (webcamResolution != Point<int>{})
                 {
-                    const std::string logMessage{ "Desired webcam resolution " + std::to_string(webcamResolution.x) + "x" + std::to_string(webcamResolution.y)
-                                                + " could not being set. Final resolution: " + std::to_string(intRound(get(CV_CAP_PROP_FRAME_WIDTH))) + "x"
-                                                + std::to_string(intRound(get(CV_CAP_PROP_FRAME_HEIGHT))) };
-                    log(logMessage, Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                    set(CV_CAP_PROP_FRAME_WIDTH, webcamResolution.x);
+                    set(CV_CAP_PROP_FRAME_HEIGHT, webcamResolution.y);
+                    if ((int)get(CV_CAP_PROP_FRAME_WIDTH) != webcamResolution.x || (int)get(CV_CAP_PROP_FRAME_HEIGHT) != webcamResolution.y)
+                    {
+                        const std::string logMessage{ "Desired webcam resolution " + std::to_string(webcamResolution.x) + "x" + std::to_string(webcamResolution.y)
+                                                    + " could not being set. Final resolution: " + std::to_string(intRound(get(CV_CAP_PROP_FRAME_WIDTH))) + "x"
+                                                    + std::to_string(intRound(get(CV_CAP_PROP_FRAME_HEIGHT))) };
+                        log(logMessage, Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                    }
                 }
-
                 // Start buffering thread
-                if (isOpened())
-                    mThread = std::thread{&WebcamReader::bufferingThread, this};
+                mThreadOpened = true;
+                mThread = std::thread{&WebcamReader::bufferingThread, this};
             }
         }
         catch (const std::exception& e)
@@ -39,8 +42,11 @@ namespace op
         try
         {
             // Close and join thread
-            mCloseThread = true;
-            mThread.join();
+            if (mThreadOpened)
+            {
+                mCloseThread = true;
+                mThread.join();
+            }
         }
         catch (const std::exception& e)
         {

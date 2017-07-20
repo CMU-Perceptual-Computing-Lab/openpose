@@ -10,16 +10,16 @@
 class WRender3D : public op::WorkerConsumer<std::shared_ptr<std::vector<Datum3D>>>
 {
 public:
-	WRender3D();
+    WRender3D(const op::PoseModel poseModel = op::PoseModel::COCO_18);
 
     void initializationOnThread() {}
 
-	void workConsumer(const std::shared_ptr<std::vector<Datum3D>>& datumsPtr);
+    void workConsumer(const std::shared_ptr<std::vector<Datum3D>>& datumsPtr);
 
 private:
-	std::thread mRenderThread;
+    std::thread mRenderThread;
 
-	void visualizationThread();
+    void visualizationThread();
 };
 
 #endif // OPENPOSE3D_RENDERER_HPP

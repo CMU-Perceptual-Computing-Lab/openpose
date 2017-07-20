@@ -8,7 +8,7 @@ namespace op
 {
     const dim3 THREADS_PER_BLOCK{128, 128, 1};
     __constant__ const unsigned int PART_PAIRS_GPU[] = FACE_PAIRS_RENDER_GPU;
-    __constant__ const float COLORS[] = {FACE_COLORS_RENDER};
+    __constant__ const float COLORS[] = {FACE_COLORS_RENDER_GPU};
 
     __global__ void renderFaceParts(float* targetPtr, const int targetWidth, const int targetHeight,
                                     const float* const facePtr, const int numberPeople, const float threshold,

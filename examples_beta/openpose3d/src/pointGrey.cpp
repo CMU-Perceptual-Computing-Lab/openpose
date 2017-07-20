@@ -145,6 +145,10 @@ std::vector<cv::Mat> acquireImages(Spinnaker::CameraList &cameraList)
 {
     try
     {
+        // Security checks
+        if (cameraList.GetSize() != INTRINSICS.size())
+            op::checkE(cameraList.GetSize(), INTRINSICS.size(), "The number of cameras must be the same as the INTRINSICS vector size.", __LINE__, __FUNCTION__, __FILE__);
+
 		std::vector<cv::Mat> cvMats;
 
         // Retrieve, convert, and return an image for each camera
@@ -284,6 +288,18 @@ int printDeviceInfo(Spinnaker::GenApi::INodeMap &iNodeMap, const unsigned int ca
 WPointGrey::WPointGrey() :
     initialized{false}
 {
+    try
+    {
+        // Security checks
+        if (INTRINSICS.size() != DISTORTIONS.size())
+            op::checkE(INTRINSICS.size(), DISTORTIONS.size(), "The INTRINSICS and DISTORTIONS vector should have the same size.", __LINE__, __FUNCTION__, __FILE__);
+        if (INTRINSICS.size() != M_EACH_CAMERA.size())
+            op::checkE(INTRINSICS.size(), M_EACH_CAMERA.size(), "The INTRINSICS and M_EACH_CAMERA vector should have the same size.", __LINE__, __FUNCTION__, __FILE__);
+    }
+    catch (const std::exception& e)
+    {
+        op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+    }
 }
 
 WPointGrey::~WPointGrey()

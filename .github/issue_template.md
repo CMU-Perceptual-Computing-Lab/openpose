@@ -33,11 +33,11 @@ You might select multiple topics, delete the rest:
 
 
 ### Your system configuration
-**Operating system** (`lsb_release -a` on Ubuntu):
+**Operating system** (`lsb_release -a` in Ubuntu):
 **CUDA version** (`cat /usr/local/cuda/version.txt` in most cases):
 **cuDNN version**:
-**GPU model** (`nvidia-smi`):
+**GPU model** (`nvidia-smi` in Ubuntu):
 **Caffe version**: Default from OpenPose or custom version.
-**OpenCV version**: installed with `apt-get install libopencv-dev` or OpenCV 2.X or OpenCV 3.X.
-Generation mode (only for Ubuntu): Makefile + Makefile.config (default) or CMake.
-Compiler (`gcc --version` on Ubuntu):
+**OpenCV version**: installed with `apt-get install libopencv-dev` (Ubuntu) or default from OpenPose (Windows) or OpenCV 2.X or OpenCV 3.X.
+Generation mode (only for Ubuntu): Makefile + Makefile.config (default, Ubuntu) or CMake (Ubuntu, Windows) or Visual Studio (Windows).
+Compiler (`gcc --version` in Ubuntu):

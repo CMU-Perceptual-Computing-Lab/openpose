@@ -5,9 +5,6 @@
 
 namespace op
 {
-    const std::vector<float> COCO_COLORS{POSE_COCO_COLORS_RENDER};
-    const std::vector<float> MPI_COLORS{POSE_MPI_COLORS_RENDER};
-
     void renderPoseKeypointsCpu(Array<float>& frameArray, const Array<float>& poseKeypoints, const PoseModel poseModel,
                                 const float renderThreshold, const bool blendOriginalFrame)
     {
@@ -26,10 +23,9 @@ namespace op
                 const auto thicknessCircleRatio = 1.f/75.f;
                 const auto thicknessLineRatioWRTCircle = 0.75f;
                 const auto& pairs = POSE_BODY_PART_PAIRS_RENDER[(int)poseModel];
-                const auto& colors = (poseModel == PoseModel::COCO_18 ? COCO_COLORS : MPI_COLORS);
 
                 // Render keypoints
-                renderKeypointsCpu(frameArray, poseKeypoints, pairs, colors, thicknessCircleRatio,
+                renderKeypointsCpu(frameArray, poseKeypoints, pairs, POSE_COLORS[(int)poseModel], thicknessCircleRatio,
                                    thicknessLineRatioWRTCircle, renderThreshold);
             }
         }

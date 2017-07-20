@@ -28,6 +28,8 @@ namespace op
             // Security checks
             if (cvInputData.empty())
                 error("Wrong input element (empty cvInputData).", __LINE__, __FUNCTION__, __FILE__);
+            if (cvInputData.channels() != 3)
+                error("Input images must be 3-channel BGR.", __LINE__, __FUNCTION__, __FILE__);
 
             // inputNetData - Reescale keeping aspect ratio and transform to float the input deep net image
             Array<float> inputNetData{mInputNetSize4D};

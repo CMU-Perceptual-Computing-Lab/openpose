@@ -13,7 +13,8 @@ namespace op
                                   41,36,  42,43,  43,44,  44,45,  45,46,  46,47,  47,42,  48,49,  49,50,  50,51,  51,52,  52,53,  53,54,  54,55,  55,56,  56,57,  57,58, \
                                   58,59,  59,48,  60,61,  61,62,  62,63,  63,64,  64,65,  65,66,  66,67,  67,60}
     const std::vector<unsigned int> FACE_PAIRS_RENDER {FACE_PAIRS_RENDER_GPU};
-    #define FACE_COLORS_RENDER      255.f,    255.f,    255.f
+    #define FACE_COLORS_RENDER_GPU 255.f,    255.f,    255.f
+    const std::vector<float> FACE_COLORS_RENDER{FACE_COLORS_RENDER_GPU};
 
     // Constant parameters
     const auto FACE_CCN_DECREASE_FACTOR = 8.f;

@@ -11,9 +11,9 @@ namespace op
     __constant__ const unsigned int COCO_PAIRS_GPU[] = POSE_COCO_PAIRS_RENDER_GPU;
     __constant__ const unsigned int BODY_22_PAIRS_GPU[] = POSE_BODY_22_PAIRS_RENDER_GPU;
     __constant__ const unsigned int MPI_PAIRS_GPU[] = POSE_MPI_PAIRS_RENDER_GPU;
-    __constant__ const float COCO_COLORS[] = {POSE_COCO_COLORS_RENDER};
-    __constant__ const float BODY_22_COLORS[] = {POSE_BODY_22_COLORS_RENDER};
-    __constant__ const float MPI_COLORS[] = {POSE_MPI_COLORS_RENDER};
+    __constant__ const float COCO_COLORS[] = {POSE_COCO_COLORS_RENDER_GPU};
+    __constant__ const float BODY_22_COLORS[] = {POSE_BODY_22_COLORS_RENDER_GPU};
+    __constant__ const float MPI_COLORS[] = {POSE_MPI_COLORS_RENDER_GPU};
 
 
 
