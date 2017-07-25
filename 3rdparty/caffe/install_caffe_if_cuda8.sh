@@ -57,7 +57,7 @@ sudo apt-get --assume-yes install --no-install-recommends libboost-all-dev
     sudo apt-get --assume-yes install libgflags-dev libgoogle-glog-dev liblmdb-dev
 # fi
 # Python libs
-sudo -h pip install numpy protobuf
+sudo -H pip install --upgrade numpy protobuf
 # OpenCV 2.4
 # sudo apt-get --assume-yes install libopencv-dev
 exitIfError
