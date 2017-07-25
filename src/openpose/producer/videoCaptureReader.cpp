@@ -5,24 +5,8 @@
 
 namespace op
 {
-    VideoCaptureReader::VideoCaptureReader(const int index) :
-        Producer{ProducerType::Webcam},
-        mVideoCapture{index}
-    {
-        try
-        {
-            // assert: make sure video capture was opened
-            if (!isOpened())
-                error("VideoCapture (webcam) could not be opened.", __LINE__, __FUNCTION__, __FILE__);
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-        }
-    }
-
-    VideoCaptureReader::VideoCaptureReader(const std::string& path) :
-        Producer{ProducerType::Video},
+    VideoCaptureReader::VideoCaptureReader(const std::string& path, const ProducerType type) :
+        Producer{type},
         mVideoCapture{path}
     {
         try

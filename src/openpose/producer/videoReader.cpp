@@ -1,10 +1,11 @@
 #include <openpose/utilities/fileSystem.hpp>
 #include <openpose/producer/videoReader.hpp>
+#include <openpose/producer/enumClasses.hpp>
 
 namespace op
 {
     VideoReader::VideoReader(const std::string & videoPath) :
-        VideoCaptureReader{videoPath},
+        VideoCaptureReader{videoPath, ProducerType::Video},
         mPathName{getFileNameNoExtension(videoPath)}
     {
     }

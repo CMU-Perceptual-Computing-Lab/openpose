@@ -59,7 +59,7 @@ namespace op
         }
     }
 
-    ProducerType flagsToProducerType(const std::string& imageDirectory, const std::string& videoPath, const int webcamIndex)
+    ProducerType flagsToProducerType(const std::string& imageDirectory, const std::string& videoPath, const std::string& webcamIndex)
     {
         try
         {
@@ -67,9 +67,9 @@ namespace op
             // Avoid duplicates (e.g. selecting at the time camera & video)
             if (!imageDirectory.empty() && !videoPath.empty())
                 error("Selected simultaneously image directory and video. Please, select only one.", __LINE__, __FUNCTION__, __FILE__);
-            else if (!imageDirectory.empty() && webcamIndex != 0)
+            else if (!imageDirectory.empty() && webcamIndex != "")
                 error("Selected simultaneously image directory and webcam. Please, select only one.", __LINE__, __FUNCTION__, __FILE__);
-            else if (!videoPath.empty() && webcamIndex != 0)
+            else if (!videoPath.empty() && webcamIndex != "")
                 error("Selected simultaneously video and webcam. Please, select only one.", __LINE__, __FUNCTION__, __FILE__);
 
             // Get desired ProducerType
@@ -87,7 +87,7 @@ namespace op
         }
     }
 
-    std::shared_ptr<Producer> flagsToProducer(const std::string& imageDirectory, const std::string& videoPath, const int webcamIndex,
+    std::shared_ptr<Producer> flagsToProducer(const std::string& imageDirectory, const std::string& videoPath, const std::string& webcamIndex,
                                               const std::string& webcamResolution, const double webcamFps)
     {
         try

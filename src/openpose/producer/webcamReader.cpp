@@ -1,11 +1,12 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <openpose/producer/webcamReader.hpp>
 #include <openpose/utilities/fastMath.hpp>
+#include <openpose/producer/enumClasses.hpp>
 
 namespace op
 {
-    WebcamReader::WebcamReader(const int webcamIndex, const Point<int>& webcamResolution, const double fps) :
-        VideoCaptureReader{webcamIndex},
+    WebcamReader::WebcamReader(const std::string& webcamIndex, const Point<int>& webcamResolution, const double fps) :
+        VideoCaptureReader{webcamIndex, ProducerType::Webcam},
         mFps{fps},
         mFrameNameCounter{-1}
     {
