@@ -250,7 +250,7 @@ include(CPack)
 # Create target
 add_custom_target(
     pack-${project_name}
-    COMMAND ${CPACK_COMMAND} --config ${PROJECT_BINARY_DIR}/CPackConfig-${project_name}.cmake -C $<CONFIG>
+    COMMAND ${CPACK_COMMAND} --config ${PROJECT_BINARY_DIR}/CPackConfig-${project_name}.cmake
     WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
 )
 set_target_properties(pack-${project_name} PROPERTIES EXCLUDE_FROM_DEFAULT_BUILD 1)
