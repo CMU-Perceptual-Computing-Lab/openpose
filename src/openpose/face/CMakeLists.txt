@@ -5,7 +5,8 @@
 
 # find_package(THIRDPARTY REQUIRED)
 #set(CUDA_SEPARABLE_COMPILATION ON)
-find_package(CUDA QUIET REQUIRED)
+find_package(CUDA QUIET)
+find_package(Caffe REQUIRED)
 
 # 
 # Library name and options
@@ -61,7 +62,7 @@ source_group_by_path(${source_path}  "\\\\.cpp$|\\\\.c$|\\\\.h$|\\\\.hpp$"
 # 
 
 # Build library
-if (CUDA_FOUND)
+if (CUDA_FOUND AND NOT CPU_ONLY)
 include_directories( ${CMAKE_SOURCE_DIR}/include )
 list(APPEND CUDA_NVCC_FLAGS "-std=c++11;-O3")
 cuda_add_library(${target}
@@ -75,7 +76,7 @@ add_library(${target}
     ${headers}
     ${cuda_files}
 )
-endif(CUDA_FOUND)
+endif (CUDA_FOUND AND NOT CPU_ONLY)
 
 # Create namespaced alias
 add_library(${META_PROJECT_NAME}::${target} ALIAS ${target})
@@ -137,6 +138,7 @@ target_include_directories(${target}
     ${PROJECT_BINARY_DIR}/source/include
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_CURRENT_BINARY_DIR}/include
+    ${Caffe_INCLUDE_DIRS}
 
     PUBLIC
     ${DEFAULT_INCLUDE_DIRECTORIES}
@@ -159,6 +161,7 @@ target_link_libraries(${target}
     ${DEFAULT_LIBRARIES}
     ${META_PROJECT_NAME}::core
     ${CUDA_LIBRARIES}
+    ${Caffe_LIBRARIES}
 #    INTERFACE
 )
 
