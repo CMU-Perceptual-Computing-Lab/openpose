@@ -14,15 +14,15 @@ find_path(Caffe_INCLUDE_DIRS
   HINTS
     ${Caffe_DIR}/include)
 
-find_library(Caffe_LIBRARIES 
+find_library(Caffe_LIBS 
   NAMES
     caffe
   HINTS
     ${Caffe_DIR}/lib)
 
 message("include_dirs:${Caffe_INCLUDE_DIRS}")
-message("lib_dirs:${Caffe_LIBRARIES}")
+message("lib_dirs:${Caffe_LIBS}")
 
-if(Caffe_LIBRARIES AND Caffe_INCLUDE_DIRS)
+if(Caffe_LIBS AND Caffe_INCLUDE_DIRS)
   set(Caffe_FOUND 1)
 endif()

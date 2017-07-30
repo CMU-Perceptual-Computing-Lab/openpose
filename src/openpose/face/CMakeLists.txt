@@ -8,4 +8,5 @@ set(SOURCES SHARED
 )
 
 cuda_add_library(face ${SOURCES})
+target_link_libraries(face caffe)
 # target_include_directories()

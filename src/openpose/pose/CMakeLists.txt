@@ -11,3 +11,4 @@ set(SOURCES
   renderPose.cu)
 
 cuda_add_library(pose SHARED ${SOURCES})
+target_link_libraries(pose caffe)
