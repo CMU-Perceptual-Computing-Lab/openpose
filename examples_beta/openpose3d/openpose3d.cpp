@@ -47,7 +47,8 @@ DEFINE_int32(keypoint_scale,            0,              "Scaling of the (x,y) co
                                                         " `resolution`), `3` to scale it in the range [0,1], and 4 for range [-1,1]. Non related"
                                                         " with `scale_number` and `scale_gap`.");
 // OpenPose Body Pose
-DEFINE_string(model_pose,               "COCO",         "Model to be used (e.g. COCO, MPI, MPI_4_layers).");
+DEFINE_string(model_pose,               "COCO",         "Model to be used. E.g. `COCO` (18 keypoints), `MPI` (15 keypoints, ~10% faster), "
+                                                        "`MPI_4_layers` (15 keypoints, even faster but less accurate).");
 DEFINE_string(net_resolution,           "656x368",      "Multiples of 16. If it is increased, the accuracy potentially increases. If it is decreased,"
                                                         " the speed increases. For maximum speed-accuracy balance, it should keep the closest aspect"
                                                         " ratio possible to the images or videos to be processed. E.g. the default `656x368` is"
@@ -68,13 +69,16 @@ DEFINE_int32(heatmaps_scale,            2,              "Set 0 to scale op::Datu
                                                         " rounded [0,255].");
 // OpenPose Face
 DEFINE_bool(face,                       true,           "Enables face keypoint detection. It will share some parameters from the body pose, e.g."
-                                                        " `model_folder`.");
+                                                        " `model_folder`. Note that this will considerable slow down the performance and increse"
+                                                        " the required GPU memory. In addition, the greater number of people on the image, the"
+                                                        " slower OpenPose will be.");
 DEFINE_string(face_net_resolution,      "368x368",      "Multiples of 16 and squared. Analogous to `net_resolution` but applied to the face keypoint"
                                                         " detector. 320x320 usually works fine while giving a substantial speed up when multiple"
                                                         " faces on the image.");
 // OpenPose Hand
 DEFINE_bool(hand,                       true,           "Enables hand keypoint detection. It will share some parameters from the body pose, e.g."
-                                                        " `model_folder`.");
+                                                        " `model_folder`. Analogously to `--face`, it will also slow down the performance, increase"
+                                                        " the required GPU memory and its speed depends on the number of people.");
 DEFINE_string(hand_net_resolution,      "368x368",      "Multiples of 16 and squared. Analogous to `net_resolution` but applied to the hand keypoint"
                                                         " detector.");
 DEFINE_int32(hand_scale_number,         1,              "Analogous to `scale_number` but applied to the hand keypoint detector. Our best results"
@@ -88,9 +92,11 @@ DEFINE_bool(hand_tracking,              false,          "Adding hand tracking mi
                                                         " simply looks for hands in positions at which hands were located in previous frames, but"
                                                         " it does not guarantee the same person ID among frames");
 // OpenPose Rendering
-DEFINE_int32(part_to_show,              0,              "Part to show from the start.");
+DEFINE_int32(part_to_show,              0,              "Prediction channel to visualize (default: 0). 0 for all the body parts, 1-18 for each body"
+                                                        " part heat map, 19 for the background heat map, 20 for all the body part heat maps"
+                                                        " together, 21 for all the PAFs, 22-40 for each body part pair PAF");
 DEFINE_bool(disable_blending,           false,          "If blending is enabled, it will merge the results with the original frame. If disabled, it"
-                                                        " will only display the results.");
+                                                        " will only display the results on a black background.");
 // OpenPose Rendering Pose
 DEFINE_double(render_threshold,         0.05,           "Only estimated keypoints whose score confidences are higher than this threshold will be"
                                                         " rendered. Generally, a high threshold (> 0.5) will only render very clear body parts;"

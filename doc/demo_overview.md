@@ -7,7 +7,30 @@ In order to learn how to use it, run `./build/examples/openpose/openpose.bin --h
 
 
 
-## All Flags
+## Most Important Configuration Flags
+We enumerate some of the most important flags, check the `Flags Detailed Description` section or run `./build/examples/openpose/openpose.bin --help` for a full description of all of them.
+
+- `--face`: Enables face keypoint detection.
+- `--hand`: Enables hand keypoint detection.
+- `--video input.mp4`: Read video.
+- `--camera 3`: Read webcam number 3.
+- `--image_dir path_to_images/`: Run on a folder with images.
+- `--write_video path.avi`: Save processed images as video.
+- `--write_images folder_path`: Save processed images on a folder.
+- `--write_keypoint path/`: Output JSON, XML or YML files with the people pose data on a folder.
+- `--process_real_time`: For video, it might skip frames to display at real time.
+- `--disable_blending`: If selected, it will render the results on a black backgroung, not showing the original image. Related: `part_to_show`, `alpha_pose`, and `alpha_pose`.
+- `--part_to_show`: Prediction channel to visualize.
+- `--no_display`: Display window not opened. Useful for servers and/or to slightly speed up OpenPose.
+- `--num_gpu 2 --num_gpu_start 1`: Parallelize over this number of GPUs starting by the desired device id. By default it uses all the available GPUs.
+- `--net_resolution 656x368 --resolution 1280x720`: For HD input (default values).
+- `--net_resolution 496x368 --resolution 640x480`: For VGA input.
+- `--model_pose MPI`: Model to use, affects number keypoints, speed and accuracy.
+- `--logging_level 3`: Logging messages threshold, range [0,255]: 0 will output any message & 255 will output none. Current messages in the range [1-4], 1 for low priority messages and 4 for important ones.
+
+
+
+## Flags Detailed Description
 Each flag is divided into flag name, default value, and description.
 
 1. Debugging
@@ -18,7 +41,7 @@ Each flag is divided into flag name, default value, and description.
 - DEFINE_string(camera_resolution,        "1280x720",     "Size of the camera frames to ask for.");
 - DEFINE_double(camera_fps,               30.0,           "Frame rate for the webcam (only used when saving video from webcam). Set this value to the minimum value between the OpenPose displayed speed and the webcam real frame rate.");
 - DEFINE_string(video,                    "",             "Use a video file instead of the camera. Use `examples/media/video.avi` for our default example video.");
-- DEFINE_string(image_dir,                "",             "Process a directory of images. Use `examples/media/` for our default example folder with 20 images.");
+- DEFINE_string(image_dir,                "",             "Process a directory of images. Use `examples/media/` for our default example folder with 20 images. Read all standard formats (jpg, png, bmp, etc.).");
 - DEFINE_uint64(frame_first,              0,              "Start on desired frame number. Indexes are 0-based, i.e. the first frame has index 0.");
 - DEFINE_uint64(frame_last,               -1,             "Finish on desired frame number. Select -1 to disable. Indexes are 0-based, e.g. if set to 10, it will process 11 frames (0-10).");
 - DEFINE_bool(frame_flip,                 false,          "Flip/mirror each frame (e.g. for real time webcam demonstrations).");
@@ -33,7 +56,7 @@ Each flag is divided into flag name, default value, and description.
 - DEFINE_int32(keypoint_scale,            0,              "Scaling of the (x,y) coordinates of the final pose data array, i.e. the scale of the (x,y) coordinates that will be saved with the `write_keypoint` & `write_keypoint_json` flags. Select `0` to scale it to the original source resolution, `1`to scale it to the net output size (set with `net_resolution`), `2` to scale it to the final output size (set with `resolution`), `3` to scale it in the range [0,1], and 4 for range [-1,1]. Non related with `scale_number` and `scale_gap`.");
 
 4. OpenPose Body Pose
-- DEFINE_string(model_pose,               "COCO",         "Model to be used (e.g. COCO, MPI, MPI_4_layers).");
+- DEFINE_string(model_pose,               "COCO",         "Model to be used. E.g. `COCO` (18 keypoints), `MPI` (15 keypoints, ~10% faster), `MPI_4_layers` (15 keypoints, even faster but less accurate).");
 - DEFINE_string(net_resolution,           "656x368",      "Multiples of 16. If it is increased, the accuracy usually increases. If it is decreased, the speed increases. For maximum speed-accuracy balance, it should keep the closest aspect ratio possible to the images or videos to be processed. E.g. the default `656x368` is optimal for 16:9 videos, e.g. full HD (1980x1080) and HD (1280x720) videos.");
 - DEFINE_int32(scale_number,              1,              "Number of scales to average.");
 - DEFINE_double(scale_gap,                0.3,            "Scale gap between scales. No effect unless scale_number > 1. Initial scale is always 1. If you want to change the initial scale, you actually want to multiply the `net_resolution` by your desired initial scale.");
@@ -42,19 +65,19 @@ Each flag is divided into flag name, default value, and description.
 - DEFINE_bool(heatmaps_add_PAFs,          false,          "Same functionality as `add_heatmaps_parts`, but adding the PAFs.");
 
 5. OpenPose Face
-- DEFINE_bool(face,                       false,          "Enables face keypoint detection. It will share some parameters from the body pose, e.g. `model_folder`.");
+- DEFINE_bool(face,                       false,          "Enables face keypoint detection. It will share some parameters from the body pose, e.g. `model_folder`. Note that this will considerable slow down the performance and increse the required GPU memory. In addition, the greater number of people on the image, the slower OpenPose will be.");
 - DEFINE_string(face_net_resolution,      "368x368",      "Multiples of 16 and squared. Analogous to `net_resolution` but applied to the face keypoint detector. 320x320 usually works fine while giving a substantial speed up when multiple faces on the image.");
 
 6. OpenPose Hand
-- DEFINE_bool(hand,                       false,          "Enables hand keypoint detection. It will share some parameters from the body pose, e.g. `model_folder`.");
+- DEFINE_bool(hand,                       false,          "Enables hand keypoint detection. It will share some parameters from the body pose, e.g. `model_folder`. Analogously to `--face`, it will also slow down the performance, increase the required GPU memory and its speed depends on the number of people.");
 - DEFINE_string(hand_net_resolution,      "368x368",      "Multiples of 16 and squared. Analogous to `net_resolution` but applied to the hand keypoint detector.");
 - DEFINE_int32(hand_scale_number,         1,              "Analogous to `scale_number` but applied to the hand keypoint detector. Our best results were found with `hand_scale_number` = 6 and `hand_scale_range` = 0.4");
 - DEFINE_double(hand_scale_range,         0.4,            "Analogous purpose than `scale_gap` but applied to the hand keypoint detector. Total range between smallest and biggest scale. The scales will be centered in ratio 1. E.g. if scaleRange = 0.4 and scalesNumber = 2, then there will be 2 scales, 0.8 and 1.2.");
 - DEFINE_bool(hand_tracking,              false,          "Adding hand tracking might improve hand keypoints detection for webcam (if the frame rate is high enough, i.e. >7 FPS per GPU) and video. This is not person ID tracking, it simply looks for hands in positions at which hands were located in previous frames, but it does not guarantee the same person ID among frames");
 
 7. OpenPose Rendering
-- DEFINE_int32(part_to_show,              0,              "Part to show from the start.");
-- DEFINE_bool(disable_blending,           false,          "If blending is enabled, it will merge the results with the original frame. If disabled, it will only display the results.");
+- DEFINE_int32(part_to_show,              0,              "Prediction channel to visualize (default: 0). 0 for all the body parts, 1-18 for each body part heat map, 19 for the background heat map, 20 for all the body part heat maps together, 21 for all the PAFs, 22-40 for each body part pair PAF");
+- DEFINE_bool(disable_blending,           false,          "If blending is enabled, it will merge the results with the original frame. If disabled, it will only display the results on a black background.");
 
 8. OpenPose Rendering Pose
 - DEFINE_double(render_threshold,         0.05,           "Only estimated keypoints whose score confidences are higher than this threshold will be rendered. Generally, a high threshold (> 0.5) will only render very clear body parts; while small thresholds (~0.1) will also output guessed and occluded keypoints, but also more false positives (i.e. wrong detections).");
@@ -78,8 +101,7 @@ Each flag is divided into flag name, default value, and description.
 - DEFINE_bool(fullscreen,                 false,          "Run in full-screen mode (press f during runtime to toggle).");
 - DEFINE_bool(process_real_time,          false,          "Enable to keep the original source frame rate (e.g. for video). If the processing time is too long, it will skip frames. If it is too fast, it will slow it down.");
 - DEFINE_bool(no_gui_verbose,             false,          "Do not write text on output images on GUI (e.g. number of current frame and people). It does not affect the pose rendering.");
-- DEFINE_bool(no_display,                 false,          "Do not open a display window.");
-
+- DEFINE_bool(no_display,                 false,          "Do not open a display window. Useful if there is no X server and/or to slightly speed up the processing if visual output is not required.");
 12. Result Saving
 - DEFINE_string(write_images,             "",             "Directory to write rendered frames in `write_images_format` image format.");
 - DEFINE_string(write_images_format,      "png",          "File extension and format for `write_images`, e.g. png, jpg or bmp. Check the OpenCV function cv::imwrite for all compatible extensions.");
@@ -93,40 +115,11 @@ Each flag is divided into flag name, default value, and description.
 
 
 
-## Multiple Scales
-Running at multiple scales might drastically slow down the speed, but it will increase the accuracy. Given the CNN input size (set with `net_resolution`), `scale_number` and `scale_gap` configure the number of scales to use and the gap between them, respectively. For instance, `--scale_number 3 --scale_gap 0.15` means using 3 scales at resolution: (1), (1-0.15) and (1-2*0.15) times the `net_resolution`.
-
-
-
 ## Heat Maps Storing
 The following command will save all the body part heat maps, background heat map and Part Affinity Fields (PAFs) in the folder `output_heatmaps_folder`. It will save them on PNG format. Instead of individually saving each of the 67 heatmaps (18 body parts + background + 2 x 19 PAFs) individually, the library concatenate them vertically into a huge (width x #heatmaps) x (height) matrix. The PAFs channels are multiplied by 2 because there is one heatmpa for the x-coordinates and one for the y-coordinates. The order is body parts + bkg + PAFs. It will follow the sequence on POSE_BODY_PART_MAPPING in [include/openpose/pose/poseParameters.hpp](../include/openpose/pose/poseParameters.hpp).
 ```
 ./build/examples/openpose/openpose.bin --video examples/media/video.avi --heatmaps_add_parts --heatmaps_add_bkg --heatmaps_add_PAFs --write_heatmaps output_heatmaps_folder/
 ```
-
-
-
-## Some Important Configuration Flags
-Please, in order to check all the real time pose demo options and their details, run `./build/examples/openpose/openpose.bin --help`. We describe here some of the most important ones.
-
-- `--face`: If enabled, it will also detect the faces on the image. Note that this will considerable slow down the performance and increse the required GPU memory. In addition, the greater number of people on the image, the slower OpenPose will be.
-- `--hand`: Analogously to `--face`, but applied to hands. Note that this will also slow down the performance, increse the required GPU memory and its speed depends on the number of people.
-- `--video input.mp4`: Input video. If omitted, it will use the webcam.
-- `--camera 3`: Choose webcam number (default: 0). If `--camera`, `--image_dir` and `--write_video` are omitted, it is equivalent to use `--camera 0`.
-- `--image_dir path_to_images/`: Run on all images (jpg, png, bmp, etc.) in `path_to_images/`. You can test the program with the image directory `examples/media/`.
-- `--write_video path.avi`: Render images with this prefix: `path.avi`. You can test the program with the example video `examples/media/video.avi`.
-- `--write_images folder_path`: Render images on the folder `folder_path`.
-- `--write_keypoint path/`: Output JSON, XML or YML files with the people pose data on the `path/` folder.
-- `--process_real_time`: It might skip frames in order to keep the final output displaying frames on real time.
-- `--disable_blending`: If selected, it will only render the pose skeleton or desired heat maps, while blocking the original background. Also related: `part_to_show`, `alpha_pose`, and `alpha_pose`.
-- `--part_to_show`: Select the prediction channel to visualize (default: 0). 0 to visualize all the body parts, 1-18 for each body part heat map, 19 for the background heat map, 20 for all the body part heat maps together, 21 for all the PAFs, 22-40 for each body part pair PAF.
-- `--no_display`: Display window not opened. Useful if there is no X server and/or to slightly speed up the processing if visual output is not required.
-- `--num_gpu 2 --num_gpu_start 1`: Parallelize over this number of GPUs starting by the desired device id. Default `num_gpu` is -1, which will use all the available GPUs.
-- `--scale_number 3 --scale_gap 0.15`: Use 3 scales, 1, (1-0.15), (1-0.15*2). Default is one scale. If you want to change the initial scale, you actually want to multiply your desired initial scale by the `net_resolution`.
-- `--net_resolution 656x368 --resolution 1280x720`: For HD images and video (default values).
-- `--net_resolution 496x368 --resolution 640x480`: For VGA images and video.
-- `--model_pose MPI`: It will use MPI (15 body keypoints). Default: COCO (18 body keypoints). MPI is slightly faster. The variation `MPI_4_layers` sacrifies accuracy in order to further increase speed.
-- `--logging_level 3`: Logging messages threshold, range [0,255]: 0 will output any message & 255 will output none. Current messages in the range [1-4], 1 for low priority messages and 4 for important ones.
 
 
 
