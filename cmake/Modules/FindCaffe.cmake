@@ -1,4 +1,4 @@
-unset(Caffe_FOUND)
+# unset(Caffe_FOUND)
 
 ###Set the variable Caffe_DIR as the root of your caffe directory
 set(Caffe_DIR ${CMAKE_SOURCE_DIR}/build/3rdparty/caffe)
@@ -23,6 +23,9 @@ find_library(Caffe_LIBS
 message("include_dirs:${Caffe_INCLUDE_DIRS}")
 message("lib_dirs:${Caffe_LIBS}")
 
-if(Caffe_LIBS AND Caffe_INCLUDE_DIRS)
-  set(Caffe_FOUND 1)
-endif()
+if (Caffe_LIBS AND Caffe_INCLUDE_DIRS)
+  set(Caffe_FOUND true)
+else ()
+  set(Caffe_FOUND false)
+endif ()
+message("\${Caffe_FOUND} = ${Caffe_FOUND}")
