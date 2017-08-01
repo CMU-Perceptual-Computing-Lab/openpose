@@ -16,6 +16,10 @@ namespace op
     OP_API std::string toFixedLengthString(const T number, const unsigned long long stringLength = 0);
 
     OP_API std::vector<std::string> splitString(const std::string& stringToSplit, const std::string& delimiter);
+
+    OP_API std::string toLower(const std::string& string);
+
+    OP_API std::string toUpper(const std::string& string);
 }
 
 #endif // OPENPOSE_UTILITIES_STRING_HPP
