@@ -2,13 +2,14 @@ OpenPose
 ====================================
 
 ## Latest News
-- Apr 2017: **Body** released!
-- May 2017: **Windows** version released!
-- Jun 2017: **Face** released!
-- Jul 2017: **Hands** released!
 - Jul 2017: **Windows**, New [**portable demo**](doc/installation.md#installation---demo) **and** [**easier library installation**](doc/installation.md#installation---library)!
+- Jul 2017: **Hands** released!
+- Jun 2017: **Face** released!
+- May 2017: **Windows** version released!
+- Apr 2017: **Body** released!
 - Check all the [release notes](doc/release_notes.md).
-- Interested in an internship on CMU as OpenPose programmer? See [this link](https://docs.google.com/document/d/14SygG39NjIRZfx08clewTdFMGwVdtRu2acyCi3TYcHs/edit?usp=sharing) for details.
+
+We are offering [internships at Carnegie Mellon University as OpenPose programmer](https://docs.google.com/document/d/14SygG39NjIRZfx08clewTdFMGwVdtRu2acyCi3TYcHs/edit?usp=sharing) (required to live or move to Pittsburgh).
 
 
 
@@ -19,7 +20,7 @@ OpenPose is a **library for real-time multi-person keypoint detection and multi-
 
 OpenPose represents the **first real-time system to jointly detect human body, hand and facial keypoints (in total 130 keypoints) on single images**. In addition, the system computational performance on body keypoint estimation is invariant to the number of detected people in the image.
 
-OpenPose is freely available for free non-commercial use, and may be redistributed under these conditions. Please, see the [license](LICENSE) for further details. For commercial purposes, contact [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/).
+OpenPose is freely available for free non-commercial use, and may be redistributed under these conditions. Please, see the [license](LICENSE) for further details. [Interested in a commercial license? Check this link](https://flintbox.com/public/project/47343/). For commercial queries, contact [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/).
 
 In addition, OpenPose would not be possible without the [CMU Panoptic Studio](http://domedb.perception.cs.cmu.edu/).
 
