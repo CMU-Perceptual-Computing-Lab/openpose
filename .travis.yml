@@ -1,0 +1,34 @@
+# This will run on Travis' 'new' container-based infrastructure
+sudo: false
+
+# Blacklist
+branches:
+  only:
+    - master
+
+# Environment variables
+env:
+  global:
+    - GH_REPO_NAME: openpose
+    - DOXYFILE: $TRAVIS_BUILD_DIR/doc/doc_autogeneration.doxygen
+    - GH_REPO_REF: github.com/bikz05/openpose.git
+
+# Install dependencies
+addons:
+  apt:
+    packages:
+      - doxygen
+      - doxygen-doc
+      - doxygen-latex
+      - doxygen-gui
+      - graphviz
+
+# Build your code e.g. by calling make
+script:
+  - make
+
+# Generate and deploy documentation
+after_success:
+  - cd $TRAVIS_BUILD_DIR
+  - chmod +x generateDocumentationAndDeploy.sh
+  - ./generateDocumentationAndDeploy.sh
