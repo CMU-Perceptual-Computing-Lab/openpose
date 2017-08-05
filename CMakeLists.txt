@@ -9,11 +9,14 @@ add_definitions(-std=c++11)
 option(BUILD_DOCS  "Build documentation." OFF)
 option(BUILD_CAFFE "Build using caffe" ON)
 option(CPU_ONLY "Build only for cpu" OFF)
+option(DOWNLOAD_MODELS "Download the models" ON)
 
 # Flag for OpenPose Macros
 add_definitions(-DUSE_CAFFE)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
+
+# Download the models
 
 # include(FindCaffe)
 
@@ -77,3 +80,40 @@ if (DOXYGEN_FOUND)
 else (DOXYGEN_FOUND)
   message("Doxygen need to be installed to generate the doxygen documentation")
 endif (DOXYGEN_FOUND)
+
+if (DOWNLOAD_MODELS)
+
+  message("Download the models.")
+
+  set(OPENPOSE_URL "http://posefs1.perception.cs.cmu.edu/OpenPose/models/")
+  set(POSE_FOLDER "${CMAKE_SOURCE_DIR}/models/pose/")
+  set(FACE_FOLDER "${CMAKE_SOURCE_DIR}/models/face/")
+  set(HAND_FOLDER "${CMAKE_SOURCE_DIR}/models/hand/")
+
+  # Body (COCO)
+  set(COCO_FOLDER pose/coco/)
+  set(COCO_MODEL ${COCO_FOLDER}pose_iter_440000.caffemodel)
+  file(DOWNLOAD ${OPENPOSE_URL}${COCO_MODEL} 
+      ${CMAKE_SOURCE_DIR}/models/${COCO_MODEL} SHOW_PROGRESS)
+
+  # Body (MPI)
+  set(MPI_FOLDER pose/mpi/)
+  set(MPI_MODEL ${MPI_FOLDER}pose_iter_160000.caffemodel)
+  file(DOWNLOAD ${OPENPOSE_URL}${MPI_MODEL} 
+      ${CMAKE_SOURCE_DIR}/models/${MPI_MODEL} SHOW_PROGRESS)
+
+  # Face
+  set(FACE_MODEL face/pose_iter_116000.caffemodel)
+  file(DOWNLOAD ${OPENPOSE_URL}${FACE_MODEL} 
+      ${CMAKE_SOURCE_DIR}/models/${FACE_MODEL} SHOW_PROGRESS)
+
+  # Hand
+  set(HAND_MODEL hand/pose_iter_102000.caffemodel)
+  file(DOWNLOAD ${OPENPOSE_URL}${HAND_MODEL} 
+      ${CMAKE_SOURCE_DIR}/models/${HAND_MODEL} SHOW_PROGRESS)
+
+  message("Completing downloading models.")
+  # add_custom_target(download_coco ALL 
+  #   DEPENDS ${COCO_MODEL} ${FACE_MODEL} ${HAND_MODEL} ${MPI_MODEL})
+
+endif (DOWNLOAD_MODELS)
