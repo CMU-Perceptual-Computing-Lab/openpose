@@ -30,7 +30,7 @@ RUN pip install --upgrade pip
 
 RUN git clone https://github.com/chriamue/openpose
 RUN cd openpose && git checkout cmake && git pull origin cmake && mkdir -p build && cd build \
-    && cmake .. && make -j"$(nproc)"
+    && cmake -DCMAKE_BUILD_TYPE=Release .. && make -j"$(nproc)"
 
 RUN cd openpose/models && ./getModels.sh
 
