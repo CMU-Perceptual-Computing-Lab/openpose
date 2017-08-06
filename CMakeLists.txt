@@ -79,6 +79,10 @@ option(OPTION_BUILD_EXAMPLES "Build examples."                                  
 option(OPTION_USE_CAFFE      "Build using caffe"                                      ON)
 option(CPU_ONLY              "Build only for cpu"                                     OFF)
 
+# Include 3rdpary
+
+add_subdirectory(3rdparty)
+
 # 
 # Declare project
 # 
@@ -180,7 +184,6 @@ endif()
 # Project modules
 # 
 
-add_subdirectory(3rdparty)
 add_subdirectory(src)
 add_subdirectory(doc)
 add_subdirectory(deploy)

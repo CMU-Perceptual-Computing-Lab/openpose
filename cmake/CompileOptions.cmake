@@ -25,12 +25,9 @@ set(DEFAULT_PROJECT_OPTIONS
     CXX_VISIBILITY_PRESET     "default"
 )
 
-find_package(Caffe QUIET)
-
-if( ${Caffe_INCLUDE_DIRS} )
-else()
-set (Caffe_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/3rdparty/caffe/include")
-endif()
+if(OPTION_USE_CAFFE)
+    find_package(Caffe REQUIRED)
+endif(OPTION_USE_CAFFE)
 
 message( STATUS "Found Caffe: ${Caffe_DIR} ${Caffe_INCLUDE_DIRS} ${Caffe_LIBRARIES}")
 
@@ -38,7 +35,7 @@ message( STATUS "Found Caffe: ${Caffe_DIR} ${Caffe_INCLUDE_DIRS} ${Caffe_LIBRARI
 # Include directories
 # 
 
-set(DEFAULT_INCLUDE_DIRECTORIES)
+set(DEFAULT_INCLUDE_DIRECTORIES ${Caffe_INCLUDE_DIR})
 
 
 # 
