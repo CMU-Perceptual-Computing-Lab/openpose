@@ -173,7 +173,7 @@ Just comment on GibHub or make a pull request and we will answer as soon as poss
 
 
 ## Citation
-Please cite the papers in your publications if it helps your research:
+Please cite these papers in your publications if it helps your research (the face keypoint detector was trained using the same procedure described in [Simon et al. 2017]):
 
     @inproceedings{cao2017realtime,
       author = {Zhe Cao and Tomas Simon and Shih-En Wei and Yaser Sheikh},
