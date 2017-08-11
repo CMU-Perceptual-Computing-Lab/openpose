@@ -9,7 +9,7 @@ OpenPose
 - Apr 2017: **Body** released!
 - Check all the [release notes](doc/release_notes.md).
 
-We are offering [internships at Carnegie Mellon University as OpenPose programmer](https://docs.google.com/document/d/14SygG39NjIRZfx08clewTdFMGwVdtRu2acyCi3TYcHs/edit?usp=sharing) (required to live or move to Pittsburgh).
+We are offering [internships at Carnegie Mellon University as OpenPose programmer](https://docs.google.com/document/d/14SygG39NjIRZfx08clewTdFMGwVdtRu2acyCi3TYcHs/edit?usp=sharing) (need to live in or be willing to move to Pittsburgh).
 
 
 
@@ -173,7 +173,7 @@ Just comment on GibHub or make a pull request and we will answer as soon as poss
 
 
 ## Citation
-Please cite the papers in your publications if it helps your research:
+Please cite these papers in your publications if it helps your research (the face keypoint detector was trained using the same procedure described in [Simon et al. 2017]):
 
     @inproceedings{cao2017realtime,
       author = {Zhe Cao and Tomas Simon and Shih-En Wei and Yaser Sheikh},
