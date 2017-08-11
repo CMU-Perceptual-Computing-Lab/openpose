@@ -9,7 +9,7 @@ OpenPose
 - Apr 2017: **Body** released!
 - Check all the [release notes](doc/release_notes.md).
 
-We are offering [internships at Carnegie Mellon University as OpenPose programmer](https://docs.google.com/document/d/14SygG39NjIRZfx08clewTdFMGwVdtRu2acyCi3TYcHs/edit?usp=sharing) (required to live or move to Pittsburgh).
+We are offering [internships at Carnegie Mellon University as OpenPose programmer](https://docs.google.com/document/d/14SygG39NjIRZfx08clewTdFMGwVdtRu2acyCi3TYcHs/edit?usp=sharing) (need to live in or be willing to move to Pittsburgh).
 
 
 
