@@ -4,6 +4,8 @@ cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
 
 # Turn on C++11
 add_definitions(-std=c++11)
+# Flag for OpenPose Macros
+add_definitions(-DUSE_CAFFE)
 
 # Project options
 option(BUILD_DOCS  "Build documentation." OFF)
@@ -23,9 +25,6 @@ if (DOWNLOAD_MODELS)
   CMAKE_DEPENDENT_OPTION(DOWNLOAD_FACE_MODEL "Download face model" OFF
       "DOWNLOAD_MODELS" OFF)
 endif (DOWNLOAD_MODELS)
-
-# Flag for OpenPose Macros
-add_definitions(-DUSE_CAFFE)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
 
