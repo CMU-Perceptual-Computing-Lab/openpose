@@ -10,7 +10,7 @@ branches:
 env:
   global:
     - GH_REPO_NAME: openpose
-    - DOXYFILE: $TRAVIS_BUILD_DIR/doc/doc_autogeneration.doxygen
+    - DOXYFILE: doc_autogeneration.doxygen
     - GH_REPO_REF: github.com/bikz05/openpose.git
 
 # Install dependencies
