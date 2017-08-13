@@ -8,15 +8,12 @@ add_definitions(-std=c++11)
 # Project options
 option(BUILD_DOCS  "Build documentation." OFF)
 option(BUILD_CAFFE "Build using caffe" ON)
-option(CPU_ONLY "Build only for cpu" OFF)
+option(CPU_ONLY "Build only for cpu" OFF) # This option is not used now,
 option(DOWNLOAD_MODELS "Download the models" OFF)
 
 # Include sub options
 include(CMakeDependentOption)
 if (DOWNLOAD_MODELS)
-  CMAKE_DEPENDENT_OPTION(USE_FOO "Use Foo" ON
-    "USE_BAR;NOT USE_ZOT" OFF)
-
   CMAKE_DEPENDENT_OPTION(DOWNLOAD_COCO_MODEL "Download coco model" OFF
       "DOWNLOAD_MODELS" OFF)
   CMAKE_DEPENDENT_OPTION(DOWNLOAD_MPI_MODEL "Download mpi model" OFF
@@ -29,7 +26,6 @@ endif (DOWNLOAD_MODELS)
 
 # Flag for OpenPose Macros
 add_definitions(-DUSE_CAFFE)
-
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
 
@@ -83,6 +79,7 @@ message(\${CUDA_NVCC_FLAGS} ${CUDA_NVCC_FLAGS})
 message(\${CMAKE_CURRENT_BINARY_DIR} = ${CMAKE_CURRENT_BINARY_DIR})
 
 # Make the CMake documentation
+# TODO remove the travis option.
 find_package(Doxygen)
 if (DOXYGEN_FOUND)
     # set input and output files
@@ -98,74 +95,21 @@ else (DOXYGEN_FOUND)
   message("Doxygen need to be installed to generate the doxygen documentation")
 endif (DOXYGEN_FOUND)
 
+include(cmake/Utils.cmake)
 # Download the models if flag is set
-# TODO -- write a function to download the models
-# To much clutter right how.
-# TODO -- add checksum.
+# TODO -- remove hardcoded ubuntu paths
 if (DOWNLOAD_MODELS)
 
   message(STATUS "Download the models.")
-
   set(OPENPOSE_URL "http://posefs1.perception.cs.cmu.edu/OpenPose/models/")
-
+  
   # Body (COCO)
-  if (DOWNLOAD_COCO_MODEL)
-    message(STATUS "Now downloading body (COCO) model")
-    set(COCO_MODEL pose/coco/pose_iter_440000.caffemodel)
-    set(COCO_FILENAME ${CMAKE_SOURCE_DIR}/models/${COCO_MODEL})
-    if (NOT EXISTS ${COCO_FILENAME})
-      file(DOWNLOAD ${OPENPOSE_URL}${COCO_MODEL} ${COCO_FILENAME}) # SHOW_PROGRESS)
-    else (NOT EXISTS ${COCO_FILENAME})
-      message(STATUS "Model already exists.")
-    endif (NOT EXISTS ${COCO_FILENAME})
-  else (DOWNLOAD_MPI_MODEL)
-    message(STATUS "Not downloading body (COCO) model")
-  endif (DOWNLOAD_COCO_MODEL)
-
+  download_model("body (coco)" ${DOWNLOAD_COCO_MODEL} pose/coco/pose_iter_440000.caffemodel)
   # Body (MPI)
-  if (DOWNLOAD_MPI_MODEL)
-    message(STATUS "Now downloading body (MPI) model")
-    set(MPI_MODEL pose/mpi/pose_iter_160000.caffemodel)
-    set(MPI_FILENAME ${CMAKE_SOURCE_DIR}/models/${MPI_MODEL})
-    if (NOT EXISTS ${MPI_FILENAME})
-      file(DOWNLOAD ${OPENPOSE_URL}${MPI_MODEL} ${MPI_FILENAME})
-    else (NOT EXISTS ${MPI_FILENAME})
-      message(STATUS "Model already exists.")
-    endif (NOT EXISTS ${MPI_FILENAME})
-  else (DOWNLOAD_MPI_MODEL)
-    message(STATUS "Not downloading body (MPI) model")
-  endif (DOWNLOAD_MPI_MODEL)
-
+  download_model("body (mpi)" ${DOWNLOAD_MPI_MODEL} pose/mpi/pose_iter_160000.caffemodel)
   # Face
-  if (DOWNLOAD_FACE_MODEL)
-    message(STATUS "Now downloading face model")
-    set(FACE_MODEL face/pose_iter_116000.caffemodel)
-    set(FACE_FILENAME ${CMAKE_SOURCE_DIR}/models/${FACE_MODEL})
-    if (NOT EXISTS ${FACE_FILENAME})
-      file(DOWNLOAD ${OPENPOSE_URL}${FACE_MODEL} ${FACE_FILENAME})
-    else (NOT EXISTS ${FACE_FILENAME})
-      message(STATUS "Model already exists.")
-    endif (NOT EXISTS ${FACE_FILENAME})
-  else (DOWNLOAD_FACE_MODEL)
-    message(STATUS "Not downloading face model")
-  endif (DOWNLOAD_FACE_MODEL)
-
+  download_model("face" ${DOWNLOAD_FACE_MODEL} face/pose_iter_116000.caffemodel)
   # Hand
-  if (DOWNLOAD_HAND_MODEL) 
-    message(STATUS "Now downloading hand model")
-    set(HAND_MODEL hand/pose_iter_102000.caffemodel)
-    set(HAND_FILENAME ${CMAKE_SOURCE_DIR}/models/${HAND_MODEL})
-    if (NOT EXISTS ${HAND_FILENAME})
-      file(DOWNLOAD ${OPENPOSE_URL}${HAND_MODEL} ${HAND_FILENAME})
-    else (NOT EXISTS ${HAND_FILENAME})
-      message(STATUS "Model already exists.")
-    endif (NOT EXISTS ${HAND_FILENAME})
-  else (DOWNLOAD_HAND_MODEL)
-    message(STATUS "Not downloading hand model")
-  endif (DOWNLOAD_HAND_MODEL)
-
-  message(STATUS "Completing downloading models.")
-  # add_custom_target(download_coco ALL 
-  #   DEPENDS ${COCO_MODEL} ${FACE_MODEL} ${HAND_MODEL} ${MPI_MODEL})
+  download_model("hand" ${DOWNLOAD_HAND_MODEL} hand/pose_iter_102000.caffemodel)
 
 endif (DOWNLOAD_MODELS)
