@@ -1,5 +1,6 @@
 # CMake version
 project(openpose)
+# Check the min
 cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
 
 # Turn on C++11
