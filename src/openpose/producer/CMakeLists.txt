@@ -6,5 +6,5 @@ set(SOURCES
   videoReader.cpp
   webcamReader.cpp)
 
-add_library(producer ${SOURCES})
+add_library(producer SHARED ${SOURCES})
 target_link_libraries(producer ${OpenCV_LIBS} core thread filestream)

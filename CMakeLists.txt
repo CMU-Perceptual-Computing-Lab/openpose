@@ -8,11 +8,37 @@ add_definitions(-std=c++11)
 # Flag for OpenPose Macros
 add_definitions(-DUSE_CAFFE)
 
+# Testing code starts here
+
+# Build Caffe
+include(ExternalProject)
+
+set(CAFFE_PREFIX caffe)
+set(CAFFE_URL ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
+
+ExternalProject_Add(caffe
+  SOURCE_DIR ${CAFFE_URL} # Is the url needed to be specified? 
+  PREFIX ${CAFFE_PREFIX}
+  CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>)
+
+ExternalProject_Get_Property(caffe install_dir)
+
+# Include caffe directories
+include_directories(${install_dir}/include)
+
+message(\${install_dir} install_dir)
+
+set(Caffe_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/caffe/include)
+set(Caffe_LIBRARIES ${CMAKE_SOURCE_DIR}/build/caffe/lib/libcaffe.so)
+
+### Testing code ends here
+
 # Project options
 option(BUILD_DOCS  "Build documentation." OFF)
 option(BUILD_CAFFE "Build using caffe" ON)
 option(CPU_ONLY "Build only for cpu" OFF) # This option is not used now,
 option(DOWNLOAD_MODELS "Download the models" OFF)
+option(BUILD_EXAMPLES "Build OpenPose examples" ON)
 
 # Include sub options
 include(CMakeDependentOption)
@@ -49,8 +75,7 @@ include_directories(
   ${CUDA_INCLUDE_DIRS}
   ${GFLAGS_INCLUDE_DIR}
   ${GLOG_INCLUDE_DIR}
-  ${OpenCV_INCLUDE_DIRS}
-  ${CMAKE_SOURCE_DIR}/3rdparty/caffe/include)
+  ${OpenCV_INCLUDE_DIRS})
 
 # message("\${Caffe_FOUND} = ${Caffe_FOUND}")
 # if (Caffe_FOUND)
@@ -63,9 +88,11 @@ include_directories(
 # add_definitions(${Caffe_INCLUDE_DIRS})
 
 # Add the subdirectories
-add_subdirectory(3rdparty)
+# add_subdirectory(3rdparty)
 add_subdirectory(src)
-add_subdirectory(examples)
+if (BUILD_EXAMPLES)
+  add_subdirectory(examples)
+endif (BUILD_EXAMPLES)
 
 message(STATUS "\${OpenCV_INCLUDE_DIRS} = ${OpenCV_INCLUDE_DIRS}")
 message(STATUS "\${OpenCV_LIBS} = ${OpenCV_LIBS}")
@@ -78,8 +105,8 @@ message(\${CUDA_NVCC_FLAGS} ${CUDA_NVCC_FLAGS})
 
 message(\${CMAKE_CURRENT_BINARY_DIR} = ${CMAKE_CURRENT_BINARY_DIR})
 
-# Make the CMake documentation
-# TODO remove the travis option.
+### GENERATE DOCUMENTATION
+
 find_package(Doxygen)
 if (DOXYGEN_FOUND)
     # set input and output files
@@ -94,6 +121,8 @@ if (DOXYGEN_FOUND)
 else (DOXYGEN_FOUND)
   message("Doxygen need to be installed to generate the doxygen documentation")
 endif (DOXYGEN_FOUND)
+
+### DOWNLOAD MODELS
 
 include(cmake/Utils.cmake)
 # Download the models if flag is set
@@ -112,4 +141,8 @@ if (DOWNLOAD_MODELS)
   # Hand
   download_model("hand" ${DOWNLOAD_HAND_MODEL} hand/pose_iter_102000.caffemodel)
 
+  message(STATUS "Models Downloaded.")
+
 endif (DOWNLOAD_MODELS)
+
+message(\${CMAKE_BINARY_DIR} ${CMAKE_BINARY_DIR})

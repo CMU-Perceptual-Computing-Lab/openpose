@@ -6,5 +6,5 @@ set(SOURCES
   guiInfoAdder.cpp
 )
 
-add_library(gui ${SOURCES})
+add_library(gui SHARED ${SOURCES})
 target_link_libraries(gui pose)
