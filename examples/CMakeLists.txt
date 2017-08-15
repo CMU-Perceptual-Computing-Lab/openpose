@@ -15,7 +15,7 @@ foreach(file ${EXAMPLE_FILES})
   # )
 
   target_link_libraries( ${SOURCE_NAME}.bin
-     wrapper utilities ${GLOG_LIBRARY} ${GFLAGS_LIBRARY} ${Caffe_LIBRARIES}
+     wrapper utilities ${GLOG_LIBRARY} ${GFLAGS_LIBRARY} ${Caffe_LIBS}
   )
 
   # install(TARGETS ${SOURCE_NAME}

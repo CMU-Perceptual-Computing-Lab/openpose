@@ -10,35 +10,42 @@ add_definitions(-DUSE_CAFFE)
 
 # Testing code starts here
 
-# Build Caffe
-include(ExternalProject)
-
-set(CAFFE_PREFIX caffe)
-set(CAFFE_URL ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
-
-ExternalProject_Add(caffe
-  SOURCE_DIR ${CAFFE_URL} # Is the url needed to be specified? 
-  PREFIX ${CAFFE_PREFIX}
-  CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>)
-
-ExternalProject_Get_Property(caffe install_dir)
-
-# Include caffe directories
-include_directories(${install_dir}/include)
-
-message(\${install_dir} install_dir)
-
-set(Caffe_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/caffe/include)
-set(Caffe_LIBRARIES ${CMAKE_SOURCE_DIR}/build/caffe/lib/libcaffe.so)
-
 ### Testing code ends here
 
 # Project options
 option(BUILD_DOCS  "Build documentation." OFF)
+option(WITH_CAFFE "Build using caffe" ON)
 option(BUILD_CAFFE "Build using caffe" ON)
-option(CPU_ONLY "Build only for cpu" OFF) # This option is not used now,
+option(CPU_ONLY "Build only for cpu" OFF) # This option is not used right now.
 option(DOWNLOAD_MODELS "Download the models" OFF)
 option(BUILD_EXAMPLES "Build OpenPose examples" ON)
+
+# find_package(Caffe)
+if (NOT Caffe_FOUND)
+  message(STATUS "Failed to find caffe, will build from source now.")
+  # Build Caffe
+  include(ExternalProject)
+
+  set(CAFFE_PREFIX caffe)
+  set(CAFFE_URL ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
+
+  ExternalProject_Add(caffe
+    SOURCE_DIR ${CAFFE_URL} # Is the url needed to be specified? 
+    PREFIX ${CAFFE_PREFIX}
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>)
+
+  ExternalProject_Get_Property(caffe install_dir)
+
+  # Include caffe directories
+  ## include_directories(${install_dir}/include)
+
+  set(Caffe_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/build/caffe/include)
+  set(Caffe_LIBS ${CMAKE_SOURCE_DIR}/build/caffe/lib/libcaffe.so)  
+endif (NOT Caffe_FOUND)
+
+# if (WITH_CAFFE)
+#   find_package(caffe)
+# endif (WITH_CAFFE)
 
 # Include sub options
 include(CMakeDependentOption)
@@ -75,6 +82,7 @@ include_directories(
   ${CUDA_INCLUDE_DIRS}
   ${GFLAGS_INCLUDE_DIR}
   ${GLOG_INCLUDE_DIR}
+  ${Caffe_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS})
 
 # message("\${Caffe_FOUND} = ${Caffe_FOUND}")
@@ -97,8 +105,8 @@ endif (BUILD_EXAMPLES)
 message(STATUS "\${OpenCV_INCLUDE_DIRS} = ${OpenCV_INCLUDE_DIRS}")
 message(STATUS "\${OpenCV_LIBS} = ${OpenCV_LIBS}")
 message("\${CMAKE_SOURCE_DIR} = ${CMAKE_SOURCE_DIR}")
-# message("\${Caffe_INCLUDE_DIRS} = ${Caffe_INCLUDE_DIRS}")
-# message("\${Caffe_LIBRARIES} = ${Caffe_LIBRARIES}")
+message("\${Caffe_INCLUDE_DIRS} = ${Caffe_INCLUDE_DIRS}")
+message("\${Caffe_LIBS} = ${Caffe_LIBS}")
 message(\${GLOG_INCLUDE_DIR} ${GLOG_INCLUDE_DIR})
 message(\${GLOG_LIBRARY} ${GLOG_LIBRARY})
 message(\${CUDA_NVCC_FLAGS} ${CUDA_NVCC_FLAGS})
