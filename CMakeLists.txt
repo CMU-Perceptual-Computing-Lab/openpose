@@ -19,6 +19,7 @@ option(BUILD_CAFFE "Build using caffe" ON)
 option(CPU_ONLY "Build only for cpu" OFF) # This option is not used right now.
 option(DOWNLOAD_MODELS "Download the models" OFF)
 option(BUILD_EXAMPLES "Build OpenPose examples" ON)
+option(USE_CUDNN "Build OpenPose with cuDNN library support" ON)
 
 # find_package(Caffe)
 if (NOT Caffe_FOUND)
@@ -32,7 +33,7 @@ if (NOT Caffe_FOUND)
   ExternalProject_Add(caffe
     SOURCE_DIR ${CAFFE_URL} # Is the url needed to be specified? 
     PREFIX ${CAFFE_PREFIX}
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>)
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR> -DUSE_CUDNN=${USE_CUDNN})
 
   ExternalProject_Get_Property(caffe install_dir)
 
