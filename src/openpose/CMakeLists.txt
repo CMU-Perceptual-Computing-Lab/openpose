@@ -8,6 +8,3 @@ add_subdirectory(thread)
 add_subdirectory(face)
 add_subdirectory(hand)
 add_subdirectory(wrapper)
-
-
-
