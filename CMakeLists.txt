@@ -1,19 +1,12 @@
-# CMake version
 project(openpose)
-# Check the min
-cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.0 FATAL_ERROR) # TODO -- Check the lowest version that works
 
 # Turn on C++11
 add_definitions(-std=c++11)
 # Flag for OpenPose Macros
 add_definitions(-DUSE_CAFFE)
 
-# Testing code starts here
-
-### Testing code ends here
-
 # Project options
-option(BUILD_DOCS  "Build documentation." OFF)
 option(WITH_CAFFE "Build using caffe" ON)
 option(BUILD_CAFFE "Build using caffe" ON)
 option(CPU_ONLY "Build only for cpu" OFF) # This option is not used right now.
@@ -21,7 +14,40 @@ option(DOWNLOAD_MODELS "Download the models" OFF)
 option(BUILD_EXAMPLES "Build OpenPose examples" ON)
 option(USE_CUDNN "Build OpenPose with cuDNN library support" ON)
 
-# find_package(Caffe)
+# Include sub options
+include(CMakeDependentOption)
+if (DOWNLOAD_MODELS)
+  CMAKE_DEPENDENT_OPTION(DOWNLOAD_COCO_MODEL "Download coco model" OFF
+      "DOWNLOAD_MODELS" OFF)
+  CMAKE_DEPENDENT_OPTION(DOWNLOAD_MPI_MODEL "Download mpi model" OFF
+      "DOWNLOAD_MODELS" OFF)
+  CMAKE_DEPENDENT_OPTION(DOWNLOAD_HAND_MODEL "Download hand model" OFF
+      "DOWNLOAD_MODELS" OFF)  
+  CMAKE_DEPENDENT_OPTION(DOWNLOAD_FACE_MODEL "Download face model" OFF
+      "DOWNLOAD_MODELS" OFF)
+endif (DOWNLOAD_MODELS)
+
+# Find the packages
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
+find_package(OpenCV REQUIRED)
+find_package(CUDA REQUIRED)
+find_package(GFlags REQUIRED)
+find_package(Glog REQUIRED)
+
+# Check if the user specified caffe paths
+if (Caffe_INCLUDE_DIRS AND Caffe_LIBS)
+  message(STATUS "\${Caffe_INCLUDE_DIRS} from the user" ${Caffe_INCLUDE_DIRS})
+  message(STATUS "\${Caffe_LIBS} from the user" ${Caffe_LIBS})
+  set(Caffe_FOUND ON)
+endif (Caffe_INCLUDE_DIRS AND Caffe_LIBS)
+
+# Check if caffe is installed in known paths
+if (NOT Caffe_FOUND)
+  message(STATUS "Looking for caffe around in expected paths.")
+  find_package(Caffe)
+endif (Caffe_FOUND)
+
+# Else build from scratch
 if (NOT Caffe_FOUND)
   message(STATUS "Failed to find caffe, will build from source now.")
   # Build Caffe
@@ -48,36 +74,12 @@ endif (NOT Caffe_FOUND)
 #   find_package(caffe)
 # endif (WITH_CAFFE)
 
-# Include sub options
-include(CMakeDependentOption)
-if (DOWNLOAD_MODELS)
-  CMAKE_DEPENDENT_OPTION(DOWNLOAD_COCO_MODEL "Download coco model" OFF
-      "DOWNLOAD_MODELS" OFF)
-  CMAKE_DEPENDENT_OPTION(DOWNLOAD_MPI_MODEL "Download mpi model" OFF
-      "DOWNLOAD_MODELS" OFF)
-  CMAKE_DEPENDENT_OPTION(DOWNLOAD_HAND_MODEL "Download hand model" OFF
-      "DOWNLOAD_MODELS" OFF)  
-  CMAKE_DEPENDENT_OPTION(DOWNLOAD_FACE_MODEL "Download face model" OFF
-      "DOWNLOAD_MODELS" OFF)
-endif (DOWNLOAD_MODELS)
-
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
-
 # Download the models
-
-# include(FindCaffe)
-
-# Find the packages
-find_package(OpenCV REQUIRED)
-find_package(CUDA REQUIRED)
-find_package(GFlags REQUIRED)
-find_package(Glog REQUIRED)
-# find_package(Caffe) # Build if not found
 
 # Set CUDA Flags
 set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -std=c++11")
 
-# Include directories
+# Specify the include directories
 include_directories(
   ${CMAKE_SOURCE_DIR}/include
   ${CUDA_INCLUDE_DIRS}
@@ -86,33 +88,20 @@ include_directories(
   ${Caffe_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS})
 
-# message("\${Caffe_FOUND} = ${Caffe_FOUND}")
-# if (Caffe_FOUND)
-#   set(caffe ${Caffe_LIBS})
-# else (Caffe_FOUND)
-#   add_subdirectory(3rdparty)
-#   set(Caffe_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/3rdparty/caffe/include)
-#   message(\${Caffe_INCLUDE_DIRS} = ${Caffe_INCLUDE_DIRS})
-# endif (Caffe_FOUND)
-# add_definitions(${Caffe_INCLUDE_DIRS})
-
-# Add the subdirectories
-# add_subdirectory(3rdparty)
+# Add subdirectories
 add_subdirectory(src)
 if (BUILD_EXAMPLES)
   add_subdirectory(examples)
 endif (BUILD_EXAMPLES)
 
-message(STATUS "\${OpenCV_INCLUDE_DIRS} = ${OpenCV_INCLUDE_DIRS}")
-message(STATUS "\${OpenCV_LIBS} = ${OpenCV_LIBS}")
-message("\${CMAKE_SOURCE_DIR} = ${CMAKE_SOURCE_DIR}")
-message("\${Caffe_INCLUDE_DIRS} = ${Caffe_INCLUDE_DIRS}")
-message("\${Caffe_LIBS} = ${Caffe_LIBS}")
-message(\${GLOG_INCLUDE_DIR} ${GLOG_INCLUDE_DIR})
-message(\${GLOG_LIBRARY} ${GLOG_LIBRARY})
-message(\${CUDA_NVCC_FLAGS} ${CUDA_NVCC_FLAGS})
-
-message(\${CMAKE_CURRENT_BINARY_DIR} = ${CMAKE_CURRENT_BINARY_DIR})
+# message(STATUS "\${OpenCV_INCLUDE_DIRS} = ${OpenCV_INCLUDE_DIRS}")
+# message(STATUS "\${OpenCV_LIBS} = ${OpenCV_LIBS}")
+# message("\${CMAKE_SOURCE_DIR} = ${CMAKE_SOURCE_DIR}")
+# message("\${Caffe_INCLUDE_DIRS} = ${Caffe_INCLUDE_DIRS}")
+# message("\${Caffe_LIBS} = ${Caffe_LIBS}")
+# message(\${GLOG_INCLUDE_DIR} ${GLOG_INCLUDE_DIR})
+# message(\${GLOG_LIBRARY} ${GLOG_LIBRARY})
+# message(\${CUDA_NVCC_FLAGS} ${CUDA_NVCC_FLAGS})
 
 ### GENERATE DOCUMENTATION
 
@@ -133,11 +122,11 @@ endif (DOXYGEN_FOUND)
 
 ### DOWNLOAD MODELS
 
-include(cmake/Utils.cmake)
 # Download the models if flag is set
 # TODO -- remove hardcoded ubuntu paths
 if (DOWNLOAD_MODELS)
-
+  include(cmake/Utils.cmake)
+  
   message(STATUS "Download the models.")
   set(OPENPOSE_URL "http://posefs1.perception.cs.cmu.edu/OpenPose/models/")
   
@@ -153,5 +142,3 @@ if (DOWNLOAD_MODELS)
   message(STATUS "Models Downloaded.")
 
 endif (DOWNLOAD_MODELS)
-
-message(\${CMAKE_BINARY_DIR} ${CMAKE_BINARY_DIR})
