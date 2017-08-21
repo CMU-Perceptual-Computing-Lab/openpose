@@ -8,24 +8,28 @@ Caffe packages are available for several Debian versions, as shown in the
 following chart:
 
 ```
-Your Distro     |  CPU_ONLY  |  CUDA  |     Alias
+Your Distro     |  CPU_ONLY  |  CUDA  | Codename
 ----------------+------------+--------+-------------------
-Debian/stable   |     ✘      |   ✘    | Debian Jessie
-Debian/testing  |     ✔      |   ✔    | Debian Stretch/Sid
-Debian/unstable |     ✔      |   ✔    | Debian Sid
+Debian/oldstable|     ✘      |   ✘    | Jessie (8.0)
+Debian/stable   |     ✔      |   ✔    | Stretch (9.0)
+Debian/testing  |     ✔      |   ✔    | Buster
+Debian/unstable |     ✔      |   ✔    | Buster
 ```
 
 * `✘ ` You should take a look at [Ubuntu installation instruction](install_apt.html).
 
 * `✔ ` You can install caffe with a single command line following this guide.
 
-Last update: 2017-02-01
+* [Package status of CPU-only version](https://tracker.debian.org/pkg/caffe)
+
+* [Package status of CUDA version](https://tracker.debian.org/pkg/caffe-contrib)
+
+Last update: 2017-07-08
 
 ## Binary installation with APT
 
-Apart from the installation methods based on source, Debian/unstable
-and Debian/testing users can install pre-compiled Caffe packages from
-the official archive.
+Apart from the installation methods based on source, Debian users can install
+pre-compiled Caffe packages from the official archive with APT.
 
 Make sure that your `/etc/apt/sources.list` contains `contrib` and `non-free`
 sections if you want to install the CUDA version, for instance:
@@ -44,7 +48,8 @@ $ caffe                                              # command line interface wo
 $ python3 -c 'import caffe; print(caffe.__path__)'   # python3 interface working
 ```
 
-These Caffe packages should work for you out of box.
+These Caffe packages should work for you out of box. However, the CUDA version
+may break if your NVIDIA driver and CUDA toolkit are not installed with APT.
 
 #### Customizing caffe packages
 
@@ -96,17 +101,21 @@ Note, this requires a `deb-src` entry in your `/etc/apt/sources.list`.
 Some users may find their favorate compiler doesn't work with CUDA.
 
 ```
-CXX compiler |  CUDA 7.5  |  CUDA 8.0  |
--------------+------------+------------+-
-GCC-7        |     ?      |     ?      |
-GCC-6        |     ✘      |     ✘      |
-GCC-5        |     ✔ [1]  |     ✔      |
-CLANG-4.0    |     ?      |     ?      |
-CLANG-3.9    |     ✘      |     ✘      |
-CLANG-3.8    |     ?      |     ✔      |
+CXX compiler |  CUDA 7.5  |  CUDA 8.0  |  CUDA 9.0  |
+-------------+------------+------------+------------+
+GCC-8        |     ?      |     ?      |     ?      |
+GCC-7        |     ?      |     ?      |     ?      |
+GCC-6        |     ✘      |     ✘      |     ✔      |
+GCC-5        |     ✔ [1]  |     ✔      |     ✔      |
+-------------+------------+------------+------------+
+CLANG-4.0    |     ?      |     ?      |     ?      |
+CLANG-3.9    |     ✘      |     ✘      |     ✔      |
+CLANG-3.8    |     ?      |     ✔      |     ✔      |
 ```
 
 `[1]` CUDA 7.5 's `host_config.h` must be patched before working with GCC-5.
+
+`[2]` CUDA 9.0: https://devblogs.nvidia.com/parallelforall/cuda-9-features-revealed/
 
 BTW, please forget the GCC-4.X series, since its `libstdc++` ABI is not compatible with GCC-5's.
 You may encounter failure linking GCC-4.X object files against GCC-5 libraries.
@@ -151,11 +160,4 @@ and hack the packaging scripts, then build your customized package.
 ```
 $ sudo apt install caffe-doc
 $ dpkg -L caffe-doc
-```
-
-* Where can I find the Debian package status?
-
-```
-https://tracker.debian.org/pkg/caffe          (for the CPU_ONLY version)
-https://tracker.debian.org/pkg/caffe-contrib  (for the CUDA version)
 ```
