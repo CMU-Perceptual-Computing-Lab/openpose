@@ -12,4 +12,6 @@ set(SOURCES
 
 cuda_add_library(pose SHARED ${SOURCES})
 target_link_libraries(pose ${Caffe_LIBS})
-add_dependencies(pose caffe)
+if (BUILD_CAFFE)
+  add_dependencies(pose caffe)
+endif (BUILD_CAFFE)

@@ -12,7 +12,7 @@ set(EXAMPLE_FILES
 foreach(file ${EXAMPLE_FILES})
 
   get_filename_component(SOURCE_NAME ${file} NAME_WE)
-  message(STATUS " Adding Example ${SOURCE_NAME} ")
+  message(STATUS "Adding Example ${SOURCE_NAME}")
   
   add_executable(${SOURCE_NAME}.bin ${file})
 

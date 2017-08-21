@@ -21,4 +21,6 @@ cuda_add_library(core SHARED
   resizeAndMergeCaffe.cpp)
 
 target_link_libraries(core ${Caffe_LIBS})
-add_dependencies(core caffe)
+if (BUILD_CAFFE)
+  add_dependencies(core caffe)
+endif (BUILD_CAFFE)
