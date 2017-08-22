@@ -22,7 +22,10 @@ option(BUILD_DOCS "Build OpenPose documentation" OFF)
 # option(Caffe_INCLUDE_DIRS "Caffe Include directory" NOT_FOUND)
 # option(Caffe_LIBS "Caffe Library path" NOT_FOUND)
 
-# Include sub options
+# Ask Gines if he prefers drop-down menu
+# SET(CAFFE_OPTION BUILD_CAFFE CACHE STRING "library selected at CMake configure time")
+# SET_PROPERTY(CACHE CAFFE_OPTION PROPERTY STRINGS BUILD_CAFFE WITH_CAFFE) 
+
 include(CMakeDependentOption)
 if (DOWNLOAD_MODELS)
   CMAKE_DEPENDENT_OPTION(DOWNLOAD_COCO_MODEL "Download coco model" OFF
@@ -130,13 +133,17 @@ if (DOWNLOAD_MODELS)
   set(OPENPOSE_URL "http://posefs1.perception.cs.cmu.edu/OpenPose/models/")
   
   # Body (COCO)
-  download_model("body (coco)" ${DOWNLOAD_COCO_MODEL} pose/coco/pose_iter_440000.caffemodel)
+  download_model("body (coco)" ${DOWNLOAD_COCO_MODEL} pose/coco/pose_iter_440000.caffemodel
+      5156d31f670511fce9b4e28b403f2939)
   # Body (MPI)
-  download_model("body (mpi)" ${DOWNLOAD_MPI_MODEL} pose/mpi/pose_iter_160000.caffemodel)
+  download_model("body (mpi)" ${DOWNLOAD_MPI_MODEL} pose/mpi/pose_iter_160000.caffemodel
+      2ca0990c7562bd7ae03f3f54afa96e00)
   # Face
-  download_model("face" ${DOWNLOAD_FACE_MODEL} face/pose_iter_116000.caffemodel)
+  download_model("face" ${DOWNLOAD_FACE_MODEL} face/pose_iter_116000.caffemodel
+      e747180d728fa4e4418c465828384333)
   # Hand
-  download_model("hand" ${DOWNLOAD_HAND_MODEL} hand/pose_iter_102000.caffemodel)
+  download_model("hand" ${DOWNLOAD_HAND_MODEL} hand/pose_iter_102000.caffemodel
+      a82cfc3fea7c62f159e11bd3674c1531)
 
   message(STATUS "Models Downloaded.")
 
