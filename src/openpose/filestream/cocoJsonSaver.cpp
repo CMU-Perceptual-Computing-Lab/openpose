@@ -60,7 +60,7 @@ namespace op
                 // keypoints - i.e. poseKeypoints
                 mJsonOfstream.key("keypoints");
                 mJsonOfstream.arrayOpen();
-                const std::vector<int> indexesInCocoOrder{0, 15, 14, 17, 16,        5, 2, 6, 3, 7, 4,       11, 8, 12, 9, 13, 10};
+                const std::vector<int> indexesInCocoOrder{0, 15, 14, 17, 16,        5, 2, 6, 3, 7,        4, 11, 8, 12, 9,        13, 10};
                 for (auto bodyPart = 0 ; bodyPart < indexesInCocoOrder.size() ; bodyPart++)
                 {
                     const auto finalIndex = 3*(person*numberBodyParts + indexesInCocoOrder.at(bodyPart));
@@ -69,7 +69,7 @@ namespace op
                     mJsonOfstream.plainText(poseKeypoints[finalIndex+1]);
                     mJsonOfstream.comma();
                     mJsonOfstream.plainText(1);
-                    if (bodyPart < numberBodyParts-1)
+                    if (bodyPart < indexesInCocoOrder.size() - 1)
                         mJsonOfstream.comma();
                 }
                 mJsonOfstream.arrayClose();

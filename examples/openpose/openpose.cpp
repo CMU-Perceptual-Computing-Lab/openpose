@@ -55,7 +55,7 @@ DEFINE_double(camera_fps,               30.0,           "Frame rate for the webc
 DEFINE_string(video,                    "",             "Use a video file instead of the camera. Use `examples/media/video.avi` for our default"
                                                         " example video.");
 DEFINE_string(image_dir,                "",             "Process a directory of images. Use `examples/media/` for our default example folder with 20"
-                                                        " images.");
+                                                        " images. Read all standard formats (jpg, png, bmp, etc.).");
 DEFINE_uint64(frame_first,              0,              "Start on desired frame number. Indexes are 0-based, i.e. the first frame has index 0.");
 DEFINE_uint64(frame_last,               -1,             "Finish on desired frame number. Select -1 to disable. Indexes are 0-based, e.g. if set to"
                                                         " 10, it will process 11 frames (0-10).");
@@ -76,7 +76,8 @@ DEFINE_int32(keypoint_scale,            0,              "Scaling of the (x,y) co
                                                         " `resolution`), `3` to scale it in the range [0,1], and 4 for range [-1,1]. Non related"
                                                         " with `scale_number` and `scale_gap`.");
 // OpenPose Body Pose
-DEFINE_string(model_pose,               "COCO",         "Model to be used (e.g. COCO, MPI, MPI_4_layers).");
+DEFINE_string(model_pose,               "COCO",         "Model to be used. E.g. `COCO` (18 keypoints), `MPI` (15 keypoints, ~10% faster), "
+                                                        "`MPI_4_layers` (15 keypoints, even faster but less accurate).");
 DEFINE_string(net_resolution,           "656x368",      "Multiples of 16. If it is increased, the accuracy potentially increases. If it is decreased,"
                                                         " the speed increases. For maximum speed-accuracy balance, it should keep the closest aspect"
                                                         " ratio possible to the images or videos to be processed. E.g. the default `656x368` is"
@@ -95,13 +96,16 @@ DEFINE_bool(heatmaps_add_bkg,           false,          "Same functionality as `
 DEFINE_bool(heatmaps_add_PAFs,          false,          "Same functionality as `add_heatmaps_parts`, but adding the PAFs.");
 // OpenPose Face
 DEFINE_bool(face,                       false,          "Enables face keypoint detection. It will share some parameters from the body pose, e.g."
-                                                        " `model_folder`.");
+                                                        " `model_folder`. Note that this will considerable slow down the performance and increse"
+                                                        " the required GPU memory. In addition, the greater number of people on the image, the"
+                                                        " slower OpenPose will be.");
 DEFINE_string(face_net_resolution,      "368x368",      "Multiples of 16 and squared. Analogous to `net_resolution` but applied to the face keypoint"
                                                         " detector. 320x320 usually works fine while giving a substantial speed up when multiple"
                                                         " faces on the image.");
 // OpenPose Hand
 DEFINE_bool(hand,                       false,          "Enables hand keypoint detection. It will share some parameters from the body pose, e.g."
-                                                        " `model_folder`.");
+                                                        " `model_folder`. Analogously to `--face`, it will also slow down the performance, increase"
+                                                        " the required GPU memory and its speed depends on the number of people.");
 DEFINE_string(hand_net_resolution,      "368x368",      "Multiples of 16 and squared. Analogous to `net_resolution` but applied to the hand keypoint"
                                                         " detector.");
 DEFINE_int32(hand_scale_number,         1,              "Analogous to `scale_number` but applied to the hand keypoint detector. Our best results"
@@ -114,9 +118,11 @@ DEFINE_bool(hand_tracking,              false,          "Adding hand tracking mi
                                                         " simply looks for hands in positions at which hands were located in previous frames, but"
                                                         " it does not guarantee the same person ID among frames");
 // OpenPose Rendering
-DEFINE_int32(part_to_show,              0,              "Part to show from the start.");
+DEFINE_int32(part_to_show,              0,              "Prediction channel to visualize (default: 0). 0 for all the body parts, 1-18 for each body"
+                                                        " part heat map, 19 for the background heat map, 20 for all the body part heat maps"
+                                                        " together, 21 for all the PAFs, 22-40 for each body part pair PAF");
 DEFINE_bool(disable_blending,           false,          "If blending is enabled, it will merge the results with the original frame. If disabled, it"
-                                                        " will only display the results.");
+                                                        " will only display the results on a black background.");
 // OpenPose Rendering Pose
 DEFINE_double(render_threshold,         0.05,           "Only estimated keypoints whose score confidences are higher than this threshold will be"
                                                         " rendered. Generally, a high threshold (> 0.5) will only render very clear body parts;"
@@ -148,7 +154,8 @@ DEFINE_bool(process_real_time,          false,          "Enable to keep the orig
                                                         " too long, it will skip frames. If it is too fast, it will slow it down.");
 DEFINE_bool(no_gui_verbose,             false,          "Do not write text on output images on GUI (e.g. number of current frame and people). It"
                                                         " does not affect the pose rendering.");
-DEFINE_bool(no_display,                 false,          "Do not open a display window.");
+DEFINE_bool(no_display,                 false,          "Do not open a display window. Useful if there is no X server and/or to slightly speed up"
+                                                        " the processing if visual output is not required.");
 // Result Saving
 DEFINE_string(write_images,             "",             "Directory to write rendered frames in `write_images_format` image format.");
 DEFINE_string(write_images_format,      "png",          "File extension and format for `write_images`, e.g. png, jpg or bmp. Check the OpenCV"

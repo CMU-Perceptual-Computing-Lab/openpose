@@ -28,7 +28,8 @@ DEFINE_int32(logging_level,             3,              "The logging level. Inte
 // Producer
 DEFINE_string(image_path,               "examples/media/COCO_val2014_000000000192.jpg",     "Process the desired image.");
 // OpenPose
-DEFINE_string(model_pose,               "COCO",         "Model to be used (e.g. COCO, MPI, MPI_4_layers).");
+DEFINE_string(model_pose,               "COCO",         "Model to be used. E.g. `COCO` (18 keypoints), `MPI` (15 keypoints, ~10% faster), "
+                                                        "`MPI_4_layers` (15 keypoints, even faster but less accurate).");
 DEFINE_string(model_folder,             "models/",      "Folder path (absolute or relative) where the models (pose, face, ...) are located.");
 DEFINE_string(net_resolution,           "656x368",      "Multiples of 16. If it is increased, the accuracy potentially increases. If it is decreased,"
                                                         " the speed increases. For maximum speed-accuracy balance, it should keep the closest aspect"
@@ -43,7 +44,7 @@ DEFINE_double(scale_gap,                0.3,            "Scale gap between scale
 DEFINE_int32(scale_number,              1,              "Number of scales to average.");
 // OpenPose Rendering
 DEFINE_bool(disable_blending,           false,          "If blending is enabled, it will merge the results with the original frame. If disabled, it"
-                                                        " will only display the results.");
+                                                        " will only display the results on a black background.");
 DEFINE_double(render_threshold,         0.05,           "Only estimated keypoints whose score confidences are higher than this threshold will be"
                                                         " rendered. Generally, a high threshold (> 0.5) will only render very clear body parts;"
                                                         " while small thresholds (~0.1) will also output guessed and occluded keypoints, but also"

@@ -33,7 +33,7 @@ DEFINE_double(camera_fps,               30.0,           "Frame rate for the webc
 DEFINE_string(video,                    "",             "Use a video file instead of the camera. Use `examples/media/video.avi` for our default"
                                                         " example video.");
 DEFINE_string(image_dir,                "",             "Process a directory of images. Use `examples/media/` for our default example folder with 20"
-                                                        " images.");
+                                                        " images. Read all standard formats (jpg, png, bmp, etc.).");
 // OpenPose
 DEFINE_string(resolution,               "1280x720",     "The image resolution (display and output). Use \"-1x-1\" to force the program to use the"
                                                         " default images resolution.");

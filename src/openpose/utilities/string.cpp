@@ -1,3 +1,4 @@
+#include <algorithm> // std::transform
 #include <openpose/utilities/string.hpp>
 
 namespace op
@@ -52,6 +53,36 @@ namespace op
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             return {};
+        }
+    }
+
+    std::string toLower(const std::string& string)
+    {
+        try
+        {
+            auto result = string;
+            std::transform(string.begin(), string.end(), result.begin(), tolower);
+            return result;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return "";
+        }
+    }
+
+    std::string toUpper(const std::string& string)
+    {
+        try
+        {
+            auto result = string;
+            std::transform(string.begin(), string.end(), result.begin(), toupper);
+            return result;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return "";
         }
     }
 

@@ -2,13 +2,14 @@ OpenPose
 ====================================
 
 ## Latest News
-- Apr 2017: **Body** released!
-- May 2017: **Windows** version released!
-- Jun 2017: **Face** released!
-- Jul 2017: **Hands** released!
 - Jul 2017: **Windows**, New [**portable demo**](doc/installation.md#installation---demo) **and** [**easier library installation**](doc/installation.md#installation---library)!
+- Jul 2017: **Hands** released!
+- Jun 2017: **Face** released!
+- May 2017: **Windows** version released!
+- Apr 2017: **Body** released!
 - Check all the [release notes](doc/release_notes.md).
-- Interested in an internship on CMU as OpenPose programmer? See [this link](https://docs.google.com/document/d/14SygG39NjIRZfx08clewTdFMGwVdtRu2acyCi3TYcHs/edit?usp=sharing) for details.
+
+We are offering [internships at Carnegie Mellon University as OpenPose programmer](https://docs.google.com/document/d/14SygG39NjIRZfx08clewTdFMGwVdtRu2acyCi3TYcHs/edit?usp=sharing) (need to live in or be willing to move to Pittsburgh).
 
 
 
@@ -19,7 +20,7 @@ OpenPose is a **library for real-time multi-person keypoint detection and multi-
 
 OpenPose represents the **first real-time system to jointly detect human body, hand and facial keypoints (in total 130 keypoints) on single images**. In addition, the system computational performance on body keypoint estimation is invariant to the number of detected people in the image.
 
-OpenPose is freely available for free non-commercial use, and may be redistributed under these conditions. Please, see the [license](LICENSE) for further details. For commercial purposes, contact [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/).
+OpenPose is freely available for free non-commercial use, and may be redistributed under these conditions. Please, see the [license](LICENSE) for further details. [Interested in a commercial license? Check this link](https://flintbox.com/public/project/47343/). For commercial queries, contact [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/).
 
 In addition, OpenPose would not be possible without the [CMU Panoptic Studio](http://domedb.perception.cs.cmu.edu/).
 
@@ -85,9 +86,10 @@ The pose estimation work is based on the C++ code from [the ECCV 2016 demo](http
     3. [OpenPose Library](#openpose-library)
 4. [Output](#output)
 5. [Speed Up Openpose And Benchmark](#speed-up-openpose-and-benchmark)
-6. [Send Us Your Feedback!](#send-us-your-feedback)
-7. [Citation](#citation)
-8. [Other Contributors](#other-contributors)
+6. [Send Us Failure Cases!](#send-us-failure-cases)
+7. [Send Us Your Feedback!](#send-us-your-feedback)
+8. [Citation](#citation)
+9. [Other Contributors](#other-contributors)
 
 
 
@@ -154,6 +156,11 @@ Check the OpenPose Benchmark and some hints to speed up OpenPose on [doc/install
 
 
 
+## Send Us Failure Cases!
+If you find videos or images where OpenPose does not seems to work well, feel free to send them to openposecmu@gmail.com, we will use them to improve the quality of the algorithm. Thanks!
+
+
+
 ## Send Us Your Feedback!
 Our library is open source for research purposes, and we want to continuously improve it! So please, let us know if...
 
@@ -172,7 +179,7 @@ Just comment on GibHub or make a pull request and we will answer as soon as poss
 
 
 ## Citation
-Please cite the papers in your publications if it helps your research:
+Please cite these papers in your publications if it helps your research (the face keypoint detector was trained using the same procedure described in [Simon et al. 2017]):
 
     @inproceedings{cao2017realtime,
       author = {Zhe Cao and Tomas Simon and Shih-En Wei and Yaser Sheikh},
