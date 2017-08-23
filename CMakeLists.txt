@@ -12,10 +12,10 @@ add_definitions(-DUSE_CAFFE)
 
 ### PROJECT OPTIONS
 
-option(WITH_CAFFE "Build using caffe" ON)
-option(BUILD_CAFFE "Build using caffe" OFF)
+option(WITH_CAFFE "Select if Caffe is already installed" ON)
+option(BUILD_CAFFE "Build Caffe along with OpenPose" OFF)
 option(CPU_ONLY "Build only for cpu" OFF) # This option is not used right now.
-option(DOWNLOAD_MODELS "Download the models" OFF)
+option(DOWNLOAD_MODELS "Download the models" ON)
 option(BUILD_EXAMPLES "Build OpenPose examples" ON)
 option(USE_CUDNN "Build OpenPose with cuDNN library support" ON)
 option(BUILD_DOCS "Build OpenPose documentation" OFF)
@@ -28,14 +28,14 @@ option(BUILD_DOCS "Build OpenPose documentation" OFF)
 
 include(CMakeDependentOption)
 if (DOWNLOAD_MODELS)
-  CMAKE_DEPENDENT_OPTION(DOWNLOAD_COCO_MODEL "Download coco model" OFF
-      "DOWNLOAD_MODELS" OFF)
-  CMAKE_DEPENDENT_OPTION(DOWNLOAD_MPI_MODEL "Download mpi model" OFF
-      "DOWNLOAD_MODELS" OFF)
-  CMAKE_DEPENDENT_OPTION(DOWNLOAD_HAND_MODEL "Download hand model" OFF
-      "DOWNLOAD_MODELS" OFF)  
-  CMAKE_DEPENDENT_OPTION(DOWNLOAD_FACE_MODEL "Download face model" OFF
-      "DOWNLOAD_MODELS" OFF)
+  CMAKE_DEPENDENT_OPTION(DOWNLOAD_COCO_MODEL "Download coco model" ON
+    "DOWNLOAD_MODELS" ON)
+  CMAKE_DEPENDENT_OPTION(DOWNLOAD_MPI_MODEL "Download mpi model" ON
+    "DOWNLOAD_MODELS" ON)
+  CMAKE_DEPENDENT_OPTION(DOWNLOAD_HAND_MODEL "Download hand model" ON
+    "DOWNLOAD_MODELS" ON)  
+  CMAKE_DEPENDENT_OPTION(DOWNLOAD_FACE_MODEL "Download face model" ON
+    "DOWNLOAD_MODELS" ON)
 endif (DOWNLOAD_MODELS)
 
 ### FIND REQUIRED PACKAGES
