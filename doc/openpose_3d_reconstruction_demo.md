@@ -3,7 +3,7 @@
 
 This is a beta version that makes body + face + hand keypoint 3-D reconstruction and rendering for 1 person. We will not keep updating it nor solving questions/issues about it at the moment. It requires the user to be familiar with computer vision, in particular with camera calibration, i.e. extraction of intrinsic and extrinsic parameters.
 
-The Windows steps were tested and worked in the OpenPose 1.0.1 version from the last GitHub commit on July 18th, 2017 in the [official repository](https://github.com/CMU-Perceptual-Computing-Lab/openpose).
+The Windows steps were tested and worked in the OpenPose 1.0.1 version from the last GitHub commit on July 18th, 2017 in the [official repository](https://github.com/CMU-Perceptual-Computing-Lab/openpose). 3D OpenPose should work with any newer version to that one. However, in case it does not, open a GitHub issue and meanwhile use the mentioned version of July 18th.
 
 
 
@@ -48,16 +48,17 @@ The program uses 3 cameras by default, but cameras can be added or removed from 
 
 
 ### Windows
-1. Open the OpenPose visual studio solution `windows\openpose.sln`.
-2. Right-click on `Solution 'OpenPose'` of the `Solution Explorer` window, usually placed at the top-right part of the VS screen.
-3. Click on `Properties`. Go to `Configuration Properties` -> `Configuration` and check `Build` for the `OpenPose3DReconstruction` project.
-4. Get the last Spinnaker SKD version, i.e. the FLIR camera driver and software:
+1. Compile and make sure the [OpenPose demo](installation.md#windows) runs, so that the required OpenPose library was properly compiled.
+2. Open the OpenPose visual studio solution `windows\openpose.sln`.
+3. Right-click on `Solution 'OpenPose'` of the `Solution Explorer` window, usually placed at the top-right part of the VS screen.
+4. Click on `Properties`. Go to `Configuration Properties` -> `Configuration` and check `Build` for the `OpenPose3DReconstruction` project.
+5. Get the last Spinnaker SKD version, i.e. the FLIR camera driver and software:
     - Download last Spinnaker SDK: https://www.ptgrey.com/support/downloads
     - Copy `{PointGreyParentDirectory}\Point Grey Research\Spinnaker\bin64\vs2015\` as `{OpenPoseDirectory}\3rdparty\windows\spinnaker\bin\`. You can remove all the *.exe files.
     - Copy `{PointGreyParentDirectory}\Point Grey Research\Spinnaker\include\` as `{OpenPoseDirectory}\3rdparty\windows\spinnaker\include\`.
     - Copy `Spinnaker_v140.lib` and `Spinnakerd_v140.lib` from `{PointGreyParentDirectory}\Point Grey Research\Spinnaker\lib64\vs2015\` into `{OpenPoseDirectory}\3rdparty\windows\spinnaker\lib\`.
     - (Optional) Spinnaker SDK overview: https://www.ptgrey.com/spinnaker-sdk
-5. Get the last OpenGL Glut library version for the rendering:
+6. Get the last OpenGL Glut library version for the rendering:
     - Download the latest `MSVC Package` from http://www.transmissionzero.co.uk/software/freeglut-devel/
     - Copy `{freeglutParentDirectory}\freeglut\bin\x64\` as `{OpenPoseDirectory}\3rdparty\windows\freeglut\bin\bin\`.
     - Copy `{freeglutParentDirectory}\freeglut\include\` as `{OpenPoseDirectory}\3rdparty\windows\freeglut\include\`.
