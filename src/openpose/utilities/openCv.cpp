@@ -31,7 +31,7 @@ namespace op
             // float* (deep net format): C x H x W
             // cv::Mat (OpenCV format): H x W x C
             if (cvMat.rows != resolutionSize.y || cvMat.cols != resolutionSize.x || cvMat.type() != CV_8UC3)
-                cvMat = cv::Mat{resolutionSize.y, resolutionSize.x, CV_8UC3};
+                cvMat = cv::Mat(resolutionSize.y, resolutionSize.x, CV_8UC3);
             const auto offsetBetweenChannels = resolutionSize.x * resolutionSize.y;
             for (auto c = 0; c < resolutionChannels; c++)
             {
@@ -70,7 +70,7 @@ namespace op
 
                 // Allocate cv::Mat
                 if (cvMatResult.cols != channels * width || cvMatResult.rows != height)
-                    cvMatResult = cv::Mat{height, areaOutput, CV_8UC1};
+                    cvMatResult = cv::Mat(height, areaOutput, CV_8UC1);
 
                 // Fill cv::Mat
                 for (auto channel = 0 ; channel < channels ; channel++)
@@ -93,7 +93,7 @@ namespace op
                 }
             }
             else
-                cvMatResult = cv::Mat{};
+                cvMatResult = cv::Mat();
         }
         catch (const std::exception& e)
         {
