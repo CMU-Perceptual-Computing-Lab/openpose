@@ -1,6 +1,15 @@
 project(openpose)
 cmake_minimum_required(VERSION 3.0 FATAL_ERROR) # TODO -- Check the lowest version that works
 
+### INSTALL PREREQUISITES
+
+execute_process(COMMAND ./install_cmake.sh
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/ubuntu)
+
+# add_custom_target(install_pre ALL
+#     COMMAND ./install_cmake.sh
+#     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/ubuntu)
+
 ### FLAGS
 
 # Turn on C++11
@@ -15,7 +24,6 @@ add_definitions(-DUSE_CAFFE)
 option(WITH_CAFFE "Select if Caffe is already installed" ON)
 option(BUILD_CAFFE "Build Caffe along with OpenPose" OFF)
 option(CPU_ONLY "Build only for cpu" OFF) # This option is not used right now.
-option(DOWNLOAD_MODELS "Download the models" ON)
 option(BUILD_EXAMPLES "Build OpenPose examples" ON)
 option(USE_CUDNN "Build OpenPose with cuDNN library support" ON)
 option(BUILD_DOCS "Build OpenPose documentation" OFF)
@@ -23,20 +31,13 @@ option(BUILD_DOCS "Build OpenPose documentation" OFF)
 # option(Caffe_LIBS "Caffe Library path" NOT_FOUND)
 
 # Ask Gines if he prefers drop-down menu
-# SET(CAFFE_OPTION BUILD_CAFFE CACHE STRING "library selected at CMake configure time")
-# SET_PROPERTY(CACHE CAFFE_OPTION PROPERTY STRINGS BUILD_CAFFE WITH_CAFFE) 
+SET(DL_FRAMEWORK CAFFE CACHE STRING "Select Deep Learning Framework")
+SET_PROPERTY(CACHE DL_FRAMEWORK PROPERTY STRINGS CAFFE CAFFE2 TENSORFLOW) 
 
-include(CMakeDependentOption)
-if (DOWNLOAD_MODELS)
-  CMAKE_DEPENDENT_OPTION(DOWNLOAD_COCO_MODEL "Download coco model" ON
-    "DOWNLOAD_MODELS" ON)
-  CMAKE_DEPENDENT_OPTION(DOWNLOAD_MPI_MODEL "Download mpi model" ON
-    "DOWNLOAD_MODELS" ON)
-  CMAKE_DEPENDENT_OPTION(DOWNLOAD_HAND_MODEL "Download hand model" ON
-    "DOWNLOAD_MODELS" ON)  
-  CMAKE_DEPENDENT_OPTION(DOWNLOAD_FACE_MODEL "Download face model" ON
-    "DOWNLOAD_MODELS" ON)
-endif (DOWNLOAD_MODELS)
+option(DOWNLOAD_COCO_MODEL "Download coco model" ON)
+option(DOWNLOAD_MPI_MODEL "Download mpi model" ON)
+option(DOWNLOAD_HAND_MODEL "Download hand model" ON)  
+option(DOWNLOAD_FACE_MODEL "Download face model" ON)
 
 ### FIND REQUIRED PACKAGES
 
@@ -46,6 +47,9 @@ find_package(CUDA REQUIRED)
 find_package(GFlags REQUIRED)
 find_package(Glog REQUIRED)
 find_package(OpenCV REQUIRED)
+
+message(STATUS \${OpenCV_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
+message(STATUS \${OpenCV_LIBS} ${OpenCV_LIBS})
 
 # Set CUDA Flags
 set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -std=c++11")
@@ -126,25 +130,35 @@ endif (BUILD_DOCS)
 
 # Download the models if flag is set
 # TODO -- remove hardcoded ubuntu paths
-if (DOWNLOAD_MODELS)
-  include(cmake/Utils.cmake)
+include(cmake/Utils.cmake)
+message(STATUS "Download the models.")
+
+set(OPENPOSE_URL "http://posefs1.perception.cs.cmu.edu/OpenPose/models/")
   
-  message(STATUS "Download the models.")
-  set(OPENPOSE_URL "http://posefs1.perception.cs.cmu.edu/OpenPose/models/")
-  
-  # Body (COCO)
+# Body (COCO)
+if (DOWNLOAD_COCO_MODEL)
   download_model("body (coco)" ${DOWNLOAD_COCO_MODEL} pose/coco/pose_iter_440000.caffemodel
       5156d31f670511fce9b4e28b403f2939)
-  # Body (MPI)
+endif (DOWNLOAD_COCO_MODEL)
+  
+# Body (MPI)
+if (DOWNLOAD_MPI_MODEL)
   download_model("body (mpi)" ${DOWNLOAD_MPI_MODEL} pose/mpi/pose_iter_160000.caffemodel
       2ca0990c7562bd7ae03f3f54afa96e00)
-  # Face
-  download_model("face" ${DOWNLOAD_FACE_MODEL} face/pose_iter_116000.caffemodel
+endif (DOWNLOAD_MPI_MODEL)
+    
+# Face
+if (DOWNLOAD_FACE_MODEL)
+download_model("face" ${DOWNLOAD_FACE_MODEL} face/pose_iter_116000.caffemodel
       e747180d728fa4e4418c465828384333)
-  # Hand
-  download_model("hand" ${DOWNLOAD_HAND_MODEL} hand/pose_iter_102000.caffemodel
+endif (DOWNLOAD_FACE_MODEL)
+
+# Hand
+if (DOWNLOAD_HAND_MODEL)
+download_model("hand" ${DOWNLOAD_HAND_MODEL} hand/pose_iter_102000.caffemodel
       a82cfc3fea7c62f159e11bd3674c1531)
+endif (DOWNLOAD_HAND_MODEL)
 
-  message(STATUS "Models Downloaded.")
+message(STATUS "Models Downloaded.")
 
-endif (DOWNLOAD_MODELS)
+

@@ -68,6 +68,7 @@ tafs
 TAGS
 tags
 .clang_complete
+openpose.vim
 
 ######################### Windows (Visual Studio) Files #########################
 *.db
