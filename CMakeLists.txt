@@ -3,8 +3,8 @@ cmake_minimum_required(VERSION 3.0 FATAL_ERROR) # TODO -- Check the lowest versi
 
 ### INSTALL PREREQUISITES
 
-execute_process(COMMAND ./install_cmake.sh
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/ubuntu)
+# execute_process(COMMAND ./install_cmake.sh
+#     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/ubuntu)
 
 # add_custom_target(install_pre ALL
 #     COMMAND ./install_cmake.sh
@@ -21,18 +21,34 @@ add_definitions(-DUSE_CAFFE)
 
 ### PROJECT OPTIONS
 
-option(WITH_CAFFE "Select if Caffe is already installed" ON)
-option(BUILD_CAFFE "Build Caffe along with OpenPose" OFF)
+SET(DL_FRAMEWORK CAFFE CACHE STRING "Select Deep Learning Framework")
+SET_PROPERTY(CACHE DL_FRAMEWORK PROPERTY STRINGS CAFFE CAFFE2 TENSORFLOW) 
+
+# Suboptions for Caffe DL Framework
+include(CMakeDependentOption)
+if (${DL_FRAMEWORK} MATCHES "CAFFE")
+  CMAKE_DEPENDENT_OPTION(WITH_CAFFE "Build using Caffe" ON
+    "DL_FRAMEWORK" ON)
+  CMAKE_DEPENDENT_OPTION(BUILD_CAFFE "Build Caffe as part of OpenPose" OFF
+    "DL_FRAMEWORK" ON)
+else (${DL_FRAMEWORK} MATCHES "CAFFE")
+  message("Nothing found")
+endif (${DL_FRAMEWORK} MATCHES "CAFFE")
+
 option(CPU_ONLY "Build only for cpu" OFF) # This option is not used right now.
 option(BUILD_EXAMPLES "Build OpenPose examples" ON)
 option(USE_CUDNN "Build OpenPose with cuDNN library support" ON)
 option(BUILD_DOCS "Build OpenPose documentation" OFF)
+option(INSTALL_OPENCV "INSTALL_OPENCV" OFF)
+
+# Install OpenCV if said by user
+if (INSTALL_OPENCV)
+  execute_process(COMMAND sudo apt-get --assume-yes install libopencv-dev)
+endif (INSTALL_OPENCV) 
+
 # option(Caffe_INCLUDE_DIRS "Caffe Include directory" NOT_FOUND)
 # option(Caffe_LIBS "Caffe Library path" NOT_FOUND)
 
-# Ask Gines if he prefers drop-down menu
-SET(DL_FRAMEWORK CAFFE CACHE STRING "Select Deep Learning Framework")
-SET_PROPERTY(CACHE DL_FRAMEWORK PROPERTY STRINGS CAFFE CAFFE2 TENSORFLOW) 
 
 option(DOWNLOAD_COCO_MODEL "Download coco model" ON)
 option(DOWNLOAD_MPI_MODEL "Download mpi model" ON)
@@ -47,9 +63,7 @@ find_package(CUDA REQUIRED)
 find_package(GFlags REQUIRED)
 find_package(Glog REQUIRED)
 find_package(OpenCV REQUIRED)
-
-message(STATUS \${OpenCV_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
-message(STATUS \${OpenCV_LIBS} ${OpenCV_LIBS})
+find_package(OpenCV REQUIRED)
 
 # Set CUDA Flags
 set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -std=c++11")
