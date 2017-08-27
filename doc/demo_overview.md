@@ -23,7 +23,7 @@ See [doc/installation.md#quick-start](./installation.md#quick-start).
 
 
 ## Basic Output Saving
-The following example runs the demo video `video.avi`, renders image frames on `output/result.avi`, and outputs JSON files in `output/`:
+The following example runs the demo video `video.avi`, renders image frames on `output/result.avi`, and outputs JSON files in `output/`. Note: see [doc/output.md](./output.md) to understand the format of the JSON files.
 ```
 ./build/examples/openpose/openpose.bin --video examples/media/video.avi --write_video output/result.avi --write_keypoint_json output/
 ```
@@ -31,7 +31,7 @@ The following example runs the demo video `video.avi`, renders image frames on `
 
 
 ## Basic Output Saving with No Visualization
-The following example runs the demo video `video.avi` and outputs JSON files in `output/`:
+The following example runs the demo video `video.avi` and outputs JSON files in `output/`. Note: see [doc/output.md](./output.md) to understand the format of the JSON files.
 ```
 # Only body
 ./build/examples/openpose/openpose.bin --video examples/media/video.avi --write_keypoint_json output/ --no_display --render_pose 0
