@@ -9,11 +9,11 @@ namespace op
 {
     OP_API void putTextOnCvMat(cv::Mat& cvMat, const std::string& textToDisplay, const Point<int>& position, const cv::Scalar& color, const bool normalizeWidth);
 
-    OP_API void floatPtrToUCharCvMat(cv::Mat& cvMat, const float* const floatImage, const Point<int>& resolutionSize, const int resolutionChannels);
+    OP_API void floatPtrToUCharCvMat(cv::Mat& uCharCvMat, const float* const floatPtrImage, const std::array<int, 3> resolutionSize);
 
     OP_API void unrollArrayToUCharCvMat(cv::Mat& cvMatResult, const Array<float>& array);
 
-    OP_API void uCharCvMatToFloatPtr(float* floatImage, const cv::Mat& cvImage, const bool normalize);
+    OP_API void uCharCvMatToFloatPtr(float* floatPtrImage, const cv::Mat& cvImage, const bool normalize);
 
     OP_API double resizeGetScaleFactor(const Point<int>& initialSize, const Point<int>& targetSize);
 

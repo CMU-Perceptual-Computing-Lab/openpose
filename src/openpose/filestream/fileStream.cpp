@@ -83,7 +83,7 @@ namespace op
             // Save cv::Mat data
             cv::FileStorage fileStorage{getFullName(fileNameNoExtension, format), cv::FileStorage::WRITE};
             for (auto i = 0 ; i < cvMats.size() ; i++)
-                fileStorage << cvMatNames[i] << (cvMats[i].empty() ? cv::Mat{} : cvMats[i]);
+                fileStorage << cvMatNames[i] << (cvMats[i].empty() ? cv::Mat() : cvMats[i]);
             // Release file
             fileStorage.release();
         }
@@ -242,7 +242,7 @@ namespace op
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return cv::Mat{};
+            return cv::Mat();
         }
     }
 
