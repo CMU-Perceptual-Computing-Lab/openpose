@@ -1,9 +1,9 @@
 set(SOURCES
-  CMakeLists.txt
-  defineTemplates.cpp
-  frameDisplayer.cpp
-  gui.cpp
-  guiInfoAdder.cpp
+    CMakeLists.txt
+    defineTemplates.cpp
+    frameDisplayer.cpp
+    gui.cpp
+    guiInfoAdder.cpp
 )
 
 add_library(gui SHARED ${SOURCES})
