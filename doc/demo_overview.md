@@ -7,7 +7,91 @@ In order to learn how to use it, run `./build/examples/openpose/openpose.bin --h
 
 
 
-## Most Important Configuration Flags
+## Running on Images, Video or Webcam
+See [doc/installation.md#quick-start](./installation.md#quick-start).
+
+
+
+## Pose + Face + Hands
+See [doc/installation.md#quick-start](./installation.md#quick-start).
+
+
+
+## Maximum Accuracy Configuration
+See [doc/installation.md#quick-start](./installation.md#quick-start).
+
+
+
+## JSON Output with No Visualization
+The following example runs the demo video `video.avi` and outputs JSON files in `output/`. Note: see [doc/output.md](./output.md) to understand the format of the JSON files.
+```
+# Only body
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --write_keypoint_json output/ --no_display --render_pose 0
+# Body + face + hands
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --write_keypoint_json output/ --no_display --render_pose 0 --face --hand
+```
+
+
+
+## JSON Output + Rendered Images Saving
+The following example runs the demo video `video.avi`, renders image frames on `output/result.avi`, and outputs JSON files in `output/`. Note: see [doc/output.md](./output.md) to understand the format of the JSON files.
+```
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --write_video output/result.avi --write_keypoint_json output/
+```
+
+
+
+## Hands
+```
+# Fast method for speed
+./build/examples/openpose/openpose.bin --hand
+# Best results found with 6 scales
+./build/examples/openpose/openpose.bin --hand --hand_scale_number 6 --hand_scale_range 0.4
+# Adding tracking to Webcam (if FPS per GPU > 10 FPS) and Video
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --hand --hand_tracking
+# Multi-scale + tracking is also possible
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --hand --hand_scale_number 6 --hand_scale_range 0.4 --hand_tracking
+```
+
+
+
+## Rendering Face and Hands without Pose
+```
+# CPU rendering (faster)
+./build/examples/openpose/openpose.bin --render_pose 0 --face --face_render 1 --hand --hand_render 1
+# GPU rendering
+./build/examples/openpose/openpose.bin --render_pose 0 --face --face_render 2 --hand --hand_render 2
+```
+
+
+
+## Debugging Information
+```
+# Basic information
+./build/examples/openpose/openpose.bin --logging_level 3
+# Showing all messages
+./build/examples/openpose/openpose.bin --logging_level 0
+```
+
+
+
+## Selecting Some GPUs
+The following example runs the demo video `video.avi`, parallelizes it over 2 GPUs, GPUs 1 and 2 (note that it will skip GPU 0):
+```
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --num_gpu 2 --num_gpu_start 1
+```
+
+
+
+## Heat Maps Storing
+The following command will save all the body part heat maps, background heat map and Part Affinity Fields (PAFs) in the folder `output_heatmaps_folder`. It will save them on PNG format. Instead of individually saving each of the 67 heatmaps (18 body parts + background + 2 x 19 PAFs) individually, the library concatenate them vertically into a huge (width x #heatmaps) x (height) matrix. The PAFs channels are multiplied by 2 because there is one heatmpa for the x-coordinates and one for the y-coordinates. The order is body parts + bkg + PAFs. It will follow the sequence on POSE_BODY_PART_MAPPING in [include/openpose/pose/poseParameters.hpp](../include/openpose/pose/poseParameters.hpp).
+```
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --heatmaps_add_parts --heatmaps_add_bkg --heatmaps_add_PAFs --write_heatmaps output_heatmaps_folder/
+```
+
+
+
+## Main Flags
 We enumerate some of the most important flags, check the `Flags Detailed Description` section or run `./build/examples/openpose/openpose.bin --help` for a full description of all of them.
 
 - `--face`: Enables face keypoint detection.
@@ -30,7 +114,7 @@ We enumerate some of the most important flags, check the `Flags Detailed Descrip
 
 
 
-## Flags Detailed Description
+## Flags Description
 Each flag is divided into flag name, default value, and description.
 
 1. Debugging
@@ -112,63 +196,3 @@ Each flag is divided into flag name, default value, and description.
 - DEFINE_string(write_coco_json,          "",             "Full file path to write people pose data with *.json COCO validation format.");
 - DEFINE_string(write_heatmaps,           "",             "Directory to write heatmaps in *.png format. At least 1 `add_heatmaps_X` flag must be enabled.");
 - DEFINE_string(write_heatmaps_format,    "png",          "File extension and format for `write_heatmaps`, analogous to `write_images_format`. Recommended `png` or any compressed and lossless format.");
-
-
-
-## Heat Maps Storing
-The following command will save all the body part heat maps, background heat map and Part Affinity Fields (PAFs) in the folder `output_heatmaps_folder`. It will save them on PNG format. Instead of individually saving each of the 67 heatmaps (18 body parts + background + 2 x 19 PAFs) individually, the library concatenate them vertically into a huge (width x #heatmaps) x (height) matrix. The PAFs channels are multiplied by 2 because there is one heatmpa for the x-coordinates and one for the y-coordinates. The order is body parts + bkg + PAFs. It will follow the sequence on POSE_BODY_PART_MAPPING in [include/openpose/pose/poseParameters.hpp](../include/openpose/pose/poseParameters.hpp).
-```
-./build/examples/openpose/openpose.bin --video examples/media/video.avi --heatmaps_add_parts --heatmaps_add_bkg --heatmaps_add_PAFs --write_heatmaps output_heatmaps_folder/
-```
-
-
-
-## Maximum Accuracy Configuration
-See [doc/installation.md#quick-start](./installation.md#quick-start).
-
-
-
-## Basic Output Saving
-The following example runs the demo video `video.avi`, renders image frames on `output/result.avi`, and outputs JSON files in `output/`. It parallelizes over 2 GPUs, GPUs 1 and 2 (note that it will skip GPU 0):
-```
-./build/examples/openpose/openpose.bin --video examples/media/video.avi --num_gpu 2 --num_gpu_start 1 --write_video output/result.avi --write_keypoint_json output/
-```
-
-
-
-## Hands
-```
-# Fast method for speed
-./build/examples/openpose/openpose.bin --hand
-# Best results found with 6 scales
-./build/examples/openpose/openpose.bin --hand --hand_scale_number 6 --hand_scale_range 0.4
-# Adding tracking to Webcam (if FPS per GPU > 10 FPS) and Video
-./build/examples/openpose/openpose.bin --video examples/media/video.avi --hand --hand_tracking
-# Multi-scale + tracking is also possible
-./build/examples/openpose/openpose.bin --video examples/media/video.avi --hand --hand_scale_number 6 --hand_scale_range 0.4 --hand_tracking
-```
-
-
-
-## Pose + Face + Hands
-See [doc/installation.md#quick-start](./installation.md#quick-start).
-
-
-
-## Rendering Face without Pose
-```
-# CPU rendering (faster)
-./build/examples/openpose/openpose.bin --face --render_pose 0 --face_render 1
-# GPU rendering
-./build/examples/openpose/openpose.bin --face --render_pose 0 --face_render 2
-```
-
-
-
-## Debugging Information
-```
-# Basic information
-./build/examples/openpose/openpose.bin --logging_level 3
-# Showing all messages
-./build/examples/openpose/openpose.bin --logging_level 0
-```

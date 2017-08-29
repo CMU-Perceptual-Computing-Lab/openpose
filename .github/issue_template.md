@@ -38,6 +38,6 @@ You might select multiple topics, delete the rest:
 **cuDNN version**:
 **GPU model** (`nvidia-smi` in Ubuntu):
 **Caffe version**: Default from OpenPose or custom version.
-**OpenCV version**: installed with `apt-get install libopencv-dev` (Ubuntu) or default from OpenPose (Windows) or OpenCV 2.X or OpenCV 3.X.
+**OpenCV version**: installed with `apt-get install libopencv-dev` (Ubuntu) or default from OpenPose (Windows) or OpenCV 2.X or OpenCV 3.X. Especify **full version** (e.g. 3.1 or 2.4.9)
 Generation mode (only for Ubuntu): Makefile + Makefile.config (default, Ubuntu) or CMake (Ubuntu, Windows) or Visual Studio (Windows).
 Compiler (`gcc --version` in Ubuntu):

@@ -14,7 +14,7 @@ namespace op
         cv::Mat formatToCvMat(const Array<float>& outputData) const;
 
     private:
-        const Point<int> mOutputResolution;
+        const std::array<int, 3> mOutputResolution;
     };
 }
 

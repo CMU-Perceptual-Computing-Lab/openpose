@@ -20,7 +20,7 @@ namespace op
 
         void initializationOnThread();
 
-        void update(const cv::Mat& cvOutputData = cv::Mat{});
+        void update(const cv::Mat& cvOutputData = cv::Mat());
 
     private:
         // Frames display

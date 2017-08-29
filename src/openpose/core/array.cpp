@@ -176,7 +176,7 @@ namespace op
                 mVolume = 0;
                 spData.reset();
                 // cv::Mat available but empty
-                mCvMatData = std::make_pair(true, cv::Mat{});
+                mCvMatData = std::make_pair(true, cv::Mat());
             }
         }
         catch (const std::exception& e)
@@ -460,9 +460,9 @@ namespace op
                 mCvMatData.first = false;
 
             if (mCvMatData.first)
-                mCvMatData.second = cv::Mat{(int)mSize.size(), mSize.data(), cvFormat, spData.get()};
+                mCvMatData.second = cv::Mat((int)mSize.size(), mSize.data(), cvFormat, spData.get());
             else
-                mCvMatData.second = cv::Mat{};
+                mCvMatData.second = cv::Mat();
         }
         catch (const std::exception& e)
         {
