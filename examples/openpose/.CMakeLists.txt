@@ -1,5 +1,0 @@
-set(SOURCES
-  openpose.cpp)
-
-add_executable(openpose.bin ${SOURCES})
-target_link_libraries(openpose.bin wrapper utilities filestream ${GLOG_LIBRARY} ${GFLAGS_LIBRARY})
