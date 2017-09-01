@@ -4,6 +4,7 @@
 #include <atomic>
 #include <thread>
 #include <opencv2/core/core.hpp> // cv::Mat
+#include <openpose/core/enumClasses.hpp>
 #include <openpose/core/common.hpp>
 #include <openpose/core/maximumCaffe.hpp>
 #include <openpose/core/net.hpp>
@@ -27,7 +28,7 @@ namespace op
          * @param rangeScales The range between the smaller and bigger scale.
          */
         explicit HandExtractor(const Point<int>& netInputSize, const Point<int>& netOutputSize, const std::string& modelFolder, const int gpuId,
-                               const unsigned short numberScales = 1, const float rangeScales = 0.4f);
+                               const unsigned short numberScales = 1, const float rangeScales = 0.4f, const ScaleMode heatMapScale = ScaleMode::ZeroToOne);
 
         /**
          * This function must be call before using any other function. It must also be called inside the thread in which the functions are going
@@ -56,10 +57,21 @@ namespace op
          */
         std::array<Array<float>, 2> getHandKeypoints() const;
 
+
+
+        // XXX PADELER
+        const float* getHeatMapCpuConstPtr() const;
+
+        const float* getHeatMapGpuConstPtr() const;
+
+        Array<float> getHeatMaps() const;
+        // XXX PADELER
+
     private:
         // const bool mMultiScaleDetection;
         const std::pair<unsigned short, float> mMultiScaleNumberAndRange;
         const Point<int> mNetOutputSize;
+	const ScaleMode mHeatMapScaleMode;
         std::shared_ptr<Net> spNet;
         std::shared_ptr<ResizeAndMergeCaffe<float>> spResizeAndMergeCaffe;
         std::shared_ptr<MaximumCaffe<float>> spMaximumCaffe;
