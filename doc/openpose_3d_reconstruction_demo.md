@@ -3,7 +3,7 @@
 
 This is a beta version that makes body + face + hand keypoint 3-D reconstruction and rendering for 1 person. We will not keep updating it nor solving questions/issues about it at the moment. It requires the user to be familiar with computer vision, in particular with camera calibration, i.e. extraction of intrinsic and extrinsic parameters.
 
-The Windows steps were tested and worked in the OpenPose 1.0.1 version from the last GitHub commit on July 18th, 2017 in the [official repository](https://github.com/CMU-Perceptual-Computing-Lab/openpose). 3D OpenPose should work with any newer version to that one. However, in case it does not, open a GitHub issue and meanwhile use the mentioned version of July 18th.
+The Windows steps were tested and worked in the OpenPose 1.0.2 version from the last GitHub commit on September 1st, 2017 in the [official repository](https://github.com/CMU-Perceptual-Computing-Lab/openpose). 3D OpenPose should work with any newer version to that one. However, in case it does not, open a GitHub issue and meanwhile use the mentioned version of July 18th.
 
 
 

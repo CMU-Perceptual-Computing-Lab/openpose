@@ -83,7 +83,7 @@ OpenPose Library - Release Notes
 
 
 
-## Current version (future OpenPose 1.0.2)
+## OpenPose 1.0.2
 1. Main improvements:
     1. Added OpenCV 3.3 compatibility.
     2. Caffe turned into DLL library.
@@ -99,3 +99,9 @@ OpenPose Library - Release Notes
 2. Main bugs fixed:
     1. Pycaffe can now be imported from Python.
     2. Fixed `Tutorial/Wrapper` VS linking errors.
+
+
+
+## Current version (future OpenPose 1.0.3)
+1. Main improvements:
+2. Main bugs fixed:
