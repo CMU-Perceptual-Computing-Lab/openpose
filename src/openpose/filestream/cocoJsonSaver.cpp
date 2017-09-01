@@ -1,3 +1,4 @@
+#include <openpose/utilities/string.hpp>
 #include <openpose/filestream/cocoJsonSaver.hpp>
 
 namespace op
@@ -27,12 +28,13 @@ namespace op
         }
     }
 
-    void CocoJsonSaver::record(const Array<float>& poseKeypoints, const unsigned long long imageId)
+    void CocoJsonSaver::record(const Array<float>& poseKeypoints, const std::string& imageName)
     {
         try
         {
             const auto numberPeople = poseKeypoints.getSize(0);
             const auto numberBodyParts = poseKeypoints.getSize(1);
+            const auto imageId = getLastNumber(imageName);
             for (auto person = 0 ; person < numberPeople ; person++)
             {
                 // Comma at any moment but first element
