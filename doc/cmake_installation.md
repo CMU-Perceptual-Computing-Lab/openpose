@@ -22,49 +22,48 @@ succinctly in the sections below.
 
 ### CMake GUI
 
-The first step is to open the CMake GUI.
-* ![im_1](media/cmake_installation/im_1.png)
+* The first step is to open the CMake GUI.
+ ![im_1](media/cmake_installation/im_1.png)
 
-After opening the CMake GUI, the next step is to select the project source directory and a sub-directory where the makefiles will
+* After opening the CMake GUI, the next step is to select the project source directory and a sub-directory where the makefiles will
 be generated. We will first select the openpose directory and then we will select a `build` directory in the project root directory as shown in the image below (See the red rectangle). If the `build` directory does not exists, CMake will create one for us.
 
-* ![im_2](media/cmake_installation/im_2.png)
+![im_2](media/cmake_installation/im_2.png)
 
-Next press the `Configure` button in the GUI. It will first ask you to create the `build` directory, if it already did not exist. Press `Yes`.
+* Next press the `Configure` button in the GUI. It will first ask you to create the `build` directory, if it already did not exist. Press `Yes`.
 
-* ![im_3](media/cmake_installation/im_3.png)
+![im_3](media/cmake_installation/im_3.png)
 
-Next a new dialog box will appear, press the `Finish` button here.
+* Next a new dialog box will appear, press the `Finish` button here.
 
-* ![im_4](media/cmake_installation/im_4.png)
+![im_4](media/cmake_installation/im_4.png)
 
-If it shows an error as shown below. It is perfect alright -- we'll fix it in the next step. If not, skip to building
+* If it shows an error as shown below. It is perfect alright -- we'll fix it in the next step. If not, skip to building
 OpenPose.
 
-* ![im_5](media/cmake_installation/im_5.png)
+![im_5](media/cmake_installation/im_5.png)
 
-The error probably occurred because CMake could not find the Caffe includes and the library. 
+* The error probably occurred because CMake could not find the Caffe includes and the library. 
 
 #### Caffe already present 
 
-If Caffe is already installed, specify the Caffe includes path and the library as shown below. 
+* If Caffe is already installed, specify the Caffe includes path and the library as shown below. 
 
-* ![im_6](media/cmake_installation/im_6.png)
+![im_6](media/cmake_installation/im_6.png)
 
-To generate the makefile, press the `Generate` button and proceed to building OpenPose.
+* To generate the makefile, press the `Generate` button and proceed to building OpenPose.
 
-* ![im_7](media/cmake_installation/im_7.png)
-
+![im_7](media/cmake_installation/im_7.png)
 
 #### Caffe not present
 
-If Caffe is not already there, the OpenPose build will do it for you. Just turn on the `BUILD_CAFFE` key as shown below.
+* If Caffe is not already there, the OpenPose build will do it for you. Just turn on the `BUILD_CAFFE` key as shown below.
 
-* ![im_8](media/cmake_installation/im_8.png)
+![im_8](media/cmake_installation/im_8.png)
 
-To generate the makefile, press the `Generate` button and proceed to building OpenPose.
+* To generate the makefile, press the `Generate` button and proceed to building OpenPose.
 
-* ![im_9](media/cmake_installation/im_9.png)
+![im_9](media/cmake_installation/im_9.png)
 
 ### Command Line build
 
