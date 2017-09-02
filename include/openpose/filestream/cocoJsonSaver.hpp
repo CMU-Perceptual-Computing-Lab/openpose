@@ -20,7 +20,7 @@ namespace op
 
         ~CocoJsonSaver();
 
-        void record(const Array<float>& poseKeypoints, const unsigned long long imageId);
+        void record(const Array<float>& poseKeypoints, const std::string& imageName);
 
     private:
         JsonOfstream mJsonOfstream;

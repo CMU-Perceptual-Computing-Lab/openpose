@@ -64,7 +64,7 @@
     </CudaCompile>
     <Link>
       <AdditionalLibraryDirectories>$(CUDA_PATH_V8_0)\lib\x64\;$(PYTHON_LIB);$(CudaToolkitLibDir);%(AdditionalLibraryDirectories);%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
-      <Version>1.0.1</Version>
+      <Version>1.0.2</Version>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
