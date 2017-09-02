@@ -65,6 +65,9 @@ OpenPose.
 
 ![im_9](media/cmake_installation/im_9.png)
 
+SIDENOTE -- If you have OpenCV installed from source -- you can specify it using the `OPENCV_DIR` variable to the
+directory where you build OpenCV.
+
 ### Command Line build
 
 After cloning the next step is to create a build folder where we will build the library --
