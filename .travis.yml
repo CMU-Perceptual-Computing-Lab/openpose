@@ -11,7 +11,8 @@ env:
   global:
     - GH_REPO_NAME: openpose
     - DOXYFILE: $TRAVIS_BUILD_DIR/doc/doc_autogeneration.doxygen
-    - GH_REPO_REF: github.com/bikz05/openpose.git
+    # Set this in Environment Variables on travis-ci.org
+    # - GH_REPO_REF: github.com/<user_name>/openpose.git
 
 # Install dependencies
 addons:
