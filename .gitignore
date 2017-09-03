@@ -58,13 +58,11 @@ MANIFEST-*
 # OSX dir files
 .DS_Store
 
-# vim plugins and temp files
-*.swp
+# Vim plugins
 cscope.files
 cscope.in.out
 cscope.out
 cscope.po.out
-tafs
 TAGS
 tags
 .clang_complete
