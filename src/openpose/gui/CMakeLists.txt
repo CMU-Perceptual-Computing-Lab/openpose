@@ -7,4 +7,4 @@ set(SOURCES
 )
 
 add_library(gui SHARED ${SOURCES})
-target_link_libraries(gui pose)
+target_link_libraries(gui pose ${OpenCV_LIBS})

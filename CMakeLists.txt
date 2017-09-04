@@ -1,5 +1,5 @@
 project(openpose)
-cmake_minimum_required(VERSION 3.0 FATAL_ERROR) # TODO -- Check the lowest version that works
+cmake_minimum_required(VERSION 2.8.7 FATAL_ERROR) # TODO -- Check the lowest version that works
 
 ### FLAGS
 
@@ -126,7 +126,10 @@ if (${DL_FRAMEWORK} MATCHES "CAFFE")
     ExternalProject_Get_Property(caffe install_dir)
 
     set(Caffe_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/build/caffe/include)
-    set(Caffe_LIBS ${CMAKE_SOURCE_DIR}/build/caffe/lib/libcaffe.so)  
+    # TODO -- Fix this
+    set(Caffe_LIBS ${CMAKE_SOURCE_DIR}/build/caffe/lib/libcaffe.so)
+    # set(Caffe_LIBS ${CMAKE_SOURCE_DIR}/build/caffe/lib/x86_64-linux-gnu/libcaffe.so)
+
   endif (BUILD_CAFFE)
 
   if (NOT Caffe_FOUND AND NOT BUILD_CAFFE)
