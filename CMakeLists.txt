@@ -1,6 +1,25 @@
 project(openpose)
 cmake_minimum_required(VERSION 2.8.7 FATAL_ERROR) # min. cmake version recommmended by Caffe
 
+### FIND THE OS
+
+if (WIN32) # OS is Windows
+  message(FATAL_ERROR "Windows OS is not currently supported.")
+elseif (APPLE) # OS is Apple
+  message(FATAL_ERROR "Apple OS is not currently supported.")
+elseif (UNIX AND NOT APPLE) # OS is a Linux dist. -- assumes ubuntu
+  set(EXECUTE_COMMAND lsb_release -rs) 
+  execute_process(COMMAND ${EXECUTE_COMMAND} OUTPUT_VARIABLE UBUNTU_VERSION)
+  string(SUBSTRING ${UBUNTU_VERSION} 0 2 UBUNTU_MAJOR_VERSION)
+  if (${UBUNTU_MAJOR_VERSION} MATCHES "16") # if 16
+    set(IS_UBUNTU_16 TRUE)
+    set(IS_UBUNTU_14_OR_LESS FALSE)
+  else (${UBUNTU_MAJOR_VERSION MATCHES "16") # if 14 or less
+    set(IS_UBUNTU_16 FALSE)
+    set(IS_UBUNTU_14_OR_LESS TRUE)
+  endif (${UBUNTU_MAJOR_VERSION} MATCHES "16")
+endif ()
+
 ### FLAGS
 
 # Turn on C++11
@@ -126,9 +145,13 @@ if (${DL_FRAMEWORK} MATCHES "CAFFE")
     ExternalProject_Get_Property(caffe install_dir)
 
     set(Caffe_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/build/caffe/include)
-    # TODO -- Fix this
-    set(Caffe_LIBS ${CMAKE_SOURCE_DIR}/build/caffe/lib/libcaffe.so)
-    # set(Caffe_LIBS ${CMAKE_SOURCE_DIR}/build/caffe/lib/x86_64-linux-gnu/libcaffe.so)
+    # TODO -- Find a better soln.
+    if (IS_UBUNTU_16)
+      set(Caffe_LIBS ${CMAKE_SOURCE_DIR}/build/caffe/lib/libcaffe.so)
+    endif (IS_UBUNTU_16)
+    if (IS_UBUNTU_14_OR_LESS)
+      set(Caffe_LIBS ${CMAKE_SOURCE_DIR}/build/caffe/lib/x86_64-linux-gnu/libcaffe.so)
+    endif (IS_UBUNTU_14_OR_LESS)
 
   endif (BUILD_CAFFE)
 
