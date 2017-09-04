@@ -1,5 +1,5 @@
 project(openpose)
-cmake_minimum_required(VERSION 2.8.7 FATAL_ERROR) # TODO -- Check the lowest version that works
+cmake_minimum_required(VERSION 2.8.7 FATAL_ERROR) # min. cmake version recommmended by Caffe
 
 ### FLAGS
 
