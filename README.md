@@ -1,6 +1,8 @@
 OpenPose
 ====================================
 
+[![Build Status](https://travis-ci.org/bikz05/openpose.svg?branch=master)](https://travis-ci.org/bikz05/openpose)
+
 ## Latest News
 - Jul 2017: **Windows**, New [**portable demo**](doc/installation.md#installation---demo) **and** [**easier library installation**](doc/installation.md#installation---library)!
 - Jul 2017: **Hands** released!

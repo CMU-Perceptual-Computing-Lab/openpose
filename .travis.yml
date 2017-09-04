@@ -42,6 +42,7 @@ after_success:
   - ./.github/generateDocumentationAndDeploy.sh
   - ./ubuntu/install_cmake.sh
   - sudo apt-get -y install libopencv-dev
+  - sudo apt-get -y install libatlas-base-dev
   - mkdir build
   - cd build
   - cmake -DBUILD_CAFFE=ON ..
