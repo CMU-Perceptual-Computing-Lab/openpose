@@ -9,7 +9,8 @@ branches:
 # OS
 os:
   - linux
-  - xenial
+  dist: xenial
+  sudo: required
 
 # Environment variables
 env:
