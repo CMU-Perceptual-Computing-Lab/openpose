@@ -6,6 +6,11 @@ branches:
   only:
     - master
 
+# OS
+os:
+  - linux
+  - xenial
+
 # Environment variables
 env:
   global:
@@ -33,3 +38,9 @@ after_success:
   - cd $TRAVIS_BUILD_DIR
   - chmod +x .github/generateDocumentationAndDeploy.sh
   - ./.github/generateDocumentationAndDeploy.sh
+  - ./ubuntu/install_cmake.sh
+  - sudo apt-get -y install libopencv-dev
+  - mkdir build
+  - cd build
+  - cmake -DBUILD_CAFFE=ON ..
+  - make -j8
