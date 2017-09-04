@@ -7,10 +7,11 @@ branches:
     - master
 
 # OS
-os:
-  - linux
-  dist: xenial
-  sudo: required
+matrix:
+  include:
+    - os: linux
+      dist: xenial
+      sudo: required
 
 # Environment variables
 env:
