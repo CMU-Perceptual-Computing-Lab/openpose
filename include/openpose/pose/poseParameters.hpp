@@ -61,7 +61,7 @@ namespace op
          85.f,     0.f,   255.f
     const std::vector<float> POSE_COCO_COLORS_RENDER{POSE_COCO_COLORS_RENDER_GPU};
     // MPI
-    const std::map<unsigned int, std::string> POSE_MPI_BODY_PARTS{
+    const std::map<unsigned int, std::string> POSE_MPI_BODY_PARTS {
         {0,  "Head"},
         {1,  "Neck"},
         {2,  "RShoulder"},
@@ -102,7 +102,27 @@ namespace op
           0.f,     0.f,   255.f
     const std::vector<float> POSE_MPI_COLORS_RENDER{POSE_MPI_COLORS_RENDER_GPU};
     // BODY_18
-    const std::map<unsigned int, std::string> POSE_BODY_18_BODY_PARTS   {POSE_COCO_BODY_PARTS};
+    const std::map<unsigned int, std::string> POSE_BODY_18_BODY_PARTS { // Windows map copy error if `= POSE_COCO_BODY_PARTS`
+		{ 0,  "Nose" },
+		{ 1,  "Neck" },
+		{ 2,  "RShoulder" },
+		{ 3,  "RElbow" },
+		{ 4,  "RWrist" },
+		{ 5,  "LShoulder" },
+		{ 6,  "LElbow" },
+		{ 7,  "LWrist" },
+		{ 8,  "RHip" },
+		{ 9,  "RKnee" },
+		{ 10, "RAnkle" },
+		{ 11, "LHip" },
+		{ 12, "LKnee" },
+		{ 13, "LAnkle" },
+		{ 14, "REye" },
+		{ 15, "LEye" },
+		{ 16, "REar" },
+		{ 17, "LEar" },
+		{ 18, "Background" }
+	};
     const unsigned int POSE_BODY_18_NUMBER_PARTS                        {POSE_COCO_NUMBER_PARTS};
     const std::vector<unsigned int> POSE_BODY_18_MAP_IDX                {POSE_COCO_MAP_IDX};
     #define POSE_BODY_18_PAIRS_RENDER_GPU                               POSE_COCO_PAIRS_RENDER_GPU

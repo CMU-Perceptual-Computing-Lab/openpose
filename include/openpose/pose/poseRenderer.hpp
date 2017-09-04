@@ -17,7 +17,7 @@ namespace op
                      const std::shared_ptr<PoseExtractor>& poseExtractor, const float renderThreshold,
                      const bool blendOriginalFrame = true, const float alphaKeypoint = POSE_DEFAULT_ALPHA_KEYPOINT,
                      const float alphaHeatMap = POSE_DEFAULT_ALPHA_HEAT_MAP, const unsigned int elementToRender = 0u,
-                     const RenderMode renderMode = RenderMode::Cpu);
+                     const RenderMode renderMode = RenderMode::Gpu);
 
         ~PoseRenderer();
 
