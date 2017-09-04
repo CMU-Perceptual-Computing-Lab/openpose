@@ -27,7 +27,7 @@ sudo apt-get --assume-yes install build-essential
 sudo apt-get --assume-yes install libprotobuf-dev libleveldb-dev libsnappy-dev libhdf5-serial-dev protobuf-compiler
 sudo apt-get --assume-yes install --no-install-recommends libboost-all-dev
 if [[ $ubuntu_version == *"14."* ]]; then
-	sudo add-apt-repository ppa:boost-latest/ppa
+	sudo add-apt-repository -y ppa:boost-latest/ppa
 	sudo apt-get update
   sudo apt-get --assume-yes install --no-install-recommends libbboost1.55-all-dev
 fi
