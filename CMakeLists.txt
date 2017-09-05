@@ -32,26 +32,28 @@ add_definitions(-DUSE_CAFFE)
 
 # Select the DL Framework
 SET(DL_FRAMEWORK CAFFE CACHE STRING "Select Deep Learning Framework")
-# SET_PROPERTY(CACHE DL_FRAMEWORK PROPERTY STRINGS CAFFE CAFFE2 TENSORFLOW) 
+SET_PROPERTY(CACHE DL_FRAMEWORK PROPERTY STRINGS CAFFE)
+# SET_PROPERTY(CACHE DL_FRAMEWORK PROPERTY STRINGS CAFFE CAFFE2 TENSORFLOW)
 
 # Suboptions for Caffe DL Framework
 include(CMakeDependentOption)
 if (${DL_FRAMEWORK} MATCHES "CAFFE")
   CMAKE_DEPENDENT_OPTION(WITH_CAFFE "Build using Caffe" ON
       "DL_FRAMEWORK" ON)
-  CMAKE_DEPENDENT_OPTION(BUILD_CAFFE "Build Caffe as part of OpenPose" OFF
+  CMAKE_DEPENDENT_OPTION(BUILD_CAFFE "Build Caffe as part of OpenPose" ON
       "DL_FRAMEWORK" ON)
 endif (${DL_FRAMEWORK} MATCHES "CAFFE")
 
 # Set the acceleration library
-SET(ACCELERATION_LIB CUDA CACHE STRING "Select the acceleration library or CPU otherwise.")
-# SET_PROPERTY(CACHE ACCELERATION_LIB PROPERTY STRINGS CUDA OPENCL CPU_ONLY) 
+SET(GPU_MODE CUDA CACHE STRING "Select the acceleration library or CPU otherwise.")
+SET_PROPERTY(CACHE GPU_MODE PROPERTY STRINGS CUDA)
+# SET_PROPERTY(CACHE GPU_MODE PROPERTY STRINGS CUDA OPENCL CPU_ONLY)
 
 # Suboptions for acceleration library
 include(CMakeDependentOption)
-if (${ACCELERATION_LIB} MATCHES "CUDA")
+if (${GPU_MODE} MATCHES "CUDA")
   option(USE_CUDNN "Build OpenPose with cuDNN library support" ON)
-endif (${ACCELERATION_LIB} MATCHES "CUDA")
+endif (${GPU_MODE} MATCHES "CUDA")
  
 # Download the models
 option(DOWNLOAD_COCO_MODEL "Download coco model" ON)
