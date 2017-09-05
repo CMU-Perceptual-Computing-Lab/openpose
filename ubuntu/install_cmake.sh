@@ -26,14 +26,9 @@ sudo apt-get --assume-yes install build-essential
 # General dependencies
 sudo apt-get --assume-yes install libprotobuf-dev libleveldb-dev libsnappy-dev libhdf5-serial-dev protobuf-compiler
 sudo apt-get --assume-yes install --no-install-recommends libboost-all-dev
-if [[ $ubuntu_version == *"14."* ]]; then
-	sudo add-apt-repository -y ppa:boost-latest/ppa
-	sudo apt-get update
-  sudo apt-get --assume-yes install --no-install-recommends libbboost1.55-all-dev
-fi
 # Remaining dependencies, 14.04
 sudo apt-get --assume-yes install libgflags-dev libgoogle-glog-dev liblmdb-dev
 # Python libs
-sudo -H pip install --upgrade numpy protobuf
+sudo pip install --upgrade numpy protobuf
 # OpenCV 2.4 -> Added as option
 # sudo apt-get --assume-yes install libopencv-dev
