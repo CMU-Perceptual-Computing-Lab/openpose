@@ -148,13 +148,7 @@ if (${DL_FRAMEWORK} MATCHES "CAFFE")
 
     set(Caffe_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/build/caffe/include)
     # TODO -- Find a better soln.
-    if (IS_UBUNTU_16)
-      set(Caffe_LIBS ${CMAKE_SOURCE_DIR}/build/caffe/lib/libcaffe.so)
-    endif (IS_UBUNTU_16)
-    if (IS_UBUNTU_14_OR_LESS)
-      set(Caffe_LIBS ${CMAKE_SOURCE_DIR}/build/caffe/lib/libcaffe.so)
-      # set(Caffe_LIBS ${CMAKE_SOURCE_DIR}/build/caffe/lib/x86_64-linux-gnu/libcaffe.so)
-    endif (IS_UBUNTU_14_OR_LESS)
+    set(Caffe_LIBS ${CMAKE_SOURCE_DIR}/build/caffe/lib/libcaffe.so)
 
   endif (BUILD_CAFFE)
 
