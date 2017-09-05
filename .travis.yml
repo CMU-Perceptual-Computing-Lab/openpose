@@ -38,7 +38,7 @@ script:
   - cd build
   - cmake -DBUILD_CAFFE=ON ..
   - no_cores=`cat /proc/cpuinfo | grep processor | wc -l`
-  -  make -j${cores}
+  - make -j${no_cores}
 
 # Generate and deploy documentation
 after_success:

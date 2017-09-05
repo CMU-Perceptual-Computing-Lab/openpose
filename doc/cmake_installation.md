@@ -118,7 +118,7 @@ directory of the project and run the below 2 commands.
 
 ```
 no_cores=`cat /proc/cpuinfo | grep processor | wc -l`
-make -j${cores}
+make -j${no_cores}
 ```
 
 # Run the OpenPose
