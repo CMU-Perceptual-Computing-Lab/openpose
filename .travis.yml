@@ -7,11 +7,8 @@ branches:
     - master
 
 # OS
-matrix:
-  include:
-    - os: linux
-      dist: xenial
-      sudo: required
+dist: trusty 
+sudo: required
 
 # Environment variables
 env:
@@ -40,7 +37,8 @@ script:
   - mkdir build
   - cd build
   - cmake -DBUILD_CAFFE=ON ..
-  - make -j8
+  - no_cores=`cat /proc/cpuinfo | grep processor | wc -l`
+  -  make -j${cores}
 
 # Generate and deploy documentation
 after_success:
