@@ -33,13 +33,6 @@ addons:
 
 # Build your code e.g. by calling make
 script:
-  - echo "Nothing to build"
-
-# Generate and deploy documentation
-after_success:
-  - cd $TRAVIS_BUILD_DIR
-  - chmod +x .github/generateDocumentationAndDeploy.sh
-  - ./.github/generateDocumentationAndDeploy.sh
   - ./ubuntu/install_cmake.sh
   - sudo apt-get -y install libopencv-dev
   - sudo apt-get -y install libatlas-base-dev
@@ -47,3 +40,9 @@ after_success:
   - cd build
   - cmake -DBUILD_CAFFE=ON ..
   - make -j8
+
+# Generate and deploy documentation
+after_success:
+  - cd $TRAVIS_BUILD_DIR
+  - chmod +x .github/generateDocumentationAndDeploy.sh
+  - ./.github/generateDocumentationAndDeploy.sh
