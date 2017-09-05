@@ -36,6 +36,7 @@ script:
   - ./ubuntu/install_cmake.sh
   - sudo apt-get -y install libopencv-dev
   - sudo apt-get -y install libatlas-base-dev
+  - pip install --upgrade numpy
   - mkdir build
   - cd build
   - cmake -DBUILD_CAFFE=ON ..

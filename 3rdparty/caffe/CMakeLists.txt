@@ -68,8 +68,6 @@ set(Caffe_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
 set(Caffe_SRC_DIR ${PROJECT_SOURCE_DIR}/src)
 include_directories(${PROJECT_BINARY_DIR})
 
-message("\${Caffe_INCLUDE_DIR} ${Caffe_INCLUDE_DIR}")
-
 # ---[ Includes & defines for CUDA
 
 # cuda_compile() does not have per-call dependencies or include pathes
