@@ -242,6 +242,37 @@ public:
         else
             op::log("Nullptr or empty datumsPtr found.", op::Priority::High, __LINE__, __FUNCTION__, __FILE__);
     }
+    void printKeypoitns(const std::shared_ptr<std::vector<UserDatum>>& datumsPtr)
+    {
+        // Example: How to use the pose keypoints
+        if (datumsPtr != nullptr && !datumsPtr->empty())
+        {
+            op::log("\nKeypoints:");
+            // Accesing each element of the keypoints
+            const auto& poseKeypoints = datumsPtr->at(0).poseKeypoints;
+            op::log("Person pose keypoints:");
+            for (auto person = 0 ; person < poseKeypoints.getSize(0) ; person++)
+            {
+                op::log("Person " + std::to_string(person) + " (x, y, score):");
+                for (auto bodyPart = 0 ; bodyPart < poseKeypoints.getSize(1) ; bodyPart++)
+                {
+                    std::string valueToPrint;
+                    for (auto xyscore = 0 ; xyscore < poseKeypoints.getSize(2) ; xyscore++)
+                    {
+                        valueToPrint += std::to_string(   poseKeypoints[{person, bodyPart, xyscore}]   ) + " ";
+                    }
+                    op::log(valueToPrint);
+                }
+            }
+            op::log(" ");
+            // Alternative: just getting std::string equivalent
+            op::log("Face keypoints: " + datumsPtr->at(0).faceKeypoints.toString());
+            op::log("Left hand keypoints: " + datumsPtr->at(0).handKeypoints[0].toString());
+            op::log("Right hand keypoints: " + datumsPtr->at(0).handKeypoints[1].toString());
+        }
+        else
+            op::log("Nullptr or empty datumsPtr found.", op::Priority::High, __LINE__, __FUNCTION__, __FILE__);
+    }
 };
 
 int openPoseTutorialWrapper1()
@@ -319,7 +350,10 @@ int openPoseTutorialWrapper1()
             // Pop frame
             std::shared_ptr<std::vector<UserDatum>> datumProcessed;
             if (successfullyEmplaced && opWrapper.waitAndPop(datumProcessed))
+            {
                 userOutputClass.display(datumProcessed);
+                userOutputClass.printKeypoitns(datumProcessed);
+            }
             else
                 op::log("Processed datum could not be emplaced.", op::Priority::High, __LINE__, __FUNCTION__, __FILE__);
         }
