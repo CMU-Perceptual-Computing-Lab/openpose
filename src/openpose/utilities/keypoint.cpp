@@ -146,9 +146,9 @@ namespace op
                 const auto width = frame.size[2];
                 const auto height = frame.size[1];
                 const auto area = width * height;
-                cv::Mat frameB{height, width, CV_32FC1, &frame.data[0]};
-                cv::Mat frameG{height, width, CV_32FC1, &frame.data[area * sizeof(float) / sizeof(uchar)]};
-                cv::Mat frameR{height, width, CV_32FC1, &frame.data[2 * area * sizeof(float) / sizeof(uchar)]};
+                cv::Mat frameB(height, width, CV_32FC1, &frame.data[0]);
+                cv::Mat frameG(height, width, CV_32FC1, &frame.data[area * sizeof(float) / sizeof(uchar)]);
+                cv::Mat frameR(height, width, CV_32FC1, &frame.data[2 * area * sizeof(float) / sizeof(uchar)]);
 
                 // Parameters
                 const auto lineType = 8;

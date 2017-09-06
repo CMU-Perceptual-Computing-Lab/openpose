@@ -60,11 +60,7 @@ namespace op
                 // T* to T
                 const auto& tDatum = tDatums->at(0);
                 // Record json in COCO format
-                const std::string stringToRemove = "COCO_val2014_";
-                const auto stringToRemoveEnd = tDatum.name.find(stringToRemove) + stringToRemove.size();
-                const auto imageId = std::stoull(tDatum.name.substr(stringToRemoveEnd, tDatum.name.size() - stringToRemoveEnd));
-                // Record json in COCO format if file within desired range of images
-                spCocoJsonSaver->record(tDatum.poseKeypoints, imageId);
+                spCocoJsonSaver->record(tDatum.poseKeypoints, tDatum.name);
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
                 Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__, Profiler::DEFAULT_X);

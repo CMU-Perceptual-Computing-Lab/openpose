@@ -3,6 +3,20 @@
 
 namespace op
 {
+    unsigned long long getLastNumber(const std::string& string)
+    {
+        try
+        {
+            const auto stringNumber = string.substr(string.find_last_not_of("0123456789") + 1);
+            return std::stoull(stringNumber);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return 0ull;
+        }
+    }
+
     template<typename T>
     std::string toFixedLengthString(const T number, const unsigned long long stringLength)
     {

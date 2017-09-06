@@ -16,7 +16,7 @@ namespace op
         {
             setGuiDisplayMode(mGuiDisplayMode);
 
-            const cv::Mat blackFrame{mWindowedSize.y, mWindowedSize.x, CV_32FC3, {0,0,0}};
+            const cv::Mat blackFrame(mWindowedSize.y, mWindowedSize.x, CV_32FC3, {0,0,0});
             FrameDisplayer::displayFrame(blackFrame);
             cv::waitKey(1); // This one will show most probably a white image (I guess the program does not have time to render in 1 msec)
             // cv::waitKey(1000); // This one will show the desired black image

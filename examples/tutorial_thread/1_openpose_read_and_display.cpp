@@ -132,7 +132,7 @@ int openPoseTutorialThread1()
 
     // ------------------------- CLOSING -------------------------
     // Logging information message
-    op::log("Example 3 successfully finished.", op::Priority::High);
+    op::log("Example 1 successfully finished.", op::Priority::High);
     // Return successful message
     return 0;
 }

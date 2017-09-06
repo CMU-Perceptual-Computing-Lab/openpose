@@ -83,15 +83,25 @@ OpenPose Library - Release Notes
 
 
 
-## Current version (future OpenPose 1.0.2)
+## OpenPose 1.0.2
 1. Main improvements:
-    1. Caffe turned into DLL library.
-    2. OpenPose is now completely portable across Windows 10 computers (with Nvidia graphic card).
-    3. Added OpenPose 1.0.1 portable demo.
-    4. Removed Python and some unnecessary boost dependencies on the VS project.
-    5. Replaced all double quotes by angle brackets in include statements (issue #61).
-    6. Added 3-D reconstruction demo.
-    7. Auto-detection of the camera index.
+    1. Added OpenCV 3.3 compatibility.
+    2. Caffe turned into DLL library.
+    3. OpenPose is now completely portable across Windows 10 computers (with Nvidia graphic card).
+    4. Added OpenPose 1.0.1 portable demo.
+    5. Removed Python and some unnecessary boost dependencies on the VS project.
+    6. Replaced all double quotes by angle brackets in include statements (issue #61).
+    7. Added 3-D reconstruction demo.
+    8. Auto-detection of the camera index.
+    9. Speed up of ~30% in op::floatPtrToUCharCvMat.
+    10. COCO extractor now extracts image ID from the image name itslef (format "string_%d"). Before, only working with validation test, now applicable to e.g. test sets.
+    11. Changed display texts, added `OpenPose` name.
 2. Main bugs fixed:
     1. Pycaffe can now be imported from Python.
     2. Fixed `Tutorial/Wrapper` VS linking errors.
+
+
+
+## Current version (future OpenPose 1.0.3)
+1. Main improvements:
+2. Main bugs fixed:

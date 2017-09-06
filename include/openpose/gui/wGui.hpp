@@ -69,7 +69,7 @@ namespace op
                 // T* to T
                 auto& tDatumsNoPtr = *tDatums;
                 // Refresh GUI
-                const auto cvOutputData = (!tDatumsNoPtr.empty() ? tDatumsNoPtr[0].cvOutputData : cv::Mat{});
+                const auto cvOutputData = (!tDatumsNoPtr.empty() ? tDatumsNoPtr[0].cvOutputData : cv::Mat());
                 spGui->update(cvOutputData);
                 // Profiling speed
                 if (!tDatumsNoPtr.empty())

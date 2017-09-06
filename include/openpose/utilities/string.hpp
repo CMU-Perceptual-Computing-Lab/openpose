@@ -5,6 +5,8 @@
 
 namespace op
 {
+    OP_API unsigned long long getLastNumber(const std::string& string);
+
     /**
      * This template function turns an integer number into a fixed-length std::string.
      * @param number T integer corresponding to the integer to be formatted.

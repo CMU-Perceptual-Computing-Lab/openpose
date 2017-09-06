@@ -40,7 +40,7 @@ namespace op
                     // Change w.r.t. other
                     if (nB != 0)
                     {
-                        if (poseModel == PoseModel::COCO_18 || poseModel == PoseModel::BODY_22)
+                        if (poseModel == PoseModel::COCO_18 || poseModel == PoseModel::BODY_18 || poseModel == PoseModel::BODY_22)
                         {
                             for (auto i = 1; i <= nB; i++)
                             {
@@ -81,7 +81,7 @@ namespace op
                     }
                     else if (nA != 0)
                     {
-                        if (poseModel == PoseModel::COCO_18 || poseModel == PoseModel::BODY_22)
+                        if (poseModel == PoseModel::COCO_18 || poseModel == PoseModel::BODY_18 || poseModel == PoseModel::BODY_22)
                         {
                             for (auto i = 1; i <= nA; i++)
                             {

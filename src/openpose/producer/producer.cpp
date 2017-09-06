@@ -57,7 +57,7 @@ namespace op
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return cv::Mat{};
+            return cv::Mat();
         }
     }
 
@@ -155,7 +155,7 @@ namespace op
                 if (mType != ProducerType::ImageDirectory && (frame.cols != get(CV_CAP_PROP_FRAME_WIDTH) || frame.rows != get(CV_CAP_PROP_FRAME_HEIGHT)))
                 {
                     log("Frame size changed. Returning empty frame.", Priority::Max, __LINE__, __FUNCTION__, __FILE__);
-                    frame = cv::Mat{};
+                    frame = cv::Mat();
                 }
             }
         }

@@ -19,7 +19,7 @@
 # ./build/examples/openpose/openpose.bin --image_dir "/home/gines/devel/images/val2014" --write_coco_json ../evaluation/coco/results/openpose/1_3.json --no_display --render_pose 0 --scale_number 3 --scale_gap 0.25 --frame_last 3558
 
 #     # 4 scales
-# ./build/examples/openpose/openpose.bin --num_gpu 1 --image_dir "/home/gines/devel/images/val2014" --write_coco_json ../evaluation/coco/results/openpose/1_4.json --no_display --render_pose 0 --scale_number 4 --scale_gap 0.25 --net_resolution "1312x736" --frame_last 3558
+# ./build/examples/openpose/openpose.bin --num_gpu 1 --image_dir "/home/gines/devel/images/val2014" --write_coco_json ../evaluation/coco/results/openpose/1_4.json --no_display --render_pose 0 --num_gpu 1 --scale_number 4 --scale_gap 0.25 --net_resolution "1312x736" --frame_last 3558
 
 # Debugging - Rendered frames saved
 #  ./build/examples/openpose/openpose.bin --image_dir "/home/gines/devel/images/val2014" --write_images ../evaluation/coco/results/openpose/frameOutput --no_display

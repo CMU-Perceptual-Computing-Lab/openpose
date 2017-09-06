@@ -24,25 +24,32 @@ namespace op
         }
     }
 
-    void floatPtrToUCharCvMat(cv::Mat& cvMat, const float* const floatImage, const Point<int>& resolutionSize, const int resolutionChannels)
+    void floatPtrToUCharCvMat(cv::Mat& uCharCvMat, const float* const floatPtrImage, const std::array<int, 3> resolutionSize)
     {
         try
         {
-            // float* (deep net format): C x H x W
-            // cv::Mat (OpenCV format): H x W x C
-            if (cvMat.rows != resolutionSize.y || cvMat.cols != resolutionSize.x || cvMat.type() != CV_8UC3)
-                cvMat = cv::Mat{resolutionSize.y, resolutionSize.x, CV_8UC3};
-            const auto offsetBetweenChannels = resolutionSize.x * resolutionSize.y;
-            for (auto c = 0; c < resolutionChannels; c++)
+            // Info:
+                // float* (deep net format): C x H x W
+                // cv::Mat (OpenCV format): H x W x C
+            // Allocate cv::Mat if it was not initialized yet
+            if (uCharCvMat.empty() || uCharCvMat.rows != resolutionSize[1] || uCharCvMat.cols != resolutionSize[0] || uCharCvMat.type() != CV_8UC3)
+                uCharCvMat = cv::Mat(resolutionSize[1], resolutionSize[0], CV_8UC3);
+            // Fill uCharCvMat from floatPtrImage
+            auto* uCharPtrCvMat = (unsigned char*)(uCharCvMat.data);
+            const auto offsetBetweenChannels = resolutionSize[0] * resolutionSize[1];
+            const auto stepSize = uCharCvMat.step; // step = cols * channels
+            for (auto c = 0; c < resolutionSize[2]; c++)
             {
                 const auto offsetChannelC = c*offsetBetweenChannels;
-                for (auto y = 0; y < resolutionSize.y; y++)
+                for (auto y = 0; y < resolutionSize[1]; y++)
                 {
-                    const auto floatImageOffsetY = offsetChannelC + y*resolutionSize.x;
-                    for (auto x = 0; x < resolutionSize.x; x++)
+                    const auto yOffset = y * stepSize;
+                    const auto floatPtrImageOffsetY = offsetChannelC + y*resolutionSize[0];
+                    for (auto x = 0; x < resolutionSize[0]; x++)
                     {
-                        const auto value = uchar(   fastTruncate(intRound(floatImage[floatImageOffsetY + x]), 0, 255)   );
-                        *(cvMat.ptr<uchar>(y) + x*resolutionChannels + c) = value;
+                        const auto value = uchar(   fastTruncate(intRound(floatPtrImage[floatPtrImageOffsetY + x]), 0, 255)   );
+                        uCharPtrCvMat[yOffset + x * resolutionSize[2] + c] = value;
+                        // *(uCharCvMat.ptr<uchar>(y, x) + c) = value; // Slower but safer and cleaner equivalent
                     }
                 }
             }
@@ -67,17 +74,14 @@ namespace op
                 const auto width = array.getSize(2);
                 const auto areaInput = height * width;
                 const auto areaOutput = channels * width;
-
-                // Allocate cv::Mat
-                if (cvMatResult.cols != channels * width || cvMatResult.rows != height)
-                    cvMatResult = cv::Mat{height, areaOutput, CV_8UC1};
-
-                // Fill cv::Mat
+                // Allocate cv::Mat if it was not initialized yet
+                if (cvMatResult.empty() || cvMatResult.cols != channels * width || cvMatResult.rows != height)
+                    cvMatResult = cv::Mat(height, areaOutput, CV_8UC1);
+                // Fill cvMatResult from array
                 for (auto channel = 0 ; channel < channels ; channel++)
                 {
                     // Get memory to be modified
-                    cv::Mat cvMatROI{cvMatResult, cv::Rect{channel * width, 0, width, height}};
-
+                    cv::Mat cvMatROI(cvMatResult, cv::Rect{channel * width, 0, width, height});
                     // Modify memory
                     const auto* arrayPtr = array.getConstPtr() + channel * areaInput;
                     for (auto y = 0 ; y < height ; y++)
@@ -93,7 +97,7 @@ namespace op
                 }
             }
             else
-                cvMatResult = cv::Mat{};
+                cvMatResult = cv::Mat();
         }
         catch (const std::exception& e)
         {
@@ -101,7 +105,7 @@ namespace op
         }
     }
 
-    void uCharCvMatToFloatPtr(float* floatImage, const cv::Mat& cvImage, const bool normalize)
+    void uCharCvMatToFloatPtr(float* floatPtrImage, const cv::Mat& cvImage, const bool normalize)
     {
         try
         {
@@ -114,22 +118,23 @@ namespace op
             const auto* const originFramePtr = cvImage.data;    // cv::Mat.data is always uchar
             for (auto c = 0; c < channels; c++)
             {
-                const auto floatImageOffsetC = c * height;
+                const auto floatPtrImageOffsetC = c * height;
                 for (auto y = 0; y < height; y++)
                 {
-                    const auto floatImageOffsetY = (floatImageOffsetC + y) * width;
+                    const auto floatPtrImageOffsetY = (floatPtrImageOffsetC + y) * width;
                     const auto originFramePtrOffsetY = y * width;
                     for (auto x = 0; x < width; x++)
-                        floatImage[floatImageOffsetY + x] = float(originFramePtr[(originFramePtrOffsetY + x) * channels + c]);
+                        floatPtrImage[floatPtrImageOffsetY + x] = float(originFramePtr[(originFramePtrOffsetY + x) * channels + c]);
                 }
             }
             // Normalizing if desired
+            // floatPtrImage wrapped as cv::Mat
                 // Empirically tested - OpenCV is more efficient normalizing a whole matrix/image (it uses AVX and other optimized instruction sets)
                 // In addition, the following if statement does not copy the pointer to a cv::Mat, just wrapps it
             if (normalize)
             {
-                cv::Mat floatImageCvWrapper{height, width, CV_32FC3, floatImage};
-                floatImageCvWrapper = floatImageCvWrapper/256.f - 0.5f;
+                cv::Mat floatPtrImageCvWrapper(height, width, CV_32FC3, floatPtrImage);
+                floatPtrImageCvWrapper = floatPtrImageCvWrapper/256.f - 0.5f;
             }
         }
         catch (const std::exception& e)
@@ -171,7 +176,7 @@ namespace op
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return cv::Mat{};
+            return cv::Mat();
         }
     }
 }

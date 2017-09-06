@@ -86,9 +86,10 @@ The pose estimation work is based on the C++ code from [the ECCV 2016 demo](http
     3. [OpenPose Library](#openpose-library)
 4. [Output](#output)
 5. [Speed Up Openpose And Benchmark](#speed-up-openpose-and-benchmark)
-6. [Send Us Your Feedback!](#send-us-your-feedback)
-7. [Citation](#citation)
-8. [Other Contributors](#other-contributors)
+6. [Send Us Failure Cases!](#send-us-failure-cases)
+7. [Send Us Your Feedback!](#send-us-your-feedback)
+8. [Citation](#citation)
+9. [Other Contributors](#other-contributors)
 
 
 
@@ -152,6 +153,11 @@ Check the output (format, keypoint index ordering, etc.) in [doc/output.md](doc/
 
 ## Speed Up OpenPose and Benchmark
 Check the OpenPose Benchmark and some hints to speed up OpenPose on [doc/installation.md#faq](doc/installation.md#faq).
+
+
+
+## Send Us Failure Cases!
+If you find videos or images where OpenPose does not seems to work well, feel free to send them to openposecmu@gmail.com, we will use them to improve the quality of the algorithm. Thanks!
 
 
 
