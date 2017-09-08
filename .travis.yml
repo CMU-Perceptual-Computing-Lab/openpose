@@ -1,5 +1,4 @@
 # This will run on Travis' 'new' container-based infrastructure
-sudo: false
 
 # Blacklist
 branches:
@@ -27,12 +26,12 @@ addons:
       - doxygen-latex
       - doxygen-gui
       - graphviz
+      - libopencv-dev
+      - lib-atlas-base-dev
 
 # Build your code e.g. by calling make
 script:
   - ./ubuntu/install_cmake.sh
-  - sudo apt-get -y install libopencv-dev
-  - sudo apt-get -y install libatlas-base-dev
   - pip install --upgrade numpy
   - mkdir build
   - cd build
