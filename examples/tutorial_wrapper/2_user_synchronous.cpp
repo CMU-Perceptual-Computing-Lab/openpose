@@ -276,6 +276,31 @@ public:
                 // datum.poseKeypoints: Array<float> with the estimated pose
             if (datumsPtr != nullptr && !datumsPtr->empty())
             {
+                // Show in command line the resulting pose keypoints for body, face and hands
+                op::log("\nKeypoints:");
+                // Accesing each element of the keypoints
+                const auto& poseKeypoints = datumsPtr->at(0).poseKeypoints;
+                op::log("Person pose keypoints:");
+                for (auto person = 0 ; person < poseKeypoints.getSize(0) ; person++)
+                {
+                    op::log("Person " + std::to_string(person) + " (x, y, score):");
+                    for (auto bodyPart = 0 ; bodyPart < poseKeypoints.getSize(1) ; bodyPart++)
+                    {
+                        std::string valueToPrint;
+                        for (auto xyscore = 0 ; xyscore < poseKeypoints.getSize(2) ; xyscore++)
+                        {
+                            valueToPrint += std::to_string(   poseKeypoints[{person, bodyPart, xyscore}]   ) + " ";
+                        }
+                        op::log(valueToPrint);
+                    }
+                }
+                op::log(" ");
+                // Alternative: just getting std::string equivalent
+                op::log("Face keypoints: " + datumsPtr->at(0).faceKeypoints.toString());
+                op::log("Left hand keypoints: " + datumsPtr->at(0).handKeypoints[0].toString());
+                op::log("Right hand keypoints: " + datumsPtr->at(0).handKeypoints[1].toString());
+
+                // Display rendered output image
                 cv::imshow("User worker GUI", datumsPtr->at(0).cvOutputData);
                 cv::waitKey(1); // It displays the image and sleeps at least 1 ms (it usually sleeps ~5-10 msec to display the image)
             }
