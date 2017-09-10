@@ -1,60 +1,6 @@
 OpenPose
 ====================================
 
-## Latest News
-- Jul 2017: **Windows**, New [**portable demo**](doc/installation.md#installation---demo) **and** [**easier library installation**](doc/installation.md#installation---library)!
-- Jul 2017: **Hands** released!
-- Jun 2017: **Face** released!
-- May 2017: **Windows** version released!
-- Apr 2017: **Body** released!
-- Check all the [release notes](doc/release_notes.md).
-
-We are offering [internships at Carnegie Mellon University as OpenPose programmer](https://docs.google.com/document/d/14SygG39NjIRZfx08clewTdFMGwVdtRu2acyCi3TYcHs/edit?usp=sharing) (need to live in or be willing to move to Pittsburgh).
-
-
-
-## Introduction
-OpenPose is a **library for real-time multi-person keypoint detection and multi-threading written in C++** using OpenCV and Caffe*, authored by [Gines Hidalgo](http://gines-hidalgo.site123.me/), [Zhe Cao](http://www.andrew.cmu.edu/user/zhecao), [Tomas Simon](http://www.cs.cmu.edu/~tsimon/), [Shih-En Wei](https://scholar.google.com/citations?user=sFQD3k4AAAAJ&hl=en), [Hanbyul Joo](http://www.cs.cmu.edu/~hanbyulj/) and [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/).
-
-\* It uses Caffe, but the code is ready to be ported to other frameworks (Tensorflow, Torch, etc.). If you implement any of those, feel free to make a pull request!
-
-OpenPose represents the **first real-time system to jointly detect human body, hand and facial keypoints (in total 130 keypoints) on single images**. In addition, the system computational performance on body keypoint estimation is invariant to the number of detected people in the image.
-
-OpenPose is freely available for free non-commercial use, and may be redistributed under these conditions. Please, see the [license](LICENSE) for further details. [Interested in a commercial license? Check this link](https://flintbox.com/public/project/47343/). For commercial queries, contact [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/).
-
-In addition, OpenPose would not be possible without the [CMU Panoptic Studio](http://domedb.perception.cs.cmu.edu/).
-
-
-
-Library main functionality:
-
-* Multi-person 15 or **18-keypoint body pose** estimation and rendering. **Running time invariant to number of people** on the image.
-
-* Multi-person **2x21-keypoint hand** estimation and rendering. Note: In this initial version, **running time** linearly **depends** on the **number of people** on the image. **Coming soon (in around 1-5 days)!**
-
-* Multi-person **70-keypoint face** estimation and rendering. Note: In this initial version, **running time** linearly **depends** on the **number of people** on the image.
-
-* Flexible and easy-to-configure **multi-threading** module.
-
-* Image, video, and webcam reader.
-
-* Able to save and load the results in various formats (JSON, XML, PNG, JPG, ...).
-
-* Small display and GUI for simple result visualization.
-
-* All the functionality is wrapped into a **simple-to-use OpenPose Wrapper class**.
-
-The pose estimation work is based on the C++ code from [the ECCV 2016 demo](https://github.com/CMU-Perceptual-Computing-Lab/caffe_rtpose), "Realtime Multiperson Pose Estimation", [Zhe Cao](http://www.andrew.cmu.edu/user/zhecao), [Tomas Simon](http://www.cs.cmu.edu/~tsimon/), [Shih-En Wei](https://scholar.google.com/citations?user=sFQD3k4AAAAJ&hl=en), [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/). The [full project repo](https://github.com/ZheC/Multi-Person-Pose-Estimation) includes Matlab and Python version, as well as training code.
-
-
-
-## Operating Systems
-1. **Ubuntu** 14 and 16.
-2. **Windows** 8 and 10.
-3. OpenPose has also been used on **Windows 7**, **Mac**, **CentOS**, and **Nvidia Jetson (TK1 and TX1)** embedded systems. However, we do not officially support them at the moment.
-
-
-
 ## Results
 ### Body + Hands + Face Estimation
 <p align="center">
@@ -76,8 +22,20 @@ The pose estimation work is based on the C++ code from [the ECCV 2016 demo](http
     <img src="doc/media/pose_hands.gif", width="480">
 </p>
 
+## Latest News
+- Jul 2017: **Windows**, New [**portable demo**](doc/installation.md#installation---demo) **and** [**easier library installation**](doc/installation.md#installation---library)!
+- Jul 2017: **Hands** released!
+- Jun 2017: **Face** released!
+- May 2017: **Windows** version released!
+- Apr 2017: **Body** released!
+- Check all the [release notes](doc/release_notes.md).
+
+We are offering [internships at Carnegie Mellon University as OpenPose programmer](https://docs.google.com/document/d/14SygG39NjIRZfx08clewTdFMGwVdtRu2acyCi3TYcHs/edit?usp=sharing) (need to live in or be willing to move to Pittsburgh).
 
 ## Contents
+1. [Introduction](#introduction)
+2. [Library main functionality](#library-main-functionality)
+3. [Operating Systems](#operating-systems)
 1. [Installation, Reinstallation and Uninstallation](#installation-reinstallation-and-uninstallation)
 2. [Custom Caffe](#custom-caffe)
 3. [Quick Start](#quick-start)
@@ -90,6 +48,46 @@ The pose estimation work is based on the C++ code from [the ECCV 2016 demo](http
 7. [Send Us Your Feedback!](#send-us-your-feedback)
 8. [Citation](#citation)
 9. [Other Contributors](#other-contributors)
+
+
+## Introduction
+OpenPose is a **library for real-time multi-person keypoint detection and multi-threading written in C++** using OpenCV and Caffe*, authored by [Gines Hidalgo](http://gines-hidalgo.site123.me/), [Zhe Cao](http://www.andrew.cmu.edu/user/zhecao), [Tomas Simon](http://www.cs.cmu.edu/~tsimon/), [Shih-En Wei](https://scholar.google.com/citations?user=sFQD3k4AAAAJ&hl=en), [Hanbyul Joo](http://www.cs.cmu.edu/~hanbyulj/) and [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/).
+
+\* It uses Caffe, but the code is ready to be ported to other frameworks (Tensorflow, Torch, etc.). If you implement any of those, feel free to make a pull request!
+
+OpenPose represents the **first real-time system to jointly detect human body, hand and facial keypoints (in total 130 keypoints) on single images**. In addition, the system computational performance on body keypoint estimation is invariant to the number of detected people in the image.
+
+OpenPose is freely available for free non-commercial use, and may be redistributed under these conditions. Please, see the [license](LICENSE) for further details. [Interested in a commercial license? Check this link](https://flintbox.com/public/project/47343/). For commercial queries, contact [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/).
+
+In addition, OpenPose would not be possible without the [CMU Panoptic Studio](http://domedb.perception.cs.cmu.edu/).
+
+The pose estimation work is based on the C++ code from [the ECCV 2016 demo](https://github.com/CMU-Perceptual-Computing-Lab/caffe_rtpose), "Realtime Multiperson Pose Estimation", [Zhe Cao](http://www.andrew.cmu.edu/user/zhecao), [Tomas Simon](http://www.cs.cmu.edu/~tsimon/), [Shih-En Wei](https://scholar.google.com/citations?user=sFQD3k4AAAAJ&hl=en), [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/). The [original repo](https://github.com/ZheC/Multi-Person-Pose-Estimation) includes Matlab and Python version, as well as the training code.
+
+
+## Library main functionality:
+
+* Multi-person 15 or **18-keypoint body pose** estimation and rendering. **Running time invariant to number of people** on the image.
+
+* Multi-person **2x21-keypoint hand** estimation and rendering. Note: In this initial version, **running time** linearly **depends** on the **number of people** on the image. **Coming soon (in around 1-5 days)!**
+
+* Multi-person **70-keypoint face** estimation and rendering. Note: In this initial version, **running time** linearly **depends** on the **number of people** on the image.
+
+* Flexible and easy-to-configure **multi-threading** module.
+
+* Image, video, and webcam reader.
+
+* Able to save and load the results in various formats (JSON, XML, PNG, JPG, ...).
+
+* Small display and GUI for simple result visualization.
+
+* All the functionality is wrapped into a **simple-to-use OpenPose Wrapper class**.
+
+
+
+## Operating Systems
+1. **Ubuntu** 14 and 16.
+2. **Windows** 8 and 10.
+3. OpenPose has also been used on **Windows 7**, **Mac**, **CentOS**, and **Nvidia Jetson (TK1 and TX1)** embedded systems. However, we do not officially support them at the moment.
 
 
 
