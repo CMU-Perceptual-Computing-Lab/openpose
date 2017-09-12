@@ -79,35 +79,23 @@ The pose estimation work is based on the C++ code from [the ECCV 2016 demo](http
 
 ## Contents
 1. [Installation, Reinstallation and Uninstallation](#installation-reinstallation-and-uninstallation)
-2. [Custom Caffe](#custom-caffe)
-3. [Quick Start](#quick-start)
+2. [Quick Start](#quick-start)
     1. [Demo](#demo)
     2. [OpenPose Wrapper](#openpose-wrapper)
     3. [OpenPose Library](#openpose-library)
-4. [Output](#output)
-5. [Speed Up Openpose And Benchmark](#speed-up-openpose-and-benchmark)
-6. [Send Us Failure Cases!](#send-us-failure-cases)
-7. [Send Us Your Feedback!](#send-us-your-feedback)
-8. [Citation](#citation)
-9. [Other Contributors](#other-contributors)
+3. [Output](#output)
+4. [Custom Caffe](#custom-caffe)
+5. [Standalone Face Or Hand Keypoint Detector](#standalone-face-or-hand-keypoint-detector)
+6. [Speed Up Openpose And Benchmark](#speed-up-openpose-and-benchmark)
+7. [Send Us Failure Cases!](#send-us-failure-cases)
+8. [Send Us Your Feedback!](#send-us-your-feedback)
+9. [Citation](#citation)
+10. [Other Contributors](#other-contributors)
 
 
 
 ## Installation, Reinstallation and Uninstallation
 You can find the installation, reinstallation and uninstallation steps on: [doc/installation.md](doc/installation.md).
-
-
-
-## Custom Caffe
-We only modified some Caffe compilation flags and minor details. You can use your own Caffe distribution, these are the files we added and modified:
-
-1. Added files: `install_caffe.sh`; as well as `Makefile.config.Ubuntu14.example`, `Makefile.config.Ubuntu16.example`, `Makefile.config.Ubuntu14_cuda_7.example` and `Makefile.config.Ubuntu16_cuda_7.example` (extracted from `Makefile.config.example`). Basically, you must enable cuDNN.
-2. Edited file: Makefile. Search for "# OpenPose: " to find the edited code. We basically added the C++11 flag to avoid issues in some old computers.
-3. Optional - deleted Caffe file: `Makefile.config.example`.
-4. In order to link it to OpenPose:
-    1. Run `make all && make distribute` in your Caffe version.
-    2. Open the OpenPose Makefile config file: `./Makefile.config.UbuntuX.example` (where X depends on your OS and CUDA version).
-    3. Modify the Caffe folder directory variable (`CAFFE_DIR`) to your custom Caffe `distribute` folder location in the previous OpenPose Makefile config file.
 
 
 
@@ -148,6 +136,24 @@ doxygen doc_autogeneration.doxygen
 
 ## Output
 Check the output (format, keypoint index ordering, etc.) in [doc/output.md](doc/output.md).
+
+
+
+## Custom Caffe
+We only modified some Caffe compilation flags and minor details. You can use your own Caffe distribution, these are the files we added and modified:
+
+1. Added files: `install_caffe.sh`; as well as `Makefile.config.Ubuntu14.example`, `Makefile.config.Ubuntu16.example`, `Makefile.config.Ubuntu14_cuda_7.example` and `Makefile.config.Ubuntu16_cuda_7.example` (extracted from `Makefile.config.example`). Basically, you must enable cuDNN.
+2. Edited file: Makefile. Search for "# OpenPose: " to find the edited code. We basically added the C++11 flag to avoid issues in some old computers.
+3. Optional - deleted Caffe file: `Makefile.config.example`.
+4. In order to link it to OpenPose:
+    1. Run `make all && make distribute` in your Caffe version.
+    2. Open the OpenPose Makefile config file: `./Makefile.config.UbuntuX.example` (where X depends on your OS and CUDA version).
+    3. Modify the Caffe folder directory variable (`CAFFE_DIR`) to your custom Caffe `distribute` folder location in the previous OpenPose Makefile config file.
+
+
+
+## Standalone Face Or Hand Keypoint Detector
+In case of hand camera views at which the hands are visible but not the rest of the body, or if you do not need the body keypoint detector and want to considerably speed up the process, you can use the OpenPose face or hand keypoint detectors with your own face or hand detectors, rather than using the body keypoint detector as initial detector for those. More information in [doc/standalone_face_or_hand_keypoint_detector.md#faq](doc/standalone_face_or_hand_keypoint_detector.md#faq).
 
 
 
