@@ -1,9 +1,10 @@
 OpenPose
 ====================================
 
-OpenPose is a **library for real-time multi-person keypoint detection and multi-threading written in C++** using OpenCV and Caffe*, authored by [Gines Hidalgo](http://gines-hidalgo.site123.me/), [Zhe Cao](http://www.andrew.cmu.edu/user/zhecao), [Tomas Simon](http://www.cs.cmu.edu/~tsimon/), [Shih-En Wei](https://scholar.google.com/citations?user=sFQD3k4AAAAJ&hl=en), [Hanbyul Joo](http://www.cs.cmu.edu/~hanbyulj/) and [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/).
-
-\* It uses Caffe, but it could easily be ported to other frameworks (Tensorflow, Torch, etc.). If you implement any of those, feel free to make a pull request!
+OpenPose is a **library for real-time multi-person keypoint detection and multi-threading written in C++** using OpenCV and Caffe.
+<p align="center">
+    <img src="doc/media/pose_face_hands.gif", width="480">
+</p>
 
 ## Latest News
 - Jul 2017: **Windows**, New [**portable demo**](doc/installation.md#installation---demo) **and** [**easier library installation**](doc/installation.md#installation---library)!
@@ -14,17 +15,12 @@ OpenPose is a **library for real-time multi-person keypoint detection and multi-
 - Check all the [release notes](doc/release_notes.md).
 
 ## Results
-### Body + Hands + Face Estimation
-<p align="center">
-    <img src="doc/media/pose_face_hands.gif", width="480">
-</p>
-
 ### Body Estimation
 <p align="center">
     <img src="doc/media/dance.gif", width="480">
 </p>
 
-### Body + Face Estimation
+### Body + Face + Hands Estimation
 <p align="center">
     <img src="doc/media/pose_face.gif", width="480">
 </p>
@@ -55,9 +51,11 @@ OpenPose is a **library for real-time multi-person keypoint detection and multi-
 
 
 ## Introduction
-OpenPose represents the **first real-time system to jointly detect human body, hand and facial keypoints (in total 130 keypoints) on single images**. In addition, the system computational performance on body keypoint estimation is invariant to the number of detected people in the image.
+OpenPose represents the **first real-time system to jointly detect human body, hand and facial keypoints (in total 130 keypoints) on single images**. In addition, the system computational performance on body keypoint estimation is invariant to the number of detected people in the image. It uses Caffe, but it could easily be ported to other frameworks (Tensorflow, Torch, etc.). If you implement any of those, feel free to make a pull request!
 
-OpenPose is freely available for free non-commercial use, and may be redistributed under these conditions. Please, see the [license](LICENSE) for further details. [Interested in a commercial license? Check this link](https://flintbox.com/public/project/47343/). For commercial queries, contact [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/).
+OpenPose is authored by [Gines Hidalgo](http://gines-hidalgo.site123.me/), [Zhe Cao](http://www.andrew.cmu.edu/user/zhecao), [Tomas Simon](http://www.cs.cmu.edu/~tsimon/), [Shih-En Wei](https://scholar.google.com/citations?user=sFQD3k4AAAAJ&hl=en), [Hanbyul Joo](http://www.cs.cmu.edu/~hanbyulj/) and [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/).
+
+It is freely available for free non-commercial use, and may be redistributed under these conditions. Please, see the [license](LICENSE) for further details. [Interested in a commercial license? Check this link](https://flintbox.com/public/project/47343/). For commercial queries, contact [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/).
 
 In addition, OpenPose would not be possible without the [CMU Panoptic Studio](http://domedb.perception.cs.cmu.edu/).
 
