@@ -3,7 +3,7 @@
 
 
 echo "------------------------- Installing Caffe and OpenPose -------------------------"
-echo "NOTE: This script assumes that CUDA and cuDNN are already installed on your machine. Otherwise, it might fail."
+echo "NOTE: This script assumes that just flashed JetPack 3.1 : Ubuntu 16, CUDA 8, cuDNN 6 and OpenCV are already installed on your machine. Otherwise, it might fail."
 
 
 
