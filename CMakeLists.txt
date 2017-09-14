@@ -81,13 +81,15 @@ if (NOT Boost_FOUND)
 endif (NOT Boost_FOUND)
 
 if (NOT CUDA_FOUND)
-  message(FATAL_ERROR "CUDA not found. Install CUDA from the command line using the command(s)")
+  message(STATUS "CUDA not found.") 
   execute_process(COMMAND cat install_cuda.sh WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/ubuntu)
+  message(FATAL_ERROR "Install CUDA using the above commands.")
 endif (NOT CUDA_FOUND)
 
 if (USE_CUDNN AND NOT CUDNN_FOUND)
-  message(FATAL_ERROR "cuDNN not found. Install cuDNN from the command line using the command(s)")
-  execute_process(COMMAND cat install_cuda.sh WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/ubuntu)
+  message(STATUS "cuDNN not found.") 
+  execute_process(COMMAND cat install_cudnn.sh WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/ubuntu)
+  message(FATAL_ERROR "Install cuDNN using the above commands. or turn off cuDNN by setting USE_CUDNN to OFF.")
 endif (USE_CUDNN AND NOT CUDNN_FOUND)
 
 if (NOT GLOG_FOUND)
