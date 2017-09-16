@@ -1,4 +1,4 @@
-# copied from 
+# Copied from 
 # https://raw.githubusercontent.com/opencv/opencv_contrib/master/modules/cnn_3dobj/FindCaffe.cmake
 
 find_path(Caffe_INCLUDE_DIRS NAMES 
