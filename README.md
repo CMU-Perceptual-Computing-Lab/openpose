@@ -104,12 +104,14 @@ Your case if you just want to process a folder of images or video or webcam and 
 
 Forget about the OpenPose library details and just read the [doc/demo_overview.md](doc/demo_overview.md) 1-page section.
 
+
 #### OpenPose Wrapper
 Your case if you want to read a specific format of image source and/or add a specific post-processing function and/or implement your own display/saving.
 
 (Almost) forget about the library, just take a look to the `Wrapper` tutorial on [examples/tutorial_wrapper/](examples/tutorial_wrapper/).
 
 Note: you should not need to modify the OpenPose source code nor examples. In this way, you are able to directly upgrade OpenPose anytime in the future without changing your code. You might create your custom code on [examples/user_code/](examples/user_code/) and compile it by using `make all` in the OpenPose folder.
+
 
 #### OpenPose Library
 Your case if you want to change internal functions and/or extend its functionality. First, take a look at the [Demo](#demo) and [OpenPose Wrapper](#openpose-wrapper). Second, read the 2 following subsections: OpenPose Overview and Extending Functionality.
@@ -119,6 +121,7 @@ Your case if you want to change internal functions and/or extend its functionali
 2. Extending Functionality: Learn how to extend the library in [doc/library_extend_functionality.md](doc/library_extend_functionality.md).
 
 3. Adding An Extra Module: Learn how to add an extra module in [doc/library_add_new_module.md](doc/library_add_new_module.md).
+
 
 #### Doxygen Documentation Autogeneration
 You can generate the documentation by running the following command. The documentation will be generated in `doc/doxygen/html/index.html`. You can simply open it with double-click (your default browser should automatically display it).

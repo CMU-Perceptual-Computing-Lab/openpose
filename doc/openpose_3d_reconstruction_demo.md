@@ -48,7 +48,7 @@ The program uses 3 cameras by default, but cameras can be added or removed from 
 
 
 ### Windows
-1. [Install the OpenPose library](installation.md#installation---library) and make sure the [OpenPose demo runs](installation.md#quick-start), so that the required OpenPose library was properly compiled.
+1. [Install the OpenPose library](installation.md#installation---library) and make sure the [OpenPose demo runs](quick_start.md#quick-start), so that the required OpenPose library was properly compiled.
 2. Open the OpenPose visual studio solution `windows\openpose.sln`.
 3. Right-click on `Solution 'OpenPose'` of the `Solution Explorer` window, usually placed at the top-right part of the VS screen.
 4. Click on `Properties`. Go to `Configuration Properties` -> `Configuration` and check `Build` for the `OpenPose3DReconstruction` project.

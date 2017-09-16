@@ -8,17 +8,17 @@ In order to learn how to use it, run `./build/examples/openpose/openpose.bin --h
 
 
 ## Running on Images, Video or Webcam
-See [doc/installation.md#quick-start](./installation.md#quick-start).
+See [doc/quick_start.md#quick-start](./quick_start.md#quick-start).
 
 
 
 ## Pose + Face + Hands
-See [doc/installation.md#quick-start](./installation.md#quick-start).
+See [doc/quick_start.md#quick-start](./quick_start.md#quick-start).
 
 
 
 ## Maximum Accuracy Configuration
-See [doc/installation.md#quick-start](./installation.md#quick-start).
+See [doc/quick_start.md#quick-start](./quick_start.md#quick-start).
 
 
 
