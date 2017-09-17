@@ -9,6 +9,7 @@ OpenPose - Installation using CMake
     2. [OpenPose Configuration](#openpose-configuration)
     3. [OpenPose Building](#openpose-building)
     4. [Run OpenPose](#run-openpose)
+4. [CMake Command Line Configuration](#cmake-command-line-configuration)
 
 
 
@@ -42,9 +43,9 @@ The CMake installation is experimental. It will eventually replace the standard 
 
 The instructions in this section describe the steps to build OpenPose using CMake. There are 3 main steps:
 
-    1. [Caffe Prerequisites (Ubuntu Only)](#caffe-prerequisites-ubuntu-only)
-    2. [OpenPose Configuration](#openpose-configuration)
-    3. [OpenPose Building](#openpose-building)
+1. [Caffe Prerequisites (Ubuntu Only)](#caffe-prerequisites-ubuntu-only)
+2. [OpenPose Configuration](#openpose-configuration)
+3. [OpenPose Building](#openpose-building)
 
 
 
@@ -57,32 +58,31 @@ bash ./ubuntu/install_cmake.sh
 
 
 ### OpenPose Configuration
-There are two ways to generate the makefiles, either using the CMake GUI program or the command line. Both are described
-succinctly in the sections below.
+Note: If you prefer to use CMake though the command line, see [Cmake Command Line Build](#cmake-command-line-build).
 
+1. Install CMake GUI, either by `sudo apt-get install cmake-qt-gui` in Ubuntu or by their [official website](https://cmake.org/download/) for Windows.
+There are two ways to configure the OpenPose installation, either using CMake GUI (recommended) or cmake though the command line. Both are described succinctly in the sections below.
 
-
-#### CMake GUI
-* The first step is to open the CMake GUI. After opening the CMake GUI, the next step is to select the project source directory and a sub-directory where the Makefiles will
+2. Open CMake GUI and select the project source directory and a sub-directory where the Makefiles will
 be generated. We will first select the openpose directory and then we will select a `build` directory in the project root directory as shown in the image below (See the red rectangle). If the `build` directory does not exists, CMake will create one for us.
   
   ![im_1](media/cmake_installation/im_1.png)
   
-* Next press the `Configure` button in the GUI. It will first ask you to create the `build` directory, if it already did not exist. Press `Yes`.
+3. Next press the `Configure` button in the GUI. It will first ask you to create the `build` directory, if it already did not exist. Press `Yes`.
   
   ![im_2](media/cmake_installation/im_2.png)
   
-* Next a new dialog box will appear, press the `Finish` button here.
+4. Next a new dialog box will appear, press the `Finish` button here.
   
   ![im_3](media/cmake_installation/im_3.png)
   
-* If this step is successful, in the bottom box it will show "Configuring done" (in the last line) as shown below --
+5. If this step is successful, in the bottom box it will show "Configuring done" (in the last line) as shown below --
   
   ![im_4](media/cmake_installation/im_4.png)
   
-* To generate the Makefiles, press the `Generate` button and proceed to [building OpenPose](#build-the-library).
+6. To generate the Makefiles, press the `Generate` button and proceed to [building OpenPose](#build-the-library).
   
-##### Caffe already present 
+##### Caffe Already Present 
 * If Caffe is already installed and you do not want OpenPose to build Caffe, you can specify the Caffe include path and the library as shown below. You will also need to turn on the `WITH_CAFFE` variable and turn off the `BUILD_CAFFE` variable.
   
   ![im_6](media/cmake_installation/im_6.png)
@@ -91,7 +91,24 @@ SIDENOTE -- If you have OpenCV build from source and OpenPose cannot find it aut
 
 
 
-#### Command Line build
+### OpenPose Building
+Finally, build the project by running the following commands.
+```
+cd build/
+no_cores=`cat /proc/cpuinfo | grep processor | wc -l`
+make -j${no_cores}
+```
+
+
+
+### Run OpenPose
+Check OpenPose was properly installed by running it on the default images, video or webcam: [doc/quick_start.md#quick-start](./quick_start.md#quick-start).
+
+
+
+### CMake Command Line Configuration
+Note that this step is unnecessary if you already used the CMake GUI alternative.
+
 Create a `build` folder in the root openpose folder, where you will build the library --
 
 ```bash
@@ -123,18 +140,3 @@ If Caffe is not already present but OpenCV is, then use the below command.
 ```bash
 cmake -DOpenCV_DIR=/home/"${USER}"/softwares/opencv/build
 ```
-
-
-
-### OpenPose Building
-Finally, build the project by running the following commands.
-```
-cd build/
-no_cores=`cat /proc/cpuinfo | grep processor | wc -l`
-make -j${no_cores}
-```
-
-
-
-### Run OpenPose
-Check OpenPose was properly installed by running it on the default images, video or webcam: [doc/quick_start.md#quick-start](./quick_start.md#quick-start).
