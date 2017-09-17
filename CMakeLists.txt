@@ -209,13 +209,13 @@ set(OPENPOSE_URL "http://posefs1.perception.cs.cmu.edu/OpenPose/models/")
   
 # Body (COCO)
 if (DOWNLOAD_COCO_MODEL)
-  download_model("body (coco)" ${DOWNLOAD_COCO_MODEL} pose/coco/pose_iter_440000.caffemodel
+  download_model("body (COCO)" ${DOWNLOAD_COCO_MODEL} pose/coco/pose_iter_440000.caffemodel
       5156d31f670511fce9b4e28b403f2939)
 endif (DOWNLOAD_COCO_MODEL)
   
 # Body (MPI)
 if (DOWNLOAD_MPI_MODEL)
-  download_model("body (mpi)" ${DOWNLOAD_MPI_MODEL} pose/mpi/pose_iter_160000.caffemodel
+  download_model("body (MPI)" ${DOWNLOAD_MPI_MODEL} pose/mpi/pose_iter_160000.caffemodel
       2ca0990c7562bd7ae03f3f54afa96e00)
 endif (DOWNLOAD_MPI_MODEL)
     
