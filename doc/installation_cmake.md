@@ -11,9 +11,11 @@ The CMake installation is experimental. It will eventually replace the standard 
     2. [OpenPose Configuration](#openpose-configuration)
     3. [OpenPose Building](#openpose-building)
     4. [Run OpenPose](#run-openpose)
-4. [Custom Caffe](#custom-caffe)
-5. [Custom OpenCV](#custom-opencv)
-6. [CMake Command Line Configuration](#cmake-command-line-configuration)
+4. [Optional Settings](#optional-settings)
+    1. [Custom Caffe](#custom-caffe)
+    2. [Custom OpenCV](#custom-opencv)
+    3. [MPI Model](#mpi-model)
+    4. [CMake Command Line Configuration](#cmake-command-line-configuration)
 
 
 
@@ -103,7 +105,8 @@ Check OpenPose was properly installed by running it on the default images, video
 
 
 
-##### Custom Caffe
+### Optional Settings
+#### Custom Caffe
 We only modified some Caffe compilation flags and minor details. You can use your own Caffe distribution, simply specify the Caffe include path and the library as shown below. You will also need to turn off the `BUILD_CAFFE` variable.
 <p align="center">
     <img src="media/cmake_installation/im_5.png", width="480">
@@ -111,29 +114,20 @@ We only modified some Caffe compilation flags and minor details. You can use you
 
 
 
-##### Custom OpenCV
+#### Custom OpenCV
 If you have built OpenCV from source and OpenPose cannot find it automatically, you can set the `OPENCV_DIR` variable to the directory where you build OpenCV.
 
 
 
-### Custom Caffe
-We only modified some Caffe compilation flags and minor details. You can use your own Caffe distribution, these are the files we added and modified:
-
-1. Added files: `install_caffe.sh`; as well as `Makefile.config.Ubuntu14.example`, `Makefile.config.Ubuntu16.example`, `Makefile.config.Ubuntu14_cuda_7.example` and `Makefile.config.Ubuntu16_cuda_7.example` (extracted from `Makefile.config.example`). Basically, you must enable cuDNN.
-2. Edited file: Makefile. Search for "# OpenPose: " to find the edited code. We basically added the C++11 flag to avoid issues in some old computers.
-3. Optional - deleted Caffe file: `Makefile.config.example`.
-4. In order to link it to OpenPose:
-    1. Run `make all && make distribute` in your Caffe version.
-    2. Open the OpenPose Makefile config file: `./Makefile.config.UbuntuX.example` (where X depends on your OS and CUDA version).
-    3. Modify the Caffe folder directory variable (`CAFFE_DIR`) to your custom Caffe `distribute` folder location in the previous OpenPose Makefile config file.
+#### MPI Model
+By default, the body MPI model is not downloaded. You can download it by turning on the `DOWNLOAD_MPI_MODEL`.
 
 
 
-### CMake Command Line Configuration
+#### CMake Command Line Configuration
 Note that this step is unnecessary if you already used the CMake GUI alternative.
 
 Create a `build` folder in the root openpose folder, where you will build the library --
-
 ```bash
 cd openpose
 mkdir build
@@ -144,14 +138,12 @@ The next step is to generate the Makefiles. Now there can be multiple scenarios 
 
 ##### SCENARIO 1 -- Caffe not installed and OpenCV installed using `apt-get`
 In the build directory, run the below command --
-
 ```bash
 cmake ..
 ```
 
 ##### SCENARIO 2 -- Caffe installed and OpenCV build from source
 In this example, we assume that Caffe and OpenCV are already present. The user needs to supply the paths of the library to CMake. For OpenCV, specify the `OpenCV_DIR` which is where the user build OpenCV. For Caffe, specify the include directory and library using the `Caffe_INCLUDE_DIRS` and `Caffe_LIBS` variables. This will be where you installed Caffe. Below is an example of the same.
-
 ```bash
 cmake -DOpenCV_DIR=/home/"${USER}"/softwares/opencv/build \
   -DCaffe_INCLUDE_DIRS=/home/"${USER}"/softwares/caffe/build/install/include \
@@ -163,7 +155,3 @@ If Caffe is not already present but OpenCV is, then use the below command.
 ```bash
 cmake -DOpenCV_DIR=/home/"${USER}"/softwares/opencv/build
 ```
-
-### Downloading additional models
-
-By default, the MPI model is not downloaded. To download the MPI model, turn on the `DOWNLOAD_MPI_MODEL` either using the GUI or using the command line.
