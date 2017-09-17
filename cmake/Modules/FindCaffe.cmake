@@ -18,9 +18,6 @@ find_library(Caffe_LIBS NAMES caffe
     HINTS
     /usr/local/lib)
 
-message(${Caffe_INCLUDE_DIRS})
-message(${Caffe_LIBS)
-
 if(CAFFE_LIBS AND Caffe_INCLUDE_DIRS)
   set(Caffe_FOUND 1)
 endif(CAFFE_LIBS AND Caffe_INCLUDE_DIRS)
