@@ -69,9 +69,9 @@ option(BUILD_DOCS "Build OpenPose documentation" OFF)
 ### FIND REQUIRED PACKAGES
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
-find_package(Boost COMPONENTS system filesystem)
-# find_package(CUDA)
 include(cmake/Cuda.cmake)
+# find_package(CUDA)
+find_package(Boost COMPONENTS system filesystem)
 find_package(CuDNN)
 find_package(GFlags)
 find_package(Glog)
@@ -121,7 +121,7 @@ if (${DL_FRAMEWORK} MATCHES "CAFFE")
   if (Caffe_INCLUDE_DIRS AND Caffe_LIBS AND NOT BUILD_CAFFE)
     message(STATUS "\${Caffe_INCLUDE_DIRS} set by the user to " ${Caffe_INCLUDE_DIRS})
     message(STATUS "\${Caffe_LIBS} set by the user to " ${Caffe_LIBS})
-    set(Caffe_FOUND ON)
+    set(Caffe_FOUND 1)
   endif (Caffe_INCLUDE_DIRS AND Caffe_LIBS AND NOT BUILD_CAFFE)
 
   # Check if caffe is installed in known paths
@@ -132,7 +132,7 @@ if (${DL_FRAMEWORK} MATCHES "CAFFE")
 
   # Else build from scratch
   if (BUILD_CAFFE)
-    message(STATUS "Failed to find caffe, will build from source now.")
+    message(STATUS "Caffe will be build from source now.")
     
     # Build Caffe
     include(ExternalProject)

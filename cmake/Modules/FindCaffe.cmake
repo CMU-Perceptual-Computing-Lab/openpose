@@ -1,6 +1,10 @@
 # Copied from 
 # https://raw.githubusercontent.com/opencv/opencv_contrib/master/modules/cnn_3dobj/FindCaffe.cmake
 
+unset(Caffe_FOUND)
+unset(Caffe_INCLUDE_DIRS)
+unset(Caffe_LIBS)
+
 find_path(Caffe_INCLUDE_DIRS NAMES 
     caffe/caffe.hpp 
     caffe/common.hpp 
@@ -11,9 +15,12 @@ find_path(Caffe_INCLUDE_DIRS NAMES
     /usr/local/include)
 
 find_library(Caffe_LIBS NAMES caffe
-  HINTS
-  /usr/local/lib)
+    HINTS
+    /usr/local/lib)
+
+message(${Caffe_INCLUDE_DIRS})
+message(${Caffe_LIBS)
 
 if(CAFFE_LIBS AND Caffe_INCLUDE_DIRS)
-    set(Caffe_FOUND 1)
-endif()
+  set(Caffe_FOUND 1)
+endif(CAFFE_LIBS AND Caffe_INCLUDE_DIRS)

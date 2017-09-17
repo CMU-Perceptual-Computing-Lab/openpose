@@ -104,7 +104,7 @@ Check OpenPose was properly installed by running it on the default images, video
 
 
 ##### Custom Caffe
-We only modified some Caffe compilation flags and minor details. You can use your own Caffe distribution, simply specify the Caffe include path and the library as shown below. You will also need to turn on the `WITH_CAFFE` variable and turn off the `BUILD_CAFFE` variable.
+We only modified some Caffe compilation flags and minor details. You can use your own Caffe distribution, simply specify the Caffe include path and the library as shown below. You will also need to turn o pluginsff the `BUILD_CAFFE` variable.
 <p align="center">
     <img src="media/cmake_installation/im_5.png", width="480">
 </p>
@@ -142,7 +142,7 @@ cd build
 
 The next step is to generate the Makefiles. Now there can be multiple scenarios based on what the user already has e.x. Caffe might be already installed and the user might be interested in building OpenPose against that version of Caffe instead of requiring OpenPose to build Caffe from scratch.
 
-##### SCENARIO 1 -- Caffe not installed and Opencv installed using `apt-get`
+##### SCENARIO 1 -- Caffe not installed and OpenCV installed using `apt-get`
 In the build directory, run the below command --
 
 ```bash
@@ -155,7 +155,7 @@ In this example, we assume that Caffe and OpenCV are already present. The user n
 ```bash
 cmake -DOpenCV_DIR=/home/"${USER}"/softwares/opencv/build \
   -DCaffe_INCLUDE_DIRS=/home/"${USER}"/softwares/caffe/build/install/include \
-  -DCaffe_LIBS=/home/"${USER}"/softwares/caffe/build/install/lib/libcaffe.so -DWITH_CAFFE=ON ..
+  -DCaffe_LIBS=/home/"${USER}"/softwares/caffe/build/install/lib/libcaffe.so -DBUILD_CAFFE=OFF ..
 ```
 
 ##### SCENARIO 3 -- OpenCV already installed
@@ -163,3 +163,7 @@ If Caffe is not already present but OpenCV is, then use the below command.
 ```bash
 cmake -DOpenCV_DIR=/home/"${USER}"/softwares/opencv/build
 ```
+
+### Downloading additional models
+
+By default, the MPI model is not downloaded. To download the MPI model, turn on the `DOWNLOAD_MPI_MODEL` either using the GUI or using the command line.
