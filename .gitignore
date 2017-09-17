@@ -58,15 +58,11 @@ MANIFEST-*
 # OSX dir files
 .DS_Store
 
-# Vim plugins
-cscope.files
-cscope.in.out
-cscope.out
-cscope.po.out
-TAGS
+# Vim files
+cscope.*
 tags
 .clang_complete
-openpose.vim
+.vim
 
 ######################### Windows (Visual Studio) Files #########################
 *.db

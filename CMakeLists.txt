@@ -25,8 +25,11 @@ endif ()
 # Turn on C++11
 add_definitions(-std=c++11)
 
-# Openpose flags
+# OpenPose flags
 add_definitions(-DUSE_CAFFE)
+
+# C++ additional flags
+set(OP_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp -Wpedantic -Wall -Wextra -Wfatal-errors")
 
 ### PROJECT OPTIONS
 
@@ -38,8 +41,6 @@ SET_PROPERTY(CACHE DL_FRAMEWORK PROPERTY STRINGS CAFFE)
 # Suboptions for Caffe DL Framework
 include(CMakeDependentOption)
 if (${DL_FRAMEWORK} MATCHES "CAFFE")
-  CMAKE_DEPENDENT_OPTION(WITH_CAFFE "Build using Caffe" ON
-      "DL_FRAMEWORK" ON)
   CMAKE_DEPENDENT_OPTION(BUILD_CAFFE "Build Caffe as part of OpenPose" ON
       "DL_FRAMEWORK" ON)
 endif (${DL_FRAMEWORK} MATCHES "CAFFE")
@@ -69,7 +70,8 @@ option(BUILD_DOCS "Build OpenPose documentation" OFF)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
 find_package(Boost COMPONENTS system filesystem)
-find_package(CUDA)
+# find_package(CUDA)
+include(cmake/Cuda.cmake)
 find_package(CuDNN)
 find_package(GFlags)
 find_package(Glog)
@@ -113,21 +115,20 @@ set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -std=c++11")
 
 ### CAFFE
 
-
 if (${DL_FRAMEWORK} MATCHES "CAFFE")
 
   # Check if the user specified caffe paths
-  if (Caffe_INCLUDE_DIRS AND Caffe_LIBS AND WITH_CAFFE)
+  if (Caffe_INCLUDE_DIRS AND Caffe_LIBS AND NOT BUILD_CAFFE)
     message(STATUS "\${Caffe_INCLUDE_DIRS} set by the user to " ${Caffe_INCLUDE_DIRS})
     message(STATUS "\${Caffe_LIBS} set by the user to " ${Caffe_LIBS})
     set(Caffe_FOUND ON)
-  endif (Caffe_INCLUDE_DIRS AND Caffe_LIBS AND WITH_CAFFE)
+  endif (Caffe_INCLUDE_DIRS AND Caffe_LIBS AND NOT BUILD_CAFFE)
 
   # Check if caffe is installed in known paths
-  if (NOT Caffe_FOUND AND WITH_CAFFE) 
+  if (NOT Caffe_FOUND AND NOT BUILD_CAFFE) 
     message(STATUS "Looking for caffe around in expected paths.")
     find_package(Caffe)
-  endif (NOT Caffe_FOUND AND WITH_CAFFE)
+  endif (NOT Caffe_FOUND AND NOT BUILD_CAFFE)
 
   # Else build from scratch
   if (BUILD_CAFFE)
@@ -155,7 +156,8 @@ if (${DL_FRAMEWORK} MATCHES "CAFFE")
   endif (BUILD_CAFFE)
 
   if (NOT Caffe_FOUND AND NOT BUILD_CAFFE)
-    message(FATAL_ERROR "Caffe not found. Either turn on the BUILD_CAFFE option or specify the path of Caffe includes and libs using -DCaffe_INCLUDE_DIRS and -DCaffe_LIBS")
+    message(FATAL_ERROR "Caffe not found. Either turn on the BUILD_CAFFE option or specify the path of Caffe includes 
+        and libs using -DCaffe_INCLUDE_DIRS and -DCaffe_LIBS")
   endif (NOT Caffe_FOUND AND NOT BUILD_CAFFE)
 
 endif (${DL_FRAMEWORK} MATCHES "CAFFE")

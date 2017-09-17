@@ -1,5 +1,4 @@
-# TODO -- add checksum.
-# TODO -- remove hardcoded ubuntu paths
+# Function to download models
 function (download_model MODEL_NAME MODEL_DOWNLOAD_FLAG MODEL_RELATIVE_PATH CHECKSUM)
   if (MODEL_DOWNLOAD_FLAG)
     message(STATUS "Downloading ${MODEL_NAME} model...")
