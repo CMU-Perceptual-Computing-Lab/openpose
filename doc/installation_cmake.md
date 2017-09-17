@@ -11,7 +11,9 @@ The CMake installation is experimental. It will eventually replace the standard 
     2. [OpenPose Configuration](#openpose-configuration)
     3. [OpenPose Building](#openpose-building)
     4. [Run OpenPose](#run-openpose)
-4. [CMake Command Line Configuration](#cmake-command-line-configuration)
+4. [Custom Caffe](#custom-caffe)
+5. [Custom OpenCV](#custom-opencv)
+6. [CMake Command Line Configuration](#cmake-command-line-configuration)
 
 
 
@@ -31,12 +33,7 @@ The first step is to clone the OpenPose repository. It might be done with [GitHu
 git clone https://github.com/CMU-Perceptual-Computing-Lab/openpose
 ```
 
-OpenPose can be easily updated by clicking the `synchronization` button at the top-right part in GitHub Desktop in Windows, or by running the following command in Ubuntu:
-```bash
-git pull origin master
-```
-
-After the files have been updated, just run the `Reinstallation` section described below for your specific Operating System.
+OpenPose can be easily updated by clicking the `synchronization` button at the top-right part in GitHub Desktop in Windows, or by running `git pull origin master` in Ubuntu. After OpenPose has been updated, just run the `Reinstallation` section described below for your specific Operating System.
 
 
 
@@ -51,7 +48,7 @@ The instructions in this section describe the steps to build OpenPose using CMak
 
 ### Caffe Prerequisites (Ubuntu Only)
 By default, OpenPose uses Caffe under the hood. If you have not used Caffe previously, install its dependencies by running:
-```
+```bash
 bash ./ubuntu/install_cmake.sh
 ```
 
@@ -61,11 +58,11 @@ bash ./ubuntu/install_cmake.sh
 Note: If you prefer to use CMake though the command line, see [Cmake Command Line Build](#cmake-command-line-build).
 
 1. Install CMake GUI.
-    1. In Ubuntu: run `sudo apt-get install cmake-qt-gui`.
-    2. In Windows: download and install the latest Windows win64-x64 msi installer from the [CMake website](https://cmake.org/download/).
+    1. Ubuntu: run `sudo apt-get install cmake-qt-gui`.
+    2. Windows: download and install the latest Windows win64-x64 msi installer from the [CMake website](https://cmake.org/download/).
 
 2. Open CMake GUI and select the project source directory and a sub-directory where the Makefiles will
-be generated. We will first select the openpose directory and then we will select a `build` directory in the project root directory as shown in the image below (See the red rectangle). If the `build` directory does not exists, CMake will create one for us.
+be generated. We will first select the openpose directory and then we will select a `build` directory in the project root directory as shown in the image below (See the red rectangle). If the `build` directory does not exists, CMake will create it.
   ![im_1](media/cmake_installation/im_1.png)
 
 3. Next press the `Configure` button in the GUI. It will first ask you to create the `build` directory, if it already did not exist. Press `Yes`.
@@ -77,13 +74,9 @@ be generated. We will first select the openpose directory and then we will selec
 5. If this step is successful, in the bottom box it will show "Configuring done" (in the last line) as shown below.
   ![im_4](media/cmake_installation/im_4.png)
 
-6. To generate the Makefiles, press the `Generate` button and proceed to [OpenPose Building](#openpose-building).
+6. Press the `Generate` button and proceed to [OpenPose Building](#openpose-building).
 
-##### Caffe Already Present 
-If Caffe is already installed and you do not want OpenPose to build Caffe, you can specify the Caffe include path and the library as shown below. You will also need to turn on the `WITH_CAFFE` variable and turn off the `BUILD_CAFFE` variable.
-  ![im_6](media/cmake_installation/im_6.png)
-
-SIDENOTE -- If you have OpenCV build from source and OpenPose cannot find it automatically -- you can set the `OPENCV_DIR` variable to the directory where you build OpenCV.
+Note: If you prefer to use your own custom Caffe or OpenCV versions, see [Custom Caffe](#custom-caffe) and [Custom OpenCV](#custom-opencv) respectively.
 
 
 
@@ -99,6 +92,30 @@ make -j${no_cores}
 
 ### Run OpenPose
 Check OpenPose was properly installed by running it on the default images, video or webcam: [doc/quick_start.md#quick-start](./quick_start.md#quick-start).
+
+
+
+##### Custom Caffe
+We only modified some Caffe compilation flags and minor details. You can use your own Caffe distribution, simply specify the Caffe include path and the library as shown below. You will also need to turn on the `WITH_CAFFE` variable and turn off the `BUILD_CAFFE` variable.
+  ![im_6](media/cmake_installation/im_6.png)
+
+
+
+##### Custom OpenCV
+If you have built OpenCV from source and OpenPose cannot find it automatically, you can set the `OPENCV_DIR` variable to the directory where you build OpenCV.
+
+
+
+### Custom Caffe
+We only modified some Caffe compilation flags and minor details. You can use your own Caffe distribution, these are the files we added and modified:
+
+1. Added files: `install_caffe.sh`; as well as `Makefile.config.Ubuntu14.example`, `Makefile.config.Ubuntu16.example`, `Makefile.config.Ubuntu14_cuda_7.example` and `Makefile.config.Ubuntu16_cuda_7.example` (extracted from `Makefile.config.example`). Basically, you must enable cuDNN.
+2. Edited file: Makefile. Search for "# OpenPose: " to find the edited code. We basically added the C++11 flag to avoid issues in some old computers.
+3. Optional - deleted Caffe file: `Makefile.config.example`.
+4. In order to link it to OpenPose:
+    1. Run `make all && make distribute` in your Caffe version.
+    2. Open the OpenPose Makefile config file: `./Makefile.config.UbuntuX.example` (where X depends on your OS and CUDA version).
+    3. Modify the Caffe folder directory variable (`CAFFE_DIR`) to your custom Caffe `distribute` folder location in the previous OpenPose Makefile config file.
 
 
 
