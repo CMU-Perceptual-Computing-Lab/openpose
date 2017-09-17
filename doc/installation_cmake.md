@@ -63,16 +63,24 @@ Note: If you prefer to use CMake though the command line, see [Cmake Command Lin
 
 2. Open CMake GUI and select the project source directory and a sub-directory where the Makefiles will
 be generated. We will first select the openpose directory and then we will select a `build` directory in the project root directory as shown in the image below (See the red rectangle). If the `build` directory does not exists, CMake will create it.
-  ![im_1](media/cmake_installation/im_1.png)
+<p align="center">
+    <img src="media/cmake_installation/im_1.png", width="480">
+</p>
 
 3. Next press the `Configure` button in the GUI. It will first ask you to create the `build` directory, if it already did not exist. Press `Yes`.
-  ![im_2](media/cmake_installation/im_2.png)
+<p align="center">
+    <img src="media/cmake_installation/im_2.png", width="240">
+</p>
 
 4. Next a new dialog box will appear, press the `Finish` button here.
-  ![im_3](media/cmake_installation/im_3.png)
+<p align="center">
+    <img src="media/cmake_installation/im_3.png", width="240">
+</p>
 
 5. If this step is successful, in the bottom box it will show "Configuring done" (in the last line) as shown below.
-  ![im_4](media/cmake_installation/im_4.png)
+<p align="center">
+    <img src="media/cmake_installation/im_4.png", width="480">
+</p>
 
 6. Press the `Generate` button and proceed to [OpenPose Building](#openpose-building).
 
@@ -97,7 +105,9 @@ Check OpenPose was properly installed by running it on the default images, video
 
 ##### Custom Caffe
 We only modified some Caffe compilation flags and minor details. You can use your own Caffe distribution, simply specify the Caffe include path and the library as shown below. You will also need to turn on the `WITH_CAFFE` variable and turn off the `BUILD_CAFFE` variable.
-  ![im_6](media/cmake_installation/im_6.png)
+<p align="center">
+    <img src="media/cmake_installation/im_5.png", width="480">
+</p>
 
 
 
