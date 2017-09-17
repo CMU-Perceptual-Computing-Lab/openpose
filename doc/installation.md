@@ -1,4 +1,4 @@
-OpenPose Library - Compilation and Installation
+OpenPose - Installation and FAQ
 ====================================
 
 ## Contents
@@ -6,9 +6,7 @@ OpenPose Library - Compilation and Installation
 2. [Ubuntu](#ubuntu)
 3. [Windows](#windows)
 4. [OpenPose 3D Demo](#openpose-3d-demo)
-5. [Quick Start](#quick-start)
-6. [Expected Visual Results](#expected-visual-results)
-7. [FAQ](#faq)
+5. [FAQ](#faq)
 
 
 
@@ -104,7 +102,7 @@ You just need to remove the OpenPose folder, by default called `openpose/`. E.g.
 
 ### Installation - Library
 1. Install the pre-requisites:
-    1. Microsoft Visual Studio (VS) 2015 Enterprise Update 3. VS Enterprise Update 1 will give some compiler errors, while VS 2015 Community has not been tested.
+    1. Microsoft Visual Studio (VS) 2015 Enterprise Update 3. VS Enterprise Update 1 and VS 2017 will give some compiler errors, while VS 2015 Community has not been tested.
     2. [CUDA 8](https://developer.nvidia.com/cuda-downloads): Install it on the default location, `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0`. Otherwise, modify the Visual Studio project solution accordingly. Install CUDA 8.0 after Visual Studio 2015 is installed to assure that the CUDA installation will generate all necessary files for VS. If CUDA was already installed, re-install it after installing VS!
     3. [cuDNN 5.1](https://developer.nvidia.com/cudnn): Once you have downloaded it, just unzip it and copy (merge) the contents on the CUDA folder, `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0`.
 2. Download the OpenPose dependencies and models (body, face and hand models) by double-clicking on `{openpose_path}\windows\download_3rdparty_and_models.bat`. Alternatively, you might prefer to download them manually:
@@ -129,7 +127,7 @@ You just need to remove the OpenPose folder, by default called `openpose/`. E.g.
     3. Open the Windows cmd (Windows button + X, then A).
     4. Go to the OpenPose directory, assuming OpenPose has been downloaded on `C:\openpose`: `cd C:\openpose\`.
     5. Run the tutorial commands.
-7. Check [Quick Start](#quick-start) to test video, webcam and a folder with images, in order to verify OpenPose was properly installed.
+7. Check OpenPose was properly installed by running it on the default images, video or webcam: [doc/quick_start.md#quick-start](./quick_start.md#quick-start).
 
 
 
@@ -153,114 +151,6 @@ Then, you would have to reduce the `--net_resolution` flag to fit the model into
 
 ## OpenPose 3D Demo
 If you want to try our OpenPose 3-D reconstruction demo, see [doc/openpose_3d_reconstruction_demo.md](./openpose_3d_reconstruction_demo.md).
-
-
-
-
-
-## Quick Start
-Check that the library is working properly by using any of the following commands. Note that `examples/media/video.avi` and `examples/media` exist, so you do not need to change the paths. In addition, the following commands assume your terminal (Ubuntu) or cmd (Windows) are located in the OpenPose folder.
-
-**1. Running on Video**
-```
-# Ubuntu
-./build/examples/openpose/openpose.bin --video examples/media/video.avi
-# With face and hands
-./build/examples/openpose/openpose.bin --video examples/media/video.avi --face --hand
-```
-```
-:: Windows - Demo
-bin\OpenPoseDemo.exe --video examples\media\video.avi
-:: With face and hands
-bin\OpenPoseDemo.exe --video examples\media\video.avi --face --hand
-```
-```
-:: Windows - Library
-windows\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi
-:: With face and hands
-windows\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi --face --hand
-```
-
-
-
-**2. Running on Webcam**
-```
-# Ubuntu
-./build/examples/openpose/openpose.bin
-# With face and hands
-./build/examples/openpose/openpose.bin --face --hand
-```
-```
-:: Windows - Demo
-bin\OpenPoseDemo.exe
-:: With face and hands
-bin\OpenPoseDemo.exe --face --hand
-```
-```
-:: Windows - Library
-windows\x64\Release\OpenPoseDemo.exe
-:: With face and hands
-windows\x64\Release\OpenPoseDemo.exe --face --hand
-```
-
-
-
-**3. Running on Images**
-```
-# Ubuntu
-./build/examples/openpose/openpose.bin --image_dir examples/media/
-# With face and hands
-./build/examples/openpose/openpose.bin --image_dir examples/media/ --face --hand
-```
-```
-:: Windows - Demo
-bin\OpenPoseDemo.exe --image_dir examples\media\
-:: With face and hands
-bin\OpenPoseDemo.exe --image_dir examples\media\ --face --hand
-```
-```
-:: Windows - Library
-windows\x64\Release\OpenPoseDemo.exe --image_dir examples\media\
-:: With face and hands
-windows\x64\Release\OpenPoseDemo.exe --image_dir examples\media\ --face --hand
-```
-
-
-
-**4. Maximum Accuracy Configuration**
-
-This command provides the most accurate results we have been able to achieve for body, hand and face keypoint detection. However, this command will need around 8 GB of GPU memory and runs around 1 FPS on a Titan X.
-```
-# Ubuntu
-./build/examples/openpose/openpose.bin --net_resolution "1312x736" --scale_number 4 --scale_gap 0.25 --hand --hand_scale_number 6 --hand_scale_range 0.4 --face
-```
-```
-:: Windows - Demo
-bin\OpenPoseDemo.exe --net_resolution "1312x736" --scale_number 4 --scale_gap 0.25 --hand --hand_scale_number 6 --hand_scale_range 0.4 --face
-```
-```
-:: Windows - Library
-windows\x64\Release\OpenPoseDemo.exe --net_resolution "1312x736" --scale_number 4 --scale_gap 0.25 --hand --hand_scale_number 6 --hand_scale_range 0.4 --face
-```
-
-
-
-
-
-## Expected Visual Results
-The visual GUI should show the original image with the poses blended on it, similarly to the pose of this gif:
-<p align="center">
-    <img src="media/shake.gif", width="720">
-</p>
-
-If you choose to visualize a body part or a PAF (Part Affinity Field) heat map with the command option `--part_to_show`, the result should be similar to one of the following images:
-<p align="center">
-    <img src="media/body_heat_maps.png", width="720">
-</p>
-
-<p align="center">
-    <img src="media/paf_heat_maps.png", width="720">
-</p>
 
 
 
