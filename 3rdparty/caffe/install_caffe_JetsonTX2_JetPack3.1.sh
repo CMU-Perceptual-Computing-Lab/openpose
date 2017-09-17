@@ -55,7 +55,7 @@ echo ""
 
 
 echo "------------------------- Compiling Caffe -------------------------"
-cp Makefile.config.Ubuntu16_cuda8.JetsonTX2 Makefile.config
+cp Makefile.config.Ubuntu16_cuda8_JetsonTX2 Makefile.config
 make all -j$NUM_CORES && make distribute -j$NUM_CORES
 # make test -j$NUM_CORES
 # make runtest -j$NUM_CORES
