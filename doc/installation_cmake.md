@@ -76,7 +76,7 @@ be generated. We will first select the openpose directory and then we will selec
 
 6. Press the `Generate` button and proceed to [OpenPose Building](#openpose-building).
 
-Note: If you prefer to use your own custom Caffe or OpenCV versions, see [Custom Caffe](#custom-caffe) and [Custom OpenCV](#custom-opencv) respectively.
+Note: If you prefer to use your own custom Caffe or OpenCV versions, see [Custom Caffe](#custom-caffe) or [Custom OpenCV](#custom-opencv) respectively.
 
 
 
