@@ -1,6 +1,8 @@
 OpenPose - Installation using CMake
 ====================================
 
+The CMake installation is experimental. It will eventually replace the standard and current installation system, but at the moment it is a beta version.
+
 ## Contents
 1. [Requirements](#requirements)
 2. [Clone and Update the Repository](#clone-and-update-the-repository)
@@ -39,9 +41,7 @@ After the files have been updated, just run the `Reinstallation` section describ
 
 
 ## Installation
-The CMake installation is experimental. It will eventually replace the standard and current installation system, but at the moment it is a beta version.
-
-The instructions in this section describe the steps to build OpenPose using CMake. There are 3 main steps:
+The instructions in this section describe the steps to build OpenPose using CMake (GUI). There are 3 main steps:
 
 1. [Caffe Prerequisites (Ubuntu Only)](#caffe-prerequisites-ubuntu-only)
 2. [OpenPose Configuration](#openpose-configuration)
@@ -50,7 +50,7 @@ The instructions in this section describe the steps to build OpenPose using CMak
 
 
 ### Caffe Prerequisites (Ubuntu Only)
-OpenPose uses Caffe under the hood by default. If you have not used Caffe previously, install its dependencies by running:
+By default, OpenPose uses Caffe under the hood. If you have not used Caffe previously, install its dependencies by running:
 ```
 bash ./ubuntu/install_cmake.sh
 ```
@@ -60,33 +60,29 @@ bash ./ubuntu/install_cmake.sh
 ### OpenPose Configuration
 Note: If you prefer to use CMake though the command line, see [Cmake Command Line Build](#cmake-command-line-build).
 
-1. Install CMake GUI, either by `sudo apt-get install cmake-qt-gui` in Ubuntu or by their [official website](https://cmake.org/download/) for Windows.
-There are two ways to configure the OpenPose installation, either using CMake GUI (recommended) or cmake though the command line. Both are described succinctly in the sections below.
+1. Install CMake GUI.
+    1. In Ubuntu: run `sudo apt-get install cmake-qt-gui`.
+    2. In Windows: download and install the latest Windows win64-x64 msi installer from the [CMake website](https://cmake.org/download/).
 
 2. Open CMake GUI and select the project source directory and a sub-directory where the Makefiles will
 be generated. We will first select the openpose directory and then we will select a `build` directory in the project root directory as shown in the image below (See the red rectangle). If the `build` directory does not exists, CMake will create one for us.
-  
   ![im_1](media/cmake_installation/im_1.png)
-  
+
 3. Next press the `Configure` button in the GUI. It will first ask you to create the `build` directory, if it already did not exist. Press `Yes`.
-  
   ![im_2](media/cmake_installation/im_2.png)
-  
+
 4. Next a new dialog box will appear, press the `Finish` button here.
-  
   ![im_3](media/cmake_installation/im_3.png)
-  
-5. If this step is successful, in the bottom box it will show "Configuring done" (in the last line) as shown below --
-  
+
+5. If this step is successful, in the bottom box it will show "Configuring done" (in the last line) as shown below.
   ![im_4](media/cmake_installation/im_4.png)
-  
-6. To generate the Makefiles, press the `Generate` button and proceed to [building OpenPose](#build-the-library).
-  
+
+6. To generate the Makefiles, press the `Generate` button and proceed to [OpenPose Building](#openpose-building).
+
 ##### Caffe Already Present 
-* If Caffe is already installed and you do not want OpenPose to build Caffe, you can specify the Caffe include path and the library as shown below. You will also need to turn on the `WITH_CAFFE` variable and turn off the `BUILD_CAFFE` variable.
-  
+If Caffe is already installed and you do not want OpenPose to build Caffe, you can specify the Caffe include path and the library as shown below. You will also need to turn on the `WITH_CAFFE` variable and turn off the `BUILD_CAFFE` variable.
   ![im_6](media/cmake_installation/im_6.png)
-  
+
 SIDENOTE -- If you have OpenCV build from source and OpenPose cannot find it automatically -- you can set the `OPENCV_DIR` variable to the directory where you build OpenCV.
 
 
