@@ -90,6 +90,7 @@ Makefile.config
 	# 1. reference, and not casually committed
 	# 2. custom, and live on their own unless they're deliberated contributed
 3rdparty/caffe/.*
+!3rdparty/caffe/.Doxyfile
 distribute/
 .build_release/
 .build_debug/
