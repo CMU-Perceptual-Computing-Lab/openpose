@@ -104,7 +104,7 @@ Check OpenPose was properly installed by running it on the default images, video
 
 
 ##### Custom Caffe
-We only modified some Caffe compilation flags and minor details. You can use your own Caffe distribution, simply specify the Caffe include path and the library as shown below. You will also need to turn o pluginsff the `BUILD_CAFFE` variable.
+We only modified some Caffe compilation flags and minor details. You can use your own Caffe distribution, simply specify the Caffe include path and the library as shown below. You will also need to turn off the `BUILD_CAFFE` variable.
 <p align="center">
     <img src="media/cmake_installation/im_5.png", width="480">
 </p>
