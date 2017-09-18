@@ -7,7 +7,7 @@ if (WIN32) # OS is Windows
   message(FATAL_ERROR "Windows OS is not currently supported.")
 elseif (APPLE) # OS is Apple
   message(FATAL_ERROR "Apple OS is not currently supported.")
-elseif (UNIX AND NOT APPLE) # OS is a Linux dist. -- assumes ubuntu
+elseif (UNIX AND NOT APPLE) # OS is a Linux distribution (it assumes Ubuntu)
   set(EXECUTE_COMMAND lsb_release -rs) 
   execute_process(COMMAND ${EXECUTE_COMMAND} OUTPUT_VARIABLE UBUNTU_VERSION)
   string(SUBSTRING ${UBUNTU_VERSION} 0 2 UBUNTU_MAJOR_VERSION)
