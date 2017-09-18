@@ -3,15 +3,21 @@ OpenPose - Installation and FAQ
 
 ## Contents
 1. [Requirements](#requirements)
-2. [Ubuntu](#ubuntu)
-3. [Windows](#windows)
-4. [OpenPose 3D Demo](#openpose-3d-demo)
-5. [FAQ](#faq)
+2. [Clone and Update the Repository](#clone-and-update-the-repository)
+3. [Ubuntu](#ubuntu)
+4. [Windows](#windows)
+5. [OpenPose 3D Demo](#openpose-3d-demo)
+6. [Custom Caffe](#custom-caffe)
+7. [FAQ](#faq)
 
 
 
 ## Requirements
-- Ubuntu (tested on 14 and 16) or Windows (tested on 10). We do not support any other OS but the community has been able to install it on: CentOS, Windows 7, and Windows 8.
+- Operating systems:
+    - Ubuntu (tested on 14 and 16).
+    - Windows (tested on 10).
+    - Nvidia Jetson TX2, installation instructions in [doc/installation_jetson_tx2](./installation_jetson_tx2).
+    - We do not officially support any other OS, but the community has been able to install it on: CentOS, Nvidia Jetson, Windows 7, and Windows 8.
 - NVIDIA graphics card with at least 1.6 GB available (the `nvidia-smi` command checks the available GPU memory in Ubuntu).
 - At least 2 GB of free RAM memory.
 - Highly recommended: A CPU with at least 8 cores.
@@ -19,6 +25,16 @@ OpenPose - Installation and FAQ
 Note: These requirements assume the default configuration (i.e. `--net_resolution "656x368"` and `scale_number 1`). You might need more (with a greater net resolution and/or number of scales) or less resources (with smaller net resolution and/or using the MPI and MPI_4 models).
 
 
+
+
+
+## Clone and Update the Repository
+The first step is to clone the OpenPose repository. It might be done with [GitHub Desktop](https://desktop.github.com/) in Windows and from the terminal in Ubuntu:
+```bash
+git clone https://github.com/CMU-Perceptual-Computing-Lab/openpose
+```
+
+OpenPose can be easily updated by clicking the `synchronization` button at the top-right part in GitHub Desktop in Windows, or by running `git pull origin master` in Ubuntu. After OpenPose has been updated, just run the `Reinstallation` section described below for your specific Operating System.
 
 
 
@@ -32,7 +48,7 @@ Note: These requirements assume the default configuration (i.e. `--net_resolutio
     4. In addition, OpenCV 3 does not incorporate the `opencv_contrib` module by default. Assuming you have OpenCV 3 compiled with the contrib module and you want to use it, append `opencv_contrib` at the end of the line `LIBRARIES += opencv_core opencv_highgui opencv_imgproc` in the `Makefile` file.
     5. Atlas can be installed with `sudo apt-get install libatlas-base-dev`. Instead of Atlas, you can use OpenBLAS or Intel MKL by modifying the line `BLAS := atlas` in the same way as previosuly mentioned for the OpenCV version selection.
 2. Build Caffe & the OpenPose library + download the required Caffe models for Ubuntu 14.04 or 16.04 (auto-detected for the script) and CUDA 8:
-```
+```bash
 bash ./ubuntu/install_caffe_and_openpose_if_cuda8.sh
 ```
 
@@ -64,7 +80,7 @@ Alternatively to the script installation, if you want to use CUDA 7, avoid using
     make all -j${number_of_cpus}
     ```
 
-    NOTE: If you want to use your own Caffe distribution, follow the steps on `Custom Caffe` section and later re-compile the OpenPose library:
+    NOTE: If you want to use your own Caffe distribution, follow the steps on [Custom Caffe](#custom-caffe) section and later re-compile the OpenPose library:
     ```
     bash ./install_openpose_if_cuda8.sh
     ```
@@ -83,7 +99,7 @@ If you updated some software that our library or 3rdparty use, or you simply wan
 ```
 make clean && cd 3rdparty/caffe && make clean
 ```
-2. Repeat the [Installation](#installation) steps.
+2. Repeat the [Installation](#installation) steps. You do not need to download the models again.
 
 
 
@@ -136,6 +152,14 @@ You just need to remove the OpenPose or portable demo folder.
 
 
 
+### Reinstallation
+If you updated some software that our library or 3rdparty use, or you simply want to reinstall it:
+1. Open the Visual Studio project sln file by double-cliking on `{openpose_path}\windows\OpenPose.sln`.
+2. Clean the OpenPose project by right-click on `Solution 'OpenPose'` and `Clean Solution`.
+3. Compile it and run it with F5 or the green play icon.
+
+
+
 
 
 ## Compiling without cuDNN
@@ -151,6 +175,19 @@ Then, you would have to reduce the `--net_resolution` flag to fit the model into
 
 ## OpenPose 3D Demo
 If you want to try our OpenPose 3-D reconstruction demo, see [doc/openpose_3d_reconstruction_demo.md](./openpose_3d_reconstruction_demo.md).
+
+
+
+## Custom Caffe
+We only modified some Caffe compilation flags and minor details. You can use your own Caffe distribution, these are the files we added and modified:
+
+1. Added files: `install_caffe.sh`; as well as `Makefile.config.Ubuntu14.example`, `Makefile.config.Ubuntu16.example`, `Makefile.config.Ubuntu14_cuda_7.example` and `Makefile.config.Ubuntu16_cuda_7.example` (extracted from `Makefile.config.example`). Basically, you must enable cuDNN.
+2. Edited file: Makefile. Search for "# OpenPose: " to find the edited code. We basically added the C++11 flag to avoid issues in some old computers.
+3. Optional - deleted Caffe file: `Makefile.config.example`.
+4. In order to link it to OpenPose:
+    1. Run `make all && make distribute` in your Caffe version.
+    2. Open the OpenPose Makefile config file: `./Makefile.config.UbuntuX.example` (where X depends on your OS and CUDA version).
+    3. Modify the Caffe folder directory variable (`CAFFE_DIR`) to your custom Caffe `distribute` folder location in the previous OpenPose Makefile config file.
 
 
 

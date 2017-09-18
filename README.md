@@ -44,13 +44,12 @@ OpenPose is a **library for real-time multi-person keypoint detection and multi-
     2. [OpenPose Wrapper](#openpose-wrapper)
     3. [OpenPose Library](#openpose-library)
 8. [Output](#output)
-9. [Custom Caffe](#custom-caffe)
-10. [Standalone Face Or Hand Keypoint Detector](#standalone-face-or-hand-keypoint-detector)
-11. [Speed Up Openpose And Benchmark](#speed-up-openpose-and-benchmark)
-12. [Send Us Failure Cases!](#send-us-failure-cases)
-13. [Send Us Your Feedback!](#send-us-your-feedback)
-14. [Citation](#citation)
-15. [Other Contributors](#other-contributors)
+9. [Standalone Face Or Hand Keypoint Detector](#standalone-face-or-hand-keypoint-detector)
+10. [Speed Up Openpose And Benchmark](#speed-up-openpose-and-benchmark)
+11. [Send Us Failure Cases!](#send-us-failure-cases)
+12. [Send Us Your Feedback!](#send-us-your-feedback)
+13. [Citation](#citation)
+14. [Other Contributors](#other-contributors)
 
 
 ## Introduction
@@ -136,19 +135,6 @@ doxygen doc_autogeneration.doxygen
 
 ## Output
 Check the output (format, keypoint index ordering, etc.) in [doc/output.md](doc/output.md).
-
-
-
-## Custom Caffe
-We only modified some Caffe compilation flags and minor details. You can use your own Caffe distribution, these are the files we added and modified:
-
-1. Added files: `install_caffe.sh`; as well as `Makefile.config.Ubuntu14.example`, `Makefile.config.Ubuntu16.example`, `Makefile.config.Ubuntu14_cuda_7.example` and `Makefile.config.Ubuntu16_cuda_7.example` (extracted from `Makefile.config.example`). Basically, you must enable cuDNN.
-2. Edited file: Makefile. Search for "# OpenPose: " to find the edited code. We basically added the C++11 flag to avoid issues in some old computers.
-3. Optional - deleted Caffe file: `Makefile.config.example`.
-4. In order to link it to OpenPose:
-    1. Run `make all && make distribute` in your Caffe version.
-    2. Open the OpenPose Makefile config file: `./Makefile.config.UbuntuX.example` (where X depends on your OS and CUDA version).
-    3. Modify the Caffe folder directory variable (`CAFFE_DIR`) to your custom Caffe `distribute` folder location in the previous OpenPose Makefile config file.
 
 
 
