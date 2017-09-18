@@ -12,7 +12,7 @@ namespace op
     class WQueueOrderer : public Worker<TDatums>
     {
     public:
-        explicit WQueueOrderer(const int maxBufferSize = 64);
+        explicit WQueueOrderer(const unsigned int maxBufferSize = 64u);
 
         void initializationOnThread();
 
@@ -21,7 +21,7 @@ namespace op
         void tryStop();
 
     private:
-        const int mMaxBufferSize;
+        const unsigned int mMaxBufferSize;
         bool mStopWhenEmpty;
         unsigned long long mNextExpectedId;
         std::priority_queue<TDatums, std::vector<TDatums>, PointerContainerGreater<TDatums>> mPriorityQueueBuffer;
@@ -40,7 +40,7 @@ namespace op
 namespace op
 {
     template<typename TDatums>
-    WQueueOrderer<TDatums>::WQueueOrderer(const int maxBufferSize) :
+    WQueueOrderer<TDatums>::WQueueOrderer(const unsigned int maxBufferSize) :
         mMaxBufferSize{maxBufferSize},
         mStopWhenEmpty{false},
         mNextExpectedId{0}
@@ -99,7 +99,7 @@ namespace op
                 mNextExpectedId = tDatumsNoPtr[0].id + 1;
             }
             // Sleep if no new tDatums to either pop
-            if (!checkNoNullNorEmpty(tDatums) && mPriorityQueueBuffer.size() < mMaxBufferSize / 2)
+            if (!checkNoNullNorEmpty(tDatums) && mPriorityQueueBuffer.size() < mMaxBufferSize / 2u)
                 std::this_thread::sleep_for(std::chrono::milliseconds{1});
             // If TDatum popped and/or pushed
             if (profileSpeed || tDatums != nullptr)

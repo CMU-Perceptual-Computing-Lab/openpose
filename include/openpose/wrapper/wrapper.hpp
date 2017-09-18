@@ -589,7 +589,7 @@ namespace op
                 // GPU rendering
                 if (renderOutputGpu)
                 {
-                    for (auto gpuId = 0; gpuId < poseExtractors.size(); gpuId++)
+                    for (auto gpuId = 0u; gpuId < poseExtractors.size(); gpuId++)
                     {
                         poseRenderers.emplace_back(std::make_shared<PoseRenderer>(
                             poseNetOutputSize, finalOutputSize, wrapperStructPose.poseModel, poseExtractors[gpuId],
@@ -621,14 +621,14 @@ namespace op
 
             // Pose extractor(s)
             spWPoses.resize(poseExtractors.size());
-            for (auto i = 0; i < spWPoses.size(); i++)
+            for (auto i = 0u; i < spWPoses.size(); i++)
                 spWPoses.at(i) = {std::make_shared<WPoseExtractor<TDatumsPtr>>(poseExtractors.at(i))};
 
             // Face extractor(s)
             if (wrapperStructFace.enable)
             {
                 const auto faceDetector = std::make_shared<FaceDetector>(wrapperStructPose.poseModel);
-                for (auto gpuId = 0; gpuId < spWPoses.size(); gpuId++)
+                for (auto gpuId = 0u; gpuId < spWPoses.size(); gpuId++)
                 {
                     // Face detector
                     spWPoses.at(gpuId).emplace_back(std::make_shared<WFaceDetector<TDatumsPtr>>(faceDetector));
@@ -645,7 +645,7 @@ namespace op
             if (wrapperStructHand.enable)
             {
                 const auto handDetector = std::make_shared<HandDetector>(wrapperStructPose.poseModel);
-                for (auto gpuId = 0; gpuId < spWPoses.size(); gpuId++)
+                for (auto gpuId = 0u; gpuId < spWPoses.size(); gpuId++)
                 {
                     // Hand detector
                     // If tracking
@@ -669,7 +669,7 @@ namespace op
 
             // Pose renderer(s)
             if (!poseRenderers.empty())
-                for (auto i = 0; i < spWPoses.size(); i++)
+                for (auto i = 0u; i < spWPoses.size(); i++)
                     spWPoses.at(i).emplace_back(std::make_shared<WPoseRenderer<TDatumsPtr>>(poseRenderers.at(i)));
 
             // Face renderer(s)
@@ -689,7 +689,7 @@ namespace op
                 // GPU rendering
                 else if (wrapperStructFace.renderMode == RenderMode::Gpu)
                 {
-                    for (auto i = 0; i < spWPoses.size(); i++)
+                    for (auto i = 0u; i < spWPoses.size(); i++)
                     {
                         // Construct face renderer
                         const auto faceRenderer = std::make_shared<FaceRenderer>(finalOutputSize, wrapperStructFace.renderThreshold,
@@ -727,7 +727,7 @@ namespace op
                 // GPU rendering
                 else if (wrapperStructHand.renderMode == RenderMode::Gpu)
                 {
-                    for (auto i = 0; i < spWPoses.size(); i++)
+                    for (auto i = 0u; i < spWPoses.size(); i++)
                     {
                         // Construct hands renderer
                         const auto handRenderer = std::make_shared<HandRenderer>(finalOutputSize, wrapperStructHand.renderThreshold,
@@ -751,7 +751,7 @@ namespace op
             // Itermediate workers (e.g. OpenPose format to cv::Mat, json & frames recorder, ...)
             mPostProcessingWs.clear();
             // Frame buffer and ordering
-            if (spWPoses.size() > 1)
+            if (spWPoses.size() > 1u)
                 mPostProcessingWs.emplace_back(std::make_shared<WQueueOrderer<TDatumsPtr>>());
             // Frames processor (OpenPose format -> cv::Mat format)
             if (renderOutput)

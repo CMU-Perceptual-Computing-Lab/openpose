@@ -58,7 +58,7 @@ namespace op
                 auto& tDatumsNoPtr = *tDatums;
                 // Record image(s) on disk
                 std::vector<Array<float>> poseHeatMaps(tDatumsNoPtr.size());
-                for (auto i = 0; i < tDatumsNoPtr.size(); i++)
+                for (auto i = 0u; i < tDatumsNoPtr.size(); i++)
                     poseHeatMaps[i] = tDatumsNoPtr[i].poseHeatMaps;
                 const auto fileName = (!tDatumsNoPtr[0].name.empty() ? tDatumsNoPtr[0].name : std::to_string(tDatumsNoPtr[0].id));
                 spHeatMapSaver->saveHeatMaps(poseHeatMaps, fileName);

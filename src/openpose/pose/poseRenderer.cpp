@@ -19,7 +19,7 @@ namespace op
             const auto& bodyPartPairs = POSE_BODY_PART_PAIRS[(int)poseModel];
             const auto& mapIdx = POSE_MAP_IDX[(int)poseModel];
 
-            for (auto bodyPart = 0; bodyPart < bodyPartPairs.size(); bodyPart+=2)
+            for (auto bodyPart = 0u; bodyPart < bodyPartPairs.size(); bodyPart+=2)
             {
                 const auto bodyPartPairsA = bodyPartPairs.at(bodyPart);
                 const auto bodyPartPairsB = bodyPartPairs.at(bodyPart+1);

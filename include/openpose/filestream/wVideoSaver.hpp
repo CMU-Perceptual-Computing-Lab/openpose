@@ -58,7 +58,7 @@ namespace op
                 auto& tDatumsNoPtr = *tDatums;
                 // Record video(s)
                 std::vector<cv::Mat> cvOutputDatas(tDatumsNoPtr.size());
-                for (auto i = 0 ; i < cvOutputDatas.size() ; i++)
+                for (auto i = 0u ; i < cvOutputDatas.size() ; i++)
                     cvOutputDatas[i] = tDatumsNoPtr[i].cvOutputData;
                 spVideoSaver->write(cvOutputDatas);
                 // Profiling speed

@@ -173,7 +173,7 @@ namespace op
             else
             {
                 mSize = {};
-                mVolume = 0;
+                mVolume = 0ul;
                 spData.reset();
                 // cv::Mat available but empty
                 mCvMatData = std::make_pair(true, cv::Mat());
@@ -222,7 +222,7 @@ namespace op
             {
                 // New size
                 std::vector<int> newSize(cvMat.dims,0);
-                for (auto i = 0 ; i < newSize.size() ; i++)
+                for (auto i = 0u ; i < newSize.size() ; i++)
                     newSize[i] = cvMat.size[i];
                 // Reset data & volume
                 reset(newSize);
@@ -252,7 +252,7 @@ namespace op
                 if (mCvMatData.first)
                     mCvMatData.second.setTo((double)value);
                 else
-                    for (auto i = 0 ; i < mVolume ; i++)
+                    for (auto i = 0u ; i < mVolume ; i++)
                         operator[](i) = value;
             }
         }
@@ -270,12 +270,12 @@ namespace op
             // Matlab style:
                 // If empty -> return 0
                 // If index >= # dimensions -> return 1
-            if (index < mSize.size() && 0 <= index)
+            if ((unsigned int)index < mSize.size() && 0 <= index)
                 return mSize[index];
             // Long version:
             // else if (mSize.empty())
             //     return 0;
-            // else // if mSize.size() <= index 
+            // else // if mSize.size() <= (unsigned int)index
             //     return 1;
             // Equivalent to:
             else
@@ -295,7 +295,7 @@ namespace op
         {
             if (indexA < indexB)
             {
-                if (0 <= indexA && indexB < mSize.size()) // 0 <= indexA < indexB < mSize.size()
+                if (0 <= indexA && (unsigned int)indexB < mSize.size()) // 0 <= indexA < indexB < mSize.size()
                     return std::accumulate(mSize.begin()+indexA, mSize.begin()+indexB+1, 1ul, std::multiplies<size_t>());
                 else
                 {
@@ -358,14 +358,14 @@ namespace op
             // Initial value
             std::string string{"Array<T>::toString():\n"};
             // Add each element
-            for (auto i = 0 ; i < mVolume ; i++)
+            for (auto i = 0u ; i < mVolume ; i++)
             {
                 // Adding element sepearted by an space
                 string += std::to_string(spData[i]) + " ";
                 // Introduce an enter for each dimension change
                 // If comented, all values will be printed in the same line
                 auto multiplier = 1;
-                for (auto dimension = (int)(mSize.size() - 1u) ; dimension > 0 && ((i/multiplier) % getSize(dimension) == getSize(dimension)-1) ; dimension--)
+                for (auto dimension = (int)(mSize.size() - 1u) ; dimension > 0 && (int(i/multiplier) % getSize(dimension) == getSize(dimension)-1) ; dimension--)
                 {
                     string += "\n";
                     multiplier *= getSize(dimension);
@@ -423,7 +423,7 @@ namespace op
     {
         try
         {
-            if (0 <= index && index < mVolume)
+            if (0 <= index && (size_t)index < mVolume)
                 return spData[index];
             else
             {
