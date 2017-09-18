@@ -185,7 +185,7 @@ namespace op
             {
                 spWPoses.resize(gpuNumber);
                 const auto handDetector = std::make_shared<HandDetectorFromTxt>(handGroundTruth);
-                for (auto gpuId = 0; gpuId < spWPoses.size(); gpuId++)
+                for (auto gpuId = 0u; gpuId < spWPoses.size(); gpuId++)
                 {
                     // Hand detector
                     // If tracking

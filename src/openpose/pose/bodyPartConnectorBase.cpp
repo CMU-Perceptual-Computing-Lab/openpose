@@ -25,7 +25,7 @@ namespace op
             const auto peaksOffset = 3*(maxPeaks+1);
             const auto heatMapOffset = heatMapSize.area();
 
-            for (auto pairIndex = 0; pairIndex < numberBodyPartPairs; pairIndex++)
+            for (auto pairIndex = 0u; pairIndex < numberBodyPartPairs; pairIndex++)
             {
                 const auto bodyPartA = bodyPartPairs[2*pairIndex];
                 const auto bodyPartB = bodyPartPairs[2*pairIndex+1];
@@ -46,7 +46,7 @@ namespace op
                             {
                                 bool num = false;
                                 const auto indexB = bodyPartB;
-                                for (auto j = 0; j < subset.size(); j++)
+                                for (auto j = 0u; j < subset.size(); j++)
                                 {
                                     const auto off = (int)bodyPartB*peaksOffset + i*3 + 2;
                                     if (subset[j].first[indexB] == off)
@@ -87,7 +87,7 @@ namespace op
                             {
                                 bool num = false;
                                 const auto indexA = bodyPartA;
-                                for (auto j = 0; j < subset.size(); j++)
+                                for (auto j = 0u; j < subset.size(); j++)
                                 {
                                     const auto off = (int)bodyPartA*peaksOffset + i*3 + 2;
                                     if (subset[j].first[indexA] == off)
@@ -177,7 +177,7 @@ namespace op
                     std::vector<int> occurA(nA, 0);
                     std::vector<int> occurB(nB, 0);
                     auto counter = 0;
-                    for (auto row = 0; row < temp.size(); row++)
+                    for (auto row = 0u; row < temp.size(); row++)
                     {
                         const auto score = std::get<0>(temp[row]);
                         const auto x = std::get<1>(temp[row]);
@@ -236,13 +236,13 @@ namespace op
                         if (!connectionK.empty())
                         {
                             // A is already in the subset, find its connection B
-                            for (auto i = 0; i < connectionK.size(); i++)
+                            for (auto i = 0u; i < connectionK.size(); i++)
                             {
                                 const auto indexA = std::get<0>(connectionK[i]);
                                 const auto indexB = std::get<1>(connectionK[i]);
                                 const auto score = std::get<2>(connectionK[i]);
                                 auto num = 0;
-                                for (auto j = 0; j < subset.size(); j++)
+                                for (auto j = 0u; j < subset.size(); j++)
                                 {
                                     if (subset[j].first[bodyPartA] == indexA)
                                     {
@@ -275,7 +275,7 @@ namespace op
             auto numberPeople = 0;
             std::vector<int> validSubsetIndexes;
             validSubsetIndexes.reserve(fastMin((size_t)POSE_MAX_PEOPLE, subset.size()));
-            for (auto index = 0 ; index < subset.size() ; index++)
+            for (auto index = 0u ; index < subset.size() ; index++)
             {
                 const auto subsetCounter = subset[index].first[subsetCounterIndex];
                 const auto subsetScore = subset[index].second;
@@ -295,7 +295,7 @@ namespace op
                 poseKeypoints.reset({numberPeople, (int)numberBodyParts, 3});
             else
                 poseKeypoints.reset();
-            for (auto person = 0 ; person < validSubsetIndexes.size() ; person++)
+            for (auto person = 0u ; person < validSubsetIndexes.size() ; person++)
             {
                 const auto& subsetI = subset[validSubsetIndexes[person]].first;
                 for (auto bodyPart = 0u; bodyPart < numberBodyParts; bodyPart++)

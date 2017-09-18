@@ -105,5 +105,6 @@ OpenPose Library - Release Notes
 ## Current version (future OpenPose 1.0.3)
 1. Main improvements:
     1. Added how to use keypoint data in `examples/tutorial_wrapper/`.
+    2. Added flag for warnings of type `-Wsign-compare` and removed in code.
 2. Main bugs fixed:
     1. Windows version crashing with std::map copy.

@@ -169,7 +169,10 @@ ifeq ($(USE_OPENCV), 1)
 	endif
 
 endif
-WARNINGS := -Wall -Wno-sign-compare
+##############################
+# OpenPose extra code: commented
+##############################
+# WARNINGS := -Wall -Wno-sign-compare
 
 ##############################
 # Set build directories
