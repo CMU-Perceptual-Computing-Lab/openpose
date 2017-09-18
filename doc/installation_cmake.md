@@ -11,7 +11,8 @@ The CMake installation is experimental. It will eventually replace the standard 
     2. [OpenPose Configuration](#openpose-configuration)
     3. [OpenPose Building](#openpose-building)
     4. [Run OpenPose](#run-openpose)
-4. [Optional Settings](#optional-settings)
+5. [Reinstallation](#reinstallation)
+6. [Optional Settings](#optional-settings)
     1. [Custom Caffe](#custom-caffe)
     2. [Custom OpenCV](#custom-opencv)
     3. [MPI Model](#mpi-model)
@@ -35,7 +36,7 @@ The first step is to clone the OpenPose repository. It might be done with [GitHu
 git clone https://github.com/CMU-Perceptual-Computing-Lab/openpose
 ```
 
-OpenPose can be easily updated by clicking the `synchronization` button at the top-right part in GitHub Desktop in Windows, or by running `git pull origin master` in Ubuntu. After OpenPose has been updated, just run the `Reinstallation` section described below for your specific Operating System.
+OpenPose can be easily updated by clicking the `synchronization` button at the top-right part in GitHub Desktop in Windows, or by running `git pull origin master` in Ubuntu. After OpenPose has been updated, just run the [Reinstallation](#reinstallation) section described below for your specific Operating System.
 
 
 
@@ -102,6 +103,14 @@ make -j${no_cores}
 
 ### Run OpenPose
 Check OpenPose was properly installed by running it on the default images, video or webcam: [doc/quick_start.md#quick-start](./quick_start.md#quick-start).
+
+
+
+## Reinstallation
+In order to re-install OpenPose:
+1. Delete the `build/` folder.
+2. In CMake GUI, click on `File` --> `Delete Cache`.
+3. Follow the [Installation](#installation) steps again.
 
 
 
