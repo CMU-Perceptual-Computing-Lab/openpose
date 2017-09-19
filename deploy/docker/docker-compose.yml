@@ -1,0 +1,25 @@
+version: '2'
+services:
+
+  openpose:
+    build: cpu
+    environment:
+     - DISPLAY=$DISPLAY
+     - QT_X11_NOMITSHM=1
+    volumes:
+     - '/tmp/.X11-unix:/tmp/.X11-unix'
+    devices:
+     - /dev/video0
+
+  openposegpu:
+    build: gpu
+    #privileged: true
+    environment:
+     - DISPLAY=$DISPLAY
+     - QT_X11_NOMITSHM=1
+    volumes:
+     - '/tmp/.X11-unix:/tmp/.X11-unix'
+    devices:
+     - /dev/video0
+     - /dev/nvidia0
+

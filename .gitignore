@@ -51,12 +51,17 @@ MANIFEST-*
 
 # QtCreator files
 *.user
+CMakeLists.txt.user
+CMakeLists.txt.user.*
 
 # PyCharm files
 .idea
 
 # OSX dir files
 .DS_Store
+
+# Visual Studio Code
+.vscode
 
 ######################### Windows (Visual Studio) Files #########################
 *.db

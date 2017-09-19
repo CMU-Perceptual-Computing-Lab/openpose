@@ -1,0 +1,12 @@
+language: cpp
+
+sudo: required
+services:
+ - docker
+
+before_install:
+  - docker build -t openpose deploy/docker/gpu
+  - docker ps -a
+
+script:
+  - docker ps -a
