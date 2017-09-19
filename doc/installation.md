@@ -2,25 +2,32 @@ OpenPose - Installation and FAQ
 ====================================
 
 ## Contents
-1. [Requirements](#requirements)
-2. [Clone and Update the Repository](#clone-and-update-the-repository)
-3. [Ubuntu](#ubuntu)
-4. [Windows](#windows)
-5. [OpenPose 3D Demo](#openpose-3d-demo)
-6. [Custom Caffe](#custom-caffe)
-7. [FAQ](#faq)
+1. [Operating Systems](#operating-systems)
+2. [Requirements](#requirements)
+3. [Clone and Update the Repository](#clone-and-update-the-repository)
+4. [Ubuntu](#ubuntu)
+5. [Windows](#windows)
+6. [OpenPose 3D Demo](#openpose-3d-demo)
+7. [Custom Caffe](#custom-caffe)
+8. [Compiling without cuDNN](#compiling-without-cudnn)
+9. [FAQ](#faq)
+
+
+
+## Operating Systems
+- **Ubuntu** 14 and 16.
+- **Windows** 8 and 10.
+- **Nvidia Jetson TX2**, installation instructions in [doc/installation_jetson_tx2](./installation_jetson_tx2).
+- OpenPose has also been used on **Windows 7**, **Mac**, **CentOS**, and **Nvidia Jetson (TK1 and TX1)** embedded systems. However, we do not officially support them at the moment.
+
+
 
 
 
 ## Requirements
-- Operating systems:
-    - Ubuntu (tested on 14 and 16).
-    - Windows (tested on 10).
-    - Nvidia Jetson TX2, installation instructions in [doc/installation_jetson_tx2](./installation_jetson_tx2).
-    - We do not officially support any other OS, but the community has been able to install it on: CentOS, Nvidia Jetson, Windows 7, and Windows 8.
 - NVIDIA graphics card with at least 1.6 GB available (the `nvidia-smi` command checks the available GPU memory in Ubuntu).
 - At least 2 GB of free RAM memory.
-- Highly recommended: A CPU with at least 8 cores.
+- Highly recommended: cuDNN and a CPU with at least 8 cores.
 
 Note: These requirements assume the default configuration (i.e. `--net_resolution "656x368"` and `scale_number 1`). You might need more (with a greater net resolution and/or number of scales) or less resources (with smaller net resolution and/or using the MPI and MPI_4 models).
 
@@ -38,12 +45,14 @@ OpenPose can be easily updated by clicking the `synchronization` button at the t
 
 
 
+
+
 ## Ubuntu
 ### Installation - Script Compilation
 **Highly important**: This script only works with CUDA 8 and Ubuntu 14 or 16. Otherwise, check [Manual Compilation](#manual-compilation).
 1. Required: CUDA, cuDNN, OpenCV and Atlas must be already installed on your machine.
     1. [CUDA](https://developer.nvidia.com/cuda-downloads) must be installed. You should reboot your machine after installing CUDA.
-    2. [cuDNN](https://developer.nvidia.com/cudnn): Once you have downloaded it, just unzip it and copy (merge) the contents on the CUDA folder, e.g. `/usr/local/cuda-8.0/`. Note: We found OpenPose working ~10% faster with cuDNN 5.1 compared to cuDNN 6.
+    2. [cuDNN](https://developer.nvidia.com/cudnn): Once you have downloaded it, just unzip it and copy (merge) the contents on the CUDA folder, e.g. `/usr/local/cuda-8.0/`. Note: We found OpenPose working ~10% faster with cuDNN 5.1 compared to cuDNN 6. Otherwise, check [Compiling without cuDNN](#compiling-without-cudnn).
     3. OpenCV can be installed with `apt-get install libopencv-dev`. If you have compiled OpenCV 3 by your own, follow [Manual Compilation](#manual-compilation). After both Makefile.config files have been generated, edit them and uncomment the line `# OPENCV_VERSION := 3`. You might alternatively modify all `Makefile.config.UbuntuXX` files and then run the scripts in step 2.
     4. In addition, OpenCV 3 does not incorporate the `opencv_contrib` module by default. Assuming you have OpenCV 3 compiled with the contrib module and you want to use it, append `opencv_contrib` at the end of the line `LIBRARIES += opencv_core opencv_highgui opencv_imgproc` in the `Makefile` file.
     5. Atlas can be installed with `sudo apt-get install libatlas-base-dev`. Instead of Atlas, you can use OpenBLAS or Intel MKL by modifying the line `BLAS := atlas` in the same way as previosuly mentioned for the OpenCV version selection.
@@ -162,19 +171,11 @@ If you updated some software that our library or 3rdparty use, or you simply wan
 
 
 
-## Compiling without cuDNN
-The [cuDNN](https://developer.nvidia.com/cudnn) library is not mandatory, but required for full keypoint detection accuracy. In case your graphics card is not compatible with cuDNN, you can disable it by:
-
-- Ubuntu: Modifying the `Makefile.config` files in both the OpenPose and `3rdparty/caffe` folders.
-- Windows: Modifying the `Makefile.config` files in both the OpenPose and `3rdparty/caffe` folders.
-
-Then, you would have to reduce the `--net_resolution` flag to fit the model into the GPU memory. You can try values like "640x320", "320x240", "320x160", or "160x80" to see your GPU memory capabilities. After finding the maximum approximate resolution that your GPU can handle without throwing an out-of-memory error, adjust the `net_resolution` ratio to your image or video to be processed (see the `--net_resolution` explanation from [doc/demo_overview.md](./demo_overview.md)).
-
-
-
 
 ## OpenPose 3D Demo
 If you want to try our OpenPose 3-D reconstruction demo, see [doc/openpose_3d_reconstruction_demo.md](./openpose_3d_reconstruction_demo.md).
+
+
 
 
 
@@ -188,6 +189,18 @@ We only modified some Caffe compilation flags and minor details. You can use you
     1. Run `make all && make distribute` in your Caffe version.
     2. Open the OpenPose Makefile config file: `./Makefile.config.UbuntuX.example` (where X depends on your OS and CUDA version).
     3. Modify the Caffe folder directory variable (`CAFFE_DIR`) to your custom Caffe `distribute` folder location in the previous OpenPose Makefile config file.
+
+
+
+
+
+## Compiling without cuDNN
+The [cuDNN](https://developer.nvidia.com/cudnn) library is not mandatory, but required for full keypoint detection accuracy. In case your graphics card is not compatible with cuDNN, you can disable it by:
+
+- Ubuntu: Modifying the `Makefile.config` files in both the OpenPose and `3rdparty/caffe` folders, disabling `USE_CUDNN`.
+- Windows: Compiling Caffe by your own with without cuDNN support and removing the `USE_CUDNN` define from the OpenPose project solution in Visual Studio.
+
+Then, you would have to reduce the `--net_resolution` flag to fit the model into the GPU memory. You can try values like "640x320", "320x240", "320x160", or "160x80" to see your GPU memory capabilities. After finding the maximum approximate resolution that your GPU can handle without throwing an out-of-memory error, adjust the `net_resolution` ratio to your image or video to be processed (see the `--net_resolution` explanation from [doc/demo_overview.md](./demo_overview.md)).
 
 
 
