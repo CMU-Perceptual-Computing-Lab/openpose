@@ -19,8 +19,8 @@ namespace op
             const auto numberBodyPartPairs = bodyPartPairs.size() / 2;
 
             std::vector<std::pair<std::vector<int>, double>> subset;    // Vector<int> = Each body part + body parts counter; double = subsetScore
-            const auto subsetCounterIndex = numberBodyParts+1;
-            const auto subsetSize = numberBodyParts+2;
+            const auto subsetCounterIndex = numberBodyParts;
+            const auto subsetSize = numberBodyParts+1;
 
             const auto peaksOffset = 3*(maxPeaks+1);
             const auto heatMapOffset = heatMapSize.area();
@@ -38,7 +38,7 @@ namespace op
                 if (nA == 0 || nB == 0)
                 {
                     // Change w.r.t. other
-                    if (nB != 0)
+                    if (nA == 0) // nB == 0 or not
                     {
                         if (poseModel == PoseModel::COCO_18 || poseModel == PoseModel::BODY_18 || poseModel == PoseModel::BODY_22)
                         {
@@ -79,7 +79,7 @@ namespace op
                         else
                             error("Unknown model, cast to int = " + std::to_string((int)poseModel), __LINE__, __FUNCTION__, __FILE__);
                     }
-                    else if (nA != 0)
+                    else // if (nA != 0 && nB == 0)
                     {
                         if (poseModel == PoseModel::COCO_18 || poseModel == PoseModel::BODY_18 || poseModel == PoseModel::BODY_22)
                         {
@@ -121,7 +121,7 @@ namespace op
                             error("Unknown model, cast to int = " + std::to_string((int)poseModel), __LINE__, __FUNCTION__, __FILE__);
                     }
                 }
-                else
+                else // if (nA != 0 && nB != 0)
                 {
                     std::vector<std::tuple<double, int, int>> temp;
                     const auto numInter = 10;
@@ -159,7 +159,7 @@ namespace op
                                     }
                                 }
 
-                                // parts score + cpnnection score
+                                // parts score + connection score
                                 if (count > interMinAboveThreshold)
                                     temp.emplace_back(std::make_tuple(sum/count, i, j));
                             }
@@ -213,24 +213,24 @@ namespace op
                             subset.emplace_back(std::make_pair(rowVector, subsetScore));
                         }
                     }
-                    // // Add ears connections (in case person is looking to opposite direction to camera)
-                    // else if (poseModel == PoseModel::COCO_18 && (pairIndex==16 || pairIndex==17))
-                    // {
-                    //     for (const auto& connectionKI : connectionK)
-                    //     {
-                    //         const auto indexA = std::get<0>(connectionKI);
-                    //         const auto indexB = std::get<1>(connectionKI);
-                    //         for (auto& subsetJ : subset)
-                    //         {
-                    //             auto& subsetJFirst = subsetJ.first[bodyPartA]; 
-                    //             auto& subsetJFirstPlus1 = subsetJFirst[bodyPartB]; 
-                    //             if (subsetJFirst == indexA && subsetJFirstPlus1 == 0)
-                    //                 subsetJFirstPlus1 = indexB;
-                    //             else if (subsetJFirstPlus1 == indexB && subsetJFirst == 0)
-                    //                 subsetJFirst = indexA;
-                    //         }
-                    //     }
-                    // }
+                    // Add ears connections (in case person is looking to opposite direction to camera)
+                    else if (poseModel == PoseModel::COCO_18 && (pairIndex==17 || pairIndex==18))
+                    {
+                        for (const auto& connectionKI : connectionK)
+                        {
+                            const auto indexA = std::get<0>(connectionKI);
+                            const auto indexB = std::get<1>(connectionKI);
+                            for (auto& subsetJ : subset)
+                            {
+                                auto& subsetJFirst = subsetJ.first[bodyPartA];
+                                auto& subsetJFirstPlus1 = subsetJ.first[bodyPartB];
+                                if (subsetJFirst == indexA && subsetJFirstPlus1 == 0)
+                                    subsetJFirstPlus1 = indexB;
+                                else if (subsetJFirstPlus1 == indexB && subsetJFirst == 0)
+                                    subsetJFirst = indexA;
+                            }
+                        }
+                    }
                     else
                     {
                         if (!connectionK.empty())
