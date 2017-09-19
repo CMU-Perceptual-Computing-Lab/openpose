@@ -22,6 +22,9 @@ endif ()
 
 ### FLAGS
 
+# Build as shared library
+set(BUILD_SHARED_LIBS ON)
+
 # Turn on C++11
 add_definitions(-std=c++11)
 

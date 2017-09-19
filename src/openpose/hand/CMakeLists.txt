@@ -7,7 +7,7 @@ set(SOURCES
     renderHand.cpp
     renderHand.cu)
 
-cuda_add_library(hand SHARED ${SOURCES})
+cuda_add_library(hand ${SOURCES})
 if (BUILD_CAFFE)
   add_dependencies(hand caffe)
 endif (BUILD_CAFFE)

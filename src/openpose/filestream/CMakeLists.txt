@@ -9,4 +9,4 @@ set(SOURCES cocoJsonSaver.cpp
     keypointSaver.cpp
     videoSaver.cpp)
 
-add_library(filestream SHARED ${SOURCES})
+add_library(filestream ${SOURCES})

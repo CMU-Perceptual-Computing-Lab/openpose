@@ -1,4 +1,4 @@
-cuda_add_library(core SHARED
+cuda_add_library(core
     array.cpp
     cvMatToOpInput.cpp
     cvMatToOpOutput.cpp

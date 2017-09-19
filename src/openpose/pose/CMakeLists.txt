@@ -10,7 +10,7 @@ set(SOURCES
     renderPose.cpp
     renderPose.cu)
 
-cuda_add_library(pose SHARED ${SOURCES})
+cuda_add_library(pose ${SOURCES})
 if (BUILD_CAFFE)
   add_dependencies(pose caffe)
 endif (BUILD_CAFFE)

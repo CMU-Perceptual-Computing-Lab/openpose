@@ -6,5 +6,5 @@ set(SOURCES
     guiInfoAdder.cpp
 )
 
-add_library(gui SHARED ${SOURCES})
+add_library(gui ${SOURCES})
 target_link_libraries(gui pose ${OpenCV_LIBS})

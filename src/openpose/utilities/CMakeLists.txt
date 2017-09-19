@@ -10,6 +10,6 @@ set(SOURCES
 
 find_package(Boost COMPONENTS system filesystem REQUIRED)
   
-cuda_add_library(utilities SHARED ${SOURCES})
+cuda_add_library(utilities ${SOURCES})
 target_link_libraries(utilities producer filestream
     ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})

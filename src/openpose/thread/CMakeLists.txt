@@ -1,4 +1,4 @@
 set(SOURCES
     defineTemplates.cpp)
 
-add_library(thread SHARED ${SOURCES})
+add_library(thread ${SOURCES})
