@@ -53,8 +53,13 @@ SET(GPU_MODE CUDA CACHE STRING "Select the acceleration library or CPU otherwise
 SET_PROPERTY(CACHE GPU_MODE PROPERTY STRINGS CUDA)
 # SET_PROPERTY(CACHE GPU_MODE PROPERTY STRINGS CUDA OPENCL CPU_ONLY)
 
+# Suboptions for GPU architectures
+if (${GPU_MODE} MATCHES "CUDA")
+  SET(CUDA_ARCH_NAME Auto CACHE STRING "Select the GPU Architecture")
+  SET_PROPERTY(CACHE CUDA_ARCH_NAME PROPERTY STRINGS Auto All Fermi Kepler Maxwell Pascal)
+endif (${GPU_MODE} MATCHES "CUDA")
+
 # Suboptions for acceleration library
-include(CMakeDependentOption)
 if (${GPU_MODE} MATCHES "CUDA")
   option(USE_CUDNN "Build OpenPose with cuDNN library support" ON)
 endif (${GPU_MODE} MATCHES "CUDA")
