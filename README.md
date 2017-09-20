@@ -1,6 +1,8 @@
 OpenPose
 ====================================
 
+[![Build Status](https://travis-ci.org/CMU-Perceptual-Computing-Lab/openpose.svg?branch=master)](https://travis-ci.org/CMU-Perceptual-Computing-Lab/openpose)
+
 OpenPose is a **library for real-time multi-person keypoint detection and multi-threading written in C++** using OpenCV and Caffe.
 <p align="center">
     <img src="doc/media/pose_face_hands.gif", width="480">

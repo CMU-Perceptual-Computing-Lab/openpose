@@ -58,6 +58,12 @@ MANIFEST-*
 # OSX dir files
 .DS_Store
 
+# Vim files
+cscope.*
+tags
+.clang_complete
+.vim
+
 ######################### Windows (Visual Studio) Files #########################
 *.db
 *.deps
