@@ -37,42 +37,42 @@ set(OP_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp -Wpedantic -Wall -Wextra -Wfatal-e
 ### PROJECT OPTIONS
 
 # Select the DL Framework
-SET(DL_FRAMEWORK CAFFE CACHE STRING "Select Deep Learning Framework")
-SET_PROPERTY(CACHE DL_FRAMEWORK PROPERTY STRINGS CAFFE)
-# SET_PROPERTY(CACHE DL_FRAMEWORK PROPERTY STRINGS CAFFE CAFFE2 TENSORFLOW)
+set(DL_FRAMEWORK CAFFE CACHE STRING "Select Deep Learning Framework.")
+set_property(CACHE DL_FRAMEWORK PROPERTY STRINGS CAFFE)
+# set_property(CACHE DL_FRAMEWORK PROPERTY STRINGS CAFFE CAFFE2 TENSORFLOW)
 
 # Suboptions for Caffe DL Framework
 include(CMakeDependentOption)
 if (${DL_FRAMEWORK} MATCHES "CAFFE")
-  CMAKE_DEPENDENT_OPTION(BUILD_CAFFE "Build Caffe as part of OpenPose" ON
+  CMAKE_DEPENDENT_OPTION(BUILD_CAFFE "Build Caffe as part of OpenPose." ON
       "DL_FRAMEWORK" ON)
 endif (${DL_FRAMEWORK} MATCHES "CAFFE")
 
 # Set the acceleration library
-SET(GPU_MODE CUDA CACHE STRING "Select the acceleration library or CPU otherwise.")
-SET_PROPERTY(CACHE GPU_MODE PROPERTY STRINGS CUDA)
-# SET_PROPERTY(CACHE GPU_MODE PROPERTY STRINGS CUDA OPENCL CPU_ONLY)
+set(GPU_MODE CUDA CACHE STRING "Select the acceleration GPU library or CPU otherwise.")
+set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA)
+# set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA OPENCL CPU_ONLY)
 
 # Suboptions for GPU architectures
 if (${GPU_MODE} MATCHES "CUDA")
-  SET(CUDA_ARCH_NAME Auto CACHE STRING "Select the GPU Architecture")
-  SET_PROPERTY(CACHE CUDA_ARCH_NAME PROPERTY STRINGS Auto All Fermi Kepler Maxwell Pascal)
+  set(CUDA_ARCH Auto CACHE STRING "Select target NVIDIA GPU achitecture.")
+  set_property(CACHE CUDA_ARCH PROPERTY STRINGS Auto All Manual)
 endif (${GPU_MODE} MATCHES "CUDA")
 
 # Suboptions for acceleration library
 if (${GPU_MODE} MATCHES "CUDA")
-  option(USE_CUDNN "Build OpenPose with cuDNN library support" ON)
+  option(USE_CUDNN "Build OpenPose with cuDNN library support." ON)
 endif (${GPU_MODE} MATCHES "CUDA")
  
 # Download the models
-option(DOWNLOAD_COCO_MODEL "Download coco model" ON)
-option(DOWNLOAD_MPI_MODEL "Download mpi model" OFF)
-option(DOWNLOAD_HAND_MODEL "Download hand model" ON)  
-option(DOWNLOAD_FACE_MODEL "Download face model" ON)
+option(DOWNLOAD_COCO_MODEL "Download COCO model." ON)
+option(DOWNLOAD_MPI_MODEL "Download MPI model." OFF)
+option(DOWNLOAD_HAND_MODEL "Download hand model." ON)  
+option(DOWNLOAD_FACE_MODEL "Download face model." ON)
 
 # More options
-option(BUILD_EXAMPLES "Build OpenPose examples" ON)
-option(BUILD_DOCS "Build OpenPose documentation" OFF)
+option(BUILD_EXAMPLES "Build OpenPose examples." ON)
+option(BUILD_DOCS "Build OpenPose documentation." OFF)
 
 ### FIND REQUIRED PACKAGES
 

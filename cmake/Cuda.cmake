@@ -16,8 +16,8 @@ macro(op_list_unique)
   endforeach()
 endmacro()
 
-# This list will be used for CUDA_ARCH_NAME = All option
-set(Caffe_known_gpu_archs "20 21(20) 30 35 50 60 61")
+# This list will be used for CUDA_ARCH = All option
+set(Caffe_known_gpu_archs "20 21(20) 30 35 50 52 60 61")
 
 ################################################################################################
 # A function for automatic detection of GPUs installed  (if autodetection is enabled)
@@ -64,7 +64,7 @@ endfunction()
 
 
 ################################################################################################
-# Function for selecting GPU arch flags for nvcc based on CUDA_ARCH_NAME
+# Function for selecting GPU arch flags for nvcc based on CUDA_ARCH
 # Usage:
 #   op_select_nvcc_arch_flags(out_variable)
 function(op_select_nvcc_arch_flags out_variable)
@@ -76,39 +76,39 @@ function(op_select_nvcc_arch_flags out_variable)
     set(__archs_name_default "Auto")
   endif()
 
-  # set CUDA_ARCH_NAME strings (so it will be seen as dropbox in CMake-Gui)
-  # set(CUDA_ARCH_NAME ${__archs_name_default} CACHE STRING "Select target NVIDIA GPU achitecture.")
-  # set_property( CACHE CUDA_ARCH_NAME PROPERTY STRINGS "" ${__archs_names} )
-  # mark_as_advanced(CUDA_ARCH_NAME)
+  # set CUDA_ARCH strings (so it will be seen as dropbox in CMake-Gui)
+  # set(CUDA_ARCH ${__archs_name_default} CACHE STRING "Select target NVIDIA GPU achitecture.")
+  # set_property( CACHE CUDA_ARCH PROPERTY STRINGS "" ${__archs_names} )
+  # mark_as_advanced(CUDA_ARCH)
 
-  # verify CUDA_ARCH_NAME value
-  if(NOT ";${__archs_names};" MATCHES ";${CUDA_ARCH_NAME};")
+  # verify CUDA_ARCH value
+  if(NOT ";${__archs_names};" MATCHES ";${CUDA_ARCH};")
     string(REPLACE ";" ", " __archs_names "${__archs_names}")
     message(FATAL_ERROR "Only ${__archs_names} architeture names are supported.")
   endif()
 
-  if(${CUDA_ARCH_NAME} STREQUAL "Manual")
+  if(${CUDA_ARCH} STREQUAL "Manual")
     set(CUDA_ARCH_BIN ${Caffe_known_gpu_archs} CACHE STRING "Specify 'real' GPU architectures to build binaries for, BIN(PTX) format is supported")
     set(CUDA_ARCH_PTX "50"                     CACHE STRING "Specify 'virtual' PTX architectures to build PTX intermediate code for")
-    mark_as_advanced(CUDA_ARCH_BIN CUDA_ARCH_PTX)
+    # mark_as_advanced(CUDA_ARCH_BIN CUDA_ARCH_PTX)
   else()
     unset(CUDA_ARCH_BIN CACHE)
     unset(CUDA_ARCH_PTX CACHE)
   endif()
 
-  if(${CUDA_ARCH_NAME} STREQUAL "Fermi")
+  if(${CUDA_ARCH} STREQUAL "Fermi")
     set(__cuda_arch_bin "20 21(20)")
-  elseif(${CUDA_ARCH_NAME} STREQUAL "Kepler")
+  elseif(${CUDA_ARCH} STREQUAL "Kepler")
     set(__cuda_arch_bin "30 35")
-  elseif(${CUDA_ARCH_NAME} STREQUAL "Maxwell")
-    set(__cuda_arch_bin "50")
-  elseif(${CUDA_ARCH_NAME} STREQUAL "Pascal")
+  elseif(${CUDA_ARCH} STREQUAL "Maxwell")
+    set(__cuda_arch_bin "50 52")
+  elseif(${CUDA_ARCH} STREQUAL "Pascal")
     set(__cuda_arch_bin "60 61")
-  elseif(${CUDA_ARCH_NAME} STREQUAL "All")
+  elseif(${CUDA_ARCH} STREQUAL "All")
     set(__cuda_arch_bin ${Caffe_known_gpu_archs})
-  elseif(${CUDA_ARCH_NAME} STREQUAL "Auto")
+  elseif(${CUDA_ARCH} STREQUAL "Auto")
     op_detect_installed_gpus(__cuda_arch_bin)
-  else()  # (${CUDA_ARCH_NAME} STREQUAL "Manual")
+  else()  # (${CUDA_ARCH} STREQUAL "Manual")
     set(__cuda_arch_bin ${CUDA_ARCH_BIN})
   endif()
 
