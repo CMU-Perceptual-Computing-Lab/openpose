@@ -48,8 +48,13 @@ OpenPose can be easily updated by clicking the `synchronization` button at the t
 
 
 ## Ubuntu
+### Installation - CMake
+Recommended installation method. It is simpler and it offers many more customization settings. See [doc/installation_cmake.md](/installation_cmake.md). Note that it is a beta version, if it fails, please post in GitHub and use [Installation - Script Compilation](#installation---script-compilation) meanwhile.
+
+
+
 ### Installation - Script Compilation
-**Highly important**: This script only works with CUDA 8 and Ubuntu 14 or 16. Otherwise, check [Manual Compilation](#manual-compilation).
+**Highly important**: This script only works with CUDA 8 and Ubuntu 14 or 16. Otherwise, see [doc/installation_cmake.md](/installation_cmake.md) or [Installation - Manual Compilation](#installation---manual-compilation).
 1. Required: CUDA, cuDNN, OpenCV and Atlas must be already installed on your machine.
     1. [CUDA](https://developer.nvidia.com/cuda-downloads) must be installed. You should reboot your machine after installing CUDA.
     2. [cuDNN](https://developer.nvidia.com/cudnn): Once you have downloaded it, just unzip it and copy (merge) the contents on the CUDA folder, e.g. `/usr/local/cuda-8.0/`. Note: We found OpenPose working ~10% faster with cuDNN 5.1 compared to cuDNN 6. Otherwise, check [Compiling without cuDNN](#compiling-without-cudnn).

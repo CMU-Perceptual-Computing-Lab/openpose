@@ -17,11 +17,11 @@ clear && clear
 
 # Parameters
 IMAGE_FOLDER=/home/gines/devel/images/val2014/
-$JSON_FOLDER=../evaluation/coco/results/openpose/
+JSON_FOLDER=../evaluation/coco/results/openpose/
 OP_BIN=./build/examples/openpose/openpose.bin
 
     # 1 scale
-$OP_BIN --image_dir $IMAGE_FOLDER --write_coco_json ${JSON_FOLDER}1_test.json --no_display --render_pose 0 --frame_last 3558
+$OP_BIN --image_dir $IMAGE_FOLDER --write_coco_json ${JSON_FOLDER}1.json --no_display --render_pose 0 --frame_last 3558
 
 #     # 3 scales
 # $OP_BIN --image_dir $IMAGE_FOLDER --write_coco_json ${JSON_FOLDER}1_3.json --no_display --render_pose 0 --scale_number 3 --scale_gap 0.25 --frame_last 3558
@@ -30,4 +30,4 @@ $OP_BIN --image_dir $IMAGE_FOLDER --write_coco_json ${JSON_FOLDER}1_test.json --
 # $OP_BIN --num_gpu 1 --image_dir $IMAGE_FOLDER --write_coco_json ${JSON_FOLDER}1_4.json --no_display --render_pose 0 --num_gpu 1 --scale_number 4 --scale_gap 0.25 --net_resolution "1312x736" --frame_last 3558
 
 # Debugging - Rendered frames saved
-#  $OP_BIN --image_dir $IMAGE_FOLDER --write_images ${JSON_FOLDER}frameOutput --no_display
+# $OP_BIN --image_dir $IMAGE_FOLDER --write_images ${JSON_FOLDER}frameOutput --no_display
