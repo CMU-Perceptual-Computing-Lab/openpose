@@ -35,7 +35,7 @@ function executeShInItsFolder {
 
 
 
-executeShInItsFolder "install_caffe_JetsonTX2_JetPack3.1.sh" "./3rdparty/caffe" "../.."
+executeShInItsFolder "install_caffe_JetsonTX2_JetPack3.1.sh" "../3rdparty/caffe" "../.."
 exitIfError
 
 
