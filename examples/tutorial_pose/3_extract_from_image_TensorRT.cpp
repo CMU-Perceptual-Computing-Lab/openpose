@@ -1,4 +1,4 @@
-// ------------------------- OpenPose Library Tutorial - Pose - Example 1 - Extract from Image -------------------------
+// ------------------------- OpenPose Library Tutorial - Pose - Example 3 - Extract from Image with TensorRT -------------------------
 // This first example shows the user how to:
     // 1. Load an image (`filestream` module)
     // 2. Extract the pose of that image (`pose` module)
@@ -52,12 +52,12 @@ DEFINE_double(render_threshold,         0.05,           "Only estimated keypoint
 DEFINE_double(alpha_pose,               0.6,            "Blending factor (range 0-1) for the body part rendering. 1 will show it completely, 0 will"
                                                         " hide it. Only valid for GPU rendering.");
 
-int openPoseTutorialPose1()
+int openPoseTutorialPose3()
 {
     op::log("Starting pose estimation.", op::Priority::High);
     const auto timerBegin = std::chrono::high_resolution_clock::now();
   
-    op::log("OpenPose Library Tutorial - Example 1.", op::Priority::High);
+    op::log("OpenPose Library Tutorial - Pose Example 3.", op::Priority::High);
     // ------------------------- INITIALIZATION -------------------------
     // Step 1 - Set logging level
         // - 0 will output all the logging messages
@@ -114,6 +114,7 @@ int openPoseTutorialPose1()
     poseRenderer.renderPose(outputArray, poseKeypoints);
     // Step 5 - OpenPose output format to cv::Mat
     auto outputImage = opOutputToCvMat.formatToCvMat(outputArray);
+    const auto now = std::chrono::high_resolution_clock::now();
 
     // ------------------------- SHOWING RESULT AND CLOSING -------------------------
     // Step 1 - Show results
@@ -121,9 +122,9 @@ int openPoseTutorialPose1()
     // Step 2 - Logging information message
     op::log("Example 1 successfully finished.", op::Priority::High);
   
-    const auto now = std::chrono::high_resolution_clock::now();
     const auto totalTimeSec = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(now-timerBegin).count() * 1e-9;
     const auto message = "Pose estimation successfully finished. Total time: " + std::to_string(totalTimeSec) + " seconds.";
+    op::log(message, op::Priority::High);
   
     // Return successful message
     return 0;
@@ -132,11 +133,11 @@ int openPoseTutorialPose1()
 int main(int argc, char *argv[])
 {
     // Initializing google logging (Caffe uses it for logging)
-    google::InitGoogleLogging("openPoseTutorialPose1");
+    google::InitGoogleLogging("openPoseTutorialPose3");
 
     // Parsing command line flags
     gflags::ParseCommandLineFlags(&argc, &argv, true);
 
     // Running openPoseTutorialPose1
-    return openPoseTutorialPose1();
+    return openPoseTutorialPose3();
 }
