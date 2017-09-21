@@ -100,7 +100,7 @@ int openPoseTutorialPose3()
     // Step 3 - Initialize all required classes
     op::CvMatToOpInput cvMatToOpInput{netInputSize, FLAGS_scale_number, (float)FLAGS_scale_gap};
     op::CvMatToOpOutput cvMatToOpOutput{outputSize};
-    op::PoseExtractorCaffe poseExtractorCaffe{netInputSize, netOutputSize, outputSize, FLAGS_scale_number, poseModel,
+    op::PoseExtractorTensorRT poseExtractorTensorRT{netInputSize, netOutputSize, outputSize, FLAGS_scale_number, poseModel,
                                               FLAGS_model_folder, FLAGS_num_gpu_start};
     op::PoseRenderer poseRenderer{netOutputSize, outputSize, poseModel, nullptr, (float)FLAGS_render_threshold,
                                   !FLAGS_disable_blending, (float)FLAGS_alpha_pose};
@@ -108,7 +108,7 @@ int openPoseTutorialPose3()
     const op::Point<int> windowedSize = outputSize;
     op::FrameDisplayer frameDisplayer{windowedSize, "OpenPose Tutorial - Example 1"};
     // Step 4 - Initialize resources on desired thread (in this case single thread, i.e. we init resources here)
-    poseExtractorCaffe.initializationOnThread();
+    poseExtractorTensorRT.initializationOnThread();
     poseRenderer.initializationOnThread();
     
     timeNow("Initialization");
@@ -128,8 +128,8 @@ int openPoseTutorialPose3()
     std::tie(scaleInputToOutput, outputArray) = cvMatToOpOutput.format(inputImage);
     timeNow("Step 2");
     // Step 3 - Estimate poseKeypoints
-    poseExtractorCaffe.forwardPass(netInputArray, {inputImage.cols, inputImage.rows}, scaleRatios);
-    const auto poseKeypoints = poseExtractorCaffe.getPoseKeypoints();
+    poseExtractorTensorRT.forwardPass(netInputArray, {inputImage.cols, inputImage.rows}, scaleRatios);
+    const auto poseKeypoints = poseExtractorTensorRT.getPoseKeypoints();
     timeNow("Step 3");
     // Step 4 - Render poseKeypoints
     poseRenderer.renderPose(outputArray, poseKeypoints);

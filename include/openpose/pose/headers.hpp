@@ -7,6 +7,7 @@
 #include <openpose/pose/enumClasses.hpp>
 #include <openpose/pose/poseExtractor.hpp>
 #include <openpose/pose/poseExtractorCaffe.hpp>
+#include <openpose/pose/poseExtractorTensorRT.hpp>
 #include <openpose/pose/poseRenderer.hpp>
 #include <openpose/pose/poseParameters.hpp>
 #include <openpose/pose/renderPose.hpp>
