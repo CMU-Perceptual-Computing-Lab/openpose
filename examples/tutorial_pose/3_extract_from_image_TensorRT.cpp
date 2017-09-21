@@ -52,20 +52,26 @@ DEFINE_double(render_threshold,         0.05,           "Only estimated keypoint
 DEFINE_double(alpha_pose,               0.6,            "Blending factor (range 0-1) for the body part rendering. 1 will show it completely, 0 will"
                                                         " hide it. Only valid for GPU rendering.");
 
+typedef std::vector<std::pair<std::string, std::chrono::high_resolution_clock::time_point>> OpTimings;
 
-static std::vector<std::pair<std::string, std::chrono::high_resolution_clock::time_point>> timings;
+static OpTimings timings;
 
-static void time_now(const std::string& label){
+static void timeNow(const std::string& label){
     const auto now = std::chrono::high_resolution_clock::now();
     const auto timing = std::make_pair(label, now);
     timings.push_back(timing);
 } 
 
+static std::string timeDiffToString(const std::chrono::high_resolution_clock::time_point& t1,
+                                const std::chrono::high_resolution_clock::time_point& t2 ) {
+    return std::to_string((double)std::chrono::duration_cast<std::chrono::duration<double>>(t1 - t2).count());
+}
+
 int openPoseTutorialPose3()
 {
     op::log("Starting pose estimation.", op::Priority::High);
     
-    time_now("Start");
+    timeNow("Start");
  
     op::log("OpenPose Library Tutorial - Pose Example 3.", op::Priority::High);
     // ------------------------- INITIALIZATION -------------------------
@@ -104,13 +110,15 @@ int openPoseTutorialPose3()
     // Step 4 - Initialize resources on desired thread (in this case single thread, i.e. we init resources here)
     poseExtractorCaffe.initializationOnThread();
     poseRenderer.initializationOnThread();
+    
+    timeNow("Initialization");
 
     // ------------------------- POSE ESTIMATION AND RENDERING -------------------------
     // Step 1 - Read and load image, error if empty (possibly wrong path)
     cv::Mat inputImage = op::loadImage(FLAGS_image_path, CV_LOAD_IMAGE_COLOR); // Alternative: cv::imread(FLAGS_image_path, CV_LOAD_IMAGE_COLOR);
     if(inputImage.empty())
         op::error("Could not open or find the image: " + FLAGS_image_path, __LINE__, __FUNCTION__, __FILE__);
-    time_now("Step 1");
+    timeNow("Step 1");
     // Step 2 - Format input image to OpenPose input and output formats
     op::Array<float> netInputArray;
     std::vector<float> scaleRatios;
@@ -118,17 +126,17 @@ int openPoseTutorialPose3()
     double scaleInputToOutput;
     op::Array<float> outputArray;
     std::tie(scaleInputToOutput, outputArray) = cvMatToOpOutput.format(inputImage);
-    time_now("Step 2");
+    timeNow("Step 2");
     // Step 3 - Estimate poseKeypoints
     poseExtractorCaffe.forwardPass(netInputArray, {inputImage.cols, inputImage.rows}, scaleRatios);
     const auto poseKeypoints = poseExtractorCaffe.getPoseKeypoints();
-    time_now("Step 3");
+    timeNow("Step 3");
     // Step 4 - Render poseKeypoints
     poseRenderer.renderPose(outputArray, poseKeypoints);
-    time_now("Step 4");
+    timeNow("Step 4");
     // Step 5 - OpenPose output format to cv::Mat
     auto outputImage = opOutputToCvMat.formatToCvMat(outputArray);
-    time_now("Step 5");
+    timeNow("Step 5");
 
     // ------------------------- SHOWING RESULT AND CLOSING -------------------------
     // Step 1 - Show results
@@ -136,12 +144,12 @@ int openPoseTutorialPose3()
     // Step 2 - Logging information message
     op::log("Example 1 successfully finished.", op::Priority::High);
   
-    const auto totalTimeSec = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(timings.back().second-timings.front().second).count() * 1e-9;
-    const auto message = "Pose estimation successfully finished. Total time: " + std::to_string(totalTimeSec) + " seconds.";
+    const auto totalTimeSec = timeDiffToString(timings.back().second, timings.front().second);
+    const auto message = "Pose estimation successfully finished. Total time: " + totalTimeSec + " seconds.";
     op::log(message, op::Priority::High);
     
-    for(const auto timing : timings) {
-        const auto log_time = timing.first + " - " + std::to_string((double)std::chrono::duration_cast<std::chrono::duration<double>>(timing.second - timings.front().second).count());
+    for(OpTimings::iterator timing = timings.begin()+1; timing != timings.end(); ++timing) {
+        const auto log_time = (*timing).first + " - " + timeDiffToString((*timing).second, (*(timing-1)).second);
         op::log(log_time, op::Priority::High);
     }
     
