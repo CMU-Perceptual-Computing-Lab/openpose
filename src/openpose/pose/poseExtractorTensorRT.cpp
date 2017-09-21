@@ -5,20 +5,20 @@
 #include <openpose/utilities/cuda.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/openCv.hpp>
-#include <openpose/pose/poseExtractorCaffe.hpp>
+#include <openpose/pose/poseExtractorTensorRT.hpp>
 
 namespace op
 {
-    PoseExtractorCaffe::PoseExtractorCaffe(const Point<int>& netInputSize, const Point<int>& netOutputSize, const Point<int>& outputSize, const int scaleNumber,
+    PoseExtractorTensorRT::PoseExtractorTensorRT(const Point<int>& netInputSize, const Point<int>& netOutputSize, const Point<int>& outputSize, const int scaleNumber,
                                            const PoseModel poseModel, const std::string& modelFolder, const int gpuId, const std::vector<HeatMapType>& heatMapTypes,
                                            const ScaleMode heatMapScale) :
         PoseExtractor{netOutputSize, outputSize, poseModel, heatMapTypes, heatMapScale},
         mResizeScale{mNetOutputSize.x / (float)netInputSize.x},
         spNet{std::make_shared<NetCaffe>(std::array<int,4>{scaleNumber, 3, (int)netInputSize.y, (int)netInputSize.x},
                                          modelFolder + POSE_PROTOTXT[(int)poseModel], modelFolder + POSE_TRAINED_MODEL[(int)poseModel], gpuId)},
-        spResizeAndMergeCaffe{std::make_shared<ResizeAndMergeCaffe<float>>()},
-        spNmsCaffe{std::make_shared<NmsCaffe<float>>()},
-        spBodyPartConnectorCaffe{std::make_shared<BodyPartConnectorCaffe<float>>()}
+        spResizeAndMergeTensorRT{std::make_shared<ResizeAndMergeCaffe<float>>()},
+        spNmsTensorRT{std::make_shared<NmsCaffe<float>>()},
+        spBodyPartConnectorTensorRT{std::make_shared<BodyPartConnectorCaffe<float>>()}
     {
         try
         {
@@ -33,35 +33,35 @@ namespace op
         }
     }
 
-    PoseExtractorCaffe::~PoseExtractorCaffe()
+    PoseExtractorTensorRT::~PoseExtractorTensorRT()
     {
     }
 
-    void PoseExtractorCaffe::netInitializationOnThread()
+    void PoseExtractorTensorRT::netInitializationOnThread()
     {
         try
         {
             log("Starting initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
-            // Caffe net
+            // TensorRT net
             spNet->initializationOnThread();
-            spCaffeNetOutputBlob = ((NetCaffe*)spNet.get())->getOutputBlob();
+            spTensorRTNetOutputBlob = ((NetCaffe*)spNet.get())->getOutputBlob();
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
 
             // HeatMaps extractor blob and layer
             spHeatMapsBlob = {std::make_shared<caffe::Blob<float>>(1,1,1,1)};
-            spResizeAndMergeCaffe->Reshape({spCaffeNetOutputBlob.get()}, {spHeatMapsBlob.get()}, mResizeScale * POSE_CCN_DECREASE_FACTOR[(int)mPoseModel]);
+            spResizeAndMergeTensorRT->Reshape({spTensorRTNetOutputBlob.get()}, {spHeatMapsBlob.get()}, mResizeScale * POSE_CCN_DECREASE_FACTOR[(int)mPoseModel]);
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
 
             // Pose extractor blob and layer
             spPeaksBlob = {std::make_shared<caffe::Blob<float>>(1,1,1,1)};
-            spNmsCaffe->Reshape({spHeatMapsBlob.get()}, {spPeaksBlob.get()}, POSE_MAX_PEAKS[(int)mPoseModel]);
+            spNmsTensorRT->Reshape({spHeatMapsBlob.get()}, {spPeaksBlob.get()}, POSE_MAX_PEAKS[(int)mPoseModel]);
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
 
             // Pose extractor blob and layer
             spPoseBlob = {std::make_shared<caffe::Blob<float>>(1,1,1,1)};
-            spBodyPartConnectorCaffe->setPoseModel(mPoseModel);
-            spBodyPartConnectorCaffe->Reshape({spHeatMapsBlob.get(), spPeaksBlob.get()}, {spPoseBlob.get()});
+            spBodyPartConnectorTensorRT->setPoseModel(mPoseModel);
+            spBodyPartConnectorTensorRT->Reshape({spHeatMapsBlob.get(), spPeaksBlob.get()}, {spPoseBlob.get()});
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
 
             log("Finished initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
@@ -72,7 +72,7 @@ namespace op
         }
     }
 
-    void PoseExtractorCaffe::forwardPass(const Array<float>& inputNetData, const Point<int>& inputDataSize, const std::vector<float>& scaleRatios)
+    void PoseExtractorTensorRT::forwardPass(const Array<float>& inputNetData, const Point<int>& inputDataSize, const std::vector<float>& scaleRatios)
     {
         try
         {
@@ -80,25 +80,25 @@ namespace op
             if (inputNetData.empty())
                 error("Empty inputNetData.", __LINE__, __FUNCTION__, __FILE__);
 
-            // 1. Caffe deep network
+            // 1. TensorRT deep network
             spNet->forwardPass(inputNetData.getConstPtr());                                                     // ~79.3836ms
 
             // 2. Resize heat maps + merge different scales
-            spResizeAndMergeCaffe->setScaleRatios(scaleRatios);
+            spResizeAndMergeTensorRT->setScaleRatios(scaleRatios);
             #ifndef CPU_ONLY
-                spResizeAndMergeCaffe->Forward_gpu({spCaffeNetOutputBlob.get()}, {spHeatMapsBlob.get()});       // ~5ms
+                spResizeAndMergeTensorRT->Forward_gpu({spTensorRTNetOutputBlob.get()}, {spHeatMapsBlob.get()});       // ~5ms
                 cudaCheck(__LINE__, __FUNCTION__, __FILE__);
             #else
-                error("ResizeAndMergeCaffe CPU version not implemented yet.", __LINE__, __FUNCTION__, __FILE__);
+                error("ResizeAndMergeTensorRT CPU version not implemented yet.", __LINE__, __FUNCTION__, __FILE__);
             #endif
 
             // 3. Get peaks by Non-Maximum Suppression
-            spNmsCaffe->setThreshold((float)get(PoseProperty::NMSThreshold));
+            spNmsTensorRT->setThreshold((float)get(PoseProperty::NMSThreshold));
             #ifndef CPU_ONLY
-                spNmsCaffe->Forward_gpu({spHeatMapsBlob.get()}, {spPeaksBlob.get()});                           // ~2ms
+                spNmsTensorRT->Forward_gpu({spHeatMapsBlob.get()}, {spPeaksBlob.get()});                           // ~2ms
                 cudaCheck(__LINE__, __FUNCTION__, __FILE__);
             #else
-                error("NmsCaffe CPU version not implemented yet.", __LINE__, __FUNCTION__, __FILE__);
+                error("NmsTensorRT CPU version not implemented yet.", __LINE__, __FUNCTION__, __FILE__);
             #endif
 
             // Get scale net to output
@@ -107,15 +107,15 @@ namespace op
             mScaleNetToOutput = {(float)resizeGetScaleFactor(netSize, mOutputSize)};
 
             // 4. Connecting body parts
-            spBodyPartConnectorCaffe->setScaleNetToOutput(mScaleNetToOutput);
-            spBodyPartConnectorCaffe->setInterMinAboveThreshold((int)get(PoseProperty::ConnectInterMinAboveThreshold));
-            spBodyPartConnectorCaffe->setInterThreshold((float)get(PoseProperty::ConnectInterThreshold));
-            spBodyPartConnectorCaffe->setMinSubsetCnt((int)get(PoseProperty::ConnectMinSubsetCnt));
-            spBodyPartConnectorCaffe->setMinSubsetScore((float)get(PoseProperty::ConnectMinSubsetScore));
+            spBodyPartConnectorTensorRT->setScaleNetToOutput(mScaleNetToOutput);
+            spBodyPartConnectorTensorRT->setInterMinAboveThreshold((int)get(PoseProperty::ConnectInterMinAboveThreshold));
+            spBodyPartConnectorTensorRT->setInterThreshold((float)get(PoseProperty::ConnectInterThreshold));
+            spBodyPartConnectorTensorRT->setMinSubsetCnt((int)get(PoseProperty::ConnectMinSubsetCnt));
+            spBodyPartConnectorTensorRT->setMinSubsetScore((float)get(PoseProperty::ConnectMinSubsetScore));
 
             // GPU version not implemented yet
-            spBodyPartConnectorCaffe->Forward_cpu({spHeatMapsBlob.get(), spPeaksBlob.get()}, mPoseKeypoints);
-            // spBodyPartConnectorCaffe->Forward_gpu({spHeatMapsBlob.get(), spPeaksBlob.get()}, {spPoseBlob.get()}, mPoseKeypoints);
+            spBodyPartConnectorTensorRT->Forward_cpu({spHeatMapsBlob.get(), spPeaksBlob.get()}, mPoseKeypoints);
+            // spBodyPartConnectorTensorRT->Forward_gpu({spHeatMapsBlob.get(), spPeaksBlob.get()}, {spPoseBlob.get()}, mPoseKeypoints);
         }
         catch (const std::exception& e)
         {
@@ -123,7 +123,7 @@ namespace op
         }
     }
 
-    const float* PoseExtractorCaffe::getHeatMapCpuConstPtr() const
+    const float* PoseExtractorTensorRT::getHeatMapCpuConstPtr() const
     {
         try
         {
@@ -137,7 +137,7 @@ namespace op
         }
     }
 
-    const float* PoseExtractorCaffe::getHeatMapGpuConstPtr() const
+    const float* PoseExtractorTensorRT::getHeatMapGpuConstPtr() const
     {
         try
         {
@@ -151,7 +151,7 @@ namespace op
         }
     }
 
-    const float* PoseExtractorCaffe::getPoseGpuConstPtr() const
+    const float* PoseExtractorTensorRT::getPoseGpuConstPtr() const
     {
         try
         {
