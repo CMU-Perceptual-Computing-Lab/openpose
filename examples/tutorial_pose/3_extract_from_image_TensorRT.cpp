@@ -52,11 +52,21 @@ DEFINE_double(render_threshold,         0.05,           "Only estimated keypoint
 DEFINE_double(alpha_pose,               0.6,            "Blending factor (range 0-1) for the body part rendering. 1 will show it completely, 0 will"
                                                         " hide it. Only valid for GPU rendering.");
 
+
+static std::vector<std::pair<std::string, std::chrono::high_resolution_clock::time_point>> timings;
+
+static void time_now(const std::string& label){
+    const auto now = std::chrono::high_resolution_clock::now();
+    const auto timing = std::make_pair(label, now);
+    timings.push_back(timing);
+} 
+
 int openPoseTutorialPose3()
 {
     op::log("Starting pose estimation.", op::Priority::High);
-    const auto timerBegin = std::chrono::high_resolution_clock::now();
-  
+    
+    time_now("Start");
+ 
     op::log("OpenPose Library Tutorial - Pose Example 3.", op::Priority::High);
     // ------------------------- INITIALIZATION -------------------------
     // Step 1 - Set logging level
@@ -100,6 +110,7 @@ int openPoseTutorialPose3()
     cv::Mat inputImage = op::loadImage(FLAGS_image_path, CV_LOAD_IMAGE_COLOR); // Alternative: cv::imread(FLAGS_image_path, CV_LOAD_IMAGE_COLOR);
     if(inputImage.empty())
         op::error("Could not open or find the image: " + FLAGS_image_path, __LINE__, __FUNCTION__, __FILE__);
+    time_now("Step 1");
     // Step 2 - Format input image to OpenPose input and output formats
     op::Array<float> netInputArray;
     std::vector<float> scaleRatios;
@@ -107,14 +118,17 @@ int openPoseTutorialPose3()
     double scaleInputToOutput;
     op::Array<float> outputArray;
     std::tie(scaleInputToOutput, outputArray) = cvMatToOpOutput.format(inputImage);
+    time_now("Step 2");
     // Step 3 - Estimate poseKeypoints
     poseExtractorCaffe.forwardPass(netInputArray, {inputImage.cols, inputImage.rows}, scaleRatios);
     const auto poseKeypoints = poseExtractorCaffe.getPoseKeypoints();
+    time_now("Step 3");
     // Step 4 - Render poseKeypoints
     poseRenderer.renderPose(outputArray, poseKeypoints);
+    time_now("Step 4");
     // Step 5 - OpenPose output format to cv::Mat
     auto outputImage = opOutputToCvMat.formatToCvMat(outputArray);
-    const auto now = std::chrono::high_resolution_clock::now();
+    time_now("Step 5");
 
     // ------------------------- SHOWING RESULT AND CLOSING -------------------------
     // Step 1 - Show results
@@ -122,9 +136,15 @@ int openPoseTutorialPose3()
     // Step 2 - Logging information message
     op::log("Example 1 successfully finished.", op::Priority::High);
   
-    const auto totalTimeSec = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(now-timerBegin).count() * 1e-9;
+    const auto totalTimeSec = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(timings.back().second-timings.front().second).count() * 1e-9;
     const auto message = "Pose estimation successfully finished. Total time: " + std::to_string(totalTimeSec) + " seconds.";
     op::log(message, op::Priority::High);
+    
+    for(const auto timing : timings) {
+        const auto log_time = timing.first + " - " + std::to_string((double)std::chrono::duration_cast<std::chrono::duration<double>>(timing.second - timings.front().second).count());
+        op::log(log_time, op::Priority::High);
+    }
+    
   
     // Return successful message
     return 0;
