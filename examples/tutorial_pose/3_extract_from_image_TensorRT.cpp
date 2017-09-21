@@ -54,6 +54,9 @@ DEFINE_double(alpha_pose,               0.6,            "Blending factor (range 
 
 int openPoseTutorialPose1()
 {
+    op::log("Starting pose estimation.", op::Priority::High);
+    const auto timerBegin = std::chrono::high_resolution_clock::now();
+  
     op::log("OpenPose Library Tutorial - Example 1.", op::Priority::High);
     // ------------------------- INITIALIZATION -------------------------
     // Step 1 - Set logging level
@@ -117,6 +120,11 @@ int openPoseTutorialPose1()
     frameDisplayer.displayFrame(outputImage, 0); // Alternative: cv::imshow(outputImage) + cv::waitKey(0)
     // Step 2 - Logging information message
     op::log("Example 1 successfully finished.", op::Priority::High);
+  
+    const auto now = std::chrono::high_resolution_clock::now();
+    const auto totalTimeSec = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(now-timerBegin).count() * 1e-9;
+    const auto message = "Pose estimation successfully finished. Total time: " + std::to_string(totalTimeSec) + " seconds.";
+  
     // Return successful message
     return 0;
 }
