@@ -64,7 +64,7 @@ static void timeNow(const std::string& label){
 
 static std::string timeDiffToString(const std::chrono::high_resolution_clock::time_point& t1,
                                 const std::chrono::high_resolution_clock::time_point& t2 ) {
-    return std::to_string((double)std::chrono::duration_cast<std::chrono::duration<double>>(t1 - t2).count());
+    return std::to_string((double)std::chrono::duration_cast<std::chrono::duration<double>>(t1 - t2).count() * 1e3) + " ms";
 }
 
 int openPoseTutorialPose3()
