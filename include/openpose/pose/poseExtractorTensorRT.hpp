@@ -43,6 +43,18 @@ namespace op
         std::shared_ptr<caffe::Blob<float>> spHeatMapsBlob;
         std::shared_ptr<caffe::Blob<float>> spPeaksBlob;
         std::shared_ptr<caffe::Blob<float>> spPoseBlob;
+      
+        // TensorRT stuff
+        const Point<int> mNetInputSize;
+        const Point<int> mNetOutputSize;
+        const Point<int> mOutputSize;
+        const int mScaleNumber;
+        const PoseModel mPoseModel;
+        const std::string mModelFolder;
+        const int mGpuId;
+        const std::vector<HeatMapType> mHeatMapTypes;
+        const ScaleMode mHeatMapScale;
+        ICudaEngine* cudaEngine;
 
         DELETE_COPY(PoseExtractorTensorRT);
     };
