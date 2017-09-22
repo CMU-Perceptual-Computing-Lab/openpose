@@ -28,7 +28,7 @@ namespace op
          * @param rangeScales The range between the smaller and bigger scale.
          */
         explicit HandExtractor(const Point<int>& netInputSize, const Point<int>& netOutputSize, const std::string& modelFolder, const int gpuId,
-                               const unsigned short numberScales = 1, const float rangeScales = 0.4f, const ScaleMode heatMapScale = ScaleMode::ZeroToOne);
+                               const unsigned short numberScales = 1, const float rangeScales = 0.4f, const bool downloadHeatmaps = false, const ScaleMode heatMapScale = ScaleMode::ZeroToOne);
 
         /**
          * This function must be call before using any other function. It must also be called inside the thread in which the functions are going
@@ -64,7 +64,7 @@ namespace op
 
         const float* getHeatMapGpuConstPtr() const;
 
-        Array<float> getHeatMaps() const;
+        Array<float> getHeatMaps(unsigned int personIndex, unsigned int handIndex) const;
         // XXX PADELER
 
     private:
@@ -72,11 +72,16 @@ namespace op
         const std::pair<unsigned short, float> mMultiScaleNumberAndRange;
         const Point<int> mNetOutputSize;
 	const ScaleMode mHeatMapScaleMode;
+	const bool mDownloadHeatmaps;
         std::shared_ptr<Net> spNet;
         std::shared_ptr<ResizeAndMergeCaffe<float>> spResizeAndMergeCaffe;
         std::shared_ptr<MaximumCaffe<float>> spMaximumCaffe;
         Array<float> mHandImageCrop;
         std::array<Array<float>, 2> mHandKeypoints;
+	
+	// store hand heatmaps during hand detection (forwardPass) for later retrieval
+	std::vector<std::array<Array<float>, 2> > mHandHeatmaps;
+	
         // Init with thread
         boost::shared_ptr<caffe::Blob<float>> spCaffeNetOutputBlob;
         std::shared_ptr<caffe::Blob<float>> spHeatMapsBlob;
@@ -86,6 +91,11 @@ namespace op
         void checkThread() const;
 
         void detectHandKeypoints(Array<float>& handCurrent, const float scaleInputToOutput, const int person, const cv::Mat& affineMatrix);
+	
+	// XXX PADELER
+	Array<float> getHeatMapsForCurrentHand() const;
+        // XXX PADELER
+
 
         DELETE_COPY(HandExtractor);
     };
