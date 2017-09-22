@@ -107,7 +107,7 @@ OpenPose Library - Release Notes
     1. Added CMake installer for Ubuntu.
     2. Added how to use keypoint data in `examples/tutorial_wrapper/`.
     3. Added flag for warnings of type `-Wsign-compare` and removed in code.
-    4. Slightly improved accuracy by considering ears-shoulder connection (e.g. 0.4 mAP for 1 scale in validation set).
+    4. Slightly improved accuracy by considering ears-shoulder connection (e.g. +0.4 mAP for 1 scale in validation set).
 2. Main bugs fixed:
     1. Windows version crashing with std::map copy.
 

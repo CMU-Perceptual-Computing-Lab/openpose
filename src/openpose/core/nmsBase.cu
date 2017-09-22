@@ -1,7 +1,7 @@
 #include <thrust/device_ptr.h>
 #include <thrust/scan.h>
 #include <openpose/utilities/cuda.hpp>
-#include <openpose/utilities/cuda.hpp>
+#include <openpose/utilities/cuda.hu>
 #include <openpose/core/nmsBase.hpp>
 
 namespace op
@@ -10,7 +10,8 @@ namespace op
     const auto THREADS_PER_BLOCK = 512u;
 
     template <typename T>
-    __global__ void nmsRegisterKernel(int* kernelPtr, const T* const sourcePtr, const int w, const int h, const T threshold)
+    __global__ void nmsRegisterKernel(int* kernelPtr, const T* const sourcePtr, const int w, const int h,
+                                      const T threshold)
     {
         // get pixel location (x,y)
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
@@ -22,16 +23,18 @@ namespace op
             const auto value = sourcePtr[index];
             if (value > threshold)
             {
-                const auto top_left        = sourcePtr[(y-1)*w + x-1];
-                const auto top             = sourcePtr[(y-1)*w + x];
-                const auto top_right       = sourcePtr[(y-1)*w + x+1];
-                const auto left            = sourcePtr[y*w + (x-1)];
-                const auto right           = sourcePtr[y*w + (x+1)];
-                const auto bottom_left     = sourcePtr[(y+1)*w + x-1];
-                const auto bottom          = sourcePtr[(y+1)*w + x];
-                const auto bottom_right    = sourcePtr[(y+1)*w + x+1];
+                const auto topLeft     = sourcePtr[(y-1)*w + x-1];
+                const auto top         = sourcePtr[(y-1)*w + x];
+                const auto topRight    = sourcePtr[(y-1)*w + x+1];
+                const auto left        = sourcePtr[    y*w + x-1];
+                const auto right       = sourcePtr[    y*w + x+1];
+                const auto bottomLeft  = sourcePtr[(y+1)*w + x-1];
+                const auto bottom      = sourcePtr[(y+1)*w + x];
+                const auto bottomRight = sourcePtr[(y+1)*w + x+1];
 
-                if (value > top_left && value > top && value > top_right && value > left && value > right && value > bottom_left && value > bottom && value > bottom_right)
+                if (value > topLeft && value > top && value > topRight
+                    && value > left && value > right
+                    && value > bottomLeft && value > bottom && value > bottomRight)
                     kernelPtr[index] = 1;
                 else
                     kernelPtr[index] = 0;
@@ -44,7 +47,8 @@ namespace op
     }
 
     template <typename T>
-    __global__ void writeResultKernel(T* output, const int length, const int* const kernelPtr, const T* const sourcePtr, const int width, const int height, const int maxPeaks)
+    __global__ void writeResultKernel(T* output, const int length, const int* const kernelPtr,
+                                      const T* const sourcePtr, const int width, const int height, const int maxPeaks)
     {
         __shared__ int local[THREADS_PER_BLOCK+1]; // one more
         const auto globalIdx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -57,30 +61,33 @@ namespace op
                 local[threadIdx.x+1] = kernelPtr[globalIdx+1];
 
             __syncthreads();
-            // see difference, except the globally last one
+            // See difference, except the globally last one
             if (globalIdx != length - 1)
             {
+                // A[globalIdx] == A[globalIdx + 1] means no peak
                 if (local[threadIdx.x] != local[threadIdx.x + 1])
                 {
-                    //means A[globalIdx] == A[globalIdx + 1] as the kernelPtr[globalIdx]-th repeat
                     const auto peakIndex = kernelPtr[globalIdx]; //0-index
                     const auto peakLocX = (int)(globalIdx % width);
                     const auto peakLocY = (int)(globalIdx / width);
 
+                    // Accurate peak location: considered neighboors
                     if (peakIndex < maxPeaks) // limitation
                     {
                         T xAcc = 0.f;
                         T yAcc = 0.f;
                         T scoreAcc = 0.f;
-                        for (auto dy = -3 ; dy < 4 ; dy++)
+                        const auto dWidth = 3;
+                        const auto dHeight = 3;
+                        for (auto dy = -dHeight ; dy <= dHeight ; dy++)
                         {
                             const auto y = peakLocY + dy;
-                            if (0 <= y && y < height) // height = 368
+                            if (0 <= y && y < height) // Default height = 368
                             {
-                                for (auto dx = -3 ; dx < 4 ; dx++)
+                                for (auto dx = -dWidth ; dx <= dWidth ; dx++)
                                 {
                                     const auto x = peakLocX + dx;
-                                    if (0 <= x && x < width) // width = 656
+                                    if (0 <= x && x < width) // Default width = 656
                                     {
                                         const auto score = sourcePtr[y * width + x];
                                         if (score > 0)
@@ -107,7 +114,8 @@ namespace op
     }
 
     template <typename T>
-    void nmsGpu(T* targetPtr, int* kernelPtr, const T* const sourcePtr, const T threshold, const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize)
+    void nmsGpu(T* targetPtr, int* kernelPtr, const T* const sourcePtr, const T threshold,
+                const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize)
     {
         try
         {
@@ -121,7 +129,8 @@ namespace op
             const auto offsetTarget = (maxPeaks+1)*targetSize[3];
 
             const dim3 threadsPerBlock2D{THREADS_PER_BLOCK_1D, THREADS_PER_BLOCK_1D};
-            const dim3 numBlocks2D{getNumberCudaBlocks(width, threadsPerBlock2D.x), getNumberCudaBlocks(height, threadsPerBlock2D.y)};
+            const dim3 numBlocks2D{getNumberCudaBlocks(width, threadsPerBlock2D.x),
+                                   getNumberCudaBlocks(height, threadsPerBlock2D.y)};
             const dim3 threadsPerBlock1D{THREADS_PER_BLOCK};
             const dim3 numBlocks1D{getNumberCudaBlocks(imageOffset, threadsPerBlock1D.x)};
             // log("num_b: " + std::to_string(bottom->shape(0)));       // = 1
@@ -146,8 +155,9 @@ namespace op
 
                     // This returns kernelPtrOffsetted, a binary array with 0s & 1s. 1s in the local maximum positions (size = size(sourcePtrOffsetted))
                     nmsRegisterKernel<<<numBlocks2D, threadsPerBlock2D>>>(kernelPtrOffsetted, sourcePtrOffsetted, width, height, threshold); //[0,0,0,0,1,0,0,0,0,1,0,0,0,0]
-                    //debug
-                    // if (c==3){
+                    // // Debug
+                    // if (c==3)
+                    // {
                     //     char filename[50];
                     //     sprintf(filename, "work%02d.txt", c);
                     //     std::ofstream fout(filename);
@@ -165,7 +175,9 @@ namespace op
                     thrust::exclusive_scan(kernelThrustPtr, kernelThrustPtr + imageOffset, kernelThrustPtr); //[0,0,0,0,0,1,1,1,1,1,2,2,2,2]
 
                     // This returns targetPtrOffsetted, with the NMS applied over it
-                    writeResultKernel<<<numBlocks1D, threadsPerBlock1D>>>(targetPtrOffsetted, imageOffset, kernelPtrOffsetted, sourcePtrOffsetted, width, height, maxPeaks);
+                    writeResultKernel<<<numBlocks1D, threadsPerBlock1D>>>(targetPtrOffsetted, imageOffset,
+                                                                          kernelPtrOffsetted, sourcePtrOffsetted,
+                                                                          width, height, maxPeaks);
                 }
             }
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
@@ -176,6 +188,8 @@ namespace op
         }
     }
 
-    template void nmsGpu(float* targetPtr, int* kernelPtr, const float* const sourcePtr, const float threshold, const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize);
-    template void nmsGpu(double* targetPtr, int* kernelPtr, const double* const sourcePtr, const double threshold, const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize);
+    template void nmsGpu(float* targetPtr, int* kernelPtr, const float* const sourcePtr, const float threshold,
+                         const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize);
+    template void nmsGpu(double* targetPtr, int* kernelPtr, const double* const sourcePtr, const double threshold,
+                         const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize);
 }

@@ -11,7 +11,7 @@ OpenPose is a **library for real-time multi-person keypoint detection and multi-
 
 
 ## Latest News
-- Jul 2017: **Windows**, New [**portable demo**](doc/installation.md#installation---demo) **and** [**easier library installation**](doc/installation.md#installation---library)!
+- Jul 2017: **Windows**, new [**portable demo**](doc/installation.md#installation---demo) **and** [**easier library installation**](doc/installation.md#installation---library)!
 - Jul 2017: **Hands** released!
 - Jun 2017: **Face** released!
 - May 2017: **Windows** version released!
@@ -72,7 +72,7 @@ The pose estimation work is based on the C++ code from [the ECCV 2016 demo](http
 
 ## Functionality
 - Multi-person 15 or **18-keypoint body pose** estimation and rendering. **Running time invariant to number of people** on the image.
-- Multi-person **2x21-keypoint hand** estimation and rendering. Note: In this initial version, **running time** linearly **depends** on the **number of people** on the image. **Coming soon (in around 1-5 days)!**
+- Multi-person **2x21-keypoint hand** estimation and rendering. Note: In this initial version, **running time** linearly **depends** on the **number of people** on the image.
 - Multi-person **70-keypoint face** estimation and rendering. Note: In this initial version, **running time** linearly **depends** on the **number of people** on the image.
 - Flexible and easy-to-configure **multi-threading** module.
 - Image, video, and webcam reader.

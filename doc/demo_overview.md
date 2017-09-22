@@ -103,7 +103,7 @@ We enumerate some of the most important flags, check the `Flags Detailed Descrip
 - `--write_images folder_path`: Save processed images on a folder.
 - `--write_keypoint path/`: Output JSON, XML or YML files with the people pose data on a folder.
 - `--process_real_time`: For video, it might skip frames to display at real time.
-- `--disable_blending`: If selected, it will render the results on a black backgroung, not showing the original image. Related: `part_to_show`, `alpha_pose`, and `alpha_pose`.
+- `--disable_blending`: If enabled, it will render the results (keypoint skeletons or heatmaps) on a black background, not showing the original image. Related: `part_to_show`, `alpha_pose`, and `alpha_pose`.
 - `--part_to_show`: Prediction channel to visualize.
 - `--no_display`: Display window not opened. Useful for servers and/or to slightly speed up OpenPose.
 - `--num_gpu 2 --num_gpu_start 1`: Parallelize over this number of GPUs starting by the desired device id. By default it uses all the available GPUs.
@@ -161,7 +161,7 @@ Each flag is divided into flag name, default value, and description.
 
 7. OpenPose Rendering
 - DEFINE_int32(part_to_show,              0,              "Prediction channel to visualize (default: 0). 0 for all the body parts, 1-18 for each body part heat map, 19 for the background heat map, 20 for all the body part heat maps together, 21 for all the PAFs, 22-40 for each body part pair PAF");
-- DEFINE_bool(disable_blending,           false,          "If blending is enabled, it will merge the results with the original frame. If disabled, it will only display the results on a black background.");
+- DEFINE_bool(disable_blending,           false,          "If enabled, it will render the results (keypoint skeletons or heatmaps) on a black background, instead of being rendered into the original image. Related: `part_to_show`, `alpha_pose`, and `alpha_pose`.");
 
 8. OpenPose Rendering Pose
 - DEFINE_double(render_threshold,         0.05,           "Only estimated keypoints whose score confidences are higher than this threshold will be rendered. Generally, a high threshold (> 0.5) will only render very clear body parts; while small thresholds (~0.1) will also output guessed and occluded keypoints, but also more false positives (i.e. wrong detections).");
