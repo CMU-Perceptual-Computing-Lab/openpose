@@ -70,7 +70,7 @@ namespace op
                     mJsonOfstream.comma();
                     mJsonOfstream.plainText(poseKeypoints[finalIndex+1]);
                     mJsonOfstream.comma();
-                    mJsonOfstream.plainText(1);
+                    mJsonOfstream.plainText((poseKeypoints[finalIndex+2] > 0.f ? 1 : 0));
                     if (bodyPart < indexesInCocoOrder.size() - 1u)
                         mJsonOfstream.comma();
                 }

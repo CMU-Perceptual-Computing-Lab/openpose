@@ -8,9 +8,10 @@ OpenPose - Installation and FAQ
 4. [Ubuntu](#ubuntu)
 5. [Windows](#windows)
 6. [OpenPose 3D Demo](#openpose-3d-demo)
-7. [Custom Caffe](#custom-caffe)
-8. [Compiling without cuDNN](#compiling-without-cudnn)
-9. [FAQ](#faq)
+7. [Doxygen Documentation Autogeneration](#doxygen-documentation-autogeneration)
+8. [Custom Caffe](#custom-caffe)
+9. [Compiling without cuDNN](#compiling-without-cudnn)
+10. [FAQ](#faq)
 
 
 
@@ -179,6 +180,17 @@ If you updated some software that our library or 3rdparty use, or you simply wan
 
 ## OpenPose 3D Demo
 If you want to try our OpenPose 3-D reconstruction demo, see [doc/openpose_3d_reconstruction_demo.md](./openpose_3d_reconstruction_demo.md).
+
+
+
+
+
+## Doxygen Documentation Autogeneration
+You can generate the documentation by running the following command. The documentation will be generated in `doc/doxygen/html/index.html`. You can simply open it with double-click (your default browser should automatically display it).
+```
+cd doc/
+doxygen doc_autogeneration.doxygen
+```
 
 
 

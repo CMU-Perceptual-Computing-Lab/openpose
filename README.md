@@ -115,14 +115,6 @@ Your case if you want to change internal functions and/or extend its functionali
 3. Adding An Extra Module: Learn how to add an extra module in [doc/library_add_new_module.md](doc/library_add_new_module.md).
 
 
-### Doxygen Documentation Autogeneration
-You can generate the documentation by running the following command. The documentation will be generated in `doc/doxygen/html/index.html`. You can simply open it with double-click (your default browser should automatically display it).
-```
-cd doc/
-doxygen doc_autogeneration.doxygen
-```
-
-
 
 ## Output
 Check the output (format, keypoint index ordering, etc.) in [doc/output.md](doc/output.md).
