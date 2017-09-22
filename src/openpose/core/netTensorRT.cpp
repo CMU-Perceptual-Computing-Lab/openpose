@@ -23,7 +23,7 @@
 using namespace nvinfer1;
 using namespace nvcaffeparser1;
 
-#define CHECK(status)								      	\
+#define CUDA_TENSORRT_CHECK(status)								      	\
 {														                \
 if (status != 0)									          \
 {												                   	\
@@ -33,7 +33,7 @@ abort();									                	\
 }
 
 std::vector<std::string> gInputs;
-std::vector<std::string, DimsCHW> gInputDimensions;
+std::map<std::string, DimsCHW> gInputDimensions;
 
 
 
@@ -48,7 +48,7 @@ class Logger : public ILogger
 } gLogger;
 
 
-ICudaEngine* caffeToGIEModel()
+ICudaEngine* caffeToGIEModel(const std::string& caffeProto, const std::string& caffeTrainedModel)
 {
   // create the builder
   IBuilder* builder = createInferBuilder(gLogger);
@@ -56,8 +56,8 @@ ICudaEngine* caffeToGIEModel()
   // parse the caffe model to populate the network, then set the outputs
   INetworkDefinition* network = builder->createNetwork();
   ICaffeParser* parser = createCaffeParser();
-  const IBlobNameToTensor* blobNameToTensor = parser->parse(mCaffeProto.c_str(),
-                                                            mCaffeTrainedModel.c_str(),
+  const IBlobNameToTensor* blobNameToTensor = parser->parse(caffeProto.c_str(),
+                                                            caffeTrainedModel.c_str(),
                                                             *network,
                                                             DataType::kHALF);
   
@@ -124,24 +124,24 @@ void createMemory(const ICudaEngine& engine, std::vector<void*>& buffers, const 
     localMem[i] = (float(rand()) / RAND_MAX) * 2 - 1;
   
   void* deviceMem;
-  CHECK(cudaMalloc(&deviceMem, memSize));
+  CUDA_TENSORRT_CHECK(cudaMalloc(&deviceMem, memSize));
   if (deviceMem == nullptr)
   {
     std::cerr << "Out of memory" << std::endl;
     exit(1);
   }
-  CHECK(cudaMemcpy(deviceMem, localMem, memSize, cudaMemcpyHostToDevice));
+  CUDA_TENSORRT_CHECK(cudaMemcpy(deviceMem, localMem, memSize, cudaMemcpyHostToDevice));
   
   delete[] localMem;
   buffers[bindingIndex] = deviceMem;
 }
 
 
-static ICudaEngine* createEngine()
+static ICudaEngine* createEngine(const std::string& caffeProto, const std::string& caffeTrainedModel)
 {
   ICudaEngine *engine;
   
-  engine = caffeToGIEModel();
+  engine = caffeToGIEModel(caffeProto, caffeTrainedModel);
   if (!engine)
   {
     std::cerr << "Engine could not be created" << std::endl;
@@ -192,7 +192,7 @@ namespace op
       // Initialize net
       cudaSetDevice(mGpuId);
       
-      cudaEngine = createEngine();
+      cudaEngine = createEngine(mCaffeProto, mCaffeTrainedModel);
       if (!cudaEngine)
       {
         std::cerr << "Engine could not be created" << std::endl;
@@ -260,22 +260,22 @@ namespace op
         // Tensor RT version
         
         // TODO maybe move this to init and keep only the execute part
-        IExecutionContext *context = cudaEngine.createExecutionContext();
+        IExecutionContext *context = cudaEngine->createExecutionContext();
         // input and output buffer pointers that we pass to the engine - the engine requires exactly IEngine::getNbBindings(),
         // of these, but in this case we know that there is exactly one input and one output.
         
         std::vector<void*> buffers(gInputs.size() + 1);
         for (size_t i = 0; i < gInputs.size(); i++)
-          createMemory(engine, buffers, gInputs[i]);
+          createMemory(*cudaEngine, buffers, gInputs[i]);
         
         
-        createMemory(engine, buffers, std::string("net_output"));
+        createMemory(*cudaEngine, buffers, std::string("net_output"));
         
         cudaStream_t stream;
-        CHECK(cudaStreamCreate(&stream));
+        CUDA_TENSORRT_CHECK(cudaStreamCreate(&stream));
         cudaEvent_t start, end;
-        CHECK(cudaEventCreate(&start));
-        CHECK(cudaEventCreate(&end));
+        CUDA_TENSORRT_CHECK(cudaEventCreate(&start));
+        CUDA_TENSORRT_CHECK(cudaEventCreate(&end));
         
         int batchSize = 1;
         context->execute(batchSize, &buffers[0]);

@@ -20,16 +20,7 @@ namespace op
                                          modelFolder + POSE_PROTOTXT[(int)poseModel], modelFolder + POSE_TRAINED_MODEL[(int)poseModel], gpuId)},
         spResizeAndMergeTensorRT{std::make_shared<ResizeAndMergeCaffe<float>>()},
         spNmsTensorRT{std::make_shared<NmsCaffe<float>>()},
-        spBodyPartConnectorTensorRT{std::make_shared<BodyPartConnectorCaffe<float>>()},
-        mNetInputSize(netInputSize),
-        mNetOutputSize(netOutputSize),
-        mOutputSize(outputSize),
-        mScaleNumber(scaleNumber),
-        mPoseModel(poseModel),
-        mModelFolder(modelFolder),
-        mGpuId(gpuId),
-        mHeatMapTypes(heatMapTypes),
-        mHeatMapScale(heatMapScale)
+        spBodyPartConnectorTensorRT{std::make_shared<BodyPartConnectorCaffe<float>>()}
     {
         try
         {
@@ -93,9 +84,8 @@ namespace op
                 error("Empty inputNetData.", __LINE__, __FUNCTION__, __FILE__);
 
             // 1. TensorRT deep network
-            //spNet->forwardPass(inputNetData.getConstPtr());                                                     // ~79.3836ms
+            spNet->forwardPass(inputNetData.getConstPtr());
           
-            doInference(inputNetData.getConstPtr());
           
             // Replace spNet->forward pass, but how to propagate to next
             // Replace spTensorRTNetOututBlob.get() ?

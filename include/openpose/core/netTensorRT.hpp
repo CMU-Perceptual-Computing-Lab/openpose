@@ -6,7 +6,7 @@
 #include <openpose/core/common.hpp>
 #include <openpose/core/net.hpp>
 
-#include <cuda_runtime_api.h>
+#include "NvInfer.h"
 
 namespace op
 {
@@ -43,15 +43,6 @@ namespace op
         boost::shared_ptr<caffe::Blob<float>> spOutputBlob;
       
         // TensorRT stuff
-        const Point<int> mNetInputSize;
-        const Point<int> mNetOutputSize;
-        const Point<int> mOutputSize;
-        const int mScaleNumber;
-        const PoseModel mPoseModel;
-        const std::string mModelFolder;
-        const int mGpuId;
-        const std::vector<HeatMapType> mHeatMapTypes;
-        const ScaleMode mHeatMapScale;
         nvinfer1::ICudaEngine* cudaEngine;
 
         DELETE_COPY(NetTensorRT);

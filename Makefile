@@ -145,6 +145,9 @@ ifneq ($(CPU_ONLY), 1)
 	LIBRARIES += cudart cublas curand
 endif
 
+# TensorRT
+LIBRARIES += nvinfer nvcaffe_parser
+
 # LIBRARIES += glog gflags boost_system boost_filesystem m hdf5_hl hdf5 caffe
 LIBRARIES += glog gflags boost_system boost_filesystem m hdf5_hl hdf5
 
