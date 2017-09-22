@@ -83,9 +83,13 @@ namespace op
             if (inputNetData.empty())
                 error("Empty inputNetData.", __LINE__, __FUNCTION__, __FILE__);
 
+          
+          
+            std::cout << "Forward Pass Pose: tensorrt forward pass" << std::endl;
             // 1. TensorRT deep network
             spNet->forwardPass(inputNetData.getConstPtr());
           
+            std::cout << "Forward Pass Pose: tensorrt passed !" << std::endl;
           
             // Replace spNet->forward pass, but how to propagate to next
             // Replace spTensorRTNetOututBlob.get() ?

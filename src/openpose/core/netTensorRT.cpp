@@ -187,10 +187,17 @@ namespace op
   
   void NetTensorRT::initializationOnThread()
   {
+    
+    std::cout << "InitializationOnThread : start" << std::endl;
+    
     try
     {
+      
+      std::cout << "Forward Pass : setting device" << std::endl;
       // Initialize net
       cudaSetDevice(mGpuId);
+      
+      std::cout << "Forward Pass : creating engine" << std::endl;
       
       cudaEngine = createEngine(mCaffeProto, mCaffeTrainedModel);
       if (!cudaEngine)
@@ -198,6 +205,8 @@ namespace op
         std::cerr << "Engine could not be created" << std::endl;
         return;
       }
+      
+      std::cout << "Forward Pass : done" << std::endl;
       
       // For tensor RT is done in caffeToGIE
       /*
@@ -247,6 +256,8 @@ namespace op
   
   void NetTensorRT::forwardPass(const float* const inputData) const
   {
+    
+    std::cout << "Forward Pass : start" << std::endl;
     try
     {
       // Copy frame data to GPU memory
@@ -260,9 +271,14 @@ namespace op
         // Tensor RT version
         
         // TODO maybe move this to init and keep only the execute part
+        
+        std::cout << "Forward Pass : creating execution context" << std::endl;
+        
         IExecutionContext *context = cudaEngine->createExecutionContext();
         // input and output buffer pointers that we pass to the engine - the engine requires exactly IEngine::getNbBindings(),
         // of these, but in this case we know that there is exactly one input and one output.
+        
+        std::cout << "Forward Pass : creating CUDA memory" << std::endl;
         
         std::vector<void*> buffers(gInputs.size() + 1);
         for (size_t i = 0; i < gInputs.size(); i++)
@@ -271,15 +287,23 @@ namespace op
         
         createMemory(*cudaEngine, buffers, std::string("net_output"));
         
+        
+        std::cout << "Forward Pass : memory created" << std::endl;
+        
         cudaStream_t stream;
         CUDA_TENSORRT_CHECK(cudaStreamCreate(&stream));
         cudaEvent_t start, end;
         CUDA_TENSORRT_CHECK(cudaEventCreate(&start));
         CUDA_TENSORRT_CHECK(cudaEventCreate(&end));
         
+        
+        std::cout << "Forward Pass : executing inference" << std::endl;
+        
         int batchSize = 1;
         context->execute(batchSize, &buffers[0]);
         
+        
+        std::cout << "Forward Pass : inference done !" << std::endl;
         
         cudaStreamDestroy(stream);
         cudaEventDestroy(start);
@@ -298,6 +322,7 @@ namespace op
   
   boost::shared_ptr<caffe::Blob<float>> NetTensorRT::getOutputBlob() const
   {
+    std::cout << "Getting output blob." << std::endl;
     try
     {
       return spOutputBlob;
@@ -307,6 +332,8 @@ namespace op
       error(e.what(), __LINE__, __FUNCTION__, __FILE__);
       return nullptr;
     }
+    
+    std::cout << "Got something..." << std::endl;
   }
 }
 
