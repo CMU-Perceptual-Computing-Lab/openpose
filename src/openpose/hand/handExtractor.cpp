@@ -97,13 +97,13 @@ namespace op
                                  const float rangeScales, const bool downloadHeatmaps, const ScaleMode heatMapScale) :
         mMultiScaleNumberAndRange{std::make_pair(numberScales, rangeScales)},
         mNetOutputSize{netOutputSize},
-	mHeatMapScaleMode{heatMapScale},
-	mDownloadHeatmaps{downloadHeatmaps},
         spNet{std::make_shared<NetCaffe>(std::array<int,4>{1, 3, mNetOutputSize.y, mNetOutputSize.x}, modelFolder + HAND_PROTOTXT,
                                          modelFolder + HAND_TRAINED_MODEL, gpuId)},
         spResizeAndMergeCaffe{std::make_shared<ResizeAndMergeCaffe<float>>()},
         spMaximumCaffe{std::make_shared<MaximumCaffe<float>>()},
-        mHandImageCrop{mNetOutputSize.area()*3}
+        mHandImageCrop{mNetOutputSize.area()*3},
+	mHeatMapScaleMode{heatMapScale},
+	mDownloadHeatmaps{downloadHeatmaps}
     {
         try
         {
@@ -176,7 +176,7 @@ namespace op
 		
 		if(mDownloadHeatmaps)
 		{
-		    mHandHeatmaps.resize(numberPeople);
+		    mHeatmaps.resize(numberPeople);
 		}
 
                 // // Debugging
@@ -254,7 +254,7 @@ namespace op
                             // recover hand heatmaps
                             if(mDownloadHeatmaps)
 			    {
-				mHandHeatmaps.at(person).at(hand) = getHeatMapsForCurrentHand();
+				mHeatmaps.at(person).at(hand) = getHeatMapsFromLastPass();
 			    }
                         }
                     }
@@ -337,21 +337,6 @@ namespace op
         }
     }
 
-    // XXX PADELER
-    const float* HandExtractor::getHeatMapCpuConstPtr() const
-    {
-        try
-        {
-            checkThread();
-            return spHeatMapsBlob->cpu_data();
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return nullptr;
-        }
-    }
-
     const float* HandExtractor::getHeatMapGpuConstPtr() const
     {
         try
@@ -376,18 +361,18 @@ namespace op
 	    return Array<float>{};
 	}
 	
-	if (personIndex>mHandHeatmaps.size() || handIndex>1)
+	if (personIndex>mHeatmaps.size() || handIndex>1)
 	{
 	    error("Invalid person or hand index", __LINE__, __FUNCTION__, __FILE__);
 	    return Array<float>{};
 	}
-	if(mHandHeatmaps.size()==0) return Array<float>{};
+	if(mHeatmaps.size()==0) return Array<float>{};
 	
-	return mHandHeatmaps.at(personIndex).at(handIndex);
+	return mHeatmaps.at(personIndex).at(handIndex);
     }
 
 
-    Array<float> HandExtractor::getHeatMapsForCurrentHand() const
+    Array<float> HandExtractor::getHeatMapsFromLastPass() const
     {
         try
         {
@@ -443,7 +428,5 @@ namespace op
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             return Array<float>{};
         }
-    }
-    // XXX PADELER
-    
+    }    
 }
