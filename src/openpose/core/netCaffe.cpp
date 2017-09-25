@@ -34,6 +34,7 @@ namespace op
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
             // Set spOutputBlob
             spOutputBlob = upCaffeNet->blob_by_name(mLastBlobName);
+            std::cout << spOutputBlob->num() << " " << spOutputBlob->channels() << " " << spOutputBlob->height() << " " << spOutputBlob->width();
             if (spOutputBlob == nullptr)
                 error("The output blob is a nullptr. Did you use the same name than the prototxt? (Used: " + mLastBlobName + ").", __LINE__, __FUNCTION__, __FILE__);
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);

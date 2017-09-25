@@ -16,6 +16,7 @@
 #include <string.h>
 #include <map>
 #include <random>
+#include <boost/make_shared.hpp>
 
 #include "NvInfer.h"
 #include "NvCaffeParser.h"
@@ -184,8 +185,8 @@ namespace op
       
       
       
-      spInputBlob = std::make_shared<caffe::Blob<float>>({1, 3, 128, 96});
-      spOutputBlob = std::make_shared<caffe::Blob<float>>({1, 57, 46, 82});
+      spInputBlob = boost::make_shared<caffe::Blob<float>>(1, 3, 128, 96);
+      spOutputBlob = boost::make_shared<caffe::Blob<float>>(1, 57, 46, 82);
       
       // For tensor RT is done in caffeToGIE
       /*
@@ -211,7 +212,7 @@ namespace op
   {
     try
     {
-      return upTensorRTNet->blobs().at(0)->mutable_cpu_data();
+      return spInputBlob->mutable_cpu_data();
     }
     catch (const std::exception& e)
     {
@@ -224,7 +225,7 @@ namespace op
   {
     try
     {
-      return upTensorRTNet->blobs().at(0)->mutable_gpu_data();
+      return spInputBlob->mutable_gpu_data();
     }
     catch (const std::exception& e)
     {
@@ -307,8 +308,9 @@ namespace op
         std::cout << "Forward Pass : executing inference" << std::endl;
         
         int batchSize = 1;
+        spInputBlob->Update();
         context->execute(batchSize, &buffers[0]);
-        
+        spOutputBlob->Update();
         
         
         std::cout << "Forward Pass : inference done !" << std::endl;
