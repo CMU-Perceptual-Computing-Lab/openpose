@@ -39,7 +39,8 @@ namespace op
         const std::string mCaffeTrainedModel;
         const std::string mLastBlobName;
         // Init with thread
-        std::unique_ptr<caffe::Net<float>> upTensorRTNet;
+      
+        boost::shared_ptr<caffe::Blob<float>> spInputBlob;
         boost::shared_ptr<caffe::Blob<float>> spOutputBlob;
       
         // TensorRT stuff

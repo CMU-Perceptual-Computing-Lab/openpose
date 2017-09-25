@@ -110,32 +110,6 @@ ICudaEngine* caffeToGIEModel(const std::string& caffeProto, const std::string& c
   return engine;
 }
 
-void createMemory(const ICudaEngine& engine, std::vector<void*>& buffers, const std::string& name)
-{
-  const int batchSize = 1;
-  size_t bindingIndex = engine.getBindingIndex(name.c_str());
-  printf("name=%s, bindingIndex=%d, buffers.size()=%d\n", name.c_str(), (int)bindingIndex, (int)buffers.size());
-  assert(bindingIndex < buffers.size());
-  DimsCHW dimensions = static_cast<DimsCHW&&>(engine.getBindingDimensions((int)bindingIndex));
-  size_t eltCount = dimensions.c()*dimensions.h()*dimensions.w()*batchSize, memSize = eltCount * sizeof(float);
-  
-  float* localMem = new float[eltCount];
-  for (size_t i = 0; i < eltCount; i++)
-    localMem[i] = (float(rand()) / RAND_MAX) * 2 - 1;
-  
-  void* deviceMem;
-  CUDA_TENSORRT_CHECK(cudaMalloc(&deviceMem, memSize));
-  if (deviceMem == nullptr)
-  {
-    std::cerr << "Out of memory" << std::endl;
-    exit(1);
-  }
-  CUDA_TENSORRT_CHECK(cudaMemcpy(deviceMem, localMem, memSize, cudaMemcpyHostToDevice));
-  
-  delete[] localMem;
-  buffers[bindingIndex] = deviceMem;
-}
-
 
 static ICudaEngine* createEngine(const std::string& caffeProto, const std::string& caffeTrainedModel)
 {
@@ -193,11 +167,11 @@ namespace op
     try
     {
       
-      std::cout << "Forward Pass : setting device" << std::endl;
+      std::cout << "InitializationOnThread : setting device" << std::endl;
       // Initialize net
       cudaSetDevice(mGpuId);
       
-      std::cout << "Forward Pass : creating engine" << std::endl;
+      std::cout << "InitializationOnThread : creating engine" << std::endl;
       
       cudaEngine = createEngine(mCaffeProto, mCaffeTrainedModel);
       if (!cudaEngine)
@@ -206,7 +180,12 @@ namespace op
         return;
       }
       
-      std::cout << "Forward Pass : done" << std::endl;
+      std::cout << "InitializationOnThread : done" << std::endl;
+      
+      
+      
+      spInputBlob = std::make_shared<caffe::Blob<float>>({1, 3, 128, 96});
+      spOutputBlob = std::make_shared<caffe::Blob<float>>({1, 57, 46, 82});
       
       // For tensor RT is done in caffeToGIE
       /*
@@ -215,9 +194,9 @@ namespace op
       upTensorRTNet->CopyTrainedLayersFrom(mTensorRTTrainedModel);
       upTensorRTNet->blobs()[0]->Reshape({mNetInputSize4D[0], mNetInputSize4D[1], mNetInputSize4D[2], mNetInputSize4D[3]});
       upTensorRTNet->Reshape();
-      cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+      cudaCheck(__LINE__, __FUNCTION__, __FILE__);*/
       // Set spOutputBlob
-      spOutputBlob = upTensorRTNet->blob_by_name(mLastBlobName);
+      /*
       if (spOutputBlob == nullptr)
         error("The output blob is a nullptr. Did you use the same name than the prototxt? (Used: " + mLastBlobName + ").", __LINE__, __FUNCTION__, __FILE__);
       cudaCheck(__LINE__, __FUNCTION__, __FILE__);*/
@@ -280,12 +259,40 @@ namespace op
         
         std::cout << "Forward Pass : creating CUDA memory" << std::endl;
         
-        std::vector<void*> buffers(gInputs.size() + 1);
-        for (size_t i = 0; i < gInputs.size(); i++)
-          createMemory(*cudaEngine, buffers, gInputs[i]);
+        
+        /*
+          const int batchSize = 1;
+          size_t bindingIndex = engine.getBindingIndex(name.c_str());
+        std::cout"name=%s, bindingIndex=%d, buffers.size()=%d\n", name.c_str(), (int)bindingIndex, (int)buffers.size());
+          assert(bindingIndex < buffers.size());
+          DimsCHW dimensions = static_cast<DimsCHW&&>(engine.getBindingDimensions((int)bindingIndex));
+          size_t eltCount = dimensions.c()*dimensions.h()*dimensions.w()*batchSize, memSize = eltCount * sizeof(float);
+          
+          float* localMem = new float[eltCount];
+          for (size_t i = 0; i < eltCount; i++)
+            localMem[i] = (float(rand()) / RAND_MAX) * 2 - 1;
+          
+          void* deviceMem;
+          CUDA_TENSORRT_CHECK(cudaMalloc(&deviceMem, memSize));
+          if (deviceMem == nullptr)
+          {
+            std::cerr << "Out of memory" << std::endl;
+            exit(1);
+          }
+          CUDA_TENSORRT_CHECK(cudaMemcpy(deviceMem, localMem, memSize, cudaMemcpyHostToDevice));
+          
+          delete[] localMem;
+          buffers[bindingIndex] = deviceMem;
+          */
+        
+        std::vector<void*> buffers(2);
+        buffers[0] = spInputBlob->mutable_gpu_data();
+        buffers[1] = spOutputBlob->mutable_gpu_data();
+        
+        //createMemory(*cudaEngine, buffers, gInputs[i]);
         
         
-        createMemory(*cudaEngine, buffers, std::string("net_output"));
+        //createMemory(*cudaEngine, buffers, std::string("net_output"));
         
         
         std::cout << "Forward Pass : memory created" << std::endl;
@@ -303,7 +310,10 @@ namespace op
         context->execute(batchSize, &buffers[0]);
         
         
+        
         std::cout << "Forward Pass : inference done !" << std::endl;
+        
+        
         
         cudaStreamDestroy(stream);
         cudaEventDestroy(start);
