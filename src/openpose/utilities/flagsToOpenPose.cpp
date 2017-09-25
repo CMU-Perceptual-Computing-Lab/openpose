@@ -20,6 +20,8 @@ namespace op
                 return PoseModel::MPI_15_4;
             else if (poseModeString == "BODY_18")
                 return PoseModel::BODY_18;
+            else if (poseModeString == "BODY_19")
+                return PoseModel::BODY_19;
             else if (poseModeString == "BODY_22")
                 return PoseModel::BODY_22;
             // else

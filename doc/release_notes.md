@@ -115,3 +115,4 @@ OpenPose Library - Release Notes
 
 ## Current version (future OpenPose 1.1.1)
 1. Main improvements:
+    1. COCO JSON file outputs 0 as score for non-detected keypoints.
