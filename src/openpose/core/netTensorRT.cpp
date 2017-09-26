@@ -51,9 +51,8 @@ namespace op
   mCaffeTrainedModel{caffeTrainedModel},
   mLastBlobName{lastBlobName}
   {
-    cudaStream_t stream;
+    std::cout << "Caffe file: " << mCaffeProto.c_str() << std::endl;
     CUDA_CHECK(cudaStreamCreate(&stream));
-    cudaEvent_t start, end;
     CUDA_CHECK(cudaEventCreate(&start));
     CUDA_CHECK(cudaEventCreate(&end));
   }
@@ -69,7 +68,7 @@ namespace op
   }
   
   
-  NetTensorRT::ICudaEngine* caffeToGIEModel()
+  ICudaEngine* NetTensorRT::caffeToGIEModel()
   {
     // create the builder
     IBuilder* builder = createInferBuilder(gLogger);
@@ -93,16 +92,16 @@ namespace op
       gInputDimensions.insert(std::make_pair(network->getInput(i)->getName(), dims));
       std::cout << "Input \"" << network->getInput(i)->getName() << "\": " << dims.c() << "x" << dims.h() << "x" << dims.w() << std::endl;
       if( i > 0)
-        std::err << "Multiple output unsupported for now!" << std:endl;
+        std::cerr << "Multiple output unsupported for now!";
     }
     
     // Specify which tensor is output (multiple unsupported)
     if (blobNameToTensor->find(mLastBlobName.c_str()) == nullptr)
     {
-      std::cout << "could not find output blob " << s << std::endl;
+      std::cout << "could not find output blob " << mLastBlobName.c_str() << std::endl;
       return nullptr;
     }
-    network->markOutput(*blobNameToTensor->find(s.c_str()));
+    network->markOutput(*blobNameToTensor->find(mLastBlobName.c_str()));
     
     
     for (int i = 0, n = network->getNbOutputs(); i < n; i++)
@@ -132,11 +131,11 @@ namespace op
   }
   
   
-  NetTensorRT::ICudaEngine* createEngine()
+  ICudaEngine* NetTensorRT::createEngine()
   {
     ICudaEngine *engine;
     
-    engine = caffeToGIEModel(caffeProto, caffeTrainedModel);
+    engine = caffeToGIEModel();
     if (!engine)
     {
       std::cerr << "Engine could not be created" << std::endl;
@@ -174,7 +173,7 @@ namespace op
       
       std::cout << "InitializationOnThread : creating engine" << std::endl;
       
-      cudaEngine = createEngine(mCaffeProto, mCaffeTrainedModel);
+      cudaEngine = createEngine();
       if (!cudaEngine)
       {
         std::cerr << "cudaEngine could not be created" << std::endl;
@@ -238,6 +237,7 @@ namespace op
     std::cout << "Forward Pass : start" << std::endl;
     try
     {
+      const int batchSize = 1;
       // Copy frame data to GPU memory
       if (inputData != nullptr)
       {
@@ -253,10 +253,7 @@ namespace op
         buffers[0] = spInputBlob->mutable_gpu_data();
         buffers[1] = spOutputBlob->mutable_gpu_data();
         
-        //createMemory(*cudaEngine, buffers, gInputs[i]);
-        
-        const int batchSize = 1;
-        size_t eltCount = 1*57*46*82*batchSize, memSize = eltCount * sizeof(float);
+        size_t eltCount = mNetOutputSize4D[0]*mNetOutputSize4D[1]*mNetOutputSize4D[2]*mNetOutputSize4D[3]*batchSize, memSize = eltCount * sizeof(float);
           
         float* localMem = new float[eltCount];
         for (size_t i = 0; i < eltCount; i++)
@@ -277,15 +274,16 @@ namespace op
         
         std::cout << "Forward Pass : memory created" << std::endl;
         cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+      
+        std::cout << "Forward Pass : executing inference" << std::endl;
+      
+        cudaContext->execute(batchSize, &buffers[0]);
+      
+        spOutputBlob->set_gpu_data((float*)deviceMem);
+      
+        std::cout << "Forward Pass : inference done !" << std::endl;
+        cudaCheck(__LINE__, __FUNCTION__, __FILE__);
       }
-      std::cout << "Forward Pass : executing inference" << std::endl;
-      
-      context->execute(batchSize, &buffers[0]);
-      
-      spOutputBlob->set_gpu_data((float*)deviceMem);
-      
-      std::cout << "Forward Pass : inference done !" << std::endl;
-      cudaCheck(__LINE__, __FUNCTION__, __FILE__);
     }
     catch (const std::exception& e)
     {

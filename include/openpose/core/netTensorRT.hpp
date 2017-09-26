@@ -47,8 +47,10 @@ namespace op
         // TensorRT stuff
         nvinfer1::ICudaEngine* cudaEngine;
         nvinfer1::IExecutionContext* cudaContext;
-        ICudaEngine* caffeToGIEModel();
-        ICudaEngine* createEngine();
+        nvinfer1::ICudaEngine* caffeToGIEModel();
+        nvinfer1::ICudaEngine* createEngine();
+        cudaStream_t stream;
+        cudaEvent_t start, end;
 
         DELETE_COPY(NetTensorRT);
     };
