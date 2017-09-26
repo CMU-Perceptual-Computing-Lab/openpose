@@ -264,8 +264,6 @@ namespace op
   
   void NetTensorRT::forwardPass(const float* const inputData) const
   {
-    
-    std::cout << "Forward Pass : start" << std::endl;
     try
     {
       const int batchSize = 1;
@@ -281,12 +279,9 @@ namespace op
         buffers[0] = spInputBlob->mutable_gpu_data();
         buffers[1] = spOutputBlob->mutable_gpu_data();
       
-        std::cout << "Forward Pass : executing inference" << std::endl;
-      
         cudaContext->enqueue(batchSize, &buffers[0], stream, nullptr);
       
-        std::cout << "Forward Pass : inference done !" << std::endl;
-        cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+        //cudaCheck(__LINE__, __FUNCTION__, __FILE__);
       }
     }
     catch (const std::exception& e)
