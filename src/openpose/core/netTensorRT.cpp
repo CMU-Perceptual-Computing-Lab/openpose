@@ -48,6 +48,31 @@ class Logger : public ILogger
   }
 } gLogger;
 
+void createMemory(const ICudaEngine& engine, std::vector<void*>& buffers, const std::string& name)
+{
+        size_t bindingIndex = engine.getBindingIndex(name.c_str());
+        printf("name=%s, bindingIndex=%d, buffers.size()=%d\n", name.c_str(), (int)bindingIndex, (int)buffers.size());
+        assert(bindingIndex < buffers.size());
+        DimsCHW dimensions = static_cast<DimsCHW&&>(engine.getBindingDimensions((int)bindingIndex));
+        size_t eltCount = dimensions.c()*dimensions.h()*dimensions.w()*1, memSize = eltCount * sizeof(float);
+
+        float* localMem = new float[eltCount];
+        for (size_t i = 0; i < eltCount; i++)
+                localMem[i] = (float(rand()) / RAND_MAX) * 2 - 1;
+
+        void* deviceMem;
+        CHECK(cudaMalloc(&deviceMem, memSize));
+        if (deviceMem == nullptr)
+        {
+                std::cerr << "Out of memory" << std::endl;
+                exit(1);
+        }
+        CHECK(cudaMemcpy(deviceMem, localMem, memSize, cudaMemcpyHostToDevice));
+
+        delete[] localMem;
+        buffers[bindingIndex] = deviceMem;
+}
+
 
 ICudaEngine* caffeToGIEModel(const std::string& caffeProto, const std::string& caffeTrainedModel)
 {
@@ -294,6 +319,26 @@ namespace op
         
         //createMemory(*cudaEngine, buffers, gInputs[i]);
         
+        const int batchSize = 1;
+        size_t eltCount = 1*57*46*82*batchSize, memSize = eltCount * sizeof(float);
+          
+        float* localMem = new float[eltCount];
+        for (size_t i = 0; i < eltCount; i++)
+          localMem[i] = (float(rand()) / RAND_MAX) * 2 - 1;
+          
+        void* deviceMem;
+        CUDA_TENSORRT_CHECK(cudaMalloc(&deviceMem, memSize));
+        if (deviceMem == nullptr)
+        {
+          std::cerr << "Out of memory" << std::endl;
+          exit(1);
+        }
+        CUDA_TENSORRT_CHECK(cudaMemcpy(deviceMem, localMem, memSize, cudaMemcpyHostToDevice));
+          
+        
+        buffers[1] = deviceMem;
+        //spOutputBlob->set_gpu_data((float*)deviceMem);
+
         
         //createMemory(*cudaEngine, buffers, std::string("net_output"));
         
@@ -309,12 +354,14 @@ namespace op
         
         std::cout << "Forward Pass : executing inference" << std::endl;
         
-        int batchSize = 1;
-        spInputBlob->Update();
+        //spInputBlob->Update();
         context->execute(batchSize, &buffers[0]);
-        spOutputBlob->Update();
-        
-        
+        //spOutputBlob->Update();
+        spOutputBlob->set_gpu_data((float*)deviceMem);
+        //CUDA_TENSORRT_CHECK(cudaMemcpy(localMem, buffers[1], memSize, cudaMemcpyDeviceToHost)); 
+        //spOutputBlob->set_cpu_data((float*)localMem);
+
+        delete[] localMem;
         std::cout << "Forward Pass : inference done !" << std::endl;
         
         
