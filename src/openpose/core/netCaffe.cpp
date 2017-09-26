@@ -32,9 +32,11 @@ namespace op
             upCaffeNet->blobs()[0]->Reshape({mNetInputSize4D[0], mNetInputSize4D[1], mNetInputSize4D[2], mNetInputSize4D[3]});
             upCaffeNet->Reshape();
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+            boost::shared_ptr<caffe::Blob<float>> spInputBlob = upCaffeNet->blobs().at(0);
+            std::cout << "Input Blob size : " << spInputBlob->num() << " " << spInputBlob->channels() << " " << spInputBlob->height() << " " << spInputBlob->width() << std::endl;
             // Set spOutputBlob
             spOutputBlob = upCaffeNet->blob_by_name(mLastBlobName);
-            std::cout << spOutputBlob->num() << " " << spOutputBlob->channels() << " " << spOutputBlob->height() << " " << spOutputBlob->width();
+            std::cout << "Output Blob size : " << spOutputBlob->num() << " " << spOutputBlob->channels() << " " << spOutputBlob->height() << " " << spOutputBlob->width() << std::endl;
             if (spOutputBlob == nullptr)
                 error("The output blob is a nullptr. Did you use the same name than the prototxt? (Used: " + mLastBlobName + ").", __LINE__, __FUNCTION__, __FILE__);
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);

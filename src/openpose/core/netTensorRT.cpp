@@ -60,7 +60,7 @@ ICudaEngine* caffeToGIEModel(const std::string& caffeProto, const std::string& c
   const IBlobNameToTensor* blobNameToTensor = parser->parse(caffeProto.c_str(),
                                                             caffeTrainedModel.c_str(),
                                                             *network,
-                                                            DataType::kHALF);
+                                                            DataType::kFLOAT);
   
   if (!blobNameToTensor)
     return nullptr;
@@ -97,8 +97,8 @@ ICudaEngine* caffeToGIEModel(const std::string& caffeProto, const std::string& c
   builder->setMaxBatchSize(1);
   // 16 megabytes, default in giexec. No idea what's best for Jetson though,
   // maybe check dusty_nv's code on github
-  builder->setMaxWorkspaceSize(16<<20);
-  builder->setHalf2Mode(true);
+  builder->setMaxWorkspaceSize(32<<20);
+  builder->setHalf2Mode(false);
   
   ICudaEngine* engine = builder->buildCudaEngine(*network);
   if (engine == nullptr)
@@ -185,7 +185,7 @@ namespace op
       
       
       
-      spInputBlob = boost::make_shared<caffe::Blob<float>>(1, 3, 128, 96);
+      spInputBlob = boost::make_shared<caffe::Blob<float>>(1, 3, 368, 656);
       spOutputBlob = boost::make_shared<caffe::Blob<float>>(1, 57, 46, 82);
       
       // For tensor RT is done in caffeToGIE
@@ -248,7 +248,7 @@ namespace op
         
         // OLD
         auto* gpuImagePtr = spInputBlob->mutable_gpu_data();
-        cudaMemcpy(gpuImagePtr, inputData, mNetInputMemory, cudaMemcpyHostToDevice);
+        CUDA_TENSORRT_CHECK(cudaMemcpy(gpuImagePtr, inputData, mNetInputMemory, cudaMemcpyHostToDevice));
         
         // Tensor RT version
         
