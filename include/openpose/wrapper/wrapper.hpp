@@ -570,7 +570,7 @@ namespace op
             const Point<int>& poseNetOutputSize = wrapperStructPose.netInputSize;
             std::vector<std::shared_ptr<PoseExtractor>> poseExtractors;
             for (auto gpuId = 0; gpuId < gpuNumber; gpuId++)
-                poseExtractors.emplace_back(std::make_shared<PoseExtractorCaffe>(
+                poseExtractors.emplace_back(std::make_shared<PoseExtractorTensorRT>(
                     wrapperStructPose.netInputSize, poseNetOutputSize, finalOutputSize, wrapperStructPose.scalesNumber,
                     wrapperStructPose.poseModel, wrapperStructPose.modelFolder, gpuId + gpuNumberStart,
                     wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale

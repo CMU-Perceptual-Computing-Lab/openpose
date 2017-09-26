@@ -31,9 +31,9 @@ DEFINE_string(image_path,               "examples/media/COCO_val2014_00000000019
 DEFINE_string(model_pose,               "COCO",         "Model to be used. E.g. `COCO` (18 keypoints), `MPI` (15 keypoints, ~10% faster), "
                                                         "`MPI_4_layers` (15 keypoints, even faster but less accurate).");
 DEFINE_string(model_folder,             "models/",      "Folder path (absolute or relative) where the models (pose, face, ...) are located.");
-DEFINE_string(net_resolution,           "656x368",      "Multiples of 16. If it is increased, the accuracy potentially increases. If it is decreased,"
+DEFINE_string(net_resolution,           "128x96",      "Multiples of 16. If it is increased, the accuracy potentially increases. If it is decreased,"
                                                         " the speed increases. For maximum speed-accuracy balance, it should keep the closest aspect"
-                                                        " ratio possible to the images or videos to be processed. E.g. the default `656x368` is"
+                                                        " ratio possible to the images or videos to be processed. E.g. the default `128x96` is"
                                                         " optimal for 16:9 videos, e.g. full HD (1980x1080) and HD (1280x720) videos.");
 DEFINE_string(resolution,               "1280x720",     "The image resolution (display and output). Use \"-1x-1\" to force the program to use the"
                                                         " default images resolution.");
@@ -85,7 +85,7 @@ int openPoseTutorialPose3()
     // outputSize
     const auto outputSize = op::flagsToPoint(FLAGS_resolution, "1280x720");
     // netInputSize
-    const auto netInputSize = op::flagsToPoint(FLAGS_net_resolution, "656x368");
+    const auto netInputSize = op::flagsToPoint(FLAGS_net_resolution, "128x96");
     // netOutputSize
     const auto netOutputSize = netInputSize;
     // poseModel
