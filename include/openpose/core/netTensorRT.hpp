@@ -34,6 +34,7 @@ namespace op
         // Init with constructor
         const int mGpuId;
         const std::array<int, 4> mNetInputSize4D;
+        std::array<int, 4> mNetOutputSize4D;
         const unsigned long mNetInputMemory;
         const std::string mCaffeProto;
         const std::string mCaffeTrainedModel;

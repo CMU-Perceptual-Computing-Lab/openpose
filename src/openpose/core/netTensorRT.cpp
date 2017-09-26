@@ -97,6 +97,9 @@ ICudaEngine* caffeToGIEModel(const std::string& caffeProto, const std::string& c
     gInputs.push_back(network->getInput(i)->getName());
     gInputDimensions.insert(std::make_pair(network->getInput(i)->getName(), dims));
     std::cout << "Input \"" << network->getInput(i)->getName() << "\": " << dims.c() << "x" << dims.h() << "x" << dims.w() << std::endl;
+    mNetOutputSize4D = { 1, dims.c(), dims.h(), dims.w() };
+    if( i > 0)
+      std::err << "Multiple output unsupported for now!" << std:endl;
   }
   
   // specify which tensors are outputs
@@ -209,9 +212,10 @@ namespace op
       std::cout << "InitializationOnThread : done" << std::endl;
       
       
-      
-      spInputBlob = boost::make_shared<caffe::Blob<float>>(1, 3, 368, 656);
-      spOutputBlob = boost::make_shared<caffe::Blob<float>>(1, 57, 46, 82);
+      std::cout << "NetInputSize4D: " << mNetInputSize4D[0] << " " << mNetInputSize4D[1] << " " << mNetInputSize4D[2] << " " << mNetInputSize4D[3] << std::endl;
+
+      spInputBlob = boost::make_shared<caffe::Blob<float>>(mNetInputSize4D[0], mNetInputSize4D[1], mNetInputSize4D[2], mNetInputSize4D[3]);
+      spOutputBlob = boost::make_shared<caffe::Blob<float>>(mNetOutputSize4D[0], mNetOutputSize4D[1], mNetOutputSize4D[2], mNetOutputSize4D[3]);
       
       // For tensor RT is done in caffeToGIE
       /*
