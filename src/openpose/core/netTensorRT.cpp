@@ -308,7 +308,7 @@ namespace op
       
         std::cout << "Forward Pass : executing inference" << std::endl;
       
-        cudaContext->execute(batchSize, &buffers[0]);
+        cudaContext->enqueue(batchSize, &buffers[0], stream, nullptr);
       
         spOutputBlob->set_gpu_data((float*)deviceMem);
       
