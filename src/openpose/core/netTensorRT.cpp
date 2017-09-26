@@ -277,40 +277,13 @@ namespace op
         
         // input and output buffer pointers that we pass to the engine - the engine requires exactly IEngine::getNbBindings(),
         // of these, but in this case we know that there is exactly one input and one output.
-        
-        std::cout << "Forward Pass : creating CUDA memory" << std::endl;
-        
         std::vector<void*> buffers(2);
         buffers[0] = spInputBlob->mutable_gpu_data();
         buffers[1] = spOutputBlob->mutable_gpu_data();
-        
-        size_t eltCount = mNetOutputSize4D[0]*mNetOutputSize4D[1]*mNetOutputSize4D[2]*mNetOutputSize4D[3]*batchSize, memSize = eltCount * sizeof(float);
-          
-        float* localMem = new float[eltCount];
-        for (size_t i = 0; i < eltCount; i++)
-          localMem[i] = (float(rand()) / RAND_MAX) * 2 - 1;
-          
-        void* deviceMem;
-        CUDA_CHECK(cudaMalloc(&deviceMem, memSize));
-        if (deviceMem == nullptr)
-        {
-          std::cerr << "Out of memory" << std::endl;
-          exit(1);
-        }
-        CUDA_CHECK(cudaMemcpy(deviceMem, localMem, memSize, cudaMemcpyHostToDevice));
-          
-        
-        buffers[1] = deviceMem;
-        delete[] localMem;
-        
-        std::cout << "Forward Pass : memory created" << std::endl;
-        cudaCheck(__LINE__, __FUNCTION__, __FILE__);
       
         std::cout << "Forward Pass : executing inference" << std::endl;
       
         cudaContext->enqueue(batchSize, &buffers[0], stream, nullptr);
-      
-        spOutputBlob->set_gpu_data((float*)deviceMem);
       
         std::cout << "Forward Pass : inference done !" << std::endl;
         cudaCheck(__LINE__, __FUNCTION__, __FILE__);
