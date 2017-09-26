@@ -108,7 +108,6 @@ namespace op
     {
       DimsCHW dims = static_cast<DimsCHW&&>(network->getOutput(i)->getDimensions());
       std::cout << "Output \"" << network->getOutput(i)->getName() << "\": " << dims.c() << "x" << dims.h() << "x" << dims.w() << std::endl;
-      mNetOutputSize4D = { 1, dims.c(), dims.h(), dims.w() };
     }
     
     // Build the engine
@@ -130,32 +129,62 @@ namespace op
     return engine;
   }
   
+  inline bool file_exists(const std::string& file_path) {
+    struct stat buffer;
+    return (stat(file_path.c_str(), &buffer) == 0);
+  }
   
   ICudaEngine* NetTensorRT::createEngine()
   {
     ICudaEngine *engine;
     
-    engine = caffeToGIEModel();
-    if (!engine)
+    std::string serializedEnginePath = mCaffeProto + ".bin";
+
+    std::cout << "Serialized engine path: " << serializedEnginePath.c_str() << std::endl;
+    if (file_exists(serializedEnginePath))
     {
-      std::cerr << "Engine could not be created" << std::endl;
-      return nullptr;
+      std::cout << "Found serialized TensorRT engine, deserializing..." << std::endl;
+      char *gieModelStream{nullptr};
+      size_t size{0};
+      std::ifstream file(serializedEnginePath, std::ios::binary);
+      if (file.good())
+      {
+        file.seekg(0, file.end);
+        size = file.tellg();
+        file.seekg(0, file.beg);
+        gieModelStream = new char[size];
+        assert(gieModelStream);
+        file.read(gieModelStream, size);
+        file.close();
+      }
+
+      IRuntime* infer = createInferRuntime(gLogger);
+      engine = infer->deserializeCudaEngine(gieModelStream, size, nullptr);
+      if (gieModelStream) delete [] gieModelStream;
+      
+      return engine; 
     }
-    
-    /* TODO Serialize and load engines for given net size as optim quite long
-     if (!gParams.engine.empty())
-     {
-     std::ofstream p(gParams.engine);
-     if (!p)
-     {
-     std::cerr << "could not open plan output file" << std::endl;
-     return nullptr;
-     }
-     IHostMemory *ptr = engine->serialize();
-     assert(ptr);
-     p.write(reinterpret_cast<const char*>(ptr->data()), ptr->size());
-     ptr->destroy();
-     }*/
+    else
+    {
+      engine = caffeToGIEModel();
+      if (!engine)
+      {
+        std::cerr << "Engine could not be created" << std::endl;
+        return nullptr;
+      }
+      else // serialize engine
+      {  
+        std::ofstream p(serializedEnginePath);
+        if (!p)
+        {
+          std::cerr << "could not serialize engine" << std::endl;
+        }
+        IHostMemory *ptr = engine->serialize();
+        assert(ptr);
+        p.write(reinterpret_cast<const char*>(ptr->data()), ptr->size());
+        ptr->destroy();
+      }
+    }
     return engine;
   }
   
@@ -188,15 +217,17 @@ namespace op
         std::cerr << "cudaContext could not be created" << std::endl;
         return;
       }
-      
-      std::cout << "InitializationOnThread : done" << std::endl;
-      
+
+      DimsCHW outputDims = static_cast<DimsCHW&&>(cudaEngine->getBindingDimensions(cudaEngine->getNbBindings() - 1));      
+      mNetOutputSize4D = { 1, outputDims.c(), outputDims.h(), outputDims.w() };
+
       
       std::cout << "NetInputSize4D: " << mNetInputSize4D[0] << " " << mNetInputSize4D[1] << " " << mNetInputSize4D[2] << " " << mNetInputSize4D[3] << std::endl;
 
       spInputBlob = boost::make_shared<caffe::Blob<float>>(mNetInputSize4D[0], mNetInputSize4D[1], mNetInputSize4D[2], mNetInputSize4D[3]);
       spOutputBlob = boost::make_shared<caffe::Blob<float>>(mNetOutputSize4D[0], mNetOutputSize4D[1], mNetOutputSize4D[2], mNetOutputSize4D[3]);
       
+      std::cout << "InitializationOnThread : done" << std::endl;
       cudaCheck(__LINE__, __FUNCTION__, __FILE__);
     }
     catch (const std::exception& e)
