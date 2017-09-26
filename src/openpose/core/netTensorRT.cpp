@@ -92,17 +92,12 @@ namespace op
       gInputs.push_back(network->getInput(i)->getName());
       gInputDimensions.insert(std::make_pair(network->getInput(i)->getName(), dims));
       std::cout << "Input \"" << network->getInput(i)->getName() << "\": " << dims.c() << "x" << dims.h() << "x" << dims.w() << std::endl;
-      mNetOutputSize4D = { 1, dims.c(), dims.h(), dims.w() };
       if( i > 0)
         std::err << "Multiple output unsupported for now!" << std:endl;
     }
     
-    // specify which tensors are outputs
-    
-    
-    // TODO, if it works switch to something more generic, add as parameter etc
-    std::string s("net_output");
-    if (blobNameToTensor->find(s.c_str()) == nullptr)
+    // Specify which tensor is output (multiple unsupported)
+    if (blobNameToTensor->find(mLastBlobName.c_str()) == nullptr)
     {
       std::cout << "could not find output blob " << s << std::endl;
       return nullptr;
@@ -114,6 +109,7 @@ namespace op
     {
       DimsCHW dims = static_cast<DimsCHW&&>(network->getOutput(i)->getDimensions());
       std::cout << "Output \"" << network->getOutput(i)->getName() << "\": " << dims.c() << "x" << dims.h() << "x" << dims.w() << std::endl;
+      mNetOutputSize4D = { 1, dims.c(), dims.h(), dims.w() };
     }
     
     // Build the engine
