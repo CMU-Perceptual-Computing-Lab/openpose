@@ -47,7 +47,7 @@ namespace op
   // mNetInputSize4D{netInputSize4D}, // This line crashes on some devices with old G++
   mNetInputSize4D{netInputSize4D[0], netInputSize4D[1], netInputSize4D[2], netInputSize4D[3]},
   mNetInputMemory{std::accumulate(mNetInputSize4D.begin(), mNetInputSize4D.end(), 1, std::multiplies<int>()) * sizeof(float)},
-  mCaffeProto{caffeProto},
+  mCaffeProto{caffeProto + "_" + std::to_string(mNetInputSize4D[2]) + "x" + std::to_string(mNetInputSize4D[3])},
   mCaffeTrainedModel{caffeTrainedModel},
   mLastBlobName{lastBlobName}
   {
