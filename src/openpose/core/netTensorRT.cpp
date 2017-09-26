@@ -244,9 +244,11 @@ namespace op
       if (inputData != nullptr)
       {
         
+      
+        
         // OLD
-        //auto* gpuImagePtr = upTensorRTNet->blobs().at(0)->mutable_gpu_data();
-        //cudaMemcpy(gpuImagePtr, inputData, mNetInputMemory, cudaMemcpyHostToDevice);
+        auto* gpuImagePtr = spInputBlob->mutable_gpu_data();
+        cudaMemcpy(gpuImagePtr, inputData, mNetInputMemory, cudaMemcpyHostToDevice);
         
         // Tensor RT version
         
