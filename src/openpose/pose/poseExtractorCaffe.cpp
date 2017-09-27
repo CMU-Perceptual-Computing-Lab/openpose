@@ -7,6 +7,22 @@
 #include <openpose/utilities/openCv.hpp>
 #include <openpose/pose/poseExtractorCaffe.hpp>
 
+typedef std::vector<std::pair<std::string, std::chrono::high_resolution_clock::time_point>> OpTimings;
+
+static OpTimings timings;
+
+static void timeNow(const std::string& label){
+    const auto now = std::chrono::high_resolution_clock::now();
+    const auto timing = std::make_pair(label, now);
+    timings.push_back(timing);
+}
+
+static std::string timeDiffToString(const std::chrono::high_resolution_clock::time_point& t1,
+                                const std::chrono::high_resolution_clock::time_point& t2 ) {
+    return std::to_string((double)std::chrono::duration_cast<std::chrono::duration<double>>(t1 - t2).count() * 1e3) + " ms";
+}
+
+
 namespace op
 {
     PoseExtractorCaffe::PoseExtractorCaffe(const Point<int>& netInputSize, const Point<int>& netOutputSize, const Point<int>& outputSize, const int scaleNumber,
@@ -79,10 +95,10 @@ namespace op
             // Security checks
             if (inputNetData.empty())
                 error("Empty inputNetData.", __LINE__, __FUNCTION__, __FILE__);
-
+            timeNow("Start");
             // 1. Caffe deep network
             spNet->forwardPass(inputNetData.getConstPtr());                                                     // ~79.3836ms
-
+            timeNow("Caffe Forward");
             // 2. Resize heat maps + merge different scales
             spResizeAndMergeCaffe->setScaleRatios(scaleRatios);
             #ifndef CPU_ONLY
@@ -91,7 +107,7 @@ namespace op
             #else
                 error("ResizeAndMergeCaffe CPU version not implemented yet.", __LINE__, __FUNCTION__, __FILE__);
             #endif
-
+            timeNow("Resize Heat Maps");
             // 3. Get peaks by Non-Maximum Suppression
             spNmsCaffe->setThreshold((float)get(PoseProperty::NMSThreshold));
             #ifndef CPU_ONLY
@@ -100,22 +116,32 @@ namespace op
             #else
                 error("NmsCaffe CPU version not implemented yet.", __LINE__, __FUNCTION__, __FILE__);
             #endif
-
+            timeNow("Peaks by nms");
             // Get scale net to output
             const auto scaleProducerToNetInput = resizeGetScaleFactor(inputDataSize, mNetOutputSize);
             const Point<int> netSize{intRound(scaleProducerToNetInput*inputDataSize.x), intRound(scaleProducerToNetInput*inputDataSize.y)};
             mScaleNetToOutput = {(float)resizeGetScaleFactor(netSize, mOutputSize)};
-
+            timeNow("Scale net to output");
             // 4. Connecting body parts
             spBodyPartConnectorCaffe->setScaleNetToOutput(mScaleNetToOutput);
             spBodyPartConnectorCaffe->setInterMinAboveThreshold((int)get(PoseProperty::ConnectInterMinAboveThreshold));
             spBodyPartConnectorCaffe->setInterThreshold((float)get(PoseProperty::ConnectInterThreshold));
             spBodyPartConnectorCaffe->setMinSubsetCnt((int)get(PoseProperty::ConnectMinSubsetCnt));
             spBodyPartConnectorCaffe->setMinSubsetScore((float)get(PoseProperty::ConnectMinSubsetScore));
-
             // GPU version not implemented yet
             spBodyPartConnectorCaffe->Forward_cpu({spHeatMapsBlob.get(), spPeaksBlob.get()}, mPoseKeypoints);
             // spBodyPartConnectorCaffe->Forward_gpu({spHeatMapsBlob.get(), spPeaksBlob.get()}, {spPoseBlob.get()}, mPoseKeypoints);
+            timeNow("Connect Body Parts");
+
+            const auto totalTimeSec = timeDiffToString(timings.back().second, timings.front().second);
+            const auto message = "Pose estimation successfully finished. Total time: " + totalTimeSec + " seconds.";
+            op::log(message, op::Priority::High);
+
+            for(OpTimings::iterator timing = timings.begin()+1; timing != timings.end(); ++timing) {
+              const auto log_time = (*timing).first + " - " + timeDiffToString((*timing).second, (*(timing-1)).second);
+              op::log(log_time, op::Priority::High);
+            }
+
         }
         catch (const std::exception& e)
         {
