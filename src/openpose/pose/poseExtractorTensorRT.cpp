@@ -105,7 +105,7 @@ namespace op
             spResizeAndMergeTensorRT->setScaleRatios(scaleRatios);
             timeNow("SpResizeAndMergeTensorRT");
             #ifndef CPU_ONLY
-                spResizeAndMergeTensorRT->Forward_cpu({spTensorRTNetOutputBlob.get()}, {spHeatMapsBlob.get()});       // ~5ms
+                spResizeAndMergeTensorRT->Forward_gpu({spTensorRTNetOutputBlob.get()}, {spHeatMapsBlob.get()});       // ~5ms
                 timeNow("RaM forward_gpu");
                 cudaCheck(__LINE__, __FUNCTION__, __FILE__);
                 timeNow("CudaCheck");

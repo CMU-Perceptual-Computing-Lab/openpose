@@ -7,18 +7,15 @@ namespace op
     const auto THREADS_PER_BLOCK_1D = 16u;
 
     template <typename T>
-    __global__ void resizeKernel(T* targetPtr, const T* const sourcePtr, const int sourceWidth, const int sourceHeight, const int targetWidth,
-                                 const int targetHeight)
+    __global__ void resizeKernel(T* targetPtr, const T* const sourcePtr, const int sourceWidth, const int sourceHeight, const int targetWidth, const int targetHeight, const T invScaleWidth, const T invScaleHeight)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
 
         if (x < targetWidth && y < targetHeight)
         {
-            const auto scaleWidth = targetWidth / T(sourceWidth);
-            const auto scaleHeight = targetHeight / T(sourceHeight);
-            const T xSource = (x + 0.5f) / scaleWidth - 0.5f;
-            const T ySource = (y + 0.5f) / scaleHeight - 0.5f;
+            const T xSource = (x + 0.5f) * invScaleWidth - 0.5f;
+            const T ySource = (y + 0.5f) * invScaleHeight - 0.5f;
 
             targetPtr[y*targetWidth+x] = bicubicInterpolate(sourcePtr, xSource, ySource, sourceWidth, sourceHeight, sourceWidth);
         }
@@ -30,7 +27,14 @@ namespace op
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
+               
+        const auto currentWidth = sourceWidth;
+        const auto currentHeight = sourceHeight;
 
+        const auto scaleWidth = targetWidth / currentWidth;
+        const auto scaleHeight = targetHeight / currentHeight;
+
+ 
         if (x < targetWidth && y < targetHeight)
         {
             auto& targetPixel = targetPtr[y*targetWidth+x];
@@ -38,17 +42,11 @@ namespace op
             // targetPixel = -1000.f; // For fastMax
             for (auto n = 0; n < num; n++)
             {
-                const auto currentWidth = sourceWidth * scaleRatios[n];
-                const auto currentHeight = sourceHeight * scaleRatios[n];
-
-                const auto scaleWidth = targetWidth / currentWidth;
-                const auto scaleHeight = targetHeight / currentHeight;
                 const T xSource = (x + 0.5f) / scaleWidth - 0.5f;
                 const T ySource = (y + 0.5f) / scaleHeight - 0.5f;
 
                 const T* const sourcePtrN = sourcePtr + n * sourceNumOffset;
-                const auto interpolated = bicubicInterpolate(sourcePtrN, xSource, ySource, intRound(currentWidth),
-                                                             intRound(currentHeight), sourceWidth);
+                const auto interpolated = bicubicInterpolate(sourcePtrN, xSource, ySource, sourceWidth, sourceHeight, sourceWidth);
                 targetPixel += interpolated;
                 // targetPixel = fastMax(targetPixel, interpolated);
             }
@@ -73,44 +71,38 @@ namespace op
             const dim3 numBlocks{getNumberCudaBlocks(targetWidth, threadsPerBlock.x), getNumberCudaBlocks(targetHeight, threadsPerBlock.y)};
             const auto sourceChannelOffset = sourceHeight * sourceWidth;
             const auto targetChannelOffset = targetWidth * targetHeight;
-
+            const auto scaleWidth = sourceWidth/T(targetWidth);
+            const auto scaleHeight = sourceHeight/T(targetHeight);
             // No multi-scale merging
-            if (targetSize[0] > 1)
+            /*if (targetSize[0] > 1)
             {
                 for (auto n = 0; n < num; n++)
-                {
-                    const auto offsetBase = n*channels;
+                {*/
                     for (auto c = 0 ; c < channels ; c++)
                     {
-                        const auto offset = offsetBase + c;
-                        resizeKernel<<<numBlocks, threadsPerBlock>>>(targetPtr + offset * targetChannelOffset,
-                                                                     sourcePtr + offset * sourceChannelOffset,
-                                                                     sourceWidth, sourceHeight, targetWidth, targetHeight);
+                        resizeKernel<<<numBlocks, threadsPerBlock>>>(targetPtr + c * targetChannelOffset,
+                                                                     sourcePtr + c * sourceChannelOffset,
+                                                                     sourceWidth, sourceHeight, targetWidth, targetHeight, scaleWidth, scaleHeight);
                     }
+/*
                 }
             }
             // Multi-scale merging
             else
             {
-                // If scale_number > 1 --> scaleRatios must be set
-                if (scaleRatios.size() != num)
-                    error("The scale ratios size must be equal than the number of scales.", __LINE__, __FUNCTION__, __FILE__);
-                const auto maxScales = 10;
-                if (scaleRatios.size() > maxScales)
-                    error("The maximum number of scales is " + std::to_string(maxScales) + ".", __LINE__, __FUNCTION__, __FILE__);
-                // Copy scaleRatios
-                T* scaleRatiosGpuPtr;
-                cudaMalloc((void**)&scaleRatiosGpuPtr, maxScales * sizeof(T));
-                cudaMemcpy(scaleRatiosGpuPtr, scaleRatios.data(), scaleRatios.size() * sizeof(T), cudaMemcpyHostToDevice);
+                const auto currentWidth = sourceWidth;
+                const auto currentHeight = sourceHeight;
+
+                const auto scaleWidth = targetWidth / currentWidth;
+                const auto scaleHeight = targetHeight / currentHeight;
+
                 // Perform resize + merging
                 const auto sourceNumOffset = channels * sourceChannelOffset;
                 for (auto c = 0 ; c < channels ; c++)
                     resizeKernelAndMerge<<<numBlocks, threadsPerBlock>>>(targetPtr + c * targetChannelOffset,
                                                                          sourcePtr + c * sourceChannelOffset, sourceNumOffset,
                                                                          num, scaleRatiosGpuPtr, sourceWidth, sourceHeight, targetWidth, targetHeight);
-                // Free memory
-                cudaFree(scaleRatiosGpuPtr);
-            }
+            }*/
 
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
         }
