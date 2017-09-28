@@ -1,52 +1,17 @@
 OpenPose - Installation using CMake
 ====================================
 
-<<<<<<< HEAD
-The CMake installation is experimental. It will eventually replace the standard and current installation system, but at the moment it is a beta version.
-
-## Contents
-1. [Requirements](#requirements)
-2. [Clone and Update the Repository](#clone-and-update-the-repository)
-3. [Installation](#installation)
-=======
 ## Contents
 1. [Operating Systems](#operating-systems)
 2. [Requirements](#requirements)
 3. [Clone and Update the Repository](#clone-and-update-the-repository)
 4. [Installation](#installation)
->>>>>>> upstream/master
     1. [Caffe Prerequisites (Ubuntu Only)](#caffe-prerequisites-ubuntu-only)
     2. [OpenPose Configuration](#openpose-configuration)
     3. [OpenPose Building](#openpose-building)
     4. [Run OpenPose](#run-openpose)
 5. [Reinstallation](#reinstallation)
 6. [Optional Settings](#optional-settings)
-<<<<<<< HEAD
-    1. [Custom Caffe](#custom-caffe)
-    2. [Custom OpenCV](#custom-opencv)
-    3. [MPI Model](#mpi-model)
-    4. [CMake Command Line Configuration](#cmake-command-line-configuration)
-
-
-
-## Requirements
-- Ubuntu (tested on 14 and 16). Windows CMake version will come soon.
-- NVIDIA graphics card with at least 1.6 GB available (the `nvidia-smi` command checks the available GPU memory in Ubuntu).
-- At least 2 GB of free RAM memory.
-- Highly recommended: A CPU with at least 8 cores.
-
-Note: These requirements assume the default configuration (i.e. `--net_resolution "656x368"` and `scale_number 1`). You might need more (with a greater net resolution and/or number of scales) or less resources (with smaller net resolution and/or using the MPI and MPI_4 models).
-
-
-
-## Clone and Update the Repository
-The first step is to clone the OpenPose repository. It might be done with [GitHub Desktop](https://desktop.github.com/) in Windows and from the terminal in Ubuntu:
-```bash
-git clone https://github.com/CMU-Perceptual-Computing-Lab/openpose
-```
-
-OpenPose can be easily updated by clicking the `synchronization` button at the top-right part in GitHub Desktop in Windows, or by running `git pull origin master` in Ubuntu. After OpenPose has been updated, just run the [Reinstallation](#reinstallation) section described below for your specific Operating System.
-=======
     1. [Doxygen Documentation Autogeneration](#doxygen-documentation-autogeneration)
     2. [Custom Caffe](#custom-caffe)
     3. [Custom OpenCV](#custom-opencv)
@@ -67,7 +32,6 @@ See [doc/quick_start.md#requirements](./quick_start.md#requirements).
 
 ## Clone and Update the Repository
 See [doc/quick_start.md#clone-and-update-the-repository](./quick_start.md#clone-and-update-the-repository).
->>>>>>> upstream/master
 
 
 
@@ -146,14 +110,11 @@ In order to re-install OpenPose:
 
 
 ### Optional Settings
-<<<<<<< HEAD
-=======
 #### Doxygen Documentation Autogeneration
 You can generate the documentation by setting the `BUILD_DOCS` flag.
 
 
 
->>>>>>> upstream/master
 #### Custom Caffe
 We only modified some Caffe compilation flags and minor details. You can use your own Caffe distribution, simply specify the Caffe include path and the library as shown below. You will also need to turn off the `BUILD_CAFFE` variable.
 <p align="center">
