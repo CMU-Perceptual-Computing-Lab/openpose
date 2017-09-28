@@ -1,5 +1,5 @@
-#ifndef OPENPOSE_FACE_W_FACE_RENDERER_HPP
-#define OPENPOSE_FACE_W_FACE_RENDERER_HPP
+#ifndef OPENPOSE_FACE_W_FACE_EXTRACTOR_OPENCV_HPP
+#define OPENPOSE_FACE_W_FACE_EXTRACTOR_OPENCV_HPP
 
 #include <openpose/core/common.hpp>
 #include <openpose/face/faceRenderer.hpp>
@@ -8,19 +8,19 @@
 namespace op
 {
     template<typename TDatums>
-    class WFaceRenderer : public Worker<TDatums>
+    class WFaceDetectorOpenCV : public Worker<TDatums>
     {
     public:
-        explicit WFaceRenderer(const std::shared_ptr<FaceRenderer>& faceRenderer);
+        explicit WFaceDetectorOpenCV(const std::shared_ptr<FaceDetectorOpenCV>& faceDetectorOpenCV);
 
         void initializationOnThread();
 
         void work(TDatums& tDatums);
 
     private:
-        std::shared_ptr<FaceRenderer> spFaceRenderer;
+        std::shared_ptr<FaceDetectorOpenCV> spFaceDetectorOpenCV;
 
-        DELETE_COPY(WFaceRenderer);
+        DELETE_COPY(WFaceDetectorOpenCV);
     };
 }
 
@@ -33,19 +33,18 @@ namespace op
 namespace op
 {
     template<typename TDatums>
-    WFaceRenderer<TDatums>::WFaceRenderer(const std::shared_ptr<FaceRenderer>& faceRenderer) :
-        spFaceRenderer{faceRenderer}
+    WFaceDetectorOpenCV<TDatums>::WFaceDetectorOpenCV(const std::shared_ptr<FaceDetectorOpenCV>& faceDetectorOpenCV) :
+        spFaceDetectorOpenCV{faceDetectorOpenCV}
     {
     }
 
     template<typename TDatums>
-    void WFaceRenderer<TDatums>::initializationOnThread()
+    void WFaceDetectorOpenCV<TDatums>::initializationOnThread()
     {
-        spFaceRenderer->initializationOnThread();
     }
 
     template<typename TDatums>
-    void WFaceRenderer<TDatums>::work(TDatums& tDatums)
+    void WFaceDetectorOpenCV<TDatums>::work(TDatums& tDatums)
     {
         try
         {
@@ -55,14 +54,9 @@ namespace op
                 dLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 // Profiling speed
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
-                // Render people face
+                // Detect people face
                 for (auto& tDatum : *tDatums)
-                    spFaceRenderer->renderFace(tDatum.outputData, tDatum.faceKeypoints);
-                for (auto& tDatum : *tDatums)
-                {
-                    op::log("tDatum.faceRectangles: " + std::to_string(tDatum.faceRectangles.size()), op::Priority::High);
-                    op::log("tDatum.posekeypoints: " + std::to_string(tDatum.poseKeypoints.getSize(0)), op::Priority::High);
-                }
+                    tDatum.faceRectangles = spFaceDetectorOpenCV->detectFacesOpenCV(tDatum.cvInputData, tDatum.scaleInputToOutput);
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
                 Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__, Profiler::DEFAULT_X);
@@ -78,7 +72,7 @@ namespace op
         }
     }
 
-    COMPILE_TEMPLATE_DATUM(WFaceRenderer);
+    COMPILE_TEMPLATE_DATUM(WFaceDetectorOpenCV);
 }
 
-#endif // OPENPOSE_FACE_W_FACE_RENDERER_HPP
+#endif // OPENPOSE_FACE_W_FACE_EXTRACTOR_OPENCV_HPP

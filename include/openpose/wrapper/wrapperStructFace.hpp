@@ -52,6 +52,11 @@ namespace op
         float renderThreshold;
 
         /**
+         * Use the OpenPose face detector (0) or Opencv detector (1).
+         */
+        int FaceDetector;
+
+        /**
          * Constructor of the struct.
          * It has the recommended and default values we recommend for each element of the struct.
          * Since all the elements of the struct are public, they can also be manually filled.
@@ -60,7 +65,8 @@ namespace op
                           const RenderMode renderMode = RenderMode::None,
                           const float alphaKeypoint = FACE_DEFAULT_ALPHA_KEYPOINT,
                           const float alphaHeatMap = FACE_DEFAULT_ALPHA_HEAT_MAP,
-                          const float renderThreshold = 0.4f);
+                          const float renderThreshold = 0.4f,
+                          const int FaceDetector = 0);
     };
 }
 

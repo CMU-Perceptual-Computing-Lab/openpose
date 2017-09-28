@@ -503,6 +503,8 @@ namespace op
             if (!wrapperStructOutput.writeVideo.empty() && wrapperStructInput.producerSharedPtr == nullptr)
                 error("Writting video is only available if the OpenPose producer is used (i.e. wrapperStructInput.producerSharedPtr cannot be a nullptr).",
                       __LINE__, __FUNCTION__, __FILE__);
+            if (wrapperStructFace.FaceDetector != 0 && wrapperStructFace.FaceDetector != 1)
+                error("Face detector flag should be 0 or 1 only",  __LINE__, __FUNCTION__, __FILE__);
 
             // Get number GPUs
             auto gpuNumber = wrapperStructPose.gpuNumber;
@@ -627,11 +629,27 @@ namespace op
             // Face extractor(s)
             if (wrapperStructFace.enable)
             {
-                const auto faceDetector = std::make_shared<FaceDetector>(wrapperStructPose.poseModel);
+                // Face detector
+                if(wrapperStructFace.FaceDetector == 0)
+                {
+                    //use OpenPose as face detector
+                    const auto faceDetector = std::make_shared<FaceDetector>(wrapperStructPose.poseModel);
+                    for (auto gpuId = 0u; gpuId < spWPoses.size(); gpuId++)
+                    {
+                        spWPoses.at(gpuId).emplace_back(std::make_shared<WFaceDetector<TDatumsPtr>>(faceDetector));
+                    }
+                }
+                else
+                {
+                    //use OpenCV as face detector
+                    const auto faceDetectorOpenCV = std::make_shared<FaceDetectorOpenCV>();
+                    for (auto gpuId = 0u; gpuId < spWPoses.size(); gpuId++)
+                    {
+                        spWPoses.at(gpuId).emplace_back(std::make_shared<WFaceDetectorOpenCV<TDatumsPtr>>(faceDetectorOpenCV));
+                    }
+                }
                 for (auto gpuId = 0u; gpuId < spWPoses.size(); gpuId++)
                 {
-                    // Face detector
-                    spWPoses.at(gpuId).emplace_back(std::make_shared<WFaceDetector<TDatumsPtr>>(faceDetector));
                     // Face keypoint extractor
                     const auto netOutputSize = wrapperStructFace.netInputSize;
                     const auto faceExtractor = std::make_shared<FaceExtractor>(
