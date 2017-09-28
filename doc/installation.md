@@ -50,7 +50,7 @@ OpenPose can be easily updated by clicking the `synchronization` button at the t
 
 ## Ubuntu
 ### Installation - CMake
-Recommended installation method. It is simpler and it offers many more customization settings. See [doc/installation_cmake.md](/installation_cmake.md). Note that it is a beta version, if it fails, please post in GitHub and use [Installation - Script Compilation](#installation---script-compilation) meanwhile.
+Recommended installation method. It is simpler and it offers many more customization settings. See [doc/installation_cmake.md](doc/installation_cmake.md). Note that it is a beta version, if it fails, please post in GitHub and use [Installation - Script Compilation](#installation---script-compilation) meanwhile.
 
 
 
