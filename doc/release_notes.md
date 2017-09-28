@@ -102,9 +102,17 @@ OpenPose Library - Release Notes
 
 
 
-## Current version (future OpenPose 1.0.3)
+## OpenPose 1.1.0
 1. Main improvements:
-    1. Added how to use keypoint data in `examples/tutorial_wrapper/`.
-    2. Added flag for warnings of type `-Wsign-compare` and removed in code.
+    1. Added CMake installer for Ubuntu.
+    2. Added how to use keypoint data in `examples/tutorial_wrapper/`.
+    3. Added flag for warnings of type `-Wsign-compare` and removed in code.
+    4. Slightly improved accuracy by considering ears-shoulder connection (e.g. +0.4 mAP for 1 scale in validation set).
 2. Main bugs fixed:
     1. Windows version crashing with std::map copy.
+
+
+
+## Current version (future OpenPose 1.1.1)
+1. Main improvements:
+    1. COCO JSON file outputs 0 as score for non-detected keypoints.

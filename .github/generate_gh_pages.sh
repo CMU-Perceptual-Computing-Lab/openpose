@@ -1,6 +1,6 @@
 #!/bin/sh
 ################################################################################
-# Title         : generateDocumentationAndDeploy.sh
+# Title         : generate_gh_pages.sh
 # Date created  : 2016/02/22
 # Notes         :
 __AUTHOR__="openpose"

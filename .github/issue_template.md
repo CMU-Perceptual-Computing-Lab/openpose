@@ -3,7 +3,8 @@
 2. **No duplicated** posts.
 3. **No** posts about **questions already answered / clearly explained in** the **documentation** (e.g. **no more low-speed nor out-of-memory questions**).
 4. Set a **proper issue title**: add the Ubuntu/Windows word and be specific (e.g. do not simple call it: `Compile error`).
-5. Only English comments.
+5. **No** questions about **training**. OpenPose only implements testing.
+6. Only English comments.
 Issues/comments that do not follow this will be **ignored or removed** with no further clarification.
 
 

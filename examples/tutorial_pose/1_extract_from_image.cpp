@@ -43,8 +43,9 @@ DEFINE_double(scale_gap,                0.3,            "Scale gap between scale
                                                         " `net_resolution` by your desired initial scale.");
 DEFINE_int32(scale_number,              1,              "Number of scales to average.");
 // OpenPose Rendering
-DEFINE_bool(disable_blending,           false,          "If blending is enabled, it will merge the results with the original frame. If disabled, it"
-                                                        " will only display the results on a black background.");
+DEFINE_bool(disable_blending,           false,          "If enabled, it will render the results (keypoint skeletons or heatmaps) on a black"
+                                                        " background, instead of being rendered into the original image. Related: `part_to_show`,"
+                                                        " `alpha_pose`, and `alpha_pose`.");
 DEFINE_double(render_threshold,         0.05,           "Only estimated keypoints whose score confidences are higher than this threshold will be"
                                                         " rendered. Generally, a high threshold (> 0.5) will only render very clear body parts;"
                                                         " while small thresholds (~0.1) will also output guessed and occluded keypoints, but also"
