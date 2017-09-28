@@ -8,3 +8,8 @@ set(SOURCES
 
 add_library(producer ${SOURCES})
 target_link_libraries(producer ${OpenCV_LIBS} core thread filestream)
+
+install(TARGETS producer
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib/openpose)

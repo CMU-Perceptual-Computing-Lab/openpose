@@ -8,3 +8,8 @@ set(SOURCES
 
 add_library(wrapper ${SOURCES})
 target_link_libraries(wrapper thread pose hand core face filestream gui producer utilities)
+
+install(TARGETS wrapper
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib/openpose)

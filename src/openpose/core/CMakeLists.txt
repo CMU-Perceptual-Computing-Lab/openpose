@@ -24,3 +24,8 @@ target_link_libraries(core ${Caffe_LIBS})
 if (BUILD_CAFFE)
   add_dependencies(core caffe)
 endif (BUILD_CAFFE)
+
+install(TARGETS core
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib/openpose)

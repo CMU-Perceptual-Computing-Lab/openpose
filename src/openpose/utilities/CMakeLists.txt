@@ -13,3 +13,8 @@ find_package(Boost COMPONENTS system filesystem REQUIRED)
 cuda_add_library(utilities ${SOURCES})
 target_link_libraries(utilities producer filestream
     ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
+
+install(TARGETS utilities
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib/openpose)

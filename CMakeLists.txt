@@ -1,5 +1,5 @@
 project(openpose)
-cmake_minimum_required(VERSION 2.8.7 FATAL_ERROR) # min. cmake version recommmended by Caffe
+cmake_minimum_required(VERSION 2.8.7 FATAL_ERROR) # min. cmake version recommended by Caffe
 
 ### FIND THE OS
 
@@ -242,3 +242,8 @@ if (DOWNLOAD_HAND_MODEL)
 endif (DOWNLOAD_HAND_MODEL)
 
 message(STATUS "Models Downloaded.")
+
+### INSTALL
+
+# Install the headers
+install(DIRECTORY include/openpose DESTINATION include/openpose)

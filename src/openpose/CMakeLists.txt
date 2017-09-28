@@ -10,4 +10,3 @@ add_subdirectory(hand)
 add_subdirectory(wrapper)
 set_target_properties(core filestream gui pose utilities producer thread face hand wrapper
   PROPERTIES COMPILE_FLAGS ${OP_CXX_FLAGS})
-
