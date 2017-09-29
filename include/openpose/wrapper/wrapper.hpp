@@ -503,7 +503,7 @@ namespace op
             if (!wrapperStructOutput.writeVideo.empty() && wrapperStructInput.producerSharedPtr == nullptr)
                 error("Writting video is only available if the OpenPose producer is used (i.e. wrapperStructInput.producerSharedPtr cannot be a nullptr).",
                       __LINE__, __FUNCTION__, __FILE__);
-            if (wrapperStructFace.FaceDetector != 0 && wrapperStructFace.FaceDetector != 1)
+            if (wrapperStructFace.faceDetector != 0 && wrapperStructFace.faceDetector != 1)
                 error("Face detector flag should be 0 or 1 only",  __LINE__, __FUNCTION__, __FILE__);
 
             // Get number GPUs
@@ -630,7 +630,7 @@ namespace op
             if (wrapperStructFace.enable)
             {
                 // Face detector
-                if(wrapperStructFace.FaceDetector == 0)
+                if(wrapperStructFace.faceDetector == 0)
                 {
                     //use OpenPose as face detector
                     const auto faceDetector = std::make_shared<FaceDetector>(wrapperStructPose.poseModel);

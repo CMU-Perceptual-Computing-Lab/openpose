@@ -54,7 +54,7 @@ namespace op
         /**
          * Use the OpenPose face detector (0) or Opencv detector (1).
          */
-        int FaceDetector;
+        int faceDetector;
 
         /**
          * Constructor of the struct.
@@ -66,7 +66,7 @@ namespace op
                           const float alphaKeypoint = FACE_DEFAULT_ALPHA_KEYPOINT,
                           const float alphaHeatMap = FACE_DEFAULT_ALPHA_HEAT_MAP,
                           const float renderThreshold = 0.4f,
-                          const int FaceDetector = 0);
+                          const int faceDetector = 0);
     };
 }
 
