@@ -548,11 +548,26 @@ namespace op
                         error(message, __LINE__, __FUNCTION__, __FILE__);
                     }
                 }
+
             }
             else if (finalOutputSize.x == -1 || finalOutputSize.y == -1)
             {
                 const auto message = "Output resolution cannot be (-1 x -1) unless wrapperStructInput.producerSharedPtr is also set.";
                 error(message, __LINE__, __FUNCTION__, __FILE__);
+            }
+            // Set poseNetInputSize if -1 used
+            Point<int> poseNetInputSize = wrapperStructPose.netInputSize;
+            if (poseNetInputSize.x == -1 || poseNetInputSize.y == -1)
+            {
+                if (producerSize.area() <= 0)
+                {
+                    const auto message = "Net resolution cannot be -1 for image_dir, only for video and webcam.";
+                    error(message, __LINE__, __FUNCTION__, __FILE__);
+                }
+                else if (poseNetInputSize.x == -1)
+                    poseNetInputSize.x = 16 * intRound(poseNetInputSize.y * producerSize.x / (float) producerSize.y / 16.f);
+                else // if (poseNetInputSize.y == -1)
+                    poseNetInputSize.y = 16 * intRound(poseNetInputSize.x * producerSize.y / (float) producerSize.x / 16.f);
             }
 
             // Producer
@@ -567,11 +582,11 @@ namespace op
                 wDatumProducer = nullptr;
 
             // Pose estimators
-            const Point<int>& poseNetOutputSize = wrapperStructPose.netInputSize;
+            const Point<int>& poseNetOutputSize = poseNetInputSize;
             std::vector<std::shared_ptr<PoseExtractor>> poseExtractors;
             for (auto gpuId = 0; gpuId < gpuNumber; gpuId++)
                 poseExtractors.emplace_back(std::make_shared<PoseExtractorCaffe>(
-                    wrapperStructPose.netInputSize, poseNetOutputSize, finalOutputSize, wrapperStructPose.scalesNumber,
+                    poseNetInputSize, poseNetOutputSize, finalOutputSize, wrapperStructPose.scalesNumber,
                     wrapperStructPose.poseModel, wrapperStructPose.modelFolder, gpuId + gpuNumberStart,
                     wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale
                 ));
@@ -613,7 +628,7 @@ namespace op
 
             // Input cvMat to OpenPose format
             const auto cvMatToOpInput = std::make_shared<CvMatToOpInput>(
-                wrapperStructPose.netInputSize, wrapperStructPose.scalesNumber, wrapperStructPose.scaleGap
+                poseNetInputSize, wrapperStructPose.scalesNumber, wrapperStructPose.scaleGap
             );
             spWCvMatToOpInput = std::make_shared<WCvMatToOpInput<TDatumsPtr>>(cvMatToOpInput);
             const auto cvMatToOpOutput = std::make_shared<CvMatToOpOutput>(finalOutputSize, renderOutput);

@@ -117,3 +117,4 @@ OpenPose Library - Release Notes
 1. Main improvements:
     1. COCO JSON file outputs 0 as score for non-detected keypoints.
     2. Added example for OpenPose for user asynchronous output and cleaned all `tutorial_wrapper/` examples.
+    3. Added `-1` option for `net_resolution` in order to auto-select the best possible aspect ratio given the user input.
