@@ -36,10 +36,12 @@ namespace op
             std::vector<Rectangle<float>> faceRectangles(detectedFaces.size());
             for(auto i = 0u; i < detectedFaces.size(); i++)
             {
-                faceRectangles.at(i).x = detectedFaces.at(i).x / scaleInputToOutput;
-                faceRectangles.at(i).y = detectedFaces.at(i).y / scaleInputToOutput;
-                faceRectangles.at(i).width = detectedFaces.at(i).width / scaleInputToOutput;
-                faceRectangles.at(i).height = detectedFaces.at(i).height / scaleInputToOutput;
+                // enlarge the rectangle by 1.5X, so that it covers the face better.
+                log(std::to_string(scaleInputToOutput));
+                faceRectangles.at(i).x = detectedFaces.at(i).x - 0.25*detectedFaces.at(i).width;
+                faceRectangles.at(i).y = detectedFaces.at(i).y - 0.25*detectedFaces.at(i).height;
+                faceRectangles.at(i).width = 1.5*detectedFaces.at(i).width;
+                faceRectangles.at(i).height = 1.5*detectedFaces.at(i).height;
             }
             return faceRectangles;
         }

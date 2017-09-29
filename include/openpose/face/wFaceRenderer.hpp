@@ -58,11 +58,6 @@ namespace op
                 // Render people face
                 for (auto& tDatum : *tDatums)
                     spFaceRenderer->renderFace(tDatum.outputData, tDatum.faceKeypoints);
-                for (auto& tDatum : *tDatums)
-                {
-                    op::log("tDatum.faceRectangles: " + std::to_string(tDatum.faceRectangles.size()), op::Priority::High);
-                    op::log("tDatum.posekeypoints: " + std::to_string(tDatum.poseKeypoints.getSize(0)), op::Priority::High);
-                }
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
                 Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__, Profiler::DEFAULT_X);
