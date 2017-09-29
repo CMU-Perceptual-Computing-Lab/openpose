@@ -149,7 +149,7 @@ Our library is open source for research purposes, and we want to continuously im
 
 5. ... etc.
 
-Just comment on GibHub or make a pull request and we will answer as soon as possible! Send us an email if you use the library to make a cool demo or YouTube video!
+Just comment on GitHub or make a pull request and we will answer as soon as possible! Send us an email if you use the library to make a cool demo or YouTube video!
 
 
 
