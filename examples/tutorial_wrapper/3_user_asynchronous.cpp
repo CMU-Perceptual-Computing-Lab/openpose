@@ -1,6 +1,6 @@
-// ------------------------- OpenPose Library Tutorial - Thread - Example 2 - Synchronous -------------------------
-// Synchronous mode: ideal for performance. The user can add his own frames producer / post-processor / consumer to the OpenPose wrapper or use the
-// default ones.
+// ------------------------- OpenPose Library Tutorial - Thread - Example 1 - Asynchronous -------------------------
+// Asynchronous mode: ideal for fast prototyping when performance is not an issue. The user emplaces/pushes and pops frames from the OpenPose wrapper
+// when he desires to.
 
 // This example shows the user how to use the OpenPose wrapper class:
     // 1. User reads images
@@ -157,155 +157,114 @@ struct UserDatum : public op::Datum
 // in this case we assume a std::shared_ptr of a std::vector of UserDatum
 
 // This worker will just read and return all the jpg files in a directory
-class WUserInput : public op::WorkerProducer<std::shared_ptr<std::vector<UserDatum>>>
+class UserInputClass
 {
 public:
-    WUserInput(const std::string& directoryPath) :
+    UserInputClass(const std::string& directoryPath) :
         mImageFiles{op::getFilesOnDirectory(directoryPath, "jpg")},
         // mImageFiles{op::getFilesOnDirectory(directoryPath, std::vector<std::string>{"jpg", "png"})}, // If we want "jpg" + "png" images
-        mCounter{0}
+        mCounter{0},
+        mClosed{false}
     {
         if (mImageFiles.empty())
             op::error("No images found on: " + directoryPath, __LINE__, __FUNCTION__, __FILE__);
     }
 
-    void initializationOnThread() {}
-
-    std::shared_ptr<std::vector<UserDatum>> workProducer()
+    std::shared_ptr<std::vector<UserDatum>> createDatum()
     {
-        try
+        // Close program when empty frame
+        if (mClosed || mImageFiles.size() <= mCounter)
         {
-            // Close program when empty frame
-            if (mImageFiles.size() <= mCounter)
-            {
-                op::log("Last frame read and added to queue. Closing program after it is processed.", op::Priority::High);
-                // This funtion stops this worker, which will eventually stop the whole thread system once all the frames have been processed
-                this->stop();
-                return nullptr;
-            }
-            else
-            {
-                // Create new datum
-                auto datumsPtr = std::make_shared<std::vector<UserDatum>>();
-                datumsPtr->emplace_back();
-                auto& datum = datumsPtr->at(0);
-
-                // Fill datum
-                datum.cvInputData = cv::imread(mImageFiles.at(mCounter++));
-
-                // If empty frame -> return nullptr
-                if (datum.cvInputData.empty())
-                {
-                    op::log("Empty frame detected on path: " + mImageFiles.at(mCounter-1) + ". Closing program.", op::Priority::High);
-                    this->stop();
-                    datumsPtr = nullptr;
-                }
-
-                return datumsPtr;
-            }
-        }
-        catch (const std::exception& e)
-        {
-            op::log("Some kind of unexpected error happened.");
-            this->stop();
-            op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            op::log("Last frame read and added to queue. Closing program after it is processed.", op::Priority::High);
+            // This funtion stops this worker, which will eventually stop the whole thread system once all the frames have been processed
+            mClosed = true;
             return nullptr;
         }
+        else // if (!mClosed)
+        {
+            // Create new datum
+            auto datumsPtr = std::make_shared<std::vector<UserDatum>>();
+            datumsPtr->emplace_back();
+            auto& datum = datumsPtr->at(0);
+
+            // Fill datum
+            datum.cvInputData = cv::imread(mImageFiles.at(mCounter++));
+
+            // If empty frame -> return nullptr
+            if (datum.cvInputData.empty())
+            {
+                op::log("Empty frame detected on path: " + mImageFiles.at(mCounter-1) + ". Closing program.", op::Priority::High);
+                mClosed = true;
+                datumsPtr = nullptr;
+            }
+
+            return datumsPtr;
+        }
+    }
+
+    bool isFinished() const
+    {
+        return mClosed;
     }
 
 private:
     const std::vector<std::string> mImageFiles;
     unsigned long long mCounter;
-};
-
-// This worker will just invert the image
-class WUserPostProcessing : public op::Worker<std::shared_ptr<std::vector<UserDatum>>>
-{
-public:
-    WUserPostProcessing()
-    {
-        // User's constructor here
-    }
-
-    void initializationOnThread() {}
-
-    void work(std::shared_ptr<std::vector<UserDatum>>& datumsPtr)
-    {
-        // User's post-processing (after OpenPose processing & before OpenPose outputs) here
-            // datum.cvOutputData: rendered frame with pose or heatmaps
-            // datum.poseKeypoints: Array<float> with the estimated pose
-        try
-        {
-            if (datumsPtr != nullptr && !datumsPtr->empty())
-                for (auto& datum : *datumsPtr)
-                    cv::bitwise_not(datum.cvOutputData, datum.cvOutputData);
-        }
-        catch (const std::exception& e)
-        {
-            op::log("Some kind of unexpected error happened.");
-            this->stop();
-            op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-        }
-    }
+    bool mClosed;
 };
 
 // This worker will just read and return all the jpg files in a directory
-class WUserOutput : public op::WorkerConsumer<std::shared_ptr<std::vector<UserDatum>>>
+class UserOutputClass
 {
 public:
-    void initializationOnThread() {}
-
-    void workConsumer(const std::shared_ptr<std::vector<UserDatum>>& datumsPtr)
+    bool display(const std::shared_ptr<std::vector<UserDatum>>& datumsPtr)
     {
-        try
+        // User's displaying/saving/other processing here
+            // datum.cvOutputData: rendered frame with pose or heatmaps
+            // datum.poseKeypoints: Array<float> with the estimated pose
+        char key = ' ';
+        if (datumsPtr != nullptr && !datumsPtr->empty())
         {
-            // User's displaying/saving/other processing here
-                // datum.cvOutputData: rendered frame with pose or heatmaps
-                // datum.poseKeypoints: Array<float> with the estimated pose
-            if (datumsPtr != nullptr && !datumsPtr->empty())
+            cv::imshow("User worker GUI", datumsPtr->at(0).cvOutputData);
+            // Display image and sleeps at least 1 ms (it usually sleeps ~5-10 msec to display the image)
+            key = cv::waitKey(1);
+        }
+        else
+            op::log("Nullptr or empty datumsPtr found.", op::Priority::High, __LINE__, __FUNCTION__, __FILE__);
+        return (key == 27);
+    }
+    void printKeypoints(const std::shared_ptr<std::vector<UserDatum>>& datumsPtr)
+    {
+        // Example: How to use the pose keypoints
+        if (datumsPtr != nullptr && !datumsPtr->empty())
+        {
+            op::log("\nKeypoints:");
+            // Accesing each element of the keypoints
+            const auto& poseKeypoints = datumsPtr->at(0).poseKeypoints;
+            op::log("Person pose keypoints:");
+            for (auto person = 0 ; person < poseKeypoints.getSize(0) ; person++)
             {
-                // Show in command line the resulting pose keypoints for body, face and hands
-                op::log("\nKeypoints:");
-                // Accesing each element of the keypoints
-                const auto& poseKeypoints = datumsPtr->at(0).poseKeypoints;
-                op::log("Person pose keypoints:");
-                for (auto person = 0 ; person < poseKeypoints.getSize(0) ; person++)
+                op::log("Person " + std::to_string(person) + " (x, y, score):");
+                for (auto bodyPart = 0 ; bodyPart < poseKeypoints.getSize(1) ; bodyPart++)
                 {
-                    op::log("Person " + std::to_string(person) + " (x, y, score):");
-                    for (auto bodyPart = 0 ; bodyPart < poseKeypoints.getSize(1) ; bodyPart++)
-                    {
-                        std::string valueToPrint;
-                        for (auto xyscore = 0 ; xyscore < poseKeypoints.getSize(2) ; xyscore++)
-                        {
-                            valueToPrint += std::to_string(   poseKeypoints[{person, bodyPart, xyscore}]   ) + " ";
-                        }
-                        op::log(valueToPrint);
-                    }
+                    std::string valueToPrint;
+                    for (auto xyscore = 0 ; xyscore < poseKeypoints.getSize(2) ; xyscore++)
+                        valueToPrint += std::to_string(   poseKeypoints[{person, bodyPart, xyscore}]   ) + " ";
+                    op::log(valueToPrint);
                 }
-                op::log(" ");
-                // Alternative: just getting std::string equivalent
-                op::log("Face keypoints: " + datumsPtr->at(0).faceKeypoints.toString());
-                op::log("Left hand keypoints: " + datumsPtr->at(0).handKeypoints[0].toString());
-                op::log("Right hand keypoints: " + datumsPtr->at(0).handKeypoints[1].toString());
-
-                // Display rendered output image
-                cv::imshow("User worker GUI", datumsPtr->at(0).cvOutputData);
-                // Display image and sleeps at least 1 ms (it usually sleeps ~5-10 msec to display the image)
-                const char key = cv::waitKey(1);
-                if (key == 27)
-                    this->stop();
             }
+            op::log(" ");
+            // Alternative: just getting std::string equivalent
+            op::log("Face keypoints: " + datumsPtr->at(0).faceKeypoints.toString());
+            op::log("Left hand keypoints: " + datumsPtr->at(0).handKeypoints[0].toString());
+            op::log("Right hand keypoints: " + datumsPtr->at(0).handKeypoints[1].toString());
         }
-        catch (const std::exception& e)
-        {
-            op::log("Some kind of unexpected error happened.");
-            this->stop();
-            op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-        }
+        else
+            op::log("Nullptr or empty datumsPtr found.", op::Priority::High, __LINE__, __FUNCTION__, __FILE__);
     }
 };
 
-int openPoseTutorialWrapper2()
+int openPoseTutorialWrapper1()
 {
     // logging_level
     op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.", __LINE__, __FUNCTION__, __FILE__);
@@ -335,26 +294,9 @@ int openPoseTutorialWrapper2()
                                : (FLAGS_heatmaps_scale == 1 ? op::ScaleMode::ZeroToOne : op::ScaleMode::UnsignedChar ));
     op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
-    // Initializing the user custom classes
-    // Frames producer (e.g. video, webcam, ...)
-    auto wUserInput = std::make_shared<WUserInput>(FLAGS_image_dir);
-    // Processing
-    auto wUserPostProcessing = std::make_shared<WUserPostProcessing>();
-    // GUI (Display)
-    auto wUserOutput = std::make_shared<WUserOutput>();
-
-    op::Wrapper<std::vector<UserDatum>> opWrapper;
-    // Add custom input
-    const auto workerInputOnNewThread = false;
-    opWrapper.setWorkerInput(wUserInput, workerInputOnNewThread);
-    // Add custom processing
-    const auto workerProcessingOnNewThread = false;
-    opWrapper.setWorkerPostProcessing(wUserPostProcessing, workerProcessingOnNewThread);
-    // Add custom output
-    const auto workerOutputOnNewThread = true;
-    opWrapper.setWorkerOutput(wUserOutput, workerOutputOnNewThread);
     // Configure OpenPose
-    op::log("Configuring OpenPose wrapper.", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+    op::Wrapper<std::vector<UserDatum>> opWrapper{op::ThreadManagerMode::Asynchronous};
+    // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
     const op::WrapperStructPose wrapperStructPose{netInputSize, outputSize, keypointScale, FLAGS_num_gpu,
                                                   FLAGS_num_gpu_start, FLAGS_scale_number, (float)FLAGS_scale_gap,
                                                   op::flagsToRenderMode(FLAGS_render_pose), poseModel,
@@ -377,33 +319,39 @@ int openPoseTutorialWrapper2()
                                                       FLAGS_write_coco_json, FLAGS_write_images, FLAGS_write_images_format, FLAGS_write_video,
                                                       FLAGS_write_heatmaps, FLAGS_write_heatmaps_format};
     // Configure wrapper
+    op::log("Configuring OpenPose wrapper.", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
     opWrapper.configure(wrapperStructPose, wrapperStructFace, wrapperStructHand, op::WrapperStructInput{}, wrapperStructOutput);
     // Set to single-thread running (e.g. for debugging purposes)
     // opWrapper.disableMultiThreading();
 
     op::log("Starting thread(s)", op::Priority::High);
-    // Two different ways of running the program on multithread environment
-    // // Option a) Recommended - Also using the main thread (this thread) for processing (it saves 1 thread)
-    // // Start, run & stop threads
-    opWrapper.exec();  // It blocks this thread until all threads have finished
+    opWrapper.start();
 
-    // Option b) Keeping this thread free in case you want to do something else meanwhile, e.g. profiling the GPU memory
-    // // VERY IMPORTANT NOTE: if OpenCV is compiled with Qt support, this option will not work. Qt needs the main thread to
-    // // plot visual results, so the final GUI (which uses OpenCV) would return an exception similar to:
-    // // `QMetaMethod::invoke: Unable to invoke methods with return values in queued connections`
-    // // Start threads
-    // opWrapper.start();
-    // // Profile used GPU memory
-    //     // 1: wait ~10sec so the memory has been totally loaded on GPU
-    //     // 2: profile the GPU memory
-    // std::this_thread::sleep_for(std::chrono::milliseconds{1000});
-    // op::log("Random task here...", op::Priority::High);
-    // // Keep program alive while running threads
-    // while (opWrapper.isRunning())
-    //     std::this_thread::sleep_for(std::chrono::milliseconds{33});
-    // // Stop and join threads
-    // op::log("Stopping thread(s)", op::Priority::High);
-    // opWrapper.stop();
+    // User processing
+    UserInputClass userInputClass(FLAGS_image_dir);
+    UserOutputClass userOutputClass;
+    bool userWantsToExit = false;
+    while (!userWantsToExit && !userInputClass.isFinished())
+    {
+        // Push frame
+        auto datumToProcess = userInputClass.createDatum();
+        if (datumToProcess != nullptr)
+        {
+            auto successfullyEmplaced = opWrapper.waitAndEmplace(datumToProcess);
+            // Pop frame
+            std::shared_ptr<std::vector<UserDatum>> datumProcessed;
+            if (successfullyEmplaced && opWrapper.waitAndPop(datumProcessed))
+            {
+                userWantsToExit = userOutputClass.display(datumProcessed);
+                userOutputClass.printKeypoints(datumProcessed);
+            }
+            else
+                op::log("Processed datum could not be emplaced.", op::Priority::High, __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    op::log("Stopping thread(s)", op::Priority::High);
+    opWrapper.stop();
 
     // Measuring total time
     const auto now = std::chrono::high_resolution_clock::now();
@@ -417,11 +365,11 @@ int openPoseTutorialWrapper2()
 int main(int argc, char *argv[])
 {
     // Initializing google logging (Caffe uses it for logging)
-    google::InitGoogleLogging("openPoseTutorialWrapper2");
+    google::InitGoogleLogging("openPoseTutorialWrapper1");
 
     // Parsing command line flags
     gflags::ParseCommandLineFlags(&argc, &argv, true);
 
-    // Running openPoseTutorialWrapper2
-    return openPoseTutorialWrapper2();
+    // Running openPoseTutorialWrapper1
+    return openPoseTutorialWrapper1();
 }

@@ -1,6 +1,7 @@
 set(EXAMPLE_FILES 
-    1_user_asynchronous.cpp
-    2_user_synchronous.cpp)
+    1_user_asynchronous_output.cpp
+    2_user_synchronous.cpp
+    3_user_asynchronous.cpp)
   
 foreach(EXAMPLE_FILE ${EXAMPLE_FILES})
 

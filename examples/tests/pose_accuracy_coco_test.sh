@@ -17,7 +17,7 @@ clear && clear
 
 # Parameters
 IMAGE_FOLDER=/home/gines/devel/images/val2014/
-JSON_FOLDER=../evaluation/coco/results/openpose/
+JSON_FOLDER=../evaluation/coco_val_jsons/
 OP_BIN=./build/examples/openpose/openpose.bin
 
     # 1 scale

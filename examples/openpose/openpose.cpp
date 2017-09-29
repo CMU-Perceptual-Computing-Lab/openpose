@@ -4,7 +4,7 @@
     // 1. Read folder of images / video / webcam  (`producer` module)
     // 2. Extract and render body keypoint / heatmap / PAF of that image (`pose` module)
     // 3. Extract and render face keypoint / heatmap / PAF of that image (`face` module)
-    // 4. Save the results on disc (`filestream` module)
+    // 4. Save the results on disk (`filestream` module)
     // 5. Display the rendered pose (`gui` module)
     // Everything in a multi-thread scenario (`thread` module)
     // Points 2 to 5 are included in the `wrapper` module
@@ -21,21 +21,8 @@
 // Other 3rdparty dependencies
 #include <gflags/gflags.h> // DEFINE_bool, DEFINE_int32, DEFINE_int64, DEFINE_uint64, DEFINE_double, DEFINE_string
 #include <glog/logging.h> // google::InitGoogleLogging
-
 // OpenPose dependencies
-// Option a) Importing all modules
 #include <openpose/headers.hpp>
-// Option b) Manually importing the desired modules. Recommended if you only intend to use a few modules.
-// #include <openpose/core/headers.hpp>
-// #include <openpose/experimental/headers.hpp>
-// #include <openpose/face/headers.hpp>
-// #include <openpose/filestream/headers.hpp>
-// #include <openpose/gui/headers.hpp>
-// #include <openpose/pose/headers.hpp>
-// #include <openpose/producer/headers.hpp>
-// #include <openpose/thread/headers.hpp>
-// #include <openpose/utilities/headers.hpp>
-// #include <openpose/wrapper/headers.hpp>
 
 // See all the available parameter options withe the `--help` flag. E.g. `./build/examples/openpose/openpose.bin --help`.
 // Note: This command will show you flags for other unnecessary 3rdparty files. Check only the flags for the OpenPose
@@ -60,6 +47,8 @@ DEFINE_uint64(frame_last,               -1,             "Finish on desired frame
 DEFINE_bool(frame_flip,                 false,          "Flip/mirror each frame (e.g. for real time webcam demonstrations).");
 DEFINE_int32(frame_rotate,              0,              "Rotate each frame, 4 possible values: 0, 90, 180, 270.");
 DEFINE_bool(frames_repeat,              false,          "Repeat frames when finished.");
+DEFINE_bool(process_real_time,          false,          "Enable to keep the original source frame rate (e.g. for video). If the processing time is"
+                                                        " too long, it will skip frames. If it is too fast, it will slow it down.");
 // OpenPose
 DEFINE_string(model_folder,             "models/",      "Folder path (absolute or relative) where the models (pose, face, ...) are located.");
 DEFINE_string(resolution,               "1280x720",     "The image resolution (display and output). Use \"-1x-1\" to force the program to use the"
@@ -149,8 +138,6 @@ DEFINE_double(hand_alpha_pose,          0.6,            "Analogous to `alpha_pos
 DEFINE_double(hand_alpha_heatmap,       0.7,            "Analogous to `alpha_heatmap` but applied to hand.");
 // Display
 DEFINE_bool(fullscreen,                 false,          "Run in full-screen mode (press f during runtime to toggle).");
-DEFINE_bool(process_real_time,          false,          "Enable to keep the original source frame rate (e.g. for video). If the processing time is"
-                                                        " too long, it will skip frames. If it is too fast, it will slow it down.");
 DEFINE_bool(no_gui_verbose,             false,          "Do not write text on output images on GUI (e.g. number of current frame and people). It"
                                                         " does not affect the pose rendering.");
 DEFINE_bool(no_display,                 false,          "Do not open a display window. Useful if there is no X server and/or to slightly speed up"
