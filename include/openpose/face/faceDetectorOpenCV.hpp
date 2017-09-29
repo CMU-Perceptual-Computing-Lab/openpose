@@ -13,7 +13,7 @@ namespace op
     public:
         explicit FaceDetectorOpenCV();
 
-        std::vector<Rectangle<float>> detectFacesOpenCV(const cv::Mat& cvInputData, const float scaleInputToOutput);
+        std::vector<Rectangle<float>> detectFacesOpenCV(const cv::Mat& cvInputData);
 
     private:
         cv::CascadeClassifier face_cascade;

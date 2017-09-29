@@ -24,7 +24,7 @@ namespace op
         }
     }
 
-    std::vector<Rectangle<float>> FaceDetectorOpenCV::detectFacesOpenCV(const cv::Mat& cvInputData, const float scaleInputToOutput)
+    std::vector<Rectangle<float>> FaceDetectorOpenCV::detectFacesOpenCV(const cv::Mat& cvInputData)
     {
         try
         {
@@ -37,7 +37,6 @@ namespace op
             for(auto i = 0u; i < detectedFaces.size(); i++)
             {
                 // enlarge the rectangle by 1.5X, so that it covers the face better.
-                log(std::to_string(scaleInputToOutput));
                 faceRectangles.at(i).x = detectedFaces.at(i).x - 0.25*detectedFaces.at(i).width;
                 faceRectangles.at(i).y = detectedFaces.at(i).y - 0.25*detectedFaces.at(i).height;
                 faceRectangles.at(i).width = 1.5*detectedFaces.at(i).width;
