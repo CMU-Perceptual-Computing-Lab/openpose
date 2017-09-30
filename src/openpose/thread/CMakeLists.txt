@@ -4,6 +4,7 @@ set(SOURCES
 add_library(thread ${SOURCES})
 
 install(TARGETS thread 
+    EXPORT OpenPose
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib/openpose)

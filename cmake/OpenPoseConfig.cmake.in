@@ -1,0 +1,12 @@
+# Compute and install package configuration and version files
+get_filename_component(_dir "${CMAKE_CURRENT_LIST_FILE}" PATH)
+get_filename_component(_prefix "${_dir}/../.." ABSOLUTE)
+
+# Import the targets
+set(OpenPose_INCLUDE_DIRS "${_prefix}/include/openpose")
+set(OpenPose_INCLUDE_DIRS "${_prefix}/include/openpose")
+include("${_prefix}/lib/OpenPose/OpenPose.cmake")
+
+# Report other information
+set(OpenPose_INCLUDE_DIRS "${_prefix}/include/openpose")
+set(OpenPose_LIBS "core;filestream;gui;pose;utilities;producer;thread;face;hand;wrapper")

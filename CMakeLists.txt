@@ -157,9 +157,9 @@ if (${DL_FRAMEWORK} MATCHES "CAFFE")
 
     ExternalProject_Get_Property(caffe install_dir)
 
-    set(Caffe_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/build/caffe/include)
+    set(Caffe_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/caffe/include)
     # TODO -- Find a better soln.
-    set(Caffe_LIBS ${CMAKE_SOURCE_DIR}/build/caffe/lib/libcaffe.so)
+    set(Caffe_LIBS ${CMAKE_BINARY_DIR}/caffe/lib/libcaffe.so)
 
   endif (BUILD_CAFFE)
 
@@ -246,4 +246,17 @@ message(STATUS "Models Downloaded.")
 ### INSTALL
 
 # Install the headers
-install(DIRECTORY include/openpose DESTINATION include/openpose)
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/include/openpose DESTINATION include)
+if (BUILD_CAFFE)
+  install(DIRECTORY ${CMAKE_BINARY_DIR}/caffe/include/caffe DESTINATION include)
+  install(DIRECTORY ${CMAKE_BINARY_DIR}/caffe/lib/ DESTINATION lib)
+endif (BUILD_CAFFE)
+install(EXPORT OpenPose DESTINATION lib/OpenPose)
+
+# Compute installation prefix relative to this file
+configure_file(
+  ${CMAKE_SOURCE_DIR}/cmake/OpenPoseConfig.cmake.in
+  ${CMAKE_BINARY_DIR}/cmake/OpenPoseConfig.cmake @ONLY)
+
+install(FILES ${CMAKE_BINARY_DIR}/cmake/OpenPoseConfig.cmake
+    DESTINATION lib/OpenPose)

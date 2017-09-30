@@ -13,6 +13,7 @@ if (BUILD_CAFFE)
 endif (BUILD_CAFFE)
 
 install(TARGETS hand
+    EXPORT OpenPose
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib/openpose)

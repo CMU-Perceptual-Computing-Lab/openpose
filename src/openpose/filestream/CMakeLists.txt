@@ -12,6 +12,7 @@ set(SOURCES cocoJsonSaver.cpp
 add_library(filestream ${SOURCES})
 
 install(TARGETS filestream
+    EXPORT OpenPose
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib/openpose)
