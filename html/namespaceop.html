@@ -243,6 +243,8 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_image_directory_reader.html">ImageDirectoryReader</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_ip_camera_reader.html">IpCameraReader</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_producer.html">Producer</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_video_capture_reader.html">VideoCaptureReader</a></td></tr>
@@ -372,10 +374,14 @@ Enumerations</h2></td></tr>
 <a class="el" href="namespaceop.html#abc501c56c6cf6cf1989c84b1692cb774a6f6cb72d544962fa333e2e34ce64f719">ProducerProperty::Size</a>
  }</td></tr>
 <tr class="separator:abc501c56c6cf6cf1989c84b1692cb774"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a54b73745852c270cfd891eed0f6f2332"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a54b73745852c270cfd891eed0f6f2332">ProducerType</a> : unsigned char { <a class="el" href="namespaceop.html#a54b73745852c270cfd891eed0f6f2332a54a365e86ee42cff91ca36532c9bbabf">ProducerType::ImageDirectory</a>, 
+<tr class="memitem:a54b73745852c270cfd891eed0f6f2332"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a54b73745852c270cfd891eed0f6f2332">ProducerType</a> : unsigned char { <br/>
+&#160;&#160;<a class="el" href="namespaceop.html#a54b73745852c270cfd891eed0f6f2332a54a365e86ee42cff91ca36532c9bbabf">ProducerType::ImageDirectory</a>, 
+<a class="el" href="namespaceop.html#a54b73745852c270cfd891eed0f6f2332af40a40a04a078c4449cda2f326d7fb18">ProducerType::IPCamera</a>, 
 <a class="el" href="namespaceop.html#a54b73745852c270cfd891eed0f6f2332a34e2d1989a1dbf75cd631596133ee5ee">ProducerType::Video</a>, 
 <a class="el" href="namespaceop.html#a54b73745852c270cfd891eed0f6f2332ae2faa2a74b6a4134d0b3e84c7c0e2a01">ProducerType::Webcam</a>, 
-<a class="el" href="namespaceop.html#a54b73745852c270cfd891eed0f6f2332a6adf97f83acf6453d4a6a4b1070f3754">ProducerType::None</a>
+<br/>
+&#160;&#160;<a class="el" href="namespaceop.html#a54b73745852c270cfd891eed0f6f2332a6adf97f83acf6453d4a6a4b1070f3754">ProducerType::None</a>
+<br/>
  }</td></tr>
 <tr class="separator:a54b73745852c270cfd891eed0f6f2332"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3593e2d53bec533f0048ef3973eebd36"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a3593e2d53bec533f0048ef3973eebd36">ThreadManagerMode</a> : unsigned char { <a class="el" href="namespaceop.html#a3593e2d53bec533f0048ef3973eebd36a288aae25bc408055f50c21c991903a44">ThreadManagerMode::Asynchronous</a>, 
@@ -659,10 +665,10 @@ std::string &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a cla
 <tr class="separator:aed592469f254f31c2356d4628f75aaea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac3bebe88bedbd7785d48159c8e3f0515"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> <a class="el" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bda">ScaleMode</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#ac3bebe88bedbd7785d48159c8e3f0515">flagsToScaleMode</a> (const int keypointScale)</td></tr>
 <tr class="separator:ac3bebe88bedbd7785d48159c8e3f0515"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:addea1234862c634b17c06f00a9fdca0b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> <a class="el" href="namespaceop.html#a54b73745852c270cfd891eed0f6f2332">ProducerType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#addea1234862c634b17c06f00a9fdca0b">flagsToProducerType</a> (const std::string &amp;imageDirectory, const std::string &amp;videoPath, const int webcamIndex)</td></tr>
-<tr class="separator:addea1234862c634b17c06f00a9fdca0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a645039151d00dcb1c33d84509af83bed"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> std::shared_ptr&lt; <a class="el" href="classop_1_1_producer.html">Producer</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a645039151d00dcb1c33d84509af83bed">flagsToProducer</a> (const std::string &amp;imageDirectory, const std::string &amp;videoPath, const int webcamIndex, const std::string &amp;webcamResolution=&quot;1280x720&quot;, const double webcamFps=30.)</td></tr>
-<tr class="separator:a645039151d00dcb1c33d84509af83bed"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0237c9773b9ee6a63ebdf0e8a497bb84"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> <a class="el" href="namespaceop.html#a54b73745852c270cfd891eed0f6f2332">ProducerType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a0237c9773b9ee6a63ebdf0e8a497bb84">flagsToProducerType</a> (const std::string &amp;imageDirectory, const std::string &amp;videoPath, const std::string &amp;ipCameraPath, const int webcamIndex)</td></tr>
+<tr class="separator:a0237c9773b9ee6a63ebdf0e8a497bb84"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a266801b568c885ef280c41ea82f3871f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> std::shared_ptr&lt; <a class="el" href="classop_1_1_producer.html">Producer</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a266801b568c885ef280c41ea82f3871f">flagsToProducer</a> (const std::string &amp;imageDirectory, const std::string &amp;videoPath, const std::string &amp;ipCameraPath, const int webcamIndex, const std::string &amp;webcamResolution=&quot;1280x720&quot;, const double webcamFps=30.)</td></tr>
+<tr class="separator:a266801b568c885ef280c41ea82f3871f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad3b02ca66d11f4129372f4a9f98c6437"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> std::vector&lt; <a class="el" href="namespaceop.html#a1c3dbc214e7552f7ef9cc753ee97226b">HeatMapType</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#ad3b02ca66d11f4129372f4a9f98c6437">flagsToHeatMaps</a> (const bool heatMapsAddParts=false, const bool heatMapsAddBkg=false, const bool heatMapsAddPAFs=false)</td></tr>
 <tr class="separator:ad3b02ca66d11f4129372f4a9f98c6437"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4526c07c6dafe2a5e3437b66d20a6dd3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> <a class="el" href="namespaceop.html#afce557f02e337e16150d00bdf72ec033">RenderMode</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a4526c07c6dafe2a5e3437b66d20a6dd3">flagsToRenderMode</a> (const int renderFlag, const int renderPoseFlag=-2)</td></tr>
@@ -1213,6 +1219,9 @@ std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><em><a class="anchor" id="a54b73745852c270cfd891eed0f6f2332a54a365e86ee42cff91ca36532c9bbabf"></a>ImageDirectory</em>&#160;</td><td class="fielddoc">
 <p>An image directory reader. It is able to read images on a folder with a interface similar to the OpenCV cv::VideoCapture. </p>
+</td></tr>
+<tr><td class="fieldname"><em><a class="anchor" id="a54b73745852c270cfd891eed0f6f2332af40a40a04a078c4449cda2f326d7fb18"></a>IPCamera</em>&#160;</td><td class="fielddoc">
+<p>An IP camera frames extractor, extending the functionality of cv::VideoCapture. </p>
 </td></tr>
 <tr><td class="fieldname"><em><a class="anchor" id="a54b73745852c270cfd891eed0f6f2332a34e2d1989a1dbf75cd631596133ee5ee"></a>Video</em>&#160;</td><td class="fielddoc">
 <p>A video frames extractor, extending the functionality of cv::VideoCapture. </p>
@@ -2873,7 +2882,7 @@ template&lt;class T &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a645039151d00dcb1c33d84509af83bed"></a>
+<a class="anchor" id="a266801b568c885ef280c41ea82f3871f"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -2888,6 +2897,12 @@ template&lt;class T &gt; </div>
           <td></td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>videoPath</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>ipCameraPath</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -2917,7 +2932,7 @@ template&lt;class T &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="addea1234862c634b17c06f00a9fdca0b"></a>
+<a class="anchor" id="a0237c9773b9ee6a63ebdf0e8a497bb84"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -2932,6 +2947,12 @@ template&lt;class T &gt; </div>
           <td></td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>videoPath</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>ipCameraPath</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>

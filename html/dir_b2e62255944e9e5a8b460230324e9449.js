@@ -8,6 +8,9 @@ var dir_b2e62255944e9e5a8b460230324e9449 =
     [ "imageDirectoryReader.hpp", "image_directory_reader_8hpp.html", [
       [ "ImageDirectoryReader", "classop_1_1_image_directory_reader.html", "classop_1_1_image_directory_reader" ]
     ] ],
+    [ "ipCameraReader.hpp", "ip_camera_reader_8hpp.html", [
+      [ "IpCameraReader", "classop_1_1_ip_camera_reader.html", "classop_1_1_ip_camera_reader" ]
+    ] ],
     [ "producer.hpp", "producer_8hpp.html", [
       [ "Producer", "classop_1_1_producer.html", "classop_1_1_producer" ]
     ] ],

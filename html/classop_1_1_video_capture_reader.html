@@ -118,14 +118,14 @@ $(document).ready(function(){initNavTree('classop_1_1_video_capture_reader.html'
 
 <p>Inherits <a class="el" href="classop_1_1_producer.html">op::Producer</a>.</p>
 
-<p>Inherited by <a class="el" href="classop_1_1_video_reader.html">op::VideoReader</a>, and <a class="el" href="classop_1_1_webcam_reader.html">op::WebcamReader</a>.</p>
+<p>Inherited by <a class="el" href="classop_1_1_ip_camera_reader.html">op::IpCameraReader</a>, <a class="el" href="classop_1_1_video_reader.html">op::VideoReader</a>, and <a class="el" href="classop_1_1_webcam_reader.html">op::WebcamReader</a>.</p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a59ce0932d49ee86c9e810cae22e9b519"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_video_capture_reader.html#a59ce0932d49ee86c9e810cae22e9b519">VideoCaptureReader</a> (const int index, const bool throwExceptionIfNoOpened)</td></tr>
 <tr class="separator:a59ce0932d49ee86c9e810cae22e9b519"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2d9f5705fec80dc480b3ea1e495fce87"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_video_capture_reader.html#a2d9f5705fec80dc480b3ea1e495fce87">VideoCaptureReader</a> (const std::string &amp;path)</td></tr>
-<tr class="separator:a2d9f5705fec80dc480b3ea1e495fce87"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a41eac24222b6f0f62d8bf6b40e36e353"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_video_capture_reader.html#a41eac24222b6f0f62d8bf6b40e36e353">VideoCaptureReader</a> (const std::string &amp;path, const <a class="el" href="namespaceop.html#a54b73745852c270cfd891eed0f6f2332">ProducerType</a> producerType)</td></tr>
+<tr class="separator:a41eac24222b6f0f62d8bf6b40e36e353"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7ea52eabf5133a1a01d38f95b1a4b601"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_video_capture_reader.html#a7ea52eabf5133a1a01d38f95b1a4b601">~VideoCaptureReader</a> ()</td></tr>
 <tr class="separator:a7ea52eabf5133a1a01d38f95b1a4b601"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a83b4cd38f8eb2182711c506e84d97253"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_video_capture_reader.html#a83b4cd38f8eb2182711c506e84d97253">getFrameName</a> ()=0</td></tr>
@@ -212,23 +212,42 @@ Protected Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a2d9f5705fec80dc480b3ea1e495fce87"></a>
+<a class="anchor" id="a41eac24222b6f0f62d8bf6b40e36e353"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">op::VideoCaptureReader::VideoCaptureReader </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>path</em></td><td>)</td>
+          <td class="paramname"><em>path</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const <a class="el" href="namespaceop.html#a54b73745852c270cfd891eed0f6f2332">ProducerType</a>&#160;</td>
+          <td class="paramname"><em>producerType</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">explicit</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 <p>This constructor of <a class="el" href="classop_1_1_video_capture_reader.html">VideoCaptureReader</a> wraps cv::VideoCapture(const std::string). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">path</td><td>const std::string indicating the cv::VideoCapture constructor string argument. </td></tr>
+    <tr><td class="paramname">producerType</td><td>const std::string indicating whether the frame source is an IP camera or video. </td></tr>
   </table>
   </dd>
 </dl>
@@ -292,7 +311,7 @@ Protected Member Functions</h2></td></tr>
 
 <p>Implements <a class="el" href="classop_1_1_producer.html#a366881a952ad34071cc719477f08b968">op::Producer</a>.</p>
 
-<p>Implemented in <a class="el" href="classop_1_1_webcam_reader.html#a38ccbdf61f21fba0694362077cb6bdb1">op::WebcamReader</a>, and <a class="el" href="classop_1_1_video_reader.html#a057a7d0c498c48639b38c10ac7efc183">op::VideoReader</a>.</p>
+<p>Implemented in <a class="el" href="classop_1_1_webcam_reader.html#a38ccbdf61f21fba0694362077cb6bdb1">op::WebcamReader</a>, <a class="el" href="classop_1_1_video_reader.html#a057a7d0c498c48639b38c10ac7efc183">op::VideoReader</a>, and <a class="el" href="classop_1_1_ip_camera_reader.html#aa7ad6adac6e401193e03d279176dd889">op::IpCameraReader</a>.</p>
 
 </div>
 </div>
@@ -347,7 +366,7 @@ Protected Member Functions</h2></td></tr>
 
 <p>Implements <a class="el" href="classop_1_1_producer.html#adc348105fca58f18e39aa3439e2d627b">op::Producer</a>.</p>
 
-<p>Implemented in <a class="el" href="classop_1_1_webcam_reader.html#a31fa72f65d40416e812ad72d43b43649">op::WebcamReader</a>, and <a class="el" href="classop_1_1_video_reader.html#a28244ab83836e0d0b2a896f33ad34403">op::VideoReader</a>.</p>
+<p>Implemented in <a class="el" href="classop_1_1_webcam_reader.html#a31fa72f65d40416e812ad72d43b43649">op::WebcamReader</a>, <a class="el" href="classop_1_1_video_reader.html#a28244ab83836e0d0b2a896f33ad34403">op::VideoReader</a>, and <a class="el" href="classop_1_1_ip_camera_reader.html#a2277d9a58316bfb4314bf345369e37c1">op::IpCameraReader</a>.</p>
 
 </div>
 </div>
@@ -473,7 +492,7 @@ Protected Member Functions</h2></td></tr>
 
 <p>Implements <a class="el" href="classop_1_1_producer.html#ab30c7b3e34d962e0b17458d9a0947f6b">op::Producer</a>.</p>
 
-<p>Implemented in <a class="el" href="classop_1_1_webcam_reader.html#ae66b26829cc2d6e3f02109d4431a7bc2">op::WebcamReader</a>, and <a class="el" href="classop_1_1_video_reader.html#a0dd53334327642368d41ec860e64e756">op::VideoReader</a>.</p>
+<p>Implemented in <a class="el" href="classop_1_1_webcam_reader.html#ae66b26829cc2d6e3f02109d4431a7bc2">op::WebcamReader</a>, <a class="el" href="classop_1_1_video_reader.html#a0dd53334327642368d41ec860e64e756">op::VideoReader</a>, and <a class="el" href="classop_1_1_ip_camera_reader.html#ac13cc7da97a31d8e69eaa64b2a7b31ba">op::IpCameraReader</a>.</p>
 
 </div>
 </div>

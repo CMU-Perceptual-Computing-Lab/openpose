@@ -47,6 +47,7 @@ var hierarchy =
     [ "op::Producer", "classop_1_1_producer.html", [
       [ "op::ImageDirectoryReader", "classop_1_1_image_directory_reader.html", null ],
       [ "op::VideoCaptureReader", "classop_1_1_video_capture_reader.html", [
+        [ "op::IpCameraReader", "classop_1_1_ip_camera_reader.html", null ],
         [ "op::VideoReader", "classop_1_1_video_reader.html", null ],
         [ "op::WebcamReader", "classop_1_1_webcam_reader.html", null ]
       ] ]

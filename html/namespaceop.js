@@ -64,6 +64,7 @@ var namespaceop =
     [ "WPoseRenderer", "classop_1_1_w_pose_renderer.html", "classop_1_1_w_pose_renderer" ],
     [ "DatumProducer", "classop_1_1_datum_producer.html", "classop_1_1_datum_producer" ],
     [ "ImageDirectoryReader", "classop_1_1_image_directory_reader.html", "classop_1_1_image_directory_reader" ],
+    [ "IpCameraReader", "classop_1_1_ip_camera_reader.html", "classop_1_1_ip_camera_reader" ],
     [ "Producer", "classop_1_1_producer.html", "classop_1_1_producer" ],
     [ "VideoCaptureReader", "classop_1_1_video_capture_reader.html", "classop_1_1_video_capture_reader" ],
     [ "VideoReader", "classop_1_1_video_reader.html", "classop_1_1_video_reader" ],

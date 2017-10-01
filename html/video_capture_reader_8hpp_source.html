@@ -122,44 +122,44 @@ $(document).ready(function(){initNavTree('video_capture_reader_8hpp_source.html'
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;    <span class="keyword">public</span>:</div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;        <span class="keyword">explicit</span> <a class="code" href="classop_1_1_video_capture_reader.html">VideoCaptureReader</a>(<span class="keyword">const</span> <span class="keywordtype">int</span> index, <span class="keyword">const</span> <span class="keywordtype">bool</span> throwExceptionIfNoOpened);</div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;        <a class="code" href="classop_1_1_video_capture_reader.html">VideoCaptureReader</a>(<span class="keyword">const</span> std::string&amp; path);</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;        <span class="keyword">virtual</span> ~<a class="code" href="classop_1_1_video_capture_reader.html">VideoCaptureReader</a>();</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;        <span class="keyword">virtual</span> std::string getFrameName() = 0;</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;</div>
-<div class="line"><a name="l00038"></a><span class="lineno"><a class="line" href="classop_1_1_video_capture_reader.html#ae10d37b58fe4f3daa8817b72eb3faa64">   38</a></span>&#160;        <span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code" href="classop_1_1_video_capture_reader.html#ae10d37b58fe4f3daa8817b72eb3faa64">isOpened</a>()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="keyword">        </span>{</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;            <span class="keywordflow">return</span> mVideoCapture.isOpened();</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;        }</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;        <span class="keywordtype">void</span> release();</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;        <span class="keyword">virtual</span> <span class="keywordtype">double</span> <span class="keyword">get</span>(<span class="keyword">const</span> <span class="keywordtype">int</span> capProperty) = 0;</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;        <span class="keyword">virtual</span> <span class="keywordtype">void</span> set(<span class="keyword">const</span> <span class="keywordtype">int</span> capProperty, <span class="keyword">const</span> <span class="keywordtype">double</span> value) = 0;</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;</div>
-<div class="line"><a name="l00049"></a><span class="lineno"><a class="line" href="classop_1_1_video_capture_reader.html#ae9b111f8b4de16905a157bb6dda09f94">   49</a></span>&#160;        <span class="keyword">inline</span> <span class="keywordtype">double</span> <span class="keyword">get</span>(<span class="keyword">const</span> <a class="code" href="namespaceop.html#abc501c56c6cf6cf1989c84b1692cb774">ProducerProperty</a> property)</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;        {</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;            <span class="keywordflow">return</span> <a class="code" href="classop_1_1_producer.html#a366881a952ad34071cc719477f08b968">Producer::get</a>(property);</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;        }</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;</div>
-<div class="line"><a name="l00054"></a><span class="lineno"><a class="line" href="classop_1_1_video_capture_reader.html#ac3a270770d13ae351d711a7353b32b9b">   54</a></span>&#160;        <span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="classop_1_1_video_capture_reader.html#ac3a270770d13ae351d711a7353b32b9b">set</a>(<span class="keyword">const</span> <a class="code" href="namespaceop.html#abc501c56c6cf6cf1989c84b1692cb774">ProducerProperty</a> property, <span class="keyword">const</span> <span class="keywordtype">double</span> value)</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;        {</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;            <a class="code" href="classop_1_1_producer.html#ab30c7b3e34d962e0b17458d9a0947f6b">Producer::set</a>(property, value);</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        }</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <span class="keyword">protected</span>:</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        <span class="keyword">virtual</span> cv::Mat getRawFrame() = 0;</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;        cv::VideoCapture mVideoCapture;</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;        <a class="code" href="macros_8hpp.html#abef96b5dd35dd9d44ad27ddf0e2f5f2e">DELETE_COPY</a>(<a class="code" href="classop_1_1_video_capture_reader.html">VideoCaptureReader</a>);</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    };</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;}</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="preprocessor">#endif // OPENPOSE_PRODUCER_VIDEO_CAPTURE_READER_HPP</span></div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;        <span class="keyword">explicit</span> <a class="code" href="classop_1_1_video_capture_reader.html">VideoCaptureReader</a>(<span class="keyword">const</span> std::string&amp; path, <span class="keyword">const</span> <a class="code" href="namespaceop.html#a54b73745852c270cfd891eed0f6f2332">ProducerType</a> producerType);</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;        <span class="keyword">virtual</span> ~<a class="code" href="classop_1_1_video_capture_reader.html">VideoCaptureReader</a>();</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;        <span class="keyword">virtual</span> std::string getFrameName() = 0;</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;</div>
+<div class="line"><a name="l00039"></a><span class="lineno"><a class="line" href="classop_1_1_video_capture_reader.html#ae10d37b58fe4f3daa8817b72eb3faa64">   39</a></span>&#160;        <span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code" href="classop_1_1_video_capture_reader.html#ae10d37b58fe4f3daa8817b72eb3faa64">isOpened</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="keyword">        </span>{</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;            <span class="keywordflow">return</span> mVideoCapture.isOpened();</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;        }</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;        <span class="keywordtype">void</span> release();</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;        <span class="keyword">virtual</span> <span class="keywordtype">double</span> <span class="keyword">get</span>(<span class="keyword">const</span> <span class="keywordtype">int</span> capProperty) = 0;</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        <span class="keyword">virtual</span> <span class="keywordtype">void</span> set(<span class="keyword">const</span> <span class="keywordtype">int</span> capProperty, <span class="keyword">const</span> <span class="keywordtype">double</span> value) = 0;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;</div>
+<div class="line"><a name="l00050"></a><span class="lineno"><a class="line" href="classop_1_1_video_capture_reader.html#ae9b111f8b4de16905a157bb6dda09f94">   50</a></span>&#160;        <span class="keyword">inline</span> <span class="keywordtype">double</span> <span class="keyword">get</span>(<span class="keyword">const</span> <a class="code" href="namespaceop.html#abc501c56c6cf6cf1989c84b1692cb774">ProducerProperty</a> property)</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;        {</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;            <span class="keywordflow">return</span> <a class="code" href="classop_1_1_producer.html#a366881a952ad34071cc719477f08b968">Producer::get</a>(property);</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;        }</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;</div>
+<div class="line"><a name="l00055"></a><span class="lineno"><a class="line" href="classop_1_1_video_capture_reader.html#ac3a270770d13ae351d711a7353b32b9b">   55</a></span>&#160;        <span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="classop_1_1_video_capture_reader.html#ac3a270770d13ae351d711a7353b32b9b">set</a>(<span class="keyword">const</span> <a class="code" href="namespaceop.html#abc501c56c6cf6cf1989c84b1692cb774">ProducerProperty</a> property, <span class="keyword">const</span> <span class="keywordtype">double</span> value)</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        {</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;            <a class="code" href="classop_1_1_producer.html#ab30c7b3e34d962e0b17458d9a0947f6b">Producer::set</a>(property, value);</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        }</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="keyword">protected</span>:</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        <span class="keyword">virtual</span> cv::Mat getRawFrame() = 0;</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        cv::VideoCapture mVideoCapture;</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        <a class="code" href="macros_8hpp.html#abef96b5dd35dd9d44ad27ddf0e2f5f2e">DELETE_COPY</a>(<a class="code" href="classop_1_1_video_capture_reader.html">VideoCaptureReader</a>);</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    };</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;}</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="preprocessor">#endif // OPENPOSE_PRODUCER_VIDEO_CAPTURE_READER_HPP</span></div>
 <div class="ttc" id="macros_8hpp_html_abef96b5dd35dd9d44ad27ddf0e2f5f2e"><div class="ttname"><a href="macros_8hpp.html#abef96b5dd35dd9d44ad27ddf0e2f5f2e">DELETE_COPY</a></div><div class="ttdeci">#define DELETE_COPY(className)</div><div class="ttdef"><b>Definition:</b> macros.hpp:25</div></div>
 <div class="ttc" id="classop_1_1_video_capture_reader_html"><div class="ttname"><a href="classop_1_1_video_capture_reader.html">op::VideoCaptureReader</a></div><div class="ttdef"><b>Definition:</b> videoCaptureReader.hpp:15</div></div>
 <div class="ttc" id="namespaceop_html_abc501c56c6cf6cf1989c84b1692cb774"><div class="ttname"><a href="namespaceop.html#abc501c56c6cf6cf1989c84b1692cb774">op::ProducerProperty</a></div><div class="ttdeci">ProducerProperty</div><div class="ttdef"><b>Definition:</b> enumClasses.hpp:12</div></div>
@@ -167,8 +167,9 @@ $(document).ready(function(){initNavTree('video_capture_reader_8hpp_source.html'
 <div class="ttc" id="common_8hpp_html"><div class="ttname"><a href="common_8hpp.html">common.hpp</a></div></div>
 <div class="ttc" id="classop_1_1_producer_html_ab30c7b3e34d962e0b17458d9a0947f6b"><div class="ttname"><a href="classop_1_1_producer.html#ab30c7b3e34d962e0b17458d9a0947f6b">op::Producer::set</a></div><div class="ttdeci">virtual void set(const int capProperty, const double value)=0</div></div>
 <div class="ttc" id="classop_1_1_producer_html_a366881a952ad34071cc719477f08b968"><div class="ttname"><a href="classop_1_1_producer.html#a366881a952ad34071cc719477f08b968">op::Producer::get</a></div><div class="ttdeci">virtual double get(const int capProperty)=0</div></div>
-<div class="ttc" id="classop_1_1_video_capture_reader_html_ac3a270770d13ae351d711a7353b32b9b"><div class="ttname"><a href="classop_1_1_video_capture_reader.html#ac3a270770d13ae351d711a7353b32b9b">op::VideoCaptureReader::set</a></div><div class="ttdeci">void set(const ProducerProperty property, const double value)</div><div class="ttdef"><b>Definition:</b> videoCaptureReader.hpp:54</div></div>
-<div class="ttc" id="classop_1_1_video_capture_reader_html_ae10d37b58fe4f3daa8817b72eb3faa64"><div class="ttname"><a href="classop_1_1_video_capture_reader.html#ae10d37b58fe4f3daa8817b72eb3faa64">op::VideoCaptureReader::isOpened</a></div><div class="ttdeci">bool isOpened() const </div><div class="ttdef"><b>Definition:</b> videoCaptureReader.hpp:38</div></div>
+<div class="ttc" id="classop_1_1_video_capture_reader_html_ac3a270770d13ae351d711a7353b32b9b"><div class="ttname"><a href="classop_1_1_video_capture_reader.html#ac3a270770d13ae351d711a7353b32b9b">op::VideoCaptureReader::set</a></div><div class="ttdeci">void set(const ProducerProperty property, const double value)</div><div class="ttdef"><b>Definition:</b> videoCaptureReader.hpp:55</div></div>
+<div class="ttc" id="classop_1_1_video_capture_reader_html_ae10d37b58fe4f3daa8817b72eb3faa64"><div class="ttname"><a href="classop_1_1_video_capture_reader.html#ae10d37b58fe4f3daa8817b72eb3faa64">op::VideoCaptureReader::isOpened</a></div><div class="ttdeci">bool isOpened() const </div><div class="ttdef"><b>Definition:</b> videoCaptureReader.hpp:39</div></div>
+<div class="ttc" id="namespaceop_html_a54b73745852c270cfd891eed0f6f2332"><div class="ttname"><a href="namespaceop.html#a54b73745852c270cfd891eed0f6f2332">op::ProducerType</a></div><div class="ttdeci">ProducerType</div><div class="ttdef"><b>Definition:</b> enumClasses.hpp:25</div></div>
 <div class="ttc" id="producer_8hpp_html"><div class="ttname"><a href="producer_8hpp.html">producer.hpp</a></div></div>
 <div class="ttc" id="macros_8hpp_html_a4ba443bb7a0e5dbe8054a9ac37a5e000"><div class="ttname"><a href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a></div><div class="ttdeci">#define OP_API</div><div class="ttdef"><b>Definition:</b> macros.hpp:5</div></div>
 </div><!-- fragment --></div><!-- contents -->

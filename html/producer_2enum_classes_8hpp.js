@@ -12,6 +12,7 @@ var producer_2enum_classes_8hpp =
     ] ],
     [ "ProducerType", "producer_2enum_classes_8hpp.html#a54b73745852c270cfd891eed0f6f2332", [
       [ "ImageDirectory", "producer_2enum_classes_8hpp.html#a54b73745852c270cfd891eed0f6f2332a54a365e86ee42cff91ca36532c9bbabf", null ],
+      [ "IPCamera", "producer_2enum_classes_8hpp.html#a54b73745852c270cfd891eed0f6f2332af40a40a04a078c4449cda2f326d7fb18", null ],
       [ "Video", "producer_2enum_classes_8hpp.html#a54b73745852c270cfd891eed0f6f2332a34e2d1989a1dbf75cd631596133ee5ee", null ],
       [ "Webcam", "producer_2enum_classes_8hpp.html#a54b73745852c270cfd891eed0f6f2332ae2faa2a74b6a4134d0b3e84c7c0e2a01", null ],
       [ "None", "producer_2enum_classes_8hpp.html#a54b73745852c270cfd891eed0f6f2332a6adf97f83acf6453d4a6a4b1070f3754", null ]
