@@ -544,24 +544,6 @@
     <ClCompile Include="..\..\src\openpose\thread\defineTemplates.cpp">
       <Filter>Source Files\thread</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\openpose\producer\defineTemplates.cpp">
-      <Filter>Source Files\producer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\openpose\producer\imageDirectoryReader.cpp">
-      <Filter>Source Files\producer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\openpose\producer\producer.cpp">
-      <Filter>Source Files\producer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\openpose\producer\videoCaptureReader.cpp">
-      <Filter>Source Files\producer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\openpose\producer\videoReader.cpp">
-      <Filter>Source Files\producer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\openpose\producer\webcamReader.cpp">
-      <Filter>Source Files\producer</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\openpose\gui\defineTemplates.cpp">
       <Filter>Source Files\gui</Filter>
     </ClCompile>
@@ -729,6 +711,27 @@
     </ClCompile>
     <ClCompile Include="..\..\src\openpose\pose\renderPose.cpp">
       <Filter>Source Files\pose</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\producer\defineTemplates.cpp">
+      <Filter>Source Files\producer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\producer\imageDirectoryReader.cpp">
+      <Filter>Source Files\producer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\producer\ipCameraReader.cpp">
+      <Filter>Source Files\producer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\producer\producer.cpp">
+      <Filter>Source Files\producer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\producer\videoCaptureReader.cpp">
+      <Filter>Source Files\producer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\producer\videoReader.cpp">
+      <Filter>Source Files\producer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\producer\webcamReader.cpp">
+      <Filter>Source Files\producer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

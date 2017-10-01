@@ -295,6 +295,7 @@
     <ClCompile Include="..\..\src\openpose\pose\renderPose.cpp" />
     <ClCompile Include="..\..\src\openpose\producer\defineTemplates.cpp" />
     <ClCompile Include="..\..\src\openpose\producer\imageDirectoryReader.cpp" />
+    <ClCompile Include="..\..\src\openpose\producer\ipCameraReader.cpp" />
     <ClCompile Include="..\..\src\openpose\producer\producer.cpp" />
     <ClCompile Include="..\..\src\openpose\producer\videoCaptureReader.cpp" />
     <ClCompile Include="..\..\src\openpose\producer\videoReader.cpp" />

@@ -41,6 +41,7 @@ DEFINE_string(video,                    "",             "Use a video file instea
                                                         " example video.");
 DEFINE_string(image_dir,                "",             "Process a directory of images. Use `examples/media/` for our default example folder with 20"
                                                         " images. Read all standard formats (jpg, png, bmp, etc.).");
+DEFINE_string(ip_camera,                "",             "String with the IP camera URL. It supports protocols like RTSP and HTTP.");
 DEFINE_uint64(frame_first,              0,              "Start on desired frame number. Indexes are 0-based, i.e. the first frame has index 0.");
 DEFINE_uint64(frame_last,               -1,             "Finish on desired frame number. Select -1 to disable. Indexes are 0-based, e.g. if set to"
                                                         " 10, it will process 11 frames (0-10).");
@@ -180,7 +181,8 @@ int openPoseDemo()
     // handNetInputSize
     const auto handNetInputSize = op::flagsToPoint(FLAGS_hand_net_resolution, "368x368 (multiples of 16)");
     // producerType
-    const auto producerSharedPtr = op::flagsToProducer(FLAGS_image_dir, FLAGS_video, FLAGS_camera, FLAGS_camera_resolution, FLAGS_camera_fps);
+    const auto producerSharedPtr = op::flagsToProducer(FLAGS_image_dir, FLAGS_video, FLAGS_ip_camera, FLAGS_camera,
+                                                       FLAGS_camera_resolution, FLAGS_camera_fps);
     // poseModel
     const auto poseModel = op::flagsToPoseModel(FLAGS_model_pose);
     // keypointScale

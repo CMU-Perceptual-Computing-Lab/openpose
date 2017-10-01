@@ -99,6 +99,7 @@ We enumerate some of the most important flags, check the `Flags Detailed Descrip
 - `--video input.mp4`: Read video.
 - `--camera 3`: Read webcam number 3.
 - `--image_dir path_to_images/`: Run on a folder with images.
+- `--ip_camera http://iris.not.iac.es/axis-cgi/mjpg/video.cgi?resolution=320x240?x.mjpeg`: Run on a streamed IP camera. See examples public IP cameras [here](http://www.webcamxp.com/publicipcams.aspx).
 - `--write_video path.avi`: Save processed images as video.
 - `--write_images folder_path`: Save processed images on a folder.
 - `--write_keypoint path/`: Output JSON, XML or YML files with the people pose data on a folder.
@@ -126,6 +127,7 @@ Each flag is divided into flag name, default value, and description.
 - DEFINE_double(camera_fps,               30.0,           "Frame rate for the webcam (only used when saving video from webcam). Set this value to the minimum value between the OpenPose displayed speed and the webcam real frame rate.");
 - DEFINE_string(video,                    "",             "Use a video file instead of the camera. Use `examples/media/video.avi` for our default example video.");
 - DEFINE_string(image_dir,                "",             "Process a directory of images. Use `examples/media/` for our default example folder with 20 images. Read all standard formats (jpg, png, bmp, etc.).");
+- DEFINE_string(ip_camera,                "",             "String with the IP camera URL. It supports protocols like RTSP and HTTP.");
 - DEFINE_uint64(frame_first,              0,              "Start on desired frame number. Indexes are 0-based, i.e. the first frame has index 0.");
 - DEFINE_uint64(frame_last,               -1,             "Finish on desired frame number. Select -1 to disable. Indexes are 0-based, e.g. if set to 10, it will process 11 frames (0-10).");
 - DEFINE_bool(frame_flip,                 false,          "Flip/mirror each frame (e.g. for real time webcam demonstrations).");

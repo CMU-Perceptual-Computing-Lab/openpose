@@ -115,13 +115,14 @@ OpenPose Library - Release Notes
 
 ## Current version (future OpenPose 1.2.0)
 1. Main improvements:
-    1. COCO JSON file outputs 0 as score for non-detected keypoints.
-    2. Added example for OpenPose for user asynchronous output and cleaned all `tutorial_wrapper/` examples.
-    3. Added `-1` option for `net_resolution` in order to auto-select the best possible aspect ratio given the user input.
-    4. Output images can have the input size, OpenPose able to change its size for each image and not required fixed size anymore.
+    1. Added IP camera support.
+    2. Output images can have the input size, OpenPose able to change its size for each image and not required fixed size anymore.
         1. FrameDisplayer accepts variable size images by rescaling every time a frame with bigger width or height is displayed (gui module).
         2. OpOutputToCvMat & GuiInfoAdder does not require to know the output size at construction time, deduced from each image.
         3. CvMatToOutput and Renderers allow to keep input resolution as output for images (core module).
+    3. COCO JSON file outputs 0 as score for non-detected keypoints.
+    4. Added example for OpenPose for user asynchronous output and cleaned all `tutorial_wrapper/` examples.
+    5. Added `-1` option for `net_resolution` in order to auto-select the best possible aspect ratio given the user input.
 2. Functions or parameters renamed:
     1. OpenPose able to change its size and initial size:
         1. Flag `resolution` renamed as `output_resolution`.

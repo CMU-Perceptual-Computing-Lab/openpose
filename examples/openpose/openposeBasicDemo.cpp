@@ -22,6 +22,7 @@ DEFINE_string(video,                    "",             "Use a video file instea
                                                         " example video.");
 DEFINE_string(image_dir,                "",             "Process a directory of images. Use `examples/media/` for our default example folder with 20"
                                                         " images. Read all standard formats (jpg, png, bmp, etc.).");
+DEFINE_string(ip_camera,                "",             "String with the IP camera URL. It supports protocols like RTSP and HTTP.");
 // Display
 DEFINE_bool(no_gui_verbose,             false,          "Do not write text on output images on GUI (e.g. number of current frame and people). It"
                                                         " does not affect the pose rendering.");
@@ -34,7 +35,8 @@ int openPoseDemo()
     const auto timerBegin = std::chrono::high_resolution_clock::now();
 
     // Applying user defined configuration - Google flags to program variables
-    const auto producerSharedPtr = op::flagsToProducer(FLAGS_image_dir, FLAGS_video, FLAGS_camera, FLAGS_camera_resolution, FLAGS_camera_fps);
+    const auto producerSharedPtr = op::flagsToProducer(FLAGS_image_dir, FLAGS_video, FLAGS_ip_camera, FLAGS_camera,
+                                                       FLAGS_camera_resolution, FLAGS_camera_fps);
     op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
     // OpenPose wrapper

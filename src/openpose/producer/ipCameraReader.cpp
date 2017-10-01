@@ -1,15 +1,18 @@
-#include <openpose/utilities/fileSystem.hpp>
-#include <openpose/producer/videoReader.hpp>
+#include <openpose/producer/ipCameraReader.hpp>
 
 namespace op
 {
-    VideoReader::VideoReader(const std::string & videoPath) :
-        VideoCaptureReader{videoPath, ProducerType::Video},
-        mPathName{getFileNameNoExtension(videoPath)}
+    // Public IP cameras for testing (add ?x.mjpeg):
+    // http://iris.not.iac.es/axis-cgi/mjpg/video.cgi?resolution=320x240?x.mjpeg
+    // http://www.webcamxp.com/publicipcams.aspx
+
+    IpCameraReader::IpCameraReader(const std::string & cameraPath) :
+        VideoCaptureReader{cameraPath, ProducerType::IPCamera},
+        mPathName{cameraPath}
     {
     }
 
-    std::string VideoReader::getFrameName()
+    std::string IpCameraReader::getFrameName()
     {
         try
         {
@@ -22,7 +25,7 @@ namespace op
         }
     }
 
-    cv::Mat VideoReader::getRawFrame()
+    cv::Mat IpCameraReader::getRawFrame()
     {
         try
         {
