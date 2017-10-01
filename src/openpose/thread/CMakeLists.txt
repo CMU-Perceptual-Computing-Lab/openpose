@@ -1,9 +1,9 @@
 set(SOURCES
     defineTemplates.cpp)
 
-add_library(thread ${SOURCES})
+add_library(openpose_thread ${SOURCES})
 
-install(TARGETS thread 
+install(TARGETS openpose_thread 
     EXPORT OpenPose
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib

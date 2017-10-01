@@ -10,11 +10,11 @@ set(SOURCES
 
 find_package(Boost COMPONENTS system filesystem REQUIRED)
   
-cuda_add_library(utilities ${SOURCES})
-target_link_libraries(utilities producer filestream
+cuda_add_library(openpose_utilities ${SOURCES})
+target_link_libraries(openpose_utilities openpose_producer openpose_filestream
     ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
 
-install(TARGETS utilities
+install(TARGETS openpose_utilities
     EXPORT OpenPose
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib

@@ -247,11 +247,11 @@ message(STATUS "Models Downloaded.")
 
 # Install the headers
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/include/openpose DESTINATION include)
+install(EXPORT OpenPose DESTINATION lib/OpenPose)
 if (BUILD_CAFFE)
   install(DIRECTORY ${CMAKE_BINARY_DIR}/caffe/include/caffe DESTINATION include)
   install(DIRECTORY ${CMAKE_BINARY_DIR}/caffe/lib/ DESTINATION lib)
 endif (BUILD_CAFFE)
-install(EXPORT OpenPose DESTINATION lib/OpenPose)
 
 # Compute installation prefix relative to this file
 configure_file(
@@ -259,4 +259,13 @@ configure_file(
   ${CMAKE_BINARY_DIR}/cmake/OpenPoseConfig.cmake @ONLY)
 
 install(FILES ${CMAKE_BINARY_DIR}/cmake/OpenPoseConfig.cmake
-    DESTINATION lib/OpenPose)
+		DESTINATION lib/OpenPose)
+
+# uninstall target
+configure_file(
+    "${CMAKE_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
+    "${CMAKE_BINARY_DIR}/cmake_uninstall.cmake"
+    IMMEDIATE @ONLY)
+
+add_custom_target(uninstall
+    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)

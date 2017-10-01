@@ -9,9 +9,9 @@ set(SOURCES cocoJsonSaver.cpp
     keypointSaver.cpp
     videoSaver.cpp)
 
-add_library(filestream ${SOURCES})
+add_library(openpose_filestream ${SOURCES})
 
-install(TARGETS filestream
+install(TARGETS openpose_filestream
     EXPORT OpenPose
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib

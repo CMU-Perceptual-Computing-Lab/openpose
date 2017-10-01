@@ -7,12 +7,12 @@ set(SOURCES
     renderHand.cpp
     renderHand.cu)
 
-cuda_add_library(hand ${SOURCES})
+cuda_add_library(openpose_hand ${SOURCES})
 if (BUILD_CAFFE)
-  add_dependencies(hand caffe)
+  add_dependencies(openpose_hand caffe)
 endif (BUILD_CAFFE)
 
-install(TARGETS hand
+install(TARGETS openpose_hand
     EXPORT OpenPose
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib

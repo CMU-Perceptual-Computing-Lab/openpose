@@ -1,4 +1,4 @@
-cuda_add_library(core
+cuda_add_library(openpose_core
     array.cpp
     cvMatToOpInput.cpp
     cvMatToOpOutput.cpp
@@ -20,12 +20,12 @@ cuda_add_library(core
     resizeAndMergeBase.cu
     resizeAndMergeCaffe.cpp)
 
-target_link_libraries(core ${Caffe_LIBS})
+target_link_libraries(openpose_core ${Caffe_LIBS})
 if (BUILD_CAFFE)
-  add_dependencies(core caffe)
+  add_dependencies(openpose_core caffe)
 endif (BUILD_CAFFE)
 
-install(TARGETS core
+install(TARGETS openpose_core
     EXPORT OpenPose
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib
