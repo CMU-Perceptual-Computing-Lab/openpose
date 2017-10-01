@@ -111,57 +111,24 @@ $(document).ready(function(){initNavTree('face_renderer_8hpp_source.html','');})
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define OPENPOSE_FACE_FACE_RENDERER_HPP</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor"></span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="common_8hpp.html">openpose/core/common.hpp</a>&gt;</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="core_2enum_classes_8hpp.html">openpose/core/enumClasses.hpp</a>&gt;</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="renderer_8hpp.html">openpose/core/renderer.hpp</a>&gt;</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="face_parameters_8hpp.html">openpose/face/faceParameters.hpp</a>&gt;</span></div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="worker_8hpp.html">openpose/thread/worker.hpp</a>&gt;</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;</div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="keyword">namespace </span>op</div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;{</div>
-<div class="line"><a name="l00012"></a><span class="lineno"><a class="line" href="classop_1_1_face_renderer.html">   12</a></span>&#160;    <span class="keyword">class </span><a class="code" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> <a class="code" href="classop_1_1_face_renderer.html">FaceRenderer</a> : <span class="keyword">public</span> <a class="code" href="classop_1_1_renderer.html">Renderer</a></div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;    {</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;        <a class="code" href="classop_1_1_face_renderer.html">FaceRenderer</a>(<span class="keyword">const</span> <a class="code" href="structop_1_1_point.html">Point&lt;int&gt;</a>&amp; frameSize, <span class="keyword">const</span> <span class="keywordtype">float</span> renderThreshold,</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;                     <span class="keyword">const</span> <span class="keywordtype">float</span> alphaKeypoint = <a class="code" href="namespaceop.html#a15f6c39797cee87f6aa941d93f22b78b">FACE_DEFAULT_ALPHA_KEYPOINT</a>,</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;                     <span class="keyword">const</span> <span class="keywordtype">float</span> alphaHeatMap = <a class="code" href="namespaceop.html#a4f191afed46fea5e3ce5b2a8756e1ddd">FACE_DEFAULT_ALPHA_HEAT_MAP</a>,</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;                     <span class="keyword">const</span> <a class="code" href="namespaceop.html#afce557f02e337e16150d00bdf72ec033">RenderMode</a> renderMode = <a class="code" href="namespaceop.html#afce557f02e337e16150d00bdf72ec033a54c82ef76ecbbd4c2293e09bae01b54e">RenderMode::Cpu</a>);</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;        ~<a class="code" href="classop_1_1_face_renderer.html">FaceRenderer</a>();</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;        <span class="keywordtype">void</span> initializationOnThread();</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;        <span class="keywordtype">void</span> renderFace(<a class="code" href="classop_1_1_array.html">Array&lt;float&gt;</a>&amp; outputData, <span class="keyword">const</span> <a class="code" href="classop_1_1_array.html">Array&lt;float&gt;</a>&amp; faceKeypoints);</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">float</span> mRenderThreshold;</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;        <span class="keyword">const</span> <a class="code" href="structop_1_1_point.html">Point&lt;int&gt;</a> mFrameSize;</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;        <span class="keyword">const</span> <a class="code" href="namespaceop.html#afce557f02e337e16150d00bdf72ec033">RenderMode</a> mRenderMode;</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;        <span class="keywordtype">float</span>* pGpuFace; <span class="comment">// GPU aux memory</span></div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;        <span class="keywordtype">void</span> renderFaceCpu(<a class="code" href="classop_1_1_array.html">Array&lt;float&gt;</a>&amp; outputData, <span class="keyword">const</span> <a class="code" href="classop_1_1_array.html">Array&lt;float&gt;</a>&amp; faceKeypoints);</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;        <span class="keywordtype">void</span> renderFaceGpu(<a class="code" href="classop_1_1_array.html">Array&lt;float&gt;</a>&amp; outputData, <span class="keyword">const</span> <a class="code" href="classop_1_1_array.html">Array&lt;float&gt;</a>&amp; faceKeypoints);</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;        <a class="code" href="macros_8hpp.html#abef96b5dd35dd9d44ad27ddf0e2f5f2e">DELETE_COPY</a>(<a class="code" href="classop_1_1_face_renderer.html">FaceRenderer</a>);</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    };</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;}</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="preprocessor">#endif // OPENPOSE_FACE_FACE_RENDERER_HPP</span></div>
-<div class="ttc" id="macros_8hpp_html_abef96b5dd35dd9d44ad27ddf0e2f5f2e"><div class="ttname"><a href="macros_8hpp.html#abef96b5dd35dd9d44ad27ddf0e2f5f2e">DELETE_COPY</a></div><div class="ttdeci">#define DELETE_COPY(className)</div><div class="ttdef"><b>Definition:</b> macros.hpp:25</div></div>
-<div class="ttc" id="classop_1_1_face_renderer_html"><div class="ttname"><a href="classop_1_1_face_renderer.html">op::FaceRenderer</a></div><div class="ttdef"><b>Definition:</b> faceRenderer.hpp:12</div></div>
-<div class="ttc" id="structop_1_1_point_html"><div class="ttname"><a href="structop_1_1_point.html">op::Point&lt; int &gt;</a></div></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;</div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="keyword">namespace </span>op</div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;{</div>
+<div class="line"><a name="l00008"></a><span class="lineno"><a class="line" href="classop_1_1_face_renderer.html">    8</a></span>&#160;    <span class="keyword">class </span><a class="code" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> <a class="code" href="classop_1_1_face_renderer.html">FaceRenderer</a></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;    {</div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00011"></a><span class="lineno"><a class="line" href="classop_1_1_face_renderer.html#aa34ce7a0602b0994cc3043b80627a31c">   11</a></span>&#160;        <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classop_1_1_face_renderer.html#aa34ce7a0602b0994cc3043b80627a31c">initializationOnThread</a>(){};</div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;        <span class="keyword">virtual</span> <span class="keywordtype">void</span> renderFace(<a class="code" href="classop_1_1_array.html">Array&lt;float&gt;</a>&amp; outputData, <span class="keyword">const</span> <a class="code" href="classop_1_1_array.html">Array&lt;float&gt;</a>&amp; faceKeypoints) = 0;</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;    };</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;}</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#endif // OPENPOSE_FACE_FACE_RENDERER_HPP</span></div>
+<div class="ttc" id="classop_1_1_face_renderer_html"><div class="ttname"><a href="classop_1_1_face_renderer.html">op::FaceRenderer</a></div><div class="ttdef"><b>Definition:</b> faceRenderer.hpp:8</div></div>
+<div class="ttc" id="classop_1_1_face_renderer_html_aa34ce7a0602b0994cc3043b80627a31c"><div class="ttname"><a href="classop_1_1_face_renderer.html#aa34ce7a0602b0994cc3043b80627a31c">op::FaceRenderer::initializationOnThread</a></div><div class="ttdeci">virtual void initializationOnThread()</div><div class="ttdef"><b>Definition:</b> faceRenderer.hpp:11</div></div>
 <div class="ttc" id="common_8hpp_html"><div class="ttname"><a href="common_8hpp.html">common.hpp</a></div></div>
-<div class="ttc" id="namespaceop_html_afce557f02e337e16150d00bdf72ec033a54c82ef76ecbbd4c2293e09bae01b54e"><div class="ttname"><a href="namespaceop.html#afce557f02e337e16150d00bdf72ec033a54c82ef76ecbbd4c2293e09bae01b54e">op::RenderMode::Cpu</a></div></div>
-<div class="ttc" id="worker_8hpp_html"><div class="ttname"><a href="worker_8hpp.html">worker.hpp</a></div></div>
 <div class="ttc" id="classop_1_1_array_html"><div class="ttname"><a href="classop_1_1_array.html">op::Array&lt; float &gt;</a></div></div>
-<div class="ttc" id="namespaceop_html_afce557f02e337e16150d00bdf72ec033"><div class="ttname"><a href="namespaceop.html#afce557f02e337e16150d00bdf72ec033">op::RenderMode</a></div><div class="ttdeci">RenderMode</div><div class="ttdef"><b>Definition:</b> enumClasses.hpp:23</div></div>
 <div class="ttc" id="macros_8hpp_html_a4ba443bb7a0e5dbe8054a9ac37a5e000"><div class="ttname"><a href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a></div><div class="ttdeci">#define OP_API</div><div class="ttdef"><b>Definition:</b> macros.hpp:5</div></div>
-<div class="ttc" id="core_2enum_classes_8hpp_html"><div class="ttname"><a href="core_2enum_classes_8hpp.html">enumClasses.hpp</a></div></div>
-<div class="ttc" id="namespaceop_html_a4f191afed46fea5e3ce5b2a8756e1ddd"><div class="ttname"><a href="namespaceop.html#a4f191afed46fea5e3ce5b2a8756e1ddd">op::FACE_DEFAULT_ALPHA_HEAT_MAP</a></div><div class="ttdeci">const auto FACE_DEFAULT_ALPHA_HEAT_MAP</div><div class="ttdef"><b>Definition:</b> faceParameters.hpp:26</div></div>
-<div class="ttc" id="face_parameters_8hpp_html"><div class="ttname"><a href="face_parameters_8hpp.html">faceParameters.hpp</a></div></div>
-<div class="ttc" id="classop_1_1_renderer_html"><div class="ttname"><a href="classop_1_1_renderer.html">op::Renderer</a></div><div class="ttdef"><b>Definition:</b> renderer.hpp:10</div></div>
-<div class="ttc" id="renderer_8hpp_html"><div class="ttname"><a href="renderer_8hpp.html">renderer.hpp</a></div></div>
-<div class="ttc" id="namespaceop_html_a15f6c39797cee87f6aa941d93f22b78b"><div class="ttname"><a href="namespaceop.html#a15f6c39797cee87f6aa941d93f22b78b">op::FACE_DEFAULT_ALPHA_KEYPOINT</a></div><div class="ttdeci">const auto FACE_DEFAULT_ALPHA_KEYPOINT</div><div class="ttdef"><b>Definition:</b> faceParameters.hpp:25</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

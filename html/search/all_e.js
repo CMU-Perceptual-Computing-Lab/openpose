@@ -23,7 +23,6 @@ var searchData=
   ['operator_3e_3d',['operator&gt;=',['../structop_1_1_datum.html#afcdbf1d87e08761d952d19ef6a8ace10',1,'op::Datum::operator&gt;=()'],['../structop_1_1_point.html#a480b8feec1a2c0652ea0ab6dd7717e6d',1,'op::Point::operator&gt;=()']]],
   ['operator_5b_5d',['operator[]',['../classop_1_1_array.html#aa40dc59e800d3c4cce623d560c0e0fad',1,'op::Array::operator[](const int index)'],['../classop_1_1_array.html#aeccfa42607d5deb5039ff260eb980abc',1,'op::Array::operator[](const int index) const '],['../classop_1_1_array.html#aada0f1bd6e9eb73b4f977e62da536f58',1,'op::Array::operator[](const std::vector&lt; int &gt; &amp;indexes)'],['../classop_1_1_array.html#a3f6c6f7ddeed3d1edbc907441888a8cf',1,'op::Array::operator[](const std::vector&lt; int &gt; &amp;indexes) const ']]],
   ['opoutputtocvmat',['OpOutputToCvMat',['../classop_1_1_op_output_to_cv_mat.html',1,'op']]],
-  ['opoutputtocvmat',['OpOutputToCvMat',['../classop_1_1_op_output_to_cv_mat.html#a6143107d3f4bca37d3e413e35efb46b8',1,'op::OpOutputToCvMat']]],
   ['opoutputtocvmat_2ehpp',['opOutputToCvMat.hpp',['../op_output_to_cv_mat_8hpp.html',1,'']]],
   ['originalfps',['OriginalFps',['../namespaceop.html#ac0230b669b296920c0cfc41b7587268fa0123c3afc0fac5edaf8b1672cb12626c',1,'op']]],
   ['outputdata',['outputData',['../structop_1_1_datum.html#a42b953c082f479eddc527da9a3a4cc75',1,'op::Datum']]],

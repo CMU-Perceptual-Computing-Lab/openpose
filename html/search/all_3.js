@@ -12,7 +12,7 @@ var searchData=
   ['default_5fx',['DEFAULT_X',['../classop_1_1_profiler.html#a7f03e8f26dee3384fd2310557842be16',1,'op::Profiler']]],
   ['defaultparttorender',['defaultPartToRender',['../structop_1_1_wrapper_struct_pose.html#ab6810e97aa62a728aa09dbbe6b9b6c06',1,'op::WrapperStructPose']]],
   ['define_5ftemplate_5fdatum',['DEFINE_TEMPLATE_DATUM',['../macros_8hpp.html#ad11d52b69bc54e48ceb2f5787f700431',1,'macros.hpp']]],
-  ['delete_5fcopy',['DELETE_COPY',['../classop_1_1_sub_thread_no_queue.html#a43504502c36461305d656fb87b914749',1,'op::SubThreadNoQueue::DELETE_COPY()'],['../macros_8hpp.html#abef96b5dd35dd9d44ad27ddf0e2f5f2e',1,'DELETE_COPY():&#160;macros.hpp']]],
+  ['delete_5fcopy',['DELETE_COPY',['../classop_1_1_face_cpu_renderer.html#a233f2a83930d07e4d420b43c8a660f32',1,'op::FaceCpuRenderer::DELETE_COPY()'],['../classop_1_1_hand_cpu_renderer.html#a66a7d318b240c73687320bf092363409',1,'op::HandCpuRenderer::DELETE_COPY()'],['../classop_1_1_sub_thread_no_queue.html#a43504502c36461305d656fb87b914749',1,'op::SubThreadNoQueue::DELETE_COPY()'],['../macros_8hpp.html#abef96b5dd35dd9d44ad27ddf0e2f5f2e',1,'DELETE_COPY():&#160;macros.hpp']]],
   ['detectfaces',['detectFaces',['../classop_1_1_face_detector.html#a9f72a1ac7276849dc9cbc141eedf96ca',1,'op::FaceDetector']]],
   ['detecthands',['detectHands',['../classop_1_1_hand_detector.html#a7814b17c16304f817cf83d7ee80de86b',1,'op::HandDetector::detectHands()'],['../classop_1_1_hand_detector_from_txt.html#a1e6ba23fa1486e92a3bdca36b2e86d22',1,'op::HandDetectorFromTxt::detectHands()']]],
   ['disablemultithreading',['disableMultiThreading',['../classop_1_1_wrapper.html#ad0d02645583cd58d11923df3aa064dc7',1,'op::Wrapper']]],

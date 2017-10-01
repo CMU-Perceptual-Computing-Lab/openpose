@@ -1,10 +1,16 @@
 var dir_f405bd8e18e06aa171eb4c66f2ad61ec =
 [
+    [ "faceCpuRenderer.hpp", "face_cpu_renderer_8hpp.html", [
+      [ "FaceCpuRenderer", "classop_1_1_face_cpu_renderer.html", "classop_1_1_face_cpu_renderer" ]
+    ] ],
     [ "faceDetector.hpp", "face_detector_8hpp.html", [
       [ "FaceDetector", "classop_1_1_face_detector.html", "classop_1_1_face_detector" ]
     ] ],
     [ "faceExtractor.hpp", "face_extractor_8hpp.html", [
       [ "FaceExtractor", "classop_1_1_face_extractor.html", "classop_1_1_face_extractor" ]
+    ] ],
+    [ "faceGpuRenderer.hpp", "face_gpu_renderer_8hpp.html", [
+      [ "FaceGpuRenderer", "classop_1_1_face_gpu_renderer.html", "classop_1_1_face_gpu_renderer" ]
     ] ],
     [ "faceParameters.hpp", "face_parameters_8hpp.html", "face_parameters_8hpp" ],
     [ "faceRenderer.hpp", "face_renderer_8hpp.html", [

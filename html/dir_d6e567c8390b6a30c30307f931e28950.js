@@ -14,6 +14,9 @@ var dir_d6e567c8390b6a30c30307f931e28950 =
       [ "Datum", "structop_1_1_datum.html", "structop_1_1_datum" ]
     ] ],
     [ "enumClasses.hpp", "core_2enum_classes_8hpp.html", "core_2enum_classes_8hpp" ],
+    [ "gpuRenderer.hpp", "gpu_renderer_8hpp.html", [
+      [ "GpuRenderer", "classop_1_1_gpu_renderer.html", "classop_1_1_gpu_renderer" ]
+    ] ],
     [ "headers.hpp", "core_2headers_8hpp.html", null ],
     [ "keypointScaler.hpp", "keypoint_scaler_8hpp.html", [
       [ "KeypointScaler", "classop_1_1_keypoint_scaler.html", "classop_1_1_keypoint_scaler" ]

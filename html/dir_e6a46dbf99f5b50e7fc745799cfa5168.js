@@ -1,5 +1,8 @@
 var dir_e6a46dbf99f5b50e7fc745799cfa5168 =
 [
+    [ "handCpuRenderer.hpp", "hand_cpu_renderer_8hpp.html", [
+      [ "HandCpuRenderer", "classop_1_1_hand_cpu_renderer.html", "classop_1_1_hand_cpu_renderer" ]
+    ] ],
     [ "handDetector.hpp", "hand_detector_8hpp.html", [
       [ "HandDetector", "classop_1_1_hand_detector.html", "classop_1_1_hand_detector" ]
     ] ],
@@ -8,6 +11,9 @@ var dir_e6a46dbf99f5b50e7fc745799cfa5168 =
     ] ],
     [ "handExtractor.hpp", "hand_extractor_8hpp.html", [
       [ "HandExtractor", "classop_1_1_hand_extractor.html", "classop_1_1_hand_extractor" ]
+    ] ],
+    [ "handGpuRenderer.hpp", "hand_gpu_renderer_8hpp.html", [
+      [ "HandGpuRenderer", "classop_1_1_hand_gpu_renderer.html", "classop_1_1_hand_gpu_renderer" ]
     ] ],
     [ "handParameters.hpp", "hand_parameters_8hpp.html", "hand_parameters_8hpp" ],
     [ "handRenderer.hpp", "hand_renderer_8hpp.html", [

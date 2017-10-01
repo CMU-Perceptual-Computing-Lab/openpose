@@ -119,7 +119,7 @@ $(document).ready(function(){initNavTree('frame_displayer_8hpp_source.html','');
 <div class="line"><a name="l00013"></a><span class="lineno"><a class="line" href="classop_1_1_frame_displayer.html">   13</a></span>&#160;    <span class="keyword">class </span><a class="code" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> <a class="code" href="classop_1_1_frame_displayer.html">FrameDisplayer</a></div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;    {</div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;        <a class="code" href="classop_1_1_frame_displayer.html">FrameDisplayer</a>(<span class="keyword">const</span> <a class="code" href="structop_1_1_point.html">Point&lt;int&gt;</a>&amp; windowedSize, <span class="keyword">const</span> std::string&amp; windowedName = <span class="stringliteral">&quot;OpenPose Display&quot;</span>, <span class="keyword">const</span> <span class="keywordtype">bool</span> fullScreen = <span class="keyword">false</span>);</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;        <a class="code" href="classop_1_1_frame_displayer.html">FrameDisplayer</a>(<span class="keyword">const</span> std::string&amp; windowedName = <span class="stringliteral">&quot;OpenPose Display&quot;</span>, <span class="keyword">const</span> <a class="code" href="structop_1_1_point.html">Point&lt;int&gt;</a>&amp; initialWindowedSize = <a class="code" href="structop_1_1_point.html">Point&lt;int&gt;</a>{}, <span class="keyword">const</span> <span class="keywordtype">bool</span> fullScreen = <span class="keyword">false</span>);</div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;</div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;        <span class="comment">// Due to OpenCV visualization issues (all visualization functions must be in the same thread)</span></div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;        <span class="keywordtype">void</span> initializationOnThread();</div>
@@ -131,8 +131,8 @@ $(document).ready(function(){initNavTree('frame_displayer_8hpp_source.html','');
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;        <span class="keywordtype">void</span> displayFrame(<span class="keyword">const</span> cv::Mat&amp; frame, <span class="keyword">const</span> <span class="keywordtype">int</span> waitKeyValue = -1);</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;        <span class="keyword">const</span> <a class="code" href="structop_1_1_point.html">Point&lt;int&gt;</a> mWindowedSize;</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        <span class="keyword">const</span> std::string mWindowName;</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;        <span class="keyword">const</span> std::string mWindowName;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        <a class="code" href="structop_1_1_point.html">Point&lt;int&gt;</a> mWindowedSize;</div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        <a class="code" href="namespaceop.html#a38f03cd0b02b760ffd2ea9e737680e01">GuiDisplayMode</a> mGuiDisplayMode;</div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    };</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;}</div>

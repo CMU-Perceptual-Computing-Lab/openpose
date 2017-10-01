@@ -1,8 +1,9 @@
 var searchData=
 [
+  ['facecpurenderer',['FaceCpuRenderer',['../classop_1_1_face_cpu_renderer.html#afb0dcfff75c4a89d5971d7b0bbd0b51b',1,'op::FaceCpuRenderer']]],
   ['facedetector',['FaceDetector',['../classop_1_1_face_detector.html#adfeab6977c93b7bef66c1dfbcf6f8150',1,'op::FaceDetector']]],
   ['faceextractor',['FaceExtractor',['../classop_1_1_face_extractor.html#aa2c31df663d2bb2e4d965833bb8270a8',1,'op::FaceExtractor']]],
-  ['facerenderer',['FaceRenderer',['../classop_1_1_face_renderer.html#a0e15c630518aea0dcdc023e90f304e14',1,'op::FaceRenderer']]],
+  ['facegpurenderer',['FaceGpuRenderer',['../classop_1_1_face_gpu_renderer.html#a344b4f1d256d6ad805273eb8ba29cde1',1,'op::FaceGpuRenderer']]],
   ['fastmax',['fastMax',['../namespaceop.html#a9f4b99449c0c73e2c89ee1a1eff007c7',1,'op']]],
   ['fastmin',['fastMin',['../namespaceop.html#a6e1d1f90ef06cc7af576fdaad4b4e320',1,'op']]],
   ['fasttruncate',['fastTruncate',['../namespaceop.html#a2dafd3db8f922405b38240345dd1dce5',1,'op']]],
@@ -22,6 +23,6 @@ var searchData=
   ['formatasdirectory',['formatAsDirectory',['../namespaceop.html#ab38ea91ef7b7dad700d8e4a4654d48f5',1,'op']]],
   ['formattocvmat',['formatToCvMat',['../classop_1_1_op_output_to_cv_mat.html#a478daa5915f60a6a962f29fcb64aaac5',1,'op::OpOutputToCvMat']]],
   ['forwardpass',['forwardPass',['../classop_1_1_net.html#ac8edfe73a20fd3d5e548160dffbd0b71',1,'op::Net::forwardPass()'],['../classop_1_1_face_extractor.html#a557850c549e3972916e833f9ffea99e1',1,'op::FaceExtractor::forwardPass()'],['../classop_1_1_hand_extractor.html#a0f76c1b4cf6770bbb889259204510877',1,'op::HandExtractor::forwardPass()'],['../classop_1_1_pose_extractor.html#af14676f867643ca2ccc666d8757d694c',1,'op::PoseExtractor::forwardPass()']]],
-  ['framedisplayer',['FrameDisplayer',['../classop_1_1_frame_displayer.html#a6e9d0d1a44ec174e444439917c56666c',1,'op::FrameDisplayer']]],
+  ['framedisplayer',['FrameDisplayer',['../classop_1_1_frame_displayer.html#a3b81422440197c14b6ae58e40a95b4ec',1,'op::FrameDisplayer']]],
   ['front',['front',['../classop_1_1_priority_queue.html#a1c0dbd77bbd40ce80818ced0664a0ac0',1,'op::PriorityQueue::front()'],['../classop_1_1_queue.html#ab28fa9f713d05e55e5ba1510b34d57f0',1,'op::Queue::front()'],['../classop_1_1_queue_base.html#aad7a6a666dcf70834d9d18ae6d92cb2c',1,'op::QueueBase::front()']]]
 ];

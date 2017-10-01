@@ -107,7 +107,6 @@ $(document).ready(function(){initNavTree('classop_1_1_renderer.html','');});
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="classop_1_1_renderer-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -117,29 +116,20 @@ $(document).ready(function(){initNavTree('classop_1_1_renderer.html','');});
 
 <p><code>#include &lt;<a class="el" href="renderer_8hpp_source.html">renderer.hpp</a>&gt;</code></p>
 
-<p>Inherited by <a class="el" href="classop_1_1_face_renderer.html">op::FaceRenderer</a>, <a class="el" href="classop_1_1_hand_renderer.html">op::HandRenderer</a>, and <a class="el" href="classop_1_1_pose_renderer.html">op::PoseRenderer</a>.</p>
+<p>Inherited by <a class="el" href="classop_1_1_face_cpu_renderer.html">op::FaceCpuRenderer</a>, <a class="el" href="classop_1_1_gpu_renderer.html">op::GpuRenderer</a>, <a class="el" href="classop_1_1_hand_cpu_renderer.html">op::HandCpuRenderer</a>, and <a class="el" href="classop_1_1_pose_cpu_renderer.html">op::PoseCpuRenderer</a>.</p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:acf36dc28d290e1cad3a6e2a91f920116"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_renderer.html#acf36dc28d290e1cad3a6e2a91f920116">Renderer</a> (const unsigned long long volume, const float alphaKeypoint, const float alphaHeatMap, const unsigned int elementToRender=0u, const unsigned int numberElementsToRender=0u)</td></tr>
-<tr class="separator:acf36dc28d290e1cad3a6e2a91f920116"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1fa9fc4aed0c776cc280bfb6bb862a36"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_renderer.html#a1fa9fc4aed0c776cc280bfb6bb862a36">~Renderer</a> ()</td></tr>
-<tr class="separator:a1fa9fc4aed0c776cc280bfb6bb862a36"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af54f88868b2024724935b48a237f43e7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_renderer.html#af54f88868b2024724935b48a237f43e7">initializationOnThread</a> ()</td></tr>
-<tr class="separator:af54f88868b2024724935b48a237f43e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a00caf604fad781dfcf3bc311ef6a6623"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_renderer.html#a00caf604fad781dfcf3bc311ef6a6623">Renderer</a> (const float renderThreshold, const float alphaKeypoint, const float alphaHeatMap, const bool blendOriginalFrame=true, const unsigned int elementToRender=0u, const unsigned int numberElementsToRender=0u)</td></tr>
+<tr class="separator:a00caf604fad781dfcf3bc311ef6a6623"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a298a5a58bab80b7252db7d3386a0ed8a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_renderer.html#a298a5a58bab80b7252db7d3386a0ed8a">increaseElementToRender</a> (const int increment)</td></tr>
 <tr class="separator:a298a5a58bab80b7252db7d3386a0ed8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afd48a9cb0be184303dce2969fa2f8e02"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_renderer.html#afd48a9cb0be184303dce2969fa2f8e02">setElementToRender</a> (const int elementToRender)</td></tr>
 <tr class="separator:afd48a9cb0be184303dce2969fa2f8e02"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aec5ea88125a96434b52b70ebfc7c5cdb"><td class="memItemLeft" align="right" valign="top">std::tuple&lt; std::shared_ptr<br class="typebreak"/>
-&lt; float * &gt;, std::shared_ptr<br class="typebreak"/>
-&lt; bool &gt;, std::shared_ptr<br class="typebreak"/>
-&lt; std::atomic&lt; unsigned int &gt;<br class="typebreak"/>
- &gt;, std::shared_ptr&lt; const <br class="typebreak"/>
-unsigned int &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_renderer.html#aec5ea88125a96434b52b70ebfc7c5cdb">getSharedParameters</a> ()</td></tr>
-<tr class="separator:aec5ea88125a96434b52b70ebfc7c5cdb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aedabf2bb6aad3ee6a0964913806c419f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_renderer.html#aedabf2bb6aad3ee6a0964913806c419f">setSharedParametersAndIfLast</a> (const std::tuple&lt; std::shared_ptr&lt; float * &gt;, std::shared_ptr&lt; bool &gt;, std::shared_ptr&lt; std::atomic&lt; unsigned int &gt;&gt;, std::shared_ptr&lt; const unsigned int &gt;&gt; &amp;tuple, const bool isLast)</td></tr>
-<tr class="separator:aedabf2bb6aad3ee6a0964913806c419f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8e0739fb55d61fc76918ca3fb6ac3bc4"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_renderer.html#a8e0739fb55d61fc76918ca3fb6ac3bc4">getBlendOriginalFrame</a> () const </td></tr>
+<tr class="separator:a8e0739fb55d61fc76918ca3fb6ac3bc4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa8339054ed113d99ca70208d0cee5aa9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_renderer.html#aa8339054ed113d99ca70208d0cee5aa9">setBlendOriginalFrame</a> (const bool blendOriginalFrame)</td></tr>
+<tr class="separator:aa8339054ed113d99ca70208d0cee5aa9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac4df12764776ba2e27c71a3c4181f647"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_renderer.html#ac4df12764776ba2e27c71a3c4181f647">getAlphaKeypoint</a> () const </td></tr>
 <tr class="separator:ac4df12764776ba2e27c71a3c4181f647"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a039e88897ed844551cadb115ea98e9ef"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_renderer.html#a039e88897ed844551cadb115ea98e9ef">setAlphaKeypoint</a> (const float alphaKeypoint)</td></tr>
@@ -148,27 +138,28 @@ unsigned int &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a cla
 <tr class="separator:a503d7fdba655b14348769ad3f69b6c00"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abaea1725725ff775aed0c120b2ba3d1f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_renderer.html#abaea1725725ff775aed0c120b2ba3d1f">setAlphaHeatMap</a> (const float alphaHeatMap)</td></tr>
 <tr class="separator:abaea1725725ff775aed0c120b2ba3d1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
-Protected Member Functions</h2></td></tr>
-<tr class="memitem:a3e286cd3dfc8dbd0c84bf89aaa5ac1b1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_renderer.html#a3e286cd3dfc8dbd0c84bf89aaa5ac1b1">cpuToGpuMemoryIfNotCopiedYet</a> (const float *const cpuMemory)</td></tr>
-<tr class="separator:a3e286cd3dfc8dbd0c84bf89aaa5ac1b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4baa9fca69a5afd3e6b4718986f43ea5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_renderer.html#a4baa9fca69a5afd3e6b4718986f43ea5">gpuToCpuMemoryIfLastRenderer</a> (float *cpuMemory)</td></tr>
-<tr class="separator:a4baa9fca69a5afd3e6b4718986f43ea5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a891be57b699f6adbb7cd841870214b8e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_renderer.html#a891be57b699f6adbb7cd841870214b8e">getShowGooglyEyes</a> () const </td></tr>
+<tr class="separator:a891be57b699f6adbb7cd841870214b8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab226d47f554735fa3e0372ce429747c3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_renderer.html#ab226d47f554735fa3e0372ce429747c3">setShowGooglyEyes</a> (const bool showGooglyEyes)</td></tr>
+<tr class="separator:ab226d47f554735fa3e0372ce429747c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
-<tr class="memitem:a36a6defc4a131985cf332fc2893e835d"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; float * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_renderer.html#a36a6defc4a131985cf332fc2893e835d">spGpuMemoryPtr</a></td></tr>
-<tr class="separator:a36a6defc4a131985cf332fc2893e835d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adc4cd0a62008325c5c7df6df2f95a167"><td class="memItemLeft" align="right" valign="top">const float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_renderer.html#adc4cd0a62008325c5c7df6df2f95a167">mRenderThreshold</a></td></tr>
+<tr class="separator:adc4cd0a62008325c5c7df6df2f95a167"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a88449a7c29a48e157cd6b16089825be7"><td class="memItemLeft" align="right" valign="top">std::atomic&lt; bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_renderer.html#a88449a7c29a48e157cd6b16089825be7">mBlendOriginalFrame</a></td></tr>
+<tr class="separator:a88449a7c29a48e157cd6b16089825be7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aca8ebf0c0a50b87f0be82afa090155a0"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; std::atomic<br class="typebreak"/>
 &lt; unsigned int &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_renderer.html#aca8ebf0c0a50b87f0be82afa090155a0">spElementToRender</a></td></tr>
 <tr class="separator:aca8ebf0c0a50b87f0be82afa090155a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3e04644546dd9990a16d0b6861b60553"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; const <br class="typebreak"/>
 unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_renderer.html#a3e04644546dd9990a16d0b6861b60553">spNumberElementsToRender</a></td></tr>
 <tr class="separator:a3e04644546dd9990a16d0b6861b60553"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ace2490fa3c5a87443e4d1e64007cd1ff"><td class="memItemLeft" align="right" valign="top">std::atomic&lt; bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_renderer.html#ace2490fa3c5a87443e4d1e64007cd1ff">mShowGooglyEyes</a></td></tr>
+<tr class="separator:ace2490fa3c5a87443e4d1e64007cd1ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="acf36dc28d290e1cad3a6e2a91f920116"></a>
+<a class="anchor" id="a00caf604fad781dfcf3bc311ef6a6623"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -178,8 +169,8 @@ unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="e
         <tr>
           <td class="memname">op::Renderer::Renderer </td>
           <td>(</td>
-          <td class="paramtype">const unsigned long long&#160;</td>
-          <td class="paramname"><em>volume</em>, </td>
+          <td class="paramtype">const float&#160;</td>
+          <td class="paramname"><em>renderThreshold</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -192,6 +183,12 @@ unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="e
           <td></td>
           <td class="paramtype">const float&#160;</td>
           <td class="paramname"><em>alphaHeatMap</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>blendOriginalFrame</em> = <code>true</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -220,46 +217,7 @@ unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="e
 
 </div>
 </div>
-<a class="anchor" id="a1fa9fc4aed0c776cc280bfb6bb862a36"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">op::Renderer::~Renderer </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a3e286cd3dfc8dbd0c84bf89aaa5ac1b1"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void op::Renderer::cpuToGpuMemoryIfNotCopiedYet </td>
-          <td>(</td>
-          <td class="paramtype">const float *const&#160;</td>
-          <td class="paramname"><em>cpuMemory</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a class="anchor" id="a503d7fdba655b14348769ad3f69b6c00"></a>
 <div class="memitem">
 <div class="memproto">
@@ -290,41 +248,32 @@ unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="e
 
 </div>
 </div>
-<a class="anchor" id="aec5ea88125a96434b52b70ebfc7c5cdb"></a>
+<a class="anchor" id="a8e0739fb55d61fc76918ca3fb6ac3bc4"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">std::tuple&lt;std::shared_ptr&lt;float*&gt;, std::shared_ptr&lt;bool&gt;, std::shared_ptr&lt;std::atomic&lt;unsigned int&gt; &gt;, std::shared_ptr&lt;const unsigned int&gt; &gt; op::Renderer::getSharedParameters </td>
+          <td class="memname">bool op::Renderer::getBlendOriginalFrame </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="a4baa9fca69a5afd3e6b4718986f43ea5"></a>
+<a class="anchor" id="a891be57b699f6adbb7cd841870214b8e"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void op::Renderer::gpuToCpuMemoryIfLastRenderer </td>
+          <td class="memname">bool op::Renderer::getShowGooglyEyes </td>
           <td>(</td>
-          <td class="paramtype">float *&#160;</td>
-          <td class="paramname"><em>cpuMemory</em></td><td>)</td>
-          <td></td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 </div>
@@ -338,21 +287,6 @@ unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="e
           <td>(</td>
           <td class="paramtype">const int&#160;</td>
           <td class="paramname"><em>increment</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="af54f88868b2024724935b48a237f43e7"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void op::Renderer::initializationOnThread </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -392,6 +326,22 @@ unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="e
 
 </div>
 </div>
+<a class="anchor" id="aa8339054ed113d99ca70208d0cee5aa9"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void op::Renderer::setBlendOriginalFrame </td>
+          <td>(</td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>blendOriginalFrame</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a class="anchor" id="afd48a9cb0be184303dce2969fa2f8e02"></a>
 <div class="memitem">
 <div class="memproto">
@@ -408,26 +358,16 @@ unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="e
 
 </div>
 </div>
-<a class="anchor" id="aedabf2bb6aad3ee6a0964913806c419f"></a>
+<a class="anchor" id="ab226d47f554735fa3e0372ce429747c3"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void op::Renderer::setSharedParametersAndIfLast </td>
+          <td class="memname">void op::Renderer::setShowGooglyEyes </td>
           <td>(</td>
-          <td class="paramtype">const std::tuple&lt; std::shared_ptr&lt; float * &gt;, std::shared_ptr&lt; bool &gt;, std::shared_ptr&lt; std::atomic&lt; unsigned int &gt;&gt;, std::shared_ptr&lt; const unsigned int &gt;&gt; &amp;&#160;</td>
-          <td class="paramname"><em>tuple</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
           <td class="paramtype">const bool&#160;</td>
-          <td class="paramname"><em>isLast</em>&#160;</td>
-        </tr>
-        <tr>
+          <td class="paramname"><em>showGooglyEyes</em></td><td>)</td>
           <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -435,7 +375,7 @@ unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="e
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
-<a class="anchor" id="aca8ebf0c0a50b87f0be82afa090155a0"></a>
+<a class="anchor" id="a88449a7c29a48e157cd6b16089825be7"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -443,7 +383,7 @@ unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="e
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::shared_ptr&lt;std::atomic&lt;unsigned int&gt; &gt; op::Renderer::spElementToRender</td>
+          <td class="memname">std::atomic&lt;bool&gt; op::Renderer::mBlendOriginalFrame</td>
         </tr>
       </table>
   </td>
@@ -455,7 +395,7 @@ unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="e
 
 </div>
 </div>
-<a class="anchor" id="a36a6defc4a131985cf332fc2893e835d"></a>
+<a class="anchor" id="adc4cd0a62008325c5c7df6df2f95a167"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -463,7 +403,47 @@ unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="e
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::shared_ptr&lt;float*&gt; op::Renderer::spGpuMemoryPtr</td>
+          <td class="memname">const float op::Renderer::mRenderThreshold</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ace2490fa3c5a87443e4d1e64007cd1ff"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::atomic&lt;bool&gt; op::Renderer::mShowGooglyEyes</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="aca8ebf0c0a50b87f0be82afa090155a0"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::shared_ptr&lt;std::atomic&lt;unsigned int&gt; &gt; op::Renderer::spElementToRender</td>
         </tr>
       </table>
   </td>
