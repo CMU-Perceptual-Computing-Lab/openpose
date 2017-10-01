@@ -37,8 +37,8 @@ DEFINE_string(image_dir,                "",             "Process a directory of 
 DEFINE_bool(process_real_time,          false,          "Enable to keep the original source frame rate (e.g. for video). If the processing time is"
                                                         " too long, it will skip frames. If it is too fast, it will slow it down.");
 // OpenPose
-DEFINE_string(resolution,               "1280x720",     "The image resolution (display and output). Use \"-1x-1\" to force the program to use the"
-                                                        " default images resolution.");
+DEFINE_string(output_resolution,        "-1x-1",        "The image resolution (display and output). Use \"-1x-1\" to force the program to use the"
+                                                        " input image resolution.");
 // Consumer
 DEFINE_bool(fullscreen,                 false,          "Run in full-screen mode (press f during runtime to toggle).");
 
@@ -53,7 +53,7 @@ int openPoseTutorialThread1()
     op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
     // Step 2 - Read Google flags (user defined configuration)
     // outputSize
-    auto outputSize = op::flagsToPoint(FLAGS_resolution, "1280x720");
+    const auto outputSize = op::flagsToPoint(FLAGS_output_resolution, "-1x-1");
     // producerType
     const auto producerSharedPtr = op::flagsToProducer(FLAGS_image_dir, FLAGS_video, FLAGS_camera, FLAGS_camera_resolution, FLAGS_camera_fps);
     const auto displayProducerFpsMode = (FLAGS_process_real_time ? op::ProducerFpsMode::OriginalFps : op::ProducerFpsMode::RetrievalFps);
@@ -65,14 +65,6 @@ int openPoseTutorialThread1()
     videoSeekSharedPtr->second = 0;
     const op::Point<int> producerSize{(int)producerSharedPtr->get(CV_CAP_PROP_FRAME_WIDTH),
                                 (int)producerSharedPtr->get(CV_CAP_PROP_FRAME_HEIGHT)};
-    if (outputSize.x == -1 || outputSize.y == -1)
-    {
-        if (producerSize.area() > 0)
-            outputSize = producerSize;
-        else
-            op::error("Output resolution = input resolution not valid for image reading (size might change between images).",
-                      __LINE__, __FUNCTION__, __FILE__);
-    }
     // Step 4 - Setting thread workers && manager
     typedef std::vector<op::Datum> TypedefDatumsNoPtr;
     typedef std::shared_ptr<TypedefDatumsNoPtr> TypedefDatums;
@@ -82,7 +74,7 @@ int openPoseTutorialThread1()
     auto DatumProducer = std::make_shared<op::DatumProducer<TypedefDatumsNoPtr>>(producerSharedPtr);
     auto wDatumProducer = std::make_shared<op::WDatumProducer<TypedefDatums, TypedefDatumsNoPtr>>(DatumProducer);
     // GUI (Display)
-    auto gui = std::make_shared<op::Gui>(FLAGS_fullscreen, outputSize, threadManager.getIsRunningSharedPtr());
+    auto gui = std::make_shared<op::Gui>(outputSize, FLAGS_fullscreen, threadManager.getIsRunningSharedPtr());
     auto wGui = std::make_shared<op::WGui<TypedefDatums>>(gui);
 
     // ------------------------- CONFIGURING THREADING -------------------------

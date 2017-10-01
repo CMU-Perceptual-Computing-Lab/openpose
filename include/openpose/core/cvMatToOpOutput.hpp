@@ -9,7 +9,8 @@ namespace op
     class OP_API CvMatToOpOutput
     {
     public:
-        CvMatToOpOutput(const Point<int>& outputResolution, const bool generateOutput = true);
+        // Use outputResolution <= {0,0} to keep input resolution
+        CvMatToOpOutput(const Point<int>& outputResolution = Point<int>{0, 0}, const bool generateOutput = true);
 
         std::tuple<double, Array<float>> format(const cv::Mat& cvInputData) const;
 

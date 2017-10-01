@@ -37,8 +37,8 @@ DEFINE_string(net_resolution,           "656x368",      "Multiples of 16. If it 
                                                         " any of the dimensions, OP will choose the optimal aspect ratio depending on the user's"
                                                         " input value. E.g. the default `-1x368` is equivalent to `656x368` in 16:9 resolutions,"
                                                         " e.g. full HD (1980x1080) and HD (1280x720) resolutions.");
-DEFINE_string(resolution,               "1280x720",     "The image resolution (display and output). Use \"-1x-1\" to force the program to use the"
-                                                        " default images resolution.");
+DEFINE_string(output_resolution,        "-1x-1",        "The image resolution (display and output). Use \"-1x-1\" to force the program to use the"
+                                                        " input image resolution.");
 DEFINE_int32(num_gpu_start,             0,              "GPU device start number.");
 DEFINE_double(scale_gap,                0.3,            "Scale gap between scales. No effect unless scale_number > 1. Initial scale is always 1."
                                                         " If you want to change the initial scale, you actually want to multiply the"
@@ -72,7 +72,7 @@ int openPoseTutorialPose2()
     op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
     // Step 2 - Read Google flags (user defined configuration)
     // outputSize
-    const auto outputSize = op::flagsToPoint(FLAGS_resolution, "1280x720");
+    const auto outputSize = op::flagsToPoint(FLAGS_output_resolution, "-1x-1");
     // netInputSize
     const auto netInputSize = op::flagsToPoint(FLAGS_net_resolution, "-1x368");
     // netOutputSize
@@ -92,15 +92,14 @@ int openPoseTutorialPose2()
     std::shared_ptr<op::PoseExtractor> poseExtractorPtr = std::make_shared<op::PoseExtractorCaffe>(netInputSize, netOutputSize, outputSize,
                                                                                                    FLAGS_scale_number, poseModel,
                                                                                                    FLAGS_model_folder, FLAGS_num_gpu_start);
-    op::PoseRenderer poseRenderer{netOutputSize, outputSize, poseModel, poseExtractorPtr, (float)FLAGS_render_threshold,
-                                  !FLAGS_disable_blending, (float)FLAGS_alpha_pose, (float)FLAGS_alpha_heatmap};
-    poseRenderer.setElementToRender(FLAGS_part_to_show);
-    op::OpOutputToCvMat opOutputToCvMat{outputSize};
-    const op::Point<int> windowedSize = outputSize;
-    op::FrameDisplayer frameDisplayer{windowedSize, "OpenPose Tutorial - Example 2"};
+    op::PoseGpuRenderer poseGpuRenderer{netOutputSize, poseModel, poseExtractorPtr, (float)FLAGS_render_threshold,
+                                        !FLAGS_disable_blending, (float)FLAGS_alpha_pose, (float)FLAGS_alpha_heatmap};
+    poseGpuRenderer.setElementToRender(FLAGS_part_to_show);
+    op::OpOutputToCvMat opOutputToCvMat;
+    op::FrameDisplayer frameDisplayer{"OpenPose Tutorial - Example 2", outputSize};
     // Step 4 - Initialize resources on desired thread (in this case single thread, i.e. we init resources here)
     poseExtractorPtr->initializationOnThread();
-    poseRenderer.initializationOnThread();
+    poseGpuRenderer.initializationOnThread();
 
     // ------------------------- POSE ESTIMATION AND RENDERING -------------------------
     // Step 1 - Read and load image, error if empty (possibly wrong path)
@@ -119,7 +118,7 @@ int openPoseTutorialPose2()
     const auto poseKeypoints = poseExtractorPtr->getPoseKeypoints();
     const auto scaleNetToOutput = poseExtractorPtr->getScaleNetToOutput();
     // Step 4 - Render pose
-    poseRenderer.renderPose(outputArray, poseKeypoints, scaleNetToOutput);
+    poseGpuRenderer.renderPose(outputArray, poseKeypoints, scaleNetToOutput);
     // Step 5 - OpenPose output format to cv::Mat
     auto outputImage = opOutputToCvMat.formatToCvMat(outputArray);
 

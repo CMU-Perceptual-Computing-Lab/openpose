@@ -11,10 +11,11 @@ OpenPose is a **library for real-time multi-person keypoint detection and multi-
 
 
 ## Latest News
-- Jul 2017: **Windows**, new [**portable demo**](doc/installation.md#installation---demo) **and** [**easier library installation**](doc/installation.md#installation---library)!
+- Sep 2017: **CMake** installer!
+- Jul 2017: [**Windows portable demo**](doc/installation.md#installation---demo)!
 - Jul 2017: **Hands** released!
 - Jun 2017: **Face** released!
-- May 2017: **Windows** version released!
+- May 2017: **Windows** version!
 - Apr 2017: **Body** released!
 - Check all the [release notes](doc/release_notes.md).
 

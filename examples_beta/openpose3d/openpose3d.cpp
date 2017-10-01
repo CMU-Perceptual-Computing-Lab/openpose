@@ -35,8 +35,8 @@ DEFINE_int32(logging_level,             3,              "The logging level. Inte
                                                         " low priority messages and 4 for important ones.");
 // OpenPose
 DEFINE_string(model_folder,             "models/",      "Folder path (absolute or relative) where the models (pose, face, ...) are located.");
-DEFINE_string(resolution,               "1280x720",     "The image resolution (display and output). Use \"-1x-1\" to force the program to use the"
-                                                        " default images resolution.");
+DEFINE_string(output_resolution,        "-1x-1",        "The image resolution (display and output). Use \"-1x-1\" to force the program to use the"
+                                                        " input image resolution.");
 DEFINE_int32(num_gpu,                   -1,             "The number of GPU devices to use. If negative, it will use all the available GPUs in your"
                                                         " machine.");
 DEFINE_int32(num_gpu_start,             0,              "GPU device start number.");
@@ -153,7 +153,7 @@ int openpose3d()
 
     // Applying user defined configuration - Google flags to program variables
     // outputSize
-    const auto outputSize = op::flagsToPoint(FLAGS_resolution, "1280x720");
+    const auto outputSize = op::flagsToPoint(FLAGS_output_resolution, "-1x-1");
     // netInputSize
     const auto netInputSize = op::flagsToPoint(FLAGS_net_resolution, "-1x368");
     // faceNetInputSize

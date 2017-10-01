@@ -80,69 +80,6 @@
     <ClInclude Include="..\..\include\openpose\headers.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\openpose\core\array.hpp">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\core\cvMatToOpInput.hpp">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\core\cvMatToOpOutput.hpp">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\core\datum.hpp">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\core\enumClasses.hpp">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\core\headers.hpp">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\core\keypointScaler.hpp">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\core\net.hpp">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\core\netCaffe.hpp">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\core\nmsBase.hpp">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\core\nmsCaffe.hpp">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\core\opOutputToCvMat.hpp">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\core\point.hpp">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\core\rectangle.hpp">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\core\renderer.hpp">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\core\resizeAndMergeBase.hpp">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\core\resizeAndMergeCaffe.hpp">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\core\wCvMatToOpInput.hpp">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\core\wCvMatToOpOutput.hpp">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\core\wKeypointScaler.hpp">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\core\wOpOutputToCvMat.hpp">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\openpose\wrapper\headers.hpp">
       <Filter>Header Files\wrapper</Filter>
     </ClInclude>
@@ -278,39 +215,6 @@
     <ClInclude Include="..\..\include\openpose\producer\webcamReader.hpp">
       <Filter>Header Files\producer</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\openpose\pose\bodyPartConnectorBase.hpp">
-      <Filter>Header Files\pose</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\pose\bodyPartConnectorCaffe.hpp">
-      <Filter>Header Files\pose</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\pose\enumClasses.hpp">
-      <Filter>Header Files\pose</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\pose\headers.hpp">
-      <Filter>Header Files\pose</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\pose\poseExtractor.hpp">
-      <Filter>Header Files\pose</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\pose\poseExtractorCaffe.hpp">
-      <Filter>Header Files\pose</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\pose\poseParameters.hpp">
-      <Filter>Header Files\pose</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\pose\poseRenderer.hpp">
-      <Filter>Header Files\pose</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\pose\renderPose.hpp">
-      <Filter>Header Files\pose</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\pose\wPoseExtractor.hpp">
-      <Filter>Header Files\pose</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\pose\wPoseRenderer.hpp">
-      <Filter>Header Files\pose</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\openpose\gui\enumClasses.hpp">
       <Filter>Header Files\gui</Filter>
     </ClInclude>
@@ -341,74 +245,8 @@
     <ClInclude Include="..\..\include\openpose\experimental\producer\wPeoplePoseLoader.hpp">
       <Filter>Header Files\experimental\producer</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\openpose\face\faceDetector.hpp">
-      <Filter>Header Files\face</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\face\faceExtractor.hpp">
-      <Filter>Header Files\face</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\face\faceParameters.hpp">
-      <Filter>Header Files\face</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\face\faceRenderer.hpp">
-      <Filter>Header Files\face</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\face\headers.hpp">
-      <Filter>Header Files\face</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\face\renderFace.hpp">
-      <Filter>Header Files\face</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\face\wFaceDetector.hpp">
-      <Filter>Header Files\face</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\face\wFaceExtractor.hpp">
-      <Filter>Header Files\face</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\face\wFaceRenderer.hpp">
-      <Filter>Header Files\face</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\hand\handDetector.hpp">
-      <Filter>Header Files\hand</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\hand\handExtractor.hpp">
-      <Filter>Header Files\hand</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\hand\handParameters.hpp">
-      <Filter>Header Files\hand</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\hand\handRenderer.hpp">
-      <Filter>Header Files\hand</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\hand\headers.hpp">
-      <Filter>Header Files\hand</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\hand\renderHand.hpp">
-      <Filter>Header Files\hand</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\hand\wHandDetector.hpp">
-      <Filter>Header Files\hand</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\hand\wHandDetectorTracking.hpp">
-      <Filter>Header Files\hand</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\hand\wHandDetectorUpdate.hpp">
-      <Filter>Header Files\hand</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\hand\wHandExtractor.hpp">
-      <Filter>Header Files\hand</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\hand\wHandRenderer.hpp">
-      <Filter>Header Files\hand</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\openpose\utilities\flagsToOpenPose.hpp">
       <Filter>Header Files\utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\core\maximumBase.hpp">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\openpose\core\maximumCaffe.hpp">
-      <Filter>Header Files\core</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\openpose\filestream\cocoJsonSaver.hpp">
       <Filter>Header Files\filestream</Filter>
@@ -467,17 +305,200 @@
     <ClInclude Include="..\..\include\openpose\filestream\wVideoSaver.hpp">
       <Filter>Header Files\filestream</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\openpose\core\array.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\core\common.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\core\cvMatToOpInput.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\core\cvMatToOpOutput.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\core\datum.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\core\enumClasses.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\core\gpuRenderer.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\core\headers.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\core\keypointScaler.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\core\macros.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\core\maximumBase.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\core\maximumCaffe.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\core\net.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\core\netCaffe.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\core\nmsBase.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\core\nmsCaffe.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\core\opOutputToCvMat.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\core\point.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\core\rectangle.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\core\renderer.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\core\resizeAndMergeBase.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\core\resizeAndMergeCaffe.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\core\wCvMatToOpInput.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\core\wCvMatToOpOutput.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\core\wKeypointScaler.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\core\wOpOutputToCvMat.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\face\faceCpuRenderer.hpp">
+      <Filter>Header Files\face</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\face\faceDetector.hpp">
+      <Filter>Header Files\face</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\face\faceExtractor.hpp">
+      <Filter>Header Files\face</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\face\faceGpuRenderer.hpp">
+      <Filter>Header Files\face</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\face\faceParameters.hpp">
+      <Filter>Header Files\face</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\face\faceRenderer.hpp">
+      <Filter>Header Files\face</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\face\headers.hpp">
+      <Filter>Header Files\face</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\face\renderFace.hpp">
+      <Filter>Header Files\face</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\face\wFaceDetector.hpp">
+      <Filter>Header Files\face</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\face\wFaceExtractor.hpp">
+      <Filter>Header Files\face</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\face\wFaceRenderer.hpp">
+      <Filter>Header Files\face</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\hand\handCpuRenderer.hpp">
+      <Filter>Header Files\hand</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\hand\handDetector.hpp">
+      <Filter>Header Files\hand</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\include\openpose\hand\handDetectorFromTxt.hpp">
+      <Filter>Header Files\hand</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\hand\handExtractor.hpp">
+      <Filter>Header Files\hand</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\hand\handGpuRenderer.hpp">
+      <Filter>Header Files\hand</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\hand\handParameters.hpp">
+      <Filter>Header Files\hand</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\hand\handRenderer.hpp">
+      <Filter>Header Files\hand</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\hand\headers.hpp">
+      <Filter>Header Files\hand</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\hand\renderHand.hpp">
+      <Filter>Header Files\hand</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\hand\wHandDetector.hpp">
       <Filter>Header Files\hand</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\openpose\hand\wHandDetectorFromTxt.hpp">
       <Filter>Header Files\hand</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\openpose\core\macros.hpp">
-      <Filter>Header Files\core</Filter>
+    <ClInclude Include="..\..\include\openpose\hand\wHandDetectorTracking.hpp">
+      <Filter>Header Files\hand</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\openpose\core\common.hpp">
-      <Filter>Header Files\core</Filter>
+    <ClInclude Include="..\..\include\openpose\hand\wHandDetectorUpdate.hpp">
+      <Filter>Header Files\hand</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\hand\wHandExtractor.hpp">
+      <Filter>Header Files\hand</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\hand\wHandRenderer.hpp">
+      <Filter>Header Files\hand</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\pose\bodyPartConnectorBase.hpp">
+      <Filter>Header Files\pose</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\pose\bodyPartConnectorCaffe.hpp">
+      <Filter>Header Files\pose</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\pose\enumClasses.hpp">
+      <Filter>Header Files\pose</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\pose\headers.hpp">
+      <Filter>Header Files\pose</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\pose\poseCpuRenderer.hpp">
+      <Filter>Header Files\pose</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\pose\poseExtractor.hpp">
+      <Filter>Header Files\pose</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\pose\poseExtractorCaffe.hpp">
+      <Filter>Header Files\pose</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\pose\poseGpuRenderer.hpp">
+      <Filter>Header Files\pose</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\pose\poseParameters.hpp">
+      <Filter>Header Files\pose</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\pose\poseRenderer.hpp">
+      <Filter>Header Files\pose</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\pose\renderPose.hpp">
+      <Filter>Header Files\pose</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\pose\wPoseExtractor.hpp">
+      <Filter>Header Files\pose</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\pose\wPoseRenderer.hpp">
+      <Filter>Header Files\pose</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -541,30 +562,6 @@
     <ClCompile Include="..\..\src\openpose\producer\webcamReader.cpp">
       <Filter>Source Files\producer</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\openpose\pose\bodyPartConnectorBase.cpp">
-      <Filter>Source Files\pose</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\openpose\pose\bodyPartConnectorCaffe.cpp">
-      <Filter>Source Files\pose</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\openpose\pose\defineTemplates.cpp">
-      <Filter>Source Files\pose</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\openpose\pose\poseExtractor.cpp">
-      <Filter>Source Files\pose</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\openpose\pose\poseExtractorCaffe.cpp">
-      <Filter>Source Files\pose</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\openpose\pose\poseParameters.cpp">
-      <Filter>Source Files\pose</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\openpose\pose\poseRenderer.cpp">
-      <Filter>Source Files\pose</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\openpose\pose\renderPose.cpp">
-      <Filter>Source Files\pose</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\openpose\gui\defineTemplates.cpp">
       <Filter>Source Files\gui</Filter>
     </ClCompile>
@@ -576,6 +573,39 @@
     </ClCompile>
     <ClCompile Include="..\..\src\openpose\gui\guiInfoAdder.cpp">
       <Filter>Source Files\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\utilities\flagsToOpenPose.cpp">
+      <Filter>Source Files\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\filestream\cocoJsonSaver.cpp">
+      <Filter>Source Files\filestream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\filestream\defineTemplates.cpp">
+      <Filter>Source Files\filestream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\filestream\fileSaver.cpp">
+      <Filter>Source Files\filestream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\filestream\fileStream.cpp">
+      <Filter>Source Files\filestream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\filestream\heatMapSaver.cpp">
+      <Filter>Source Files\filestream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\filestream\imageSaver.cpp">
+      <Filter>Source Files\filestream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\filestream\jsonOfstream.cpp">
+      <Filter>Source Files\filestream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\filestream\keypointJsonSaver.cpp">
+      <Filter>Source Files\filestream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\filestream\keypointSaver.cpp">
+      <Filter>Source Files\filestream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\filestream\videoSaver.cpp">
+      <Filter>Source Files\filestream</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\openpose\core\array.cpp">
       <Filter>Source Files\core</Filter>
@@ -592,7 +622,16 @@
     <ClCompile Include="..\..\src\openpose\core\defineTemplates.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\openpose\core\gpuRenderer.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\openpose\core\keypointScaler.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\core\maximumBase.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\core\maximumCaffe.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\openpose\core\netCaffe.cpp">
@@ -625,13 +664,16 @@
     <ClCompile Include="..\..\src\openpose\face\defineTemplates.cpp">
       <Filter>Source Files\face</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\openpose\face\faceCpuRenderer.cpp">
+      <Filter>Source Files\face</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\openpose\face\faceDetector.cpp">
       <Filter>Source Files\face</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\openpose\face\faceExtractor.cpp">
       <Filter>Source Files\face</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\openpose\face\faceRenderer.cpp">
+    <ClCompile Include="..\..\src\openpose\face\faceGpuRenderer.cpp">
       <Filter>Source Files\face</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\openpose\face\renderFace.cpp">
@@ -640,67 +682,66 @@
     <ClCompile Include="..\..\src\openpose\hand\defineTemplates.cpp">
       <Filter>Source Files\hand</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\openpose\hand\handCpuRenderer.cpp">
+      <Filter>Source Files\hand</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\openpose\hand\handDetector.cpp">
+      <Filter>Source Files\hand</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\hand\handDetectorFromTxt.cpp">
       <Filter>Source Files\hand</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\openpose\hand\handExtractor.cpp">
       <Filter>Source Files\hand</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\openpose\hand\handRenderer.cpp">
+    <ClCompile Include="..\..\src\openpose\hand\handGpuRenderer.cpp">
       <Filter>Source Files\hand</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\openpose\hand\renderHand.cpp">
       <Filter>Source Files\hand</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\openpose\utilities\flagsToOpenPose.cpp">
-      <Filter>Source Files\utilities</Filter>
+    <ClCompile Include="..\..\src\openpose\pose\bodyPartConnectorBase.cpp">
+      <Filter>Source Files\pose</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\openpose\core\maximumBase.cpp">
-      <Filter>Source Files\core</Filter>
+    <ClCompile Include="..\..\src\openpose\pose\bodyPartConnectorCaffe.cpp">
+      <Filter>Source Files\pose</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\openpose\core\maximumCaffe.cpp">
-      <Filter>Source Files\core</Filter>
+    <ClCompile Include="..\..\src\openpose\pose\defineTemplates.cpp">
+      <Filter>Source Files\pose</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\openpose\filestream\cocoJsonSaver.cpp">
-      <Filter>Source Files\filestream</Filter>
+    <ClCompile Include="..\..\src\openpose\pose\poseCpuRenderer.cpp">
+      <Filter>Source Files\pose</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\openpose\filestream\defineTemplates.cpp">
-      <Filter>Source Files\filestream</Filter>
+    <ClCompile Include="..\..\src\openpose\pose\poseExtractor.cpp">
+      <Filter>Source Files\pose</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\openpose\filestream\fileSaver.cpp">
-      <Filter>Source Files\filestream</Filter>
+    <ClCompile Include="..\..\src\openpose\pose\poseExtractorCaffe.cpp">
+      <Filter>Source Files\pose</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\openpose\filestream\fileStream.cpp">
-      <Filter>Source Files\filestream</Filter>
+    <ClCompile Include="..\..\src\openpose\pose\poseGpuRenderer.cpp">
+      <Filter>Source Files\pose</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\openpose\filestream\heatMapSaver.cpp">
-      <Filter>Source Files\filestream</Filter>
+    <ClCompile Include="..\..\src\openpose\pose\poseParameters.cpp">
+      <Filter>Source Files\pose</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\openpose\filestream\imageSaver.cpp">
-      <Filter>Source Files\filestream</Filter>
+    <ClCompile Include="..\..\src\openpose\pose\poseRenderer.cpp">
+      <Filter>Source Files\pose</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\openpose\filestream\jsonOfstream.cpp">
-      <Filter>Source Files\filestream</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\openpose\filestream\keypointJsonSaver.cpp">
-      <Filter>Source Files\filestream</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\openpose\filestream\keypointSaver.cpp">
-      <Filter>Source Files\filestream</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\openpose\filestream\videoSaver.cpp">
-      <Filter>Source Files\filestream</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\openpose\hand\handDetectorFromTxt.cpp">
-      <Filter>Source Files\hand</Filter>
+    <ClCompile Include="..\..\src\openpose\pose\renderPose.cpp">
+      <Filter>Source Files\pose</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="..\..\src\openpose\pose\bodyPartConnectorBase.cu">
-      <Filter>Source Files\pose</Filter>
-    </CudaCompile>
-    <CudaCompile Include="..\..\src\openpose\pose\renderPose.cu">
-      <Filter>Source Files\pose</Filter>
+    <None Include="..\..\include\openpose\utilities\cuda.hu">
+      <Filter>Header Files\utilities</Filter>
+    </None>
+    <None Include="..\..\include\openpose\utilities\render.hu">
+      <Filter>Header Files\utilities</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="..\..\src\openpose\core\maximumBase.cu">
+      <Filter>Source Files\core</Filter>
     </CudaCompile>
     <CudaCompile Include="..\..\src\openpose\core\nmsBase.cu">
       <Filter>Source Files\core</Filter>
@@ -714,16 +755,11 @@
     <CudaCompile Include="..\..\src\openpose\hand\renderHand.cu">
       <Filter>Source Files\hand</Filter>
     </CudaCompile>
-    <CudaCompile Include="..\..\src\openpose\core\maximumBase.cu">
-      <Filter>Source Files\core</Filter>
+    <CudaCompile Include="..\..\src\openpose\pose\bodyPartConnectorBase.cu">
+      <Filter>Source Files\pose</Filter>
     </CudaCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\include\openpose\utilities\cuda.hu">
-      <Filter>Header Files\utilities</Filter>
-    </None>
-    <None Include="..\..\include\openpose\utilities\render.hu">
-      <Filter>Header Files\utilities</Filter>
-    </None>
+    <CudaCompile Include="..\..\src\openpose\pose\renderPose.cu">
+      <Filter>Source Files\pose</Filter>
+    </CudaCompile>
   </ItemGroup>
 </Project>
