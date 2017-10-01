@@ -58,6 +58,12 @@ MANIFEST-*
 # OSX dir files
 .DS_Store
 
+# Vim files
+cscope.*
+tags
+.clang_complete
+.vim
+
 ######################### Windows (Visual Studio) Files #########################
 *.db
 *.deps
@@ -83,7 +89,8 @@ Makefile.config
 # Data and models are either
 	# 1. reference, and not casually committed
 	# 2. custom, and live on their own unless they're deliberated contributed
-3rdparty/caffe/.*
+3rdparty/caffe/.git
+3rdparty/caffe/.github
 distribute/
 .build_release/
 .build_debug/

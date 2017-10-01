@@ -341,7 +341,7 @@ WRender3D::WRender3D(const op::PoseModel poseModel)
     // Update sPoseModel
     sPoseModel = poseModel;
     // Init display
-    cv::imshow(GUI_NAME, cv::Mat{ 500, 500, CV_8UC3, cv::Scalar{ 0,0,0 } });
+    cv::imshow(GUI_NAME, cv::Mat( 500, 500, CV_8UC3, cv::Scalar{ 0,0,0 } ));
     //Run OpenGL
     mRenderThread = std::thread{ &WRender3D::visualizationThread, this };
 }

@@ -1,5 +1,6 @@
 #include <cstdio> // sscanf
 #include <openpose/producer/imageDirectoryReader.hpp>
+#include <openpose/producer/ipCameraReader.hpp>
 #include <openpose/producer/videoReader.hpp>
 #include <openpose/producer/webcamReader.hpp>
 #include <openpose/utilities/check.hpp>
@@ -18,10 +19,15 @@ namespace op
                 return PoseModel::MPI_15;
             else if (poseModeString == "MPI_4_layers")
                 return PoseModel::MPI_15_4;
+            else if (poseModeString == "BODY_18")
+                return PoseModel::BODY_18;
+            else if (poseModeString == "BODY_19")
+                return PoseModel::BODY_19;
             else if (poseModeString == "BODY_22")
                 return PoseModel::BODY_22;
             // else
-            error("String does not correspond to any model (COCO, MPI, MPI_4_layers)", __LINE__, __FUNCTION__, __FILE__);
+            error("String does not correspond to any model (COCO, MPI, MPI_4_layers)",
+                  __LINE__, __FUNCTION__, __FILE__);
             return PoseModel::COCO_18;
         }
         catch (const std::exception& e)
@@ -47,8 +53,9 @@ namespace op
             else if (keypointScale == 4)
                 return ScaleMode::PlusMinusOne;
             // else
-            const std::string message = "String does not correspond to any scale mode: (0, 1, 2, 3, 4) for (InputResolution,"
-                                        " NetOutputResolution, OutputResolution, ZeroToOne, PlusMinusOne).";
+            const std::string message = "String does not correspond to any scale mode: (0, 1, 2, 3, 4) for"
+                                        " (InputResolution, NetOutputResolution, OutputResolution, ZeroToOne,"
+                                        " PlusMinusOne).";
             error(message, __LINE__, __FUNCTION__, __FILE__);
             return ScaleMode::InputResolution;
         }
@@ -59,24 +66,33 @@ namespace op
         }
     }
 
-    ProducerType flagsToProducerType(const std::string& imageDirectory, const std::string& videoPath, const int webcamIndex)
+    ProducerType flagsToProducerType(const std::string& imageDirectory, const std::string& videoPath,
+                                     const std::string& ipCameraPath, const int webcamIndex)
     {
         try
         {
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             // Avoid duplicates (e.g. selecting at the time camera & video)
-            if (!imageDirectory.empty() && !videoPath.empty())
-                error("Selected simultaneously image directory and video. Please, select only one.", __LINE__, __FUNCTION__, __FILE__);
+            if (int(!imageDirectory.empty()) + int(!videoPath.empty()) + int(!ipCameraPath.empty()) > 1)
+                error("Selected simultaneously image directory, video and/or IP camera. Please, select only one.",
+                      __LINE__, __FUNCTION__, __FILE__);
             else if (!imageDirectory.empty() && webcamIndex > 0)
-                error("Selected simultaneously image directory and webcam. Please, select only one.", __LINE__, __FUNCTION__, __FILE__);
+                error("Selected simultaneously image directory and webcam. Please, select only one.",
+                      __LINE__, __FUNCTION__, __FILE__);
             else if (!videoPath.empty() && webcamIndex > 0)
-                error("Selected simultaneously video and webcam. Please, select only one.", __LINE__, __FUNCTION__, __FILE__);
+                error("Selected simultaneously video and webcam. Please, select only one.",
+                      __LINE__, __FUNCTION__, __FILE__);
+            else if (!ipCameraPath.empty() && webcamIndex > 0)
+                error("Selected simultaneously IP camera and webcam. Please, select only one.",
+                      __LINE__, __FUNCTION__, __FILE__);
 
             // Get desired ProducerType
             if (!imageDirectory.empty())
                 return ProducerType::ImageDirectory;
             else if (!videoPath.empty())
                 return ProducerType::Video;
+            else if (!ipCameraPath.empty())
+                return ProducerType::IPCamera;
             else
                 return ProducerType::Webcam;
         }
@@ -87,18 +103,21 @@ namespace op
         }
     }
 
-    std::shared_ptr<Producer> flagsToProducer(const std::string& imageDirectory, const std::string& videoPath, const int webcamIndex,
+    std::shared_ptr<Producer> flagsToProducer(const std::string& imageDirectory, const std::string& videoPath,
+                                              const std::string& ipCameraPath, const int webcamIndex,
                                               const std::string& webcamResolution, const double webcamFps)
     {
         try
         {
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-            const auto type = flagsToProducerType(imageDirectory, videoPath, webcamIndex);
+            const auto type = flagsToProducerType(imageDirectory, videoPath, ipCameraPath, webcamIndex);
 
             if (type == ProducerType::ImageDirectory)
                 return std::make_shared<ImageDirectoryReader>(imageDirectory);
             else if (type == ProducerType::Video)
                 return std::make_shared<VideoReader>(videoPath);
+            else if (type == ProducerType::IPCamera)
+                return std::make_shared<IpCameraReader>(ipCameraPath);
             else if (type == ProducerType::Webcam)
             {
                 // cameraFrameSize
@@ -106,7 +125,8 @@ namespace op
                 if (webcamIndex >= 0)
                 {
                     const auto throwExceptionIfNoOpened = true;
-                    return std::make_shared<WebcamReader>(webcamIndex, webcamFrameSize, webcamFps, throwExceptionIfNoOpened);
+                    return std::make_shared<WebcamReader>(webcamIndex, webcamFrameSize, webcamFps,
+                                                          throwExceptionIfNoOpened);
                 }
                 else
                 {
@@ -114,10 +134,12 @@ namespace op
                     std::shared_ptr<WebcamReader> webcamReader;
                     for (auto index = 0 ; index < 10 ; index++)
                     {
-                        webcamReader = std::make_shared<WebcamReader>(index, webcamFrameSize, webcamFps, throwExceptionIfNoOpened);
+                        webcamReader = std::make_shared<WebcamReader>(index, webcamFrameSize, webcamFps,
+                                                                      throwExceptionIfNoOpened);
                         if (webcamReader->isOpened())
                         {
-                            log("Auto-detecting camera index... Detected and opened camera " + std::to_string(index) + ".", Priority::High);
+                            log("Auto-detecting camera index... Detected and opened camera " + std::to_string(index)
+                                + ".", Priority::High);
                             return webcamReader;
                         }
                     }
@@ -135,7 +157,8 @@ namespace op
         }
     }
 
-    std::vector<HeatMapType> flagsToHeatMaps(const bool heatMapsAddParts, const bool heatMapsAddBkg, const bool heatMapsAddPAFs)
+    std::vector<HeatMapType> flagsToHeatMaps(const bool heatMapsAddParts, const bool heatMapsAddBkg,
+                                             const bool heatMapsAddPAFs)
     {
         try
         {

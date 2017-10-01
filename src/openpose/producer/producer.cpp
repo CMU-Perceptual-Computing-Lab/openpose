@@ -41,7 +41,8 @@ namespace op
 
             if (isOpened())
             {
-                // If ProducerFpsMode::OriginalFps, then force producer to keep the frame rate of the frames producer sources (e.g. a video)
+                // If ProducerFpsMode::OriginalFps, then force producer to keep the frame rate of the frames producer
+                // sources (e.g. a video)
                 keepDesiredFrameRate();
                 // Get frame
                 frame = getRawFrame();
@@ -57,7 +58,7 @@ namespace op
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return cv::Mat{};
+            return cv::Mat();
         }
     }
 
@@ -65,20 +66,24 @@ namespace op
     {
         try
         {
-            check(fpsMode == ProducerFpsMode::RetrievalFps || fpsMode == ProducerFpsMode::OriginalFps, "Unknown ProducerFpsMode.", __LINE__, __FUNCTION__, __FILE__);
-            // For webcam, ProducerFpsMode::OriginalFps == ProducerFpsMode::RetrievalFps, since the internal webcam cache will overwrite frames after it gets full
+            check(fpsMode == ProducerFpsMode::RetrievalFps || fpsMode == ProducerFpsMode::OriginalFps,
+                  "Unknown ProducerFpsMode.", __LINE__, __FUNCTION__, __FILE__);
+            // For webcam, ProducerFpsMode::OriginalFps == ProducerFpsMode::RetrievalFps, since the internal webcam
+            // cache will overwrite frames after it gets full
             if (mType == ProducerType::Webcam)
             {
                 mProducerFpsMode = {ProducerFpsMode::RetrievalFps};
                 if (fpsMode == ProducerFpsMode::OriginalFps)
-                    log("The producer fps mode set to `OriginalFps` (flag `process_real_time` on the demo) is not necessary, it is already assumed for webcam.",
+                    log("The producer fps mode set to `OriginalFps` (flag `process_real_time` on the demo) is not"
+                        " necessary, it is already assumed for webcam.",
                         Priority::Max, __LINE__, __FUNCTION__, __FILE__);
             }
             // If no webcam
             else
             {
                 check(fpsMode == ProducerFpsMode::RetrievalFps || get(CV_CAP_PROP_FPS) > 0,
-                      "Selected to keep the source fps but get(CV_CAP_PROP_FPS) <= 0, i.e. the source did not set its fps property.", __LINE__, __FUNCTION__, __FILE__);
+                      "Selected to keep the source fps but get(CV_CAP_PROP_FPS) <= 0, i.e. the source did not set"
+                      " its fps property.", __LINE__, __FUNCTION__, __FILE__);
                 mProducerFpsMode = {fpsMode};
             }
             reset(mNumberEmptyFrames, mTrackingFps);
@@ -118,12 +123,14 @@ namespace op
                 if (property == ProducerProperty::AutoRepeat)
                 {
                     check(value != 1. || (mType == ProducerType::ImageDirectory || mType == ProducerType::Video),
-                          "ProducerProperty::AutoRepeat only implemented for ProducerType::ImageDirectory and Video.", __LINE__, __FUNCTION__, __FILE__);
+                          "ProducerProperty::AutoRepeat only implemented for ProducerType::ImageDirectory and"
+                          " Video.", __LINE__, __FUNCTION__, __FILE__);
                 }
                 else if (property == ProducerProperty::Rotation)
                 {
                     check(value == 0. || value == 90. || value == 180. || value == 270.,
-                          "ProducerProperty::Rotation only implemented for {0, 90, 180, 270} degrees.", __LINE__, __FUNCTION__, __FILE__);
+                          "ProducerProperty::Rotation only implemented for {0, 90, 180, 270} degrees.",
+                          __LINE__, __FUNCTION__, __FILE__);
                 }
 
                 // Common operation
@@ -152,10 +159,11 @@ namespace op
             {
                 mNumberEmptyFrames = 0;
 
-                if (mType != ProducerType::ImageDirectory && (frame.cols != get(CV_CAP_PROP_FRAME_WIDTH) || frame.rows != get(CV_CAP_PROP_FRAME_HEIGHT)))
+                if (mType != ProducerType::ImageDirectory
+                      && (frame.cols != get(CV_CAP_PROP_FRAME_WIDTH) || frame.rows != get(CV_CAP_PROP_FRAME_HEIGHT)))
                 {
                     log("Frame size changed. Returning empty frame.", Priority::Max, __LINE__, __FUNCTION__, __FILE__);
-                    frame = cv::Mat{};
+                    frame = cv::Mat();
                 }
             }
         }
@@ -216,9 +224,12 @@ namespace op
         {
             if (isOpened())
             {
-                // OpenCV closing issue: OpenCV goes in the range [1, get(CV_CAP_PROP_FRAME_COUNT) - 1] in some videos (i.e. there is a frame missing),
-                // mNumberEmptyFrames allows the program to be properly closed keeping the 0-index frame counting
-                if (mNumberEmptyFrames > 2 || (mType != ProducerType::Webcam && get(CV_CAP_PROP_POS_FRAMES) >= get(CV_CAP_PROP_FRAME_COUNT)))
+                // OpenCV closing issue: OpenCV goes in the range [1, get(CV_CAP_PROP_FRAME_COUNT) - 1] in some
+                // videos (i.e. there is a frame missing), mNumberEmptyFrames allows the program to be properly
+                // closed keeping the 0-index frame counting
+                if (mNumberEmptyFrames > 2
+                    || (mType != ProducerType::IPCamera && mType != ProducerType::Webcam
+                        && get(CV_CAP_PROP_POS_FRAMES) >= get(CV_CAP_PROP_FRAME_COUNT)))
                 {
                     // Repeat video
                     if (mProperties[(unsigned char)ProducerProperty::AutoRepeat])
@@ -253,7 +264,9 @@ namespace op
                         const auto currentFrames = get(CV_CAP_PROP_POS_FRAMES) - mFirstFrameTrackingFps;
                         // Expected #frames
                         const auto nsPerFrame = 1e9/get(CV_CAP_PROP_FPS);
-                        const auto timeNs = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now()-mClockTrackingFps).count();
+                        const auto timeNs = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(
+                            std::chrono::high_resolution_clock::now()-mClockTrackingFps
+                        ).count();
                         const auto expectedFrames = timeNs / nsPerFrame;
 
                         const auto difference = expectedFrames - currentFrames;
@@ -264,7 +277,8 @@ namespace op
                             if (difference > 15)
                             {
                                 set(CV_CAP_PROP_POS_FRAMES, std::floor(expectedFrames) + mFirstFrameTrackingFps);
-                                mNumberSetPositionTrackingFps = fastMin(mNumberSetPositionTrackingFps+1, numberSetPositionThreshold);
+                                mNumberSetPositionTrackingFps = fastMin(mNumberSetPositionTrackingFps+1,
+                                                                        numberSetPositionThreshold);
                             }
                             else
                             {
@@ -273,7 +287,8 @@ namespace op
                                     frame = getRawFrame();
                             }
                         }
-                        // Low down frame extraction - sleep thread unless it is too slow in most frames (using set(frames, X) sets to frame X+delta, due to codecs issues)
+                        // Low down frame extraction - sleep thread unless it is too slow in most frames (using
+                        // set(frames, X) sets to frame X+delta, due to codecs issues)
                         else if (difference < -0.45 && mNumberSetPositionTrackingFps < numberSetPositionThreshold)
                         {
                             const auto sleepMs = intRound( (-difference*nsPerFrame*1e-6)*0.99 );

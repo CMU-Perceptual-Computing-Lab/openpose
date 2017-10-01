@@ -3,11 +3,6 @@
 
 namespace op
 {
-    OpOutputToCvMat::OpOutputToCvMat(const Point<int>& outputResolution) :
-        mOutputResolution{outputResolution}
-    {
-    }
-
     cv::Mat OpOutputToCvMat::formatToCvMat(const Array<float>& outputData) const
     {
         try
@@ -15,16 +10,18 @@ namespace op
             // Security checks
             if (outputData.empty())
                 error("Wrong input element (empty outputData).", __LINE__, __FUNCTION__, __FILE__);
-
+            // outputData to cvMat
             cv::Mat cvMat;
-            floatPtrToUCharCvMat(cvMat, outputData.getConstPtr(), mOutputResolution, 3);
-
+            const std::array<int, 3> outputResolution{outputData.getSize(2), outputData.getSize(1),
+                                                      outputData.getSize(0)};
+            floatPtrToUCharCvMat(cvMat, outputData.getConstPtr(), outputResolution);
+            // Return cvMat
             return cvMat;
         }
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return cv::Mat{};
+            return cv::Mat();
         }
     }
 }

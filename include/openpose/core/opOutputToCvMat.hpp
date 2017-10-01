@@ -9,12 +9,7 @@ namespace op
     class OP_API OpOutputToCvMat
     {
     public:
-        explicit OpOutputToCvMat(const Point<int>& outputResolution);
-
         cv::Mat formatToCvMat(const Array<float>& outputData) const;
-
-    private:
-        const Point<int> mOutputResolution;
     };
 }
 

@@ -7,7 +7,91 @@ In order to learn how to use it, run `./build/examples/openpose/openpose.bin --h
 
 
 
-## Most Important Configuration Flags
+## Running on Images, Video or Webcam
+See [doc/quick_start.md#quick-start](./quick_start.md#quick-start).
+
+
+
+## Pose + Face + Hands
+See [doc/quick_start.md#quick-start](./quick_start.md#quick-start).
+
+
+
+## Maximum Accuracy Configuration
+See [doc/quick_start.md#quick-start](./quick_start.md#quick-start).
+
+
+
+## JSON Output with No Visualization
+The following example runs the demo video `video.avi` and outputs JSON files in `output/`. Note: see [doc/output.md](./output.md) to understand the format of the JSON files.
+```
+# Only body
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --write_keypoint_json output/ --no_display --render_pose 0
+# Body + face + hands
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --write_keypoint_json output/ --no_display --render_pose 0 --face --hand
+```
+
+
+
+## JSON Output + Rendered Images Saving
+The following example runs the demo video `video.avi`, renders image frames on `output/result.avi`, and outputs JSON files in `output/`. Note: see [doc/output.md](./output.md) to understand the format of the JSON files.
+```
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --write_video output/result.avi --write_keypoint_json output/
+```
+
+
+
+## Hands
+```
+# Fast method for speed
+./build/examples/openpose/openpose.bin --hand
+# Best results found with 6 scales
+./build/examples/openpose/openpose.bin --hand --hand_scale_number 6 --hand_scale_range 0.4
+# Adding tracking to Webcam (if FPS per GPU > 10 FPS) and Video
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --hand --hand_tracking
+# Multi-scale + tracking is also possible
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --hand --hand_scale_number 6 --hand_scale_range 0.4 --hand_tracking
+```
+
+
+
+## Rendering Face and Hands without Pose
+```
+# CPU rendering (faster)
+./build/examples/openpose/openpose.bin --render_pose 0 --face --face_render 1 --hand --hand_render 1
+# GPU rendering
+./build/examples/openpose/openpose.bin --render_pose 0 --face --face_render 2 --hand --hand_render 2
+```
+
+
+
+## Debugging Information
+```
+# Basic information
+./build/examples/openpose/openpose.bin --logging_level 3
+# Showing all messages
+./build/examples/openpose/openpose.bin --logging_level 0
+```
+
+
+
+## Selecting Some GPUs
+The following example runs the demo video `video.avi`, parallelizes it over 2 GPUs, GPUs 1 and 2 (note that it will skip GPU 0):
+```
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --num_gpu 2 --num_gpu_start 1
+```
+
+
+
+## Heat Maps Storing
+The following command will save all the body part heat maps, background heat map and Part Affinity Fields (PAFs) in the folder `output_heatmaps_folder`. It will save them on PNG format. Instead of individually saving each of the 67 heatmaps (18 body parts + background + 2 x 19 PAFs) individually, the library concatenate them vertically into a huge (width x #heatmaps) x (height) matrix. The PAFs channels are multiplied by 2 because there is one heatmpa for the x-coordinates and one for the y-coordinates. The order is body parts + bkg + PAFs. It will follow the sequence on POSE_BODY_PART_MAPPING in [include/openpose/pose/poseParameters.hpp](../include/openpose/pose/poseParameters.hpp).
+```
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --heatmaps_add_parts --heatmaps_add_bkg --heatmaps_add_PAFs --write_heatmaps output_heatmaps_folder/
+```
+
+
+
+## Main Flags
 We enumerate some of the most important flags, check the `Flags Detailed Description` section or run `./build/examples/openpose/openpose.bin --help` for a full description of all of them.
 
 - `--face`: Enables face keypoint detection.
@@ -15,22 +99,23 @@ We enumerate some of the most important flags, check the `Flags Detailed Descrip
 - `--video input.mp4`: Read video.
 - `--camera 3`: Read webcam number 3.
 - `--image_dir path_to_images/`: Run on a folder with images.
+- `--ip_camera http://iris.not.iac.es/axis-cgi/mjpg/video.cgi?resolution=320x240?x.mjpeg`: Run on a streamed IP camera. See examples public IP cameras [here](http://www.webcamxp.com/publicipcams.aspx).
 - `--write_video path.avi`: Save processed images as video.
 - `--write_images folder_path`: Save processed images on a folder.
 - `--write_keypoint path/`: Output JSON, XML or YML files with the people pose data on a folder.
 - `--process_real_time`: For video, it might skip frames to display at real time.
-- `--disable_blending`: If selected, it will render the results on a black backgroung, not showing the original image. Related: `part_to_show`, `alpha_pose`, and `alpha_pose`.
+- `--disable_blending`: If enabled, it will render the results (keypoint skeletons or heatmaps) on a black background, not showing the original image. Related: `part_to_show`, `alpha_pose`, and `alpha_pose`.
 - `--part_to_show`: Prediction channel to visualize.
 - `--no_display`: Display window not opened. Useful for servers and/or to slightly speed up OpenPose.
 - `--num_gpu 2 --num_gpu_start 1`: Parallelize over this number of GPUs starting by the desired device id. By default it uses all the available GPUs.
-- `--net_resolution 656x368 --resolution 1280x720`: For HD input (default values).
-- `--net_resolution 496x368 --resolution 640x480`: For VGA input.
+- `--net_resolution 656x368: For HD input (default value).
+- `--net_resolution 496x368: For VGA input.
 - `--model_pose MPI`: Model to use, affects number keypoints, speed and accuracy.
 - `--logging_level 3`: Logging messages threshold, range [0,255]: 0 will output any message & 255 will output none. Current messages in the range [1-4], 1 for low priority messages and 4 for important ones.
 
 
 
-## Flags Detailed Description
+## Flags Description
 Each flag is divided into flag name, default value, and description.
 
 1. Debugging
@@ -42,22 +127,24 @@ Each flag is divided into flag name, default value, and description.
 - DEFINE_double(camera_fps,               30.0,           "Frame rate for the webcam (only used when saving video from webcam). Set this value to the minimum value between the OpenPose displayed speed and the webcam real frame rate.");
 - DEFINE_string(video,                    "",             "Use a video file instead of the camera. Use `examples/media/video.avi` for our default example video.");
 - DEFINE_string(image_dir,                "",             "Process a directory of images. Use `examples/media/` for our default example folder with 20 images. Read all standard formats (jpg, png, bmp, etc.).");
+- DEFINE_string(ip_camera,                "",             "String with the IP camera URL. It supports protocols like RTSP and HTTP.");
 - DEFINE_uint64(frame_first,              0,              "Start on desired frame number. Indexes are 0-based, i.e. the first frame has index 0.");
 - DEFINE_uint64(frame_last,               -1,             "Finish on desired frame number. Select -1 to disable. Indexes are 0-based, e.g. if set to 10, it will process 11 frames (0-10).");
 - DEFINE_bool(frame_flip,                 false,          "Flip/mirror each frame (e.g. for real time webcam demonstrations).");
 - DEFINE_int32(frame_rotate,              0,              "Rotate each frame, 4 possible values: 0, 90, 180, 270.");
 - DEFINE_bool(frames_repeat,              false,          "Repeat frames when finished.");
+- DEFINE_bool(process_real_time,          false,          "Enable to keep the original source frame rate (e.g. for video). If the processing time is too long, it will skip frames. If it is too fast, it will slow it down.");
 
 3. OpenPose
 - DEFINE_string(model_folder,             "models/",      "Folder path (absolute or relative) where the models (pose, face, ...) are located.");
-- DEFINE_string(resolution,               "1280x720",     "The image resolution (display and output). Use \"-1x-1\" to force the program to use the default images resolution.");
+- DEFINE_string(output_resolution,        "-1x-1",        "The image resolution (display and output). Use \"-1x-1\" to force the program to use the input image resolution.");
 - DEFINE_int32(num_gpu,                   -1,             "The number of GPU devices to use. If negative, it will use all the available GPUs in your machine.");
 - DEFINE_int32(num_gpu_start,             0,              "GPU device start number.");
 - DEFINE_int32(keypoint_scale,            0,              "Scaling of the (x,y) coordinates of the final pose data array, i.e. the scale of the (x,y) coordinates that will be saved with the `write_keypoint` & `write_keypoint_json` flags. Select `0` to scale it to the original source resolution, `1`to scale it to the net output size (set with `net_resolution`), `2` to scale it to the final output size (set with `resolution`), `3` to scale it in the range [0,1], and 4 for range [-1,1]. Non related with `scale_number` and `scale_gap`.");
 
 4. OpenPose Body Pose
 - DEFINE_string(model_pose,               "COCO",         "Model to be used. E.g. `COCO` (18 keypoints), `MPI` (15 keypoints, ~10% faster), `MPI_4_layers` (15 keypoints, even faster but less accurate).");
-- DEFINE_string(net_resolution,           "656x368",      "Multiples of 16. If it is increased, the accuracy usually increases. If it is decreased, the speed increases. For maximum speed-accuracy balance, it should keep the closest aspect ratio possible to the images or videos to be processed. E.g. the default `656x368` is optimal for 16:9 videos, e.g. full HD (1980x1080) and HD (1280x720) videos.");
+- DEFINE_string(net_resolution,           "656x368",      "Multiples of 16. If it is increased, the accuracy potentially increases. If it is decreased, the speed increases. For maximum speed-accuracy balance, it should keep the closest aspect ratio possible to the images or videos to be processed. Using `-1` in any of the dimensions, OP will choose the optimal resolution depending on the other value introduced by the user. E.g. the default `-1x368` is equivalent to `656x368` in 16:9 videos, e.g. full HD (1980x1080) and HD (1280x720) resolutions.");
 - DEFINE_int32(scale_number,              1,              "Number of scales to average.");
 - DEFINE_double(scale_gap,                0.3,            "Scale gap between scales. No effect unless scale_number > 1. Initial scale is always 1. If you want to change the initial scale, you actually want to multiply the `net_resolution` by your desired initial scale.");
 - DEFINE_bool(heatmaps_add_parts,         false,          "If true, it will add the body part heatmaps to the final op::Datum::poseHeatMaps array (program speed will decrease). Not required for our library, enable it only if you intend to process this information later. If more than one `add_heatmaps_X` flag is enabled, it will place then in sequential memory order: body parts + bkg + PAFs. It will follow the order on POSE_BODY_PART_MAPPING in `include/openpose/pose/poseParameters.hpp`.");
@@ -77,7 +164,7 @@ Each flag is divided into flag name, default value, and description.
 
 7. OpenPose Rendering
 - DEFINE_int32(part_to_show,              0,              "Prediction channel to visualize (default: 0). 0 for all the body parts, 1-18 for each body part heat map, 19 for the background heat map, 20 for all the body part heat maps together, 21 for all the PAFs, 22-40 for each body part pair PAF");
-- DEFINE_bool(disable_blending,           false,          "If blending is enabled, it will merge the results with the original frame. If disabled, it will only display the results on a black background.");
+- DEFINE_bool(disable_blending,           false,          "If enabled, it will render the results (keypoint skeletons or heatmaps) on a black background, instead of being rendered into the original image. Related: `part_to_show`, `alpha_pose`, and `alpha_pose`.");
 
 8. OpenPose Rendering Pose
 - DEFINE_double(render_threshold,         0.05,           "Only estimated keypoints whose score confidences are higher than this threshold will be rendered. Generally, a high threshold (> 0.5) will only render very clear body parts; while small thresholds (~0.1) will also output guessed and occluded keypoints, but also more false positives (i.e. wrong detections).");
@@ -99,7 +186,6 @@ Each flag is divided into flag name, default value, and description.
 
 11. Display
 - DEFINE_bool(fullscreen,                 false,          "Run in full-screen mode (press f during runtime to toggle).");
-- DEFINE_bool(process_real_time,          false,          "Enable to keep the original source frame rate (e.g. for video). If the processing time is too long, it will skip frames. If it is too fast, it will slow it down.");
 - DEFINE_bool(no_gui_verbose,             false,          "Do not write text on output images on GUI (e.g. number of current frame and people). It does not affect the pose rendering.");
 - DEFINE_bool(no_display,                 false,          "Do not open a display window. Useful if there is no X server and/or to slightly speed up the processing if visual output is not required.");
 12. Result Saving
@@ -112,63 +198,3 @@ Each flag is divided into flag name, default value, and description.
 - DEFINE_string(write_coco_json,          "",             "Full file path to write people pose data with *.json COCO validation format.");
 - DEFINE_string(write_heatmaps,           "",             "Directory to write heatmaps in *.png format. At least 1 `add_heatmaps_X` flag must be enabled.");
 - DEFINE_string(write_heatmaps_format,    "png",          "File extension and format for `write_heatmaps`, analogous to `write_images_format`. Recommended `png` or any compressed and lossless format.");
-
-
-
-## Heat Maps Storing
-The following command will save all the body part heat maps, background heat map and Part Affinity Fields (PAFs) in the folder `output_heatmaps_folder`. It will save them on PNG format. Instead of individually saving each of the 67 heatmaps (18 body parts + background + 2 x 19 PAFs) individually, the library concatenate them vertically into a huge (width x #heatmaps) x (height) matrix. The PAFs channels are multiplied by 2 because there is one heatmpa for the x-coordinates and one for the y-coordinates. The order is body parts + bkg + PAFs. It will follow the sequence on POSE_BODY_PART_MAPPING in [include/openpose/pose/poseParameters.hpp](../include/openpose/pose/poseParameters.hpp).
-```
-./build/examples/openpose/openpose.bin --video examples/media/video.avi --heatmaps_add_parts --heatmaps_add_bkg --heatmaps_add_PAFs --write_heatmaps output_heatmaps_folder/
-```
-
-
-
-## Maximum Accuracy Configuration
-See [doc/installation.md#quick-start](./installation.md#quick-start).
-
-
-
-## Basic Output Saving
-The following example runs the demo video `video.avi`, renders image frames on `output/result.avi`, and outputs JSON files in `output/`. It parallelizes over 2 GPUs, GPUs 1 and 2 (note that it will skip GPU 0):
-```
-./build/examples/openpose/openpose.bin --video examples/media/video.avi --num_gpu 2 --num_gpu_start 1 --write_video output/result.avi --write_keypoint_json output/
-```
-
-
-
-## Hands
-```
-# Fast method for speed
-./build/examples/openpose/openpose.bin --hand
-# Best results found with 6 scales
-./build/examples/openpose/openpose.bin --hand --hand_scale_number 6 --hand_scale_range 0.4
-# Adding tracking to Webcam (if FPS per GPU > 10 FPS) and Video
-./build/examples/openpose/openpose.bin --video examples/media/video.avi --hand --hand_tracking
-# Multi-scale + tracking is also possible
-./build/examples/openpose/openpose.bin --video examples/media/video.avi --hand --hand_scale_number 6 --hand_scale_range 0.4 --hand_tracking
-```
-
-
-
-## Pose + Face + Hands
-See [doc/installation.md#quick-start](./installation.md#quick-start).
-
-
-
-## Rendering Face without Pose
-```
-# CPU rendering (faster)
-./build/examples/openpose/openpose.bin --face --render_pose 0 --face_render 1
-# GPU rendering
-./build/examples/openpose/openpose.bin --face --render_pose 0 --face_render 2
-```
-
-
-
-## Debugging Information
-```
-# Basic information
-./build/examples/openpose/openpose.bin --logging_level 3
-# Showing all messages
-./build/examples/openpose/openpose.bin --logging_level 0
-```

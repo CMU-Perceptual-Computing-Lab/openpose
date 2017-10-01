@@ -30,7 +30,7 @@ namespace op
             // Security checks
             if (keypointsA.getNumberDimensions() != keypointsB.getNumberDimensions())
                 error("keypointsA.getNumberDimensions() != keypointsB.getNumberDimensions().", __LINE__, __FUNCTION__, __FILE__);
-            for (auto dimension = 1 ; dimension < keypointsA.getNumberDimensions() ; dimension++)
+            for (auto dimension = 1u ; dimension < keypointsA.getNumberDimensions() ; dimension++)
                 if (keypointsA.getSize(dimension) != keypointsB.getSize(dimension))
                     error("keypointsA.getSize() != keypointsB.getSize().", __LINE__, __FUNCTION__, __FILE__);
             // For each body part
@@ -146,9 +146,9 @@ namespace op
                 const auto width = frame.size[2];
                 const auto height = frame.size[1];
                 const auto area = width * height;
-                cv::Mat frameB{height, width, CV_32FC1, &frame.data[0]};
-                cv::Mat frameG{height, width, CV_32FC1, &frame.data[area * sizeof(float) / sizeof(uchar)]};
-                cv::Mat frameR{height, width, CV_32FC1, &frame.data[2 * area * sizeof(float) / sizeof(uchar)]};
+                cv::Mat frameB(height, width, CV_32FC1, &frame.data[0]);
+                cv::Mat frameG(height, width, CV_32FC1, &frame.data[area * sizeof(float) / sizeof(uchar)]);
+                cv::Mat frameR(height, width, CV_32FC1, &frame.data[2 * area * sizeof(float) / sizeof(uchar)]);
 
                 // Parameters
                 const auto lineType = 8;
@@ -172,7 +172,7 @@ namespace op
                         const auto radius = thicknessRatio / 2;
 
                         // Draw lines
-                        for (auto pair = 0 ; pair < pairs.size() ; pair+=2)
+                        for (auto pair = 0u ; pair < pairs.size() ; pair+=2)
                         {
                             const auto index1 = (person * numberKeypoints + pairs[pair]) * keypoints.getSize(2);
                             const auto index2 = (person * numberKeypoints + pairs[pair+1]) * keypoints.getSize(2);

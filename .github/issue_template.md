@@ -3,7 +3,8 @@
 2. **No duplicated** posts.
 3. **No** posts about **questions already answered / clearly explained in** the **documentation** (e.g. **no more low-speed nor out-of-memory questions**).
 4. Set a **proper issue title**: add the Ubuntu/Windows word and be specific (e.g. do not simple call it: `Compile error`).
-5. Only English comments.
+5. **No** questions about **training**. OpenPose only implements testing.
+6. Only English comments.
 Issues/comments that do not follow this will be **ignored or removed** with no further clarification.
 
 
@@ -33,11 +34,12 @@ You might select multiple topics, delete the rest:
 
 
 ### Your system configuration
+**Installation mode**: CMake or sh script or manual Makefile installation.
 **Operating system** (`lsb_release -a` in Ubuntu):
 **CUDA version** (`cat /usr/local/cuda/version.txt` in most cases):
 **cuDNN version**:
 **GPU model** (`nvidia-smi` in Ubuntu):
 **Caffe version**: Default from OpenPose or custom version.
-**OpenCV version**: installed with `apt-get install libopencv-dev` (Ubuntu) or default from OpenPose (Windows) or OpenCV 2.X or OpenCV 3.X.
+**OpenCV version**: installed with `apt-get install libopencv-dev` (Ubuntu) or default from OpenPose (Windows) or OpenCV 2.X or OpenCV 3.X. Especify **full version** (e.g. 3.1 or 2.4.9)
 Generation mode (only for Ubuntu): Makefile + Makefile.config (default, Ubuntu) or CMake (Ubuntu, Windows) or Visual Studio (Windows).
 Compiler (`gcc --version` in Ubuntu):

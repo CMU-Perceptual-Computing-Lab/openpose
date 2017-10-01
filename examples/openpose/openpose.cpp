@@ -4,7 +4,7 @@
     // 1. Read folder of images / video / webcam  (`producer` module)
     // 2. Extract and render body keypoint / heatmap / PAF of that image (`pose` module)
     // 3. Extract and render face keypoint / heatmap / PAF of that image (`face` module)
-    // 4. Save the results on disc (`filestream` module)
+    // 4. Save the results on disk (`filestream` module)
     // 5. Display the rendered pose (`gui` module)
     // Everything in a multi-thread scenario (`thread` module)
     // Points 2 to 5 are included in the `wrapper` module
@@ -17,27 +17,12 @@
 
 // C++ std library dependencies
 #include <chrono> // `std::chrono::` functions and classes, e.g. std::chrono::milliseconds
-#include <string>
 #include <thread> // std::this_thread
-#include <vector>
 // Other 3rdparty dependencies
 #include <gflags/gflags.h> // DEFINE_bool, DEFINE_int32, DEFINE_int64, DEFINE_uint64, DEFINE_double, DEFINE_string
 #include <glog/logging.h> // google::InitGoogleLogging
-
 // OpenPose dependencies
-// Option a) Importing all modules
 #include <openpose/headers.hpp>
-// Option b) Manually importing the desired modules. Recommended if you only intend to use a few modules.
-// #include <openpose/core/headers.hpp>
-// #include <openpose/experimental/headers.hpp>
-// #include <openpose/face/headers.hpp>
-// #include <openpose/filestream/headers.hpp>
-// #include <openpose/gui/headers.hpp>
-// #include <openpose/pose/headers.hpp>
-// #include <openpose/producer/headers.hpp>
-// #include <openpose/thread/headers.hpp>
-// #include <openpose/utilities/headers.hpp>
-// #include <openpose/wrapper/headers.hpp>
 
 // See all the available parameter options withe the `--help` flag. E.g. `./build/examples/openpose/openpose.bin --help`.
 // Note: This command will show you flags for other unnecessary 3rdparty files. Check only the flags for the OpenPose
@@ -56,16 +41,19 @@ DEFINE_string(video,                    "",             "Use a video file instea
                                                         " example video.");
 DEFINE_string(image_dir,                "",             "Process a directory of images. Use `examples/media/` for our default example folder with 20"
                                                         " images. Read all standard formats (jpg, png, bmp, etc.).");
+DEFINE_string(ip_camera,                "",             "String with the IP camera URL. It supports protocols like RTSP and HTTP.");
 DEFINE_uint64(frame_first,              0,              "Start on desired frame number. Indexes are 0-based, i.e. the first frame has index 0.");
 DEFINE_uint64(frame_last,               -1,             "Finish on desired frame number. Select -1 to disable. Indexes are 0-based, e.g. if set to"
                                                         " 10, it will process 11 frames (0-10).");
 DEFINE_bool(frame_flip,                 false,          "Flip/mirror each frame (e.g. for real time webcam demonstrations).");
 DEFINE_int32(frame_rotate,              0,              "Rotate each frame, 4 possible values: 0, 90, 180, 270.");
 DEFINE_bool(frames_repeat,              false,          "Repeat frames when finished.");
+DEFINE_bool(process_real_time,          false,          "Enable to keep the original source frame rate (e.g. for video). If the processing time is"
+                                                        " too long, it will skip frames. If it is too fast, it will slow it down.");
 // OpenPose
 DEFINE_string(model_folder,             "models/",      "Folder path (absolute or relative) where the models (pose, face, ...) are located.");
-DEFINE_string(resolution,               "1280x720",     "The image resolution (display and output). Use \"-1x-1\" to force the program to use the"
-                                                        " default images resolution.");
+DEFINE_string(output_resolution,        "-1x-1",        "The image resolution (display and output). Use \"-1x-1\" to force the program to use the"
+                                                        " input image resolution.");
 DEFINE_int32(num_gpu,                   -1,             "The number of GPU devices to use. If negative, it will use all the available GPUs in your"
                                                         " machine.");
 DEFINE_int32(num_gpu_start,             0,              "GPU device start number.");
@@ -78,10 +66,12 @@ DEFINE_int32(keypoint_scale,            0,              "Scaling of the (x,y) co
 // OpenPose Body Pose
 DEFINE_string(model_pose,               "COCO",         "Model to be used. E.g. `COCO` (18 keypoints), `MPI` (15 keypoints, ~10% faster), "
                                                         "`MPI_4_layers` (15 keypoints, even faster but less accurate).");
-DEFINE_string(net_resolution,           "656x368",      "Multiples of 16. If it is increased, the accuracy potentially increases. If it is decreased,"
-                                                        " the speed increases. For maximum speed-accuracy balance, it should keep the closest aspect"
-                                                        " ratio possible to the images or videos to be processed. E.g. the default `656x368` is"
-                                                        " optimal for 16:9 videos, e.g. full HD (1980x1080) and HD (1280x720) videos.");
+DEFINE_string(net_resolution,           "656x368",      "Multiples of 16. If it is increased, the accuracy potentially increases. If it is"
+                                                        " decreased, the speed increases. For maximum speed-accuracy balance, it should keep the"
+                                                        " closest aspect ratio possible to the images or videos to be processed. Using `-1` in"
+                                                        " any of the dimensions, OP will choose the optimal aspect ratio depending on the user's"
+                                                        " input value. E.g. the default `-1x368` is equivalent to `656x368` in 16:9 resolutions,"
+                                                        " e.g. full HD (1980x1080) and HD (1280x720) resolutions.");
 DEFINE_int32(scale_number,              1,              "Number of scales to average.");
 DEFINE_double(scale_gap,                0.3,            "Scale gap between scales. No effect unless scale_number > 1. Initial scale is always 1."
                                                         " If you want to change the initial scale, you actually want to multiply the"
@@ -121,8 +111,9 @@ DEFINE_bool(hand_tracking,              false,          "Adding hand tracking mi
 DEFINE_int32(part_to_show,              0,              "Prediction channel to visualize (default: 0). 0 for all the body parts, 1-18 for each body"
                                                         " part heat map, 19 for the background heat map, 20 for all the body part heat maps"
                                                         " together, 21 for all the PAFs, 22-40 for each body part pair PAF");
-DEFINE_bool(disable_blending,           false,          "If blending is enabled, it will merge the results with the original frame. If disabled, it"
-                                                        " will only display the results on a black background.");
+DEFINE_bool(disable_blending,           false,          "If enabled, it will render the results (keypoint skeletons or heatmaps) on a black"
+                                                        " background, instead of being rendered into the original image. Related: `part_to_show`,"
+                                                        " `alpha_pose`, and `alpha_pose`.");
 // OpenPose Rendering Pose
 DEFINE_double(render_threshold,         0.05,           "Only estimated keypoints whose score confidences are higher than this threshold will be"
                                                         " rendered. Generally, a high threshold (> 0.5) will only render very clear body parts;"
@@ -150,8 +141,6 @@ DEFINE_double(hand_alpha_pose,          0.6,            "Analogous to `alpha_pos
 DEFINE_double(hand_alpha_heatmap,       0.7,            "Analogous to `alpha_heatmap` but applied to hand.");
 // Display
 DEFINE_bool(fullscreen,                 false,          "Run in full-screen mode (press f during runtime to toggle).");
-DEFINE_bool(process_real_time,          false,          "Enable to keep the original source frame rate (e.g. for video). If the processing time is"
-                                                        " too long, it will skip frames. If it is too fast, it will slow it down.");
 DEFINE_bool(no_gui_verbose,             false,          "Do not write text on output images on GUI (e.g. number of current frame and people). It"
                                                         " does not affect the pose rendering.");
 DEFINE_bool(no_display,                 false,          "Do not open a display window. Useful if there is no X server and/or to slightly speed up"
@@ -184,15 +173,16 @@ int openPoseDemo()
 
     // Applying user defined configuration - Google flags to program variables
     // outputSize
-    const auto outputSize = op::flagsToPoint(FLAGS_resolution, "1280x720");
+    const auto outputSize = op::flagsToPoint(FLAGS_output_resolution, "-1x-1");
     // netInputSize
-    const auto netInputSize = op::flagsToPoint(FLAGS_net_resolution, "656x368");
+    const auto netInputSize = op::flagsToPoint(FLAGS_net_resolution, "-1x368");
     // faceNetInputSize
     const auto faceNetInputSize = op::flagsToPoint(FLAGS_face_net_resolution, "368x368 (multiples of 16)");
     // handNetInputSize
     const auto handNetInputSize = op::flagsToPoint(FLAGS_hand_net_resolution, "368x368 (multiples of 16)");
     // producerType
-    const auto producerSharedPtr = op::flagsToProducer(FLAGS_image_dir, FLAGS_video, FLAGS_camera, FLAGS_camera_resolution, FLAGS_camera_fps);
+    const auto producerSharedPtr = op::flagsToProducer(FLAGS_image_dir, FLAGS_video, FLAGS_ip_camera, FLAGS_camera,
+                                                       FLAGS_camera_resolution, FLAGS_camera_fps);
     // poseModel
     const auto poseModel = op::flagsToPoseModel(FLAGS_model_pose);
     // keypointScale

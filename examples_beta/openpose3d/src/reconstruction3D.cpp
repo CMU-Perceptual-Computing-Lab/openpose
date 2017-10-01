@@ -108,7 +108,7 @@ void reconstructArray(op::Array<float>& keypoints3D, const std::vector<op::Array
             // 3D points to pose
             // OpenCV alternative:
             // // http://docs.opencv.org/2.4/modules/calib3d/doc/camera_calibration_and_3d_reconstruction.html#triangulatepoints
-            // cv::Mat reconstructedcv::Points{4, firstcv::Points.size(), CV_64F};
+            // cv::Mat reconstructedPoints{4, firstcv::Points.size(), CV_64F};
             // cv::triangulatecv::Points(cv::Mat::eye(3,4, CV_64F), M_3_1, firstcv::Points, secondcv::Points, reconstructedcv::Points);
             keypoints3D = op::Array<float>{ { 1, numberBodyParts, 4 }, 0 };
             for (auto index = 0u; index < indexesUsed.size(); index++)

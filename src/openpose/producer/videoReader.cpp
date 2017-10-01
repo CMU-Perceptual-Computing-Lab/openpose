@@ -4,7 +4,7 @@
 namespace op
 {
     VideoReader::VideoReader(const std::string & videoPath) :
-        VideoCaptureReader{videoPath},
+        VideoCaptureReader{videoPath, ProducerType::Video},
         mPathName{getFileNameNoExtension(videoPath)}
     {
     }
@@ -31,7 +31,7 @@ namespace op
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return cv::Mat{};
+            return cv::Mat();
         }
     }
 }

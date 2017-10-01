@@ -79,7 +79,7 @@ namespace op
             if (cvMats.size() != mVideoWriters.size())
                 error("Size cvMats != size video writers");
 
-            for (auto i = 0 ; i < mVideoWriters.size() ; i++)
+            for (auto i = 0u ; i < mVideoWriters.size() ; i++)
                 mVideoWriters[i].write(cvMats[i]);
         }
         catch (const std::exception& e)

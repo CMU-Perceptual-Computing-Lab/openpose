@@ -35,13 +35,14 @@ DEFINE_string(video,                    "",             "Use a video file instea
                                                         " example video.");
 DEFINE_string(image_dir,                "",             "Process a directory of images. Use `examples/media/` for our default example folder with 20"
                                                         " images. Read all standard formats (jpg, png, bmp, etc.).");
-// OpenPose
-DEFINE_string(resolution,               "1280x720",     "The image resolution (display and output). Use \"-1x-1\" to force the program to use the"
-                                                        " default images resolution.");
-// Consumer
-DEFINE_bool(fullscreen,                 false,          "Run in full-screen mode (press f during runtime to toggle).");
+DEFINE_string(ip_camera,                "",             "String with the IP camera URL. It supports protocols like RTSP and HTTP.");
 DEFINE_bool(process_real_time,          false,          "Enable to keep the original source frame rate (e.g. for video). If the processing time is"
                                                         " too long, it will skip frames. If it is too fast, it will slow it down.");
+// OpenPose
+DEFINE_string(output_resolution,        "-1x-1",        "The image resolution (display and output). Use \"-1x-1\" to force the program to use the"
+                                                        " input image resolution.");
+// Consumer
+DEFINE_bool(fullscreen,                 false,          "Run in full-screen mode (press f during runtime to toggle).");
 
 // This class can be implemented either as a template or as a simple class given
 // that the user usually knows which kind of data he will move between the queues,
@@ -87,9 +88,10 @@ int openPoseTutorialThread2()
     op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
     // Step 2 - Read Google flags (user defined configuration)
     // outputSize
-    auto outputSize = op::flagsToPoint(FLAGS_resolution, "1280x720");
+    const auto outputSize = op::flagsToPoint(FLAGS_output_resolution, "-1x-1");
     // producerType
-    const auto producerSharedPtr = op::flagsToProducer(FLAGS_image_dir, FLAGS_video, FLAGS_camera, FLAGS_camera_resolution, FLAGS_camera_fps);
+    const auto producerSharedPtr = op::flagsToProducer(FLAGS_image_dir, FLAGS_video, FLAGS_ip_camera, FLAGS_camera,
+                                                       FLAGS_camera_resolution, FLAGS_camera_fps);
     const auto displayProducerFpsMode = (FLAGS_process_real_time ? op::ProducerFpsMode::OriginalFps : op::ProducerFpsMode::RetrievalFps);
     producerSharedPtr->setProducerFpsMode(displayProducerFpsMode);
     op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
@@ -99,14 +101,6 @@ int openPoseTutorialThread2()
     videoSeekSharedPtr->second = 0;
     const op::Point<int> producerSize{(int)producerSharedPtr->get(CV_CAP_PROP_FRAME_WIDTH),
                                 (int)producerSharedPtr->get(CV_CAP_PROP_FRAME_HEIGHT)};
-    if (outputSize.x == -1 || outputSize.y == -1)
-    {
-        if (producerSize.area() > 0)
-            outputSize = producerSize;
-        else
-            op::error("Output resolution = input resolution not valid for image reading (size might change between images).",
-                      __LINE__, __FUNCTION__, __FILE__);
-    }
     // Step 4 - Setting thread workers && manager
     typedef std::vector<op::Datum> TypedefDatumsNoPtr;
     typedef std::shared_ptr<TypedefDatumsNoPtr> TypedefDatums;
@@ -118,7 +112,7 @@ int openPoseTutorialThread2()
     // Specific WUserClass
     auto wUserClass = std::make_shared<WUserClass>();
     // GUI (Display)
-    auto gui = std::make_shared<op::Gui>(FLAGS_fullscreen, outputSize, threadManager.getIsRunningSharedPtr());
+    auto gui = std::make_shared<op::Gui>(outputSize, FLAGS_fullscreen, threadManager.getIsRunningSharedPtr());
     auto wGui = std::make_shared<op::WGui<TypedefDatums>>(gui);
 
     // ------------------------- CONFIGURING THREADING -------------------------
@@ -174,7 +168,7 @@ int openPoseTutorialThread2()
 
     // ------------------------- CLOSING -------------------------
     // Logging information message
-    op::log("Example 3 successfully finished.", op::Priority::High);
+    op::log("Example 2 successfully finished.", op::Priority::High);
     // Return successful message
     return 0;
 }

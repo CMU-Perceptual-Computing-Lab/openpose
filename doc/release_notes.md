@@ -83,15 +83,49 @@ OpenPose Library - Release Notes
 
 
 
-## Current version (future OpenPose 1.0.2)
+## OpenPose 1.0.2
 1. Main improvements:
-    1. Caffe turned into DLL library.
-    2. OpenPose is now completely portable across Windows 10 computers (with Nvidia graphic card).
-    3. Added OpenPose 1.0.1 portable demo.
-    4. Removed Python and some unnecessary boost dependencies on the VS project.
-    5. Replaced all double quotes by angle brackets in include statements (issue #61).
-    6. Added 3-D reconstruction demo.
-    7. Auto-detection of the camera index.
+    1. Added OpenCV 3.3 compatibility.
+    2. Caffe turned into DLL library.
+    3. OpenPose is now completely portable across Windows 10 computers (with Nvidia graphic card).
+    4. Added OpenPose 1.0.1 portable demo.
+    5. Removed Python and some unnecessary boost dependencies on the VS project.
+    6. Replaced all double quotes by angle brackets in include statements (issue #61).
+    7. Added 3-D reconstruction demo.
+    8. Auto-detection of the camera index.
+    9. Speed up of ~30% in op::floatPtrToUCharCvMat.
+    10. COCO extractor now extracts image ID from the image name itslef (format "string_%d"). Before, only working with validation test, now applicable to e.g. test sets.
+    11. Changed display texts, added `OpenPose` name.
 2. Main bugs fixed:
     1. Pycaffe can now be imported from Python.
     2. Fixed `Tutorial/Wrapper` VS linking errors.
+
+
+
+## OpenPose 1.1.0
+1. Main improvements:
+    1. Added CMake installer for Ubuntu.
+    2. Added how to use keypoint data in `examples/tutorial_wrapper/`.
+    3. Added flag for warnings of type `-Wsign-compare` and removed in code.
+    4. Slightly improved accuracy by considering ears-shoulder connection (e.g. +0.4 mAP for 1 scale in validation set).
+2. Main bugs fixed:
+    1. Windows version crashing with std::map copy.
+
+
+
+## Current version (future OpenPose 1.2.0)
+1. Main improvements:
+    1. Added IP camera support.
+    2. Output images can have the input size, OpenPose able to change its size for each image and not required fixed size anymore.
+        1. FrameDisplayer accepts variable size images by rescaling every time a frame with bigger width or height is displayed (gui module).
+        2. OpOutputToCvMat & GuiInfoAdder does not require to know the output size at construction time, deduced from each image.
+        3. CvMatToOutput and Renderers allow to keep input resolution as output for images (core module).
+    3. COCO JSON file outputs 0 as score for non-detected keypoints.
+    4. Added example for OpenPose for user asynchronous output and cleaned all `tutorial_wrapper/` examples.
+    5. Added `-1` option for `net_resolution` in order to auto-select the best possible aspect ratio given the user input.
+2. Functions or parameters renamed:
+    1. OpenPose able to change its size and initial size:
+        1. Flag `resolution` renamed as `output_resolution`.
+        2. FrameDisplayer, GuiInfoAdder and Gui constructors arguments modified (gui module).
+        3. OpOutputToCvMat constructor removed (core module).
+        4. New Renders classes to split GpuRenderers from CpuRenderers.

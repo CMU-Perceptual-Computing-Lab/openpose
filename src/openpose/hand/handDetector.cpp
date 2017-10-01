@@ -94,7 +94,7 @@ namespace op
                 // Find closest previous rectangle
                 auto maxIndex = -1;
                 auto maxValue = 0.f;
-                for (auto previous = 0 ; previous < previousHands.size() ; previous++)
+                for (auto previous = 0u ; previous < previousHands.size() ; previous++)
                 {
                     const auto areaRatio = getAreaRatio(currentRectangle, previousHands[previous]);
                     if (maxValue < areaRatio)
@@ -169,11 +169,8 @@ namespace op
             // Baseline detectHands
             auto handRectangles = detectHands(poseKeypoints, scaleInputToOutput);
             // If previous hands saved
-            // for (auto current = 0 ; current < handRectangles.size() ; current++)
             for (auto& handRectangle : handRectangles)
             {
-                // trackHand(handRectangles[current][0], mHandLeftPrevious);
-                // trackHand(handRectangles[current][1], mHandRightPrevious);
                 trackHand(handRectangle[0], mHandLeftPrevious);
                 trackHand(handRectangle[1], mHandRightPrevious);
             }
@@ -203,7 +200,7 @@ namespace op
                 mPoseTrack.resize(numberPeople);
                 mHandLeftPrevious.clear();
                 mHandRightPrevious.clear();
-                for (auto person = 0 ; person < mPoseTrack.size() ; person++)
+                for (auto person = 0u ; person < mPoseTrack.size() ; person++)
                 {
                     const auto scoreThreshold = 0.66667f;
                     // Left hand
@@ -234,7 +231,7 @@ namespace op
     ) const
     {
         std::array<unsigned int, (int)PosePart::Size> poseKeypoints;
-        for (auto i = 0 ; i < poseKeypoints.size() ; i++)
+        for (auto i = 0u ; i < poseKeypoints.size() ; i++)
             poseKeypoints.at(i) = poseBodyPartMapStringToKey(poseModel, poseStrings.at(i));
         return poseKeypoints;
     }
