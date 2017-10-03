@@ -4,6 +4,7 @@ cuda_add_library(core
     cvMatToOpOutput.cpp
     datum.cpp
     defineTemplates.cpp
+    gpuRenderer.cpp
     keypointScaler.cpp
     maximumBase.cpp
     maximumBase.cu

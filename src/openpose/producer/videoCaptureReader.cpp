@@ -11,7 +11,7 @@ namespace op
     {
         try
         {
-            // assert: make sure video capture was opened
+            // Make sure video capture was opened
             if (throwExceptionIfNoOpened && !isOpened())
                 error("VideoCapture (webcam) could not be opened.", __LINE__, __FUNCTION__, __FILE__);
         }
@@ -21,15 +21,20 @@ namespace op
         }
     }
 
-    VideoCaptureReader::VideoCaptureReader(const std::string& path) :
-        Producer{ProducerType::Video},
+    VideoCaptureReader::VideoCaptureReader(const std::string& path, const ProducerType producerType) :
+        Producer{producerType},
         mVideoCapture{path}
     {
         try
         {
-            // assert: make sure video capture was opened
+            // Make sure only video or IP camera
+            if (producerType != ProducerType::IPCamera && producerType != ProducerType::Video)
+                error("VideoCapture with an input path must be IP camera or video.",
+                      __LINE__, __FUNCTION__, __FILE__);
+            // Make sure video capture was opened
             if (!isOpened())
-                error("VideoCapture (video) could not be opened for path: '" + path + "'.", __LINE__, __FUNCTION__, __FILE__);
+                error("VideoCapture (IP camera/video) could not be opened for path: '" + path + "'.",
+                      __LINE__, __FUNCTION__, __FILE__);
         }
         catch (const std::exception& e)
         {

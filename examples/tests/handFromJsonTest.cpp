@@ -42,7 +42,7 @@ int handFromJsonTest()
     // handNetInputSize
     const auto handNetInputSize = op::flagsToPoint(FLAGS_hand_net_resolution, "368x368 (multiples of 16)");
     // producerType
-    const auto producerSharedPtr = op::flagsToProducer(FLAGS_image_dir, "", 0);
+    const auto producerSharedPtr = op::flagsToProducer(FLAGS_image_dir, "", "", 0);
     op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
     // OpenPose wrapper

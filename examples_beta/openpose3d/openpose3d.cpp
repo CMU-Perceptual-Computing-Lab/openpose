@@ -35,8 +35,8 @@ DEFINE_int32(logging_level,             3,              "The logging level. Inte
                                                         " low priority messages and 4 for important ones.");
 // OpenPose
 DEFINE_string(model_folder,             "models/",      "Folder path (absolute or relative) where the models (pose, face, ...) are located.");
-DEFINE_string(resolution,               "1280x720",     "The image resolution (display and output). Use \"-1x-1\" to force the program to use the"
-                                                        " default images resolution.");
+DEFINE_string(output_resolution,        "-1x-1",        "The image resolution (display and output). Use \"-1x-1\" to force the program to use the"
+                                                        " input image resolution.");
 DEFINE_int32(num_gpu,                   -1,             "The number of GPU devices to use. If negative, it will use all the available GPUs in your"
                                                         " machine.");
 DEFINE_int32(num_gpu_start,             0,              "GPU device start number.");
@@ -49,10 +49,12 @@ DEFINE_int32(keypoint_scale,            0,              "Scaling of the (x,y) co
 // OpenPose Body Pose
 DEFINE_string(model_pose,               "COCO",         "Model to be used. E.g. `COCO` (18 keypoints), `MPI` (15 keypoints, ~10% faster), "
                                                         "`MPI_4_layers` (15 keypoints, even faster but less accurate).");
-DEFINE_string(net_resolution,           "656x368",      "Multiples of 16. If it is increased, the accuracy potentially increases. If it is decreased,"
-                                                        " the speed increases. For maximum speed-accuracy balance, it should keep the closest aspect"
-                                                        " ratio possible to the images or videos to be processed. E.g. the default `656x368` is"
-                                                        " optimal for 16:9 videos, e.g. full HD (1980x1080) and HD (1280x720) videos.");
+DEFINE_string(net_resolution,           "656x368",      "Multiples of 16. If it is increased, the accuracy potentially increases. If it is"
+                                                        " decreased, the speed increases. For maximum speed-accuracy balance, it should keep the"
+                                                        " closest aspect ratio possible to the images or videos to be processed. Using `-1` in"
+                                                        " any of the dimensions, OP will choose the optimal aspect ratio depending on the user's"
+                                                        " input value. E.g. the default `-1x368` is equivalent to `656x368` in 16:9 resolutions,"
+                                                        " e.g. full HD (1980x1080) and HD (1280x720) resolutions.");
 DEFINE_int32(scale_number,              1,              "Number of scales to average.");
 DEFINE_double(scale_gap,                0.3,            "Scale gap between scales. No effect unless scale_number > 1. Initial scale is always 1."
                                                         " If you want to change the initial scale, you actually want to multiply the"
@@ -95,8 +97,9 @@ DEFINE_bool(hand_tracking,              false,          "Adding hand tracking mi
 DEFINE_int32(part_to_show,              0,              "Prediction channel to visualize (default: 0). 0 for all the body parts, 1-18 for each body"
                                                         " part heat map, 19 for the background heat map, 20 for all the body part heat maps"
                                                         " together, 21 for all the PAFs, 22-40 for each body part pair PAF");
-DEFINE_bool(disable_blending,           false,          "If blending is enabled, it will merge the results with the original frame. If disabled, it"
-                                                        " will only display the results on a black background.");
+DEFINE_bool(disable_blending,           false,          "If enabled, it will render the results (keypoint skeletons or heatmaps) on a black"
+                                                        " background, instead of being rendered into the original image. Related: `part_to_show`,"
+                                                        " `alpha_pose`, and `alpha_pose`.");
 // OpenPose Rendering Pose
 DEFINE_double(render_threshold,         0.05,           "Only estimated keypoints whose score confidences are higher than this threshold will be"
                                                         " rendered. Generally, a high threshold (> 0.5) will only render very clear body parts;"
@@ -150,9 +153,9 @@ int openpose3d()
 
     // Applying user defined configuration - Google flags to program variables
     // outputSize
-    const auto outputSize = op::flagsToPoint(FLAGS_resolution, "1280x720");
+    const auto outputSize = op::flagsToPoint(FLAGS_output_resolution, "-1x-1");
     // netInputSize
-    const auto netInputSize = op::flagsToPoint(FLAGS_net_resolution, "656x368");
+    const auto netInputSize = op::flagsToPoint(FLAGS_net_resolution, "-1x368");
     // faceNetInputSize
     const auto faceNetInputSize = op::flagsToPoint(FLAGS_face_net_resolution, "368x368 (multiples of 16)");
     // handNetInputSize

@@ -12,10 +12,11 @@ OpenPose - Installation using CMake
     4. [Run OpenPose](#run-openpose)
 5. [Reinstallation](#reinstallation)
 6. [Optional Settings](#optional-settings)
-    1. [Custom Caffe](#custom-caffe)
-    2. [Custom OpenCV](#custom-opencv)
-    3. [MPI Model](#mpi-model)
-    4. [CMake Command Line Configuration](#cmake-command-line-configuration)
+    1. [Doxygen Documentation Autogeneration](#doxygen-documentation-autogeneration)
+    2. [Custom Caffe](#custom-caffe)
+    3. [Custom OpenCV](#custom-opencv)
+    4. [MPI Model](#mpi-model)
+    5. [CMake Command Line Configuration](#cmake-command-line-configuration)
 
 
 
@@ -109,6 +110,11 @@ In order to re-install OpenPose:
 
 
 ### Optional Settings
+#### Doxygen Documentation Autogeneration
+You can generate the documentation by setting the `BUILD_DOCS` flag.
+
+
+
 #### Custom Caffe
 We only modified some Caffe compilation flags and minor details. You can use your own Caffe distribution, simply specify the Caffe include path and the library as shown below. You will also need to turn off the `BUILD_CAFFE` variable.
 <p align="center">
