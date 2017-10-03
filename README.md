@@ -76,7 +76,7 @@ The pose estimation work is based on the C++ code from [the ECCV 2016 demo](http
 - Multi-person **2x21-keypoint hand** estimation and rendering. Note: In this initial version, **running time** linearly **depends** on the **number of people** on the image.
 - Multi-person **70-keypoint face** estimation and rendering. Note: In this initial version, **running time** linearly **depends** on the **number of people** on the image.
 - Flexible and easy-to-configure **multi-threading** module.
-- Image, video, and webcam reader.
+- Image, video, webcam and IP camera reader.
 - Able to save and load the results in various formats (JSON, XML, PNG, JPG, ...).
 - Small display and GUI for simple result visualization.
 - All the functionality is wrapped into a **simple-to-use OpenPose Wrapper class**.
@@ -123,7 +123,9 @@ Check the output (format, keypoint index ordering, etc.) in [doc/output.md](doc/
 
 
 ## Standalone Face Or Hand Keypoint Detector
-In case of hand camera views at which the hands are visible but not the rest of the body, or if you do not need the body keypoint detector and want to considerably speed up the process, you can use the OpenPose face or hand keypoint detectors with your own face or hand detectors, rather than using the body keypoint detector as initial detector for those. More information in [doc/standalone_face_or_hand_keypoint_detector.md#faq](doc/standalone_face_or_hand_keypoint_detector.md#faq).
+If you do not need the body keypoint detector and want to considerably speed up the face keypoint detection, you can use the new approach based on OpenCV face detector. See [doc/standalone_face_or_hand_keypoint_detector.md](doc/standalone_face_or_hand_keypoint_detector.md).
+
+You can also use the OpenPose hand and/or face keypoint detectors with your own face or hand detectors, rather than using the body keypoint detector as initial detector for those. E.g. in case of hand camera views at which the hands are visible but not the rest of the body, so that the OpenPose detector would fail. See [doc/standalone_face_or_hand_keypoint_detector.md](doc/standalone_face_or_hand_keypoint_detector.md).
 
 
 
