@@ -684,7 +684,7 @@ namespace op
                     const auto netOutputSize = wrapperStructFace.netInputSize;
                     const auto faceExtractor = std::make_shared<FaceExtractor>(
                         wrapperStructFace.netInputSize, netOutputSize, wrapperStructPose.modelFolder,
-                        gpu + gpuNumberStart
+                        gpu + gpuNumberStart, wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale
                     );
                     spWPoses.at(gpu).emplace_back(std::make_shared<WFaceExtractor<TDatumsPtr>>(faceExtractor));
                 }
@@ -709,7 +709,8 @@ namespace op
                     const auto netOutputSize = wrapperStructHand.netInputSize;
                     const auto handExtractor = std::make_shared<HandExtractor>(
                         wrapperStructHand.netInputSize, netOutputSize, wrapperStructPose.modelFolder,
-                        gpu + gpuNumberStart, wrapperStructHand.scalesNumber, wrapperStructHand.scaleRange
+                        gpu + gpuNumberStart, wrapperStructHand.scalesNumber, wrapperStructHand.scaleRange,
+                        wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale
                     );
                     spWPoses.at(gpu).emplace_back(std::make_shared<WHandExtractor<TDatumsPtr>>(handExtractor));
                     // If tracking

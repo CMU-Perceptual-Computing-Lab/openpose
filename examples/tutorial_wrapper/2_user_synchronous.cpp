@@ -59,7 +59,8 @@ DEFINE_int32(scale_number,              1,              "Number of scales to ave
 DEFINE_double(scale_gap,                0.3,            "Scale gap between scales. No effect unless scale_number > 1. Initial scale is always 1."
                                                         " If you want to change the initial scale, you actually want to multiply the"
                                                         " `net_resolution` by your desired initial scale.");
-DEFINE_bool(heatmaps_add_parts,         false,          "If true, it will add the body part heatmaps to the final op::Datum::poseHeatMaps array"
+DEFINE_bool(heatmaps_add_parts,         false,          "If true, it will add the body part heatmaps to the final op::Datum::poseHeatMaps array,"
+                                                        " and analogously face & hand heatmaps to op::Datum::faceHeatMaps & op::Datum::handHeatMaps"
                                                         " (program speed will decrease). Not required for our library, enable it only if you intend"
                                                         " to process this information later. If more than one `add_heatmaps_X` flag is enabled, it"
                                                         " will place then in sequential memory order: body parts + bkg + PAFs. It will follow the"
@@ -136,8 +137,8 @@ DEFINE_string(write_keypoint_format,    "yml",          "File extension and form
                                                         " for OpenCV < 3.0, use `write_keypoint_json` instead.");
 DEFINE_string(write_keypoint_json,      "",             "Directory to write people pose data in *.json format, compatible with any OpenCV version.");
 DEFINE_string(write_coco_json,          "",             "Full file path to write people pose data with *.json COCO validation format.");
-DEFINE_string(write_heatmaps,           "",             "Directory to write heatmaps in *.png format. At least 1 `add_heatmaps_X` flag must be"
-                                                        " enabled.");
+DEFINE_string(write_heatmaps,           "",             "Directory to write body pose heatmaps in *.png format. At least 1 `add_heatmaps_X` flag"
+                                                        " must be enabled.");
 DEFINE_string(write_heatmaps_format,    "png",          "File extension and format for `write_heatmaps`, analogous to `write_images_format`."
                                                         " Recommended `png` or any compressed and lossless format.");
 
@@ -289,6 +290,28 @@ public:
                 op::log("Face keypoints: " + datumsPtr->at(0).faceKeypoints.toString());
                 op::log("Left hand keypoints: " + datumsPtr->at(0).handKeypoints[0].toString());
                 op::log("Right hand keypoints: " + datumsPtr->at(0).handKeypoints[1].toString());
+                // Heatmaps
+                const auto& poseHeatMaps = datumsPtr->at(0).poseHeatMaps;
+                if (!poseHeatMaps.empty())
+                {
+                    op::log("Pose heatmaps size: [" + std::to_string(poseHeatMaps.getSize(0)) + ", "
+                            + std::to_string(poseHeatMaps.getSize(1)) + ", "
+                            + std::to_string(poseHeatMaps.getSize(2)) + "]");
+                    const auto& faceHeatMaps = datumsPtr->at(0).faceHeatMaps;
+                    op::log("Face heatmaps size: [" + std::to_string(faceHeatMaps.getSize(0)) + ", "
+                            + std::to_string(faceHeatMaps.getSize(1)) + ", "
+                            + std::to_string(faceHeatMaps.getSize(2)) + ", "
+                            + std::to_string(faceHeatMaps.getSize(3)) + "]");
+                    const auto& handHeatMaps = datumsPtr->at(0).handHeatMaps;
+                    op::log("Left hand heatmaps size: [" + std::to_string(handHeatMaps[0].getSize(0)) + ", "
+                            + std::to_string(handHeatMaps[0].getSize(1)) + ", "
+                            + std::to_string(handHeatMaps[0].getSize(2)) + ", "
+                            + std::to_string(handHeatMaps[0].getSize(3)) + "]");
+                    op::log("Right hand heatmaps size: [" + std::to_string(handHeatMaps[1].getSize(0)) + ", "
+                            + std::to_string(handHeatMaps[1].getSize(1)) + ", "
+                            + std::to_string(handHeatMaps[1].getSize(2)) + ", "
+                            + std::to_string(handHeatMaps[1].getSize(3)) + "]");
+                }
 
                 // Display rendered output image
                 cv::imshow("User worker GUI", datumsPtr->at(0).cvOutputData);
