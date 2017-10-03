@@ -16,8 +16,8 @@ namespace op
     class OP_API FaceExtractor
     {
     public:
-        explicit FaceExtractor(const Point<int>& netInputSize, const Point<int>& netOutputSize, const std::string& modelFolder, const int gpuId, 
-			       const bool downloadHeatmaps = false, const ScaleMode heatMapScale = ScaleMode::ZeroToOne);
+        explicit FaceExtractor(const Point<int>& netInputSize, const Point<int>& netOutputSize, const std::string& modelFolder, const int gpuId,
+                               const bool downloadHeatmaps = false, const ScaleMode heatMapScale = ScaleMode::ZeroToOne);
 
         void initializationOnThread();
 
@@ -25,11 +25,10 @@ namespace op
 
         Array<float> getFaceKeypoints() const;
 
-	// TODO Move the heatmap related methods and members to a super class common for the body part extractors (face and hands)
+        // TODO Move the heatmap related methods and members to a super class common for the body part extractors (face and hands)
         const float* getHeatMapGpuConstPtr() const;
         Array<float> getHeatMaps(unsigned int personIndex) const;
 
-	
     private:
         const Point<int> mNetOutputSize;
         const Point<int> mOutputSize;
@@ -43,15 +42,14 @@ namespace op
         std::shared_ptr<caffe::Blob<float>> spHeatMapsBlob;
         std::shared_ptr<caffe::Blob<float>> spPeaksBlob;
         std::thread::id mThreadId;
+        // HeatMaps parameters
+        const ScaleMode mHeatMapScaleMode;
+        const bool mDownloadHeatmaps;
+        // store heatmaps during detection (forwardPass) for later retrieval
+        std::vector<Array<float>> mHeatmaps;
 
-	const ScaleMode mHeatMapScaleMode;
-	const bool mDownloadHeatmaps;
-	// store heatmaps during detection (forwardPass) for later retrieval
-	std::vector<Array<float> > mHeatmaps;
-
-	
         void checkThread() const;
-	Array<float> getHeatMapsFromLastPass() const;
+        Array<float> getHeatMapsFromLastPass() const;
 
         DELETE_COPY(FaceExtractor);
     };
