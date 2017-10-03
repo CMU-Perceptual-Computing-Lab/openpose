@@ -1,22 +1,23 @@
 #ifndef OPENPOSE_FACE_FACE_DETECTOR_OPENCV_HPP
 #define OPENPOSE_FACE_FACE_DETECTOR_OPENCV_HPP
 
-#include <openpose/core/common.hpp>
-#include <openpose/pose/enumClasses.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/objdetect/objdetect.hpp>
+#include <openpose/core/common.hpp>
 
 namespace op
 {
     class OP_API FaceDetectorOpenCV
     {
     public:
-        explicit FaceDetectorOpenCV();
+        explicit FaceDetectorOpenCV(const std::string& modelFolder);
 
-        std::vector<Rectangle<float>> detectFacesOpenCV(const cv::Mat& cvInputData);
+        // No thread-save
+        std::vector<Rectangle<float>> detectFaces(const cv::Mat& cvInputData);
 
     private:
-        cv::CascadeClassifier face_cascade;
+        cv::CascadeClassifier mFaceCascade;
+
         DELETE_COPY(FaceDetectorOpenCV);
     };
 }
