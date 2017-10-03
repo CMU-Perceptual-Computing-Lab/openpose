@@ -59,6 +59,7 @@ namespace op
                 for (auto& tDatum : *tDatums)
                 {
                     spHandExtractor->forwardPass(tDatum.handRectangles, tDatum.cvInputData, tDatum.scaleInputToOutput);
+                    tDatum.handHeatMaps = spHandExtractor->getHeatMaps();
                     tDatum.handKeypoints = spHandExtractor->getHandKeypoints();
                 }
                 // Profiling speed

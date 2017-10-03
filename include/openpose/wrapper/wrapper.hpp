@@ -666,7 +666,7 @@ namespace op
                     const auto netOutputSize = wrapperStructFace.netInputSize;
                     const auto faceExtractor = std::make_shared<FaceExtractor>(
                         wrapperStructFace.netInputSize, netOutputSize, wrapperStructPose.modelFolder,
-                        gpu + gpuNumberStart
+                        gpu + gpuNumberStart, wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale
                     );
                     spWPoses.at(gpu).emplace_back(std::make_shared<WFaceExtractor<TDatumsPtr>>(faceExtractor));
                 }

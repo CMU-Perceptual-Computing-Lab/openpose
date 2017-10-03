@@ -110,10 +110,14 @@ namespace op
             // Error check
             if (mHeatMapScaleMode != ScaleMode::ZeroToOne && mHeatMapScaleMode != ScaleMode::PlusMinusOne && mHeatMapScaleMode != ScaleMode::UnsignedChar)
                 error("The ScaleMode heatMapScale must be ZeroToOne, PlusMinusOne or UnsignedChar.", __LINE__, __FUNCTION__, __FILE__);
-
             checkE(netOutputSize.x, netInputSize.x, "Net input and output size must be equal.", __LINE__, __FUNCTION__, __FILE__);
             checkE(netOutputSize.y, netInputSize.y, "Net input and output size must be equal.", __LINE__, __FUNCTION__, __FILE__);
             checkE(netInputSize.x, netInputSize.y, "Net input size must be squared.", __LINE__, __FUNCTION__, __FILE__);
+            // Warnings
+            // if (!mHeatMapTypes.empty())
+            if (mDownloadHeatmaps)
+                log("Note only keypoint heatmaps are available with face heatmaps (no background nor PAFs).",
+                    Priority::Low, __LINE__, __FUNCTION__, __FILE__);
         }
         catch (const std::exception& e)
         {
@@ -125,27 +129,24 @@ namespace op
     {
         try
         {
+            // Logging
             log("Starting initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-
             // Get thread id
             mThreadId = {std::this_thread::get_id()};
-
             // Caffe net
             spNet->initializationOnThread();
             spCaffeNetOutputBlob = ((NetCaffe*)spNet.get())->getOutputBlob();
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
-
             // HeatMaps extractor blob and layer
             spHeatMapsBlob = {std::make_shared<caffe::Blob<float>>(1,1,1,1)};
             const bool mergeFirstDimension = true;
             spResizeAndMergeCaffe->Reshape({spCaffeNetOutputBlob.get()}, {spHeatMapsBlob.get()}, HAND_CCN_DECREASE_FACTOR, mergeFirstDimension);
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
-
             // Pose extractor blob and layer
             spPeaksBlob = {std::make_shared<caffe::Blob<float>>(1,1,1,1)};
             spMaximumCaffe->Reshape({spHeatMapsBlob.get()}, {spPeaksBlob.get()});
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
-
+            // Logging
             log("Finished initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
         }
         catch (const std::exception& e)
@@ -173,7 +174,7 @@ namespace op
                 mHandKeypoints[0].reset({numberPeople, (int)HAND_NUMBER_PARTS, 3}, 0);
                 mHandKeypoints[1].reset(mHandKeypoints[0].getSize(), 0);
 
-                if(mDownloadHeatmaps)
+                if (mDownloadHeatmaps)
                     mHeatmaps.resize(numberPeople);
 
                 // // Debugging
@@ -249,7 +250,7 @@ namespace op
                                 }
                             }
                             // recover hand heatmaps
-                            if(mDownloadHeatmaps)
+                            if (mDownloadHeatmaps)
                                 mHeatmaps.at(person).at(hand) = getHeatMapsFromLastPass();
                         }
                     }
@@ -287,7 +288,7 @@ namespace op
     {
         try
         {
-            if(mThreadId != std::this_thread::get_id())
+            if (mThreadId != std::this_thread::get_id())
                 error("The CPU/GPU pointer data cannot be accessed from a different thread.", __LINE__, __FUNCTION__, __FILE__);
         }
         catch (const std::exception& e)
@@ -346,24 +347,14 @@ namespace op
         }
     }
 
-    Array<float> HandExtractor::getHeatMaps(unsigned int personIndex,unsigned  int handIndex) const
+    Array<float> HandExtractor::getHeatMaps(const unsigned int personIndex, const unsigned int handIndex) const
     {
-
-    // Error check
-    if(!mDownloadHeatmaps)
-    {
-        error("Enable downloadHeatmaps on the constructor before calling getHeatMaps", __LINE__, __FUNCTION__, __FILE__);
-        return Array<float>{};
-    }
-
-    if (personIndex>mHeatmaps.size() || handIndex>1)
-    {
-        error("Invalid person or hand index", __LINE__, __FUNCTION__, __FILE__);
-        return Array<float>{};
-    }
-    if(mHeatmaps.size()==0) return Array<float>{};
-
-    return mHeatmaps.at(personIndex).at(handIndex);
+        // Error check
+        if (!mDownloadHeatmaps)
+            error("Enable downloadHeatmaps on the constructor before calling getHeatMaps", __LINE__, __FUNCTION__, __FILE__);
+        if (personIndex >= mHeatmaps.size() || handIndex > 1)
+            error("Invalid person or hand index", __LINE__, __FUNCTION__, __FILE__);
+        return mHeatmaps.at(personIndex).at(handIndex);
     }
 
 

@@ -59,6 +59,7 @@ namespace op
                 for (auto& tDatum : *tDatums)
                 {
                     spFaceExtractor->forwardPass(tDatum.faceRectangles, tDatum.cvInputData, tDatum.scaleInputToOutput);
+                    tDatum.faceHeatMaps = spFaceExtractor->getHeatMaps();
                     tDatum.faceKeypoints = spFaceExtractor->getFaceKeypoints();
                 }
                 // Profiling speed

@@ -57,13 +57,15 @@ namespace op
          */
         std::array<Array<float>, 2> getHandKeypoints() const;
 
-
         // TODO Move the heatmap related methods and members to a super class common for the body part extractors (face and hands)
         const float* getHeatMapGpuConstPtr() const;
-        Array<float> getHeatMaps(unsigned int personIndex, unsigned int handIndex) const;
+        inline std::array<Array<float>, 2> getHeatMaps() const
+        {
+            return {};
+        }
+        Array<float> getHeatMaps(const unsigned int personIndex, const unsigned int handIndex) const;
 
     private:
-        // const bool mMultiScaleDetection;
         const std::pair<unsigned short, float> mMultiScaleNumberAndRange;
         const Point<int> mNetOutputSize;
         std::shared_ptr<Net> spNet;
@@ -71,24 +73,21 @@ namespace op
         std::shared_ptr<MaximumCaffe<float>> spMaximumCaffe;
         Array<float> mHandImageCrop;
         std::array<Array<float>, 2> mHandKeypoints;
+        // HeatMaps parameters
+        const ScaleMode mHeatMapScaleMode;
+        const bool mDownloadHeatmaps;
+        std::vector<std::array<Array<float>, 2>> mHeatmaps;
         // Init with thread
         boost::shared_ptr<caffe::Blob<float>> spCaffeNetOutputBlob;
         std::shared_ptr<caffe::Blob<float>> spHeatMapsBlob;
         std::shared_ptr<caffe::Blob<float>> spPeaksBlob;
         std::thread::id mThreadId;
-        // HeatMaps parameters
-        const ScaleMode mHeatMapScaleMode;
-        const bool mDownloadHeatmaps;
-        // store heatmaps during detection (forwardPass) for later retrieval
-        std::vector<std::array<Array<float>, 2> > mHeatmaps;
-
 
         void checkThread() const;
 
         void detectHandKeypoints(Array<float>& handCurrent, const float scaleInputToOutput, const int person, const cv::Mat& affineMatrix);
 
         Array<float> getHeatMapsFromLastPass() const;
-
 
         DELETE_COPY(HandExtractor);
     };
