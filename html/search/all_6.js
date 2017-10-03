@@ -22,7 +22,7 @@ var searchData=
   ['gethandkeypoints',['getHandKeypoints',['../classop_1_1_hand_extractor.html#a322a1c3a0ab7abaf0c697246af9309cc',1,'op::HandExtractor']]],
   ['getheatmapcpuconstptr',['getHeatMapCpuConstPtr',['../classop_1_1_pose_extractor.html#a0bb5cf37e5b93e347e355be126d22ead',1,'op::PoseExtractor']]],
   ['getheatmapgpuconstptr',['getHeatMapGpuConstPtr',['../classop_1_1_pose_extractor.html#a0b895e3e582bd504b531ba525ed77430',1,'op::PoseExtractor']]],
-  ['getheatmaps',['getHeatMaps',['../classop_1_1_pose_extractor.html#a1f91723c5d541a2872637a1510da76e6',1,'op::PoseExtractor']]],
+  ['getheatmaps',['getHeatMaps',['../classop_1_1_face_extractor.html#af326457ed8977781fe48f1086ac5efee',1,'op::FaceExtractor::getHeatMaps()'],['../classop_1_1_hand_extractor.html#af5ce8cd602820921de3ec3f676aacf0d',1,'op::HandExtractor::getHeatMaps()'],['../classop_1_1_pose_extractor.html#a1f91723c5d541a2872637a1510da76e6',1,'op::PoseExtractor::getHeatMaps()']]],
   ['getinputdatacpuptr',['getInputDataCpuPtr',['../classop_1_1_net.html#a042324a660661408830caf85cfe17603',1,'op::Net']]],
   ['getinputdatagpuptr',['getInputDataGpuPtr',['../classop_1_1_net.html#a6e39824e84be05c9942523e48e7cff55',1,'op::Net']]],
   ['getisrunningsharedptr',['getIsRunningSharedPtr',['../classop_1_1_thread_manager.html#a48ea53b3de4d09c84db18e2c31ce1be1',1,'op::ThreadManager']]],

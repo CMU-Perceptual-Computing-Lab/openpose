@@ -117,51 +117,64 @@ $(document).ready(function(){initNavTree('face_extractor_8hpp_source.html','');}
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="maximum_caffe_8hpp.html">openpose/core/maximumCaffe.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="net_8hpp.html">openpose/core/net.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="resize_and_merge_caffe_8hpp.html">openpose/core/resizeAndMergeCaffe.hpp</a>&gt;</span></div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;</div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="keyword">namespace </span>op</div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;{</div>
-<div class="line"><a name="l00014"></a><span class="lineno"><a class="line" href="classop_1_1_face_extractor.html">   14</a></span>&#160;    <span class="keyword">class </span><a class="code" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> <a class="code" href="classop_1_1_face_extractor.html">FaceExtractor</a></div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;    {</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;        <span class="keyword">explicit</span> <a class="code" href="classop_1_1_face_extractor.html">FaceExtractor</a>(<span class="keyword">const</span> <a class="code" href="structop_1_1_point.html">Point&lt;int&gt;</a>&amp; netInputSize, <span class="keyword">const</span> <a class="code" href="structop_1_1_point.html">Point&lt;int&gt;</a>&amp; netOutputSize, <span class="keyword">const</span> std::string&amp; modelFolder, <span class="keyword">const</span> <span class="keywordtype">int</span> gpuId);</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;        <span class="keywordtype">void</span> initializationOnThread();</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;        <span class="keywordtype">void</span> forwardPass(<span class="keyword">const</span> std::vector&lt;<a class="code" href="structop_1_1_rectangle.html">Rectangle&lt;float&gt;</a>&gt;&amp; faceRectangles, <span class="keyword">const</span> cv::Mat&amp; cvInputData, <span class="keyword">const</span> <span class="keywordtype">float</span> scaleInputToOutput);</div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="core_2enum_classes_8hpp.html">openpose/core/enumClasses.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="keyword">namespace </span>op</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;{</div>
+<div class="line"><a name="l00015"></a><span class="lineno"><a class="line" href="classop_1_1_face_extractor.html">   15</a></span>&#160;    <span class="keyword">class </span><a class="code" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> <a class="code" href="classop_1_1_face_extractor.html">FaceExtractor</a></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;    {</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;        <span class="keyword">explicit</span> <a class="code" href="classop_1_1_face_extractor.html">FaceExtractor</a>(<span class="keyword">const</span> <a class="code" href="structop_1_1_point.html">Point&lt;int&gt;</a>&amp; netInputSize, <span class="keyword">const</span> <a class="code" href="structop_1_1_point.html">Point&lt;int&gt;</a>&amp; netOutputSize,</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;                               <span class="keyword">const</span> std::string&amp; modelFolder, <span class="keyword">const</span> <span class="keywordtype">int</span> gpuId,</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;                               <span class="keyword">const</span> std::vector&lt;HeatMapType&gt;&amp; heatMapTypes = {},</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;                               <span class="keyword">const</span> <a class="code" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bda">ScaleMode</a> heatMapScale = <a class="code" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bdaa4b942544cb3e764bbb8d33f8a8744855">ScaleMode::ZeroToOne</a>);</div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;        <a class="code" href="classop_1_1_array.html">Array&lt;float&gt;</a> getFaceKeypoints() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;        <span class="keywordtype">void</span> initializationOnThread();</div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;        <span class="keyword">const</span> <a class="code" href="structop_1_1_point.html">Point&lt;int&gt;</a> mNetOutputSize;</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;        <span class="keyword">const</span> <a class="code" href="structop_1_1_point.html">Point&lt;int&gt;</a> mOutputSize;</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;        std::shared_ptr&lt;Net&gt; spNet;</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;        std::shared_ptr&lt;ResizeAndMergeCaffe&lt;float&gt;&gt; spResizeAndMergeCaffe;</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;        std::shared_ptr&lt;MaximumCaffe&lt;float&gt;&gt; spMaximumCaffe;</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;        <a class="code" href="classop_1_1_array.html">Array&lt;float&gt;</a> mFaceImageCrop;</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;        <a class="code" href="classop_1_1_array.html">Array&lt;float&gt;</a> mFaceKeypoints;</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;        <span class="comment">// Init with thread</span></div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;        boost::shared_ptr&lt;caffe::Blob&lt;float&gt;&gt; spCaffeNetOutputBlob;</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;        std::shared_ptr&lt;caffe::Blob&lt;float&gt;&gt; spHeatMapsBlob;</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;        std::shared_ptr&lt;caffe::Blob&lt;float&gt;&gt; spPeaksBlob;</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;        std::thread::id mThreadId;</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;        <span class="keywordtype">void</span> checkThread() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;        <a class="code" href="macros_8hpp.html#abef96b5dd35dd9d44ad27ddf0e2f5f2e">DELETE_COPY</a>(<a class="code" href="classop_1_1_face_extractor.html">FaceExtractor</a>);</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    };</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;}</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="preprocessor">#endif // OPENPOSE_FACE_FACE_EXTRACTOR_HPP</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;        <span class="keywordtype">void</span> forwardPass(<span class="keyword">const</span> std::vector&lt;<a class="code" href="structop_1_1_rectangle.html">Rectangle&lt;float&gt;</a>&gt;&amp; faceRectangles, <span class="keyword">const</span> cv::Mat&amp; cvInputData,</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;                         <span class="keyword">const</span> <span class="keywordtype">float</span> scaleInputToOutput);</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;        <a class="code" href="classop_1_1_array.html">Array&lt;float&gt;</a> getFaceKeypoints() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;        <a class="code" href="classop_1_1_array.html">Array&lt;float&gt;</a> getHeatMaps() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;        <span class="keyword">const</span> <a class="code" href="structop_1_1_point.html">Point&lt;int&gt;</a> mNetOutputSize;</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;        std::shared_ptr&lt;Net&gt; spNet;</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;        std::shared_ptr&lt;ResizeAndMergeCaffe&lt;float&gt;&gt; spResizeAndMergeCaffe;</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;        std::shared_ptr&lt;MaximumCaffe&lt;float&gt;&gt; spMaximumCaffe;</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;        <a class="code" href="classop_1_1_array.html">Array&lt;float&gt;</a> mFaceImageCrop;</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;        <a class="code" href="classop_1_1_array.html">Array&lt;float&gt;</a> mFaceKeypoints;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;        <span class="comment">// HeatMaps parameters</span></div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;        <span class="keyword">const</span> <a class="code" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bda">ScaleMode</a> mHeatMapScaleMode;</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;        <span class="keyword">const</span> std::vector&lt;HeatMapType&gt; mHeatMapTypes;</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;        <a class="code" href="classop_1_1_array.html">Array&lt;float&gt;</a> mHeatMaps;</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;        <span class="comment">// Init with thread</span></div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;        boost::shared_ptr&lt;caffe::Blob&lt;float&gt;&gt; spCaffeNetOutputBlob;</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;        std::shared_ptr&lt;caffe::Blob&lt;float&gt;&gt; spHeatMapsBlob;</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;        std::shared_ptr&lt;caffe::Blob&lt;float&gt;&gt; spPeaksBlob;</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;        std::thread::id mThreadId;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        <span class="keywordtype">void</span> checkThread() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;        <a class="code" href="macros_8hpp.html#abef96b5dd35dd9d44ad27ddf0e2f5f2e">DELETE_COPY</a>(<a class="code" href="classop_1_1_face_extractor.html">FaceExtractor</a>);</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    };</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;}</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="preprocessor">#endif // OPENPOSE_FACE_FACE_EXTRACTOR_HPP</span></div>
 <div class="ttc" id="macros_8hpp_html_abef96b5dd35dd9d44ad27ddf0e2f5f2e"><div class="ttname"><a href="macros_8hpp.html#abef96b5dd35dd9d44ad27ddf0e2f5f2e">DELETE_COPY</a></div><div class="ttdeci">#define DELETE_COPY(className)</div><div class="ttdef"><b>Definition:</b> macros.hpp:25</div></div>
 <div class="ttc" id="resize_and_merge_caffe_8hpp_html"><div class="ttname"><a href="resize_and_merge_caffe_8hpp.html">resizeAndMergeCaffe.hpp</a></div></div>
 <div class="ttc" id="net_8hpp_html"><div class="ttname"><a href="net_8hpp.html">net.hpp</a></div></div>
 <div class="ttc" id="structop_1_1_point_html"><div class="ttname"><a href="structop_1_1_point.html">op::Point&lt; int &gt;</a></div></div>
 <div class="ttc" id="common_8hpp_html"><div class="ttname"><a href="common_8hpp.html">common.hpp</a></div></div>
+<div class="ttc" id="namespaceop_html_af72fe4ed32846c12f41b049d3d0e1bdaa4b942544cb3e764bbb8d33f8a8744855"><div class="ttname"><a href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bdaa4b942544cb3e764bbb8d33f8a8744855">op::ScaleMode::ZeroToOne</a></div></div>
+<div class="ttc" id="namespaceop_html_af72fe4ed32846c12f41b049d3d0e1bda"><div class="ttname"><a href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bda">op::ScaleMode</a></div><div class="ttdeci">ScaleMode</div><div class="ttdef"><b>Definition:</b> enumClasses.hpp:6</div></div>
 <div class="ttc" id="classop_1_1_array_html"><div class="ttname"><a href="classop_1_1_array.html">op::Array&lt; float &gt;</a></div></div>
 <div class="ttc" id="maximum_caffe_8hpp_html"><div class="ttname"><a href="maximum_caffe_8hpp.html">maximumCaffe.hpp</a></div></div>
 <div class="ttc" id="structop_1_1_rectangle_html"><div class="ttname"><a href="structop_1_1_rectangle.html">op::Rectangle</a></div><div class="ttdef"><b>Definition:</b> rectangle.hpp:10</div></div>
 <div class="ttc" id="macros_8hpp_html_a4ba443bb7a0e5dbe8054a9ac37a5e000"><div class="ttname"><a href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a></div><div class="ttdeci">#define OP_API</div><div class="ttdef"><b>Definition:</b> macros.hpp:5</div></div>
-<div class="ttc" id="classop_1_1_face_extractor_html"><div class="ttname"><a href="classop_1_1_face_extractor.html">op::FaceExtractor</a></div><div class="ttdef"><b>Definition:</b> faceExtractor.hpp:14</div></div>
+<div class="ttc" id="core_2enum_classes_8hpp_html"><div class="ttname"><a href="core_2enum_classes_8hpp.html">enumClasses.hpp</a></div></div>
+<div class="ttc" id="classop_1_1_face_extractor_html"><div class="ttname"><a href="classop_1_1_face_extractor.html">op::FaceExtractor</a></div><div class="ttdef"><b>Definition:</b> faceExtractor.hpp:15</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

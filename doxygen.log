@@ -640,12 +640,16 @@ Generating docs for file /home/travis/build/CMU-Perceptual-Computing-Lab/openpos
 Generating docs for file /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/thread/worker.hpp...
 Generating docs for file /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/thread/workerConsumer.hpp...
 Generating docs for file /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/thread/workerProducer.hpp...
-Generating docs for file /home/travi/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:81: warning: explicit link request to 'people' could not be resolved
+Generating docs for file /home/travi/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:88: warning: explicit link request to 'people' could not be resolved
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:88: warning: explicit link request to 'face' could not be resolved
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:81: warning: explicit link request to 'people' could not be resolved
 /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:81: warning: explicit link request to 'face' could not be resolved
 /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:74: warning: explicit link request to 'people' could not be resolved
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:96: warning: explicit link request to 'people' could not be resolved
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:96: warning: explicit link request to 'hand' could not be resolved
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:88: warning: explicit link request to 'people' could not be resolved
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:110: warning: explicit link request to 'people' could not be resolved
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:110: warning: explicit link request to 'hand' could not be resolved
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:103: warning: explicit link request to 'people' could not be resolved
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:103: warning: explicit link request to 'hand' could not be resolved
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:95: warning: explicit link request to 'people' could not be resolved
 /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:32: warning: explicit link request to 'scales' could not be resolved
 /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:64: warning: explicit link request to 'heatmaps' could not be resolved
 /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:64: warning: explicit link request to 'body' could not be resolved
@@ -710,8 +714,11 @@ Generating docs for compound op::KeypointJsonSaver...
 Generating docs for compound op::KeypointSaver...
 Generating docs for compound op::VideoSaver...
 Generating docs for compound op::WCocoJsonSaver...
-Generating/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/hand/handExtractor.hpp:39: warning: argument 'fpsMode' of command @param is not found in the argument list of op::HandExtractor::forwardPass(const std::vector< std::array< Rectangle< float >, 2 >> handRectangles, const cv::Mat &cvInputData, const float scaleInputToOutput)
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/hand/handExtractor.hpp:39: warning: The following parameters of op::HandExtractor::forwardPass(const std::vector< std::array< Rectangle< float >, 2 >> handRectangles, const cv::Mat &cvInputData, const float scaleInputToOutput) are not documented:
+Generating/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/hand/handExtractor.hpp:22: warning: The following parameters of op::HandExtractor::HandExtractor(const Point< int > &netInputSize, const Point< int > &netOutputSize, const std::string &modelFolder, const int gpuId, const unsigned short numberScales=1, const float rangeScales=0.4f, const std::vector< HeatMapType > &heatMapTypes={}, const ScaleMode heatMapScale=ScaleMode::ZeroToOne) are not documented:
+  parameter 'heatMapTypes'
+  parameter 'heatMapScale'
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/hand/handExtractor.hpp:44: warning: argument 'fpsMode' of command @param is not found in the argument list of op::HandExtractor::forwardPass(const std::vector< std::array< Rectangle< float >, 2 >> handRectangles, const cv::Mat &cvInputData, const float scaleInputToOutput)
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/hand/handExtractor.hpp:44: warning: The following parameters of op::HandExtractor::forwardPass(const std::vector< std::array< Rectangle< float >, 2 >> handRectangles, const cv::Mat &cvInputData, const float scaleInputToOutput) are not documented:
   parameter 'handRectangles'
 /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/producer/producer.hpp:20: warning: argument 'repeatWhenFinished' of command @param is not found in the argument list of op::Producer::Producer(const ProducerType type)
 /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/producer/producer.hpp:20: warning: The following parameters of op::Producer::Producer(const ProducerType type) are not documented:
@@ -816,5 +823,5 @@ Generating file index...
 Generating file member index...
 Generating example index...
 finalizing index lists...
-lookup cache used 2430/65536 hits=13693 misses=2547
+lookup cache used 2453/65536 hits=13822 misses=2571
 finished...

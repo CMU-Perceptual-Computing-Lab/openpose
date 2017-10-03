@@ -2,7 +2,7 @@ var searchData=
 [
   ['facecpurenderer',['FaceCpuRenderer',['../classop_1_1_face_cpu_renderer.html#afb0dcfff75c4a89d5971d7b0bbd0b51b',1,'op::FaceCpuRenderer']]],
   ['facedetector',['FaceDetector',['../classop_1_1_face_detector.html#adfeab6977c93b7bef66c1dfbcf6f8150',1,'op::FaceDetector']]],
-  ['faceextractor',['FaceExtractor',['../classop_1_1_face_extractor.html#aa2c31df663d2bb2e4d965833bb8270a8',1,'op::FaceExtractor']]],
+  ['faceextractor',['FaceExtractor',['../classop_1_1_face_extractor.html#a04b4cd08bc5cbba132be73368890af02',1,'op::FaceExtractor']]],
   ['facegpurenderer',['FaceGpuRenderer',['../classop_1_1_face_gpu_renderer.html#a344b4f1d256d6ad805273eb8ba29cde1',1,'op::FaceGpuRenderer']]],
   ['fastmax',['fastMax',['../namespaceop.html#a9f4b99449c0c73e2c89ee1a1eff007c7',1,'op']]],
   ['fastmin',['fastMin',['../namespaceop.html#a6e1d1f90ef06cc7af576fdaad4b4e320',1,'op']]],

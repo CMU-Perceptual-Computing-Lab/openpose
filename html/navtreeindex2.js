@@ -1,5 +1,7 @@
 var NAVTREEINDEX2 =
 {
+"classop_1_1_worker.html#ae45ac828f6e8f6055203c224e50f145b":[1,0,0,81,5],
+"classop_1_1_worker_consumer.html":[1,0,0,82],
 "classop_1_1_worker_consumer.html#a26cf5c40df363d94d603fce92a5b69eb":[1,0,0,82,2],
 "classop_1_1_worker_consumer.html#a7383747b3bdc6ac79e6f9afbf2c28d27":[1,0,0,82,1],
 "classop_1_1_worker_consumer.html#a9aaa75f194df6b3ed4994c8e95aa0ab5":[1,0,0,82,0],
@@ -247,7 +249,5 @@ var NAVTREEINDEX2 =
 "gui_info_adder_8hpp_source.html":[2,0,0,0,4,3],
 "hand_2headers_8hpp.html":[2,0,0,0,5,7],
 "hand_2headers_8hpp_source.html":[2,0,0,0,5,7],
-"hand_cpu_renderer_8hpp.html":[2,0,0,0,5,0],
-"hand_cpu_renderer_8hpp_source.html":[2,0,0,0,5,0],
-"hand_detector_8hpp.html":[2,0,0,0,5,1]
+"hand_cpu_renderer_8hpp.html":[2,0,0,0,5,0]
 };

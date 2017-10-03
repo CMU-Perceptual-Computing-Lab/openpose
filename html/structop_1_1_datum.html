@@ -167,11 +167,15 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a0b2f6955a1751fc79b107789272effad"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aebd19bf50725a5cd87de1efd96f6ebfe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structop_1_1_datum.html#aebd19bf50725a5cd87de1efd96f6ebfe">faceKeypoints</a></td></tr>
 <tr class="separator:aebd19bf50725a5cd87de1efd96f6ebfe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae0c0f33a6b75c7f47e11112dd33f23c1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structop_1_1_datum.html#ae0c0f33a6b75c7f47e11112dd33f23c1">faceHeatMaps</a></td></tr>
+<tr class="separator:ae0c0f33a6b75c7f47e11112dd33f23c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a52d75e3273490624414f0602785bb608"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::array<br class="typebreak"/>
 &lt; <a class="el" href="structop_1_1_rectangle.html">Rectangle</a>&lt; float &gt;, 2 &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structop_1_1_datum.html#a52d75e3273490624414f0602785bb608">handRectangles</a></td></tr>
 <tr class="separator:a52d75e3273490624414f0602785bb608"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a59d455dbddc50d700809c5e102c40d4e"><td class="memItemLeft" align="right" valign="top">std::array&lt; <a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt;, 2 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structop_1_1_datum.html#a59d455dbddc50d700809c5e102c40d4e">handKeypoints</a></td></tr>
 <tr class="separator:a59d455dbddc50d700809c5e102c40d4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aef6c478313691ab5101664c1df55aa58"><td class="memItemLeft" align="right" valign="top">std::array&lt; <a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt;, 2 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structop_1_1_datum.html#aef6c478313691ab5101664c1df55aa58">handHeatMaps</a></td></tr>
+<tr class="separator:aef6c478313691ab5101664c1df55aa58"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6546c11ca264fdeab4a5f21104f8a8b2"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structop_1_1_datum.html#a6546c11ca264fdeab4a5f21104f8a8b2">scaleInputToOutput</a></td></tr>
 <tr class="separator:a6546c11ca264fdeab4a5f21104f8a8b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4eec45a7f4b8bc017736b41096327043"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structop_1_1_datum.html#a4eec45a7f4b8bc017736b41096327043">scaleNetToOutput</a></td></tr>
@@ -576,6 +580,19 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="ae0c0f33a6b75c7f47e11112dd33f23c1"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classop_1_1_array.html">Array</a>&lt;float&gt; op::Datum::faceHeatMaps</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Face pose heatmaps (face parts and/or background) for the whole image. Analogous of bodyHeatMaps applied to face. However, there is no PAFs and the size is different. Size: #people x #face parts (70) x output_net_height x output_net_width </p>
+
+</div>
+</div>
 <a class="anchor" id="aebd19bf50725a5cd87de1efd96f6ebfe"></a>
 <div class="memitem">
 <div class="memproto">
@@ -602,6 +619,19 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="aef6c478313691ab5101664c1df55aa58"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::array&lt;<a class="el" href="classop_1_1_array.html">Array</a>&lt;float&gt;, 2&gt; op::Datum::handHeatMaps</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Face pose heatmaps (hand parts and/or background) for the whole image. Analogous of faceHeatMaps applied to face. Size each <a class="el" href="classop_1_1_array.html">Array</a>: #people x #hand parts (21) x output_net_height x output_net_width </p>
+
+</div>
+</div>
 <a class="anchor" id="a59d455dbddc50d700809c5e102c40d4e"></a>
 <div class="memitem">
 <div class="memproto">
@@ -611,7 +641,7 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Hand keypoints (x,y,score) locations for each person in the image. It has been resized to the same resolution as <code>poseKeypoints</code>. handKeypoints[0] corresponds to left hands, and handKeypoints[1] to right ones. Size: #people x #hand parts (21) x 3 ((x,y) coordinates + score) </p>
+<p>Hand keypoints (x,y,score) locations for each person in the image. It has been resized to the same resolution as <code>poseKeypoints</code>. handKeypoints[0] corresponds to left hands, and handKeypoints[1] to right ones. Size each <a class="el" href="classop_1_1_array.html">Array</a>: #people x #hand parts (21) x 3 ((x,y) coordinates + score) </p>
 
 </div>
 </div>

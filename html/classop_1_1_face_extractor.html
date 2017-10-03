@@ -117,17 +117,19 @@ $(document).ready(function(){initNavTree('classop_1_1_face_extractor.html','');}
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aa2c31df663d2bb2e4d965833bb8270a8"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_face_extractor.html#aa2c31df663d2bb2e4d965833bb8270a8">FaceExtractor</a> (const <a class="el" href="structop_1_1_point.html">Point</a>&lt; int &gt; &amp;netInputSize, const <a class="el" href="structop_1_1_point.html">Point</a>&lt; int &gt; &amp;netOutputSize, const std::string &amp;modelFolder, const int gpuId)</td></tr>
-<tr class="separator:aa2c31df663d2bb2e4d965833bb8270a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a04b4cd08bc5cbba132be73368890af02"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_face_extractor.html#a04b4cd08bc5cbba132be73368890af02">FaceExtractor</a> (const <a class="el" href="structop_1_1_point.html">Point</a>&lt; int &gt; &amp;netInputSize, const <a class="el" href="structop_1_1_point.html">Point</a>&lt; int &gt; &amp;netOutputSize, const std::string &amp;modelFolder, const int gpuId, const std::vector&lt; <a class="el" href="namespaceop.html#a1c3dbc214e7552f7ef9cc753ee97226b">HeatMapType</a> &gt; &amp;heatMapTypes={}, const <a class="el" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bda">ScaleMode</a> heatMapScale=<a class="el" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bdaa4b942544cb3e764bbb8d33f8a8744855">ScaleMode::ZeroToOne</a>)</td></tr>
+<tr class="separator:a04b4cd08bc5cbba132be73368890af02"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2692c0040bb8c0b84a84d195194d037a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_face_extractor.html#a2692c0040bb8c0b84a84d195194d037a">initializationOnThread</a> ()</td></tr>
 <tr class="separator:a2692c0040bb8c0b84a84d195194d037a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a557850c549e3972916e833f9ffea99e1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_face_extractor.html#a557850c549e3972916e833f9ffea99e1">forwardPass</a> (const std::vector&lt; <a class="el" href="structop_1_1_rectangle.html">Rectangle</a>&lt; float &gt;&gt; &amp;faceRectangles, const cv::Mat &amp;cvInputData, const float scaleInputToOutput)</td></tr>
 <tr class="separator:a557850c549e3972916e833f9ffea99e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a13d7920f4029a4aa6d63b3609956c475"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_face_extractor.html#a13d7920f4029a4aa6d63b3609956c475">getFaceKeypoints</a> () const </td></tr>
 <tr class="separator:a13d7920f4029a4aa6d63b3609956c475"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af326457ed8977781fe48f1086ac5efee"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_face_extractor.html#af326457ed8977781fe48f1086ac5efee">getHeatMaps</a> () const </td></tr>
+<tr class="separator:af326457ed8977781fe48f1086ac5efee"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="aa2c31df663d2bb2e4d965833bb8270a8"></a>
+<a class="anchor" id="a04b4cd08bc5cbba132be73368890af02"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -156,7 +158,19 @@ Public Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const int&#160;</td>
-          <td class="paramname"><em>gpuId</em>&#160;</td>
+          <td class="paramname"><em>gpuId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; <a class="el" href="namespaceop.html#a1c3dbc214e7552f7ef9cc753ee97226b">HeatMapType</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>heatMapTypes</em> = <code>{}</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bda">ScaleMode</a>&#160;</td>
+          <td class="paramname"><em>heatMapScale</em> = <code><a class="el" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bdaa4b942544cb3e764bbb8d33f8a8744855">ScaleMode::ZeroToOne</a></code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -212,6 +226,21 @@ Public Member Functions</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="classop_1_1_array.html">Array</a>&lt;float&gt; op::FaceExtractor::getFaceKeypoints </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="af326457ed8977781fe48f1086ac5efee"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classop_1_1_array.html">Array</a>&lt;float&gt; op::FaceExtractor::getHeatMaps </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
