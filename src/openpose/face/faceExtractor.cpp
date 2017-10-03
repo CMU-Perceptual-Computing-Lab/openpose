@@ -9,14 +9,15 @@
 
 namespace op
 {
-    void updateHeatMapsForPerson(Array<float>& heatMaps, const int person, const ScaleMode heatMapScaleMode, const float* heatMapsGpuPtr)
+    void updateFaceHeatMapsForPerson(Array<float>& heatMaps, const int person, const ScaleMode heatMapScaleMode,
+                                     const float* heatMapsGpuPtr)
     {
         try
         {
             // Copy memory
             const auto channelOffset = heatMaps.getVolume(2, 3);
             const auto volumeBodyParts = FACE_NUMBER_PARTS * channelOffset;
-            unsigned int totalOffset = 0u;
+            auto totalOffset = 0u;
             auto* heatMapsPtr = &heatMaps.getPtr()[person*volumeBodyParts];
             // Copy face parts
             cudaMemcpy(heatMapsPtr, heatMapsGpuPtr, volumeBodyParts * sizeof(float), cudaMemcpyDeviceToHost);
@@ -40,11 +41,12 @@ namespace op
         }
     }
 
-    FaceExtractor::FaceExtractor(const Point<int>& netInputSize, const Point<int>& netOutputSize, const std::string& modelFolder,
-                                 const int gpuId, const std::vector<HeatMapType>& heatMapTypes, const ScaleMode heatMapScale) :
+    FaceExtractor::FaceExtractor(const Point<int>& netInputSize, const Point<int>& netOutputSize,
+                                 const std::string& modelFolder, const int gpuId,
+                                 const std::vector<HeatMapType>& heatMapTypes, const ScaleMode heatMapScale) :
         mNetOutputSize{netOutputSize},
-        spNet{std::make_shared<NetCaffe>(std::array<int,4>{1, 3, mNetOutputSize.y, mNetOutputSize.x}, modelFolder + FACE_PROTOTXT,
-                                         modelFolder + FACE_TRAINED_MODEL, gpuId)},
+        spNet{std::make_shared<NetCaffe>(std::array<int,4>{1, 3, mNetOutputSize.y, mNetOutputSize.x},
+                                         modelFolder + FACE_PROTOTXT, modelFolder + FACE_TRAINED_MODEL, gpuId)},
         spResizeAndMergeCaffe{std::make_shared<ResizeAndMergeCaffe<float>>()},
         spMaximumCaffe{std::make_shared<MaximumCaffe<float>>()},
         mFaceImageCrop{mNetOutputSize.area()*3},
@@ -54,11 +56,16 @@ namespace op
         try
         {
             // Error check
-            if (mHeatMapScaleMode != ScaleMode::ZeroToOne && mHeatMapScaleMode != ScaleMode::PlusMinusOne && mHeatMapScaleMode != ScaleMode::UnsignedChar)
-                error("The ScaleMode heatMapScale must be ZeroToOne, PlusMinusOne or UnsignedChar.", __LINE__, __FUNCTION__, __FILE__);
-            checkE(netOutputSize.x, netInputSize.x, "Net input and output size must be equal.", __LINE__, __FUNCTION__, __FILE__);
-            checkE(netOutputSize.y, netInputSize.y, "Net input and output size must be equal.", __LINE__, __FUNCTION__, __FILE__);
-            checkE(netInputSize.x, netInputSize.y, "Net input size must be squared.", __LINE__, __FUNCTION__, __FILE__);
+            if (mHeatMapScaleMode != ScaleMode::ZeroToOne && mHeatMapScaleMode != ScaleMode::PlusMinusOne
+                && mHeatMapScaleMode != ScaleMode::UnsignedChar)
+                error("The ScaleMode heatMapScale must be ZeroToOne, PlusMinusOne or UnsignedChar.",
+                      __LINE__, __FUNCTION__, __FILE__);
+            checkE(netOutputSize.x, netInputSize.x, "Net input and output size must be equal.",
+                   __LINE__, __FUNCTION__, __FILE__);
+            checkE(netOutputSize.y, netInputSize.y, "Net input and output size must be equal.",
+                   __LINE__, __FUNCTION__, __FILE__);
+            checkE(netInputSize.x, netInputSize.y, "Net input size must be squared.",
+                   __LINE__, __FUNCTION__, __FILE__);
             // Warnings
             if (!mHeatMapTypes.empty())
                 log("Note only keypoint heatmaps are available with face heatmaps (no background nor PAFs).",
@@ -85,7 +92,8 @@ namespace op
             // HeatMaps extractor blob and layer
             spHeatMapsBlob = {std::make_shared<caffe::Blob<float>>(1,1,1,1)};
             const bool mergeFirstDimension = true;
-            spResizeAndMergeCaffe->Reshape({spCaffeNetOutputBlob.get()}, {spHeatMapsBlob.get()}, FACE_CCN_DECREASE_FACTOR, mergeFirstDimension);
+            spResizeAndMergeCaffe->Reshape({spCaffeNetOutputBlob.get()}, {spHeatMapsBlob.get()},
+                                            FACE_CCN_DECREASE_FACTOR, mergeFirstDimension);
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
             // Pose extractor blob and layer
             spPeaksBlob = {std::make_shared<caffe::Blob<float>>(1,1,1,1)};
@@ -100,7 +108,8 @@ namespace op
         }
     }
 
-    void FaceExtractor::forwardPass(const std::vector<Rectangle<float>>& faceRectangles, const cv::Mat& cvInputData, const float scaleInputToOutput)
+    void FaceExtractor::forwardPass(const std::vector<Rectangle<float>>& faceRectangles, const cv::Mat& cvInputData,
+                                    const float scaleInputToOutput)
     {
         try
         {
@@ -142,7 +151,8 @@ namespace op
                         // log(std::to_string(cvInputData.cols) + " " + std::to_string(cvInputData.rows));
                         // cv::rectangle(cvInputDataCopy,
                         //               cv::Point{(int)faceRectangle.x, (int)faceRectangle.y},
-                        //               cv::Point{(int)faceRectangle.bottomRight().x, (int)faceRectangle.bottomRight().y},
+                        //               cv::Point{(int)faceRectangle.bottomRight().x,
+                        //                         (int)faceRectangle.bottomRight().y},
                         //               cv::Scalar{0,255,0}, 2);
                         // Resize and shift image to face rectangle positions
                         const auto faceSize = fastMax(faceRectangle.width, faceRectangle.height);
@@ -166,7 +176,8 @@ namespace op
 
                         // 1. Caffe deep network
                         auto* inputDataGpuPtr = spNet->getInputDataGpuPtr();
-                        cudaMemcpy(inputDataGpuPtr, mFaceImageCrop.getPtr(), mNetOutputSize.area() * 3 * sizeof(float), cudaMemcpyHostToDevice);
+                        cudaMemcpy(inputDataGpuPtr, mFaceImageCrop.getPtr(), mNetOutputSize.area() * 3 * sizeof(float),
+                                   cudaMemcpyHostToDevice);
                         spNet->forwardPass();
 
                         // 2. Resize heat maps + merge different scales
@@ -192,7 +203,8 @@ namespace op
                             const auto x = facePeaksPtr[xyIndex];
                             const auto y = facePeaksPtr[xyIndex + 1];
                             const auto score = facePeaksPtr[xyIndex + 2];
-                            const auto baseIndex = mFaceKeypoints.getSize(2) * (part + person * mFaceKeypoints.getSize(1));
+                            const auto baseIndex = mFaceKeypoints.getSize(2)
+                                                 * (part + person * mFaceKeypoints.getSize(1));
                             mFaceKeypoints[baseIndex] = (float)(scaleInputToOutput * (Mscaling.at<double>(0,0) * x
                                                                                       + Mscaling.at<double>(0,1) * y
                                                                                       + Mscaling.at<double>(0,2)));
@@ -201,10 +213,10 @@ namespace op
                                                                                       + Mscaling.at<double>(1,2)));
                             mFaceKeypoints[baseIndex+2] = score;
                         }
-
                         // HeatMaps: storing
                         if (!mHeatMapTypes.empty())
-                            updateHeatMapsForPerson(mHeatMaps, person, mHeatMapScaleMode, spHeatMapsBlob->gpu_data());
+                            updateFaceHeatMapsForPerson(mHeatMaps, person, mHeatMapScaleMode,
+                                                        spHeatMapsBlob->gpu_data());
                     }
                 }
                 // // Debugging
@@ -233,19 +245,6 @@ namespace op
         }
     }
 
-    void FaceExtractor::checkThread() const
-    {
-        try
-        {
-            if (mThreadId != std::this_thread::get_id())
-                error("The CPU/GPU pointer data cannot be accessed from a different thread.", __LINE__, __FUNCTION__, __FILE__);
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-        }
-    }
-
     Array<float> FaceExtractor::getHeatMaps() const
     {
         try
@@ -256,7 +255,21 @@ namespace op
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return mHeatMaps;
+            return Array<float>{};
+        }
+    }
+
+    void FaceExtractor::checkThread() const
+    {
+        try
+        {
+            if (mThreadId != std::this_thread::get_id())
+                error("The CPU/GPU pointer data cannot be accessed from a different thread.",
+                      __LINE__, __FUNCTION__, __FILE__);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
     }
 }

@@ -15,12 +15,15 @@ namespace op
     class OP_API FaceExtractor
     {
     public:
-        explicit FaceExtractor(const Point<int>& netInputSize, const Point<int>& netOutputSize, const std::string& modelFolder, const int gpuId,
-                               const std::vector<HeatMapType>& heatMapTypes = {}, const ScaleMode heatMapScale = ScaleMode::ZeroToOne);
+        explicit FaceExtractor(const Point<int>& netInputSize, const Point<int>& netOutputSize,
+                               const std::string& modelFolder, const int gpuId,
+                               const std::vector<HeatMapType>& heatMapTypes = {},
+                               const ScaleMode heatMapScale = ScaleMode::ZeroToOne);
 
         void initializationOnThread();
 
-        void forwardPass(const std::vector<Rectangle<float>>& faceRectangles, const cv::Mat& cvInputData, const float scaleInputToOutput);
+        void forwardPass(const std::vector<Rectangle<float>>& faceRectangles, const cv::Mat& cvInputData,
+                         const float scaleInputToOutput);
 
         Array<float> getFaceKeypoints() const;
 
