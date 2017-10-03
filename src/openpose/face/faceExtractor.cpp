@@ -6,7 +6,7 @@
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/openCv.hpp>
 #include <openpose/face/faceExtractor.hpp>
- 
+
 namespace op
 {
     FaceExtractor::FaceExtractor(const Point<int>& netInputSize, const Point<int>& netOutputSize, const std::string& modelFolder,
@@ -17,13 +17,13 @@ namespace op
         spResizeAndMergeCaffe{std::make_shared<ResizeAndMergeCaffe<float>>()},
         spMaximumCaffe{std::make_shared<MaximumCaffe<float>>()},
         mFaceImageCrop{mNetOutputSize.area()*3},
-	mHeatMapScaleMode{heatMapScale},
-	mDownloadHeatmaps{downloadHeatmaps}
+        mHeatMapScaleMode{heatMapScale},
+        mDownloadHeatmaps{downloadHeatmaps}
 
     {
         try
         {
-	    // Error check
+            // Error check
             if (mHeatMapScaleMode != ScaleMode::ZeroToOne && mHeatMapScaleMode != ScaleMode::PlusMinusOne && mHeatMapScaleMode != ScaleMode::UnsignedChar)
                 error("The ScaleMode heatMapScale must be ZeroToOne, PlusMinusOne or UnsignedChar.", __LINE__, __FUNCTION__, __FILE__);
 
@@ -42,26 +42,26 @@ namespace op
         try
         {
             log("Starting initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
- 
+
             // Get thread id
             mThreadId = {std::this_thread::get_id()};
- 
+
             // Caffe net
             spNet->initializationOnThread();
             spCaffeNetOutputBlob = ((NetCaffe*)spNet.get())->getOutputBlob();
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
- 
+
             // HeatMaps extractor blob and layer
             spHeatMapsBlob = {std::make_shared<caffe::Blob<float>>(1,1,1,1)};
             const bool mergeFirstDimension = true;
             spResizeAndMergeCaffe->Reshape({spCaffeNetOutputBlob.get()}, {spHeatMapsBlob.get()}, FACE_CCN_DECREASE_FACTOR, mergeFirstDimension);
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
- 
+
             // Pose extractor blob and layer
             spPeaksBlob = {std::make_shared<caffe::Blob<float>>(1,1,1,1)};
             spMaximumCaffe->Reshape({spHeatMapsBlob.get()}, {spPeaksBlob.get()});
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
- 
+
             log("Finished initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
         }
         catch (const std::exception& e)
@@ -87,10 +87,8 @@ namespace op
                 const auto numberPeople = (int)faceRectangles.size();
                 mFaceKeypoints.reset({numberPeople, (int)FACE_NUMBER_PARTS, 3}, 0);
 
-		if(mDownloadHeatmaps)
-		{
-		    mHeatmaps.resize(numberPeople);
-		}
+                if(mDownloadHeatmaps)
+                    mHeatmaps.resize(numberPeople);
 
                 // // Debugging
                 // cv::Mat cvInputDataCopy = cvInputData.clone();
@@ -139,7 +137,7 @@ namespace op
                         auto* inputDataGpuPtr = spNet->getInputDataGpuPtr();
                         cudaMemcpy(inputDataGpuPtr, mFaceImageCrop.getPtr(), mNetOutputSize.area() * 3 * sizeof(float), cudaMemcpyHostToDevice);
                         spNet->forwardPass();
-     
+
                         // 2. Resize heat maps + merge different scales
                         #ifndef CPU_ONLY
                             spResizeAndMergeCaffe->Forward_gpu({spCaffeNetOutputBlob.get()}, {spHeatMapsBlob.get()});
@@ -147,7 +145,7 @@ namespace op
                         #else
                             spResizeAndMergeCaffe->Forward_cpu({spCaffeNetOutputBlob.get()}, {spHeatMapsBlob.get()});
                         #endif
-     
+
                         // 3. Get peaks by Non-Maximum Suppression
                         #ifndef CPU_ONLY
                             spMaximumCaffe->Forward_gpu({spHeatMapsBlob.get()}, {spPeaksBlob.get()});
@@ -155,7 +153,7 @@ namespace op
                         #else
                             spMaximumCaffe->Forward_cpu({spHeatMapsBlob.get()}, {spPeaksBlob.get()});
                         #endif
-     
+
                         const auto* facePeaksPtr = spPeaksBlob->mutable_cpu_data();
                         for (auto part = 0 ; part < mFaceKeypoints.getSize(1) ; part++)
                         {
@@ -172,12 +170,10 @@ namespace op
                                                                                       + Mscaling.at<double>(1,2)));
                             mFaceKeypoints[baseIndex+2] = score;
                         }
-                        
-			// recover face heatmaps
-			if(mDownloadHeatmaps)
-			{
-			    mHeatmaps.at(person) = getHeatMapsFromLastPass();
-			}
+
+                        // recover face heatmaps
+                        if(mDownloadHeatmaps)
+                            mHeatmaps.at(person) = getHeatMapsFromLastPass();
                     }
                 }
                 // // Debugging
@@ -218,7 +214,7 @@ namespace op
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
     }
-    
+
     const float* FaceExtractor::getHeatMapGpuConstPtr() const
     {
         try
@@ -232,27 +228,25 @@ namespace op
             return nullptr;
         }
     }
-    
+
     Array<float> FaceExtractor::getHeatMaps(unsigned int personIndex) const
     {
-	
-	// Error check
-	if(!mDownloadHeatmaps)
-	{
-	    error("Enable downloadHeatmaps on the constructor before calling getHeatMaps", __LINE__, __FUNCTION__, __FILE__);
-	    return Array<float>{};
-	}
-	
-	if (personIndex>mHeatmaps.size())
-	{
-	    error("Invalid person index", __LINE__, __FUNCTION__, __FILE__);
-	    return Array<float>{};
-	}
-	if(mHeatmaps.size()==0) return Array<float>{};
-	
-	return mHeatmaps.at(personIndex);
-    }
+        // Error check
+        if(!mDownloadHeatmaps)
+        {
+            error("Enable downloadHeatmaps on the constructor before calling getHeatMaps", __LINE__, __FUNCTION__, __FILE__);
+            return Array<float>{};
+        }
+        if (personIndex>mHeatmaps.size())
+        {
+            error("Invalid person index", __LINE__, __FUNCTION__, __FILE__);
+            return Array<float>{};
+        }
+        if(mHeatmaps.size()==0)
+            return Array<float>{};
 
+    return mHeatmaps.at(personIndex);
+    }
 
     Array<float> FaceExtractor::getHeatMapsFromLastPass() const
     {
@@ -260,31 +254,31 @@ namespace op
         {
             checkThread();
             Array<float> poseHeatMaps;
- 	    // Allocate memory
-	    const auto numberHeatMapChannels = FACE_NUMBER_PARTS; // all face parts 
-	    poseHeatMaps.reset({numberHeatMapChannels, mNetOutputSize.y, mNetOutputSize.x});
+            // Allocate memory
+            const auto numberHeatMapChannels = FACE_NUMBER_PARTS; // all face parts
+            poseHeatMaps.reset({numberHeatMapChannels, mNetOutputSize.y, mNetOutputSize.x});
 
-	    // Copy memory
-	    const auto channelOffset = poseHeatMaps.getVolume(1, 2);
-	    const auto volumeBodyParts = FACE_NUMBER_PARTS * channelOffset;
-	    unsigned int totalOffset = 0u;
-	    // copy hand parts 
-	    {
-		cudaMemcpy(poseHeatMaps.getPtr(), getHeatMapGpuConstPtr(), volumeBodyParts * sizeof(float), cudaMemcpyDeviceToHost);
-		// Change from [0,1] to [-1,1]
-		if (mHeatMapScaleMode == ScaleMode::PlusMinusOne)
-		    for (auto i = 0u ; i < volumeBodyParts ; i++)
-			poseHeatMaps[i] = fastTruncate(poseHeatMaps[i]) * 2.f - 1.f;
-		    // [0, 255]
-		else if (mHeatMapScaleMode == ScaleMode::UnsignedChar)
-		    for (auto i = 0u ; i < volumeBodyParts ; i++)
-			poseHeatMaps[i] = (float)intRound(fastTruncate(poseHeatMaps[i]) * 255.f);
-		    // Avoid values outside original range
-		else
-		    for (auto i = 0u ; i < volumeBodyParts ; i++)
-			poseHeatMaps[i] = fastTruncate(poseHeatMaps[i]);
-		totalOffset += (unsigned int)volumeBodyParts;
-	    }
+            // Copy memory
+            const auto channelOffset = poseHeatMaps.getVolume(1, 2);
+            const auto volumeBodyParts = FACE_NUMBER_PARTS * channelOffset;
+            unsigned int totalOffset = 0u;
+            // copy hand parts
+            {
+                cudaMemcpy(poseHeatMaps.getPtr(), getHeatMapGpuConstPtr(), volumeBodyParts * sizeof(float), cudaMemcpyDeviceToHost);
+                // Change from [0,1] to [-1,1]
+                if (mHeatMapScaleMode == ScaleMode::PlusMinusOne)
+                    for (auto i = 0u ; i < volumeBodyParts ; i++)
+                        poseHeatMaps[i] = fastTruncate(poseHeatMaps[i]) * 2.f - 1.f;
+                // [0, 255]
+                else if (mHeatMapScaleMode == ScaleMode::UnsignedChar)
+                    for (auto i = 0u ; i < volumeBodyParts ; i++)
+                        poseHeatMaps[i] = (float)intRound(fastTruncate(poseHeatMaps[i]) * 255.f);
+                // Avoid values outside original range
+                else
+                    for (auto i = 0u ; i < volumeBodyParts ; i++)
+                        poseHeatMaps[i] = fastTruncate(poseHeatMaps[i]);
+                totalOffset += (unsigned int)volumeBodyParts;
+            }
             return poseHeatMaps;
         }
         catch (const std::exception& e)
@@ -293,5 +287,4 @@ namespace op
             return Array<float>{};
         }
     }
-
 }
