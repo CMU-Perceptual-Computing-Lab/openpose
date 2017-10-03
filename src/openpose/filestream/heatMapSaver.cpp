@@ -27,7 +27,7 @@ namespace op
             if (!heatMaps.empty())
             {
                 // File path (no extension)
-                const auto fileNameNoExtension = getNextFileName(fileName) + "_heatmaps";
+                const auto fileNameNoExtension = getNextFileName(fileName);
 
                 // Get names for each heatMap
                 std::vector<std::string> fileNames(heatMaps.size());

@@ -59,8 +59,8 @@ namespace op
                 for (auto& tDatum : *tDatums)
                 {
                     spPoseExtractor->forwardPass(tDatum.inputNetData, Point<int>{tDatum.cvInputData.cols, tDatum.cvInputData.rows}, tDatum.scaleRatios);
-                    tDatum.poseHeatMaps = spPoseExtractor->getHeatMaps();
-                    tDatum.poseKeypoints = spPoseExtractor->getPoseKeypoints();
+                    tDatum.poseHeatMaps = spPoseExtractor->getHeatMaps().clone();
+                    tDatum.poseKeypoints = spPoseExtractor->getPoseKeypoints().clone();
                     tDatum.scaleNetToOutput = spPoseExtractor->getScaleNetToOutput();
                 }
                 // Profiling speed
