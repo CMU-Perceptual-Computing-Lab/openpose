@@ -120,10 +120,11 @@ OpenPose Library - Release Notes
         1. FrameDisplayer accepts variable size images by rescaling every time a frame with bigger width or height is displayed (gui module).
         2. OpOutputToCvMat & GuiInfoAdder does not require to know the output size at construction time, deduced from each image.
         3. CvMatToOutput and Renderers allow to keep input resolution as output for images (core module).
-    3. Face and hand keypoint detectors now can return each keypoint heatmap.
-    4. COCO JSON file outputs 0 as score for non-detected keypoints.
-    5. Added example for OpenPose for user asynchronous output and cleaned all `tutorial_wrapper/` examples.
-    6. Added `-1` option for `net_resolution` in order to auto-select the best possible aspect ratio given the user input.
+    3. New standalone face keypoint detector based on OpenCV face detector: much faster if body keypoint detection is not required but much less accurate.
+    4. Face and hand keypoint detectors now can return each keypoint heatmap.
+    5. COCO JSON file outputs 0 as score for non-detected keypoints.
+    6. Added example for OpenPose for user asynchronous output and cleaned all `tutorial_wrapper/` examples.
+    7. Added `-1` option for `net_resolution` in order to auto-select the best possible aspect ratio given the user input.
 2. Functions or parameters renamed:
     1. OpenPose able to change its size and initial size:
         1. Flag `resolution` renamed as `output_resolution`.

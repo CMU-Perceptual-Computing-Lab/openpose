@@ -524,6 +524,14 @@ namespace op
             if (!wrapperStructOutput.writeVideo.empty() && wrapperStructInput.producerSharedPtr == nullptr)
                 error("Writting video is only available if the OpenPose producer is used (i.e."
                       " wrapperStructInput.producerSharedPtr cannot be a nullptr).", __LINE__, __FUNCTION__, __FILE__);
+            if (!wrapperStructPose.enable)
+            {
+                if (!wrapperStructFace.enable)
+                    error("Body keypoint detection must be enabled.", __LINE__, __FUNCTION__, __FILE__);
+                if (wrapperStructHand.enable)
+                    error("Body keypoint detection must be enabled in order to run hand keypoint detection.",
+                          __LINE__, __FUNCTION__, __FILE__);
+            }
 
             // Get number GPUs
             auto gpuNumber = wrapperStructPose.gpuNumber;
@@ -545,6 +553,7 @@ namespace op
             const auto writeKeypointCleaned = formatAsDirectory(wrapperStructOutput.writeKeypoint);
             const auto writeKeypointJsonCleaned = formatAsDirectory(wrapperStructOutput.writeKeypointJson);
             const auto writeHeatMapsCleaned = formatAsDirectory(wrapperStructOutput.writeHeatMaps);
+            const auto modelFolder = formatAsDirectory(wrapperStructPose.modelFolder);
 
             // Common parameters
             auto finalOutputSize = wrapperStructPose.outputSize;
@@ -597,46 +606,50 @@ namespace op
             else
                 wDatumProducer = nullptr;
 
-            // Pose estimators
+            // Pose estimators & renderers
             const Point<int>& poseNetOutputSize = poseNetInputSize;
             std::vector<std::shared_ptr<PoseExtractor>> poseExtractors;
-            for (auto gpuId = 0; gpuId < gpuNumber; gpuId++)
-                poseExtractors.emplace_back(std::make_shared<PoseExtractorCaffe>(
-                    poseNetInputSize, poseNetOutputSize, finalOutputSize, wrapperStructPose.scalesNumber,
-                    wrapperStructPose.poseModel, wrapperStructPose.modelFolder, gpuId + gpuNumberStart,
-                    wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale
-                ));
-
-            // Pose renderers
             std::vector<std::shared_ptr<PoseGpuRenderer>> poseGpuRenderers;
             std::shared_ptr<PoseCpuRenderer> poseCpuRenderer;
             std::vector<TWorker> cpuRenderers;
-            if (renderOutputGpu || wrapperStructPose.renderMode == RenderMode::Cpu)
+            if (wrapperStructPose.enable)
             {
-                // If wrapperStructPose.renderMode != RenderMode::Gpu but renderOutput, then we create an alpha = 0
-                // pose renderer in order to keep the removing background option
-                const auto alphaKeypoint = (wrapperStructPose.renderMode != RenderMode::None
-                                            ? wrapperStructPose.alphaKeypoint : 0.f);
-                const auto alphaHeatMap = (wrapperStructPose.renderMode != RenderMode::None
-                                            ? wrapperStructPose.alphaHeatMap : 0.f);
-                // GPU rendering
-                if (renderOutputGpu)
+                // Pose estimators
+                for (auto gpuId = 0; gpuId < gpuNumber; gpuId++)
+                    poseExtractors.emplace_back(std::make_shared<PoseExtractorCaffe>(
+                        poseNetInputSize, poseNetOutputSize, finalOutputSize, wrapperStructPose.scalesNumber,
+                        wrapperStructPose.poseModel, modelFolder, gpuId + gpuNumberStart,
+                        wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale
+                    ));
+
+                // Pose renderers
+                if (renderOutputGpu || wrapperStructPose.renderMode == RenderMode::Cpu)
                 {
-                    for (auto gpuId = 0u; gpuId < poseExtractors.size(); gpuId++)
+                    // If wrapperStructPose.renderMode != RenderMode::Gpu but renderOutput, then we create an alpha = 0
+                    // pose renderer in order to keep the removing background option
+                    const auto alphaKeypoint = (wrapperStructPose.renderMode != RenderMode::None
+                                                ? wrapperStructPose.alphaKeypoint : 0.f);
+                    const auto alphaHeatMap = (wrapperStructPose.renderMode != RenderMode::None
+                                                ? wrapperStructPose.alphaHeatMap : 0.f);
+                    // GPU rendering
+                    if (renderOutputGpu)
                     {
-                        poseGpuRenderers.emplace_back(std::make_shared<PoseGpuRenderer>(
-                            poseNetOutputSize, wrapperStructPose.poseModel, poseExtractors[gpuId],
-                            wrapperStructPose.renderThreshold, wrapperStructPose.blendOriginalFrame, alphaKeypoint,
-                            alphaHeatMap, wrapperStructPose.defaultPartToRender
-                        ));
+                        for (auto gpuId = 0u; gpuId < poseExtractors.size(); gpuId++)
+                        {
+                            poseGpuRenderers.emplace_back(std::make_shared<PoseGpuRenderer>(
+                                poseNetOutputSize, wrapperStructPose.poseModel, poseExtractors[gpuId],
+                                wrapperStructPose.renderThreshold, wrapperStructPose.blendOriginalFrame, alphaKeypoint,
+                                alphaHeatMap, wrapperStructPose.defaultPartToRender
+                            ));
+                        }
                     }
-                }
-                // CPU rendering
-                if (wrapperStructPose.renderMode == RenderMode::Cpu)
-                {
-                    poseCpuRenderer = std::make_shared<PoseCpuRenderer>(wrapperStructPose.poseModel,
-                                                                        wrapperStructPose.blendOriginalFrame);
-                    cpuRenderers.emplace_back(std::make_shared<WPoseRenderer<TDatumsPtr>>(poseCpuRenderer));
+                    // CPU rendering
+                    if (wrapperStructPose.renderMode == RenderMode::Cpu)
+                    {
+                        poseCpuRenderer = std::make_shared<PoseCpuRenderer>(wrapperStructPose.poseModel,
+                                                                            wrapperStructPose.blendOriginalFrame);
+                        cpuRenderers.emplace_back(std::make_shared<WPoseRenderer<TDatumsPtr>>(poseCpuRenderer));
+                    }
                 }
             }
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
@@ -650,22 +663,46 @@ namespace op
             spWCvMatToOpOutput = std::make_shared<WCvMatToOpOutput<TDatumsPtr>>(cvMatToOpOutput);
 
             // Pose extractor(s)
-            spWPoses.resize(poseExtractors.size());
-            for (auto i = 0u; i < spWPoses.size(); i++)
-                spWPoses.at(i) = {std::make_shared<WPoseExtractor<TDatumsPtr>>(poseExtractors.at(i))};
+            if (wrapperStructPose.enable)
+            {
+                spWPoses.resize(poseExtractors.size());
+                for (auto i = 0u; i < spWPoses.size(); i++)
+                    spWPoses.at(i) = {std::make_shared<WPoseExtractor<TDatumsPtr>>(poseExtractors.at(i))};
+            }
+            else
+                spWPoses.resize(gpuNumber);
+
 
             // Face extractor(s)
             if (wrapperStructFace.enable)
             {
-                const auto faceDetector = std::make_shared<FaceDetector>(wrapperStructPose.poseModel);
+                // Face detector
+                // OpenPose face detector
+                if (wrapperStructPose.enable)
+                {
+                    const auto faceDetector = std::make_shared<FaceDetector>(wrapperStructPose.poseModel);
+                    for (auto gpu = 0u; gpu < spWPoses.size(); gpu++)
+                        spWPoses.at(gpu).emplace_back(std::make_shared<WFaceDetector<TDatumsPtr>>(faceDetector));
+                }
+                // OpenCV face detector
+                else
+                {
+                    log("Body keypoint detection is disabled. Hence, using OpenCV face detector (much less accurate"
+                        " but faster).", Priority::High);
+                    for (auto gpu = 0u; gpu < spWPoses.size(); gpu++)
+                    {
+                        // 1 FaceDetectorOpenCV per thread, OpenCV face detector is not thread-safe
+                        const auto faceDetectorOpenCV = std::make_shared<FaceDetectorOpenCV>(modelFolder);
+                        spWPoses.at(gpu).emplace_back(std::make_shared<WFaceDetectorOpenCV<TDatumsPtr>>(faceDetectorOpenCV));
+                    }
+                }
+                // Face keypoint extractor
                 for (auto gpu = 0u; gpu < spWPoses.size(); gpu++)
                 {
-                    // Face detector
-                    spWPoses.at(gpu).emplace_back(std::make_shared<WFaceDetector<TDatumsPtr>>(faceDetector));
                     // Face keypoint extractor
                     const auto netOutputSize = wrapperStructFace.netInputSize;
                     const auto faceExtractor = std::make_shared<FaceExtractor>(
-                        wrapperStructFace.netInputSize, netOutputSize, wrapperStructPose.modelFolder,
+                        wrapperStructFace.netInputSize, netOutputSize, modelFolder,
                         gpu + gpuNumberStart, wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale
                     );
                     spWPoses.at(gpu).emplace_back(std::make_shared<WFaceExtractor<TDatumsPtr>>(faceExtractor));
@@ -690,7 +727,7 @@ namespace op
                     // Hand keypoint extractor
                     const auto netOutputSize = wrapperStructHand.netInputSize;
                     const auto handExtractor = std::make_shared<HandExtractor>(
-                        wrapperStructHand.netInputSize, netOutputSize, wrapperStructPose.modelFolder,
+                        wrapperStructHand.netInputSize, netOutputSize, modelFolder,
                         gpu + gpuNumberStart, wrapperStructHand.scalesNumber, wrapperStructHand.scaleRange,
                         wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale
                     );

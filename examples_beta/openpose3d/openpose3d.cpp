@@ -47,6 +47,8 @@ DEFINE_int32(keypoint_scale,            0,              "Scaling of the (x,y) co
                                                         " `resolution`), `3` to scale it in the range [0,1], and 4 for range [-1,1]. Non related"
                                                         " with `scale_number` and `scale_gap`.");
 // OpenPose Body Pose
+DEFINE_bool(body_disable,               false,          "Disable body keypoint detection. Option only possible for faster (but less accurate) face"
+                                                        " keypoint detection.");
 DEFINE_string(model_pose,               "COCO",         "Model to be used. E.g. `COCO` (18 keypoints), `MPI` (15 keypoints, ~10% faster), "
                                                         "`MPI_4_layers` (15 keypoints, even faster but less accurate).");
 DEFINE_string(net_resolution,           "656x368",      "Multiples of 16. If it is increased, the accuracy potentially increases. If it is"
@@ -191,7 +193,7 @@ int openpose3d()
     const auto workerOutputOnNewThread = true;
     opWrapper.setWorkerOutput(wRender3D, workerOutputOnNewThread);
     // Configure OpenPose
-    const op::WrapperStructPose wrapperStructPose{netInputSize, outputSize, keypointScale, FLAGS_num_gpu,
+    const op::WrapperStructPose wrapperStructPose{!FLAGS_body_disable, netInputSize, outputSize, keypointScale, FLAGS_num_gpu,
                                                   FLAGS_num_gpu_start, FLAGS_scale_number, (float)FLAGS_scale_gap,
                                                   op::flagsToRenderMode(FLAGS_render_pose), poseModel,
                                                   !FLAGS_disable_blending, (float)FLAGS_alpha_pose,

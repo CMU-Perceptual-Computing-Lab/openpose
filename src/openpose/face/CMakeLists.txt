@@ -1,6 +1,7 @@
 set(SOURCES
     defineTemplates.cpp
     faceDetector.cpp
+    faceDetectorOpenCV.cpp
     faceExtractor.cpp
     faceCpuRenderer.cpp
     faceGpuRenderer.cpp
