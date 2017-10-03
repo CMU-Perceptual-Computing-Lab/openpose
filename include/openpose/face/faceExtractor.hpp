@@ -10,7 +10,6 @@
 #include <openpose/core/resizeAndMergeCaffe.hpp>
 #include <openpose/core/enumClasses.hpp>
 
-
 namespace op
 {
     class OP_API FaceExtractor
