@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>OpenPose: /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/face/headers.hpp File Reference</title>
+<title>OpenPose: /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/face/faceDetectorOpenCV.hpp Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -85,7 +85,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   </div>
 </div>
 <script type="text/javascript">
-$(document).ready(function(){initNavTree('face_2headers_8hpp.html','');});
+$(document).ready(function(){initNavTree('face_detector_open_c_v_8hpp_source.html','');});
 </script>
 <div id="doc-content">
 <!-- window showing the filter options -->
@@ -104,29 +104,44 @@ $(document).ready(function(){initNavTree('face_2headers_8hpp.html','');});
 
 <div class="header">
   <div class="headertitle">
-<div class="title">headers.hpp File Reference</div>  </div>
+<div class="title">faceDetectorOpenCV.hpp</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;<a class="el" href="face_detector_8hpp_source.html">openpose/face/faceDetector.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="face_detector_open_c_v_8hpp_source.html">openpose/face/faceDetectorOpenCV.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="face_extractor_8hpp_source.html">openpose/face/faceExtractor.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="face_parameters_8hpp_source.html">openpose/face/faceParameters.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="face_cpu_renderer_8hpp_source.html">openpose/face/faceCpuRenderer.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="face_gpu_renderer_8hpp_source.html">openpose/face/faceGpuRenderer.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="face_renderer_8hpp_source.html">openpose/face/faceRenderer.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="render_face_8hpp_source.html">openpose/face/renderFace.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="w_face_detector_8hpp_source.html">openpose/face/wFaceDetector.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="w_face_detector_open_c_v_8hpp_source.html">openpose/face/wFaceDetectorOpenCV.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="w_face_extractor_8hpp_source.html">openpose/face/wFaceExtractor.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="w_face_renderer_8hpp_source.html">openpose/face/wFaceRenderer.hpp</a>&gt;</code><br/>
-</div>
-<p><a href="face_2headers_8hpp_source.html">Go to the source code of this file.</a></p>
-</div><!-- contents -->
+<a href="face_detector_open_c_v_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#ifndef OPENPOSE_FACE_FACE_DETECTOR_OPENCV_HPP</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define OPENPOSE_FACE_FACE_DETECTOR_OPENCV_HPP</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;opencv2/core/core.hpp&gt;</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;opencv2/objdetect/objdetect.hpp&gt;</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="common_8hpp.html">openpose/core/common.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;</div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="keyword">namespace </span>op</div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;{</div>
+<div class="line"><a name="l00010"></a><span class="lineno"><a class="line" href="classop_1_1_face_detector_open_c_v.html">   10</a></span>&#160;    <span class="keyword">class </span><a class="code" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> <a class="code" href="classop_1_1_face_detector_open_c_v.html">FaceDetectorOpenCV</a></div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;    {</div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;        <span class="keyword">explicit</span> <a class="code" href="classop_1_1_face_detector_open_c_v.html">FaceDetectorOpenCV</a>(<span class="keyword">const</span> std::string&amp; modelFolder);</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;        <span class="comment">// No thread-save</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;        std::vector&lt;Rectangle&lt;float&gt;&gt; detectFaces(<span class="keyword">const</span> cv::Mat&amp; cvInputData);</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;        cv::CascadeClassifier mFaceCascade;</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;        <a class="code" href="macros_8hpp.html#abef96b5dd35dd9d44ad27ddf0e2f5f2e">DELETE_COPY</a>(<a class="code" href="classop_1_1_face_detector_open_c_v.html">FaceDetectorOpenCV</a>);</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    };</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;}</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#endif // OPENPOSE_FACE_FACE_DETECTOR_OPENCV_HPP</span></div>
+<div class="ttc" id="macros_8hpp_html_abef96b5dd35dd9d44ad27ddf0e2f5f2e"><div class="ttname"><a href="macros_8hpp.html#abef96b5dd35dd9d44ad27ddf0e2f5f2e">DELETE_COPY</a></div><div class="ttdeci">#define DELETE_COPY(className)</div><div class="ttdef"><b>Definition:</b> macros.hpp:25</div></div>
+<div class="ttc" id="classop_1_1_face_detector_open_c_v_html"><div class="ttname"><a href="classop_1_1_face_detector_open_c_v.html">op::FaceDetectorOpenCV</a></div><div class="ttdef"><b>Definition:</b> faceDetectorOpenCV.hpp:10</div></div>
+<div class="ttc" id="common_8hpp_html"><div class="ttname"><a href="common_8hpp.html">common.hpp</a></div></div>
+<div class="ttc" id="macros_8hpp_html_a4ba443bb7a0e5dbe8054a9ac37a5e000"><div class="ttname"><a href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a></div><div class="ttdeci">#define OP_API</div><div class="ttdef"><b>Definition:</b> macros.hpp:5</div></div>
+</div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_7f012205977c6890af7afa3b7477c2d1.html">include</a></li><li class="navelem"><a class="el" href="dir_18695feb986752a25b816536eab00e96.html">openpose</a></li><li class="navelem"><a class="el" href="dir_f405bd8e18e06aa171eb4c66f2ad61ec.html">face</a></li><li class="navelem"><a class="el" href="face_2headers_8hpp.html">headers.hpp</a></li>
+    <li class="navelem"><a class="el" href="dir_7f012205977c6890af7afa3b7477c2d1.html">include</a></li><li class="navelem"><a class="el" href="dir_18695feb986752a25b816536eab00e96.html">openpose</a></li><li class="navelem"><a class="el" href="dir_f405bd8e18e06aa171eb4c66f2ad61ec.html">face</a></li><li class="navelem"><a class="el" href="face_detector_open_c_v_8hpp.html">faceDetectorOpenCV.hpp</a></li>
     <li class="footer">Generated by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>

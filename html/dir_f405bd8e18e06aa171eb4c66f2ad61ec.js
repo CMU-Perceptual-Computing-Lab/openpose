@@ -6,6 +6,9 @@ var dir_f405bd8e18e06aa171eb4c66f2ad61ec =
     [ "faceDetector.hpp", "face_detector_8hpp.html", [
       [ "FaceDetector", "classop_1_1_face_detector.html", "classop_1_1_face_detector" ]
     ] ],
+    [ "faceDetectorOpenCV.hpp", "face_detector_open_c_v_8hpp.html", [
+      [ "FaceDetectorOpenCV", "classop_1_1_face_detector_open_c_v.html", "classop_1_1_face_detector_open_c_v" ]
+    ] ],
     [ "faceExtractor.hpp", "face_extractor_8hpp.html", [
       [ "FaceExtractor", "classop_1_1_face_extractor.html", "classop_1_1_face_extractor" ]
     ] ],
@@ -19,6 +22,7 @@ var dir_f405bd8e18e06aa171eb4c66f2ad61ec =
     [ "headers.hpp", "face_2headers_8hpp.html", null ],
     [ "renderFace.hpp", "render_face_8hpp.html", "render_face_8hpp" ],
     [ "wFaceDetector.hpp", "w_face_detector_8hpp.html", "w_face_detector_8hpp" ],
+    [ "wFaceDetectorOpenCV.hpp", "w_face_detector_open_c_v_8hpp.html", "w_face_detector_open_c_v_8hpp" ],
     [ "wFaceExtractor.hpp", "w_face_extractor_8hpp.html", "w_face_extractor_8hpp" ],
     [ "wFaceRenderer.hpp", "w_face_renderer_8hpp.html", "w_face_renderer_8hpp" ]
 ];

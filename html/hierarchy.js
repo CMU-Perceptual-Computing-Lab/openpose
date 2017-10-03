@@ -10,6 +10,7 @@ var hierarchy =
     [ "op::Datum", "structop_1_1_datum.html", null ],
     [ "op::DatumProducer< TDatumsNoPtr >", "classop_1_1_datum_producer.html", null ],
     [ "op::FaceDetector", "classop_1_1_face_detector.html", null ],
+    [ "op::FaceDetectorOpenCV", "classop_1_1_face_detector_open_c_v.html", null ],
     [ "op::FaceExtractor", "classop_1_1_face_extractor.html", null ],
     [ "op::FaceRenderer", "classop_1_1_face_renderer.html", [
       [ "op::FaceCpuRenderer", "classop_1_1_face_cpu_renderer.html", null ],
@@ -82,6 +83,7 @@ var hierarchy =
       [ "op::WCvMatToOpInput< TDatums >", "classop_1_1_w_cv_mat_to_op_input.html", null ],
       [ "op::WCvMatToOpOutput< TDatums >", "classop_1_1_w_cv_mat_to_op_output.html", null ],
       [ "op::WFaceDetector< TDatums >", "classop_1_1_w_face_detector.html", null ],
+      [ "op::WFaceDetectorOpenCV< TDatums >", "classop_1_1_w_face_detector_open_c_v.html", null ],
       [ "op::WFaceExtractor< TDatums >", "classop_1_1_w_face_extractor.html", null ],
       [ "op::WFaceRenderer< TDatums >", "classop_1_1_w_face_renderer.html", null ],
       [ "op::WGuiInfoAdder< TDatums >", "classop_1_1_w_gui_info_adder.html", null ],

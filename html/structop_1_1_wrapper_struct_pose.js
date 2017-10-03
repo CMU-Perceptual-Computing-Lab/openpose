@@ -1,10 +1,11 @@
 var structop_1_1_wrapper_struct_pose =
 [
-    [ "WrapperStructPose", "structop_1_1_wrapper_struct_pose.html#af01ce35fe6ae83b4a6c5d1607baa1697", null ],
+    [ "WrapperStructPose", "structop_1_1_wrapper_struct_pose.html#a13fc8197737fdb399df5b9ec0c091b4b", null ],
     [ "alphaHeatMap", "structop_1_1_wrapper_struct_pose.html#ac1233492c750fbd98df353bffa8f9b78", null ],
     [ "alphaKeypoint", "structop_1_1_wrapper_struct_pose.html#a4d3ad84b14697d5f1009fa29e2ff1998", null ],
     [ "blendOriginalFrame", "structop_1_1_wrapper_struct_pose.html#aa2cee9019b708d48cc18313615d0189e", null ],
     [ "defaultPartToRender", "structop_1_1_wrapper_struct_pose.html#ab6810e97aa62a728aa09dbbe6b9b6c06", null ],
+    [ "enable", "structop_1_1_wrapper_struct_pose.html#acad34562a52b7474f928a021b03a9f90", null ],
     [ "gpuNumber", "structop_1_1_wrapper_struct_pose.html#a536ea76d50e94d513066e9e5767d0c03", null ],
     [ "gpuNumberStart", "structop_1_1_wrapper_struct_pose.html#a8be188d871061079432ead77b278fe0d", null ],
     [ "heatMapScale", "structop_1_1_wrapper_struct_pose.html#abeb9ae450a7b37e76075c8dca64b3617", null ],

@@ -6,6 +6,7 @@ var searchData=
   ['wdatumproducer',['WDatumProducer',['../classop_1_1_w_datum_producer.html',1,'op']]],
   ['webcamreader',['WebcamReader',['../classop_1_1_webcam_reader.html',1,'op']]],
   ['wfacedetector',['WFaceDetector',['../classop_1_1_w_face_detector.html',1,'op']]],
+  ['wfacedetectoropencv',['WFaceDetectorOpenCV',['../classop_1_1_w_face_detector_open_c_v.html',1,'op']]],
   ['wfaceextractor',['WFaceExtractor',['../classop_1_1_w_face_extractor.html',1,'op']]],
   ['wfacerenderer',['WFaceRenderer',['../classop_1_1_w_face_renderer.html',1,'op']]],
   ['wfacesaver',['WFaceSaver',['../classop_1_1_w_face_saver.html',1,'op']]],
