@@ -679,6 +679,7 @@ namespace op
                     }
                 }
                 for (auto gpu = 0u; gpu < spWPoses.size(); gpu++)
+                {
                     // Face keypoint extractor
                     const auto netOutputSize = wrapperStructFace.netInputSize;
                     const auto faceExtractor = std::make_shared<FaceExtractor>(
