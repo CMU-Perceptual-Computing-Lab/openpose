@@ -34,6 +34,7 @@ You might select multiple topics, delete the rest:
 
 
 ### Your system configuration
+**Installation mode**: CMake or sh script or manual Makefile installation.
 **Operating system** (`lsb_release -a` in Ubuntu):
 **CUDA version** (`cat /usr/local/cuda/version.txt` in most cases):
 **cuDNN version**:

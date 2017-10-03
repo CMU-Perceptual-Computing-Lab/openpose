@@ -4,7 +4,7 @@
 namespace op
 {
     VideoReader::VideoReader(const std::string & videoPath) :
-        VideoCaptureReader{videoPath},
+        VideoCaptureReader{videoPath, ProducerType::Video},
         mPathName{getFileNameNoExtension(videoPath)}
     {
     }

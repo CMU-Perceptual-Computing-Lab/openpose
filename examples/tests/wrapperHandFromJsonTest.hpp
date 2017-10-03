@@ -209,10 +209,9 @@ namespace op
             if (displayGui)
             {
                 // Construct hand renderer
-                const auto handRenderer = std::make_shared<HandRenderer>(finalOutputSize, wrapperStructHand.renderThreshold,
-                                                                         wrapperStructHand.alphaKeypoint,
-                                                                         wrapperStructHand.alphaHeatMap,
-                                                                         wrapperStructHand.renderMode);
+                const auto handRenderer = std::make_shared<HandCpuRenderer>(wrapperStructHand.renderThreshold,
+                                                                            wrapperStructHand.alphaKeypoint,
+                                                                            wrapperStructHand.alphaHeatMap);
                 // Add worker
                 cpuRenderers.emplace_back(std::make_shared<WHandRenderer<TDatumsPtr>>(handRenderer));
             }
@@ -226,7 +225,7 @@ namespace op
             if (displayGui)
             {
                 mPostProcessingWs = mergeWorkers(mPostProcessingWs, cpuRenderers);
-                const auto opOutputToCvMat = std::make_shared<OpOutputToCvMat>(finalOutputSize);
+                const auto opOutputToCvMat = std::make_shared<OpOutputToCvMat>();
                 mPostProcessingWs.emplace_back(std::make_shared<WOpOutputToCvMat<TDatumsPtr>>(opOutputToCvMat));
             }
             // Re-scale pose if desired
@@ -249,10 +248,10 @@ namespace op
             spWGui = nullptr;
             if (displayGui)
             {
-                const auto guiInfoAdder = std::make_shared<GuiInfoAdder>(finalOutputSize, gpuNumber, displayGui);
+                const auto guiInfoAdder = std::make_shared<GuiInfoAdder>(gpuNumber, displayGui);
                 mOutputWs.emplace_back(std::make_shared<WGuiInfoAdder<TDatumsPtr>>(guiInfoAdder));
                 const auto gui = std::make_shared<Gui>(
-                    false, finalOutputSize, mThreadManager.getIsRunningSharedPtr()
+                    finalOutputSize, false, mThreadManager.getIsRunningSharedPtr()
                 );
                 spWGui = {std::make_shared<WGui<TDatumsPtr>>(gui)};
             }

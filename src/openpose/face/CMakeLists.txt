@@ -2,7 +2,8 @@ set(SOURCES
     defineTemplates.cpp
     faceDetector.cpp
     faceExtractor.cpp
-    faceRenderer.cpp
+    faceCpuRenderer.cpp
+    faceGpuRenderer.cpp
     renderFace.cpp
     renderFace.cu
 )

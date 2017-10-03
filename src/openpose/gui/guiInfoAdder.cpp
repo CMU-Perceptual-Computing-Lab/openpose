@@ -49,9 +49,7 @@ namespace op
         }
     }
 
-    GuiInfoAdder::GuiInfoAdder(const Point<int>& outputSize, const int numberGpus, const bool guiEnabled) :
-        mOutputSize{outputSize},
-        mBorderMargin{intRound(fastMax(mOutputSize.x, mOutputSize.y) * 0.025)},
+    GuiInfoAdder::GuiInfoAdder(const int numberGpus, const bool guiEnabled) :
         mNumberGpus{numberGpus},
         mGuiEnabled{guiEnabled},
         mFpsCounter{0u},
@@ -68,6 +66,8 @@ namespace op
             // Security checks
             if (cvOutputData.empty())
                 error("Wrong input element (empty cvOutputData).", __LINE__, __FUNCTION__, __FILE__);
+            // Size
+            const auto borderMargin = intRound(fastMax(cvOutputData.cols, cvOutputData.rows) * 0.025);
             // Update fps
             updateFps(mLastId, mFps, mFpsCounter, mFpsQueue, id, mNumberGpus);
             // Used colors
@@ -77,7 +77,7 @@ namespace op
             std::snprintf(charArrayAux, 15, "%4.1f fps", mFps);
             // Recording inverse: sec/gpu
             // std::snprintf(charArrayAux, 15, "%4.2f s/gpu", (mFps != 0. ? mNumberGpus/mFps : 0.));
-            putTextOnCvMat(cvOutputData, charArrayAux, {intRound(mOutputSize.x - mBorderMargin), mBorderMargin},
+            putTextOnCvMat(cvOutputData, charArrayAux, {intRound(cvOutputData.cols - borderMargin), borderMargin},
                            white, true);
             // Part to show
             // Allowing some buffer when changing the part to show (if >= 2 GPUs)
@@ -96,13 +96,13 @@ namespace op
             putTextOnCvMat(cvOutputData, "OpenPose - " +
                            (!mLastElementRenderedName.empty() ?
                                 mLastElementRenderedName : (mGuiEnabled ? "'h' for help" : "")),
-                           {mBorderMargin, mBorderMargin}, white, false);
+                           {borderMargin, borderMargin}, white, false);
             // Frame number
             putTextOnCvMat(cvOutputData, "Frame: " + std::to_string(id),
-                           {mBorderMargin, (int)(mOutputSize.y - mBorderMargin)}, white, false);
+                           {borderMargin, (int)(cvOutputData.rows - borderMargin)}, white, false);
             // Number people
             putTextOnCvMat(cvOutputData, "People: " + std::to_string(poseKeypoints.getSize(0)),
-                           {(int)(mOutputSize.x - mBorderMargin), (int)(mOutputSize.y - mBorderMargin)}, white, true);
+                           {(int)(cvOutputData.cols - borderMargin), (int)(cvOutputData.rows - borderMargin)}, white, true);
         }
         catch (const std::exception& e)
         {

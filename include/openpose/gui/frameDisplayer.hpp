@@ -15,11 +15,11 @@ namespace op
     public:
         /**
          * Constructor of the FrameDisplayer class.
-         * @param fullScreen bool from which the FrameDisplayer::GuiDisplayMode property mGuiDisplayMode will be set, i.e. specifying the type of initial display (it can be changed later).
-         * @param windowedSize const Point<int> with the windored output resolution (width and height).
          * @param windowedName const std::string value with the opencv resulting display name. Showed at the top-left part of the window.
+         * @param initialWindowedSize const Point<int> with the initial window output resolution (width and height).
+         * @param fullScreen bool from which the FrameDisplayer::GuiDisplayMode property mGuiDisplayMode will be set, i.e. specifying the type of initial display (it can be changed later).
          */
-        FrameDisplayer(const Point<int>& windowedSize, const std::string& windowedName = "OpenPose Display", const bool fullScreen = false);
+        FrameDisplayer(const std::string& windowedName = "OpenPose Display", const Point<int>& initialWindowedSize = Point<int>{}, const bool fullScreen = false);
 
         // Due to OpenCV visualization issues (all visualization functions must be in the same thread)
         void initializationOnThread();
@@ -44,8 +44,8 @@ namespace op
         void displayFrame(const cv::Mat& frame, const int waitKeyValue = -1);
 
     private:
-        const Point<int> mWindowedSize;
         const std::string mWindowName;
+        Point<int> mWindowedSize;
         GuiDisplayMode mGuiDisplayMode;
     };
 }
