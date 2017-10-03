@@ -8,7 +8,7 @@
 #include <openpose/utilities/keypoint.hpp>
 #include <openpose/utilities/openCv.hpp>
 #include <openpose/hand/handExtractor.hpp>
- 
+
 namespace op
 {
     void cropFrame(Array<float>& handImageCrop, cv::Mat& affineMatrix, const cv::Mat& cvInputData, const Rectangle<float>& handRectangle,
@@ -102,12 +102,12 @@ namespace op
         spResizeAndMergeCaffe{std::make_shared<ResizeAndMergeCaffe<float>>()},
         spMaximumCaffe{std::make_shared<MaximumCaffe<float>>()},
         mHandImageCrop{mNetOutputSize.area()*3},
-	mHeatMapScaleMode{heatMapScale},
-	mDownloadHeatmaps{downloadHeatmaps}
+        mHeatMapScaleMode{heatMapScale},
+        mDownloadHeatmaps{downloadHeatmaps}
     {
         try
         {
-	    // Error check
+            // Error check
             if (mHeatMapScaleMode != ScaleMode::ZeroToOne && mHeatMapScaleMode != ScaleMode::PlusMinusOne && mHeatMapScaleMode != ScaleMode::UnsignedChar)
                 error("The ScaleMode heatMapScale must be ZeroToOne, PlusMinusOne or UnsignedChar.", __LINE__, __FUNCTION__, __FILE__);
 
@@ -145,7 +145,7 @@ namespace op
             spPeaksBlob = {std::make_shared<caffe::Blob<float>>(1,1,1,1)};
             spMaximumCaffe->Reshape({spHeatMapsBlob.get()}, {spPeaksBlob.get()});
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
- 
+
             log("Finished initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
         }
         catch (const std::exception& e)
@@ -159,7 +159,6 @@ namespace op
     {
         try
         {
-	    
             if (!handRectangles.empty())
             {
                 // Security checks
@@ -173,11 +172,9 @@ namespace op
                 const auto numberPeople = (int)handRectangles.size();
                 mHandKeypoints[0].reset({numberPeople, (int)HAND_NUMBER_PARTS, 3}, 0);
                 mHandKeypoints[1].reset(mHandKeypoints[0].getSize(), 0);
-		
-		if(mDownloadHeatmaps)
-		{
-		    mHeatmaps.resize(numberPeople);
-		}
+
+                if(mDownloadHeatmaps)
+                    mHeatmaps.resize(numberPeople);
 
                 // // Debugging
                 // cv::Mat cvInputDataCopied = cvInputData.clone();
@@ -253,9 +250,7 @@ namespace op
                             }
                             // recover hand heatmaps
                             if(mDownloadHeatmaps)
-			    {
-				mHeatmaps.at(person).at(hand) = getHeatMapsFromLastPass();
-			    }
+                                mHeatmaps.at(person).at(hand) = getHeatMapsFromLastPass();
                         }
                     }
                 }
@@ -350,25 +345,25 @@ namespace op
             return nullptr;
         }
     }
-    
+
     Array<float> HandExtractor::getHeatMaps(unsigned int personIndex,unsigned  int handIndex) const
     {
-	
-	// Error check
-	if(!mDownloadHeatmaps)
-	{
-	    error("Enable downloadHeatmaps on the constructor before calling getHeatMaps", __LINE__, __FUNCTION__, __FILE__);
-	    return Array<float>{};
-	}
-	
-	if (personIndex>mHeatmaps.size() || handIndex>1)
-	{
-	    error("Invalid person or hand index", __LINE__, __FUNCTION__, __FILE__);
-	    return Array<float>{};
-	}
-	if(mHeatmaps.size()==0) return Array<float>{};
-	
-	return mHeatmaps.at(personIndex).at(handIndex);
+
+    // Error check
+    if(!mDownloadHeatmaps)
+    {
+        error("Enable downloadHeatmaps on the constructor before calling getHeatMaps", __LINE__, __FUNCTION__, __FILE__);
+        return Array<float>{};
+    }
+
+    if (personIndex>mHeatmaps.size() || handIndex>1)
+    {
+        error("Invalid person or hand index", __LINE__, __FUNCTION__, __FILE__);
+        return Array<float>{};
+    }
+    if(mHeatmaps.size()==0) return Array<float>{};
+
+    return mHeatmaps.at(personIndex).at(handIndex);
     }
 
 
@@ -378,49 +373,49 @@ namespace op
         {
             checkThread();
             Array<float> poseHeatMaps;
- 	    // Allocate memory
-	    const auto numberHeatMapChannels = HAND_NUMBER_PARTS; // all hand parts (it looks like there is no background for hands)
-	    poseHeatMaps.reset({numberHeatMapChannels, mNetOutputSize.y, mNetOutputSize.x});
+            // Allocate memory
+            const auto numberHeatMapChannels = HAND_NUMBER_PARTS; // all hand parts (it looks like there is no background for hands)
+            poseHeatMaps.reset({numberHeatMapChannels, mNetOutputSize.y, mNetOutputSize.x});
 
-	    // Copy memory
-	    const auto channelOffset = poseHeatMaps.getVolume(1, 2);
-	    const auto volumeBodyParts = HAND_NUMBER_PARTS * channelOffset;
-	    unsigned int totalOffset = 0u;
-	    // copy hand parts 
-	    {
-		cudaMemcpy(poseHeatMaps.getPtr(), getHeatMapGpuConstPtr(), volumeBodyParts * sizeof(float), cudaMemcpyDeviceToHost);
-		// Change from [0,1] to [-1,1]
-		if (mHeatMapScaleMode == ScaleMode::PlusMinusOne)
-		    for (auto i = 0u ; i < volumeBodyParts ; i++)
-			poseHeatMaps[i] = fastTruncate(poseHeatMaps[i]) * 2.f - 1.f;
-		    // [0, 255]
-		else if (mHeatMapScaleMode == ScaleMode::UnsignedChar)
-		    for (auto i = 0u ; i < volumeBodyParts ; i++)
-			poseHeatMaps[i] = (float)intRound(fastTruncate(poseHeatMaps[i]) * 255.f);
-		    // Avoid values outside original range
-		else
-		    for (auto i = 0u ; i < volumeBodyParts ; i++)
-			poseHeatMaps[i] = fastTruncate(poseHeatMaps[i]);
-		totalOffset += (unsigned int)volumeBodyParts;
-	    }
-	    //copy background. FIXME it looks like background is not available for the Hand network.
-// 	    {
-// 		cudaMemcpy(poseHeatMaps.getPtr() + totalOffset, getHeatMapGpuConstPtr() + volumeBodyParts, channelOffset * sizeof(float), cudaMemcpyDeviceToHost);
-// 		Change from [0,1] to [-1,1]
-// 		auto* poseHeatMapsPtr = poseHeatMaps.getPtr() + totalOffset;
-// 		if (mHeatMapScaleMode == ScaleMode::PlusMinusOne)
-// 		    for (auto i = 0u ; i < channelOffset ; i++)
-// 			poseHeatMapsPtr[i] = fastTruncate(poseHeatMapsPtr[i]) * 2.f - 1.f;
-// 		    [0, 255]
-// 		else if (mHeatMapScaleMode == ScaleMode::UnsignedChar)
-// 		    for (auto i = 0u ; i < channelOffset ; i++)
-// 			poseHeatMapsPtr[i] = (float)intRound(fastTruncate(poseHeatMapsPtr[i]) * 255.f);
-// 		    Avoid values outside original range
-// 		else
-// 		    for (auto i = 0u ; i < channelOffset ; i++)
-// 			poseHeatMapsPtr[i] = fastTruncate(poseHeatMapsPtr[i]);
-// 		totalOffset += (unsigned int)channelOffset;
-// 	    }
+            // Copy memory
+            const auto channelOffset = poseHeatMaps.getVolume(1, 2);
+            const auto volumeBodyParts = HAND_NUMBER_PARTS * channelOffset;
+            unsigned int totalOffset = 0u;
+            // copy hand parts
+            {
+            cudaMemcpy(poseHeatMaps.getPtr(), getHeatMapGpuConstPtr(), volumeBodyParts * sizeof(float), cudaMemcpyDeviceToHost);
+            // Change from [0,1] to [-1,1]
+            if (mHeatMapScaleMode == ScaleMode::PlusMinusOne)
+                for (auto i = 0u ; i < volumeBodyParts ; i++)
+                    poseHeatMaps[i] = fastTruncate(poseHeatMaps[i]) * 2.f - 1.f;
+            // [0, 255]
+            else if (mHeatMapScaleMode == ScaleMode::UnsignedChar)
+                for (auto i = 0u ; i < volumeBodyParts ; i++)
+                    poseHeatMaps[i] = (float)intRound(fastTruncate(poseHeatMaps[i]) * 255.f);
+            // Avoid values outside original range
+            else
+                for (auto i = 0u ; i < volumeBodyParts ; i++)
+                    poseHeatMaps[i] = fastTruncate(poseHeatMaps[i]);
+            totalOffset += (unsigned int)volumeBodyParts;
+            }
+            //copy background. FIXME it looks like background is not available for the Hand network.
+            // {
+            // cudaMemcpy(poseHeatMaps.getPtr() + totalOffset, getHeatMapGpuConstPtr() + volumeBodyParts, channelOffset * sizeof(float), cudaMemcpyDeviceToHost);
+            // // Change from [0,1] to [-1,1]
+            // auto* poseHeatMapsPtr = poseHeatMaps.getPtr() + totalOffset;
+            // if (mHeatMapScaleMode == ScaleMode::PlusMinusOne)
+            //     for (auto i = 0u ; i < channelOffset ; i++)
+            //         poseHeatMapsPtr[i] = fastTruncate(poseHeatMapsPtr[i]) * 2.f - 1.f;
+            // // [0, 255]
+            // else if (mHeatMapScaleMode == ScaleMode::UnsignedChar)
+            //     for (auto i = 0u ; i < channelOffset ; i++)
+            //         poseHeatMapsPtr[i] = (float)intRound(fastTruncate(poseHeatMapsPtr[i]) * 255.f);
+            // // Avoid values outside original range
+            // else
+            //     for (auto i = 0u ; i < channelOffset ; i++)
+            //         poseHeatMapsPtr[i] = fastTruncate(poseHeatMapsPtr[i]);
+            // totalOffset += (unsigned int)channelOffset;
+            // }
             return poseHeatMaps;
         }
         catch (const std::exception& e)
@@ -428,5 +423,5 @@ namespace op
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             return Array<float>{};
         }
-    }    
+    }
 }
