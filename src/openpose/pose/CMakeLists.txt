@@ -12,7 +12,7 @@ set(SOURCES
 
 cuda_add_library(openpose_pose ${SOURCES})
 if (BUILD_CAFFE)
-  add_dependencies(openpose_pose caffe)
+  add_dependencies(openpose_pose openpose_caffe)
 endif (BUILD_CAFFE)
 
 install(TARGETS openpose_pose

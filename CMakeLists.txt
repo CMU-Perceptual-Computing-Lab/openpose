@@ -144,18 +144,17 @@ if (${DL_FRAMEWORK} MATCHES "CAFFE")
     
     # Build Caffe
     include(ExternalProject)
-    set(BUILD_CAFFE ON)
     set(CAFFE_PREFIX caffe)
     set(CAFFE_URL ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
 
-    ExternalProject_Add(${CAFFE_PREFIX}
+    ExternalProject_Add(openpose_caffe
         SOURCE_DIR ${CAFFE_URL}
         PREFIX ${CAFFE_PREFIX}
         CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR> 
             -DUSE_CUDNN=${USE_CUDNN}
             -DOpenCV_DIR=${OpenCV_DIR})
 
-    ExternalProject_Get_Property(caffe install_dir)
+    ExternalProject_Get_Property(openpose_caffe install_dir)
 
     set(Caffe_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/caffe/include)
     # TODO -- Find a better soln.
@@ -269,3 +268,12 @@ configure_file(
 
 add_custom_target(uninstall
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
+
+# the RPATH to be used when installing, but only if it's not a system directory
+# message(STATUS ${CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES})
+# LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
+# message("\${isSystemDir} = ${isSystemDir}")   
+# IF("${isSystemDir}" STREQUAL "-1")
+#   message("${isSystemDir} is a system directory.")   
+#   SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+# ENDIF("${isSystemDir}" STREQUAL "-1")

@@ -9,7 +9,7 @@ set(SOURCES
 
 cuda_add_library(openpose_hand ${SOURCES})
 if (BUILD_CAFFE)
-  add_dependencies(openpose_hand caffe)
+  add_dependencies(openpose_hand openpose_caffe)
 endif (BUILD_CAFFE)
 
 install(TARGETS openpose_hand
