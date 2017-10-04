@@ -126,6 +126,7 @@
     <ClInclude Include="..\..\include\openpose\experimental\producer\wPeoplePoseLoader.hpp" />
     <ClInclude Include="..\..\include\openpose\face\faceCpuRenderer.hpp" />
     <ClInclude Include="..\..\include\openpose\face\faceDetector.hpp" />
+    <ClInclude Include="..\..\include\openpose\face\faceDetectorOpenCV.hpp" />
     <ClInclude Include="..\..\include\openpose\face\faceExtractor.hpp" />
     <ClInclude Include="..\..\include\openpose\face\faceGpuRenderer.hpp" />
     <ClInclude Include="..\..\include\openpose\face\faceParameters.hpp" />
@@ -133,6 +134,7 @@
     <ClInclude Include="..\..\include\openpose\face\headers.hpp" />
     <ClInclude Include="..\..\include\openpose\face\renderFace.hpp" />
     <ClInclude Include="..\..\include\openpose\face\wFaceDetector.hpp" />
+    <ClInclude Include="..\..\include\openpose\face\wFaceDetectorOpenCV.hpp" />
     <ClInclude Include="..\..\include\openpose\face\wFaceExtractor.hpp" />
     <ClInclude Include="..\..\include\openpose\face\wFaceRenderer.hpp" />
     <ClInclude Include="..\..\include\openpose\filestream\cocoJsonSaver.hpp" />
@@ -259,6 +261,7 @@
     <ClCompile Include="..\..\src\openpose\face\defineTemplates.cpp" />
     <ClCompile Include="..\..\src\openpose\face\faceCpuRenderer.cpp" />
     <ClCompile Include="..\..\src\openpose\face\faceDetector.cpp" />
+    <ClCompile Include="..\..\src\openpose\face\faceDetectorOpenCV.cpp" />
     <ClCompile Include="..\..\src\openpose\face\faceExtractor.cpp" />
     <ClCompile Include="..\..\src\openpose\face\faceGpuRenderer.cpp" />
     <ClCompile Include="..\..\src\openpose\face\renderFace.cpp" />
