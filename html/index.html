@@ -156,7 +156,7 @@ $(document).ready(function(){initNavTree('index.html','');});
 <li>Multi-person <b>2x21-keypoint hand</b> estimation and rendering. Note: In this initial version, <b>running time</b> linearly <b>depends</b> on the <b>number of people</b> on the image.</li>
 <li>Multi-person <b>70-keypoint face</b> estimation and rendering. Note: In this initial version, <b>running time</b> linearly <b>depends</b> on the <b>number of people</b> on the image.</li>
 <li>Flexible and easy-to-configure <b>multi-threading</b> module.</li>
-<li>Image, video, and webcam reader.</li>
+<li>Image, video, webcam and IP camera reader.</li>
 <li>Able to save and load the results in various formats (JSON, XML, PNG, JPG, ...).</li>
 <li>Small display and GUI for simple result visualization.</li>
 <li>All the functionality is wrapped into a <b>simple-to-use OpenPose Wrapper class</b>.</li>
@@ -182,7 +182,8 @@ $(document).ready(function(){initNavTree('index.html','');});
 <h2>Output</h2>
 <p>Check the output (format, keypoint index ordering, etc.) in doc/output.md.</p>
 <h2>Standalone Face Or Hand Keypoint Detector</h2>
-<p>In case of hand camera views at which the hands are visible but not the rest of the body, or if you do not need the body keypoint detector and want to considerably speed up the process, you can use the OpenPose face or hand keypoint detectors with your own face or hand detectors, rather than using the body keypoint detector as initial detector for those. More information in <a href="doc/standalone_face_or_hand_keypoint_detector.md#faq">doc/standalone_face_or_hand_keypoint_detector.md#faq</a>.</p>
+<p>If you do not need the body keypoint detector and want to considerably speed up the face keypoint detection, you can use the new approach based on OpenCV face detector. See doc/standalone_face_or_hand_keypoint_detector.md.</p>
+<p>You can also use the OpenPose hand and/or face keypoint detectors with your own face or hand detectors, rather than using the body keypoint detector as initial detector for those. E.g. in case of hand camera views at which the hands are visible but not the rest of the body, so that the OpenPose detector would fail. See doc/standalone_face_or_hand_keypoint_detector.md.</p>
 <h2>Speed Up OpenPose and Benchmark</h2>
 <p>Check the OpenPose Benchmark and some hints to speed up OpenPose on <a href="doc/installation.md#faq">doc/installation.md#faq</a>.</p>
 <h2>Send Us Failure Cases!</h2>

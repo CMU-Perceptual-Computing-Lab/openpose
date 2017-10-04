@@ -810,9 +810,10 @@ Generating docs for compound op::WrapperS/home/travis/build/CMU-Perceptual-Compu
 /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:116: warning: unable to resolve reference to `doc/library_extend_functionality.md' for \ref command
 /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:118: warning: unable to resolve reference to `doc/library_add_new_module.md' for \ref command
 /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:123: warning: unable to resolve reference to `doc/output.md' for \ref command
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:128: warning: explicit link request to 'faq' could not be resolved
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:133: warning: explicit link request to 'faq' could not be resolved
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:189: warning: unable to resolve reference to `doc/contributors.md' for \ref command
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:128: warning: unable to resolve reference to `doc/standalone_face_or_hand_keypoint_detector.md' for \ref command
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:130: warning: unable to resolve reference to `doc/standalone_face_or_hand_keypoint_detector.md' for \ref command
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:135: warning: explicit link request to 'faq' could not be resolved
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:191: warning: unable to resolve reference to `doc/contributors.md' for \ref command
 tructFace...
 Generating docs for compound op::WrapperStructHand...
 Generating docs for compound op::WrapperStructInput...
