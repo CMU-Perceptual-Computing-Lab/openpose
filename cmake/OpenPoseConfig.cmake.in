@@ -9,9 +9,9 @@ include("${_prefix}/lib/OpenPose/OpenPose.cmake")
 
 # Report other information
 set(OpenPose_INCLUDE_DIRS "${_prefix}/include/openpose")
-set(OpenPose_LIBS "openpose_core;openpose_filestream;openpose_gui;openpose_pose;\
-openpose_utilities;openpose_producer;openpose_thread;openpose_face;openpose_hand;\
-openpose_wrapper")
+set(OpenPose_LIBS "openpose_core;openpose_filestream;openpose_gui;openpose_pose;"
+    "openpose_utilities;openpose_producer;openpose_thread;openpose_face;openpose_hand;"
+    "openpose_wrapper")
 
 if (@BUILD_CAFFE@)
   set(Caffe_INCLUDE_DIRS "${_prefix}/include/caffe")
