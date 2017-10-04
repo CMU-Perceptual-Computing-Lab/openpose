@@ -500,6 +500,12 @@
     <ClInclude Include="..\..\include\openpose\pose\wPoseRenderer.hpp">
       <Filter>Header Files\pose</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\openpose\face\faceDetectorOpenCV.hpp">
+      <Filter>Header Files\face</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\face\wFaceDetectorOpenCV.hpp">
+      <Filter>Header Files\face</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\openpose\wrapper\defineTemplates.cpp">
@@ -732,6 +738,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\openpose\producer\webcamReader.cpp">
       <Filter>Source Files\producer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\face\faceDetectorOpenCV.cpp">
+      <Filter>Source Files\face</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
