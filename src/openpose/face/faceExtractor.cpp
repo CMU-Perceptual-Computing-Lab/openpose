@@ -128,7 +128,7 @@ namespace op
 
                 // HeatMaps: define size
                 if (!mHeatMapTypes.empty())
-                    mHeatMaps.reset({numberPeople, FACE_NUMBER_PARTS, mNetOutputSize.y, mNetOutputSize.x});
+                    mHeatMaps.reset({numberPeople, (int)FACE_NUMBER_PARTS, mNetOutputSize.y, mNetOutputSize.x});
 
                 // // Debugging
                 // cv::Mat cvInputDataCopy = cvInputData.clone();

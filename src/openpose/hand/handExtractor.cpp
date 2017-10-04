@@ -219,7 +219,7 @@ namespace op
                 // HeatMaps: define size
                 if (!mHeatMapTypes.empty())
                 {
-                    mHeatMaps[0].reset({numberPeople, HAND_NUMBER_PARTS, mNetOutputSize.y, mNetOutputSize.x});
+                    mHeatMaps[0].reset({numberPeople, (int)HAND_NUMBER_PARTS, mNetOutputSize.y, mNetOutputSize.x});
                     mHeatMaps[1].reset({numberPeople, HAND_NUMBER_PARTS, mNetOutputSize.y, mNetOutputSize.x});
                 }
 
