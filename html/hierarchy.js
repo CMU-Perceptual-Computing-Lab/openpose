@@ -2,6 +2,8 @@ var hierarchy =
 [
     [ "op::Array< T >", "classop_1_1_array.html", null ],
     [ "op::Array< float >", "classop_1_1_array.html", null ],
+    [ "caffe::Blob< T >", "classcaffe_1_1_blob.html", null ],
+    [ "op::BodyPartConnectorCaffe< T >", "classop_1_1_body_part_connector_caffe.html", null ],
     [ "op::CocoJsonSaver", "classop_1_1_coco_json_saver.html", null ],
     [ "op::ConfigureError", "classop_1_1_configure_error.html", null ],
     [ "op::ConfigureLog", "classop_1_1_configure_log.html", null ],
@@ -11,7 +13,9 @@ var hierarchy =
     [ "op::DatumProducer< TDatumsNoPtr >", "classop_1_1_datum_producer.html", null ],
     [ "op::FaceDetector", "classop_1_1_face_detector.html", null ],
     [ "op::FaceDetectorOpenCV", "classop_1_1_face_detector_open_c_v.html", null ],
-    [ "op::FaceExtractor", "classop_1_1_face_extractor.html", null ],
+    [ "op::FaceExtractor", "classop_1_1_face_extractor.html", [
+      [ "op::FaceExtractorCaffe", "classop_1_1_face_extractor_caffe.html", null ]
+    ] ],
     [ "op::FaceRenderer", "classop_1_1_face_renderer.html", [
       [ "op::FaceCpuRenderer", "classop_1_1_face_cpu_renderer.html", null ],
       [ "op::FaceGpuRenderer", "classop_1_1_face_gpu_renderer.html", null ]
@@ -27,20 +31,28 @@ var hierarchy =
     [ "op::GuiInfoAdder", "classop_1_1_gui_info_adder.html", null ],
     [ "op::HandDetector", "classop_1_1_hand_detector.html", null ],
     [ "op::HandDetectorFromTxt", "classop_1_1_hand_detector_from_txt.html", null ],
-    [ "op::HandExtractor", "classop_1_1_hand_extractor.html", null ],
+    [ "op::HandExtractor", "classop_1_1_hand_extractor.html", [
+      [ "op::HandExtractorCaffe", "classop_1_1_hand_extractor_caffe.html", null ]
+    ] ],
     [ "op::HandRenderer", "classop_1_1_hand_renderer.html", [
       [ "op::HandCpuRenderer", "classop_1_1_hand_cpu_renderer.html", null ],
       [ "op::HandGpuRenderer", "classop_1_1_hand_gpu_renderer.html", null ]
     ] ],
     [ "op::JsonOfstream", "classop_1_1_json_ofstream.html", null ],
     [ "op::KeypointScaler", "classop_1_1_keypoint_scaler.html", null ],
-    [ "op::Net", "classop_1_1_net.html", null ],
+    [ "op::MaximumCaffe< T >", "classop_1_1_maximum_caffe.html", null ],
+    [ "op::Net", "classop_1_1_net.html", [
+      [ "op::NetCaffe", "classop_1_1_net_caffe.html", null ]
+    ] ],
+    [ "op::NmsCaffe< T >", "classop_1_1_nms_caffe.html", null ],
     [ "op::OpOutputToCvMat", "classop_1_1_op_output_to_cv_mat.html", null ],
     [ "op::Point< T >", "structop_1_1_point.html", null ],
     [ "op::Point< int >", "structop_1_1_point.html", null ],
     [ "op::PointerContainerGreater< TDatums >", "classop_1_1_pointer_container_greater.html", null ],
     [ "op::PointerContainerLess< TDatums >", "classop_1_1_pointer_container_less.html", null ],
-    [ "op::PoseExtractor", "classop_1_1_pose_extractor.html", null ],
+    [ "op::PoseExtractor", "classop_1_1_pose_extractor.html", [
+      [ "op::PoseExtractorCaffe", "classop_1_1_pose_extractor_caffe.html", null ]
+    ] ],
     [ "op::PoseRenderer", "classop_1_1_pose_renderer.html", [
       [ "op::PoseCpuRenderer", "classop_1_1_pose_cpu_renderer.html", null ],
       [ "op::PoseGpuRenderer", "classop_1_1_pose_gpu_renderer.html", null ]
@@ -69,6 +81,8 @@ var hierarchy =
       [ "op::HandCpuRenderer", "classop_1_1_hand_cpu_renderer.html", null ],
       [ "op::PoseCpuRenderer", "classop_1_1_pose_cpu_renderer.html", null ]
     ] ],
+    [ "op::ResizeAndMergeCaffe< T >", "classop_1_1_resize_and_merge_caffe.html", null ],
+    [ "op::ScaleAndSizeExtractor", "classop_1_1_scale_and_size_extractor.html", null ],
     [ "op::SubThread< TDatums, TWorker >", "classop_1_1_sub_thread.html", [
       [ "op::SubThreadNoQueue< TDatums, TWorker >", "classop_1_1_sub_thread_no_queue.html", null ],
       [ "op::SubThreadQueueIn< TDatums, TWorker, TQueue >", "classop_1_1_sub_thread_queue_in.html", null ],
@@ -112,7 +126,8 @@ var hierarchy =
       ] ],
       [ "op::WPoseExtractor< TDatums >", "classop_1_1_w_pose_extractor.html", null ],
       [ "op::WPoseRenderer< TDatums >", "classop_1_1_w_pose_renderer.html", null ],
-      [ "op::WQueueOrderer< TDatums >", "classop_1_1_w_queue_orderer.html", null ]
+      [ "op::WQueueOrderer< TDatums >", "classop_1_1_w_queue_orderer.html", null ],
+      [ "op::WScaleAndSizeExtractor< TDatums >", "classop_1_1_w_scale_and_size_extractor.html", null ]
     ] ],
     [ "op::Wrapper< TDatums, TWorker, TQueue >", "classop_1_1_wrapper.html", null ],
     [ "op::WrapperStructFace", "structop_1_1_wrapper_struct_face.html", null ],

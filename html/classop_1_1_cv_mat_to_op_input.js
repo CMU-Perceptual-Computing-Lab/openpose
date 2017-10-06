@@ -1,5 +1,4 @@
 var classop_1_1_cv_mat_to_op_input =
 [
-    [ "CvMatToOpInput", "classop_1_1_cv_mat_to_op_input.html#a195aa1c45b81b5e8cec22cceece1df45", null ],
-    [ "format", "classop_1_1_cv_mat_to_op_input.html#a95ae5a3b3e765955f4fa380fe0663402", null ]
+    [ "createArray", "classop_1_1_cv_mat_to_op_input.html#ab9b198d84fbacc0b8aa9e863632e57c9", null ]
 ];

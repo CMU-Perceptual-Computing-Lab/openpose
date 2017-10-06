@@ -138,59 +138,59 @@ $(document).ready(function(){initNavTree('w_cv_mat_to_op_input_8hpp_source.html'
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;</div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="comment">// Implementation</span></div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="open_cv_8hpp.html">openpose/utilities/openCv.hpp</a>&gt;</span></div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="pointer_container_8hpp.html">openpose/utilities/pointerContainer.hpp</a>&gt;</span></div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="keyword">namespace </span>op</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;{</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TDatums&gt;</div>
-<div class="line"><a name="l00037"></a><span class="lineno"><a class="line" href="classop_1_1_w_cv_mat_to_op_input.html#a82c13641d071fdb5db50afdee7cfa849">   37</a></span>&#160;    <a class="code" href="classop_1_1_w_cv_mat_to_op_input.html#a82c13641d071fdb5db50afdee7cfa849">WCvMatToOpInput&lt;TDatums&gt;::WCvMatToOpInput</a>(<span class="keyword">const</span> std::shared_ptr&lt;CvMatToOpInput&gt;&amp; cvMatToOpInput) :</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;        spCvMatToOpInput{cvMatToOpInput}</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    {</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    }</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TDatums&gt;</div>
-<div class="line"><a name="l00043"></a><span class="lineno"><a class="line" href="classop_1_1_w_cv_mat_to_op_input.html#ac03534bbe3b6c3c45efb61b5d78402da">   43</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classop_1_1_w_cv_mat_to_op_input.html#ac03534bbe3b6c3c45efb61b5d78402da">WCvMatToOpInput&lt;TDatums&gt;::initializationOnThread</a>()</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    {</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    }</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TDatums&gt;</div>
-<div class="line"><a name="l00048"></a><span class="lineno"><a class="line" href="classop_1_1_w_cv_mat_to_op_input.html#aa7faa9e2671a85d36aad3366a7958f58">   48</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classop_1_1_w_cv_mat_to_op_input.html#aa7faa9e2671a85d36aad3366a7958f58">WCvMatToOpInput&lt;TDatums&gt;::work</a>(TDatums&amp; tDatums)</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    {</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;        <span class="keywordflow">try</span></div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;        {</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;            <span class="keywordflow">if</span> (<a class="code" href="namespaceop.html#a02164ca0af9e838190f584f5d1d8465e">checkNoNullNorEmpty</a>(tDatums))</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;            {</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;                <span class="comment">// Debugging log</span></div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;                <a class="code" href="namespaceop.html#a4eb991aa18818196d35c66455a437a32">dLog</a>(<span class="stringliteral">&quot;&quot;</span>, <a class="code" href="namespaceop.html#adc43fb9031418e7f8112816a3b535d14a28d0edd045e05cf5af64e35ae0c4c6ef">Priority::Low</a>, __LINE__, __FUNCTION__, __FILE__);</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;                <span class="comment">// Profiling speed</span></div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;                <span class="keyword">const</span> <span class="keyword">auto</span> profilerKey = <a class="code" href="classop_1_1_profiler.html#aea2c89bcd0a661a53f47e59b9bec2be7">Profiler::timerInit</a>(__LINE__, __FUNCTION__, __FILE__);</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;                <span class="comment">// cv::Mat -&gt; float*</span></div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;                <span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; tDatum : *tDatums)</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;                    std::tie(tDatum.inputNetData, tDatum.scaleRatios) = spCvMatToOpInput-&gt;format(tDatum.cvInputData);</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;                <span class="comment">// Profiling speed</span></div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;                <a class="code" href="classop_1_1_profiler.html#affff5b0b992e05276b2a699f97ad525d">Profiler::timerEnd</a>(profilerKey);</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;                <a class="code" href="classop_1_1_profiler.html#a58b930a54a98bbc91af074395852da76">Profiler::printAveragedTimeMsOnIterationX</a>(profilerKey, __LINE__, __FUNCTION__, __FILE__, <a class="code" href="classop_1_1_profiler.html#a7f03e8f26dee3384fd2310557842be16">Profiler::DEFAULT_X</a>);</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;                <span class="comment">// Debugging log</span></div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;                <a class="code" href="namespaceop.html#a4eb991aa18818196d35c66455a437a32">dLog</a>(<span class="stringliteral">&quot;&quot;</span>, <a class="code" href="namespaceop.html#adc43fb9031418e7f8112816a3b535d14a28d0edd045e05cf5af64e35ae0c4c6ef">Priority::Low</a>, __LINE__, __FUNCTION__, __FILE__);</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;            }</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;        }</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        <span class="keywordflow">catch</span> (<span class="keyword">const</span> std::exception&amp; e)</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        {</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;            this-&gt;stop();</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;            tDatums = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;            <a class="code" href="namespaceop.html#a5f092bd36c716a894cb035e1ead2aca3">error</a>(e.what(), __LINE__, __FUNCTION__, __FILE__);</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;        }</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    }</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <a class="code" href="namespaceop.html#a9076fc1719030c2a74f21682999d2315">COMPILE_TEMPLATE_DATUM</a>(<a class="code" href="classop_1_1_w_cv_mat_to_op_input.html">WCvMatToOpInput</a>);</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;}</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="preprocessor">#endif // OPENPOSE_CORE_W_CV_MAT_TO_OP_INPUT_HPP</span></div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="pointer_container_8hpp.html">openpose/utilities/pointerContainer.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="keyword">namespace </span>op</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;{</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TDatums&gt;</div>
+<div class="line"><a name="l00036"></a><span class="lineno"><a class="line" href="classop_1_1_w_cv_mat_to_op_input.html#a82c13641d071fdb5db50afdee7cfa849">   36</a></span>&#160;    <a class="code" href="classop_1_1_w_cv_mat_to_op_input.html#a82c13641d071fdb5db50afdee7cfa849">WCvMatToOpInput&lt;TDatums&gt;::WCvMatToOpInput</a>(<span class="keyword">const</span> std::shared_ptr&lt;CvMatToOpInput&gt;&amp; cvMatToOpInput) :</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;        spCvMatToOpInput{cvMatToOpInput}</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    {</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    }</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TDatums&gt;</div>
+<div class="line"><a name="l00042"></a><span class="lineno"><a class="line" href="classop_1_1_w_cv_mat_to_op_input.html#ac03534bbe3b6c3c45efb61b5d78402da">   42</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classop_1_1_w_cv_mat_to_op_input.html#ac03534bbe3b6c3c45efb61b5d78402da">WCvMatToOpInput&lt;TDatums&gt;::initializationOnThread</a>()</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    {</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    }</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TDatums&gt;</div>
+<div class="line"><a name="l00047"></a><span class="lineno"><a class="line" href="classop_1_1_w_cv_mat_to_op_input.html#aa7faa9e2671a85d36aad3366a7958f58">   47</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classop_1_1_w_cv_mat_to_op_input.html#aa7faa9e2671a85d36aad3366a7958f58">WCvMatToOpInput&lt;TDatums&gt;::work</a>(TDatums&amp; tDatums)</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    {</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        <span class="keywordflow">try</span></div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;        {</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;            <span class="keywordflow">if</span> (<a class="code" href="namespaceop.html#a02164ca0af9e838190f584f5d1d8465e">checkNoNullNorEmpty</a>(tDatums))</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;            {</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;                <span class="comment">// Debugging log</span></div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;                <a class="code" href="namespaceop.html#a4eb991aa18818196d35c66455a437a32">dLog</a>(<span class="stringliteral">&quot;&quot;</span>, <a class="code" href="namespaceop.html#adc43fb9031418e7f8112816a3b535d14a28d0edd045e05cf5af64e35ae0c4c6ef">Priority::Low</a>, __LINE__, __FUNCTION__, __FILE__);</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;                <span class="comment">// Profiling speed</span></div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;                <span class="keyword">const</span> <span class="keyword">auto</span> profilerKey = <a class="code" href="classop_1_1_profiler.html#aea2c89bcd0a661a53f47e59b9bec2be7">Profiler::timerInit</a>(__LINE__, __FUNCTION__, __FILE__);</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;                <span class="comment">// cv::Mat -&gt; float*</span></div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;                <span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; tDatum : *tDatums)</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;                    tDatum.inputNetData = spCvMatToOpInput-&gt;createArray(tDatum.cvInputData,</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;                                                                        tDatum.scaleInputToNetInputs,</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;                                                                        tDatum.netInputSizes);</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;                <span class="comment">// Profiling speed</span></div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;                <a class="code" href="classop_1_1_profiler.html#affff5b0b992e05276b2a699f97ad525d">Profiler::timerEnd</a>(profilerKey);</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;                <a class="code" href="classop_1_1_profiler.html#a58b930a54a98bbc91af074395852da76">Profiler::printAveragedTimeMsOnIterationX</a>(profilerKey, __LINE__, __FUNCTION__, __FILE__);</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;                <span class="comment">// Debugging log</span></div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;                <a class="code" href="namespaceop.html#a4eb991aa18818196d35c66455a437a32">dLog</a>(<span class="stringliteral">&quot;&quot;</span>, <a class="code" href="namespaceop.html#adc43fb9031418e7f8112816a3b535d14a28d0edd045e05cf5af64e35ae0c4c6ef">Priority::Low</a>, __LINE__, __FUNCTION__, __FILE__);</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;            }</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        }</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        <span class="keywordflow">catch</span> (<span class="keyword">const</span> std::exception&amp; e)</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        {</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;            this-&gt;stop();</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;            tDatums = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;            <a class="code" href="namespaceop.html#a5f092bd36c716a894cb035e1ead2aca3">error</a>(e.what(), __LINE__, __FUNCTION__, __FILE__);</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        }</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    }</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    <a class="code" href="namespaceop.html#a9076fc1719030c2a74f21682999d2315">COMPILE_TEMPLATE_DATUM</a>(<a class="code" href="classop_1_1_w_cv_mat_to_op_input.html">WCvMatToOpInput</a>);</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;}</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="preprocessor">#endif // OPENPOSE_CORE_W_CV_MAT_TO_OP_INPUT_HPP</span></div>
 <div class="ttc" id="namespaceop_html_adc43fb9031418e7f8112816a3b535d14a28d0edd045e05cf5af64e35ae0c4c6ef"><div class="ttname"><a href="namespaceop.html#adc43fb9031418e7f8112816a3b535d14a28d0edd045e05cf5af64e35ae0c4c6ef">op::Priority::Low</a></div></div>
-<div class="ttc" id="classop_1_1_w_cv_mat_to_op_input_html_aa7faa9e2671a85d36aad3366a7958f58"><div class="ttname"><a href="classop_1_1_w_cv_mat_to_op_input.html#aa7faa9e2671a85d36aad3366a7958f58">op::WCvMatToOpInput::work</a></div><div class="ttdeci">void work(TDatums &amp;tDatums)</div><div class="ttdef"><b>Definition:</b> wCvMatToOpInput.hpp:48</div></div>
+<div class="ttc" id="classop_1_1_w_cv_mat_to_op_input_html_aa7faa9e2671a85d36aad3366a7958f58"><div class="ttname"><a href="classop_1_1_w_cv_mat_to_op_input.html#aa7faa9e2671a85d36aad3366a7958f58">op::WCvMatToOpInput::work</a></div><div class="ttdeci">void work(TDatums &amp;tDatums)</div><div class="ttdef"><b>Definition:</b> wCvMatToOpInput.hpp:47</div></div>
 <div class="ttc" id="classop_1_1_worker_html"><div class="ttname"><a href="classop_1_1_worker.html">op::Worker</a></div><div class="ttdef"><b>Definition:</b> worker.hpp:9</div></div>
 <div class="ttc" id="cv_mat_to_op_input_8hpp_html"><div class="ttname"><a href="cv_mat_to_op_input_8hpp.html">cvMatToOpInput.hpp</a></div></div>
-<div class="ttc" id="classop_1_1_profiler_html_a7f03e8f26dee3384fd2310557842be16"><div class="ttname"><a href="classop_1_1_profiler.html#a7f03e8f26dee3384fd2310557842be16">op::Profiler::DEFAULT_X</a></div><div class="ttdeci">static const unsigned long long DEFAULT_X</div><div class="ttdef"><b>Definition:</b> profiler.hpp:24</div></div>
 <div class="ttc" id="common_8hpp_html"><div class="ttname"><a href="common_8hpp.html">common.hpp</a></div></div>
 <div class="ttc" id="classop_1_1_profiler_html_aea2c89bcd0a661a53f47e59b9bec2be7"><div class="ttname"><a href="classop_1_1_profiler.html#aea2c89bcd0a661a53f47e59b9bec2be7">op::Profiler::timerInit</a></div><div class="ttdeci">static const std::string timerInit(const int line, const std::string &amp;function, const std::string &amp;file)</div></div>
 <div class="ttc" id="namespaceop_html_a5f092bd36c716a894cb035e1ead2aca3"><div class="ttname"><a href="namespaceop.html#a5f092bd36c716a894cb035e1ead2aca3">op::error</a></div><div class="ttdeci">OP_API void error(const std::string &amp;message, const int line=-1, const std::string &amp;function=&quot;&quot;, const std::string &amp;file=&quot;&quot;)</div></div>
@@ -198,13 +198,12 @@ $(document).ready(function(){initNavTree('w_cv_mat_to_op_input_8hpp_source.html'
 <div class="ttc" id="pointer_container_8hpp_html"><div class="ttname"><a href="pointer_container_8hpp.html">pointerContainer.hpp</a></div></div>
 <div class="ttc" id="namespaceop_html_a4eb991aa18818196d35c66455a437a32"><div class="ttname"><a href="namespaceop.html#a4eb991aa18818196d35c66455a437a32">op::dLog</a></div><div class="ttdeci">void dLog(const T &amp;message, const Priority priority=Priority::Max, const int line=-1, const std::string &amp;function=&quot;&quot;, const std::string &amp;file=&quot;&quot;)</div><div class="ttdef"><b>Definition:</b> errorAndLog.hpp:47</div></div>
 <div class="ttc" id="worker_8hpp_html"><div class="ttname"><a href="worker_8hpp.html">worker.hpp</a></div></div>
-<div class="ttc" id="classop_1_1_w_cv_mat_to_op_input_html_a82c13641d071fdb5db50afdee7cfa849"><div class="ttname"><a href="classop_1_1_w_cv_mat_to_op_input.html#a82c13641d071fdb5db50afdee7cfa849">op::WCvMatToOpInput::WCvMatToOpInput</a></div><div class="ttdeci">WCvMatToOpInput(const std::shared_ptr&lt; CvMatToOpInput &gt; &amp;cvMatToOpInput)</div><div class="ttdef"><b>Definition:</b> wCvMatToOpInput.hpp:37</div></div>
+<div class="ttc" id="classop_1_1_w_cv_mat_to_op_input_html_a82c13641d071fdb5db50afdee7cfa849"><div class="ttname"><a href="classop_1_1_w_cv_mat_to_op_input.html#a82c13641d071fdb5db50afdee7cfa849">op::WCvMatToOpInput::WCvMatToOpInput</a></div><div class="ttdeci">WCvMatToOpInput(const std::shared_ptr&lt; CvMatToOpInput &gt; &amp;cvMatToOpInput)</div><div class="ttdef"><b>Definition:</b> wCvMatToOpInput.hpp:36</div></div>
 <div class="ttc" id="namespaceop_html_a02164ca0af9e838190f584f5d1d8465e"><div class="ttname"><a href="namespaceop.html#a02164ca0af9e838190f584f5d1d8465e">op::checkNoNullNorEmpty</a></div><div class="ttdeci">bool checkNoNullNorEmpty(const TPointerContainer &amp;tPointerContainer)</div><div class="ttdef"><b>Definition:</b> pointerContainer.hpp:7</div></div>
 <div class="ttc" id="namespaceop_html_a9076fc1719030c2a74f21682999d2315"><div class="ttname"><a href="namespaceop.html#a9076fc1719030c2a74f21682999d2315">op::COMPILE_TEMPLATE_DATUM</a></div><div class="ttdeci">COMPILE_TEMPLATE_DATUM(WCvMatToOpInput)</div></div>
-<div class="ttc" id="classop_1_1_w_cv_mat_to_op_input_html_ac03534bbe3b6c3c45efb61b5d78402da"><div class="ttname"><a href="classop_1_1_w_cv_mat_to_op_input.html#ac03534bbe3b6c3c45efb61b5d78402da">op::WCvMatToOpInput::initializationOnThread</a></div><div class="ttdeci">void initializationOnThread()</div><div class="ttdef"><b>Definition:</b> wCvMatToOpInput.hpp:43</div></div>
+<div class="ttc" id="classop_1_1_w_cv_mat_to_op_input_html_ac03534bbe3b6c3c45efb61b5d78402da"><div class="ttname"><a href="classop_1_1_w_cv_mat_to_op_input.html#ac03534bbe3b6c3c45efb61b5d78402da">op::WCvMatToOpInput::initializationOnThread</a></div><div class="ttdeci">void initializationOnThread()</div><div class="ttdef"><b>Definition:</b> wCvMatToOpInput.hpp:42</div></div>
 <div class="ttc" id="classop_1_1_profiler_html_a58b930a54a98bbc91af074395852da76"><div class="ttname"><a href="classop_1_1_profiler.html#a58b930a54a98bbc91af074395852da76">op::Profiler::printAveragedTimeMsOnIterationX</a></div><div class="ttdeci">static void printAveragedTimeMsOnIterationX(const std::string &amp;key, const int line, const std::string &amp;function, const std::string &amp;file, const unsigned long long x=DEFAULT_X)</div></div>
 <div class="ttc" id="classop_1_1_profiler_html_affff5b0b992e05276b2a699f97ad525d"><div class="ttname"><a href="classop_1_1_profiler.html#affff5b0b992e05276b2a699f97ad525d">op::Profiler::timerEnd</a></div><div class="ttdeci">static void timerEnd(const std::string &amp;key)</div></div>
-<div class="ttc" id="open_cv_8hpp_html"><div class="ttname"><a href="open_cv_8hpp.html">openCv.hpp</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

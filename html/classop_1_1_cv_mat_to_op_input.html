@@ -117,56 +117,36 @@ $(document).ready(function(){initNavTree('classop_1_1_cv_mat_to_op_input.html','
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a195aa1c45b81b5e8cec22cceece1df45"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_cv_mat_to_op_input.html#a195aa1c45b81b5e8cec22cceece1df45">CvMatToOpInput</a> (const <a class="el" href="structop_1_1_point.html">Point</a>&lt; int &gt; &amp;netInputResolution, const int scaleNumber=1, const float scaleGap=0.25)</td></tr>
-<tr class="separator:a195aa1c45b81b5e8cec22cceece1df45"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a95ae5a3b3e765955f4fa380fe0663402"><td class="memItemLeft" align="right" valign="top">std::pair&lt; <a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt;<br class="typebreak"/>
-, std::vector&lt; float &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_cv_mat_to_op_input.html#a95ae5a3b3e765955f4fa380fe0663402">format</a> (const cv::Mat &amp;cvInputData) const </td></tr>
-<tr class="separator:a95ae5a3b3e765955f4fa380fe0663402"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab9b198d84fbacc0b8aa9e863632e57c9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_cv_mat_to_op_input.html#ab9b198d84fbacc0b8aa9e863632e57c9">createArray</a> (const cv::Mat &amp;cvInputData, const std::vector&lt; double &gt; &amp;scaleInputToNetInputs, const std::vector&lt; <a class="el" href="structop_1_1_point.html">Point</a>&lt; int &gt;&gt; &amp;netInputSizes) const </td></tr>
+<tr class="separator:ab9b198d84fbacc0b8aa9e863632e57c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a195aa1c45b81b5e8cec22cceece1df45"></a>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="ab9b198d84fbacc0b8aa9e863632e57c9"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">op::CvMatToOpInput::CvMatToOpInput </td>
+          <td class="memname"><a class="el" href="classop_1_1_array.html">Array</a>&lt;float&gt; op::CvMatToOpInput::createArray </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="structop_1_1_point.html">Point</a>&lt; int &gt; &amp;&#160;</td>
-          <td class="paramname"><em>netInputResolution</em>, </td>
+          <td class="paramtype">const cv::Mat &amp;&#160;</td>
+          <td class="paramname"><em>cvInputData</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const int&#160;</td>
-          <td class="paramname"><em>scaleNumber</em> = <code>1</code>, </td>
+          <td class="paramtype">const std::vector&lt; double &gt; &amp;&#160;</td>
+          <td class="paramname"><em>scaleInputToNetInputs</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const float&#160;</td>
-          <td class="paramname"><em>scaleGap</em> = <code>0.25</code>&#160;</td>
+          <td class="paramtype">const std::vector&lt; <a class="el" href="structop_1_1_point.html">Point</a>&lt; int &gt;&gt; &amp;&#160;</td>
+          <td class="paramname"><em>netInputSizes</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a95ae5a3b3e765955f4fa380fe0663402"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::pair&lt;<a class="el" href="classop_1_1_array.html">Array</a>&lt;float&gt;, std::vector&lt;float&gt; &gt; op::CvMatToOpInput::format </td>
-          <td>(</td>
-          <td class="paramtype">const cv::Mat &amp;&#160;</td>
-          <td class="paramname"><em>cvInputData</em></td><td>)</td>
-          <td> const</td>
+          <td></td><td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">

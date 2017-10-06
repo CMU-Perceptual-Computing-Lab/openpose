@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['opoutputtocvmat',['OpOutputToCvMat',['../classop_1_1_op_output_to_cv_mat.html',1,'op']]]
+  ['maximumcaffe',['MaximumCaffe',['../classop_1_1_maximum_caffe.html',1,'op']]]
 ];

@@ -12,6 +12,9 @@ var dir_e6a46dbf99f5b50e7fc745799cfa5168 =
     [ "handExtractor.hpp", "hand_extractor_8hpp.html", [
       [ "HandExtractor", "classop_1_1_hand_extractor.html", "classop_1_1_hand_extractor" ]
     ] ],
+    [ "handExtractorCaffe.hpp", "hand_extractor_caffe_8hpp.html", [
+      [ "HandExtractorCaffe", "classop_1_1_hand_extractor_caffe.html", "classop_1_1_hand_extractor_caffe" ]
+    ] ],
     [ "handGpuRenderer.hpp", "hand_gpu_renderer_8hpp.html", [
       [ "HandGpuRenderer", "classop_1_1_hand_gpu_renderer.html", "classop_1_1_hand_gpu_renderer" ]
     ] ],

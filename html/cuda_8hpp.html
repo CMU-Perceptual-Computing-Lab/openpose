@@ -112,8 +112,6 @@ $(document).ready(function(){initNavTree('cuda_8hpp.html','');});
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &lt;utility&gt;</code><br/>
-<code>#include &lt;cuda.h&gt;</code><br/>
-<code>#include &lt;cuda_runtime.h&gt;</code><br/>
 <code>#include &lt;<a class="el" href="common_8hpp_source.html">openpose/core/common.hpp</a>&gt;</code><br/>
 </div>
 <p><a href="cuda_8hpp_source.html">Go to the source code of this file.</a></p>
@@ -131,10 +129,8 @@ Functions</h2></td></tr>
 <tr class="separator:aaad222b087dd041c35de2f3414c1a01f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4ba080c11cc9758051db97ce2a11c023"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a4ba080c11cc9758051db97ce2a11c023">op::getNumberCudaBlocks</a> (const unsigned int totalRequired, const unsigned int numberCudaThreads=CUDA_NUM_THREADS)</td></tr>
 <tr class="separator:a4ba080c11cc9758051db97ce2a11c023"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acdef71e862290092751ef096409a96eb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> dim3&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#acdef71e862290092751ef096409a96eb">op::getNumberCudaBlocks</a> (const Point&lt; int &gt; &amp;frameSize, const dim3 numberCudaThreads=dim3{CUDA_NUM_THREADS, CUDA_NUM_THREADS, 1})</td></tr>
-<tr class="separator:acdef71e862290092751ef096409a96eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a29f445fa90f6ba302910ce6a23c84dd9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> std::pair&lt; dim3, dim3 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a29f445fa90f6ba302910ce6a23c84dd9">op::getNumberCudaThreadsAndBlocks</a> (const Point&lt; int &gt; &amp;frameSize)</td></tr>
-<tr class="separator:a29f445fa90f6ba302910ce6a23c84dd9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8b9860388a640472d25a1dacb007c675"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a8b9860388a640472d25a1dacb007c675">op::getNumberCudaThreadsAndBlocks</a> (dim3 &amp;numberCudaThreads, dim3 &amp;numberCudaBlocks, const Point&lt; int &gt; &amp;frameSize)</td></tr>
+<tr class="separator:a8b9860388a640472d25a1dacb007c675"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>

@@ -1,7 +1,7 @@
 var searchData=
 [
   ['add',['add',['../classop_1_1_thread.html#a0617df4103c25bb04ee2c75f05ea2978',1,'op::Thread::add(const std::vector&lt; std::shared_ptr&lt; SubThread&lt; TDatums, TWorker &gt;&gt;&gt; &amp;subThreads)'],['../classop_1_1_thread.html#a820b9416b96c69cb1fc6773b9a53a47a',1,'op::Thread::add(const std::shared_ptr&lt; SubThread&lt; TDatums, TWorker &gt;&gt; &amp;subThread)'],['../classop_1_1_thread_manager.html#a8134abeaec65b5647ae92e34f3ad420b',1,'op::ThreadManager::add(const unsigned long long threadId, const std::vector&lt; TWorker &gt; &amp;tWorkers, const unsigned long long queueInId, const unsigned long long queueOutId)'],['../classop_1_1_thread_manager.html#a762acc9eb60bd10857da1f416e169f3d',1,'op::ThreadManager::add(const unsigned long long threadId, const TWorker &amp;tWorker, const unsigned long long queueInId, const unsigned long long queueOutId)']]],
-  ['addinfo',['addInfo',['../classop_1_1_gui_info_adder.html#a8271c03e2f0531e59a83104f2640ad02',1,'op::GuiInfoAdder']]],
+  ['addinfo',['addInfo',['../classop_1_1_gui_info_adder.html#a208806933d0e0932f7cddfad3cf04343',1,'op::GuiInfoAdder']]],
   ['addpopper',['addPopper',['../classop_1_1_queue_base.html#adc5df8a039d360831db06e3c610bf015',1,'op::QueueBase']]],
   ['addpusher',['addPusher',['../classop_1_1_queue_base.html#a1ccdec39ea65a83edc54661acc283134',1,'op::QueueBase']]],
   ['area',['area',['../structop_1_1_point.html#aba8ffdc78fdec7d45222f640eb130874',1,'op::Point::area()'],['../structop_1_1_rectangle.html#a85cabb0d2f3af02e32be35bb9841c1f3',1,'op::Rectangle::area()']]],

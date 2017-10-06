@@ -96,6 +96,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li><a href="functions_func_i.html#index_i"><span>i</span></a></li>
       <li><a href="functions_func_j.html#index_j"><span>j</span></a></li>
       <li><a href="functions_func_k.html#index_k"><span>k</span></a></li>
+      <li><a href="functions_func_l.html#index_l"><span>l</span></a></li>
+      <li><a href="functions_func_m.html#index_m"><span>m</span></a></li>
       <li><a href="functions_func_n.html#index_n"><span>n</span></a></li>
       <li><a href="functions_func_o.html#index_o"><span>o</span></a></li>
       <li><a href="functions_func_p.html#index_p"><span>p</span></a></li>
@@ -152,7 +154,10 @@ $(document).ready(function(){initNavTree('functions_func_f.html','');});
 : <a class="el" href="classop_1_1_face_detector_open_c_v.html#a8c4d55863b726448762a142fa91bb69d">op::FaceDetectorOpenCV</a>
 </li>
 <li>FaceExtractor()
-: <a class="el" href="classop_1_1_face_extractor.html#a04b4cd08bc5cbba132be73368890af02">op::FaceExtractor</a>
+: <a class="el" href="classop_1_1_face_extractor.html#a6f3faf536edd57fa9198969f633c01f4">op::FaceExtractor</a>
+</li>
+<li>FaceExtractorCaffe()
+: <a class="el" href="classop_1_1_face_extractor_caffe.html#aab3117c74c915d01981dd52aa536e6c4">op::FaceExtractorCaffe</a>
 </li>
 <li>FaceGpuRenderer()
 : <a class="el" href="classop_1_1_face_gpu_renderer.html#a344b4f1d256d6ad805273eb8ba29cde1">op::FaceGpuRenderer</a>
@@ -169,18 +174,30 @@ $(document).ready(function(){initNavTree('functions_func_f.html','');});
 <li>forcePush()
 : <a class="el" href="classop_1_1_queue_base.html#ad124d414b7c2680e5312ee163d18410f">op::QueueBase&lt; TDatums, TQueue &gt;</a>
 </li>
-<li>format()
-: <a class="el" href="classop_1_1_cv_mat_to_op_input.html#a95ae5a3b3e765955f4fa380fe0663402">op::CvMatToOpInput</a>
-, <a class="el" href="classop_1_1_cv_mat_to_op_output.html#a9bc92b059e6dbfb768247c2db97577e3">op::CvMatToOpOutput</a>
-</li>
 <li>formatToCvMat()
 : <a class="el" href="classop_1_1_op_output_to_cv_mat.html#a478daa5915f60a6a962f29fcb64aaac5">op::OpOutputToCvMat</a>
 </li>
+<li>Forward_cpu()
+: <a class="el" href="classop_1_1_body_part_connector_caffe.html#aa728acee4594d701475b1a687ac9d61f">op::BodyPartConnectorCaffe&lt; T &gt;</a>
+, <a class="el" href="classop_1_1_maximum_caffe.html#a694c1077ac5141ff377c4e98a87cc249">op::MaximumCaffe&lt; T &gt;</a>
+, <a class="el" href="classop_1_1_nms_caffe.html#ac631ccb632041ab406859fa1118e8d6c">op::NmsCaffe&lt; T &gt;</a>
+, <a class="el" href="classop_1_1_resize_and_merge_caffe.html#a9c8733511a410a60aa5509f3f8037af0">op::ResizeAndMergeCaffe&lt; T &gt;</a>
+</li>
+<li>Forward_gpu()
+: <a class="el" href="classop_1_1_body_part_connector_caffe.html#a7f68693a4dbdadba9ae75947e906568a">op::BodyPartConnectorCaffe&lt; T &gt;</a>
+, <a class="el" href="classop_1_1_maximum_caffe.html#a2dd1f7f0221d602596a14b720e5594b2">op::MaximumCaffe&lt; T &gt;</a>
+, <a class="el" href="classop_1_1_nms_caffe.html#a7bb4d872cd3673bcf868049a3aedb393">op::NmsCaffe&lt; T &gt;</a>
+, <a class="el" href="classop_1_1_resize_and_merge_caffe.html#a404ed0d3f3102ca9afd1b191204d5a0b">op::ResizeAndMergeCaffe&lt; T &gt;</a>
+</li>
 <li>forwardPass()
-: <a class="el" href="classop_1_1_face_extractor.html#a557850c549e3972916e833f9ffea99e1">op::FaceExtractor</a>
-, <a class="el" href="classop_1_1_hand_extractor.html#a0f76c1b4cf6770bbb889259204510877">op::HandExtractor</a>
+: <a class="el" href="classop_1_1_face_extractor.html#a7e6d4f9d0154551ea050c94dd90cd2fb">op::FaceExtractor</a>
+, <a class="el" href="classop_1_1_face_extractor_caffe.html#ad9cb84599f76e7836379890bde577b50">op::FaceExtractorCaffe</a>
+, <a class="el" href="classop_1_1_hand_extractor.html#a1d4eb3fc406aa44bb2c8e320ba3cb377">op::HandExtractor</a>
+, <a class="el" href="classop_1_1_hand_extractor_caffe.html#a892d6233b92a7862c32adfa85574236c">op::HandExtractorCaffe</a>
 , <a class="el" href="classop_1_1_net.html#ac8edfe73a20fd3d5e548160dffbd0b71">op::Net</a>
-, <a class="el" href="classop_1_1_pose_extractor.html#af14676f867643ca2ccc666d8757d694c">op::PoseExtractor</a>
+, <a class="el" href="classop_1_1_net_caffe.html#a46472ff210748d47f81115f1eb01e2b0">op::NetCaffe</a>
+, <a class="el" href="classop_1_1_pose_extractor.html#a31162da929b9ca5cc592b6438cfea7c8">op::PoseExtractor</a>
+, <a class="el" href="classop_1_1_pose_extractor_caffe.html#af48e859d9da1410335e0cf931f38f776">op::PoseExtractorCaffe</a>
 </li>
 <li>FrameDisplayer()
 : <a class="el" href="classop_1_1_frame_displayer.html#a3b81422440197c14b6ae58e40a95b4ec">op::FrameDisplayer</a>

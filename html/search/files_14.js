@@ -39,5 +39,6 @@ var searchData=
   ['wrapperstructinput_2ehpp',['wrapperStructInput.hpp',['../wrapper_struct_input_8hpp.html',1,'']]],
   ['wrapperstructoutput_2ehpp',['wrapperStructOutput.hpp',['../wrapper_struct_output_8hpp.html',1,'']]],
   ['wrapperstructpose_2ehpp',['wrapperStructPose.hpp',['../wrapper_struct_pose_8hpp.html',1,'']]],
+  ['wscaleandsizeextractor_2ehpp',['wScaleAndSizeExtractor.hpp',['../w_scale_and_size_extractor_8hpp.html',1,'']]],
   ['wvideosaver_2ehpp',['wVideoSaver.hpp',['../w_video_saver_8hpp.html',1,'']]]
 ];

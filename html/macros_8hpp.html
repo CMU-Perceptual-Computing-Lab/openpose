@@ -104,6 +104,8 @@ $(document).ready(function(){initNavTree('macros_8hpp.html','');});
 
 <div class="header">
   <div class="summary">
+<a href="#nested-classes">Classes</a> &#124;
+<a href="#namespaces">Namespaces</a> &#124;
 <a href="#define-members">Macros</a>  </div>
   <div class="headertitle">
 <div class="title">macros.hpp File Reference</div>  </div>
@@ -117,6 +119,16 @@ $(document).ready(function(){initNavTree('macros_8hpp.html','');});
 </div>
 <p><a href="macros_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcaffe_1_1_blob.html">caffe::Blob&lt; T &gt;</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
+Namespaces</h2></td></tr>
+<tr class="memitem:namespacecaffe"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecaffe.html">caffe</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:a4ba443bb7a0e5dbe8054a9ac37a5e000"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a></td></tr>
@@ -139,6 +151,12 @@ Macros</h2></td></tr>
 <tr class="separator:ac5627744abe5fd0c8eacfe9c7f8bd32e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6bf32c65e0f388d5b09d8b2424416c0e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8hpp.html#a6bf32c65e0f388d5b09d8b2424416c0e">COMPILE_TEMPLATE_BASIC_TYPES</a>(className, classType)</td></tr>
 <tr class="separator:a6bf32c65e0f388d5b09d8b2424416c0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1eadbb31e92e7fbc799bf7cf4d2a6f50"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8hpp.html#a1eadbb31e92e7fbc799bf7cf4d2a6f50">COMPILE_TEMPLATE_FLOATING_TYPES_CLASS</a>(className)&#160;&#160;&#160;<a class="el" href="macros_8hpp.html#a80404791b46a15fd601feaa11f1e5028">COMPILE_TEMPLATE_FLOATING_TYPES</a>(className, class)</td></tr>
+<tr class="separator:a1eadbb31e92e7fbc799bf7cf4d2a6f50"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af9fed593b7a4237bc6ede717a1ae70f0"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8hpp.html#af9fed593b7a4237bc6ede717a1ae70f0">COMPILE_TEMPLATE_FLOATING_TYPES_STRUCT</a>(className)&#160;&#160;&#160;<a class="el" href="macros_8hpp.html#a80404791b46a15fd601feaa11f1e5028">COMPILE_TEMPLATE_FLOATING_TYPES</a>(className, struct)</td></tr>
+<tr class="separator:af9fed593b7a4237bc6ede717a1ae70f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a80404791b46a15fd601feaa11f1e5028"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8hpp.html#a80404791b46a15fd601feaa11f1e5028">COMPILE_TEMPLATE_FLOATING_TYPES</a>(className, classType)</td></tr>
+<tr class="separator:a80404791b46a15fd601feaa11f1e5028"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
 <a class="anchor" id="a6bf32c65e0f388d5b09d8b2424416c0e"></a>
@@ -224,6 +242,68 @@ Macros</h2></td></tr>
           <td class="paramtype">&#160;</td>
           <td class="paramname">templateName</td><td>)</td>
           <td>&#160;&#160;&#160;extern <a class="el" href="macros_8hpp.html#ad11d52b69bc54e48ceb2f5787f700431">DEFINE_TEMPLATE_DATUM</a>(templateName)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a80404791b46a15fd601feaa11f1e5028"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define COMPILE_TEMPLATE_FLOATING_TYPES</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">className, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">classType&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line"><span class="keywordtype">char</span> gInstantiationGuard##className; \</div>
+<div class="line">  template classType <a class="code" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> className&lt;float&gt;; \</div>
+<div class="line">  template classType <a class="code" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> className&lt;double&gt;</div>
+<div class="ttc" id="macros_8hpp_html_a4ba443bb7a0e5dbe8054a9ac37a5e000"><div class="ttname"><a href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a></div><div class="ttdeci">#define OP_API</div><div class="ttdef"><b>Definition:</b> macros.hpp:5</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a class="anchor" id="a1eadbb31e92e7fbc799bf7cf4d2a6f50"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define COMPILE_TEMPLATE_FLOATING_TYPES_CLASS</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">className</td><td>)</td>
+          <td>&#160;&#160;&#160;<a class="el" href="macros_8hpp.html#a80404791b46a15fd601feaa11f1e5028">COMPILE_TEMPLATE_FLOATING_TYPES</a>(className, class)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="af9fed593b7a4237bc6ede717a1ae70f0"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define COMPILE_TEMPLATE_FLOATING_TYPES_STRUCT</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">className</td><td>)</td>
+          <td>&#160;&#160;&#160;<a class="el" href="macros_8hpp.html#a80404791b46a15fd601feaa11f1e5028">COMPILE_TEMPLATE_FLOATING_TYPES</a>(className, struct)</td>
         </tr>
       </table>
 </div><div class="memdoc">

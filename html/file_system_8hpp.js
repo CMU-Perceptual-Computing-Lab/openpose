@@ -1,6 +1,7 @@
 var file_system_8hpp =
 [
-    [ "exist", "file_system_8hpp.html#a75f407018175cac86a3a6fc62cfd39ff", null ],
+    [ "existDir", "file_system_8hpp.html#a595aad58db9f96e328089c5d2c260c55", null ],
+    [ "existFile", "file_system_8hpp.html#ac1f4b95440d2fb57fc715558d039b947", null ],
     [ "formatAsDirectory", "file_system_8hpp.html#ab38ea91ef7b7dad700d8e4a4654d48f5", null ],
     [ "getFileExtension", "file_system_8hpp.html#a515273b013402d8c75780330588421bc", null ],
     [ "getFileNameAndExtension", "file_system_8hpp.html#a573544858d0a9c29c9707eeda3a21c98", null ],

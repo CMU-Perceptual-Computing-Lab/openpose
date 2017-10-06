@@ -4,6 +4,7 @@ var searchData=
   ['facedetector_2ehpp',['faceDetector.hpp',['../face_detector_8hpp.html',1,'']]],
   ['facedetectoropencv_2ehpp',['faceDetectorOpenCV.hpp',['../face_detector_open_c_v_8hpp.html',1,'']]],
   ['faceextractor_2ehpp',['faceExtractor.hpp',['../face_extractor_8hpp.html',1,'']]],
+  ['faceextractorcaffe_2ehpp',['faceExtractorCaffe.hpp',['../face_extractor_caffe_8hpp.html',1,'']]],
   ['facegpurenderer_2ehpp',['faceGpuRenderer.hpp',['../face_gpu_renderer_8hpp.html',1,'']]],
   ['faceparameters_2ehpp',['faceParameters.hpp',['../face_parameters_8hpp.html',1,'']]],
   ['facerenderer_2ehpp',['faceRenderer.hpp',['../face_renderer_8hpp.html',1,'']]],

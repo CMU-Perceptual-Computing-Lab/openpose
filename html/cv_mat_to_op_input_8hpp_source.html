@@ -110,30 +110,24 @@ $(document).ready(function(){initNavTree('cv_mat_to_op_input_8hpp_source.html','
 <a href="cv_mat_to_op_input_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#ifndef OPENPOSE_CORE_CV_MAT_TO_OP_INPUT_HPP</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define OPENPOSE_CORE_CV_MAT_TO_OP_INPUT_HPP</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;utility&gt;</span> <span class="comment">// std::pair</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;opencv2/core/core.hpp&gt;</span> <span class="comment">// cv::Mat</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="common_8hpp.html">openpose/core/common.hpp</a>&gt;</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;</div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="keyword">namespace </span>op</div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;{</div>
-<div class="line"><a name="l00010"></a><span class="lineno"><a class="line" href="classop_1_1_cv_mat_to_op_input.html">   10</a></span>&#160;    <span class="keyword">class </span><a class="code" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> <a class="code" href="classop_1_1_cv_mat_to_op_input.html">CvMatToOpInput</a></div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;    {</div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;        <a class="code" href="classop_1_1_cv_mat_to_op_input.html">CvMatToOpInput</a>(<span class="keyword">const</span> <a class="code" href="structop_1_1_point.html">Point&lt;int&gt;</a>&amp; netInputResolution, <span class="keyword">const</span> <span class="keywordtype">int</span> scaleNumber = 1, <span class="keyword">const</span> <span class="keywordtype">float</span> scaleGap = 0.25);</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;        std::pair&lt;Array&lt;float&gt;, std::vector&lt;float&gt;&gt; format(<span class="keyword">const</span> cv::Mat&amp; cvInputData) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;opencv2/core/core.hpp&gt;</span> <span class="comment">// cv::Mat</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="common_8hpp.html">openpose/core/common.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;</div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="keyword">namespace </span>op</div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;{</div>
+<div class="line"><a name="l00009"></a><span class="lineno"><a class="line" href="classop_1_1_cv_mat_to_op_input.html">    9</a></span>&#160;    <span class="keyword">class </span><a class="code" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> <a class="code" href="classop_1_1_cv_mat_to_op_input.html">CvMatToOpInput</a></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;    {</div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;        <a class="code" href="classop_1_1_array.html">Array&lt;float&gt;</a> createArray(<span class="keyword">const</span> cv::Mat&amp; cvInputData, <span class="keyword">const</span> std::vector&lt;double&gt;&amp; scaleInputToNetInputs,</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;                                 <span class="keyword">const</span> std::vector&lt;<a class="code" href="structop_1_1_point.html">Point&lt;int&gt;</a>&gt;&amp; netInputSizes) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;    };</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;}</div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">int</span> mScaleNumber;</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">float</span> mScaleGap;</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;        <span class="keyword">const</span> std::vector&lt;int&gt; mInputNetSize4D;</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    };</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;}</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#endif // OPENPOSE_CORE_CV_MAT_TO_OP_INPUT_HPP</span></div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#endif // OPENPOSE_CORE_CV_MAT_TO_OP_INPUT_HPP</span></div>
 <div class="ttc" id="structop_1_1_point_html"><div class="ttname"><a href="structop_1_1_point.html">op::Point&lt; int &gt;</a></div></div>
 <div class="ttc" id="common_8hpp_html"><div class="ttname"><a href="common_8hpp.html">common.hpp</a></div></div>
-<div class="ttc" id="classop_1_1_cv_mat_to_op_input_html"><div class="ttname"><a href="classop_1_1_cv_mat_to_op_input.html">op::CvMatToOpInput</a></div><div class="ttdef"><b>Definition:</b> cvMatToOpInput.hpp:10</div></div>
+<div class="ttc" id="classop_1_1_array_html"><div class="ttname"><a href="classop_1_1_array.html">op::Array&lt; float &gt;</a></div></div>
+<div class="ttc" id="classop_1_1_cv_mat_to_op_input_html"><div class="ttname"><a href="classop_1_1_cv_mat_to_op_input.html">op::CvMatToOpInput</a></div><div class="ttdef"><b>Definition:</b> cvMatToOpInput.hpp:9</div></div>
 <div class="ttc" id="macros_8hpp_html_a4ba443bb7a0e5dbe8054a9ac37a5e000"><div class="ttname"><a href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a></div><div class="ttdeci">#define OP_API</div><div class="ttdef"><b>Definition:</b> macros.hpp:5</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->

@@ -121,25 +121,25 @@ $(document).ready(function(){initNavTree('gui_info_adder_8hpp_source.html','');}
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;    <span class="keyword">public</span>:</div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;        <a class="code" href="classop_1_1_gui_info_adder.html">GuiInfoAdder</a>(<span class="keyword">const</span> <span class="keywordtype">int</span> numberGpus, <span class="keyword">const</span> <span class="keywordtype">bool</span> guiEnabled = <span class="keyword">false</span>);</div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;        <span class="keywordtype">void</span> addInfo(cv::Mat&amp; cvOutputData, <span class="keyword">const</span> <a class="code" href="classop_1_1_array.html">Array&lt;float&gt;</a>&amp; poseKeypoints, <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> <span class="keywordtype">long</span> <span class="keywordtype">id</span>, <span class="keyword">const</span> std::string&amp; elementRenderedName);</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;        <span class="comment">// Const variables</span></div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">int</span> mNumberGpus;</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">bool</span> mGuiEnabled;</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;        <span class="comment">// Other variables</span></div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;        std::queue&lt;std::chrono::high_resolution_clock::time_point&gt; mFpsQueue;</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;        <span class="keywordtype">double</span> mFps;</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;        <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> mFpsCounter;</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;        std::string mLastElementRenderedName;</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;        <span class="keywordtype">int</span> mLastElementRenderedCounter;</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;        <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> <span class="keywordtype">long</span> mLastId;</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    };</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;}</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor">#endif // OPENPOSE_GUI_ADD_GUI_INFO_HPP</span></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;        <span class="keywordtype">void</span> addInfo(cv::Mat&amp; cvOutputData, <span class="keyword">const</span> <span class="keywordtype">int</span> numberPeople, <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> <span class="keywordtype">long</span> <span class="keywordtype">id</span>,</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;                     <span class="keyword">const</span> std::string&amp; elementRenderedName);</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;        <span class="comment">// Const variables</span></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">int</span> mNumberGpus;</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">bool</span> mGuiEnabled;</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;        <span class="comment">// Other variables</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;        std::queue&lt;std::chrono::high_resolution_clock::time_point&gt; mFpsQueue;</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;        <span class="keywordtype">double</span> mFps;</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;        <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> mFpsCounter;</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;        std::string mLastElementRenderedName;</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;        <span class="keywordtype">int</span> mLastElementRenderedCounter;</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;        <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> <span class="keywordtype">long</span> mLastId;</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    };</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;}</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="preprocessor">#endif // OPENPOSE_GUI_ADD_GUI_INFO_HPP</span></div>
 <div class="ttc" id="common_8hpp_html"><div class="ttname"><a href="common_8hpp.html">common.hpp</a></div></div>
-<div class="ttc" id="classop_1_1_array_html"><div class="ttname"><a href="classop_1_1_array.html">op::Array&lt; float &gt;</a></div></div>
 <div class="ttc" id="macros_8hpp_html_a4ba443bb7a0e5dbe8054a9ac37a5e000"><div class="ttname"><a href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a></div><div class="ttdeci">#define OP_API</div><div class="ttdef"><b>Definition:</b> macros.hpp:5</div></div>
 <div class="ttc" id="classop_1_1_gui_info_adder_html"><div class="ttname"><a href="classop_1_1_gui_info_adder.html">op::GuiInfoAdder</a></div><div class="ttdef"><b>Definition:</b> guiInfoAdder.hpp:10</div></div>
 </div><!-- fragment --></div><!-- contents -->

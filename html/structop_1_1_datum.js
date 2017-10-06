@@ -25,10 +25,12 @@ var structop_1_1_datum =
     [ "id", "structop_1_1_datum.html#a65deddd49d0fbca81f367198fc600015", null ],
     [ "inputNetData", "structop_1_1_datum.html#a0b105b52ce12f2689c7aa26708117254", null ],
     [ "name", "structop_1_1_datum.html#ae6adcdacea12a9cfa445cf0cac1985b0", null ],
+    [ "netInputSizes", "structop_1_1_datum.html#a32d164c01acf6b4f7eb1323d74edbdca", null ],
+    [ "netOutputSize", "structop_1_1_datum.html#ac734d4262a5a7892c6d4094cdd2bcc7c", null ],
     [ "outputData", "structop_1_1_datum.html#a42b953c082f479eddc527da9a3a4cc75", null ],
     [ "poseHeatMaps", "structop_1_1_datum.html#a5429e97e0ab9b0e2209a3947af668381", null ],
     [ "poseKeypoints", "structop_1_1_datum.html#a6d629b1f6f7b958fe4cf2ef4cdf57c5b", null ],
-    [ "scaleInputToOutput", "structop_1_1_datum.html#a6546c11ca264fdeab4a5f21104f8a8b2", null ],
-    [ "scaleNetToOutput", "structop_1_1_datum.html#a4eec45a7f4b8bc017736b41096327043", null ],
-    [ "scaleRatios", "structop_1_1_datum.html#a2db6ffa73c5cc87a277a6d7a1bac33e2", null ]
+    [ "scaleInputToNetInputs", "structop_1_1_datum.html#a0e416771f275be98c83aaff01e482a71", null ],
+    [ "scaleInputToOutput", "structop_1_1_datum.html#a6cf96c250c236a03f13da69e1d4336d9", null ],
+    [ "scaleNetToOutput", "structop_1_1_datum.html#a44af7162e180c6856ce909057f43d8e1", null ]
 ];

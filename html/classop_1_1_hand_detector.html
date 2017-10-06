@@ -119,12 +119,12 @@ $(document).ready(function(){initNavTree('classop_1_1_hand_detector.html','');})
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a20b127dd7b51afcd336d1f16b40ee0b1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_hand_detector.html#a20b127dd7b51afcd336d1f16b40ee0b1">HandDetector</a> (const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel)</td></tr>
 <tr class="separator:a20b127dd7b51afcd336d1f16b40ee0b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7814b17c16304f817cf83d7ee80de86b"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::array<br class="typebreak"/>
-&lt; <a class="el" href="structop_1_1_rectangle.html">Rectangle</a>&lt; float &gt;, 2 &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_hand_detector.html#a7814b17c16304f817cf83d7ee80de86b">detectHands</a> (const <a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt; &amp;poseKeypoints, const float scaleInputToOutput) const </td></tr>
-<tr class="separator:a7814b17c16304f817cf83d7ee80de86b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a999de7df3b5bbe24ace9f46edb56d7cb"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::array<br class="typebreak"/>
-&lt; <a class="el" href="structop_1_1_rectangle.html">Rectangle</a>&lt; float &gt;, 2 &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_hand_detector.html#a999de7df3b5bbe24ace9f46edb56d7cb">trackHands</a> (const <a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt; &amp;poseKeypoints, const float scaleInputToOutput)</td></tr>
-<tr class="separator:a999de7df3b5bbe24ace9f46edb56d7cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a660199dc2080df40f67cd6680997f6d0"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::array<br class="typebreak"/>
+&lt; <a class="el" href="structop_1_1_rectangle.html">Rectangle</a>&lt; float &gt;, 2 &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_hand_detector.html#a660199dc2080df40f67cd6680997f6d0">detectHands</a> (const <a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt; &amp;poseKeypoints, const double scaleInputToOutput) const </td></tr>
+<tr class="separator:a660199dc2080df40f67cd6680997f6d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa5eae5b3c86642906806129fc511d229"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::array<br class="typebreak"/>
+&lt; <a class="el" href="structop_1_1_rectangle.html">Rectangle</a>&lt; float &gt;, 2 &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_hand_detector.html#aa5eae5b3c86642906806129fc511d229">trackHands</a> (const <a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt; &amp;poseKeypoints, const double scaleInputToOutput)</td></tr>
+<tr class="separator:aa5eae5b3c86642906806129fc511d229"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a58513169f01ab7c705979f1f2a88b571"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_hand_detector.html#a58513169f01ab7c705979f1f2a88b571">updateTracker</a> (const std::array&lt; <a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt;, 2 &gt; &amp;handKeypoints, const unsigned long long id)</td></tr>
 <tr class="separator:a58513169f01ab7c705979f1f2a88b571"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -154,7 +154,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a7814b17c16304f817cf83d7ee80de86b"></a>
+<a class="anchor" id="a660199dc2080df40f67cd6680997f6d0"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -167,7 +167,7 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const float&#160;</td>
+          <td class="paramtype">const double&#160;</td>
           <td class="paramname"><em>scaleInputToOutput</em>&#160;</td>
         </tr>
         <tr>
@@ -180,7 +180,7 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a999de7df3b5bbe24ace9f46edb56d7cb"></a>
+<a class="anchor" id="aa5eae5b3c86642906806129fc511d229"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -193,7 +193,7 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const float&#160;</td>
+          <td class="paramtype">const double&#160;</td>
           <td class="paramname"><em>scaleInputToOutput</em>&#160;</td>
         </tr>
         <tr>

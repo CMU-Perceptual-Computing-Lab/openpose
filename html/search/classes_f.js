@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['thread',['Thread',['../classop_1_1_thread.html',1,'op']]],
-  ['threadmanager',['ThreadManager',['../classop_1_1_thread_manager.html',1,'op']]],
-  ['threadmanager_3c_20std_3a_3ashared_5fptr_3c_20tdatums_20_3e_20_3e',['ThreadManager&lt; std::shared_ptr&lt; TDatums &gt; &gt;',['../classop_1_1_thread_manager.html',1,'op']]]
+  ['rectangle',['Rectangle',['../structop_1_1_rectangle.html',1,'op']]],
+  ['renderer',['Renderer',['../classop_1_1_renderer.html',1,'op']]],
+  ['resizeandmergecaffe',['ResizeAndMergeCaffe',['../classop_1_1_resize_and_merge_caffe.html',1,'op']]]
 ];

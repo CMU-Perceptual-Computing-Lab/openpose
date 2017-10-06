@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['scaleandsizeextractor_2ehpp',['scaleAndSizeExtractor.hpp',['../scale_and_size_extractor_8hpp.html',1,'']]],
   ['string_2ehpp',['string.hpp',['../string_8hpp.html',1,'']]],
   ['subthread_2ehpp',['subThread.hpp',['../sub_thread_8hpp.html',1,'']]],
   ['subthreadnoqueue_2ehpp',['subThreadNoQueue.hpp',['../sub_thread_no_queue_8hpp.html',1,'']]],

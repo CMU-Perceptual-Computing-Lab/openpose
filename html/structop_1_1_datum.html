@@ -176,12 +176,16 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a59d455dbddc50d700809c5e102c40d4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aef6c478313691ab5101664c1df55aa58"><td class="memItemLeft" align="right" valign="top">std::array&lt; <a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt;, 2 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structop_1_1_datum.html#aef6c478313691ab5101664c1df55aa58">handHeatMaps</a></td></tr>
 <tr class="separator:aef6c478313691ab5101664c1df55aa58"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6546c11ca264fdeab4a5f21104f8a8b2"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structop_1_1_datum.html#a6546c11ca264fdeab4a5f21104f8a8b2">scaleInputToOutput</a></td></tr>
-<tr class="separator:a6546c11ca264fdeab4a5f21104f8a8b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4eec45a7f4b8bc017736b41096327043"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structop_1_1_datum.html#a4eec45a7f4b8bc017736b41096327043">scaleNetToOutput</a></td></tr>
-<tr class="separator:a4eec45a7f4b8bc017736b41096327043"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2db6ffa73c5cc87a277a6d7a1bac33e2"><td class="memItemLeft" align="right" valign="top">std::vector&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structop_1_1_datum.html#a2db6ffa73c5cc87a277a6d7a1bac33e2">scaleRatios</a></td></tr>
-<tr class="separator:a2db6ffa73c5cc87a277a6d7a1bac33e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0e416771f275be98c83aaff01e482a71"><td class="memItemLeft" align="right" valign="top">std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structop_1_1_datum.html#a0e416771f275be98c83aaff01e482a71">scaleInputToNetInputs</a></td></tr>
+<tr class="separator:a0e416771f275be98c83aaff01e482a71"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a32d164c01acf6b4f7eb1323d74edbdca"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="structop_1_1_point.html">Point</a>&lt; int &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structop_1_1_datum.html#a32d164c01acf6b4f7eb1323d74edbdca">netInputSizes</a></td></tr>
+<tr class="separator:a32d164c01acf6b4f7eb1323d74edbdca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6cf96c250c236a03f13da69e1d4336d9"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structop_1_1_datum.html#a6cf96c250c236a03f13da69e1d4336d9">scaleInputToOutput</a></td></tr>
+<tr class="separator:a6cf96c250c236a03f13da69e1d4336d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac734d4262a5a7892c6d4094cdd2bcc7c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structop_1_1_point.html">Point</a>&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structop_1_1_datum.html#ac734d4262a5a7892c6d4094cdd2bcc7c">netOutputSize</a></td></tr>
+<tr class="separator:ac734d4262a5a7892c6d4094cdd2bcc7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a44af7162e180c6856ce909057f43d8e1"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structop_1_1_datum.html#a44af7162e180c6856ce909057f43d8e1">scaleNetToOutput</a></td></tr>
+<tr class="separator:a44af7162e180c6856ce909057f43d8e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a35212700ef2a2ac290a6666e2993a192"><td class="memItemLeft" align="right" valign="top">std::pair&lt; int, std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structop_1_1_datum.html#a35212700ef2a2ac290a6666e2993a192">elementRendered</a></td></tr>
 <tr class="separator:a35212700ef2a2ac290a6666e2993a192"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -697,6 +701,32 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a32d164c01acf6b4f7eb1323d74edbdca"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;<a class="el" href="structop_1_1_point.html">Point</a>&lt;int&gt; &gt; op::Datum::netInputSizes</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p><a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261fa6f6cb72d544962fa333e2e34ce64f719">Size(s)</a> (width x height) of the image(s) fed to the pose deep net. The size of the std::vector corresponds to the number of scales. </p>
+
+</div>
+</div>
+<a class="anchor" id="ac734d4262a5a7892c6d4094cdd2bcc7c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structop_1_1_point.html">Point</a>&lt;int&gt; op::Datum::netOutputSize</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Size (width x height) of the image returned by the deep net. </p>
+
+</div>
+</div>
 <a class="anchor" id="a42b953c082f479eddc527da9a3a4cc75"></a>
 <div class="memitem">
 <div class="memproto">
@@ -736,12 +766,25 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a6546c11ca264fdeab4a5f21104f8a8b2"></a>
+<a class="anchor" id="a0e416771f275be98c83aaff01e482a71"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">float op::Datum::scaleInputToOutput</td>
+          <td class="memname">std::vector&lt;double&gt; op::Datum::scaleInputToNetInputs</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Scale ratio between the input <a class="el" href="structop_1_1_datum.html#a0b2c8ccac37be088524cc7c24a502c7b">Datum::cvInputData</a> and the net input size. </p>
+
+</div>
+</div>
+<a class="anchor" id="a6cf96c250c236a03f13da69e1d4336d9"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double op::Datum::scaleInputToOutput</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -749,29 +792,16 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a4eec45a7f4b8bc017736b41096327043"></a>
+<a class="anchor" id="a44af7162e180c6856ce909057f43d8e1"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">float op::Datum::scaleNetToOutput</td>
+          <td class="memname">double op::Datum::scaleNetToOutput</td>
         </tr>
       </table>
 </div><div class="memdoc">
 <p>Scale ratio between the net output and the final output <a class="el" href="structop_1_1_datum.html#a0d1f1c3d3494386e2d652268f6e17b5a">Datum::cvOutputData</a>. </p>
-
-</div>
-</div>
-<a class="anchor" id="a2db6ffa73c5cc87a277a6d7a1bac33e2"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::vector&lt;float&gt; op::Datum::scaleRatios</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Scale ratios between each scale (e.g. flag <code>scale_number</code>). Used to resize the different scales. </p>
 
 </div>
 </div>
