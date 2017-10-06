@@ -254,13 +254,13 @@ endif (BUILD_CAFFE)
 
 # Compute installation prefix relative to this file
 configure_file(
-  ${CMAKE_SOURCE_DIR}/cmake/OpenPoseConfig.cmake.in
-  ${CMAKE_BINARY_DIR}/cmake/OpenPoseConfig.cmake @ONLY)
+    ${CMAKE_SOURCE_DIR}/cmake/OpenPoseConfig.cmake.in
+    ${CMAKE_BINARY_DIR}/cmake/OpenPoseConfig.cmake @ONLY)
 
 install(FILES ${CMAKE_BINARY_DIR}/cmake/OpenPoseConfig.cmake
 		DESTINATION lib/OpenPose)
 
-# uninstall target
+# Uninstall target
 configure_file(
     "${CMAKE_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
     "${CMAKE_BINARY_DIR}/cmake_uninstall.cmake"
@@ -268,12 +268,3 @@ configure_file(
 
 add_custom_target(uninstall
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
-
-# the RPATH to be used when installing, but only if it's not a system directory
-# message(STATUS ${CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES})
-# LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
-# message("\${isSystemDir} = ${isSystemDir}")   
-# IF("${isSystemDir}" STREQUAL "-1")
-#   message("${isSystemDir} is a system directory.")   
-#   SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-# ENDIF("${isSystemDir}" STREQUAL "-1")
