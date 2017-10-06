@@ -9,7 +9,8 @@ OpenPose - Installation using CMake
     1. [Caffe Prerequisites (Ubuntu Only)](#caffe-prerequisites-ubuntu-only)
     2. [OpenPose Configuration](#openpose-configuration)
     3. [OpenPose Building](#openpose-building)
-    4. [Run OpenPose](#run-openpose)
+    4. [Installing Headers and Libraries](#installing-headers-and-libraries) 
+    5. [Run OpenPose](#run-openpose)
 5. [Reinstallation](#reinstallation)
 6. [Optional Settings](#optional-settings)
     1. [Doxygen Documentation Autogeneration](#doxygen-documentation-autogeneration)
@@ -53,7 +54,7 @@ bash ./ubuntu/install_cmake.sh
 
 
 ### OpenPose Configuration
-Note: If you prefer to use CMake though the command line, see [Cmake Command Line Build](#cmake-command-line-build).
+Note: If you prefer to use CMake through the command line, see [Cmake Command Line Build](#cmake-command-line-build).
 
 1. Install CMake GUI.
     1. Ubuntu: run `sudo apt-get install cmake-qt-gui`.
@@ -94,7 +95,54 @@ no_cores=`cat /proc/cpuinfo | grep processor | wc -l`
 make -j${no_cores}
 ```
 
+### Installing Headers and Libraries
 
+To install the headers and the libraries to system paths (ideally `/usr/local` or `/usr`), run the below command in the `build` directory.
+
+```
+sudo make install
+```
+
+Once, the install is complete you use OpenPose in some other project using the `find_package` cmake command. Below, is a small example `CMakeLists.txt`.
+
+```
+cmake_minimum_required(VERSION 2.8.7)
+
+add_definitions(-DUSE_CAFFE)
+add_definitions(-std=c++11)
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
+
+find_package(CUDA)
+find_package(GFlags)
+find_package(Glog)
+find_package(OpenCV)
+find_package(OpenPose REQUIRED)
+
+include_directories(${OpenPose_INCLUDE_DIRS} ${CUDA_INCLUDE_DIRS} ${GFLAGS_INCLUDE_DIR})
+
+add_executable(example.bin example.cpp)
+
+target_link_libraries(example.bin ${GLOG_LIBRARY} ${GFLAGS_LIBRARY} ${OpenCV_LIBS} ${OpenPose_LIBS}) 
+```
+
+If Caffe was build with OpenPose, it will also find Caffe. If Caffe was not build using OpenPose, you will need to link again Caffe as shown below -- 
+
+```
+link_directories(<path_to_caffe_installation>/caffe/build/install/lib) 
+```
+
+If you don't perform above step, you might get an error like the one below.
+
+```
+/usr/bin/ld: cannot find -lcaffe
+```
+
+To uninstall the installed headers and libraries, simply use the command below in the `build` directory.
+
+```
+sudo make uninstall
+```
 
 ### Run OpenPose
 Check OpenPose was properly installed by running it on the default images, video or webcam: [doc/quick_start.md#quick-start](./quick_start.md#quick-start).
