@@ -192,7 +192,7 @@ public:
         {
             cv::imshow("User worker GUI", datumsPtr->at(0).cvOutputData);
             // Display image and sleeps at least 1 ms (it usually sleeps ~5-10 msec to display the image)
-            key = cv::waitKey(1);
+            key = (char)cv::waitKey(1);
         }
         else
             op::log("Nullptr or empty datumsPtr found.", op::Priority::High, __LINE__, __FUNCTION__, __FILE__);

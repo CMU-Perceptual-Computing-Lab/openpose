@@ -3,6 +3,7 @@ set(SOURCES
     faceDetector.cpp
     faceDetectorOpenCV.cpp
     faceExtractor.cpp
+    faceExtractorCaffe.cpp
     faceCpuRenderer.cpp
     faceGpuRenderer.cpp
     renderFace.cpp

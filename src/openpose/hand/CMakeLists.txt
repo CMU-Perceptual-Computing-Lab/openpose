@@ -3,6 +3,7 @@ set(SOURCES
     handDetector.cpp
     handDetectorFromTxt.cpp
     handExtractor.cpp
+    handExtractorCaffe.cpp
     handCpuRenderer.cpp
     handGpuRenderer.cpp
     renderHand.cpp

@@ -5,6 +5,7 @@
 #include <openpose/face/faceDetector.hpp>
 #include <openpose/face/faceDetectorOpenCV.hpp>
 #include <openpose/face/faceExtractor.hpp>
+#include <openpose/face/faceExtractorCaffe.hpp>
 #include <openpose/face/faceParameters.hpp>
 #include <openpose/face/faceCpuRenderer.hpp>
 #include <openpose/face/faceGpuRenderer.hpp>

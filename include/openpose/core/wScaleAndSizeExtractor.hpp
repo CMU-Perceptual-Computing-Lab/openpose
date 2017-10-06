@@ -1,26 +1,26 @@
-#ifndef OPENPOSE_HAND_W_HAND_DETECTOR_TRACKING_HPP
-#define OPENPOSE_HAND_W_HAND_DETECTOR_TRACKING_HPP
+#ifndef OPENPOSE_CORE_W_SCALE_AND_SIZE_EXTRACTOR_HPP
+#define OPENPOSE_CORE_W_SCALE_AND_SIZE_EXTRACTOR_HPP
 
 #include <openpose/core/common.hpp>
-#include <openpose/hand/handRenderer.hpp>
+#include <openpose/core/scaleAndSizeExtractor.hpp>
 #include <openpose/thread/worker.hpp>
 
 namespace op
 {
     template<typename TDatums>
-    class WHandDetectorTracking : public Worker<TDatums>
+    class WScaleAndSizeExtractor : public Worker<TDatums>
     {
     public:
-        explicit WHandDetectorTracking(const std::shared_ptr<HandDetector>& handDetector);
+        explicit WScaleAndSizeExtractor(const std::shared_ptr<ScaleAndSizeExtractor>& scaleAndSizeExtractor);
 
         void initializationOnThread();
 
         void work(TDatums& tDatums);
 
     private:
-        std::shared_ptr<HandDetector> spHandDetector;
+        const std::shared_ptr<ScaleAndSizeExtractor> spScaleAndSizeExtractor;
 
-        DELETE_COPY(WHandDetectorTracking);
+        DELETE_COPY(WScaleAndSizeExtractor);
     };
 }
 
@@ -33,18 +33,18 @@ namespace op
 namespace op
 {
     template<typename TDatums>
-    WHandDetectorTracking<TDatums>::WHandDetectorTracking(const std::shared_ptr<HandDetector>& handDetector) :
-        spHandDetector{handDetector}
+    WScaleAndSizeExtractor<TDatums>::WScaleAndSizeExtractor(const std::shared_ptr<ScaleAndSizeExtractor>& scaleAndSizeExtractor) :
+        spScaleAndSizeExtractor{scaleAndSizeExtractor}
     {
     }
 
     template<typename TDatums>
-    void WHandDetectorTracking<TDatums>::initializationOnThread()
+    void WScaleAndSizeExtractor<TDatums>::initializationOnThread()
     {
     }
 
     template<typename TDatums>
-    void WHandDetectorTracking<TDatums>::work(TDatums& tDatums)
+    void WScaleAndSizeExtractor<TDatums>::work(TDatums& tDatums)
     {
         try
         {
@@ -54,9 +54,13 @@ namespace op
                 dLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 // Profiling speed
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
-                // Detect people hand
+                // cv::Mat -> float*
                 for (auto& tDatum : *tDatums)
-                    tDatum.handRectangles = spHandDetector->trackHands(tDatum.poseKeypoints, tDatum.scaleInputToOutput);
+                {
+                    const Point<int> inputSize{tDatum.cvInputData.cols, tDatum.cvInputData.rows};
+                    std::tie(tDatum.scaleInputToNetInputs, tDatum.netInputSizes, tDatum.scaleInputToOutput,
+                        tDatum.netOutputSize) = spScaleAndSizeExtractor->extract(inputSize);
+                }
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
                 Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);
@@ -72,7 +76,7 @@ namespace op
         }
     }
 
-    COMPILE_TEMPLATE_DATUM(WHandDetectorTracking);
+    COMPILE_TEMPLATE_DATUM(WScaleAndSizeExtractor);
 }
 
-#endif // OPENPOSE_HAND_W_HAND_DETECTOR_TRACKING_HPP
+#endif // OPENPOSE_CORE_W_SCALE_AND_SIZE_EXTRACTOR_HPP

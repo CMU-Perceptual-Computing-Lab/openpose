@@ -228,7 +228,7 @@ namespace op
     }
 
     __global__ void renderBodyPartHeatMaps(float* targetPtr, const int targetWidth, const int targetHeight, const float* const heatMapPtr, const int widthHeatMap,
-                                            const int heightHeatMap, const float scaleToKeepRatio, const int numberBodyParts, const float alphaColorToAdd)
+                                           const int heightHeatMap, const float scaleToKeepRatio, const int numberBodyParts, const float alphaColorToAdd)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -359,7 +359,7 @@ namespace op
             const auto heatMapOffset = POSE_NUMBER_BODY_PARTS[(int)poseModel] * heatMapSize.area();
             dim3 threadsPerBlock;
             dim3 numBlocks;
-            std::tie(threadsPerBlock, numBlocks) = getNumberCudaThreadsAndBlocks(frameSize);
+            getNumberCudaThreadsAndBlocks(threadsPerBlock, numBlocks, frameSize);
             renderPartAffinities<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.x, frameSize.y, heatMapPtr, heatMapSize.x,
                                                                  heatMapSize.y, scaleToKeepRatio, partsToRender, part, alphaBlending);
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
@@ -386,7 +386,7 @@ namespace op
 
                 dim3 threadsPerBlock;
                 dim3 numBlocks;
-                std::tie(threadsPerBlock, numBlocks) = getNumberCudaThreadsAndBlocks(frameSize);
+                getNumberCudaThreadsAndBlocks(threadsPerBlock, numBlocks, frameSize);
 
                 if (poseModel == PoseModel::COCO_18)
                     renderPoseCoco<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.x, frameSize.y, posePtr, numberPeople,
@@ -424,7 +424,7 @@ namespace op
             checkAlpha(alphaBlending);
             dim3 threadsPerBlock;
             dim3 numBlocks;
-            std::tie(threadsPerBlock, numBlocks) = getNumberCudaThreadsAndBlocks(frameSize);
+            getNumberCudaThreadsAndBlocks(threadsPerBlock, numBlocks, frameSize);
             const auto numberBodyParts = POSE_NUMBER_BODY_PARTS[(int)poseModel];
             const auto heatMapOffset = numberBodyParts * heatMapSize.area();
 
@@ -448,7 +448,7 @@ namespace op
             checkAlpha(alphaBlending);
             dim3 threadsPerBlock;
             dim3 numBlocks;
-            std::tie(threadsPerBlock, numBlocks) = getNumberCudaThreadsAndBlocks(frameSize);
+            getNumberCudaThreadsAndBlocks(threadsPerBlock, numBlocks, frameSize);
             const auto numberBodyParts = POSE_NUMBER_BODY_PARTS[(int)poseModel];
             const auto heatMapOffset = numberBodyParts * heatMapSize.area();
 

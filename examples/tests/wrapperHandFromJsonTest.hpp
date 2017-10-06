@@ -173,12 +173,13 @@ namespace op
             wDatumProducer = std::make_shared<WDatumProducer<TDatumsPtr, TDatums>>(datumProducer);
 
             // Input cvMat to OpenPose format
-            const auto cvMatToOpInput = std::make_shared<CvMatToOpInput>(
-                wrapperStructPose.netInputSize, wrapperStructPose.scalesNumber, wrapperStructPose.scaleGap
-            );
+            const auto cvMatToOpInput = std::make_shared<CvMatToOpInput>();
             spWCvMatToOpInput = std::make_shared<WCvMatToOpInput<TDatumsPtr>>(cvMatToOpInput);
-            const auto cvMatToOpOutput = std::make_shared<CvMatToOpOutput>(finalOutputSize, displayGui);
-            spWCvMatToOpOutput = std::make_shared<WCvMatToOpOutput<TDatumsPtr>>(cvMatToOpOutput);
+            if (displayGui)
+            {
+                const auto cvMatToOpOutput = std::make_shared<CvMatToOpOutput>();
+                spWCvMatToOpOutput = std::make_shared<WCvMatToOpOutput<TDatumsPtr>>(cvMatToOpOutput);
+            }
 
             // Hand extractor(s)
             if (wrapperStructHand.enable)
@@ -196,7 +197,7 @@ namespace op
                         spWPoses.at(gpuId) = {std::make_shared<WHandDetectorFromTxt<TDatumsPtr>>(handDetector)};
                     // Hand keypoint extractor
                     const auto netOutputSize = wrapperStructHand.netInputSize;
-                    const auto handExtractor = std::make_shared<HandExtractor>(
+                    const auto handExtractor = std::make_shared<HandExtractorCaffe>(
                         wrapperStructHand.netInputSize, netOutputSize, wrapperStructPose.modelFolder,
                         gpuId + gpuNumberStart, wrapperStructHand.scalesNumber, wrapperStructHand.scaleRange
                     );
@@ -304,7 +305,7 @@ namespace op
         try
         {
             // Security checks
-            if (spWCvMatToOpInput == nullptr || spWCvMatToOpOutput == nullptr)
+            if (spWCvMatToOpInput == nullptr)
                 error("Configure the WrapperHandFromJsonTest class before calling `start()`.", __LINE__, __FUNCTION__, __FILE__);
             if (wDatumProducer == nullptr)
             {
@@ -325,9 +326,14 @@ namespace op
             // If custom user Worker in same thread or producer on same thread
             spWIdGenerator = std::make_shared<WIdGenerator<std::shared_ptr<TDatums>>>();
             // OpenPose producer
-            mThreadManager.add(threadId++, {wDatumProducer, spWIdGenerator, spWCvMatToOpInput, spWCvMatToOpOutput}, queueIn++, queueOut++);   // Thread 0 or 1, queues 0 -> 1
+            // Thread 0 or 1, queues 0 -> 1
+            if (spWCvMatToOpOutput == nullptr)
+                mThreadManager.add(threadId++, {wDatumProducer, spWIdGenerator, spWCvMatToOpInput}, queueIn++, queueOut++);
+            else
+                mThreadManager.add(threadId++, {wDatumProducer, spWIdGenerator, spWCvMatToOpInput, spWCvMatToOpOutput}, queueIn++, queueOut++);
             // Pose estimation & rendering
-            if (!spWPoses.empty())                                                                      // Thread 1 or 2...X, queues 1 -> 2, X = 2 + #GPUs
+            // Thread 1 or 2...X, queues 1 -> 2, X = 2 + #GPUs
+            if (!spWPoses.empty())
             {
                 for (auto& wPose : spWPoses)
                     mThreadManager.add(threadId++, wPose, queueIn, queueOut);
@@ -336,10 +342,12 @@ namespace op
             }
             // If custom user Worker in same thread or producer on same thread
             // Post processing workers + User post processing workers + Output workers
-            mThreadManager.add(threadId++, mergeWorkers(mPostProcessingWs, mOutputWs), queueIn++, queueOut++); // Thread 2 or 3, queues 2 -> 3
+            // Thread 2 or 3, queues 2 -> 3
+            mThreadManager.add(threadId++, mergeWorkers(mPostProcessingWs, mOutputWs), queueIn++, queueOut++);
             // OpenPose GUI
+            // Thread Y+1, queues Q+1 -> Q+2
             if (spWGui != nullptr)
-                mThreadManager.add(threadId++, spWGui, queueIn++, queueOut++);                               // Thread Y+1, queues Q+1 -> Q+2
+                mThreadManager.add(threadId++, spWGui, queueIn++, queueOut++);
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
         }
         catch (const std::exception& e)

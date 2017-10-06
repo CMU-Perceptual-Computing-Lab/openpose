@@ -58,7 +58,7 @@ namespace op
     {
     }
 
-    void GuiInfoAdder::addInfo(cv::Mat& cvOutputData, const Array<float>& poseKeypoints, const unsigned long long id,
+    void GuiInfoAdder::addInfo(cv::Mat& cvOutputData, const int numberPeople, const unsigned long long id,
                                const std::string& elementRenderedName)
     {
         try
@@ -101,8 +101,9 @@ namespace op
             putTextOnCvMat(cvOutputData, "Frame: " + std::to_string(id),
                            {borderMargin, (int)(cvOutputData.rows - borderMargin)}, white, false);
             // Number people
-            putTextOnCvMat(cvOutputData, "People: " + std::to_string(poseKeypoints.getSize(0)),
-                           {(int)(cvOutputData.cols - borderMargin), (int)(cvOutputData.rows - borderMargin)}, white, true);
+            putTextOnCvMat(cvOutputData, "People: " + std::to_string(numberPeople),
+                           {(int)(cvOutputData.cols - borderMargin), (int)(cvOutputData.rows - borderMargin)},
+                           white, true);
         }
         catch (const std::exception& e)
         {

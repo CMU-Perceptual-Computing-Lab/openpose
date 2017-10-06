@@ -19,7 +19,8 @@ cuda_add_library(core
     renderer.cpp
     resizeAndMergeBase.cpp
     resizeAndMergeBase.cu
-    resizeAndMergeCaffe.cpp)
+    resizeAndMergeCaffe.cpp
+    scaleAndSizeExtractor)
 
 target_link_libraries(core ${Caffe_LIBS})
 if (BUILD_CAFFE)

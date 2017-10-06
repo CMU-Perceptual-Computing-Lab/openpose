@@ -122,14 +122,18 @@ OpenPose Library - Release Notes
         3. CvMatToOutput and Renderers allow to keep input resolution as output for images (core module).
     3. New standalone face keypoint detector based on OpenCV face detector: much faster if body keypoint detection is not required but much less accurate.
     4. Face and hand keypoint detectors now can return each keypoint heatmap.
-    5. COCO JSON file outputs 0 as score for non-detected keypoints.
-    6. Added example for OpenPose for user asynchronous output and cleaned all `tutorial_wrapper/` examples.
-    7. Added `-1` option for `net_resolution` in order to auto-select the best possible aspect ratio given the user input.
+    5. The flag `USE_CUDNN` is no longer required; `USE_CAFFE` and `USE_CUDA` (replacing the old `CPU_ONLY`) are no longer required to use the library, only to build it. In addition, Caffe and its dependencies have been removed from the OpenPose header files. Only OpenCV include and lib folders are required when building a project using OpenPose.
+    6. OpenPose successfully compiles if the flags `USE_CAFFE` and/or `USE_CUDA` are not enabled, although it will give an error saying they are required.
+    7. COCO JSON file outputs 0 as score for non-detected keypoints.
+    8. Added example for OpenPose for user asynchronous output and cleaned all `tutorial_wrapper/` examples.
+    9. Added `-1` option for `net_resolution` in order to auto-select the best possible aspect ratio given the user input.
 2. Functions or parameters renamed:
     1. OpenPose able to change its size and initial size:
         1. Flag `resolution` renamed as `output_resolution`.
         2. FrameDisplayer, GuiInfoAdder and Gui constructors arguments modified (gui module).
         3. OpOutputToCvMat constructor removed (core module).
         4. New Renders classes to split GpuRenderers from CpuRenderers.
+        5. Etc.
+    2. `CPU_ONLY` changed by `USE_CUDA` to keep format.
 3. Main bugs fixed:
     1. Ubuntu installer script now works even if Python pip was not installed previously.

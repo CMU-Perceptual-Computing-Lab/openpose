@@ -1,4 +1,6 @@
-#include <cuda_runtime_api.h>
+#ifdef USE_CUDA
+    #include <cuda_runtime_api.h>
+#endif
 #include <openpose/core/enumClasses.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/pose/poseExtractor.hpp>
@@ -41,8 +43,9 @@ namespace op
         }
     }
 
-    PoseExtractor::PoseExtractor(const Point<int>& netOutputSize, const Point<int>& outputSize, const PoseModel poseModel,
-                                 const std::vector<HeatMapType>& heatMapTypes, const ScaleMode heatMapScale) :
+    PoseExtractor::PoseExtractor(const Point<int>& netOutputSize, const Point<int>& outputSize,
+                                 const PoseModel poseModel, const std::vector<HeatMapType>& heatMapTypes,
+                                 const ScaleMode heatMapScale) :
         mPoseModel{poseModel},
         mNetOutputSize{netOutputSize},
         mOutputSize{outputSize},
@@ -52,17 +55,22 @@ namespace op
         try
         {
             // Error check
-            if (mHeatMapScaleMode != ScaleMode::ZeroToOne && mHeatMapScaleMode != ScaleMode::PlusMinusOne && mHeatMapScaleMode != ScaleMode::UnsignedChar)
-                error("The ScaleMode heatMapScale must be ZeroToOne, PlusMinusOne or UnsignedChar.", __LINE__, __FUNCTION__, __FILE__);
+            if (mHeatMapScaleMode != ScaleMode::ZeroToOne && mHeatMapScaleMode != ScaleMode::PlusMinusOne
+                && mHeatMapScaleMode != ScaleMode::UnsignedChar)
+                error("The ScaleMode heatMapScale must be ZeroToOne, PlusMinusOne or UnsignedChar.",
+                      __LINE__, __FUNCTION__, __FILE__);
 
             // Properties
             for (auto& property : mProperties)
                 property = 0.;
             mProperties[(int)PoseProperty::NMSThreshold] = POSE_DEFAULT_NMS_THRESHOLD[(int)mPoseModel];
-            mProperties[(int)PoseProperty::ConnectInterMinAboveThreshold] = POSE_DEFAULT_CONNECT_INTER_MIN_ABOVE_THRESHOLD[(int)mPoseModel];
-            mProperties[(int)PoseProperty::ConnectInterThreshold] = POSE_DEFAULT_CONNECT_INTER_THRESHOLD[(int)mPoseModel];
+            mProperties[(int)PoseProperty::ConnectInterMinAboveThreshold]
+                = POSE_DEFAULT_CONNECT_INTER_MIN_ABOVE_THRESHOLD[(int)mPoseModel];
+            mProperties[(int)PoseProperty::ConnectInterThreshold]
+                = POSE_DEFAULT_CONNECT_INTER_THRESHOLD[(int)mPoseModel];
             mProperties[(int)PoseProperty::ConnectMinSubsetCnt] = POSE_DEFAULT_CONNECT_MIN_SUBSET_CNT[(int)mPoseModel];
-            mProperties[(int)PoseProperty::ConnectMinSubsetScore] = POSE_DEFAULT_CONNECT_MIN_SUBSET_SCORE[(int)mPoseModel];
+            mProperties[(int)PoseProperty::ConnectMinSubsetScore]
+                = POSE_DEFAULT_CONNECT_MIN_SUBSET_SCORE[(int)mPoseModel];
         }
         catch (const std::exception& e)
         {
@@ -108,7 +116,13 @@ namespace op
                 unsigned int totalOffset = 0u;
                 if (heatMapTypesHas(mHeatMapTypes, HeatMapType::Parts))
                 {
-                    cudaMemcpy(heatMaps.getPtr(), getHeatMapGpuConstPtr(), volumeBodyParts * sizeof(float), cudaMemcpyDeviceToHost);
+                    #ifdef USE_CUDA
+                        cudaMemcpy(heatMaps.getPtr(), getHeatMapGpuConstPtr(),
+                                   volumeBodyParts * sizeof(float), cudaMemcpyDeviceToHost);
+                    #else
+                        const auto* heatMapCpuPtr = getHeatMapCpuConstPtr();
+                        std::copy(heatMapCpuPtr, heatMapCpuPtr+volumeBodyParts, heatMaps.getPtr());
+                    #endif
                     // Change from [0,1] to [-1,1]
                     if (mHeatMapScaleMode == ScaleMode::PlusMinusOne)
                         for (auto i = 0u ; i < volumeBodyParts ; i++)
@@ -125,7 +139,14 @@ namespace op
                 }
                 if (heatMapTypesHas(mHeatMapTypes, HeatMapType::Background))
                 {
-                    cudaMemcpy(heatMaps.getPtr() + totalOffset, getHeatMapGpuConstPtr() + volumeBodyParts, channelOffset * sizeof(float), cudaMemcpyDeviceToHost);
+                    #ifdef USE_CUDA
+                        cudaMemcpy(heatMaps.getPtr() + totalOffset, getHeatMapGpuConstPtr() + volumeBodyParts,
+                                   channelOffset * sizeof(float), cudaMemcpyDeviceToHost);
+                    #else
+                        const auto* heatMapCpuPtr = getHeatMapCpuConstPtr();
+                        std::copy(heatMapCpuPtr + volumeBodyParts, heatMapCpuPtr + volumeBodyParts + channelOffset,
+                                  heatMaps.getPtr() + totalOffset);
+                    #endif
                     // Change from [0,1] to [-1,1]
                     auto* heatMapsPtr = heatMaps.getPtr() + totalOffset;
                     if (mHeatMapScaleMode == ScaleMode::PlusMinusOne)
@@ -143,7 +164,16 @@ namespace op
                 }
                 if (heatMapTypesHas(mHeatMapTypes, HeatMapType::PAFs))
                 {
-                    cudaMemcpy(heatMaps.getPtr() + totalOffset, getHeatMapGpuConstPtr() + volumeBodyParts + channelOffset, volumePAFs * sizeof(float), cudaMemcpyDeviceToHost);
+                    #ifdef USE_CUDA
+                        cudaMemcpy(heatMaps.getPtr() + totalOffset,
+                                   getHeatMapGpuConstPtr() + volumeBodyParts + channelOffset,
+                                   volumePAFs * sizeof(float), cudaMemcpyDeviceToHost);
+                    #else
+                        const auto* heatMapCpuPtr = getHeatMapCpuConstPtr();
+                        std::copy(heatMapCpuPtr + volumeBodyParts + channelOffset,
+                                  heatMapCpuPtr + volumeBodyParts + channelOffset + volumePAFs,
+                                  heatMaps.getPtr() + totalOffset);
+                    #endif
                     // Change from [-1,1] to [0,1]. Note that PAFs are in [-1,1]
                     auto* heatMapsPtr = heatMaps.getPtr() + totalOffset;
                     if (mHeatMapScaleMode == ScaleMode::ZeroToOne)
@@ -152,7 +182,9 @@ namespace op
                     // [0, 255]
                     else if (mHeatMapScaleMode == ScaleMode::UnsignedChar)
                         for (auto i = 0u ; i < volumePAFs ; i++)
-                            heatMapsPtr[i] = (float)intRound(fastTruncate(heatMapsPtr[i], -1.f) * 128.5f + 128.5f);
+                            heatMapsPtr[i] = (float)intRound(
+                                fastTruncate(heatMapsPtr[i], -1.f) * 128.5f + 128.5f
+                            );
                     // Avoid values outside original range
                     else
                         for (auto i = 0u ; i < volumePAFs ; i++)
@@ -160,7 +192,8 @@ namespace op
                     totalOffset += (unsigned int)volumePAFs;
                 }
                 // Copy all at once
-                // cudaMemcpy(heatMaps.getPtr(), getHeatMapGpuConstPtr(), heatMaps.getVolume() * sizeof(float), cudaMemcpyDeviceToHost);
+                // cudaMemcpy(heatMaps.getPtr(), getHeatMapGpuConstPtr(), heatMaps.getVolume() * sizeof(float),
+                //            cudaMemcpyDeviceToHost);
             }
             return heatMaps;
         }
@@ -241,7 +274,8 @@ namespace op
         try
         {
             if(mThreadId != std::this_thread::get_id())
-                error("The CPU/GPU pointer data cannot be accessed from a different thread.", __LINE__, __FUNCTION__, __FILE__);
+                error("The CPU/GPU pointer data cannot be accessed from a different thread.",
+                      __LINE__, __FUNCTION__, __FILE__);
         }
         catch (const std::exception& e)
         {

@@ -26,10 +26,9 @@
     className(const className&) = delete; \
     className& operator=(const className&) = delete
 
+// Instantiate a class with all the basic types
 #define COMPILE_TEMPLATE_BASIC_TYPES_CLASS(className) COMPILE_TEMPLATE_BASIC_TYPES(className, class)
-
 #define COMPILE_TEMPLATE_BASIC_TYPES_STRUCT(className) COMPILE_TEMPLATE_BASIC_TYPES(className, struct)
-
 #define COMPILE_TEMPLATE_BASIC_TYPES(className, classType) \
     template classType OP_API className<char>; \
     template classType OP_API className<signed char>; \
@@ -45,6 +44,22 @@
     template classType OP_API className<float>; \
     template classType OP_API className<double>; \
     template classType OP_API className<long double>
+
+// Instantiate a class with float and double specifications
+#define COMPILE_TEMPLATE_FLOATING_TYPES_CLASS(className) COMPILE_TEMPLATE_FLOATING_TYPES(className, class)
+#define COMPILE_TEMPLATE_FLOATING_TYPES_STRUCT(className) COMPILE_TEMPLATE_FLOATING_TYPES(className, struct)
+#define COMPILE_TEMPLATE_FLOATING_TYPES(className, classType) \
+  char gInstantiationGuard##className; \
+  template classType OP_API className<float>; \
+  template classType OP_API className<double>
+
+// PIMPL does not work if function arguments need the 3rd-party class. Alternative:
+// stackoverflow.com/questions/13978775/how-to-avoid-include-dependency-to-external-library?answertab=active#tab-top
+struct dim3;
+namespace caffe
+{
+    template <typename T> class Blob;
+}
 
 // Includes at the end, since this macros class does not need them, but the files that call this
 // file. However, keeping the files at the beginning might create a circular include linking problem.

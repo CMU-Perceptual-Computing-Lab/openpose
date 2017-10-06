@@ -58,14 +58,16 @@ namespace op
                 // Extract people pose
                 for (auto& tDatum : *tDatums)
                 {
-                    spPoseExtractor->forwardPass(tDatum.inputNetData, Point<int>{tDatum.cvInputData.cols, tDatum.cvInputData.rows}, tDatum.scaleRatios);
+                    spPoseExtractor->forwardPass(tDatum.inputNetData,
+                                                 Point<int>{tDatum.cvInputData.cols, tDatum.cvInputData.rows},
+                                                 tDatum.scaleInputToNetInputs);
                     tDatum.poseHeatMaps = spPoseExtractor->getHeatMaps().clone();
                     tDatum.poseKeypoints = spPoseExtractor->getPoseKeypoints().clone();
                     tDatum.scaleNetToOutput = spPoseExtractor->getScaleNetToOutput();
                 }
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
-                Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__, Profiler::DEFAULT_X);
+                Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);
                 // Debugging log
                 dLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             }

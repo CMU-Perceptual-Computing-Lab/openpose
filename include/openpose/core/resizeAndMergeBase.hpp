@@ -7,11 +7,11 @@ namespace op
 {
     template <typename T>
     OP_API void resizeAndMergeCpu(T* targetPtr, const T* const sourcePtr, const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize,
-                                  const std::vector<T>& scaleRatios = {1});
+                                  const std::vector<T>& scaleInputToNetInputs = {1.f});
 
     template <typename T>
     OP_API void resizeAndMergeGpu(T* targetPtr, const T* const sourcePtr, const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize,
-                                  const std::vector<T>& scaleRatios = {1});
+                                  const std::vector<T>& scaleInputToNetInputs = {1.f});
 }
 
 #endif // OPENPOSE_CORE_RESIZE_AND_MERGE_BASE_HPP

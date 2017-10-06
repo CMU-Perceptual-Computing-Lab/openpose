@@ -60,7 +60,7 @@ The program uses 3 cameras by default, but cameras can be added or removed from 
     - (Optional) Spinnaker SDK overview: https://www.ptgrey.com/spinnaker-sdk
 6. Get the last OpenGL Glut library version for the rendering:
     - Download the latest `MSVC Package` from http://www.transmissionzero.co.uk/software/freeglut-devel/
-    - Copy `{freeglutParentDirectory}\freeglut\bin\x64\` as `{OpenPoseDirectory}\3rdparty\windows\freeglut\bin\bin\`.
+    - Copy `{freeglutParentDirectory}\freeglut\bin\x64\` as `{OpenPoseDirectory}\3rdparty\windows\freeglut\bin\`.
     - Copy `{freeglutParentDirectory}\freeglut\include\` as `{OpenPoseDirectory}\3rdparty\windows\freeglut\include\`.
     - Copy `{freeglutParentDirectory}\freeglut\lib\x64\` as `{OpenPoseDirectory}\3rdparty\windows\freeglut\lib\`.
 
@@ -78,7 +78,6 @@ We did not create an Ubuntu version. We did an very first version for Ubuntu 16 
 8. Get the required files from `{OpenPose path}/examples_beta/openpose3d/`. Check the Windows VS solution for more details.
 9. Create a proper Makefile or CMake file to run it. The following code is part of an old QMake (Qt) file generated for the old version, you can ideally get all the flags and includes from it:
 ```
-DEFINES += USE_CAFFE USE_CUDNN
 INCLUDEPATH += \
     $$PWD/include \
     $$PWD/3rdparty/caffe/include \

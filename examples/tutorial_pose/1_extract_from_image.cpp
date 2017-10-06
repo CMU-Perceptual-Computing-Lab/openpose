@@ -62,7 +62,8 @@ int openPoseTutorialPose1()
     // Step 1 - Set logging level
         // - 0 will output all the logging messages
         // - 255 will output nothing
-    op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.", __LINE__, __FUNCTION__, __FILE__);
+    op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.",
+              __LINE__, __FUNCTION__, __FILE__);
     op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
     op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
     // Step 2 - Read Google flags (user defined configuration)
@@ -78,15 +79,18 @@ int openPoseTutorialPose1()
     if (FLAGS_alpha_pose < 0. || FLAGS_alpha_pose > 1.)
         op::error("Alpha value for blending must be in the range [0,1].", __LINE__, __FUNCTION__, __FILE__);
     if (FLAGS_scale_gap <= 0. && FLAGS_scale_number > 1)
-        op::error("Incompatible flag configuration: scale_gap must be greater than 0 or scale_number = 1.", __LINE__, __FUNCTION__, __FILE__);
+        op::error("Incompatible flag configuration: scale_gap must be greater than 0 or scale_number = 1.",
+                  __LINE__, __FUNCTION__, __FILE__);
     // Logging
     op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
     // Step 3 - Initialize all required classes
-    op::CvMatToOpInput cvMatToOpInput{netInputSize, FLAGS_scale_number, (float)FLAGS_scale_gap};
-    op::CvMatToOpOutput cvMatToOpOutput{outputSize};
+    op::ScaleAndSizeExtractor scaleAndSizeExtractor(netInputSize, outputSize, FLAGS_scale_number, FLAGS_scale_gap);
+    op::CvMatToOpInput cvMatToOpInput;
+    op::CvMatToOpOutput cvMatToOpOutput;
     op::PoseExtractorCaffe poseExtractorCaffe{netInputSize, netOutputSize, outputSize, FLAGS_scale_number, poseModel,
                                               FLAGS_model_folder, FLAGS_num_gpu_start};
-    op::PoseCpuRenderer poseRenderer{poseModel, (float)FLAGS_render_threshold, !FLAGS_disable_blending, (float)FLAGS_alpha_pose};
+    op::PoseCpuRenderer poseRenderer{poseModel, (float)FLAGS_render_threshold, !FLAGS_disable_blending,
+                                     (float)FLAGS_alpha_pose};
     op::OpOutputToCvMat opOutputToCvMat;
     op::FrameDisplayer frameDisplayer{"OpenPose Tutorial - Example 1", outputSize};
     // Step 4 - Initialize resources on desired thread (in this case single thread, i.e. we init resources here)
@@ -95,22 +99,27 @@ int openPoseTutorialPose1()
 
     // ------------------------- POSE ESTIMATION AND RENDERING -------------------------
     // Step 1 - Read and load image, error if empty (possibly wrong path)
-    cv::Mat inputImage = op::loadImage(FLAGS_image_path, CV_LOAD_IMAGE_COLOR); // Alternative: cv::imread(FLAGS_image_path, CV_LOAD_IMAGE_COLOR);
+    // Alternative: cv::imread(FLAGS_image_path, CV_LOAD_IMAGE_COLOR);
+    cv::Mat inputImage = op::loadImage(FLAGS_image_path, CV_LOAD_IMAGE_COLOR);
     if(inputImage.empty())
         op::error("Could not open or find the image: " + FLAGS_image_path, __LINE__, __FUNCTION__, __FILE__);
-    // Step 2 - Format input image to OpenPose input and output formats
-    op::Array<float> netInputArray;
-    std::vector<float> scaleRatios;
-    std::tie(netInputArray, scaleRatios) = cvMatToOpInput.format(inputImage);
+    const op::Point<int> imageSize{inputImage.cols, inputImage.rows};
+    // Step 2 - Get desired scale sizes
+    std::vector<double> scaleInputToNetInputs;
+    std::vector<op::Point<int>> netInputSizes;
     double scaleInputToOutput;
-    op::Array<float> outputArray;
-    std::tie(scaleInputToOutput, outputArray) = cvMatToOpOutput.format(inputImage);
-    // Step 3 - Estimate poseKeypoints
-    poseExtractorCaffe.forwardPass(netInputArray, {inputImage.cols, inputImage.rows}, scaleRatios);
+    op::Point<int> outputResolution;
+    std::tie(scaleInputToNetInputs, netInputSizes, scaleInputToOutput, outputResolution)
+        = scaleAndSizeExtractor.extract(imageSize);
+    // Step 3 - Format input image to OpenPose input and output formats
+    const auto netInputArray = cvMatToOpInput.createArray(inputImage, scaleInputToNetInputs, netInputSizes);
+    auto outputArray = cvMatToOpOutput.createArray(inputImage, scaleInputToOutput, outputResolution);
+    // Step 4 - Estimate poseKeypoints
+    poseExtractorCaffe.forwardPass(netInputArray, imageSize, scaleInputToNetInputs);
     const auto poseKeypoints = poseExtractorCaffe.getPoseKeypoints();
-    // Step 4 - Render poseKeypoints
+    // Step 5 - Render poseKeypoints
     poseRenderer.renderPose(outputArray, poseKeypoints);
-    // Step 5 - OpenPose output format to cv::Mat
+    // Step 6 - OpenPose output format to cv::Mat
     auto outputImage = opOutputToCvMat.formatToCvMat(outputArray);
 
     // ------------------------- SHOWING RESULT AND CLOSING -------------------------

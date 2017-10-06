@@ -107,13 +107,13 @@ Note: you should not need to modify the OpenPose source code nor examples. In th
 
 
 ### OpenPose Library
-Your case if you want to change internal functions and/or extend its functionality. First, take a look at the [Demo](#demo) and [OpenPose Wrapper](#openpose-wrapper). Second, read the 2 following subsections: OpenPose Overview and Extending Functionality.
+Your case if you want to change internal functions and/or extend its functionality.
 
-1. OpenPose Overview: Learn the basics about the library source code in [doc/library_overview.md](doc/library_overview.md).
-
-2. Extending Functionality: Learn how to extend the library in [doc/library_extend_functionality.md](doc/library_extend_functionality.md).
-
-3. Adding An Extra Module: Learn how to add an extra module in [doc/library_add_new_module.md](doc/library_add_new_module.md).
+1. Take a look at the [Demo](#demo) and [OpenPose Wrapper](#openpose-wrapper).
+2. OpenPose Overview: Learn the basics about the library source code in [doc/library_overview.md](doc/library_overview.md).
+3. Extending Functionality: Learn how to extend the library in [doc/library_extend_functionality.md](doc/library_extend_functionality.md).
+4. Adding An Extra Module: Learn how to add an extra module in [doc/library_add_new_module.md](doc/library_add_new_module.md).
+5. See the Doxygen documentation on [http://cmu-perceptual-computing-lab.github.io/openpose/html/index.html](http://cmu-perceptual-computing-lab.github.io/openpose/html/index.html) or build it from the source code.
 
 
 

@@ -318,7 +318,7 @@ public:
                 // Display rendered output image
                 cv::imshow("User worker GUI", datumsPtr->at(0).cvOutputData);
                 // Display image and sleeps at least 1 ms (it usually sleeps ~5-10 msec to display the image)
-                const char key = cv::waitKey(1);
+                const char key = (char)cv::waitKey(1);
                 if (key == 27)
                     this->stop();
             }

@@ -214,6 +214,7 @@ namespace op
         std::vector<TWorker> mUserInputWs;
         TWorker wDatumProducer;
         TWorker spWIdGenerator;
+        TWorker spWScaleAndSizeExtractor;
         TWorker spWCvMatToOpInput;
         TWorker spWCvMatToOpOutput;
         std::vector<std::vector<TWorker>> spWPoses;
@@ -581,8 +582,8 @@ namespace op
                 error("Net input size cannot be -1x-1.", __LINE__, __FUNCTION__, __FILE__);
             else if (poseNetInputSize.x == -1 || poseNetInputSize.y == -1)
             {
-                if (producerSize.area() <= 0)
-                    error("Net resolution cannot be -1 for image_dir, only for video and webcam.",
+                if (producerSize.x <= 0 || producerSize.y <= 0)
+                    error("Net resolution cannot be -1 for image_dir, only for video, webcam, and IP camera.",
                           __LINE__, __FUNCTION__, __FILE__);
                 else if (poseNetInputSize.x == -1)
                     poseNetInputSize.x = 16 * intRound(
@@ -593,6 +594,10 @@ namespace op
                         poseNetInputSize.x * producerSize.y / (float) producerSize.x / 16.f
                     );
             }
+            // Security checks
+            if ((poseNetInputSize.x > 0 && poseNetInputSize.x % 16 != 0)
+                || (poseNetInputSize.y > 0 && poseNetInputSize.y % 16 != 0))
+                error("Net input resolution must be multiples of 16.", __LINE__, __FUNCTION__, __FILE__);
 
             // Producer
             if (wrapperStructInput.producerSharedPtr != nullptr)
@@ -606,12 +611,29 @@ namespace op
             else
                 wDatumProducer = nullptr;
 
+            // Get input scales and sizes
+            const auto scaleAndSizeExtractor = std::make_shared<ScaleAndSizeExtractor>(
+                poseNetInputSize, finalOutputSize, wrapperStructPose.scalesNumber, wrapperStructPose.scaleGap
+            );
+            spWScaleAndSizeExtractor = std::make_shared<WScaleAndSizeExtractor<TDatumsPtr>>(scaleAndSizeExtractor);
+
+            // Input cvMat to OpenPose input & output format
+            const auto cvMatToOpInput = std::make_shared<CvMatToOpInput>();
+            spWCvMatToOpInput = std::make_shared<WCvMatToOpInput<TDatumsPtr>>(cvMatToOpInput);
+            if (renderOutput)
+            {
+                const auto cvMatToOpOutput = std::make_shared<CvMatToOpOutput>();
+                spWCvMatToOpOutput = std::make_shared<WCvMatToOpOutput<TDatumsPtr>>(cvMatToOpOutput);
+            }
+
             // Pose estimators & renderers
             const Point<int>& poseNetOutputSize = poseNetInputSize;
             std::vector<std::shared_ptr<PoseExtractor>> poseExtractors;
             std::vector<std::shared_ptr<PoseGpuRenderer>> poseGpuRenderers;
             std::shared_ptr<PoseCpuRenderer> poseCpuRenderer;
             std::vector<TWorker> cpuRenderers;
+            spWPoses.clear();
+            spWPoses.resize(gpuNumber);
             if (wrapperStructPose.enable)
             {
                 // Pose estimators
@@ -634,11 +656,11 @@ namespace op
                     // GPU rendering
                     if (renderOutputGpu)
                     {
-                        for (auto gpuId = 0u; gpuId < poseExtractors.size(); gpuId++)
+                        for (const auto& poseExtractor : poseExtractors)
                         {
                             poseGpuRenderers.emplace_back(std::make_shared<PoseGpuRenderer>(
-                                poseNetOutputSize, wrapperStructPose.poseModel, poseExtractors[gpuId],
-                                wrapperStructPose.renderThreshold, wrapperStructPose.blendOriginalFrame, alphaKeypoint,
+                                wrapperStructPose.poseModel, poseExtractor, wrapperStructPose.renderThreshold,
+                                wrapperStructPose.blendOriginalFrame, alphaKeypoint,
                                 alphaHeatMap, wrapperStructPose.defaultPartToRender
                             ));
                         }
@@ -651,26 +673,13 @@ namespace op
                         cpuRenderers.emplace_back(std::make_shared<WPoseRenderer<TDatumsPtr>>(poseCpuRenderer));
                     }
                 }
-            }
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
-            // Input cvMat to OpenPose format
-            const auto cvMatToOpInput = std::make_shared<CvMatToOpInput>(
-                poseNetInputSize, wrapperStructPose.scalesNumber, wrapperStructPose.scaleGap
-            );
-            spWCvMatToOpInput = std::make_shared<WCvMatToOpInput<TDatumsPtr>>(cvMatToOpInput);
-            const auto cvMatToOpOutput = std::make_shared<CvMatToOpOutput>(finalOutputSize, renderOutput);
-            spWCvMatToOpOutput = std::make_shared<WCvMatToOpOutput<TDatumsPtr>>(cvMatToOpOutput);
-
-            // Pose extractor(s)
-            if (wrapperStructPose.enable)
-            {
+                // Pose extractor(s)
                 spWPoses.resize(poseExtractors.size());
                 for (auto i = 0u; i < spWPoses.size(); i++)
                     spWPoses.at(i) = {std::make_shared<WPoseExtractor<TDatumsPtr>>(poseExtractors.at(i))};
             }
-            else
-                spWPoses.resize(gpuNumber);
 
 
             // Face extractor(s)
@@ -693,7 +702,9 @@ namespace op
                     {
                         // 1 FaceDetectorOpenCV per thread, OpenCV face detector is not thread-safe
                         const auto faceDetectorOpenCV = std::make_shared<FaceDetectorOpenCV>(modelFolder);
-                        spWPoses.at(gpu).emplace_back(std::make_shared<WFaceDetectorOpenCV<TDatumsPtr>>(faceDetectorOpenCV));
+                        spWPoses.at(gpu).emplace_back(
+                            std::make_shared<WFaceDetectorOpenCV<TDatumsPtr>>(faceDetectorOpenCV)
+                        );
                     }
                 }
                 // Face keypoint extractor
@@ -701,7 +712,7 @@ namespace op
                 {
                     // Face keypoint extractor
                     const auto netOutputSize = wrapperStructFace.netInputSize;
-                    const auto faceExtractor = std::make_shared<FaceExtractor>(
+                    const auto faceExtractor = std::make_shared<FaceExtractorCaffe>(
                         wrapperStructFace.netInputSize, netOutputSize, modelFolder,
                         gpu + gpuNumberStart, wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale
                     );
@@ -726,7 +737,7 @@ namespace op
                         spWPoses.at(gpu).emplace_back(std::make_shared<WHandDetector<TDatumsPtr>>(handDetector));
                     // Hand keypoint extractor
                     const auto netOutputSize = wrapperStructHand.netInputSize;
-                    const auto handExtractor = std::make_shared<HandExtractor>(
+                    const auto handExtractor = std::make_shared<HandExtractorCaffe>(
                         wrapperStructHand.netInputSize, netOutputSize, modelFolder,
                         gpu + gpuNumberStart, wrapperStructHand.scalesNumber, wrapperStructHand.scaleRange,
                         wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale
@@ -884,7 +895,8 @@ namespace op
             if (!wrapperStructOutput.writeVideo.empty() && wrapperStructInput.producerSharedPtr != nullptr)
             {
                 if (finalOutputSize.x <= 0 || finalOutputSize.y <= 0)
-                    error("Video can only be recorded if outputSize is known.", __LINE__, __FUNCTION__, __FILE__);
+                    error("Video can only be recorded if outputSize is fixed (e.g. video, webcam, IP camera),"
+                          "but not for a image directory.", __LINE__, __FUNCTION__, __FILE__);
                 const auto originalVideoFps = (wrapperStructInput.producerSharedPtr->get(CV_CAP_PROP_FPS) > 0.
                                                ? wrapperStructInput.producerSharedPtr->get(CV_CAP_PROP_FPS) : 30.);
                 const auto videoSaver = std::make_shared<VideoSaver>(
@@ -1103,6 +1115,7 @@ namespace op
             // Reset
             mUserInputWs.clear();
             wDatumProducer = nullptr;
+            spWScaleAndSizeExtractor = nullptr;
             spWCvMatToOpInput = nullptr;
             spWCvMatToOpOutput = nullptr;
             spWPoses.clear();
@@ -1126,7 +1139,7 @@ namespace op
             // The less number of queues -> the less lag
 
             // Security checks
-            if (spWCvMatToOpInput == nullptr || spWCvMatToOpOutput == nullptr)
+            if (spWScaleAndSizeExtractor == nullptr || spWCvMatToOpInput == nullptr)
                 error("Configure the Wrapper class before calling `start()`.", __LINE__, __FUNCTION__, __FILE__);
             if ((wDatumProducer == nullptr) == (mUserInputWs.empty())
                 && mThreadManagerMode != ThreadManagerMode::Asynchronous
@@ -1159,8 +1172,12 @@ namespace op
                 mThreadManager.add(mThreadId, mUserInputWs, queueIn++, queueOut++);
                 threadIdPP();
                 // Thread 1, queues 1 -> 2
-                mThreadManager.add(mThreadId, {spWIdGenerator, spWCvMatToOpInput, spWCvMatToOpOutput}, queueIn++,
-                                   queueOut++);
+                if (spWCvMatToOpOutput == nullptr)
+                    mThreadManager.add(mThreadId, {spWIdGenerator, spWScaleAndSizeExtractor, spWCvMatToOpInput},
+                                       queueIn++, queueOut++);
+                else
+                    mThreadManager.add(mThreadId, {spWIdGenerator, spWScaleAndSizeExtractor, spWCvMatToOpInput,
+                                       spWCvMatToOpOutput}, queueIn++, queueOut++);
             }
             // If custom user Worker in same thread or producer on same thread
             else
@@ -1177,7 +1194,12 @@ namespace op
                             && mThreadManagerMode != ThreadManagerMode::AsynchronousIn)
                     error("No input selected.", __LINE__, __FUNCTION__, __FILE__);
 
-                workersAux = mergeWorkers(workersAux, {spWIdGenerator, spWCvMatToOpInput, spWCvMatToOpOutput});
+                if (spWCvMatToOpOutput == nullptr)
+                    workersAux = mergeWorkers(workersAux, {spWIdGenerator, spWScaleAndSizeExtractor,
+                                                           spWCvMatToOpInput});
+                else
+                    workersAux = mergeWorkers(workersAux, {spWIdGenerator, spWScaleAndSizeExtractor,
+                                                           spWCvMatToOpInput, spWCvMatToOpOutput});
                 // Thread 0 or 1, queues 0 -> 1
                 mThreadManager.add(mThreadId, workersAux, queueIn++, queueOut++);
             }

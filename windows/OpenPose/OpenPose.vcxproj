@@ -55,7 +55,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ObjectFileName>$(IntDir)\obj\obj\obj\%(RelativeDir)\%(Filename)%(Extension).obj</ObjectFileName>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;CAFFE_VERSION=1.0.0;CMAKE_WINDOWS_BUILD;GLOG_NO_ABBREVIATED_SEVERITIES;GOOGLE_GLOG_DLL_DECL=__declspec(dllimport);GOOGLE_GLOG_DLL_DECL_FOR_UNITTESTS=__declspec(dllimport);H5_BUILT_AS_DYNAMIC_LIB=1;USE_CAFFE;USE_CUDNN;USE_OPENCV;USE_LEVELDB;USE_LMDB;CMAKE_INTDIR="Debug";OP_EXPORTS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;CAFFE_VERSION=1.0.0;CMAKE_WINDOWS_BUILD;GLOG_NO_ABBREVIATED_SEVERITIES;GOOGLE_GLOG_DLL_DECL=__declspec(dllimport);GOOGLE_GLOG_DLL_DECL_FOR_UNITTESTS=__declspec(dllimport);H5_BUILT_AS_DYNAMIC_LIB=1;USE_CAFFE;USE_CUDA;USE_OPENCV;USE_LEVELDB;USE_LMDB;CMAKE_INTDIR="Debug";OP_EXPORTS</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <CudaCompile>
@@ -75,7 +75,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>..\..\include;..\..\3rdparty\windows\opencv\include;..\..\3rdparty\windows\caffe\include;..\..\3rdparty\windows\caffe\include2;..\..\3rdparty\windows\caffe3rdparty\include;..\..\3rdparty\windows\caffe3rdparty\include\boost-1_61;$(CUDA_PATH_V8_0)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;CAFFE_VERSION=1.0.0;CMAKE_WINDOWS_BUILD;GLOG_NO_ABBREVIATED_SEVERITIES;GOOGLE_GLOG_DLL_DECL=__declspec(dllimport);GOOGLE_GLOG_DLL_DECL_FOR_UNITTESTS=__declspec(dllimport);H5_BUILT_AS_DYNAMIC_LIB=1;USE_CAFFE;USE_CUDNN;USE_OPENCV;USE_LEVELDB;USE_LMDB;CMAKE_INTDIR="Release";NDEBUG;OP_EXPORTS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;CAFFE_VERSION=1.0.0;CMAKE_WINDOWS_BUILD;GLOG_NO_ABBREVIATED_SEVERITIES;GOOGLE_GLOG_DLL_DECL=__declspec(dllimport);GOOGLE_GLOG_DLL_DECL_FOR_UNITTESTS=__declspec(dllimport);H5_BUILT_AS_DYNAMIC_LIB=1;USE_CAFFE;USE_CUDA;USE_OPENCV;USE_LEVELDB;USE_LMDB;CMAKE_INTDIR="Release";NDEBUG;OP_EXPORTS</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)\obj\obj\obj\%(RelativeDir)\%(Filename)%(Extension).obj</ObjectFileName>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -117,10 +117,12 @@
     <ClInclude Include="..\..\include\openpose\core\renderer.hpp" />
     <ClInclude Include="..\..\include\openpose\core\resizeAndMergeBase.hpp" />
     <ClInclude Include="..\..\include\openpose\core\resizeAndMergeCaffe.hpp" />
+    <ClInclude Include="..\..\include\openpose\core\scaleAndSizeExtractor.hpp" />
     <ClInclude Include="..\..\include\openpose\core\wCvMatToOpInput.hpp" />
     <ClInclude Include="..\..\include\openpose\core\wCvMatToOpOutput.hpp" />
     <ClInclude Include="..\..\include\openpose\core\wKeypointScaler.hpp" />
     <ClInclude Include="..\..\include\openpose\core\wOpOutputToCvMat.hpp" />
+    <ClInclude Include="..\..\include\openpose\core\wScaleAndSizeExtractor.hpp" />
     <ClInclude Include="..\..\include\openpose\experimental\headers.hpp" />
     <ClInclude Include="..\..\include\openpose\experimental\producer\headers.hpp" />
     <ClInclude Include="..\..\include\openpose\experimental\producer\wPeoplePoseLoader.hpp" />
@@ -128,6 +130,7 @@
     <ClInclude Include="..\..\include\openpose\face\faceDetector.hpp" />
     <ClInclude Include="..\..\include\openpose\face\faceDetectorOpenCV.hpp" />
     <ClInclude Include="..\..\include\openpose\face\faceExtractor.hpp" />
+    <ClInclude Include="..\..\include\openpose\face\faceExtractorCaffe.hpp" />
     <ClInclude Include="..\..\include\openpose\face\faceGpuRenderer.hpp" />
     <ClInclude Include="..\..\include\openpose\face\faceParameters.hpp" />
     <ClInclude Include="..\..\include\openpose\face\faceRenderer.hpp" />
@@ -167,6 +170,7 @@
     <ClInclude Include="..\..\include\openpose\hand\handDetector.hpp" />
     <ClInclude Include="..\..\include\openpose\hand\handDetectorFromTxt.hpp" />
     <ClInclude Include="..\..\include\openpose\hand\handExtractor.hpp" />
+    <ClInclude Include="..\..\include\openpose\hand\handExtractorCaffe.hpp" />
     <ClInclude Include="..\..\include\openpose\hand\handGpuRenderer.hpp" />
     <ClInclude Include="..\..\include\openpose\hand\handParameters.hpp" />
     <ClInclude Include="..\..\include\openpose\hand\handRenderer.hpp" />
@@ -196,6 +200,7 @@
     <ClInclude Include="..\..\include\openpose\producer\enumClasses.hpp" />
     <ClInclude Include="..\..\include\openpose\producer\headers.hpp" />
     <ClInclude Include="..\..\include\openpose\producer\imageDirectoryReader.hpp" />
+    <ClInclude Include="..\..\include\openpose\producer\ipCameraReader.hpp" />
     <ClInclude Include="..\..\include\openpose\producer\producer.hpp" />
     <ClInclude Include="..\..\include\openpose\producer\videoCaptureReader.hpp" />
     <ClInclude Include="..\..\include\openpose\producer\videoReader.hpp" />
@@ -240,6 +245,10 @@
     <ClInclude Include="..\..\include\openpose\wrapper\wrapperStructPose.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\include\openpose\utilities\cuda.hu" />
+    <None Include="..\..\include\openpose\utilities\render.hu" />
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="..\..\src\openpose\core\array.cpp" />
     <ClCompile Include="..\..\src\openpose\core\cvMatToOpInput.cpp" />
     <ClCompile Include="..\..\src\openpose\core\cvMatToOpOutput.cpp" />
@@ -258,11 +267,13 @@
     <ClCompile Include="..\..\src\openpose\core\renderer.cpp" />
     <ClCompile Include="..\..\src\openpose\core\resizeAndMergeBase.cpp" />
     <ClCompile Include="..\..\src\openpose\core\resizeAndMergeCaffe.cpp" />
+    <ClCompile Include="..\..\src\openpose\core\scaleAndSizeExtractor.cpp" />
     <ClCompile Include="..\..\src\openpose\face\defineTemplates.cpp" />
     <ClCompile Include="..\..\src\openpose\face\faceCpuRenderer.cpp" />
     <ClCompile Include="..\..\src\openpose\face\faceDetector.cpp" />
     <ClCompile Include="..\..\src\openpose\face\faceDetectorOpenCV.cpp" />
     <ClCompile Include="..\..\src\openpose\face\faceExtractor.cpp" />
+    <ClCompile Include="..\..\src\openpose\face\faceExtractorCaffe.cpp" />
     <ClCompile Include="..\..\src\openpose\face\faceGpuRenderer.cpp" />
     <ClCompile Include="..\..\src\openpose\face\renderFace.cpp" />
     <ClCompile Include="..\..\src\openpose\filestream\cocoJsonSaver.cpp" />
@@ -284,6 +295,7 @@
     <ClCompile Include="..\..\src\openpose\hand\handDetector.cpp" />
     <ClCompile Include="..\..\src\openpose\hand\handDetectorFromTxt.cpp" />
     <ClCompile Include="..\..\src\openpose\hand\handExtractor.cpp" />
+    <ClCompile Include="..\..\src\openpose\hand\handExtractorCaffe.cpp" />
     <ClCompile Include="..\..\src\openpose\hand\handGpuRenderer.cpp" />
     <ClCompile Include="..\..\src\openpose\hand\renderHand.cpp" />
     <ClCompile Include="..\..\src\openpose\pose\bodyPartConnectorBase.cpp" />
@@ -318,10 +330,6 @@
     <ClCompile Include="..\..\src\openpose\wrapper\wrapperStructInput.cpp" />
     <ClCompile Include="..\..\src\openpose\wrapper\wrapperStructOutput.cpp" />
     <ClCompile Include="..\..\src\openpose\wrapper\wrapperStructPose.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\include\openpose\utilities\cuda.hu" />
-    <None Include="..\..\include\openpose\utilities\render.hu" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\..\src\openpose\core\maximumBase.cu" />
