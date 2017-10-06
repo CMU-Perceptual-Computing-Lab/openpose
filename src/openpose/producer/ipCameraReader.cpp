@@ -16,7 +16,7 @@ namespace op
     {
         try
         {
-            return mPathName + "_" + VideoCaptureReader::getFrameName();
+            return VideoCaptureReader::getFrameName();
         }
         catch (const std::exception& e)
         {
