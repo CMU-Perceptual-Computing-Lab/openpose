@@ -3,6 +3,7 @@
     #include <caffe/net.hpp>
 #endif
 #include <openpose/utilities/cuda.hpp>
+#include <openpose/utilities/fileSystem.hpp>
 #include <openpose/core/netCaffe.hpp>
 
 namespace op
@@ -32,6 +33,14 @@ namespace op
                 mCaffeTrainedModel{caffeTrainedModel},
                 mLastBlobName{lastBlobName}
             {
+                const std::string message{".\nPossible causes:\n\t1. Not downloading the OpenPose trained models."
+                                          "\n\t2. Not running OpenPose from the same directory where the `model`"
+                                          " folder is located.\n\t3. Using paths with spaces."};
+                if (!existFile(mCaffeProto))
+                    error("Prototxt file not found: " + mCaffeProto + message, __LINE__, __FUNCTION__, __FILE__);
+                if (!existFile(mCaffeTrainedModel))
+                    error("Caffe trained model file not found: " + mCaffeTrainedModel + message,
+                          __LINE__, __FUNCTION__, __FILE__);
             }
         #endif
     };

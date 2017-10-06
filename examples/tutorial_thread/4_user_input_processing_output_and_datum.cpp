@@ -9,7 +9,12 @@
     // 2. `utilities` module: for the error & logging functions, i.e. op::error & op::log respectively
 
 // 3rdparty dependencies
-#include <gflags/gflags.h> // DEFINE_bool, DEFINE_int32, DEFINE_int64, DEFINE_uint64, DEFINE_double, DEFINE_string
+// GFlags: DEFINE_bool, _int32, _int64, _uint64, _double, _string
+#include <gflags/gflags.h>
+// Allow Google Flags in Ubuntu 14
+#ifndef GFLAGS_GFLAGS_H_
+    namespace gflags = google;
+#endif
 #include <glog/logging.h> // google::InitGoogleLogging
 // OpenPose dependencies
 // Option a) Importing all modules
