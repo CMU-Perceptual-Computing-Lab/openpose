@@ -1,6 +1,7 @@
 set(SOURCES
     defineTemplates.cpp
     imageDirectoryReader.cpp
+    ipCameraReader.cpp
     producer.cpp
     videoCaptureReader.cpp
     videoReader.cpp

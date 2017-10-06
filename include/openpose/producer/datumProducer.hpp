@@ -104,7 +104,7 @@ namespace op
                     const std::string commonMessage{"Input images must be 3-channel BGR."};
                     if (datum.cvInputData.channels() == 1)
                     {
-                        log(commonMessage + " Converting your grey image into BGR.", Priority::High, __LINE__, __FUNCTION__, __FILE__);
+                        log(commonMessage + " Converting grey image into BGR.", Priority::High);
                         cv::cvtColor(datum.cvInputData, datum.cvInputData, CV_GRAY2BGR);
                     }
                     else

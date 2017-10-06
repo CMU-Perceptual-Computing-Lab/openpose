@@ -113,6 +113,23 @@ OpenPose Library - Release Notes
 
 
 
-## Current version (future OpenPose 1.1.1)
+## Current version (future OpenPose 1.2.0)
 1. Main improvements:
-    1. COCO JSON file outputs 0 as score for non-detected keypoints.
+    1. Added IP camera support.
+    2. Output images can have the input size, OpenPose able to change its size for each image and not required fixed size anymore.
+        1. FrameDisplayer accepts variable size images by rescaling every time a frame with bigger width or height is displayed (gui module).
+        2. OpOutputToCvMat & GuiInfoAdder does not require to know the output size at construction time, deduced from each image.
+        3. CvMatToOutput and Renderers allow to keep input resolution as output for images (core module).
+    3. New standalone face keypoint detector based on OpenCV face detector: much faster if body keypoint detection is not required but much less accurate.
+    4. Face and hand keypoint detectors now can return each keypoint heatmap.
+    5. COCO JSON file outputs 0 as score for non-detected keypoints.
+    6. Added example for OpenPose for user asynchronous output and cleaned all `tutorial_wrapper/` examples.
+    7. Added `-1` option for `net_resolution` in order to auto-select the best possible aspect ratio given the user input.
+2. Functions or parameters renamed:
+    1. OpenPose able to change its size and initial size:
+        1. Flag `resolution` renamed as `output_resolution`.
+        2. FrameDisplayer, GuiInfoAdder and Gui constructors arguments modified (gui module).
+        3. OpOutputToCvMat constructor removed (core module).
+        4. New Renders classes to split GpuRenderers from CpuRenderers.
+3. Main bugs fixed:
+    1. Ubuntu installer script now works even if Python pip was not installed previously.

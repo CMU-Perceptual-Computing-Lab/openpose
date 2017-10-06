@@ -10,21 +10,21 @@
 */
 cv::Mat pointGreyToCvMat(const Spinnaker::ImagePtr &imagePtr)
 {
-	try
-	{
-		const auto XPadding = imagePtr->GetXPadding();
-		const auto YPadding = imagePtr->GetYPadding();
-		const auto rowsize = imagePtr->GetWidth();
-		const auto colsize = imagePtr->GetHeight();
+    try
+    {
+        const auto XPadding = imagePtr->GetXPadding();
+        const auto YPadding = imagePtr->GetYPadding();
+        const auto rowsize = imagePtr->GetWidth();
+        const auto colsize = imagePtr->GetHeight();
 
-		// image data contains padding. When allocating cv::Mat container size, you need to account for the X,Y image data padding.
-		return cv::Mat((int)(colsize + YPadding), (int)(rowsize + XPadding), CV_8UC3, imagePtr->GetData(), imagePtr->GetStride());
-	}
-	catch (const std::exception& e)
-	{
-		op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-		return cv::Mat();
-	}
+        // image data contains padding. When allocating cv::Mat container size, you need to account for the X,Y image data padding.
+        return cv::Mat((int)(colsize + YPadding), (int)(rowsize + XPadding), CV_8UC3, imagePtr->GetData(), imagePtr->GetStride());
+    }
+    catch (const std::exception& e)
+    {
+        op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        return cv::Mat();
+    }
 }
 
 // This function configures the camera to use a trigger. First, trigger mode is
@@ -35,24 +35,24 @@ int configureTrigger(Spinnaker::GenApi::INodeMap &iNodeMap)
 {
     try
     {
-		int result = 0;
-		op::log("*** CONFIGURING TRIGGER ***", op::Priority::High);
-		op::log("Configuring hardware trigger...", op::Priority::High);
+        int result = 0;
+        op::log("*** CONFIGURING TRIGGER ***", op::Priority::High);
+        op::log("Configuring hardware trigger...", op::Priority::High);
         // Ensure trigger mode off
         // *** NOTES ***
         // The trigger must be disabled in order to configure whether the source
         // is software or hardware.
         Spinnaker::GenApi::CEnumerationPtr ptrTriggerMode = iNodeMap.GetNode("TriggerMode");
         if (!Spinnaker::GenApi::IsAvailable(ptrTriggerMode) || !Spinnaker::GenApi::IsReadable(ptrTriggerMode))
-			op::error("Unable to disable trigger mode (node retrieval). Aborting...", __LINE__, __FUNCTION__, __FILE__);
+            op::error("Unable to disable trigger mode (node retrieval). Aborting...", __LINE__, __FUNCTION__, __FILE__);
 
         Spinnaker::GenApi::CEnumEntryPtr ptrTriggerModeOff = ptrTriggerMode->GetEntryByName("Off");
         if (!Spinnaker::GenApi::IsAvailable(ptrTriggerModeOff) || !Spinnaker::GenApi::IsReadable(ptrTriggerModeOff))
-			op::error("Unable to disable trigger mode (enum entry retrieval). Aborting...", __LINE__, __FUNCTION__, __FILE__);
+            op::error("Unable to disable trigger mode (enum entry retrieval). Aborting...", __LINE__, __FUNCTION__, __FILE__);
 
         ptrTriggerMode->SetIntValue(ptrTriggerModeOff->GetValue());
 
-		op::log("Trigger mode disabled...", op::Priority::High);
+        op::log("Trigger mode disabled...", op::Priority::High);
 
         // Select trigger source
         // *** NOTES ***
@@ -60,16 +60,16 @@ int configureTrigger(Spinnaker::GenApi::INodeMap &iNodeMap)
         // mode is off.
         Spinnaker::GenApi::CEnumerationPtr ptrTriggerSource = iNodeMap.GetNode("TriggerSource");
         if (!Spinnaker::GenApi::IsAvailable(ptrTriggerSource) || !Spinnaker::GenApi::IsWritable(ptrTriggerSource))
-			op::error("Unable to set trigger mode (node retrieval). Aborting...", __LINE__, __FUNCTION__, __FILE__);
+            op::error("Unable to set trigger mode (node retrieval). Aborting...", __LINE__, __FUNCTION__, __FILE__);
 
         // Set trigger mode to hardware ('Line0')
         Spinnaker::GenApi::CEnumEntryPtr ptrTriggerSourceHardware = ptrTriggerSource->GetEntryByName("Line0");
         if (!Spinnaker::GenApi::IsAvailable(ptrTriggerSourceHardware) || !Spinnaker::GenApi::IsReadable(ptrTriggerSourceHardware))
-			op::error("Unable to set trigger mode (enum entry retrieval). Aborting...", __LINE__, __FUNCTION__, __FILE__);
+            op::error("Unable to set trigger mode (enum entry retrieval). Aborting...", __LINE__, __FUNCTION__, __FILE__);
 
         ptrTriggerSource->SetIntValue(ptrTriggerSourceHardware->GetValue());
 
-		op::log("Trigger source set to hardware...", op::Priority::High);
+        op::log("Trigger source set to hardware...", op::Priority::High);
 
         // Turn trigger mode on
         // *** LATER ***
@@ -78,26 +78,26 @@ int configureTrigger(Spinnaker::GenApi::INodeMap &iNodeMap)
         Spinnaker::GenApi::CEnumEntryPtr ptrTriggerModeOn = ptrTriggerMode->GetEntryByName("On");
         if (!Spinnaker::GenApi::IsAvailable(ptrTriggerModeOn) || !Spinnaker::GenApi::IsReadable(ptrTriggerModeOn))
         {
-			op::error("Unable to enable trigger mode (enum entry retrieval). Aborting...", __LINE__, __FUNCTION__, __FILE__);
+            op::error("Unable to enable trigger mode (enum entry retrieval). Aborting...", __LINE__, __FUNCTION__, __FILE__);
             return -1;
         }
 
         ptrTriggerMode->SetIntValue(ptrTriggerModeOn->GetValue());
 
-		op::log("Trigger mode turned back on...", op::Priority::High);
+        op::log("Trigger mode turned back on...", op::Priority::High);
 
-		return result;
+        return result;
     }
-	catch (const Spinnaker::Exception& e)
-	{
-		op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-		return -1;
-	}
-	catch (const std::exception& e)
-	{
-		op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-		return -1;
-	}
+    catch (const Spinnaker::Exception& e)
+    {
+        op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        return -1;
+    }
+    catch (const std::exception& e)
+    {
+        op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        return -1;
+    }
 }
 
 // This function returns the camera to a normal state by turning off trigger
@@ -106,7 +106,7 @@ int resetTrigger(Spinnaker::GenApi::INodeMap &iNodeMap)
 {
     try
     {
-		int result = 0;
+        int result = 0;
         //
         // Turn trigger mode back off
         //
@@ -116,28 +116,28 @@ int resetTrigger(Spinnaker::GenApi::INodeMap &iNodeMap)
         //
         Spinnaker::GenApi::CEnumerationPtr ptrTriggerMode = iNodeMap.GetNode("TriggerMode");
         if (!Spinnaker::GenApi::IsAvailable(ptrTriggerMode) || !Spinnaker::GenApi::IsReadable(ptrTriggerMode))
-			op::error("Unable to disable trigger mode (node retrieval). Non-fatal error...", __LINE__, __FUNCTION__, __FILE__);
+            op::error("Unable to disable trigger mode (node retrieval). Non-fatal error...", __LINE__, __FUNCTION__, __FILE__);
 
         Spinnaker::GenApi::CEnumEntryPtr ptrTriggerModeOff = ptrTriggerMode->GetEntryByName("Off");
         if (!Spinnaker::GenApi::IsAvailable(ptrTriggerModeOff) || !Spinnaker::GenApi::IsReadable(ptrTriggerModeOff))
-			op::error("Unable to disable trigger mode (enum entry retrieval). Non-fatal error...", __LINE__, __FUNCTION__, __FILE__);
+            op::error("Unable to disable trigger mode (enum entry retrieval). Non-fatal error...", __LINE__, __FUNCTION__, __FILE__);
 
         ptrTriggerMode->SetIntValue(ptrTriggerModeOff->GetValue());
 
-		// op::log("Trigger mode disabled...", op::Priority::High);
+        // op::log("Trigger mode disabled...", op::Priority::High);
 
-		return result;
+        return result;
     }
     catch (Spinnaker::Exception &e)
     {
-		op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         return -1;
-	}
-	catch (const std::exception& e)
-	{
-		op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-		return -1;
-	}
+    }
+    catch (const std::exception& e)
+    {
+        op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        return -1;
+    }
 }
 
 // This function acquires and displays images from each device.
@@ -149,7 +149,7 @@ std::vector<cv::Mat> acquireImages(Spinnaker::CameraList &cameraList)
         if (cameraList.GetSize() != INTRINSICS.size())
             op::checkE(cameraList.GetSize(), INTRINSICS.size(), "The number of cameras must be the same as the INTRINSICS vector size.", __LINE__, __FUNCTION__, __FILE__);
 
-		std::vector<cv::Mat> cvMats;
+        std::vector<cv::Mat> cvMats;
 
         // Retrieve, convert, and return an image for each camera
         // In order to work with simultaneous camera streams, nested loops are
@@ -176,7 +176,7 @@ std::vector<cv::Mat> acquireImages(Spinnaker::CameraList &cameraList)
             for (auto i = 0u; i < cameraPtrs.size(); i++)
                 imagePtrs.at(i) = cameraPtrs.at(i)->GetNextImage();
             durationMs = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now()-begin).count() * 1e-6;
-			// op::log("Time extraction (ms): " + std::to_string(durationMs), op::Priority::High, __LINE__, __FUNCTION__, __FILE__);
+            // op::log("Time extraction (ms): " + std::to_string(durationMs), op::Priority::High);
         }
 
         // Original format -> RGB8
@@ -186,7 +186,7 @@ std::vector<cv::Mat> acquireImages(Spinnaker::CameraList &cameraList)
             if (imagePtr->IsIncomplete())
             {
                 op::log("Image incomplete with image status " + std::to_string(imagePtr->GetImageStatus()) + "...",
-					    op::Priority::High, __LINE__, __FUNCTION__, __FILE__);
+                        op::Priority::High, __LINE__, __FUNCTION__, __FILE__);
                 imagesExtracted = false;
                 break;
             }
@@ -222,7 +222,7 @@ std::vector<cv::Mat> acquireImages(Spinnaker::CameraList &cameraList)
                 // imagePtr = imagePtr;
                 // }
                 // durationMs = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now()-begin).count() * 1e-6;
-				// op::log("Time conversion (ms): " + std::to_string(durationMs / reps), op::Priority::High, __LINE__, __FUNCTION__, __FILE__);
+                // op::log("Time conversion (ms): " + std::to_string(durationMs / reps), op::Priority::High);
             }
         }
 
@@ -241,18 +241,18 @@ std::vector<cv::Mat> acquireImages(Spinnaker::CameraList &cameraList)
             }
         }
 
-		return cvMats;
+        return cvMats;
     }
     catch (Spinnaker::Exception &e)
     {
-		op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-		return {};
-	}
-	catch (const std::exception& e)
-	{
-		op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-		return {};
-	}
+        op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        return {};
+    }
+    catch (const std::exception& e)
+    {
+        op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        return {};
+    }
 }
 
 // This function prints the device information of the camera from the transport
@@ -262,7 +262,7 @@ int printDeviceInfo(Spinnaker::GenApi::INodeMap &iNodeMap, const unsigned int ca
 {
     int result = 0;
 
-	op::log("Printing device information for camera " + std::to_string(camNum) + "...\n", op::Priority::High);
+    op::log("Printing device information for camera " + std::to_string(camNum) + "...\n", op::Priority::High);
 
     Spinnaker::GenApi::FeatureList_t features;
     Spinnaker::GenApi::CCategoryPtr cCategoryPtr = iNodeMap.GetNode("DeviceInformation");
@@ -275,12 +275,12 @@ int printDeviceInfo(Spinnaker::GenApi::INodeMap &iNodeMap, const unsigned int ca
         {
             Spinnaker::GenApi::CNodePtr pfeatureNode = *it;
             const auto cValuePtr = (Spinnaker::GenApi::CValuePtr)pfeatureNode;
-			op::log(pfeatureNode->GetName() + " : " + (IsReadable(cValuePtr) ? cValuePtr->ToString() : "Node not readable"), op::Priority::High);
+            op::log(pfeatureNode->GetName() + " : " + (IsReadable(cValuePtr) ? cValuePtr->ToString() : "Node not readable"), op::Priority::High);
         }
     }
     else
-		op::log("Device control information not available.", op::Priority::High);
-	op::log(" ", op::Priority::High);
+        op::log("Device control information not available.", op::Priority::High);
+    op::log(" ", op::Priority::High);
 
     return result;
 }
@@ -335,7 +335,7 @@ WPointGrey::~WPointGrey()
                 // Reset trigger
                 auto result = resetTrigger(iNodeMap);
                 if (result < 0)
-					op::error("Error happened..." + std::to_string(result), __LINE__, __FUNCTION__, __FILE__);
+                    op::error("Error happened..." + std::to_string(result), __LINE__, __FUNCTION__, __FILE__);
 
                 // Deinitialize each camera
                 // Each camera must be deinitialized separately by first
@@ -343,7 +343,7 @@ WPointGrey::~WPointGrey()
                 cameraPtr->DeInit();
             }
 
-			op::log("Completed. Releasing...", op::Priority::High);
+            op::log("Completed. Releasing...", op::Priority::High);
 
             // Clear camera list before releasing mSystemPtr
             mCameraList.Clear();
@@ -352,7 +352,7 @@ WPointGrey::~WPointGrey()
             mSystemPtr->ReleaseInstance();
         }
 
-		op::log("Done! Exitting...", op::Priority::High);
+        op::log("Done! Exitting...", op::Priority::High);
     }
     catch (const Spinnaker::Exception& e)
     {
@@ -371,7 +371,7 @@ void WPointGrey::initializationOnThread()
         initialized = true;
 
         // Print application build information
-		op::log(std::string{ "Application build date: " } + __DATE__ + " " + __TIME__, op::Priority::High, __LINE__, __FUNCTION__, __FILE__);
+        op::log(std::string{ "Application build date: " } + __DATE__ + " " + __TIME__, op::Priority::High);
 
         // Retrieve singleton reference to mSystemPtr object
         mSystemPtr = Spinnaker::System::GetInstance();
@@ -381,7 +381,7 @@ void WPointGrey::initializationOnThread()
 
         unsigned int numCameras = mCameraList.GetSize();
 
-		op::log("Number of cameras detected: " + std::to_string(numCameras), op::Priority::High, __LINE__, __FUNCTION__, __FILE__);
+        op::log("Number of cameras detected: " + std::to_string(numCameras), op::Priority::High);
 
         // Finish if there are no cameras
         if (numCameras == 0)
@@ -392,12 +392,12 @@ void WPointGrey::initializationOnThread()
             // Release mSystemPtr
             mSystemPtr->ReleaseInstance();
 
-			op::log("Not enough cameras!\nPress Enter to exit...", op::Priority::High);
+            op::log("Not enough cameras!\nPress Enter to exit...", op::Priority::High);
             getchar();
 
             op::error("No cameras detected.", __LINE__, __FUNCTION__, __FILE__);
         }
-		op::log("Camera system initialized...", op::Priority::High);
+        op::log("Camera system initialized...", op::Priority::High);
 
         //
         // Retrieve transport layer nodemaps and print device information for
@@ -409,7 +409,7 @@ void WPointGrey::initializationOnThread()
         // serial number. Rather than caching the nodemap, each nodemap is
         // retrieved both times as needed.
         //
-		op::log("\n*** DEVICE INFORMATION ***\n", op::Priority::High);
+        op::log("\n*** DEVICE INFORMATION ***\n", op::Priority::High);
 
         for (int i = 0; i < mCameraList.GetSize(); i++)
         {
@@ -445,7 +445,7 @@ void WPointGrey::initializationOnThread()
             // // Configure trigger
             // result = configureTrigger(iNodeMap);
             // if (result < 0)
-			// op::error("Result > 0, error " + std::to_string(result) + " occurred...", __LINE__, __FUNCTION__, __FILE__);
+            // op::error("Result > 0, error " + std::to_string(result) + " occurred...", __LINE__, __FUNCTION__, __FILE__);
 
             // // Configure chunk data
             // result = configureChunkData(iNodeMap);
@@ -456,11 +456,11 @@ void WPointGrey::initializationOnThread()
             Spinnaker::GenApi::INodeMap& snodeMap = cameraPtr->GetTLStreamNodeMap();
             Spinnaker::GenApi::CEnumerationPtr ptrBufferHandlingMode = snodeMap.GetNode("StreamBufferHandlingMode");
             if (!Spinnaker::GenApi::IsAvailable(ptrBufferHandlingMode) || !Spinnaker::GenApi::IsWritable(ptrBufferHandlingMode))
-				op::error("Unable to change buffer handling mode", __LINE__, __FUNCTION__, __FILE__);
+                op::error("Unable to change buffer handling mode", __LINE__, __FUNCTION__, __FILE__);
 
             Spinnaker::GenApi::CEnumEntryPtr ptrBufferHandlingModeNewest = ptrBufferHandlingMode->GetEntryByName("NewestFirstOverwrite");
             if (!Spinnaker::GenApi::IsAvailable(ptrBufferHandlingModeNewest) || !IsReadable(ptrBufferHandlingModeNewest))
-				op::error("Unable to set buffer handling mode to newest (entry 'NewestFirstOverwrite' retrieval). Aborting...", __LINE__, __FUNCTION__, __FILE__);
+                op::error("Unable to set buffer handling mode to newest (entry 'NewestFirstOverwrite' retrieval). Aborting...", __LINE__, __FUNCTION__, __FILE__);
             int64_t bufferHandlingModeNewest = ptrBufferHandlingModeNewest->GetValue();
 
             ptrBufferHandlingMode->SetIntValue(bufferHandlingModeNewest);
@@ -486,22 +486,22 @@ void WPointGrey::initializationOnThread()
             // Set acquisition mode to continuous
             Spinnaker::GenApi::CEnumerationPtr ptrAcquisitionMode = cameraPtr->GetNodeMap().GetNode("AcquisitionMode");
             if (!Spinnaker::GenApi::IsAvailable(ptrAcquisitionMode) || !Spinnaker::GenApi::IsWritable(ptrAcquisitionMode))
-				op::error("Unable to set acquisition mode to continuous (node retrieval; camera " + std::to_string(i) + "). Aborting...", __LINE__, __FUNCTION__, __FILE__);
+                op::error("Unable to set acquisition mode to continuous (node retrieval; camera " + std::to_string(i) + "). Aborting...", __LINE__, __FUNCTION__, __FILE__);
 
             Spinnaker::GenApi::CEnumEntryPtr ptrAcquisitionModeContinuous = ptrAcquisitionMode->GetEntryByName("Continuous");
             if (!Spinnaker::GenApi::IsAvailable(ptrAcquisitionModeContinuous) || !Spinnaker::GenApi::IsReadable(ptrAcquisitionModeContinuous))
-				op::error("Unable to set acquisition mode to continuous (entry 'continuous' retrieval " + std::to_string(i) + "). Aborting...", __LINE__, __FUNCTION__, __FILE__);
+                op::error("Unable to set acquisition mode to continuous (entry 'continuous' retrieval " + std::to_string(i) + "). Aborting...", __LINE__, __FUNCTION__, __FILE__);
 
             int64_t acquisitionModeContinuous = ptrAcquisitionModeContinuous->GetValue();
 
             ptrAcquisitionMode->SetIntValue(acquisitionModeContinuous);
 
-			op::log("Camera " + std::to_string(i) + " acquisition mode set to continuous...", op::Priority::High);
+            op::log("Camera " + std::to_string(i) + " acquisition mode set to continuous...", op::Priority::High);
 
             // Begin acquiring images
             cameraPtr->BeginAcquisition();
 
-			op::log("Camera " + std::to_string(i) + " started acquiring images...", op::Priority::High);
+            op::log("Camera " + std::to_string(i) + " started acquiring images...", op::Priority::High);
 
             // Retrieve device serial number for filename
             strSerialNumbers[i] = "";
@@ -513,10 +513,10 @@ void WPointGrey::initializationOnThread()
                 strSerialNumbers[i] = ptrStringSerial->GetValue();
                 op::log("Camera " + std::to_string(i) + " serial number set to " + strSerialNumbers[i].c_str() + "...", op::Priority::High);
             }
-			op::log(" ", op::Priority::High);
+            op::log(" ", op::Priority::High);
         }
 
-		op::log("\nRunning for all cameras...\n\n*** IMAGE ACQUISITION ***\n", op::Priority::High);
+        op::log("\nRunning for all cameras...\n\n*** IMAGE ACQUISITION ***\n", op::Priority::High);
     }
     catch (const Spinnaker::Exception& e)
     {

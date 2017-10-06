@@ -8,6 +8,7 @@
 #include <openpose/core/cvMatToOpOutput.hpp>
 #include <openpose/core/datum.hpp>
 #include <openpose/core/enumClasses.hpp>
+#include <openpose/core/gpuRenderer.hpp>
 #include <openpose/core/keypointScaler.hpp>
 #include <openpose/core/macros.hpp>
 #include <openpose/core/net.hpp>

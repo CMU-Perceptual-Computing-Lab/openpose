@@ -83,6 +83,13 @@ namespace op
         Array<float> faceKeypoints;
 
         /**
+         * Face pose heatmaps (face parts and/or background) for the whole image.
+         * Analogous of bodyHeatMaps applied to face. However, there is no PAFs and the size is different.
+         * Size: #people x #face parts (70) x output_net_height x output_net_width
+         */
+        Array<float> faceHeatMaps;
+
+        /**
          * Hand detection locations (x,y,width,height) for each person in the image.
          * It is resized to cvInputData.size().
          * Size: #people
@@ -93,9 +100,16 @@ namespace op
          * Hand keypoints (x,y,score) locations for each person in the image.
          * It has been resized to the same resolution as `poseKeypoints`.
          * handKeypoints[0] corresponds to left hands, and handKeypoints[1] to right ones.
-         * Size: #people x #hand parts (21) x 3 ((x,y) coordinates + score)
+         * Size each Array: #people x #hand parts (21) x 3 ((x,y) coordinates + score)
          */
         std::array<Array<float>, 2> handKeypoints;
+
+        /**
+         * Face pose heatmaps (hand parts and/or background) for the whole image.
+         * Analogous of faceHeatMaps applied to face.
+         * Size each Array: #people x #hand parts (21) x output_net_height x output_net_width
+         */
+        std::array<Array<float>, 2> handHeatMaps;
 
         // -------------------------------------------------- Other parameters -------------------------------------------------- //
         float scaleInputToOutput; /**< Scale ratio between the input Datum::cvInputData and the output Datum::cvOutputData. */

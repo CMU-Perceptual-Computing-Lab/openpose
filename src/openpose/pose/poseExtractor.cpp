@@ -76,11 +76,17 @@ namespace op
 
     void PoseExtractor::initializationOnThread()
     {
-        // Get thread id
-        mThreadId = {std::this_thread::get_id()};
-
-        // Deep net initialization
-        netInitializationOnThread();
+        try
+        {
+            // Get thread id
+            mThreadId = {std::this_thread::get_id()};
+            // Deep net initialization
+            netInitializationOnThread();
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
     }
 
     Array<float> PoseExtractor::getHeatMaps() const
@@ -88,75 +94,75 @@ namespace op
         try
         {
             checkThread();
-            Array<float> poseHeatMaps;
+            Array<float> heatMaps;
             if (!mHeatMapTypes.empty())
             {
                 // Allocate memory
                 const auto numberHeatMapChannels = getNumberHeatMapChannels(mHeatMapTypes, mPoseModel);
-                poseHeatMaps.reset({numberHeatMapChannels, mNetOutputSize.y, mNetOutputSize.x});
+                heatMaps.reset({numberHeatMapChannels, mNetOutputSize.y, mNetOutputSize.x});
 
                 // Copy memory
-                const auto channelOffset = poseHeatMaps.getVolume(1, 2);
+                const auto channelOffset = heatMaps.getVolume(1, 2);
                 const auto volumeBodyParts = POSE_NUMBER_BODY_PARTS[(int)mPoseModel] * channelOffset;
                 const auto volumePAFs = POSE_BODY_PART_PAIRS[(int)mPoseModel].size() * channelOffset;
                 unsigned int totalOffset = 0u;
                 if (heatMapTypesHas(mHeatMapTypes, HeatMapType::Parts))
                 {
-                    cudaMemcpy(poseHeatMaps.getPtr(), getHeatMapGpuConstPtr(), volumeBodyParts * sizeof(float), cudaMemcpyDeviceToHost);
+                    cudaMemcpy(heatMaps.getPtr(), getHeatMapGpuConstPtr(), volumeBodyParts * sizeof(float), cudaMemcpyDeviceToHost);
                     // Change from [0,1] to [-1,1]
                     if (mHeatMapScaleMode == ScaleMode::PlusMinusOne)
                         for (auto i = 0u ; i < volumeBodyParts ; i++)
-                            poseHeatMaps[i] = fastTruncate(poseHeatMaps[i]) * 2.f - 1.f;
+                            heatMaps[i] = fastTruncate(heatMaps[i]) * 2.f - 1.f;
                     // [0, 255]
                     else if (mHeatMapScaleMode == ScaleMode::UnsignedChar)
                         for (auto i = 0u ; i < volumeBodyParts ; i++)
-                            poseHeatMaps[i] = (float)intRound(fastTruncate(poseHeatMaps[i]) * 255.f);
+                            heatMaps[i] = (float)intRound(fastTruncate(heatMaps[i]) * 255.f);
                     // Avoid values outside original range
                     else
                         for (auto i = 0u ; i < volumeBodyParts ; i++)
-                            poseHeatMaps[i] = fastTruncate(poseHeatMaps[i]);
+                            heatMaps[i] = fastTruncate(heatMaps[i]);
                     totalOffset += (unsigned int)volumeBodyParts;
                 }
                 if (heatMapTypesHas(mHeatMapTypes, HeatMapType::Background))
                 {
-                    cudaMemcpy(poseHeatMaps.getPtr() + totalOffset, getHeatMapGpuConstPtr() + volumeBodyParts, channelOffset * sizeof(float), cudaMemcpyDeviceToHost);
+                    cudaMemcpy(heatMaps.getPtr() + totalOffset, getHeatMapGpuConstPtr() + volumeBodyParts, channelOffset * sizeof(float), cudaMemcpyDeviceToHost);
                     // Change from [0,1] to [-1,1]
-                    auto* poseHeatMapsPtr = poseHeatMaps.getPtr() + totalOffset;
+                    auto* heatMapsPtr = heatMaps.getPtr() + totalOffset;
                     if (mHeatMapScaleMode == ScaleMode::PlusMinusOne)
                         for (auto i = 0u ; i < channelOffset ; i++)
-                            poseHeatMapsPtr[i] = fastTruncate(poseHeatMapsPtr[i]) * 2.f - 1.f;
+                            heatMapsPtr[i] = fastTruncate(heatMapsPtr[i]) * 2.f - 1.f;
                     // [0, 255]
                     else if (mHeatMapScaleMode == ScaleMode::UnsignedChar)
                         for (auto i = 0u ; i < channelOffset ; i++)
-                            poseHeatMapsPtr[i] = (float)intRound(fastTruncate(poseHeatMapsPtr[i]) * 255.f);
+                            heatMapsPtr[i] = (float)intRound(fastTruncate(heatMapsPtr[i]) * 255.f);
                     // Avoid values outside original range
                     else
                         for (auto i = 0u ; i < channelOffset ; i++)
-                            poseHeatMapsPtr[i] = fastTruncate(poseHeatMapsPtr[i]);
+                            heatMapsPtr[i] = fastTruncate(heatMapsPtr[i]);
                     totalOffset += (unsigned int)channelOffset;
                 }
                 if (heatMapTypesHas(mHeatMapTypes, HeatMapType::PAFs))
                 {
-                    cudaMemcpy(poseHeatMaps.getPtr() + totalOffset, getHeatMapGpuConstPtr() + volumeBodyParts + channelOffset, volumePAFs * sizeof(float), cudaMemcpyDeviceToHost);
+                    cudaMemcpy(heatMaps.getPtr() + totalOffset, getHeatMapGpuConstPtr() + volumeBodyParts + channelOffset, volumePAFs * sizeof(float), cudaMemcpyDeviceToHost);
                     // Change from [-1,1] to [0,1]. Note that PAFs are in [-1,1]
-                    auto* poseHeatMapsPtr = poseHeatMaps.getPtr() + totalOffset;
+                    auto* heatMapsPtr = heatMaps.getPtr() + totalOffset;
                     if (mHeatMapScaleMode == ScaleMode::ZeroToOne)
                         for (auto i = 0u ; i < volumePAFs ; i++)
-                            poseHeatMapsPtr[i] = fastTruncate(poseHeatMapsPtr[i], -1.f) * 0.5f + 0.5f;
+                            heatMapsPtr[i] = fastTruncate(heatMapsPtr[i], -1.f) * 0.5f + 0.5f;
                     // [0, 255]
                     else if (mHeatMapScaleMode == ScaleMode::UnsignedChar)
                         for (auto i = 0u ; i < volumePAFs ; i++)
-                            poseHeatMapsPtr[i] = (float)intRound(fastTruncate(poseHeatMapsPtr[i], -1.f) * 128.5f + 128.5f);
+                            heatMapsPtr[i] = (float)intRound(fastTruncate(heatMapsPtr[i], -1.f) * 128.5f + 128.5f);
                     // Avoid values outside original range
                     else
                         for (auto i = 0u ; i < volumePAFs ; i++)
-                            poseHeatMapsPtr[i] = fastTruncate(poseHeatMapsPtr[i], -1.f);
+                            heatMapsPtr[i] = fastTruncate(heatMapsPtr[i], -1.f);
                     totalOffset += (unsigned int)volumePAFs;
                 }
                 // Copy all at once
-                // cudaMemcpy(poseHeatMaps.getPtr(), getHeatMapGpuConstPtr(), poseHeatMaps.getVolume() * sizeof(float), cudaMemcpyDeviceToHost);
+                // cudaMemcpy(heatMaps.getPtr(), getHeatMapGpuConstPtr(), heatMaps.getVolume() * sizeof(float), cudaMemcpyDeviceToHost);
             }
-            return poseHeatMaps;
+            return heatMaps;
         }
         catch (const std::exception& e)
         {

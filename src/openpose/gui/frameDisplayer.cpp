@@ -1,13 +1,24 @@
+#include <opencv2/opencv.hpp> // cv::imshow, cv::waitKey, cv::namedWindow, cv::setWindowProperty
 #include <opencv2/highgui/highgui.hpp> // cv::imshow, cv::waitKey, cv::namedWindow, cv::setWindowProperty
 #include <openpose/gui/frameDisplayer.hpp>
 
 namespace op
 {
-    FrameDisplayer::FrameDisplayer(const Point<int>& windowedSize, const std::string& windowedName, const bool fullScreen) :
-        mWindowedSize{windowedSize},
+    FrameDisplayer::FrameDisplayer(const std::string& windowedName, const Point<int>& initialWindowedSize, const bool fullScreen) :
         mWindowName{windowedName},
+        mWindowedSize{initialWindowedSize},
         mGuiDisplayMode{(fullScreen ? GuiDisplayMode::FullScreen : GuiDisplayMode::Windowed)}
     {
+        try
+        {
+            // If initial window size = 0 --> initialize to 640x480
+            if (mWindowedSize.x <= 0 || mWindowedSize.y <= 0)
+                mWindowedSize = Point<int>{640, 480};
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
     }
 
     void FrameDisplayer::initializationOnThread()
@@ -72,6 +83,14 @@ namespace op
     {
         try
         {
+            // If frame > window size --> Resize window
+            if (mWindowedSize.x < frame.cols || mWindowedSize.y < frame.rows)
+            {
+                mWindowedSize.x = std::max(mWindowedSize.x, frame.cols);
+                mWindowedSize.y = std::max(mWindowedSize.y, frame.rows);
+                cv::resizeWindow(mWindowName, mWindowedSize.x, mWindowedSize.y);
+                cv::waitKey(1); // This one will show most probably a white image (I guess the program does not have time to render in 1 msec)
+            }
             cv::imshow(mWindowName, frame);
             if (waitKeyValue != -1)
                 cv::waitKey(waitKeyValue);

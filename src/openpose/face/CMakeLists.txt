@@ -1,8 +1,10 @@
 set(SOURCES
     defineTemplates.cpp
     faceDetector.cpp
+    faceDetectorOpenCV.cpp
     faceExtractor.cpp
-    faceRenderer.cpp
+    faceCpuRenderer.cpp
+    faceGpuRenderer.cpp
     renderFace.cpp
     renderFace.cu
 )

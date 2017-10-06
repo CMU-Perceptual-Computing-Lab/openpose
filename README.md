@@ -11,10 +11,11 @@ OpenPose is a **library for real-time multi-person keypoint detection and multi-
 
 
 ## Latest News
-- Jul 2017: **Windows**, new [**portable demo**](doc/installation.md#installation---demo) **and** [**easier library installation**](doc/installation.md#installation---library)!
+- Sep 2017: **CMake** installer and **IP camera** support!
+- Jul 2017: [**Windows portable demo**](doc/installation.md#installation---demo)!
 - Jul 2017: **Hands** released!
 - Jun 2017: **Face** released!
-- May 2017: **Windows** version released!
+- May 2017: **Windows** version!
 - Apr 2017: **Body** released!
 - Check all the [release notes](doc/release_notes.md).
 
@@ -61,7 +62,7 @@ OpenPose is a **library for real-time multi-person keypoint detection and multi-
 ## Introduction
 OpenPose represents the **first real-time system to jointly detect human body, hand and facial keypoints (in total 130 keypoints) on single images**. In addition, the system computational performance on body keypoint estimation is invariant to the number of detected people in the image. It uses Caffe, but it could easily be ported to other frameworks (Tensorflow, Torch, etc.). If you implement any of those, feel free to make a pull request!
 
-OpenPose is authored by [Gines Hidalgo](http://gines-hidalgo.site123.me/), [Zhe Cao](http://www.andrew.cmu.edu/user/zhecao), [Tomas Simon](http://www.cs.cmu.edu/~tsimon/), [Shih-En Wei](https://scholar.google.com/citations?user=sFQD3k4AAAAJ&hl=en), [Hanbyul Joo](http://www.cs.cmu.edu/~hanbyulj/) and [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/). In addition, it is being maintained by [Gines Hidalgo](http://gines-hidalgo.site123.me/) and [Bikramjot Hanzra](https://www.linkedin.com/in/bikz05).
+OpenPose is authored by [Gines Hidalgo](http://gineshidalgo.com/), [Zhe Cao](http://www.andrew.cmu.edu/user/zhecao), [Tomas Simon](http://www.cs.cmu.edu/~tsimon/), [Shih-En Wei](https://scholar.google.com/citations?user=sFQD3k4AAAAJ&hl=en), [Hanbyul Joo](http://www.cs.cmu.edu/~hanbyulj/) and [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/). In addition, it is being maintained by [Gines Hidalgo](http://gineshidalgo.com/) and [Bikramjot Hanzra](https://www.linkedin.com/in/bikz05).
 
 It is freely available for free non-commercial use, and may be redistributed under these conditions. Please, see the [license](LICENSE) for further details. [Interested in a commercial license? Check this link](https://flintbox.com/public/project/47343/). For commercial queries, contact [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/).
 
@@ -75,7 +76,7 @@ The pose estimation work is based on the C++ code from [the ECCV 2016 demo](http
 - Multi-person **2x21-keypoint hand** estimation and rendering. Note: In this initial version, **running time** linearly **depends** on the **number of people** on the image.
 - Multi-person **70-keypoint face** estimation and rendering. Note: In this initial version, **running time** linearly **depends** on the **number of people** on the image.
 - Flexible and easy-to-configure **multi-threading** module.
-- Image, video, and webcam reader.
+- Image, video, webcam and IP camera reader.
 - Able to save and load the results in various formats (JSON, XML, PNG, JPG, ...).
 - Small display and GUI for simple result visualization.
 - All the functionality is wrapped into a **simple-to-use OpenPose Wrapper class**.
@@ -122,7 +123,9 @@ Check the output (format, keypoint index ordering, etc.) in [doc/output.md](doc/
 
 
 ## Standalone Face Or Hand Keypoint Detector
-In case of hand camera views at which the hands are visible but not the rest of the body, or if you do not need the body keypoint detector and want to considerably speed up the process, you can use the OpenPose face or hand keypoint detectors with your own face or hand detectors, rather than using the body keypoint detector as initial detector for those. More information in [doc/standalone_face_or_hand_keypoint_detector.md#faq](doc/standalone_face_or_hand_keypoint_detector.md#faq).
+If you do not need the body keypoint detector and want to considerably speed up the face keypoint detection, you can use the new approach based on OpenCV face detector. See [doc/standalone_face_or_hand_keypoint_detector.md](doc/standalone_face_or_hand_keypoint_detector.md).
+
+You can also use the OpenPose hand and/or face keypoint detectors with your own face or hand detectors, rather than using the body keypoint detector as initial detector for those. E.g. in case of hand camera views at which the hands are visible but not the rest of the body, so that the OpenPose detector would fail. See [doc/standalone_face_or_hand_keypoint_detector.md](doc/standalone_face_or_hand_keypoint_detector.md).
 
 
 
@@ -149,7 +152,7 @@ Our library is open source for research purposes, and we want to continuously im
 
 5. ... etc.
 
-Just comment on GibHub or make a pull request and we will answer as soon as possible! Send us an email if you use the library to make a cool demo or YouTube video!
+Just comment on GitHub or make a pull request and we will answer as soon as possible! Send us an email if you use the library to make a cool demo or YouTube video!
 
 
 
@@ -161,21 +164,21 @@ Please cite these papers in your publications if it helps your research (the fac
       booktitle = {CVPR},
       title = {Realtime Multi-Person 2D Pose Estimation using Part Affinity Fields},
       year = {2017}
-      }
+    }
 
     @inproceedings{simon2017hand,
       author = {Tomas Simon and Hanbyul Joo and Iain Matthews and Yaser Sheikh},
       booktitle = {CVPR},
       title = {Hand Keypoint Detection in Single Images using Multiview Bootstrapping},
       year = {2017}
-      }
+    }
 
     @inproceedings{wei2016cpm,
       author = {Shih-En Wei and Varun Ramakrishna and Takeo Kanade and Yaser Sheikh},
       booktitle = {CVPR},
       title = {Convolutional pose machines},
       year = {2016}
-      }
+    }
 
 
 

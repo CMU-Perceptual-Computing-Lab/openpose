@@ -11,7 +11,6 @@ namespace op
     {
         FullScreen, /**< Full screen mode. */
         Windowed,   /**< Windowed mode, depending on the frame output size. */
-        // NoDisplay,  /**< Not displaying the output. */
     };
 }
 

@@ -42,14 +42,14 @@ int handFromJsonTest()
     // handNetInputSize
     const auto handNetInputSize = op::flagsToPoint(FLAGS_hand_net_resolution, "368x368 (multiples of 16)");
     // producerType
-    const auto producerSharedPtr = op::flagsToProducer(FLAGS_image_dir, "", 0);
+    const auto producerSharedPtr = op::flagsToProducer(FLAGS_image_dir, "", "", 0);
     op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
     // OpenPose wrapper
     op::log("Configuring OpenPose wrapper.", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
     op::WrapperHandFromJsonTest<std::vector<op::Datum>> opWrapper;
     // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
-    op::WrapperStructPose wrapperStructPose{op::flagsToPoint("656x368"), op::flagsToPoint("1280x720"),
+    op::WrapperStructPose wrapperStructPose{true, op::flagsToPoint("656x368"), op::flagsToPoint("1280x720"),
                                             op::ScaleMode::InputResolution, FLAGS_num_gpu, FLAGS_num_gpu_start};
     wrapperStructPose.modelFolder = FLAGS_model_folder;
     // Hand configuration (use op::WrapperStructHand{} to disable it)

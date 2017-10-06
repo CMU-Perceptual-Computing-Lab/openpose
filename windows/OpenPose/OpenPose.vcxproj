@@ -101,6 +101,7 @@
     <ClInclude Include="..\..\include\openpose\core\cvMatToOpOutput.hpp" />
     <ClInclude Include="..\..\include\openpose\core\datum.hpp" />
     <ClInclude Include="..\..\include\openpose\core\enumClasses.hpp" />
+    <ClInclude Include="..\..\include\openpose\core\gpuRenderer.hpp" />
     <ClInclude Include="..\..\include\openpose\core\headers.hpp" />
     <ClInclude Include="..\..\include\openpose\core\keypointScaler.hpp" />
     <ClInclude Include="..\..\include\openpose\core\macros.hpp" />
@@ -123,13 +124,17 @@
     <ClInclude Include="..\..\include\openpose\experimental\headers.hpp" />
     <ClInclude Include="..\..\include\openpose\experimental\producer\headers.hpp" />
     <ClInclude Include="..\..\include\openpose\experimental\producer\wPeoplePoseLoader.hpp" />
+    <ClInclude Include="..\..\include\openpose\face\faceCpuRenderer.hpp" />
     <ClInclude Include="..\..\include\openpose\face\faceDetector.hpp" />
+    <ClInclude Include="..\..\include\openpose\face\faceDetectorOpenCV.hpp" />
     <ClInclude Include="..\..\include\openpose\face\faceExtractor.hpp" />
+    <ClInclude Include="..\..\include\openpose\face\faceGpuRenderer.hpp" />
     <ClInclude Include="..\..\include\openpose\face\faceParameters.hpp" />
     <ClInclude Include="..\..\include\openpose\face\faceRenderer.hpp" />
     <ClInclude Include="..\..\include\openpose\face\headers.hpp" />
     <ClInclude Include="..\..\include\openpose\face\renderFace.hpp" />
     <ClInclude Include="..\..\include\openpose\face\wFaceDetector.hpp" />
+    <ClInclude Include="..\..\include\openpose\face\wFaceDetectorOpenCV.hpp" />
     <ClInclude Include="..\..\include\openpose\face\wFaceExtractor.hpp" />
     <ClInclude Include="..\..\include\openpose\face\wFaceRenderer.hpp" />
     <ClInclude Include="..\..\include\openpose\filestream\cocoJsonSaver.hpp" />
@@ -158,9 +163,11 @@
     <ClInclude Include="..\..\include\openpose\gui\headers.hpp" />
     <ClInclude Include="..\..\include\openpose\gui\wGui.hpp" />
     <ClInclude Include="..\..\include\openpose\gui\wGuiInfoAdder.hpp" />
+    <ClInclude Include="..\..\include\openpose\hand\handCpuRenderer.hpp" />
     <ClInclude Include="..\..\include\openpose\hand\handDetector.hpp" />
     <ClInclude Include="..\..\include\openpose\hand\handDetectorFromTxt.hpp" />
     <ClInclude Include="..\..\include\openpose\hand\handExtractor.hpp" />
+    <ClInclude Include="..\..\include\openpose\hand\handGpuRenderer.hpp" />
     <ClInclude Include="..\..\include\openpose\hand\handParameters.hpp" />
     <ClInclude Include="..\..\include\openpose\hand\handRenderer.hpp" />
     <ClInclude Include="..\..\include\openpose\hand\headers.hpp" />
@@ -176,8 +183,10 @@
     <ClInclude Include="..\..\include\openpose\pose\bodyPartConnectorCaffe.hpp" />
     <ClInclude Include="..\..\include\openpose\pose\enumClasses.hpp" />
     <ClInclude Include="..\..\include\openpose\pose\headers.hpp" />
+    <ClInclude Include="..\..\include\openpose\pose\poseCpuRenderer.hpp" />
     <ClInclude Include="..\..\include\openpose\pose\poseExtractor.hpp" />
     <ClInclude Include="..\..\include\openpose\pose\poseExtractorCaffe.hpp" />
+    <ClInclude Include="..\..\include\openpose\pose\poseGpuRenderer.hpp" />
     <ClInclude Include="..\..\include\openpose\pose\poseParameters.hpp" />
     <ClInclude Include="..\..\include\openpose\pose\poseRenderer.hpp" />
     <ClInclude Include="..\..\include\openpose\pose\renderPose.hpp" />
@@ -236,6 +245,7 @@
     <ClCompile Include="..\..\src\openpose\core\cvMatToOpOutput.cpp" />
     <ClCompile Include="..\..\src\openpose\core\datum.cpp" />
     <ClCompile Include="..\..\src\openpose\core\defineTemplates.cpp" />
+    <ClCompile Include="..\..\src\openpose\core\gpuRenderer.cpp" />
     <ClCompile Include="..\..\src\openpose\core\keypointScaler.cpp" />
     <ClCompile Include="..\..\src\openpose\core\maximumBase.cpp" />
     <ClCompile Include="..\..\src\openpose\core\maximumCaffe.cpp" />
@@ -249,9 +259,11 @@
     <ClCompile Include="..\..\src\openpose\core\resizeAndMergeBase.cpp" />
     <ClCompile Include="..\..\src\openpose\core\resizeAndMergeCaffe.cpp" />
     <ClCompile Include="..\..\src\openpose\face\defineTemplates.cpp" />
+    <ClCompile Include="..\..\src\openpose\face\faceCpuRenderer.cpp" />
     <ClCompile Include="..\..\src\openpose\face\faceDetector.cpp" />
+    <ClCompile Include="..\..\src\openpose\face\faceDetectorOpenCV.cpp" />
     <ClCompile Include="..\..\src\openpose\face\faceExtractor.cpp" />
-    <ClCompile Include="..\..\src\openpose\face\faceRenderer.cpp" />
+    <ClCompile Include="..\..\src\openpose\face\faceGpuRenderer.cpp" />
     <ClCompile Include="..\..\src\openpose\face\renderFace.cpp" />
     <ClCompile Include="..\..\src\openpose\filestream\cocoJsonSaver.cpp" />
     <ClCompile Include="..\..\src\openpose\filestream\defineTemplates.cpp" />
@@ -268,21 +280,25 @@
     <ClCompile Include="..\..\src\openpose\gui\gui.cpp" />
     <ClCompile Include="..\..\src\openpose\gui\guiInfoAdder.cpp" />
     <ClCompile Include="..\..\src\openpose\hand\defineTemplates.cpp" />
+    <ClCompile Include="..\..\src\openpose\hand\handCpuRenderer.cpp" />
     <ClCompile Include="..\..\src\openpose\hand\handDetector.cpp" />
     <ClCompile Include="..\..\src\openpose\hand\handDetectorFromTxt.cpp" />
     <ClCompile Include="..\..\src\openpose\hand\handExtractor.cpp" />
-    <ClCompile Include="..\..\src\openpose\hand\handRenderer.cpp" />
+    <ClCompile Include="..\..\src\openpose\hand\handGpuRenderer.cpp" />
     <ClCompile Include="..\..\src\openpose\hand\renderHand.cpp" />
     <ClCompile Include="..\..\src\openpose\pose\bodyPartConnectorBase.cpp" />
     <ClCompile Include="..\..\src\openpose\pose\bodyPartConnectorCaffe.cpp" />
     <ClCompile Include="..\..\src\openpose\pose\defineTemplates.cpp" />
+    <ClCompile Include="..\..\src\openpose\pose\poseCpuRenderer.cpp" />
     <ClCompile Include="..\..\src\openpose\pose\poseExtractor.cpp" />
     <ClCompile Include="..\..\src\openpose\pose\poseExtractorCaffe.cpp" />
+    <ClCompile Include="..\..\src\openpose\pose\poseGpuRenderer.cpp" />
     <ClCompile Include="..\..\src\openpose\pose\poseParameters.cpp" />
     <ClCompile Include="..\..\src\openpose\pose\poseRenderer.cpp" />
     <ClCompile Include="..\..\src\openpose\pose\renderPose.cpp" />
     <ClCompile Include="..\..\src\openpose\producer\defineTemplates.cpp" />
     <ClCompile Include="..\..\src\openpose\producer\imageDirectoryReader.cpp" />
+    <ClCompile Include="..\..\src\openpose\producer\ipCameraReader.cpp" />
     <ClCompile Include="..\..\src\openpose\producer\producer.cpp" />
     <ClCompile Include="..\..\src\openpose\producer\videoCaptureReader.cpp" />
     <ClCompile Include="..\..\src\openpose\producer\videoReader.cpp" />
@@ -304,6 +320,10 @@
     <ClCompile Include="..\..\src\openpose\wrapper\wrapperStructPose.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\include\openpose\utilities\cuda.hu" />
+    <None Include="..\..\include\openpose\utilities\render.hu" />
+  </ItemGroup>
+  <ItemGroup>
     <CudaCompile Include="..\..\src\openpose\core\maximumBase.cu" />
     <CudaCompile Include="..\..\src\openpose\core\nmsBase.cu" />
     <CudaCompile Include="..\..\src\openpose\core\resizeAndMergeBase.cu" />
@@ -311,10 +331,6 @@
     <CudaCompile Include="..\..\src\openpose\hand\renderHand.cu" />
     <CudaCompile Include="..\..\src\openpose\pose\bodyPartConnectorBase.cu" />
     <CudaCompile Include="..\..\src\openpose\pose\renderPose.cu" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\include\openpose\utilities\cuda.hu" />
-    <None Include="..\..\include\openpose\utilities\render.hu" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -3,8 +3,10 @@ set(SOURCES
     bodyPartConnectorBase.cu
     bodyPartConnectorCaffe.cpp
     defineTemplates.cpp
+    poseCpuRenderer.cpp
     poseExtractor.cpp
     poseExtractorCaffe.cpp
+    poseGpuRenderer.cpp
     poseParameters.cpp
     poseRenderer.cpp
     renderPose.cpp

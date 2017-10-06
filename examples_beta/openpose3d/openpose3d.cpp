@@ -35,8 +35,8 @@ DEFINE_int32(logging_level,             3,              "The logging level. Inte
                                                         " low priority messages and 4 for important ones.");
 // OpenPose
 DEFINE_string(model_folder,             "models/",      "Folder path (absolute or relative) where the models (pose, face, ...) are located.");
-DEFINE_string(resolution,               "1280x720",     "The image resolution (display and output). Use \"-1x-1\" to force the program to use the"
-                                                        " default images resolution.");
+DEFINE_string(output_resolution,        "-1x-1",        "The image resolution (display and output). Use \"-1x-1\" to force the program to use the"
+                                                        " input image resolution.");
 DEFINE_int32(num_gpu,                   -1,             "The number of GPU devices to use. If negative, it will use all the available GPUs in your"
                                                         " machine.");
 DEFINE_int32(num_gpu_start,             0,              "GPU device start number.");
@@ -47,17 +47,22 @@ DEFINE_int32(keypoint_scale,            0,              "Scaling of the (x,y) co
                                                         " `resolution`), `3` to scale it in the range [0,1], and 4 for range [-1,1]. Non related"
                                                         " with `scale_number` and `scale_gap`.");
 // OpenPose Body Pose
+DEFINE_bool(body_disable,               false,          "Disable body keypoint detection. Option only possible for faster (but less accurate) face"
+                                                        " keypoint detection.");
 DEFINE_string(model_pose,               "COCO",         "Model to be used. E.g. `COCO` (18 keypoints), `MPI` (15 keypoints, ~10% faster), "
                                                         "`MPI_4_layers` (15 keypoints, even faster but less accurate).");
-DEFINE_string(net_resolution,           "656x368",      "Multiples of 16. If it is increased, the accuracy potentially increases. If it is decreased,"
-                                                        " the speed increases. For maximum speed-accuracy balance, it should keep the closest aspect"
-                                                        " ratio possible to the images or videos to be processed. E.g. the default `656x368` is"
-                                                        " optimal for 16:9 videos, e.g. full HD (1980x1080) and HD (1280x720) videos.");
+DEFINE_string(net_resolution,           "656x368",      "Multiples of 16. If it is increased, the accuracy potentially increases. If it is"
+                                                        " decreased, the speed increases. For maximum speed-accuracy balance, it should keep the"
+                                                        " closest aspect ratio possible to the images or videos to be processed. Using `-1` in"
+                                                        " any of the dimensions, OP will choose the optimal aspect ratio depending on the user's"
+                                                        " input value. E.g. the default `-1x368` is equivalent to `656x368` in 16:9 resolutions,"
+                                                        " e.g. full HD (1980x1080) and HD (1280x720) resolutions.");
 DEFINE_int32(scale_number,              1,              "Number of scales to average.");
 DEFINE_double(scale_gap,                0.3,            "Scale gap between scales. No effect unless scale_number > 1. Initial scale is always 1."
                                                         " If you want to change the initial scale, you actually want to multiply the"
                                                         " `net_resolution` by your desired initial scale.");
-DEFINE_bool(heatmaps_add_parts,         false,          "If true, it will add the body part heatmaps to the final op::Datum::poseHeatMaps array"
+DEFINE_bool(heatmaps_add_parts,         false,          "If true, it will add the body part heatmaps to the final op::Datum::poseHeatMaps array,"
+                                                        " and analogously face & hand heatmaps to op::Datum::faceHeatMaps & op::Datum::handHeatMaps"
                                                         " (program speed will decrease). Not required for our library, enable it only if you intend"
                                                         " to process this information later. If more than one `add_heatmaps_X` flag is enabled, it"
                                                         " will place then in sequential memory order: body parts + bkg + PAFs. It will follow the"
@@ -134,8 +139,8 @@ DEFINE_string(write_keypoint_format,    "yml",          "File extension and form
                                                         " for OpenCV < 3.0, use `write_keypoint_json` instead.");
 DEFINE_string(write_keypoint_json,      "",             "Directory to write people pose data in *.json format, compatible with any OpenCV version.");
 DEFINE_string(write_coco_json,          "",             "Full file path to write people pose data with *.json COCO validation format.");
-DEFINE_string(write_heatmaps,           "",             "Directory to write heatmaps in *.png format. At least 1 `add_heatmaps_X` flag must be"
-                                                        " enabled.");
+DEFINE_string(write_heatmaps,           "",             "Directory to write body pose heatmaps in *.png format. At least 1 `add_heatmaps_X` flag"
+                                                        " must be enabled.");
 DEFINE_string(write_heatmaps_format,    "png",          "File extension and format for `write_heatmaps`, analogous to `write_images_format`."
                                                         " Recommended `png` or any compressed and lossless format.");
 
@@ -151,9 +156,9 @@ int openpose3d()
 
     // Applying user defined configuration - Google flags to program variables
     // outputSize
-    const auto outputSize = op::flagsToPoint(FLAGS_resolution, "1280x720");
+    const auto outputSize = op::flagsToPoint(FLAGS_output_resolution, "-1x-1");
     // netInputSize
-    const auto netInputSize = op::flagsToPoint(FLAGS_net_resolution, "656x368");
+    const auto netInputSize = op::flagsToPoint(FLAGS_net_resolution, "-1x368");
     // faceNetInputSize
     const auto faceNetInputSize = op::flagsToPoint(FLAGS_face_net_resolution, "368x368 (multiples of 16)");
     // handNetInputSize
@@ -188,7 +193,7 @@ int openpose3d()
     const auto workerOutputOnNewThread = true;
     opWrapper.setWorkerOutput(wRender3D, workerOutputOnNewThread);
     // Configure OpenPose
-    const op::WrapperStructPose wrapperStructPose{netInputSize, outputSize, keypointScale, FLAGS_num_gpu,
+    const op::WrapperStructPose wrapperStructPose{!FLAGS_body_disable, netInputSize, outputSize, keypointScale, FLAGS_num_gpu,
                                                   FLAGS_num_gpu_start, FLAGS_scale_number, (float)FLAGS_scale_gap,
                                                   op::flagsToRenderMode(FLAGS_render_pose), poseModel,
                                                   !FLAGS_disable_blending, (float)FLAGS_alpha_pose,
