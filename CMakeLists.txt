@@ -29,9 +29,6 @@ endif ()
 
 ### FLAGS
 
-# Build as shared library
-set(BUILD_SHARED_LIBS ON)
-
 # Turn on C++11
 add_definitions(-std=c++11)
 
@@ -86,6 +83,9 @@ option(DOWNLOAD_FACE_MODEL "Download face model." ON)
 # More options
 option(BUILD_EXAMPLES "Build OpenPose examples." ON)
 option(BUILD_DOCS "Build OpenPose documentation." OFF)
+
+# Build as shared library
+option(BUILD_SHARED_LIBS "Build as shared lib" ON)
 
 ### FIND REQUIRED PACKAGES
 
