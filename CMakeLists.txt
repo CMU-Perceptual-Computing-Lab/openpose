@@ -1,5 +1,12 @@
-project(openpose)
+project(OpenPose)
 cmake_minimum_required(VERSION 2.8.7 FATAL_ERROR) # min. cmake version recommended by Caffe
+
+### VERSION INFO
+
+set(OpenPose_VERSION_MAJOR 1)
+set(OpenPose_VERSION_MINOR 1)
+set(OpenPose_VERSION_PATCH 0)
+set(OpenPose_VERSION ${OpenPose_VERSION_MAJOR}.${OpenPose_VERSION_MINOR}.${OpenPose_VERSION_PATCH})
 
 ### FIND THE OS
 

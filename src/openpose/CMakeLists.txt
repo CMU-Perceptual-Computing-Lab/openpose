@@ -26,6 +26,8 @@ if (BUILD_CAFFE)
     add_dependencies(openpose openpose_caffe)
 endif (BUILD_CAFFE)
 
+set_property(TARGET openpose PROPERTY VERSION ${OpenPose_VERSION})
+
 install(TARGETS openpose
     EXPORT OpenPose
     RUNTIME DESTINATION bin
