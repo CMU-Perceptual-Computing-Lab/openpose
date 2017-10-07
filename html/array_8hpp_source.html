@@ -110,9 +110,9 @@ $(document).ready(function(){initNavTree('array_8hpp_source.html','');});
 <a href="array_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#ifndef OPENPOSE_CORE_ARRAY_HPP</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define OPENPOSE_CORE_ARRAY_HPP</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;vector&gt;</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;opencv2/core/core.hpp&gt;</span> <span class="comment">// cv::Mat</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;boost/shared_ptr.hpp&gt;</span> <span class="comment">// Note: std::shared_ptr not (fully) supported for array pointers: http://stackoverflow.com/questions/8947579/</span></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;memory&gt;</span> <span class="comment">// std::shared_ptr</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;vector&gt;</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;opencv2/core/core.hpp&gt;</span> <span class="comment">// cv::Mat</span></div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;</div>
 <div class="line"><a name="l00008"></a><span class="lineno"><a class="line" href="namespaceop.html">    8</a></span>&#160;<span class="keyword">namespace </span>op</div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;{</div>
@@ -198,7 +198,7 @@ $(document).ready(function(){initNavTree('array_8hpp_source.html','');});
 <div class="line"><a name="l00241"></a><span class="lineno"><a class="line" href="classop_1_1_array.html#aa40dc59e800d3c4cce623d560c0e0fad">  241</a></span>&#160;        <span class="keyword">inline</span> T&amp; <a class="code" href="classop_1_1_array.html#aa40dc59e800d3c4cce623d560c0e0fad">operator[]</a>(<span class="keyword">const</span> <span class="keywordtype">int</span> index)</div>
 <div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;        {</div>
 <div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;<span class="preprocessor">            #ifdef NDEBUG</span></div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;<span class="preprocessor"></span>                <span class="keywordflow">return</span> spData[index];</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;<span class="preprocessor"></span>                <span class="keywordflow">return</span> spData.get()[index];</div>
 <div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;<span class="preprocessor">            #else</span></div>
 <div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;<span class="preprocessor"></span>                <span class="keywordflow">return</span> <a class="code" href="classop_1_1_array.html#a6e0afd5f447efbfc29efbeac62716eff">at</a>(index);</div>
 <div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;<span class="preprocessor">            #endif</span></div>
@@ -207,7 +207,7 @@ $(document).ready(function(){initNavTree('array_8hpp_source.html','');});
 <div class="line"><a name="l00256"></a><span class="lineno"><a class="line" href="classop_1_1_array.html#aeccfa42607d5deb5039ff260eb980abc">  256</a></span>&#160;        <span class="keyword">inline</span> <span class="keyword">const</span> T&amp; <a class="code" href="classop_1_1_array.html#aeccfa42607d5deb5039ff260eb980abc">operator[]</a>(<span class="keyword">const</span> <span class="keywordtype">int</span> index)<span class="keyword"> const</span></div>
 <div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;<span class="keyword">        </span>{</div>
 <div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;<span class="preprocessor">            #ifdef NDEBUG</span></div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;<span class="preprocessor"></span>                <span class="keywordflow">return</span> spData[index];</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;<span class="preprocessor"></span>                <span class="keywordflow">return</span> spData.get()[index];</div>
 <div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;<span class="preprocessor">            #else</span></div>
 <div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;<span class="preprocessor"></span>                <span class="keywordflow">return</span> <a class="code" href="classop_1_1_array.html#a6e0afd5f447efbfc29efbeac62716eff">at</a>(index);</div>
 <div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;<span class="preprocessor">            #endif</span></div>
@@ -248,7 +248,7 @@ $(document).ready(function(){initNavTree('array_8hpp_source.html','');});
 <div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;    <span class="keyword">private</span>:</div>
 <div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;        std::vector&lt;int&gt; mSize;</div>
 <div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;        <span class="keywordtype">size_t</span> mVolume;</div>
-<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;        boost::shared_ptr&lt;T[]&gt; spData;</div>
+<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;        std::shared_ptr&lt;T&gt; spData;</div>
 <div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;        std::pair&lt;bool, cv::Mat&gt; mCvMatData;</div>
 <div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;</div>
 <div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;        <span class="keywordtype">int</span> getIndex(<span class="keyword">const</span> std::vector&lt;int&gt;&amp; indexes) <span class="keyword">const</span>;</div>

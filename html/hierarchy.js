@@ -83,6 +83,7 @@ var hierarchy =
     ] ],
     [ "op::ResizeAndMergeCaffe< T >", "classop_1_1_resize_and_merge_caffe.html", null ],
     [ "op::ScaleAndSizeExtractor", "classop_1_1_scale_and_size_extractor.html", null ],
+    [ "boost::shared_ptr< T >", "classboost_1_1shared__ptr.html", null ],
     [ "op::SubThread< TDatums, TWorker >", "classop_1_1_sub_thread.html", [
       [ "op::SubThreadNoQueue< TDatums, TWorker >", "classop_1_1_sub_thread_no_queue.html", null ],
       [ "op::SubThreadQueueIn< TDatums, TWorker, TQueue >", "classop_1_1_sub_thread_queue_in.html", null ],

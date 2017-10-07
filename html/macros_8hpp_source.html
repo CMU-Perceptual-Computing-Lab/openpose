@@ -169,18 +169,23 @@ $(document).ready(function(){initNavTree('macros_8hpp_source.html','');});
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;{</div>
 <div class="line"><a name="l00061"></a><span class="lineno"><a class="line" href="classcaffe_1_1_blob.html">   61</a></span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">class </span><a class="code" href="classcaffe_1_1_blob.html">Blob</a>;</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;}</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="comment">// Includes at the end, since this macros class does not need them, but the files that call this</span></div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="comment">// file. However, keeping the files at the beginning might create a circular include linking problem.</span></div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="preprocessor">#include &lt;memory&gt;</span> <span class="comment">// std::shared_ptr</span></div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="preprocessor">#include &lt;vector&gt;</span></div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="datum_8hpp.html">openpose/core/datum.hpp</a>&gt;</span></div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="point_8hpp.html">openpose/core/point.hpp</a>&gt;</span></div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="rectangle_8hpp.html">openpose/core/rectangle.hpp</a>&gt;</span></div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="preprocessor">#endif // OPENPOSE_CORE_MACROS_HPP</span></div>
+<div class="line"><a name="l00063"></a><span class="lineno"><a class="line" href="namespaceboost.html">   63</a></span>&#160;<span class="keyword">namespace </span>boost</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;{</div>
+<div class="line"><a name="l00065"></a><span class="lineno"><a class="line" href="classboost_1_1shared__ptr.html">   65</a></span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">class </span><a class="code" href="classboost_1_1shared__ptr.html">shared_ptr</a>;</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;}</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="comment">// Includes at the end, since this macros class does not need them, but the files that call this</span></div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="comment">// file. However, keeping the files at the beginning might create a circular include linking problem.</span></div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="preprocessor">#include &lt;memory&gt;</span> <span class="comment">// std::shared_ptr</span></div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="preprocessor">#include &lt;vector&gt;</span></div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="datum_8hpp.html">openpose/core/datum.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="point_8hpp.html">openpose/core/point.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="rectangle_8hpp.html">openpose/core/rectangle.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="preprocessor">#endif // OPENPOSE_CORE_MACROS_HPP</span></div>
 <div class="ttc" id="point_8hpp_html"><div class="ttname"><a href="point_8hpp.html">point.hpp</a></div></div>
 <div class="ttc" id="rectangle_8hpp_html"><div class="ttname"><a href="rectangle_8hpp.html">rectangle.hpp</a></div></div>
+<div class="ttc" id="classboost_1_1shared__ptr_html"><div class="ttname"><a href="classboost_1_1shared__ptr.html">boost::shared_ptr</a></div><div class="ttdef"><b>Definition:</b> macros.hpp:65</div></div>
 <div class="ttc" id="datum_8hpp_html"><div class="ttname"><a href="datum_8hpp.html">datum.hpp</a></div></div>
 <div class="ttc" id="classcaffe_1_1_blob_html"><div class="ttname"><a href="classcaffe_1_1_blob.html">caffe::Blob</a></div><div class="ttdef"><b>Definition:</b> macros.hpp:61</div></div>
 </div><!-- fragment --></div><!-- contents -->

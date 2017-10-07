@@ -1,6 +1,7 @@
 var macros_8hpp =
 [
     [ "Blob", "classcaffe_1_1_blob.html", null ],
+    [ "shared_ptr", "classboost_1_1shared__ptr.html", null ],
     [ "COMPILE_TEMPLATE_BASIC_TYPES", "macros_8hpp.html#a6bf32c65e0f388d5b09d8b2424416c0e", null ],
     [ "COMPILE_TEMPLATE_BASIC_TYPES_CLASS", "macros_8hpp.html#a60e010d8a2352d94b8b57d97cf4a7d73", null ],
     [ "COMPILE_TEMPLATE_BASIC_TYPES_STRUCT", "macros_8hpp.html#ac5627744abe5fd0c8eacfe9c7f8bd32e", null ],
