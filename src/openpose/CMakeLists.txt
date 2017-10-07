@@ -12,3 +12,22 @@ set_target_properties(openpose_core openpose_filestream openpose_gui openpose_po
     openpose_utilities openpose_producer openpose_thread openpose_face openpose_hand 
     openpose_wrapper
   PROPERTIES COMPILE_FLAGS ${OP_CXX_FLAGS})
+
+# make the openpose.so
+
+add_library(caffe SHARED IMPORTED)
+set_property(TARGET caffe PROPERTY IMPORTED_LOCATION ${Caffe_LIBS})
+
+file(GLOB_RECURSE SOURCES "*.cu" "*.cpp") # It better not to hardcode here.
+
+cuda_add_library(openpose ${SOURCES})
+target_link_libraries(openpose ${OpenCV_LIBS} ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY} caffe)
+if (BUILD_CAFFE)
+    add_dependencies(openpose openpose_caffe)
+endif (BUILD_CAFFE)
+
+install(TARGETS openpose
+    EXPORT OpenPose
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib/openpose)
