@@ -11,6 +11,10 @@ endif (@BUILD_CAFFE@)
 
 # Report other information
 set(OpenPose_INCLUDE_DIRS "${_prefix}/include/openpose")
+set(OpenPose_VERSION_MAJOR @OpenPose_VERSION_MAJOR@)
+set(OpenPose_VERSION_MINOR @OpenPose_VERSION_MINOR@)
+set(OpenPose_VERSION_PATCH @OpenPose_VERSION_PATCH@)
+set(OpenPose_VERSION @OpenPose_VERSION@)
 
 # Check that the user requested components 
 # are actually targets that are part of this build
