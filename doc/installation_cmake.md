@@ -134,14 +134,15 @@ Check OpenPose was properly installed by running it on the default images, video
 
 ## Reinstallation
 In order to re-install OpenPose:
-1. Delete the `build/` folder.
-2. In CMake GUI, click on `File` --> `Delete Cache`.
-3. Follow the [Installation](#installation) steps again.
+1. If you ran `sudo make install`, then run `sudo make uninstall` in `build/`.
+2. Delete the `build/` folder.
+3. In CMake GUI, click on `File` --> `Delete Cache`.
+4. Follow the [Installation](#installation) steps again.
 
 
 
 ## Uninstallation
-If you used `sudo make install`, simply use the command below in the `build` directory.
+If you used `sudo make install`, simply use the command below in the `build` directory and later remove the OpenPose folder.
 ```
 cd build/
 sudo make uninstall
