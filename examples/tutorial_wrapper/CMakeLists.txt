@@ -9,7 +9,7 @@ foreach(EXAMPLE_FILE ${EXAMPLE_FILES})
   message(STATUS "Adding Example ${SOURCE_NAME}")
   add_executable(${SOURCE_NAME}.bin ${EXAMPLE_FILE})
   target_link_libraries( ${SOURCE_NAME}.bin
-      openpose_wrapper ${GLOG_LIBRARY} ${GFLAGS_LIBRARY} ${Caffe_LIBS}
+      openpose ${GLOG_LIBRARY} ${GFLAGS_LIBRARY} ${Caffe_LIBS}
   )
 
 endforeach()
