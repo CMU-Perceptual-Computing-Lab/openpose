@@ -25,9 +25,10 @@ namespace op
         handRectangles{datum.handRectangles},
         handKeypoints(datum.handKeypoints), // Parentheses instead of braces to avoid error in GCC 4.8
         // Other parameters
+        scaleInputToNetInputs{datum.scaleInputToNetInputs},
+        netInputSizes{datum.netInputSizes},
         scaleInputToOutput{datum.scaleInputToOutput},
         scaleNetToOutput{datum.scaleNetToOutput},
-        scaleRatios{datum.scaleRatios},
         elementRendered{datum.elementRendered}
     {
     }
@@ -53,9 +54,10 @@ namespace op
             handRectangles = datum.handRectangles,
             handKeypoints = datum.handKeypoints,
             // Other parameters
+            scaleInputToNetInputs = datum.scaleInputToNetInputs;
+            netInputSizes = datum.netInputSizes;
             scaleInputToOutput = datum.scaleInputToOutput;
             scaleNetToOutput = datum.scaleNetToOutput;
-            scaleRatios = datum.scaleRatios;
             elementRendered = datum.elementRendered;
             // Return
             return *this;
@@ -92,7 +94,8 @@ namespace op
             std::swap(handRectangles, datum.handRectangles);
             std::swap(handKeypoints, datum.handKeypoints);
             // Other parameters
-            std::swap(scaleRatios, datum.scaleRatios);
+            std::swap(scaleInputToNetInputs, datum.scaleInputToNetInputs);
+            std::swap(netInputSizes, datum.netInputSizes);
             std::swap(elementRendered, datum.elementRendered);
         }
         catch (const std::exception& e)
@@ -122,9 +125,8 @@ namespace op
             std::swap(handRectangles, datum.handRectangles);
             std::swap(handKeypoints, datum.handKeypoints);
             // Other parameters
-            scaleInputToOutput = datum.scaleInputToOutput;
-            scaleNetToOutput = datum.scaleNetToOutput;
-            std::swap(scaleRatios, datum.scaleRatios);
+            std::swap(scaleInputToNetInputs, datum.scaleInputToNetInputs);
+            std::swap(netInputSizes, datum.netInputSizes);
             std::swap(elementRendered, datum.elementRendered);
             // Return
             return *this;
@@ -163,9 +165,10 @@ namespace op
             datum.handKeypoints[0] = handKeypoints[0].clone();
             datum.handKeypoints[1] = handKeypoints[1].clone();
             // Other parameters
+            datum.scaleInputToNetInputs = scaleInputToNetInputs;
+            datum.netInputSizes = netInputSizes;
             datum.scaleInputToOutput = scaleInputToOutput;
             datum.scaleNetToOutput = scaleNetToOutput;
-            datum.scaleRatios = scaleRatios;
             datum.elementRendered = elementRendered;
             // Return
             return std::move(datum);

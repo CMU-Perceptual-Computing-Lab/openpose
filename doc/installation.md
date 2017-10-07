@@ -18,7 +18,7 @@ OpenPose - Installation and FAQ
 ## Operating Systems
 - **Ubuntu** 14 and 16.
 - **Windows** 8 and 10.
-- **Nvidia Jetson TX2**, installation instructions in [doc/installation_jetson_tx2](./installation_jetson_tx2).
+- **Nvidia Jetson TX2**, installation instructions in [doc/installation_jetson_tx2.md](./installation_jetson_tx2.md).
 - OpenPose has also been used on **Windows 7**, **Mac**, **CentOS**, and **Nvidia Jetson (TK1 and TX1)** embedded systems. However, we do not officially support them at the moment.
 
 
@@ -133,7 +133,7 @@ You just need to remove the OpenPose folder, by default called `openpose/`. E.g.
 
 ### Installation - Library
 1. Install the pre-requisites:
-    1. Microsoft Visual Studio (VS) 2015 Enterprise Update 3. VS Enterprise Update 1 and VS 2017 will give some compiler errors, while VS 2015 Community has not been tested.
+    1. Microsoft Visual Studio (VS) 2015 Enterprise Update 3. If Visual Studio 2017 Community is desired, we do not support it, but it might be compiled by firstly [enabling CUDA 8.0](https://stackoverflow.com/questions/43745099/using-cuda-with-visual-studio-2017?answertab=active#tab-top). VS Enterprise Update 1 will give some compiler errors and VS 2015 Community has not been tested.
     2. [CUDA 8](https://developer.nvidia.com/cuda-downloads): Install it on the default location, `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0`. Otherwise, modify the Visual Studio project solution accordingly. Install CUDA 8.0 after Visual Studio 2015 is installed to assure that the CUDA installation will generate all necessary files for VS. If CUDA was already installed, re-install it after installing VS!
     3. [cuDNN 5.1](https://developer.nvidia.com/cudnn): Once you have downloaded it, just unzip it and copy (merge) the contents on the CUDA folder, `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0`.
 2. Download the OpenPose dependencies and models (body, face and hand models) by double-clicking on `{openpose_path}\windows\download_3rdparty_and_models.bat`. Alternatively, you might prefer to download them manually:
@@ -214,8 +214,8 @@ We only modified some Caffe compilation flags and minor details. You can use you
 ## Compiling without cuDNN
 The [cuDNN](https://developer.nvidia.com/cudnn) library is not mandatory, but required for full keypoint detection accuracy. In case your graphics card is not compatible with cuDNN, you can disable it by:
 
-- Ubuntu: Modifying the `Makefile.config` files in both the OpenPose and `3rdparty/caffe` folders, disabling `USE_CUDNN`.
-- Windows: Compiling Caffe by your own with without cuDNN support and removing the `USE_CUDNN` define from the OpenPose project solution in Visual Studio.
+- Ubuntu: Disable `USE_CUDNN` in the `Makefile.config` file in `3rdparty/caffe`, and recompiling Caffe.
+- Windows: Compiling Caffe by your own with without cuDNN support and replacing the [3rdparty/windows/caffe](../3rdparty/windows/caffe)) folder by your own implementation.
 
 Then, you would have to reduce the `--net_resolution` flag to fit the model into the GPU memory. You can try values like "640x320", "320x240", "320x160", or "160x80" to see your GPU memory capabilities. After finding the maximum approximate resolution that your GPU can handle without throwing an out-of-memory error, adjust the `net_resolution` ratio to your image or video to be processed (see the `--net_resolution` explanation from [doc/demo_overview.md](./demo_overview.md)).
 

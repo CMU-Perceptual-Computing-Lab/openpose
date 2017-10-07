@@ -1,15 +1,20 @@
-#ifdef USE_CAFFE
 #ifndef OPENPOSE_CORE_RESIZE_AND_MERGE_CAFFE_HPP
 #define OPENPOSE_CORE_RESIZE_AND_MERGE_CAFFE_HPP
 
-#include <caffe/blob.hpp>
 #include <openpose/core/common.hpp>
+
+// PIMPL does not work here. Alternative:
+// stackoverflow.com/questions/13978775/how-to-avoid-include-dependency-to-external-library?answertab=active#tab-top
+namespace caffe
+{
+    template <typename T> class Blob;
+}
 
 namespace op
 {
-    // It mostly follows the Caffe::layer implementation, so Caffe users can easily use it. However, in order to keep the
-    // compatibility with any generic Caffe version,
-    // we keep this 'layer' inside our library rather than in the Caffe code.
+    // It mostly follows the Caffe::layer implementation, so Caffe users can easily use it. However, in order to keep
+    // the compatibility with any generic Caffe version, we keep this 'layer' inside our library rather than in the
+    // Caffe code.
     template <typename T>
     class OP_API ResizeAndMergeCaffe
     {
@@ -45,4 +50,3 @@ namespace op
 }
 
 #endif // OPENPOSE_CORE_RESIZE_AND_MERGE_CAFFE_HPP
-#endif

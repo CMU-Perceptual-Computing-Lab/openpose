@@ -28,9 +28,6 @@ set(BUILD_SHARED_LIBS ON)
 # Turn on C++11
 add_definitions(-std=c++11)
 
-# OpenPose flags
-add_definitions(-DUSE_CAFFE)
-
 # C++ additional flags
 set(OP_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp -Wpedantic -Wall -Wextra -Wfatal-errors")
 
@@ -46,12 +43,21 @@ include(CMakeDependentOption)
 if (${DL_FRAMEWORK} MATCHES "CAFFE")
   CMAKE_DEPENDENT_OPTION(BUILD_CAFFE "Build Caffe as part of OpenPose." ON
       "DL_FRAMEWORK" ON)
+  # OpenPose flags
+  add_definitions(-DUSE_CAFFE)
 endif (${DL_FRAMEWORK} MATCHES "CAFFE")
 
 # Set the acceleration library
 set(GPU_MODE CUDA CACHE STRING "Select the acceleration GPU library or CPU otherwise.")
 set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA)
 # set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA OPENCL CPU_ONLY)
+if (${GPU_MODE} MATCHES "CUDA")
+  # OpenPose flags
+  add_definitions(-DUSE_CUDA)
+elseif (${GPU_MODE} MATCHES "CPU_ONLY")
+  # OpenPose flag for Caffe
+  add_definitions(-DCPU_ONLY)
+endif ()
 
 # Suboptions for GPU architectures
 if (${GPU_MODE} MATCHES "CUDA")

@@ -130,7 +130,7 @@ namespace op
     {
     }
 
-    std::vector<std::array<Rectangle<float>, 2>> HandDetector::detectHands(const Array<float>& poseKeypoints, const float scaleInputToOutput) const
+    std::vector<std::array<Rectangle<float>, 2>> HandDetector::detectHands(const Array<float>& poseKeypoints, const double scaleInputToOutput) const
     {
         try
         {
@@ -148,8 +148,8 @@ namespace op
                         mPoseIndexes[(int)PosePart::LShoulder], mPoseIndexes[(int)PosePart::RWrist],
                         mPoseIndexes[(int)PosePart::RElbow], mPoseIndexes[(int)PosePart::RShoulder], threshold
                     );
-                    handRectangles.at(person).at(0) /= scaleInputToOutput;
-                    handRectangles.at(person).at(1) /= scaleInputToOutput;
+                    handRectangles.at(person).at(0) /= (float) scaleInputToOutput;
+                    handRectangles.at(person).at(1) /= (float) scaleInputToOutput;
                 }
             }
             return handRectangles;
@@ -161,7 +161,7 @@ namespace op
         }
     }
 
-    std::vector<std::array<Rectangle<float>, 2>> HandDetector::trackHands(const Array<float>& poseKeypoints, const float scaleInputToOutput)
+    std::vector<std::array<Rectangle<float>, 2>> HandDetector::trackHands(const Array<float>& poseKeypoints, const double scaleInputToOutput)
     {
         try
         {

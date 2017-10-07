@@ -8,7 +8,8 @@ namespace op
     {
     }
 
-    void KeypointScaler::scale(Array<float>& arrayToScale, const float scaleInputToOutput, const float scaleNetToOutput, const Point<int>& producerSize) const
+    void KeypointScaler::scale(Array<float>& arrayToScale, const double scaleInputToOutput,
+                               const double scaleNetToOutput, const Point<int>& producerSize) const
     {
         try
         {
@@ -21,7 +22,8 @@ namespace op
         }
     }
 
-    void KeypointScaler::scale(std::vector<Array<float>>& arrayToScalesToScale, const float scaleInputToOutput, const float scaleNetToOutput, const Point<int>& producerSize) const
+    void KeypointScaler::scale(std::vector<Array<float>>& arrayToScalesToScale, const double scaleInputToOutput,
+                               const double scaleNetToOutput, const Point<int>& producerSize) const
     {
         try
         {
@@ -30,15 +32,15 @@ namespace op
                 // InputResolution
                 if (mScaleMode == ScaleMode::InputResolution)
                     for (auto& arrayToScale : arrayToScalesToScale)
-                        scaleKeypoints(arrayToScale, 1.f/scaleInputToOutput);
+                        scaleKeypoints(arrayToScale, float(1./scaleInputToOutput));
                 // NetOutputResolution
                 else if (mScaleMode == ScaleMode::NetOutputResolution)
                     for (auto& arrayToScale : arrayToScalesToScale)
-                        scaleKeypoints(arrayToScale, 1.f/scaleNetToOutput);
+                        scaleKeypoints(arrayToScale, float(1./scaleNetToOutput));
                 // [0,1]
                 else if (mScaleMode == ScaleMode::ZeroToOne)
                 {
-                    const auto scale = 1.f/scaleInputToOutput;
+                    const auto scale = float(1./scaleInputToOutput);
                     const auto scaleX = scale / ((float)producerSize.x - 1.f);
                     const auto scaleY = scale / ((float)producerSize.y - 1.f);
                     for (auto& arrayToScale : arrayToScalesToScale)
@@ -47,7 +49,7 @@ namespace op
                 // [-1,1]
                 else if (mScaleMode == ScaleMode::PlusMinusOne)
                 {
-                    const auto scale = 2.f/scaleInputToOutput;
+                    const auto scale = float(2./scaleInputToOutput);
                     const auto scaleX = (scale / ((float)producerSize.x - 1.f));
                     const auto scaleY = (scale / ((float)producerSize.y - 1.f));
                     const auto offset = -1.f;

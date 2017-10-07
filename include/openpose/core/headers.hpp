@@ -21,9 +21,11 @@
 #include <openpose/core/renderer.hpp>
 #include <openpose/core/resizeAndMergeBase.hpp>
 #include <openpose/core/resizeAndMergeCaffe.hpp>
+#include <openpose/core/scaleAndSizeExtractor.hpp>
 #include <openpose/core/wCvMatToOpInput.hpp>
 #include <openpose/core/wCvMatToOpOutput.hpp>
 #include <openpose/core/wKeypointScaler.hpp>
 #include <openpose/core/wOpOutputToCvMat.hpp>
+#include <openpose/core/wScaleAndSizeExtractor.hpp>
 
 #endif // OPENPOSE_CORE_HEADERS_HPP

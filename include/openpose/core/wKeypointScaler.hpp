@@ -56,11 +56,11 @@ namespace op
                 for (auto& tDatum : *tDatums)
                 {
                     std::vector<Array<float>> arraysToScale{tDatum.poseKeypoints, tDatum.handKeypoints[0], tDatum.handKeypoints[1], tDatum.faceKeypoints};
-                    spKeypointScaler->scale(arraysToScale, (float)tDatum.scaleInputToOutput, (float)tDatum.scaleNetToOutput, Point<int>{tDatum.cvInputData.cols, tDatum.cvInputData.rows});
+                    spKeypointScaler->scale(arraysToScale, tDatum.scaleInputToOutput, tDatum.scaleNetToOutput, Point<int>{tDatum.cvInputData.cols, tDatum.cvInputData.rows});
                 }
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
-                Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__, Profiler::DEFAULT_X);
+                Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);
                 // Debugging log
                 dLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             }

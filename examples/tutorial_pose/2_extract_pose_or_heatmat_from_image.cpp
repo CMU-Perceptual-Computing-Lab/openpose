@@ -9,7 +9,12 @@
     // 2. `utilities` module: for the error & logging functions, i.e. op::error & op::log respectively
 
 // 3rdparty dependencies
-#include <gflags/gflags.h> // DEFINE_bool, DEFINE_int32, DEFINE_int64, DEFINE_uint64, DEFINE_double, DEFINE_string
+// GFlags: DEFINE_bool, _int32, _int64, _uint64, _double, _string
+#include <gflags/gflags.h>
+// Allow Google Flags in Ubuntu 14
+#ifndef GFLAGS_GFLAGS_H_
+    namespace gflags = google;
+#endif
 #include <glog/logging.h> // google::InitGoogleLogging
 // OpenPose dependencies
 #include <openpose/core/headers.hpp>
@@ -67,7 +72,8 @@ int openPoseTutorialPose2()
     // Step 1 - Set logging level
         // - 0 will output all the logging messages
         // - 255 will output nothing
-    op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.", __LINE__, __FUNCTION__, __FILE__);
+    op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.",
+              __LINE__, __FUNCTION__, __FILE__);
     op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
     op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
     // Step 2 - Read Google flags (user defined configuration)
@@ -83,16 +89,18 @@ int openPoseTutorialPose2()
     if (FLAGS_alpha_pose < 0. || FLAGS_alpha_pose > 1.)
         op::error("Alpha value for blending must be in the range [0,1].", __LINE__, __FUNCTION__, __FILE__);
     if (FLAGS_scale_gap <= 0. && FLAGS_scale_number > 1)
-        op::error("Incompatible flag configuration: scale_gap must be greater than 0 or scale_number = 1.", __LINE__, __FUNCTION__, __FILE__);
+        op::error("Incompatible flag configuration: scale_gap must be greater than 0 or scale_number = 1.",
+                  __LINE__, __FUNCTION__, __FILE__);
     // Logging
     op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
     // Step 3 - Initialize all required classes
-    op::CvMatToOpInput cvMatToOpInput{netInputSize, FLAGS_scale_number, (float)FLAGS_scale_gap};
-    op::CvMatToOpOutput cvMatToOpOutput{outputSize};
-    std::shared_ptr<op::PoseExtractor> poseExtractorPtr = std::make_shared<op::PoseExtractorCaffe>(netInputSize, netOutputSize, outputSize,
-                                                                                                   FLAGS_scale_number, poseModel,
-                                                                                                   FLAGS_model_folder, FLAGS_num_gpu_start);
-    op::PoseGpuRenderer poseGpuRenderer{netOutputSize, poseModel, poseExtractorPtr, (float)FLAGS_render_threshold,
+    op::ScaleAndSizeExtractor scaleAndSizeExtractor(netInputSize, outputSize, FLAGS_scale_number, FLAGS_scale_gap);
+    op::CvMatToOpInput cvMatToOpInput;
+    op::CvMatToOpOutput cvMatToOpOutput;
+    auto poseExtractorPtr = std::make_shared<op::PoseExtractorCaffe>(
+        netInputSize, netOutputSize, outputSize, FLAGS_scale_number, poseModel, FLAGS_model_folder, FLAGS_num_gpu_start
+    );
+    op::PoseGpuRenderer poseGpuRenderer{poseModel, poseExtractorPtr, (float)FLAGS_render_threshold,
                                         !FLAGS_disable_blending, (float)FLAGS_alpha_pose, (float)FLAGS_alpha_heatmap};
     poseGpuRenderer.setElementToRender(FLAGS_part_to_show);
     op::OpOutputToCvMat opOutputToCvMat;
@@ -103,23 +111,28 @@ int openPoseTutorialPose2()
 
     // ------------------------- POSE ESTIMATION AND RENDERING -------------------------
     // Step 1 - Read and load image, error if empty (possibly wrong path)
-    cv::Mat inputImage = op::loadImage(FLAGS_image_path, CV_LOAD_IMAGE_COLOR); // Alternative: cv::imread(FLAGS_image_path, CV_LOAD_IMAGE_COLOR);
+    // Alternative: cv::imread(FLAGS_image_path, CV_LOAD_IMAGE_COLOR);
+    cv::Mat inputImage = op::loadImage(FLAGS_image_path, CV_LOAD_IMAGE_COLOR);
     if(inputImage.empty())
         op::error("Could not open or find the image: " + FLAGS_image_path, __LINE__, __FUNCTION__, __FILE__);
-    // Step 2 - Format input image to OpenPose input and output formats
-    op::Array<float> netInputArray;
-    std::vector<float> scaleRatios;
-    std::tie(netInputArray, scaleRatios) = cvMatToOpInput.format(inputImage);
+    const op::Point<int> imageSize{inputImage.cols, inputImage.rows};
+    // Step 2 - Get desired scale sizes
+    std::vector<double> scaleInputToNetInputs;
+    std::vector<op::Point<int>> netInputSizes;
     double scaleInputToOutput;
-    op::Array<float> outputArray;
-    std::tie(scaleInputToOutput, outputArray) = cvMatToOpOutput.format(inputImage);
-    // Step 3 - Estimate poseKeypoints
-    poseExtractorPtr->forwardPass(netInputArray, {inputImage.cols, inputImage.rows}, scaleRatios);
+    op::Point<int> outputResolution;
+    std::tie(scaleInputToNetInputs, netInputSizes, scaleInputToOutput, outputResolution)
+        = scaleAndSizeExtractor.extract(imageSize);
+    // Step 3 - Format input image to OpenPose input and output formats
+    const auto netInputArray = cvMatToOpInput.createArray(inputImage, scaleInputToNetInputs, netInputSizes);
+    auto outputArray = cvMatToOpOutput.createArray(inputImage, scaleInputToOutput, outputResolution);
+    // Step 4 - Estimate poseKeypoints
+    poseExtractorPtr->forwardPass(netInputArray, imageSize, scaleInputToNetInputs);
     const auto poseKeypoints = poseExtractorPtr->getPoseKeypoints();
     const auto scaleNetToOutput = poseExtractorPtr->getScaleNetToOutput();
-    // Step 4 - Render pose
+    // Step 5 - Render pose
     poseGpuRenderer.renderPose(outputArray, poseKeypoints, scaleNetToOutput);
-    // Step 5 - OpenPose output format to cv::Mat
+    // Step 6 - OpenPose output format to cv::Mat
     auto outputImage = opOutputToCvMat.formatToCvMat(outputArray);
 
     // ------------------------- SHOWING RESULT AND CLOSING -------------------------

@@ -8,17 +8,21 @@ namespace op
 {
     /**
      * Datum: The OpenPose Basic Piece of Information Between Threads
-     * Datum is one the main OpenPose classes/structs. The workers and threads share by default a std::shared_ptr<std::vector<Datum>>. It contains
-     * all the parameters that the different workers and threads need to exchange.
+     * Datum is one the main OpenPose classes/structs. The workers and threads share by default a
+     * std::shared_ptr<std::vector<Datum>>. It contains all the parameters that the different workers and threads need
+     * to exchange.
      */
     struct OP_API Datum
     {
-        // -------------------------------------------------- ID parameters -------------------------------------------------- //
+        // ---------------------------------------- ID parameters ---------------------------------------- //
         unsigned long long id; /**< Datum ID. Internally used to sort the Datums if multi-threading is used. */
 
-        std::string name;      /**< Name used when saving the data to disk (e.g. `write_images` or `write_keypoint` flags in the demo). */
+        /**
+         * Name used when saving the data to disk (e.g. `write_images` or `write_keypoint` flags in the demo).
+         */
+        std::string name;
 
-        // -------------------------------------------------- Input image and rendered version parameters -------------------------------------------------- //
+        // ------------------------------ Input image and rendered version parameters ------------------------------ //
         /**
          * Original image to be processed in cv::Mat uchar format.
          * Size: (input_width x input_height) x 3 channels
@@ -27,8 +31,10 @@ namespace op
 
         /**
          * Original image to be processed in Array<float> format.
-         * It has been resized to the net input resolution, as well as reformatted Array<float> format to be compatible with the net.
-         * In case of >1 scales, then each scale is right- and bottom-padded to fill the greatest resolution. The scales are sorted from bigger to smaller.
+         * It has been resized to the net input resolution, as well as reformatted Array<float> format to be compatible
+         * with the net.
+         * In case of >1 scales, then each scale is right- and bottom-padded to fill the greatest resolution. The
+         * scales are sorted from bigger to smaller.
          * Size: #scales x 3 x input_net_height x input_net_width
          */
         Array<float> inputNetData;
@@ -49,7 +55,7 @@ namespace op
          */
         cv::Mat cvOutputData;
 
-        // -------------------------------------------------- Resulting Array<float> data parameters -------------------------------------------------- //
+        // ------------------------------ Resulting Array<float> data parameters ------------------------------ //
         /**
          * Body pose (x,y,score) locations for each person in the image.
          * It has been resized to the desired output resolution (e.g. `resolution` flag in the demo).
@@ -60,10 +66,14 @@ namespace op
 
         /**
          * Body pose heatmaps (body parts, background and/or PAFs) for the whole image.
-         * This parameters is by default empty and disabled for performance. Each group (body parts, background and PAFs) can be individually enabled.
-         * #heatmaps = #body parts (if enabled) + 1 (if background enabled) + 2 x #PAFs (if enabled). Each PAF has 2 consecutive channels, one for x- and one for y-coordinates.
-         * Order heatmaps: body parts + background (as appears in POSE_BODY_PART_MAPPING) + (x,y) channel of each PAF (sorted as appears in POSE_BODY_PART_PAIRS). See `pose/poseParameters.hpp`.
-         * The user can choose the heatmaps normalization: ranges [0, 1], [-1, 1] or [0, 255]. Check the `heatmaps_scale` flag in the examples/tutorial_wrapper/ for more details.
+         * This parameters is by default empty and disabled for performance. Each group (body parts, background and
+         * PAFs) can be individually enabled.
+         * #heatmaps = #body parts (if enabled) + 1 (if background enabled) + 2 x #PAFs (if enabled). Each PAF has 2
+         * consecutive channels, one for x- and one for y-coordinates.
+         * Order heatmaps: body parts + background (as appears in POSE_BODY_PART_MAPPING) + (x,y) channel of each PAF
+         * (sorted as appears in POSE_BODY_PART_PAIRS). See `pose/poseParameters.hpp`.
+         * The user can choose the heatmaps normalization: ranges [0, 1], [-1, 1] or [0, 255]. Check the
+         * `heatmaps_scale` flag in the examples/tutorial_wrapper/ for more details.
          * Size: #heatmaps x output_net_height x output_net_width
          */
         Array<float> poseHeatMaps;
@@ -111,29 +121,55 @@ namespace op
          */
         std::array<Array<float>, 2> handHeatMaps;
 
-        // -------------------------------------------------- Other parameters -------------------------------------------------- //
-        float scaleInputToOutput; /**< Scale ratio between the input Datum::cvInputData and the output Datum::cvOutputData. */
+        // ---------------------------------------- Other parameters ---------------------------------------- //
+        /**
+         * Scale ratio between the input Datum::cvInputData and the net input size.
+         */
+        std::vector<double> scaleInputToNetInputs;
 
-        float scaleNetToOutput; /**< Scale ratio between the net output and the final output Datum::cvOutputData. */
+        /**
+         * Size(s) (width x height) of the image(s) fed to the pose deep net.
+         * The size of the std::vector corresponds to the number of scales. 
+         */
+        std::vector<Point<int>> netInputSizes;
 
-        std::vector<float> scaleRatios; /**< Scale ratios between each scale (e.g. flag `scale_number`). Used to resize the different scales. */
+        /**
+         * Scale ratio between the input Datum::cvInputData and the output Datum::cvOutputData.
+         */
+        double scaleInputToOutput;
 
-        std::pair<int, std::string> elementRendered; /**< Pair with the element key id POSE_BODY_PART_MAPPING on `pose/poseParameters.hpp` and its mapped value (e.g. 1 and "Neck"). */
+        /**
+         * Size (width x height) of the image returned by the deep net.
+         */
+        Point<int> netOutputSize;
+
+        /**
+         * Scale ratio between the net output and the final output Datum::cvOutputData.
+         */
+        double scaleNetToOutput;
+
+        /**
+         * Pair with the element key id POSE_BODY_PART_MAPPING on `pose/poseParameters.hpp` and its mapped value (e.g.
+         * 1 and "Neck").
+         */
+        std::pair<int, std::string> elementRendered;
 
 
 
 
 
-        // -------------------------------------------------- Functions -------------------------------------------------- //
+        // ---------------------------------------- Functions ---------------------------------------- //
         /**
          * Default constructor struct.
-         * It simply initializes the struct, id is temporary set to 0 and each other variable is assigned to its default value.
+         * It simply initializes the struct, id is temporary set to 0 and each other variable is assigned to its
+         * default value.
          */
         explicit Datum();
 
         /**
          * Copy constructor.
-         * It performs `fast copy`: For performance purpose, copying a Datum or Array<T> or cv::Mat just copies the reference, it still shares the same internal data.
+         * It performs `fast copy`: For performance purpose, copying a Datum or Array<T> or cv::Mat just copies the
+         * reference, it still shares the same internal data.
          * Modifying the copied element will modify the original one.
          * Use clone() for a slower but real copy, similarly to cv::Mat and Array<T>.
          * @param datum Datum to be copied.
@@ -172,7 +208,8 @@ namespace op
         /**
          * Clone function.
          * Similar to cv::Mat::clone and Array<T>::clone.
-         * It performs a real but slow copy of the data, i.e., even if the copied element is modified, the original one is not.
+         * It performs a real but slow copy of the data, i.e., even if the copied element is modified, the original
+         * one is not.
          * @return The resulting Datum.
          */
         Datum clone() const;
@@ -181,7 +218,7 @@ namespace op
 
 
 
-        // -------------------------------------------------- Comparison operators -------------------------------------------------- //
+        // ---------------------------------------- Comparison operators ---------------------------------------- //
         /**
          * Less comparison operator.
          * @param datum Datum to be compared.

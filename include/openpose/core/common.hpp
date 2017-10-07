@@ -3,7 +3,7 @@
 
 // Std library most used classes
 #include <array>
-#include <memory> // std::shared_ptr
+#include <memory> // std::shared_ptr, std::unique_ptr
 #include <string>
 #include <vector>
 // OpenPose most used classes

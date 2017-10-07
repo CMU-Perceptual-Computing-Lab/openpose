@@ -19,7 +19,8 @@ cuda_add_library(openpose_core
     renderer.cpp
     resizeAndMergeBase.cpp
     resizeAndMergeBase.cu
-    resizeAndMergeCaffe.cpp)
+    resizeAndMergeCaffe.cpp
+    scaleAndSizeExtractor)
 
 add_library(caffe SHARED IMPORTED)
 set_property(TARGET caffe PROPERTY IMPORTED_LOCATION ${Caffe_LIBS}) 

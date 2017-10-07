@@ -6,13 +6,12 @@
 
 namespace op
 {
-    const dim3 THREADS_PER_BLOCK{128, 128, 1};
     __constant__ const unsigned int PART_PAIRS_GPU[] = FACE_PAIRS_RENDER_GPU;
     __constant__ const float COLORS[] = {FACE_COLORS_RENDER_GPU};
 
     __global__ void renderFaceParts(float* targetPtr, const int targetWidth, const int targetHeight,
-                                    const float* const facePtr, const int numberPeople, const float threshold,
-                                    const float alphaColorToAdd)
+                                    const float* const facePtr, const int numberPeople,
+                                    const float threshold, const float alphaColorToAdd)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -43,10 +42,11 @@ namespace op
         {
             if (numberPeople > 0)
             {
-                const auto numBlocks = getNumberCudaBlocks(frameSize, THREADS_PER_BLOCK);
-                renderFaceParts<<<THREADS_PER_BLOCK, numBlocks>>>(framePtr, frameSize.x, frameSize.y, facePtr,
-                                                                  numberPeople, renderThreshold,
-                                                                  alphaColorToAdd);
+                dim3 threadsPerBlock;
+                dim3 numBlocks;
+                getNumberCudaThreadsAndBlocks(threadsPerBlock, numBlocks, frameSize);
+                renderFaceParts<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.x, frameSize.y, facePtr,
+                                                                numberPeople, renderThreshold, alphaColorToAdd);
                 cudaCheck(__LINE__, __FUNCTION__, __FILE__);
             }
         }

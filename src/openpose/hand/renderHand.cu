@@ -9,8 +9,6 @@ namespace op
     __constant__ const unsigned int PART_PAIRS_GPU[] = HAND_PAIRS_RENDER_GPU;
     __constant__ const float COLORS[] = {HAND_COLORS_RENDER_GPU};
 
-
-
     __global__ void renderHandsParts(float* targetPtr, const int targetWidth, const int targetHeight,
                                      const float* const handsPtr, const int numberHands,
                                      const float threshold, const float alphaColorToAdd)
@@ -46,7 +44,7 @@ namespace op
             {
                 dim3 threadsPerBlock;
                 dim3 numBlocks;
-                std::tie(threadsPerBlock, numBlocks) = getNumberCudaThreadsAndBlocks(frameSize);
+                getNumberCudaThreadsAndBlocks(threadsPerBlock, numBlocks, frameSize);
                 renderHandsParts<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.x, frameSize.y, handsPtr,
                                                                  numberHands, renderThreshold, alphaColorToAdd);
                 cudaCheck(__LINE__, __FUNCTION__, __FILE__);

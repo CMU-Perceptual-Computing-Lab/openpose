@@ -13,9 +13,9 @@ namespace op
     class OP_API PoseGpuRenderer : public GpuRenderer, public PoseRenderer
     {
     public:
-        PoseGpuRenderer(const Point<int>& heatMapsSize, const PoseModel poseModel,
-                        const std::shared_ptr<PoseExtractor>& poseExtractor, const float renderThreshold,
-                        const bool blendOriginalFrame = true, const float alphaKeypoint = POSE_DEFAULT_ALPHA_KEYPOINT,
+        PoseGpuRenderer(const PoseModel poseModel, const std::shared_ptr<PoseExtractor>& poseExtractor,
+                        const float renderThreshold, const bool blendOriginalFrame = true,
+                        const float alphaKeypoint = POSE_DEFAULT_ALPHA_KEYPOINT,
                         const float alphaHeatMap = POSE_DEFAULT_ALPHA_HEAT_MAP,
                         const unsigned int elementToRender = 0u);
 
@@ -27,7 +27,6 @@ namespace op
                                                const float scaleNetToOutput = -1.f);
 
     private:
-        const Point<int> mHeatMapsSize;
         const std::shared_ptr<PoseExtractor> spPoseExtractor;
         // Init with thread
         float* pGpuPose; // GPU aux memory

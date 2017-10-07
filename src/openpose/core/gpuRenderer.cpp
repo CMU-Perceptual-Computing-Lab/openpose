@@ -1,4 +1,4 @@
-#ifndef CPU_ONLY
+#ifdef USE_CUDA
     #include <cuda.h>
     #include <cuda_runtime_api.h>
 #endif
@@ -6,26 +6,26 @@
 
 namespace op
 {
-    void checkAndIncreaseGpuMemory(std::shared_ptr<float*>& gpuMemoryPtr,
-                                   std::shared_ptr<std::atomic<unsigned long long>>& currentVolumePtr,
-                                   const unsigned long long memoryVolume)
-    {
-        try
+    #ifdef USE_CUDA
+        void checkAndIncreaseGpuMemory(std::shared_ptr<float*>& gpuMemoryPtr,
+                                       std::shared_ptr<std::atomic<unsigned long long>>& currentVolumePtr,
+                                       const unsigned long long memoryVolume)
         {
-            #ifndef CPU_ONLY
+            try
+            {
                 if (*currentVolumePtr < memoryVolume)
                 {
                     *currentVolumePtr = memoryVolume;
                     cudaFree(*gpuMemoryPtr);
                     cudaMalloc((void**)(gpuMemoryPtr.get()), *currentVolumePtr * sizeof(float));
                 }
-            #endif
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-        }
+            }
+            catch (const std::exception& e)
+            {
+                error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            }
     }
+    #endif
 
     GpuRenderer::GpuRenderer(const float renderThreshold, const float alphaKeypoint,
                              const float alphaHeatMap, const bool blendOriginalFrame,
@@ -44,7 +44,7 @@ namespace op
     {
         try
         {
-            #ifndef CPU_ONLY
+            #ifdef USE_CUDA
                 if (mIsLastRenderer)
                     cudaFree(*spGpuMemory);
             #endif
@@ -97,7 +97,7 @@ namespace op
     {
         try
         {
-            #ifndef CPU_ONLY
+            #ifdef USE_CUDA
                 if (!*spGpuMemoryAllocated)
                 {
                     checkAndIncreaseGpuMemory(spGpuMemory, spVolume, memoryVolume);
@@ -105,8 +105,10 @@ namespace op
                     *spGpuMemoryAllocated = true;
                 }
             #else
-                error("GPU rendering not available if `CPU_ONLY` is set.", __LINE__, __FUNCTION__, __FILE__);
                 UNUSED(cpuMemory);
+                UNUSED(memoryVolume);
+                error("OpenPose must be compiled with the `USE_CUDA` macro definitions in order to run this"
+                      " functionality.", __LINE__, __FUNCTION__, __FILE__);
             #endif
         }
         catch (const std::exception& e)
@@ -119,7 +121,7 @@ namespace op
     {
         try
         {
-            #ifndef CPU_ONLY
+            #ifdef USE_CUDA
                 if (*spGpuMemoryAllocated && mIsLastRenderer)
                 {
                     if (*spVolume < memoryVolume)
@@ -129,8 +131,10 @@ namespace op
                     *spGpuMemoryAllocated = false;
                 }
             #else
-                error("GPU rendering not available if `CPU_ONLY` is set.", __LINE__, __FUNCTION__, __FILE__);
                 UNUSED(cpuMemory);
+                UNUSED(memoryVolume);
+                error("OpenPose must be compiled with the `USE_CUDA` macro definitions in order to run this"
+                      " functionality.", __LINE__, __FUNCTION__, __FILE__);
             #endif
         }
         catch (const std::exception& e)
