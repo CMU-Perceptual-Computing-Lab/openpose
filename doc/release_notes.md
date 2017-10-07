@@ -122,7 +122,7 @@ OpenPose Library - Release Notes
         3. CvMatToOutput and Renderers allow to keep input resolution as output for images (core module).
     3. New standalone face keypoint detector based on OpenCV face detector: much faster if body keypoint detection is not required but much less accurate.
     4. Face and hand keypoint detectors now can return each keypoint heatmap.
-    5. The flag `USE_CUDNN` is no longer required; `USE_CAFFE` and `USE_CUDA` (replacing the old `CPU_ONLY`) are no longer required to use the library, only to build it. In addition, Caffe and its dependencies have been removed from the OpenPose header files. Only OpenCV include and lib folders are required when building a project using OpenPose.
+    5. The flag `USE_CUDNN` is no longer required; `USE_CAFFE` and `USE_CUDA` (replacing the old `CPU_ONLY`) are no longer required to use the library, only to build it. In addition, Boost, Caffe, and its dependencies have been removed from the OpenPose header files. Only OpenCV include and lib folders are required when building a project using OpenPose.
     6. OpenPose successfully compiles if the flags `USE_CAFFE` and/or `USE_CUDA` are not enabled, although it will give an error saying they are required.
     7. COCO JSON file outputs 0 as score for non-detected keypoints.
     8. Added example for OpenPose for user asynchronous output and cleaned all `tutorial_wrapper/` examples.

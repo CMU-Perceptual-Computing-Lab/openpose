@@ -4,6 +4,17 @@
 #include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/core/array.hpp>
 
+// Note: std::shared_ptr not (fully) supported for array pointers:
+// http://stackoverflow.com/questions/8947579/
+// Solutions:
+// 1) Using boost::shared_ptr from <boost/shared_ptr.hpp>: Very easy but requires Boost.
+// 2) Using std::unique_ptr from <memory>: Same behaviour than 1, but only `unique`.
+// 3) Using std::shared_ptr from <memory>: Harder to use, but benefits of 1 & 2. Solutions to its problems:
+//     a) Accessing elements:
+//        https://stackoverflow.com/questions/30780262/accessing-array-of-shared-ptr
+//     b) Default delete:
+//        https://stackoverflow.com/questions/13061979/shared-ptr-to-an-array-should-it-be-used
+
 namespace op
 {
     template<typename T>
@@ -167,7 +178,7 @@ namespace op
                 mSize = sizes;
                 mVolume = {std::accumulate(sizes.begin(), sizes.end(), 1ul, std::multiplies<size_t>())};
                 // Prepare shared_ptr
-                spData.reset(new T[mVolume]);
+                spData.reset(new T[mVolume], std::default_delete<T[]>());
                 setCvMatFromSharedPtr();
             }
             else
@@ -324,7 +335,8 @@ namespace op
         try
         {
             if (!mCvMatData.first)
-                error("Array<T>: cv::Mat functions only valid for T types defined by OpenCV: unsigned char, signed char, int, float & double", __LINE__, __FUNCTION__, __FILE__);
+                error("Array<T>: cv::Mat functions only valid for T types defined by OpenCV: unsigned char,"
+                      " signed char, int, float & double", __LINE__, __FUNCTION__, __FILE__);
             return mCvMatData.second;
         }
         catch (const std::exception& e)
@@ -340,7 +352,8 @@ namespace op
         try
         {
             if (!mCvMatData.first)
-                error("Array<T>: cv::Mat functions only valid for T types defined by OpenCV: unsigned char, signed char, int, float & double", __LINE__, __FUNCTION__, __FILE__);
+                error("Array<T>: cv::Mat functions only valid for T types defined by OpenCV: unsigned char,"
+                      " signed char, int, float & double", __LINE__, __FUNCTION__, __FILE__);
             return mCvMatData.second;
         }
         catch (const std::exception& e)
@@ -358,14 +371,16 @@ namespace op
             // Initial value
             std::string string{"Array<T>::toString():\n"};
             // Add each element
+            auto* dataPtr = spData.get();
             for (auto i = 0u ; i < mVolume ; i++)
             {
                 // Adding element sepearted by an space
-                string += std::to_string(spData[i]) + " ";
+                string += std::to_string(dataPtr[i]) + " ";
                 // Introduce an enter for each dimension change
                 // If comented, all values will be printed in the same line
                 auto multiplier = 1;
-                for (auto dimension = (int)(mSize.size() - 1u) ; dimension > 0 && (int(i/multiplier) % getSize(dimension) == getSize(dimension)-1) ; dimension--)
+                for (auto dimension = (int)(mSize.size() - 1u) ; dimension > 0
+                      && (int(i/multiplier) % getSize(dimension) == getSize(dimension)-1) ; dimension--)
                 {
                     string += "\n";
                     multiplier *= getSize(dimension);
@@ -424,17 +439,17 @@ namespace op
         try
         {
             if (0 <= index && (size_t)index < mVolume)
-                return spData[index];
+                return spData.get()[index];
             else
             {
                 error("Index out of bounds: 0 <= index && index < mVolume", __LINE__, __FUNCTION__, __FILE__);
-                return spData[0];
+                return spData.get()[0];
             }
         }
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return spData[0];
+            return spData.get()[0];
         }
     }
 
@@ -460,7 +475,7 @@ namespace op
                 mCvMatData.first = false;
 
             if (mCvMatData.first)
-                mCvMatData.second = cv::Mat((int)mSize.size(), mSize.data(), cvFormat, spData.get());
+                mCvMatData.second = cv::Mat((int)mSize.size(), mSize.data(), cvFormat, spData.get()[0]);
             else
                 mCvMatData.second = cv::Mat();
         }
