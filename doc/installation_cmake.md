@@ -91,57 +91,39 @@ Note: If you prefer to use your own custom Caffe or OpenCV versions, see [Custom
 Finally, build the project by running the following commands.
 ```
 cd build/
-no_cores=`cat /proc/cpuinfo | grep processor | wc -l`
-make -j${no_cores}
+make -j`nproc`
 ```
 
-### Installing Headers and Libraries
-
-To install the headers and the libraries to system paths (ideally `/usr/local` or `/usr`), run the below command in the `build` directory.
-
+### Installing Headers and Libraries (Optional)
+To install the OpenPose headers and libraries into the system environment path (e.g. `/usr/local/` or `/usr/`), run the following command.
 ```
+cd build/
 sudo make install
 ```
 
-Once, the install is complete you use OpenPose in some other project using the `find_package` cmake command. Below, is a small example `CMakeLists.txt`.
-
+Once the installation is completed, you can use OpenPose in your other project using the `find_package` cmake command. Below, is a small example `CMakeLists.txt`.
 ```
 cmake_minimum_required(VERSION 2.8.7)
 
-add_definitions(-DUSE_CAFFE)
 add_definitions(-std=c++11)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
 
-find_package(CUDA)
 find_package(GFlags)
 find_package(Glog)
 find_package(OpenCV)
 find_package(OpenPose REQUIRED)
 
-include_directories(${OpenPose_INCLUDE_DIRS} ${CUDA_INCLUDE_DIRS} ${GFLAGS_INCLUDE_DIR})
+include_directories(${OpenPose_INCLUDE_DIRS} ${GFLAGS_INCLUDE_DIR} ${GLOG_INCLUDE_DIR} ${OpenCV_INCLUDE_DIRS})
 
 add_executable(example.bin example.cpp)
 
-target_link_libraries(example.bin ${GLOG_LIBRARY} ${GFLAGS_LIBRARY} ${OpenCV_LIBS} ${OpenPose_LIBS}) 
+target_link_libraries(example.bin ${OpenPose_LIBS} ${GFLAGS_LIBRARY} ${GLOG_LIBRARY} ${OpenCV_LIBS})
 ```
 
-If Caffe was build with OpenPose, it will also find Caffe. If Caffe was not build using OpenPose, you will need to link again Caffe as shown below -- 
-
+If Caffe was built with OpenPose, it will automatically find it. Otherwise, you will need to link Caffe again as shown below (otherwise, you might get an error like `/usr/bin/ld: cannot find -lcaffe`).
 ```
 link_directories(<path_to_caffe_installation>/caffe/build/install/lib) 
-```
-
-If you don't perform above step, you might get an error like the one below.
-
-```
-/usr/bin/ld: cannot find -lcaffe
-```
-
-To uninstall the installed headers and libraries, simply use the command below in the `build` directory.
-
-```
-sudo make uninstall
 ```
 
 ### Run OpenPose
@@ -154,6 +136,16 @@ In order to re-install OpenPose:
 1. Delete the `build/` folder.
 2. In CMake GUI, click on `File` --> `Delete Cache`.
 3. Follow the [Installation](#installation) steps again.
+
+
+
+## Uninstallation
+If you used `sudo make install`, simply use the command below in the `build` directory.
+```
+cd build/
+sudo make uninstall
+```
+If you did not use `sudo make install`, simply remove the OpenPose folder.
 
 
 
