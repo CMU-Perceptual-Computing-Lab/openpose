@@ -1,0 +1,16 @@
+# Compute and install package configuration and version files
+get_filename_component(_dir "${CMAKE_CURRENT_LIST_FILE}" PATH)
+get_filename_component(_prefix "${_dir}/../.." ABSOLUTE)
+
+# Import the targets
+include("${_prefix}/lib/OpenPose/OpenPose.cmake")
+if (@BUILD_CAFFE@)
+  set(Caffe_INCLUDE_DIRS "${_prefix}/include/caffe")
+  # set(Caffe_LIBS "${_prefix}/lib/libcaffe.so")
+endif (@BUILD_CAFFE@)
+
+# Report other information
+set(OpenPose_INCLUDE_DIRS "${_prefix}/include/openpose")
+set(OpenPose_LIBS "openpose_core;openpose_filestream;openpose_gui;openpose_pose;"
+    "openpose_utilities;openpose_producer;openpose_thread;openpose_face;openpose_hand;"
+    "openpose_wrapper")

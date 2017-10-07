@@ -7,11 +7,13 @@ OpenPose - Installation using CMake
 3. [Clone and Update the Repository](#clone-and-update-the-repository)
 4. [Installation](#installation)
     1. [Caffe Prerequisites (Ubuntu Only)](#caffe-prerequisites-ubuntu-only)
-    2. [OpenPose Configuration](#openpose-configuration)
-    3. [OpenPose Building](#openpose-building)
-    4. [Run OpenPose](#run-openpose)
+    2. [Configuration](#openpose-configuration)
+    3. [Building](#openpose-building)
+    4. [OpenPose from other Projects](#openpose-from-other-projects) 
+    5. [Run OpenPose](#run-openpose)
 5. [Reinstallation](#reinstallation)
-6. [Optional Settings](#optional-settings)
+6. [Uninstallation](#uninstallation)
+7. [Optional Settings](#optional-settings)
     1. [Doxygen Documentation Autogeneration](#doxygen-documentation-autogeneration)
     2. [Custom Caffe](#custom-caffe)
     3. [Custom OpenCV](#custom-opencv)
@@ -53,7 +55,7 @@ bash ./ubuntu/install_cmake.sh
 
 
 ### OpenPose Configuration
-Note: If you prefer to use CMake though the command line, see [Cmake Command Line Build](#cmake-command-line-build).
+Note: If you prefer to use CMake through the command line, see [Cmake Command Line Build](#cmake-command-line-build).
 
 1. Install CMake GUI.
     1. Ubuntu: run `sudo apt-get install cmake-qt-gui`.
@@ -90,11 +92,42 @@ Note: If you prefer to use your own custom Caffe or OpenCV versions, see [Custom
 Finally, build the project by running the following commands.
 ```
 cd build/
-no_cores=`cat /proc/cpuinfo | grep processor | wc -l`
-make -j${no_cores}
+make -j`nproc`
 ```
 
+### OpenPose from other Projects
+If you only intend to use the OpenPose demo, you might skip this step. This step is only recommended if you plan to use the OpenPose API from other projects.
 
+To install the OpenPose headers and libraries into the system environment path (e.g. `/usr/local/` or `/usr/`), run the following command.
+```
+cd build/
+sudo make install
+```
+
+Once the installation is completed, you can use OpenPose in your other project using the `find_package` cmake command. Below, is a small example `CMakeLists.txt`.
+```
+cmake_minimum_required(VERSION 2.8.7)
+
+add_definitions(-std=c++11)
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
+
+find_package(GFlags)
+find_package(Glog)
+find_package(OpenCV)
+find_package(OpenPose REQUIRED)
+
+include_directories(${OpenPose_INCLUDE_DIRS} ${GFLAGS_INCLUDE_DIR} ${GLOG_INCLUDE_DIR} ${OpenCV_INCLUDE_DIRS})
+
+add_executable(example.bin example.cpp)
+
+target_link_libraries(example.bin ${OpenPose_LIBS} ${GFLAGS_LIBRARY} ${GLOG_LIBRARY} ${OpenCV_LIBS})
+```
+
+If Caffe was built with OpenPose, it will automatically find it. Otherwise, you will need to link Caffe again as shown below (otherwise, you might get an error like `/usr/bin/ld: cannot find -lcaffe`).
+```
+link_directories(<path_to_caffe_installation>/caffe/build/install/lib) 
+```
 
 ### Run OpenPose
 Check OpenPose was properly installed by running it on the default images, video or webcam: [doc/quick_start.md#quick-start](./quick_start.md#quick-start).
@@ -103,9 +136,20 @@ Check OpenPose was properly installed by running it on the default images, video
 
 ## Reinstallation
 In order to re-install OpenPose:
-1. Delete the `build/` folder.
-2. In CMake GUI, click on `File` --> `Delete Cache`.
-3. Follow the [Installation](#installation) steps again.
+1. If you ran `sudo make install`, then run `sudo make uninstall` in `build/`.
+2. Delete the `build/` folder.
+3. In CMake GUI, click on `File` --> `Delete Cache`.
+4. Follow the [Installation](#installation) steps again.
+
+
+
+## Uninstallation
+If you used `sudo make install`, simply use the command below in the `build` directory and later remove the OpenPose folder.
+```
+cd build/
+sudo make uninstall
+```
+If you did not use `sudo make install`, simply remove the OpenPose folder.
 
 
 
