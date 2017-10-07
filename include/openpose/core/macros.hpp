@@ -60,6 +60,10 @@ namespace caffe
 {
     template <typename T> class Blob;
 }
+namespace boost
+{
+    template <typename T> class shared_ptr;
+}
 
 // Includes at the end, since this macros class does not need them, but the files that call this
 // file. However, keeping the files at the beginning might create a circular include linking problem.
