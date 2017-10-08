@@ -1,5 +1,12 @@
-project(openpose)
+project(OpenPose)
 cmake_minimum_required(VERSION 2.8.7 FATAL_ERROR) # min. cmake version recommended by Caffe
+
+### VERSION INFO
+
+set(OpenPose_VERSION_MAJOR 1)
+set(OpenPose_VERSION_MINOR 1)
+set(OpenPose_VERSION_PATCH 0)
+set(OpenPose_VERSION ${OpenPose_VERSION_MAJOR}.${OpenPose_VERSION_MINOR}.${OpenPose_VERSION_PATCH})
 
 ### FIND THE OS
 
@@ -21,9 +28,6 @@ elseif (UNIX AND NOT APPLE) # OS is a Linux distribution (it assumes Ubuntu)
 endif ()
 
 ### FLAGS
-
-# Build as shared library
-set(BUILD_SHARED_LIBS ON)
 
 # Turn on C++11
 add_definitions(-std=c++11)
@@ -79,6 +83,9 @@ option(DOWNLOAD_FACE_MODEL "Download face model." ON)
 # More options
 option(BUILD_EXAMPLES "Build OpenPose examples." ON)
 option(BUILD_DOCS "Build OpenPose documentation." OFF)
+
+# Build as shared library
+option(BUILD_SHARED_LIBS "Build as shared lib" ON)
 
 ### FIND REQUIRED PACKAGES
 
