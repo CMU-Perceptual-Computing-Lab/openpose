@@ -1,6 +1,6 @@
 var classop_1_1_net_caffe =
 [
-    [ "NetCaffe", "classop_1_1_net_caffe.html#a6b15b23d0d77b2253975cda0dd7cbe3b", null ],
+    [ "NetCaffe", "classop_1_1_net_caffe.html#a89964d1f9be424cb4c9b85f23803c9e3", null ],
     [ "~NetCaffe", "classop_1_1_net_caffe.html#a84007645c88de286e9d306461a044e8d", null ],
     [ "forwardPass", "classop_1_1_net_caffe.html#a46472ff210748d47f81115f1eb01e2b0", null ],
     [ "getInputDataCpuPtr", "classop_1_1_net_caffe.html#a3ac11c69dc0ece3f60c862a7c558bb15", null ],

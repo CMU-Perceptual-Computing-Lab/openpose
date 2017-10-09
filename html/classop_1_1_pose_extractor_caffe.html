@@ -119,8 +119,8 @@ $(document).ready(function(){initNavTree('classop_1_1_pose_extractor_caffe.html'
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:adf09cb89df4ad93de22242aa1f89a105"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_extractor_caffe.html#adf09cb89df4ad93de22242aa1f89a105">PoseExtractorCaffe</a> (const <a class="el" href="structop_1_1_point.html">Point</a>&lt; int &gt; &amp;netInputSize, const <a class="el" href="structop_1_1_point.html">Point</a>&lt; int &gt; &amp;netOutputSize, const <a class="el" href="structop_1_1_point.html">Point</a>&lt; int &gt; &amp;outputSize, const int scaleNumber, const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel, const std::string &amp;modelFolder, const int gpuId, const std::vector&lt; <a class="el" href="namespaceop.html#a1c3dbc214e7552f7ef9cc753ee97226b">HeatMapType</a> &gt; &amp;heatMapTypes={}, const <a class="el" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bda">ScaleMode</a> heatMapScale=<a class="el" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bdaa4b942544cb3e764bbb8d33f8a8744855">ScaleMode::ZeroToOne</a>)</td></tr>
-<tr class="separator:adf09cb89df4ad93de22242aa1f89a105"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adf8c39f86ce5f7fbf76af2e99817947c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_extractor_caffe.html#adf8c39f86ce5f7fbf76af2e99817947c">PoseExtractorCaffe</a> (const <a class="el" href="structop_1_1_point.html">Point</a>&lt; int &gt; &amp;netInputSize, const <a class="el" href="structop_1_1_point.html">Point</a>&lt; int &gt; &amp;netOutputSize, const <a class="el" href="structop_1_1_point.html">Point</a>&lt; int &gt; &amp;outputSize, const int scaleNumber, const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel, const std::string &amp;modelFolder, const int gpuId, const std::vector&lt; <a class="el" href="namespaceop.html#a1c3dbc214e7552f7ef9cc753ee97226b">HeatMapType</a> &gt; &amp;heatMapTypes={}, const <a class="el" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bda">ScaleMode</a> heatMapScale=<a class="el" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bdaa4b942544cb3e764bbb8d33f8a8744855">ScaleMode::ZeroToOne</a>, const bool enableGoogleLogging=true)</td></tr>
+<tr class="separator:adf8c39f86ce5f7fbf76af2e99817947c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3359641c1199c712a07859dcb76b7dcf"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_extractor_caffe.html#a3359641c1199c712a07859dcb76b7dcf">~PoseExtractorCaffe</a> ()</td></tr>
 <tr class="separator:a3359641c1199c712a07859dcb76b7dcf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7cefba61d8a4f69a0f8790505bd6b0d3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_extractor_caffe.html#a7cefba61d8a4f69a0f8790505bd6b0d3">netInitializationOnThread</a> ()</td></tr>
@@ -173,7 +173,7 @@ Additional Inherited Members</h2></td></tr>
 <tr class="separator:ab32d08e00cf4321682ba9acc2b78a289 inherit pro_attribs_classop_1_1_pose_extractor"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="adf09cb89df4ad93de22242aa1f89a105"></a>
+<a class="anchor" id="adf8c39f86ce5f7fbf76af2e99817947c"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -229,7 +229,13 @@ Additional Inherited Members</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const <a class="el" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bda">ScaleMode</a>&#160;</td>
-          <td class="paramname"><em>heatMapScale</em> = <code><a class="el" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bdaa4b942544cb3e764bbb8d33f8a8744855">ScaleMode::ZeroToOne</a></code>&#160;</td>
+          <td class="paramname"><em>heatMapScale</em> = <code><a class="el" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bdaa4b942544cb3e764bbb8d33f8a8744855">ScaleMode::ZeroToOne</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>enableGoogleLogging</em> = <code>true</code>&#160;</td>
         </tr>
         <tr>
           <td></td>

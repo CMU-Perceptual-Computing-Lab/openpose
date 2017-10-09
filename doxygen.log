@@ -691,11 +691,12 @@ Generating docs for file /home/travis/build/CMU-Perceptual-Computing-Lab/openpos
 /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/face/faceExtractor.hpp:18: warning: The following parameters of op::FaceExtractor::FaceExtractor(const Point< int > &netInputSize, const Point< int > &netOutputSize, const std::vector< HeatMapType > &heatMapTypes={}, const ScaleMode heatMapScale=ScaleMode::ZeroToOne) are not documented:
   parameter 'heatMapTypes'
   parameter 'heatMapScale'
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/face/faceExtractorCaffe.hpp:18: warning: The following parameters of op::FaceExtractorCaffe::FaceExtractorCaffe(const Point< int > &netInputSize, const Point< int > &netOutputSize, const std::string &modelFolder, const int gpuId, const std::vector< HeatMapType > &heatMapTypes={}, const ScaleMode heatMapScale=ScaleMode::ZeroToOne) are not documented:
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/face/faceExtractorCaffe.hpp:18: warning: The following parameters of op::FaceExtractorCaffe::FaceExtractorCaffe(const Point< int > &netInputSize, const Point< int > &netOutputSize, const std::string &modelFolder, const int gpuId, const std::vector< HeatMapType > &heatMapTypes={}, const ScaleMode heatMapScale=ScaleMode::ZeroToOne, const bool enableGoogleLogging=true) are not documented:
   parameter 'modelFolder'
   parameter 'gpuId'
   parameter 'heatMapTypes'
   parameter 'heatMapScale'
+  parameter 'enableGoogleLogging'
 /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/filestream/cocoJsonSaver.hpp:16: warning: The following parameters of op::CocoJsonSaver::CocoJsonSaver(const std::string &filePathToSave, const bool humanReadable=true) are not documented:
   parameter 'humanReadable'
 enCv.hpp...
@@ -771,9 +772,10 @@ Generating docs for compound op::Gui...
 Generating docs/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/hand/handExtractor.hpp:18: warning: The following parameters of op::HandExtractor::HandExtractor(const Point< int > &netInputSize, const Point< int > &netOutputSize, const unsigned short numberScales=1, const float rangeScales=0.4f, const std::vector< HeatMapType > &heatMapTypes={}, const ScaleMode heatMapScale=ScaleMode::ZeroToOne) are not documented:
   parameter 'heatMapTypes'
   parameter 'heatMapScale'
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/hand/handExtractorCaffe.hpp:18: warning: The following parameters of op::HandExtractorCaffe::HandExtractorCaffe(const Point< int > &netInputSize, const Point< int > &netOutputSize, const std::string &modelFolder, const int gpuId, const unsigned short numberScales=1, const float rangeScales=0.4f, const std::vector< HeatMapType > &heatMapTypes={}, const ScaleMode heatMapScale=ScaleMode::ZeroToOne) are not documented:
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/hand/handExtractorCaffe.hpp:18: warning: The following parameters of op::HandExtractorCaffe::HandExtractorCaffe(const Point< int > &netInputSize, const Point< int > &netOutputSize, const std::string &modelFolder, const int gpuId, const unsigned short numberScales=1, const float rangeScales=0.4f, const std::vector< HeatMapType > &heatMapTypes={}, const ScaleMode heatMapScale=ScaleMode::ZeroToOne, const bool enableGoogleLogging=true) are not documented:
   parameter 'heatMapTypes'
   parameter 'heatMapScale'
+  parameter 'enableGoogleLogging'
 /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/producer/producer.hpp:20: warning: argument 'repeatWhenFinished' of command @param is not found in the argument list of op::Producer::Producer(const ProducerType type)
 /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/producer/producer.hpp:20: warning: The following parameters of op::Producer::Producer(const ProducerType type) are not documented:
   parameter 'type'
@@ -872,5 +874,5 @@ Generating file index...
 Generating file member index...
 Generating example index...
 finalizing index lists...
-lookup cache used 2783/65536 hits=16280 misses=2970
+lookup cache used 2789/65536 hits=16306 misses=2976
 finished...

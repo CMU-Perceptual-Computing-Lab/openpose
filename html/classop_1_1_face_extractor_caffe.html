@@ -119,8 +119,8 @@ $(document).ready(function(){initNavTree('classop_1_1_face_extractor_caffe.html'
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aab3117c74c915d01981dd52aa536e6c4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_face_extractor_caffe.html#aab3117c74c915d01981dd52aa536e6c4">FaceExtractorCaffe</a> (const <a class="el" href="structop_1_1_point.html">Point</a>&lt; int &gt; &amp;netInputSize, const <a class="el" href="structop_1_1_point.html">Point</a>&lt; int &gt; &amp;netOutputSize, const std::string &amp;modelFolder, const int gpuId, const std::vector&lt; <a class="el" href="namespaceop.html#a1c3dbc214e7552f7ef9cc753ee97226b">HeatMapType</a> &gt; &amp;heatMapTypes={}, const <a class="el" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bda">ScaleMode</a> heatMapScale=<a class="el" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bdaa4b942544cb3e764bbb8d33f8a8744855">ScaleMode::ZeroToOne</a>)</td></tr>
-<tr class="separator:aab3117c74c915d01981dd52aa536e6c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a399c6709f8fe93d40f38b03938d39966"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_face_extractor_caffe.html#a399c6709f8fe93d40f38b03938d39966">FaceExtractorCaffe</a> (const <a class="el" href="structop_1_1_point.html">Point</a>&lt; int &gt; &amp;netInputSize, const <a class="el" href="structop_1_1_point.html">Point</a>&lt; int &gt; &amp;netOutputSize, const std::string &amp;modelFolder, const int gpuId, const std::vector&lt; <a class="el" href="namespaceop.html#a1c3dbc214e7552f7ef9cc753ee97226b">HeatMapType</a> &gt; &amp;heatMapTypes={}, const <a class="el" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bda">ScaleMode</a> heatMapScale=<a class="el" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bdaa4b942544cb3e764bbb8d33f8a8744855">ScaleMode::ZeroToOne</a>, const bool enableGoogleLogging=true)</td></tr>
+<tr class="separator:a399c6709f8fe93d40f38b03938d39966"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4450e656f21a8cb7f1d9bf5f545012f1"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_face_extractor_caffe.html#a4450e656f21a8cb7f1d9bf5f545012f1">~FaceExtractorCaffe</a> ()</td></tr>
 <tr class="separator:a4450e656f21a8cb7f1d9bf5f545012f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:add2a24d9bd5e03ff90034239e90523c2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_face_extractor_caffe.html#add2a24d9bd5e03ff90034239e90523c2">netInitializationOnThread</a> ()</td></tr>
@@ -158,12 +158,9 @@ Additional Inherited Members</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Face keypoint extractor class for Caffe framework. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="aab3117c74c915d01981dd52aa536e6c4"></a>
+<a class="anchor" id="a399c6709f8fe93d40f38b03938d39966"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">op::FaceExtractorCaffe::FaceExtractorCaffe </td>
@@ -199,7 +196,13 @@ Additional Inherited Members</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const <a class="el" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bda">ScaleMode</a>&#160;</td>
-          <td class="paramname"><em>heatMapScale</em> = <code><a class="el" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bdaa4b942544cb3e764bbb8d33f8a8744855">ScaleMode::ZeroToOne</a></code>&#160;</td>
+          <td class="paramname"><em>heatMapScale</em> = <code><a class="el" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bdaa4b942544cb3e764bbb8d33f8a8744855">ScaleMode::ZeroToOne</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>enableGoogleLogging</em> = <code>true</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -207,11 +210,6 @@ Additional Inherited Members</h2></td></tr>
           <td></td><td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">explicit</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 <p>Constructor of the <a class="el" href="classop_1_1_face_extractor.html">FaceExtractor</a> class. </p>
 <dl class="params"><dt>Parameters</dt><dd>

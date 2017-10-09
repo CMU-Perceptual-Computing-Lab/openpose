@@ -4,7 +4,7 @@ var searchData=
   ['facedetector',['FaceDetector',['../classop_1_1_face_detector.html#adfeab6977c93b7bef66c1dfbcf6f8150',1,'op::FaceDetector']]],
   ['facedetectoropencv',['FaceDetectorOpenCV',['../classop_1_1_face_detector_open_c_v.html#a8c4d55863b726448762a142fa91bb69d',1,'op::FaceDetectorOpenCV']]],
   ['faceextractor',['FaceExtractor',['../classop_1_1_face_extractor.html#a6f3faf536edd57fa9198969f633c01f4',1,'op::FaceExtractor']]],
-  ['faceextractorcaffe',['FaceExtractorCaffe',['../classop_1_1_face_extractor_caffe.html#aab3117c74c915d01981dd52aa536e6c4',1,'op::FaceExtractorCaffe']]],
+  ['faceextractorcaffe',['FaceExtractorCaffe',['../classop_1_1_face_extractor_caffe.html#a399c6709f8fe93d40f38b03938d39966',1,'op::FaceExtractorCaffe']]],
   ['facegpurenderer',['FaceGpuRenderer',['../classop_1_1_face_gpu_renderer.html#a344b4f1d256d6ad805273eb8ba29cde1',1,'op::FaceGpuRenderer']]],
   ['fastmax',['fastMax',['../namespaceop.html#a9f4b99449c0c73e2c89ee1a1eff007c7',1,'op']]],
   ['fastmin',['fastMin',['../namespaceop.html#a6e1d1f90ef06cc7af576fdaad4b4e320',1,'op']]],

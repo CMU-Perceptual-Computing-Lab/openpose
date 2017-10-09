@@ -119,8 +119,8 @@ $(document).ready(function(){initNavTree('classop_1_1_hand_extractor_caffe.html'
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a9a383a3a26f79c5be4cbd3ff900ec596"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_hand_extractor_caffe.html#a9a383a3a26f79c5be4cbd3ff900ec596">HandExtractorCaffe</a> (const <a class="el" href="structop_1_1_point.html">Point</a>&lt; int &gt; &amp;netInputSize, const <a class="el" href="structop_1_1_point.html">Point</a>&lt; int &gt; &amp;netOutputSize, const std::string &amp;modelFolder, const int gpuId, const unsigned short numberScales=1, const float rangeScales=0.4f, const std::vector&lt; HeatMapType &gt; &amp;heatMapTypes={}, const ScaleMode heatMapScale=ScaleMode::ZeroToOne)</td></tr>
-<tr class="separator:a9a383a3a26f79c5be4cbd3ff900ec596"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3ac44c32806b647fc11daa14da2bda16"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_hand_extractor_caffe.html#a3ac44c32806b647fc11daa14da2bda16">HandExtractorCaffe</a> (const <a class="el" href="structop_1_1_point.html">Point</a>&lt; int &gt; &amp;netInputSize, const <a class="el" href="structop_1_1_point.html">Point</a>&lt; int &gt; &amp;netOutputSize, const std::string &amp;modelFolder, const int gpuId, const unsigned short numberScales=1, const float rangeScales=0.4f, const std::vector&lt; HeatMapType &gt; &amp;heatMapTypes={}, const ScaleMode heatMapScale=ScaleMode::ZeroToOne, const bool enableGoogleLogging=true)</td></tr>
+<tr class="separator:a3ac44c32806b647fc11daa14da2bda16"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aee681b43b8691ac1f07e08616522f6af"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_hand_extractor_caffe.html#aee681b43b8691ac1f07e08616522f6af">~HandExtractorCaffe</a> ()</td></tr>
 <tr class="separator:aee681b43b8691ac1f07e08616522f6af"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ace3ee9d717887ee9dc0f00ce69bd0c82"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_hand_extractor_caffe.html#ace3ee9d717887ee9dc0f00ce69bd0c82">netInitializationOnThread</a> ()</td></tr>
@@ -161,12 +161,9 @@ short, float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="e
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Hand keypoint extractor class for Caffe framework. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a9a383a3a26f79c5be4cbd3ff900ec596"></a>
+<a class="anchor" id="a3ac44c32806b647fc11daa14da2bda16"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">op::HandExtractorCaffe::HandExtractorCaffe </td>
@@ -214,7 +211,13 @@ short, float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="e
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const <a class="el" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bda">ScaleMode</a>&#160;</td>
-          <td class="paramname"><em>heatMapScale</em> = <code><a class="el" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bdaa4b942544cb3e764bbb8d33f8a8744855">ScaleMode::ZeroToOne</a></code>&#160;</td>
+          <td class="paramname"><em>heatMapScale</em> = <code><a class="el" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bdaa4b942544cb3e764bbb8d33f8a8744855">ScaleMode::ZeroToOne</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>enableGoogleLogging</em> = <code>true</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -222,11 +225,6 @@ short, float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="e
           <td></td><td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">explicit</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 <p>Constructor of the <a class="el" href="classop_1_1_hand_extractor_caffe.html">HandExtractorCaffe</a> class. </p>
 <dl class="params"><dt>Parameters</dt><dd>
