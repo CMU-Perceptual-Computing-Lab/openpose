@@ -24,11 +24,12 @@ namespace op
          * accurate.
          * @param rangeScales The range between the smaller and bigger scale.
          */
-        explicit HandExtractorCaffe(const Point<int>& netInputSize, const Point<int>& netOutputSize,
-                                    const std::string& modelFolder, const int gpuId,
-                                    const unsigned short numberScales = 1, const float rangeScales = 0.4f,
-                                    const std::vector<HeatMapType>& heatMapTypes = {},
-                                    const ScaleMode heatMapScale = ScaleMode::ZeroToOne);
+        HandExtractorCaffe(const Point<int>& netInputSize, const Point<int>& netOutputSize,
+                           const std::string& modelFolder, const int gpuId,
+                           const unsigned short numberScales = 1, const float rangeScales = 0.4f,
+                           const std::vector<HeatMapType>& heatMapTypes = {},
+                           const ScaleMode heatMapScale = ScaleMode::ZeroToOne,
+                           const bool enableGoogleLogging = true);
 
         /**
          * Virtual destructor of the HandExtractor class.

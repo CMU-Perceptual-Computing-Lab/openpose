@@ -15,7 +15,6 @@
 #ifndef GFLAGS_GFLAGS_H_
     namespace gflags = google;
 #endif
-#include <glog/logging.h> // google::InitGoogleLogging
 // OpenPose dependencies
 #include <openpose/core/headers.hpp>
 #include <openpose/filestream/headers.hpp>
@@ -91,6 +90,8 @@ int openPoseTutorialPose2()
     if (FLAGS_scale_gap <= 0. && FLAGS_scale_number > 1)
         op::error("Incompatible flag configuration: scale_gap must be greater than 0 or scale_number = 1.",
                   __LINE__, __FUNCTION__, __FILE__);
+    // Enabling Google Logging
+    const bool enableGoogleLogging = true;
     // Logging
     op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
     // Step 3 - Initialize all required classes
@@ -98,7 +99,8 @@ int openPoseTutorialPose2()
     op::CvMatToOpInput cvMatToOpInput;
     op::CvMatToOpOutput cvMatToOpOutput;
     auto poseExtractorPtr = std::make_shared<op::PoseExtractorCaffe>(
-        netInputSize, netOutputSize, outputSize, FLAGS_scale_number, poseModel, FLAGS_model_folder, FLAGS_num_gpu_start
+        netInputSize, netOutputSize, outputSize, FLAGS_scale_number, poseModel, FLAGS_model_folder,
+        FLAGS_num_gpu_start, std::vector<op::HeatMapType>{}, op::ScaleMode::ZeroToOne, enableGoogleLogging
     );
     op::PoseGpuRenderer poseGpuRenderer{poseModel, poseExtractorPtr, (float)FLAGS_render_threshold,
                                         !FLAGS_disable_blending, (float)FLAGS_alpha_pose, (float)FLAGS_alpha_heatmap};
@@ -146,9 +148,6 @@ int openPoseTutorialPose2()
 
 int main(int argc, char *argv[])
 {
-    // Initializing google logging (Caffe uses it for logging)
-    google::InitGoogleLogging("openPoseTutorialPose2");
-
     // Parsing command line flags
     gflags::ParseCommandLineFlags(&argc, &argv, true);
 

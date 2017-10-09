@@ -11,6 +11,7 @@ namespace op
     public:
         NetCaffe(const std::array<int, 4>& netInputSize4D, const std::string& caffeProto,
                  const std::string& caffeTrainedModel, const int gpuId = 0,
+                 const bool enableGoogleLogging = true,
                  const std::string& lastBlobName = "net_output");
 
         virtual ~NetCaffe();

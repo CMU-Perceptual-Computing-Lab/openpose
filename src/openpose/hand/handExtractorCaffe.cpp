@@ -26,10 +26,11 @@ namespace op
             std::shared_ptr<caffe::Blob<float>> spPeaksBlob;
 
             ImplHandExtractorCaffe(const Point<int>& netOutputSize,
-                                   const std::string& modelFolder, const int gpuId) :
+                                   const std::string& modelFolder, const int gpuId,
+                                   const bool enableGoogleLogging) :
                 spNetCaffe{std::make_shared<NetCaffe>(std::array<int,4>{1, 3, netOutputSize.y, netOutputSize.x},
                                                       modelFolder + HAND_PROTOTXT, modelFolder + HAND_TRAINED_MODEL,
-                                                      gpuId)},
+                                                      gpuId, enableGoogleLogging)},
                 spResizeAndMergeCaffe{std::make_shared<ResizeAndMergeCaffe<float>>()},
                 spMaximumCaffe{std::make_shared<MaximumCaffe<float>>()}
             {
@@ -159,10 +160,11 @@ namespace op
                                            const std::string& modelFolder, const int gpuId,
                                            const unsigned short numberScales,
                                            const float rangeScales, const std::vector<HeatMapType>& heatMapTypes,
-                                           const ScaleMode heatMapScale) :
+                                           const ScaleMode heatMapScale,
+                                           const bool enableGoogleLogging) :
         HandExtractor{netInputSize, netOutputSize, numberScales, rangeScales, heatMapTypes, heatMapScale}
         #if defined USE_CAFFE && defined USE_CUDA
-        , upImpl{new ImplHandExtractorCaffe{mNetOutputSize, modelFolder, gpuId}}
+        , upImpl{new ImplHandExtractorCaffe{mNetOutputSize, modelFolder, gpuId, enableGoogleLogging}}
         #endif
     {
         try

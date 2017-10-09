@@ -15,7 +15,6 @@
 #ifndef GFLAGS_GFLAGS_H_
     namespace gflags = google;
 #endif
-#include <glog/logging.h> // google::InitGoogleLogging
 // OpenPose dependencies
 #include <openpose/core/headers.hpp>
 #include <openpose/filestream/headers.hpp>
@@ -86,6 +85,8 @@ int openPoseTutorialPose1()
     if (FLAGS_scale_gap <= 0. && FLAGS_scale_number > 1)
         op::error("Incompatible flag configuration: scale_gap must be greater than 0 or scale_number = 1.",
                   __LINE__, __FUNCTION__, __FILE__);
+    // Enabling Google Logging
+    const bool enableGoogleLogging = true;
     // Logging
     op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
     // Step 3 - Initialize all required classes
@@ -93,7 +94,8 @@ int openPoseTutorialPose1()
     op::CvMatToOpInput cvMatToOpInput;
     op::CvMatToOpOutput cvMatToOpOutput;
     op::PoseExtractorCaffe poseExtractorCaffe{netInputSize, netOutputSize, outputSize, FLAGS_scale_number, poseModel,
-                                              FLAGS_model_folder, FLAGS_num_gpu_start};
+                                              FLAGS_model_folder, FLAGS_num_gpu_start, {}, op::ScaleMode::ZeroToOne,
+                                              enableGoogleLogging};
     op::PoseCpuRenderer poseRenderer{poseModel, (float)FLAGS_render_threshold, !FLAGS_disable_blending,
                                      (float)FLAGS_alpha_pose};
     op::OpOutputToCvMat opOutputToCvMat;
@@ -138,9 +140,6 @@ int openPoseTutorialPose1()
 
 int main(int argc, char *argv[])
 {
-    // Initializing google logging (Caffe uses it for logging)
-    google::InitGoogleLogging("openPoseTutorialPose1");
-
     // Parsing command line flags
     gflags::ParseCommandLineFlags(&argc, &argv, true);
 

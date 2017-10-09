@@ -14,7 +14,6 @@
 #ifndef GFLAGS_GFLAGS_H_
     namespace gflags = google;
 #endif
-#include <glog/logging.h> // google::InitGoogleLogging
 // OpenPose dependencies
 #include <openpose/core/headers.hpp>
 #include <openpose/gui/headers.hpp>
@@ -71,7 +70,7 @@ int openPoseTutorialThread1()
     videoSeekSharedPtr->first = false;
     videoSeekSharedPtr->second = 0;
     const op::Point<int> producerSize{(int)producerSharedPtr->get(CV_CAP_PROP_FRAME_WIDTH),
-                                (int)producerSharedPtr->get(CV_CAP_PROP_FRAME_HEIGHT)};
+                                      (int)producerSharedPtr->get(CV_CAP_PROP_FRAME_HEIGHT)};
     // Step 4 - Setting thread workers && manager
     typedef std::vector<op::Datum> TypedefDatumsNoPtr;
     typedef std::shared_ptr<TypedefDatumsNoPtr> TypedefDatums;
@@ -138,9 +137,6 @@ int openPoseTutorialThread1()
 
 int main(int argc, char *argv[])
 {
-    // Initializing google logging (Caffe uses it for logging)
-    google::InitGoogleLogging("openPoseTutorialThread1");
-
     // Parsing command line flags
     gflags::ParseCommandLineFlags(&argc, &argv, true);
 

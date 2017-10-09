@@ -1,6 +1,9 @@
 #include <numeric> // std::accumulate
 #ifdef USE_CAFFE
+    #include <atomic>
+    #include <mutex>
     #include <caffe/net.hpp>
+    #include <glog/logging.h> // google::InitGoogleLogging
 #endif
 #include <openpose/utilities/cuda.hpp>
 #include <openpose/utilities/fileSystem.hpp>
@@ -8,6 +11,9 @@
 
 namespace op
 {
+    std::mutex sMutex;
+    std::atomic<bool> sGoogleLoggingInitialized{false};
+
     struct NetCaffe::ImplNetCaffe
     {
         #ifdef USE_CAFFE
@@ -23,7 +29,8 @@ namespace op
             boost::shared_ptr<caffe::Blob<float>> spOutputBlob;
 
             ImplNetCaffe(const std::array<int, 4>& netInputSize4D, const std::string& caffeProto,
-                         const std::string& caffeTrainedModel, const int gpuId, const std::string& lastBlobName) :
+                         const std::string& caffeTrainedModel, const int gpuId,
+                         const bool enableGoogleLogging, const std::string& lastBlobName) :
                 mGpuId{gpuId},
                 // mNetInputSize4D{netInputSize4D}, // This line crashes on some devices with old G++
                 mNetInputSize4D{netInputSize4D[0], netInputSize4D[1], netInputSize4D[2], netInputSize4D[3]},
@@ -41,14 +48,26 @@ namespace op
                 if (!existFile(mCaffeTrainedModel))
                     error("Caffe trained model file not found: " + mCaffeTrainedModel + message,
                           __LINE__, __FUNCTION__, __FILE__);
+                // Double if condition in order to speed up the program if it is called several times
+                if (enableGoogleLogging && !sGoogleLoggingInitialized)
+                {
+                    std::lock_guard<std::mutex> lock{sMutex};
+                    if (enableGoogleLogging && !sGoogleLoggingInitialized)
+                    {
+                        google::InitGoogleLogging("OpenPose");
+                        sGoogleLoggingInitialized = true;
+                    }
+                }
             }
         #endif
     };
 
     NetCaffe::NetCaffe(const std::array<int, 4>& netInputSize4D, const std::string& caffeProto,
-                       const std::string& caffeTrainedModel, const int gpuId, const std::string& lastBlobName)
+                       const std::string& caffeTrainedModel, const int gpuId,
+                       const bool enableGoogleLogging, const std::string& lastBlobName)
         #ifdef USE_CAFFE
-            : upImpl{new ImplNetCaffe{netInputSize4D, caffeProto, caffeTrainedModel, gpuId, lastBlobName}}
+            : upImpl{new ImplNetCaffe{netInputSize4D, caffeProto, caffeTrainedModel, gpuId, enableGoogleLogging,
+                                      lastBlobName}}
         #endif
     {
         try

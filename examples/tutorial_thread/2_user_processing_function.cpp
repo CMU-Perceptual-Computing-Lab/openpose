@@ -15,7 +15,6 @@
 #ifndef GFLAGS_GFLAGS_H_
     namespace gflags = google;
 #endif
-#include <glog/logging.h> // google::InitGoogleLogging
 // OpenPose dependencies
 #include <openpose/core/headers.hpp>
 #include <openpose/gui/headers.hpp>
@@ -180,9 +179,6 @@ int openPoseTutorialThread2()
 
 int main(int argc, char *argv[])
 {
-    // Initializing google logging (Caffe uses it for logging)
-    google::InitGoogleLogging("openPoseTutorialThread2");
-
     // Parsing command line flags
     gflags::ParseCommandLineFlags(&argc, &argv, true);
 

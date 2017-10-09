@@ -641,7 +641,8 @@ namespace op
                     poseExtractors.emplace_back(std::make_shared<PoseExtractorCaffe>(
                         poseNetInputSize, poseNetOutputSize, finalOutputSize, wrapperStructPose.scalesNumber,
                         wrapperStructPose.poseModel, modelFolder, gpuId + gpuNumberStart,
-                        wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale
+                        wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale,
+                        wrapperStructPose.enableGoogleLogging
                     ));
 
                 // Pose renderers
@@ -714,7 +715,8 @@ namespace op
                     const auto netOutputSize = wrapperStructFace.netInputSize;
                     const auto faceExtractor = std::make_shared<FaceExtractorCaffe>(
                         wrapperStructFace.netInputSize, netOutputSize, modelFolder,
-                        gpu + gpuNumberStart, wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale
+                        gpu + gpuNumberStart, wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale,
+                        wrapperStructPose.enableGoogleLogging
                     );
                     spWPoses.at(gpu).emplace_back(std::make_shared<WFaceExtractor<TDatumsPtr>>(faceExtractor));
                 }
@@ -740,7 +742,8 @@ namespace op
                     const auto handExtractor = std::make_shared<HandExtractorCaffe>(
                         wrapperStructHand.netInputSize, netOutputSize, modelFolder,
                         gpu + gpuNumberStart, wrapperStructHand.scalesNumber, wrapperStructHand.scaleRange,
-                        wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale
+                        wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale,
+                        wrapperStructPose.enableGoogleLogging
                     );
                     spWPoses.at(gpu).emplace_back(std::make_shared<WHandExtractor<TDatumsPtr>>(handExtractor));
                     // If tracking

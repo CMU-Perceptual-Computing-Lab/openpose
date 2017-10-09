@@ -25,7 +25,6 @@
 #ifndef GFLAGS_GFLAGS_H_
     namespace gflags = google;
 #endif
-#include <glog/logging.h> // google::InitGoogleLogging
 // OpenPose dependencies
 #include <openpose/headers.hpp>
 
@@ -197,6 +196,9 @@ int openPoseDemo()
     const auto keypointScale = op::flagsToScaleMode(FLAGS_keypoint_scale);
     // heatmaps to add
     const auto heatMapTypes = op::flagsToHeatMaps(FLAGS_heatmaps_add_parts, FLAGS_heatmaps_add_bkg, FLAGS_heatmaps_add_PAFs);
+    // Enabling Google Logging
+    const bool enableGoogleLogging = true;
+    // Logging
     op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
     // OpenPose wrapper
@@ -208,7 +210,8 @@ int openPoseDemo()
                                                   op::flagsToRenderMode(FLAGS_render_pose), poseModel,
                                                   !FLAGS_disable_blending, (float)FLAGS_alpha_pose,
                                                   (float)FLAGS_alpha_heatmap, FLAGS_part_to_show, FLAGS_model_folder,
-                                                  heatMapTypes, op::ScaleMode::UnsignedChar, (float)FLAGS_render_threshold};
+                                                  heatMapTypes, op::ScaleMode::UnsignedChar, (float)FLAGS_render_threshold,
+                                                  enableGoogleLogging};
     // Face configuration (use op::WrapperStructFace{} to disable it)
     const op::WrapperStructFace wrapperStructFace{FLAGS_face, faceNetInputSize, op::flagsToRenderMode(FLAGS_face_render, FLAGS_render_pose),
                                                   (float)FLAGS_face_alpha_pose, (float)FLAGS_face_alpha_heatmap, (float)FLAGS_face_render_threshold};
@@ -267,9 +270,6 @@ int openPoseDemo()
 
 int main(int argc, char *argv[])
 {
-    // Initializing google logging (Caffe uses it for logging)
-    google::InitGoogleLogging("openPoseDemo");
-
     // Parsing command line flags
     gflags::ParseCommandLineFlags(&argc, &argv, true);
 

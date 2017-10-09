@@ -25,10 +25,11 @@ namespace op
             std::shared_ptr<caffe::Blob<float>> spPeaksBlob;
 
             ImplFaceExtractorCaffe(const Point<int>& netOutputSize,
-                                   const std::string& modelFolder, const int gpuId) :
+                                   const std::string& modelFolder, const int gpuId,
+                                   const bool enableGoogleLogging) :
                 spNetCaffe{std::make_shared<NetCaffe>(std::array<int,4>{1, 3, netOutputSize.y, netOutputSize.x},
                                                       modelFolder + FACE_PROTOTXT, modelFolder + FACE_TRAINED_MODEL,
-                                                      gpuId)},
+                                                      gpuId, enableGoogleLogging)},
                 spResizeAndMergeCaffe{std::make_shared<ResizeAndMergeCaffe<float>>()},
                 spMaximumCaffe{std::make_shared<MaximumCaffe<float>>()}
             {
@@ -73,10 +74,10 @@ namespace op
     FaceExtractorCaffe::FaceExtractorCaffe(const Point<int>& netInputSize, const Point<int>& netOutputSize,
                                            const std::string& modelFolder, const int gpuId,
                                            const std::vector<HeatMapType>& heatMapTypes,
-                                           const ScaleMode heatMapScale) :
+                                           const ScaleMode heatMapScale, const bool enableGoogleLogging) :
         FaceExtractor{netInputSize, netOutputSize, heatMapTypes, heatMapScale}
         #if defined USE_CAFFE && defined USE_CUDA
-        , upImpl{new ImplFaceExtractorCaffe{mNetOutputSize, modelFolder, gpuId}}
+        , upImpl{new ImplFaceExtractorCaffe{mNetOutputSize, modelFolder, gpuId, enableGoogleLogging}}
         #endif
     {
         try

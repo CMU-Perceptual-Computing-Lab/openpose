@@ -30,12 +30,13 @@ namespace op
 
             ImplPoseExtractorCaffe(const Point<int>& netInputSize, const Point<int>& netOutputSize,
                                    const int scaleNumber, const PoseModel poseModel, const int gpuId,
-                                   const std::string& modelFolder) :
+                                   const std::string& modelFolder, const bool enableGoogleLogging) :
                 mResizeScale{netOutputSize.x / (float)netInputSize.x},
                 spNetCaffe{std::make_shared<NetCaffe>(std::array<int,4>{scaleNumber, 3, (int)netInputSize.y,
                                                       (int)netInputSize.x},
                                                       modelFolder + POSE_PROTOTXT[(int)poseModel],
-                                                      modelFolder + POSE_TRAINED_MODEL[(int)poseModel], gpuId)},
+                                                      modelFolder + POSE_TRAINED_MODEL[(int)poseModel], gpuId,
+                                                      enableGoogleLogging)},
                 spResizeAndMergeCaffe{std::make_shared<ResizeAndMergeCaffe<float>>()},
                 spNmsCaffe{std::make_shared<NmsCaffe<float>>()},
                 spBodyPartConnectorCaffe{std::make_shared<BodyPartConnectorCaffe<float>>()}
@@ -48,11 +49,11 @@ namespace op
                                            const Point<int>& outputSize, const int scaleNumber,
                                            const PoseModel poseModel, const std::string& modelFolder,
                                            const int gpuId, const std::vector<HeatMapType>& heatMapTypes,
-                                           const ScaleMode heatMapScale) :
+                                           const ScaleMode heatMapScale, const bool enableGoogleLogging) :
         PoseExtractor{netOutputSize, outputSize, poseModel, heatMapTypes, heatMapScale}
         #ifdef USE_CAFFE
         , upImpl{new ImplPoseExtractorCaffe{netInputSize, netOutputSize, scaleNumber, poseModel,
-                                            gpuId, modelFolder}}
+                                            gpuId, modelFolder, enableGoogleLogging}}
         #endif
     {
         try

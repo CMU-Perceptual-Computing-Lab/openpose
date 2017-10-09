@@ -25,7 +25,6 @@
 #ifndef GFLAGS_GFLAGS_H_
     namespace gflags = google;
 #endif
-#include <glog/logging.h> // google::InitGoogleLogging
 // OpenPose dependencies
 #include <openpose/headers.hpp>
 
@@ -365,6 +364,9 @@ int openPoseTutorialWrapper2()
     op::check(FLAGS_heatmaps_scale >= 0 && FLAGS_heatmaps_scale <= 2, "Non valid `heatmaps_scale`.", __LINE__, __FUNCTION__, __FILE__);
     const auto heatMapScale = (FLAGS_heatmaps_scale == 0 ? op::ScaleMode::PlusMinusOne
                                : (FLAGS_heatmaps_scale == 1 ? op::ScaleMode::ZeroToOne : op::ScaleMode::UnsignedChar ));
+    // Enabling Google Logging
+    const bool enableGoogleLogging = true;
+    // Logging
     op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
     // Initializing the user custom classes
@@ -392,7 +394,8 @@ int openPoseTutorialWrapper2()
                                                   op::flagsToRenderMode(FLAGS_render_pose), poseModel,
                                                   !FLAGS_disable_blending, (float)FLAGS_alpha_pose,
                                                   (float)FLAGS_alpha_heatmap, FLAGS_part_to_show, FLAGS_model_folder,
-                                                  heatMapTypes, heatMapScale, (float)FLAGS_render_threshold};
+                                                  heatMapTypes, heatMapScale, (float)FLAGS_render_threshold,
+                                                  enableGoogleLogging};
     // Face configuration (use op::WrapperStructFace{} to disable it)
     const op::WrapperStructFace wrapperStructFace{FLAGS_face, faceNetInputSize, op::flagsToRenderMode(FLAGS_face_render, FLAGS_render_pose),
                                                   (float)FLAGS_face_alpha_pose, (float)FLAGS_face_alpha_heatmap, (float)FLAGS_face_render_threshold};
@@ -448,9 +451,6 @@ int openPoseTutorialWrapper2()
 
 int main(int argc, char *argv[])
 {
-    // Initializing google logging (Caffe uses it for logging)
-    google::InitGoogleLogging("openPoseTutorialWrapper2");
-
     // Parsing command line flags
     gflags::ParseCommandLineFlags(&argc, &argv, true);
 

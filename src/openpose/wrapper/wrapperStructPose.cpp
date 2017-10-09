@@ -11,7 +11,8 @@ namespace op
                                          const float alphaHeatMap_, const int defaultPartToRender_,
                                          const std::string& modelFolder_,
                                          const std::vector<HeatMapType>& heatMapTypes_,
-                                         const ScaleMode heatMapScale_, const float renderThreshold_) :
+                                         const ScaleMode heatMapScale_, const float renderThreshold_,
+                                         const bool enableGoogleLogging_) :
         enable{enable_},
         netInputSize{netInputSize_},
         outputSize{outputSize_},
@@ -29,7 +30,8 @@ namespace op
         modelFolder{modelFolder_},
         heatMapTypes{heatMapTypes_},
         heatMapScale{heatMapScale_},
-        renderThreshold{renderThreshold_}
+        renderThreshold{renderThreshold_},
+        enableGoogleLogging{enableGoogleLogging_}
     {
     }
 }

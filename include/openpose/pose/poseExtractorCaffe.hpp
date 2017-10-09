@@ -14,7 +14,8 @@ namespace op
                            const Point<int>& outputSize, const int scaleNumber, const PoseModel poseModel,
                            const std::string& modelFolder, const int gpuId,
                            const std::vector<HeatMapType>& heatMapTypes = {},
-                           const ScaleMode heatMapScale = ScaleMode::ZeroToOne);
+                           const ScaleMode heatMapScale = ScaleMode::ZeroToOne,
+                           const bool enableGoogleLogging = true);
 
         virtual ~PoseExtractorCaffe();
 
