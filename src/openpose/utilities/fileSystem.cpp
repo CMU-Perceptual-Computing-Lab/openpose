@@ -1,7 +1,8 @@
+#include <cstdio> // fopen
 #include <boost/filesystem.hpp>
 #include <boost/range/iterator_range_core.hpp>
-#include <openpose/utilities/fileSystem.hpp>
 #include <openpose/utilities/string.hpp>
+#include <openpose/utilities/fileSystem.hpp>
 
 namespace op
 {
@@ -23,11 +24,31 @@ namespace op
         }
     }
 
-    bool exist(const std::string& directoryPath)
+    bool existDir(const std::string& directoryPath)
     {
         try
         {
+            // Maybe existFile also works for directories in Ubuntu/Windows/Mac?
             return boost::filesystem::exists(directoryPath);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return false;
+        }
+    }
+
+    bool existFile(const std::string& filePath)
+    {
+        try
+        {
+            if (auto* file = fopen(filePath.c_str(), "r"))
+            {
+                fclose(file);
+                return true;
+            }
+            else
+                return false;
         }
         catch (const std::exception& e)
         {
@@ -153,7 +174,7 @@ namespace op
         try
         {
             // Check folder exits
-            if (!exist(directoryPath))
+            if (!existDir(directoryPath))
                 error("Folder " + directoryPath + " does not exist.", __LINE__, __FUNCTION__, __FILE__);
             // Read images
             std::vector<std::string> filePaths;

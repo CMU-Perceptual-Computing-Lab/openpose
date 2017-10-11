@@ -1,22 +1,34 @@
-OpenPose Library - Compilation and Installation
+OpenPose - Installation and FAQ
 ====================================
 
 ## Contents
-1. [Requirements](#requirements)
-2. [Ubuntu](#ubuntu)
-3. [Windows](#windows)
-4. [OpenPose 3D Demo](#openpose-3d-demo)
-5. [Quick Start](#quick-start)
-6. [Expected Visual Results](#expected-visual-results)
-7. [FAQ](#faq)
+1. [Operating Systems](#operating-systems)
+2. [Requirements](#requirements)
+3. [Clone and Update the Repository](#clone-and-update-the-repository)
+4. [Ubuntu](#ubuntu)
+5. [Windows](#windows)
+6. [OpenPose 3D Demo](#openpose-3d-demo)
+7. [Doxygen Documentation Autogeneration](#doxygen-documentation-autogeneration)
+8. [Custom Caffe](#custom-caffe)
+9. [Compiling without cuDNN](#compiling-without-cudnn)
+10. [FAQ](#faq)
+
+
+
+## Operating Systems
+- **Ubuntu** 14 and 16.
+- **Windows** 8 and 10.
+- **Nvidia Jetson TX2**, installation instructions in [doc/installation_jetson_tx2.md](./installation_jetson_tx2.md).
+- OpenPose has also been used on **Windows 7**, **Mac**, **CentOS**, and **Nvidia Jetson (TK1 and TX1)** embedded systems. However, we do not officially support them at the moment.
+
+
 
 
 
 ## Requirements
-- Ubuntu (tested on 14 and 16) or Windows (tested on 10). We do not support any other OS but the community has been able to install it on: CentOS, Windows 7, and Windows 8.
 - NVIDIA graphics card with at least 1.6 GB available (the `nvidia-smi` command checks the available GPU memory in Ubuntu).
 - At least 2 GB of free RAM memory.
-- Highly recommended: A CPU with at least 8 cores.
+- Highly recommended: cuDNN and a CPU with at least 8 cores.
 
 Note: These requirements assume the default configuration (i.e. `--net_resolution "656x368"` and `scale_number 1`). You might need more (with a greater net resolution and/or number of scales) or less resources (with smaller net resolution and/or using the MPI and MPI_4 models).
 
@@ -24,17 +36,34 @@ Note: These requirements assume the default configuration (i.e. `--net_resolutio
 
 
 
+## Clone and Update the Repository
+The first step is to clone the OpenPose repository. It might be done with [GitHub Desktop](https://desktop.github.com/) in Windows and from the terminal in Ubuntu:
+```bash
+git clone https://github.com/CMU-Perceptual-Computing-Lab/openpose
+```
+
+OpenPose can be easily updated by clicking the `synchronization` button at the top-right part in GitHub Desktop in Windows, or by running `git pull origin master` in Ubuntu. After OpenPose has been updated, just run the `Reinstallation` section described below for your specific Operating System.
+
+
+
+
+
 ## Ubuntu
+### Installation - CMake
+Recommended installation method. It is simpler and it offers many more customization settings. See [doc/installation_cmake.md](installation_cmake.md). Note that it is a beta version, if it fails, please post in GitHub and use [Installation - Script Compilation](#installation---script-compilation) meanwhile.
+
+
+
 ### Installation - Script Compilation
-**Highly important**: This script only works with CUDA 8 and Ubuntu 14 or 16. Otherwise, check [Manual Compilation](#manual-compilation).
+**Highly important**: This script only works with CUDA 8 and Ubuntu 14 or 16. Otherwise, see [doc/installation_cmake.md](installation_cmake.md) or [Installation - Manual Compilation](#installation---manual-compilation).
 1. Required: CUDA, cuDNN, OpenCV and Atlas must be already installed on your machine.
     1. [CUDA](https://developer.nvidia.com/cuda-downloads) must be installed. You should reboot your machine after installing CUDA.
-    2. [cuDNN](https://developer.nvidia.com/cudnn): Once you have downloaded it, just unzip it and copy (merge) the contents on the CUDA folder, e.g. `/usr/local/cuda-8.0/`. Note: We found OpenPose working ~10% faster with cuDNN 5.1 compared to cuDNN 6.
+    2. [cuDNN](https://developer.nvidia.com/cudnn): Once you have downloaded it, just unzip it and copy (merge) the contents on the CUDA folder, e.g. `/usr/local/cuda-8.0/`. Note: We found OpenPose working ~10% faster with cuDNN 5.1 compared to cuDNN 6. Otherwise, check [Compiling without cuDNN](#compiling-without-cudnn).
     3. OpenCV can be installed with `apt-get install libopencv-dev`. If you have compiled OpenCV 3 by your own, follow [Manual Compilation](#manual-compilation). After both Makefile.config files have been generated, edit them and uncomment the line `# OPENCV_VERSION := 3`. You might alternatively modify all `Makefile.config.UbuntuXX` files and then run the scripts in step 2.
     4. In addition, OpenCV 3 does not incorporate the `opencv_contrib` module by default. Assuming you have OpenCV 3 compiled with the contrib module and you want to use it, append `opencv_contrib` at the end of the line `LIBRARIES += opencv_core opencv_highgui opencv_imgproc` in the `Makefile` file.
     5. Atlas can be installed with `sudo apt-get install libatlas-base-dev`. Instead of Atlas, you can use OpenBLAS or Intel MKL by modifying the line `BLAS := atlas` in the same way as previosuly mentioned for the OpenCV version selection.
 2. Build Caffe & the OpenPose library + download the required Caffe models for Ubuntu 14.04 or 16.04 (auto-detected for the script) and CUDA 8:
-```
+```bash
 bash ./ubuntu/install_caffe_and_openpose_if_cuda8.sh
 ```
 
@@ -66,7 +95,7 @@ Alternatively to the script installation, if you want to use CUDA 7, avoid using
     make all -j${number_of_cpus}
     ```
 
-    NOTE: If you want to use your own Caffe distribution, follow the steps on `Custom Caffe` section and later re-compile the OpenPose library:
+    NOTE: If you want to use your own Caffe distribution, follow the steps on [Custom Caffe](#custom-caffe) section and later re-compile the OpenPose library:
     ```
     bash ./install_openpose_if_cuda8.sh
     ```
@@ -85,7 +114,7 @@ If you updated some software that our library or 3rdparty use, or you simply wan
 ```
 make clean && cd 3rdparty/caffe && make clean
 ```
-2. Repeat the [Installation](#installation) steps.
+2. Repeat the [Installation](#installation) steps. You do not need to download the models again.
 
 
 
@@ -104,7 +133,7 @@ You just need to remove the OpenPose folder, by default called `openpose/`. E.g.
 
 ### Installation - Library
 1. Install the pre-requisites:
-    1. Microsoft Visual Studio (VS) 2015 Enterprise Update 3. VS Enterprise Update 1 will give some compiler errors, while VS 2015 Community has not been tested.
+    1. Microsoft Visual Studio (VS) 2015 Enterprise Update 3. If Visual Studio 2017 Community is desired, we do not support it, but it might be compiled by firstly [enabling CUDA 8.0](https://stackoverflow.com/questions/43745099/using-cuda-with-visual-studio-2017?answertab=active#tab-top). VS Enterprise Update 1 will give some compiler errors and VS 2015 Community has not been tested.
     2. [CUDA 8](https://developer.nvidia.com/cuda-downloads): Install it on the default location, `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0`. Otherwise, modify the Visual Studio project solution accordingly. Install CUDA 8.0 after Visual Studio 2015 is installed to assure that the CUDA installation will generate all necessary files for VS. If CUDA was already installed, re-install it after installing VS!
     3. [cuDNN 5.1](https://developer.nvidia.com/cudnn): Once you have downloaded it, just unzip it and copy (merge) the contents on the CUDA folder, `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0`.
 2. Download the OpenPose dependencies and models (body, face and hand models) by double-clicking on `{openpose_path}\windows\download_3rdparty_and_models.bat`. Alternatively, you might prefer to download them manually:
@@ -129,7 +158,7 @@ You just need to remove the OpenPose folder, by default called `openpose/`. E.g.
     3. Open the Windows cmd (Windows button + X, then A).
     4. Go to the OpenPose directory, assuming OpenPose has been downloaded on `C:\openpose`: `cd C:\openpose\`.
     5. Run the tutorial commands.
-7. Check [Quick Start](#quick-start) to test video, webcam and a folder with images, in order to verify OpenPose was properly installed.
+7. Check OpenPose was properly installed by running it on the default images, video or webcam: [doc/quick_start.md#quick-start](./quick_start.md#quick-start).
 
 
 
@@ -138,15 +167,13 @@ You just need to remove the OpenPose or portable demo folder.
 
 
 
+### Reinstallation
+If you updated some software that our library or 3rdparty use, or you simply want to reinstall it:
+1. Open the Visual Studio project sln file by double-cliking on `{openpose_path}\windows\OpenPose.sln`.
+2. Clean the OpenPose project by right-click on `Solution 'OpenPose'` and `Clean Solution`.
+3. Compile it and run it with F5 or the green play icon.
 
 
-## Compiling without cuDNN
-The [cuDNN](https://developer.nvidia.com/cudnn) library is not mandatory, but required for full keypoint detection accuracy. In case your graphics card is not compatible with cuDNN, you can disable it by:
-
-- Ubuntu: Modifying the `Makefile.config` files in both the OpenPose and `3rdparty/caffe` folders.
-- Windows: Modifying the `Makefile.config` files in both the OpenPose and `3rdparty/caffe` folders.
-
-Then, you would have to reduce the `--net_resolution` flag to fit the model into the GPU memory. You can try values like "640x320", "320x240", "320x160", or "160x80" to see your GPU memory capabilities. After finding the maximum approximate resolution that your GPU can handle without throwing an out-of-memory error, adjust the `net_resolution` ratio to your image or video to be processed (see the `--net_resolution` explanation from [doc/demo_overview.md](./demo_overview.md)).
 
 
 
@@ -158,109 +185,39 @@ If you want to try our OpenPose 3-D reconstruction demo, see [doc/openpose_3d_re
 
 
 
-## Quick Start
-Check that the library is working properly by using any of the following commands. Note that `examples/media/video.avi` and `examples/media` exist, so you do not need to change the paths. In addition, the following commands assume your terminal (Ubuntu) or cmd (Windows) are located in the OpenPose folder.
-
-**1. Running on Video**
+## Doxygen Documentation Autogeneration
+You can generate the documentation by running the following command. The documentation will be generated in `doc/doxygen/html/index.html`. You can simply open it with double-click (your default browser should automatically display it).
 ```
-# Ubuntu
-./build/examples/openpose/openpose.bin --video examples/media/video.avi
-# With face and hands
-./build/examples/openpose/openpose.bin --video examples/media/video.avi --face --hand
-```
-```
-:: Windows - Demo
-bin\OpenPoseDemo.exe --video examples\media\video.avi
-:: With face and hands
-bin\OpenPoseDemo.exe --video examples\media\video.avi --face --hand
-```
-```
-:: Windows - Library
-windows\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi
-:: With face and hands
-windows\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi --face --hand
-```
-
-
-
-**2. Running on Webcam**
-```
-# Ubuntu
-./build/examples/openpose/openpose.bin
-# With face and hands
-./build/examples/openpose/openpose.bin --face --hand
-```
-```
-:: Windows - Demo
-bin\OpenPoseDemo.exe
-:: With face and hands
-bin\OpenPoseDemo.exe --face --hand
-```
-```
-:: Windows - Library
-windows\x64\Release\OpenPoseDemo.exe
-:: With face and hands
-windows\x64\Release\OpenPoseDemo.exe --face --hand
-```
-
-
-
-**3. Running on Images**
-```
-# Ubuntu
-./build/examples/openpose/openpose.bin --image_dir examples/media/
-# With face and hands
-./build/examples/openpose/openpose.bin --image_dir examples/media/ --face --hand
-```
-```
-:: Windows - Demo
-bin\OpenPoseDemo.exe --image_dir examples\media\
-:: With face and hands
-bin\OpenPoseDemo.exe --image_dir examples\media\ --face --hand
-```
-```
-:: Windows - Library
-windows\x64\Release\OpenPoseDemo.exe --image_dir examples\media\
-:: With face and hands
-windows\x64\Release\OpenPoseDemo.exe --image_dir examples\media\ --face --hand
-```
-
-
-
-**4. Maximum Accuracy Configuration**
-
-This command provides the most accurate results we have been able to achieve for body, hand and face keypoint detection. However, this command will need around 8 GB of GPU memory and runs around 1 FPS on a Titan X.
-```
-# Ubuntu
-./build/examples/openpose/openpose.bin --net_resolution "1312x736" --scale_number 4 --scale_gap 0.25 --hand --hand_scale_number 6 --hand_scale_range 0.4 --face
-```
-```
-:: Windows - Demo
-bin\OpenPoseDemo.exe --net_resolution "1312x736" --scale_number 4 --scale_gap 0.25 --hand --hand_scale_number 6 --hand_scale_range 0.4 --face
-```
-```
-:: Windows - Library
-windows\x64\Release\OpenPoseDemo.exe --net_resolution "1312x736" --scale_number 4 --scale_gap 0.25 --hand --hand_scale_number 6 --hand_scale_range 0.4 --face
+cd doc/
+doxygen doc_autogeneration.doxygen
 ```
 
 
 
 
 
-## Expected Visual Results
-The visual GUI should show the original image with the poses blended on it, similarly to the pose of this gif:
-<p align="center">
-    <img src="media/shake.gif", width="720">
-</p>
+## Custom Caffe
+We only modified some Caffe compilation flags and minor details. You can use your own Caffe distribution, these are the files we added and modified:
 
-If you choose to visualize a body part or a PAF (Part Affinity Field) heat map with the command option `--part_to_show`, the result should be similar to one of the following images:
-<p align="center">
-    <img src="media/body_heat_maps.png", width="720">
-</p>
+1. Added files: `install_caffe.sh`; as well as `Makefile.config.Ubuntu14.example`, `Makefile.config.Ubuntu16.example`, `Makefile.config.Ubuntu14_cuda_7.example` and `Makefile.config.Ubuntu16_cuda_7.example` (extracted from `Makefile.config.example`). Basically, you must enable cuDNN.
+2. Edited file: Makefile. Search for "# OpenPose: " to find the edited code. We basically added the C++11 flag to avoid issues in some old computers.
+3. Optional - deleted Caffe file: `Makefile.config.example`.
+4. In order to link it to OpenPose:
+    1. Run `make all && make distribute` in your Caffe version.
+    2. Open the OpenPose Makefile config file: `./Makefile.config.UbuntuX.example` (where X depends on your OS and CUDA version).
+    3. Modify the Caffe folder directory variable (`CAFFE_DIR`) to your custom Caffe `distribute` folder location in the previous OpenPose Makefile config file.
 
-<p align="center">
-    <img src="media/paf_heat_maps.png", width="720">
-</p>
+
+
+
+
+## Compiling without cuDNN
+The [cuDNN](https://developer.nvidia.com/cudnn) library is not mandatory, but required for full keypoint detection accuracy. In case your graphics card is not compatible with cuDNN, you can disable it by:
+
+- Ubuntu: Disable `USE_CUDNN` in the `Makefile.config` file in `3rdparty/caffe`, and recompiling Caffe.
+- Windows: Compiling Caffe by your own with without cuDNN support and replacing the [3rdparty/windows/caffe](../3rdparty/windows/caffe)) folder by your own implementation.
+
+Then, you would have to reduce the `--net_resolution` flag to fit the model into the GPU memory. You can try values like "640x320", "320x240", "320x160", or "160x80" to see your GPU memory capabilities. After finding the maximum approximate resolution that your GPU can handle without throwing an out-of-memory error, adjust the `net_resolution` ratio to your image or video to be processed (see the `--net_resolution` explanation from [doc/demo_overview.md](./demo_overview.md)).
 
 
 

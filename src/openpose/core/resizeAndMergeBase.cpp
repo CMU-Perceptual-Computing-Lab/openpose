@@ -7,7 +7,7 @@ namespace op
 {
     template <typename T>
     void resizeAndMergeCpu(T* targetPtr, const T* const sourcePtr, const std::array<int, 4>& targetSize,
-                           const std::array<int, 4>& sourceSize, const std::vector<T>& scaleRatios)
+                           const std::array<int, 4>& sourceSize, const std::vector<T>& scaleInputToNetInputs)
     {
         try
         {
@@ -42,7 +42,7 @@ namespace op
     }
 
     template void resizeAndMergeCpu(float* targetPtr, const float* const sourcePtr, const std::array<int, 4>& targetSize,
-                                    const std::array<int, 4>& sourceSize, const std::vector<float>& scaleRatios);
+                                    const std::array<int, 4>& sourceSize, const std::vector<float>& scaleInputToNetInputs);
     template void resizeAndMergeCpu(double* targetPtr, const double* const sourcePtr, const std::array<int, 4>& targetSize,
-                                    const std::array<int, 4>& sourceSize, const std::vector<double>& scaleRatios);
+                                    const std::array<int, 4>& sourceSize, const std::vector<double>& scaleInputToNetInputs);
 }

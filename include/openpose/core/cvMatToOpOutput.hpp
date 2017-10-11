@@ -9,13 +9,8 @@ namespace op
     class OP_API CvMatToOpOutput
     {
     public:
-        CvMatToOpOutput(const Point<int>& outputResolution, const bool generateOutput = true);
-
-        std::tuple<double, Array<float>> format(const cv::Mat& cvInputData) const;
-
-    private:
-        const bool mGenerateOutput;
-        const std::vector<int> mOutputSize3D;
+        Array<float> createArray(const cv::Mat& cvInputData, const double scaleInputToOutput,
+                                 const Point<int>& outputResolution) const;
     };
 }
 

@@ -58,13 +58,13 @@ namespace op
                 auto& tDatumsNoPtr = *tDatums;
                 // Record image(s) on disk
                 std::vector<cv::Mat> cvOutputDatas(tDatumsNoPtr.size());
-                for (auto i = 0; i < tDatumsNoPtr.size(); i++)
+                for (auto i = 0u; i < tDatumsNoPtr.size(); i++)
                     cvOutputDatas[i] = tDatumsNoPtr[i].cvOutputData;
                 const auto fileName = (!tDatumsNoPtr[0].name.empty() ? tDatumsNoPtr[0].name : std::to_string(tDatumsNoPtr[0].id));
                 spImageSaver->saveImages(cvOutputDatas, fileName);
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
-                Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__, Profiler::DEFAULT_X);
+                Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);
                 // Debugging log
                 dLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             }

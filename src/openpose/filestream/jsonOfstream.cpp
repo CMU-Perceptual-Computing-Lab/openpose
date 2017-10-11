@@ -2,7 +2,8 @@
 
 namespace op
 {
-    void enterAndTab(std::ofstream& ofstream, const bool humanReadable, const long long bracesCounter, const long long bracketsCounter)
+    void enterAndTab(std::ofstream& ofstream, const bool humanReadable, const long long bracesCounter,
+                     const long long bracketsCounter)
     {
         try
         {

@@ -62,16 +62,22 @@ namespace op
                 // keypoints - i.e. poseKeypoints
                 mJsonOfstream.key("keypoints");
                 mJsonOfstream.arrayOpen();
-                const std::vector<int> indexesInCocoOrder{0, 15, 14, 17, 16,        5, 2, 6, 3, 7,        4, 11, 8, 12, 9,        13, 10};
-                for (auto bodyPart = 0 ; bodyPart < indexesInCocoOrder.size() ; bodyPart++)
+                std::vector<int> indexesInCocoOrder;
+                if (numberBodyParts == 18)
+                    indexesInCocoOrder = std::vector<int>{0, 15, 14, 17, 16,        5, 2, 6, 3, 7,        4, 11, 8, 12, 9,        13, 10};
+                else if (numberBodyParts == 19)
+                    indexesInCocoOrder = std::vector<int>{0, 16, 15, 18, 17,        5, 2, 6, 3, 7,        4, 12, 9, 13, 10,       14, 11};
+                else
+                    error("Unvalid number of body parts (" + std::to_string(numberBodyParts) + ").", __LINE__, __FUNCTION__, __FILE__);
+                for (auto bodyPart = 0u ; bodyPart < indexesInCocoOrder.size() ; bodyPart++)
                 {
                     const auto finalIndex = 3*(person*numberBodyParts + indexesInCocoOrder.at(bodyPart));
                     mJsonOfstream.plainText(poseKeypoints[finalIndex]);
                     mJsonOfstream.comma();
                     mJsonOfstream.plainText(poseKeypoints[finalIndex+1]);
                     mJsonOfstream.comma();
-                    mJsonOfstream.plainText(1);
-                    if (bodyPart < indexesInCocoOrder.size() - 1)
+                    mJsonOfstream.plainText((poseKeypoints[finalIndex+2] > 0.f ? 1 : 0));
+                    if (bodyPart < indexesInCocoOrder.size() - 1u)
                         mJsonOfstream.comma();
                 }
                 mJsonOfstream.arrayClose();

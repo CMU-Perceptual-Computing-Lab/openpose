@@ -59,11 +59,15 @@ namespace op
                 for (auto& tDatum : *tDatums)
                 {
                     spHandExtractor->forwardPass(tDatum.handRectangles, tDatum.cvInputData, tDatum.scaleInputToOutput);
-                    tDatum.handKeypoints = spHandExtractor->getHandKeypoints();
+                    for (auto hand = 0 ; hand < 2 ; hand++)
+                    {
+                        tDatum.handHeatMaps[hand] = spHandExtractor->getHeatMaps()[hand].clone();
+                        tDatum.handKeypoints[hand] = spHandExtractor->getHandKeypoints()[hand].clone();
+                    }
                 }
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
-                Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__, Profiler::DEFAULT_X);
+                Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);
                 // Debugging log
                 dLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             }

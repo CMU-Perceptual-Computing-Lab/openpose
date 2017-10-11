@@ -14,9 +14,9 @@ namespace op
     public:
         explicit HandDetector(const PoseModel poseModel);
 
-        std::vector<std::array<Rectangle<float>, 2>> detectHands(const Array<float>& poseKeypoints, const float scaleInputToOutput) const;
+        std::vector<std::array<Rectangle<float>, 2>> detectHands(const Array<float>& poseKeypoints, const double scaleInputToOutput) const;
 
-        std::vector<std::array<Rectangle<float>, 2>> trackHands(const Array<float>& poseKeypoints, const float scaleInputToOutput);
+        std::vector<std::array<Rectangle<float>, 2>> trackHands(const Array<float>& poseKeypoints, const double scaleInputToOutput);
 
         void updateTracker(const std::array<Array<float>, 2>& handKeypoints, const unsigned long long id);
 

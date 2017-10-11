@@ -12,18 +12,22 @@ namespace op
     class OP_API PoseExtractor
     {
     public:
-        PoseExtractor(const Point<int>& netOutputSize, const Point<int>& outputSize, const PoseModel poseModel, const std::vector<HeatMapType>& heatMapTypes = {},
+        PoseExtractor(const Point<int>& netOutputSize, const Point<int>& outputSize, const PoseModel poseModel,
+                      const std::vector<HeatMapType>& heatMapTypes = {},
                       const ScaleMode heatMapScale = ScaleMode::ZeroToOne);
 
         virtual ~PoseExtractor();
 
         void initializationOnThread();
 
-        virtual void forwardPass(const Array<float>& inputNetData, const Point<int>& inputDataSize, const std::vector<float>& scaleRatios = {1.f}) = 0;
+        virtual void forwardPass(const Array<float>& inputNetData, const Point<int>& inputDataSize,
+                                 const std::vector<double>& scaleRatios = {1.f}) = 0;
 
         virtual const float* getHeatMapCpuConstPtr() const = 0;
 
         virtual const float* getHeatMapGpuConstPtr() const = 0;
+
+        virtual std::vector<int> getHeatMapSize() const = 0;
 
         Array<float> getHeatMaps() const;
 

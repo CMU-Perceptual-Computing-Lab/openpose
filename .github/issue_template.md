@@ -1,27 +1,29 @@
 ### Posting rules
-1. **Add** the **system configuration (all of it!), command and output** if you have some kind of error or performance question.
-2. **No duplicated** posts.
-3. **No** posts about **questions already answered / clearly explained in** the **documentation** (e.g. **no more low-speed nor out-of-memory questions**).
-4. Set a **proper issue title**: add the Ubuntu/Windows word and be specific (e.g. do not simple call it: `Compile error`).
-5. Only English comments.
-Issues/comments that do not follow this will be **ignored or removed** with no further clarification.
+1. **No** questions about **training**. OpenPose only implements testing.
+2. **No** questions about **Caffe installation errors/issues**. Check [Caffe](http://caffe.berkeleyvision.org) documentation and help for those errors.
+3. **Fill** the **Your System Configuration section (all of it!)** if you have some kind of error or performance question.
+4. **No duplicated** posts.
+5. **No** posts about **questions already answered / clearly explained in** the **documentation** (e.g. **no more low-speed nor out-of-memory questions**).
+6. Set a **proper issue title**: add the Ubuntu/Windows word and be specific (e.g. do not simple call it: `Compile error`).
+7. Only English comments.
+Issues/comments which do not follow these rules will be **ignored or removed** with no further clarification.
 
 
 
-### Issue summary
+### Issue Summary
 
 
 
-### Executed command (if any)
+### Executed Command (if any)
 Note: add `--logging_level 0` to get higher debug information.
 
 
 
-### OpenPose output (if any)
+### OpenPose Output (if any)
 
 
 
-### Type of issue
+### Type of Issue
 You might select multiple topics, delete the rest:
 - Compilation/installation error
 - Execution error
@@ -32,12 +34,12 @@ You might select multiple topics, delete the rest:
 
 
 
-### Your system configuration
+### Your System Configuration
 **Operating system** (`lsb_release -a` in Ubuntu):
+**Installation mode**: CMake, sh script, or manual Makefile installation (Ubuntu); VS2015, VS2017, CMake, ... (Windows)
 **CUDA version** (`cat /usr/local/cuda/version.txt` in most cases):
 **cuDNN version**:
 **GPU model** (`nvidia-smi` in Ubuntu):
 **Caffe version**: Default from OpenPose or custom version.
-**OpenCV version**: installed with `apt-get install libopencv-dev` (Ubuntu) or default from OpenPose (Windows) or OpenCV 2.X or OpenCV 3.X. Especify **full version** (e.g. 3.1 or 2.4.9)
-Generation mode (only for Ubuntu): Makefile + Makefile.config (default, Ubuntu) or CMake (Ubuntu, Windows) or Visual Studio (Windows).
+**OpenCV version**: pre-compiled `apt-get install libopencv-dev` (only Ubuntu); OpenPose default (only Windows); compiled from source: 2.4.9, 2.4.12, 3.1, 3.2, ...
 Compiler (`gcc --version` in Ubuntu):

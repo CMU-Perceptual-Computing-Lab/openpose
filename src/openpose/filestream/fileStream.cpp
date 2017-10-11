@@ -82,7 +82,7 @@ namespace op
                 error("cvMats.size() != cvMatNames.size()", __LINE__, __FUNCTION__, __FILE__);
             // Save cv::Mat data
             cv::FileStorage fileStorage{getFullName(fileNameNoExtension, format), cv::FileStorage::WRITE};
-            for (auto i = 0 ; i < cvMats.size() ; i++)
+            for (auto i = 0u ; i < cvMats.size() ; i++)
                 fileStorage << cvMatNames[i] << (cvMats[i].empty() ? cv::Mat() : cvMats[i]);
             // Release file
             fileStorage.release();
@@ -114,7 +114,7 @@ namespace op
 
             cv::FileStorage fileStorage{getFullName(fileNameNoExtension, format), cv::FileStorage::READ};
             std::vector<cv::Mat> cvMats(cvMatNames.size());
-            for (auto i = 0 ; i < cvMats.size() ; i++)
+            for (auto i = 0u ; i < cvMats.size() ; i++)
                 fileStorage[cvMatNames[i]] >> cvMats[i];
             fileStorage.release();
             return cvMats;
@@ -171,12 +171,12 @@ namespace op
             jsonOfstream.arrayOpen();
             // Ger max numberPeople
             auto numberPeople = 0;
-            for (auto vectorIndex = 0 ; vectorIndex < keypointVector.size() ; vectorIndex++)
+            for (auto vectorIndex = 0u ; vectorIndex < keypointVector.size() ; vectorIndex++)
                 numberPeople = fastMax(numberPeople, keypointVector[vectorIndex].first.getSize(0));
             for (auto person = 0 ; person < numberPeople ; person++)
             {
                 jsonOfstream.objectOpen();
-                for (auto vectorIndex = 0 ; vectorIndex < keypointVector.size() ; vectorIndex++)
+                for (auto vectorIndex = 0u ; vectorIndex < keypointVector.size() ; vectorIndex++)
                 {
                     const auto& keypoints = keypointVector[vectorIndex].first;
                     const auto& keypointName = keypointVector[vectorIndex].second;
@@ -262,7 +262,7 @@ namespace op
                     std::vector<float> splittedInts;
                     for (auto splittedString : splittedStrings)
                         splittedInts.emplace_back(std::stof(splittedString));
-                    if (splittedInts.size() != 4)
+                    if (splittedInts.size() != 4u)
                         error("splittedInts.size() != 4, but splittedInts.size() = "
                               + std::to_string(splittedInts.size()) + ".", __LINE__, __FUNCTION__, __FILE__);
                     const Rectangle<float> handRectangleZero;

@@ -5,7 +5,10 @@
 #include <openpose/hand/handDetector.hpp>
 #include <openpose/hand/handDetectorFromTxt.hpp>
 #include <openpose/hand/handExtractor.hpp>
+#include <openpose/hand/handExtractorCaffe.hpp>
 #include <openpose/hand/handParameters.hpp>
+#include <openpose/hand/handCpuRenderer.hpp>
+#include <openpose/hand/handGpuRenderer.hpp>
 #include <openpose/hand/handRenderer.hpp>
 #include <openpose/hand/renderHand.hpp>
 #include <openpose/hand/wHandDetector.hpp>

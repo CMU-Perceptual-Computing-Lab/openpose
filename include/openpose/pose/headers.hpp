@@ -5,13 +5,18 @@
 #include <openpose/pose/bodyPartConnectorBase.hpp>
 #include <openpose/pose/bodyPartConnectorCaffe.hpp>
 #include <openpose/pose/enumClasses.hpp>
+#include <openpose/pose/poseCpuRenderer.hpp>
 #include <openpose/pose/poseExtractor.hpp>
 #include <openpose/pose/poseExtractorCaffe.hpp>
-#include <openpose/pose/poseExtractorTensorRT.hpp>
-#include <openpose/pose/poseRenderer.hpp>
+#include <openpose/pose/poseGpuRenderer.hpp>
 #include <openpose/pose/poseParameters.hpp>
+#include <openpose/pose/poseRenderer.hpp>
 #include <openpose/pose/renderPose.hpp>
 #include <openpose/pose/wPoseExtractor.hpp>
 #include <openpose/pose/wPoseRenderer.hpp>
+
+#ifdef USE_TENSORRT
+	#include <openpose/pose/poseExtractorTensorRT.hpp>
+#endif // USE_TENSORRT
 
 #endif // OPENPOSE_POSE_HEADERS_HPP

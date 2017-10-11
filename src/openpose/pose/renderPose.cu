@@ -10,10 +10,12 @@ namespace op
     __constant__ const float PI = 3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745f;
     __constant__ const unsigned int COCO_PAIRS_GPU[] = POSE_COCO_PAIRS_RENDER_GPU;
     __constant__ const unsigned int BODY_18_PAIRS_GPU[] = POSE_BODY_18_PAIRS_RENDER_GPU;
+    __constant__ const unsigned int BODY_19_PAIRS_GPU[] = POSE_BODY_19_PAIRS_RENDER_GPU;
     __constant__ const unsigned int BODY_22_PAIRS_GPU[] = POSE_BODY_22_PAIRS_RENDER_GPU;
     __constant__ const unsigned int MPI_PAIRS_GPU[] = POSE_MPI_PAIRS_RENDER_GPU;
     __constant__ const float COCO_COLORS[] = {POSE_COCO_COLORS_RENDER_GPU};
     __constant__ const float BODY_18_COLORS[] = {POSE_BODY_18_COLORS_RENDER_GPU};
+    __constant__ const float BODY_19_COLORS[] = {POSE_BODY_19_COLORS_RENDER_GPU};
     __constant__ const float BODY_22_COLORS[] = {POSE_BODY_22_COLORS_RENDER_GPU};
     __constant__ const float MPI_COLORS[] = {POSE_MPI_COLORS_RENDER_GPU};
 
@@ -148,6 +150,32 @@ namespace op
                         radius, stickwidth, threshold, alphaColorToAdd, blendOriginalFrame, (googlyEyes ? 14 : -1), (googlyEyes ? 15 : -1));
     }
 
+    __global__ void renderPoseBody19(float* targetPtr, const int targetWidth, const int targetHeight, const float* const posePtr,
+                                    const int numberPeople, const float threshold, const bool googlyEyes, const bool blendOriginalFrame,
+                                    const float alphaColorToAdd)
+    {
+        const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
+        const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
+        const auto globalIdx = threadIdx.y * blockDim.x + threadIdx.x;
+
+        // Shared parameters
+        __shared__ float2 sharedMins[POSE_MAX_PEOPLE];
+        __shared__ float2 sharedMaxs[POSE_MAX_PEOPLE];
+        __shared__ float sharedScaleF[POSE_MAX_PEOPLE];
+
+        // Other parameters
+        const auto numberPartPairs = sizeof(BODY_19_PAIRS_GPU) / (2*sizeof(BODY_19_PAIRS_GPU[0]));
+        const auto numberColors = sizeof(BODY_19_COLORS) / (3*sizeof(BODY_19_COLORS[0]));
+        const auto radius = fastMin(targetWidth, targetHeight) / 100.f;
+        const auto stickwidth = fastMin(targetWidth, targetHeight) / 120.f;
+
+        // Render key points
+        renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF,
+                        globalIdx, x, y, targetWidth, targetHeight, posePtr, BODY_19_PAIRS_GPU, numberPeople,
+                        POSE_BODY_19_NUMBER_PARTS, numberPartPairs, BODY_19_COLORS, numberColors,
+                        radius, stickwidth, threshold, alphaColorToAdd, blendOriginalFrame, (googlyEyes ? 15 : -1), (googlyEyes ? 16 : -1));
+    }
+
     __global__ void renderPoseBody22(float* targetPtr, const int targetWidth, const int targetHeight, const float* const posePtr,
                                      const int numberPeople, const float threshold, const bool googlyEyes, const bool blendOriginalFrame,
                                      const float alphaColorToAdd)
@@ -200,7 +228,7 @@ namespace op
     }
 
     __global__ void renderBodyPartHeatMaps(float* targetPtr, const int targetWidth, const int targetHeight, const float* const heatMapPtr, const int widthHeatMap,
-                                            const int heightHeatMap, const float scaleToKeepRatio, const int numberBodyParts, const float alphaColorToAdd)
+                                           const int heightHeatMap, const float scaleToKeepRatio, const int numberBodyParts, const float alphaColorToAdd)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -331,7 +359,7 @@ namespace op
             const auto heatMapOffset = POSE_NUMBER_BODY_PARTS[(int)poseModel] * heatMapSize.area();
             dim3 threadsPerBlock;
             dim3 numBlocks;
-            std::tie(threadsPerBlock, numBlocks) = getNumberCudaThreadsAndBlocks(frameSize);
+            getNumberCudaThreadsAndBlocks(threadsPerBlock, numBlocks, frameSize);
             renderPartAffinities<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.x, frameSize.y, heatMapPtr, heatMapSize.x,
                                                                  heatMapSize.y, scaleToKeepRatio, partsToRender, part, alphaBlending);
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
@@ -358,16 +386,19 @@ namespace op
 
                 dim3 threadsPerBlock;
                 dim3 numBlocks;
-                std::tie(threadsPerBlock, numBlocks) = getNumberCudaThreadsAndBlocks(frameSize);
+                getNumberCudaThreadsAndBlocks(threadsPerBlock, numBlocks, frameSize);
 
                 if (poseModel == PoseModel::COCO_18)
-                    renderPoseCoco<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, 
+                    renderPoseCoco<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.x, frameSize.y, posePtr, numberPeople,
                                                                    renderThreshold, googlyEyes, blendOriginalFrame, alphaBlending);
                 else if (poseModel == PoseModel::BODY_18)
-                    renderPoseBody18<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, 
+                    renderPoseBody18<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.x, frameSize.y, posePtr, numberPeople,
+                                                                     renderThreshold, googlyEyes, blendOriginalFrame, alphaBlending);
+                else if (poseModel == PoseModel::BODY_19)
+                    renderPoseBody19<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.x, frameSize.y, posePtr, numberPeople,
                                                                      renderThreshold, googlyEyes, blendOriginalFrame, alphaBlending);
                 else if (poseModel == PoseModel::BODY_22)
-                    renderPoseBody22<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, 
+                    renderPoseBody22<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.x, frameSize.y, posePtr, numberPeople,
                                                                      renderThreshold, googlyEyes, blendOriginalFrame, alphaBlending);
                 else if (poseModel == PoseModel::MPI_15 || poseModel == PoseModel::MPI_15_4)
                     renderPoseMpi29Parts<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.x, frameSize.y, posePtr,
@@ -393,7 +424,7 @@ namespace op
             checkAlpha(alphaBlending);
             dim3 threadsPerBlock;
             dim3 numBlocks;
-            std::tie(threadsPerBlock, numBlocks) = getNumberCudaThreadsAndBlocks(frameSize);
+            getNumberCudaThreadsAndBlocks(threadsPerBlock, numBlocks, frameSize);
             const auto numberBodyParts = POSE_NUMBER_BODY_PARTS[(int)poseModel];
             const auto heatMapOffset = numberBodyParts * heatMapSize.area();
 
@@ -417,7 +448,7 @@ namespace op
             checkAlpha(alphaBlending);
             dim3 threadsPerBlock;
             dim3 numBlocks;
-            std::tie(threadsPerBlock, numBlocks) = getNumberCudaThreadsAndBlocks(frameSize);
+            getNumberCudaThreadsAndBlocks(threadsPerBlock, numBlocks, frameSize);
             const auto numberBodyParts = POSE_NUMBER_BODY_PARTS[(int)poseModel];
             const auto heatMapOffset = numberBodyParts * heatMapSize.area();
 

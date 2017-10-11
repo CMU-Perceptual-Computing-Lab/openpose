@@ -29,7 +29,6 @@ namespace op
 
 
 // Implementation
-#include <openpose/utilities/openCv.hpp>
 #include <openpose/utilities/pointerContainer.hpp>
 namespace op
 {
@@ -57,10 +56,12 @@ namespace op
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                 // cv::Mat -> float*
                 for (auto& tDatum : *tDatums)
-                    std::tie(tDatum.inputNetData, tDatum.scaleRatios) = spCvMatToOpInput->format(tDatum.cvInputData);
+                    tDatum.inputNetData = spCvMatToOpInput->createArray(tDatum.cvInputData,
+                                                                        tDatum.scaleInputToNetInputs,
+                                                                        tDatum.netInputSizes);
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
-                Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__, Profiler::DEFAULT_X);
+                Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);
                 // Debugging log
                 dLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             }

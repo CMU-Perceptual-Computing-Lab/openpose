@@ -2,8 +2,6 @@
 #define OPENPOSE_UTILITIES_CUDA_HPP
 
 #include <utility> // std::pair
-#include <cuda.h>
-#include <cuda_runtime.h>
 #include <openpose/core/common.hpp>
 
 namespace op
@@ -14,14 +12,14 @@ namespace op
 
     OP_API int getGpuNumber();
 
-    inline unsigned int getNumberCudaBlocks(const unsigned int totalRequired, const unsigned int numberCudaThreads = CUDA_NUM_THREADS)
+    inline unsigned int getNumberCudaBlocks(const unsigned int totalRequired,
+                                            const unsigned int numberCudaThreads = CUDA_NUM_THREADS)
     {
         return (totalRequired + numberCudaThreads - 1) / numberCudaThreads;
     }
 
-    OP_API dim3 getNumberCudaBlocks(const Point<int>& frameSize, const dim3 numberCudaThreads = dim3{ CUDA_NUM_THREADS, CUDA_NUM_THREADS, 1 });
-
-    OP_API std::pair<dim3, dim3> getNumberCudaThreadsAndBlocks(const Point<int>& frameSize);
+    OP_API void getNumberCudaThreadsAndBlocks(dim3& numberCudaThreads, dim3& numberCudaBlocks,
+                                              const Point<int>& frameSize);
 }
 
 #endif // OPENPOSE_UTILITIES_CUDA_HPP

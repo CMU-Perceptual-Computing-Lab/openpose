@@ -1,9 +1,9 @@
 #ifndef OPENPOSE_CORE_ARRAY_HPP
 #define OPENPOSE_CORE_ARRAY_HPP
 
+#include <memory> // std::shared_ptr
 #include <vector>
 #include <opencv2/core/core.hpp> // cv::Mat
-#include <boost/shared_ptr.hpp> // Note: std::shared_ptr not (fully) supported for array pointers: http://stackoverflow.com/questions/8947579/
 
 namespace op
 {
@@ -241,7 +241,7 @@ namespace op
         inline T& operator[](const int index)
         {
             #ifdef NDEBUG
-                return spData[index];
+                return spData.get()[index];
             #else
                 return at(index);
             #endif
@@ -256,7 +256,7 @@ namespace op
         inline const T& operator[](const int index) const
         {
             #ifdef NDEBUG
-                return spData[index];
+                return spData.get()[index];
             #else
                 return at(index);
             #endif
@@ -346,7 +346,7 @@ namespace op
     private:
         std::vector<int> mSize;
         size_t mVolume;
-        boost::shared_ptr<T[]> spData;
+        std::shared_ptr<T> spData;
         std::pair<bool, cv::Mat> mCvMatData;
 
         /**

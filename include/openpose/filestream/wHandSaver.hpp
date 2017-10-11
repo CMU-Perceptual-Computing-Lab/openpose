@@ -61,16 +61,16 @@ namespace op
                 const auto fileName = (!tDatumsNoPtr[0].name.empty() ? tDatumsNoPtr[0].name : std::to_string(tDatumsNoPtr[0].id));
                 std::vector<Array<float>> keypointVector(tDatumsNoPtr.size());
                 // Left hand
-                for (auto i = 0; i < tDatumsNoPtr.size(); i++)
+                for (auto i = 0u; i < tDatumsNoPtr.size(); i++)
                     keypointVector[i] = tDatumsNoPtr[i].handKeypoints[0];
                 spKeypointSaver->saveKeypoints(keypointVector, fileName, "hand_left");
                 // Right hand
-                for (auto i = 0; i < tDatumsNoPtr.size(); i++)
+                for (auto i = 0u; i < tDatumsNoPtr.size(); i++)
                     keypointVector[i] = tDatumsNoPtr[i].handKeypoints[1];
                 spKeypointSaver->saveKeypoints(keypointVector, fileName, "hand_right");
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
-                Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__, Profiler::DEFAULT_X);
+                Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);
                 // Debugging log
                 dLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             }

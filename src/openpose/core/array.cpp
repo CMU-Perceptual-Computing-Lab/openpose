@@ -4,6 +4,17 @@
 #include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/core/array.hpp>
 
+// Note: std::shared_ptr not (fully) supported for array pointers:
+// http://stackoverflow.com/questions/8947579/
+// Solutions:
+// 1) Using boost::shared_ptr from <boost/shared_ptr.hpp>: Very easy but requires Boost.
+// 2) Using std::unique_ptr from <memory>: Same behaviour than 1, but only `unique`.
+// 3) Using std::shared_ptr from <memory>: Harder to use, but benefits of 1 & 2. Solutions to its problems:
+//     a) Accessing elements:
+//        https://stackoverflow.com/questions/30780262/accessing-array-of-shared-ptr
+//     b) Default delete:
+//        https://stackoverflow.com/questions/13061979/shared-ptr-to-an-array-should-it-be-used
+
 namespace op
 {
     template<typename T>
@@ -167,13 +178,13 @@ namespace op
                 mSize = sizes;
                 mVolume = {std::accumulate(sizes.begin(), sizes.end(), 1ul, std::multiplies<size_t>())};
                 // Prepare shared_ptr
-                spData.reset(new T[mVolume]);
+                spData.reset(new T[mVolume], std::default_delete<T[]>());
                 setCvMatFromSharedPtr();
             }
             else
             {
                 mSize = {};
-                mVolume = 0;
+                mVolume = 0ul;
                 spData.reset();
                 // cv::Mat available but empty
                 mCvMatData = std::make_pair(true, cv::Mat());
@@ -222,7 +233,7 @@ namespace op
             {
                 // New size
                 std::vector<int> newSize(cvMat.dims,0);
-                for (auto i = 0 ; i < newSize.size() ; i++)
+                for (auto i = 0u ; i < newSize.size() ; i++)
                     newSize[i] = cvMat.size[i];
                 // Reset data & volume
                 reset(newSize);
@@ -252,7 +263,7 @@ namespace op
                 if (mCvMatData.first)
                     mCvMatData.second.setTo((double)value);
                 else
-                    for (auto i = 0 ; i < mVolume ; i++)
+                    for (auto i = 0u ; i < mVolume ; i++)
                         operator[](i) = value;
             }
         }
@@ -270,12 +281,12 @@ namespace op
             // Matlab style:
                 // If empty -> return 0
                 // If index >= # dimensions -> return 1
-            if (index < mSize.size() && 0 <= index)
+            if ((unsigned int)index < mSize.size() && 0 <= index)
                 return mSize[index];
             // Long version:
             // else if (mSize.empty())
             //     return 0;
-            // else // if mSize.size() <= index 
+            // else // if mSize.size() <= (unsigned int)index
             //     return 1;
             // Equivalent to:
             else
@@ -295,7 +306,7 @@ namespace op
         {
             if (indexA < indexB)
             {
-                if (0 <= indexA && indexB < mSize.size()) // 0 <= indexA < indexB < mSize.size()
+                if (0 <= indexA && (unsigned int)indexB < mSize.size()) // 0 <= indexA < indexB < mSize.size()
                     return std::accumulate(mSize.begin()+indexA, mSize.begin()+indexB+1, 1ul, std::multiplies<size_t>());
                 else
                 {
@@ -324,7 +335,8 @@ namespace op
         try
         {
             if (!mCvMatData.first)
-                error("Array<T>: cv::Mat functions only valid for T types defined by OpenCV: unsigned char, signed char, int, float & double", __LINE__, __FUNCTION__, __FILE__);
+                error("Array<T>: cv::Mat functions only valid for T types defined by OpenCV: unsigned char,"
+                      " signed char, int, float & double", __LINE__, __FUNCTION__, __FILE__);
             return mCvMatData.second;
         }
         catch (const std::exception& e)
@@ -340,7 +352,8 @@ namespace op
         try
         {
             if (!mCvMatData.first)
-                error("Array<T>: cv::Mat functions only valid for T types defined by OpenCV: unsigned char, signed char, int, float & double", __LINE__, __FUNCTION__, __FILE__);
+                error("Array<T>: cv::Mat functions only valid for T types defined by OpenCV: unsigned char,"
+                      " signed char, int, float & double", __LINE__, __FUNCTION__, __FILE__);
             return mCvMatData.second;
         }
         catch (const std::exception& e)
@@ -358,14 +371,16 @@ namespace op
             // Initial value
             std::string string{"Array<T>::toString():\n"};
             // Add each element
-            for (auto i = 0 ; i < mVolume ; i++)
+            auto* dataPtr = spData.get();
+            for (auto i = 0u ; i < mVolume ; i++)
             {
                 // Adding element sepearted by an space
-                string += std::to_string(spData[i]) + " ";
+                string += std::to_string(dataPtr[i]) + " ";
                 // Introduce an enter for each dimension change
                 // If comented, all values will be printed in the same line
                 auto multiplier = 1;
-                for (auto dimension = (int)(mSize.size() - 1u) ; dimension > 0 && ((i/multiplier) % getSize(dimension) == getSize(dimension)-1) ; dimension--)
+                for (auto dimension = (int)(mSize.size() - 1u) ; dimension > 0
+                      && (int(i/multiplier) % getSize(dimension) == getSize(dimension)-1) ; dimension--)
                 {
                     string += "\n";
                     multiplier *= getSize(dimension);
@@ -423,18 +438,18 @@ namespace op
     {
         try
         {
-            if (0 <= index && index < mVolume)
-                return spData[index];
+            if (0 <= index && (size_t)index < mVolume)
+                return spData.get()[index];
             else
             {
                 error("Index out of bounds: 0 <= index && index < mVolume", __LINE__, __FUNCTION__, __FILE__);
-                return spData[0];
+                return spData.get()[0];
             }
         }
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return spData[0];
+            return spData.get()[0];
         }
     }
 

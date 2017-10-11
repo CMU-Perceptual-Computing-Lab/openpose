@@ -59,7 +59,7 @@ namespace op
                 const auto baseFileName = (!tDatumFirst.name.empty() ? tDatumFirst.name
                                             : std::to_string(tDatumFirst.id)) + "_keypoints";
                 const bool humanReadable = true;
-                for (auto i = 0 ; i < tDatums->size() ; i++)
+                for (auto i = 0u ; i < tDatums->size() ; i++)
                 {
                     const auto& tDatum = (*tDatums)[i];
                     // const auto fileName = baseFileName;
@@ -76,7 +76,7 @@ namespace op
                 }
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
-                Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__, Profiler::DEFAULT_X);
+                Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);
                 // Debugging log
                 dLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             }
