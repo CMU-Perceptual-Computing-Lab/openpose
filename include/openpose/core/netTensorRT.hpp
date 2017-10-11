@@ -1,4 +1,4 @@
-#ifdef USE_CAFFE
+#ifdef USE_TENSORRT
 #ifndef OPENPOSE_CORE_NET_TENSORRT_HPP
 #define OPENPOSE_CORE_NET_TENSORRT_HPP
 
@@ -57,4 +57,4 @@ namespace op
 }
 
 #endif // OPENPOSE_CORE_NET_TENSORRT_HPP
-#endif
+#endif // USE_TENSORRT

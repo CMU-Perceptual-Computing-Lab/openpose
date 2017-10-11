@@ -1,4 +1,4 @@
-#ifdef USE_CAFFE
+#ifdef USE_TENSORRT
 #include <numeric> // std::accumulate
 #include <openpose/utilities/cuda.hpp>
 #include <openpose/core/netTensorRT.hpp>
@@ -307,4 +307,4 @@ namespace op
   }
 }
 
-#endif
+#endif // USE_TENSORRT

@@ -61,6 +61,8 @@ ifeq ($(DEEP_NET), tensorflow)
 # Torch
 else ifeq ($(DEEP_NET), torch)
 	# COMMON_FLAGS += -DUSE_TORCH
+else ifeq ($(DEEP_NET), tensorrt)
+        COMMON_FLAGS += -DUSE_TENSORRT
 # Caffe
 else
 	COMMON_FLAGS += -DUSE_CAFFE
@@ -146,7 +148,9 @@ ifeq ($(USE_CUDA), 1)
 endif
 
 # TensorRT
-LIBRARIES += nvinfer nvcaffe_parser
+ifeq ($(DEEP_NET), tensorrt)
+        LIBRARIES += nvinfer nvcaffe_parser
+endif
 
 # LIBRARIES += glog gflags boost_system boost_filesystem m hdf5_hl hdf5 caffe
 LIBRARIES += glog gflags boost_system boost_filesystem m hdf5_hl hdf5
