@@ -70,6 +70,10 @@ else
 	LDFLAGS += -Wl,-rpath=$(CAFFE_DIR)/lib
 	INCLUDE_DIRS += $(CAFFE_DIR)/include
 	LIBRARY_DIRS += $(CAFFE_DIR)/lib
+        
+        ifeq ($(DEEP_NET), tensorrt)
+                COMMON_FLAGS += -DUSE_TENSORRT
+        endif
 endif
 
 ##############################
