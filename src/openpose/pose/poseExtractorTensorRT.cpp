@@ -1,4 +1,4 @@
-#ifdef USE_CAFFE
+#ifdef USE_TENSORRT
 #include <openpose/core/netCaffe.hpp>
 #include <openpose/core/netTensorRT.hpp>
 #include <openpose/pose/poseParameters.hpp>

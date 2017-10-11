@@ -69,6 +69,7 @@ static std::string timeDiffToString(const std::chrono::high_resolution_clock::ti
 
 int openPoseTutorialPose3()
 {
+#ifdef USE_TENSORRT
     op::log("Starting pose estimation.", op::Priority::High);
     
     timeNow("Start");
@@ -153,6 +154,7 @@ int openPoseTutorialPose3()
         op::log(log_time, op::Priority::High);
     }
     
+#endif // USE_TENSORRT
   
     // Return successful message
     return 0;
@@ -169,3 +171,4 @@ int main(int argc, char *argv[])
     // Running openPoseTutorialPose1
     return openPoseTutorialPose3();
 }
+
