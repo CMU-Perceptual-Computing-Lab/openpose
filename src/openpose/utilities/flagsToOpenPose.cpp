@@ -23,8 +23,8 @@ namespace op
                 return PoseModel::BODY_18;
             else if (poseModeString == "BODY_19")
                 return PoseModel::BODY_19;
-            else if (poseModeString == "BODY_22")
-                return PoseModel::BODY_22;
+            else if (poseModeString == "BODY_23")
+                return PoseModel::BODY_23;
             // else
             error("String does not correspond to any model (COCO, MPI, MPI_4_layers)",
                   __LINE__, __FUNCTION__, __FILE__);

@@ -41,7 +41,7 @@ namespace op
                     if (nA == 0) // nB == 0 or not
                     {
                         if (poseModel == PoseModel::COCO_18 || poseModel == PoseModel::BODY_18
-                            || poseModel == PoseModel::BODY_19 || poseModel == PoseModel::BODY_22)
+                            || poseModel == PoseModel::BODY_19 || poseModel == PoseModel::BODY_23)
                         {
                             for (auto i = 1; i <= nB; i++)
                             {
@@ -83,7 +83,7 @@ namespace op
                     else // if (nA != 0 && nB == 0)
                     {
                         if (poseModel == PoseModel::COCO_18 || poseModel == PoseModel::BODY_18
-                            || poseModel == PoseModel::BODY_19 || poseModel == PoseModel::BODY_22)
+                            || poseModel == PoseModel::BODY_19 || poseModel == PoseModel::BODY_23)
                         {
                             for (auto i = 1; i <= nA; i++)
                             {
@@ -217,7 +217,8 @@ namespace op
                     }
                     // Add ears connections (in case person is looking to opposite direction to camera)
                     else if (((poseModel == PoseModel::COCO_18 || poseModel == PoseModel::BODY_18) && (pairIndex==17 || pairIndex==18))
-                                || (poseModel == PoseModel::BODY_19 && (pairIndex==18 || pairIndex==19)))
+                                || (poseModel == PoseModel::BODY_19 && (pairIndex==18 || pairIndex==19))
+                                || (poseModel == PoseModel::BODY_23 && (pairIndex==22 || pairIndex==23)))
                     {
                         for (const auto& connectionKI : connectionK)
                         {
