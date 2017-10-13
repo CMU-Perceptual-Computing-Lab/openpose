@@ -7,7 +7,7 @@
 
 namespace op
 {
-    // #define when needed in CUDA code
+    // All #define are for CUDA code
 
     // Constant Global Parameters
     const unsigned int POSE_MAX_PEOPLE = 96u;
@@ -206,31 +206,35 @@ namespace op
         {22, "LEar"},
         {23, "Background"}
     };
-    const unsigned int POSE_BODY_23_NUMBER_PARTS               = 22u; // Equivalent to size of std::map POSE_BODY_23_BODY_PARTS - 1 (removing background)
+    const unsigned int POSE_BODY_23_NUMBER_PARTS               = 23u; // Equivalent to size of std::map POSE_BODY_23_BODY_PARTS - 1 (removing background)
     const std::vector<unsigned int> POSE_BODY_23_MAP_IDX       {24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71};
-    #define POSE_BODY_23_PAIRS_RENDER_GPU                      { 0,1,  0,4,  1,2,  2,3,  4,5,  5,6,  0,7,  7,8,  7,13, 8,9,  9,10,10,11,10,12,13,14,14,15,15,16,15,17, 0,18,18,19,18,21,19,20,21,22}
+    #define POSE_BODY_23_PAIRS_RENDER_GPU                      { 0,1,  0,4,  1,2,  2,3,  4,5,  5,6,  0,7,  7,8,  7,13, 8,9,  9,10,10,11,11,12,13,14,14,15,15,16,16,17, 0,18,18,19,18,21,19,20,21,22}
     const std::vector<unsigned int> POSE_BODY_23_PAIRS_RENDER  {POSE_BODY_23_PAIRS_RENDER_GPU};
     const std::vector<unsigned int> POSE_BODY_23_PAIRS         { 0,1,  0,4,  1,2,  2,3,  4,5,  5,6,  0,7,  7,8,  7,13, 8,9,  9,10,10,11,10,12,13,14,14,15,15,16,15,17, 0,18,18,19,18,21,19,20,21,22, 1,20, 4,22};
     #define POSE_BODY_23_COLORS_RENDER_GPU \
-        255.f,     0.f,    85.f, \
         255.f,     0.f,     0.f, \
-        255.f,    85.f,     0.f, \
-        255.f,   170.f,     0.f, \
+        255.f,    55.f,     0.f, \
+        255.f,   110.f,     0.f, \
+        255.f,   165.f,     0.f, \
+        255.f,   215.f,     0.f, \
+        255.f,   235.f,     0.f, \
         255.f,   255.f,     0.f, \
-        170.f,   255.f,     0.f, \
+        255.f,     0.f,     0.f, \
+        175.f,   255.f,     0.f, \
          85.f,   255.f,     0.f, \
           0.f,   255.f,     0.f, \
-        255.f,     0.f,     0.f, \
           0.f,   255.f,    85.f, \
           0.f,   255.f,   170.f, \
-          0.f,   255.f,   255.f, \
-          0.f,   170.f,   255.f, \
+         25.f,    25.f,   128.f, \
           0.f,    85.f,   255.f, \
-          0.f,     0.f,   255.f, \
-        255.f,     0.f,   170.f, \
-        170.f,     0.f,   255.f, \
+          0.f,   170.f,   255.f, \
+          0.f,  212.5f,   255.f, \
+          0.f,   255.f,   255.f, \
+        255.f,     0.f,     0.f, \
         255.f,     0.f,   255.f, \
-         85.f,     0.f,   255.f
+        238.f,   130.f,   238.f, \
+        138.f,    43.f,   226.f, \
+         75.f,     0.f,   130.f
     const std::vector<float> POSE_BODY_23_COLORS_RENDER{POSE_BODY_23_COLORS_RENDER_GPU};
 
     // Constant Array Parameters
@@ -269,7 +273,7 @@ namespace op
         "pose/mpi/pose_iter_160000.caffemodel",
         "pose/body_18/pose_iter_XXXXXX.caffemodel",
         "pose/body_19/pose_iter_XXXXXX.caffemodel",
-        "pose/body_23/pose_iter_42000.caffemodel"
+        "pose/body_23/pose_iter_XXXXXX.caffemodel"
     };
     // POSE_BODY_PART_MAPPING crashes on Windows at dynamic initialization, to avoid this crash:
     // POSE_BODY_PART_MAPPING has been moved to poseParameters.cpp and getPoseBodyPartMapping() wraps it

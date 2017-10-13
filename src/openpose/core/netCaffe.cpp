@@ -11,7 +11,7 @@
 
 namespace op
 {
-    std::mutex sMutex;
+    std::mutex sMutexNetCaffe;
     std::atomic<bool> sGoogleLoggingInitialized{false};
 
     struct NetCaffe::ImplNetCaffe
@@ -51,7 +51,7 @@ namespace op
                 // Double if condition in order to speed up the program if it is called several times
                 if (enableGoogleLogging && !sGoogleLoggingInitialized)
                 {
-                    std::lock_guard<std::mutex> lock{sMutex};
+                    std::lock_guard<std::mutex> lock{sMutexNetCaffe};
                     if (enableGoogleLogging && !sGoogleLoggingInitialized)
                     {
                         google::InitGoogleLogging("OpenPose");
