@@ -75,7 +75,8 @@ int handFromJsonTest()
 
     // Measuring total time
     const auto now = std::chrono::high_resolution_clock::now();
-    const auto totalTimeSec = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(now-timerBegin).count() * 1e-9;
+    const auto totalTimeSec = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(now-timerBegin).count()
+                            * 1e-9;
     const auto message = "Real-time pose estimation demo successfully finished. Total time: "
                        + std::to_string(totalTimeSec) + " seconds.";
     op::log(message, op::Priority::High);

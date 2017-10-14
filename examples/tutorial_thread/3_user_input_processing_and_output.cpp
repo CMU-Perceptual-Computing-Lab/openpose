@@ -27,7 +27,7 @@
 // #include <openpose/thread/headers.hpp>
 // #include <openpose/utilities/headers.hpp>
 
-// See all the available parameter options withe the `--help` flag. E.g. `./build/examples/openpose/openpose.bin --help`.
+// See all the available parameter options withe the `--help` flag. E.g. `build/examples/openpose/openpose.bin --help`
 // Note: This command will show you flags for other unnecessary 3rdparty files. Check only the flags for the OpenPose
 // executable. E.g. for `openpose.bin`, look for `Flags from examples/openpose/openpose.cpp:`.
 // Debugging
@@ -49,7 +49,8 @@ class WUserInput : public op::WorkerProducer<std::shared_ptr<std::vector<op::Dat
 public:
     WUserInput(const std::string& directoryPath) :
         mImageFiles{op::getFilesOnDirectory(directoryPath, "jpg")},
-        // mImageFiles{op::getFilesOnDirectory(directoryPath, std::vector<std::string>{"jpg", "png"})}, // If we want "jpg" + "png" images
+        // If we want "jpg" + "png" images
+        // mImageFiles{op::getFilesOnDirectory(directoryPath, std::vector<std::string>{"jpg", "png"})},
         mCounter{0}
     {
         if (mImageFiles.empty())
@@ -65,8 +66,10 @@ public:
             // Close program when empty frame
             if (mImageFiles.size() <= mCounter)
             {
-                op::log("Last frame read and added to queue. Closing program after it is processed.", op::Priority::High);
-                // This funtion stops this worker, which will eventually stop the whole thread system once all the frames have been processed
+                op::log("Last frame read and added to queue. Closing program after it is processed.",
+                        op::Priority::High);
+                // This funtion stops this worker, which will eventually stop the whole thread system once all the
+                // frames have been processed
                 this->stop();
                 return nullptr;
             }
@@ -83,7 +86,8 @@ public:
                 // If empty frame -> return nullptr
                 if (datum.cvInputData.empty())
                 {
-                    op::log("Empty frame detected on path: " + mImageFiles.at(mCounter-1) + ". Closing program.", op::Priority::High);
+                    op::log("Empty frame detected on path: " + mImageFiles.at(mCounter-1) + ". Closing program.",
+                        op::Priority::High);
                     this->stop();
                     datumsPtr = nullptr;
                 }
@@ -152,7 +156,8 @@ public:
             if (datumsPtr != nullptr && !datumsPtr->empty())
             {
                 cv::imshow("User worker GUI", datumsPtr->at(0).cvOutputData);
-                cv::waitKey(1); // It displays the image and sleeps at least 1 ms (it usually sleeps ~5-10 msec to display the image)
+                // It displays the image and sleeps at least 1 ms (it usually sleeps ~5-10 msec to display the image)
+                cv::waitKey(1);
             }
         }
         catch (const std::exception& e)
@@ -171,7 +176,8 @@ int openPoseTutorialThread3()
     // Step 1 - Set logging level
         // - 0 will output all the logging messages
         // - 255 will output nothing
-    op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.", __LINE__, __FUNCTION__, __FILE__);
+    op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.",
+              __LINE__, __FUNCTION__, __FILE__);
     op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
     // Step 2 - Setting thread workers && manager
     typedef std::shared_ptr<std::vector<op::Datum>> TypedefDatums;
@@ -188,8 +194,8 @@ int openPoseTutorialThread3()
     // ------------------------- CONFIGURING THREADING -------------------------
     // In this simple multi-thread example, we will do the following:
         // 3 (virtual) queues: 0, 1, 2
-        // 1 real queue: 1. The first and last queue ids (in this case 0 and 2) are not actual queues, but the beginning and end of the processing
-        // sequence
+        // 1 real queue: 1. The first and last queue ids (in this case 0 and 2) are not actual queues, but the
+        // beginning and end of the processing sequence
         // 2 threads: 0, 1
         // wUserInput will generate frames (there is no real queue 0) and push them on queue 1
         // wGui will pop frames from queue 1 and process them (there is no real queue 2)
@@ -206,8 +212,8 @@ int openPoseTutorialThread3()
         // Option a) Using the main thread (this thread) for processing (it saves 1 thread, recommended)
     threadManager.exec();  // It blocks this thread until all threads have finished
         // Option b) Giving to the user the control of this thread
-    // // VERY IMPORTANT NOTE: if OpenCV is compiled with Qt support, this option will not work. Qt needs the main thread to
-    // // plot visual results, so the final GUI (which uses OpenCV) would return an exception similar to:
+    // // VERY IMPORTANT NOTE: if OpenCV is compiled with Qt support, this option will not work. Qt needs the main
+    // // thread to plot visual results, so the final GUI (which uses OpenCV) would return an exception similar to:
     // // `QMetaMethod::invoke: Unable to invoke methods with return values in queued connections`
     // // Start threads
     // threadManager.start();
