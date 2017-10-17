@@ -127,6 +127,7 @@ OpenPose Library - Release Notes
     7. COCO JSON file outputs 0 as score for non-detected keypoints.
     8. Added example for OpenPose for user asynchronous output and cleaned all `tutorial_wrapper/` examples.
     9. Added `-1` option for `net_resolution` in order to auto-select the best possible aspect ratio given the user input.
+    10. Added example to add functionality to OpenPose.
 2. Functions or parameters renamed:
     1. OpenPose able to change its size and initial size:
         1. Flag `resolution` renamed as `output_resolution`.
@@ -137,3 +138,4 @@ OpenPose Library - Release Notes
     2. `CPU_ONLY` changed by `USE_CUDA` to keep format.
 3. Main bugs fixed:
     1. Ubuntu installer script now works even if Python pip was not installed previously.
+    2. Flags to set first and last frame as well as jumping frames backward and forward now works on image directory reader.
