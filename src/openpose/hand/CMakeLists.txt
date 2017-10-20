@@ -10,9 +10,11 @@ set(SOURCES
     renderHand.cu)
 
 cuda_add_library(openpose_hand ${SOURCES})
-if (BUILD_CAFFE)
-  add_dependencies(openpose_hand openpose_caffe)
-endif (BUILD_CAFFE)
+if (UNIX AND NOT APPLE)
+  if (BUILD_CAFFE)
+    add_dependencies(openpose_hand openpose_caffe)
+  endif (BUILD_CAFFE)
+endif (UNIX AND NOT APPLE)
 
 install(TARGETS openpose_hand
     EXPORT OpenPose

@@ -11,7 +11,7 @@ set(OpenPose_VERSION ${OpenPose_VERSION_MAJOR}.${OpenPose_VERSION_MINOR}.${OpenP
 ### FIND THE OS
 
 if (WIN32) # OS is Windows
-  message(FATAL_ERROR "Windows OS is not currently supported.")
+  message(STATUS "Windows OS is currently is experimental. You are blessed if this works :)")
 elseif (APPLE) # OS is Apple
   message(FATAL_ERROR "Apple OS is not currently supported.")
 elseif (UNIX AND NOT APPLE) # OS is a Linux distribution (it assumes Ubuntu)
@@ -33,7 +33,11 @@ endif ()
 add_definitions(-std=c++11)
 
 # C++ additional flags
-set(OP_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp -Wpedantic -Wall -Wextra -Wfatal-errors")
+if(CMAKE_COMPILER_IS_GNUCXX)
+    message(STATUS "GCC detected, adding compile flags")
+    set(OP_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp -Wpedantic -Wall -Wextra -Wfatal-errors")
+endif(CMAKE_COMPILER_IS_GNUCXX)
+
 
 ### PROJECT OPTIONS
 
@@ -90,45 +94,87 @@ option(BUILD_SHARED_LIBS "Build as shared lib" ON)
 ### FIND REQUIRED PACKAGES
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
-include(cmake/Cuda.cmake)
-# find_package(CUDA)
-find_package(Boost COMPONENTS system filesystem)
-find_package(CuDNN)
-find_package(GFlags)
-find_package(Glog)
-find_package(OpenCV)
 
-if (NOT Boost_FOUND)
-  message(FATAL_ERROR "Boost not found. Install Boost from the command line using the command(s) --\
-      sudo apt-get install libboost-all-dev")
-endif (NOT Boost_FOUND)
+find_package(CUDA)
+set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-gencode arch=compute_61,code=sm_61)
 
-if (NOT CUDA_FOUND)
-  message(STATUS "CUDA not found.") 
-  execute_process(COMMAND cat install_cuda.sh WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/ubuntu)
-  message(FATAL_ERROR "Install CUDA using the above commands.")
-endif (NOT CUDA_FOUND)
+if (UNIX AND NOT APPLE)
+  include(cmake/Cuda.cmake)
+  # find_package(CUDA)
+  find_package(Boost COMPONENTS system filesystem)
+  find_package(CuDNN)
+  find_package(GFlags)
+  find_package(Glog)
+  find_package(OpenCV)
 
-if (USE_CUDNN AND NOT CUDNN_FOUND)
-  message(STATUS "cuDNN not found.") 
-  execute_process(COMMAND cat install_cudnn.sh WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/ubuntu)
-  message(FATAL_ERROR "Install cuDNN using the above commands. or turn off cuDNN by setting USE_CUDNN to OFF.")
-endif (USE_CUDNN AND NOT CUDNN_FOUND)
+  if (NOT Boost_FOUND)
+    message(FATAL_ERROR "Boost not found. Install Boost from the command line using the command(s) --\
+        sudo apt-get install libboost-all-dev")
+  endif (NOT Boost_FOUND)
 
-if (NOT GLOG_FOUND)
-  message(FATAL_ERROR "Glog not found. Install Glog from the command line using the command(s) -\ 
-      sudo apt-get install libgoogle-glog-dev")
-endif (NOT GLOG_FOUND)
+  if (NOT CUDA_FOUND)
+    message(STATUS "CUDA not found.") 
+    execute_process(COMMAND cat install_cuda.sh WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/ubuntu)
+    message(FATAL_ERROR "Install CUDA using the above commands.")
+  endif (NOT CUDA_FOUND)
 
-if (NOT GFLAGS_FOUND)
-  message(FATAL_ERROR "GFlags not found. Install GFlags from the command line using the command(s) --\ 
-    sudo apt-get install libgflags-dev")
-endif (NOT GFLAGS_FOUND)
+  if (USE_CUDNN AND NOT CUDNN_FOUND)
+    message(STATUS "cuDNN not found.") 
+    execute_process(COMMAND cat install_cudnn.sh WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/ubuntu)
+    message(FATAL_ERROR "Install cuDNN using the above commands. or turn off cuDNN by setting USE_CUDNN to OFF.")
+  endif (USE_CUDNN AND NOT CUDNN_FOUND)
 
-if (NOT OpenCV_FOUND)
-  message(FATAL_ERROR "OpenCV not found. Install OpenCV from the command line using the command(s) --\
-    sudo apt-get install libopencv-dev")
-endif (NOT OpenCV_FOUND)
+  if (NOT GLOG_FOUND)
+    message(FATAL_ERROR "Glog not found. Install Glog from the command line using the command(s) -\ 
+        sudo apt-get install libgoogle-glog-dev")
+  endif (NOT GLOG_FOUND)
+
+  if (NOT GFLAGS_FOUND)
+    message(FATAL_ERROR "GFlags not found. Install GFlags from the command line using the command(s) --\ 
+      sudo apt-get install libgflags-dev")
+  endif (NOT GFLAGS_FOUND)
+
+  if (NOT OpenCV_FOUND)
+    message(FATAL_ERROR "OpenCV not found. Install OpenCV from the command line using the command(s) --\
+      sudo apt-get install libopencv-dev")
+  endif (NOT OpenCV_FOUND)
+
+ endif (UNIX AND NOT APPLE)
+
+if (WIN32)
+  
+  find_library(Boost_FILESYSTEM_LIBRARY_OPTIMIZED boost_filesystem-vc140-mt-1_61 HINTS ${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/lib)
+  find_library(Boost_SYSTEM_LIBRARY_OPTIMIZED boost_system-vc140-mt-1_61 HINTS ${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/lib)
+  find_library(Boost_FILESYSTEM_LIBRARY_DEBUG boost_filesystem-vc140-mt-gd-1_61 HINTS ${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/lib)
+  find_library(Boost_SYSTEM_LIBRARY_DEBUG boost_system-vc140-mt-gd-1_61 HINTS ${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/lib)
+  
+  message("\${Boost_FILESYSTEM_LIBRARY_OPTIMIZED} = ${Boost_FILESYSTEM_LIBRARY_OPTIMIZED}")
+  message("\${Boost_FILESYSTEM_LIBRARY_DEBUG} = ${Boost_FILESYSTEM_LIBRARY_DEBUG}")
+  message("\${Boost_SYSTEM_LIBRARY_OPTIMIZED} = ${Boost_SYSTEM_LIBRARY_OPTIMIZED}")
+  message("\${Boost_FILESYSTEM_LIBRARY_DEBUG} = ${Boost_FILESYSTEM_LIBRARY_DEBUG}")
+  message(status "${CMAKE_SOURCE_DIR}")
+
+  set(OpenCV_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/3rdparty/windows/opencv/include)
+  set(Caffe_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe/include;${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe/include2")
+  set(Boost_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/include/boost-1_61)
+  set(GFLAGS_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/include/gflags)
+  set(GLOG_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/include)
+  
+  # C:\Users\bikram\Documents\GitHub\openpose\build\src\openpose\Release
+  # PATH=%PATH%;;C:\Users\bikram\Documents\GitHub\openpose\3rdparty\windows\caffe\bin\;;C:\Users\bikram\Documents\GitHub\openpose\3rdparty\windows\opencv\x64\vc14\bin;C:\Users\bikram\Documents\GitHub\openpose\build\src\openpose\Release
+  set(CMAKE_MSVCIDE_RUN_PATH "C:/Users/bikram/Documents/GitHub/openpose/3rdparty/windows/caffe/bin/;;C:/Users/bikram/Documents/GitHub/openpose/3rdparty/windows/opencv/x64/vc14/bin;C:/Users/bikram/Documents/GitHub/openpose/build/src/openpose/Release")
+
+  link_directories(${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/lib)
+  # set(Boost_FILESYSTEM_LIBRARY "${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/lib/boost_filesystem-vc140-mt-1_61.lib;${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/lib/boost_filesystem-vc140-mt-gd-1_61.lib")
+  # set(Boost_SYSTEM_LIBRARY "${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/lib/boost_system-vc140-mt-1_61.lib;${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/lib/boost_system-vc140-mt-gd-1_61.lib")
+  set(OpenCV_LIBS ${CMAKE_SOURCE_DIR}/3rdparty/windows/opencv/x64/vc14/lib/opencv_world310.lib)
+  set(Caffe_LIBS "${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe/lib/caffe.lib;${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe/lib/caffeproto.lib")
+  set(GFLAGS_LIBRARY_RELEASE ${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/lib/gflags.lib)
+  set(GFLAGS_LIBRARY_DEBUG ${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/lib/gflagsd.lib)
+  set(GLOG_LIBRARY_RELEASE ${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/lib/glog.lib)
+  set(GLOG_LIBRARY_DEBUG ${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/lib/glogd.lib)
+
+endif (WIN32)
 
 # Set CUDA Flags
 
@@ -136,51 +182,55 @@ set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -std=c++11")
 
 ### CAFFE
 
-if (${DL_FRAMEWORK} MATCHES "CAFFE")
+if (UNIX AND NOT APPLE)
 
-  # Check if the user specified caffe paths
-  if (Caffe_INCLUDE_DIRS AND Caffe_LIBS AND NOT BUILD_CAFFE)
-    message(STATUS "\${Caffe_INCLUDE_DIRS} set by the user to " ${Caffe_INCLUDE_DIRS})
-    message(STATUS "\${Caffe_LIBS} set by the user to " ${Caffe_LIBS})
-    set(Caffe_FOUND 1)
-  endif (Caffe_INCLUDE_DIRS AND Caffe_LIBS AND NOT BUILD_CAFFE)
+  if (${DL_FRAMEWORK} MATCHES "CAFFE")
 
-  # Check if caffe is installed in known paths
-  if (NOT Caffe_FOUND AND NOT BUILD_CAFFE) 
-    message(STATUS "Looking for caffe around in expected paths.")
-    find_package(Caffe)
-  endif (NOT Caffe_FOUND AND NOT BUILD_CAFFE)
+    # Check if the user specified caffe paths
+    if (Caffe_INCLUDE_DIRS AND Caffe_LIBS AND NOT BUILD_CAFFE)
+      message(STATUS "\${Caffe_INCLUDE_DIRS} set by the user to " ${Caffe_INCLUDE_DIRS})
+      message(STATUS "\${Caffe_LIBS} set by the user to " ${Caffe_LIBS})
+      set(Caffe_FOUND 1)
+    endif (Caffe_INCLUDE_DIRS AND Caffe_LIBS AND NOT BUILD_CAFFE)
 
-  # Else build from scratch
-  if (BUILD_CAFFE)
-    message(STATUS "Caffe will be build from source now.")
-    
-    # Build Caffe
-    include(ExternalProject)
-    set(CAFFE_PREFIX caffe)
-    set(CAFFE_URL ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
+    # Check if caffe is installed in known paths
+    if (NOT Caffe_FOUND AND NOT BUILD_CAFFE) 
+      message(STATUS "Looking for caffe around in expected paths.")
+      find_package(Caffe)
+    endif (NOT Caffe_FOUND AND NOT BUILD_CAFFE)
 
-    ExternalProject_Add(openpose_caffe
-        SOURCE_DIR ${CAFFE_URL}
-        PREFIX ${CAFFE_PREFIX}
-        CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR> 
-            -DUSE_CUDNN=${USE_CUDNN}
-            -DOpenCV_DIR=${OpenCV_DIR})
+    # Else build from scratch
+    if (BUILD_CAFFE)
+      message(STATUS "Caffe will be build from source now.")
+      
+      # Build Caffe
+      include(ExternalProject)
+      set(CAFFE_PREFIX caffe)
+      set(CAFFE_URL ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
 
-    ExternalProject_Get_Property(openpose_caffe install_dir)
+      ExternalProject_Add(openpose_caffe
+          SOURCE_DIR ${CAFFE_URL}
+          PREFIX ${CAFFE_PREFIX}
+          CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR> 
+              -DUSE_CUDNN=${USE_CUDNN}
+              -DOpenCV_DIR=${OpenCV_DIR})
 
-    set(Caffe_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/caffe/include)
-    # TODO -- Find a better soln.
-    set(Caffe_LIBS ${CMAKE_BINARY_DIR}/caffe/lib/libcaffe.so)
+      ExternalProject_Get_Property(openpose_caffe install_dir)
 
-  endif (BUILD_CAFFE)
+      set(Caffe_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/caffe/include)
+      # TODO -- Find a better soln.
+      set(Caffe_LIBS ${CMAKE_BINARY_DIR}/caffe/lib/libcaffe.so)
 
-  if (NOT Caffe_FOUND AND NOT BUILD_CAFFE)
-    message(FATAL_ERROR "Caffe not found. Either turn on the BUILD_CAFFE option or specify the path of Caffe includes 
-        and libs using -DCaffe_INCLUDE_DIRS and -DCaffe_LIBS")
-  endif (NOT Caffe_FOUND AND NOT BUILD_CAFFE)
+    endif (BUILD_CAFFE)
 
-endif (${DL_FRAMEWORK} MATCHES "CAFFE")
+    if (NOT Caffe_FOUND AND NOT BUILD_CAFFE)
+      message(FATAL_ERROR "Caffe not found. Either turn on the BUILD_CAFFE option or specify the path of Caffe includes 
+          and libs using -DCaffe_INCLUDE_DIRS and -DCaffe_LIBS")
+    endif (NOT Caffe_FOUND AND NOT BUILD_CAFFE)
+
+  endif (${DL_FRAMEWORK} MATCHES "CAFFE")
+
+endif (UNIX AND NOT APPLE)
 
 ### PROJECT INCLUDES
 
@@ -191,7 +241,8 @@ include_directories(
   ${GFLAGS_INCLUDE_DIR}
   ${GLOG_INCLUDE_DIR}
   ${Caffe_INCLUDE_DIRS}
-  ${OpenCV_INCLUDE_DIRS})
+  ${OpenCV_INCLUDE_DIRS}
+  ${Boost_INCLUDE_DIRS})
 
 ### ADD SUBDIRECTORIES
 
