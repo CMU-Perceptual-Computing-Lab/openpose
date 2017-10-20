@@ -232,11 +232,6 @@ namespace op
             // Re-scale pose if desired
             if (wrapperStructPose.keypointScale != ScaleMode::InputResolution)
                 error("Only wrapperStructPose.keypointScale == ScaleMode::InputResolution.", __LINE__, __FUNCTION__, __FILE__);
-            if (finalOutputSize != producerSize)
-            {
-                auto keypointScaler = std::make_shared<KeypointScaler>(ScaleMode::InputResolution);
-                mPostProcessingWs.emplace_back(std::make_shared<WKeypointScaler<TDatumsPtr>>(keypointScaler));
-            }
 
             mOutputWs.clear();
             // Write people pose data on disk (json format)

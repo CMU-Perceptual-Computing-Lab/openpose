@@ -8,7 +8,7 @@ namespace op
                                  const std::vector<HeatMapType>& heatMapTypes, const ScaleMode heatMapScale) :
         mMultiScaleNumberAndRange{std::make_pair(numberScales, rangeScales)},
         mNetOutputSize{netOutputSize},
-        mHandImageCrop{mNetOutputSize.area()*3},
+        mHandImageCrop{{1, 3, mNetOutputSize.y, mNetOutputSize.x}},
         mHeatMapScaleMode{heatMapScale},
         mHeatMapTypes{heatMapTypes}
     {

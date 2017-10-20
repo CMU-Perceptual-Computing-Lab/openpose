@@ -9,7 +9,7 @@ namespace op
 {
     template <typename T>
     ResizeAndMergeCaffe<T>::ResizeAndMergeCaffe() :
-        mScaleRatios{1}
+        mScaleRatios{T(1)}
     {
         try
         {
@@ -158,7 +158,8 @@ namespace op
     }
 
     template <typename T>
-    void ResizeAndMergeCaffe<T>::Backward_gpu(const std::vector<caffe::Blob<T>*>& top, const std::vector<bool>& propagate_down,
+    void ResizeAndMergeCaffe<T>::Backward_gpu(const std::vector<caffe::Blob<T>*>& top,
+                                              const std::vector<bool>& propagate_down,
                                               const std::vector<caffe::Blob<T>*>& bottom)
     {
         try

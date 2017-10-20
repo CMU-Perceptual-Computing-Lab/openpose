@@ -35,7 +35,7 @@ DEFINE_string(image_path,               "examples/media/COCO_val2014_00000000019
 DEFINE_string(model_pose,               "COCO",         "Model to be used. E.g. `COCO` (18 keypoints), `MPI` (15 keypoints, ~10% faster), "
                                                         "`MPI_4_layers` (15 keypoints, even faster but less accurate).");
 DEFINE_string(model_folder,             "models/",      "Folder path (absolute or relative) where the models (pose, face, ...) are located.");
-DEFINE_string(net_resolution,           "656x368",      "Multiples of 16. If it is increased, the accuracy potentially increases. If it is"
+DEFINE_string(net_resolution,           "-1x368",       "Multiples of 16. If it is increased, the accuracy potentially increases. If it is"
                                                         " decreased, the speed increases. For maximum speed-accuracy balance, it should keep the"
                                                         " closest aspect ratio possible to the images or videos to be processed. Using `-1` in"
                                                         " any of the dimensions, OP will choose the optimal aspect ratio depending on the user's"
@@ -80,8 +80,6 @@ int openPoseTutorialPose2()
     const auto outputSize = op::flagsToPoint(FLAGS_output_resolution, "-1x-1");
     // netInputSize
     const auto netInputSize = op::flagsToPoint(FLAGS_net_resolution, "-1x368");
-    // netOutputSize
-    const auto netOutputSize = netInputSize;
     // poseModel
     const auto poseModel = op::flagsToPoseModel(FLAGS_model_pose);
     // Check no contradictory flags enabled
@@ -99,8 +97,8 @@ int openPoseTutorialPose2()
     op::CvMatToOpInput cvMatToOpInput;
     op::CvMatToOpOutput cvMatToOpOutput;
     auto poseExtractorPtr = std::make_shared<op::PoseExtractorCaffe>(
-        netInputSize, netOutputSize, outputSize, FLAGS_scale_number, poseModel, FLAGS_model_folder,
-        FLAGS_num_gpu_start, std::vector<op::HeatMapType>{}, op::ScaleMode::ZeroToOne, enableGoogleLogging
+        poseModel, FLAGS_model_folder, FLAGS_num_gpu_start, std::vector<op::HeatMapType>{}, op::ScaleMode::ZeroToOne,
+        enableGoogleLogging
     );
     op::PoseGpuRenderer poseGpuRenderer{poseModel, poseExtractorPtr, (float)FLAGS_render_threshold,
                                         !FLAGS_disable_blending, (float)FLAGS_alpha_pose, (float)FLAGS_alpha_heatmap};

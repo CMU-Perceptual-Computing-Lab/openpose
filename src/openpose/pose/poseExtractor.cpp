@@ -43,12 +43,10 @@ namespace op
         }
     }
 
-    PoseExtractor::PoseExtractor(const Point<int>& netOutputSize, const Point<int>& outputSize,
-                                 const PoseModel poseModel, const std::vector<HeatMapType>& heatMapTypes,
+    PoseExtractor::PoseExtractor(const PoseModel poseModel, const std::vector<HeatMapType>& heatMapTypes,
                                  const ScaleMode heatMapScale) :
         mPoseModel{poseModel},
-        mNetOutputSize{netOutputSize},
-        mOutputSize{outputSize},
+        mNetOutputSize{0, 0},
         mHeatMapTypes{heatMapTypes},
         mHeatMapScaleMode{heatMapScale}
     {

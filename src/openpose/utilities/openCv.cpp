@@ -147,8 +147,8 @@ namespace op
     {
         try
         {
-            const auto ratioWidth = targetSize.x / (double)initialSize.x;
-            const auto ratioHeight = targetSize.y / (double)initialSize.y;
+            const auto ratioWidth = (targetSize.x - 1) / (double)(initialSize.x - 1);
+            const auto ratioHeight = (targetSize.y - 1) / (double)(initialSize.y - 1);
             return fastMin(ratioWidth, ratioHeight);
         }
         catch (const std::exception& e)

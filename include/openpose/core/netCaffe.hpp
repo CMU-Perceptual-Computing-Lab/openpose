@@ -9,22 +9,14 @@ namespace op
     class OP_API NetCaffe : public Net
     {
     public:
-        NetCaffe(const std::array<int, 4>& netInputSize4D, const std::string& caffeProto,
-                 const std::string& caffeTrainedModel, const int gpuId = 0,
-                 const bool enableGoogleLogging = true,
-                 const std::string& lastBlobName = "net_output");
+        NetCaffe(const std::string& caffeProto, const std::string& caffeTrainedModel, const int gpuId = 0,
+                 const bool enableGoogleLogging = true, const std::string& lastBlobName = "net_output");
 
         virtual ~NetCaffe();
 
         void initializationOnThread();
 
-        // Alternative a) getInputDataCpuPtr or getInputDataGpuPtr + forwardPass
-        float* getInputDataCpuPtr() const;
-
-        float* getInputDataGpuPtr() const;
-
-        // Alternative b)
-        void forwardPass(const float* const inputNetData = nullptr) const;
+        void forwardPass(const Array<float>& inputNetData) const;
 
         boost::shared_ptr<caffe::Blob<float>> getOutputBlob() const;
 

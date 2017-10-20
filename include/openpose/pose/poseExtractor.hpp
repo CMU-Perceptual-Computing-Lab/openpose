@@ -12,7 +12,7 @@ namespace op
     class OP_API PoseExtractor
     {
     public:
-        PoseExtractor(const Point<int>& netOutputSize, const Point<int>& outputSize, const PoseModel poseModel,
+        PoseExtractor(const PoseModel poseModel,
                       const std::vector<HeatMapType>& heatMapTypes = {},
                       const ScaleMode heatMapScale = ScaleMode::ZeroToOne);
 
@@ -45,8 +45,7 @@ namespace op
 
     protected:
         const PoseModel mPoseModel;
-        const Point<int> mNetOutputSize;
-        const Point<int> mOutputSize;
+        Point<int> mNetOutputSize;
         Array<float> mPoseKeypoints;
         float mScaleNetToOutput;
 

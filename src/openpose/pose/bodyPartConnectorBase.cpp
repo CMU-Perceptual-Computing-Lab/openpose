@@ -6,9 +6,10 @@
 namespace op
 {
     template <typename T>
-    void connectBodyPartsCpu(Array<T>& poseKeypoints, const T* const heatMapPtr, const T* const peaksPtr, const PoseModel poseModel,
-                             const Point<int>& heatMapSize, const int maxPeaks, const int interMinAboveThreshold,
-                             const T interThreshold, const int minSubsetCnt, const T minSubsetScore, const T scaleFactor)
+    void connectBodyPartsCpu(Array<T>& poseKeypoints, const T* const heatMapPtr, const T* const peaksPtr,
+                             const PoseModel poseModel, const Point<int>& heatMapSize, const int maxPeaks,
+                             const int interMinAboveThreshold, const T interThreshold, const int minSubsetCnt,
+                             const T minSubsetScore, const T scaleFactor)
     {
         try
         {
@@ -18,7 +19,8 @@ namespace op
             const auto numberBodyParts = POSE_NUMBER_BODY_PARTS[(int)poseModel];
             const auto numberBodyPartPairs = bodyPartPairs.size() / 2;
 
-            std::vector<std::pair<std::vector<int>, double>> subset;    // Vector<int> = Each body part + body parts counter; double = subsetScore
+            // Vector<int> = Each body part + body parts counter; double = subsetScore
+            std::vector<std::pair<std::vector<int>, double>> subset;
             const auto subsetCounterIndex = numberBodyParts;
             const auto subsetSize = numberBodyParts+1;
 
@@ -59,9 +61,12 @@ namespace op
                                 if (!num)
                                 {
                                     std::vector<int> rowVector(subsetSize, 0);
-                                    rowVector[ bodyPartB ] = bodyPartB*peaksOffset + i*3 + 2; //store the index
-                                    rowVector[subsetCounterIndex] = 1; //last number in each row is the parts number of that person
-                                    const auto subsetScore = candidateB[i*3+2]; //second last number in each row is the total score
+                                    // Store the index
+                                    rowVector[ bodyPartB ] = bodyPartB*peaksOffset + i*3 + 2;
+                                    // Last number in each row is the parts number of that person
+                                    rowVector[subsetCounterIndex] = 1;
+                                    const auto subsetScore = candidateB[i*3+2];
+                                    // Second last number in each row is the total score
                                     subset.emplace_back(std::make_pair(rowVector, subsetScore));
                                 }
                             }
@@ -71,14 +76,18 @@ namespace op
                             for (auto i = 1; i <= nB; i++)
                             {
                                 std::vector<int> rowVector(subsetSize, 0);
-                                rowVector[ bodyPartB ] = bodyPartB*peaksOffset + i*3 + 2; //store the index
-                                rowVector[subsetCounterIndex] = 1; //last number in each row is the parts number of that person
-                                const auto subsetScore = candidateB[i*3+2]; //second last number in each row is the total score
+                                // Store the index
+                                rowVector[ bodyPartB ] = bodyPartB*peaksOffset + i*3 + 2;
+                                // Last number in each row is the parts number of that person
+                                rowVector[subsetCounterIndex] = 1;
+                                // Second last number in each row is the total score
+                                const auto subsetScore = candidateB[i*3+2];
                                 subset.emplace_back(std::make_pair(rowVector, subsetScore));
                             }
                         }
                         else
-                            error("Unknown model, cast to int = " + std::to_string((int)poseModel), __LINE__, __FUNCTION__, __FILE__);
+                            error("Unknown model, cast to int = " + std::to_string((int)poseModel),
+                                  __LINE__, __FUNCTION__, __FILE__);
                     }
                     else // if (nA != 0 && nB == 0)
                     {
@@ -101,9 +110,12 @@ namespace op
                                 if (!num)
                                 {
                                     std::vector<int> rowVector(subsetSize, 0);
-                                    rowVector[ bodyPartA ] = bodyPartA*peaksOffset + i*3 + 2; //store the index
-                                    rowVector[subsetCounterIndex] = 1; //last number in each row is the parts number of that person
-                                    const auto subsetScore = candidateA[i*3+2]; //second last number in each row is the total score
+                                    // Store the index
+                                    rowVector[ bodyPartA ] = bodyPartA*peaksOffset + i*3 + 2;
+                                    // Last number in each row is the parts number of that person
+                                    rowVector[subsetCounterIndex] = 1;
+                                    // Second last number in each row is the total score
+                                    const auto subsetScore = candidateA[i*3+2];
                                     subset.emplace_back(std::make_pair(rowVector, subsetScore));
                                 }
                             }
@@ -113,14 +125,18 @@ namespace op
                             for (auto i = 1; i <= nA; i++)
                             {
                                 std::vector<int> rowVector(subsetSize, 0);
-                                rowVector[ bodyPartA ] = bodyPartA*peaksOffset + i*3 + 2; //store the index
-                                rowVector[subsetCounterIndex] = 1; //last number in each row is the parts number of that person
-                                const auto subsetScore = candidateA[i*3+2]; //second last number in each row is the total score
+                                // Store the index
+                                rowVector[ bodyPartA ] = bodyPartA*peaksOffset + i*3 + 2;
+                                // Last number in each row is the parts number of that person
+                                rowVector[subsetCounterIndex] = 1;
+                                // Second last number in each row is the total score
+                                const auto subsetScore = candidateA[i*3+2];
                                 subset.emplace_back(std::make_pair(rowVector, subsetScore));
                             }
                         }
                         else
-                            error("Unknown model, cast to int = " + std::to_string((int)poseModel), __LINE__, __FUNCTION__, __FILE__);
+                            error("Unknown model, cast to int = " + std::to_string((int)poseModel),
+                                  __LINE__, __FUNCTION__, __FILE__);
                     }
                 }
                 else // if (nA != 0 && nB != 0)
@@ -216,9 +232,10 @@ namespace op
                         }
                     }
                     // Add ears connections (in case person is looking to opposite direction to camera)
-                    else if (((poseModel == PoseModel::COCO_18 || poseModel == PoseModel::BODY_18) && (pairIndex==17 || pairIndex==18))
-                                || (poseModel == PoseModel::BODY_19 && (pairIndex==18 || pairIndex==19))
-                                || (poseModel == PoseModel::BODY_23 && (pairIndex==22 || pairIndex==23)))
+                    else if (((poseModel == PoseModel::COCO_18
+                                || poseModel == PoseModel::BODY_18) && (pairIndex==17 || pairIndex==18))
+                             || (poseModel == PoseModel::BODY_19 && (pairIndex==18 || pairIndex==19))
+                             || (poseModel == PoseModel::BODY_23 && (pairIndex==22 || pairIndex==23)))
                     {
                         for (const auto& connectionKI : connectionK)
                         {
@@ -291,7 +308,8 @@ namespace op
                         break;
                 }
                 else if (subsetCounter < 1)
-                    error("Bad subsetCounter. Bug in this function if this happens.", __LINE__, __FUNCTION__, __FILE__);
+                    error("Bad subsetCounter. Bug in this function if this happens.",
+                          __LINE__, __FUNCTION__, __FILE__);
             }
 
             // Fill and return poseKeypoints
@@ -327,10 +345,16 @@ namespace op
         }
     }
 
-    template void connectBodyPartsCpu(Array<float>& poseKeypoints, const float* const heatMapPtr, const float* const peaksPtr, const PoseModel poseModel, const Point<int>& heatMapSize,
-                                      const int maxPeaks, const int interMinAboveThreshold, const float interThreshold, const int minSubsetCnt,
-                                      const float minSubsetScore, const float scaleFactor);
-    template void connectBodyPartsCpu(Array<double>& poseKeypoints, const double* const heatMapPtr, const double* const peaksPtr, const PoseModel poseModel, const Point<int>& heatMapSize,
-                                      const int maxPeaks, const int interMinAboveThreshold, const double interThreshold, const int minSubsetCnt,
-                                      const double minSubsetScore, const double scaleFactor);
+    template void connectBodyPartsCpu(Array<float>& poseKeypoints, const float* const heatMapPtr,
+                                      const float* const peaksPtr, const PoseModel poseModel,
+                                      const Point<int>& heatMapSize, const int maxPeaks,
+                                      const int interMinAboveThreshold, const float interThreshold,
+                                      const int minSubsetCnt, const float minSubsetScore,
+                                      const float scaleFactor);
+    template void connectBodyPartsCpu(Array<double>& poseKeypoints, const double* const heatMapPtr,
+                                      const double* const peaksPtr, const PoseModel poseModel,
+                                      const Point<int>& heatMapSize, const int maxPeaks,
+                                      const int interMinAboveThreshold, const double interThreshold,
+                                      const int minSubsetCnt, const double minSubsetScore,
+                                      const double scaleFactor);
 }

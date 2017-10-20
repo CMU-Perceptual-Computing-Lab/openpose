@@ -5,7 +5,8 @@
 
 namespace op
 {
-    const std::string errorMessage = "The Array<float> is not a RGB image. This function is only for array of dimension: [sizeA x sizeB x 3].";
+    const std::string errorMessage = "The Array<float> is not a RGB image. This function is only for array of"
+                                     " dimension: [sizeA x sizeB x 3].";
 
     float getDistance(const Array<float>& keypoints, const int person, const int elementA, const int elementB)
     {
@@ -29,7 +30,8 @@ namespace op
         {
             // Security checks
             if (keypointsA.getNumberDimensions() != keypointsB.getNumberDimensions())
-                error("keypointsA.getNumberDimensions() != keypointsB.getNumberDimensions().", __LINE__, __FUNCTION__, __FILE__);
+                error("keypointsA.getNumberDimensions() != keypointsB.getNumberDimensions().",
+                      __LINE__, __FUNCTION__, __FILE__);
             for (auto dimension = 1u ; dimension < keypointsA.getNumberDimensions() ; dimension++)
                 if (keypointsA.getSize(dimension) != keypointsB.getSize(dimension))
                     error("keypointsA.getSize() != keypointsB.getSize().", __LINE__, __FUNCTION__, __FILE__);
@@ -96,7 +98,8 @@ namespace op
         }
     }
 
-    void scaleKeypoints(Array<float>& keypoints, const float scaleX, const float scaleY, const float offsetX, const float offsetY)
+    void scaleKeypoints(Array<float>& keypoints, const float scaleX, const float scaleY, const float offsetX,
+                        const float offsetY)
     {
         try
         {
@@ -127,8 +130,9 @@ namespace op
         }
     }
 
-    void renderKeypointsCpu(Array<float>& frameArray, const Array<float>& keypoints, const std::vector<unsigned int>& pairs,
-                            const std::vector<float> colors, const float thicknessCircleRatio, const float thicknessLineRatioWRTCircle,
+    void renderKeypointsCpu(Array<float>& frameArray, const Array<float>& keypoints,
+                            const std::vector<unsigned int>& pairs, const std::vector<float> colors,
+                            const float thicknessCircleRatio, const float thicknessLineRatioWRTCircle,
                             const float threshold)
     {
         try
@@ -160,12 +164,15 @@ namespace op
                 // Keypoints
                 for (auto person = 0 ; person < keypoints.getSize(0) ; person++)
                 {
-                    const auto personRectangle = getKeypointsRectangle(keypoints, person, numberKeypoints, thresholdRectangle);
+                    const auto personRectangle = getKeypointsRectangle(keypoints, person, numberKeypoints,
+                                                                       thresholdRectangle);
                     if (personRectangle.area() > 0)
                     {
-                        const auto ratioAreas = fastMin(1.f, fastMax(personRectangle.width/(float)width, personRectangle.height/(float)height));
+                        const auto ratioAreas = fastMin(1.f, fastMax(personRectangle.width/(float)width,
+                                                                     personRectangle.height/(float)height));
                         // Size-dependent variables
-                        const auto thicknessRatio = fastMax(intRound(std::sqrt(area)*thicknessCircleRatio * ratioAreas), 2);
+                        const auto thicknessRatio = fastMax(intRound(std::sqrt(area)
+                                                                     * thicknessCircleRatio * ratioAreas), 2);
                         // Negative thickness in cv::circle means that a filled circle is to be drawn.
                         const auto thicknessCircle = (ratioAreas > 0.05 ? thicknessRatio : -1);
                         const auto thicknessLine = intRound(thicknessRatio * thicknessLineRatioWRTCircle);
@@ -200,7 +207,8 @@ namespace op
                                 const cv::Scalar color{colors[colorIndex % numberColors],
                                                        colors[(colorIndex+1) % numberColors],
                                                        colors[(colorIndex+2) % numberColors]};
-                                const cv::Point center{intRound(keypoints[faceIndex]), intRound(keypoints[faceIndex+1])};
+                                const cv::Point center{intRound(keypoints[faceIndex]),
+                                                       intRound(keypoints[faceIndex+1])};
                                 cv::circle(frameR, center, radius, color[0], thicknessCircle, lineType, shift);
                                 cv::circle(frameG, center, radius, color[1], thicknessCircle, lineType, shift);
                                 cv::circle(frameB, center, radius, color[2], thicknessCircle, lineType, shift);
@@ -216,7 +224,8 @@ namespace op
         }
     }
 
-    Rectangle<float> getKeypointsRectangle(const Array<float>& keypoints, const int person, const int numberKeypoints, const float threshold)
+    Rectangle<float> getKeypointsRectangle(const Array<float>& keypoints, const int person, const int numberKeypoints,
+                                           const float threshold)
     {
         try
         {
