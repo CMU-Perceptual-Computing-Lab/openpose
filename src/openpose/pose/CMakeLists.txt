@@ -13,9 +13,11 @@ set(SOURCES
     renderPose.cu)
 
 cuda_add_library(openpose_pose ${SOURCES})
-if (BUILD_CAFFE)
-  add_dependencies(openpose_pose openpose_caffe)
-endif (BUILD_CAFFE)
+if (UNIX AND NOT APPLE)
+  if (BUILD_CAFFE)
+    add_dependencies(openpose_pose openpose_caffe)
+  endif (BUILD_CAFFE)
+endif (UNIX AND NOT APPLE)
 
 install(TARGETS openpose_pose
     EXPORT OpenPose

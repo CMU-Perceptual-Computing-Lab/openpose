@@ -27,9 +27,11 @@ set_property(TARGET caffe PROPERTY IMPORTED_LOCATION ${Caffe_LIBS})
 
 target_link_libraries(openpose_core caffe)
 
-if (BUILD_CAFFE)
-  add_dependencies(openpose_core openpose_caffe)
-endif (BUILD_CAFFE)
+if (UNIX AND NOT APPLE)
+  if (BUILD_CAFFE)
+    add_dependencies(openpose_core openpose_caffe)
+  endif (BUILD_CAFFE)
+endif (UNIX AND NOT APPLE)
 
 install(TARGETS openpose_core
     EXPORT OpenPose
