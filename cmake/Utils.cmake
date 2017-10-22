@@ -14,3 +14,24 @@ function (download_model MODEL_NAME MODEL_DOWNLOAD_FLAG MODEL_RELATIVE_PATH CHEC
     message(STATUS "Not downloading ${MODEL_NAME} model")
   endif (MODEL_DOWNLOAD_FLAG)
 endfunction (download_model)
+
+# Function to prepend filenames with common path
+function(prepend var prefix)
+   set(listVar "")
+   foreach (f ${ARGN})
+      list(APPEND listVar "${prefix}/${f}")
+   endforeach (f)
+   set(${var} "${listVar}" PARENT_SCOPE)
+endfunction(prepend)
+
+# Get names of subdirectories in directory
+macro(subdirlist result curdir)
+  FILE(GLOB children RELATIVE ${curdir} ${curdir}/*)
+  SET(dirlist "")
+  foreach (child ${children})
+    if (IS_DIRECTORY ${curdir}/${child})
+      list(APPEND dirlist ${child})
+    endif()
+  endforeach ()
+  set(${result} ${dirlist})
+endmacro()

@@ -3,6 +3,8 @@ set(EXAMPLE_FILES
     2_user_synchronous.cpp
     3_user_asynchronous.cpp)
   
+include(${CMAKE_SOURCE_DIR}/cmake/Utils.cmake)
+
 foreach(EXAMPLE_FILE ${EXAMPLE_FILES})
 
   get_filename_component(SOURCE_NAME ${EXAMPLE_FILE} NAME_WE)
@@ -10,8 +12,7 @@ foreach(EXAMPLE_FILE ${EXAMPLE_FILES})
   if (UNIX AND NOT APPLE)
     set(EXE_NAME "${SOURCE_NAME}_bin")
   elseif (WIN32)
-    # TODO -- Change to Pascal Case
-    string(EXE_NAME SOURCE_NAME)
+    set(EXE_NAME "${SOURCE_NAME}")
   endif ()
 
   message(STATUS "Adding Example ${EXE_NAME}")
