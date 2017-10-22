@@ -142,7 +142,8 @@ if (UNIX AND NOT APPLE)
  endif (UNIX AND NOT APPLE)
 
 if (WIN32)
-  
+  set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
   find_library(Boost_FILESYSTEM_LIBRARY_OPTIMIZED boost_filesystem-vc140-mt-1_61 HINTS ${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/lib)
   find_library(Boost_SYSTEM_LIBRARY_OPTIMIZED boost_system-vc140-mt-1_61 HINTS ${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/lib)
   find_library(Boost_FILESYSTEM_LIBRARY_DEBUG boost_filesystem-vc140-mt-gd-1_61 HINTS ${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/lib)

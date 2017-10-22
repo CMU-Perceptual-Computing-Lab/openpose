@@ -14,9 +14,10 @@ foreach(EXAMPLE_FILE ${EXAMPLE_FILES})
 
   message(STATUS "Adding Example ${EXE_NAME}")
   add_executable(${EXE_NAME} ${EXAMPLE_FILE})
-  target_link_libraries( ${EXE_NAME} openpose ${GLOG_LIBRARY} ${GFLAGS_LIBRARY} ${Caffe_LIBS})
+  target_link_libraries(${EXE_NAME} openpose ${GLOG_LIBRARY} ${GFLAGS_LIBRARY} ${Caffe_LIBS})
   
   if (WIN32)
+    set_property(TARGET ${EXE_NAME} PROPERTY FOLDER "Tutorial/Pose")
     configure_file(${CMAKE_SOURCE_DIR}/cmake/OpenPose.vcxproj.user 
         ${CMAKE_CURRENT_BINARY_DIR}/${EXE_NAME}.vcxproj.user @ONLY) 
   endif (WIN32)
