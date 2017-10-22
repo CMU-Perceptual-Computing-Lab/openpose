@@ -9,8 +9,7 @@ foreach(EXAMPLE_FILE ${EXAMPLE_FILES})
   if (UNIX AND NOT APPLE)
     set(EXE_NAME "${SOURCE_NAME}_bin")
   elseif (WIN32)
-    # TODO -- Change to Pascal Case
-    string(EXE_NAME SOURCE_NAME)
+    set(EXE_NAME "${SOURCE_NAME}")
   endif ()
 
   message(STATUS "Adding Example ${EXE_NAME}")
