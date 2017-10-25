@@ -43,7 +43,7 @@ var pose_parameters_8hpp =
     [ "POSE_COLORS", "pose_parameters_8hpp.html#aefbe109a859cc12a9a06f607e61d8dba", null ],
     [ "POSE_DEFAULT_ALPHA_HEAT_MAP", "pose_parameters_8hpp.html#af45cddacd69fff73a4ea4acbbbac43e0", null ],
     [ "POSE_DEFAULT_ALPHA_KEYPOINT", "pose_parameters_8hpp.html#a21fcb98366f6ea8895fc7f527f232db5", null ],
-    [ "POSE_DEFAULT_CONNECT_INTER_MIN_ABOVE_THRESHOLD", "pose_parameters_8hpp.html#a8861b57b97b5e07f73f87635ea08318b", null ],
+    [ "POSE_DEFAULT_CONNECT_INTER_MIN_ABOVE_THRESHOLD", "pose_parameters_8hpp.html#a029c14582c63e33a9b7350bb374527c8", null ],
     [ "POSE_DEFAULT_CONNECT_INTER_THRESHOLD", "pose_parameters_8hpp.html#a02de45e0a3df20b593d9b1b79a96f20c", null ],
     [ "POSE_DEFAULT_CONNECT_MIN_SUBSET_CNT", "pose_parameters_8hpp.html#a8b6edeb3f39ac581317c10e48e6729ad", null ],
     [ "POSE_DEFAULT_CONNECT_MIN_SUBSET_SCORE", "pose_parameters_8hpp.html#a600643a9a3f46d6a4cab58943e059d57", null ],

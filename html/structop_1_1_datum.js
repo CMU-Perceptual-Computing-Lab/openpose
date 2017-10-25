@@ -30,6 +30,7 @@ var structop_1_1_datum =
     [ "outputData", "structop_1_1_datum.html#a42b953c082f479eddc527da9a3a4cc75", null ],
     [ "poseHeatMaps", "structop_1_1_datum.html#a5429e97e0ab9b0e2209a3947af668381", null ],
     [ "poseKeypoints", "structop_1_1_datum.html#a6d629b1f6f7b958fe4cf2ef4cdf57c5b", null ],
+    [ "poseScores", "structop_1_1_datum.html#afb117821de7aff9ac3c219ef3bbc0c14", null ],
     [ "scaleInputToNetInputs", "structop_1_1_datum.html#a0e416771f275be98c83aaff01e482a71", null ],
     [ "scaleInputToOutput", "structop_1_1_datum.html#a6cf96c250c236a03f13da69e1d4336d9", null ],
     [ "scaleNetToOutput", "structop_1_1_datum.html#a44af7162e180c6856ce909057f43d8e1", null ]

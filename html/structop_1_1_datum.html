@@ -161,6 +161,8 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a0d1f1c3d3494386e2d652268f6e17b5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6d629b1f6f7b958fe4cf2ef4cdf57c5b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structop_1_1_datum.html#a6d629b1f6f7b958fe4cf2ef4cdf57c5b">poseKeypoints</a></td></tr>
 <tr class="separator:a6d629b1f6f7b958fe4cf2ef4cdf57c5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afb117821de7aff9ac3c219ef3bbc0c14"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structop_1_1_datum.html#afb117821de7aff9ac3c219ef3bbc0c14">poseScores</a></td></tr>
+<tr class="separator:afb117821de7aff9ac3c219ef3bbc0c14"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5429e97e0ab9b0e2209a3947af668381"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structop_1_1_datum.html#a5429e97e0ab9b0e2209a3947af668381">poseHeatMaps</a></td></tr>
 <tr class="separator:a5429e97e0ab9b0e2209a3947af668381"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0b2f6955a1751fc79b107789272effad"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="structop_1_1_rectangle.html">Rectangle</a>&lt; float &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structop_1_1_datum.html#a0b2f6955a1751fc79b107789272effad">faceRectangles</a></td></tr>
@@ -762,7 +764,20 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Body pose (x,y,score) locations for each person in the image. It has been resized to the desired output resolution (e.g. <code>resolution</code> flag in the demo). If outputData is empty, then cvOutputData will also be empty. Size: #people x #body parts (e.g. 18 for COCO or 15 for MPI) x 3 ((x,y) coordinates + score) </p>
+<p>Body pose (x,y,score) locations for each person in the image. It has been resized to the desired output resolution (e.g. <code>resolution</code> flag in the demo). Size: #people x #body parts (e.g. 18 for COCO or 15 for MPI) x 3 ((x,y) coordinates + score) </p>
+
+</div>
+</div>
+<a class="anchor" id="afb117821de7aff9ac3c219ef3bbc0c14"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classop_1_1_array.html">Array</a>&lt;float&gt; op::Datum::poseScores</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Body pose global confidence/score for each person in the image. It does not only consider the score of each body keypoint, but also the score of each PAF association. Optimized for COCO evaluation metric. It will highly penalyze people with missing body parts (e.g. cropped people on the borders of the image). If poseKeypoints is empty, then poseScores will also be empty. Size: #people </p>
 
 </div>
 </div>

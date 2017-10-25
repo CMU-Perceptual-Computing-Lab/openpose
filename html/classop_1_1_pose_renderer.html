@@ -124,9 +124,9 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a1dfd34d42fa69913a9702e0a0ebcd04e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af861d8213f1444b3246402061cea1b33"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_renderer.html#af861d8213f1444b3246402061cea1b33">initializationOnThread</a> ()</td></tr>
 <tr class="separator:af861d8213f1444b3246402061cea1b33"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aac8809fbff88eec8aeff6e35a1cac670"><td class="memItemLeft" align="right" valign="top">virtual std::pair&lt; int, <br class="typebreak"/>
-std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_renderer.html#aac8809fbff88eec8aeff6e35a1cac670">renderPose</a> (<a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt; &amp;outputData, const <a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt; &amp;poseKeypoints, const float scaleNetToOutput=-1.f)=0</td></tr>
-<tr class="separator:aac8809fbff88eec8aeff6e35a1cac670"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad1e96ceb47bf205b56b50c6b2792f9e3"><td class="memItemLeft" align="right" valign="top">virtual std::pair&lt; int, <br class="typebreak"/>
+std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_renderer.html#ad1e96ceb47bf205b56b50c6b2792f9e3">renderPose</a> (<a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt; &amp;outputData, const <a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt; &amp;poseKeypoints, const float scaleInputToOutput, const float scaleNetToOutput=-1.f)=0</td></tr>
+<tr class="separator:ad1e96ceb47bf205b56b50c6b2792f9e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
@@ -179,7 +179,7 @@ std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el
 
 </div>
 </div>
-<a class="anchor" id="aac8809fbff88eec8aeff6e35a1cac670"></a>
+<a class="anchor" id="ad1e96ceb47bf205b56b50c6b2792f9e3"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -202,6 +202,12 @@ std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const float&#160;</td>
+          <td class="paramname"><em>scaleInputToOutput</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const float&#160;</td>
           <td class="paramname"><em>scaleNetToOutput</em> = <code>-1.f</code>&#160;</td>
         </tr>
         <tr>
@@ -217,7 +223,7 @@ std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el
 </table>
 </div><div class="memdoc">
 
-<p>Implemented in <a class="el" href="classop_1_1_pose_gpu_renderer.html#ad6db098189826e1341d5ca006b5f2c63">op::PoseGpuRenderer</a>, and <a class="el" href="classop_1_1_pose_cpu_renderer.html#a578b42ae011b6aa8703019562dfab60f">op::PoseCpuRenderer</a>.</p>
+<p>Implemented in <a class="el" href="classop_1_1_pose_gpu_renderer.html#a4705b3c47cd9ac8174e357999960a28f">op::PoseGpuRenderer</a>, and <a class="el" href="classop_1_1_pose_cpu_renderer.html#a98541b982847713472411402314efd96">op::PoseCpuRenderer</a>.</p>
 
 </div>
 </div>

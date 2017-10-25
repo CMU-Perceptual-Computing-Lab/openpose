@@ -119,36 +119,26 @@ $(document).ready(function(){initNavTree('classop_1_1_net_caffe.html','');});
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a89964d1f9be424cb4c9b85f23803c9e3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_net_caffe.html#a89964d1f9be424cb4c9b85f23803c9e3">NetCaffe</a> (const std::array&lt; int, 4 &gt; &amp;netInputSize4D, const std::string &amp;caffeProto, const std::string &amp;caffeTrainedModel, const int gpuId=0, const bool enableGoogleLogging=true, const std::string &amp;lastBlobName=&quot;net_output&quot;)</td></tr>
-<tr class="separator:a89964d1f9be424cb4c9b85f23803c9e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af6d9ee03568d2783e0e4ed0b78a21c3d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_net_caffe.html#af6d9ee03568d2783e0e4ed0b78a21c3d">NetCaffe</a> (const std::string &amp;caffeProto, const std::string &amp;caffeTrainedModel, const int gpuId=0, const bool enableGoogleLogging=true, const std::string &amp;lastBlobName=&quot;net_output&quot;)</td></tr>
+<tr class="separator:af6d9ee03568d2783e0e4ed0b78a21c3d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a84007645c88de286e9d306461a044e8d"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_net_caffe.html#a84007645c88de286e9d306461a044e8d">~NetCaffe</a> ()</td></tr>
 <tr class="separator:a84007645c88de286e9d306461a044e8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a08b71387287339e68327dd6d4cb1e8b3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_net_caffe.html#a08b71387287339e68327dd6d4cb1e8b3">initializationOnThread</a> ()</td></tr>
 <tr class="separator:a08b71387287339e68327dd6d4cb1e8b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3ac11c69dc0ece3f60c862a7c558bb15"><td class="memItemLeft" align="right" valign="top">float *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_net_caffe.html#a3ac11c69dc0ece3f60c862a7c558bb15">getInputDataCpuPtr</a> () const </td></tr>
-<tr class="separator:a3ac11c69dc0ece3f60c862a7c558bb15"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5ae766135624644db2d6fa6d530c9a5d"><td class="memItemLeft" align="right" valign="top">float *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_net_caffe.html#a5ae766135624644db2d6fa6d530c9a5d">getInputDataGpuPtr</a> () const </td></tr>
-<tr class="separator:a5ae766135624644db2d6fa6d530c9a5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a46472ff210748d47f81115f1eb01e2b0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_net_caffe.html#a46472ff210748d47f81115f1eb01e2b0">forwardPass</a> (const float *const inputNetData=nullptr) const </td></tr>
-<tr class="separator:a46472ff210748d47f81115f1eb01e2b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4db7c5de8c0619ae39c3620fed5c577f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_net_caffe.html#a4db7c5de8c0619ae39c3620fed5c577f">forwardPass</a> (const <a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt; &amp;inputNetData) const </td></tr>
+<tr class="separator:a4db7c5de8c0619ae39c3620fed5c577f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8869d49723a0e94c990b1c4f95f00916"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classboost_1_1shared__ptr.html">boost::shared_ptr</a>&lt; <a class="el" href="classcaffe_1_1_blob.html">caffe::Blob</a><br class="typebreak"/>
 &lt; float &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_net_caffe.html#a8869d49723a0e94c990b1c4f95f00916">getOutputBlob</a> () const </td></tr>
 <tr class="separator:a8869d49723a0e94c990b1c4f95f00916"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a89964d1f9be424cb4c9b85f23803c9e3"></a>
+<a class="anchor" id="af6d9ee03568d2783e0e4ed0b78a21c3d"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">op::NetCaffe::NetCaffe </td>
           <td>(</td>
-          <td class="paramtype">const std::array&lt; int, 4 &gt; &amp;&#160;</td>
-          <td class="paramname"><em>netInputSize4D</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>caffeProto</em>, </td>
         </tr>
@@ -210,7 +200,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a46472ff210748d47f81115f1eb01e2b0"></a>
+<a class="anchor" id="a4db7c5de8c0619ae39c3620fed5c577f"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -220,8 +210,8 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">void op::NetCaffe::forwardPass </td>
           <td>(</td>
-          <td class="paramtype">const float *const&#160;</td>
-          <td class="paramname"><em>inputNetData</em> = <code>nullptr</code></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt; &amp;&#160;</td>
+          <td class="paramname"><em>inputNetData</em></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
@@ -232,57 +222,7 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Implements <a class="el" href="classop_1_1_net.html#ac8edfe73a20fd3d5e548160dffbd0b71">op::Net</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a3ac11c69dc0ece3f60c862a7c558bb15"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">float* op::NetCaffe::getInputDataCpuPtr </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Implements <a class="el" href="classop_1_1_net.html#a042324a660661408830caf85cfe17603">op::Net</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a5ae766135624644db2d6fa6d530c9a5d"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">float* op::NetCaffe::getInputDataGpuPtr </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Implements <a class="el" href="classop_1_1_net.html#a6e39824e84be05c9942523e48e7cff55">op::Net</a>.</p>
+<p>Implements <a class="el" href="classop_1_1_net.html#a65193e857c721f2f606ea6b010953dbc">op::Net</a>.</p>
 
 </div>
 </div>

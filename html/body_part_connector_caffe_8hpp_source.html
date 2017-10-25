@@ -139,7 +139,7 @@ $(document).ready(function(){initNavTree('body_part_connector_caffe_8hpp_source.
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;        <span class="keywordtype">void</span> setPoseModel(<span class="keyword">const</span> <a class="code" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel);</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;        <span class="keywordtype">void</span> setInterMinAboveThreshold(<span class="keyword">const</span> <span class="keywordtype">int</span> interMinAboveThreshold);</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;        <span class="keywordtype">void</span> setInterMinAboveThreshold(<span class="keyword">const</span> T interMinAboveThreshold);</div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;</div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;        <span class="keywordtype">void</span> setInterThreshold(<span class="keyword">const</span> T interThreshold);</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;</div>
@@ -149,33 +149,34 @@ $(document).ready(function(){initNavTree('body_part_connector_caffe_8hpp_source.
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;        <span class="keywordtype">void</span> setScaleNetToOutput(<span class="keyword">const</span> T scaleNetToOutput);</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;        <span class="keyword">virtual</span> <span class="keywordtype">void</span> Forward_cpu(<span class="keyword">const</span> std::vector&lt;<a class="code" href="classcaffe_1_1_blob.html">caffe::Blob&lt;T&gt;</a>*&gt;&amp; bottom, <a class="code" href="classop_1_1_array.html">Array&lt;T&gt;</a>&amp; poseKeypoints);</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;        <span class="keyword">virtual</span> <span class="keywordtype">void</span> Forward_gpu(<span class="keyword">const</span> std::vector&lt;<a class="code" href="classcaffe_1_1_blob.html">caffe::Blob&lt;T&gt;</a>*&gt;&amp; bottom, <span class="keyword">const</span> std::vector&lt;<a class="code" href="classcaffe_1_1_blob.html">caffe::Blob&lt;T&gt;</a>*&gt;&amp; top,</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;                                 <a class="code" href="classop_1_1_array.html">Array&lt;T&gt;</a>&amp; poseKeypoints);</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        <span class="keyword">virtual</span> <span class="keywordtype">void</span> Backward_cpu(<span class="keyword">const</span> std::vector&lt;<a class="code" href="classcaffe_1_1_blob.html">caffe::Blob&lt;T&gt;</a>*&gt;&amp; top, <span class="keyword">const</span> std::vector&lt;bool&gt;&amp; propagate_down,</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;                                  <span class="keyword">const</span> std::vector&lt;<a class="code" href="classcaffe_1_1_blob.html">caffe::Blob&lt;T&gt;</a>*&gt;&amp; bottom);</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;        <span class="keyword">virtual</span> <span class="keywordtype">void</span> Backward_gpu(<span class="keyword">const</span> std::vector&lt;<a class="code" href="classcaffe_1_1_blob.html">caffe::Blob&lt;T&gt;</a>*&gt;&amp; top, <span class="keyword">const</span> std::vector&lt;bool&gt;&amp; propagate_down,</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;                                  <span class="keyword">const</span> std::vector&lt;<a class="code" href="classcaffe_1_1_blob.html">caffe::Blob&lt;T&gt;</a>*&gt;&amp; bottom);</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;        <a class="code" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> mPoseModel;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        <span class="keywordtype">int</span> mInterMinAboveThreshold;</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        T mInterThreshold;</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        <span class="keywordtype">int</span> mMinSubsetCnt;</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        T mMinSubsetScore;</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        T mScaleNetToOutput;</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        std::array&lt;int, 4&gt; mHeatMapsSize;</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;        std::array&lt;int, 4&gt; mPeaksSize;</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;        std::array&lt;int, 4&gt; mTopSize;</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;        <a class="code" href="macros_8hpp.html#abef96b5dd35dd9d44ad27ddf0e2f5f2e">DELETE_COPY</a>(<a class="code" href="classop_1_1_body_part_connector_caffe.html">BodyPartConnectorCaffe</a>);</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    };</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;}</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="preprocessor">#endif // OPENPOSE_POSE_BODY_PART_CONNECTOR_CAFFE_HPP</span></div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;        <span class="keyword">virtual</span> <span class="keywordtype">void</span> Forward_cpu(<span class="keyword">const</span> std::vector&lt;<a class="code" href="classcaffe_1_1_blob.html">caffe::Blob&lt;T&gt;</a>*&gt;&amp; bottom, <a class="code" href="classop_1_1_array.html">Array&lt;T&gt;</a>&amp; poseKeypoints,</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;                                 <a class="code" href="classop_1_1_array.html">Array&lt;T&gt;</a>&amp; poseScores);</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;        <span class="keyword">virtual</span> <span class="keywordtype">void</span> Forward_gpu(<span class="keyword">const</span> std::vector&lt;<a class="code" href="classcaffe_1_1_blob.html">caffe::Blob&lt;T&gt;</a>*&gt;&amp; bottom, <span class="keyword">const</span> std::vector&lt;<a class="code" href="classcaffe_1_1_blob.html">caffe::Blob&lt;T&gt;</a>*&gt;&amp; top,</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;                                 <a class="code" href="classop_1_1_array.html">Array&lt;T&gt;</a>&amp; poseKeypoints);</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        <span class="keyword">virtual</span> <span class="keywordtype">void</span> Backward_cpu(<span class="keyword">const</span> std::vector&lt;<a class="code" href="classcaffe_1_1_blob.html">caffe::Blob&lt;T&gt;</a>*&gt;&amp; top, <span class="keyword">const</span> std::vector&lt;bool&gt;&amp; propagate_down,</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;                                  <span class="keyword">const</span> std::vector&lt;<a class="code" href="classcaffe_1_1_blob.html">caffe::Blob&lt;T&gt;</a>*&gt;&amp; bottom);</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;        <span class="keyword">virtual</span> <span class="keywordtype">void</span> Backward_gpu(<span class="keyword">const</span> std::vector&lt;<a class="code" href="classcaffe_1_1_blob.html">caffe::Blob&lt;T&gt;</a>*&gt;&amp; top, <span class="keyword">const</span> std::vector&lt;bool&gt;&amp; propagate_down,</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;                                  <span class="keyword">const</span> std::vector&lt;<a class="code" href="classcaffe_1_1_blob.html">caffe::Blob&lt;T&gt;</a>*&gt;&amp; bottom);</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        <a class="code" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> mPoseModel;</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        T mInterMinAboveThreshold;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        T mInterThreshold;</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        <span class="keywordtype">int</span> mMinSubsetCnt;</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        T mMinSubsetScore;</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        T mScaleNetToOutput;</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;        std::array&lt;int, 4&gt; mHeatMapsSize;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;        std::array&lt;int, 4&gt; mPeaksSize;</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        std::array&lt;int, 4&gt; mTopSize;</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        <a class="code" href="macros_8hpp.html#abef96b5dd35dd9d44ad27ddf0e2f5f2e">DELETE_COPY</a>(<a class="code" href="classop_1_1_body_part_connector_caffe.html">BodyPartConnectorCaffe</a>);</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    };</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;}</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="preprocessor">#endif // OPENPOSE_POSE_BODY_PART_CONNECTOR_CAFFE_HPP</span></div>
 <div class="ttc" id="macros_8hpp_html_abef96b5dd35dd9d44ad27ddf0e2f5f2e"><div class="ttname"><a href="macros_8hpp.html#abef96b5dd35dd9d44ad27ddf0e2f5f2e">DELETE_COPY</a></div><div class="ttdeci">#define DELETE_COPY(className)</div><div class="ttdef"><b>Definition:</b> macros.hpp:25</div></div>
 <div class="ttc" id="pose_2enum_classes_8hpp_html"><div class="ttname"><a href="pose_2enum_classes_8hpp.html">enumClasses.hpp</a></div></div>
 <div class="ttc" id="namespaceop_html_af5b3ce2a5d3de87cb31b9b67e96f261f"><div class="ttname"><a href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">op::PoseModel</a></div><div class="ttdeci">PoseModel</div><div class="ttdef"><b>Definition:</b> enumClasses.hpp:9</div></div>

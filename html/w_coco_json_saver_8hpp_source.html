@@ -169,7 +169,7 @@ $(document).ready(function(){initNavTree('w_coco_json_saver_8hpp_source.html',''
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;                <span class="comment">// T* to T</span></div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;                <span class="keyword">const</span> <span class="keyword">auto</span>&amp; tDatum = tDatums-&gt;at(0);</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;                <span class="comment">// Record json in COCO format</span></div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;                spCocoJsonSaver-&gt;record(tDatum.poseKeypoints, tDatum.name);</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;                spCocoJsonSaver-&gt;record(tDatum.poseKeypoints, tDatum.poseScores, tDatum.name);</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;                <span class="comment">// Profiling speed</span></div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;                <a class="code" href="classop_1_1_profiler.html#affff5b0b992e05276b2a699f97ad525d">Profiler::timerEnd</a>(profilerKey);</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;                <a class="code" href="classop_1_1_profiler.html#a58b930a54a98bbc91af074395852da76">Profiler::printAveragedTimeMsOnIterationX</a>(profilerKey, __LINE__, __FUNCTION__, __FILE__);</div>

@@ -125,8 +125,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a97cf6c235bd66a2ea893ab95c2f5f8d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9e94ab926baf360dd6b23e14fba09836"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_gpu_renderer.html#a9e94ab926baf360dd6b23e14fba09836">initializationOnThread</a> ()</td></tr>
 <tr class="separator:a9e94ab926baf360dd6b23e14fba09836"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad6db098189826e1341d5ca006b5f2c63"><td class="memItemLeft" align="right" valign="top">std::pair&lt; int, std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_gpu_renderer.html#ad6db098189826e1341d5ca006b5f2c63">renderPose</a> (<a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt; &amp;outputData, const <a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt; &amp;poseKeypoints, const float scaleNetToOutput=-1.f)</td></tr>
-<tr class="separator:ad6db098189826e1341d5ca006b5f2c63"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4705b3c47cd9ac8174e357999960a28f"><td class="memItemLeft" align="right" valign="top">std::pair&lt; int, std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_gpu_renderer.html#a4705b3c47cd9ac8174e357999960a28f">renderPose</a> (<a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt; &amp;outputData, const <a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt; &amp;poseKeypoints, const float scaleInputToOutput, const float scaleNetToOutput=-1.f)</td></tr>
+<tr class="separator:a4705b3c47cd9ac8174e357999960a28f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classop_1_1_gpu_renderer"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classop_1_1_gpu_renderer')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classop_1_1_gpu_renderer.html">op::GpuRenderer</a></td></tr>
 <tr class="memitem:a9852b2017e972637b47250bb7fbc53ea inherit pub_methods_classop_1_1_gpu_renderer"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_gpu_renderer.html#a9852b2017e972637b47250bb7fbc53ea">GpuRenderer</a> (const float renderThreshold, const float alphaKeypoint, const float alphaHeatMap, const bool blendOriginalFrame=true, const unsigned int elementToRender=0u, const unsigned int numberElementsToRender=0u)</td></tr>
 <tr class="separator:a9852b2017e972637b47250bb7fbc53ea inherit pub_methods_classop_1_1_gpu_renderer"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -298,7 +298,7 @@ std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el
 
 </div>
 </div>
-<a class="anchor" id="ad6db098189826e1341d5ca006b5f2c63"></a>
+<a class="anchor" id="a4705b3c47cd9ac8174e357999960a28f"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -321,6 +321,12 @@ std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const float&#160;</td>
+          <td class="paramname"><em>scaleInputToOutput</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const float&#160;</td>
           <td class="paramname"><em>scaleNetToOutput</em> = <code>-1.f</code>&#160;</td>
         </tr>
         <tr>
@@ -336,7 +342,7 @@ std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el
 </table>
 </div><div class="memdoc">
 
-<p>Implements <a class="el" href="classop_1_1_pose_renderer.html#aac8809fbff88eec8aeff6e35a1cac670">op::PoseRenderer</a>.</p>
+<p>Implements <a class="el" href="classop_1_1_pose_renderer.html#ad1e96ceb47bf205b56b50c6b2792f9e3">op::PoseRenderer</a>.</p>
 
 </div>
 </div>

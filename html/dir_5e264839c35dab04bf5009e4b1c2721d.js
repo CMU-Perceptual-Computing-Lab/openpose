@@ -14,5 +14,6 @@ var dir_5e264839c35dab04bf5009e4b1c2721d =
     [ "profiler.hpp", "profiler_8hpp.html", [
       [ "Profiler", "classop_1_1_profiler.html", null ]
     ] ],
+    [ "standard.hpp", "standard_8hpp.html", "standard_8hpp" ],
     [ "string.hpp", "string_8hpp.html", "string_8hpp" ]
 ];

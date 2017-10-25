@@ -133,18 +133,19 @@ $(document).ready(function(){initNavTree('pose_gpu_renderer_8hpp_source.html',''
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;        <span class="keywordtype">void</span> initializationOnThread();</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;</div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;        std::pair&lt;int, std::string&gt; renderPose(<a class="code" href="classop_1_1_array.html">Array&lt;float&gt;</a>&amp; outputData, <span class="keyword">const</span> <a class="code" href="classop_1_1_array.html">Array&lt;float&gt;</a>&amp; poseKeypoints,</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;                                               <span class="keyword">const</span> <span class="keywordtype">float</span> scaleNetToOutput = -1.f);</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;        <span class="keyword">const</span> std::shared_ptr&lt;PoseExtractor&gt; spPoseExtractor;</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;        <span class="comment">// Init with thread</span></div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;        <span class="keywordtype">float</span>* pGpuPose; <span class="comment">// GPU aux memory</span></div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;        <a class="code" href="macros_8hpp.html#abef96b5dd35dd9d44ad27ddf0e2f5f2e">DELETE_COPY</a>(<a class="code" href="classop_1_1_pose_gpu_renderer.html">PoseGpuRenderer</a>);</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    };</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;}</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="preprocessor">#endif // OPENPOSE_POSE_POSE_GPU_RENDERER_HPP</span></div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;                                               <span class="keyword">const</span> <span class="keywordtype">float</span> scaleInputToOutput,</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;                                               <span class="keyword">const</span> <span class="keywordtype">float</span> scaleNetToOutput = -1.f);</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;        <span class="keyword">const</span> std::shared_ptr&lt;PoseExtractor&gt; spPoseExtractor;</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;        <span class="comment">// Init with thread</span></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;        <span class="keywordtype">float</span>* pGpuPose; <span class="comment">// GPU aux memory</span></div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;        <a class="code" href="macros_8hpp.html#abef96b5dd35dd9d44ad27ddf0e2f5f2e">DELETE_COPY</a>(<a class="code" href="classop_1_1_pose_gpu_renderer.html">PoseGpuRenderer</a>);</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    };</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;}</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="preprocessor">#endif // OPENPOSE_POSE_POSE_GPU_RENDERER_HPP</span></div>
 <div class="ttc" id="macros_8hpp_html_abef96b5dd35dd9d44ad27ddf0e2f5f2e"><div class="ttname"><a href="macros_8hpp.html#abef96b5dd35dd9d44ad27ddf0e2f5f2e">DELETE_COPY</a></div><div class="ttdeci">#define DELETE_COPY(className)</div><div class="ttdef"><b>Definition:</b> macros.hpp:25</div></div>
 <div class="ttc" id="pose_2enum_classes_8hpp_html"><div class="ttname"><a href="pose_2enum_classes_8hpp.html">enumClasses.hpp</a></div></div>
 <div class="ttc" id="pose_parameters_8hpp_html"><div class="ttname"><a href="pose_parameters_8hpp.html">poseParameters.hpp</a></div></div>

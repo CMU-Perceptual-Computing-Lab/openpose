@@ -166,26 +166,28 @@ $(document).ready(function(){initNavTree('w_pose_renderer_8hpp_source.html','');
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;                <span class="keyword">const</span> <span class="keyword">auto</span> profilerKey = <a class="code" href="classop_1_1_profiler.html#aea2c89bcd0a661a53f47e59b9bec2be7">Profiler::timerInit</a>(__LINE__, __FUNCTION__, __FILE__);</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;                <span class="comment">// Render people pose</span></div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;                <span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; tDatum : *tDatums)</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;                    tDatum.elementRendered = spPoseRenderer-&gt;renderPose(tDatum.outputData, tDatum.poseKeypoints, (<span class="keywordtype">float</span>)tDatum.scaleNetToOutput);</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;                <span class="comment">// Profiling speed</span></div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;                <a class="code" href="classop_1_1_profiler.html#affff5b0b992e05276b2a699f97ad525d">Profiler::timerEnd</a>(profilerKey);</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;                <a class="code" href="classop_1_1_profiler.html#a58b930a54a98bbc91af074395852da76">Profiler::printAveragedTimeMsOnIterationX</a>(profilerKey, __LINE__, __FUNCTION__, __FILE__);</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;                <span class="comment">// Debugging log</span></div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;                <a class="code" href="namespaceop.html#a4eb991aa18818196d35c66455a437a32">dLog</a>(<span class="stringliteral">&quot;&quot;</span>, <a class="code" href="namespaceop.html#adc43fb9031418e7f8112816a3b535d14a28d0edd045e05cf5af64e35ae0c4c6ef">Priority::Low</a>, __LINE__, __FUNCTION__, __FILE__);</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;            }</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;        }</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        <span class="keywordflow">catch</span> (<span class="keyword">const</span> std::exception&amp; e)</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        {</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;            this-&gt;stop();</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;            tDatums = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;            <a class="code" href="namespaceop.html#a5f092bd36c716a894cb035e1ead2aca3">error</a>(e.what(), __LINE__, __FUNCTION__, __FILE__);</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;        }</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    }</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <a class="code" href="namespaceop.html#a9076fc1719030c2a74f21682999d2315">COMPILE_TEMPLATE_DATUM</a>(<a class="code" href="classop_1_1_w_pose_renderer.html">WPoseRenderer</a>);</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;}</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="preprocessor">#endif // OPENPOSE_POSE_W_POSE_RENDERER_HPP</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;                    tDatum.elementRendered = spPoseRenderer-&gt;renderPose(tDatum.outputData, tDatum.poseKeypoints,</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;                                                                        (<span class="keywordtype">float</span>)tDatum.scaleInputToOutput,</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;                                                                        (<span class="keywordtype">float</span>)tDatum.scaleNetToOutput);</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;                <span class="comment">// Profiling speed</span></div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;                <a class="code" href="classop_1_1_profiler.html#affff5b0b992e05276b2a699f97ad525d">Profiler::timerEnd</a>(profilerKey);</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;                <a class="code" href="classop_1_1_profiler.html#a58b930a54a98bbc91af074395852da76">Profiler::printAveragedTimeMsOnIterationX</a>(profilerKey, __LINE__, __FUNCTION__, __FILE__);</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;                <span class="comment">// Debugging log</span></div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;                <a class="code" href="namespaceop.html#a4eb991aa18818196d35c66455a437a32">dLog</a>(<span class="stringliteral">&quot;&quot;</span>, <a class="code" href="namespaceop.html#adc43fb9031418e7f8112816a3b535d14a28d0edd045e05cf5af64e35ae0c4c6ef">Priority::Low</a>, __LINE__, __FUNCTION__, __FILE__);</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;            }</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        }</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        <span class="keywordflow">catch</span> (<span class="keyword">const</span> std::exception&amp; e)</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;        {</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;            this-&gt;stop();</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;            tDatums = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;            <a class="code" href="namespaceop.html#a5f092bd36c716a894cb035e1ead2aca3">error</a>(e.what(), __LINE__, __FUNCTION__, __FILE__);</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;        }</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    }</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    <a class="code" href="namespaceop.html#a9076fc1719030c2a74f21682999d2315">COMPILE_TEMPLATE_DATUM</a>(<a class="code" href="classop_1_1_w_pose_renderer.html">WPoseRenderer</a>);</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;}</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="preprocessor">#endif // OPENPOSE_POSE_W_POSE_RENDERER_HPP</span></div>
 <div class="ttc" id="namespaceop_html_adc43fb9031418e7f8112816a3b535d14a28d0edd045e05cf5af64e35ae0c4c6ef"><div class="ttname"><a href="namespaceop.html#adc43fb9031418e7f8112816a3b535d14a28d0edd045e05cf5af64e35ae0c4c6ef">op::Priority::Low</a></div></div>
 <div class="ttc" id="classop_1_1_worker_html"><div class="ttname"><a href="classop_1_1_worker.html">op::Worker</a></div><div class="ttdef"><b>Definition:</b> worker.hpp:9</div></div>
 <div class="ttc" id="classop_1_1_w_pose_renderer_html_aba989a73cef9a807879ad2196725c61c"><div class="ttname"><a href="classop_1_1_w_pose_renderer.html#aba989a73cef9a807879ad2196725c61c">op::WPoseRenderer::initializationOnThread</a></div><div class="ttdeci">void initializationOnThread()</div><div class="ttdef"><b>Definition:</b> wPoseRenderer.hpp:42</div></div>

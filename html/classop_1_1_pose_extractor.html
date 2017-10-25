@@ -121,8 +121,8 @@ $(document).ready(function(){initNavTree('classop_1_1_pose_extractor.html','');}
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a456f8162e683b24189afb2d250085142"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_extractor.html#a456f8162e683b24189afb2d250085142">PoseExtractor</a> (const <a class="el" href="structop_1_1_point.html">Point</a>&lt; int &gt; &amp;netOutputSize, const <a class="el" href="structop_1_1_point.html">Point</a>&lt; int &gt; &amp;outputSize, const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel, const std::vector&lt; <a class="el" href="namespaceop.html#a1c3dbc214e7552f7ef9cc753ee97226b">HeatMapType</a> &gt; &amp;heatMapTypes={}, const <a class="el" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bda">ScaleMode</a> heatMapScale=<a class="el" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bdaa4b942544cb3e764bbb8d33f8a8744855">ScaleMode::ZeroToOne</a>)</td></tr>
-<tr class="separator:a456f8162e683b24189afb2d250085142"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3b88d13440d182925701386549b7a61f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_extractor.html#a3b88d13440d182925701386549b7a61f">PoseExtractor</a> (const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel, const std::vector&lt; <a class="el" href="namespaceop.html#a1c3dbc214e7552f7ef9cc753ee97226b">HeatMapType</a> &gt; &amp;heatMapTypes={}, const <a class="el" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bda">ScaleMode</a> heatMapScale=<a class="el" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bdaa4b942544cb3e764bbb8d33f8a8744855">ScaleMode::ZeroToOne</a>)</td></tr>
+<tr class="separator:a3b88d13440d182925701386549b7a61f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9f98eef4ac08cacefe74e002ac086582"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_extractor.html#a9f98eef4ac08cacefe74e002ac086582">~PoseExtractor</a> ()</td></tr>
 <tr class="separator:a9f98eef4ac08cacefe74e002ac086582"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aab1cccc9ad99f6b007abaa14600ea6df"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_extractor.html#aab1cccc9ad99f6b007abaa14600ea6df">initializationOnThread</a> ()</td></tr>
@@ -141,6 +141,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a50f1a79f774b3cd9e9c0825669e8a154"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a63432a905e6fcd9be8d9464a80a7fd52"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_extractor.html#a63432a905e6fcd9be8d9464a80a7fd52">getPoseKeypoints</a> () const </td></tr>
 <tr class="separator:a63432a905e6fcd9be8d9464a80a7fd52"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a99e7a656f0bace55402a187e9326ded1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_extractor.html#a99e7a656f0bace55402a187e9326ded1">getPoseScores</a> () const </td></tr>
+<tr class="separator:a99e7a656f0bace55402a187e9326ded1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5fd73c053c293c59eb3d6eb38335c157"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_extractor.html#a5fd73c053c293c59eb3d6eb38335c157">getScaleNetToOutput</a> () const </td></tr>
 <tr class="separator:a5fd73c053c293c59eb3d6eb38335c157"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7dc82be227cc759582184de9c26f0b64"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_extractor.html#a7dc82be227cc759582184de9c26f0b64">get</a> (const <a class="el" href="namespaceop.html#a37c58b781e5bcd9fee67a7768afc5d0e">PoseProperty</a> property) const </td></tr>
@@ -161,35 +163,23 @@ Protected Member Functions</h2></td></tr>
 Protected Attributes</h2></td></tr>
 <tr class="memitem:a57ba3e70a7ac01a687337c66ca36c8da"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_extractor.html#a57ba3e70a7ac01a687337c66ca36c8da">mPoseModel</a></td></tr>
 <tr class="separator:a57ba3e70a7ac01a687337c66ca36c8da"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaf9330b199770a16f44015724dfd24dc"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structop_1_1_point.html">Point</a>&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_extractor.html#aaf9330b199770a16f44015724dfd24dc">mNetOutputSize</a></td></tr>
-<tr class="separator:aaf9330b199770a16f44015724dfd24dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae8ca02dd3a8fa4448dfb22d4b71a84d5"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structop_1_1_point.html">Point</a>&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_extractor.html#ae8ca02dd3a8fa4448dfb22d4b71a84d5">mOutputSize</a></td></tr>
-<tr class="separator:ae8ca02dd3a8fa4448dfb22d4b71a84d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7507183ad2d2fe5eaff3d351443d97e0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structop_1_1_point.html">Point</a>&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_extractor.html#a7507183ad2d2fe5eaff3d351443d97e0">mNetOutputSize</a></td></tr>
+<tr class="separator:a7507183ad2d2fe5eaff3d351443d97e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac432c3f9265f6dbeb1dfff5621df25de"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_extractor.html#ac432c3f9265f6dbeb1dfff5621df25de">mPoseKeypoints</a></td></tr>
 <tr class="separator:ac432c3f9265f6dbeb1dfff5621df25de"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a034f1fe33fe83967d8c7c4901ce3b4b4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_extractor.html#a034f1fe33fe83967d8c7c4901ce3b4b4">mPoseScores</a></td></tr>
+<tr class="separator:a034f1fe33fe83967d8c7c4901ce3b4b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab32d08e00cf4321682ba9acc2b78a289"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_extractor.html#ab32d08e00cf4321682ba9acc2b78a289">mScaleNetToOutput</a></td></tr>
 <tr class="separator:ab32d08e00cf4321682ba9acc2b78a289"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a456f8162e683b24189afb2d250085142"></a>
+<a class="anchor" id="a3b88d13440d182925701386549b7a61f"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">op::PoseExtractor::PoseExtractor </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="structop_1_1_point.html">Point</a>&lt; int &gt; &amp;&#160;</td>
-          <td class="paramname"><em>netOutputSize</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="structop_1_1_point.html">Point</a>&lt; int &gt; &amp;&#160;</td>
-          <td class="paramname"><em>outputSize</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
           <td class="paramtype">const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a>&#160;</td>
           <td class="paramname"><em>poseModel</em>, </td>
         </tr>
@@ -300,7 +290,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Implemented in <a class="el" href="classop_1_1_pose_extractor_caffe.html#af48e859d9da1410335e0cf931f38f776">op::PoseExtractorCaffe</a>.</p>
+<p>Implemented in <a class="el" href="classop_1_1_pose_extractor_caffe.html#ae785f2602872740050de18a99e6a41cb">op::PoseExtractorCaffe</a>.</p>
 
 </div>
 </div>
@@ -450,6 +440,21 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a99e7a656f0bace55402a187e9326ded1"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classop_1_1_array.html">Array</a>&lt;float&gt; op::PoseExtractor::getPoseScores </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a class="anchor" id="a5fd73c053c293c59eb3d6eb38335c157"></a>
 <div class="memitem">
 <div class="memproto">
@@ -558,7 +563,7 @@ Protected Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
-<a class="anchor" id="aaf9330b199770a16f44015724dfd24dc"></a>
+<a class="anchor" id="a7507183ad2d2fe5eaff3d351443d97e0"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -566,27 +571,7 @@ Protected Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="structop_1_1_point.html">Point</a>&lt;int&gt; op::PoseExtractor::mNetOutputSize</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ae8ca02dd3a8fa4448dfb22d4b71a84d5"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="el" href="structop_1_1_point.html">Point</a>&lt;int&gt; op::PoseExtractor::mOutputSize</td>
+          <td class="memname"><a class="el" href="structop_1_1_point.html">Point</a>&lt;int&gt; op::PoseExtractor::mNetOutputSize</td>
         </tr>
       </table>
   </td>
@@ -627,6 +612,26 @@ Protected Attributes</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> op::PoseExtractor::mPoseModel</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a034f1fe33fe83967d8c7c4901ce3b4b4"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classop_1_1_array.html">Array</a>&lt;float&gt; op::PoseExtractor::mPoseScores</td>
         </tr>
       </table>
   </td>

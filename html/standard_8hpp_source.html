@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>OpenPose: /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/keypointScaler.hpp Source File</title>
+<title>OpenPose: /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/utilities/standard.hpp Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -85,7 +85,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   </div>
 </div>
 <script type="text/javascript">
-$(document).ready(function(){initNavTree('keypoint_scaler_8hpp_source.html','');});
+$(document).ready(function(){initNavTree('standard_8hpp_source.html','');});
 </script>
 <div id="doc-content">
 <!-- window showing the filter options -->
@@ -104,47 +104,49 @@ $(document).ready(function(){initNavTree('keypoint_scaler_8hpp_source.html','');
 
 <div class="header">
   <div class="headertitle">
-<div class="title">keypointScaler.hpp</div>  </div>
+<div class="title">standard.hpp</div>  </div>
 </div><!--header-->
 <div class="contents">
-<a href="keypoint_scaler_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#ifndef OPENPOSE_CORE_KEYPOINT_SCALER_HPP</span></div>
-<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define OPENPOSE_CORE_KEYPOINT_SCALER_HPP</span></div>
+<a href="standard_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#ifndef OPENPOSE_UTILITIES_STANDARD_HPP</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define OPENPOSE_UTILITIES_STANDARD_HPP</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor"></span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="common_8hpp.html">openpose/core/common.hpp</a>&gt;</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="core_2enum_classes_8hpp.html">openpose/core/enumClasses.hpp</a>&gt;</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;</div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="keyword">namespace </span>op</div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;{</div>
-<div class="line"><a name="l00009"></a><span class="lineno"><a class="line" href="classop_1_1_keypoint_scaler.html">    9</a></span>&#160;    <span class="keyword">class </span><a class="code" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> <a class="code" href="classop_1_1_keypoint_scaler.html">KeypointScaler</a></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;</div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="keyword">namespace </span>op</div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;{</div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
+<div class="line"><a name="l00009"></a><span class="lineno"><a class="line" href="namespaceop.html#af63e418966741f7efebacc9519174a0a">    9</a></span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="namespaceop.html#af63e418966741f7efebacc9519174a0a">vectorsAreEqual</a>(<span class="keyword">const</span> std::vector&lt;T&gt;&amp; vectorA, <span class="keyword">const</span> std::vector&lt;T&gt;&amp; vectorB)</div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;    {</div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;        <span class="keyword">explicit</span> <a class="code" href="classop_1_1_keypoint_scaler.html">KeypointScaler</a>(<span class="keyword">const</span> <a class="code" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bda">ScaleMode</a> scaleMode);</div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;        <span class="keywordtype">void</span> scale(<a class="code" href="classop_1_1_array.html">Array&lt;float&gt;</a>&amp; arrayToScale, <span class="keyword">const</span> <span class="keywordtype">double</span> scaleInputToOutput, <span class="keyword">const</span> <span class="keywordtype">double</span> scaleNetToOutput,</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;                   <span class="keyword">const</span> <a class="code" href="structop_1_1_point.html">Point&lt;int&gt;</a>&amp; producerSize) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;        <span class="keywordtype">void</span> scale(std::vector&lt;<a class="code" href="classop_1_1_array.html">Array&lt;float&gt;</a>&gt;&amp; arraysToScale, <span class="keyword">const</span> <span class="keywordtype">double</span> scaleInputToOutput,</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;                   <span class="keyword">const</span> <span class="keywordtype">double</span> scaleNetToOutput, <span class="keyword">const</span> <a class="code" href="structop_1_1_point.html">Point&lt;int&gt;</a>&amp; producerSize) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;        <span class="keyword">const</span> <a class="code" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bda">ScaleMode</a> mScaleMode;</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    };</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;}</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#endif // OPENPOSE_CORE_KEYPOINT_SCALER_HPP</span></div>
-<div class="ttc" id="classop_1_1_keypoint_scaler_html"><div class="ttname"><a href="classop_1_1_keypoint_scaler.html">op::KeypointScaler</a></div><div class="ttdef"><b>Definition:</b> keypointScaler.hpp:9</div></div>
-<div class="ttc" id="structop_1_1_point_html"><div class="ttname"><a href="structop_1_1_point.html">op::Point&lt; int &gt;</a></div></div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;        <span class="keywordflow">try</span></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;        {</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;            <span class="keywordflow">if</span> (vectorA.size() != vectorB.size())</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;                <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;            <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;            {</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;                <span class="keywordflow">for</span> (<span class="keyword">auto</span> i = 0u ; i &lt; vectorA.size() ; i++)</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;                    <span class="keywordflow">if</span> (vectorA[i] != vectorB[i])</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;                        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;                <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;            }</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;        }</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;        <span class="keywordflow">catch</span> (<span class="keyword">const</span> std::exception&amp; e)</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;        {</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;            <a class="code" href="namespaceop.html#a5f092bd36c716a894cb035e1ead2aca3">error</a>(e.what(), __LINE__, __FUNCTION__, __FILE__);</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;        }</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    }</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;}</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor">#endif // OPENPOSE_UTILITIES_STANDARD_HPP</span></div>
 <div class="ttc" id="common_8hpp_html"><div class="ttname"><a href="common_8hpp.html">common.hpp</a></div></div>
-<div class="ttc" id="namespaceop_html_af72fe4ed32846c12f41b049d3d0e1bda"><div class="ttname"><a href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bda">op::ScaleMode</a></div><div class="ttdeci">ScaleMode</div><div class="ttdef"><b>Definition:</b> enumClasses.hpp:6</div></div>
-<div class="ttc" id="classop_1_1_array_html"><div class="ttname"><a href="classop_1_1_array.html">op::Array&lt; float &gt;</a></div></div>
-<div class="ttc" id="macros_8hpp_html_a4ba443bb7a0e5dbe8054a9ac37a5e000"><div class="ttname"><a href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a></div><div class="ttdeci">#define OP_API</div><div class="ttdef"><b>Definition:</b> macros.hpp:5</div></div>
-<div class="ttc" id="core_2enum_classes_8hpp_html"><div class="ttname"><a href="core_2enum_classes_8hpp.html">enumClasses.hpp</a></div></div>
+<div class="ttc" id="namespaceop_html_a5f092bd36c716a894cb035e1ead2aca3"><div class="ttname"><a href="namespaceop.html#a5f092bd36c716a894cb035e1ead2aca3">op::error</a></div><div class="ttdeci">OP_API void error(const std::string &amp;message, const int line=-1, const std::string &amp;function=&quot;&quot;, const std::string &amp;file=&quot;&quot;)</div></div>
+<div class="ttc" id="namespaceop_html_af63e418966741f7efebacc9519174a0a"><div class="ttname"><a href="namespaceop.html#af63e418966741f7efebacc9519174a0a">op::vectorsAreEqual</a></div><div class="ttdeci">bool vectorsAreEqual(const std::vector&lt; T &gt; &amp;vectorA, const std::vector&lt; T &gt; &amp;vectorB)</div><div class="ttdef"><b>Definition:</b> standard.hpp:9</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_7f012205977c6890af7afa3b7477c2d1.html">include</a></li><li class="navelem"><a class="el" href="dir_18695feb986752a25b816536eab00e96.html">openpose</a></li><li class="navelem"><a class="el" href="dir_d6e567c8390b6a30c30307f931e28950.html">core</a></li><li class="navelem"><a class="el" href="keypoint_scaler_8hpp.html">keypointScaler.hpp</a></li>
+    <li class="navelem"><a class="el" href="dir_7f012205977c6890af7afa3b7477c2d1.html">include</a></li><li class="navelem"><a class="el" href="dir_18695feb986752a25b816536eab00e96.html">openpose</a></li><li class="navelem"><a class="el" href="dir_5e264839c35dab04bf5009e4b1c2721d.html">utilities</a></li><li class="navelem"><a class="el" href="standard_8hpp.html">standard.hpp</a></li>
     <li class="footer">Generated by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>

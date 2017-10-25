@@ -1,8 +1,5 @@
 var NAVTREEINDEX3 =
 {
-"file_stream_8hpp.html#a80f8d102523be3fd8a884d14e38cbce9":[2,0,0,0,3,3,6],
-"file_stream_8hpp.html#a9aa59e0cf663360a10f372d7680ad39c":[2,0,0,0,3,3,5],
-"file_stream_8hpp.html#ad8705cea162a5874afc33fdec9a37d9f":[2,0,0,0,3,3,3],
 "file_stream_8hpp.html#adbf40f4d71086d4e072e8dba79e8a41a":[2,0,0,0,3,3,8],
 "file_stream_8hpp_source.html":[2,0,0,0,3,3],
 "file_system_8hpp.html":[2,0,0,0,9,5],
@@ -191,8 +188,8 @@ var NAVTREEINDEX3 =
 "maximum_caffe_8hpp_source.html":[2,0,0,0,0,11],
 "namespaceboost.html":[0,0,0],
 "namespaceboost.html":[1,0,0],
-"namespacecaffe.html":[0,0,1],
 "namespacecaffe.html":[1,0,1],
+"namespacecaffe.html":[0,0,1],
 "namespacemembers.html":[0,1,0,0],
 "namespacemembers.html":[0,1,0],
 "namespacemembers_b.html":[0,1,0,1],
@@ -249,5 +246,8 @@ var NAVTREEINDEX3 =
 "point_8hpp.html":[2,0,0,0,0,17],
 "point_8hpp_source.html":[2,0,0,0,0,17],
 "pointer_container_8hpp.html":[2,0,0,0,9,10],
-"pointer_container_8hpp.html#a02164ca0af9e838190f584f5d1d8465e":[2,0,0,0,9,10,2]
+"pointer_container_8hpp.html#a02164ca0af9e838190f584f5d1d8465e":[2,0,0,0,9,10,2],
+"pointer_container_8hpp_source.html":[2,0,0,0,9,10],
+"pose_2enum_classes_8hpp.html":[2,0,0,0,6,2],
+"pose_2enum_classes_8hpp.html#a37c58b781e5bcd9fee67a7768afc5d0e":[2,0,0,0,6,2,1]
 };

@@ -1,7 +1,7 @@
 var searchData=
 [
   ['recenter',['recenter',['../structop_1_1_rectangle.html#a1c9a572db2c17fb02a7d19e965c1d3dc',1,'op::Rectangle::recenter()'],['../namespaceop.html#a7cd131c9ddd8f3987508e89e0881b9e0',1,'op::recenter()']]],
-  ['record',['record',['../classop_1_1_coco_json_saver.html#a4f80aa56ab346e743e80aef8da4d78c6',1,'op::CocoJsonSaver']]],
+  ['record',['record',['../classop_1_1_coco_json_saver.html#a3a7fd417aa5d85044fb0703379af1a23',1,'op::CocoJsonSaver']]],
   ['rectangle',['Rectangle',['../structop_1_1_rectangle.html#a0112ddaa9782f3ccbb76a319b05f030b',1,'op::Rectangle::Rectangle(const T x=0, const T y=0, const T width=0, const T height=0)'],['../structop_1_1_rectangle.html#afbb0da8956e35178d3f28d2b1d998175',1,'op::Rectangle::Rectangle(const Rectangle&lt; T &gt; &amp;rectangle)'],['../structop_1_1_rectangle.html#a5a9a60fdfd9c88ab8ded6275d64333ea',1,'op::Rectangle::Rectangle(Rectangle&lt; T &gt; &amp;&amp;rectangle)']]],
   ['release',['release',['../classop_1_1_image_directory_reader.html#af74e192f8cba5c10f8e252674a85185a',1,'op::ImageDirectoryReader::release()'],['../classop_1_1_producer.html#a7753ffb0daa486ab0f82873b3567f95e',1,'op::Producer::release()'],['../classop_1_1_video_capture_reader.html#a2f73e10efe7f9b24a6cb75af2167de58',1,'op::VideoCaptureReader::release()']]],
   ['renderer',['Renderer',['../classop_1_1_renderer.html#a00caf604fad781dfcf3bc311ef6a6623',1,'op::Renderer']]],
@@ -12,7 +12,7 @@ var searchData=
   ['renderhandkeypointscpu',['renderHandKeypointsCpu',['../namespaceop.html#afb5b711819f94b51f32460861d9cea38',1,'op']]],
   ['renderhandkeypointsgpu',['renderHandKeypointsGpu',['../namespaceop.html#a74458454b8bec064b435a3bde5ad25e0',1,'op']]],
   ['renderkeypointscpu',['renderKeypointsCpu',['../namespaceop.html#a0dd0211bd87bb13345294af1390555b7',1,'op']]],
-  ['renderpose',['renderPose',['../classop_1_1_pose_cpu_renderer.html#a578b42ae011b6aa8703019562dfab60f',1,'op::PoseCpuRenderer::renderPose()'],['../classop_1_1_pose_gpu_renderer.html#ad6db098189826e1341d5ca006b5f2c63',1,'op::PoseGpuRenderer::renderPose()'],['../classop_1_1_pose_renderer.html#aac8809fbff88eec8aeff6e35a1cac670',1,'op::PoseRenderer::renderPose()']]],
+  ['renderpose',['renderPose',['../classop_1_1_pose_cpu_renderer.html#a98541b982847713472411402314efd96',1,'op::PoseCpuRenderer::renderPose()'],['../classop_1_1_pose_gpu_renderer.html#a4705b3c47cd9ac8174e357999960a28f',1,'op::PoseGpuRenderer::renderPose()'],['../classop_1_1_pose_renderer.html#ad1e96ceb47bf205b56b50c6b2792f9e3',1,'op::PoseRenderer::renderPose()']]],
   ['renderposeheatmapgpu',['renderPoseHeatMapGpu',['../namespaceop.html#a9a3b197334a6a606f85eea43128a9a46',1,'op']]],
   ['renderposeheatmapsgpu',['renderPoseHeatMapsGpu',['../namespaceop.html#aa01e90a66388f8ced55d0aa61fb205a1',1,'op']]],
   ['renderposekeypointscpu',['renderPoseKeypointsCpu',['../namespaceop.html#a99a08148f440bd96546076e15f0de04c',1,'op']]],
@@ -20,7 +20,7 @@ var searchData=
   ['renderposepafgpu',['renderPosePAFGpu',['../namespaceop.html#a832678e25561cd77d174847b0dddc6bb',1,'op']]],
   ['renderposepafsgpu',['renderPosePAFsGpu',['../namespaceop.html#a7e2c7f463bbbbe9665faa46c073cc5ac',1,'op']]],
   ['reset',['reset',['../classop_1_1_array.html#a12e538b09e98bf0900163031602ed2ed',1,'op::Array::reset(const int size)'],['../classop_1_1_array.html#a0ad0232daa69783cf2c8f7a0ff5b3b0c',1,'op::Array::reset(const std::vector&lt; int &gt; &amp;sizes={})'],['../classop_1_1_array.html#ac7183eb2f4e78a6941da3a2079b9ed32',1,'op::Array::reset(const int size, const T value)'],['../classop_1_1_array.html#add2eeccd967cdf0900449649cb6f5afb',1,'op::Array::reset(const std::vector&lt; int &gt; &amp;sizes, const T value)'],['../classop_1_1_thread_manager.html#a5b7c5ea46c360496e261094c5e1397a7',1,'op::ThreadManager::reset()']]],
-  ['reshape',['Reshape',['../classop_1_1_maximum_caffe.html#aa9ab7eab51c9539b141a0aac998b2223',1,'op::MaximumCaffe::Reshape()'],['../classop_1_1_nms_caffe.html#a9eae1bc23e983dbe6f1a513f82e6d97d',1,'op::NmsCaffe::Reshape()'],['../classop_1_1_resize_and_merge_caffe.html#a5a2af6845b9a44730a4834f95e842489',1,'op::ResizeAndMergeCaffe::Reshape()'],['../classop_1_1_body_part_connector_caffe.html#a988042172b192eb80b3479c5f68484f4',1,'op::BodyPartConnectorCaffe::Reshape()']]],
+  ['reshape',['Reshape',['../classop_1_1_maximum_caffe.html#aa9ab7eab51c9539b141a0aac998b2223',1,'op::MaximumCaffe::Reshape()'],['../classop_1_1_nms_caffe.html#a9eae1bc23e983dbe6f1a513f82e6d97d',1,'op::NmsCaffe::Reshape()'],['../classop_1_1_resize_and_merge_caffe.html#a4aa422b6121c51cbf14acf6f19119927',1,'op::ResizeAndMergeCaffe::Reshape()'],['../classop_1_1_body_part_connector_caffe.html#a988042172b192eb80b3479c5f68484f4',1,'op::BodyPartConnectorCaffe::Reshape()']]],
   ['resizeandmergecaffe',['ResizeAndMergeCaffe',['../classop_1_1_resize_and_merge_caffe.html#a30805a265fa887eff04b1200dbda91a5',1,'op::ResizeAndMergeCaffe']]],
   ['resizeandmergecpu',['resizeAndMergeCpu',['../namespaceop.html#a1903becf836ae4d14f61cd18c12db262',1,'op']]],
   ['resizeandmergegpu',['resizeAndMergeGpu',['../namespaceop.html#a324c1217e863f4cd24edb0c3fcbbc4a8',1,'op']]],

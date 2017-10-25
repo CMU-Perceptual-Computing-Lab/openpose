@@ -30,7 +30,7 @@ var searchData=
   ['pose_5fcolors',['POSE_COLORS',['../namespaceop.html#aefbe109a859cc12a9a06f607e61d8dba',1,'op']]],
   ['pose_5fdefault_5falpha_5fheat_5fmap',['POSE_DEFAULT_ALPHA_HEAT_MAP',['../namespaceop.html#af45cddacd69fff73a4ea4acbbbac43e0',1,'op']]],
   ['pose_5fdefault_5falpha_5fkeypoint',['POSE_DEFAULT_ALPHA_KEYPOINT',['../namespaceop.html#a21fcb98366f6ea8895fc7f527f232db5',1,'op']]],
-  ['pose_5fdefault_5fconnect_5finter_5fmin_5fabove_5fthreshold',['POSE_DEFAULT_CONNECT_INTER_MIN_ABOVE_THRESHOLD',['../namespaceop.html#a8861b57b97b5e07f73f87635ea08318b',1,'op']]],
+  ['pose_5fdefault_5fconnect_5finter_5fmin_5fabove_5fthreshold',['POSE_DEFAULT_CONNECT_INTER_MIN_ABOVE_THRESHOLD',['../namespaceop.html#a029c14582c63e33a9b7350bb374527c8',1,'op']]],
   ['pose_5fdefault_5fconnect_5finter_5fthreshold',['POSE_DEFAULT_CONNECT_INTER_THRESHOLD',['../namespaceop.html#a02de45e0a3df20b593d9b1b79a96f20c',1,'op']]],
   ['pose_5fdefault_5fconnect_5fmin_5fsubset_5fcnt',['POSE_DEFAULT_CONNECT_MIN_SUBSET_CNT',['../namespaceop.html#a8b6edeb3f39ac581317c10e48e6729ad',1,'op']]],
   ['pose_5fdefault_5fconnect_5fmin_5fsubset_5fscore',['POSE_DEFAULT_CONNECT_MIN_SUBSET_SCORE',['../namespaceop.html#a600643a9a3f46d6a4cab58943e059d57',1,'op']]],
@@ -49,5 +49,6 @@ var searchData=
   ['poseheatmaps',['poseHeatMaps',['../structop_1_1_datum.html#a5429e97e0ab9b0e2209a3947af668381',1,'op::Datum']]],
   ['posekeypoints',['poseKeypoints',['../structop_1_1_datum.html#a6d629b1f6f7b958fe4cf2ef4cdf57c5b',1,'op::Datum']]],
   ['posemodel',['poseModel',['../structop_1_1_wrapper_struct_pose.html#a35147b6fb9e300d79b71637793053a1b',1,'op::WrapperStructPose']]],
+  ['posescores',['poseScores',['../structop_1_1_datum.html#afb117821de7aff9ac3c219ef3bbc0c14',1,'op::Datum']]],
   ['producersharedptr',['producerSharedPtr',['../structop_1_1_wrapper_struct_input.html#adb77e57fd11db9950d9754a2c8c8eaa5',1,'op::WrapperStructInput']]]
 ];

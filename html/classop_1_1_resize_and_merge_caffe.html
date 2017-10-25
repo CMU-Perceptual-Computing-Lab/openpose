@@ -121,8 +121,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a30805a265fa887eff04b1200dbda91a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acc1469eec1be9dc96b078d05d5e29b9a"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_resize_and_merge_caffe.html#acc1469eec1be9dc96b078d05d5e29b9a">LayerSetUp</a> (const std::vector&lt; <a class="el" href="classcaffe_1_1_blob.html">caffe::Blob</a>&lt; T &gt; * &gt; &amp;bottom, const std::vector&lt; <a class="el" href="classcaffe_1_1_blob.html">caffe::Blob</a>&lt; T &gt; * &gt; &amp;top)</td></tr>
 <tr class="separator:acc1469eec1be9dc96b078d05d5e29b9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5a2af6845b9a44730a4834f95e842489"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_resize_and_merge_caffe.html#a5a2af6845b9a44730a4834f95e842489">Reshape</a> (const std::vector&lt; <a class="el" href="classcaffe_1_1_blob.html">caffe::Blob</a>&lt; T &gt; * &gt; &amp;bottom, const std::vector&lt; <a class="el" href="classcaffe_1_1_blob.html">caffe::Blob</a>&lt; T &gt; * &gt; &amp;top, const float factor, const bool mergeFirstDimension=true)</td></tr>
-<tr class="separator:a5a2af6845b9a44730a4834f95e842489"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4aa422b6121c51cbf14acf6f19119927"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_resize_and_merge_caffe.html#a4aa422b6121c51cbf14acf6f19119927">Reshape</a> (const std::vector&lt; <a class="el" href="classcaffe_1_1_blob.html">caffe::Blob</a>&lt; T &gt; * &gt; &amp;bottom, const std::vector&lt; <a class="el" href="classcaffe_1_1_blob.html">caffe::Blob</a>&lt; T &gt; * &gt; &amp;top, const float netFactor, const float scaleFactor, const bool mergeFirstDimension=true)</td></tr>
+<tr class="separator:a4aa422b6121c51cbf14acf6f19119927"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4327169d05916bd59b97f04847d215d9"><td class="memItemLeft" align="right" valign="top">virtual const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_resize_and_merge_caffe.html#a4327169d05916bd59b97f04847d215d9">type</a> () const </td></tr>
 <tr class="separator:a4327169d05916bd59b97f04847d215d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa16862bbc207fef227d53d37223512b8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_resize_and_merge_caffe.html#aa16862bbc207fef227d53d37223512b8">setScaleRatios</a> (const std::vector&lt; T &gt; &amp;scaleRatios)</td></tr>
@@ -355,7 +355,7 @@ template&lt;typename T &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a5a2af6845b9a44730a4834f95e842489"></a>
+<a class="anchor" id="a4aa422b6121c51cbf14acf6f19119927"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -380,7 +380,13 @@ template&lt;typename T &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const float&#160;</td>
-          <td class="paramname"><em>factor</em>, </td>
+          <td class="paramname"><em>netFactor</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const float&#160;</td>
+          <td class="paramname"><em>scaleFactor</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>

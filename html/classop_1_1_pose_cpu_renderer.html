@@ -121,8 +121,8 @@ $(document).ready(function(){initNavTree('classop_1_1_pose_cpu_renderer.html',''
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a8b5c83bbf076b949b1209261f25d170d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_cpu_renderer.html#a8b5c83bbf076b949b1209261f25d170d">PoseCpuRenderer</a> (const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel, const float renderThreshold, const bool blendOriginalFrame=true, const float alphaKeypoint=<a class="el" href="namespaceop.html#a21fcb98366f6ea8895fc7f527f232db5">POSE_DEFAULT_ALPHA_KEYPOINT</a>, const float alphaHeatMap=<a class="el" href="namespaceop.html#af45cddacd69fff73a4ea4acbbbac43e0">POSE_DEFAULT_ALPHA_HEAT_MAP</a>)</td></tr>
 <tr class="separator:a8b5c83bbf076b949b1209261f25d170d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a578b42ae011b6aa8703019562dfab60f"><td class="memItemLeft" align="right" valign="top">std::pair&lt; int, std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_cpu_renderer.html#a578b42ae011b6aa8703019562dfab60f">renderPose</a> (<a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt; &amp;outputData, const <a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt; &amp;poseKeypoints, const float scaleNetToOutput=-1.f)</td></tr>
-<tr class="separator:a578b42ae011b6aa8703019562dfab60f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a98541b982847713472411402314efd96"><td class="memItemLeft" align="right" valign="top">std::pair&lt; int, std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_cpu_renderer.html#a98541b982847713472411402314efd96">renderPose</a> (<a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt; &amp;outputData, const <a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt; &amp;poseKeypoints, const float scaleInputToOutput, const float scaleNetToOutput=-1.f)</td></tr>
+<tr class="separator:a98541b982847713472411402314efd96"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classop_1_1_renderer"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classop_1_1_renderer')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classop_1_1_renderer.html">op::Renderer</a></td></tr>
 <tr class="memitem:a00caf604fad781dfcf3bc311ef6a6623 inherit pub_methods_classop_1_1_renderer"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_renderer.html#a00caf604fad781dfcf3bc311ef6a6623">Renderer</a> (const float renderThreshold, const float alphaKeypoint, const float alphaHeatMap, const bool blendOriginalFrame=true, const unsigned int elementToRender=0u, const unsigned int numberElementsToRender=0u)</td></tr>
 <tr class="separator:a00caf604fad781dfcf3bc311ef6a6623 inherit pub_methods_classop_1_1_renderer"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -220,7 +220,7 @@ std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a578b42ae011b6aa8703019562dfab60f"></a>
+<a class="anchor" id="a98541b982847713472411402314efd96"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -243,6 +243,12 @@ std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const float&#160;</td>
+          <td class="paramname"><em>scaleInputToOutput</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const float&#160;</td>
           <td class="paramname"><em>scaleNetToOutput</em> = <code>-1.f</code>&#160;</td>
         </tr>
         <tr>
@@ -258,7 +264,7 @@ std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el
 </table>
 </div><div class="memdoc">
 
-<p>Implements <a class="el" href="classop_1_1_pose_renderer.html#aac8809fbff88eec8aeff6e35a1cac670">op::PoseRenderer</a>.</p>
+<p>Implements <a class="el" href="classop_1_1_pose_renderer.html#ad1e96ceb47bf205b56b50c6b2792f9e3">op::PoseRenderer</a>.</p>
 
 </div>
 </div>
