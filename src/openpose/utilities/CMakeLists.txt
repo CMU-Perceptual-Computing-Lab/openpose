@@ -16,7 +16,8 @@ set(SOURCES_OPENPOSE ${SOURCES_OPENPOSE} ${SOURCES_OP_UTILITIES_WITH_CP} PARENT_
 if (UNIX AND NOT APPLE)
   cuda_add_library(openpose_utilities ${SOURCES})
   target_link_libraries(openpose_utilities openpose_producer openpose_filestream
-      ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
+      debug ${Boost_FILESYSTEM_LIBRARY_DEBUG} debug ${Boost_SYSTEM_LIBRARY_DEBUG}
+      optimized ${Boost_FILESYSTEM_LIBRARY_OPTIMIZED} optimized ${Boost_SYSTEM_LIBRARY_OPTIMIZED})
 
   install(TARGETS openpose_utilities
       EXPORT OpenPose

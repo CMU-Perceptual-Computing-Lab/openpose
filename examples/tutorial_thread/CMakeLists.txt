@@ -19,7 +19,7 @@ foreach(EXAMPLE_FILE ${EXAMPLE_FILES})
   target_link_libraries( ${EXE_NAME} openpose ${GLOG_LIBRARY} ${GFLAGS_LIBRARY} ${Caffe_LIBS})
   
   if (WIN32)
-    set_property(TARGET ${EXE_NAME} PROPERTY FOLDER "Tutorial/Thread")
+    set_property(TARGET ${EXE_NAME} PROPERTY FOLDER "Examples/Tutorial/Thread")
     configure_file(${CMAKE_SOURCE_DIR}/cmake/OpenPose.vcxproj.user 
         ${CMAKE_CURRENT_BINARY_DIR}/${EXE_NAME}.vcxproj.user @ONLY) 
   endif (WIN32)
