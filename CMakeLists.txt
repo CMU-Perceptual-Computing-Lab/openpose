@@ -98,6 +98,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
 find_package(CUDA)
 set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-gencode arch=compute_61,code=sm_61)
 
+
 if (UNIX AND NOT APPLE)
   include(cmake/Cuda.cmake)
   # find_package(CUDA)
@@ -139,46 +140,35 @@ if (UNIX AND NOT APPLE)
       sudo apt-get install libopencv-dev")
   endif (NOT OpenCV_FOUND)
 
- endif (UNIX AND NOT APPLE)
+endif (UNIX AND NOT APPLE)
 
 if (WIN32)
   set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-  find_library(Boost_FILESYSTEM_LIBRARY_OPTIMIZED boost_filesystem-vc140-mt-1_61 HINTS ${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/lib)
-  find_library(Boost_SYSTEM_LIBRARY_OPTIMIZED boost_system-vc140-mt-1_61 HINTS ${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/lib)
-  find_library(Boost_FILESYSTEM_LIBRARY_DEBUG boost_filesystem-vc140-mt-gd-1_61 HINTS ${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/lib)
-  find_library(Boost_SYSTEM_LIBRARY_DEBUG boost_system-vc140-mt-gd-1_61 HINTS ${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/lib)
-  
-  message("\${Boost_FILESYSTEM_LIBRARY_OPTIMIZED} = ${Boost_FILESYSTEM_LIBRARY_OPTIMIZED}")
-  message("\${Boost_FILESYSTEM_LIBRARY_DEBUG} = ${Boost_FILESYSTEM_LIBRARY_DEBUG}")
-  message("\${Boost_SYSTEM_LIBRARY_OPTIMIZED} = ${Boost_SYSTEM_LIBRARY_OPTIMIZED}")
-  message("\${Boost_FILESYSTEM_LIBRARY_DEBUG} = ${Boost_FILESYSTEM_LIBRARY_DEBUG}")
-  message(status "${CMAKE_SOURCE_DIR}")
+  set(FIND_LIB_PREFIX ${CMAKE_SOURCE_DIR}/3rdparty/windows)
+  set(FIND_LIB_PREFIX ${CMAKE_SOURCE_DIR}/3rdparty/windows)
+  find_library(Boost_FILESYSTEM_LIBRARY_OPTIMIZED boost_filesystem-vc140-mt-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
+  find_library(Boost_SYSTEM_LIBRARY_OPTIMIZED boost_system-vc140-mt-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
+  find_library(Boost_FILESYSTEM_LIBRARY_DEBUG boost_filesystem-vc140-mt-gd-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
+  find_library(Boost_SYSTEM_LIBRARY_DEBUG boost_system-vc140-mt-gd-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
+  find_library (OpenCV_LIBS opencv_world310 HINTS ${FIND_LIB_PREFIX}/opencv/x64/vc14/lib)
+  find_library(GFLAGS_LIBRARY_RELEASE gflags HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
+  find_library(GFLAGS_LIBRARY_DEBUG gflagsd HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
+  find_library(GLOG_LIBRARY_RELEASE glog HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
+  find_library(GLOG_LIBRARY_DEBUG glogd HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
+  find_library(OpenCV_LIBS opencv_world310 HINTS ${FIND_LIB_PREFIX}/opencv/x64/vc14/lib)
+  find_library(Caffe_LIB caffe HINTS ${FIND_LIB_PREFIX}/caffe/lib)
+  find_library(Caffe_Proto_LIB caffeproto HINTS ${FIND_LIB_PREFIX}/caffe/lib)
+  set(Caffe_LIBS ${Caffe_LIB};${Caffe_Proto_LIB})
 
-  set(OpenCV_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/3rdparty/windows/opencv/include)
-  set(Caffe_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe/include;${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe/include2")
-  set(Boost_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/include/boost-1_61)
-  set(GFLAGS_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/include/gflags)
-  set(GLOG_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/include)
-  
-  # C:\Users\bikram\Documents\GitHub\openpose\build\src\openpose\Release
-  # PATH=%PATH%;;C:\Users\bikram\Documents\GitHub\openpose\3rdparty\windows\caffe\bin\;;C:\Users\bikram\Documents\GitHub\openpose\3rdparty\windows\opencv\x64\vc14\bin;C:\Users\bikram\Documents\GitHub\openpose\build\src\openpose\Release
-  set(CMAKE_MSVCIDE_RUN_PATH "C:/Users/bikram/Documents/GitHub/openpose/3rdparty/windows/caffe/bin/;;C:/Users/bikram/Documents/GitHub/openpose/3rdparty/windows/opencv/x64/vc14/bin;C:/Users/bikram/Documents/GitHub/openpose/build/src/openpose/Release")
-
-  link_directories(${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/lib)
-  # set(Boost_FILESYSTEM_LIBRARY "${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/lib/boost_filesystem-vc140-mt-1_61.lib;${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/lib/boost_filesystem-vc140-mt-gd-1_61.lib")
-  # set(Boost_SYSTEM_LIBRARY "${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/lib/boost_system-vc140-mt-1_61.lib;${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/lib/boost_system-vc140-mt-gd-1_61.lib")
-  set(OpenCV_LIBS ${CMAKE_SOURCE_DIR}/3rdparty/windows/opencv/x64/vc14/lib/opencv_world310.lib)
-  set(Caffe_LIBS "${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe/lib/caffe.lib;${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe/lib/caffeproto.lib")
-  set(GFLAGS_LIBRARY_RELEASE ${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/lib/gflags.lib)
-  set(GFLAGS_LIBRARY_DEBUG ${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/lib/gflagsd.lib)
-  set(GLOG_LIBRARY_RELEASE ${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/lib/glog.lib)
-  set(GLOG_LIBRARY_DEBUG ${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/lib/glogd.lib)
+  set(OpenCV_INCLUDE_DIRS ${FIND_LIB_PREFIX}/opencv/include)
+  set(Caffe_INCLUDE_DIRS "${FIND_LIB_PREFIX}/caffe/include;${FIND_LIB_PREFIX}/caffe/include2")
+  set(Boost_INCLUDE_DIRS ${FIND_LIB_PREFIX}/caffe3rdparty/include/boost-1_61)
+  set(WINDOWS_INCLUDE_DIRS ${FIND_LIB_PREFIX}/caffe3rdparty/include)
 
 endif (WIN32)
 
 # Set CUDA Flags
-
 set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -std=c++11")
 
 ### CAFFE
@@ -243,7 +233,8 @@ include_directories(
   ${GLOG_INCLUDE_DIR}
   ${Caffe_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
-  ${Boost_INCLUDE_DIRS})
+  ${Boost_INCLUDE_DIRS}
+  ${WINDOWS_INCLUDE_DIRS})
 
 ### ADD SUBDIRECTORIES
 
