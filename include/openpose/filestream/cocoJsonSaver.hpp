@@ -7,20 +7,23 @@
 namespace op
 {
     /**
-     *  The CocoJsonSaver class creates a COCO validation json file with details about the processed images. It inherits from Recorder.
+     *  The CocoJsonSaver class creates a COCO validation json file with details about the processed images. It
+     * inherits from Recorder.
      */
     class OP_API CocoJsonSaver
     {
     public:
         /**
-         * This constructor of CocoJsonSaver extends the Recorder::Recorder(const std::string & filePathToSave) constructor.
-         * @param filePathToSave const std::string parameter with the final file path where the generated json file will be saved.
+         * This constructor of CocoJsonSaver extends the Recorder::Recorder(const std::string & filePathToSave)
+         * constructor.
+         * @param filePathToSave const std::string parameter with the final file path where the generated json file
+         * will be saved.
          */
         explicit CocoJsonSaver(const std::string& filePathToSave, const bool humanReadable = true);
 
         ~CocoJsonSaver();
 
-        void record(const Array<float>& poseKeypoints, const std::string& imageName);
+        void record(const Array<float>& poseKeypoints, const Array<float>& poseScores, const std::string& imageName);
 
     private:
         JsonOfstream mJsonOfstream;

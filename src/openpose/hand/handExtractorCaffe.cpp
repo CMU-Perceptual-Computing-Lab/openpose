@@ -166,7 +166,7 @@ namespace op
                 // HeatMaps extractor blob and layer
                 const bool mergeFirstDimension = true;
                 resizeAndMergeCaffe->Reshape({caffeNetOutputBlob.get()}, {heatMapsBlob.get()},
-                                             HAND_CCN_DECREASE_FACTOR, mergeFirstDimension);
+                                             HAND_CCN_DECREASE_FACTOR, 1.f, mergeFirstDimension);
                 // Pose extractor blob and layer
                 maximumCaffe->Reshape({heatMapsBlob.get()}, {peaksBlob.get()});
                 // Cuda check

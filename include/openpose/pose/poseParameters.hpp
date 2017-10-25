@@ -287,8 +287,8 @@ namespace op
     const std::array<float, (int)PoseModel::Size>           POSE_DEFAULT_NMS_THRESHOLD{
         0.05f,      0.6f,       0.3f,       0.05f,      0.05f,      0.05f
     };
-    const std::array<unsigned int, (int)PoseModel::Size>    POSE_DEFAULT_CONNECT_INTER_MIN_ABOVE_THRESHOLD{
-        9,          8,          8,          9,          9,          9
+    const std::array<float, (int)PoseModel::Size>    POSE_DEFAULT_CONNECT_INTER_MIN_ABOVE_THRESHOLD{
+        0.95f,      0.95f,      0.95f,      0.95f,      0.95f,      0.95f
     };
     const std::array<float, (int)PoseModel::Size>           POSE_DEFAULT_CONNECT_INTER_THRESHOLD{
         0.05f,      0.01f,      0.01f,      0.05f,      0.05f,      0.05f

@@ -113,7 +113,7 @@ OpenPose Library - Release Notes
 
 
 
-## Current version (future OpenPose 2.0.0alpha)
+## Current version (future OpenPose 1.2.0alpha)
 1. Main improvements:
     1. Added IP camera support.
     2. Output images can have the input size, OpenPose able to change its size for each image and not required fixed size anymore.
@@ -128,7 +128,7 @@ OpenPose Library - Release Notes
     8. Added example for OpenPose for user asynchronous output and cleaned all `tutorial_wrapper/` examples.
     9. Added `-1` option for `net_resolution` in order to auto-select the best possible aspect ratio given the user input.
     10. Net resolution can be dynamically changed (e.g. for images with different size).
-    11. Added example to add functionality to OpenPose.
+    11. Added example to add functionality/modules to OpenPose.
 2. Functions or parameters renamed:
     1. OpenPose able to change its size and initial size dynamically:
         1. Flag `resolution` renamed as `output_resolution`.
@@ -140,5 +140,6 @@ OpenPose Library - Release Notes
         1. Changed several functions on `core/`, `pose/`, `face/`, and `hand/` modules.
     3. `CPU_ONLY` changed by `USE_CUDA` to keep format.
 3. Main bugs fixed:
-    1. Ubuntu installer script now works even if Python pip was not installed previously.
-    2. Flags to set first and last frame as well as jumping frames backward and forward now works on image directory reader.
+    1. Scaling resize issue fixed: ~1-pixel offset due to not considering 0-based indexes.
+    2. Ubuntu installer script now works even if Python pip was not installed previously.
+    3. Flags to set first and last frame as well as jumping frames backward and forward now works on image directory reader.

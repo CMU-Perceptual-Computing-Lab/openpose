@@ -647,6 +647,7 @@ namespace op
                     if (wrapperStructPose.renderMode == RenderMode::Cpu)
                     {
                         poseCpuRenderer = std::make_shared<PoseCpuRenderer>(wrapperStructPose.poseModel,
+                                                                            wrapperStructPose.renderThreshold,
                                                                             wrapperStructPose.blendOriginalFrame);
                         cpuRenderers.emplace_back(std::make_shared<WPoseRenderer<TDatumsPtr>>(poseCpuRenderer));
                     }

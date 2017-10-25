@@ -48,22 +48,27 @@ namespace op
 
     template <typename T>
     void ResizeAndMergeCaffe<T>::Reshape(const std::vector<caffe::Blob<T>*>& bottom,
-                                         const std::vector<caffe::Blob<T>*>& top, const float factor,
+                                         const std::vector<caffe::Blob<T>*>& top,
+                                         const float netFactor,
+                                         const float scaleFactor,
                                          const bool mergeFirstDimension)
     {
         try
         {
             #ifdef USE_CAFFE
-                auto bottomBlob = bottom.at(0);
-                auto topBlob = top.at(0);
-
-                // Top shape
+                // Data
+                const auto* bottomBlob = bottom.at(0);
+                auto* topBlob = top.at(0);
+                // Set top shape
                 auto topShape = bottomBlob->shape();
                 topShape[0] = (mergeFirstDimension ? 1 : bottomBlob->shape(0));
-                topShape[2] = intRound(topShape[2] * factor);
-                topShape[3] = intRound(topShape[3] * factor);
+                // -1 and later +1 to take into account that we are using 0-based index
+                // E.g. 100x100 image --> 200x200 --> 0-99 to 0-199 --> scale = 199/99 (not 2!)
+                // E.g. 101x101 image --> 201x201 --> scale = 2
+                // Test: pixel 0 --> 0, pixel 99 (ex 1) --> 199, pixel 100 (ex 2) --> 200
+                topShape[2] = intRound((topShape[2]*netFactor - 1.f) * scaleFactor + 1);
+                topShape[3] = intRound((topShape[3]*netFactor - 1.f) * scaleFactor + 1);
                 topBlob->Reshape(topShape);
-
                 // Array sizes
                 mTopSize = std::array<int, 4>{topBlob->shape(0), topBlob->shape(1), topBlob->shape(2),
                                               topBlob->shape(3)};

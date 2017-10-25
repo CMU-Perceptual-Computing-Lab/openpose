@@ -10,6 +10,7 @@
 #include <openpose/utilities/cuda.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/openCv.hpp>
+#include <openpose/utilities/standard.hpp>
 #include <openpose/pose/poseExtractorCaffe.hpp>
 
 namespace op
@@ -17,11 +18,12 @@ namespace op
     struct PoseExtractorCaffe::ImplPoseExtractorCaffe
     {
         #ifdef USE_CAFFE
-            std::vector<int> mNetInputSize4D;
             std::shared_ptr<NetCaffe> spNetCaffe;
             std::shared_ptr<ResizeAndMergeCaffe<float>> spResizeAndMergeCaffe;
             std::shared_ptr<NmsCaffe<float>> spNmsCaffe;
             std::shared_ptr<BodyPartConnectorCaffe<float>> spBodyPartConnectorCaffe;
+            std::vector<int> mNetInputSize4D;
+            std::vector<double> mScaleInputToNetInputs;
             // Init with thread
             boost::shared_ptr<caffe::Blob<float>> spCaffeNetOutputBlob;
             std::shared_ptr<caffe::Blob<float>> spHeatMapsBlob;
@@ -30,7 +32,6 @@ namespace op
 
             ImplPoseExtractorCaffe(const PoseModel poseModel, const int gpuId,
                                    const std::string& modelFolder, const bool enableGoogleLogging) :
-                mNetInputSize4D{0,0,0,0},
                 spNetCaffe{std::make_shared<NetCaffe>(modelFolder + POSE_PROTOTXT[(int)poseModel],
                                                       modelFolder + POSE_TRAINED_MODEL[(int)poseModel], gpuId,
                                                       enableGoogleLogging)},
@@ -56,9 +57,8 @@ namespace op
             try
             {
                 // HeatMaps extractor blob and layer
-                UNUSED(scaleInputToNetInput);
                 resizeAndMergeCaffe->Reshape({caffeNetOutputBlob.get()}, {heatMapsBlob.get()},
-                                             POSE_CCN_DECREASE_FACTOR[(int)poseModel]);
+                                             POSE_CCN_DECREASE_FACTOR[(int)poseModel], 1.f/scaleInputToNetInput);
                 // Pose extractor blob and layer
                 nmsCaffe->Reshape({heatMapsBlob.get()}, {peaksBlob.get()}, POSE_MAX_PEAKS[(int)poseModel]);
                 // Pose extractor blob and layer
@@ -69,21 +69,6 @@ namespace op
             catch (const std::exception& e)
             {
                 error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            }
-        }
-
-        inline bool requiredReshapePoseExtractorCaffe(const std::vector<int>& dimensionsA,
-                                                      const std::vector<int>& dimensionsB)
-        {
-            try
-            {
-                return (dimensionsA[0] != dimensionsB[0] || dimensionsA[1] != dimensionsB[1]
-                        || dimensionsA[2] != dimensionsB[2] || dimensionsA[3] != dimensionsB[3]);
-            }
-            catch (const std::exception& e)
-            {
-                error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-                return false;
             }
         }
     #endif
@@ -158,17 +143,21 @@ namespace op
                     error("Empty inputNetData.", __LINE__, __FUNCTION__, __FILE__);
 
                 // 1. Caffe deep network
-                upImpl->spNetCaffe->forwardPass(inputNetData);                                                  // ~80ms
+                upImpl->spNetCaffe->forwardPass(inputNetData);                                                 // ~80ms
 
                 // Reshape blobs if required
-                if (requiredReshapePoseExtractorCaffe(upImpl->mNetInputSize4D, inputNetData.getSize()))
+                // Note: In order to resize to input size to have same results as Matlab, uncomment the commented lines
+                if (!vectorsAreEqual(upImpl->mNetInputSize4D, inputNetData.getSize()))
+                    // || !vectorsAreEqual(upImpl->mScaleInputToNetInputs, scaleInputToNetInputs))
                 {
                     upImpl->mNetInputSize4D = inputNetData.getSize();
                     mNetOutputSize = Point<int>{upImpl->mNetInputSize4D[3], upImpl->mNetInputSize4D[2]};
+                    // upImpl->mScaleInputToNetInputs = scaleInputToNetInputs;
                     reshapePoseExtractorCaffe(upImpl->spResizeAndMergeCaffe, upImpl->spNmsCaffe,
                                               upImpl->spBodyPartConnectorCaffe, upImpl->spCaffeNetOutputBlob,
                                               upImpl->spHeatMapsBlob, upImpl->spPeaksBlob, upImpl->spPoseBlob,
-                                              scaleInputToNetInputs[0], mPoseModel);
+                                              1.f, mPoseModel);
+                                              // scaleInputToNetInputs[0], mPoseModel);
                 }
 
                 // 2. Resize heat maps + merge different scales
@@ -192,16 +181,18 @@ namespace op
                 #endif
 
                 // Get scale net to output (i.e. image input)
+                // Note: In order to resize to input size, (un)comment the following lines
                 const auto scaleProducerToNetInput = resizeGetScaleFactor(inputDataSize, mNetOutputSize);
                 const Point<int> netSize{intRound(scaleProducerToNetInput*inputDataSize.x),
                                          intRound(scaleProducerToNetInput*inputDataSize.y)};
                 mScaleNetToOutput = {(float)resizeGetScaleFactor(netSize, inputDataSize)};
+                // mScaleNetToOutput = 1.f;
 
                 // 4. Connecting body parts
+                // Get scale net to output (i.e. image input)
                 upImpl->spBodyPartConnectorCaffe->setScaleNetToOutput(mScaleNetToOutput);
-                // upImpl->spBodyPartConnectorCaffe->setScaleNetToOutput(1);
                 upImpl->spBodyPartConnectorCaffe->setInterMinAboveThreshold(
-                    (int)get(PoseProperty::ConnectInterMinAboveThreshold)
+                    (float)get(PoseProperty::ConnectInterMinAboveThreshold)
                 );
                 upImpl->spBodyPartConnectorCaffe->setInterThreshold((float)get(PoseProperty::ConnectInterThreshold));
                 upImpl->spBodyPartConnectorCaffe->setMinSubsetCnt((int)get(PoseProperty::ConnectMinSubsetCnt));
@@ -215,7 +206,7 @@ namespace op
                 // #else
                     upImpl->spBodyPartConnectorCaffe->Forward_cpu({upImpl->spHeatMapsBlob.get(),
                                                                    upImpl->spPeaksBlob.get()},
-                                                                  mPoseKeypoints);
+                                                                  mPoseKeypoints, mPoseScores);
                 // #endif
             #else
                 UNUSED(inputNetData);

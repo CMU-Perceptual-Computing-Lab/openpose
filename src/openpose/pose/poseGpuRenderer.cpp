@@ -100,6 +100,9 @@ namespace op
                     }
                     else
                     {
+                        // If resized to input resolution: Replace scaleNetToOutput * scaleInputToOutput by
+                        // scaleInputToOutput, and comment the security checks.
+                        // Security checks
                         if (scaleNetToOutput == -1.f)
                             error("Non valid scaleNetToOutput.", __LINE__, __FUNCTION__, __FILE__);
                         // Parameters

@@ -35,6 +35,8 @@ namespace op
 
         Array<float> getPoseKeypoints() const;
 
+        Array<float> getPoseScores() const;
+
         float getScaleNetToOutput() const;
 
         double get(const PoseProperty property) const;
@@ -47,6 +49,7 @@ namespace op
         const PoseModel mPoseModel;
         Point<int> mNetOutputSize;
         Array<float> mPoseKeypoints;
+        Array<float> mPoseScores;
         float mScaleNetToOutput;
 
         void checkThread() const;

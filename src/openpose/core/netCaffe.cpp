@@ -7,6 +7,7 @@
 #endif
 #include <openpose/utilities/cuda.hpp>
 #include <openpose/utilities/fileSystem.hpp>
+#include <openpose/utilities/standard.hpp>
 #include <openpose/core/netCaffe.hpp>
 
 namespace op
@@ -69,20 +70,6 @@ namespace op
             catch (const std::exception& e)
             {
                 error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            }
-        }
-
-        inline bool requiredReshapeNetCaffe(const std::vector<int>& dimensionsA, const std::vector<int>& dimensionsB)
-        {
-            try
-            {
-                return (dimensionsA[0] != dimensionsB[0] || dimensionsA[1] != dimensionsB[1]
-                        || dimensionsA[2] != dimensionsB[2] || dimensionsA[3] != dimensionsB[3]);
-            }
-            catch (const std::exception& e)
-            {
-                error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-                return false;
             }
         }
     #endif
@@ -157,7 +144,7 @@ namespace op
                     error("The Array inputData must have 4 dimensions: [batch size, 3 (RGB), height, width].",
                           __LINE__, __FUNCTION__, __FILE__);
                 // Reshape Caffe net if required
-                if (requiredReshapeNetCaffe(upImpl->mNetInputSize4D, inputData.getSize()))
+                if (!vectorsAreEqual(upImpl->mNetInputSize4D, inputData.getSize()))
                 {
                     upImpl->mNetInputSize4D = inputData.getSize();
                     reshapeNetCaffe(upImpl->upCaffeNet.get(), inputData.getSize());
