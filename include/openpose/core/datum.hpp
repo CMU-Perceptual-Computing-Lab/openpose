@@ -59,10 +59,19 @@ namespace op
         /**
          * Body pose (x,y,score) locations for each person in the image.
          * It has been resized to the desired output resolution (e.g. `resolution` flag in the demo).
-         * If outputData is empty, then cvOutputData will also be empty.
          * Size: #people x #body parts (e.g. 18 for COCO or 15 for MPI) x 3 ((x,y) coordinates + score)
          */
         Array<float> poseKeypoints;
+
+        /**
+         * Body pose global confidence/score for each person in the image.
+         * It does not only consider the score of each body keypoint, but also the score of each PAF association.
+         * Optimized for COCO evaluation metric.
+         * It will highly penalyze people with missing body parts (e.g. cropped people on the borders of the image).
+         * If poseKeypoints is empty, then poseScores will also be empty.
+         * Size: #people
+         */
+        Array<float> poseScores;
 
         /**
          * Body pose heatmaps (body parts, background and/or PAFs) for the whole image.

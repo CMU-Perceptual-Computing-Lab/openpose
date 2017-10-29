@@ -15,7 +15,6 @@
 #ifndef GFLAGS_GFLAGS_H_
     namespace gflags = google;
 #endif
-#include <glog/logging.h> // google::InitGoogleLogging
 // OpenPose dependencies
 #include <openpose/core/headers.hpp>
 #include <openpose/gui/headers.hpp>
@@ -23,7 +22,7 @@
 #include <openpose/thread/headers.hpp>
 #include <openpose/utilities/headers.hpp>
 
-// See all the available parameter options withe the `--help` flag. E.g. `./build/examples/openpose/openpose.bin --help`.
+// See all the available parameter options withe the `--help` flag. E.g. `build/examples/openpose/openpose.bin --help`
 // Note: This command will show you flags for other unnecessary 3rdparty files. Check only the flags for the OpenPose
 // executable. E.g. for `openpose.bin`, look for `Flags from examples/openpose/openpose.cpp:`.
 // Debugging
@@ -89,7 +88,8 @@ int openPoseTutorialThread2()
     // Step 1 - Set logging level
         // - 0 will output all the logging messages
         // - 255 will output nothing
-    op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.", __LINE__, __FUNCTION__, __FILE__);
+    op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.",
+              __LINE__, __FUNCTION__, __FILE__);
     op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
     // Step 2 - Read Google flags (user defined configuration)
     // outputSize
@@ -123,8 +123,8 @@ int openPoseTutorialThread2()
     // ------------------------- CONFIGURING THREADING -------------------------
     // In this simple multi-thread example, we will do the following:
         // 3 (virtual) queues: 0, 1, 2
-        // 1 real queue: 1. The first and last queue ids (in this case 0 and 2) are not actual queues, but the beginning and end of the processing
-        // sequence
+        // 1 real queue: 1. The first and last queue ids (in this case 0 and 2) are not actual queues, but the
+        // beginning and end of the processing sequence
         // 2 threads: 0, 1
         // wDatumProducer will generate frames (there is no real queue 0) and push them on queue 1
         // wGui will pop frames from queue 1 and process them (there is no real queue 2)
@@ -159,8 +159,8 @@ int openPoseTutorialThread2()
         // Option a) Using the main thread (this thread) for processing (it saves 1 thread, recommended)
     threadManager.exec();  // It blocks this thread until all threads have finished
         // Option b) Giving to the user the control of this thread
-    // // VERY IMPORTANT NOTE: if OpenCV is compiled with Qt support, this option will not work. Qt needs the main thread to
-    // // plot visual results, so the final GUI (which uses OpenCV) would return an exception similar to:
+    // // VERY IMPORTANT NOTE: if OpenCV is compiled with Qt support, this option will not work. Qt needs the main
+    // // thread to plot visual results, so the final GUI (which uses OpenCV) would return an exception similar to:
     // // `QMetaMethod::invoke: Unable to invoke methods with return values in queued connections`
     // // Start threads
     // threadManager.start();
@@ -180,9 +180,6 @@ int openPoseTutorialThread2()
 
 int main(int argc, char *argv[])
 {
-    // Initializing google logging (Caffe uses it for logging)
-    google::InitGoogleLogging("openPoseTutorialThread2");
-
     // Parsing command line flags
     gflags::ParseCommandLineFlags(&argc, &argv, true);
 

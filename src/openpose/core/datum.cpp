@@ -19,6 +19,7 @@ namespace op
         cvOutputData{datum.cvOutputData},
         // Resulting Array<float> data
         poseKeypoints{datum.poseKeypoints},
+        poseScores{datum.poseScores},
         poseHeatMaps{datum.poseHeatMaps},
         faceRectangles{datum.faceRectangles},
         faceKeypoints{datum.faceKeypoints},
@@ -48,6 +49,7 @@ namespace op
             cvOutputData = datum.cvOutputData;
             // Resulting Array<float> data
             poseKeypoints = datum.poseKeypoints;
+            poseScores = datum.poseScores,
             poseHeatMaps = datum.poseHeatMaps,
             faceRectangles = datum.faceRectangles,
             faceKeypoints = datum.faceKeypoints,
@@ -88,6 +90,7 @@ namespace op
             std::swap(cvOutputData, datum.cvOutputData);
             // Resulting Array<float> data
             std::swap(poseKeypoints, datum.poseKeypoints);
+            std::swap(poseScores, datum.poseScores);
             std::swap(poseHeatMaps, datum.poseHeatMaps);
             std::swap(faceRectangles, datum.faceRectangles);
             std::swap(faceKeypoints, datum.faceKeypoints);
@@ -119,6 +122,7 @@ namespace op
             std::swap(cvOutputData, datum.cvOutputData);
             // Resulting Array<float> data
             std::swap(poseKeypoints, datum.poseKeypoints);
+            std::swap(poseScores, datum.poseScores);
             std::swap(poseHeatMaps, datum.poseHeatMaps);
             std::swap(faceRectangles, datum.faceRectangles);
             std::swap(faceKeypoints, datum.faceKeypoints);
@@ -158,6 +162,7 @@ namespace op
             datum.cvOutputData = cvOutputData.clone();
             // Resulting Array<float> data
             datum.poseKeypoints = poseKeypoints.clone();
+            datum.poseScores = poseScores.clone();
             datum.poseHeatMaps = poseHeatMaps.clone();
             datum.faceRectangles = faceRectangles;
             datum.faceKeypoints = faceKeypoints.clone();

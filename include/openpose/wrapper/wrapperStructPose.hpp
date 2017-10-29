@@ -142,6 +142,15 @@ namespace op
         float renderThreshold;
 
         /**
+         * Whether to internally enable Google Logging.
+         * This option is only applicable if Caffe is used.
+         * Only disable it if the user is already calling google::InitGoogleLogging() in his code.
+         * If the user disables Google Logging and he does not call it by himself, then Caffe will start to pop up
+         * all the verbose messages.
+         */
+        bool enableGoogleLogging;
+
+        /**
          * Constructor of the struct.
          * It has the recommended and default values we recommend for each element of the struct.
          * Since all the elements of the struct are public, they can also be manually filled.
@@ -157,7 +166,8 @@ namespace op
                           const int defaultPartToRender = 0, const std::string& modelFolder = "models/",
                           const std::vector<HeatMapType>& heatMapTypes = {},
                           const ScaleMode heatMapScale = ScaleMode::ZeroToOne,
-                          const float renderThreshold = 0.05f);
+                          const float renderThreshold = 0.05f,
+                          const bool enableGoogleLogging = true);
     };
 }
 

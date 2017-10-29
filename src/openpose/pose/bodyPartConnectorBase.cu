@@ -6,7 +6,7 @@ namespace op
     template <typename T>
     void connectBodyPartsGpu(Array<T>& poseKeypoints, T* posePtr, const T* const heatMapPtr, const T* const peaksPtr,
                              const PoseModel poseModel, const Point<int>& heatMapSize, const int maxPeaks,
-                             const int interMinAboveThreshold, const T interThreshold, const int minSubsetCnt,
+                             const T interMinAboveThreshold, const T interThreshold, const int minSubsetCnt,
                              const T minSubsetScore, const T scaleFactor)
     {
         try
@@ -35,11 +35,11 @@ namespace op
     template void connectBodyPartsGpu(Array<float>& poseKeypoints, float* posePtr, const float* const heatMapPtr,
                                       const float* const peaksPtr, const PoseModel poseModel,
                                       const Point<int>& heatMapSize, const int maxPeaks,
-                                      const int interMinAboveThreshold, const float interThreshold,
+                                      const float interMinAboveThreshold, const float interThreshold,
                                       const int minSubsetCnt, const float minSubsetScore, const float scaleFactor);
     template void connectBodyPartsGpu(Array<double>& poseKeypoints, double* posePtr, const double* const heatMapPtr,
                                       const double* const peaksPtr, const PoseModel poseModel,
                                       const Point<int>& heatMapSize, const int maxPeaks,
-                                      const int interMinAboveThreshold, const double interThreshold,
+                                      const double interMinAboveThreshold, const double interThreshold,
                                       const int minSubsetCnt, const double minSubsetScore, const double scaleFactor);
 }

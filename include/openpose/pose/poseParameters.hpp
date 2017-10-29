@@ -7,7 +7,7 @@
 
 namespace op
 {
-    // #define when needed in CUDA code
+    // All #define are for CUDA code
 
     // Constant Global Parameters
     const unsigned int POSE_MAX_PEOPLE = 96u;
@@ -39,7 +39,7 @@ namespace op
     const std::vector<unsigned int> POSE_COCO_MAP_IDX       {31,32, 39,40, 33,34, 35,36, 41,42, 43,44, 19,20, 21,22, 23,24, 25,26, 27,28, 29,30, 47,48, 49,50, 53,54, 51,52, 55,56, 37,38, 45,46};
     #define POSE_COCO_PAIRS_RENDER_GPU                      {1,2,   1,5,   2,3,   3,4,   5,6,   6,7,   1,8,   8,9,   9,10,  1,11,  11,12, 12,13,  1,0,   0,14, 14,16,  0,15, 15,17}
     const std::vector<unsigned int> POSE_COCO_PAIRS_RENDER  {POSE_COCO_PAIRS_RENDER_GPU};
-    const std::vector<unsigned int> POSE_COCO_PAIRS         {1,2,   1,5,   2,3,   3,4,   5,6,   6,7,   1,8,   8,9,   9,10,  1,11,  11,12, 12,13,  1,0,   0,14, 14,16,  0,15, 15,17,   2,16,  5,17};
+    const std::vector<unsigned int> POSE_COCO_PAIRS         {1,2,   1,5,   2,3,   3,4,   5,6,   6,7,   1,8,   8,9,   9,10,  1,11,  11,12, 12,13,  1,0,   0,14, 14,16,  0,15, 15,17,  2,16,  5,17};
     #define POSE_COCO_COLORS_RENDER_GPU \
         255.f,     0.f,    85.f, \
         255.f,     0.f,     0.f, \
@@ -179,57 +179,63 @@ namespace op
         255.f,     0.f,   255.f, \
          85.f,     0.f,   255.f
     const std::vector<float> POSE_BODY_19_COLORS_RENDER{POSE_BODY_19_COLORS_RENDER_GPU};
-    // BODY_22
-    const std::map<unsigned int, std::string> POSE_BODY_22_BODY_PARTS {
-        {0,  "Nose"},
-        {1,  "Neck"},
-        {2,  "RShoulder"},
-        {3,  "RElbow"},
-        {4,  "RWrist"},
-        {5,  "LShoulder"},
-        {6,  "LElbow"},
-        {7,  "LWrist"},
+    // BODY_23
+    const std::map<unsigned int, std::string> POSE_BODY_23_BODY_PARTS {
+        {0,  "Neck"},
+        {1,  "RShoulder"},
+        {2,  "RElbow"},
+        {3,  "RWrist"},
+        {4,  "LShoulder"},
+        {5,  "LElbow"},
+        {6,  "LWrist"},
+        {7,  "LowerAbs"},
         {8,  "RHip"},
         {9,  "RKnee"},
         {10, "RAnkle"},
-        {11, "LHip"},
-        {12, "LKnee"},
-        {13, "LAnkle"},
-        {14, "REye"},
-        {15, "LEye"},
-        {16, "REar"},
-        {17, "LEar"},
-        {18, "RTest1"},
-        {19, "LTest1"},
-        {20, "RTest2"},
-        {21, "LTest2"},
-        {22, "Background"}
+        {11, "RBigToe"},
+        {12, "RSmallToe"},
+        {13, "LHip"},
+        {14, "LKnee"},
+        {15, "LAnkle"},
+        {16, "LBigToe"},
+        {17, "LSmallToe"},
+        {18, "Nose"},
+        {19, "REye"},
+        {20, "REar"},
+        {21, "LEye"},
+        {22, "LEar"},
+        {23, "Background"}
     };
-    const unsigned int POSE_BODY_22_NUMBER_PARTS               = 22u; // Equivalent to size of std::map POSE_BODY_22_BODY_PARTS - 1 (removing background)
-    const std::vector<unsigned int> POSE_BODY_22_MAP_IDX       {35,36, 43,45, 37,38, 39,40, 45,46, 47,48, 23,24, 25,26, 27,28, 29,30, 31,32, 33,34, 51,52};
-    #define POSE_BODY_22_PAIRS_RENDER_GPU                      {1,2,   1,5,   2,3,   3,4,   5,6,   6,7,   1,8,   8,9,   9,10,  1,11,  11,12}
-    const std::vector<unsigned int> POSE_BODY_22_PAIRS_RENDER  {POSE_BODY_22_PAIRS_RENDER_GPU};
-    const std::vector<unsigned int> POSE_BODY_22_PAIRS         {1,2,   1,5,   2,3,   3,4,   5,6,   6,7,   1,8,   8,9,   9,10,  1,11,  11,12, 12,13,  1,0};
-    #define POSE_BODY_22_COLORS_RENDER_GPU \
+    const unsigned int POSE_BODY_23_NUMBER_PARTS               = 23u; // Equivalent to size of std::map POSE_BODY_23_BODY_PARTS - 1 (removing background)
+    const std::vector<unsigned int> POSE_BODY_23_MAP_IDX       {24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71};
+    #define POSE_BODY_23_PAIRS_RENDER_GPU                      { 0,1,  0,4,  1,2,  2,3,  4,5,  5,6,  0,7,  7,8,  7,13, 8,9,  9,10,10,11,11,12,13,14,14,15,15,16,16,17, 0,18,18,19,18,21,19,20,21,22}
+    const std::vector<unsigned int> POSE_BODY_23_PAIRS_RENDER  {POSE_BODY_23_PAIRS_RENDER_GPU};
+    const std::vector<unsigned int> POSE_BODY_23_PAIRS         { 0,1,  0,4,  1,2,  2,3,  4,5,  5,6,  0,7,  7,8,  7,13, 8,9,  9,10,10,11,10,12,13,14,14,15,15,16,15,17, 0,18,18,19,18,21,19,20,21,22, 1,20, 4,22};
+    #define POSE_BODY_23_COLORS_RENDER_GPU \
         255.f,     0.f,     0.f, \
-        255.f,    85.f,     0.f, \
-        255.f,   170.f,     0.f, \
+        255.f,    55.f,     0.f, \
+        255.f,   110.f,     0.f, \
+        255.f,   165.f,     0.f, \
+        255.f,   215.f,     0.f, \
+        255.f,   235.f,     0.f, \
         255.f,   255.f,     0.f, \
-        170.f,   255.f,     0.f, \
+        255.f,     0.f,     0.f, \
+        175.f,   255.f,     0.f, \
          85.f,   255.f,     0.f, \
           0.f,   255.f,     0.f, \
           0.f,   255.f,    85.f, \
           0.f,   255.f,   170.f, \
-          0.f,   255.f,   255.f, \
-          0.f,   170.f,   255.f, \
+         25.f,    25.f,   128.f, \
           0.f,    85.f,   255.f, \
-          0.f,     0.f,   255.f, \
-         85.f,     0.f,   255.f, \
-        170.f,     0.f,   255.f, \
+          0.f,   170.f,   255.f, \
+          0.f,  212.5f,   255.f, \
+          0.f,   255.f,   255.f, \
+        255.f,     0.f,     0.f, \
         255.f,     0.f,   255.f, \
-        255.f,     0.f,   170.f, \
-        255.f,     0.f,    85.f
-    const std::vector<float> POSE_BODY_22_COLORS_RENDER{POSE_BODY_22_COLORS_RENDER_GPU};
+        238.f,   130.f,   238.f, \
+        138.f,    43.f,   226.f, \
+         75.f,     0.f,   130.f
+    const std::vector<float> POSE_BODY_23_COLORS_RENDER{POSE_BODY_23_COLORS_RENDER_GPU};
 
     // Constant Array Parameters
     const std::array<float, (int)PoseModel::Size> POSE_CCN_DECREASE_FACTOR{
@@ -239,19 +245,19 @@ namespace op
         POSE_MAX_PEOPLE,        POSE_MAX_PEOPLE,        POSE_MAX_PEOPLE,        POSE_MAX_PEOPLE,        POSE_MAX_PEOPLE,        POSE_MAX_PEOPLE
     };
     const std::array<unsigned int, (int)PoseModel::Size> POSE_NUMBER_BODY_PARTS{
-        POSE_COCO_NUMBER_PARTS, POSE_MPI_NUMBER_PARTS,  POSE_MPI_NUMBER_PARTS,  POSE_BODY_18_NUMBER_PARTS,  POSE_BODY_19_NUMBER_PARTS,  POSE_BODY_22_NUMBER_PARTS
+        POSE_COCO_NUMBER_PARTS, POSE_MPI_NUMBER_PARTS,  POSE_MPI_NUMBER_PARTS,  POSE_BODY_18_NUMBER_PARTS,  POSE_BODY_19_NUMBER_PARTS,  POSE_BODY_23_NUMBER_PARTS
     };
     const std::array<std::vector<unsigned int>, (int)PoseModel::Size> POSE_BODY_PART_PAIRS{
-        POSE_COCO_PAIRS,        POSE_MPI_PAIRS,         POSE_MPI_PAIRS,         POSE_BODY_18_PAIRS,         POSE_BODY_19_PAIRS,         POSE_BODY_22_PAIRS
+        POSE_COCO_PAIRS,        POSE_MPI_PAIRS,         POSE_MPI_PAIRS,         POSE_BODY_18_PAIRS,         POSE_BODY_19_PAIRS,         POSE_BODY_23_PAIRS
     };
     const std::array<std::vector<unsigned int>, (int)PoseModel::Size> POSE_BODY_PART_PAIRS_RENDER{
-        POSE_COCO_PAIRS_RENDER, POSE_MPI_PAIRS,         POSE_MPI_PAIRS,         POSE_BODY_18_PAIRS_RENDER,  POSE_BODY_19_PAIRS_RENDER,  POSE_BODY_22_PAIRS_RENDER
+        POSE_COCO_PAIRS_RENDER, POSE_MPI_PAIRS,         POSE_MPI_PAIRS,         POSE_BODY_18_PAIRS_RENDER,  POSE_BODY_19_PAIRS_RENDER,  POSE_BODY_23_PAIRS_RENDER
     };
     const std::array<std::vector<unsigned int>, (int)PoseModel::Size> POSE_MAP_IDX{
-        POSE_COCO_MAP_IDX,      POSE_MPI_MAP_IDX,       POSE_MPI_MAP_IDX,       POSE_BODY_18_MAP_IDX,       POSE_BODY_19_MAP_IDX,       POSE_BODY_22_MAP_IDX
+        POSE_COCO_MAP_IDX,      POSE_MPI_MAP_IDX,       POSE_MPI_MAP_IDX,       POSE_BODY_18_MAP_IDX,       POSE_BODY_19_MAP_IDX,       POSE_BODY_23_MAP_IDX
     };
     const std::array<std::vector<float>, (int)PoseModel::Size> POSE_COLORS{
-        POSE_COCO_COLORS_RENDER,POSE_MPI_COLORS_RENDER, POSE_MPI_COLORS_RENDER, POSE_BODY_18_COLORS_RENDER, POSE_BODY_19_COLORS_RENDER, POSE_BODY_22_COLORS_RENDER
+        POSE_COCO_COLORS_RENDER,POSE_MPI_COLORS_RENDER, POSE_MPI_COLORS_RENDER, POSE_BODY_18_COLORS_RENDER, POSE_BODY_19_COLORS_RENDER, POSE_BODY_23_COLORS_RENDER
     };
     const std::array<std::string, (int)PoseModel::Size> POSE_PROTOTXT{
         "pose/coco/pose_deploy_linevec.prototxt",
@@ -259,7 +265,7 @@ namespace op
         "pose/mpi/pose_deploy_linevec_faster_4_stages.prototxt",
         "pose/body_18/pose_deploy.prototxt",
         "pose/body_19/pose_deploy.prototxt",
-        "pose/body_22/pose_deploy.prototxt"
+        "pose/body_23/pose_deploy.prototxt"
     };
     const std::array<std::string, (int)PoseModel::Size> POSE_TRAINED_MODEL{
         "pose/coco/pose_iter_440000.caffemodel",
@@ -267,7 +273,7 @@ namespace op
         "pose/mpi/pose_iter_160000.caffemodel",
         "pose/body_18/pose_iter_XXXXXX.caffemodel",
         "pose/body_19/pose_iter_XXXXXX.caffemodel",
-        "pose/body_22/pose_iter_40000.caffemodel"
+        "pose/body_23/pose_iter_XXXXXX.caffemodel"
     };
     // POSE_BODY_PART_MAPPING crashes on Windows at dynamic initialization, to avoid this crash:
     // POSE_BODY_PART_MAPPING has been moved to poseParameters.cpp and getPoseBodyPartMapping() wraps it
@@ -281,8 +287,8 @@ namespace op
     const std::array<float, (int)PoseModel::Size>           POSE_DEFAULT_NMS_THRESHOLD{
         0.05f,      0.6f,       0.3f,       0.05f,      0.05f,      0.05f
     };
-    const std::array<unsigned int, (int)PoseModel::Size>    POSE_DEFAULT_CONNECT_INTER_MIN_ABOVE_THRESHOLD{
-        9,          8,          8,          9,          9,          9
+    const std::array<float, (int)PoseModel::Size>    POSE_DEFAULT_CONNECT_INTER_MIN_ABOVE_THRESHOLD{
+        0.95f,      0.95f,      0.95f,      0.95f,      0.95f,      0.95f
     };
     const std::array<float, (int)PoseModel::Size>           POSE_DEFAULT_CONNECT_INTER_THRESHOLD{
         0.05f,      0.01f,      0.01f,      0.05f,      0.05f,      0.05f

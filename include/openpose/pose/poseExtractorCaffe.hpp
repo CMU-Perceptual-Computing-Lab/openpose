@@ -10,18 +10,17 @@ namespace op
     class OP_API PoseExtractorCaffe : public PoseExtractor
     {
     public:
-        PoseExtractorCaffe(const Point<int>& netInputSize, const Point<int>& netOutputSize,
-                           const Point<int>& outputSize, const int scaleNumber, const PoseModel poseModel,
-                           const std::string& modelFolder, const int gpuId,
+        PoseExtractorCaffe(const PoseModel poseModel, const std::string& modelFolder, const int gpuId,
                            const std::vector<HeatMapType>& heatMapTypes = {},
-                           const ScaleMode heatMapScale = ScaleMode::ZeroToOne);
+                           const ScaleMode heatMapScale = ScaleMode::ZeroToOne,
+                           const bool enableGoogleLogging = true);
 
         virtual ~PoseExtractorCaffe();
 
         void netInitializationOnThread();
 
         void forwardPass(const Array<float>& inputNetData, const Point<int>& inputDataSize,
-                         const std::vector<double>& scaleRatios = {1.f});
+                         const std::vector<double>& scaleInputToNetInputs = {1.f});
 
         const float* getHeatMapCpuConstPtr() const;
 

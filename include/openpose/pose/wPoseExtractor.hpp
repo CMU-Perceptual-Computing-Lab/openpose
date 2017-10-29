@@ -63,6 +63,7 @@ namespace op
                                                  tDatum.scaleInputToNetInputs);
                     tDatum.poseHeatMaps = spPoseExtractor->getHeatMaps().clone();
                     tDatum.poseKeypoints = spPoseExtractor->getPoseKeypoints().clone();
+                    tDatum.poseScores = spPoseExtractor->getPoseScores().clone();
                     tDatum.scaleNetToOutput = spPoseExtractor->getScaleNetToOutput();
                 }
                 // Profiling speed

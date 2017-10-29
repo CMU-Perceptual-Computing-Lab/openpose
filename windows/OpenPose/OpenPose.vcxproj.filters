@@ -497,6 +497,9 @@
     <ClInclude Include="..\..\include\openpose\utilities\profiler.hpp">
       <Filter>Header Files\utilities</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\openpose\utilities\standard.hpp">
+      <Filter>Header Files\utilities</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\include\openpose\utilities\string.hpp">
       <Filter>Header Files\utilities</Filter>
     </ClInclude>

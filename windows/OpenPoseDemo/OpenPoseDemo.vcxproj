@@ -69,7 +69,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\..\include;..\..\3rdparty\windows\opencv\include;..\..\3rdparty\windows\caffe\include;..\..\3rdparty\windows\caffe\include2;..\..\3rdparty\windows\caffe3rdparty\include;..\..\3rdparty\windows\caffe3rdparty\include\boost-1_61;$(CUDA_PATH_V8_0)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\include;..\..\3rdparty\windows\opencv\include;..\..\3rdparty\windows\caffe3rdparty\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;CMAKE_WINDOWS_BUILD;GLOG_NO_ABBREVIATED_SEVERITIES;GOOGLE_GLOG_DLL_DECL=__declspec(dllimport);GOOGLE_GLOG_DLL_DECL_FOR_UNITTESTS=__declspec(dllimport);CMAKE_INTDIR="Release";NDEBUG</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)\obj\relDir\relDir\%(RelativeDir)\%(Filename)%(Extension).obj</ObjectFileName>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -80,7 +80,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(CUDA_PATH_V8_0)\lib\x64\;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>..\..\3rdparty\windows\caffe\lib\caffe.lib;..\..\3rdparty\windows\caffe\lib\caffeproto.lib;..\..\3rdparty\windows\caffe3rdparty\lib\boost_filesystem-vc140-mt-1_61.lib;..\..\3rdparty\windows\caffe3rdparty\lib\boost_system-vc140-mt-1_61.lib;..\..\3rdparty\windows\caffe3rdparty\lib\caffehdf5.lib;..\..\3rdparty\windows\caffe3rdparty\lib\caffehdf5_hl.lib;..\..\3rdparty\windows\caffe3rdparty\lib\caffezlib.lib;..\..\3rdparty\windows\caffe3rdparty\lib\gflags.lib;..\..\3rdparty\windows\caffe3rdparty\lib\glog.lib;..\..\3rdparty\windows\caffe3rdparty\lib\leveldb.lib;..\..\3rdparty\windows\caffe3rdparty\lib\libopenblas.dll.a;..\..\3rdparty\windows\caffe3rdparty\lib\libprotobuf.lib;..\..\3rdparty\windows\caffe3rdparty\lib\lmdb.lib;..\..\3rdparty\windows\caffe3rdparty\lib\snappy.lib;..\..\3rdparty\windows\opencv\x64\vc14\lib\opencv_world310.lib;cublas.lib;cublas_device.lib;cudart.lib;cudnn.lib;curand.lib;ntdll.lib;shlwapi.lib;..\x64\Release\OpenPose.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\..\3rdparty\windows\caffe3rdparty\lib\gflags.lib;..\..\3rdparty\windows\opencv\x64\vc14\lib\opencv_world310.lib;..\x64\Release\OpenPose.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -15,7 +15,6 @@
 #ifndef GFLAGS_GFLAGS_H_
     namespace gflags = google;
 #endif
-#include <glog/logging.h> // google::InitGoogleLogging
 // OpenPose dependencies
 #include <openpose/core/headers.hpp>
 #include <openpose/filestream/headers.hpp>
@@ -23,7 +22,7 @@
 #include <openpose/pose/headers.hpp>
 #include <openpose/utilities/headers.hpp>
 
-// See all the available parameter options withe the `--help` flag. E.g. `./build/examples/openpose/openpose.bin --help`.
+// See all the available parameter options withe the `--help` flag. E.g. `build/examples/openpose/openpose.bin --help`
 // Note: This command will show you flags for other unnecessary 3rdparty files. Check only the flags for the OpenPose
 // executable. E.g. for `openpose.bin`, look for `Flags from examples/openpose/openpose.cpp:`.
 // Debugging
@@ -36,7 +35,7 @@ DEFINE_string(image_path,               "examples/media/COCO_val2014_00000000019
 DEFINE_string(model_pose,               "COCO",         "Model to be used. E.g. `COCO` (18 keypoints), `MPI` (15 keypoints, ~10% faster), "
                                                         "`MPI_4_layers` (15 keypoints, even faster but less accurate).");
 DEFINE_string(model_folder,             "models/",      "Folder path (absolute or relative) where the models (pose, face, ...) are located.");
-DEFINE_string(net_resolution,           "656x368",      "Multiples of 16. If it is increased, the accuracy potentially increases. If it is"
+DEFINE_string(net_resolution,           "-1x368",       "Multiples of 16. If it is increased, the accuracy potentially increases. If it is"
                                                         " decreased, the speed increases. For maximum speed-accuracy balance, it should keep the"
                                                         " closest aspect ratio possible to the images or videos to be processed. Using `-1` in"
                                                         " any of the dimensions, OP will choose the optimal aspect ratio depending on the user's"
@@ -81,8 +80,6 @@ int openPoseTutorialPose2()
     const auto outputSize = op::flagsToPoint(FLAGS_output_resolution, "-1x-1");
     // netInputSize
     const auto netInputSize = op::flagsToPoint(FLAGS_net_resolution, "-1x368");
-    // netOutputSize
-    const auto netOutputSize = netInputSize;
     // poseModel
     const auto poseModel = op::flagsToPoseModel(FLAGS_model_pose);
     // Check no contradictory flags enabled
@@ -91,6 +88,8 @@ int openPoseTutorialPose2()
     if (FLAGS_scale_gap <= 0. && FLAGS_scale_number > 1)
         op::error("Incompatible flag configuration: scale_gap must be greater than 0 or scale_number = 1.",
                   __LINE__, __FUNCTION__, __FILE__);
+    // Enabling Google Logging
+    const bool enableGoogleLogging = true;
     // Logging
     op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
     // Step 3 - Initialize all required classes
@@ -98,7 +97,8 @@ int openPoseTutorialPose2()
     op::CvMatToOpInput cvMatToOpInput;
     op::CvMatToOpOutput cvMatToOpOutput;
     auto poseExtractorPtr = std::make_shared<op::PoseExtractorCaffe>(
-        netInputSize, netOutputSize, outputSize, FLAGS_scale_number, poseModel, FLAGS_model_folder, FLAGS_num_gpu_start
+        poseModel, FLAGS_model_folder, FLAGS_num_gpu_start, std::vector<op::HeatMapType>{}, op::ScaleMode::ZeroToOne,
+        enableGoogleLogging
     );
     op::PoseGpuRenderer poseGpuRenderer{poseModel, poseExtractorPtr, (float)FLAGS_render_threshold,
                                         !FLAGS_disable_blending, (float)FLAGS_alpha_pose, (float)FLAGS_alpha_heatmap};
@@ -146,9 +146,6 @@ int openPoseTutorialPose2()
 
 int main(int argc, char *argv[])
 {
-    // Initializing google logging (Caffe uses it for logging)
-    google::InitGoogleLogging("openPoseTutorialPose2");
-
     // Parsing command line flags
     gflags::ParseCommandLineFlags(&argc, &argv, true);
 

@@ -28,10 +28,14 @@ namespace op
         }
     }
 
-    void CocoJsonSaver::record(const Array<float>& poseKeypoints, const std::string& imageName)
+    void CocoJsonSaver::record(const Array<float>& poseKeypoints, const Array<float>& poseScores,
+                               const std::string& imageName)
     {
         try
         {
+            // Security checks
+            if ((size_t)poseKeypoints.getSize(0) != poseScores.getVolume())
+                error("Dimension mismatch between poseKeypoints and poseScores.", __LINE__, __FUNCTION__, __FILE__);
             const auto numberPeople = poseKeypoints.getSize(0);
             const auto numberBodyParts = poseKeypoints.getSize(1);
             const auto imageId = getLastNumber(imageName);
@@ -64,11 +68,14 @@ namespace op
                 mJsonOfstream.arrayOpen();
                 std::vector<int> indexesInCocoOrder;
                 if (numberBodyParts == 18)
-                    indexesInCocoOrder = std::vector<int>{0, 15, 14, 17, 16,        5, 2, 6, 3, 7,        4, 11, 8, 12, 9,        13, 10};
+                    indexesInCocoOrder = std::vector<int>{0, 15,14,17,16,    5,2,6,3,7,    4,11,8,12, 9,    13,10};
                 else if (numberBodyParts == 19)
-                    indexesInCocoOrder = std::vector<int>{0, 16, 15, 18, 17,        5, 2, 6, 3, 7,        4, 12, 9, 13, 10,       14, 11};
+                    indexesInCocoOrder = std::vector<int>{0, 16,15,18,17,    5,2,6,3,7,    4,12,9,13,10,    14,11};
+                else if (numberBodyParts == 23)
+                    indexesInCocoOrder = std::vector<int>{18,21,19,22,20,    4,1,5,2,6,    3,13,8,14, 9,    15,10};
                 else
-                    error("Unvalid number of body parts (" + std::to_string(numberBodyParts) + ").", __LINE__, __FUNCTION__, __FILE__);
+                    error("Unvalid number of body parts (" + std::to_string(numberBodyParts) + ").",
+                          __LINE__, __FUNCTION__, __FILE__);
                 for (auto bodyPart = 0u ; bodyPart < indexesInCocoOrder.size() ; bodyPart++)
                 {
                     const auto finalIndex = 3*(person*numberBodyParts + indexesInCocoOrder.at(bodyPart));
@@ -77,6 +84,7 @@ namespace op
                     mJsonOfstream.plainText(poseKeypoints[finalIndex+1]);
                     mJsonOfstream.comma();
                     mJsonOfstream.plainText((poseKeypoints[finalIndex+2] > 0.f ? 1 : 0));
+                    // mJsonOfstream.plainText(poseKeypoints[finalIndex+2]); // For debugging
                     if (bodyPart < indexesInCocoOrder.size() - 1u)
                         mJsonOfstream.comma();
                 }
@@ -85,7 +93,7 @@ namespace op
 
                 // score
                 mJsonOfstream.key("score");
-                mJsonOfstream.plainText("0.0");
+                mJsonOfstream.plainText(poseScores[person]);
 
                 mJsonOfstream.objectClose();
             }

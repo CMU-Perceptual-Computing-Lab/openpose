@@ -19,10 +19,11 @@ namespace op
          * @param netInputSize Size at which the cropped image (where the face is located) is resized.
          * @param netOutputSize Size of the final results. At the moment, it must be equal than netOutputSize.
          */
-        explicit FaceExtractorCaffe(const Point<int>& netInputSize, const Point<int>& netOutputSize,
-                                    const std::string& modelFolder, const int gpuId,
-                                    const std::vector<HeatMapType>& heatMapTypes = {},
-                                    const ScaleMode heatMapScale = ScaleMode::ZeroToOne);
+        FaceExtractorCaffe(const Point<int>& netInputSize, const Point<int>& netOutputSize,
+                           const std::string& modelFolder, const int gpuId,
+                           const std::vector<HeatMapType>& heatMapTypes = {},
+                           const ScaleMode heatMapScale = ScaleMode::ZeroToOne,
+                           const bool enableGoogleLogging = true);
 
         virtual ~FaceExtractorCaffe();
 

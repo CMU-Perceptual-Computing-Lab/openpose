@@ -5,6 +5,7 @@
 #include <openpose/pose/poseParameters.hpp>
 #include <openpose/pose/renderPose.hpp>
 #include <openpose/utilities/cuda.hpp>
+#include <openpose/utilities/keypoint.hpp>
 #include <openpose/pose/poseGpuRenderer.hpp>
 
 namespace op
@@ -61,6 +62,7 @@ namespace op
 
     std::pair<int, std::string> PoseGpuRenderer::renderPose(Array<float>& outputData,
                                                             const Array<float>& poseKeypoints,
+                                                            const float scaleInputToOutput,
                                                             const float scaleNetToOutput)
     {
         try
@@ -83,9 +85,14 @@ namespace op
                     // Draw poseKeypoints
                     if (elementRendered == 0)
                     {
+                        // Rescale keypoints to output size
+                        auto poseKeypointsRescaled = poseKeypoints.clone();
+                        scaleKeypoints(poseKeypointsRescaled, scaleInputToOutput);
+                        // Render keypoints
                         if (!poseKeypoints.empty())
                             cudaMemcpy(pGpuPose,
-                                       poseKeypoints.getConstPtr(), numberPeople * numberBodyParts * 3 * sizeof(float),
+                                       poseKeypointsRescaled.getConstPtr(),
+                                       numberPeople * numberBodyParts * 3 * sizeof(float),
                                        cudaMemcpyHostToDevice);
                         renderPoseKeypointsGpu(*spGpuMemory, mPoseModel, numberPeople, frameSize, pGpuPose,
                                                mRenderThreshold, mShowGooglyEyes, mBlendOriginalFrame,
@@ -93,6 +100,9 @@ namespace op
                     }
                     else
                     {
+                        // If resized to input resolution: Replace scaleNetToOutput * scaleInputToOutput by
+                        // scaleInputToOutput, and comment the security checks.
+                        // Security checks
                         if (scaleNetToOutput == -1.f)
                             error("Non valid scaleNetToOutput.", __LINE__, __FUNCTION__, __FILE__);
                         // Parameters
@@ -104,7 +114,7 @@ namespace op
                             elementRenderedName = mPartIndexToName.at(elementRendered-1);
                             renderPoseHeatMapGpu(*spGpuMemory, mPoseModel, frameSize,
                                                  spPoseExtractor->getHeatMapGpuConstPtr(),
-                                                 heatMapSize, scaleNetToOutput, elementRendered,
+                                                 heatMapSize, scaleNetToOutput * scaleInputToOutput, elementRendered,
                                                  (mBlendOriginalFrame ? getAlphaHeatMap() : 1.f));
                         }
                         // Draw PAFs (Part Affinity Fields)
@@ -113,7 +123,7 @@ namespace op
                             elementRenderedName = "Heatmaps";
                             renderPoseHeatMapsGpu(*spGpuMemory, mPoseModel, frameSize,
                                                   spPoseExtractor->getHeatMapGpuConstPtr(),
-                                                  heatMapSize, scaleNetToOutput,
+                                                  heatMapSize, scaleNetToOutput * scaleInputToOutput,
                                                   (mBlendOriginalFrame ? getAlphaHeatMap() : 1.f));
                         }
                         // Draw PAFs (Part Affinity Fields)
@@ -122,7 +132,7 @@ namespace op
                             elementRenderedName = "PAFs (Part Affinity Fields)";
                             renderPosePAFsGpu(*spGpuMemory, mPoseModel, frameSize,
                                               spPoseExtractor->getHeatMapGpuConstPtr(),
-                                              heatMapSize, scaleNetToOutput,
+                                              heatMapSize, scaleNetToOutput * scaleInputToOutput,
                                               (mBlendOriginalFrame ? getAlphaHeatMap() : 1.f));
                         }
                         // Draw affinity between 2 body parts
@@ -134,7 +144,7 @@ namespace op
                             elementRenderedName = elementRenderedName.substr(0, elementRenderedName.find("("));
                             renderPosePAFGpu(*spGpuMemory, mPoseModel, frameSize,
                                              spPoseExtractor->getHeatMapGpuConstPtr(),
-                                             heatMapSize, scaleNetToOutput, affinityPartMapped,
+                                             heatMapSize, scaleNetToOutput * scaleInputToOutput, affinityPartMapped,
                                              (mBlendOriginalFrame ? getAlphaHeatMap() : 1.f));
                         }
                     }
