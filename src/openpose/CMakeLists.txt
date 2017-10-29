@@ -4,14 +4,6 @@ foreach (SUB_DIR ${SUB_DIRS})
   add_subdirectory(${SUB_DIR})
 endforeach (SUB_DIR ${SUB_DIRS})
 
-# TODO -- Test this on Ubuntu.
-if (CMAKE_COMPILER_IS_GNUCXX)
-  foreach (SUB_DIR ${SUB_DIRS})
-      set_target_properties(openpose_${SUB_DIR} PROPERTIES COMPILE_FLAGS ${OP_CXX_FLAGS})
-  endforeach (SUB_DIR ${SUB_DIRS})
-  set_target_properties(openpose PROPERTIES COMPILE_FLAGS ${OP_CXX_FLAGS})
-endif (CMAKE_COMPILER_IS_GNUCXX)
-
 # make the openpose.so/dll
 file(GLOB_RECURSE OP_HEADERS_UNFILTERED "${CMAKE_SOURCE_DIR}/include/openpose/*.h" 
         "${CMAKE_SOURCE_DIR}/include/openpose/*.hpp" 
@@ -24,17 +16,26 @@ foreach (FILE ${OP_HEADERS_UNFILTERED})
 endforeach(FILE ${OP_HEADERS_UNFILTERED})
 # list(REMOVE_ITEM OP_HEADERS "${CMAKE_SOURCE_DIR}/include/openpose/experimental/*")
 
-message(STATUS "\${OP_HEADERS} = ${OP_HEADERS}")
-message(STATUS "\${OP_HEADERS_UNFILTERED} = ${OP_HEADERS_UNFILTERED}")
-
 cuda_add_library(openpose ${SOURCES_OPENPOSE} ${OP_HEADERS})
-target_link_libraries(openpose ${OpenCV_LIBS} ${Caffe_LIBS}
-    debug ${Boost_FILESYSTEM_LIBRARY_DEBUG} debug ${Boost_SYSTEM_LIBRARY_DEBUG}
-    optimized ${Boost_FILESYSTEM_LIBRARY_OPTIMIZED} optimized ${Boost_SYSTEM_LIBRARY_OPTIMIZED} 
-    debug ${GFLAGS_LIBRARY_DEBUG} optimized ${GFLAGS_LIBRARY_RELEASE}
-    debug ${GLOG_LIBRARY_DEBUG} optimized ${GLOG_LIBRARY_RELEASE})
+
+if(UNIX AND NOT APPLE)
+  target_link_libraries(openpose ${OpenCV_LIBS} ${Caffe_LIBS}
+      ${Boost_SYSTEM_LIBRARY} ${Boost_FILESYSTEM_LIBRARY} 
+      ${GFLAGS_LIBRARY} ${GLOG_LIBRARY})
+  if (CMAKE_COMPILER_IS_GNUCXX)
+    foreach (SUB_DIR ${SUB_DIRS})
+        set_target_properties(openpose_${SUB_DIR} PROPERTIES COMPILE_FLAGS ${OP_CXX_FLAGS})
+    endforeach (SUB_DIR ${SUB_DIRS})
+    set_target_properties(openpose PROPERTIES COMPILE_FLAGS ${OP_CXX_FLAGS})
+  endif (CMAKE_COMPILER_IS_GNUCXX)
+endif(UNIX AND NOT APPLE)
 
 if (WIN32)
+  target_link_libraries(openpose ${OpenCV_LIBS} ${Caffe_LIBS}
+      debug ${Boost_FILESYSTEM_LIBRARY_DEBUG} debug ${Boost_SYSTEM_LIBRARY_DEBUG}
+      optimized ${Boost_FILESYSTEM_LIBRARY_OPTIMIZED} optimized ${Boost_SYSTEM_LIBRARY_OPTIMIZED} 
+      debug ${GFLAGS_LIBRARY_DEBUG} optimized ${GFLAGS_LIBRARY_RELEASE}
+      debug ${GLOG_LIBRARY_DEBUG} optimized ${GLOG_LIBRARY_RELEASE})
   target_compile_definitions(openpose PRIVATE BOOST_ALL_NO_LIB)
   # source_group("Header Files" FILES ${CMAKE_SOURCE_DIR}/include)
   set_property(TARGET openpose PROPERTY FOLDER "Openpose library")
