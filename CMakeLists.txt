@@ -31,6 +31,10 @@ endif ()
 
 # Turn on C++11
 add_definitions(-std=c++11)
+if (WIN32)
+  string(REPLACE "/O2" "/Ox" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+  string(CONCAT CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}" " /MP")
+endif (WIN32)
 
 # C++ additional flags
 if(CMAKE_COMPILER_IS_GNUCXX)
