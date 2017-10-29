@@ -475,7 +475,7 @@ namespace op
                 mCvMatData.first = false;
 
             if (mCvMatData.first)
-                mCvMatData.second = cv::Mat((int)mSize.size(), mSize.data(), cvFormat, spData.get()[0]);
+                mCvMatData.second = cv::Mat((int)mSize.size(), mSize.data(), cvFormat, spData.get());
             else
                 mCvMatData.second = cv::Mat();
         }

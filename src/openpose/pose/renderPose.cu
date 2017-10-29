@@ -11,12 +11,12 @@ namespace op
     __constant__ const unsigned int COCO_PAIRS_GPU[] = POSE_COCO_PAIRS_RENDER_GPU;
     __constant__ const unsigned int BODY_18_PAIRS_GPU[] = POSE_BODY_18_PAIRS_RENDER_GPU;
     __constant__ const unsigned int BODY_19_PAIRS_GPU[] = POSE_BODY_19_PAIRS_RENDER_GPU;
-    __constant__ const unsigned int BODY_22_PAIRS_GPU[] = POSE_BODY_22_PAIRS_RENDER_GPU;
+    __constant__ const unsigned int BODY_23_PAIRS_GPU[] = POSE_BODY_23_PAIRS_RENDER_GPU;
     __constant__ const unsigned int MPI_PAIRS_GPU[] = POSE_MPI_PAIRS_RENDER_GPU;
     __constant__ const float COCO_COLORS[] = {POSE_COCO_COLORS_RENDER_GPU};
     __constant__ const float BODY_18_COLORS[] = {POSE_BODY_18_COLORS_RENDER_GPU};
     __constant__ const float BODY_19_COLORS[] = {POSE_BODY_19_COLORS_RENDER_GPU};
-    __constant__ const float BODY_22_COLORS[] = {POSE_BODY_22_COLORS_RENDER_GPU};
+    __constant__ const float BODY_23_COLORS[] = {POSE_BODY_23_COLORS_RENDER_GPU};
     __constant__ const float MPI_COLORS[] = {POSE_MPI_COLORS_RENDER_GPU};
 
 
@@ -176,7 +176,7 @@ namespace op
                         radius, stickwidth, threshold, alphaColorToAdd, blendOriginalFrame, (googlyEyes ? 15 : -1), (googlyEyes ? 16 : -1));
     }
 
-    __global__ void renderPoseBody22(float* targetPtr, const int targetWidth, const int targetHeight, const float* const posePtr,
+    __global__ void renderPoseBody23(float* targetPtr, const int targetWidth, const int targetHeight, const float* const posePtr,
                                      const int numberPeople, const float threshold, const bool googlyEyes, const bool blendOriginalFrame,
                                      const float alphaColorToAdd)
     {
@@ -190,16 +190,16 @@ namespace op
         __shared__ float sharedScaleF[POSE_MAX_PEOPLE];
 
         // Other parameters
-        const auto numberPartPairs = sizeof(BODY_22_PAIRS_GPU) / (2*sizeof(BODY_22_PAIRS_GPU[0]));
-        const auto numberColors = sizeof(BODY_22_COLORS) / (3*sizeof(BODY_22_COLORS[0]));
+        const auto numberPartPairs = sizeof(BODY_23_PAIRS_GPU) / (2*sizeof(BODY_23_PAIRS_GPU[0]));
+        const auto numberColors = sizeof(BODY_23_COLORS) / (3*sizeof(BODY_23_COLORS[0]));
         const auto radius = fastMin(targetWidth, targetHeight) / 100.f;
         const auto stickwidth = fastMin(targetWidth, targetHeight) / 120.f;
 
         // Render key points
         renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF,
-                        globalIdx, x, y, targetWidth, targetHeight, posePtr, BODY_22_PAIRS_GPU, numberPeople,
-                        POSE_BODY_22_NUMBER_PARTS, numberPartPairs, BODY_22_COLORS, numberColors,
-                        radius, stickwidth, threshold, alphaColorToAdd, blendOriginalFrame, (googlyEyes ? 14 : -1), (googlyEyes ? 15 : -1));
+                        globalIdx, x, y, targetWidth, targetHeight, posePtr, BODY_23_PAIRS_GPU, numberPeople,
+                        POSE_BODY_23_NUMBER_PARTS, numberPartPairs, BODY_23_COLORS, numberColors,
+                        radius, stickwidth, threshold, alphaColorToAdd, blendOriginalFrame, (googlyEyes ? 19 : -1), (googlyEyes ? 21 : -1));
     }
 
     __global__ void renderPoseMpi29Parts(float* targetPtr, const int targetWidth, const int targetHeight, const float* const posePtr,
@@ -397,8 +397,8 @@ namespace op
                 else if (poseModel == PoseModel::BODY_19)
                     renderPoseBody19<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.x, frameSize.y, posePtr, numberPeople,
                                                                      renderThreshold, googlyEyes, blendOriginalFrame, alphaBlending);
-                else if (poseModel == PoseModel::BODY_22)
-                    renderPoseBody22<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.x, frameSize.y, posePtr, numberPeople,
+                else if (poseModel == PoseModel::BODY_23)
+                    renderPoseBody23<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.x, frameSize.y, posePtr, numberPeople,
                                                                      renderThreshold, googlyEyes, blendOriginalFrame, alphaBlending);
                 else if (poseModel == PoseModel::MPI_15 || poseModel == PoseModel::MPI_15_4)
                     renderPoseMpi29Parts<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.x, frameSize.y, posePtr,

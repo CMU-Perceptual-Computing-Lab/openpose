@@ -7,8 +7,8 @@ namespace op
     const auto THREADS_PER_BLOCK_1D = 16u;
 
     template <typename T>
-    __global__ void resizeKernel(T* targetPtr, const T* const sourcePtr, const int sourceWidth, const int sourceHeight, const int targetWidth,
-                                 const int targetHeight)
+    __global__ void resizeKernel(T* targetPtr, const T* const sourcePtr, const int sourceWidth, const int sourceHeight,
+                                 const int targetWidth, const int targetHeight)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -20,13 +20,15 @@ namespace op
             const T xSource = (x + 0.5f) / scaleWidth - 0.5f;
             const T ySource = (y + 0.5f) / scaleHeight - 0.5f;
 
-            targetPtr[y*targetWidth+x] = bicubicInterpolate(sourcePtr, xSource, ySource, sourceWidth, sourceHeight, sourceWidth);
+            targetPtr[y*targetWidth+x] = bicubicInterpolate(sourcePtr, xSource, ySource, sourceWidth, sourceHeight,
+                                                            sourceWidth);
         }
     }
 
     template <typename T>
-    __global__ void resizeKernelAndMerge(T* targetPtr, const T* const sourcePtr, const int sourceNumOffset, const int num, const T* scaleInputToNetInputs,
-                                         const int sourceWidth, const int sourceHeight, const int targetWidth, const int targetHeight)
+    __global__ void resizeKernelAndMerge(T* targetPtr, const T* const sourcePtr, const int sourceNumOffset,
+                                         const int num, const T* scaleInputToNetInputs, const int sourceWidth,
+                                         const int sourceHeight, const int targetWidth, const int targetHeight)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -70,7 +72,8 @@ namespace op
             const auto targetWidth = targetSize[3];
 
             const dim3 threadsPerBlock{THREADS_PER_BLOCK_1D, THREADS_PER_BLOCK_1D};
-            const dim3 numBlocks{getNumberCudaBlocks(targetWidth, threadsPerBlock.x), getNumberCudaBlocks(targetHeight, threadsPerBlock.y)};
+            const dim3 numBlocks{getNumberCudaBlocks(targetWidth, threadsPerBlock.x),
+                                 getNumberCudaBlocks(targetHeight, threadsPerBlock.y)};
             const auto sourceChannelOffset = sourceHeight * sourceWidth;
             const auto targetChannelOffset = targetWidth * targetHeight;
 
@@ -85,7 +88,8 @@ namespace op
                         const auto offset = offsetBase + c;
                         resizeKernel<<<numBlocks, threadsPerBlock>>>(targetPtr + offset * targetChannelOffset,
                                                                      sourcePtr + offset * sourceChannelOffset,
-                                                                     sourceWidth, sourceHeight, targetWidth, targetHeight);
+                                                                     sourceWidth, sourceHeight, targetWidth,
+                                                                     targetHeight);
                     }
                 }
             }
@@ -94,20 +98,25 @@ namespace op
             {
                 // If scale_number > 1 --> scaleInputToNetInputs must be set
                 if (scaleInputToNetInputs.size() != num)
-                    error("The scale ratios size must be equal than the number of scales.", __LINE__, __FUNCTION__, __FILE__);
+                    error("The scale ratios size must be equal than the number of scales.",
+                          __LINE__, __FUNCTION__, __FILE__);
                 const auto maxScales = 10;
                 if (scaleInputToNetInputs.size() > maxScales)
-                    error("The maximum number of scales is " + std::to_string(maxScales) + ".", __LINE__, __FUNCTION__, __FILE__);
+                    error("The maximum number of scales is " + std::to_string(maxScales) + ".",
+                          __LINE__, __FUNCTION__, __FILE__);
                 // Copy scaleInputToNetInputs
                 T* scaleInputToNetInputsPtr;
                 cudaMalloc((void**)&scaleInputToNetInputsPtr, maxScales * sizeof(T));
-                cudaMemcpy(scaleInputToNetInputsPtr, scaleInputToNetInputs.data(), scaleInputToNetInputs.size() * sizeof(T), cudaMemcpyHostToDevice);
+                cudaMemcpy(scaleInputToNetInputsPtr, scaleInputToNetInputs.data(),
+                           scaleInputToNetInputs.size() * sizeof(T), cudaMemcpyHostToDevice);
                 // Perform resize + merging
                 const auto sourceNumOffset = channels * sourceChannelOffset;
                 for (auto c = 0 ; c < channels ; c++)
                     resizeKernelAndMerge<<<numBlocks, threadsPerBlock>>>(targetPtr + c * targetChannelOffset,
-                                                                         sourcePtr + c * sourceChannelOffset, sourceNumOffset,
-                                                                         num, scaleInputToNetInputsPtr, sourceWidth, sourceHeight, targetWidth, targetHeight);
+                                                                         sourcePtr + c * sourceChannelOffset,
+                                                                         sourceNumOffset, num,
+                                                                         scaleInputToNetInputsPtr, sourceWidth,
+                                                                         sourceHeight, targetWidth, targetHeight);
                 // Free memory
                 cudaFree(scaleInputToNetInputsPtr);
             }
@@ -120,8 +129,10 @@ namespace op
         }
     }
 
-    template void resizeAndMergeGpu(float* targetPtr, const float* const sourcePtr, const std::array<int, 4>& targetSize,
-                                    const std::array<int, 4>& sourceSize, const std::vector<float>& scaleInputToNetInputs);
-    template void resizeAndMergeGpu(double* targetPtr, const double* const sourcePtr, const std::array<int, 4>& targetSize,
-                                    const std::array<int, 4>& sourceSize, const std::vector<double>& scaleInputToNetInputs);
+    template void resizeAndMergeGpu(float* targetPtr, const float* const sourcePtr,
+                                    const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize,
+                                    const std::vector<float>& scaleInputToNetInputs);
+    template void resizeAndMergeGpu(double* targetPtr, const double* const sourcePtr,
+                                    const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize,
+                                    const std::vector<double>& scaleInputToNetInputs);
 }

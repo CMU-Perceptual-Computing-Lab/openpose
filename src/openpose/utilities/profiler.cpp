@@ -17,7 +17,7 @@ namespace op
         std::map<std::string, std::tuple<double, unsigned long long, std::chrono::high_resolution_clock::time_point>> sProfilerTuple{
             std::map<std::string, std::tuple<double, unsigned long long, std::chrono::high_resolution_clock::time_point>>()
         };
-        std::mutex sMutex{};
+        std::mutex sMutexProfiler{};
 
         std::string getKey(const int line, const std::string& function, const std::string& file)
         {
@@ -37,7 +37,7 @@ namespace op
     {
         #ifdef PROFILER_ENABLED
             const auto key = getKey(line, function, file);
-            std::unique_lock<std::mutex> lock{sMutex};
+            std::unique_lock<std::mutex> lock{sMutexProfiler};
             if (sProfilerTuple.count(key) > 0)
                 std::get<2>(sProfilerTuple[key]) = std::chrono::high_resolution_clock::now();
             else
@@ -55,7 +55,7 @@ namespace op
     void Profiler::timerEnd(const std::string& key)
     {
         #ifdef PROFILER_ENABLED
-            const std::lock_guard<std::mutex> lock{sMutex};
+            const std::lock_guard<std::mutex> lock{sMutexProfiler};
             if (sProfilerTuple.count(key) > 0)
             {
                 auto tuple = sProfilerTuple[key];
@@ -77,7 +77,7 @@ namespace op
     void Profiler::printAveragedTimeMsOnIterationX(const std::string& key, const int line, const std::string& function, const std::string& file, const unsigned long long x)
     {
         #ifdef PROFILER_ENABLED
-            std::unique_lock<std::mutex> lock{sMutex};
+            std::unique_lock<std::mutex> lock{sMutexProfiler};
             if (sProfilerTuple.count(key) > 0)
             {
                 const auto tuple = sProfilerTuple[key];
@@ -101,7 +101,7 @@ namespace op
     void Profiler::printAveragedTimeMsEveryXIterations(const std::string& key, const int line, const std::string& function, const std::string& file, const unsigned long long x)
     {
         #ifdef PROFILER_ENABLED
-            std::unique_lock<std::mutex> lock{sMutex};
+            std::unique_lock<std::mutex> lock{sMutexProfiler};
             if (sProfilerTuple.count(key) > 0)
             {
                 const auto tuple = sProfilerTuple[key];
@@ -111,7 +111,7 @@ namespace op
                     printAveragedTimeMsCommon(std::get<0>(tuple), std::get<1>(tuple), line, function, file);
 
                     // Reset
-                    const std::lock_guard<std::mutex> lock{sMutex};
+                    const std::lock_guard<std::mutex> lock{sMutexProfiler};
                     auto& tuple = sProfilerTuple[key];
                     std::get<0>(tuple) = 0.;
                     std::get<1>(tuple) = 0;

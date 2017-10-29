@@ -235,6 +235,7 @@
     <ClInclude Include="..\..\include\openpose\utilities\openCv.hpp" />
     <ClInclude Include="..\..\include\openpose\utilities\pointerContainer.hpp" />
     <ClInclude Include="..\..\include\openpose\utilities\profiler.hpp" />
+    <ClInclude Include="..\..\include\openpose\utilities\standard.hpp" />
     <ClInclude Include="..\..\include\openpose\utilities\string.hpp" />
     <ClInclude Include="..\..\include\openpose\wrapper\headers.hpp" />
     <ClInclude Include="..\..\include\openpose\wrapper\wrapper.hpp" />

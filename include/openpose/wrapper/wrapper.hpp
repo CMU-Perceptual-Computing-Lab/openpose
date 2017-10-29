@@ -576,28 +576,6 @@ namespace op
                 if (finalOutputSize.x == -1 || finalOutputSize.y == -1)
                     finalOutputSize = producerSize;
             }
-            // Set poseNetInputSize if -1 used
-            Point<int> poseNetInputSize = wrapperStructPose.netInputSize;
-            if (poseNetInputSize.x == -1 && poseNetInputSize.y == -1)
-                error("Net input size cannot be -1x-1.", __LINE__, __FUNCTION__, __FILE__);
-            else if (poseNetInputSize.x == -1 || poseNetInputSize.y == -1)
-            {
-                if (producerSize.x <= 0 || producerSize.y <= 0)
-                    error("Net resolution cannot be -1 for image_dir, only for video, webcam, and IP camera.",
-                          __LINE__, __FUNCTION__, __FILE__);
-                else if (poseNetInputSize.x == -1)
-                    poseNetInputSize.x = 16 * intRound(
-                        poseNetInputSize.y * producerSize.x / (float) producerSize.y / 16.f
-                    );
-                else // if (poseNetInputSize.y == -1)
-                    poseNetInputSize.y = 16 * intRound(
-                        poseNetInputSize.x * producerSize.y / (float) producerSize.x / 16.f
-                    );
-            }
-            // Security checks
-            if ((poseNetInputSize.x > 0 && poseNetInputSize.x % 16 != 0)
-                || (poseNetInputSize.y > 0 && poseNetInputSize.y % 16 != 0))
-                error("Net input resolution must be multiples of 16.", __LINE__, __FUNCTION__, __FILE__);
 
             // Producer
             if (wrapperStructInput.producerSharedPtr != nullptr)
@@ -613,7 +591,8 @@ namespace op
 
             // Get input scales and sizes
             const auto scaleAndSizeExtractor = std::make_shared<ScaleAndSizeExtractor>(
-                poseNetInputSize, finalOutputSize, wrapperStructPose.scalesNumber, wrapperStructPose.scaleGap
+                wrapperStructPose.netInputSize, finalOutputSize, wrapperStructPose.scalesNumber,
+                wrapperStructPose.scaleGap
             );
             spWScaleAndSizeExtractor = std::make_shared<WScaleAndSizeExtractor<TDatumsPtr>>(scaleAndSizeExtractor);
 
@@ -627,7 +606,6 @@ namespace op
             }
 
             // Pose estimators & renderers
-            const Point<int>& poseNetOutputSize = poseNetInputSize;
             std::vector<std::shared_ptr<PoseExtractor>> poseExtractors;
             std::vector<std::shared_ptr<PoseGpuRenderer>> poseGpuRenderers;
             std::shared_ptr<PoseCpuRenderer> poseCpuRenderer;
@@ -639,9 +617,9 @@ namespace op
                 // Pose estimators
                 for (auto gpuId = 0; gpuId < gpuNumber; gpuId++)
                     poseExtractors.emplace_back(std::make_shared<PoseExtractorCaffe>(
-                        poseNetInputSize, poseNetOutputSize, finalOutputSize, wrapperStructPose.scalesNumber,
                         wrapperStructPose.poseModel, modelFolder, gpuId + gpuNumberStart,
-                        wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale
+                        wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale,
+                        wrapperStructPose.enableGoogleLogging
                     ));
 
                 // Pose renderers
@@ -669,6 +647,7 @@ namespace op
                     if (wrapperStructPose.renderMode == RenderMode::Cpu)
                     {
                         poseCpuRenderer = std::make_shared<PoseCpuRenderer>(wrapperStructPose.poseModel,
+                                                                            wrapperStructPose.renderThreshold,
                                                                             wrapperStructPose.blendOriginalFrame);
                         cpuRenderers.emplace_back(std::make_shared<WPoseRenderer<TDatumsPtr>>(poseCpuRenderer));
                     }
@@ -714,7 +693,8 @@ namespace op
                     const auto netOutputSize = wrapperStructFace.netInputSize;
                     const auto faceExtractor = std::make_shared<FaceExtractorCaffe>(
                         wrapperStructFace.netInputSize, netOutputSize, modelFolder,
-                        gpu + gpuNumberStart, wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale
+                        gpu + gpuNumberStart, wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale,
+                        wrapperStructPose.enableGoogleLogging
                     );
                     spWPoses.at(gpu).emplace_back(std::make_shared<WFaceExtractor<TDatumsPtr>>(faceExtractor));
                 }
@@ -740,7 +720,8 @@ namespace op
                     const auto handExtractor = std::make_shared<HandExtractorCaffe>(
                         wrapperStructHand.netInputSize, netOutputSize, modelFolder,
                         gpu + gpuNumberStart, wrapperStructHand.scalesNumber, wrapperStructHand.scaleRange,
-                        wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale
+                        wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale,
+                        wrapperStructPose.enableGoogleLogging
                     );
                     spWPoses.at(gpu).emplace_back(std::make_shared<WHandExtractor<TDatumsPtr>>(handExtractor));
                     // If tracking
@@ -843,14 +824,14 @@ namespace op
                 mPostProcessingWs.emplace_back(std::make_shared<WOpOutputToCvMat<TDatumsPtr>>(opOutputToCvMat));
             }
             // Re-scale pose if desired
-            // If desired scale is not the current output
-            if (wrapperStructPose.keypointScale != ScaleMode::OutputResolution
-                // and desired scale is not input when size(output) = size(input)
-                && !(wrapperStructPose.keypointScale == ScaleMode::InputResolution &&
+            // If desired scale is not the current input
+            if (wrapperStructPose.keypointScale != ScaleMode::InputResolution
+                // and desired scale is not output when size(input) = size(output)
+                && !(wrapperStructPose.keypointScale == ScaleMode::OutputResolution &&
                      (finalOutputSize == producerSize || finalOutputSize.x <= 0 || finalOutputSize.y <= 0))
-                // and desired scale is not net output when size(output) = size(net output)
+                // and desired scale is not net output when size(input) = size(net output)
                 && !(wrapperStructPose.keypointScale == ScaleMode::NetOutputResolution
-                     && finalOutputSize == poseNetOutputSize))
+                     && producerSize == wrapperStructPose.netInputSize))
             {
                 // Then we must rescale the keypoints
                 auto keypointScaler = std::make_shared<KeypointScaler>(wrapperStructPose.keypointScale);
