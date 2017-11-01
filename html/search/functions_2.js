@@ -23,6 +23,6 @@ var searchData=
   ['connectbodypartscpu',['connectBodyPartsCpu',['../namespaceop.html#a708e05033d5c51c3a3ff5d4ed621ebbf',1,'op']]],
   ['connectbodypartsgpu',['connectBodyPartsGpu',['../namespaceop.html#ac4e6f18247395105a9ee7dc1ebeccea2',1,'op']]],
   ['cputogpumemoryifnotcopiedyet',['cpuToGpuMemoryIfNotCopiedYet',['../classop_1_1_gpu_renderer.html#ac7c1ab0eebf1d54b55cc65a5560bad7b',1,'op::GpuRenderer']]],
-  ['createarray',['createArray',['../classop_1_1_cv_mat_to_op_input.html#ab9b198d84fbacc0b8aa9e863632e57c9',1,'op::CvMatToOpInput::createArray()'],['../classop_1_1_cv_mat_to_op_output.html#a003515873bf34525e2a6d313d8619ff3',1,'op::CvMatToOpOutput::createArray()']]],
+  ['createarray',['createArray',['../classop_1_1_cv_mat_to_op_input.html#acf0c43174fe8e3b1c71d76aca861a6ab',1,'op::CvMatToOpInput::createArray()'],['../classop_1_1_cv_mat_to_op_output.html#a003515873bf34525e2a6d313d8619ff3',1,'op::CvMatToOpOutput::createArray()']]],
   ['cudacheck',['cudaCheck',['../namespaceop.html#a2af8422ada0de882cc222920ca15c6d2',1,'op']]]
 ];

@@ -153,8 +153,8 @@ Public Attributes</h2></td></tr>
 <tr class="separator:ae6adcdacea12a9cfa445cf0cac1985b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0b2c8ccac37be088524cc7c24a502c7b"><td class="memItemLeft" align="right" valign="top">cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structop_1_1_datum.html#a0b2c8ccac37be088524cc7c24a502c7b">cvInputData</a></td></tr>
 <tr class="separator:a0b2c8ccac37be088524cc7c24a502c7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0b105b52ce12f2689c7aa26708117254"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structop_1_1_datum.html#a0b105b52ce12f2689c7aa26708117254">inputNetData</a></td></tr>
-<tr class="separator:a0b105b52ce12f2689c7aa26708117254"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a46ff336119fd0d67c8223b1a9371731d"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structop_1_1_datum.html#a46ff336119fd0d67c8223b1a9371731d">inputNetData</a></td></tr>
+<tr class="separator:a46ff336119fd0d67c8223b1a9371731d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a42b953c082f479eddc527da9a3a4cc75"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structop_1_1_datum.html#a42b953c082f479eddc527da9a3a4cc75">outputData</a></td></tr>
 <tr class="separator:a42b953c082f479eddc527da9a3a4cc75"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0d1f1c3d3494386e2d652268f6e17b5a"><td class="memItemLeft" align="right" valign="top">cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structop_1_1_datum.html#a0d1f1c3d3494386e2d652268f6e17b5a">cvOutputData</a></td></tr>
@@ -677,16 +677,16 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a0b105b52ce12f2689c7aa26708117254"></a>
+<a class="anchor" id="a46ff336119fd0d67c8223b1a9371731d"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classop_1_1_array.html">Array</a>&lt;float&gt; op::Datum::inputNetData</td>
+          <td class="memname">std::vector&lt;<a class="el" href="classop_1_1_array.html">Array</a>&lt;float&gt; &gt; op::Datum::inputNetData</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Original image to be processed in <a class="el" href="classop_1_1_array.html">Array&lt;float&gt;</a> format. It has been resized to the net input resolution, as well as reformatted <a class="el" href="classop_1_1_array.html">Array&lt;float&gt;</a> format to be compatible with the net. In case of &gt;1 scales, then each scale is right- and bottom-padded to fill the greatest resolution. The scales are sorted from bigger to smaller. Size: #scales x 3 x input_net_height x input_net_width </p>
+<p>Original image to be processed in <a class="el" href="classop_1_1_array.html">Array&lt;float&gt;</a> format. It has been resized to the net input resolution, as well as reformatted <a class="el" href="classop_1_1_array.html">Array&lt;float&gt;</a> format to be compatible with the net. In case of &gt;1 scales, then each scale is right- and bottom-padded to fill the greatest resolution. The scales are sorted from bigger to smaller. Vector size: #scales Each array size: 3 x input_net_height x input_net_width </p>
 
 </div>
 </div>
@@ -738,7 +738,7 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Rendered image in <a class="el" href="classop_1_1_array.html">Array&lt;float&gt;</a> format. It consists of a blending of the inputNetData and the pose/body part(s) heatmap/PAF(s). If rendering is disabled (e.g. <code>no_render_pose</code> flag in the demo), then outputData will be empty. Size: 3 x output_net_height x output_net_width </p>
+<p>Rendered image in <a class="el" href="classop_1_1_array.html">Array&lt;float&gt;</a> format. It consists of a blending of the cvInputData and the pose/body part(s) heatmap/PAF(s). If rendering is disabled (e.g. <code>no_render_pose</code> flag in the demo), then outputData will be empty. Size: 3 x output_net_height x output_net_width </p>
 
 </div>
 </div>

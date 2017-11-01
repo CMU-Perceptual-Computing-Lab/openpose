@@ -128,7 +128,7 @@ $(document).ready(function(){initNavTree('pose_extractor_caffe_8hpp_source.html'
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;</div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;        <span class="keywordtype">void</span> netInitializationOnThread();</div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;        <span class="keywordtype">void</span> forwardPass(<span class="keyword">const</span> <a class="code" href="classop_1_1_array.html">Array&lt;float&gt;</a>&amp; inputNetData, <span class="keyword">const</span> <a class="code" href="structop_1_1_point.html">Point&lt;int&gt;</a>&amp; inputDataSize,</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;        <span class="keywordtype">void</span> forwardPass(<span class="keyword">const</span> std::vector&lt;<a class="code" href="classop_1_1_array.html">Array&lt;float&gt;</a>&gt;&amp; inputNetData, <span class="keyword">const</span> <a class="code" href="structop_1_1_point.html">Point&lt;int&gt;</a>&amp; inputDataSize,</div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;                         <span class="keyword">const</span> std::vector&lt;double&gt;&amp; scaleInputToNetInputs = {1.f});</div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">float</span>* getHeatMapCpuConstPtr() <span class="keyword">const</span>;</div>

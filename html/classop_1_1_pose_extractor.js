@@ -3,7 +3,7 @@ var classop_1_1_pose_extractor =
     [ "PoseExtractor", "classop_1_1_pose_extractor.html#a3b88d13440d182925701386549b7a61f", null ],
     [ "~PoseExtractor", "classop_1_1_pose_extractor.html#a9f98eef4ac08cacefe74e002ac086582", null ],
     [ "checkThread", "classop_1_1_pose_extractor.html#ae3477e0ab1a350fd044215b0ba6f7520", null ],
-    [ "forwardPass", "classop_1_1_pose_extractor.html#a31162da929b9ca5cc592b6438cfea7c8", null ],
+    [ "forwardPass", "classop_1_1_pose_extractor.html#afe4ceae04443242148c563eb6d8b954c", null ],
     [ "get", "classop_1_1_pose_extractor.html#a7dc82be227cc759582184de9c26f0b64", null ],
     [ "getHeatMapCpuConstPtr", "classop_1_1_pose_extractor.html#a0bb5cf37e5b93e347e355be126d22ead", null ],
     [ "getHeatMapGpuConstPtr", "classop_1_1_pose_extractor.html#a0b895e3e582bd504b531ba525ed77430", null ],

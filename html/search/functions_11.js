@@ -20,10 +20,10 @@ var searchData=
   ['renderposepafgpu',['renderPosePAFGpu',['../namespaceop.html#a832678e25561cd77d174847b0dddc6bb',1,'op']]],
   ['renderposepafsgpu',['renderPosePAFsGpu',['../namespaceop.html#a7e2c7f463bbbbe9665faa46c073cc5ac',1,'op']]],
   ['reset',['reset',['../classop_1_1_array.html#a12e538b09e98bf0900163031602ed2ed',1,'op::Array::reset(const int size)'],['../classop_1_1_array.html#a0ad0232daa69783cf2c8f7a0ff5b3b0c',1,'op::Array::reset(const std::vector&lt; int &gt; &amp;sizes={})'],['../classop_1_1_array.html#ac7183eb2f4e78a6941da3a2079b9ed32',1,'op::Array::reset(const int size, const T value)'],['../classop_1_1_array.html#add2eeccd967cdf0900449649cb6f5afb',1,'op::Array::reset(const std::vector&lt; int &gt; &amp;sizes, const T value)'],['../classop_1_1_thread_manager.html#a5b7c5ea46c360496e261094c5e1397a7',1,'op::ThreadManager::reset()']]],
-  ['reshape',['Reshape',['../classop_1_1_maximum_caffe.html#aa9ab7eab51c9539b141a0aac998b2223',1,'op::MaximumCaffe::Reshape()'],['../classop_1_1_nms_caffe.html#a9eae1bc23e983dbe6f1a513f82e6d97d',1,'op::NmsCaffe::Reshape()'],['../classop_1_1_resize_and_merge_caffe.html#a4aa422b6121c51cbf14acf6f19119927',1,'op::ResizeAndMergeCaffe::Reshape()'],['../classop_1_1_body_part_connector_caffe.html#a988042172b192eb80b3479c5f68484f4',1,'op::BodyPartConnectorCaffe::Reshape()']]],
+  ['reshape',['Reshape',['../classop_1_1_maximum_caffe.html#aa9ab7eab51c9539b141a0aac998b2223',1,'op::MaximumCaffe::Reshape()'],['../classop_1_1_nms_caffe.html#a9eae1bc23e983dbe6f1a513f82e6d97d',1,'op::NmsCaffe::Reshape()'],['../classop_1_1_resize_and_merge_caffe.html#aea893710063fc6c58d19f7e02f1a6681',1,'op::ResizeAndMergeCaffe::Reshape()'],['../classop_1_1_body_part_connector_caffe.html#a988042172b192eb80b3479c5f68484f4',1,'op::BodyPartConnectorCaffe::Reshape()']]],
   ['resizeandmergecaffe',['ResizeAndMergeCaffe',['../classop_1_1_resize_and_merge_caffe.html#a30805a265fa887eff04b1200dbda91a5',1,'op::ResizeAndMergeCaffe']]],
-  ['resizeandmergecpu',['resizeAndMergeCpu',['../namespaceop.html#a1903becf836ae4d14f61cd18c12db262',1,'op']]],
-  ['resizeandmergegpu',['resizeAndMergeGpu',['../namespaceop.html#a324c1217e863f4cd24edb0c3fcbbc4a8',1,'op']]],
+  ['resizeandmergecpu',['resizeAndMergeCpu',['../namespaceop.html#a1b6c4abcf6948b5ac5651bb2f2909bc9',1,'op']]],
+  ['resizeandmergegpu',['resizeAndMergeGpu',['../namespaceop.html#a6a5cb4e7c022ac0fbcc399e24bb6931a',1,'op']]],
   ['resizefixedaspectratio',['resizeFixedAspectRatio',['../namespaceop.html#ae6845e9d6fddf61cb7cb2eea7a7d4afc',1,'op']]],
   ['resizegetscalefactor',['resizeGetScaleFactor',['../namespaceop.html#a24ebdcb8395dea0429f220de6a715d6e',1,'op']]]
 ];

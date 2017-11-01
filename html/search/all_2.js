@@ -42,7 +42,7 @@ var searchData=
   ['connectminsubsetscore',['ConnectMinSubsetScore',['../namespaceop.html#a37c58b781e5bcd9fee67a7768afc5d0ea04576b26f5dc3637bf3c8168fba1641d',1,'op']]],
   ['cpu',['Cpu',['../namespaceop.html#afce557f02e337e16150d00bdf72ec033a54c82ef76ecbbd4c2293e09bae01b54e',1,'op']]],
   ['cputogpumemoryifnotcopiedyet',['cpuToGpuMemoryIfNotCopiedYet',['../classop_1_1_gpu_renderer.html#ac7c1ab0eebf1d54b55cc65a5560bad7b',1,'op::GpuRenderer']]],
-  ['createarray',['createArray',['../classop_1_1_cv_mat_to_op_input.html#ab9b198d84fbacc0b8aa9e863632e57c9',1,'op::CvMatToOpInput::createArray()'],['../classop_1_1_cv_mat_to_op_output.html#a003515873bf34525e2a6d313d8619ff3',1,'op::CvMatToOpOutput::createArray()']]],
+  ['createarray',['createArray',['../classop_1_1_cv_mat_to_op_input.html#acf0c43174fe8e3b1c71d76aca861a6ab',1,'op::CvMatToOpInput::createArray()'],['../classop_1_1_cv_mat_to_op_output.html#a003515873bf34525e2a6d313d8619ff3',1,'op::CvMatToOpOutput::createArray()']]],
   ['cuda_2ehpp',['cuda.hpp',['../cuda_8hpp.html',1,'']]],
   ['cuda_5fnum_5fthreads',['CUDA_NUM_THREADS',['../namespaceop.html#ac7bbf63b37bf6762c47557ad227e036d',1,'op']]],
   ['cudacheck',['cudaCheck',['../namespaceop.html#a2af8422ada0de882cc222920ca15c6d2',1,'op']]],

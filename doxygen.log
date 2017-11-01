@@ -673,23 +673,23 @@ Generating docs for file /home/travis/build/CMU-Perceptual-Computing-Lab/openpos
 Generating docs for file /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/utilities/errorAndLog.hpp...
 Generating docs for file /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/utilities/fastMath.hpp...
 Generating docs for file /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/utilities/fileSystem.hpp...
-Generating docs /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:107: warning: explicit link request to 'people' could not be resolved
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:107: warning: explicit link request to 'face' could not be resolved
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:100: warning: explicit link request to 'people' could not be resolved
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:100: warning: explicit link request to 'face' could not be resolved
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:93: warning: explicit link request to 'people' could not be resolved
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:129: warning: explicit link request to 'people' could not be resolved
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:129: warning: explicit link request to 'hand' could not be resolved
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:122: warning: explicit link request to 'people' could not be resolved
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:122: warning: explicit link request to 'hand' could not be resolved
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:114: warning: explicit link request to 'people' could not be resolved
+Generating docs /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:108: warning: explicit link request to 'people' could not be resolved
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:108: warning: explicit link request to 'face' could not be resolved
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:101: warning: explicit link request to 'people' could not be resolved
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:101: warning: explicit link request to 'face' could not be resolved
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:94: warning: explicit link request to 'people' could not be resolved
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:130: warning: explicit link request to 'people' could not be resolved
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:130: warning: explicit link request to 'hand' could not be resolved
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:123: warning: explicit link request to 'people' could not be resolved
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:123: warning: explicit link request to 'hand' could not be resolved
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:115: warning: explicit link request to 'people' could not be resolved
 /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:38: warning: explicit link request to 'scales' could not be resolved
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:80: warning: explicit link request to 'heatmaps' could not be resolved
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:80: warning: explicit link request to 'body' could not be resolved
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:86: warning: explicit link request to 'heatmaps' could not be resolved
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:62: warning: explicit link request to 'people' could not be resolved
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:62: warning: explicit link request to 'body' could not be resolved
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:72: warning: explicit link request to 'people' could not be resolved
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:81: warning: explicit link request to 'heatmaps' could not be resolved
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:81: warning: explicit link request to 'body' could not be resolved
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:87: warning: explicit link request to 'heatmaps' could not be resolved
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:63: warning: explicit link request to 'people' could not be resolved
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:63: warning: explicit link request to 'body' could not be resolved
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/core/datum.hpp:73: warning: explicit link request to 'people' could not be resolved
 /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/face/faceExtractor.hpp:18: warning: The following parameters of op::FaceExtractor::FaceExtractor(const Point< int > &netInputSize, const Point< int > &netOutputSize, const std::vector< HeatMapType > &heatMapTypes={}, const ScaleMode heatMapScale=ScaleMode::ZeroToOne) are not documented:
   parameter 'heatMapTypes'
   parameter 'heatMapScale'
@@ -879,5 +879,5 @@ Generating file index...
 Generating file member index...
 Generating example index...
 finalizing index lists...
-lookup cache used 2793/65536 hits=16343 misses=2980
+lookup cache used 2793/65536 hits=16336 misses=2980
 finished...
