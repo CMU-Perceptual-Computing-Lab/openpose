@@ -113,7 +113,7 @@ OpenPose Library - Release Notes
 
 
 
-## Current version (future OpenPose 1.2.0alpha)
+## Current version (future OpenPose 1.2.0)
 1. Main improvements:
     1. Speed increase when processing images with different aspect ratios. E.g. ~20% increase over 3.7k COCO validation images on 1 scale.
     2. Huge speed increase and memory reduction when processing multi-scale. E.g. over 3.7k COCO validation images on 4 scales: ~40% (~770 to ~450 sec) speed increase, ~25% memory reduction (from ~8.9 to ~6.7 GB / GPU).

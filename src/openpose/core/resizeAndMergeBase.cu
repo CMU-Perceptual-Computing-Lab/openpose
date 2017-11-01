@@ -15,30 +15,46 @@ namespace op
 
         if (x < targetWidth && y < targetHeight)
         {
-            const T xSource = (x + 0.5f) * sourceWidth / T(targetWidth) - 0.5f;
-            const T ySource = (y + 0.5f) * sourceHeight / T(targetHeight) - 0.5f;
+            const T xSource = (x + T(0.5f)) * sourceWidth / T(targetWidth) - T(0.5f);
+            const T ySource = (y + T(0.5f)) * sourceHeight / T(targetHeight) - T(0.5f);
             targetPtr[y*targetWidth+x] = bicubicInterpolate(sourcePtr, xSource, ySource, sourceWidth, sourceHeight,
                                                             sourceWidth);
         }
     }
 
     template <typename T>
-    __global__ void resizeKernelAndMerge(T* targetPtr, const T* const sourcePtr, const T scaleWidth,
-                                         const T scaleHeight, const int sourceWidth, const int sourceHeight,
-                                         const int targetWidth, const int targetHeight, const int averageCounter)
+    __global__ void resizeKernelAndAdd(T* targetPtr, const T* const sourcePtr, const T scaleWidth,
+                                       const T scaleHeight, const int sourceWidth, const int sourceHeight,
+                                       const int targetWidth, const int targetHeight)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
 
         if (x < targetWidth && y < targetHeight)
         {
-            const T xSource = (x + 0.5f) / scaleWidth - 0.5f;
-            const T ySource = (y + 0.5f) / scaleHeight - 0.5f;
+            const T xSource = (x + T(0.5f)) / scaleWidth - T(0.5f);
+            const T ySource = (y + T(0.5f)) / scaleHeight - T(0.5f);
+            targetPtr[y*targetWidth+x] += bicubicInterpolate(sourcePtr, xSource, ySource, sourceWidth, sourceHeight,
+                                                             sourceWidth);
+        }
+    }
+
+    template <typename T>
+    __global__ void resizeKernelAndAverage(T* targetPtr, const T* const sourcePtr, const T scaleWidth,
+                                           const T scaleHeight, const int sourceWidth, const int sourceHeight,
+                                           const int targetWidth, const int targetHeight, const int counter)
+    {
+        const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
+        const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
+
+        if (x < targetWidth && y < targetHeight)
+        {
+            const T xSource = (x + T(0.5f)) / scaleWidth - T(0.5f);
+            const T ySource = (y + T(0.5f)) / scaleHeight - T(0.5f);
             const auto interpolated = bicubicInterpolate(sourcePtr, xSource, ySource, sourceWidth, sourceHeight,
                                                          sourceWidth);
             auto& targetPixel = targetPtr[y*targetWidth+x];
-            targetPixel = ((averageCounter * targetPixel) + interpolated) / T(averageCounter + 1);
-            // targetPixel = fastMax(targetPixel, interpolated);
+            targetPixel = (targetPixel + interpolated) / T(counter);
         }
     }
 
@@ -91,14 +107,13 @@ namespace op
                 }
                 // Old inefficient multi-scale merging
                 else
-                    error("It should never reaches this point. Notify us.", __LINE__, __FUNCTION__, __FILE__);
+                    error("It should never reache this point. Notify us otherwise.", __LINE__, __FUNCTION__, __FILE__);
             }
             // Multi-scaling merging
             else
             {
                 const auto targetChannelOffset = targetWidth * targetHeight;
                 cudaMemset(targetPtr, 0.f, channels*targetChannelOffset * sizeof(T));
-                auto averageCounter = -1;
                 const auto scaleToMainScaleWidth = targetWidth / T(sourceWidth);
                 const auto scaleToMainScaleHeight = targetHeight / T(sourceHeight);
 
@@ -111,14 +126,29 @@ namespace op
                     const auto scaleInputToNet = scaleInputToNetInputs[i] / scaleInputToNetInputs[0];
                     const auto scaleWidth = scaleToMainScaleWidth / scaleInputToNet;
                     const auto scaleHeight = scaleToMainScaleHeight / scaleInputToNet;
-                    averageCounter++;
-                    for (auto c = 0 ; c < channels ; c++)
+                    // All but last image --> add
+                    if (i < sourceSizes.size() - 1)
                     {
-                        resizeKernelAndMerge<<<numBlocks, threadsPerBlock>>>(
-                            targetPtr + c * targetChannelOffset, sourcePtrs[i] + c * sourceChannelOffset,
-                            scaleWidth, scaleHeight, currentWidth, currentHeight, targetWidth,
-                            targetHeight, averageCounter
-                        );
+                        for (auto c = 0 ; c < channels ; c++)
+                        {
+                            resizeKernelAndAdd<<<numBlocks, threadsPerBlock>>>(
+                                targetPtr + c * targetChannelOffset, sourcePtrs[i] + c * sourceChannelOffset,
+                                scaleWidth, scaleHeight, currentWidth, currentHeight, targetWidth,
+                                targetHeight
+                            );
+                        }
+                    }
+                    // Last image --> average all
+                    else
+                    {
+                        for (auto c = 0 ; c < channels ; c++)
+                        {
+                            resizeKernelAndAverage<<<numBlocks, threadsPerBlock>>>(
+                                targetPtr + c * targetChannelOffset, sourcePtrs[i] + c * sourceChannelOffset,
+                                scaleWidth, scaleHeight, currentWidth, currentHeight, targetWidth,
+                                targetHeight, sourceSizes.size()
+                            );
+                        }
                     }
                 }
             }
