@@ -157,7 +157,9 @@ namespace op
             datum.name = name;
             // Input image and rendered version
             datum.cvInputData = cvInputData.clone();
-            datum.inputNetData = inputNetData.clone();
+            datum.inputNetData.resize(inputNetData.size());
+            for (auto i = 0u ; i < datum.inputNetData.size() ; i++)
+                datum.inputNetData[i] = inputNetData[i].clone();
             datum.outputData = outputData.clone();
             datum.cvOutputData = cvOutputData.clone();
             // Resulting Array<float> data

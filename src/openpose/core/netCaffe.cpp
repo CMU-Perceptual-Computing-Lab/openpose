@@ -33,8 +33,7 @@ namespace op
                 mGpuId{gpuId},
                 mCaffeProto{caffeProto},
                 mCaffeTrainedModel{caffeTrainedModel},
-                mLastBlobName{lastBlobName},
-                mNetInputSize4D{0,0,0,0}
+                mLastBlobName{lastBlobName}
             {
                 const std::string message{".\nPossible causes:\n\t1. Not downloading the OpenPose trained models."
                                           "\n\t2. Not running OpenPose from the same directory where the `model`"
@@ -160,7 +159,10 @@ namespace op
                 #endif
                 // Perform deep network forward pass
                 upImpl->upCaffeNet->ForwardFrom(0);
-                cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+                // Cuda checks
+                #ifdef USE_CUDA
+                    cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+                #endif
             #else
                 UNUSED(inputData);
             #endif

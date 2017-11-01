@@ -115,20 +115,23 @@ OpenPose Library - Release Notes
 
 ## Current version (future OpenPose 1.2.0alpha)
 1. Main improvements:
-    1. Added IP camera support.
-    2. Output images can have the input size, OpenPose able to change its size for each image and not required fixed size anymore.
+    1. Speed increase when processing images with different aspect ratios. E.g. ~20% increase over 3.7k COCO validation images on 1 scale.
+    2. Huge speed increase and memory reduction when processing multi-scale. E.g. over 3.7k COCO validation images on 4 scales: ~40% (~770 to ~450 sec) speed increase, ~25% memory reduction (from ~8.9 to ~6.7 GB / GPU).
+    3. Slightly increase of accuracy given the fixed mini-bugs.
+    4. Added IP camera support.
+    5. Output images can have the input size, OpenPose able to change its size for each image and not required fixed size anymore.
         1. FrameDisplayer accepts variable size images by rescaling every time a frame with bigger width or height is displayed (gui module).
         2. OpOutputToCvMat & GuiInfoAdder does not require to know the output size at construction time, deduced from each image.
         3. CvMatToOutput and Renderers allow to keep input resolution as output for images (core module).
-    3. New standalone face keypoint detector based on OpenCV face detector: much faster if body keypoint detection is not required but much less accurate.
-    4. Face and hand keypoint detectors now can return each keypoint heatmap.
-    5. The flag `USE_CUDNN` is no longer required; `USE_CAFFE` and `USE_CUDA` (replacing the old `CPU_ONLY`) are no longer required to use the library, only to build it. In addition, Boost, Caffe, and its dependencies have been removed from the OpenPose header files. Only OpenCV include and lib folders are required when building a project using OpenPose.
-    6. OpenPose successfully compiles if the flags `USE_CAFFE` and/or `USE_CUDA` are not enabled, although it will give an error saying they are required.
-    7. COCO JSON file outputs 0 as score for non-detected keypoints.
-    8. Added example for OpenPose for user asynchronous output and cleaned all `tutorial_wrapper/` examples.
-    9. Added `-1` option for `net_resolution` in order to auto-select the best possible aspect ratio given the user input.
-    10. Net resolution can be dynamically changed (e.g. for images with different size).
-    11. Added example to add functionality/modules to OpenPose.
+    6. New standalone face keypoint detector based on OpenCV face detector: much faster if body keypoint detection is not required but much less accurate.
+    7. Face and hand keypoint detectors now can return each keypoint heatmap.
+    8. The flag `USE_CUDNN` is no longer required; `USE_CAFFE` and `USE_CUDA` (replacing the old `CPU_ONLY`) are no longer required to use the library, only to build it. In addition, Boost, Caffe, and its dependencies have been removed from the OpenPose header files. Only OpenCV include and lib folders are required when building a project using OpenPose.
+    9. OpenPose successfully compiles if the flags `USE_CAFFE` and/or `USE_CUDA` are not enabled, although it will give an error saying they are required.
+    10. COCO JSON file outputs 0 as score for non-detected keypoints.
+    11. Added example for OpenPose for user asynchronous output and cleaned all `tutorial_wrapper/` examples.
+    12. Added `-1` option for `net_resolution` in order to auto-select the best possible aspect ratio given the user input.
+    13. Net resolution can be dynamically changed (e.g. for images with different size).
+    14. Added example to add functionality/modules to OpenPose.
 2. Functions or parameters renamed:
     1. OpenPose able to change its size and initial size dynamically:
         1. Flag `resolution` renamed as `output_resolution`.
