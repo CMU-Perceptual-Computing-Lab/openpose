@@ -11,7 +11,7 @@ set(OpenPose_VERSION ${OpenPose_VERSION_MAJOR}.${OpenPose_VERSION_MINOR}.${OpenP
 ### FIND THE OS
 
 if (WIN32) # OS is Windows
-  message(STATUS "Windows OS is currently is experimental. You are blessed if this works :)")
+  message(STATUS "Windows OS support currently is experimental. You are blessed if this works :)")
 elseif (APPLE) # OS is Apple
   message(FATAL_ERROR "Apple OS is not currently supported.")
 elseif (UNIX AND NOT APPLE) # OS is a Linux distribution (it assumes Ubuntu)
@@ -146,9 +146,22 @@ if (UNIX AND NOT APPLE)
 
 endif (UNIX AND NOT APPLE)
 
+include(cmake/Utils.cmake)
+
 if (WIN32)
   set_property(GLOBAL PROPERTY USE_FOLDERS ON)
   set(FIND_LIB_PREFIX ${CMAKE_SOURCE_DIR}/3rdparty/windows)
+
+  # Download Windows 3rd party
+  message(STATUS "Downloading windows dependencies...")
+  set(OP_WIN_URL "http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows")
+  set(OP_WIN_DIR "${CMAKE_SOURCE_DIR}/3rdparty/windows")
+
+  #TODO Add hashes
+  download_zip("opencv_310.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 1e5240a64b814b3c0b822f136be78ad7)
+  download_zip("caffe3rdparty_2017_07_14.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} ec0f800c8fb337e33304f3375bd06a80)
+  download_zip("caffe_2017_07_11.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 0302edc8843529f8ded1da74eae8e061)
+  message(STATUS "Windows dependencies downloaded.")
 
   find_library(Boost_FILESYSTEM_LIBRARY_OPTIMIZED boost_filesystem-vc140-mt-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
   find_library(Boost_SYSTEM_LIBRARY_OPTIMIZED boost_system-vc140-mt-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
@@ -257,7 +270,7 @@ if (BUILD_DOCS)
         COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_FILE}
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/doc
         COMMENT "Generating API documentation with Doxygen"
-        VERBATIM )
+        VERBATIM)
   else (DOXYGEN_FOUND)
     message("Doxygen need to be installed to generate the doxygen documentation")
   endif (DOXYGEN_FOUND)
@@ -266,36 +279,19 @@ endif (BUILD_DOCS)
 ### DOWNLOAD MODELS
 
 # Download the models if flag is set
-# TODO -- remove hardcoded ubuntu paths
-include(cmake/Utils.cmake)
 message(STATUS "Download the models.")
 
 # URL to the models
 set(OPENPOSE_URL "http://posefs1.perception.cs.cmu.edu/OpenPose/models/")
   
-# Body (COCO)
-if (DOWNLOAD_COCO_MODEL)
-  download_model("body (COCO)" ${DOWNLOAD_COCO_MODEL} pose/coco/pose_iter_440000.caffemodel
-      5156d31f670511fce9b4e28b403f2939)
-endif (DOWNLOAD_COCO_MODEL)
-  
-# Body (MPI)
-if (DOWNLOAD_MPI_MODEL)
-  download_model("body (MPI)" ${DOWNLOAD_MPI_MODEL} pose/mpi/pose_iter_160000.caffemodel
-      2ca0990c7562bd7ae03f3f54afa96e00)
-endif (DOWNLOAD_MPI_MODEL)
-    
-# Face
-if (DOWNLOAD_FACE_MODEL)
-  download_model("face" ${DOWNLOAD_FACE_MODEL} face/pose_iter_116000.caffemodel
-        e747180d728fa4e4418c465828384333)
-endif (DOWNLOAD_FACE_MODEL)
-
-# Hand
-if (DOWNLOAD_HAND_MODEL)
-  download_model("hand" ${DOWNLOAD_HAND_MODEL} hand/pose_iter_102000.caffemodel
-        a82cfc3fea7c62f159e11bd3674c1531)
-endif (DOWNLOAD_HAND_MODEL)
+download_model("body (COCO)" ${DOWNLOAD_COCO_MODEL} pose/coco/pose_iter_440000.caffemodel
+    5156d31f670511fce9b4e28b403f2939) # Body (COCO)
+download_model("body (MPI)" ${DOWNLOAD_MPI_MODEL} pose/mpi/pose_iter_160000.caffemodel
+    2ca0990c7562bd7ae03f3f54afa96e00) # Body (MPI)
+download_model("face" ${DOWNLOAD_FACE_MODEL} face/pose_iter_116000.caffemodel
+    e747180d728fa4e4418c465828384333) # Face
+download_model("hand" ${DOWNLOAD_HAND_MODEL} hand/pose_iter_102000.caffemodel
+    a82cfc3fea7c62f159e11bd3674c1531) # Hand
 
 message(STATUS "Models Downloaded.")
 
