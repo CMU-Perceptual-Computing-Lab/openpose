@@ -22,6 +22,11 @@ See [doc/quick_start.md#quick-start](./quick_start.md#quick-start).
 
 
 
+## Kinect 2.0 as Webcam on Windows 10
+Since the Windows 10 Anniversary, Kinect 2.0 can be read as a normal webcam. All you need to do is go to `device manager`, expand the `kinect sensor devices` tab, right click and update driver of `WDF kinectSensor Interface`. If you already have another webcam, disconnect it or use `--camera 2`.
+
+
+
 ## JSON Output with No Visualization
 The following example runs the demo video `video.avi` and outputs JSON files in `output/`. Note: see [doc/output.md](./output.md) to understand the format of the JSON files.
 ```
