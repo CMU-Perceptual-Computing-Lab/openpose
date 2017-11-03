@@ -500,13 +500,6 @@ namespace op
                                          + additionalMessage;
                     error(message, __LINE__, __FUNCTION__, __FILE__);
                 }
-
-                if ((wrapperStructOutput.displayGui && wrapperStructOutput.guiVerbose) && !renderOutput)
-                {
-                    const auto message = "No render is enabled (e.g. `no_render_pose`), so you should also remove the"
-                                         " display (set `no_display` or `no_gui_verbose`)." + additionalMessage;
-                    error(message, __LINE__, __FUNCTION__, __FILE__);
-                }
                 if (wrapperStructInput.framesRepeat && savingSomething)
                 {
                     const auto message = "Frames repetition (`frames_repeat`) is enabled as well as some writing"
@@ -514,12 +507,21 @@ namespace op
                                          " frames over and over. Please, disable repetition or remove writing.";
                     error(message, __LINE__, __FUNCTION__, __FILE__);
                 }
+                // Warnings
+                if ((wrapperStructOutput.displayGui && wrapperStructOutput.guiVerbose) && !renderOutput)
+                {
+                    const auto message = "No render is enabled (e.g. `render_pose 0`), so you might also want to"
+                                         " remove the display (set `no_display` or `no_gui_verbose`). If you simply"
+                                         " want to use OpenPose to record video/images without keypoints, you only"
+                                         " need to set `num_gpu 0`." + additionalMessage;
+                    log(message, Priority::High);
+                }
                 if (wrapperStructInput.realTimeProcessing && savingSomething)
                 {
                     const auto message = "Real time processing is enabled as well as some writing function. Thus, some"
                                          " frames might be skipped. Consider disabling real time processing if you"
                                          " intend to save any results.";
-                    log(message, Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                    log(message, Priority::High);
                 }
             }
             if (!wrapperStructOutput.writeVideo.empty() && wrapperStructInput.producerSharedPtr == nullptr)
@@ -1202,7 +1204,7 @@ namespace op
                     if (spWPoses.size() > 1)
                         log("Multi-threading disabled, only 1 thread running. All GPUs have been disabled but the"
                             " first one, which is defined by gpuNumberStart (e.g. in the OpenPose demo, it is set"
-                            " with the `num_gpu_start` flag).");
+                            " with the `num_gpu_start` flag).", Priority::High);
                     mThreadManager.add(mThreadId, spWPoses.at(0), queueIn, queueOut);
                 }
                 queueIn++;

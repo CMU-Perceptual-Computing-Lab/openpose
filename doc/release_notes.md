@@ -133,6 +133,7 @@ OpenPose Library - Release Notes
     13. Net resolution can be dynamically changed (e.g. for images with different size).
     14. Added example to add functionality/modules to OpenPose.
     15. Added `disable_multi_thread` flag in order to allow debug and/or highly reduce the latency (e.g. when using webcam in real-time).
+    16. Allowed to output images without any rendering.
 2. Functions or parameters renamed:
     1. OpenPose able to change its size and initial size dynamically:
         1. Flag `resolution` renamed as `output_resolution`.
