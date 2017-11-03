@@ -3,7 +3,7 @@ OpenPose Library - Release Notes
 
 
 
-## OpenPose 1.0.0rc1
+## OpenPose 1.0.0rc1 (Apr 24, 2017)
 1. Initial version, main functionality:
     1. Body keypoint detection and rendering in Ubuntu 14 and 16.
     2. It can read an image directory, video or webcam.
@@ -11,7 +11,7 @@ OpenPose Library - Release Notes
 
 
 
-## OpenPose 1.0.0rc2
+## OpenPose 1.0.0rc2 (May 10, 2017)
 1. Main improvements:
     1. Rendering max resolution from 720p to >32k images.
     2. Highly improved documentation.
@@ -22,7 +22,7 @@ OpenPose Library - Release Notes
 
 
 
-## OpenPose 1.0.0rc3
+## OpenPose 1.0.0rc3 (Jun 8, 2017)
 1. Main improvements:
     1. Added face keypoint detection.
     2. Added Windows 10 compatibility.
@@ -44,7 +44,7 @@ OpenPose Library - Release Notes
 
 
 
-## OpenPose 1.0.0
+## OpenPose 1.0.0 (Jul 8, 2017)
 1. Main improvements:
     1. Added hand keypoint detection.
     2. Windows branch merged to master branch.
@@ -74,7 +74,7 @@ OpenPose Library - Release Notes
 
 
 
-## OpenPose 1.0.1
+## OpenPose 1.0.1 (Jul 11, 2017)
 1. Main improvements:
     1. Windows library turned into DLL dynamic library (i.e. portable).
     2. Improved documentation.
@@ -83,7 +83,7 @@ OpenPose Library - Release Notes
 
 
 
-## OpenPose 1.0.2
+## OpenPose 1.0.2 (Sep 3, 2017)
 1. Main improvements:
     1. Added OpenCV 3.3 compatibility.
     2. Caffe turned into DLL library.
@@ -102,7 +102,7 @@ OpenPose Library - Release Notes
 
 
 
-## OpenPose 1.1.0
+## OpenPose 1.1.0 (Sep 19, 2017)
 1. Main improvements:
     1. Added CMake installer for Ubuntu.
     2. Added how to use keypoint data in `examples/tutorial_wrapper/`.
@@ -113,7 +113,7 @@ OpenPose Library - Release Notes
 
 
 
-## Current version (future OpenPose 1.2.0)
+## OpenPose 1.2.0 (Nov 3, 2017)
 1. Main improvements:
     1. Speed increase when processing images with different aspect ratios. E.g. ~20% increase over 3.7k COCO validation images on 1 scale.
     2. Huge speed increase and memory reduction when processing multi-scale. E.g. over 3.7k COCO validation images on 4 scales: ~40% (~770 to ~450 sec) speed increase, ~25% memory reduction (from ~8.9 to ~6.7 GB / GPU).
@@ -148,3 +148,7 @@ OpenPose Library - Release Notes
     1. Scaling resize issue fixed: ~1-pixel offset due to not considering 0-based indexes.
     2. Ubuntu installer script now works even if Python pip was not installed previously.
     3. Flags to set first and last frame as well as jumping frames backward and forward now works on image directory reader.
+
+
+
+## Current version (future OpenPose 1.2.1)

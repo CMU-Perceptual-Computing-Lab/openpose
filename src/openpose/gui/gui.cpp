@@ -7,7 +7,7 @@
 
 namespace op
 {
-    const std::string OPEN_POSE_TEXT{"OpenPose 1.1.0"};
+    const std::string OPEN_POSE_TEXT{"OpenPose 1.2.0"};
 
     inline void showGuiHelp()
     {
