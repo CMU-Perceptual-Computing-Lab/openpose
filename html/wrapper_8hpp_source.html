@@ -1165,114 +1165,115 @@ $(document).ready(function(){initNavTree('wrapper_8hpp_source.html','');});
 <div class="line"><a name="l01199"></a><span class="lineno"> 1199</span>&#160;                }</div>
 <div class="line"><a name="l01200"></a><span class="lineno"> 1200</span>&#160;                <span class="keywordflow">else</span></div>
 <div class="line"><a name="l01201"></a><span class="lineno"> 1201</span>&#160;                {</div>
-<div class="line"><a name="l01202"></a><span class="lineno"> 1202</span>&#160;                    <a class="code" href="namespaceop.html#a9912b2bfa3dbe427b4e72dd34c605df2">log</a>(<span class="stringliteral">&quot;Multi-threading disabled, only 1 thread running. All GPUs have been disabled but the first&quot;</span></div>
-<div class="line"><a name="l01203"></a><span class="lineno"> 1203</span>&#160;                        <span class="stringliteral">&quot; one, which is defined by gpuNumberStart (in the demo, it is set with the `num_gpu_start`&quot;</span></div>
-<div class="line"><a name="l01204"></a><span class="lineno"> 1204</span>&#160;                        <span class="stringliteral">&quot; flag.&quot;</span>);</div>
-<div class="line"><a name="l01205"></a><span class="lineno"> 1205</span>&#160;                    mThreadManager.add(mThreadId, spWPoses.at(0), queueIn, queueOut);</div>
-<div class="line"><a name="l01206"></a><span class="lineno"> 1206</span>&#160;                }</div>
-<div class="line"><a name="l01207"></a><span class="lineno"> 1207</span>&#160;                queueIn++;</div>
-<div class="line"><a name="l01208"></a><span class="lineno"> 1208</span>&#160;                queueOut++;</div>
-<div class="line"><a name="l01209"></a><span class="lineno"> 1209</span>&#160;            }</div>
-<div class="line"><a name="l01210"></a><span class="lineno"> 1210</span>&#160;            <span class="comment">// If custom user Worker and uses its own thread</span></div>
-<div class="line"><a name="l01211"></a><span class="lineno"> 1211</span>&#160;            <span class="keywordflow">if</span> (!mUserPostProcessingWs.empty() &amp;&amp; mUserPostProcessingWsOnNewThread)</div>
-<div class="line"><a name="l01212"></a><span class="lineno"> 1212</span>&#160;            {</div>
-<div class="line"><a name="l01213"></a><span class="lineno"> 1213</span>&#160;                <span class="comment">// Post processing workers</span></div>
-<div class="line"><a name="l01214"></a><span class="lineno"> 1214</span>&#160;                <span class="keywordflow">if</span> (!mPostProcessingWs.empty())</div>
-<div class="line"><a name="l01215"></a><span class="lineno"> 1215</span>&#160;                {</div>
-<div class="line"><a name="l01216"></a><span class="lineno"> 1216</span>&#160;                    <span class="comment">// Thread 2 or 3, queues 2 -&gt; 3</span></div>
-<div class="line"><a name="l01217"></a><span class="lineno"> 1217</span>&#160;                    mThreadManager.add(mThreadId, mPostProcessingWs, queueIn++, queueOut++);</div>
-<div class="line"><a name="l01218"></a><span class="lineno"> 1218</span>&#160;                    threadIdPP();</div>
-<div class="line"><a name="l01219"></a><span class="lineno"> 1219</span>&#160;                }</div>
-<div class="line"><a name="l01220"></a><span class="lineno"> 1220</span>&#160;                <span class="comment">// User processing workers</span></div>
-<div class="line"><a name="l01221"></a><span class="lineno"> 1221</span>&#160;                <span class="comment">// Thread 3 or 4, queues 3 -&gt; 4</span></div>
-<div class="line"><a name="l01222"></a><span class="lineno"> 1222</span>&#160;                mThreadManager.add(mThreadId, mUserPostProcessingWs, queueIn++, queueOut++);</div>
-<div class="line"><a name="l01223"></a><span class="lineno"> 1223</span>&#160;                threadIdPP();</div>
-<div class="line"><a name="l01224"></a><span class="lineno"> 1224</span>&#160;                <span class="comment">// Output workers</span></div>
-<div class="line"><a name="l01225"></a><span class="lineno"> 1225</span>&#160;                <span class="keywordflow">if</span> (!mOutputWs.empty())</div>
-<div class="line"><a name="l01226"></a><span class="lineno"> 1226</span>&#160;                {</div>
-<div class="line"><a name="l01227"></a><span class="lineno"> 1227</span>&#160;                    <span class="comment">// Thread 4 or 5, queues 4 -&gt; 5</span></div>
-<div class="line"><a name="l01228"></a><span class="lineno"> 1228</span>&#160;                    mThreadManager.add(mThreadId, mOutputWs, queueIn++, queueOut++);</div>
-<div class="line"><a name="l01229"></a><span class="lineno"> 1229</span>&#160;                    threadIdPP();</div>
-<div class="line"><a name="l01230"></a><span class="lineno"> 1230</span>&#160;                }</div>
-<div class="line"><a name="l01231"></a><span class="lineno"> 1231</span>&#160;            }</div>
-<div class="line"><a name="l01232"></a><span class="lineno"> 1232</span>&#160;            <span class="comment">// If custom user Worker in same thread or producer on same thread</span></div>
-<div class="line"><a name="l01233"></a><span class="lineno"> 1233</span>&#160;            <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01234"></a><span class="lineno"> 1234</span>&#160;            {</div>
-<div class="line"><a name="l01235"></a><span class="lineno"> 1235</span>&#160;                <span class="comment">// Post processing workers + User post processing workers + Output workers</span></div>
-<div class="line"><a name="l01236"></a><span class="lineno"> 1236</span>&#160;                <span class="keyword">auto</span> workersAux = mergeWorkers(mPostProcessingWs, mUserPostProcessingWs);</div>
-<div class="line"><a name="l01237"></a><span class="lineno"> 1237</span>&#160;                workersAux = mergeWorkers(workersAux, mOutputWs);</div>
-<div class="line"><a name="l01238"></a><span class="lineno"> 1238</span>&#160;                <span class="keywordflow">if</span> (!workersAux.empty())</div>
-<div class="line"><a name="l01239"></a><span class="lineno"> 1239</span>&#160;                {</div>
-<div class="line"><a name="l01240"></a><span class="lineno"> 1240</span>&#160;                    <span class="comment">// Thread 2 or 3, queues 2 -&gt; 3</span></div>
-<div class="line"><a name="l01241"></a><span class="lineno"> 1241</span>&#160;                    mThreadManager.add(mThreadId, workersAux, queueIn++, queueOut++);</div>
-<div class="line"><a name="l01242"></a><span class="lineno"> 1242</span>&#160;                    threadIdPP();</div>
-<div class="line"><a name="l01243"></a><span class="lineno"> 1243</span>&#160;                }</div>
-<div class="line"><a name="l01244"></a><span class="lineno"> 1244</span>&#160;            }</div>
-<div class="line"><a name="l01245"></a><span class="lineno"> 1245</span>&#160;            <span class="comment">// User output worker</span></div>
-<div class="line"><a name="l01246"></a><span class="lineno"> 1246</span>&#160;            <span class="comment">// Thread Y, queues Q -&gt; Q+1</span></div>
-<div class="line"><a name="l01247"></a><span class="lineno"> 1247</span>&#160;            <span class="keywordflow">if</span> (!mUserOutputWs.empty())</div>
-<div class="line"><a name="l01248"></a><span class="lineno"> 1248</span>&#160;            {</div>
-<div class="line"><a name="l01249"></a><span class="lineno"> 1249</span>&#160;                <span class="keywordflow">if</span> (mUserOutputWsOnNewThread)</div>
-<div class="line"><a name="l01250"></a><span class="lineno"> 1250</span>&#160;                {</div>
-<div class="line"><a name="l01251"></a><span class="lineno"> 1251</span>&#160;                    mThreadManager.add(mThreadId, mUserOutputWs, queueIn++, queueOut++);</div>
-<div class="line"><a name="l01252"></a><span class="lineno"> 1252</span>&#160;                    threadIdPP();</div>
-<div class="line"><a name="l01253"></a><span class="lineno"> 1253</span>&#160;                }</div>
-<div class="line"><a name="l01254"></a><span class="lineno"> 1254</span>&#160;                <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01255"></a><span class="lineno"> 1255</span>&#160;                    mThreadManager.add(mThreadId-1, mUserOutputWs, queueIn++, queueOut++);</div>
-<div class="line"><a name="l01256"></a><span class="lineno"> 1256</span>&#160;            }</div>
-<div class="line"><a name="l01257"></a><span class="lineno"> 1257</span>&#160;            <span class="comment">// OpenPose GUI</span></div>
-<div class="line"><a name="l01258"></a><span class="lineno"> 1258</span>&#160;            <span class="keywordflow">if</span> (spWGui != <span class="keyword">nullptr</span>)</div>
-<div class="line"><a name="l01259"></a><span class="lineno"> 1259</span>&#160;            {</div>
-<div class="line"><a name="l01260"></a><span class="lineno"> 1260</span>&#160;                <span class="comment">// Thread Y+1, queues Q+1 -&gt; Q+2</span></div>
-<div class="line"><a name="l01261"></a><span class="lineno"> 1261</span>&#160;                mThreadManager.add(mThreadId, spWGui, queueIn++, queueOut++);</div>
-<div class="line"><a name="l01262"></a><span class="lineno"> 1262</span>&#160;                threadIdPP();</div>
-<div class="line"><a name="l01263"></a><span class="lineno"> 1263</span>&#160;            }</div>
-<div class="line"><a name="l01264"></a><span class="lineno"> 1264</span>&#160;            <a class="code" href="namespaceop.html#a9912b2bfa3dbe427b4e72dd34c605df2">log</a>(<span class="stringliteral">&quot;&quot;</span>, <a class="code" href="namespaceop.html#adc43fb9031418e7f8112816a3b535d14a28d0edd045e05cf5af64e35ae0c4c6ef">Priority::Low</a>, __LINE__, __FUNCTION__, __FILE__);</div>
-<div class="line"><a name="l01265"></a><span class="lineno"> 1265</span>&#160;        }</div>
-<div class="line"><a name="l01266"></a><span class="lineno"> 1266</span>&#160;        <span class="keywordflow">catch</span> (<span class="keyword">const</span> std::exception&amp; e)</div>
-<div class="line"><a name="l01267"></a><span class="lineno"> 1267</span>&#160;        {</div>
-<div class="line"><a name="l01268"></a><span class="lineno"> 1268</span>&#160;            <a class="code" href="namespaceop.html#a5f092bd36c716a894cb035e1ead2aca3">error</a>(e.what(), __LINE__, __FUNCTION__, __FILE__);</div>
-<div class="line"><a name="l01269"></a><span class="lineno"> 1269</span>&#160;        }</div>
-<div class="line"><a name="l01270"></a><span class="lineno"> 1270</span>&#160;    }</div>
-<div class="line"><a name="l01271"></a><span class="lineno"> 1271</span>&#160;</div>
-<div class="line"><a name="l01272"></a><span class="lineno"> 1272</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TDatums, <span class="keyword">typename</span> TWorker, <span class="keyword">typename</span> TQueue&gt;</div>
-<div class="line"><a name="l01273"></a><span class="lineno"> 1273</span>&#160;    <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> <span class="keywordtype">long</span> Wrapper&lt;TDatums, TWorker, TQueue&gt;::threadIdPP()</div>
-<div class="line"><a name="l01274"></a><span class="lineno"> 1274</span>&#160;    {</div>
-<div class="line"><a name="l01275"></a><span class="lineno"> 1275</span>&#160;        <span class="keywordflow">try</span></div>
-<div class="line"><a name="l01276"></a><span class="lineno"> 1276</span>&#160;        {</div>
-<div class="line"><a name="l01277"></a><span class="lineno"> 1277</span>&#160;            <span class="keywordflow">if</span> (mMultiThreadEnabled)</div>
-<div class="line"><a name="l01278"></a><span class="lineno"> 1278</span>&#160;                mThreadId++;</div>
-<div class="line"><a name="l01279"></a><span class="lineno"> 1279</span>&#160;            <span class="keywordflow">return</span> mThreadId;</div>
-<div class="line"><a name="l01280"></a><span class="lineno"> 1280</span>&#160;        }</div>
-<div class="line"><a name="l01281"></a><span class="lineno"> 1281</span>&#160;        <span class="keywordflow">catch</span> (<span class="keyword">const</span> std::exception&amp; e)</div>
-<div class="line"><a name="l01282"></a><span class="lineno"> 1282</span>&#160;        {</div>
-<div class="line"><a name="l01283"></a><span class="lineno"> 1283</span>&#160;            <a class="code" href="namespaceop.html#a5f092bd36c716a894cb035e1ead2aca3">error</a>(e.what(), __LINE__, __FUNCTION__, __FILE__);</div>
-<div class="line"><a name="l01284"></a><span class="lineno"> 1284</span>&#160;            <span class="keywordflow">return</span> 0ull;</div>
-<div class="line"><a name="l01285"></a><span class="lineno"> 1285</span>&#160;        }</div>
-<div class="line"><a name="l01286"></a><span class="lineno"> 1286</span>&#160;    }</div>
-<div class="line"><a name="l01287"></a><span class="lineno"> 1287</span>&#160;</div>
-<div class="line"><a name="l01288"></a><span class="lineno"> 1288</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TDatums, <span class="keyword">typename</span> TWorker, <span class="keyword">typename</span> TQueue&gt;</div>
-<div class="line"><a name="l01289"></a><span class="lineno"> 1289</span>&#160;    std::vector&lt;TWorker&gt; Wrapper&lt;TDatums, TWorker, TQueue&gt;::mergeWorkers(<span class="keyword">const</span> std::vector&lt;TWorker&gt;&amp; workersA,</div>
-<div class="line"><a name="l01290"></a><span class="lineno"> 1290</span>&#160;                                                                         <span class="keyword">const</span> std::vector&lt;TWorker&gt;&amp; workersB)</div>
-<div class="line"><a name="l01291"></a><span class="lineno"> 1291</span>&#160;    {</div>
-<div class="line"><a name="l01292"></a><span class="lineno"> 1292</span>&#160;        <span class="keywordflow">try</span></div>
-<div class="line"><a name="l01293"></a><span class="lineno"> 1293</span>&#160;        {</div>
-<div class="line"><a name="l01294"></a><span class="lineno"> 1294</span>&#160;            <span class="keyword">auto</span> workersToReturn(workersA);</div>
-<div class="line"><a name="l01295"></a><span class="lineno"> 1295</span>&#160;            <span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; worker : workersB)</div>
-<div class="line"><a name="l01296"></a><span class="lineno"> 1296</span>&#160;                workersToReturn.emplace_back(worker);</div>
-<div class="line"><a name="l01297"></a><span class="lineno"> 1297</span>&#160;            <span class="keywordflow">return</span> workersToReturn;</div>
-<div class="line"><a name="l01298"></a><span class="lineno"> 1298</span>&#160;        }</div>
-<div class="line"><a name="l01299"></a><span class="lineno"> 1299</span>&#160;        <span class="keywordflow">catch</span> (<span class="keyword">const</span> std::exception&amp; e)</div>
-<div class="line"><a name="l01300"></a><span class="lineno"> 1300</span>&#160;        {</div>
-<div class="line"><a name="l01301"></a><span class="lineno"> 1301</span>&#160;            <a class="code" href="namespaceop.html#a5f092bd36c716a894cb035e1ead2aca3">error</a>(e.what(), __LINE__, __FUNCTION__, __FILE__);</div>
-<div class="line"><a name="l01302"></a><span class="lineno"> 1302</span>&#160;            <span class="keywordflow">return</span> std::vector&lt;TWorker&gt;{};</div>
-<div class="line"><a name="l01303"></a><span class="lineno"> 1303</span>&#160;        }</div>
-<div class="line"><a name="l01304"></a><span class="lineno"> 1304</span>&#160;    }</div>
-<div class="line"><a name="l01305"></a><span class="lineno"> 1305</span>&#160;</div>
-<div class="line"><a name="l01306"></a><span class="lineno"> 1306</span>&#160;    <span class="keyword">extern</span> <span class="keyword">template</span> <span class="keyword">class </span>Wrapper&lt;DATUM_BASE_NO_PTR&gt;;</div>
-<div class="line"><a name="l01307"></a><span class="lineno"> 1307</span>&#160;}</div>
-<div class="line"><a name="l01308"></a><span class="lineno"> 1308</span>&#160;</div>
-<div class="line"><a name="l01309"></a><span class="lineno"> 1309</span>&#160;<span class="preprocessor">#endif // OPENPOSE_WRAPPER_WRAPPER_HPP</span></div>
+<div class="line"><a name="l01202"></a><span class="lineno"> 1202</span>&#160;                    <span class="keywordflow">if</span> (spWPoses.size() &gt; 1)</div>
+<div class="line"><a name="l01203"></a><span class="lineno"> 1203</span>&#160;                        <a class="code" href="namespaceop.html#a9912b2bfa3dbe427b4e72dd34c605df2">log</a>(<span class="stringliteral">&quot;Multi-threading disabled, only 1 thread running. All GPUs have been disabled but the&quot;</span></div>
+<div class="line"><a name="l01204"></a><span class="lineno"> 1204</span>&#160;                            <span class="stringliteral">&quot; first one, which is defined by gpuNumberStart (e.g. in the OpenPose demo, it is set&quot;</span></div>
+<div class="line"><a name="l01205"></a><span class="lineno"> 1205</span>&#160;                            <span class="stringliteral">&quot; with the `num_gpu_start` flag).&quot;</span>);</div>
+<div class="line"><a name="l01206"></a><span class="lineno"> 1206</span>&#160;                    mThreadManager.add(mThreadId, spWPoses.at(0), queueIn, queueOut);</div>
+<div class="line"><a name="l01207"></a><span class="lineno"> 1207</span>&#160;                }</div>
+<div class="line"><a name="l01208"></a><span class="lineno"> 1208</span>&#160;                queueIn++;</div>
+<div class="line"><a name="l01209"></a><span class="lineno"> 1209</span>&#160;                queueOut++;</div>
+<div class="line"><a name="l01210"></a><span class="lineno"> 1210</span>&#160;            }</div>
+<div class="line"><a name="l01211"></a><span class="lineno"> 1211</span>&#160;            <span class="comment">// If custom user Worker and uses its own thread</span></div>
+<div class="line"><a name="l01212"></a><span class="lineno"> 1212</span>&#160;            <span class="keywordflow">if</span> (!mUserPostProcessingWs.empty() &amp;&amp; mUserPostProcessingWsOnNewThread)</div>
+<div class="line"><a name="l01213"></a><span class="lineno"> 1213</span>&#160;            {</div>
+<div class="line"><a name="l01214"></a><span class="lineno"> 1214</span>&#160;                <span class="comment">// Post processing workers</span></div>
+<div class="line"><a name="l01215"></a><span class="lineno"> 1215</span>&#160;                <span class="keywordflow">if</span> (!mPostProcessingWs.empty())</div>
+<div class="line"><a name="l01216"></a><span class="lineno"> 1216</span>&#160;                {</div>
+<div class="line"><a name="l01217"></a><span class="lineno"> 1217</span>&#160;                    <span class="comment">// Thread 2 or 3, queues 2 -&gt; 3</span></div>
+<div class="line"><a name="l01218"></a><span class="lineno"> 1218</span>&#160;                    mThreadManager.add(mThreadId, mPostProcessingWs, queueIn++, queueOut++);</div>
+<div class="line"><a name="l01219"></a><span class="lineno"> 1219</span>&#160;                    threadIdPP();</div>
+<div class="line"><a name="l01220"></a><span class="lineno"> 1220</span>&#160;                }</div>
+<div class="line"><a name="l01221"></a><span class="lineno"> 1221</span>&#160;                <span class="comment">// User processing workers</span></div>
+<div class="line"><a name="l01222"></a><span class="lineno"> 1222</span>&#160;                <span class="comment">// Thread 3 or 4, queues 3 -&gt; 4</span></div>
+<div class="line"><a name="l01223"></a><span class="lineno"> 1223</span>&#160;                mThreadManager.add(mThreadId, mUserPostProcessingWs, queueIn++, queueOut++);</div>
+<div class="line"><a name="l01224"></a><span class="lineno"> 1224</span>&#160;                threadIdPP();</div>
+<div class="line"><a name="l01225"></a><span class="lineno"> 1225</span>&#160;                <span class="comment">// Output workers</span></div>
+<div class="line"><a name="l01226"></a><span class="lineno"> 1226</span>&#160;                <span class="keywordflow">if</span> (!mOutputWs.empty())</div>
+<div class="line"><a name="l01227"></a><span class="lineno"> 1227</span>&#160;                {</div>
+<div class="line"><a name="l01228"></a><span class="lineno"> 1228</span>&#160;                    <span class="comment">// Thread 4 or 5, queues 4 -&gt; 5</span></div>
+<div class="line"><a name="l01229"></a><span class="lineno"> 1229</span>&#160;                    mThreadManager.add(mThreadId, mOutputWs, queueIn++, queueOut++);</div>
+<div class="line"><a name="l01230"></a><span class="lineno"> 1230</span>&#160;                    threadIdPP();</div>
+<div class="line"><a name="l01231"></a><span class="lineno"> 1231</span>&#160;                }</div>
+<div class="line"><a name="l01232"></a><span class="lineno"> 1232</span>&#160;            }</div>
+<div class="line"><a name="l01233"></a><span class="lineno"> 1233</span>&#160;            <span class="comment">// If custom user Worker in same thread or producer on same thread</span></div>
+<div class="line"><a name="l01234"></a><span class="lineno"> 1234</span>&#160;            <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01235"></a><span class="lineno"> 1235</span>&#160;            {</div>
+<div class="line"><a name="l01236"></a><span class="lineno"> 1236</span>&#160;                <span class="comment">// Post processing workers + User post processing workers + Output workers</span></div>
+<div class="line"><a name="l01237"></a><span class="lineno"> 1237</span>&#160;                <span class="keyword">auto</span> workersAux = mergeWorkers(mPostProcessingWs, mUserPostProcessingWs);</div>
+<div class="line"><a name="l01238"></a><span class="lineno"> 1238</span>&#160;                workersAux = mergeWorkers(workersAux, mOutputWs);</div>
+<div class="line"><a name="l01239"></a><span class="lineno"> 1239</span>&#160;                <span class="keywordflow">if</span> (!workersAux.empty())</div>
+<div class="line"><a name="l01240"></a><span class="lineno"> 1240</span>&#160;                {</div>
+<div class="line"><a name="l01241"></a><span class="lineno"> 1241</span>&#160;                    <span class="comment">// Thread 2 or 3, queues 2 -&gt; 3</span></div>
+<div class="line"><a name="l01242"></a><span class="lineno"> 1242</span>&#160;                    mThreadManager.add(mThreadId, workersAux, queueIn++, queueOut++);</div>
+<div class="line"><a name="l01243"></a><span class="lineno"> 1243</span>&#160;                    threadIdPP();</div>
+<div class="line"><a name="l01244"></a><span class="lineno"> 1244</span>&#160;                }</div>
+<div class="line"><a name="l01245"></a><span class="lineno"> 1245</span>&#160;            }</div>
+<div class="line"><a name="l01246"></a><span class="lineno"> 1246</span>&#160;            <span class="comment">// User output worker</span></div>
+<div class="line"><a name="l01247"></a><span class="lineno"> 1247</span>&#160;            <span class="comment">// Thread Y, queues Q -&gt; Q+1</span></div>
+<div class="line"><a name="l01248"></a><span class="lineno"> 1248</span>&#160;            <span class="keywordflow">if</span> (!mUserOutputWs.empty())</div>
+<div class="line"><a name="l01249"></a><span class="lineno"> 1249</span>&#160;            {</div>
+<div class="line"><a name="l01250"></a><span class="lineno"> 1250</span>&#160;                <span class="keywordflow">if</span> (mUserOutputWsOnNewThread)</div>
+<div class="line"><a name="l01251"></a><span class="lineno"> 1251</span>&#160;                {</div>
+<div class="line"><a name="l01252"></a><span class="lineno"> 1252</span>&#160;                    mThreadManager.add(mThreadId, mUserOutputWs, queueIn++, queueOut++);</div>
+<div class="line"><a name="l01253"></a><span class="lineno"> 1253</span>&#160;                    threadIdPP();</div>
+<div class="line"><a name="l01254"></a><span class="lineno"> 1254</span>&#160;                }</div>
+<div class="line"><a name="l01255"></a><span class="lineno"> 1255</span>&#160;                <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01256"></a><span class="lineno"> 1256</span>&#160;                    mThreadManager.add(mThreadId-1, mUserOutputWs, queueIn++, queueOut++);</div>
+<div class="line"><a name="l01257"></a><span class="lineno"> 1257</span>&#160;            }</div>
+<div class="line"><a name="l01258"></a><span class="lineno"> 1258</span>&#160;            <span class="comment">// OpenPose GUI</span></div>
+<div class="line"><a name="l01259"></a><span class="lineno"> 1259</span>&#160;            <span class="keywordflow">if</span> (spWGui != <span class="keyword">nullptr</span>)</div>
+<div class="line"><a name="l01260"></a><span class="lineno"> 1260</span>&#160;            {</div>
+<div class="line"><a name="l01261"></a><span class="lineno"> 1261</span>&#160;                <span class="comment">// Thread Y+1, queues Q+1 -&gt; Q+2</span></div>
+<div class="line"><a name="l01262"></a><span class="lineno"> 1262</span>&#160;                mThreadManager.add(mThreadId, spWGui, queueIn++, queueOut++);</div>
+<div class="line"><a name="l01263"></a><span class="lineno"> 1263</span>&#160;                threadIdPP();</div>
+<div class="line"><a name="l01264"></a><span class="lineno"> 1264</span>&#160;            }</div>
+<div class="line"><a name="l01265"></a><span class="lineno"> 1265</span>&#160;            <a class="code" href="namespaceop.html#a9912b2bfa3dbe427b4e72dd34c605df2">log</a>(<span class="stringliteral">&quot;&quot;</span>, <a class="code" href="namespaceop.html#adc43fb9031418e7f8112816a3b535d14a28d0edd045e05cf5af64e35ae0c4c6ef">Priority::Low</a>, __LINE__, __FUNCTION__, __FILE__);</div>
+<div class="line"><a name="l01266"></a><span class="lineno"> 1266</span>&#160;        }</div>
+<div class="line"><a name="l01267"></a><span class="lineno"> 1267</span>&#160;        <span class="keywordflow">catch</span> (<span class="keyword">const</span> std::exception&amp; e)</div>
+<div class="line"><a name="l01268"></a><span class="lineno"> 1268</span>&#160;        {</div>
+<div class="line"><a name="l01269"></a><span class="lineno"> 1269</span>&#160;            <a class="code" href="namespaceop.html#a5f092bd36c716a894cb035e1ead2aca3">error</a>(e.what(), __LINE__, __FUNCTION__, __FILE__);</div>
+<div class="line"><a name="l01270"></a><span class="lineno"> 1270</span>&#160;        }</div>
+<div class="line"><a name="l01271"></a><span class="lineno"> 1271</span>&#160;    }</div>
+<div class="line"><a name="l01272"></a><span class="lineno"> 1272</span>&#160;</div>
+<div class="line"><a name="l01273"></a><span class="lineno"> 1273</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TDatums, <span class="keyword">typename</span> TWorker, <span class="keyword">typename</span> TQueue&gt;</div>
+<div class="line"><a name="l01274"></a><span class="lineno"> 1274</span>&#160;    <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> <span class="keywordtype">long</span> Wrapper&lt;TDatums, TWorker, TQueue&gt;::threadIdPP()</div>
+<div class="line"><a name="l01275"></a><span class="lineno"> 1275</span>&#160;    {</div>
+<div class="line"><a name="l01276"></a><span class="lineno"> 1276</span>&#160;        <span class="keywordflow">try</span></div>
+<div class="line"><a name="l01277"></a><span class="lineno"> 1277</span>&#160;        {</div>
+<div class="line"><a name="l01278"></a><span class="lineno"> 1278</span>&#160;            <span class="keywordflow">if</span> (mMultiThreadEnabled)</div>
+<div class="line"><a name="l01279"></a><span class="lineno"> 1279</span>&#160;                mThreadId++;</div>
+<div class="line"><a name="l01280"></a><span class="lineno"> 1280</span>&#160;            <span class="keywordflow">return</span> mThreadId;</div>
+<div class="line"><a name="l01281"></a><span class="lineno"> 1281</span>&#160;        }</div>
+<div class="line"><a name="l01282"></a><span class="lineno"> 1282</span>&#160;        <span class="keywordflow">catch</span> (<span class="keyword">const</span> std::exception&amp; e)</div>
+<div class="line"><a name="l01283"></a><span class="lineno"> 1283</span>&#160;        {</div>
+<div class="line"><a name="l01284"></a><span class="lineno"> 1284</span>&#160;            <a class="code" href="namespaceop.html#a5f092bd36c716a894cb035e1ead2aca3">error</a>(e.what(), __LINE__, __FUNCTION__, __FILE__);</div>
+<div class="line"><a name="l01285"></a><span class="lineno"> 1285</span>&#160;            <span class="keywordflow">return</span> 0ull;</div>
+<div class="line"><a name="l01286"></a><span class="lineno"> 1286</span>&#160;        }</div>
+<div class="line"><a name="l01287"></a><span class="lineno"> 1287</span>&#160;    }</div>
+<div class="line"><a name="l01288"></a><span class="lineno"> 1288</span>&#160;</div>
+<div class="line"><a name="l01289"></a><span class="lineno"> 1289</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TDatums, <span class="keyword">typename</span> TWorker, <span class="keyword">typename</span> TQueue&gt;</div>
+<div class="line"><a name="l01290"></a><span class="lineno"> 1290</span>&#160;    std::vector&lt;TWorker&gt; Wrapper&lt;TDatums, TWorker, TQueue&gt;::mergeWorkers(<span class="keyword">const</span> std::vector&lt;TWorker&gt;&amp; workersA,</div>
+<div class="line"><a name="l01291"></a><span class="lineno"> 1291</span>&#160;                                                                         <span class="keyword">const</span> std::vector&lt;TWorker&gt;&amp; workersB)</div>
+<div class="line"><a name="l01292"></a><span class="lineno"> 1292</span>&#160;    {</div>
+<div class="line"><a name="l01293"></a><span class="lineno"> 1293</span>&#160;        <span class="keywordflow">try</span></div>
+<div class="line"><a name="l01294"></a><span class="lineno"> 1294</span>&#160;        {</div>
+<div class="line"><a name="l01295"></a><span class="lineno"> 1295</span>&#160;            <span class="keyword">auto</span> workersToReturn(workersA);</div>
+<div class="line"><a name="l01296"></a><span class="lineno"> 1296</span>&#160;            <span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; worker : workersB)</div>
+<div class="line"><a name="l01297"></a><span class="lineno"> 1297</span>&#160;                workersToReturn.emplace_back(worker);</div>
+<div class="line"><a name="l01298"></a><span class="lineno"> 1298</span>&#160;            <span class="keywordflow">return</span> workersToReturn;</div>
+<div class="line"><a name="l01299"></a><span class="lineno"> 1299</span>&#160;        }</div>
+<div class="line"><a name="l01300"></a><span class="lineno"> 1300</span>&#160;        <span class="keywordflow">catch</span> (<span class="keyword">const</span> std::exception&amp; e)</div>
+<div class="line"><a name="l01301"></a><span class="lineno"> 1301</span>&#160;        {</div>
+<div class="line"><a name="l01302"></a><span class="lineno"> 1302</span>&#160;            <a class="code" href="namespaceop.html#a5f092bd36c716a894cb035e1ead2aca3">error</a>(e.what(), __LINE__, __FUNCTION__, __FILE__);</div>
+<div class="line"><a name="l01303"></a><span class="lineno"> 1303</span>&#160;            <span class="keywordflow">return</span> std::vector&lt;TWorker&gt;{};</div>
+<div class="line"><a name="l01304"></a><span class="lineno"> 1304</span>&#160;        }</div>
+<div class="line"><a name="l01305"></a><span class="lineno"> 1305</span>&#160;    }</div>
+<div class="line"><a name="l01306"></a><span class="lineno"> 1306</span>&#160;</div>
+<div class="line"><a name="l01307"></a><span class="lineno"> 1307</span>&#160;    <span class="keyword">extern</span> <span class="keyword">template</span> <span class="keyword">class </span>Wrapper&lt;DATUM_BASE_NO_PTR&gt;;</div>
+<div class="line"><a name="l01308"></a><span class="lineno"> 1308</span>&#160;}</div>
+<div class="line"><a name="l01309"></a><span class="lineno"> 1309</span>&#160;</div>
+<div class="line"><a name="l01310"></a><span class="lineno"> 1310</span>&#160;<span class="preprocessor">#endif // OPENPOSE_WRAPPER_WRAPPER_HPP</span></div>
 <div class="ttc" id="structop_1_1_wrapper_struct_pose_html_a35147b6fb9e300d79b71637793053a1b"><div class="ttname"><a href="structop_1_1_wrapper_struct_pose.html#a35147b6fb9e300d79b71637793053a1b">op::WrapperStructPose::poseModel</a></div><div class="ttdeci">PoseModel poseModel</div><div class="ttdef"><b>Definition:</b> wrapperStructPose.hpp:87</div></div>
 <div class="ttc" id="core_2headers_8hpp_html"><div class="ttname"><a href="core_2headers_8hpp.html">headers.hpp</a></div></div>
 <div class="ttc" id="structop_1_1_wrapper_struct_pose_html_acff912f14ba3c0ba706ea99e1cef790e"><div class="ttname"><a href="structop_1_1_wrapper_struct_pose.html#acff912f14ba3c0ba706ea99e1cef790e">op::WrapperStructPose::netInputSize</a></div><div class="ttdeci">Point&lt; int &gt; netInputSize</div><div class="ttdef"><b>Definition:</b> wrapperStructPose.hpp:30</div></div>
