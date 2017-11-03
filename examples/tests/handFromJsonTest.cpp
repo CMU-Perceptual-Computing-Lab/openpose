@@ -12,7 +12,7 @@
 #include "wrapperHandFromJsonTest.hpp"
 
 // For info about the flags, check `examples/openpose/openpose.bin`.
-// Debugging
+// Debugging/Other
 DEFINE_int32(logging_level,             3,              "");
 // Producer
 DEFINE_string(image_dir,                "", "");

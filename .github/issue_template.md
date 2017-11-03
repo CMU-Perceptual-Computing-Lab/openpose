@@ -15,7 +15,7 @@ Issues/comments which do not follow these rules will be **ignored or removed** w
 
 
 ### Executed Command (if any)
-Note: add `--logging_level 0` to get higher debug information.
+Note: add `--logging_level 0 --disable_multi_thread` to get higher debug information.
 
 
 
