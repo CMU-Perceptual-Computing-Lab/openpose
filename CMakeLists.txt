@@ -2,9 +2,9 @@ project(OpenPose)
 cmake_minimum_required(VERSION 2.8.7 FATAL_ERROR) # min. cmake version recommended by Caffe
 
 ### VERSION INFO
-
+  
 set(OpenPose_VERSION_MAJOR 1)
-set(OpenPose_VERSION_MINOR 1)
+set(OpenPose_VERSION_MINOR 2)
 set(OpenPose_VERSION_PATCH 0)
 set(OpenPose_VERSION ${OpenPose_VERSION_MAJOR}.${OpenPose_VERSION_MINOR}.${OpenPose_VERSION_PATCH})
 
@@ -29,12 +29,20 @@ endif ()
 
 ### FLAGS
 
-# Turn on C++11
-add_definitions(-std=c++11)
 if (WIN32)
+  # string (REPLACE "/D_WINDOWS" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+  # string (REPLACE "/DWIN32" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+
+  # set(CMAKE_CONFIGURATION_TYPES Release Debug CACHE TYPE INTERNAL FORCE)
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MP")
   string(REPLACE "/O2" "/Ox" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
-  string(CONCAT CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}" " /MP")
-endif (WIN32)
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Ob2 /Ot /Oi") # /GL")
+  message(${CMAKE_CXX_FLAGS_RELEASE})
+  # set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /LTCG /INCREMENTAL:NO /OPT:REF")
+elseif (UNIX AND NOT APPLE)
+  # Turn on C++11
+  add_definitions(-std=c++11)
+endif ()
 
 # C++ additional flags
 if(CMAKE_COMPILER_IS_GNUCXX)
@@ -99,18 +107,18 @@ option(BUILD_SHARED_LIBS "Build as shared lib" ON)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
 
-find_package(CUDA)
-set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-gencode arch=compute_61,code=sm_61)
-
+include(cmake/Cuda.cmake)
 
 if (UNIX AND NOT APPLE)
-  include(cmake/Cuda.cmake)
   # find_package(CUDA)
   find_package(Boost COMPONENTS system filesystem)
   find_package(CuDNN)
   find_package(GFlags)
   find_package(Glog)
   find_package(OpenCV)
+
+  # Set CUDA Flags
+  set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -std=c++11")
 
   if (NOT Boost_FOUND)
     message(FATAL_ERROR "Boost not found. Install Boost from the command line using the command(s) --\
@@ -149,6 +157,11 @@ endif (UNIX AND NOT APPLE)
 include(cmake/Utils.cmake)
 
 if (WIN32)
+
+  if("${CMAKE_VERSION}" VERSION_GREATER 3.6.3)
+    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT OpenPoseDemo)
+  endif("${CMAKE_VERSION}" VERSION_GREATER 3.6.3)
+
   set_property(GLOBAL PROPERTY USE_FOLDERS ON)
   set(FIND_LIB_PREFIX ${CMAKE_SOURCE_DIR}/3rdparty/windows)
 
@@ -167,7 +180,7 @@ if (WIN32)
   find_library(Boost_SYSTEM_LIBRARY_OPTIMIZED boost_system-vc140-mt-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
   find_library(Boost_FILESYSTEM_LIBRARY_DEBUG boost_filesystem-vc140-mt-gd-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
   find_library(Boost_SYSTEM_LIBRARY_DEBUG boost_system-vc140-mt-gd-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
-  find_library (OpenCV_LIBS opencv_world310 HINTS ${FIND_LIB_PREFIX}/opencv/x64/vc14/lib)
+  find_library(OpenCV_LIBS opencv_world310 HINTS ${FIND_LIB_PREFIX}/opencv/x64/vc14/lib)
   find_library(GFLAGS_LIBRARY_RELEASE gflags HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
   find_library(GFLAGS_LIBRARY_DEBUG gflagsd HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
   find_library(GLOG_LIBRARY_RELEASE glog HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
@@ -181,9 +194,6 @@ if (WIN32)
   set(Boost_INCLUDE_DIRS ${FIND_LIB_PREFIX}/caffe3rdparty/include/boost-1_61)
   set(WINDOWS_INCLUDE_DIRS ${FIND_LIB_PREFIX}/caffe3rdparty/include)
 endif (WIN32)
-
-# Set CUDA Flags
-set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -std=c++11")
 
 ### CAFFE
 

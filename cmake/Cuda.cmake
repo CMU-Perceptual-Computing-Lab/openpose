@@ -17,7 +17,12 @@ macro(op_list_unique)
 endmacro()
 
 # This list will be used for CUDA_ARCH = All option
-set(Caffe_known_gpu_archs "20 21(20) 30 35 50 52 60 61")
+if (UNIX AND NOT APPLE)
+  set(Caffe_known_gpu_archs "20 21(20) 30 35 50 52 60 61")
+elseif (WIN32)
+  set(Caffe_known_gpu_archs "30 35 50 52 60 61")
+endif ()
+
 
 ################################################################################################
 # A function for automatic detection of GPUs installed  (if autodetection is enabled)
