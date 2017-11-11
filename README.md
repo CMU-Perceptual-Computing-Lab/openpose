@@ -1,5 +1,7 @@
-OpenPose
-====================================
+<div align="center">
+    <img src=".github/Logo_main_black.png", width="480">
+</div>
+-----------------
 
 [![Build Status](https://travis-ci.org/CMU-Perceptual-Computing-Lab/openpose.svg?branch=master)](https://travis-ci.org/CMU-Perceptual-Computing-Lab/openpose)
 
