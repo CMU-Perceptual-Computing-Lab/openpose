@@ -101,10 +101,12 @@ $(document).ready(function(){initNavTree('index.html','');});
 <div class="title">OpenPose Documentation</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><div align="center"> &lt;img src=".github/Logo_main_black.png", width="480"&gt; </p>
-<h2></h2>
-</div><div align="center"></div><div align="center"><a href="https://travis-ci.org/CMU-Perceptual-Computing-Lab/openpose">![Build Status](https://travis-ci.org/CMU-Perceptual-Computing-Lab/openpose.svg?branch=master)</a></div><div align="center">OpenPose is a **library for real-time multi-person keypoint detection and multi-threading written in C++** using OpenCV and Caffe. </div><div align="center"> &lt;img src="doc/media/pose_face_hands.gif", width="480"&gt; </div><div align="center"></div><div align="center"><h2>Latest News</h2>
-</div><div align="center"><ul>
+<div class="textblock"><div align="center"> &lt;img src=".github/Logo_main_black.png", width="480"&gt; </div> <hr/>
+<p><a href="https://travis-ci.org/CMU-Perceptual-Computing-Lab/openpose">![Build Status](https://travis-ci.org/CMU-Perceptual-Computing-Lab/openpose.svg?branch=master)</a></p>
+<p>OpenPose is a **library for real-time multi-person keypoint detection and multi-threading written in C++** using OpenCV and Caffe. </p>
+<p>&lt;img src="doc/media/pose_face_hands.gif", width="480"&gt; </p>
+<h2>Latest News</h2>
+<ul>
 <li>Sep 2017: <b>CMake</b> installer and <b>IP camera</b> support!</li>
 <li>Jul 2017: <a href="doc/installation.md#installation---demo">**Windows portable demo**</a>!</li>
 <li>Jul 2017: <b>Hands</b> released!</li>
@@ -113,12 +115,15 @@ $(document).ready(function(){initNavTree('index.html','');});
 <li>Apr 2017: <b>Body</b> released!</li>
 <li>Check all the release notes.</li>
 </ul>
-</div><div align="center"><h2>Results</h2>
-</div><div align="center"> <h3>Body Estimation</h3>
-</div><div align="center"> </div><div align="center"> &lt;img src="doc/media/dance.gif", width="480"&gt; </div><div align="center"></div><div align="center"><h3>Body + Face + Hands Estimation</h3>
-</div><div align="center"> </div><div align="center"> &lt;img src="doc/media/pose_face.gif", width="480"&gt; </div><div align="center"></div><div align="center"><h3>Body + Hands</h3>
-</div><div align="center"> </div><div align="center"> &lt;img src="doc/media/pose_hands.gif", width="480"&gt; </div><div align="center"></div><div align="center"><h2>Contents</h2>
-</div><div align="center"><ol type="1">
+<h2>Results</h2>
+<h3>Body Estimation</h3>
+<p>&lt;img src="doc/media/dance.gif", width="480"&gt; </p>
+<h3>Body + Face + Hands Estimation</h3>
+<p>&lt;img src="doc/media/pose_face.gif", width="480"&gt; </p>
+<h3>Body + Hands</h3>
+<p>&lt;img src="doc/media/pose_hands.gif", width="480"&gt; </p>
+<h2>Contents</h2>
+<ol type="1">
 <li><a href="#latest-news">Latest News</a></li>
 <li><a href="#results">Results</a></li>
 <li><a href="#introduction">Introduction</a></li>
@@ -140,9 +145,14 @@ $(document).ready(function(){initNavTree('index.html','');});
 <ol type="1">
 <li><a href="#other-contributors">Other Contributors</a></li>
 </ol>
-</div><div align="center"><h2>Introduction</h2>
-</div><div align="center"> OpenPose represents the <b>first real-time system to jointly detect human body, hand and facial keypoints (in total 130 keypoints) on single images</b>. In addition, the system computational performance on body keypoint estimation is invariant to the number of detected people in the image. It uses Caffe, but it could easily be ported to other frameworks (Tensorflow, Torch, etc.). If you implement any of those, feel free to make a pull request!</div><div align="center">OpenPose is authored by <a href="https://www.gineshidalgo.com/">Gines Hidalgo</a>, <a href="http://www.andrew.cmu.edu/user/zhecao">Zhe Cao</a>, <a href="http://www.cs.cmu.edu/~tsimon/">Tomas Simon</a>, <a href="https://scholar.google.com/citations?user=sFQD3k4AAAAJ&amp;hl=en">Shih-En Wei</a>, <a href="http://www.cs.cmu.edu/~hanbyulj/">Hanbyul Joo</a>, and <a href="http://www.cs.cmu.edu/~yaser/">Yaser Sheikh</a>. Currently, it is being maintained by <a href="https://www.gineshidalgo.com/">Gines Hidalgo</a> and <a href="https://www.linkedin.com/in/bikz05">Bikramjot Hanzra</a>.</div><div align="center">It is freely available for free non-commercial use, and may be redistributed under these conditions. Please, see the [license](LICENSE) for further details. <a href="https://flintbox.com/public/project/47343/">Interested in a commercial license? Check this link</a>. For commercial queries, contact <a href="http://www.cs.cmu.edu/~yaser/">Yaser Sheikh</a>.</div><div align="center">In addition, OpenPose would not be possible without the <a href="http://domedb.perception.cs.cmu.edu/">CMU Panoptic Studio</a>.</div><div align="center">The pose estimation work is based on the C++ code from <a href="https://github.com/CMU-Perceptual-Computing-Lab/caffe_rtpose">the ECCV 2016 demo</a>, "Realtime Multiperson Pose Estimation", <a href="http://www.andrew.cmu.edu/user/zhecao">Zhe Cao</a>, <a href="http://www.cs.cmu.edu/~tsimon/">Tomas Simon</a>, <a href="https://scholar.google.com/citations?user=sFQD3k4AAAAJ&amp;hl=en">Shih-En Wei</a>, <a href="http://www.cs.cmu.edu/~yaser/">Yaser Sheikh</a>. The <a href="https://github.com/ZheC/Multi-Person-Pose-Estimation">original repo</a> includes Matlab and Python version, as well as the training code.</div><div align="center"><h2>Functionality</h2>
-</div><div align="center"><ul>
+<h2>Introduction</h2>
+<p>OpenPose represents the <b>first real-time system to jointly detect human body, hand and facial keypoints (in total 130 keypoints) on single images</b>. In addition, the system computational performance on body keypoint estimation is invariant to the number of detected people in the image. It uses Caffe, but it could easily be ported to other frameworks (Tensorflow, Torch, etc.). If you implement any of those, feel free to make a pull request!</p>
+<p>OpenPose is authored by <a href="https://www.gineshidalgo.com/">Gines Hidalgo</a>, <a href="http://www.andrew.cmu.edu/user/zhecao">Zhe Cao</a>, <a href="http://www.cs.cmu.edu/~tsimon/">Tomas Simon</a>, <a href="https://scholar.google.com/citations?user=sFQD3k4AAAAJ&amp;hl=en">Shih-En Wei</a>, <a href="http://www.cs.cmu.edu/~hanbyulj/">Hanbyul Joo</a>, and <a href="http://www.cs.cmu.edu/~yaser/">Yaser Sheikh</a>. Currently, it is being maintained by <a href="https://www.gineshidalgo.com/">Gines Hidalgo</a> and <a href="https://www.linkedin.com/in/bikz05">Bikramjot Hanzra</a>.</p>
+<p>It is freely available for free non-commercial use, and may be redistributed under these conditions. Please, see the [license](LICENSE) for further details. <a href="https://flintbox.com/public/project/47343/">Interested in a commercial license? Check this link</a>. For commercial queries, contact <a href="http://www.cs.cmu.edu/~yaser/">Yaser Sheikh</a>.</p>
+<p>In addition, OpenPose would not be possible without the <a href="http://domedb.perception.cs.cmu.edu/">CMU Panoptic Studio</a>.</p>
+<p>The pose estimation work is based on the C++ code from <a href="https://github.com/CMU-Perceptual-Computing-Lab/caffe_rtpose">the ECCV 2016 demo</a>, "Realtime Multiperson Pose Estimation", <a href="http://www.andrew.cmu.edu/user/zhecao">Zhe Cao</a>, <a href="http://www.cs.cmu.edu/~tsimon/">Tomas Simon</a>, <a href="https://scholar.google.com/citations?user=sFQD3k4AAAAJ&amp;hl=en">Shih-En Wei</a>, <a href="http://www.cs.cmu.edu/~yaser/">Yaser Sheikh</a>. The <a href="https://github.com/ZheC/Multi-Person-Pose-Estimation">original repo</a> includes Matlab and Python version, as well as the training code.</p>
+<h2>Functionality</h2>
+<ul>
 <li>Multi-person 15 or <b>18-keypoint body pose</b> estimation and rendering. <b>Running time invariant to number of people</b> on the image.</li>
 <li>Multi-person <b>2x21-keypoint hand</b> estimation and rendering. Note: In this initial version, <b>running time</b> linearly <b>depends</b> on the <b>number of people</b> on the image.</li>
 <li>Multi-person <b>70-keypoint face</b> estimation and rendering. Note: In this initial version, <b>running time</b> linearly <b>depends</b> on the <b>number of people</b> on the image.</li>
@@ -152,32 +162,47 @@ $(document).ready(function(){initNavTree('index.html','');});
 <li>Small display and GUI for simple result visualization.</li>
 <li>All the functionality is wrapped into a <b>simple-to-use OpenPose Wrapper class</b>.</li>
 </ul>
-</div><div align="center"><h2>Installation, Reinstallation and Uninstallation</h2>
-</div><div align="center"> You can find the installation, reinstallation and uninstallation steps on: doc/installation.md.</div><div align="center"><h2>Quick Start</h2>
-</div><div align="center"> Most users cases should not need to dive deep into the library, they might just be able to use the <a href="#demo">Demo</a> or the simple <a href="#openpose-wrapper">OpenPose Wrapper</a>. So you can most probably skip the library details in <a href="#openpose-library">OpenPose Library</a>.</div><div align="center"><h3>Demo</h3>
-</div><div align="center"> Your case if you just want to process a folder of images or video or webcam and display or save the pose results.</div><div align="center">Forget about the OpenPose library details and just read the doc/demo_overview.md 1-page section.</div><div align="center"><h3>OpenPose Wrapper</h3>
-</div><div align="center"> Your case if you want to read a specific format of image source and/or add a specific post-processing function and/or implement your own display/saving.</div><div align="center">(Almost) forget about the library, just take a look to the <code>Wrapper</code> tutorial on <a href="examples/tutorial_wrapper/">examples/tutorial_wrapper/</a>.</div><div align="center">Note: you should not need to modify the OpenPose source code nor examples. In this way, you are able to directly upgrade OpenPose anytime in the future without changing your code. You might create your custom code on <a href="examples/user_code/">examples/user_code/</a> and compile it by using <code>make all</code> in the OpenPose folder.</div><div align="center"><h3>OpenPose Library</h3>
-</div><div align="center"> Your case if you want to change internal functions and/or extend its functionality.</div><div align="center"><ol type="1">
+<h2>Installation, Reinstallation and Uninstallation</h2>
+<p>You can find the installation, reinstallation and uninstallation steps on: doc/installation.md.</p>
+<h2>Quick Start</h2>
+<p>Most users cases should not need to dive deep into the library, they might just be able to use the <a href="#demo">Demo</a> or the simple <a href="#openpose-wrapper">OpenPose Wrapper</a>. So you can most probably skip the library details in <a href="#openpose-library">OpenPose Library</a>.</p>
+<h3>Demo</h3>
+<p>Your case if you just want to process a folder of images or video or webcam and display or save the pose results.</p>
+<p>Forget about the OpenPose library details and just read the doc/demo_overview.md 1-page section.</p>
+<h3>OpenPose Wrapper</h3>
+<p>Your case if you want to read a specific format of image source and/or add a specific post-processing function and/or implement your own display/saving.</p>
+<p>(Almost) forget about the library, just take a look to the <code>Wrapper</code> tutorial on <a href="examples/tutorial_wrapper/">examples/tutorial_wrapper/</a>.</p>
+<p>Note: you should not need to modify the OpenPose source code nor examples. In this way, you are able to directly upgrade OpenPose anytime in the future without changing your code. You might create your custom code on <a href="examples/user_code/">examples/user_code/</a> and compile it by using <code>make all</code> in the OpenPose folder.</p>
+<h3>OpenPose Library</h3>
+<p>Your case if you want to change internal functions and/or extend its functionality.</p>
+<ol type="1">
 <li>Take a look at the <a href="#demo">Demo</a> and <a href="#openpose-wrapper">OpenPose Wrapper</a>.</li>
 <li>OpenPose Overview: Learn the basics about the library source code in doc/library_overview.md.</li>
 <li>Extending Functionality: Learn how to extend the library in doc/library_extend_functionality.md.</li>
 <li>Adding An Extra Module: Learn how to add an extra module in doc/library_add_new_module.md.</li>
 <li>See the Doxygen documentation on <a href="http://cmu-perceptual-computing-lab.github.io/openpose/html/index.html">http://cmu-perceptual-computing-lab.github.io/openpose/html/index.html</a> or build it from the source code.</li>
 </ol>
-</div><div align="center"><h2>Output</h2>
-</div><div align="center"> Check the output (format, keypoint index ordering, etc.) in doc/output.md.</div><div align="center"><h2>Standalone Face Or Hand Keypoint Detector</h2>
-</div><div align="center"> If you do not need the body keypoint detector and want to considerably speed up the face keypoint detection, you can use the new approach based on OpenCV face detector. See doc/standalone_face_or_hand_keypoint_detector.md.</div><div align="center">You can also use the OpenPose hand and/or face keypoint detectors with your own face or hand detectors, rather than using the body keypoint detector as initial detector for those. E.g. in case of hand camera views at which the hands are visible but not the rest of the body, so that the OpenPose detector would fail. See doc/standalone_face_or_hand_keypoint_detector.md.</div><div align="center"><h2>Speed Up OpenPose and Benchmark</h2>
-</div><div align="center"> Check the OpenPose Benchmark and some hints to speed up OpenPose on <a href="doc/installation.md#faq">doc/installation.md#faq</a>.</div><div align="center"><h2>Send Us Failure Cases!</h2>
-</div><div align="center"> If you find videos or images where OpenPose does not seems to work well, feel free to send them to <a href="#" onclick="location.href='mai'+'lto:'+'ope'+'np'+'ose'+'cm'+'u@g'+'ma'+'il.'+'co'+'m'; return false;">openp<span style="display: none;">.nosp@m.</span>osec<span style="display: none;">.nosp@m.</span>mu@gm<span style="display: none;">.nosp@m.</span>ail.<span style="display: none;">.nosp@m.</span>com</a>, we will use them to improve the quality of the algorithm. Thanks!</div><div align="center"><h2>Send Us Your Feedback!</h2>
-</div><div align="center"> Our library is open source for research purposes, and we want to continuously improve it! So please, let us know if...</div><div align="center"><ol type="1">
+<h2>Output</h2>
+<p>Check the output (format, keypoint index ordering, etc.) in doc/output.md.</p>
+<h2>Standalone Face Or Hand Keypoint Detector</h2>
+<p>If you do not need the body keypoint detector and want to considerably speed up the face keypoint detection, you can use the new approach based on OpenCV face detector. See doc/standalone_face_or_hand_keypoint_detector.md.</p>
+<p>You can also use the OpenPose hand and/or face keypoint detectors with your own face or hand detectors, rather than using the body keypoint detector as initial detector for those. E.g. in case of hand camera views at which the hands are visible but not the rest of the body, so that the OpenPose detector would fail. See doc/standalone_face_or_hand_keypoint_detector.md.</p>
+<h2>Speed Up OpenPose and Benchmark</h2>
+<p>Check the OpenPose Benchmark and some hints to speed up OpenPose on <a href="doc/installation.md#faq">doc/installation.md#faq</a>.</p>
+<h2>Send Us Failure Cases!</h2>
+<p>If you find videos or images where OpenPose does not seems to work well, feel free to send them to <a href="#" onclick="location.href='mai'+'lto:'+'ope'+'np'+'ose'+'cm'+'u@g'+'ma'+'il.'+'co'+'m'; return false;">openp<span style="display: none;">.nosp@m.</span>osec<span style="display: none;">.nosp@m.</span>mu@gm<span style="display: none;">.nosp@m.</span>ail.<span style="display: none;">.nosp@m.</span>com</a>, we will use them to improve the quality of the algorithm. Thanks!</p>
+<h2>Send Us Your Feedback!</h2>
+<p>Our library is open source for research purposes, and we want to continuously improve it! So please, let us know if...</p>
+<ol type="1">
 <li>... you find any bug (in functionality or speed).</li>
 <li>... you added some functionality to some class or some new Worker&lt;T&gt; subclass which we might potentially incorporate.</li>
 <li>... you know how to speed up or improve any part of the library.</li>
 <li>... you have a request about possible functionality.</li>
 <li>... etc.</li>
 </ol>
-</div><div align="center">Just comment on GitHub or make a pull request and we will answer as soon as possible! Send us an email if you use the library to make a cool demo or YouTube video!</div><div align="center"><h2>Citation</h2>
-</div><div align="center"> Please cite these papers in your publications if it helps your research (the face keypoint detector was trained using the same procedure described in [Simon et al. 2017]): </p>
+<p>Just comment on GitHub or make a pull request and we will answer as soon as possible! Send us an email if you use the library to make a cool demo or YouTube video!</p>
+<h2>Citation</h2>
+<p>Please cite these papers in your publications if it helps your research (the face keypoint detector was trained using the same procedure described in [Simon et al. 2017]): </p>
 <pre class="fragment">@inproceedings{cao2017realtime,
   author = {Zhe Cao and Tomas Simon and Shih-En Wei and Yaser Sheikh},
   booktitle = {CVPR},
@@ -198,8 +223,9 @@ $(document).ready(function(){initNavTree('index.html','');});
   title = {Convolutional pose machines},
   year = {2016}
 }
-</pre></div><div align="center"><h2>Other Contributors</h2>
-</div><div align="center"> We would like to thank all the people who helped OpenPose in any way. The main contributors are listed in doc/contributors.md. </div></div></div><!-- contents -->
+</pre><h2>Other Contributors</h2>
+<p>We would like to thank all the people who helped OpenPose in any way. The main contributors are listed in doc/contributors.md. </p>
+</div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
