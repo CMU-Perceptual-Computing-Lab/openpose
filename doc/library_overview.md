@@ -1,5 +1,9 @@
-OpenPose Library - Basic Overview
+OpenPose C++ API - Basic Overview
 ====================================
+
+
+
+Note: Read [doc/library_introduction.md](./library_introduction.md) before this page.
 
 
 
