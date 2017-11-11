@@ -132,7 +132,8 @@ $(document).ready(function(){initNavTree('index.html','');});
 <li><a href="#quick-start">Quick Start</a><ol type="a">
 <li><a href="#demo">Demo</a></li>
 <li><a href="#openpose-wrapper">OpenPose Wrapper</a></li>
-<li><a href="#openpose-library">OpenPose Library</a></li>
+<li><a href="#Adding-an-extra-module">Adding An Extra Module</a></li>
+<li><a href="#openpose-c++-api">OpenPose C++ API</a></li>
 </ol>
 </li>
 <li><a href="#output">Output</a></li>
@@ -165,32 +166,24 @@ $(document).ready(function(){initNavTree('index.html','');});
 <h2>Installation, Reinstallation and Uninstallation</h2>
 <p>You can find the installation, reinstallation and uninstallation steps on: doc/installation.md.</p>
 <h2>Quick Start</h2>
-<p>Most users cases should not need to dive deep into the library, they might just be able to use the <a href="#demo">Demo</a> or the simple <a href="#openpose-wrapper">OpenPose Wrapper</a>. So you can most probably skip the library details in <a href="#openpose-library">OpenPose Library</a>.</p>
+<p>Most users do not need the <a href="#openpose-c++-api">OpenPose C++ API</a>, but they can simply use the basic <a href="#demo">Demo</a> and/or <a href="#openpose-wrapper">OpenPose Wrapper</a>.</p>
 <h3>Demo</h3>
-<p>Your case if you just want to process a folder of images or video or webcam and display or save the pose results.</p>
-<p>Forget about the OpenPose library details and just read the doc/demo_overview.md 1-page section.</p>
+<p>Ideal to process images/video/webcam and display/save the results. Check doc/demo_overview.md.</p>
 <h3>OpenPose Wrapper</h3>
-<p>Your case if you want to read a specific format of image source and/or add a specific post-processing function and/or implement your own display/saving.</p>
-<p>(Almost) forget about the library, just take a look to the <code>Wrapper</code> tutorial on <a href="examples/tutorial_wrapper/">examples/tutorial_wrapper/</a>.</p>
-<p>Note: you should not need to modify the OpenPose source code nor examples. In this way, you are able to directly upgrade OpenPose anytime in the future without changing your code. You might create your custom code on <a href="examples/user_code/">examples/user_code/</a> and compile it by using <code>make all</code> in the OpenPose folder.</p>
-<h3>OpenPose Library</h3>
-<p>Your case if you want to change internal functions and/or extend its functionality.</p>
-<ol type="1">
-<li>Take a look at the <a href="#demo">Demo</a> and <a href="#openpose-wrapper">OpenPose Wrapper</a>.</li>
-<li>OpenPose Overview: Learn the basics about the library source code in doc/library_overview.md.</li>
-<li>Extending Functionality: Learn how to extend the library in doc/library_extend_functionality.md.</li>
-<li>Adding An Extra Module: Learn how to add an extra module in doc/library_add_new_module.md.</li>
-<li>See the Doxygen documentation on <a href="http://cmu-perceptual-computing-lab.github.io/openpose/html/index.html">http://cmu-perceptual-computing-lab.github.io/openpose/html/index.html</a> or build it from the source code.</li>
-</ol>
+<p>Ideal if you want to read a specific input, and/or add your custom post-processing function, and/or implement your own display/saving. Take a look to the <code>Wrapper</code> tutorial on <a href="examples/tutorial_wrapper/">examples/tutorial_wrapper/</a>. You might create your custom code on <a href="examples/user_code/">examples/user_code/</a> and compile it by using <code>make all</code> in the OpenPose folder.</p>
+<h3>Adding An Extra Module</h3>
+<p>Learn how to easily add an extra module to OpenPose in ./library_add_new_module.md "doc/library_add_new_module.md".</p>
+<h3>OpenPose C++ API</h3>
+<p>Your case if you want to use the C++ API. See doc/library_introduction.md.</p>
 <h2>Output</h2>
-<p>Check the output (format, keypoint index ordering, etc.) in doc/output.md.</p>
+<p>Output (format, keypoint index ordering, etc.) in doc/output.md.</p>
 <h2>Standalone Face Or Hand Keypoint Detector</h2>
-<p>If you do not need the body keypoint detector and want to considerably speed up the face keypoint detection, you can use the new approach based on OpenCV face detector. See doc/standalone_face_or_hand_keypoint_detector.md.</p>
-<p>You can also use the OpenPose hand and/or face keypoint detectors with your own face or hand detectors, rather than using the body keypoint detector as initial detector for those. E.g. in case of hand camera views at which the hands are visible but not the rest of the body, so that the OpenPose detector would fail. See doc/standalone_face_or_hand_keypoint_detector.md.</p>
+<p>If you do not need the body detector and want to speed up the face keypoint detection, you can use the OpenCV-based approach, see doc/standalone_face_or_hand_keypoint_detector.md.</p>
+<p>You can also use the OpenPose hand and/or face keypoint detectors with your own face or hand detectors, rather than using the body detector. E.g. useful for camera views at which the hands are visible but not the body, so that the OpenPose detector would fail. See doc/standalone_face_or_hand_keypoint_detector.md.</p>
 <h2>Speed Up OpenPose and Benchmark</h2>
 <p>Check the OpenPose Benchmark and some hints to speed up OpenPose on <a href="doc/installation.md#faq">doc/installation.md#faq</a>.</p>
 <h2>Send Us Failure Cases!</h2>
-<p>If you find videos or images where OpenPose does not seems to work well, feel free to send them to <a href="#" onclick="location.href='mai'+'lto:'+'ope'+'np'+'ose'+'cm'+'u@g'+'ma'+'il.'+'co'+'m'; return false;">openp<span style="display: none;">.nosp@m.</span>osec<span style="display: none;">.nosp@m.</span>mu@gm<span style="display: none;">.nosp@m.</span>ail.<span style="display: none;">.nosp@m.</span>com</a>, we will use them to improve the quality of the algorithm. Thanks!</p>
+<p>If you find videos or images where OpenPose does not seems to work well, feel free to send them to <a href="#" onclick="location.href='mai'+'lto:'+'ope'+'np'+'ose'+'cm'+'u@g'+'ma'+'il.'+'co'+'m'; return false;">openp<span style="display: none;">.nosp@m.</span>osec<span style="display: none;">.nosp@m.</span>mu@gm<span style="display: none;">.nosp@m.</span>ail.<span style="display: none;">.nosp@m.</span>com</a> (email only for failure cases!), we will use them to improve the quality of the algorithm. Thanks!</p>
 <h2>Send Us Your Feedback!</h2>
 <p>Our library is open source for research purposes, and we want to continuously improve it! So please, let us know if...</p>
 <ol type="1">
