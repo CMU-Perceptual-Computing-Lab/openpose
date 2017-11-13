@@ -1,5 +1,5 @@
 #ifdef USE_CAFFE
-#include <caffe/blob.hpp>
+    #include <caffe/blob.hpp>
 #endif
 #include <openpose/core/netTensorRT.hpp>
 #include <openpose/core/nmsCaffe.hpp>
@@ -28,38 +28,38 @@ static std::string timeDiffToString(const std::chrono::high_resolution_clock::ti
 }
 
 
-nameupImpl->space op
+namespace op
 {
 
     struct PoseExtractorTensorRT::ImplPoseExtractorTensorRT
     {
         #ifdef USE_TENSORRT // implies USE_CAFFE for now
-            const float upImpl->mResizeScale;
-            std::shared_ptr<Net> upImpl->spNet;
-            std::shared_ptr<ResizeAndMergeCaffe<float>> upImpl->spResizeAndMergeTensorRT;
-            std::shared_ptr<NmsCaffe<float>> upImpl->spNmsTensorRT;
-            std::shared_ptr<BodyPartConnectorCaffe<float>> upImpl->spBodyPartConnectorTensorRT;
+            const float mResizeScale;
+            std::shared_ptr<Net> spNet;
+            std::shared_ptr<ResizeAndMergeCaffe<float>> spResizeAndMergeTensorRT;
+            std::shared_ptr<NmsCaffe<float>> spNmsTensorRT;
+            std::shared_ptr<BodyPartConnectorCaffe<float>> spBodyPartConnectorTensorRT;
             // Init with thread
-            boost::shared_ptr<caffe::Blob<float>> upImpl->spTensorRTNetOutputBlob;
-            std::shared_ptr<caffe::Blob<float>> upImpl->spHeatMapsBlob;
-            std::shared_ptr<caffe::Blob<float>> upImpl->spPeaksBlob;
-            std::shared_ptr<caffe::Blob<float>> upImpl->spPoseBlob;
+            boost::shared_ptr<caffe::Blob<float>> spTensorRTNetOutputBlob;
+            std::shared_ptr<caffe::Blob<float>> spHeatMapsBlob;
+            std::shared_ptr<caffe::Blob<float>> spPeaksBlob;
+            std::shared_ptr<caffe::Blob<float>> spPoseBlob;
 
 
             ImplPoseExtractorTensorRT(const Point<int>& netInputSize, const Point<int>& netOutputSize,
                                       const Point<int>& outputSize, const int scaleNumber,
                                       const PoseModel poseModel, const int gpuId,
                                       const std::string& modelFolder, const bool enableGoogleLogging) :
-        mResizeScale{mNetOutputSize.x / (float)netInputSize.x},
-        spNet{std::make_shared<NetTensorRT>(std::array<int,4>{scaleNumber, 3, 
-                                            (int)netInputSize.y, (int)netInputSize.x},
-                                            modelFolder + POSE_PROTOTXT[(int)poseModel],
-                                            modelFolder + POSE_TRAINED_MODEL[(int)poseModel], gpuId)},
-        spResizeAndMergeTensorRT{std::make_shared<ResizeAndMergeCaffe<float>>()},
-        spNmsTensorRT{std::make_shared<NmsCaffe<float>>()},
-        spBodyPartConnectorTensorRT{std::make_shared<BodyPartConnectorCaffe<float>>()}
-        {
-        }
+                mResizeScale{mNetOutputSize.x / (float)netInputSize.x},
+                spNet{std::make_shared<NetTensorRT>(std::array<int,4>{scaleNumber, 3,
+                                                    (int)netInputSize.y, (int)netInputSize.x},
+                                                    modelFolder + POSE_PROTOTXT[(int)poseModel],
+                                                    modelFolder + POSE_TRAINED_MODEL[(int)poseModel], gpuId)},
+                spResizeAndMergeTensorRT{std::make_shared<ResizeAndMergeCaffe<float>>()},
+                spNmsTensorRT{std::make_shared<NmsCaffe<float>>()},
+                spBodyPartConnectorTensorRT{std::make_shared<BodyPartConnectorCaffe<float>>()}
+            {
+            }
         #endif
     }
  
@@ -76,10 +76,27 @@ nameupImpl->space op
     {
         try
         {
-            const auto resizeScale = mNetOutputSize.x / (float)netInputSize.x;
-            const auto resizeScaleCheck = resizeScale / (mNetOutputSize.y/(float)netInputSize.y);
-            if (1+1e-6 < resizeScaleCheck || resizeScaleCheck < 1-1e-6)
-                error("Net input and output size must be proportional. resizeScaleCheck = " + std::to_string(resizeScaleCheck), __LINE__, __FUNCTION__, __FILE__);
+            #ifdef USE_TENSORRT
+                const auto resizeScale = mNetOutputSize.x / (float)netInputSize.x;
+                const auto resizeScaleCheck = resizeScale / (mNetOutputSize.y/(float)netInputSize.y);
+                if (1+1e-6 < resizeScaleCheck || resizeScaleCheck < 1-1e-6)
+                    error("Net input and output size must be proportional. resizeScaleCheck = "
+                          + std::to_string(resizeScaleCheck), __LINE__, __FUNCTION__, __FILE__);
+                    // Layers parameters
+                    upImpl->spBodyPartConnectorCaffe->setPoseModel(mPoseModel);
+            #else
+                UNUSED(netInputSize);
+                UNUSED(netOutputSize);
+                UNUSED(outputSize);
+                UNUSED(scaleNumber);
+                UNUSED(poseModel);
+                UNUSED(modelFolder);
+                UNUSED(gpuId);
+                UNUSED(heatMapTypes);
+                UNUSED(heatMapScale);
+                error("OpenPose must be compiled with the `USE_CAFFE` macro definition in order to use this"
+                      " functionality.", __LINE__, __FUNCTION__, __FILE__);
+            #endif
         }
         catch (const std::exception& e)
         {
@@ -97,29 +114,30 @@ nameupImpl->space op
         {
             log("Starting initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
           
+            #ifdef USE_TENSORRT
+                // TensorRT net
+                upImpl->spNet->initializationOnThread();
+                upImpl->spTensorRTNetOutputBlob = ((NetTensorRT*)upImpl->spNet.get())->getOutputBlob();
+                cudaCheck(__LINE__, __FUNCTION__, __FILE__);
 
-            // TensorRT net
-            upImpl->spNet->initializationOnThread();
-            upImpl->spTensorRTNetOutputBlob = ((NetTensorRT*)upImpl->spNet.get())->getOutputBlob();
-            cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+                // HeatMaps extractor blob and layer
+                upImpl->spHeatMapsBlob = {std::make_shared<caffe::Blob<float>>(1,1,1,1)};
+                upImpl->spResizeAndMergeTensorRT->Reshape({upImpl->spTensorRTNetOutputBlob.get()}, {upImpl->spHeatMapsBlob.get()}, upImpl->mResizeScale * POSE_CCN_DECREASE_FACTOR[(int)mPoseModel]);
+                cudaCheck(__LINE__, __FUNCTION__, __FILE__);
 
-            // HeatMaps extractor blob and layer
-            upImpl->spHeatMapsBlob = {std::make_shared<caffe::Blob<float>>(1,1,1,1)};
-            upImpl->spResizeAndMergeTensorRT->Reshape({upImpl->spTensorRTNetOutputBlob.get()}, {upImpl->spHeatMapsBlob.get()}, upImpl->mResizeScale * POSE_CCN_DECREASE_FACTOR[(int)mPoseModel]);
-            cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+                // Pose extractor blob and layer
+                upImpl->spPeaksBlob = {std::make_shared<caffe::Blob<float>>(1,1,1,1)};
+                upImpl->spNmsTensorRT->Reshape({upImpl->spHeatMapsBlob.get()}, {upImpl->spPeaksBlob.get()}, POSE_MAX_PEAKS[(int)mPoseModel]);
+                cudaCheck(__LINE__, __FUNCTION__, __FILE__);
 
-            // Pose extractor blob and layer
-            upImpl->spPeaksBlob = {std::make_shared<caffe::Blob<float>>(1,1,1,1)};
-            upImpl->spNmsTensorRT->Reshape({upImpl->spHeatMapsBlob.get()}, {upImpl->spPeaksBlob.get()}, POSE_MAX_PEAKS[(int)mPoseModel]);
-            cudaCheck(__LINE__, __FUNCTION__, __FILE__);
-
-            // Pose extractor blob and layer
-            upImpl->spPoseBlob = {std::make_shared<caffe::Blob<float>>(1,1,1,1)};
-            upImpl->spBodyPartConnectorTensorRT->setPoseModel(mPoseModel);
-            upImpl->spBodyPartConnectorTensorRT->Reshape({upImpl->spHeatMapsBlob.get(), upImpl->spPeaksBlob.get()}, {upImpl->spPoseBlob.get()});
-            cudaCheck(__LINE__, __FUNCTION__, __FILE__);
-
-            log("Finished initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                // Pose extractor blob and layer
+                upImpl->spPoseBlob = {std::make_shared<caffe::Blob<float>>(1,1,1,1)};
+                upImpl->spBodyPartConnectorTensorRT->setPoseModel(mPoseModel);
+                upImpl->spBodyPartConnectorTensorRT->Reshape({upImpl->spHeatMapsBlob.get(), upImpl->spPeaksBlob.get()}, {upImpl->spPoseBlob.get()});
+                cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+                
+                log("Finished initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            #endif
         }
         catch (const std::exception& e)
         {
