@@ -226,8 +226,12 @@ namespace op
     {
         try
         {
-            checkThread();
-            return upImpl->spHeatMapsBlob->gpu_data();
+            #ifdef USE_CAFFE
+                checkThread();
+                return upImpl->spHeatMapsBlob->gpu_data();
+            #else
+                return nullptr;
+            #endif
         }
         catch (const std::exception& e)
         {
@@ -235,7 +239,6 @@ namespace op
             return nullptr;
         }
     }
-
 
     std::vector<int> PoseExtractorTensorRT::getHeatMapSize() const
     {
@@ -255,14 +258,17 @@ namespace op
         }
     }
 
-
     const float* PoseExtractorTensorRT::getPoseGpuConstPtr() const
     {
         try
         {
-            error("GPU pointer for people pose data not implemented yet.", __LINE__, __FUNCTION__, __FILE__);
-            checkThread();
-            return upImpl->spPoseBlob->gpu_data();
+            #ifdef USE_CAFFE
+                error("GPU pointer for people pose data not implemented yet.", __LINE__, __FUNCTION__, __FILE__);
+                checkThread();
+                return upImpl->spPoseBlob->gpu_data();
+            #else
+                return nullptr;
+            #endif
         }
         catch (const std::exception& e)
         {
@@ -271,7 +277,3 @@ namespace op
         }
     }
 }
-
-
-
-
