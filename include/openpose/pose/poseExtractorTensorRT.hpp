@@ -1,9 +1,9 @@
 #ifndef OPENPOSE_POSE_POSE_EXTRACTOR_TENSORRT_HPP
 #define OPENPOSE_POSE_POSE_EXTRACTOR_TENSORRT_HPP
 
-#include <caffe/blob.hpp>
 #include <openpose/core/common.hpp>
 #include <openpose/pose/enumClasses.hpp>
+#include <openpose/pose/poseExtractor.hpp>
 
 namespace op
 {
