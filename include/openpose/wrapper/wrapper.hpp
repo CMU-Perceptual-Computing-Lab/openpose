@@ -638,10 +638,10 @@ namespace op
             {
                 // Pose estimators
                 for (auto gpuId = 0; gpuId < gpuNumber; gpuId++)
-#ifndef USE_TENSORRT
-                    poseExtractors.emplace_back(std::make_shared<PoseExtractorCaffe>(
-#else
+#ifdef USE_TENSORRT
                     poseExtractors.emplace_back(std::make_shared<PoseExtractorTensorRT>(
+#else
+                    poseExtractors.emplace_back(std::make_shared<PoseExtractorCaffe>(
 #endif
                         poseNetInputSize, poseNetOutputSize, finalOutputSize, wrapperStructPose.scalesNumber,
                         wrapperStructPose.poseModel, modelFolder, gpuId + gpuNumberStart,
