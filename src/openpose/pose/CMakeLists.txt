@@ -1,4 +1,4 @@
-set(SOURCES 
+set(SOURCES
     bodyPartConnectorBase.cpp
     bodyPartConnectorBase.cu
     bodyPartConnectorCaffe.cpp

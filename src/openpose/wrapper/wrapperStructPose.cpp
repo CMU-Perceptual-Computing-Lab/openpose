@@ -12,7 +12,7 @@ namespace op
                                          const std::string& modelFolder_,
                                          const std::vector<HeatMapType>& heatMapTypes_,
                                          const ScaleMode heatMapScale_, const float renderThreshold_,
-                                         const bool enableGoogleLogging_) :
+                                         const bool enableGoogleLogging_, const bool identification_) :
         enable{enable_},
         netInputSize{netInputSize_},
         outputSize{outputSize_},
@@ -31,7 +31,8 @@ namespace op
         heatMapTypes{heatMapTypes_},
         heatMapScale{heatMapScale_},
         renderThreshold{renderThreshold_},
-        enableGoogleLogging{enableGoogleLogging_}
+        enableGoogleLogging{enableGoogleLogging_},
+        identification{identification_}
     {
     }
 }

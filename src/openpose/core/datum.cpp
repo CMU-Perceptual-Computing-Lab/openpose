@@ -3,7 +3,9 @@
 
 namespace op
 {
-    Datum::Datum()
+    Datum::Datum() :
+        id{std::numeric_limits<unsigned long long>::max()},
+        poseIds{-1}
     {
     }
 
@@ -19,6 +21,7 @@ namespace op
         cvOutputData{datum.cvOutputData},
         // Resulting Array<float> data
         poseKeypoints{datum.poseKeypoints},
+        poseIds{datum.poseIds},
         poseScores{datum.poseScores},
         poseHeatMaps{datum.poseHeatMaps},
         faceRectangles{datum.faceRectangles},
@@ -49,6 +52,7 @@ namespace op
             cvOutputData = datum.cvOutputData;
             // Resulting Array<float> data
             poseKeypoints = datum.poseKeypoints;
+            poseIds = datum.poseIds,
             poseScores = datum.poseScores,
             poseHeatMaps = datum.poseHeatMaps,
             faceRectangles = datum.faceRectangles,
@@ -90,6 +94,7 @@ namespace op
             std::swap(cvOutputData, datum.cvOutputData);
             // Resulting Array<float> data
             std::swap(poseKeypoints, datum.poseKeypoints);
+            std::swap(poseIds, datum.poseIds);
             std::swap(poseScores, datum.poseScores);
             std::swap(poseHeatMaps, datum.poseHeatMaps);
             std::swap(faceRectangles, datum.faceRectangles);
@@ -122,6 +127,7 @@ namespace op
             std::swap(cvOutputData, datum.cvOutputData);
             // Resulting Array<float> data
             std::swap(poseKeypoints, datum.poseKeypoints);
+            std::swap(poseIds, datum.poseIds);
             std::swap(poseScores, datum.poseScores);
             std::swap(poseHeatMaps, datum.poseHeatMaps);
             std::swap(faceRectangles, datum.faceRectangles);
@@ -164,6 +170,7 @@ namespace op
             datum.cvOutputData = cvOutputData.clone();
             // Resulting Array<float> data
             datum.poseKeypoints = poseKeypoints.clone();
+            datum.poseIds = poseIds.clone();
             datum.poseScores = poseScores.clone();
             datum.poseHeatMaps = poseHeatMaps.clone();
             datum.faceRectangles = faceRectangles;

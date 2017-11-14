@@ -71,6 +71,7 @@ DEFINE_int32(keypoint_scale,            0,              "Scaling of the (x,y) co
                                                         " size (set with `net_resolution`), `2` to scale it to the final output size (set with"
                                                         " `resolution`), `3` to scale it in the range [0,1], and 4 for range [-1,1]. Non related"
                                                         " with `scale_number` and `scale_gap`.");
+DEFINE_bool(identification,             false,          "Whether to enable people identification across frames. Not available yet, coming soon.");
 // OpenPose Body Pose
 DEFINE_bool(body_disable,               false,          "Disable body keypoint detection. Option only possible for faster (but less accurate) face"
                                                         " keypoint detection.");
@@ -217,7 +218,8 @@ int openPoseDemo()
                                                   poseModel, !FLAGS_disable_blending, (float)FLAGS_alpha_pose,
                                                   (float)FLAGS_alpha_heatmap, FLAGS_part_to_show, FLAGS_model_folder,
                                                   heatMapTypes, op::ScaleMode::UnsignedChar,
-                                                  (float)FLAGS_render_threshold, enableGoogleLogging};
+                                                  (float)FLAGS_render_threshold, enableGoogleLogging,
+                                                  FLAGS_identification};
     // Face configuration (use op::WrapperStructFace{} to disable it)
     const op::WrapperStructFace wrapperStructFace{FLAGS_face, faceNetInputSize,
                                                   op::flagsToRenderMode(FLAGS_face_render, FLAGS_render_pose),

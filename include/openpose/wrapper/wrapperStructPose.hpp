@@ -151,6 +151,11 @@ namespace op
         bool enableGoogleLogging;
 
         /**
+         * Whether to return a person ID for each body skeleton, providing temporal consistency.
+         */
+        bool identification;
+
+        /**
          * Constructor of the struct.
          * It has the recommended and default values we recommend for each element of the struct.
          * Since all the elements of the struct are public, they can also be manually filled.
@@ -166,8 +171,8 @@ namespace op
                           const int defaultPartToRender = 0, const std::string& modelFolder = "models/",
                           const std::vector<HeatMapType>& heatMapTypes = {},
                           const ScaleMode heatMapScale = ScaleMode::ZeroToOne,
-                          const float renderThreshold = 0.05f,
-                          const bool enableGoogleLogging = true);
+                          const float renderThreshold = 0.05f, const bool enableGoogleLogging = true,
+                          const bool identification = false);
     };
 }
 

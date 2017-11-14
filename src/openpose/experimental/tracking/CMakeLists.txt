@@ -1,9 +1,10 @@
 set(SOURCES
-    defineTemplates.cpp)
+    defineTemplates.cpp
+    personIdExtractor.cpp)
 
-add_library(openpose_thread ${SOURCES})
+add_library(openpose_tracking ${SOURCES})
 
-install(TARGETS openpose_thread
+install(TARGETS openpose_tracking
     EXPORT OpenPose
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib

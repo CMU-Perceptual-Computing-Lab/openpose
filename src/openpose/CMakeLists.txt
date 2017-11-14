@@ -1,4 +1,5 @@
 add_subdirectory(core)
+add_subdirectory(experimental)
 add_subdirectory(filestream)
 add_subdirectory(gui)
 add_subdirectory(pose)
@@ -8,9 +9,9 @@ add_subdirectory(thread)
 add_subdirectory(face)
 add_subdirectory(hand)
 add_subdirectory(wrapper)
-set_target_properties(openpose_core openpose_filestream openpose_gui openpose_pose 
-    openpose_utilities openpose_producer openpose_thread openpose_face openpose_hand 
-    openpose_wrapper
+set_target_properties(openpose_core openpose_face openpose_filestream
+	openpose_gui openpose_hand openpose_pose openpose_producer
+	openpose_utilities openpose_thread openpose_tracking openpose_wrapper
   PROPERTIES COMPILE_FLAGS ${OP_CXX_FLAGS})
 
 # make the openpose.so

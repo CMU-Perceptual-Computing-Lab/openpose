@@ -33,7 +33,7 @@ namespace op
          * Original image to be processed in Array<float> format.
          * It has been resized to the net input resolution, as well as reformatted Array<float> format to be compatible
          * with the net.
-         * In case of >1 scales, then each scale is right- and bottom-padded to fill the greatest resolution. The
+         * If >1 scales, each scale is right- and bottom-padded to fill the greatest resolution. The
          * scales are sorted from bigger to smaller.
          * Vector size: #scales
          * Each array size: 3 x input_net_height x input_net_width
@@ -43,7 +43,7 @@ namespace op
         /**
          * Rendered image in Array<float> format.
          * It consists of a blending of the cvInputData and the pose/body part(s) heatmap/PAF(s).
-         * If rendering is disabled (e.g. `no_render_pose` flag in the demo), then outputData will be empty.
+         * If rendering is disabled (e.g. `no_render_pose` flag in the demo), outputData will be empty.
          * Size: 3 x output_net_height x output_net_width
          */
         Array<float> outputData;
@@ -51,7 +51,7 @@ namespace op
         /**
          * Rendered image in cv::Mat uchar format.
          * It has been resized to the desired output resolution (e.g. `resolution` flag in the demo).
-         * If outputData is empty, then cvOutputData will also be empty.
+         * If outputData is empty, cvOutputData will also be empty.
          * Size: (output_height x output_width) x 3 channels
          */
         cv::Mat cvOutputData;
@@ -65,11 +65,20 @@ namespace op
         Array<float> poseKeypoints;
 
         /**
+         * People ID
+         * It returns a person ID for each body pose, providing temporal consistency. The ID will be the same one
+         * for a person across frames. I.e. this ID allows to keep track of the same person in time.
+         * If either person identification is disabled or poseKeypoints is empty, poseIds will also be empty.
+         * Size: #people
+         */
+        Array<long long> poseIds;
+
+        /**
          * Body pose global confidence/score for each person in the image.
          * It does not only consider the score of each body keypoint, but also the score of each PAF association.
          * Optimized for COCO evaluation metric.
          * It will highly penalyze people with missing body parts (e.g. cropped people on the borders of the image).
-         * If poseKeypoints is empty, then poseScores will also be empty.
+         * If poseKeypoints is empty, poseScores will also be empty.
          * Size: #people
          */
         Array<float> poseScores;

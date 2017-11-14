@@ -276,6 +276,7 @@ namespace op
 #include <openpose/hand/headers.hpp>
 #include <openpose/pose/headers.hpp>
 #include <openpose/producer/headers.hpp>
+#include <openpose/experimental/tracking/headers.hpp>
 #include <openpose/utilities/cuda.hpp>
 #include <openpose/utilities/fileSystem.hpp>
 namespace op
@@ -818,6 +819,12 @@ namespace op
             // Frame buffer and ordering
             if (spWPoses.size() > 1u)
                 mPostProcessingWs.emplace_back(std::make_shared<WQueueOrderer<TDatumsPtr>>());
+            // Person ID identification
+            if (wrapperStructPose.identification)
+            {
+                const auto personIdExtractor = std::make_shared<PersonIdExtractor>();
+                mPostProcessingWs.emplace_back(std::make_shared<WPersonIdExtractor<TDatumsPtr>>(personIdExtractor));
+            }
             // Frames processor (OpenPose format -> cv::Mat format)
             if (renderOutput)
             {

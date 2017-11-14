@@ -1,4 +1,4 @@
-set(SOURCES 
+set(SOURCES
     defineTemplates.cpp
     handDetector.cpp
     handDetectorFromTxt.cpp
