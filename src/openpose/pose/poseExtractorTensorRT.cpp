@@ -34,27 +34,28 @@ namespace op
     struct PoseExtractorTensorRT::ImplPoseExtractorTensorRT
     {
         #ifdef USE_TENSORRT // implies USE_TENSORRT for now
-            const float mResizeScale;
-            std::shared_ptr<Net> spNet;
+            const PoseModel mPoseModel;
+            const int mGpuId;
+            const std::string mModelFolder;
+            const bool mEnableGoogleLogging;
+            // General parameters
+            std::vector<std::shared_ptr<NetTensorRT>> spTensorRTNets;
             std::shared_ptr<ResizeAndMergeCaffe<float>> spResizeAndMergeTensorRT;
             std::shared_ptr<NmsCaffe<float>> spNmsTensorRT;
             std::shared_ptr<BodyPartConnectorCaffe<float>> spBodyPartConnectorTensorRT;
             // Init with thread
-            boost::shared_ptr<caffe::Blob<float>> spTensorRTNetOutputBlob;
+            std::vector<boost::shared_ptr<caffe::Blob<float>>> spTensorRTNetOutputBlobs;
             std::shared_ptr<caffe::Blob<float>> spHeatMapsBlob;
             std::shared_ptr<caffe::Blob<float>> spPeaksBlob;
             std::shared_ptr<caffe::Blob<float>> spPoseBlob;
 
 
-            ImplPoseExtractorTensorRT(const Point<int>& netInputSize, const Point<int>& netOutputSize,
-                                      const Point<int>& outputSize, const int scaleNumber,
-                                      const PoseModel poseModel, const int gpuId,
+            ImplPoseExtractorTensorRT(const PoseModel poseModel, const int gpuId,
                                       const std::string& modelFolder, const bool enableGoogleLogging) :
-                mResizeScale{netOutputSize.x / (float)netInputSize.x},
-                spNet{std::make_shared<NetTensorRT>(std::array<int,4>{scaleNumber, 3,
-                                                    (int)netInputSize.y, (int)netInputSize.x},
-                                                    modelFolder + POSE_PROTOTXT[(int)poseModel],
-                                                    modelFolder + POSE_TRAINED_MODEL[(int)poseModel], gpuId, enableGoogleLogging)},
+                mPoseModel{poseModel},
+                mGpuId{gpuId},
+                mModelFolder{modelFolder},
+                mEnableGoogleLoggin{enableGoogleLogging},
                 spResizeAndMergeTensorRT{std::make_shared<ResizeAndMergeCaffe<float>>()},
                 spNmsTensorRT{std::make_shared<NmsCaffe<float>>()},
                 spBodyPartConnectorTensorRT{std::make_shared<BodyPartConnectorCaffe<float>>()}
@@ -62,6 +63,69 @@ namespace op
             }
         #endif
     };
+
+    inline void reshapePoseExtractorCaffe(std::shared_ptr<ResizeAndMergeCaffe<float>>& resizeAndMergeCaffe,
+                                          std::shared_ptr<NmsCaffe<float>>& nmsCaffe,
+                                          std::shared_ptr<BodyPartConnectorCaffe<float>>& bodyPartConnectorCaffe,
+                                          std::vector<boost::shared_ptr<caffe::Blob<float>>>& caffeNetOutputBlob,
+                                          std::shared_ptr<caffe::Blob<float>>& heatMapsBlob,
+                                          std::shared_ptr<caffe::Blob<float>>& peaksBlob,
+                                          std::shared_ptr<caffe::Blob<float>>& poseBlob,
+                                          const float scaleInputToNetInput,
+                                          const PoseModel poseModel)
+        {
+            try
+            {
+                // HeatMaps extractor blob and layer
+                const auto caffeNetOutputBlobs = caffeNetSharedToPtr(caffeNetOutputBlob);
+                resizeAndMergeCaffe->Reshape(caffeNetOutputBlobs, {heatMapsBlob.get()},
+                                             POSE_CCN_DECREASE_FACTOR[(int)poseModel], 1.f/scaleInputToNetInput);
+                // Pose extractor blob and layer
+                nmsCaffe->Reshape({heatMapsBlob.get()}, {peaksBlob.get()}, POSE_MAX_PEAKS[(int)poseModel]);
+                // Pose extractor blob and layer
+                bodyPartConnectorCaffe->Reshape({heatMapsBlob.get(), peaksBlob.get()}, {poseBlob.get()});
+                // Cuda check
+                #ifdef USE_CUDA
+                    cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+                #endif
+            }
+            catch (const std::exception& e)
+            {
+                error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            }
+        }
+
+    void addTensorRTNetOnThread(std::vector<std::shared_ptr<NetTensorRT>>& netTensorRT,
+                             std::vector<boost::shared_ptr<caffe::Blob<float>>>& caffeNetOutputBlob,
+                             const PoseModel poseModel, const int gpuId,
+                             const std::string& modelFolder, const bool enableGoogleLogging)
+        {
+            try
+            {
+                // Add Caffe Net
+                netTensorRT.emplace_back(
+                    std::make_shared<NetCaffe>(modelFolder + POSE_PROTOTXT[(int)poseModel],
+                                               modelFolder + POSE_TRAINED_MODEL[(int)poseModel],
+                                               gpuId, enableGoogleLogging)
+                );
+                // Initializing them on the thread
+                netTensorRT.back()->initializationOnThread();
+                caffeNetOutputBlob.emplace_back(netTensorRT.back()->getOutputBlob());
+                // Security checks
+                if (netTensorRT.size() != caffeNetOutputBlob.size())
+                    error("Weird error, this should not happen. Notify us.", __LINE__, __FUNCTION__, __FILE__);
+                // Cuda check
+                #ifdef USE_CUDA
+                    cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+                #endif
+            }
+            catch (const std::exception& e)
+            {
+                error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            }
+        }
+    #endif
+
  
     PoseExtractorTensorRT::PoseExtractorTensorRT(const Point<int>& netInputSize, const Point<int>& netOutputSize,
                                                  const Point<int>& outputSize, const int scaleNumber,
@@ -116,13 +180,13 @@ namespace op
           
             #ifdef USE_TENSORRT
                 // TensorRT net
-                upImpl->spNet->initializationOnThread();
-                upImpl->spTensorRTNetOutputBlob = ((NetTensorRT*)upImpl->spNet.get())->getOutputBlob();
+                upImpl->spTensorRTNets->initializationOnThread();
+                upImpl->spTensorRTNetOutputBlobs = ((NetTensorRT*)upImpl->spTensorRTNets.get())->getOutputBlob();
                 cudaCheck(__LINE__, __FUNCTION__, __FILE__);
 
                 // HeatMaps extractor blob and layer
                 upImpl->spHeatMapsBlob = {std::make_shared<caffe::Blob<float>>(1,1,1,1)};
-                upImpl->spResizeAndMergeTensorRT->Reshape({upImpl->spTensorRTNetOutputBlob.get()}, {upImpl->spHeatMapsBlob.get()}, upImpl->mResizeScale * POSE_CCN_DECREASE_FACTOR[(int)mPoseModel]);
+                upImpl->spResizeAndMergeTensorRT->Reshape({upImpl->spTensorRTNetOutputBlobs.get()}, {upImpl->spHeatMapsBlob.get()}, upImpl->mResizeScale * POSE_CCN_DECREASE_FACTOR[(int)mPoseModel]);
                 cudaCheck(__LINE__, __FUNCTION__, __FILE__);
 
                 // Pose extractor blob and layer
@@ -155,13 +219,13 @@ namespace op
                     error("Empty inputNetData.", __LINE__, __FUNCTION__, __FILE__);
                 timeNow("Start");
                 // 1. TensorRT deep network
-                upImpl->spNet->forwardPass(inputNetData.getConstPtr());
+                upImpl->spTensorRTNets->forwardPass(inputNetData.getConstPtr());
                 timeNow("TensorRT forward");
                 // 2. Resize heat maps + merge different scales
                 upImpl->spResizeAndMergeTensorRT->setScaleRatios(scaleRatios);
                 timeNow("SpResizeAndMergeTensorRT");
                 #ifndef CPU_ONLY
-                    upImpl->spResizeAndMergeTensorRT->Forward_gpu({upImpl->spTensorRTNetOutputBlob.get()}, {upImpl->spHeatMapsBlob.get()});       // ~5ms
+                    upImpl->spResizeAndMergeTensorRT->Forward_gpu({upImpl->spTensorRTNetOutputBlobs.get()}, {upImpl->spHeatMapsBlob.get()});       // ~5ms
                     timeNow("RaM forward_gpu");
                     cudaCheck(__LINE__, __FUNCTION__, __FILE__);
                     timeNow("CudaCheck");
