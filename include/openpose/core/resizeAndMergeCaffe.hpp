@@ -24,7 +24,7 @@ namespace op
         virtual void LayerSetUp(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top);
 
         virtual void Reshape(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top,
-                             const float factor, const bool mergeFirstDimension = true);
+                             const T netFactor, const T scaleFactor, const bool mergeFirstDimension = true);
 
         virtual inline const char* type() const { return "ResizeAndMerge"; }
 
@@ -42,7 +42,7 @@ namespace op
 
     private:
         std::vector<T> mScaleRatios;
-        std::array<int, 4> mBottomSize;
+        std::vector<std::array<int, 4>> mBottomSizes;
         std::array<int, 4> mTopSize;
 
         DELETE_COPY(ResizeAndMergeCaffe);

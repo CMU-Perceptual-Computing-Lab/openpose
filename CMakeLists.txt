@@ -165,6 +165,7 @@ if (${DL_FRAMEWORK} MATCHES "CAFFE")
         PREFIX ${CAFFE_PREFIX}
         CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR> 
             -DUSE_CUDNN=${USE_CUDNN}
+            -DBUILD_python=OFF
             -DOpenCV_DIR=${OpenCV_DIR})
 
     ExternalProject_Get_Property(openpose_caffe install_dir)

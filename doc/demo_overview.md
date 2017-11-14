@@ -22,6 +22,11 @@ See [doc/quick_start.md#quick-start](./quick_start.md#quick-start).
 
 
 
+## Kinect 2.0 as Webcam on Windows 10
+Since the Windows 10 Anniversary, Kinect 2.0 can be read as a normal webcam. All you need to do is go to `device manager`, expand the `kinect sensor devices` tab, right click and update driver of `WDF kinectSensor Interface`. If you already have another webcam, disconnect it or use `--camera 2`.
+
+
+
 ## JSON Output with No Visualization
 The following example runs the demo video `video.avi` and outputs JSON files in `output/`. Note: see [doc/output.md](./output.md) to understand the format of the JSON files.
 ```
@@ -108,8 +113,6 @@ We enumerate some of the most important flags, check the `Flags Detailed Descrip
 - `--part_to_show`: Prediction channel to visualize.
 - `--no_display`: Display window not opened. Useful for servers and/or to slightly speed up OpenPose.
 - `--num_gpu 2 --num_gpu_start 1`: Parallelize over this number of GPUs starting by the desired device id. By default it uses all the available GPUs.
-- `--net_resolution 656x368: For HD input (default value).
-- `--net_resolution 496x368: For VGA input.
 - `--model_pose MPI`: Model to use, affects number keypoints, speed and accuracy.
 - `--logging_level 3`: Logging messages threshold, range [0,255]: 0 will output any message & 255 will output none. Current messages in the range [1-4], 1 for low priority messages and 4 for important ones.
 
@@ -118,8 +121,9 @@ We enumerate some of the most important flags, check the `Flags Detailed Descrip
 ## Flags Description
 Each flag is divided into flag name, default value, and description.
 
-1. Debugging
+1. Debugging/Other
 - DEFINE_int32(logging_level,             3,              "The logging level. Integer in the range [0, 255]. 0 will output any log() message, while 255 will not output any. Current OpenPose library messages are in the range 0-4: 1 for low priority messages and 4 for important ones.");
+- DEFINE_bool(disable_multi_thread,       false,          "It would slightly reduce the frame rate in order to highly reduce the lag. Mainly useful for 1) Cases where it is needed a low latency (e.g. webcam in real-time scenarios with low-range GPU devices); and 2) Debugging OpenPose when it is crashing to locate the error.");
 
 2. Producer
 - DEFINE_int32(camera,                    -1,             "The camera index for cv::VideoCapture. Integer in the range [0, 9]. Select a negative number (by default), to auto-detect and open the first available camera.");
@@ -145,7 +149,7 @@ Each flag is divided into flag name, default value, and description.
 4. OpenPose Body Pose
 - DEFINE_bool(body_disable,               false,          "Disable body keypoint detection. Option only possible for faster (but less accurate) face keypoint detection.");
 - DEFINE_string(model_pose,               "COCO",         "Model to be used. E.g. `COCO` (18 keypoints), `MPI` (15 keypoints, ~10% faster), `MPI_4_layers` (15 keypoints, even faster but less accurate).");
-- DEFINE_string(net_resolution,           "656x368",      "Multiples of 16. If it is increased, the accuracy potentially increases. If it is decreased, the speed increases. For maximum speed-accuracy balance, it should keep the closest aspect ratio possible to the images or videos to be processed. Using `-1` in any of the dimensions, OP will choose the optimal resolution depending on the other value introduced by the user. E.g. the default `-1x368` is equivalent to `656x368` in 16:9 videos, e.g. full HD (1980x1080) and HD (1280x720) resolutions.");
+- DEFINE_string(net_resolution,           "-1x368",       "Multiples of 16. If it is increased, the accuracy potentially increases. If it is decreased, the speed increases. For maximum speed-accuracy balance, it should keep the closest aspect ratio possible to the images or videos to be processed. Using `-1` in any of the dimensions, OP will choose the optimal resolution depending on the other value introduced by the user. E.g. the default `-1x368` is equivalent to `656x368` in 16:9 videos, e.g. full HD (1980x1080) and HD (1280x720) resolutions.");
 - DEFINE_int32(scale_number,              1,              "Number of scales to average.");
 - DEFINE_double(scale_gap,                0.3,            "Scale gap between scales. No effect unless scale_number > 1. Initial scale is always 1. If you want to change the initial scale, you actually want to multiply the `net_resolution` by your desired initial scale.");
 - DEFINE_bool(heatmaps_add_parts,         false,          "If true, it will add the body part heatmaps to the final op::Datum::poseHeatMaps array, and analogously face & hand heatmaps to op::Datum::faceHeatMaps & op::Datum::handHeatMaps (program speed will decrease). Not required for our library, enable it only if you intend to process this information later. If more than one `add_heatmaps_X` flag is enabled, it will place then in sequential memory order: body parts + bkg + PAFs. It will follow the order on POSE_BODY_PART_MAPPING in `include/openpose/pose/poseParameters.hpp`.");

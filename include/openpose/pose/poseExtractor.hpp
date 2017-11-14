@@ -12,7 +12,7 @@ namespace op
     class OP_API PoseExtractor
     {
     public:
-        PoseExtractor(const Point<int>& netOutputSize, const Point<int>& outputSize, const PoseModel poseModel,
+        PoseExtractor(const PoseModel poseModel,
                       const std::vector<HeatMapType>& heatMapTypes = {},
                       const ScaleMode heatMapScale = ScaleMode::ZeroToOne);
 
@@ -20,7 +20,7 @@ namespace op
 
         void initializationOnThread();
 
-        virtual void forwardPass(const Array<float>& inputNetData, const Point<int>& inputDataSize,
+        virtual void forwardPass(const std::vector<Array<float>>& inputNetData, const Point<int>& inputDataSize,
                                  const std::vector<double>& scaleRatios = {1.f}) = 0;
 
         virtual const float* getHeatMapCpuConstPtr() const = 0;
@@ -35,6 +35,8 @@ namespace op
 
         Array<float> getPoseKeypoints() const;
 
+        Array<float> getPoseScores() const;
+
         float getScaleNetToOutput() const;
 
         double get(const PoseProperty property) const;
@@ -45,9 +47,9 @@ namespace op
 
     protected:
         const PoseModel mPoseModel;
-        const Point<int> mNetOutputSize;
-        const Point<int> mOutputSize;
+        Point<int> mNetOutputSize;
         Array<float> mPoseKeypoints;
+        Array<float> mPoseScores;
         float mScaleNetToOutput;
 
         void checkThread() const;

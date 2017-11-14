@@ -1,4 +1,5 @@
 #include <openpose/pose/renderPose.hpp>
+#include <openpose/utilities/keypoint.hpp>
 #include <openpose/pose/poseCpuRenderer.hpp>
 
 namespace op
@@ -13,6 +14,7 @@ namespace op
 
     std::pair<int, std::string> PoseCpuRenderer::renderPose(Array<float>& outputData,
                                                             const Array<float>& poseKeypoints,
+                                                            const float scaleInputToOutput,
                                                             const float scaleNetToOutput)
     {
         try
@@ -25,7 +27,14 @@ namespace op
             std::string elementRenderedName;
             // Draw poseKeypoints
             if (elementRendered == 0)
-                renderPoseKeypointsCpu(outputData, poseKeypoints, mPoseModel, mRenderThreshold, mBlendOriginalFrame);
+            {
+                // Rescale keypoints to output size
+                auto poseKeypointsRescaled = poseKeypoints.clone();
+                scaleKeypoints(poseKeypointsRescaled, scaleInputToOutput);
+                // Render keypoints
+                renderPoseKeypointsCpu(outputData, poseKeypointsRescaled, mPoseModel, mRenderThreshold,
+                                       mBlendOriginalFrame);
+            }
             // Draw heat maps / PAFs
             else
             {

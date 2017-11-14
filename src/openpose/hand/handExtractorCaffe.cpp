@@ -17,6 +17,7 @@ namespace op
     struct HandExtractorCaffe::ImplHandExtractorCaffe
     {
         #if defined USE_CAFFE && defined USE_CUDA
+            bool netInitialized;
             std::shared_ptr<NetCaffe> spNetCaffe;
             std::shared_ptr<ResizeAndMergeCaffe<float>> spResizeAndMergeCaffe;
             std::shared_ptr<MaximumCaffe<float>> spMaximumCaffe;
@@ -25,11 +26,10 @@ namespace op
             std::shared_ptr<caffe::Blob<float>> spHeatMapsBlob;
             std::shared_ptr<caffe::Blob<float>> spPeaksBlob;
 
-            ImplHandExtractorCaffe(const Point<int>& netOutputSize,
-                                   const std::string& modelFolder, const int gpuId,
+            ImplHandExtractorCaffe(const std::string& modelFolder, const int gpuId,
                                    const bool enableGoogleLogging) :
-                spNetCaffe{std::make_shared<NetCaffe>(std::array<int,4>{1, 3, netOutputSize.y, netOutputSize.x},
-                                                      modelFolder + HAND_PROTOTXT, modelFolder + HAND_TRAINED_MODEL,
+                netInitialized{false},
+                spNetCaffe{std::make_shared<NetCaffe>(modelFolder + HAND_PROTOTXT, modelFolder + HAND_TRAINED_MODEL,
                                                       gpuId, enableGoogleLogging)},
                 spResizeAndMergeCaffe{std::make_shared<ResizeAndMergeCaffe<float>>()},
                 spMaximumCaffe{std::make_shared<MaximumCaffe<float>>()}
@@ -154,6 +154,29 @@ namespace op
                 error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             }
         }
+
+        inline void reshapeFaceExtractorCaffe(std::shared_ptr<ResizeAndMergeCaffe<float>>& resizeAndMergeCaffe,
+                                              std::shared_ptr<MaximumCaffe<float>>& maximumCaffe,
+                                              boost::shared_ptr<caffe::Blob<float>>& caffeNetOutputBlob,
+                                              std::shared_ptr<caffe::Blob<float>>& heatMapsBlob,
+                                              std::shared_ptr<caffe::Blob<float>>& peaksBlob)
+        {
+            try
+            {
+                // HeatMaps extractor blob and layer
+                const bool mergeFirstDimension = true;
+                resizeAndMergeCaffe->Reshape({caffeNetOutputBlob.get()}, {heatMapsBlob.get()},
+                                             HAND_CCN_DECREASE_FACTOR, 1.f, mergeFirstDimension);
+                // Pose extractor blob and layer
+                maximumCaffe->Reshape({heatMapsBlob.get()}, {peaksBlob.get()});
+                // Cuda check
+                cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+            }
+            catch (const std::exception& e)
+            {
+                error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            }
+        }
     #endif
 
     HandExtractorCaffe::HandExtractorCaffe(const Point<int>& netInputSize, const Point<int>& netOutputSize,
@@ -164,7 +187,7 @@ namespace op
                                            const bool enableGoogleLogging) :
         HandExtractor{netInputSize, netOutputSize, numberScales, rangeScales, heatMapTypes, heatMapScale}
         #if defined USE_CAFFE && defined USE_CUDA
-        , upImpl{new ImplHandExtractorCaffe{mNetOutputSize, modelFolder, gpuId, enableGoogleLogging}}
+        , upImpl{new ImplHandExtractorCaffe{modelFolder, gpuId, enableGoogleLogging}}
         #endif
     {
         try
@@ -199,20 +222,13 @@ namespace op
             #if defined USE_CAFFE && defined USE_CUDA
                 // Logging
                 log("Starting initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-                // Caffe net
+                // Initialize Caffe net
                 upImpl->spNetCaffe->initializationOnThread();
+                cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+                // Initialize blobs
                 upImpl->spCaffeNetOutputBlob = upImpl->spNetCaffe->getOutputBlob();
-                cudaCheck(__LINE__, __FUNCTION__, __FILE__);
-                // HeatMaps extractor blob and layer
                 upImpl->spHeatMapsBlob = {std::make_shared<caffe::Blob<float>>(1,1,1,1)};
-                const bool mergeFirstDimension = true;
-                upImpl->spResizeAndMergeCaffe->Reshape({upImpl->spCaffeNetOutputBlob.get()},
-                                                       {upImpl->spHeatMapsBlob.get()},
-                                                       HAND_CCN_DECREASE_FACTOR, mergeFirstDimension);
-                cudaCheck(__LINE__, __FUNCTION__, __FILE__);
-                // Pose extractor blob and layer
                 upImpl->spPeaksBlob = {std::make_shared<caffe::Blob<float>>(1,1,1,1)};
-                upImpl->spMaximumCaffe->Reshape({upImpl->spHeatMapsBlob.get()}, {upImpl->spPeaksBlob.get()});
                 cudaCheck(__LINE__, __FUNCTION__, __FILE__);
                 // Logging
                 log("Finished initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
@@ -369,12 +385,17 @@ namespace op
         try
         {
             #if defined USE_CAFFE && defined USE_CUDA
-                // Deep net
-                // 1. Caffe deep network
-                auto* inputDataGpuPtr = upImpl->spNetCaffe->getInputDataGpuPtr();
-                cudaMemcpy(inputDataGpuPtr, mHandImageCrop.getConstPtr(), mNetOutputSize.area() * 3 * sizeof(float),
-                           cudaMemcpyHostToDevice);
-                upImpl->spNetCaffe->forwardPass();
+                // 1. Deep net
+                upImpl->spNetCaffe->forwardPass(mHandImageCrop);
+
+                // Reshape blobs
+                if (!upImpl->netInitialized)
+                {
+                    upImpl->netInitialized = true;
+                    reshapeFaceExtractorCaffe(upImpl->spResizeAndMergeCaffe, upImpl->spMaximumCaffe,
+                                              upImpl->spCaffeNetOutputBlob, upImpl->spHeatMapsBlob,
+                                              upImpl->spPeaksBlob);
+                }
 
                 // 2. Resize heat maps + merge different scales
                 #ifdef USE_CUDA

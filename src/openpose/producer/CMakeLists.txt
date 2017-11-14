@@ -8,8 +8,8 @@ set(SOURCES
     webcamReader.cpp)
 
 add_library(openpose_producer ${SOURCES})
-target_link_libraries(openpose_producer ${OpenCV_LIBS} openpose_core 
-    openpose_thread openpose_filestream)
+target_link_libraries(openpose_producer ${OpenCV_LIBS} openpose_core
+    openpose_filestream openpose_thread)
 
 install(TARGETS openpose_producer
     EXPORT OpenPose

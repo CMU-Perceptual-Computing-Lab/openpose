@@ -15,7 +15,7 @@ if (BUILD_CAFFE)
   add_dependencies(openpose_face openpose_caffe)
 endif (BUILD_CAFFE)
 
-install(TARGETS openpose_face 
+install(TARGETS openpose_face
     EXPORT OpenPose
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib

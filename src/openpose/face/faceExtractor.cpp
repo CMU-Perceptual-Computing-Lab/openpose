@@ -6,7 +6,7 @@ namespace op
     FaceExtractor::FaceExtractor(const Point<int>& netInputSize, const Point<int>& netOutputSize,
                                  const std::vector<HeatMapType>& heatMapTypes, const ScaleMode heatMapScale) :
         mNetOutputSize{netOutputSize},
-        mFaceImageCrop{mNetOutputSize.area()*3},
+        mFaceImageCrop{{1, 3, mNetOutputSize.y, mNetOutputSize.x}},
         mHeatMapScaleMode{heatMapScale},
         mHeatMapTypes{heatMapTypes}
     {

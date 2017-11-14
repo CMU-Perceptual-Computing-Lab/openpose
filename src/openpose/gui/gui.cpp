@@ -7,7 +7,7 @@
 
 namespace op
 {
-    const std::string OPEN_POSE_TEXT{"OpenPose 1.1.0"};
+    const std::string OPEN_POSE_TEXT{"OpenPose 1.2.0"};
 
     inline void showGuiHelp()
     {
@@ -97,7 +97,7 @@ namespace op
                         poseExtractor->increase(PoseProperty::ConnectInterThreshold, 0.005f * (castedKey=='[' ? -1 : 1));
                 else if (castedKey=='{' || castedKey=='}')
                     for (auto& poseExtractor : poseExtractors)
-                        poseExtractor->increase(PoseProperty::ConnectInterMinAboveThreshold, (castedKey=='{' ? -1 : 1));
+                        poseExtractor->increase(PoseProperty::ConnectInterMinAboveThreshold, (castedKey=='{' ? -0.1f : 0.1f));
                 else if (castedKey==';' || castedKey=='\'')
                     for (auto& poseExtractor : poseExtractors)
                         poseExtractor->increase(PoseProperty::ConnectMinSubsetCnt, (castedKey==';' ? -1 : 1));

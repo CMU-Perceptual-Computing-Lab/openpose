@@ -22,10 +22,10 @@
 #include <openpose/pose/headers.hpp>
 #include <openpose/utilities/headers.hpp>
 
-// See all the available parameter options withe the `--help` flag. E.g. `./build/examples/openpose/openpose.bin --help`.
+// See all the available parameter options withe the `--help` flag. E.g. `build/examples/openpose/openpose.bin --help`
 // Note: This command will show you flags for other unnecessary 3rdparty files. Check only the flags for the OpenPose
 // executable. E.g. for `openpose.bin`, look for `Flags from examples/openpose/openpose.cpp:`.
-// Debugging
+// Debugging/Other
 DEFINE_int32(logging_level,             3,              "The logging level. Integer in the range [0, 255]. 0 will output any log() message, while"
                                                         " 255 will not output any. Current OpenPose library messages are in the range 0-4: 1 for"
                                                         " low priority messages and 4 for important ones.");
@@ -35,7 +35,7 @@ DEFINE_string(image_path,               "examples/media/COCO_val2014_00000000019
 DEFINE_string(model_pose,               "COCO",         "Model to be used. E.g. `COCO` (18 keypoints), `MPI` (15 keypoints, ~10% faster), "
                                                         "`MPI_4_layers` (15 keypoints, even faster but less accurate).");
 DEFINE_string(model_folder,             "models/",      "Folder path (absolute or relative) where the models (pose, face, ...) are located.");
-DEFINE_string(net_resolution,           "656x368",      "Multiples of 16. If it is increased, the accuracy potentially increases. If it is"
+DEFINE_string(net_resolution,           "-1x368",       "Multiples of 16. If it is increased, the accuracy potentially increases. If it is"
                                                         " decreased, the speed increases. For maximum speed-accuracy balance, it should keep the"
                                                         " closest aspect ratio possible to the images or videos to be processed. Using `-1` in"
                                                         " any of the dimensions, OP will choose the optimal aspect ratio depending on the user's"
@@ -94,8 +94,6 @@ int openPoseTutorialPose1()
     const auto outputSize = op::flagsToPoint(FLAGS_output_resolution, "-1x-1");
     // netInputSize
     const auto netInputSize = op::flagsToPoint(FLAGS_net_resolution, "-1x368");
-    // netOutputSize
-    const auto netOutputSize = netInputSize;
     // poseModel
     const auto poseModel = op::flagsToPoseModel(FLAGS_model_pose);
     // Check no contradictory flags enabled
@@ -112,9 +110,8 @@ int openPoseTutorialPose1()
     op::ScaleAndSizeExtractor scaleAndSizeExtractor(netInputSize, outputSize, FLAGS_scale_number, FLAGS_scale_gap);
     op::CvMatToOpInput cvMatToOpInput;
     op::CvMatToOpOutput cvMatToOpOutput;
-    op::PoseExtractorCaffe poseExtractorCaffe{netInputSize, netOutputSize, outputSize, FLAGS_scale_number, poseModel,
-                                              FLAGS_model_folder, FLAGS_num_gpu_start, {}, op::ScaleMode::ZeroToOne,
-                                              enableGoogleLogging};
+    op::PoseExtractorCaffe poseExtractorCaffe{poseModel, FLAGS_model_folder,
+                                              FLAGS_num_gpu_start, {}, op::ScaleMode::ZeroToOne, enableGoogleLogging};
     op::PoseCpuRenderer poseRenderer{poseModel, (float)FLAGS_render_threshold, !FLAGS_disable_blending,
                                      (float)FLAGS_alpha_pose};
     op::OpOutputToCvMat opOutputToCvMat;
@@ -146,7 +143,7 @@ int openPoseTutorialPose1()
     poseExtractorCaffe.forwardPass(netInputArray, imageSize, scaleInputToNetInputs);
     const auto poseKeypoints = poseExtractorCaffe.getPoseKeypoints();
     // Step 5 - Render poseKeypoints
-    poseRenderer.renderPose(outputArray, poseKeypoints);
+    poseRenderer.renderPose(outputArray, poseKeypoints, scaleInputToOutput);
     // Step 6 - OpenPose output format to cv::Mat
     auto outputImage = opOutputToCvMat.formatToCvMat(outputArray);
     timeNow("Step 5");

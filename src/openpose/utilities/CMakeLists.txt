@@ -1,4 +1,4 @@
-set(SOURCES  
+set(SOURCES
     cuda.cpp
     errorAndLog.cpp
     fileSystem.cpp
@@ -9,9 +9,9 @@ set(SOURCES
     string.cpp)
 
 find_package(Boost COMPONENTS system filesystem REQUIRED)
-  
+
 cuda_add_library(openpose_utilities ${SOURCES})
-target_link_libraries(openpose_utilities openpose_producer openpose_filestream
+target_link_libraries(openpose_utilities openpose_filestream openpose_producer
     ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
 
 install(TARGETS openpose_utilities

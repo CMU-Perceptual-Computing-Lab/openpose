@@ -64,7 +64,7 @@
     </CudaCompile>
     <Link>
       <AdditionalLibraryDirectories>$(CUDA_PATH_V8_0)\lib\x64\;$(PYTHON_LIB);$(CudaToolkitLibDir);%(AdditionalLibraryDirectories);%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
-      <Version>1.1.0</Version>
+      <Version>1.2.0</Version>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -235,6 +235,7 @@
     <ClInclude Include="..\..\include\openpose\utilities\openCv.hpp" />
     <ClInclude Include="..\..\include\openpose\utilities\pointerContainer.hpp" />
     <ClInclude Include="..\..\include\openpose\utilities\profiler.hpp" />
+    <ClInclude Include="..\..\include\openpose\utilities\standard.hpp" />
     <ClInclude Include="..\..\include\openpose\utilities\string.hpp" />
     <ClInclude Include="..\..\include\openpose\wrapper\headers.hpp" />
     <ClInclude Include="..\..\include\openpose\wrapper\wrapper.hpp" />

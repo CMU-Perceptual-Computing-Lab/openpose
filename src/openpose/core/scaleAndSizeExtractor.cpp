@@ -37,9 +37,26 @@ namespace op
             // Security checks
             if (inputResolution.area() <= 0)
                 error("Wrong input element (empty cvInputData).", __LINE__, __FUNCTION__, __FILE__);
-            // scaleRatios & sizes - Reescale keeping aspect ratio
-            std::vector<double> scaleRatios(mScaleNumber, 1.f);
-            std::vector<Point<int>> sizes(mScaleNumber);
+            // Set poseNetInputSize
+            auto poseNetInputSize = mNetInputResolution;
+            if (poseNetInputSize.x <= 0 || poseNetInputSize.y <= 0)
+            {
+                // Security checks
+                if (poseNetInputSize.x <= 0 && poseNetInputSize.y <= 0)
+                    error("Only 1 of the dimensions of net input resolution can be <= 0.",
+                          __LINE__, __FUNCTION__, __FILE__);
+                if (poseNetInputSize.x <= 0)
+                    poseNetInputSize.x = 16 * intRound(
+                        poseNetInputSize.y * inputResolution.x / (float) inputResolution.y / 16.f
+                    );
+                else // if (poseNetInputSize.y <= 0)
+                    poseNetInputSize.y = 16 * intRound(
+                        poseNetInputSize.x * inputResolution.y / (float) inputResolution.x / 16.f
+                    );
+            }
+            // scaleInputToNetInputs & netInputSizes - Reescale keeping aspect ratio
+            std::vector<double> scaleInputToNetInputs(mScaleNumber, 1.f);
+            std::vector<Point<int>> netInputSizes(mScaleNumber);
             for (auto i = 0; i < mScaleNumber; i++)
             {
                 const auto currentScale = 1. - i*mScaleGap;
@@ -47,13 +64,13 @@ namespace op
                     error("All scales must be in the range [0, 1], i.e. 0 <= 1-scale_number*scale_gap <= 1",
                           __LINE__, __FUNCTION__, __FILE__);
 
-                const auto targetWidth = fastTruncate(intRound(mNetInputResolution.x * currentScale) / 16 * 16, 1,
-                                                      mNetInputResolution.x);
-                const auto targetHeight = fastTruncate(intRound(mNetInputResolution.y * currentScale) / 16 * 16, 1,
-                                                       mNetInputResolution.y);
+                const auto targetWidth = fastTruncate(intRound(poseNetInputSize.x * currentScale) / 16 * 16, 1,
+                                                      poseNetInputSize.x);
+                const auto targetHeight = fastTruncate(intRound(poseNetInputSize.y * currentScale) / 16 * 16, 1,
+                                                       poseNetInputSize.y);
                 const Point<int> targetSize{targetWidth, targetHeight};
-                scaleRatios[i] = resizeGetScaleFactor(inputResolution, targetSize);
-                sizes[i] = mNetInputResolution;
+                scaleInputToNetInputs[i] = resizeGetScaleFactor(inputResolution, targetSize);
+                netInputSizes[i] = targetSize;
             }
             // scaleInputToOutput - Scale between input and desired output size
             Point<int> outputResolution;
@@ -71,7 +88,7 @@ namespace op
                 scaleInputToOutput = 1.;
             }
             // Return result
-            return std::make_tuple(scaleRatios, sizes, scaleInputToOutput, outputResolution);
+            return std::make_tuple(scaleInputToNetInputs, netInputSizes, scaleInputToOutput, outputResolution);
         }
         catch (const std::exception& e)
         {

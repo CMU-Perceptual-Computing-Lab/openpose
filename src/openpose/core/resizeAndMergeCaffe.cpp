@@ -9,7 +9,7 @@ namespace op
 {
     template <typename T>
     ResizeAndMergeCaffe<T>::ResizeAndMergeCaffe() :
-        mScaleRatios{1}
+        mScaleRatios{T(1)}
     {
         try
         {
@@ -32,9 +32,9 @@ namespace op
         {
             #ifdef USE_CAFFE
                 if (top.size() != 1)
-                    error("top.size() != 1", __LINE__, __FUNCTION__, __FILE__);
+                    error("top.size() != 1.", __LINE__, __FUNCTION__, __FILE__);
                 if (bottom.size() != 1)
-                    error("bottom.size() != 2", __LINE__, __FUNCTION__, __FILE__);
+                    error("bottom.size() != 1.", __LINE__, __FUNCTION__, __FILE__);
             #else
                 UNUSED(bottom);
                 UNUSED(top);
@@ -48,31 +48,44 @@ namespace op
 
     template <typename T>
     void ResizeAndMergeCaffe<T>::Reshape(const std::vector<caffe::Blob<T>*>& bottom,
-                                         const std::vector<caffe::Blob<T>*>& top, const float factor,
+                                         const std::vector<caffe::Blob<T>*>& top,
+                                         const T netFactor,
+                                         const T scaleFactor,
                                          const bool mergeFirstDimension)
     {
         try
         {
             #ifdef USE_CAFFE
-                auto bottomBlob = bottom.at(0);
-                auto topBlob = top.at(0);
-
-                // Top shape
+                // Security checks
+                if (top.size() != 1)
+                    error("top.size() != 1", __LINE__, __FUNCTION__, __FILE__);
+                if (bottom.empty())
+                    error("bottom cannot be empty.", __LINE__, __FUNCTION__, __FILE__);
+                // Data
+                auto* topBlob = top.at(0);
+                const auto* bottomBlob = bottom.at(0);
+                // Set top shape
                 auto topShape = bottomBlob->shape();
                 topShape[0] = (mergeFirstDimension ? 1 : bottomBlob->shape(0));
-                topShape[2] = intRound(topShape[2] * factor);
-                topShape[3] = intRound(topShape[3] * factor);
+                // -1 and later +1 to take into account that we are using 0-based index
+                // E.g. 100x100 image --> 200x200 --> 0-99 to 0-199 --> scale = 199/99 (not 2!)
+                // E.g. 101x101 image --> 201x201 --> scale = 2
+                // Test: pixel 0 --> 0, pixel 99 (ex 1) --> 199, pixel 100 (ex 2) --> 200
+                topShape[2] = intRound((topShape[2]*netFactor - 1.f) * scaleFactor) + 1;
+                topShape[3] = intRound((topShape[3]*netFactor - 1.f) * scaleFactor) + 1;
                 topBlob->Reshape(topShape);
-
                 // Array sizes
                 mTopSize = std::array<int, 4>{topBlob->shape(0), topBlob->shape(1), topBlob->shape(2),
                                               topBlob->shape(3)};
-                mBottomSize = std::array<int, 4>{bottomBlob->shape(0), bottomBlob->shape(1),
-                                                 bottomBlob->shape(2), bottomBlob->shape(3)};
+                mBottomSizes.resize(bottom.size());
+                for (auto i = 0u ; i < mBottomSizes.size() ; i++)
+                    mBottomSizes[i] = std::array<int, 4>{bottom[i]->shape(0), bottom[i]->shape(1),
+                                                         bottom[i]->shape(2), bottom[i]->shape(3)};
             #else
                 UNUSED(bottom);
                 UNUSED(top);
-                UNUSED(factor);
+                UNUSED(netFactor);
+                UNUSED(scaleFactor);
                 UNUSED(mergeFirstDimension);
             #endif
         }
@@ -102,7 +115,10 @@ namespace op
         try
         {
             #ifdef USE_CAFFE
-                resizeAndMergeCpu(top.at(0)->mutable_cpu_data(), bottom.at(0)->cpu_data(), mTopSize, mBottomSize,
+                std::vector<const T*> sourcePtrs(bottom.size());
+                for (auto i = 0u ; i < sourcePtrs.size() ; i++)
+                    sourcePtrs[i] = bottom[i]->cpu_data();
+                resizeAndMergeCpu(top.at(0)->mutable_cpu_data(), sourcePtrs, mTopSize, mBottomSizes,
                                   mScaleRatios);
             #else
                 UNUSED(bottom);
@@ -122,7 +138,10 @@ namespace op
         try
         {
             #if defined USE_CAFFE && defined USE_CUDA
-                resizeAndMergeGpu(top.at(0)->mutable_gpu_data(), bottom.at(0)->gpu_data(), mTopSize, mBottomSize,
+                std::vector<const T*> sourcePtrs(bottom.size());
+                for (auto i = 0u ; i < sourcePtrs.size() ; i++)
+                    sourcePtrs[i] = bottom[i]->gpu_data();
+                resizeAndMergeGpu(top.at(0)->mutable_gpu_data(), sourcePtrs, mTopSize, mBottomSizes,
                                   mScaleRatios);
             #else
                 UNUSED(bottom);
@@ -158,7 +177,8 @@ namespace op
     }
 
     template <typename T>
-    void ResizeAndMergeCaffe<T>::Backward_gpu(const std::vector<caffe::Blob<T>*>& top, const std::vector<bool>& propagate_down,
+    void ResizeAndMergeCaffe<T>::Backward_gpu(const std::vector<caffe::Blob<T>*>& top,
+                                              const std::vector<bool>& propagate_down,
                                               const std::vector<caffe::Blob<T>*>& bottom)
     {
         try

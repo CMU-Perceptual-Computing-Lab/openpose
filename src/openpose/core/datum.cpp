@@ -3,7 +3,9 @@
 
 namespace op
 {
-    Datum::Datum()
+    Datum::Datum() :
+        id{std::numeric_limits<unsigned long long>::max()},
+        poseIds{-1}
     {
     }
 
@@ -19,6 +21,8 @@ namespace op
         cvOutputData{datum.cvOutputData},
         // Resulting Array<float> data
         poseKeypoints{datum.poseKeypoints},
+        poseIds{datum.poseIds},
+        poseScores{datum.poseScores},
         poseHeatMaps{datum.poseHeatMaps},
         faceRectangles{datum.faceRectangles},
         faceKeypoints{datum.faceKeypoints},
@@ -48,6 +52,8 @@ namespace op
             cvOutputData = datum.cvOutputData;
             // Resulting Array<float> data
             poseKeypoints = datum.poseKeypoints;
+            poseIds = datum.poseIds,
+            poseScores = datum.poseScores,
             poseHeatMaps = datum.poseHeatMaps,
             faceRectangles = datum.faceRectangles,
             faceKeypoints = datum.faceKeypoints,
@@ -88,6 +94,8 @@ namespace op
             std::swap(cvOutputData, datum.cvOutputData);
             // Resulting Array<float> data
             std::swap(poseKeypoints, datum.poseKeypoints);
+            std::swap(poseIds, datum.poseIds);
+            std::swap(poseScores, datum.poseScores);
             std::swap(poseHeatMaps, datum.poseHeatMaps);
             std::swap(faceRectangles, datum.faceRectangles);
             std::swap(faceKeypoints, datum.faceKeypoints);
@@ -119,6 +127,8 @@ namespace op
             std::swap(cvOutputData, datum.cvOutputData);
             // Resulting Array<float> data
             std::swap(poseKeypoints, datum.poseKeypoints);
+            std::swap(poseIds, datum.poseIds);
+            std::swap(poseScores, datum.poseScores);
             std::swap(poseHeatMaps, datum.poseHeatMaps);
             std::swap(faceRectangles, datum.faceRectangles);
             std::swap(faceKeypoints, datum.faceKeypoints);
@@ -153,11 +163,15 @@ namespace op
             datum.name = name;
             // Input image and rendered version
             datum.cvInputData = cvInputData.clone();
-            datum.inputNetData = inputNetData.clone();
+            datum.inputNetData.resize(inputNetData.size());
+            for (auto i = 0u ; i < datum.inputNetData.size() ; i++)
+                datum.inputNetData[i] = inputNetData[i].clone();
             datum.outputData = outputData.clone();
             datum.cvOutputData = cvOutputData.clone();
             // Resulting Array<float> data
             datum.poseKeypoints = poseKeypoints.clone();
+            datum.poseIds = poseIds.clone();
+            datum.poseScores = poseScores.clone();
             datum.poseHeatMaps = poseHeatMaps.clone();
             datum.faceRectangles = faceRectangles;
             datum.faceKeypoints = faceKeypoints.clone();

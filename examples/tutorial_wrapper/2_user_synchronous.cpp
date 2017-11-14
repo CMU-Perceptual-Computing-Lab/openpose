@@ -1,4 +1,4 @@
-// ------------------------- OpenPose Library Tutorial - Thread - Example 2 - Synchronous -------------------------
+// ------------------------- OpenPose Library Tutorial - Wrapper - Example 2 - Synchronous -------------------------
 // Synchronous mode: ideal for performance. The user can add his own frames producer / post-processor / consumer to the OpenPose wrapper or use the
 // default ones.
 
@@ -28,13 +28,17 @@
 // OpenPose dependencies
 #include <openpose/headers.hpp>
 
-// See all the available parameter options withe the `--help` flag. E.g. `./build/examples/openpose/openpose.bin --help`.
+// See all the available parameter options withe the `--help` flag. E.g. `build/examples/openpose/openpose.bin --help`
 // Note: This command will show you flags for other unnecessary 3rdparty files. Check only the flags for the OpenPose
 // executable. E.g. for `openpose.bin`, look for `Flags from examples/openpose/openpose.cpp:`.
-// Debugging
+// Debugging/Other
 DEFINE_int32(logging_level,             3,              "The logging level. Integer in the range [0, 255]. 0 will output any log() message, while"
                                                         " 255 will not output any. Current OpenPose library messages are in the range 0-4: 1 for"
                                                         " low priority messages and 4 for important ones.");
+DEFINE_bool(disable_multi_thread,       false,          "It would slightly reduce the frame rate in order to highly reduce the lag. Mainly useful"
+                                                        " for 1) Cases where it is needed a low latency (e.g. webcam in real-time scenarios with"
+                                                        " low-range GPU devices); and 2) Debugging OpenPose when it is crashing to locate the"
+                                                        " error.");
 // Producer
 DEFINE_string(image_dir,                "examples/media/",      "Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).");
 // OpenPose
@@ -55,7 +59,7 @@ DEFINE_bool(body_disable,               false,          "Disable body keypoint d
                                                         " keypoint detection.");
 DEFINE_string(model_pose,               "COCO",         "Model to be used. E.g. `COCO` (18 keypoints), `MPI` (15 keypoints, ~10% faster), "
                                                         "`MPI_4_layers` (15 keypoints, even faster but less accurate).");
-DEFINE_string(net_resolution,           "656x368",      "Multiples of 16. If it is increased, the accuracy potentially increases. If it is"
+DEFINE_string(net_resolution,           "-1x368",       "Multiples of 16. If it is increased, the accuracy potentially increases. If it is"
                                                         " decreased, the speed increases. For maximum speed-accuracy balance, it should keep the"
                                                         " closest aspect ratio possible to the images or videos to be processed. Using `-1` in"
                                                         " any of the dimensions, OP will choose the optimal aspect ratio depending on the user's"
@@ -95,7 +99,6 @@ DEFINE_int32(hand_scale_number,         1,              "Analogous to `scale_num
 DEFINE_double(hand_scale_range,         0.4,            "Analogous purpose than `scale_gap` but applied to the hand keypoint detector. Total range"
                                                         " between smallest and biggest scale. The scales will be centered in ratio 1. E.g. if"
                                                         " scaleRange = 0.4 and scalesNumber = 2, then there will be 2 scales, 0.8 and 1.2.");
-
 DEFINE_bool(hand_tracking,              false,          "Adding hand tracking might improve hand keypoints detection for webcam (if the frame rate"
                                                         " is high enough, i.e. >7 FPS per GPU) and video. This is not person ID tracking, it"
                                                         " simply looks for hands in positions at which hands were located in previous frames, but"
@@ -150,8 +153,8 @@ DEFINE_string(write_heatmaps_format,    "png",          "File extension and form
 
 
 // If the user needs his own variables, he can inherit the op::Datum struct and add them
-// UserDatum can be directly used by the OpenPose wrapper because it inherits from op::Datum, just define Wrapper<UserDatum> instead of
-// Wrapper<op::Datum>
+// UserDatum can be directly used by the OpenPose wrapper because it inherits from op::Datum, just define
+// Wrapper<UserDatum> instead of Wrapper<op::Datum>
 struct UserDatum : public op::Datum
 {
     bool boolThatUserNeedsForSomeReason;
@@ -171,7 +174,8 @@ class WUserInput : public op::WorkerProducer<std::shared_ptr<std::vector<UserDat
 public:
     WUserInput(const std::string& directoryPath) :
         mImageFiles{op::getFilesOnDirectory(directoryPath, "jpg")},
-        // mImageFiles{op::getFilesOnDirectory(directoryPath, std::vector<std::string>{"jpg", "png"})}, // If we want "jpg" + "png" images
+        // If we want "jpg" + "png" images
+        // mImageFiles{op::getFilesOnDirectory(directoryPath, std::vector<std::string>{"jpg", "png"})},
         mCounter{0}
     {
         if (mImageFiles.empty())
@@ -187,8 +191,10 @@ public:
             // Close program when empty frame
             if (mImageFiles.size() <= mCounter)
             {
-                op::log("Last frame read and added to queue. Closing program after it is processed.", op::Priority::High);
-                // This funtion stops this worker, which will eventually stop the whole thread system once all the frames have been processed
+                op::log("Last frame read and added to queue. Closing program after it is processed.",
+                        op::Priority::High);
+                // This funtion stops this worker, which will eventually stop the whole thread system once all the
+                // frames have been processed
                 this->stop();
                 return nullptr;
             }
@@ -205,7 +211,8 @@ public:
                 // If empty frame -> return nullptr
                 if (datum.cvInputData.empty())
                 {
-                    op::log("Empty frame detected on path: " + mImageFiles.at(mCounter-1) + ". Closing program.", op::Priority::High);
+                    op::log("Empty frame detected on path: " + mImageFiles.at(mCounter-1) + ". Closing program.",
+                        op::Priority::High);
                     this->stop();
                     datumsPtr = nullptr;
                 }
@@ -339,7 +346,8 @@ public:
 int openPoseTutorialWrapper2()
 {
     // logging_level
-    op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.", __LINE__, __FUNCTION__, __FILE__);
+    op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.",
+              __LINE__, __FUNCTION__, __FILE__);
     op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
     // op::ConfigureLog::setPriorityThreshold(op::Priority::None); // To print all logging messages
 
@@ -360,10 +368,12 @@ int openPoseTutorialWrapper2()
     // keypointScale
     const auto keypointScale = op::flagsToScaleMode(FLAGS_keypoint_scale);
     // heatmaps to add
-    const auto heatMapTypes = op::flagsToHeatMaps(FLAGS_heatmaps_add_parts, FLAGS_heatmaps_add_bkg, FLAGS_heatmaps_add_PAFs);
-    op::check(FLAGS_heatmaps_scale >= 0 && FLAGS_heatmaps_scale <= 2, "Non valid `heatmaps_scale`.", __LINE__, __FUNCTION__, __FILE__);
+    const auto heatMapTypes = op::flagsToHeatMaps(FLAGS_heatmaps_add_parts, FLAGS_heatmaps_add_bkg,
+                                                  FLAGS_heatmaps_add_PAFs);
+    op::check(FLAGS_heatmaps_scale >= 0 && FLAGS_heatmaps_scale <= 2, "Non valid `heatmaps_scale`.",
+              __LINE__, __FUNCTION__, __FILE__);
     const auto heatMapScale = (FLAGS_heatmaps_scale == 0 ? op::ScaleMode::PlusMinusOne
-                               : (FLAGS_heatmaps_scale == 1 ? op::ScaleMode::ZeroToOne : op::ScaleMode::UnsignedChar ));
+                              : (FLAGS_heatmaps_scale == 1 ? op::ScaleMode::ZeroToOne : op::ScaleMode::UnsignedChar ));
     // Enabling Google Logging
     const bool enableGoogleLogging = true;
     // Logging
@@ -389,20 +399,24 @@ int openPoseTutorialWrapper2()
     opWrapper.setWorkerOutput(wUserOutput, workerOutputOnNewThread);
     // Configure OpenPose
     op::log("Configuring OpenPose wrapper.", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-    const op::WrapperStructPose wrapperStructPose{!FLAGS_body_disable, netInputSize, outputSize, keypointScale, FLAGS_num_gpu,
-                                                  FLAGS_num_gpu_start, FLAGS_scale_number, (float)FLAGS_scale_gap,
-                                                  op::flagsToRenderMode(FLAGS_render_pose), poseModel,
-                                                  !FLAGS_disable_blending, (float)FLAGS_alpha_pose,
+    const op::WrapperStructPose wrapperStructPose{!FLAGS_body_disable, netInputSize, outputSize, keypointScale,
+                                                  FLAGS_num_gpu, FLAGS_num_gpu_start, FLAGS_scale_number,
+                                                  (float)FLAGS_scale_gap, op::flagsToRenderMode(FLAGS_render_pose),
+                                                  poseModel, !FLAGS_disable_blending, (float)FLAGS_alpha_pose,
                                                   (float)FLAGS_alpha_heatmap, FLAGS_part_to_show, FLAGS_model_folder,
                                                   heatMapTypes, heatMapScale, (float)FLAGS_render_threshold,
                                                   enableGoogleLogging};
     // Face configuration (use op::WrapperStructFace{} to disable it)
-    const op::WrapperStructFace wrapperStructFace{FLAGS_face, faceNetInputSize, op::flagsToRenderMode(FLAGS_face_render, FLAGS_render_pose),
-                                                  (float)FLAGS_face_alpha_pose, (float)FLAGS_face_alpha_heatmap, (float)FLAGS_face_render_threshold};
+    const op::WrapperStructFace wrapperStructFace{FLAGS_face, faceNetInputSize,
+                                                  op::flagsToRenderMode(FLAGS_face_render, FLAGS_render_pose),
+                                                  (float)FLAGS_face_alpha_pose, (float)FLAGS_face_alpha_heatmap,
+                                                  (float)FLAGS_face_render_threshold};
     // Hand configuration (use op::WrapperStructHand{} to disable it)
-    const op::WrapperStructHand wrapperStructHand{FLAGS_hand, handNetInputSize, FLAGS_hand_scale_number, (float)FLAGS_hand_scale_range,
-                                                  FLAGS_hand_tracking, op::flagsToRenderMode(FLAGS_hand_render, FLAGS_render_pose),
-                                                  (float)FLAGS_hand_alpha_pose, (float)FLAGS_hand_alpha_heatmap, (float)FLAGS_hand_render_threshold};
+    const op::WrapperStructHand wrapperStructHand{FLAGS_hand, handNetInputSize, FLAGS_hand_scale_number,
+                                                  (float)FLAGS_hand_scale_range, FLAGS_hand_tracking,
+                                                  op::flagsToRenderMode(FLAGS_hand_render, FLAGS_render_pose),
+                                                  (float)FLAGS_hand_alpha_pose, (float)FLAGS_hand_alpha_heatmap,
+                                                  (float)FLAGS_hand_render_threshold};
     // Consumer (comment or use default argument to disable any output)
     const bool displayGui = false;
     const bool guiVerbose = false;
@@ -412,9 +426,11 @@ int openPoseTutorialWrapper2()
                                                       FLAGS_write_coco_json, FLAGS_write_images, FLAGS_write_images_format, FLAGS_write_video,
                                                       FLAGS_write_heatmaps, FLAGS_write_heatmaps_format};
     // Configure wrapper
-    opWrapper.configure(wrapperStructPose, wrapperStructFace, wrapperStructHand, op::WrapperStructInput{}, wrapperStructOutput);
-    // Set to single-thread running (e.g. for debugging purposes)
-    // opWrapper.disableMultiThreading();
+    opWrapper.configure(wrapperStructPose, wrapperStructFace, wrapperStructHand, op::WrapperStructInput{},
+                        wrapperStructOutput);
+    // Set to single-thread running (to debug and/or reduce latency)
+    if (FLAGS_disable_multi_thread)
+       opWrapper.disableMultiThreading();
 
     op::log("Starting thread(s)", op::Priority::High);
     // Two different ways of running the program on multithread environment
@@ -423,8 +439,8 @@ int openPoseTutorialWrapper2()
     opWrapper.exec();  // It blocks this thread until all threads have finished
 
     // Option b) Keeping this thread free in case you want to do something else meanwhile, e.g. profiling the GPU memory
-    // // VERY IMPORTANT NOTE: if OpenCV is compiled with Qt support, this option will not work. Qt needs the main thread to
-    // // plot visual results, so the final GUI (which uses OpenCV) would return an exception similar to:
+    // // VERY IMPORTANT NOTE: if OpenCV is compiled with Qt support, this option will not work. Qt needs the main
+    // // thread to plot visual results, so the final GUI (which uses OpenCV) would return an exception similar to:
     // // `QMetaMethod::invoke: Unable to invoke methods with return values in queued connections`
     // // Start threads
     // opWrapper.start();
@@ -442,8 +458,10 @@ int openPoseTutorialWrapper2()
 
     // Measuring total time
     const auto now = std::chrono::high_resolution_clock::now();
-    const auto totalTimeSec = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(now-timerBegin).count() * 1e-9;
-    const auto message = "Real-time pose estimation demo successfully finished. Total time: " + std::to_string(totalTimeSec) + " seconds.";
+    const auto totalTimeSec = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(now-timerBegin).count()
+                            * 1e-9;
+    const auto message = "Real-time pose estimation demo successfully finished. Total time: "
+                       + std::to_string(totalTimeSec) + " seconds.";
     op::log(message, op::Priority::High);
 
     return 0;

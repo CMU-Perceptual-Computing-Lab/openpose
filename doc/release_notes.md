@@ -3,7 +3,7 @@ OpenPose Library - Release Notes
 
 
 
-## OpenPose 1.0.0rc1
+## OpenPose 1.0.0rc1 (Apr 24, 2017)
 1. Initial version, main functionality:
     1. Body keypoint detection and rendering in Ubuntu 14 and 16.
     2. It can read an image directory, video or webcam.
@@ -11,7 +11,7 @@ OpenPose Library - Release Notes
 
 
 
-## OpenPose 1.0.0rc2
+## OpenPose 1.0.0rc2 (May 10, 2017)
 1. Main improvements:
     1. Rendering max resolution from 720p to >32k images.
     2. Highly improved documentation.
@@ -22,7 +22,7 @@ OpenPose Library - Release Notes
 
 
 
-## OpenPose 1.0.0rc3
+## OpenPose 1.0.0rc3 (Jun 8, 2017)
 1. Main improvements:
     1. Added face keypoint detection.
     2. Added Windows 10 compatibility.
@@ -44,7 +44,7 @@ OpenPose Library - Release Notes
 
 
 
-## OpenPose 1.0.0
+## OpenPose 1.0.0 (Jul 8, 2017)
 1. Main improvements:
     1. Added hand keypoint detection.
     2. Windows branch merged to master branch.
@@ -74,7 +74,7 @@ OpenPose Library - Release Notes
 
 
 
-## OpenPose 1.0.1
+## OpenPose 1.0.1 (Jul 11, 2017)
 1. Main improvements:
     1. Windows library turned into DLL dynamic library (i.e. portable).
     2. Improved documentation.
@@ -83,7 +83,7 @@ OpenPose Library - Release Notes
 
 
 
-## OpenPose 1.0.2
+## OpenPose 1.0.2 (Sep 3, 2017)
 1. Main improvements:
     1. Added OpenCV 3.3 compatibility.
     2. Caffe turned into DLL library.
@@ -102,7 +102,7 @@ OpenPose Library - Release Notes
 
 
 
-## OpenPose 1.1.0
+## OpenPose 1.1.0 (Sep 19, 2017)
 1. Main improvements:
     1. Added CMake installer for Ubuntu.
     2. Added how to use keypoint data in `examples/tutorial_wrapper/`.
@@ -113,27 +113,42 @@ OpenPose Library - Release Notes
 
 
 
-## Current version (future OpenPose 1.2.0)
+## OpenPose 1.2.0 (Nov 3, 2017)
 1. Main improvements:
-    1. Added IP camera support.
-    2. Output images can have the input size, OpenPose able to change its size for each image and not required fixed size anymore.
+    1. Speed increase when processing images with different aspect ratios. E.g. ~20% increase over 3.7k COCO validation images on 1 scale.
+    2. Huge speed increase and memory reduction when processing multi-scale. E.g. over 3.7k COCO validation images on 4 scales: ~40% (~770 to ~450 sec) speed increase, ~25% memory reduction (from ~8.9 to ~6.7 GB / GPU).
+    3. Slightly increase of accuracy given the fixed mini-bugs.
+    4. Added IP camera support.
+    5. Output images can have the input size, OpenPose able to change its size for each image and not required fixed size anymore.
         1. FrameDisplayer accepts variable size images by rescaling every time a frame with bigger width or height is displayed (gui module).
         2. OpOutputToCvMat & GuiInfoAdder does not require to know the output size at construction time, deduced from each image.
         3. CvMatToOutput and Renderers allow to keep input resolution as output for images (core module).
-    3. New standalone face keypoint detector based on OpenCV face detector: much faster if body keypoint detection is not required but much less accurate.
-    4. Face and hand keypoint detectors now can return each keypoint heatmap.
-    5. The flag `USE_CUDNN` is no longer required; `USE_CAFFE` and `USE_CUDA` (replacing the old `CPU_ONLY`) are no longer required to use the library, only to build it. In addition, Boost, Caffe, and its dependencies have been removed from the OpenPose header files. Only OpenCV include and lib folders are required when building a project using OpenPose.
-    6. OpenPose successfully compiles if the flags `USE_CAFFE` and/or `USE_CUDA` are not enabled, although it will give an error saying they are required.
-    7. COCO JSON file outputs 0 as score for non-detected keypoints.
-    8. Added example for OpenPose for user asynchronous output and cleaned all `tutorial_wrapper/` examples.
-    9. Added `-1` option for `net_resolution` in order to auto-select the best possible aspect ratio given the user input.
+    6. New standalone face keypoint detector based on OpenCV face detector: much faster if body keypoint detection is not required but much less accurate.
+    7. Face and hand keypoint detectors now can return each keypoint heatmap.
+    8. The flag `USE_CUDNN` is no longer required; `USE_CAFFE` and `USE_CUDA` (replacing the old `CPU_ONLY`) are no longer required to use the library, only to build it. In addition, Boost, Caffe, and its dependencies have been removed from the OpenPose header files. Only OpenCV include and lib folders are required when building a project using OpenPose.
+    9. OpenPose successfully compiles if the flags `USE_CAFFE` and/or `USE_CUDA` are not enabled, although it will give an error saying they are required.
+    10. COCO JSON file outputs 0 as score for non-detected keypoints.
+    11. Added example for OpenPose for user asynchronous output and cleaned all `tutorial_wrapper/` examples.
+    12. Added `-1` option for `net_resolution` in order to auto-select the best possible aspect ratio given the user input.
+    13. Net resolution can be dynamically changed (e.g. for images with different size).
+    14. Added example to add functionality/modules to OpenPose.
+    15. Added `disable_multi_thread` flag in order to allow debug and/or highly reduce the latency (e.g. when using webcam in real-time).
+    16. Allowed to output images without any rendering.
 2. Functions or parameters renamed:
-    1. OpenPose able to change its size and initial size:
+    1. OpenPose able to change its size and initial size dynamically:
         1. Flag `resolution` renamed as `output_resolution`.
         2. FrameDisplayer, GuiInfoAdder and Gui constructors arguments modified (gui module).
         3. OpOutputToCvMat constructor removed (core module).
         4. New Renders classes to split GpuRenderers from CpuRenderers.
         5. Etc.
-    2. `CPU_ONLY` changed by `USE_CUDA` to keep format.
+    2. OpenPose able to change its net resolution size dynamically:
+        1. Changed several functions on `core/`, `pose/`, `face/`, and `hand/` modules.
+    3. `CPU_ONLY` changed by `USE_CUDA` to keep format.
 3. Main bugs fixed:
-    1. Ubuntu installer script now works even if Python pip was not installed previously.
+    1. Scaling resize issue fixed: ~1-pixel offset due to not considering 0-based indexes.
+    2. Ubuntu installer script now works even if Python pip was not installed previously.
+    3. Flags to set first and last frame as well as jumping frames backward and forward now works on image directory reader.
+
+
+
+## Current version (future OpenPose 1.2.1)

@@ -43,12 +43,10 @@ namespace op
         }
     }
 
-    PoseExtractor::PoseExtractor(const Point<int>& netOutputSize, const Point<int>& outputSize,
-                                 const PoseModel poseModel, const std::vector<HeatMapType>& heatMapTypes,
+    PoseExtractor::PoseExtractor(const PoseModel poseModel, const std::vector<HeatMapType>& heatMapTypes,
                                  const ScaleMode heatMapScale) :
         mPoseModel{poseModel},
-        mNetOutputSize{netOutputSize},
-        mOutputSize{outputSize},
+        mNetOutputSize{0,0},
         mHeatMapTypes{heatMapTypes},
         mHeatMapScaleMode{heatMapScale}
     {
@@ -105,15 +103,19 @@ namespace op
             Array<float> heatMaps;
             if (!mHeatMapTypes.empty())
             {
+                // Get heatmaps size
+                const auto heatMapSize = getHeatMapSize();
+
                 // Allocate memory
                 const auto numberHeatMapChannels = getNumberHeatMapChannels(mHeatMapTypes, mPoseModel);
-                heatMaps.reset({numberHeatMapChannels, mNetOutputSize.y, mNetOutputSize.x});
+                heatMaps.reset({numberHeatMapChannels, heatMapSize[2], heatMapSize[3]});
 
                 // Copy memory
                 const auto channelOffset = heatMaps.getVolume(1, 2);
                 const auto volumeBodyParts = POSE_NUMBER_BODY_PARTS[(int)mPoseModel] * channelOffset;
                 const auto volumePAFs = POSE_BODY_PART_PAIRS[(int)mPoseModel].size() * channelOffset;
                 unsigned int totalOffset = 0u;
+                // Body parts
                 if (heatMapTypesHas(mHeatMapTypes, HeatMapType::Parts))
                 {
                     #ifdef USE_CUDA
@@ -137,6 +139,7 @@ namespace op
                             heatMaps[i] = fastTruncate(heatMaps[i]);
                     totalOffset += (unsigned int)volumeBodyParts;
                 }
+                // Background
                 if (heatMapTypesHas(mHeatMapTypes, HeatMapType::Background))
                 {
                     #ifdef USE_CUDA
@@ -162,6 +165,7 @@ namespace op
                             heatMapsPtr[i] = fastTruncate(heatMapsPtr[i]);
                     totalOffset += (unsigned int)channelOffset;
                 }
+                // PAFs
                 if (heatMapTypesHas(mHeatMapTypes, HeatMapType::PAFs))
                 {
                     #ifdef USE_CUDA
@@ -210,6 +214,20 @@ namespace op
         {
             checkThread();
             return mPoseKeypoints;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return Array<float>{};
+        }
+    }
+
+    Array<float> PoseExtractor::getPoseScores() const
+    {
+        try
+        {
+            checkThread();
+            return mPoseScores;
         }
         catch (const std::exception& e)
         {

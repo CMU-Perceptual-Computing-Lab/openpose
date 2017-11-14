@@ -15,7 +15,7 @@ Issues/comments which do not follow these rules will be **ignored or removed** w
 
 
 ### Executed Command (if any)
-Note: add `--logging_level 0` to get higher debug information.
+Note: add `--logging_level 0 --disable_multi_thread` to get higher debug information.
 
 
 
@@ -36,10 +36,10 @@ You might select multiple topics, delete the rest:
 
 ### Your System Configuration
 **Operating system** (`lsb_release -a` in Ubuntu):
-**Installation mode**: CMake, sh script, or manual Makefile installation (Ubuntu); VS2015, VS2017, CMake, ... (Windows)
+**Installation mode**: CMake, sh script, manual Makefile installation, ... (Ubuntu); VS2015, VS2017, CMake, ... (Windows); ...?
 **CUDA version** (`cat /usr/local/cuda/version.txt` in most cases):
 **cuDNN version**:
 **GPU model** (`nvidia-smi` in Ubuntu):
-**Caffe version**: Default from OpenPose or custom version.
-**OpenCV version**: pre-compiled `apt-get install libopencv-dev` (only Ubuntu); OpenPose default (only Windows); compiled from source: 2.4.9, 2.4.12, 3.1, 3.2, ...
+**Caffe version**: Default from OpenPose, custom version, ...?
+**OpenCV version**: pre-compiled `apt-get install libopencv-dev` (only Ubuntu); OpenPose default (only Windows); compiled from source? If so, 2.4.9, 2.4.12, 3.1, 3.2?; ...?
 Compiler (`gcc --version` in Ubuntu):

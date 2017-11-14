@@ -9,8 +9,9 @@ namespace op
     class OP_API CvMatToOpInput
     {
     public:
-        Array<float> createArray(const cv::Mat& cvInputData, const std::vector<double>& scaleInputToNetInputs,
-                                 const std::vector<Point<int>>& netInputSizes) const;
+        std::vector<Array<float>> createArray(const cv::Mat& cvInputData,
+                                              const std::vector<double>& scaleInputToNetInputs,
+                                              const std::vector<Point<int>>& netInputSizes) const;
     };
 }
 
