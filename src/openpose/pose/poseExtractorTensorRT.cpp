@@ -50,7 +50,7 @@ namespace op
                                       const Point<int>& outputSize, const int scaleNumber,
                                       const PoseModel poseModel, const int gpuId,
                                       const std::string& modelFolder, const bool enableGoogleLogging) :
-                mResizeScale{mNetOutputSize.x / (float)netInputSize.x},
+                mResizeScale{netOutputSize.x / (float)netInputSize.x},
                 spNet{std::make_shared<NetTensorRT>(std::array<int,4>{scaleNumber, 3,
                                                     (int)netInputSize.y, (int)netInputSize.x},
                                                     modelFolder + POSE_PROTOTXT[(int)poseModel],
