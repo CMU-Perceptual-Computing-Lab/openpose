@@ -643,7 +643,6 @@ namespace op
 #else
                     poseExtractors.emplace_back(std::make_shared<PoseExtractorCaffe>(
 #endif
-                        poseNetInputSize, poseNetOutputSize, finalOutputSize, wrapperStructPose.scalesNumber,
                         wrapperStructPose.poseModel, modelFolder, gpuId + gpuNumberStart,
                         wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale,
                         wrapperStructPose.enableGoogleLogging
