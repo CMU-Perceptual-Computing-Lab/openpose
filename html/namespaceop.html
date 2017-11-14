@@ -157,6 +157,10 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_w_scale_and_size_extractor.html">WScaleAndSizeExtractor</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_person_id_extractor.html">PersonIdExtractor</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_w_person_id_extractor.html">WPersonIdExtractor</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_face_cpu_renderer.html">FaceCpuRenderer</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_face_detector.html">FaceDetector</a></td></tr>
@@ -470,6 +474,8 @@ Functions</h2></td></tr>
 <tr class="separator:a1d9f50688522ed7368acc33a09ae9ece"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaca98fe6101cda512a43c513182ae5cc"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#aaca98fe6101cda512a43c513182ae5cc">COMPILE_TEMPLATE_DATUM</a> (<a class="el" href="classop_1_1_w_scale_and_size_extractor.html">WScaleAndSizeExtractor</a>)</td></tr>
 <tr class="separator:aaca98fe6101cda512a43c513182ae5cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a674a652ad38b355285417529fc050847"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a674a652ad38b355285417529fc050847">COMPILE_TEMPLATE_DATUM</a> (<a class="el" href="classop_1_1_w_person_id_extractor.html">WPersonIdExtractor</a>)</td></tr>
+<tr class="separator:a674a652ad38b355285417529fc050847"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5fc85e8500dbeda3b75c1b6ecfac91cd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a5fc85e8500dbeda3b75c1b6ecfac91cd">renderFaceKeypointsCpu</a> (<a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt; &amp;frameArray, const <a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt; &amp;faceKeypoints, const float renderThreshold)</td></tr>
 <tr class="separator:a5fc85e8500dbeda3b75c1b6ecfac91cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1e997077b4c7e1d68c8191e0b377f4c6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a1e997077b4c7e1d68c8191e0b377f4c6">renderFaceKeypointsGpu</a> (float *framePtr, const <a class="el" href="structop_1_1_point.html">Point</a>&lt; int &gt; &amp;frameSize, const float *const facePtr, const int numberPeople, const float renderThreshold, const float alphaColorToAdd=<a class="el" href="namespaceop.html#a15f6c39797cee87f6aa941d93f22b78b">FACE_DEFAULT_ALPHA_KEYPOINT</a>)</td></tr>
@@ -1807,22 +1813,6 @@ template&lt;typename TPointerContainer &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a5660f0e72781ce6d7db9eb78b582e5c6"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">op::COMPILE_TEMPLATE_DATUM </td>
-          <td>(</td>
-          <td class="paramtype">WorkerProducer&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a class="anchor" id="a01aa5c6e24026536367cf47a64e9bba5"></a>
 <div class="memitem">
 <div class="memproto">
@@ -1831,6 +1821,22 @@ template&lt;typename TPointerContainer &gt; </div>
           <td class="memname">op::COMPILE_TEMPLATE_DATUM </td>
           <td>(</td>
           <td class="paramtype">WorkerConsumer&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a5660f0e72781ce6d7db9eb78b582e5c6"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">op::COMPILE_TEMPLATE_DATUM </td>
+          <td>(</td>
+          <td class="paramtype">WorkerProducer&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1887,6 +1893,22 @@ template&lt;typename TPointerContainer &gt; </div>
 
 </div>
 </div>
+<a class="anchor" id="a196f17357cd1c1bb02e24e4e8a0e6ec3"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">op::COMPILE_TEMPLATE_DATUM </td>
+          <td>(</td>
+          <td class="paramtype">WFaceDetector&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a class="anchor" id="a1d9f50688522ed7368acc33a09ae9ece"></a>
 <div class="memitem">
 <div class="memproto">
@@ -1903,22 +1925,6 @@ template&lt;typename TPointerContainer &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a0424a8e4dc8ceb5e8d8a2230c157a7fd"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">op::COMPILE_TEMPLATE_DATUM </td>
-          <td>(</td>
-          <td class="paramtype">WHandDetector&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a class="anchor" id="a767385c8d3ebe736e1752825ab4d4ea0"></a>
 <div class="memitem">
 <div class="memproto">
@@ -1927,6 +1933,22 @@ template&lt;typename TPointerContainer &gt; </div>
           <td class="memname">op::COMPILE_TEMPLATE_DATUM </td>
           <td>(</td>
           <td class="paramtype">WHandDetectorFromTxt&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a0424a8e4dc8ceb5e8d8a2230c157a7fd"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">op::COMPILE_TEMPLATE_DATUM </td>
+          <td>(</td>
+          <td class="paramtype">WHandDetector&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1967,14 +1989,14 @@ template&lt;typename TPointerContainer &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a196f17357cd1c1bb02e24e4e8a0e6ec3"></a>
+<a class="anchor" id="a674a652ad38b355285417529fc050847"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">op::COMPILE_TEMPLATE_DATUM </td>
           <td>(</td>
-          <td class="paramtype">WFaceDetector&#160;</td>
+          <td class="paramtype">WPersonIdExtractor&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -2191,22 +2213,6 @@ template&lt;typename TPointerContainer &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="ac610051ddb4703c80e6ee73f77f6df8a"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">op::COMPILE_TEMPLATE_DATUM </td>
-          <td>(</td>
-          <td class="paramtype">WFaceExtractor&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a class="anchor" id="a31ad937a2e52ea08ce925031d26616b9"></a>
 <div class="memitem">
 <div class="memproto">
@@ -2215,6 +2221,22 @@ template&lt;typename TPointerContainer &gt; </div>
           <td class="memname">op::COMPILE_TEMPLATE_DATUM </td>
           <td>(</td>
           <td class="paramtype">WPoseSaver&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ac610051ddb4703c80e6ee73f77f6df8a"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">op::COMPILE_TEMPLATE_DATUM </td>
+          <td>(</td>
+          <td class="paramtype">WFaceExtractor&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>

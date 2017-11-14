@@ -28,6 +28,7 @@ var searchData=
   ['worker',['Worker',['../classop_1_1_worker.html',1,'op']]],
   ['workerconsumer',['WorkerConsumer',['../classop_1_1_worker_consumer.html',1,'op']]],
   ['workerproducer',['WorkerProducer',['../classop_1_1_worker_producer.html',1,'op']]],
+  ['wpersonidextractor',['WPersonIdExtractor',['../classop_1_1_w_person_id_extractor.html',1,'op']]],
   ['wposeextractor',['WPoseExtractor',['../classop_1_1_w_pose_extractor.html',1,'op']]],
   ['wposerenderer',['WPoseRenderer',['../classop_1_1_w_pose_renderer.html',1,'op']]],
   ['wposesaver',['WPoseSaver',['../classop_1_1_w_pose_saver.html',1,'op']]],

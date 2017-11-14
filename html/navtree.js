@@ -36,10 +36,10 @@ var NAVTREEINDEX =
 [
 "annotated.html",
 "classop_1_1_nms_caffe.html#a7bb4d872cd3673bcf868049a3aedb393",
-"classop_1_1_w_face_saver.html#a5dc60ede4b88594d59ece4ce3e4683d6",
-"file_stream_8hpp.html#adbf40f4d71086d4e072e8dba79e8a41a",
-"pose_2enum_classes_8hpp.html#a37c58b781e5bcd9fee67a7768afc5d0ea04576b26f5dc3637bf3c8168fba1641d",
-"structop_1_1_wrapper_struct_hand.html#a667ad7eed9f4f96b460f331d25f3d87f"
+"classop_1_1_w_face_renderer.html#a7b72c70dc02c9209d84992caad6ad7d0",
+"file_saver_8hpp_source.html",
+"open_cv_8hpp.html#acb254b70d044335beb825174f62c7685",
+"structop_1_1_rectangle.html#addb67763ca3a0ca9fd4f7184ad9d11ae"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

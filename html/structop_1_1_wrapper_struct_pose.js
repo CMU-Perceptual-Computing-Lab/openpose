@@ -1,6 +1,6 @@
 var structop_1_1_wrapper_struct_pose =
 [
-    [ "WrapperStructPose", "structop_1_1_wrapper_struct_pose.html#a58486eb3fae95724eb9994fe5a8ebbac", null ],
+    [ "WrapperStructPose", "structop_1_1_wrapper_struct_pose.html#a939631f393e87c1b53c25c37c8d551d3", null ],
     [ "alphaHeatMap", "structop_1_1_wrapper_struct_pose.html#ac1233492c750fbd98df353bffa8f9b78", null ],
     [ "alphaKeypoint", "structop_1_1_wrapper_struct_pose.html#a4d3ad84b14697d5f1009fa29e2ff1998", null ],
     [ "blendOriginalFrame", "structop_1_1_wrapper_struct_pose.html#aa2cee9019b708d48cc18313615d0189e", null ],
@@ -11,6 +11,7 @@ var structop_1_1_wrapper_struct_pose =
     [ "gpuNumberStart", "structop_1_1_wrapper_struct_pose.html#a8be188d871061079432ead77b278fe0d", null ],
     [ "heatMapScale", "structop_1_1_wrapper_struct_pose.html#abeb9ae450a7b37e76075c8dca64b3617", null ],
     [ "heatMapTypes", "structop_1_1_wrapper_struct_pose.html#aa459f2f26c1f1a929af55b8c2d39ccf6", null ],
+    [ "identification", "structop_1_1_wrapper_struct_pose.html#a0aa4454f4a528f28395e2463ffd8d1af", null ],
     [ "keypointScale", "structop_1_1_wrapper_struct_pose.html#a4900b6c522150140d27f2e98a260e0ec", null ],
     [ "modelFolder", "structop_1_1_wrapper_struct_pose.html#a8ff78782ff1bfdcec3e20e42fc03dbc6", null ],
     [ "netInputSize", "structop_1_1_wrapper_struct_pose.html#acff912f14ba3c0ba706ea99e1cef790e", null ],

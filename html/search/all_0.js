@@ -12,6 +12,7 @@ var searchData=
   ['array',['Array',['../classop_1_1_array.html#a793b9851c7490bc98d4dd52020c0cd3c',1,'op::Array::Array(const int size)'],['../classop_1_1_array.html#a48c1ba1f7017b5aa8e0451079dd3a6d3',1,'op::Array::Array(const std::vector&lt; int &gt; &amp;sizes={})'],['../classop_1_1_array.html#ac833fdcb245fcc3135ce65227bb9e4b2',1,'op::Array::Array(const int size, const T value)'],['../classop_1_1_array.html#a959ede0df7e535d2d3ac40d098541c27',1,'op::Array::Array(const std::vector&lt; int &gt; &amp;sizes, const T value)'],['../classop_1_1_array.html#a5a68cca98a3ebaf565f1e546eebd9f01',1,'op::Array::Array(const Array&lt; T &gt; &amp;array)'],['../classop_1_1_array.html#a7a7d854d63815e10e158fe889d17a88e',1,'op::Array::Array(Array&lt; T &gt; &amp;&amp;array)']]],
   ['array_2ehpp',['array.hpp',['../array_8hpp.html',1,'']]],
   ['array_3c_20float_20_3e',['Array&lt; float &gt;',['../classop_1_1_array.html',1,'op']]],
+  ['array_3c_20long_20long_20_3e',['Array&lt; long long &gt;',['../classop_1_1_array.html',1,'op']]],
   ['arrayclose',['arrayClose',['../classop_1_1_json_ofstream.html#a3f940d3ad51d0acb7126d62a5617fd69',1,'op::JsonOfstream']]],
   ['arrayopen',['arrayOpen',['../classop_1_1_json_ofstream.html#a4cc6d50256354b3dc7385e2db01aabc0',1,'op::JsonOfstream']]],
   ['asynchronous',['Asynchronous',['../namespaceop.html#a3593e2d53bec533f0048ef3973eebd36a288aae25bc408055f50c21c991903a44',1,'op']]],

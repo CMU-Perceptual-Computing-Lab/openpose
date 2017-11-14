@@ -21,6 +21,8 @@ var namespaceop =
     [ "WKeypointScaler", "classop_1_1_w_keypoint_scaler.html", "classop_1_1_w_keypoint_scaler" ],
     [ "WOpOutputToCvMat", "classop_1_1_w_op_output_to_cv_mat.html", "classop_1_1_w_op_output_to_cv_mat" ],
     [ "WScaleAndSizeExtractor", "classop_1_1_w_scale_and_size_extractor.html", "classop_1_1_w_scale_and_size_extractor" ],
+    [ "PersonIdExtractor", "classop_1_1_person_id_extractor.html", "classop_1_1_person_id_extractor" ],
+    [ "WPersonIdExtractor", "classop_1_1_w_person_id_extractor.html", "classop_1_1_w_person_id_extractor" ],
     [ "FaceCpuRenderer", "classop_1_1_face_cpu_renderer.html", "classop_1_1_face_cpu_renderer" ],
     [ "FaceDetector", "classop_1_1_face_detector.html", "classop_1_1_face_detector" ],
     [ "FaceDetectorOpenCV", "classop_1_1_face_detector_open_c_v.html", "classop_1_1_face_detector_open_c_v" ],

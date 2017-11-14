@@ -47,6 +47,7 @@ var searchData=
   ['pose_5fprototxt',['POSE_PROTOTXT',['../namespaceop.html#a2d63d4b60789b52bb8524b7596cb73a7',1,'op']]],
   ['pose_5ftrained_5fmodel',['POSE_TRAINED_MODEL',['../namespaceop.html#ad964ad6758567f7244d134599e8cb04b',1,'op']]],
   ['poseheatmaps',['poseHeatMaps',['../structop_1_1_datum.html#a5429e97e0ab9b0e2209a3947af668381',1,'op::Datum']]],
+  ['poseids',['poseIds',['../structop_1_1_datum.html#aba90dccffb5a830296231bd430c4766c',1,'op::Datum']]],
   ['posekeypoints',['poseKeypoints',['../structop_1_1_datum.html#a6d629b1f6f7b958fe4cf2ef4cdf57c5b',1,'op::Datum']]],
   ['posemodel',['poseModel',['../structop_1_1_wrapper_struct_pose.html#a35147b6fb9e300d79b71637793053a1b',1,'op::WrapperStructPose']]],
   ['posescores',['poseScores',['../structop_1_1_datum.html#afb117821de7aff9ac3c219ef3bbc0c14',1,'op::Datum']]],

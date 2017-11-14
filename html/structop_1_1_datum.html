@@ -161,6 +161,8 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a0d1f1c3d3494386e2d652268f6e17b5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6d629b1f6f7b958fe4cf2ef4cdf57c5b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structop_1_1_datum.html#a6d629b1f6f7b958fe4cf2ef4cdf57c5b">poseKeypoints</a></td></tr>
 <tr class="separator:a6d629b1f6f7b958fe4cf2ef4cdf57c5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aba90dccffb5a830296231bd430c4766c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classop_1_1_array.html">Array</a>&lt; long long &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structop_1_1_datum.html#aba90dccffb5a830296231bd430c4766c">poseIds</a></td></tr>
+<tr class="separator:aba90dccffb5a830296231bd430c4766c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afb117821de7aff9ac3c219ef3bbc0c14"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structop_1_1_datum.html#afb117821de7aff9ac3c219ef3bbc0c14">poseScores</a></td></tr>
 <tr class="separator:afb117821de7aff9ac3c219ef3bbc0c14"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5429e97e0ab9b0e2209a3947af668381"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structop_1_1_datum.html#a5429e97e0ab9b0e2209a3947af668381">poseHeatMaps</a></td></tr>
@@ -569,7 +571,7 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Rendered image in cv::Mat uchar format. It has been resized to the desired output resolution (e.g. <code>resolution</code> flag in the demo). If outputData is empty, then cvOutputData will also be empty. Size: (output_height x output_width) x 3 channels </p>
+<p>Rendered image in cv::Mat uchar format. It has been resized to the desired output resolution (e.g. <code>resolution</code> flag in the demo). If outputData is empty, cvOutputData will also be empty. Size: (output_height x output_width) x 3 channels </p>
 
 </div>
 </div>
@@ -686,7 +688,7 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Original image to be processed in <a class="el" href="classop_1_1_array.html">Array&lt;float&gt;</a> format. It has been resized to the net input resolution, as well as reformatted <a class="el" href="classop_1_1_array.html">Array&lt;float&gt;</a> format to be compatible with the net. In case of &gt;1 scales, then each scale is right- and bottom-padded to fill the greatest resolution. The scales are sorted from bigger to smaller. Vector size: #scales Each array size: 3 x input_net_height x input_net_width </p>
+<p>Original image to be processed in <a class="el" href="classop_1_1_array.html">Array&lt;float&gt;</a> format. It has been resized to the net input resolution, as well as reformatted <a class="el" href="classop_1_1_array.html">Array&lt;float&gt;</a> format to be compatible with the net. If &gt;1 scales, each scale is right- and bottom-padded to fill the greatest resolution. The scales are sorted from bigger to smaller. Vector size: #scales Each array size: 3 x input_net_height x input_net_width </p>
 
 </div>
 </div>
@@ -738,7 +740,7 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Rendered image in <a class="el" href="classop_1_1_array.html">Array&lt;float&gt;</a> format. It consists of a blending of the cvInputData and the pose/body part(s) heatmap/PAF(s). If rendering is disabled (e.g. <code>no_render_pose</code> flag in the demo), then outputData will be empty. Size: 3 x output_net_height x output_net_width </p>
+<p>Rendered image in <a class="el" href="classop_1_1_array.html">Array&lt;float&gt;</a> format. It consists of a blending of the cvInputData and the pose/body part(s) heatmap/PAF(s). If rendering is disabled (e.g. <code>no_render_pose</code> flag in the demo), outputData will be empty. Size: 3 x output_net_height x output_net_width </p>
 
 </div>
 </div>
@@ -752,6 +754,19 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Body pose heatmaps (body parts, background and/or PAFs) for the whole image. This parameters is by default empty and disabled for performance. Each group (body parts, background and PAFs) can be individually enabled. #heatmaps = #body parts (if enabled) + 1 (if background enabled) + 2 x <a class="el" href="namespaceop.html#a1c3dbc214e7552f7ef9cc753ee97226ba21c5c3f60f4881b8d5477f5628db74f1">PAFs</a> (if enabled). Each PAF has 2 consecutive channels, one for x- and one for y-coordinates. Order heatmaps: body parts + background (as appears in POSE_BODY_PART_MAPPING) + (x,y) channel of each PAF (sorted as appears in POSE_BODY_PART_PAIRS). See <code><a class="el" href="pose_parameters_8hpp.html">pose/poseParameters.hpp</a></code>. The user can choose the heatmaps normalization: ranges [0, 1], [-1, 1] or [0, 255]. Check the <code>heatmaps_scale</code> flag in the examples/tutorial_wrapper/ for more details. Size: #heatmaps x output_net_height x output_net_width </p>
+
+</div>
+</div>
+<a class="anchor" id="aba90dccffb5a830296231bd430c4766c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classop_1_1_array.html">Array</a>&lt;long long&gt; op::Datum::poseIds</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>People ID It returns a person ID for each body pose, providing temporal consistency. The ID will be the same one for a person across frames. I.e. this ID allows to keep track of the same person in time. If either person identification is disabled or poseKeypoints is empty, poseIds will also be empty. Size: #people </p>
 
 </div>
 </div>
@@ -777,7 +792,7 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Body pose global confidence/score for each person in the image. It does not only consider the score of each body keypoint, but also the score of each PAF association. Optimized for COCO evaluation metric. It will highly penalyze people with missing body parts (e.g. cropped people on the borders of the image). If poseKeypoints is empty, then poseScores will also be empty. Size: #people </p>
+<p>Body pose global confidence/score for each person in the image. It does not only consider the score of each body keypoint, but also the score of each PAF association. Optimized for COCO evaluation metric. It will highly penalyze people with missing body parts (e.g. cropped people on the borders of the image). If poseKeypoints is empty, poseScores will also be empty. Size: #people </p>
 
 </div>
 </div>
