@@ -339,9 +339,10 @@ namespace op
             if (inputData.getNumberDimensions() != 4 || inputData.getSize(1) != 3)
                 error("The Array inputData must have 4 dimensions: [batch size, 3 (RGB), height, width].",
                       __LINE__, __FUNCTION__, __FILE__);
-            // Reshape Caffe net if required
+            // Reshape Tensor RT net if required
             if (!vectorsAreEqual(upImpl->mNetInputSize4D, inputData.getSize()))
             {
+                std::cout << "Reshaping Tensor RT Net : WARNING NOT TESTED, probably won't work" << std::endl;
                 upImpl->mNetInputSize4D = inputData.getSize();
                 reshapeNetTensorRT(upImpl->spInputBlob, inputData.getSize());
             }
@@ -357,7 +358,7 @@ namespace op
             buffers[1] = upImpl->spOutputBlob->mutable_gpu_data();
             
             // Perform deep network forward pass
-            upImpl->cudaContext->enqueue(1, &buffers[0], upImpl->stream, nullptr);
+            upImpl->cudaContext->enqueue(inputData.getSize(0), &buffers[0], upImpl->stream, nullptr);
             
             // Cuda checks
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
