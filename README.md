@@ -1,5 +1,5 @@
 <div align="center">
-    <img src=".github/Logo_main_black.png", width="240">
+    <img src=".github/Logo_main_black.png", width="360">
 </div>
 
 -----------------
@@ -8,11 +8,14 @@
 |-------------|
 |[![Build Status](https://travis-ci.org/CMU-Perceptual-Computing-Lab/openpose.svg?branch=master)](https://travis-ci.org/CMU-Perceptual-Computing-Lab/openpose)|
 
+OpenPose represents the **first real-time multi-person system to jointly detect human body, hand, and facial keypoints (in total 130 keypoints) on single images**.
+
 <p align="center">
     <img src="doc/media/pose_face_hands.gif", width="480">
 </p>
 
-OpenPose represents the **first real-time multi-person system to jointly detect human body, hand and facial keypoints (in total 130 keypoints) on single images**. **Functionality**:
+**Functionality**:
+
 - **Real-time multi-person keypoint detection**.
     - 15 or **18-keypoint body estimation**. **Running time invariant to number of detected people**.
     - **2x21-keypoint hand** estimation. Currently, **running time depends** on **number of detected people**.
@@ -40,12 +43,6 @@ OpenPose represents the **first real-time multi-person system to jointly detect 
 2. [Results](#results)
 3. [Installation, Reinstallation and Uninstallation](#installation-reinstallation-and-uninstallation)
 4. [Quick Start](#quick-start)
-    1. [Demo](#demo)
-    2. [OpenPose Wrapper](#openpose-wrapper)
-    3. [Adding An Extra Module](#adding-an-extra-module)
-    4. [OpenPose C++ API](#openpose-c-api)
-    5. [Standalone Face Or Hand Detector](#standalone-face-or-hand-detector)
-    6. [Library Dependencies](#library-dependencies)
 5. [Output](#output)
 6. [Speeding Up OpenPose and Benchmark](#speeding-up-openpose-and-benchmark)
 7. [Send Us Failure Cases and Feedback!](#send-us-failure-cases-and-feedback)
@@ -81,25 +78,19 @@ See [doc/installation.md](doc/installation.md) for instructions on how to build 
 ## Quick Start
 Most users do not need the [OpenPose C++ API](#openpose-c-api), but they can simply use the basic [Demo](#demo) and/or [OpenPose Wrapper](#openpose-wrapper).
 
-### Demo
-Ideal to process images/video/webcam and display/save the results. Check [doc/demo_overview.md](doc/demo_overview.md).
+- **Demo**: To easily process images/video/webcam and display/save the results. See [doc/demo_overview.md](doc/demo_overview.md).
 
-### OpenPose Wrapper
-Ideal if you want to read a specific input, and/or add your custom post-processing function, and/or implement your own display/saving. Take a look to the `Wrapper` tutorial on [examples/tutorial_wrapper/](examples/tutorial_wrapper/). You might create your custom code on [examples/user_code/](examples/user_code/) and compile it by using `make all` in the OpenPose folder.
+- **OpenPose Wrapper**: If you want to read a specific input, and/or add your custom post-processing function, and/or implement your own display/saving, check the `Wrapper` tutorial on [examples/tutorial_wrapper/](examples/tutorial_wrapper/). You can create your custom code on [examples/user_code/](examples/user_code/) and quickly compile it by using `make all` in the OpenPose folder (assuming Makefile installer).
 
-### Adding An Extra Module
-Learn how to easily add an extra module to OpenPose in [doc/library_add_new_module.md](./library_add_new_module.md).
+- **Adding An Extra Module**: Check [doc/library_add_new_module.md](./library_add_new_module.md).
 
-### OpenPose C++ API
-Your case if you want to use the C++ API. See [doc/library_introduction.md](doc/library_introduction.md).
+- **OpenPose C++ API**: See [doc/library_introduction.md](doc/library_introduction.md).
 
-### Standalone Face Or Hand Detector
-If you do not need the body detector and want to speed up the face keypoint detection, you can use the OpenCV-based approach, see [doc/standalone_face_or_hand_keypoint_detector.md](doc/standalone_face_or_hand_keypoint_detector.md).
+- **Standalone Face Or Hand Detector**:
+    - Face keypoint detection without body keypoint detection: If you want to speed it up (but also reduce amount of detected faces), check the OpenCV-face-detector approach in [doc/standalone_face_or_hand_keypoint_detector.md](doc/standalone_face_or_hand_keypoint_detector.md).
+    - You can use the hand and/or face keypoint detectors with your own face or hand detectors, rather than using the body detector. E.g. useful for camera views at which the hands are visible but not the body, so that the OpenPose detector would fail. See [doc/standalone_face_or_hand_keypoint_detector.md](doc/standalone_face_or_hand_keypoint_detector.md).
 
-You can also use the OpenPose hand and/or face keypoint detectors with your own face or hand detectors, rather than using the body detector. E.g. useful for camera views at which the hands are visible but not the body, so that the OpenPose detector would fail. See [doc/standalone_face_or_hand_keypoint_detector.md](doc/standalone_face_or_hand_keypoint_detector.md).
-
-### Library Dependencies
-OpenPose currently uses OpenCV and Caffe, as well as any Caffe dependency. The demos additionally use GFlags. It could easily be ported to other deep learning frameworks (Tensorflow, Torch, ...). Feel free to make a pull request if you implement any of those!
+- **Library Dependencies**: OpenPose uses default Caffe and OpenCV, as well as any Caffe dependency. The demos additionally use GFlags. It could easily be ported to other deep learning frameworks (Tensorflow, Torch, ...). Feel free to make a pull request if you implement any of those!
 
 
 
