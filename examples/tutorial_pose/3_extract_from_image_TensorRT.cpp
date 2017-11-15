@@ -110,7 +110,7 @@ int openPoseTutorialPose3()
     op::ScaleAndSizeExtractor scaleAndSizeExtractor(netInputSize, outputSize, FLAGS_scale_number, FLAGS_scale_gap);
     op::CvMatToOpInput cvMatToOpInput;
     op::CvMatToOpOutput cvMatToOpOutput;
-    op::PoseExtractorCaffe poseExtractorTensorRT{poseModel, FLAGS_model_folder,
+    op::PoseExtractorTensorRT poseExtractorTensorRT{poseModel, FLAGS_model_folder,
         FLAGS_num_gpu_start, {}, op::ScaleMode::ZeroToOne, enableGoogleLogging};
     op::PoseCpuRenderer poseRenderer{poseModel, (float)FLAGS_render_threshold, !FLAGS_disable_blending,
         (float)FLAGS_alpha_pose};
@@ -171,9 +171,6 @@ int openPoseTutorialPose3()
 
 int main(int argc, char *argv[])
 {
-    // Initializing google logging (Caffe uses it for logging)
-    google::InitGoogleLogging("openPoseTutorialPose3");
-
     // Parsing command line flags
     gflags::ParseCommandLineFlags(&argc, &argv, true);
 

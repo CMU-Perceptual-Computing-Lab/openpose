@@ -51,7 +51,7 @@ class Logger : public ILogger
 namespace op
 {
     std::mutex sMutexNetTensorRT;
-    std::atomic<bool> sGoogleLoggingInitialized{false};
+    std::atomic<bool> sGoogleLoggingInitializedTensorRT{false}; // Already defined in netCaffe
     
     struct NetTensorRT::ImplNetTensorRT
     {
@@ -82,7 +82,7 @@ namespace op
             ImplNetTensorRT(const std::string& caffeProto, const std::string& caffeTrainedModel, const int gpuId,
                          const bool enableGoogleLogging, const std::string& lastBlobName) :
                 mGpuId{gpuId},
-                mCaffeProto{caffeProto}, // TODO, no size, how to proceed ?
+                mCaffeProto{caffeProto + std::string("_368x656")}, // TODO, no size, how to proceed ?
                 mCaffeTrainedModel{caffeTrainedModel},
                 mLastBlobName{lastBlobName}
             {
@@ -95,13 +95,13 @@ namespace op
                         error("Caffe trained model file not found: " + mCaffeTrainedModel + message,
                               __LINE__, __FUNCTION__, __FILE__);
                         // Double if condition in order to speed up the program if it is called several times
-                        if (enableGoogleLogging && !sGoogleLoggingInitialized)
+                        if (enableGoogleLogging && !sGoogleLoggingInitializedTensorRT)
                         {
                             std::lock_guard<std::mutex> lock{sMutexNetTensorRT};
-                            if (enableGoogleLogging && !sGoogleLoggingInitialized)
+                            if (enableGoogleLogging && !sGoogleLoggingInitializedTensorRT)
                             {
                                 google::InitGoogleLogging("OpenPose");
-                                sGoogleLoggingInitialized = true;
+                                sGoogleLoggingInitializedTensorRT = true;
                             }
                         }
             }

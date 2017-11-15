@@ -67,7 +67,7 @@ namespace op
     };
 
     #ifdef USE_CAFFE
-        std::vector<caffe::Blob<float>*> caffeNetSharedToPtr(
+        std::vector<caffe::Blob<float>*> tensorRTNetSharedToPtr(
                                                              std::vector<boost::shared_ptr<caffe::Blob<float>>>& caffeNetOutputBlob)
         {
             try
@@ -98,7 +98,7 @@ namespace op
             try
             {
                 // HeatMaps extractor blob and layer
-                const auto caffeNetOutputBlobs = caffeNetSharedToPtr(caffeNetOutputBlob);
+                const auto caffeNetOutputBlobs = tensorRTNetSharedToPtr(caffeNetOutputBlob);
                 resizeAndMergeCaffe->Reshape(caffeNetOutputBlobs, {heatMapsBlob.get()},
                                              POSE_CCN_DECREASE_FACTOR[(int)poseModel], 1.f/scaleInputToNetInput);
                 // Pose extractor blob and layer
@@ -265,7 +265,7 @@ namespace op
                 timeNow("TensorRT forwards");
             
                 // 2. Resize heat maps + merge different scales
-                const auto caffeNetOutputBlobs = caffeNetSharedToPtr(upImpl->spTensorRTNetOutputBlobs);
+                const auto caffeNetOutputBlobs = tensorRTNetSharedToPtr(upImpl->spTensorRTNetOutputBlobs);
                 const std::vector<float> floatScaleRatios(scaleInputToNetInputs.begin(), scaleInputToNetInputs.end());
                 upImpl->spResizeAndMergeCaffe->setScaleRatios(floatScaleRatios);
                 #ifdef USE_CUDA // Implied by tensorrt
