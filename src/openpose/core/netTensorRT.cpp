@@ -307,14 +307,15 @@ namespace op
                     std::cerr << "cudaContext could not be created" << std::endl;
                     return;
                 }
-            
                 DimsCHW outputDims = static_cast<DimsCHW&&>(upImpl->cudaEngine->getBindingDimensions(upImpl->cudaEngine->getNbBindings() - 1));
-                upImpl->mNetOutputSize4D = { 1, outputDims.c(), outputDims.h(), outputDims.w() };
+                upImpl->mNetOutputSize4D.push_back(1);
+                upImpl->mNetOutputSize4D.push_back(outputDims.c());           
+                upImpl->mNetOutputSize4D.push_back(outputDims.h());
+                upImpl->mNetOutputSize4D.push_back(outputDims.w()); 
             
+                //std::cout << "NetInputSize4D: " << upImpl->mNetInputSize4D.at(0) << " " << upImpl->mNetInputSize4D.at(1) << " " << upImpl->mNetInputSize4D.at(2) << " " << upImpl->mNetInputSize4D.at(3) << std::endl;
             
-                std::cout << "NetInputSize4D: " << upImpl->mNetInputSize4D[0] << " " << upImpl->mNetInputSize4D[1] << " " << upImpl->mNetInputSize4D[2] << " " << upImpl->mNetInputSize4D[3] << std::endl;
-            
-                upImpl->spInputBlob = boost::make_shared<caffe::Blob<float>>(upImpl->mNetInputSize4D[0], upImpl->mNetInputSize4D[1], upImpl->mNetInputSize4D[2], upImpl->mNetInputSize4D[3]);
+                upImpl->spInputBlob = boost::make_shared<caffe::Blob<float>>(1, 3, 368, 656);
                 upImpl->spOutputBlob = boost::make_shared<caffe::Blob<float>>(upImpl->mNetOutputSize4D[0], upImpl->mNetOutputSize4D[1], upImpl->mNetOutputSize4D[2], upImpl->mNetOutputSize4D[3]);
             
                 std::cout << "InitializationOnThread : done" << std::endl;
