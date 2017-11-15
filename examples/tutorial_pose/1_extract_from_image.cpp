@@ -99,7 +99,7 @@ int openPoseTutorialPose1()
     // Check no contradictory flags enabled
     if (FLAGS_alpha_pose < 0. || FLAGS_alpha_pose > 1.)
         op::error("Alpha value for blending must be in the range [0,1].", __LINE__, __FUNCTION__, __FILE__);
-    if (FLAGS_scale_gap <= 0. && FLAGS_scale_number > 1)
+    if (FLAGS_scale_gap <= 0. && FLAGS_scale_number > 1.)
         op::error("Incompatible flag configuration: scale_gap must be greater than 0 or scale_number = 1.",
                   __LINE__, __FUNCTION__, __FILE__);
     // Enabling Google Logging
