@@ -101,15 +101,16 @@ $(document).ready(function(){initNavTree('index.html','');});
 <div class="title">OpenPose Documentation</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><div align="center"> &lt;img src=".github/Logo_main_black.png", width="240"&gt; </div> <hr/>
+<div class="textblock"><div align="center"> &lt;img src=".github/Logo_main_black.png", width="360"&gt; </div> <hr/>
 <table class="doxtable">
 <tr>
 <th>**<code>Linux</code>**  </th></tr>
 <tr>
 <td><a href="https://travis-ci.org/CMU-Perceptual-Computing-Lab/openpose">![Build Status](https://travis-ci.org/CMU-Perceptual-Computing-Lab/openpose.svg?branch=master)</a> </td></tr>
 </table>
+<p>OpenPose represents the <b>first real-time multi-person system to jointly detect human body, hand, and facial keypoints (in total 130 keypoints) on single images</b>.</p>
 <p>&lt;img src="doc/media/pose_face_hands.gif", width="480"&gt; </p>
-<p>OpenPose represents the <b>first real-time multi-person system to jointly detect human body, hand and facial keypoints (in total 130 keypoints) on single images</b>. <b>Functionality</b>:</p>
+<p><b>Functionality</b>:</p>
 <ul>
 <li><b>Real-time multi-person keypoint detection</b>.<ul>
 <li>15 or <b>18-keypoint body estimation</b>. <b>Running time invariant to number of detected people</b>.</li>
@@ -137,15 +138,7 @@ $(document).ready(function(){initNavTree('index.html','');});
 <li><a href="#latest-news">Latest News</a></li>
 <li><a href="#results">Results</a></li>
 <li><a href="#installation-reinstallation-and-uninstallation">Installation, Reinstallation and Uninstallation</a></li>
-<li><a href="#quick-start">Quick Start</a><ol type="a">
-<li><a href="#demo">Demo</a></li>
-<li><a href="#openpose-wrapper">OpenPose Wrapper</a></li>
-<li><a href="#adding-an-extra-module">Adding An Extra Module</a></li>
-<li><a href="#openpose-c-api">OpenPose C++ API</a></li>
-<li><a href="#standalone-face-or-hand-detector">Standalone Face Or Hand Detector</a></li>
-<li><a href="#library-dependencies">Library Dependencies</a></li>
-</ol>
-</li>
+<li><a href="#quick-start">Quick Start</a></li>
 <li><a href="#output">Output</a></li>
 <li><a href="#speeding-up-openpose-and-benchmark">Speeding Up OpenPose and Benchmark</a></li>
 <li><a href="#send-us-failure-cases-and-feedback">Send Us Failure Cases and Feedback!</a></li>
@@ -164,19 +157,18 @@ $(document).ready(function(){initNavTree('index.html','');});
 <p>See doc/installation.md for instructions on how to build from source or how to download our portable binaries.</p>
 <h2>Quick Start</h2>
 <p>Most users do not need the <a href="#openpose-c-api">OpenPose C++ API</a>, but they can simply use the basic <a href="#demo">Demo</a> and/or <a href="#openpose-wrapper">OpenPose Wrapper</a>.</p>
-<h3>Demo</h3>
-<p>Ideal to process images/video/webcam and display/save the results. Check doc/demo_overview.md.</p>
-<h3>OpenPose Wrapper</h3>
-<p>Ideal if you want to read a specific input, and/or add your custom post-processing function, and/or implement your own display/saving. Take a look to the <code>Wrapper</code> tutorial on <a href="examples/tutorial_wrapper/">examples/tutorial_wrapper/</a>. You might create your custom code on <a href="examples/user_code/">examples/user_code/</a> and compile it by using <code>make all</code> in the OpenPose folder.</p>
-<h3>Adding An Extra Module</h3>
-<p>Learn how to easily add an extra module to OpenPose in ./library_add_new_module.md "doc/library_add_new_module.md".</p>
-<h3>OpenPose C++ API</h3>
-<p>Your case if you want to use the C++ API. See doc/library_introduction.md.</p>
-<h3>Standalone Face Or Hand Detector</h3>
-<p>If you do not need the body detector and want to speed up the face keypoint detection, you can use the OpenCV-based approach, see doc/standalone_face_or_hand_keypoint_detector.md.</p>
-<p>You can also use the OpenPose hand and/or face keypoint detectors with your own face or hand detectors, rather than using the body detector. E.g. useful for camera views at which the hands are visible but not the body, so that the OpenPose detector would fail. See doc/standalone_face_or_hand_keypoint_detector.md.</p>
-<h3>Library Dependencies</h3>
-<p>OpenPose currently uses OpenCV and Caffe, as well as any Caffe dependency. The demos additionally use GFlags. It could easily be ported to other deep learning frameworks (Tensorflow, Torch, ...). Feel free to make a pull request if you implement any of those!</p>
+<ul>
+<li><b>Demo</b>: To easily process images/video/webcam and display/save the results. See doc/demo_overview.md.</li>
+<li><b>OpenPose Wrapper</b>: If you want to read a specific input, and/or add your custom post-processing function, and/or implement your own display/saving, check the <code>Wrapper</code> tutorial on <a href="examples/tutorial_wrapper/">examples/tutorial_wrapper/</a>. You can create your custom code on <a href="examples/user_code/">examples/user_code/</a> and quickly compile it by using <code>make all</code> in the OpenPose folder (assuming Makefile installer).</li>
+<li><b>Adding An Extra Module</b>: Check ./library_add_new_module.md "doc/library_add_new_module.md".</li>
+<li><b>OpenPose C++ API</b>: See doc/library_introduction.md.</li>
+<li><b>Standalone Face Or Hand Detector</b>:<ul>
+<li>Face keypoint detection without body keypoint detection: If you want to speed it up (but also reduce amount of detected faces), check the OpenCV-face-detector approach in doc/standalone_face_or_hand_keypoint_detector.md.</li>
+<li>You can use the hand and/or face keypoint detectors with your own face or hand detectors, rather than using the body detector. E.g. useful for camera views at which the hands are visible but not the body, so that the OpenPose detector would fail. See doc/standalone_face_or_hand_keypoint_detector.md.</li>
+</ul>
+</li>
+<li><b>Library Dependencies</b>: OpenPose uses default Caffe and OpenCV, as well as any Caffe dependency. The demos additionally use GFlags. It could easily be ported to other deep learning frameworks (Tensorflow, Torch, ...). Feel free to make a pull request if you implement any of those!</li>
+</ul>
 <h2>Output</h2>
 <p>Output (format, keypoint index ordering, etc.) in doc/output.md.</p>
 <h2>Speeding Up OpenPose and Benchmark</h2>

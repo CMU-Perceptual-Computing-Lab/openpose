@@ -845,16 +845,16 @@ Generati/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpos
 /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/wrapper/wrapperStructPose.hpp:111: warning: explicit link request to 'body' could not be resolved
 /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/wrapper/wrapperStructPose.hpp:111: warning: explicit link request to 'body' could not be resolved
 /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/wrapper/wrapperStructPose.hpp:111: warning: explicit link request to 'pair' could not be resolved
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:34: warning: unable to resolve reference to `doc/release_notes.md' for \ref command
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:77: warning: unable to resolve reference to `doc/installation.md' for \ref command
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:39: warning: unable to resolve reference to `doc/release_notes.md' for \ref command
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:76: warning: unable to resolve reference to `doc/installation.md' for \ref command
 /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:85: warning: unable to resolve reference to `doc/demo_overview.md' for \ref command
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:91: warning: unexpected token TK_EOF as the argument of ref
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:94: warning: unable to resolve reference to `doc/library_introduction.md' for \ref command
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:97: warning: unable to resolve reference to `doc/standalone_face_or_hand_keypoint_detector.md' for \ref command
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:99: warning: unable to resolve reference to `doc/standalone_face_or_hand_keypoint_detector.md' for \ref command
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:107: warning: unable to resolve reference to `doc/output.md' for \ref command
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:112: warning: explicit link request to 'faq' could not be resolved
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:137: warning: unable to resolve reference to `doc/contributors.md' for \ref command
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:89: warning: unexpected token TK_EOF as the argument of ref
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:91: warning: unable to resolve reference to `doc/library_introduction.md' for \ref command
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:94: warning: unable to resolve reference to `doc/standalone_face_or_hand_keypoint_detector.md' for \ref command
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:95: warning: unable to resolve reference to `doc/standalone_face_or_hand_keypoint_detector.md' for \ref command
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:102: warning: unable to resolve reference to `doc/output.md' for \ref command
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:107: warning: explicit link request to 'faq' could not be resolved
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:132: warning: unable to resolve reference to `doc/contributors.md' for \ref command
 ng docs for compound op::QueueBase...
 Generating docs for compound op::SubThread...
 Generating docs for compound op::SubThreadNoQueue...
