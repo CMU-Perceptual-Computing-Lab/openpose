@@ -72,7 +72,7 @@ namespace op
         {
             try
             {
-                // Prepare spCaffeNetOutputBlobss
+                // Prepare spTensorRTNetOutputBlobss
                 std::vector<caffe::Blob<float>*> caffeNetOutputBlobs(caffeNetOutputBlob.size());
                 for (auto i = 0u ; i < caffeNetOutputBlobs.size() ; i++)
                     caffeNetOutputBlobs[i] = caffeNetOutputBlob[i].get();
@@ -190,7 +190,7 @@ namespace op
                 // Logging
                 log("Starting initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 // Initialize Caffe net
-                addTensorRTNetOnThread(upImpl->spCaffeNets, upImpl->spCaffeNetOutputBlobs, upImpl->mPoseModel,
+                addTensorRTNetOnThread(upImpl->spTensorRTNets, upImpl->spTensorRTNetOutputBlobs, upImpl->mPoseModel,
                                     upImpl->mGpuId, upImpl->mModelFolder, upImpl->mEnableGoogleLogging);
             
                 cudaCheck(__LINE__, __FUNCTION__, __FILE__);
@@ -212,7 +212,9 @@ namespace op
         }
     }
 
-    void PoseExtractorTensorRT::forwardPass(const Array<float>& inputNetData, const Point<int>& inputDataSize, const std::vector<float>& scaleRatios)
+    void PoseExtractorTensorRT::forwardPass(const std::vector<Array<float>>& inputNetData,
+                                            const Point<int>& inputDataSize,
+                                            const std::vector<double>& scaleInputToNetInputs)
     {
         try
         {
@@ -232,15 +234,15 @@ namespace op
                 // Resize std::vectors if required
                 const auto numberScales = inputNetData.size();
                 upImpl->mNetInput4DSizes.resize(numberScales);
-                while (upImpl->spCaffeNets.size() < numberScales)
-                    addCaffeNetOnThread(upImpl->spCaffeNets, upImpl->spCaffeNetOutputBlobs, upImpl->mPoseModel,
+                while (upImpl->spTensorRTNets.size() < numberScales)
+                    addTensorRTNetOnThread(upImpl->spTensorRTNets, upImpl->spTensorRTNetOutputBlobs, upImpl->mPoseModel,
                                         upImpl->mGpuId, upImpl->mModelFolder, false);
             
                 // Process each image
                 for (auto i = 0u ; i < inputNetData.size(); i++)
                 {
                     // 1. TensorRT deep network
-                    upImpl->spTensorRTNets->forwardPass(inputNetData.getConstPtr());
+                    upImpl->spTensorRTNets.at(i)->forwardPass(inputNetData[i]);
                     
                     // Reshape blobs if required
                     // Note: In order to resize to input size to have same results as Matlab, uncomment the commented
@@ -253,7 +255,7 @@ namespace op
                             upImpl->mNetInput4DSizes[0][2]};
                         // upImpl->mScaleInputToNetInputs = scaleInputToNetInputs;
                         reshapePoseExtractorCaffe(upImpl->spResizeAndMergeCaffe, upImpl->spNmsCaffe,
-                                                  upImpl->spBodyPartConnectorCaffe, upImpl->spCaffeNetOutputBlobs,
+                                                  upImpl->spBodyPartConnectorCaffe, upImpl->spTensorRTNetOutputBlobs,
                                                   upImpl->spHeatMapsBlob, upImpl->spPeaksBlob, upImpl->spPoseBlob,
                                                   1.f, mPoseModel);
                         // scaleInputToNetInputs[i], mPoseModel);
@@ -263,7 +265,7 @@ namespace op
                 timeNow("TensorRT forwards");
             
                 // 2. Resize heat maps + merge different scales
-                const auto caffeNetOutputBlobs = caffeNetSharedToPtr(upImpl->spCaffeNetOutputBlobs);
+                const auto caffeNetOutputBlobs = caffeNetSharedToPtr(upImpl->spTensorRTNetOutputBlobs);
                 const std::vector<float> floatScaleRatios(scaleInputToNetInputs.begin(), scaleInputToNetInputs.end());
                 upImpl->spResizeAndMergeCaffe->setScaleRatios(floatScaleRatios);
                 #ifdef USE_CUDA // Implied by tensorrt

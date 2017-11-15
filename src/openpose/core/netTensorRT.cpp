@@ -24,7 +24,7 @@
 //#include <string.h>
 //#include <map>
 //#include <random>
-//#include <boost/make_shared.hpp>
+#include <boost/make_shared.hpp>
 
 
 #ifdef USE_TENSORRT
@@ -34,8 +34,8 @@
     using namespace nvinfer1;
     using namespace nvcaffeparser1;
 
-//std::vector<std::string> gInputs;
-//std::map<std::string, DimsCHW> gInputDimensions;
+    std::vector<std::string> gInputs;
+    std::map<std::string, DimsCHW> gInputDimensions;
 #endif // USE_TENSORRT
 
 // Logger for GIE info/warning/errors
@@ -68,15 +68,14 @@ namespace op
         
             // Init with constructor
             //const std::array<int, 4> mNetInputSize4D;
-            //std::array<int, 4> mNetOutputSize4D;
-            //const unsigned long mNetInputMemory;
+            std::vector<int> mNetOutputSize4D;
             // Init with thread
         
             // TensorRT stuff
             nvinfer1::ICudaEngine* cudaEngine;
             nvinfer1::IExecutionContext* cudaContext;
-            nvinfer1::ICudaEngine* caffeToGIEModel();
-            nvinfer1::ICudaEngine* createEngine();
+            //nvinfer1::ICudaEngine* caffeToGIEModel();
+            //nvinfer1::ICudaEngine* createEngine();
             cudaStream_t stream;
             cudaEvent_t start, end;
     
@@ -119,8 +118,8 @@ namespace op
         // parse the caffe model to populate the network, then set the outputs
         INetworkDefinition* network = builder->createNetwork();
         ICaffeParser* parser = createCaffeParser();
-        const IBlobNameToTensor* blobNameToTensor = parser->parse(mCaffeProto.c_str(),
-                                                                  mCaffeTrainedModel.c_str(),
+        const IBlobNameToTensor* blobNameToTensor = parser->parse(upImpl->mCaffeProto.c_str(),
+                                                                  upImpl->mCaffeTrainedModel.c_str(),
                                                                   *network,
                                                                   DataType::kFLOAT);
         
@@ -139,12 +138,12 @@ namespace op
         }
         
         // Specify which tensor is output (multiple unsupported)
-        if (blobNameToTensor->find(mLastBlobName.c_str()) == nullptr)
+        if (blobNameToTensor->find(upImpl->mLastBlobName.c_str()) == nullptr)
         {
-            std::cout << "could not find output blob " << mLastBlobName.c_str() << std::endl;
+            std::cout << "could not find output blob " << upImpl->mLastBlobName.c_str() << std::endl;
             return nullptr;
         }
-        network->markOutput(*blobNameToTensor->find(mLastBlobName.c_str()));
+        network->markOutput(*blobNameToTensor->find(upImpl->mLastBlobName.c_str()));
         
         
         for (int i = 0, n = network->getNbOutputs(); i < n; i++)
@@ -176,7 +175,7 @@ namespace op
     {
         ICudaEngine *engine;
         
-        std::string serializedEnginePath = mCaffeProto + ".bin";
+        std::string serializedEnginePath = upImpl->mCaffeProto + ".bin";
         
         std::cout << "Serialized engine path: " << serializedEnginePath.c_str() << std::endl;
         if (existFile(serializedEnginePath))
@@ -226,12 +225,12 @@ namespace op
         return engine;
     }
     
-    inline void reshapeNetTensorRT(caffe::Net<float>* caffeNet, const std::vector<int>& dimensions)
+    inline void reshapeNetTensorRT(boost::shared_ptr<caffe::Blob<float>> inputBlob, const std::vector<int>& dimensions)
     {
         try
         {
-            caffeNet->blobs()[0]->Reshape(dimensions);
-            caffeNet->Reshape();
+            inputBlob->Reshape(dimensions);
+            //caffeNet->Reshape(); TODO find TensorRT equivalent
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
         }
         catch (const std::exception& e)
@@ -251,10 +250,10 @@ namespace op
         try
         {
             #ifdef USE_TENSORRT
-                std::cout << "Caffe file: " << mCaffeProto.c_str() << std::endl;
-                CUDA_CHECK(cudaStreamCreate(&stream));
-                CUDA_CHECK(cudaEventCreate(&start));
-                CUDA_CHECK(cudaEventCreate(&end));
+                std::cout << "Caffe file: " << upImpl->mCaffeProto.c_str() << std::endl;
+                CUDA_CHECK(cudaStreamCreate(&upImpl->stream));
+                CUDA_CHECK(cudaEventCreate(&upImpl->start));
+                CUDA_CHECK(cudaEventCreate(&upImpl->end));
             #else
                 UNUSED(netInputSize4D);
                 UNUSED(caffeProto);
@@ -273,12 +272,12 @@ namespace op
     
     NetTensorRT::~NetTensorRT()
     {
-        cudaStreamDestroy(stream);
-        cudaEventDestroy(start);
-        cudaEventDestroy(end);
+        cudaStreamDestroy(upImpl->stream);
+        cudaEventDestroy(upImpl->start);
+        cudaEventDestroy(upImpl->end);
         
-        if (cudaEngine)
-            cudaEngine->destroy();
+        if (upImpl->cudaEngine)
+            upImpl->cudaEngine->destroy();
     }
     
     void NetTensorRT::initializationOnThread()
@@ -289,12 +288,12 @@ namespace op
             #ifdef USE_TENSORRT
                 std::cout << "InitializationOnThread : setting device" << std::endl;
                 // Initialize net
-                cudaSetDevice(mGpuId);
+                cudaSetDevice(upImpl->mGpuId);
             
                 std::cout << "InitializationOnThread : creating engine" << std::endl;
             
-                cudaEngine = createEngine();
-                if (!cudaEngine)
+                upImpl->cudaEngine = createEngine();
+                if (!upImpl->cudaEngine)
                 {
                     std::cerr << "cudaEngine could not be created" << std::endl;
                     return;
@@ -302,21 +301,21 @@ namespace op
             
                 std::cout << "InitializationOnThread Pass : creating execution context" << std::endl;
             
-                cudaContext = cudaEngine->createExecutionContext();
-                if (!cudaContext)
+                upImpl->cudaContext = upImpl->cudaEngine->createExecutionContext();
+                if (!upImpl->cudaContext)
                 {
                     std::cerr << "cudaContext could not be created" << std::endl;
                     return;
                 }
             
-                DimsCHW outputDims = static_cast<DimsCHW&&>(cudaEngine->getBindingDimensions(cudaEngine->getNbBindings() - 1));
-                mNetOutputSize4D = { 1, outputDims.c(), outputDims.h(), outputDims.w() };
+                DimsCHW outputDims = static_cast<DimsCHW&&>(upImpl->cudaEngine->getBindingDimensions(upImpl->cudaEngine->getNbBindings() - 1));
+                upImpl->mNetOutputSize4D = { 1, outputDims.c(), outputDims.h(), outputDims.w() };
             
             
-                std::cout << "NetInputSize4D: " << mNetInputSize4D[0] << " " << mNetInputSize4D[1] << " " << mNetInputSize4D[2] << " " << mNetInputSize4D[3] << std::endl;
+                std::cout << "NetInputSize4D: " << upImpl->mNetInputSize4D[0] << " " << upImpl->mNetInputSize4D[1] << " " << upImpl->mNetInputSize4D[2] << " " << upImpl->mNetInputSize4D[3] << std::endl;
             
-                upImpl->spInputBlob = boost::make_shared<caffe::Blob<float>>(mNetInputSize4D[0], mNetInputSize4D[1], mNetInputSize4D[2], mNetInputSize4D[3]);
-                upImpl->spOutputBlob = boost::make_shared<caffe::Blob<float>>(mNetOutputSize4D[0], mNetOutputSize4D[1], mNetOutputSize4D[2], mNetOutputSize4D[3]);
+                upImpl->spInputBlob = boost::make_shared<caffe::Blob<float>>(upImpl->mNetInputSize4D[0], upImpl->mNetInputSize4D[1], upImpl->mNetInputSize4D[2], upImpl->mNetInputSize4D[3]);
+                upImpl->spOutputBlob = boost::make_shared<caffe::Blob<float>>(upImpl->mNetOutputSize4D[0], upImpl->mNetOutputSize4D[1], upImpl->mNetOutputSize4D[2], upImpl->mNetOutputSize4D[3]);
             
                 std::cout << "InitializationOnThread : done" << std::endl;
                 cudaCheck(__LINE__, __FUNCTION__, __FILE__);
@@ -343,12 +342,12 @@ namespace op
             if (!vectorsAreEqual(upImpl->mNetInputSize4D, inputData.getSize()))
             {
                 upImpl->mNetInputSize4D = inputData.getSize();
-                reshapeNetTensorRT(upImpl->upCaffeNet.get(), inputData.getSize());
+                reshapeNetTensorRT(upImpl->spInputBlob, inputData.getSize());
             }
             
             // Copy frame data to GPU memory
             auto* gpuImagePtr = upImpl->spInputBlob->mutable_gpu_data();
-            CUDA_CHECK(cudaMemcpy(gpuImagePtr, inputData.getConstPtr(), mNetInputMemory, cudaMemcpyHostToDevice));
+            CUDA_CHECK(cudaMemcpy(gpuImagePtr, inputData.getConstPtr(), inputData.getVolume() * sizeof(float), cudaMemcpyHostToDevice));
             
             // input and output buffer pointers that we pass to the engine - the engine requires exactly IEngine::getNbBindings(),
             // of these, but in this case we know that there is exactly one input and one output.
@@ -357,7 +356,7 @@ namespace op
             buffers[1] = upImpl->spOutputBlob->mutable_gpu_data();
             
             // Perform deep network forward pass
-            cudaContext->enqueue(batchSize, &buffers[0], stream, nullptr);
+            upImpl->cudaContext->enqueue(1, &buffers[0], upImpl->stream, nullptr);
             
             // Cuda checks
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);

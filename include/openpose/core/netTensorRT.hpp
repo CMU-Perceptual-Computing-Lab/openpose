@@ -5,31 +5,32 @@
 #include <openpose/core/net.hpp>
 
 
-#include "NvInfer.h"
+#ifdef USE_TENSORRT
+    #include "NvInfer.h"
+#endif
 
 namespace op
 {
     class OP_API NetTensorRT : public Net
     {
     public:
-        NetTensorRT(const std::array<int, 4>& netInputSize4D, const std::string& caffeProto, const std::string& caffeTrainedModel, const int gpuId = 0,
+        NetTensorRT(const std::string& caffeProto, const std::string& caffeTrainedModel, const int gpuId = 0, const bool enableGoogleLogging = true,
                  const std::string& lastBlobName = "net_output");
 
         virtual ~NetTensorRT();
 
         void initializationOnThread();
 
-        // Alternative a) getInputDataCpuPtr or getInputDataGpuPtr + forwardPass
-        float* getInputDataCpuPtr() const;
-
-        float* getInputDataGpuPtr() const;
-
-        // Alternative b)
-        void forwardPass(const float* const inputNetData = nullptr) const;
+        void forwardPass(const Array<float>& inputNetData) const;
 
         boost::shared_ptr<caffe::Blob<float>> getOutputBlob() const;
-
+    
     private:
+#ifdef USE_TENSORRT
+        nvinfer1::ICudaEngine* caffeToGIEModel();
+        
+        nvinfer1::ICudaEngine* createEngine();
+#endif
         // PIMPL idiom
         // http://www.cppsamples.com/common-tasks/pimpl.html
         struct ImplNetTensorRT;
