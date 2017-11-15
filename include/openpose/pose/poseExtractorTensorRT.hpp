@@ -10,7 +10,7 @@ namespace op
     class OP_API PoseExtractorTensorRT : public PoseExtractor
     {
     public:
-        PoseExtractorTensorRT(const std::string& modelFolder, const int gpuId,
+        PoseExtractorTensorRT(const PoseModel poseModel, const std::string& modelFolder, const int gpuId,
                               const std::vector<HeatMapType>& heatMapTypes = {},
                               const ScaleMode heatMapScale = ScaleMode::ZeroToOne,
                               const bool enableGoogleLogging = true);
@@ -19,10 +19,9 @@ namespace op
 
         void netInitializationOnThread();
 
-        void forwardPass(const Array<float>& inputNetData, const Point<int>& inputDataSize,
-                         const std::vector<float>& scaleRatios = {1.f});
+        void forwardPass(const std::vector<Array<float>>& inputNetData, const Point<int>& inputDataSize,
+                         const std::vector<double>& scaleInputToNetInputs = {1.f});
 
-         
         const float* getHeatMapCpuConstPtr() const;
 
         const float* getHeatMapGpuConstPtr() const;
@@ -31,7 +30,7 @@ namespace op
 
         const float* getPoseGpuConstPtr() const;
 
-  private:
+    private:
         // PIMPL idiom
         // http://www.cppsamples.com/common-tasks/pimpl.html
         struct ImplPoseExtractorTensorRT;

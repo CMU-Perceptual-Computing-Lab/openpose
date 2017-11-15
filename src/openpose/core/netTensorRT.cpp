@@ -1,310 +1,390 @@
-#ifdef USE_TENSORRT
 #include <numeric> // std::accumulate
+#ifdef USE_TENSORRT
+    #include <atomic>
+    #include <mutex>
+    #include <caffe/net.hpp>
+    #include <glog/logging.h> // google::InitGoogleLogging
+#endif
 #include <openpose/utilities/cuda.hpp>
+#include <openpose/utilities/fileSystem.hpp>
+#include <openpose/utilities/standard.hpp>
 #include <openpose/core/netTensorRT.hpp>
-#include <assert.h>
-#include <fstream>
-#include <sstream>
-#include <iostream>
-#include <cmath>
-#include <sys/stat.h>
-#include <cmath>
-#include <time.h>
-#include <cuda_runtime_api.h>
-#include <algorithm>
-#include <chrono>
-#include <string.h>
-#include <map>
-#include <random>
-#include <boost/make_shared.hpp>
 
-#include "NvInfer.h"
-#include "NvCaffeParser.h"
-
-using namespace nvinfer1;
-using namespace nvcaffeparser1;
+//#include <assert.h>
+//#include <fstream>
+//#include <sstream>
+//#include <iostream>
+//#include <cmath>
+//#include <sys/stat.h>
+//#include <cmath>
+//#include <time.h>
+//#include <cuda_runtime_api.h>
+//#include <algorithm>
+//#include <chrono>
+//#include <string.h>
+//#include <map>
+//#include <random>
+//#include <boost/make_shared.hpp>
 
 
-std::vector<std::string> gInputs;
-std::map<std::string, DimsCHW> gInputDimensions;
+#ifdef USE_TENSORRT
+    #include "NvInfer.h"
+    #include "NvCaffeParser.h"
 
+    using namespace nvinfer1;
+    using namespace nvcaffeparser1;
+
+//std::vector<std::string> gInputs;
+//std::map<std::string, DimsCHW> gInputDimensions;
+#endif // USE_TENSORRT
 
 // Logger for GIE info/warning/errors
 class Logger : public ILogger
 {
-  void log(Severity severity, const char* msg) override
-  {
-    // if suppress info-level message:  if (severity != Severity::kINFO)
-    std::cout << msg << std::endl;
-  }
+    void log(Severity severity, const char* msg) override
+    {
+        // if suppress info-level message:  if (severity != Severity::kINFO)
+        std::cout << msg << std::endl;
+    }
 } gLogger;
-
 
 namespace op
 {
-  NetTensorRT::NetTensorRT(const std::array<int, 4>& netInputSize4D, const std::string& caffeProto, const std::string& caffeTrainedModel, const int gpuId, const std::string& lastBlobName) :
-  mGpuId{gpuId},
-  // mNetInputSize4D{netInputSize4D}, // This line crashes on some devices with old G++
-  mNetInputSize4D{netInputSize4D[0], netInputSize4D[1], netInputSize4D[2], netInputSize4D[3]},
-  mNetInputMemory{std::accumulate(mNetInputSize4D.begin(), mNetInputSize4D.end(), 1, std::multiplies<int>()) * sizeof(float)},
-  mCaffeProto{caffeProto + "_" + std::to_string(mNetInputSize4D[2]) + "x" + std::to_string(mNetInputSize4D[3])},
-  mCaffeTrainedModel{caffeTrainedModel},
-  mLastBlobName{lastBlobName}
-  {
-    std::cout << "Caffe file: " << mCaffeProto.c_str() << std::endl;
-    CUDA_CHECK(cudaStreamCreate(&stream));
-    CUDA_CHECK(cudaEventCreate(&start));
-    CUDA_CHECK(cudaEventCreate(&end));
-  }
-  
-  NetTensorRT::~NetTensorRT()
-  {
-    cudaStreamDestroy(stream);
-    cudaEventDestroy(start);
-    cudaEventDestroy(end);
+    std::mutex sMutexNetTensorRT;
+    std::atomic<bool> sGoogleLoggingInitialized{false};
     
-    if (cudaEngine)
-      cudaEngine->destroy();
-  }
-  
-  
-  ICudaEngine* NetTensorRT::caffeToGIEModel()
-  {
-    // create the builder
-    IBuilder* builder = createInferBuilder(gLogger);
-    
-    // parse the caffe model to populate the network, then set the outputs
-    INetworkDefinition* network = builder->createNetwork();
-    ICaffeParser* parser = createCaffeParser();
-    const IBlobNameToTensor* blobNameToTensor = parser->parse(mCaffeProto.c_str(),
-                                                              mCaffeTrainedModel.c_str(),
-                                                              *network,
-                                                              DataType::kFLOAT);
-    
-    if (!blobNameToTensor)
-      return nullptr;
-    
-    
-    for (int i = 0, n = network->getNbInputs(); i < n; i++)
+    struct NetTensorRT::ImplNetTensorRT
     {
-      DimsCHW dims = static_cast<DimsCHW&&>(network->getInput(i)->getDimensions());
-      gInputs.push_back(network->getInput(i)->getName());
-      gInputDimensions.insert(std::make_pair(network->getInput(i)->getName(), dims));
-      std::cout << "Input \"" << network->getInput(i)->getName() << "\": " << dims.c() << "x" << dims.h() << "x" << dims.w() << std::endl;
-      if( i > 0)
-        std::cerr << "Multiple output unsupported for now!";
-    }
-    
-    // Specify which tensor is output (multiple unsupported)
-    if (blobNameToTensor->find(mLastBlobName.c_str()) == nullptr)
-    {
-      std::cout << "could not find output blob " << mLastBlobName.c_str() << std::endl;
-      return nullptr;
-    }
-    network->markOutput(*blobNameToTensor->find(mLastBlobName.c_str()));
-    
-    
-    for (int i = 0, n = network->getNbOutputs(); i < n; i++)
-    {
-      DimsCHW dims = static_cast<DimsCHW&&>(network->getOutput(i)->getDimensions());
-      std::cout << "Output \"" << network->getOutput(i)->getName() << "\": " << dims.c() << "x" << dims.h() << "x" << dims.w() << std::endl;
-    }
-    
-    // Build the engine
-    builder->setMaxBatchSize(1);
-    // 16 megabytes, default in giexec. No idea what's best for Jetson though,
-    // maybe check dusty_nv's code on github
-    builder->setMaxWorkspaceSize(32<<20);
-    builder->setHalf2Mode(false);
-    
-    ICudaEngine* engine = builder->buildCudaEngine(*network);
-    if (engine == nullptr)
-      std::cout << "could not build engine" << std::endl;
-    
-    parser->destroy();
-    network->destroy();
-    builder->destroy();
-    shutdownProtobufLibrary();
-    
-    return engine;
-  }
-  
-  inline bool file_exists(const std::string& file_path) {
-    struct stat buffer;
-    return (stat(file_path.c_str(), &buffer) == 0);
-  }
-  
-  ICudaEngine* NetTensorRT::createEngine()
-  {
-    ICudaEngine *engine;
-    
-    std::string serializedEnginePath = mCaffeProto + ".bin";
-
-    std::cout << "Serialized engine path: " << serializedEnginePath.c_str() << std::endl;
-    if (file_exists(serializedEnginePath))
-    {
-      std::cout << "Found serialized TensorRT engine, deserializing..." << std::endl;
-      char *gieModelStream{nullptr};
-      size_t size{0};
-      std::ifstream file(serializedEnginePath, std::ios::binary);
-      if (file.good())
-      {
-        file.seekg(0, file.end);
-        size = file.tellg();
-        file.seekg(0, file.beg);
-        gieModelStream = new char[size];
-        assert(gieModelStream);
-        file.read(gieModelStream, size);
-        file.close();
-      }
-
-      IRuntime* infer = createInferRuntime(gLogger);
-      engine = infer->deserializeCudaEngine(gieModelStream, size, nullptr);
-      if (gieModelStream) delete [] gieModelStream;
-      
-      return engine; 
-    }
-    else
-    {
-      engine = caffeToGIEModel();
-      if (!engine)
-      {
-        std::cerr << "Engine could not be created" << std::endl;
-        return nullptr;
-      }
-      else // serialize engine
-      {  
-        std::ofstream p(serializedEnginePath);
-        if (!p)
-        {
-          std::cerr << "could not serialize engine" << std::endl;
-        }
-        IHostMemory *ptr = engine->serialize();
-        assert(ptr);
-        p.write(reinterpret_cast<const char*>(ptr->data()), ptr->size());
-        ptr->destroy();
-      }
-    }
-    return engine;
-  }
-  
-  void NetTensorRT::initializationOnThread()
-  {
-    
-    std::cout << "InitializationOnThread : start" << std::endl;
-    
-    try
-    {
-      
-      std::cout << "InitializationOnThread : setting device" << std::endl;
-      // Initialize net
-      cudaSetDevice(mGpuId);
-      
-      std::cout << "InitializationOnThread : creating engine" << std::endl;
-      
-      cudaEngine = createEngine();
-      if (!cudaEngine)
-      {
-        std::cerr << "cudaEngine could not be created" << std::endl;
-        return;
-      }
-      
-      std::cout << "InitializationOnThread Pass : creating execution context" << std::endl;
-      
-      cudaContext = cudaEngine->createExecutionContext();
-      if (!cudaContext)
-      {
-        std::cerr << "cudaContext could not be created" << std::endl;
-        return;
-      }
-
-      DimsCHW outputDims = static_cast<DimsCHW&&>(cudaEngine->getBindingDimensions(cudaEngine->getNbBindings() - 1));      
-      mNetOutputSize4D = { 1, outputDims.c(), outputDims.h(), outputDims.w() };
-
-      
-      std::cout << "NetInputSize4D: " << mNetInputSize4D[0] << " " << mNetInputSize4D[1] << " " << mNetInputSize4D[2] << " " << mNetInputSize4D[3] << std::endl;
-
-      spInputBlob = boost::make_shared<caffe::Blob<float>>(mNetInputSize4D[0], mNetInputSize4D[1], mNetInputSize4D[2], mNetInputSize4D[3]);
-      spOutputBlob = boost::make_shared<caffe::Blob<float>>(mNetOutputSize4D[0], mNetOutputSize4D[1], mNetOutputSize4D[2], mNetOutputSize4D[3]);
-      
-      std::cout << "InitializationOnThread : done" << std::endl;
-      cudaCheck(__LINE__, __FUNCTION__, __FILE__);
-    }
-    catch (const std::exception& e)
-    {
-      error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-    }
-  }
-  
-  float* NetTensorRT::getInputDataCpuPtr() const
-  {
-    try
-    {
-      return spInputBlob->mutable_cpu_data();
-    }
-    catch (const std::exception& e)
-    {
-      error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-      return nullptr;
-    }
-  }
-  
-  float* NetTensorRT::getInputDataGpuPtr() const
-  {
-    try
-    {
-      return spInputBlob->mutable_gpu_data();
-    }
-    catch (const std::exception& e)
-    {
-      error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-      return nullptr;
-    }
-  }
-  
-  void NetTensorRT::forwardPass(const float* const inputData) const
-  {
-    try
-    {
-      const int batchSize = 1;
-      // Copy frame data to GPU memory
-      if (inputData != nullptr)
-      {
-        auto* gpuImagePtr = spInputBlob->mutable_gpu_data();
-        CUDA_CHECK(cudaMemcpy(gpuImagePtr, inputData, mNetInputMemory, cudaMemcpyHostToDevice));
+        #ifdef USE_TENSORRT
+            // Init with constructor
+            const int mGpuId;
+            const std::string mCaffeProto;
+            const std::string mCaffeTrainedModel;
+            const std::string mLastBlobName;
+            std::vector<int> mNetInputSize4D;
+            // Init with thread
+            boost::shared_ptr<caffe::Blob<float>> spInputBlob;
+            boost::shared_ptr<caffe::Blob<float>> spOutputBlob;
         
-        // input and output buffer pointers that we pass to the engine - the engine requires exactly IEngine::getNbBindings(),
-        // of these, but in this case we know that there is exactly one input and one output.
-        std::vector<void*> buffers(2);
-        buffers[0] = spInputBlob->mutable_gpu_data();
-        buffers[1] = spOutputBlob->mutable_gpu_data();
-      
-        cudaContext->enqueue(batchSize, &buffers[0], stream, nullptr);
-      
-        //cudaCheck(__LINE__, __FUNCTION__, __FILE__);
-      }
-    }
-    catch (const std::exception& e)
+            // Init with constructor
+            //const std::array<int, 4> mNetInputSize4D;
+            //std::array<int, 4> mNetOutputSize4D;
+            //const unsigned long mNetInputMemory;
+            // Init with thread
+        
+            // TensorRT stuff
+            nvinfer1::ICudaEngine* cudaEngine;
+            nvinfer1::IExecutionContext* cudaContext;
+            nvinfer1::ICudaEngine* caffeToGIEModel();
+            nvinfer1::ICudaEngine* createEngine();
+            cudaStream_t stream;
+            cudaEvent_t start, end;
+    
+            ImplNetTensorRT(const std::string& caffeProto, const std::string& caffeTrainedModel, const int gpuId,
+                         const bool enableGoogleLogging, const std::string& lastBlobName) :
+                mGpuId{gpuId},
+                mCaffeProto{caffeProto}, // TODO, no size, how to proceed ?
+                mCaffeTrainedModel{caffeTrainedModel},
+                mLastBlobName{lastBlobName}
+            {
+                const std::string message{".\nPossible causes:\n\t1. Not downloading the OpenPose trained models."
+                    "\n\t2. Not running OpenPose from the same directory where the `model`"
+                    " folder is located.\n\t3. Using paths with spaces."};
+                if (!existFile(mCaffeProto))
+                    error("Prototxt file not found: " + mCaffeProto + message, __LINE__, __FUNCTION__, __FILE__);
+                    if (!existFile(mCaffeTrainedModel))
+                        error("Caffe trained model file not found: " + mCaffeTrainedModel + message,
+                              __LINE__, __FUNCTION__, __FILE__);
+                        // Double if condition in order to speed up the program if it is called several times
+                        if (enableGoogleLogging && !sGoogleLoggingInitialized)
+                        {
+                            std::lock_guard<std::mutex> lock{sMutexNetTensorRT};
+                            if (enableGoogleLogging && !sGoogleLoggingInitialized)
+                            {
+                                google::InitGoogleLogging("OpenPose");
+                                sGoogleLoggingInitialized = true;
+                            }
+                        }
+            }
+        #endif
+    };
+    
+    
+#ifdef USE_TENSORRT
+    ICudaEngine* NetTensorRT::caffeToGIEModel()
     {
-      error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        // create the builder
+        IBuilder* builder = createInferBuilder(gLogger);
+        
+        // parse the caffe model to populate the network, then set the outputs
+        INetworkDefinition* network = builder->createNetwork();
+        ICaffeParser* parser = createCaffeParser();
+        const IBlobNameToTensor* blobNameToTensor = parser->parse(mCaffeProto.c_str(),
+                                                                  mCaffeTrainedModel.c_str(),
+                                                                  *network,
+                                                                  DataType::kFLOAT);
+        
+        if (!blobNameToTensor)
+            return nullptr;
+        
+        
+        for (int i = 0, n = network->getNbInputs(); i < n; i++)
+        {
+            DimsCHW dims = static_cast<DimsCHW&&>(network->getInput(i)->getDimensions());
+            gInputs.push_back(network->getInput(i)->getName());
+            gInputDimensions.insert(std::make_pair(network->getInput(i)->getName(), dims));
+            std::cout << "Input \"" << network->getInput(i)->getName() << "\": " << dims.c() << "x" << dims.h() << "x" << dims.w() << std::endl;
+            if( i > 0)
+                std::cerr << "Multiple output unsupported for now!";
+        }
+        
+        // Specify which tensor is output (multiple unsupported)
+        if (blobNameToTensor->find(mLastBlobName.c_str()) == nullptr)
+        {
+            std::cout << "could not find output blob " << mLastBlobName.c_str() << std::endl;
+            return nullptr;
+        }
+        network->markOutput(*blobNameToTensor->find(mLastBlobName.c_str()));
+        
+        
+        for (int i = 0, n = network->getNbOutputs(); i < n; i++)
+        {
+            DimsCHW dims = static_cast<DimsCHW&&>(network->getOutput(i)->getDimensions());
+            std::cout << "Output \"" << network->getOutput(i)->getName() << "\": " << dims.c() << "x" << dims.h() << "x" << dims.w() << std::endl;
+        }
+        
+        // Build the engine
+        builder->setMaxBatchSize(1);
+        // 16 megabytes, default in giexec. No idea what's best for Jetson though,
+        // maybe check dusty_nv's code on github
+        builder->setMaxWorkspaceSize(32<<20);
+        builder->setHalf2Mode(false);
+        
+        ICudaEngine* engine = builder->buildCudaEngine(*network);
+        if (engine == nullptr)
+            std::cout << "could not build engine" << std::endl;
+        
+        parser->destroy();
+        network->destroy();
+        builder->destroy();
+        shutdownProtobufLibrary();
+        
+        return engine;
     }
-  }
-  
-  boost::shared_ptr<caffe::Blob<float>> NetTensorRT::getOutputBlob() const
-  {
-    std::cout << "Getting output blob." << std::endl;
-    try
+
+    ICudaEngine* NetTensorRT::createEngine()
     {
-      return spOutputBlob;
-    }
-    catch (const std::exception& e)
-    {
-      error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-      return nullptr;
+        ICudaEngine *engine;
+        
+        std::string serializedEnginePath = mCaffeProto + ".bin";
+        
+        std::cout << "Serialized engine path: " << serializedEnginePath.c_str() << std::endl;
+        if (existFile(serializedEnginePath))
+        {
+            std::cout << "Found serialized TensorRT engine, deserializing..." << std::endl;
+            char *gieModelStream{nullptr};
+            size_t size{0};
+            std::ifstream file(serializedEnginePath, std::ios::binary);
+            if (file.good())
+            {
+                file.seekg(0, file.end);
+                size = file.tellg();
+                file.seekg(0, file.beg);
+                gieModelStream = new char[size];
+                assert(gieModelStream);
+                file.read(gieModelStream, size);
+                file.close();
+            }
+            
+            IRuntime* infer = createInferRuntime(gLogger);
+            engine = infer->deserializeCudaEngine(gieModelStream, size, nullptr);
+            if (gieModelStream) delete [] gieModelStream;
+            
+            return engine;
+        }
+        else
+        {
+            engine = caffeToGIEModel();
+            if (!engine)
+            {
+                std::cerr << "Engine could not be created" << std::endl;
+                return nullptr;
+            }
+            else // serialize engine
+            {
+                std::ofstream p(serializedEnginePath);
+                if (!p)
+                {
+                    std::cerr << "could not serialize engine" << std::endl;
+                }
+                IHostMemory *ptr = engine->serialize();
+                assert(ptr);
+                p.write(reinterpret_cast<const char*>(ptr->data()), ptr->size());
+                ptr->destroy();
+            }
+        }
+        return engine;
     }
     
-    std::cout << "Got something..." << std::endl;
-  }
+    inline void reshapeNetTensorRT(caffe::Net<float>* caffeNet, const std::vector<int>& dimensions)
+    {
+        try
+        {
+            caffeNet->blobs()[0]->Reshape(dimensions);
+            caffeNet->Reshape();
+            cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+#endif
+    
+    NetTensorRT::NetTensorRT(const std::string& caffeProto, const std::string& caffeTrainedModel, const int gpuId,
+                       const bool enableGoogleLogging, const std::string& lastBlobName)
+#ifdef USE_TENSORRT
+    : upImpl{new ImplNetTensorRT{caffeProto, caffeTrainedModel, gpuId, enableGoogleLogging,
+        lastBlobName}}
+#endif
+    {
+        try
+        {
+            #ifdef USE_TENSORRT
+                std::cout << "Caffe file: " << mCaffeProto.c_str() << std::endl;
+                CUDA_CHECK(cudaStreamCreate(&stream));
+                CUDA_CHECK(cudaEventCreate(&start));
+                CUDA_CHECK(cudaEventCreate(&end));
+            #else
+                UNUSED(netInputSize4D);
+                UNUSED(caffeProto);
+                UNUSED(caffeTrainedModel);
+                UNUSED(gpuId);
+                UNUSED(lastBlobName);
+                error("OpenPose must be compiled with the `USE_CAFFE` macro definition in order to use this"
+                      " functionality.", __LINE__, __FUNCTION__, __FILE__);
+            #endif
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+    
+    NetTensorRT::~NetTensorRT()
+    {
+        cudaStreamDestroy(stream);
+        cudaEventDestroy(start);
+        cudaEventDestroy(end);
+        
+        if (cudaEngine)
+            cudaEngine->destroy();
+    }
+    
+    void NetTensorRT::initializationOnThread()
+    {
+        std::cout << "InitializationOnThread : start" << std::endl;
+        try
+        {
+            #ifdef USE_TENSORRT
+                std::cout << "InitializationOnThread : setting device" << std::endl;
+                // Initialize net
+                cudaSetDevice(mGpuId);
+            
+                std::cout << "InitializationOnThread : creating engine" << std::endl;
+            
+                cudaEngine = createEngine();
+                if (!cudaEngine)
+                {
+                    std::cerr << "cudaEngine could not be created" << std::endl;
+                    return;
+                }
+            
+                std::cout << "InitializationOnThread Pass : creating execution context" << std::endl;
+            
+                cudaContext = cudaEngine->createExecutionContext();
+                if (!cudaContext)
+                {
+                    std::cerr << "cudaContext could not be created" << std::endl;
+                    return;
+                }
+            
+                DimsCHW outputDims = static_cast<DimsCHW&&>(cudaEngine->getBindingDimensions(cudaEngine->getNbBindings() - 1));
+                mNetOutputSize4D = { 1, outputDims.c(), outputDims.h(), outputDims.w() };
+            
+            
+                std::cout << "NetInputSize4D: " << mNetInputSize4D[0] << " " << mNetInputSize4D[1] << " " << mNetInputSize4D[2] << " " << mNetInputSize4D[3] << std::endl;
+            
+                upImpl->spInputBlob = boost::make_shared<caffe::Blob<float>>(mNetInputSize4D[0], mNetInputSize4D[1], mNetInputSize4D[2], mNetInputSize4D[3]);
+                upImpl->spOutputBlob = boost::make_shared<caffe::Blob<float>>(mNetOutputSize4D[0], mNetOutputSize4D[1], mNetOutputSize4D[2], mNetOutputSize4D[3]);
+            
+                std::cout << "InitializationOnThread : done" << std::endl;
+                cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+            #endif
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+    
+    void NetTensorRT::forwardPass(const Array<float>& inputData) const
+    {
+        try
+        {
+            #ifdef USE_TENSORRT
+            // Security checks
+            if (inputData.empty())
+                error("The Array inputData cannot be empty.", __LINE__, __FUNCTION__, __FILE__);
+            if (inputData.getNumberDimensions() != 4 || inputData.getSize(1) != 3)
+                error("The Array inputData must have 4 dimensions: [batch size, 3 (RGB), height, width].",
+                      __LINE__, __FUNCTION__, __FILE__);
+            // Reshape Caffe net if required
+            if (!vectorsAreEqual(upImpl->mNetInputSize4D, inputData.getSize()))
+            {
+                upImpl->mNetInputSize4D = inputData.getSize();
+                reshapeNetTensorRT(upImpl->upCaffeNet.get(), inputData.getSize());
+            }
+            
+            // Copy frame data to GPU memory
+            auto* gpuImagePtr = upImpl->spInputBlob->mutable_gpu_data();
+            CUDA_CHECK(cudaMemcpy(gpuImagePtr, inputData.getConstPtr(), mNetInputMemory, cudaMemcpyHostToDevice));
+            
+            // input and output buffer pointers that we pass to the engine - the engine requires exactly IEngine::getNbBindings(),
+            // of these, but in this case we know that there is exactly one input and one output.
+            std::vector<void*> buffers(2);
+            buffers[0] = upImpl->spInputBlob->mutable_gpu_data();
+            buffers[1] = upImpl->spOutputBlob->mutable_gpu_data();
+            
+            // Perform deep network forward pass
+            cudaContext->enqueue(batchSize, &buffers[0], stream, nullptr);
+            
+            // Cuda checks
+            cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+            
+            #endif
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+    
+    boost::shared_ptr<caffe::Blob<float>> NetTensorRT::getOutputBlob() const
+    {
+        try
+        {
+            #ifdef USE_TENSORRT
+                return upImpl->spOutputBlob;
+            #else
+                return nullptr;
+            #endif
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return nullptr;
+        }
+    }
 }
-
-#endif // USE_TENSORRT
+    

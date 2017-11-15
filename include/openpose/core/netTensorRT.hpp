@@ -1,10 +1,9 @@
-#ifdef USE_TENSORRT
 #ifndef OPENPOSE_CORE_NET_TENSORRT_HPP
 #define OPENPOSE_CORE_NET_TENSORRT_HPP
 
-#include <caffe/net.hpp>
 #include <openpose/core/common.hpp>
 #include <openpose/core/net.hpp>
+
 
 #include "NvInfer.h"
 
@@ -31,30 +30,15 @@ namespace op
         boost::shared_ptr<caffe::Blob<float>> getOutputBlob() const;
 
     private:
-        // Init with constructor
-        const int mGpuId;
-        const std::array<int, 4> mNetInputSize4D;
-        std::array<int, 4> mNetOutputSize4D;
-        const unsigned long mNetInputMemory;
-        const std::string mCaffeProto;
-        const std::string mCaffeTrainedModel;
-        const std::string mLastBlobName;
-        // Init with thread
-      
-        boost::shared_ptr<caffe::Blob<float>> spInputBlob;
-        boost::shared_ptr<caffe::Blob<float>> spOutputBlob;
-      
-        // TensorRT stuff
-        nvinfer1::ICudaEngine* cudaEngine;
-        nvinfer1::IExecutionContext* cudaContext;
-        nvinfer1::ICudaEngine* caffeToGIEModel();
-        nvinfer1::ICudaEngine* createEngine();
-        cudaStream_t stream;
-        cudaEvent_t start, end;
-
+        // PIMPL idiom
+        // http://www.cppsamples.com/common-tasks/pimpl.html
+        struct ImplNetTensorRT;
+        std::unique_ptr<ImplNetTensorRT> upImpl;
+        
+        // PIMP requires DELETE_COPY & destructor, or extra code
+        // http://oliora.github.io/2015/12/29/pimpl-and-rule-of-zero.html
         DELETE_COPY(NetTensorRT);
     };
 }
 
 #endif // OPENPOSE_CORE_NET_TENSORRT_HPP
-#endif // USE_TENSORRT
