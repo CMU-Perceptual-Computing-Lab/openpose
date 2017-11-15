@@ -268,14 +268,10 @@ namespace op
                 const auto caffeNetOutputBlobs = tensorRTNetSharedToPtr(upImpl->spTensorRTNetOutputBlobs);
                 const std::vector<float> floatScaleRatios(scaleInputToNetInputs.begin(), scaleInputToNetInputs.end());
                 upImpl->spResizeAndMergeCaffe->setScaleRatios(floatScaleRatios);
-                #ifdef USE_CUDA // Implied by tensorrt
+            
                 upImpl->spResizeAndMergeCaffe->Forward_gpu(caffeNetOutputBlobs,                             // ~5ms
                                                            {upImpl->spHeatMapsBlob.get()});
                 cudaCheck(__LINE__, __FUNCTION__, __FILE__);
-                #else // Never reached, suppress ?
-                upImpl->spResizeAndMergeCaffe->Forward_cpu({upImpl->spCaffeNetOutputBlob.get()},
-                                                           {upImpl->spHeatMapsBlob.get()});
-                #endif
             
                 timeNow("Resize heat Maps");
             
