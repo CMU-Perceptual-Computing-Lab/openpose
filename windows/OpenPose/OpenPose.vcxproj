@@ -126,6 +126,9 @@
     <ClInclude Include="..\..\include\openpose\experimental\headers.hpp" />
     <ClInclude Include="..\..\include\openpose\experimental\producer\headers.hpp" />
     <ClInclude Include="..\..\include\openpose\experimental\producer\wPeoplePoseLoader.hpp" />
+    <ClInclude Include="..\..\include\openpose\experimental\tracking\headers.hpp" />
+    <ClInclude Include="..\..\include\openpose\experimental\tracking\personIdExtractor.hpp" />
+    <ClInclude Include="..\..\include\openpose\experimental\tracking\wPersonIdExtractor.hpp" />
     <ClInclude Include="..\..\include\openpose\face\faceCpuRenderer.hpp" />
     <ClInclude Include="..\..\include\openpose\face\faceDetector.hpp" />
     <ClInclude Include="..\..\include\openpose\face\faceDetectorOpenCV.hpp" />
@@ -269,6 +272,8 @@
     <ClCompile Include="..\..\src\openpose\core\resizeAndMergeBase.cpp" />
     <ClCompile Include="..\..\src\openpose\core\resizeAndMergeCaffe.cpp" />
     <ClCompile Include="..\..\src\openpose\core\scaleAndSizeExtractor.cpp" />
+    <ClCompile Include="..\..\src\openpose\experimental\tracking\defineTemplates.cpp" />
+    <ClCompile Include="..\..\src\openpose\experimental\tracking\personIdExtractor.cpp" />
     <ClCompile Include="..\..\src\openpose\face\defineTemplates.cpp" />
     <ClCompile Include="..\..\src\openpose\face\faceCpuRenderer.cpp" />
     <ClCompile Include="..\..\src\openpose\face\faceDetector.cpp" />

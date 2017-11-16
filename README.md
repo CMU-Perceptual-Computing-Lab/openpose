@@ -82,15 +82,15 @@ Most users do not need the [OpenPose C++ API](#openpose-c-api), but they can sim
 
 - **OpenPose Wrapper**: If you want to read a specific input, and/or add your custom post-processing function, and/or implement your own display/saving, check the `Wrapper` tutorial on [examples/tutorial_wrapper/](examples/tutorial_wrapper/). You can create your custom code on [examples/user_code/](examples/user_code/) and quickly compile it by using `make all` in the OpenPose folder (assuming Makefile installer).
 
-- **Adding An Extra Module**: Check [doc/library_add_new_module.md](./library_add_new_module.md).
-
 - **OpenPose C++ API**: See [doc/library_introduction.md](doc/library_introduction.md).
 
-- **Standalone Face Or Hand Detector**:
-    - Face keypoint detection without body keypoint detection: If you want to speed it up (but also reduce amount of detected faces), check the OpenCV-face-detector approach in [doc/standalone_face_or_hand_keypoint_detector.md](doc/standalone_face_or_hand_keypoint_detector.md).
-    - You can use the hand and/or face keypoint detectors with your own face or hand detectors, rather than using the body detector. E.g. useful for camera views at which the hands are visible but not the body, so that the OpenPose detector would fail. See [doc/standalone_face_or_hand_keypoint_detector.md](doc/standalone_face_or_hand_keypoint_detector.md).
+- **Adding an extra module**: Check [doc/library_add_new_module.md](./library_add_new_module.md).
 
-- **Library Dependencies**: OpenPose uses default Caffe and OpenCV, as well as any Caffe dependency. The demos additionally use GFlags. It could easily be ported to other deep learning frameworks (Tensorflow, Torch, ...). Feel free to make a pull request if you implement any of those!
+- **Standalone face or hand detector**:
+    - **Face** keypoint detection **without body** keypoint detection: If you want to speed it up (but also reduce amount of detected faces), check the OpenCV-face-detector approach in [doc/standalone_face_or_hand_keypoint_detector.md](doc/standalone_face_or_hand_keypoint_detector.md).
+    - **Use your own face/hand detector**: You can use the hand and/or face keypoint detectors with your own face or hand detectors, rather than using the body detector. E.g. useful for camera views at which the hands are visible but not the body (OpenPose detector would fail). See [doc/standalone_face_or_hand_keypoint_detector.md](doc/standalone_face_or_hand_keypoint_detector.md).
+
+- **Library dependencies**: OpenPose uses default Caffe and OpenCV, as well as any Caffe dependency. The demos additionally use GFlags. It could easily be ported to other deep learning frameworks (Tensorflow, Torch, ...). Feel free to make a pull request if you implement any of those!
 
 
 

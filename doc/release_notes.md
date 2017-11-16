@@ -152,3 +152,5 @@ OpenPose Library - Release Notes
 
 
 ## Current version (future OpenPose 1.2.1)
+3. Main bugs fixed:
+    1. Render working on images > 4K (#324).
