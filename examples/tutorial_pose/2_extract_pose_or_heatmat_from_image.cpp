@@ -131,7 +131,7 @@ int openPoseTutorialPose2()
     const auto poseKeypoints = poseExtractorPtr->getPoseKeypoints();
     const auto scaleNetToOutput = poseExtractorPtr->getScaleNetToOutput();
     // Step 5 - Render pose
-    poseGpuRenderer.renderPose(outputArray, poseKeypoints, scaleNetToOutput);
+    poseGpuRenderer.renderPose(outputArray, poseKeypoints, scaleInputToOutput, scaleNetToOutput);
     // Step 6 - OpenPose output format to cv::Mat
     auto outputImage = opOutputToCvMat.formatToCvMat(outputArray);
 
