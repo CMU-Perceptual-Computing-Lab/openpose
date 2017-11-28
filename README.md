@@ -1,5 +1,5 @@
 <div align="center">
-    <img src=".github/Logo_main_black.png", width="360">
+    <img src=".github/Logo_main_black.png", width="300">
 </div>
 
 -----------------
@@ -20,10 +20,10 @@ OpenPose represents the **first real-time multi-person system to jointly detect 
     - 15 or **18-keypoint body estimation**. **Running time invariant to number of detected people**.
     - **2x21-keypoint hand** estimation. Currently, **running time depends** on **number of detected people**.
     - **70-keypoint face** estimation. Currently, **running time depends** on **number of detected people**.
-- Inputs: Image, video, webcam, and IP camera. Included C++ demos to add your custom input.
-- Outputs: Basic GUI display, keypoint saving (JSON, XML, YML, ...), and/or rendered image/video + keypoint saving (PNG, JPG, AVI, ...).
+- **Input**: Image, video, webcam, and IP camera. Included C++ demos to add your custom input.
+- **Output**: Basic image + keypoint display/saving (PNG, JPG, AVI, ...), keypoint saving (JSON, XML, YML, ...), and/or keypoints as array class.
 - Available: command-line demo, C++ wrapper, and C++ API.
-- OS: Ubuntu, Windows, Nvidia TX2.
+- **OS**: Ubuntu (14, 16), Windows (8, 10), Nvidia TX2.
 
 
 
@@ -78,7 +78,13 @@ See [doc/installation.md](doc/installation.md) for instructions on how to build 
 ## Quick Start
 Most users do not need the [OpenPose C++ API](#openpose-c-api), but they can simply use the basic [Demo](#demo) and/or [OpenPose Wrapper](#openpose-wrapper).
 
-- **Demo**: To easily process images/video/webcam and display/save the results. See [doc/demo_overview.md](doc/demo_overview.md).
+- **Demo**: To easily process images/video/webcam and display/save the results. See [doc/demo_overview.md](doc/demo_overview.md). E.g. run it in a video with:
+```
+# Ubuntu
+./build/examples/openpose/openpose.bin --video examples/media/video.avi
+:: Windows - Portable Demo
+bin\OpenPoseDemo.exe --video examples\media\video.avi
+```
 
 - **OpenPose Wrapper**: If you want to read a specific input, and/or add your custom post-processing function, and/or implement your own display/saving, check the `Wrapper` tutorial on [examples/tutorial_wrapper/](examples/tutorial_wrapper/). You can create your custom code on [examples/user_code/](examples/user_code/) and quickly compile it by using `make all` in the OpenPose folder (assuming Makefile installer).
 

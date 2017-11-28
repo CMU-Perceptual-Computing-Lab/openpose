@@ -281,11 +281,11 @@ namespace op
                 upImpl->spBodyPartConnectorCaffe->setMinSubsetCnt((int)get(PoseProperty::ConnectMinSubsetCnt));
                 upImpl->spBodyPartConnectorCaffe->setMinSubsetScore((float)get(PoseProperty::ConnectMinSubsetScore));
 
-                // GPU version not implemented yet
+                // CUDA version not implemented yet
                 // #ifdef USE_CUDA
                 //     upImpl->spBodyPartConnectorCaffe->Forward_gpu({upImpl->spHeatMapsBlob.get(),
                 //                                                    upImpl->spPeaksBlob.get()},
-                //                                                   {upImpl->spPoseBlob.get()}, mPoseKeypoints);
+                //                                                   mPoseKeypoints, mPoseScores);
                 // #else
                     upImpl->spBodyPartConnectorCaffe->Forward_cpu({upImpl->spHeatMapsBlob.get(),
                                                                    upImpl->spPeaksBlob.get()},

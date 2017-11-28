@@ -22,7 +22,7 @@ Check that the library is working properly by running any of the following comma
 ./build/examples/openpose/openpose.bin --video examples/media/video.avi --face --hand
 ```
 ```
-:: Windows - Demo
+:: Windows - Portable Demo
 bin\OpenPoseDemo.exe --video examples\media\video.avi
 :: With face and hands
 bin\OpenPoseDemo.exe --video examples\media\video.avi --face --hand
@@ -44,7 +44,7 @@ windows\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi --face --h
 ./build/examples/openpose/openpose.bin --face --hand
 ```
 ```
-:: Windows - Demo
+:: Windows - Portable Demo
 bin\OpenPoseDemo.exe
 :: With face and hands
 bin\OpenPoseDemo.exe --face --hand
@@ -66,7 +66,7 @@ windows\x64\Release\OpenPoseDemo.exe --face --hand
 ./build/examples/openpose/openpose.bin --image_dir examples/media/ --face --hand
 ```
 ```
-:: Windows - Demo
+:: Windows - Portable Demo
 bin\OpenPoseDemo.exe --image_dir examples\media\
 :: With face and hands
 bin\OpenPoseDemo.exe --image_dir examples\media\ --face --hand
@@ -89,9 +89,9 @@ This command provides the most accurate results we have been able to achieve for
 ./build/examples/openpose/openpose.bin --net_resolution "1312x736" --scale_number 4 --scale_gap 0.25 --hand --hand_scale_number 6 --hand_scale_range 0.4 --face
 ```
 ```
-:: Windows - Demo: Body
+:: Windows - Portable Demo: Body
 bin\OpenPoseDemo.exe --net_resolution "1312x736" --scale_number 4 --scale_gap 0.25
-:: Windows - Demo: Body + Hand + Face
+:: Windows - Portable Demo: Body + Hand + Face
 bin\OpenPoseDemo.exe --net_resolution "1312x736" --scale_number 4 --scale_gap 0.25 --hand --hand_scale_number 6 --hand_scale_range 0.4 --face
 ```
 ```

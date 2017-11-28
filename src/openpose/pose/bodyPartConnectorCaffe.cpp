@@ -183,20 +183,23 @@ namespace op
     }
 
     template <typename T>
-    void BodyPartConnectorCaffe<T>::Forward_gpu(const std::vector<caffe::Blob<T>*>& bottom,
-                                                const std::vector<caffe::Blob<T>*>& top, Array<T>& poseKeypoints)
+    void BodyPartConnectorCaffe<T>::Forward_gpu(const std::vector<caffe::Blob<T>*>& bottom, Array<T>& poseKeypoints,
+                                                Array<T>& poseScores)
     {
         try
         {
             #if defined USE_CAFFE && defined USE_CUDA
                 const auto heatMapsBlob = bottom.at(0);
-                const auto* const heatMapsPtr = heatMapsBlob->gpu_data();
-                const auto* const peaksPtr = bottom.at(1)->gpu_data();
+                const auto* const heatMapsPtr = heatMapsBlob->cpu_data();
+                const auto* const peaksPtr = bottom.at(1)->cpu_data();
+                const auto* const heatMapsGpuPtr = heatMapsBlob->gpu_data();
+                const auto* const peaksGpuPtr = bottom.at(1)->gpu_data();
                 const auto maxPeaks = mTopSize[1];
-                connectBodyPartsGpu(poseKeypoints, top.at(0)->mutable_gpu_data(), heatMapsPtr, peaksPtr, mPoseModel,
-                                    Point<int>{heatMapsBlob->shape(3), heatMapsBlob->shape(2)}, maxPeaks,
-                                    mInterMinAboveThreshold, mInterThreshold, mMinSubsetCnt, mMinSubsetScore,
-                                    mScaleNetToOutput);
+                connectBodyPartsGpu(poseKeypoints, poseScores, heatMapsPtr, peaksPtr, mPoseModel,
+                                    Point<int>{heatMapsBlob->shape(3), heatMapsBlob->shape(2)},
+                                    maxPeaks, mInterMinAboveThreshold, mInterThreshold,
+                                    mMinSubsetCnt, mMinSubsetScore, mScaleNetToOutput,
+                                    heatMapsGpuPtr, peaksGpuPtr);
             #else
                 UNUSED(bottom);
                 UNUSED(top);
