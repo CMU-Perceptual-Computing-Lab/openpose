@@ -4,7 +4,7 @@ var classop_1_1_body_part_connector_caffe =
     [ "Backward_cpu", "classop_1_1_body_part_connector_caffe.html#a8b70616dc1b45f4a3c2b10308e45b5ce", null ],
     [ "Backward_gpu", "classop_1_1_body_part_connector_caffe.html#a4a42a1d04cbca147da6e9392fdc73327", null ],
     [ "Forward_cpu", "classop_1_1_body_part_connector_caffe.html#a886f7dc30e999b7fa8488ae95cc3ac8b", null ],
-    [ "Forward_gpu", "classop_1_1_body_part_connector_caffe.html#a7f68693a4dbdadba9ae75947e906568a", null ],
+    [ "Forward_gpu", "classop_1_1_body_part_connector_caffe.html#affde8d06784ca9896a1d2d62f7088d76", null ],
     [ "LayerSetUp", "classop_1_1_body_part_connector_caffe.html#a7f42676b81568800336dacec62dfd0ca", null ],
     [ "Reshape", "classop_1_1_body_part_connector_caffe.html#a988042172b192eb80b3479c5f68484f4", null ],
     [ "setInterMinAboveThreshold", "classop_1_1_body_part_connector_caffe.html#a789c77e69e5590a78b22e1e5f5cc4efc", null ],

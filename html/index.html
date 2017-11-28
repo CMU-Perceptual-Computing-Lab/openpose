@@ -101,7 +101,7 @@ $(document).ready(function(){initNavTree('index.html','');});
 <div class="title">OpenPose Documentation</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><div align="center"> &lt;img src=".github/Logo_main_black.png", width="360"&gt; </div> <hr/>
+<div class="textblock"><div align="center"> &lt;img src=".github/Logo_main_black.png", width="300"&gt; </div> <hr/>
 <table class="doxtable">
 <tr>
 <th>**<code>Linux</code>**  </th></tr>
@@ -118,10 +118,10 @@ $(document).ready(function(){initNavTree('index.html','');});
 <li><b>70-keypoint face</b> estimation. Currently, <b>running time depends</b> on <b>number of detected people</b>.</li>
 </ul>
 </li>
-<li>Inputs: Image, video, webcam, and IP camera. Included C++ demos to add your custom input.</li>
-<li>Outputs: Basic GUI display, keypoint saving (JSON, XML, YML, ...), and/or rendered image/video + keypoint saving (PNG, JPG, AVI, ...).</li>
+<li><b>Input</b>: Image, video, webcam, and IP camera. Included C++ demos to add your custom input.</li>
+<li><b>Output</b>: Basic image + keypoint display/saving (PNG, JPG, AVI, ...), keypoint saving (JSON, XML, YML, ...), and/or keypoints as array class.</li>
 <li>Available: command-line demo, C++ wrapper, and C++ API.</li>
-<li>OS: Ubuntu, Windows, Nvidia TX2.</li>
+<li><b>OS</b>: Ubuntu (14, 16), Windows (8, 10), Nvidia TX2.</li>
 </ul>
 <h2>Latest News</h2>
 <ul>
@@ -158,7 +158,11 @@ $(document).ready(function(){initNavTree('index.html','');});
 <h2>Quick Start</h2>
 <p>Most users do not need the <a href="#openpose-c-api">OpenPose C++ API</a>, but they can simply use the basic <a href="#demo">Demo</a> and/or <a href="#openpose-wrapper">OpenPose Wrapper</a>.</p>
 <ul>
-<li><b>Demo</b>: To easily process images/video/webcam and display/save the results. See doc/demo_overview.md.</li>
+<li><b>Demo</b>: To easily process images/video/webcam and display/save the results. See doc/demo_overview.md. E.g. run it in a video with: ``` <h1>Ubuntu</h1>
+</li>
+</ul>
+<p>./build/examples/openpose/openpose.bin &ndash;video examples/media/video.avi :: Windows - Portable Demo bin\OpenPoseDemo.exe &ndash;video examples\media\video.avi ```</p>
+<ul>
 <li><b>OpenPose Wrapper</b>: If you want to read a specific input, and/or add your custom post-processing function, and/or implement your own display/saving, check the <code>Wrapper</code> tutorial on <a href="examples/tutorial_wrapper/">examples/tutorial_wrapper/</a>. You can create your custom code on <a href="examples/user_code/">examples/user_code/</a> and quickly compile it by using <code>make all</code> in the OpenPose folder (assuming Makefile installer).</li>
 <li><b>OpenPose C++ API</b>: See doc/library_introduction.md.</li>
 <li><b>Adding an extra module</b>: Check ./library_add_new_module.md "doc/library_add_new_module.md".</li>

@@ -548,9 +548,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a708e05033d5c51c3a3ff5d4ed621ebbf"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr class="memitem:a708e05033d5c51c3a3ff5d4ed621ebbf"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceop.html#a708e05033d5c51c3a3ff5d4ed621ebbf">connectBodyPartsCpu</a> (<a class="el" href="classop_1_1_array.html">Array</a>&lt; T &gt; &amp;poseKeypoints, <a class="el" href="classop_1_1_array.html">Array</a>&lt; T &gt; &amp;poseScores, const T *const heatMapPtr, const T *const peaksPtr, const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel, const <a class="el" href="structop_1_1_point.html">Point</a>&lt; int &gt; &amp;heatMapSize, const int maxPeaks, const T interMinAboveThreshold, const T interThreshold, const int minSubsetCnt, const T minSubsetScore, const T scaleFactor=1.f)</td></tr>
 <tr class="separator:a708e05033d5c51c3a3ff5d4ed621ebbf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac4e6f18247395105a9ee7dc1ebeccea2"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
-<tr class="memitem:ac4e6f18247395105a9ee7dc1ebeccea2"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceop.html#ac4e6f18247395105a9ee7dc1ebeccea2">connectBodyPartsGpu</a> (<a class="el" href="classop_1_1_array.html">Array</a>&lt; T &gt; &amp;poseKeypoints, T *posePtr, const T *const heatMapPtr, const T *const peaksPtr, const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel, const <a class="el" href="structop_1_1_point.html">Point</a>&lt; int &gt; &amp;heatMapSize, const int maxPeaks, const T interMinAboveThreshold, const T interThreshold, const int minSubsetCnt, const T minSubsetScore, const T scaleFactor=1.f)</td></tr>
-<tr class="separator:ac4e6f18247395105a9ee7dc1ebeccea2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a047afd1856d394bec9b19dab7e765029"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:a047afd1856d394bec9b19dab7e765029"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceop.html#a047afd1856d394bec9b19dab7e765029">connectBodyPartsGpu</a> (<a class="el" href="classop_1_1_array.html">Array</a>&lt; T &gt; &amp;poseKeypoints, <a class="el" href="classop_1_1_array.html">Array</a>&lt; T &gt; &amp;poseScores, const T *const heatMapPtr, const T *const peaksPtr, const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel, const <a class="el" href="structop_1_1_point.html">Point</a>&lt; int &gt; &amp;heatMapSize, const int maxPeaks, const T interMinAboveThreshold, const T interThreshold, const int minSubsetCnt, const T minSubsetScore, const T scaleFactor=1.f, const T *const heatMapGpuPtr=nullptr, const T *const peaksGpuPtr=nullptr)</td></tr>
+<tr class="separator:a047afd1856d394bec9b19dab7e765029"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a41a5430dc7296645934584b8ea0238d7"><td class="memItemLeft" align="right" valign="top">const std::map&lt; unsigned int, <br class="typebreak"/>
 std::string &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a41a5430dc7296645934584b8ea0238d7">getPoseBodyPartMapping</a> (const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel)</td></tr>
 <tr class="separator:a41a5430dc7296645934584b8ea0238d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -2509,7 +2509,7 @@ template&lt;typename T &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="ac4e6f18247395105a9ee7dc1ebeccea2"></a>
+<a class="anchor" id="a047afd1856d394bec9b19dab7e765029"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -2524,8 +2524,8 @@ template&lt;typename T &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">T *&#160;</td>
-          <td class="paramname"><em>posePtr</em>, </td>
+          <td class="paramtype">Array&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>poseScores</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -2585,7 +2585,19 @@ template&lt;typename T &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const T&#160;</td>
-          <td class="paramname"><em>scaleFactor</em> = <code>1.f</code>&#160;</td>
+          <td class="paramname"><em>scaleFactor</em> = <code>1.f</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const T *const&#160;</td>
+          <td class="paramname"><em>heatMapGpuPtr</em> = <code>nullptr</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const T *const&#160;</td>
+          <td class="paramname"><em>peaksGpuPtr</em> = <code>nullptr</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
