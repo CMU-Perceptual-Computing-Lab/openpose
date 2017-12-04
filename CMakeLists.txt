@@ -36,10 +36,12 @@ if (WIN32)
   set(CMAKE_CONFIGURATION_TYPES Release Debug CACHE TYPE INTERNAL FORCE)
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MP")
   string(REPLACE "/O2" "/Ox" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
-  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Ob2 /Ot /Oi /GL")
+  # set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Ob2 /Ot /Oi /GL")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Ob2 /Ot /Oi")
+  # set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /LTCG:incremental /OPT:REF /OPT:ICF")
   set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /LTCG:incremental /OPT:REF /OPT:ICF")
 elseif (UNIX AND NOT APPLE)
-  # Turn on C++11
+  # Turn on C++11 
   add_definitions(-std=c++11)
 endif ()
 
@@ -48,7 +50,6 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     message(STATUS "GCC detected, adding compile flags")
     set(OP_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp -Wpedantic -Wall -Wextra -Wfatal-errors")
 endif(CMAKE_COMPILER_IS_GNUCXX)
-
 
 ### PROJECT OPTIONS
 
@@ -106,10 +107,10 @@ option(BUILD_SHARED_LIBS "Build as shared lib" ON)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
 
-include(cmake/Cuda.cmake)
+find_package(CUDA)
 
 if (UNIX AND NOT APPLE)
-  # find_package(CUDA)
+  include(cmake/Cuda.cmake)
   find_package(Boost COMPONENTS system filesystem)
   find_package(CuDNN)
   find_package(GFlags)
@@ -157,6 +158,8 @@ include(cmake/Utils.cmake)
 
 if (WIN32)
 
+  add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+
   if("${CMAKE_VERSION}" VERSION_GREATER 3.6.3)
     set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT OpenPoseDemo)
   endif("${CMAKE_VERSION}" VERSION_GREATER 3.6.3)
@@ -188,10 +191,10 @@ if (WIN32)
   find_library(Caffe_LIB caffe HINTS ${FIND_LIB_PREFIX}/caffe/lib)
   find_library(Caffe_Proto_LIB caffeproto HINTS ${FIND_LIB_PREFIX}/caffe/lib)
   set(Caffe_LIBS ${Caffe_LIB};${Caffe_Proto_LIB})
-  set(OpenCV_INCLUDE_DIRS ${FIND_LIB_PREFIX}/opencv/include)
-  set(Caffe_INCLUDE_DIRS "${FIND_LIB_PREFIX}/caffe/include;${FIND_LIB_PREFIX}/caffe/include2")
-  set(Boost_INCLUDE_DIRS ${FIND_LIB_PREFIX}/caffe3rdparty/include/boost-1_61)
-  set(WINDOWS_INCLUDE_DIRS ${FIND_LIB_PREFIX}/caffe3rdparty/include)
+  set(OpenCV_INCLUDE_DIRS "3rdparty/windows/opencv/include")
+  set(Caffe_INCLUDE_DIRS "3rdparty/windows/caffe/include;3rdparty/windows/caffe/include2")
+  set(Boost_INCLUDE_DIRS "3rdparty/windows/caffe3rdparty/include/boost-1_61")
+  set(WINDOWS_INCLUDE_DIRS "3rdparty/windows/caffe3rdparty/include")
 endif (WIN32)
 
 ### CAFFE
@@ -250,7 +253,7 @@ endif (UNIX AND NOT APPLE)
 
 # Specify the include directories
 include_directories(
-  ${CMAKE_SOURCE_DIR}/include
+  include
   ${CUDA_INCLUDE_DIRS}
   ${GFLAGS_INCLUDE_DIR}
   ${GLOG_INCLUDE_DIR}
