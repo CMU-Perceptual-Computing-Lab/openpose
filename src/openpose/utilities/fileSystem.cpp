@@ -14,7 +14,7 @@ namespace op
             {
                 // Create folder if it does not exist
                 const boost::filesystem::path directory{directoryPath};
-                if (!boost::filesystem::is_directory(directory) && !boost::filesystem::create_directory(directory))
+                if (!isDirectory(directoryPath) && !boost::filesystem::create_directory(directory))
                     error("Could not write to or create directory to save processed frames.", __LINE__, __FUNCTION__, __FILE__);
             };
         }
@@ -179,7 +179,7 @@ namespace op
                 error("Folder " + directoryPath + " does not exist.", __LINE__, __FUNCTION__, __FILE__);
             // Read images
             std::vector<std::string> filePaths;
-            for (auto& file : boost::make_iterator_range(boost::filesystem::directory_iterator{directoryPath}, {}))
+            for (const auto& file : boost::make_iterator_range(boost::filesystem::directory_iterator{directoryPath}, {}))
                 if (!boost::filesystem::is_directory(file.status()))                // Skip directories
                     filePaths.emplace_back(file.path().string());
             // Check #files > 0
