@@ -249,17 +249,6 @@ namespace op
          */
         unsigned long long threadIdPP();
 
-        /**
-         * TWorker concatenator (private internal function).
-         * Auxiliary function that concatenate std::vectors of TWorker. Since TWorker is some kind of smart pointer
-         * (usually std::shared_ptr), its copy still shares the same internal data. It will not work for TWorker
-         * classes that do not share the data when moved.
-         * @param workersA First std::shared_ptr<TDatums> element to be concatenated.
-         * @param workersB Second std::shared_ptr<TDatums> element to be concatenated.
-         * @return Concatenated std::vector<TWorker> of both workersA and workersB.
-         */
-        std::vector<TWorker> mergeWorkers(const std::vector<TWorker>& workersA, const std::vector<TWorker>& workersB);
-
         DELETE_COPY(Wrapper);
     };
 }
@@ -279,6 +268,7 @@ namespace op
 #include <openpose/experimental/tracking/headers.hpp>
 #include <openpose/utilities/cuda.hpp>
 #include <openpose/utilities/fileSystem.hpp>
+#include <openpose/utilities/standard.hpp>
 namespace op
 {
     template<typename TDatums, typename TWorker, typename TQueue>
@@ -476,10 +466,13 @@ namespace op
                 error(message, __LINE__, __FUNCTION__, __FILE__);
             }
             if (!wrapperStructOutput.writeHeatMaps.empty()
-                && wrapperStructPose.heatMapScale != ScaleMode::UnsignedChar)
+                && (wrapperStructPose.heatMapScale != ScaleMode::UnsignedChar &&
+                        wrapperStructOutput.writeHeatMapsFormat != "float"))
             {
-                const auto message = "In order to save the heatmaps, you must set wrapperStructPose.heatMapScale to"
-                                     " ScaleMode::UnsignedChar, i.e. range [0, 255].";
+                const auto message = "In order to save the heatmaps, you must either set"
+                                     " wrapperStructPose.heatMapScale to ScaleMode::UnsignedChar (i.e. range [0, 255])"
+                                     " or `write_heatmaps_format` to `float` to storage floating numbers in binary"
+                                     " mode.";
                 error(message, __LINE__, __FUNCTION__, __FILE__);
             }
             if (mUserOutputWs.empty() && mThreadManagerMode != ThreadManagerMode::Asynchronous
@@ -828,7 +821,7 @@ namespace op
             // Frames processor (OpenPose format -> cv::Mat format)
             if (renderOutput)
             {
-                mPostProcessingWs = mergeWorkers(mPostProcessingWs, cpuRenderers);
+                mPostProcessingWs = mergeVectors(mPostProcessingWs, cpuRenderers);
                 const auto opOutputToCvMat = std::make_shared<OpOutputToCvMat>();
                 mPostProcessingWs.emplace_back(std::make_shared<WOpOutputToCvMat<TDatumsPtr>>(opOutputToCvMat));
             }
@@ -1175,20 +1168,20 @@ namespace op
                 std::vector<TWorker> workersAux;
                 // Custom user Worker
                 if (!mUserInputWs.empty())
-                    workersAux = mergeWorkers(workersAux, mUserInputWs);
+                    workersAux = mergeVectors(workersAux, mUserInputWs);
                 // OpenPose producer
                 else if (wDatumProducer != nullptr)
-                    workersAux = mergeWorkers(workersAux, {wDatumProducer});
+                    workersAux = mergeVectors(workersAux, {wDatumProducer});
                 // Otherwise
                 else if (mThreadManagerMode != ThreadManagerMode::Asynchronous
                             && mThreadManagerMode != ThreadManagerMode::AsynchronousIn)
                     error("No input selected.", __LINE__, __FUNCTION__, __FILE__);
 
                 if (spWCvMatToOpOutput == nullptr)
-                    workersAux = mergeWorkers(workersAux, {spWIdGenerator, spWScaleAndSizeExtractor,
+                    workersAux = mergeVectors(workersAux, {spWIdGenerator, spWScaleAndSizeExtractor,
                                                            spWCvMatToOpInput});
                 else
-                    workersAux = mergeWorkers(workersAux, {spWIdGenerator, spWScaleAndSizeExtractor,
+                    workersAux = mergeVectors(workersAux, {spWIdGenerator, spWScaleAndSizeExtractor,
                                                            spWCvMatToOpInput, spWCvMatToOpOutput});
                 // Thread 0 or 1, queues 0 -> 1
                 mThreadManager.add(mThreadId, workersAux, queueIn++, queueOut++);
@@ -1243,8 +1236,8 @@ namespace op
             else
             {
                 // Post processing workers + User post processing workers + Output workers
-                auto workersAux = mergeWorkers(mPostProcessingWs, mUserPostProcessingWs);
-                workersAux = mergeWorkers(workersAux, mOutputWs);
+                auto workersAux = mergeVectors(mPostProcessingWs, mUserPostProcessingWs);
+                workersAux = mergeVectors(workersAux, mOutputWs);
                 if (!workersAux.empty())
                 {
                     // Thread 2 or 3, queues 2 -> 3
@@ -1292,24 +1285,6 @@ namespace op
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             return 0ull;
-        }
-    }
-
-    template<typename TDatums, typename TWorker, typename TQueue>
-    std::vector<TWorker> Wrapper<TDatums, TWorker, TQueue>::mergeWorkers(const std::vector<TWorker>& workersA,
-                                                                         const std::vector<TWorker>& workersB)
-    {
-        try
-        {
-            auto workersToReturn(workersA);
-            for (auto& worker : workersB)
-                workersToReturn.emplace_back(worker);
-            return workersToReturn;
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return std::vector<TWorker>{};
         }
     }
 

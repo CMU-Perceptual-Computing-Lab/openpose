@@ -1,4 +1,4 @@
-#include <fstream> // std::ifstream
+#include <fstream> // std::ifstream, std::ofstream
 #include <opencv2/highgui/highgui.hpp> // cv::imread
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/fileSystem.hpp>
@@ -68,6 +68,33 @@ namespace op
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             return DataFormat::Json;
+        }
+    }
+
+    void saveFloatArray(const Array<float>& array, const std::string& fullFilePath)
+    {
+        try
+        {
+            // Open file
+            std::ofstream outputFile;
+            outputFile.open(fullFilePath, std::ios::binary);
+            // Save #dimensions
+            const auto numberDimensions = (float)(array.getNumberDimensions());
+            outputFile.write((char*)&numberDimensions, sizeof(float));
+            // Save dimensions
+            for (const auto& sizeI : array.getSize())
+            {
+                const float sizeIFloat = (float) sizeI;
+                outputFile.write((char*)&sizeIFloat, sizeof(float));
+            }
+            // Save each value
+            outputFile.write((char*)&array[0], array.getVolume() * sizeof(float));
+            // Close file
+            outputFile.close();
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
     }
 
@@ -217,7 +244,8 @@ namespace op
         }
     }
 
-    void saveImage(const cv::Mat& cvMat, const std::string& fullFilePath, const std::vector<int>& openCvCompressionParams)
+    void saveImage(const cv::Mat& cvMat, const std::string& fullFilePath,
+                   const std::vector<int>& openCvCompressionParams)
     {
         try
         {

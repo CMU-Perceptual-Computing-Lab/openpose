@@ -78,7 +78,7 @@ See [doc/installation.md](doc/installation.md) for instructions on how to build 
 ## Quick Start
 Most users do not need the [OpenPose C++ API](#openpose-c-api), but they can simply use the basic [Demo](#demo) and/or [OpenPose Wrapper](#openpose-wrapper).
 
-- **Demo**: To easily process images/video/webcam and display/save the results. See [doc/demo_overview.md](doc/demo_overview.md). E.g. run it in a video with:
+- **Demo**: To easily process images/video/webcam and display/save the results. See [doc/demo_overview.md](doc/demo_overview.md). E.g. run OpenPose in a video with:
 ```
 # Ubuntu
 ./build/examples/openpose/openpose.bin --video examples/media/video.avi

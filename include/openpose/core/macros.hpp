@@ -62,7 +62,7 @@ namespace caffe
 }
 namespace boost
 {
-    template <typename T> class shared_ptr;
+    template <typename T> class shared_ptr; // E.g., boost::shared_ptr<caffe::Blob<float>>
 }
 
 // Includes at the end, since this macros class does not need them, but the files that call this

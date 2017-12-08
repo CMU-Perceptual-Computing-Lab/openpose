@@ -169,7 +169,8 @@ namespace op
         }
     }
 
-    std::vector<std::string> getFilesOnDirectory(const std::string& directoryPath, const std::vector<std::string>& extensions)
+    std::vector<std::string> getFilesOnDirectory(const std::string& directoryPath,
+                                                 const std::vector<std::string>& extensions)
     {
         try
         {

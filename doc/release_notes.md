@@ -152,5 +152,7 @@ OpenPose Library - Release Notes
 
 
 ## Current version (future OpenPose 1.2.1)
-3. Main bugs fixed:
+1. Main improvements:
+    1. Heatmaps can be saved in floating format.
+2. Main bugs fixed:
     1. Render working on images > 4K (#324).

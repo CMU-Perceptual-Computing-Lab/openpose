@@ -69,6 +69,7 @@ DEFINE_int32(scale_number,              1,              "Number of scales to ave
 DEFINE_double(scale_gap,                0.3,            "Scale gap between scales. No effect unless scale_number > 1. Initial scale is always 1."
                                                         " If you want to change the initial scale, you actually want to multiply the"
                                                         " `net_resolution` by your desired initial scale.");
+// OpenPose Body Pose Heatmaps
 DEFINE_bool(heatmaps_add_parts,         false,          "If true, it will add the body part heatmaps to the final op::Datum::poseHeatMaps array,"
                                                         " and analogously face & hand heatmaps to op::Datum::faceHeatMaps & op::Datum::handHeatMaps"
                                                         " (program speed will decrease). Not required for our library, enable it only if you intend"
@@ -149,7 +150,8 @@ DEFINE_string(write_coco_json,          "",             "Full file path to write
 DEFINE_string(write_heatmaps,           "",             "Directory to write body pose heatmaps in *.png format. At least 1 `add_heatmaps_X` flag"
                                                         " must be enabled.");
 DEFINE_string(write_heatmaps_format,    "png",          "File extension and format for `write_heatmaps`, analogous to `write_images_format`."
-                                                        " Recommended `png` or any compressed and lossless format.");
+                                                        " For lossless compression, recommended `png` for integer `heatmaps_scale` and `float` for"
+                                                        " floating values.");
 
 
 // If the user needs his own variables, he can inherit the op::Datum struct and add them
@@ -370,10 +372,7 @@ int openPoseTutorialWrapper2()
     // heatmaps to add
     const auto heatMapTypes = op::flagsToHeatMaps(FLAGS_heatmaps_add_parts, FLAGS_heatmaps_add_bkg,
                                                   FLAGS_heatmaps_add_PAFs);
-    op::check(FLAGS_heatmaps_scale >= 0 && FLAGS_heatmaps_scale <= 2, "Non valid `heatmaps_scale`.",
-              __LINE__, __FUNCTION__, __FILE__);
-    const auto heatMapScale = (FLAGS_heatmaps_scale == 0 ? op::ScaleMode::PlusMinusOne
-                              : (FLAGS_heatmaps_scale == 1 ? op::ScaleMode::ZeroToOne : op::ScaleMode::UnsignedChar ));
+    const auto heatMapScale = op::flagsToHeatMapScaleMode(FLAGS_heatmaps_scale);
     // Enabling Google Logging
     const bool enableGoogleLogging = true;
     // Logging
