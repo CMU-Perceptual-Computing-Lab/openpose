@@ -2,6 +2,7 @@ var searchData=
 [
   ['save',['save',['../classop_1_1_keypoint_json_saver.html#a10fff77ff17356bf7786ec3c70930095',1,'op::KeypointJsonSaver']]],
   ['savedata',['saveData',['../namespaceop.html#a7dbf8ae7dec5eb913da4bd2e27e49f7d',1,'op::saveData(const std::vector&lt; cv::Mat &gt; &amp;cvMats, const std::vector&lt; std::string &gt; &amp;cvMatNames, const std::string &amp;fileNameNoExtension, const DataFormat format)'],['../namespaceop.html#a9aa59e0cf663360a10f372d7680ad39c',1,'op::saveData(const cv::Mat &amp;cvMat, const std::string cvMatName, const std::string &amp;fileNameNoExtension, const DataFormat format)']]],
+  ['savefloatarray',['saveFloatArray',['../namespaceop.html#ac1080e627185a65b88ec788184a95552',1,'op']]],
   ['saveheatmaps',['saveHeatMaps',['../classop_1_1_heat_map_saver.html#a6f67771a43b746a86a9793f19e7b6974',1,'op::HeatMapSaver']]],
   ['saveimage',['saveImage',['../namespaceop.html#a80f8d102523be3fd8a884d14e38cbce9',1,'op']]],
   ['saveimages',['saveImages',['../classop_1_1_image_saver.html#a8495143c9ddbe39744a4be0a4703007c',1,'op::ImageSaver']]],

@@ -10,6 +10,7 @@ var searchData=
   ['maximumgpu',['maximumGpu',['../namespaceop.html#a4852b0b78742b27c332f4b9e95d0106c',1,'op']]],
   ['mblendoriginalframe',['mBlendOriginalFrame',['../classop_1_1_renderer.html#a88449a7c29a48e157cd6b16089825be7',1,'op::Renderer']]],
   ['mconditionvariable',['mConditionVariable',['../classop_1_1_queue_base.html#a8b5e59161a0b175d12955b552a90a47f',1,'op::QueueBase']]],
+  ['mergevectors',['mergeVectors',['../namespaceop.html#aa3a3e2acfb27ecbd187d01c8dcd41899',1,'op']]],
   ['mfaceimagecrop',['mFaceImageCrop',['../classop_1_1_face_extractor.html#aec29268798b50ef752d6ec62c3cc5dc4',1,'op::FaceExtractor']]],
   ['mfacekeypoints',['mFaceKeypoints',['../classop_1_1_face_extractor.html#a9d408bb492f490fa46b71b3bcbe28b62',1,'op::FaceExtractor']]],
   ['mhandimagecrop',['mHandImageCrop',['../classop_1_1_hand_extractor.html#afe80be5a3b786ad71cd0e0ff6443ff22',1,'op::HandExtractor']]],

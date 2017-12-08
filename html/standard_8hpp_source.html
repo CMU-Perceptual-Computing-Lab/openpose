@@ -135,11 +135,29 @@ $(document).ready(function(){initNavTree('standard_8hpp_source.html','');});
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;        }</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    }</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;}</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor">#endif // OPENPOSE_UTILITIES_STANDARD_HPP</span></div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
+<div class="line"><a name="l00040"></a><span class="lineno"><a class="line" href="namespaceop.html#aa3a3e2acfb27ecbd187d01c8dcd41899">   40</a></span>&#160;    std::vector&lt;T&gt; <a class="code" href="namespaceop.html#aa3a3e2acfb27ecbd187d01c8dcd41899">mergeVectors</a>(<span class="keyword">const</span> std::vector&lt;T&gt;&amp; vectorA, <span class="keyword">const</span> std::vector&lt;T&gt;&amp; vectorB)</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    {</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;        <span class="keywordflow">try</span></div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;        {</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;            <span class="keyword">auto</span> vectorToReturn(vectorA);</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;            <span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; tElement : vectorB)</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;                vectorToReturn.emplace_back(tElement);</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;            <span class="keywordflow">return</span> vectorToReturn;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        }</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        <span class="keywordflow">catch</span> (<span class="keyword">const</span> std::exception&amp; e)</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;        {</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;            <a class="code" href="namespaceop.html#a5f092bd36c716a894cb035e1ead2aca3">error</a>(e.what(), __LINE__, __FUNCTION__, __FILE__);</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;            <span class="keywordflow">return</span> std::vector&lt;T&gt;{};</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;        }</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    }</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;}</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="preprocessor">#endif // OPENPOSE_UTILITIES_STANDARD_HPP</span></div>
 <div class="ttc" id="common_8hpp_html"><div class="ttname"><a href="common_8hpp.html">common.hpp</a></div></div>
 <div class="ttc" id="namespaceop_html_a5f092bd36c716a894cb035e1ead2aca3"><div class="ttname"><a href="namespaceop.html#a5f092bd36c716a894cb035e1ead2aca3">op::error</a></div><div class="ttdeci">OP_API void error(const std::string &amp;message, const int line=-1, const std::string &amp;function=&quot;&quot;, const std::string &amp;file=&quot;&quot;)</div></div>
+<div class="ttc" id="namespaceop_html_aa3a3e2acfb27ecbd187d01c8dcd41899"><div class="ttname"><a href="namespaceop.html#aa3a3e2acfb27ecbd187d01c8dcd41899">op::mergeVectors</a></div><div class="ttdeci">std::vector&lt; T &gt; mergeVectors(const std::vector&lt; T &gt; &amp;vectorA, const std::vector&lt; T &gt; &amp;vectorB)</div><div class="ttdef"><b>Definition:</b> standard.hpp:40</div></div>
 <div class="ttc" id="namespaceop_html_af63e418966741f7efebacc9519174a0a"><div class="ttname"><a href="namespaceop.html#af63e418966741f7efebacc9519174a0a">op::vectorsAreEqual</a></div><div class="ttdeci">bool vectorsAreEqual(const std::vector&lt; T &gt; &amp;vectorA, const std::vector&lt; T &gt; &amp;vectorB)</div><div class="ttdef"><b>Definition:</b> standard.hpp:9</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
