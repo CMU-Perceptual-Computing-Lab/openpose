@@ -12,6 +12,17 @@
 #include <memory>
 #include <unistd.h>
 
+// The only remaining boost dependency part
+// We could use the mkdir method to create dir
+// in unix or windows
+
+//#if defined _MSC_VER
+//#include <direct.h>
+//#elif defined __GNUC__
+//#include <sys/types.h>
+//#include <sys/stat.h>
+//#endif
+
 namespace op
 {
     void mkdir(const std::string& directoryPath)
@@ -20,10 +31,18 @@ namespace op
         {
             if (!directoryPath.empty())
             {
+
+                //#if defined _MSC_VER
+                //_mkdir(directoryPath.c_str());
+                //#elif defined __GNUC__
+                //mkdir(directoryPath.data(), S_IRUSR | S_IWUSR | S_IXUSR);
+                //#endif
+
                 // Create folder if it does not exist
                 const boost::filesystem::path directory{directoryPath};
                 if (!boost::filesystem::is_directory(directory) && !boost::filesystem::create_directory(directory))
-                    error("Could not write to or create directory to save processed frames.", __LINE__, __FUNCTION__, __FILE__);
+                    error("Could not write to or create directory to save processed frames.",
+                          __LINE__, __FUNCTION__, __FILE__);
             };
         }
         catch (const std::exception& e)
@@ -224,7 +243,8 @@ namespace op
                 error("Folder " + directoryPath + " does not exist.", __LINE__, __FUNCTION__, __FILE__);
             // Read images
             std::vector<std::string> filePaths;
-            std::shared_ptr<DIR> directory_ptr(opendir(format_path.c_str()), [](DIR* format_path){ format_path && closedir(format_path); });
+            std::shared_ptr<DIR> directory_ptr(opendir(format_path.c_str()), [](DIR* format_path)
+					       { format_path && closedir(format_path); });
             struct dirent *dirent_ptr;
 
             while ((dirent_ptr = readdir(directory_ptr.get())) != nullptr)
