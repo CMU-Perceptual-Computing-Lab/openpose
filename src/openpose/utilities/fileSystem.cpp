@@ -244,7 +244,6 @@ namespace op
                 error("Folder " + directoryPath + " does not exist.", __LINE__, __FUNCTION__, __FILE__);
             // Read images
             std::vector<std::string> filePaths;
-
             std::shared_ptr<DIR> directory_ptr(opendir(format_path.c_str()), [](DIR* format_path)
 					       { format_path && closedir(format_path); });
             struct dirent *dirent_ptr;
