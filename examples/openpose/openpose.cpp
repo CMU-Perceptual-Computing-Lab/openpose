@@ -87,6 +87,7 @@ DEFINE_int32(scale_number,              1,              "Number of scales to ave
 DEFINE_double(scale_gap,                0.3,            "Scale gap between scales. No effect unless scale_number > 1. Initial scale is always 1."
                                                         " If you want to change the initial scale, you actually want to multiply the"
                                                         " `net_resolution` by your desired initial scale.");
+// OpenPose Body Pose Heatmaps
 DEFINE_bool(heatmaps_add_parts,         false,          "If true, it will add the body part heatmaps to the final op::Datum::poseHeatMaps array,"
                                                         " and analogously face & hand heatmaps to op::Datum::faceHeatMaps & op::Datum::handHeatMaps"
                                                         " (program speed will decrease). Not required for our library, enable it only if you intend"
@@ -96,6 +97,8 @@ DEFINE_bool(heatmaps_add_parts,         false,          "If true, it will add th
 DEFINE_bool(heatmaps_add_bkg,           false,          "Same functionality as `add_heatmaps_parts`, but adding the heatmap corresponding to"
                                                         " background.");
 DEFINE_bool(heatmaps_add_PAFs,          false,          "Same functionality as `add_heatmaps_parts`, but adding the PAFs.");
+DEFINE_int32(heatmaps_scale,            2,              "Set 0 to scale op::Datum::poseHeatMaps in the range [-1,1], 1 for [0,1]; and 2 for integer"
+                                                        " rounded [0,255].");
 // OpenPose Face
 DEFINE_bool(face,                       false,          "Enables face keypoint detection. It will share some parameters from the body pose, e.g."
                                                         " `model_folder`. Note that this will considerable slow down the performance and increse"
@@ -171,7 +174,8 @@ DEFINE_string(write_coco_json,          "",             "Full file path to write
 DEFINE_string(write_heatmaps,           "",             "Directory to write body pose heatmaps in *.png format. At least 1 `add_heatmaps_X` flag"
                                                         " must be enabled.");
 DEFINE_string(write_heatmaps_format,    "png",          "File extension and format for `write_heatmaps`, analogous to `write_images_format`."
-                                                        " Recommended `png` or any compressed and lossless format.");
+                                                        " For lossless compression, recommended `png` for integer `heatmaps_scale` and `float` for"
+                                                        " floating values.");
 
 int openPoseDemo()
 {
@@ -203,6 +207,7 @@ int openPoseDemo()
     // heatmaps to add
     const auto heatMapTypes = op::flagsToHeatMaps(FLAGS_heatmaps_add_parts, FLAGS_heatmaps_add_bkg,
                                                   FLAGS_heatmaps_add_PAFs);
+    const auto heatMapScale = op::flagsToHeatMapScaleMode(FLAGS_heatmaps_scale);
     // Enabling Google Logging
     const bool enableGoogleLogging = true;
     // Logging
@@ -217,9 +222,8 @@ int openPoseDemo()
                                                   (float)FLAGS_scale_gap, op::flagsToRenderMode(FLAGS_render_pose),
                                                   poseModel, !FLAGS_disable_blending, (float)FLAGS_alpha_pose,
                                                   (float)FLAGS_alpha_heatmap, FLAGS_part_to_show, FLAGS_model_folder,
-                                                  heatMapTypes, op::ScaleMode::UnsignedChar,
-                                                  (float)FLAGS_render_threshold, enableGoogleLogging,
-                                                  FLAGS_identification};
+                                                  heatMapTypes, heatMapScale, (float)FLAGS_render_threshold,
+                                                  enableGoogleLogging, FLAGS_identification};
     // Face configuration (use op::WrapperStructFace{} to disable it)
     const op::WrapperStructFace wrapperStructFace{FLAGS_face, faceNetInputSize,
                                                   op::flagsToRenderMode(FLAGS_face_render, FLAGS_render_pose),

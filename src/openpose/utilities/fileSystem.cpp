@@ -40,7 +40,7 @@ namespace op
 
                 // Create folder if it does not exist
                 const boost::filesystem::path directory{directoryPath};
-                if (!boost::filesystem::is_directory(directory) && !boost::filesystem::create_directory(directory))
+                if (!isDirectory(directoryPath) && !boost::filesystem::create_directory(directory))
                     error("Could not write to or create directory to save processed frames.",
                           __LINE__, __FUNCTION__, __FILE__);
             };
@@ -232,7 +232,8 @@ namespace op
         }
     }
 
-    std::vector<std::string> getFilesOnDirectory(const std::string& directoryPath, const std::vector<std::string>& extensions)
+    std::vector<std::string> getFilesOnDirectory(const std::string& directoryPath,
+                                                 const std::vector<std::string>& extensions)
     {
         try
         {
@@ -243,6 +244,7 @@ namespace op
                 error("Folder " + directoryPath + " does not exist.", __LINE__, __FUNCTION__, __FILE__);
             // Read images
             std::vector<std::string> filePaths;
+
             std::shared_ptr<DIR> directory_ptr(opendir(format_path.c_str()), [](DIR* format_path)
 					       { format_path && closedir(format_path); });
             struct dirent *dirent_ptr;
