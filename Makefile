@@ -68,6 +68,10 @@ else
 	LDFLAGS += -Wl,-rpath=$(CAFFE_DIR)/lib
 	INCLUDE_DIRS += $(CAFFE_DIR)/include
 	LIBRARY_DIRS += $(CAFFE_DIR)/lib
+        
+        ifeq ($(DEEP_NET), tensorrt)
+                COMMON_FLAGS += -DUSE_TENSORRT
+        endif
 endif
 
 ##############################
@@ -143,6 +147,11 @@ ifeq ($(USE_CUDA), 1)
 	INCLUDE_DIRS += $(CUDA_INCLUDE_DIR)
 	LIBRARY_DIRS += $(CUDA_LIB_DIR)
 	LIBRARIES += cudart cublas curand
+endif
+
+# TensorRT
+ifeq ($(DEEP_NET), tensorrt)
+        LIBRARIES += nvinfer nvcaffe_parser
 endif
 
 # LIBRARIES += glog gflags boost_system boost_filesystem m hdf5_hl hdf5 caffe

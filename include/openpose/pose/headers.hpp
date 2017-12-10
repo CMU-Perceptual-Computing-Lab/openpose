@@ -8,6 +8,7 @@
 #include <openpose/pose/poseCpuRenderer.hpp>
 #include <openpose/pose/poseExtractor.hpp>
 #include <openpose/pose/poseExtractorCaffe.hpp>
+#include <openpose/pose/poseExtractorTensorRT.hpp>
 #include <openpose/pose/poseGpuRenderer.hpp>
 #include <openpose/pose/poseParameters.hpp>
 #include <openpose/pose/poseRenderer.hpp>
