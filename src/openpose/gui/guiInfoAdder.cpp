@@ -59,7 +59,7 @@ namespace op
     }
 
     void GuiInfoAdder::addInfo(cv::Mat& cvOutputData, const int numberPeople, const unsigned long long id,
-                               const std::string& elementRenderedName)
+                               const std::string& elementRenderedName, const Array<long long>& poseIds)
     {
         try
         {
@@ -101,7 +101,11 @@ namespace op
             putTextOnCvMat(cvOutputData, "Frame: " + std::to_string(id),
                            {borderMargin, (int)(cvOutputData.rows - borderMargin)}, white, false);
             // Number people
-            putTextOnCvMat(cvOutputData, "People: " + std::to_string(numberPeople),
+            std::string peopleIds{"People (" + std::to_string(numberPeople) + "):"};
+            for (auto i = 0u ; i < poseIds.getVolume() ; i++)
+                peopleIds += " " + std::to_string(poseIds[i]);
+            // putTextOnCvMat(cvOutputData, "People: " + std::to_string(numberPeople),
+            putTextOnCvMat(cvOutputData, peopleIds,
                            {(int)(cvOutputData.cols - borderMargin), (int)(cvOutputData.rows - borderMargin)},
                            white, true);
         }
