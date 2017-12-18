@@ -89,7 +89,6 @@ namespace op
 
             person_entry pe;
             pe.keypoints = new_points;
-            // pe.counter = 0;
             pe.status = lkanade_points[idx].status;
             lkanade_points[idx] = pe;
         }
@@ -115,7 +114,7 @@ namespace op
                 cp.y = poseKeypoints[{p,kp,1}];
                 keypoints.push_back(cp);
 
-                if (poseKeypoints[{p,kp,0}] < thres_conf)
+                if (poseKeypoints[{p,kp,2}] < thres_conf)
                   status.push_back(1);
                 else
                    status.push_back(0);         
@@ -157,10 +156,11 @@ namespace op
                     if (lkanade_points[idx].status[kp] || openpose_points[i].status[kp])
                         continue;
 
+                    
                     active ++;
                     float dist = get_euclidean_distance(lkanade_points[idx].keypoints[kp],
                                                         openpose_points[i].keypoints[kp]);
-                    std::cout<<dist<<std::endl;
+                    //std::cout<<dist<<std::endl;
                     
                     if (dist < dist_thr)
                         inliers ++;
@@ -168,7 +168,7 @@ namespace op
 
                 float score = 0.0;
 
-                if (inliers) score = (float) inliers / (float) active;;
+                if (active) score = (float) inliers / (float) active;;
 
                 //std::cout<<inliers<<std::endl;
 
