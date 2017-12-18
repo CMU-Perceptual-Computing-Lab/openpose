@@ -30,7 +30,7 @@ namespace op
 
     float get_euclidean_distance(cv::Point2f a, cv::Point2f b)
     {
-        std::cout<<a.x<<" "<<b.x<<" "<<a.y<<" "<<b.y<<std::endl;
+        //std::cout<<a.x<<" "<<b.x<<" "<<a.y<<" "<<b.y<<std::endl;
 
         return std::sqrt((a.x - b.x)*(a.x - b.x)
                          + (a.y - b.y)*(a.y - b.y));
@@ -54,9 +54,9 @@ namespace op
                 keypoints.push_back(cp);
 
                 if (poseKeypoints[{p,kp,2}] < thres_conf)
-                    status.push_back(0);
+                    status.push_back(1);
                 else
-                    status.push_back(1); 
+                    status.push_back(0); 
                     
             }
 
@@ -156,7 +156,7 @@ namespace op
                     if (lkanade_points[idx].status[kp] || openpose_points[i].status[kp])
                         continue;
 
-                    
+
                     active ++;
                     float dist = get_euclidean_distance(lkanade_points[idx].keypoints[kp],
                                                         openpose_points[i].keypoints[kp]);
@@ -176,6 +176,7 @@ namespace op
                 {
                     best_score = score;
                     best_match = entry_lk.first;
+                    std::cout<<"BEST MATCH ENCOUNTERED"<<std::endl;
                 }
             }
             /* Found a best match, update LK table and poseIds */
