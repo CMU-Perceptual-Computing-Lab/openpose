@@ -7,6 +7,20 @@
 namespace op
 {
 
+    struct person_entry
+    {
+        long long counter;
+        std::vector<cv::Point2f> keypoints;
+        std::vector<char> status;
+        /*
+        person_entry(long long _last_frame, 
+                     std::vector<cv::Point2f> _keypoints,
+                     std::vector<char> _active):
+                     last_frame(_last_frame), keypoints(_keypoints),
+                     active(_active)
+                     {}
+        */
+    };
     class OP_API PersonIdExtractor
     {
 
@@ -18,20 +32,6 @@ namespace op
         Array<long long> extractIds(const Array<float>& poseKeypoints, const cv::Mat& cvMatInput);
 
     private:
-        struct person_entry
-        {
-            long long last_frame;
-            std::vector<cv::Point2f> keypoints;
-            std::vector<char> active;
-            /*
-            person_entry(long long _last_frame, 
-                         std::vector<cv::Point2f> _keypoints,
-                         std::vector<char> _active):
-                         last_frame(_last_frame), keypoints(_keypoints),
-                         active(_active)
-                         {}
-            */
-        };
         long long mNextPersonId;
         bool init;
         cv::Mat previous_frame;
@@ -39,9 +39,8 @@ namespace op
         std::vector<cv::Point2f> J;
         std::vector<char> status;
         long long max_person;
-        std::unordered_map<int,person_entry> track_map;
-        const float thres_conf = 0.1;
-
+        std::vector<person_entry> openpose_points;
+        std::unordered_map<int,person_entry> lkanade_points;
         DELETE_COPY(PersonIdExtractor);
     };
 }
