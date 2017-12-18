@@ -37,17 +37,16 @@ namespace op
 
     }
     
-    void caputre_keypoints(const Array<float>& poseKeypoints, std::vector<person_entry> &result)
+    void captureKeypoints(const Array<float>& poseKeypoints, std::vector<person_entry> &result)
     {
-        int npersons = poseKeypoints.getSize(0);
         result.clear();
 
-        for (int p = 0; p < npersons; p++)
+        for (auto p = 0u; p < poseKeypoints.getSize(0); p++)
         {
             std::vector<char> status;
             std::vector<cv::Point2f> keypoints;
 
-            for (int kp = 0; kp < poseKeypoints.getSize(1); kp++)
+            for (auto kp = 0u; kp < poseKeypoints.getSize(1); kp++)
             {
                 cv::Point2f cp;
                 cp.x = poseKeypoints[{p,kp,0}];
@@ -55,9 +54,9 @@ namespace op
                 keypoints.push_back(cp);
 
                 if (poseKeypoints[{p,kp,2}] < thres_conf)
-                  status.push_back(0);
+                    status.push_back(0);
                 else
-                   status.push_back(1); 
+                    status.push_back(1); 
                     
             }
 
@@ -90,7 +89,7 @@ namespace op
 
             person_entry pe;
             pe.keypoints = new_points;
-            pe.counter = 0;
+            // pe.counter = 0;
             pe.status = lkanade_points[idx].status;
             lkanade_points[idx] = pe;
         }
@@ -200,7 +199,7 @@ namespace op
         try
         {
             Array<long long> poseIds;
-            caputre_keypoints(poseKeypoints, openpose_points);
+            captureKeypoints(poseKeypoints, openpose_points);
 
             if (!init)
             {
