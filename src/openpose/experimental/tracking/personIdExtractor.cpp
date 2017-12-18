@@ -1,43 +1,16 @@
-#include <openpose/experimental/tracking/lkpyramidal.hpp>
+#include <openpose/experimental/tracking/pyramidalLK.hpp>
 #include <openpose/experimental/tracking/personIdExtractor.hpp>
 #include <iostream>
 namespace op
 {
-    const float thres_conf = 0.1;
-    const int idle_frame = 10;
-    const float inlier_thr = 0.5;
-    const float dist_thr = 30.0;
-
-
-    PersonIdExtractor::PersonIdExtractor() :
-        mNextPersonId{0ll},
-        init{false}
+    float getEuclideanDistance(const cv::Point2f& a, const cv::Point2f& b)
     {
-        try
-        {
-            // error("PersonIdExtractor (`identification` flag) not available yet, but we are working on it! Coming"
-            //       " soon!", __LINE__, __FUNCTION__, __FILE__);
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-        }
+        const auto difference = a - b;
+        return std::sqrt(difference.x * difference.x + difference.y * difference.y);
     }
 
-    PersonIdExtractor::~PersonIdExtractor()
-    {
-    }
-
-    float get_euclidean_distance(cv::Point2f a, cv::Point2f b)
-    {
-        // std::cout<<a.x<<" "<<b.x<<" "<<a.y<<" "<<b.y<<std::endl;
-
-        return std::sqrt((a.x - b.x)*(a.x - b.x)
-                         + (a.y - b.y)*(a.y - b.y));
-
-    }
-
-    void captureKeypoints(const Array<float>& poseKeypoints, std::vector<person_entry> &result)
+    void captureKeypoints(std::vector<PersonEntry>& result, const Array<float>& poseKeypoints,
+                          const float confidenceThreshold)
     {
         result.clear();
 
@@ -53,53 +26,56 @@ namespace op
                 cp.y = poseKeypoints[{p,kp,1}];
                 keypoints.push_back(cp);
 
-                if (poseKeypoints[{p,kp,2}] < thres_conf)
+                if (poseKeypoints[{p,kp,2}] < confidenceThreshold)
                     status.push_back(1);
                 else
                     status.push_back(0);
             }
 
-            /* Create and add person entry the trackinng map */
-            person_entry pe;
-            pe.keypoints = keypoints;
-            pe.counter = 0;
-            pe.status = status;
-            result.push_back(pe);
+            // Create and add person entry the trackinng map
+            PersonEntry personEntry;
+            personEntry.keypoints = keypoints;
+            personEntry.counterLastDetection = 0;
+            personEntry.status = status;
+            result.push_back(personEntry);
         }
     }
 
-    void updateLK(std::unordered_map<int,person_entry> &lkanade_points, cv::Mat& prev, cv::Mat& next)
+    void updateLK(std::unordered_map<int,PersonEntry>& mPointsLK, std::vector<cv::Mat>& pyramidImagesPrevious,
+                  std::vector<cv::Mat>& pyramidImagesCurrent, const cv::Mat& imagePrevious,
+                  const cv::Mat& imageCurrent, const int numberFramesToDeletePerson)
     {
-        for (auto &entry: lkanade_points)
+        for (auto& entry: mPointsLK)
         {
             int idx = entry.first;
 
-            if (lkanade_points[idx].counter++ > idle_frame)
+            if (mPointsLK[idx].counterLastDetection++ > numberFramesToDeletePerson)
             {
-                lkanade_points.erase(idx);
+                mPointsLK.erase(idx);
                 continue;
             }
 
-            /* Update all keypoints for that entry */
-            person_entry pe;
-            runLKPyramidal(lkanade_points[idx].keypoints, pe.keypoints, prev, next,
-                             lkanade_points[idx].status, 3, 21);
-            pe.status = lkanade_points[idx].status;
-            lkanade_points[idx] = pe;
+            // Update all keypoints for that entry
+            PersonEntry personEntry;
+            pyramidalLKCpu(mPointsLK[idx].keypoints, personEntry.keypoints, pyramidImagesPrevious,
+                           pyramidImagesCurrent, mPointsLK[idx].status, imagePrevious, imageCurrent, 3, 21);
+            personEntry.status = mPointsLK[idx].status;
+            mPointsLK[idx] = personEntry;
         }
     }
 
-    void initializeLK(std::unordered_map<int,person_entry>& lkanade_points,
+    void initializeLK(std::unordered_map<int,PersonEntry>& mPointsLK,
+                     long long& mNextPersonId,
                      const Array<float>& poseKeypoints,
-                     long long &max_person)
+                     const float confidenceThreshold)
     {
         for (auto p = 0; p < poseKeypoints.getSize(0); p++)
         {
-            int actual_person = max_person++;
+            int actual_person = mNextPersonId++;
 
-            person_entry pe;
-            auto& keypoints = pe.keypoints;
-            auto& status = pe.status;
+            PersonEntry personEntry;
+            auto& keypoints = personEntry.keypoints;
+            auto& status = personEntry.status;
 
             for (auto kp = 0; kp < poseKeypoints.getSize(1); kp++)
             {
@@ -108,111 +84,134 @@ namespace op
                 cp.y = poseKeypoints[{p,kp,1}];
                 keypoints.push_back(cp);
 
-                if (poseKeypoints[{p,kp,2}] < thres_conf)
+                if (poseKeypoints[{p,kp,2}] < confidenceThreshold)
                     status.push_back(1);
                 else
                     status.push_back(0);
             }
 
-            /* Create and add person entry the tracking map */
-            pe.counter = 0;
-            lkanade_points[actual_person] = pe;
+            // Create and add person entry the tracking map
+            personEntry.counterLastDetection = 0;
+            mPointsLK[actual_person] = personEntry;
         }
     }
 
-    Array<long long> match_lk_vs_op(std::unordered_map<int,person_entry>& lkanade_points,
-                                    std::vector<person_entry> &openpose_points,
-                                    long long &max_person)
+    Array<long long> matchLKAndOP(std::unordered_map<int,PersonEntry>& mPointsLK,
+                                  long long& mNextPersonId,
+                                  const std::vector<PersonEntry>& openposePersonEntries,
+                                  const float inlierRatioThreshold,
+                                  const float distanceThreshold)
     {
 
-        Array<long long> poseIds{(int)openpose_points.size(), -1};
-        std::unordered_map<int,person_entry> pending_queue;
+        Array<long long> poseIds{(int)openposePersonEntries.size(), -1};
+        std::unordered_map<int,PersonEntry> pending_queue;
 
-
-        for (auto i = 0u; i < openpose_points.size(); i++)
+        if (!openposePersonEntries.empty())
         {
-            long long best_match = -1;
-            float best_score = 0.0;
-
-            /* Find best correspondance in the LK set */
-            for (auto &entry_lk: lkanade_points)
+            const auto numberKeypoints = openposePersonEntries[0].keypoints.size();
+            for (auto i = 0u; i < openposePersonEntries.size(); i++)
             {
-                int inliers = 0, active = 0;
-                int idx = entry_lk.first;
+                auto bestMatch = -1ll;
+                auto bestScore = 0.f;
 
-                /* Iterate through all keypoints */
-                for (auto kp = 0u; kp < openpose_points[i].keypoints.size(); kp++)
+                // Find best correspondance in the LK set
+                for (auto& entry_lk : mPointsLK)
                 {
-                    /* Not enough threshold */
-                    if (lkanade_points[idx].status[kp] || openpose_points[i].status[kp])
-                        continue;
+                    auto inliers = 0;
+                    auto active = 0;
+                    int idx = entry_lk.first;
 
-                    active ++;
-                    float dist = get_euclidean_distance(lkanade_points[idx].keypoints[kp],
-                                                        openpose_points[i].keypoints[kp]);
-                    // std::cout<<dist<<std::endl;
-                    if (dist < dist_thr)
-                        inliers ++;
+                    // Iterate through all keypoints
+                    for (auto kp = 0u; kp < numberKeypoints; kp++)
+                    {
+                        // Not enough threshold
+                        if (mPointsLK[idx].status[kp] || openposePersonEntries[i].status[kp])
+                            continue;
+
+                        active++;
+                        const auto dist = getEuclideanDistance(mPointsLK[idx].keypoints[kp],
+                                                               openposePersonEntries[i].keypoints[kp]);
+                        // std::cout<<dist<<std::endl;
+                        if (dist < distanceThreshold)
+                            inliers ++;
+                    }
+
+                    float score = 0.f;
+
+                    if (active) score = (float) inliers / (float) active;
+
+                    //std::cout<<inliers<<std::endl;
+
+                    if (score >= inlierRatioThreshold && score > bestScore)
+                    {
+                        bestScore = score;
+                        bestMatch = entry_lk.first;
+                        // std::cout<<"BEST MATCH ENCOUNTERED"<<std::endl;
+                    }
                 }
+                // Found a best match, update LK table and poseIds
+                if (bestMatch != -1)
+                    poseIds[i] = bestMatch;
+                else
+                    poseIds[i] = mNextPersonId++;
 
-                float score = 0.0;
-
-                if (active) score = (float) inliers / (float) active;
-
-                //std::cout<<inliers<<std::endl;
-
-                if (score >= inlier_thr && score > best_score)
-                {
-                    best_score = score;
-                    best_match = entry_lk.first;
-                    // std::cout<<"BEST MATCH ENCOUNTERED"<<std::endl;
-                }
+                pending_queue[poseIds[i]] = openposePersonEntries[i];
             }
-            /* Found a best match, update LK table and poseIds */
-            if (best_match != -1)
-                poseIds[i] = best_match;
-            else
-                poseIds[i] = max_person++;
-
-            pending_queue[poseIds[i]] = openpose_points[i];
-
         }
 
-        /* Update LK table with pending queue */
-        for (auto &entry_q: pending_queue)
-            lkanade_points[entry_q.first] = entry_q.second;
+        // Update LK table with pending queue
+        for (auto& entry_q: pending_queue)
+            mPointsLK[entry_q.first] = entry_q.second;
 
         return poseIds;
     }
+
+    PersonIdExtractor::PersonIdExtractor(const float confidenceThreshold, const float inlierRatioThreshold,
+                                         const float distanceThreshold, const int numberFramesToDeletePerson) :
+        mConfidenceThreshold{confidenceThreshold},
+        mInlierRatioThreshold{inlierRatioThreshold},
+        mDistanceThreshold{distanceThreshold},
+        mNumberFramesToDeletePerson{numberFramesToDeletePerson},
+        mNextPersonId{0ll}
+    {
+    }
+
+    PersonIdExtractor::~PersonIdExtractor()
+    {
+    }
+
     Array<long long> PersonIdExtractor::extractIds(const Array<float>& poseKeypoints, const cv::Mat& cvMatInput)
     {
         try
         {
             Array<long long> poseIds;
-            captureKeypoints(poseKeypoints, openpose_points);
+            std::vector<PersonEntry> openposePersonEntries;
+            captureKeypoints(openposePersonEntries, poseKeypoints, mConfidenceThreshold);
 
-            if (!init)
+            // First frame
+            if (mImagePrevious.empty())
             {
-                /* First frame initialization values */
-                init = true;
-                max_person = 0;
+                // Add first persons to the LK set
+                initializeLK(mPointsLK, mNextPersonId, poseKeypoints, mConfidenceThreshold);
 
-                /* Add first persons to the lknade set */
-                initializeLK(lkanade_points, poseKeypoints, max_person);
-
-                /* Capture current frame as floating point */
-                cvMatInput.convertTo(previous_frame, CV_32F);
+                // Capture current frame as floating point
+                cvMatInput.convertTo(mImagePrevious, CV_32F);
             }
+            // Rest
             else
             {
-                cv::Mat current_frame;
-                cvMatInput.convertTo(current_frame, CV_32F);
-                updateLK(lkanade_points, previous_frame, current_frame);
-                previous_frame = current_frame.clone();
+                cv::Mat imageCurrent;
+                std::vector<cv::Mat> pyramidImagesCurrent;
+                cvMatInput.convertTo(imageCurrent, CV_32F);
+                updateLK(mPointsLK, mPyramidImagesPrevious, pyramidImagesCurrent, mImagePrevious, imageCurrent,
+                         mNumberFramesToDeletePerson);
+                mImagePrevious = imageCurrent;
+                mPyramidImagesPrevious = pyramidImagesCurrent;
             }
 
-            /* Get poseIds and update LKset according to OpenPose set */
-            poseIds = match_lk_vs_op(lkanade_points,openpose_points,max_person);
+            // Get poseIds and update LKset according to OpenPose set
+            poseIds = matchLKAndOP(mPointsLK, mNextPersonId, openposePersonEntries, mInlierRatioThreshold,
+                                   mDistanceThreshold);
 
             return poseIds;
         }

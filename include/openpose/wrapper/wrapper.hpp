@@ -841,6 +841,16 @@ namespace op
             }
 
             mOutputWs.clear();
+            // Add frame information for GUI
+            // If this WGuiInfoAdder instance is placed before the WImageSaver or WVideoSaver, then the resulting
+            // recorded frames will look exactly as the final displayed image by the GUI
+            if (wrapperStructOutput.guiVerbose && (wrapperStructOutput.displayGui || !mUserOutputWs.empty()
+                                                   || mThreadManagerMode == ThreadManagerMode::Asynchronous
+                                                   || mThreadManagerMode == ThreadManagerMode::AsynchronousOut))
+            {
+                const auto guiInfoAdder = std::make_shared<GuiInfoAdder>(gpuNumber, wrapperStructOutput.displayGui);
+                mOutputWs.emplace_back(std::make_shared<WGuiInfoAdder<TDatumsPtr>>(guiInfoAdder));
+            }
             // Write people pose data on disk (json for OpenCV >= 3, xml, yml...)
             if (!writeKeypointCleaned.empty())
             {
@@ -893,16 +903,6 @@ namespace op
                 const auto heatMapSaver = std::make_shared<HeatMapSaver>(writeHeatMapsCleaned,
                                                                          wrapperStructOutput.writeHeatMapsFormat);
                 mOutputWs.emplace_back(std::make_shared<WHeatMapSaver<TDatumsPtr>>(heatMapSaver));
-            }
-            // Add frame information for GUI
-            // If this WGuiInfoAdder instance is placed before the WImageSaver or WVideoSaver, then the resulting
-            // recorded frames will look exactly as the final displayed image by the GUI
-            if (wrapperStructOutput.guiVerbose && (wrapperStructOutput.displayGui || !mUserOutputWs.empty()
-                                                   || mThreadManagerMode == ThreadManagerMode::Asynchronous
-                                                   || mThreadManagerMode == ThreadManagerMode::AsynchronousOut))
-            {
-                const auto guiInfoAdder = std::make_shared<GuiInfoAdder>(gpuNumber, wrapperStructOutput.displayGui);
-                mOutputWs.emplace_back(std::make_shared<WGuiInfoAdder<TDatumsPtr>>(guiInfoAdder));
             }
             // Minimal graphical user interface (GUI)
             spWGui = nullptr;

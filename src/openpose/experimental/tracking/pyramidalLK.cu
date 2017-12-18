@@ -1,4 +1,4 @@
-// #include <openpose/experimental/tracking/lkpyramidal.hpp>
+// #include <openpose/experimental/tracking/pyramidalLK.hpp>
 
 
 
@@ -130,7 +130,7 @@
 //     }
 
 //     /* Given an OpenCV image 'img', build a gaussian pyramid of size 'levels' */
-//     void build_gaussian_pyramid_gpu(Mat &img, int levels, vector<cv::gpu::GpuMat> &pyramid)
+//     void build_gaussian_pyramid_gpu(const Mat& img, int levels, vector<cv::gpu::GpuMat>& pyramid)
 //     {
 //         cv::gpu::GpuMat current;
 //         pyramid.clear();
@@ -149,7 +149,7 @@
 
 //     void call_bkernel(cv::gpu::GpuMat img, int w, int h)
 //     {
-//         /* Device image */
+//          Device image 
 //         float *img_ptr = (float*) img.ptr<float>();
 //         float2 *cpuf2 = (float2 *) malloc(sizeof(float2)*10);
         
@@ -170,7 +170,7 @@
 //     }
 
 
-//     int lkpyramidal_iteration_gpu (cv::gpu::GpuMat &I, cv::gpu::GpuMat &J, 
+//     int lkpyramidal_iteration_gpu (cv::gpu::GpuMat& I, cv::gpu::GpuMat& J, 
 //                                     float2 *ptsI,
 //                                     float2 *ptsJ, 
 //                                     int patch_size,
@@ -202,9 +202,10 @@
 //         return 0;
 //     }
 
-//     int lkpyramidal_gpu(cv::Mat &I, cv::Mat &J,int levels, int patch_size, 
-//                         vector<Point2f> &ptsI, vector<Point2f> &ptsJ,
-//                         vector<char> &status)
+//     int pyramidalLKGpu(vector<Point2f>& ptsI, vector<Point2f>& ptsJ,
+//                         vector<char>& status,
+//                        const cv::Mat& I, const cv::Mat& J,
+//                         const int levels, const int patch_size) 
 //     {
 //         vector<cv::gpu::GpuMat> pyrI;
 //         vector<cv::gpu::GpuMat> pyrJ;
