@@ -194,7 +194,7 @@ namespace op
                         if (active > 0)
                         {
                             const auto score = inliers / (float)active;
-                            if (score > bestScore)
+                            if (score > bestScore && score >= inlierRatioThreshold)
                             {
                                 bestScore = score;
                                 bestMatch = personEntry.first;
@@ -202,7 +202,7 @@ namespace op
                         }
                     }
                     // Found a best match, update LK table and poseIds
-                    if (bestMatch != -1 && bestScore >= inlierRatioThreshold)
+                    if (bestMatch != -1)
                         poseId = bestMatch;
                     else
                         poseId = nextPersonId++;
