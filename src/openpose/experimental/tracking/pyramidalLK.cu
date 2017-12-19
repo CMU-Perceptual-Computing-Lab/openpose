@@ -6,19 +6,19 @@
 #include <iomanip>
 #include <iostream>
 #include <opencv2/opencv.hpp>
-#if CV_VERSION_MAJOR > 2
+#if (defined(CV_VERSION_EPOCH) && CV_VERSION_EPOCH == 2)
+    #include <opencv2/gpu/gpu.hpp>
+    #define cvCuda cv::gpu
+#else
     #include <opencv2/cudaimgproc.hpp>
     #include <opencv2/core/cuda.hpp>
-    #define GPU_MAT cv::cuda::GpuMat
-#else
-    #include <opencv2/gpu/gpu.hpp>
-    #define GPU_MAT cv::gpu::GpuMat
+    #define cvCuda cv::cuda
 #endif
 #include <openpose/experimental/tracking/pyramidalLK.hpp>
 
 namespace op
 {
-    // Error codes for kernel caller*/
+    // Error codes for kernel caller
     #define IMAGE_SIZES_NEQUAL -1
 
     // Point error status
@@ -28,7 +28,7 @@ namespace op
     // Global parameters
     int block_size = 128;
 
-    __global__ void pyramidalLKKernel(float* I, float* J, const int w, const int h, 
+    __global__ void pyramidalLKKernel(float* I, float* J, const int w, const int h,
                                       float2* ptsI, float2* ptsJ, const int npoints,
                                       char* status, const int patchSize, const float scale)
     {
@@ -57,15 +57,15 @@ namespace op
         {
             status[idx] = OUT_OF_FRAME;
             return;
-        } 
+        }
         // Validate patch area for J
-        if ((int)xj < 0 || (int)yj < 0 || (int)xj >= w ||(int)yj >= h)  
+        if ((int)xj < 0 || (int)yj < 0 || (int)xj >= w ||(int)yj >= h)
         {
             status[idx] = OUT_OF_FRAME;
             return;
         }
 
-        // Sum terms to calculate delta_u and delta_v    
+        // Sum terms to calculate delta_u and delta_v
         float sum_xx = 0.0, sum_yy = 0.0, sum_xt = 0.0,
               sum_yt = 0.0, sum_xy = 0.0;
 
@@ -80,17 +80,17 @@ namespace op
         {
             for (int j = -r; j <= r; j++)
             {
-                dx = (I[((int)yi+i)*w + ((int)xi+1+j)] - 
-                      I[((int)yi+i)*w + ((int)xi-1+j)]) / 2.0;    
-                dy = (I[((int)yi+i+1)*w + ((int)xi+j)] - 
+                dx = (I[((int)yi+i)*w + ((int)xi+1+j)] -
+                      I[((int)yi+i)*w + ((int)xi-1+j)]) / 2.0;
+                dy = (I[((int)yi+i+1)*w + ((int)xi+j)] -
                       I[((int)yi+i-1)*w + ((int)xi+j)]) / 2.0;
-                dt = J[((int)yj+i)*w + ((int)xj+j)] - 
+                dt = J[((int)yj+i)*w + ((int)xj+j)] -
                      I[((int)yi+i)*w + ((int)xi+j)];
                 sum_xx += dx*dx;
                 sum_yy += dy*dy;
                 sum_xy += dx*dy;
                 sum_yt += dy*dt;
-                sum_xt += dx*dt; 
+                sum_xt += dx*dt;
             }
         }
 
@@ -103,7 +103,7 @@ namespace op
         {
             status[idx] = ZERO_DENOMINATOR;
             return;
-        } 
+        }
 
         float num_u = (-1.0 * sum_yy * sum_xt) + (sum_xy * sum_yt);
         float num_v = (-1.0 * sum_xx * sum_yt) + (sum_xt * sum_xy);
@@ -115,52 +115,49 @@ namespace op
     }
 
     // Given an OpenCV image 'img', build a gaussian pyramid of size 'levels'
-    void buildGaussianPyramid(std::vector<GPU_MAT>& pyramid, const cv::Mat& img, const int levels)
+    void buildGaussianPyramid(std::vector<cvCuda::GpuMat>& pyramid, const cv::Mat& img, const int levels)
     {
-        GPU_MAT current;
+        cvCuda::GpuMat current;
         pyramid.clear();
 
         current.upload(img);
         pyramid.push_back(current);
 
-        for(int i = 0; i < levels - 1; i++)
+        for (int i = 0; i < levels - 1; i++)
         {
-            GPU_MAT tmp;
-            #if CV_VERSION_MAJOR > 2
-                cv::cuda::pyrDown(pyramid.back(), tmp);
-            #else
-                cv::gpu::pyrDown(pyramid.back(), tmp);
-            #endif
+            cvCuda::GpuMat tmp;
+            cvCuda::pyrDown(pyramid.back(), tmp);
             pyramid.push_back(tmp);
         }
     }
 
-    int pyramidalLKIterationGpu(GPU_MAT& I, GPU_MAT& J, 
+    int pyramidalLKIterationGpu(cvCuda::GpuMat& I, cvCuda::GpuMat& J,
                                 float2* ptsI,
-                                float2* ptsJ, 
+                                float2* ptsJ,
                                 const int patchSize,
-                                const int npoints, 
+                                const int npoints,
                                 char* status,
                                 const float scale)
-    { 
+    {
 
         // Get float pointers of I and J
         float* ptrI = (float*) I.ptr<float>();
-        float* ptrJ = (float*) J.ptr<float>();    
+        float* ptrJ = (float*) J.ptr<float>();
 
         // Validate equal dimension for both images and assign width and height
         int w = I.cols;
         int h = I.rows;
 
-        if (w != J.cols || h != I.rows) return IMAGE_SIZES_NEQUAL;
+        if (w != J.cols || h != I.rows)
+            return IMAGE_SIZES_NEQUAL;
 
         // Block size and number of blocks
         int bsize = block_size;
         int nblocks = (npoints + bsize -1) / bsize;
 
-        // Launch kernel 
+        // Launch kernel
         pyramidalLKKernel<<<nblocks, bsize>>>(ptrI,ptrJ,w,h,ptsI,ptsJ,
-                                              npoints,status, patchSize, scale);      
+                                              npoints,status, patchSize, scale);
         // Wait for all cuda threads to finish
         cudaDeviceSynchronize();
 
@@ -172,16 +169,16 @@ namespace op
                        const cv::Mat& I, const cv::Mat& J,
                        const int levels, const int patchSize)
     {
-        std::vector<GPU_MAT> pyrI;
-        std::vector<GPU_MAT> pyrJ;
+        std::vector<cvCuda::GpuMat> pyrI;
+        std::vector<cvCuda::GpuMat> pyrJ;
 
         // Allocate ptsJ and initialize
         ptsJ.clear();
         ptsJ.assign(ptsI.begin(), ptsI.end());
 
         // Build Gaussian pyramid for both I and J
-        buildGaussianPyramid(pyrI, I, levels);            
-        buildGaussianPyramid(pyrJ, J, levels);                                        
+        buildGaussianPyramid(pyrI, I, levels);
+        buildGaussianPyramid(pyrJ, J, levels);
         // Convert cv::Point2f std::vector to float2 array
         int pts_size = sizeof(float2) * ptsI.size();
         float2* ptsI_f2 = (float2*) malloc(pts_size);
@@ -219,8 +216,8 @@ namespace op
                 scale = 2.0;
 
             pyramidalLKIterationGpu(pyrI[l], pyrJ[l], ptsI_gpu, ptsJ_gpu,
-                                    patchSize, npoints, status_gpu,scale); 
-        } 
+                                    patchSize, npoints, status_gpu,scale);
+        }
 
         // Copy points and status back
         cudaMemcpy(ptsI_f2, ptsI_gpu, pts_size, cudaMemcpyDeviceToHost);
@@ -244,4 +241,4 @@ namespace op
 
         return 0;
     }
-}     
+}
