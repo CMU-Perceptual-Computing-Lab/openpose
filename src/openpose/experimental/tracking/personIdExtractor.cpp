@@ -73,7 +73,6 @@ namespace op
             // Update or remove elements
             for (auto& key : keyValues)
             {
-                // const int idx = entry.first;
                 auto& element = personEntries[key];
 
                 // Remove keypoint
@@ -155,52 +154,60 @@ namespace op
                 const auto numberKeypoints = openposePersonEntries[0].keypoints.size();
                 for (auto i = 0u; i < openposePersonEntries.size(); i++)
                 {
-                    auto bestMatch = -1ll;
-                    auto bestScore = 0.f;
+                    const auto& openposePersonEntry = openposePersonEntries.at(i);
+                    auto& poseId = poseIds.at(i);
 
                     // Find best correspondance in the LK set
-                    for (auto& personEntry : personEntries)
+                    auto bestMatch = -1ll;
+                    auto bestScore = 0.f;
+                    for (const auto& personEntry : personEntries)
                     {
+                        const auto& element = personEntry.second;
                         auto inliers = 0;
                         auto active = 0;
-                        int idx = personEntry.first;
 
+                        // Security checks
+                        if (element.status.size() != numberKeypoints)
+                            error("element.status.size() != numberKeypoints ||", __LINE__, __FUNCTION__, __FILE__);
+                        if (openposePersonEntry.status.size() != numberKeypoints)
+                            error("openposePersonEntry.status.size() != numberKeypoints",
+                                  __LINE__, __FUNCTION__, __FILE__);
+                        if (element.keypoints.size() != numberKeypoints)
+                            error("element.keypoints.size() != numberKeypoints ||", __LINE__, __FUNCTION__, __FILE__);
+                        if (openposePersonEntry.keypoints.size() != numberKeypoints)
+                            error("openposePersonEntry.keypoints.size() != numberKeypoints",
+                                  __LINE__, __FUNCTION__, __FILE__);
                         // Iterate through all keypoints
                         for (auto kp = 0u; kp < numberKeypoints; kp++)
                         {
-                            // Not enough threshold
-                            if (personEntries.at(idx).status.at(kp) || openposePersonEntries.at(i).status.at(kp))
-                                continue;
-
-                            active++;
-                            const auto dist = getEuclideanDistance(personEntries.at(idx).keypoints.at(kp),
-                                                                   openposePersonEntries.at(i).keypoints.at(kp));
-                            // std::cout<<dist<<std::endl;
-                            if (dist < distanceThreshold)
-                                inliers ++;
+                            // If enough threshold
+                            if (!element.status[kp] && !openposePersonEntry.status[kp])
+                            {
+                                active++;
+                                const auto distance = getEuclideanDistance(element.keypoints[kp],
+                                                                           openposePersonEntry.keypoints[kp]);
+                                if (distance < distanceThreshold)
+                                    inliers++;
+                            }
                         }
 
-                        float score = 0.f;
-
-                        if (active)
-                            score = inliers / (float)active;
-
-                        //std::cout<<inliers<<std::endl;
-
-                        if (score >= inlierRatioThreshold && score > bestScore)
+                        if (active > 0)
                         {
-                            bestScore = score;
-                            bestMatch = personEntry.first;
-                            // std::cout<<"BEST MATCH ENCOUNTERED"<<std::endl;
+                            const auto score = inliers / (float)active;
+                            if (score > bestScore)
+                            {
+                                bestScore = score;
+                                bestMatch = personEntry.first;
+                            }
                         }
                     }
                     // Found a best match, update LK table and poseIds
-                    if (bestMatch != -1)
-                        poseIds.at(i) = bestMatch;
+                    if (bestMatch != -1 && bestScore >= inlierRatioThreshold)
+                        poseId = bestMatch;
                     else
-                        poseIds.at(i) = nextPersonId++;
+                        poseId = nextPersonId++;
 
-                    pendingQueue[poseIds.at(i)] = openposePersonEntries.at(i);
+                    pendingQueue[poseId] = openposePersonEntry;
                 }
             }
 
@@ -244,7 +251,6 @@ namespace op
             {
                 // Add first persons to the LK set
                 initializeLK(mPersonEntries, mNextPersonId, poseKeypoints, mConfidenceThreshold);
-
                 // Capture current frame as floating point
                 cvMatInput.convertTo(mImagePrevious, CV_32F);
             }
