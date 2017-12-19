@@ -194,7 +194,6 @@ namespace op
                 mCurrentId = id;
                 // Parameters
                 const auto numberPeople = handKeypoints.at(0).getSize(0);
-                const auto handNumberParts = handKeypoints[0].getSize(1);
                 const auto thresholdRectangle = 0.25f;
                 // Update pose keypoints and hand rectangles
                 mPoseTrack.resize(numberPeople);
@@ -206,14 +205,14 @@ namespace op
                     // Left hand
                     if (getAverageScore(handKeypoints[0], person) > scoreThreshold)
                     {
-                        const auto handLeftRectangle = getKeypointsRectangle(handKeypoints[0], person, handNumberParts, thresholdRectangle);
+                        const auto handLeftRectangle = getKeypointsRectangle(handKeypoints[0], person, thresholdRectangle);
                         if (handLeftRectangle.area() > 0)
                             mHandLeftPrevious.emplace_back(handLeftRectangle);
                     }
                     // Right hand
                     if (getAverageScore(handKeypoints[1], person) > scoreThreshold)
                     {
-                        const auto handRightRectangle = getKeypointsRectangle(handKeypoints[1], person, handNumberParts, thresholdRectangle);
+                        const auto handRightRectangle = getKeypointsRectangle(handKeypoints[1], person, thresholdRectangle);
                         if (handRightRectangle.area() > 0)
                             mHandRightPrevious.emplace_back(handRightRectangle);
                     }
