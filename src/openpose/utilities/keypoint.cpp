@@ -164,8 +164,7 @@ namespace op
                 // Keypoints
                 for (auto person = 0 ; person < keypoints.getSize(0) ; person++)
                 {
-                    const auto personRectangle = getKeypointsRectangle(keypoints, person, numberKeypoints,
-                                                                       thresholdRectangle);
+                    const auto personRectangle = getKeypointsRectangle(keypoints, person, thresholdRectangle);
                     if (personRectangle.area() > 0)
                     {
                         const auto ratioAreas = fastMin(1.f, fastMax(personRectangle.width/(float)width,
@@ -224,11 +223,11 @@ namespace op
         }
     }
 
-    Rectangle<float> getKeypointsRectangle(const Array<float>& keypoints, const int person, const int numberKeypoints,
-                                           const float threshold)
+    Rectangle<float> getKeypointsRectangle(const Array<float>& keypoints, const int person, const float threshold)
     {
         try
         {
+            const auto numberKeypoints = keypoints.getSize(1);
             // Security checks
             if (numberKeypoints < 1)
                 error("Number body parts must be > 0", __LINE__, __FUNCTION__, __FILE__);
@@ -292,12 +291,11 @@ namespace op
         }
     }
 
-    float getKeypointsArea(const Array<float>& keypoints, const int person, const int numberKeypoints,
-                           const float threshold)
+    float getKeypointsArea(const Array<float>& keypoints, const int person, const float threshold)
     {
         try
         {
-            return getKeypointsRectangle(keypoints, person, numberKeypoints, threshold).area();
+            return getKeypointsRectangle(keypoints, person, threshold).area();
         }
         catch (const std::exception& e)
         {
@@ -313,12 +311,11 @@ namespace op
             if (!keypoints.empty())
             {
                 const auto numberPeople = keypoints.getSize(0);
-                const auto numberKeypoints = keypoints.getSize(1);
                 auto biggestPoseIndex = -1;
                 auto biggestArea = -1.f;
                 for (auto person = 0 ; person < numberPeople ; person++)
                 {
-                    const auto newPersonArea = getKeypointsArea(keypoints, person, numberKeypoints, threshold);
+                    const auto newPersonArea = getKeypointsArea(keypoints, person, threshold);
                     if (newPersonArea > biggestArea)
                     {
                         biggestArea = newPersonArea;

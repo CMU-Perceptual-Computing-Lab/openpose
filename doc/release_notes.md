@@ -156,7 +156,9 @@ OpenPose Library - Release Notes
     1. Heatmaps can be saved in floating format.
     2. More efficient non-processing version (i.e. if all keypoint extractors are disabled, and only image extraction and display/saving operations are performed).
     3. Heat maps scaling: Added `heatmaps_scale` to OpenPoseDemo, added option not to scale the heatmaps, and added custom `float` format to save heatmaps in floating format.
+    4. Detector of the number of GPU also considers the initial GPU index given by the user.
 2. Functions or parameters renamed:
     1. `PoseParameters` splitted into `PoseParameters` and `PoseParametersRender` and const parameters turned into functions for more clarity.
 3. Main bugs fixed:
     1. Render working on images > 4K (#324).
+    2. Cleaned redundant arguments on `getAverageScore` and `getKeypointsArea`.
