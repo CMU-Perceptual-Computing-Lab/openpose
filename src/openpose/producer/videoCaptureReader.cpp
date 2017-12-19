@@ -33,8 +33,8 @@ namespace op
                       __LINE__, __FUNCTION__, __FILE__);
             // Make sure video capture was opened
             if (!isOpened())
-                error("VideoCapture (IP camera/video) could not be opened for path: '" + path + "'.",
-                      __LINE__, __FUNCTION__, __FILE__);
+                error("VideoCapture (IP camera/video) could not be opened for path: '" + path + "'. If"
+                      " it is a video path, is the path correct?", __LINE__, __FUNCTION__, __FILE__);
         }
         catch (const std::exception& e)
         {
