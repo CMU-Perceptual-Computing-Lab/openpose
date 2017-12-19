@@ -14,9 +14,9 @@ namespace op
         try
         {
             // Parts Connection
-            const auto& bodyPartPairs = POSE_BODY_PART_PAIRS[(int)poseModel];
-            const auto& mapIdx = POSE_MAP_IDX[(int)poseModel];
-            const auto numberBodyParts = POSE_NUMBER_BODY_PARTS[(int)poseModel];
+            const auto& bodyPartPairs = getPosePartPairs(poseModel);
+            const auto& mapIdx = getPoseMapIndex(poseModel);
+            const auto numberBodyParts = getPoseNumberBodyParts(poseModel);
             const auto numberBodyPartPairs = bodyPartPairs.size() / 2;
 
             // Vector<int> = Each body part + body parts counter; double = subsetScore
@@ -42,8 +42,7 @@ namespace op
                     // Change w.r.t. other
                     if (numberA == 0) // numberB == 0 or not
                     {
-                        if (poseModel == PoseModel::COCO_18 || poseModel == PoseModel::BODY_18
-                            || poseModel == PoseModel::BODY_19 || poseModel == PoseModel::BODY_23)
+                        if (poseModel != PoseModel::MPI_15 && poseModel != PoseModel::MPI_15_4)
                         {
                             for (auto i = 1; i <= numberB; i++)
                             {
@@ -71,7 +70,7 @@ namespace op
                                 }
                             }
                         }
-                        else if (poseModel == PoseModel::MPI_15 || poseModel == PoseModel::MPI_15_4)
+                        else
                         {
                             for (auto i = 1; i <= numberB; i++)
                             {
@@ -85,14 +84,10 @@ namespace op
                                 subset.emplace_back(std::make_pair(rowVector, subsetScore));
                             }
                         }
-                        else
-                            error("Unknown model, cast to int = " + std::to_string((int)poseModel),
-                                  __LINE__, __FUNCTION__, __FILE__);
                     }
                     else // if (numberA != 0 && numberB == 0)
                     {
-                        if (poseModel == PoseModel::COCO_18 || poseModel == PoseModel::BODY_18
-                            || poseModel == PoseModel::BODY_19 || poseModel == PoseModel::BODY_23)
+                        if (poseModel != PoseModel::MPI_15 && poseModel != PoseModel::MPI_15_4)
                         {
                             for (auto i = 1; i <= numberA; i++)
                             {
@@ -120,7 +115,7 @@ namespace op
                                 }
                             }
                         }
-                        else if (poseModel == PoseModel::MPI_15 || poseModel == PoseModel::MPI_15_4)
+                        else
                         {
                             for (auto i = 1; i <= numberA; i++)
                             {
@@ -134,9 +129,6 @@ namespace op
                                 subset.emplace_back(std::make_pair(rowVector, subsetScore));
                             }
                         }
-                        else
-                            error("Unknown model, cast to int = " + std::to_string((int)poseModel),
-                                  __LINE__, __FUNCTION__, __FILE__);
                     }
                 }
                 else // if (numberA != 0 && numberB != 0)
@@ -238,7 +230,8 @@ namespace op
                         // Add ears connections (in case person is looking to opposite direction to camera)
                         else if (((poseModel == PoseModel::COCO_18
                                     || poseModel == PoseModel::BODY_18) && (pairIndex==17 || pairIndex==18))
-                                 || (poseModel == PoseModel::BODY_19 && (pairIndex==18 || pairIndex==19))
+                                 || ((poseModel == PoseModel::BODY_19 || poseModel == PoseModel::BODY_59)
+                                        && (pairIndex==18 || pairIndex==19))
                                  || (poseModel == PoseModel::BODY_23 && (pairIndex==22 || pairIndex==23)))
                         {
                             for (const auto& connectionKI : connectionK)

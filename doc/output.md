@@ -16,7 +16,7 @@ There are 2 alternatives to save the **(x,y,score) body part locations**. The `w
 }
 ```
 
-The body part order of the COCO (18 body parts) and MPI (15 body parts) keypoints is described in `POSE_BODY_PART_MAPPING` in [include/openpose/pose/poseParameters.hpp](../include/openpose/pose/poseParameters.hpp). E.g., for COCO:
+The body part order of the COCO (18 body parts) and MPI (15 body parts) keypoints is described in `POSE_BODY_PART_MAPPING` in [src/openpose/pose/poseParameters.cpp](../src/openpose/pose/poseParameters.cpp). E.g., for COCO:
 ```
     POSE_COCO_BODY_PARTS {
         {0,  "Nose"},
@@ -37,7 +37,7 @@ The body part order of the COCO (18 body parts) and MPI (15 body parts) keypoint
         {15, "LEye"},
         {16, "REar"},
         {17, "LEar"},
-        {18, "Bkg"},
+        {18, "Background"},
     }
 ```
 

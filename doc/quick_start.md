@@ -6,7 +6,7 @@ OpenPose - Quick Start
     1. [Running on Video](#running-on-video)
     2. [Running on Webcam](#running-on-webcam)
     3. [Running on Images](#running-on-images)
-    4. [Maximum Accuracy Configuration](#Maximum-accuracy-configuration)
+    4. [Maximum Accuracy Configuration](#maximum-accuracy-configuration)
 2. [Expected Visual Results](#expected-visual-results)
 
 

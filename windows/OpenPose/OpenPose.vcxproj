@@ -195,6 +195,7 @@
     <ClInclude Include="..\..\include\openpose\pose\poseExtractorCaffe.hpp" />
     <ClInclude Include="..\..\include\openpose\pose\poseGpuRenderer.hpp" />
     <ClInclude Include="..\..\include\openpose\pose\poseParameters.hpp" />
+    <ClInclude Include="..\..\include\openpose\pose\poseParametersRender.hpp" />
     <ClInclude Include="..\..\include\openpose\pose\poseRenderer.hpp" />
     <ClInclude Include="..\..\include\openpose\pose\renderPose.hpp" />
     <ClInclude Include="..\..\include\openpose\pose\wPoseExtractor.hpp" />
@@ -312,6 +313,7 @@
     <ClCompile Include="..\..\src\openpose\pose\poseExtractorCaffe.cpp" />
     <ClCompile Include="..\..\src\openpose\pose\poseGpuRenderer.cpp" />
     <ClCompile Include="..\..\src\openpose\pose\poseParameters.cpp" />
+    <ClCompile Include="..\..\src\openpose\pose\poseParametersRender.cpp" />
     <ClCompile Include="..\..\src\openpose\pose\poseRenderer.cpp" />
     <ClCompile Include="..\..\src\openpose\pose\renderPose.cpp" />
     <ClCompile Include="..\..\src\openpose\producer\defineTemplates.cpp" />

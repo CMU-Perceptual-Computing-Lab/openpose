@@ -1,4 +1,5 @@
 #include <openpose/pose/poseParameters.hpp>
+#include <openpose/pose/poseParametersRender.hpp>
 #include <openpose/pose/renderPose.hpp>
 #include <openpose/pose/poseRenderer.hpp>
 
@@ -11,8 +12,8 @@ namespace op
             // POSE_BODY_PART_MAPPING crashes on Windows, replaced by getPoseBodyPartMapping
             // auto partToName = POSE_BODY_PART_MAPPING[(int)poseModel];
             auto partToName = getPoseBodyPartMapping(poseModel);
-            const auto& bodyPartPairs = POSE_BODY_PART_PAIRS[(int)poseModel];
-            const auto& mapIdx = POSE_MAP_IDX[(int)poseModel];
+            const auto& bodyPartPairs = getPosePartPairs(poseModel);
+            const auto& mapIdx = getPoseMapIndex(poseModel);
 
             for (auto bodyPart = 0u; bodyPart < bodyPartPairs.size(); bodyPart+=2)
             {

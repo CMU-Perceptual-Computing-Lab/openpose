@@ -164,8 +164,8 @@ namespace op
         {
             #ifdef USE_CAFFE
                 const auto heatMapsBlob = bottom.at(0);
-                const auto* const heatMapsPtr = heatMapsBlob->cpu_data();                       // ~8.5ms / 114
-                const auto* const peaksPtr = bottom.at(1)->cpu_data();                          // ~0.02ms
+                const auto* const heatMapsPtr = heatMapsBlob->cpu_data();                 // ~8.5 ms COCO, 27ms BODY_59
+                const auto* const peaksPtr = bottom.at(1)->cpu_data();                    // ~0.02ms
                 const auto maxPeaks = mTopSize[1];
                 connectBodyPartsCpu(poseKeypoints, poseScores, heatMapsPtr, peaksPtr, mPoseModel,
                                     Point<int>{heatMapsBlob->shape(3), heatMapsBlob->shape(2)},
