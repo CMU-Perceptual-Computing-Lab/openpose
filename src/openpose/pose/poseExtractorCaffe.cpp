@@ -84,9 +84,9 @@ namespace op
                 // HeatMaps extractor blob and layer
                 const auto caffeNetOutputBlobs = caffeNetSharedToPtr(caffeNetOutputBlob);
                 resizeAndMergeCaffe->Reshape(caffeNetOutputBlobs, {heatMapsBlob.get()},
-                                             POSE_CCN_DECREASE_FACTOR[(int)poseModel], 1.f/scaleInputToNetInput);
+                                             getPoseNetDecreaseFactor(poseModel), 1.f/scaleInputToNetInput);
                 // Pose extractor blob and layer
-                nmsCaffe->Reshape({heatMapsBlob.get()}, {peaksBlob.get()}, POSE_MAX_PEAKS[(int)poseModel]);
+                nmsCaffe->Reshape({heatMapsBlob.get()}, {peaksBlob.get()}, getPoseMaxPeaks(poseModel));
                 // Pose extractor blob and layer
                 bodyPartConnectorCaffe->Reshape({heatMapsBlob.get(), peaksBlob.get()}, {poseBlob.get()});
                 // Cuda check
@@ -101,16 +101,16 @@ namespace op
         }
 
         void addCaffeNetOnThread(std::vector<std::shared_ptr<NetCaffe>>& netCaffe,
-                         std::vector<boost::shared_ptr<caffe::Blob<float>>>& caffeNetOutputBlob,
-                         const PoseModel poseModel, const int gpuId,
-                         const std::string& modelFolder, const bool enableGoogleLogging)
+                                 std::vector<boost::shared_ptr<caffe::Blob<float>>>& caffeNetOutputBlob,
+                                 const PoseModel poseModel, const int gpuId,
+                                 const std::string& modelFolder, const bool enableGoogleLogging)
         {
             try
             {
                 // Add Caffe Net
                 netCaffe.emplace_back(
-                    std::make_shared<NetCaffe>(modelFolder + POSE_PROTOTXT[(int)poseModel],
-                                               modelFolder + POSE_TRAINED_MODEL[(int)poseModel],
+                    std::make_shared<NetCaffe>(modelFolder + getPoseProtoTxt(poseModel),
+                                               modelFolder + getPoseTrainedModel(poseModel),
                                                gpuId, enableGoogleLogging)
                 );
                 // Initializing them on the thread

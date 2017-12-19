@@ -377,6 +377,9 @@
     <ClInclude Include="..\..\include\openpose\pose\poseParameters.hpp">
       <Filter>Header Files\pose</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\openpose\pose\poseParametersRender.hpp">
+      <Filter>Header Files\pose</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\include\openpose\pose\poseRenderer.hpp">
       <Filter>Header Files\pose</Filter>
     </ClInclude>
@@ -721,6 +724,9 @@
       <Filter>Source Files\pose</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\openpose\pose\poseParameters.cpp">
+      <Filter>Source Files\pose</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\pose\poseParametersRender.cpp">
       <Filter>Source Files\pose</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\openpose\pose\poseRenderer.cpp">

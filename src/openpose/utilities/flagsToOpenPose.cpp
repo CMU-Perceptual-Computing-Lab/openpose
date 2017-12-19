@@ -25,6 +25,8 @@ namespace op
                 return PoseModel::BODY_19;
             else if (poseModeString == "BODY_23")
                 return PoseModel::BODY_23;
+            else if (poseModeString == "BODY_59")
+                return PoseModel::BODY_59;
             // else
             error("String does not correspond to any model (COCO, MPI, MPI_4_layers)",
                   __LINE__, __FUNCTION__, __FILE__);
@@ -77,9 +79,11 @@ namespace op
                 return ScaleMode::ZeroToOne;
             else if (heatMapScale == 2)
                 return ScaleMode::UnsignedChar;
+            else if (heatMapScale == 3)
+                return ScaleMode::NoScale;
             // else
-            const std::string message = "Integer does not correspond to any scale mode: (0, 1, 2) for"
-                                        " (PlusMinusOne, ZeroToOne, UnsignedChar).";
+            const std::string message = "Integer does not correspond to any scale mode: (0, 1, 2, 3) for"
+                                        " (PlusMinusOne, ZeroToOne, UnsignedChar, NoScale).";
             error(message, __LINE__, __FUNCTION__, __FILE__);
             return ScaleMode::PlusMinusOne;
         }

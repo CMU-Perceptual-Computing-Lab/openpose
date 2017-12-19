@@ -14,7 +14,7 @@ namespace op
     // Example to read it in Python, assuming a (18 x 300 x 500) size Array
     // x = np.fromfile(heatMapFullPath, dtype=np.float32)
     // assert x[0] == 3 # First parameter saves the number of dimensions (18x300x500 = 3 dimensions)
-    // shape_x = x[1:x[0]]
+    // shape_x = x[1:1+int(x[0])]
     // assert len(shape_x[0]) == 3 # Number of dimensions
     // assert shape_x[0] == 18 # Size of the first dimension
     // assert shape_x[1] == 300 # Size of the second dimension
