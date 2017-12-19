@@ -1,6 +1,9 @@
+#include <iostream>
 #include <openpose/experimental/tracking/pyramidalLK.hpp>
 #include <openpose/experimental/tracking/personIdExtractor.hpp>
-#include <iostream>
+
+#define LK_CUDA
+
 namespace op
 {
     float getEuclideanDistance(const cv::Point2f& a, const cv::Point2f& b)
@@ -57,8 +60,15 @@ namespace op
 
             // Update all keypoints for that entry
             PersonEntry personEntry;
-            pyramidalLKCpu(mPointsLK[idx].keypoints, personEntry.keypoints, pyramidImagesPrevious,
-                           pyramidImagesCurrent, mPointsLK[idx].status, imagePrevious, imageCurrent, 3, 21);
+            #ifdef LK_CUDA
+                UNUSED(pyramidImagesPrevious);
+                UNUSED(pyramidImagesCurrent);
+                pyramidalLKGpu(mPointsLK[idx].keypoints, personEntry.keypoints, mPointsLK[idx].status,
+                               imagePrevious, imageCurrent, 3, 21);
+            #else
+                pyramidalLKCpu(mPointsLK[idx].keypoints, personEntry.keypoints, pyramidImagesPrevious,
+                               pyramidImagesCurrent, mPointsLK[idx].status, imagePrevious, imageCurrent, 3, 21);
+            #endif
             personEntry.status = mPointsLK[idx].status;
             mPointsLK[idx] = personEntry;
         }

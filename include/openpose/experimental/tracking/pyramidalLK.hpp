@@ -14,12 +14,12 @@ namespace op
                                const cv::Mat& imageCurrent,
                                const int levels,
                                const int patchSize = 5);
-    int pyramidalLKGpu(std::vector<cv::Point2f>& ptsI,
-                       std::vector<cv::Point2f>& ptsJ,
-                       std::vector<char>& status,
-                       const cv::Mat& imagePrevious,
-                       const cv::Mat& imageCurrent,
-                       const int levels, const int patchSize); 
+    OP_API int pyramidalLKGpu(std::vector<cv::Point2f>& ptsI,
+                              std::vector<cv::Point2f>& ptsJ,
+                              std::vector<char>& status,
+                              const cv::Mat& imagePrevious,
+                              const cv::Mat& imageCurrent,
+                              const int levels, const int patchSize); 
 }
 
 #endif // OPENPOSE_TRACKING_LKPYRAMIDAL_HPP
