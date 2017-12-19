@@ -1,5 +1,7 @@
 #include <iostream>
 #include <openpose/experimental/tracking/pyramidalLK.hpp>
+#include <openpose/utilities/fastMath.hpp>
+#include <openpose/utilities/keypoint.hpp>
 #include <openpose/experimental/tracking/personIdExtractor.hpp>
 
 // #define LK_CUDA
@@ -141,6 +143,7 @@ namespace op
     Array<long long> matchLKAndOP(std::unordered_map<int,PersonEntry>& personEntries,
                                   long long& nextPersonId,
                                   const std::vector<PersonEntry>& openposePersonEntries,
+                                  const Array<float>& poseKeypoints,
                                   const float inlierRatioThreshold,
                                   const float distanceThreshold)
     {
@@ -155,6 +158,8 @@ namespace op
                 for (auto i = 0u; i < openposePersonEntries.size(); i++)
                 {
                     const auto& openposePersonEntry = openposePersonEntries.at(i);
+                    const auto personRectangle = getKeypointsRectangle(poseKeypoints, i, 0.05f);
+                    const auto personDistanceThreshold = distanceThreshold*fastMax(personRectangle.x, personRectangle.y);
                     auto& poseId = poseIds.at(i);
 
                     // Find best correspondance in the LK set
@@ -186,7 +191,7 @@ namespace op
                                 active++;
                                 const auto distance = getEuclideanDistance(element.keypoints[kp],
                                                                            openposePersonEntry.keypoints[kp]);
-                                if (distance < distanceThreshold)
+                                if (distance < personDistanceThreshold)
                                     inliers++;
                             }
                         }
@@ -267,8 +272,8 @@ namespace op
             }
 
             // Get poseIds and update LKset according to OpenPose set
-            poseIds = matchLKAndOP(mPersonEntries, mNextPersonId, openposePersonEntries, mInlierRatioThreshold,
-                                   mDistanceThreshold);
+            poseIds = matchLKAndOP(mPersonEntries, mNextPersonId, openposePersonEntries, poseKeypoints,
+                                   mInlierRatioThreshold, mDistanceThreshold);
 
             return poseIds;
         }
