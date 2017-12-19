@@ -534,17 +534,21 @@ namespace op
 
             // Get number GPUs
             auto gpuNumber = wrapperStructPose.gpuNumber;
-            auto gpuNumberStart = wrapperStructPose.gpuNumberStart;
+            const auto gpuNumberStart = wrapperStructPose.gpuNumberStart;
             // If number GPU < 0 --> set it to all the available GPUs
             if (gpuNumber < 0)
             {
                 // Get total number GPUs
-                gpuNumber = getGpuNumber();
+                const auto totalGpuNumber = getGpuNumber();
+                if (totalGpuNumber <= gpuNumberStart)
+                    error("Number of initial GPUs (`number_gpu_start`) must be lower than the total number of used"
+                          " GPUs (`number_gpu`)", __LINE__, __FUNCTION__, __FILE__);
+                gpuNumber = totalGpuNumber - gpuNumberStart;
                 // Reset initial GPU to 0 (we want them all)
-                gpuNumberStart = 0;
                 // Logging message
-                log("Auto-detecting GPUs... Detected " + std::to_string(gpuNumber) + " GPU(s), using them all.",
-                    Priority::High);
+                log("Auto-detecting all available GPUs... Detected " + std::to_string(totalGpuNumber)
+                    + " GPU(s), using " + std::to_string(gpuNumber) + " of them starting at GPU "
+                    + std::to_string(gpuNumberStart) + ".", Priority::High);
             }
 
             // Proper format
