@@ -123,7 +123,7 @@ $(document).ready(function(){initNavTree('file_stream_8hpp_source.html','');});
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;    <span class="comment">// Example to read it in Python, assuming a (18 x 300 x 500) size Array</span></div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;    <span class="comment">// x = np.fromfile(heatMapFullPath, dtype=np.float32)</span></div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;    <span class="comment">// assert x[0] == 3 # First parameter saves the number of dimensions (18x300x500 = 3 dimensions)</span></div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;    <span class="comment">// shape_x = x[1:x[0]]</span></div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;    <span class="comment">// shape_x = x[1:1+int(x[0])]</span></div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    <span class="comment">// assert len(shape_x[0]) == 3 # Number of dimensions</span></div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;    <span class="comment">// assert shape_x[0] == 18 # Size of the first dimension</span></div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;    <span class="comment">// assert shape_x[1] == 300 # Size of the second dimension</span></div>

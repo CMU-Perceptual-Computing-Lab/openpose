@@ -16,6 +16,7 @@ var core_2enum_classes_8hpp =
       [ "OutputResolution", "core_2enum_classes_8hpp.html#af72fe4ed32846c12f41b049d3d0e1bdaa73c42013aac51c335d50d103f30fcb99", null ],
       [ "ZeroToOne", "core_2enum_classes_8hpp.html#af72fe4ed32846c12f41b049d3d0e1bdaa4b942544cb3e764bbb8d33f8a8744855", null ],
       [ "PlusMinusOne", "core_2enum_classes_8hpp.html#af72fe4ed32846c12f41b049d3d0e1bdaab7e7b2beae3435e73021d6d9a6a3fd8a", null ],
-      [ "UnsignedChar", "core_2enum_classes_8hpp.html#af72fe4ed32846c12f41b049d3d0e1bdaaa93f121640d609f8772397a0f40f40d6", null ]
+      [ "UnsignedChar", "core_2enum_classes_8hpp.html#af72fe4ed32846c12f41b049d3d0e1bdaaa93f121640d609f8772397a0f40f40d6", null ],
+      [ "NoScale", "core_2enum_classes_8hpp.html#af72fe4ed32846c12f41b049d3d0e1bdaa6089ccf7c3fe93a62745e51200419c60", null ]
     ] ]
 ];

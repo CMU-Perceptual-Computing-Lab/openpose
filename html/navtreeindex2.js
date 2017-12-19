@@ -151,6 +151,7 @@ var NAVTREEINDEX2 =
 "core_2enum_classes_8hpp.html#af72fe4ed32846c12f41b049d3d0e1bda":[2,0,0,0,0,5,2],
 "core_2enum_classes_8hpp.html#af72fe4ed32846c12f41b049d3d0e1bdaa46f9a0da0a5d448fd0cc8b3aa0a9b228":[2,0,0,0,0,5,2,0],
 "core_2enum_classes_8hpp.html#af72fe4ed32846c12f41b049d3d0e1bdaa4b942544cb3e764bbb8d33f8a8744855":[2,0,0,0,0,5,2,3],
+"core_2enum_classes_8hpp.html#af72fe4ed32846c12f41b049d3d0e1bdaa6089ccf7c3fe93a62745e51200419c60":[2,0,0,0,0,5,2,6],
 "core_2enum_classes_8hpp.html#af72fe4ed32846c12f41b049d3d0e1bdaa668a2bc599fd07445eae0730d043c96d":[2,0,0,0,0,5,2,1],
 "core_2enum_classes_8hpp.html#af72fe4ed32846c12f41b049d3d0e1bdaa73c42013aac51c335d50d103f30fcb99":[2,0,0,0,0,5,2,2],
 "core_2enum_classes_8hpp.html#af72fe4ed32846c12f41b049d3d0e1bdaaa93f121640d609f8772397a0f40f40d6":[2,0,0,0,0,5,2,5],
@@ -248,6 +249,5 @@ var NAVTREEINDEX2 =
 "fast_math_8hpp.html#abbf62284718858335848e43bbeafb192":[2,0,0,0,9,4,0],
 "fast_math_8hpp.html#adcfd0bf5ba782278488c157667a80c54":[2,0,0,0,9,4,4],
 "fast_math_8hpp.html#ae0d8debba08b802d115b71ee1232e535":[2,0,0,0,9,4,6],
-"fast_math_8hpp_source.html":[2,0,0,0,9,4],
-"file_saver_8hpp.html":[2,0,0,0,3,2]
+"fast_math_8hpp_source.html":[2,0,0,0,9,4]
 };

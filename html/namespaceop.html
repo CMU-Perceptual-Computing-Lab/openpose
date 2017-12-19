@@ -345,7 +345,8 @@ Enumerations</h2></td></tr>
 <a class="el" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bdaa4b942544cb3e764bbb8d33f8a8744855">ScaleMode::ZeroToOne</a>, 
 <br/>
 &#160;&#160;<a class="el" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bdaab7e7b2beae3435e73021d6d9a6a3fd8a">ScaleMode::PlusMinusOne</a>, 
-<a class="el" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bdaaa93f121640d609f8772397a0f40f40d6">ScaleMode::UnsignedChar</a>
+<a class="el" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bdaaa93f121640d609f8772397a0f40f40d6">ScaleMode::UnsignedChar</a>, 
+<a class="el" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bdaa6089ccf7c3fe93a62745e51200419c60">ScaleMode::NoScale</a>
 <br/>
  }</td></tr>
 <tr class="separator:af72fe4ed32846c12f41b049d3d0e1bda"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -377,6 +378,7 @@ Enumerations</h2></td></tr>
 <br/>
 &#160;&#160;<a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261fae3ae2003e0e0458bdc49480fb19c876e">PoseModel::BODY_19</a> = 4, 
 <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261fa003cc3795b0eeed2af2dfd34ed482794">PoseModel::BODY_23</a> = 5, 
+<a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261fa68aa8b41e419d187d9f7daff5d65708f">PoseModel::BODY_59</a> = 6, 
 <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261fa6f6cb72d544962fa333e2e34ce64f719">PoseModel::Size</a>
 <br/>
  }</td></tr>
@@ -553,13 +555,44 @@ Functions</h2></td></tr>
 <tr class="memitem:a047afd1856d394bec9b19dab7e765029"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr class="memitem:a047afd1856d394bec9b19dab7e765029"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceop.html#a047afd1856d394bec9b19dab7e765029">connectBodyPartsGpu</a> (<a class="el" href="classop_1_1_array.html">Array</a>&lt; T &gt; &amp;poseKeypoints, <a class="el" href="classop_1_1_array.html">Array</a>&lt; T &gt; &amp;poseScores, const T *const heatMapPtr, const T *const peaksPtr, const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel, const <a class="el" href="structop_1_1_point.html">Point</a>&lt; int &gt; &amp;heatMapSize, const int maxPeaks, const T interMinAboveThreshold, const T interThreshold, const int minSubsetCnt, const T minSubsetScore, const T scaleFactor=1.f, const T *const heatMapGpuPtr=nullptr, const T *const peaksGpuPtr=nullptr)</td></tr>
 <tr class="separator:a047afd1856d394bec9b19dab7e765029"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a41a5430dc7296645934584b8ea0238d7"><td class="memItemLeft" align="right" valign="top">const std::map&lt; unsigned int, <br class="typebreak"/>
-std::string &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a41a5430dc7296645934584b8ea0238d7">getPoseBodyPartMapping</a> (const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel)</td></tr>
-<tr class="separator:a41a5430dc7296645934584b8ea0238d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aab3de911b04b96c1850cc05c6947e184"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> const std::map<br class="typebreak"/>
+&lt; unsigned int, std::string &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#aab3de911b04b96c1850cc05c6947e184">getPoseBodyPartMapping</a> (const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel)</td></tr>
+<tr class="separator:aab3de911b04b96c1850cc05c6947e184"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae0730c6559abdb976423ecf81eac4620"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#ae0730c6559abdb976423ecf81eac4620">getPoseProtoTxt</a> (const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel)</td></tr>
+<tr class="separator:ae0730c6559abdb976423ecf81eac4620"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ade70b024ee461ae04e7233bf3937c5c6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#ade70b024ee461ae04e7233bf3937c5c6">getPoseTrainedModel</a> (const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel)</td></tr>
+<tr class="separator:ade70b024ee461ae04e7233bf3937c5c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a54a6c42a42a0a7e539061f5e30abb4bc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a54a6c42a42a0a7e539061f5e30abb4bc">getPoseNumberBodyParts</a> (const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel)</td></tr>
+<tr class="separator:a54a6c42a42a0a7e539061f5e30abb4bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a307b2c7b1506415a4ba44590fe8a7258"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> const std::vector<br class="typebreak"/>
+&lt; unsigned int &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a307b2c7b1506415a4ba44590fe8a7258">getPosePartPairs</a> (const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel)</td></tr>
+<tr class="separator:a307b2c7b1506415a4ba44590fe8a7258"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a84d87ec0e4ed3cf75a37ce99d0d25ef7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> const std::vector<br class="typebreak"/>
+&lt; unsigned int &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a84d87ec0e4ed3cf75a37ce99d0d25ef7">getPoseMapIndex</a> (const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel)</td></tr>
+<tr class="separator:a84d87ec0e4ed3cf75a37ce99d0d25ef7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab48e314ecd19f55f664b14da1d83312f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#ab48e314ecd19f55f664b14da1d83312f">getPoseMaxPeaks</a> (const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel)</td></tr>
+<tr class="separator:ab48e314ecd19f55f664b14da1d83312f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad7ca8d89f9045481075902c8bd98b8f4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#ad7ca8d89f9045481075902c8bd98b8f4">getPoseNetDecreaseFactor</a> (const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel)</td></tr>
+<tr class="separator:ad7ca8d89f9045481075902c8bd98b8f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3df938ef93037c534c5d342720d5fb70"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a3df938ef93037c534c5d342720d5fb70">poseBodyPartMapStringToKey</a> (const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel, const std::string &amp;string)</td></tr>
 <tr class="separator:a3df938ef93037c534c5d342720d5fb70"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aacf6e688031bb116e4878b811e8dbc23"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#aacf6e688031bb116e4878b811e8dbc23">poseBodyPartMapStringToKey</a> (const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel, const std::vector&lt; std::string &gt; &amp;strings)</td></tr>
 <tr class="separator:aacf6e688031bb116e4878b811e8dbc23"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa170c3107396e4d0e4214bb0c1b78f08"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#aa170c3107396e4d0e4214bb0c1b78f08">getPoseDefaultNmsThreshold</a> (const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel)</td></tr>
+<tr class="separator:aa170c3107396e4d0e4214bb0c1b78f08"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1b7d7061c819ee76328d5917ee009b1d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a1b7d7061c819ee76328d5917ee009b1d">getPoseDefaultConnectInterMinAboveThreshold</a> (const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel)</td></tr>
+<tr class="separator:a1b7d7061c819ee76328d5917ee009b1d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a692472b562fba051964f9ddea07b97d7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a692472b562fba051964f9ddea07b97d7">getPoseDefaultConnectInterThreshold</a> (const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel)</td></tr>
+<tr class="separator:a692472b562fba051964f9ddea07b97d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af1ed202254520cd489723052d1f5a86d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#af1ed202254520cd489723052d1f5a86d">getPoseDefaultMinSubsetCnt</a> (const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel)</td></tr>
+<tr class="separator:af1ed202254520cd489723052d1f5a86d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1f690bf083e250642144bf8e5d6e6d2c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a1f690bf083e250642144bf8e5d6e6d2c">getPoseDefaultConnectMinSubsetScore</a> (const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel)</td></tr>
+<tr class="separator:a1f690bf083e250642144bf8e5d6e6d2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abb49286241ba7a1d754b31dee333274a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> const std::vector&lt; float &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#abb49286241ba7a1d754b31dee333274a">getPoseColors</a> (const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel)</td></tr>
+<tr class="separator:abb49286241ba7a1d754b31dee333274a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a11bd7e53698eabe32b69b48708cf7b19"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> const std::vector<br class="typebreak"/>
+&lt; unsigned int &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a11bd7e53698eabe32b69b48708cf7b19">getPoseBodyPartPairsRender</a> (const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel)</td></tr>
+<tr class="separator:a11bd7e53698eabe32b69b48708cf7b19"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a99a08148f440bd96546076e15f0de04c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a99a08148f440bd96546076e15f0de04c">renderPoseKeypointsCpu</a> (<a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt; &amp;frameArray, const <a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt; &amp;poseKeypoints, const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel, const float renderThreshold, const bool blendOriginalFrame=true)</td></tr>
 <tr class="separator:a99a08148f440bd96546076e15f0de04c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab79ad497b3b69db2d233656a2e97bc63"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#ab79ad497b3b69db2d233656a2e97bc63">renderPoseKeypointsGpu</a> (float *framePtr, const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel, const int numberPeople, const <a class="el" href="structop_1_1_point.html">Point</a>&lt; int &gt; &amp;frameSize, const float *const posePtr, const float renderThreshold, const bool googlyEyes=false, const bool blendOriginalFrame=true, const float alphaBlending=<a class="el" href="namespaceop.html#a21fcb98366f6ea8895fc7f527f232db5">POSE_DEFAULT_ALPHA_KEYPOINT</a>)</td></tr>
@@ -768,7 +801,7 @@ std::string &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a cla
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:a9b4b92c621cc5962a72898899d2f2534"><td class="memItemLeft" align="right" valign="top">const auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a9b4b92c621cc5962a72898899d2f2534">FACE_MAX_FACES</a> = <a class="el" href="namespaceop.html#a4ce7d2037ec2a189cd284d34726c2d49">POSE_MAX_PEOPLE</a></td></tr>
+<tr class="memitem:a9b4b92c621cc5962a72898899d2f2534"><td class="memItemLeft" align="right" valign="top">const auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a9b4b92c621cc5962a72898899d2f2534">FACE_MAX_FACES</a> = <a class="el" href="namespaceop.html#a522d4552d2aeabe367f4d3bf371e6b3e">POSE_MAX_PEOPLE</a></td></tr>
 <tr class="separator:a9b4b92c621cc5962a72898899d2f2534"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8a05bdc38612c38e28b96bba5b4679b8"><td class="memItemLeft" align="right" valign="top">const auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a8a05bdc38612c38e28b96bba5b4679b8">FACE_NUMBER_PARTS</a> = 70u</td></tr>
 <tr class="separator:a8a05bdc38612c38e28b96bba5b4679b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -786,7 +819,7 @@ Variables</h2></td></tr>
 <tr class="separator:a15f6c39797cee87f6aa941d93f22b78b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4f191afed46fea5e3ce5b2a8756e1ddd"><td class="memItemLeft" align="right" valign="top">const auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a4f191afed46fea5e3ce5b2a8756e1ddd">FACE_DEFAULT_ALPHA_HEAT_MAP</a> = <a class="el" href="namespaceop.html#af45cddacd69fff73a4ea4acbbbac43e0">POSE_DEFAULT_ALPHA_HEAT_MAP</a></td></tr>
 <tr class="separator:a4f191afed46fea5e3ce5b2a8756e1ddd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a182585e2e944cdb62f3dededdd85d1fc"><td class="memItemLeft" align="right" valign="top">const auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a182585e2e944cdb62f3dededdd85d1fc">HAND_MAX_HANDS</a> = 2*<a class="el" href="namespaceop.html#a4ce7d2037ec2a189cd284d34726c2d49">POSE_MAX_PEOPLE</a></td></tr>
+<tr class="memitem:a182585e2e944cdb62f3dededdd85d1fc"><td class="memItemLeft" align="right" valign="top">const auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a182585e2e944cdb62f3dededdd85d1fc">HAND_MAX_HANDS</a> = 2*<a class="el" href="namespaceop.html#a522d4552d2aeabe367f4d3bf371e6b3e">POSE_MAX_PEOPLE</a></td></tr>
 <tr class="separator:a182585e2e944cdb62f3dededdd85d1fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a41b6fb82924c5532cf10151e6ce497f2"><td class="memItemLeft" align="right" valign="top">const auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a41b6fb82924c5532cf10151e6ce497f2">HAND_NUMBER_PARTS</a> = 21u</td></tr>
 <tr class="separator:a41b6fb82924c5532cf10151e6ce497f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -804,118 +837,8 @@ Variables</h2></td></tr>
 <tr class="separator:aa8cc53d2fe5353f9d87d50c32a8c1a95"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a76c1f1ea90b73e13e93f72413b3cab0e"><td class="memItemLeft" align="right" valign="top">const auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a76c1f1ea90b73e13e93f72413b3cab0e">HAND_DEFAULT_ALPHA_HEAT_MAP</a> = <a class="el" href="namespaceop.html#af45cddacd69fff73a4ea4acbbbac43e0">POSE_DEFAULT_ALPHA_HEAT_MAP</a></td></tr>
 <tr class="separator:a76c1f1ea90b73e13e93f72413b3cab0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4ce7d2037ec2a189cd284d34726c2d49"><td class="memItemLeft" align="right" valign="top">const unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a4ce7d2037ec2a189cd284d34726c2d49">POSE_MAX_PEOPLE</a> = 96u</td></tr>
-<tr class="separator:a4ce7d2037ec2a189cd284d34726c2d49"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1007a541c7af1a5e1e15475b8c4cec3b"><td class="memItemLeft" align="right" valign="top">const std::map&lt; unsigned int, <br class="typebreak"/>
-std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a1007a541c7af1a5e1e15475b8c4cec3b">POSE_COCO_BODY_PARTS</a></td></tr>
-<tr class="separator:a1007a541c7af1a5e1e15475b8c4cec3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4dad15b160be5343298d80f4d83a6150"><td class="memItemLeft" align="right" valign="top">const unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a4dad15b160be5343298d80f4d83a6150">POSE_COCO_NUMBER_PARTS</a> = 18u</td></tr>
-<tr class="separator:a4dad15b160be5343298d80f4d83a6150"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a674110c186802f7df02ad7822a885542"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a674110c186802f7df02ad7822a885542">POSE_COCO_MAP_IDX</a> {31,32, 39,40, 33,34, 35,36, 41,42, 43,44, 19,20, 21,22, 23,24, 25,26, 27,28, 29,30, 47,48, 49,50, 53,54, 51,52, 55,56, 37,38, 45,46}</td></tr>
-<tr class="separator:a674110c186802f7df02ad7822a885542"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae8d324a5c49dcbfd1b6f820608f5a292"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#ae8d324a5c49dcbfd1b6f820608f5a292">POSE_COCO_PAIRS_RENDER</a> {<a class="el" href="pose_parameters_8hpp.html#a5afab27fbbebc71b8753a20dd6c9a322">POSE_COCO_PAIRS_RENDER_GPU</a>}</td></tr>
-<tr class="separator:ae8d324a5c49dcbfd1b6f820608f5a292"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a67518f0a66cb3ee382b88a999e4f20b8"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a67518f0a66cb3ee382b88a999e4f20b8">POSE_COCO_PAIRS</a> {1,2, 1,5, 2,3, 3,4, 5,6, 6,7, 1,8, 8,9, 9,10, 1,11, 11,12, 12,13, 1,0, 0,14, 14,16, 0,15, 15,17, 2,16, 5,17}</td></tr>
-<tr class="separator:a67518f0a66cb3ee382b88a999e4f20b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a93a4ee242c33f626ff146643bb8971bd"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a93a4ee242c33f626ff146643bb8971bd">POSE_COCO_COLORS_RENDER</a> {<a class="el" href="pose_parameters_8hpp.html#a8b293ab02337be3f90218c5b824ece06">POSE_COCO_COLORS_RENDER_GPU</a>}</td></tr>
-<tr class="separator:a93a4ee242c33f626ff146643bb8971bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a67936cc61d129d2262546534b2c7cd30"><td class="memItemLeft" align="right" valign="top">const std::map&lt; unsigned int, <br class="typebreak"/>
-std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a67936cc61d129d2262546534b2c7cd30">POSE_MPI_BODY_PARTS</a></td></tr>
-<tr class="separator:a67936cc61d129d2262546534b2c7cd30"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad8ed879d7e9d7bb73c0da7650ce934da"><td class="memItemLeft" align="right" valign="top">const unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#ad8ed879d7e9d7bb73c0da7650ce934da">POSE_MPI_NUMBER_PARTS</a> = 15</td></tr>
-<tr class="separator:ad8ed879d7e9d7bb73c0da7650ce934da"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a46dc266a61a0b0061563cb9c6359cb71"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a46dc266a61a0b0061563cb9c6359cb71">POSE_MPI_MAP_IDX</a> {16,17, 18,19, 20,21, 22,23, 24,25, 26,27, 28,29, 30,31, 32,33, 34,35, 36,37, 38,39, 40,41, 42,43}</td></tr>
-<tr class="separator:a46dc266a61a0b0061563cb9c6359cb71"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aba7025c2e941605b2f5d70ce6a37f0e5"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; unsigned <br class="typebreak"/>
-int &gt; POSE_MPI_PAIRS&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#aba7025c2e941605b2f5d70ce6a37f0e5">POSE_MPI_PAIRS_RENDER_GPU</a></td></tr>
-<tr class="separator:aba7025c2e941605b2f5d70ce6a37f0e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9e87deaa37c301fac10af492469bcc86"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a9e87deaa37c301fac10af492469bcc86">POSE_MPI_COLORS_RENDER</a> {<a class="el" href="pose_parameters_8hpp.html#a7fdd75b1478d65f11ebc77144662958c">POSE_MPI_COLORS_RENDER_GPU</a>}</td></tr>
-<tr class="separator:a9e87deaa37c301fac10af492469bcc86"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4596b1c0cc8f654025d6c5c4c43a92b5"><td class="memItemLeft" align="right" valign="top">const std::map&lt; unsigned int, <br class="typebreak"/>
-std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a4596b1c0cc8f654025d6c5c4c43a92b5">POSE_BODY_18_BODY_PARTS</a></td></tr>
-<tr class="separator:a4596b1c0cc8f654025d6c5c4c43a92b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1508c5fa871a1da61a2b740a9c5e2df1"><td class="memItemLeft" align="right" valign="top">const unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a1508c5fa871a1da61a2b740a9c5e2df1">POSE_BODY_18_NUMBER_PARTS</a> {<a class="el" href="namespaceop.html#a4dad15b160be5343298d80f4d83a6150">POSE_COCO_NUMBER_PARTS</a>}</td></tr>
-<tr class="separator:a1508c5fa871a1da61a2b740a9c5e2df1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3ce26fa0a7373e612d130d1657ac7d16"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a3ce26fa0a7373e612d130d1657ac7d16">POSE_BODY_18_MAP_IDX</a> {<a class="el" href="namespaceop.html#a674110c186802f7df02ad7822a885542">POSE_COCO_MAP_IDX</a>}</td></tr>
-<tr class="separator:a3ce26fa0a7373e612d130d1657ac7d16"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8bbf4f3e7a4739c4a44faff8d2c7ada9"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a8bbf4f3e7a4739c4a44faff8d2c7ada9">POSE_BODY_18_PAIRS_RENDER</a> {<a class="el" href="pose_parameters_8hpp.html#a0d821946779eaea1be5996816c4ca6bd">POSE_BODY_18_PAIRS_RENDER_GPU</a>}</td></tr>
-<tr class="separator:a8bbf4f3e7a4739c4a44faff8d2c7ada9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a360d95ba9769e4cb5cfc7aa2a2bab927"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a360d95ba9769e4cb5cfc7aa2a2bab927">POSE_BODY_18_PAIRS</a> {<a class="el" href="namespaceop.html#a67518f0a66cb3ee382b88a999e4f20b8">POSE_COCO_PAIRS</a>}</td></tr>
-<tr class="separator:a360d95ba9769e4cb5cfc7aa2a2bab927"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abc8fdb41aa395c46430373facfbd554c"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#abc8fdb41aa395c46430373facfbd554c">POSE_BODY_18_COLORS_RENDER</a> {<a class="el" href="pose_parameters_8hpp.html#a6e17f6ddfcedd5b314d356d30bbf4280">POSE_BODY_18_COLORS_RENDER_GPU</a>}</td></tr>
-<tr class="separator:abc8fdb41aa395c46430373facfbd554c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7af31bad1c8e2f89c8e3eaea9b1c654c"><td class="memItemLeft" align="right" valign="top">const std::map&lt; unsigned int, <br class="typebreak"/>
-std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a7af31bad1c8e2f89c8e3eaea9b1c654c">POSE_BODY_19_BODY_PARTS</a></td></tr>
-<tr class="separator:a7af31bad1c8e2f89c8e3eaea9b1c654c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9a089b86a0cb8dfbf81501de2ec10b07"><td class="memItemLeft" align="right" valign="top">const unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a9a089b86a0cb8dfbf81501de2ec10b07">POSE_BODY_19_NUMBER_PARTS</a> = 19u</td></tr>
-<tr class="separator:a9a089b86a0cb8dfbf81501de2ec10b07"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a62ee3fdd0dfb13209926711937899b8e"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a62ee3fdd0dfb13209926711937899b8e">POSE_BODY_19_MAP_IDX</a> {20,21, 34,35, 42,43, 36,37, 38,39, 44,45, 46,47, 26,27, 22,23, 24,25, 28,29, 30,31, 32,33, 50,51, 52,53, 56,57, 54,55, 58,59, 40,41, 48,49}</td></tr>
-<tr class="separator:a62ee3fdd0dfb13209926711937899b8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2d9c72a62d012a21fd647d238784bd0b"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a2d9c72a62d012a21fd647d238784bd0b">POSE_BODY_19_PAIRS_RENDER</a> {<a class="el" href="pose_parameters_8hpp.html#a5afab27fbbebc71b8753a20dd6c9a322">POSE_COCO_PAIRS_RENDER_GPU</a>}</td></tr>
-<tr class="separator:a2d9c72a62d012a21fd647d238784bd0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a550c78ab4e4e1d31194d65445fa12b94"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a550c78ab4e4e1d31194d65445fa12b94">POSE_BODY_19_PAIRS</a> {1,8, 1,2, 1,5, 2,3, 3,4, 5,6, 6,7, 8,9, 9,10, 10,11, 8,12, 12,13, 13,14, 1,0, 0,15, 15,17, 0,16, 16,18, 2,17, 5,18}</td></tr>
-<tr class="separator:a550c78ab4e4e1d31194d65445fa12b94"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acea3456a45f673bd479b817caca9567a"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#acea3456a45f673bd479b817caca9567a">POSE_BODY_19_COLORS_RENDER</a> {<a class="el" href="pose_parameters_8hpp.html#a17cec2005928720d6da0e83ba26cca01">POSE_BODY_19_COLORS_RENDER_GPU</a>}</td></tr>
-<tr class="separator:acea3456a45f673bd479b817caca9567a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a417991b82e2e14e8dc90a09e4facef19"><td class="memItemLeft" align="right" valign="top">const std::map&lt; unsigned int, <br class="typebreak"/>
-std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a417991b82e2e14e8dc90a09e4facef19">POSE_BODY_23_BODY_PARTS</a></td></tr>
-<tr class="separator:a417991b82e2e14e8dc90a09e4facef19"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad49ac3147773460e2d0bd95c0c6004e0"><td class="memItemLeft" align="right" valign="top">const unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#ad49ac3147773460e2d0bd95c0c6004e0">POSE_BODY_23_NUMBER_PARTS</a> = 23u</td></tr>
-<tr class="separator:ad49ac3147773460e2d0bd95c0c6004e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af15beef165379754507c429962130965"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#af15beef165379754507c429962130965">POSE_BODY_23_MAP_IDX</a> {24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71}</td></tr>
-<tr class="separator:af15beef165379754507c429962130965"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0ea1d13b5a9b47ba2534aec20ab39335"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a0ea1d13b5a9b47ba2534aec20ab39335">POSE_BODY_23_PAIRS_RENDER</a> {<a class="el" href="pose_parameters_8hpp.html#a5f3db3bbb18fe8d978661f3c5417c110">POSE_BODY_23_PAIRS_RENDER_GPU</a>}</td></tr>
-<tr class="separator:a0ea1d13b5a9b47ba2534aec20ab39335"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5f72bc3d372f33c5b095335a687030e7"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a5f72bc3d372f33c5b095335a687030e7">POSE_BODY_23_PAIRS</a> { 0,1, 0,4, 1,2, 2,3, 4,5, 5,6, 0,7, 7,8, 7,13, 8,9, 9,10,10,11,10,12,13,14,14,15,15,16,15,17, 0,18,18,19,18,21,19,20,21,22, 1,20, 4,22}</td></tr>
-<tr class="separator:a5f72bc3d372f33c5b095335a687030e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa5fe1c898b53e3f7736ad9037571edaf"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#aa5fe1c898b53e3f7736ad9037571edaf">POSE_BODY_23_COLORS_RENDER</a> {<a class="el" href="pose_parameters_8hpp.html#aeb1e2dd8178c15024e372185e2e5cf54">POSE_BODY_23_COLORS_RENDER_GPU</a>}</td></tr>
-<tr class="separator:aa5fe1c898b53e3f7736ad9037571edaf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a84b4b00bb40c0c3a4cce7eed5978f047"><td class="memItemLeft" align="right" valign="top">const std::array&lt; float,(int) <br class="typebreak"/>
-<a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261fa6f6cb72d544962fa333e2e34ce64f719">PoseModel::Size</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a84b4b00bb40c0c3a4cce7eed5978f047">POSE_CCN_DECREASE_FACTOR</a></td></tr>
-<tr class="separator:a84b4b00bb40c0c3a4cce7eed5978f047"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a91d47f70c39fdf167d46ea6b4361209b"><td class="memItemLeft" align="right" valign="top">const std::array&lt; unsigned int,(int) <br class="typebreak"/>
-<a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261fa6f6cb72d544962fa333e2e34ce64f719">PoseModel::Size</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a91d47f70c39fdf167d46ea6b4361209b">POSE_MAX_PEAKS</a></td></tr>
-<tr class="separator:a91d47f70c39fdf167d46ea6b4361209b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4dd1047c27e639d21f830f97017b5e44"><td class="memItemLeft" align="right" valign="top">const std::array&lt; unsigned int,(int) <br class="typebreak"/>
-<a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261fa6f6cb72d544962fa333e2e34ce64f719">PoseModel::Size</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a4dd1047c27e639d21f830f97017b5e44">POSE_NUMBER_BODY_PARTS</a></td></tr>
-<tr class="separator:a4dd1047c27e639d21f830f97017b5e44"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5efd2c1cd059608982d7ff66ed1a606f"><td class="memItemLeft" align="right" valign="top">const std::array&lt; std::vector<br class="typebreak"/>
-&lt; unsigned int &gt;,(int) <br class="typebreak"/>
-<a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261fa6f6cb72d544962fa333e2e34ce64f719">PoseModel::Size</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a5efd2c1cd059608982d7ff66ed1a606f">POSE_BODY_PART_PAIRS</a></td></tr>
-<tr class="separator:a5efd2c1cd059608982d7ff66ed1a606f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa95149b7c176de2ec33a0093c8e24a36"><td class="memItemLeft" align="right" valign="top">const std::array&lt; std::vector<br class="typebreak"/>
-&lt; unsigned int &gt;,(int) <br class="typebreak"/>
-<a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261fa6f6cb72d544962fa333e2e34ce64f719">PoseModel::Size</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#aa95149b7c176de2ec33a0093c8e24a36">POSE_BODY_PART_PAIRS_RENDER</a></td></tr>
-<tr class="separator:aa95149b7c176de2ec33a0093c8e24a36"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8ce48a4305cac872140ef4eb3d8c6896"><td class="memItemLeft" align="right" valign="top">const std::array&lt; std::vector<br class="typebreak"/>
-&lt; unsigned int &gt;,(int) <br class="typebreak"/>
-<a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261fa6f6cb72d544962fa333e2e34ce64f719">PoseModel::Size</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a8ce48a4305cac872140ef4eb3d8c6896">POSE_MAP_IDX</a></td></tr>
-<tr class="separator:a8ce48a4305cac872140ef4eb3d8c6896"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aefbe109a859cc12a9a06f607e61d8dba"><td class="memItemLeft" align="right" valign="top">const std::array&lt; std::vector<br class="typebreak"/>
-&lt; float &gt;,(int) <br class="typebreak"/>
-<a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261fa6f6cb72d544962fa333e2e34ce64f719">PoseModel::Size</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#aefbe109a859cc12a9a06f607e61d8dba">POSE_COLORS</a></td></tr>
-<tr class="separator:aefbe109a859cc12a9a06f607e61d8dba"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2d63d4b60789b52bb8524b7596cb73a7"><td class="memItemLeft" align="right" valign="top">const std::array&lt; std::string,(int) <br class="typebreak"/>
-<a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261fa6f6cb72d544962fa333e2e34ce64f719">PoseModel::Size</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a2d63d4b60789b52bb8524b7596cb73a7">POSE_PROTOTXT</a></td></tr>
-<tr class="separator:a2d63d4b60789b52bb8524b7596cb73a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad964ad6758567f7244d134599e8cb04b"><td class="memItemLeft" align="right" valign="top">const std::array&lt; std::string,(int) <br class="typebreak"/>
-<a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261fa6f6cb72d544962fa333e2e34ce64f719">PoseModel::Size</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#ad964ad6758567f7244d134599e8cb04b">POSE_TRAINED_MODEL</a></td></tr>
-<tr class="separator:ad964ad6758567f7244d134599e8cb04b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af5bcc4a300e5d6f2572ba2b955c2c992"><td class="memItemLeft" align="right" valign="top">const std::array&lt; float,(int) <br class="typebreak"/>
-<a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261fa6f6cb72d544962fa333e2e34ce64f719">PoseModel::Size</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#af5bcc4a300e5d6f2572ba2b955c2c992">POSE_DEFAULT_NMS_THRESHOLD</a></td></tr>
-<tr class="separator:af5bcc4a300e5d6f2572ba2b955c2c992"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a029c14582c63e33a9b7350bb374527c8"><td class="memItemLeft" align="right" valign="top">const std::array&lt; float,(int) <br class="typebreak"/>
-<a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261fa6f6cb72d544962fa333e2e34ce64f719">PoseModel::Size</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a029c14582c63e33a9b7350bb374527c8">POSE_DEFAULT_CONNECT_INTER_MIN_ABOVE_THRESHOLD</a></td></tr>
-<tr class="separator:a029c14582c63e33a9b7350bb374527c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a02de45e0a3df20b593d9b1b79a96f20c"><td class="memItemLeft" align="right" valign="top">const std::array&lt; float,(int) <br class="typebreak"/>
-<a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261fa6f6cb72d544962fa333e2e34ce64f719">PoseModel::Size</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a02de45e0a3df20b593d9b1b79a96f20c">POSE_DEFAULT_CONNECT_INTER_THRESHOLD</a></td></tr>
-<tr class="separator:a02de45e0a3df20b593d9b1b79a96f20c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8b6edeb3f39ac581317c10e48e6729ad"><td class="memItemLeft" align="right" valign="top">const std::array&lt; unsigned int,(int) <br class="typebreak"/>
-<a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261fa6f6cb72d544962fa333e2e34ce64f719">PoseModel::Size</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a8b6edeb3f39ac581317c10e48e6729ad">POSE_DEFAULT_CONNECT_MIN_SUBSET_CNT</a></td></tr>
-<tr class="separator:a8b6edeb3f39ac581317c10e48e6729ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a600643a9a3f46d6a4cab58943e059d57"><td class="memItemLeft" align="right" valign="top">const std::array&lt; float,(int) <br class="typebreak"/>
-<a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261fa6f6cb72d544962fa333e2e34ce64f719">PoseModel::Size</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a600643a9a3f46d6a4cab58943e059d57">POSE_DEFAULT_CONNECT_MIN_SUBSET_SCORE</a></td></tr>
-<tr class="separator:a600643a9a3f46d6a4cab58943e059d57"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a522d4552d2aeabe367f4d3bf371e6b3e"><td class="memItemLeft" align="right" valign="top">const auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a522d4552d2aeabe367f4d3bf371e6b3e">POSE_MAX_PEOPLE</a> = 96u</td></tr>
+<tr class="separator:a522d4552d2aeabe367f4d3bf371e6b3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a21fcb98366f6ea8895fc7f527f232db5"><td class="memItemLeft" align="right" valign="top">const auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a21fcb98366f6ea8895fc7f527f232db5">POSE_DEFAULT_ALPHA_KEYPOINT</a> = 0.6f</td></tr>
 <tr class="separator:a21fcb98366f6ea8895fc7f527f232db5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af45cddacd69fff73a4ea4acbbbac43e0"><td class="memItemLeft" align="right" valign="top">const auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#af45cddacd69fff73a4ea4acbbbac43e0">POSE_DEFAULT_ALPHA_HEAT_MAP</a> = 0.7f</td></tr>
@@ -1108,6 +1031,9 @@ std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el
 <p>Experimental. Do not use. </p>
 </td></tr>
 <tr><td class="fieldname"><em><a class="anchor" id="af5b3ce2a5d3de87cb31b9b67e96f261fa003cc3795b0eeed2af2dfd34ed482794"></a>BODY_23</em>&#160;</td><td class="fielddoc">
+<p>Experimental. Do not use. </p>
+</td></tr>
+<tr><td class="fieldname"><em><a class="anchor" id="af5b3ce2a5d3de87cb31b9b67e96f261fa68aa8b41e419d187d9f7daff5d65708f"></a>BODY_59</em>&#160;</td><td class="fielddoc">
 <p>Experimental. Do not use. </p>
 </td></tr>
 <tr><td class="fieldname"><em><a class="anchor" id="af5b3ce2a5d3de87cb31b9b67e96f261fa6f6cb72d544962fa333e2e34ce64f719"></a>Size</em>&#160;</td><td class="fielddoc">
@@ -1337,6 +1263,8 @@ std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el
 <tr><td class="fieldname"><em><a class="anchor" id="af72fe4ed32846c12f41b049d3d0e1bdaab7e7b2beae3435e73021d6d9a6a3fd8a"></a>PlusMinusOne</em>&#160;</td><td class="fielddoc">
 </td></tr>
 <tr><td class="fieldname"><em><a class="anchor" id="af72fe4ed32846c12f41b049d3d0e1bdaaa93f121640d609f8772397a0f40f40d6"></a>UnsignedChar</em>&#160;</td><td class="fielddoc">
+</td></tr>
+<tr><td class="fieldname"><em><a class="anchor" id="af72fe4ed32846c12f41b049d3d0e1bdaa6089ccf7c3fe93a62745e51200419c60"></a>NoScale</em>&#160;</td><td class="fielddoc">
 </td></tr>
 </table>
 
@@ -1820,22 +1748,6 @@ template&lt;typename TPointerContainer &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a01aa5c6e24026536367cf47a64e9bba5"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">op::COMPILE_TEMPLATE_DATUM </td>
-          <td>(</td>
-          <td class="paramtype">WorkerConsumer&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a class="anchor" id="a5660f0e72781ce6d7db9eb78b582e5c6"></a>
 <div class="memitem">
 <div class="memproto">
@@ -1844,6 +1756,22 @@ template&lt;typename TPointerContainer &gt; </div>
           <td class="memname">op::COMPILE_TEMPLATE_DATUM </td>
           <td>(</td>
           <td class="paramtype">WorkerProducer&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a01aa5c6e24026536367cf47a64e9bba5"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">op::COMPILE_TEMPLATE_DATUM </td>
+          <td>(</td>
+          <td class="paramtype">WorkerConsumer&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1876,22 +1804,6 @@ template&lt;typename TPointerContainer &gt; </div>
           <td class="memname">op::COMPILE_TEMPLATE_DATUM </td>
           <td>(</td>
           <td class="paramtype">Worker&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a1d9f50688522ed7368acc33a09ae9ece"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">op::COMPILE_TEMPLATE_DATUM </td>
-          <td>(</td>
-          <td class="paramtype">WOpOutputToCvMat&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1940,6 +1852,22 @@ template&lt;typename TPointerContainer &gt; </div>
           <td class="memname">op::COMPILE_TEMPLATE_DATUM </td>
           <td>(</td>
           <td class="paramtype">WHandDetector&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a1d9f50688522ed7368acc33a09ae9ece"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">op::COMPILE_TEMPLATE_DATUM </td>
+          <td>(</td>
+          <td class="paramtype">WOpOutputToCvMat&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -2092,38 +2020,6 @@ template&lt;typename TPointerContainer &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a49bd4106b0cd1cb81980329b06c0d2c8"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">op::COMPILE_TEMPLATE_DATUM </td>
-          <td>(</td>
-          <td class="paramtype">WVideoSaver&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="af46e80e6bac0f815006759df4c9d00c3"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">op::COMPILE_TEMPLATE_DATUM </td>
-          <td>(</td>
-          <td class="paramtype">WCocoJsonSaver&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a class="anchor" id="ae76afeeeaedaebe6941f41a4bdf50e2a"></a>
 <div class="memitem">
 <div class="memproto">
@@ -2132,6 +2028,22 @@ template&lt;typename TPointerContainer &gt; </div>
           <td class="memname">op::COMPILE_TEMPLATE_DATUM </td>
           <td>(</td>
           <td class="paramtype">WPoseRenderer&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a49bd4106b0cd1cb81980329b06c0d2c8"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">op::COMPILE_TEMPLATE_DATUM </td>
+          <td>(</td>
+          <td class="paramtype">WVideoSaver&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -2164,6 +2076,22 @@ template&lt;typename TPointerContainer &gt; </div>
           <td class="memname">op::COMPILE_TEMPLATE_DATUM </td>
           <td>(</td>
           <td class="paramtype">Queue&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="af46e80e6bac0f815006759df4c9d00c3"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">op::COMPILE_TEMPLATE_DATUM </td>
+          <td>(</td>
+          <td class="paramtype">WCocoJsonSaver&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -3615,12 +3543,236 @@ template&lt;class T &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a41a5430dc7296645934584b8ea0238d7"></a>
+<a class="anchor" id="aab3de911b04b96c1850cc05c6947e184"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const std::map&lt;unsigned int, std::string&gt;&amp; op::getPoseBodyPartMapping </td>
+          <td class="memname"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> const std::map&lt;unsigned int, std::string&gt;&amp; op::getPoseBodyPartMapping </td>
+          <td>(</td>
+          <td class="paramtype">const PoseModel&#160;</td>
+          <td class="paramname"><em>poseModel</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a11bd7e53698eabe32b69b48708cf7b19"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> const std::vector&lt;unsigned int&gt;&amp; op::getPoseBodyPartPairsRender </td>
+          <td>(</td>
+          <td class="paramtype">const PoseModel&#160;</td>
+          <td class="paramname"><em>poseModel</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="abb49286241ba7a1d754b31dee333274a"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> const std::vector&lt;float&gt;&amp; op::getPoseColors </td>
+          <td>(</td>
+          <td class="paramtype">const PoseModel&#160;</td>
+          <td class="paramname"><em>poseModel</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a1b7d7061c819ee76328d5917ee009b1d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> float op::getPoseDefaultConnectInterMinAboveThreshold </td>
+          <td>(</td>
+          <td class="paramtype">const PoseModel&#160;</td>
+          <td class="paramname"><em>poseModel</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a692472b562fba051964f9ddea07b97d7"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> float op::getPoseDefaultConnectInterThreshold </td>
+          <td>(</td>
+          <td class="paramtype">const PoseModel&#160;</td>
+          <td class="paramname"><em>poseModel</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a1f690bf083e250642144bf8e5d6e6d2c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> float op::getPoseDefaultConnectMinSubsetScore </td>
+          <td>(</td>
+          <td class="paramtype">const PoseModel&#160;</td>
+          <td class="paramname"><em>poseModel</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="af1ed202254520cd489723052d1f5a86d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> unsigned int op::getPoseDefaultMinSubsetCnt </td>
+          <td>(</td>
+          <td class="paramtype">const PoseModel&#160;</td>
+          <td class="paramname"><em>poseModel</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="aa170c3107396e4d0e4214bb0c1b78f08"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> float op::getPoseDefaultNmsThreshold </td>
+          <td>(</td>
+          <td class="paramtype">const PoseModel&#160;</td>
+          <td class="paramname"><em>poseModel</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a84d87ec0e4ed3cf75a37ce99d0d25ef7"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> const std::vector&lt;unsigned int&gt;&amp; op::getPoseMapIndex </td>
+          <td>(</td>
+          <td class="paramtype">const PoseModel&#160;</td>
+          <td class="paramname"><em>poseModel</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ab48e314ecd19f55f664b14da1d83312f"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> unsigned int op::getPoseMaxPeaks </td>
+          <td>(</td>
+          <td class="paramtype">const PoseModel&#160;</td>
+          <td class="paramname"><em>poseModel</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ad7ca8d89f9045481075902c8bd98b8f4"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> float op::getPoseNetDecreaseFactor </td>
+          <td>(</td>
+          <td class="paramtype">const PoseModel&#160;</td>
+          <td class="paramname"><em>poseModel</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a54a6c42a42a0a7e539061f5e30abb4bc"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> unsigned int op::getPoseNumberBodyParts </td>
+          <td>(</td>
+          <td class="paramtype">const PoseModel&#160;</td>
+          <td class="paramname"><em>poseModel</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a307b2c7b1506415a4ba44590fe8a7258"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> const std::vector&lt;unsigned int&gt;&amp; op::getPosePartPairs </td>
+          <td>(</td>
+          <td class="paramtype">const PoseModel&#160;</td>
+          <td class="paramname"><em>poseModel</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ae0730c6559abdb976423ecf81eac4620"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> const std::string&amp; op::getPoseProtoTxt </td>
+          <td>(</td>
+          <td class="paramtype">const PoseModel&#160;</td>
+          <td class="paramname"><em>poseModel</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ade70b024ee461ae04e7233bf3937c5c6"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> const std::string&amp; op::getPoseTrainedModel </td>
           <td>(</td>
           <td class="paramtype">const PoseModel&#160;</td>
           <td class="paramname"><em>poseModel</em></td><td>)</td>
@@ -5743,7 +5895,7 @@ template&lt;typename T &gt; </div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const auto op::FACE_MAX_FACES = <a class="el" href="namespaceop.html#a4ce7d2037ec2a189cd284d34726c2d49">POSE_MAX_PEOPLE</a></td>
+          <td class="memname">const auto op::FACE_MAX_FACES = <a class="el" href="namespaceop.html#a522d4552d2aeabe367f4d3bf371e6b3e">POSE_MAX_PEOPLE</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -5851,7 +6003,7 @@ template&lt;typename T &gt; </div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const auto op::HAND_MAX_HANDS = 2*<a class="el" href="namespaceop.html#a4ce7d2037ec2a189cd284d34726c2d49">POSE_MAX_PEOPLE</a></td>
+          <td class="memname">const auto op::HAND_MAX_HANDS = 2*<a class="el" href="namespaceop.html#a522d4552d2aeabe367f4d3bf371e6b3e">POSE_MAX_PEOPLE</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -5906,457 +6058,6 @@ template&lt;typename T &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a4596b1c0cc8f654025d6c5c4c43a92b5"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::map&lt;unsigned int, std::string&gt; op::POSE_BODY_18_BODY_PARTS</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">{ </div>
-<div class="line">        { 0,  <span class="stringliteral">&quot;Nose&quot;</span> },</div>
-<div class="line">        { 1,  <span class="stringliteral">&quot;Neck&quot;</span> },</div>
-<div class="line">        { 2,  <span class="stringliteral">&quot;RShoulder&quot;</span> },</div>
-<div class="line">        { 3,  <span class="stringliteral">&quot;RElbow&quot;</span> },</div>
-<div class="line">        { 4,  <span class="stringliteral">&quot;RWrist&quot;</span> },</div>
-<div class="line">        { 5,  <span class="stringliteral">&quot;LShoulder&quot;</span> },</div>
-<div class="line">        { 6,  <span class="stringliteral">&quot;LElbow&quot;</span> },</div>
-<div class="line">        { 7,  <span class="stringliteral">&quot;LWrist&quot;</span> },</div>
-<div class="line">        { 8,  <span class="stringliteral">&quot;RHip&quot;</span> },</div>
-<div class="line">        { 9,  <span class="stringliteral">&quot;RKnee&quot;</span> },</div>
-<div class="line">        { 10, <span class="stringliteral">&quot;RAnkle&quot;</span> },</div>
-<div class="line">        { 11, <span class="stringliteral">&quot;LHip&quot;</span> },</div>
-<div class="line">        { 12, <span class="stringliteral">&quot;LKnee&quot;</span> },</div>
-<div class="line">        { 13, <span class="stringliteral">&quot;LAnkle&quot;</span> },</div>
-<div class="line">        { 14, <span class="stringliteral">&quot;REye&quot;</span> },</div>
-<div class="line">        { 15, <span class="stringliteral">&quot;LEye&quot;</span> },</div>
-<div class="line">        { 16, <span class="stringliteral">&quot;REar&quot;</span> },</div>
-<div class="line">        { 17, <span class="stringliteral">&quot;LEar&quot;</span> },</div>
-<div class="line">        { 18, <span class="stringliteral">&quot;Background&quot;</span> }</div>
-<div class="line">    }</div>
-</div><!-- fragment -->
-</div>
-</div>
-<a class="anchor" id="abc8fdb41aa395c46430373facfbd554c"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::vector&lt;float&gt; op::POSE_BODY_18_COLORS_RENDER {<a class="el" href="pose_parameters_8hpp.html#a6e17f6ddfcedd5b314d356d30bbf4280">POSE_BODY_18_COLORS_RENDER_GPU</a>}</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a3ce26fa0a7373e612d130d1657ac7d16"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::vector&lt;unsigned int&gt; op::POSE_BODY_18_MAP_IDX {<a class="el" href="namespaceop.html#a674110c186802f7df02ad7822a885542">POSE_COCO_MAP_IDX</a>}</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a1508c5fa871a1da61a2b740a9c5e2df1"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const unsigned int op::POSE_BODY_18_NUMBER_PARTS {<a class="el" href="namespaceop.html#a4dad15b160be5343298d80f4d83a6150">POSE_COCO_NUMBER_PARTS</a>}</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a360d95ba9769e4cb5cfc7aa2a2bab927"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::vector&lt;unsigned int&gt; op::POSE_BODY_18_PAIRS {<a class="el" href="namespaceop.html#a67518f0a66cb3ee382b88a999e4f20b8">POSE_COCO_PAIRS</a>}</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a8bbf4f3e7a4739c4a44faff8d2c7ada9"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::vector&lt;unsigned int&gt; op::POSE_BODY_18_PAIRS_RENDER {<a class="el" href="pose_parameters_8hpp.html#a0d821946779eaea1be5996816c4ca6bd">POSE_BODY_18_PAIRS_RENDER_GPU</a>}</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a7af31bad1c8e2f89c8e3eaea9b1c654c"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::map&lt;unsigned int, std::string&gt; op::POSE_BODY_19_BODY_PARTS</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">{</div>
-<div class="line">        { 0,  <span class="stringliteral">&quot;Nose&quot;</span> },</div>
-<div class="line">        { 1,  <span class="stringliteral">&quot;Neck&quot;</span> },</div>
-<div class="line">        { 2,  <span class="stringliteral">&quot;RShoulder&quot;</span> },</div>
-<div class="line">        { 3,  <span class="stringliteral">&quot;RElbow&quot;</span> },</div>
-<div class="line">        { 4,  <span class="stringliteral">&quot;RWrist&quot;</span> },</div>
-<div class="line">        { 5,  <span class="stringliteral">&quot;LShoulder&quot;</span> },</div>
-<div class="line">        { 6,  <span class="stringliteral">&quot;LElbow&quot;</span> },</div>
-<div class="line">        { 7,  <span class="stringliteral">&quot;LWrist&quot;</span> },</div>
-<div class="line">        { 8,  <span class="stringliteral">&quot;LowerAbs&quot;</span> },</div>
-<div class="line">        { 9,  <span class="stringliteral">&quot;RHip&quot;</span> },</div>
-<div class="line">        { 10, <span class="stringliteral">&quot;RKnee&quot;</span> },</div>
-<div class="line">        { 11, <span class="stringliteral">&quot;RAnkle&quot;</span> },</div>
-<div class="line">        { 12, <span class="stringliteral">&quot;LHip&quot;</span> },</div>
-<div class="line">        { 13, <span class="stringliteral">&quot;LKnee&quot;</span> },</div>
-<div class="line">        { 14, <span class="stringliteral">&quot;LAnkle&quot;</span> },</div>
-<div class="line">        { 15, <span class="stringliteral">&quot;REye&quot;</span> },</div>
-<div class="line">        { 16, <span class="stringliteral">&quot;LEye&quot;</span> },</div>
-<div class="line">        { 17, <span class="stringliteral">&quot;REar&quot;</span> },</div>
-<div class="line">        { 18, <span class="stringliteral">&quot;LEar&quot;</span> },</div>
-<div class="line">        { 19, <span class="stringliteral">&quot;Background&quot;</span> }</div>
-<div class="line">    }</div>
-</div><!-- fragment -->
-</div>
-</div>
-<a class="anchor" id="acea3456a45f673bd479b817caca9567a"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::vector&lt;float&gt; op::POSE_BODY_19_COLORS_RENDER {<a class="el" href="pose_parameters_8hpp.html#a17cec2005928720d6da0e83ba26cca01">POSE_BODY_19_COLORS_RENDER_GPU</a>}</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a62ee3fdd0dfb13209926711937899b8e"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::vector&lt;unsigned int&gt; op::POSE_BODY_19_MAP_IDX {20,21, 34,35, 42,43, 36,37, 38,39, 44,45, 46,47, 26,27, 22,23, 24,25, 28,29, 30,31, 32,33, 50,51, 52,53, 56,57, 54,55, 58,59, 40,41, 48,49}</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a9a089b86a0cb8dfbf81501de2ec10b07"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const unsigned int op::POSE_BODY_19_NUMBER_PARTS = 19u</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a550c78ab4e4e1d31194d65445fa12b94"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::vector&lt;unsigned int&gt; op::POSE_BODY_19_PAIRS {1,8, 1,2, 1,5, 2,3, 3,4, 5,6, 6,7, 8,9, 9,10, 10,11, 8,12, 12,13, 13,14, 1,0, 0,15, 15,17, 0,16, 16,18, 2,17, 5,18}</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a2d9c72a62d012a21fd647d238784bd0b"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::vector&lt;unsigned int&gt; op::POSE_BODY_19_PAIRS_RENDER {<a class="el" href="pose_parameters_8hpp.html#a5afab27fbbebc71b8753a20dd6c9a322">POSE_COCO_PAIRS_RENDER_GPU</a>}</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a417991b82e2e14e8dc90a09e4facef19"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::map&lt;unsigned int, std::string&gt; op::POSE_BODY_23_BODY_PARTS</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">{</div>
-<div class="line">        {0,  <span class="stringliteral">&quot;Neck&quot;</span>},</div>
-<div class="line">        {1,  <span class="stringliteral">&quot;RShoulder&quot;</span>},</div>
-<div class="line">        {2,  <span class="stringliteral">&quot;RElbow&quot;</span>},</div>
-<div class="line">        {3,  <span class="stringliteral">&quot;RWrist&quot;</span>},</div>
-<div class="line">        {4,  <span class="stringliteral">&quot;LShoulder&quot;</span>},</div>
-<div class="line">        {5,  <span class="stringliteral">&quot;LElbow&quot;</span>},</div>
-<div class="line">        {6,  <span class="stringliteral">&quot;LWrist&quot;</span>},</div>
-<div class="line">        {7,  <span class="stringliteral">&quot;LowerAbs&quot;</span>},</div>
-<div class="line">        {8,  <span class="stringliteral">&quot;RHip&quot;</span>},</div>
-<div class="line">        {9,  <span class="stringliteral">&quot;RKnee&quot;</span>},</div>
-<div class="line">        {10, <span class="stringliteral">&quot;RAnkle&quot;</span>},</div>
-<div class="line">        {11, <span class="stringliteral">&quot;RBigToe&quot;</span>},</div>
-<div class="line">        {12, <span class="stringliteral">&quot;RSmallToe&quot;</span>},</div>
-<div class="line">        {13, <span class="stringliteral">&quot;LHip&quot;</span>},</div>
-<div class="line">        {14, <span class="stringliteral">&quot;LKnee&quot;</span>},</div>
-<div class="line">        {15, <span class="stringliteral">&quot;LAnkle&quot;</span>},</div>
-<div class="line">        {16, <span class="stringliteral">&quot;LBigToe&quot;</span>},</div>
-<div class="line">        {17, <span class="stringliteral">&quot;LSmallToe&quot;</span>},</div>
-<div class="line">        {18, <span class="stringliteral">&quot;Nose&quot;</span>},</div>
-<div class="line">        {19, <span class="stringliteral">&quot;REye&quot;</span>},</div>
-<div class="line">        {20, <span class="stringliteral">&quot;REar&quot;</span>},</div>
-<div class="line">        {21, <span class="stringliteral">&quot;LEye&quot;</span>},</div>
-<div class="line">        {22, <span class="stringliteral">&quot;LEar&quot;</span>},</div>
-<div class="line">        {23, <span class="stringliteral">&quot;Background&quot;</span>}</div>
-<div class="line">    }</div>
-</div><!-- fragment -->
-</div>
-</div>
-<a class="anchor" id="aa5fe1c898b53e3f7736ad9037571edaf"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::vector&lt;float&gt; op::POSE_BODY_23_COLORS_RENDER {<a class="el" href="pose_parameters_8hpp.html#aeb1e2dd8178c15024e372185e2e5cf54">POSE_BODY_23_COLORS_RENDER_GPU</a>}</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="af15beef165379754507c429962130965"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::vector&lt;unsigned int&gt; op::POSE_BODY_23_MAP_IDX {24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71}</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ad49ac3147773460e2d0bd95c0c6004e0"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const unsigned int op::POSE_BODY_23_NUMBER_PARTS = 23u</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a5f72bc3d372f33c5b095335a687030e7"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::vector&lt;unsigned int&gt; op::POSE_BODY_23_PAIRS { 0,1, 0,4, 1,2, 2,3, 4,5, 5,6, 0,7, 7,8, 7,13, 8,9, 9,10,10,11,10,12,13,14,14,15,15,16,15,17, 0,18,18,19,18,21,19,20,21,22, 1,20, 4,22}</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a0ea1d13b5a9b47ba2534aec20ab39335"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::vector&lt;unsigned int&gt; op::POSE_BODY_23_PAIRS_RENDER {<a class="el" href="pose_parameters_8hpp.html#a5f3db3bbb18fe8d978661f3c5417c110">POSE_BODY_23_PAIRS_RENDER_GPU</a>}</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a5efd2c1cd059608982d7ff66ed1a606f"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::array&lt;std::vector&lt;unsigned int&gt;, (int)<a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261fa6f6cb72d544962fa333e2e34ce64f719">PoseModel::Size</a>&gt; op::POSE_BODY_PART_PAIRS</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">{</div>
-<div class="line">        <a class="code" href="namespaceop.html#a67518f0a66cb3ee382b88a999e4f20b8">POSE_COCO_PAIRS</a>,        POSE_MPI_PAIRS,         POSE_MPI_PAIRS,         <a class="code" href="namespaceop.html#a360d95ba9769e4cb5cfc7aa2a2bab927">POSE_BODY_18_PAIRS</a>,         <a class="code" href="namespaceop.html#a550c78ab4e4e1d31194d65445fa12b94">POSE_BODY_19_PAIRS</a>,         <a class="code" href="namespaceop.html#a5f72bc3d372f33c5b095335a687030e7">POSE_BODY_23_PAIRS</a></div>
-<div class="line">    }</div>
-<div class="ttc" id="namespaceop_html_a5f72bc3d372f33c5b095335a687030e7"><div class="ttname"><a href="namespaceop.html#a5f72bc3d372f33c5b095335a687030e7">op::POSE_BODY_23_PAIRS</a></div><div class="ttdeci">const std::vector&lt; unsigned int &gt; POSE_BODY_23_PAIRS</div><div class="ttdef"><b>Definition:</b> poseParameters.hpp:213</div></div>
-<div class="ttc" id="namespaceop_html_a550c78ab4e4e1d31194d65445fa12b94"><div class="ttname"><a href="namespaceop.html#a550c78ab4e4e1d31194d65445fa12b94">op::POSE_BODY_19_PAIRS</a></div><div class="ttdeci">const std::vector&lt; unsigned int &gt; POSE_BODY_19_PAIRS</div><div class="ttdef"><b>Definition:</b> poseParameters.hpp:160</div></div>
-<div class="ttc" id="namespaceop_html_a360d95ba9769e4cb5cfc7aa2a2bab927"><div class="ttname"><a href="namespaceop.html#a360d95ba9769e4cb5cfc7aa2a2bab927">op::POSE_BODY_18_PAIRS</a></div><div class="ttdeci">const std::vector&lt; unsigned int &gt; POSE_BODY_18_PAIRS</div><div class="ttdef"><b>Definition:</b> poseParameters.hpp:130</div></div>
-<div class="ttc" id="namespaceop_html_a67518f0a66cb3ee382b88a999e4f20b8"><div class="ttname"><a href="namespaceop.html#a67518f0a66cb3ee382b88a999e4f20b8">op::POSE_COCO_PAIRS</a></div><div class="ttdeci">const std::vector&lt; unsigned int &gt; POSE_COCO_PAIRS</div><div class="ttdef"><b>Definition:</b> poseParameters.hpp:42</div></div>
-</div><!-- fragment -->
-</div>
-</div>
-<a class="anchor" id="aa95149b7c176de2ec33a0093c8e24a36"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::array&lt;std::vector&lt;unsigned int&gt;, (int)<a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261fa6f6cb72d544962fa333e2e34ce64f719">PoseModel::Size</a>&gt; op::POSE_BODY_PART_PAIRS_RENDER</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">{</div>
-<div class="line">        <a class="code" href="namespaceop.html#ae8d324a5c49dcbfd1b6f820608f5a292">POSE_COCO_PAIRS_RENDER</a>, POSE_MPI_PAIRS,         POSE_MPI_PAIRS,         <a class="code" href="namespaceop.html#a8bbf4f3e7a4739c4a44faff8d2c7ada9">POSE_BODY_18_PAIRS_RENDER</a>,  <a class="code" href="namespaceop.html#a2d9c72a62d012a21fd647d238784bd0b">POSE_BODY_19_PAIRS_RENDER</a>,  <a class="code" href="namespaceop.html#a0ea1d13b5a9b47ba2534aec20ab39335">POSE_BODY_23_PAIRS_RENDER</a></div>
-<div class="line">    }</div>
-<div class="ttc" id="namespaceop_html_a2d9c72a62d012a21fd647d238784bd0b"><div class="ttname"><a href="namespaceop.html#a2d9c72a62d012a21fd647d238784bd0b">op::POSE_BODY_19_PAIRS_RENDER</a></div><div class="ttdeci">const std::vector&lt; unsigned int &gt; POSE_BODY_19_PAIRS_RENDER</div><div class="ttdef"><b>Definition:</b> poseParameters.hpp:159</div></div>
-<div class="ttc" id="namespaceop_html_ae8d324a5c49dcbfd1b6f820608f5a292"><div class="ttname"><a href="namespaceop.html#ae8d324a5c49dcbfd1b6f820608f5a292">op::POSE_COCO_PAIRS_RENDER</a></div><div class="ttdeci">const std::vector&lt; unsigned int &gt; POSE_COCO_PAIRS_RENDER</div><div class="ttdef"><b>Definition:</b> poseParameters.hpp:41</div></div>
-<div class="ttc" id="namespaceop_html_a0ea1d13b5a9b47ba2534aec20ab39335"><div class="ttname"><a href="namespaceop.html#a0ea1d13b5a9b47ba2534aec20ab39335">op::POSE_BODY_23_PAIRS_RENDER</a></div><div class="ttdeci">const std::vector&lt; unsigned int &gt; POSE_BODY_23_PAIRS_RENDER</div><div class="ttdef"><b>Definition:</b> poseParameters.hpp:212</div></div>
-<div class="ttc" id="namespaceop_html_a8bbf4f3e7a4739c4a44faff8d2c7ada9"><div class="ttname"><a href="namespaceop.html#a8bbf4f3e7a4739c4a44faff8d2c7ada9">op::POSE_BODY_18_PAIRS_RENDER</a></div><div class="ttdeci">const std::vector&lt; unsigned int &gt; POSE_BODY_18_PAIRS_RENDER</div><div class="ttdef"><b>Definition:</b> poseParameters.hpp:129</div></div>
-</div><!-- fragment -->
-</div>
-</div>
-<a class="anchor" id="a84b4b00bb40c0c3a4cce7eed5978f047"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::array&lt;float, (int)<a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261fa6f6cb72d544962fa333e2e34ce64f719">PoseModel::Size</a>&gt; op::POSE_CCN_DECREASE_FACTOR</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">{</div>
-<div class="line">        8.f,        8.f,        8.f,        8.f,        8.f,        8.f</div>
-<div class="line">    }</div>
-</div><!-- fragment -->
-</div>
-</div>
-<a class="anchor" id="a1007a541c7af1a5e1e15475b8c4cec3b"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::map&lt;unsigned int, std::string&gt; op::POSE_COCO_BODY_PARTS</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">{</div>
-<div class="line">        {0,  <span class="stringliteral">&quot;Nose&quot;</span>},</div>
-<div class="line">        {1,  <span class="stringliteral">&quot;Neck&quot;</span>},</div>
-<div class="line">        {2,  <span class="stringliteral">&quot;RShoulder&quot;</span>},</div>
-<div class="line">        {3,  <span class="stringliteral">&quot;RElbow&quot;</span>},</div>
-<div class="line">        {4,  <span class="stringliteral">&quot;RWrist&quot;</span>},</div>
-<div class="line">        {5,  <span class="stringliteral">&quot;LShoulder&quot;</span>},</div>
-<div class="line">        {6,  <span class="stringliteral">&quot;LElbow&quot;</span>},</div>
-<div class="line">        {7,  <span class="stringliteral">&quot;LWrist&quot;</span>},</div>
-<div class="line">        {8,  <span class="stringliteral">&quot;RHip&quot;</span>},</div>
-<div class="line">        {9,  <span class="stringliteral">&quot;RKnee&quot;</span>},</div>
-<div class="line">        {10, <span class="stringliteral">&quot;RAnkle&quot;</span>},</div>
-<div class="line">        {11, <span class="stringliteral">&quot;LHip&quot;</span>},</div>
-<div class="line">        {12, <span class="stringliteral">&quot;LKnee&quot;</span>},</div>
-<div class="line">        {13, <span class="stringliteral">&quot;LAnkle&quot;</span>},</div>
-<div class="line">        {14, <span class="stringliteral">&quot;REye&quot;</span>},</div>
-<div class="line">        {15, <span class="stringliteral">&quot;LEye&quot;</span>},</div>
-<div class="line">        {16, <span class="stringliteral">&quot;REar&quot;</span>},</div>
-<div class="line">        {17, <span class="stringliteral">&quot;LEar&quot;</span>},</div>
-<div class="line">        {18, <span class="stringliteral">&quot;Background&quot;</span>}</div>
-<div class="line">    }</div>
-</div><!-- fragment -->
-</div>
-</div>
-<a class="anchor" id="a93a4ee242c33f626ff146643bb8971bd"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::vector&lt;float&gt; op::POSE_COCO_COLORS_RENDER {<a class="el" href="pose_parameters_8hpp.html#a8b293ab02337be3f90218c5b824ece06">POSE_COCO_COLORS_RENDER_GPU</a>}</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a674110c186802f7df02ad7822a885542"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::vector&lt;unsigned int&gt; op::POSE_COCO_MAP_IDX {31,32, 39,40, 33,34, 35,36, 41,42, 43,44, 19,20, 21,22, 23,24, 25,26, 27,28, 29,30, 47,48, 49,50, 53,54, 51,52, 55,56, 37,38, 45,46}</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a4dad15b160be5343298d80f4d83a6150"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const unsigned int op::POSE_COCO_NUMBER_PARTS = 18u</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a67518f0a66cb3ee382b88a999e4f20b8"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::vector&lt;unsigned int&gt; op::POSE_COCO_PAIRS {1,2, 1,5, 2,3, 3,4, 5,6, 6,7, 1,8, 8,9, 9,10, 1,11, 11,12, 12,13, 1,0, 0,14, 14,16, 0,15, 15,17, 2,16, 5,17}</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ae8d324a5c49dcbfd1b6f820608f5a292"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::vector&lt;unsigned int&gt; op::POSE_COCO_PAIRS_RENDER {<a class="el" href="pose_parameters_8hpp.html#a5afab27fbbebc71b8753a20dd6c9a322">POSE_COCO_PAIRS_RENDER_GPU</a>}</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="aefbe109a859cc12a9a06f607e61d8dba"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::array&lt;std::vector&lt;float&gt;, (int)<a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261fa6f6cb72d544962fa333e2e34ce64f719">PoseModel::Size</a>&gt; op::POSE_COLORS</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">{</div>
-<div class="line">        <a class="code" href="namespaceop.html#a93a4ee242c33f626ff146643bb8971bd">POSE_COCO_COLORS_RENDER</a>,<a class="code" href="namespaceop.html#a9e87deaa37c301fac10af492469bcc86">POSE_MPI_COLORS_RENDER</a>, <a class="code" href="namespaceop.html#a9e87deaa37c301fac10af492469bcc86">POSE_MPI_COLORS_RENDER</a>, <a class="code" href="namespaceop.html#abc8fdb41aa395c46430373facfbd554c">POSE_BODY_18_COLORS_RENDER</a>, <a class="code" href="namespaceop.html#acea3456a45f673bd479b817caca9567a">POSE_BODY_19_COLORS_RENDER</a>, <a class="code" href="namespaceop.html#aa5fe1c898b53e3f7736ad9037571edaf">POSE_BODY_23_COLORS_RENDER</a></div>
-<div class="line">    }</div>
-<div class="ttc" id="namespaceop_html_a9e87deaa37c301fac10af492469bcc86"><div class="ttname"><a href="namespaceop.html#a9e87deaa37c301fac10af492469bcc86">op::POSE_MPI_COLORS_RENDER</a></div><div class="ttdeci">const std::vector&lt; float &gt; POSE_MPI_COLORS_RENDER</div><div class="ttdef"><b>Definition:</b> poseParameters.hpp:103</div></div>
-<div class="ttc" id="namespaceop_html_abc8fdb41aa395c46430373facfbd554c"><div class="ttname"><a href="namespaceop.html#abc8fdb41aa395c46430373facfbd554c">op::POSE_BODY_18_COLORS_RENDER</a></div><div class="ttdeci">const std::vector&lt; float &gt; POSE_BODY_18_COLORS_RENDER</div><div class="ttdef"><b>Definition:</b> poseParameters.hpp:132</div></div>
-<div class="ttc" id="namespaceop_html_a93a4ee242c33f626ff146643bb8971bd"><div class="ttname"><a href="namespaceop.html#a93a4ee242c33f626ff146643bb8971bd">op::POSE_COCO_COLORS_RENDER</a></div><div class="ttdeci">const std::vector&lt; float &gt; POSE_COCO_COLORS_RENDER</div><div class="ttdef"><b>Definition:</b> poseParameters.hpp:62</div></div>
-<div class="ttc" id="namespaceop_html_aa5fe1c898b53e3f7736ad9037571edaf"><div class="ttname"><a href="namespaceop.html#aa5fe1c898b53e3f7736ad9037571edaf">op::POSE_BODY_23_COLORS_RENDER</a></div><div class="ttdeci">const std::vector&lt; float &gt; POSE_BODY_23_COLORS_RENDER</div><div class="ttdef"><b>Definition:</b> poseParameters.hpp:238</div></div>
-<div class="ttc" id="namespaceop_html_acea3456a45f673bd479b817caca9567a"><div class="ttname"><a href="namespaceop.html#acea3456a45f673bd479b817caca9567a">op::POSE_BODY_19_COLORS_RENDER</a></div><div class="ttdeci">const std::vector&lt; float &gt; POSE_BODY_19_COLORS_RENDER</div><div class="ttdef"><b>Definition:</b> poseParameters.hpp:181</div></div>
-</div><!-- fragment -->
-</div>
-</div>
 <a class="anchor" id="af45cddacd69fff73a4ea4acbbbac43e0"></a>
 <div class="memitem">
 <div class="memproto">
@@ -6381,267 +6082,16 @@ template&lt;typename T &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a029c14582c63e33a9b7350bb374527c8"></a>
+<a class="anchor" id="a522d4552d2aeabe367f4d3bf371e6b3e"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const std::array&lt;float, (int)<a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261fa6f6cb72d544962fa333e2e34ce64f719">PoseModel::Size</a>&gt; op::POSE_DEFAULT_CONNECT_INTER_MIN_ABOVE_THRESHOLD</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">{</div>
-<div class="line">        0.95f,      0.95f,      0.95f,      0.95f,      0.95f,      0.95f</div>
-<div class="line">        </div>
-<div class="line">    }</div>
-</div><!-- fragment -->
-</div>
-</div>
-<a class="anchor" id="a02de45e0a3df20b593d9b1b79a96f20c"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::array&lt;float, (int)<a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261fa6f6cb72d544962fa333e2e34ce64f719">PoseModel::Size</a>&gt; op::POSE_DEFAULT_CONNECT_INTER_THRESHOLD</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">{</div>
-<div class="line">        0.05f,      0.01f,      0.01f,      0.05f,      0.05f,      0.05f</div>
-<div class="line">    }</div>
-</div><!-- fragment -->
-</div>
-</div>
-<a class="anchor" id="a8b6edeb3f39ac581317c10e48e6729ad"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::array&lt;unsigned int, (int)<a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261fa6f6cb72d544962fa333e2e34ce64f719">PoseModel::Size</a>&gt; op::POSE_DEFAULT_CONNECT_MIN_SUBSET_CNT</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">{</div>
-<div class="line">        3,          3,          3,          3,          3,          3</div>
-<div class="line">    }</div>
-</div><!-- fragment -->
-</div>
-</div>
-<a class="anchor" id="a600643a9a3f46d6a4cab58943e059d57"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::array&lt;float, (int)<a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261fa6f6cb72d544962fa333e2e34ce64f719">PoseModel::Size</a>&gt; op::POSE_DEFAULT_CONNECT_MIN_SUBSET_SCORE</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">{</div>
-<div class="line">        0.4f,       0.4f,       0.4f,       0.4f,       0.4f,       0.4f</div>
-<div class="line">        </div>
-<div class="line">    }</div>
-</div><!-- fragment -->
-</div>
-</div>
-<a class="anchor" id="af5bcc4a300e5d6f2572ba2b955c2c992"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::array&lt;float, (int)<a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261fa6f6cb72d544962fa333e2e34ce64f719">PoseModel::Size</a>&gt; op::POSE_DEFAULT_NMS_THRESHOLD</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">{</div>
-<div class="line">        0.05f,      0.6f,       0.3f,       0.05f,      0.05f,      0.05f</div>
-<div class="line">    }</div>
-</div><!-- fragment -->
-</div>
-</div>
-<a class="anchor" id="a8ce48a4305cac872140ef4eb3d8c6896"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::array&lt;std::vector&lt;unsigned int&gt;, (int)<a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261fa6f6cb72d544962fa333e2e34ce64f719">PoseModel::Size</a>&gt; op::POSE_MAP_IDX</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">{</div>
-<div class="line">        <a class="code" href="namespaceop.html#a674110c186802f7df02ad7822a885542">POSE_COCO_MAP_IDX</a>,      <a class="code" href="namespaceop.html#a46dc266a61a0b0061563cb9c6359cb71">POSE_MPI_MAP_IDX</a>,       <a class="code" href="namespaceop.html#a46dc266a61a0b0061563cb9c6359cb71">POSE_MPI_MAP_IDX</a>,       <a class="code" href="namespaceop.html#a3ce26fa0a7373e612d130d1657ac7d16">POSE_BODY_18_MAP_IDX</a>,       <a class="code" href="namespaceop.html#a62ee3fdd0dfb13209926711937899b8e">POSE_BODY_19_MAP_IDX</a>,       <a class="code" href="namespaceop.html#af15beef165379754507c429962130965">POSE_BODY_23_MAP_IDX</a></div>
-<div class="line">    }</div>
-<div class="ttc" id="namespaceop_html_a62ee3fdd0dfb13209926711937899b8e"><div class="ttname"><a href="namespaceop.html#a62ee3fdd0dfb13209926711937899b8e">op::POSE_BODY_19_MAP_IDX</a></div><div class="ttdeci">const std::vector&lt; unsigned int &gt; POSE_BODY_19_MAP_IDX</div><div class="ttdef"><b>Definition:</b> poseParameters.hpp:157</div></div>
-<div class="ttc" id="namespaceop_html_a3ce26fa0a7373e612d130d1657ac7d16"><div class="ttname"><a href="namespaceop.html#a3ce26fa0a7373e612d130d1657ac7d16">op::POSE_BODY_18_MAP_IDX</a></div><div class="ttdeci">const std::vector&lt; unsigned int &gt; POSE_BODY_18_MAP_IDX</div><div class="ttdef"><b>Definition:</b> poseParameters.hpp:127</div></div>
-<div class="ttc" id="namespaceop_html_a674110c186802f7df02ad7822a885542"><div class="ttname"><a href="namespaceop.html#a674110c186802f7df02ad7822a885542">op::POSE_COCO_MAP_IDX</a></div><div class="ttdeci">const std::vector&lt; unsigned int &gt; POSE_COCO_MAP_IDX</div><div class="ttdef"><b>Definition:</b> poseParameters.hpp:39</div></div>
-<div class="ttc" id="namespaceop_html_af15beef165379754507c429962130965"><div class="ttname"><a href="namespaceop.html#af15beef165379754507c429962130965">op::POSE_BODY_23_MAP_IDX</a></div><div class="ttdeci">const std::vector&lt; unsigned int &gt; POSE_BODY_23_MAP_IDX</div><div class="ttdef"><b>Definition:</b> poseParameters.hpp:210</div></div>
-<div class="ttc" id="namespaceop_html_a46dc266a61a0b0061563cb9c6359cb71"><div class="ttname"><a href="namespaceop.html#a46dc266a61a0b0061563cb9c6359cb71">op::POSE_MPI_MAP_IDX</a></div><div class="ttdeci">const std::vector&lt; unsigned int &gt; POSE_MPI_MAP_IDX</div><div class="ttdef"><b>Definition:</b> poseParameters.hpp:83</div></div>
-</div><!-- fragment -->
-</div>
-</div>
-<a class="anchor" id="a91d47f70c39fdf167d46ea6b4361209b"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::array&lt;unsigned int, (int)<a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261fa6f6cb72d544962fa333e2e34ce64f719">PoseModel::Size</a>&gt; op::POSE_MAX_PEAKS</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">{</div>
-<div class="line">        <a class="code" href="namespaceop.html#a4ce7d2037ec2a189cd284d34726c2d49">POSE_MAX_PEOPLE</a>,        <a class="code" href="namespaceop.html#a4ce7d2037ec2a189cd284d34726c2d49">POSE_MAX_PEOPLE</a>,        <a class="code" href="namespaceop.html#a4ce7d2037ec2a189cd284d34726c2d49">POSE_MAX_PEOPLE</a>,        <a class="code" href="namespaceop.html#a4ce7d2037ec2a189cd284d34726c2d49">POSE_MAX_PEOPLE</a>,        <a class="code" href="namespaceop.html#a4ce7d2037ec2a189cd284d34726c2d49">POSE_MAX_PEOPLE</a>,        POSE_MAX_PEOPLE</div>
-<div class="line">    }</div>
-<div class="ttc" id="namespaceop_html_a4ce7d2037ec2a189cd284d34726c2d49"><div class="ttname"><a href="namespaceop.html#a4ce7d2037ec2a189cd284d34726c2d49">op::POSE_MAX_PEOPLE</a></div><div class="ttdeci">const unsigned int POSE_MAX_PEOPLE</div><div class="ttdef"><b>Definition:</b> poseParameters.hpp:13</div></div>
-</div><!-- fragment -->
-</div>
-</div>
-<a class="anchor" id="a4ce7d2037ec2a189cd284d34726c2d49"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const unsigned int op::POSE_MAX_PEOPLE = 96u</td>
+          <td class="memname">const auto op::POSE_MAX_PEOPLE = 96u</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-</div>
-</div>
-<a class="anchor" id="a67936cc61d129d2262546534b2c7cd30"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::map&lt;unsigned int, std::string&gt; op::POSE_MPI_BODY_PARTS</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">{</div>
-<div class="line">        {0,  <span class="stringliteral">&quot;Head&quot;</span>},</div>
-<div class="line">        {1,  <span class="stringliteral">&quot;Neck&quot;</span>},</div>
-<div class="line">        {2,  <span class="stringliteral">&quot;RShoulder&quot;</span>},</div>
-<div class="line">        {3,  <span class="stringliteral">&quot;RElbow&quot;</span>},</div>
-<div class="line">        {4,  <span class="stringliteral">&quot;RWrist&quot;</span>},</div>
-<div class="line">        {5,  <span class="stringliteral">&quot;LShoulder&quot;</span>},</div>
-<div class="line">        {6,  <span class="stringliteral">&quot;LElbow&quot;</span>},</div>
-<div class="line">        {7,  <span class="stringliteral">&quot;LWrist&quot;</span>},</div>
-<div class="line">        {8,  <span class="stringliteral">&quot;RHip&quot;</span>},</div>
-<div class="line">        {9,  <span class="stringliteral">&quot;RKnee&quot;</span>},</div>
-<div class="line">        {10, <span class="stringliteral">&quot;RAnkle&quot;</span>},</div>
-<div class="line">        {11, <span class="stringliteral">&quot;LHip&quot;</span>},</div>
-<div class="line">        {12, <span class="stringliteral">&quot;LKnee&quot;</span>},</div>
-<div class="line">        {13, <span class="stringliteral">&quot;LAnkle&quot;</span>},</div>
-<div class="line">        {14, <span class="stringliteral">&quot;Chest&quot;</span>},</div>
-<div class="line">        {15, <span class="stringliteral">&quot;Background&quot;</span>}</div>
-<div class="line">    }</div>
-</div><!-- fragment -->
-</div>
-</div>
-<a class="anchor" id="a9e87deaa37c301fac10af492469bcc86"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::vector&lt;float&gt; op::POSE_MPI_COLORS_RENDER {<a class="el" href="pose_parameters_8hpp.html#a7fdd75b1478d65f11ebc77144662958c">POSE_MPI_COLORS_RENDER_GPU</a>}</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a46dc266a61a0b0061563cb9c6359cb71"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::vector&lt;unsigned int&gt; op::POSE_MPI_MAP_IDX {16,17, 18,19, 20,21, 22,23, 24,25, 26,27, 28,29, 30,31, 32,33, 34,35, 36,37, 38,39, 40,41, 42,43}</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ad8ed879d7e9d7bb73c0da7650ce934da"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const unsigned int op::POSE_MPI_NUMBER_PARTS = 15</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="aba7025c2e941605b2f5d70ce6a37f0e5"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::vector&lt;unsigned int&gt; POSE_MPI_PAIRS op::POSE_MPI_PAIRS_RENDER_GPU</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a4dd1047c27e639d21f830f97017b5e44"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::array&lt;unsigned int, (int)<a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261fa6f6cb72d544962fa333e2e34ce64f719">PoseModel::Size</a>&gt; op::POSE_NUMBER_BODY_PARTS</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">{</div>
-<div class="line">        <a class="code" href="namespaceop.html#a4dad15b160be5343298d80f4d83a6150">POSE_COCO_NUMBER_PARTS</a>, <a class="code" href="namespaceop.html#ad8ed879d7e9d7bb73c0da7650ce934da">POSE_MPI_NUMBER_PARTS</a>,  <a class="code" href="namespaceop.html#ad8ed879d7e9d7bb73c0da7650ce934da">POSE_MPI_NUMBER_PARTS</a>,  <a class="code" href="namespaceop.html#a1508c5fa871a1da61a2b740a9c5e2df1">POSE_BODY_18_NUMBER_PARTS</a>,  <a class="code" href="namespaceop.html#a9a089b86a0cb8dfbf81501de2ec10b07">POSE_BODY_19_NUMBER_PARTS</a>,  <a class="code" href="namespaceop.html#ad49ac3147773460e2d0bd95c0c6004e0">POSE_BODY_23_NUMBER_PARTS</a></div>
-<div class="line">    }</div>
-<div class="ttc" id="namespaceop_html_a4dad15b160be5343298d80f4d83a6150"><div class="ttname"><a href="namespaceop.html#a4dad15b160be5343298d80f4d83a6150">op::POSE_COCO_NUMBER_PARTS</a></div><div class="ttdeci">const unsigned int POSE_COCO_NUMBER_PARTS</div><div class="ttdef"><b>Definition:</b> poseParameters.hpp:38</div></div>
-<div class="ttc" id="namespaceop_html_a1508c5fa871a1da61a2b740a9c5e2df1"><div class="ttname"><a href="namespaceop.html#a1508c5fa871a1da61a2b740a9c5e2df1">op::POSE_BODY_18_NUMBER_PARTS</a></div><div class="ttdeci">const unsigned int POSE_BODY_18_NUMBER_PARTS</div><div class="ttdef"><b>Definition:</b> poseParameters.hpp:126</div></div>
-<div class="ttc" id="namespaceop_html_ad49ac3147773460e2d0bd95c0c6004e0"><div class="ttname"><a href="namespaceop.html#ad49ac3147773460e2d0bd95c0c6004e0">op::POSE_BODY_23_NUMBER_PARTS</a></div><div class="ttdeci">const unsigned int POSE_BODY_23_NUMBER_PARTS</div><div class="ttdef"><b>Definition:</b> poseParameters.hpp:209</div></div>
-<div class="ttc" id="namespaceop_html_ad8ed879d7e9d7bb73c0da7650ce934da"><div class="ttname"><a href="namespaceop.html#ad8ed879d7e9d7bb73c0da7650ce934da">op::POSE_MPI_NUMBER_PARTS</a></div><div class="ttdeci">const unsigned int POSE_MPI_NUMBER_PARTS</div><div class="ttdef"><b>Definition:</b> poseParameters.hpp:82</div></div>
-<div class="ttc" id="namespaceop_html_a9a089b86a0cb8dfbf81501de2ec10b07"><div class="ttname"><a href="namespaceop.html#a9a089b86a0cb8dfbf81501de2ec10b07">op::POSE_BODY_19_NUMBER_PARTS</a></div><div class="ttdeci">const unsigned int POSE_BODY_19_NUMBER_PARTS</div><div class="ttdef"><b>Definition:</b> poseParameters.hpp:156</div></div>
-</div><!-- fragment -->
-</div>
-</div>
-<a class="anchor" id="a2d63d4b60789b52bb8524b7596cb73a7"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::array&lt;std::string, (int)<a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261fa6f6cb72d544962fa333e2e34ce64f719">PoseModel::Size</a>&gt; op::POSE_PROTOTXT</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">{</div>
-<div class="line">        <span class="stringliteral">&quot;pose/coco/pose_deploy_linevec.prototxt&quot;</span>,</div>
-<div class="line">        <span class="stringliteral">&quot;pose/mpi/pose_deploy_linevec.prototxt&quot;</span>,</div>
-<div class="line">        <span class="stringliteral">&quot;pose/mpi/pose_deploy_linevec_faster_4_stages.prototxt&quot;</span>,</div>
-<div class="line">        <span class="stringliteral">&quot;pose/body_18/pose_deploy.prototxt&quot;</span>,</div>
-<div class="line">        <span class="stringliteral">&quot;pose/body_19/pose_deploy.prototxt&quot;</span>,</div>
-<div class="line">        <span class="stringliteral">&quot;pose/body_23/pose_deploy.prototxt&quot;</span></div>
-<div class="line">    }</div>
-</div><!-- fragment -->
-</div>
-</div>
-<a class="anchor" id="ad964ad6758567f7244d134599e8cb04b"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::array&lt;std::string, (int)<a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261fa6f6cb72d544962fa333e2e34ce64f719">PoseModel::Size</a>&gt; op::POSE_TRAINED_MODEL</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">{</div>
-<div class="line">        <span class="stringliteral">&quot;pose/coco/pose_iter_440000.caffemodel&quot;</span>,</div>
-<div class="line">        <span class="stringliteral">&quot;pose/mpi/pose_iter_160000.caffemodel&quot;</span>,</div>
-<div class="line">        <span class="stringliteral">&quot;pose/mpi/pose_iter_160000.caffemodel&quot;</span>,</div>
-<div class="line">        <span class="stringliteral">&quot;pose/body_18/pose_iter_XXXXXX.caffemodel&quot;</span>,</div>
-<div class="line">        <span class="stringliteral">&quot;pose/body_19/pose_iter_XXXXXX.caffemodel&quot;</span>,</div>
-<div class="line">        <span class="stringliteral">&quot;pose/body_23/pose_iter_XXXXXX.caffemodel&quot;</span></div>
-<div class="line">    }</div>
-</div><!-- fragment -->
 </div>
 </div>
 <a class="anchor" id="a55207f49aadd5f79e75251d6ccfad1fc"></a>
