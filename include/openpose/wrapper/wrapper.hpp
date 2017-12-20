@@ -456,9 +456,9 @@ namespace op
                       __LINE__, __FUNCTION__, __FILE__);
             if (!renderOutput && (!wrapperStructOutput.writeImages.empty() || !wrapperStructOutput.writeVideo.empty()))
             {
-                const auto message = "In order to save the rendered frames (`write_images` or `write_video`), you must"
-                                     " set `render_output` to true.";
-                error(message, __LINE__, __FUNCTION__, __FILE__);
+                const auto message = "In order to save the rendered frames (`write_images` or `write_video`), you"
+                                     " cannot disable `render_pose`.";
+                log(message, Priority::High);
             }
             if (!wrapperStructOutput.writeHeatMaps.empty() && wrapperStructPose.heatMapTypes.empty())
             {
