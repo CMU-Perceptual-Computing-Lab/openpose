@@ -122,7 +122,7 @@ namespace op
         }
     }
 
-    char extractPatchIt(std::vector< std::vector<float>>& patch, const int xI, const int yI, const int xJ,
+    char extractPatchIt(std::vector<std::vector<float>>& patch, const int xI, const int yI, const int xJ,
                         const int yJ, const cv::Mat& I, const cv::Mat& J, const int patchSize)
     {
         try

@@ -1,7 +1,6 @@
 #include <iostream>
 #include <openpose/experimental/tracking/pyramidalLK.hpp>
 #include <openpose/utilities/fastMath.hpp>
-#include <openpose/utilities/keypoint.hpp>
 #include <openpose/experimental/tracking/personIdExtractor.hpp>
 
 // #define LK_CUDA
@@ -143,7 +142,7 @@ namespace op
     Array<long long> matchLKAndOP(std::unordered_map<int,PersonEntry>& personEntries,
                                   long long& nextPersonId,
                                   const std::vector<PersonEntry>& openposePersonEntries,
-                                  const Array<float>& poseKeypoints,
+                                  const cv::Mat& imagePrevious,
                                   const float inlierRatioThreshold,
                                   const float distanceThreshold)
     {
@@ -157,10 +156,10 @@ namespace op
                 const auto numberKeypoints = openposePersonEntries[0].keypoints.size();
                 for (auto i = 0u; i < openposePersonEntries.size(); i++)
                 {
-                    const auto& openposePersonEntry = openposePersonEntries.at(i);
-                    const auto personRectangle = getKeypointsRectangle(poseKeypoints, i, 0.05f);
-                    const auto personDistanceThreshold = distanceThreshold*fastMax(personRectangle.x, personRectangle.y);
                     auto& poseId = poseIds.at(i);
+                    const auto& openposePersonEntry = openposePersonEntries.at(i);
+                    const auto personDistanceThreshold = fastMax(10.f,
+                        distanceThreshold*float(std::sqrt(imagePrevious.cols*imagePrevious.rows)) / 960.f);
 
                     // Find best correspondance in the LK set
                     auto bestMatch = -1ll;
@@ -272,7 +271,7 @@ namespace op
             }
 
             // Get poseIds and update LKset according to OpenPose set
-            poseIds = matchLKAndOP(mPersonEntries, mNextPersonId, openposePersonEntries, poseKeypoints,
+            poseIds = matchLKAndOP(mPersonEntries, mNextPersonId, openposePersonEntries, mImagePrevious,
                                    mInlierRatioThreshold, mDistanceThreshold);
 
             return poseIds;

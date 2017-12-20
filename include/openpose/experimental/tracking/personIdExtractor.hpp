@@ -25,8 +25,8 @@ namespace op
     {
 
     public:
-        PersonIdExtractor(const float confidenceThreshold = 0.1f, const float inlierRatioThreshold = 0.3f,
-                          const float distanceThreshold = 0.25f, const int numberFramesToDeletePerson = 10);
+        PersonIdExtractor(const float confidenceThreshold = 0.1f, const float inlierRatioThreshold = 0.5f,
+                          const float distanceThreshold = 30.f, const int numberFramesToDeletePerson = 10);
 
         virtual ~PersonIdExtractor();
 
