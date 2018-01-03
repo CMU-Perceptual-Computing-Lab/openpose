@@ -41,6 +41,7 @@ namespace op
         // Workers
         TWorker wDatumProducer;
         TWorker spWIdGenerator;
+        TWorker spWScaleAndSizeExtractor;
         TWorker spWCvMatToOpInput;
         TWorker spWCvMatToOpOutput;
         std::vector<std::vector<TWorker>> spWPoses;
@@ -172,6 +173,13 @@ namespace op
             const auto datumProducer = std::make_shared<DatumProducer<TDatums>>(producerSharedPtr);
             wDatumProducer = std::make_shared<WDatumProducer<TDatumsPtr, TDatums>>(datumProducer);
 
+            // Get input scales and sizes
+            const auto scaleAndSizeExtractor = std::make_shared<ScaleAndSizeExtractor>(
+                wrapperStructPose.netInputSize, finalOutputSize, wrapperStructPose.scalesNumber,
+                wrapperStructPose.scaleGap
+            );
+            spWScaleAndSizeExtractor = std::make_shared<WScaleAndSizeExtractor<TDatumsPtr>>(scaleAndSizeExtractor);
+
             // Input cvMat to OpenPose format
             const auto cvMatToOpInput = std::make_shared<CvMatToOpInput>();
             spWCvMatToOpInput = std::make_shared<WCvMatToOpInput<TDatumsPtr>>(cvMatToOpInput);
@@ -281,6 +289,7 @@ namespace op
             mThreadManager.reset();
             // Reset 
             wDatumProducer = nullptr;
+            spWScaleAndSizeExtractor = nullptr;
             spWCvMatToOpInput = nullptr;
             spWCvMatToOpOutput = nullptr;
             spWPoses.clear();
@@ -301,7 +310,8 @@ namespace op
         {
             // Security checks
             if (spWCvMatToOpInput == nullptr)
-                error("Configure the WrapperHandFromJsonTest class before calling `start()`.", __LINE__, __FUNCTION__, __FILE__);
+                error("Configure the WrapperHandFromJsonTest class before calling `start()`.",
+                      __LINE__, __FUNCTION__, __FILE__);
             if (wDatumProducer == nullptr)
             {
                 const auto message = "You need to use the OpenPose default producer.";
@@ -323,9 +333,11 @@ namespace op
             // OpenPose producer
             // Thread 0 or 1, queues 0 -> 1
             if (spWCvMatToOpOutput == nullptr)
-                mThreadManager.add(threadId++, {wDatumProducer, spWIdGenerator, spWCvMatToOpInput}, queueIn++, queueOut++);
+                mThreadManager.add(threadId++, {wDatumProducer, spWIdGenerator, spWScaleAndSizeExtractor,
+                                   spWCvMatToOpInput}, queueIn++, queueOut++);
             else
-                mThreadManager.add(threadId++, {wDatumProducer, spWIdGenerator, spWCvMatToOpInput, spWCvMatToOpOutput}, queueIn++, queueOut++);
+                mThreadManager.add(threadId++, {wDatumProducer, spWIdGenerator, spWScaleAndSizeExtractor,
+                                   spWCvMatToOpInput, spWCvMatToOpOutput}, queueIn++, queueOut++);
             // Pose estimation & rendering
             // Thread 1 or 2...X, queues 1 -> 2, X = 2 + #GPUs
             if (!spWPoses.empty())
