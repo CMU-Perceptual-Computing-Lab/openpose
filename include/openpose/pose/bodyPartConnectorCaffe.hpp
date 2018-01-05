@@ -22,9 +22,7 @@ namespace op
     public:
         explicit BodyPartConnectorCaffe();
 
-        virtual void LayerSetUp(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top);
-
-        virtual void Reshape(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top);
+        virtual void Reshape(const std::vector<caffe::Blob<T>*>& bottom);
 
         virtual inline const char* type() const { return "BodyPartConnector"; }
 
