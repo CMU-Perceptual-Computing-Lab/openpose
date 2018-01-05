@@ -9,7 +9,8 @@
 namespace op
 {
     // Private class (on *.cpp)
-    const auto errorMessage = "Json format only implemented in OpenCV for versions >= 3.0. Check savePoseJson instead.";
+    const auto errorMessage = "Json format only implemented in OpenCV for versions >= 3.0. Check savePoseJson"
+                              " instead.";
 
     std::string dataFormatToString(const DataFormat format)
     {
@@ -60,7 +61,8 @@ namespace op
                 return DataFormat::Yml;
             else
             {
-                error("String does not correspond to any format (json, xml, yaml, yml)", __LINE__, __FUNCTION__, __FILE__);
+                error("String does not correspond to any format (json, xml, yaml, yml)",
+                      __LINE__, __FUNCTION__, __FILE__);
                 return DataFormat::Json;
             }
         }
@@ -98,7 +100,8 @@ namespace op
         }
     }
 
-    void saveData(const std::vector<cv::Mat>& cvMats, const std::vector<std::string>& cvMatNames, const std::string& fileNameNoExtension, const DataFormat format)
+    void saveData(const std::vector<cv::Mat>& cvMats, const std::vector<std::string>& cvMatNames,
+                  const std::string& fileNameNoExtension, const DataFormat format)
     {
         try
         {
@@ -120,7 +123,8 @@ namespace op
         }
     }
 
-    void saveData(const cv::Mat& cvMat, const std::string cvMatName, const std::string& fileNameNoExtension, const DataFormat format)
+    void saveData(const cv::Mat& cvMat, const std::string cvMatName, const std::string& fileNameNoExtension,
+                  const DataFormat format)
     {
         try
         {
@@ -132,7 +136,8 @@ namespace op
         }
     }
 
-    std::vector<cv::Mat> loadData(const std::vector<std::string>& cvMatNames, const std::string& fileNameNoExtension, const DataFormat format)
+    std::vector<cv::Mat> loadData(const std::vector<std::string>& cvMatNames, const std::string& fileNameNoExtension,
+                                  const DataFormat format)
     {
         try
         {
@@ -166,11 +171,15 @@ namespace op
         }
     }
 
-    void saveKeypointsJson(const Array<float>& keypoints, const std::string& keypointName, const std::string& fileName, const bool humanReadable)
+    void saveKeypointsJson(const Array<float>& keypoints, const std::string& keypointName, const std::string& fileName,
+                           const bool humanReadable)
     {
         try
         {
-            saveKeypointsJson(std::vector<std::pair<Array<float>, std::string>>{std::make_pair(keypoints, keypointName)}, fileName, humanReadable);
+            saveKeypointsJson(
+                std::vector<std::pair<Array<float>, std::string>>{std::make_pair(keypoints, keypointName)},
+                fileName, humanReadable
+            );
         }
         catch (const std::exception& e)
         {
@@ -178,7 +187,8 @@ namespace op
         }
     }
 
-    void saveKeypointsJson(const std::vector<std::pair<Array<float>, std::string>>& keypointVector, const std::string& fileName, const bool humanReadable)
+    void saveKeypointsJson(const std::vector<std::pair<Array<float>, std::string>>& keypointVector,
+                           const std::string& fileName, const bool humanReadable)
     {
         try
         {
@@ -294,7 +304,8 @@ namespace op
                         error("splittedInts.size() != 4, but splittedInts.size() = "
                               + std::to_string(splittedInts.size()) + ".", __LINE__, __FUNCTION__, __FILE__);
                     const Rectangle<float> handRectangleZero;
-                    const Rectangle<float> handRectangle{splittedInts[0], splittedInts[1], splittedInts[2], splittedInts[3]};
+                    const Rectangle<float> handRectangle{splittedInts[0], splittedInts[1], splittedInts[2],
+                                                         splittedInts[3]};
                     if (getFileNameNoExtension(txtFilePath).back() == 'l')
                         handRectangles.emplace_back(std::array<Rectangle<float>, 2>{handRectangle, handRectangleZero});
                     else

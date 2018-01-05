@@ -22,12 +22,11 @@ namespace op
                                    const float threshold);
 
     OP_API Rectangle<float> getKeypointsRectangle(const Array<float>& keypoints, const int person,
-                                                  const int numberKeypoints, const float threshold);
+                                                  const float threshold);
 
     OP_API float getAverageScore(const Array<float>& keypoints, const int person);
 
-    OP_API float getKeypointsArea(const Array<float>& keypoints, const int person, const int numberKeypoints,
-                                  const float threshold);
+    OP_API float getKeypointsArea(const Array<float>& keypoints, const int person, const float threshold);
 
     OP_API int getBiggestPerson(const Array<float>& keypoints, const float threshold);
 }

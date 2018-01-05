@@ -100,13 +100,13 @@ namespace op
         }
 
         Rectangle<float> getHandRectangle(Array<float>& handCurrent, const int person, const float increaseRatio,
-                                          const int handNumberParts, const float thresholdRectangle,
+                                          const float thresholdRectangle,
                                           const Rectangle<float>& previousHandRectangle = Rectangle<float>{})
         {
             try
             {
                 // Initial Rectangle
-                auto handRectangle = getKeypointsRectangle(handCurrent, person, handNumberParts, thresholdRectangle);
+                auto handRectangle = getKeypointsRectangle(handCurrent, person, thresholdRectangle);
                 // Get final width
                 auto finalWidth = fastMax(handRectangle.width, handRectangle.height) * increaseRatio;
                 if (previousHandRectangle.width > 0 && previousHandRectangle.height > 0)
