@@ -222,7 +222,6 @@ namespace op
                 opendir(formatedPath.c_str()),
                 [](DIR* formatedPath){ formatedPath && closedir(formatedPath); }
             );
-
             struct dirent* direntPtr;
             while ((direntPtr = readdir(directoryPtr.get())) != nullptr)
             {
@@ -231,11 +230,9 @@ namespace op
                         continue;
                 filePaths.push_back(currentPath);
             }
-
             // Check #files > 0
             if (filePaths.empty())
                 error("No files were found on " + directoryPath, __LINE__, __FUNCTION__, __FILE__);
-
             // If specific extensions specified
             if (!extensions.empty())
             {
@@ -247,10 +244,9 @@ namespace op
                         specificExtensionPaths.emplace_back(filePath);
                 std::swap(filePaths, specificExtensionPaths);
             }
-
             // Sort alphabetically
             std::sort(filePaths.begin(), filePaths.end());
-
+            // Return result
             return filePaths;
         }
         catch (const std::exception& e)
