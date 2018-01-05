@@ -1,14 +1,14 @@
+#include <algorithm>
+#include <cstring>
+#include <dirent.h> // opendir
+#include <fstream>
+#include <memory>
+#include <unistd.h>
+
 #include <cstdio> // fopen
 #include <boost/filesystem.hpp>
 #include <openpose/utilities/string.hpp>
 #include <openpose/utilities/fileSystem.hpp>
-
-#include <algorithm>
-#include <cstring>
-#include <dirent.h> //opendir
-#include <fstream>
-#include <memory>
-#include <unistd.h>
 
 // The only remaining boost dependency part
 // We could use the mkdir method to create dir
