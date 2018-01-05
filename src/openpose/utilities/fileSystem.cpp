@@ -1,14 +1,12 @@
 #include <cstdio> // fopen
 #include <boost/filesystem.hpp>
-#include <boost/range/iterator_range_core.hpp>
 #include <openpose/utilities/string.hpp>
 #include <openpose/utilities/fileSystem.hpp>
 
-#include <iostream>
-#include <fstream>
 #include <algorithm>
-#include <dirent.h> //opendir
 #include <cstring>
+#include <dirent.h> //opendir
+#include <fstream>
 #include <memory>
 #include <unistd.h>
 
@@ -40,7 +38,7 @@ namespace op
 
                 // Create folder if it does not exist
                 const boost::filesystem::path directory{directoryPath};
-                if (!isDirectory(directoryPath) && !boost::filesystem::create_directory(directory))
+                if (!existDirectory(directoryPath) && !boost::filesystem::create_directory(directory))
                     error("Could not write to or create directory to save processed frames.",
                           __LINE__, __FUNCTION__, __FILE__);
             };
@@ -51,11 +49,10 @@ namespace op
         }
     }
 
-    bool existDir(const std::string& directoryPath)
+    bool existDirectory(const std::string& directoryPath)
     {
         try
         {
-            // Maybe existFile also works for directories in Ubuntu/Windows/Mac?
             DIR* dir = opendir(directoryPath.c_str());
 
             if (dir != NULL)
@@ -64,9 +61,7 @@ namespace op
                 return true;
             }
             else
-            {
                 return false;
-            }
         }
         catch (const std::exception& e)
         {
@@ -86,30 +81,6 @@ namespace op
             }
             else
                 return false;
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return false;
-        }
-    }
-
-    // What's the difference with existDir
-    bool isDirectory(const std::string& directoryPath)
-    {
-        try
-        {
-            DIR* dir = opendir(directoryPath.c_str());
-
-            if (dir != NULL)
-            {
-                closedir(dir);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
         }
         catch (const std::exception& e)
         {
@@ -142,9 +113,9 @@ namespace op
     {
         try
         {
-            size_t sep = fullPath.find_last_of("\\/");
-            if (sep != std::string::npos)
-                return fullPath.substr(sep+1, fullPath.size() - sep - 1);
+            size_t lastSlashPos = fullPath.find_last_of("\\/");
+            if (lastSlashPos != std::string::npos)
+                return fullPath.substr(lastSlashPos+1, fullPath.size() - lastSlashPos - 1);
             else
                 return fullPath;
         }
@@ -159,10 +130,12 @@ namespace op
     {
         try
         {
+            // Name + extension
             std::string nameExt = getFileNameAndExtension(fullPath);
-            size_t dot = nameExt.find_last_of(".");
-            if (dot != std::string::npos)
-                return nameExt.substr(0, dot);
+            // Name
+            size_t dotPos = nameExt.find_last_of(".");
+            if (dotPos != std::string::npos)
+                return nameExt.substr(0, dotPos);
             else
                 return nameExt;
         }
@@ -177,11 +150,12 @@ namespace op
     {
         try
         {
+            // Name + extension
             std::string nameExt = getFileNameAndExtension(fullPath);
-
-            size_t dot = nameExt.find_last_of(".");
-            if (dot != std::string::npos)
-                return nameExt.substr(dot+1, nameExt.size()-dot-1);
+            // Extension
+            size_t dotPos = nameExt.find_last_of(".");
+            if (dotPos != std::string::npos)
+                return nameExt.substr(dotPos + 1, nameExt.size() - dotPos - 1);
             else
                 return "";
         }
@@ -238,22 +212,24 @@ namespace op
         try
         {
             // Format the path first
-            std::string format_path = formatAsDirectory(directoryPath);
+            std::string formatedPath = formatAsDirectory(directoryPath);
             // Check folder exits
-            if (!existDir(directoryPath))
+            if (!existDirectory(directoryPath))
                 error("Folder " + directoryPath + " does not exist.", __LINE__, __FUNCTION__, __FILE__);
             // Read images
             std::vector<std::string> filePaths;
-            std::shared_ptr<DIR> directory_ptr(opendir(format_path.c_str()), [](DIR* format_path)
-					       { format_path && closedir(format_path); });
-            struct dirent *dirent_ptr;
+            std::shared_ptr<DIR> directoryPtr(
+                opendir(formatedPath.c_str()),
+                [](DIR* formatedPath){ formatedPath && closedir(formatedPath); }
+            );
 
-            while ((dirent_ptr = readdir(directory_ptr.get())) != nullptr)
+            struct dirent* direntPtr;
+            while ((direntPtr = readdir(directoryPtr.get())) != nullptr)
             {
-                std::string tmp_path = format_path + dirent_ptr->d_name;
-                if ((strncmp(dirent_ptr->d_name, ".", 1) ==0)||(isDirectory(tmp_path) == 1))
+                std::string currentPath = formatedPath + direntPtr->d_name;
+                if ((strncmp(direntPtr->d_name, ".", 1) == 0) || (existDirectory(currentPath) == 1))
                         continue;
-                filePaths.push_back(tmp_path);
+                filePaths.push_back(currentPath);
             }
 
             // Check #files > 0
