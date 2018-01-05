@@ -1,6 +1,5 @@
 var NAVTREEINDEX5 =
 {
-"structop_1_1_wrapper_struct_hand.html#a9655c0dfa83eefde174d09e622482089":[1,0,2,106,6],
 "structop_1_1_wrapper_struct_hand.html#adaea15e182e5c75129293873cd94e35f":[1,0,2,106,7],
 "structop_1_1_wrapper_struct_hand.html#aea6263dc96708b11fab72416d810b3d6":[1,0,2,106,8],
 "structop_1_1_wrapper_struct_input.html":[1,0,2,107],
