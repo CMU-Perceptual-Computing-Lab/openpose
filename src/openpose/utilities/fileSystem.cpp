@@ -53,11 +53,9 @@ namespace op
     {
         try
         {
-            DIR* dir = opendir(directoryPath.c_str());
-
-            if (dir != NULL)
+            if (auto* directory = opendir(directoryPath.c_str()))
             {
-                closedir(dir);
+                closedir(directory);
                 return true;
             }
             else
