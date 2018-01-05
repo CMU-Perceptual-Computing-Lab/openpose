@@ -1,11 +1,5 @@
-#include <algorithm>
-#include <cstring>
-#include <dirent.h> // opendir
-#include <fstream>
-#include <memory>
-#include <unistd.h>
-
 #include <cstdio> // fopen
+#include <dirent.h> // opendir
 #include <boost/filesystem.hpp>
 #include <openpose/utilities/string.hpp>
 #include <openpose/utilities/fileSystem.hpp>
@@ -14,6 +8,11 @@
 // We could use the mkdir method to create dir
 // in unix or windows
 
+// #include <algorithm>
+// #include <cstring>
+// #include <fstream>
+// #include <memory>
+// #include <unistd.h>
 //#if defined _MSC_VER
 //#include <direct.h>
 //#elif defined __GNUC__
@@ -29,7 +28,6 @@ namespace op
         {
             if (!directoryPath.empty())
             {
-
                 //#if defined _MSC_VER
                 //_mkdir(directoryPath.c_str());
                 //#elif defined __GNUC__
@@ -224,7 +222,7 @@ namespace op
             while ((direntPtr = readdir(directoryPtr.get())) != nullptr)
             {
                 std::string currentPath = formatedPath + direntPtr->d_name;
-                if ((strncmp(direntPtr->d_name, ".", 1) == 0) || (existDirectory(currentPath) == 1))
+                if ((strncmp(direntPtr->d_name, ".", 1) == 0) || existDirectory(currentPath))
                         continue;
                 filePaths.push_back(currentPath);
             }
