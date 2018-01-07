@@ -397,6 +397,27 @@ namespace op
     }
 
     template<typename T>
+    std::string Array<T>::getSizeAsString() const
+    {
+        try
+        {
+            u_int8_t counter = 0;
+            std::string sizeString = "[ ";
+            for(auto i : mSize){
+                sizeString += std::to_string(i);
+                if(++counter < mSize.size()) sizeString += " x ";
+            }
+            sizeString += " ]";
+            return sizeString;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return "";
+        }
+    }
+
+    template<typename T>
     int Array<T>::getIndex(const std::vector<int>& indexes) const
     {
         try
