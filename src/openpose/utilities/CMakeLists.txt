@@ -1,4 +1,5 @@
 set(SOURCES
+    caffeutil.cpp
     cuda.cpp
     errorAndLog.cpp
     fileSystem.cpp
