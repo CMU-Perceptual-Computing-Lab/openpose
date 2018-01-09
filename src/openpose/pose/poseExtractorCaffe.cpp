@@ -12,6 +12,7 @@
 #include <openpose/utilities/openCv.hpp>
 #include <openpose/utilities/standard.hpp>
 #include <openpose/pose/poseExtractorCaffe.hpp>
+#include <openpose/utilities/caffeutil.hpp>
 
 namespace op
 {
@@ -82,13 +83,28 @@ namespace op
             try
             {
                 // HeatMaps extractor blob and layer
+                // Caffe modifies bottom - Heatmap gets resized
+                // std::string heatMapBlobSize = op::getCaffeBlobShapeAsString(*heatMapsBlob.get());
+                // std::string peaksBlobSize = op::getCaffeBlobShapeAsString(*peaksBlob.get());
+                // std::string poseBlobSize = op::getCaffeBlobShapeAsString(*poseBlob.get());
                 const auto caffeNetOutputBlobs = caffeNetSharedToPtr(caffeNetOutputBlob);
                 resizeAndMergeCaffe->Reshape(caffeNetOutputBlobs, {heatMapsBlob.get()},
                                              getPoseNetDecreaseFactor(poseModel), 1.f/scaleInputToNetInput);
                 // Pose extractor blob and layer
+                // Caffe modifies bottom - PeakBlobs gets resized
                 nmsCaffe->Reshape({heatMapsBlob.get()}, {peaksBlob.get()}, getPoseMaxPeaks(poseModel));
+
                 // Pose extractor blob and layer
                 bodyPartConnectorCaffe->Reshape({heatMapsBlob.get(), peaksBlob.get()}, {poseBlob.get()});
+
+                // Check if changed
+                // std::string newHeatMapBlobSize = op::getCaffeBlobShapeAsString(*heatMapsBlob.get());
+                // std::string newPeaksBlobSize = op::getCaffeBlobShapeAsString(*peaksBlob.get());
+                // std::string newPoseBlobSize = op::getCaffeBlobShapeAsString(*poseBlob.get());
+                // if(newHeatMapBlobSize != heatMapBlobSize) log("HeatMapBlobSize Changed from " + heatMapBlobSize + " to " + newHeatMapBlobSize);
+                // if(newPeaksBlobSize != peaksBlobSize) log("PeaksBlobSize Changed from " + peaksBlobSize + " to " + newPeaksBlobSize);
+                // if(newPoseBlobSize != poseBlobSize) log("PoseBlobSize Changed from " + poseBlobSize + " to " + newPoseBlobSize);
+
                 // Cuda check
                 #ifdef USE_CUDA
                     cudaCheck(__LINE__, __FUNCTION__, __FILE__);
@@ -226,6 +242,7 @@ namespace op
 
                     // Reshape blobs if required
                     // Note: In order to resize to input size to have same results as Matlab, uncomment the commented
+                    // Note: For Dynamic Video sizes
                     // lines
                     if (!vectorsAreEqual(upImpl->mNetInput4DSizes.at(i), inputNetData[i].getSize()))
                         // || !vectorsAreEqual(upImpl->mScaleInputToNetInputs, scaleInputToNetInputs))
@@ -251,7 +268,8 @@ namespace op
                                                                {upImpl->spHeatMapsBlob.get()});
                     cudaCheck(__LINE__, __FUNCTION__, __FILE__);
                 #else
-                    error("ResizeAndMergeCaffe CPU version not implemented yet.", __LINE__, __FUNCTION__, __FILE__);
+                    upImpl->spResizeAndMergeCaffe->Forward_cpu(caffeNetOutputBlobs,                             // ~20ms
+                                                               {upImpl->spHeatMapsBlob.get()});
                 #endif
 
                 // 3. Get peaks by Non-Maximum Suppression
