@@ -151,7 +151,7 @@ OpenPose Library - Release Notes
 
 
 
-## Current version (future OpenPose 1.2.1)
+## OpenPose 1.2.1 (Jan 9, 2018)
 1. Main improvements:
     1. Heatmaps can be saved in floating format.
     2. More efficient non-processing version (i.e., if all keypoint extractors are disabled, and only image extraction and display/saving operations are performed).
@@ -165,3 +165,7 @@ OpenPose Library - Release Notes
     1. Render working on images > 4K (#324).
     2. Cleaned redundant arguments on `getAverageScore` and `getKeypointsArea`.
     3. Slight speed up when heatmaps must be returned to the user (not doing a double copy anymore).
+
+
+
+## Current version (future OpenPose 1.3.0)
