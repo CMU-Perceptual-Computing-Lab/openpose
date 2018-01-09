@@ -21,7 +21,7 @@ elseif (UNIX AND NOT APPLE) # OS is a Linux distribution (it assumes Ubuntu)
   if (${UBUNTU_MAJOR_VERSION} MATCHES "16") # if 16
     set(IS_UBUNTU_16 TRUE)
     set(IS_UBUNTU_14_OR_LESS FALSE)
-  else (${UBUNTU_MAJOR_VERSION MATCHES "16") # if 14 or less
+  else (${UBUNTU_MAJOR_VERSION} MATCHES "16") # if 14 or less
     set(IS_UBUNTU_16 FALSE)
     set(IS_UBUNTU_14_OR_LESS TRUE)
   endif (${UBUNTU_MAJOR_VERSION} MATCHES "16")
