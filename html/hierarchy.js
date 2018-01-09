@@ -24,8 +24,8 @@ var hierarchy =
     [ "op::FileSaver", "classop_1_1_file_saver.html", [
       [ "op::HeatMapSaver", "classop_1_1_heat_map_saver.html", null ],
       [ "op::ImageSaver", "classop_1_1_image_saver.html", null ],
-      [ "op::KeypointJsonSaver", "classop_1_1_keypoint_json_saver.html", null ],
-      [ "op::KeypointSaver", "classop_1_1_keypoint_saver.html", null ]
+      [ "op::KeypointSaver", "classop_1_1_keypoint_saver.html", null ],
+      [ "op::PeopleJsonSaver", "classop_1_1_people_json_saver.html", null ]
     ] ],
     [ "op::FrameDisplayer", "classop_1_1_frame_displayer.html", null ],
     [ "op::Gui", "classop_1_1_gui.html", null ],
@@ -120,7 +120,7 @@ var hierarchy =
         [ "op::WHandSaver< TDatums >", "classop_1_1_w_hand_saver.html", null ],
         [ "op::WHeatMapSaver< TDatums >", "classop_1_1_w_heat_map_saver.html", null ],
         [ "op::WImageSaver< TDatums >", "classop_1_1_w_image_saver.html", null ],
-        [ "op::WKeypointJsonSaver< TDatums >", "classop_1_1_w_keypoint_json_saver.html", null ],
+        [ "op::WPeopleJsonSaver< TDatums >", "classop_1_1_w_people_json_saver.html", null ],
         [ "op::WPoseSaver< TDatums >", "classop_1_1_w_pose_saver.html", null ],
         [ "op::WVideoSaver< TDatums >", "classop_1_1_w_video_saver.html", null ]
       ] ],

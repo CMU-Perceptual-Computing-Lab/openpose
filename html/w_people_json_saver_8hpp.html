@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>OpenPose: /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/filestream/keypointJsonSaver.hpp Source File</title>
+<title>OpenPose: /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/filestream/wPeopleJsonSaver.hpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -85,7 +85,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   </div>
 </div>
 <script type="text/javascript">
-$(document).ready(function(){initNavTree('keypoint_json_saver_8hpp_source.html','');});
+$(document).ready(function(){initNavTree('w_people_json_saver_8hpp.html','');});
 </script>
 <div id="doc-content">
 <!-- window showing the filter options -->
@@ -103,41 +103,42 @@ $(document).ready(function(){initNavTree('keypoint_json_saver_8hpp_source.html',
 </div>
 
 <div class="header">
+  <div class="summary">
+<a href="#nested-classes">Classes</a> &#124;
+<a href="#namespaces">Namespaces</a> &#124;
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
-<div class="title">keypointJsonSaver.hpp</div>  </div>
+<div class="title">wPeopleJsonSaver.hpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<a href="keypoint_json_saver_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#ifndef OPENPOSE_FILESTREAM_KEYPOINT_JSON_SAVER_HPP</span></div>
-<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define OPENPOSE_FILESTREAM_KEYPOINT_JSON_SAVER_HPP</span></div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="common_8hpp.html">openpose/core/common.hpp</a>&gt;</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="file_saver_8hpp.html">openpose/filestream/fileSaver.hpp</a>&gt;</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;</div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="keyword">namespace </span>op</div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;{</div>
-<div class="line"><a name="l00009"></a><span class="lineno"><a class="line" href="classop_1_1_keypoint_json_saver.html">    9</a></span>&#160;    <span class="keyword">class </span><a class="code" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> <a class="code" href="classop_1_1_keypoint_json_saver.html">KeypointJsonSaver</a> : <span class="keyword">public</span> <a class="code" href="classop_1_1_file_saver.html">FileSaver</a></div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;    {</div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;        <a class="code" href="classop_1_1_keypoint_json_saver.html">KeypointJsonSaver</a>(<span class="keyword">const</span> std::string&amp; directoryPath);</div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;        <span class="keywordtype">void</span> save(<span class="keyword">const</span> std::vector&lt;std::pair&lt;<a class="code" href="classop_1_1_array.html">Array&lt;float&gt;</a>, std::string&gt;&gt;&amp; keypointVector,</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;                  <span class="keyword">const</span> std::string&amp; fileName, <span class="keyword">const</span> <span class="keywordtype">bool</span> humanReadable = <span class="keyword">true</span>) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;    };</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;}</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#endif // OPENPOSE_FILESTREAM_KEYPOINT_JSON_SAVER_HPP</span></div>
-<div class="ttc" id="classop_1_1_keypoint_json_saver_html"><div class="ttname"><a href="classop_1_1_keypoint_json_saver.html">op::KeypointJsonSaver</a></div><div class="ttdef"><b>Definition:</b> keypointJsonSaver.hpp:9</div></div>
-<div class="ttc" id="common_8hpp_html"><div class="ttname"><a href="common_8hpp.html">common.hpp</a></div></div>
-<div class="ttc" id="classop_1_1_file_saver_html"><div class="ttname"><a href="classop_1_1_file_saver.html">op::FileSaver</a></div><div class="ttdef"><b>Definition:</b> fileSaver.hpp:9</div></div>
-<div class="ttc" id="file_saver_8hpp_html"><div class="ttname"><a href="file_saver_8hpp.html">fileSaver.hpp</a></div></div>
-<div class="ttc" id="classop_1_1_array_html"><div class="ttname"><a href="classop_1_1_array.html">op::Array&lt; float &gt;</a></div></div>
-<div class="ttc" id="macros_8hpp_html_a4ba443bb7a0e5dbe8054a9ac37a5e000"><div class="ttname"><a href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a></div><div class="ttdeci">#define OP_API</div><div class="ttdef"><b>Definition:</b> macros.hpp:5</div></div>
-</div><!-- fragment --></div><!-- contents -->
+<div class="textblock"><code>#include &lt;<a class="el" href="common_8hpp_source.html">openpose/core/common.hpp</a>&gt;</code><br/>
+<code>#include &lt;<a class="el" href="people_json_saver_8hpp_source.html">openpose/filestream/peopleJsonSaver.hpp</a>&gt;</code><br/>
+<code>#include &lt;<a class="el" href="worker_consumer_8hpp_source.html">openpose/thread/workerConsumer.hpp</a>&gt;</code><br/>
+<code>#include &lt;<a class="el" href="pointer_container_8hpp_source.html">openpose/utilities/pointerContainer.hpp</a>&gt;</code><br/>
+</div>
+<p><a href="w_people_json_saver_8hpp_source.html">Go to the source code of this file.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_w_people_json_saver.html">op::WPeopleJsonSaver&lt; TDatums &gt;</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
+Namespaces</h2></td></tr>
+<tr class="memitem:namespaceop"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html">op</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a774871462f7fefb8cadea1e49f501e45"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a774871462f7fefb8cadea1e49f501e45">op::COMPILE_TEMPLATE_DATUM</a> (WPeopleJsonSaver)</td></tr>
+<tr class="separator:a774871462f7fefb8cadea1e49f501e45"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+</div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_7f012205977c6890af7afa3b7477c2d1.html">include</a></li><li class="navelem"><a class="el" href="dir_18695feb986752a25b816536eab00e96.html">openpose</a></li><li class="navelem"><a class="el" href="dir_da8f0331eb5f441599a7c56ee4b45b7a.html">filestream</a></li><li class="navelem"><a class="el" href="keypoint_json_saver_8hpp.html">keypointJsonSaver.hpp</a></li>
+    <li class="navelem"><a class="el" href="dir_7f012205977c6890af7afa3b7477c2d1.html">include</a></li><li class="navelem"><a class="el" href="dir_18695feb986752a25b816536eab00e96.html">openpose</a></li><li class="navelem"><a class="el" href="dir_da8f0331eb5f441599a7c56ee4b45b7a.html">filestream</a></li><li class="navelem"><a class="el" href="w_people_json_saver_8hpp.html">wPeopleJsonSaver.hpp</a></li>
     <li class="footer">Generated by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>

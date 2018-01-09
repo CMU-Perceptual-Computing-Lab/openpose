@@ -123,64 +123,72 @@ $(document).ready(function(){initNavTree('pose_extractor_8hpp_source.html','');}
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;    <span class="keyword">public</span>:</div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;        <a class="code" href="classop_1_1_pose_extractor.html">PoseExtractor</a>(<span class="keyword">const</span> <a class="code" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel,</div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;                      <span class="keyword">const</span> std::vector&lt;HeatMapType&gt;&amp; heatMapTypes = {},</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;                      <span class="keyword">const</span> <a class="code" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bda">ScaleMode</a> heatMapScale = <a class="code" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bdaa4b942544cb3e764bbb8d33f8a8744855">ScaleMode::ZeroToOne</a>);</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;        <span class="keyword">virtual</span> ~<a class="code" href="classop_1_1_pose_extractor.html">PoseExtractor</a>();</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;        <span class="keywordtype">void</span> initializationOnThread();</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;        <span class="keyword">virtual</span> <span class="keywordtype">void</span> forwardPass(<span class="keyword">const</span> std::vector&lt;<a class="code" href="classop_1_1_array.html">Array&lt;float&gt;</a>&gt;&amp; inputNetData, <span class="keyword">const</span> <a class="code" href="structop_1_1_point.html">Point&lt;int&gt;</a>&amp; inputDataSize,</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;                                 <span class="keyword">const</span> std::vector&lt;double&gt;&amp; scaleRatios = {1.f}) = 0;</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;        <span class="keyword">virtual</span> <span class="keyword">const</span> <span class="keywordtype">float</span>* getHeatMapCpuConstPtr() <span class="keyword">const</span> = 0;</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;        <span class="keyword">virtual</span> <span class="keyword">const</span> <span class="keywordtype">float</span>* getHeatMapGpuConstPtr() <span class="keyword">const</span> = 0;</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;        <span class="keyword">virtual</span> std::vector&lt;int&gt; getHeatMapSize() <span class="keyword">const</span> = 0;</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;        <a class="code" href="classop_1_1_array.html">Array&lt;float&gt;</a> getHeatMaps() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;        <span class="keyword">virtual</span> <span class="keyword">const</span> <span class="keywordtype">float</span>* getPoseGpuConstPtr() <span class="keyword">const</span> = 0;</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;        <a class="code" href="classop_1_1_array.html">Array&lt;float&gt;</a> getPoseKeypoints() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;        <a class="code" href="classop_1_1_array.html">Array&lt;float&gt;</a> getPoseScores() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;        <span class="keywordtype">float</span> getScaleNetToOutput() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;        <span class="keywordtype">double</span> <span class="keyword">get</span>(<span class="keyword">const</span> <a class="code" href="namespaceop.html#a37c58b781e5bcd9fee67a7768afc5d0e">PoseProperty</a> property) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;        <span class="keywordtype">void</span> set(<span class="keyword">const</span> <a class="code" href="namespaceop.html#a37c58b781e5bcd9fee67a7768afc5d0e">PoseProperty</a> property, <span class="keyword">const</span> <span class="keywordtype">double</span> value);</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;        <span class="keywordtype">void</span> increase(<span class="keyword">const</span> <a class="code" href="namespaceop.html#a37c58b781e5bcd9fee67a7768afc5d0e">PoseProperty</a> property, <span class="keyword">const</span> <span class="keywordtype">double</span> value);</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="keyword">protected</span>:</div>
-<div class="line"><a name="l00049"></a><span class="lineno"><a class="line" href="classop_1_1_pose_extractor.html#a57ba3e70a7ac01a687337c66ca36c8da">   49</a></span>&#160;        <span class="keyword">const</span> <a class="code" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> <a class="code" href="classop_1_1_pose_extractor.html#a57ba3e70a7ac01a687337c66ca36c8da">mPoseModel</a>;</div>
-<div class="line"><a name="l00050"></a><span class="lineno"><a class="line" href="classop_1_1_pose_extractor.html#a7507183ad2d2fe5eaff3d351443d97e0">   50</a></span>&#160;        <a class="code" href="structop_1_1_point.html">Point&lt;int&gt;</a> <a class="code" href="classop_1_1_pose_extractor.html#a7507183ad2d2fe5eaff3d351443d97e0">mNetOutputSize</a>;</div>
-<div class="line"><a name="l00051"></a><span class="lineno"><a class="line" href="classop_1_1_pose_extractor.html#ac432c3f9265f6dbeb1dfff5621df25de">   51</a></span>&#160;        <a class="code" href="classop_1_1_array.html">Array&lt;float&gt;</a> <a class="code" href="classop_1_1_pose_extractor.html#ac432c3f9265f6dbeb1dfff5621df25de">mPoseKeypoints</a>;</div>
-<div class="line"><a name="l00052"></a><span class="lineno"><a class="line" href="classop_1_1_pose_extractor.html#a034f1fe33fe83967d8c7c4901ce3b4b4">   52</a></span>&#160;        <a class="code" href="classop_1_1_array.html">Array&lt;float&gt;</a> <a class="code" href="classop_1_1_pose_extractor.html#a034f1fe33fe83967d8c7c4901ce3b4b4">mPoseScores</a>;</div>
-<div class="line"><a name="l00053"></a><span class="lineno"><a class="line" href="classop_1_1_pose_extractor.html#ab32d08e00cf4321682ba9acc2b78a289">   53</a></span>&#160;        <span class="keywordtype">float</span> <a class="code" href="classop_1_1_pose_extractor.html#ab32d08e00cf4321682ba9acc2b78a289">mScaleNetToOutput</a>;</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;                      <span class="keyword">const</span> <a class="code" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bda">ScaleMode</a> heatMapScale = <a class="code" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bdaa4b942544cb3e764bbb8d33f8a8744855">ScaleMode::ZeroToOne</a>,</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;                      <span class="keyword">const</span> <span class="keywordtype">bool</span> addPartCandidates = <span class="keyword">false</span>);</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;        <span class="keyword">virtual</span> ~<a class="code" href="classop_1_1_pose_extractor.html">PoseExtractor</a>();</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;        <span class="keywordtype">void</span> initializationOnThread();</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;        <span class="keyword">virtual</span> <span class="keywordtype">void</span> forwardPass(<span class="keyword">const</span> std::vector&lt;<a class="code" href="classop_1_1_array.html">Array&lt;float&gt;</a>&gt;&amp; inputNetData, <span class="keyword">const</span> <a class="code" href="structop_1_1_point.html">Point&lt;int&gt;</a>&amp; inputDataSize,</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;                                 <span class="keyword">const</span> std::vector&lt;double&gt;&amp; scaleRatios = {1.f}) = 0;</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;        <span class="keyword">virtual</span> <span class="keyword">const</span> <span class="keywordtype">float</span>* getCandidatesCpuConstPtr() <span class="keyword">const</span> = 0;</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;        <span class="keyword">virtual</span> <span class="keyword">const</span> <span class="keywordtype">float</span>* getCandidatesGpuConstPtr() <span class="keyword">const</span> = 0;</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;        <span class="keyword">virtual</span> <span class="keyword">const</span> <span class="keywordtype">float</span>* getHeatMapCpuConstPtr() <span class="keyword">const</span> = 0;</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;        <span class="keyword">virtual</span> <span class="keyword">const</span> <span class="keywordtype">float</span>* getHeatMapGpuConstPtr() <span class="keyword">const</span> = 0;</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;        <span class="keyword">virtual</span> std::vector&lt;int&gt; getHeatMapSize() <span class="keyword">const</span> = 0;</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;        <a class="code" href="classop_1_1_array.html">Array&lt;float&gt;</a> getHeatMapsCopy() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;        std::vector&lt;std::vector&lt;std::array&lt;float,3&gt;&gt;&gt; getCandidatesCopy() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;        <span class="keyword">virtual</span> <span class="keyword">const</span> <span class="keywordtype">float</span>* getPoseGpuConstPtr() <span class="keyword">const</span> = 0;</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;        <a class="code" href="classop_1_1_array.html">Array&lt;float&gt;</a> getPoseKeypoints() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;        <a class="code" href="classop_1_1_array.html">Array&lt;float&gt;</a> getPoseScores() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;        <span class="keywordtype">float</span> getScaleNetToOutput() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        <span class="keywordtype">double</span> <span class="keyword">get</span>(<span class="keyword">const</span> <a class="code" href="namespaceop.html#a37c58b781e5bcd9fee67a7768afc5d0e">PoseProperty</a> property) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;        <span class="keywordtype">void</span> set(<span class="keyword">const</span> <a class="code" href="namespaceop.html#a37c58b781e5bcd9fee67a7768afc5d0e">PoseProperty</a> property, <span class="keyword">const</span> <span class="keywordtype">double</span> value);</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;        <span class="keywordtype">void</span> increase(<span class="keyword">const</span> <a class="code" href="namespaceop.html#a37c58b781e5bcd9fee67a7768afc5d0e">PoseProperty</a> property, <span class="keyword">const</span> <span class="keywordtype">double</span> value);</div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;        <span class="keywordtype">void</span> checkThread() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        <span class="keyword">virtual</span> <span class="keywordtype">void</span> netInitializationOnThread() = 0;</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        <span class="keyword">const</span> std::vector&lt;HeatMapType&gt; mHeatMapTypes;</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        <span class="keyword">const</span> <a class="code" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bda">ScaleMode</a> mHeatMapScaleMode;</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;        std::array&lt;std::atomic&lt;double&gt;, (int)<a class="code" href="namespaceop.html#a37c58b781e5bcd9fee67a7768afc5d0ea6f6cb72d544962fa333e2e34ce64f719">PoseProperty::Size</a>&gt; mProperties;</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;        std::thread::id mThreadId;</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;        <a class="code" href="macros_8hpp.html#abef96b5dd35dd9d44ad27ddf0e2f5f2e">DELETE_COPY</a>(<a class="code" href="classop_1_1_pose_extractor.html">PoseExtractor</a>);</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    };</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;}</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="preprocessor">#endif // OPENPOSE_POSE_POSE_EXTRACTOR_HPP</span></div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keyword">protected</span>:</div>
+<div class="line"><a name="l00056"></a><span class="lineno"><a class="line" href="classop_1_1_pose_extractor.html#a57ba3e70a7ac01a687337c66ca36c8da">   56</a></span>&#160;        <span class="keyword">const</span> <a class="code" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> <a class="code" href="classop_1_1_pose_extractor.html#a57ba3e70a7ac01a687337c66ca36c8da">mPoseModel</a>;</div>
+<div class="line"><a name="l00057"></a><span class="lineno"><a class="line" href="classop_1_1_pose_extractor.html#a7507183ad2d2fe5eaff3d351443d97e0">   57</a></span>&#160;        <a class="code" href="structop_1_1_point.html">Point&lt;int&gt;</a> <a class="code" href="classop_1_1_pose_extractor.html#a7507183ad2d2fe5eaff3d351443d97e0">mNetOutputSize</a>;</div>
+<div class="line"><a name="l00058"></a><span class="lineno"><a class="line" href="classop_1_1_pose_extractor.html#ac432c3f9265f6dbeb1dfff5621df25de">   58</a></span>&#160;        <a class="code" href="classop_1_1_array.html">Array&lt;float&gt;</a> <a class="code" href="classop_1_1_pose_extractor.html#ac432c3f9265f6dbeb1dfff5621df25de">mPoseKeypoints</a>;</div>
+<div class="line"><a name="l00059"></a><span class="lineno"><a class="line" href="classop_1_1_pose_extractor.html#a034f1fe33fe83967d8c7c4901ce3b4b4">   59</a></span>&#160;        <a class="code" href="classop_1_1_array.html">Array&lt;float&gt;</a> <a class="code" href="classop_1_1_pose_extractor.html#a034f1fe33fe83967d8c7c4901ce3b4b4">mPoseScores</a>;</div>
+<div class="line"><a name="l00060"></a><span class="lineno"><a class="line" href="classop_1_1_pose_extractor.html#ab32d08e00cf4321682ba9acc2b78a289">   60</a></span>&#160;        <span class="keywordtype">float</span> <a class="code" href="classop_1_1_pose_extractor.html#ab32d08e00cf4321682ba9acc2b78a289">mScaleNetToOutput</a>;</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;        <span class="keywordtype">void</span> checkThread() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        <span class="keyword">virtual</span> <span class="keywordtype">void</span> netInitializationOnThread() = 0;</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;        <span class="keyword">const</span> std::vector&lt;HeatMapType&gt; mHeatMapTypes;</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        <span class="keyword">const</span> <a class="code" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bda">ScaleMode</a> mHeatMapScaleMode;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">bool</span> mAddPartCandidates;</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        std::array&lt;std::atomic&lt;double&gt;, (int)<a class="code" href="namespaceop.html#a37c58b781e5bcd9fee67a7768afc5d0ea6f6cb72d544962fa333e2e34ce64f719">PoseProperty::Size</a>&gt; mProperties;</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;        std::thread::id mThreadId;</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;        <a class="code" href="macros_8hpp.html#abef96b5dd35dd9d44ad27ddf0e2f5f2e">DELETE_COPY</a>(<a class="code" href="classop_1_1_pose_extractor.html">PoseExtractor</a>);</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    };</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;}</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="preprocessor">#endif // OPENPOSE_POSE_POSE_EXTRACTOR_HPP</span></div>
 <div class="ttc" id="macros_8hpp_html_abef96b5dd35dd9d44ad27ddf0e2f5f2e"><div class="ttname"><a href="macros_8hpp.html#abef96b5dd35dd9d44ad27ddf0e2f5f2e">DELETE_COPY</a></div><div class="ttdeci">#define DELETE_COPY(className)</div><div class="ttdef"><b>Definition:</b> macros.hpp:25</div></div>
 <div class="ttc" id="classop_1_1_pose_extractor_html"><div class="ttname"><a href="classop_1_1_pose_extractor.html">op::PoseExtractor</a></div><div class="ttdef"><b>Definition:</b> poseExtractor.hpp:12</div></div>
 <div class="ttc" id="pose_parameters_8hpp_html"><div class="ttname"><a href="pose_parameters_8hpp.html">poseParameters.hpp</a></div></div>
 <div class="ttc" id="namespaceop_html_af5b3ce2a5d3de87cb31b9b67e96f261f"><div class="ttname"><a href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">op::PoseModel</a></div><div class="ttdeci">PoseModel</div><div class="ttdef"><b>Definition:</b> enumClasses.hpp:9</div></div>
-<div class="ttc" id="classop_1_1_pose_extractor_html_a57ba3e70a7ac01a687337c66ca36c8da"><div class="ttname"><a href="classop_1_1_pose_extractor.html#a57ba3e70a7ac01a687337c66ca36c8da">op::PoseExtractor::mPoseModel</a></div><div class="ttdeci">const PoseModel mPoseModel</div><div class="ttdef"><b>Definition:</b> poseExtractor.hpp:49</div></div>
+<div class="ttc" id="classop_1_1_pose_extractor_html_a57ba3e70a7ac01a687337c66ca36c8da"><div class="ttname"><a href="classop_1_1_pose_extractor.html#a57ba3e70a7ac01a687337c66ca36c8da">op::PoseExtractor::mPoseModel</a></div><div class="ttdeci">const PoseModel mPoseModel</div><div class="ttdef"><b>Definition:</b> poseExtractor.hpp:56</div></div>
 <div class="ttc" id="namespaceop_html_a37c58b781e5bcd9fee67a7768afc5d0ea6f6cb72d544962fa333e2e34ce64f719"><div class="ttname"><a href="namespaceop.html#a37c58b781e5bcd9fee67a7768afc5d0ea6f6cb72d544962fa333e2e34ce64f719">op::PoseProperty::Size</a></div></div>
 <div class="ttc" id="structop_1_1_point_html"><div class="ttname"><a href="structop_1_1_point.html">op::Point&lt; int &gt;</a></div></div>
 <div class="ttc" id="common_8hpp_html"><div class="ttname"><a href="common_8hpp.html">common.hpp</a></div></div>
@@ -188,12 +196,12 @@ $(document).ready(function(){initNavTree('pose_extractor_8hpp_source.html','');}
 <div class="ttc" id="namespaceop_html_a37c58b781e5bcd9fee67a7768afc5d0e"><div class="ttname"><a href="namespaceop.html#a37c58b781e5bcd9fee67a7768afc5d0e">op::PoseProperty</a></div><div class="ttdeci">PoseProperty</div><div class="ttdef"><b>Definition:</b> enumClasses.hpp:21</div></div>
 <div class="ttc" id="namespaceop_html_af72fe4ed32846c12f41b049d3d0e1bda"><div class="ttname"><a href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bda">op::ScaleMode</a></div><div class="ttdeci">ScaleMode</div><div class="ttdef"><b>Definition:</b> enumClasses.hpp:6</div></div>
 <div class="ttc" id="classop_1_1_array_html"><div class="ttname"><a href="classop_1_1_array.html">op::Array&lt; float &gt;</a></div></div>
-<div class="ttc" id="classop_1_1_pose_extractor_html_ab32d08e00cf4321682ba9acc2b78a289"><div class="ttname"><a href="classop_1_1_pose_extractor.html#ab32d08e00cf4321682ba9acc2b78a289">op::PoseExtractor::mScaleNetToOutput</a></div><div class="ttdeci">float mScaleNetToOutput</div><div class="ttdef"><b>Definition:</b> poseExtractor.hpp:53</div></div>
-<div class="ttc" id="classop_1_1_pose_extractor_html_a034f1fe33fe83967d8c7c4901ce3b4b4"><div class="ttname"><a href="classop_1_1_pose_extractor.html#a034f1fe33fe83967d8c7c4901ce3b4b4">op::PoseExtractor::mPoseScores</a></div><div class="ttdeci">Array&lt; float &gt; mPoseScores</div><div class="ttdef"><b>Definition:</b> poseExtractor.hpp:52</div></div>
-<div class="ttc" id="classop_1_1_pose_extractor_html_ac432c3f9265f6dbeb1dfff5621df25de"><div class="ttname"><a href="classop_1_1_pose_extractor.html#ac432c3f9265f6dbeb1dfff5621df25de">op::PoseExtractor::mPoseKeypoints</a></div><div class="ttdeci">Array&lt; float &gt; mPoseKeypoints</div><div class="ttdef"><b>Definition:</b> poseExtractor.hpp:51</div></div>
+<div class="ttc" id="classop_1_1_pose_extractor_html_ab32d08e00cf4321682ba9acc2b78a289"><div class="ttname"><a href="classop_1_1_pose_extractor.html#ab32d08e00cf4321682ba9acc2b78a289">op::PoseExtractor::mScaleNetToOutput</a></div><div class="ttdeci">float mScaleNetToOutput</div><div class="ttdef"><b>Definition:</b> poseExtractor.hpp:60</div></div>
+<div class="ttc" id="classop_1_1_pose_extractor_html_a034f1fe33fe83967d8c7c4901ce3b4b4"><div class="ttname"><a href="classop_1_1_pose_extractor.html#a034f1fe33fe83967d8c7c4901ce3b4b4">op::PoseExtractor::mPoseScores</a></div><div class="ttdeci">Array&lt; float &gt; mPoseScores</div><div class="ttdef"><b>Definition:</b> poseExtractor.hpp:59</div></div>
+<div class="ttc" id="classop_1_1_pose_extractor_html_ac432c3f9265f6dbeb1dfff5621df25de"><div class="ttname"><a href="classop_1_1_pose_extractor.html#ac432c3f9265f6dbeb1dfff5621df25de">op::PoseExtractor::mPoseKeypoints</a></div><div class="ttdeci">Array&lt; float &gt; mPoseKeypoints</div><div class="ttdef"><b>Definition:</b> poseExtractor.hpp:58</div></div>
 <div class="ttc" id="macros_8hpp_html_a4ba443bb7a0e5dbe8054a9ac37a5e000"><div class="ttname"><a href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a></div><div class="ttdeci">#define OP_API</div><div class="ttdef"><b>Definition:</b> macros.hpp:5</div></div>
 <div class="ttc" id="core_2enum_classes_8hpp_html"><div class="ttname"><a href="core_2enum_classes_8hpp.html">enumClasses.hpp</a></div></div>
-<div class="ttc" id="classop_1_1_pose_extractor_html_a7507183ad2d2fe5eaff3d351443d97e0"><div class="ttname"><a href="classop_1_1_pose_extractor.html#a7507183ad2d2fe5eaff3d351443d97e0">op::PoseExtractor::mNetOutputSize</a></div><div class="ttdeci">Point&lt; int &gt; mNetOutputSize</div><div class="ttdef"><b>Definition:</b> poseExtractor.hpp:50</div></div>
+<div class="ttc" id="classop_1_1_pose_extractor_html_a7507183ad2d2fe5eaff3d351443d97e0"><div class="ttname"><a href="classop_1_1_pose_extractor.html#a7507183ad2d2fe5eaff3d351443d97e0">op::PoseExtractor::mNetOutputSize</a></div><div class="ttdeci">Point&lt; int &gt; mNetOutputSize</div><div class="ttdef"><b>Definition:</b> poseExtractor.hpp:57</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

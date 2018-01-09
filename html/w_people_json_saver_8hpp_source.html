@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>OpenPose: /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/filestream/wKeypointJsonSaver.hpp Source File</title>
+<title>OpenPose: /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/filestream/wPeopleJsonSaver.hpp Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -85,7 +85,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   </div>
 </div>
 <script type="text/javascript">
-$(document).ready(function(){initNavTree('w_keypoint_json_saver_8hpp_source.html','');});
+$(document).ready(function(){initNavTree('w_people_json_saver_8hpp_source.html','');});
 </script>
 <div id="doc-content">
 <!-- window showing the filter options -->
@@ -104,32 +104,32 @@ $(document).ready(function(){initNavTree('w_keypoint_json_saver_8hpp_source.html
 
 <div class="header">
   <div class="headertitle">
-<div class="title">wKeypointJsonSaver.hpp</div>  </div>
+<div class="title">wPeopleJsonSaver.hpp</div>  </div>
 </div><!--header-->
 <div class="contents">
-<a href="w_keypoint_json_saver_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#ifndef OPENPOSE_FILESTREAM_W_KEYPOINT_JSON_SAVER_HPP</span></div>
-<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define OPENPOSE_FILESTREAM_W_KEYPOINT_JSON_SAVER_HPP</span></div>
+<a href="w_people_json_saver_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#ifndef OPENPOSE_FILESTREAM_W_PEOPLE_JSON_SAVER_HPP</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define OPENPOSE_FILESTREAM_W_PEOPLE_JSON_SAVER_HPP</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor"></span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="common_8hpp.html">openpose/core/common.hpp</a>&gt;</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="keypoint_json_saver_8hpp.html">openpose/filestream/keypointJsonSaver.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="people_json_saver_8hpp.html">openpose/filestream/peopleJsonSaver.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="worker_consumer_8hpp.html">openpose/thread/workerConsumer.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;</div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="keyword">namespace </span>op</div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;{</div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TDatums&gt;</div>
-<div class="line"><a name="l00011"></a><span class="lineno"><a class="line" href="classop_1_1_w_keypoint_json_saver.html">   11</a></span>&#160;    <span class="keyword">class </span><a class="code" href="classop_1_1_w_keypoint_json_saver.html">WKeypointJsonSaver</a> : <span class="keyword">public</span> <a class="code" href="classop_1_1_worker_consumer.html">WorkerConsumer</a>&lt;TDatums&gt;</div>
+<div class="line"><a name="l00011"></a><span class="lineno"><a class="line" href="classop_1_1_w_people_json_saver.html">   11</a></span>&#160;    <span class="keyword">class </span><a class="code" href="classop_1_1_w_people_json_saver.html">WPeopleJsonSaver</a> : <span class="keyword">public</span> <a class="code" href="classop_1_1_worker_consumer.html">WorkerConsumer</a>&lt;TDatums&gt;</div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;    {</div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;        <span class="keyword">explicit</span> <a class="code" href="classop_1_1_w_keypoint_json_saver.html#aff660868a7508e61fb92e3fbca3bf4c7">WKeypointJsonSaver</a>(<span class="keyword">const</span> std::shared_ptr&lt;KeypointJsonSaver&gt;&amp; keypointJsonSaver);</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;        <span class="keyword">explicit</span> <a class="code" href="classop_1_1_w_people_json_saver.html#ac12dfe8c1414ec36ace474ecbf148f67">WPeopleJsonSaver</a>(<span class="keyword">const</span> std::shared_ptr&lt;PeopleJsonSaver&gt;&amp; peopleJsonSaver);</div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classop_1_1_w_keypoint_json_saver.html#ad6b170f027c3b145c51adee3019a9cbd">initializationOnThread</a>();</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classop_1_1_w_people_json_saver.html#a5d4239596a996723a20a1031d32c7446">initializationOnThread</a>();</div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classop_1_1_w_keypoint_json_saver.html#aa90e672fd245fd105ed45cfe6b7ecd66">workConsumer</a>(<span class="keyword">const</span> TDatums&amp; tDatums);</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classop_1_1_w_people_json_saver.html#af874a16a06a9a3452a0e3792ac15647e">workConsumer</a>(<span class="keyword">const</span> TDatums&amp; tDatums);</div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;</div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;        <span class="keyword">const</span> std::shared_ptr&lt;KeypointJsonSaver&gt; spKeypointJsonSaver;</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;        <span class="keyword">const</span> std::shared_ptr&lt;PeopleJsonSaver&gt; spPeopleJsonSaver;</div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;        DELETE_COPY(<a class="code" href="classop_1_1_w_keypoint_json_saver.html">WKeypointJsonSaver</a>);</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;        DELETE_COPY(<a class="code" href="classop_1_1_w_people_json_saver.html">WPeopleJsonSaver</a>);</div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    };</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;}</div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;</div>
@@ -142,18 +142,18 @@ $(document).ready(function(){initNavTree('w_keypoint_json_saver_8hpp_source.html
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="keyword">namespace </span>op</div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;{</div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TDatums&gt;</div>
-<div class="line"><a name="l00036"></a><span class="lineno"><a class="line" href="classop_1_1_w_keypoint_json_saver.html#aff660868a7508e61fb92e3fbca3bf4c7">   36</a></span>&#160;    <a class="code" href="classop_1_1_w_keypoint_json_saver.html#aff660868a7508e61fb92e3fbca3bf4c7">WKeypointJsonSaver&lt;TDatums&gt;::WKeypointJsonSaver</a>(<span class="keyword">const</span> std::shared_ptr&lt;KeypointJsonSaver&gt;&amp; keypointJsonSaver) :</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;        spKeypointJsonSaver{keypointJsonSaver}</div>
+<div class="line"><a name="l00036"></a><span class="lineno"><a class="line" href="classop_1_1_w_people_json_saver.html#ac12dfe8c1414ec36ace474ecbf148f67">   36</a></span>&#160;    <a class="code" href="classop_1_1_w_people_json_saver.html#ac12dfe8c1414ec36ace474ecbf148f67">WPeopleJsonSaver&lt;TDatums&gt;::WPeopleJsonSaver</a>(<span class="keyword">const</span> std::shared_ptr&lt;PeopleJsonSaver&gt;&amp; peopleJsonSaver) :</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;        spPeopleJsonSaver{peopleJsonSaver}</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    {</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    }</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TDatums&gt;</div>
-<div class="line"><a name="l00042"></a><span class="lineno"><a class="line" href="classop_1_1_w_keypoint_json_saver.html#ad6b170f027c3b145c51adee3019a9cbd">   42</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classop_1_1_w_keypoint_json_saver.html#ad6b170f027c3b145c51adee3019a9cbd">WKeypointJsonSaver&lt;TDatums&gt;::initializationOnThread</a>()</div>
+<div class="line"><a name="l00042"></a><span class="lineno"><a class="line" href="classop_1_1_w_people_json_saver.html#a5d4239596a996723a20a1031d32c7446">   42</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classop_1_1_w_people_json_saver.html#a5d4239596a996723a20a1031d32c7446">WPeopleJsonSaver&lt;TDatums&gt;::initializationOnThread</a>()</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    {</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    }</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TDatums&gt;</div>
-<div class="line"><a name="l00047"></a><span class="lineno"><a class="line" href="classop_1_1_w_keypoint_json_saver.html#aa90e672fd245fd105ed45cfe6b7ecd66">   47</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classop_1_1_w_keypoint_json_saver.html#aa90e672fd245fd105ed45cfe6b7ecd66">WKeypointJsonSaver&lt;TDatums&gt;::workConsumer</a>(<span class="keyword">const</span> TDatums&amp; tDatums)</div>
+<div class="line"><a name="l00047"></a><span class="lineno"><a class="line" href="classop_1_1_w_people_json_saver.html#af874a16a06a9a3452a0e3792ac15647e">   47</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classop_1_1_w_people_json_saver.html#af874a16a06a9a3452a0e3792ac15647e">WPeopleJsonSaver&lt;TDatums&gt;::workConsumer</a>(<span class="keyword">const</span> TDatums&amp; tDatums)</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    {</div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        <span class="keywordflow">try</span></div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;        {</div>
@@ -181,7 +181,7 @@ $(document).ready(function(){initNavTree('w_keypoint_json_saver_8hpp_source.html
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;                        std::make_pair(tDatum.handKeypoints[1], <span class="stringliteral">&quot;hand_right_keypoints&quot;</span>)</div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;                    };</div>
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;                    <span class="comment">// Save keypoints</span></div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;                    spKeypointJsonSaver-&gt;save(keypointVector, fileName, humanReadable);</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;                    spPeopleJsonSaver-&gt;save(keypointVector, tDatum.poseCandidates, fileName, humanReadable);</div>
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;                }</div>
 <div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;                <span class="comment">// Profiling speed</span></div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;                <a class="code" href="classop_1_1_profiler.html#affff5b0b992e05276b2a699f97ad525d">Profiler::timerEnd</a>(profilerKey);</div>
@@ -197,33 +197,33 @@ $(document).ready(function(){initNavTree('w_keypoint_json_saver_8hpp_source.html
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;        }</div>
 <div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    }</div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    <a class="code" href="namespaceop.html#a9076fc1719030c2a74f21682999d2315">COMPILE_TEMPLATE_DATUM</a>(<a class="code" href="classop_1_1_w_keypoint_json_saver.html">WKeypointJsonSaver</a>);</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    <a class="code" href="namespaceop.html#a9076fc1719030c2a74f21682999d2315">COMPILE_TEMPLATE_DATUM</a>(<a class="code" href="classop_1_1_w_people_json_saver.html">WPeopleJsonSaver</a>);</div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;}</div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;<span class="preprocessor">#endif // OPENPOSE_FILESTREAM_W_KEYPOINT_JSON_SAVER_HPP</span></div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;<span class="preprocessor">#endif // OPENPOSE_FILESTREAM_W_PEOPLE_JSON_SAVER_HPP</span></div>
 <div class="ttc" id="namespaceop_html_adc43fb9031418e7f8112816a3b535d14a28d0edd045e05cf5af64e35ae0c4c6ef"><div class="ttname"><a href="namespaceop.html#adc43fb9031418e7f8112816a3b535d14a28d0edd045e05cf5af64e35ae0c4c6ef">op::Priority::Low</a></div></div>
 <div class="ttc" id="classop_1_1_worker_consumer_html"><div class="ttname"><a href="classop_1_1_worker_consumer.html">op::WorkerConsumer</a></div><div class="ttdef"><b>Definition:</b> workerConsumer.hpp:10</div></div>
-<div class="ttc" id="classop_1_1_w_keypoint_json_saver_html"><div class="ttname"><a href="classop_1_1_w_keypoint_json_saver.html">op::WKeypointJsonSaver</a></div><div class="ttdef"><b>Definition:</b> wKeypointJsonSaver.hpp:11</div></div>
-<div class="ttc" id="classop_1_1_w_keypoint_json_saver_html_aff660868a7508e61fb92e3fbca3bf4c7"><div class="ttname"><a href="classop_1_1_w_keypoint_json_saver.html#aff660868a7508e61fb92e3fbca3bf4c7">op::WKeypointJsonSaver::WKeypointJsonSaver</a></div><div class="ttdeci">WKeypointJsonSaver(const std::shared_ptr&lt; KeypointJsonSaver &gt; &amp;keypointJsonSaver)</div><div class="ttdef"><b>Definition:</b> wKeypointJsonSaver.hpp:36</div></div>
-<div class="ttc" id="classop_1_1_w_keypoint_json_saver_html_aa90e672fd245fd105ed45cfe6b7ecd66"><div class="ttname"><a href="classop_1_1_w_keypoint_json_saver.html#aa90e672fd245fd105ed45cfe6b7ecd66">op::WKeypointJsonSaver::workConsumer</a></div><div class="ttdeci">void workConsumer(const TDatums &amp;tDatums)</div><div class="ttdef"><b>Definition:</b> wKeypointJsonSaver.hpp:47</div></div>
-<div class="ttc" id="keypoint_json_saver_8hpp_html"><div class="ttname"><a href="keypoint_json_saver_8hpp.html">keypointJsonSaver.hpp</a></div></div>
+<div class="ttc" id="classop_1_1_w_people_json_saver_html_a5d4239596a996723a20a1031d32c7446"><div class="ttname"><a href="classop_1_1_w_people_json_saver.html#a5d4239596a996723a20a1031d32c7446">op::WPeopleJsonSaver::initializationOnThread</a></div><div class="ttdeci">void initializationOnThread()</div><div class="ttdef"><b>Definition:</b> wPeopleJsonSaver.hpp:42</div></div>
+<div class="ttc" id="classop_1_1_w_people_json_saver_html"><div class="ttname"><a href="classop_1_1_w_people_json_saver.html">op::WPeopleJsonSaver</a></div><div class="ttdef"><b>Definition:</b> wPeopleJsonSaver.hpp:11</div></div>
+<div class="ttc" id="classop_1_1_w_people_json_saver_html_ac12dfe8c1414ec36ace474ecbf148f67"><div class="ttname"><a href="classop_1_1_w_people_json_saver.html#ac12dfe8c1414ec36ace474ecbf148f67">op::WPeopleJsonSaver::WPeopleJsonSaver</a></div><div class="ttdeci">WPeopleJsonSaver(const std::shared_ptr&lt; PeopleJsonSaver &gt; &amp;peopleJsonSaver)</div><div class="ttdef"><b>Definition:</b> wPeopleJsonSaver.hpp:36</div></div>
 <div class="ttc" id="common_8hpp_html"><div class="ttname"><a href="common_8hpp.html">common.hpp</a></div></div>
 <div class="ttc" id="classop_1_1_profiler_html_aea2c89bcd0a661a53f47e59b9bec2be7"><div class="ttname"><a href="classop_1_1_profiler.html#aea2c89bcd0a661a53f47e59b9bec2be7">op::Profiler::timerInit</a></div><div class="ttdeci">static const std::string timerInit(const int line, const std::string &amp;function, const std::string &amp;file)</div></div>
 <div class="ttc" id="namespaceop_html_a5f092bd36c716a894cb035e1ead2aca3"><div class="ttname"><a href="namespaceop.html#a5f092bd36c716a894cb035e1ead2aca3">op::error</a></div><div class="ttdeci">OP_API void error(const std::string &amp;message, const int line=-1, const std::string &amp;function=&quot;&quot;, const std::string &amp;file=&quot;&quot;)</div></div>
 <div class="ttc" id="pointer_container_8hpp_html"><div class="ttname"><a href="pointer_container_8hpp.html">pointerContainer.hpp</a></div></div>
+<div class="ttc" id="people_json_saver_8hpp_html"><div class="ttname"><a href="people_json_saver_8hpp.html">peopleJsonSaver.hpp</a></div></div>
 <div class="ttc" id="namespaceop_html_a4eb991aa18818196d35c66455a437a32"><div class="ttname"><a href="namespaceop.html#a4eb991aa18818196d35c66455a437a32">op::dLog</a></div><div class="ttdeci">void dLog(const T &amp;message, const Priority priority=Priority::Max, const int line=-1, const std::string &amp;function=&quot;&quot;, const std::string &amp;file=&quot;&quot;)</div><div class="ttdef"><b>Definition:</b> errorAndLog.hpp:47</div></div>
 <div class="ttc" id="worker_consumer_8hpp_html"><div class="ttname"><a href="worker_consumer_8hpp.html">workerConsumer.hpp</a></div></div>
 <div class="ttc" id="namespaceop_html_a02164ca0af9e838190f584f5d1d8465e"><div class="ttname"><a href="namespaceop.html#a02164ca0af9e838190f584f5d1d8465e">op::checkNoNullNorEmpty</a></div><div class="ttdeci">bool checkNoNullNorEmpty(const TPointerContainer &amp;tPointerContainer)</div><div class="ttdef"><b>Definition:</b> pointerContainer.hpp:7</div></div>
 <div class="ttc" id="namespaceop_html_a9076fc1719030c2a74f21682999d2315"><div class="ttname"><a href="namespaceop.html#a9076fc1719030c2a74f21682999d2315">op::COMPILE_TEMPLATE_DATUM</a></div><div class="ttdeci">COMPILE_TEMPLATE_DATUM(WCvMatToOpInput)</div></div>
-<div class="ttc" id="classop_1_1_w_keypoint_json_saver_html_ad6b170f027c3b145c51adee3019a9cbd"><div class="ttname"><a href="classop_1_1_w_keypoint_json_saver.html#ad6b170f027c3b145c51adee3019a9cbd">op::WKeypointJsonSaver::initializationOnThread</a></div><div class="ttdeci">void initializationOnThread()</div><div class="ttdef"><b>Definition:</b> wKeypointJsonSaver.hpp:42</div></div>
 <div class="ttc" id="classop_1_1_profiler_html_a58b930a54a98bbc91af074395852da76"><div class="ttname"><a href="classop_1_1_profiler.html#a58b930a54a98bbc91af074395852da76">op::Profiler::printAveragedTimeMsOnIterationX</a></div><div class="ttdeci">static void printAveragedTimeMsOnIterationX(const std::string &amp;key, const int line, const std::string &amp;function, const std::string &amp;file, const unsigned long long x=DEFAULT_X)</div></div>
 <div class="ttc" id="classop_1_1_profiler_html_affff5b0b992e05276b2a699f97ad525d"><div class="ttname"><a href="classop_1_1_profiler.html#affff5b0b992e05276b2a699f97ad525d">op::Profiler::timerEnd</a></div><div class="ttdeci">static void timerEnd(const std::string &amp;key)</div></div>
+<div class="ttc" id="classop_1_1_w_people_json_saver_html_af874a16a06a9a3452a0e3792ac15647e"><div class="ttname"><a href="classop_1_1_w_people_json_saver.html#af874a16a06a9a3452a0e3792ac15647e">op::WPeopleJsonSaver::workConsumer</a></div><div class="ttdeci">void workConsumer(const TDatums &amp;tDatums)</div><div class="ttdef"><b>Definition:</b> wPeopleJsonSaver.hpp:47</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_7f012205977c6890af7afa3b7477c2d1.html">include</a></li><li class="navelem"><a class="el" href="dir_18695feb986752a25b816536eab00e96.html">openpose</a></li><li class="navelem"><a class="el" href="dir_da8f0331eb5f441599a7c56ee4b45b7a.html">filestream</a></li><li class="navelem"><a class="el" href="w_keypoint_json_saver_8hpp.html">wKeypointJsonSaver.hpp</a></li>
+    <li class="navelem"><a class="el" href="dir_7f012205977c6890af7afa3b7477c2d1.html">include</a></li><li class="navelem"><a class="el" href="dir_18695feb986752a25b816536eab00e96.html">openpose</a></li><li class="navelem"><a class="el" href="dir_da8f0331eb5f441599a7c56ee4b45b7a.html">filestream</a></li><li class="navelem"><a class="el" href="w_people_json_saver_8hpp.html">wPeopleJsonSaver.hpp</a></li>
     <li class="footer">Generated by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>

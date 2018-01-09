@@ -1,6 +1,7 @@
 var structop_1_1_wrapper_struct_pose =
 [
-    [ "WrapperStructPose", "structop_1_1_wrapper_struct_pose.html#a939631f393e87c1b53c25c37c8d551d3", null ],
+    [ "WrapperStructPose", "structop_1_1_wrapper_struct_pose.html#a6780395296eca480ff64d4815ce7812d", null ],
+    [ "addPartCandidates", "structop_1_1_wrapper_struct_pose.html#ad73981c6ad9b23f511ef6f12136bf8e7", null ],
     [ "alphaHeatMap", "structop_1_1_wrapper_struct_pose.html#ac1233492c750fbd98df353bffa8f9b78", null ],
     [ "alphaKeypoint", "structop_1_1_wrapper_struct_pose.html#a4d3ad84b14697d5f1009fa29e2ff1998", null ],
     [ "blendOriginalFrame", "structop_1_1_wrapper_struct_pose.html#aa2cee9019b708d48cc18313615d0189e", null ],

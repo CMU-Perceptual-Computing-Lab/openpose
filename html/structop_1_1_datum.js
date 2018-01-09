@@ -28,6 +28,7 @@ var structop_1_1_datum =
     [ "netInputSizes", "structop_1_1_datum.html#a32d164c01acf6b4f7eb1323d74edbdca", null ],
     [ "netOutputSize", "structop_1_1_datum.html#ac734d4262a5a7892c6d4094cdd2bcc7c", null ],
     [ "outputData", "structop_1_1_datum.html#a42b953c082f479eddc527da9a3a4cc75", null ],
+    [ "poseCandidates", "structop_1_1_datum.html#a55dd5354e09696ed6896923755f1c85b", null ],
     [ "poseHeatMaps", "structop_1_1_datum.html#a5429e97e0ab9b0e2209a3947af668381", null ],
     [ "poseIds", "structop_1_1_datum.html#aba90dccffb5a830296231bd430c4766c", null ],
     [ "poseKeypoints", "structop_1_1_datum.html#a6d629b1f6f7b958fe4cf2ef4cdf57c5b", null ],

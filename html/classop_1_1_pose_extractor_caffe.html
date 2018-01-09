@@ -119,14 +119,18 @@ $(document).ready(function(){initNavTree('classop_1_1_pose_extractor_caffe.html'
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:adb9510d859f0e179358d03e78ec22b0c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_extractor_caffe.html#adb9510d859f0e179358d03e78ec22b0c">PoseExtractorCaffe</a> (const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel, const std::string &amp;modelFolder, const int gpuId, const std::vector&lt; <a class="el" href="namespaceop.html#a1c3dbc214e7552f7ef9cc753ee97226b">HeatMapType</a> &gt; &amp;heatMapTypes={}, const <a class="el" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bda">ScaleMode</a> heatMapScale=<a class="el" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bdaa4b942544cb3e764bbb8d33f8a8744855">ScaleMode::ZeroToOne</a>, const bool enableGoogleLogging=true)</td></tr>
-<tr class="separator:adb9510d859f0e179358d03e78ec22b0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab58c3ab4b745b35f542165ce27293554"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_extractor_caffe.html#ab58c3ab4b745b35f542165ce27293554">PoseExtractorCaffe</a> (const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel, const std::string &amp;modelFolder, const int gpuId, const std::vector&lt; <a class="el" href="namespaceop.html#a1c3dbc214e7552f7ef9cc753ee97226b">HeatMapType</a> &gt; &amp;heatMapTypes={}, const <a class="el" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bda">ScaleMode</a> heatMapScale=<a class="el" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bdaa4b942544cb3e764bbb8d33f8a8744855">ScaleMode::ZeroToOne</a>, const bool addPartCandidates=false, const bool enableGoogleLogging=true)</td></tr>
+<tr class="separator:ab58c3ab4b745b35f542165ce27293554"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3359641c1199c712a07859dcb76b7dcf"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_extractor_caffe.html#a3359641c1199c712a07859dcb76b7dcf">~PoseExtractorCaffe</a> ()</td></tr>
 <tr class="separator:a3359641c1199c712a07859dcb76b7dcf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7cefba61d8a4f69a0f8790505bd6b0d3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_extractor_caffe.html#a7cefba61d8a4f69a0f8790505bd6b0d3">netInitializationOnThread</a> ()</td></tr>
 <tr class="separator:a7cefba61d8a4f69a0f8790505bd6b0d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8e7ae6b63ccd0ab6eb61c5530fa44731"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_extractor_caffe.html#a8e7ae6b63ccd0ab6eb61c5530fa44731">forwardPass</a> (const std::vector&lt; <a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt;&gt; &amp;inputNetData, const <a class="el" href="structop_1_1_point.html">Point</a>&lt; int &gt; &amp;inputDataSize, const std::vector&lt; double &gt; &amp;scaleInputToNetInputs={1.f})</td></tr>
 <tr class="separator:a8e7ae6b63ccd0ab6eb61c5530fa44731"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5e84521120bcee4a9f047ae1d7fec8af"><td class="memItemLeft" align="right" valign="top">const float *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_extractor_caffe.html#a5e84521120bcee4a9f047ae1d7fec8af">getCandidatesCpuConstPtr</a> () const </td></tr>
+<tr class="separator:a5e84521120bcee4a9f047ae1d7fec8af"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abacfbe7f39819671b47d9ca2ef793046"><td class="memItemLeft" align="right" valign="top">const float *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_extractor_caffe.html#abacfbe7f39819671b47d9ca2ef793046">getCandidatesGpuConstPtr</a> () const </td></tr>
+<tr class="separator:abacfbe7f39819671b47d9ca2ef793046"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a98dc1c67a589a5493b194f23446c5759"><td class="memItemLeft" align="right" valign="top">const float *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_extractor_caffe.html#a98dc1c67a589a5493b194f23446c5759">getHeatMapCpuConstPtr</a> () const </td></tr>
 <tr class="separator:a98dc1c67a589a5493b194f23446c5759"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa030dcbaa38473ab86aff084600ae4b1"><td class="memItemLeft" align="right" valign="top">const float *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_extractor_caffe.html#aa030dcbaa38473ab86aff084600ae4b1">getHeatMapGpuConstPtr</a> () const </td></tr>
@@ -136,14 +140,17 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a6982cb1a7203129610fe0959a45c81cf"><td class="memItemLeft" align="right" valign="top">const float *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_extractor_caffe.html#a6982cb1a7203129610fe0959a45c81cf">getPoseGpuConstPtr</a> () const </td></tr>
 <tr class="separator:a6982cb1a7203129610fe0959a45c81cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classop_1_1_pose_extractor"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classop_1_1_pose_extractor')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classop_1_1_pose_extractor.html">op::PoseExtractor</a></td></tr>
-<tr class="memitem:a3b88d13440d182925701386549b7a61f inherit pub_methods_classop_1_1_pose_extractor"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_extractor.html#a3b88d13440d182925701386549b7a61f">PoseExtractor</a> (const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel, const std::vector&lt; <a class="el" href="namespaceop.html#a1c3dbc214e7552f7ef9cc753ee97226b">HeatMapType</a> &gt; &amp;heatMapTypes={}, const <a class="el" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bda">ScaleMode</a> heatMapScale=<a class="el" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bdaa4b942544cb3e764bbb8d33f8a8744855">ScaleMode::ZeroToOne</a>)</td></tr>
-<tr class="separator:a3b88d13440d182925701386549b7a61f inherit pub_methods_classop_1_1_pose_extractor"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a54b0c911456746d4faf493bb4e9b0c1e inherit pub_methods_classop_1_1_pose_extractor"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_extractor.html#a54b0c911456746d4faf493bb4e9b0c1e">PoseExtractor</a> (const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel, const std::vector&lt; <a class="el" href="namespaceop.html#a1c3dbc214e7552f7ef9cc753ee97226b">HeatMapType</a> &gt; &amp;heatMapTypes={}, const <a class="el" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bda">ScaleMode</a> heatMapScale=<a class="el" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bdaa4b942544cb3e764bbb8d33f8a8744855">ScaleMode::ZeroToOne</a>, const bool addPartCandidates=false)</td></tr>
+<tr class="separator:a54b0c911456746d4faf493bb4e9b0c1e inherit pub_methods_classop_1_1_pose_extractor"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9f98eef4ac08cacefe74e002ac086582 inherit pub_methods_classop_1_1_pose_extractor"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_extractor.html#a9f98eef4ac08cacefe74e002ac086582">~PoseExtractor</a> ()</td></tr>
 <tr class="separator:a9f98eef4ac08cacefe74e002ac086582 inherit pub_methods_classop_1_1_pose_extractor"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aab1cccc9ad99f6b007abaa14600ea6df inherit pub_methods_classop_1_1_pose_extractor"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_extractor.html#aab1cccc9ad99f6b007abaa14600ea6df">initializationOnThread</a> ()</td></tr>
 <tr class="separator:aab1cccc9ad99f6b007abaa14600ea6df inherit pub_methods_classop_1_1_pose_extractor"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1f91723c5d541a2872637a1510da76e6 inherit pub_methods_classop_1_1_pose_extractor"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_extractor.html#a1f91723c5d541a2872637a1510da76e6">getHeatMaps</a> () const </td></tr>
-<tr class="separator:a1f91723c5d541a2872637a1510da76e6 inherit pub_methods_classop_1_1_pose_extractor"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a53eac2bf280492baca5aeb1a777d3646 inherit pub_methods_classop_1_1_pose_extractor"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_extractor.html#a53eac2bf280492baca5aeb1a777d3646">getHeatMapsCopy</a> () const </td></tr>
+<tr class="separator:a53eac2bf280492baca5aeb1a777d3646 inherit pub_methods_classop_1_1_pose_extractor"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a67f2afb1a7e0de01dd3271b5dc30cd5a inherit pub_methods_classop_1_1_pose_extractor"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::vector<br class="typebreak"/>
+&lt; std::array&lt; float, 3 &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_extractor.html#a67f2afb1a7e0de01dd3271b5dc30cd5a">getCandidatesCopy</a> () const </td></tr>
+<tr class="separator:a67f2afb1a7e0de01dd3271b5dc30cd5a inherit pub_methods_classop_1_1_pose_extractor"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a63432a905e6fcd9be8d9464a80a7fd52 inherit pub_methods_classop_1_1_pose_extractor"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_extractor.html#a63432a905e6fcd9be8d9464a80a7fd52">getPoseKeypoints</a> () const </td></tr>
 <tr class="separator:a63432a905e6fcd9be8d9464a80a7fd52 inherit pub_methods_classop_1_1_pose_extractor"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a99e7a656f0bace55402a187e9326ded1 inherit pub_methods_classop_1_1_pose_extractor"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_extractor.html#a99e7a656f0bace55402a187e9326ded1">getPoseScores</a> () const </td></tr>
@@ -175,7 +182,7 @@ Additional Inherited Members</h2></td></tr>
 <tr class="separator:ab32d08e00cf4321682ba9acc2b78a289 inherit pro_attribs_classop_1_1_pose_extractor"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="adb9510d859f0e179358d03e78ec22b0c"></a>
+<a class="anchor" id="ab58c3ab4b745b35f542165ce27293554"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -208,6 +215,12 @@ Additional Inherited Members</h2></td></tr>
           <td></td>
           <td class="paramtype">const <a class="el" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bda">ScaleMode</a>&#160;</td>
           <td class="paramname"><em>heatMapScale</em> = <code><a class="el" href="namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bdaa4b942544cb3e764bbb8d33f8a8744855">ScaleMode::ZeroToOne</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>addPartCandidates</em> = <code>false</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -288,6 +301,56 @@ Additional Inherited Members</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Implements <a class="el" href="classop_1_1_pose_extractor.html#afe4ceae04443242148c563eb6d8b954c">op::PoseExtractor</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a5e84521120bcee4a9f047ae1d7fec8af"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const float* op::PoseExtractorCaffe::getCandidatesCpuConstPtr </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implements <a class="el" href="classop_1_1_pose_extractor.html#ae087157035d7b81da560328dce1d0728">op::PoseExtractor</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="abacfbe7f39819671b47d9ca2ef793046"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const float* op::PoseExtractorCaffe::getCandidatesGpuConstPtr </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implements <a class="el" href="classop_1_1_pose_extractor.html#af26c5b9f93407b74bdd06357aa7566a9">op::PoseExtractor</a>.</p>
 
 </div>
 </div>

@@ -167,6 +167,9 @@ Public Attributes</h2></td></tr>
 <tr class="separator:afb117821de7aff9ac3c219ef3bbc0c14"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5429e97e0ab9b0e2209a3947af668381"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structop_1_1_datum.html#a5429e97e0ab9b0e2209a3947af668381">poseHeatMaps</a></td></tr>
 <tr class="separator:a5429e97e0ab9b0e2209a3947af668381"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a55dd5354e09696ed6896923755f1c85b"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::vector<br class="typebreak"/>
+&lt; std::array&lt; float, 3 &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structop_1_1_datum.html#a55dd5354e09696ed6896923755f1c85b">poseCandidates</a></td></tr>
+<tr class="separator:a55dd5354e09696ed6896923755f1c85b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0b2f6955a1751fc79b107789272effad"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="structop_1_1_rectangle.html">Rectangle</a>&lt; float &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structop_1_1_datum.html#a0b2f6955a1751fc79b107789272effad">faceRectangles</a></td></tr>
 <tr class="separator:a0b2f6955a1751fc79b107789272effad"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aebd19bf50725a5cd87de1efd96f6ebfe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structop_1_1_datum.html#aebd19bf50725a5cd87de1efd96f6ebfe">faceKeypoints</a></td></tr>
@@ -744,6 +747,19 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a55dd5354e09696ed6896923755f1c85b"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;std::vector&lt;std::array&lt;float,3&gt; &gt; &gt; op::Datum::poseCandidates</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Body pose candidates for the whole image. This parameter is by default empty and disabled for performance. It can be enabled with <code>candidates_body</code>. Candidates refer to all the detected body parts, before being assembled into people. Note that the number of candidates is equal or higher than the number of body parts after being assembled into people. Size: #body parts x min(part candidates, POSE_MAX_PEOPLE) x 3 (x,y,score). Rather than vector, it should ideally be: std::array&lt;std::vector&lt;std::array&lt;float,3&gt;&gt;, #BP&gt; poseCandidates; </p>
+
+</div>
+</div>
 <a class="anchor" id="a5429e97e0ab9b0e2209a3947af668381"></a>
 <div class="memitem">
 <div class="memproto">
@@ -753,7 +769,7 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Body pose heatmaps (body parts, background and/or PAFs) for the whole image. This parameters is by default empty and disabled for performance. Each group (body parts, background and PAFs) can be individually enabled. #heatmaps = #body parts (if enabled) + 1 (if background enabled) + 2 x <a class="el" href="namespaceop.html#a1c3dbc214e7552f7ef9cc753ee97226ba21c5c3f60f4881b8d5477f5628db74f1">PAFs</a> (if enabled). Each PAF has 2 consecutive channels, one for x- and one for y-coordinates. Order heatmaps: body parts + background (as appears in POSE_BODY_PART_MAPPING) + (x,y) channel of each PAF (sorted as appears in POSE_BODY_PART_PAIRS). See <code><a class="el" href="pose_parameters_8hpp.html">pose/poseParameters.hpp</a></code>. The user can choose the heatmaps normalization: ranges [0, 1], [-1, 1] or [0, 255]. Check the <code>heatmaps_scale</code> flag in the examples/tutorial_wrapper/ for more details. Size: #heatmaps x output_net_height x output_net_width </p>
+<p>Body pose heatmaps (body parts, background and/or PAFs) for the whole image. This parameter is by default empty and disabled for performance. Each group (body parts, background and PAFs) can be individually enabled. #heatmaps = #body parts (if enabled) + 1 (if background enabled) + 2 x <a class="el" href="namespaceop.html#a1c3dbc214e7552f7ef9cc753ee97226ba21c5c3f60f4881b8d5477f5628db74f1">PAFs</a> (if enabled). Each PAF has 2 consecutive channels, one for x- and one for y-coordinates. Order heatmaps: body parts + background (as appears in POSE_BODY_PART_MAPPING) + (x,y) channel of each PAF (sorted as appears in POSE_BODY_PART_PAIRS). See <code><a class="el" href="pose_parameters_8hpp.html">pose/poseParameters.hpp</a></code>. The user can choose the heatmaps normalization: ranges [0, 1], [-1, 1] or [0, 255]. Check the <code>heatmaps_scale</code> flag in the examples/tutorial_wrapper/ for more details. Size: #heatmaps x output_net_height x output_net_width </p>
 
 </div>
 </div>

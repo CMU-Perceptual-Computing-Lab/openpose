@@ -6,8 +6,8 @@ var searchData=
   ['writeheatmapsformat',['writeHeatMapsFormat',['../structop_1_1_wrapper_struct_output.html#a34d5796e02b8afaaaef99fc26e7f3056',1,'op::WrapperStructOutput']]],
   ['writeimages',['writeImages',['../structop_1_1_wrapper_struct_output.html#a5f56c15d410645442b5ac21c316b9c85',1,'op::WrapperStructOutput']]],
   ['writeimagesformat',['writeImagesFormat',['../structop_1_1_wrapper_struct_output.html#aba2aed26f1d01771a0c896bc50e477a5',1,'op::WrapperStructOutput']]],
+  ['writejson',['writeJson',['../structop_1_1_wrapper_struct_output.html#a8a2f29bae4ff55195b10a83717a0f738',1,'op::WrapperStructOutput']]],
   ['writekeypoint',['writeKeypoint',['../structop_1_1_wrapper_struct_output.html#ad9ca696781cb7c250752f078f5c937fc',1,'op::WrapperStructOutput']]],
   ['writekeypointformat',['writeKeypointFormat',['../structop_1_1_wrapper_struct_output.html#ad338fd4719d6f243bb64bc67f68bc7c9',1,'op::WrapperStructOutput']]],
-  ['writekeypointjson',['writeKeypointJson',['../structop_1_1_wrapper_struct_output.html#a398edf95214b90d8fed2239b4f7e096e',1,'op::WrapperStructOutput']]],
   ['writevideo',['writeVideo',['../structop_1_1_wrapper_struct_output.html#a73d6a5687ab8abac22f5cd29690b6277',1,'op::WrapperStructOutput']]]
 ];

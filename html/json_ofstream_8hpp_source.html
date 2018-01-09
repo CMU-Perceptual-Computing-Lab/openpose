@@ -130,37 +130,39 @@ $(document).ready(function(){initNavTree('json_ofstream_8hpp_source.html','');})
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;</div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;        <span class="keywordtype">void</span> arrayClose();</div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;        <span class="keywordtype">void</span> key(<span class="keyword">const</span> std::string&amp; <span class="keywordtype">string</span>);</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;        <span class="keywordtype">void</span> version(<span class="keyword">const</span> std::string&amp; version);</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;        <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
-<div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="classop_1_1_json_ofstream.html#aa432ff172e10bb9e3b6e2bfa6124c648">   27</a></span>&#160;        <span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="classop_1_1_json_ofstream.html#aa432ff172e10bb9e3b6e2bfa6124c648">plainText</a>(<span class="keyword">const</span> T&amp; value)</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;        {</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;            mOfstream &lt;&lt; value;</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;        }</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;</div>
-<div class="line"><a name="l00032"></a><span class="lineno"><a class="line" href="classop_1_1_json_ofstream.html#ae4468279f789c8026d431b2ef62646f9">   32</a></span>&#160;        <span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="classop_1_1_json_ofstream.html#ae4468279f789c8026d431b2ef62646f9">comma</a>()</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;        {</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;            mOfstream &lt;&lt; <span class="stringliteral">&quot;,&quot;</span>;</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;        }</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;        <span class="keywordtype">void</span> enter();</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;        <span class="keywordtype">void</span> key(<span class="keyword">const</span> std::string&amp; <span class="keywordtype">string</span>);</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;        <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
+<div class="line"><a name="l00029"></a><span class="lineno"><a class="line" href="classop_1_1_json_ofstream.html#aa432ff172e10bb9e3b6e2bfa6124c648">   29</a></span>&#160;        <span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="classop_1_1_json_ofstream.html#aa432ff172e10bb9e3b6e2bfa6124c648">plainText</a>(<span class="keyword">const</span> T&amp; value)</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;        {</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;            mOfstream &lt;&lt; value;</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;        }</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;</div>
+<div class="line"><a name="l00034"></a><span class="lineno"><a class="line" href="classop_1_1_json_ofstream.html#ae4468279f789c8026d431b2ef62646f9">   34</a></span>&#160;        <span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="classop_1_1_json_ofstream.html#ae4468279f789c8026d431b2ef62646f9">comma</a>()</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;        {</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;            mOfstream &lt;&lt; <span class="stringliteral">&quot;,&quot;</span>;</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;        }</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">bool</span> mHumanReadable;</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;        <span class="keywordtype">long</span> <span class="keywordtype">long</span> mBracesCounter;</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;        <span class="keywordtype">long</span> <span class="keywordtype">long</span> mBracketsCounter;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;        std::ofstream mOfstream;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;        <a class="code" href="macros_8hpp.html#abef96b5dd35dd9d44ad27ddf0e2f5f2e">DELETE_COPY</a>(<a class="code" href="classop_1_1_json_ofstream.html">JsonOfstream</a>);</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    };</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;}</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="preprocessor">#endif // OPENPOSE_FILESTREAM_JSON_OFSTREAM_HPP</span></div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;        <span class="keywordtype">void</span> enter();</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">bool</span> mHumanReadable;</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;        <span class="keywordtype">long</span> <span class="keywordtype">long</span> mBracesCounter;</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;        <span class="keywordtype">long</span> <span class="keywordtype">long</span> mBracketsCounter;</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;        std::ofstream mOfstream;</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;        <a class="code" href="macros_8hpp.html#abef96b5dd35dd9d44ad27ddf0e2f5f2e">DELETE_COPY</a>(<a class="code" href="classop_1_1_json_ofstream.html">JsonOfstream</a>);</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    };</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;}</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="preprocessor">#endif // OPENPOSE_FILESTREAM_JSON_OFSTREAM_HPP</span></div>
 <div class="ttc" id="macros_8hpp_html_abef96b5dd35dd9d44ad27ddf0e2f5f2e"><div class="ttname"><a href="macros_8hpp.html#abef96b5dd35dd9d44ad27ddf0e2f5f2e">DELETE_COPY</a></div><div class="ttdeci">#define DELETE_COPY(className)</div><div class="ttdef"><b>Definition:</b> macros.hpp:25</div></div>
 <div class="ttc" id="common_8hpp_html"><div class="ttname"><a href="common_8hpp.html">common.hpp</a></div></div>
 <div class="ttc" id="classop_1_1_json_ofstream_html"><div class="ttname"><a href="classop_1_1_json_ofstream.html">op::JsonOfstream</a></div><div class="ttdef"><b>Definition:</b> jsonOfstream.hpp:9</div></div>
-<div class="ttc" id="classop_1_1_json_ofstream_html_aa432ff172e10bb9e3b6e2bfa6124c648"><div class="ttname"><a href="classop_1_1_json_ofstream.html#aa432ff172e10bb9e3b6e2bfa6124c648">op::JsonOfstream::plainText</a></div><div class="ttdeci">void plainText(const T &amp;value)</div><div class="ttdef"><b>Definition:</b> jsonOfstream.hpp:27</div></div>
-<div class="ttc" id="classop_1_1_json_ofstream_html_ae4468279f789c8026d431b2ef62646f9"><div class="ttname"><a href="classop_1_1_json_ofstream.html#ae4468279f789c8026d431b2ef62646f9">op::JsonOfstream::comma</a></div><div class="ttdeci">void comma()</div><div class="ttdef"><b>Definition:</b> jsonOfstream.hpp:32</div></div>
+<div class="ttc" id="classop_1_1_json_ofstream_html_aa432ff172e10bb9e3b6e2bfa6124c648"><div class="ttname"><a href="classop_1_1_json_ofstream.html#aa432ff172e10bb9e3b6e2bfa6124c648">op::JsonOfstream::plainText</a></div><div class="ttdeci">void plainText(const T &amp;value)</div><div class="ttdef"><b>Definition:</b> jsonOfstream.hpp:29</div></div>
+<div class="ttc" id="classop_1_1_json_ofstream_html_ae4468279f789c8026d431b2ef62646f9"><div class="ttname"><a href="classop_1_1_json_ofstream.html#ae4468279f789c8026d431b2ef62646f9">op::JsonOfstream::comma</a></div><div class="ttdeci">void comma()</div><div class="ttdef"><b>Definition:</b> jsonOfstream.hpp:34</div></div>
 <div class="ttc" id="macros_8hpp_html_a4ba443bb7a0e5dbe8054a9ac37a5e000"><div class="ttname"><a href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a></div><div class="ttdeci">#define OP_API</div><div class="ttdef"><b>Definition:</b> macros.hpp:5</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->

@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>OpenPose: op::KeypointJsonSaver Class Reference</title>
+<title>OpenPose: op::PeopleJsonSaver Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -87,7 +87,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   </div>
 </div>
 <script type="text/javascript">
-$(document).ready(function(){initNavTree('classop_1_1_keypoint_json_saver.html','');});
+$(document).ready(function(){initNavTree('classop_1_1_people_json_saver.html','');});
 </script>
 <div id="doc-content">
 <!-- window showing the filter options -->
@@ -107,22 +107,22 @@ $(document).ready(function(){initNavTree('classop_1_1_keypoint_json_saver.html',
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="classop_1_1_keypoint_json_saver-members.html">List of all members</a>  </div>
+<a href="classop_1_1_people_json_saver-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">op::KeypointJsonSaver Class Reference</div>  </div>
+<div class="title">op::PeopleJsonSaver Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p><code>#include &lt;<a class="el" href="keypoint_json_saver_8hpp_source.html">keypointJsonSaver.hpp</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="people_json_saver_8hpp_source.html">peopleJsonSaver.hpp</a>&gt;</code></p>
 
 <p>Inherits <a class="el" href="classop_1_1_file_saver.html">op::FileSaver</a>.</p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a339487926e004f8b058b5bb7624b1f30"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_keypoint_json_saver.html#a339487926e004f8b058b5bb7624b1f30">KeypointJsonSaver</a> (const std::string &amp;directoryPath)</td></tr>
-<tr class="separator:a339487926e004f8b058b5bb7624b1f30"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a10fff77ff17356bf7786ec3c70930095"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_keypoint_json_saver.html#a10fff77ff17356bf7786ec3c70930095">save</a> (const std::vector&lt; std::pair&lt; <a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt;, std::string &gt;&gt; &amp;keypointVector, const std::string &amp;fileName, const bool humanReadable=true) const </td></tr>
-<tr class="separator:a10fff77ff17356bf7786ec3c70930095"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa6e2f479d959752c5c0f71cd8b4427c2"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_people_json_saver.html#aa6e2f479d959752c5c0f71cd8b4427c2">PeopleJsonSaver</a> (const std::string &amp;directoryPath)</td></tr>
+<tr class="separator:aa6e2f479d959752c5c0f71cd8b4427c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a601ec8a006692ee1b4c3faff06df3582"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_people_json_saver.html#a601ec8a006692ee1b4c3faff06df3582">save</a> (const std::vector&lt; std::pair&lt; <a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt;, std::string &gt;&gt; &amp;keypointVector, const std::vector&lt; std::vector&lt; std::array&lt; float, 3 &gt;&gt;&gt; &amp;candidates, const std::string &amp;fileName, const bool humanReadable=true) const </td></tr>
+<tr class="separator:a601ec8a006692ee1b4c3faff06df3582"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
@@ -135,12 +135,12 @@ Additional Inherited Members</h2></td></tr>
 <tr class="separator:a91818f12a9409eae7c1caf6e2b525282 inherit pro_methods_classop_1_1_file_saver"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a339487926e004f8b058b5bb7624b1f30"></a>
+<a class="anchor" id="aa6e2f479d959752c5c0f71cd8b4427c2"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">op::KeypointJsonSaver::KeypointJsonSaver </td>
+          <td class="memname">op::PeopleJsonSaver::PeopleJsonSaver </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>directoryPath</em></td><td>)</td>
@@ -152,15 +152,21 @@ Additional Inherited Members</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a10fff77ff17356bf7786ec3c70930095"></a>
+<a class="anchor" id="a601ec8a006692ee1b4c3faff06df3582"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void op::KeypointJsonSaver::save </td>
+          <td class="memname">void op::PeopleJsonSaver::save </td>
           <td>(</td>
           <td class="paramtype">const std::vector&lt; std::pair&lt; <a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt;, std::string &gt;&gt; &amp;&#160;</td>
           <td class="paramname"><em>keypointVector</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; std::vector&lt; std::array&lt; float, 3 &gt;&gt;&gt; &amp;&#160;</td>
+          <td class="paramname"><em>candidates</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -185,14 +191,14 @@ Additional Inherited Members</h2></td></tr>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/filestream/<a class="el" href="keypoint_json_saver_8hpp_source.html">keypointJsonSaver.hpp</a></li>
+<li>/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/filestream/<a class="el" href="people_json_saver_8hpp_source.html">peopleJsonSaver.hpp</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="namespaceop.html">op</a></li><li class="navelem"><a class="el" href="classop_1_1_keypoint_json_saver.html">KeypointJsonSaver</a></li>
+    <li class="navelem"><a class="el" href="namespaceop.html">op</a></li><li class="navelem"><a class="el" href="classop_1_1_people_json_saver.html">PeopleJsonSaver</a></li>
     <li class="footer">Generated by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>

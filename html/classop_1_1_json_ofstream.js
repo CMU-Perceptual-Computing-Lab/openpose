@@ -9,5 +9,6 @@ var classop_1_1_json_ofstream =
     [ "key", "classop_1_1_json_ofstream.html#af0c7f763e7e809810c00b394a260672e", null ],
     [ "objectClose", "classop_1_1_json_ofstream.html#a45eeb25d9413fc31786f315b46c341cc", null ],
     [ "objectOpen", "classop_1_1_json_ofstream.html#a5c38e36c1449d808dd4ab6558d65289c", null ],
-    [ "plainText", "classop_1_1_json_ofstream.html#aa432ff172e10bb9e3b6e2bfa6124c648", null ]
+    [ "plainText", "classop_1_1_json_ofstream.html#aa432ff172e10bb9e3b6e2bfa6124c648", null ],
+    [ "version", "classop_1_1_json_ofstream.html#a6a5e0e4f3cdf8f93fb1bdef8cb63b0a2", null ]
 ];

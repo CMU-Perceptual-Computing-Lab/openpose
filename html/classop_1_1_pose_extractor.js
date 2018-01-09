@@ -1,13 +1,16 @@
 var classop_1_1_pose_extractor =
 [
-    [ "PoseExtractor", "classop_1_1_pose_extractor.html#a3b88d13440d182925701386549b7a61f", null ],
+    [ "PoseExtractor", "classop_1_1_pose_extractor.html#a54b0c911456746d4faf493bb4e9b0c1e", null ],
     [ "~PoseExtractor", "classop_1_1_pose_extractor.html#a9f98eef4ac08cacefe74e002ac086582", null ],
     [ "checkThread", "classop_1_1_pose_extractor.html#ae3477e0ab1a350fd044215b0ba6f7520", null ],
     [ "forwardPass", "classop_1_1_pose_extractor.html#afe4ceae04443242148c563eb6d8b954c", null ],
     [ "get", "classop_1_1_pose_extractor.html#a7dc82be227cc759582184de9c26f0b64", null ],
+    [ "getCandidatesCopy", "classop_1_1_pose_extractor.html#a67f2afb1a7e0de01dd3271b5dc30cd5a", null ],
+    [ "getCandidatesCpuConstPtr", "classop_1_1_pose_extractor.html#ae087157035d7b81da560328dce1d0728", null ],
+    [ "getCandidatesGpuConstPtr", "classop_1_1_pose_extractor.html#af26c5b9f93407b74bdd06357aa7566a9", null ],
     [ "getHeatMapCpuConstPtr", "classop_1_1_pose_extractor.html#a0bb5cf37e5b93e347e355be126d22ead", null ],
     [ "getHeatMapGpuConstPtr", "classop_1_1_pose_extractor.html#a0b895e3e582bd504b531ba525ed77430", null ],
-    [ "getHeatMaps", "classop_1_1_pose_extractor.html#a1f91723c5d541a2872637a1510da76e6", null ],
+    [ "getHeatMapsCopy", "classop_1_1_pose_extractor.html#a53eac2bf280492baca5aeb1a777d3646", null ],
     [ "getHeatMapSize", "classop_1_1_pose_extractor.html#a81157b4616955598fcf6de5d9676f21b", null ],
     [ "getPoseGpuConstPtr", "classop_1_1_pose_extractor.html#a50f1a79f774b3cd9e9c0825669e8a154", null ],
     [ "getPoseKeypoints", "classop_1_1_pose_extractor.html#a63432a905e6fcd9be8d9464a80a7fd52", null ],
