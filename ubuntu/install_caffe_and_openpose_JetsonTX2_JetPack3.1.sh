@@ -35,6 +35,7 @@ function executeShInItsFolder {
 
 
 
+git submodule init && git submodule update
 executeShInItsFolder "install_caffe_JetsonTX2_JetPack3.1.sh" "./3rdparty/caffe" "../.."
 exitIfError
 
