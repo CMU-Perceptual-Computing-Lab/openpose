@@ -1,5 +1,6 @@
 #ifdef USE_CAFFE
     #include <caffe/blob.hpp>
+    #include <openpose/utilities/caffeutil.hpp>
 #endif
 #include <openpose/core/resizeAndMergeBase.hpp>
 #include <openpose/utilities/fastMath.hpp>
@@ -115,7 +116,7 @@ namespace op
         try
         {
             #ifdef USE_CAFFE
-                std::vector<const T*> sourcePtrs(bottom.size());
+                std::vector<const T*> sourcePtrs(bottom.size());   
                 for (auto i = 0u ; i < sourcePtrs.size() ; i++)
                     sourcePtrs[i] = bottom[i]->cpu_data();
                 resizeAndMergeCpu(top.at(0)->mutable_cpu_data(), sourcePtrs, mTopSize, mBottomSizes,

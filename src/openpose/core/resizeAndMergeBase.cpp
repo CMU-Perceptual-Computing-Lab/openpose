@@ -1,13 +1,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <openpose/core/resizeAndMergeBase.hpp>
 #include <openpose/utilities/fastMath.hpp>
-
-// FOR RAAJ DEBUGGING
-#include <iostream>
 #include <opencv2/imgproc/imgproc.hpp>
-#include <chrono>
-using namespace std;
-using namespace std::chrono;
 
 namespace op
 {

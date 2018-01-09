@@ -264,12 +264,10 @@ namespace op
                 const std::vector<float> floatScaleRatios(scaleInputToNetInputs.begin(), scaleInputToNetInputs.end());
                 upImpl->spResizeAndMergeCaffe->setScaleRatios(floatScaleRatios);
                 #ifdef USE_CUDA
-                    upImpl->spResizeAndMergeCaffe->Forward_gpu(caffeNetOutputBlobs,                             // ~5ms
-                                                               {upImpl->spHeatMapsBlob.get()});
+                    upImpl->spResizeAndMergeCaffe->Forward_gpu(caffeNetOutputBlobs, {upImpl->spHeatMapsBlob.get()}); // ~5ms
                     cudaCheck(__LINE__, __FUNCTION__, __FILE__);
                 #else
-                    upImpl->spResizeAndMergeCaffe->Forward_cpu(caffeNetOutputBlobs,                             // ~20ms
-                                                               {upImpl->spHeatMapsBlob.get()});
+                    upImpl->spResizeAndMergeCaffe->Forward_cpu(caffeNetOutputBlobs, {upImpl->spHeatMapsBlob.get()}); // ~20ms
                 #endif
 
                 // 3. Get peaks by Non-Maximum Suppression
@@ -278,7 +276,7 @@ namespace op
                     upImpl->spNmsCaffe->Forward_gpu({upImpl->spHeatMapsBlob.get()}, {upImpl->spPeaksBlob.get()});// ~2ms
                     cudaCheck(__LINE__, __FUNCTION__, __FILE__);
                 #else
-                    error("NmsCaffe CPU version not implemented yet.", __LINE__, __FUNCTION__, __FILE__);
+                    upImpl->spNmsCaffe->Forward_cpu({upImpl->spHeatMapsBlob.get()}, {upImpl->spPeaksBlob.get()}); // ~ 7ms
                 #endif
 
                 // Get scale net to output (i.e. image input)

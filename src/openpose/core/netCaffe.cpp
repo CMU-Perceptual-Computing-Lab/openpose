@@ -146,7 +146,6 @@ namespace op
                 if (!vectorsAreEqual(upImpl->mNetInputSize4D, inputData.getSize()))
                 {
                     upImpl->mNetInputSize4D = inputData.getSize();
-                    log(inputData.getSizeAsString());
                     reshapeNetCaffe(upImpl->upCaffeNet.get(), inputData.getSize());
                 }
                 // Copy frame data to GPU memory
@@ -160,12 +159,6 @@ namespace op
                 #endif
                 // Perform deep network forward pass
                 upImpl->upCaffeNet->ForwardFrom(0);
-
-                // Raaj Debug - Shape will be [1, 57, inputResY/8, inputResX/8]
-                log("Shape:");
-                for(const auto i : upImpl->spOutputBlob->shape()){
-                    log(std::to_string(i));
-                }
 
                 // Cuda checks
                 #ifdef USE_CUDA
