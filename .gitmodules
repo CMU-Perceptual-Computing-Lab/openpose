@@ -1,0 +1,3 @@
+[submodule "3rdparty/caffe"]
+	path = 3rdparty/caffe
+	url = https://github.com/CMU-Perceptual-Computing-Lab/caffe.git
