@@ -80,7 +80,7 @@ Alternatively to the script installation, if you want to use CUDA 7, avoid using
 2. Compile Caffe and OpenPose by running these lines:
     ```
     ### Install Caffe ###
-    git submodule init && git submodule update
+    git submodule update --init --recursive
     cd 3rdparty/caffe/
     # Select your desired Makefile file (run only one of the next 4 commands)
     cp Makefile.config.Ubuntu14_cuda7.example Makefile.config # Ubuntu 14, cuda 7

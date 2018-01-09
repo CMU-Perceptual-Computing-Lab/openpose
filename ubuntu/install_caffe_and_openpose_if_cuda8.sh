@@ -35,7 +35,7 @@ function executeShInItsFolder {
 
 
 
-git submodule init && git submodule update
+git submodule update --init --recursive
 executeShInItsFolder "install_caffe_if_cuda8.sh" "./3rdparty/caffe" "../.."
 exitIfError
 
