@@ -1,26 +1,26 @@
-#ifndef OPENPOSE_FILESTREAM_W_KEYPOINT_JSON_SAVER_HPP
-#define OPENPOSE_FILESTREAM_W_KEYPOINT_JSON_SAVER_HPP
+#ifndef OPENPOSE_FILESTREAM_W_PEOPLE_JSON_SAVER_HPP
+#define OPENPOSE_FILESTREAM_W_PEOPLE_JSON_SAVER_HPP
 
 #include <openpose/core/common.hpp>
-#include <openpose/filestream/keypointJsonSaver.hpp>
+#include <openpose/filestream/peopleJsonSaver.hpp>
 #include <openpose/thread/workerConsumer.hpp>
 
 namespace op
 {
     template<typename TDatums>
-    class WKeypointJsonSaver : public WorkerConsumer<TDatums>
+    class WPeopleJsonSaver : public WorkerConsumer<TDatums>
     {
     public:
-        explicit WKeypointJsonSaver(const std::shared_ptr<KeypointJsonSaver>& keypointJsonSaver);
+        explicit WPeopleJsonSaver(const std::shared_ptr<PeopleJsonSaver>& peopleJsonSaver);
 
         void initializationOnThread();
 
         void workConsumer(const TDatums& tDatums);
 
     private:
-        const std::shared_ptr<KeypointJsonSaver> spKeypointJsonSaver;
+        const std::shared_ptr<PeopleJsonSaver> spPeopleJsonSaver;
 
-        DELETE_COPY(WKeypointJsonSaver);
+        DELETE_COPY(WPeopleJsonSaver);
     };
 }
 
@@ -33,18 +33,18 @@ namespace op
 namespace op
 {
     template<typename TDatums>
-    WKeypointJsonSaver<TDatums>::WKeypointJsonSaver(const std::shared_ptr<KeypointJsonSaver>& keypointJsonSaver) :
-        spKeypointJsonSaver{keypointJsonSaver}
+    WPeopleJsonSaver<TDatums>::WPeopleJsonSaver(const std::shared_ptr<PeopleJsonSaver>& peopleJsonSaver) :
+        spPeopleJsonSaver{peopleJsonSaver}
     {
     }
 
     template<typename TDatums>
-    void WKeypointJsonSaver<TDatums>::initializationOnThread()
+    void WPeopleJsonSaver<TDatums>::initializationOnThread()
     {
     }
 
     template<typename TDatums>
-    void WKeypointJsonSaver<TDatums>::workConsumer(const TDatums& tDatums)
+    void WPeopleJsonSaver<TDatums>::workConsumer(const TDatums& tDatums)
     {
         try
         {
@@ -72,7 +72,7 @@ namespace op
                         std::make_pair(tDatum.handKeypoints[1], "hand_right_keypoints")
                     };
                     // Save keypoints
-                    spKeypointJsonSaver->save(keypointVector, fileName, humanReadable);
+                    spPeopleJsonSaver->save(keypointVector, tDatum.poseCandidates, fileName, humanReadable);
                 }
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
@@ -88,7 +88,7 @@ namespace op
         }
     }
 
-    COMPILE_TEMPLATE_DATUM(WKeypointJsonSaver);
+    COMPILE_TEMPLATE_DATUM(WPeopleJsonSaver);
 }
 
-#endif // OPENPOSE_FILESTREAM_W_KEYPOINT_JSON_SAVER_HPP
+#endif // OPENPOSE_FILESTREAM_W_PEOPLE_JSON_SAVER_HPP

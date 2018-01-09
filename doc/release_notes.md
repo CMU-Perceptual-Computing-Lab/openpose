@@ -33,9 +33,9 @@ OpenPose Library - Release Notes
     7. It prints out the error description before throwing the exception (so that it is written on the Windows cmd).
     8. Highly improved documentation.
 2. Functions or parameters renamed:
-    1. Flag `write_pose` renamed as `write_keypoint` and it also applies to face and/or hands.
-    2. Flag `write_pose_json` renamed as `write_keypoint_json` and it also applies to face and/or hands.
-    3. Flag `write_pose_format` renamed as `write_keypoint_format` and it also applies to face and/or hands.
+    1. Flag `--write_pose` renamed as `--write_keypoint` and it also applies to face and/or hands.
+    2. Flag `--write_pose_json` renamed as `--write_keypoint_json` and it also applies to face and/or hands.
+    3. Flag `--write_pose_format` renamed as `--write_keypoint_format` and it also applies to face and/or hands.
     4. PoseSaver and its JSON variant renamed as KeypointSaver.
     5. PoseJsonCocoSaver renamed as CocoJsonSaver.
 3. Main bugs fixed:
@@ -55,22 +55,22 @@ OpenPose Library - Release Notes
     7. Rendering threshold for pose, face and hands becomes user-configurable.
     8. Check() functions give more feedback.
     9. WCocoJsonSaver finished and removed its 3599-image limit.
-    10. Added `camera_fps` so generated video will use that frame rate.
+    10. Added `--camera_fps` so generated video will use that frame rate.
     11. Reduced the number of printed information messages. Default logging priority threshold increased to Priority::Max.
     12. Google flags to OpenPose configuration parameters reader moved from each demo to utilities/flagsToOpenPose.
     13. Nms classes do not use `numberParts` for `Reshape`, they deduce the value.
     14. Improved documentation.
 2. Functions or parameters renamed:
     1. Render flags renamed in the demo in order to incorporate the CPU/GPU rendering.
-    2. Keypoints saved in JSON files (`write_keypoint_json`) are now saved as `pose_keypoints`, `face_keypoints`, `hand_left_keypoints`, and `hand_right_keypoints`. They all were previously saved as `body_parts`.
-    3. Flag `num_scales` renamed as `scale_number`.
-    4. All hand and pose flags renamed such as they start by `hand_` and `face_` respectively.
+    2. Keypoints saved in JSON files (`--write_keypoint_json`) are now saved as `pose_keypoints`, `face_keypoints`, `hand_left_keypoints`, and `hand_right_keypoints`. They all were previously saved as `body_parts`.
+    3. Flag `--num_scales` renamed as `--scale_number`.
+    4. All hand and pose flags renamed such as they start by `--hand_` and `--face_` respectively.
 3. Main bugs fixed:
     1. Fixed bug in Array::getConstCvMat() if mVolume=0, now returning empty cv::Mat.
     2. Fixed bug: `--process_real_time` threw error with webcam.
     3. Fixed bug: Face not working when input and output resolutions are different.
     4. Fixed some bugs that prevented debug version to run.
-    5. Face saved in JSON files were called `body_parts`. Now they are called `face_keypoints`.
+    5. Face saved in JSON files were called `--body_parts`. Now they are called `--face_keypoints`.
 
 
 
@@ -129,14 +129,14 @@ OpenPose Library - Release Notes
     9. OpenPose successfully compiles if the flags `USE_CAFFE` and/or `USE_CUDA` are not enabled, although it will give an error saying they are required.
     10. COCO JSON file outputs 0 as score for non-detected keypoints.
     11. Added example for OpenPose for user asynchronous output and cleaned all `tutorial_wrapper/` examples.
-    12. Added `-1` option for `net_resolution` in order to auto-select the best possible aspect ratio given the user input.
+    12. Added `-1` option for `--net_resolution` in order to auto-select the best possible aspect ratio given the user input.
     13. Net resolution can be dynamically changed (e.g. for images with different size).
     14. Added example to add functionality/modules to OpenPose.
-    15. Added `disable_multi_thread` flag in order to allow debug and/or highly reduce the latency (e.g. when using webcam in real-time).
+    15. Added `--disable_multi_thread` flag in order to allow debug and/or highly reduce the latency (e.g. when using webcam in real-time).
     16. Allowed to output images without any rendering.
 2. Functions or parameters renamed:
     1. OpenPose able to change its size and initial size dynamically:
-        1. Flag `resolution` renamed as `output_resolution`.
+        1. Flag `--resolution` renamed as `--output_resolution`.
         2. FrameDisplayer, GuiInfoAdder and Gui constructors arguments modified (gui module).
         3. OpOutputToCvMat constructor removed (core module).
         4. New Renders classes to split GpuRenderers from CpuRenderers.
@@ -151,14 +151,17 @@ OpenPose Library - Release Notes
 
 
 
-## Current version (future OpenPose 1.3.0)
+## Current version (future OpenPose 1.2.1)
 1. Main improvements:
     1. Heatmaps can be saved in floating format.
-    2. More efficient non-processing version (i.e. if all keypoint extractors are disabled, and only image extraction and display/saving operations are performed).
-    3. Heat maps scaling: Added `heatmaps_scale` to OpenPoseDemo, added option not to scale the heatmaps, and added custom `float` format to save heatmaps in floating format.
+    2. More efficient non-processing version (i.e., if all keypoint extractors are disabled, and only image extraction and display/saving operations are performed).
+    3. Heat maps scaling: Added `--heatmaps_scale` to OpenPoseDemo, added option not to scale the heatmaps, and added custom `float` format to save heatmaps in floating format.
     4. Detector of the number of GPU also considers the initial GPU index given by the user.
+    5. Added `--write_json` as new version of `--write_keypoint_json`. It includes the body part candidates (if enabled), as well as any extra information added in the future (e.g. person ID).
+    6. Body part candidates can be retrieved in op::Datum and saved with `--write_json`.
 2. Functions or parameters renamed:
     1. `PoseParameters` splitted into `PoseParameters` and `PoseParametersRender` and const parameters turned into functions for more clarity.
 3. Main bugs fixed:
     1. Render working on images > 4K (#324).
     2. Cleaned redundant arguments on `getAverageScore` and `getKeypointsArea`.
+    3. Slight speed up when heatmaps must be returned to the user (not doing a double copy anymore).

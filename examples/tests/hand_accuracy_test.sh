@@ -11,10 +11,10 @@
         # Read that script for details about all the paths and change them for your own paths.
 
         # Careful:
-        # If you are using the NAS, please do not override my files, i.e. please change the output paths (corresponding to the ones indicated by `--write_keypoint_json`, which is ).
+        # If you are using the NAS, please do not override my files, i.e. please change the output paths (corresponding to the ones indicated by `--write_json`, which is ).
 
         # In order to generate the JSON output:
-        # Uncomment the commented lines starting by `--write_keypoint_json` and `--no_display`
+        # Uncomment the commented lines starting by `--write_json` and `--no_display`
 
     # Step 2 - Running JSON output to get accuracy
         # Once you have the JSON files, run them with the script Tomas prepared for it, which in my case I use:
@@ -32,12 +32,12 @@ HAND_TESTING_FOLDER="/media/posefs3b/Users/gines/openpose_train/dataset/hand_tes
 IMAGES_FOLDER=${HAND_TESTING_FOLDER}"0_images/"
 IMAGES_BB_FOLDER=${HAND_TESTING_FOLDER}"3_images_bounding_box"
 HAND_GROUND_TRUTH_FOLDER=${HAND_TESTING_FOLDER}"4_hand_detections"
-KEYPOINT_JSON_FOLDER=${HAND_TESTING_FOLDER}"5_keypointJson/"
+PEOPLE_JSON_FOLDER=${HAND_TESTING_FOLDER}"5_keypointJson/"
 
 # Variable paths
 SCALES=6
 SUFFIX="_${SCALES}"
-HAND_RESULTS_FOLDER_BASE=${KEYPOINT_JSON_FOLDER}"hand_keypoints_estimated"
+HAND_RESULTS_FOLDER_BASE=${PEOPLE_JSON_FOLDER}"hand_keypoints_estimated"
 HAND_RESULTS_FOLDER_NO_BB=${HAND_RESULTS_FOLDER_BASE}"_old"${SUFFIX}
 HAND_RESULTS_FOLDER_BB=${HAND_RESULTS_FOLDER_BASE}"_BBox"${SUFFIX}
 HAND_RESULTS_FOLDER_BODY_59=${HAND_RESULTS_FOLDER_BASE}"_BODY_59"
@@ -52,7 +52,7 @@ rm -rf $HAND_RESULTS_FOLDER_BB
     --hand_scale_number ${SCALES} --hand_scale_range 0.4 \
     --image_dir ${IMAGES_BB_FOLDER} \
     --hand_ground_truth ${HAND_GROUND_TRUTH_FOLDER} \
-    --write_keypoint_json $HAND_RESULTS_FOLDER_BB \
+    --write_json $HAND_RESULTS_FOLDER_BB \
     --no_display
 
 
@@ -65,7 +65,7 @@ rm -rf $HAND_RESULTS_FOLDER_NO_BB
     --hand \
     --hand_scale_number ${SCALES} --hand_scale_range 0.4 \
     --image_dir ${IMAGES_FOLDER} \
-    --write_keypoint_json $HAND_RESULTS_FOLDER_NO_BB \
+    --write_json $HAND_RESULTS_FOLDER_NO_BB \
     --no_display
 
 
@@ -77,5 +77,5 @@ rm -rf $HAND_RESULTS_FOLDER_BODY_59
 ./build/examples/openpose/openpose.bin \
     --model_pose BODY_59 \
     --image_dir ${IMAGES_FOLDER} \
-    --write_keypoint_json $HAND_RESULTS_FOLDER_BODY_59 \
+    --write_json $HAND_RESULTS_FOLDER_BODY_59 \
     --no_display

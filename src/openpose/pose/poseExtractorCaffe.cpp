@@ -131,8 +131,9 @@ namespace op
 
     PoseExtractorCaffe::PoseExtractorCaffe(const PoseModel poseModel, const std::string& modelFolder,
                                            const int gpuId, const std::vector<HeatMapType>& heatMapTypes,
-                                           const ScaleMode heatMapScale, const bool enableGoogleLogging) :
-        PoseExtractor{poseModel, heatMapTypes, heatMapScale}
+                                           const ScaleMode heatMapScale, const bool addPartCandidates,
+                                           const bool enableGoogleLogging) :
+        PoseExtractor{poseModel, heatMapTypes, heatMapScale, addPartCandidates}
         #ifdef USE_CAFFE
         , upImpl{new ImplPoseExtractorCaffe{poseModel, gpuId, modelFolder, enableGoogleLogging}}
         #endif
@@ -148,6 +149,7 @@ namespace op
                 UNUSED(gpuId);
                 UNUSED(heatMapTypes);
                 UNUSED(heatMapScale);
+                UNUSED(addPartCandidates);
                 error("OpenPose must be compiled with the `USE_CAFFE` macro definition in order to use this"
                       " functionality.", __LINE__, __FUNCTION__, __FILE__);
             #endif
@@ -297,6 +299,42 @@ namespace op
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    const float* PoseExtractorCaffe::getCandidatesCpuConstPtr() const
+    {
+        try
+        {
+            #ifdef USE_CAFFE
+                checkThread();
+                return upImpl->spPeaksBlob->cpu_data();
+            #else
+                return nullptr;
+            #endif
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return nullptr;
+        }
+    }
+
+    const float* PoseExtractorCaffe::getCandidatesGpuConstPtr() const
+    {
+        try
+        {
+            #ifdef USE_CAFFE
+                checkThread();
+                return upImpl->spPeaksBlob->gpu_data();
+            #else
+                return nullptr;
+            #endif
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return nullptr;
         }
     }
 

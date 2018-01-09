@@ -26,7 +26,7 @@ namespace op
                        const WrapperStructHand& wrapperStructHand,
                        const std::shared_ptr<Producer>& producerSharedPtr,
                        const std::string& handGroundTruth,
-                       const std::string& writeKeypointJson,
+                       const std::string& writeJson,
                        const bool displayGui = false);
 
         /**
@@ -119,7 +119,7 @@ namespace op
                                                                       const WrapperStructHand& wrapperStructHand,
                                                                       const std::shared_ptr<Producer>& producerSharedPtr,
                                                                       const std::string& handGroundTruth,
-                                                                      const std::string& writeKeypointJson,
+                                                                      const std::string& writeJson,
                                                                       const bool displayGui)
     {
         try
@@ -134,7 +134,7 @@ namespace op
                 error("The scale gap must be greater than 0 (it has no effect if the number of scales is 1).", __LINE__, __FUNCTION__, __FILE__);
             const std::string additionalMessage = " You could also set mThreadManagerMode = mThreadManagerMode::Asynchronous(Out) and/or add your own"
                                                   " output worker class before calling this function.";
-            const auto savingSomething = !writeKeypointJson.empty();
+            const auto savingSomething = !writeJson.empty();
             if (!displayGui && !savingSomething)
             {
                 const auto message = "No output is selected (`no_display`) and no results are generated (no `write_X` flags enabled). Thus,"
@@ -157,7 +157,7 @@ namespace op
             }
 
             // Proper format
-            const auto writeKeypointJsonCleaned = formatAsDirectory(writeKeypointJson);
+            const auto writeJsonCleaned = formatAsDirectory(writeJson);
 
             // Common parameters
             const auto finalOutputSize = wrapperStructPose.outputSize;
@@ -243,10 +243,10 @@ namespace op
 
             mOutputWs.clear();
             // Write people pose data on disk (json format)
-            if (!writeKeypointJsonCleaned.empty())
+            if (!writeJsonCleaned.empty())
             {
-                const auto keypointJsonSaver = std::make_shared<KeypointJsonSaver>(writeKeypointJsonCleaned);
-                mOutputWs.emplace_back(std::make_shared<WKeypointJsonSaver<TDatumsPtr>>(keypointJsonSaver));
+                const auto jsonSaver = std::make_shared<PeopleJsonSaver>(writeJsonCleaned);
+                mOutputWs.emplace_back(std::make_shared<WPeopleJsonSaver<TDatumsPtr>>(jsonSaver));
             }
             // Minimal graphical user interface (GUI)
             spWGui = nullptr;

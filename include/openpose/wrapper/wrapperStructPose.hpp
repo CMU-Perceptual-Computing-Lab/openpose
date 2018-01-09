@@ -134,6 +134,12 @@ namespace op
         ScaleMode heatMapScale;
 
         /**
+         * Whether to add the body part candidates.
+         * Candidates refer to all the detected body parts, before being assembled into people.
+         */
+        bool addPartCandidates;
+
+        /**
          * Rendering threshold. Only estimated keypoints whose score confidences are higher than this value will be
          * rendered. Generally, a high threshold (> 0.5) will only render very clear body parts; while small thresholds
          * (~0.1) will also output guessed and occluded keypoints, but also more false positives (i.e. wrong
@@ -170,7 +176,7 @@ namespace op
                           const float alphaHeatMap = POSE_DEFAULT_ALPHA_HEAT_MAP,
                           const int defaultPartToRender = 0, const std::string& modelFolder = "models/",
                           const std::vector<HeatMapType>& heatMapTypes = {},
-                          const ScaleMode heatMapScale = ScaleMode::ZeroToOne,
+                          const ScaleMode heatMapScale = ScaleMode::ZeroToOne, const bool addPartCandidates = false,
                           const float renderThreshold = 0.05f, const bool enableGoogleLogging = true,
                           const bool identification = false);
     };

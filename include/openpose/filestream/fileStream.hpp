@@ -36,12 +36,15 @@ namespace op
                             const DataFormat format);
 
     // Json - Saving as *.json not available in OpenCV verions < 3.0, this function is a quick fix
-    OP_API void saveKeypointsJson(const Array<float>& keypoints, const std::string& keypointName,
-                                  const std::string& fileName, const bool humanReadable);
+    OP_API void savePeopleJson(const Array<float>& keypoints,
+                               const std::vector<std::vector<std::array<float,3>>>& candidates,
+                               const std::string& keypointName, const std::string& fileName,
+                               const bool humanReadable);
 
     // It will save a bunch of Array<float> elements
-    OP_API void saveKeypointsJson(const std::vector<std::pair<Array<float>, std::string>>& keypointVector,
-                                  const std::string& fileName, const bool humanReadable);
+    OP_API void savePeopleJson(const std::vector<std::pair<Array<float>, std::string>>& keypointVector,
+                               const std::vector<std::vector<std::array<float,3>>>& candidates,
+                               const std::string& fileName, const bool humanReadable);
 
     // Save/load image
     OP_API void saveImage(const cv::Mat& cvMat, const std::string& fullFilePath,

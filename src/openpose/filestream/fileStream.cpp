@@ -42,6 +42,109 @@ namespace op
         return fileNameNoExtension + "." + dataFormatToString(format);
     }
 
+    void addKeypointsToJson(JsonOfstream& jsonOfstream,
+                            const std::vector<std::pair<Array<float>, std::string>>& keypointVector)
+    {
+        try
+        {
+            // Security checks
+            for (const auto& keypointPair : keypointVector)
+                if (!keypointPair.first.empty() && keypointPair.first.getNumberDimensions() != 3 )
+                    error("keypointVector.getNumberDimensions() != 3.", __LINE__, __FUNCTION__, __FILE__);
+            // Add people keypoints
+            jsonOfstream.key("people");
+            jsonOfstream.arrayOpen();
+            // Ger max numberPeople
+            auto numberPeople = 0;
+            for (auto vectorIndex = 0u ; vectorIndex < keypointVector.size() ; vectorIndex++)
+                numberPeople = fastMax(numberPeople, keypointVector[vectorIndex].first.getSize(0));
+            for (auto person = 0 ; person < numberPeople ; person++)
+            {
+                jsonOfstream.objectOpen();
+                for (auto vectorIndex = 0u ; vectorIndex < keypointVector.size() ; vectorIndex++)
+                {
+                    const auto& keypoints = keypointVector[vectorIndex].first;
+                    const auto& keypointName = keypointVector[vectorIndex].second;
+                    const auto numberBodyParts = keypoints.getSize(1);
+                    jsonOfstream.key(keypointName);
+                    jsonOfstream.arrayOpen();
+                    // Body parts
+                    for (auto bodyPart = 0 ; bodyPart < numberBodyParts ; bodyPart++)
+                    {
+                        const auto finalIndex = 3*(person*numberBodyParts + bodyPart);
+                        jsonOfstream.plainText(keypoints[finalIndex]);
+                        jsonOfstream.comma();
+                        jsonOfstream.plainText(keypoints[finalIndex+1]);
+                        jsonOfstream.comma();
+                        jsonOfstream.plainText(keypoints[finalIndex+2]);
+                        if (bodyPart < numberBodyParts-1)
+                            jsonOfstream.comma();
+                    }
+                    jsonOfstream.arrayClose();
+                    if (vectorIndex < keypointVector.size()-1)
+                        jsonOfstream.comma();
+                }
+                jsonOfstream.objectClose();
+                if (person < numberPeople-1)
+                {
+                    jsonOfstream.comma();
+                    jsonOfstream.enter();
+                }
+            }
+            // Close bodies array
+            jsonOfstream.arrayClose();
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    void addCandidatesToJson(JsonOfstream& jsonOfstream,
+                             const std::vector<std::vector<std::array<float,3>>>& candidates)
+    {
+        try
+        {
+            // Add body part candidates
+            jsonOfstream.key("part_candidates");
+            jsonOfstream.arrayOpen();
+            // Ger max numberParts
+            auto numberParts = candidates.size();
+            jsonOfstream.objectOpen();
+            for (auto part = 0u ; part < numberParts ; part++)
+            {
+                // Open array
+                jsonOfstream.key(std::to_string(part));
+                jsonOfstream.arrayOpen();
+                // Iterate over part candidates
+                const auto& partCandidates = candidates[part];
+                const auto numberPartCandidates = partCandidates.size();
+                // Body part candidates
+                for (auto bodyPart = 0u ; bodyPart < numberPartCandidates ; bodyPart++)
+                {
+                    const auto& candidate = partCandidates[bodyPart];
+                    jsonOfstream.plainText(candidate[0]);
+                    jsonOfstream.comma();
+                    jsonOfstream.plainText(candidate[1]);
+                    jsonOfstream.comma();
+                    jsonOfstream.plainText(candidate[2]);
+                    if (bodyPart < numberPartCandidates-1)
+                        jsonOfstream.comma();
+                }
+                jsonOfstream.arrayClose();
+                if (part < numberParts-1)
+                    jsonOfstream.comma();
+            }
+            jsonOfstream.objectClose();
+            // Close array
+            jsonOfstream.arrayClose();
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
 
 
 
@@ -171,13 +274,15 @@ namespace op
         }
     }
 
-    void saveKeypointsJson(const Array<float>& keypoints, const std::string& keypointName, const std::string& fileName,
-                           const bool humanReadable)
+    void savePeopleJson(const Array<float>& keypoints,
+                        const std::vector<std::vector<std::array<float,3>>>& candidates,
+                        const std::string& keypointName, const std::string& fileName,
+                        const bool humanReadable)
     {
         try
         {
-            saveKeypointsJson(
-                std::vector<std::pair<Array<float>, std::string>>{std::make_pair(keypoints, keypointName)},
+            savePeopleJson(
+                std::vector<std::pair<Array<float>, std::string>>{std::make_pair(keypoints, keypointName)}, candidates,
                 fileName, humanReadable
             );
         }
@@ -187,8 +292,9 @@ namespace op
         }
     }
 
-    void saveKeypointsJson(const std::vector<std::pair<Array<float>, std::string>>& keypointVector,
-                           const std::string& fileName, const bool humanReadable)
+    void savePeopleJson(const std::vector<std::pair<Array<float>, std::string>>& keypointVector,
+                        const std::vector<std::vector<std::array<float,3>>>& candidates,
+                        const std::string& fileName, const bool humanReadable)
     {
         try
         {
@@ -199,52 +305,17 @@ namespace op
             // Record frame on desired path
             JsonOfstream jsonOfstream{fileName, humanReadable};
             jsonOfstream.objectOpen();
-            // Version
-            jsonOfstream.key("version");
-            jsonOfstream.plainText("1.0");
+            // Add version
+            jsonOfstream.version("1.1");
             jsonOfstream.comma();
-            // Bodies
-            jsonOfstream.key("people");
-            jsonOfstream.arrayOpen();
-            // Ger max numberPeople
-            auto numberPeople = 0;
-            for (auto vectorIndex = 0u ; vectorIndex < keypointVector.size() ; vectorIndex++)
-                numberPeople = fastMax(numberPeople, keypointVector[vectorIndex].first.getSize(0));
-            for (auto person = 0 ; person < numberPeople ; person++)
+            // Add people keypoints
+            addKeypointsToJson(jsonOfstream, keypointVector);
+            // Add body part candidates
+            if (!candidates.empty())
             {
-                jsonOfstream.objectOpen();
-                for (auto vectorIndex = 0u ; vectorIndex < keypointVector.size() ; vectorIndex++)
-                {
-                    const auto& keypoints = keypointVector[vectorIndex].first;
-                    const auto& keypointName = keypointVector[vectorIndex].second;
-                    const auto numberBodyParts = keypoints.getSize(1);
-                    jsonOfstream.key(keypointName);
-                    jsonOfstream.arrayOpen();
-                    // Body parts
-                    for (auto bodyPart = 0 ; bodyPart < numberBodyParts ; bodyPart++)
-                    {
-                        const auto finalIndex = 3*(person*numberBodyParts + bodyPart);
-                        jsonOfstream.plainText(keypoints[finalIndex]);
-                        jsonOfstream.comma();
-                        jsonOfstream.plainText(keypoints[finalIndex+1]);
-                        jsonOfstream.comma();
-                        jsonOfstream.plainText(keypoints[finalIndex+2]);
-                        if (bodyPart < numberBodyParts-1)
-                            jsonOfstream.comma();
-                    }
-                    jsonOfstream.arrayClose();
-                    if (vectorIndex < keypointVector.size()-1)
-                        jsonOfstream.comma();
-                }
-                jsonOfstream.objectClose();
-                if (person < numberPeople-1)
-                {
-                    jsonOfstream.comma();
-                    jsonOfstream.enter();
-                }
+                jsonOfstream.comma();
+                addCandidatesToJson(jsonOfstream, candidates);
             }
-            // Close array
-            jsonOfstream.arrayClose();
             // Close object
             jsonOfstream.objectClose();
         }

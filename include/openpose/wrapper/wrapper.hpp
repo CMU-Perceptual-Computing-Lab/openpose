@@ -456,14 +456,14 @@ namespace op
                       __LINE__, __FUNCTION__, __FILE__);
             if (!renderOutput && (!wrapperStructOutput.writeImages.empty() || !wrapperStructOutput.writeVideo.empty()))
             {
-                const auto message = "In order to save the rendered frames (`write_images` or `write_video`), you"
-                                     " cannot disable `render_pose`.";
+                const auto message = "In order to save the rendered frames (`--write_images` or `--write_video`), you"
+                                     " cannot disable `--render_pose`.";
                 log(message, Priority::High);
             }
             if (!wrapperStructOutput.writeHeatMaps.empty() && wrapperStructPose.heatMapTypes.empty())
             {
-                const auto message = "In order to save the heatmaps (`write_heatmaps`), you need to pick which heat"
-                                     " maps you want to save: `heatmaps_add_X` flags or fill the"
+                const auto message = "In order to save the heatmaps (`--write_heatmaps`), you need to pick which heat"
+                                     " maps you want to save: `--heatmaps_add_X` flags or fill the"
                                      " wrapperStructPose.heatMapTypes.";
                 error(message, __LINE__, __FUNCTION__, __FILE__);
             }
@@ -473,7 +473,7 @@ namespace op
             {
                 const auto message = "In order to save the heatmaps, you must either set"
                                      " wrapperStructPose.heatMapScale to ScaleMode::UnsignedChar (i.e. range [0, 255])"
-                                     " or `write_heatmaps_format` to `float` to storage floating numbers in binary"
+                                     " or `--write_heatmaps_format` to `float` to storage floating numbers in binary"
                                      " mode.";
                 error(message, __LINE__, __FUNCTION__, __FILE__);
             }
@@ -486,30 +486,30 @@ namespace op
                 };
                 const auto savingSomething = (
                     !wrapperStructOutput.writeImages.empty() || !wrapperStructOutput.writeVideo.empty()
-                        || !wrapperStructOutput.writeKeypoint.empty() || !wrapperStructOutput.writeKeypointJson.empty()
+                        || !wrapperStructOutput.writeKeypoint.empty() || !wrapperStructOutput.writeJson.empty()
                         || !wrapperStructOutput.writeCocoJson.empty() || !wrapperStructOutput.writeHeatMaps.empty()
                 );
                 if (!wrapperStructOutput.displayGui && !savingSomething)
                 {
-                    const auto message = "No output is selected (`no_display`) and no results are generated (no"
-                                         " `write_X` flags enabled). Thus, no output would be generated."
+                    const auto message = "No output is selected (`--no_display`) and no results are generated (no"
+                                         " `--write_X` flags enabled). Thus, no output would be generated."
                                          + additionalMessage;
                     error(message, __LINE__, __FUNCTION__, __FILE__);
                 }
                 if (wrapperStructInput.framesRepeat && savingSomething)
                 {
-                    const auto message = "Frames repetition (`frames_repeat`) is enabled as well as some writing"
-                                         " function (`write_X`). This program would never stop recording the same"
+                    const auto message = "Frames repetition (`--frames_repeat`) is enabled as well as some writing"
+                                         " function (`--write_X`). This program would never stop recording the same"
                                          " frames over and over. Please, disable repetition or remove writing.";
                     error(message, __LINE__, __FUNCTION__, __FILE__);
                 }
                 // Warnings
                 if ((wrapperStructOutput.displayGui && wrapperStructOutput.guiVerbose) && !renderOutput)
                 {
-                    const auto message = "No render is enabled (e.g. `render_pose 0`), so you might also want to"
-                                         " remove the display (set `no_display` or `no_gui_verbose`). If you simply"
-                                         " want to use OpenPose to record video/images without keypoints, you only"
-                                         " need to set `num_gpu 0`." + additionalMessage;
+                    const auto message = "No render is enabled (e.g. `--render_pose 0`), so you might also want to"
+                                         " remove the display (set `--no_display` or `--no_gui_verbose`). If you"
+                                         " simply want to use OpenPose to record video/images without keypoints, you"
+                                         " only need to set `--num_gpu 0`." + additionalMessage;
                     log(message, Priority::High);
                 }
                 if (wrapperStructInput.realTimeProcessing && savingSomething)
@@ -541,8 +541,8 @@ namespace op
                 // Get total number GPUs
                 const auto totalGpuNumber = getGpuNumber();
                 if (totalGpuNumber <= gpuNumberStart)
-                    error("Number of initial GPUs (`number_gpu_start`) must be lower than the total number of used"
-                          " GPUs (`number_gpu`)", __LINE__, __FUNCTION__, __FILE__);
+                    error("Number of initial GPUs (`--number_gpu_start`) must be lower than the total number of used"
+                          " GPUs (`--number_gpu`)", __LINE__, __FUNCTION__, __FILE__);
                 gpuNumber = totalGpuNumber - gpuNumberStart;
                 // Reset initial GPU to 0 (we want them all)
                 // Logging message
@@ -554,7 +554,7 @@ namespace op
             // Proper format
             const auto writeImagesCleaned = formatAsDirectory(wrapperStructOutput.writeImages);
             const auto writeKeypointCleaned = formatAsDirectory(wrapperStructOutput.writeKeypoint);
-            const auto writeKeypointJsonCleaned = formatAsDirectory(wrapperStructOutput.writeKeypointJson);
+            const auto writeJsonCleaned = formatAsDirectory(wrapperStructOutput.writeJson);
             const auto writeHeatMapsCleaned = formatAsDirectory(wrapperStructOutput.writeHeatMaps);
             const auto modelFolder = formatAsDirectory(wrapperStructPose.modelFolder);
 
@@ -623,7 +623,7 @@ namespace op
                         poseExtractors.emplace_back(std::make_shared<PoseExtractorCaffe>(
                             wrapperStructPose.poseModel, modelFolder, gpuId + gpuNumberStart,
                             wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale,
-                            wrapperStructPose.enableGoogleLogging
+                            wrapperStructPose.addPartCandidates, wrapperStructPose.enableGoogleLogging
                         ));
 
                     // Pose renderers
@@ -875,11 +875,12 @@ namespace op
                 if (wrapperStructHand.enable)
                     mOutputWs.emplace_back(std::make_shared<WHandSaver<TDatumsPtr>>(keypointSaver));
             }
-            // Write people pose data on disk (json format)
-            if (!writeKeypointJsonCleaned.empty())
+            // Write OpenPose output data on disk in json format (body/hand/face keypoints, body part locations if
+            // enabled, etc.)
+            if (!writeJsonCleaned.empty())
             {
-                const auto keypointJsonSaver = std::make_shared<KeypointJsonSaver>(writeKeypointJsonCleaned);
-                mOutputWs.emplace_back(std::make_shared<WKeypointJsonSaver<TDatumsPtr>>(keypointJsonSaver));
+                const auto peopleJsonSaver = std::make_shared<PeopleJsonSaver>(writeJsonCleaned);
+                mOutputWs.emplace_back(std::make_shared<WPeopleJsonSaver<TDatumsPtr>>(peopleJsonSaver));
             }
             // Write people pose data on disk (COCO validation json format)
             if (!wrapperStructOutput.writeCocoJson.empty())
@@ -1239,7 +1240,7 @@ namespace op
                     if (spWPoses.size() > 1)
                         log("Multi-threading disabled, only 1 thread running. All GPUs have been disabled but the"
                             " first one, which is defined by gpuNumberStart (e.g. in the OpenPose demo, it is set"
-                            " with the `num_gpu_start` flag).", Priority::High);
+                            " with the `--num_gpu_start` flag).", Priority::High);
                     mThreadManager.add(mThreadId, spWPoses.at(0), queueIn, queueOut);
                 }
                 queueIn++;

@@ -85,7 +85,7 @@ namespace op
 
         /**
          * Body pose heatmaps (body parts, background and/or PAFs) for the whole image.
-         * This parameters is by default empty and disabled for performance. Each group (body parts, background and
+         * This parameter is by default empty and disabled for performance. Each group (body parts, background and
          * PAFs) can be individually enabled.
          * #heatmaps = #body parts (if enabled) + 1 (if background enabled) + 2 x #PAFs (if enabled). Each PAF has 2
          * consecutive channels, one for x- and one for y-coordinates.
@@ -96,6 +96,17 @@ namespace op
          * Size: #heatmaps x output_net_height x output_net_width
          */
         Array<float> poseHeatMaps;
+
+        /**
+         * Body pose candidates for the whole image.
+         * This parameter is by default empty and disabled for performance. It can be enabled with `candidates_body`.
+         * Candidates refer to all the detected body parts, before being assembled into people. Note that the number
+         * of candidates is equal or higher than the number of body parts after being assembled into people.
+         * Size: #body parts x min(part candidates, POSE_MAX_PEOPLE) x 3 (x,y,score).
+         * Rather than vector, it should ideally be:
+         * std::array<std::vector<std::array<float,3>>, #BP> poseCandidates;
+         */
+        std::vector<std::vector<std::array<float,3>>> poseCandidates;
 
         /**
          * Face detection locations (x,y,width,height) for each person in the image.
@@ -140,7 +151,7 @@ namespace op
          */
         std::array<Array<float>, 2> handHeatMaps;
 
-        // ---------------------------------------- Other parameters ---------------------------------------- //
+        // ---------------------------------------- Other (internal) parameters ---------------------------------------- //
         /**
          * Scale ratio between the input Datum::cvInputData and the net input size.
          */

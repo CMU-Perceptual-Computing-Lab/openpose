@@ -151,15 +151,15 @@
     <ClInclude Include="..\..\include\openpose\filestream\heatMapSaver.hpp" />
     <ClInclude Include="..\..\include\openpose\filestream\imageSaver.hpp" />
     <ClInclude Include="..\..\include\openpose\filestream\jsonOfstream.hpp" />
-    <ClInclude Include="..\..\include\openpose\filestream\keypointJsonSaver.hpp" />
     <ClInclude Include="..\..\include\openpose\filestream\keypointSaver.hpp" />
+    <ClInclude Include="..\..\include\openpose\filestream\peopleJsonSaver.hpp" />
     <ClInclude Include="..\..\include\openpose\filestream\videoSaver.hpp" />
     <ClInclude Include="..\..\include\openpose\filestream\wCocoJsonSaver.hpp" />
     <ClInclude Include="..\..\include\openpose\filestream\wFaceSaver.hpp" />
     <ClInclude Include="..\..\include\openpose\filestream\wHandSaver.hpp" />
     <ClInclude Include="..\..\include\openpose\filestream\wHeatMapSaver.hpp" />
     <ClInclude Include="..\..\include\openpose\filestream\wImageSaver.hpp" />
-    <ClInclude Include="..\..\include\openpose\filestream\wKeypointJsonSaver.hpp" />
+    <ClInclude Include="..\..\include\openpose\filestream\wPeopleJsonSaver.hpp" />
     <ClInclude Include="..\..\include\openpose\filestream\wPoseSaver.hpp" />
     <ClInclude Include="..\..\include\openpose\filestream\wVideoSaver.hpp" />
     <ClInclude Include="..\..\include\openpose\gui\enumClasses.hpp" />
@@ -290,8 +290,8 @@
     <ClCompile Include="..\..\src\openpose\filestream\heatMapSaver.cpp" />
     <ClCompile Include="..\..\src\openpose\filestream\imageSaver.cpp" />
     <ClCompile Include="..\..\src\openpose\filestream\jsonOfstream.cpp" />
-    <ClCompile Include="..\..\src\openpose\filestream\keypointJsonSaver.cpp" />
     <ClCompile Include="..\..\src\openpose\filestream\keypointSaver.cpp" />
+    <ClCompile Include="..\..\src\openpose\filestream\peopleJsonSaver.cpp" />
     <ClCompile Include="..\..\src\openpose\filestream\videoSaver.cpp" />
     <ClCompile Include="..\..\src\openpose\gui\defineTemplates.cpp" />
     <ClCompile Include="..\..\src\openpose\gui\frameDisplayer.cpp" />
