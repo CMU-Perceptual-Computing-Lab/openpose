@@ -63,7 +63,7 @@ namespace op
 
     template <typename T>
     void NmsCaffe<T>::Reshape(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top,
-                              const int maxPeaks)
+                              const int maxPeaks, const int outputChannels)
     {
         try
         {
@@ -76,7 +76,7 @@ namespace op
 
                 // Top shape
                 std::vector<int> topShape{bottomShape};
-                topShape[1] = bottomShape[1]-1; // Number parts + bck - 1
+                topShape[1] = (outputChannels > 0 ? outputChannels : bottomShape[1]);
                 topShape[2] = maxPeaks+1; // # maxPeaks + 1
                 topShape[3] = 3;  // X, Y, score
                 topBlob->Reshape(topShape);

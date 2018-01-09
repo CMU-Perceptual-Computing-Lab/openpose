@@ -84,7 +84,8 @@ namespace op
                 resizeAndMergeCaffe->Reshape(caffeNetOutputBlobs, {heatMapsBlob.get()},
                                              getPoseNetDecreaseFactor(poseModel), 1.f/scaleInputToNetInput);
                 // Pose extractor blob and layer
-                nmsCaffe->Reshape({heatMapsBlob.get()}, {peaksBlob.get()}, getPoseMaxPeaks(poseModel));
+                nmsCaffe->Reshape({heatMapsBlob.get()}, {peaksBlob.get()}, getPoseMaxPeaks(poseModel),
+                                  getPoseNumberBodyParts(poseModel));
                 // Pose extractor blob and layer
                 bodyPartConnectorCaffe->Reshape({heatMapsBlob.get(), peaksBlob.get()});
                 // Cuda check

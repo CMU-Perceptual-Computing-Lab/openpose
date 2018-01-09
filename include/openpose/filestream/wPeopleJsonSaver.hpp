@@ -58,7 +58,7 @@ namespace op
                 const auto& tDatumFirst = (*tDatums)[0];
                 const auto baseFileName = (!tDatumFirst.name.empty() ? tDatumFirst.name
                                             : std::to_string(tDatumFirst.id)) + "_keypoints";
-                const bool humanReadable = true;
+                const bool humanReadable = false;
                 for (auto i = 0u ; i < tDatums->size() ; i++)
                 {
                     const auto& tDatum = (*tDatums)[i];
