@@ -1,4 +1,4 @@
-cuda_add_library(openpose_core
+list(APPEND SOURCES
     array.cpp
     cvMatToOpInput.cpp
     cvMatToOpOutput.cpp
@@ -20,12 +20,19 @@ cuda_add_library(openpose_core
     resizeAndMergeBase.cpp
     resizeAndMergeBase.cu
     resizeAndMergeCaffe.cpp
-    scaleAndSizeExtractor.cpp)
+    scaleAndSizeExtractor.cpp
+)
+
+if (${GPU_MODE} MATCHES "CUDA")
+    cuda_add_library(openpose_core ${SOURCES})
+else()
+    add_library(openpose_core ${SOURCES})
+endif ()
 
 add_library(caffe SHARED IMPORTED)
 set_property(TARGET caffe PROPERTY IMPORTED_LOCATION ${Caffe_LIBS})
 
-target_link_libraries(openpose_core caffe)
+target_link_libraries(openpose_core caffe ${MKL_LIBS})
 
 if (BUILD_CAFFE)
   add_dependencies(openpose_core openpose_caffe)

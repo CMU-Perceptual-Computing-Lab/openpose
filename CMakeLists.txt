@@ -1,6 +1,15 @@
 project(OpenPose)
 cmake_minimum_required(VERSION 2.8.7 FATAL_ERROR) # min. cmake version recommended by Caffe
 
+message("**********HACK ADDED************")
+set(MKL_LIBS
+    "/home/ryaadhav/openpose_fix/3rdparty/caffe/external/mkl/mklml_lnx_2018.0.1.20171007/lib/libiomp5.so"
+    "/home/ryaadhav/openpose_fix/3rdparty/caffe/external/mkl/mklml_lnx_2018.0.1.20171007/lib/libmklml_intel.so"
+    "/home/ryaadhav/openpose_fix/3rdparty/caffe/external/mkldnn/install/lib/libmkldnn.so.0"
+    "/home/ryaadhav/openpose_fix/3rdparty/caffe/external/mkldnn/install/lib/libmkldnn.so"
+    "/home/ryaadhav/openpose_fix/3rdparty/caffe/external/mkldnn/install/lib/libmkldnn.so.0.11.0"
+    )
+
 ### VERSION INFO
 
 set(OpenPose_VERSION_MAJOR 1)
@@ -53,14 +62,16 @@ endif (${DL_FRAMEWORK} MATCHES "CAFFE")
 
 # Set the acceleration library
 set(GPU_MODE CUDA CACHE STRING "Select the acceleration GPU library or CPU otherwise.")
-set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA)
-# set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA OPENCL CPU_ONLY)
+#set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA)
+set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA OPENCL CPU_ONLY)
 if (${GPU_MODE} MATCHES "CUDA")
   # OpenPose flags
   add_definitions(-DUSE_CUDA)
+  message("Building with CUDA")
 elseif (${GPU_MODE} MATCHES "CPU_ONLY")
   # OpenPose flag for Caffe
   add_definitions(-DCPU_ONLY)
+  message("Building CPU Only")
 endif ()
 
 # Suboptions for GPU architectures
@@ -90,30 +101,38 @@ option(BUILD_SHARED_LIBS "Build as shared lib" ON)
 ### FIND REQUIRED PACKAGES
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
-include(cmake/Cuda.cmake)
-# find_package(CUDA)
+if (${GPU_MODE} MATCHES "CUDA")
+    include(cmake/Cuda.cmake)
+    # find_package(CUDA)
+    find_package(CuDNN)
+endif ()
 find_package(Boost COMPONENTS system filesystem)
-find_package(CuDNN)
 find_package(GFlags)
 find_package(Glog)
 find_package(OpenCV)
+
+#if (${GPU_MODE} MATCHES "CPU_ONLY")
+#    find_package(MKL REQUIRED)
+#endif ()
 
 if (NOT Boost_FOUND)
   message(FATAL_ERROR "Boost not found. Install Boost from the command line using the command(s) --\
       sudo apt-get install libboost-all-dev")
 endif (NOT Boost_FOUND)
 
-if (NOT CUDA_FOUND)
-  message(STATUS "CUDA not found.") 
-  execute_process(COMMAND cat install_cuda.sh WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/ubuntu)
-  message(FATAL_ERROR "Install CUDA using the above commands.")
-endif (NOT CUDA_FOUND)
+if (${GPU_MODE} MATCHES "CUDA")
+    if (NOT CUDA_FOUND)
+        message(STATUS "CUDA not found.")
+        execute_process(COMMAND cat install_cuda.sh WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/ubuntu)
+        message(FATAL_ERROR "Install CUDA using the above commands.")
+      endif (NOT CUDA_FOUND)
 
-if (USE_CUDNN AND NOT CUDNN_FOUND)
-  message(STATUS "cuDNN not found.") 
-  execute_process(COMMAND cat install_cudnn.sh WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/ubuntu)
-  message(FATAL_ERROR "Install cuDNN using the above commands. or turn off cuDNN by setting USE_CUDNN to OFF.")
-endif (USE_CUDNN AND NOT CUDNN_FOUND)
+    if (USE_CUDNN AND NOT CUDNN_FOUND)
+      message(STATUS "cuDNN not found.")
+      execute_process(COMMAND cat install_cudnn.sh WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/ubuntu)
+      message(FATAL_ERROR "Install cuDNN using the above commands. or turn off cuDNN by setting USE_CUDNN to OFF.")
+    endif (USE_CUDNN AND NOT CUDNN_FOUND)
+endif ()
 
 if (NOT GLOG_FOUND)
   message(FATAL_ERROR "Glog not found. Install Glog from the command line using the command(s) -\ 
@@ -157,8 +176,25 @@ if (${DL_FRAMEWORK} MATCHES "CAFFE")
     # Download Caffe
     message(STATUS "Caffe will be downloaded from source now. NOTE: This process might take several minutes depending
         on your internet connection.")
-    execute_process(COMMAND git submodule update --init --recursive)
-    
+
+    # Check if pulled
+    set(TEST_COMMAND "ls")
+    execute_process(COMMAND ${TEST_COMMAND} WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe RESULT_VARIABLE rv OUTPUT_QUIET)
+    if(rv)
+        execute_process(COMMAND git submodule update --init --recursive)
+    else()
+        message(STATUS "Caffe has already been downloaded")
+    endif()
+
+    set(CAFFE_CPU_ONLY OFF)
+    if (${GPU_MODE} MATCHES "CUDA")
+        execute_process(COMMAND git checkout master WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
+    elseif (${GPU_MODE} MATCHES "CPU_ONLY")
+        execute_process(COMMAND git checkout intel WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
+        set(CAFFE_CPU_ONLY ON)
+        set(USE_CUDNN OFF)
+    endif ()
+
     # Build Caffe
     message(STATUS "Caffe will be built from source now.")
     include(ExternalProject)
@@ -171,6 +207,8 @@ if (${DL_FRAMEWORK} MATCHES "CAFFE")
         CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR> 
             -DUSE_CUDNN=${USE_CUDNN}
             -DBUILD_python=OFF
+            -DCPU_ONLY=${CAFFE_CPU_ONLY}
+            -DCMAKE_BUILD_TYPE=Release
             -DOpenCV_DIR=${OpenCV_DIR})
 
     ExternalProject_Get_Property(openpose_caffe install_dir)
@@ -193,11 +231,14 @@ endif (${DL_FRAMEWORK} MATCHES "CAFFE")
 # Specify the include directories
 include_directories(
   ${CMAKE_SOURCE_DIR}/include
-  ${CUDA_INCLUDE_DIRS}
   ${GFLAGS_INCLUDE_DIR}
   ${GLOG_INCLUDE_DIR}
   ${Caffe_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS})
+if (${GPU_MODE} MATCHES "CUDA")
+    include_directories(
+        ${CUDA_INCLUDE_DIRS})
+endif ()
 
 ### ADD SUBDIRECTORIES
 

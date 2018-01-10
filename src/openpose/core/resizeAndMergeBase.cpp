@@ -28,6 +28,8 @@ namespace op
                       + std::to_string(sourcePtrs.size()) + " vs. " + std::to_string(sourceSizes.size()) + " vs. "
                       + std::to_string(scaleInputToNetInputs.size()) + ".", __LINE__, __FUNCTION__, __FILE__);
 
+            // TEST WITH SCALEINPUTTONETINPUTS
+
             // Params
             const auto nums = (signed)sourceSizes.size();
             const auto channels = targetSize[1]; // 57
@@ -96,6 +98,7 @@ namespace op
                         cv::Mat source(cv::Size(sourceWidth, sourceHeight), CV_32FC1, const_cast<T*>(&sourcePtr[c*sourceChannelOffset]));
                         cv::Mat target(cv::Size(targetWidth, targetHeight), CV_32FC1, (&tempTargetPtr[c*targetChannelOffset]));
                         cv::resize(source, target, {targetWidth, targetHeight}, 0, 0, CV_INTER_CUBIC);
+log(scaleFactor);
                         //cv::warpAffine(source, target, M, cv::Size(targetWidth, targetHeight),(scaleFactor < 1. ? cv::INTER_AREA : cv::INTER_CUBIC));
 
                         // Add

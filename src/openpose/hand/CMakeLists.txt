@@ -1,4 +1,4 @@
-set(SOURCES
+list(APPEND SOURCES
     defineTemplates.cpp
     handDetector.cpp
     handDetectorFromTxt.cpp
@@ -7,9 +7,15 @@ set(SOURCES
     handCpuRenderer.cpp
     handGpuRenderer.cpp
     renderHand.cpp
-    renderHand.cu)
+    renderHand.cu
+)
 
-cuda_add_library(openpose_hand ${SOURCES})
+if (${GPU_MODE} MATCHES "CUDA")
+    cuda_add_library(openpose_hand ${SOURCES})
+else()
+    add_library(openpose_hand ${SOURCES})
+endif ()
+
 if (BUILD_CAFFE)
   add_dependencies(openpose_hand openpose_caffe)
 endif (BUILD_CAFFE)

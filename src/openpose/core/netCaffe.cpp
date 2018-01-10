@@ -64,7 +64,9 @@ namespace op
             {
                 caffeNet->blobs()[0]->Reshape(dimensions);
                 caffeNet->Reshape();
-                cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+                #ifdef USE_CUDA
+                    cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+                #endif
             }
             catch (const std::exception& e)
             {
@@ -116,13 +118,17 @@ namespace op
                 #endif
                 upImpl->upCaffeNet.reset(new caffe::Net<float>{upImpl->mCaffeProto, caffe::TEST});
                 upImpl->upCaffeNet->CopyTrainedLayersFrom(upImpl->mCaffeTrainedModel);
-                cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+                #ifdef USE_CUDA
+                    cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+                #endif
                 // Set spOutputBlob
                 upImpl->spOutputBlob = upImpl->upCaffeNet->blob_by_name(upImpl->mLastBlobName);
                 if (upImpl->spOutputBlob == nullptr)
                     error("The output blob is a nullptr. Did you use the same name than the prototxt? (Used: "
                           + upImpl->mLastBlobName + ").", __LINE__, __FUNCTION__, __FILE__);
-                cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+                #ifdef USE_CUDA
+                    cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+                #endif
             #endif
         }
         catch (const std::exception& e)

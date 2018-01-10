@@ -1,4 +1,4 @@
-set(SOURCES
+list(APPEND SOURCES
     bodyPartConnectorBase.cpp
     bodyPartConnectorBase.cu
     bodyPartConnectorCaffe.cpp
@@ -11,9 +11,15 @@ set(SOURCES
     poseParametersRender.cpp
     poseRenderer.cpp
     renderPose.cpp
-    renderPose.cu)
+    renderPose.cu
+)
 
-cuda_add_library(openpose_pose ${SOURCES})
+if (${GPU_MODE} MATCHES "CUDA")
+    cuda_add_library(openpose_pose ${SOURCES})
+else()
+    add_library(openpose_pose ${SOURCES})
+endif ()
+
 if (BUILD_CAFFE)
   add_dependencies(openpose_pose openpose_caffe)
 endif (BUILD_CAFFE)

@@ -1,4 +1,4 @@
-set(SOURCES
+list(APPEND SOURCES
     defineTemplates.cpp
     faceDetector.cpp
     faceDetectorOpenCV.cpp
@@ -10,7 +10,12 @@ set(SOURCES
     renderFace.cu
 )
 
-cuda_add_library(openpose_face ${SOURCES})
+if (${GPU_MODE} MATCHES "CUDA")
+    cuda_add_library(openpose_face ${SOURCES})
+else()
+    add_library(openpose_face ${SOURCES})
+endif ()
+
 if (BUILD_CAFFE)
   add_dependencies(openpose_face openpose_caffe)
 endif (BUILD_CAFFE)
