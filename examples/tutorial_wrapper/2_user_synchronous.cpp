@@ -69,18 +69,26 @@ DEFINE_int32(scale_number,              1,              "Number of scales to ave
 DEFINE_double(scale_gap,                0.3,            "Scale gap between scales. No effect unless scale_number > 1. Initial scale is always 1."
                                                         " If you want to change the initial scale, you actually want to multiply the"
                                                         " `net_resolution` by your desired initial scale.");
-// OpenPose Body Pose Heatmaps
-DEFINE_bool(heatmaps_add_parts,         false,          "If true, it will add the body part heatmaps to the final op::Datum::poseHeatMaps array,"
-                                                        " and analogously face & hand heatmaps to op::Datum::faceHeatMaps & op::Datum::handHeatMaps"
-                                                        " (program speed will decrease). Not required for our library, enable it only if you intend"
-                                                        " to process this information later. If more than one `add_heatmaps_X` flag is enabled, it"
-                                                        " will place then in sequential memory order: body parts + bkg + PAFs. It will follow the"
-                                                        " order on POSE_BODY_PART_MAPPING in `include/openpose/pose/poseParameters.hpp`.");
+// OpenPose Body Pose Heatmaps and Part Candidates
+DEFINE_bool(heatmaps_add_parts,         false,          "If true, it will fill op::Datum::poseHeatMaps array with the body part heatmaps, and"
+                                                        " analogously face & hand heatmaps to op::Datum::faceHeatMaps & op::Datum::handHeatMaps."
+                                                        " If more than one `add_heatmaps_X` flag is enabled, it will place then in sequential"
+                                                        " memory order: body parts + bkg + PAFs. It will follow the order on"
+                                                        " POSE_BODY_PART_MAPPING in `src/openpose/pose/poseParameters.cpp`. Program speed will"
+                                                        " considerably decrease. Not required for OpenPose, enable it only if you intend to"
+                                                        " explicitly use this information later.");
 DEFINE_bool(heatmaps_add_bkg,           false,          "Same functionality as `add_heatmaps_parts`, but adding the heatmap corresponding to"
                                                         " background.");
 DEFINE_bool(heatmaps_add_PAFs,          false,          "Same functionality as `add_heatmaps_parts`, but adding the PAFs.");
 DEFINE_int32(heatmaps_scale,            2,              "Set 0 to scale op::Datum::poseHeatMaps in the range [-1,1], 1 for [0,1]; 2 for integer"
                                                         " rounded [0,255]; and 3 for no scaling.");
+DEFINE_bool(part_candidates,            false,          "Also enable `write_json` in order to save this information. If true, it will fill the"
+                                                        " op::Datum::poseCandidates array with the body part candidates. Candidates refer to all"
+                                                        " the detected body parts, before being assembled into people. Note that the number of"
+                                                        " candidates is equal or higher than the number of final body parts (i.e. after being"
+                                                        " assembled into people). The empty body parts are filled with 0s. Program speed will"
+                                                        " slightly decrease. Not required for OpenPose, enable it only if you intend to explicitly"
+                                                        " use this information.");
 // OpenPose Face
 DEFINE_bool(face,                       false,          "Enables face keypoint detection. It will share some parameters from the body pose, e.g."
                                                         " `model_folder`. Note that this will considerable slow down the performance and increse"
@@ -142,16 +150,20 @@ DEFINE_string(write_images_format,      "png",          "File extension and form
                                                         " function cv::imwrite for all compatible extensions.");
 DEFINE_string(write_video,              "",             "Full file path to write rendered frames in motion JPEG video format. It might fail if the"
                                                         " final path does not finish in `.avi`. It internally uses cv::VideoWriter.");
-DEFINE_string(write_keypoint,           "",             "Directory to write the people body pose keypoint data. Set format with `write_keypoint_format`.");
-DEFINE_string(write_keypoint_format,    "yml",          "File extension and format for `write_keypoint`: json, xml, yaml & yml. Json not available"
-                                                        " for OpenCV < 3.0, use `write_keypoint_json` instead.");
-DEFINE_string(write_keypoint_json,      "",             "Directory to write people pose data in *.json format, compatible with any OpenCV version.");
-DEFINE_string(write_coco_json,          "",             "Full file path to write people pose data with *.json COCO validation format.");
-DEFINE_string(write_heatmaps,           "",             "Directory to write body pose heatmaps in *.png format. At least 1 `add_heatmaps_X` flag"
+DEFINE_string(write_json,               "",             "Directory to write OpenPose output in JSON format. It includes body, hand, and face pose"
+                                                        " keypoints, as well as pose candidates (if `--part_candidates` enabled).");
+DEFINE_string(write_coco_json,          "",             "Full file path to write people pose data with JSON COCO validation format.");
+DEFINE_string(write_heatmaps,           "",             "Directory to write body pose heatmaps in PNG format. At least 1 `add_heatmaps_X` flag"
                                                         " must be enabled.");
 DEFINE_string(write_heatmaps_format,    "png",          "File extension and format for `write_heatmaps`, analogous to `write_images_format`."
                                                         " For lossless compression, recommended `png` for integer `heatmaps_scale` and `float` for"
                                                         " floating values.");
+DEFINE_string(write_keypoint,           "",             "(Deprecated, use `write_json`) Directory to write the people pose keypoint data. Set format"
+                                                        " with `write_keypoint_format`.");
+DEFINE_string(write_keypoint_format,    "yml",          "(Deprecated, use `write_json`) File extension and format for `write_keypoint`: json, xml,"
+                                                        " yaml & yml. Json not available for OpenCV < 3.0, use `write_keypoint_json` instead.");
+DEFINE_string(write_keypoint_json,      "",             "(Deprecated, use `write_json`) Directory to write people pose data in JSON format,"
+                                                        " compatible with any OpenCV version.");
 
 
 // If the user needs his own variables, he can inherit the op::Datum struct and add them
@@ -367,6 +379,11 @@ int openPoseTutorialWrapper2()
     const auto handNetInputSize = op::flagsToPoint(FLAGS_hand_net_resolution, "368x368 (multiples of 16)");
     // poseModel
     const auto poseModel = op::flagsToPoseModel(FLAGS_model_pose);
+    // JSON saving
+    const auto writeJson = (!FLAGS_write_json.empty() ? FLAGS_write_json : FLAGS_write_keypoint_json);
+    if (!FLAGS_write_keypoint.empty() || !FLAGS_write_keypoint_json.empty())
+        op::log("Flags `write_keypoint` and `write_keypoint_json` are deprecated and will eventually be removed."
+                " Please, use `write_json` instead.", op::Priority::Max);
     // keypointScale
     const auto keypointScale = op::flagsToScaleMode(FLAGS_keypoint_scale);
     // heatmaps to add
@@ -403,8 +420,8 @@ int openPoseTutorialWrapper2()
                                                   (float)FLAGS_scale_gap, op::flagsToRenderMode(FLAGS_render_pose),
                                                   poseModel, !FLAGS_disable_blending, (float)FLAGS_alpha_pose,
                                                   (float)FLAGS_alpha_heatmap, FLAGS_part_to_show, FLAGS_model_folder,
-                                                  heatMapTypes, heatMapScale, (float)FLAGS_render_threshold,
-                                                  enableGoogleLogging};
+                                                  heatMapTypes, heatMapScale, FLAGS_part_candidates,
+                                                  (float)FLAGS_render_threshold, enableGoogleLogging};
     // Face configuration (use op::WrapperStructFace{} to disable it)
     const op::WrapperStructFace wrapperStructFace{FLAGS_face, faceNetInputSize,
                                                   op::flagsToRenderMode(FLAGS_face_render, FLAGS_render_pose),
@@ -421,8 +438,9 @@ int openPoseTutorialWrapper2()
     const bool guiVerbose = false;
     const bool fullScreen = false;
     const op::WrapperStructOutput wrapperStructOutput{displayGui, guiVerbose, fullScreen, FLAGS_write_keypoint,
-                                                      op::stringToDataFormat(FLAGS_write_keypoint_format), FLAGS_write_keypoint_json,
-                                                      FLAGS_write_coco_json, FLAGS_write_images, FLAGS_write_images_format, FLAGS_write_video,
+                                                      op::stringToDataFormat(FLAGS_write_keypoint_format),
+                                                      writeJson, FLAGS_write_coco_json,
+                                                      FLAGS_write_images, FLAGS_write_images_format, FLAGS_write_video,
                                                       FLAGS_write_heatmaps, FLAGS_write_heatmaps_format};
     // Configure wrapper
     opWrapper.configure(wrapperStructPose, wrapperStructFace, wrapperStructHand, op::WrapperStructInput{},

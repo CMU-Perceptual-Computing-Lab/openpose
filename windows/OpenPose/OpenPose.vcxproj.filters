@@ -248,10 +248,10 @@
     <ClInclude Include="..\..\include\openpose\filestream\jsonOfstream.hpp">
       <Filter>Header Files\filestream</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\openpose\filestream\keypointJsonSaver.hpp">
+    <ClInclude Include="..\..\include\openpose\filestream\keypointSaver.hpp">
       <Filter>Header Files\filestream</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\openpose\filestream\keypointSaver.hpp">
+    <ClInclude Include="..\..\include\openpose\filestream\peopleJsonSaver.hpp">
       <Filter>Header Files\filestream</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\openpose\filestream\videoSaver.hpp">
@@ -272,7 +272,7 @@
     <ClInclude Include="..\..\include\openpose\filestream\wImageSaver.hpp">
       <Filter>Header Files\filestream</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\openpose\filestream\wKeypointJsonSaver.hpp">
+    <ClInclude Include="..\..\include\openpose\filestream\wPeopleJsonSaver.hpp">
       <Filter>Header Files\filestream</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\openpose\filestream\wPoseSaver.hpp">
@@ -657,10 +657,10 @@
     <ClCompile Include="..\..\src\openpose\filestream\jsonOfstream.cpp">
       <Filter>Source Files\filestream</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\openpose\filestream\keypointJsonSaver.cpp">
+    <ClCompile Include="..\..\src\openpose\filestream\keypointSaver.cpp">
       <Filter>Source Files\filestream</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\openpose\filestream\keypointSaver.cpp">
+    <ClCompile Include="..\..\src\openpose\filestream\peopleJsonSaver.cpp">
       <Filter>Source Files\filestream</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\openpose\filestream\videoSaver.cpp">

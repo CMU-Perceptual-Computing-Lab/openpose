@@ -5,8 +5,8 @@ set(SOURCES cocoJsonSaver.cpp
     heatMapSaver.cpp
     imageSaver.cpp
     jsonOfstream.cpp
-    keypointJsonSaver.cpp
     keypointSaver.cpp
+    peopleJsonSaver.cpp
     videoSaver.cpp)
 
 add_library(openpose_filestream ${SOURCES})

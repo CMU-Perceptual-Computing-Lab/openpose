@@ -13,6 +13,7 @@ namespace op
         PoseExtractorCaffe(const PoseModel poseModel, const std::string& modelFolder, const int gpuId,
                            const std::vector<HeatMapType>& heatMapTypes = {},
                            const ScaleMode heatMapScale = ScaleMode::ZeroToOne,
+                           const bool addPartCandidates = false,
                            const bool enableGoogleLogging = true);
 
         virtual ~PoseExtractorCaffe();
@@ -21,6 +22,10 @@ namespace op
 
         void forwardPass(const std::vector<Array<float>>& inputNetData, const Point<int>& inputDataSize,
                          const std::vector<double>& scaleInputToNetInputs = {1.f});
+
+        const float* getCandidatesCpuConstPtr() const;
+
+        const float* getCandidatesGpuConstPtr() const;
 
         const float* getHeatMapCpuConstPtr() const;
 

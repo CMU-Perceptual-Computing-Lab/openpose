@@ -24,6 +24,7 @@ namespace op
         poseIds{datum.poseIds},
         poseScores{datum.poseScores},
         poseHeatMaps{datum.poseHeatMaps},
+        poseCandidates{datum.poseCandidates},
         faceRectangles{datum.faceRectangles},
         faceKeypoints{datum.faceKeypoints},
         handRectangles{datum.handRectangles},
@@ -55,6 +56,7 @@ namespace op
             poseIds = datum.poseIds,
             poseScores = datum.poseScores,
             poseHeatMaps = datum.poseHeatMaps,
+            poseCandidates = datum.poseCandidates,
             faceRectangles = datum.faceRectangles,
             faceKeypoints = datum.faceKeypoints,
             handRectangles = datum.handRectangles,
@@ -97,6 +99,7 @@ namespace op
             std::swap(poseIds, datum.poseIds);
             std::swap(poseScores, datum.poseScores);
             std::swap(poseHeatMaps, datum.poseHeatMaps);
+            std::swap(poseCandidates, datum.poseCandidates);
             std::swap(faceRectangles, datum.faceRectangles);
             std::swap(faceKeypoints, datum.faceKeypoints);
             std::swap(handRectangles, datum.handRectangles);
@@ -130,6 +133,7 @@ namespace op
             std::swap(poseIds, datum.poseIds);
             std::swap(poseScores, datum.poseScores);
             std::swap(poseHeatMaps, datum.poseHeatMaps);
+            std::swap(poseCandidates, datum.poseCandidates);
             std::swap(faceRectangles, datum.faceRectangles);
             std::swap(faceKeypoints, datum.faceKeypoints);
             std::swap(handRectangles, datum.handRectangles);
@@ -173,6 +177,7 @@ namespace op
             datum.poseIds = poseIds.clone();
             datum.poseScores = poseScores.clone();
             datum.poseHeatMaps = poseHeatMaps.clone();
+            datum.poseCandidates = poseCandidates;
             datum.faceRectangles = faceRectangles;
             datum.faceKeypoints = faceKeypoints.clone();
             datum.handRectangles = datum.handRectangles;
