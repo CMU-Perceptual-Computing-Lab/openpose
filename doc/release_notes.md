@@ -171,7 +171,7 @@ OpenPose Library - Release Notes
 ## Current version (future OpenPose 1.3.0)
 1. Main improvements:
     1. Output of `--write_json` uses less hard disk space (enters and tabs removed).
-    2. Removed most boost dependencies.
+    2. Removed Boost dependencies.
     3. Caffe added as submodule.
 2. Main bugs fixed:
     1. Slight speed up (~1%) for performing the non-maximum suppression stage only in the body part heatmaps channels, and not also in the PAF channels.

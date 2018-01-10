@@ -95,6 +95,7 @@ Alternatively to the script installation, if you want to use CUDA 7, avoid using
     cd ../../models/
     bash ./getModels.sh # It just downloads the Caffe trained models
     cd ..
+    cp ubuntu/Makefile.example Makefile
     # Same file cp command as the one used for Caffe
     cp ubuntu/Makefile.config.Ubuntu14_cuda7.example Makefile.config
     # Change any custom flag from the resulting Makefile.config (e.g. OpenCV 3, Atlas/OpenBLAS/MKL, etc.)
