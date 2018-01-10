@@ -16,7 +16,7 @@ var searchData=
   ['errorandlog_2ehpp',['errorAndLog.hpp',['../error_and_log_8hpp.html',1,'']]],
   ['errormode',['ErrorMode',['../namespaceop.html#a5f5a4cee9809deaf7201fb9caf5e400c',1,'op']]],
   ['exec',['exec',['../classop_1_1_thread.html#ad6c3721793d0f65ffe755ab74534afed',1,'op::Thread::exec()'],['../classop_1_1_thread_manager.html#a67a2d7cecc749be414e6896a88ec268d',1,'op::ThreadManager::exec()'],['../classop_1_1_wrapper.html#a8ae0f91a6882f04464d8897a7c81d174',1,'op::Wrapper::exec()']]],
-  ['existdir',['existDir',['../namespaceop.html#a595aad58db9f96e328089c5d2c260c55',1,'op']]],
+  ['existdirectory',['existDirectory',['../namespaceop.html#a6fc2ee2d2c256695fb7b2b953ee7f762',1,'op']]],
   ['existfile',['existFile',['../namespaceop.html#ac1f4b95440d2fb57fc715558d039b947',1,'op']]],
   ['extract',['extract',['../classop_1_1_scale_and_size_extractor.html#af1c56d1ce833e88056c3dd7fd43762a5',1,'op::ScaleAndSizeExtractor']]],
   ['extractids',['extractIds',['../classop_1_1_person_id_extractor.html#a11e4afb87a5c4aa1b5af3e779da0a7c2',1,'op::PersonIdExtractor']]]

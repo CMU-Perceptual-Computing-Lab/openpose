@@ -17,10 +17,9 @@ var searchData=
   ['inputresolution',['InputResolution',['../namespaceop.html#af72fe4ed32846c12f41b049d3d0e1bdaa46f9a0da0a5d448fd0cc8b3aa0a9b228',1,'op']]],
   ['intround',['intRound',['../namespaceop.html#adcfd0bf5ba782278488c157667a80c54',1,'op']]],
   ['ipcamera',['IPCamera',['../namespaceop.html#a54b73745852c270cfd891eed0f6f2332af40a40a04a078c4449cda2f326d7fb18',1,'op']]],
-  ['ipcamerareader',['IpCameraReader',['../classop_1_1_ip_camera_reader.html#abbe7f1bbf200ed9c6c0868eb3c6b0764',1,'op::IpCameraReader']]],
   ['ipcamerareader',['IpCameraReader',['../classop_1_1_ip_camera_reader.html',1,'op']]],
+  ['ipcamerareader',['IpCameraReader',['../classop_1_1_ip_camera_reader.html#abbe7f1bbf200ed9c6c0868eb3c6b0764',1,'op::IpCameraReader']]],
   ['ipcamerareader_2ehpp',['ipCameraReader.hpp',['../ip_camera_reader_8hpp.html',1,'']]],
-  ['isdirectory',['isDirectory',['../namespaceop.html#ab4f8d497b1ec08dfa1d2ed30e0a00312',1,'op']]],
   ['isopened',['isOpened',['../classop_1_1_video_saver.html#a0c5dadfa4f687283c370e7890ae5037f',1,'op::VideoSaver::isOpened()'],['../classop_1_1_image_directory_reader.html#a432bc94339019f251cc48bbb4c5ae1e8',1,'op::ImageDirectoryReader::isOpened()'],['../classop_1_1_producer.html#a58590e4a409d31f839184b4bf030a68b',1,'op::Producer::isOpened()'],['../classop_1_1_video_capture_reader.html#ae10d37b58fe4f3daa8817b72eb3faa64',1,'op::VideoCaptureReader::isOpened()']]],
   ['isrunning',['isRunning',['../classop_1_1_queue_base.html#a42a873f65588219449e21ac4927311d7',1,'op::QueueBase::isRunning()'],['../classop_1_1_thread.html#af0471340c93fdcc0ba8e06c3f9524fef',1,'op::Thread::isRunning()'],['../classop_1_1_thread_manager.html#ae15857e155633662cd46616fc54a4877',1,'op::ThreadManager::isRunning()'],['../classop_1_1_worker.html#a3f7c86ab1c4ce15c0f0ef12a1d4647e0',1,'op::Worker::isRunning()'],['../classop_1_1_wrapper.html#a51ab9e8a63f8fb822550365fc0417d01',1,'op::Wrapper::isRunning()']]]
 ];
