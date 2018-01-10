@@ -153,9 +153,14 @@ if (${DL_FRAMEWORK} MATCHES "CAFFE")
 
   # Else build from scratch
   if (BUILD_CAFFE)
-    message(STATUS "Caffe will be build from source now.")
+
+    # Download Caffe
+    message(STATUS "Caffe will be downloaded from source now. NOTE: This process might take several minutes depending
+        on your internet connection.")
+    execute_process(COMMAND git submodule update --init --recursive)
     
     # Build Caffe
+    message(STATUS "Caffe will be built from source now.")
     include(ExternalProject)
     set(CAFFE_PREFIX caffe)
     set(CAFFE_URL ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
@@ -272,7 +277,7 @@ configure_file(
     ${CMAKE_BINARY_DIR}/cmake/OpenPoseConfig.cmake @ONLY)
 
 install(FILES ${CMAKE_BINARY_DIR}/cmake/OpenPoseConfig.cmake
-		DESTINATION lib/OpenPose)
+    DESTINATION lib/OpenPose)
 
 # Uninstall target
 configure_file(
