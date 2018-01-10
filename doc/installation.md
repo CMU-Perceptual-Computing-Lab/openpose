@@ -80,6 +80,7 @@ Alternatively to the script installation, if you want to use CUDA 7, avoid using
 2. Compile Caffe and OpenPose by running these lines:
     ```
     ### Install Caffe ###
+    git submodule update --init --recursive
     cd 3rdparty/caffe/
     # Select your desired Makefile file (run only one of the next 4 commands)
     cp Makefile.config.Ubuntu14_cuda7.example Makefile.config # Ubuntu 14, cuda 7
@@ -88,7 +89,7 @@ Alternatively to the script installation, if you want to use CUDA 7, avoid using
     cp Makefile.config.Ubuntu16_cuda8.example Makefile.config # Ubuntu 16, cuda 8
     # Change any custom flag from the resulting Makefile.config (e.g. OpenCV 3, Atlas/OpenBLAS/MKL, etc.)
     # Compile Caffe
-    make all -j${number_of_cpus} && make distribute -j${number_of_cpus}
+    make all -j`nproc` && make distribute -j`nproc`
 
     ### Install OpenPose ###
     cd ../../models/
@@ -97,7 +98,7 @@ Alternatively to the script installation, if you want to use CUDA 7, avoid using
     # Same file cp command as the one used for Caffe
     cp ubuntu/Makefile.config.Ubuntu14_cuda7.example Makefile.config
     # Change any custom flag from the resulting Makefile.config (e.g. OpenCV 3, Atlas/OpenBLAS/MKL, etc.)
-    make all -j${number_of_cpus}
+    make all -j`nproc`
     ```
 
     NOTE: If you want to use your own Caffe distribution, follow the steps on [Custom Caffe](#custom-caffe) section and later re-compile the OpenPose library:
