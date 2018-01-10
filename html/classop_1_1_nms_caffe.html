@@ -123,8 +123,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a0702488e5d899a6610535f6741601978"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab4d3a1d507579711e0aed65dcb06f8ac"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_nms_caffe.html#ab4d3a1d507579711e0aed65dcb06f8ac">LayerSetUp</a> (const std::vector&lt; <a class="el" href="classcaffe_1_1_blob.html">caffe::Blob</a>&lt; T &gt; * &gt; &amp;bottom, const std::vector&lt; <a class="el" href="classcaffe_1_1_blob.html">caffe::Blob</a>&lt; T &gt; * &gt; &amp;top)</td></tr>
 <tr class="separator:ab4d3a1d507579711e0aed65dcb06f8ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9eae1bc23e983dbe6f1a513f82e6d97d"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_nms_caffe.html#a9eae1bc23e983dbe6f1a513f82e6d97d">Reshape</a> (const std::vector&lt; <a class="el" href="classcaffe_1_1_blob.html">caffe::Blob</a>&lt; T &gt; * &gt; &amp;bottom, const std::vector&lt; <a class="el" href="classcaffe_1_1_blob.html">caffe::Blob</a>&lt; T &gt; * &gt; &amp;top, const int maxPeaks)</td></tr>
-<tr class="separator:a9eae1bc23e983dbe6f1a513f82e6d97d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a96198ee87433f55f52a5054b92f946d9"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_nms_caffe.html#a96198ee87433f55f52a5054b92f946d9">Reshape</a> (const std::vector&lt; <a class="el" href="classcaffe_1_1_blob.html">caffe::Blob</a>&lt; T &gt; * &gt; &amp;bottom, const std::vector&lt; <a class="el" href="classcaffe_1_1_blob.html">caffe::Blob</a>&lt; T &gt; * &gt; &amp;top, const int maxPeaks, const int outputChannels=-1)</td></tr>
+<tr class="separator:a96198ee87433f55f52a5054b92f946d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5213ac573acd982c7e590a6d8f603968"><td class="memItemLeft" align="right" valign="top">virtual const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_nms_caffe.html#a5213ac573acd982c7e590a6d8f603968">type</a> () const </td></tr>
 <tr class="separator:a5213ac573acd982c7e590a6d8f603968"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5f257eb561fc705c2b74489b12269b49"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_nms_caffe.html#a5f257eb561fc705c2b74489b12269b49">setThreshold</a> (const T threshold)</td></tr>
@@ -382,7 +382,7 @@ template&lt;typename T &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a9eae1bc23e983dbe6f1a513f82e6d97d"></a>
+<a class="anchor" id="a96198ee87433f55f52a5054b92f946d9"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -407,7 +407,13 @@ template&lt;typename T &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const int&#160;</td>
-          <td class="paramname"><em>maxPeaks</em>&#160;</td>
+          <td class="paramname"><em>maxPeaks</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>outputChannels</em> = <code>-1</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
