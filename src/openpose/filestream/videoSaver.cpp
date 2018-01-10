@@ -26,9 +26,9 @@ namespace op
                 if (!mVideoWriters.crbegin()->isOpened())
                 {
                     const std::string errorMessage{"Video to write frames could not be opened as `" + videoSaverPath
-                                                   + "`. Please, check that:\n\t1. The path ends in *.avi."
-                                                   "\n\t2. OpenCV is properly compiled with the FFmpeg codecs in"
-                                                   " order to save video."};
+                                                   + "`. Please, check that:\n\t1. The path ends in `.avi`."
+                                                   "\n\t2. The parent folder exists.\n\t3. OpenCV is properly"
+                                                   " compiled with the FFmpeg codecs in order to save video."};
                     error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
                 }
             }

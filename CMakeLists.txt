@@ -92,16 +92,10 @@ option(BUILD_SHARED_LIBS "Build as shared lib" ON)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
 include(cmake/Cuda.cmake)
 # find_package(CUDA)
-find_package(Boost COMPONENTS system filesystem)
 find_package(CuDNN)
 find_package(GFlags)
 find_package(Glog)
 find_package(OpenCV)
-
-if (NOT Boost_FOUND)
-  message(FATAL_ERROR "Boost not found. Install Boost from the command line using the command(s) --\
-      sudo apt-get install libboost-all-dev")
-endif (NOT Boost_FOUND)
 
 if (NOT CUDA_FOUND)
   message(STATUS "CUDA not found.") 
