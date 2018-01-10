@@ -97,6 +97,7 @@ namespace op
             // Per channel operation
             for (auto c = 0 ; c < channels ; c++)
             {
+                //if(c == 18) break;
                 int* currKernelPtr = &kernelPtr[c*sourceChannelOffset];
                 const T* currSourcePtr = &sourcePtr[c*sourceChannelOffset];
                 for(auto y = 0; y < sourceHeight; y++){
