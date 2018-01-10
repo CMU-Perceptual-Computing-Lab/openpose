@@ -1,6 +1,7 @@
 var searchData=
 [
   ['macros_2ehpp',['macros.hpp',['../macros_8hpp.html',1,'']]],
+  ['makedirectory',['makeDirectory',['../namespaceop.html#acc650faa23df88ca16a09a2d2a522960',1,'op']]],
   ['max',['Max',['../namespaceop.html#adc43fb9031418e7f8112816a3b535d14a6a061313d22e51e0f25b7cd4dc065233',1,'op']]],
   ['maximumbase_2ehpp',['maximumBase.hpp',['../maximum_base_8hpp.html',1,'']]],
   ['maximumcaffe',['MaximumCaffe',['../classop_1_1_maximum_caffe.html',1,'op']]],
@@ -18,7 +19,6 @@ var searchData=
   ['mheatmaps',['mHeatMaps',['../classop_1_1_face_extractor.html#ab1924617d954db6fc86fb60dfab0dde4',1,'op::FaceExtractor::mHeatMaps()'],['../classop_1_1_hand_extractor.html#acbe2c75c57b1df7279eae30ddcc63241',1,'op::HandExtractor::mHeatMaps()']]],
   ['mheatmapscalemode',['mHeatMapScaleMode',['../classop_1_1_face_extractor.html#ab2f1f5bf37949e0357091c80363dac0a',1,'op::FaceExtractor::mHeatMapScaleMode()'],['../classop_1_1_hand_extractor.html#aa31fd82cb8900c24841f3ef9cce6a0c8',1,'op::HandExtractor::mHeatMapScaleMode()']]],
   ['mheatmaptypes',['mHeatMapTypes',['../classop_1_1_face_extractor.html#a1cd07622445ab4efcc364da2e028ff13',1,'op::FaceExtractor::mHeatMapTypes()'],['../classop_1_1_hand_extractor.html#aa8f444ce4953a41081acaac9ca8d2570',1,'op::HandExtractor::mHeatMapTypes()']]],
-  ['mkdir',['mkdir',['../namespaceop.html#a4b3aaeb920cb0b3b62d80e231531d83f',1,'op']]],
   ['mmaxpopperspushers',['mMaxPoppersPushers',['../classop_1_1_queue_base.html#a1d55f40e032cd5d43d63ba02040b3117',1,'op::QueueBase']]],
   ['mmultiscalenumberandrange',['mMultiScaleNumberAndRange',['../classop_1_1_hand_extractor.html#aba2046c5363f11f14719f104b0780e9f',1,'op::HandExtractor']]],
   ['mmutex',['mMutex',['../classop_1_1_queue_base.html#a22c5e2964e9d9c18a9f02b8d2e0f30b4',1,'op::QueueBase']]],

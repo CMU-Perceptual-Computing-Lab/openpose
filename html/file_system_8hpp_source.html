@@ -114,7 +114,7 @@ $(document).ready(function(){initNavTree('file_system_8hpp_source.html','');});
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;</div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="keyword">namespace </span>op</div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;{</div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;    <a class="code" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> <span class="keywordtype">void</span> <a class="code" href="namespaceop.html#a4b3aaeb920cb0b3b62d80e231531d83f">mkdir</a>(<span class="keyword">const</span> std::string&amp; directoryPath);</div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;    <a class="code" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> <span class="keywordtype">void</span> <a class="code" href="namespaceop.html#acc650faa23df88ca16a09a2d2a522960">makeDirectory</a>(<span class="keyword">const</span> std::string&amp; directoryPath);</div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;</div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;    <a class="code" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> <span class="keywordtype">bool</span> <a class="code" href="namespaceop.html#a6fc2ee2d2c256695fb7b2b953ee7f762">existDirectory</a>(<span class="keyword">const</span> std::string&amp; directoryPath);</div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;</div>
@@ -137,6 +137,7 @@ $(document).ready(function(){initNavTree('file_system_8hpp_source.html','');});
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="preprocessor">#endif // OPENPOSE_UTILITIES_FILE_SYSTEM_HPP</span></div>
 <div class="ttc" id="namespaceop_html_a515273b013402d8c75780330588421bc"><div class="ttname"><a href="namespaceop.html#a515273b013402d8c75780330588421bc">op::getFileExtension</a></div><div class="ttdeci">OP_API std::string getFileExtension(const std::string &amp;fullPath)</div></div>
+<div class="ttc" id="namespaceop_html_acc650faa23df88ca16a09a2d2a522960"><div class="ttname"><a href="namespaceop.html#acc650faa23df88ca16a09a2d2a522960">op::makeDirectory</a></div><div class="ttdeci">OP_API void makeDirectory(const std::string &amp;directoryPath)</div></div>
 <div class="ttc" id="namespaceop_html_a6fc2ee2d2c256695fb7b2b953ee7f762"><div class="ttname"><a href="namespaceop.html#a6fc2ee2d2c256695fb7b2b953ee7f762">op::existDirectory</a></div><div class="ttdeci">OP_API bool existDirectory(const std::string &amp;directoryPath)</div></div>
 <div class="ttc" id="common_8hpp_html"><div class="ttname"><a href="common_8hpp.html">common.hpp</a></div></div>
 <div class="ttc" id="namespaceop_html_a573544858d0a9c29c9707eeda3a21c98"><div class="ttname"><a href="namespaceop.html#a573544858d0a9c29c9707eeda3a21c98">op::getFileNameAndExtension</a></div><div class="ttdeci">OP_API std::string getFileNameAndExtension(const std::string &amp;fullPath)</div></div>
@@ -144,7 +145,6 @@ $(document).ready(function(){initNavTree('file_system_8hpp_source.html','');});
 <div class="ttc" id="namespaceop_html_ab38ea91ef7b7dad700d8e4a4654d48f5"><div class="ttname"><a href="namespaceop.html#ab38ea91ef7b7dad700d8e4a4654d48f5">op::formatAsDirectory</a></div><div class="ttdeci">OP_API std::string formatAsDirectory(const std::string &amp;directoryPathString)</div></div>
 <div class="ttc" id="namespaceop_html_ac1f4b95440d2fb57fc715558d039b947"><div class="ttname"><a href="namespaceop.html#ac1f4b95440d2fb57fc715558d039b947">op::existFile</a></div><div class="ttdeci">OP_API bool existFile(const std::string &amp;filePath)</div></div>
 <div class="ttc" id="macros_8hpp_html_a4ba443bb7a0e5dbe8054a9ac37a5e000"><div class="ttname"><a href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a></div><div class="ttdeci">#define OP_API</div><div class="ttdef"><b>Definition:</b> macros.hpp:5</div></div>
-<div class="ttc" id="namespaceop_html_a4b3aaeb920cb0b3b62d80e231531d83f"><div class="ttname"><a href="namespaceop.html#a4b3aaeb920cb0b3b62d80e231531d83f">op::mkdir</a></div><div class="ttdeci">OP_API void mkdir(const std::string &amp;directoryPath)</div></div>
 <div class="ttc" id="namespaceop_html_a3ff74a37eb4bf12e31bc5aa95b69f9e3"><div class="ttname"><a href="namespaceop.html#a3ff74a37eb4bf12e31bc5aa95b69f9e3">op::getFilesOnDirectory</a></div><div class="ttdeci">OP_API std::vector&lt; std::string &gt; getFilesOnDirectory(const std::string &amp;directoryPath, const std::vector&lt; std::string &gt; &amp;extensions={})</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->

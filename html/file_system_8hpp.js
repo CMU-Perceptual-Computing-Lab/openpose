@@ -8,5 +8,5 @@ var file_system_8hpp =
     [ "getFileNameNoExtension", "file_system_8hpp.html#a6f37638480139a4076eef4d0c7dc6cd1", null ],
     [ "getFilesOnDirectory", "file_system_8hpp.html#a3ff74a37eb4bf12e31bc5aa95b69f9e3", null ],
     [ "getFilesOnDirectory", "file_system_8hpp.html#adb26da2c52486e926d98471b5387c7e1", null ],
-    [ "mkdir", "file_system_8hpp.html#a4b3aaeb920cb0b3b62d80e231531d83f", null ]
+    [ "makeDirectory", "file_system_8hpp.html#acc650faa23df88ca16a09a2d2a522960", null ]
 ];
