@@ -3,11 +3,11 @@ cmake_minimum_required(VERSION 2.8.7 FATAL_ERROR) # min. cmake version recommend
 
 message("**********HACK ADDED************")
 set(MKL_LIBS
-    "/home/ryaadhav/openpose_fix/3rdparty/caffe/external/mkl/mklml_lnx_2018.0.1.20171007/lib/libiomp5.so"
-    "/home/ryaadhav/openpose_fix/3rdparty/caffe/external/mkl/mklml_lnx_2018.0.1.20171007/lib/libmklml_intel.so"
-    "/home/ryaadhav/openpose_fix/3rdparty/caffe/external/mkldnn/install/lib/libmkldnn.so.0"
-    "/home/ryaadhav/openpose_fix/3rdparty/caffe/external/mkldnn/install/lib/libmkldnn.so"
-    "/home/ryaadhav/openpose_fix/3rdparty/caffe/external/mkldnn/install/lib/libmkldnn.so.0.11.0"
+    "/home/ryaadhav/caffe/external/mkl/mklml_lnx_2018.0.1.20171007/lib/libiomp5.so"
+    "/home/ryaadhav/caffe/external/mkl/mklml_lnx_2018.0.1.20171007/lib/libmklml_intel.so"
+    "/home/ryaadhav/caffe/external/mkldnn/install/lib/libmkldnn.so.0"
+    "/home/ryaadhav/caffe/external/mkldnn/install/lib/libmkldnn.so"
+    "/home/ryaadhav/caffe/external/mkldnn/install/lib/libmkldnn.so.0.11.0"
     )
 
 ### VERSION INFO
@@ -208,6 +208,7 @@ if (${DL_FRAMEWORK} MATCHES "CAFFE")
             -DUSE_CUDNN=${USE_CUDNN}
             -DBUILD_python=OFF
             -DCPU_ONLY=${CAFFE_CPU_ONLY}
+            -DUSE_MKL2017_AS_DEFAULT_ENGINE=${CAFFE_CPU_ONLY}
             -DCMAKE_BUILD_TYPE=Release
             -DOpenCV_DIR=${OpenCV_DIR})
 

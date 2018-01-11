@@ -164,7 +164,9 @@ namespace op
                     std::copy(inputData.getConstPtr(), inputData.getConstPtr() + inputData.getVolume(), cpuImagePtr);
                 #endif
                 // Perform deep network forward pass
+                log("Try");
                 upImpl->upCaffeNet->ForwardFrom(0);
+                log("End");
 
                 // Cuda checks
                 #ifdef USE_CUDA
