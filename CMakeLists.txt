@@ -1,8 +1,9 @@
-project(OpenPose)
+cmake_policy(SET CMP0048 NEW)
+project(OpenPose VERSION 1.2.0)
 cmake_minimum_required(VERSION 2.8.7 FATAL_ERROR) # min. cmake version recommended by Caffe
 
 ### VERSION INFO
-  
+
 set(OpenPose_VERSION_MAJOR 1)
 set(OpenPose_VERSION_MINOR 2)
 set(OpenPose_VERSION_PATCH 0)
@@ -21,7 +22,7 @@ elseif (UNIX AND NOT APPLE) # OS is a Linux distribution (it assumes Ubuntu)
   if (${UBUNTU_MAJOR_VERSION} MATCHES "16") # if 16
     set(IS_UBUNTU_16 TRUE)
     set(IS_UBUNTU_14_OR_LESS FALSE)
-  else (${UBUNTU_MAJOR_VERSION MATCHES "16") # if 14 or less
+  else (${UBUNTU_MAJOR_VERSION} MATCHES "16") # if 14 or less
     set(IS_UBUNTU_16 FALSE)
     set(IS_UBUNTU_14_OR_LESS TRUE)
   endif (${UBUNTU_MAJOR_VERSION} MATCHES "16")
@@ -33,17 +34,22 @@ if (WIN32)
   string (REPLACE "/D_WINDOWS" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
   string (REPLACE "/DWIN32" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
 
-  set(CMAKE_CONFIGURATION_TYPES Release Debug CACHE TYPE INTERNAL FORCE)
-  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MP")
+  # /GL option causes the code to crash -- fix this
+  # sdl flags causes error -- error : unknown attribute \"guard\"
+
+  set(CMAKE_CONFIGURATION_TYPES Debug Release CACHE TYPE INTERNAL FORCE)
+  
   string(REPLACE "/O2" "/Ox" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
-  # set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Ob2 /Ot /Oi /GL")
-  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Ob2 /Ot /Oi")
-  # set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /LTCG:incremental /OPT:REF /OPT:ICF")
-  set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /LTCG:incremental /OPT:REF /OPT:ICF")
+  string(REPLACE "/Ob2" "" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MP /Ot /Oi /Gy /Z7")
+  string(REPLACE "/W3" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+  string(REPLACE "/GR" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+
+  set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /LTCG:incremental /OPT:REF /OPT:ICF /VERSION:32")
 elseif (UNIX AND NOT APPLE)
   # Turn on C++11 
   add_definitions(-std=c++11)
-endif ()
+endif (WIN32)
 
 # C++ additional flags
 if(CMAKE_COMPILER_IS_GNUCXX)
@@ -66,6 +72,25 @@ if (${DL_FRAMEWORK} MATCHES "CAFFE")
   # OpenPose flags
   add_definitions(-DUSE_CAFFE)
 endif (${DL_FRAMEWORK} MATCHES "CAFFE")
+
+if (WIN32)
+  # Select the Enhanced Instruction Set
+  set(EEIS NONE CACHE STRING "Enable Enhanced Instruction Set")
+  set_property(CACHE EEIS PROPERTY STRINGS SSE SSE2 AVX AVX2 IA32)
+
+  # Suboptions for Enhanced Instruction Set
+  if (${EEIS} MATCHES "SSE")
+    add_definitions("/arch:SSE")
+  elseif (${EEIS} MATCHES "SSE2")
+    add_definitions("/arch:SSE2")
+  elseif (${EEIS} MATCHES "AVX")
+    add_definitions("/arch:AVX")
+  elseif (${EEIS} MATCHES "AVX2")
+    add_definitions("/arch:AVX2")
+  elseif (${EEIS} MATCHES "IA32")
+    add_definitions("/arch:IA32")
+  endif (${EEIS} MATCHES "SSE")
+endif (WIN32)
 
 # Set the acceleration library
 set(GPU_MODE CUDA CACHE STRING "Select the acceleration GPU library or CPU otherwise.")
@@ -269,25 +294,6 @@ if (BUILD_EXAMPLES)
   add_subdirectory(examples)
 endif (BUILD_EXAMPLES)
 
-### GENERATE DOCUMENTATION
-
-if (BUILD_DOCS)
-  find_package(Doxygen)
-  if (DOXYGEN_FOUND)
-    # Set input and output files
-    set(DOXYGEN_FILE ${CMAKE_SOURCE_DIR}/doc/doc_autogeneration.doxygen)
-
-    # Custom target to build the documentation
-    add_custom_target(doc_doxygen ALL
-        COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_FILE}
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/doc
-        COMMENT "Generating API documentation with Doxygen"
-        VERBATIM)
-  else (DOXYGEN_FOUND)
-    message("Doxygen need to be installed to generate the doxygen documentation")
-  endif (DOXYGEN_FOUND)
-endif (BUILD_DOCS)
-
 ### DOWNLOAD MODELS
 
 # Download the models if flag is set
@@ -306,6 +312,29 @@ download_model("hand" ${DOWNLOAD_HAND_MODEL} hand/pose_iter_102000.caffemodel
     a82cfc3fea7c62f159e11bd3674c1531) # Hand
 
 message(STATUS "Models Downloaded.")
+
+### GENERATE DOCUMENTATION
+
+if (UNIX AND NOT APPLE)
+
+  if (BUILD_DOCS)
+    find_package(Doxygen)
+    if (DOXYGEN_FOUND)
+      # Set input and output files
+      set(DOXYGEN_FILE ${CMAKE_SOURCE_DIR}/doc/doc_autogeneration.doxygen)
+
+      # Custom target to build the documentation
+      add_custom_target(doc_doxygen ALL
+          COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_FILE}
+          WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/doc
+          COMMENT "Generating API documentation with Doxygen"
+          VERBATIM)
+    else (DOXYGEN_FOUND)
+      message("Doxygen need to be installed to generate the doxygen documentation")
+    endif (DOXYGEN_FOUND)
+  endif (BUILD_DOCS)
+
+endif (UNIX AND NOT APPLE)
 
 ### INSTALL
 

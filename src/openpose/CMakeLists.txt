@@ -6,8 +6,8 @@ endforeach (SUB_DIR ${SUB_DIRS})
 
 # make the openpose.so/dll
 file(GLOB_RECURSE OP_HEADERS_UNFILTERED "${CMAKE_SOURCE_DIR}/include/openpose/*.h" 
-        "${CMAKE_SOURCE_DIR}/include/openpose/*.hpp" 
-        "${CMAKE_SOURCE_DIR}/include/openpose/*.hu")
+    "${CMAKE_SOURCE_DIR}/include/openpose/*.hpp" 
+    "${CMAKE_SOURCE_DIR}/include/openpose/*.hu")
 
 set(OP_HEADERS "")
 foreach (FILE ${OP_HEADERS_UNFILTERED})
@@ -31,6 +31,11 @@ if(UNIX AND NOT APPLE)
 endif(UNIX AND NOT APPLE)
 
 if (WIN32)
+
+  # TODO -- Makeshift solution -- This prevents rerunning build again
+  # https://gitlab.kitware.com/cmake/cmake/issues/16783
+  set(CMAKE_SUPPRESS_REGENERATION 1)
+
   target_link_libraries(openpose ${OpenCV_LIBS} ${Caffe_LIBS}
       debug ${Boost_FILESYSTEM_LIBRARY_DEBUG} debug ${Boost_SYSTEM_LIBRARY_DEBUG}
       optimized ${Boost_FILESYSTEM_LIBRARY_OPTIMIZED} optimized ${Boost_SYSTEM_LIBRARY_OPTIMIZED} 
@@ -39,6 +44,7 @@ if (WIN32)
   target_compile_definitions(openpose PRIVATE BOOST_ALL_NO_LIB)
   # source_group("Header Files" FILES ${CMAKE_SOURCE_DIR}/include)
   set_property(TARGET openpose PROPERTY FOLDER "Openpose library")
+  
   foreach (SUB_DIR ${SUB_DIRS})
     string(TOUPPER ${SUB_DIR} SUB_DIR_UPPERCASE)
     source_group("Source Files\\${SUB_DIR}" FILES ${SOURCES_OP_${SUB_DIR_UPPERCASE}_WITH_CP} "*")
