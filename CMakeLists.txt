@@ -1,15 +1,6 @@
 project(OpenPose)
 cmake_minimum_required(VERSION 2.8.7 FATAL_ERROR) # min. cmake version recommended by Caffe
 
-message("**********HACK ADDED************")
-set(MKL_LIBS
-    "/home/ryaadhav/caffe/external/mkl/mklml_lnx_2018.0.1.20171007/lib/libiomp5.so"
-    "/home/ryaadhav/caffe/external/mkl/mklml_lnx_2018.0.1.20171007/lib/libmklml_intel.so"
-    "/home/ryaadhav/caffe/external/mkldnn/install/lib/libmkldnn.so.0"
-    "/home/ryaadhav/caffe/external/mkldnn/install/lib/libmkldnn.so"
-    "/home/ryaadhav/caffe/external/mkldnn/install/lib/libmkldnn.so.0.11.0"
-    )
-
 ### VERSION INFO
 
 set(OpenPose_VERSION_MAJOR 1)
@@ -74,6 +65,13 @@ elseif (${GPU_MODE} MATCHES "CPU_ONLY")
   message("Building CPU Only")
 endif ()
 
+# Intel branch with MKL Support
+if (${GPU_MODE} MATCHES "CPU_ONLY")
+  if (UNIX AND NOT APPLE)
+      OPTION(USE_MKL "Use MKL Intel Branch." ON)
+  endif ()
+endif ()
+
 # Suboptions for GPU architectures
 if (${GPU_MODE} MATCHES "CUDA")
   set(CUDA_ARCH Auto CACHE STRING "Select target NVIDIA GPU achitecture.")
@@ -111,9 +109,13 @@ find_package(GFlags)
 find_package(Glog)
 find_package(OpenCV)
 
-#if (${GPU_MODE} MATCHES "CPU_ONLY")
-#    find_package(MKL REQUIRED)
-#endif ()
+# OpenMP
+find_package(OpenMP)
+if (OPENMP_FOUND)
+    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+endif()
 
 if (NOT Boost_FOUND)
   message(FATAL_ERROR "Boost not found. Install Boost from the command line using the command(s) --\
@@ -186,11 +188,32 @@ if (${DL_FRAMEWORK} MATCHES "CAFFE")
         message(STATUS "Caffe has already been downloaded")
     endif()
 
+    # Build Process
     set(CAFFE_CPU_ONLY OFF)
     if (${GPU_MODE} MATCHES "CUDA")
         execute_process(COMMAND git checkout master WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
     elseif (${GPU_MODE} MATCHES "CPU_ONLY")
-        execute_process(COMMAND git checkout intel WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
+        if(USE_MKL)
+            execute_process(COMMAND git checkout intel WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
+            execute_process(COMMAND sh prepare_mkl.sh WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe/external/mkl OUTPUT_VARIABLE rv)
+            set( MLIST ${rv} )
+            separate_arguments(MLIST)
+            list(GET MLIST 0 MKL_PATH)
+            file(GLOB MKL_SO
+              "${MKL_PATH}lib/*"
+            )
+            file(COPY ${MKL_SO} DESTINATION ${CMAKE_BINARY_DIR}/caffe)
+
+            set(MKL_LIBS
+                "${CMAKE_BINARY_DIR}/caffe/libiomp5.so"
+                "${CMAKE_BINARY_DIR}/caffe/libmklml_intel.so"
+                "${CMAKE_BINARY_DIR}/caffe/lib/libmkldnn.so.0"
+                "${CMAKE_BINARY_DIR}/caffe/lib/libmkldnn.so"
+                "${CMAKE_BINARY_DIR}/caffe/lib/libmkldnn.so.0.11.0"
+                )
+        else ()
+            execute_process(COMMAND git checkout master WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
+        endif ()
         set(CAFFE_CPU_ONLY ON)
         set(USE_CUDNN OFF)
     endif ()
@@ -201,16 +224,30 @@ if (${DL_FRAMEWORK} MATCHES "CAFFE")
     set(CAFFE_PREFIX caffe)
     set(CAFFE_URL ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
 
-    ExternalProject_Add(openpose_caffe
-        SOURCE_DIR ${CAFFE_URL}
-        PREFIX ${CAFFE_PREFIX}
-        CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR> 
-            -DUSE_CUDNN=${USE_CUDNN}
-            -DBUILD_python=OFF
-            -DCPU_ONLY=${CAFFE_CPU_ONLY}
-            -DUSE_MKL2017_AS_DEFAULT_ENGINE=${CAFFE_CPU_ONLY}
-            -DCMAKE_BUILD_TYPE=Release
-            -DOpenCV_DIR=${OpenCV_DIR})
+    # One for Intel Branch and one for Master
+    if(USE_MKL)
+        ExternalProject_Add(openpose_caffe
+            SOURCE_DIR ${CAFFE_URL}
+            PREFIX ${CAFFE_PREFIX}
+            CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
+                -DMKLDNN_INSTALL_DIR:PATH=<INSTALL_DIR>
+                -DUSE_CUDNN=${USE_CUDNN}
+                -DBUILD_python=OFF
+                -DCPU_ONLY=${CAFFE_CPU_ONLY}
+                -DUSE_MKL2017_AS_DEFAULT_ENGINE=${CAFFE_CPU_ONLY}
+                -DCMAKE_BUILD_TYPE=Release
+                -DOpenCV_DIR=${OpenCV_DIR})
+    else ()
+        ExternalProject_Add(openpose_caffe
+            SOURCE_DIR ${CAFFE_URL}
+            PREFIX ${CAFFE_PREFIX}
+            CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
+                -DUSE_CUDNN=${USE_CUDNN}
+                -DBUILD_python=OFF
+                -DCPU_ONLY=${CAFFE_CPU_ONLY}
+                -DCMAKE_BUILD_TYPE=Release
+                -DOpenCV_DIR=${OpenCV_DIR})
+    endif ()
 
     ExternalProject_Get_Property(openpose_caffe install_dir)
 
