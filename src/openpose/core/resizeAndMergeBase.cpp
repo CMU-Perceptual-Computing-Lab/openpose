@@ -43,7 +43,7 @@ namespace op
             {
                 // Params
                 const auto& sourceSize = sourceSizes[0];
-                const auto sourceHeight = sourceSize[2]; // 368/6 ..
+                const auto sourceHeight = sourceSize[2]; // 368/8 ..
                 const auto sourceWidth = sourceSize[3]; // 496/8 ..
                 const auto sourceChannelOffset = sourceHeight * sourceWidth;
                 if(sourceSize[0] != 1) error("It should never reache this point. Notify us otherwise.", __LINE__, __FUNCTION__, __FILE__);
