@@ -7,7 +7,7 @@ namespace op
                              const T& threshold, const int& x, const int& y)
     {
         const auto index = y*w + x;
-        if (0 < x && x < (w-1) && 0 < y && y < (h-1))
+        if (1 < x && x < (w-2) && 1 < y && y < (h-2))
         {
             const auto value = sourcePtr[index];
             if (value > threshold)
@@ -31,7 +31,39 @@ namespace op
             else
                 kernelPtr[index] = 0;
         }
-        else if (x == 0 || x == (w-1) || y == 0 || y == (h-1))
+        else if (x == 1 || x == (w-2) || y == 1 || y == (h-2))
+        {
+            //kernelPtr[index] = 0;
+            const auto value = sourcePtr[index];
+            if (value > threshold)
+            {
+                const auto topLeft = ((0 < x && 0 < y) ? sourcePtr[(y-1)*w + x-1] : threshold);
+                auto top = threshold;
+                if(0 < y) top = sourcePtr[(y-1)*w + x];
+                auto topRight = threshold;
+                if(0 < y && x < (w-1)) topRight = sourcePtr[(y-1)*w + x+1];
+                auto left = threshold;
+                if(0 < x) left = sourcePtr[    y*w + x-1];
+                auto right = threshold;
+                if(x < (w-1)) right = sourcePtr[y*w + x+1];
+                auto bottomLeft = threshold;
+                if(y < (h-1) && 0 < x) bottomLeft  = sourcePtr[(y+1)*w + x-1];
+                auto bottom = threshold;
+                if(y < (h-1)) bottom = sourcePtr[(y+1)*w + x];
+                auto bottomRight = threshold;
+                if(x < (w-1) && y < (h-1)) bottomRight = sourcePtr[(y+1)*w + x+1];
+
+                if (value >= topLeft && value >= top && value >= topRight
+                    && value >= left && value >= right
+                        && value >= bottomLeft && value >= bottom && value >= bottomRight)
+                    kernelPtr[index] = 1;
+                else
+                    kernelPtr[index] = 0;
+            }
+            else
+                kernelPtr[index] = 0;
+        }
+        else
             kernelPtr[index] = 0;
     }
 
@@ -97,7 +129,7 @@ namespace op
             // Per channel operation
             for (auto c = 0 ; c < channels ; c++)
             {
-                //if(c == 18) break;
+                if(c == 18) break;
                 int* currKernelPtr = &kernelPtr[c*sourceChannelOffset];
                 const T* currSourcePtr = &sourcePtr[c*sourceChannelOffset];
                 for(auto y = 0; y < sourceHeight; y++){
