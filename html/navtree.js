@@ -37,9 +37,9 @@ var NAVTREEINDEX =
 "annotated.html",
 "classop_1_1_nms_caffe.html#ab4d3a1d507579711e0aed65dcb06f8ac",
 "classop_1_1_w_face_extractor.html#a16522778f67bc544867929f5a4357934",
-"fast_math_8hpp.html#aaafe2e235a1a3a146bb026b71c521c7b",
-"open_cv_8hpp.html",
-"structop_1_1_wrapper_struct_hand.html#a6a54d5b5766d23412c87bd10c26cb291"
+"fast_math_8hpp.html#a8525e440d6ac1b558e72637dc4f4e3c4",
+"nms_caffe_8hpp.html",
+"structop_1_1_wrapper_struct_face.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

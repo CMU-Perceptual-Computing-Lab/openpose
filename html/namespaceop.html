@@ -588,6 +588,8 @@ Functions</h2></td></tr>
 <tr class="separator:af1ed202254520cd489723052d1f5a86d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1f690bf083e250642144bf8e5d6e6d2c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a1f690bf083e250642144bf8e5d6e6d2c">getPoseDefaultConnectMinSubsetScore</a> (const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel)</td></tr>
 <tr class="separator:a1f690bf083e250642144bf8e5d6e6d2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a016abefba53293ed2ffe3a3c3bd88dd0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> const std::vector&lt; float &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a016abefba53293ed2ffe3a3c3bd88dd0">getPoseScales</a> (const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel)</td></tr>
+<tr class="separator:a016abefba53293ed2ffe3a3c3bd88dd0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abb49286241ba7a1d754b31dee333274a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> const std::vector&lt; float &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#abb49286241ba7a1d754b31dee333274a">getPoseColors</a> (const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel)</td></tr>
 <tr class="separator:abb49286241ba7a1d754b31dee333274a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a11bd7e53698eabe32b69b48708cf7b19"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> const std::vector<br class="typebreak"/>
@@ -754,8 +756,8 @@ Functions</h2></td></tr>
 <tr class="separator:affdd0ecec773d38da5348e6eb482396e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1c6d17a9f442da1795540e2d1023129c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a1c6d17a9f442da1795540e2d1023129c">scaleKeypoints</a> (<a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt; &amp;keypoints, const float scaleX, const float scaleY, const float offsetX, const float offsetY)</td></tr>
 <tr class="separator:a1c6d17a9f442da1795540e2d1023129c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0dd0211bd87bb13345294af1390555b7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a0dd0211bd87bb13345294af1390555b7">renderKeypointsCpu</a> (<a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt; &amp;frameArray, const <a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt; &amp;keypoints, const std::vector&lt; unsigned int &gt; &amp;pairs, const std::vector&lt; float &gt; colors, const float thicknessCircleRatio, const float thicknessLineRatioWRTCircle, const float threshold)</td></tr>
-<tr class="separator:a0dd0211bd87bb13345294af1390555b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a07d0092a7c9ce5130cd26a7bbba927e9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a07d0092a7c9ce5130cd26a7bbba927e9">renderKeypointsCpu</a> (<a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt; &amp;frameArray, const <a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt; &amp;keypoints, const std::vector&lt; unsigned int &gt; &amp;pairs, const std::vector&lt; float &gt; colors, const float thicknessCircleRatio, const float thicknessLineRatioWRTCircle, const std::vector&lt; float &gt; &amp;poseScales, const float threshold)</td></tr>
+<tr class="separator:a07d0092a7c9ce5130cd26a7bbba927e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afb230634bc4a07f84ca91ebaf13e385f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> <a class="el" href="structop_1_1_rectangle.html">Rectangle</a>&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#afb230634bc4a07f84ca91ebaf13e385f">getKeypointsRectangle</a> (const <a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt; &amp;keypoints, const int person, const float threshold)</td></tr>
 <tr class="separator:afb230634bc4a07f84ca91ebaf13e385f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a29e26ec36e2ca8b8e0b7b6180f9315e3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a29e26ec36e2ca8b8e0b7b6180f9315e3">getAverageScore</a> (const <a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt; &amp;keypoints, const int person)</td></tr>
@@ -807,6 +809,8 @@ Variables</h2></td></tr>
 <tr class="separator:a1245f62cf98c4ee7591dfc8807ef355d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3fbae1778780ae5bf4ffcc84cdef1870"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a3fbae1778780ae5bf4ffcc84cdef1870">FACE_COLORS_RENDER</a> {<a class="el" href="face_parameters_8hpp.html#a740a6228babfde5f18fba6fc033ef0ed">FACE_COLORS_RENDER_GPU</a>}</td></tr>
 <tr class="separator:a3fbae1778780ae5bf4ffcc84cdef1870"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a00c56c20997f734b2bd44d6f85b86cf0"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a00c56c20997f734b2bd44d6f85b86cf0">FACE_SCALES_RENDER</a> {<a class="el" href="face_parameters_8hpp.html#a1a7ddb1a137c44091a1b4161725adfa0">FACE_SCALES_RENDER_GPU</a>}</td></tr>
+<tr class="separator:a00c56c20997f734b2bd44d6f85b86cf0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa6701cc08e1a8651798ef3bf8437375b"><td class="memItemLeft" align="right" valign="top">const auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#aa6701cc08e1a8651798ef3bf8437375b">FACE_CCN_DECREASE_FACTOR</a> = 8.f</td></tr>
 <tr class="separator:aa6701cc08e1a8651798ef3bf8437375b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4d07868d77fb11253b413ed579e04c22"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a4d07868d77fb11253b413ed579e04c22">FACE_PROTOTXT</a> {&quot;face/pose_deploy.prototxt&quot;}</td></tr>
@@ -825,6 +829,8 @@ Variables</h2></td></tr>
 <tr class="separator:a335d707e98d311d39d9a9dab0e325391"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a450bb646e7573322d8f622bfdbab4833"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a450bb646e7573322d8f622bfdbab4833">HAND_COLORS_RENDER</a> {<a class="el" href="hand_parameters_8hpp.html#a5ca06d0202756b9a3b8825ccbafc0558">HAND_COLORS_RENDER_GPU</a>}</td></tr>
 <tr class="separator:a450bb646e7573322d8f622bfdbab4833"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4e9bbc2167923763c5982d6d1f41f560"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a4e9bbc2167923763c5982d6d1f41f560">HAND_SCALES_RENDER</a> {<a class="el" href="hand_parameters_8hpp.html#a799d629d7fddd7f0daf40ccdae0293b9">HAND_SCALES_RENDER_GPU</a>}</td></tr>
+<tr class="separator:a4e9bbc2167923763c5982d6d1f41f560"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aed0d108f5ada623eeb0ed41f896f8e97"><td class="memItemLeft" align="right" valign="top">const auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#aed0d108f5ada623eeb0ed41f896f8e97">HAND_CCN_DECREASE_FACTOR</a> = 8.f</td></tr>
 <tr class="separator:aed0d108f5ada623eeb0ed41f896f8e97"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3fe70bd1eacdd78aef3344c83533ffc7"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a3fe70bd1eacdd78aef3344c83533ffc7">HAND_PROTOTXT</a> {&quot;hand/pose_deploy.prototxt&quot;}</td></tr>
@@ -1746,22 +1752,6 @@ template&lt;typename TPointerContainer &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a5660f0e72781ce6d7db9eb78b582e5c6"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">op::COMPILE_TEMPLATE_DATUM </td>
-          <td>(</td>
-          <td class="paramtype">WorkerProducer&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a class="anchor" id="a01aa5c6e24026536367cf47a64e9bba5"></a>
 <div class="memitem">
 <div class="memproto">
@@ -1770,6 +1760,22 @@ template&lt;typename TPointerContainer &gt; </div>
           <td class="memname">op::COMPILE_TEMPLATE_DATUM </td>
           <td>(</td>
           <td class="paramtype">WorkerConsumer&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a5660f0e72781ce6d7db9eb78b582e5c6"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">op::COMPILE_TEMPLATE_DATUM </td>
+          <td>(</td>
+          <td class="paramtype">WorkerProducer&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1826,22 +1832,6 @@ template&lt;typename TPointerContainer &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a196f17357cd1c1bb02e24e4e8a0e6ec3"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">op::COMPILE_TEMPLATE_DATUM </td>
-          <td>(</td>
-          <td class="paramtype">WFaceDetector&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a class="anchor" id="a0424a8e4dc8ceb5e8d8a2230c157a7fd"></a>
 <div class="memitem">
 <div class="memproto">
@@ -1850,6 +1840,22 @@ template&lt;typename TPointerContainer &gt; </div>
           <td class="memname">op::COMPILE_TEMPLATE_DATUM </td>
           <td>(</td>
           <td class="paramtype">WHandDetector&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a196f17357cd1c1bb02e24e4e8a0e6ec3"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">op::COMPILE_TEMPLATE_DATUM </td>
+          <td>(</td>
+          <td class="paramtype">WFaceDetector&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -2018,22 +2024,6 @@ template&lt;typename TPointerContainer &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="ae76afeeeaedaebe6941f41a4bdf50e2a"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">op::COMPILE_TEMPLATE_DATUM </td>
-          <td>(</td>
-          <td class="paramtype">WPoseRenderer&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a class="anchor" id="a49bd4106b0cd1cb81980329b06c0d2c8"></a>
 <div class="memitem">
 <div class="memproto">
@@ -2042,6 +2032,22 @@ template&lt;typename TPointerContainer &gt; </div>
           <td class="memname">op::COMPILE_TEMPLATE_DATUM </td>
           <td>(</td>
           <td class="paramtype">WVideoSaver&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ae76afeeeaedaebe6941f41a4bdf50e2a"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">op::COMPILE_TEMPLATE_DATUM </td>
+          <td>(</td>
+          <td class="paramtype">WPoseRenderer&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -3753,6 +3759,22 @@ template&lt;class T &gt; </div>
 
 </div>
 </div>
+<a class="anchor" id="a016abefba53293ed2ffe3a3c3bd88dd0"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> const std::vector&lt;float&gt;&amp; op::getPoseScales </td>
+          <td>(</td>
+          <td class="paramtype">const PoseModel&#160;</td>
+          <td class="paramname"><em>poseModel</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a class="anchor" id="ade70b024ee461ae04e7233bf3937c5c6"></a>
 <div class="memitem">
 <div class="memproto">
@@ -4582,7 +4604,7 @@ template&lt;typename T &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a0dd0211bd87bb13345294af1390555b7"></a>
+<a class="anchor" id="a07d0092a7c9ce5130cd26a7bbba927e9"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -4621,6 +4643,12 @@ template&lt;typename T &gt; </div>
           <td></td>
           <td class="paramtype">const float&#160;</td>
           <td class="paramname"><em>thicknessLineRatioWRTCircle</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; float &gt; &amp;&#160;</td>
+          <td class="paramname"><em>poseScales</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -5920,6 +5948,18 @@ template&lt;typename T &gt; </div>
 
 </div>
 </div>
+<a class="anchor" id="a00c56c20997f734b2bd44d6f85b86cf0"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::vector&lt;float&gt; op::FACE_SCALES_RENDER {<a class="el" href="face_parameters_8hpp.html#a1a7ddb1a137c44091a1b4161725adfa0">FACE_SCALES_RENDER_GPU</a>}</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a class="anchor" id="abd0ef2306478c3295283e7f1b59e3aff"></a>
 <div class="memitem">
 <div class="memproto">
@@ -6022,6 +6062,18 @@ template&lt;typename T &gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">const std::string op::HAND_PROTOTXT {&quot;hand/pose_deploy.prototxt&quot;}</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a4e9bbc2167923763c5982d6d1f41f560"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::vector&lt;float&gt; op::HAND_SCALES_RENDER {<a class="el" href="hand_parameters_8hpp.html#a799d629d7fddd7f0daf40ccdae0293b9">HAND_SCALES_RENDER_GPU</a>}</td>
         </tr>
       </table>
 </div><div class="memdoc">

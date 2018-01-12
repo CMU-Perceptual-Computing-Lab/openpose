@@ -20,7 +20,7 @@ var searchData=
   ['renderhand_2ehpp',['renderHand.hpp',['../render_hand_8hpp.html',1,'']]],
   ['renderhandkeypointscpu',['renderHandKeypointsCpu',['../namespaceop.html#afb5b711819f94b51f32460861d9cea38',1,'op']]],
   ['renderhandkeypointsgpu',['renderHandKeypointsGpu',['../namespaceop.html#a74458454b8bec064b435a3bde5ad25e0',1,'op']]],
-  ['renderkeypointscpu',['renderKeypointsCpu',['../namespaceop.html#a0dd0211bd87bb13345294af1390555b7',1,'op']]],
+  ['renderkeypointscpu',['renderKeypointsCpu',['../namespaceop.html#a07d0092a7c9ce5130cd26a7bbba927e9',1,'op']]],
   ['rendermode',['renderMode',['../structop_1_1_wrapper_struct_face.html#accc6e564598130b9bf0a6d0ec9c304c4',1,'op::WrapperStructFace::renderMode()'],['../structop_1_1_wrapper_struct_hand.html#a90ddd24ee55b6aabd9a1728ccd91525e',1,'op::WrapperStructHand::renderMode()'],['../structop_1_1_wrapper_struct_pose.html#ad6b5ea0cef8eb81d20ab39099ba7716e',1,'op::WrapperStructPose::renderMode()'],['../namespaceop.html#afce557f02e337e16150d00bdf72ec033',1,'op::RenderMode()']]],
   ['renderpose',['renderPose',['../classop_1_1_pose_cpu_renderer.html#a98541b982847713472411402314efd96',1,'op::PoseCpuRenderer::renderPose()'],['../classop_1_1_pose_gpu_renderer.html#a4705b3c47cd9ac8174e357999960a28f',1,'op::PoseGpuRenderer::renderPose()'],['../classop_1_1_pose_renderer.html#ad1e96ceb47bf205b56b50c6b2792f9e3',1,'op::PoseRenderer::renderPose()']]],
   ['renderpose_2ehpp',['renderPose.hpp',['../render_pose_8hpp.html',1,'']]],

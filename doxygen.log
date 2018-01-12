@@ -841,16 +841,17 @@ Generating docs for c/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/in
 /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/wrapper/wrapperStructPose.hpp:111: warning: explicit link request to 'body' could not be resolved
 /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/wrapper/wrapperStructPose.hpp:111: warning: explicit link request to 'body' could not be resolved
 /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/include/openpose/wrapper/wrapperStructPose.hpp:111: warning: explicit link request to 'pair' could not be resolved
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:39: warning: unable to resolve reference to `doc/release_notes.md' for \ref command
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:76: warning: unable to resolve reference to `doc/installation.md' for \ref command
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:85: warning: unable to resolve reference to `doc/demo_overview.md' for \ref command
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:97: warning: unable to resolve reference to `doc/library_introduction.md' for \ref command
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:99: warning: unexpected token TK_EOF as the argument of ref
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:102: warning: unable to resolve reference to `doc/standalone_face_or_hand_keypoint_detector.md' for \ref command
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:103: warning: unable to resolve reference to `doc/standalone_face_or_hand_keypoint_detector.md' for \ref command
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:110: warning: unable to resolve reference to `doc/output.md' for \ref command
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:115: warning: explicit link request to 'faq' could not be resolved
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:140: warning: unable to resolve reference to `doc/contributors.md' for \ref command
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:37: warning: unable to resolve reference to `doc/released_features.md' for \ref command
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:37: warning: unable to resolve reference to `doc/release_notes.md' for \ref command
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:74: warning: unable to resolve reference to `doc/installation.md' for \ref command
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:83: warning: unable to resolve reference to `doc/demo_overview.md' for \ref command
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:95: warning: unable to resolve reference to `doc/library_introduction.md' for \ref command
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:97: warning: unexpected token TK_EOF as the argument of ref
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:100: warning: unable to resolve reference to `doc/standalone_face_or_hand_keypoint_detector.md' for \ref command
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:101: warning: unable to resolve reference to `doc/standalone_face_or_hand_keypoint_detector.md' for \ref command
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:108: warning: unable to resolve reference to `doc/output.md' for \ref command
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:113: warning: explicit link request to 'faq' could not be resolved
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:138: warning: unable to resolve reference to `doc/contributors.md' for \ref command
 ompound op::DatumProducer...
 Generating docs for compound op::ImageDirectoryReader...
 Generating docs for compound op::IpCameraReader...
@@ -900,5 +901,5 @@ Generating file index...
 Generating file member index...
 Generating example index...
 finalizing index lists...
-lookup cache used 2766/65536 hits=16646 misses=2959
+lookup cache used 2781/65536 hits=16685 misses=2974
 finished...

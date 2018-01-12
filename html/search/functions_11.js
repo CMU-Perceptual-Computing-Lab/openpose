@@ -11,7 +11,7 @@ var searchData=
   ['renderhand',['renderHand',['../classop_1_1_hand_cpu_renderer.html#a98a3cc7f939105224bcc4be07782563a',1,'op::HandCpuRenderer::renderHand()'],['../classop_1_1_hand_gpu_renderer.html#a3a05fd1d74868c1766e49ccf3979b9c9',1,'op::HandGpuRenderer::renderHand()'],['../classop_1_1_hand_renderer.html#aca16bfb051c891ea7c020df48602b111',1,'op::HandRenderer::renderHand()']]],
   ['renderhandkeypointscpu',['renderHandKeypointsCpu',['../namespaceop.html#afb5b711819f94b51f32460861d9cea38',1,'op']]],
   ['renderhandkeypointsgpu',['renderHandKeypointsGpu',['../namespaceop.html#a74458454b8bec064b435a3bde5ad25e0',1,'op']]],
-  ['renderkeypointscpu',['renderKeypointsCpu',['../namespaceop.html#a0dd0211bd87bb13345294af1390555b7',1,'op']]],
+  ['renderkeypointscpu',['renderKeypointsCpu',['../namespaceop.html#a07d0092a7c9ce5130cd26a7bbba927e9',1,'op']]],
   ['renderpose',['renderPose',['../classop_1_1_pose_cpu_renderer.html#a98541b982847713472411402314efd96',1,'op::PoseCpuRenderer::renderPose()'],['../classop_1_1_pose_gpu_renderer.html#a4705b3c47cd9ac8174e357999960a28f',1,'op::PoseGpuRenderer::renderPose()'],['../classop_1_1_pose_renderer.html#ad1e96ceb47bf205b56b50c6b2792f9e3',1,'op::PoseRenderer::renderPose()']]],
   ['renderposeheatmapgpu',['renderPoseHeatMapGpu',['../namespaceop.html#a9a3b197334a6a606f85eea43128a9a46',1,'op']]],
   ['renderposeheatmapsgpu',['renderPoseHeatMapsGpu',['../namespaceop.html#aa01e90a66388f8ced55d0aa61fb205a1',1,'op']]],

@@ -8,6 +8,7 @@ var searchData=
   ['face_5fnumber_5fparts',['FACE_NUMBER_PARTS',['../namespaceop.html#a8a05bdc38612c38e28b96bba5b4679b8',1,'op']]],
   ['face_5fpairs_5frender',['FACE_PAIRS_RENDER',['../namespaceop.html#a1245f62cf98c4ee7591dfc8807ef355d',1,'op']]],
   ['face_5fprototxt',['FACE_PROTOTXT',['../namespaceop.html#a4d07868d77fb11253b413ed579e04c22',1,'op']]],
+  ['face_5fscales_5frender',['FACE_SCALES_RENDER',['../namespaceop.html#a00c56c20997f734b2bd44d6f85b86cf0',1,'op']]],
   ['face_5ftrained_5fmodel',['FACE_TRAINED_MODEL',['../namespaceop.html#abd0ef2306478c3295283e7f1b59e3aff',1,'op']]],
   ['faceheatmaps',['faceHeatMaps',['../structop_1_1_datum.html#ae0c0f33a6b75c7f47e11112dd33f23c1',1,'op::Datum']]],
   ['facekeypoints',['faceKeypoints',['../structop_1_1_datum.html#aebd19bf50725a5cd87de1efd96f6ebfe',1,'op::Datum']]],
