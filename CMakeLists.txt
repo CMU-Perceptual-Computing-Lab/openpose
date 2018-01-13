@@ -180,9 +180,9 @@ if (${DL_FRAMEWORK} MATCHES "CAFFE")
         on your internet connection.")
 
     # Check if pulled
-    set(TEST_COMMAND "ls")
-    execute_process(COMMAND ${TEST_COMMAND} WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe RESULT_VARIABLE rv OUTPUT_QUIET)
-    if(rv)
+    file(GLOB CAFFE_DIR_VALID ${CMAKE_SOURCE_DIR}/3rdparty/caffe/*)
+    list(LENGTH CAFFE_DIR_VALID CAFFE_DIR_VALID_LENGTH)
+    if(CAFFE_DIR_VALID_LENGTH EQUAL 0)
         execute_process(COMMAND git submodule update --init --recursive)
     else()
         message(STATUS "Caffe has already been downloaded")
