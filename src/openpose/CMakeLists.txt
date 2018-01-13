@@ -18,9 +18,9 @@ endforeach(FILE ${OP_HEADERS_UNFILTERED})
 
 cuda_add_library(openpose ${SOURCES_OPENPOSE} ${OP_HEADERS})
 
+# Ubuntu
 if(UNIX AND NOT APPLE)
   target_link_libraries(openpose ${OpenCV_LIBS} ${Caffe_LIBS}
-      ${Boost_SYSTEM_LIBRARY} ${Boost_FILESYSTEM_LIBRARY} 
       ${GFLAGS_LIBRARY} ${GLOG_LIBRARY})
   if (CMAKE_COMPILER_IS_GNUCXX)
     foreach (SUB_DIR ${SUB_DIRS})
@@ -28,10 +28,8 @@ if(UNIX AND NOT APPLE)
     endforeach (SUB_DIR ${SUB_DIRS})
     set_target_properties(openpose PROPERTIES COMPILE_FLAGS ${OP_CXX_FLAGS})
   endif (CMAKE_COMPILER_IS_GNUCXX)
-endif(UNIX AND NOT APPLE)
-
-if (WIN32)
-
+# Windows
+elseif (WIN32)
   target_link_libraries(openpose ${OpenCV_LIBS} ${Caffe_LIBS}
       debug ${Boost_FILESYSTEM_LIBRARY_DEBUG} debug ${Boost_SYSTEM_LIBRARY_DEBUG}
       optimized ${Boost_FILESYSTEM_LIBRARY_OPTIMIZED} optimized ${Boost_SYSTEM_LIBRARY_OPTIMIZED} 
@@ -50,15 +48,15 @@ if (WIN32)
     source_group("Header Files\\${SUB_DIR}" FILES ${SUB_MOD_HEADERS})
   endforeach (SUB_DIR ${SUB_DIRS})
   set_target_properties(openpose PROPERTIES COMPILE_FLAGS -DOP_EXPORTS)
-endif (WIN32)
+endif (UNIX AND NOT APPLE)
 
 if (UNIX AND NOT APPLE)
   add_library(caffe SHARED IMPORTED)
-	set_property(TARGET caffe PROPERTY IMPORTED_LOCATION ${Caffe_LIBS})
-	target_link_libraries(openpose caffe)
+  set_property(TARGET caffe PROPERTY IMPORTED_LOCATION ${Caffe_LIBS})
+  target_link_libraries(openpose caffe)
 
   if (BUILD_CAFFE)
-  	add_dependencies(openpose openpose_caffe)
+    add_dependencies(openpose openpose_caffe)
   endif (BUILD_CAFFE)
 
   set_property(TARGET openpose PROPERTY VERSION ${OpenPose_VERSION})

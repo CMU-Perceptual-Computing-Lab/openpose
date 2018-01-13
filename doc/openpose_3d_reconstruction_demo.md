@@ -106,7 +106,7 @@ LIBS += -L/usr/local/cuda-8.0/lib64 -lcudart -lcublas -lcurand
 # OpenGL
 LIBS += -lGLU -lGL -lglut
 # Other 3rdparty
-LIBS += -lcudnn -lglog -lgflags -lboost_system -lboost_filesystem -lm -lboost_thread
+LIBS += -lcudnn -lglog -lgflags -lm
 LIBS += -pthread -fPIC -std=c++11 -fopenmp
 # Optimization flags
 LIBS += -DNDEBUG -O3 -march=native
