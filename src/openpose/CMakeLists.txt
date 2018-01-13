@@ -48,11 +48,9 @@ if (WIN32)
   foreach (SUB_DIR ${SUB_DIRS})
     string(TOUPPER ${SUB_DIR} SUB_DIR_UPPERCASE)
     source_group("Source Files\\${SUB_DIR}" FILES ${SOURCES_OP_${SUB_DIR_UPPERCASE}_WITH_CP} "*")
-    message(${CMAKE_SOURCE_DIR}/include/openpose/${SUB_DIR})
     file(GLOB_RECURSE SUB_MOD_HEADERS "${CMAKE_SOURCE_DIR}/include/openpose/${SUB_DIR}/*.h" 
         "${CMAKE_SOURCE_DIR}/include/openpose/${SUB_DIR}/*.hpp" 
         "${CMAKE_SOURCE_DIR}/include/openpose/${SUB_DIR}/*.hu")
-    message(STATUS "\${SUB_MOD_HEADERS} = ${SUB_MOD_HEADERS}")
     source_group("Header Files\\${SUB_DIR}" FILES ${SUB_MOD_HEADERS})
   endforeach (SUB_DIR ${SUB_DIRS})
   set_target_properties(openpose PROPERTIES COMPILE_FLAGS -DOP_EXPORTS)
