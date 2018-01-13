@@ -204,6 +204,7 @@ namespace op
     private:
         const ThreadManagerMode mThreadManagerMode;
         const std::shared_ptr<std::pair<std::atomic<bool>, std::atomic<int>>> spVideoSeek;
+        bool mConfigured;
         ThreadManager<std::shared_ptr<TDatums>> mThreadManager;
         bool mUserInputWsOnNewThread;
         bool mUserPostProcessingWsOnNewThread;
@@ -249,17 +250,6 @@ namespace op
          */
         unsigned long long threadIdPP();
 
-        /**
-         * TWorker concatenator (private internal function).
-         * Auxiliary function that concatenate std::vectors of TWorker. Since TWorker is some kind of smart pointer
-         * (usually std::shared_ptr), its copy still shares the same internal data. It will not work for TWorker
-         * classes that do not share the data when moved.
-         * @param workersA First std::shared_ptr<TDatums> element to be concatenated.
-         * @param workersB Second std::shared_ptr<TDatums> element to be concatenated.
-         * @return Concatenated std::vector<TWorker> of both workersA and workersB.
-         */
-        std::vector<TWorker> mergeWorkers(const std::vector<TWorker>& workersA, const std::vector<TWorker>& workersB);
-
         DELETE_COPY(Wrapper);
     };
 }
@@ -276,14 +266,17 @@ namespace op
 #include <openpose/hand/headers.hpp>
 #include <openpose/pose/headers.hpp>
 #include <openpose/producer/headers.hpp>
+#include <openpose/experimental/tracking/headers.hpp>
 #include <openpose/utilities/cuda.hpp>
 #include <openpose/utilities/fileSystem.hpp>
+#include <openpose/utilities/standard.hpp>
 namespace op
 {
     template<typename TDatums, typename TWorker, typename TQueue>
     Wrapper<TDatums, TWorker, TQueue>::Wrapper(const ThreadManagerMode threadManagerMode) :
         mThreadManagerMode{threadManagerMode},
         spVideoSeek{std::make_shared<std::pair<std::atomic<bool>, std::atomic<int>>>()},
+        mConfigured{false},
         mThreadManager{threadManagerMode},
         mMultiThreadEnabled{true}
     {
@@ -463,22 +456,25 @@ namespace op
                       __LINE__, __FUNCTION__, __FILE__);
             if (!renderOutput && (!wrapperStructOutput.writeImages.empty() || !wrapperStructOutput.writeVideo.empty()))
             {
-                const auto message = "In order to save the rendered frames (`write_images` or `write_video`), you must"
-                                     " set `render_output` to true.";
-                error(message, __LINE__, __FUNCTION__, __FILE__);
+                const auto message = "In order to save the rendered frames (`--write_images` or `--write_video`), you"
+                                     " cannot disable `--render_pose`.";
+                log(message, Priority::High);
             }
             if (!wrapperStructOutput.writeHeatMaps.empty() && wrapperStructPose.heatMapTypes.empty())
             {
-                const auto message = "In order to save the heatmaps (`write_heatmaps`), you need to pick which heat"
-                                     " maps you want to save: `heatmaps_add_X` flags or fill the"
+                const auto message = "In order to save the heatmaps (`--write_heatmaps`), you need to pick which heat"
+                                     " maps you want to save: `--heatmaps_add_X` flags or fill the"
                                      " wrapperStructPose.heatMapTypes.";
                 error(message, __LINE__, __FUNCTION__, __FILE__);
             }
             if (!wrapperStructOutput.writeHeatMaps.empty()
-                && wrapperStructPose.heatMapScale != ScaleMode::UnsignedChar)
+                && (wrapperStructPose.heatMapScale != ScaleMode::UnsignedChar &&
+                        wrapperStructOutput.writeHeatMapsFormat != "float"))
             {
-                const auto message = "In order to save the heatmaps, you must set wrapperStructPose.heatMapScale to"
-                                     " ScaleMode::UnsignedChar, i.e. range [0, 255].";
+                const auto message = "In order to save the heatmaps, you must either set"
+                                     " wrapperStructPose.heatMapScale to ScaleMode::UnsignedChar (i.e. range [0, 255])"
+                                     " or `--write_heatmaps_format` to `float` to storage floating numbers in binary"
+                                     " mode.";
                 error(message, __LINE__, __FUNCTION__, __FILE__);
             }
             if (mUserOutputWs.empty() && mThreadManagerMode != ThreadManagerMode::Asynchronous
@@ -490,36 +486,38 @@ namespace op
                 };
                 const auto savingSomething = (
                     !wrapperStructOutput.writeImages.empty() || !wrapperStructOutput.writeVideo.empty()
-                        || !wrapperStructOutput.writeKeypoint.empty() || !wrapperStructOutput.writeKeypointJson.empty()
+                        || !wrapperStructOutput.writeKeypoint.empty() || !wrapperStructOutput.writeJson.empty()
                         || !wrapperStructOutput.writeCocoJson.empty() || !wrapperStructOutput.writeHeatMaps.empty()
                 );
                 if (!wrapperStructOutput.displayGui && !savingSomething)
                 {
-                    const auto message = "No output is selected (`no_display`) and no results are generated (no"
-                                         " `write_X` flags enabled). Thus, no output would be generated."
+                    const auto message = "No output is selected (`--no_display`) and no results are generated (no"
+                                         " `--write_X` flags enabled). Thus, no output would be generated."
                                          + additionalMessage;
-                    error(message, __LINE__, __FUNCTION__, __FILE__);
-                }
-
-                if ((wrapperStructOutput.displayGui && wrapperStructOutput.guiVerbose) && !renderOutput)
-                {
-                    const auto message = "No render is enabled (e.g. `no_render_pose`), so you should also remove the"
-                                         " display (set `no_display` or `no_gui_verbose`)." + additionalMessage;
                     error(message, __LINE__, __FUNCTION__, __FILE__);
                 }
                 if (wrapperStructInput.framesRepeat && savingSomething)
                 {
-                    const auto message = "Frames repetition (`frames_repeat`) is enabled as well as some writing"
-                                         " function (`write_X`). This program would never stop recording the same"
+                    const auto message = "Frames repetition (`--frames_repeat`) is enabled as well as some writing"
+                                         " function (`--write_X`). This program would never stop recording the same"
                                          " frames over and over. Please, disable repetition or remove writing.";
                     error(message, __LINE__, __FUNCTION__, __FILE__);
+                }
+                // Warnings
+                if ((wrapperStructOutput.displayGui && wrapperStructOutput.guiVerbose) && !renderOutput)
+                {
+                    const auto message = "No render is enabled (e.g. `--render_pose 0`), so you might also want to"
+                                         " remove the display (set `--no_display` or `--no_gui_verbose`). If you"
+                                         " simply want to use OpenPose to record video/images without keypoints, you"
+                                         " only need to set `--num_gpu 0`." + additionalMessage;
+                    log(message, Priority::High);
                 }
                 if (wrapperStructInput.realTimeProcessing && savingSomething)
                 {
                     const auto message = "Real time processing is enabled as well as some writing function. Thus, some"
                                          " frames might be skipped. Consider disabling real time processing if you"
                                          " intend to save any results.";
-                    log(message, Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                    log(message, Priority::High);
                 }
             }
             if (!wrapperStructOutput.writeVideo.empty() && wrapperStructInput.producerSharedPtr == nullptr)
@@ -536,23 +534,27 @@ namespace op
 
             // Get number GPUs
             auto gpuNumber = wrapperStructPose.gpuNumber;
-            auto gpuNumberStart = wrapperStructPose.gpuNumberStart;
+            const auto gpuNumberStart = wrapperStructPose.gpuNumberStart;
             // If number GPU < 0 --> set it to all the available GPUs
             if (gpuNumber < 0)
             {
                 // Get total number GPUs
-                gpuNumber = getGpuNumber();
+                const auto totalGpuNumber = getGpuNumber();
+                if (totalGpuNumber <= gpuNumberStart)
+                    error("Number of initial GPUs (`--number_gpu_start`) must be lower than the total number of used"
+                          " GPUs (`--number_gpu`)", __LINE__, __FUNCTION__, __FILE__);
+                gpuNumber = totalGpuNumber - gpuNumberStart;
                 // Reset initial GPU to 0 (we want them all)
-                gpuNumberStart = 0;
                 // Logging message
-                log("Auto-detecting GPUs... Detected " + std::to_string(gpuNumber) + " GPU(s), using them all.",
-                    Priority::High);
+                log("Auto-detecting all available GPUs... Detected " + std::to_string(totalGpuNumber)
+                    + " GPU(s), using " + std::to_string(gpuNumber) + " of them starting at GPU "
+                    + std::to_string(gpuNumberStart) + ".", Priority::High);
             }
 
             // Proper format
             const auto writeImagesCleaned = formatAsDirectory(wrapperStructOutput.writeImages);
             const auto writeKeypointCleaned = formatAsDirectory(wrapperStructOutput.writeKeypoint);
-            const auto writeKeypointJsonCleaned = formatAsDirectory(wrapperStructOutput.writeKeypointJson);
+            const auto writeJsonCleaned = formatAsDirectory(wrapperStructOutput.writeJson);
             const auto writeHeatMapsCleaned = formatAsDirectory(wrapperStructOutput.writeHeatMaps);
             const auto modelFolder = formatAsDirectory(wrapperStructPose.modelFolder);
 
@@ -589,253 +591,276 @@ namespace op
             else
                 wDatumProducer = nullptr;
 
-            // Get input scales and sizes
-            const auto scaleAndSizeExtractor = std::make_shared<ScaleAndSizeExtractor>(
-                wrapperStructPose.netInputSize, finalOutputSize, wrapperStructPose.scalesNumber,
-                wrapperStructPose.scaleGap
-            );
-            spWScaleAndSizeExtractor = std::make_shared<WScaleAndSizeExtractor<TDatumsPtr>>(scaleAndSizeExtractor);
-
-            // Input cvMat to OpenPose input & output format
-            const auto cvMatToOpInput = std::make_shared<CvMatToOpInput>();
-            spWCvMatToOpInput = std::make_shared<WCvMatToOpInput<TDatumsPtr>>(cvMatToOpInput);
-            if (renderOutput)
-            {
-                const auto cvMatToOpOutput = std::make_shared<CvMatToOpOutput>();
-                spWCvMatToOpOutput = std::make_shared<WCvMatToOpOutput<TDatumsPtr>>(cvMatToOpOutput);
-            }
-
-            // Pose estimators & renderers
             std::vector<std::shared_ptr<PoseExtractor>> poseExtractors;
             std::vector<std::shared_ptr<PoseGpuRenderer>> poseGpuRenderers;
             std::shared_ptr<PoseCpuRenderer> poseCpuRenderer;
-            std::vector<TWorker> cpuRenderers;
-            spWPoses.clear();
-            spWPoses.resize(gpuNumber);
-            if (wrapperStructPose.enable)
+            if (gpuNumber > 0)
             {
-                // Pose estimators
-                for (auto gpuId = 0; gpuId < gpuNumber; gpuId++)
-                    poseExtractors.emplace_back(std::make_shared<PoseExtractorCaffe>(
-                        wrapperStructPose.poseModel, modelFolder, gpuId + gpuNumberStart,
-                        wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale,
-                        wrapperStructPose.enableGoogleLogging
-                    ));
+                // Get input scales and sizes
+                const auto scaleAndSizeExtractor = std::make_shared<ScaleAndSizeExtractor>(
+                    wrapperStructPose.netInputSize, finalOutputSize, wrapperStructPose.scalesNumber,
+                    wrapperStructPose.scaleGap
+                );
+                spWScaleAndSizeExtractor = std::make_shared<WScaleAndSizeExtractor<TDatumsPtr>>(scaleAndSizeExtractor);
 
-                // Pose renderers
-                if (renderOutputGpu || wrapperStructPose.renderMode == RenderMode::Cpu)
+                // Input cvMat to OpenPose input & output format
+                const auto cvMatToOpInput = std::make_shared<CvMatToOpInput>();
+                spWCvMatToOpInput = std::make_shared<WCvMatToOpInput<TDatumsPtr>>(cvMatToOpInput);
+                if (renderOutput)
                 {
-                    // If wrapperStructPose.renderMode != RenderMode::Gpu but renderOutput, then we create an alpha = 0
-                    // pose renderer in order to keep the removing background option
-                    const auto alphaKeypoint = (wrapperStructPose.renderMode != RenderMode::None
-                                                ? wrapperStructPose.alphaKeypoint : 0.f);
-                    const auto alphaHeatMap = (wrapperStructPose.renderMode != RenderMode::None
-                                                ? wrapperStructPose.alphaHeatMap : 0.f);
-                    // GPU rendering
-                    if (renderOutputGpu)
-                    {
-                        for (const auto& poseExtractor : poseExtractors)
-                        {
-                            poseGpuRenderers.emplace_back(std::make_shared<PoseGpuRenderer>(
-                                wrapperStructPose.poseModel, poseExtractor, wrapperStructPose.renderThreshold,
-                                wrapperStructPose.blendOriginalFrame, alphaKeypoint,
-                                alphaHeatMap, wrapperStructPose.defaultPartToRender
-                            ));
-                        }
-                    }
-                    // CPU rendering
-                    if (wrapperStructPose.renderMode == RenderMode::Cpu)
-                    {
-                        poseCpuRenderer = std::make_shared<PoseCpuRenderer>(wrapperStructPose.poseModel,
-                                                                            wrapperStructPose.renderThreshold,
-                                                                            wrapperStructPose.blendOriginalFrame);
-                        cpuRenderers.emplace_back(std::make_shared<WPoseRenderer<TDatumsPtr>>(poseCpuRenderer));
-                    }
+                    const auto cvMatToOpOutput = std::make_shared<CvMatToOpOutput>();
+                    spWCvMatToOpOutput = std::make_shared<WCvMatToOpOutput<TDatumsPtr>>(cvMatToOpOutput);
                 }
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
-                // Pose extractor(s)
-                spWPoses.resize(poseExtractors.size());
-                for (auto i = 0u; i < spWPoses.size(); i++)
-                    spWPoses.at(i) = {std::make_shared<WPoseExtractor<TDatumsPtr>>(poseExtractors.at(i))};
-            }
-
-
-            // Face extractor(s)
-            if (wrapperStructFace.enable)
-            {
-                // Face detector
-                // OpenPose face detector
+                // Pose estimators & renderers
+                std::vector<TWorker> cpuRenderers;
+                spWPoses.clear();
+                spWPoses.resize(gpuNumber);
                 if (wrapperStructPose.enable)
                 {
-                    const auto faceDetector = std::make_shared<FaceDetector>(wrapperStructPose.poseModel);
-                    for (auto gpu = 0u; gpu < spWPoses.size(); gpu++)
-                        spWPoses.at(gpu).emplace_back(std::make_shared<WFaceDetector<TDatumsPtr>>(faceDetector));
+                    // Pose estimators
+                    for (auto gpuId = 0; gpuId < gpuNumber; gpuId++)
+                        poseExtractors.emplace_back(std::make_shared<PoseExtractorCaffe>(
+                            wrapperStructPose.poseModel, modelFolder, gpuId + gpuNumberStart,
+                            wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale,
+                            wrapperStructPose.addPartCandidates, wrapperStructPose.enableGoogleLogging
+                        ));
+
+                    // Pose renderers
+                    if (renderOutputGpu || wrapperStructPose.renderMode == RenderMode::Cpu)
+                    {
+                        // If wrapperStructPose.renderMode != RenderMode::Gpu but renderOutput, then we create an
+                        // alpha = 0 pose renderer in order to keep the removing background option
+                        const auto alphaKeypoint = (wrapperStructPose.renderMode != RenderMode::None
+                                                    ? wrapperStructPose.alphaKeypoint : 0.f);
+                        const auto alphaHeatMap = (wrapperStructPose.renderMode != RenderMode::None
+                                                    ? wrapperStructPose.alphaHeatMap : 0.f);
+                        // GPU rendering
+                        if (renderOutputGpu)
+                        {
+                            for (const auto& poseExtractor : poseExtractors)
+                            {
+                                poseGpuRenderers.emplace_back(std::make_shared<PoseGpuRenderer>(
+                                    wrapperStructPose.poseModel, poseExtractor, wrapperStructPose.renderThreshold,
+                                    wrapperStructPose.blendOriginalFrame, alphaKeypoint,
+                                    alphaHeatMap, wrapperStructPose.defaultPartToRender
+                                ));
+                            }
+                        }
+                        // CPU rendering
+                        if (wrapperStructPose.renderMode == RenderMode::Cpu)
+                        {
+                            poseCpuRenderer = std::make_shared<PoseCpuRenderer>(wrapperStructPose.poseModel,
+                                                                                wrapperStructPose.renderThreshold,
+                                                                                wrapperStructPose.blendOriginalFrame);
+                            cpuRenderers.emplace_back(std::make_shared<WPoseRenderer<TDatumsPtr>>(poseCpuRenderer));
+                        }
+                    }
+                    log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+
+                    // Pose extractor(s)
+                    spWPoses.resize(poseExtractors.size());
+                    for (auto i = 0u; i < spWPoses.size(); i++)
+                        spWPoses.at(i) = {std::make_shared<WPoseExtractor<TDatumsPtr>>(poseExtractors.at(i))};
                 }
-                // OpenCV face detector
-                else
+
+
+                // Face extractor(s)
+                if (wrapperStructFace.enable)
                 {
-                    log("Body keypoint detection is disabled. Hence, using OpenCV face detector (much less accurate"
-                        " but faster).", Priority::High);
+                    // Face detector
+                    // OpenPose face detector
+                    if (wrapperStructPose.enable)
+                    {
+                        const auto faceDetector = std::make_shared<FaceDetector>(wrapperStructPose.poseModel);
+                        for (auto gpu = 0u; gpu < spWPoses.size(); gpu++)
+                            spWPoses.at(gpu).emplace_back(std::make_shared<WFaceDetector<TDatumsPtr>>(faceDetector));
+                    }
+                    // OpenCV face detector
+                    else
+                    {
+                        log("Body keypoint detection is disabled. Hence, using OpenCV face detector (much less"
+                            " accurate but faster).", Priority::High);
+                        for (auto gpu = 0u; gpu < spWPoses.size(); gpu++)
+                        {
+                            // 1 FaceDetectorOpenCV per thread, OpenCV face detector is not thread-safe
+                            const auto faceDetectorOpenCV = std::make_shared<FaceDetectorOpenCV>(modelFolder);
+                            spWPoses.at(gpu).emplace_back(
+                                std::make_shared<WFaceDetectorOpenCV<TDatumsPtr>>(faceDetectorOpenCV)
+                            );
+                        }
+                    }
+                    // Face keypoint extractor
                     for (auto gpu = 0u; gpu < spWPoses.size(); gpu++)
                     {
-                        // 1 FaceDetectorOpenCV per thread, OpenCV face detector is not thread-safe
-                        const auto faceDetectorOpenCV = std::make_shared<FaceDetectorOpenCV>(modelFolder);
-                        spWPoses.at(gpu).emplace_back(
-                            std::make_shared<WFaceDetectorOpenCV<TDatumsPtr>>(faceDetectorOpenCV)
+                        // Face keypoint extractor
+                        const auto netOutputSize = wrapperStructFace.netInputSize;
+                        const auto faceExtractor = std::make_shared<FaceExtractorCaffe>(
+                            wrapperStructFace.netInputSize, netOutputSize, modelFolder,
+                            gpu + gpuNumberStart, wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale,
+                            wrapperStructPose.enableGoogleLogging
                         );
+                        spWPoses.at(gpu).emplace_back(std::make_shared<WFaceExtractor<TDatumsPtr>>(faceExtractor));
                     }
                 }
-                // Face keypoint extractor
-                for (auto gpu = 0u; gpu < spWPoses.size(); gpu++)
-                {
-                    // Face keypoint extractor
-                    const auto netOutputSize = wrapperStructFace.netInputSize;
-                    const auto faceExtractor = std::make_shared<FaceExtractorCaffe>(
-                        wrapperStructFace.netInputSize, netOutputSize, modelFolder,
-                        gpu + gpuNumberStart, wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale,
-                        wrapperStructPose.enableGoogleLogging
-                    );
-                    spWPoses.at(gpu).emplace_back(std::make_shared<WFaceExtractor<TDatumsPtr>>(faceExtractor));
-                }
-            }
 
-            // Hand extractor(s)
-            if (wrapperStructHand.enable)
-            {
-                const auto handDetector = std::make_shared<HandDetector>(wrapperStructPose.poseModel);
-                for (auto gpu = 0u; gpu < spWPoses.size(); gpu++)
+                // Hand extractor(s)
+                if (wrapperStructHand.enable)
                 {
-                    // Hand detector
-                    // If tracking
-                    if (wrapperStructHand.tracking)
-                        spWPoses.at(gpu).emplace_back(
-                            std::make_shared<WHandDetectorTracking<TDatumsPtr>>(handDetector)
+                    const auto handDetector = std::make_shared<HandDetector>(wrapperStructPose.poseModel);
+                    for (auto gpu = 0u; gpu < spWPoses.size(); gpu++)
+                    {
+                        // Hand detector
+                        // If tracking
+                        if (wrapperStructHand.tracking)
+                            spWPoses.at(gpu).emplace_back(
+                                std::make_shared<WHandDetectorTracking<TDatumsPtr>>(handDetector)
+                            );
+                        // If detection
+                        else
+                            spWPoses.at(gpu).emplace_back(std::make_shared<WHandDetector<TDatumsPtr>>(handDetector));
+                        // Hand keypoint extractor
+                        const auto netOutputSize = wrapperStructHand.netInputSize;
+                        const auto handExtractor = std::make_shared<HandExtractorCaffe>(
+                            wrapperStructHand.netInputSize, netOutputSize, modelFolder,
+                            gpu + gpuNumberStart, wrapperStructHand.scalesNumber, wrapperStructHand.scaleRange,
+                            wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale,
+                            wrapperStructPose.enableGoogleLogging
                         );
-                    // If detection
-                    else
-                        spWPoses.at(gpu).emplace_back(std::make_shared<WHandDetector<TDatumsPtr>>(handDetector));
-                    // Hand keypoint extractor
-                    const auto netOutputSize = wrapperStructHand.netInputSize;
-                    const auto handExtractor = std::make_shared<HandExtractorCaffe>(
-                        wrapperStructHand.netInputSize, netOutputSize, modelFolder,
-                        gpu + gpuNumberStart, wrapperStructHand.scalesNumber, wrapperStructHand.scaleRange,
-                        wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale,
-                        wrapperStructPose.enableGoogleLogging
-                    );
-                    spWPoses.at(gpu).emplace_back(std::make_shared<WHandExtractor<TDatumsPtr>>(handExtractor));
-                    // If tracking
-                    if (wrapperStructHand.tracking)
-                        spWPoses.at(gpu).emplace_back(std::make_shared<WHandDetectorUpdate<TDatumsPtr>>(handDetector));
+                        spWPoses.at(gpu).emplace_back(
+                            std::make_shared<WHandExtractor<TDatumsPtr>>(handExtractor)
+                            );
+                        // If tracking
+                        if (wrapperStructHand.tracking)
+                            spWPoses.at(gpu).emplace_back(
+                                std::make_shared<WHandDetectorUpdate<TDatumsPtr>>(handDetector)
+                            );
+                    }
                 }
-            }
 
-            // Pose renderer(s)
-            if (!poseGpuRenderers.empty())
-                for (auto i = 0u; i < spWPoses.size(); i++)
-                    spWPoses.at(i).emplace_back(std::make_shared<WPoseRenderer<TDatumsPtr>>(poseGpuRenderers.at(i)));
-
-            // Face renderer(s)
-            if (renderFace)
-            {
-                // CPU rendering
-                if (wrapperStructFace.renderMode == RenderMode::Cpu)
-                {
-                    // Construct face renderer
-                    const auto faceRenderer = std::make_shared<FaceCpuRenderer>(wrapperStructFace.renderThreshold,
-                                                                                wrapperStructFace.alphaKeypoint,
-                                                                                wrapperStructFace.alphaHeatMap);
-                    // Add worker
-                    cpuRenderers.emplace_back(std::make_shared<WFaceRenderer<TDatumsPtr>>(faceRenderer));
-                }
-                // GPU rendering
-                else if (wrapperStructFace.renderMode == RenderMode::Gpu)
-                {
+                // Pose renderer(s)
+                if (!poseGpuRenderers.empty())
                     for (auto i = 0u; i < spWPoses.size(); i++)
+                        spWPoses.at(i).emplace_back(std::make_shared<WPoseRenderer<TDatumsPtr>>(
+                            poseGpuRenderers.at(i)
+                        ));
+
+                // Face renderer(s)
+                if (renderFace)
+                {
+                    // CPU rendering
+                    if (wrapperStructFace.renderMode == RenderMode::Cpu)
                     {
                         // Construct face renderer
-                        const auto faceRenderer = std::make_shared<FaceGpuRenderer>(wrapperStructFace.renderThreshold,
+                        const auto faceRenderer = std::make_shared<FaceCpuRenderer>(wrapperStructFace.renderThreshold,
                                                                                     wrapperStructFace.alphaKeypoint,
                                                                                     wrapperStructFace.alphaHeatMap);
-                        // Performance boost -> share spGpuMemory for all renderers
-                        if (!poseGpuRenderers.empty())
-                        {
-                            const bool isLastRenderer = !renderHandGpu;
-                            const auto renderer = std::static_pointer_cast<PoseGpuRenderer>(poseGpuRenderers.at(i));
-                            faceRenderer->setSharedParametersAndIfLast(renderer->getSharedParameters(),
-                                                                       isLastRenderer);
-                        }
                         // Add worker
-                        spWPoses.at(i).emplace_back(std::make_shared<WFaceRenderer<TDatumsPtr>>(faceRenderer));
+                        cpuRenderers.emplace_back(std::make_shared<WFaceRenderer<TDatumsPtr>>(faceRenderer));
                     }
-                }
-                else
-                    error("Unknown RenderMode.", __LINE__, __FUNCTION__, __FILE__);
-            }
-
-            // Hand renderer(s)
-            if (renderHand)
-            {
-                // CPU rendering
-                if (wrapperStructHand.renderMode == RenderMode::Cpu)
-                {
-                    // Construct hand renderer
-                    const auto handRenderer = std::make_shared<HandCpuRenderer>(wrapperStructHand.renderThreshold,
-                                                                                wrapperStructHand.alphaKeypoint,
-                                                                                wrapperStructHand.alphaHeatMap);
-                    // Add worker
-                    cpuRenderers.emplace_back(std::make_shared<WHandRenderer<TDatumsPtr>>(handRenderer));
-                }
-                // GPU rendering
-                else if (wrapperStructHand.renderMode == RenderMode::Gpu)
-                {
-                    for (auto i = 0u; i < spWPoses.size(); i++)
+                    // GPU rendering
+                    else if (wrapperStructFace.renderMode == RenderMode::Gpu)
                     {
-                        // Construct hands renderer
-                        const auto handRenderer = std::make_shared<HandGpuRenderer>(wrapperStructHand.renderThreshold,
+                        for (auto i = 0u; i < spWPoses.size(); i++)
+                        {
+                            // Construct face renderer
+                            const auto faceRenderer = std::make_shared<FaceGpuRenderer>(
+                                wrapperStructFace.renderThreshold, wrapperStructFace.alphaKeypoint,
+                                wrapperStructFace.alphaHeatMap
+                            );
+                            // Performance boost -> share spGpuMemory for all renderers
+                            if (!poseGpuRenderers.empty())
+                            {
+                                const bool isLastRenderer = !renderHandGpu;
+                                const auto renderer = std::static_pointer_cast<PoseGpuRenderer>(
+                                    poseGpuRenderers.at(i)
+                                );
+                                faceRenderer->setSharedParametersAndIfLast(renderer->getSharedParameters(),
+                                                                           isLastRenderer);
+                            }
+                            // Add worker
+                            spWPoses.at(i).emplace_back(std::make_shared<WFaceRenderer<TDatumsPtr>>(faceRenderer));
+                        }
+                    }
+                    else
+                        error("Unknown RenderMode.", __LINE__, __FUNCTION__, __FILE__);
+                }
+
+                // Hand renderer(s)
+                if (renderHand)
+                {
+                    // CPU rendering
+                    if (wrapperStructHand.renderMode == RenderMode::Cpu)
+                    {
+                        // Construct hand renderer
+                        const auto handRenderer = std::make_shared<HandCpuRenderer>(wrapperStructHand.renderThreshold,
                                                                                     wrapperStructHand.alphaKeypoint,
                                                                                     wrapperStructHand.alphaHeatMap);
-                        // Performance boost -> share spGpuMemory for all renderers
-                        if (!poseGpuRenderers.empty())
-                        {
-                            const bool isLastRenderer = true;
-                            const auto renderer = std::static_pointer_cast<PoseGpuRenderer>(poseGpuRenderers.at(i));
-                            handRenderer->setSharedParametersAndIfLast(renderer->getSharedParameters(),
-                                                                       isLastRenderer);
-                        }
                         // Add worker
-                        spWPoses.at(i).emplace_back(std::make_shared<WHandRenderer<TDatumsPtr>>(handRenderer));
+                        cpuRenderers.emplace_back(std::make_shared<WHandRenderer<TDatumsPtr>>(handRenderer));
                     }
+                    // GPU rendering
+                    else if (wrapperStructHand.renderMode == RenderMode::Gpu)
+                    {
+                        for (auto i = 0u; i < spWPoses.size(); i++)
+                        {
+                            // Construct hands renderer
+                            const auto handRenderer = std::make_shared<HandGpuRenderer>(
+                                wrapperStructHand.renderThreshold, wrapperStructHand.alphaKeypoint,
+                                wrapperStructHand.alphaHeatMap
+                            );
+                            // Performance boost -> share spGpuMemory for all renderers
+                            if (!poseGpuRenderers.empty())
+                            {
+                                const bool isLastRenderer = true;
+                                const auto renderer = std::static_pointer_cast<PoseGpuRenderer>(
+                                    poseGpuRenderers.at(i)
+                                    );
+                                handRenderer->setSharedParametersAndIfLast(renderer->getSharedParameters(),
+                                                                           isLastRenderer);
+                            }
+                            // Add worker
+                            spWPoses.at(i).emplace_back(std::make_shared<WHandRenderer<TDatumsPtr>>(handRenderer));
+                        }
+                    }
+                    else
+                        error("Unknown RenderMode.", __LINE__, __FUNCTION__, __FILE__);
                 }
-                else
-                    error("Unknown RenderMode.", __LINE__, __FUNCTION__, __FILE__);
-            }
 
-            // Itermediate workers (e.g. OpenPose format to cv::Mat, json & frames recorder, ...)
-            mPostProcessingWs.clear();
-            // Frame buffer and ordering
-            if (spWPoses.size() > 1u)
-                mPostProcessingWs.emplace_back(std::make_shared<WQueueOrderer<TDatumsPtr>>());
-            // Frames processor (OpenPose format -> cv::Mat format)
-            if (renderOutput)
-            {
-                mPostProcessingWs = mergeWorkers(mPostProcessingWs, cpuRenderers);
-                const auto opOutputToCvMat = std::make_shared<OpOutputToCvMat>();
-                mPostProcessingWs.emplace_back(std::make_shared<WOpOutputToCvMat<TDatumsPtr>>(opOutputToCvMat));
-            }
-            // Re-scale pose if desired
-            // If desired scale is not the current input
-            if (wrapperStructPose.keypointScale != ScaleMode::InputResolution
-                // and desired scale is not output when size(input) = size(output)
-                && !(wrapperStructPose.keypointScale == ScaleMode::OutputResolution &&
-                     (finalOutputSize == producerSize || finalOutputSize.x <= 0 || finalOutputSize.y <= 0))
-                // and desired scale is not net output when size(input) = size(net output)
-                && !(wrapperStructPose.keypointScale == ScaleMode::NetOutputResolution
-                     && producerSize == wrapperStructPose.netInputSize))
-            {
-                // Then we must rescale the keypoints
-                auto keypointScaler = std::make_shared<KeypointScaler>(wrapperStructPose.keypointScale);
-                mPostProcessingWs.emplace_back(std::make_shared<WKeypointScaler<TDatumsPtr>>(keypointScaler));
+                // Itermediate workers (e.g. OpenPose format to cv::Mat, json & frames recorder, ...)
+                mPostProcessingWs.clear();
+                // Frame buffer and ordering
+                if (spWPoses.size() > 1u)
+                    mPostProcessingWs.emplace_back(std::make_shared<WQueueOrderer<TDatumsPtr>>());
+                // Person ID identification
+                if (wrapperStructPose.identification)
+                {
+                    const auto personIdExtractor = std::make_shared<PersonIdExtractor>();
+                    mPostProcessingWs.emplace_back(
+                        std::make_shared<WPersonIdExtractor<TDatumsPtr>>(personIdExtractor)
+                    );
+                }
+                // Frames processor (OpenPose format -> cv::Mat format)
+                if (renderOutput)
+                {
+                    mPostProcessingWs = mergeVectors(mPostProcessingWs, cpuRenderers);
+                    const auto opOutputToCvMat = std::make_shared<OpOutputToCvMat>();
+                    mPostProcessingWs.emplace_back(std::make_shared<WOpOutputToCvMat<TDatumsPtr>>(opOutputToCvMat));
+                }
+                // Re-scale pose if desired
+                // If desired scale is not the current input
+                if (wrapperStructPose.keypointScale != ScaleMode::InputResolution
+                    // and desired scale is not output when size(input) = size(output)
+                    && !(wrapperStructPose.keypointScale == ScaleMode::OutputResolution &&
+                         (finalOutputSize == producerSize || finalOutputSize.x <= 0 || finalOutputSize.y <= 0))
+                    // and desired scale is not net output when size(input) = size(net output)
+                    && !(wrapperStructPose.keypointScale == ScaleMode::NetOutputResolution
+                         && producerSize == wrapperStructPose.netInputSize))
+                {
+                    // Then we must rescale the keypoints
+                    auto keypointScaler = std::make_shared<KeypointScaler>(wrapperStructPose.keypointScale);
+                    mPostProcessingWs.emplace_back(std::make_shared<WKeypointScaler<TDatumsPtr>>(keypointScaler));
+                }
             }
 
             mOutputWs.clear();
@@ -850,11 +875,12 @@ namespace op
                 if (wrapperStructHand.enable)
                     mOutputWs.emplace_back(std::make_shared<WHandSaver<TDatumsPtr>>(keypointSaver));
             }
-            // Write people pose data on disk (json format)
-            if (!writeKeypointJsonCleaned.empty())
+            // Write OpenPose output data on disk in json format (body/hand/face keypoints, body part locations if
+            // enabled, etc.)
+            if (!writeJsonCleaned.empty())
             {
-                const auto keypointJsonSaver = std::make_shared<KeypointJsonSaver>(writeKeypointJsonCleaned);
-                mOutputWs.emplace_back(std::make_shared<WKeypointJsonSaver<TDatumsPtr>>(keypointJsonSaver));
+                const auto peopleJsonSaver = std::make_shared<PeopleJsonSaver>(writeJsonCleaned);
+                mOutputWs.emplace_back(std::make_shared<WPeopleJsonSaver<TDatumsPtr>>(peopleJsonSaver));
             }
             // Write people pose data on disk (COCO validation json format)
             if (!wrapperStructOutput.writeCocoJson.empty())
@@ -921,6 +947,8 @@ namespace op
                 // WGui
                 spWGui = {std::make_shared<WGui<TDatumsPtr>>(gui)};
             }
+            // Set wrapper as configured
+            mConfigured = true;
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
         }
         catch (const std::exception& e)
@@ -935,6 +963,7 @@ namespace op
         try
         {
             configureThreadManager();
+            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             mThreadManager.exec();
         }
         catch (const std::exception& e)
@@ -949,6 +978,7 @@ namespace op
         try
         {
             configureThreadManager();
+            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             mThreadManager.start();
         }
         catch (const std::exception& e)
@@ -1091,6 +1121,7 @@ namespace op
     {
         try
         {
+            mConfigured = false;
             mThreadManager.reset();
             mThreadId = 0ull;
             // Reset
@@ -1120,7 +1151,7 @@ namespace op
             // The less number of queues -> the less lag
 
             // Security checks
-            if (spWScaleAndSizeExtractor == nullptr || spWCvMatToOpInput == nullptr)
+            if (!mConfigured)
                 error("Configure the Wrapper class before calling `start()`.", __LINE__, __FUNCTION__, __FILE__);
             if ((wDatumProducer == nullptr) == (mUserInputWs.empty())
                 && mThreadManagerMode != ThreadManagerMode::Asynchronous
@@ -1151,14 +1182,19 @@ namespace op
             {
                 // Thread 0, queues 0 -> 1
                 mThreadManager.add(mThreadId, mUserInputWs, queueIn++, queueOut++);
-                threadIdPP();
-                // Thread 1, queues 1 -> 2
-                if (spWCvMatToOpOutput == nullptr)
-                    mThreadManager.add(mThreadId, {spWIdGenerator, spWScaleAndSizeExtractor, spWCvMatToOpInput},
-                                       queueIn++, queueOut++);
+                if (spWScaleAndSizeExtractor != nullptr && spWCvMatToOpInput != nullptr)
+                {
+                    threadIdPP();
+                    // Thread 1, queues 1 -> 2
+                    if (spWCvMatToOpOutput == nullptr)
+                        mThreadManager.add(mThreadId, {spWIdGenerator, spWScaleAndSizeExtractor, spWCvMatToOpInput},
+                                           queueIn++, queueOut++);
+                    else
+                        mThreadManager.add(mThreadId, {spWIdGenerator, spWScaleAndSizeExtractor, spWCvMatToOpInput,
+                                           spWCvMatToOpOutput}, queueIn++, queueOut++);
+                }
                 else
-                    mThreadManager.add(mThreadId, {spWIdGenerator, spWScaleAndSizeExtractor, spWCvMatToOpInput,
-                                       spWCvMatToOpOutput}, queueIn++, queueOut++);
+                    mThreadManager.add(mThreadId, spWIdGenerator, queueIn++, queueOut++);
             }
             // If custom user Worker in same thread or producer on same thread
             else
@@ -1166,21 +1202,23 @@ namespace op
                 std::vector<TWorker> workersAux;
                 // Custom user Worker
                 if (!mUserInputWs.empty())
-                    workersAux = mergeWorkers(workersAux, mUserInputWs);
+                    workersAux = mergeVectors(workersAux, mUserInputWs);
                 // OpenPose producer
                 else if (wDatumProducer != nullptr)
-                    workersAux = mergeWorkers(workersAux, {wDatumProducer});
+                    workersAux = mergeVectors(workersAux, {wDatumProducer});
                 // Otherwise
                 else if (mThreadManagerMode != ThreadManagerMode::Asynchronous
                             && mThreadManagerMode != ThreadManagerMode::AsynchronousIn)
                     error("No input selected.", __LINE__, __FUNCTION__, __FILE__);
-
-                if (spWCvMatToOpOutput == nullptr)
-                    workersAux = mergeWorkers(workersAux, {spWIdGenerator, spWScaleAndSizeExtractor,
+                // ID generator
+                workersAux = mergeVectors(workersAux, {spWIdGenerator});
+                // Scale & cv::Mat to OP format
+                if (spWScaleAndSizeExtractor != nullptr && spWCvMatToOpInput != nullptr)
+                    workersAux = mergeVectors(workersAux, {spWScaleAndSizeExtractor,
                                                            spWCvMatToOpInput});
-                else
-                    workersAux = mergeWorkers(workersAux, {spWIdGenerator, spWScaleAndSizeExtractor,
-                                                           spWCvMatToOpInput, spWCvMatToOpOutput});
+                // cv::Mat to output format
+                if (spWCvMatToOpOutput != nullptr)
+                    workersAux = mergeVectors(workersAux, {spWCvMatToOpOutput});
                 // Thread 0 or 1, queues 0 -> 1
                 mThreadManager.add(mThreadId, workersAux, queueIn++, queueOut++);
             }
@@ -1199,9 +1237,10 @@ namespace op
                 }
                 else
                 {
-                    log("Multi-threading disabled, only 1 thread running. All GPUs have been disabled but the first"
-                        " one, which is defined by gpuNumberStart (in the demo, it is set with the `num_gpu_start`"
-                        " flag.");
+                    if (spWPoses.size() > 1)
+                        log("Multi-threading disabled, only 1 thread running. All GPUs have been disabled but the"
+                            " first one, which is defined by gpuNumberStart (e.g. in the OpenPose demo, it is set"
+                            " with the `--num_gpu_start` flag).", Priority::High);
                     mThreadManager.add(mThreadId, spWPoses.at(0), queueIn, queueOut);
                 }
                 queueIn++;
@@ -1233,8 +1272,8 @@ namespace op
             else
             {
                 // Post processing workers + User post processing workers + Output workers
-                auto workersAux = mergeWorkers(mPostProcessingWs, mUserPostProcessingWs);
-                workersAux = mergeWorkers(workersAux, mOutputWs);
+                auto workersAux = mergeVectors(mPostProcessingWs, mUserPostProcessingWs);
+                workersAux = mergeVectors(workersAux, mOutputWs);
                 if (!workersAux.empty())
                 {
                     // Thread 2 or 3, queues 2 -> 3
@@ -1282,24 +1321,6 @@ namespace op
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             return 0ull;
-        }
-    }
-
-    template<typename TDatums, typename TWorker, typename TQueue>
-    std::vector<TWorker> Wrapper<TDatums, TWorker, TQueue>::mergeWorkers(const std::vector<TWorker>& workersA,
-                                                                         const std::vector<TWorker>& workersB)
-    {
-        try
-        {
-            auto workersToReturn(workersA);
-            for (auto& worker : workersB)
-                workersToReturn.emplace_back(worker);
-            return workersToReturn;
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return std::vector<TWorker>{};
         }
     }
 

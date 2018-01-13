@@ -8,15 +8,26 @@ namespace op
 {
     // PI digits: http://www.piday.org/million/
     __constant__ const float PI = 3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745f;
-    __constant__ const unsigned int COCO_PAIRS_GPU[] = POSE_COCO_PAIRS_RENDER_GPU;
-    __constant__ const unsigned int BODY_18_PAIRS_GPU[] = POSE_BODY_18_PAIRS_RENDER_GPU;
-    __constant__ const unsigned int BODY_19_PAIRS_GPU[] = POSE_BODY_19_PAIRS_RENDER_GPU;
-    __constant__ const unsigned int BODY_23_PAIRS_GPU[] = POSE_BODY_23_PAIRS_RENDER_GPU;
-    __constant__ const unsigned int MPI_PAIRS_GPU[] = POSE_MPI_PAIRS_RENDER_GPU;
+    // Keypoint pairs
+    __constant__ const unsigned int COCO_PAIRS_GPU[] = {POSE_COCO_PAIRS_RENDER_GPU};
+    __constant__ const unsigned int BODY_18_PAIRS_GPU[] = {POSE_BODY_18_PAIRS_RENDER_GPU};
+    __constant__ const unsigned int BODY_19_PAIRS_GPU[] = {POSE_BODY_19_PAIRS_RENDER_GPU};
+    __constant__ const unsigned int BODY_23_PAIRS_GPU[] = {POSE_BODY_23_PAIRS_RENDER_GPU};
+    __constant__ const unsigned int BODY_59_PAIRS_GPU[] = {POSE_BODY_59_PAIRS_RENDER_GPU};
+    __constant__ const unsigned int MPI_PAIRS_GPU[] = {POSE_MPI_PAIRS_RENDER_GPU};
+    // Keypoint scales
+    __constant__ const float COCO_SCALES[] = {POSE_COCO_SCALES_RENDER_GPU};
+    __constant__ const float BODY_18_SCALES[] = {POSE_BODY_18_SCALES_RENDER_GPU};
+    __constant__ const float BODY_19_SCALES[] = {POSE_BODY_19_SCALES_RENDER_GPU};
+    __constant__ const float BODY_23_SCALES[] = {POSE_BODY_23_SCALES_RENDER_GPU};
+    __constant__ const float BODY_59_SCALES[] = {POSE_BODY_59_SCALES_RENDER_GPU};
+    __constant__ const float MPI_SCALES[] = {POSE_MPI_SCALES_RENDER_GPU};
+    // RGB colors
     __constant__ const float COCO_COLORS[] = {POSE_COCO_COLORS_RENDER_GPU};
     __constant__ const float BODY_18_COLORS[] = {POSE_BODY_18_COLORS_RENDER_GPU};
     __constant__ const float BODY_19_COLORS[] = {POSE_BODY_19_COLORS_RENDER_GPU};
     __constant__ const float BODY_23_COLORS[] = {POSE_BODY_23_COLORS_RENDER_GPU};
+    __constant__ const float BODY_59_COLORS[] = {POSE_BODY_59_COLORS_RENDER_GPU};
     __constant__ const float MPI_COLORS[] = {POSE_MPI_COLORS_RENDER_GPU};
 
 
@@ -70,19 +81,19 @@ namespace op
         v = fastTruncate(v, vmin, vmax) * summed;
 
         if (v < RY)
-            colorPtr = {255.f,                          255.f*(v/(RY)),                     0.f};
+            colorPtr = {255.f,                        255.f*(v/(RY)),               0.f};
         else if (v < RY+YG)
-            colorPtr = {255.f*(1-((v-RY)/(YG))),        255.f,                              0.f};
+            colorPtr = {255.f*(1-((v-RY)/(YG))),      255.f,                        0.f};
         else if (v < RY+YG+GC)
-            colorPtr = {0.f * (1-((v-RY)/(YG))),        255.f,                              255.f*((v-RY-YG)/(GC))};
+            colorPtr = {0.f * (1-((v-RY)/(YG))),      255.f,                        255.f*((v-RY-YG)/(GC))};
         else if (v < RY+YG+GC+CB)
-            colorPtr = {0.f,                            255.f*(1-((v-RY-YG-GC)/(CB))),      255.f};
+            colorPtr = {0.f,                          255.f*(1-((v-RY-YG-GC)/(CB))),255.f};
         else if (v < summed-MR)
-            colorPtr = {255.f*((v-RY-YG-GC-CB)/(BM)),   0.f,                                255.f};
+            colorPtr = {255.f*((v-RY-YG-GC-CB)/(BM)), 0.f,                          255.f};
         else if (v < summed)
-            colorPtr = {255.f,                          0.f,                                255.f*(1-((v-RY-YG-GC-CB-BM)/(MR)))};
+            colorPtr = {255.f,                        0.f,                          255.f*(1-((v-RY-YG-GC-CB-BM)/(MR)))};
         else
-            colorPtr = {255.f,                          0.f,                                0.f};
+            colorPtr = {255.f,                        0.f,                          0.f};
     }
 
     inline __device__ void getColorXYAffinity(float3& colorPtr, const float x, const float y)
@@ -98,9 +109,9 @@ namespace op
         colorPtr.z *= rad;
     }
 
-    __global__ void renderPoseCoco(float* targetPtr, const int targetWidth, const int targetHeight, const float* const posePtr,
-                                   const int numberPeople, const float threshold, const bool googlyEyes, const bool blendOriginalFrame,
-                                   const float alphaColorToAdd)
+    __global__ void renderPoseCoco(float* targetPtr, const int targetWidth, const int targetHeight,
+                                   const float* const posePtr, const int numberPeople, const float threshold,
+                                   const bool googlyEyes, const bool blendOriginalFrame, const float alphaColorToAdd)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -113,20 +124,21 @@ namespace op
 
         // Other parameters
         const auto numberPartPairs = sizeof(COCO_PAIRS_GPU) / (2*sizeof(COCO_PAIRS_GPU[0]));
+        const auto numberScales = sizeof(COCO_SCALES) / sizeof(COCO_SCALES[0]);
         const auto numberColors = sizeof(COCO_COLORS) / (3*sizeof(COCO_COLORS[0]));
         const auto radius = fastMin(targetWidth, targetHeight) / 100.f;
-        const auto stickwidth = fastMin(targetWidth, targetHeight) / 120.f;
+        const auto lineWidth = fastMin(targetWidth, targetHeight) / 120.f;
 
         // Render key points
-        renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF,
-                        globalIdx, x, y, targetWidth, targetHeight, posePtr, COCO_PAIRS_GPU, numberPeople,
-                        POSE_COCO_NUMBER_PARTS, numberPartPairs, COCO_COLORS, numberColors,
-                        radius, stickwidth, threshold, alphaColorToAdd, blendOriginalFrame, (googlyEyes ? 14 : -1), (googlyEyes ? 15 : -1));
+        renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight,
+                        posePtr, COCO_PAIRS_GPU, numberPeople, 18, numberPartPairs, COCO_COLORS,
+                        numberColors, radius, lineWidth, COCO_SCALES, numberScales, threshold, alphaColorToAdd,
+                        blendOriginalFrame, (googlyEyes ? 14 : -1), (googlyEyes ? 15 : -1));
     }
 
-    __global__ void renderPoseBody18(float* targetPtr, const int targetWidth, const int targetHeight, const float* const posePtr,
-                                    const int numberPeople, const float threshold, const bool googlyEyes, const bool blendOriginalFrame,
-                                    const float alphaColorToAdd)
+    __global__ void renderPoseBody18(float* targetPtr, const int targetWidth, const int targetHeight,
+                                     const float* const posePtr, const int numberPeople, const float threshold,
+                                     const bool googlyEyes, const bool blendOriginalFrame, const float alphaColorToAdd)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -139,20 +151,21 @@ namespace op
 
         // Other parameters
         const auto numberPartPairs = sizeof(BODY_18_PAIRS_GPU) / (2*sizeof(BODY_18_PAIRS_GPU[0]));
+        const auto numberScales = sizeof(BODY_18_SCALES) / sizeof(BODY_18_SCALES[0]);
         const auto numberColors = sizeof(BODY_18_COLORS) / (3*sizeof(BODY_18_COLORS[0]));
         const auto radius = fastMin(targetWidth, targetHeight) / 100.f;
-        const auto stickwidth = fastMin(targetWidth, targetHeight) / 120.f;
+        const auto lineWidth = fastMin(targetWidth, targetHeight) / 120.f;
 
         // Render key points
-        renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF,
-                        globalIdx, x, y, targetWidth, targetHeight, posePtr, BODY_18_PAIRS_GPU, numberPeople,
-                        POSE_BODY_18_NUMBER_PARTS, numberPartPairs, BODY_18_COLORS, numberColors,
-                        radius, stickwidth, threshold, alphaColorToAdd, blendOriginalFrame, (googlyEyes ? 14 : -1), (googlyEyes ? 15 : -1));
+        renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight,
+                        posePtr, BODY_18_PAIRS_GPU, numberPeople, 18, numberPartPairs, BODY_18_COLORS, numberColors,
+                        radius, lineWidth, BODY_18_SCALES, numberScales, threshold, alphaColorToAdd,
+                        blendOriginalFrame, (googlyEyes ? 14 : -1), (googlyEyes ? 15 : -1));
     }
 
-    __global__ void renderPoseBody19(float* targetPtr, const int targetWidth, const int targetHeight, const float* const posePtr,
-                                    const int numberPeople, const float threshold, const bool googlyEyes, const bool blendOriginalFrame,
-                                    const float alphaColorToAdd)
+    __global__ void renderPoseBody19(float* targetPtr, const int targetWidth, const int targetHeight,
+                                     const float* const posePtr, const int numberPeople, const float threshold,
+                                     const bool googlyEyes, const bool blendOriginalFrame, const float alphaColorToAdd)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -165,20 +178,21 @@ namespace op
 
         // Other parameters
         const auto numberPartPairs = sizeof(BODY_19_PAIRS_GPU) / (2*sizeof(BODY_19_PAIRS_GPU[0]));
+        const auto numberScales = sizeof(BODY_19_SCALES) / sizeof(BODY_19_SCALES[0]);
         const auto numberColors = sizeof(BODY_19_COLORS) / (3*sizeof(BODY_19_COLORS[0]));
         const auto radius = fastMin(targetWidth, targetHeight) / 100.f;
-        const auto stickwidth = fastMin(targetWidth, targetHeight) / 120.f;
+        const auto lineWidth = fastMin(targetWidth, targetHeight) / 120.f;
 
         // Render key points
-        renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF,
-                        globalIdx, x, y, targetWidth, targetHeight, posePtr, BODY_19_PAIRS_GPU, numberPeople,
-                        POSE_BODY_19_NUMBER_PARTS, numberPartPairs, BODY_19_COLORS, numberColors,
-                        radius, stickwidth, threshold, alphaColorToAdd, blendOriginalFrame, (googlyEyes ? 15 : -1), (googlyEyes ? 16 : -1));
+        renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight,
+                        posePtr, BODY_19_PAIRS_GPU, numberPeople, 19, numberPartPairs, BODY_19_COLORS, numberColors,
+                        radius, lineWidth, BODY_19_SCALES, numberScales, threshold, alphaColorToAdd,
+                        blendOriginalFrame, (googlyEyes ? 15 : -1), (googlyEyes ? 16 : -1));
     }
 
-    __global__ void renderPoseBody23(float* targetPtr, const int targetWidth, const int targetHeight, const float* const posePtr,
-                                     const int numberPeople, const float threshold, const bool googlyEyes, const bool blendOriginalFrame,
-                                     const float alphaColorToAdd)
+    __global__ void renderPoseBody23(float* targetPtr, const int targetWidth, const int targetHeight,
+                                     const float* const posePtr, const int numberPeople, const float threshold,
+                                     const bool googlyEyes, const bool blendOriginalFrame, const float alphaColorToAdd)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -191,19 +205,48 @@ namespace op
 
         // Other parameters
         const auto numberPartPairs = sizeof(BODY_23_PAIRS_GPU) / (2*sizeof(BODY_23_PAIRS_GPU[0]));
+        const auto numberScales = sizeof(BODY_23_SCALES) / sizeof(BODY_23_SCALES[0]);
         const auto numberColors = sizeof(BODY_23_COLORS) / (3*sizeof(BODY_23_COLORS[0]));
         const auto radius = fastMin(targetWidth, targetHeight) / 100.f;
-        const auto stickwidth = fastMin(targetWidth, targetHeight) / 120.f;
+        const auto lineWidth = fastMin(targetWidth, targetHeight) / 120.f;
 
         // Render key points
-        renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF,
-                        globalIdx, x, y, targetWidth, targetHeight, posePtr, BODY_23_PAIRS_GPU, numberPeople,
-                        POSE_BODY_23_NUMBER_PARTS, numberPartPairs, BODY_23_COLORS, numberColors,
-                        radius, stickwidth, threshold, alphaColorToAdd, blendOriginalFrame, (googlyEyes ? 19 : -1), (googlyEyes ? 21 : -1));
+        renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight,
+                        posePtr, BODY_23_PAIRS_GPU, numberPeople, 23, numberPartPairs, BODY_23_COLORS, numberColors,
+                        radius, lineWidth, BODY_23_SCALES, numberScales, threshold, alphaColorToAdd,
+                        blendOriginalFrame, (googlyEyes ? 19 : -1), (googlyEyes ? 21 : -1));
     }
 
-    __global__ void renderPoseMpi29Parts(float* targetPtr, const int targetWidth, const int targetHeight, const float* const posePtr,
-                                         const int numberPeople, const float threshold, const bool blendOriginalFrame, const float alphaColorToAdd)
+    __global__ void renderPoseBody59(float* targetPtr, const int targetWidth, const int targetHeight,
+                                     const float* const posePtr, const int numberPeople, const float threshold,
+                                     const bool googlyEyes, const bool blendOriginalFrame, const float alphaColorToAdd)
+    {
+        const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
+        const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
+        const auto globalIdx = threadIdx.y * blockDim.x + threadIdx.x;
+
+        // Shared parameters
+        __shared__ float2 sharedMins[POSE_MAX_PEOPLE];
+        __shared__ float2 sharedMaxs[POSE_MAX_PEOPLE];
+        __shared__ float sharedScaleF[POSE_MAX_PEOPLE];
+
+        // Other parameters
+        const auto numberPartPairs = sizeof(BODY_59_PAIRS_GPU) / (2*sizeof(BODY_59_PAIRS_GPU[0]));
+        const auto numberScales = sizeof(BODY_59_SCALES) / sizeof(BODY_59_SCALES[0]);
+        const auto numberColors = sizeof(BODY_59_COLORS) / (3*sizeof(BODY_59_COLORS[0]));
+        const auto radius = fastMin(targetWidth, targetHeight) / 100.f;
+        const auto lineWidth = fastMin(targetWidth, targetHeight) / 120.f;
+
+        // Render key points
+        renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight,
+                        posePtr, BODY_59_PAIRS_GPU, numberPeople, 59, numberPartPairs, BODY_59_COLORS, numberColors,
+                        radius, lineWidth, BODY_59_SCALES, numberScales, threshold, alphaColorToAdd,
+                        blendOriginalFrame, (googlyEyes ? 15 : -1), (googlyEyes ? 16 : -1));
+    }
+
+    __global__ void renderPoseMpi29Parts(float* targetPtr, const int targetWidth, const int targetHeight,
+                                         const float* const posePtr, const int numberPeople, const float threshold,
+                                         const bool blendOriginalFrame, const float alphaColorToAdd)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -216,19 +259,21 @@ namespace op
 
         // Other parameters
         const auto numberPartPairs = sizeof(MPI_PAIRS_GPU) / (2*sizeof(MPI_PAIRS_GPU[0]));
+        const auto numberScales = sizeof(MPI_SCALES) / sizeof(MPI_SCALES[0]);
         const auto numberColors = sizeof(MPI_COLORS) / (3*sizeof(MPI_COLORS[0]));
         const auto radius = fastMin(targetWidth, targetHeight) / 100.f;
-        const auto stickwidth = fastMin(targetWidth, targetHeight) / 120.f;
+        const auto lineWidth = fastMin(targetWidth, targetHeight) / 120.f;
 
         // Render key points
-        renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF,
-                        globalIdx, x, y, targetWidth, targetHeight, posePtr, MPI_PAIRS_GPU, numberPeople,
-                        POSE_MPI_NUMBER_PARTS, numberPartPairs, MPI_COLORS, numberColors,
-                        radius, stickwidth, threshold, alphaColorToAdd, blendOriginalFrame);
+        renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight,
+                        posePtr, MPI_PAIRS_GPU, numberPeople, 15, numberPartPairs, MPI_COLORS, numberColors,
+                        radius, lineWidth, BODY_18_SCALES, numberScales, threshold, alphaColorToAdd, blendOriginalFrame);
     }
 
-    __global__ void renderBodyPartHeatMaps(float* targetPtr, const int targetWidth, const int targetHeight, const float* const heatMapPtr, const int widthHeatMap,
-                                           const int heightHeatMap, const float scaleToKeepRatio, const int numberBodyParts, const float alphaColorToAdd)
+    __global__ void renderBodyPartHeatMaps(float* targetPtr, const int targetWidth, const int targetHeight,
+                                           const float* const heatMapPtr, const int widthHeatMap,
+                                           const int heightHeatMap, const float scaleToKeepRatio,
+                                           const int numberBodyParts, const float alphaColorToAdd)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -246,7 +291,8 @@ namespace op
             for (auto part = 0u ; part < numberBodyParts ; part++)
             {
                 const auto offsetOrigin = part * heatMapArea;
-                const auto value = __saturatef(heatMapPtr[offsetOrigin + yHeatMap*widthHeatMap + xHeatMap]); // __saturatef = trucate to [0,1]
+                // __saturatef = trucate to [0,1]
+                const auto value = __saturatef(heatMapPtr[offsetOrigin + yHeatMap*widthHeatMap + xHeatMap]);
                 const auto rgbColorIndex = (part%numberColors)*3;
                 rgbColor[0] += value*COCO_COLORS[rgbColorIndex];
                 rgbColor[1] += value*COCO_COLORS[rgbColorIndex+1];
@@ -256,12 +302,15 @@ namespace op
             const auto blueIndex = y * targetWidth + x;
             const auto greenIndex = targetWidth * targetHeight + blueIndex;
             const auto redIndex = targetWidth * targetHeight + greenIndex;
-            addColorWeighted(targetPtr[redIndex], targetPtr[greenIndex], targetPtr[blueIndex], rgbColor, alphaColorToAdd);
+            addColorWeighted(targetPtr[redIndex], targetPtr[greenIndex], targetPtr[blueIndex], rgbColor,
+                             alphaColorToAdd);
         }
     }
 
-    __global__ void renderBodyPartHeatMap(float* targetPtr, const int targetWidth, const int targetHeight, const float* const heatMapPtr, const int widthHeatMap,
-                                          const int heightHeatMap, const float scaleToKeepRatio, const int part, const int numberBodyParts, const float alphaColorToAdd)
+    __global__ void renderBodyPartHeatMap(float* targetPtr, const int targetWidth, const int targetHeight,
+                                          const float* const heatMapPtr, const int widthHeatMap,
+                                          const int heightHeatMap, const float scaleToKeepRatio, const int part,
+                                          const int numberBodyParts, const float alphaColorToAdd)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -272,7 +321,8 @@ namespace op
             const auto ySource = (y + 0.5f) / scaleToKeepRatio - 0.5f;
             const auto heatMapOffset = part * widthHeatMap * heightHeatMap;
             const auto* const heatMapPtrOffsetted = heatMapPtr + heatMapOffset;
-            const auto interpolatedValue = bicubicInterpolate(heatMapPtrOffsetted, xSource, ySource, widthHeatMap, heightHeatMap, widthHeatMap);
+            const auto interpolatedValue = bicubicInterpolate(heatMapPtrOffsetted, xSource, ySource, widthHeatMap,
+                                                              heightHeatMap, widthHeatMap);
 
             float rgbColor[3];
             getColorHeatMap(rgbColor, interpolatedValue, 0.f, 1.f);
@@ -280,12 +330,15 @@ namespace op
             const auto blueIndex = y * targetWidth + x;
             const auto greenIndex = targetWidth * targetHeight + blueIndex;
             const auto redIndex = targetWidth * targetHeight + greenIndex;
-            addColorWeighted(targetPtr[redIndex], targetPtr[greenIndex], targetPtr[blueIndex], rgbColor, alphaColorToAdd);
+            addColorWeighted(targetPtr[redIndex], targetPtr[greenIndex], targetPtr[blueIndex], rgbColor,
+                             alphaColorToAdd);
         }
     }
 
-    __global__ void renderPartAffinities(float* targetPtr, const int targetWidth, const int targetHeight, const float* const heatMapPtr, const int widthHeatMap,
-                                         const int heightHeatMap, const float scaleToKeepRatio, const int partsToRender, const int initPart, const float alphaColorToAdd)
+    __global__ void renderPartAffinities(float* targetPtr, const int targetWidth, const int targetHeight,
+                                         const float* const heatMapPtr, const int widthHeatMap,
+                                         const int heightHeatMap, const float scaleToKeepRatio,
+                                         const int partsToRender, const int initPart, const float alphaColorToAdd)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -337,7 +390,8 @@ namespace op
             const auto blueIndex = y * targetWidth + x;
             const auto greenIndex = blueIndex + targetWidth * targetHeight;
             const auto redIndex = greenIndex + targetWidth * targetHeight;
-            addColorWeighted(targetPtr[redIndex], targetPtr[greenIndex], targetPtr[blueIndex], rgbColor, alphaColorToAdd);
+            addColorWeighted(targetPtr[redIndex], targetPtr[greenIndex], targetPtr[blueIndex], rgbColor,
+                             alphaColorToAdd);
         }
     }
 
@@ -348,20 +402,22 @@ namespace op
     }
 
     inline void renderPosePAFGpuAux(float* framePtr, const PoseModel poseModel, const Point<int>& frameSize,
-                                    const float* const heatMapPtr, const Point<int>& heatMapSize, const float scaleToKeepRatio,
-                                    const int part, const int partsToRender, const float alphaBlending)
+                                    const float* const heatMapPtr, const Point<int>& heatMapSize,
+                                    const float scaleToKeepRatio, const int part, const int partsToRender,
+                                    const float alphaBlending)
     {
         try
         {
             //framePtr      =   width * height * 3
             //heatMapPtr    =   heatMapSize.x * heatMapSize.y * #body parts
             checkAlpha(alphaBlending);
-            const auto heatMapOffset = POSE_NUMBER_BODY_PARTS[(int)poseModel] * heatMapSize.area();
+            const auto heatMapOffset = getPoseNumberBodyParts(poseModel) * heatMapSize.area();
             dim3 threadsPerBlock;
             dim3 numBlocks;
             getNumberCudaThreadsAndBlocks(threadsPerBlock, numBlocks, frameSize);
-            renderPartAffinities<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.x, frameSize.y, heatMapPtr, heatMapSize.x,
-                                                                 heatMapSize.y, scaleToKeepRatio, partsToRender, part, alphaBlending);
+            renderPartAffinities<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.x, frameSize.y, heatMapPtr,
+                                                                 heatMapSize.x, heatMapSize.y, scaleToKeepRatio,
+                                                                 partsToRender, part, alphaBlending);
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
         }
         catch (const std::exception& e)
@@ -382,27 +438,43 @@ namespace op
                 //heatMapPtr    =   heatMapSize.x * heatMapSize.y * #body parts
                 //posePtr       =   3 (x,y,score) * #Body parts * numberPeople
                 if (googlyEyes && poseModel != PoseModel::COCO_18 && poseModel != PoseModel::BODY_18)
-                    error("Bool googlyEyes only compatible with PoseModel::COCO_18.", __LINE__, __FUNCTION__, __FILE__);
+                    error("Bool googlyEyes only compatible with PoseModel::COCO_18.",
+                          __LINE__, __FUNCTION__, __FILE__);
 
                 dim3 threadsPerBlock;
                 dim3 numBlocks;
                 getNumberCudaThreadsAndBlocks(threadsPerBlock, numBlocks, frameSize);
 
                 if (poseModel == PoseModel::COCO_18)
-                    renderPoseCoco<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.x, frameSize.y, posePtr, numberPeople,
-                                                                   renderThreshold, googlyEyes, blendOriginalFrame, alphaBlending);
+                    renderPoseCoco<<<threadsPerBlock, numBlocks>>>(
+                        framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
+                        blendOriginalFrame, alphaBlending
+                    );
                 else if (poseModel == PoseModel::BODY_18)
-                    renderPoseBody18<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.x, frameSize.y, posePtr, numberPeople,
-                                                                     renderThreshold, googlyEyes, blendOriginalFrame, alphaBlending);
+                    renderPoseBody18<<<threadsPerBlock, numBlocks>>>(
+                        framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
+                        blendOriginalFrame, alphaBlending
+                    );
                 else if (poseModel == PoseModel::BODY_19)
-                    renderPoseBody19<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.x, frameSize.y, posePtr, numberPeople,
-                                                                     renderThreshold, googlyEyes, blendOriginalFrame, alphaBlending);
+                    renderPoseBody19<<<threadsPerBlock, numBlocks>>>(
+                        framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
+                        blendOriginalFrame, alphaBlending
+                    );
                 else if (poseModel == PoseModel::BODY_23)
-                    renderPoseBody23<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.x, frameSize.y, posePtr, numberPeople,
-                                                                     renderThreshold, googlyEyes, blendOriginalFrame, alphaBlending);
+                    renderPoseBody23<<<threadsPerBlock, numBlocks>>>(
+                        framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
+                        blendOriginalFrame, alphaBlending
+                    );
+                else if (poseModel == PoseModel::BODY_59)
+                    renderPoseBody59<<<threadsPerBlock, numBlocks>>>(
+                        framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
+                        blendOriginalFrame, alphaBlending
+                    );
                 else if (poseModel == PoseModel::MPI_15 || poseModel == PoseModel::MPI_15_4)
-                    renderPoseMpi29Parts<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.x, frameSize.y, posePtr,
-                                                                         numberPeople, renderThreshold, blendOriginalFrame, alphaBlending);
+                    renderPoseMpi29Parts<<<threadsPerBlock, numBlocks>>>(
+                        framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold,
+                        blendOriginalFrame, alphaBlending
+                    );
                 else
                     error("Invalid Model.", __LINE__, __FUNCTION__, __FILE__);
                 cudaCheck(__LINE__, __FUNCTION__, __FILE__);
@@ -414,8 +486,9 @@ namespace op
         }
     }
 
-    void renderPoseHeatMapGpu(float* framePtr, const PoseModel poseModel, const Point<int>& frameSize, const float* const heatMapPtr,
-                              const Point<int>& heatMapSize, const float scaleToKeepRatio, const int part, const float alphaBlending)
+    void renderPoseHeatMapGpu(float* framePtr, const PoseModel poseModel, const Point<int>& frameSize,
+                              const float* const heatMapPtr, const Point<int>& heatMapSize,
+                              const float scaleToKeepRatio, const int part, const float alphaBlending)
     {
         try
         {
@@ -425,11 +498,13 @@ namespace op
             dim3 threadsPerBlock;
             dim3 numBlocks;
             getNumberCudaThreadsAndBlocks(threadsPerBlock, numBlocks, frameSize);
-            const auto numberBodyParts = POSE_NUMBER_BODY_PARTS[(int)poseModel];
+            const auto numberBodyParts = getPoseNumberBodyParts(poseModel);
             const auto heatMapOffset = numberBodyParts * heatMapSize.area();
 
-            renderBodyPartHeatMap<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.x, frameSize.y, heatMapPtr, heatMapSize.x,
-                                                                  heatMapSize.y, scaleToKeepRatio, part-1, numberBodyParts, alphaBlending);
+            renderBodyPartHeatMap<<<threadsPerBlock, numBlocks>>>(
+                framePtr, frameSize.x, frameSize.y, heatMapPtr, heatMapSize.x, heatMapSize.y, scaleToKeepRatio,
+                part-1, numberBodyParts, alphaBlending
+            );
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
         }
         catch (const std::exception& e)
@@ -438,8 +513,9 @@ namespace op
         }
     }
 
-    void renderPoseHeatMapsGpu(float* framePtr, const PoseModel poseModel, const Point<int>& frameSize, const float* const heatMapPtr,
-                               const Point<int>& heatMapSize, const float scaleToKeepRatio, const float alphaBlending)
+    void renderPoseHeatMapsGpu(float* framePtr, const PoseModel poseModel, const Point<int>& frameSize,
+                               const float* const heatMapPtr, const Point<int>& heatMapSize,
+                               const float scaleToKeepRatio, const float alphaBlending)
     {
         try
         {
@@ -449,11 +525,13 @@ namespace op
             dim3 threadsPerBlock;
             dim3 numBlocks;
             getNumberCudaThreadsAndBlocks(threadsPerBlock, numBlocks, frameSize);
-            const auto numberBodyParts = POSE_NUMBER_BODY_PARTS[(int)poseModel];
+            const auto numberBodyParts = getPoseNumberBodyParts(poseModel);
             const auto heatMapOffset = numberBodyParts * heatMapSize.area();
 
-            renderBodyPartHeatMaps<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.x, frameSize.y, heatMapPtr, heatMapSize.x, heatMapSize.y,
-                                                                   scaleToKeepRatio, numberBodyParts, alphaBlending);
+            renderBodyPartHeatMaps<<<threadsPerBlock, numBlocks>>>(
+                framePtr, frameSize.x, frameSize.y, heatMapPtr, heatMapSize.x, heatMapSize.y, scaleToKeepRatio,
+                numberBodyParts, alphaBlending
+            );
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
         }
         catch (const std::exception& e)
@@ -462,12 +540,14 @@ namespace op
         }
     }
 
-    void renderPosePAFGpu(float* framePtr, const PoseModel poseModel, const Point<int>& frameSize, const float* const heatMapPtr,
-                          const Point<int>& heatMapSize, const float scaleToKeepRatio, const int part, const float alphaBlending)
+    void renderPosePAFGpu(float* framePtr, const PoseModel poseModel, const Point<int>& frameSize,
+                          const float* const heatMapPtr, const Point<int>& heatMapSize, const float scaleToKeepRatio,
+                          const int part, const float alphaBlending)
     {
         try
         {
-            renderPosePAFGpuAux(framePtr, poseModel, frameSize, heatMapPtr, heatMapSize, scaleToKeepRatio, part, 1, alphaBlending);
+            renderPosePAFGpuAux(framePtr, poseModel, frameSize, heatMapPtr, heatMapSize, scaleToKeepRatio, part, 1,
+                                alphaBlending);
         }
         catch (const std::exception& e)
         {
@@ -475,14 +555,15 @@ namespace op
         }
     }
 
-    void renderPosePAFsGpu(float* framePtr, const PoseModel poseModel, const Point<int>& frameSize, const float* const heatMapPtr,
-                           const Point<int>& heatMapSize, const float scaleToKeepRatio, const float alphaBlending)
+    void renderPosePAFsGpu(float* framePtr, const PoseModel poseModel, const Point<int>& frameSize,
+                           const float* const heatMapPtr, const Point<int>& heatMapSize, const float scaleToKeepRatio,
+                           const float alphaBlending)
     {
         try
         {
-            const auto numberBodyPartPairs = (int)POSE_BODY_PART_PAIRS[(int)poseModel].size()/2;
+            const auto numberBodyPartPairs = (int)getPosePartPairs(poseModel).size()/2;
             renderPosePAFGpuAux(framePtr, poseModel, frameSize, heatMapPtr, heatMapSize, scaleToKeepRatio,
-                                POSE_NUMBER_BODY_PARTS[(int)poseModel]+1, numberBodyPartPairs, alphaBlending);
+                                getPoseNumberBodyParts(poseModel)+1, numberBodyPartPairs, alphaBlending);
         }
         catch (const std::exception& e)
         {

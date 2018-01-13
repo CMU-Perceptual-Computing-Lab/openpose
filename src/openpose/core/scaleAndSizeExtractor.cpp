@@ -54,9 +54,9 @@ namespace op
                         poseNetInputSize.x * inputResolution.y / (float) inputResolution.x / 16.f
                     );
             }
-            // scaleInputToNetInputs & sizes - Reescale keeping aspect ratio
+            // scaleInputToNetInputs & netInputSizes - Reescale keeping aspect ratio
             std::vector<double> scaleInputToNetInputs(mScaleNumber, 1.f);
-            std::vector<Point<int>> sizes(mScaleNumber);
+            std::vector<Point<int>> netInputSizes(mScaleNumber);
             for (auto i = 0; i < mScaleNumber; i++)
             {
                 const auto currentScale = 1. - i*mScaleGap;
@@ -70,7 +70,7 @@ namespace op
                                                        poseNetInputSize.y);
                 const Point<int> targetSize{targetWidth, targetHeight};
                 scaleInputToNetInputs[i] = resizeGetScaleFactor(inputResolution, targetSize);
-                sizes[i] = poseNetInputSize;
+                netInputSizes[i] = targetSize;
             }
             // scaleInputToOutput - Scale between input and desired output size
             Point<int> outputResolution;
@@ -88,7 +88,7 @@ namespace op
                 scaleInputToOutput = 1.;
             }
             // Return result
-            return std::make_tuple(scaleInputToNetInputs, sizes, scaleInputToOutput, outputResolution);
+            return std::make_tuple(scaleInputToNetInputs, netInputSizes, scaleInputToOutput, outputResolution);
         }
         catch (const std::exception& e)
         {

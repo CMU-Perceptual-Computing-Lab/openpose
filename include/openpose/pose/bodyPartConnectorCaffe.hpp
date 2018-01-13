@@ -22,9 +22,7 @@ namespace op
     public:
         explicit BodyPartConnectorCaffe();
 
-        virtual void LayerSetUp(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top);
-
-        virtual void Reshape(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top);
+        virtual void Reshape(const std::vector<caffe::Blob<T>*>& bottom);
 
         virtual inline const char* type() const { return "BodyPartConnector"; }
 
@@ -43,8 +41,8 @@ namespace op
         virtual void Forward_cpu(const std::vector<caffe::Blob<T>*>& bottom, Array<T>& poseKeypoints,
                                  Array<T>& poseScores);
 
-        virtual void Forward_gpu(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top,
-                                 Array<T>& poseKeypoints);
+        virtual void Forward_gpu(const std::vector<caffe::Blob<T>*>& bottom, Array<T>& poseKeypoints,
+                                 Array<T>& poseScores);
 
         virtual void Backward_cpu(const std::vector<caffe::Blob<T>*>& top, const std::vector<bool>& propagate_down,
                                   const std::vector<caffe::Blob<T>*>& bottom);

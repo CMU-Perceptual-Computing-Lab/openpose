@@ -8,7 +8,7 @@ namespace op
     {
         try
         {
-            mkdir(mDirectoryPath);
+            makeDirectory(mDirectoryPath);
         }
         catch (const std::exception& e)
         {

@@ -1,4 +1,4 @@
-#include <fstream> // std::ifstream
+#include <fstream> // std::ifstream, std::ofstream
 #include <opencv2/highgui/highgui.hpp> // cv::imread
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/fileSystem.hpp>
@@ -9,7 +9,8 @@
 namespace op
 {
     // Private class (on *.cpp)
-    const auto errorMessage = "Json format only implemented in OpenCV for versions >= 3.0. Check savePoseJson instead.";
+    const auto errorMessage = "Json format only implemented in OpenCV for versions >= 3.0. Check savePoseJson"
+                              " instead.";
 
     std::string dataFormatToString(const DataFormat format)
     {
@@ -41,117 +42,8 @@ namespace op
         return fileNameNoExtension + "." + dataFormatToString(format);
     }
 
-
-
-
-
-    // Public classes (on *.hpp)
-    DataFormat stringToDataFormat(const std::string& dataFormat)
-    {
-        try
-        {
-            if (dataFormat == "json")
-                return DataFormat::Json;
-            else if (dataFormat == "xml")
-                return DataFormat::Xml;
-            else if (dataFormat == "yaml")
-                return DataFormat::Yaml;
-            else if (dataFormat == "yml")
-                return DataFormat::Yml;
-            else
-            {
-                error("String does not correspond to any format (json, xml, yaml, yml)", __LINE__, __FUNCTION__, __FILE__);
-                return DataFormat::Json;
-            }
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return DataFormat::Json;
-        }
-    }
-
-    void saveData(const std::vector<cv::Mat>& cvMats, const std::vector<std::string>& cvMatNames, const std::string& fileNameNoExtension, const DataFormat format)
-    {
-        try
-        {
-            // Security checks
-            if (format == DataFormat::Json && CV_MAJOR_VERSION < 3)
-                error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
-            if (cvMats.size() != cvMatNames.size())
-                error("cvMats.size() != cvMatNames.size()", __LINE__, __FUNCTION__, __FILE__);
-            // Save cv::Mat data
-            cv::FileStorage fileStorage{getFullName(fileNameNoExtension, format), cv::FileStorage::WRITE};
-            for (auto i = 0u ; i < cvMats.size() ; i++)
-                fileStorage << cvMatNames[i] << (cvMats[i].empty() ? cv::Mat() : cvMats[i]);
-            // Release file
-            fileStorage.release();
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-        }
-    }
-
-    void saveData(const cv::Mat& cvMat, const std::string cvMatName, const std::string& fileNameNoExtension, const DataFormat format)
-    {
-        try
-        {
-            saveData(std::vector<cv::Mat>{cvMat}, std::vector<std::string>{cvMatName}, fileNameNoExtension, format);
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-        }
-    }
-
-    std::vector<cv::Mat> loadData(const std::vector<std::string>& cvMatNames, const std::string& fileNameNoExtension, const DataFormat format)
-    {
-        try
-        {
-            if (format == DataFormat::Json && CV_MAJOR_VERSION < 3)
-                error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
-
-            cv::FileStorage fileStorage{getFullName(fileNameNoExtension, format), cv::FileStorage::READ};
-            std::vector<cv::Mat> cvMats(cvMatNames.size());
-            for (auto i = 0u ; i < cvMats.size() ; i++)
-                fileStorage[cvMatNames[i]] >> cvMats[i];
-            fileStorage.release();
-            return cvMats;
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return {};
-        }
-    }
-
-    cv::Mat loadData(const std::string& cvMatName, const std::string& fileNameNoExtension, const DataFormat format)
-    {
-        try
-        {
-            return loadData(std::vector<std::string>{cvMatName}, fileNameNoExtension, format)[0];
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return {};
-        }
-    }
-
-    void saveKeypointsJson(const Array<float>& keypoints, const std::string& keypointName, const std::string& fileName, const bool humanReadable)
-    {
-        try
-        {
-            saveKeypointsJson(std::vector<std::pair<Array<float>, std::string>>{std::make_pair(keypoints, keypointName)}, fileName, humanReadable);
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-        }
-    }
-
-    void saveKeypointsJson(const std::vector<std::pair<Array<float>, std::string>>& keypointVector, const std::string& fileName, const bool humanReadable)
+    void addKeypointsToJson(JsonOfstream& jsonOfstream,
+                            const std::vector<std::pair<Array<float>, std::string>>& keypointVector)
     {
         try
         {
@@ -159,14 +51,7 @@ namespace op
             for (const auto& keypointPair : keypointVector)
                 if (!keypointPair.first.empty() && keypointPair.first.getNumberDimensions() != 3 )
                     error("keypointVector.getNumberDimensions() != 3.", __LINE__, __FUNCTION__, __FILE__);
-            // Record frame on desired path
-            JsonOfstream jsonOfstream{fileName, humanReadable};
-            jsonOfstream.objectOpen();
-            // Version
-            jsonOfstream.key("version");
-            jsonOfstream.plainText("1.0");
-            jsonOfstream.comma();
-            // Bodies
+            // Add people keypoints
             jsonOfstream.key("people");
             jsonOfstream.arrayOpen();
             // Ger max numberPeople
@@ -206,8 +91,231 @@ namespace op
                     jsonOfstream.enter();
                 }
             }
+            // Close bodies array
+            jsonOfstream.arrayClose();
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    void addCandidatesToJson(JsonOfstream& jsonOfstream,
+                             const std::vector<std::vector<std::array<float,3>>>& candidates)
+    {
+        try
+        {
+            // Add body part candidates
+            jsonOfstream.key("part_candidates");
+            jsonOfstream.arrayOpen();
+            // Ger max numberParts
+            auto numberParts = candidates.size();
+            jsonOfstream.objectOpen();
+            for (auto part = 0u ; part < numberParts ; part++)
+            {
+                // Open array
+                jsonOfstream.key(std::to_string(part));
+                jsonOfstream.arrayOpen();
+                // Iterate over part candidates
+                const auto& partCandidates = candidates[part];
+                const auto numberPartCandidates = partCandidates.size();
+                // Body part candidates
+                for (auto bodyPart = 0u ; bodyPart < numberPartCandidates ; bodyPart++)
+                {
+                    const auto& candidate = partCandidates[bodyPart];
+                    jsonOfstream.plainText(candidate[0]);
+                    jsonOfstream.comma();
+                    jsonOfstream.plainText(candidate[1]);
+                    jsonOfstream.comma();
+                    jsonOfstream.plainText(candidate[2]);
+                    if (bodyPart < numberPartCandidates-1)
+                        jsonOfstream.comma();
+                }
+                jsonOfstream.arrayClose();
+                if (part < numberParts-1)
+                    jsonOfstream.comma();
+            }
+            jsonOfstream.objectClose();
             // Close array
             jsonOfstream.arrayClose();
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+
+
+
+
+    // Public classes (on *.hpp)
+    DataFormat stringToDataFormat(const std::string& dataFormat)
+    {
+        try
+        {
+            if (dataFormat == "json")
+                return DataFormat::Json;
+            else if (dataFormat == "xml")
+                return DataFormat::Xml;
+            else if (dataFormat == "yaml")
+                return DataFormat::Yaml;
+            else if (dataFormat == "yml")
+                return DataFormat::Yml;
+            else
+            {
+                error("String does not correspond to any format (json, xml, yaml, yml)",
+                      __LINE__, __FUNCTION__, __FILE__);
+                return DataFormat::Json;
+            }
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return DataFormat::Json;
+        }
+    }
+
+    void saveFloatArray(const Array<float>& array, const std::string& fullFilePath)
+    {
+        try
+        {
+            // Open file
+            std::ofstream outputFile;
+            outputFile.open(fullFilePath, std::ios::binary);
+            // Save #dimensions
+            const auto numberDimensions = (float)(array.getNumberDimensions());
+            outputFile.write((char*)&numberDimensions, sizeof(float));
+            // Save dimensions
+            for (const auto& sizeI : array.getSize())
+            {
+                const float sizeIFloat = (float) sizeI;
+                outputFile.write((char*)&sizeIFloat, sizeof(float));
+            }
+            // Save each value
+            outputFile.write((char*)&array[0], array.getVolume() * sizeof(float));
+            // Close file
+            outputFile.close();
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    void saveData(const std::vector<cv::Mat>& cvMats, const std::vector<std::string>& cvMatNames,
+                  const std::string& fileNameNoExtension, const DataFormat format)
+    {
+        try
+        {
+            // Security checks
+            if (format == DataFormat::Json && CV_MAJOR_VERSION < 3)
+                error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
+            if (cvMats.size() != cvMatNames.size())
+                error("cvMats.size() != cvMatNames.size()", __LINE__, __FUNCTION__, __FILE__);
+            // Save cv::Mat data
+            cv::FileStorage fileStorage{getFullName(fileNameNoExtension, format), cv::FileStorage::WRITE};
+            for (auto i = 0u ; i < cvMats.size() ; i++)
+                fileStorage << cvMatNames[i] << (cvMats[i].empty() ? cv::Mat() : cvMats[i]);
+            // Release file
+            fileStorage.release();
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    void saveData(const cv::Mat& cvMat, const std::string cvMatName, const std::string& fileNameNoExtension,
+                  const DataFormat format)
+    {
+        try
+        {
+            saveData(std::vector<cv::Mat>{cvMat}, std::vector<std::string>{cvMatName}, fileNameNoExtension, format);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    std::vector<cv::Mat> loadData(const std::vector<std::string>& cvMatNames, const std::string& fileNameNoExtension,
+                                  const DataFormat format)
+    {
+        try
+        {
+            if (format == DataFormat::Json && CV_MAJOR_VERSION < 3)
+                error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
+
+            cv::FileStorage fileStorage{getFullName(fileNameNoExtension, format), cv::FileStorage::READ};
+            std::vector<cv::Mat> cvMats(cvMatNames.size());
+            for (auto i = 0u ; i < cvMats.size() ; i++)
+                fileStorage[cvMatNames[i]] >> cvMats[i];
+            fileStorage.release();
+            return cvMats;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return {};
+        }
+    }
+
+    cv::Mat loadData(const std::string& cvMatName, const std::string& fileNameNoExtension, const DataFormat format)
+    {
+        try
+        {
+            return loadData(std::vector<std::string>{cvMatName}, fileNameNoExtension, format)[0];
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return {};
+        }
+    }
+
+    void savePeopleJson(const Array<float>& keypoints,
+                        const std::vector<std::vector<std::array<float,3>>>& candidates,
+                        const std::string& keypointName, const std::string& fileName,
+                        const bool humanReadable)
+    {
+        try
+        {
+            savePeopleJson(
+                std::vector<std::pair<Array<float>, std::string>>{std::make_pair(keypoints, keypointName)}, candidates,
+                fileName, humanReadable
+            );
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    void savePeopleJson(const std::vector<std::pair<Array<float>, std::string>>& keypointVector,
+                        const std::vector<std::vector<std::array<float,3>>>& candidates,
+                        const std::string& fileName, const bool humanReadable)
+    {
+        try
+        {
+            // Security checks
+            for (const auto& keypointPair : keypointVector)
+                if (!keypointPair.first.empty() && keypointPair.first.getNumberDimensions() != 3 )
+                    error("keypointVector.getNumberDimensions() != 3.", __LINE__, __FUNCTION__, __FILE__);
+            // Record frame on desired path
+            JsonOfstream jsonOfstream{fileName, humanReadable};
+            jsonOfstream.objectOpen();
+            // Add version
+            jsonOfstream.version("1.1");
+            jsonOfstream.comma();
+            // Add people keypoints
+            addKeypointsToJson(jsonOfstream, keypointVector);
+            // Add body part candidates
+            if (!candidates.empty())
+            {
+                jsonOfstream.comma();
+                addCandidatesToJson(jsonOfstream, candidates);
+            }
             // Close object
             jsonOfstream.objectClose();
         }
@@ -217,7 +325,8 @@ namespace op
         }
     }
 
-    void saveImage(const cv::Mat& cvMat, const std::string& fullFilePath, const std::vector<int>& openCvCompressionParams)
+    void saveImage(const cv::Mat& cvMat, const std::string& fullFilePath,
+                   const std::vector<int>& openCvCompressionParams)
     {
         try
         {
@@ -266,7 +375,8 @@ namespace op
                         error("splittedInts.size() != 4, but splittedInts.size() = "
                               + std::to_string(splittedInts.size()) + ".", __LINE__, __FUNCTION__, __FILE__);
                     const Rectangle<float> handRectangleZero;
-                    const Rectangle<float> handRectangle{splittedInts[0], splittedInts[1], splittedInts[2], splittedInts[3]};
+                    const Rectangle<float> handRectangle{splittedInts[0], splittedInts[1], splittedInts[2],
+                                                         splittedInts[3]};
                     if (getFileNameNoExtension(txtFilePath).back() == 'l')
                         handRectangles.emplace_back(std::array<Rectangle<float>, 2>{handRectangle, handRectangleZero});
                     else

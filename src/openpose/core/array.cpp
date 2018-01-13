@@ -371,10 +371,10 @@ namespace op
             // Initial value
             std::string string{"Array<T>::toString():\n"};
             // Add each element
-            auto* dataPtr = spData.get();
+            const auto* dataPtr = spData.get();
             for (auto i = 0u ; i < mVolume ; i++)
             {
-                // Adding element sepearted by an space
+                // Adding element separated by a space
                 string += std::to_string(dataPtr[i]) + " ";
                 // Introduce an enter for each dimension change
                 // If comented, all values will be printed in the same line

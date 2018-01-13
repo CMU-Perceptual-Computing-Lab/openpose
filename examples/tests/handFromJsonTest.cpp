@@ -12,7 +12,7 @@
 #include "wrapperHandFromJsonTest.hpp"
 
 // For info about the flags, check `examples/openpose/openpose.bin`.
-// Debugging
+// Debugging/Other
 DEFINE_int32(logging_level,             3,              "");
 // Producer
 DEFINE_string(image_dir,                "", "");
@@ -30,7 +30,7 @@ DEFINE_bool(hand_tracking,              false,          "");
 // Display
 DEFINE_bool(no_display,                 false,          "");
 // Result Saving
-DEFINE_string(write_keypoint_json,      "", "");
+DEFINE_string(write_json,               "",             "");
 
 int handFromJsonTest()
 {
@@ -67,7 +67,7 @@ int handFromJsonTest()
                                                   op::flagsToRenderMode(1)};
     // Configure wrapper
     opWrapper.configure(wrapperStructPose, wrapperStructHand, producerSharedPtr, FLAGS_hand_ground_truth,
-                        FLAGS_write_keypoint_json, !FLAGS_no_display);
+                        FLAGS_write_json, !FLAGS_no_display);
 
     // Start processing
     op::log("Starting thread(s)", op::Priority::High);

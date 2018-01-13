@@ -54,18 +54,23 @@ Recommended installation method. It is simpler and it offers many more customiza
 
 
 
-### Installation - Script Compilation
-**Highly important**: This script only works with CUDA 8 and Ubuntu 14 or 16. Otherwise, see [doc/installation_cmake.md](installation_cmake.md) or [Installation - Manual Compilation](#installation---manual-compilation).
-1. Required: CUDA, cuDNN, OpenCV and Atlas must be already installed on your machine.
+### Prerequisites
+CUDA, cuDNN, OpenCV and Atlas must be already installed on your machine:
+
     1. [CUDA](https://developer.nvidia.com/cuda-80-ga2-download-archive) must be installed. You should reboot your machine after installing CUDA.
     2. [cuDNN](https://developer.nvidia.com/cudnn): Once you have downloaded it, just unzip it and copy (merge) the contents on the CUDA folder, e.g. `/usr/local/cuda-8.0/`. Note: We found OpenPose working ~10% faster with cuDNN 5.1 compared to cuDNN 6. Otherwise, check [Compiling without cuDNN](#compiling-without-cudnn).
     3. OpenCV can be installed with `apt-get install libopencv-dev`. If you have compiled OpenCV 3 by your own, follow [Manual Compilation](#manual-compilation). After both Makefile.config files have been generated, edit them and uncomment the line `# OPENCV_VERSION := 3`. You might alternatively modify all `Makefile.config.UbuntuXX` files and then run the scripts in step 2.
     4. In addition, OpenCV 3 does not incorporate the `opencv_contrib` module by default. Assuming you have OpenCV 3 compiled with the contrib module and you want to use it, append `opencv_contrib` at the end of the line `LIBRARIES += opencv_core opencv_highgui opencv_imgproc` in the `Makefile` file.
     5. Atlas can be installed with `sudo apt-get install libatlas-base-dev`. Instead of Atlas, you can use OpenBLAS or Intel MKL by modifying the line `BLAS := atlas` in the same way as previosuly mentioned for the OpenCV version selection.
-2. Build Caffe & the OpenPose library + download the required Caffe models for Ubuntu 14.04 or 16.04 (auto-detected for the script) and CUDA 8:
+
+
+
+### Installation - Script Compilation
+Build Caffe & the OpenPose library + download the required Caffe models for Ubuntu 14.04 or 16.04 (auto-detected for the script) and CUDA 8:
 ```bash
 bash ./ubuntu/install_caffe_and_openpose_if_cuda8.sh
 ```
+**Highly important**: This script only works with CUDA 8 and Ubuntu 14 or 16. Otherwise, see [doc/installation_cmake.md](installation_cmake.md) or [Installation - Manual Compilation](#installation---manual-compilation).
 
 
 
@@ -75,6 +80,7 @@ Alternatively to the script installation, if you want to use CUDA 7, avoid using
 2. Compile Caffe and OpenPose by running these lines:
     ```
     ### Install Caffe ###
+    git submodule update --init --recursive
     cd 3rdparty/caffe/
     # Select your desired Makefile file (run only one of the next 4 commands)
     cp Makefile.config.Ubuntu14_cuda7.example Makefile.config # Ubuntu 14, cuda 7
@@ -83,16 +89,17 @@ Alternatively to the script installation, if you want to use CUDA 7, avoid using
     cp Makefile.config.Ubuntu16_cuda8.example Makefile.config # Ubuntu 16, cuda 8
     # Change any custom flag from the resulting Makefile.config (e.g. OpenCV 3, Atlas/OpenBLAS/MKL, etc.)
     # Compile Caffe
-    make all -j${number_of_cpus} && make distribute -j${number_of_cpus}
+    make all -j`nproc` && make distribute -j`nproc`
 
     ### Install OpenPose ###
     cd ../../models/
     bash ./getModels.sh # It just downloads the Caffe trained models
     cd ..
+    cp ubuntu/Makefile.example Makefile
     # Same file cp command as the one used for Caffe
     cp ubuntu/Makefile.config.Ubuntu14_cuda7.example Makefile.config
     # Change any custom flag from the resulting Makefile.config (e.g. OpenCV 3, Atlas/OpenBLAS/MKL, etc.)
-    make all -j${number_of_cpus}
+    make all -j`nproc`
     ```
 
     NOTE: If you want to use your own Caffe distribution, follow the steps on [Custom Caffe](#custom-caffe) section and later re-compile the OpenPose library:
@@ -133,9 +140,11 @@ You just need to remove the OpenPose folder, by default called `openpose/`. E.g.
 
 ### Installation - Library
 1. Install the pre-requisites:
-    1. Microsoft Visual Studio (VS) 2015 Enterprise Update 3. If Visual Studio 2017 Community is desired, we do not support it, but it might be compiled by firstly [enabling CUDA 8.0 in VS2017](https://stackoverflow.com/questions/43745099/using-cuda-with-visual-studio-2017?answertab=active#tab-top). VS Enterprise Update 1 will give some compiler errors and VS 2015 Community has not been tested.
-    2. [CUDA 8](https://developer.nvidia.com/cuda-80-ga2-download-archive): Install it on the default location, `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0`. Otherwise, modify the Visual Studio project solution accordingly. Install CUDA 8.0 after Visual Studio 2015 is installed to assure that the CUDA installation will generate all necessary files for VS. If CUDA was already installed, re-install it after installing VS!
-    3. [cuDNN 5.1](https://developer.nvidia.com/cudnn): Once you have downloaded it, just unzip it and copy (merge) the contents on the CUDA folder, `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0`.
+    1. **Microsoft Visual Studio (VS) 2015 Enterprise Update 3**.
+        - If **Visual Studio 2017 Community** is desired, we do not officially support it, but it might be compiled by firstly [enabling CUDA 8.0 in VS2017](https://stackoverflow.com/questions/43745099/using-cuda-with-visual-studio-2017?answertab=active#tab-top) or use **VS2017 with CUDA 9** by checking the `.vcxproj` file and changing the necessary paths from CUDA 8 to 9.
+        - VS 2015 Enterprise Update 1 will give some compiler errors and VS 2015 Community has not been tested.
+    2. [**CUDA 8**](https://developer.nvidia.com/cuda-80-ga2-download-archive): Install it on the default location, `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0`. Otherwise, modify the Visual Studio project solution accordingly. Install CUDA 8.0 after Visual Studio 2015 is installed to assure that the CUDA installation will generate all necessary files for VS. If CUDA was already installed, re-install it after installing VS!
+    3. [**cuDNN 5.1**](https://developer.nvidia.com/cudnn): Once you have downloaded it, just unzip it and copy (merge) the contents on the CUDA folder, `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0`.
 2. Download the OpenPose dependencies and models (body, face and hand models) by double-clicking on `{openpose_path}\windows\download_3rdparty_and_models.bat`. Alternatively, you might prefer to download them manually:
     - Models:
         - [COCO model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/coco/pose_iter_440000.caffemodel): download in `models/pose/coco/`.
@@ -251,3 +260,9 @@ Then, you would have to reduce the `--net_resolution` flag to fit the model into
 **Q: Video and/or webcam are not working** - Using a folder with images does work, but the video and/or the webcam do not. Note: often on Windows.
 
 **A**: OpenCV has some issues with some camera drivers and video codecs (specially on Windows). Follow the same steps as the `Webcam is slow` question to test the webcam is working. After re-compiling OpenCV, you can also try this [OpenCV example for video](http://docs.opencv.org/3.0-beta/modules/videoio/doc/reading_and_writing_video.html).
+
+
+
+**Q: I am getting an error of the type: munmap_chunk()/free/invalid pointer.**
+
+**A**: In order to run OpenCV 3.X and Caffe simultaneously, [OpenCV must be compiled without `WITH_GTK` and with `WITH_QT` flags](https://github.com/BVLC/caffe/issues/5282#issuecomment-306063718). On Ubuntu 16.04 the qt5 package is "qt5-default" and the OpenCV cmake option is WITH_QT.

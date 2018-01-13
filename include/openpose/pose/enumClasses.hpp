@@ -14,6 +14,7 @@ namespace op
         BODY_18 = 3,    /**< Experimental. Do not use. */
         BODY_19 = 4,    /**< Experimental. Do not use. */
         BODY_23 = 5,    /**< Experimental. Do not use. */
+        BODY_59 = 6,    /**< Experimental. Do not use. */
         Size,
     };
 

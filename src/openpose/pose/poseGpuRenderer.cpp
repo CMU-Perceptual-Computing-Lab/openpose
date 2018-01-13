@@ -19,7 +19,7 @@ namespace op
         // POSE_BODY_PART_MAPPING crashes on Windows, replaced by getPoseBodyPartMapping
         GpuRenderer{renderThreshold, alphaKeypoint, alphaHeatMap, blendOriginalFrame, elementToRender,
                     (unsigned int)(getPoseBodyPartMapping(poseModel).size()
-                                   + POSE_BODY_PART_PAIRS[(int)poseModel].size()/2 + 3)}, // mNumberElementsToRender
+                                   + getPosePartPairs(poseModel).size()/2 + 3)}, // mNumberElementsToRender
         PoseRenderer{poseModel},
         spPoseExtractor{poseExtractor},
         pGpuPose{nullptr}
@@ -49,7 +49,7 @@ namespace op
             // GPU memory allocation for rendering
             #ifdef USE_CUDA
                 cudaMalloc((void**)(&pGpuPose),
-                           POSE_MAX_PEOPLE * POSE_NUMBER_BODY_PARTS[(int)mPoseModel] * 3 * sizeof(float));
+                           POSE_MAX_PEOPLE * getPoseNumberBodyParts(mPoseModel) * 3 * sizeof(float));
                 cudaCheck(__LINE__, __FUNCTION__, __FILE__);
             #endif
             log("Finished initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
@@ -79,7 +79,7 @@ namespace op
                 {
                     cpuToGpuMemoryIfNotCopiedYet(outputData.getPtr(), outputData.getVolume());
                     cudaCheck(__LINE__, __FUNCTION__, __FILE__);
-                    const auto numberBodyParts = POSE_NUMBER_BODY_PARTS[(int)mPoseModel];
+                    const auto numberBodyParts = getPoseNumberBodyParts(mPoseModel);
                     const auto numberBodyPartsPlusBkg = numberBodyParts+1;
                     const Point<int> frameSize{outputData.getSize(2), outputData.getSize(1)};
                     // Draw poseKeypoints
@@ -139,7 +139,7 @@ namespace op
                         else
                         {
                             const auto affinityPart = (elementRendered-numberBodyPartsPlusBkg-3)*2;
-                            const auto affinityPartMapped = POSE_MAP_IDX[(int)mPoseModel].at(affinityPart);
+                            const auto affinityPartMapped = getPoseMapIndex(mPoseModel).at(affinityPart);
                             elementRenderedName = mPartIndexToName.at(affinityPartMapped);
                             elementRenderedName = elementRenderedName.substr(0, elementRenderedName.find("("));
                             renderPosePAFGpu(*spGpuMemory, mPoseModel, frameSize,
@@ -158,7 +158,8 @@ namespace op
                 UNUSED(poseKeypoints);
                 UNUSED(scaleNetToOutput);
                 error("OpenPose must be compiled with the `USE_CUDA` macro definitions in order to run this"
-                      " functionality.", __LINE__, __FUNCTION__, __FILE__);
+                      " functionality. You can alternatively use CPU rendering (flag `--render_pose 1`).",
+                      __LINE__, __FUNCTION__, __FILE__);
             #endif
             // Return result
             return std::make_pair(elementRendered, elementRenderedName);

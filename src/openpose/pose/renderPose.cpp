@@ -22,11 +22,12 @@ namespace op
                 // Parameters
                 const auto thicknessCircleRatio = 1.f/75.f;
                 const auto thicknessLineRatioWRTCircle = 0.75f;
-                const auto& pairs = POSE_BODY_PART_PAIRS_RENDER[(int)poseModel];
+                const auto& pairs = getPoseBodyPartPairsRender(poseModel);
+                const auto& poseScales = getPoseScales(poseModel);
 
                 // Render keypoints
-                renderKeypointsCpu(frameArray, poseKeypoints, pairs, POSE_COLORS[(int)poseModel], thicknessCircleRatio,
-                                   thicknessLineRatioWRTCircle, renderThreshold);
+                renderKeypointsCpu(frameArray, poseKeypoints, pairs, getPoseColors(poseModel), thicknessCircleRatio,
+                                   thicknessLineRatioWRTCircle, poseScales, renderThreshold);
             }
         }
         catch (const std::exception& e)

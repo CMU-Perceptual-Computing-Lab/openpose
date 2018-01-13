@@ -1,5 +1,9 @@
-OpenPose Library - Basic Overview
+OpenPose C++ API - Basic Overview
 ====================================
+
+
+
+Note: Read [doc/library_introduction.md](./library_introduction.md) before this page.
 
 
 
@@ -22,7 +26,7 @@ In order to use and/or slightly extend the OpenPose library, we try to explain t
 
 ## Basic Module: `core`
 ### Array<T> - The OpenPose Basic Raw Data Container
-This template class implements a multidimensional data array. It is our basic data container, analogous to `cv::Mat` in OpenCV, Tensor in Torch and TensorFlow or Blob in Caffe. It wraps a `cv::Mat` and a `boost::shared_ptr`, both of them pointing to the same raw data. I.e. they both share the same memory, so we can read this data in both formats, while there is no performance impact. For instance, `op::Datum` has several `op::Array<float>`, for instance the `op::Datum<float> pose` with the pose data.
+This template class implements a multidimensional data array. It is our basic data container, analogous to `cv::Mat` in OpenCV, Tensor in Torch and TensorFlow or Blob in Caffe. It wraps a `cv::Mat` and a `std::shared_ptr`, both of them pointing to the same raw data. I.e. they both share the same memory, so we can read this data in both formats, while there is no performance impact. For instance, `op::Datum` has several `op::Array<float>`, for instance the `op::Datum<float> pose` with the pose data.
 
 #### Construction And Data allocation
 There are 4 different ways to allocate the memory:
@@ -31,7 +35,7 @@ There are 4 different ways to allocate the memory:
 
 2. The constructor `Array(const int size)`, which calls `reset(size)`.
 
-3. The `reset(const std::vector<int>& size)` function: It allocates the memory indicated for size. The allocated memory equals the product of all elements in the size vector. Internally, it is saved as a 1-D boost::shared_ptr<T[]>.
+3. The `reset(const std::vector<int>& size)` function: It allocates the memory indicated for size. The allocated memory equals the product of all elements in the size vector. Internally, it is saved as a 1-D std::shared_ptr<T[]>.
 
 4. The `reset(const int size)` function: equivalent for 1-dimension data (i.e. vector).
 
@@ -44,7 +48,7 @@ The data can be access as a raw pointer, shared pointer or `cv::Mat`. So given y
 
 2. As `const cv::Mat`: `array.getConstCvMat()`. We do not allow to directly modify the `cv::Mat`, since some operations might change the dimensional size of the data. If you want to do so, you can clone this `cv::Mat`, perform any desired operation, and copy it back to the array class with `setFrom()`.
 
-3. As raw pointer: `T* getPtr()` and `const T* const getConstPtr()`. Similar to std:: and boost::shared_ptr::get(). For instance, CUDA code usually requires raw pointers to access its data.
+3. As raw pointer: `T* getPtr()` and `const T* const getConstPtr()`. Similar to std:: and std::shared_ptr::get(). For instance, CUDA code usually requires raw pointers to access its data.
 
 #### Dimensionality Information
 There are several functions to get information about the allocated data:

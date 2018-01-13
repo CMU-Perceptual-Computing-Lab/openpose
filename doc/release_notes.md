@@ -3,7 +3,7 @@ OpenPose Library - Release Notes
 
 
 
-## OpenPose 1.0.0rc1
+## OpenPose 1.0.0rc1 (Apr 24, 2017)
 1. Initial version, main functionality:
     1. Body keypoint detection and rendering in Ubuntu 14 and 16.
     2. It can read an image directory, video or webcam.
@@ -11,7 +11,7 @@ OpenPose Library - Release Notes
 
 
 
-## OpenPose 1.0.0rc2
+## OpenPose 1.0.0rc2 (May 10, 2017)
 1. Main improvements:
     1. Rendering max resolution from 720p to >32k images.
     2. Highly improved documentation.
@@ -22,7 +22,7 @@ OpenPose Library - Release Notes
 
 
 
-## OpenPose 1.0.0rc3
+## OpenPose 1.0.0rc3 (Jun 8, 2017)
 1. Main improvements:
     1. Added face keypoint detection.
     2. Added Windows 10 compatibility.
@@ -33,9 +33,9 @@ OpenPose Library - Release Notes
     7. It prints out the error description before throwing the exception (so that it is written on the Windows cmd).
     8. Highly improved documentation.
 2. Functions or parameters renamed:
-    1. Flag `write_pose` renamed as `write_keypoint` and it also applies to face and/or hands.
-    2. Flag `write_pose_json` renamed as `write_keypoint_json` and it also applies to face and/or hands.
-    3. Flag `write_pose_format` renamed as `write_keypoint_format` and it also applies to face and/or hands.
+    1. Flag `--write_pose` renamed as `--write_keypoint` and it also applies to face and/or hands.
+    2. Flag `--write_pose_json` renamed as `--write_keypoint_json` and it also applies to face and/or hands.
+    3. Flag `--write_pose_format` renamed as `--write_keypoint_format` and it also applies to face and/or hands.
     4. PoseSaver and its JSON variant renamed as KeypointSaver.
     5. PoseJsonCocoSaver renamed as CocoJsonSaver.
 3. Main bugs fixed:
@@ -44,7 +44,7 @@ OpenPose Library - Release Notes
 
 
 
-## OpenPose 1.0.0
+## OpenPose 1.0.0 (Jul 8, 2017)
 1. Main improvements:
     1. Added hand keypoint detection.
     2. Windows branch merged to master branch.
@@ -55,26 +55,26 @@ OpenPose Library - Release Notes
     7. Rendering threshold for pose, face and hands becomes user-configurable.
     8. Check() functions give more feedback.
     9. WCocoJsonSaver finished and removed its 3599-image limit.
-    10. Added `camera_fps` so generated video will use that frame rate.
+    10. Added `--camera_fps` so generated video will use that frame rate.
     11. Reduced the number of printed information messages. Default logging priority threshold increased to Priority::Max.
     12. Google flags to OpenPose configuration parameters reader moved from each demo to utilities/flagsToOpenPose.
     13. Nms classes do not use `numberParts` for `Reshape`, they deduce the value.
     14. Improved documentation.
 2. Functions or parameters renamed:
     1. Render flags renamed in the demo in order to incorporate the CPU/GPU rendering.
-    2. Keypoints saved in JSON files (`write_keypoint_json`) are now saved as `pose_keypoints`, `face_keypoints`, `hand_left_keypoints`, and `hand_right_keypoints`. They all were previously saved as `body_parts`.
-    3. Flag `num_scales` renamed as `scale_number`.
-    4. All hand and pose flags renamed such as they start by `hand_` and `face_` respectively.
+    2. Keypoints saved in JSON files (`--write_keypoint_json`) are now saved as `pose_keypoints`, `face_keypoints`, `hand_left_keypoints`, and `hand_right_keypoints`. They all were previously saved as `body_parts`.
+    3. Flag `--num_scales` renamed as `--scale_number`.
+    4. All hand and pose flags renamed such as they start by `--hand_` and `--face_` respectively.
 3. Main bugs fixed:
     1. Fixed bug in Array::getConstCvMat() if mVolume=0, now returning empty cv::Mat.
     2. Fixed bug: `--process_real_time` threw error with webcam.
     3. Fixed bug: Face not working when input and output resolutions are different.
     4. Fixed some bugs that prevented debug version to run.
-    5. Face saved in JSON files were called `body_parts`. Now they are called `face_keypoints`.
+    5. Face saved in JSON files were called `--body_parts`. Now they are called `--face_keypoints`.
 
 
 
-## OpenPose 1.0.1
+## OpenPose 1.0.1 (Jul 11, 2017)
 1. Main improvements:
     1. Windows library turned into DLL dynamic library (i.e. portable).
     2. Improved documentation.
@@ -83,7 +83,7 @@ OpenPose Library - Release Notes
 
 
 
-## OpenPose 1.0.2
+## OpenPose 1.0.2 (Sep 3, 2017)
 1. Main improvements:
     1. Added OpenCV 3.3 compatibility.
     2. Caffe turned into DLL library.
@@ -102,7 +102,7 @@ OpenPose Library - Release Notes
 
 
 
-## OpenPose 1.1.0
+## OpenPose 1.1.0 (Sep 19, 2017)
 1. Main improvements:
     1. Added CMake installer for Ubuntu.
     2. Added how to use keypoint data in `examples/tutorial_wrapper/`.
@@ -113,25 +113,30 @@ OpenPose Library - Release Notes
 
 
 
-## Current version (future OpenPose 1.2.0alpha)
+## OpenPose 1.2.0 (Nov 3, 2017)
 1. Main improvements:
-    1. Added IP camera support.
-    2. Output images can have the input size, OpenPose able to change its size for each image and not required fixed size anymore.
+    1. Speed increase when processing images with different aspect ratios. E.g. ~20% increase over 3.7k COCO validation images on 1 scale.
+    2. Huge speed increase and memory reduction when processing multi-scale. E.g. over 3.7k COCO validation images on 4 scales: ~40% (~770 to ~450 sec) speed increase, ~25% memory reduction (from ~8.9 to ~6.7 GB / GPU).
+    3. Slightly increase of accuracy given the fixed mini-bugs.
+    4. Added IP camera support.
+    5. Output images can have the input size, OpenPose able to change its size for each image and not required fixed size anymore.
         1. FrameDisplayer accepts variable size images by rescaling every time a frame with bigger width or height is displayed (gui module).
         2. OpOutputToCvMat & GuiInfoAdder does not require to know the output size at construction time, deduced from each image.
         3. CvMatToOutput and Renderers allow to keep input resolution as output for images (core module).
-    3. New standalone face keypoint detector based on OpenCV face detector: much faster if body keypoint detection is not required but much less accurate.
-    4. Face and hand keypoint detectors now can return each keypoint heatmap.
-    5. The flag `USE_CUDNN` is no longer required; `USE_CAFFE` and `USE_CUDA` (replacing the old `CPU_ONLY`) are no longer required to use the library, only to build it. In addition, Boost, Caffe, and its dependencies have been removed from the OpenPose header files. Only OpenCV include and lib folders are required when building a project using OpenPose.
-    6. OpenPose successfully compiles if the flags `USE_CAFFE` and/or `USE_CUDA` are not enabled, although it will give an error saying they are required.
-    7. COCO JSON file outputs 0 as score for non-detected keypoints.
-    8. Added example for OpenPose for user asynchronous output and cleaned all `tutorial_wrapper/` examples.
-    9. Added `-1` option for `net_resolution` in order to auto-select the best possible aspect ratio given the user input.
-    10. Net resolution can be dynamically changed (e.g. for images with different size).
-    11. Added example to add functionality/modules to OpenPose.
+    6. New standalone face keypoint detector based on OpenCV face detector: much faster if body keypoint detection is not required but much less accurate.
+    7. Face and hand keypoint detectors now can return each keypoint heatmap.
+    8. The flag `USE_CUDNN` is no longer required; `USE_CAFFE` and `USE_CUDA` (replacing the old `CPU_ONLY`) are no longer required to use the library, only to build it. In addition, Boost, Caffe, and its dependencies have been removed from the OpenPose header files. Only OpenCV include and lib folders are required when building a project using OpenPose.
+    9. OpenPose successfully compiles if the flags `USE_CAFFE` and/or `USE_CUDA` are not enabled, although it will give an error saying they are required.
+    10. COCO JSON file outputs 0 as score for non-detected keypoints.
+    11. Added example for OpenPose for user asynchronous output and cleaned all `tutorial_wrapper/` examples.
+    12. Added `-1` option for `--net_resolution` in order to auto-select the best possible aspect ratio given the user input.
+    13. Net resolution can be dynamically changed (e.g. for images with different size).
+    14. Added example to add functionality/modules to OpenPose.
+    15. Added `--disable_multi_thread` flag in order to allow debug and/or highly reduce the latency (e.g. when using webcam in real-time).
+    16. Allowed to output images without any rendering.
 2. Functions or parameters renamed:
     1. OpenPose able to change its size and initial size dynamically:
-        1. Flag `resolution` renamed as `output_resolution`.
+        1. Flag `--resolution` renamed as `--output_resolution`.
         2. FrameDisplayer, GuiInfoAdder and Gui constructors arguments modified (gui module).
         3. OpOutputToCvMat constructor removed (core module).
         4. New Renders classes to split GpuRenderers from CpuRenderers.
@@ -143,3 +148,30 @@ OpenPose Library - Release Notes
     1. Scaling resize issue fixed: ~1-pixel offset due to not considering 0-based indexes.
     2. Ubuntu installer script now works even if Python pip was not installed previously.
     3. Flags to set first and last frame as well as jumping frames backward and forward now works on image directory reader.
+
+
+
+## OpenPose 1.2.1 (Jan 9, 2018)
+1. Main improvements:
+    1. Heatmaps can be saved in floating format.
+    2. More efficient non-processing version (i.e., if all keypoint extractors are disabled, and only image extraction and display/saving operations are performed).
+    3. Heat maps scaling: Added `--heatmaps_scale` to OpenPoseDemo, added option not to scale the heatmaps, and added custom `float` format to save heatmaps in floating format.
+    4. Detector of the number of GPU also considers the initial GPU index given by the user.
+    5. Added `--write_json` as new version of `--write_keypoint_json`. It includes the body part candidates (if enabled), as well as any extra information added in the future (e.g. person ID).
+    6. Body part candidates can be retrieved in op::Datum and saved with `--write_json`.
+2. Functions or parameters renamed:
+    1. `PoseParameters` splitted into `PoseParameters` and `PoseParametersRender` and const parameters turned into functions for more clarity.
+3. Main bugs fixed:
+    1. Render working on images > 4K (#324).
+    2. Cleaned redundant arguments on `getAverageScore` and `getKeypointsArea`.
+    3. Slight speed up when heatmaps must be returned to the user (not doing a double copy anymore).
+
+
+
+## Current version (future OpenPose 1.3.0)
+1. Main improvements:
+    1. Output of `--write_json` uses less hard disk space (enters and tabs removed).
+    2. Removed Boost dependencies.
+    3. Caffe added as submodule.
+2. Main bugs fixed:
+    1. Slight speed up (~1%) for performing the non-maximum suppression stage only in the body part heatmaps channels, and not also in the PAF channels.

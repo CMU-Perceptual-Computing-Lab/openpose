@@ -75,6 +75,15 @@
     <Filter Include="Header Files\face">
       <UniqueIdentifier>{b47060c5-db00-4436-94f9-e20bb1ba71db}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\experimental">
+      <UniqueIdentifier>{c072f156-f705-4e3f-a828-a2e14361a3aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\experimental\tracking">
+      <UniqueIdentifier>{41a8ee1c-20c0-4b08-889e-017624f22b2e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\experimental\tracking">
+      <UniqueIdentifier>{24e85903-dd30-4fe6-af6f-154724a96a70}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\openpose\headers.hpp">
@@ -239,10 +248,10 @@
     <ClInclude Include="..\..\include\openpose\filestream\jsonOfstream.hpp">
       <Filter>Header Files\filestream</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\openpose\filestream\keypointJsonSaver.hpp">
+    <ClInclude Include="..\..\include\openpose\filestream\keypointSaver.hpp">
       <Filter>Header Files\filestream</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\openpose\filestream\keypointSaver.hpp">
+    <ClInclude Include="..\..\include\openpose\filestream\peopleJsonSaver.hpp">
       <Filter>Header Files\filestream</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\openpose\filestream\videoSaver.hpp">
@@ -263,7 +272,7 @@
     <ClInclude Include="..\..\include\openpose\filestream\wImageSaver.hpp">
       <Filter>Header Files\filestream</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\openpose\filestream\wKeypointJsonSaver.hpp">
+    <ClInclude Include="..\..\include\openpose\filestream\wPeopleJsonSaver.hpp">
       <Filter>Header Files\filestream</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\openpose\filestream\wPoseSaver.hpp">
@@ -366,6 +375,9 @@
       <Filter>Header Files\pose</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\openpose\pose\poseParameters.hpp">
+      <Filter>Header Files\pose</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\pose\poseParametersRender.hpp">
       <Filter>Header Files\pose</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\openpose\pose\poseRenderer.hpp">
@@ -524,6 +536,15 @@
     <ClInclude Include="..\..\include\openpose\wrapper\wrapperStructPose.hpp">
       <Filter>Header Files\wrapper</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\openpose\experimental\tracking\headers.hpp">
+      <Filter>Header Files\experimental\tracking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\experimental\tracking\personIdExtractor.hpp">
+      <Filter>Header Files\experimental\tracking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\experimental\tracking\wPersonIdExtractor.hpp">
+      <Filter>Header Files\experimental\tracking</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\include\openpose\utilities\cuda.hu">
@@ -636,10 +657,10 @@
     <ClCompile Include="..\..\src\openpose\filestream\jsonOfstream.cpp">
       <Filter>Source Files\filestream</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\openpose\filestream\keypointJsonSaver.cpp">
+    <ClCompile Include="..\..\src\openpose\filestream\keypointSaver.cpp">
       <Filter>Source Files\filestream</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\openpose\filestream\keypointSaver.cpp">
+    <ClCompile Include="..\..\src\openpose\filestream\peopleJsonSaver.cpp">
       <Filter>Source Files\filestream</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\openpose\filestream\videoSaver.cpp">
@@ -703,6 +724,9 @@
       <Filter>Source Files\pose</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\openpose\pose\poseParameters.cpp">
+      <Filter>Source Files\pose</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\pose\poseParametersRender.cpp">
       <Filter>Source Files\pose</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\openpose\pose\poseRenderer.cpp">
@@ -776,6 +800,12 @@
     </ClCompile>
     <ClCompile Include="..\..\src\openpose\wrapper\wrapperStructPose.cpp">
       <Filter>Source Files\wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\experimental\tracking\defineTemplates.cpp">
+      <Filter>Source Files\experimental\tracking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\experimental\tracking\personIdExtractor.cpp">
+      <Filter>Source Files\experimental\tracking</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

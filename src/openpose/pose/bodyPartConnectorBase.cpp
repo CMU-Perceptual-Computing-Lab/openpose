@@ -14,9 +14,9 @@ namespace op
         try
         {
             // Parts Connection
-            const auto& bodyPartPairs = POSE_BODY_PART_PAIRS[(int)poseModel];
-            const auto& mapIdx = POSE_MAP_IDX[(int)poseModel];
-            const auto numberBodyParts = POSE_NUMBER_BODY_PARTS[(int)poseModel];
+            const auto& bodyPartPairs = getPosePartPairs(poseModel);
+            const auto& mapIdx = getPoseMapIndex(poseModel);
+            const auto numberBodyParts = getPoseNumberBodyParts(poseModel);
             const auto numberBodyPartPairs = bodyPartPairs.size() / 2;
 
             // Vector<int> = Each body part + body parts counter; double = subsetScore
@@ -31,21 +31,20 @@ namespace op
             {
                 const auto bodyPartA = bodyPartPairs[2*pairIndex];
                 const auto bodyPartB = bodyPartPairs[2*pairIndex+1];
-                const auto* candidateA = peaksPtr + bodyPartA*peaksOffset;
-                const auto* candidateB = peaksPtr + bodyPartB*peaksOffset;
-                const auto nA = intRound(candidateA[0]);
-                const auto nB = intRound(candidateB[0]);
+                const auto* candidateAPtr = peaksPtr + bodyPartA*peaksOffset;
+                const auto* candidateBPtr = peaksPtr + bodyPartB*peaksOffset;
+                const auto numberA = intRound(candidateAPtr[0]);
+                const auto numberB = intRound(candidateBPtr[0]);
 
                 // Add parts into the subset in special case
-                if (nA == 0 || nB == 0)
+                if (numberA == 0 || numberB == 0)
                 {
                     // Change w.r.t. other
-                    if (nA == 0) // nB == 0 or not
+                    if (numberA == 0) // numberB == 0 or not
                     {
-                        if (poseModel == PoseModel::COCO_18 || poseModel == PoseModel::BODY_18
-                            || poseModel == PoseModel::BODY_19 || poseModel == PoseModel::BODY_23)
+                        if (poseModel != PoseModel::MPI_15 && poseModel != PoseModel::MPI_15_4)
                         {
-                            for (auto i = 1; i <= nB; i++)
+                            for (auto i = 1; i <= numberB; i++)
                             {
                                 bool num = false;
                                 const auto indexB = bodyPartB;
@@ -65,15 +64,15 @@ namespace op
                                     rowVector[ bodyPartB ] = bodyPartB*peaksOffset + i*3 + 2;
                                     // Last number in each row is the parts number of that person
                                     rowVector[subsetCounterIndex] = 1;
-                                    const auto subsetScore = candidateB[i*3+2];
+                                    const auto subsetScore = candidateBPtr[i*3+2];
                                     // Second last number in each row is the total score
                                     subset.emplace_back(std::make_pair(rowVector, subsetScore));
                                 }
                             }
                         }
-                        else if (poseModel == PoseModel::MPI_15 || poseModel == PoseModel::MPI_15_4)
+                        else
                         {
-                            for (auto i = 1; i <= nB; i++)
+                            for (auto i = 1; i <= numberB; i++)
                             {
                                 std::vector<int> rowVector(subsetSize, 0);
                                 // Store the index
@@ -81,20 +80,16 @@ namespace op
                                 // Last number in each row is the parts number of that person
                                 rowVector[subsetCounterIndex] = 1;
                                 // Second last number in each row is the total score
-                                const auto subsetScore = candidateB[i*3+2];
+                                const auto subsetScore = candidateBPtr[i*3+2];
                                 subset.emplace_back(std::make_pair(rowVector, subsetScore));
                             }
                         }
-                        else
-                            error("Unknown model, cast to int = " + std::to_string((int)poseModel),
-                                  __LINE__, __FUNCTION__, __FILE__);
                     }
-                    else // if (nA != 0 && nB == 0)
+                    else // if (numberA != 0 && numberB == 0)
                     {
-                        if (poseModel == PoseModel::COCO_18 || poseModel == PoseModel::BODY_18
-                            || poseModel == PoseModel::BODY_19 || poseModel == PoseModel::BODY_23)
+                        if (poseModel != PoseModel::MPI_15 && poseModel != PoseModel::MPI_15_4)
                         {
-                            for (auto i = 1; i <= nA; i++)
+                            for (auto i = 1; i <= numberA; i++)
                             {
                                 bool num = false;
                                 const auto indexA = bodyPartA;
@@ -115,14 +110,14 @@ namespace op
                                     // Last number in each row is the parts number of that person
                                     rowVector[subsetCounterIndex] = 1;
                                     // Second last number in each row is the total score
-                                    const auto subsetScore = candidateA[i*3+2];
+                                    const auto subsetScore = candidateAPtr[i*3+2];
                                     subset.emplace_back(std::make_pair(rowVector, subsetScore));
                                 }
                             }
                         }
-                        else if (poseModel == PoseModel::MPI_15 || poseModel == PoseModel::MPI_15_4)
+                        else
                         {
-                            for (auto i = 1; i <= nA; i++)
+                            for (auto i = 1; i <= numberA; i++)
                             {
                                 std::vector<int> rowVector(subsetSize, 0);
                                 // Store the index
@@ -130,49 +125,46 @@ namespace op
                                 // Last number in each row is the parts number of that person
                                 rowVector[subsetCounterIndex] = 1;
                                 // Second last number in each row is the total score
-                                const auto subsetScore = candidateA[i*3+2];
+                                const auto subsetScore = candidateAPtr[i*3+2];
                                 subset.emplace_back(std::make_pair(rowVector, subsetScore));
                             }
                         }
-                        else
-                            error("Unknown model, cast to int = " + std::to_string((int)poseModel),
-                                  __LINE__, __FUNCTION__, __FILE__);
                     }
                 }
-                else // if (nA != 0 && nB != 0)
+                else // if (numberA != 0 && numberB != 0)
                 {
                     std::vector<std::tuple<double, int, int>> temp;
-                    const auto* const mapX = heatMapPtr + mapIdx[2*pairIndex] * heatMapOffset;
-                    const auto* const mapY = heatMapPtr + mapIdx[2*pairIndex+1] * heatMapOffset;
-                    for (auto i = 1; i <= nA; i++)
+                    const auto* mapX = heatMapPtr + mapIdx[2*pairIndex] * heatMapOffset;
+                    const auto* mapY = heatMapPtr + mapIdx[2*pairIndex+1] * heatMapOffset;
+                    for (auto i = 1; i <= numberA; i++)
                     {
-                        for (auto j = 1; j <= nB; j++)
+                        for (auto j = 1; j <= numberB; j++)
                         {
-                            const auto dX = candidateB[j*3] - candidateA[i*3];
-                            const auto dY = candidateB[j*3+1] - candidateA[i*3+1];
-                            const auto dMax = fastMax(std::abs(dX), std::abs(dY));
-                            const auto numberPointsInLine = fastMax(5, fastMin(25, intRound(std::sqrt(5*dMax))));
-                            const auto normVec = T(std::sqrt( dX*dX + dY*dY ));
+                            const auto vectorAToBX = candidateBPtr[j*3] - candidateAPtr[i*3];
+                            const auto vectorAToBY = candidateBPtr[j*3+1] - candidateAPtr[i*3+1];
+                            const auto vectorAToBMax = fastMax(std::abs(vectorAToBX), std::abs(vectorAToBY));
+                            const auto numberPointsInLine = fastMax(5, fastMin(25, intRound(std::sqrt(5*vectorAToBMax))));
+                            const auto vectorNorm = T(std::sqrt( vectorAToBX*vectorAToBX + vectorAToBY*vectorAToBY ));
                             // If the peaksPtr are coincident. Don't connect them.
-                            if (normVec > 1e-6)
+                            if (vectorNorm > 1e-6)
                             {
-                                const auto sX = candidateA[i*3];
-                                const auto sY = candidateA[i*3+1];
-                                const auto vecX = dX/normVec;
-                                const auto vecY = dY/normVec;
+                                const auto sX = candidateAPtr[i*3];
+                                const auto sY = candidateAPtr[i*3+1];
+                                const auto vectorAToBNormX = vectorAToBX/vectorNorm;
+                                const auto vectorAToBNormY = vectorAToBY/vectorNorm;
 
                                 auto sum = 0.;
                                 auto count = 0;
-                                const auto dXInLine = dX/numberPointsInLine;
-                                const auto dYInLine = dY/numberPointsInLine;
+                                const auto vectorAToBXInLine = vectorAToBX/numberPointsInLine;
+                                const auto vectorAToBYInLine = vectorAToBY/numberPointsInLine;
                                 for (auto lm = 0; lm < numberPointsInLine; lm++)
                                 {
-                                    const auto mX = fastMin(heatMapSize.x-1, intRound(sX + lm*dXInLine));
-                                    const auto mY = fastMin(heatMapSize.y-1, intRound(sY + lm*dYInLine));
+                                    const auto mX = fastMin(heatMapSize.x-1, intRound(sX + lm*vectorAToBXInLine));
+                                    const auto mY = fastMin(heatMapSize.y-1, intRound(sY + lm*vectorAToBYInLine));
                                     checkGE(mX, 0, "", __LINE__, __FUNCTION__, __FILE__);
                                     checkGE(mY, 0, "", __LINE__, __FUNCTION__, __FILE__);
                                     const auto idx = mY * heatMapSize.x + mX;
-                                    const auto score = (vecX*mapX[idx] + vecY*mapY[idx]);
+                                    const auto score = (vectorAToBNormX*mapX[idx] + vectorAToBNormY*mapY[idx]);
                                     if (score > interThreshold)
                                     {
                                         sum += score;
@@ -193,9 +185,9 @@ namespace op
                         std::sort(temp.begin(), temp.end(), std::greater<std::tuple<T, int, int>>());
 
                     std::vector<std::tuple<int, int, double>> connectionK;
-                    const auto minAB = fastMin(nA, nB);
-                    std::vector<int> occurA(nA, 0);
-                    std::vector<int> occurB(nB, 0);
+                    const auto minAB = fastMin(numberA, numberB);
+                    std::vector<int> occurA(numberA, 0);
+                    std::vector<int> occurB(numberB, 0);
                     auto counter = 0;
                     for (auto row = 0u; row < temp.size(); row++)
                     {
@@ -238,7 +230,8 @@ namespace op
                         // Add ears connections (in case person is looking to opposite direction to camera)
                         else if (((poseModel == PoseModel::COCO_18
                                     || poseModel == PoseModel::BODY_18) && (pairIndex==17 || pairIndex==18))
-                                 || (poseModel == PoseModel::BODY_19 && (pairIndex==18 || pairIndex==19))
+                                 || ((poseModel == PoseModel::BODY_19 || poseModel == PoseModel::BODY_59)
+                                        && (pairIndex==18 || pairIndex==19))
                                  || (poseModel == PoseModel::BODY_23 && (pairIndex==22 || pairIndex==23)))
                         {
                             for (const auto& connectionKI : connectionK)

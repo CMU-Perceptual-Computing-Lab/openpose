@@ -25,6 +25,8 @@ namespace op
                 return PoseModel::BODY_19;
             else if (poseModeString == "BODY_23")
                 return PoseModel::BODY_23;
+            else if (poseModeString == "BODY_59")
+                return PoseModel::BODY_59;
             // else
             error("String does not correspond to any model (COCO, MPI, MPI_4_layers)",
                   __LINE__, __FUNCTION__, __FILE__);
@@ -53,7 +55,7 @@ namespace op
             else if (keypointScale == 4)
                 return ScaleMode::PlusMinusOne;
             // else
-            const std::string message = "String does not correspond to any scale mode: (0, 1, 2, 3, 4) for"
+            const std::string message = "Integer does not correspond to any scale mode: (0, 1, 2, 3, 4) for"
                                         " (InputResolution, NetOutputResolution, OutputResolution, ZeroToOne,"
                                         " PlusMinusOne).";
             error(message, __LINE__, __FUNCTION__, __FILE__);
@@ -63,6 +65,32 @@ namespace op
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             return ScaleMode::InputResolution;
+        }
+    }
+
+    ScaleMode flagsToHeatMapScaleMode(const int heatMapScale)
+    {
+        try
+        {
+            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            if (heatMapScale == 0)
+                return ScaleMode::PlusMinusOne;
+            else if (heatMapScale == 1)
+                return ScaleMode::ZeroToOne;
+            else if (heatMapScale == 2)
+                return ScaleMode::UnsignedChar;
+            else if (heatMapScale == 3)
+                return ScaleMode::NoScale;
+            // else
+            const std::string message = "Integer does not correspond to any scale mode: (0, 1, 2, 3) for"
+                                        " (PlusMinusOne, ZeroToOne, UnsignedChar, NoScale).";
+            error(message, __LINE__, __FUNCTION__, __FILE__);
+            return ScaleMode::PlusMinusOne;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return ScaleMode::PlusMinusOne;
         }
     }
 

@@ -14,14 +14,19 @@ namespace op
     public:
         PoseExtractor(const PoseModel poseModel,
                       const std::vector<HeatMapType>& heatMapTypes = {},
-                      const ScaleMode heatMapScale = ScaleMode::ZeroToOne);
+                      const ScaleMode heatMapScale = ScaleMode::ZeroToOne,
+                      const bool addPartCandidates = false);
 
         virtual ~PoseExtractor();
 
         void initializationOnThread();
 
-        virtual void forwardPass(const Array<float>& inputNetData, const Point<int>& inputDataSize,
+        virtual void forwardPass(const std::vector<Array<float>>& inputNetData, const Point<int>& inputDataSize,
                                  const std::vector<double>& scaleRatios = {1.f}) = 0;
+
+        virtual const float* getCandidatesCpuConstPtr() const = 0;
+
+        virtual const float* getCandidatesGpuConstPtr() const = 0;
 
         virtual const float* getHeatMapCpuConstPtr() const = 0;
 
@@ -29,7 +34,9 @@ namespace op
 
         virtual std::vector<int> getHeatMapSize() const = 0;
 
-        Array<float> getHeatMaps() const;
+        Array<float> getHeatMapsCopy() const;
+
+        std::vector<std::vector<std::array<float,3>>> getCandidatesCopy() const;
 
         virtual const float* getPoseGpuConstPtr() const = 0;
 
@@ -59,6 +66,7 @@ namespace op
     private:
         const std::vector<HeatMapType> mHeatMapTypes;
         const ScaleMode mHeatMapScaleMode;
+        const bool mAddPartCandidates;
         std::array<std::atomic<double>, (int)PoseProperty::Size> mProperties;
         std::thread::id mThreadId;
 

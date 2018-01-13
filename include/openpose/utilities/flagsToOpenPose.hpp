@@ -12,6 +12,8 @@ namespace op
 
     OP_API ScaleMode flagsToScaleMode(const int keypointScale);
 
+    OP_API ScaleMode flagsToHeatMapScaleMode(const int heatMapScale);
+
     // Determine type of frame source
     OP_API ProducerType flagsToProducerType(const std::string& imageDirectory, const std::string& videoPath,
                                             const std::string& ipCameraPath, const int webcamIndex);

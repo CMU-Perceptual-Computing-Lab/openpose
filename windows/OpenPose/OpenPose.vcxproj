@@ -64,7 +64,7 @@
     </CudaCompile>
     <Link>
       <AdditionalLibraryDirectories>$(CUDA_PATH_V8_0)\lib\x64\;$(PYTHON_LIB);$(CudaToolkitLibDir);%(AdditionalLibraryDirectories);%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
-      <Version>1.1.0</Version>
+      <Version>1.2</Version>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -126,6 +126,9 @@
     <ClInclude Include="..\..\include\openpose\experimental\headers.hpp" />
     <ClInclude Include="..\..\include\openpose\experimental\producer\headers.hpp" />
     <ClInclude Include="..\..\include\openpose\experimental\producer\wPeoplePoseLoader.hpp" />
+    <ClInclude Include="..\..\include\openpose\experimental\tracking\headers.hpp" />
+    <ClInclude Include="..\..\include\openpose\experimental\tracking\personIdExtractor.hpp" />
+    <ClInclude Include="..\..\include\openpose\experimental\tracking\wPersonIdExtractor.hpp" />
     <ClInclude Include="..\..\include\openpose\face\faceCpuRenderer.hpp" />
     <ClInclude Include="..\..\include\openpose\face\faceDetector.hpp" />
     <ClInclude Include="..\..\include\openpose\face\faceDetectorOpenCV.hpp" />
@@ -148,15 +151,15 @@
     <ClInclude Include="..\..\include\openpose\filestream\heatMapSaver.hpp" />
     <ClInclude Include="..\..\include\openpose\filestream\imageSaver.hpp" />
     <ClInclude Include="..\..\include\openpose\filestream\jsonOfstream.hpp" />
-    <ClInclude Include="..\..\include\openpose\filestream\keypointJsonSaver.hpp" />
     <ClInclude Include="..\..\include\openpose\filestream\keypointSaver.hpp" />
+    <ClInclude Include="..\..\include\openpose\filestream\peopleJsonSaver.hpp" />
     <ClInclude Include="..\..\include\openpose\filestream\videoSaver.hpp" />
     <ClInclude Include="..\..\include\openpose\filestream\wCocoJsonSaver.hpp" />
     <ClInclude Include="..\..\include\openpose\filestream\wFaceSaver.hpp" />
     <ClInclude Include="..\..\include\openpose\filestream\wHandSaver.hpp" />
     <ClInclude Include="..\..\include\openpose\filestream\wHeatMapSaver.hpp" />
     <ClInclude Include="..\..\include\openpose\filestream\wImageSaver.hpp" />
-    <ClInclude Include="..\..\include\openpose\filestream\wKeypointJsonSaver.hpp" />
+    <ClInclude Include="..\..\include\openpose\filestream\wPeopleJsonSaver.hpp" />
     <ClInclude Include="..\..\include\openpose\filestream\wPoseSaver.hpp" />
     <ClInclude Include="..\..\include\openpose\filestream\wVideoSaver.hpp" />
     <ClInclude Include="..\..\include\openpose\gui\enumClasses.hpp" />
@@ -192,6 +195,7 @@
     <ClInclude Include="..\..\include\openpose\pose\poseExtractorCaffe.hpp" />
     <ClInclude Include="..\..\include\openpose\pose\poseGpuRenderer.hpp" />
     <ClInclude Include="..\..\include\openpose\pose\poseParameters.hpp" />
+    <ClInclude Include="..\..\include\openpose\pose\poseParametersRender.hpp" />
     <ClInclude Include="..\..\include\openpose\pose\poseRenderer.hpp" />
     <ClInclude Include="..\..\include\openpose\pose\renderPose.hpp" />
     <ClInclude Include="..\..\include\openpose\pose\wPoseExtractor.hpp" />
@@ -269,6 +273,8 @@
     <ClCompile Include="..\..\src\openpose\core\resizeAndMergeBase.cpp" />
     <ClCompile Include="..\..\src\openpose\core\resizeAndMergeCaffe.cpp" />
     <ClCompile Include="..\..\src\openpose\core\scaleAndSizeExtractor.cpp" />
+    <ClCompile Include="..\..\src\openpose\experimental\tracking\defineTemplates.cpp" />
+    <ClCompile Include="..\..\src\openpose\experimental\tracking\personIdExtractor.cpp" />
     <ClCompile Include="..\..\src\openpose\face\defineTemplates.cpp" />
     <ClCompile Include="..\..\src\openpose\face\faceCpuRenderer.cpp" />
     <ClCompile Include="..\..\src\openpose\face\faceDetector.cpp" />
@@ -284,8 +290,8 @@
     <ClCompile Include="..\..\src\openpose\filestream\heatMapSaver.cpp" />
     <ClCompile Include="..\..\src\openpose\filestream\imageSaver.cpp" />
     <ClCompile Include="..\..\src\openpose\filestream\jsonOfstream.cpp" />
-    <ClCompile Include="..\..\src\openpose\filestream\keypointJsonSaver.cpp" />
     <ClCompile Include="..\..\src\openpose\filestream\keypointSaver.cpp" />
+    <ClCompile Include="..\..\src\openpose\filestream\peopleJsonSaver.cpp" />
     <ClCompile Include="..\..\src\openpose\filestream\videoSaver.cpp" />
     <ClCompile Include="..\..\src\openpose\gui\defineTemplates.cpp" />
     <ClCompile Include="..\..\src\openpose\gui\frameDisplayer.cpp" />
@@ -307,6 +313,7 @@
     <ClCompile Include="..\..\src\openpose\pose\poseExtractorCaffe.cpp" />
     <ClCompile Include="..\..\src\openpose\pose\poseGpuRenderer.cpp" />
     <ClCompile Include="..\..\src\openpose\pose\poseParameters.cpp" />
+    <ClCompile Include="..\..\src\openpose\pose\poseParametersRender.cpp" />
     <ClCompile Include="..\..\src\openpose\pose\poseRenderer.cpp" />
     <ClCompile Include="..\..\src\openpose\pose\renderPose.cpp" />
     <ClCompile Include="..\..\src\openpose\producer\defineTemplates.cpp" />

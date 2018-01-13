@@ -85,6 +85,7 @@ tags
 
 ######################### Caffe Files / Folders #########################
 # User's build configuration
+Makefile
 Makefile.config
 
 # Data and models are either

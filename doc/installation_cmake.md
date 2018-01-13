@@ -40,9 +40,15 @@ See [doc/quick_start.md#clone-and-update-the-repository](./quick_start.md#clone-
 ## Installation
 The instructions in this section describe the steps to build OpenPose using CMake (GUI). There are 3 main steps:
 
-1. [Caffe Prerequisites (Ubuntu Only)](#caffe-prerequisites-ubuntu-only)
-2. [OpenPose Configuration](#openpose-configuration)
-3. [OpenPose Building](#openpose-building)
+1. [Prerequisites (Ubuntu Only)](#prerequisites-ubuntu-only)
+2. [Caffe Prerequisites (Ubuntu Only)](#caffe-prerequisites-ubuntu-only)
+3. [OpenPose Configuration](#openpose-configuration)
+4. [OpenPose Building](#openpose-building)
+
+
+
+### Prerequisites (Ubuntu Only)
+OpenCV must be already installed on your machine. It can be installed with `apt-get install libopencv-dev`. You can also use your own compiled OpenCV version.
 
 
 
@@ -104,7 +110,7 @@ cd build/
 sudo make install
 ```
 
-Once the installation is completed, you can use OpenPose in your other project using the `find_package` cmake command. Below, is a small example `CMakeLists.txt`.
+Once the installation is completed, you can use OpenPose in your other project using the `find_package` cmake command. Below, is a small example `CMakeLists.txt`. In order to use this script, you also need to copy `FindGFlags.cmake` and `FindGlog.cmake` into your `<project_root_directory>/cmake/Modules/` (create the directory if necessary).
 ```
 cmake_minimum_required(VERSION 2.8.7)
 

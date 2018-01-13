@@ -5,8 +5,8 @@ set(SOURCES_OP_FILESTREAM cocoJsonSaver.cpp
     heatMapSaver.cpp
     imageSaver.cpp
     jsonOfstream.cpp
-    keypointJsonSaver.cpp
     keypointSaver.cpp
+    peopleJsonSaver.cpp
     videoSaver.cpp)
 
 include(${CMAKE_SOURCE_DIR}/cmake/Utils.cmake)

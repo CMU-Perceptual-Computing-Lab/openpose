@@ -11,7 +11,7 @@ namespace op
      * Array<T>: The OpenPose Basic Raw Data Container
      * This template class implements a multidimensional data array. It is our basic data container, analogous to cv::Mat in OpenCV, Tensor in
      * Torch/TensorFlow or Blob in Caffe.
-     * It wraps a cv::Mat and a boost::shared_ptr, both of them pointing to the same raw data. I.e. they both share the same memory, so we can read
+     * It wraps a cv::Mat and a std::shared_ptr, both of them pointing to the same raw data. I.e. they both share the same memory, so we can read
      * and modify this data in both formats with no performance impact.
      * Hence, it keeps high performance while adding high-level functions.
      */
@@ -192,7 +192,7 @@ namespace op
 
         // -------------------------------------------------- Data Access Functions And Operators -------------------------------------------------- //
         /**
-         * Return a raw pointer to the data. Similar to: boost::shared_ptr::get().
+         * Return a raw pointer to the data. Similar to: std::shared_ptr::get().
          * Note: if you modify the pointer data, you will directly modify it in the Array<T> instance too.
          * If you know you do not want to modify the data, then use getConstPtr() instead.
          * @return A raw pointer to the data.
@@ -373,7 +373,7 @@ namespace op
         T& commonAt(const int index) const;
 
         /**
-         * Private auxiliar function that sets the cv::Mat wrapper and makes it point to the same data than boost::shared_ptr points to.
+         * Private auxiliar function that sets the cv::Mat wrapper and makes it point to the same data than std::shared_ptr points to.
          */
         void setCvMatFromSharedPtr();
     };

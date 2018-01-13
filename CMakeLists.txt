@@ -243,9 +243,14 @@ if (UNIX AND NOT APPLE)
 
     # Else build from scratch
     if (BUILD_CAFFE)
-      message(STATUS "Caffe will be build from source now.")
+
+      # Download Caffe
+      message(STATUS "Caffe will be downloaded from source now. NOTE: This process might take several minutes depending
+          on your internet connection.")
+      execute_process(COMMAND git submodule update --init --recursive)
       
       # Build Caffe
+      message(STATUS "Caffe will be built from source now.")
       include(ExternalProject)
       set(CAFFE_PREFIX caffe)
       set(CAFFE_URL ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
@@ -255,6 +260,7 @@ if (UNIX AND NOT APPLE)
           PREFIX ${CAFFE_PREFIX}
           CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR> 
               -DUSE_CUDNN=${USE_CUDNN}
+              -DBUILD_python=OFF
               -DOpenCV_DIR=${OpenCV_DIR})
 
       ExternalProject_Get_Property(openpose_caffe install_dir)

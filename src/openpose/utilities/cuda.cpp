@@ -12,6 +12,7 @@ namespace op
         const dim3 THREADS_PER_BLOCK_SMALL{64, 64, 1};
         const dim3 THREADS_PER_BLOCK_MEDIUM{128, 128, 1};
         const dim3 THREADS_PER_BLOCK_BIG{256, 256, 1};
+        const dim3 THREADS_PER_BLOCK_HUGE{512, 512, 1};
     #endif
 
     void cudaCheck(const int line, const std::string& function, const std::string& file)
@@ -67,15 +68,23 @@ namespace op
                 // numberCudaThreads
                 // Image <= 480p    --> THREADS_PER_BLOCK_TINY
                 // Image <= 720p    --> THREADS_PER_BLOCK_SMALL
-                // Image <= 16K     --> THREADS_PER_BLOCK_MEDIUM
-                // Image > 16K      --> THREADS_PER_BLOCK_BIG
+                // Image <= 1080p   --> THREADS_PER_BLOCK_MEDIUM
+                // Image <= 4k      --> THREADS_PER_BLOCK_BIG
+                // Image >  4K      --> THREADS_PER_BLOCK_HUGE
                 const auto maxValue = fastMax(frameSize.x, frameSize.y);
-                if (maxValue >= 16384)
+                // > 4K
+                if (maxValue > 3840)
+                    numberCudaThreads = THREADS_PER_BLOCK_HUGE;
+                // 4K
+                else if (maxValue > 1980)
                     numberCudaThreads = THREADS_PER_BLOCK_BIG;
+                // FullHD
                 else if (maxValue > 1280)
                     numberCudaThreads = THREADS_PER_BLOCK_MEDIUM;
+                // HD
                 else if (maxValue > 640)
                     numberCudaThreads = THREADS_PER_BLOCK_SMALL;
+                // VGA
                 else
                     numberCudaThreads = THREADS_PER_BLOCK_TINY;
                 // numberCudaBlocks
