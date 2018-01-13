@@ -32,10 +32,6 @@ endif(UNIX AND NOT APPLE)
 
 if (WIN32)
 
-  # TODO -- Makeshift solution -- This prevents rerunning build again
-  # https://gitlab.kitware.com/cmake/cmake/issues/16783
-  set(CMAKE_SUPPRESS_REGENERATION 1)
-
   target_link_libraries(openpose ${OpenCV_LIBS} ${Caffe_LIBS}
       debug ${Boost_FILESYSTEM_LIBRARY_DEBUG} debug ${Boost_SYSTEM_LIBRARY_DEBUG}
       optimized ${Boost_FILESYSTEM_LIBRARY_OPTIMIZED} optimized ${Boost_SYSTEM_LIBRARY_OPTIMIZED} 

@@ -31,6 +31,10 @@ endif ()
 ### FLAGS
 
 if (WIN32)
+   # TODO -- Makeshift solution -- This prevents rerunning build again
+  # https://gitlab.kitware.com/cmake/cmake/issues/16783
+  set(CMAKE_SUPPRESS_REGENERATION ON)
+
   string (REPLACE "/D_WINDOWS" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
   string (REPLACE "/DWIN32" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
 
