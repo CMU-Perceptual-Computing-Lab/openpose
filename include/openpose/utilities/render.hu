@@ -139,8 +139,8 @@ namespace op
                             if (googlyEye1 == part || googlyEye2 == part)
                             {
                                 const auto eyeRatio = 2.5f * sqrt(radiusScaled);
-                                const auto minr2 = sharedScaleF[person]
-                                                 * sharedScaleF[person] * (eyeRatio - 2) * (eyeRatio - 2);
+                                const auto minr2 = sharedScaleF[person] * sharedScaleF[person]
+                                                 * (eyeRatio - 2) * (eyeRatio - 2);
                                 const auto maxr2 = sharedScaleF[person] * sharedScaleF[person] * eyeRatio * eyeRatio;
                                 if (dist2 <= maxr2)
                                 {

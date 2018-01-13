@@ -3,6 +3,19 @@ OpenPose Demo - Output
 
 
 
+## Contents
+1. [Output Format](#output-format)
+    1. [Keypoint Ordering](#keypoint-ordering)
+    2. [Heatmap Ordering](#heatmap-ordering)
+    3. [Face and Hands](#face-and-hands)
+    4. [Pose Output Format](#pose-output-format)
+    5. [Face Output Format](#face-output-format)
+    6. [Hand Output Format](#hand-output-format)
+3. [Reading Saved Results](#reading-saved-results)
+4. [Keypoint Format in the C++ API](#keypoint-format-in-the-c-api)
+
+
+
 ## Output Format
 There are 2 alternatives to save the OpenPose output.
 
@@ -51,7 +64,7 @@ There are 2 alternatives to save the OpenPose output.
 
 
 
-## Keypoint Ordering
+### Keypoint Ordering
 The body part mapping order of any body model (e.g. COCO, MPI) can be extracted from the C++ API by using the `getPoseBodyPartMapping(const PoseModel poseModel)` function available in [poseParameters.hpp](../include/openpose/pose/poseParameters.hpp):
 ```
 // C++ API call
@@ -85,7 +98,7 @@ const auto& poseBodyPartMappingMpi = getPoseBodyPartMapping(PoseModel::MPI_15);
 
 
 
-## Heatmap Ordering
+### Heatmap Ordering
 For the **heat maps storing format**, instead of saving each of the 67 heatmaps (18 body parts + background + 2 x 19 PAFs) individually, the library concatenates them into a huge (width x #heat maps) x (height) matrix (i.e., concatenated by columns). E.g., columns [0, individual heat map width] contains the first heat map, columns [individual heat map width + 1, 2 * individual heat map width] contains the second heat map, etc. Note that some image viewers are not able to display the resulting images due to the size. However, Chrome and Firefox are able to properly open them.
 
 The saving order is body parts + background + PAFs. Any of them can be disabled with program flags. If background is disabled, then the final image will be body parts + PAFs. The body parts and background follow the order of `getPoseBodyPartMapping(const PoseModel poseModel)`, while the PAFs follow the order specified on `getPosePartPairs(const PoseModel poseModel)`:
@@ -102,13 +115,39 @@ const auto& posePartPairsMpi = getPosePartPairs(PoseModel::MPI_15);
 
 
 
-## Face and Hands
+### Face and Hands
 The output format is analogous for hand (`hand_left_keypoints`, `hand_right_keypoints`) and face (`face_keypoints`) JSON files.
 
 
 
-## Keypoint Format on the op::Datum Class
-There are 3 different keypoint Array<float> elements on this class:
+### Pose Output Format
+<p align="center">
+    <img src="media/keypoints_pose.png", width="480">
+</p>
+
+
+
+### Face Output Format
+<p align="center">
+    <img src="media/keypoints_face.png", width="480">
+</p>
+
+
+
+### Hand Output Format
+<p align="center">
+    <img src="media/keypoints_hand.png", width="480">
+</p>
+
+
+
+## Reading Saved Results
+We use standard formats (JSON, XML, PNG, JPG, ...) to save our results, so there are many open-source libraries to read them in most programming languages. From C++, but you might the functions in [include/openpose/filestream/fileStream.hpp](../include/openpose/filestream/fileStream.hpp). In particular, `loadData` (for JSON, XML and YML files) and `loadImage` (for image formats such as PNG or JPG) to load the data into cv::Mat format.
+
+
+
+## Keypoint Format in the C++ API
+There are 3 different keypoint `Array<float>` elements in the `Datum` class:
 
 1. Array<float> **poseKeypoints**: In order to access person `person` and body part `part` (where the index matches `POSE_COCO_BODY_PARTS` or `POSE_MPI_BODY_PARTS`), you can simply output:
 ```
@@ -169,29 +208,3 @@ There are 3 different keypoint Array<float> elements on this class:
     const auto yR = handKeypoints[1][baseIndex + 1];
     const auto scoreR = handKeypoints[1][baseIndex + 2];
 ```
-
-
-
-## Reading Saved Results
-We use standard formats (JSON, XML, PNG, JPG, ...) to save our results, so there are many open-source libraries to read them in most programming languages. From C++, but you might the functions in [include/openpose/filestream/fileStream.hpp](../include/openpose/filestream/fileStream.hpp). In particular, `loadData` (for JSON, XML and YML files) and `loadImage` (for image formats such as PNG or JPG) to load the data into cv::Mat format.
-
-
-
-## Pose Output Format
-<p align="center">
-    <img src="media/keypoints_pose.png", width="480">
-</p>
-
-
-
-## Face Output Format
-<p align="center">
-    <img src="media/keypoints_face.png", width="480">
-</p>
-
-
-
-## Hand Output Format
-<p align="center">
-    <img src="media/keypoints_hand.png", width="480">
-</p>

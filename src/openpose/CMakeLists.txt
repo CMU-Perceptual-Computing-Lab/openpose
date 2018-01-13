@@ -22,7 +22,7 @@ set_property(TARGET caffe PROPERTY IMPORTED_LOCATION ${Caffe_LIBS})
 file(GLOB_RECURSE SOURCES "*.cu" "*.cpp") # It's better not to hardcode here.
 
 cuda_add_library(openpose ${SOURCES})
-target_link_libraries(openpose ${OpenCV_LIBS} ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY} caffe)
+target_link_libraries(openpose ${OpenCV_LIBS} caffe)
 if (BUILD_CAFFE)
     add_dependencies(openpose openpose_caffe)
 endif (BUILD_CAFFE)
