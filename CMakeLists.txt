@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 2.8.7 FATAL_ERROR) # min. cmake version recommend
 
 set(OpenPose_VERSION_MAJOR 1)
 set(OpenPose_VERSION_MINOR 2)
-set(OpenPose_VERSION_PATCH 0)
+set(OpenPose_VERSION_PATCH 1)
 set(OpenPose_VERSION ${OpenPose_VERSION_MAJOR}.${OpenPose_VERSION_MINOR}.${OpenPose_VERSION_PATCH})
 
 ### FIND THE OS
@@ -79,21 +79,21 @@ endif (${DL_FRAMEWORK} MATCHES "CAFFE")
 
 if (WIN32)
   # Select the Enhanced Instruction Set
-  set(EEIS NONE CACHE STRING "Enable Enhanced Instruction Set")
-  set_property(CACHE EEIS PROPERTY STRINGS SSE SSE2 AVX AVX2 IA32)
+  set(INSTRUCTION_SET NONE CACHE STRING "Enable Enhanced Instruction Set")
+  set_property(CACHE INSTRUCTION_SET PROPERTY STRINGS NONE SSE SSE2 AVX AVX2 IA32)
 
   # Suboptions for Enhanced Instruction Set
-  if (${EEIS} MATCHES "SSE")
+  if (${INSTRUCTION_SET} MATCHES "SSE")
     add_definitions("/arch:SSE")
-  elseif (${EEIS} MATCHES "SSE2")
+  elseif (${INSTRUCTION_SET} MATCHES "SSE2")
     add_definitions("/arch:SSE2")
-  elseif (${EEIS} MATCHES "AVX")
+  elseif (${INSTRUCTION_SET} MATCHES "AVX")
     add_definitions("/arch:AVX")
-  elseif (${EEIS} MATCHES "AVX2")
+  elseif (${INSTRUCTION_SET} MATCHES "AVX2")
     add_definitions("/arch:AVX2")
-  elseif (${EEIS} MATCHES "IA32")
+  elseif (${INSTRUCTION_SET} MATCHES "IA32")
     add_definitions("/arch:IA32")
-  endif (${EEIS} MATCHES "SSE")
+  endif (${INSTRUCTION_SET} MATCHES "SSE")
 endif (WIN32)
 
 # Set the acceleration library
