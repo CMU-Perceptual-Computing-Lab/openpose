@@ -9,6 +9,10 @@ Windows:
         - Version 1.0.0, extracted from GitHub on 07/11/2017 from the current master branch.
         - Link: https://github.com/BVLC/caffe/tree/windows
 
+    - FreeGLUT (only for the 3-D reconstruction demo):
+        - Version 3.0.0-2 (MSVC), extracted from their oficial website.
+        - Link: https://www.transmissionzero.co.uk/software/freeglut-devel/
+
     - OpenCV:
         - Version 3.1.0, extracted from their oficial website, section releases/3.1.0/Win pack.
         - Link: http://opencv.org/releases.html

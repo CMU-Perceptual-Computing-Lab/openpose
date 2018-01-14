@@ -48,11 +48,13 @@ if (WIN32)
   
   string(REPLACE "/O2" "/Ox" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
   string(REPLACE "/Ob2" "" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
-  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MP /Ot /Oi /Gy /Z7")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Ot /Oi /Gy /Z7")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP") # Multi-processor compilation
   string(REPLACE "/W3" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
   string(REPLACE "/GR" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
-  set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /LTCG:incremental /OPT:REF /OPT:ICF /VERSION:32")
+  set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /LTCG:incremental /OPT:REF /OPT:ICF")
+  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /VERSION:${OpenPose_VERSION_MAJOR}.${OpenPose_VERSION_MINOR}")
 elseif (UNIX AND NOT APPLE)
   # Turn on C++11 
   add_definitions(-std=c++11)
@@ -122,6 +124,12 @@ endif (${GPU_MODE} MATCHES "CUDA")
 if (${GPU_MODE} MATCHES "CUDA")
   option(USE_CUDNN "Build OpenPose with cuDNN library support." ON)
 endif (${GPU_MODE} MATCHES "CUDA")
+
+# Suboptions for OpenPose 3D Reconstruction demo
+if (WIN32)
+  option(WITH_3D "Build OpenPose 3D Reconstruction demo." OFF)
+endif(WIN32)
+
  
 # Download the models
 option(DOWNLOAD_COCO_MODEL "Download COCO model." ON)
