@@ -35,7 +35,7 @@ elseif (WIN32)
       debug ${GLOG_LIBRARY_DEBUG} optimized ${GLOG_LIBRARY_RELEASE})
   target_compile_definitions(openpose PRIVATE BOOST_ALL_NO_LIB)
   # source_group("Header Files" FILES ${CMAKE_SOURCE_DIR}/include)
-  set_property(TARGET openpose PROPERTY FOLDER "Openpose library")
+  set_property(TARGET openpose PROPERTY FOLDER "OpenPose library")
   
   foreach (SUB_DIR ${SUB_DIRS})
     string(TOUPPER ${SUB_DIR} SUB_DIR_UPPERCASE)
