@@ -56,6 +56,7 @@ if (WIN32)
 elseif (UNIX AND NOT APPLE)
   # Turn on C++11 
   add_definitions(-std=c++11)
+  set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 endif (WIN32)
 
 # C++ additional flags
@@ -286,9 +287,12 @@ include_directories(
   ${GFLAGS_INCLUDE_DIR}
   ${GLOG_INCLUDE_DIR}
   ${Caffe_INCLUDE_DIRS}
-  ${OpenCV_INCLUDE_DIRS}
-  ${Boost_INCLUDE_DIRS}
-  ${WINDOWS_INCLUDE_DIRS})
+  ${OpenCV_INCLUDE_DIRS})
+if (WIN32)
+  include_directories(
+    ${Boost_INCLUDE_DIRS}
+    ${WINDOWS_INCLUDE_DIRS})
+endif (WIN32)
 
 ### ADD SUBDIRECTORIES
 
