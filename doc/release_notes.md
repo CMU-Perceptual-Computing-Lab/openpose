@@ -173,5 +173,6 @@ OpenPose Library - Release Notes
     1. Output of `--write_json` uses less hard disk space (enters and tabs removed).
     2. Removed Boost dependencies.
     3. Caffe added as submodule.
+    4. Added freeglut download script (3-D reconstruction demo for Windows).
 2. Main bugs fixed:
     1. Slight speed up (~1%) for performing the non-maximum suppression stage only in the body part heatmaps channels, and not also in the PAF channels.
