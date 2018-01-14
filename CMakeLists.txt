@@ -1,7 +1,3 @@
-cmake_policy(SET CMP0048 NEW)
-project(OpenPose VERSION 1.2.0)
-cmake_minimum_required(VERSION 2.8.7 FATAL_ERROR) # min. cmake version recommended by Caffe
-
 ### VERSION INFO
 
 set(OpenPose_VERSION_MAJOR 1)
@@ -9,10 +5,17 @@ set(OpenPose_VERSION_MINOR 2)
 set(OpenPose_VERSION_PATCH 1)
 set(OpenPose_VERSION ${OpenPose_VERSION_MAJOR}.${OpenPose_VERSION_MINOR}.${OpenPose_VERSION_PATCH})
 
+
+### CMAKE HEADERS
+cmake_policy(SET CMP0048 NEW)
+project(OpenPose VERSION ${OpenPose_VERSION})
+cmake_minimum_required(VERSION 2.8.7 FATAL_ERROR) # min. cmake version recommended by Caffe
+
+
 ### FIND THE OS
 
 if (WIN32) # OS is Windows
-  message(STATUS "Windows OS support currently is experimental. You are blessed if this works :)")
+  message(STATUS "Windows OS support currently is experimental. Feel free to send us any suggestion or bug you encounter.")
 elseif (APPLE) # OS is Apple
   message(FATAL_ERROR "Apple OS is not currently supported.")
 elseif (UNIX AND NOT APPLE) # OS is a Linux distribution (it assumes Ubuntu)
@@ -140,7 +143,6 @@ find_package(CUDA)
 
 if (UNIX AND NOT APPLE)
   include(cmake/Cuda.cmake)
-  find_package(Boost COMPONENTS system filesystem)
   find_package(CuDNN)
   find_package(GFlags)
   find_package(Glog)
@@ -148,11 +150,6 @@ if (UNIX AND NOT APPLE)
 
   # Set CUDA Flags
   set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -std=c++11")
-
-  if (NOT Boost_FOUND)
-    message(FATAL_ERROR "Boost not found. Install Boost from the command line using the command(s) --\
-        sudo apt-get install libboost-all-dev")
-  endif (NOT Boost_FOUND)
 
   if (NOT CUDA_FOUND)
     message(STATUS "CUDA not found.") 
@@ -207,10 +204,6 @@ if (WIN32)
   download_zip("caffe_2017_07_11.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 0302edc8843529f8ded1da74eae8e061)
   message(STATUS "Windows dependencies downloaded.")
 
-  find_library(Boost_FILESYSTEM_LIBRARY_OPTIMIZED boost_filesystem-vc140-mt-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
-  find_library(Boost_SYSTEM_LIBRARY_OPTIMIZED boost_system-vc140-mt-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
-  find_library(Boost_FILESYSTEM_LIBRARY_DEBUG boost_filesystem-vc140-mt-gd-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
-  find_library(Boost_SYSTEM_LIBRARY_DEBUG boost_system-vc140-mt-gd-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
   find_library(OpenCV_LIBS opencv_world310 HINTS ${FIND_LIB_PREFIX}/opencv/x64/vc14/lib)
   find_library(GFLAGS_LIBRARY_RELEASE gflags HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
   find_library(GFLAGS_LIBRARY_DEBUG gflagsd HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)

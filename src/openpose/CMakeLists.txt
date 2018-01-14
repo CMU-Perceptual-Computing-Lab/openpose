@@ -31,8 +31,6 @@ if(UNIX AND NOT APPLE)
 # Windows
 elseif (WIN32)
   target_link_libraries(openpose ${OpenCV_LIBS} ${Caffe_LIBS}
-      debug ${Boost_FILESYSTEM_LIBRARY_DEBUG} debug ${Boost_SYSTEM_LIBRARY_DEBUG}
-      optimized ${Boost_FILESYSTEM_LIBRARY_OPTIMIZED} optimized ${Boost_SYSTEM_LIBRARY_OPTIMIZED} 
       debug ${GFLAGS_LIBRARY_DEBUG} optimized ${GFLAGS_LIBRARY_RELEASE}
       debug ${GLOG_LIBRARY_DEBUG} optimized ${GLOG_LIBRARY_RELEASE})
   target_compile_definitions(openpose PRIVATE BOOST_ALL_NO_LIB)
