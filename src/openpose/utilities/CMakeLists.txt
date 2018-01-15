@@ -1,5 +1,4 @@
 list(APPEND SOURCES
-    caffeutil.cpp
     cuda.cpp
     errorAndLog.cpp
     fileSystem.cpp

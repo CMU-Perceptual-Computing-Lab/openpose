@@ -4,7 +4,8 @@ set(SOURCES
     wrapperStructHand.cpp
     wrapperStructInput.cpp
     wrapperStructOutput.cpp
-    wrapperStructPose.cpp)
+    wrapperStructPose.cpp
+)
 
 add_library(openpose_wrapper ${SOURCES})
 target_link_libraries(openpose_wrapper openpose_core openpose_face openpose_filestream

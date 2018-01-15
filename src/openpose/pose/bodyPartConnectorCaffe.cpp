@@ -175,7 +175,6 @@ namespace op
                                     heatMapsGpuPtr, peaksGpuPtr);
             #else
                 UNUSED(bottom);
-                //UNUSED(top);
                 UNUSED(poseKeypoints);
                 error("OpenPose must be compiled with the `USE_CAFFE` & `USE_CUDA` macro definitions in order to run"
                       " this functionality.", __LINE__, __FUNCTION__, __FILE__);

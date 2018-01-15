@@ -1,6 +1,5 @@
 #ifdef USE_CAFFE
     #include <caffe/blob.hpp>
-    #include <openpose/utilities/caffeutil.hpp>
 #endif
 #include <openpose/core/resizeAndMergeBase.hpp>
 #include <openpose/utilities/fastMath.hpp>

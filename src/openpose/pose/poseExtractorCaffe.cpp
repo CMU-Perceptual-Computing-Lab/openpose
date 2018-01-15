@@ -12,7 +12,6 @@
 #include <openpose/utilities/openCv.hpp>
 #include <openpose/utilities/standard.hpp>
 #include <openpose/pose/poseExtractorCaffe.hpp>
-#include <openpose/utilities/caffeutil.hpp>
 
 namespace op
 {
@@ -82,9 +81,6 @@ namespace op
             {
                 // HeatMaps extractor blob and layer
                 // Caffe modifies bottom - Heatmap gets resized
-                // std::string heatMapBlobSize = op::getCaffeBlobShapeAsString(*heatMapsBlob.get());
-                // std::string peaksBlobSize = op::getCaffeBlobShapeAsString(*peaksBlob.get());
-                // std::string poseBlobSize = op::getCaffeBlobShapeAsString(*poseBlob.get());
                 const auto caffeNetOutputBlobs = caffeNetSharedToPtr(caffeNetOutputBlob);
                 resizeAndMergeCaffe->Reshape(caffeNetOutputBlobs, {heatMapsBlob.get()},
                                              getPoseNetDecreaseFactor(poseModel), 1.f/scaleInputToNetInput);
@@ -93,14 +89,8 @@ namespace op
                                   getPoseNumberBodyParts(poseModel));
                 // Pose extractor blob and layer
                 bodyPartConnectorCaffe->Reshape({heatMapsBlob.get(), peaksBlob.get()});
-		// Check if changed
-                // std::string newHeatMapBlobSize = op::getCaffeBlobShapeAsString(*heatMapsBlob.get());
-                // std::string newPeaksBlobSize = op::getCaffeBlobShapeAsString(*peaksBlob.get());
-                // std::string newPoseBlobSize = op::getCaffeBlobShapeAsString(*poseBlob.get());
-                // if(newHeatMapBlobSize != heatMapBlobSize) log("HeatMapBlobSize Changed from " + heatMapBlobSize + " to " + newHeatMapBlobSize);
-                // if(newPeaksBlobSize != peaksBlobSize) log("PeaksBlobSize Changed from " + peaksBlobSize + " to " + newPeaksBlobSize);
-                // if(newPoseBlobSize != poseBlobSize) log("PoseBlobSize Changed from " + poseBlobSize + " to " + newPoseBlobSize);                
-		// Cuda check
+
+                // Cuda check
                 #ifdef USE_CUDA
                     cudaCheck(__LINE__, __FUNCTION__, __FILE__);
                 #endif
