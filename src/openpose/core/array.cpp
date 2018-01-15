@@ -397,15 +397,17 @@ namespace op
     }
 
     template<typename T>
-    std::string Array<T>::getSizeAsString() const
+    std::string Array<T>::printSize() const
     {
         try
         {
             u_int8_t counter = 0;
             std::string sizeString = "[ ";
-            for(auto i : mSize){
+            for (auto i : mSize)
+            {
                 sizeString += std::to_string(i);
-                if(++counter < mSize.size()) sizeString += " x ";
+                if (++counter < mSize.size())
+                    sizeString += " x ";
             }
             sizeString += " ]";
             return sizeString;

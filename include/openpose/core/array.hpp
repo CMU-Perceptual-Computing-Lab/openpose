@@ -159,7 +159,7 @@ namespace op
          * Return a string with the size of each dimension allocated.
          * @return A std::stringwith the size of each dimension. If no memory has been allocated, it will return an empty string.
          */
-        std::string getSizeAsString() const;
+        std::string printSize() const;
 
         /**
          * Return a vector with the size of the desired dimension.
