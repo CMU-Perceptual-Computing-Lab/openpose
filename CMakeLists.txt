@@ -15,7 +15,8 @@ cmake_minimum_required(VERSION 2.8.7 FATAL_ERROR) # min. cmake version recommend
 ### FIND THE OS
 
 if (WIN32) # OS is Windows
-  message(STATUS "Windows OS support currently is experimental. Feel free to send us any suggestion or bug you encounter.")
+  message(STATUS "Windows OS support currently is experimental. 
+      Feel free to send us any suggestion or bug you encounter.")
 elseif (APPLE) # OS is Apple
   message(FATAL_ERROR "Apple OS is not currently supported.")
 elseif (UNIX AND NOT APPLE) # OS is a Linux distribution (it assumes Ubuntu)
@@ -56,12 +57,17 @@ if (WIN32)
   string(REPLACE "/GR" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
   set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /LTCG:incremental /OPT:REF /OPT:ICF")
-  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /VERSION:${OpenPose_VERSION_MAJOR}.${OpenPose_VERSION_MINOR}")
+  
+  string(REPLACE "/MDd" "/MD" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
+  string(REPLACE "/Zi" "/Z7" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
+  string(REPLACE "/RTC1" "/" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
 elseif (UNIX AND NOT APPLE)
   # Turn on C++11 
   add_definitions(-std=c++11)
   set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 endif (WIN32)
+
+message(STATUS "\${CMAKE_CXX_FLAGS_DEBUG} = ${CMAKE_CXX_FLAGS_DEBUG}")
 
 # C++ additional flags
 if(CMAKE_COMPILER_IS_GNUCXX)
@@ -128,9 +134,10 @@ if (${GPU_MODE} MATCHES "CUDA")
 endif (${GPU_MODE} MATCHES "CUDA")
 
 # Suboptions for OpenPose 3D Reconstruction demo
+message(STATUS "\${WITH_3D} = ${WITH_3D}")
 if (WIN32)
   option(WITH_3D "Build OpenPose 3D Reconstruction demo." OFF)
-endif(WIN32)
+endif (WIN32)
 
  
 # Download the models
@@ -196,6 +203,9 @@ include(cmake/Utils.cmake)
 if (WIN32)
 
   add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+  add_definitions(-DGLOG_NO_ABBREVIATED_SEVERITIES)
+  # add_definitions(-DGOOGLE_GLOG_DLL_DECL=__declspec(dllimport))
+  # add_definitions(-DGOOGLE_GLOG_DLL_DECL_FOR_UNITTESTS=__declspec(dllimport))
 
   if("${CMAKE_VERSION}" VERSION_GREATER 3.6.3)
     set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT OpenPoseDemo)
@@ -226,11 +236,20 @@ if (WIN32)
   find_library(OpenCV_LIBS opencv_world310 HINTS ${FIND_LIB_PREFIX}/opencv/x64/vc14/lib)
   find_library(Caffe_LIB caffe HINTS ${FIND_LIB_PREFIX}/caffe/lib)
   find_library(Caffe_Proto_LIB caffeproto HINTS ${FIND_LIB_PREFIX}/caffe/lib)
+  if (WITH_3D)
+    find_library(Spinnaker_LIB spinnaker_v140 HINTS ${FIND_LIB_PREFIX}/spinnaker/lib)
+    find_library(Freeglut_LIB freeglut HINTS ${FIND_LIB_PREFIX}/freeglut/lib)
+    message(STATUS "\${Freeglut_LIB} = ${Freeglut_LIB}")
+  endif (WITH_3D)
   set(Caffe_LIBS ${Caffe_LIB};${Caffe_Proto_LIB})
   set(OpenCV_INCLUDE_DIRS "3rdparty/windows/opencv/include")
   set(Caffe_INCLUDE_DIRS "3rdparty/windows/caffe/include;3rdparty/windows/caffe/include2")
   set(Boost_INCLUDE_DIRS "3rdparty/windows/caffe3rdparty/include/boost-1_61")
   set(WINDOWS_INCLUDE_DIRS "3rdparty/windows/caffe3rdparty/include")
+  if (WITH_3D)
+    set(SPINNAKER_INCLUDE_DIRS "3rdparty/windows/spinnaker/include")
+    set(FREEGLUT_INCLUDE_DIRS "3rdparty/windows/freeglut/include")
+  endif (WITH_3D)
 endif (WIN32)
 
 ### CAFFE
@@ -305,6 +324,11 @@ if (WIN32)
   include_directories(
     ${Boost_INCLUDE_DIRS}
     ${WINDOWS_INCLUDE_DIRS})
+  if (WITH_3D)
+    include_directories(
+      ${SPINNAKER_INCLUDE_DIRS}
+      ${FREEGLUT_INCLUDE_DIRS})
+  endif (WITH_3D)
 endif (WIN32)
 
 ### ADD SUBDIRECTORIES
@@ -312,6 +336,9 @@ endif (WIN32)
 add_subdirectory(src)
 if (BUILD_EXAMPLES)
   add_subdirectory(examples)
+  if (WITH_3D)
+    add_subdirectory(examples_beta)
+  endif (WITH_3D)
 endif (BUILD_EXAMPLES)
 
 ### DOWNLOAD MODELS
@@ -384,3 +411,6 @@ if (UNIX AND NOT APPLE)
   add_custom_target(uninstall
       COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
 endif (UNIX AND NOT APPLE)
+
+message(STATUS "\${GLOG_INCLUDE_DIR}  = ${GLOG_INCLUDE_DIR}")
+message(STATUS "\${GFLAGS_INCLUDE_DIR}  = ${GFLAGS_INCLUDE_DIR}")
