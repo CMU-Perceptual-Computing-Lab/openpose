@@ -9,7 +9,7 @@ OpenPose - Installation using CMake
     1. [Caffe Prerequisites (Ubuntu Only)](#caffe-prerequisites-ubuntu-only)
     2. [Configuration](#openpose-configuration)
     3. [Building](#openpose-building)
-    4. [OpenPose from other Projects](#openpose-from-other-projects) 
+    4. [OpenPose from other Projects (Ubuntu Only)](#openpose-from-other-projects-ubuntu-only) 
     5. [Run OpenPose](#run-openpose)
 5. [Reinstallation (Ubuntu Only)](#reinstallation-ubuntu-only)
 6. [Uninstallation (Ubuntu Only)](#uninstallation-ubuntu-only)
@@ -144,7 +144,7 @@ To build the project, set the configuration to `Release` and then press <kbd>Ctr
     <img src="media/cmake_installation/im_5_windows.png", width="480">
 </p>
 
-### OpenPose from other Projects
+### OpenPose from other Projects (Ubuntu Only)
 If you only intend to use the OpenPose demo, you might skip this step. This step is only recommended if you plan to use the OpenPose API from other projects.
 
 To install the OpenPose headers and libraries into the system environment path (e.g. `/usr/local/` or `/usr/`), run the following command.
