@@ -15,8 +15,8 @@ cmake_minimum_required(VERSION 2.8.7 FATAL_ERROR) # min. cmake version recommend
 ### FIND THE OS
 
 if (WIN32) # OS is Windows
-  message(STATUS "Windows OS support currently is experimental. 
-      Feel free to send us any suggestion or bug you encounter.")
+  message(STATUS "Windows OS support currently is experimental.")
+  message(STATUS "Feel free to send us any suggestion or bug you encounter.")
 elseif (APPLE) # OS is Apple
   message(FATAL_ERROR "Apple OS is not currently supported.")
 elseif (UNIX AND NOT APPLE) # OS is a Linux distribution (it assumes Ubuntu)
@@ -47,14 +47,13 @@ if (WIN32)
 
   set(CMAKE_CONFIGURATION_TYPES Debug Release CACHE TYPE INTERNAL FORCE)
   
-  string(REPLACE "/O2" "/Ox" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
-  string(REPLACE "/Ob2" "" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
-  # Optimization flags
-  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Ot /Oi /Gy /Z7")
-  # Multi-processor compilation
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
   string(REPLACE "/W3" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
   string(REPLACE "/GR" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+
+  string(REPLACE "/O2" "/Ox" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+  string(REPLACE "/Ob2" "" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Ot /Oi /Gy /Z7")
 
   set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /LTCG:incremental /OPT:REF /OPT:ICF")
   
@@ -66,8 +65,6 @@ elseif (UNIX AND NOT APPLE)
   add_definitions(-std=c++11)
   set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 endif (WIN32)
-
-message(STATUS "\${CMAKE_CXX_FLAGS_DEBUG} = ${CMAKE_CXX_FLAGS_DEBUG}")
 
 # C++ additional flags
 if(CMAKE_COMPILER_IS_GNUCXX)
@@ -134,7 +131,6 @@ if (${GPU_MODE} MATCHES "CUDA")
 endif (${GPU_MODE} MATCHES "CUDA")
 
 # Suboptions for OpenPose 3D Reconstruction demo
-message(STATUS "\${WITH_3D} = ${WITH_3D}")
 if (WIN32)
   option(WITH_3D "Build OpenPose 3D Reconstruction demo." OFF)
 endif (WIN32)
@@ -157,8 +153,9 @@ option(BUILD_SHARED_LIBS "Build as shared lib" ON)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
 
-find_package(CUDA)
-
+# find_package(CUDA)
+include(cmake/Cuda.cmake)
+  
 if (UNIX AND NOT APPLE)
   include(cmake/Cuda.cmake)
   find_package(CuDNN)
@@ -411,6 +408,3 @@ if (UNIX AND NOT APPLE)
   add_custom_target(uninstall
       COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
 endif (UNIX AND NOT APPLE)
-
-message(STATUS "\${GLOG_INCLUDE_DIR}  = ${GLOG_INCLUDE_DIR}")
-message(STATUS "\${GFLAGS_INCLUDE_DIR}  = ${GFLAGS_INCLUDE_DIR}")

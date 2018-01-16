@@ -11,9 +11,9 @@ OpenPose - Installation using CMake
     3. [Building](#openpose-building)
     4. [OpenPose from other Projects](#openpose-from-other-projects) 
     5. [Run OpenPose](#run-openpose)
-5. [Reinstallation](#reinstallation)
-6. [Uninstallation](#uninstallation)
-7. [Optional Settings](#optional-settings)
+5. [Reinstallation (Ubuntu Only)](#reinstallation-ubuntu-only)
+6. [Uninstallation (Ubuntu Only)](#uninstallation-ubuntu-only)
+7. [Optional Settings (Ubuntu Only)](#optional-settings-ubuntu-only)
     1. [Doxygen Documentation Autogeneration](#doxygen-documentation-autogeneration)
     2. [Custom Caffe](#custom-caffe)
     3. [Custom OpenCV](#custom-opencv)
@@ -24,6 +24,7 @@ OpenPose - Installation using CMake
 
 ## Operating Systems
 - **Ubuntu** 14 and 16.
+- Windows 10.
 
 
 
@@ -61,11 +62,12 @@ bash ./ubuntu/install_cmake.sh
 
 
 ### OpenPose Configuration
+
+#### Ubuntu 
+
 Note: If you prefer to use CMake through the command line, see [Cmake Command Line Build](#cmake-command-line-build).
 
-1. Install CMake GUI.
-    1. Ubuntu: run `sudo apt-get install cmake-qt-gui`.
-    2. Windows: download and install the latest Windows win64-x64 msi installer from the [CMake website](https://cmake.org/download/).
+1. Install CMake GUI by running the command `sudo apt-get install cmake-qt-gui`.
 
 2. Open CMake GUI and select the project source directory and a sub-directory where the Makefiles will
 be generated. We will first select the openpose directory and then we will select a `build` directory in the project root directory as shown in the image below (See the red rectangle). If the `build` directory does not exists, CMake will create it.
@@ -92,14 +94,55 @@ be generated. We will first select the openpose directory and then we will selec
 
 Note: If you prefer to use your own custom Caffe or OpenCV versions, see [Custom Caffe](#custom-caffe) or [Custom OpenCV](#custom-opencv) respectively.
 
+#### Windows 
 
+1. Download and install the latest Windows win64-x64 msi installer from the [CMake website](https://cmake.org/download/).
+
+2. Open CMake GUI and select the project source directory and a sub-directory where the Makefiles will
+be generated. We will first select the openpose directory and then we will select a `build_windows` directory in the project root directory as shown in the image below (See the red rectangle). If the `build_windows` directory does not exists, CMake will create it.
+<p align="center">
+    <img src="media/cmake_installation/im_1_windows.png", width="480">
+</p>
+
+3. Next press the `Configure` button in the GUI. It will first ask you to create the `build_windows` directory, if it already did not exist. Press `Yes`.
+<p align="center">
+    <img src="media/cmake_installation/im_2_windows.png", width="240">
+</p>
+
+4. Next a new dialog box will appear. Set the generator to `Visual Studio 14 2015 Win64`  and then press the `Finish` button.
+<p align="center">
+    <img src="media/cmake_installation/im_3_windows.png", width="240">
+</p>
+
+5. If this step is successful, in the bottom box it will show "Configuring done" (in the last line) as shown below.
+<p align="center">
+    <img src="media/cmake_installation/im_4_windows.png", width="480">
+</p>
+
+6. If you want to build OpenPose 3D reconstruction module also, select the `WITH_3D` option as shown below. After this, you need to press the `Configure` button again.
+
+<p align="center">
+    <img src="media/cmake_installation/im_6_windows.png", width="480">
+</p>
+
+7. Press the `Generate` button and then click the `Open Project` button as shown in the image above. This will open project in Visual Studios.
 
 ### OpenPose Building
+
+#### Ubuntu
+
 Finally, build the project by running the following commands.
 ```
 cd build/
 make -j`nproc`
 ```
+
+#### Windows
+
+To build the project, set the configuration to `Release` and then press <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>B</kbd>.
+<p align="center">
+    <img src="media/cmake_installation/im_5_windows.png", width="480">
+</p>
 
 ### OpenPose from other Projects
 If you only intend to use the OpenPose demo, you might skip this step. This step is only recommended if you plan to use the OpenPose API from other projects.
@@ -140,7 +183,7 @@ Check OpenPose was properly installed by running it on the default images, video
 
 
 
-## Reinstallation
+## Reinstallation (Ubuntu Only)
 In order to re-install OpenPose:
 1. If you ran `sudo make install`, then run `sudo make uninstall` in `build/`.
 2. Delete the `build/` folder.
@@ -149,7 +192,7 @@ In order to re-install OpenPose:
 
 
 
-## Uninstallation
+## Uninstallation (Ubuntu Only)
 If you used `sudo make install`, simply use the command below in the `build` directory and later remove the OpenPose folder.
 ```
 cd build/
@@ -159,7 +202,7 @@ If you did not use `sudo make install`, simply remove the OpenPose folder.
 
 
 
-### Optional Settings
+### Optional Settings (Ubuntu Only)
 #### Doxygen Documentation Autogeneration
 You can generate the documentation by setting the `BUILD_DOCS` flag.
 

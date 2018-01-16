@@ -20,7 +20,7 @@ if (WIN32)
         ${Freeglut_LIB} ${Spinnaker_LIB})
     
     set_property(TARGET ${EXE_NAME} PROPERTY FOLDER "Examples/Tutorial/OpenPose3DReconstruction")
-    configure_file(${CMAKE_SOURCE_DIR}/cmake/OpenPose.vcxproj.user 
+    configure_file(${CMAKE_SOURCE_DIR}/cmake/OpenPose3D.vcxproj.user 
         ${CMAKE_CURRENT_BINARY_DIR}/${EXE_NAME}.vcxproj.user @ONLY) 
   
   endforeach ()
