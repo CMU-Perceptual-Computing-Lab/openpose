@@ -6,6 +6,14 @@ namespace op
     void nmsRegisterKernelCPU(int* kernelPtr, const T* const sourcePtr, const int& w, const int& h,
                              const T& threshold, const int& x, const int& y)
     {
+        /*
+        We have three scenarios for NMS, one for the border, 1 for the 1st inner border, and
+        1 for the rest. cv::resize adds artifacts around the 1st inner border, causing two
+        maximas to occur side by side. Eg. [1 1 0.8 0.8 0.5 ..]. The CUDA kernel gives
+        [0.8 1 0.8 0.8 0.5 ..] Hence for this special case in the 1st inner border, we look at the
+        visible regions.
+        */
+
         const auto index = y*w + x;
         if (1 < x && x < (w-2) && 1 < y && y < (h-2))
         {
