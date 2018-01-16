@@ -153,8 +153,7 @@ option(BUILD_SHARED_LIBS "Build as shared lib" ON)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
 
-# find_package(CUDA)
-include(cmake/Cuda.cmake)
+find_package(CUDA)
   
 if (UNIX AND NOT APPLE)
   include(cmake/Cuda.cmake)
@@ -198,11 +197,6 @@ endif (UNIX AND NOT APPLE)
 include(cmake/Utils.cmake)
 
 if (WIN32)
-
-  add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-  add_definitions(-DGLOG_NO_ABBREVIATED_SEVERITIES)
-  # add_definitions(-DGOOGLE_GLOG_DLL_DECL=__declspec(dllimport))
-  # add_definitions(-DGOOGLE_GLOG_DLL_DECL_FOR_UNITTESTS=__declspec(dllimport))
 
   if("${CMAKE_VERSION}" VERSION_GREATER 3.6.3)
     set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT OpenPoseDemo)
