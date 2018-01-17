@@ -5,7 +5,7 @@
 
 namespace op
 {
-    OP_API void mkdir(const std::string& directoryPath);
+    OP_API void makeDirectory(const std::string& directoryPath);
 
     OP_API bool existDirectory(const std::string& directoryPath);
 

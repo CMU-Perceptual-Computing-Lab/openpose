@@ -158,7 +158,8 @@ namespace op
                 UNUSED(poseKeypoints);
                 UNUSED(scaleNetToOutput);
                 error("OpenPose must be compiled with the `USE_CUDA` macro definitions in order to run this"
-                      " functionality.", __LINE__, __FUNCTION__, __FILE__);
+                      " functionality. You can alternatively use CPU rendering (flag `--render_pose 1`).",
+                      __LINE__, __FUNCTION__, __FILE__);
             #endif
             // Return result
             return std::make_pair(elementRendered, elementRenderedName);

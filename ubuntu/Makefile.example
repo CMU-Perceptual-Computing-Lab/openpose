@@ -145,8 +145,7 @@ ifeq ($(USE_CUDA), 1)
 	LIBRARIES += cudart cublas curand
 endif
 
-# LIBRARIES += glog gflags boost_system boost_filesystem m hdf5_hl hdf5 caffe
-LIBRARIES += glog gflags boost_system boost_filesystem m hdf5_hl hdf5
+LIBRARIES += glog gflags m hdf5_hl hdf5
 
 # handle IO dependencies
 USE_LEVELDB ?= 1
@@ -236,13 +235,8 @@ endif
 ifeq ($(LINUX), 1)
 	CXX ?= /usr/bin/g++
 	GCCVERSION := $(shell $(CXX) -dumpversion | cut -f1,2 -d.)
-	# older versions of gcc are too dumb to build boost with -Wuninitalized
-	ifeq ($(shell echo | awk '{exit $(GCCVERSION) < 4.6;}'), 1)
-		WARNINGS += -Wno-uninitialized
-	endif
-	# boost::thread is reasonably called boost_thread (compare OS X)
 	# We will also explicitly add stdc++ to the link target.
-	LIBRARIES += boost_thread stdc++
+	LIBRARIES += stdc++
 	VERSIONFLAGS += -Wl,-soname,$(DYNAMIC_VERSIONED_NAME_SHORT) -Wl,-rpath,$(ORIGIN)/../lib
 endif
 
@@ -268,8 +262,6 @@ ifeq ($(OSX), 1)
 			endif
 		endif
 	endif
-	# boost::thread is called boost_thread-mt to mark multithreading on OS X
-	LIBRARIES += boost_thread-mt
 	# we need to explicitly ask for the rpath to be obeyed
 	ORIGIN := @loader_path
 	VERSIONFLAGS += -Wl,-install_name,@rpath/$(DYNAMIC_VERSIONED_NAME_SHORT) -Wl,-rpath,$(ORIGIN)/../../build/lib

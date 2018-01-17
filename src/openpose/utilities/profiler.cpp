@@ -10,7 +10,7 @@
 
 namespace op
 {
-    const unsigned long long Profiler::DEFAULT_X = 1000;
+    unsigned long long Profiler::DEFAULT_X = 1000;
 
     #ifdef PROFILER_ENABLED
 
@@ -26,12 +26,22 @@ namespace op
             return file + function + std::to_string(line) + threadId.str();
         }
 
-        void printAveragedTimeMsCommon(const double timePast, const unsigned long long timeCounter, const int line, const std::string& function, const std::string& file)
+        void printAveragedTimeMsCommon(const double timePast, const unsigned long long timeCounter, const int line,
+                                       const std::string& function, const std::string& file)
         {
             const auto stringMessage = std::to_string(   timePast / timeCounter / 1e6   ) + " msec at";
             log(stringMessage, Priority::Max, line, function, file);
         }
     #endif
+
+    void Profiler::setDefaultX(const unsigned long long defaultX)
+    {
+        #ifdef PROFILER_ENABLED
+            DEFAULT_X = defaultX;
+        #else
+            UNUSED(defaultX);
+        #endif
+    }
 
     const std::string Profiler::timerInit(const int line, const std::string& function, const std::string& file)
     {
@@ -60,7 +70,9 @@ namespace op
             {
                 auto tuple = sProfilerTuple[key];
                 // Time between init & end
-                const auto timeNs = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - std::get<2>(tuple)).count();
+                const auto timeNs = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(
+                    std::chrono::high_resolution_clock::now() - std::get<2>(tuple)
+                ).count();
                 // Accumulate averaged time
                 std::get<0>(tuple) += timeNs;
                 std::get<1>(tuple)++;
@@ -74,7 +86,8 @@ namespace op
         #endif
     }
 
-    void Profiler::printAveragedTimeMsOnIterationX(const std::string& key, const int line, const std::string& function, const std::string& file, const unsigned long long x)
+    void Profiler::printAveragedTimeMsOnIterationX(const std::string& key, const int line, const std::string& function,
+                                                   const std::string& file, const unsigned long long x)
     {
         #ifdef PROFILER_ENABLED
             std::unique_lock<std::mutex> lock{sMutexProfiler};
@@ -88,7 +101,8 @@ namespace op
                 }
             }
             else
-                error("Profiler::printAveragedTimeMsOnIterationX called with a non-existing key.", __LINE__, __FUNCTION__, __FILE__);
+                error("Profiler::printAveragedTimeMsOnIterationX called with a non-existing key.",
+                      __LINE__, __FUNCTION__, __FILE__);
         #else
             UNUSED(key);
             UNUSED(line);
@@ -98,7 +112,9 @@ namespace op
         #endif
     }
 
-    void Profiler::printAveragedTimeMsEveryXIterations(const std::string& key, const int line, const std::string& function, const std::string& file, const unsigned long long x)
+    void Profiler::printAveragedTimeMsEveryXIterations(const std::string& key, const int line,
+                                                       const std::string& function, const std::string& file,
+                                                       const unsigned long long x)
     {
         #ifdef PROFILER_ENABLED
             std::unique_lock<std::mutex> lock{sMutexProfiler};
@@ -118,7 +134,8 @@ namespace op
                 }
             }
             else
-                error("Profiler::printAveragedTimeMsOnIterationX called with a non-existing key.", __LINE__, __FUNCTION__, __FILE__);
+                error("Profiler::printAveragedTimeMsOnIterationX called with a non-existing key.",
+                      __LINE__, __FUNCTION__, __FILE__);
         #else
             UNUSED(key);
             UNUSED(line);
@@ -135,7 +152,8 @@ namespace op
             log("GPU usage.", Priority::Max, line, function, file);
 
             // GPU info
-            const auto answer = std::system("nvidia-smi | grep \"Processes:\"") | std::system("nvidia-smi | grep \"Process name\"");
+            const auto answer = std::system("nvidia-smi | grep \"Processes:\"")
+                              | std::system("nvidia-smi | grep \"Process name\"");
             if (answer != 0)
                 log("Error on the nvidia-smi header. Please, inform us of this error.", Priority::Max);
             else

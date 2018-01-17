@@ -2,6 +2,15 @@
 
 namespace op
 {
+    const std::array<std::vector<float>, (int)PoseModel::Size> POSE_SCALES{
+        std::vector<float>{POSE_COCO_SCALES_RENDER_GPU},
+        std::vector<float>{POSE_MPI_SCALES_RENDER_GPU},
+        std::vector<float>{POSE_MPI_SCALES_RENDER_GPU},
+        std::vector<float>{POSE_BODY_18_SCALES_RENDER_GPU},
+        std::vector<float>{POSE_BODY_19_SCALES_RENDER_GPU},
+        std::vector<float>{POSE_BODY_23_SCALES_RENDER_GPU},
+        std::vector<float>{POSE_BODY_59_SCALES_RENDER_GPU}
+    };
     const std::array<std::vector<float>, (int)PoseModel::Size> POSE_COLORS{
         std::vector<float>{POSE_COCO_COLORS_RENDER_GPU},
         std::vector<float>{POSE_MPI_COLORS_RENDER_GPU},
@@ -22,6 +31,19 @@ namespace op
     };
 
     // Rendering functions
+    const std::vector<float>& getPoseScales(const PoseModel poseModel)
+    {
+        try
+        {
+            return POSE_SCALES.at((int)poseModel);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return POSE_SCALES[(int)poseModel];
+        }
+    }
+
     const std::vector<float>& getPoseColors(const PoseModel poseModel)
     {
         try

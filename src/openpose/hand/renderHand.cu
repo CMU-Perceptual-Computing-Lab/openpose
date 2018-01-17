@@ -6,7 +6,8 @@
 
 namespace op
 {
-    __constant__ const unsigned int PART_PAIRS_GPU[] = HAND_PAIRS_RENDER_GPU;
+    __constant__ const unsigned int PART_PAIRS_GPU[] = {HAND_PAIRS_RENDER_GPU};
+    __constant__ const float SCALES[] = {HAND_SCALES_RENDER_GPU};
     __constant__ const float COLORS[] = {HAND_COLORS_RENDER_GPU};
 
     __global__ void renderHandsParts(float* targetPtr, const int targetWidth, const int targetHeight,
@@ -24,15 +25,15 @@ namespace op
 
         // Other parameters
         const auto numberPartPairs = sizeof(PART_PAIRS_GPU) / (2*sizeof(PART_PAIRS_GPU[0]));
+        const auto numberScales = sizeof(SCALES) / sizeof(SCALES[0]);
         const auto numberColors = sizeof(COLORS) / (3*sizeof(COLORS[0]));
         const auto radius = fastMin(targetWidth, targetHeight) / 100.f;
-        const auto stickwidth = fastMin(targetWidth, targetHeight) / 80.f;
+        const auto lineWidth = fastMin(targetWidth, targetHeight) / 80.f;
 
         // Render key points
-        renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF,
-                        globalIdx, x, y, targetWidth, targetHeight, handsPtr, PART_PAIRS_GPU, numberHands,
-                        HAND_NUMBER_PARTS, numberPartPairs, COLORS, numberColors,
-                        radius, stickwidth, threshold, alphaColorToAdd);
+        renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight,
+                        handsPtr, PART_PAIRS_GPU, numberHands, HAND_NUMBER_PARTS, numberPartPairs, COLORS,
+                        numberColors, radius, lineWidth, SCALES, numberScales, threshold, alphaColorToAdd);
     }
 
     void renderHandKeypointsGpu(float* framePtr, const Point<int>& frameSize, const float* const handsPtr,

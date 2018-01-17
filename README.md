@@ -27,19 +27,17 @@ OpenPose represents the **first real-time multi-person system to jointly detect 
 
 
 
-## Latest News
+## Latest Features
 - Sep 2017: **CMake** installer and **IP camera** support!
 - Jul 2017: [**Windows portable demo**](doc/installation.md#installation---demo)!
 - Jul 2017: **Hands** released!
 - Jun 2017: **Face** released!
-- May 2017: **Windows** version!
-- Apr 2017: **Body** released!
-- Check all the [release notes](doc/release_notes.md).
+For further details, check [all released features](doc/released_features.md) and [release notes](doc/release_notes.md).
 
 
 
 ## Contents
-1. [Latest News](#latest-news)
+1. [Latest Features](#latest-features)
 2. [Results](#results)
 3. [Installation, Reinstallation and Uninstallation](#installation-reinstallation-and-uninstallation)
 4. [Quick Start](#quick-start)

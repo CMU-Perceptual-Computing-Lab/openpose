@@ -133,7 +133,7 @@ Each flag is divided into flag name, default value, and description.
 1. Debugging/Other
 - DEFINE_int32(logging_level,             3,              "The logging level. Integer in the range [0, 255]. 0 will output any log() message, while 255 will not output any. Current OpenPose library messages are in the range 0-4: 1 for low priority messages and 4 for important ones.");
 - DEFINE_bool(disable_multi_thread,       false,          "It would slightly reduce the frame rate in order to highly reduce the lag. Mainly useful for 1) Cases where it is needed a low latency (e.g. webcam in real-time scenarios with low-range GPU devices); and 2) Debugging OpenPose when it is crashing to locate the error.");
-
+- DEFINE_int32(profile_speed,             1000,           "If PROFILER_ENABLED was set in CMake or Makefile.config files, OpenPose will show some runtime statistics at this frame number.");
 2. Producer
 - DEFINE_int32(camera,                    -1,             "The camera index for cv::VideoCapture. Integer in the range [0, 9]. Select a negative number (by default), to auto-detect and open the first available camera.");
 - DEFINE_string(camera_resolution,        "1280x720",     "Size of the camera frames to ask for.");

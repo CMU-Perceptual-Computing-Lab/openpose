@@ -261,7 +261,7 @@ void renderMain(void)
     std::unique_lock<std::mutex> lock{gKeypoints3D.mutex};
     if (gKeypoints3D.validKeypoints)
     {
-        renderHumanBody(gKeypoints3D.mPoseKeypoints, op::POSE_BODY_PART_PAIRS_RENDER[(int)sPoseModel], op::POSE_COLORS[(int)sPoseModel], 1.f);
+        renderHumanBody(gKeypoints3D.mPoseKeypoints, op::getPoseBodyPartPairsRender(sPoseModel), op::getPoseColors(sPoseModel), 1.f);
         renderHumanBody(gKeypoints3D.mFaceKeypoints, op::FACE_PAIRS_RENDER, op::FACE_COLORS_RENDER, 0.5f);
         renderHumanBody(gKeypoints3D.mLeftHandKeypoints, op::HAND_PAIRS_RENDER, op::HAND_COLORS_RENDER, 0.5f);
         renderHumanBody(gKeypoints3D.mRightHandKeypoints, op::HAND_PAIRS_RENDER, op::HAND_COLORS_RENDER, 0.5f);
