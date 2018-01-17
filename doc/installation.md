@@ -134,7 +134,7 @@ You just need to remove the OpenPose folder, by default called `openpose/`. E.g.
 
 ## Windows
 ### Installation - Demo and Binaries
-Download and unzip the latest `openpose-X.X.X-win64-binaries.zip` Windows binary zip file from the [releases section](https://github.com/CMU-Perceptual-Computing-Lab/openpose/releases).
+Download and unzip the latest `openpose-X.X.X-win64-binaries.zip` Windows binary zip file from the [Releases section](https://github.com/CMU-Perceptual-Computing-Lab/openpose/releases).
 
 
 
