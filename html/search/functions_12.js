@@ -17,6 +17,7 @@ var searchData=
   ['setalphakeypoint',['setAlphaKeypoint',['../classop_1_1_renderer.html#a039e88897ed844551cadb115ea98e9ef',1,'op::Renderer']]],
   ['setblendoriginalframe',['setBlendOriginalFrame',['../classop_1_1_renderer.html#aa8339054ed113d99ca70208d0cee5aa9',1,'op::Renderer']]],
   ['setdefaultmaxsizequeues',['setDefaultMaxSizeQueues',['../classop_1_1_thread_manager.html#ace408d1d281193a9f3d3d6561181ef56',1,'op::ThreadManager']]],
+  ['setdefaultx',['setDefaultX',['../classop_1_1_profiler.html#a2dc5cfa5fd91d4cadaa7e66695f1ee51',1,'op::Profiler']]],
   ['setelementtorender',['setElementToRender',['../classop_1_1_renderer.html#afd48a9cb0be184303dce2969fa2f8e02',1,'op::Renderer']]],
   ['seterrormodes',['setErrorModes',['../classop_1_1_configure_error.html#aca35de0cb04b54dcf9c6c9898ee6002e',1,'op::ConfigureError']]],
   ['setfrom',['setFrom',['../classop_1_1_array.html#a6bf43d039478797722cf9401ceb951e9',1,'op::Array']]],
