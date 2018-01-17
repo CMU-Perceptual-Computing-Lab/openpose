@@ -87,6 +87,9 @@ option(BUILD_DOCS "Build OpenPose documentation." OFF)
 # Build as shared library
 option(BUILD_SHARED_LIBS "Build as shared lib" ON)
 
+# Speed profiler
+option(PROFILER_ENABLED "If enabled, OpenPose will be able to print out speed information at runtime." OFF)
+
 ### FIND REQUIRED PACKAGES
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
@@ -281,3 +284,10 @@ configure_file(
 
 add_custom_target(uninstall
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
+
+### OPENPOSE FLAGS
+
+# Set/disable profiler
+if (PROFILER_ENABLED)
+  add_definitions(-DPROFILER_ENABLED)
+endif (PROFILER_ENABLED)

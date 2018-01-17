@@ -6,7 +6,7 @@ SET WGET_EXE=wget\wget.exe
 
 :: Download temporary zip
 echo ----- Downloading Caffe -----
-SET FREEGLUT_FOLDER=caffe\
+SET FREEGLUT_FOLDER=freeglut\
 SET ZIP_NAME=freeglut_2018_01_14.zip
 SET ZIP_FULL_PATH=%FREEGLUT_FOLDER%%ZIP_NAME%
 %WGET_EXE% -c http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/%ZIP_NAME% -P %FREEGLUT_FOLDER%

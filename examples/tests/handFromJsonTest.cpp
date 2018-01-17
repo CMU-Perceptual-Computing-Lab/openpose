@@ -38,7 +38,6 @@ int handFromJsonTest()
     op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.",
               __LINE__, __FUNCTION__, __FILE__);
     op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
-    // op::ConfigureLog::setPriorityThreshold(op::Priority::None); // To print all logging messages
 
     op::log("Starting pose estimation demo.", op::Priority::High);
     const auto timerBegin = std::chrono::high_resolution_clock::now();
