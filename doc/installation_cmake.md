@@ -24,7 +24,7 @@ OpenPose - Installation using CMake
 
 ## Operating Systems
 - **Ubuntu** 14 and 16.
-- Windows 10.
+- **Windows** 8 and 10.
 
 
 
