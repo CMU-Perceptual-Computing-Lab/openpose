@@ -8,7 +8,7 @@
   </PropertyGroup>
   
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerEnvironment>PATH=%PATH%;3rdparty\windows\caffe\bin\;3rdparty\windows\freeglut\bin\;3rdparty\windows\spinnaker\bin\;;3rdparty\windows\opencv\x64\vc14\bin;@CMAKE_BINARY_DIR@\src\openpose\Release</LocalDebuggerEnvironment>
+    <LocalDebuggerEnvironment>PATH=%PATH%;3rdparty\windows\caffe\bin\;3rdparty\windows\freeglut\bin\;3rdparty\windows\spinnaker\bin\;;3rdparty\windows\opencv\x64\vc14\bin;@CMAKE_BINARY_DIR@\src\openpose\Debug</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerWorkingDirectory>..\..\..</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
