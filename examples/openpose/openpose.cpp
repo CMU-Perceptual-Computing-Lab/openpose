@@ -39,6 +39,8 @@ DEFINE_bool(disable_multi_thread,       false,          "It would slightly reduc
                                                         " for 1) Cases where it is needed a low latency (e.g. webcam in real-time scenarios with"
                                                         " low-range GPU devices); and 2) Debugging OpenPose when it is crashing to locate the"
                                                         " error.");
+DEFINE_int32(profile_speed,             1000,           "If PROFILER_ENABLED was set in CMake or Makefile.config files, OpenPose will show some"
+                                                        " runtime statistics at this frame number.");
 // Producer
 DEFINE_int32(camera,                    -1,             "The camera index for cv::VideoCapture. Integer in the range [0, 9]. Select a negative"
                                                         " number (by default), to auto-detect and open the first available camera.");
@@ -195,7 +197,12 @@ int openPoseDemo()
     op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.",
               __LINE__, __FUNCTION__, __FILE__);
     op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
-    // op::ConfigureLog::setPriorityThreshold(op::Priority::None); // To print all logging messages
+    op::Profiler::setDefaultX(FLAGS_profile_speed);
+    // // For debugging
+    // // Print all logging messages
+    // op::ConfigureLog::setPriorityThreshold(op::Priority::None);
+    // // Print out speed values faster
+    // op::Profiler::setDefaultX(100);
 
     op::log("Starting pose estimation demo.", op::Priority::High);
     const auto timerBegin = std::chrono::high_resolution_clock::now();
