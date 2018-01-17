@@ -30,13 +30,13 @@ if(UNIX AND NOT APPLE)
   endif (CMAKE_COMPILER_IS_GNUCXX)
 # Windows
 elseif (WIN32)
+  set_property(TARGET openpose PROPERTY DEBUG_POSTFIX d)
   target_link_libraries(openpose ${OpenCV_LIBS} ${Caffe_LIBS}
       debug ${GFLAGS_LIBRARY_DEBUG} optimized ${GFLAGS_LIBRARY_RELEASE}
       debug ${GLOG_LIBRARY_DEBUG} optimized ${GLOG_LIBRARY_RELEASE})
   if (${DL_FRAMEWORK} MATCHES "CAFFE")
     target_compile_definitions(openpose PRIVATE BOOST_ALL_NO_LIB)
   endif(${DL_FRAMEWORK} MATCHES "CAFFE")
-  # source_group("Header Files" FILES ${CMAKE_SOURCE_DIR}/include)
   set_property(TARGET openpose PROPERTY FOLDER "OpenPose library")
   
   foreach (SUB_DIR ${SUB_DIRS})
