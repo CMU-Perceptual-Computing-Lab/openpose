@@ -50,11 +50,11 @@ OpenPose can be easily updated by clicking the `synchronization` button at the t
 
 ## Ubuntu
 ### Installation - CMake
-Recommended installation method. It is simpler and it offers many more customization settings. See [doc/installation_cmake.md](installation_cmake.md). Note that it is a beta version, if it fails, please post in GitHub and use [Installation - Script Compilation](#installation---script-compilation) meanwhile.
+Recommended installation method, it is simpler and offers more customization settings. See [doc/installation_cmake.md](installation_cmake.md).
 
 
 
-### Prerequisites
+### Prerequisites (Script Compilation or Manual Compilation)
 CUDA, cuDNN, OpenCV and Atlas must be already installed on your machine:
 
     1. [CUDA](https://developer.nvidia.com/cuda-80-ga2-download-archive) must be installed. You should reboot your machine after installing CUDA.
@@ -134,7 +134,7 @@ You just need to remove the OpenPose folder, by default called `openpose/`. E.g.
 
 ## Windows
 ### Installation - Demo and Binaries
-1. Download and unzip the latest `openpose-X.X.X-win64-binaries.zip` Windows binary zip file from the [releases section](https://github.com/CMU-Perceptual-Computing-Lab/openpose/releases).
+Download and unzip the latest `openpose-X.X.X-win64-binaries.zip` Windows binary zip file from the [Releases section](https://github.com/CMU-Perceptual-Computing-Lab/openpose/releases).
 
 
 
@@ -145,7 +145,15 @@ You just need to remove the OpenPose folder, by default called `openpose/`. E.g.
         - VS 2015 Enterprise Update 1 will give some compiler errors and VS 2015 Community has not been tested.
     2. [**CUDA 8**](https://developer.nvidia.com/cuda-80-ga2-download-archive): Install it on the default location, `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0`. Otherwise, modify the Visual Studio project solution accordingly. Install CUDA 8.0 after Visual Studio 2015 is installed to assure that the CUDA installation will generate all necessary files for VS. If CUDA was already installed, re-install it after installing VS!
     3. [**cuDNN 5.1**](https://developer.nvidia.com/cudnn): Once you have downloaded it, just unzip it and copy (merge) the contents on the CUDA folder, `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0`.
-2. Download the OpenPose dependencies and models (body, face and hand models) by double-clicking on `{openpose_path}\windows\download_3rdparty_and_models.bat`. Alternatively, you might prefer to download them manually:
+
+#### CMake Installer
+Recommended installation method, it is simpler and offers more customization settings. See [doc/installation_cmake.md](installation_cmake.md). Note that it is a beta version, post in GitHub any issue you find.
+
+
+#### Deprecated Windows Installer
+Note: This installer will not incorporate any new features, we recommend to use the CMake installer.
+
+1. Download the OpenPose dependencies and models (body, face and hand models) by double-clicking on `{openpose_path}\windows\download_3rdparty_and_models.bat`. Alternatively, you might prefer to download them manually:
     - Models:
         - [COCO model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/coco/pose_iter_440000.caffemodel): download in `models/pose/coco/`.
         - [MPI model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/mpi/pose_iter_160000.caffemodel): download in `models/pose/mpi/`.
@@ -155,19 +163,19 @@ You just need to remove the OpenPose folder, by default called `openpose/`. E.g.
         - [Caffe](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe_2017_07_11.zip): Unzip as `3rdparty/windows/caffe/`.
         - [Caffe dependencies](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe3rdparty_2017_07_14.zip): Unzip as `3rdparty/windows/caffe3rdparty/`.
         - [OpenCV 3.1](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/opencv_310.zip): Unzip as `3rdparty/windows/opencv/`.
-3. Open the Visual Studio project sln file by double-cliking on `{openpose_path}\windows\OpenPose.sln`.
-4. In order to verify OpenPose is working, try compiling and executing the demo:
+2. Open the Visual Studio project sln file by double-cliking on `{openpose_path}\windows\OpenPose.sln`.
+3. In order to verify OpenPose is working, try compiling and executing the demo:
     1. Right click on `OpenPoseDemo` --> `Set as StartUp Project`.
     2. Change `Debug` by `Release` mode.
-    3. Compile it and run it with F5 or the green play icon.
-5. If you have a webcam connected, OpenPose will automatically start after being compiled.
-6. In order to use the created exe file from the command line (i.e. outside Visual Studio), you have to:
+    3. Compile it and run it with <kbd>F5</kbd> or the green play icon.
+4. If you have a webcam connected, OpenPose will automatically start after being compiled.
+5. In order to use the created exe file from the command line (i.e. outside Visual Studio), you have to:
     1. Copy all the DLLs located on `{openpose_folder}\3rdparty\windows\caffe\bin\` on the exe folder: `{openpose_folder}\windows\x64\Release`.
     2. Copy all the DLLs located on `{openpose_folder}\3rdparty\windows\opencv\x64\vc14\bin\` on the exe folder: `{openpose_folder}\windows\x64\Release`.
-    3. Open the Windows cmd (Windows button + X, then A).
+    3. Open the Windows cmd (Windows button + <kbd>X</kbd>, then <kbd>A</kbd>).
     4. Go to the OpenPose directory, assuming OpenPose has been downloaded on `C:\openpose`: `cd C:\openpose\`.
     5. Run the tutorial commands.
-7. Check OpenPose was properly installed by running it on the default images, video or webcam: [doc/quick_start.md#quick-start](./quick_start.md#quick-start).
+6. Check OpenPose was properly installed by running it on the default images, video or webcam: [doc/quick_start.md#quick-start](./quick_start.md#quick-start).
 
 
 
@@ -180,7 +188,7 @@ You just need to remove the OpenPose or portable demo folder.
 If you updated some software that our library or 3rdparty use, or you simply want to reinstall it:
 1. Open the Visual Studio project sln file by double-cliking on `{openpose_path}\windows\OpenPose.sln`.
 2. Clean the OpenPose project by right-click on `Solution 'OpenPose'` and `Clean Solution`.
-3. Compile it and run it with F5 or the green play icon.
+3. Compile it and run it with <kbd>F5</kbd>  or the green play icon.
 
 
 

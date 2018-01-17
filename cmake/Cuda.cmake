@@ -17,7 +17,12 @@ macro(op_list_unique)
 endmacro()
 
 # This list will be used for CUDA_ARCH = All option
-set(Caffe_known_gpu_archs "20 21(20) 30 35 50 52 60 61")
+if (UNIX AND NOT APPLE)
+  set(Caffe_known_gpu_archs "20 21(20) 30 35 50 52 60 61")
+elseif (WIN32)
+  set(Caffe_known_gpu_archs "30 35 50 52 60 61")
+endif ()
+
 
 ################################################################################################
 # A function for automatic detection of GPUs installed  (if autodetection is enabled)
@@ -49,7 +54,9 @@ function(op_detect_installed_gpus out_variable)
                     ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
 
     if(__nvcc_res EQUAL 0)
-      string(REPLACE "2.1" "2.1(2.0)" __nvcc_out "${__nvcc_out}")
+      if (NOT WIN32)
+        string(REPLACE "2.1" "2.1(2.0)" __nvcc_out "${__nvcc_out}")
+      endif (NOT WIN32)
       set(CUDA_gpu_detect_output ${__nvcc_out} CACHE INTERNAL "Returned GPU architetures from op_detect_gpus tool" FORCE)
     endif()
   endif()
@@ -96,7 +103,7 @@ function(op_select_nvcc_arch_flags out_variable)
     unset(CUDA_ARCH_PTX CACHE)
   endif()
 
-  if(${CUDA_ARCH} STREQUAL "Fermi")
+  if(${CUDA_ARCH} STREQUAL "Fermi" AND NOT WIN32)
     set(__cuda_arch_bin "20 21(20)")
   elseif(${CUDA_ARCH} STREQUAL "Kepler")
     set(__cuda_arch_bin "30 35")

@@ -4,10 +4,21 @@ set(EXAMPLE_FILES
 foreach(EXAMPLE_FILE ${EXAMPLE_FILES})
 
   get_filename_component(SOURCE_NAME ${EXAMPLE_FILE} NAME_WE)
-  message(STATUS "Adding Example ${SOURCE_NAME}")
-  add_executable(${SOURCE_NAME}.bin ${EXAMPLE_FILE})
-  target_link_libraries( ${SOURCE_NAME}.bin
-      openpose ${GLOG_LIBRARY} ${GFLAGS_LIBRARY} ${Caffe_LIBS}
-  )
+  
+  if (UNIX AND NOT APPLE)
+    set(EXE_NAME "${SOURCE_NAME}_bin")
+  elseif (WIN32)
+    set(EXE_NAME "OpenPoseDemo")
+  endif ()
+
+  message(STATUS "Adding Example ${EXE_NAME}")
+  add_executable(${EXE_NAME} ${EXAMPLE_FILE})
+  target_link_libraries( ${EXE_NAME} openpose ${GLOG_LIBRARY} ${GFLAGS_LIBRARY} ${Caffe_LIBS})
+  
+  if (WIN32)
+    set_property(TARGET ${EXE_NAME} PROPERTY FOLDER "Examples")
+    configure_file(${CMAKE_SOURCE_DIR}/cmake/OpenPose.vcxproj.user 
+        ${CMAKE_CURRENT_BINARY_DIR}/${EXE_NAME}.vcxproj.user @ONLY) 
+  endif (WIN32)
 
 endforeach()

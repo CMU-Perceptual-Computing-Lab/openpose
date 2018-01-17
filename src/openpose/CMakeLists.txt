@@ -1,36 +1,69 @@
-add_subdirectory(core)
-add_subdirectory(experimental)
-add_subdirectory(filestream)
-add_subdirectory(gui)
-add_subdirectory(pose)
-add_subdirectory(utilities)
-add_subdirectory(producer)
-add_subdirectory(thread)
-add_subdirectory(face)
-add_subdirectory(hand)
-add_subdirectory(wrapper)
-set_target_properties(openpose_core openpose_face openpose_filestream
-	openpose_gui openpose_hand openpose_pose openpose_producer
-	openpose_utilities openpose_thread openpose_tracking openpose_wrapper
-  PROPERTIES COMPILE_FLAGS ${OP_CXX_FLAGS})
+include(${CMAKE_SOURCE_DIR}/cmake/Utils.cmake)
+subdirlist(SUB_DIRS ${CMAKE_CURRENT_SOURCE_DIR})
+foreach (SUB_DIR ${SUB_DIRS})
+  add_subdirectory(${SUB_DIR})
+endforeach (SUB_DIR ${SUB_DIRS})
 
-# make the openpose.so
+# make the openpose.so/dll
+file(GLOB_RECURSE OP_HEADERS_UNFILTERED "${CMAKE_SOURCE_DIR}/include/openpose/*.h" 
+    "${CMAKE_SOURCE_DIR}/include/openpose/*.hpp" 
+    "${CMAKE_SOURCE_DIR}/include/openpose/*.hu")
 
-add_library(caffe SHARED IMPORTED)
-set_property(TARGET caffe PROPERTY IMPORTED_LOCATION ${Caffe_LIBS})
+set(OP_HEADERS "")
+foreach (FILE ${OP_HEADERS_UNFILTERED})
+  if (NOT FILE MATCHES "${CMAKE_SOURCE_DIR}/include/openpose/experimental/*")
+      list(APPEND OP_HEADERS ${FILE})
+  endif ()
+endforeach(FILE ${OP_HEADERS_UNFILTERED})
 
-file(GLOB_RECURSE SOURCES "*.cu" "*.cpp") # It's better not to hardcode here.
+cuda_add_library(openpose ${SOURCES_OPENPOSE} ${OP_HEADERS})
 
-cuda_add_library(openpose ${SOURCES})
-target_link_libraries(openpose ${OpenCV_LIBS} caffe)
-if (BUILD_CAFFE)
+# Ubuntu
+if(UNIX AND NOT APPLE)
+  target_link_libraries(openpose ${OpenCV_LIBS} ${Caffe_LIBS}
+      ${GFLAGS_LIBRARY} ${GLOG_LIBRARY})
+  if (CMAKE_COMPILER_IS_GNUCXX)
+    foreach (SUB_DIR ${SUB_DIRS})
+        set_target_properties(openpose_${SUB_DIR} PROPERTIES COMPILE_FLAGS ${OP_CXX_FLAGS})
+    endforeach (SUB_DIR ${SUB_DIRS})
+    set_target_properties(openpose PROPERTIES COMPILE_FLAGS ${OP_CXX_FLAGS})
+  endif (CMAKE_COMPILER_IS_GNUCXX)
+# Windows
+elseif (WIN32)
+  target_link_libraries(openpose ${OpenCV_LIBS} ${Caffe_LIBS}
+      debug ${GFLAGS_LIBRARY_DEBUG} optimized ${GFLAGS_LIBRARY_RELEASE}
+      debug ${GLOG_LIBRARY_DEBUG} optimized ${GLOG_LIBRARY_RELEASE})
+  if (${DL_FRAMEWORK} MATCHES "CAFFE")
+    target_compile_definitions(openpose PRIVATE BOOST_ALL_NO_LIB)
+  endif(${DL_FRAMEWORK} MATCHES "CAFFE")
+  # source_group("Header Files" FILES ${CMAKE_SOURCE_DIR}/include)
+  set_property(TARGET openpose PROPERTY FOLDER "OpenPose library")
+  
+  foreach (SUB_DIR ${SUB_DIRS})
+    string(TOUPPER ${SUB_DIR} SUB_DIR_UPPERCASE)
+    source_group("Source Files\\${SUB_DIR}" FILES ${SOURCES_OP_${SUB_DIR_UPPERCASE}_WITH_CP} "*")
+    file(GLOB_RECURSE SUB_MOD_HEADERS "${CMAKE_SOURCE_DIR}/include/openpose/${SUB_DIR}/*.h" 
+        "${CMAKE_SOURCE_DIR}/include/openpose/${SUB_DIR}/*.hpp" 
+        "${CMAKE_SOURCE_DIR}/include/openpose/${SUB_DIR}/*.hu")
+    source_group("Header Files\\${SUB_DIR}" FILES ${SUB_MOD_HEADERS})
+  endforeach (SUB_DIR ${SUB_DIRS})
+  set_target_properties(openpose PROPERTIES COMPILE_FLAGS -DOP_EXPORTS)
+endif (UNIX AND NOT APPLE)
+
+if (UNIX AND NOT APPLE)
+  add_library(caffe SHARED IMPORTED)
+  set_property(TARGET caffe PROPERTY IMPORTED_LOCATION ${Caffe_LIBS})
+  target_link_libraries(openpose caffe)
+
+  if (BUILD_CAFFE)
     add_dependencies(openpose openpose_caffe)
-endif (BUILD_CAFFE)
+  endif (BUILD_CAFFE)
 
-set_property(TARGET openpose PROPERTY VERSION ${OpenPose_VERSION})
+  set_property(TARGET openpose PROPERTY VERSION ${OpenPose_VERSION})
 
-install(TARGETS openpose
-    EXPORT OpenPose
-    RUNTIME DESTINATION bin
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib/openpose)
+  install(TARGETS openpose
+      EXPORT OpenPose
+      RUNTIME DESTINATION bin
+      LIBRARY DESTINATION lib
+      ARCHIVE DESTINATION lib/openpose)
+endif (UNIX AND NOT APPLE)

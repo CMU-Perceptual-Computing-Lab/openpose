@@ -71,7 +71,7 @@ tags
 *.opendb
 *.pdb
 
-######################### Windows (Visual Studio) Folders #########################
+######################### Windows (Visual Studio) Folders and Compressed files #########################
 *.vs/
 *x64/
 3rdparty/windows/caffe/
@@ -79,6 +79,7 @@ tags
 3rdparty/windows/opencv/
 3rdparty/windows/freeglut/
 3rdparty/windows/spinnaker/
+3rdparty/windows/*zip
 # Allowing this file (removed *.user for Qt)
 !*.vcxproj.user
 
