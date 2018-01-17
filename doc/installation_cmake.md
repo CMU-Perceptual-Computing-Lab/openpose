@@ -70,19 +70,19 @@ bash ./ubuntu/install_cmake.sh
     <img src="media/cmake_installation/im_1_windows.png", width="480">
 </p>
 
-3. Press the `Configure` button, keep the generator in Unix Makefile (Ubuntu) or set it to `Visual Studio 14 2015 Win64` (Windows), and press `Finish`.
+3. Press the `Configure` button, keep the generator in `Unix Makefile` (Ubuntu) or set it to `Visual Studio 14 2015 Win64` (Windows), and press `Finish`.
 <p align="center">
     <img src="media/cmake_installation/im_2.png", width="240">
     <img src="media/cmake_installation/im_2_windows.png", width="240">
 </p>
 
-4. If this step is successful, in the bottom box it will show "Configuring done" (in the last line) as shown below. Otherwise, some red text will appear in the lower part of the program.
+4. If this step is successful, the `Configuring done` text will appear in the bottom box in the last line. Otherwise, some red text will appear in that same bottom box.
 <p align="center">
     <img src="media/cmake_installation/im_3.png", width="480">
     <img src="media/cmake_installation/im_3_windows.png", width="480">
 </p>
 
-5. Press the `Generate` button, click the `Open Project` button as shown in the previous image (if Windows), and proceed to [OpenPose Building](#openpose-building). You can now close CMake. The Visual Studio solution (Windows), called `build/OpenPose.sln`, can be opened at any time.
+5. Press the `Generate` button and proceed to [OpenPose Building](#openpose-building). You can now close CMake.
 
 Note: If you prefer to use your own custom Caffe or OpenCV versions, see [Custom Caffe](#custom-caffe) or [Custom OpenCV](#custom-opencv) respectively.
 
@@ -97,7 +97,7 @@ make -j`nproc`
 ```
 
 #### Windows
-To build the project, set the configuration from `Debug` to `Release` and press the green triangle icon (alternatively press <kbd>Ctrl</kbd> + <kbd>F5</kbd>).
+In order to build the project, open the Visual Studio solution (Windows), called `build/OpenPose.sln`. Then, set the configuration from `Debug` to `Release` and press the green triangle icon (alternatively press <kbd>Ctrl</kbd> + <kbd>F5</kbd>).
 
 
 
@@ -136,7 +136,7 @@ link_directories(<path_to_caffe_installation>/caffe/build/install/lib)
 ```
 
 ### Run OpenPose
-Check OpenPose was properly installed by running it on the default images, video or webcam: [doc/quick_start.md#quick-start](./quick_start.md#quick-start).
+Check OpenPose was properly installed by running it on the default images, video, or webcam: [doc/quick_start.md#quick-start](./quick_start.md#quick-start).
 
 
 
