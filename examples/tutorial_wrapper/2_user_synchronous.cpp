@@ -39,6 +39,8 @@ DEFINE_bool(disable_multi_thread,       false,          "It would slightly reduc
                                                         " for 1) Cases where it is needed a low latency (e.g. webcam in real-time scenarios with"
                                                         " low-range GPU devices); and 2) Debugging OpenPose when it is crashing to locate the"
                                                         " error.");
+DEFINE_int32(profile_speed,             1000,           "If PROFILER_ENABLED was set in CMake or Makefile.config files, OpenPose will show some"
+                                                        " runtime statistics at this frame number.");
 // Producer
 DEFINE_string(image_dir,                "examples/media/",      "Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).");
 // OpenPose
@@ -363,7 +365,7 @@ int openPoseTutorialWrapper2()
     op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.",
               __LINE__, __FUNCTION__, __FILE__);
     op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
-    // op::ConfigureLog::setPriorityThreshold(op::Priority::None); // To print all logging messages
+    op::Profiler::setDefaultX(FLAGS_profile_speed);
 
     op::log("Starting pose estimation demo.", op::Priority::High);
     const auto timerBegin = std::chrono::high_resolution_clock::now();
