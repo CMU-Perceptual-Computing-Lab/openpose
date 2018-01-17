@@ -97,7 +97,7 @@ make -j`nproc`
 ```
 
 #### Windows
-In order to build the project, open the Visual Studio solution (Windows), called `build/OpenPose.sln`. Then, set the configuration from `Debug` to `Release` and press the green triangle icon (alternatively press <kbd>Ctrl</kbd> + <kbd>F5</kbd>).
+In order to build the project, open the Visual Studio solution (Windows), called `build/OpenPose.sln`. Then, set the configuration from `Debug` to `Release` and press the green triangle icon (alternatively press <kbd>F5</kbd>).
 
 
 
