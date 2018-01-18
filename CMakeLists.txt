@@ -411,6 +411,8 @@ if (BUILD_EXAMPLES)
 endif (BUILD_EXAMPLES)
 
 ### DOWNLOAD MODELS
+
+# Download the models if flag is set
 message(STATUS "Download the models.")
 
 # URL to the models
