@@ -411,10 +411,6 @@ if (BUILD_EXAMPLES)
 endif (BUILD_EXAMPLES)
 
 ### DOWNLOAD MODELS
-
-# Download the models if flag is set
-# TODO -- remove hardcoded ubuntu paths
-include(cmake/Utils.cmake)
 message(STATUS "Download the models.")
 
 # URL to the models
