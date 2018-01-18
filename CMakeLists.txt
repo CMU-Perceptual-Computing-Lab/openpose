@@ -126,6 +126,11 @@ if (${GPU_MODE} MATCHES "CPU_ONLY")
   endif ()
 endif ()
 
+# Set/disable profiler
+if (PROFILER_ENABLED)
+  add_definitions(-DPROFILER_ENABLED)
+endif (PROFILER_ENABLED)
+
 # Suboptions for GPU architectures
 if (${GPU_MODE} MATCHES "CUDA")
   set(CUDA_ARCH Auto CACHE STRING "Select target NVIDIA GPU achitecture.")
@@ -393,12 +398,6 @@ if (UNIX AND NOT APPLE)
   endif (${DL_FRAMEWORK} MATCHES "CAFFE")
 
 endif (UNIX AND NOT APPLE)
-
-### OPENPOSE FLAGS
-# Set/disable profiler
-if (PROFILER_ENABLED)
-  add_definitions(-DPROFILER_ENABLED)
-endif (PROFILER_ENABLED)
 
 ### PROJECT INCLUDES
 # Specify the include directories
