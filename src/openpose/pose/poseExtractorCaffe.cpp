@@ -89,7 +89,6 @@ namespace op
                                   getPoseNumberBodyParts(poseModel));
                 // Pose extractor blob and layer
                 bodyPartConnectorCaffe->Reshape({heatMapsBlob.get(), peaksBlob.get()});
-
                 // Cuda check
                 #ifdef USE_CUDA
                     cudaCheck(__LINE__, __FUNCTION__, __FILE__);
@@ -228,8 +227,8 @@ namespace op
 
                     // Reshape blobs if required
                     // Note: In order to resize to input size to have same results as Matlab, uncomment the commented
-                    // Note: For Dynamic Video sizes
                     // lines
+                    // Note: For dynamic sizes (e.g. a folder with images of different aspect ratio)
                     if (!vectorsAreEqual(upImpl->mNetInput4DSizes.at(i), inputNetData[i].getSize()))
                         // || !vectorsAreEqual(upImpl->mScaleInputToNetInputs, scaleInputToNetInputs))
                     {
