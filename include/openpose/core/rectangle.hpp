@@ -71,6 +71,16 @@ namespace op
          */
         std::string toString() const;
 
+        /**
+         * cout operator overload calling toString() function
+         * @return std::ostream containing output from toString()
+         */
+        inline friend std::ostream &operator<<(std::ostream& strm, const op::Rectangle<T>& obj)
+        {
+            strm << obj.toString();
+            return strm;
+        }
+
         // -------------------------------------------------- Basic Operators -------------------------------------------------- //
         Rectangle<T>& operator*=(const T value);
 

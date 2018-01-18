@@ -88,6 +88,29 @@ namespace op
     }
 
     template<typename T>
+    std::string Array<T>::printSize() const
+    {
+        try
+        {
+            auto counter = 0u;
+            std::string sizeString = "[ ";
+            for (const auto& i : mSize)
+            {
+                sizeString += std::to_string(i);
+                if (++counter < mSize.size())
+                    sizeString += " x ";
+            }
+            sizeString += " ]";
+            return sizeString;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return "";
+        }
+    }
+
+    template<typename T>
     Point<T>& Point<T>::operator+=(const Point<T>& point)
     {
         try

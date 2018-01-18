@@ -2,6 +2,7 @@
 #define OPENPOSE_CORE_POINT_HPP
 
 #include <string>
+#include <ostream>
 
 namespace op
 {
@@ -57,9 +58,15 @@ namespace op
          */
         std::string toString() const;
 
-
-
-
+        /**
+         * cout operator overload calling toString() function
+         * @return std::ostream containing output from toString()
+         */
+        inline friend std::ostream &operator<<(std::ostream& strm, const op::Point<T>& obj)
+        {
+            strm << obj.toString();
+            return strm;
+        }
 
         // -------------------------------------------------- Comparison operators -------------------------------------------------- //
         /**
