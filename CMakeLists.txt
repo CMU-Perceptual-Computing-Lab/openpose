@@ -410,25 +410,6 @@ if (BUILD_EXAMPLES)
   endif (WITH_3D)
 endif (BUILD_EXAMPLES)
 
-### GENERATE DOCUMENTATION
-
-if (BUILD_DOCS)
-  find_package(Doxygen)
-  if (DOXYGEN_FOUND)
-    # Set input and output files
-    set(DOXYGEN_FILE ${CMAKE_SOURCE_DIR}/doc/doc_autogeneration.doxygen)
-
-    # Custom target to build the documentation
-    add_custom_target(doc_doxygen ALL
-      COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_FILE}
-      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/doc
-      COMMENT "Generating API documentation with Doxygen"
-      VERBATIM )
-  else (DOXYGEN_FOUND)
-    message("Doxygen need to be installed to generate the doxygen documentation")
-  endif (DOXYGEN_FOUND)
-endif (BUILD_DOCS)
-
 ### DOWNLOAD MODELS
 
 # Download the models if flag is set
