@@ -351,17 +351,28 @@ if (UNIX AND NOT APPLE)
           -DCPU_ONLY=${CAFFE_CPU_ONLY}
           -DUSE_MKL2017_AS_DEFAULT_ENGINE=${CAFFE_CPU_ONLY}
           -DCMAKE_BUILD_TYPE=Release
-          -DOpenCV_DIR=${OpenCV_DIR})
+          -DBUILD_docs=OFF
+          -DBUILD_python=OFF
+          -DBUILD_python_layer=OFF
+          -DUSE_LEVELDB=OFF
+          -DUSE_LMDB=OFF
+          -DUSE_OPENCV=OFF)
+          # -DOpenCV_DIR=${OpenCV_DIR})
       else ()
         ExternalProject_Add(openpose_caffe
           SOURCE_DIR ${CAFFE_URL}
           PREFIX ${CAFFE_PREFIX}
           CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
           -DUSE_CUDNN=${USE_CUDNN}
-          -DBUILD_python=OFF
           -DCPU_ONLY=${CAFFE_CPU_ONLY}
           -DCMAKE_BUILD_TYPE=Release
-          -DOpenCV_DIR=${OpenCV_DIR})
+          -DBUILD_docs=OFF
+          -DBUILD_python=OFF
+          -DBUILD_python_layer=OFF
+          -DUSE_LEVELDB=OFF
+          -DUSE_LMDB=OFF
+          -DUSE_OPENCV=OFF)
+          # -DOpenCV_DIR=${OpenCV_DIR})
       endif ()
 
       ExternalProject_Get_Property(openpose_caffe install_dir)
