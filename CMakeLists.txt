@@ -112,11 +112,11 @@ set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA CPU_ONLY)
 if (${GPU_MODE} MATCHES "CUDA")
   # OpenPose flags
   add_definitions(-DUSE_CUDA)
-  message("Building with CUDA")
+  message(STATUS "Building with CUDA")
 elseif (${GPU_MODE} MATCHES "CPU_ONLY")
   # OpenPose flag for Caffe
   add_definitions(-DCPU_ONLY)
-  message("Building CPU Only")
+  message(STATUS "Building CPU Only")
 endif ()
 
 # Intel branch with MKL Support
