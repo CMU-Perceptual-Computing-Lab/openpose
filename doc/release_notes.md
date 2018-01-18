@@ -175,6 +175,9 @@ OpenPose Library - Release Notes
     3. Caffe added as submodule.
     4. CMake installer compatible with Windows.
     5. Added freeglut download script (3-D reconstruction demo for Windows).
+    6. Added Debug version for Windows (CMake).
+    7. Runtime verbose about average speed configurable by user with `PROFILER_ENABLED` option (CMake/Makefile.config) and `--profile_speed` flag.
+    8. Lighter Caffe version compiled by CMake in Ubuntu: disabled Caffe extra support (e.g., OpenCV, Python) and doc.
 2. Main bugs fixed:
     1. Slight speed up (~1%) for performing the non-maximum suppression stage only in the body part heatmaps channels, and not also in the PAF channels.
 

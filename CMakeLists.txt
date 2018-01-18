@@ -282,10 +282,15 @@ if (UNIX AND NOT APPLE)
       ExternalProject_Add(openpose_caffe
           SOURCE_DIR ${CAFFE_URL}
           PREFIX ${CAFFE_PREFIX}
-          CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR> 
+          CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
               -DUSE_CUDNN=${USE_CUDNN}
+              -DBUILD_docs=OFF
               -DBUILD_python=OFF
-              -DOpenCV_DIR=${OpenCV_DIR})
+              -DBUILD_python_layer=OFF
+              -DUSE_LEVELDB=OFF
+              -DUSE_LMDB=OFF
+              -DUSE_OPENCV=OFF)
+              # -DOpenCV_DIR=${OpenCV_DIR})
 
       ExternalProject_Get_Property(openpose_caffe install_dir)
 
