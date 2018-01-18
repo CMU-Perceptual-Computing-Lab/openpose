@@ -4,13 +4,14 @@ set(OpenPose_VERSION_MINOR 2)
 set(OpenPose_VERSION_PATCH 1)
 set(OpenPose_VERSION ${OpenPose_VERSION_MAJOR}.${OpenPose_VERSION_MINOR}.${OpenPose_VERSION_PATCH})
 
+
 ### CMAKE HEADERS
 cmake_policy(SET CMP0048 NEW)
 project(OpenPose VERSION ${OpenPose_VERSION})
 cmake_minimum_required(VERSION 2.8.7 FATAL_ERROR) # min. cmake version recommended by Caffe
 
-### FIND THE OS
 
+### FIND THE OS
 if (WIN32) # OS is Windows
   message(STATUS "Windows OS support currently is experimental.")
   message(STATUS "Feel free to send us any suggestion or bug you encounter.")
@@ -29,8 +30,8 @@ elseif (UNIX AND NOT APPLE) # OS is a Linux distribution (it assumes Ubuntu)
   endif (${UBUNTU_MAJOR_VERSION} MATCHES "16")
 endif ()
 
-### FLAGS
 
+### FLAGS
 if (WIN32)
   # TODO -- Makeshift solution -- This prevents rerunning build again
   # https://gitlab.kitware.com/cmake/cmake/issues/16783
@@ -69,8 +70,8 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   set(OP_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp -Wpedantic -Wall -Wextra -Wfatal-errors")
 endif(CMAKE_COMPILER_IS_GNUCXX)
 
-### PROJECT OPTIONS
 
+### PROJECT OPTIONS
 # Select the DL Framework
 set(DL_FRAMEWORK CAFFE CACHE STRING "Select Deep Learning Framework.")
 set_property(CACHE DL_FRAMEWORK PROPERTY STRINGS CAFFE)
@@ -157,8 +158,9 @@ option(BUILD_SHARED_LIBS "Build as shared lib" ON)
 # Speed profiler
 option(PROFILER_ENABLED "If enabled, OpenPose will be able to print out speed information at runtime." OFF)
 
-### FIND REQUIRED PACKAGES
 
+
+### FIND REQUIRED PACKAGES
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
 
 if (${GPU_MODE} MATCHES "CUDA")
@@ -265,8 +267,9 @@ if (WIN32)
   endif (WITH_3D)
 endif (WIN32)
 
-### CAFFE
 
+
+### CAFFE
 if (UNIX AND NOT APPLE)
 
   if (${DL_FRAMEWORK} MATCHES "CAFFE")
@@ -378,8 +381,8 @@ if (UNIX AND NOT APPLE)
 
 endif (UNIX AND NOT APPLE)
 
-### PROJECT INCLUDES
 
+### PROJECT INCLUDES
 # Specify the include directories
 include_directories(
   include
@@ -412,8 +415,8 @@ if (BUILD_EXAMPLES)
   endif (WITH_3D)
 endif (BUILD_EXAMPLES)
 
-### DOWNLOAD MODELS
 
+### DOWNLOAD MODELS
 # Download the models if flag is set
 message(STATUS "Download the models.")
 
@@ -431,8 +434,8 @@ download_model("hand" ${DOWNLOAD_HAND_MODEL} hand/pose_iter_102000.caffemodel
 
 message(STATUS "Models Downloaded.")
 
-### GENERATE DOCUMENTATION
 
+### GENERATE DOCUMENTATION
 if (UNIX AND NOT APPLE)
 
   if (BUILD_DOCS)
@@ -454,8 +457,8 @@ if (UNIX AND NOT APPLE)
 
 endif (UNIX AND NOT APPLE)
 
-### INSTALL
 
+### INSTALL
 if (UNIX AND NOT APPLE)
   # Install the headers
   install(DIRECTORY ${CMAKE_SOURCE_DIR}/include/openpose DESTINATION include)
@@ -483,8 +486,8 @@ if (UNIX AND NOT APPLE)
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
 endif (UNIX AND NOT APPLE)
 
-### OPENPOSE FLAGS
 
+### OPENPOSE FLAGS
 # Set/disable profiler
 if (PROFILER_ENABLED)
   add_definitions(-DPROFILER_ENABLED)
