@@ -161,9 +161,12 @@ option(PROFILER_ENABLED "If enabled, OpenPose will be able to print out speed in
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
 
+if (${GPU_MODE} MATCHES "CUDA")
+  include(cmake/Cuda.cmake)
+endif ()
+
 if (UNIX AND NOT APPLE)
   if (${GPU_MODE} MATCHES "CUDA")
-    include(cmake/Cuda.cmake)
     find_package(CUDA)
     find_package(CuDNN)
   endif ()
