@@ -6,7 +6,7 @@ foreach(EXAMPLE_FILE ${EXAMPLE_FILES})
   get_filename_component(SOURCE_NAME ${EXAMPLE_FILE} NAME_WE)
   
   if (UNIX AND NOT APPLE)
-    set(EXE_NAME "${SOURCE_NAME}_bin")
+    set(EXE_NAME "${SOURCE_NAME}.bin")
   elseif (WIN32)
     set(EXE_NAME "${SOURCE_NAME}")
   endif ()

@@ -531,25 +531,36 @@ namespace op
                     error("Body keypoint detection must be enabled in order to run hand keypoint detection.",
                           __LINE__, __FUNCTION__, __FILE__);
             }
+            #ifdef CPU_ONLY
+                if (wrapperStructPose.gpuNumber > 0)
+                    error("GPU number must be negative or 0 if CPU_ONLY is enabled.", __LINE__, __FUNCTION__, __FILE__);
+            #endif
 
-            // Get number GPUs
-            auto gpuNumber = wrapperStructPose.gpuNumber;
-            const auto gpuNumberStart = wrapperStructPose.gpuNumberStart;
-            // If number GPU < 0 --> set it to all the available GPUs
-            if (gpuNumber < 0)
-            {
-                // Get total number GPUs
-                const auto totalGpuNumber = getGpuNumber();
-                if (totalGpuNumber <= gpuNumberStart)
-                    error("Number of initial GPUs (`--number_gpu_start`) must be lower than the total number of used"
-                          " GPUs (`--number_gpu`)", __LINE__, __FUNCTION__, __FILE__);
-                gpuNumber = totalGpuNumber - gpuNumberStart;
-                // Reset initial GPU to 0 (we want them all)
-                // Logging message
-                log("Auto-detecting all available GPUs... Detected " + std::to_string(totalGpuNumber)
-                    + " GPU(s), using " + std::to_string(gpuNumber) + " of them starting at GPU "
-                    + std::to_string(gpuNumberStart) + ".", Priority::High);
-            }
+            // Get number threads
+            // CPU --> 1 thread or no pose extraction
+            #ifdef CPU_ONLY
+                const auto numberThreads = (wrapperStructPose.gpuNumber == 0 ? 0 : 1);
+                const auto gpuNumberStart = 0;
+            // GPU --> user picks (<= #GPUs)
+            #else
+                auto numberThreads = wrapperStructPose.gpuNumber;
+                const auto gpuNumberStart = wrapperStructPose.gpuNumberStart;
+                // If number GPU < 0 --> set it to all the available GPUs
+                if (numberThreads < 0)
+                {
+                    // Get total number GPUs
+                    const auto totalGpuNumber = getGpuNumber();
+                    if (totalGpuNumber <= gpuNumberStart)
+                        error("Number of initial GPUs (`--number_gpu_start`) must be lower than the total number of used"
+                              " GPUs (`--number_gpu`)", __LINE__, __FUNCTION__, __FILE__);
+                    numberThreads = totalGpuNumber - gpuNumberStart;
+                    // Reset initial GPU to 0 (we want them all)
+                    // Logging message
+                    log("Auto-detecting all available GPUs... Detected " + std::to_string(totalGpuNumber)
+                        + " GPU(s), using " + std::to_string(numberThreads) + " of them starting at GPU "
+                        + std::to_string(gpuNumberStart) + ".", Priority::High);
+                }
+            #endif
 
             // Proper format
             const auto writeImagesCleaned = formatAsDirectory(wrapperStructOutput.writeImages);
@@ -594,7 +605,7 @@ namespace op
             std::vector<std::shared_ptr<PoseExtractor>> poseExtractors;
             std::vector<std::shared_ptr<PoseGpuRenderer>> poseGpuRenderers;
             std::shared_ptr<PoseCpuRenderer> poseCpuRenderer;
-            if (gpuNumber > 0)
+            if (numberThreads > 0)
             {
                 // Get input scales and sizes
                 const auto scaleAndSizeExtractor = std::make_shared<ScaleAndSizeExtractor>(
@@ -615,11 +626,11 @@ namespace op
                 // Pose estimators & renderers
                 std::vector<TWorker> cpuRenderers;
                 spWPoses.clear();
-                spWPoses.resize(gpuNumber);
+                spWPoses.resize(numberThreads);
                 if (wrapperStructPose.enable)
                 {
                     // Pose estimators
-                    for (auto gpuId = 0; gpuId < gpuNumber; gpuId++)
+                    for (auto gpuId = 0; gpuId < numberThreads; gpuId++)
                         poseExtractors.emplace_back(std::make_shared<PoseExtractorCaffe>(
                             wrapperStructPose.poseModel, modelFolder, gpuId + gpuNumberStart,
                             wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale,
@@ -925,7 +936,7 @@ namespace op
                                                    || mThreadManagerMode == ThreadManagerMode::Asynchronous
                                                    || mThreadManagerMode == ThreadManagerMode::AsynchronousOut))
             {
-                const auto guiInfoAdder = std::make_shared<GuiInfoAdder>(gpuNumber, wrapperStructOutput.displayGui);
+                const auto guiInfoAdder = std::make_shared<GuiInfoAdder>(numberThreads, wrapperStructOutput.displayGui);
                 mOutputWs.emplace_back(std::make_shared<WGuiInfoAdder<TDatumsPtr>>(guiInfoAdder));
             }
             // Minimal graphical user interface (GUI)

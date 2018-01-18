@@ -128,9 +128,10 @@ DEFINE_double(render_threshold,         0.05,           "Only estimated keypoint
                                                         " while small thresholds (~0.1) will also output guessed and occluded keypoints, but also"
                                                         " more false positives (i.e. wrong detections).");
 DEFINE_int32(render_pose,               1,              "Set to 0 for no rendering, 1 for CPU rendering (slightly faster), and 2 for GPU rendering"
-                                                        " (slower but greater functionality, e.g. `alpha_X` flags). If rendering is enabled, it will"
-                                                        " render both `outputData` and `cvOutputData` with the original image and desired body part"
-                                                        " to be shown (i.e. keypoints, heat maps or PAFs).");
+                                                        " (slower but greater functionality, e.g. `alpha_X` flags). If -1, it will pick CPU if"
+                                                        " CPU_ONLY is enabled, or GPU if CUDA is enabled. If rendering is enabled, it will render"
+                                                        " both `outputData` and `cvOutputData` with the original image and desired body part to be"
+                                                        " shown (i.e. keypoints, heat maps or PAFs).");
 DEFINE_double(alpha_pose,               0.6,            "Blending factor (range 0-1) for the body part rendering. 1 will show it completely, 0 will"
                                                         " hide it. Only valid for GPU rendering.");
 DEFINE_double(alpha_heatmap,            0.7,            "Blending factor (range 0-1) between heatmap and original frame. 1 will only show the"

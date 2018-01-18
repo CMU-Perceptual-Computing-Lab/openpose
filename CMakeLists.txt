@@ -119,6 +119,11 @@ elseif (${GPU_MODE} MATCHES "CPU_ONLY")
   add_definitions(-DCPU_ONLY)
 endif ()
 
+# Set/disable profiler
+if (PROFILER_ENABLED)
+  add_definitions(-DPROFILER_ENABLED)
+endif (PROFILER_ENABLED)
+
 # Suboptions for GPU architectures
 if (${GPU_MODE} MATCHES "CUDA")
   set(CUDA_ARCH Auto CACHE STRING "Select target NVIDIA GPU achitecture.")
@@ -410,10 +415,3 @@ if (UNIX AND NOT APPLE)
   add_custom_target(uninstall
       COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
 endif (UNIX AND NOT APPLE)
-
-### OPENPOSE FLAGS
-
-# Set/disable profiler
-if (PROFILER_ENABLED)
-  add_definitions(-DPROFILER_ENABLED)
-endif (PROFILER_ENABLED)
