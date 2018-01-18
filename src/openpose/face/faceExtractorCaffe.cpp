@@ -51,7 +51,8 @@ namespace op
                 #ifdef USE_CUDA
                     cudaMemcpy(heatMapsPtr, heatMapsGpuPtr, volumeBodyParts * sizeof(float), cudaMemcpyDeviceToHost);
                 #else
-                    std::memcpy(heatMapsPtr, heatMapsGpuPtr, volumeBodyParts * sizeof(float));
+                    //std::memcpy(heatMapsPtr, heatMapsGpuPtr, volumeBodyParts * sizeof(float));
+                    std::copy(heatMapsGpuPtr, heatMapsGpuPtr + volumeBodyParts, heatMapsPtr);
                 #endif
                 // Change from [0,1] to [-1,1]
                 if (heatMapScaleMode == ScaleMode::PlusMinusOne)

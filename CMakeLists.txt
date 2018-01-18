@@ -394,6 +394,11 @@ if (UNIX AND NOT APPLE)
 
 endif (UNIX AND NOT APPLE)
 
+### OPENPOSE FLAGS
+# Set/disable profiler
+if (PROFILER_ENABLED)
+  add_definitions(-DPROFILER_ENABLED)
+endif (PROFILER_ENABLED)
 
 ### PROJECT INCLUDES
 # Specify the include directories
@@ -498,10 +503,3 @@ if (UNIX AND NOT APPLE)
   add_custom_target(uninstall
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
 endif (UNIX AND NOT APPLE)
-
-
-### OPENPOSE FLAGS
-# Set/disable profiler
-if (PROFILER_ENABLED)
-  add_definitions(-DPROFILER_ENABLED)
-endif (PROFILER_ENABLED)
