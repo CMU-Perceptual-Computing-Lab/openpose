@@ -10,12 +10,12 @@ OpenPose - Installation using CMake
 6. [Uninstallation](#uninstallation)
 7. [Optional Settings](#optional-settings)
     1. [MPI Model](#mpi-model)
-    2. [Custom Caffe (Ubuntu Only)](#custom-caffe-ubuntu-only)
-    3. [Custom OpenCV (Ubuntu Only)](#custom-opencv-ubuntu-only)
-    4. [OpenPose 3D Reconstruction Demo (Windows Only)](#openpose-3d-reconstruction-demo-windows-only)
-    5. [Doxygen Documentation Autogeneration (Ubuntu Only)](#doxygen-documentation-autogeneration-ubuntu-only)
-    6. [CMake Command Line Configuration (Ubuntu Only)](#cmake-command-line-configuration-ubuntu-only)
-    7. [CPU Version](#cpu-version)
+    2. [CPU Version](#cpu-version)
+    3. [Custom Caffe (Ubuntu Only)](#custom-caffe-ubuntu-only)
+    4. [Custom OpenCV (Ubuntu Only)](#custom-opencv-ubuntu-only)
+    5. [OpenPose 3D Reconstruction Demo (Windows Only)](#openpose-3d-reconstruction-demo-windows-only)
+    6. [Doxygen Documentation Autogeneration (Ubuntu Only)](#doxygen-documentation-autogeneration-ubuntu-only)
+    7. [CMake Command Line Configuration (Ubuntu Only)](#cmake-command-line-configuration-ubuntu-only)
 
 
 
@@ -163,6 +163,26 @@ By default, the body MPI model is not downloaded. You can download it by turning
 
 
 
+#### CPU Version
+
+If an Nvidia GPU is not available on your system, OpenPose will default to a CPU version. On Windows, this will use the default version of Caffe or one provided by the user on the CPU. 
+
+On Ubuntu, the `USE_MKL` flag is set to true by default. This will select the intel branch of Caffe and link against that automatically. This will provide a roughly 10x speedup depending on your hardware. Unfortunately, the intel branch of Caffe is not supported on Windows yet. You have the ability to configure the environmental variables `MKL_NUM_THREADS` and `OMP_NUM_THREADS`. They are set at an optimum parameter level by default. However, you can manually tweak these by copying the following commands below into your terminal window, before running any openpose application. Eg:
+
+```
+export MKL_NUM_THREADS="8"
+export OMP_NUM_THREADS="8"
+```
+
+Parallelism offered by MKL seems to work better on smaller net sizes. Also the RAM usage seems to grow exponentially with increasing net sizes. More information on the performance metrics on the CPU with MKL can be found [here](https://github.com/CMU-Perceptual-Computing-Lab/openpose#speeding-up-openpose-and-benchmark)
+
+Here is an example command for running openpose on the CPU. Setting the net size to the lowest accuracy at -1x160 yields about 5.0 FPS with 8 threads enabled. Turning on hands and face would give about 1.8 FPS.
+
+```
+build/examples/openpose/openpose_bin --net_resolution -1x160 --render_pose 1 --num_gpu 1
+```
+
+
 #### Custom Caffe (Ubuntu Only)
 We only modified some Caffe compilation flags and minor details. You can use your own Caffe distribution, simply specify the Caffe include path and the library as shown below. You will also need to turn off the `BUILD_CAFFE` variable.
 <p align="center">
@@ -218,17 +238,3 @@ If Caffe is not already present but OpenCV is, then use the below command.
 cmake -DOpenCV_DIR=/home/"${USER}"/softwares/opencv/build
 ```
 
-#### CPU Version
-
-If an Nvidia GPU is not available on your system, OpenPose will default to a CPU version. On Windows, this will use the default version of Caffe or Caffe provided by the user on the CPU. On Ubuntu, the `USE_MKL` flag is set to true by default. This will select the intel branch of Caffe and link against that automatically. This will provide a roughly 20x speedup. Unfortunately, the intel branch of Caffe is not supported on Windows yet. You will need to your `MKL_NUM_THREADS` and `OMP_NUM_THREADS` accordingly below. Eg:
-
-```
-export MKL_NUM_THREADS="8"
-export OMP_NUM_THREADS="8"
-```
-
-Openpose can then be run with the following command below. The following settings were tested on an i7 6700K and yielded about 2.0 FPS with openpose_bin.
-
-```
-build/examples/openpose/openpose_bin --net_resolution -1x256 --render_pose 1 --num_gpu 1
-```
