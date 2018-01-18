@@ -401,9 +401,9 @@ namespace op
     {
         try
         {
-            u_int8_t counter = 0;
+            auto counter = 0u;
             std::string sizeString = "[ ";
-            for (auto i : mSize)
+            for (const auto& i : mSize)
             {
                 sizeString += std::to_string(i);
                 if (++counter < mSize.size())
