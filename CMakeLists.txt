@@ -307,7 +307,7 @@ if (UNIX AND NOT APPLE)
       if(CAFFE_DIR_VALID_LENGTH EQUAL 0)
         execute_process(COMMAND git submodule update --init --recursive)
       else()
-        message(STATUS "Caffe has already been downloaded")
+        message(STATUS "Caffe has already been downloaded.")
       endif()
 
       # Build Process
