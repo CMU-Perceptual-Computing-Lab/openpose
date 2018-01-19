@@ -221,7 +221,7 @@ if (WIN32)
   #TODO Add hashes
   download_zip("opencv_310.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 1e5240a64b814b3c0b822f136be78ad7)
   download_zip("caffe3rdparty_2017_07_14.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} ec0f800c8fb337e33304f3375bd06a80)
-  download_zip("caffe_2017_07_11.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 0302edc8843529f8ded1da74eae8e061)
+  download_zip("caffe_2018_01_18.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 4b8e548cc7ea20abea472950dd5301bd)
   if (WITH_3D)
     download_zip("freeglut_2018_01_14.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} BB182187285E06880F0EDE3A39530091)
   endif (WITH_3D)

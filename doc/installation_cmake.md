@@ -25,7 +25,7 @@ OpenPose - Installation using CMake
 
 
 ## Requirements
-See [doc/quick_start.md#requirements](./quick_start.md#requirements).
+See [doc/installation.md#requirements](./installation.md#requirements).
 
 
 
