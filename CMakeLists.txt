@@ -112,7 +112,7 @@ set_property(CACHE GPU_MODE PROPERTY STRINGS CPU_ONLY)
 # Test for CUDA or OpenCL
 find_package(CUDA)
 if(CUDA_FOUND)
-  set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA CPU_ONLY)
+  set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA OPENCL CPU_ONLY)
 endif ()
 
 # set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA OPENCL CPU_ONLY)
@@ -124,6 +124,10 @@ elseif (${GPU_MODE} MATCHES "CPU_ONLY")
   # OpenPose flag for Caffe
   add_definitions(-DCPU_ONLY)
   message(STATUS "Building CPU Only")
+elseif (${GPU_MODE} MATCHES "OPENCL")
+  # OpenPose flag for Caffe
+  add_definitions(-DUSE_OPENCL)
+  message("Building with OpenCL")
 endif ()
 
 # Intel branch with MKL Support
@@ -344,6 +348,9 @@ if (UNIX AND NOT APPLE)
           execute_process(COMMAND git checkout master WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
         endif ()
         set(CAFFE_CPU_ONLY ON)
+        set(USE_CUDNN OFF)
+      elseif (${GPU_MODE} MATCHES "OPENCL")
+        execute_process(COMMAND git checkout opencl WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
         set(USE_CUDNN OFF)
       endif ()
 
