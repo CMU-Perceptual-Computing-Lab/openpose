@@ -541,6 +541,10 @@ namespace op
             #ifdef CPU_ONLY
                 const auto numberThreads = (wrapperStructPose.gpuNumber == 0 ? 0 : 1);
                 const auto gpuNumberStart = 0;
+                // Disabling multi-thread makes the code 400 ms faster (2.3 sec vs. 2.7 in i7-6850K)
+                // and fixes the bug that the screen was not properly displayed and only refreshed sometimes
+                // Note: The screen bug could be also fixed by using waitKey(30) rather than waitKey(1)
+                disableMultiThreading();
             // GPU --> user picks (<= #GPUs)
             #else
                 auto numberThreads = wrapperStructPose.gpuNumber;
