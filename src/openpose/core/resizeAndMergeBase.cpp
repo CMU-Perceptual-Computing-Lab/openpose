@@ -41,13 +41,6 @@ namespace op
                     error("It should never reache this point. Notify us otherwise.",
                           __LINE__, __FUNCTION__, __FILE__);
 
-                // Warp Matrix
-                auto scaleFactor = op::resizeGetScaleFactor(op::Point<int>(sourceWidth, sourceHeight),
-                                                            op::Point<int>(targetWidth, targetHeight));
-                cv::Mat M = cv::Mat::eye(2,3,CV_64F);
-                M.at<double>(0,0) = scaleFactor;
-                M.at<double>(1,1) = scaleFactor;
-
                 // Per channel resize
                 const T* sourcePtr = sourcePtrs[0];
                 for (auto c = 0 ; c < channels ; c++)
@@ -57,20 +50,15 @@ namespace op
                     cv::Mat target(cv::Size(targetWidth, targetHeight), CV_32FC1,
                                    (&targetPtr[c*targetChannelOffset]));
                     cv::resize(source, target, {targetWidth, targetHeight}, 0, 0, CV_INTER_CUBIC);
-                    // cv::warpAffine(source, target, M, cv::Size(targetWidth, targetHeight),
-                    //                (scaleFactor < 1. ? cv::INTER_AREA : cv::INTER_CUBIC));
                 }
             }
             // Multi-scale merging
             else
             {
-                // Construct temp targets. Could have a way of storing this somewhere if reusing same frame
-                std::vector<T*> tempTargetPtrs;
-                for (auto n = 0; n < nums; n++){
-                    if (n==0)
-                        tempTargetPtrs.emplace_back(targetPtr);
-                    else
-                        tempTargetPtrs.emplace_back(new T[targetChannelOffset * channels]());
+                // Construct temp targets. We resuse targetPtr to store first scale
+                std::vector<std::unique_ptr<T>> tempTargetPtrs;
+                for (auto n = 1; n < nums; n++){
+                    tempTargetPtrs.emplace_back(std::unique_ptr<T>(new T[targetChannelOffset * channels]()));
                 }
 
                 // Resize and sum
@@ -82,16 +70,15 @@ namespace op
                     const auto sourceWidth = sourceSize[3]; // 496/8 ..
                     const auto sourceChannelOffset = sourceHeight * sourceWidth;
 
-                    // Warp Matrix
-                    auto scaleFactor = op::resizeGetScaleFactor(op::Point<int>(sourceWidth, sourceHeight),
-                                                                op::Point<int>(targetWidth, targetHeight));
-                    cv::Mat M = cv::Mat::eye(2,3,CV_64F);
-                    M.at<double>(0,0) = scaleFactor;
-                    M.at<double>(1,1) = scaleFactor;
-
+                    // Access pointers
                     const T* sourcePtr = sourcePtrs[n];
-                    T* tempTargetPtr = tempTargetPtrs[n];
-                    T* firstTempTargetPtr = tempTargetPtrs[0];
+                    T* tempTargetPtr;
+                    if(n != 0)
+                        tempTargetPtr = tempTargetPtrs[n-1].get();
+                    else
+                        tempTargetPtr = targetPtr;
+
+                    T* firstTempTargetPtr = targetPtr;
                     for (auto c = 0 ; c < channels ; c++)
                     {
                         // Resize
@@ -100,8 +87,6 @@ namespace op
                         cv::Mat target(cv::Size(targetWidth, targetHeight), CV_32FC1,
                                        (&tempTargetPtr[c*targetChannelOffset]));
                         cv::resize(source, target, {targetWidth, targetHeight}, 0, 0, CV_INTER_CUBIC);
-                        // cv::warpAffine(source, target, M, cv::Size(targetWidth, targetHeight),
-                        //                (scaleFactor < 1. ? cv::INTER_AREA : cv::INTER_CUBIC));
 
                         // Add
                         if (n != 0)
@@ -120,18 +105,7 @@ namespace op
                     target /= (float)nums;
                 }
 
-                // Delete tempTargetPtrs later
-                for (auto n = 0; n < nums; n++)
-                {
-                    if (n!=0)
-                    {
-                        T* tempTargetPtr = tempTargetPtrs[n];
-                        delete tempTargetPtr;
-                    }
-                }
             }
-            //high_resolution_clock::time_point t2 = high_resolution_clock::now();
-            //cout << duration_cast<milliseconds>( t2 - t1 ).count()  << endl;
         }
         catch (const std::exception& e)
         {

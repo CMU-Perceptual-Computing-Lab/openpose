@@ -1,4 +1,5 @@
 #include <openpose/core/nmsBase.hpp>
+#include <opencv2/opencv.hpp>
 
 namespace op
 {
@@ -128,10 +129,9 @@ namespace op
             // Per channel operation
             for (auto c = 0 ; c < channels ; c++)
             {
-                if (c == 18)
-                    break;
                 auto* currKernelPtr = &kernelPtr[c*sourceChannelOffset];
                 const T* currSourcePtr = &sourcePtr[c*sourceChannelOffset];
+
                 for (auto y = 0; y < sourceHeight; y++)
                     for (auto x = 0; x < sourceWidth; x++)
                         nmsRegisterKernelCPU(currKernelPtr, currSourcePtr, sourceWidth, sourceHeight, threshold, x, y);
