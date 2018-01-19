@@ -1,14 +1,8 @@
 #include <opencv2/highgui/highgui.hpp>
-#include <openpose/core/resizeAndMergeBase.hpp>
-#include <openpose/utilities/fastMath.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/openCv.hpp>
-
-//#include <iostream>
-//#include <chrono>
-//#include <sys/time.h>
-//using namespace std;
-//using namespace std::chrono;
+#include <openpose/core/resizeAndMergeBase.hpp>
 
 namespace op
 {
@@ -28,28 +22,28 @@ namespace op
                       + std::to_string(sourcePtrs.size()) + " vs. " + std::to_string(sourceSizes.size()) + " vs. "
                       + std::to_string(scaleInputToNetInputs.size()) + ".", __LINE__, __FUNCTION__, __FILE__);
 
-            // TEST WITH SCALEINPUTTONETINPUTS
-
             // Params
             const auto nums = (signed)sourceSizes.size();
             const auto channels = targetSize[1]; // 57
             const auto targetHeight = targetSize[2]; // 368
             const auto targetWidth = targetSize[3]; // 496
             const auto targetChannelOffset = targetWidth * targetHeight;
-            //high_resolution_clock::time_point t1 = high_resolution_clock::now();
 
             // No multi-scale merging or no merging required
-            if(sourceSizes.size() == 1)
+            if (sourceSizes.size() == 1)
             {
                 // Params
                 const auto& sourceSize = sourceSizes[0];
                 const auto sourceHeight = sourceSize[2]; // 368/8 ..
                 const auto sourceWidth = sourceSize[3]; // 496/8 ..
                 const auto sourceChannelOffset = sourceHeight * sourceWidth;
-                if(sourceSize[0] != 1) error("It should never reache this point. Notify us otherwise.", __LINE__, __FUNCTION__, __FILE__);
+                if (sourceSize[0] != 1)
+                    error("It should never reache this point. Notify us otherwise.",
+                          __LINE__, __FUNCTION__, __FILE__);
 
                 // Warp Matrix
-                auto scaleFactor = op::resizeGetScaleFactor(op::Point<int>(sourceWidth, sourceHeight),op::Point<int>(targetWidth, targetHeight));
+                auto scaleFactor = op::resizeGetScaleFactor(op::Point<int>(sourceWidth, sourceHeight),
+                                                            op::Point<int>(targetWidth, targetHeight));
                 cv::Mat M = cv::Mat::eye(2,3,CV_64F);
                 M.at<double>(0,0) = scaleFactor;
                 M.at<double>(1,1) = scaleFactor;
@@ -58,10 +52,13 @@ namespace op
                 const T* sourcePtr = sourcePtrs[0];
                 for (auto c = 0 ; c < channels ; c++)
                 {
-                    cv::Mat source(cv::Size(sourceWidth, sourceHeight), CV_32FC1, const_cast<T*>(&sourcePtr[c*sourceChannelOffset]));
-                    cv::Mat target(cv::Size(targetWidth, targetHeight), CV_32FC1, (&targetPtr[c*targetChannelOffset]));
+                    cv::Mat source(cv::Size(sourceWidth, sourceHeight), CV_32FC1,
+                                   const_cast<T*>(&sourcePtr[c*sourceChannelOffset]));
+                    cv::Mat target(cv::Size(targetWidth, targetHeight), CV_32FC1,
+                                   (&targetPtr[c*targetChannelOffset]));
                     cv::resize(source, target, {targetWidth, targetHeight}, 0, 0, CV_INTER_CUBIC);
-                    //cv::warpAffine(source, target, M, cv::Size(targetWidth, targetHeight),(scaleFactor < 1. ? cv::INTER_AREA : cv::INTER_CUBIC));
+                    // cv::warpAffine(source, target, M, cv::Size(targetWidth, targetHeight),
+                    //                (scaleFactor < 1. ? cv::INTER_AREA : cv::INTER_CUBIC));
                 }
             }
             // Multi-scale merging
@@ -69,13 +66,15 @@ namespace op
             {
                 // Construct temp targets. Could have a way of storing this somewhere if reusing same frame
                 std::vector<T*> tempTargetPtrs;
-                for(auto n = 0; n < nums; n++){
-                    if(n==0) tempTargetPtrs.emplace_back(targetPtr);
-                    else tempTargetPtrs.emplace_back(new T[targetChannelOffset * channels]());
+                for (auto n = 0; n < nums; n++){
+                    if (n==0)
+                        tempTargetPtrs.emplace_back(targetPtr);
+                    else
+                        tempTargetPtrs.emplace_back(new T[targetChannelOffset * channels]());
                 }
 
                 // Resize and sum
-                for(auto n = 0; n < nums; n++){
+                for (auto n = 0; n < nums; n++){
 
                     // Params
                     const auto& sourceSize = sourceSizes[n];
@@ -84,7 +83,8 @@ namespace op
                     const auto sourceChannelOffset = sourceHeight * sourceWidth;
 
                     // Warp Matrix
-                    auto scaleFactor = op::resizeGetScaleFactor(op::Point<int>(sourceWidth, sourceHeight),op::Point<int>(targetWidth, targetHeight));
+                    auto scaleFactor = op::resizeGetScaleFactor(op::Point<int>(sourceWidth, sourceHeight),
+                                                                op::Point<int>(targetWidth, targetHeight));
                     cv::Mat M = cv::Mat::eye(2,3,CV_64F);
                     M.at<double>(0,0) = scaleFactor;
                     M.at<double>(1,1) = scaleFactor;
@@ -95,14 +95,19 @@ namespace op
                     for (auto c = 0 ; c < channels ; c++)
                     {
                         // Resize
-                        cv::Mat source(cv::Size(sourceWidth, sourceHeight), CV_32FC1, const_cast<T*>(&sourcePtr[c*sourceChannelOffset]));
-                        cv::Mat target(cv::Size(targetWidth, targetHeight), CV_32FC1, (&tempTargetPtr[c*targetChannelOffset]));
+                        cv::Mat source(cv::Size(sourceWidth, sourceHeight), CV_32FC1,
+                                       const_cast<T*>(&sourcePtr[c*sourceChannelOffset]));
+                        cv::Mat target(cv::Size(targetWidth, targetHeight), CV_32FC1,
+                                       (&tempTargetPtr[c*targetChannelOffset]));
                         cv::resize(source, target, {targetWidth, targetHeight}, 0, 0, CV_INTER_CUBIC);
-                        //cv::warpAffine(source, target, M, cv::Size(targetWidth, targetHeight),(scaleFactor < 1. ? cv::INTER_AREA : cv::INTER_CUBIC));
+                        // cv::warpAffine(source, target, M, cv::Size(targetWidth, targetHeight),
+                        //                (scaleFactor < 1. ? cv::INTER_AREA : cv::INTER_CUBIC));
 
                         // Add
-                        if(n != 0){
-                            cv::Mat addTarget(cv::Size(targetWidth, targetHeight), CV_32FC1, (&firstTempTargetPtr[c*targetChannelOffset]));
+                        if (n != 0)
+                        {
+                            cv::Mat addTarget(cv::Size(targetWidth, targetHeight), CV_32FC1,
+                                              (&firstTempTargetPtr[c*targetChannelOffset]));
                             cv::add(target, addTarget, addTarget);
                         }
                     }
@@ -116,8 +121,10 @@ namespace op
                 }
 
                 // Delete tempTargetPtrs later
-                for(auto n = 0; n < nums; n++){
-                    if(n!=0){
+                for (auto n = 0; n < nums; n++)
+                {
+                    if (n!=0)
+                    {
                         T* tempTargetPtr = tempTargetPtrs[n];
                         delete tempTargetPtr;
                     }

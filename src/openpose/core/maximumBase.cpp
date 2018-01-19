@@ -32,7 +32,7 @@ namespace op
             {
                 for (auto c = 0; c < channels; c++)
                 {
-                    // // Parameters
+                    // Parameters
                     const auto offsetChannel = (n * channels + c);
                     for (auto part = 0; part < numberParts; part++)
                     {

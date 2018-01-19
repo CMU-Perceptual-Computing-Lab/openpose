@@ -1,8 +1,8 @@
 #ifndef OPENPOSE_CORE_POINT_HPP
 #define OPENPOSE_CORE_POINT_HPP
 
-#include <string>
 #include <ostream>
+#include <string>
 
 namespace op
 {

@@ -163,10 +163,8 @@ namespace op
                     auto* cpuImagePtr = upImpl->upCaffeNet->blobs().at(0)->mutable_cpu_data();
                     std::copy(inputData.getConstPtr(), inputData.getConstPtr() + inputData.getVolume(), cpuImagePtr);
                 #endif
-
                 // Perform deep network forward pass
                 upImpl->upCaffeNet->ForwardFrom(0);
-
                 // Cuda checks
                 #ifdef USE_CUDA
                     cudaCheck(__LINE__, __FUNCTION__, __FILE__);

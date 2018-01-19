@@ -287,10 +287,10 @@ namespace op
                             if (!mHeatMapTypes.empty()){
                                 #ifdef USE_CUDA
                                     updateFaceHeatMapsForPerson(mHeatMaps, person, mHeatMapScaleMode,
-                                                            upImpl->spHeatMapsBlob->gpu_data());
+                                                                upImpl->spHeatMapsBlob->gpu_data());
                                 #else
                                     updateFaceHeatMapsForPerson(mHeatMaps, person, mHeatMapScaleMode,
-                                                            upImpl->spHeatMapsBlob->cpu_data());
+                                                                upImpl->spHeatMapsBlob->cpu_data());
                                 #endif
                             }
                         }

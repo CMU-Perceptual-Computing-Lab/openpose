@@ -3,16 +3,14 @@
 namespace op
 {
     template <typename T>
-    void nmsRegisterKernelCPU(int* kernelPtr, const T* const sourcePtr, const int& w, const int& h,
-                             const T& threshold, const int& x, const int& y)
+    void nmsRegisterKernelCPU(int* kernelPtr, const T* const sourcePtr, const int w, const int h,
+                              const T& threshold, const int x, const int y)
     {
-        /*
-        We have three scenarios for NMS, one for the border, 1 for the 1st inner border, and
-        1 for the rest. cv::resize adds artifacts around the 1st inner border, causing two
-        maximas to occur side by side. Eg. [1 1 0.8 0.8 0.5 ..]. The CUDA kernel gives
-        [0.8 1 0.8 0.8 0.5 ..] Hence for this special case in the 1st inner border, we look at the
-        visible regions.
-        */
+        // We have three scenarios for NMS, one for the border, 1 for the 1st inner border, and
+        // 1 for the rest. cv::resize adds artifacts around the 1st inner border, causing two
+        // maximas to occur side by side. Eg. [1 1 0.8 0.8 0.5 ..]. The CUDA kernel gives
+        // [0.8 1 0.8 0.8 0.5 ..] Hence for this special case in the 1st inner border, we look at the
+        // visible regions.
 
         const auto index = y*w + x;
         if (1 < x && x < (w-2) && 1 < y && y < (h-2))
@@ -45,21 +43,14 @@ namespace op
             const auto value = sourcePtr[index];
             if (value > threshold)
             {
-                const auto topLeft = ((0 < x && 0 < y) ? sourcePtr[(y-1)*w + x-1] : threshold);
-                auto top = threshold;
-                if(0 < y) top = sourcePtr[(y-1)*w + x];
-                auto topRight = threshold;
-                if(0 < y && x < (w-1)) topRight = sourcePtr[(y-1)*w + x+1];
-                auto left = threshold;
-                if(0 < x) left = sourcePtr[    y*w + x-1];
-                auto right = threshold;
-                if(x < (w-1)) right = sourcePtr[y*w + x+1];
-                auto bottomLeft = threshold;
-                if(y < (h-1) && 0 < x) bottomLeft  = sourcePtr[(y+1)*w + x-1];
-                auto bottom = threshold;
-                if(y < (h-1)) bottom = sourcePtr[(y+1)*w + x];
-                auto bottomRight = threshold;
-                if(x < (w-1) && y < (h-1)) bottomRight = sourcePtr[(y+1)*w + x+1];
+                const auto topLeft      = ((0 < x && 0 < y)         ? sourcePtr[(y-1)*w + x-1]  : threshold);
+                const auto top          = (0 < y                    ? sourcePtr[(y-1)*w + x]    : threshold);
+                const auto topRight     = ((0 < y && x < (w-1))     ? sourcePtr[(y-1)*w + x+1]  : threshold);
+                const auto left         = (0 < x                    ? sourcePtr[    y*w + x-1]  : threshold);
+                const auto right        = (x < (w-1)                ? sourcePtr[y*w + x+1]      : threshold);
+                const auto bottomLeft   = ((y < (h-1) && 0 < x)     ? sourcePtr[(y+1)*w + x-1]  : threshold);
+                const auto bottom       = (y < (h-1)                ? sourcePtr[(y+1)*w + x]    : threshold);
+                const auto bottomRight  = ((x < (w-1) && y < (h-1)) ? sourcePtr[(y+1)*w + x+1]  : threshold);
 
                 if (value >= topLeft && value >= top && value >= topRight
                     && value >= left && value >= right
@@ -112,7 +103,8 @@ namespace op
     }
 
     template <typename T>
-    void nmsCpu(T* targetPtr, int* kernelPtr, const T* const sourcePtr, const T threshold, const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize)
+    void nmsCpu(T* targetPtr, int* kernelPtr, const T* const sourcePtr, const T threshold,
+                const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize)
     {
         try
         {
@@ -132,43 +124,41 @@ namespace op
             const auto targetPeakVec = targetSize[3]; // 3
             const auto sourceChannelOffset = sourceWidth * sourceHeight;
             const auto targetChannelOffset = targetPeaks * targetPeakVec;
-            //high_resolution_clock::time_point t1 = high_resolution_clock::now();
 
             // Per channel operation
             for (auto c = 0 ; c < channels ; c++)
             {
-                if(c == 18) break;
-                int* currKernelPtr = &kernelPtr[c*sourceChannelOffset];
+                if (c == 18)
+                    break;
+                auto* currKernelPtr = &kernelPtr[c*sourceChannelOffset];
                 const T* currSourcePtr = &sourcePtr[c*sourceChannelOffset];
-                for(auto y = 0; y < sourceHeight; y++){
-                    for(auto x = 0; x < sourceWidth; x++){
+                for (auto y = 0; y < sourceHeight; y++)
+                    for (auto x = 0; x < sourceWidth; x++)
                         nmsRegisterKernelCPU(currKernelPtr, currSourcePtr, sourceWidth, sourceHeight, threshold, x, y);
-                    }
-                }
 
-                int currPeakCount = 1;
-                T* currTargetPtr = &targetPtr[c*targetChannelOffset];
-                for(auto y = 0; y < sourceHeight; y++){
-                    for(auto x = 0; x < sourceWidth; x++){
+                auto currentPeakCount = 1;
+                auto* currTargetPtr = &targetPtr[c*targetChannelOffset];
+                for (auto y = 0; y < sourceHeight; y++)
+                {
+                    for (auto x = 0; x < sourceWidth; x++)
+                    {
                         const auto index = y*sourceWidth + x;
-
                         // Find high intensity points
-                        if(currPeakCount < targetPeaks){
-                            if(currKernelPtr[index] == 1){
-
+                        if (currentPeakCount < targetPeaks)
+                        {
+                            if (currKernelPtr[index] == 1)
+                            {
                                 // Accurate Peak Position
-                                nmsAccuratePeakPosition(currSourcePtr, x, y, sourceWidth, sourceHeight, &currTargetPtr[currPeakCount*3]);
-                                currPeakCount++;
-
+                                nmsAccuratePeakPosition(currSourcePtr, x, y, sourceWidth, sourceHeight,
+                                                        &currTargetPtr[currentPeakCount*3]);
+                                currentPeakCount++;
                             }
                         }
 
                     }
                 }
-                currTargetPtr[0] = currPeakCount-1;
+                currTargetPtr[0] = currentPeakCount-1;
             }
-            //high_resolution_clock::time_point t2 = high_resolution_clock::now();
-            //cout << "NMSTime: " << duration_cast<milliseconds>( t2 - t1 ).count()  << endl;
         }
         catch (const std::exception& e)
         {
@@ -176,6 +166,8 @@ namespace op
         }
     }
 
-    template void nmsCpu(float* targetPtr, int* kernelPtr, const float* const sourcePtr, const float threshold, const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize);
-    template void nmsCpu(double* targetPtr, int* kernelPtr, const double* const sourcePtr, const double threshold, const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize);
+    template void nmsCpu(float* targetPtr, int* kernelPtr, const float* const sourcePtr, const float threshold,
+                         const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize);
+    template void nmsCpu(double* targetPtr, int* kernelPtr, const double* const sourcePtr, const double threshold,
+                         const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize);
 }
