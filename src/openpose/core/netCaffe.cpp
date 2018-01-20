@@ -9,6 +9,9 @@
 #include <openpose/utilities/fileSystem.hpp>
 #include <openpose/utilities/standard.hpp>
 #include <openpose/core/netCaffe.hpp>
+#ifdef USE_OPENCL
+    #include <openpose/core/clManager.hpp>
+#endif
 
 namespace op
 {
@@ -121,6 +124,7 @@ namespace op
                    caffe::Caffe::SetDevice(upImpl->mGpuId);
                    upImpl->upCaffeNet.reset(new caffe::Net<float>{upImpl->mCaffeProto, caffe::TEST, caffe::Caffe::GetDevice(upImpl->mGpuId,0)});
                    upImpl->upCaffeNet->CopyTrainedLayersFrom(upImpl->mCaffeTrainedModel);
+                   CLManager::getInstance();
                #else
                    upImpl->upCaffeNet.reset(new caffe::Net<float>{upImpl->mCaffeProto, caffe::TEST});
                    upImpl->upCaffeNet->CopyTrainedLayersFrom(upImpl->mCaffeTrainedModel);
