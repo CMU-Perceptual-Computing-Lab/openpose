@@ -15,6 +15,8 @@
     #pragma warning( disable: 4275 ) // non dll-interface structXXX used as base
 #endif
 
+#define MULTI_LINE_STRING(ARG) #ARG
+
 #define DATUM_BASE_NO_PTR std::vector<Datum>
 #define DATUM_BASE std::shared_ptr<DATUM_BASE_NO_PTR>
 #define DEFINE_TEMPLATE_DATUM(templateName) template class OP_API templateName<DATUM_BASE>

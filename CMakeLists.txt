@@ -418,6 +418,9 @@ if (UNIX AND NOT APPLE)
 
 endif (UNIX AND NOT APPLE)
 
+add_definitions( -DOPENPOSE_BINARY_DIR="${CMAKE_BINARY_DIR}" )
+add_definitions( -DOPENPOSE_INSTALL_DIR="${CMAKE_INSTALL_PREFIX}" )
+
 ### PROJECT INCLUDES
 # Specify the include directories
 include_directories(

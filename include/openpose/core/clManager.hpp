@@ -5,6 +5,7 @@
 #include <tuple>
 #include <map>
 #include <openpose/core/common.hpp>
+#include <fstream>
 
 #ifdef USE_OPENCL
     #define __CL_ENABLE_EXCEPTIONS
@@ -19,34 +20,28 @@ namespace op
     class OP_API CLManager
     {
     public:
-        explicit CLManager(int deviceType = CL_DEVICE_TYPE_GPU);
-        ~CLManager();
-        DELETE_COPY(CLManager);
         static CLManager& getInstance();
 
     private:
-
+        explicit CLManager(int deviceType = CL_DEVICE_TYPE_GPU);
+        ~CLManager();
+        DELETE_COPY(CLManager);
 
     private:
         std::map<std::string, cl::Program> clPrograms;
         std::map<std::string, cl::Kernel> clKernels;
-        std::string clPath;
         std::vector<cl::Platform> platforms;
         std::vector<cl::Device> devices;
         std::vector<cl::CommandQueue> queues;
         cl::Context context;
-        void initCL();
-        void createDevicesAndContext();
+        cl::Program buildProgramFromSource(std::string src, bool isFile = false);
 
     public:
-        void setCLPath(std::string path);
-        void destroyInstance();
-        cl::Context getContext();
-        cl::CommandQueue getQueue();
-        cl::Program buildProgramFromSource(std::string filename);
-        cl::Program buildProgramFromBinary(std::string filename);
-        void saveBinary(cl::Program* program, std::string filename);
-        cl::Device getDevice();
+        cl::Context& getContext();
+        cl::CommandQueue& getQueue(size_t gpuID = 0);
+        cl::Device& getDevice(size_t gpuID = 0);
+        bool buildKernelIntoManager(std::string kernelName, std::string src, bool isFile = false);
+        cl::Kernel& getKernelFromManager(std::string kernelName);
 
     };
 }

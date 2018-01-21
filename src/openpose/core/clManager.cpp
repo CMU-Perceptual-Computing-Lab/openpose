@@ -103,4 +103,84 @@ namespace op
 
     }
 
+    cl::Context& CLManager::getContext()
+    {
+        return context;
+    }
+
+    cl::CommandQueue& CLManager::getQueue(size_t gpuID)
+    {
+        if(gpuID >= queues.size())
+        {
+            throw std::runtime_error("Error: Invalid GPU in Queue");
+        }
+        return queues[gpuID];
+    }
+
+    cl::Device& CLManager::getDevice(size_t gpuID)
+    {
+        if(gpuID >= devices.size())
+        {
+            throw std::runtime_error("Error: Invalid Device ID");
+        }
+        return devices[gpuID];
+    }
+
+    cl::Program CLManager::buildProgramFromSource(std::string src, bool isFile)
+    {
+        cl::Program program;
+        try{
+            if(isFile)
+            {
+                std::ifstream programFile((char*) src.c_str());
+                std::string programString(std::istreambuf_iterator<char>(programFile),
+                                                  (std::istreambuf_iterator<char>()));
+                src = programString;
+            }
+            cl::Program::Sources source(1, std::make_pair(src.c_str(),
+                                                          src.length()+1));
+            program = cl::Program(context, source);
+            program.build(devices);
+        }
+        catch(cl::Error e) {
+            cerr << program.getBuildInfo<CL_PROGRAM_BUILD_STATUS>(getDevice(0)) << endl;
+            cerr << program.getBuildInfo<CL_PROGRAM_BUILD_OPTIONS>(getDevice(0)) << endl;
+            cerr << program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(getDevice(0)) << endl;
+            exit(-1);
+        }
+        return program;
+    }
+
+    bool CLManager::buildKernelIntoManager(std::string kernelName, std::string src, bool isFile){
+        // Program not built
+        if (!(clPrograms.find(src) != clPrograms.end()))
+        {
+            clPrograms[src] = buildProgramFromSource(src, isFile);
+        }
+
+        cl::Program& program = clPrograms[src];
+
+        // Kernel not built
+        if (!(clKernels.find(kernelName) != clKernels.end()))
+        {
+            clKernels[kernelName] = cl::Kernel(program, kernelName.c_str());
+            log("Kernel " + kernelName + " built successfully");
+            return true;
+        }
+        else
+        {
+            log("Kernel " + kernelName + " already built");
+            return false;
+        }
+    }
+
+    cl::Kernel& CLManager::getKernelFromManager(std::string kernelName){
+        if (!(clKernels.find(kernelName) != clKernels.end()))
+        {
+            throw std::runtime_error("Error: Kernel not found in Manager: " + kernelName);
+        }
+        return clKernels[kernelName];
+    }
+
+
 }
