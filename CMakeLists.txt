@@ -304,8 +304,13 @@ if (UNIX AND NOT APPLE)
       # TODO -- Find a better soln.
       #set(Caffe_LIBS ${CMAKE_BINARY_DIR}/caffe/lib/libcaffe.so)
 
-      if (NOT ${Caffe_FOUND})
-        add_custom_target(openpose_caffe_dummy ${CMAKE_COMMAND} ${CMAKE_SOURCE_DIR} DEPENDS openpose_caffe)
+      if (NOT Caffe_FOUND)
+        add_custom_target(TARGET ALL 
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND} 
+            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+            COMMENT "Caffe build complete"
+            VERBATIM)
       else ()
         add_custom_target(openpose_caffe_dummy)
       endif()
@@ -348,14 +353,15 @@ if (WIN32)
 endif (WIN32)
 
 ### ADD SUBDIRECTORIES
-
-add_subdirectory(src)
-if (BUILD_EXAMPLES)
-  add_subdirectory(examples)
-  if (WITH_3D)
-    add_subdirectory(examples_beta)
-  endif (WITH_3D)
-endif (BUILD_EXAMPLES)
+if (Caffe_FOUND)
+  add_subdirectory(src)
+  if (BUILD_EXAMPLES)
+    add_subdirectory(examples)
+    if (WITH_3D)
+      add_subdirectory(examples_beta)
+    endif (WITH_3D)
+  endif (BUILD_EXAMPLES)
+endif (Caffe_FOUND)
 
 ### DOWNLOAD MODELS
 
@@ -401,6 +407,7 @@ endif (UNIX AND NOT APPLE)
 ### INSTALL
 
 if (UNIX AND NOT APPLE)
+  if (Caffe_FOUND)
   # Install the headers
   install(DIRECTORY ${CMAKE_SOURCE_DIR}/include/openpose DESTINATION include)
   install(EXPORT OpenPose DESTINATION lib/OpenPose)
@@ -425,4 +432,5 @@ if (UNIX AND NOT APPLE)
 
   add_custom_target(uninstall
       COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
+  endif (Caffe_FOUND)
 endif (UNIX AND NOT APPLE)
