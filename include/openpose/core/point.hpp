@@ -155,7 +155,6 @@ namespace op
     template<typename T>
     std::ostream &operator<<(std::ostream& strm, const op::Point<T>& obj)
     {
-
         strm << obj.toString();
         return strm;
     }
