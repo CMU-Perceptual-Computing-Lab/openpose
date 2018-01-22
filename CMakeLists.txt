@@ -44,7 +44,7 @@ if (WIN32)
   # sdl flags causes error -- error : unknown attribute \"guard\"
 
   set(CMAKE_CONFIGURATION_TYPES Debug Release CACHE TYPE INTERNAL FORCE)
-  
+
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
   string(REPLACE "/W3" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
   string(REPLACE "/GR" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
@@ -54,7 +54,7 @@ if (WIN32)
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Ot /Oi /Gy /Z7")
 
   set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /LTCG:incremental /OPT:REF /OPT:ICF")
-  
+
   string(REPLACE "/MDd" "/MD" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
   string(REPLACE "/Zi" "/Z7" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
   string(REPLACE "/RTC1" "" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
@@ -65,10 +65,10 @@ elseif (UNIX AND NOT APPLE)
 endif (WIN32)
 
 # C++ additional flags
-if(CMAKE_COMPILER_IS_GNUCXX)
+if (CMAKE_COMPILER_IS_GNUCXX)
   message(STATUS "GCC detected, adding compile flags")
   set(OP_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp -Wpedantic -Wall -Wextra -Wfatal-errors")
-endif(CMAKE_COMPILER_IS_GNUCXX)
+endif (CMAKE_COMPILER_IS_GNUCXX)
 
 
 ### PROJECT OPTIONS
@@ -107,15 +107,16 @@ endif (WIN32)
 
 # Set the acceleration library
 set(GPU_MODE CUDA CACHE STRING "Select the acceleration GPU library or CPU otherwise.")
-set_property(CACHE GPU_MODE PROPERTY STRINGS CPU_ONLY)
+# set_property(CACHE GPU_MODE PROPERTY STRINGS CPU_ONLY)
 
-# Test for CUDA or OpenCL
-find_package(CUDA)
-if(CUDA_FOUND)
-  set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA CPU_ONLY)
-endif ()
+# # Test for CUDA or OpenCL
+# find_package(CUDA)
+# if (CUDA_FOUND)
+#   set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA CPU_ONLY)
+# endif ()
+# # set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA OPENCL CPU_ONLY)
+set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA)
 
-# set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA OPENCL CPU_ONLY)
 if (${GPU_MODE} MATCHES "CUDA")
   # OpenPose flags
   add_definitions(-DUSE_CUDA)
@@ -157,7 +158,7 @@ endif (WIN32)
 # Download the models
 option(DOWNLOAD_COCO_MODEL "Download COCO model." ON)
 option(DOWNLOAD_MPI_MODEL "Download MPI model." OFF)
-option(DOWNLOAD_HAND_MODEL "Download hand model." ON)  
+option(DOWNLOAD_HAND_MODEL "Download hand model." ON)
 option(DOWNLOAD_FACE_MODEL "Download face model." ON)
 
 # More options
@@ -195,8 +196,8 @@ if (UNIX AND NOT APPLE)
       set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
       set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
       set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
-    endif()
-  endif()
+    endif ()
+  endif ()
 
   if (${GPU_MODE} MATCHES "CUDA")
     # Set CUDA Flags
@@ -236,9 +237,9 @@ include(cmake/Utils.cmake)
 
 if (WIN32)
 
-  if("${CMAKE_VERSION}" VERSION_GREATER 3.6.3)
+  if ("${CMAKE_VERSION}" VERSION_GREATER 3.6.3)
     set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT OpenPoseDemo)
-  endif("${CMAKE_VERSION}" VERSION_GREATER 3.6.3)
+  endif ("${CMAKE_VERSION}" VERSION_GREATER 3.6.3)
 
   set_property(GLOBAL PROPERTY USE_FOLDERS ON)
   set(FIND_LIB_PREFIX ${CMAKE_SOURCE_DIR}/3rdparty/windows)
@@ -311,18 +312,18 @@ if (UNIX AND NOT APPLE)
       # Check if pulled
       file(GLOB CAFFE_DIR_VALID ${CMAKE_SOURCE_DIR}/3rdparty/caffe/*)
       list(LENGTH CAFFE_DIR_VALID CAFFE_DIR_VALID_LENGTH)
-      if(CAFFE_DIR_VALID_LENGTH EQUAL 0)
+      if (CAFFE_DIR_VALID_LENGTH EQUAL 0)
         execute_process(COMMAND git submodule update --init --recursive)
       else()
         message(STATUS "Caffe has already been downloaded.")
-      endif()
+      endif ()
 
       # Build Process
       set(CAFFE_CPU_ONLY OFF)
       if (${GPU_MODE} MATCHES "CUDA")
         execute_process(COMMAND git checkout master WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
       elseif (${GPU_MODE} MATCHES "CPU_ONLY")
-        if(USE_MKL)
+        if (USE_MKL)
           execute_process(COMMAND git checkout intel WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
           execute_process(COMMAND sh prepare_mkl.sh WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe/external/mkl OUTPUT_VARIABLE rv)
           set( MLIST ${rv} )
@@ -354,7 +355,7 @@ if (UNIX AND NOT APPLE)
       set(CAFFE_URL ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
 
       # One for Intel Branch and one for Master
-      if(USE_MKL)
+      if (USE_MKL)
         ExternalProject_Add(openpose_caffe
           SOURCE_DIR ${CAFFE_URL}
           PREFIX ${CAFFE_PREFIX}
