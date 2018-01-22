@@ -10,7 +10,6 @@ OpenPose - Installation using CMake
 6. [Uninstallation](#uninstallation)
 7. [Optional Settings](#optional-settings)
     1. [MPI Model](#mpi-model)
-    2. [CPU Version](#cpu-version)
     3. [Custom Caffe (Ubuntu Only)](#custom-caffe-ubuntu-only)
     4. [Custom OpenCV (Ubuntu Only)](#custom-opencv-ubuntu-only)
     5. [OpenPose 3D Reconstruction Demo (Windows Only)](#openpose-3d-reconstruction-demo-windows-only)
@@ -161,22 +160,6 @@ In order to uninstall OpenPose:
 #### MPI Model
 By default, the body MPI model is not downloaded. You can download it by turning on the `DOWNLOAD_MPI_MODEL`. It's slightly faster but less accurate and has less keypoints than the COCO body model.
 
-
-
-#### CPU Version
-
-If an Nvidia GPU is not available on your system, OpenPose will automatically default to a CPU version. On Windows, this will use the default version of Caffe or one provided by the user on the CPU. To manually selec the CPU Version, open CMake GUI mentioned above, and set the `GPU_MODE` flag to `CPU_ONLY`.
-
-The CPU Version is ~200 times slower than the GPU Version at the default resolution of `-1x368`, taking about 10 to 20 seconds per image, instead of 0.05 to 0.1s on a GPU. However, if you have Ubuntu as an OS, OpenPose will link against the Intel MKL (Math Kernel Library) of Caffe, which will increase the speed to 0.3 to 0.8 seconds per image.
-
-On Ubuntu, the `USE_MKL` flag is set to true by default. This will select the intel branch of Caffe and link against that automatically. Unfortunately, the intel branch of Caffe is not supported on Windows yet. You have the ability to configure the environmental variables `MKL_NUM_THREADS` and `OMP_NUM_THREADS`. They are set at an optimum parameter level by default. However, you can manually tweak these by copying the following commands below into your terminal window, before running any openpose application. Eg:
-
-```
-export MKL_NUM_THREADS="8" # Number of threads
-export OMP_NUM_THREADS="8"
-```
-
-More information on the performance metrics on the CPU with MKL can be found [here](https://github.com/CMU-Perceptual-Computing-Lab/openpose#speeding-up-openpose-and-benchmark)
 
 
 #### Custom Caffe (Ubuntu Only)
