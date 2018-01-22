@@ -71,12 +71,6 @@ namespace op
          */
         std::string toString() const;
 
-        /**
-         * cout operator overload calling toString() function
-         * @return std::ostream containing output from toString()
-         */
-        friend std::ostream &operator<<(std::ostream& strm, const op::Rectangle<T>& obj);
-
         // -------------------------------------------------- Basic Operators -------------------------------------------------- //
         Rectangle<T>& operator*=(const T value);
 
@@ -90,6 +84,21 @@ namespace op
     // Static methods
     template<typename T>
     Rectangle<T> recenter(const Rectangle<T>& rectangle, const T newWidth, const T newHeight);
+
+    template<typename T>
+    std::ostream &operator<<(std::ostream& strm, const op::Rectangle<T>& obj)
+    {
+        try
+        {
+            strm << obj.toString();
+            return strm;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return "";
+        }
+    }
 }
 
 #endif // OPENPOSE_CORE_RECTANGLE_HPP

@@ -349,12 +349,6 @@ namespace op
          */
         const std::string toString() const;
 
-        /**
-         * cout operator overload calling toString() function
-         * @return std::ostream containing output from toString()
-         */
-        friend std::ostream &operator<<(std::ostream& strm, const op::Array<T>& obj);
-
     private:
         std::vector<int> mSize;
         size_t mVolume;
@@ -389,6 +383,21 @@ namespace op
          */
         void setCvMatFromSharedPtr();
     };
+
+    template<typename T>
+    std::ostream &operator<<(std::ostream& strm, const op::Array<T>& obj)
+    {
+        try
+        {
+            strm << obj.toString();
+            return strm;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return "";
+        }
+    }
 }
 
 #endif // OPENPOSE_CORE_ARRAY_HPP

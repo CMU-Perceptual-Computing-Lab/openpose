@@ -57,12 +57,6 @@ namespace op
          */
         std::string toString() const;
 
-        /**
-         * cout operator overload calling toString() function
-         * @return std::ostream containing output from toString()
-         */
-        friend std::ostream &operator<<(std::ostream& strm, const op::Point<T>& obj);
-
         // -------------------------------------------------- Comparison operators -------------------------------------------------- //
         /**
          * Less comparison operator.
@@ -153,6 +147,18 @@ namespace op
 
         Point<T> operator/(const T value) const;
     };
+
+    /**
+     * cout operator overload calling toString() function
+     * @return std::ostream containing output from toString()
+     */
+    template<typename T>
+    std::ostream &operator<<(std::ostream& strm, const op::Point<T>& obj)
+    {
+
+        strm << obj.toString();
+        return strm;
+    }
 }
 
 #endif // OPENPOSE_CORE_POINT_HPP
