@@ -1,5 +1,4 @@
 ### VERSION INFO
-
 set(OpenPose_VERSION_MAJOR 1)
 set(OpenPose_VERSION_MINOR 2)
 set(OpenPose_VERSION_PATCH 1)
@@ -13,14 +12,13 @@ cmake_minimum_required(VERSION 2.8.7 FATAL_ERROR) # min. cmake version recommend
 
 
 ### FIND THE OS
-
 if (WIN32) # OS is Windows
   message(STATUS "Windows OS support currently is experimental.")
   message(STATUS "Feel free to send us any suggestion or bug you encounter.")
 elseif (APPLE) # OS is Apple
   message(FATAL_ERROR "Apple OS is not currently supported.")
 elseif (UNIX AND NOT APPLE) # OS is a Linux distribution (it assumes Ubuntu)
-  set(EXECUTE_COMMAND lsb_release -rs) 
+  set(EXECUTE_COMMAND lsb_release -rs)
   execute_process(COMMAND ${EXECUTE_COMMAND} OUTPUT_VARIABLE UBUNTU_VERSION)
   string(SUBSTRING ${UBUNTU_VERSION} 0 2 UBUNTU_MAJOR_VERSION)
   if (${UBUNTU_MAJOR_VERSION} MATCHES "16") # if 16
@@ -32,10 +30,10 @@ elseif (UNIX AND NOT APPLE) # OS is a Linux distribution (it assumes Ubuntu)
   endif (${UBUNTU_MAJOR_VERSION} MATCHES "16")
 endif ()
 
-### FLAGS
 
+### FLAGS
 if (WIN32)
-   # TODO -- Makeshift solution -- This prevents rerunning build again
+  # TODO -- Makeshift solution -- This prevents rerunning build again
   # https://gitlab.kitware.com/cmake/cmake/issues/16783
   set(CMAKE_SUPPRESS_REGENERATION ON)
 
@@ -61,19 +59,19 @@ if (WIN32)
   string(REPLACE "/Zi" "/Z7" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
   string(REPLACE "/RTC1" "" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
 elseif (UNIX AND NOT APPLE)
-  # Turn on C++11 
+  # Turn on C++11
   add_definitions(-std=c++11)
   set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 endif (WIN32)
 
 # C++ additional flags
-if(CMAKE_COMPILER_IS_GNUCXX)
-    message(STATUS "GCC detected, adding compile flags")
-    set(OP_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp -Wpedantic -Wall -Wextra -Wfatal-errors")
-endif(CMAKE_COMPILER_IS_GNUCXX)
+if (CMAKE_COMPILER_IS_GNUCXX)
+  message(STATUS "GCC detected, adding compile flags")
+  set(OP_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp -Wpedantic -Wall -Wextra -Wfatal-errors")
+endif (CMAKE_COMPILER_IS_GNUCXX)
+
 
 ### PROJECT OPTIONS
-
 # Select the DL Framework
 set(DL_FRAMEWORK CAFFE CACHE STRING "Select Deep Learning Framework.")
 set_property(CACHE DL_FRAMEWORK PROPERTY STRINGS CAFFE)
@@ -83,7 +81,7 @@ set_property(CACHE DL_FRAMEWORK PROPERTY STRINGS CAFFE)
 include(CMakeDependentOption)
 if (${DL_FRAMEWORK} MATCHES "CAFFE")
   CMAKE_DEPENDENT_OPTION(BUILD_CAFFE "Build Caffe as part of OpenPose." ON
-      "DL_FRAMEWORK" ON)
+    "DL_FRAMEWORK" ON)
   # OpenPose flags
   add_definitions(-DUSE_CAFFE)
 endif (${DL_FRAMEWORK} MATCHES "CAFFE")
@@ -108,15 +106,32 @@ if (WIN32)
 endif (WIN32)
 
 # Set the acceleration library
-set(GPU_MODE CUDA CACHE STRING "Select the acceleration GPU library or CPU otherwise.")
+# set(GPU_MODE CUDA CACHE STRING "Select the acceleration GPU library or CPU otherwise.")
+# set_property(CACHE GPU_MODE PROPERTY STRINGS CPU_ONLY)
+
+# # Test for CUDA or OpenCL
+# find_package(CUDA)
+# if (CUDA_FOUND)
+#   set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA CPU_ONLY)
+# endif ()
+# # set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA OPENCL CPU_ONLY)
 set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA)
-# set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA OPENCL CPU_ONLY)
+
 if (${GPU_MODE} MATCHES "CUDA")
   # OpenPose flags
   add_definitions(-DUSE_CUDA)
+  message(STATUS "Building with CUDA")
 elseif (${GPU_MODE} MATCHES "CPU_ONLY")
   # OpenPose flag for Caffe
   add_definitions(-DCPU_ONLY)
+  message(STATUS "Building CPU Only")
+endif ()
+
+# Intel branch with MKL Support
+if (${GPU_MODE} MATCHES "CPU_ONLY")
+  if (UNIX AND NOT APPLE)
+    OPTION(USE_MKL "Use MKL Intel Branch." ON)
+  endif ()
 endif ()
 
 # Set/disable profiler
@@ -140,7 +155,6 @@ if (WIN32)
   option(WITH_3D "Build OpenPose 3D Reconstruction demo." OFF)
 endif (WIN32)
 
- 
 # Download the models
 option(DOWNLOAD_COCO_MODEL "Download COCO model." ON)
 option(DOWNLOAD_MPI_MODEL "Download MPI model." OFF)
@@ -157,41 +171,58 @@ option(BUILD_SHARED_LIBS "Build as shared lib" ON)
 # Speed profiler
 option(PROFILER_ENABLED "If enabled, OpenPose will be able to print out speed information at runtime." OFF)
 
-### FIND REQUIRED PACKAGES
 
+
+### FIND REQUIRED PACKAGES
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
 
-find_package(CUDA)
-  
+if (${GPU_MODE} MATCHES "CUDA")
+  find_package(CUDA)
+endif ()
+
 if (UNIX AND NOT APPLE)
-  include(cmake/Cuda.cmake)
-  find_package(CuDNN)
+  if (${GPU_MODE} MATCHES "CUDA")
+    include(cmake/Cuda.cmake)
+    find_package(CuDNN)
+  endif ()
   find_package(GFlags)
   find_package(Glog)
   find_package(OpenCV)
 
-  # Set CUDA Flags
-  set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -std=c++11")
+  # OpenMP
+  if (${GPU_MODE} MATCHES "CPU_ONLY")
+    find_package(OpenMP)
+    if (OPENMP_FOUND)
+      set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+      set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+      set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+    endif ()
+  endif ()
 
-  if (NOT CUDA_FOUND)
-    message(STATUS "CUDA not found.") 
-    execute_process(COMMAND cat install_cuda.sh WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/ubuntu)
-    message(FATAL_ERROR "Install CUDA using the above commands.")
-  endif (NOT CUDA_FOUND)
+  if (${GPU_MODE} MATCHES "CUDA")
+    # Set CUDA Flags
+    set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -std=c++11")
 
-  if (USE_CUDNN AND NOT CUDNN_FOUND)
-    message(STATUS "cuDNN not found.") 
-    execute_process(COMMAND cat install_cudnn.sh WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/ubuntu)
-    message(FATAL_ERROR "Install cuDNN using the above commands. or turn off cuDNN by setting USE_CUDNN to OFF.")
-  endif (USE_CUDNN AND NOT CUDNN_FOUND)
+    if (NOT CUDA_FOUND)
+      message(STATUS "CUDA not found.")
+      execute_process(COMMAND cat install_cuda.sh WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/ubuntu)
+      message(FATAL_ERROR "Install CUDA using the above commands.")
+    endif (NOT CUDA_FOUND)
+
+    if (USE_CUDNN AND NOT CUDNN_FOUND)
+      message(STATUS "cuDNN not found.")
+      execute_process(COMMAND cat install_cudnn.sh WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/ubuntu)
+      message(FATAL_ERROR "Install cuDNN using the above commands. or turn off cuDNN by setting USE_CUDNN to OFF.")
+    endif (USE_CUDNN AND NOT CUDNN_FOUND)
+  endif ()
 
   if (NOT GLOG_FOUND)
-    message(FATAL_ERROR "Glog not found. Install Glog from the command line using the command(s) -\ 
-        sudo apt-get install libgoogle-glog-dev")
+    message(FATAL_ERROR "Glog not found. Install Glog from the command line using the command(s) -\
+      sudo apt-get install libgoogle-glog-dev")
   endif (NOT GLOG_FOUND)
 
   if (NOT GFLAGS_FOUND)
-    message(FATAL_ERROR "GFlags not found. Install GFlags from the command line using the command(s) --\ 
+    message(FATAL_ERROR "GFlags not found. Install GFlags from the command line using the command(s) --\
       sudo apt-get install libgflags-dev")
   endif (NOT GFLAGS_FOUND)
 
@@ -206,9 +237,9 @@ include(cmake/Utils.cmake)
 
 if (WIN32)
 
-  if("${CMAKE_VERSION}" VERSION_GREATER 3.6.3)
+  if ("${CMAKE_VERSION}" VERSION_GREATER 3.6.3)
     set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT OpenPoseDemo)
-  endif("${CMAKE_VERSION}" VERSION_GREATER 3.6.3)
+  endif ("${CMAKE_VERSION}" VERSION_GREATER 3.6.3)
 
   set_property(GLOBAL PROPERTY USE_FOLDERS ON)
   set(FIND_LIB_PREFIX ${CMAKE_SOURCE_DIR}/3rdparty/windows)
@@ -251,8 +282,9 @@ if (WIN32)
   endif (WITH_3D)
 endif (WIN32)
 
-### CAFFE
 
+
+### CAFFE
 if (UNIX AND NOT APPLE)
 
   if (${DL_FRAMEWORK} MATCHES "CAFFE")
@@ -265,7 +297,7 @@ if (UNIX AND NOT APPLE)
     endif (Caffe_INCLUDE_DIRS AND Caffe_LIBS AND NOT BUILD_CAFFE)
 
     # Check if caffe is installed in known paths
-    if (NOT Caffe_FOUND AND NOT BUILD_CAFFE) 
+    if (NOT Caffe_FOUND AND NOT BUILD_CAFFE)
       message(STATUS "Looking for caffe around in expected paths.")
       find_package(Caffe)
     endif (NOT Caffe_FOUND AND NOT BUILD_CAFFE)
@@ -275,27 +307,88 @@ if (UNIX AND NOT APPLE)
 
       # Download Caffe
       message(STATUS "Caffe will be downloaded from source now. NOTE: This process might take several minutes depending
-          on your internet connection.")
-      execute_process(COMMAND git submodule update --init --recursive)
-      
+        on your internet connection.")
+
+      # Check if pulled
+      file(GLOB CAFFE_DIR_VALID ${CMAKE_SOURCE_DIR}/3rdparty/caffe/*)
+      list(LENGTH CAFFE_DIR_VALID CAFFE_DIR_VALID_LENGTH)
+      if (CAFFE_DIR_VALID_LENGTH EQUAL 0)
+        execute_process(COMMAND git submodule update --init --recursive)
+      else()
+        message(STATUS "Caffe has already been downloaded.")
+      endif ()
+
+      # Build Process
+      set(CAFFE_CPU_ONLY OFF)
+      if (${GPU_MODE} MATCHES "CUDA")
+        execute_process(COMMAND git checkout master WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
+      elseif (${GPU_MODE} MATCHES "CPU_ONLY")
+        if (USE_MKL)
+          execute_process(COMMAND git checkout intel WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
+          execute_process(COMMAND sh prepare_mkl.sh WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe/external/mkl OUTPUT_VARIABLE rv)
+          set( MLIST ${rv} )
+          separate_arguments(MLIST)
+          list(GET MLIST 0 MKL_PATH)
+          file(GLOB MKL_SO
+            "${MKL_PATH}lib/*"
+            )
+          file(COPY ${MKL_SO} DESTINATION ${CMAKE_BINARY_DIR}/caffe)
+
+          set(MKL_LIBS
+            "${CMAKE_BINARY_DIR}/caffe/libiomp5.so"
+            "${CMAKE_BINARY_DIR}/caffe/libmklml_intel.so"
+            "${CMAKE_BINARY_DIR}/caffe/lib/libmkldnn.so.0"
+            "${CMAKE_BINARY_DIR}/caffe/lib/libmkldnn.so"
+            "${CMAKE_BINARY_DIR}/caffe/lib/libmkldnn.so.0.12.0"
+            )
+        else ()
+          execute_process(COMMAND git checkout master WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
+        endif ()
+        set(CAFFE_CPU_ONLY ON)
+        set(USE_CUDNN OFF)
+      endif ()
+
       # Build Caffe
       message(STATUS "Caffe will be built from source now.")
       include(ExternalProject)
       set(CAFFE_PREFIX caffe)
       set(CAFFE_URL ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
 
-      ExternalProject_Add(openpose_caffe
+      # One for Intel Branch and one for Master
+      if (USE_MKL)
+        ExternalProject_Add(openpose_caffe
           SOURCE_DIR ${CAFFE_URL}
           PREFIX ${CAFFE_PREFIX}
           CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
-              -DUSE_CUDNN=${USE_CUDNN}
-              -DBUILD_docs=OFF
-              -DBUILD_python=OFF
-              -DBUILD_python_layer=OFF
-              -DUSE_LEVELDB=OFF
-              -DUSE_LMDB=OFF
-              -DUSE_OPENCV=OFF)
-              # -DOpenCV_DIR=${OpenCV_DIR})
+          -DMKLDNN_INSTALL_DIR:PATH=<INSTALL_DIR>
+          -DUSE_CUDNN=${USE_CUDNN}
+          -DBUILD_python=OFF
+          -DCPU_ONLY=${CAFFE_CPU_ONLY}
+          -DUSE_MKL2017_AS_DEFAULT_ENGINE=${CAFFE_CPU_ONLY}
+          -DCMAKE_BUILD_TYPE=Release
+          -DBUILD_docs=OFF
+          -DBUILD_python=OFF
+          -DBUILD_python_layer=OFF
+          -DUSE_LEVELDB=OFF
+          -DUSE_LMDB=OFF
+          -DUSE_OPENCV=OFF)
+          # -DOpenCV_DIR=${OpenCV_DIR})
+      else ()
+        ExternalProject_Add(openpose_caffe
+          SOURCE_DIR ${CAFFE_URL}
+          PREFIX ${CAFFE_PREFIX}
+          CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
+          -DUSE_CUDNN=${USE_CUDNN}
+          -DCPU_ONLY=${CAFFE_CPU_ONLY}
+          -DCMAKE_BUILD_TYPE=Release
+          -DBUILD_docs=OFF
+          -DBUILD_python=OFF
+          -DBUILD_python_layer=OFF
+          -DUSE_LEVELDB=OFF
+          -DUSE_LMDB=OFF
+          -DUSE_OPENCV=OFF)
+          # -DOpenCV_DIR=${OpenCV_DIR})
+      endif ()
 
       ExternalProject_Get_Property(openpose_caffe install_dir)
 
@@ -306,8 +399,8 @@ if (UNIX AND NOT APPLE)
     endif (BUILD_CAFFE)
 
     if (NOT Caffe_FOUND AND NOT BUILD_CAFFE)
-      message(FATAL_ERROR "Caffe not found. Either turn on the BUILD_CAFFE option or specify the path of Caffe includes 
-          and libs using -DCaffe_INCLUDE_DIRS and -DCaffe_LIBS")
+      message(FATAL_ERROR "Caffe not found. Either turn on the BUILD_CAFFE option or specify the path of Caffe includes
+        and libs using -DCaffe_INCLUDE_DIRS and -DCaffe_LIBS")
     endif (NOT Caffe_FOUND AND NOT BUILD_CAFFE)
 
   endif (${DL_FRAMEWORK} MATCHES "CAFFE")
@@ -315,15 +408,17 @@ if (UNIX AND NOT APPLE)
 endif (UNIX AND NOT APPLE)
 
 ### PROJECT INCLUDES
-
 # Specify the include directories
 include_directories(
   include
-  ${CUDA_INCLUDE_DIRS}
   ${GFLAGS_INCLUDE_DIR}
   ${GLOG_INCLUDE_DIR}
   ${Caffe_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS})
+if (${GPU_MODE} MATCHES "CUDA")
+  include_directories(
+    ${CUDA_INCLUDE_DIRS})
+endif ()
 if (WIN32)
   include_directories(
     ${Boost_INCLUDE_DIRS}
@@ -345,27 +440,27 @@ if (BUILD_EXAMPLES)
   endif (WITH_3D)
 endif (BUILD_EXAMPLES)
 
-### DOWNLOAD MODELS
 
+### DOWNLOAD MODELS
 # Download the models if flag is set
 message(STATUS "Download the models.")
 
 # URL to the models
 set(OPENPOSE_URL "http://posefs1.perception.cs.cmu.edu/OpenPose/models/")
-  
+
 download_model("body (COCO)" ${DOWNLOAD_COCO_MODEL} pose/coco/pose_iter_440000.caffemodel
-    5156d31f670511fce9b4e28b403f2939) # Body (COCO)
+  5156d31f670511fce9b4e28b403f2939) # Body (COCO)
 download_model("body (MPI)" ${DOWNLOAD_MPI_MODEL} pose/mpi/pose_iter_160000.caffemodel
-    2ca0990c7562bd7ae03f3f54afa96e00) # Body (MPI)
+  2ca0990c7562bd7ae03f3f54afa96e00) # Body (MPI)
 download_model("face" ${DOWNLOAD_FACE_MODEL} face/pose_iter_116000.caffemodel
-    e747180d728fa4e4418c465828384333) # Face
+  e747180d728fa4e4418c465828384333) # Face
 download_model("hand" ${DOWNLOAD_HAND_MODEL} hand/pose_iter_102000.caffemodel
-    a82cfc3fea7c62f159e11bd3674c1531) # Hand
+  a82cfc3fea7c62f159e11bd3674c1531) # Hand
 
 message(STATUS "Models Downloaded.")
 
-### GENERATE DOCUMENTATION
 
+### GENERATE DOCUMENTATION
 if (UNIX AND NOT APPLE)
 
   if (BUILD_DOCS)
@@ -376,19 +471,19 @@ if (UNIX AND NOT APPLE)
 
       # Custom target to build the documentation
       add_custom_target(doc_doxygen ALL
-          COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_FILE}
-          WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/doc
-          COMMENT "Generating API documentation with Doxygen"
-          VERBATIM)
+        COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_FILE}
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/doc
+        COMMENT "Generating API documentation with Doxygen"
+        VERBATIM)
     else (DOXYGEN_FOUND)
-      message("Doxygen need to be installed to generate the doxygen documentation")
+      message(FATAL_ERROR "Doxygen need to be installed to generate the doxygen documentation")
     endif (DOXYGEN_FOUND)
   endif (BUILD_DOCS)
 
 endif (UNIX AND NOT APPLE)
 
-### INSTALL
 
+### INSTALL
 if (UNIX AND NOT APPLE)
   # Install the headers
   install(DIRECTORY ${CMAKE_SOURCE_DIR}/include/openpose DESTINATION include)
@@ -400,18 +495,18 @@ if (UNIX AND NOT APPLE)
 
   # Compute installation prefix relative to this file
   configure_file(
-      ${CMAKE_SOURCE_DIR}/cmake/OpenPoseConfig.cmake.in
-      ${CMAKE_BINARY_DIR}/cmake/OpenPoseConfig.cmake @ONLY)
+    ${CMAKE_SOURCE_DIR}/cmake/OpenPoseConfig.cmake.in
+    ${CMAKE_BINARY_DIR}/cmake/OpenPoseConfig.cmake @ONLY)
 
   install(FILES ${CMAKE_BINARY_DIR}/cmake/OpenPoseConfig.cmake
-      DESTINATION lib/OpenPose)
+    DESTINATION lib/OpenPose)
 
   # Uninstall target
   configure_file(
-      "${CMAKE_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
-      "${CMAKE_BINARY_DIR}/cmake_uninstall.cmake"
-      IMMEDIATE @ONLY)
+    "${CMAKE_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
+    "${CMAKE_BINARY_DIR}/cmake_uninstall.cmake"
+    IMMEDIATE @ONLY)
 
   add_custom_target(uninstall
-      COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
+    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
 endif (UNIX AND NOT APPLE)
