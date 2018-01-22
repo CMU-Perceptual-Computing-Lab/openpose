@@ -143,6 +143,13 @@ namespace op
     }
 
     template<typename T>
+    std::ostream &operator<<(std::ostream& strm, const op::Rectangle<T>& obj)
+    {
+        strm << obj.toString();
+        return strm;
+    }
+
+    template<typename T>
     Rectangle<T>& Rectangle<T>::operator*=(const T value)
     {
         try

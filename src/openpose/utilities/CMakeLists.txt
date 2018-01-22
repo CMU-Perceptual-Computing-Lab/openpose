@@ -20,7 +20,7 @@ if (UNIX AND NOT APPLE)
     add_library(openpose_utilities ${SOURCES_OP_UTILITIES})
   endif ()
 
-  target_link_libraries(openpose_utilities openpose_producer openpose_filestream ${MKL_LIBS})
+  target_link_libraries(openpose_utilities openpose_producer openpose_filestream)
 
   install(TARGETS openpose_utilities
       EXPORT OpenPose

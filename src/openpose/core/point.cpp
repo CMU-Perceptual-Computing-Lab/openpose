@@ -1,6 +1,7 @@
 #include <openpose/core/macros.hpp>
 #include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/core/point.hpp>
+#include <ostream>
 
 namespace op
 {
@@ -85,6 +86,13 @@ namespace op
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             return "";
         }
+    }
+
+    template<typename T>
+    std::ostream &operator<<(std::ostream& strm, const op::Point<T>& obj)
+    {
+        strm << obj.toString();
+        return strm;
     }
 
     template<typename T>
