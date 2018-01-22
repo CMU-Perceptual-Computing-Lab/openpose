@@ -14,10 +14,7 @@ foreach(EXAMPLE_FILE ${EXAMPLE_FILES})
 
   message(STATUS "Adding Example ${EXE_NAME}")
   add_executable(${EXE_NAME} ${EXAMPLE_FILE})
-  target_link_libraries(${EXE_NAME} openpose ${GLOG_LIBRARY} ${GFLAGS_LIBRARY})
-  if (${Caffe_FOUND})
-    target_link_libraries( ${EXE_NAME} openpose ${Caffe_LIBS})
-  endif (${Caffe_FOUND})
+  target_link_libraries(${EXE_NAME} openpose ${GLOG_LIBRARY} ${GFLAGS_LIBRARY} ${Caffe_LIBS})
   
   if (WIN32)
     set_property(TARGET ${EXE_NAME} PROPERTY FOLDER "Examples/Tutorial/Pose")

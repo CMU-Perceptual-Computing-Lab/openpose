@@ -20,10 +20,8 @@ cuda_add_library(openpose ${SOURCES_OPENPOSE} ${OP_HEADERS})
 
 # Ubuntu
 if(UNIX AND NOT APPLE)
-  target_link_libraries(openpose ${OpenCV_LIBS} ${GFLAGS_LIBRARY} ${GLOG_LIBRARY})
-  if (${Caffe_FOUND})
-    target_link_libraries(openpose ${Caffe_LIBS})
-  endif (${Caffe_FOUND})
+  target_link_libraries(openpose ${OpenCV_LIBS} ${Caffe_LIBS}
+      ${GFLAGS_LIBRARY} ${GLOG_LIBRARY})
   if (CMAKE_COMPILER_IS_GNUCXX)
     foreach (SUB_DIR ${SUB_DIRS})
         set_target_properties(openpose_${SUB_DIR} PROPERTIES COMPILE_FLAGS ${OP_CXX_FLAGS})
@@ -54,9 +52,7 @@ endif (UNIX AND NOT APPLE)
 
 if (UNIX AND NOT APPLE)
   add_library(caffe SHARED IMPORTED)
-  if (${Caffe_FOUND})
-    set_property(TARGET caffe PROPERTY IMPORTED_LOCATION ${Caffe_LIBS})
-  endif (${Caffe_FOUND})
+  set_property(TARGET caffe PROPERTY IMPORTED_LOCATION ${Caffe_LIBS})
   target_link_libraries(openpose caffe)
 
   if (BUILD_CAFFE)
