@@ -44,7 +44,7 @@ if (WIN32)
   # sdl flags causes error -- error : unknown attribute \"guard\"
 
   set(CMAKE_CONFIGURATION_TYPES Debug Release CACHE TYPE INTERNAL FORCE)
-
+  
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
   string(REPLACE "/W3" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
   string(REPLACE "/GR" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
@@ -54,7 +54,7 @@ if (WIN32)
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Ot /Oi /Gy /Z7")
 
   set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /LTCG:incremental /OPT:REF /OPT:ICF")
-
+  
   string(REPLACE "/MDd" "/MD" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
   string(REPLACE "/Zi" "/Z7" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
   string(REPLACE "/RTC1" "" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
@@ -158,7 +158,7 @@ endif (WIN32)
 # Download the models
 option(DOWNLOAD_COCO_MODEL "Download COCO model." ON)
 option(DOWNLOAD_MPI_MODEL "Download MPI model." OFF)
-option(DOWNLOAD_HAND_MODEL "Download hand model." ON)
+option(DOWNLOAD_HAND_MODEL "Download hand model." ON)  
 option(DOWNLOAD_FACE_MODEL "Download face model." ON)
 
 # More options

@@ -41,6 +41,11 @@ else
 6. Functions arguments:
     1. It should first include the variables to be edited, and secondtly the const variables.
     2. Any variable that is not gonna be modified must be added with `const`.
+7. Pointers:
+    1. Pointers must be avoided if possible.
+    2. If a pointer must be used, std::unique_ptr must be always be used.
+    3. If the pointer must be shared, then std::shared_ptr.
+    4. No `delete` keyword is allowed in OpenPose.
 
 
 
