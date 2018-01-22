@@ -306,13 +306,9 @@ if (UNIX AND NOT APPLE)
 
       if (NOT Caffe_FOUND)
         add_custom_target(TARGET ALL 
-            POST_BUILD
-            COMMAND ${CMAKE_COMMAND} 
-            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+            COMMAND ${CMAKE_COMMAND} ${CMAKE_SOURCE_DIR}
             COMMENT "Caffe build complete"
             VERBATIM)
-      else ()
-        add_custom_target(openpose_caffe_dummy)
       endif()
 
     endif (BUILD_CAFFE)
