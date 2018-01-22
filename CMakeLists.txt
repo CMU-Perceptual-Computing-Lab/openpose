@@ -281,6 +281,7 @@ if (UNIX AND NOT APPLE)
       
       # Build Caffe
       message(STATUS "Caffe will be built from source now.")
+      find_package(Caffe)
       include(ExternalProject)
       set(CAFFE_PREFIX caffe)
       set(CAFFE_URL ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
@@ -299,10 +300,15 @@ if (UNIX AND NOT APPLE)
               # -DOpenCV_DIR=${OpenCV_DIR})
 
       ExternalProject_Get_Property(openpose_caffe install_dir)
-
-      set(Caffe_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/caffe/include)
+      #set(Caffe_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/caffe/include)
       # TODO -- Find a better soln.
-      set(Caffe_LIBS ${CMAKE_BINARY_DIR}/caffe/lib/libcaffe.so)
+      #set(Caffe_LIBS ${CMAKE_BINARY_DIR}/caffe/lib/libcaffe.so)
+
+      if (NOT ${Caffe_FOUND})
+        add_custom_target(openpose_caffe_dummy ${CMAKE_COMMAND} ${CMAKE_SOURCE_DIR} DEPENDS openpose_caffe)
+      else ()
+        add_custom_target(openpose_caffe_dummy)
+      endif()
 
     endif (BUILD_CAFFE)
 
@@ -323,8 +329,13 @@ include_directories(
   ${CUDA_INCLUDE_DIRS}
   ${GFLAGS_INCLUDE_DIR}
   ${GLOG_INCLUDE_DIR}
-  ${Caffe_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS})
+
+if (Caffe_FOUND)
+  include_directories(
+    ${Caffe_INCLUDE_DIRS})
+endif (Caffe_FOUND)
+
 if (WIN32)
   include_directories(
     ${Boost_INCLUDE_DIRS}
