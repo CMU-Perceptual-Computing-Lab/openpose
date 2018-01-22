@@ -12,7 +12,7 @@ elif [[ $ubuntu_version == *"16."* ]]; then
   sudo dpkg --install cuda-repo-ubuntu1604-8-0-local-ga2_8.0.61-1_amd64-deb
 fi
 sudo apt-get update
-sudo apt-get install cuda
+sudo apt-get install cuda-8-0
 
 # Install cuDNN 5.1
 CUDNN_URL="http://developer.download.nvidia.com/compute/redist/cudnn/v5.1/cudnn-8.0-linux-x64-v5.1.tgz"

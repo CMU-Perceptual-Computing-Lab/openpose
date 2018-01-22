@@ -5,12 +5,14 @@ set(OpenPose_VERSION_MINOR 2)
 set(OpenPose_VERSION_PATCH 1)
 set(OpenPose_VERSION ${OpenPose_VERSION_MAJOR}.${OpenPose_VERSION_MINOR}.${OpenPose_VERSION_PATCH})
 
-
 ### CMAKE HEADERS
-cmake_policy(SET CMP0048 NEW)
-project(OpenPose VERSION ${OpenPose_VERSION})
+if (${CMAKE_VERSION} VERSION_GREATER 3.0.0)
+ cmake_policy(SET CMP0048 NEW)
+ project(OpenPose VERSION ${OpenPose_VERSION})
+else (${CMAKE_VERSION} VERSION_GREATER 3.0.0)
+ project(OpenPose)
+endif (${CMAKE_VERSION} VERSION_GREATER 3.0.0)
 cmake_minimum_required(VERSION 2.8.7 FATAL_ERROR) # min. cmake version recommended by Caffe
-
 
 ### FIND THE OS
 
@@ -119,6 +121,11 @@ elseif (${GPU_MODE} MATCHES "CPU_ONLY")
   add_definitions(-DCPU_ONLY)
 endif ()
 
+# Set/disable profiler
+if (PROFILER_ENABLED)
+  add_definitions(-DPROFILER_ENABLED)
+endif (PROFILER_ENABLED)
+
 # Suboptions for GPU architectures
 if (${GPU_MODE} MATCHES "CUDA")
   set(CUDA_ARCH Auto CACHE STRING "Select target NVIDIA GPU achitecture.")
@@ -155,7 +162,6 @@ option(PROFILER_ENABLED "If enabled, OpenPose will be able to print out speed in
 ### FIND REQUIRED PACKAGES
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
-
 find_package(CUDA)
   
 if (UNIX AND NOT APPLE)
@@ -216,7 +222,7 @@ if (WIN32)
   #TODO Add hashes
   download_zip("opencv_310.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 1e5240a64b814b3c0b822f136be78ad7)
   download_zip("caffe3rdparty_2017_07_14.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} ec0f800c8fb337e33304f3375bd06a80)
-  download_zip("caffe_2017_07_11.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 0302edc8843529f8ded1da74eae8e061)
+  download_zip("caffe_2018_01_18.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 4b8e548cc7ea20abea472950dd5301bd)
   if (WITH_3D)
     download_zip("freeglut_2018_01_14.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} BB182187285E06880F0EDE3A39530091)
   endif (WITH_3D)
@@ -282,10 +288,15 @@ if (UNIX AND NOT APPLE)
       ExternalProject_Add(openpose_caffe
           SOURCE_DIR ${CAFFE_URL}
           PREFIX ${CAFFE_PREFIX}
-          CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR> 
+          CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
               -DUSE_CUDNN=${USE_CUDNN}
+              -DBUILD_docs=OFF
               -DBUILD_python=OFF
-              -DOpenCV_DIR=${OpenCV_DIR})
+              -DBUILD_python_layer=OFF
+              -DUSE_LEVELDB=OFF
+              -DUSE_LMDB=OFF
+              -DUSE_OPENCV=OFF)
+              # -DOpenCV_DIR=${OpenCV_DIR})
 
       ExternalProject_Get_Property(openpose_caffe install_dir)
 
@@ -355,7 +366,6 @@ download_model("hand" ${DOWNLOAD_HAND_MODEL} hand/pose_iter_102000.caffemodel
 message(STATUS "Models Downloaded.")
 
 ### GENERATE DOCUMENTATION
-
 if (UNIX AND NOT APPLE)
 
   if (BUILD_DOCS)
@@ -405,10 +415,3 @@ if (UNIX AND NOT APPLE)
   add_custom_target(uninstall
       COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
 endif (UNIX AND NOT APPLE)
-
-### OPENPOSE FLAGS
-
-# Set/disable profiler
-if (PROFILER_ENABLED)
-  add_definitions(-DPROFILER_ENABLED)
-endif (PROFILER_ENABLED)

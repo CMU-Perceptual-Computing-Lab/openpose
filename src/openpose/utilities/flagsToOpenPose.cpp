@@ -210,12 +210,25 @@ namespace op
     {
         try
         {
-            if (renderFlag == -1 && renderPoseFlag != -2)
+            // Body: to auto-pick CPU/GPU depending on CPU_ONLY/CUDA
+            if (renderFlag == -1 && renderPoseFlag == -2)
+            {
+                #ifdef USE_CUDA
+                    return RenderMode::Gpu;
+                #else
+                    return RenderMode::Cpu;
+                #endif
+            }
+            // Face and hand: to pick same than body
+            else if (renderFlag == -1 && renderPoseFlag != -2)
                 return flagsToRenderMode(renderPoseFlag, -2);
+            // No render
             else if (renderFlag == 0)
                 return RenderMode::None;
+            // CPU render
             else if (renderFlag == 1)
                 return RenderMode::Cpu;
+            // GPU render
             else if (renderFlag == 2)
                 return RenderMode::Gpu;
             // else
