@@ -136,6 +136,7 @@ namespace op
                 std::string programString(std::istreambuf_iterator<char>(programFile),
                                                   (std::istreambuf_iterator<char>()));
                 src = programString;
+                //src = std::regex_replace(src, std::regex(";"), std::string(";\n"));
             }
             cl::Program::Sources source(1, std::make_pair(src.c_str(),
                                                           src.length()+1));

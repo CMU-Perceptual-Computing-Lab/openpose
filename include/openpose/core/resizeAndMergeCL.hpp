@@ -1,3 +1,6 @@
+#ifndef OPENPOSE_RESIZE_AND_MERGE_CL_HPP
+#define OPENPOSE_RESIZE_AND_MERGE_CL_HPP
+
 #include <openpose/core/common.hpp>
 
 namespace op
@@ -74,3 +77,5 @@ namespace op
         }
     );
 }
+
+#endif

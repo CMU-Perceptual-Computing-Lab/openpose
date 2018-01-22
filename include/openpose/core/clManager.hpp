@@ -6,6 +6,7 @@
 #include <map>
 #include <openpose/core/common.hpp>
 #include <fstream>
+#include <regex>
 
 #ifdef USE_OPENCL
     #define __CL_ENABLE_EXCEPTIONS

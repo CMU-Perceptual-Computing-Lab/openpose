@@ -12,6 +12,9 @@
 #include <openpose/utilities/openCv.hpp>
 #include <openpose/utilities/standard.hpp>
 #include <openpose/pose/poseExtractorCaffe.hpp>
+#ifdef USE_OPENCL
+    #include <openpose/core/clManager.hpp>
+#endif
 
 namespace op
 {
@@ -243,6 +246,17 @@ namespace op
                                                   // scaleInputToNetInputs[i], mPoseModel);
                     }
                 }
+
+                // My Test
+                log("A");
+                const auto blob = caffeNetSharedToPtr(upImpl->spCaffeNetOutputBlobs);
+                cl::Buffer x(reinterpret_cast<cl_mem>(const_cast<float*>(blob.at(0)->gpu_data())));
+                log("B");
+                // reinterpret_cast< const cl_mem>(blob.at(0)->gpu_data());
+                //cl::Buffer x(ocl_buffer);
+                //float* gpuPtr = (blob[0]->mutable_gpu_data());
+                //cl::Buffer(CLManager::getInstance().getContext(),)
+                //cl::Buffer
 
                 // 2. Resize heat maps + merge different scales
                 const auto caffeNetOutputBlobs = caffeNetSharedToPtr(upImpl->spCaffeNetOutputBlobs);
