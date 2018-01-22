@@ -250,6 +250,7 @@ if (WIN32)
     set(SPINNAKER_INCLUDE_DIRS "3rdparty/windows/spinnaker/include")
     set(FREEGLUT_INCLUDE_DIRS "3rdparty/windows/freeglut/include")
   endif (WITH_3D)
+  set(Caffe_FOUND 1)
 endif (WIN32)
 
 ### CAFFE
@@ -304,11 +305,14 @@ if (UNIX AND NOT APPLE)
       # TODO -- Find a better soln.
       #set(Caffe_LIBS ${CMAKE_BINARY_DIR}/caffe/lib/libcaffe.so)
 
-
-      add_custom_target(TARGET openpose_caffe 
-          COMMAND ${CMAKE_COMMAND} ${CMAKE_SOURCE_DIR}
-          DEPENDS openpose_caffe
-          COMMENT "Caffe build complete")
+      if (NOT Caffe_FOUND)
+        add_custom_command(TARGET openpose_caffe
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND} ${CMAKE_SOURCE_DIR} 
+            COMMAND make -j`nproc`
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+            COMMENT "Rerunning cmake after building Caffe submodule")
+      endif (NOT Caffe_FOUND)
 
     endif (BUILD_CAFFE)
 
