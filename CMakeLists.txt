@@ -309,7 +309,7 @@ if (UNIX AND NOT APPLE)
         add_custom_command(TARGET openpose_caffe
             POST_BUILD
             COMMAND ${CMAKE_COMMAND} ${CMAKE_SOURCE_DIR} 
-            COMMAND make -j`nproc`
+            COMMAND +make
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
             COMMENT "Rerunning cmake after building Caffe submodule")
       endif (NOT Caffe_FOUND)
