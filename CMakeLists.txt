@@ -308,8 +308,7 @@ if (UNIX AND NOT APPLE)
       add_custom_target(TARGET openpose_caffe 
           COMMAND ${CMAKE_COMMAND} ${CMAKE_SOURCE_DIR}
           DEPENDS openpose_caffe
-          COMMENT "Caffe build complete"
-          VERBATIM)
+          COMMENT "Caffe build complete")
 
     endif (BUILD_CAFFE)
 
