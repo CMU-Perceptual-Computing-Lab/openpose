@@ -145,8 +145,16 @@ namespace op
     template<typename T>
     std::ostream &operator<<(std::ostream& strm, const op::Rectangle<T>& obj)
     {
-        strm << obj.toString();
-        return strm;
+        try
+        {
+            strm << obj.toString();
+            return strm;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return "";
+        }
     }
 
     template<typename T>
