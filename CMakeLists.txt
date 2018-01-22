@@ -304,12 +304,11 @@ if (UNIX AND NOT APPLE)
       # TODO -- Find a better soln.
       #set(Caffe_LIBS ${CMAKE_BINARY_DIR}/caffe/lib/libcaffe.so)
 
-      add_custom_command(TARGET openpose_caffe 
-          POST_BUILD
+
+      add_custom_target(TARGET openpose_caffe 
           COMMAND ${CMAKE_COMMAND} ${CMAKE_SOURCE_DIR}
-          COMMAND make
-          WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-          COMMENT "2. Caffe build complete"
+          DEPENDS openpose_caffe
+          COMMENT "Caffe build complete"
           VERBATIM)
 
     endif (BUILD_CAFFE)
