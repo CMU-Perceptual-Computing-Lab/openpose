@@ -5,7 +5,7 @@
 
 namespace op
 {
-    const char *commonKernels = MULTI_LINE_STRING(
+    const std::string commonKernels = MULTI_LINE_STRING(
         // Max/min functions
         int fastMax(int a, int b)
         {
@@ -71,7 +71,7 @@ namespace op
         }
     );
 
-    const char *resizeAndMergeKernel = MULTI_LINE_STRING(
+    const std::string resizeAndMergeKernel = MULTI_LINE_STRING(
         __kernel void resizeAndMergeKernel(__global float* T)
         {
         }

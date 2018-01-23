@@ -20,6 +20,8 @@ namespace op
 
         boost::shared_ptr<caffe::Blob<float>> getOutputBlob() const;
 
+        int getGPUID() const;
+
     private:
         // PIMPL idiom
         // http://www.cppsamples.com/common-tasks/pimpl.html

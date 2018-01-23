@@ -9,8 +9,10 @@
 #include <regex>
 
 #ifdef USE_OPENCL
-    #define __CL_ENABLE_EXCEPTIONS
-    #include <CL/cl.hpp>
+    #define CL_HPP_ENABLE_EXCEPTIONS
+    #define CL_HPP_TARGET_OPENCL_VERSION 200
+    #include <CL/cl2.hpp>
+    #include <viennacl/backend/opencl.hpp>
 #endif
 
 // Singleton structure
@@ -18,32 +20,29 @@
 
 namespace op
 {
-    class OP_API CLManager
+    class CLManager
     {
-    public:
-        static CLManager& getInstance();
-
     private:
-        explicit CLManager(int deviceType = CL_DEVICE_TYPE_GPU);
+    public:
+        static std::shared_ptr<CLManager> getInstance(int deviceId = 0, int deviceType = CL_DEVICE_TYPE_GPU, bool getFromVienna = false);
         ~CLManager();
         DELETE_COPY(CLManager);
 
     private:
+        CLManager(int deviceId, int deviceType, bool getFromVienna);
         std::map<std::string, cl::Program> clPrograms;
         std::map<std::string, cl::Kernel> clKernels;
-        std::vector<cl::Platform> platforms;
-        std::vector<cl::Device> devices;
-        std::vector<cl::CommandQueue> queues;
+        cl::Device device;
+        cl::CommandQueue queue;
         cl::Context context;
         cl::Program buildProgramFromSource(std::string src, bool isFile = false);
 
     public:
         cl::Context& getContext();
-        cl::CommandQueue& getQueue(size_t gpuID = 0);
-        cl::Device& getDevice(size_t gpuID = 0);
+        cl::CommandQueue& getQueue();
+        cl::Device& getDevice();
         bool buildKernelIntoManager(std::string kernelName, std::string src, bool isFile = false);
         cl::Kernel& getKernelFromManager(std::string kernelName);
-
     };
 }
 

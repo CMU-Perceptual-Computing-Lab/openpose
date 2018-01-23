@@ -248,15 +248,17 @@ namespace op
                 }
 
                 // My Test
-                log("A");
                 const auto blob = caffeNetSharedToPtr(upImpl->spCaffeNetOutputBlobs);
-                cl::Buffer x(reinterpret_cast<cl_mem>(const_cast<float*>(blob.at(0)->gpu_data())));
-                log("B");
-                // reinterpret_cast< const cl_mem>(blob.at(0)->gpu_data());
-                //cl::Buffer x(ocl_buffer);
-                //float* gpuPtr = (blob[0]->mutable_gpu_data());
-                //cl::Buffer(CLManager::getInstance().getContext(),)
-                //cl::Buffer
+                const int gpuId = upImpl->spCaffeNets.at(0)->getGPUID();
+                cl::Buffer x((cl_mem)blob.at(0)->gpu_data(), true);
+                cl::Kernel& resizeAndMergeKernel = op::CLManager::getInstance(gpuId)->getKernelFromManager("resizeAndMergeKernel");
+                try{
+                    resizeAndMergeKernel.setArg(0,x);
+                }catch(cl::Error& e){
+                    log(e.what());
+                    log(std::to_string(e.err()));
+                }
+                op::CLManager::getInstance(gpuId)->getQueue().enqueueNDRangeKernel(resizeAndMergeKernel, cl::NDRange(), cl::NDRange(5,5), cl::NDRange(), NULL, NULL);
 
                 // 2. Resize heat maps + merge different scales
                 const auto caffeNetOutputBlobs = caffeNetSharedToPtr(upImpl->spCaffeNetOutputBlobs);

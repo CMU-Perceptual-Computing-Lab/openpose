@@ -39,6 +39,7 @@ namespace op
             const auto numberPeople = poseKeypoints.getSize(0);
             const auto numberBodyParts = poseKeypoints.getSize(1);
             const auto imageId = getLastNumber(imageName);
+            log(std::to_string(numberPeople));
             for (auto person = 0 ; person < numberPeople ; person++)
             {
                 // Comma at any moment but first element
