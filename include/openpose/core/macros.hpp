@@ -1,6 +1,10 @@
 #ifndef OPENPOSE_CORE_MACROS_HPP
 #define OPENPOSE_CORE_MACROS_HPP
 
+#include <memory> // std::shared_ptr
+#include <ostream>
+#include <vector>
+
 #ifndef _WIN32
     #define OP_API
 #elif defined OP_EXPORTS
@@ -14,11 +18,6 @@
     #pragma warning ( disable : 4251 ) // XXX needs to have dll-interface to be used by clients of class YYY
     #pragma warning( disable: 4275 ) // non dll-interface structXXX used as base
 #endif
-
-#define DATUM_BASE_NO_PTR std::vector<Datum>
-#define DATUM_BASE std::shared_ptr<DATUM_BASE_NO_PTR>
-#define DEFINE_TEMPLATE_DATUM(templateName) template class OP_API templateName<DATUM_BASE>
-#define COMPILE_TEMPLATE_DATUM(templateName) extern DEFINE_TEMPLATE_DATUM(templateName)
 
 #define UNUSED(unusedVariable) (void)(unusedVariable)
 
@@ -45,6 +44,17 @@
     template classType OP_API className<double>; \
     template classType OP_API className<long double>
 
+/**
+ * cout operator overload calling toString() function
+ * @return std::ostream containing output from toString()
+ */
+#define OVERLOAD_C_OUT(className) \
+    template<typename T> std::ostream &operator<<(std::ostream& ostream, const op::className<T>& obj) \
+    { \
+        ostream << obj.toString(); \
+        return ostream; \
+    }
+
 // Instantiate a class with float and double specifications
 #define COMPILE_TEMPLATE_FLOATING_TYPES_CLASS(className) COMPILE_TEMPLATE_FLOATING_TYPES(className, class)
 #define COMPILE_TEMPLATE_FLOATING_TYPES_STRUCT(className) COMPILE_TEMPLATE_FLOATING_TYPES(className, struct)
@@ -64,13 +74,5 @@ namespace boost
 {
     template <typename T> class shared_ptr; // E.g., boost::shared_ptr<caffe::Blob<float>>
 }
-
-// Includes at the end, since this macros class does not need them, but the files that call this
-// file. However, keeping the files at the beginning might create a circular include linking problem.
-#include <memory> // std::shared_ptr
-#include <vector>
-#include <openpose/core/datum.hpp>
-#include <openpose/core/point.hpp>
-#include <openpose/core/rectangle.hpp>
 
 #endif // OPENPOSE_CORE_MACROS_HPP

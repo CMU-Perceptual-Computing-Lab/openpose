@@ -1,6 +1,5 @@
 #include <typeinfo> // typeid
 #include <numeric> // std::accumulate
-#include <openpose/core/macros.hpp>
 #include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/core/array.hpp>
 

@@ -2,6 +2,7 @@
 #define OPENPOSE_CORE_POINT_HPP
 
 #include <string>
+#include <openpose/core/macros.hpp>
 
 namespace op
 {
@@ -15,7 +16,8 @@ namespace op
 
         /**
          * Copy constructor.
-         * It performs `fast copy`: For performance purpose, copying a Point<T> or Point<T> or cv::Mat just copies the reference, it still shares the same internal data.
+         * It performs `fast copy`: For performance purpose, copying a Point<T> or Point<T> or cv::Mat just copies the
+         * reference, it still shares the same internal data.
          * Modifying the copied element will modify the original one.
          * Use clone() for a slower but real copy, similarly to cv::Mat and Point<T>.
          * @param point Point to be copied.
@@ -57,7 +59,11 @@ namespace op
          */
         std::string toString() const;
 
-        // -------------------------------------------------- Comparison operators -------------------------------------------------- //
+
+
+
+
+        // ------------------------------ Comparison operators ------------------------------ //
         /**
          * Less comparison operator.
          * @param point Point<T> to be compared.
@@ -122,7 +128,7 @@ namespace op
 
 
 
-        // -------------------------------------------------- Basic Operators -------------------------------------------------- //
+        // ------------------------------ Basic Operators ------------------------------ //
         Point<T>& operator+=(const Point<T>& point);
 
         Point<T> operator+(const Point<T>& point) const;
@@ -148,16 +154,8 @@ namespace op
         Point<T> operator/(const T value) const;
     };
 
-    /**
-     * cout operator overload calling toString() function
-     * @return std::ostream containing output from toString()
-     */
-    template<typename T>
-    std::ostream &operator<<(std::ostream& strm, const op::Point<T>& obj)
-    {
-        strm << obj.toString();
-        return strm;
-    }
+    // Static methods
+    OVERLOAD_C_OUT(Point)
 }
 
 #endif // OPENPOSE_CORE_POINT_HPP

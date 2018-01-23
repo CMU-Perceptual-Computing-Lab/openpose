@@ -2,6 +2,7 @@
 #define OPENPOSE_CORE_RECTANGLE_HPP
 
 #include <string>
+#include <openpose/core/macros.hpp>
 #include <openpose/core/point.hpp>
 
 namespace op
@@ -18,7 +19,8 @@ namespace op
 
         /**
          * Copy constructor.
-         * It performs `fast copy`: For performance purpose, copying a Rectangle<T> or Datum or cv::Mat just copies the reference, it still shares the same internal data.
+         * It performs `fast copy`: For performance purpose, copying a Rectangle<T> or Datum or cv::Mat just copies
+         * the reference, it still shares the same internal data.
          * Modifying the copied element will modify the original one.
          * Use clone() for a slower but real copy, similarly to cv::Mat and Rectangle<T>.
          * @param rectangle Rectangle to be copied.
@@ -71,7 +73,7 @@ namespace op
          */
         std::string toString() const;
 
-        // -------------------------------------------------- Basic Operators -------------------------------------------------- //
+        // ------------------------------ Basic Operators ------------------------------ //
         Rectangle<T>& operator*=(const T value);
 
         Rectangle<T> operator*(const T value) const;
@@ -85,12 +87,7 @@ namespace op
     template<typename T>
     Rectangle<T> recenter(const Rectangle<T>& rectangle, const T newWidth, const T newHeight);
 
-    template<typename T>
-    std::ostream &operator<<(std::ostream& strm, const op::Rectangle<T>& obj)
-    {
-        strm << obj.toString();
-        return strm;
-    }
+    OVERLOAD_C_OUT(Rectangle)
 }
 
 #endif // OPENPOSE_CORE_RECTANGLE_HPP
