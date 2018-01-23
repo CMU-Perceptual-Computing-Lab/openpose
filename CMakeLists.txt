@@ -107,15 +107,15 @@ endif (WIN32)
 
 # Set the acceleration library
 set(GPU_MODE CUDA CACHE STRING "Select the acceleration GPU library or CPU otherwise.")
-# set_property(CACHE GPU_MODE PROPERTY STRINGS CPU_ONLY)
+set_property(CACHE GPU_MODE PROPERTY STRINGS CPU_ONLY)
 
-# # Test for CUDA or OpenCL
-# find_package(CUDA)
-# if (CUDA_FOUND)
-#   set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA CPU_ONLY)
-# endif ()
-# # set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA OPENCL CPU_ONLY)
-set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA)
+# Test for CUDA or OpenCL
+find_package(CUDA)
+if (CUDA_FOUND)
+  set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA CPU_ONLY)
+endif ()
+# set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA OPENCL CPU_ONLY)
+# set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA)
 
 if (${GPU_MODE} MATCHES "CUDA")
   # OpenPose flags
