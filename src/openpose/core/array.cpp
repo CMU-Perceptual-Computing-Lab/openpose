@@ -1,6 +1,5 @@
 #include <typeinfo> // typeid
 #include <numeric> // std::accumulate
-#include <openpose/core/macros.hpp>
 #include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/core/array.hpp>
 
@@ -388,6 +387,29 @@ namespace op
             }
             // Return string
             return string;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return "";
+        }
+    }
+
+    template<typename T>
+    std::string Array<T>::printSize() const
+    {
+        try
+        {
+            auto counter = 0u;
+            std::string sizeString = "[ ";
+            for (const auto& i : mSize)
+            {
+                sizeString += std::to_string(i);
+                if (++counter < mSize.size())
+                    sizeString += " x ";
+            }
+            sizeString += " ]";
+            return sizeString;
         }
         catch (const std::exception& e)
         {

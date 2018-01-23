@@ -80,6 +80,7 @@ namespace op
             try
             {
                 // HeatMaps extractor blob and layer
+                // Caffe modifies bottom - Heatmap gets resized
                 const auto caffeNetOutputBlobs = caffeNetSharedToPtr(caffeNetOutputBlob);
                 resizeAndMergeCaffe->Reshape(caffeNetOutputBlobs, {heatMapsBlob.get()},
                                              getPoseNetDecreaseFactor(poseModel), 1.f/scaleInputToNetInput);
@@ -227,6 +228,7 @@ namespace op
                     // Reshape blobs if required
                     // Note: In order to resize to input size to have same results as Matlab, uncomment the commented
                     // lines
+                    // Note: For dynamic sizes (e.g. a folder with images of different aspect ratio)
                     if (!vectorsAreEqual(upImpl->mNetInput4DSizes.at(i), inputNetData[i].getSize()))
                         // || !vectorsAreEqual(upImpl->mScaleInputToNetInputs, scaleInputToNetInputs))
                     {
@@ -247,11 +249,9 @@ namespace op
                 const std::vector<float> floatScaleRatios(scaleInputToNetInputs.begin(), scaleInputToNetInputs.end());
                 upImpl->spResizeAndMergeCaffe->setScaleRatios(floatScaleRatios);
                 #ifdef USE_CUDA
-                    upImpl->spResizeAndMergeCaffe->Forward_gpu(caffeNetOutputBlobs,                             // ~5ms
-                                                               {upImpl->spHeatMapsBlob.get()});
-                    cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+                    upImpl->spResizeAndMergeCaffe->Forward_gpu(caffeNetOutputBlobs, {upImpl->spHeatMapsBlob.get()}); // ~5ms
                 #else
-                    error("ResizeAndMergeCaffe CPU version not implemented yet.", __LINE__, __FUNCTION__, __FILE__);
+                    upImpl->spResizeAndMergeCaffe->Forward_cpu(caffeNetOutputBlobs, {upImpl->spHeatMapsBlob.get()}); // ~20ms
                 #endif
 
                 // 3. Get peaks by Non-Maximum Suppression
@@ -260,7 +260,7 @@ namespace op
                     upImpl->spNmsCaffe->Forward_gpu({upImpl->spHeatMapsBlob.get()}, {upImpl->spPeaksBlob.get()});// ~2ms
                     cudaCheck(__LINE__, __FUNCTION__, __FILE__);
                 #else
-                    error("NmsCaffe CPU version not implemented yet.", __LINE__, __FUNCTION__, __FILE__);
+                    upImpl->spNmsCaffe->Forward_cpu({upImpl->spHeatMapsBlob.get()}, {upImpl->spPeaksBlob.get()}); // ~ 7ms
                 #endif
 
                 // Get scale net to output (i.e. image input)

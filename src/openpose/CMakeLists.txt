@@ -16,12 +16,16 @@ foreach (FILE ${OP_HEADERS_UNFILTERED})
   endif ()
 endforeach(FILE ${OP_HEADERS_UNFILTERED})
 
-cuda_add_library(openpose ${SOURCES_OPENPOSE} ${OP_HEADERS})
+if (${GPU_MODE} MATCHES "CUDA")
+    cuda_add_library(openpose ${SOURCES_OPENPOSE} ${OP_HEADERS})
+else()
+    add_library(openpose ${SOURCES_OPENPOSE} ${OP_HEADERS})
+endif ()
 
 # Ubuntu
 if(UNIX AND NOT APPLE)
   target_link_libraries(openpose ${OpenCV_LIBS} ${Caffe_LIBS}
-      ${GFLAGS_LIBRARY} ${GLOG_LIBRARY})
+      ${GFLAGS_LIBRARY} ${GLOG_LIBRARY} ${MKL_LIBS})
   if (CMAKE_COMPILER_IS_GNUCXX)
     foreach (SUB_DIR ${SUB_DIRS})
         set_target_properties(openpose_${SUB_DIR} PROPERTIES COMPILE_FLAGS ${OP_CXX_FLAGS})

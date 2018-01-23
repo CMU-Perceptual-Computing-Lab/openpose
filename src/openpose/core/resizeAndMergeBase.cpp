@@ -1,4 +1,7 @@
-// #include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <openpose/utilities/fastMath.hpp>
+#include <openpose/utilities/openCv.hpp>
 #include <openpose/core/resizeAndMergeBase.hpp>
 
 namespace op
@@ -11,50 +14,98 @@ namespace op
     {
         try
         {
-            UNUSED(targetPtr);
-            UNUSED(sourcePtrs);
-            UNUSED(scaleInputToNetInputs);
-            UNUSED(targetSize);
-            UNUSED(sourceSizes);
-            error("CPU version not completely implemented.", __LINE__, __FUNCTION__, __FILE__);
+            // Security checks
+            if (sourceSizes.empty())
+                error("sourceSizes cannot be empty.", __LINE__, __FUNCTION__, __FILE__);
+            if (sourcePtrs.size() != sourceSizes.size() || sourceSizes.size() != scaleInputToNetInputs.size())
+                error("Size(sourcePtrs) must match size(sourceSizes) and size(scaleInputToNetInputs). Currently: "
+                      + std::to_string(sourcePtrs.size()) + " vs. " + std::to_string(sourceSizes.size()) + " vs. "
+                      + std::to_string(scaleInputToNetInputs.size()) + ".", __LINE__, __FUNCTION__, __FILE__);
 
-            // TODO: THIS CODE IS WORKING, BUT IT DOES NOT CONSIDER THE SCALES (I.E. SCALE NUMBER, START AND GAP) 
-            // const int num = bottom->shape(0);
-            // const int channel = bottom->shape(1);
-            // const int sourceHeight = bottom->shape(2);
-            // const int sourceWidth = bottom->shape(3);
-            // const int targetHeight = top->shape(2);
-            // const int targetWidth = top->shape(3);
+            // Params
+            const auto nums = (signed)sourceSizes.size();
+            const auto channels = targetSize[1]; // 57
+            const auto targetHeight = targetSize[2]; // 368
+            const auto targetWidth = targetSize[3]; // 496
+            const auto targetChannelOffset = targetWidth * targetHeight;
 
-            // //stupid method
-            // for (int n = 0; n < num; n++)
-            // {
-            //     for (int c = 0; c < channel; c++)
-            //     {
-            //         //fill source
-            //         cv::Mat source(sourceWidth, sourceHeight, CV_32FC1);
-            //         const auto sourceOffsetChannel = sourceHeight * sourceWidth;
-            //         const auto sourceOffsetNum = sourceOffsetChannel * channel;
-            //         const auto sourceOffset = n*sourceOffsetNum + c*sourceOffsetChannel;
-            //         const T* const sourcePtrs = bottom->cpu_data();
-            //         for (int y = 0; y < sourceHeight; y++)
-            //             for (int x = 0; x < sourceWidth; x++)
-            //                 source.at<T>(x,y) = sourcePtrs[sourceOffset + y*sourceWidth + x];
+            // No multi-scale merging or no merging required
+            if (sourceSizes.size() == 1)
+            {
+                // Params
+                const auto& sourceSize = sourceSizes[0];
+                const auto sourceHeight = sourceSize[2]; // 368/8 ..
+                const auto sourceWidth = sourceSize[3]; // 496/8 ..
+                const auto sourceChannelOffset = sourceHeight * sourceWidth;
+                if (sourceSize[0] != 1)
+                    error("It should never reache this point. Notify us otherwise.",
+                          __LINE__, __FUNCTION__, __FILE__);
 
-            //         // spatial resize
-            //         cv::Mat target;
-            //         cv::resize(source, target, {targetWidth, targetHeight}, 0, 0, CV_INTER_CUBIC);
+                // Per channel resize
+                const T* sourcePtr = sourcePtrs[0];
+                for (auto c = 0 ; c < channels ; c++)
+                {
+                    cv::Mat source(cv::Size(sourceWidth, sourceHeight), CV_32FC1,
+                                   const_cast<T*>(&sourcePtr[c*sourceChannelOffset]));
+                    cv::Mat target(cv::Size(targetWidth, targetHeight), CV_32FC1,
+                                   (&targetPtr[c*targetChannelOffset]));
+                    cv::resize(source, target, {targetWidth, targetHeight}, 0, 0, CV_INTER_CUBIC);
+                }
+            }
+            // Multi-scale merging
+            else
+            {
+                // Construct temp targets. We resuse targetPtr to store first scale
+                std::vector<std::unique_ptr<T>> tempTargetPtrs;
+                for (auto n = 1; n < nums; n++){
+                    tempTargetPtrs.emplace_back(std::unique_ptr<T>(new T[targetChannelOffset * channels]()));
+                }
 
-            //         //fill top
-            //         const auto targetOffsetChannel = targetHeight * targetWidth;
-            //         const auto targetOffsetNum = targetOffsetChannel * channel;
-            //         const auto targetOffset = n*targetOffsetNum + c*targetOffsetChannel;
-            //         T* targetPtr = top->mutable_cpu_data();
-            //         for (int y = 0; y < targetHeight; y++)
-            //             for (int x = 0; x < targetWidth; x++)
-            //                 targetPtr[targetOffset + y*targetWidth + x] = target.at<T>(x,y);
-            //     }
-            // }
+                // Resize and sum
+                for (auto n = 0; n < nums; n++){
+
+                    // Params
+                    const auto& sourceSize = sourceSizes[n];
+                    const auto sourceHeight = sourceSize[2]; // 368/6 ..
+                    const auto sourceWidth = sourceSize[3]; // 496/8 ..
+                    const auto sourceChannelOffset = sourceHeight * sourceWidth;
+
+                    // Access pointers
+                    const T* sourcePtr = sourcePtrs[n];
+                    T* tempTargetPtr;
+                    if(n != 0)
+                        tempTargetPtr = tempTargetPtrs[n-1].get();
+                    else
+                        tempTargetPtr = targetPtr;
+
+                    T* firstTempTargetPtr = targetPtr;
+                    for (auto c = 0 ; c < channels ; c++)
+                    {
+                        // Resize
+                        cv::Mat source(cv::Size(sourceWidth, sourceHeight), CV_32FC1,
+                                       const_cast<T*>(&sourcePtr[c*sourceChannelOffset]));
+                        cv::Mat target(cv::Size(targetWidth, targetHeight), CV_32FC1,
+                                       (&tempTargetPtr[c*targetChannelOffset]));
+                        cv::resize(source, target, {targetWidth, targetHeight}, 0, 0, CV_INTER_CUBIC);
+
+                        // Add
+                        if (n != 0)
+                        {
+                            cv::Mat addTarget(cv::Size(targetWidth, targetHeight), CV_32FC1,
+                                              (&firstTempTargetPtr[c*targetChannelOffset]));
+                            cv::add(target, addTarget, addTarget);
+                        }
+                    }
+                }
+
+                // Average
+                for (auto c = 0 ; c < channels ; c++)
+                {
+                    cv::Mat target(cv::Size(targetWidth, targetHeight), CV_32FC1, (&targetPtr[c*targetChannelOffset]));
+                    target /= (float)nums;
+                }
+
+            }
         }
         catch (const std::exception& e)
         {
