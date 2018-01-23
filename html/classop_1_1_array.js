@@ -27,6 +27,7 @@ var classop_1_1_array =
     [ "operator[]", "classop_1_1_array.html#aeccfa42607d5deb5039ff260eb980abc", null ],
     [ "operator[]", "classop_1_1_array.html#aada0f1bd6e9eb73b4f977e62da536f58", null ],
     [ "operator[]", "classop_1_1_array.html#a3f6c6f7ddeed3d1edbc907441888a8cf", null ],
+    [ "printSize", "classop_1_1_array.html#a337e33980c231bc207ea7d31ffa84fe3", null ],
     [ "reset", "classop_1_1_array.html#a12e538b09e98bf0900163031602ed2ed", null ],
     [ "reset", "classop_1_1_array.html#a0ad0232daa69783cf2c8f7a0ff5b3b0c", null ],
     [ "reset", "classop_1_1_array.html#ac7183eb2f4e78a6941da3a2079b9ed32", null ],

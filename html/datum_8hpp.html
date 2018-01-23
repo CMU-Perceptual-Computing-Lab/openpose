@@ -105,7 +105,8 @@ $(document).ready(function(){initNavTree('datum_8hpp.html','');});
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#namespaces">Namespaces</a>  </div>
+<a href="#namespaces">Namespaces</a> &#124;
+<a href="#define-members">Macros</a>  </div>
   <div class="headertitle">
 <div class="title">datum.hpp File Reference</div>  </div>
 </div><!--header-->
@@ -124,7 +125,75 @@ Classes</h2></td></tr>
 Namespaces</h2></td></tr>
 <tr class="memitem:namespaceop"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html">op</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:ad96b23e17e179ed25d779d31b8ee2c07"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="datum_8hpp.html#ad96b23e17e179ed25d779d31b8ee2c07">DATUM_BASE_NO_PTR</a>&#160;&#160;&#160;std::vector&lt;Datum&gt;</td></tr>
+<tr class="separator:ad96b23e17e179ed25d779d31b8ee2c07"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a07cabbfba0fbaa740292d7ffca1e33ed"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="datum_8hpp.html#a07cabbfba0fbaa740292d7ffca1e33ed">DATUM_BASE</a>&#160;&#160;&#160;std::shared_ptr&lt;<a class="el" href="datum_8hpp.html#ad96b23e17e179ed25d779d31b8ee2c07">DATUM_BASE_NO_PTR</a>&gt;</td></tr>
+<tr class="separator:a07cabbfba0fbaa740292d7ffca1e33ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad11d52b69bc54e48ceb2f5787f700431"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="datum_8hpp.html#ad11d52b69bc54e48ceb2f5787f700431">DEFINE_TEMPLATE_DATUM</a>(templateName)&#160;&#160;&#160;template class <a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> templateName&lt;<a class="el" href="datum_8hpp.html#a07cabbfba0fbaa740292d7ffca1e33ed">DATUM_BASE</a>&gt;</td></tr>
+<tr class="separator:ad11d52b69bc54e48ceb2f5787f700431"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af87cd873cebb915837ae27248f67e822"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="datum_8hpp.html#af87cd873cebb915837ae27248f67e822">COMPILE_TEMPLATE_DATUM</a>(templateName)&#160;&#160;&#160;extern <a class="el" href="datum_8hpp.html#ad11d52b69bc54e48ceb2f5787f700431">DEFINE_TEMPLATE_DATUM</a>(templateName)</td></tr>
+<tr class="separator:af87cd873cebb915837ae27248f67e822"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Macro Definition Documentation</h2>
+<a class="anchor" id="af87cd873cebb915837ae27248f67e822"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define COMPILE_TEMPLATE_DATUM</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">templateName</td><td>)</td>
+          <td>&#160;&#160;&#160;extern <a class="el" href="datum_8hpp.html#ad11d52b69bc54e48ceb2f5787f700431">DEFINE_TEMPLATE_DATUM</a>(templateName)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a07cabbfba0fbaa740292d7ffca1e33ed"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define DATUM_BASE&#160;&#160;&#160;std::shared_ptr&lt;<a class="el" href="datum_8hpp.html#ad96b23e17e179ed25d779d31b8ee2c07">DATUM_BASE_NO_PTR</a>&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ad96b23e17e179ed25d779d31b8ee2c07"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define DATUM_BASE_NO_PTR&#160;&#160;&#160;std::vector&lt;Datum&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ad11d52b69bc54e48ceb2f5787f700431"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define DEFINE_TEMPLATE_DATUM</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">templateName</td><td>)</td>
+          <td>&#160;&#160;&#160;template class <a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> templateName&lt;<a class="el" href="datum_8hpp.html#a07cabbfba0fbaa740292d7ffca1e33ed">DATUM_BASE</a>&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

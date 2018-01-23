@@ -151,6 +151,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ad51b6ac12ed115f1056effefd6fa878b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2330657a79a444d1ab44370423be006e"><td class="memItemLeft" align="right" valign="top">std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_array.html#a2330657a79a444d1ab44370423be006e">getSize</a> () const </td></tr>
 <tr class="separator:a2330657a79a444d1ab44370423be006e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a337e33980c231bc207ea7d31ffa84fe3"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_array.html#a337e33980c231bc207ea7d31ffa84fe3">printSize</a> () const </td></tr>
+<tr class="separator:a337e33980c231bc207ea7d31ffa84fe3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a146d6e773e14dd7aaa29a73f878358e1"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_array.html#a146d6e773e14dd7aaa29a73f878358e1">getSize</a> (const int index) const </td></tr>
 <tr class="separator:a146d6e773e14dd7aaa29a73f878358e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adeb008e878709bb5a51e26be55a5452d"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_array.html#adeb008e878709bb5a51e26be55a5452d">getNumberDimensions</a> () const </td></tr>
@@ -218,7 +220,7 @@ template&lt;typename T&gt; </div>
 <p><a class="el" href="classop_1_1_array.html">Array</a> constructor. Equivalent to default constructor + <a class="el" href="classop_1_1_array.html#a12e538b09e98bf0900163031602ed2ed">reset(const int size)</a>. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">size</td><td>Integer with the number of T element to be allocated. E.g. size = 5 is internally similar to: new T[5]. </td></tr>
+    <tr><td class="paramname">size</td><td>Integer with the number of T element to be allocated. E.g. size = 5 is internally similar to <code>new T[5]</code>. </td></tr>
   </table>
   </dd>
 </dl>
@@ -251,7 +253,7 @@ template&lt;typename T&gt; </div>
 <p><a class="el" href="classop_1_1_array.html">Array</a> constructor. Equivalent to default constructor + reset(const std::vector&lt;int&gt;&amp; size = {}). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">sizes</td><td>Vector with the size of each dimension. E.g. size = {3, 5, 2} is internally similar to: new T[3*5*2]. </td></tr>
+    <tr><td class="paramname">sizes</td><td>Vector with the size of each dimension. E.g. size = {3, 5, 2} is internally similar to <code>new T[3*5*2]</code>. </td></tr>
   </table>
   </dd>
 </dl>
@@ -286,7 +288,7 @@ template&lt;typename T&gt; </div>
 <p><a class="el" href="classop_1_1_array.html">Array</a> constructor. Equivalent to default constructor + <a class="el" href="classop_1_1_array.html#ac7183eb2f4e78a6941da3a2079b9ed32">reset(const int size, const T value)</a>. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">size</td><td>Integer with the number of T element to be allocated. E.g. size = 5 is internally similar to: new T[5]. </td></tr>
+    <tr><td class="paramname">size</td><td>Integer with the number of T element to be allocated. E.g. size = 5 is internally similar to <code>new T[5]</code>. </td></tr>
     <tr><td class="paramname">value</td><td>Initial value for each component of the <a class="el" href="classop_1_1_array.html">Array</a>. </td></tr>
   </table>
   </dd>
@@ -322,7 +324,7 @@ template&lt;typename T&gt; </div>
 <p><a class="el" href="classop_1_1_array.html">Array</a> constructor. Equivalent to default constructor + <a class="el" href="classop_1_1_array.html#add2eeccd967cdf0900449649cb6f5afb">reset(const std::vector&lt;int&gt;&amp; size, const T value)</a>. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">sizes</td><td>Vector with the size of each dimension. E.g. size = {3, 5, 2} is internally similar to: new T[3*5*2]. </td></tr>
+    <tr><td class="paramname">sizes</td><td>Vector with the size of each dimension. E.g. size = {3, 5, 2} is internally similar to: <code>new T[3*5*2]</code>. </td></tr>
     <tr><td class="paramname">value</td><td>Initial value for each component of the <a class="el" href="classop_1_1_array.html">Array</a>. </td></tr>
   </table>
   </dd>
@@ -787,7 +789,7 @@ template&lt;typename T&gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Similar to <a class="el" href="classop_1_1_array.html#afee5e6149bc917586b3fd56323d20a87">getVolume()</a>, but in this case it just returns the volume between the desired dimensions. E.g. for a Array&lt;T&gt; of size = {2,5,3}, the volume or total number of elements for getVolume(1,2) is: 5x3 = 15. </p>
+<p>Similar to <a class="el" href="classop_1_1_array.html#afee5e6149bc917586b3fd56323d20a87">getVolume()</a>, but in this case it just returns the volume between the desired dimensions. E.g. for a Array&lt;T&gt; of size = {2,5,3}, the volume or total number of elements for getVolume(1,2) is 5x3 = 15. </p>
 <dl class="section return"><dt>Returns</dt><dd>The total volume of the allocated data between the desired dimensions. If the index are out of bounds, it throws an error. </dd></dl>
 
 </div>
@@ -980,6 +982,25 @@ template&lt;typename T&gt; </div>
 
 </div>
 </div>
+<a class="anchor" id="a337e33980c231bc207ea7d31ffa84fe3"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string <a class="el" href="classop_1_1_array.html">op::Array</a>&lt; T &gt;::printSize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Return a string with the size of each dimension allocated. </p>
+<dl class="section return"><dt>Returns</dt><dd>A std::stringwith the size of each dimension. If no memory has been allocated, it will return an empty string. </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="a12e538b09e98bf0900163031602ed2ed"></a>
 <div class="memitem">
 <div class="memproto">
@@ -998,7 +1019,7 @@ template&lt;typename T&gt; </div>
 <p>Data allocation function. It allocates the required space for the memory (it does not initialize that memory). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">size</td><td>Integer with the number of T element to be allocated. E.g. size = 5 is internally similar to: new T[5]. </td></tr>
+    <tr><td class="paramname">size</td><td>Integer with the number of T element to be allocated. E.g. size = 5 is internally similar to <code>new T[5]</code>. </td></tr>
   </table>
   </dd>
 </dl>
@@ -1023,7 +1044,7 @@ template&lt;typename T&gt; </div>
 <p>Data allocation function. Similar to <a class="el" href="classop_1_1_array.html#a12e538b09e98bf0900163031602ed2ed">reset(const int size)</a>, but it allocates a multi-dimensional array of dimensions each of the values of the argument. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">sizes</td><td>Vector with the size of each dimension. E.g. size = {3, 5, 2} is internally similar to: new T[3*5*2]. </td></tr>
+    <tr><td class="paramname">sizes</td><td>Vector with the size of each dimension. E.g. size = {3, 5, 2} is internally similar to <code>new T[3*5*2]</code>. </td></tr>
   </table>
   </dd>
 </dl>
@@ -1058,7 +1079,7 @@ template&lt;typename T&gt; </div>
 <p>Data allocation function. Similar to <a class="el" href="classop_1_1_array.html#a12e538b09e98bf0900163031602ed2ed">reset(const int size)</a>, but initializing the data to the value specified by the second argument. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">size</td><td>Integer with the number of T element to be allocated. E.g. size = 5 is internally similar to: new T[5]. </td></tr>
+    <tr><td class="paramname">size</td><td>Integer with the number of T element to be allocated. E.g. size = 5 is internally similar to <code>new T[5]</code>. </td></tr>
     <tr><td class="paramname">value</td><td>Initial value for each component of the <a class="el" href="classop_1_1_array.html">Array</a>. </td></tr>
   </table>
   </dd>
@@ -1094,7 +1115,7 @@ template&lt;typename T&gt; </div>
 <p>Data allocation function. Similar to <a class="el" href="classop_1_1_array.html#a0ad0232daa69783cf2c8f7a0ff5b3b0c">reset(const std::vector&lt;int&gt;&amp; size)</a>, but initializing the data to the value specified by the second argument. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">sizes</td><td>Vector with the size of each dimension. E.g. size = {3, 5, 2} is internally similar to: new T[3*5*2]. </td></tr>
+    <tr><td class="paramname">sizes</td><td>Vector with the size of each dimension. E.g. size = {3, 5, 2} is internally similar to <code>new T[3*5*2]</code>. </td></tr>
     <tr><td class="paramname">value</td><td>Initial value for each component of the <a class="el" href="classop_1_1_array.html">Array</a>. </td></tr>
   </table>
   </dd>

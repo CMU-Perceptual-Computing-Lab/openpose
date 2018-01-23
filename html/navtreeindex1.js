@@ -1,5 +1,6 @@
 var NAVTREEINDEX1 =
 {
+"classop_1_1_nms_caffe.html#a96198ee87433f55f52a5054b92f946d9":[1,0,2,9,7],
 "classop_1_1_nms_caffe.html#ab4d3a1d507579711e0aed65dcb06f8ac":[1,0,2,9,6],
 "classop_1_1_nms_caffe.html#ac631ccb632041ab406859fa1118e8d6c":[1,0,2,9,4],
 "classop_1_1_nms_caffe.html#afb808d9a264ce50664f8641e477d9e2d":[1,0,2,9,0],
@@ -248,6 +249,5 @@ var NAVTREEINDEX1 =
 "classop_1_1_w_face_detector_open_c_v.html":[1,0,2,31],
 "classop_1_1_w_face_detector_open_c_v.html#a4d3a4a29bcb7b8c141ae1917634ca4c9":[1,0,2,31,2],
 "classop_1_1_w_face_detector_open_c_v.html#a8c765201f0cc9440f8d172c8d8c76a62":[1,0,2,31,0],
-"classop_1_1_w_face_detector_open_c_v.html#ad7dce5824ba32bc07d2474c20b23e62d":[1,0,2,31,1],
-"classop_1_1_w_face_extractor.html":[1,0,2,32]
+"classop_1_1_w_face_detector_open_c_v.html#ad7dce5824ba32bc07d2474c20b23e62d":[1,0,2,31,1]
 };

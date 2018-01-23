@@ -10,9 +10,7 @@ var dir_d6e567c8390b6a30c30307f931e28950 =
     [ "cvMatToOpOutput.hpp", "cv_mat_to_op_output_8hpp.html", [
       [ "CvMatToOpOutput", "classop_1_1_cv_mat_to_op_output.html", "classop_1_1_cv_mat_to_op_output" ]
     ] ],
-    [ "datum.hpp", "datum_8hpp.html", [
-      [ "Datum", "structop_1_1_datum.html", "structop_1_1_datum" ]
-    ] ],
+    [ "datum.hpp", "datum_8hpp.html", "datum_8hpp" ],
     [ "enumClasses.hpp", "core_2enum_classes_8hpp.html", "core_2enum_classes_8hpp" ],
     [ "gpuRenderer.hpp", "gpu_renderer_8hpp.html", [
       [ "GpuRenderer", "classop_1_1_gpu_renderer.html", "classop_1_1_gpu_renderer" ]

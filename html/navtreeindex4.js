@@ -1,5 +1,7 @@
 var NAVTREEINDEX4 =
 {
+"nms_base_8hpp.html#ae2fb8a239d937b884913caa5bcbc2357":[2,0,0,0,0,14,0],
+"nms_base_8hpp_source.html":[2,0,0,0,0,14],
 "nms_caffe_8hpp.html":[2,0,0,0,0,15],
 "nms_caffe_8hpp_source.html":[2,0,0,0,0,15],
 "op_output_to_cv_mat_8hpp.html":[2,0,0,0,0,16],
@@ -247,7 +249,5 @@ var NAVTREEINDEX4 =
 "structop_1_1_rectangle.html#abea1a6760629dc4ed99875dae9d5ac36":[1,0,2,12,11],
 "structop_1_1_rectangle.html#ac4ae58fe6ffd2f811f5cbc48661c1856":[1,0,2,12,17],
 "structop_1_1_rectangle.html#addb67763ca3a0ca9fd4f7184ad9d11ae":[1,0,2,12,13],
-"structop_1_1_rectangle.html#aed0ca00eb295de406ec8ec6dd03c1da5":[1,0,2,12,14],
-"structop_1_1_rectangle.html#aed48a0008434867b879a678c1da015b3":[1,0,2,12,6],
-"structop_1_1_rectangle.html#afbb0da8956e35178d3f28d2b1d998175":[1,0,2,12,1]
+"structop_1_1_rectangle.html#aed0ca00eb295de406ec8ec6dd03c1da5":[1,0,2,12,14]
 };

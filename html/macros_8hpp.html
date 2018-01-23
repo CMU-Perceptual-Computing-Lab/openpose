@@ -112,10 +112,8 @@ $(document).ready(function(){initNavTree('macros_8hpp.html','');});
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &lt;memory&gt;</code><br/>
+<code>#include &lt;ostream&gt;</code><br/>
 <code>#include &lt;vector&gt;</code><br/>
-<code>#include &lt;<a class="el" href="datum_8hpp_source.html">openpose/core/datum.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="point_8hpp_source.html">openpose/core/point.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="rectangle_8hpp_source.html">openpose/core/rectangle.hpp</a>&gt;</code><br/>
 </div>
 <p><a href="macros_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -137,14 +135,6 @@ Namespaces</h2></td></tr>
 Macros</h2></td></tr>
 <tr class="memitem:a4ba443bb7a0e5dbe8054a9ac37a5e000"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a></td></tr>
 <tr class="separator:a4ba443bb7a0e5dbe8054a9ac37a5e000"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad96b23e17e179ed25d779d31b8ee2c07"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8hpp.html#ad96b23e17e179ed25d779d31b8ee2c07">DATUM_BASE_NO_PTR</a>&#160;&#160;&#160;std::vector&lt;Datum&gt;</td></tr>
-<tr class="separator:ad96b23e17e179ed25d779d31b8ee2c07"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a07cabbfba0fbaa740292d7ffca1e33ed"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8hpp.html#a07cabbfba0fbaa740292d7ffca1e33ed">DATUM_BASE</a>&#160;&#160;&#160;std::shared_ptr&lt;<a class="el" href="macros_8hpp.html#ad96b23e17e179ed25d779d31b8ee2c07">DATUM_BASE_NO_PTR</a>&gt;</td></tr>
-<tr class="separator:a07cabbfba0fbaa740292d7ffca1e33ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad11d52b69bc54e48ceb2f5787f700431"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8hpp.html#ad11d52b69bc54e48ceb2f5787f700431">DEFINE_TEMPLATE_DATUM</a>(templateName)&#160;&#160;&#160;template class <a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> templateName&lt;<a class="el" href="macros_8hpp.html#a07cabbfba0fbaa740292d7ffca1e33ed">DATUM_BASE</a>&gt;</td></tr>
-<tr class="separator:ad11d52b69bc54e48ceb2f5787f700431"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af87cd873cebb915837ae27248f67e822"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8hpp.html#af87cd873cebb915837ae27248f67e822">COMPILE_TEMPLATE_DATUM</a>(templateName)&#160;&#160;&#160;extern <a class="el" href="macros_8hpp.html#ad11d52b69bc54e48ceb2f5787f700431">DEFINE_TEMPLATE_DATUM</a>(templateName)</td></tr>
-<tr class="separator:af87cd873cebb915837ae27248f67e822"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af57a843cfdae82e064838c20b3b54851"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8hpp.html#af57a843cfdae82e064838c20b3b54851">UNUSED</a>(unusedVariable)&#160;&#160;&#160;(void)(unusedVariable)</td></tr>
 <tr class="separator:af57a843cfdae82e064838c20b3b54851"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abef96b5dd35dd9d44ad27ddf0e2f5f2e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8hpp.html#abef96b5dd35dd9d44ad27ddf0e2f5f2e">DELETE_COPY</a>(className)</td></tr>
@@ -155,6 +145,8 @@ Macros</h2></td></tr>
 <tr class="separator:ac5627744abe5fd0c8eacfe9c7f8bd32e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6bf32c65e0f388d5b09d8b2424416c0e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8hpp.html#a6bf32c65e0f388d5b09d8b2424416c0e">COMPILE_TEMPLATE_BASIC_TYPES</a>(className, classType)</td></tr>
 <tr class="separator:a6bf32c65e0f388d5b09d8b2424416c0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa883b8ec96d2804b37d3bfb0bd4c5f16"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8hpp.html#aa883b8ec96d2804b37d3bfb0bd4c5f16">OVERLOAD_C_OUT</a>(className)</td></tr>
+<tr class="separator:aa883b8ec96d2804b37d3bfb0bd4c5f16"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1eadbb31e92e7fbc799bf7cf4d2a6f50"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8hpp.html#a1eadbb31e92e7fbc799bf7cf4d2a6f50">COMPILE_TEMPLATE_FLOATING_TYPES_CLASS</a>(className)&#160;&#160;&#160;<a class="el" href="macros_8hpp.html#a80404791b46a15fd601feaa11f1e5028">COMPILE_TEMPLATE_FLOATING_TYPES</a>(className, class)</td></tr>
 <tr class="separator:a1eadbb31e92e7fbc799bf7cf4d2a6f50"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af9fed593b7a4237bc6ede717a1ae70f0"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8hpp.html#af9fed593b7a4237bc6ede717a1ae70f0">COMPILE_TEMPLATE_FLOATING_TYPES_STRUCT</a>(className)&#160;&#160;&#160;<a class="el" href="macros_8hpp.html#a80404791b46a15fd601feaa11f1e5028">COMPILE_TEMPLATE_FLOATING_TYPES</a>(className, struct)</td></tr>
@@ -200,7 +192,7 @@ Macros</h2></td></tr>
 <div class="line">    template classType <a class="code" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> className&lt;float&gt;; \</div>
 <div class="line">    template classType <a class="code" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> className&lt;double&gt;; \</div>
 <div class="line">    template classType <a class="code" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> className&lt;long double&gt;</div>
-<div class="ttc" id="macros_8hpp_html_a4ba443bb7a0e5dbe8054a9ac37a5e000"><div class="ttname"><a href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a></div><div class="ttdeci">#define OP_API</div><div class="ttdef"><b>Definition:</b> macros.hpp:5</div></div>
+<div class="ttc" id="macros_8hpp_html_a4ba443bb7a0e5dbe8054a9ac37a5e000"><div class="ttname"><a href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a></div><div class="ttdeci">#define OP_API</div><div class="ttdef"><b>Definition:</b> macros.hpp:9</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -236,22 +228,6 @@ Macros</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="af87cd873cebb915837ae27248f67e822"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define COMPILE_TEMPLATE_DATUM</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">templateName</td><td>)</td>
-          <td>&#160;&#160;&#160;extern <a class="el" href="macros_8hpp.html#ad11d52b69bc54e48ceb2f5787f700431">DEFINE_TEMPLATE_DATUM</a>(templateName)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a class="anchor" id="a80404791b46a15fd601feaa11f1e5028"></a>
 <div class="memitem">
 <div class="memproto">
@@ -278,7 +254,7 @@ Macros</h2></td></tr>
 <b>Value:</b><div class="fragment"><div class="line"><span class="keywordtype">char</span> gInstantiationGuard##className; \</div>
 <div class="line">  template classType <a class="code" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> className&lt;float&gt;; \</div>
 <div class="line">  template classType <a class="code" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> className&lt;double&gt;</div>
-<div class="ttc" id="macros_8hpp_html_a4ba443bb7a0e5dbe8054a9ac37a5e000"><div class="ttname"><a href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a></div><div class="ttdeci">#define OP_API</div><div class="ttdef"><b>Definition:</b> macros.hpp:5</div></div>
+<div class="ttc" id="macros_8hpp_html_a4ba443bb7a0e5dbe8054a9ac37a5e000"><div class="ttname"><a href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a></div><div class="ttdeci">#define OP_API</div><div class="ttdef"><b>Definition:</b> macros.hpp:9</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -314,46 +290,6 @@ Macros</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a07cabbfba0fbaa740292d7ffca1e33ed"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define DATUM_BASE&#160;&#160;&#160;std::shared_ptr&lt;<a class="el" href="macros_8hpp.html#ad96b23e17e179ed25d779d31b8ee2c07">DATUM_BASE_NO_PTR</a>&gt;</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ad96b23e17e179ed25d779d31b8ee2c07"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define DATUM_BASE_NO_PTR&#160;&#160;&#160;std::vector&lt;Datum&gt;</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ad11d52b69bc54e48ceb2f5787f700431"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define DEFINE_TEMPLATE_DATUM</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">templateName</td><td>)</td>
-          <td>&#160;&#160;&#160;template class <a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> templateName&lt;<a class="el" href="macros_8hpp.html#a07cabbfba0fbaa740292d7ffca1e33ed">DATUM_BASE</a>&gt;</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a class="anchor" id="abef96b5dd35dd9d44ad27ddf0e2f5f2e"></a>
 <div class="memitem">
 <div class="memproto">
@@ -381,6 +317,29 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="aa883b8ec96d2804b37d3bfb0bd4c5f16"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define OVERLOAD_C_OUT</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">className</td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; std::ostream &amp;operator&lt;&lt;(std::ostream&amp; ostream, const op::className&lt;T&gt;&amp; obj) \</div>
+<div class="line">    { \</div>
+<div class="line">        ostream &lt;&lt; obj.toString(); \</div>
+<div class="line">        return ostream; \</div>
+<div class="line">    }</div>
+</div><!-- fragment --><p>cout operator overload calling toString() function </p>
+<dl class="section return"><dt>Returns</dt><dd>std::ostream containing output from toString() </dd></dl>
 
 </div>
 </div>
