@@ -20,6 +20,8 @@ namespace op
         {
             context = cl::Context(viennacl::ocl::get_context(deviceId).handle().get(), true);
             queue = cl::CommandQueue(viennacl::ocl::get_context(deviceId).get_queue().handle().get(), true);
+            op::log(std::to_string(context.getInfo<CL_CONTEXT_DEVICES>().size()));
+            device = context.getInfo<CL_CONTEXT_DEVICES>()[0];
             //context.printContext();
         }
         else
@@ -178,10 +180,11 @@ namespace op
             }
             program = cl::Program(context, src, true);
         }
-        catch(cl::Error e) {
-            op::log(program.getBuildInfo<CL_PROGRAM_BUILD_STATUS>(getDevice()));
-            op::log(program.getBuildInfo<CL_PROGRAM_BUILD_OPTIONS>(getDevice()));
-            op::log(program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(getDevice()));
+        catch(cl::BuildError e) {
+            auto buildInfo = e.getBuildLog();
+            for (auto &pair : buildInfo) {
+                std::cerr << "Device: " << pair.first.getInfo<CL_DEVICE_NAME>() << std::endl << pair.second << std::endl << std::endl;
+            }
             exit(-1);
         }
         return program;

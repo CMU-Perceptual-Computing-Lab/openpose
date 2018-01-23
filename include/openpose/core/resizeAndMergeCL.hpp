@@ -72,8 +72,21 @@ namespace op
     );
 
     const std::string resizeAndMergeKernel = MULTI_LINE_STRING(
-        __kernel void resizeAndMergeKernel(__global float* T)
+        __kernel void resizeAndMergeKernel(__global float* targetPtr, const float* sourcePtr,
+                                           const float scaleWidth, const float scaleHeight,
+                                           const int sourceWidth, const int sourceHeight,
+                                           const int targetWidth, const int targetHeight)
         {
+            int x = get_global_id(0);
+            int y = get_global_id(1);
+
+            if (x < targetWidth && y < targetHeight)
+            {
+                const float xSource = (x + 0.5f) * sourceWidth / (float)targetWidth - 0.5f;
+                const float ySource = (y + 0.5f) * sourceHeight / (float)targetHeight - 0.5f;
+                targetPtr[y*targetWidth+x] = bicubicInterpolate(sourcePtr, xSource, ySource, sourceWidth, sourceHeight,
+                                                                sourceWidth);
+            }
         }
     );
 }

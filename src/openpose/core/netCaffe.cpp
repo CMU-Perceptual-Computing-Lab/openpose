@@ -128,7 +128,7 @@ namespace op
                    upImpl->upCaffeNet.reset(new caffe::Net<float>{upImpl->mCaffeProto, caffe::TEST, device});
                    upImpl->upCaffeNet->CopyTrainedLayersFrom(upImpl->mCaffeTrainedModel);
                    op::CLManager::getInstance(upImpl->mGpuId, CL_DEVICE_TYPE_GPU, true);
-                   op::CLManager::getInstance(upImpl->mGpuId)->buildKernelIntoManager("resizeAndMergeKernel",op::resizeAndMergeKernel+op::commonKernels);
+                   op::CLManager::getInstance(upImpl->mGpuId)->buildKernelIntoManager("resizeAndMergeKernel",op::commonKernels+op::resizeAndMergeKernel);
                #else
                    upImpl->upCaffeNet.reset(new caffe::Net<float>{upImpl->mCaffeProto, caffe::TEST});
                    upImpl->upCaffeNet->CopyTrainedLayersFrom(upImpl->mCaffeTrainedModel);
