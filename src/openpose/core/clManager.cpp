@@ -221,20 +221,25 @@ namespace op
     }
 
     template <typename T>
-    cl::Kernel& CLManager::getKernelFromManager(std::string kernelName){
+    cl::Kernel& CLManager::getKernelFromManager(std::string kernelName, std::string src, bool isFile){
         // Set type
         std::string type = getType<T>();
         std::string key = kernelName + "_" + type;
 
         if (!(clKernels.find(key) != clKernels.end()))
         {
-            throw std::runtime_error("Error: Kernel " + kernelName + " Type: " + type + " not found in Manager");
+            if(!src.size())
+                throw std::runtime_error("Error: Kernel " + kernelName + " Type: " + type + " not found in Manager");
+            else
+            {
+                buildKernelIntoManager<T>(kernelName, src, isFile);
+            }
         }
         return clKernels[key];
     }
 
-    template cl::Kernel&  CLManager::getKernelFromManager<float>(std::string kernelName);
-    template cl::Kernel&  CLManager::getKernelFromManager<double>(std::string kernelName);
+    template cl::Kernel&  CLManager::getKernelFromManager<float>(std::string kernelName, std::string src, bool isFile);
+    template cl::Kernel&  CLManager::getKernelFromManager<double>(std::string kernelName, std::string src, bool isFile);
     template bool CLManager::buildKernelIntoManager<float>(std::string kernelName, std::string src, bool isFile);
     template bool CLManager::buildKernelIntoManager<double>(std::string kernelName, std::string src, bool isFile);
     template cl::Program CLManager::buildProgramFromSource<float>(std::string src, bool isFile);

@@ -3,7 +3,10 @@
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/openCv.hpp>
 #include <openpose/core/resizeAndMergeBase.hpp>
-#include <openpose/core/clManager.hpp>
+#ifdef USE_OPENCL
+    #include <openpose/core/clManager.hpp>
+    #include <openpose/core/resizeAndMergeCL.hpp>
+#endif
 
 namespace op
 {
@@ -132,7 +135,7 @@ namespace op
                       + std::to_string(scaleInputToNetInputs.size()) + ".", __LINE__, __FUNCTION__, __FILE__);
 
             // Get Kernels
-            cl::Kernel& resizeAndMergeKernel = op::CLManager::getInstance(gpuID)->getKernelFromManager<T>("resizeAndMergeKernel");
+            cl::Kernel& resizeAndMergeKernel = op::CLManager::getInstance(gpuID)->getKernelFromManager<T>("resizeAndMergeKernel",op::commonKernels+op::resizeAndMergeKernel);
             cl::Buffer targetPtrBuffer = cl::Buffer((cl_mem)(targetPtr), true);
 
             // Parameters
@@ -150,7 +153,7 @@ namespace op
                 if (targetSize[0] > 1 || num == 1)
                 {
                     cl::Buffer sourcePtrBuffer = cl::Buffer((cl_mem)(sourcePtrs.at(0)), true);
-                    const auto sourceChannelOffset = sourceHeight * sourceWidth;
+                    const auto sourceChannelOffshet = sourceHeight * sourceWidth;
                     const auto targetChannelOffset = targetWidth * targetHeight;
                     for (auto n = 0; n < num; n++)
                     {
@@ -171,6 +174,7 @@ namespace op
                             op::CLManager::getInstance(gpuID)->getQueue().enqueueNDRangeKernel(resizeAndMergeKernel, cl::NDRange(), cl::NDRange(targetWidth,targetHeight), cl::NDRange(), NULL, NULL);
                         }
                     }
+                    op::CLManager::getInstance(gpuID)->getQueue().finish();
                 }
                 // Old inefficient multi-scale merging
                 else

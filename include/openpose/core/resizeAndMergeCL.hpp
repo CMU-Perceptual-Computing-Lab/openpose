@@ -71,6 +71,27 @@ namespace op
         }
     );
 
+    const std::string resizeAndMergeFullKernel = MULTI_LINE_STRING(
+        __kernel void resizeAndMergeFullKernel(__global Type* targetPtr, __global const Type* sourcePtr,
+                                           const int sourceWidth, const int sourceHeight,
+                                           const int targetWidth, const int targetHeight)
+        {
+            int c = get_global_id(0);
+            int y = get_global_id(1);
+            int x = get_global_id(2);
+
+            Type* targetPtrC = &targetPtr[c*targetWidth*targetHeight];
+            const Type* sourcePtrC = &sourcePtr[c*sourceWidth*sourceHeight];
+
+            if (x < targetWidth && y < targetHeight)
+            {
+                const Type xSource = (x + 0.5f) * sourceWidth / (Type)targetWidth - 0.5f;
+                const Type ySource = (y + 0.5f) * sourceHeight / (Type)targetHeight - 0.5f;
+                targetPtrC[y*targetWidth+x] = bicubicInterpolate(sourcePtrC, xSource, ySource, sourceWidth, sourceHeight, sourceWidth);
+            }
+        }
+    );
+
     const std::string resizeAndMergeKernel = MULTI_LINE_STRING(
         __kernel void resizeAndMergeKernel(__global Type* targetPtr, __global const Type* sourcePtr,
                                            const int sourceWidth, const int sourceHeight,
@@ -84,6 +105,44 @@ namespace op
                 const Type xSource = (x + 0.5f) * sourceWidth / (Type)targetWidth - 0.5f;
                 const Type ySource = (y + 0.5f) * sourceHeight / (Type)targetHeight - 0.5f;
                 targetPtr[y*targetWidth+x] = bicubicInterpolate(sourcePtr, xSource, ySource, sourceWidth, sourceHeight, sourceWidth);
+            }
+        }
+    );
+
+    const std::string resizeKernelAndAdd = MULTI_LINE_STRING(
+        __kernel void resizeKernelAndAdd(__global Type* targetPtr, __global const Type* sourcePtr,
+                                           const Type scaleWidth, const Type scaleHeight,
+                                           const int sourceWidth, const int sourceHeight,
+                                           const int targetWidth, const int targetHeight)
+        {
+            int x = get_global_id(0);
+            int y = get_global_id(1);
+
+            if (x < targetWidth && y < targetHeight)
+            {
+                const Type xSource = (x + 0.5f) / scaleWidth - 0.5f;
+                const Type ySource = (y + 0.5f) / scaleHeight - 0.5f;
+                targetPtr[y*targetWidth+x] = bicubicInterpolate(sourcePtr, xSource, ySource, sourceWidth, sourceHeight, sourceWidth);
+            }
+        }
+    );
+
+    const std::string resizeKernelAndAverage = MULTI_LINE_STRING(
+        __kernel void resizeKernelAndAverage(__global Type* targetPtr, __global const Type* sourcePtr,
+                                           const Type scaleWidth, const Type scaleHeight,
+                                           const int sourceWidth, const int sourceHeight,
+                                           const int targetWidth, const int targetHeight, const int counter)
+        {
+            int x = get_global_id(0);
+            int y = get_global_id(1);
+
+            if (x < targetWidth && y < targetHeight)
+            {
+                const Type xSource = (x + 0.5f) / scaleWidth - 0.5f;
+                const Type ySource = (y + 0.5f) / scaleHeight - 0.5f;
+                Type interpolated = bicubicInterpolate(sourcePtr, xSource, ySource, sourceWidth, sourceHeight, sourceWidth);
+                Type& targetPixel = targetPtr[y*targetWidth+x];
+                targetPixel = (targetPixel + interpolated) / (Type)(counter)
             }
         }
     );

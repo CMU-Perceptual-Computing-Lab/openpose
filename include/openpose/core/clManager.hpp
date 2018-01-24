@@ -41,8 +41,8 @@ namespace op
         cl::Context& getContext();
         cl::CommandQueue& getQueue();
         cl::Device& getDevice();
-        template <typename T> bool buildKernelIntoManager(std::string kernelName, std::string src, bool isFile = false);
-        template <typename T> cl::Kernel& getKernelFromManager(std::string kernelName);
+        template <typename T> bool buildKernelIntoManager(std::string kernelName, std::string src = "", bool isFile = false);
+        template <typename T> cl::Kernel& getKernelFromManager(std::string kernelName, std::string src = "", bool isFile = false);
 
     private:
         template <typename T> inline std::string getType()

@@ -11,8 +11,6 @@
 #include <openpose/core/netCaffe.hpp>
 #ifdef USE_OPENCL
     #include <openpose/core/clManager.hpp>
-    #include <openpose/core/resizeAndMergeCL.hpp>
-    #include <viennacl/backend/opencl.hpp>
 #endif
 
 namespace op
@@ -128,8 +126,6 @@ namespace op
                    upImpl->upCaffeNet.reset(new caffe::Net<float>{upImpl->mCaffeProto, caffe::TEST, device});
                    upImpl->upCaffeNet->CopyTrainedLayersFrom(upImpl->mCaffeTrainedModel);
                    op::CLManager::getInstance(upImpl->mGpuId, CL_DEVICE_TYPE_GPU, true);
-                   op::CLManager::getInstance(upImpl->mGpuId)->buildKernelIntoManager<float>("resizeAndMergeKernel",op::commonKernels+op::resizeAndMergeKernel);
-                   op::CLManager::getInstance(upImpl->mGpuId)->buildKernelIntoManager<double>("resizeAndMergeKernel",op::commonKernels+op::resizeAndMergeKernel);
                #else
                    upImpl->upCaffeNet.reset(new caffe::Net<float>{upImpl->mCaffeProto, caffe::TEST});
                    upImpl->upCaffeNet->CopyTrainedLayersFrom(upImpl->mCaffeTrainedModel);
