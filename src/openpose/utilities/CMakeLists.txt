@@ -14,7 +14,12 @@ set(SOURCES_OP_UTILITIES_WITH_CP ${SOURCES_OP_UTILITIES_WITH_CP} PARENT_SCOPE)
 set(SOURCES_OPENPOSE ${SOURCES_OPENPOSE} ${SOURCES_OP_UTILITIES_WITH_CP} PARENT_SCOPE)
 
 if (UNIX AND NOT APPLE)
-  cuda_add_library(openpose_utilities ${SOURCES_OP_UTILITIES})
+  if (${GPU_MODE} MATCHES "CUDA")
+    cuda_add_library(openpose_utilities ${SOURCES_OP_UTILITIES})
+  else()
+    add_library(openpose_utilities ${SOURCES_OP_UTILITIES})
+  endif ()
+
   target_link_libraries(openpose_utilities openpose_producer openpose_filestream)
 
   install(TARGETS openpose_utilities

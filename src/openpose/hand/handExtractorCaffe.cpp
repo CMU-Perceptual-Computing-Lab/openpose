@@ -1,4 +1,4 @@
-#if defined USE_CAFFE && defined USE_CUDA
+#if defined USE_CAFFE
     #include <caffe/blob.hpp>
 #endif
 #include <opencv2/opencv.hpp> // CV_WARP_INVERSE_MAP, CV_INTER_LINEAR
@@ -16,7 +16,7 @@ namespace op
 {
     struct HandExtractorCaffe::ImplHandExtractorCaffe
     {
-        #if defined USE_CAFFE && defined USE_CUDA
+        #if defined USE_CAFFE
             bool netInitialized;
             std::shared_ptr<NetCaffe> spNetCaffe;
             std::shared_ptr<ResizeAndMergeCaffe<float>> spResizeAndMergeCaffe;
@@ -38,7 +38,7 @@ namespace op
         #endif
     };
 
-    #if defined USE_CAFFE && defined USE_CUDA
+    #if defined USE_CAFFE
         void cropFrame(Array<float>& handImageCrop, cv::Mat& affineMatrix, const cv::Mat& cvInputData,
                        const Rectangle<float>& handRectangle, const int netInputSide,
                        const Point<int>& netOutputSize, const bool mirrorImage)
@@ -134,7 +134,12 @@ namespace op
                 auto totalOffset = 0u;
                 auto* heatMapsPtr = &heatMaps.getPtr()[person*volumeBodyParts];
                 // Copy hand parts
-                cudaMemcpy(heatMapsPtr, heatMapsGpuPtr, volumeBodyParts * sizeof(float), cudaMemcpyDeviceToHost);
+                #ifdef USE_CUDA
+                    cudaMemcpy(heatMapsPtr, heatMapsGpuPtr, volumeBodyParts * sizeof(float), cudaMemcpyDeviceToHost);
+                #else
+                    //std::memcpy(heatMapsPtr, heatMapsGpuPtr, volumeBodyParts * sizeof(float));
+                    std::copy(heatMapsGpuPtr, heatMapsGpuPtr + volumeBodyParts, heatMapsPtr);
+                #endif
                 // Change from [0,1] to [-1,1]
                 if (heatMapScaleMode == ScaleMode::PlusMinusOne)
                     for (auto i = 0u ; i < volumeBodyParts ; i++)
@@ -170,7 +175,9 @@ namespace op
                 // Pose extractor blob and layer
                 maximumCaffe->Reshape({heatMapsBlob.get()}, {peaksBlob.get()});
                 // Cuda check
-                cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+                #ifdef USE_CUDA
+                    cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+                #endif
             }
             catch (const std::exception& e)
             {
@@ -186,13 +193,13 @@ namespace op
                                            const ScaleMode heatMapScale,
                                            const bool enableGoogleLogging) :
         HandExtractor{netInputSize, netOutputSize, numberScales, rangeScales, heatMapTypes, heatMapScale}
-        #if defined USE_CAFFE && defined USE_CUDA
+        #if defined USE_CAFFE
         , upImpl{new ImplHandExtractorCaffe{modelFolder, gpuId, enableGoogleLogging}}
         #endif
     {
         try
         {
-            #if !defined USE_CAFFE || !defined USE_CUDA
+            #if !defined USE_CAFFE
                 UNUSED(netInputSize);
                 UNUSED(netOutputSize);
                 UNUSED(modelFolder);
@@ -219,17 +226,21 @@ namespace op
     {
         try
         {
-            #if defined USE_CAFFE && defined USE_CUDA
+            #if defined USE_CAFFE
                 // Logging
                 log("Starting initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 // Initialize Caffe net
                 upImpl->spNetCaffe->initializationOnThread();
-                cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+                #if defined USE_CUDA
+                    cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+                #endif
                 // Initialize blobs
                 upImpl->spCaffeNetOutputBlob = upImpl->spNetCaffe->getOutputBlob();
                 upImpl->spHeatMapsBlob = {std::make_shared<caffe::Blob<float>>(1,1,1,1)};
                 upImpl->spPeaksBlob = {std::make_shared<caffe::Blob<float>>(1,1,1,1)};
-                cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+                #if defined USE_CUDA
+                    cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+                #endif
                 // Logging
                 log("Finished initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             #endif
@@ -246,7 +257,7 @@ namespace op
     {
         try
         {
-            #if defined USE_CAFFE && defined USE_CUDA
+            #if defined USE_CAFFE
                 if (!handRectangles.empty())
                 {
                     // Security checks
@@ -353,9 +364,15 @@ namespace op
                                     }
                                 }
                                 // HeatMaps: storing
-                                if (!mHeatMapTypes.empty())
-                                    updateHandHeatMapsForPerson(mHeatMaps[hand], person, mHeatMapScaleMode,
-                                                                upImpl->spHeatMapsBlob->gpu_data());
+                                if (!mHeatMapTypes.empty()){
+                                    #ifdef USE_CUDA
+                                        updateHandHeatMapsForPerson(mHeatMaps[hand], person, mHeatMapScaleMode,
+                                                                    upImpl->spHeatMapsBlob->gpu_data());
+                                    #else
+                                        updateHandHeatMapsForPerson(mHeatMaps[hand], person, mHeatMapScaleMode,
+                                                                    upImpl->spHeatMapsBlob->cpu_data());
+                                    #endif
+                                }
                             }
                         }
                     }
@@ -384,7 +401,7 @@ namespace op
     {
         try
         {
-            #if defined USE_CAFFE && defined USE_CUDA
+            #if defined USE_CAFFE
                 // 1. Deep net
                 upImpl->spNetCaffe->forwardPass(mHandImageCrop);
 

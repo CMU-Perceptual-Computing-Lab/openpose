@@ -19,7 +19,11 @@ set(SOURCES_OP_POSE_WITH_CP ${SOURCES_OP_POSE_WITH_CP} PARENT_SCOPE)
 set(SOURCES_OPENPOSE ${SOURCES_OPENPOSE} ${SOURCES_OP_POSE_WITH_CP} PARENT_SCOPE)
 
 if (UNIX AND NOT APPLE)
-  cuda_add_library(openpose_pose ${SOURCES_OP_POSE})
+  if (${GPU_MODE} MATCHES "CUDA")
+    cuda_add_library(openpose_pose ${SOURCES_OP_POSE})
+  else()
+    add_library(openpose_pose ${SOURCES_OP_POSE})
+  endif ()
   
   if (BUILD_CAFFE)
     add_dependencies(openpose_pose openpose_caffe)

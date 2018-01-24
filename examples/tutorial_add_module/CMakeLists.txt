@@ -1,4 +1,4 @@
-set(EXAMPLE_FILES 
+set(EXAMPLE_FILES
     1_custom_post_processing.cpp)
 
 include(${CMAKE_SOURCE_DIR}/cmake/Utils.cmake)
@@ -6,7 +6,7 @@ include(${CMAKE_SOURCE_DIR}/cmake/Utils.cmake)
 foreach(EXAMPLE_FILE ${EXAMPLE_FILES})
 
   get_filename_component(SOURCE_NAME ${EXAMPLE_FILE} NAME_WE)
-  
+
   if (UNIX AND NOT APPLE)
     set(EXE_NAME "${SOURCE_NAME}.bin")
   elseif (WIN32)
@@ -15,13 +15,13 @@ foreach(EXAMPLE_FILE ${EXAMPLE_FILES})
 
   message(STATUS "Adding Example ${EXE_NAME}")
   add_executable(${EXE_NAME} ${EXAMPLE_FILE})
-  target_link_libraries( ${EXE_NAME} openpose ${GLOG_LIBRARY} ${GFLAGS_LIBRARY} 
-      ${Caffe_LIBS})
-  
+  target_link_libraries( ${EXE_NAME} openpose ${GLOG_LIBRARY} ${GFLAGS_LIBRARY}
+      ${Caffe_LIBS} ${MKL_LIBS})
+
   if (WIN32)
     set_property(TARGET ${EXE_NAME} PROPERTY FOLDER "Examples/Tutorial/AddModule")
-    configure_file(${CMAKE_SOURCE_DIR}/cmake/OpenPose.vcxproj.user 
-        ${CMAKE_CURRENT_BINARY_DIR}/${EXE_NAME}.vcxproj.user @ONLY) 
+    configure_file(${CMAKE_SOURCE_DIR}/cmake/OpenPose.vcxproj.user
+        ${CMAKE_CURRENT_BINARY_DIR}/${EXE_NAME}.vcxproj.user @ONLY)
   endif (WIN32)
 
 endforeach()

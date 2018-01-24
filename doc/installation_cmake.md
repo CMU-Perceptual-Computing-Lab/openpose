@@ -10,11 +10,11 @@ OpenPose - Installation using CMake
 6. [Uninstallation](#uninstallation)
 7. [Optional Settings](#optional-settings)
     1. [MPI Model](#mpi-model)
-    2. [Custom Caffe (Ubuntu Only)](#custom-caffe-ubuntu-only)
-    3. [Custom OpenCV (Ubuntu Only)](#custom-opencv-ubuntu-only)
-    4. [OpenPose 3D Reconstruction Demo (Windows Only)](#openpose-3d-reconstruction-demo-windows-only)
-    5. [Doxygen Documentation Autogeneration (Ubuntu Only)](#doxygen-documentation-autogeneration-ubuntu-only)
-    6. [CMake Command Line Configuration (Ubuntu Only)](#cmake-command-line-configuration-ubuntu-only)
+    3. [Custom Caffe (Ubuntu Only)](#custom-caffe-ubuntu-only)
+    4. [Custom OpenCV (Ubuntu Only)](#custom-opencv-ubuntu-only)
+    5. [OpenPose 3D Reconstruction Demo (Windows Only)](#openpose-3d-reconstruction-demo-windows-only)
+    6. [Doxygen Documentation Autogeneration (Ubuntu Only)](#doxygen-documentation-autogeneration-ubuntu-only)
+    7. [CMake Command Line Configuration (Ubuntu Only)](#cmake-command-line-configuration-ubuntu-only)
 
 
 
@@ -216,3 +216,4 @@ If Caffe is not already present but OpenCV is, then use the below command.
 ```bash
 cmake -DOpenCV_DIR=/home/"${USER}"/softwares/opencv/build
 ```
+

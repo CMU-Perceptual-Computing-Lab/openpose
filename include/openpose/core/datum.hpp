@@ -304,6 +304,12 @@ namespace op
             return id != datum.id;
         }
     };
+
+    // Defines for Datum. Added here rather than in `macros.hpp` to avoid circular dependencies
+    #define DATUM_BASE_NO_PTR std::vector<Datum>
+    #define DATUM_BASE std::shared_ptr<DATUM_BASE_NO_PTR>
+    #define DEFINE_TEMPLATE_DATUM(templateName) template class OP_API templateName<DATUM_BASE>
+    #define COMPILE_TEMPLATE_DATUM(templateName) extern DEFINE_TEMPLATE_DATUM(templateName)
 }
 
 #endif // OPENPOSE_CORE_DATUM_HPP
