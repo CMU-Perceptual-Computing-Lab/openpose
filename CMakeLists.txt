@@ -301,15 +301,12 @@ if (UNIX AND NOT APPLE)
               # -DOpenCV_DIR=${OpenCV_DIR})
 
       ExternalProject_Get_Property(openpose_caffe install_dir)
-      #set(Caffe_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/caffe/include)
-      # TODO -- Find a better soln.
-      #set(Caffe_LIBS ${CMAKE_BINARY_DIR}/caffe/lib/libcaffe.so)
 
       if (NOT Caffe_FOUND)
         add_custom_command(TARGET openpose_caffe
             POST_BUILD
             COMMAND ${CMAKE_COMMAND} ${CMAKE_SOURCE_DIR} 
-            COMMAND +make
+            COMMAND ${MAKE} 
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
             COMMENT "Rerunning cmake after building Caffe submodule")
       endif (NOT Caffe_FOUND)
