@@ -20,7 +20,6 @@ namespace op
         {
             context = cl::Context(viennacl::ocl::get_context(deviceId).handle().get(), true);
             queue = cl::CommandQueue(viennacl::ocl::get_context(deviceId).get_queue().handle().get(), true);
-            op::log(std::to_string(context.getInfo<CL_CONTEXT_DEVICES>().size()));
             device = context.getInfo<CL_CONTEXT_DEVICES>()[0];
             //context.printContext();
         }
@@ -166,18 +165,21 @@ namespace op
         return device;
     }
 
+    template <typename T>
     cl::Program CLManager::buildProgramFromSource(std::string src, bool isFile)
     {
         cl::Program program;
         try{
+            std::string type = getType<T>();
+
             if(isFile)
             {
                 std::ifstream programFile((char*) src.c_str());
                 std::string programString(std::istreambuf_iterator<char>(programFile),
                                                   (std::istreambuf_iterator<char>()));
                 src = programString;
-                //src = std::regex_replace(src, std::regex(";"), std::string(";\n"));
             }
+            src = std::regex_replace(src, std::regex("Type"), std::string(type));
             program = cl::Program(context, src, true);
         }
         catch(cl::BuildError e) {
@@ -190,20 +192,25 @@ namespace op
         return program;
     }
 
+    template <typename T>
     bool CLManager::buildKernelIntoManager(std::string kernelName, std::string src, bool isFile){
+        // Set type
+        std::string type = getType<T>();
+        std::string key = kernelName + "_" + type;
+
         // Program not built
-        if (!(clPrograms.find(src) != clPrograms.end()))
+        if (!(clPrograms.find(key) != clPrograms.end()))
         {
-            clPrograms[src] = buildProgramFromSource(src, isFile);
+            clPrograms[key] = buildProgramFromSource<T>(src, isFile);
         }
 
-        cl::Program& program = clPrograms[src];
+        cl::Program& program = clPrograms[key];
 
         // Kernel not built
-        if (!(clKernels.find(kernelName) != clKernels.end()))
+        if (!(clKernels.find(key) != clKernels.end()))
         {
-            clKernels[kernelName] = cl::Kernel(program, kernelName.c_str());
-            op::log("Kernel " + kernelName + " built successfully");
+            clKernels[key] = cl::Kernel(program, kernelName.c_str());
+            op::log("Kernel: " + kernelName + " Type: " + type + " built successfully");
             return true;
         }
         else
@@ -213,11 +220,23 @@ namespace op
         }
     }
 
+    template <typename T>
     cl::Kernel& CLManager::getKernelFromManager(std::string kernelName){
-        if (!(clKernels.find(kernelName) != clKernels.end()))
+        // Set type
+        std::string type = getType<T>();
+        std::string key = kernelName + "_" + type;
+
+        if (!(clKernels.find(key) != clKernels.end()))
         {
-            throw std::runtime_error("Error: Kernel not found in Manager: " + kernelName);
+            throw std::runtime_error("Error: Kernel " + kernelName + " Type: " + type + " not found in Manager");
         }
-        return clKernels[kernelName];
+        return clKernels[key];
     }
+
+    template cl::Kernel&  CLManager::getKernelFromManager<float>(std::string kernelName);
+    template cl::Kernel&  CLManager::getKernelFromManager<double>(std::string kernelName);
+    template bool CLManager::buildKernelIntoManager<float>(std::string kernelName, std::string src, bool isFile);
+    template bool CLManager::buildKernelIntoManager<double>(std::string kernelName, std::string src, bool isFile);
+    template cl::Program CLManager::buildProgramFromSource<float>(std::string src, bool isFile);
+    template cl::Program CLManager::buildProgramFromSource<double>(std::string src, bool isFile);
 }

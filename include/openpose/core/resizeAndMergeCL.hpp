@@ -22,7 +22,7 @@ namespace op
             return fastMin(max, fastMax(min, value));
         }
 
-        void cubicSequentialData(int* xIntArray, int* yIntArray, float* dx, float* dy, const float xSource, const float ySource, const int width, const int height)
+        void cubicSequentialData(int* xIntArray, int* yIntArray, Type* dx, Type* dy, const Type xSource, const Type ySource, const int width, const int height)
         {
             xIntArray[1] = fastTruncate((int)(xSource + 1e-5), 0, width - 1);
             xIntArray[0] = fastMax(0, xIntArray[1] - 1);
@@ -37,7 +37,7 @@ namespace op
             *dy = ySource - yIntArray[1];
         }
 
-        float cubicInterpolate(const float v0, const float v1, const float v2, const float v3, const float dx)
+        Type cubicInterpolate(const Type v0, const Type v1, const Type v2, const Type v3, const Type dx)
         {
             // http://www.paulinternet.nl/?page=bicubic
             // const auto a = (-0.5f * v0 + 1.5f * v1 - 1.5f * v2 + 0.5f * v3);
@@ -51,16 +51,16 @@ namespace op
             // return v1 + 0.5f * dx * (v2 - v0 + dx * (2.f * v0 - 5.f * v1 + 4.f * v2 - v3 + dx * (3.f * (v1 - v2) + v3 - v0)));
         }
 
-        float bicubicInterpolate(const float* const sourcePtr, const float xSource, const float ySource, const int widthSource,
+        Type bicubicInterpolate(const Type* const sourcePtr, const Type xSource, const Type ySource, const int widthSource,
                                                const int heightSource, const int widthSourcePtr)
         {
             int xIntArray[4];
             int yIntArray[4];
-            float dx;
-            float dy;
+            Type dx;
+            Type dy;
             cubicSequentialData(xIntArray, yIntArray, &dx, &dy, xSource, ySource, widthSource, heightSource);
 
-            float temp[4];
+            Type temp[4];
             for (unsigned char i = 0; i < 4; i++)
             {
                 const auto offset = yIntArray[i]*widthSourcePtr;
@@ -72,8 +72,7 @@ namespace op
     );
 
     const std::string resizeAndMergeKernel = MULTI_LINE_STRING(
-        __kernel void resizeAndMergeKernel(__global float* targetPtr, const float* sourcePtr,
-                                           const float scaleWidth, const float scaleHeight,
+        __kernel void resizeAndMergeKernel(__global Type* targetPtr, __global const Type* sourcePtr,
                                            const int sourceWidth, const int sourceHeight,
                                            const int targetWidth, const int targetHeight)
         {
@@ -82,10 +81,9 @@ namespace op
 
             if (x < targetWidth && y < targetHeight)
             {
-                const float xSource = (x + 0.5f) * sourceWidth / (float)targetWidth - 0.5f;
-                const float ySource = (y + 0.5f) * sourceHeight / (float)targetHeight - 0.5f;
-                targetPtr[y*targetWidth+x] = bicubicInterpolate(sourcePtr, xSource, ySource, sourceWidth, sourceHeight,
-                                                                sourceWidth);
+                const Type xSource = (x + 0.5f) * sourceWidth / (Type)targetWidth - 0.5f;
+                const Type ySource = (y + 0.5f) * sourceHeight / (Type)targetHeight - 0.5f;
+                targetPtr[y*targetWidth+x] = bicubicInterpolate(sourcePtr, xSource, ySource, sourceWidth, sourceHeight, sourceWidth);
             }
         }
     );

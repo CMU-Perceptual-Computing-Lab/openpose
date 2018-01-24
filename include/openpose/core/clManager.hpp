@@ -35,14 +35,36 @@ namespace op
         cl::Device device;
         cl::CommandQueue queue;
         cl::Context context;
-        cl::Program buildProgramFromSource(std::string src, bool isFile = false);
+        template <typename T> cl::Program buildProgramFromSource(std::string src, bool isFile = false);
 
     public:
         cl::Context& getContext();
         cl::CommandQueue& getQueue();
         cl::Device& getDevice();
-        bool buildKernelIntoManager(std::string kernelName, std::string src, bool isFile = false);
-        cl::Kernel& getKernelFromManager(std::string kernelName);
+        template <typename T> bool buildKernelIntoManager(std::string kernelName, std::string src, bool isFile = false);
+        template <typename T> cl::Kernel& getKernelFromManager(std::string kernelName);
+
+    private:
+        template <typename T> inline std::string getType()
+        {
+            std::string type = "";
+            if ((std::is_same<T, float>::value))
+                type = "float";
+            else if ((std::is_same<T, double>::value))
+                type = "double";
+            else
+                throw std::runtime_error("Error: Invalid CL type");
+            return type;
+        }
+
+    public:
+        template <typename T> static inline cl_buffer_region getBufferRegion(int origin, int size)
+        {
+            cl_buffer_region region;
+            region.origin = sizeof(T) * origin;
+            region.size = sizeof(T) * size;
+            return region;
+        }
     };
 }
 

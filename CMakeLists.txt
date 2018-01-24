@@ -420,6 +420,7 @@ endif (UNIX AND NOT APPLE)
 
 add_definitions( -DOPENPOSE_BINARY_DIR="${CMAKE_BINARY_DIR}" )
 add_definitions( -DOPENPOSE_INSTALL_DIR="${CMAKE_INSTALL_PREFIX}" )
+add_definitions( -DCMAKE_SOURCE_DIR="${CMAKE_SOURCE_DIR}" )
 
 ### PROJECT INCLUDES
 # Specify the include directories
