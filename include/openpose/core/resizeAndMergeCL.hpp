@@ -2,6 +2,9 @@
 #define OPENPOSE_RESIZE_AND_MERGE_CL_HPP
 
 #include <openpose/core/common.hpp>
+#ifdef USE_OPENCL
+    #include <CL/cl2.hpp>
+#endif
 
 namespace op
 {
@@ -71,6 +74,7 @@ namespace op
         }
     );
 
+    typedef cl::KernelFunctor<cl::Buffer, cl::Buffer, int, int, int, int> ResizeAndMergeFullFunctor;
     const std::string resizeAndMergeFullKernel = MULTI_LINE_STRING(
         __kernel void resizeAndMergeFullKernel(__global Type* targetPtr, __global const Type* sourcePtr,
                                            const int sourceWidth, const int sourceHeight,
@@ -92,6 +96,7 @@ namespace op
         }
     );
 
+    typedef cl::KernelFunctor<cl::Buffer, cl::Buffer, int, int, int, int> ResizeAndMergeFunctor;
     const std::string resizeAndMergeKernel = MULTI_LINE_STRING(
         __kernel void resizeAndMergeKernel(__global Type* targetPtr, __global const Type* sourcePtr,
                                            const int sourceWidth, const int sourceHeight,
@@ -109,8 +114,9 @@ namespace op
         }
     );
 
-    const std::string resizeKernelAndAdd = MULTI_LINE_STRING(
-        __kernel void resizeKernelAndAdd(__global Type* targetPtr, __global const Type* sourcePtr,
+    typedef cl::KernelFunctor<cl::Buffer, cl::Buffer, float, float, int, int, int, int> ResizeAndAddFunctor;
+    const std::string resizeAndAddKernel = MULTI_LINE_STRING(
+        __kernel void resizeAndAddKernel(__global Type* targetPtr, __global const Type* sourcePtr,
                                            const Type scaleWidth, const Type scaleHeight,
                                            const int sourceWidth, const int sourceHeight,
                                            const int targetWidth, const int targetHeight)
@@ -122,13 +128,14 @@ namespace op
             {
                 const Type xSource = (x + 0.5f) / scaleWidth - 0.5f;
                 const Type ySource = (y + 0.5f) / scaleHeight - 0.5f;
-                targetPtr[y*targetWidth+x] = bicubicInterpolate(sourcePtr, xSource, ySource, sourceWidth, sourceHeight, sourceWidth);
+                targetPtr[y*targetWidth+x] += bicubicInterpolate(sourcePtr, xSource, ySource, sourceWidth, sourceHeight, sourceWidth);
             }
         }
     );
 
-    const std::string resizeKernelAndAverage = MULTI_LINE_STRING(
-        __kernel void resizeKernelAndAverage(__global Type* targetPtr, __global const Type* sourcePtr,
+    typedef cl::KernelFunctor<cl::Buffer, cl::Buffer, float, float, int, int, int, int, int> ResizeAndAverageFunctor;
+    const std::string resizeAndAverageKernel = MULTI_LINE_STRING(
+        __kernel void resizeAndAverageKernel(__global Type* targetPtr, __global const Type* sourcePtr,
                                            const Type scaleWidth, const Type scaleHeight,
                                            const int sourceWidth, const int sourceHeight,
                                            const int targetWidth, const int targetHeight, const int counter)
@@ -141,8 +148,8 @@ namespace op
                 const Type xSource = (x + 0.5f) / scaleWidth - 0.5f;
                 const Type ySource = (y + 0.5f) / scaleHeight - 0.5f;
                 Type interpolated = bicubicInterpolate(sourcePtr, xSource, ySource, sourceWidth, sourceHeight, sourceWidth);
-                Type& targetPixel = targetPtr[y*targetWidth+x];
-                targetPixel = (targetPixel + interpolated) / (Type)(counter)
+                Type* targetPixel = &targetPtr[y*targetWidth+x];
+                *targetPixel = (*targetPixel + interpolated) / (Type)(counter);
             }
         }
     );

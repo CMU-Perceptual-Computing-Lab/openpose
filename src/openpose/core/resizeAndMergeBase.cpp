@@ -134,9 +134,14 @@ namespace op
                       + std::to_string(sourcePtrs.size()) + " vs. " + std::to_string(sourceSizes.size()) + " vs. "
                       + std::to_string(scaleInputToNetInputs.size()) + ".", __LINE__, __FUNCTION__, __FILE__);
 
-            // Get Kernels
-            cl::Kernel& resizeAndMergeKernel = op::CLManager::getInstance(gpuID)->getKernelFromManager<T>("resizeAndMergeKernel",op::commonKernels+op::resizeAndMergeKernel);
+            // Get Kernels            
             cl::Buffer targetPtrBuffer = cl::Buffer((cl_mem)(targetPtr), true);
+            auto resizeAndMergeKernel = op::CLManager::getInstance(gpuID)->getKernelFunctorFromManager<op::ResizeAndMergeFunctor, T>(
+                        "resizeAndMergeKernel",op::commonKernels+op::resizeAndMergeKernel);
+            auto resizeAndAddKernel = op::CLManager::getInstance(gpuID)->getKernelFunctorFromManager<op::ResizeAndAddFunctor, T>(
+                        "resizeAndAddKernel",op::commonKernels+op::resizeAndAddKernel);
+            auto resizeAndAverageKernel = op::CLManager::getInstance(gpuID)->getKernelFunctorFromManager<op::ResizeAndAverageFunctor, T>(
+                        "resizeAndAverageKernel",op::commonKernels+op::resizeAndAverageKernel);
 
             // Parameters
             const auto channels = targetSize[1];
@@ -153,7 +158,7 @@ namespace op
                 if (targetSize[0] > 1 || num == 1)
                 {
                     cl::Buffer sourcePtrBuffer = cl::Buffer((cl_mem)(sourcePtrs.at(0)), true);
-                    const auto sourceChannelOffshet = sourceHeight * sourceWidth;
+                    const auto sourceChannelOffset = sourceHeight * sourceWidth;
                     const auto targetChannelOffset = targetWidth * targetHeight;
                     for (auto n = 0; n < num; n++)
                     {
@@ -165,13 +170,14 @@ namespace op
                             cl::Buffer targetBuffer = targetPtrBuffer.createSubBuffer(CL_MEM_READ_WRITE, CL_BUFFER_CREATE_TYPE_REGION, &targerRegion);
                             cl_buffer_region sourceRegion = op::CLManager::getBufferRegion<T>(offset * sourceChannelOffset, sourceChannelOffset);
                             cl::Buffer sourceBuffer = sourcePtrBuffer.createSubBuffer(CL_MEM_READ_ONLY, CL_BUFFER_CREATE_TYPE_REGION, &sourceRegion);
-                            resizeAndMergeKernel.setArg(0, targetBuffer);
-                            resizeAndMergeKernel.setArg(1, sourceBuffer);
-                            resizeAndMergeKernel.setArg(2, sourceWidth);
-                            resizeAndMergeKernel.setArg(3, sourceHeight);
-                            resizeAndMergeKernel.setArg(4, targetWidth);
-                            resizeAndMergeKernel.setArg(5, targetHeight);
-                            op::CLManager::getInstance(gpuID)->getQueue().enqueueNDRangeKernel(resizeAndMergeKernel, cl::NDRange(), cl::NDRange(targetWidth,targetHeight), cl::NDRange(), NULL, NULL);
+                            resizeAndMergeKernel(cl::EnqueueArgs(op::CLManager::getInstance(gpuID)->getQueue(), cl::NDRange(targetWidth, targetHeight)),
+                                                  targetBuffer, sourceBuffer, sourceWidth, sourceHeight, targetWidth, targetHeight);
+
+//                            cl::Buffer buffer; // assume to be allocated
+//                            const int five = 5;
+//                            auto kf = cl::KernelFunctor<resizeAndMergeDef>(resizeAndMergeKernel);
+//                            kf(cl::EnqueueArgs(cl::NDRange(1,1)), buffer, buffer, five, five, five, five);
+
                         }
                     }
                     op::CLManager::getInstance(gpuID)->getQueue().finish();
@@ -183,46 +189,47 @@ namespace op
             // Multi-scaling merging
             else
             {
-                error("Not Implemented", __LINE__, __FUNCTION__, __FILE__);
-//                const auto targetChannelOffset = targetWidth * targetHeight;
-//                cudaMemset(targetPtr, 0.f, channels*targetChannelOffset * sizeof(T));
-//                const auto scaleToMainScaleWidth = targetWidth / T(sourceWidth);
-//                const auto scaleToMainScaleHeight = targetHeight / T(sourceHeight);
+                const auto targetChannelOffset = targetWidth * targetHeight;
+                const auto scaleToMainScaleWidth = targetWidth / T(sourceWidth);
+                const auto scaleToMainScaleHeight = targetHeight / T(sourceHeight);
 
-//                for (auto i = 0u ; i < sourceSizes.size(); i++)
-//                {
-//                    const auto& currentSize = sourceSizes.at(i);
-//                    const auto currentHeight = currentSize[2];
-//                    const auto currentWidth = currentSize[3];
-//                    const auto sourceChannelOffset = currentHeight * currentWidth;
-//                    const auto scaleInputToNet = scaleInputToNetInputs[i] / scaleInputToNetInputs[0];
-//                    const auto scaleWidth = scaleToMainScaleWidth / scaleInputToNet;
-//                    const auto scaleHeight = scaleToMainScaleHeight / scaleInputToNet;
-//                    // All but last image --> add
-//                    if (i < sourceSizes.size() - 1)
-//                    {
-//                        for (auto c = 0 ; c < channels ; c++)
-//                        {
-//                            resizeKernelAndAdd<<<numBlocks, threadsPerBlock>>>(
-//                                targetPtr + c * targetChannelOffset, sourcePtrs[i] + c * sourceChannelOffset,
-//                                scaleWidth, scaleHeight, currentWidth, currentHeight, targetWidth,
-//                                targetHeight
-//                            );
-//                        }
-//                    }
-//                    // Last image --> average all
-//                    else
-//                    {
-//                        for (auto c = 0 ; c < channels ; c++)
-//                        {
-//                            resizeKernelAndAverage<<<numBlocks, threadsPerBlock>>>(
-//                                targetPtr + c * targetChannelOffset, sourcePtrs[i] + c * sourceChannelOffset,
-//                                scaleWidth, scaleHeight, currentWidth, currentHeight, targetWidth,
-//                                targetHeight, sourceSizes.size()
-//                            );
-//                        }
-//                    }
-//                }
+                for (auto i = 0u ; i < sourceSizes.size(); i++)
+                {
+                    const auto& currentSize = sourceSizes.at(i);
+                    const auto currentHeight = currentSize[2];
+                    const auto currentWidth = currentSize[3];
+                    const auto sourceChannelOffset = currentHeight * currentWidth;
+                    const auto scaleInputToNet = scaleInputToNetInputs[i] / scaleInputToNetInputs[0];
+                    const auto scaleWidth = scaleToMainScaleWidth / scaleInputToNet;
+                    const auto scaleHeight = scaleToMainScaleHeight / scaleInputToNet;
+                    cl::Buffer sourcePtrBuffer = cl::Buffer((cl_mem)(sourcePtrs.at(i)), true);
+                    // All but last image --> add
+                    if (i < sourceSizes.size() - 1)
+                    {
+                        for (auto c = 0 ; c < channels ; c++)
+                        {
+                            cl_buffer_region targerRegion = op::CLManager::getBufferRegion<T>(c * targetChannelOffset, targetChannelOffset);
+                            cl_buffer_region sourceRegion = op::CLManager::getBufferRegion<T>(c * sourceChannelOffset, sourceChannelOffset);
+                            cl::Buffer targetBuffer = targetPtrBuffer.createSubBuffer(CL_MEM_READ_WRITE, CL_BUFFER_CREATE_TYPE_REGION, &targerRegion);
+                            cl::Buffer sourceBuffer = sourcePtrBuffer.createSubBuffer(CL_MEM_READ_WRITE, CL_BUFFER_CREATE_TYPE_REGION, &sourceRegion);
+                            resizeAndAddKernel(cl::EnqueueArgs(op::CLManager::getInstance(gpuID)->getQueue(), cl::NDRange(targetWidth, targetHeight)),
+                                                                              targetBuffer, sourceBuffer, scaleWidth, scaleHeight, currentWidth, currentHeight, targetWidth, targetHeight);
+                        }
+                    }
+                    // Last image --> average all
+                    else
+                    {
+                        for (auto c = 0 ; c < channels ; c++)
+                        {
+                            cl_buffer_region targerRegion = op::CLManager::getBufferRegion<T>(c * targetChannelOffset, targetChannelOffset);
+                            cl_buffer_region sourceRegion = op::CLManager::getBufferRegion<T>(c * sourceChannelOffset, sourceChannelOffset);
+                            cl::Buffer targetBuffer = targetPtrBuffer.createSubBuffer(CL_MEM_READ_WRITE, CL_BUFFER_CREATE_TYPE_REGION, &targerRegion);
+                            cl::Buffer sourceBuffer = sourcePtrBuffer.createSubBuffer(CL_MEM_READ_WRITE, CL_BUFFER_CREATE_TYPE_REGION, &sourceRegion);
+                            resizeAndAverageKernel(cl::EnqueueArgs(op::CLManager::getInstance(gpuID)->getQueue(), cl::NDRange(targetWidth, targetHeight)),
+                                                                              targetBuffer, sourceBuffer, scaleWidth, scaleHeight, currentWidth, currentHeight, targetWidth, targetHeight, (int)sourceSizes.size());
+                        }
+                    }
+                }
             }
         }
         catch (const std::exception& e)

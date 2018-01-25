@@ -65,6 +65,10 @@ namespace op
             region.size = sizeof(T) * size;
             return region;
         }
+
+        template <typename K, typename T> inline K getKernelFunctorFromManager(std::string kernelName, std::string src = "", bool isFile = false){
+            return K(getKernelFromManager<T>(kernelName, src, isFile));
+        }
     };
 }
 
