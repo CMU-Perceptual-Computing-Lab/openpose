@@ -172,15 +172,8 @@ namespace op
                             cl::Buffer sourceBuffer = sourcePtrBuffer.createSubBuffer(CL_MEM_READ_ONLY, CL_BUFFER_CREATE_TYPE_REGION, &sourceRegion);
                             resizeAndMergeKernel(cl::EnqueueArgs(op::CLManager::getInstance(gpuID)->getQueue(), cl::NDRange(targetWidth, targetHeight)),
                                                   targetBuffer, sourceBuffer, sourceWidth, sourceHeight, targetWidth, targetHeight);
-
-//                            cl::Buffer buffer; // assume to be allocated
-//                            const int five = 5;
-//                            auto kf = cl::KernelFunctor<resizeAndMergeDef>(resizeAndMergeKernel);
-//                            kf(cl::EnqueueArgs(cl::NDRange(1,1)), buffer, buffer, five, five, five, five);
-
                         }
                     }
-                    op::CLManager::getInstance(gpuID)->getQueue().finish();
                 }
                 // Old inefficient multi-scale merging
                 else
