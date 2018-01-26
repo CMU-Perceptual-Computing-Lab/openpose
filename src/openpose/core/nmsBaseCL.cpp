@@ -151,22 +151,20 @@ namespace op
                                       kernelBuffer, sourceBuffer, width, height, threshold, debug);
                     op::CLManager::getInstance(gpuID)->getQueue().enqueueReadBuffer(kernelBuffer, CL_TRUE, 0, sizeof(float) * width * height, (void*)&kernelCPU.at<float>(0));
 
-
-                    //cv::Mat x, y;
-
-                    // write my own?
-                    y = cv::abs(kernelCPU);
-                    y.convertTo(x,CV_8UC1);
-                    x = cv::abs(x);
+                    // Find Locations
                     std::vector<cv::Point> locations;
-                    int count = cv::countNonZero(x); // No need for OpenCV 3.0 and above
-                    if(count > 0)
-                    {
-                        cv::findNonZero(x,locations);
+                    int* currKernelPtr = &kernelCPU.at<int>(0);
+                    for(int y=0; y<height; y++){
+                        for(int x=0; x<width; x++){
+                            int index = y*width +x;
+                            if(currKernelPtr[index]){
+                                locations.push_back(cv::Point(x,y));
+                            }
+                        }
                     }
 
+                    // Save to Map
                     auto currentPeakCount = 1;
-                    int* currKernelPtr = &kernelCPU.at<int>(0);
                     auto* currTargetPtr = &targetPtr[c*targetChannelOffset];
                     for(auto point : locations){
                         int index = point.y*width + point.x;
