@@ -10,7 +10,9 @@ var hierarchy =
     [ "op::ConfigureLog", "classop_1_1_configure_log.html", null ],
     [ "op::CvMatToOpInput", "classop_1_1_cv_mat_to_op_input.html", null ],
     [ "op::CvMatToOpOutput", "classop_1_1_cv_mat_to_op_output.html", null ],
-    [ "op::Datum", "structop_1_1_datum.html", null ],
+    [ "op::Datum", "structop_1_1_datum.html", [
+      [ "op::Datum3D", "structop_1_1_datum3_d.html", null ]
+    ] ],
     [ "op::DatumProducer< TDatumsNoPtr >", "classop_1_1_datum_producer.html", null ],
     [ "op::FaceDetector", "classop_1_1_face_detector.html", null ],
     [ "op::FaceDetectorOpenCV", "classop_1_1_face_detector_open_c_v.html", null ],
@@ -132,6 +134,15 @@ var hierarchy =
       [ "op::WPoseRenderer< TDatums >", "classop_1_1_w_pose_renderer.html", null ],
       [ "op::WQueueOrderer< TDatums >", "classop_1_1_w_queue_orderer.html", null ],
       [ "op::WScaleAndSizeExtractor< TDatums >", "classop_1_1_w_scale_and_size_extractor.html", null ]
+    ] ],
+    [ "op::Worker< std::shared_ptr< std::vector< Datum3D > > >", "classop_1_1_worker.html", [
+      [ "op::WReconstruction3D", "classop_1_1_w_reconstruction3_d.html", null ],
+      [ "op::WorkerConsumer< std::shared_ptr< std::vector< Datum3D > > >", "classop_1_1_worker_consumer.html", [
+        [ "op::WRender3D", "classop_1_1_w_render3_d.html", null ]
+      ] ],
+      [ "op::WorkerProducer< std::shared_ptr< std::vector< Datum3D > > >", "classop_1_1_worker_producer.html", [
+        [ "op::WPointGrey", "classop_1_1_w_point_grey.html", null ]
+      ] ]
     ] ],
     [ "op::Wrapper< TDatums, TWorker, TQueue >", "classop_1_1_wrapper.html", null ],
     [ "op::WrapperStructFace", "structop_1_1_wrapper_struct_face.html", null ],

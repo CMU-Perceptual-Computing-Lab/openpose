@@ -41,7 +41,7 @@ var dir_d6e567c8390b6a30c30307f931e28950 =
       [ "Point", "structop_1_1_point.html", "structop_1_1_point" ]
     ] ],
     [ "rectangle.hpp", "rectangle_8hpp.html", "rectangle_8hpp" ],
-    [ "renderer.hpp", "renderer_8hpp.html", [
+    [ "renderer.hpp", "core_2renderer_8hpp.html", [
       [ "Renderer", "classop_1_1_renderer.html", "classop_1_1_renderer" ]
     ] ],
     [ "resizeAndMergeBase.hpp", "resize_and_merge_base_8hpp.html", "resize_and_merge_base_8hpp" ],
