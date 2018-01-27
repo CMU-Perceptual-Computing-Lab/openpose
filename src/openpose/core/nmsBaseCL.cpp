@@ -11,7 +11,7 @@
 namespace op
 {
     const std::string nmsOclCommonFunctions = MULTI_LINE_STRING(
-        void nmsAccuratePeakPosition(const Type* sourcePtr, const int peakLocX, const int peakLocY,
+        void nmsAccuratePeakPosition(__global const Type* sourcePtr, const int peakLocX, const int peakLocY,
                                      const int width, const int height, Type* fx, Type* fy, Type* fscore)
         {
             Type xAcc = 0.f;

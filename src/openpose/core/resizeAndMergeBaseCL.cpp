@@ -53,7 +53,7 @@ namespace op
             // return v1 + 0.5f * dx * (v2 - v0 + dx * (2.f * v0 - 5.f * v1 + 4.f * v2 - v3 + dx * (3.f * (v1 - v2) + v3 - v0)));
         }
 
-        Type bicubicInterpolate(const Type* const sourcePtr, const Type xSource, const Type ySource, const int widthSource,
+        Type bicubicInterpolate(__global const Type* sourcePtr, const Type xSource, const Type ySource, const int widthSource,
                                                const int heightSource, const int widthSourcePtr)
         {
             int xIntArray[4];
@@ -147,7 +147,7 @@ namespace op
                 const Type xSource = (x + 0.5f) / scaleWidth - 0.5f;
                 const Type ySource = (y + 0.5f) / scaleHeight - 0.5f;
                 Type interpolated = bicubicInterpolate(sourcePtr, xSource, ySource, sourceWidth, sourceHeight, sourceWidth);
-                Type* targetPixel = &targetPtr[y*targetWidth+x];
+                __global Type* targetPixel = &targetPtr[y*targetWidth+x];
                 *targetPixel = (*targetPixel + interpolated) / (Type)(counter);
             }
         }
