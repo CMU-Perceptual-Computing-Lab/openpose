@@ -10,7 +10,7 @@ namespace op
     struct NmsCaffe<T>::ImplNmsCaffe
     {
         #ifdef USE_CAFFE
-            std::shared_ptr<caffe::Blob<int>> mKernelBlobT;
+            std::shared_ptr<caffe::Blob<double>> mKernelBlobT;
             caffe::Blob<int> mKernelBlob;
             std::array<int, 4> mBottomSize;
             std::array<int, 4> mTopSize;
@@ -85,7 +85,7 @@ namespace op
 
                 // Special Kernel for OpenCL NMS
                 #ifdef USE_OPENCL
-                    upImpl->mKernelBlobT = {std::make_shared<caffe::Blob<int>>(1,1,1,1)};
+                    upImpl->mKernelBlobT = {std::make_shared<caffe::Blob<double>>(1,1,1,1)};
                     upImpl->mKernelBlobT->Reshape(bottomShape);
                 #endif
 

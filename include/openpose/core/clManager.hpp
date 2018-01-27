@@ -9,6 +9,7 @@
 #include <regex>
 
 #ifdef USE_OPENCL
+    #pragma OPENCL EXTENSION cl_khr_fp64 : enable
     #define CL_HPP_ENABLE_EXCEPTIONS
     #define CL_HPP_TARGET_OPENCL_VERSION 200
     #include <CL/cl2.hpp>
