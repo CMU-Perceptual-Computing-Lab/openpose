@@ -893,7 +893,7 @@ Generating docs for compound op::SubThrea/home/travis/build/CMU-Perceptual-Compu
 /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:100: warning: unable to resolve reference to `doc/standalone_face_or_hand_keypoint_detector.md' for \ref command
 /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:101: warning: unable to resolve reference to `doc/standalone_face_or_hand_keypoint_detector.md' for \ref command
 /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:108: warning: unable to resolve reference to `doc/output.md' for \ref command
-/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:113: warning: explicit link request to 'faq' could not be resolved
+/home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:113: warning: explicit link request to 'speed' could not be resolved
 /home/travis/build/CMU-Perceptual-Computing-Lab/openpose/README.md:138: warning: unable to resolve reference to `doc/contributors.md' for \ref command
 dQueueInOut...
 Generating docs for compound op::SubThreadQueueOut...
