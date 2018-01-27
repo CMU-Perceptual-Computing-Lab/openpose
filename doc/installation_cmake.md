@@ -10,9 +10,9 @@ OpenPose - Installation using CMake
 6. [Uninstallation](#uninstallation)
 7. [Optional Settings](#optional-settings)
     1. [MPI Model](#mpi-model)
-    3. [Custom Caffe (Ubuntu Only)](#custom-caffe-ubuntu-only)
-    4. [Custom OpenCV (Ubuntu Only)](#custom-opencv-ubuntu-only)
-    5. [OpenPose 3D Reconstruction Demo (Windows Only)](#openpose-3d-reconstruction-demo-windows-only)
+    3. [OpenPose 3D Reconstruction Module and Demo](#openpose-3d-reconstruction-module-and-demo)
+    4. [Custom Caffe (Ubuntu Only)](#custom-caffe-ubuntu-only)
+    5. [Custom OpenCV (Ubuntu Only)](#custom-opencv-ubuntu-only)
     6. [Doxygen Documentation Autogeneration (Ubuntu Only)](#doxygen-documentation-autogeneration-ubuntu-only)
     7. [CMake Command Line Configuration (Ubuntu Only)](#cmake-command-line-configuration-ubuntu-only)
 
@@ -162,6 +162,36 @@ By default, the body MPI model is not downloaded. You can download it by turning
 
 
 
+#### OpenPose 3D Reconstruction Module and Demo
+You can include the 3D reconstruction module by:
+
+1. Install the FLIR camera driver and software, Spinnaker SDK. It is a propietary software, so we cannot provide direct download link.
+    1. Ubuntu: Get and install the latest Spinnaker SKD version in their default path. OpenPose will automatically find it.
+    2. Windows: Donwload the latest Spinnaker SKD version from [https://www.ptgrey.com/support/downloads](https://www.ptgrey.com/support/downloads).
+        - Copy `{PointGreyParentDirectory}\Point Grey Research\Spinnaker\bin64\vs2015\` as `{OpenPoseDirectory}\3rdparty\windows\spinnaker\bin\`. You can remove all the *.exe files.
+        - Copy `{PointGreyParentDirectory}\Point Grey Research\Spinnaker\include\` as `{OpenPoseDirectory}\3rdparty\windows\spinnaker\include\`.
+        - Copy `Spinnaker_v140.lib` and `Spinnakerd_v140.lib` from `{PointGreyParentDirectory}\Point Grey Research\Spinnaker\lib64\vs2015\` into `{OpenPoseDirectory}\3rdparty\windows\spinnaker\lib\`.
+        - (Optional) Spinnaker SDK overview: [https://www.ptgrey.com/spinnaker-sdk](https://www.ptgrey.com/spinnaker-sdk).
+2. Install the 3D visualizer, FreeGLUT:
+    1. Ubuntu: run `sudo apt-get install freeglut3 freeglut3-dev`.
+    2. Windows:
+        1. It is automatically downloaded by the CMake installer.
+        2. Alternatively, if you prefer to download it yourself, you could either:
+            1. Double click on `3rdparty\windows\getFreeglut.bat`.
+            2. Download [this version from our server](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/freeglut_2018_01_14.zip) and unzip it in `{OpenPoseDirectory}\3rdparty\windows\freeglut\`.
+            3. Download the latest `MSVC Package` from [http://www.transmissionzero.co.uk/software/freeglut-devel/](http://www.transmissionzero.co.uk/software/freeglut-devel/).
+                - Copy `{freeglutParentDirectory}\freeglut\bin\x64\` as `{OpenPoseDirectory}\3rdparty\windows\freeglut\bin\`.
+                - Copy `{freeglutParentDirectory}\freeglut\include\` as `{OpenPoseDirectory}\3rdparty\windows\freeglut\include\`.
+                - Copy `{freeglutParentDirectory}\freeglut\lib\x64\` as `{OpenPoseDirectory}\3rdparty\windows\freeglut\lib\`.
+3. Follow the CMake installation steps, and set the `BUILD_MODULE_3D` option.
+4. In Windows, after openning the OpenPose visual studio solution:
+    1. Right-click on `Solution 'OpenPose'` of the `Solution Explorer` window, usually placed at the top-right part of the VS screen.
+    2. Click on `Properties`. Go to `Configuration Properties` -> `Configuration` and check `Build` for the `OpenPose3DReconstruction` project.
+
+After installation, check the [doc/openpose_3d_reconstruction_demo.md](./openpose_3d_reconstruction_demo.md) instructions.
+
+
+
 #### Custom Caffe (Ubuntu Only)
 We only modified some Caffe compilation flags and minor details. You can use your own Caffe distribution, simply specify the Caffe include path and the library as shown below. You will also need to turn off the `BUILD_CAFFE` variable.
 <p align="center">
@@ -172,11 +202,6 @@ We only modified some Caffe compilation flags and minor details. You can use you
 
 #### Custom OpenCV (Ubuntu Only)
 If you have built OpenCV from source and OpenPose cannot find it automatically, you can set the `OPENCV_DIR` variable to the directory where you build OpenCV.
-
-
-
-#### OpenPose 3D Reconstruction Demo (Windows Only)
-You can include the 3D Reconstruction Demo by setting the `WITH_3D` option. After installation, check the [doc/openpose_3d_reconstruction_demo.md](./openpose_3d_reconstruction_demo.md) instructions.
 
 
 

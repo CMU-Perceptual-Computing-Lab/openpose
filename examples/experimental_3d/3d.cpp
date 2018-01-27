@@ -15,9 +15,7 @@
 
 // C++ std library dependencies
 #include <chrono> // `std::chrono::` functions and classes, e.g. std::chrono::milliseconds
-#include <string>
 #include <thread> // std::this_thread
-#include <vector>
 // Other 3rdparty dependencies
 // GFlags: DEFINE_bool, _int32, _int64, _uint64, _double, _string
 #include <gflags/gflags.h>
@@ -28,7 +26,6 @@
 
 // OpenPose dependencies
 #include <openpose/headers.hpp>
-#include <openpose3d/headers.hpp>
 
 // See all the available parameter options withe the `--help` flag. E.g. `build/examples/openpose/openpose.bin --help`
 // Note: This command will show you flags for other unnecessary 3rdparty files. Check only the flags for the OpenPose
@@ -169,7 +166,7 @@ DEFINE_string(write_keypoint_format,    "yml",          "(Deprecated, use `write
 DEFINE_string(write_keypoint_json,      "",             "(Deprecated, use `write_json`) Directory to write people pose data in JSON format,"
                                                         " compatible with any OpenCV version.");
 
-int openpose3d()
+int openpose()
 {
     // logging_level
     op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.",
@@ -209,13 +206,13 @@ int openpose3d()
 
     // Initializing the user custom classes
     // Frames producer (e.g. video, webcam, ...)
-    auto wPointGrey = std::make_shared<WPointGrey>();
+    auto wPointGrey = std::make_shared<op::WPointGrey>();
     // Processing
-    auto wReconstruction3D = std::make_shared<WReconstruction3D>();
+    auto wReconstruction3D = std::make_shared<op::WReconstruction3D>();
     // GUI (Display)
-    auto wRender3D = std::make_shared<WRender3D>();
+    auto wRender3D = std::make_shared<op::WRender3D>();
 
-    op::Wrapper<std::vector<Datum3D>> opWrapper;
+    op::Wrapper<std::vector<op::Datum3D>> opWrapper;
     // Add custom input
     const auto workerInputOnNewThread = true;
     opWrapper.setWorkerInput(wPointGrey, workerInputOnNewThread);
@@ -280,6 +277,6 @@ int main(int argc, char *argv[])
     // Parsing command line flags
     gflags::ParseCommandLineFlags(&argc, &argv, true);
 
-    // Running openpose3d
-    return openpose3d();
+    // Running openpose
+    return openpose();
 }

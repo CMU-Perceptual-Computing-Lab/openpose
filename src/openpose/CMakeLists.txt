@@ -25,7 +25,7 @@ endif ()
 # Ubuntu
 if(UNIX AND NOT APPLE)
   target_link_libraries(openpose ${OpenCV_LIBS} ${Caffe_LIBS}
-      ${GFLAGS_LIBRARY} ${GLOG_LIBRARY} ${MKL_LIBS})
+      ${GFLAGS_LIBRARY} ${GLOG_LIBRARY} ${MKL_LIBS} ${GLUT_LIBRARY} ${SPINNAKER_LIB})
   if (CMAKE_COMPILER_IS_GNUCXX)
     foreach (SUB_DIR ${SUB_DIRS})
         set_target_properties(openpose_${SUB_DIR} PROPERTIES COMPILE_FLAGS ${OP_CXX_FLAGS})
@@ -35,7 +35,7 @@ if(UNIX AND NOT APPLE)
 # Windows
 elseif (WIN32)
   set_property(TARGET openpose PROPERTY DEBUG_POSTFIX d)
-  target_link_libraries(openpose ${OpenCV_LIBS} ${Caffe_LIBS}
+  target_link_libraries(openpose ${OpenCV_LIBS} ${Caffe_LIBS} ${GLUT_LIBRARY} ${SPINNAKER_LIB}
       debug ${GFLAGS_LIBRARY_DEBUG} optimized ${GFLAGS_LIBRARY_RELEASE}
       debug ${GLOG_LIBRARY_DEBUG} optimized ${GLOG_LIBRARY_RELEASE})
   if (${DL_FRAMEWORK} MATCHES "CAFFE")
@@ -52,6 +52,10 @@ elseif (WIN32)
     source_group("Header Files\\${SUB_DIR}" FILES ${SUB_MOD_HEADERS})
   endforeach (SUB_DIR ${SUB_DIRS})
   set_target_properties(openpose PROPERTIES COMPILE_FLAGS -DOP_EXPORTS)
+  # Properties->General->Output Directory
+  set_property(TARGET openpose PROPERTY RUNTIME_OUTPUT_DIRECTORY_RELEASE ${PROJECT_BINARY_DIR}/$(Platform)/$(Configuration))
+  set_property(TARGET openpose PROPERTY RUNTIME_OUTPUT_DIRECTORY_DEBUG ${PROJECT_BINARY_DIR}/$(Platform)/$(Configuration))
+
 endif (UNIX AND NOT APPLE)
 
 if (UNIX AND NOT APPLE)

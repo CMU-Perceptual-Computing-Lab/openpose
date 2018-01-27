@@ -46,8 +46,8 @@ COMMON_FLAGS += -DOPEN_POSE_VERSION=$(DYNAMIC_VERSION_MAJOR).$(DYNAMIC_VERSION_M
 # Enable profiler
 ##############################
 PROFILER_ENABLED ?= 0
-ifeq ($(PROFILER_ENABLED), 1)
-	COMMON_FLAGS += -DPROFILER_ENABLED
+ifneq ($(PROFILER_ENABLED), 0)
+	COMMON_FLAGS += -DPROFILER_ENABLED=$(PROFILER_ENABLED)
 endif
 
 
@@ -68,6 +68,19 @@ else
 	LDFLAGS += -Wl,-rpath=$(CAFFE_DIR)/lib
 	INCLUDE_DIRS += $(CAFFE_DIR)/include
 	LIBRARY_DIRS += $(CAFFE_DIR)/lib
+endif
+
+
+# Spinnaker
+BUILD_MODULE_3D ?= 0
+ifneq ($(BUILD_MODULE_3D), 0)
+	COMMON_FLAGS += -DBUILD_MODULE_3D
+	# Spinnaker SDK
+	LIBRARIES += Spinnaker
+	INCLUDE_DIRS += $(SPINNAKER_DIR)
+	# FreeGLUT
+	LIBRARIES += glut
+	# LIBRARIES += GLU GL glut
 endif
 
 ##############################
@@ -330,8 +343,6 @@ ifeq ($(USE_PKG_CONFIG), 1)
 else
 	PKG_CONFIG :=
 endif
-# LDFLAGS += $(foreach librarydir,$(LIBRARY_DIRS),-L$(librarydir)) $(PKG_CONFIG) \
-# 		$(foreach library,$(LIBRARIES),-l$(library)) -Wl,-rpath=$(CAFFE_DIR)/lib
 LDFLAGS += $(foreach librarydir,$(LIBRARY_DIRS),-L$(librarydir)) $(PKG_CONFIG) \
 		$(foreach library,$(LIBRARIES),-l$(library))
 

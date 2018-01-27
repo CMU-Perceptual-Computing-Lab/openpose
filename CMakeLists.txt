@@ -151,9 +151,7 @@ if (${GPU_MODE} MATCHES "CUDA")
 endif (${GPU_MODE} MATCHES "CUDA")
 
 # Suboptions for OpenPose 3D Reconstruction demo
-if (WIN32)
-  option(WITH_3D "Build OpenPose 3D Reconstruction demo." OFF)
-endif (WIN32)
+option(BUILD_MODULE_3D "Build OpenPose 3D Reconstruction module." OFF)
 
 # Download the models
 option(DOWNLOAD_COCO_MODEL "Download COCO model." ON)
@@ -180,6 +178,12 @@ if (${GPU_MODE} MATCHES "CUDA")
   find_package(CUDA)
 endif ()
 
+# Adding 3D
+if (BUILD_MODULE_3D)
+  # OpenPose flags
+  add_definitions(-DBUILD_MODULE_3D)
+endif (BUILD_MODULE_3D)
+
 if (UNIX AND NOT APPLE)
   if (${GPU_MODE} MATCHES "CUDA")
     include(cmake/Cuda.cmake)
@@ -188,6 +192,18 @@ if (UNIX AND NOT APPLE)
   find_package(GFlags)
   find_package(Glog)
   find_package(OpenCV)
+
+  # 3D
+  if (BUILD_MODULE_3D)
+    # GLUT
+    find_package(GLUT REQUIRED)
+    # Spinnaker
+    find_package(Spinnaker)
+    if (NOT SPINNAKER_FOUND)
+      message(FATAL_ERROR "Spinnaker not found. Either turn off the `BUILD_MODULE_3D` option or specify the path of
+        Spinnaker includes and libs.")
+    endif (NOT SPINNAKER_FOUND)
+  endif (BUILD_MODULE_3D)
 
   # OpenMP
   if (${GPU_MODE} MATCHES "CPU_ONLY")
@@ -253,9 +269,9 @@ if (WIN32)
   download_zip("opencv_310.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 1e5240a64b814b3c0b822f136be78ad7)
   download_zip("caffe3rdparty_2017_07_14.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} ec0f800c8fb337e33304f3375bd06a80)
   download_zip("caffe_2018_01_18.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 4b8e548cc7ea20abea472950dd5301bd)
-  if (WITH_3D)
+  if (BUILD_MODULE_3D)
     download_zip("freeglut_2018_01_14.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} BB182187285E06880F0EDE3A39530091)
-  endif (WITH_3D)
+  endif (BUILD_MODULE_3D)
   message(STATUS "Windows dependencies downloaded.")
 
   find_library(OpenCV_LIBS opencv_world310 HINTS ${FIND_LIB_PREFIX}/opencv/x64/vc14/lib)
@@ -266,20 +282,20 @@ if (WIN32)
   find_library(OpenCV_LIBS opencv_world310 HINTS ${FIND_LIB_PREFIX}/opencv/x64/vc14/lib)
   find_library(Caffe_LIB caffe HINTS ${FIND_LIB_PREFIX}/caffe/lib)
   find_library(Caffe_Proto_LIB caffeproto HINTS ${FIND_LIB_PREFIX}/caffe/lib)
-  if (WITH_3D)
-    find_library(Spinnaker_LIB spinnaker_v140 HINTS ${FIND_LIB_PREFIX}/spinnaker/lib)
-    find_library(Freeglut_LIB freeglut HINTS ${FIND_LIB_PREFIX}/freeglut/lib)
-    message(STATUS "\${Freeglut_LIB} = ${Freeglut_LIB}")
-  endif (WITH_3D)
+  if (BUILD_MODULE_3D)
+    find_library(SPINNAKER_LIB spinnaker_v140 HINTS ${FIND_LIB_PREFIX}/spinnaker/lib)
+    find_library(GLUT_LIBRARY freeglut HINTS ${FIND_LIB_PREFIX}/freeglut/lib)
+    message(STATUS "\${GLUT_LIBRARY} = ${GLUT_LIBRARY}")
+  endif (BUILD_MODULE_3D)
   set(Caffe_LIBS ${Caffe_LIB};${Caffe_Proto_LIB})
   set(OpenCV_INCLUDE_DIRS "3rdparty/windows/opencv/include")
   set(Caffe_INCLUDE_DIRS "3rdparty/windows/caffe/include;3rdparty/windows/caffe/include2")
   set(Boost_INCLUDE_DIRS "3rdparty/windows/caffe3rdparty/include/boost-1_61")
   set(WINDOWS_INCLUDE_DIRS "3rdparty/windows/caffe3rdparty/include")
-  if (WITH_3D)
+  if (BUILD_MODULE_3D)
     set(SPINNAKER_INCLUDE_DIRS "3rdparty/windows/spinnaker/include")
-    set(FREEGLUT_INCLUDE_DIRS "3rdparty/windows/freeglut/include")
-  endif (WITH_3D)
+    set(GLUT_INCLUDE_DIRS "3rdparty/windows/freeglut/include")
+  endif (BUILD_MODULE_3D)
 endif (WIN32)
 
 
@@ -400,7 +416,7 @@ if (UNIX AND NOT APPLE)
 
     if (NOT Caffe_FOUND AND NOT BUILD_CAFFE)
       message(FATAL_ERROR "Caffe not found. Either turn on the BUILD_CAFFE option or specify the path of Caffe includes
-        and libs using -DCaffe_INCLUDE_DIRS and -DCaffe_LIBS")
+        and libs using -DCaffe_INCLUDE_DIRS and -DCaffe_LIBS.")
     endif (NOT Caffe_FOUND AND NOT BUILD_CAFFE)
 
   endif (${DL_FRAMEWORK} MATCHES "CAFFE")
@@ -419,15 +435,15 @@ if (${GPU_MODE} MATCHES "CUDA")
   include_directories(
     ${CUDA_INCLUDE_DIRS})
 endif ()
+# 3D
+if (BUILD_MODULE_3D)
+  include_directories(${GLUT_INCLUDE_DIRS} ${SPINNAKER_INCLUDE_DIRS})
+endif (BUILD_MODULE_3D)
+# Windows includes
 if (WIN32)
   include_directories(
     ${Boost_INCLUDE_DIRS}
     ${WINDOWS_INCLUDE_DIRS})
-  if (WITH_3D)
-    include_directories(
-      ${SPINNAKER_INCLUDE_DIRS}
-      ${FREEGLUT_INCLUDE_DIRS})
-  endif (WITH_3D)
 endif (WIN32)
 
 ### ADD SUBDIRECTORIES
@@ -435,9 +451,6 @@ endif (WIN32)
 add_subdirectory(src)
 if (BUILD_EXAMPLES)
   add_subdirectory(examples)
-  if (WITH_3D)
-    add_subdirectory(examples_beta)
-  endif (WITH_3D)
 endif (BUILD_EXAMPLES)
 
 
@@ -476,7 +489,7 @@ if (UNIX AND NOT APPLE)
         COMMENT "Generating API documentation with Doxygen"
         VERBATIM)
     else (DOXYGEN_FOUND)
-      message(FATAL_ERROR "Doxygen need to be installed to generate the doxygen documentation")
+      message(FATAL_ERROR "Doxygen need to be installed to generate the doxygen documentation.")
     endif (DOXYGEN_FOUND)
   endif (BUILD_DOCS)
 
