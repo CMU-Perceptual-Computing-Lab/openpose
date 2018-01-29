@@ -6,8 +6,12 @@ set(OpenPose_VERSION ${OpenPose_VERSION_MAJOR}.${OpenPose_VERSION_MINOR}.${OpenP
 
 
 ### CMAKE HEADERS
-cmake_policy(SET CMP0048 NEW)
-project(OpenPose VERSION ${OpenPose_VERSION})
+if (${CMAKE_VERSION} VERSION_GREATER 3.0.0)
+ cmake_policy(SET CMP0048 NEW)
+ project(OpenPose VERSION ${OpenPose_VERSION})
+else (${CMAKE_VERSION} VERSION_GREATER 3.0.0)
+ project(OpenPose)
+endif (${CMAKE_VERSION} VERSION_GREATER 3.0.0)
 cmake_minimum_required(VERSION 2.8.7 FATAL_ERROR) # min. cmake version recommended by Caffe
 
 
@@ -17,17 +21,6 @@ if (WIN32) # OS is Windows
   message(STATUS "Feel free to send us any suggestion or bug you encounter.")
 elseif (APPLE) # OS is Apple
   message(FATAL_ERROR "Apple OS is not currently supported.")
-elseif (UNIX AND NOT APPLE) # OS is a Linux distribution (it assumes Ubuntu)
-  set(EXECUTE_COMMAND lsb_release -rs)
-  execute_process(COMMAND ${EXECUTE_COMMAND} OUTPUT_VARIABLE UBUNTU_VERSION)
-  string(SUBSTRING ${UBUNTU_VERSION} 0 2 UBUNTU_MAJOR_VERSION)
-  if (${UBUNTU_MAJOR_VERSION} MATCHES "16") # if 16
-    set(IS_UBUNTU_16 TRUE)
-    set(IS_UBUNTU_14_OR_LESS FALSE)
-  else (${UBUNTU_MAJOR_VERSION} MATCHES "16") # if 14 or less
-    set(IS_UBUNTU_16 FALSE)
-    set(IS_UBUNTU_14_OR_LESS TRUE)
-  endif (${UBUNTU_MAJOR_VERSION} MATCHES "16")
 endif ()
 
 
@@ -170,7 +163,6 @@ option(BUILD_SHARED_LIBS "Build as shared lib" ON)
 option(PROFILER_ENABLED "If enabled, OpenPose will be able to print out speed information at runtime." OFF)
 
 
-
 ### FIND REQUIRED PACKAGES
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
 
@@ -296,8 +288,8 @@ if (WIN32)
     set(SPINNAKER_INCLUDE_DIRS "3rdparty/windows/spinnaker/include")
     set(GLUT_INCLUDE_DIRS "3rdparty/windows/freeglut/include")
   endif (BUILD_MODULE_3D)
+  set(Caffe_FOUND 1)
 endif (WIN32)
-
 
 
 ### CAFFE
@@ -341,7 +333,8 @@ if (UNIX AND NOT APPLE)
       elseif (${GPU_MODE} MATCHES "CPU_ONLY")
         if (USE_MKL)
           execute_process(COMMAND git checkout intel WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
-          execute_process(COMMAND sh prepare_mkl.sh WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe/external/mkl OUTPUT_VARIABLE rv)
+          execute_process(COMMAND sh prepare_mkl.sh WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe/external/mkl
+              OUTPUT_VARIABLE rv)
           set( MLIST ${rv} )
           separate_arguments(MLIST)
           list(GET MLIST 0 MKL_PATH)
@@ -366,6 +359,7 @@ if (UNIX AND NOT APPLE)
 
       # Build Caffe
       message(STATUS "Caffe will be built from source now.")
+      find_package(Caffe)
       include(ExternalProject)
       set(CAFFE_PREFIX caffe)
       set(CAFFE_URL ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
@@ -408,9 +402,14 @@ if (UNIX AND NOT APPLE)
 
       ExternalProject_Get_Property(openpose_caffe install_dir)
 
-      set(Caffe_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/caffe/include)
-      # TODO -- Find a better soln.
-      set(Caffe_LIBS ${CMAKE_BINARY_DIR}/caffe/lib/libcaffe.so)
+      if (NOT Caffe_FOUND)
+        add_custom_command(TARGET openpose_caffe
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND} ${CMAKE_SOURCE_DIR} 
+            COMMAND $(MAKE)
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+            COMMENT "Rerunning cmake after building Caffe submodule")
+      endif (NOT Caffe_FOUND)
 
     endif (BUILD_CAFFE)
 
@@ -423,17 +422,23 @@ if (UNIX AND NOT APPLE)
 
 endif (UNIX AND NOT APPLE)
 
+
 ### PROJECT INCLUDES
 # Specify the include directories
 include_directories(
   include
   ${GFLAGS_INCLUDE_DIR}
   ${GLOG_INCLUDE_DIR}
-  ${Caffe_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS})
+
+if (Caffe_FOUND)
+  include_directories(
+      ${Caffe_INCLUDE_DIRS})
+endif (Caffe_FOUND)
+
 if (${GPU_MODE} MATCHES "CUDA")
   include_directories(
-    ${CUDA_INCLUDE_DIRS})
+      ${CUDA_INCLUDE_DIRS})
 endif ()
 # 3D
 if (BUILD_MODULE_3D)
@@ -446,12 +451,14 @@ if (WIN32)
     ${WINDOWS_INCLUDE_DIRS})
 endif (WIN32)
 
-### ADD SUBDIRECTORIES
 
-add_subdirectory(src)
-if (BUILD_EXAMPLES)
-  add_subdirectory(examples)
-endif (BUILD_EXAMPLES)
+### ADD SUBDIRECTORIES
+if (Caffe_FOUND)
+  add_subdirectory(src)
+  if (BUILD_EXAMPLES)
+    add_subdirectory(examples)
+  endif (BUILD_EXAMPLES)
+endif (Caffe_FOUND)
 
 
 ### DOWNLOAD MODELS
@@ -498,28 +505,30 @@ endif (UNIX AND NOT APPLE)
 
 ### INSTALL
 if (UNIX AND NOT APPLE)
-  # Install the headers
-  install(DIRECTORY ${CMAKE_SOURCE_DIR}/include/openpose DESTINATION include)
-  install(EXPORT OpenPose DESTINATION lib/OpenPose)
-  if (BUILD_CAFFE)
-    install(DIRECTORY ${CMAKE_BINARY_DIR}/caffe/include/caffe DESTINATION include)
-    install(DIRECTORY ${CMAKE_BINARY_DIR}/caffe/lib/ DESTINATION lib)
-  endif (BUILD_CAFFE)
+  if (Caffe_FOUND)
+    # Install the headers
+    install(DIRECTORY ${CMAKE_SOURCE_DIR}/include/openpose DESTINATION include)
+    install(EXPORT OpenPose DESTINATION lib/OpenPose)
+    if (BUILD_CAFFE)
+      install(DIRECTORY ${CMAKE_BINARY_DIR}/caffe/include/caffe DESTINATION include)
+      install(DIRECTORY ${CMAKE_BINARY_DIR}/caffe/lib/ DESTINATION lib)
+    endif (BUILD_CAFFE)
 
-  # Compute installation prefix relative to this file
-  configure_file(
-    ${CMAKE_SOURCE_DIR}/cmake/OpenPoseConfig.cmake.in
-    ${CMAKE_BINARY_DIR}/cmake/OpenPoseConfig.cmake @ONLY)
+    # Compute installation prefix relative to this file
+    configure_file(
+      ${CMAKE_SOURCE_DIR}/cmake/OpenPoseConfig.cmake.in
+      ${CMAKE_BINARY_DIR}/cmake/OpenPoseConfig.cmake @ONLY)
 
-  install(FILES ${CMAKE_BINARY_DIR}/cmake/OpenPoseConfig.cmake
-    DESTINATION lib/OpenPose)
+    install(FILES ${CMAKE_BINARY_DIR}/cmake/OpenPoseConfig.cmake
+      DESTINATION lib/OpenPose)
 
-  # Uninstall target
-  configure_file(
-    "${CMAKE_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
-    "${CMAKE_BINARY_DIR}/cmake_uninstall.cmake"
-    IMMEDIATE @ONLY)
+    # Uninstall target
+    configure_file(
+      "${CMAKE_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
+      "${CMAKE_BINARY_DIR}/cmake_uninstall.cmake"
+      IMMEDIATE @ONLY)
 
-  add_custom_target(uninstall
-    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
+    add_custom_target(uninstall
+        COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
+  endif (Caffe_FOUND)
 endif (UNIX AND NOT APPLE)
