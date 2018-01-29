@@ -42,7 +42,7 @@ var searchData=
   ['pose_5fmpi_5fscales_5frender_5fgpu',['POSE_MPI_SCALES_RENDER_GPU',['../pose_parameters_render_8hpp.html#a32e98c9dd9e6f38c597c7924582570d0',1,'poseParametersRender.hpp']]],
   ['posebodypartmapstringtokey',['poseBodyPartMapStringToKey',['../namespaceop.html#a3df938ef93037c534c5d342720d5fb70',1,'op::poseBodyPartMapStringToKey(const PoseModel poseModel, const std::string &amp;string)'],['../namespaceop.html#aacf6e688031bb116e4878b811e8dbc23',1,'op::poseBodyPartMapStringToKey(const PoseModel poseModel, const std::vector&lt; std::string &gt; &amp;strings)']]],
   ['posecandidates',['poseCandidates',['../structop_1_1_datum.html#a55dd5354e09696ed6896923755f1c85b',1,'op::Datum']]],
-  ['posecpurenderer',['PoseCpuRenderer',['../classop_1_1_pose_cpu_renderer.html#a8b5c83bbf076b949b1209261f25d170d',1,'op::PoseCpuRenderer']]],
+  ['posecpurenderer',['PoseCpuRenderer',['../classop_1_1_pose_cpu_renderer.html#a5863733d560345d4890557b0f8c0d08e',1,'op::PoseCpuRenderer']]],
   ['posecpurenderer',['PoseCpuRenderer',['../classop_1_1_pose_cpu_renderer.html',1,'op']]],
   ['posecpurenderer_2ehpp',['poseCpuRenderer.hpp',['../pose_cpu_renderer_8hpp.html',1,'']]],
   ['poseextractor',['PoseExtractor',['../classop_1_1_pose_extractor.html#a54b0c911456746d4faf493bb4e9b0c1e',1,'op::PoseExtractor']]],

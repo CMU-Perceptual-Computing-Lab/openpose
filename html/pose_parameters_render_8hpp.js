@@ -18,6 +18,7 @@ var pose_parameters_render_8hpp =
     [ "POSE_MPI_COLORS_RENDER_GPU", "pose_parameters_render_8hpp.html#a7fdd75b1478d65f11ebc77144662958c", null ],
     [ "POSE_MPI_PAIRS_RENDER_GPU", "pose_parameters_render_8hpp.html#a7987426d997b6b040302d25fd07403ac", null ],
     [ "POSE_MPI_SCALES_RENDER_GPU", "pose_parameters_render_8hpp.html#a32e98c9dd9e6f38c597c7924582570d0", null ],
+    [ "getNumberElementsToRender", "pose_parameters_render_8hpp.html#aebff78a4cfbef1cf1b2e03066d88564c", null ],
     [ "getPoseBodyPartPairsRender", "pose_parameters_render_8hpp.html#a11bd7e53698eabe32b69b48708cf7b19", null ],
     [ "getPoseColors", "pose_parameters_render_8hpp.html#abb49286241ba7a1d754b31dee333274a", null ],
     [ "getPoseScales", "pose_parameters_render_8hpp.html#a016abefba53293ed2ffe3a3c3bd88dd0", null ],

@@ -119,8 +119,8 @@ $(document).ready(function(){initNavTree('classop_1_1_pose_cpu_renderer.html',''
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a8b5c83bbf076b949b1209261f25d170d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_cpu_renderer.html#a8b5c83bbf076b949b1209261f25d170d">PoseCpuRenderer</a> (const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel, const float renderThreshold, const bool blendOriginalFrame=true, const float alphaKeypoint=<a class="el" href="namespaceop.html#a21fcb98366f6ea8895fc7f527f232db5">POSE_DEFAULT_ALPHA_KEYPOINT</a>, const float alphaHeatMap=<a class="el" href="namespaceop.html#af45cddacd69fff73a4ea4acbbbac43e0">POSE_DEFAULT_ALPHA_HEAT_MAP</a>)</td></tr>
-<tr class="separator:a8b5c83bbf076b949b1209261f25d170d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5863733d560345d4890557b0f8c0d08e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_cpu_renderer.html#a5863733d560345d4890557b0f8c0d08e">PoseCpuRenderer</a> (const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel, const float renderThreshold, const bool blendOriginalFrame=true, const float alphaKeypoint=<a class="el" href="namespaceop.html#a21fcb98366f6ea8895fc7f527f232db5">POSE_DEFAULT_ALPHA_KEYPOINT</a>, const float alphaHeatMap=<a class="el" href="namespaceop.html#af45cddacd69fff73a4ea4acbbbac43e0">POSE_DEFAULT_ALPHA_HEAT_MAP</a>, const unsigned int elementToRender=0u)</td></tr>
+<tr class="separator:a5863733d560345d4890557b0f8c0d08e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a98541b982847713472411402314efd96"><td class="memItemLeft" align="right" valign="top">std::pair&lt; int, std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classop_1_1_pose_cpu_renderer.html#a98541b982847713472411402314efd96">renderPose</a> (<a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt; &amp;outputData, const <a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt; &amp;poseKeypoints, const float scaleInputToOutput, const float scaleNetToOutput=-1.f)</td></tr>
 <tr class="separator:a98541b982847713472411402314efd96"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classop_1_1_renderer"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classop_1_1_renderer')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classop_1_1_renderer.html">op::Renderer</a></td></tr>
@@ -175,7 +175,7 @@ std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el
 <tr class="separator:aecc0a9296ca880ad6ceaf38ecd8c3c53 inherit pro_attribs_classop_1_1_pose_renderer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a8b5c83bbf076b949b1209261f25d170d"></a>
+<a class="anchor" id="a5863733d560345d4890557b0f8c0d08e"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -207,7 +207,13 @@ std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const float&#160;</td>
-          <td class="paramname"><em>alphaHeatMap</em> = <code><a class="el" href="namespaceop.html#af45cddacd69fff73a4ea4acbbbac43e0">POSE_DEFAULT_ALPHA_HEAT_MAP</a></code>&#160;</td>
+          <td class="paramname"><em>alphaHeatMap</em> = <code><a class="el" href="namespaceop.html#af45cddacd69fff73a4ea4acbbbac43e0">POSE_DEFAULT_ALPHA_HEAT_MAP</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const unsigned int&#160;</td>
+          <td class="paramname"><em>elementToRender</em> = <code>0u</code>&#160;</td>
         </tr>
         <tr>
           <td></td>

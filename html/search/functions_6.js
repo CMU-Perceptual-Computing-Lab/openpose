@@ -43,6 +43,7 @@ var searchData=
   ['getnumbercudablocks',['getNumberCudaBlocks',['../namespaceop.html#a4ba080c11cc9758051db97ce2a11c023',1,'op']]],
   ['getnumbercudathreadsandblocks',['getNumberCudaThreadsAndBlocks',['../namespaceop.html#a8b9860388a640472d25a1dacb007c675',1,'op']]],
   ['getnumberdimensions',['getNumberDimensions',['../classop_1_1_array.html#adeb008e878709bb5a51e26be55a5452d',1,'op::Array']]],
+  ['getnumberelementstorender',['getNumberElementsToRender',['../namespaceop.html#aebff78a4cfbef1cf1b2e03066d88564c',1,'op']]],
   ['getoutputblob',['getOutputBlob',['../classop_1_1_net_caffe.html#a8869d49723a0e94c990b1c4f95f00916',1,'op::NetCaffe']]],
   ['getposebodypartmapping',['getPoseBodyPartMapping',['../namespaceop.html#aab3de911b04b96c1850cc05c6947e184',1,'op']]],
   ['getposebodypartpairsrender',['getPoseBodyPartPairsRender',['../namespaceop.html#a11bd7e53698eabe32b69b48708cf7b19',1,'op']]],

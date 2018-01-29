@@ -6,7 +6,7 @@ var searchData=
   ['point',['Point',['../structop_1_1_point.html#a9f80114d18ec8055360222d975bcd5a8',1,'op::Point::Point(const T x=0, const T y=0)'],['../structop_1_1_point.html#a44559988e3980e21568b5d9dd2897368',1,'op::Point::Point(const Point&lt; T &gt; &amp;point)'],['../structop_1_1_point.html#ab3b92e4a40cd58d948647484f21dd9ef',1,'op::Point::Point(Point&lt; T &gt; &amp;&amp;point)']]],
   ['pop',['pop',['../classop_1_1_queue_base.html#a5b28915cc58e040aca673bdfdf7c8be3',1,'op::QueueBase']]],
   ['posebodypartmapstringtokey',['poseBodyPartMapStringToKey',['../namespaceop.html#a3df938ef93037c534c5d342720d5fb70',1,'op::poseBodyPartMapStringToKey(const PoseModel poseModel, const std::string &amp;string)'],['../namespaceop.html#aacf6e688031bb116e4878b811e8dbc23',1,'op::poseBodyPartMapStringToKey(const PoseModel poseModel, const std::vector&lt; std::string &gt; &amp;strings)']]],
-  ['posecpurenderer',['PoseCpuRenderer',['../classop_1_1_pose_cpu_renderer.html#a8b5c83bbf076b949b1209261f25d170d',1,'op::PoseCpuRenderer']]],
+  ['posecpurenderer',['PoseCpuRenderer',['../classop_1_1_pose_cpu_renderer.html#a5863733d560345d4890557b0f8c0d08e',1,'op::PoseCpuRenderer']]],
   ['poseextractor',['PoseExtractor',['../classop_1_1_pose_extractor.html#a54b0c911456746d4faf493bb4e9b0c1e',1,'op::PoseExtractor']]],
   ['poseextractorcaffe',['PoseExtractorCaffe',['../classop_1_1_pose_extractor_caffe.html#ab58c3ab4b745b35f542165ce27293554',1,'op::PoseExtractorCaffe']]],
   ['posegpurenderer',['PoseGpuRenderer',['../classop_1_1_pose_gpu_renderer.html#afc6fbf8fcf13fad9c824136f8f8ec409',1,'op::PoseGpuRenderer']]],

@@ -1,5 +1,6 @@
 var NAVTREEINDEX5 =
 {
+"structop_1_1_point.html#a81a09bde4e8e27ec6e8b4808f0f60f57":[1,0,2,11,17],
 "structop_1_1_point.html#a9759f95e852025014cb071aefb242cef":[1,0,2,11,5],
 "structop_1_1_point.html#a9f80114d18ec8055360222d975bcd5a8":[1,0,2,11,0],
 "structop_1_1_point.html#aa389e5c56126074997b4a6fb1a471b45":[1,0,2,11,12],
@@ -248,6 +249,5 @@ var NAVTREEINDEX5 =
 "w_scale_and_size_extractor_8hpp.html#aaca98fe6101cda512a43c513182ae5cc":[2,0,0,0,0,27,1],
 "w_scale_and_size_extractor_8hpp_source.html":[2,0,0,0,0,27],
 "w_video_saver_8hpp.html":[2,0,0,0,3,18],
-"w_video_saver_8hpp.html#a49bd4106b0cd1cb81980329b06c0d2c8":[2,0,0,0,3,18,1],
-"w_video_saver_8hpp_source.html":[2,0,0,0,3,18]
+"w_video_saver_8hpp.html#a49bd4106b0cd1cb81980329b06c0d2c8":[2,0,0,0,3,18,1]
 };

@@ -613,6 +613,8 @@ Functions</h2></td></tr>
 <tr class="memitem:a11bd7e53698eabe32b69b48708cf7b19"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> const std::vector<br class="typebreak"/>
 &lt; unsigned int &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a11bd7e53698eabe32b69b48708cf7b19">getPoseBodyPartPairsRender</a> (const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel)</td></tr>
 <tr class="separator:a11bd7e53698eabe32b69b48708cf7b19"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aebff78a4cfbef1cf1b2e03066d88564c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#aebff78a4cfbef1cf1b2e03066d88564c">getNumberElementsToRender</a> (const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel)</td></tr>
+<tr class="separator:aebff78a4cfbef1cf1b2e03066d88564c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a99a08148f440bd96546076e15f0de04c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#a99a08148f440bd96546076e15f0de04c">renderPoseKeypointsCpu</a> (<a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt; &amp;frameArray, const <a class="el" href="classop_1_1_array.html">Array</a>&lt; float &gt; &amp;poseKeypoints, const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel, const float renderThreshold, const bool blendOriginalFrame=true)</td></tr>
 <tr class="separator:a99a08148f440bd96546076e15f0de04c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab79ad497b3b69db2d233656a2e97bc63"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceop.html#ab79ad497b3b69db2d233656a2e97bc63">renderPoseKeypointsGpu</a> (float *framePtr, const <a class="el" href="namespaceop.html#af5b3ce2a5d3de87cb31b9b67e96f261f">PoseModel</a> poseModel, const int numberPeople, const <a class="el" href="structop_1_1_point.html">Point</a>&lt; int &gt; &amp;frameSize, const float *const posePtr, const float renderThreshold, const bool googlyEyes=false, const bool blendOriginalFrame=true, const float alphaBlending=<a class="el" href="namespaceop.html#a21fcb98366f6ea8895fc7f527f232db5">POSE_DEFAULT_ALPHA_KEYPOINT</a>)</td></tr>
@@ -1834,22 +1836,6 @@ template&lt;typename TPointerContainer &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a196f17357cd1c1bb02e24e4e8a0e6ec3"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">op::COMPILE_TEMPLATE_DATUM </td>
-          <td>(</td>
-          <td class="paramtype">WFaceDetector&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a class="anchor" id="a1d9f50688522ed7368acc33a09ae9ece"></a>
 <div class="memitem">
 <div class="memproto">
@@ -1898,14 +1884,14 @@ template&lt;typename TPointerContainer &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a0424a8e4dc8ceb5e8d8a2230c157a7fd"></a>
+<a class="anchor" id="a196f17357cd1c1bb02e24e4e8a0e6ec3"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">op::COMPILE_TEMPLATE_DATUM </td>
           <td>(</td>
-          <td class="paramtype">WHandDetector&#160;</td>
+          <td class="paramtype">WFaceDetector&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1922,6 +1908,22 @@ template&lt;typename TPointerContainer &gt; </div>
           <td class="memname">op::COMPILE_TEMPLATE_DATUM </td>
           <td>(</td>
           <td class="paramtype">WHandDetectorTracking&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a0424a8e4dc8ceb5e8d8a2230c157a7fd"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">op::COMPILE_TEMPLATE_DATUM </td>
+          <td>(</td>
+          <td class="paramtype">WHandDetector&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -2090,22 +2092,6 @@ template&lt;typename TPointerContainer &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="aa7f93261bd6d87f86c45e933607a0678"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">op::COMPILE_TEMPLATE_DATUM </td>
-          <td>(</td>
-          <td class="paramtype">Queue&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a class="anchor" id="a49bd4106b0cd1cb81980329b06c0d2c8"></a>
 <div class="memitem">
 <div class="memproto">
@@ -2114,6 +2100,22 @@ template&lt;typename TPointerContainer &gt; </div>
           <td class="memname">op::COMPILE_TEMPLATE_DATUM </td>
           <td>(</td>
           <td class="paramtype">WVideoSaver&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="aa7f93261bd6d87f86c45e933607a0678"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">op::COMPILE_TEMPLATE_DATUM </td>
+          <td>(</td>
+          <td class="paramtype">Queue&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -3625,6 +3627,22 @@ template&lt;class T &gt; </div>
           <td></td>
           <td>)</td>
           <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="aebff78a4cfbef1cf1b2e03066d88564c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="macros_8hpp.html#a4ba443bb7a0e5dbe8054a9ac37a5e000">OP_API</a> unsigned int op::getNumberElementsToRender </td>
+          <td>(</td>
+          <td class="paramtype">const PoseModel&#160;</td>
+          <td class="paramname"><em>poseModel</em></td><td>)</td>
+          <td></td>
         </tr>
       </table>
 </div><div class="memdoc">

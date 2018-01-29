@@ -39,8 +39,8 @@ var NAVTREEINDEX =
 "classop_1_1_w_face_detector.html#a721ced99378516c04cb3cff296cc274a",
 "face_detector_8hpp_source.html",
 "namespacemembers_g.html",
-"structop_1_1_point.html#a9759f95e852025014cb071aefb242cef",
-"webcam_reader_8hpp.html"
+"structop_1_1_point.html#a81a09bde4e8e27ec6e8b4808f0f60f57",
+"w_video_saver_8hpp_source.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
