@@ -17,6 +17,7 @@ namespace op
     {
         #if defined USE_CAFFE
             bool netInitialized;
+            const int mGpuId;
             std::shared_ptr<NetCaffe> spNetCaffe;
             std::shared_ptr<ResizeAndMergeCaffe<float>> spResizeAndMergeCaffe;
             std::shared_ptr<MaximumCaffe<float>> spMaximumCaffe;
@@ -27,6 +28,7 @@ namespace op
 
             ImplFaceExtractorCaffe(const std::string& modelFolder, const int gpuId, const bool enableGoogleLogging) :
                 netInitialized{false},
+                mGpuId{gpuId},
                 spNetCaffe{std::make_shared<NetCaffe>(modelFolder + FACE_PROTOTXT, modelFolder + FACE_TRAINED_MODEL,
                                                       gpuId, enableGoogleLogging)},
                 spResizeAndMergeCaffe{std::make_shared<ResizeAndMergeCaffe<float>>()},
@@ -249,6 +251,9 @@ namespace op
                                 upImpl->spResizeAndMergeCaffe->Forward_gpu({upImpl->spCaffeNetOutputBlob.get()},
                                                                            {upImpl->spHeatMapsBlob.get()});
                                 cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+                            #elif USE_OPENCL
+                                upImpl->spResizeAndMergeCaffe->Forward_ocl({upImpl->spCaffeNetOutputBlob.get()},
+                                                                           {upImpl->spHeatMapsBlob.get()}, upImpl->mGpuId);
                             #else
                                 upImpl->spResizeAndMergeCaffe->Forward_cpu({upImpl->spCaffeNetOutputBlob.get()},
                                                                            {upImpl->spHeatMapsBlob.get()});
@@ -259,6 +264,9 @@ namespace op
                                 upImpl->spMaximumCaffe->Forward_gpu({upImpl->spHeatMapsBlob.get()},
                                                                     {upImpl->spPeaksBlob.get()});
                                 cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+                            #elif USE_OPENCL
+                                // CPU Version is already very fast (4ms) and data is sent to connectKeypoints as CPU for now anyway
+                                upImpl->spMaximumCaffe->Forward_cpu({upImpl->spHeatMapsBlob.get()}, {upImpl->spPeaksBlob.get()});
                             #else
                                 upImpl->spMaximumCaffe->Forward_cpu({upImpl->spHeatMapsBlob.get()},
                                                                     {upImpl->spPeaksBlob.get()});
