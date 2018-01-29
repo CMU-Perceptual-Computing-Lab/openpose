@@ -1,22 +1,22 @@
 set(EXAMPLE_FILES
-    handFromJsonTest.cpp)
+    3d.cpp)
 
 foreach(EXAMPLE_FILE ${EXAMPLE_FILES})
 
   get_filename_component(SOURCE_NAME ${EXAMPLE_FILE} NAME_WE)
-  
+
   if (UNIX AND NOT APPLE)
     set(EXE_NAME "${SOURCE_NAME}.bin")
   elseif (WIN32)
-    set(EXE_NAME "${SOURCE_NAME}")
+    set(EXE_NAME "OpenPoseDemo3D")
   endif ()
 
   message(STATUS "Adding Example ${EXE_NAME}")
   add_executable(${EXE_NAME} ${EXAMPLE_FILE})
   target_link_libraries( ${EXE_NAME} openpose ${GLOG_LIBRARY} ${GFLAGS_LIBRARY} ${Caffe_LIBS} ${MKL_LIBS} ${GLUT_LIBRARY} ${SPINNAKER_LIB})
-  
+
   if (WIN32)
-    set_property(TARGET ${EXE_NAME} PROPERTY FOLDER "Examples/Tutorial/Tests")
+    set_property(TARGET ${EXE_NAME} PROPERTY FOLDER "Examples")
     configure_file(${CMAKE_SOURCE_DIR}/cmake/OpenPose.vcxproj.user
         ${CMAKE_CURRENT_BINARY_DIR}/${EXE_NAME}.vcxproj.user @ONLY)
     # Properties->General->Output Directory
@@ -25,4 +25,3 @@ foreach(EXAMPLE_FILE ${EXAMPLE_FILES})
   endif (WIN32)
 
 endforeach()
-

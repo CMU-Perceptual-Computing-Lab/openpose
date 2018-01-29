@@ -200,6 +200,7 @@ namespace op
     OP_API const std::vector<float>& getPoseScales(const PoseModel poseModel);
     OP_API const std::vector<float>& getPoseColors(const PoseModel poseModel);
     OP_API const std::vector<unsigned int>& getPoseBodyPartPairsRender(const PoseModel poseModel);
+    OP_API unsigned int getNumberElementsToRender(const PoseModel poseModel);
 }
 
 #endif // OPENPOSE_POSE_POSE_PARAMETERS_RENDER_HPP
