@@ -23,8 +23,8 @@ namespace op
         return false;
     }
 
-    std::string createFullMessage(const std::string& message, const int line = -1, const std::string& function = "", const std::string& file = "")
-    // std::string createFullMessage(const std::string& message, const int line, const std::string& function, const std::string& file)
+    std::string createFullMessage(const std::string& message, const int line = -1, const std::string& function = "",
+                                  const std::string& file = "")
     {
         const auto hasMessage = (!message.empty());
         const auto hasLocation = (line != -1 || !function.empty() || !file.empty());
@@ -34,10 +34,14 @@ namespace op
         if (hasMessage)
         {
             fullMessage += message;
-            // // Add dot at the end if the sentence does not finish in a programming file path (this happens when the error is propagated over several error)
+            // // Add dot at the end if the sentence does not finish in a programming file path (this happens when the
+            // error is propagated over several error)
             // if (*message.crbegin() != '.'
             //     && (message.size() < 4
-            //         || (message.substr(message.size() - 4, 4) != ".cpp" && message.substr(message.size() - 4, 4) != ".hpp" && message.substr(message.size() - 4, 4) != ".h" && message.substr(message.size() - 4, 4) != ".c")))
+            //         || (message.substr(message.size() - 4, 4) != ".cpp"
+            //             && message.substr(message.size() - 4, 4) != ".hpp"
+            //             && message.substr(message.size() - 4, 4) != ".h"
+            //             && message.substr(message.size() - 4, 4) != ".c")))
             //     fullMessage += ".";
 
             if (hasLocation)
@@ -74,8 +78,9 @@ namespace op
         // Common
         timeStruct.tm_mon++;
         timeStruct.tm_year += 1900;
-        return std::to_string(timeStruct.tm_year) + '_' + std::to_string(timeStruct.tm_mon) + '_' + std::to_string(timeStruct.tm_mday) + "___"
-               + std::to_string(timeStruct.tm_hour) + '_' + std::to_string(timeStruct.tm_min) + '_' + std::to_string(timeStruct.tm_sec);
+        return std::to_string(timeStruct.tm_year) + '_' + std::to_string(timeStruct.tm_mon)
+               + '_' + std::to_string(timeStruct.tm_mday) + "___" + std::to_string(timeStruct.tm_hour)
+               + '_' + std::to_string(timeStruct.tm_min) + '_' + std::to_string(timeStruct.tm_sec);
     }
 
     void fileLogging(const std::string& message)
@@ -89,7 +94,8 @@ namespace op
 
         // Continue at the end of the file or delete it and re-write it (according to current file size)
         const auto maxLogSize = 15 * 1024 * 1024; // 15 MB
-        std::ofstream loggingFile{fileToOpen, (currentSizeBytes < maxLogSize ? std::ios_base::app : std::ios_base::trunc)};
+        std::ofstream loggingFile{fileToOpen,
+                                  (currentSizeBytes < maxLogSize ? std::ios_base::app : std::ios_base::trunc)};
 
         // Message to write
         loggingFile << getTime();
@@ -116,14 +122,16 @@ namespace op
         // If first error
         if (message.size() < errorInit.size() || message.substr(0, errorInit.size()) != errorInit)
         {
-            errorMessageToPrint = errorInit + createFullMessage(message) + "\n\nComing from:\n" + errorEnum + createFullMessage("", line, function, file);
+            errorMessageToPrint = errorInit + createFullMessage(message) + "\n\nComing from:\n" + errorEnum
+                                + createFullMessage("", line, function, file);
             errorMessageToPropagate = errorMessageToPrint + "\n";
         }
         // If error propagated among different errors
         else
         {
             errorMessageToPrint = errorEnum + createFullMessage("", line, function, file);
-            errorMessageToPropagate = createFullMessage(message.substr(0, message.size()-1)) + "\n" + errorMessageToPrint + "\n";
+            errorMessageToPropagate = createFullMessage(message.substr(0, message.size()-1)) + "\n"
+                                    + errorMessageToPrint + "\n";
         }
 
         // std::cerr
@@ -139,7 +147,8 @@ namespace op
             throw std::runtime_error{errorMessageToPropagate};
     }
 
-    void log(const std::string& message, const Priority priority, const int line, const std::string& function, const std::string& file)
+    void log(const std::string& message, const Priority priority, const int line, const std::string& function,
+             const std::string& file)
     {
         if (priority >= ConfigureLog::getPriorityThreshold())
         {

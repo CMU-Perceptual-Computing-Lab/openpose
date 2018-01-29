@@ -18,8 +18,7 @@ namespace op
         //                          + 3 (+whole pose +whole heatmaps +PAFs)
         // POSE_BODY_PART_MAPPING crashes on Windows, replaced by getPoseBodyPartMapping
         GpuRenderer{renderThreshold, alphaKeypoint, alphaHeatMap, blendOriginalFrame, elementToRender,
-                    (unsigned int)(getPoseBodyPartMapping(poseModel).size()
-                                   + getPosePartPairs(poseModel).size()/2 + 3)}, // mNumberElementsToRender
+                    getNumberElementsToRender(poseModel)}, // mNumberElementsToRender
         PoseRenderer{poseModel},
         spPoseExtractor{poseExtractor},
         pGpuPose{nullptr}
