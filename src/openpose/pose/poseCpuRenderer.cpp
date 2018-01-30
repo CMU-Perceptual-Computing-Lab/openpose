@@ -6,8 +6,9 @@ namespace op
 {
     PoseCpuRenderer::PoseCpuRenderer(const PoseModel poseModel, const float renderThreshold,
                                      const bool blendOriginalFrame, const float alphaKeypoint,
-                                     const float alphaHeatMap) :
-        Renderer{renderThreshold, alphaKeypoint, alphaHeatMap, blendOriginalFrame},
+                                     const float alphaHeatMap, const unsigned int elementToRender) :
+        Renderer{renderThreshold, alphaKeypoint, alphaHeatMap, blendOriginalFrame, elementToRender,
+                 getNumberElementsToRender(poseModel)}, // mNumberElementsToRender
         PoseRenderer{poseModel}
     {
     }

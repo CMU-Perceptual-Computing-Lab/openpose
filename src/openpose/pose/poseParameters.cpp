@@ -1,3 +1,4 @@
+#include <openpose/pose/poseParametersRender.hpp>
 #include <openpose/pose/poseParameters.hpp>
 
 namespace op

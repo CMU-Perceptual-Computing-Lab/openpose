@@ -182,6 +182,7 @@ OpenPose Library - Release Notes
     10. 3-D Reconstruction demo cleaned, implemented in Ubuntu too, and now defined as experimental module of OpenPose rather than just a demo.
 2. Main bugs fixed:
     1. Slight speed up (~1%) for performing the non-maximum suppression stage only in the body part heatmaps channels, and not also in the PAF channels.
+    2. Fixed core-dumped in PoseRenderer with GUI when changed element to be rendered to something else than skeleton.
 
 
 

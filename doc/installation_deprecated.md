@@ -56,7 +56,7 @@ Build Caffe & the OpenPose library + download the required Caffe models for Ubun
 ```bash
 bash ./ubuntu/install_caffe_and_openpose_if_cuda8.sh
 ```
-**Highly important**: This script only works with CUDA 8 and Ubuntu 14 or 16. Otherwise, see [doc/installation_cmake.md](installation_cmake.md) or [Installation - Manual Compilation](#installation---manual-compilation).
+**Highly important**: This script only works with CUDA 8 and Ubuntu 14 or 16. Otherwise, see [doc/installation.md](installation.md) or [Installation - Manual Compilation](#installation---manual-compilation).
 
 
 
@@ -126,7 +126,7 @@ You just need to remove the OpenPose folder, by default called `openpose/`. E.g.
     3. [**cuDNN 5.1**](https://developer.nvidia.com/cudnn): Once you have downloaded it, just unzip it and copy (merge) the contents on the CUDA folder, `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0`.
 
 #### CMake Installer
-Recommended installation method, it is simpler and offers more customization settings. See [doc/installation_cmake.md](installation_cmake.md). Note that it is a beta version, post in GitHub any issue you find.
+Recommended installation method, it is simpler and offers more customization settings. See [doc/installation.md](installation.md). Note that it is a beta version, post in GitHub any issue you find.
 
 
 #### Deprecated Windows Installer

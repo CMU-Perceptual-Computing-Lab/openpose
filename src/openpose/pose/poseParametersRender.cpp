@@ -1,3 +1,4 @@
+#include <openpose/pose/poseParameters.hpp>
 #include <openpose/pose/poseParametersRender.hpp>
 
 namespace op
@@ -67,6 +68,20 @@ namespace op
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             return POSE_BODY_PART_PAIRS_RENDER[(int)poseModel];
+        }
+    }
+
+    unsigned int getNumberElementsToRender(const PoseModel poseModel)
+    {
+        try
+        {
+            return (unsigned int)(getPoseBodyPartMapping(poseModel).size()
+                                  + getPosePartPairs(poseModel).size()/2 + 3);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return 0u;
         }
     }
 }
