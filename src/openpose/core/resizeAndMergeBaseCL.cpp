@@ -261,6 +261,10 @@ namespace op
                 }
             }
         }
+        catch (const cl::Error& e)
+        {
+            error(std::string(e.what()) + " : " + op::CLManager::clErrorToString(e.err()) + " ID: " + std::to_string(gpuID), __LINE__, __FUNCTION__, __FILE__);
+        }
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);

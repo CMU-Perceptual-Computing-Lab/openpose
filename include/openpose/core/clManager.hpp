@@ -6,13 +6,16 @@
 #include <map>
 #include <openpose/core/common.hpp>
 #include <fstream>
+#include <mutex>
+#include <thread>
 
 #ifdef USE_OPENCL
     #define CL_HPP_ENABLE_EXCEPTIONS
-    #define CL_HPP_MINIMUM_OPENCL_VERSION 120
-    #define CL_HPP_TARGET_OPENCL_VERSION 120
+    #define CL_HPP_MINIMUM_OPENCL_VERSION 200 // Need to set to 120 on CUDA 8
+    #define CL_HPP_TARGET_OPENCL_VERSION 200 // Need to set to 120 on CUDA 8
     #include <CL/cl2.hpp>
     #include <viennacl/backend/opencl.hpp>
+    #include <caffe/caffe.hpp>
 #endif
 
 // Singleton structure
@@ -32,6 +35,7 @@ namespace op
         CLManager(int deviceId, int deviceType, bool getFromVienna);
         std::map<std::string, cl::Program> clPrograms;
         std::map<std::string, cl::Kernel> clKernels;
+        int id;
         cl::Device device;
         cl::CommandQueue queue;
         cl::Context context;
@@ -69,6 +73,9 @@ namespace op
         template <typename K, typename T> inline K getKernelFunctorFromManager(std::string kernelName, std::string src = "", bool isFile = false){
             return K(getKernelFromManager<T>(kernelName, src, isFile));
         }
+    public:
+        static std::string clErrorToString(cl_int error);
+        static int getTotalGPU();
     };
 }
 

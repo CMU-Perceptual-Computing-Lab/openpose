@@ -17,6 +17,9 @@ namespace op
 {
     std::mutex sMutexNetCaffe;
     std::atomic<bool> sGoogleLoggingInitialized{false};
+    #ifdef USE_OPENCL
+        std::atomic<bool> sOpenCLInitialized{false};
+    #endif
 
     struct NetCaffe::ImplNetCaffe
     {
@@ -56,6 +59,25 @@ namespace op
                         sGoogleLoggingInitialized = true;
                     }
                 }
+                #ifdef USE_OPENCL
+                    // Initialize OpenCL
+                    if (!sOpenCLInitialized)
+                    {
+                        std::lock_guard<std::mutex> lock{sMutexNetCaffe};
+                        if (!sOpenCLInitialized)
+                        {
+                            caffe::Caffe::set_mode(caffe::Caffe::GPU);
+                            std::vector<int> devices;
+                            int maxNumberGpu = op::CLManager::getTotalGPU();
+                            for(int i=0; i<maxNumberGpu; i++)
+                                devices.push_back(i);
+                            caffe::Caffe::SetDevices(devices);
+                            if (mGpuId >= maxNumberGpu)
+                                error("Notify us");
+                            sOpenCLInitialized = true;
+                        }
+                    }
+                #endif
             }
         #endif
     };
@@ -113,20 +135,19 @@ namespace op
         {
             #ifdef USE_CAFFE
                // Initialize net
-               #ifdef USE_CUDA
-                   caffe::Caffe::set_mode(caffe::Caffe::GPU);
-                   caffe::Caffe::SetDevice(upImpl->mGpuId);
-               #else
-                   caffe::Caffe::set_mode(caffe::Caffe::CPU);
-               #endif
                #ifdef USE_OPENCL
                    caffe::Caffe::set_mode(caffe::Caffe::GPU);
-                   caffe::Caffe::SetDevice(upImpl->mGpuId);
-                   caffe::device* device = caffe::Caffe::GetDevice(upImpl->mGpuId,0);
-                   upImpl->upCaffeNet.reset(new caffe::Net<float>{upImpl->mCaffeProto, caffe::TEST, device});
+                   caffe::Caffe::SelectDevice(upImpl->mGpuId, true);
+                   upImpl->upCaffeNet.reset(new caffe::Net<float>{upImpl->mCaffeProto, caffe::TEST, caffe::Caffe::GetDefaultDevice()});
                    upImpl->upCaffeNet->CopyTrainedLayersFrom(upImpl->mCaffeTrainedModel);
                    op::CLManager::getInstance(upImpl->mGpuId, CL_DEVICE_TYPE_GPU, true);
                #else
+                   #ifdef USE_CUDA
+                       caffe::Caffe::set_mode(caffe::Caffe::GPU);
+                       caffe::Caffe::SetDevice(upImpl->mGpuId);
+                   #else
+                       caffe::Caffe::set_mode(caffe::Caffe::CPU);
+                   #endif
                    upImpl->upCaffeNet.reset(new caffe::Net<float>{upImpl->mCaffeProto, caffe::TEST});
                    upImpl->upCaffeNet->CopyTrainedLayersFrom(upImpl->mCaffeTrainedModel);
                #endif
@@ -171,7 +192,12 @@ namespace op
                     auto* gpuImagePtr = upImpl->upCaffeNet->blobs().at(0)->mutable_gpu_data();
                     cudaMemcpy(gpuImagePtr, inputData.getConstPtr(), inputData.getVolume() * sizeof(float),
                                cudaMemcpyHostToDevice);
+                #elif USE_OPENCL
+                    auto* gpuImagePtr = upImpl->upCaffeNet->blobs().at(0)->mutable_gpu_data();
+                    cl::Buffer imageBuffer = cl::Buffer((cl_mem)gpuImagePtr, true);
+                    op::CLManager::getInstance(upImpl->mGpuId)->getQueue().enqueueWriteBuffer(imageBuffer, true, 0, inputData.getVolume() * sizeof(float), inputData.getConstPtr());
                 #else
+                    op::log(inputData.printSize());
                     auto* cpuImagePtr = upImpl->upCaffeNet->blobs().at(0)->mutable_cpu_data();
                     std::copy(inputData.getConstPtr(), inputData.getConstPtr() + inputData.getVolume(), cpuImagePtr);
                 #endif

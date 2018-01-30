@@ -8,6 +8,9 @@
 #include <openpose/wrapper/wrapperStructInput.hpp>
 #include <openpose/wrapper/wrapperStructOutput.hpp>
 #include <openpose/wrapper/wrapperStructPose.hpp>
+//#ifdef USE_OPENCL
+//    #include <openpose/core/clManager.hpp>
+//#endif
 
 namespace op
 {
@@ -553,7 +556,12 @@ namespace op
                 if (numberThreads < 0)
                 {
                     // Get total number GPUs
-                    const auto totalGpuNumber = getGpuNumber();
+                    int totalGpuNumber = -1;;
+                    #ifdef USE_CUDA
+                        totalGpuNumber = getGpuNumber();
+                    #elif USE_OPENCL
+                        //totalGpuNumber = op::CLManager::getTotalGPU();
+                    #endif
                     if (totalGpuNumber <= gpuNumberStart)
                         error("Number of initial GPUs (`--number_gpu_start`) must be lower than the total number of used"
                               " GPUs (`--number_gpu`)", __LINE__, __FUNCTION__, __FILE__);
