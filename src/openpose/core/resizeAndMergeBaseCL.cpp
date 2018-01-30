@@ -155,6 +155,19 @@ namespace op
         }
     );
 
+    typedef cl::KernelFunctor<cl::Buffer, int, int> ZeroBufferFunctor;
+    const std::string zeroBufferKernel = MULTI_LINE_STRING(
+        __kernel void zeroBufferKernel(__global Type* targetPtr, const int targetWidth, const int targetHeight)
+        {
+            int x = get_global_id(0);
+            int y = get_global_id(1);
+            int c = get_global_id(2);
+
+            Type* targetPtrC = &targetPtr[c*targetWidth*targetHeight];
+            targetPtrC[y*targetWidth+x] = 0;
+        }
+    );
+
     template <typename T>
     void resizeAndMergeOcl(T* targetPtr, const std::vector<const T*>& sourcePtrs,
                            const std::array<int, 4>& targetSize,
@@ -181,6 +194,8 @@ namespace op
                         "resizeAndAddKernel",op::resizeAndMergeOclCommonFunctions+op::resizeAndAddKernel);
             auto resizeAndAverageKernel = op::CLManager::getInstance(gpuID)->getKernelFunctorFromManager<op::ResizeAndAverageFunctor, T>(
                         "resizeAndAverageKernel",op::resizeAndMergeOclCommonFunctions+op::resizeAndAverageKernel);
+            auto zeroBufferKernel = op::CLManager::getInstance(gpuID)->getKernelFunctorFromManager<op::ZeroBufferFunctor, T>(
+                        "zeroBufferKernel",op::zeroBufferKernel);
 
             // Parameters
             const auto channels = targetSize[1];
@@ -191,7 +206,7 @@ namespace op
             const auto sourceWidth = sourceSize[3];
 
             // No multi-scale merging or no merging required
-            if (sourceSizes.size() == 1)
+            if (sourceSizes.size() == 10)
             {
                 const auto num = sourceSize[0];
                 if (targetSize[0] > 1 || num == 1)
@@ -223,6 +238,8 @@ namespace op
             else
             {
                 const auto targetChannelOffset = targetWidth * targetHeight;
+                //cudaMemset(targetPtr, 0.f, channels*targetChannelOffset * sizeof(T));
+                zeroBufferKernel(cl::EnqueueArgs(op::CLManager::getInstance(gpuID)->getQueue(), cl::NDRange(targetWidth, targetHeight, channels)), targetPtrBuffer, targetWidth, targetHeight);
                 const auto scaleToMainScaleWidth = targetWidth / T(sourceWidth);
                 const auto scaleToMainScaleHeight = targetHeight / T(sourceHeight);
 
