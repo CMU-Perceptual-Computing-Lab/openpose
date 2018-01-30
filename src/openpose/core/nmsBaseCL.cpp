@@ -3,6 +3,7 @@
 
 #ifdef USE_OPENCL
     #include <openpose/core/clManager.hpp>
+    #include <CL/cl2.hpp>
 #endif
 
 #include <opencv2/opencv.hpp>
@@ -109,6 +110,7 @@ namespace op
     {
         try
         {
+            #ifdef USE_OPENCL
             //Forward_cpu(bottom, top);
             const auto num = sourceSize[0];
             const auto height = sourceSize[2];
@@ -116,9 +118,7 @@ namespace op
             const auto channels = targetSize[1];
             const auto targetPeaks = targetSize[2]; // 97
             const auto targetPeakVec = targetSize[3]; // 3
-            const auto maxPeaks = targetSize[2]-1;
             const auto imageOffset = height * width;
-            const auto offsetTarget = (maxPeaks+1)*targetSize[3];
             const auto targetChannelOffset = targetPeaks * targetPeakVec;
 
             // Get Kernel
@@ -157,9 +157,10 @@ namespace op
                     const auto offsetChannel = (n * channels + c);
 
                     // CL Data
-                    cl_buffer_region kernelRegion = op::CLManager::getBufferRegion<double>(offsetChannel * imageOffset, imageOffset);
+                    cl_buffer_region kernelRegion, sourceRegion;
+                    op::CLManager::getBufferRegion<double>(kernelRegion, offsetChannel * imageOffset, imageOffset);
                     cl::Buffer kernelBuffer = kernelPtrBuffer.createSubBuffer(CL_MEM_READ_WRITE, CL_BUFFER_CREATE_TYPE_REGION, &kernelRegion);
-                    cl_buffer_region sourceRegion = op::CLManager::getBufferRegion<T>(offsetChannel * imageOffset, imageOffset);
+                    op::CLManager::getBufferRegion<T>(sourceRegion, offsetChannel * imageOffset, imageOffset);
                     cl::Buffer sourceBuffer = sourcePtrBuffer.createSubBuffer(CL_MEM_READ_ONLY, CL_BUFFER_CREATE_TYPE_REGION, &sourceRegion);
 
                     // Run Kernel
@@ -197,7 +198,24 @@ namespace op
                     currTargetPtr[0] = currentPeakCount-1;
                 }
             }
+            #else
+            UNUSED(targetPtr);
+            UNUSED(kernelPtr);
+            UNUSED(sourcePtr);
+            UNUSED(threshold);
+            UNUSED(targetSize);
+            UNUSED(sourceSize);
+            UNUSED(gpuID);
+            error("OpenPose must be compiled with the `USE_OPENCL` macro definition in order to use this"
+                  " functionality.", __LINE__, __FUNCTION__, __FILE__);
+            #endif
         }
+        #ifdef USE_OPENCL
+        catch (const cl::Error& e)
+        {
+            error(std::string(e.what()) + " : " + op::CLManager::clErrorToString(e.err()) + " ID: " + std::to_string(gpuID), __LINE__, __FUNCTION__, __FILE__);
+        }
+        #endif
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);

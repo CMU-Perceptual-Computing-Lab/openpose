@@ -170,6 +170,7 @@ namespace op
             #else
                 UNUSED(bottom);
                 UNUSED(top);
+                UNUSED(gpuID);
                 error("OpenPose must be compiled with the `USE_CAFFE` & `USE_OPENCL` macro definitions in order to run"
                       " this functionality.", __LINE__, __FUNCTION__, __FILE__);
             #endif

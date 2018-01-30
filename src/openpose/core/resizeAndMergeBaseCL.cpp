@@ -2,7 +2,9 @@
 #include <openpose/core/resizeAndMergeBase.hpp>
 
 #ifdef USE_OPENCL
+    #define CL_HPP_ENABLE_EXCEPTIONS
     #include <openpose/core/clManager.hpp>
+    #include <CL/cl2.hpp>
 #endif
 
 namespace op
@@ -162,6 +164,7 @@ namespace op
     {
         try
         {
+            #ifdef USE_OPENCL
             // Security checks
             if (sourceSizes.empty())
                 error("sourceSizes cannot be empty.", __LINE__, __FUNCTION__, __FILE__);
@@ -202,9 +205,10 @@ namespace op
                         for (auto c = 0 ; c < channels ; c++)
                         {
                             const auto offset = offsetBase + c;
-                            cl_buffer_region targerRegion = op::CLManager::getBufferRegion<T>(offset * targetChannelOffset, targetChannelOffset);
+                            cl_buffer_region targerRegion, sourceRegion;
+                            op::CLManager::getBufferRegion<T>(targerRegion, offset * targetChannelOffset, targetChannelOffset);
                             cl::Buffer targetBuffer = targetPtrBuffer.createSubBuffer(CL_MEM_READ_WRITE, CL_BUFFER_CREATE_TYPE_REGION, &targerRegion);
-                            cl_buffer_region sourceRegion = op::CLManager::getBufferRegion<T>(offset * sourceChannelOffset, sourceChannelOffset);
+                            op::CLManager::getBufferRegion<T>(sourceRegion, offset * sourceChannelOffset, sourceChannelOffset);
                             cl::Buffer sourceBuffer = sourcePtrBuffer.createSubBuffer(CL_MEM_READ_ONLY, CL_BUFFER_CREATE_TYPE_REGION, &sourceRegion);
                             resizeAndMergeKernel(cl::EnqueueArgs(op::CLManager::getInstance(gpuID)->getQueue(), cl::NDRange(targetWidth, targetHeight)),
                                                   targetBuffer, sourceBuffer, sourceWidth, sourceHeight, targetWidth, targetHeight);
@@ -237,8 +241,9 @@ namespace op
                     {
                         for (auto c = 0 ; c < channels ; c++)
                         {
-                            cl_buffer_region targerRegion = op::CLManager::getBufferRegion<T>(c * targetChannelOffset, targetChannelOffset);
-                            cl_buffer_region sourceRegion = op::CLManager::getBufferRegion<T>(c * sourceChannelOffset, sourceChannelOffset);
+                            cl_buffer_region targerRegion, sourceRegion;
+                            op::CLManager::getBufferRegion<T>(targerRegion, c * targetChannelOffset, targetChannelOffset);
+                            op::CLManager::getBufferRegion<T>(sourceRegion, c * sourceChannelOffset, sourceChannelOffset);
                             cl::Buffer targetBuffer = targetPtrBuffer.createSubBuffer(CL_MEM_READ_WRITE, CL_BUFFER_CREATE_TYPE_REGION, &targerRegion);
                             cl::Buffer sourceBuffer = sourcePtrBuffer.createSubBuffer(CL_MEM_READ_WRITE, CL_BUFFER_CREATE_TYPE_REGION, &sourceRegion);
                             resizeAndAddKernel(cl::EnqueueArgs(op::CLManager::getInstance(gpuID)->getQueue(), cl::NDRange(targetWidth, targetHeight)),
@@ -250,8 +255,9 @@ namespace op
                     {
                         for (auto c = 0 ; c < channels ; c++)
                         {
-                            cl_buffer_region targerRegion = op::CLManager::getBufferRegion<T>(c * targetChannelOffset, targetChannelOffset);
-                            cl_buffer_region sourceRegion = op::CLManager::getBufferRegion<T>(c * sourceChannelOffset, sourceChannelOffset);
+                            cl_buffer_region targerRegion, sourceRegion;
+                            op::CLManager::getBufferRegion<T>(targerRegion, c * targetChannelOffset, targetChannelOffset);
+                            op::CLManager::getBufferRegion<T>(sourceRegion, c * sourceChannelOffset, sourceChannelOffset);
                             cl::Buffer targetBuffer = targetPtrBuffer.createSubBuffer(CL_MEM_READ_WRITE, CL_BUFFER_CREATE_TYPE_REGION, &targerRegion);
                             cl::Buffer sourceBuffer = sourcePtrBuffer.createSubBuffer(CL_MEM_READ_WRITE, CL_BUFFER_CREATE_TYPE_REGION, &sourceRegion);
                             resizeAndAverageKernel(cl::EnqueueArgs(op::CLManager::getInstance(gpuID)->getQueue(), cl::NDRange(targetWidth, targetHeight)),
@@ -260,11 +266,23 @@ namespace op
                     }
                 }
             }
+            #else
+            UNUSED(targetPtr);
+            UNUSED(sourcePtrs);
+            UNUSED(targetSize);
+            UNUSED(sourceSizes);
+            UNUSED(scaleInputToNetInputs);
+            UNUSED(gpuID);
+            error("OpenPose must be compiled with the `USE_OPENCL` macro definition in order to use this"
+                  " functionality.", __LINE__, __FUNCTION__, __FILE__);
+            #endif
         }
+        #ifdef USE_OPENCL
         catch (const cl::Error& e)
         {
             error(std::string(e.what()) + " : " + op::CLManager::clErrorToString(e.err()) + " ID: " + std::to_string(gpuID), __LINE__, __FUNCTION__, __FILE__);
         }
+        #endif
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);

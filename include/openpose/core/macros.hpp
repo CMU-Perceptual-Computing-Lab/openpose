@@ -66,6 +66,20 @@ namespace boost
 {
     template <typename T> class shared_ptr; // E.g., boost::shared_ptr<caffe::Blob<float>>
 }
+typedef struct _cl_buffer_region cl_buffer_region;
+typedef struct _cl_mem *            cl_mem;
+#define CL_DEVICE_TYPE_GPU                          (1 << 2)
+namespace cl
+{
+    class Error;
+    class Buffer;
+    class Program;
+    class Device;
+    class CommandQueue;
+    class Context;
+    class Kernel;
+    template <typename... Ts> class KernelFunctor;
+}
 
 // Includes at the end, since this macros class does not need them, but the files that call this
 // file. However, keeping the files at the beginning might create a circular include linking problem.

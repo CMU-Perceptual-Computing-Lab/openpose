@@ -1,5 +1,11 @@
 #include <openpose/core/clManager.hpp>
 
+#ifdef USE_OPENCL
+    #include <CL/cl2.hpp>
+    #include <viennacl/backend/opencl.hpp>
+    #include <caffe/caffe.hpp>
+#endif
+
 namespace op
 {
     std::shared_ptr<CLManager> CLManager::getInstance(int deviceId, int deviceType, bool getFromVienna)
@@ -17,30 +23,50 @@ namespace op
         }
     }
 
-    CLManager::CLManager(int deviceId, int deviceType, bool getFromVienna)
+    struct CLManager::ImplCLManager
     {
-        id = deviceId;
+    public:
+        #ifdef USE_OPENCL
+        std::map<std::string, cl::Program> mClPrograms;
+        std::map<std::string, cl::Kernel> mClKernels;
+        int mId;
+        cl::Device mDevice;
+        cl::CommandQueue mQueue;
+        cl::Context mContext;
+        #endif
+
+        ImplCLManager()
+        {
+
+        }
+    };
+
+    CLManager::CLManager(int deviceId, int deviceType, bool getFromVienna)
+        : upImpl{new ImplCLManager{}}
+    {
+        #ifdef USE_OPENCL
+        upImpl->mId = deviceId;
         if(getFromVienna)
         {
-            context = cl::Context(caffe::Caffe::GetOpenCLContext(deviceId, 0), true);
-            queue = cl::CommandQueue(caffe::Caffe::GetOpenCLQueue(deviceId, 0), true);
+            upImpl->mContext = cl::Context(caffe::Caffe::GetOpenCLContext(deviceId, 0), true);
+            upImpl->mQueue = cl::CommandQueue(caffe::Caffe::GetOpenCLQueue(deviceId, 0), true);
+            upImpl->mDevice = upImpl->mContext.getInfo<CL_CONTEXT_DEVICES>()[0];
             //context = cl::Context(viennacl::ocl::get_context(deviceId).handle().get(), true);
             //queue = cl::CommandQueue(viennacl::ocl::get_context(deviceId).get_queue().handle().get(), true);
-            device = context.getInfo<CL_CONTEXT_DEVICES>()[0];
         }
         else
         {
             std::vector<cl::Platform> platforms;
             std::vector<cl::Device> devices;
             std::string deviceName;
-            cl_uint type;
+            //cl_uint type;
             try {
                 cl::Platform::get(&platforms);
                 switch(deviceType)
                 {
                     case CL_DEVICE_TYPE_GPU:
                     {
-                        type = platforms[0].getDevices(CL_DEVICE_TYPE_GPU, &devices);
+                        auto type = platforms[0].getDevices(CL_DEVICE_TYPE_GPU, &devices);
                         if( type == CL_SUCCESS)
                         {
                             // Get only relavent device
@@ -48,11 +74,11 @@ namespace op
                             std::vector<cl::Device> gpuDevices;
                             gpuDevices = allContext.getInfo<CL_CONTEXT_DEVICES>();
                             bool deviceFound = false;
-                            for(int i=0; i<gpuDevices.size(); i++){
-                                if(i == deviceId){
-                                    device = gpuDevices[i];
-                                    context = cl::Context(device);
-                                    queue = cl::CommandQueue(context, device, CL_QUEUE_PROFILING_ENABLE);
+                            for(size_t i=0; i<gpuDevices.size(); i++){
+                                if(i == (unsigned int)deviceId){
+                                    upImpl->mDevice = gpuDevices[i];
+                                    upImpl->mContext = cl::Context(upImpl->mDevice);
+                                    upImpl->mQueue = cl::CommandQueue(upImpl->mContext, upImpl->mDevice, CL_QUEUE_PROFILING_ENABLE);
                                     deviceFound = true;
                                     op::log("Made new GPU Instance: " + std::to_string(deviceId));
                                     break;
@@ -73,7 +99,7 @@ namespace op
                     case CL_DEVICE_TYPE_CPU:
                     {
                         cl::Platform::get(&platforms);
-                        type = platforms[0].getDevices(CL_DEVICE_TYPE_CPU, &devices);
+                        auto type = platforms[0].getDevices(CL_DEVICE_TYPE_CPU, &devices);
                         if( type == CL_SUCCESS)
                         {
                             // Get only relavent device
@@ -82,11 +108,11 @@ namespace op
                             std::vector<cl::Device> cpuDevices;
                             cpuDevices = allContext.getInfo<CL_CONTEXT_DEVICES>();
                             bool deviceFound = false;
-                            for(int i=0; i<cpuDevices.size(); i++){
-                                if(i == deviceId){
-                                    device = cpuDevices[i];
-                                    context = cl::Context(device);
-                                    queue = cl::CommandQueue(context, device, CL_QUEUE_PROFILING_ENABLE);
+                            for(size_t i=0; i<cpuDevices.size(); i++){
+                                if(i == (unsigned int)deviceId){
+                                    upImpl->mDevice = cpuDevices[i];
+                                    upImpl->mContext = cl::Context(upImpl->mDevice);
+                                    upImpl->mQueue = cl::CommandQueue(upImpl->mContext, upImpl->mDevice, CL_QUEUE_PROFILING_ENABLE);
                                     deviceFound = true;
                                     op::log("Made new CPU Instance: " + std::to_string(deviceId));
                                     break;
@@ -107,7 +133,7 @@ namespace op
                     case CL_DEVICE_TYPE_ACCELERATOR:
                     {
                         cl::Platform::get(&platforms);
-                        type = platforms[0].getDevices(CL_DEVICE_TYPE_ACCELERATOR, &devices);
+                        auto type = platforms[0].getDevices(CL_DEVICE_TYPE_ACCELERATOR, &devices);
                         if( type == CL_SUCCESS)
                         {
                             // Get only relavent device
@@ -116,11 +142,11 @@ namespace op
                             std::vector<cl::Device> accDevices;
                             accDevices = allContext.getInfo<CL_CONTEXT_DEVICES>();
                             bool deviceFound = false;
-                            for(int i=0; i<accDevices.size(); i++){
-                                if(i == deviceId){
-                                    device = accDevices[i];
-                                    context = cl::Context(device);
-                                    queue = cl::CommandQueue(context, device, CL_QUEUE_PROFILING_ENABLE);
+                            for(size_t i=0; i<accDevices.size(); i++){
+                                if(i == (unsigned int)deviceId){
+                                    upImpl->mDevice = accDevices[i];
+                                    upImpl->mContext = cl::Context(upImpl->mDevice);
+                                    upImpl->mQueue = cl::CommandQueue(upImpl->mContext, upImpl->mDevice, CL_QUEUE_PROFILING_ENABLE);
                                     deviceFound = true;
                                     op::log("Made new ACC Instance: " + std::to_string(deviceId));
                                     break;
@@ -148,6 +174,13 @@ namespace op
                 op::log("Error: " + std::string(e.what()));
             }
         }
+        #else
+        UNUSED(deviceId);
+        UNUSED(deviceType);
+        UNUSED(getFromVienna);
+        error("OpenPose must be compiled with the `USE_OPENCL` macro definition in order to use this"
+              " functionality.", __LINE__, __FUNCTION__, __FILE__);
+        #endif
     }
 
     CLManager::~CLManager()
@@ -157,17 +190,35 @@ namespace op
 
     cl::Context& CLManager::getContext()
     {
-        return context;
+        #ifdef USE_OPENCL
+        return upImpl->mContext;
+        #else
+        error("OpenPose must be compiled with the `USE_OPENCL` macro definition in order to use this"
+              " functionality.", __LINE__, __FUNCTION__, __FILE__);
+        throw std::runtime_error("");
+        #endif
     }
 
     cl::CommandQueue& CLManager::getQueue()
     {
-        return queue;
+        #ifdef USE_OPENCL
+        return upImpl->mQueue;
+        #else
+        error("OpenPose must be compiled with the `USE_OPENCL` macro definition in order to use this"
+              " functionality.", __LINE__, __FUNCTION__, __FILE__);
+        throw std::runtime_error("");
+        #endif
     }
 
     cl::Device& CLManager::getDevice()
     {
-        return device;
+        #ifdef USE_OPENCL
+        return upImpl->mDevice;
+        #else
+        error("OpenPose must be compiled with the `USE_OPENCL` macro definition in order to use this"
+              " functionality.", __LINE__, __FUNCTION__, __FILE__);
+        throw std::runtime_error("");
+        #endif
     }
 
     void replaceAll( std::string &s, const std::string &search, const std::string &replace ) {
@@ -181,10 +232,22 @@ namespace op
         }
     }
 
-    template <typename T>
-    cl::Program CLManager::buildProgramFromSource(std::string src, bool isFile)
+    template <typename T> inline std::string getType()
     {
-        cl::Program program;
+        std::string type = "";
+        if ((std::is_same<T, float>::value))
+            type = "float";
+        else if ((std::is_same<T, double>::value))
+            type = "double";
+        else
+            throw std::runtime_error("Error: Invalid CL type");
+        return type;
+    }
+
+    template <typename T>
+    bool buildProgramFromSource(cl::Program& program, cl::Context& context, std::string src, bool isFile = false)
+    {
+        #ifdef USE_OPENCL
         try{
             std::string type = getType<T>();
 
@@ -206,28 +269,39 @@ namespace op
             }
             exit(-1);
         }
-        return program;
+        return true;
+        #else
+        UNUSED(program);
+        UNUSED(src);
+        UNUSED(isFile);
+        error("OpenPose must be compiled with the `USE_OPENCL` macro definition in order to use this"
+              " functionality.", __LINE__, __FUNCTION__, __FILE__);
+        return false;
+        #endif
     }
 
     template <typename T>
     bool CLManager::buildKernelIntoManager(std::string kernelName, std::string src, bool isFile){
+        #ifdef USE_OPENCL
         // Set type
         std::string type = getType<T>();
         std::string key = kernelName + "_" + type;
 
         // Program not built
-        if (!(clPrograms.find(key) != clPrograms.end()))
+        if (!(upImpl->mClPrograms.find(key) != upImpl->mClPrograms.end()))
         {
-            clPrograms[key] = buildProgramFromSource<T>(src, isFile);
+            cl::Program program;
+            buildProgramFromSource<T>(program, upImpl->mContext, src, isFile);
+            upImpl->mClPrograms[key] = program;
         }
 
-        cl::Program& program = clPrograms[key];
+        cl::Program& program = upImpl->mClPrograms[key];
 
         // Kernel not built
-        if (!(clKernels.find(key) != clKernels.end()))
+        if (!(upImpl->mClKernels.find(key) != upImpl->mClKernels.end()))
         {
-            clKernels[key] = cl::Kernel(program, kernelName.c_str());
-            op::log("Kernel: " + kernelName + " Type: " + type + + " GPU: " + std::to_string(id) + " built successfully");
+            upImpl->mClKernels[key] = cl::Kernel(program, kernelName.c_str());
+            op::log("Kernel: " + kernelName + " Type: " + type + + " GPU: " + std::to_string(upImpl->mId) + " built successfully");
             return true;
         }
         else
@@ -235,15 +309,24 @@ namespace op
             op::log("Kernel " + kernelName + " already built");
             return false;
         }
+        #else
+        UNUSED(kernelName);
+        UNUSED(src);
+        UNUSED(isFile);
+        error("OpenPose must be compiled with the `USE_OPENCL` macro definition in order to use this"
+              " functionality.", __LINE__, __FUNCTION__, __FILE__);
+        return false;
+        #endif
     }
 
     template <typename T>
     cl::Kernel& CLManager::getKernelFromManager(std::string kernelName, std::string src, bool isFile){
+        #ifdef USE_OPENCL
         // Set type
         std::string type = getType<T>();
         std::string key = kernelName + "_" + type;
 
-        if (!(clKernels.find(key) != clKernels.end()))
+        if (!(upImpl->mClKernels.find(key) != upImpl->mClKernels.end()))
         {
             if(!src.size())
                 throw std::runtime_error("Error: Kernel " + kernelName + " Type: " + type + " not found in Manager");
@@ -252,12 +335,21 @@ namespace op
                 buildKernelIntoManager<T>(kernelName, src, isFile);
             }
         }
-        return clKernels[key];
+        return upImpl->mClKernels[key];
+        #else
+        UNUSED(kernelName);
+        UNUSED(src);
+        UNUSED(isFile);
+        error("OpenPose must be compiled with the `USE_OPENCL` macro definition in order to use this"
+              " functionality.", __LINE__, __FUNCTION__, __FILE__);
+        throw std::runtime_error("");
+        #endif
     }
 
-    std::string CLManager::clErrorToString(cl_int error)
+    std::string CLManager::clErrorToString(int err)
     {
-        switch(error){
+        #ifdef USE_OPENCL
+        switch(err){
         case CL_SUCCESS: return "Success";
         case CL_DEVICE_NOT_FOUND: return "Device Not Found";
         case CL_DEVICE_NOT_AVAILABLE: return "Device Not Available";
@@ -323,13 +415,20 @@ namespace op
         #endif
         default: {
             std::stringstream s;
-            s << "Unknown OpenCL Error (" << error << ")";
+            s << "Unknown OpenCL Error (" << err << ")";
             return s.str();
         }
         }
+        #else
+        UNUSED(err);
+        error("OpenPose must be compiled with the `USE_OPENCL` macro definition in order to use this"
+              " functionality.", __LINE__, __FUNCTION__, __FILE__);
+        return "";
+        #endif
     }
 
     int CLManager::getTotalGPU(){
+        #ifdef USE_OPENCL
         std::vector<cl::Platform> platforms;
         std::vector<cl::Device> devices;
         cl_uint type;
@@ -351,13 +450,31 @@ namespace op
         {
             op::log("Error: " + std::string(e.what()));
         }
+        #else
+        error("OpenPose must be compiled with the `USE_OPENCL` macro definition in order to use this"
+              " functionality.", __LINE__, __FUNCTION__, __FILE__);
+        #endif
         return -1;
     }
 
+    template <typename T> void CLManager::getBufferRegion(cl_buffer_region& region, int origin, int size)
+    {
+        #ifdef USE_OPENCL
+        region.origin = sizeof(T) * origin;
+        region.size = sizeof(T) * size;
+        #else
+        UNUSED(origin);
+        UNUSED(size);
+        UNUSED(region);
+        error("OpenPose must be compiled with the `USE_OPENCL` macro definition in order to use this"
+              " functionality.", __LINE__, __FUNCTION__, __FILE__);
+        #endif
+    }
+
+    template void CLManager::getBufferRegion<float>(cl_buffer_region& region, int origin, int size);
+    template void CLManager::getBufferRegion<double>(cl_buffer_region& region, int origin, int size);
     template cl::Kernel&  CLManager::getKernelFromManager<float>(std::string kernelName, std::string src, bool isFile);
-    template cl::Kernel&  CLManager::getKernelFromManager<double>(std::string kernelName, std::string src, bool isFile);
+    template cl::Kernel& CLManager::getKernelFromManager<double>(std::string kernelName, std::string src, bool isFile);
     template bool CLManager::buildKernelIntoManager<float>(std::string kernelName, std::string src, bool isFile);
     template bool CLManager::buildKernelIntoManager<double>(std::string kernelName, std::string src, bool isFile);
-    template cl::Program CLManager::buildProgramFromSource<float>(std::string src, bool isFile);
-    template cl::Program CLManager::buildProgramFromSource<double>(std::string src, bool isFile);
 }

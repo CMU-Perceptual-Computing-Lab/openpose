@@ -2,21 +2,16 @@
 #define OPENPOSE_CORE_CL_MANAGER_HPP
 
 #include <atomic>
-#include <tuple>
-#include <map>
-#include <openpose/core/common.hpp>
 #include <fstream>
+#include <map>
 #include <mutex>
 #include <thread>
+#include <tuple>
+#include <openpose/core/common.hpp>
 
-#ifdef USE_OPENCL
-    #define CL_HPP_ENABLE_EXCEPTIONS
-    #define CL_HPP_MINIMUM_OPENCL_VERSION 200 // Need to set to 120 on CUDA 8
-    #define CL_HPP_TARGET_OPENCL_VERSION 200 // Need to set to 120 on CUDA 8
-    #include <CL/cl2.hpp>
-    #include <viennacl/backend/opencl.hpp>
-    #include <caffe/caffe.hpp>
-#endif
+#define CL_HPP_ENABLE_EXCEPTIONS
+#define CL_HPP_MINIMUM_OPENCL_VERSION 200 // Need to set to 120 on CUDA 8
+#define CL_HPP_TARGET_OPENCL_VERSION 200 // Need to set to 120 on CUDA 8
 
 // Singleton structure
 // https://stackoverflow.com/questions/1008019/c-singleton-design-pattern
@@ -33,13 +28,8 @@ namespace op
 
     private:
         CLManager(int deviceId, int deviceType, bool getFromVienna);
-        std::map<std::string, cl::Program> clPrograms;
-        std::map<std::string, cl::Kernel> clKernels;
-        int id;
-        cl::Device device;
-        cl::CommandQueue queue;
-        cl::Context context;
-        template <typename T> cl::Program buildProgramFromSource(std::string src, bool isFile = false);
+        struct ImplCLManager;
+        std::unique_ptr<ImplCLManager> upImpl;
 
     public:
         cl::Context& getContext();
@@ -47,34 +37,12 @@ namespace op
         cl::Device& getDevice();
         template <typename T> bool buildKernelIntoManager(std::string kernelName, std::string src = "", bool isFile = false);
         template <typename T> cl::Kernel& getKernelFromManager(std::string kernelName, std::string src = "", bool isFile = false);
-
-    private:
-        template <typename T> inline std::string getType()
-        {
-            std::string type = "";
-            if ((std::is_same<T, float>::value))
-                type = "float";
-            else if ((std::is_same<T, double>::value))
-                type = "double";
-            else
-                throw std::runtime_error("Error: Invalid CL type");
-            return type;
-        }
-
-    public:
-        template <typename T> static inline cl_buffer_region getBufferRegion(int origin, int size)
-        {
-            cl_buffer_region region;
-            region.origin = sizeof(T) * origin;
-            region.size = sizeof(T) * size;
-            return region;
-        }
-
-        template <typename K, typename T> inline K getKernelFunctorFromManager(std::string kernelName, std::string src = "", bool isFile = false){
+        template <typename K, typename T> inline K getKernelFunctorFromManager(std::string kernelName, std::string src = "", bool isFile = false){            
             return K(getKernelFromManager<T>(kernelName, src, isFile));
         }
-    public:
-        static std::string clErrorToString(cl_int error);
+    public:       
+        template <typename T> static void getBufferRegion(cl_buffer_region& region, int origin, int size);
+        static std::string clErrorToString(int err);
         static int getTotalGPU();
     };
 }

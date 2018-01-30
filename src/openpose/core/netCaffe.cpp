@@ -11,6 +11,7 @@
 #include <openpose/core/netCaffe.hpp>
 #ifdef USE_OPENCL
     #include <openpose/core/clManager.hpp>
+    #include <CL/cl2.hpp>
 #endif
 
 namespace op

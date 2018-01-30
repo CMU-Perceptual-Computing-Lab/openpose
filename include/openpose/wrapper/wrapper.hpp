@@ -8,9 +8,6 @@
 #include <openpose/wrapper/wrapperStructInput.hpp>
 #include <openpose/wrapper/wrapperStructOutput.hpp>
 #include <openpose/wrapper/wrapperStructPose.hpp>
-//#ifdef USE_OPENCL
-//    #include <openpose/core/clManager.hpp>
-//#endif
 
 namespace op
 {
@@ -273,6 +270,9 @@ namespace op
 #include <openpose/utilities/cuda.hpp>
 #include <openpose/utilities/fileSystem.hpp>
 #include <openpose/utilities/standard.hpp>
+#ifdef USE_OPENCL
+    #include <openpose/core/clManager.hpp>
+#endif
 namespace op
 {
     template<typename TDatums, typename TWorker, typename TQueue>
@@ -560,7 +560,7 @@ namespace op
                     #ifdef USE_CUDA
                         totalGpuNumber = getGpuNumber();
                     #elif USE_OPENCL
-                        //totalGpuNumber = op::CLManager::getTotalGPU();
+                        totalGpuNumber = op::CLManager::getTotalGPU();
                     #endif
                     if (totalGpuNumber <= gpuNumberStart)
                         error("Number of initial GPUs (`--number_gpu_start`) must be lower than the total number of used"
