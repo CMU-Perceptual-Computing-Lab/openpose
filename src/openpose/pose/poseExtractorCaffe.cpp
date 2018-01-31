@@ -253,6 +253,7 @@ namespace op
                 upImpl->spResizeAndMergeCaffe->setScaleRatios(floatScaleRatios);
 
                 #ifdef USE_CUDA
+                    //upImpl->spResizeAndMergeCaffe->Forward_cpu(caffeNetOutputBlobs, {upImpl->spHeatMapsBlob.get()}); // ~20ms
                     upImpl->spResizeAndMergeCaffe->Forward_gpu(caffeNetOutputBlobs, {upImpl->spHeatMapsBlob.get()}); // ~5ms
                 #elif USE_OPENCL
                     //upImpl->spResizeAndMergeCaffe->Forward_cpu(caffeNetOutputBlobs, {upImpl->spHeatMapsBlob.get()}); // ~20ms
@@ -264,6 +265,7 @@ namespace op
                 // 3. Get peaks by Non-Maximum Suppression
                 upImpl->spNmsCaffe->setThreshold((float)get(PoseProperty::NMSThreshold));
                 #ifdef USE_CUDA
+                    //upImpl->spNmsCaffe->Forward_cpu({upImpl->spHeatMapsBlob.get()}, {upImpl->spPeaksBlob.get()}); // ~ 7ms
                     upImpl->spNmsCaffe->Forward_gpu({upImpl->spHeatMapsBlob.get()}, {upImpl->spPeaksBlob.get()});// ~2ms
                     cudaCheck(__LINE__, __FUNCTION__, __FILE__);
                 #elif USE_OPENCL
