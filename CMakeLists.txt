@@ -171,6 +171,8 @@ option(BUILD_SHARED_LIBS "Build as shared lib" ON)
 # Speed profiler
 option(PROFILER_ENABLED "If enabled, OpenPose will be able to print out speed information at runtime." OFF)
 
+# Threads
+find_package (Threads)
 
 ### FIND REQUIRED PACKAGES
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
@@ -371,6 +373,7 @@ if (UNIX AND NOT APPLE)
 
       # Build Caffe
       message(STATUS "Caffe will be built from source now.")
+      find_package(Caffe)
       include(ExternalProject)
       set(CAFFE_PREFIX caffe)
       set(CAFFE_URL ${CMAKE_SOURCE_DIR}/3rdparty/caffe)

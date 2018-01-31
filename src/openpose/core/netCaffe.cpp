@@ -198,7 +198,6 @@ namespace op
                     cl::Buffer imageBuffer = cl::Buffer((cl_mem)gpuImagePtr, true);
                     op::CLManager::getInstance(upImpl->mGpuId)->getQueue().enqueueWriteBuffer(imageBuffer, true, 0, inputData.getVolume() * sizeof(float), inputData.getConstPtr());
                 #else
-                    op::log(inputData.printSize());
                     auto* cpuImagePtr = upImpl->upCaffeNet->blobs().at(0)->mutable_cpu_data();
                     std::copy(inputData.getConstPtr(), inputData.getConstPtr() + inputData.getVolume(), cpuImagePtr);
                 #endif
