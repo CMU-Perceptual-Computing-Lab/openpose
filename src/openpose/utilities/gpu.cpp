@@ -1,7 +1,5 @@
 #ifdef USE_CUDA
-    #include <cuda.h>
-    #include <cuda_runtime.h>
-    #include <openpose/utilities/fastMath.hpp>
+    #include <openpose/utilities/cuda.hpp>
 #endif
 #ifdef USE_OPENCL
     #include <openpose/core/clManager.hpp>
