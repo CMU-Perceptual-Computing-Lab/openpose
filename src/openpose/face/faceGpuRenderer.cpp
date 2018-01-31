@@ -3,7 +3,7 @@
     #include <cuda_runtime_api.h>
 #endif
 #include <openpose/face/renderFace.hpp>
-#include <openpose/utilities/cuda.hpp>
+#include <openpose/gpu/cuda.hpp>
 #include <openpose/face/faceGpuRenderer.hpp>
 
 namespace op

@@ -18,7 +18,8 @@ namespace op
             if (!helpCvMat.empty())
             {
                 const auto fullScreen = false;
-                FrameDisplayer frameDisplayer{OPEN_POSE_TEXT + " - GUI Help", Point<int>{helpCvMat.cols, helpCvMat.rows}, fullScreen};
+                FrameDisplayer frameDisplayer{OPEN_POSE_TEXT + " - GUI Help",
+                                              Point<int>{helpCvMat.cols, helpCvMat.rows}, fullScreen};
                 frameDisplayer.displayFrame(helpCvMat, 33);
             }
         }
@@ -28,8 +29,10 @@ namespace op
         }
     }
 
-    void handleWaitKey(bool& guiPaused, FrameDisplayer& frameDisplayer, std::vector<std::shared_ptr<PoseExtractor>>& poseExtractors,
-                       std::vector<std::shared_ptr<Renderer>>& renderers, std::shared_ptr<std::atomic<bool>>& isRunningSharedPtr,
+    void handleWaitKey(bool& guiPaused, FrameDisplayer& frameDisplayer,
+                       std::vector<std::shared_ptr<PoseExtractor>>& poseExtractors,
+                       std::vector<std::shared_ptr<Renderer>>& renderers,
+                       std::shared_ptr<std::atomic<bool>>& isRunningSharedPtr,
                        std::shared_ptr<std::pair<std::atomic<bool>, std::atomic<int>>>& spVideoSeek)
     {
         try
@@ -91,13 +94,16 @@ namespace op
                         poseExtractor->increase(PoseProperty::NMSThreshold, 0.005f * (castedKey=='-' ? -1 : 1));
                 else if (castedKey=='_' || castedKey=='+')
                     for (auto& poseExtractor : poseExtractors)
-                        poseExtractor->increase(PoseProperty::ConnectMinSubsetScore, 0.005f * (castedKey=='_' ? -1 : 1));
+                        poseExtractor->increase(PoseProperty::ConnectMinSubsetScore,
+                                                0.005f * (castedKey=='_' ? -1 : 1));
                 else if (castedKey=='[' || castedKey==']')
                     for (auto& poseExtractor : poseExtractors)
-                        poseExtractor->increase(PoseProperty::ConnectInterThreshold, 0.005f * (castedKey=='[' ? -1 : 1));
+                        poseExtractor->increase(PoseProperty::ConnectInterThreshold,
+                                                0.005f * (castedKey=='[' ? -1 : 1));
                 else if (castedKey=='{' || castedKey=='}')
                     for (auto& poseExtractor : poseExtractors)
-                        poseExtractor->increase(PoseProperty::ConnectInterMinAboveThreshold, (castedKey=='{' ? -0.1f : 0.1f));
+                        poseExtractor->increase(PoseProperty::ConnectInterMinAboveThreshold,
+                                                (castedKey=='{' ? -0.1f : 0.1f));
                 else if (castedKey==';' || castedKey=='\'')
                     for (auto& poseExtractor : poseExtractors)
                         poseExtractor->increase(PoseProperty::ConnectMinSubsetCnt, (castedKey==';' ? -1 : 1));
@@ -130,7 +136,8 @@ namespace op
     }
 
     void handleUserInput(FrameDisplayer& frameDisplayer, std::vector<std::shared_ptr<PoseExtractor>>& poseExtractors,
-                         std::vector<std::shared_ptr<Renderer>>& renderers, std::shared_ptr<std::atomic<bool>>& isRunningSharedPtr,
+                         std::vector<std::shared_ptr<Renderer>>& renderers,
+                         std::shared_ptr<std::atomic<bool>>& isRunningSharedPtr,
                          std::shared_ptr<std::pair<std::atomic<bool>, std::atomic<int>>>& spVideoSeek)
     {
         try
@@ -150,9 +157,11 @@ namespace op
         }
     }
 
-    Gui::Gui(const Point<int>& outputSize, const bool fullScreen, const std::shared_ptr<std::atomic<bool>>& isRunningSharedPtr,
+    Gui::Gui(const Point<int>& outputSize, const bool fullScreen,
+             const std::shared_ptr<std::atomic<bool>>& isRunningSharedPtr,
              const std::shared_ptr<std::pair<std::atomic<bool>, std::atomic<int>>>& videoSeekSharedPtr,
-             const std::vector<std::shared_ptr<PoseExtractor>>& poseExtractors, const std::vector<std::shared_ptr<Renderer>>& renderers) :
+             const std::vector<std::shared_ptr<PoseExtractor>>& poseExtractors,
+             const std::vector<std::shared_ptr<Renderer>>& renderers) :
         mFrameDisplayer{OPEN_POSE_TEXT, outputSize, fullScreen},
         mPoseExtractors{poseExtractors},
         mRenderers{renderers},

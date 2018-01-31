@@ -100,9 +100,16 @@ endif (WIN32)
 
 # Set the acceleration library
 set(GPU_MODE CUDA CACHE STRING "Select the acceleration GPU library or CPU otherwise.")
-set(OpenCL_FOUND FALSE)
+# Look for CUDA
 find_package(CUDA)
+# Look for OpenCL
+set(OpenCL_FOUND FALSE)
 find_package(OpenCL)
+# Code to avoid crash at compiling time if OpenCL is not found
+if (NOT OpenCL_FOUND)
+  set(OpenCL_LIBRARIES "")
+endif (NOT OpenCL_FOUND)
+# Display proper options to user
 if (CUDA_FOUND AND OpenCL_FOUND)
   set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA OPENCL CPU_ONLY)
 elseif (CUDA_FOUND)
@@ -112,8 +119,7 @@ elseif (OpenCL_FOUND)
 else ()
   set_property(CACHE GPU_MODE PROPERTY STRINGS CPU_ONLY)
 endif ()
-
-# set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA OPENCL CPU_ONLY)
+# Handle desired GPU mode option
 if (${GPU_MODE} MATCHES "CUDA")
   # OpenPose flags
   add_definitions(-DUSE_CUDA)
@@ -125,8 +131,8 @@ elseif (${GPU_MODE} MATCHES "CPU_ONLY")
 elseif (${GPU_MODE} MATCHES "OPENCL")
   # OpenPose flag for Caffe
   add_definitions(-DUSE_OPENCL)
-  add_definitions( -DUSE_GREENTEA )
-  message("Building with OpenCL")
+  add_definitions(-DUSE_GREENTEA)
+  message(STATUS "Building with OpenCL")
 endif ()
 
 # Intel branch with MKL Support
@@ -172,7 +178,7 @@ option(BUILD_SHARED_LIBS "Build as shared lib" ON)
 option(PROFILER_ENABLED "If enabled, OpenPose will be able to print out speed information at runtime." OFF)
 
 # Threads
-find_package (Threads)
+find_package(Threads)
 
 ### FIND REQUIRED PACKAGES
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
@@ -424,7 +430,7 @@ if (UNIX AND NOT APPLE)
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
             COMMENT "Rerunning cmake after building Caffe submodule")
       endif (NOT Caffe_FOUND)
-      
+
     endif (BUILD_CAFFE)
 
     if (NOT Caffe_FOUND AND NOT BUILD_CAFFE)
@@ -436,9 +442,9 @@ if (UNIX AND NOT APPLE)
 
 endif (UNIX AND NOT APPLE)
 
-add_definitions( -DOPENPOSE_BINARY_DIR="${CMAKE_BINARY_DIR}" )
-add_definitions( -DOPENPOSE_INSTALL_DIR="${CMAKE_INSTALL_PREFIX}" )
-add_definitions( -DCMAKE_SOURCE_DIR="${CMAKE_SOURCE_DIR}" )
+add_definitions(-DOPENPOSE_BINARY_DIR="${CMAKE_BINARY_DIR}")
+add_definitions(-DOPENPOSE_INSTALL_DIR="${CMAKE_INSTALL_PREFIX}")
+add_definitions(-DCMAKE_SOURCE_DIR="${CMAKE_SOURCE_DIR}")
 
 ### PROJECT INCLUDES
 # Specify the include directories

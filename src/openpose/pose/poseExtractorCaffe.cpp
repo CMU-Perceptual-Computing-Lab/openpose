@@ -4,10 +4,10 @@
 #include <openpose/core/netCaffe.hpp>
 #include <openpose/core/nmsCaffe.hpp>
 #include <openpose/core/resizeAndMergeCaffe.hpp>
+#include <openpose/gpu/cuda.hpp>
 #include <openpose/pose/bodyPartConnectorCaffe.hpp>
 #include <openpose/pose/poseParameters.hpp>
 #include <openpose/utilities/check.hpp>
-#include <openpose/utilities/cuda.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/openCv.hpp>
 #include <openpose/utilities/standard.hpp>

@@ -6,7 +6,7 @@
 #include <openpose/core/netCaffe.hpp>
 #include <openpose/core/resizeAndMergeCaffe.hpp>
 #include <openpose/face/faceParameters.hpp>
-#include <openpose/utilities/cuda.hpp>
+#include <openpose/gpu/cuda.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/openCv.hpp>
 #include <openpose/face/faceExtractorCaffe.hpp>
