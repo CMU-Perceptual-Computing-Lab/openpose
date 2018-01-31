@@ -41,7 +41,7 @@ https://github.com/fragalfernando/optical_flow_pyramidal/tree/master/lecture
 
 From the OpenPose home directory you can call the OpticalFlow tester (make sure it is compiled first after running 'make' in the OpenPose home directory).
 
-./build/examples/tests/tracking/test_of.bin -s 'START FRAME' -e 'END FRAME' -p 'TEST DATA DIRECTORY' -c 'TEST DATA DIRECTORY/output.log' -o 'VISUAL RESULTS OUTPUT DIRECTORY' -v -g
+    ./build/examples/tests/tracking/test_of.bin -s 'START FRAME' -e 'END FRAME' -p 'TEST DATA DIRECTORY' -c 'TEST DATA DIRECTORY/output.log' -o 'VISUAL RESULTS OUTPUT DIRECTORY' -v -g 
 
 The following options are provided by the accuracy tester:
 
