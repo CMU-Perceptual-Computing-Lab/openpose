@@ -56,7 +56,8 @@ namespace op
                               __LINE__, __FUNCTION__, __FILE__);
 
                 Spinnaker::GenApi::CEnumEntryPtr ptrTriggerModeOff = ptrTriggerMode->GetEntryByName("Off");
-                if (!Spinnaker::GenApi::IsAvailable(ptrTriggerModeOff) || !Spinnaker::GenApi::IsReadable(ptrTriggerModeOff))
+                if (!Spinnaker::GenApi::IsAvailable(ptrTriggerModeOff)
+                    || !Spinnaker::GenApi::IsReadable(ptrTriggerModeOff))
                     error("Unable to disable trigger mode (enum entry retrieval). Aborting...",
                               __LINE__, __FUNCTION__, __FILE__);
 
@@ -69,8 +70,10 @@ namespace op
                 // The trigger source must be set to hardware or software while trigger
                 // mode is off.
                 Spinnaker::GenApi::CEnumerationPtr ptrTriggerSource = iNodeMap.GetNode("TriggerSource");
-                if (!Spinnaker::GenApi::IsAvailable(ptrTriggerSource) || !Spinnaker::GenApi::IsWritable(ptrTriggerSource))
-                    error("Unable to set trigger mode (node retrieval). Aborting...", __LINE__, __FUNCTION__, __FILE__);
+                if (!Spinnaker::GenApi::IsAvailable(ptrTriggerSource)
+                    || !Spinnaker::GenApi::IsWritable(ptrTriggerSource))
+                    error("Unable to set trigger mode (node retrieval). Aborting...",
+                          __LINE__, __FUNCTION__, __FILE__);
 
                 // Set trigger mode to hardware ('Line0')
                 Spinnaker::GenApi::CEnumEntryPtr ptrTriggerSourceHardware = ptrTriggerSource->GetEntryByName("Line0");
@@ -88,7 +91,8 @@ namespace op
                 // Once the appropriate trigger source has been set, turn trigger mode
                 // on in order to retrieve images using the trigger.
                 Spinnaker::GenApi::CEnumEntryPtr ptrTriggerModeOn = ptrTriggerMode->GetEntryByName("On");
-                if (!Spinnaker::GenApi::IsAvailable(ptrTriggerModeOn) || !Spinnaker::GenApi::IsReadable(ptrTriggerModeOn))
+                if (!Spinnaker::GenApi::IsAvailable(ptrTriggerModeOn)
+                    || !Spinnaker::GenApi::IsReadable(ptrTriggerModeOn))
                 {
                     error("Unable to enable trigger mode (enum entry retrieval). Aborting...",
                               __LINE__, __FUNCTION__, __FILE__);
@@ -128,12 +132,14 @@ namespace op
                 // restore the camera to a clean state.
                 //
                 Spinnaker::GenApi::CEnumerationPtr ptrTriggerMode = iNodeMap.GetNode("TriggerMode");
-                if (!Spinnaker::GenApi::IsAvailable(ptrTriggerMode) || !Spinnaker::GenApi::IsReadable(ptrTriggerMode))
+                if (!Spinnaker::GenApi::IsAvailable(ptrTriggerMode)
+                    || !Spinnaker::GenApi::IsReadable(ptrTriggerMode))
                     error("Unable to disable trigger mode (node retrieval). Non-fatal error...",
                               __LINE__, __FUNCTION__, __FILE__);
 
                 Spinnaker::GenApi::CEnumEntryPtr ptrTriggerModeOff = ptrTriggerMode->GetEntryByName("Off");
-                if (!Spinnaker::GenApi::IsAvailable(ptrTriggerModeOff) || !Spinnaker::GenApi::IsReadable(ptrTriggerModeOff))
+                if (!Spinnaker::GenApi::IsAvailable(ptrTriggerModeOff)
+                    || !Spinnaker::GenApi::IsReadable(ptrTriggerModeOff))
                     error("Unable to disable trigger mode (enum entry retrieval). Non-fatal error...",
                               __LINE__, __FUNCTION__, __FILE__);
 
@@ -204,7 +210,7 @@ namespace op
                     if (imagePtr->IsIncomplete())
                     {
                         log("Image incomplete with image status " + std::to_string(imagePtr->GetImageStatus()) + "...",
-                                Priority::High, __LINE__, __FUNCTION__, __FILE__);
+                            Priority::High, __LINE__, __FUNCTION__, __FILE__);
                         imagesExtracted = false;
                         break;
                     }
@@ -389,7 +395,7 @@ namespace op
                         cameraPtr->DeInit();
                     }
 
-                    log("Completed. Releasing...", Priority::High);
+                    log("FLIR (Point-grey) capture completed. Releasing cameras...", Priority::High);
 
                     // Clear camera list before releasing upImpl->mSystemPtr
                     upImpl->mCameraList.Clear();
@@ -398,7 +404,7 @@ namespace op
                     upImpl->mSystemPtr->ReleaseInstance();
                 }
 
-                log("Done! Exitting...", Priority::High);
+                log("Cameras released! Exitting program.", Priority::High);
             }
             catch (const Spinnaker::Exception& e)
             {
@@ -504,14 +510,14 @@ namespace op
 
                     // Remove buffer --> Always get newest frame
                     Spinnaker::GenApi::INodeMap& snodeMap = cameraPtr->GetTLStreamNodeMap();
-                    Spinnaker::GenApi::CEnumerationPtr ptrBufferHandlingMode = snodeMap.GetNode("StreamBufferHandlingMode");
+                    Spinnaker::GenApi::CEnumerationPtr ptrBufferHandlingMode = snodeMap.GetNode(
+                        "StreamBufferHandlingMode");
                     if (!Spinnaker::GenApi::IsAvailable(ptrBufferHandlingMode)
                         || !Spinnaker::GenApi::IsWritable(ptrBufferHandlingMode))
                         error("Unable to change buffer handling mode", __LINE__, __FUNCTION__, __FILE__);
 
                     Spinnaker::GenApi::CEnumEntryPtr ptrBufferHandlingModeNewest = ptrBufferHandlingMode->GetEntryByName(
-                        "NewestFirstOverwrite"
-                    );
+                        "NewestFirstOverwrite");
                     if (!Spinnaker::GenApi::IsAvailable(ptrBufferHandlingModeNewest)
                         || !IsReadable(ptrBufferHandlingModeNewest))
                         error("Unable to set buffer handling mode to newest (entry 'NewestFirstOverwrite' retrieval)."
@@ -539,15 +545,15 @@ namespace op
                     auto cameraPtr = upImpl->mCameraList.GetByIndex(i);
 
                     // Set acquisition mode to continuous
-                    Spinnaker::GenApi::CEnumerationPtr ptrAcquisitionMode = cameraPtr->GetNodeMap().GetNode("AcquisitionMode");
+                    Spinnaker::GenApi::CEnumerationPtr ptrAcquisitionMode = cameraPtr->GetNodeMap().GetNode(
+                        "AcquisitionMode");
                     if (!Spinnaker::GenApi::IsAvailable(ptrAcquisitionMode)
                         || !Spinnaker::GenApi::IsWritable(ptrAcquisitionMode))
-                        error("Unable to set acquisition mode to continuous (node retrieval; camera " + std::to_string(i)
-                                  + "). Aborting...", __LINE__, __FUNCTION__, __FILE__);
+                        error("Unable to set acquisition mode to continuous (node retrieval; camera "
+                              + std::to_string(i) + "). Aborting...", __LINE__, __FUNCTION__, __FILE__);
 
                     Spinnaker::GenApi::CEnumEntryPtr ptrAcquisitionModeContinuous = ptrAcquisitionMode->GetEntryByName(
-                        "Continuous"
-                    );
+                        "Continuous");
                     if (!Spinnaker::GenApi::IsAvailable(ptrAcquisitionModeContinuous)
                         || !Spinnaker::GenApi::IsReadable(ptrAcquisitionModeContinuous))
                         error("Unable to set acquisition mode to continuous (entry 'continuous' retrieval "
@@ -571,7 +577,8 @@ namespace op
                         "DeviceSerialNumber"
                     );
 
-                    if (Spinnaker::GenApi::IsAvailable(ptrStringSerial) && Spinnaker::GenApi::IsReadable(ptrStringSerial))
+                    if (Spinnaker::GenApi::IsAvailable(ptrStringSerial)
+                        && Spinnaker::GenApi::IsReadable(ptrStringSerial))
                     {
                         strSerialNumbers[i] = ptrStringSerial->GetValue();
                         log("Camera " + std::to_string(i) + " serial number set to "
@@ -607,7 +614,10 @@ namespace op
                     // Images to userDatum
                     auto datums3d = std::make_shared<std::vector<Datum3D>>(cvMats.size());
                     for (auto i = 0u ; i < cvMats.size() ; i++)
+                    {
                         datums3d->at(i).cvInputData = cvMats.at(i);
+                        datums3d->at(i).cvOutputData = (*datums3d)[i].cvInputData;
+                    }
                     // Profiling speed
                     if (!cvMats.empty())
                     {

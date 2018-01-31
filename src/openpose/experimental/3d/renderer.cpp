@@ -2,6 +2,8 @@
 #include <stdio.h>
 #ifdef BUILD_MODULE_3D
     #include <GL/glut.h>
+    #include <GL/freeglut_ext.h> // glutLeaveMainLoop
+    #include <GL/freeglut_std.h>
 #endif
 #include <opencv2/opencv.hpp>
 #include <openpose/face/faceParameters.hpp>
@@ -33,6 +35,7 @@ namespace op
 
         Keypoints3D gKeypoints3D;
         PoseModel sPoseModel = PoseModel::COCO_18;
+        int sLastKeyPressed = -1;
 
         CameraMode gCameraMode = CameraMode::CAM_DEFAULT;
 
@@ -223,7 +226,8 @@ namespace op
 
             const auto gridNum = 10;
             const auto width = 50.;//sqrt(Distance(gGloorPts.front(),gGloorCenter)*2 /gridNum) * 1.2;
-            const cv::Point3f origin = gGloorCenter - gGloorAxis1*(width*gridNum / 2) - gGloorAxis2*(width*gridNum / 2);
+            const cv::Point3f origin = gGloorCenter - gGloorAxis1*(width*gridNum / 2)
+                                     - gGloorAxis2*(width*gridNum / 2);
             const cv::Point3f axis1 = gGloorAxis1 * width;
             const cv::Point3f axis2 = gGloorAxis2 * width;
             for (auto y = 0; y <= gridNum; ++y)
@@ -354,6 +358,55 @@ namespace op
                 }
             }
         }
+
+        void keyPressed(const unsigned char key, const int x, const int y)
+        {
+            try
+            {
+                UNUSED(x);
+                UNUSED(y);
+                const std::lock_guard<std::mutex> lock{gKeypoints3D.mutex};
+                sLastKeyPressed = key;
+            }
+            catch (const std::exception& e)
+            {
+                error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            }
+        }
+
+        void initializeVisualization()
+        {
+            try
+            {
+                char *my_argv[] = { NULL };
+                int my_argc = 0;
+                glutInit(&my_argc, my_argv);
+
+                // setup the size, position, and display mode for new windows
+                glutInitWindowSize(1280, 720);
+                glutInitWindowPosition(200, 0);
+                // glutSetOption(GLUT_MULTISAMPLE,8);
+                // Ideally adding also GLUT_BORDERLESS | GLUT_CAPTIONLESS should fix the problem of disabling the `x`
+                // button, but it does not work (tested in Ubuntu)
+                glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_MULTISAMPLE);
+
+                // create and set up a window
+                glutCreateWindow(GUI_NAME.c_str());
+                initGraphics();
+                glutDisplayFunc(renderMain);
+                glutMouseFunc(mouseButton);
+                glutMotionFunc(mouseMotion);
+                glutIdleFunc(idleFunc);
+                // Full screen would fix the problem of disabling `x` button
+                // glutFullScreen();
+                // Key presses
+                glutKeyboardFunc(keyPressed);
+            }
+            catch (const std::exception& e)
+            {
+                error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            }
+        }
     #endif
 
     WRender3D::WRender3D(const PoseModel poseModel)
@@ -363,10 +416,6 @@ namespace op
             #ifdef BUILD_MODULE_3D
                 // Update sPoseModel
                 sPoseModel = poseModel;
-                // Init display
-                cv::imshow(GUI_NAME, cv::Mat( 500, 500, CV_8UC3, cv::Scalar{ 0,0,0 } ));
-                //Run OpenGL
-                mRenderThread = std::thread{ &WRender3D::visualizationThread, this };
             #else
                 UNUSED(poseModel);
                 error("OpenPose must be compiled with `BUILD_MODULE_3D` in order to use this class.",
@@ -377,6 +426,37 @@ namespace op
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
+    }
+
+    WRender3D::~WRender3D()
+    {
+        try
+        {
+            #ifdef BUILD_MODULE_3D
+                glutLeaveMainLoop();
+            #endif
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    void WRender3D::initializationOnThread()
+    {
+        #ifdef BUILD_MODULE_3D
+            try
+            {
+                // Init display
+                cv::imshow(GUI_NAME, cv::Mat(500, 500, CV_8UC3, cv::Scalar{ 0,0,0 }));
+                // OpenGL - Initialization
+                initializeVisualization();
+            }
+            catch (const std::exception& e)
+            {
+                error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            }
+        #endif
     }
 
     void WRender3D::workConsumer(const std::shared_ptr<std::vector<Datum3D>>& datumsPtr)
@@ -408,57 +488,32 @@ namespace op
                     gKeypoints3D.mLeftHandKeypoints = datumsPtr->at(0).leftHandKeypoints3D;
                     gKeypoints3D.mRightHandKeypoints = datumsPtr->at(0).rightHandKeypoints3D;
                     gKeypoints3D.validKeypoints = true;
+                    // Esc pressed -> Close program
+                    if (sLastKeyPressed == 27)
+                        this->stop();
                     lock.unlock();
                     // Profiling speed
                     Profiler::timerEnd(profilerKey);
                     Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);
                 }
                 // Render images
-                // It sleeps 1 ms just to let the user see the output. Change to 33ms for normal 30 fps display if too fast
-                cv::waitKey(1);
+                // It sleeps 1 ms just to let the user see the 2D visual output
+                // Change to 33ms for normal 30 fps display if too fast
+                if ((char)cv::waitKey(1) == 27)
+                    this->stop();
+                // OpenCL - Run main loop event
+                // It is run outside loop, or it would get visually stuck if loop to slow
+                glutMainLoopEvent();
+                // This alternative can only be called once, and it will block the thread until program exit
+                // glutMainLoop();
             }
             catch (const std::exception& e)
             {
-                log("Some kind of unexpected error happened.");
                 this->stop();
                 error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             }
         #else
             UNUSED(datumsPtr);
-        #endif
-    }
-
-    void WRender3D::visualizationThread()
-    {
-        #ifdef BUILD_MODULE_3D
-            try
-            {
-                char *my_argv[] = { NULL };
-                int my_argc = 0;
-                glutInit(&my_argc, my_argv);
-
-                // setup the size, position, and display mode for new windows
-                glutInitWindowSize(1280, 720);
-                glutInitWindowPosition(200, 0);
-                // glutSetOption(GLUT_MULTISAMPLE,8);
-                glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_MULTISAMPLE);
-
-                // create and set up a window
-                glutCreateWindow(GUI_NAME.c_str());
-                initGraphics();
-                glutDisplayFunc(renderMain);
-                glutMouseFunc(mouseButton);
-                glutMotionFunc(mouseMotion);
-                glutIdleFunc(idleFunc);
-
-                glutMainLoop();
-
-                this->stop();
-            }
-            catch (const std::exception& e)
-            {
-                error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            }
         #endif
     }
 }
