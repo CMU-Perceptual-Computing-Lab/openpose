@@ -23,8 +23,7 @@ set(SOURCES_OP_CORE
     resizeAndMergeBase.cu
     resizeAndMergeBaseCL.cpp
     resizeAndMergeCaffe.cpp
-    scaleAndSizeExtractor.cpp
-    clManager.cpp)
+    scaleAndSizeExtractor.cpp)
 
 include(${CMAKE_SOURCE_DIR}/cmake/Utils.cmake)
 prepend(SOURCES_OP_CORE_WITH_CP ${CMAKE_CURRENT_SOURCE_DIR} ${SOURCES_OP_CORE})

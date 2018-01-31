@@ -1,5 +1,5 @@
-#ifndef OPENPOSE_CORE_CL_MANAGER_HPP
-#define OPENPOSE_CORE_CL_MANAGER_HPP
+#ifndef OPENPOSE_CORE_OPENCL_HPP
+#define OPENPOSE_CORE_OPENCL_HPP
 
 #include <atomic>
 #include <fstream>
@@ -18,12 +18,12 @@
 
 namespace op
 {
-    class OP_API CLManager
+    class OP_API OpenCL
     {
     public:
-        static std::shared_ptr<CLManager> getInstance(int deviceId = 0, int deviceType = CL_DEVICE_TYPE_GPU,
+        static std::shared_ptr<OpenCL> getInstance(int deviceId = 0, int deviceType = CL_DEVICE_TYPE_GPU,
                                                       bool getFromVienna = false);
-        ~CLManager();
+        ~OpenCL();
 
         cl::Context& getContext();
 
@@ -50,12 +50,12 @@ namespace op
         static int getTotalGPU();
 
     private:
-        CLManager(int deviceId, int deviceType, bool getFromVienna);
+        OpenCL(int deviceId, int deviceType, bool getFromVienna);
         struct ImplCLManager;
         std::unique_ptr<ImplCLManager> upImpl;
 
-        DELETE_COPY(CLManager);
+        DELETE_COPY(OpenCL);
     };
 }
 
-#endif // OPENPOSE_CORE_CL_MANAGER_HPP
+#endif // OPENPOSE_CORE_OPENCL_HPP

@@ -13,7 +13,7 @@
 #include <openpose/utilities/standard.hpp>
 #include <openpose/pose/poseExtractorCaffe.hpp>
 #ifdef USE_OPENCL
-    #include <openpose/core/clManager.hpp>
+    #include <openpose/gpu/opencl.hpp>
 #endif
 
 namespace op

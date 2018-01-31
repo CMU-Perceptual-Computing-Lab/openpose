@@ -10,7 +10,7 @@
 #include <openpose/utilities/standard.hpp>
 #include <openpose/core/netCaffe.hpp>
 #ifdef USE_OPENCL
-    #include <openpose/core/clManager.hpp>
+    #include <openpose/gpu/opencl.hpp>
     #include <CL/cl2.hpp>
 #endif
 
@@ -69,7 +69,7 @@ namespace op
                         {
                             caffe::Caffe::set_mode(caffe::Caffe::GPU);
                             std::vector<int> devices;
-                            int maxNumberGpu = op::CLManager::getTotalGPU();
+                            int maxNumberGpu = op::OpenCL::getTotalGPU();
                             for(int i=0; i<maxNumberGpu; i++)
                                 devices.push_back(i);
                             caffe::Caffe::SetDevices(devices);
@@ -141,7 +141,7 @@ namespace op
                    caffe::Caffe::SelectDevice(upImpl->mGpuId, true);
                    upImpl->upCaffeNet.reset(new caffe::Net<float>{upImpl->mCaffeProto, caffe::TEST, caffe::Caffe::GetDefaultDevice()});
                    upImpl->upCaffeNet->CopyTrainedLayersFrom(upImpl->mCaffeTrainedModel);
-                   op::CLManager::getInstance(upImpl->mGpuId, CL_DEVICE_TYPE_GPU, true);
+                   op::OpenCL::getInstance(upImpl->mGpuId, CL_DEVICE_TYPE_GPU, true);
                #else
                    #ifdef USE_CUDA
                        caffe::Caffe::set_mode(caffe::Caffe::GPU);
@@ -196,7 +196,7 @@ namespace op
                 #elif USE_OPENCL
                     auto* gpuImagePtr = upImpl->upCaffeNet->blobs().at(0)->mutable_gpu_data();
                     cl::Buffer imageBuffer = cl::Buffer((cl_mem)gpuImagePtr, true);
-                    op::CLManager::getInstance(upImpl->mGpuId)->getQueue().enqueueWriteBuffer(imageBuffer, true, 0, inputData.getVolume() * sizeof(float), inputData.getConstPtr());
+                    op::OpenCL::getInstance(upImpl->mGpuId)->getQueue().enqueueWriteBuffer(imageBuffer, true, 0, inputData.getVolume() * sizeof(float), inputData.getConstPtr());
                 #else
                     auto* cpuImagePtr = upImpl->upCaffeNet->blobs().at(0)->mutable_cpu_data();
                     std::copy(inputData.getConstPtr(), inputData.getConstPtr() + inputData.getVolume(), cpuImagePtr);
