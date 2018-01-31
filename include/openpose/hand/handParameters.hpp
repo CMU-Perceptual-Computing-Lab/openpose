@@ -2,6 +2,7 @@
 #define OPENPOSE_HAND_HAND_PARAMETERS_HPP
 
 #include <openpose/pose/poseParameters.hpp>
+#include <openpose/pose/poseParametersRender.hpp>
 
 namespace op
 {

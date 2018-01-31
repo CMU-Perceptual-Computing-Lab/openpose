@@ -94,8 +94,6 @@ Makefile.config
 3rdparty/caffe/.git
 3rdparty/caffe/.github
 distribute/
-.build_release/
-.build_debug/
 *.caffemodel
 *.caffemodel.h5
 *.solverstate
@@ -108,8 +106,8 @@ distribute/
 *.bin
 *.testbin
 build
-*build_debug/
-*build_release/
+build*
+.build*
 *cmake_build
 distribute/*
 python/caffe/proto/

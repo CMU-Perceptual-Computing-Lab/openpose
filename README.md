@@ -104,7 +104,7 @@ Output (format, keypoint index ordering, etc.) in [doc/output.md](doc/output.md)
 
 
 ## Speeding Up OpenPose and Benchmark
-Check the OpenPose Benchmark and some hints to speed up OpenPose on [doc/installation.md#faq](doc/installation.md#faq).
+Check the OpenPose Benchmark and some hints to speed up OpenPose on [doc/faq.md#speed-up-and-benchmark](doc/faq.md#speed-up-and-benchmark).
 
 
 

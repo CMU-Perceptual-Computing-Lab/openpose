@@ -2,6 +2,7 @@
 #define OPENPOSE_FACE_FACE_PARAMETERS_HPP
 
 #include <openpose/pose/poseParameters.hpp>
+#include <openpose/pose/poseParametersRender.hpp>
 
 namespace op
 {

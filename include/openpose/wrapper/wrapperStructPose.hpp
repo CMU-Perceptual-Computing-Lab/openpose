@@ -5,6 +5,7 @@
 #include <openpose/core/enumClasses.hpp>
 #include <openpose/pose/enumClasses.hpp>
 #include <openpose/pose/poseParameters.hpp>
+#include <openpose/pose/poseParametersRender.hpp>
 
 namespace op
 {

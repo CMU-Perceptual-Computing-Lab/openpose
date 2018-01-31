@@ -11,18 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\examples_beta\openpose3d\openpose3d.cpp" />
-    <ClCompile Include="..\..\examples_beta\openpose3d\src\pointGrey.cpp" />
-    <ClCompile Include="..\..\examples_beta\openpose3d\src\reconstruction3D.cpp" />
-    <ClCompile Include="..\..\examples_beta\openpose3d\src\renderer.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\examples_beta\openpose3d\include\openpose3d\cameraParameters.hpp" />
-    <ClInclude Include="..\..\examples_beta\openpose3d\include\openpose3d\datum3D.hpp" />
-    <ClInclude Include="..\..\examples_beta\openpose3d\include\openpose3d\headers.hpp" />
-    <ClInclude Include="..\..\examples_beta\openpose3d\include\openpose3d\pointGrey.hpp" />
-    <ClInclude Include="..\..\examples_beta\openpose3d\include\openpose3d\reconstruction3D.hpp" />
-    <ClInclude Include="..\..\examples_beta\openpose3d\include\openpose3d\renderer.hpp" />
+    <ClCompile Include="..\..\examples\experimental_3d\3d.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F31BEEF2-37B0-4B0F-85D3-AD427C56AD72}</ProjectGuid>

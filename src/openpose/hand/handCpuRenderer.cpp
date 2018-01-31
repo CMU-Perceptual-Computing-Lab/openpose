@@ -17,7 +17,8 @@ namespace op
             if (outputData.empty())
                 error("Empty Array<float> outputData.", __LINE__, __FUNCTION__, __FILE__);
             if (handKeypoints[0].getSize(0) != handKeypoints[1].getSize(0))
-                error("Wrong hand format: handKeypoints.getSize(0) != handKeypoints.getSize(1).", __LINE__, __FUNCTION__, __FILE__);
+                error("Wrong hand format: handKeypoints.getSize(0) != handKeypoints.getSize(1).",
+                      __LINE__, __FUNCTION__, __FILE__);
             // CPU rendering
             renderHandKeypointsCpu(outputData, handKeypoints, mRenderThreshold);
         }

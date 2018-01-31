@@ -52,6 +52,11 @@ DEEP_NET := caffe
 # Caffe directory
 CAFFE_DIR := 3rdparty/caffe/distribute
 
+# OpenPose 3-D Reconstruction
+# BUILD_MODULE_3D := 1
+# Spinnaker directory
+SPINNAKER_DIR := /usr/include/spinnaker
+
 # Whatever else you find you need goes here.
 INCLUDE_DIRS := /usr/local/include
 LIBRARY_DIRS := /usr/local/lib /usr/lib
