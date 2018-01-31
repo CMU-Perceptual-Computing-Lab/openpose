@@ -18,7 +18,7 @@
 
 namespace op
 {
-    class CLManager
+    class OP_API CLManager
     {
     private:
     public:
