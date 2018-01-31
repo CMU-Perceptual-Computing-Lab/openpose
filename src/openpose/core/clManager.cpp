@@ -1,9 +1,9 @@
+#include <openpose/core/clManager.hpp>
 #ifdef USE_OPENCL
     #include <CL/cl2.hpp>
     #include <viennacl/backend/opencl.hpp>
     #include <caffe/caffe.hpp>
 #endif
-#include <openpose/core/clManager.hpp>
 
 namespace op
 {
