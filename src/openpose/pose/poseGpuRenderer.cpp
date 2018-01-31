@@ -156,7 +156,6 @@ namespace op
                 UNUSED(poseKeypoints);
                 UNUSED(scaleInputToOutput);
                 UNUSED(scaleNetToOutput);
-                UNUSED(scaleInputToOutput);
                 error("OpenPose must be compiled with the `USE_CUDA` macro definitions in order to run this"
                       " functionality. You can alternatively use CPU rendering (flag `--render_pose 1`).",
                       __LINE__, __FUNCTION__, __FILE__);

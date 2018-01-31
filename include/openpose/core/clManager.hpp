@@ -20,30 +20,41 @@ namespace op
 {
     class OP_API CLManager
     {
-    private:
     public:
-        static std::shared_ptr<CLManager> getInstance(int deviceId = 0, int deviceType = CL_DEVICE_TYPE_GPU, bool getFromVienna = false);
+        static std::shared_ptr<CLManager> getInstance(int deviceId = 0, int deviceType = CL_DEVICE_TYPE_GPU,
+                                                      bool getFromVienna = false);
         ~CLManager();
-        DELETE_COPY(CLManager);
+
+        cl::Context& getContext();
+
+        cl::CommandQueue& getQueue();
+
+        cl::Device& getDevice();
+
+        template <typename T>
+        bool buildKernelIntoManager(std::string kernelName, std::string src = "", bool isFile = false);
+
+        template <typename T>
+        cl::Kernel& getKernelFromManager(std::string kernelName, std::string src = "", bool isFile = false);
+
+        template <typename K, typename T>
+        inline K getKernelFunctorFromManager(std::string kernelName, std::string src = "", bool isFile = false)
+        {            
+            return K(getKernelFromManager<T>(kernelName, src, isFile));
+        }
+      
+        template <typename T> static void getBufferRegion(cl_buffer_region& region, int origin, int size);
+
+        static std::string clErrorToString(int err);
+
+        static int getTotalGPU();
 
     private:
         CLManager(int deviceId, int deviceType, bool getFromVienna);
         struct ImplCLManager;
         std::unique_ptr<ImplCLManager> upImpl;
 
-    public:
-        cl::Context& getContext();
-        cl::CommandQueue& getQueue();
-        cl::Device& getDevice();
-        template <typename T> bool buildKernelIntoManager(std::string kernelName, std::string src = "", bool isFile = false);
-        template <typename T> cl::Kernel& getKernelFromManager(std::string kernelName, std::string src = "", bool isFile = false);
-        template <typename K, typename T> inline K getKernelFunctorFromManager(std::string kernelName, std::string src = "", bool isFile = false){            
-            return K(getKernelFromManager<T>(kernelName, src, isFile));
-        }
-    public:       
-        template <typename T> static void getBufferRegion(cl_buffer_region& region, int origin, int size);
-        static std::string clErrorToString(int err);
-        static int getTotalGPU();
+        DELETE_COPY(CLManager);
     };
 }
 
