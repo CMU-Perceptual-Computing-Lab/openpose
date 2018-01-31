@@ -79,7 +79,8 @@ namespace op
                                     {
                                         upImpl->mDevice = gpuDevices[i];
                                         upImpl->mContext = cl::Context(upImpl->mDevice);
-                                        upImpl->mQueue = cl::CommandQueue(upImpl->mContext, upImpl->mDevice, CL_QUEUE_PROFILING_ENABLE);
+                                        upImpl->mQueue = cl::CommandQueue(upImpl->mContext, upImpl->mDevice,
+                                                                          CL_QUEUE_PROFILING_ENABLE);
                                         deviceFound = true;
                                         op::log("Made new GPU Instance: " + std::to_string(deviceId));
                                         break;
@@ -109,7 +110,8 @@ namespace op
                                     if (i == (unsigned int)deviceId){
                                         upImpl->mDevice = cpuDevices[i];
                                         upImpl->mContext = cl::Context(upImpl->mDevice);
-                                        upImpl->mQueue = cl::CommandQueue(upImpl->mContext, upImpl->mDevice, CL_QUEUE_PROFILING_ENABLE);
+                                        upImpl->mQueue = cl::CommandQueue(upImpl->mContext, upImpl->mDevice,
+                                                                          CL_QUEUE_PROFILING_ENABLE);
                                         deviceFound = true;
                                         op::log("Made new CPU Instance: " + std::to_string(deviceId));
                                         break;
@@ -141,7 +143,8 @@ namespace op
                                     {
                                         upImpl->mDevice = accDevices[i];
                                         upImpl->mContext = cl::Context(upImpl->mDevice);
-                                        upImpl->mQueue = cl::CommandQueue(upImpl->mContext, upImpl->mDevice, CL_QUEUE_PROFILING_ENABLE);
+                                        upImpl->mQueue = cl::CommandQueue(upImpl->mContext, upImpl->mDevice,
+                                                                          CL_QUEUE_PROFILING_ENABLE);
                                         deviceFound = true;
                                         op::log("Made new ACC Instance: " + std::to_string(deviceId));
                                         break;
@@ -260,7 +263,8 @@ namespace op
             {
                 auto buildInfo = e.getBuildLog();
                 for (auto &pair : buildInfo)
-                    std::cerr << "Device: " << pair.first.getInfo<CL_DEVICE_NAME>() << std::endl << pair.second << std::endl << std::endl;
+                    std::cerr << "Device: " << pair.first.getInfo<CL_DEVICE_NAME>() << std::endl <<
+                                 pair.second << std::endl;
                 exit(-1);
             }
             return true;
@@ -296,7 +300,8 @@ namespace op
             if (!(upImpl->mClKernels.find(key) != upImpl->mClKernels.end()))
             {
                 upImpl->mClKernels[key] = cl::Kernel(program, kernelName.c_str());
-                op::log("Kernel: " + kernelName + " Type: " + type + + " GPU: " + std::to_string(upImpl->mId) + " built successfully");
+                op::log("Kernel: " + kernelName + " Type: " + type + + " GPU: " + std::to_string(upImpl->mId) +
+                        " built successfully");
                 return true;
             }
             else

@@ -157,9 +157,11 @@ namespace op
             cl::Buffer sourcePtrBuffer = cl::Buffer((cl_mem)(sourcePtr), true);
             cl::Buffer kernelPtrBuffer = cl::Buffer((cl_mem)(kernelPtr), true);
             cl::Buffer targetPtrBuffer = cl::Buffer((cl_mem)(targetPtr), true);
-            auto nmsRegisterKernel = op::OpenCL::getInstance(gpuID)->getKernelFunctorFromManager<op::NMSRegisterKernelFunctor, T>(
+            auto nmsRegisterKernel = op::OpenCL::getInstance(gpuID)->getKernelFunctorFromManager
+                    <op::NMSRegisterKernelFunctor, T>(
                         "nmsRegisterKernel",op::nmsOclCommonFunctions + op::nmsRegisterKernel);
-            auto nmsWriteKernel = op::OpenCL::getInstance(gpuID)->getKernelFunctorFromManager<op::NMSWriteKernelFunctor, T>(
+            auto nmsWriteKernel = op::OpenCL::getInstance(gpuID)->getKernelFunctorFromManager
+                    <op::NMSWriteKernelFunctor, T>(
                         "nmsWriteKernel",op::nmsOclCommonFunctions + op::nmsWriteKernel);
 
             // log("num_b: " + std::to_string(bottom->shape(0)));       // = 1
@@ -186,19 +188,27 @@ namespace op
                     cl_buffer_region kernelRegion, sourceRegion, targetRegion;
                     kernelRegion.origin = sizeof(int) * offsetChannel * imageOffset;
                     kernelRegion.size = sizeof(int) * imageOffset;
-                    cl::Buffer kernelBuffer = kernelPtrBuffer.createSubBuffer(CL_MEM_READ_WRITE, CL_BUFFER_CREATE_TYPE_REGION, &kernelRegion);
+                    cl::Buffer kernelBuffer = kernelPtrBuffer.createSubBuffer(CL_MEM_READ_WRITE,
+                                                                              CL_BUFFER_CREATE_TYPE_REGION,
+                                                                              &kernelRegion);
                     op::OpenCL::getBufferRegion<T>(sourceRegion, offsetChannel * imageOffset, imageOffset);
                     op::OpenCL::getBufferRegion<T>(targetRegion, offsetChannel * targetChannelOffset, targetChannelOffset);
-                    cl::Buffer sourceBuffer = sourcePtrBuffer.createSubBuffer(CL_MEM_READ_ONLY, CL_BUFFER_CREATE_TYPE_REGION, &sourceRegion);
-                    cl::Buffer targetBuffer = targetPtrBuffer.createSubBuffer(CL_MEM_READ_WRITE, CL_BUFFER_CREATE_TYPE_REGION, &targetRegion);
+                    cl::Buffer sourceBuffer = sourcePtrBuffer.createSubBuffer(CL_MEM_READ_ONLY,
+                                                                              CL_BUFFER_CREATE_TYPE_REGION,
+                                                                              &sourceRegion);
+                    cl::Buffer targetBuffer = targetPtrBuffer.createSubBuffer(CL_MEM_READ_WRITE,
+                                                                              CL_BUFFER_CREATE_TYPE_REGION,
+                                                                              &targetRegion);
 
                     // Run Kernel
                     bool debug = false;
                     nmsRegisterKernel(cl::EnqueueArgs(op::OpenCL::getInstance(gpuID)->getQueue(), cl::NDRange(width, height)),
                                       kernelBuffer, sourceBuffer, width, height, threshold, debug);
-                    op::OpenCL::getInstance(gpuID)->getQueue().enqueueReadBuffer(kernelBuffer, CL_TRUE, 0, sizeof(int) *  width * height, &kernelCPU[0]);
+                    op::OpenCL::getInstance(gpuID)->getQueue().enqueueReadBuffer(kernelBuffer, CL_TRUE, 0,
+                                                                                 sizeof(int) *  width * height, &kernelCPU[0]);
                     std::partial_sum(kernelCPU.begin(),kernelCPU.end(),kernelCPU.begin());
-                    op::OpenCL::getInstance(gpuID)->getQueue().enqueueWriteBuffer(kernelBuffer, CL_TRUE, 0, sizeof(int) *  width * height, &kernelCPU[0]);
+                    op::OpenCL::getInstance(gpuID)->getQueue().enqueueWriteBuffer(kernelBuffer, CL_TRUE, 0,
+                                                                                  sizeof(int) *  width * height, &kernelCPU[0]);
                     nmsWriteKernel(cl::EnqueueArgs(op::OpenCL::getInstance(gpuID)->getQueue(), cl::NDRange(width, height)),
                                       targetBuffer, kernelBuffer, sourceBuffer, width, height, targetPeaks-1, debug);
                 }
@@ -218,7 +228,8 @@ namespace op
         #ifdef USE_OPENCL
         catch (const cl::Error& e)
         {
-            error(std::string(e.what()) + " : " + op::OpenCL::clErrorToString(e.err()) + " ID: " + std::to_string(gpuID), __LINE__, __FUNCTION__, __FILE__);
+            error(std::string(e.what()) + " : " + op::OpenCL::clErrorToString(e.err()) + " ID: " +
+                  std::to_string(gpuID), __LINE__, __FUNCTION__, __FILE__);
         }
         #endif
         catch (const std::exception& e)
