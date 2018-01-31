@@ -1,5 +1,6 @@
 set(SOURCES_OP_UTILITIES 
     cuda.cpp
+    gpu.cpp
     errorAndLog.cpp
     fileSystem.cpp
     flagsToOpenPose.cpp

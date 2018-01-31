@@ -425,10 +425,6 @@ if (UNIX AND NOT APPLE)
             COMMENT "Rerunning cmake after building Caffe submodule")
       endif (NOT Caffe_FOUND)
       
-      # set(Caffe_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/caffe/include)
-      # TODO -- Find a better soln.
-      # set(Caffe_LIBS ${CMAKE_BINARY_DIR}/caffe/lib/libcaffe.so)
-
     endif (BUILD_CAFFE)
 
     if (NOT Caffe_FOUND AND NOT BUILD_CAFFE)

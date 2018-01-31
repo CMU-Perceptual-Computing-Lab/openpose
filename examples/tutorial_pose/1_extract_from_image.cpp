@@ -59,11 +59,6 @@ DEFINE_double(render_threshold,         0.05,           "Only estimated keypoint
 DEFINE_double(alpha_pose,               0.6,            "Blending factor (range 0-1) for the body part rendering. 1 will show it completely, 0 will"
                                                         " hide it. Only valid for GPU rendering.");
 
-#ifdef USE_OPENCL
-#include <viennacl/backend/opencl.hpp>
-void f(){viennacl::ocl::context &ctx = viennacl::ocl::get_context(0);}
-#endif
-
 int openPoseTutorialPose1()
 {
     op::log("OpenPose Library Tutorial - Example 1.", op::Priority::High);

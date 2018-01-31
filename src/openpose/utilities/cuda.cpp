@@ -38,7 +38,7 @@ namespace op
         }
     }
 
-    int getGpuNumber()
+    int cudaGetGpuNumber()
     {
         try
         {

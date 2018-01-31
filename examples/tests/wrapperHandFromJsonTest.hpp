@@ -149,7 +149,7 @@ namespace op
             if (gpuNumber < 0)
             {
                 // Get total number GPUs
-                gpuNumber = getGpuNumber();
+                gpuNumber = cudaGetGpuNumber();
                 // Reset initial GPU to 0 (we want them all)
                 gpuNumberStart = 0;
                 // Logging message

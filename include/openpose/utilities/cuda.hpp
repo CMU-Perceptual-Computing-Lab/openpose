@@ -10,7 +10,7 @@ namespace op
 
     OP_API void cudaCheck(const int line = -1, const std::string& function = "", const std::string& file = "");
 
-    OP_API int getGpuNumber();
+    OP_API int cudaGetGpuNumber();
 
     inline unsigned int getNumberCudaBlocks(const unsigned int totalRequired,
                                             const unsigned int numberCudaThreads = CUDA_NUM_THREADS)

@@ -192,11 +192,6 @@ DEFINE_string(write_keypoint_format,    "yml",          "(Deprecated, use `write
 DEFINE_string(write_keypoint_json,      "",             "(Deprecated, use `write_json`) Directory to write people pose data in JSON format,"
                                                         " compatible with any OpenCV version.");
 
-#ifdef USE_OPENCL
-#include <viennacl/backend/opencl.hpp>
-void f(){viennacl::ocl::context &ctx = viennacl::ocl::get_context(0);}
-#endif
-
 int openPoseDemo()
 {
     // logging_level
