@@ -157,6 +157,32 @@ namespace op
     }
 
     template <typename T>
+    void ResizeAndMergeCaffe<T>::Forward_ocl(const std::vector<caffe::Blob<T>*>& bottom,
+                                             const std::vector<caffe::Blob<T>*>& top, int gpuID)
+    {
+        try
+        {
+            #if defined USE_CAFFE && defined USE_OPENCL
+                std::vector<const T*> sourcePtrs(bottom.size());
+                for (auto i = 0u ; i < sourcePtrs.size() ; i++)
+                    sourcePtrs[i] = bottom[i]->gpu_data();
+                resizeAndMergeOcl(top.at(0)->mutable_gpu_data(), sourcePtrs, mTopSize, mBottomSizes,
+                                  mScaleRatios, gpuID);
+            #else
+                UNUSED(bottom);
+                UNUSED(top);
+                UNUSED(gpuID);
+                error("OpenPose must be compiled with the `USE_CAFFE` & `USE_OPENCL` macro definitions in order to run"
+                      " this functionality.", __LINE__, __FUNCTION__, __FILE__);
+            #endif
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    template <typename T>
     void ResizeAndMergeCaffe<T>::Backward_cpu(const std::vector<caffe::Blob<T>*>& top,
                                               const std::vector<bool>& propagate_down,
                                               const std::vector<caffe::Blob<T>*>& bottom)

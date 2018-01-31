@@ -100,16 +100,20 @@ endif (WIN32)
 
 # Set the acceleration library
 set(GPU_MODE CUDA CACHE STRING "Select the acceleration GPU library or CPU otherwise.")
-set_property(CACHE GPU_MODE PROPERTY STRINGS CPU_ONLY)
-
-# Test for CUDA or OpenCL
+set(OpenCL_FOUND FALSE)
 find_package(CUDA)
-if (CUDA_FOUND)
+find_package(OpenCL)
+if (CUDA_FOUND AND OpenCL_FOUND)
+  set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA OPENCL CPU_ONLY)
+elseif (CUDA_FOUND)
   set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA CPU_ONLY)
+elseif (OpenCL_FOUND)
+  set_property(CACHE GPU_MODE PROPERTY STRINGS OPENCL CPU_ONLY)
+else ()
+  set_property(CACHE GPU_MODE PROPERTY STRINGS CPU_ONLY)
 endif ()
-# set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA OPENCL CPU_ONLY)
-# set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA)
 
+# set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA OPENCL CPU_ONLY)
 if (${GPU_MODE} MATCHES "CUDA")
   # OpenPose flags
   add_definitions(-DUSE_CUDA)
@@ -118,6 +122,11 @@ elseif (${GPU_MODE} MATCHES "CPU_ONLY")
   # OpenPose flag for Caffe
   add_definitions(-DCPU_ONLY)
   message(STATUS "Building CPU Only")
+elseif (${GPU_MODE} MATCHES "OPENCL")
+  # OpenPose flag for Caffe
+  add_definitions(-DUSE_OPENCL)
+  add_definitions( -DUSE_GREENTEA )
+  message("Building with OpenCL")
 endif ()
 
 # Intel branch with MKL Support
@@ -355,11 +364,13 @@ if (UNIX AND NOT APPLE)
         endif ()
         set(CAFFE_CPU_ONLY ON)
         set(USE_CUDNN OFF)
+      elseif (${GPU_MODE} MATCHES "OPENCL")
+        execute_process(COMMAND git checkout opencl WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
+        set(USE_CUDNN OFF)
       endif ()
 
       # Build Caffe
       message(STATUS "Caffe will be built from source now.")
-      find_package(Caffe)
       include(ExternalProject)
       set(CAFFE_PREFIX caffe)
       set(CAFFE_URL ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
@@ -410,6 +421,10 @@ if (UNIX AND NOT APPLE)
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
             COMMENT "Rerunning cmake after building Caffe submodule")
       endif (NOT Caffe_FOUND)
+      
+      # set(Caffe_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/caffe/include)
+      # TODO -- Find a better soln.
+      # set(Caffe_LIBS ${CMAKE_BINARY_DIR}/caffe/lib/libcaffe.so)
 
     endif (BUILD_CAFFE)
 
@@ -422,6 +437,9 @@ if (UNIX AND NOT APPLE)
 
 endif (UNIX AND NOT APPLE)
 
+add_definitions( -DOPENPOSE_BINARY_DIR="${CMAKE_BINARY_DIR}" )
+add_definitions( -DOPENPOSE_INSTALL_DIR="${CMAKE_INSTALL_PREFIX}" )
+add_definitions( -DCMAKE_SOURCE_DIR="${CMAKE_SOURCE_DIR}" )
 
 ### PROJECT INCLUDES
 # Specify the include directories
@@ -439,6 +457,10 @@ endif (Caffe_FOUND)
 if (${GPU_MODE} MATCHES "CUDA")
   include_directories(
       ${CUDA_INCLUDE_DIRS})
+endif ()
+if (${GPU_MODE} MATCHES "OPENCL")
+  include_directories(
+    ${OpenCL_INCLUDE_DIRS})
 endif ()
 # 3D
 if (BUILD_MODULE_3D)

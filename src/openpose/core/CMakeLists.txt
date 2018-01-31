@@ -1,3 +1,4 @@
+set(CMAKE_CXX_SOURCE_FILE_EXTENSIONS C;M;c++;cc;cpp;cxx;mm;CPP;cl)
 set(SOURCES_OP_CORE
     array.cpp
     cvMatToOpInput.cpp
@@ -12,6 +13,7 @@ set(SOURCES_OP_CORE
     netCaffe.cpp
     nmsBase.cpp
     nmsBase.cu
+    nmsBaseCL.cpp
     nmsCaffe.cpp
     opOutputToCvMat.cpp
     point.cpp
@@ -19,8 +21,10 @@ set(SOURCES_OP_CORE
     renderer.cpp
     resizeAndMergeBase.cpp
     resizeAndMergeBase.cu
+    resizeAndMergeBaseCL.cpp
     resizeAndMergeCaffe.cpp
-    scaleAndSizeExtractor.cpp)
+    scaleAndSizeExtractor.cpp
+    clManager.cpp)
 
 include(${CMAKE_SOURCE_DIR}/cmake/Utils.cmake)
 prepend(SOURCES_OP_CORE_WITH_CP ${CMAKE_CURRENT_SOURCE_DIR} ${SOURCES_OP_CORE})
@@ -33,6 +37,14 @@ if (UNIX AND NOT APPLE)
   else()
     add_library(openpose_core ${SOURCES_OP_CORE})
   endif ()
+
+  #if (${GPU_MODE} MATCHES "OPENCL")
+  #   add_custom_command(TARGET openpose_core POST_BUILD
+  #   COMMAND ${CMAKE_COMMAND} -E copy
+  #       ${CMAKE_CURRENT_SOURCE_DIR}/*.cl
+  #       $<TARGET_FILE_DIR:openpose_core>
+  #   )
+  #endif()
 
   add_library(caffe SHARED IMPORTED)
   set_property(TARGET caffe PROPERTY IMPORTED_LOCATION ${Caffe_LIBS}) 

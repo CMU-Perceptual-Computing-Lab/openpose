@@ -10,6 +10,7 @@ namespace op
     struct NmsCaffe<T>::ImplNmsCaffe
     {
         #ifdef USE_CAFFE
+            std::shared_ptr<caffe::Blob<double>> mKernelBlobT;
             caffe::Blob<int> mKernelBlob;
             std::array<int, 4> mBottomSize;
             std::array<int, 4> mTopSize;
@@ -82,6 +83,12 @@ namespace op
                 topBlob->Reshape(topShape);
                 upImpl->mKernelBlob.Reshape(bottomShape);
 
+                // Special Kernel for OpenCL NMS
+                #ifdef USE_OPENCL
+                    upImpl->mKernelBlobT = {std::make_shared<caffe::Blob<double>>(1,1,1,1)};
+                    upImpl->mKernelBlobT->Reshape(bottomShape);
+                #endif
+
                 // Array sizes
                 upImpl->mTopSize = std::array<int, 4>{topBlob->shape(0), topBlob->shape(1),
                                                       topBlob->shape(2), topBlob->shape(3)};
@@ -143,6 +150,28 @@ namespace op
                 UNUSED(bottom);
                 UNUSED(top);
                 error("OpenPose must be compiled with the `USE_CAFFE` & `USE_CUDA` macro definitions in order to run"
+                      " this functionality.", __LINE__, __FUNCTION__, __FILE__);
+            #endif
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    template <typename T>
+    void NmsCaffe<T>::Forward_ocl(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top, int gpuID)
+    {
+        try
+        {
+            #if defined USE_CAFFE && defined USE_OPENCL
+                nmsOcl(top.at(0)->mutable_cpu_data(), upImpl->mKernelBlobT->mutable_gpu_data(),
+                       bottom.at(0)->gpu_data(), mThreshold, upImpl->mTopSize, upImpl->mBottomSize, gpuID);
+            #else
+                UNUSED(bottom);
+                UNUSED(top);
+                UNUSED(gpuID);
+                error("OpenPose must be compiled with the `USE_CAFFE` & `USE_OPENCL` macro definitions in order to run"
                       " this functionality.", __LINE__, __FUNCTION__, __FILE__);
             #endif
         }

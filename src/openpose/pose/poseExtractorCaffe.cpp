@@ -12,6 +12,9 @@
 #include <openpose/utilities/openCv.hpp>
 #include <openpose/utilities/standard.hpp>
 #include <openpose/pose/poseExtractorCaffe.hpp>
+#ifdef USE_OPENCL
+    #include <openpose/core/clManager.hpp>
+#endif
 
 namespace op
 {
@@ -248,8 +251,12 @@ namespace op
                 const auto caffeNetOutputBlobs = caffeNetSharedToPtr(upImpl->spCaffeNetOutputBlobs);
                 const std::vector<float> floatScaleRatios(scaleInputToNetInputs.begin(), scaleInputToNetInputs.end());
                 upImpl->spResizeAndMergeCaffe->setScaleRatios(floatScaleRatios);
+
                 #ifdef USE_CUDA
                     upImpl->spResizeAndMergeCaffe->Forward_gpu(caffeNetOutputBlobs, {upImpl->spHeatMapsBlob.get()}); // ~5ms
+                #elif USE_OPENCL
+                    //upImpl->spResizeAndMergeCaffe->Forward_cpu(caffeNetOutputBlobs, {upImpl->spHeatMapsBlob.get()}); // ~20ms
+                    upImpl->spResizeAndMergeCaffe->Forward_ocl(caffeNetOutputBlobs, {upImpl->spHeatMapsBlob.get()}, upImpl->mGpuId);
                 #else
                     upImpl->spResizeAndMergeCaffe->Forward_cpu(caffeNetOutputBlobs, {upImpl->spHeatMapsBlob.get()}); // ~20ms
                 #endif
@@ -259,6 +266,9 @@ namespace op
                 #ifdef USE_CUDA
                     upImpl->spNmsCaffe->Forward_gpu({upImpl->spHeatMapsBlob.get()}, {upImpl->spPeaksBlob.get()});// ~2ms
                     cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+                #elif USE_OPENCL
+                    //upImpl->spNmsCaffe->Forward_cpu({upImpl->spHeatMapsBlob.get()}, {upImpl->spPeaksBlob.get()}); // ~ 7ms
+                    upImpl->spNmsCaffe->Forward_ocl({upImpl->spHeatMapsBlob.get()}, {upImpl->spPeaksBlob.get()}, upImpl->mGpuId);
                 #else
                     upImpl->spNmsCaffe->Forward_cpu({upImpl->spHeatMapsBlob.get()}, {upImpl->spPeaksBlob.get()}); // ~ 7ms
                 #endif

@@ -15,12 +15,12 @@ clear && clear
     # ID 50006  <-->    #frames = 3559      -->     ~ 4 min at 15fps
 
 # Parameters
-IMAGE_FOLDER=/home/gines/devel/images/val2017/
-JSON_FOLDER=../evaluation/coco_val_jsons/
-OP_BIN=./build/examples/openpose/openpose.bin
+IMAGE_FOLDER=/home/ryaadhav/Downloads/val2017/
+JSON_FOLDER=./evaluation/coco_val_jsons/mkl_656x368_3_0.25_200
+OP_BIN=./build_mkl/examples/openpose/openpose.bin
 
     # 1 scale
-$OP_BIN --image_dir $IMAGE_FOLDER --write_coco_json ${JSON_FOLDER}1.json --no_display --render_pose 0
+#$OP_BIN --image_dir $IMAGE_FOLDER --write_coco_json ${JSON_FOLDER}1.json --no_display --render_pose 1
 
     # 1 scale - Debugging
 # $OP_BIN --image_dir $IMAGE_FOLDER --write_coco_json ${JSON_FOLDER}1.json --no_display --write_images ~/Desktop/CppValidation/
@@ -29,7 +29,7 @@ $OP_BIN --image_dir $IMAGE_FOLDER --write_coco_json ${JSON_FOLDER}1.json --no_di
 # $OP_BIN --image_dir $IMAGE_FOLDER --write_coco_json ${JSON_FOLDER}1_3.json --no_display --render_pose 0 --scale_number 3 --scale_gap 0.25
 
 #     # 4 scales
-# $OP_BIN --num_gpu 1 --image_dir $IMAGE_FOLDER --write_coco_json ${JSON_FOLDER}1_4.json --no_display --render_pose 0 --scale_number 4 --scale_gap 0.25 --net_resolution "1312x736"
+$OP_BIN  --image_dir $IMAGE_FOLDER --write_coco_json ${JSON_FOLDER}.json --no_display --render_pose 0 --scale_number 3 --scale_gap 0.25 --net_resolution "656x368"  --frame_last 200
 
 # 	  # Debugging - Rendered frames saved
 # $OP_BIN --image_dir $IMAGE_FOLDER --write_images ${JSON_FOLDER}frameOutput --no_display
