@@ -100,12 +100,16 @@ endif (WIN32)
 
 # Set the acceleration library
 set(GPU_MODE CUDA CACHE STRING "Select the acceleration GPU library or CPU otherwise.")
-set(OpenCL_FOUND FALSE)
+# Look for CUDA
 find_package(CUDA)
+# Look for OpenCL
+set(OpenCL_FOUND FALSE)
 find_package(OpenCL)
+# Code to avoid crash at compiling time if OpenCL is not found
 if (NOT OpenCL_FOUND)
   set(OpenCL_LIBRARIES "")
 endif (NOT OpenCL_FOUND)
+# Display proper options to user
 if (CUDA_FOUND AND OpenCL_FOUND)
   set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA OPENCL CPU_ONLY)
 elseif (CUDA_FOUND)
@@ -115,8 +119,7 @@ elseif (OpenCL_FOUND)
 else ()
   set_property(CACHE GPU_MODE PROPERTY STRINGS CPU_ONLY)
 endif ()
-
-# set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA OPENCL CPU_ONLY)
+# Handle desired GPU mode option
 if (${GPU_MODE} MATCHES "CUDA")
   # OpenPose flags
   add_definitions(-DUSE_CUDA)

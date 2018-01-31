@@ -11,12 +11,13 @@ OpenPose - Installation
 7. [Uninstallation](#uninstallation)
 8. [Optional Settings](#optional-settings)
     1. [MPI Model](#mpi-model)
-    2. [OpenPose 3D Reconstruction Module and Demo](#openpose-3d-reconstruction-module-and-demo)
-    3. [Compiling without cuDNN](#compiling-without-cudnn)
-    4. [Custom Caffe (Ubuntu Only)](#custom-caffe-ubuntu-only)
-    5. [Custom OpenCV (Ubuntu Only)](#custom-opencv-ubuntu-only)
-    6. [Doxygen Documentation Autogeneration (Ubuntu Only)](#doxygen-documentation-autogeneration-ubuntu-only)
-    7. [CMake Command Line Configuration (Ubuntu Only)](#cmake-command-line-configuration-ubuntu-only)
+    2. [CPU Version](#cpu-version)
+    3. [OpenPose 3D Reconstruction Module and Demo](#openpose-3d-reconstruction-module-and-demo)
+    4. [Compiling without cuDNN](#compiling-without-cudnn)
+    5. [Custom Caffe (Ubuntu Only)](#custom-caffe-ubuntu-only)
+    6. [Custom OpenCV (Ubuntu Only)](#custom-opencv-ubuntu-only)
+    7. [Doxygen Documentation Autogeneration (Ubuntu Only)](#doxygen-documentation-autogeneration-ubuntu-only)
+    8. [CMake Command Line Configuration (Ubuntu Only)](#cmake-command-line-configuration-ubuntu-only)
 
 
 
@@ -191,6 +192,25 @@ In order to uninstall OpenPose:
 ### Optional Settings
 #### MPI Model
 By default, the body MPI model is not downloaded. You can download it by turning on the `DOWNLOAD_MPI_MODEL`. It's slightly faster but less accurate and has less keypoints than the COCO body model.
+
+
+
+#### CPU Version
+OpenPose will automatically use CPU mode if no Nvidia GPU is found in your system. To manually selec the CPU Version, open CMake GUI mentioned above, and set the `GPU_MODE` flag to `CPU_ONLY`.
+
+- On Ubuntu, OpenPose will link against the Intel MKL version (Math Kernel Library) of Caffe. Alternatively, the user can choose his own Caffe version, by unselecting `USE_MKL` and selecting his own Caffe path. 
+- On Windows, it will use the default version of Caffe or one provided by the user on the CPU.
+
+The default CPU version takes ~0.5 seconds per image on Ubuntu (~5x slower than GPU) and ~15 seconds on Windows (~200x slower than GPU). Unfortunately, the intel branch of Caffe is not supported on Windows. Note that the GPU version takes ~0.1 seconds per image (in a GTX 1080 Ti).
+
+The user can configure the environmental variables `MKL_NUM_THREADS` and `OMP_NUM_THREADS`. They are set at an optimum parameter level by default (i.e., to the number of threads of the machine). However, they can be tweak by running the following commands into the terminal window, right before running any OpenPose application. Eg:
+```
+# Optimal number = Number of threads (used by default)
+export MKL_NUM_THREADS="8"
+export OMP_NUM_THREADS="8"
+```
+
+You can check the [OpenPose benchmark](https://github.com/CMU-Perceptual-Computing-Lab/openpose#speeding-up-openpose-and-benchmark) for more information about speed and memory requirements in several CPUs and GPUs.
 
 
 
