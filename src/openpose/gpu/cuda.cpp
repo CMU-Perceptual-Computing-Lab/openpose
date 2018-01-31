@@ -3,7 +3,7 @@
     #include <cuda_runtime.h>
     #include <openpose/utilities/fastMath.hpp>
 #endif
-#include <openpose/utilities/cuda.hpp>
+#include <openpose/gpu/cuda.hpp>
 
 namespace op
 {
@@ -38,7 +38,7 @@ namespace op
         }
     }
 
-    int getGpuNumber()
+    int getCudaGpuNumber()
     {
         try
         {

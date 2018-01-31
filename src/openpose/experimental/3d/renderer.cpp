@@ -388,6 +388,7 @@ namespace op
                 // glutSetOption(GLUT_MULTISAMPLE,8);
                 // Ideally adding also GLUT_BORDERLESS | GLUT_CAPTIONLESS should fix the problem of disabling the `x`
                 // button, but it does not work (tested in Ubuntu)
+                // https://stackoverflow.com/questions/3799803/is-it-possible-to-make-a-window-withouth-a-top-in-glut
                 glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_MULTISAMPLE);
 
                 // create and set up a window

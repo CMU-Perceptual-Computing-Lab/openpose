@@ -1,6 +1,6 @@
+#include <openpose/gpu/cuda.hpp>
+#include <openpose/gpu/cuda.hu>
 #include <openpose/pose/poseParameters.hpp>
-#include <openpose/utilities/cuda.hpp>
-#include <openpose/utilities/cuda.hu>
 #include <openpose/utilities/render.hu>
 #include <openpose/pose/renderPose.hpp>
 
