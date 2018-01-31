@@ -22,9 +22,8 @@ You will need to add the OpenPose shared library to your LD_LIBRARY_PATH environ
 1. Go to your OpenPose home directory.
 2. Run the following command 'export LD_LIBRARY_PATH=./build/lib'
 
+    ```export LD_LIBRARY_PATH=./build/lib/``` 
 
-    export LD_LIBRARY_PATH=./build/lib
-    
 You will need to have a dataset ready for testing. Currently there are 4 datasets available for testing. In the future the dataset generation will be automated:
 
 1. Boxing video:
