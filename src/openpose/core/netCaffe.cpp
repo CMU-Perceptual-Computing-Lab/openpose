@@ -5,7 +5,7 @@
     #include <caffe/net.hpp>
     #include <glog/logging.h> // google::InitGoogleLogging
 #endif
-#include <openpose/utilities/cuda.hpp>
+#include <openpose/gpu/cuda.hpp>
 #include <openpose/utilities/fileSystem.hpp>
 #include <openpose/utilities/standard.hpp>
 #include <openpose/core/netCaffe.hpp>

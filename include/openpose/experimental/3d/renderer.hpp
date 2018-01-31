@@ -1,7 +1,6 @@
 ﻿#ifndef OPENPOSE_EXPERIMENTAL_3D_RENDERER_HPP
 #define OPENPOSE_EXPERIMENTAL_3D_RENDERER_HPP
 
-#include <thread>
 #include <openpose/core/common.hpp>
 #include <openpose/experimental/3d/datum3D.hpp>
 #include <openpose/pose/enumClasses.hpp>
@@ -15,14 +14,11 @@ namespace op
     public:
         WRender3D(const PoseModel poseModel = PoseModel::COCO_18);
 
-        void initializationOnThread() {}
+        ~WRender3D();
+
+        void initializationOnThread();
 
         void workConsumer(const std::shared_ptr<std::vector<Datum3D>>& datumsPtr);
-
-    private:
-        std::thread mRenderThread;
-
-        void visualizationThread();
     };
 }
 

@@ -1,6 +1,18 @@
 ﻿OpenPose 3-D Reconstruction Module and Demo
 =============================================
 
+## Contents
+1. [Introduction](#introduction)
+2. [Features](#features)
+3. [Required Hardware](#required-hardware)
+4. [Camera Calibration](#camera-calibration)
+5. [Camera Ordering](#camera-ordering)
+6. [Installing the OpenPose 3-D Reconstruction Module](#installing-the-openpose-3-d-reconstruction-module)
+7. [Known Bug](#known-bug)
+
+
+
+## Introduction
 This experimental module performs 3-D keypoint (body, face, and hand) reconstruction and rendering for 1 person. We will not keep updating it nor solving questions/issues about it at the moment. It requires the user to be familiar with computer vision and camera calibration, including extraction of intrinsic and extrinsic parameters.
 
 
@@ -72,3 +84,10 @@ It should be similar to the following image.
 <p align="center">
     <img src="media/openpose3d.png">
 </p>
+
+
+
+## Known Bug
+FreeGLUT is a quite light library. Due to that, there is a known bug in the 3D module:
+
+1. The window must be closed with the <kbd>Esc</kbd> key. Clicking the close button will cause a core dumped or std::exception error in OpenPose. Reason: There is no way to control the behaviour of the exit button in a FreeGLUT program. Feel free to let us know or create a pull request if you find a workaround applicable to 3-D OpenPose. Another alternative is ussing `--disable_multi_thread` in OpenPose. This would avoid the issue but slow down the program, especially in multi-GPU systems.

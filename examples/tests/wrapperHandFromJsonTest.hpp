@@ -87,10 +87,10 @@ namespace op
 #include <openpose/face/headers.hpp>
 #include <openpose/filestream/headers.hpp>
 #include <openpose/gui/headers.hpp>
+#include <openpose/gpu/gpu.hpp>
 #include <openpose/hand/headers.hpp>
 #include <openpose/pose/headers.hpp>
 #include <openpose/producer/headers.hpp>
-#include <openpose/utilities/cuda.hpp>
 #include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/utilities/fileSystem.hpp>
 namespace op
@@ -149,7 +149,7 @@ namespace op
             if (gpuNumber < 0)
             {
                 // Get total number GPUs
-                gpuNumber = cudaGetGpuNumber();
+                gpuNumber = getGpuNumber();
                 // Reset initial GPU to 0 (we want them all)
                 gpuNumberStart = 0;
                 // Logging message

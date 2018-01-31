@@ -4,7 +4,7 @@
 #endif
 #include <openpose/pose/poseParameters.hpp>
 #include <openpose/pose/renderPose.hpp>
-#include <openpose/utilities/cuda.hpp>
+#include <openpose/gpu/cuda.hpp>
 #include <openpose/utilities/keypoint.hpp>
 #include <openpose/pose/poseGpuRenderer.hpp>
 
@@ -152,9 +152,9 @@ namespace op
                 gpuToCpuMemoryIfLastRenderer(outputData.getPtr(), outputData.getVolume());
                 cudaCheck(__LINE__, __FUNCTION__, __FILE__);
             #else
-                UNUSED(elementRendered);
                 UNUSED(outputData);
                 UNUSED(poseKeypoints);
+                UNUSED(scaleInputToOutput);
                 UNUSED(scaleNetToOutput);
                 UNUSED(scaleInputToOutput);
                 error("OpenPose must be compiled with the `USE_CUDA` macro definitions in order to run this"
