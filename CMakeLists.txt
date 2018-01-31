@@ -132,7 +132,7 @@ elseif (${GPU_MODE} MATCHES "OPENCL")
   # OpenPose flag for Caffe
   add_definitions(-DUSE_OPENCL)
   add_definitions(-DUSE_GREENTEA)
-  message("Building with OpenCL")
+  message(STATUS "Building with OpenCL")
 endif ()
 
 # Intel branch with MKL Support
