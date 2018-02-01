@@ -183,7 +183,11 @@ if (UNIX AND NOT APPLE)
   endif ()
   find_package(GFlags)
   find_package(Glog)
-  find_package(OpenCV)
+  if (OpenCV_CONFIG_FILE)
+    include (${OpenCV_CONFIG_FILE})
+  else (OpenCV_CONFIG_FILE)
+    find_package(OpenCV)
+  endif (OpenCV_CONFIG_FILE)
 
   # 3D
   if (BUILD_MODULE_3D)
