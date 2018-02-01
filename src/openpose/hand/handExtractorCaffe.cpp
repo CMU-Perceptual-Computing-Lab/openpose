@@ -166,14 +166,15 @@ namespace op
                                               std::shared_ptr<MaximumCaffe<float>>& maximumCaffe,
                                               boost::shared_ptr<caffe::Blob<float>>& caffeNetOutputBlob,
                                               std::shared_ptr<caffe::Blob<float>>& heatMapsBlob,
-                                              std::shared_ptr<caffe::Blob<float>>& peaksBlob)
+                                              std::shared_ptr<caffe::Blob<float>>& peaksBlob,
+                                              const int gpuID)
         {
             try
             {
                 // HeatMaps extractor blob and layer
                 const bool mergeFirstDimension = true;
                 resizeAndMergeCaffe->Reshape({caffeNetOutputBlob.get()}, {heatMapsBlob.get()},
-                                             HAND_CCN_DECREASE_FACTOR, 1.f, mergeFirstDimension);
+                                             HAND_CCN_DECREASE_FACTOR, 1.f, mergeFirstDimension, gpuID);
                 // Pose extractor blob and layer
                 maximumCaffe->Reshape({heatMapsBlob.get()}, {peaksBlob.get()});
                 // Cuda check
@@ -413,7 +414,7 @@ namespace op
                     upImpl->netInitialized = true;
                     reshapeFaceExtractorCaffe(upImpl->spResizeAndMergeCaffe, upImpl->spMaximumCaffe,
                                               upImpl->spCaffeNetOutputBlob, upImpl->spHeatMapsBlob,
-                                              upImpl->spPeaksBlob);
+                                              upImpl->spPeaksBlob, upImpl->mGpuId);
                 }
 
                 // 2. Resize heat maps + merge different scales
@@ -423,7 +424,7 @@ namespace op
                     cudaCheck(__LINE__, __FUNCTION__, __FILE__);
                 #elif USE_OPENCL
                     upImpl->spResizeAndMergeCaffe->Forward_ocl({upImpl->spCaffeNetOutputBlob.get()},
-                                                               {upImpl->spHeatMapsBlob.get()}, upImpl->mGpuId);
+                                                               {upImpl->spHeatMapsBlob.get()});
                 #else
                     upImpl->spResizeAndMergeCaffe->Forward_cpu({upImpl->spCaffeNetOutputBlob.get()},
                                                                {upImpl->spHeatMapsBlob.get()});

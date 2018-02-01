@@ -24,7 +24,7 @@ namespace op
         virtual void LayerSetUp(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top);
 
         virtual void Reshape(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top,
-                             const T netFactor, const T scaleFactor, const bool mergeFirstDimension = true);
+                             const T netFactor, const T scaleFactor, const bool mergeFirstDimension = true, const int gpuID = 0);
 
         virtual inline const char* type() const { return "ResizeAndMerge"; }
 
@@ -34,7 +34,7 @@ namespace op
 
         virtual void Forward_gpu(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top);
 
-        virtual void Forward_ocl(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top, int gpuID = 0);
+        virtual void Forward_ocl(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top);
 
         virtual void Backward_cpu(const std::vector<caffe::Blob<T>*>& top, const std::vector<bool>& propagate_down,
                                   const std::vector<caffe::Blob<T>*>& bottom);
@@ -46,6 +46,7 @@ namespace op
         std::vector<T> mScaleRatios;
         std::vector<std::array<int, 4>> mBottomSizes;
         std::array<int, 4> mTopSize;
+        int mGpuID;
 
         DELETE_COPY(ResizeAndMergeCaffe);
     };

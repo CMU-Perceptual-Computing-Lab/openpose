@@ -64,7 +64,7 @@ namespace op
 
     template <typename T>
     void NmsCaffe<T>::Reshape(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top,
-                              const int maxPeaks, const int outputChannels)
+                              const int maxPeaks, const int outputChannels, const int gpuID)
     {
         try
         {
@@ -88,6 +88,9 @@ namespace op
                     upImpl->mKernelBlobT = {std::make_shared<caffe::Blob<int>>(1,1,1,1)};
                     upImpl->mKernelBlobT->Reshape(bottomShape);
                 #endif
+
+                // GPU ID
+                mGpuID = gpuID;
 
                 // Array sizes
                 upImpl->mTopSize = std::array<int, 4>{topBlob->shape(0), topBlob->shape(1),
@@ -160,13 +163,13 @@ namespace op
     }
 
     template <typename T>
-    void NmsCaffe<T>::Forward_ocl(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top, int gpuID)
+    void NmsCaffe<T>::Forward_ocl(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top)
     {
         try
         {
             #if defined USE_CAFFE && defined USE_OPENCL
                 nmsOcl(top.at(0)->mutable_gpu_data(), upImpl->mKernelBlobT->mutable_gpu_data(),
-                       bottom.at(0)->gpu_data(), mThreshold, upImpl->mTopSize, upImpl->mBottomSize, gpuID);
+                       bottom.at(0)->gpu_data(), mThreshold, upImpl->mTopSize, upImpl->mBottomSize, mGpuID);
             #else
                 UNUSED(bottom);
                 UNUSED(top);

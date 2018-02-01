@@ -51,7 +51,8 @@ namespace op
                                          const std::vector<caffe::Blob<T>*>& top,
                                          const T netFactor,
                                          const T scaleFactor,
-                                         const bool mergeFirstDimension)
+                                         const bool mergeFirstDimension,
+                                         const int gpuID)
     {
         try
         {
@@ -81,6 +82,8 @@ namespace op
                 for (auto i = 0u ; i < mBottomSizes.size() ; i++)
                     mBottomSizes[i] = std::array<int, 4>{bottom[i]->shape(0), bottom[i]->shape(1),
                                                          bottom[i]->shape(2), bottom[i]->shape(3)};
+                // GPU ID
+                mGpuID = gpuID;
             #else
                 UNUSED(bottom);
                 UNUSED(top);
@@ -158,7 +161,7 @@ namespace op
 
     template <typename T>
     void ResizeAndMergeCaffe<T>::Forward_ocl(const std::vector<caffe::Blob<T>*>& bottom,
-                                             const std::vector<caffe::Blob<T>*>& top, int gpuID)
+                                             const std::vector<caffe::Blob<T>*>& top)
     {
         try
         {
@@ -167,7 +170,7 @@ namespace op
                 for (auto i = 0u ; i < sourcePtrs.size() ; i++)
                     sourcePtrs[i] = bottom[i]->gpu_data();
                 resizeAndMergeOcl(top.at(0)->mutable_gpu_data(), sourcePtrs, mTopSize, mBottomSizes,
-                                  mScaleRatios, gpuID);
+                                  mScaleRatios, mGpuID);
             #else
                 UNUSED(bottom);
                 UNUSED(top);
