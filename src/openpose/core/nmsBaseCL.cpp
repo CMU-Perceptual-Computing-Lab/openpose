@@ -208,15 +208,20 @@ namespace op
                                                                               CL_BUFFER_CREATE_TYPE_REGION,
                                                                               &targetRegion);
 
-                    // Run Kernel
+                    // Run Kernel to get 1-0 map
                     bool debug = false;
                     nmsRegisterKernel(cl::EnqueueArgs(op::OpenCL::getInstance(gpuID)->getQueue(), cl::NDRange(width, height)),
                                       kernelBuffer, sourceBuffer, width, height, threshold, debug);
+                    // This is a really bad approach. We need to write a custom accumalator to run on gpu
+                    // Download it to CPU
                     op::OpenCL::getInstance(gpuID)->getQueue().enqueueReadBuffer(kernelBuffer, CL_TRUE, 0,
                                                                                  sizeof(int) *  width * height, &kernelCPU[0]);
+                    // Compute partial sum in CPU
                     std::partial_sum(kernelCPU.begin(),kernelCPU.end(),kernelCPU.begin());
+                    // Reupload to GPU
                     op::OpenCL::getInstance(gpuID)->getQueue().enqueueWriteBuffer(kernelBuffer, CL_TRUE, 0,
                                                                                   sizeof(int) *  width * height, &kernelCPU[0]);
+                    // Write Kernel
                     nmsWriteKernel(cl::EnqueueArgs(op::OpenCL::getInstance(gpuID)->getQueue(), cl::NDRange(width, height)),
                                       targetBuffer, kernelBuffer, sourceBuffer, width, height, targetPeaks-1, debug);
                 }
