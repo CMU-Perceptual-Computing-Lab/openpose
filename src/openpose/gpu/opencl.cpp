@@ -7,7 +7,7 @@
 
 namespace op
 {
-    std::shared_ptr<OpenCL> OpenCL::getInstance(int deviceId, int deviceType, bool getFromVienna)
+    std::shared_ptr<OpenCL> OpenCL::getInstance(const int deviceId, const int deviceType, bool getFromVienna)
     {
         static std::mutex managerMutex;
         static std::map<int, std::shared_ptr<OpenCL>> clManagers;
@@ -39,7 +39,7 @@ namespace op
         }
     };
 
-    OpenCL::OpenCL(int deviceId, int deviceType, bool getFromVienna)
+    OpenCL::OpenCL(const int deviceId, const int deviceType, bool getFromVienna)
         : upImpl{new ImplCLManager{}}
     {
         #ifdef USE_OPENCL
@@ -279,7 +279,7 @@ namespace op
     }
 
     template <typename T>
-    bool OpenCL::buildKernelIntoManager(std::string kernelName, std::string src, bool isFile)
+    bool OpenCL::buildKernelIntoManager(const std::string& kernelName, const std::string& src, bool isFile)
     {
         #ifdef USE_OPENCL
             // Set type
@@ -320,7 +320,7 @@ namespace op
     }
 
     template <typename T>
-    cl::Kernel& OpenCL::getKernelFromManager(std::string kernelName, std::string src, bool isFile)
+    cl::Kernel& OpenCL::getKernelFromManager(const std::string& kernelName, const std::string& src, bool isFile)
     {
         #ifdef USE_OPENCL
         // Set type
@@ -456,7 +456,7 @@ namespace op
         return -1;
     }
 
-    template <typename T> void OpenCL::getBufferRegion(cl_buffer_region& region, int origin, int size)
+    template <typename T> void OpenCL::getBufferRegion(cl_buffer_region& region, const int origin, const int size)
     {
         #ifdef USE_OPENCL
             region.origin = sizeof(T) * origin;
@@ -470,10 +470,10 @@ namespace op
         #endif
     }
 
-    template void OpenCL::getBufferRegion<float>(cl_buffer_region& region, int origin, int size);
-    template void OpenCL::getBufferRegion<double>(cl_buffer_region& region, int origin, int size);
-    template cl::Kernel&  OpenCL::getKernelFromManager<float>(std::string kernelName, std::string src, bool isFile);
-    template cl::Kernel& OpenCL::getKernelFromManager<double>(std::string kernelName, std::string src, bool isFile);
-    template bool OpenCL::buildKernelIntoManager<float>(std::string kernelName, std::string src, bool isFile);
-    template bool OpenCL::buildKernelIntoManager<double>(std::string kernelName, std::string src, bool isFile);
+    template void OpenCL::getBufferRegion<float>(cl_buffer_region& region, const int origin, const int size);
+    template void OpenCL::getBufferRegion<double>(cl_buffer_region& region, const int origin, const int size);
+    template cl::Kernel&  OpenCL::getKernelFromManager<float>(const std::string& kernelName, const std::string& src, bool isFile);
+    template cl::Kernel& OpenCL::getKernelFromManager<double>(const std::string& kernelName, const std::string& src, bool isFile);
+    template bool OpenCL::buildKernelIntoManager<float>(const std::string& kernelName, const std::string& src, bool isFile);
+    template bool OpenCL::buildKernelIntoManager<double>(const std::string& kernelName, const std::string& src, bool isFile);
 }

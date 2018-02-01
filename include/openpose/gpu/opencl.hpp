@@ -21,7 +21,7 @@ namespace op
     class OP_API OpenCL
     {
     public:
-        static std::shared_ptr<OpenCL> getInstance(int deviceId = 0, int deviceType = CL_DEVICE_TYPE_GPU,
+        static std::shared_ptr<OpenCL> getInstance(const int deviceId = 0, const int deviceType = CL_DEVICE_TYPE_GPU,
                                                       bool getFromVienna = false);
         ~OpenCL();
 
@@ -32,25 +32,25 @@ namespace op
         cl::Device& getDevice();
 
         template <typename T>
-        bool buildKernelIntoManager(std::string kernelName, std::string src = "", bool isFile = false);
+        bool buildKernelIntoManager(const std::string& kernelName, const std::string& src = "", bool isFile = false);
 
         template <typename T>
-        cl::Kernel& getKernelFromManager(std::string kernelName, std::string src = "", bool isFile = false);
+        cl::Kernel& getKernelFromManager(const std::string& kernelName, const std::string& src = "", bool isFile = false);
 
         template <typename K, typename T>
-        inline K getKernelFunctorFromManager(std::string kernelName, std::string src = "", bool isFile = false)
+        inline K getKernelFunctorFromManager(const std::string& kernelName, const std::string& src = "", bool isFile = false)
         {            
             return K(getKernelFromManager<T>(kernelName, src, isFile));
         }
       
-        template <typename T> static void getBufferRegion(cl_buffer_region& region, int origin, int size);
+        template <typename T> static void getBufferRegion(cl_buffer_region& region, const int origin, const int size);
 
         static std::string clErrorToString(int err);
 
         static int getTotalGPU();
 
     private:
-        OpenCL(int deviceId, int deviceType, bool getFromVienna);
+        OpenCL(const int deviceId, const int deviceType, bool getFromVienna);
         struct ImplCLManager;
         std::unique_ptr<ImplCLManager> upImpl;
 
