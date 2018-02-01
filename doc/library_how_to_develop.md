@@ -6,17 +6,20 @@ OpenPose C++ API - How to Develop OpenPose
 
 
 ## OpenPose Coding Style
-1. Naming:
+1. Error-prone mistakes:
+    1. Do never use std::mutex.lock and/or std::mutex.unlock. Use std::unique_lock<std::mutex> if unlock required or std::lock_guard<std::mutex> otherwise.
+    2. Do never use the new keyword with std::shared_ptr, but rather: std::make_shared<>.
+2. Naming:
     1. Class parameters should start with `m`, class pointers with `p`, shared_ptrs with `sp`, unique_ptrs with `up`, static parameters with `s`.
     2. Function and class parameters coding style is the same other than the previous point.
     3. Any parameters should not contain special characters, simply letters and numbers (preferred only letters) separated with upper case. E.g., `mThisIsAParameter`, `thisIsAParameter`.
     4. In addition, the names should be self-explanatory and not abbreviated. Good examples: `counter`, `thisIs. Bad examples: `ctr`, `var`.
-2. Lenght:
+3. Lenght:
     1. Lines should contain up to 120 characters.
-3. Comments:
+4. Comments:
     1. Only `//` comments are allowed in the code, `/* */` should not be used.
     2. There should be a (at least) 1-line comment for each block of code inside each function.
-4. Loops and statements:
+5. Loops and statements:
     1. There should be a space between the keyword (`if`, `for`, etc) and the parenthesis, e.g.: `if (true)`. Wrong: `if(true)`. Note: So they can be easily located with Ctrl + F.
     2. Braces should be added in the following line with respect to the loop/statement keyword. See example in point 3.
     3. 1-line loops/statements should not contain braces. E.g.:
@@ -30,7 +33,7 @@ else
 }
 ```
 
-5. Includes:
+6. Includes:
     1. They should be sorted in this order:
         1. Std libraries.
         2. OS libraries.
@@ -38,10 +41,10 @@ else
         4. OpenPose libraries.
         5. If it is a cpp file, the last one should be its own hpp.
     2. Inside each of the previous groups, it should be sorted alphabetically.
-6. Functions arguments:
+7. Functions arguments:
     1. It should first include the variables to be edited, and secondtly the const variables.
     2. Any variable that is not gonna be modified must be added with `const`.
-7. Pointers:
+8. Pointers:
     1. Pointers must be avoided if possible.
     2. If a pointer must be used, std::unique_ptr must be always be used.
     3. If the pointer must be shared, then std::shared_ptr.

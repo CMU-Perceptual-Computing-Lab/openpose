@@ -195,15 +195,18 @@ if (UNIX AND NOT APPLE)
       message(FATAL_ERROR "Spinnaker not found. Either turn off the `BUILD_MODULE_3D` option or specify the path of
         Spinnaker includes and libs.")
     endif (NOT SPINNAKER_FOUND)
+  # Otherwise error if 3D module enabled, and then disabled (with Spinnaker not installed)
+  else (BUILD_MODULE_3D)
+    set(SPINNAKER_LIB "")
   endif (BUILD_MODULE_3D)
 
   # OpenMP
   if (${GPU_MODE} MATCHES "CPU_ONLY")
     find_package(OpenMP)
     if (OPENMP_FOUND)
-      set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-      set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-      set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+      set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+      set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
     endif ()
   endif ()
 
