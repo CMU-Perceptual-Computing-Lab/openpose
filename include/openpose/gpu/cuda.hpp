@@ -1,5 +1,5 @@
-#ifndef OPENPOSE_UTILITIES_CUDA_HPP
-#define OPENPOSE_UTILITIES_CUDA_HPP
+#ifndef OPENPOSE_GPU_CUDA_HPP
+#define OPENPOSE_GPU_CUDA_HPP
 
 #include <utility> // std::pair
 #include <openpose/core/common.hpp>
@@ -10,7 +10,7 @@ namespace op
 
     OP_API void cudaCheck(const int line = -1, const std::string& function = "", const std::string& file = "");
 
-    OP_API int getGpuNumber();
+    OP_API int getCudaGpuNumber();
 
     inline unsigned int getNumberCudaBlocks(const unsigned int totalRequired,
                                             const unsigned int numberCudaThreads = CUDA_NUM_THREADS)
@@ -22,4 +22,4 @@ namespace op
                                               const Point<int>& frameSize);
 }
 
-#endif // OPENPOSE_UTILITIES_CUDA_HPP
+#endif // OPENPOSE_GPU_CUDA_HPP

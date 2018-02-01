@@ -183,6 +183,7 @@ OpenPose Library - Release Notes
 2. Main bugs fixed:
     1. Slight speed up (~1%) for performing the non-maximum suppression stage only in the body part heatmaps channels, and not also in the PAF channels.
     2. Fixed core-dumped in PoseRenderer with GUI when changed element to be rendered to something else than skeleton.
+    3. 3-D visualizer does not crash on exit anymore.
 
 
 

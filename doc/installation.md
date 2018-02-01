@@ -205,7 +205,7 @@ You can include the 3D reconstruction module by:
         - Copy `Spinnaker_v140.lib` and `Spinnakerd_v140.lib` from `{PointGreyParentDirectory}\Point Grey Research\Spinnaker\lib64\vs2015\` into `{OpenPoseDirectory}\3rdparty\windows\spinnaker\lib\`.
         - (Optional) Spinnaker SDK overview: [https://www.ptgrey.com/spinnaker-sdk](https://www.ptgrey.com/spinnaker-sdk).
 2. Install the 3D visualizer, FreeGLUT:
-    1. Ubuntu: run `sudo apt-get install freeglut3 freeglut3-dev`.
+    1. Ubuntu: run `sudo apt-get install freeglut3 freeglut3-dev libxmu-dev libxi-dev`.
     2. Windows:
         1. It is automatically downloaded by the CMake installer.
         2. Alternatively, if you prefer to download it yourself, you could either:
