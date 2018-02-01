@@ -15,9 +15,9 @@ namespace op
             return clManagers[deviceId];
         else
         {
-            managerMutex.lock();
+            std::unique_lock<std::mutex> lock{managerMutex};
             clManagers[deviceId] = std::shared_ptr<OpenCL>(new OpenCL(deviceId, deviceType, getFromVienna));
-            managerMutex.unlock();
+            lock.unlock();
             return clManagers[deviceId];
         }
     }

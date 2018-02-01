@@ -111,23 +111,23 @@ namespace op
             int y = get_global_id(1);
             int index = y*w + x;
 
-            if(index != 0){
+            if (index != 0){
                 int prev = kernelPtr[index-1];
                 int curr = kernelPtr[index];
-                if(curr < maxPeaks){
-                    if(prev - curr){
+                if (curr < maxPeaks){
+                    if (prev - curr){
                         Type fx = 0; Type fy = 0; Type fscore = 0;
                         nmsAccuratePeakPosition(sourcePtr, x, y, w, h, &fx, &fy, &fscore);
-                        if(debug) printf("C %d %d %d \n", x,y,kernelPtr[index]);
+                        if (debug) printf("C %d %d %d \n", x,y,kernelPtr[index]);
                         Type* output = &targetPtr[curr*3];
                         output[0] = fx; output[1] = fy; output[2] = fscore;
                     }
-                    if(index + 1 == w*h){
+                    if (index + 1 == w*h){
                         Type* output = &targetPtr[0*3];
                         output[0] = curr;
                     }
                 }else{
-                    if(index + 1 == w*h){
+                    if (index + 1 == w*h){
                         Type* output = &targetPtr[0*3];
                         output[0] = maxPeaks;
                     }
@@ -143,6 +143,14 @@ namespace op
         try
         {
             #ifdef USE_OPENCL
+            // Security checks
+            if (sourceSize.empty())
+                error("sourceSize cannot be empty.", __LINE__, __FUNCTION__, __FILE__);
+            if (targetSize.empty())
+                error("targetSize cannot be empty.", __LINE__, __FUNCTION__, __FILE__);
+            if (threshold < 0 || threshold > 1.0)
+                error("threshold value invalid.", __LINE__, __FUNCTION__, __FILE__);
+
             //Forward_cpu(bottom, top);
             const auto num = sourceSize[0];
             const auto height = sourceSize[2];

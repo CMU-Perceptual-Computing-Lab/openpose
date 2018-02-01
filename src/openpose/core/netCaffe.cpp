@@ -70,7 +70,7 @@ namespace op
                             caffe::Caffe::set_mode(caffe::Caffe::GPU);
                             std::vector<int> devices;
                             int maxNumberGpu = op::OpenCL::getTotalGPU();
-                            for(int i=0; i<maxNumberGpu; i++)
+                            for (int i=0; i<maxNumberGpu; i++)
                                 devices.push_back(i);
                             caffe::Caffe::SetDevices(devices);
                             if (mGpuId >= maxNumberGpu)
