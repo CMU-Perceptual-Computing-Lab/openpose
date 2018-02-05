@@ -40,6 +40,8 @@ You might select multiple topics, delete the rest:
 **Installation mode**: CMake, sh script, manual Makefile installation, ... (Ubuntu); VS2015, VS2017, CMake, ... (Windows); ...?
 **CUDA version** (`cat /usr/local/cuda/version.txt` in most cases):
 **cuDNN version**:
+**Release or Debug mode**? (by defualt: release):
+**3-D Reconstruction module added**? (by default: no):
 **GPU model** (`nvidia-smi` in Ubuntu):
 **Caffe version**: Default from OpenPose, custom version, ...?
 **OpenCV version**: pre-compiled `apt-get install libopencv-dev` (only Ubuntu); OpenPose default (only Windows); compiled from source? If so, 2.4.9, 2.4.12, 3.1, 3.2?; ...?
