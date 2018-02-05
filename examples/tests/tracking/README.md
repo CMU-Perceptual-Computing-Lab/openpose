@@ -12,6 +12,7 @@
 ## Files description
 
 - **test_of.cpp**: Accuracy tester of the custom LK Pyramidal implementation. OpenCV and OpenPose ground truth are shown.
+ **test_of_speed.cpp**: Performance (spped) tester of the custom LK Pyramidal implementation for both GPU and CPU.
 </div>
 
 
@@ -24,6 +25,7 @@ You will need to add the OpenPose shared library to your LD_LIBRARY_PATH environ
 
     ```export LD_LIBRARY_PATH=./build/lib/``` 
 
+## 1) Accuracy tester
 You will need to have a dataset ready for testing. Currently there are 4 datasets available for testing. In the future the dataset generation will be automated:
 
 1. Boxing video:
@@ -75,5 +77,18 @@ will show the statistics of errors with respect to OpenPose (median, minimum, ma
 </div>
 
 
+## 2) Speed tester
 
+## Running the speed tester (test_of_speed).
+
+From the OpenPose home directory you can call the OpticalFlow speed tester (make sure it is compiled first after running 'make' in the OpenPose home directory).
+
+    ./build/examples/tests/tracking/test_of_spped.bin -i 500 -n 900 -g -d ./examples/tests/tracking/data_speed_test/
+
+The following options are provided by the accuracy tester:
+
+- **-i (Mandatory)**: Number of times you want to run the simulation (the average of all iterations is calculated. For GPU test the first two runs are ignored due to the GPU initialization overhead).
+- **-n (Mandatory)**: Number of keypoints where OF will be computed in each simulation
+- **-g**: Runs the test using the GPU version
+- **-d**: Data directory where the two frames (It and It_+1) are read. By default it is './examples/tests/tracking/data_speed_test/'. The two files should be named '001.jpg' and '002.jpg'. The tester directory provides two sample images.
 
