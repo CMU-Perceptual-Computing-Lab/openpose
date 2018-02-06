@@ -69,52 +69,53 @@ OpenPose can be easily updated by:
 ## Installation
 The instructions in this section describe the steps to build OpenPose using CMake (GUI). There are 3 main steps:
 
-1. [Prerequisites (Ubuntu Only)](#prerequisites-ubuntu-only)
-2. [Caffe Prerequisites (Ubuntu Only)](#caffe-prerequisites-ubuntu-only)
-3. [OpenPose Configuration](#openpose-configuration)
-4. [OpenPose Building](#openpose-building)
-5. [OpenPose from other Projects (Ubuntu Only)](#openpose-from-other-projects-ubuntu-only) 
-6. [Run OpenPose](#run-openpose)
+1. [Prerequisites](#prerequisites)
+2. [OpenPose Configuration](#openpose-configuration)
+3. [OpenPose Building](#openpose-building)
+4. [OpenPose from other Projects (Ubuntu Only)](#openpose-from-other-projects-ubuntu-only) 
+5. [Run OpenPose](#run-openpose)
 
 
 
-### Prerequisites (Ubuntu Only)
-OpenCV must be already installed on your machine. It can be installed with `apt-get install libopencv-dev`. You can also use your own compiled OpenCV version.
-
-
-
-### Caffe Prerequisites (Ubuntu Only)
-By default, OpenPose uses Caffe under the hood. If you have not used Caffe previously, install its dependencies by running:
-```bash
-bash ./ubuntu/install_cmake.sh
-```
+### Prerequisites
+1. Download and install CMake GUI.
+    - Ubuntu: run the command `sudo apt-get install cmake-qt-gui`. Note: If you prefer to use CMake through the command line, see [Cmake Command Line Build](#cmake-command-line-build-ubuntu-only).
+    - Windows: download and install the latest CMake win64-x64 msi installer from the [CMake website](https://cmake.org/download/), called `cmake-X.X.X-win64-x64.msi`.
+2. [**CUDA 8**](https://developer.nvidia.com/cuda-80-ga2-download-archive).
+    - Ubuntu: Run `ubuntu/install_cuda.sh` or alternatively download and install it from their website.
+    - Windows: Install CUDA 8.0 after Visual Studio 2015 is installed to assure that the CUDA installation will generate all necessary files for VS. If CUDA was already installed, re-install CUDA after installing VS!
+3. [**cuDNN 5.1**](https://developer.nvidia.com/cudnn):
+    - Ubuntu: Run `ubuntu/install_cudnn.sh` or alternatively download and install it from their website.
+    - Windows (and Ubuntu if manual installation): In order to manually install it, just unzip it and copy (merge) the contents on the CUDA folder, usually `/usr/local/cuda/` in Ubuntu and `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0` in Windows.
+3. (Ubuntu):
+    - Caffe prerequisites: By default, OpenPose uses Caffe under the hood. If you have not used Caffe previously, install its dependencies by running `bash ./ubuntu/install_cmake.sh`.
+    - OpenCV must be already installed on your machine. It can be installed with `apt-get install libopencv-dev`. You can also use your own compiled OpenCV version.
+4. (Windows): **Microsoft Visual Studio (VS) 2015 Enterprise Update 3**.
+    - If **Visual Studio 2017 Community** is desired, we do not officially support it, but it might be compiled by firstly [enabling CUDA 8.0 in VS2017](https://stackoverflow.com/questions/43745099/using-cuda-with-visual-studio-2017?answertab=active#tab-top) or use **VS2017 with CUDA 9** by checking the `.vcxproj` file and changing the necessary paths from CUDA 8 to 9.
+    - VS 2015 Enterprise Update 1 will give some compiler errors and VS 2015 Community has not been tested.
 
 
 
 ### OpenPose Configuration
-1. Download and install CMake GUI.
-    - Ubuntu: runn the command `sudo apt-get install cmake-qt-gui`. Note: If you prefer to use CMake through the command line, see [Cmake Command Line Build](#cmake-command-line-build-ubuntu-only).
-    - Windows: download and install the latest CMake win64-x64 msi installer from the [CMake website](https://cmake.org/download/), called `cmake-X.X.X-win64-x64.msi`.
-
-2. Open CMake GUI and select the OpenPose directory as project source directory, and a non-existing or empty sub-directory (e.g., `build`) where the Makefile files (Ubuntu) or Visual Studio solution (Windows) will be generated. If `build` does not exist, it will ask you whether to create it. Press `Yes`.
+1. Open CMake GUI and select the OpenPose directory as project source directory, and a non-existing or empty sub-directory (e.g., `build`) where the Makefile files (Ubuntu) or Visual Studio solution (Windows) will be generated. If `build` does not exist, it will ask you whether to create it. Press `Yes`.
 <p align="center">
     <img src="media/cmake_installation/im_1.png", width="480">
     <img src="media/cmake_installation/im_1_windows.png", width="480">
 </p>
 
-3. Press the `Configure` button, keep the generator in `Unix Makefile` (Ubuntu) or set it to `Visual Studio 14 2015 Win64` (Windows), and press `Finish`.
+2. Press the `Configure` button, keep the generator in `Unix Makefile` (Ubuntu) or set it to `Visual Studio 14 2015 Win64` (Windows), and press `Finish`.
 <p align="center">
     <img src="media/cmake_installation/im_2.png", width="240">
     <img src="media/cmake_installation/im_2_windows.png", width="240">
 </p>
 
-4. If this step is successful, the `Configuring done` text will appear in the bottom box in the last line. Otherwise, some red text will appear in that same bottom box.
+3. If this step is successful, the `Configuring done` text will appear in the bottom box in the last line. Otherwise, some red text will appear in that same bottom box.
 <p align="center">
     <img src="media/cmake_installation/im_3.png", width="480">
     <img src="media/cmake_installation/im_3_windows.png", width="480">
 </p>
 
-5. Press the `Generate` button and proceed to [OpenPose Building](#openpose-building). You can now close CMake.
+4. Press the `Generate` button and proceed to [OpenPose Building](#openpose-building). You can now close CMake.
 
 Note: If you prefer to use your own custom Caffe or OpenCV versions, see [Custom Caffe](#custom-caffe) or [Custom OpenCV](#custom-opencv) respectively.
 
