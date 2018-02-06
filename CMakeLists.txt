@@ -183,7 +183,14 @@ if (UNIX AND NOT APPLE)
   endif ()
   find_package(GFlags)
   find_package(Glog)
-  find_package(OpenCV)
+  if (OpenCV_CONFIG_FILE)
+    include (${OpenCV_CONFIG_FILE})
+  elseif (OpenCV_INCLUDE_DIRS AND OpenCV_LIBS_DIR)
+    file(GLOB_RECURSE OpenCV_LIBS "${OpenCV_LIBS_DIR}*.so")
+    set(OpenCV_FOUND 1)
+  else ()
+    find_package(OpenCV)
+  endif (OpenCV_CONFIG_FILE)
 
   # 3D
   if (BUILD_MODULE_3D)
@@ -306,12 +313,6 @@ if (UNIX AND NOT APPLE)
       message(STATUS "\${Caffe_LIBS} set by the user to " ${Caffe_LIBS})
       set(Caffe_FOUND 1)
     endif (Caffe_INCLUDE_DIRS AND Caffe_LIBS AND NOT BUILD_CAFFE)
-
-    # Check if caffe is installed in known paths
-    if (NOT Caffe_FOUND AND NOT BUILD_CAFFE)
-      message(STATUS "Looking for caffe around in expected paths.")
-      find_package(Caffe)
-    endif (NOT Caffe_FOUND AND NOT BUILD_CAFFE)
 
     # Else build from scratch
     if (BUILD_CAFFE)
