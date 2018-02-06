@@ -78,19 +78,19 @@ The instructions in this section describe the steps to build OpenPose using CMak
 
 
 ### Prerequisites
-1. Download and install CMake GUI.
+1. Download and install CMake GUI:
     - Ubuntu: run the command `sudo apt-get install cmake-qt-gui`. Note: If you prefer to use CMake through the command line, see [Cmake Command Line Build](#cmake-command-line-build-ubuntu-only).
     - Windows: download and install the latest CMake win64-x64 msi installer from the [CMake website](https://cmake.org/download/), called `cmake-X.X.X-win64-x64.msi`.
-2. [**CUDA 8**](https://developer.nvidia.com/cuda-80-ga2-download-archive).
+2. [**CUDA 8**](https://developer.nvidia.com/cuda-80-ga2-download-archive):
     - Ubuntu: Run `ubuntu/install_cuda.sh` or alternatively download and install it from their website.
     - Windows: Install CUDA 8.0 after Visual Studio 2015 is installed to assure that the CUDA installation will generate all necessary files for VS. If CUDA was already installed, re-install CUDA after installing VS!
 3. [**cuDNN 5.1**](https://developer.nvidia.com/cudnn):
     - Ubuntu: Run `ubuntu/install_cudnn.sh` or alternatively download and install it from their website.
     - Windows (and Ubuntu if manual installation): In order to manually install it, just unzip it and copy (merge) the contents on the CUDA folder, usually `/usr/local/cuda/` in Ubuntu and `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0` in Windows.
-3. (Ubuntu):
+3. Ubuntu - Other prerequisites:
     - Caffe prerequisites: By default, OpenPose uses Caffe under the hood. If you have not used Caffe previously, install its dependencies by running `bash ./ubuntu/install_cmake.sh`.
     - OpenCV must be already installed on your machine. It can be installed with `apt-get install libopencv-dev`. You can also use your own compiled OpenCV version.
-4. (Windows): **Microsoft Visual Studio (VS) 2015 Enterprise Update 3**.
+4. Windows - **Microsoft Visual Studio (VS) 2015 Enterprise Update 3**:
     - If **Visual Studio 2017 Community** is desired, we do not officially support it, but it might be compiled by firstly [enabling CUDA 8.0 in VS2017](https://stackoverflow.com/questions/43745099/using-cuda-with-visual-studio-2017?answertab=active#tab-top) or use **VS2017 with CUDA 9** by checking the `.vcxproj` file and changing the necessary paths from CUDA 8 to 9.
     - VS 2015 Enterprise Update 1 will give some compiler errors and VS 2015 Community has not been tested.
 
