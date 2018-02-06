@@ -269,9 +269,16 @@ cmake ..
 ```
 
 ##### SCENARIO 2 -- Caffe installed and OpenCV build from source
-In this example, we assume that Caffe and OpenCV are already present. The user needs to supply the paths of the library to CMake. For OpenCV, specify the `OpenCV_DIR` which is where the user build OpenCV. For Caffe, specify the include directory and library using the `Caffe_INCLUDE_DIRS` and `Caffe_LIBS` variables. This will be where you installed Caffe. Below is an example of the same.
+In this example, we assume that Caffe and OpenCV are already present. The user needs to supply the paths of the libraries and the include directories to CMake. For OpenCV, specify the include directories and the libraries directory using `OpenCV_INCLUDE_DIRS` and `OpenCV_LIBS_DIR` variables respectively. Alternatively, the user can also specify the path to the `OpenCVConfig.cmake` file by setting the `OpenCV_CONFIG_FILE` variable. For Caffe, specify the include directory and library using the `Caffe_INCLUDE_DIRS` and `Caffe_LIBS` variables. This will be where you installed Caffe. Below is an example of the same.
 ```bash
-cmake -DOpenCV_DIR=/home/"${USER}"/softwares/opencv/build \
+cmake -DOpenCV_INCLUDE_DIRS=/home/"${USER}"/softwares/opencv/build/install/include \
+  -DOpenCV_LIBS_DIR=/home/"${USER}"/softwares/opencv/build/install/lib \
+  -DCaffe_INCLUDE_DIRS=/home/"${USER}"/softwares/caffe/build/install/include \
+  -DCaffe_LIBS=/home/"${USER}"/softwares/caffe/build/install/lib/libcaffe.so -DBUILD_CAFFE=OFF ..
+```
+
+```bash
+cmake -DOpenCV_CONFIG_FILE=/home/"${USER}"/softwares/opencv/build/install/share/OpenCV/OpenCVConfig.cmake \
   -DCaffe_INCLUDE_DIRS=/home/"${USER}"/softwares/caffe/build/install/include \
   -DCaffe_LIBS=/home/"${USER}"/softwares/caffe/build/install/lib/libcaffe.so -DBUILD_CAFFE=OFF ..
 ```
@@ -279,5 +286,10 @@ cmake -DOpenCV_DIR=/home/"${USER}"/softwares/opencv/build \
 ##### SCENARIO 3 -- OpenCV already installed
 If Caffe is not already present but OpenCV is, then use the below command.
 ```bash
-cmake -DOpenCV_DIR=/home/"${USER}"/softwares/opencv/build
+cmake -DOpenCV_INCLUDE_DIRS=/home/"${USER}"/softwares/opencv/build/install/include \
+  -DOpenCV_LIBS_DIR=/home/"${USER}"/softwares/opencv/build/install/lib ..
+```
+
+```bash
+cmake -DOpenCV_CONFIG_FILE=/home/"${USER}"/softwares/opencv/build/install/share/OpenCV/OpenCVConfig.cmake ..
 ```
