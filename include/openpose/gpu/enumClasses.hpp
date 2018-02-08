@@ -7,7 +7,7 @@ namespace op
     {
         CUDA = 0,
         OPEN_CL = 1,
-        CPU_ONLY = 2,
+        CPU = 2,
         Size,
     };
 }
