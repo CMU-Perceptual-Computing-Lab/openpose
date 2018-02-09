@@ -1,5 +1,5 @@
-#ifndef OPENPOSE_WRAPPER_AUXILIARY_HPP
-#define OPENPOSE_WRAPPER_AUXILIARY_HPP
+#ifndef OPENPOSE_WRAPPER_WRAPPER_AUXILIARY_HPP
+#define OPENPOSE_WRAPPER_WRAPPER_AUXILIARY_HPP
 
 #include <openpose/wrapper/wrapperStructFace.hpp>
 #include <openpose/wrapper/wrapperStructHand.hpp>
@@ -20,14 +20,14 @@ namespace op
      * @param userOutputWsEmpty
      * @param threadManagerMode
      */
-    void wrapperConfigureSecurityChecks(const WrapperStructPose& wrapperStructPose,
-                                        const WrapperStructFace& wrapperStructFace,
-                                        const WrapperStructHand& wrapperStructHand,
-                                        const WrapperStructInput& wrapperStructInput,
-                                        const WrapperStructOutput& wrapperStructOutput,
-                                        const bool renderOutput,
-                                        const bool userOutputWsEmpty,
-                                        const ThreadManagerMode threadManagerMode);
+	OP_API void wrapperConfigureSecurityChecks(const WrapperStructPose& wrapperStructPose,
+                                               const WrapperStructFace& wrapperStructFace,
+                                               const WrapperStructHand& wrapperStructHand,
+                                               const WrapperStructInput& wrapperStructInput,
+                                               const WrapperStructOutput& wrapperStructOutput,
+                                               const bool renderOutput,
+                                               const bool userOutputWsEmpty,
+                                               const ThreadManagerMode threadManagerMode);
 }
 
-#endif // OPENPOSE_WRAPPER_AUXILIARY_HPP
+#endif // OPENPOSE_WRAPPER_WRAPPER_AUXILIARY_HPP

@@ -168,6 +168,10 @@
     <ClInclude Include="..\..\include\openpose\filestream\wPeopleJsonSaver.hpp" />
     <ClInclude Include="..\..\include\openpose\filestream\wPoseSaver.hpp" />
     <ClInclude Include="..\..\include\openpose\filestream\wVideoSaver.hpp" />
+    <ClInclude Include="..\..\include\openpose\gpu\cuda.hpp" />
+    <ClInclude Include="..\..\include\openpose\gpu\enumClasses.hpp" />
+    <ClInclude Include="..\..\include\openpose\gpu\gpu.hpp" />
+    <ClInclude Include="..\..\include\openpose\gpu\headers.hpp" />
     <ClInclude Include="..\..\include\openpose\gui\enumClasses.hpp" />
     <ClInclude Include="..\..\include\openpose\gui\frameDisplayer.hpp" />
     <ClInclude Include="..\..\include\openpose\gui\gui.hpp" />
@@ -234,7 +238,6 @@
     <ClInclude Include="..\..\include\openpose\thread\workerProducer.hpp" />
     <ClInclude Include="..\..\include\openpose\thread\wQueueOrderer.hpp" />
     <ClInclude Include="..\..\include\openpose\utilities\check.hpp" />
-    <ClInclude Include="..\..\include\openpose\utilities\cuda.hpp" />
     <ClInclude Include="..\..\include\openpose\utilities\enumClasses.hpp" />
     <ClInclude Include="..\..\include\openpose\utilities\errorAndLog.hpp" />
     <ClInclude Include="..\..\include\openpose\utilities\fastMath.hpp" />
@@ -249,6 +252,7 @@
     <ClInclude Include="..\..\include\openpose\utilities\string.hpp" />
     <ClInclude Include="..\..\include\openpose\wrapper\headers.hpp" />
     <ClInclude Include="..\..\include\openpose\wrapper\wrapper.hpp" />
+    <ClInclude Include="..\..\include\openpose\wrapper\wrapperAuxiliary.hpp" />
     <ClInclude Include="..\..\include\openpose\wrapper\wrapperStructFace.hpp" />
     <ClInclude Include="..\..\include\openpose\wrapper\wrapperStructHand.hpp" />
     <ClInclude Include="..\..\include\openpose\wrapper\wrapperStructInput.hpp" />
@@ -256,7 +260,7 @@
     <ClInclude Include="..\..\include\openpose\wrapper\wrapperStructPose.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\include\openpose\utilities\cuda.hu" />
+    <None Include="..\..\include\openpose\gpu\cuda.hu" />
     <None Include="..\..\include\openpose\utilities\render.hu" />
   </ItemGroup>
   <ItemGroup>
@@ -303,6 +307,8 @@
     <ClCompile Include="..\..\src\openpose\filestream\keypointSaver.cpp" />
     <ClCompile Include="..\..\src\openpose\filestream\peopleJsonSaver.cpp" />
     <ClCompile Include="..\..\src\openpose\filestream\videoSaver.cpp" />
+    <ClCompile Include="..\..\src\openpose\gpu\cuda.cpp" />
+    <ClCompile Include="..\..\src\openpose\gpu\gpu.cpp" />
     <ClCompile Include="..\..\src\openpose\gui\defineTemplates.cpp" />
     <ClCompile Include="..\..\src\openpose\gui\frameDisplayer.cpp" />
     <ClCompile Include="..\..\src\openpose\gui\gui.cpp" />
@@ -334,7 +340,6 @@
     <ClCompile Include="..\..\src\openpose\producer\videoReader.cpp" />
     <ClCompile Include="..\..\src\openpose\producer\webcamReader.cpp" />
     <ClCompile Include="..\..\src\openpose\thread\defineTemplates.cpp" />
-    <ClCompile Include="..\..\src\openpose\utilities\cuda.cpp" />
     <ClCompile Include="..\..\src\openpose\utilities\errorAndLog.cpp" />
     <ClCompile Include="..\..\src\openpose\utilities\fileSystem.cpp" />
     <ClCompile Include="..\..\src\openpose\utilities\flagsToOpenPose.cpp" />
@@ -343,6 +348,7 @@
     <ClCompile Include="..\..\src\openpose\utilities\profiler.cpp" />
     <ClCompile Include="..\..\src\openpose\utilities\string.cpp" />
     <ClCompile Include="..\..\src\openpose\wrapper\defineTemplates.cpp" />
+    <ClCompile Include="..\..\src\openpose\wrapper\wrapperAuxiliary.cpp" />
     <ClCompile Include="..\..\src\openpose\wrapper\wrapperStructFace.cpp" />
     <ClCompile Include="..\..\src\openpose\wrapper\wrapperStructHand.cpp" />
     <ClCompile Include="..\..\src\openpose\wrapper\wrapperStructInput.cpp" />

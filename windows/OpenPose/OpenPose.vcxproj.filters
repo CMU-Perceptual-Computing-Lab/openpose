@@ -90,6 +90,12 @@
     <Filter Include="Header Files\experimental\3d">
       <UniqueIdentifier>{080754ef-07d7-41ed-a363-509c1202f108}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\gpu">
+      <UniqueIdentifier>{01b90523-3151-4008-9799-3e664b523dc4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\gpu">
+      <UniqueIdentifier>{ffd0a630-de3e-4857-93d1-b78ed7a56c4c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\openpose\headers.hpp">
@@ -482,9 +488,6 @@
     <ClInclude Include="..\..\include\openpose\utilities\check.hpp">
       <Filter>Header Files\utilities</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\openpose\utilities\cuda.hpp">
-      <Filter>Header Files\utilities</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\openpose\utilities\enumClasses.hpp">
       <Filter>Header Files\utilities</Filter>
     </ClInclude>
@@ -569,10 +572,25 @@
     <ClInclude Include="..\..\include\openpose\experimental\3d\renderer.hpp">
       <Filter>Header Files\experimental\3d</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\openpose\wrapper\wrapperAuxiliary.hpp">
+      <Filter>Header Files\wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\gpu\cuda.hpp">
+      <Filter>Header Files\gpu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\gpu\enumClasses.hpp">
+      <Filter>Header Files\gpu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\gpu\gpu.hpp">
+      <Filter>Header Files\gpu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\openpose\gpu\headers.hpp">
+      <Filter>Header Files\gpu</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\include\openpose\utilities\cuda.hu">
-      <Filter>Header Files\utilities</Filter>
+    <None Include="..\..\include\openpose\gpu\cuda.hu">
+      <Filter>Header Files\gpu</Filter>
     </None>
     <None Include="..\..\include\openpose\utilities\render.hu">
       <Filter>Header Files\utilities</Filter>
@@ -635,6 +653,18 @@
     </ClCompile>
     <ClCompile Include="..\..\src\openpose\core\scaleAndSizeExtractor.cpp">
       <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\experimental\3d\cameraParameters.cpp">
+      <Filter>Source Files\experimental\3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\experimental\3d\pointGrey.cpp">
+      <Filter>Source Files\experimental\3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\experimental\3d\reconstruction3D.cpp">
+      <Filter>Source Files\experimental\3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\experimental\3d\renderer.cpp">
+      <Filter>Source Files\experimental\3d</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\openpose\face\defineTemplates.cpp">
       <Filter>Source Files\face</Filter>
@@ -701,6 +731,12 @@
     </ClCompile>
     <ClCompile Include="..\..\src\openpose\gui\guiInfoAdder.cpp">
       <Filter>Source Files\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\gpu\cuda.cpp">
+      <Filter>Source Files\gpu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\openpose\gpu\gpu.cpp">
+      <Filter>Source Files\gpu</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\openpose\hand\defineTemplates.cpp">
       <Filter>Source Files\hand</Filter>
@@ -783,9 +819,6 @@
     <ClCompile Include="..\..\src\openpose\thread\defineTemplates.cpp">
       <Filter>Source Files\thread</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\openpose\utilities\cuda.cpp">
-      <Filter>Source Files\utilities</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\openpose\utilities\errorAndLog.cpp">
       <Filter>Source Files\utilities</Filter>
     </ClCompile>
@@ -810,6 +843,9 @@
     <ClCompile Include="..\..\src\openpose\wrapper\defineTemplates.cpp">
       <Filter>Source Files\wrapper</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\openpose\wrapper\wrapperAuxiliary.cpp">
+      <Filter>Source Files\wrapper</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\openpose\wrapper\wrapperStructFace.cpp">
       <Filter>Source Files\wrapper</Filter>
     </ClCompile>
@@ -830,18 +866,6 @@
     </ClCompile>
     <ClCompile Include="..\..\src\openpose\experimental\tracking\personIdExtractor.cpp">
       <Filter>Source Files\experimental\tracking</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\openpose\experimental\3d\pointGrey.cpp">
-      <Filter>Source Files\experimental\3d</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\openpose\experimental\3d\reconstruction3D.cpp">
-      <Filter>Source Files\experimental\3d</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\openpose\experimental\3d\renderer.cpp">
-      <Filter>Source Files\experimental\3d</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\openpose\experimental\3d\cameraParameters.cpp">
-      <Filter>Source Files\experimental\3d</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

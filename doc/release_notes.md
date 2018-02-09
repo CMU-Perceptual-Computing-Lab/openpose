@@ -180,6 +180,7 @@ OpenPose Library - Release Notes
     8. Lighter Caffe version compiled by CMake in Ubuntu: disabled Caffe extra support (e.g., OpenCV, Python) and doc.
     9. Renamed CMake binaries (Ubuntu) to match old Makefile format: `_bin` by `.bin`.
     10. 3-D Reconstruction demo cleaned, implemented in Ubuntu too, and now defined as experimental module of OpenPose rather than just a demo.
+    11. CMake as default installer in documentation.
 2. Main bugs fixed:
     1. Slight speed up (~1%) for performing the non-maximum suppression stage only in the body part heatmaps channels, and not also in the PAF channels.
     2. Fixed core-dumped in PoseRenderer with GUI when changed element to be rendered to something else than skeleton.
