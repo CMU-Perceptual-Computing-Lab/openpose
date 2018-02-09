@@ -66,7 +66,7 @@ namespace op
         {
             int x = get_global_id(0);
             int y = get_global_id(1);
-            int index = y*w + x;
+            int index = y*w + x;      
 
             if (0 < x && x < (w-1) && 0 < y && y < (h-1))
             {
@@ -89,7 +89,7 @@ namespace op
                         //Type fx = 0; Type fy = 0; Type fscore = 0;
                         //nmsAccuratePeakPosition(sourcePtr, x, y, w, h, &fx, &fy, &fscore);
                         kernelPtr[index] = 1;
-                        if(debug) printf("%d %d \n", x,y);
+                        //if(debug) printf("%d %d \n", x,y);
                     }
                     else
                         kernelPtr[index] = 0;
@@ -118,17 +118,17 @@ namespace op
                     if (prev - curr){
                         Type fx = 0; Type fy = 0; Type fscore = 0;
                         nmsAccuratePeakPosition(sourcePtr, x, y, w, h, &fx, &fy, &fscore);
-                        if (debug) printf("C %d %d %d \n", x,y,kernelPtr[index]);
-                        Type* output = &targetPtr[curr*3];
+                        //if (debug) printf("C %d %d %d \n", x,y,kernelPtr[index]);
+                        __global Type* output = &targetPtr[curr*3];
                         output[0] = fx; output[1] = fy; output[2] = fscore;
                     }
                     if (index + 1 == w*h){
-                        Type* output = &targetPtr[0*3];
+                        __global Type* output = &targetPtr[0*3];
                         output[0] = curr;
                     }
                 }else{
                     if (index + 1 == w*h){
-                        Type* output = &targetPtr[0*3];
+                        __global Type* output = &targetPtr[0*3];
                         output[0] = maxPeaks;
                     }
                 }

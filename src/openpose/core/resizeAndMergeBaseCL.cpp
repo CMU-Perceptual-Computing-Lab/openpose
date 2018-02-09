@@ -167,7 +167,7 @@ namespace op
             int y = get_global_id(1);
             int c = get_global_id(2);
 
-            Type* targetPtrC = &targetPtr[c*targetWidth*targetHeight];
+            __global Type* targetPtrC = &targetPtr[c*targetWidth*targetHeight];
             targetPtrC[y*targetWidth+x] = 0;
         }
     );

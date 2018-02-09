@@ -46,7 +46,7 @@ cv::Mat gpuResize(cv::Mat& img, cv::Size newSize){
     cudaFree(newGpuPtr);
     return newImg;
 #else
-    error("OpenPose must be compiled with the `USE_CAFFE` & `USE_CUDA` macro definitions in order to run"
+    op::error("OpenPose must be compiled with the `USE_CAFFE` & `USE_CUDA` macro definitions in order to run"
           " this functionality.", __LINE__, __FUNCTION__, __FILE__);
 #endif
 }
