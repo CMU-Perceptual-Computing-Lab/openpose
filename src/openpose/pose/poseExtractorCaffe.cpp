@@ -144,7 +144,7 @@ namespace op
         {
             #ifdef USE_CAFFE
                 // Layers parameters
-                upImpl->spBodyPartConnectorCaffe->setPoseModel(mPoseModel);
+                upImpl->spBodyPartConnectorCaffe->setPoseModel(upImpl->mPoseModel);
             #else
                 UNUSED(poseModel);
                 UNUSED(modelFolder);
@@ -239,8 +239,8 @@ namespace op
                         reshapePoseExtractorCaffe(upImpl->spResizeAndMergeCaffe, upImpl->spNmsCaffe,
                                                   upImpl->spBodyPartConnectorCaffe, upImpl->spCaffeNetOutputBlobs,
                                                   upImpl->spHeatMapsBlob, upImpl->spPeaksBlob,
-                                                  1.f, mPoseModel);
-                                                  // scaleInputToNetInputs[i], mPoseModel);
+                                                  1.f, upImpl->mPoseModel);
+                                                  // scaleInputToNetInputs[i], upImpl->mPoseModel);
                     }
                 }
 

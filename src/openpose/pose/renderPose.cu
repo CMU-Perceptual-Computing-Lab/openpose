@@ -455,7 +455,7 @@ namespace op
                         framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
                         blendOriginalFrame, alphaBlending
                     );
-                else if (poseModel == PoseModel::BODY_19)
+                else if (poseModel == PoseModel::BODY_19 || poseModel == PoseModel::BODY_19_X2)
                     renderPoseBody19<<<threadsPerBlock, numBlocks>>>(
                         framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
                         blendOriginalFrame, alphaBlending

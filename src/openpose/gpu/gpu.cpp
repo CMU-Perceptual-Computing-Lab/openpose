@@ -38,13 +38,13 @@ namespace op
             #elif defined USE_OPENCL
                 return GpuMode::OPEN_CL;
             #else
-                return GpuMode::CPU_ONLY;
+                return GpuMode::NO_GPU;
             #endif
         }
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return GpuMode::CPU_ONLY;
+            return GpuMode::NO_GPU;
         }
     }
 }
