@@ -47,7 +47,7 @@ DEFINE_int32(camera,                    -1,             "The camera index for cv
 DEFINE_string(camera_resolution,        "1280x720",     "Size of the camera frames to ask for.");
 DEFINE_double(camera_fps,               30.0,           "Frame rate for the webcam (only used when saving video from webcam). Set this value to the"
                                                         " minimum value between the OpenPose displayed speed and the webcam real frame rate.");
-DEFINE_string(video,                    "examples/media/video.avi",             "Use a video file instead of the camera. Use `examples/media/video.avi` for our default"
+DEFINE_string(video,                    "",             "Use a video file instead of the camera. Use `examples/media/video.avi` for our default"
                                                         " example video.");
 DEFINE_string(image_dir,                "",             "Process a directory of images. Use `examples/media/` for our default example folder with 20"
                                                         " images. Read all standard formats (jpg, png, bmp, etc.).");
