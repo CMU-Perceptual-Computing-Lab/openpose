@@ -10,8 +10,11 @@ namespace op
         try
         {
             // Get files on directory with the desired extensions
-            const std::vector<std::string> extensions{"bmp", "dib", "pbm", "pgm", "ppm", "sr", "ras",   // Completely supported by OpenCV
-                                                      "jpg", "jpeg", "png"};                            // Most of them supported by OpenCV
+            const std::vector<std::string> extensions{
+                // Completely supported by OpenCV
+                "bmp", "dib", "pbm", "pgm", "ppm", "sr", "ras",
+                // Most of them supported by OpenCV
+                "jpg", "jpeg", "png"};
             const auto imagePaths = getFilesOnDirectory(imageDirectoryPath, extensions);
 
             // Check #files > 0
@@ -45,7 +48,8 @@ namespace op
         try
         {
             auto frame = loadImage(mFilePaths.at(mFrameNameCounter++).c_str(), CV_LOAD_IMAGE_COLOR);
-            // Check frame integrity. This function also checks width/height changes. However, if it is performed after setWidth/setHeight this is performed over the new resolution (so they always match).
+            // Check frame integrity. This function also checks width/height changes. However, if it is performed
+            // after setWidth/setHeight this is performed over the new resolution (so they always match).
             checkFrameIntegrity(frame);
             // Update size, since images might have different size between each one of them
             mResolution = Point<int>{frame.cols, frame.rows};

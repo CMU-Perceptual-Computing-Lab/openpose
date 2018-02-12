@@ -1,6 +1,6 @@
 ﻿#include <mutex>
 #include <stdio.h>
-#ifdef BUILD_MODULE_3D
+#ifdef WITH_3D_RENDERER
     #include <GL/glut.h>
     #include <GL/freeglut_ext.h> // glutLeaveMainLoop
     #include <GL/freeglut_std.h>
@@ -15,7 +15,7 @@ namespace op
 {
     const bool LOG_VERBOSE_3D_RENDERER = false;
 
-    #ifdef BUILD_MODULE_3D
+    #ifdef WITH_3D_RENDERER
         struct Keypoints3D
         {
             Array<float> mPoseKeypoints;
@@ -206,7 +206,7 @@ namespace op
         }
 
         // this is the actual idle function
-        void idleFunc()
+        void idleFunction()
         {
             glutPostRedisplay();
             glutSwapBuffers();
@@ -381,8 +381,7 @@ namespace op
                 char *my_argv[] = { NULL };
                 int my_argc = 0;
                 glutInit(&my_argc, my_argv);
-
-                // setup the size, position, and display mode for new windows
+                // Setup the size, position, and display mode for new windows
                 glutInitWindowSize(1280, 720);
                 glutInitWindowPosition(200, 0);
                 // glutSetOption(GLUT_MULTISAMPLE,8);
@@ -390,14 +389,14 @@ namespace op
                 // button, but it does not work (tested in Ubuntu)
                 // https://stackoverflow.com/questions/3799803/is-it-possible-to-make-a-window-withouth-a-top-in-glut
                 glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_MULTISAMPLE);
-
-                // create and set up a window
+                // Create and set up a window
                 glutCreateWindow(GUI_NAME.c_str());
                 initGraphics();
                 glutDisplayFunc(renderMain);
                 glutMouseFunc(mouseButton);
                 glutMotionFunc(mouseMotion);
-                glutIdleFunc(idleFunc);
+                // Only required if glutMainLoop() called
+                // glutIdleFunc(idleFunction);
                 // Full screen would fix the problem of disabling `x` button
                 // glutFullScreen();
                 // Key presses
@@ -414,12 +413,12 @@ namespace op
     {
         try
         {
-            #ifdef BUILD_MODULE_3D
+            #ifdef WITH_3D_RENDERER
                 // Update sPoseModel
                 sPoseModel = poseModel;
             #else
                 UNUSED(poseModel);
-                error("OpenPose must be compiled with `BUILD_MODULE_3D` in order to use this class.",
+                error("OpenPose must be compiled with `WITH_3D_RENDERER` in order to use this class.",
                           __LINE__, __FUNCTION__, __FILE__);
             #endif
         }
@@ -433,7 +432,7 @@ namespace op
     {
         try
         {
-            #ifdef BUILD_MODULE_3D
+            #ifdef WITH_3D_RENDERER
                 glutLeaveMainLoop();
             #endif
         }
@@ -445,7 +444,7 @@ namespace op
 
     void WRender3D::initializationOnThread()
     {
-        #ifdef BUILD_MODULE_3D
+        #ifdef WITH_3D_RENDERER
             try
             {
                 // Init display
@@ -462,9 +461,11 @@ namespace op
 
     void WRender3D::workConsumer(const std::shared_ptr<std::vector<Datum3D>>& datumsPtr)
     {
-        #ifdef BUILD_MODULE_3D
+        #ifdef WITH_3D_RENDERER
             try
             {
+                // Debugging log
+                dLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 // Profiling speed
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                 // User's displaying/saving/other processing here
@@ -504,9 +505,12 @@ namespace op
                     this->stop();
                 // OpenCL - Run main loop event
                 // It is run outside loop, or it would get visually stuck if loop to slow
+                idleFunction();
                 glutMainLoopEvent();
                 // This alternative can only be called once, and it will block the thread until program exit
                 // glutMainLoop();
+                // Debugging log
+                dLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             }
             catch (const std::exception& e)
             {

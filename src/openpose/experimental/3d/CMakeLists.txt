@@ -1,6 +1,6 @@
 set(SOURCES_OP_3D
     cameraParameters.cpp
-    pointGrey.cpp
+    flirReader.cpp
     reconstruction3D.cpp
     renderer.cpp)
 

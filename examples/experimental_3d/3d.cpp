@@ -206,7 +206,7 @@ int openpose()
 
     // Initializing the user custom classes
     // Frames producer (e.g. video, webcam, ...)
-    auto wPointGrey = std::make_shared<op::WPointGrey>();
+    auto wFlirReader = std::make_shared<op::WFlirReader>();
     // Processing
     auto wReconstruction3D = std::make_shared<op::WReconstruction3D>();
     // GUI (Display)
@@ -215,7 +215,7 @@ int openpose()
     op::Wrapper<std::vector<op::Datum3D>> opWrapper;
     // Add custom input
     const auto workerInputOnNewThread = true;
-    opWrapper.setWorkerInput(wPointGrey, workerInputOnNewThread);
+    opWrapper.setWorkerInput(wFlirReader, workerInputOnNewThread);
     // Add custom processing
     const auto workerProcessingOnNewThread = true;
     opWrapper.setWorkerPostProcessing(wReconstruction3D, workerProcessingOnNewThread);

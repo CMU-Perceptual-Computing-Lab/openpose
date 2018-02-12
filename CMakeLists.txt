@@ -144,7 +144,8 @@ if (${GPU_MODE} MATCHES "CUDA")
 endif (${GPU_MODE} MATCHES "CUDA")
 
 # Suboptions for OpenPose 3D Reconstruction demo
-option(BUILD_MODULE_3D "Build OpenPose 3D Reconstruction module." OFF)
+option(WITH_3D_RENDERER "Add OpenPose 3D renderer module (it requires FreeGLUT library)." OFF)
+option(WITH_FLIR_CAMERA "Add FLIR (formerly Point Grey) camera code (requires Spinnaker SDK already installed)." OFF)
 
 # Download the models
 option(DOWNLOAD_COCO_MODEL "Download COCO model." ON)
@@ -171,10 +172,14 @@ if (${GPU_MODE} MATCHES "CUDA")
 endif ()
 
 # Adding 3D
-if (BUILD_MODULE_3D)
+if (WITH_3D_RENDERER)
   # OpenPose flags
-  add_definitions(-DBUILD_MODULE_3D)
-endif (BUILD_MODULE_3D)
+  add_definitions(-DWITH_3D_RENDERER)
+endif (WITH_3D_RENDERER)
+if (WITH_FLIR_CAMERA)
+  # OpenPose flags
+  add_definitions(-DWITH_FLIR_CAMERA)
+endif (WITH_FLIR_CAMERA)
 
 if (UNIX AND NOT APPLE)
   if (${GPU_MODE} MATCHES "CUDA")
@@ -193,19 +198,21 @@ if (UNIX AND NOT APPLE)
   endif (OpenCV_CONFIG_FILE)
 
   # 3D
-  if (BUILD_MODULE_3D)
+  if (WITH_3D_RENDERER)
     # GLUT
     find_package(GLUT REQUIRED)
+  endif (WITH_3D_RENDERER)
+  if (WITH_FLIR_CAMERA)
     # Spinnaker
     find_package(Spinnaker)
     if (NOT SPINNAKER_FOUND)
-      message(FATAL_ERROR "Spinnaker not found. Either turn off the `BUILD_MODULE_3D` option or specify the path of
-        Spinnaker includes and libs.")
+      message(FATAL_ERROR "Spinnaker not found. Either turn off the `WITH_FLIR_CAMERA` option or specify the path to
+        the Spinnaker includes and libs.")
     endif (NOT SPINNAKER_FOUND)
   # Otherwise error if 3D module enabled, and then disabled (with Spinnaker not installed)
-  else (BUILD_MODULE_3D)
+  else (WITH_FLIR_CAMERA)
     set(SPINNAKER_LIB "")
-  endif (BUILD_MODULE_3D)
+  endif (WITH_FLIR_CAMERA)
 
   # OpenMP
   if (${GPU_MODE} MATCHES "CPU_ONLY")
@@ -271,9 +278,9 @@ if (WIN32)
   download_zip("opencv_310.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 1e5240a64b814b3c0b822f136be78ad7)
   download_zip("caffe3rdparty_2017_07_14.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} ec0f800c8fb337e33304f3375bd06a80)
   download_zip("caffe_2018_01_18.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 4b8e548cc7ea20abea472950dd5301bd)
-  if (BUILD_MODULE_3D)
+  if (WITH_3D_RENDERER)
     download_zip("freeglut_2018_01_14.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} BB182187285E06880F0EDE3A39530091)
-  endif (BUILD_MODULE_3D)
+  endif (WITH_3D_RENDERER)
   message(STATUS "Windows dependencies downloaded.")
 
   find_library(OpenCV_LIBS opencv_world310 HINTS ${FIND_LIB_PREFIX}/opencv/x64/vc14/lib)
@@ -284,20 +291,24 @@ if (WIN32)
   find_library(OpenCV_LIBS opencv_world310 HINTS ${FIND_LIB_PREFIX}/opencv/x64/vc14/lib)
   find_library(Caffe_LIB caffe HINTS ${FIND_LIB_PREFIX}/caffe/lib)
   find_library(Caffe_Proto_LIB caffeproto HINTS ${FIND_LIB_PREFIX}/caffe/lib)
-  if (BUILD_MODULE_3D)
-    find_library(SPINNAKER_LIB spinnaker_v140 HINTS ${FIND_LIB_PREFIX}/spinnaker/lib)
+  if (WITH_3D_RENDERER)
     find_library(GLUT_LIBRARY freeglut HINTS ${FIND_LIB_PREFIX}/freeglut/lib)
     message(STATUS "\${GLUT_LIBRARY} = ${GLUT_LIBRARY}")
-  endif (BUILD_MODULE_3D)
+  endif (WITH_3D_RENDERER)
+  if (WITH_FLIR_CAMERA)
+    find_library(SPINNAKER_LIB spinnaker_v140 HINTS ${FIND_LIB_PREFIX}/spinnaker/lib)
+  endif (WITH_FLIR_CAMERA)
   set(Caffe_LIBS ${Caffe_LIB};${Caffe_Proto_LIB})
   set(OpenCV_INCLUDE_DIRS "3rdparty/windows/opencv/include")
   set(Caffe_INCLUDE_DIRS "3rdparty/windows/caffe/include;3rdparty/windows/caffe/include2")
   set(Boost_INCLUDE_DIRS "3rdparty/windows/caffe3rdparty/include/boost-1_61")
   set(WINDOWS_INCLUDE_DIRS "3rdparty/windows/caffe3rdparty/include")
-  if (BUILD_MODULE_3D)
-    set(SPINNAKER_INCLUDE_DIRS "3rdparty/windows/spinnaker/include")
+  if (WITH_3D_RENDERER)
     set(GLUT_INCLUDE_DIRS "3rdparty/windows/freeglut/include")
-  endif (BUILD_MODULE_3D)
+  endif (WITH_3D_RENDERER)
+  if (WITH_FLIR_CAMERA)
+    set(SPINNAKER_INCLUDE_DIRS "3rdparty/windows/spinnaker/include")
+  endif (WITH_FLIR_CAMERA)
   set(Caffe_FOUND 1)
 endif (WIN32)
 
@@ -445,9 +456,12 @@ if (${GPU_MODE} MATCHES "CUDA")
       ${CUDA_INCLUDE_DIRS})
 endif ()
 # 3D
-if (BUILD_MODULE_3D)
-  include_directories(${GLUT_INCLUDE_DIRS} ${SPINNAKER_INCLUDE_DIRS})
-endif (BUILD_MODULE_3D)
+if (WITH_3D_RENDERER)
+  include_directories(${GLUT_INCLUDE_DIRS})
+endif (WITH_3D_RENDERER)
+if (WITH_FLIR_CAMERA)
+  include_directories(${SPINNAKER_INCLUDE_DIRS})
+endif (WITH_FLIR_CAMERA)
 # Windows includes
 if (WIN32)
   include_directories(

@@ -14,6 +14,7 @@ namespace op
         Array<float> faceKeypoints3D;
         Array<float> leftHandKeypoints3D;
         Array<float> rightHandKeypoints3D;
+        cv::Mat cameraParameterMatrix;
     };
 }
 

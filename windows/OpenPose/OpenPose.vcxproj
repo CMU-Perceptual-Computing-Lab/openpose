@@ -125,8 +125,8 @@
     <ClInclude Include="..\..\include\openpose\core\wScaleAndSizeExtractor.hpp" />
     <ClInclude Include="..\..\include\openpose\experimental\3d\cameraParameters.hpp" />
     <ClInclude Include="..\..\include\openpose\experimental\3d\datum3D.hpp" />
+    <ClInclude Include="..\..\include\openpose\experimental\3d\flirReader.hpp" />
     <ClInclude Include="..\..\include\openpose\experimental\3d\headers.hpp" />
-    <ClInclude Include="..\..\include\openpose\experimental\3d\pointGrey.hpp" />
     <ClInclude Include="..\..\include\openpose\experimental\3d\reconstruction3D.hpp" />
     <ClInclude Include="..\..\include\openpose\experimental\3d\renderer.hpp" />
     <ClInclude Include="..\..\include\openpose\experimental\headers.hpp" />
@@ -284,7 +284,7 @@
     <ClCompile Include="..\..\src\openpose\core\resizeAndMergeCaffe.cpp" />
     <ClCompile Include="..\..\src\openpose\core\scaleAndSizeExtractor.cpp" />
     <ClCompile Include="..\..\src\openpose\experimental\3d\cameraParameters.cpp" />
-    <ClCompile Include="..\..\src\openpose\experimental\3d\pointGrey.cpp" />
+    <ClCompile Include="..\..\src\openpose\experimental\3d\flirReader.cpp" />
     <ClCompile Include="..\..\src\openpose\experimental\3d\reconstruction3D.cpp" />
     <ClCompile Include="..\..\src\openpose\experimental\3d\renderer.cpp" />
     <ClCompile Include="..\..\src\openpose\experimental\tracking\defineTemplates.cpp" />

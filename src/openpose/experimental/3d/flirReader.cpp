@@ -1,20 +1,20 @@
 ﻿#include <chrono>
 #include <thread>
 #include <opencv2/imgproc/imgproc.hpp>
-#ifdef BUILD_MODULE_3D
+#ifdef WITH_FLIR_CAMERA
     #include <Spinnaker.h>
 #endif
 #include <openpose/experimental/3d/cameraParameters.hpp>
 #include <openpose/utilities/check.hpp>
-#include <openpose/experimental/3d/pointGrey.hpp>
+#include <openpose/experimental/3d/flirReader.hpp>
 
 namespace op
 {
-    #ifdef BUILD_MODULE_3D
+    #ifdef WITH_FLIR_CAMERA
         /*
          * This function converts between Spinnaker::ImagePtr container to cv::Mat container used in OpenCV.
         */
-        cv::Mat pointGreyToCvMat(const Spinnaker::ImagePtr &imagePtr)
+        cv::Mat flirReaderToCvMat(const Spinnaker::ImagePtr &imagePtr)
         {
             try
             {
@@ -266,10 +266,10 @@ namespace op
                     for (auto i = 0u; i < imagePtrs.size(); i++)
                     {
                         // Baseline
-                        // cvMats.emplace_back(pointGreyToCvMat(imagePtrs.at(i)).clone());
+                        // cvMats.emplace_back(flirReaderToCvMat(imagePtrs.at(i)).clone());
                         // Undistort
                         // http://docs.opencv.org/2.4/modules/imgproc/doc/geometric_transformations.html#undistort
-                        auto auxCvMat = pointGreyToCvMat(imagePtrs.at(i));
+                        auto auxCvMat = flirReaderToCvMat(imagePtrs.at(i));
                         cvMats.emplace_back();
                         cv::undistort(auxCvMat, cvMats[i], getIntrinsics(i), getDistorsion(i));
                     }
@@ -321,29 +321,29 @@ namespace op
         }
     #endif
 
-    struct WPointGrey::ImplWPointGrey
+    struct WFlirReader::ImplWFlirReader
     {
-        #ifdef BUILD_MODULE_3D
+        #ifdef WITH_FLIR_CAMERA
             bool mInitialized;
             Spinnaker::CameraList mCameraList;
             Spinnaker::SystemPtr mSystemPtr;
 
-            ImplWPointGrey() :
+            ImplWFlirReader() :
                 mInitialized{false}
             {
             }
         #endif
     };
 
-    WPointGrey::WPointGrey()
-        #ifdef BUILD_MODULE_3D
-         : upImpl{new ImplWPointGrey{}}
+    WFlirReader::WFlirReader()
+        #ifdef WITH_FLIR_CAMERA
+         : upImpl{new ImplWFlirReader{}}
         #endif
     {
         try
         {
-            #ifndef BUILD_MODULE_3D
-                error("OpenPose must be compiled with `BUILD_MODULE_3D` in order to use this class.",
+            #ifndef WITH_FLIR_CAMERA
+                error("OpenPose must be compiled with `WITH_FLIR_CAMERA` in order to use this class.",
                           __LINE__, __FUNCTION__, __FILE__);
             #endif
         }
@@ -353,9 +353,9 @@ namespace op
         }
     }
 
-    WPointGrey::~WPointGrey()
+    WFlirReader::~WFlirReader()
     {
-        #ifdef BUILD_MODULE_3D
+        #ifdef WITH_FLIR_CAMERA
             try
             {
                 if (upImpl->mInitialized)
@@ -417,9 +417,9 @@ namespace op
         #endif
     }
 
-    void WPointGrey::initializationOnThread()
+    void WFlirReader::initializationOnThread()
     {
-        #ifdef BUILD_MODULE_3D
+        #ifdef WITH_FLIR_CAMERA
             try
             {
                 upImpl->mInitialized = true;
@@ -600,13 +600,15 @@ namespace op
         #endif
     }
 
-    std::shared_ptr<std::vector<Datum3D>> WPointGrey::workProducer()
+    std::shared_ptr<std::vector<Datum3D>> WFlirReader::workProducer()
     {
         try
         {
-            #ifdef BUILD_MODULE_3D
+            #ifdef WITH_FLIR_CAMERA
                 try
                 {
+                    // Debugging log
+                    dLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     // Profiling speed
                     const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                     // Get image from each camera
@@ -616,7 +618,8 @@ namespace op
                     for (auto i = 0u ; i < cvMats.size() ; i++)
                     {
                         datums3d->at(i).cvInputData = cvMats.at(i);
-                        datums3d->at(i).cvOutputData = (*datums3d)[i].cvInputData;
+                        (*datums3d)[i].cvOutputData = (*datums3d)[i].cvInputData;
+                        (*datums3d)[i].cameraParameterMatrix = getM(i);
                     }
                     // Profiling speed
                     if (!cvMats.empty())
@@ -624,6 +627,8 @@ namespace op
                         Profiler::timerEnd(profilerKey);
                         Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);
                     }
+                    // Debugging log
+                    dLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     // Return Datum
                     return datums3d;
                 }
@@ -634,7 +639,7 @@ namespace op
                     return nullptr;
                 }
             #else
-                error("OpenPose must be compiled with `BUILD_MODULE_3D` in order to use this class.",
+                error("OpenPose must be compiled with `WITH_FLIR_CAMERA` in order to use this class.",
                       __LINE__, __FUNCTION__, __FILE__);
                 return nullptr;
             #endif

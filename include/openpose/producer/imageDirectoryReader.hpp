@@ -15,8 +15,8 @@ namespace op
     {
     public:
         /**
-         * Constructor of ImageDirectoryReader. It sets the image directory path from which the images will be loaded and
-         * generates a std::vector<std::string> with the list of images on that directory.
+         * Constructor of ImageDirectoryReader. It sets the image directory path from which the images will be loaded
+         * and generates a std::vector<std::string> with the list of images on that directory.
          * @param imageDirectoryPath const std::string parameter with the folder path containing the images.
          */
         explicit ImageDirectoryReader(const std::string& imageDirectoryPath);

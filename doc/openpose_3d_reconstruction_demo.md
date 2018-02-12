@@ -8,7 +8,8 @@
 4. [Camera Calibration](#camera-calibration)
 5. [Camera Ordering](#camera-ordering)
 6. [Installing the OpenPose 3-D Reconstruction Module](#installing-the-openpose-3-d-reconstruction-module)
-7. [Known Bug](#known-bug)
+7. [Using a Different Camera Brand](#using-a-different-camera-brand)
+8. [Known Bug](#known-bug)
 
 
 
@@ -84,6 +85,11 @@ It should be similar to the following image.
 <p align="center">
     <img src="media/openpose3d.png">
 </p>
+
+
+
+## Using a Different Camera Brand
+You can copy and modify the OpenPose 3-D demo to use any camera brand, by modifying the frames producer. For that, you would need to provide your custom code to retrieve synchronized images from your cameras, as well as their intrinsic and extrinsic camera parameters.
 
 
 
