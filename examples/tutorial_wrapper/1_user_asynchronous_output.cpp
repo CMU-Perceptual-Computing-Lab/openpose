@@ -137,6 +137,11 @@ DEFINE_bool(hand_tracking,              false,          "Adding hand tracking mi
                                                         " is high enough, i.e. >7 FPS per GPU) and video. This is not person ID tracking, it"
                                                         " simply looks for hands in positions at which hands were located in previous frames, but"
                                                         " it does not guarantee the same person ID among frames.");
+// OpenPose 3-D Reconstruction
+DEFINE_bool(3d,                         false,          "Running OpenPose 3-D reconstruction demo: 1) Reading from a stereo camera system."
+                                                        " 2) Performing 3-D reconstruction from the multiple views. 3) Displaying 3-D reconstruction"
+                                                        " results. Note that it will only display 1 person. If multiple people is present, it will"
+                                                        " fail.");
 // OpenPose Rendering
 DEFINE_int32(part_to_show,              0,              "Prediction channel to visualize (default: 0). 0 for all the body parts, 1-18 for each body"
                                                         " part heat map, 19 for the background heat map, 20 for all the body part heat maps"
@@ -335,7 +340,7 @@ int openPoseTutorialWrapper1()
                                                   (float)FLAGS_alpha_heatmap, FLAGS_part_to_show, FLAGS_model_folder,
                                                   heatMapTypes, heatMapScale, FLAGS_part_candidates,
                                                   (float)FLAGS_render_threshold, FLAGS_number_people_max,
-                                                  enableGoogleLogging};
+                                                  enableGoogleLogging, FLAGS_3d};
     // Face configuration (use op::WrapperStructFace{} to disable it)
     const op::WrapperStructFace wrapperStructFace{FLAGS_face, faceNetInputSize,
                                                   op::flagsToRenderMode(FLAGS_face_render, FLAGS_render_pose),
@@ -352,10 +357,10 @@ int openPoseTutorialWrapper1()
                                                     FLAGS_process_real_time, FLAGS_frame_flip, FLAGS_frame_rotate,
                                                     FLAGS_frames_repeat};
     // Consumer (comment or use default argument to disable any output)
-    const bool displayGui = false;
+    const auto displayMode = op::DisplayMode::NoDisplay;
     const bool guiVerbose = false;
     const bool fullScreen = false;
-    const op::WrapperStructOutput wrapperStructOutput{displayGui, guiVerbose, fullScreen, FLAGS_write_keypoint,
+    const op::WrapperStructOutput wrapperStructOutput{displayMode, guiVerbose, fullScreen, FLAGS_write_keypoint,
                                                       op::stringToDataFormat(FLAGS_write_keypoint_format),
                                                       writeJson, FLAGS_write_coco_json,
                                                       FLAGS_write_images, FLAGS_write_images_format, FLAGS_write_video,

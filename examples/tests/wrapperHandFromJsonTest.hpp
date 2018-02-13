@@ -27,7 +27,7 @@ namespace op
                        const std::shared_ptr<Producer>& producerSharedPtr,
                        const std::string& handGroundTruth,
                        const std::string& writeJson,
-                       const bool displayGui = false);
+                       const DisplayMode displayMode = DisplayMode::NoDisplay);
 
         /**
          * Function to start multi-threading.
@@ -120,7 +120,7 @@ namespace op
                                                                       const std::shared_ptr<Producer>& producerSharedPtr,
                                                                       const std::string& handGroundTruth,
                                                                       const std::string& writeJson,
-                                                                      const bool displayGui)
+                                                                      const DisplayMode displayMode)
     {
         try
         {
@@ -131,13 +131,15 @@ namespace op
 
             // Check no wrong/contradictory flags enabled
             if (wrapperStructPose.scaleGap <= 0.f && wrapperStructPose.scalesNumber > 1)
-                error("The scale gap must be greater than 0 (it has no effect if the number of scales is 1).", __LINE__, __FUNCTION__, __FILE__);
-            const std::string additionalMessage = " You could also set mThreadManagerMode = mThreadManagerMode::Asynchronous(Out) and/or add your own"
-                                                  " output worker class before calling this function.";
+                error("The scale gap must be greater than 0 (it has no effect if the number of scales is 1).",
+                      __LINE__, __FUNCTION__, __FILE__);
+            const std::string additionalMessage = " You could also set mThreadManagerMode = mThreadManagerMode::Asynchronous(Out)"
+                                                  " and/or add your own output worker class before calling this function.";
             const auto savingSomething = !writeJson.empty();
+            const auto displayGui = (displayMode != DisplayMode::NoDisplay);
             if (!displayGui && !savingSomething)
             {
-                const auto message = "No output is selected (`no_display`) and no results are generated (no `write_X` flags enabled). Thus,"
+                const auto message = "No output is selected (`--display 0`) and no results are generated (no `write_X` flags enabled). Thus,"
                                      " no output would be generated." + additionalMessage;
                 error(message, __LINE__, __FUNCTION__, __FILE__);
             }

@@ -1,26 +1,26 @@
-#ifndef OPENPOSE_GUI_W_GUI_HPP
-#define OPENPOSE_GUI_W_GUI_HPP
+#ifndef OPENPOSE_GUI_W_GUI_3D_HPP
+#define OPENPOSE_GUI_W_GUI_3D_HPP
 
 #include <openpose/core/common.hpp>
-#include <openpose/gui/gui.hpp>
+#include <openpose/gui/gui3D.hpp>
 #include <openpose/thread/workerConsumer.hpp>
 
 namespace op
 {
     template<typename TDatums>
-    class WGui : public WorkerConsumer<TDatums>
+    class WGui3D : public WorkerConsumer<TDatums>
     {
     public:
-        explicit WGui(const std::shared_ptr<Gui>& gui);
+        explicit WGui3D(const std::shared_ptr<Gui3D>& gui3D);
 
         void initializationOnThread();
 
         void workConsumer(const TDatums& tDatums);
 
     private:
-        std::shared_ptr<Gui> spGui;
+        std::shared_ptr<Gui3D> spGui3D;
 
-        DELETE_COPY(WGui);
+        DELETE_COPY(WGui3D);
     };
 }
 
@@ -33,17 +33,17 @@ namespace op
 namespace op
 {
     template<typename TDatums>
-    WGui<TDatums>::WGui(const std::shared_ptr<Gui>& gui) :
-        spGui{gui}
+    WGui3D<TDatums>::WGui3D(const std::shared_ptr<Gui3D>& gui3D) :
+        spGui3D{gui3D}
     {
     }
 
     template<typename TDatums>
-    void WGui<TDatums>::initializationOnThread()
+    void WGui3D<TDatums>::initializationOnThread()
     {
         try
         {
-            spGui->initializationOnThread();
+            spGui3D->initializationOnThread();
         }
         catch (const std::exception& e)
         {
@@ -52,30 +52,32 @@ namespace op
     }
 
     template<typename TDatums>
-    void WGui<TDatums>::workConsumer(const TDatums& tDatums)
+    void WGui3D<TDatums>::workConsumer(const TDatums& tDatums)
     {
         try
         {
             // tDatums might be empty but we still wanna update the GUI
             if (tDatums != nullptr)
             {
-                // Check tDatums->size() == 1
-                if (tDatums->size() > 1)
-                    error("Only implemented for tDatums->size() == 1", __LINE__, __FUNCTION__, __FILE__);
                 // Debugging log
                 dLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 // Profiling speed
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
-                // T* to T
-                auto& tDatumsNoPtr = *tDatums;
-                // Set image
-                const auto cvOutputData = (!tDatumsNoPtr.empty() ? tDatumsNoPtr[0].cvOutputData : cv::Mat());
-                spGui->setImage(cvOutputData);
-                // Refresh GUI
-                spGui->update();
-                // Profiling speed
-                if (!tDatumsNoPtr.empty())
+                if (!tDatums->empty())
                 {
+                    // T* to T
+                    auto& tDatum = (*tDatums)[0];
+                    // Update cvMat
+                    std::vector<cv::Mat> cvOutputDatas;
+                    for (auto& tDatum : *tDatums)
+                        cvOutputDatas.emplace_back(tDatum.cvOutputData);
+                    spGui3D->setImage(cvOutputDatas);
+                    // Update keypoints
+                    spGui3D->setKeypoints(tDatum.poseKeypoints3D, tDatum.faceKeypoints3D, tDatum.handKeypoints3D[0],
+                                          tDatum.handKeypoints3D[1]);
+                    // Refresh/update GUI
+                    spGui3D->update();
+                    // Profiling speed
                     Profiler::timerEnd(profilerKey);
                     Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);
                 }
@@ -90,7 +92,7 @@ namespace op
         }
     }
 
-    COMPILE_TEMPLATE_DATUM(WGui);
+    COMPILE_TEMPLATE_DATUM(WGui3D);
 }
 
-#endif // OPENPOSE_GUI_W_GUI_HPP
+#endif // OPENPOSE_GUI_W_GUI_3D_HPP

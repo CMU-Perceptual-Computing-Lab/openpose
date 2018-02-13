@@ -2,6 +2,7 @@ set(SOURCES_OP_GUI
     defineTemplates.cpp
     frameDisplayer.cpp
     gui.cpp
+    gui3D.cpp
     guiInfoAdder.cpp
 )
 

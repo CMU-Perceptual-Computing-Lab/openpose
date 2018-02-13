@@ -2,14 +2,15 @@ OpenPose - Installation
 ==========================
 
 ## Contents
-1. [Operating Systems](#operating-systems)
-2. [Requirements](#requirements)
-3. [Clone OpenPose](#clone-openpose)
-4. [Update OpenPose](#update-openpose)
-5. [Installation](#installation)
-6. [Reinstallation](#reinstallation)
-7. [Uninstallation](#uninstallation)
-8. [Optional Settings](#optional-settings)
+1. [Windows Portable Demo](#windows-portable-demo)
+2. [Operating Systems](#operating-systems)
+3. [Requirements](#requirements)
+4. [Clone OpenPose](#clone-openpose)
+5. [Update OpenPose](#update-openpose)
+6. [Installation](#installation)
+7. [Reinstallation](#reinstallation)
+8. [Uninstallation](#uninstallation)
+9. [Optional Settings](#optional-settings)
     1. [MPI Model](#mpi-model)
     2. [OpenPose 3D Reconstruction Module and Demo](#openpose-3d-reconstruction-module-and-demo)
     3. [Compiling without cuDNN](#compiling-without-cudnn)
@@ -17,6 +18,11 @@ OpenPose - Installation
     5. [Custom OpenCV (Ubuntu Only)](#custom-opencv-ubuntu-only)
     6. [Doxygen Documentation Autogeneration (Ubuntu Only)](#doxygen-documentation-autogeneration-ubuntu-only)
     7. [CMake Command Line Configuration (Ubuntu Only)](#cmake-command-line-configuration-ubuntu-only)
+
+
+
+## Windows Portable Demo
+This installation section is only intended if you plan to modify the OpenPose code or integrate it with another library or project. If you just want to use the OpenPose demo in Windows, simply use the latest version of the OpenPose binaries which you can find in the [Releases](https://github.com/CMU-Perceptual-Computing-Lab/openpose/releases) section.
 
 
 

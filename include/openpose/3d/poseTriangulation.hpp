@@ -6,8 +6,8 @@
 
 namespace op
 {
-    OP_API void reconstructArray(Array<float>& keypoints3D, const std::vector<Array<float>>& keypointsVector,
-                                 const std::vector<cv::Mat>& matrixEachCamera);
+    OP_API Array<float> reconstructArray(const std::vector<Array<float>>& keypointsVector,
+                                         const std::vector<cv::Mat>& matrixEachCamera);
 }
 
 #endif // OPENPOSE_3D_POSE_TRIANGULATION_HPP

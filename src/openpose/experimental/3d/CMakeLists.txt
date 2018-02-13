@@ -1,7 +1,6 @@
 set(SOURCES_OP_3D
     cameraParameters.cpp
-    flirReader.cpp
-    renderer.cpp)
+    flirReader.cpp)
 
 include(${CMAKE_SOURCE_DIR}/cmake/Utils.cmake)
 prepend(SOURCES_OP_3D_WITH_CP ${CMAKE_CURRENT_SOURCE_DIR} ${SOURCES_OP_3D})
@@ -9,11 +8,11 @@ set(SOURCES_OP_3D_WITH_CP ${SOURCES_OP_3D_WITH_CP} PARENT_SCOPE)
 set(SOURCES_OPENPOSE ${SOURCES_OPENPOSE} ${SOURCES_OP_3D_WITH_CP} PARENT_SCOPE)
 
 if (UNIX AND NOT APPLE)
-	add_library(openpose_3d ${SOURCES_OP_3D})
+	add_library(openpose_experimental_3d ${SOURCES_OP_3D})
 
-	set_target_properties(openpose_3d PROPERTIES COMPILE_FLAGS ${OP_CXX_FLAGS})
+	set_target_properties(openpose_experimental_3d PROPERTIES COMPILE_FLAGS ${OP_CXX_FLAGS})
 
-	install(TARGETS openpose_3d
+	install(TARGETS openpose_experimental_3d
 	    EXPORT OpenPose
 	    RUNTIME DESTINATION bin
 	    LIBRARY DESTINATION lib

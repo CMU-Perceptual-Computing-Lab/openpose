@@ -182,8 +182,9 @@ DEFINE_double(hand_alpha_heatmap,       0.7,            "Analogous to `alpha_hea
 DEFINE_bool(fullscreen,                 false,          "Run in full-screen mode (press f during runtime to toggle).");
 DEFINE_bool(no_gui_verbose,             false,          "Do not write text on output images on GUI (e.g. number of current frame and people). It"
                                                         " does not affect the pose rendering.");
-DEFINE_bool(no_display,                 false,          "Do not open a display window. Useful if there is no X server and/or to slightly speed up"
-                                                        " the processing if visual output is not required.");
+DEFINE_int32(display,                   -1,             "Display mode: -1 for automatic selection; 0 for no display (useful if there is no X server"
+                                                        " and/or to slightly speed up the processing if visual output is not required); 2 for 2-D"
+                                                        " display; 3 for 3-D display (if `--3d` enabled); and 1 for both 2-D and 3-D display.");
 // Result Saving
 DEFINE_string(write_images,             "",             "Directory to write rendered frames in `write_images_format` image format.");
 DEFINE_string(write_images_format,      "png",          "File extension and format for `write_images`, e.g. png, jpg or bmp. Check the OpenCV"
@@ -279,8 +280,8 @@ int openPoseDemo()
                                                     FLAGS_process_real_time, FLAGS_frame_flip, FLAGS_frame_rotate,
                                                     FLAGS_frames_repeat};
     // Consumer (comment or use default argument to disable any output)
-    const op::WrapperStructOutput wrapperStructOutput{!FLAGS_no_display, !FLAGS_no_gui_verbose, FLAGS_fullscreen,
-                                                      FLAGS_write_keypoint,
+    const op::WrapperStructOutput wrapperStructOutput{op::flagsToDisplayMode(FLAGS_display, FLAGS_3d),
+                                                      !FLAGS_no_gui_verbose, FLAGS_fullscreen, FLAGS_write_keypoint,
                                                       op::stringToDataFormat(FLAGS_write_keypoint_format),
                                                       writeJson, FLAGS_write_coco_json,
                                                       FLAGS_write_images, FLAGS_write_images_format, FLAGS_write_video,

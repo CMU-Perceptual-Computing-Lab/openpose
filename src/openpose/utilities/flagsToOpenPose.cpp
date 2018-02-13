@@ -1,4 +1,5 @@
 #include <cstdio> // sscanf
+// #include <openpose/producer/flirReader.hpp>
 #include <openpose/producer/imageDirectoryReader.hpp>
 #include <openpose/producer/ipCameraReader.hpp>
 #include <openpose/producer/videoReader.hpp>
@@ -97,24 +98,22 @@ namespace op
     }
 
     ProducerType flagsToProducerType(const std::string& imageDirectory, const std::string& videoPath,
-                                     const std::string& ipCameraPath, const int webcamIndex)
+                                     const std::string& ipCameraPath, const int webcamIndex,
+                                     const bool flirCamera)
     {
         try
         {
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             // Avoid duplicates (e.g. selecting at the time camera & video)
-            if (int(!imageDirectory.empty()) + int(!videoPath.empty()) + int(!ipCameraPath.empty()) > 1)
-                error("Selected simultaneously image directory, video and/or IP camera. Please, select only one.",
-                      __LINE__, __FUNCTION__, __FILE__);
-            else if (!imageDirectory.empty() && webcamIndex > 0)
-                error("Selected simultaneously image directory and webcam. Please, select only one.",
-                      __LINE__, __FUNCTION__, __FILE__);
-            else if (!videoPath.empty() && webcamIndex > 0)
-                error("Selected simultaneously video and webcam. Please, select only one.",
-                      __LINE__, __FUNCTION__, __FILE__);
-            else if (!ipCameraPath.empty() && webcamIndex > 0)
-                error("Selected simultaneously IP camera and webcam. Please, select only one.",
-                      __LINE__, __FUNCTION__, __FILE__);
+            if (int(!imageDirectory.empty()) + int(!videoPath.empty()) + int(webcamIndex > 0)
+                + int(flirCamera) + int(!ipCameraPath.empty()) > 1)
+                error("Selected simultaneously"
+                      " image directory (seletected: " + (imageDirectory.empty() ? "no" : imageDirectory) + "),"
+                      " video (seletected: " + (videoPath.empty() ? "no" : videoPath) + "),"
+                      " camera (selected: " + (webcamIndex > 0 ? std::to_string(webcamIndex) : "no") + "),"
+                      " flirCamera (selected: " + (flirCamera ? "yes" : "no") + ","
+                      " and/or IP camera (selected: " + (ipCameraPath.empty() ? "no" : ipCameraPath) + ")."
+                      " Please, select only one.", __LINE__, __FUNCTION__, __FILE__);
 
             // Get desired ProducerType
             if (!imageDirectory.empty())
@@ -123,8 +122,11 @@ namespace op
                 return ProducerType::Video;
             else if (!ipCameraPath.empty())
                 return ProducerType::IPCamera;
+            // else if (flirCamera)
+            //     return ProducerType::FlirCamera;
             else
                 return ProducerType::Webcam;
+            UNUSED(flirCamera);
         }
         catch (const std::exception& e)
         {
@@ -139,8 +141,25 @@ namespace op
     {
         try
         {
+            return flagsToProducer(imageDirectory, videoPath, ipCameraPath, webcamIndex, false, webcamResolution,
+                                   webcamFps);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return std::shared_ptr<Producer>{};
+        }
+    }
+
+    std::shared_ptr<Producer> flagsToProducer(const std::string& imageDirectory, const std::string& videoPath,
+                                              const std::string& ipCameraPath, const int webcamIndex,
+                                              const bool flirCamera, const std::string& webcamResolution,
+                                              const double webcamFps)
+    {
+        try
+        {
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-            const auto type = flagsToProducerType(imageDirectory, videoPath, ipCameraPath, webcamIndex);
+            const auto type = flagsToProducerType(imageDirectory, videoPath, ipCameraPath, webcamIndex, flirCamera);
 
             if (type == ProducerType::ImageDirectory)
                 return std::make_shared<ImageDirectoryReader>(imageDirectory);
@@ -148,6 +167,8 @@ namespace op
                 return std::make_shared<VideoReader>(videoPath);
             else if (type == ProducerType::IPCamera)
                 return std::make_shared<IpCameraReader>(ipCameraPath);
+            // else if (type == ProducerType::FlirCamera)
+            //     return std::make_shared<FlirReader>();
             else if (type == ProducerType::Webcam)
             {
                 // cameraFrameSize
@@ -241,6 +262,41 @@ namespace op
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             return RenderMode::None;
+        }
+    }
+
+    DisplayMode flagsToDisplayMode(const int display, const bool enabled3d)
+    {
+        try
+        {
+            // Automatic --> All if 3d enabled, 2d otherwise
+            if (display == -1)
+            {
+                if (enabled3d)
+                    return DisplayMode::DisplayAll;
+                else
+                    return DisplayMode::Display2D;
+            }
+            // No render
+            else if (display == 0)
+                return DisplayMode::NoDisplay;
+            // All (2-D + 3-D)
+            else if (display == 1)
+                return DisplayMode::DisplayAll;
+            // 2-D
+            else if (display == 2)
+                return DisplayMode::Display2D;
+            // 3-D
+            else if (display == 3)
+                return DisplayMode::Display3D;
+            // else
+            error("Undefined RenderMode selected.", __LINE__, __FUNCTION__, __FILE__);
+            return DisplayMode::NoDisplay;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return DisplayMode::NoDisplay;
         }
     }
 

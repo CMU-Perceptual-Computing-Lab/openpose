@@ -1,4 +1,5 @@
-﻿#include <mutex>
+﻿#include <atomic>
+#include <mutex>
 #include <stdio.h>
 #ifdef WITH_3D_RENDERER
     #include <GL/glut.h>
@@ -9,19 +10,20 @@
 #include <openpose/face/faceParameters.hpp>
 #include <openpose/hand/handParameters.hpp>
 #include <openpose/pose/poseParameters.hpp>
-#include <openpose/experimental/3d/renderer.hpp>
+#include <openpose/gui/gui3D.hpp>
 
 namespace op
 {
-    const bool LOG_VERBOSE_3D_RENDERER = false;
-
     #ifdef WITH_3D_RENDERER
+        const bool LOG_VERBOSE_3D_RENDERER = false;
+        std::atomic<bool> sConstructorSet{false};
+
         struct Keypoints3D
         {
-            Array<float> mPoseKeypoints;
-            Array<float> mFaceKeypoints;
-            Array<float> mLeftHandKeypoints;
-            Array<float> mRightHandKeypoints;
+            Array<float> poseKeypoints;
+            Array<float> faceKeypoints;
+            Array<float> leftHandKeypoints;
+            Array<float> rightHandKeypoints;
             bool validKeypoints;
             std::mutex mutex;
         };
@@ -42,7 +44,6 @@ namespace op
         const std::vector<GLfloat> LIGHT_DIFFUSE{ 1.f, 1.f, 1.f, 1.f };  // Diffuse light
         const std::vector<GLfloat> LIGHT_POSITION{ 1.f, 1.f, 1.f, 0.f };  // Infinite light location
         const std::vector<GLfloat> COLOR_DIFFUSE{ 0.5f, 0.5f, 0.5f, 1.f };
-        const std::string GUI_NAME{"OpenPose 3-D Reconstruction"};
 
         const auto RAD_TO_DEG = 0.0174532925199433;
 
@@ -172,7 +173,7 @@ namespace op
             }
         }
 
-        void initGraphics(void)
+        void initGraphics()
         {
             // Enable a single OpenGL light
             glLightfv(GL_LIGHT0, GL_AMBIENT, LIGHT_DIFFUSE.data());
@@ -278,11 +279,11 @@ namespace op
             std::unique_lock<std::mutex> lock{gKeypoints3D.mutex};
             if (gKeypoints3D.validKeypoints)
             {
-                renderHumanBody(gKeypoints3D.mPoseKeypoints, getPoseBodyPartPairsRender(sPoseModel),
+                renderHumanBody(gKeypoints3D.poseKeypoints, getPoseBodyPartPairsRender(sPoseModel),
                                 getPoseColors(sPoseModel), 1.f);
-                renderHumanBody(gKeypoints3D.mFaceKeypoints, FACE_PAIRS_RENDER, FACE_COLORS_RENDER, 0.5f);
-                renderHumanBody(gKeypoints3D.mLeftHandKeypoints, HAND_PAIRS_RENDER, HAND_COLORS_RENDER, 0.5f);
-                renderHumanBody(gKeypoints3D.mRightHandKeypoints, HAND_PAIRS_RENDER, HAND_COLORS_RENDER, 0.5f);
+                renderHumanBody(gKeypoints3D.faceKeypoints, FACE_PAIRS_RENDER, FACE_COLORS_RENDER, 0.5f);
+                renderHumanBody(gKeypoints3D.leftHandKeypoints, HAND_PAIRS_RENDER, HAND_COLORS_RENDER, 0.5f);
+                renderHumanBody(gKeypoints3D.rightHandKeypoints, HAND_PAIRS_RENDER, HAND_COLORS_RENDER, 0.5f);
             }
             lock.unlock();
 
@@ -390,7 +391,7 @@ namespace op
                 // https://stackoverflow.com/questions/3799803/is-it-possible-to-make-a-window-withouth-a-top-in-glut
                 glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_MULTISAMPLE);
                 // Create and set up a window
-                glutCreateWindow(GUI_NAME.c_str());
+                glutCreateWindow(std::string{OPEN_POSE_NAME_AND_VERSION + " - 3-D Display"}.c_str());
                 initGraphics();
                 glutDisplayFunc(renderMain);
                 glutMouseFunc(mouseButton);
@@ -409,17 +410,29 @@ namespace op
         }
     #endif
 
-    WRender3D::WRender3D(const PoseModel poseModel)
+    Gui3D::Gui3D(const Point<int>& outputSize, const bool fullScreen,
+                 const std::shared_ptr<std::atomic<bool>>& isRunningSharedPtr,
+                 const std::shared_ptr<std::pair<std::atomic<bool>, std::atomic<int>>>& videoSeekSharedPtr,
+                 const std::vector<std::shared_ptr<PoseExtractor>>& poseExtractors,
+                 const std::vector<std::shared_ptr<Renderer>>& renderers, const PoseModel poseModel,
+                 const DisplayMode displayMode) :
+        Gui{outputSize, fullScreen, isRunningSharedPtr, videoSeekSharedPtr, poseExtractors, renderers},
+        mDisplayMode{displayMode}
     {
         try
         {
             #ifdef WITH_3D_RENDERER
                 // Update sPoseModel
                 sPoseModel = poseModel;
+                if (!sConstructorSet)
+                    sConstructorSet = true;
+                else
+                    error("The Gui3D class can only be initialized once.", __LINE__, __FUNCTION__, __FILE__);
             #else
                 UNUSED(poseModel);
-                error("OpenPose must be compiled with `WITH_3D_RENDERER` in order to use this class.",
-                          __LINE__, __FUNCTION__, __FILE__);
+                if (mDisplayMode == DisplayMode::DisplayAll || mDisplayMode == DisplayMode::Display3D)
+                    error("OpenPose must be compiled with `WITH_3D_RENDERER` in order to use the 3-D visualization"
+                          "renderer. Alternatively, set 2-D rendering.", __LINE__, __FUNCTION__, __FILE__);
             #endif
         }
         catch (const std::exception& e)
@@ -428,12 +441,29 @@ namespace op
         }
     }
 
-    WRender3D::~WRender3D()
+    Gui3D::~Gui3D()
+    {
+        #ifdef WITH_3D_RENDERER
+            try
+            {
+                glutLeaveMainLoop();
+            }
+            catch (const std::exception& e)
+            {
+                error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            }
+        #endif
+    }
+
+    void Gui3D::initializationOnThread()
     {
         try
         {
+            // Init parent class
+            Gui::initializationOnThread();
             #ifdef WITH_3D_RENDERER
-                glutLeaveMainLoop();
+                // OpenGL - Initialization
+                initializeVisualization();
             #endif
         }
         catch (const std::exception& e)
@@ -442,83 +472,72 @@ namespace op
         }
     }
 
-    void WRender3D::initializationOnThread()
+    void Gui3D::setKeypoints(const Array<float>& poseKeypoints3D, const Array<float>& faceKeypoints3D,
+                             const Array<float>& leftHandKeypoints3D, const Array<float>& rightHandKeypoints3D)
     {
-        #ifdef WITH_3D_RENDERER
-            try
-            {
-                // Init display
-                cv::imshow(GUI_NAME, cv::Mat(500, 500, CV_8UC3, cv::Scalar{ 0,0,0 }));
-                // OpenGL - Initialization
-                initializeVisualization();
-            }
-            catch (const std::exception& e)
-            {
-                error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            }
-        #endif
+        try
+        {   
+            // 3-D rendering
+            #ifdef WITH_3D_RENDERER
+                if (mDisplayMode == DisplayMode::DisplayAll || mDisplayMode == DisplayMode::Display3D)
+                {
+                    if (!poseKeypoints3D.empty() || !faceKeypoints3D.empty()
+                        || !leftHandKeypoints3D.empty() || !rightHandKeypoints3D.empty())
+                    {
+                        // OpenGL Rendering
+                        std::unique_lock<std::mutex> lock{gKeypoints3D.mutex};
+                        gKeypoints3D.poseKeypoints = poseKeypoints3D;
+                        gKeypoints3D.faceKeypoints = faceKeypoints3D;
+                        gKeypoints3D.leftHandKeypoints = leftHandKeypoints3D;
+                        gKeypoints3D.rightHandKeypoints = rightHandKeypoints3D;
+                        gKeypoints3D.validKeypoints = true;
+                        lock.unlock();
+                    }
+                }
+            #else
+                UNUSED(poseKeypoints3D);
+                UNUSED(faceKeypoints3D);
+                UNUSED(leftHandKeypoints3D);
+                UNUSED(rightHandKeypoints3D);
+            #endif
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
     }
 
-    void WRender3D::workConsumer(const std::shared_ptr<std::vector<Datum>>& datumsPtr)
+    void Gui3D::update()
     {
-        #ifdef WITH_3D_RENDERER
-            try
-            {
-                // Debugging log
-                dLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-                // Profiling speed
-                const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
-                // User's displaying/saving/other processing here
-                // datum.cvOutputData: rendered frame with pose or heatmaps
-                // datum.poseKeypoints: Array<float> with the estimated pose
-                if (datumsPtr != nullptr && !datumsPtr->empty())
+        try
+        {   
+            // 2-D rendering
+            // Display all 2-D views
+            if (mDisplayMode == DisplayMode::DisplayAll || mDisplayMode == DisplayMode::Display2D)
+                Gui::update();
+            // 3-D rendering
+            #ifdef WITH_3D_RENDERER
+                if (mDisplayMode == DisplayMode::DisplayAll || mDisplayMode == DisplayMode::Display3D)
                 {
-                    cv::Mat cvMat = datumsPtr->at(0).cvOutputData.clone();
-                    for (auto i = 1u; i < datumsPtr->size(); i++)
-                        cv::hconcat(cvMat, datumsPtr->at(i).cvOutputData, cvMat);
-                    // while (cvMat.cols > 1500 || cvMat.rows > 1500)
-                    while (cvMat.cols > 1920 || cvMat.rows > 1920)
-                        // while (cvMat.rows > 3500)
-                        cv::pyrDown(cvMat, cvMat);
-                    // Display all views
-                    cv::imshow(GUI_NAME, cvMat);
-                    cv::resizeWindow(GUI_NAME, cvMat.cols, cvMat.rows);
                     // OpenGL Rendering
                     std::unique_lock<std::mutex> lock{gKeypoints3D.mutex};
-                    gKeypoints3D.mPoseKeypoints = datumsPtr->at(0).poseKeypoints3D;
-                    gKeypoints3D.mFaceKeypoints = datumsPtr->at(0).faceKeypoints3D;
-                    gKeypoints3D.mLeftHandKeypoints = datumsPtr->at(0).handKeypoints3D[0];
-                    gKeypoints3D.mRightHandKeypoints = datumsPtr->at(0).handKeypoints3D[1];
-                    gKeypoints3D.validKeypoints = true;
                     // Esc pressed -> Close program
                     if (sLastKeyPressed == 27)
-                        this->stop();
+                        if (spIsRunning != nullptr)
+                            *spIsRunning = false;
                     lock.unlock();
-                    // Profiling speed
-                    Profiler::timerEnd(profilerKey);
-                    Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);
+                    // OpenCL - Run main loop event
+                    // It is run outside loop, or it would get visually stuck if loop to slow
+                    idleFunction();
+                    glutMainLoopEvent();
+                    // This alternative can only be called once, and it will block the thread until program exit
+                    // glutMainLoop();
                 }
-                // Render images
-                // It sleeps 1 ms just to let the user see the 2D visual output
-                // Change to 33ms for normal 30 fps display if too fast
-                if ((char)cv::waitKey(1) == 27)
-                    this->stop();
-                // OpenCL - Run main loop event
-                // It is run outside loop, or it would get visually stuck if loop to slow
-                idleFunction();
-                glutMainLoopEvent();
-                // This alternative can only be called once, and it will block the thread until program exit
-                // glutMainLoop();
-                // Debugging log
-                dLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-            }
-            catch (const std::exception& e)
-            {
-                this->stop();
-                error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            }
-        #else
-            UNUSED(datumsPtr);
-        #endif
+            #endif
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
     }
 }

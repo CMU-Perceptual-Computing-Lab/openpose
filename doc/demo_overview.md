@@ -40,9 +40,9 @@ Since the Windows 10 Anniversary, Kinect 2.0 can be read as a normal webcam. All
 The following example runs the demo video `video.avi` and outputs JSON files in `output/`. Note: see [doc/output.md](./output.md) to understand the format of the JSON files.
 ```
 # Only body
-./build/examples/openpose/openpose.bin --video examples/media/video.avi --write_keypoint_json output/ --no_display --render_pose 0
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --write_keypoint_json output/ --display 0 --render_pose 0
 # Body + face + hands
-./build/examples/openpose/openpose.bin --video examples/media/video.avi --write_keypoint_json output/ --no_display --render_pose 0 --face --hand
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --write_keypoint_json output/ --display 0 --render_pose 0 --face --hand
 ```
 
 
@@ -120,7 +120,7 @@ We enumerate some of the most important flags, check the `Flags Detailed Descrip
 - `--process_real_time`: For video, it might skip frames to display at real time.
 - `--disable_blending`: If enabled, it will render the results (keypoint skeletons or heatmaps) on a black background, not showing the original image. Related: `part_to_show`, `alpha_pose`, and `alpha_pose`.
 - `--part_to_show`: Prediction channel to visualize.
-- `--no_display`: Display window not opened. Useful for servers and/or to slightly speed up OpenPose.
+- `--display 0`: Display window not opened. Useful for servers and/or to slightly speed up OpenPose.
 - `--num_gpu 2 --num_gpu_start 1`: Parallelize over this number of GPUs starting by the desired device id. By default it uses all the available GPUs.
 - `--model_pose MPI`: Model to use, affects number keypoints, speed and accuracy.
 - `--logging_level 3`: Logging messages threshold, range [0,255]: 0 will output any message & 255 will output none. Current messages in the range [1-4], 1 for low priority messages and 4 for important ones.
@@ -206,7 +206,7 @@ Each flag is divided into flag name, default value, and description.
 12. Display
 - DEFINE_bool(fullscreen,                 false,          "Run in full-screen mode (press f during runtime to toggle).");
 - DEFINE_bool(no_gui_verbose,             false,          "Do not write text on output images on GUI (e.g. number of current frame and people). It does not affect the pose rendering.");
-- DEFINE_bool(no_display,                 false,          "Do not open a display window. Useful if there is no X server and/or to slightly speed up the processing if visual output is not required.");
+- DEFINE_int32(display,                   -1,             "Display mode: -1 for automatic selection; 0 for no display (useful if there is no X server and/or to slightly speed up the processing if visual output is not required); 2 for 2-D display; 3 for 3-D display (if `--3d` enabled); and 1 for both 2-D and 3-D display.");
 12. Result Saving
 - DEFINE_string(write_images,             "",             "Directory to write rendered frames in `write_images_format` image format.");
 - DEFINE_string(write_images_format,      "png",          "File extension and format for `write_images`, e.g. png, jpg or bmp. Check the OpenCV function cv::imwrite for all compatible extensions.");

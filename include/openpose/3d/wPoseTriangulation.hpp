@@ -66,13 +66,18 @@ namespace op
                     cameraParameterMatrices.emplace_back(datumsElement.cameraParameterMatrix);
                 }
                 // Pose 3-D reconstruction
-                reconstructArray(tDatums->at(0).poseKeypoints3D, poseKeypointVector, cameraParameterMatrices);
-                // Face 3-D reconstruction
-                reconstructArray(tDatums->at(0).faceKeypoints3D, faceKeypointVector, cameraParameterMatrices);
-                // Left hand 3-D reconstruction
-                reconstructArray(tDatums->at(0).handKeypoints3D[0], leftHandKeypointVector, cameraParameterMatrices);
-                // Right hand 3-D reconstruction
-                reconstructArray(tDatums->at(0).handKeypoints3D[1], rightHandKeypointVector, cameraParameterMatrices);
+                auto poseKeypoints3D = reconstructArray(poseKeypointVector, cameraParameterMatrices);
+                auto faceKeypoints3D = reconstructArray(faceKeypointVector, cameraParameterMatrices);
+                auto leftHandKeypoints3D = reconstructArray(leftHandKeypointVector, cameraParameterMatrices);
+                auto rightHandKeypoints3D = reconstructArray(rightHandKeypointVector, cameraParameterMatrices);
+                // Assign to all tDatums
+                for (auto& datumsElement : *tDatums)
+                {
+                    datumsElement.poseKeypoints3D = poseKeypoints3D;
+                    datumsElement.faceKeypoints3D = faceKeypoints3D;
+                    datumsElement.handKeypoints3D[0] = leftHandKeypoints3D;
+                    datumsElement.handKeypoints3D[1] = rightHandKeypoints3D;
+                }
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
                 Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);

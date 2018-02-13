@@ -69,7 +69,9 @@ For further details, check [all released features](doc/released_features.md) and
 
 
 ## Installation, Reinstallation and Uninstallation
-See [doc/installation.md](doc/installation.md) for instructions on how to build from source or how to download our portable binaries.
+**Windows portable version**: Simply download and use the latest version from the [Releases](https://github.com/CMU-Perceptual-Computing-Lab/openpose/releases) section.
+
+Otherwise, check [doc/installation.md](doc/installation.md) for instructions on how to build OpenPose from source.
 
 
 

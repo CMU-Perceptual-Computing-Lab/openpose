@@ -147,6 +147,11 @@ DEFINE_bool(hand_tracking,              false,          "Adding hand tracking mi
                                                         " is high enough, i.e. >7 FPS per GPU) and video. This is not person ID tracking, it"
                                                         " simply looks for hands in positions at which hands were located in previous frames, but"
                                                         " it does not guarantee the same person ID among frames.");
+// OpenPose 3-D Reconstruction
+DEFINE_bool(3d,                         false,          "Running OpenPose 3-D reconstruction demo: 1) Reading from a stereo camera system."
+                                                        " 2) Performing 3-D reconstruction from the multiple views. 3) Displaying 3-D reconstruction"
+                                                        " results. Note that it will only display 1 person. If multiple people is present, it will"
+                                                        " fail.");
 // OpenPose Rendering
 DEFINE_int32(part_to_show,              0,              "Prediction channel to visualize (default: 0). 0 for all the body parts, 1-18 for each body"
                                                         " part heat map, 19 for the background heat map, 20 for all the body part heat maps"
@@ -184,8 +189,9 @@ DEFINE_double(hand_alpha_heatmap,       0.7,            "Analogous to `alpha_hea
 DEFINE_bool(fullscreen,                 false,          "Run in full-screen mode (press f during runtime to toggle).");
 DEFINE_bool(no_gui_verbose,             false,          "Do not write text on output images on GUI (e.g. number of current frame and people). It"
                                                         " does not affect the pose rendering.");
-DEFINE_bool(no_display,                 false,          "Do not open a display window. Useful if there is no X server and/or to slightly speed up"
-                                                        " the processing if visual output is not required.");
+DEFINE_int32(display,                   -1,             "Display mode: -1 for automatic selection; 0 for no display (useful if there is no X server"
+                                                        " and/or to slightly speed up the processing if visual output is not required); 2 for 2-D"
+                                                        " display; 3 for 3-D display (if `--3d` enabled); and 1 for both 2-D and 3-D display.");
 // Result Saving
 DEFINE_string(write_images,             "",             "Directory to write rendered frames in `write_images_format` image format.");
 DEFINE_string(write_images_format,      "png",          "File extension and format for `write_images`, e.g. png, jpg or bmp. Check the OpenCV"
@@ -259,7 +265,7 @@ int openPoseTutorialWrapper4()
                                                   (float)FLAGS_alpha_heatmap, FLAGS_part_to_show, FLAGS_model_folder,
                                                   heatMapTypes, heatMapScale, FLAGS_part_candidates,
                                                   (float)FLAGS_render_threshold, FLAGS_number_people_max,
-                                                  enableGoogleLogging};
+                                                  enableGoogleLogging, FLAGS_3d};
     // Face configuration (use op::WrapperStructFace{} to disable it)
     const op::WrapperStructFace wrapperStructFace{FLAGS_face, faceNetInputSize,
                                                   op::flagsToRenderMode(FLAGS_face_render, FLAGS_render_pose),
@@ -276,8 +282,8 @@ int openPoseTutorialWrapper4()
                                                     FLAGS_process_real_time, FLAGS_frame_flip, FLAGS_frame_rotate,
                                                     FLAGS_frames_repeat};
     // Consumer (comment or use default argument to disable any output)
-    const op::WrapperStructOutput wrapperStructOutput{!FLAGS_no_display, !FLAGS_no_gui_verbose, FLAGS_fullscreen,
-                                                      FLAGS_write_keypoint,
+    const op::WrapperStructOutput wrapperStructOutput{op::flagsToDisplayMode(FLAGS_display, FLAGS_3d),
+                                                      !FLAGS_no_gui_verbose, FLAGS_fullscreen, FLAGS_write_keypoint,
                                                       op::stringToDataFormat(FLAGS_write_keypoint_format),
                                                       writeJson, FLAGS_write_coco_json,
                                                       FLAGS_write_images, FLAGS_write_images_format, FLAGS_write_video,

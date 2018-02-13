@@ -28,7 +28,7 @@ DEFINE_int32(hand_scale_number,         1,              "");
 DEFINE_double(hand_scale_range,         0.4,            "");
 DEFINE_bool(hand_tracking,              false,          "");
 // Display
-DEFINE_bool(no_display,                 false,          "");
+DEFINE_int32(display,                   -1,             "");
 // Result Saving
 DEFINE_string(write_json,               "",             "");
 
@@ -69,7 +69,7 @@ int handFromJsonTest()
                                                   op::flagsToRenderMode(1)};
     // Configure wrapper
     opWrapper.configure(wrapperStructPose, wrapperStructHand, producerSharedPtr, FLAGS_hand_ground_truth,
-                        FLAGS_write_json, !FLAGS_no_display);
+                        FLAGS_write_json, op::flagsToDisplayMode(FLAGS_display, false));
 
     // Start processing
     op::log("Starting thread(s)", op::Priority::High);

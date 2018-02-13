@@ -873,18 +873,19 @@ namespace op
                 mOutputWs.emplace_back(std::make_shared<WHeatMapSaver<TDatumsPtr>>(heatMapSaver));
             }
             // Add frame information for GUI
+            const bool guiEnabled = (wrapperStructOutput.displayMode != DisplayMode::NoDisplay);
             // If this WGuiInfoAdder instance is placed before the WImageSaver or WVideoSaver, then the resulting
             // recorded frames will look exactly as the final displayed image by the GUI
-            if (wrapperStructOutput.guiVerbose && (wrapperStructOutput.displayGui || !mUserOutputWs.empty()
+            if (wrapperStructOutput.guiVerbose && (guiEnabled || !mUserOutputWs.empty()
                                                    || mThreadManagerMode == ThreadManagerMode::Asynchronous
                                                    || mThreadManagerMode == ThreadManagerMode::AsynchronousOut))
             {
-                const auto guiInfoAdder = std::make_shared<GuiInfoAdder>(numberThreads, wrapperStructOutput.displayGui);
+                const auto guiInfoAdder = std::make_shared<GuiInfoAdder>(numberThreads, guiEnabled);
                 mOutputWs.emplace_back(std::make_shared<WGuiInfoAdder<TDatumsPtr>>(guiInfoAdder));
             }
             // Minimal graphical user interface (GUI)
             spWGui = nullptr;
-            if (wrapperStructOutput.displayGui)
+            if (guiEnabled)
             {
                 // PoseRenderers to Renderers
                 std::vector<std::shared_ptr<Renderer>> renderers;
@@ -893,13 +894,31 @@ namespace op
                 else
                     for (const auto& poseGpuRenderer : poseGpuRenderers)
                         renderers.emplace_back(std::static_pointer_cast<Renderer>(poseGpuRenderer));
-                // Gui
-                const auto gui = std::make_shared<Gui>(
-                    finalOutputSize, wrapperStructOutput.fullScreen, mThreadManager.getIsRunningSharedPtr(),
-                    spVideoSeek, poseExtractors, renderers
-                );
-                // WGui
-                spWGui = {std::make_shared<WGui<TDatumsPtr>>(gui)};
+                // Display
+                // 3-D (+2-D) display
+                if (wrapperStructOutput.displayMode == DisplayMode::Display3D
+                    || wrapperStructOutput.displayMode == DisplayMode::DisplayAll)
+                {
+                    // Gui
+                    auto gui = std::make_shared<Gui3D>(
+                        finalOutputSize, wrapperStructOutput.fullScreen, mThreadManager.getIsRunningSharedPtr(),
+                        spVideoSeek, poseExtractors, renderers, wrapperStructPose.poseModel,
+                        wrapperStructOutput.displayMode
+                    );
+                    // WGui
+                    spWGui = {std::make_shared<WGui3D<TDatumsPtr>>(gui)};
+                }
+                // 2-D display
+                else if (wrapperStructOutput.displayMode == DisplayMode::Display2D)
+                {
+                    // Gui
+                    auto gui = std::make_shared<Gui>(
+                        finalOutputSize, wrapperStructOutput.fullScreen, mThreadManager.getIsRunningSharedPtr(),
+                        spVideoSeek, poseExtractors, renderers
+                    );
+                    // WGui
+                    spWGui = {std::make_shared<WGui<TDatumsPtr>>(gui)};
+                }
             }
             // Set wrapper as configured
             mConfigured = true;

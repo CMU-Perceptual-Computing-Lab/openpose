@@ -7,7 +7,8 @@ OpenPose - Frequently Asked Question (FAQ)
     2. [Speed Up and Benchmark](#speed-up-and-benchmark)
     3. [Webcam Slower than Images](#webcam-slower-than-images)
     4. [Vide/Webcam Not Working](#video-webcam-not-working)
-    5. [Free Invalid Pointer Error](#free-invalid-pointer-error)
+    5. [Cannot Find OpenPose.dll Error](#cannot-find-openpose.dll-error-windows)
+    6. [Free Invalid Pointer Error](#free-invalid-pointer-error)
 
 
 
@@ -37,7 +38,7 @@ OpenPose - Frequently Asked Question (FAQ)
 ### Webcam Slower than Images
 **Q: Webcam is slow** - Using a folder with images matches the speed FPS benchmarks, but the webcam has lower FPS. Note: often on Windows.
 
-**A**: OpenCV has some issues with some camera drivers (specially on Windows). The first step should be to compile OpenCV by your own and re-compile OpenPose after that (following the `Reinstallation` section in Ubuntu or cleaning the project on Windows). If the speed is still slower, you can better debug it by running a webcam OpenCV example (e.g. [this C++ example](http://answers.opencv.org/question/1/how-can-i-get-frames-from-my-webcam/)). If you are able to get the proper FPS with the OpenCV demo but OpenPose is still low, then let us know!
+**A**: OpenCV has some issues with some camera drivers (specially on Windows). The first step should be to compile OpenCV by your own and re-compile OpenPose after that (following the [doc/installation.md#reinstallation](./installation.md#reinstallation) section). If the speed is still slower, you can better debug it by running a webcam OpenCV example (e.g. [this C++ example](http://answers.opencv.org/question/1/how-can-i-get-frames-from-my-webcam/)). If you are able to get the proper FPS with the OpenCV demo but OpenPose is still low, then let us know!
 
 
 
@@ -45,6 +46,19 @@ OpenPose - Frequently Asked Question (FAQ)
 **Q: Video and/or webcam are not working** - Using a folder with images does work, but the video and/or the webcam do not. Note: often on Windows.
 
 **A**: OpenCV has some issues with some camera drivers and video codecs (specially on Windows). Follow the same steps as the `Webcam is slow` question to test the webcam is working. After re-compiling OpenCV, you can also try this [OpenCV example for video](http://docs.opencv.org/3.0-beta/modules/videoio/doc/reading_and_writing_video.html).
+
+
+
+### Cannot Find OpenPose.dll Error (Windows)
+**Q: System cannot find the file specified (Openpose.dll) error when trying to release** - Using a folder with images does work, but the video and/or the webcam do not. Note: often on Windows.
+
+**A**: Visual Studio (VS) and the [doc/installation.md](./installation.md) section is only intended if you plan to modify the OpenPose code or integrate it with another library or project. If you just want to use the OpenPose demo, simply follow [doc/installation.md#windows-portable-demo](./installation.md#windows-portable-demo) and download the OpenPose binaries in the [Releases](https://github.com/CMU-Perceptual-Computing-Lab/openpose/releases) section.
+
+If you need to compile it with Visual Studio (VS), then keep reading. In this error, VS is simply saying that there were errors while compiling the OpenPose library. Try compiling only the OpenPose library (not the demo), by right clicking on it, then `Set as StartUp Project`, and finally right click + `Build`. Then, at the bottom left part of VS, press `Error list` and then you should see which errors VS encountered while compiling. In that way, VS gives you the exact error so you can know it and share the exact issue.
+
+If it didn't have any error, then setting OpenPoseDemo as main project again and F5 (or green play button) should work.
+
+Note: OpenPose library is not an executable, but a library. So instead clicking F5 or the green button instead of `Build` will give you an error similar to `openpose.dll is not a valid Win32 application`.
 
 
 

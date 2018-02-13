@@ -17,7 +17,8 @@ namespace op
         explicit DatumProducer(const std::shared_ptr<Producer>& producerSharedPtr,
                                const unsigned long long frameFirst = 0,
                                const unsigned long long frameLast = std::numeric_limits<unsigned long long>::max(),
-                               const std::shared_ptr<std::pair<std::atomic<bool>, std::atomic<int>>>& videoSeekSharedPtr = nullptr);
+                               const std::shared_ptr<std::pair<std::atomic<bool>,
+                                                     std::atomic<int>>>& videoSeekSharedPtr = nullptr);
 
         std::pair<bool, std::shared_ptr<TDatumsNoPtr>> checkIfRunningAndGetDatum();
 
@@ -47,7 +48,8 @@ namespace op
     template<typename TDatumsNoPtr>
     DatumProducer<TDatumsNoPtr>::DatumProducer(const std::shared_ptr<Producer>& producerSharedPtr,
                                                const unsigned long long frameFirst, const unsigned long long frameLast,
-                                               const std::shared_ptr<std::pair<std::atomic<bool>, std::atomic<int>>>& videoSeekSharedPtr) :
+                                               const std::shared_ptr<std::pair<std::atomic<bool>,
+                                                                               std::atomic<int>>>& videoSeekSharedPtr) :
         mNumberFramesToProcess{(frameLast != std::numeric_limits<unsigned long long>::max()
                                 ? frameLast - frameFirst : frameLast)},
         spProducer{producerSharedPtr},

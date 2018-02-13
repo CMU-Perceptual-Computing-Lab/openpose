@@ -60,9 +60,10 @@ namespace op
                         || !wrapperStructOutput.writeKeypoint.empty() || !wrapperStructOutput.writeJson.empty()
                         || !wrapperStructOutput.writeCocoJson.empty() || !wrapperStructOutput.writeHeatMaps.empty()
                 );
-                if (!wrapperStructOutput.displayGui && !savingSomething)
+                const bool guiEnabled = (wrapperStructOutput.displayMode != DisplayMode::NoDisplay);
+                if (!guiEnabled && !savingSomething)
                 {
-                    const auto message = "No output is selected (`--no_display`) and no results are generated (no"
+                    const auto message = "No output is selected (`--display 0`) and no results are generated (no"
                                          " `--write_X` flags enabled). Thus, no output would be generated."
                                          + additionalMessage;
                     error(message, __LINE__, __FUNCTION__, __FILE__);
@@ -75,10 +76,10 @@ namespace op
                     error(message, __LINE__, __FUNCTION__, __FILE__);
                 }
                 // Warnings
-                if ((wrapperStructOutput.displayGui && wrapperStructOutput.guiVerbose) && !renderOutput)
+                if (guiEnabled && wrapperStructOutput.guiVerbose && !renderOutput)
                 {
                     const auto message = "No render is enabled (e.g. `--render_pose 0`), so you might also want to"
-                                         " remove the display (set `--no_display` or `--no_gui_verbose`). If you"
+                                         " remove the display (set `--display 0` or `--no_gui_verbose`). If you"
                                          " simply want to use OpenPose to record video/images without keypoints, you"
                                          " only need to set `--num_gpu 0`." + additionalMessage;
                     log(message, Priority::High);

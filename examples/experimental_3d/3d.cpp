@@ -113,7 +113,6 @@ DEFINE_int32(hand_scale_number,         1,              "Analogous to `scale_num
 DEFINE_double(hand_scale_range,         0.4,            "Analogous purpose than `scale_gap` but applied to the hand keypoint detector. Total range"
                                                         " between smallest and biggest scale. The scales will be centered in ratio 1. E.g. if"
                                                         " scaleRange = 0.4 and scalesNumber = 2, then there will be 2 scales, 0.8 and 1.2.");
-
 DEFINE_bool(hand_tracking,              false,          "Adding hand tracking might improve hand keypoints detection for webcam (if the frame rate"
                                                         " is high enough, i.e. >7 FPS per GPU) and video. This is not person ID tracking, it"
                                                         " simply looks for hands in positions at which hands were located in previous frames, but"
@@ -156,6 +155,13 @@ DEFINE_int32(hand_render,               -1,             "Analogous to `render_po
                                                         " configuration that `render_pose` is using.");
 DEFINE_double(hand_alpha_pose,          0.6,            "Analogous to `alpha_pose` but applied to hand.");
 DEFINE_double(hand_alpha_heatmap,       0.7,            "Analogous to `alpha_heatmap` but applied to hand.");
+// Display
+DEFINE_bool(fullscreen,                 false,          "Run in full-screen mode (press f during runtime to toggle).");
+DEFINE_bool(no_gui_verbose,             false,          "Do not write text on output images on GUI (e.g. number of current frame and people). It"
+                                                        " does not affect the pose rendering.");
+DEFINE_int32(display,                   -1,             "Display mode: -1 for automatic selection; 0 for no display (useful if there is no X server"
+                                                        " and/or to slightly speed up the processing if visual output is not required); 2 for 2-D"
+                                                        " display; 3 for 3-D display (if `--3d` enabled); and 1 for both 2-D and 3-D display.");
 // Result Saving
 DEFINE_string(write_images,             "",             "Directory to write rendered frames in `write_images_format` image format.");
 DEFINE_string(write_images_format,      "png",          "File extension and format for `write_images`, e.g. png, jpg or bmp. Check the OpenCV"
@@ -218,16 +224,11 @@ int openpose()
     // Initializing the user custom classes
     // Frames producer (e.g. video, webcam, ...)
     auto wFlirReader = std::make_shared<op::WFlirReader>();
-    // GUI (Display)
-    auto wRender3D = std::make_shared<op::WRender3D>();
 
     op::Wrapper<std::vector<op::Datum>> opWrapper;
     // Add custom input
     const auto workerInputOnNewThread = true;
     opWrapper.setWorkerInput(wFlirReader, workerInputOnNewThread);
-    // Add custom output
-    const auto workerOutputOnNewThread = true;
-    opWrapper.setWorkerOutput(wRender3D, workerOutputOnNewThread);
     // Configure OpenPose
     const op::WrapperStructPose wrapperStructPose{!FLAGS_body_disable, netInputSize, outputSize, keypointScale,
                                                   FLAGS_num_gpu, FLAGS_num_gpu_start, FLAGS_scale_number,
@@ -249,10 +250,8 @@ int openpose()
                                                   (float)FLAGS_hand_alpha_pose, (float)FLAGS_hand_alpha_heatmap,
                                                   (float)FLAGS_hand_render_threshold};
     // Consumer (comment or use default argument to disable any output)
-    const bool displayGui = false;
-    const bool guiVerbose = true;
-    const bool fullScreen = false;
-    const op::WrapperStructOutput wrapperStructOutput{displayGui, guiVerbose, fullScreen, FLAGS_write_keypoint,
+    const op::WrapperStructOutput wrapperStructOutput{op::flagsToDisplayMode(FLAGS_display, FLAGS_3d),
+                                                      !FLAGS_no_gui_verbose, FLAGS_fullscreen, FLAGS_write_keypoint,
                                                       op::stringToDataFormat(FLAGS_write_keypoint_format),
                                                       writeJson, FLAGS_write_coco_json,
                                                       FLAGS_write_images, FLAGS_write_images_format, FLAGS_write_video,

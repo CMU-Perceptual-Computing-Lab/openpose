@@ -105,6 +105,7 @@ windows\x64\Release\OpenPoseDemo.exe --net_resolution "1312x736" --scale_number 
 
 
 ### 3-D Reconstruction
+1. Real-time demo
 ```
 # Ubuntu
 ./build/examples/openpose/openpose.bin --3d --number_people_max 1
@@ -122,6 +123,20 @@ bin\OpenPoseDemo.exe --3d --number_people_max 1 --face --hand
 windows\x64\Release\OpenPoseDemo.exe --3d --number_people_max 1
 :: With face and hands
 windows\x64\Release\OpenPoseDemo.exe --3d --number_people_max 1 --face --hand
+```
+
+2. Saving stereo camera images for a later post-processing:
+```
+# Ubuntu (same flags for Windows version)
+./build/examples/openpose/openpose.bin --3d --num_gpu 0 --write_images output_folder_path/
+```
+
+3. Reading previouly saved stereo camera images and processing them:
+```
+# Ubuntu (same flags for Windows version)
+./build/examples/openpose/openpose.bin --image_dir output_folder_path/ --3d --number_people_max 1
+# Ubuntu face and hands (same flags for Windows version)
+./build/examples/openpose/openpose.bin --image_dir output_folder_path/ --3d --number_people_max 1 --face --hand
 ```
 
 

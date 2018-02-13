@@ -83,11 +83,17 @@ namespace op
         }
     }
 
-    void reconstructArray(Array<float>& keypoints3D, const std::vector<Array<float>>& keypointsVector,
-                          const std::vector<cv::Mat>& matrixEachCamera)
+    Array<float> reconstructArray(const std::vector<Array<float>>& keypointsVector,
+                                  const std::vector<cv::Mat>& matrixEachCamera)
     {
         try
         {
+            Array<float> keypoints3D;
+            // Security checks
+            if (matrixEachCamera.size() < 2)
+                error("Only 1 camera detected. The 3-D reconstruction module can only be used with > 1 cameras"
+                      " simultaneously. E.g., using FLIR stereo cameras (`--flir_camera`).",
+                      __LINE__, __FUNCTION__, __FILE__);
             // Get number body parts
             auto detectionMissed = false;
             for (auto& keypoints : keypointsVector)
@@ -102,6 +108,7 @@ namespace op
             if (!detectionMissed)
             {
                 const auto numberBodyParts = keypointsVector.at(0).getSize(1);
+                const auto lastChannelLength = keypointsVector.at(0).getSize(2);
                 // Create x-y vector from high score results
                 const auto threshold = 0.2f;
                 std::vector<int> indexesUsed;
@@ -111,11 +118,12 @@ namespace op
                     // Create vector of points
                     auto missedPoint = false;
                     std::vector<cv::Point2d> xyPointsElement;
+                    const auto baseIndex = part * lastChannelLength;
                     for (auto& keypoints : keypointsVector)
                     {
-                        if (keypoints[{0, part, 2}] > threshold)
-                            xyPointsElement.emplace_back(cv::Point2d{ keypoints[{0, part, 0}],
-                                                                      keypoints[{0, part, 1}]});
+                        if (keypoints[baseIndex+2] > threshold)
+                            xyPointsElement.emplace_back(cv::Point2d{ keypoints[baseIndex],
+                                                                      keypoints[baseIndex+1]});
                         else
                         {
                             missedPoint = true;
@@ -146,28 +154,28 @@ namespace op
                     // cv::Mat reconstructedPoints{4, firstcv::Points.size(), CV_64F};
                     // cv::triangulatecv::Points(cv::Mat::eye(3,4, CV_64F), M_3_1, firstcv::Points, secondcv::Points,
                     //                           reconstructedcv::Points);
-                    keypoints3D = Array<float>{ { 1, numberBodyParts, 4 }, 0 };
+                    keypoints3D.reset({ 1, numberBodyParts, 4 }, 0);
+                    const auto lastChannelLength = keypoints3D.getSize(2);
                     for (auto index = 0u; index < indexesUsed.size(); index++)
                     {
-                        auto& xValue = keypoints3D[{0, indexesUsed[index], 0}];
-                        auto& yValue = keypoints3D[{0, indexesUsed[index], 1}];
-                        auto& zValue = keypoints3D[{0, indexesUsed[index], 2}];
-                        auto& scoreValue = keypoints3D[{0, indexesUsed[index], 3}];
                         if (std::isfinite(xyzPoints[index].x) && std::isfinite(xyzPoints[index].y)
                             && std::isfinite(xyzPoints[index].z))
                         {
-                            xValue = xyzPoints[index].x;
-                            yValue = xyzPoints[index].y;
-                            zValue = xyzPoints[index].z;
-                            scoreValue = 1.f;
+                            const auto baseIndex = indexesUsed[index] * lastChannelLength;
+                            keypoints3D[baseIndex] = xyzPoints[index].x;
+                            keypoints3D[baseIndex + 1] = xyzPoints[index].y;
+                            keypoints3D[baseIndex + 2] = xyzPoints[index].z;
+                            keypoints3D[baseIndex + 3] = 1.f;
                         }
                     }
                 }
             }
+            return keypoints3D;
         }
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return Array<float>{};
         }
     }
 }
