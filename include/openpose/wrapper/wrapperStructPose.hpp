@@ -149,6 +149,16 @@ namespace op
         float renderThreshold;
 
         /**
+         * Maximum number of people to be detected.
+         * This parameter will limit the maximum number of people detected, by keeping the people with the
+         * `numberPeopleMax` top scores.
+         * Useful if you know the exact number of people in the scene, so it can remove false positives (if all the
+         * people have been detected.
+         * However, it might also include false negatives by removing very small or highly occluded people.
+         */
+        int numberPeopleMax;
+
+        /**
          * Whether to internally enable Google Logging.
          * This option is only applicable if Caffe is used.
          * Only disable it if the user is already calling google::InitGoogleLogging() in his code.
@@ -156,6 +166,14 @@ namespace op
          * all the verbose messages.
          */
         bool enableGoogleLogging;
+
+        /**
+         * Whether to run the 3-D reconstruction demo, i.e.,
+         * 1) Reading from a stereo camera system.
+         * 2) Performing 3-D reconstruction from the multiple views.
+         * 3) Displaying 3-D reconstruction results.
+         */
+        bool reconstruct3d;
 
         /**
          * Whether to return a person ID for each body skeleton, providing temporal consistency.
@@ -178,7 +196,8 @@ namespace op
                           const int defaultPartToRender = 0, const std::string& modelFolder = "models/",
                           const std::vector<HeatMapType>& heatMapTypes = {},
                           const ScaleMode heatMapScale = ScaleMode::ZeroToOne, const bool addPartCandidates = false,
-                          const float renderThreshold = 0.05f, const bool enableGoogleLogging = true,
+                          const float renderThreshold = 0.05f, const int numberPeopleMax = -1,
+                          const bool enableGoogleLogging = true, const bool reconstruct3d = false,
                           const bool identification = false);
     };
 }

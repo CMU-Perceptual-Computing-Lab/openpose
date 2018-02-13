@@ -100,7 +100,7 @@ endif (WIN32)
 
 # Set the acceleration library
 set(GPU_MODE CUDA CACHE STRING "Select the acceleration GPU library or CPU otherwise.")
-# set_property(CACHE GPU_MODE PROPERTY STRINGS CPU_ONLY)
+# set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA CPU_ONLY)
 
 # # Test for CUDA or OpenCL
 # find_package(CUDA)
@@ -113,12 +113,18 @@ set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA)
 if (${GPU_MODE} MATCHES "CUDA")
   # OpenPose flags
   add_definitions(-DUSE_CUDA)
-  message(STATUS "Building with CUDA")
+  message(STATUS "Building with CUDA.")
 elseif (${GPU_MODE} MATCHES "CPU_ONLY")
   # OpenPose flag for Caffe
   add_definitions(-DCPU_ONLY)
-  message(STATUS "Building CPU Only")
+  message(STATUS "Building CPU Only.")
 endif ()
+
+if (${USE_MKL})
+  # OpenPose flags
+  add_definitions(-DUSE_MKL)
+  message(STATUS "Building with MKL support.")
+endif (${USE_MKL})
 
 # Intel branch with MKL Support
 if (${GPU_MODE} MATCHES "CPU_ONLY")

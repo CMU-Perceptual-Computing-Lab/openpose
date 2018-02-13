@@ -557,9 +557,6 @@
     <ClInclude Include="..\..\include\openpose\experimental\3d\cameraParameters.hpp">
       <Filter>Header Files\experimental\3d</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\openpose\experimental\3d\datum3D.hpp">
-      <Filter>Header Files\experimental\3d</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\openpose\experimental\3d\flirReader.hpp">
       <Filter>Header Files\experimental\3d</Filter>
     </ClInclude>

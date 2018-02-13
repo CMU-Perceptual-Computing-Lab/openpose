@@ -1,24 +1,24 @@
-#ifndef OPENPOSE_CORE_W_KEYPOINT_SCALER_HPP
-#define OPENPOSE_CORE_W_KEYPOINT_SCALER_HPP
+#ifndef OPENPOSE_CORE_W_KEEP_TOP_N_PEOPLE_HPP
+#define OPENPOSE_CORE_W_KEEP_TOP_N_PEOPLE_HPP
 
 #include <openpose/core/common.hpp>
-#include <openpose/core/keypointScaler.hpp>
+#include <openpose/core/keepTopNPeople.hpp>
 #include <openpose/thread/worker.hpp>
 
 namespace op
 {
     template<typename TDatums>
-    class WKeypointScaler : public Worker<TDatums>
+    class WKeepTopNPeople : public Worker<TDatums>
     {
     public:
-        explicit WKeypointScaler(const std::shared_ptr<KeypointScaler>& keypointScaler);
+        explicit WKeepTopNPeople(const std::shared_ptr<KeepTopNPeople>& keepTopNPeople);
 
         void initializationOnThread();
 
         void work(TDatums& tDatums);
 
     private:
-        std::shared_ptr<KeypointScaler> spKeypointScaler;
+        std::shared_ptr<KeepTopNPeople> spKeepTopNPeople;
     };
 }
 
@@ -31,18 +31,18 @@ namespace op
 namespace op
 {
     template<typename TDatums>
-    WKeypointScaler<TDatums>::WKeypointScaler(const std::shared_ptr<KeypointScaler>& keypointScaler) :
-        spKeypointScaler{keypointScaler}
+    WKeepTopNPeople<TDatums>::WKeepTopNPeople(const std::shared_ptr<KeepTopNPeople>& keepTopNPeople) :
+        spKeepTopNPeople{keepTopNPeople}
     {
     }
 
     template<typename TDatums>
-    void WKeypointScaler<TDatums>::initializationOnThread()
+    void WKeepTopNPeople<TDatums>::initializationOnThread()
     {
     }
 
     template<typename TDatums>
-    void WKeypointScaler<TDatums>::work(TDatums& tDatums)
+    void WKeepTopNPeople<TDatums>::work(TDatums& tDatums)
     {
         try
         {
@@ -55,10 +55,12 @@ namespace op
                 // Rescale pose data
                 for (auto& tDatum : *tDatums)
                 {
-                    std::vector<Array<float>> arraysToScale{tDatum.poseKeypoints, tDatum.handKeypoints[0],
-                                                            tDatum.handKeypoints[1], tDatum.faceKeypoints};
-                    spKeypointScaler->scale(arraysToScale, tDatum.scaleInputToOutput, tDatum.scaleNetToOutput,
-                                            Point<int>{tDatum.cvInputData.cols, tDatum.cvInputData.rows});
+                    tDatum.poseKeypoints = spKeepTopNPeople->keepTopPeople(tDatum.poseKeypoints, tDatum.poseScores);
+                    tDatum.faceKeypoints = spKeepTopNPeople->keepTopPeople(tDatum.faceKeypoints, tDatum.poseScores);
+                    tDatum.handKeypoints[0] = spKeepTopNPeople->keepTopPeople(tDatum.handKeypoints[0],
+                                                                              tDatum.poseScores);
+                    tDatum.handKeypoints[1] = spKeepTopNPeople->keepTopPeople(tDatum.handKeypoints[1],
+                                                                              tDatum.poseScores);
                 }
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
@@ -75,7 +77,7 @@ namespace op
         }
     }
 
-    COMPILE_TEMPLATE_DATUM(WKeypointScaler);
+    COMPILE_TEMPLATE_DATUM(WKeepTopNPeople);
 }
 
-#endif // OPENPOSE_CORE_W_KEYPOINT_SCALER_HPP
+#endif // OPENPOSE_CORE_W_KEEP_TOP_N_PEOPLE_HPP

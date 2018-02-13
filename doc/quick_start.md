@@ -7,6 +7,7 @@ OpenPose - Quick Start
     2. [Running on Webcam](#running-on-webcam)
     3. [Running on Images](#running-on-images)
     4. [Maximum Accuracy Configuration](#maximum-accuracy-configuration)
+    5. [3-D Reconstruction](#3-d-reconstruction)
 2. [Expected Visual Results](#expected-visual-results)
 
 
@@ -99,6 +100,28 @@ bin\OpenPoseDemo.exe --net_resolution "1312x736" --scale_number 4 --scale_gap 0.
 windows\x64\Release\OpenPoseDemo.exe --net_resolution "1312x736" --scale_number 4 --scale_gap 0.25
 :: Windows - Library: Body + Hand + Face
 windows\x64\Release\OpenPoseDemo.exe --net_resolution "1312x736" --scale_number 4 --scale_gap 0.25 --hand --hand_scale_number 6 --hand_scale_range 0.4 --face
+```
+
+
+
+### 3-D Reconstruction
+```
+# Ubuntu
+./build/examples/openpose/openpose.bin --3d --number_people_max 1
+# With face and hands
+./build/examples/openpose/openpose.bin --3d --number_people_max 1 --face --hand
+```
+```
+:: Windows - Portable Demo
+bin\OpenPoseDemo.exe --3d --number_people_max 1
+:: With face and hands
+bin\OpenPoseDemo.exe --3d --number_people_max 1 --face --hand
+```
+```
+:: Windows - Library
+windows\x64\Release\OpenPoseDemo.exe --3d --number_people_max 1
+:: With face and hands
+windows\x64\Release\OpenPoseDemo.exe --3d --number_people_max 1 --face --hand
 ```
 
 

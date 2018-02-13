@@ -1,3 +1,4 @@
+#include <openpose/gpu/gpu.hpp>
 #include <openpose/thread/enumClasses.hpp>
 #include <openpose/wrapper/wrapperAuxiliary.hpp>
 
@@ -92,7 +93,8 @@ namespace op
             }
             if (!wrapperStructOutput.writeVideo.empty() && wrapperStructInput.producerSharedPtr == nullptr)
                 error("Writting video is only available if the OpenPose producer is used (i.e."
-                      " wrapperStructInput.producerSharedPtr cannot be a nullptr).", __LINE__, __FUNCTION__, __FILE__);
+                      " wrapperStructInput.producerSharedPtr cannot be a nullptr).",
+                      __LINE__, __FUNCTION__, __FILE__);
             if (!wrapperStructPose.enable)
             {
                 if (!wrapperStructFace.enable)
@@ -101,9 +103,28 @@ namespace op
                     error("Body keypoint detection must be enabled in order to run hand keypoint detection.",
                           __LINE__, __FUNCTION__, __FILE__);
             }
-            #ifdef CPU_ONLY
+            // If 3-D module, 1 person is the maximum
+            if (wrapperStructPose.reconstruct3d && wrapperStructPose.numberPeopleMax > 1)
+            {
+                error("Set `--number_people_max 1` when using `--3d`. The 3-D reconstruction demo assumes there is"
+                      " at most 1 person on each image.", __LINE__, __FUNCTION__, __FILE__);
+            }
+            // If CPU mode, #GPU cannot be > 0
+            if (getGpuMode() == GpuMode::NoGpu)
                 if (wrapperStructPose.gpuNumber > 0)
-                    error("GPU number must be negative or 0 if CPU_ONLY is enabled.", __LINE__, __FUNCTION__, __FILE__);
+                    error("GPU number must be negative or 0 if CPU_ONLY is enabled.",
+                          __LINE__, __FUNCTION__, __FILE__);
+            // Net input resolution cannot be reshaped for Caffe OpenCL and MKL versions, only for CUDA version
+            #if defined USE_MKL || defined CPU_ONLY
+                // If image_dir and netInputSize == -1 --> error
+                if ((wrapperStructInput.producerSharedPtr == nullptr
+                     || wrapperStructInput.producerSharedPtr->getType() == ProducerType::ImageDirectory)
+                    // If netInputSize is -1
+                    && (wrapperStructPose.netInputSize.x == -1 || wrapperStructPose.netInputSize.y == -1))
+                    error("Dynamic `--net_resolution` is not supported in MKL (CPU) and OpenCL Caffe versions. Please"
+                          " remove `-1` from `net_resolution` or use the Caffe master branch when processing images"
+                          " and when using your custom image reader.",
+                          __LINE__, __FUNCTION__, __FILE__);
             #endif
 
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);

@@ -124,7 +124,6 @@
     <ClInclude Include="..\..\include\openpose\core\wOpOutputToCvMat.hpp" />
     <ClInclude Include="..\..\include\openpose\core\wScaleAndSizeExtractor.hpp" />
     <ClInclude Include="..\..\include\openpose\experimental\3d\cameraParameters.hpp" />
-    <ClInclude Include="..\..\include\openpose\experimental\3d\datum3D.hpp" />
     <ClInclude Include="..\..\include\openpose\experimental\3d\flirReader.hpp" />
     <ClInclude Include="..\..\include\openpose\experimental\3d\headers.hpp" />
     <ClInclude Include="..\..\include\openpose\experimental\3d\reconstruction3D.hpp" />

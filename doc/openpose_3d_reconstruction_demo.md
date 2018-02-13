@@ -8,8 +8,10 @@
 4. [Camera Calibration](#camera-calibration)
 5. [Camera Ordering](#camera-ordering)
 6. [Installing the OpenPose 3-D Reconstruction Module](#installing-the-openpose-3-d-reconstruction-module)
-7. [Using a Different Camera Brand](#using-a-different-camera-brand)
-8. [Known Bug](#known-bug)
+7. [Quick Start](#quick-start)
+8. [Expected Visual Results](#expected-visual-results)
+9. [Using a Different Camera Brand](#using-a-different-camera-brand)
+10. [Known Bug](#known-bug)
 
 
 
@@ -69,7 +71,12 @@ In order to verify that the camera parameters introduced by the user are sorted 
 
 
 ## Installing the OpenPose 3-D Reconstruction Module
-Check the [doc/installation.md#openpose-3d-reconstruction-module-and-demo](./installation.md#openpose-3d-reconstruction-module-and-demo) instructions.
+Check the [doc/quick_start.md#3-d-reconstruction](./quick_start.md#3-d-reconstruction) for 3-D examples.
+
+
+
+## Quick Start
+You can copy and modify the OpenPose 3-D demo to use any camera brand, by modifying the frames producer. For that, you would need to provide your custom code to retrieve synchronized images from your cameras, as well as their intrinsic and extrinsic camera parameters.
 
 
 

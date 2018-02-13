@@ -259,6 +259,7 @@ namespace op
 
 
 // Implementation
+#include <openpose/3d/headers.hpp>
 #include <openpose/core/headers.hpp>
 #include <openpose/experimental/tracking/headers.hpp>
 #include <openpose/face/headers.hpp>
@@ -453,18 +454,21 @@ namespace op
                                            wrapperStructOutput, renderOutput, userOutputWsEmpty, mThreadManagerMode);
 
             // Get number threads
+            auto numberThreads = wrapperStructPose.gpuNumber;
+            auto gpuNumberStart = wrapperStructPose.gpuNumberStart;
             // CPU --> 1 thread or no pose extraction
-            #ifdef CPU_ONLY
-                const auto numberThreads = (wrapperStructPose.gpuNumber == 0 ? 0 : 1);
-                const auto gpuNumberStart = 0;
+            if (getGpuMode() == GpuMode::NoGpu)
+            {
+                numberThreads = (wrapperStructPose.gpuNumber == 0 ? 0 : 1);
+                gpuNumberStart = 0;
                 // Disabling multi-thread makes the code 400 ms faster (2.3 sec vs. 2.7 in i7-6850K)
                 // and fixes the bug that the screen was not properly displayed and only refreshed sometimes
                 // Note: The screen bug could be also fixed by using waitKey(30) rather than waitKey(1)
                 disableMultiThreading();
+            }
             // GPU --> user picks (<= #GPUs)
-            #else
-                auto numberThreads = wrapperStructPose.gpuNumber;
-                const auto gpuNumberStart = wrapperStructPose.gpuNumberStart;
+            else
+            {
                 // If number GPU < 0 --> set it to all the available GPUs
                 if (numberThreads < 0)
                 {
@@ -480,7 +484,7 @@ namespace op
                         + " GPU(s), using " + std::to_string(numberThreads) + " of them starting at GPU "
                         + std::to_string(gpuNumberStart) + ".", Priority::High);
                 }
-            #endif
+            }
 
             // Proper format
             const auto writeImagesCleaned = formatAsDirectory(wrapperStructOutput.writeImages);
@@ -594,6 +598,17 @@ namespace op
                     spWPoses.resize(poseExtractors.size());
                     for (auto i = 0u; i < spWPoses.size(); i++)
                         spWPoses.at(i) = {std::make_shared<WPoseExtractor<TDatumsPtr>>(poseExtractors.at(i))};
+
+                    // Added right after PoseExtractor to avoid:
+                    // 1) Rendering people that are later deleted (wrong visualization).
+                    // 2) Processing faces and hands on people that will be deleted (speed up).
+                    if (wrapperStructPose.numberPeopleMax > 0)
+                    {
+                        // Add KeepTopNPeople for each PoseExtractor
+                        const auto keepTopNPeople = std::make_shared<KeepTopNPeople>(wrapperStructPose.numberPeopleMax);
+                        for (auto& wPose : spWPoses)
+                            wPose.emplace_back(std::make_shared<WKeepTopNPeople<TDatumsPtr>>(keepTopNPeople));
+                    }
                 }
 
 
@@ -605,19 +620,19 @@ namespace op
                     if (wrapperStructPose.enable)
                     {
                         const auto faceDetector = std::make_shared<FaceDetector>(wrapperStructPose.poseModel);
-                        for (auto gpu = 0u; gpu < spWPoses.size(); gpu++)
-                            spWPoses.at(gpu).emplace_back(std::make_shared<WFaceDetector<TDatumsPtr>>(faceDetector));
+                        for (auto& wPose : spWPoses)
+                            wPose.emplace_back(std::make_shared<WFaceDetector<TDatumsPtr>>(faceDetector));
                     }
                     // OpenCV face detector
                     else
                     {
                         log("Body keypoint detection is disabled. Hence, using OpenCV face detector (much less"
                             " accurate but faster).", Priority::High);
-                        for (auto gpu = 0u; gpu < spWPoses.size(); gpu++)
+                        for (auto& wPose : spWPoses)
                         {
                             // 1 FaceDetectorOpenCV per thread, OpenCV face detector is not thread-safe
                             const auto faceDetectorOpenCV = std::make_shared<FaceDetectorOpenCV>(modelFolder);
-                            spWPoses.at(gpu).emplace_back(
+                            wPose.emplace_back(
                                 std::make_shared<WFaceDetectorOpenCV<TDatumsPtr>>(faceDetectorOpenCV)
                             );
                         }
@@ -770,6 +785,13 @@ namespace op
                     const auto personIdExtractor = std::make_shared<PersonIdExtractor>();
                     mPostProcessingWs.emplace_back(
                         std::make_shared<WPersonIdExtractor<TDatumsPtr>>(personIdExtractor)
+                    );
+                }
+                // 3-D reconstruction
+                if (wrapperStructPose.reconstruct3d)
+                {
+                    mPostProcessingWs.emplace_back(
+                        std::make_shared<WPoseTriangulation<TDatumsPtr>>()
                     );
                 }
                 // Frames processor (OpenPose format -> cv::Mat format)

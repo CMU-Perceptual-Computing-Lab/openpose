@@ -56,9 +56,12 @@ int handFromJsonTest()
     op::log("Configuring OpenPose wrapper.", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
     op::WrapperHandFromJsonTest<std::vector<op::Datum>> opWrapper;
     // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
+    const bool identification = false;
     op::WrapperStructPose wrapperStructPose{false, op::flagsToPoint("656x368"), op::flagsToPoint("1280x720"),
                                             op::ScaleMode::InputResolution, FLAGS_num_gpu, FLAGS_num_gpu_start,
-                                            true, enableGoogleLogging};
+                                            1, 0.15f, op::RenderMode::None, op::PoseModel::COCO_18,
+                                            true, 0.f, 0.f, 0, "models/", {}, op::ScaleMode::ZeroToOne, false,
+                                            0.05f, -1, enableGoogleLogging, false, identification};
     wrapperStructPose.modelFolder = FLAGS_model_folder;
     // Hand configuration (use op::WrapperStructHand{} to disable it)
     const op::WrapperStructHand wrapperStructHand{FLAGS_hand, handNetInputSize, FLAGS_hand_scale_number,

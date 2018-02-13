@@ -34,17 +34,17 @@ namespace op
         try
         {
             #ifdef USE_CUDA
-                return GpuMode::CUDA;
+                return GpuMode::Cuda;
             #elif defined USE_OPENCL
-                return GpuMode::OPEN_CL;
+                return GpuMode::OpenCL;
             #else
-                return GpuMode::NO_GPU;
+                return GpuMode::NoGpu;
             #endif
         }
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return GpuMode::NO_GPU;
+            return GpuMode::NoGpu;
         }
     }
 }

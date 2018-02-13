@@ -5,9 +5,9 @@ namespace op
 {
     enum class GpuMode : unsigned char
     {
-        CUDA = 0,
-        OPEN_CL = 1,
-        NO_GPU = 2,
+        Cuda = 0,
+        OpenCL = 1,
+        NoGpu = 2,
         Size,
     };
 }

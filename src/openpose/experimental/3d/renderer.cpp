@@ -459,7 +459,7 @@ namespace op
         #endif
     }
 
-    void WRender3D::workConsumer(const std::shared_ptr<std::vector<Datum3D>>& datumsPtr)
+    void WRender3D::workConsumer(const std::shared_ptr<std::vector<Datum>>& datumsPtr)
     {
         #ifdef WITH_3D_RENDERER
             try
@@ -487,8 +487,8 @@ namespace op
                     std::unique_lock<std::mutex> lock{gKeypoints3D.mutex};
                     gKeypoints3D.mPoseKeypoints = datumsPtr->at(0).poseKeypoints3D;
                     gKeypoints3D.mFaceKeypoints = datumsPtr->at(0).faceKeypoints3D;
-                    gKeypoints3D.mLeftHandKeypoints = datumsPtr->at(0).leftHandKeypoints3D;
-                    gKeypoints3D.mRightHandKeypoints = datumsPtr->at(0).rightHandKeypoints3D;
+                    gKeypoints3D.mLeftHandKeypoints = datumsPtr->at(0).handKeypoints3D[0];
+                    gKeypoints3D.mRightHandKeypoints = datumsPtr->at(0).handKeypoints3D[1];
                     gKeypoints3D.validKeypoints = true;
                     // Esc pressed -> Close program
                     if (sLastKeyPressed == 27)

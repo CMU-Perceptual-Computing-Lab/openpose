@@ -10,9 +10,7 @@ namespace op
 
 	OP_API const cv::Mat getDistorsion(const int cameraIndex);
 
-	OP_API const cv::Mat getM(const int cameraIndex);
-
-	OP_API std::vector<cv::Mat> getMs();
+	OP_API cv::Mat getM(const int cameraIndex);
 
 	OP_API unsigned long long getNumberCameras();
 }

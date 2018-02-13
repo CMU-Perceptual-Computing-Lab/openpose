@@ -5,6 +5,7 @@ set(SOURCES_OP_CORE
     datum.cpp
     defineTemplates.cpp
     gpuRenderer.cpp
+    keepTopNPeople.cpp
     keypointScaler.cpp
     maximumBase.cpp
     maximumBase.cu

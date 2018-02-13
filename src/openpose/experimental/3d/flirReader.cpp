@@ -600,7 +600,7 @@ namespace op
         #endif
     }
 
-    std::shared_ptr<std::vector<Datum3D>> WFlirReader::workProducer()
+    std::shared_ptr<std::vector<Datum>> WFlirReader::workProducer()
     {
         try
         {
@@ -614,7 +614,7 @@ namespace op
                     // Get image from each camera
                     const auto cvMats = acquireImages(upImpl->mCameraList);
                     // Images to userDatum
-                    auto datums3d = std::make_shared<std::vector<Datum3D>>(cvMats.size());
+                    auto datums3d = std::make_shared<std::vector<Datum>>(cvMats.size());
                     for (auto i = 0u ; i < cvMats.size() ; i++)
                     {
                         datums3d->at(i).cvInputData = cvMats.at(i);

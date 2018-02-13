@@ -1,7 +1,6 @@
 set(SOURCES_OP_3D
     cameraParameters.cpp
     flirReader.cpp
-    reconstruction3D.cpp
     renderer.cpp)
 
 include(${CMAKE_SOURCE_DIR}/cmake/Utils.cmake)

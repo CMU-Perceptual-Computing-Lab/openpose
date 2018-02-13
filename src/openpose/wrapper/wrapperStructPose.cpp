@@ -12,7 +12,8 @@ namespace op
                                          const std::string& modelFolder_,
                                          const std::vector<HeatMapType>& heatMapTypes_,
                                          const ScaleMode heatMapScale_, const bool addPartCandidates_,
-                                         const float renderThreshold_, const bool enableGoogleLogging_,
+                                         const float renderThreshold_, const int numberPeopleMax_,
+                                         const bool enableGoogleLogging_, const bool reconstruct3d_,
                                          const bool identification_) :
         enable{enable_},
         netInputSize{netInputSize_},
@@ -33,7 +34,9 @@ namespace op
         heatMapScale{heatMapScale_},
         addPartCandidates{addPartCandidates_},
         renderThreshold{renderThreshold_},
+        numberPeopleMax{numberPeopleMax_},
         enableGoogleLogging{enableGoogleLogging_},
+        reconstruct3d{reconstruct3d_},
         identification{identification_}
     {
     }
