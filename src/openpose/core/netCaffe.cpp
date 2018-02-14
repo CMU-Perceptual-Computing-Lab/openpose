@@ -196,7 +196,9 @@ namespace op
                 #elif USE_OPENCL
                     auto* gpuImagePtr = upImpl->upCaffeNet->blobs().at(0)->mutable_gpu_data();
                     cl::Buffer imageBuffer = cl::Buffer((cl_mem)gpuImagePtr, true);
-                    op::OpenCL::getInstance(upImpl->mGpuId)->getQueue().enqueueWriteBuffer(imageBuffer, true, 0, inputData.getVolume() * sizeof(float), inputData.getConstPtr());
+                    op::OpenCL::getInstance(upImpl->mGpuId)->getQueue().enqueueWriteBuffer(imageBuffer, true, 0,
+                                                                                           inputData.getVolume() * sizeof(float),
+                                                                                           inputData.getConstPtr());
                 #else
                     auto* cpuImagePtr = upImpl->upCaffeNet->blobs().at(0)->mutable_cpu_data();
                     std::copy(inputData.getConstPtr(), inputData.getConstPtr() + inputData.getVolume(), cpuImagePtr);
