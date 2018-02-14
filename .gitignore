@@ -75,6 +75,7 @@ tags
 *.vs/
 *x64/
 3rdparty/windows/caffe/
+3rdparty/windows/caffe_opencl/
 3rdparty/windows/caffe3rdparty/
 3rdparty/windows/opencv/
 3rdparty/windows/freeglut/
