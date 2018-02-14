@@ -52,7 +52,7 @@ namespace op
                 // Profiling speed
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                 // 3-D triangulation and reconstruction
-                std::vector<cv::Mat> cameraParameterMatrices;
+                std::vector<cv::Mat> cameraMatrices;
                 std::vector<Array<float>> poseKeypointVector;
                 std::vector<Array<float>> faceKeypointVector;
                 std::vector<Array<float>> leftHandKeypointVector;
@@ -63,13 +63,13 @@ namespace op
                     faceKeypointVector.emplace_back(datumsElement.faceKeypoints);
                     leftHandKeypointVector.emplace_back(datumsElement.handKeypoints[0]);
                     rightHandKeypointVector.emplace_back(datumsElement.handKeypoints[1]);
-                    cameraParameterMatrices.emplace_back(datumsElement.cameraParameterMatrix);
+                    cameraMatrices.emplace_back(datumsElement.cameraMatrix);
                 }
                 // Pose 3-D reconstruction
-                auto poseKeypoints3D = reconstructArray(poseKeypointVector, cameraParameterMatrices);
-                auto faceKeypoints3D = reconstructArray(faceKeypointVector, cameraParameterMatrices);
-                auto leftHandKeypoints3D = reconstructArray(leftHandKeypointVector, cameraParameterMatrices);
-                auto rightHandKeypoints3D = reconstructArray(rightHandKeypointVector, cameraParameterMatrices);
+                auto poseKeypoints3D = reconstructArray(poseKeypointVector, cameraMatrices);
+                auto faceKeypoints3D = reconstructArray(faceKeypointVector, cameraMatrices);
+                auto leftHandKeypoints3D = reconstructArray(leftHandKeypointVector, cameraMatrices);
+                auto rightHandKeypoints3D = reconstructArray(rightHandKeypointVector, cameraMatrices);
                 // Assign to all tDatums
                 for (auto& datumsElement : *tDatums)
                 {

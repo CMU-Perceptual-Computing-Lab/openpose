@@ -1,4 +1,5 @@
 set(SOURCES_OP_3D
+    cameraParameterReader.cpp
     defineTemplates.cpp
     poseTriangulation.cpp)
 

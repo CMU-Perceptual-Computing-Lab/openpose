@@ -18,6 +18,8 @@ namespace op
          */
         explicit IpCameraReader(const std::string& cameraPath);
 
+        std::vector<cv::Mat> getCameraMatrices();
+
         std::string getFrameName();
 
         inline double get(const int capProperty)
@@ -34,6 +36,8 @@ namespace op
         const std::string mPathName;
 
         cv::Mat getRawFrame();
+
+        std::vector<cv::Mat> getRawFrames();
 
         DELETE_COPY(IpCameraReader);
     };

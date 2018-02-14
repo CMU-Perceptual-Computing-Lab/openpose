@@ -1,12 +1,13 @@
-﻿#include <chrono>
-#include <thread>
-#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/imgproc/imgproc.hpp> // cv::undistort
 #ifdef WITH_FLIR_CAMERA
     #include <Spinnaker.h>
 #endif
-#include <openpose/experimental/3d/cameraParameters.hpp>
-#include <openpose/utilities/check.hpp>
-#include <openpose/experimental/3d/flirReader.hpp>
+#include <openpose/3d/cameraParameterReader.hpp>
+#include <openpose/filestream/fileStream.hpp>
+#include <openpose/utilities/fastMath.hpp>
+#include <openpose/utilities/fileSystem.hpp>
+#include <openpose/utilities/string.hpp>
+#include <openpose/producer/flirReader.hpp>
 
 namespace op
 {
@@ -319,105 +320,31 @@ namespace op
 
             return result;
         }
+    #else
+        const std::string WITH_FLIR_CAMERA_ERROR{"OpenPose CMake must be compiled with the `WITH_FLIR_CAMERA` flag in"
+            " order to use the FLIR camera. Alternatively, disable `--flir_camera`."};
     #endif
 
-    struct WFlirReader::ImplWFlirReader
+    struct FlirReader::ImplFlirReader
     {
         #ifdef WITH_FLIR_CAMERA
             bool mInitialized;
             Spinnaker::CameraList mCameraList;
             Spinnaker::SystemPtr mSystemPtr;
 
-            ImplWFlirReader() :
+            ImplFlirReader() :
                 mInitialized{false}
             {
             }
         #endif
     };
 
-    WFlirReader::WFlirReader()
+    FlirReader::FlirReader() :
+        Producer{ProducerType::FlirCamera},
         #ifdef WITH_FLIR_CAMERA
-         : upImpl{new ImplWFlirReader{}}
+            upImpl{new ImplFlirReader{}},
         #endif
-    {
-        try
-        {
-            #ifndef WITH_FLIR_CAMERA
-                error("OpenPose must be compiled with `WITH_FLIR_CAMERA` in order to use this class.",
-                          __LINE__, __FUNCTION__, __FILE__);
-            #endif
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-        }
-    }
-
-    WFlirReader::~WFlirReader()
-    {
-        #ifdef WITH_FLIR_CAMERA
-            try
-            {
-                if (upImpl->mInitialized)
-                {
-                    // End acquisition for each camera
-                    // Notice that what is usually a one-step process is now two steps
-                    // because of the additional step of selecting the camera. It is worth
-                    // repeating that camera selection needs to be done once per loop.
-                    // It is possible to interact with cameras through the camera list with
-                    // GetByIndex(); this is an alternative to retrieving cameras as
-                    // Spinnaker::CameraPtr objects that can be quick and easy for small tasks.
-                    //
-                    for (auto i = 0; i < upImpl->mCameraList.GetSize(); i++)
-                        upImpl->mCameraList.GetByIndex(i)->EndAcquisition();
-
-                    for (auto i = 0; i < upImpl->mCameraList.GetSize(); i++)
-                    {
-                        // Select camera
-                        auto cameraPtr = upImpl->mCameraList.GetByIndex(i);
-
-                        // Retrieve GenICam nodemap
-                        auto& iNodeMap = cameraPtr->GetNodeMap();
-
-                        // // Disable chunk data
-                        // result = disableChunkData(iNodeMap);
-                        // // if (result < 0)
-                        // //     return result;
-
-                        // Reset trigger
-                        auto result = resetTrigger(iNodeMap);
-                        if (result < 0)
-                            error("Error happened..." + std::to_string(result), __LINE__, __FUNCTION__, __FILE__);
-
-                        // Deinitialize each camera
-                        // Each camera must be deinitialized separately by first
-                        // selecting the camera and then deinitializing it.
-                        cameraPtr->DeInit();
-                    }
-
-                    log("FLIR (Point-grey) capture completed. Releasing cameras...", Priority::High);
-
-                    // Clear camera list before releasing upImpl->mSystemPtr
-                    upImpl->mCameraList.Clear();
-
-                    // Release upImpl->mSystemPtr
-                    upImpl->mSystemPtr->ReleaseInstance();
-                }
-
-                log("Cameras released! Exitting program.", Priority::High);
-            }
-            catch (const Spinnaker::Exception& e)
-            {
-                error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            }
-            catch (const std::exception& e)
-            {
-                error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            }
-        #endif
-    }
-
-    void WFlirReader::initializationOnThread()
+        mFrameNameCounter{0}
     {
         #ifdef WITH_FLIR_CAMERA
             try
@@ -587,7 +514,118 @@ namespace op
                     log(" ", Priority::High);
                 }
 
+                const auto cvMats = getRawFrames();
+                // Security checks
+                if (cvMats.empty())
+                    error("Cameras could not be opened.", __LINE__, __FUNCTION__, __FILE__);
+                // Get resolution
+                else
+                {
+                    set(CV_CAP_PROP_FRAME_WIDTH, cvMats[0].cols);
+                    set(CV_CAP_PROP_FRAME_HEIGHT, cvMats[0].rows);
+                }
+
                 log("\nRunning for all cameras...\n\n*** IMAGE ACQUISITION ***\n", Priority::High);
+            }
+            catch (const Spinnaker::Exception& e)
+            {
+                error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            }
+            catch (const std::exception& e)
+            {
+                error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            }
+        #else
+            error(WITH_FLIR_CAMERA_ERROR, __LINE__, __FUNCTION__, __FILE__);
+        #endif
+    }
+
+    FlirReader::~FlirReader()
+    {
+        try
+        {
+            release();
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    std::vector<cv::Mat> FlirReader::getCameraMatrices()
+    {
+        try
+        {
+            std::vector<cv::Mat> cameraMatrices(getNumberCameras());
+            for (auto i = 0ull ; i < cameraMatrices.size() ; i++)
+                cameraMatrices[i] = getM(i);
+            return cameraMatrices;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return {};
+        }
+    }
+
+    std::string FlirReader::getFrameName()
+    {
+        const auto stringLength = 12u;
+        return toFixedLengthString(   fastMax(0ll, longLongRound(mFrameNameCounter)),   stringLength);
+    }
+
+    void FlirReader::release()
+    {
+        #ifdef WITH_FLIR_CAMERA
+            try
+            {
+                if (upImpl->mInitialized)
+                {
+                    // End acquisition for each camera
+                    // Notice that what is usually a one-step process is now two steps
+                    // because of the additional step of selecting the camera. It is worth
+                    // repeating that camera selection needs to be done once per loop.
+                    // It is possible to interact with cameras through the camera list with
+                    // GetByIndex(); this is an alternative to retrieving cameras as
+                    // Spinnaker::CameraPtr objects that can be quick and easy for small tasks.
+                    //
+                    for (auto i = 0; i < upImpl->mCameraList.GetSize(); i++)
+                        upImpl->mCameraList.GetByIndex(i)->EndAcquisition();
+
+                    for (auto i = 0; i < upImpl->mCameraList.GetSize(); i++)
+                    {
+                        // Select camera
+                        auto cameraPtr = upImpl->mCameraList.GetByIndex(i);
+
+                        // Retrieve GenICam nodemap
+                        auto& iNodeMap = cameraPtr->GetNodeMap();
+
+                        // // Disable chunk data
+                        // result = disableChunkData(iNodeMap);
+                        // // if (result < 0)
+                        // //     return result;
+
+                        // Reset trigger
+                        auto result = resetTrigger(iNodeMap);
+                        if (result < 0)
+                            error("Error happened..." + std::to_string(result), __LINE__, __FUNCTION__, __FILE__);
+
+                        // Deinitialize each camera
+                        // Each camera must be deinitialized separately by first
+                        // selecting the camera and then deinitializing it.
+                        cameraPtr->DeInit();
+                    }
+
+                    log("FLIR (Point-grey) capture completed. Releasing cameras...", Priority::High);
+
+                    // Clear camera list before releasing upImpl->mSystemPtr
+                    upImpl->mCameraList.Clear();
+
+                    // Release upImpl->mSystemPtr
+                    upImpl->mSystemPtr->ReleaseInstance();
+                }
+
+                log("Cameras released! Exiting program.", Priority::High);
             }
             catch (const Spinnaker::Exception& e)
             {
@@ -600,55 +638,115 @@ namespace op
         #endif
     }
 
-    std::shared_ptr<std::vector<Datum>> WFlirReader::workProducer()
+    cv::Mat FlirReader::getRawFrame()
     {
         try
         {
             #ifdef WITH_FLIR_CAMERA
                 try
                 {
-                    // Debugging log
-                    dLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-                    // Profiling speed
-                    const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
-                    // Get image from each camera
-                    const auto cvMats = acquireImages(upImpl->mCameraList);
-                    // Images to userDatum
-                    auto datums3d = std::make_shared<std::vector<Datum>>(cvMats.size());
-                    for (auto i = 0u ; i < cvMats.size() ; i++)
-                    {
-                        datums3d->at(i).cvInputData = cvMats.at(i);
-                        (*datums3d)[i].cvOutputData = (*datums3d)[i].cvInputData;
-                        (*datums3d)[i].cameraParameterMatrix = getM(i);
-                    }
-                    // Profiling speed
-                    if (!cvMats.empty())
-                    {
-                        Profiler::timerEnd(profilerKey);
-                        Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);
-                    }
-                    // Debugging log
-                    dLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-                    // Return Datum
-                    return datums3d;
+                    return acquireImages(upImpl->mCameraList).at(0);
                 }
                 catch (const Spinnaker::Exception& e)
                 {
-                    this->stop();
                     error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-                    return nullptr;
+                    return cv::Mat();
                 }
             #else
-                error("OpenPose must be compiled with `WITH_FLIR_CAMERA` in order to use this class.",
-                      __LINE__, __FUNCTION__, __FILE__);
-                return nullptr;
+                error(WITH_FLIR_CAMERA_ERROR, __LINE__, __FUNCTION__, __FILE__);
+                return cv::Mat();
             #endif
         }
         catch (const std::exception& e)
         {
-            this->stop();
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return nullptr;
+            return cv::Mat();
+        }
+    }
+
+    std::vector<cv::Mat> FlirReader::getRawFrames()
+    {
+        try
+        {
+            #ifdef WITH_FLIR_CAMERA
+                try
+                {
+                    return acquireImages(upImpl->mCameraList);
+                }
+                catch (const Spinnaker::Exception& e)
+                {
+                    error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+                    return {};
+                }
+            #else
+                error(WITH_FLIR_CAMERA_ERROR, __LINE__, __FUNCTION__, __FILE__);
+                return {};
+            #endif
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return {};
+        }
+    }
+
+    double FlirReader::get(const int capProperty)
+    {
+        try
+        {
+            if (capProperty == CV_CAP_PROP_FRAME_WIDTH)
+            {
+                if (Producer::get(ProducerProperty::Rotation) == 0.
+                    || Producer::get(ProducerProperty::Rotation) == 180.)
+                    return mResolution.x;
+                else
+                    return mResolution.y;
+            }
+            else if (capProperty == CV_CAP_PROP_FRAME_HEIGHT)
+            {
+                if (Producer::get(ProducerProperty::Rotation) == 0.
+                    || Producer::get(ProducerProperty::Rotation) == 180.)
+                    return mResolution.y;
+                else
+                    return mResolution.x;
+            }
+            else if (capProperty == CV_CAP_PROP_POS_FRAMES)
+                return (double)mFrameNameCounter;
+            else if (capProperty == CV_CAP_PROP_FRAME_COUNT)
+                return -1.;
+            else if (capProperty == CV_CAP_PROP_FPS)
+                return -1.;
+            else
+            {
+                log("Unknown property", Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                return -1.;
+            }
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return 0.;
+        }
+    }
+
+    void FlirReader::set(const int capProperty, const double value)
+    {
+        try
+        {
+            if (capProperty == CV_CAP_PROP_FRAME_WIDTH)
+                mResolution.x = {(int)value};
+            else if (capProperty == CV_CAP_PROP_FRAME_HEIGHT)
+                mResolution.y = {(int)value};
+            else if (capProperty == CV_CAP_PROP_POS_FRAMES)
+                log("This property is read-only.", Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+            else if (capProperty == CV_CAP_PROP_FRAME_COUNT || capProperty == CV_CAP_PROP_FPS)
+                log("This property is read-only.", Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+            else
+                log("Unknown property", Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
     }
 }

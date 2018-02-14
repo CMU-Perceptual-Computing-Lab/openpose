@@ -408,6 +408,9 @@ namespace op
                 error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             }
         }
+    #else
+        const std::string WITH_3D_RENDERER_ERROR{"OpenPose CMake must be compiled with the `WITH_3D_RENDERER` flag in"
+            " order to use the 3-D visualization renderer. Alternatively, set 2-D rendering with `--display 2`."};
     #endif
 
     Gui3D::Gui3D(const Point<int>& outputSize, const bool fullScreen,
@@ -431,8 +434,7 @@ namespace op
             #else
                 UNUSED(poseModel);
                 if (mDisplayMode == DisplayMode::DisplayAll || mDisplayMode == DisplayMode::Display3D)
-                    error("OpenPose must be compiled with `WITH_3D_RENDERER` in order to use the 3-D visualization"
-                          "renderer. Alternatively, set 2-D rendering.", __LINE__, __FUNCTION__, __FILE__);
+                    error(WITH_3D_RENDERER_ERROR, __LINE__, __FUNCTION__, __FILE__);
             #endif
         }
         catch (const std::exception& e)

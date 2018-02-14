@@ -20,6 +20,8 @@ namespace op
          */
         explicit VideoReader(const std::string& videoPath);
 
+        std::vector<cv::Mat> getCameraMatrices();
+
         std::string getFrameName();
 
         inline double get(const int capProperty)
@@ -36,6 +38,8 @@ namespace op
         const std::string mPathName;
 
         cv::Mat getRawFrame();
+
+        std::vector<cv::Mat> getRawFrames();
 
         DELETE_COPY(VideoReader);
     };

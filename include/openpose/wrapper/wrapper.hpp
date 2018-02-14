@@ -919,6 +919,8 @@ namespace op
                     // WGui
                     spWGui = {std::make_shared<WGui<TDatumsPtr>>(gui)};
                 }
+                else
+                    error("Unknown DisplayMode.", __LINE__, __FUNCTION__, __FILE__);
             }
             // Set wrapper as configured
             mConfigured = true;

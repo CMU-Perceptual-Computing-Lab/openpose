@@ -1,4 +1,3 @@
-add_subdirectory(experimental_3d)
 add_subdirectory(openpose)
 add_subdirectory(tutorial_add_module)
 add_subdirectory(tutorial_pose)

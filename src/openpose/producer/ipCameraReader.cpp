@@ -12,6 +12,19 @@ namespace op
     {
     }
 
+    std::vector<cv::Mat> IpCameraReader::getCameraMatrices()
+    {
+        try
+        {
+            return {};
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return {};
+        }
+    }
+
     std::string IpCameraReader::getFrameName()
     {
         try
@@ -35,6 +48,19 @@ namespace op
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             return cv::Mat();
+        }
+    }
+
+    std::vector<cv::Mat> IpCameraReader::getRawFrames()
+    {
+        try
+        {
+            return VideoCaptureReader::getRawFrames();
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return {};
         }
     }
 }

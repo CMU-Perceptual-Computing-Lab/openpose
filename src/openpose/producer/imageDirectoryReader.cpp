@@ -38,6 +38,19 @@ namespace op
     {
     }
 
+    std::vector<cv::Mat> ImageDirectoryReader::getCameraMatrices()
+    {
+        try
+        {
+            return {};
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return {};
+        }
+    }
+
     std::string ImageDirectoryReader::getFrameName()
     {
         return getFileNameNoExtension(mFilePaths.at(mFrameNameCounter));
@@ -62,20 +75,35 @@ namespace op
         }
     }
 
+    std::vector<cv::Mat> ImageDirectoryReader::getRawFrames()
+    {
+        try
+        {
+            return std::vector<cv::Mat>{getRawFrame()};
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return {};
+        }
+    }
+
     double ImageDirectoryReader::get(const int capProperty)
     {
         try
         {
             if (capProperty == CV_CAP_PROP_FRAME_WIDTH)
             {
-                if (get(ProducerProperty::Rotation) == 0. || get(ProducerProperty::Rotation) == 180.)
+                if (Producer::get(ProducerProperty::Rotation) == 0.
+                    || Producer::get(ProducerProperty::Rotation) == 180.)
                     return mResolution.x;
                 else
                     return mResolution.y;
             }
             else if (capProperty == CV_CAP_PROP_FRAME_HEIGHT)
             {
-                if (get(ProducerProperty::Rotation) == 0. || get(ProducerProperty::Rotation) == 180.)
+                if (Producer::get(ProducerProperty::Rotation) == 0.
+                    || Producer::get(ProducerProperty::Rotation) == 180.)
                     return mResolution.y;
                 else
                     return mResolution.x;

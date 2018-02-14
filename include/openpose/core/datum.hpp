@@ -174,9 +174,9 @@ namespace op
         std::array<Array<float>, 2> handKeypoints3D;
 
         /**
-         * 4x3 extrinsic parameter matrix of the camera.
+         * 3x4 camera matrix of the camera.
          */
-        cv::Mat cameraParameterMatrix;
+        cv::Mat cameraMatrix;
 
         // ---------------------------------------- Other (internal) parameters ---------------------------------------- //
         /**

@@ -1,6 +1,6 @@
 ﻿#include <vector>
 #include <openpose/utilities/errorAndLog.hpp>
-#include <openpose/experimental/3d/cameraParameters.hpp>
+#include <openpose/3d/cameraParameterReader.hpp>
 
 namespace op
 {

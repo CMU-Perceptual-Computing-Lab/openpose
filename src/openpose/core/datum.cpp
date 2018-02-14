@@ -35,7 +35,7 @@ namespace op
         poseKeypoints3D{datum.poseKeypoints3D},
         faceKeypoints3D{datum.faceKeypoints3D},
         handKeypoints3D(datum.handKeypoints3D), // Parentheses instead of braces to avoid error in GCC 4.8
-        cameraParameterMatrix{datum.cameraParameterMatrix},
+        cameraMatrix{datum.cameraMatrix},
         // Other parameters
         scaleInputToNetInputs{datum.scaleInputToNetInputs},
         netInputSizes{datum.netInputSizes},
@@ -74,7 +74,7 @@ namespace op
             poseKeypoints3D = datum.poseKeypoints3D,
             faceKeypoints3D = datum.faceKeypoints3D,
             handKeypoints3D = datum.handKeypoints3D,
-            cameraParameterMatrix = datum.cameraParameterMatrix;
+            cameraMatrix = datum.cameraMatrix;
             // Other parameters
             scaleInputToNetInputs = datum.scaleInputToNetInputs;
             netInputSizes = datum.netInputSizes;
@@ -124,7 +124,7 @@ namespace op
             std::swap(poseKeypoints3D, datum.poseKeypoints3D);
             std::swap(faceKeypoints3D, datum.faceKeypoints3D);
             std::swap(handKeypoints3D, datum.handKeypoints3D);
-            std::swap(cameraParameterMatrix, datum.cameraParameterMatrix);
+            std::swap(cameraMatrix, datum.cameraMatrix);
             // Other parameters
             std::swap(scaleInputToNetInputs, datum.scaleInputToNetInputs);
             std::swap(netInputSizes, datum.netInputSizes);
@@ -165,7 +165,7 @@ namespace op
             std::swap(poseKeypoints3D, datum.poseKeypoints3D);
             std::swap(faceKeypoints3D, datum.faceKeypoints3D);
             std::swap(handKeypoints3D, datum.handKeypoints3D);
-            std::swap(cameraParameterMatrix, datum.cameraParameterMatrix);
+            std::swap(cameraMatrix, datum.cameraMatrix);
             // Other parameters
             std::swap(scaleInputToNetInputs, datum.scaleInputToNetInputs);
             std::swap(netInputSizes, datum.netInputSizes);
@@ -219,7 +219,7 @@ namespace op
             datum.faceKeypoints3D = faceKeypoints3D.clone();
             for (auto i = 0u ; i < datum.handKeypoints.size() ; i++)
                 datum.handKeypoints3D[i] = handKeypoints3D[i].clone();
-            datum.cameraParameterMatrix = cameraParameterMatrix.clone();
+            datum.cameraMatrix = cameraMatrix.clone();
             // Other parameters
             datum.scaleInputToNetInputs = scaleInputToNetInputs;
             datum.netInputSizes = netInputSizes;
