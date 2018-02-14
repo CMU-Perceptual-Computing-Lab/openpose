@@ -12,34 +12,9 @@ namespace op
     const auto errorMessage = "Json format only implemented in OpenCV for versions >= 3.0. Check savePoseJson"
                               " instead.";
 
-    std::string dataFormatToString(const DataFormat format)
+    std::string getFullName(const std::string& fileNameNoExtension, const DataFormat dataFormat)
     {
-        try
-        {
-            if (format == DataFormat::Json)
-                return "json";
-            else if (format == DataFormat::Xml)
-                return "xml";
-            else if (format == DataFormat::Yaml)
-                return "yaml";
-            else if (format == DataFormat::Yml)
-                return "yml";
-            else
-            {
-                error("Undefined DataFormat.", __LINE__, __FUNCTION__, __FILE__);
-                return "";
-            }
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return "";
-        }
-    }
-
-    std::string getFullName(const std::string& fileNameNoExtension, const DataFormat format)
-    {
-        return fileNameNoExtension + "." + dataFormatToString(format);
+        return fileNameNoExtension + "." + dataFormatToString(dataFormat);
     }
 
     void addKeypointsToJson(JsonOfstream& jsonOfstream,
@@ -150,6 +125,31 @@ namespace op
 
 
     // Public classes (on *.hpp)
+    std::string dataFormatToString(const DataFormat dataFormat)
+    {
+        try
+        {
+            if (dataFormat == DataFormat::Json)
+                return "json";
+            else if (dataFormat == DataFormat::Xml)
+                return "xml";
+            else if (dataFormat == DataFormat::Yaml)
+                return "yaml";
+            else if (dataFormat == DataFormat::Yml)
+                return "yml";
+            else
+            {
+                error("Undefined DataFormat.", __LINE__, __FUNCTION__, __FILE__);
+                return "";
+            }
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return "";
+        }
+    }
+
     DataFormat stringToDataFormat(const std::string& dataFormat)
     {
         try
@@ -164,7 +164,7 @@ namespace op
                 return DataFormat::Yml;
             else
             {
-                error("String does not correspond to any format (json, xml, yaml, yml)",
+                error("String does not correspond to any known format (json, xml, yaml, yml)",
                       __LINE__, __FUNCTION__, __FILE__);
                 return DataFormat::Json;
             }
@@ -204,17 +204,18 @@ namespace op
     }
 
     void saveData(const std::vector<cv::Mat>& cvMats, const std::vector<std::string>& cvMatNames,
-                  const std::string& fileNameNoExtension, const DataFormat format)
+                  const std::string& fileNameNoExtension, const DataFormat dataFormat)
     {
         try
         {
             // Security checks
-            if (format == DataFormat::Json && CV_MAJOR_VERSION < 3)
+            if (dataFormat == DataFormat::Json && CV_MAJOR_VERSION < 3)
                 error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
             if (cvMats.size() != cvMatNames.size())
-                error("cvMats.size() != cvMatNames.size()", __LINE__, __FUNCTION__, __FILE__);
+                error("cvMats.size() != cvMatNames.size() (" + std::to_string(cvMats.size())
+                      + " vs. " + std::to_string(cvMatNames.size()) + ")", __LINE__, __FUNCTION__, __FILE__);
             // Save cv::Mat data
-            cv::FileStorage fileStorage{getFullName(fileNameNoExtension, format), cv::FileStorage::WRITE};
+            cv::FileStorage fileStorage{getFullName(fileNameNoExtension, dataFormat), cv::FileStorage::WRITE};
             for (auto i = 0u ; i < cvMats.size() ; i++)
                 fileStorage << cvMatNames[i] << (cvMats[i].empty() ? cv::Mat() : cvMats[i]);
             // Release file
@@ -227,11 +228,12 @@ namespace op
     }
 
     void saveData(const cv::Mat& cvMat, const std::string cvMatName, const std::string& fileNameNoExtension,
-                  const DataFormat format)
+                  const DataFormat dataFormat)
     {
         try
         {
-            saveData(std::vector<cv::Mat>{cvMat}, std::vector<std::string>{cvMatName}, fileNameNoExtension, format);
+            saveData(std::vector<cv::Mat>{cvMat}, std::vector<std::string>{cvMatName}, fileNameNoExtension,
+                     dataFormat);
         }
         catch (const std::exception& e)
         {
@@ -240,14 +242,19 @@ namespace op
     }
 
     std::vector<cv::Mat> loadData(const std::vector<std::string>& cvMatNames, const std::string& fileNameNoExtension,
-                                  const DataFormat format)
+                                  const DataFormat dataFormat)
     {
         try
         {
-            if (format == DataFormat::Json && CV_MAJOR_VERSION < 3)
+            // Security checks
+            if (dataFormat == DataFormat::Json && CV_MAJOR_VERSION < 3)
                 error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
-
-            cv::FileStorage fileStorage{getFullName(fileNameNoExtension, format), cv::FileStorage::READ};
+            const auto fileName = getFullName(fileNameNoExtension, dataFormat);
+            // Security checks
+            if (!existFile(fileName))
+                error("File to be read does not exist: " + fileName + ".", __LINE__, __FUNCTION__, __FILE__);
+            // Read file
+            cv::FileStorage fileStorage{fileName, cv::FileStorage::READ};
             std::vector<cv::Mat> cvMats(cvMatNames.size());
             for (auto i = 0u ; i < cvMats.size() ; i++)
                 fileStorage[cvMatNames[i]] >> cvMats[i];
@@ -261,11 +268,11 @@ namespace op
         }
     }
 
-    cv::Mat loadData(const std::string& cvMatName, const std::string& fileNameNoExtension, const DataFormat format)
+    cv::Mat loadData(const std::string& cvMatName, const std::string& fileNameNoExtension, const DataFormat dataFormat)
     {
         try
         {
-            return loadData(std::vector<std::string>{cvMatName}, fileNameNoExtension, format)[0];
+            return loadData(std::vector<std::string>{cvMatName}, fileNameNoExtension, dataFormat)[0];
         }
         catch (const std::exception& e)
         {

@@ -52,11 +52,12 @@ This demo assumes n arbitrary stereo cameras from the FLIR company (formerly Poi
 
 
 ## Camera Calibration
-The user must manually get the intrinsic and extrinsic parameters of the cameras, introduce them on: `src/experimental/3d/cameraParameters.cpp`, and recompile OpenPose.
+The user must manually get the intrinsic and extrinsic parameters of the FLIR cameras:
 
-The program uses 3 cameras by default, but cameras can be added or removed from `cameraParameters.hpp` by adding or removing elements to `INTRINSICS`, `DISTORTIONS` and `M_EACH_CAMERA`. `INTRINSICS` corresponds to the intrinsic parameters, `DISTORTIONS` to the distortion coefficients, and `M` corresponds to the extrinsic parameters of the cameras with respect to camera 1, i.e. camera 1 is considered the coordinates origin. However, it can be changed by the user by setting these parameters differently.
-
-3D OpenPose uses the 8-distortion-parameter version of OpenCV by default. Internally, the distortion parameters are used by the OpenCV function [undistort()](http://docs.opencv.org/3.2.0/da/d54/group__imgproc__transform.html#ga69f2545a8b62a6b0fc2ee060dc30559d) to rectify the images. This function can take either 4-, 5- or 8-parameter distortion coefficients (OpenCV 3.X also adds a 12- and 14-parameter alternatives). Therefore, either version (4, 5, 8, 12 or 14) will work in 3D OpenPose, the user just needs to modify the `DISTORTION_i` variables in `cameraParameters.hpp` with the desired number of distortion parameters for each camera.
+1. Create a xml file for each camera named as `models/cameraParameters/flir/{camera_serial_number}.xml`.
+2. The elements inside each xml file are the extrinsic parameters of the camera, the intrinsic parameters, and the distortion coefficients. Copy the format from `models/cameraParameters/flir/17012332.xml.example`.
+3. The program can use any arbitrary number of cameras. Even if lots of cameras are added in `models/cameraParameters/flir/`, the program will check at runtime which FLIR cameras are detected and simply read those camera parameters. If the file corresponding to any of the cameras detected at runtime is not found, OpenPose will return an error.
+4. In the example XML, OpenPose uses the 8-distortion-parameter version of OpenCV. The distortion parameters are internally used by the OpenCV function [undistort()](http://docs.opencv.org/3.2.0/da/d54/group__imgproc__transform.html#ga69f2545a8b62a6b0fc2ee060dc30559d) to rectify the images. Therefore, this function can take either 4-, 5- or 8-parameter distortion coefficients (OpenCV 3.X also adds a 12- and 14-parameter alternatives). Therefore, either version (4, 5, 8, 12 or 14) will work in 3D OpenPose.
 
 
 

@@ -53,7 +53,15 @@ namespace op
 
     std::string ImageDirectoryReader::getFrameName()
     {
-        return getFileNameNoExtension(mFilePaths.at(mFrameNameCounter));
+        try
+        {
+            return getFileNameNoExtension(mFilePaths.at(mFrameNameCounter));
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return "";
+        }
     }
 
     cv::Mat ImageDirectoryReader::getRawFrame()

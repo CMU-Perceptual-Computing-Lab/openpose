@@ -6,13 +6,31 @@
 
 namespace op
 {
-	OP_API const cv::Mat getIntrinsics(const int cameraIndex);
+    class OP_API CameraParameterReader
+    {
+    public:
+        explicit CameraParameterReader();
 
-	OP_API const cv::Mat getDistorsion(const int cameraIndex);
+        void readParameters(const std::string& cameraParameterPath,
+                            const std::vector<std::string>& serialNumbers);
 
-	OP_API cv::Mat getM(const int cameraIndex);
+        unsigned long long getNumberCameras() const;
 
-	OP_API unsigned long long getNumberCameras();
+        const std::vector<cv::Mat>& getCameraMatrices() const;
+
+        const std::vector<cv::Mat>& getCameraIntrinsics() const;
+
+        const std::vector<cv::Mat>& getCameraDistortions() const;
+
+    private:
+        std::vector<std::string> mSerialNumbers;
+        unsigned long long mNumberCameras;
+        std::vector<cv::Mat> mCameraMatrices;
+        std::vector<cv::Mat> mCameraIntrinsics;
+        std::vector<cv::Mat> mCameraDistortions;
+
+        DELETE_COPY(CameraParameterReader);
+    };
 }
 
 #endif // OPENPOSE_EXPERIMENTAL_3D_CAMERA_PARAMETER_READER_HPP

@@ -42,6 +42,7 @@ DEFINE_bool(flir_camera,                false,          "Whether to use FLIR (Po
 DEFINE_string(ip_camera,                "",             "String with the IP camera URL. It supports protocols like RTSP and HTTP.");
 DEFINE_bool(process_real_time,          false,          "Enable to keep the original source frame rate (e.g. for video). If the processing time is"
                                                         " too long, it will skip frames. If it is too fast, it will slow it down.");
+DEFINE_string(camera_parameter_folder,  "models/cameraParameters/", "String with the folder where the camera parameters are located.");
 // OpenPose
 DEFINE_string(output_resolution,        "-1x-1",        "The image resolution (display and output). Use \"-1x-1\" to force the program to use the"
                                                         " input image resolution.");
@@ -63,7 +64,8 @@ int openPoseTutorialThread1()
     const auto outputSize = op::flagsToPoint(FLAGS_output_resolution, "-1x-1");
     // producerType
     const auto producerSharedPtr = op::flagsToProducer(FLAGS_image_dir, FLAGS_video, FLAGS_ip_camera, FLAGS_camera,
-                                                       FLAGS_flir_camera, FLAGS_camera_resolution, FLAGS_camera_fps);
+                                                       FLAGS_flir_camera, FLAGS_camera_resolution, FLAGS_camera_fps,
+                                                       FLAGS_camera_parameter_folder);
     const auto displayProducerFpsMode = (FLAGS_process_real_time
                                       ? op::ProducerFpsMode::OriginalFps : op::ProducerFpsMode::RetrievalFps);
     producerSharedPtr->setProducerFpsMode(displayProducerFpsMode);
