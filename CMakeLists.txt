@@ -188,7 +188,12 @@ option(BUILD_SHARED_LIBS "Build as shared lib" ON)
 option(PROFILER_ENABLED "If enabled, OpenPose will be able to print out speed information at runtime." OFF)
 
 # Threads
-find_package(Threads)
+if (${GPU_MODE} MATCHES "OPENCL")
+  unset(CMAKE_THREAD_LIBS_INIT CACHE)
+  find_package(Threads)
+else ()
+  set(CMAKE_THREAD_LIBS_INIT "")
+endif ()
 
 ### FIND REQUIRED PACKAGES
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
@@ -332,8 +337,15 @@ if (WIN32)
     find_library(Caffe_Proto_LIB caffeproto HINTS ${FIND_LIB_PREFIX}/caffe/lib)
   endif ()
 
-  find_library(BOOST_SYSTEM_LIB_RELEASE boost_system-vc140-mt-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
-  find_library(BOOST_SYSTEM_LIB_DEBUG boost_system-vc140-mt-gd-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
+  if (${GPU_MODE} MATCHES "OPENCL")
+    unset(BOOST_SYSTEM_LIB_RELEASE CACHE)
+    unset(BOOST_SYSTEM_LIB_DEBUG CACHE)
+    find_library(BOOST_SYSTEM_LIB_RELEASE boost_system-vc140-mt-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
+    find_library(BOOST_SYSTEM_LIB_DEBUG boost_system-vc140-mt-gd-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
+  else ()
+    set(BOOST_SYSTEM_LIB_RELEASE "")
+    set(BOOST_SYSTEM_LIB_DEBUG "")
+  endif ()
 
   if (WITH_3D_RENDERER)
     find_library(GLUT_LIBRARY freeglut HINTS ${FIND_LIB_PREFIX}/freeglut/lib)
