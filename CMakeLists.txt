@@ -414,7 +414,7 @@ if (UNIX AND NOT APPLE)
           set( MLIST ${rv} )
           separate_arguments(MLIST)
           list(GET MLIST 0 MKL_PATH)
-          message(${MKL_PATH})
+          message(STATUS ${MKL_PATH})
           file(GLOB MKL_SO
             "${MKL_PATH}lib/*"
             )

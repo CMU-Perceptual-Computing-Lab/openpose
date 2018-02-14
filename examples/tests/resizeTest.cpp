@@ -1,5 +1,4 @@
-// ------------------------- OpenPose Library Tutorial - Hand Keypoint Detection from JSON Ground-Truth Data -------------------------
-// Example to test hands accuracy given ground-truth bounding boxes.
+// ------------------------- OpenPose Resize Layer Testing -------------------------
 
 #include <chrono> // `std::chrono::` functions and classes, e.g. std::chrono::milliseconds
 // GFlags: DEFINE_bool, _int32, _int64, _uint64, _double, _string
@@ -61,7 +60,6 @@ cv::Mat cpuResize(cv::Mat& img, cv::Size newSize)
 
     // Upload to Dest to GPU
     cv::Mat newImg = cv::Mat(newSize,CV_32FC1,cv::Scalar(0));
-    float* newCpuPtr = &newImg.at<float>(0);
 
     std::vector<const float*> sourcePtrs;
     sourcePtrs.emplace_back(cpuPtr);
