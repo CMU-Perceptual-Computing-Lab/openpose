@@ -137,7 +137,7 @@ namespace op
     std::shared_ptr<Producer> flagsToProducer(const std::string& imageDirectory, const std::string& videoPath,
                                               const std::string& ipCameraPath, const int webcamIndex,
                                               const bool flirCamera, const std::string& webcamResolution,
-                                              const double webcamFps)
+                                              const double webcamFps, const std::string& cameraParameterPath)
     {
         try
         {
@@ -151,7 +151,7 @@ namespace op
             else if (type == ProducerType::IPCamera)
                 return std::make_shared<IpCameraReader>(ipCameraPath);
             else if (type == ProducerType::FlirCamera)
-                return std::make_shared<FlirReader>();
+                return std::make_shared<FlirReader>(cameraParameterPath);
             else if (type == ProducerType::Webcam)
             {
                 // cameraFrameSize

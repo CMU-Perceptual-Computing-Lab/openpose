@@ -62,6 +62,7 @@ DEFINE_int32(frame_rotate,              0,              "Rotate each frame, 4 po
 DEFINE_bool(frames_repeat,              false,          "Repeat frames when finished.");
 DEFINE_bool(process_real_time,          false,          "Enable to keep the original source frame rate (e.g. for video). If the processing time is"
                                                         " too long, it will skip frames. If it is too fast, it will slow it down.");
+DEFINE_string(camera_parameter_folder,  "models/cameraParameters/", "String with the folder where the camera parameters are located.");
 // OpenPose
 DEFINE_string(model_folder,             "models/",      "Folder path (absolute or relative) where the models (pose, face, ...) are located.");
 DEFINE_string(output_resolution,        "-1x-1",        "The image resolution (display and output). Use \"-1x-1\" to force the program to use the"
@@ -234,7 +235,8 @@ int openPoseDemo()
     const auto handNetInputSize = op::flagsToPoint(FLAGS_hand_net_resolution, "368x368 (multiples of 16)");
     // producerType
     const auto producerSharedPtr = op::flagsToProducer(FLAGS_image_dir, FLAGS_video, FLAGS_ip_camera, FLAGS_camera,
-                                                       FLAGS_flir_camera, FLAGS_camera_resolution, FLAGS_camera_fps);
+                                                       FLAGS_flir_camera, FLAGS_camera_resolution, FLAGS_camera_fps,
+                                                       FLAGS_camera_parameter_folder);
     // poseModel
     const auto poseModel = op::flagsToPoseModel(FLAGS_model_pose);
     // JSON saving

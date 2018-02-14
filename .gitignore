@@ -102,6 +102,9 @@ distribute/
 *leveldb
 *lmdb
 
+# Camera parameters
+*.xml
+
 ######################### Compilation (build, distribute & bins) Files / Folders #########################
 *.bin
 *.testbin

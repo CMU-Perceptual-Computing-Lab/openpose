@@ -73,7 +73,7 @@ namespace op
                     // Access pointers
                     const T* sourcePtr = sourcePtrs[n];
                     T* tempTargetPtr;
-                    if(n != 0)
+                    if (n != 0)
                         tempTargetPtr = tempTargetPtrs[n-1].get();
                     else
                         tempTargetPtr = targetPtr;

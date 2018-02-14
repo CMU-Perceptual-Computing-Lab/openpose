@@ -227,7 +227,7 @@ You can include the 3D reconstruction module by:
     1. Right-click on `Solution 'OpenPose'` of the `Solution Explorer` window, usually placed at the top-right part of the VS screen.
     2. Click on `Properties`. Go to `Configuration Properties` -> `Configuration` and check `Build` for the `OpenPose3DReconstruction` project.
 
-After installation, check the [doc/openpose_3d_reconstruction_demo.md](./openpose_3d_reconstruction_demo.md) instructions.
+After installation, check the [doc/3d_reconstruction_demo.md](./3d_reconstruction_demo.md) instructions.
 
 
 

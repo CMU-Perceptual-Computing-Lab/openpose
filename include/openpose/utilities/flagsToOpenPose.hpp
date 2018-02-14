@@ -24,7 +24,8 @@ namespace op
                                                      const std::string& ipCameraPath, const int webcamIndex,
                                                      const bool flirCamera = false,
                                                      const std::string& webcamResolution = "1280x720",
-                                                     const double webcamFps = 30.);
+                                                     const double webcamFps = 30.,
+                                                     const std::string& cameraParameterPath = "models/cameraParameters/");
 
     OP_API std::vector<HeatMapType> flagsToHeatMaps(const bool heatMapsAddParts = false,
                                                     const bool heatMapsAddBkg = false,

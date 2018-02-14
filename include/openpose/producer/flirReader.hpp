@@ -3,11 +3,12 @@
 
 #include <openpose/core/common.hpp>
 #include <openpose/producer/producer.hpp>
+#include <openpose/producer/spinnakerWrapper.hpp>
 
 namespace op
 {
     /**
-     * FlirReader is an abstract class to extract frames from a image directory. Its interface imitates the
+     * FlirReader is an abstract class to extract frames from a FLIR stereo-camera system. Its interface imitates the
      * cv::VideoCapture class, so it can be used quite similarly to the cv::VideoCapture class. Thus,
      * it is quite similar to VideoReader and WebcamReader.
      */
@@ -15,11 +16,9 @@ namespace op
     {
     public:
         /**
-         * Constructor of FlirReader. It sets the image directory path from which the images will be loaded
-         * and generates a std::vector<std::string> with the list of images on that directory.
-         * @param imageDirectoryPath const std::string parameter with the folder path containing the images.
+         * Constructor of FlirReader. It opens all the available FLIR cameras
          */
-        explicit FlirReader();
+        explicit FlirReader(const std::string& cameraParametersPath);
 
         ~FlirReader();
 
@@ -27,10 +26,7 @@ namespace op
 
         std::string getFrameName();
 
-        inline bool isOpened() const
-        {
-            return true;
-        }
+        bool isOpened() const;
 
         void release();
 
@@ -39,11 +35,7 @@ namespace op
         void set(const int capProperty, const double value);
 
     private:
-        // PIMPL idiom
-        // http://www.cppsamples.com/common-tasks/pimpl.html
-        struct ImplFlirReader;
-        std::shared_ptr<ImplFlirReader> upImpl;
-
+        SpinnakerWrapper mSpinnakerWrapper;
         Point<int> mResolution;
         long long mFrameNameCounter;
 
