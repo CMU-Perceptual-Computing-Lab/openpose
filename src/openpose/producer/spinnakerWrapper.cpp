@@ -334,9 +334,9 @@ namespace op
         #endif
     };
 
-    SpinnakerWrapper::SpinnakerWrapper(const std::string& cameraParameterPath) :
+    SpinnakerWrapper::SpinnakerWrapper(const std::string& cameraParameterPath)
         #ifdef WITH_FLIR_CAMERA
-            upImpl{new ImplSpinnakerWrapper{}}
+            : upImpl{new ImplSpinnakerWrapper{}}
         #endif
     {
         #ifdef WITH_FLIR_CAMERA
@@ -533,6 +533,7 @@ namespace op
                 error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             }
         #else
+            UNUSED(cameraParameterPath);
             error(WITH_FLIR_CAMERA_ERROR, __LINE__, __FUNCTION__, __FILE__);
         #endif
     }
