@@ -193,7 +193,7 @@ namespace op
                     auto* gpuImagePtr = upImpl->upCaffeNet->blobs().at(0)->mutable_gpu_data();
                     cudaMemcpy(gpuImagePtr, inputData.getConstPtr(), inputData.getVolume() * sizeof(float),
                                cudaMemcpyHostToDevice);
-                #elif USE_OPENCL
+                #elif defined USE_OPENCL
                     auto* gpuImagePtr = upImpl->upCaffeNet->blobs().at(0)->mutable_gpu_data();
                     cl::Buffer imageBuffer = cl::Buffer((cl_mem)gpuImagePtr, true);
                     op::OpenCL::getInstance(upImpl->mGpuId)->getQueue().enqueueWriteBuffer(imageBuffer, true, 0,

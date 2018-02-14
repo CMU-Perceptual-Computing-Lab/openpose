@@ -138,7 +138,7 @@ namespace op
 
     template <typename T>
     void nmsOcl(T* targetPtr, int* kernelPtr, const T* const sourcePtr, const T threshold,
-                const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize, int gpuID)
+                const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize, const int gpuID)
     {
         try
         {
