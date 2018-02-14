@@ -145,11 +145,38 @@ namespace op
         std::array<Array<float>, 2> handKeypoints;
 
         /**
-         * Face pose heatmaps (hand parts and/or background) for the whole image.
+         * Hand pose heatmaps (hand parts and/or background) for the whole image.
          * Analogous of faceHeatMaps applied to face.
          * Size each Array: #people x #hand parts (21) x output_net_height x output_net_width
          */
         std::array<Array<float>, 2> handHeatMaps;
+
+        // ---------------------------------------- 3-D Reconstruction parameters ---------------------------------------- //
+        /**
+         * Body pose (x,y,z,score) locations for each person in the image.
+         * Size: #people x #body parts (e.g. 18 for COCO or 15 for MPI) x 4 ((x,y,z) coordinates + score)
+         */
+        Array<float> poseKeypoints3D;
+
+        /**
+         * Face keypoints (x,y,z,score) locations for each person in the image.
+         * It has been resized to the same resolution as `poseKeypoints3D`.
+         * Size: #people x #face parts (70) x 4 ((x,y,z) coordinates + score)
+         */
+        Array<float> faceKeypoints3D;
+
+        /**
+         * Hand keypoints (x,y,z,score) locations for each person in the image.
+         * It has been resized to the same resolution as `poseKeypoints3D`.
+         * handKeypoints[0] corresponds to left hands, and handKeypoints[1] to right ones.
+         * Size each Array: #people x #hand parts (21) x 4 ((x,y,z) coordinates + score)
+         */
+        std::array<Array<float>, 2> handKeypoints3D;
+
+        /**
+         * 3x4 camera matrix of the camera.
+         */
+        cv::Mat cameraMatrix;
 
         // ---------------------------------------- Other (internal) parameters ---------------------------------------- //
         /**

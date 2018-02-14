@@ -39,6 +39,7 @@ DEFINE_string(video,                    "",             "Use a video file instea
                                                         " example video.");
 DEFINE_string(image_dir,                "",             "Process a directory of images. Use `examples/media/` for our default example folder with 20"
                                                         " images. Read all standard formats (jpg, png, bmp, etc.).");
+DEFINE_bool(flir_camera,                false,          "Whether to use FLIR (Point-Grey) stereo camera.");
 DEFINE_string(ip_camera,                "",             "String with the IP camera URL. It supports protocols like RTSP and HTTP.");
 DEFINE_bool(process_real_time,          false,          "Enable to keep the original source frame rate (e.g. for video). If the processing time is"
                                                         " too long, it will skip frames. If it is too fast, it will slow it down.");
@@ -96,8 +97,9 @@ int openPoseTutorialThread2()
     const auto outputSize = op::flagsToPoint(FLAGS_output_resolution, "-1x-1");
     // producerType
     const auto producerSharedPtr = op::flagsToProducer(FLAGS_image_dir, FLAGS_video, FLAGS_ip_camera, FLAGS_camera,
-                                                       FLAGS_camera_resolution, FLAGS_camera_fps);
-    const auto displayProducerFpsMode = (FLAGS_process_real_time ? op::ProducerFpsMode::OriginalFps : op::ProducerFpsMode::RetrievalFps);
+                                                       FLAGS_flir_camera, FLAGS_camera_resolution, FLAGS_camera_fps);
+    const auto displayProducerFpsMode = (FLAGS_process_real_time
+                                      ? op::ProducerFpsMode::OriginalFps : op::ProducerFpsMode::RetrievalFps);
     producerSharedPtr->setProducerFpsMode(displayProducerFpsMode);
     op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
     // Step 3 - Setting producer

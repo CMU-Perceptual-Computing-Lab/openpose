@@ -14,7 +14,7 @@
         # If you are using the NAS, please do not override my files, i.e. please change the output paths (corresponding to the ones indicated by `--write_json`, which is ).
 
         # In order to generate the JSON output:
-        # Uncomment the commented lines starting by `--write_json` and `--no_display`
+        # Uncomment the commented lines starting by `--write_json` and `--display 0`
 
     # Step 2 - Running JSON output to get accuracy
         # Once you have the JSON files, run them with the script Tomas prepared for it, which in my case I use:
@@ -53,7 +53,7 @@ rm -rf $HAND_RESULTS_FOLDER_BB
     --image_dir ${IMAGES_BB_FOLDER} \
     --hand_ground_truth ${HAND_GROUND_TRUTH_FOLDER} \
     --write_json $HAND_RESULTS_FOLDER_BB \
-    --no_display
+    --display 0
 
 
 
@@ -66,7 +66,7 @@ rm -rf $HAND_RESULTS_FOLDER_NO_BB
     --hand_scale_number ${SCALES} --hand_scale_range 0.4 \
     --image_dir ${IMAGES_FOLDER} \
     --write_json $HAND_RESULTS_FOLDER_NO_BB \
-    --no_display
+    --display 0
 
 
 
@@ -78,4 +78,4 @@ rm -rf $HAND_RESULTS_FOLDER_BODY_59
     --model_pose BODY_59 \
     --image_dir ${IMAGES_FOLDER} \
     --write_json $HAND_RESULTS_FOLDER_BODY_59 \
-    --no_display
+    --display 0

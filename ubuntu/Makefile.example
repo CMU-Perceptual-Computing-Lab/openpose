@@ -71,16 +71,22 @@ else
 endif
 
 
-# Spinnaker
-BUILD_MODULE_3D ?= 0
-ifneq ($(BUILD_MODULE_3D), 0)
-	COMMON_FLAGS += -DBUILD_MODULE_3D
-	# Spinnaker SDK
-	LIBRARIES += Spinnaker
-	INCLUDE_DIRS += $(SPINNAKER_DIR)
+# 3-D
+# 3-D renderer
+WITH_3D_RENDERER ?= 0
+ifneq ($(WITH_3D_RENDERER), 0)
+	COMMON_FLAGS += -DWITH_3D_RENDERER
 	# FreeGLUT
 	LIBRARIES += glut
 	# LIBRARIES += GLU GL glut
+endif
+# Spinnaker SDK
+WITH_FLIR_CAMERA ?= 0
+ifneq ($(WITH_FLIR_CAMERA), 0)
+	COMMON_FLAGS += -DWITH_FLIR_CAMERA
+	# Spinnaker SDK
+	LIBRARIES += Spinnaker
+	INCLUDE_DIRS += $(SPINNAKER_DIR)
 endif
 
 ##############################

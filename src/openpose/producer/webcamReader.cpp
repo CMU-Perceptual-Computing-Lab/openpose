@@ -58,6 +58,19 @@ namespace op
         }
     }
 
+    std::vector<cv::Mat> WebcamReader::getCameraMatrices()
+    {
+        try
+        {
+            return {};
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return {};
+        }
+    }
+
     std::string WebcamReader::getFrameName()
     {
         try
@@ -138,6 +151,19 @@ namespace op
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             return cv::Mat();
+        }
+    }
+
+    std::vector<cv::Mat> WebcamReader::getRawFrames()
+    {
+        try
+        {
+            return std::vector<cv::Mat>{getRawFrame()};
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return {};
         }
     }
 

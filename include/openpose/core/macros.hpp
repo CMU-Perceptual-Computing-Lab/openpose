@@ -3,7 +3,13 @@
 
 #include <memory> // std::shared_ptr
 #include <ostream>
+#include <string>
 #include <vector>
+
+// OpenPose name and version
+const std::string OPEN_POSE_NAME_STRING = "OpenPose";
+const std::string OPEN_POSE_VERSION_STRING = "1.2.1";
+const std::string OPEN_POSE_NAME_AND_VERSION = OPEN_POSE_NAME_STRING + " " + OPEN_POSE_VERSION_STRING;
 
 #ifndef _WIN32
     #define OP_API

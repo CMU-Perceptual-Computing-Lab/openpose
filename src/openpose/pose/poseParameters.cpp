@@ -87,6 +87,29 @@ namespace op
         {18, "LEar"},
         {19, "Background"}
     };
+    // Windows map copy error if `POSE_BODY_19_BODY_PARTS = POSE_BODY_19_X2_BODY_PARTS`
+    const std::map<unsigned int, std::string> POSE_BODY_19_X2_BODY_PARTS {
+        {0,  "Nose"},
+        {1,  "Neck"},
+        {2,  "RShoulder"},
+        {3,  "RElbow"},
+        {4,  "RWrist"},
+        {5,  "LShoulder"},
+        {6,  "LElbow"},
+        {7,  "LWrist"},
+        {8,  "LowerAbs"},
+        {9,  "RHip"},
+        {10, "RKnee"},
+        {11, "RAnkle"},
+        {12, "LHip"},
+        {13, "LKnee"},
+        {14, "LAnkle"},
+        {15, "REye"},
+        {16, "LEye"},
+        {17, "REar"},
+        {18, "LEar"},
+        {19, "Background"}
+    };
     const std::map<unsigned int, std::string> POSE_BODY_23_BODY_PARTS {
         {0,  "Neck"},
         {1,  "RShoulder"},
@@ -165,37 +188,43 @@ namespace op
         std::vector<unsigned int>{
             31,32, 39,40, 33,34, 35,36, 41,42, 43,44, 19,20, 21,22, 23,24, 25,26, 27,28, 29,30, 47,48, 49,50, 53,54, 51,52, 55,56, 37,38, 45,46
         },
-        // MPI & MPI_15
+        // MPI_15
         std::vector<unsigned int>{
             16,17, 18,19, 20,21, 22,23, 24,25, 26,27, 28,29, 30,31, 32,33, 34,35, 36,37, 38,39, 40,41, 42,43
         },
+        // MPI_15_4
         std::vector<unsigned int>{
             16,17, 18,19, 20,21, 22,23, 24,25, 26,27, 28,29, 30,31, 32,33, 34,35, 36,37, 38,39, 40,41, 42,43
         },
-        // BODY 18
+        // BODY_18
         std::vector<unsigned int>{
             31,32, 39,40, 33,34, 35,36, 41,42, 43,44, 19,20, 21,22, 23,24, 25,26, 27,28, 29,30, 47,48, 49,50, 53,54, 51,52, 55,56, 37,38, 45,46
         },
-        // BODY 19
+        // BODY_19
         std::vector<unsigned int>{
             20,21, 34,35, 42,43, 36,37, 38,39, 44,45, 46,47, 26,27, 22,23, 24,25, 28,29, 30,31, 32,33, 50,51, 52,53, 56,57, 54,55, 58,59, 40,41, 48,49
         },
-        // BODY 23
+        // BODY_19_X2
+        std::vector<unsigned int>{
+            20,21, 34,35, 42,43, 36,37, 38,39, 44,45, 46,47, 26,27, 22,23, 24,25, 28,29, 30,31, 32,33, 50,51, 52,53, 56,57, 54,55, 58,59, 40,41, 48,49
+        },
+        // BODY_23
         std::vector<unsigned int>{
             24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71
         },
-        // BODY 59
+        // BODY_59
         std::vector<unsigned int>{
             60,61, 74,75, 82,83, 76,77, 78,79, 84,85, 86,87, 66,67, 62,63, 64,65, 68,69, 70,71, 72,73, 90,91, 92,93, 96,97, 94,95, 98,99, 80,81, 88,89, // Body
             100,101, 102,103, 104,105, 106,107, 108,109, 110,111, 112,113, 114,115, 116,117, 118,119,
             120,121, 122,123, 124,125, 126,127, 128,129, 130,131, 132,133, 134,135, 136,137, 138,139,// Left hand
             140,141, 142,143, 144,145, 146,147, 148,149, 150,151, 152,153, 154,155, 156,157, 158,159,
             160,161, 162,163, 164,165, 166,167, 168,169, 170,171, 172,173, 174,175, 176,177, 178,179 // Right hand
-        }
+        },
     };
+    // POSE_BODY_PART_MAPPING on HPP crashes on Windows at dynamic initialization if it's on hpp
     const std::array<std::map<unsigned int, std::string>, (int)PoseModel::Size>   POSE_BODY_PART_MAPPING{
         POSE_COCO_BODY_PARTS,   POSE_MPI_BODY_PARTS,    POSE_MPI_BODY_PARTS,    POSE_BODY_18_BODY_PARTS,
-        POSE_BODY_19_BODY_PARTS,POSE_BODY_23_BODY_PARTS,POSE_BODY_59_BODY_PARTS
+        POSE_BODY_19_BODY_PARTS,POSE_BODY_19_X2_BODY_PARTS,POSE_BODY_23_BODY_PARTS,POSE_BODY_59_BODY_PARTS
     };
 
     const std::array<std::string, (int)PoseModel::Size> POSE_PROTOTXT{
@@ -204,8 +233,9 @@ namespace op
         "pose/mpi/pose_deploy_linevec_faster_4_stages.prototxt",
         "pose/body_18/pose_deploy.prototxt",
         "pose/body_19/pose_deploy.prototxt",
+        "pose/body_19_x2/pose_deploy.prototxt",
         "pose/body_23/pose_deploy.prototxt",
-        "pose/body_59/pose_deploy.prototxt"
+        "pose/body_59/pose_deploy.prototxt",
     };
     const std::array<std::string, (int)PoseModel::Size> POSE_TRAINED_MODEL{
         "pose/coco/pose_iter_440000.caffemodel",
@@ -213,29 +243,34 @@ namespace op
         "pose/mpi/pose_iter_160000.caffemodel",
         "pose/body_18/pose_iter_XXXXXX.caffemodel",
         "pose/body_19/pose_iter_XXXXXX.caffemodel",
+        "pose/body_19_x2/pose_iter_XXXXXX.caffemodel",
         "pose/body_23/pose_iter_XXXXXX.caffemodel",
-        "pose/body_59/pose_iter_XXXXXX.caffemodel"
+        "pose/body_59/pose_iter_XXXXXX.caffemodel",
     };
 
     // Constant Array Parameters
     // POSE_NUMBER_BODY_PARTS equivalent to size of std::map POSE_BODY_XX_BODY_PARTS - 1 (removing background)
     const std::array<unsigned int, (int)PoseModel::Size> POSE_NUMBER_BODY_PARTS{
-        18, 15, 15, 18, 19, 23, 59
+        18, 15, 15, 18, 19, 19, 23, 59
     };
     const std::array<std::vector<unsigned int>, (int)PoseModel::Size> POSE_BODY_PART_PAIRS{
         // COCO
         std::vector<unsigned int>{
             1,2,   1,5,   2,3,   3,4,   5,6,   6,7,   1,8,   8,9,   9,10,  1,11,  11,12, 12,13,  1,0,   0,14, 14,16,  0,15, 15,17,  2,16,  5,17
         },
-        // MPI
-        std::vector<unsigned int>{POSE_MPI_PAIRS_RENDER_GPU},
         // MPI_15
+        std::vector<unsigned int>{POSE_MPI_PAIRS_RENDER_GPU},
+        // MPI_15_4
         std::vector<unsigned int>{POSE_MPI_PAIRS_RENDER_GPU},
         // BODY_18
         std::vector<unsigned int>{
             1,2,   1,5,   2,3,   3,4,   5,6,   6,7,   1,8,   8,9,   9,10,  1,11,  11,12, 12,13,  1,0,   0,14, 14,16,  0,15, 15,17,  2,16,  5,17
         },
         // BODY_19
+        std::vector<unsigned int>{
+            1,8,   1,2,   1,5,   2,3,   3,4,   5,6,   6,7,   8,9,   9,10,  10,11, 8,12,  12,13, 13,14,  1,0,   0,15, 15,17,  0,16, 16,18,   2,17,  5,18
+        },
+        // BODY_19_X2
         std::vector<unsigned int>{
             1,8,   1,2,   1,5,   2,3,   3,4,   5,6,   6,7,   8,9,   9,10,  10,11, 8,12,  12,13, 13,14,  1,0,   0,15, 15,17,  0,16, 16,18,   2,17,  5,18
         },
@@ -251,30 +286,43 @@ namespace op
         },
     };
     const std::array<unsigned int, (int)PoseModel::Size> POSE_MAX_PEAKS{
-        POSE_MAX_PEOPLE,        POSE_MAX_PEOPLE,        POSE_MAX_PEOPLE,        POSE_MAX_PEOPLE,
-        POSE_MAX_PEOPLE,        POSE_MAX_PEOPLE,        POSE_MAX_PEOPLE
+        POSE_MAX_PEOPLE,    // COCO
+        POSE_MAX_PEOPLE,    // MPI_15
+        POSE_MAX_PEOPLE,    // MPI_15_4
+        POSE_MAX_PEOPLE,    // BODY_18
+        POSE_MAX_PEOPLE,    // BODY_19
+        POSE_MAX_PEOPLE,    // BODY_19_X2
+        POSE_MAX_PEOPLE,    // BODY_23
+        POSE_MAX_PEOPLE,    // BODY_59
     };
     const std::array<float, (int)PoseModel::Size> POSE_CCN_DECREASE_FACTOR{
-        8.f,        8.f,        8.f,        8.f,        8.f,        8.f,        8.f
+        8.f,    // COCO
+        8.f,    // MPI_15
+        8.f,    // MPI_15_4
+        8.f,    // BODY_18
+        8.f,    // BODY_19
+        4.f,    // BODY_19_X2
+        8.f,    // BODY_23
+        8.f,    // BODY_59
     };
 
     // Default Model Parameters
     // They might be modified on running time
     const std::array<float, (int)PoseModel::Size>           POSE_DEFAULT_NMS_THRESHOLD{
-        0.05f,      0.6f,       0.3f,       0.05f,      0.05f,      0.05f,      0.05f
+        0.05f,      0.6f,       0.3f,       0.05f,      0.05f,      0.05f,      0.05f,      0.05f
     };
     const std::array<float, (int)PoseModel::Size>    POSE_DEFAULT_CONNECT_INTER_MIN_ABOVE_THRESHOLD{
-        0.95f,      0.95f,      0.95f,      0.95f,      0.95f,      0.95f,      0.95f
+        0.95f,      0.95f,      0.95f,      0.95f,      0.95f,      0.95f,      0.95f,      0.95f
         // 0.85f,      0.85f,      0.85f,      0.85f,      0.85f,      0.85f // Matlab version
     };
     const std::array<float, (int)PoseModel::Size>           POSE_DEFAULT_CONNECT_INTER_THRESHOLD{
-        0.05f,      0.01f,      0.01f,      0.05f,      0.05f,      0.05f,      0.05f
+        0.05f,      0.01f,      0.01f,      0.05f,      0.05f,      0.05f,      0.05f,      0.05f
     };
     const std::array<unsigned int, (int)PoseModel::Size>    POSE_DEFAULT_CONNECT_MIN_SUBSET_CNT{
-        3,          3,          3,          3,          3,          3,          3
+        3,          3,          3,          3,          3,          3,          3,          3
     };
     const std::array<float, (int)PoseModel::Size>           POSE_DEFAULT_CONNECT_MIN_SUBSET_SCORE{
-        0.4f,       0.4f,       0.4f,       0.4f,       0.4f,       0.4f,       0.4f
+        0.4f,       0.4f,       0.4f,       0.4f,       0.4f,       0.4f,       0.4f,       0.4f
         // 0.2f,       0.4f,       0.4f,       0.4f,       0.4f,       0.4f // Matlab version
     };
 

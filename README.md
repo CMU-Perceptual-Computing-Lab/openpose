@@ -8,7 +8,7 @@
 |-------------|
 |[![Build Status](https://travis-ci.org/CMU-Perceptual-Computing-Lab/openpose.svg?branch=master)](https://travis-ci.org/CMU-Perceptual-Computing-Lab/openpose)|
 
-OpenPose represents the **first real-time multi-person system to jointly detect human body, hand, and facial keypoints (in total 130 keypoints) on single images**.
+[OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose) represents the **first real-time multi-person system to jointly detect human body, hand, and facial keypoints (in total 130 keypoints) on single images**.
 
 <p align="center">
     <img src="doc/media/pose_face_hands.gif", width="480">
@@ -69,7 +69,9 @@ For further details, check [all released features](doc/released_features.md) and
 
 
 ## Installation, Reinstallation and Uninstallation
-See [doc/installation.md](doc/installation.md) for instructions on how to build from source or how to download our portable binaries.
+**Windows portable version**: Simply download and use the latest version from the [Releases](https://github.com/CMU-Perceptual-Computing-Lab/openpose/releases) section.
+
+Otherwise, check [doc/installation.md](doc/installation.md) for instructions on how to build OpenPose from source.
 
 
 

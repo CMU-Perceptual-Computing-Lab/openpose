@@ -7,8 +7,6 @@
 
 namespace op
 {
-    const std::string OPEN_POSE_TEXT{"OpenPose 1.2.1"};
-
     inline void showGuiHelp()
     {
         try
@@ -18,7 +16,7 @@ namespace op
             if (!helpCvMat.empty())
             {
                 const auto fullScreen = false;
-                FrameDisplayer frameDisplayer{OPEN_POSE_TEXT + " - GUI Help",
+                FrameDisplayer frameDisplayer{OPEN_POSE_NAME_AND_VERSION + " - GUI Help",
                                               Point<int>{helpCvMat.cols, helpCvMat.rows}, fullScreen};
                 frameDisplayer.displayFrame(helpCvMat, 33);
             }
@@ -57,7 +55,7 @@ namespace op
                     showGuiHelp();
                 // Switch full screen - normal screen
                 else if (castedKey=='f')
-                    frameDisplayer.switchGuiDisplayMode();
+                    frameDisplayer.switchFullScreenMode();
                 // ------------------------- Producer-Related ------------------------- //
                 // Pause
                 else if (castedKey==' ')
@@ -162,10 +160,10 @@ namespace op
              const std::shared_ptr<std::pair<std::atomic<bool>, std::atomic<int>>>& videoSeekSharedPtr,
              const std::vector<std::shared_ptr<PoseExtractor>>& poseExtractors,
              const std::vector<std::shared_ptr<Renderer>>& renderers) :
-        mFrameDisplayer{OPEN_POSE_TEXT, outputSize, fullScreen},
+        spIsRunning{isRunningSharedPtr},
+        mFrameDisplayer{OPEN_POSE_NAME_AND_VERSION, outputSize, fullScreen},
         mPoseExtractors{poseExtractors},
         mRenderers{renderers},
-        spIsRunning{isRunningSharedPtr},
         spVideoSeek{videoSeekSharedPtr}
     {
     }
@@ -175,17 +173,68 @@ namespace op
         mFrameDisplayer.initializationOnThread();
     }
 
-    void Gui::update(const cv::Mat& cvOutputData)
+    void Gui::setImage(const cv::Mat& cvMatOutput)
     {
         try
         {
             // Check tDatum integrity
-            const bool returnedIsValidFrame = ((spIsRunning == nullptr || *spIsRunning) && !cvOutputData.empty());
+            const bool returnedIsValidFrame = ((spIsRunning == nullptr || *spIsRunning) && !cvMatOutput.empty());
 
             // Display
             if (returnedIsValidFrame)
-                mFrameDisplayer.displayFrame(cvOutputData, -1);
+                mFrameDisplayer.displayFrame(cvMatOutput, -1);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
 
+    void Gui::setImage(const std::vector<cv::Mat>& cvMatOutputs)
+    {
+        try
+        {
+            // 0 image
+            if (cvMatOutputs.empty())
+                setImage(cvMatOutputs[0]);
+            // 1 image
+            else if (cvMatOutputs.size() == 1)
+                setImage(cvMatOutputs[0]);
+            // > 1 image
+            else
+            {
+                // Check tDatum integrity
+                bool returnedIsValidFrame = ((spIsRunning == nullptr || *spIsRunning) && !cvMatOutputs.empty());
+                if (returnedIsValidFrame)
+                {
+                    // Security checks
+                    for (const auto& cvMatOutput : cvMatOutputs)
+                        if (cvMatOutput.empty())
+                            returnedIsValidFrame = false;
+                    // Prepare final cvMat
+                    if (returnedIsValidFrame)
+                    {
+                        // Concat (0)
+                        cv::Mat cvMat = cvMatOutputs[0].clone();
+                        // Concat (1,size()-1)
+                        for (auto i = 1u; i < cvMatOutputs.size(); i++)
+                            cv::hconcat(cvMat, cvMatOutputs[i], cvMat);
+                        // Display
+                        mFrameDisplayer.displayFrame(cvMat, -1);
+                    }
+                }
+            }
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    void Gui::update()
+    {
+        try
+        {
             // Handle user input
             handleUserInput(mFrameDisplayer, mPoseExtractors, mRenderers, spIsRunning, spVideoSeek);
         }

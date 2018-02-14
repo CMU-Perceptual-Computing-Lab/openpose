@@ -179,9 +179,15 @@ OpenPose Library - Release Notes
     7. Runtime verbose about average speed configurable by user with `PROFILER_ENABLED` option (CMake/Makefile.config) and `--profile_speed` flag.
     8. Lighter Caffe version compiled by CMake in Ubuntu: disabled Caffe extra support (e.g., OpenCV, Python) and doc.
     9. Renamed CMake binaries (Ubuntu) to match old Makefile format: `_bin` by `.bin`.
-    10. 3-D Reconstruction demo cleaned, implemented in Ubuntu too, and now defined as experimental module of OpenPose rather than just a demo.
+    10. 3-D reconstruction demo cleaned, implemented in Ubuntu too, and now defined as module of OpenPose rather than just a demo.
     11. CMake as default installer in documentation.
-2. Main bugs fixed:
+    12. Added flag: number_people_max to optionally select the maximum number of people to be detected.
+    13. 3-D reconstruction module forces the user to set `number_people_max 1` to avoid errors (as it assumes only 1 person per image).
+    14. Removed old `windows/` version. CMake is the only Windows version available.
+2. Functions or parameters renamed:
+    1. Flag `no_display` renamed as `display`, able to select between `NoDisplay`, `Display2D`, `Display3D`, and `DisplayAll`.
+    2. 3-D reconstruction demo is now inside the OpenPose demo binary.
+3. Main bugs fixed:
     1. Slight speed up (~1%) for performing the non-maximum suppression stage only in the body part heatmaps channels, and not also in the PAF channels.
     2. Fixed core-dumped in PoseRenderer with GUI when changed element to be rendered to something else than skeleton.
     3. 3-D visualizer does not crash on exit anymore.

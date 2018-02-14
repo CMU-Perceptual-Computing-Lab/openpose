@@ -2,14 +2,15 @@ OpenPose - Installation
 ==========================
 
 ## Contents
-1. [Operating Systems](#operating-systems)
-2. [Requirements](#requirements)
-3. [Clone OpenPose](#clone-openpose)
-4. [Update OpenPose](#update-openpose)
-5. [Installation](#installation)
-6. [Reinstallation](#reinstallation)
-7. [Uninstallation](#uninstallation)
-8. [Optional Settings](#optional-settings)
+1. [Windows Portable Demo](#windows-portable-demo)
+2. [Operating Systems](#operating-systems)
+3. [Requirements](#requirements)
+4. [Clone OpenPose](#clone-openpose)
+5. [Update OpenPose](#update-openpose)
+6. [Installation](#installation)
+7. [Reinstallation](#reinstallation)
+8. [Uninstallation](#uninstallation)
+9. [Optional Settings](#optional-settings)
     1. [MPI Model](#mpi-model)
     2. [CPU Version](#cpu-version)
     3. [OpenPose 3D Reconstruction Module and Demo](#openpose-3d-reconstruction-module-and-demo)
@@ -18,6 +19,11 @@ OpenPose - Installation
     6. [Custom OpenCV (Ubuntu Only)](#custom-opencv-ubuntu-only)
     7. [Doxygen Documentation Autogeneration (Ubuntu Only)](#doxygen-documentation-autogeneration-ubuntu-only)
     8. [CMake Command Line Configuration (Ubuntu Only)](#cmake-command-line-configuration-ubuntu-only)
+
+
+
+## Windows Portable Demo
+This installation section is only intended if you plan to modify the OpenPose code or integrate it with another library or project. If you just want to use the OpenPose demo in Windows, simply use the latest version of the OpenPose binaries which you can find in the [Releases](https://github.com/CMU-Perceptual-Computing-Lab/openpose/releases) section.
 
 
 
@@ -218,7 +224,7 @@ You can check the [OpenPose benchmark](https://github.com/CMU-Perceptual-Computi
 #### OpenPose 3D Reconstruction Module and Demo
 You can include the 3D reconstruction module by:
 
-1. Install the FLIR camera driver and software, Spinnaker SDK. It is a propietary software, so we cannot provide direct download link.
+1. Install the FLIR camera software, Spinnaker SDK. It is a propietary software, so we cannot provide direct download link. Note: You might skip this step if you intend to use the 3-D OpenPose module with a different camera brand.
     1. Ubuntu: Get and install the latest Spinnaker SKD version in their default path. OpenPose will automatically find it. Otherwise, set the right path with CMake.
     2. Windows: Donwload the latest Spinnaker SKD version from [https://www.ptgrey.com/support/downloads](https://www.ptgrey.com/support/downloads).
         - Copy `{PointGreyParentDirectory}\Point Grey Research\Spinnaker\bin64\vs2015\` as `{OpenPoseDirectory}\3rdparty\windows\spinnaker\bin\`. You can remove all the *.exe files.
@@ -226,7 +232,7 @@ You can include the 3D reconstruction module by:
         - Copy `Spinnaker_v140.lib` and `Spinnakerd_v140.lib` from `{PointGreyParentDirectory}\Point Grey Research\Spinnaker\lib64\vs2015\` into `{OpenPoseDirectory}\3rdparty\windows\spinnaker\lib\`.
         - (Optional) Spinnaker SDK overview: [https://www.ptgrey.com/spinnaker-sdk](https://www.ptgrey.com/spinnaker-sdk).
 2. Install the 3D visualizer, FreeGLUT:
-    1. Ubuntu: run `sudo apt-get install freeglut3 freeglut3-dev libxmu-dev libxi-dev`.
+    1. Ubuntu: run `sudo apt-get update && sudo apt-get install build-essential freeglut3 freeglut3-dev libxmu-dev libxi-dev` and reboot your PC.
     2. Windows:
         1. It is automatically downloaded by the CMake installer.
         2. Alternatively, if you prefer to download it yourself, you could either:
@@ -236,7 +242,7 @@ You can include the 3D reconstruction module by:
                 - Copy `{freeglutParentDirectory}\freeglut\bin\x64\` as `{OpenPoseDirectory}\3rdparty\windows\freeglut\bin\`.
                 - Copy `{freeglutParentDirectory}\freeglut\include\` as `{OpenPoseDirectory}\3rdparty\windows\freeglut\include\`.
                 - Copy `{freeglutParentDirectory}\freeglut\lib\x64\` as `{OpenPoseDirectory}\3rdparty\windows\freeglut\lib\`.
-3. Follow the CMake installation steps, and set the `BUILD_MODULE_3D` option.
+3. Follow the CMake installation steps. In addition, set the `WITH_FLIR_CAMERA` (only if Spinnaker was installed) and `WITH_3D_RENDERER` options.
 4. In Windows, after openning the OpenPose visual studio solution:
     1. Right-click on `Solution 'OpenPose'` of the `Solution Explorer` window, usually placed at the top-right part of the VS screen.
     2. Click on `Properties`. Go to `Configuration Properties` -> `Configuration` and check `Build` for the `OpenPose3DReconstruction` project.

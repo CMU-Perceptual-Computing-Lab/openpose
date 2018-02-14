@@ -28,7 +28,7 @@ DEFINE_int32(hand_scale_number,         1,              "");
 DEFINE_double(hand_scale_range,         0.4,            "");
 DEFINE_bool(hand_tracking,              false,          "");
 // Display
-DEFINE_bool(no_display,                 false,          "");
+DEFINE_int32(display,                   -1,             "");
 // Result Saving
 DEFINE_string(write_json,               "",             "");
 
@@ -56,9 +56,12 @@ int handFromJsonTest()
     op::log("Configuring OpenPose wrapper.", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
     op::WrapperHandFromJsonTest<std::vector<op::Datum>> opWrapper;
     // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
+    const bool identification = false;
     op::WrapperStructPose wrapperStructPose{false, op::flagsToPoint("656x368"), op::flagsToPoint("1280x720"),
                                             op::ScaleMode::InputResolution, FLAGS_num_gpu, FLAGS_num_gpu_start,
-                                            true, enableGoogleLogging};
+                                            1, 0.15f, op::RenderMode::None, op::PoseModel::COCO_18,
+                                            true, 0.f, 0.f, 0, "models/", {}, op::ScaleMode::ZeroToOne, false,
+                                            0.05f, -1, enableGoogleLogging, false, identification};
     wrapperStructPose.modelFolder = FLAGS_model_folder;
     // Hand configuration (use op::WrapperStructHand{} to disable it)
     const op::WrapperStructHand wrapperStructHand{FLAGS_hand, handNetInputSize, FLAGS_hand_scale_number,
@@ -66,7 +69,7 @@ int handFromJsonTest()
                                                   op::flagsToRenderMode(1)};
     // Configure wrapper
     opWrapper.configure(wrapperStructPose, wrapperStructHand, producerSharedPtr, FLAGS_hand_ground_truth,
-                        FLAGS_write_json, !FLAGS_no_display);
+                        FLAGS_write_json, op::flagsToDisplayMode(FLAGS_display, false));
 
     // Start processing
     op::log("Starting thread(s)", op::Priority::High);

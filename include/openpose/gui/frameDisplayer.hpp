@@ -15,38 +15,44 @@ namespace op
     public:
         /**
          * Constructor of the FrameDisplayer class.
-         * @param windowedName const std::string value with the opencv resulting display name. Showed at the top-left part of the window.
+         * @param windowedName const std::string value with the opencv resulting display name. Showed at the top-left
+         * part of the window.
          * @param initialWindowedSize const Point<int> with the initial window output resolution (width and height).
-         * @param fullScreen bool from which the FrameDisplayer::GuiDisplayMode property mGuiDisplayMode will be set, i.e. specifying the type of initial display (it can be changed later).
+         * @param fullScreen bool from which the FrameDisplayer::FullScreenMode property mFullScreenMode will be set,
+         * i.e. specifying the type of initial display (it can be changed later).
          */
-        FrameDisplayer(const std::string& windowedName = "OpenPose Display", const Point<int>& initialWindowedSize = Point<int>{}, const bool fullScreen = false);
+        FrameDisplayer(const std::string& windowedName = OPEN_POSE_NAME_AND_VERSION,
+                       const Point<int>& initialWindowedSize = Point<int>{}, const bool fullScreen = false);
 
         // Due to OpenCV visualization issues (all visualization functions must be in the same thread)
         void initializationOnThread();
 
         /**
-         * This function set the new FrameDisplayer::GuiDisplayMode (e.g. full screen).
-         * @param displayMode New FrameDisplayer::GuiDisplayMode state.
+         * This function set the new FrameDisplayer::FullScreenMode (e.g. full screen).
+         * @param fullScreenMode New FrameDisplayer::FullScreenMode state.
          */
-        void setGuiDisplayMode(const GuiDisplayMode displayMode);
+        void setFullScreenMode(const FullScreenMode fullScreenMode);
 
         /**
-         * This function switch between full screen and windowed modes (e.g. when double-click on video players or Ctrt+Enter are presed).
+         * This function switch between full screen and windowed modes (e.g. when double-click on video players or
+         * Ctrt+Enter are presed).
          */
-        void switchGuiDisplayMode();
+        void switchFullScreenMode();
 
         /**
          * This function displays an image on the display.
          * @param frame cv::Mat image to display.
-         * @param waitKeyValue int value that specifies the argument parameter for cv::waitKey (see OpenCV documentation for more information). Special cases: select -1
-         * not to use cv::waitKey or 0 for cv::waitKey(0). OpenCV doc: http://docs.opencv.org/2.4/modules/highgui/doc/user_interface.html?highlight=waitkey
+         * @param waitKeyValue int value that specifies the argument parameter for cv::waitKey (see OpenCV
+         * documentation for more information). Special cases: select -1
+         * not to use cv::waitKey or 0 for cv::waitKey(0). OpenCV doc:
+         * http://docs.opencv.org/2.4/modules/highgui/doc/user_interface.html?highlight=waitkey
          */
         void displayFrame(const cv::Mat& frame, const int waitKeyValue = -1);
 
     private:
         const std::string mWindowName;
         Point<int> mWindowedSize;
-        GuiDisplayMode mGuiDisplayMode;
+        FullScreenMode mFullScreenMode;
     };
 }
 

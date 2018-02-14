@@ -3,6 +3,7 @@
 
 #include <openpose/core/common.hpp>
 #include <openpose/filestream/enumClasses.hpp>
+#include <openpose/gui/enumClasses.hpp>
 
 namespace op
 {
@@ -13,9 +14,15 @@ namespace op
     struct OP_API WrapperStructOutput
     {
         /**
-         * Whether to display the OpenPose small integrated GUI.
+         * Display mode
+         * a) -1 for automatic selection.
+         * b) 0 for no display. Useful if there is no X server and/or to slightly speed up the processing if visual
+         *    output is not required.
+         * c) 2 for 2-D display in the OpenPose small integrated GUI.
+         * d) 3 for 3-D display, if `--3d` was enabled.
+         * e) 1 for both 2-D and 3-D display.
          */
-        bool displayGui;
+        DisplayMode displayMode;
 
         /**
          * Whether to add some information to the frame (number of frame, number people detected, etc.) after it is
@@ -98,7 +105,7 @@ namespace op
          * It has the recommended and default values we recommend for each element of the struct.
          * Since all the elements of the struct are public, they can also be manually filled.
          */
-        WrapperStructOutput(const bool displayGui = false, const bool guiVerbose = false,
+        WrapperStructOutput(const DisplayMode displayMode = DisplayMode::NoDisplay, const bool guiVerbose = false,
                             const bool fullScreen = false, const std::string& writeKeypoint = "",
                             const DataFormat writeKeypointFormat = DataFormat::Xml,
                             const std::string& writeJson = "", const std::string& writeCocoJson = "",

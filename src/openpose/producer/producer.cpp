@@ -37,7 +37,22 @@ namespace op
     {
         try
         {
-            cv::Mat frame;
+            // Return first element from getFrames (if any)
+            const auto frames = getFrames();
+            return (frames.empty() ? cv::Mat() : frames[0]);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return cv::Mat();
+        }
+    }
+
+    std::vector<cv::Mat> Producer::getFrames()
+    {
+        try
+        {
+            std::vector<cv::Mat> frames;
 
             if (isOpened())
             {
@@ -45,20 +60,29 @@ namespace op
                 // sources (e.g. a video)
                 keepDesiredFrameRate();
                 // Get frame
-                frame = getRawFrame();
-                // Flip + rotate frame
-                flipAndRotate(frame);
-                // Check frame integrity
-                checkFrameIntegrity(frame);
+                frames = getRawFrames();
+                for (auto& frame : frames)
+                {
+                    // Flip + rotate frame
+                    flipAndRotate(frame);
+                    // Check frame integrity
+                    checkFrameIntegrity(frame);
+                    // If any frame unvalid --> exit
+                    if (frame.empty())
+                    {
+                        frames.clear();
+                        break;
+                    }
+                }
                 // Check if video capture did finish and close/restart it
                 ifEndedResetOrRelease();
             }
-            return frame;
+            return frames;
         }
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return cv::Mat();
+            return {};
         }
     }
 
@@ -228,7 +252,8 @@ namespace op
                 // videos (i.e. there is a frame missing), mNumberEmptyFrames allows the program to be properly
                 // closed keeping the 0-index frame counting
                 if (mNumberEmptyFrames > 2
-                    || (mType != ProducerType::IPCamera && mType != ProducerType::Webcam
+                    || (mType != ProducerType::FlirCamera && mType != ProducerType::IPCamera
+                        && mType != ProducerType::Webcam
                         && get(CV_CAP_PROP_POS_FRAMES) >= get(CV_CAP_PROP_FRAME_COUNT)))
                 {
                     // Repeat video
@@ -282,9 +307,9 @@ namespace op
                             }
                             else
                             {
-                                cv::Mat frame;
+                                std::vector<cv::Mat> frames;
                                 for (auto i = 0 ; i < std::floor(difference) ; i++)
-                                    frame = getRawFrame();
+                                    frames = getRawFrames();
                             }
                         }
                         // Low down frame extraction - sleep thread unless it is too slow in most frames (using
