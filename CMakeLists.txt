@@ -126,23 +126,17 @@ endif ()
 if (${GPU_MODE} MATCHES "CUDA")
   # OpenPose flags
   add_definitions(-DUSE_CUDA)
-  message(STATUS "Building with CUDA")
+  message(STATUS "Building with CUDA.")
 elseif (${GPU_MODE} MATCHES "CPU_ONLY")
   # OpenPose flag for Caffe
   add_definitions(-DCPU_ONLY)
-  message(STATUS "Building CPU Only")
+  message(STATUS "Building CPU Only.")
 elseif (${GPU_MODE} MATCHES "OPENCL")
   # OpenPose flag for Caffe
   add_definitions(-DUSE_OPENCL)
   add_definitions(-DUSE_GREENTEA)
-  message(STATUS "Building with OpenCL")
+  message(STATUS "Building with OpenCL.")
 endif ()
-
-if (${USE_MKL})
-  # OpenPose flags
-  add_definitions(-DUSE_MKL)
-  message(STATUS "Building with MKL support.")
-endif (${USE_MKL})
 
 # Intel branch with MKL Support
 if (${GPU_MODE} MATCHES "CPU_ONLY")
@@ -150,6 +144,12 @@ if (${GPU_MODE} MATCHES "CPU_ONLY")
     OPTION(USE_MKL "Use MKL Intel Branch." ON)
   endif ()
 endif ()
+
+if (${USE_MKL})
+  # OpenPose flags
+  add_definitions(-DUSE_MKL)
+  message(STATUS "Building with MKL support.")
+endif (${USE_MKL})
 
 # Set/disable profiler
 if (PROFILER_ENABLED)
