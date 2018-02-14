@@ -402,6 +402,7 @@ if (UNIX AND NOT APPLE)
           set( MLIST ${rv} )
           separate_arguments(MLIST)
           list(GET MLIST 0 MKL_PATH)
+          message(${MKL_PATH})
           file(GLOB MKL_SO
             "${MKL_PATH}lib/*"
             )
@@ -500,6 +501,11 @@ include_directories(
   ${GFLAGS_INCLUDE_DIR}
   ${GLOG_INCLUDE_DIR}
   ${OpenCV_INCLUDE_DIRS})
+
+if(USE_MKL)
+ include_directories(
+     "${MKL_PATH}/include/")
+endif (USE_MKL)
 
 if (Caffe_FOUND)
   include_directories(

@@ -10,7 +10,9 @@ namespace gflags = google;
 #endif
 #include <openpose/headers.hpp>
 #include <openpose/core/resizeAndMergeBase.hpp>
+#ifdef USE_CUDA
 #include <caffe/net.hpp>
+#endif
 #include <openpose/gpu/cuda.hpp>
 
 DEFINE_string(image_path,               "examples/media/COCO_val2014_000000000192.jpg",     "Process the desired image.");
@@ -95,8 +97,6 @@ int main(int argc, char *argv[])
 {
     // Parsing command line flags
     gflags::ParseCommandLineFlags(&argc, &argv, true);
-
-
 
     // Running handFromJsonTest
     return resizeTest();

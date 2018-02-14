@@ -243,7 +243,7 @@ namespace op
                         reshapePoseExtractorCaffe(upImpl->spResizeAndMergeCaffe, upImpl->spNmsCaffe,
                                                   upImpl->spBodyPartConnectorCaffe, upImpl->spCaffeNetOutputBlobs,
                                                   upImpl->spHeatMapsBlob, upImpl->spPeaksBlob,
-                                                  1.f, upImpl->mPoseModel);
+                                                  1.f, upImpl->mPoseModel, upImpl->mGpuId);
                                                   // scaleInputToNetInputs[i], upImpl->mPoseModel);
                     }
                 }
