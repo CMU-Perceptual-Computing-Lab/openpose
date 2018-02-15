@@ -4,7 +4,7 @@
 #ifdef USE_OPENCL
     #define CL_HPP_ENABLE_EXCEPTIONS
     #include <openpose/gpu/opencl.hpp>
-    #include <CL/cl2.hpp>
+    #include <openpose/gpu/cl2.hpp>
 #endif
 
 namespace op

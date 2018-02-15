@@ -3,7 +3,7 @@
 
 #ifdef USE_OPENCL
     #include <openpose/gpu/opencl.hpp>
-    #include <CL/cl2.hpp>
+    #include <openpose/gpu/cl2.hpp>
 #endif
 
 #include <opencv2/opencv.hpp>
