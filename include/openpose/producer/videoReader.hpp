@@ -22,7 +22,7 @@ namespace op
 
         std::vector<cv::Mat> getCameraMatrices();
 
-        std::string getFrameName();
+        std::string getNextFrameName();
 
         inline double get(const int capProperty)
         {

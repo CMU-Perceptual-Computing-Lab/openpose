@@ -22,11 +22,11 @@ namespace op
         }
     }
 
-    std::string VideoReader::getFrameName()
+    std::string VideoReader::getNextFrameName()
     {
         try
         {
-            return mPathName + "_" + VideoCaptureReader::getFrameName();
+            return mPathName + "_" + VideoCaptureReader::getNextFrameName();
         }
         catch (const std::exception& e)
         {

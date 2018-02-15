@@ -46,7 +46,7 @@ namespace op
         }
     }
 
-    std::string FlirReader::getFrameName()
+    std::string FlirReader::getNextFrameName()
     {
         try
         {

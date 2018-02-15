@@ -25,11 +25,11 @@ namespace op
         }
     }
 
-    std::string IpCameraReader::getFrameName()
+    std::string IpCameraReader::getNextFrameName()
     {
         try
         {
-            return VideoCaptureReader::getFrameName();
+            return VideoCaptureReader::getNextFrameName();
         }
         catch (const std::exception& e)
         {

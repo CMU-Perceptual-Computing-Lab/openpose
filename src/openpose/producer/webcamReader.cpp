@@ -71,11 +71,11 @@ namespace op
         }
     }
 
-    std::string WebcamReader::getFrameName()
+    std::string WebcamReader::getNextFrameName()
     {
         try
         {
-            return VideoCaptureReader::getFrameName();
+            return VideoCaptureReader::getNextFrameName();
         }
         catch (const std::exception& e)
         {

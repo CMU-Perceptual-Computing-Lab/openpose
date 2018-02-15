@@ -51,7 +51,7 @@ namespace op
         }
     }
 
-    std::string ImageDirectoryReader::getFrameName()
+    std::string ImageDirectoryReader::getNextFrameName()
     {
         try
         {
