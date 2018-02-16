@@ -15,6 +15,7 @@ namespace op
         {
             if (isOpened())
             {
+                mFrameNameCounter = 0;
                 if (webcamResolution != Point<int>{})
                 {
                     set(CV_CAP_PROP_FRAME_WIDTH, webcamResolution.x);

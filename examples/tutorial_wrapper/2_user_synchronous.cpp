@@ -165,7 +165,7 @@ DEFINE_string(write_images_format,      "png",          "File extension and form
 DEFINE_string(write_video,              "",             "Full file path to write rendered frames in motion JPEG video format. It might fail if the"
                                                         " final path does not finish in `.avi`. It internally uses cv::VideoWriter.");
 DEFINE_string(write_json,               "",             "Directory to write OpenPose output in JSON format. It includes body, hand, and face pose"
-                                                        " keypoints, as well as pose candidates (if `--part_candidates` enabled).");
+                                                        " keypoints (2-D and 3-D), as well as pose candidates (if `--part_candidates` enabled).");
 DEFINE_string(write_coco_json,          "",             "Full file path to write people pose data with JSON COCO validation format.");
 DEFINE_string(write_heatmaps,           "",             "Directory to write body pose heatmaps in PNG format. At least 1 `add_heatmaps_X` flag"
                                                         " must be enabled.");

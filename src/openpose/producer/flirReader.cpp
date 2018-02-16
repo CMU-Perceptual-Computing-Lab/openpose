@@ -102,6 +102,7 @@ namespace op
     {
         try
         {
+            mFrameNameCounter++; // Simple counter: 0,1,2,3,...
             return mSpinnakerWrapper.getRawFrames();
         }
         catch (const std::exception& e)

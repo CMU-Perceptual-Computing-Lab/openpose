@@ -40,21 +40,22 @@ namespace op
                 {
                     const auto& keypoints = keypointVector[vectorIndex].first;
                     const auto& keypointName = keypointVector[vectorIndex].second;
-                    const auto numberBodyParts = keypoints.getSize(1);
+                    const auto numberElementsPerRaw = keypoints.getSize(1) * keypoints.getSize(2);
                     jsonOfstream.key(keypointName);
                     jsonOfstream.arrayOpen();
                     // Body parts
-                    for (auto bodyPart = 0 ; bodyPart < numberBodyParts ; bodyPart++)
+                    if (numberElementsPerRaw > 0)
                     {
-                        const auto finalIndex = 3*(person*numberBodyParts + bodyPart);
-                        jsonOfstream.plainText(keypoints[finalIndex]);
-                        jsonOfstream.comma();
-                        jsonOfstream.plainText(keypoints[finalIndex+1]);
-                        jsonOfstream.comma();
-                        jsonOfstream.plainText(keypoints[finalIndex+2]);
-                        if (bodyPart < numberBodyParts-1)
+                        const auto finalIndex = person*numberElementsPerRaw;
+                        for (auto element = 0 ; element < numberElementsPerRaw - 1 ; element++)
+                        {
+                            jsonOfstream.plainText(keypoints[finalIndex + element]);
                             jsonOfstream.comma();
+                        }
+                        // Last element (no comma)
+                        jsonOfstream.plainText(keypoints[finalIndex + numberElementsPerRaw - 1]);
                     }
+                    // Close array
                     jsonOfstream.arrayClose();
                     if (vectorIndex < keypointVector.size()-1)
                         jsonOfstream.comma();
@@ -313,7 +314,11 @@ namespace op
             JsonOfstream jsonOfstream{fileName, humanReadable};
             jsonOfstream.objectOpen();
             // Add version
-            jsonOfstream.version("1.1");
+            // Version 0.1: Body keypoints (2-D)
+            // Version 1.0: Added face and hands (2-D)
+            // Version 1.1: Added candidates
+            // Version 1.2: Added body, face, and hands (3-D)
+            jsonOfstream.version("1.2");
             jsonOfstream.comma();
             // Add people keypoints
             addKeypointsToJson(jsonOfstream, keypointVector);

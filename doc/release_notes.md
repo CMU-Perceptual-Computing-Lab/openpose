@@ -185,6 +185,8 @@ OpenPose Library - Release Notes
     13. 3-D reconstruction module forces the user to set `number_people_max 1` to avoid errors (as it assumes only 1 person per image).
     14. Removed old `windows/` version. CMake is the only Windows version available.
     15. Camera parameters (flir camera) are read from disk at runtime rather than being compiled.
+    16. 3-D reconstruction module can be implemented with different camera brands or custom image sources.
+    16. Flag `--write_json` includes 3-D keypoints.
 2. Functions or parameters renamed:
     1. Flag `no_display` renamed as `display`, able to select between `NoDisplay`, `Display2D`, `Display3D`, and `DisplayAll`.
     2. 3-D reconstruction demo is now inside the OpenPose demo binary.

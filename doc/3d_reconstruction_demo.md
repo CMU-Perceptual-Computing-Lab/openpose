@@ -97,7 +97,14 @@ It should be similar to the following image.
 
 
 ## Using a Different Camera Brand
-You can copy and modify the OpenPose 3-D demo to use any camera brand, by modifying the frames producer. For that, you would need to provide your custom code to retrieve synchronized images from your cameras, as well as their intrinsic and extrinsic camera parameters.
+You can copy and modify the OpenPose 3-D demo to use any camera brand by:
+
+1. You can optionally turn off the `WITH_FLIR_CAMERA` while compiling CMake.
+2. Copy any of the `examples/tutorial_wrapper/*.cpp` examples (we recommend `2_user_synchronous.cpp`).
+3. Modify `WUserInput` and add your custom code there. Your code should fill `Datum::name`, `Datum::cameraMatrix`, `Datum::cvInputData`, and `Datum::cvOutputData` (fill cvOutputData = cvInputData).
+4. Remove `WUserPostProcessing` and `WUserOutput` (unless you want to have your custom post-processing and/or output).
+
+Note that your custom code should retrieve synchronized images from your cameras or any other source, as well as their intrinsic and extrinsic camera parameters.
 
 
 

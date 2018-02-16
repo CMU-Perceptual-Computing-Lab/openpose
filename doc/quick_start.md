@@ -125,13 +125,20 @@ build\x64\Release\OpenPoseDemo.exe --flir_camera --3d --number_people_max 1
 build\x64\Release\OpenPoseDemo.exe --flir_camera --3d --number_people_max 1 --face --hand
 ```
 
-2. Saving stereo camera images for a later post-processing:
+2. Saving 3-D keypoints
 ```
 # Ubuntu (same flags for Windows version)
-./build/examples/openpose/openpose.bin --flir_camera --3d --number_people_max 1 --num_gpu 0 --write_images output_folder_path/
+./build/examples/openpose/openpose.bin --flir_camera --3d --number_people_max 1 --write_json output_folder_path/
 ```
 
-3. Reading previouly saved stereo camera images and processing them:
+3. Saving stereo camera images fast (without keypoint detection) for later post-processing
+```
+# Ubuntu (same flags for Windows version)
+# Note: saving in PNG rather than JPG will improve image quality, but slow down FPS (depending on hard disk writing speed and camera number)
+./build/examples/openpose/openpose.bin --flir_camera --num_gpu 0 --write_images output_folder_path/
+```
+
+4. Reading and processing previouly saved stereo camera images
 ```
 # Ubuntu (same flags for Windows version)
 # Optionally add `--face` and/or `--hand` to include face and/or hands

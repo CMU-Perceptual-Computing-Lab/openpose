@@ -63,21 +63,24 @@ namespace op
                 dLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 // Profiling speed
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
+                // Update cvMat & keypoints
                 if (!tDatums->empty())
                 {
-                    // T* to T
-                    auto& tDatum = (*tDatums)[0];
                     // Update cvMat
                     std::vector<cv::Mat> cvOutputDatas;
                     for (auto& tDatum : *tDatums)
                         cvOutputDatas.emplace_back(tDatum.cvOutputData);
                     spGui3D->setImage(cvOutputDatas);
                     // Update keypoints
+                    auto& tDatum = (*tDatums)[0];
                     spGui3D->setKeypoints(tDatum.poseKeypoints3D, tDatum.faceKeypoints3D, tDatum.handKeypoints3D[0],
                                           tDatum.handKeypoints3D[1]);
-                    // Refresh/update GUI
-                    spGui3D->update();
-                    // Profiling speed
+                }
+                // Refresh/update GUI
+                spGui3D->update();
+                // Profiling speed
+                if (!tDatums->empty())
+                {
                     Profiler::timerEnd(profilerKey);
                     Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);
                 }
