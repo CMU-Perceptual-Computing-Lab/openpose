@@ -30,19 +30,45 @@ namespace op
         }
     }
 
-    ImageDirectoryReader::ImageDirectoryReader(const std::string& imageDirectoryPath) :
+    ImageDirectoryReader::ImageDirectoryReader(const std::string& imageDirectoryPath,
+                                               const unsigned int imageDirectoryStereo,
+                                               const std::string& cameraParameterPath) :
         Producer{ProducerType::ImageDirectory},
         mImageDirectoryPath{imageDirectoryPath},
+        mImageDirectoryStereo{imageDirectoryStereo},
         mFilePaths{getImagePathsOnDirectory(imageDirectoryPath)},
-        mFrameNameCounter{0}
+        mFrameNameCounter{0ll}
     {
+        try
+        {
+            // Read camera parameters from SN
+            auto serialNumbers = getFilesOnDirectory(cameraParameterPath, ".xml");
+            // Security check
+            if (serialNumbers.size() != mImageDirectoryStereo && mImageDirectoryStereo > 1)
+                error("Found different number of camera parameter files than the number indicated by"
+                      " `--image_dir_stereo` ("
+                      + std::to_string(serialNumbers.size()) + " vs. "
+                      + std::to_string(mImageDirectoryStereo) + "). Make them equal or add"
+                      + " `--image_dir_stereo 1`",
+                      __LINE__, __FUNCTION__, __FILE__);
+            // Get serial numbers
+            for (auto& serialNumber : serialNumbers)
+                serialNumber = getFileNameNoExtension(serialNumber);
+            // Get camera paremeters
+            if (mImageDirectoryStereo > 1)
+                mCameraParameterReader.readParameters(cameraParameterPath, serialNumbers);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
     }
 
     std::vector<cv::Mat> ImageDirectoryReader::getCameraMatrices()
     {
         try
         {
-            return {};
+            return mCameraParameterReader.getCameraMatrices();
         }
         catch (const std::exception& e)
         {
@@ -87,7 +113,10 @@ namespace op
     {
         try
         {
-            return std::vector<cv::Mat>{getRawFrame()};
+            std::vector<cv::Mat> rawFrames;
+            for (auto i = 0u ; i < mImageDirectoryStereo ; i++)
+                rawFrames.emplace_back(getRawFrame());
+            return rawFrames;
         }
         catch (const std::exception& e)
         {

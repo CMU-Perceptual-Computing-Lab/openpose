@@ -148,7 +148,7 @@ Each flag is divided into flag name, default value, and description.
 - DEFINE_int32(frame_rotate,              0,              "Rotate each frame, 4 possible values: 0, 90, 180, 270.");
 - DEFINE_bool(frames_repeat,              false,          "Repeat frames when finished.");
 - DEFINE_bool(process_real_time,          false,          "Enable to keep the original source frame rate (e.g. for video). If the processing time is too long, it will skip frames. If it is too fast, it will slow it down.");
-- DEFINE_string(camera_parameter_folder,  "models/cameraParameters/", "String with the folder where the camera parameters are located.");
+- DEFINE_string(camera_parameter_folder,  "models/cameraParameters/flir/", "String with the folder where the camera parameters are located.");
 
 3. OpenPose
 - DEFINE_string(model_folder,             "models/",      "Folder path (absolute or relative) where the models (pose, face, ...) are located.");

@@ -12,7 +12,7 @@ OpenPose - Installation
 8. [Uninstallation](#uninstallation)
 9. [Optional Settings](#optional-settings)
     1. [MPI Model](#mpi-model)
-    2. [OpenPose 3D Reconstruction Module and Demo](#openpose-3d-reconstruction-module-and-demo)
+    2. [OpenPose 3D Reconstruction Module](#openpose-3d-reconstruction-module)
     3. [Compiling without cuDNN](#compiling-without-cudnn)
     4. [Custom Caffe (Ubuntu Only)](#custom-caffe-ubuntu-only)
     5. [Custom OpenCV (Ubuntu Only)](#custom-opencv-ubuntu-only)
@@ -99,6 +99,18 @@ The instructions in this section describe the steps to build OpenPose using CMak
 4. Windows - **Microsoft Visual Studio (VS) 2015 Enterprise Update 3**:
     - If **Visual Studio 2017 Community** is desired, we do not officially support it, but it might be compiled by firstly [enabling CUDA 8.0 in VS2017](https://stackoverflow.com/questions/43745099/using-cuda-with-visual-studio-2017?answertab=active#tab-top) or use **VS2017 with CUDA 9** by checking the `.vcxproj` file and changing the necessary paths from CUDA 8 to 9.
     - VS 2015 Enterprise Update 1 will give some compiler errors and VS 2015 Community has not been tested.
+5. Windows - **Caffe, OpenCV, and Caffe prerequisites**:
+    - CMake automatically downloads all the Windows DLLs. Alternatively, you might prefer to download them manually:
+        - Models:
+            - [COCO model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/coco/pose_iter_440000.caffemodel): download in `models/pose/coco/`.
+            - [MPI model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/mpi/pose_iter_160000.caffemodel): download in `models/pose/mpi/`.
+            - [Face model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/face/pose_iter_116000.caffemodel): download in `models/face/`.
+            - [Hands model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/hand/pose_iter_102000.caffemodel): download in `models/hand/`.
+        - Dependencies:
+            - Note: Leave the zip files in `3rdparty/windows/` so that CMake does not try to download them again.
+            - [Caffe](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe_2018_01_18.zip): Unzip as `3rdparty/windows/caffe/`.
+            - [Caffe dependencies](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe3rdparty_2017_07_14.zip): Unzip as `3rdparty/windows/caffe3rdparty/`.
+            - [OpenCV 3.1](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/opencv_310.zip): Unzip as `3rdparty/windows/opencv/`.
 
 
 
@@ -201,7 +213,7 @@ By default, the body MPI model is not downloaded. You can download it by turning
 
 
 
-#### OpenPose 3D Reconstruction Module and Demo
+#### OpenPose 3D Reconstruction Module
 You can include the 3D reconstruction module by:
 
 1. Install the FLIR camera software, Spinnaker SDK. It is a propietary software, so we cannot provide direct download link. Note: You might skip this step if you intend to use the 3-D OpenPose module with a different camera brand.

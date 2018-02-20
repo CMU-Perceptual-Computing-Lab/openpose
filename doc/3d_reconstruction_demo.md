@@ -72,12 +72,12 @@ In order to verify that the camera parameters introduced by the user are sorted 
 
 
 ## Installing the OpenPose 3-D Reconstruction Module
-Check the [doc/quick_start.md#3-d-reconstruction](./quick_start.md#3-d-reconstruction) for basic examples.
+Check the [doc/installation.md#openpose-3d-reconstruction-module](./quick_start.md#openpose-3d-reconstruction-module) for installation steps.
 
 
 
 ## Quick Start
-You can copy and modify the OpenPose 3-D demo to use any camera brand, by modifying the frames producer. For that, you would need to provide your custom code to retrieve synchronized images from your cameras, as well as their intrinsic and extrinsic camera parameters.
+Check the [doc/quick_start.md#3-d-reconstruction](./quick_start.md#3-d-reconstruction) for basic examples.
 
 
 

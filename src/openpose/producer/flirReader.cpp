@@ -6,7 +6,7 @@ namespace op
 {
     FlirReader::FlirReader(const std::string& cameraParametersPath) :
         Producer{ProducerType::FlirCamera},
-        mSpinnakerWrapper{cameraParametersPath + "flir/"},
+        mSpinnakerWrapper{cameraParametersPath},
         mFrameNameCounter{0}
     {
         try

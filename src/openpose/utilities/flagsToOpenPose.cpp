@@ -137,7 +137,8 @@ namespace op
     std::shared_ptr<Producer> flagsToProducer(const std::string& imageDirectory, const std::string& videoPath,
                                               const std::string& ipCameraPath, const int webcamIndex,
                                               const bool flirCamera, const std::string& webcamResolution,
-                                              const double webcamFps, const std::string& cameraParameterPath)
+                                              const double webcamFps, const std::string& cameraParameterPath,
+                                              const unsigned int imageDirectoryStereo)
     {
         try
         {
@@ -145,7 +146,8 @@ namespace op
             const auto type = flagsToProducerType(imageDirectory, videoPath, ipCameraPath, webcamIndex, flirCamera);
 
             if (type == ProducerType::ImageDirectory)
-                return std::make_shared<ImageDirectoryReader>(imageDirectory);
+                return std::make_shared<ImageDirectoryReader>(imageDirectory, imageDirectoryStereo,
+                                                              cameraParameterPath);
             else if (type == ProducerType::Video)
                 return std::make_shared<VideoReader>(videoPath);
             else if (type == ProducerType::IPCamera)
