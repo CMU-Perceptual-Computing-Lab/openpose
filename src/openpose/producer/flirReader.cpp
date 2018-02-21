@@ -6,7 +6,7 @@ namespace op
 {
     FlirReader::FlirReader(const std::string& cameraParametersPath) :
         Producer{ProducerType::FlirCamera},
-        mSpinnakerWrapper{cameraParametersPath + "flir/"},
+        mSpinnakerWrapper{cameraParametersPath},
         mFrameNameCounter{0}
     {
         try
@@ -46,7 +46,7 @@ namespace op
         }
     }
 
-    std::string FlirReader::getFrameName()
+    std::string FlirReader::getNextFrameName()
     {
         try
         {
@@ -102,6 +102,7 @@ namespace op
     {
         try
         {
+            mFrameNameCounter++; // Simple counter: 0,1,2,3,...
             return mSpinnakerWrapper.getRawFrames();
         }
         catch (const std::exception& e)

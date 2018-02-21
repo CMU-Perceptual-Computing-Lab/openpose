@@ -15,6 +15,7 @@ namespace op
         {
             if (isOpened())
             {
+                mFrameNameCounter = 0;
                 if (webcamResolution != Point<int>{})
                 {
                     set(CV_CAP_PROP_FRAME_WIDTH, webcamResolution.x);
@@ -71,11 +72,11 @@ namespace op
         }
     }
 
-    std::string WebcamReader::getFrameName()
+    std::string WebcamReader::getNextFrameName()
     {
         try
         {
-            return VideoCaptureReader::getFrameName();
+            return VideoCaptureReader::getNextFrameName();
         }
         catch (const std::exception& e)
         {

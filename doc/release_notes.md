@@ -185,9 +185,13 @@ OpenPose Library - Release Notes
     13. 3-D reconstruction module forces the user to set `number_people_max 1` to avoid errors (as it assumes only 1 person per image).
     14. Removed old `windows/` version. CMake is the only Windows version available.
     15. Camera parameters (flir camera) are read from disk at runtime rather than being compiled.
+    16. 3-D reconstruction module can be implemented with different camera brands or custom image sources.
+    17. Flag `--write_json` includes 3-D keypoints.
+    18. Flag `--image_dir_stereo` added to allow `--image_dir` to load stereo images.
 2. Functions or parameters renamed:
     1. Flag `no_display` renamed as `display`, able to select between `NoDisplay`, `Display2D`, `Display3D`, and `DisplayAll`.
     2. 3-D reconstruction demo is now inside the OpenPose demo binary.
+    3. Renamed `*_keypoints` by `*_keypoints_2d` to avoid confusion with 3d ones in `--write_json` output file.
 3. Main bugs fixed:
     1. Slight speed up (~1%) for performing the non-maximum suppression stage only in the body part heatmaps channels, and not also in the PAF channels.
     2. Fixed core-dumped in PoseRenderer with GUI when changed element to be rendered to something else than skeleton.

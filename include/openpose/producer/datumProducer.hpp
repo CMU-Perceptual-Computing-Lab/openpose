@@ -97,6 +97,7 @@ namespace op
                         spVideoSeek->second = 0;
                     }
                 }
+                auto nextFrameName = spProducer->getNextFrameName();
                 auto cvMats = spProducer->getFrames();
                 auto cameraMatrices = spProducer->getCameraMatrices();
                 // Check frames are not empty
@@ -107,7 +108,7 @@ namespace op
                     // Datum cannot be assigned before resize()
                     auto& datum = (*datums)[0];
                     // Filling first element
-                    datum.name = spProducer->getFrameName();
+                    std::swap(datum.name, nextFrameName);
                     datum.cvInputData = cvMats[0];
                     if (!cameraMatrices.empty())
                         datum.cameraMatrix = cameraMatrices[0];

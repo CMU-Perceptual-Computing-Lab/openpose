@@ -54,7 +54,7 @@ namespace op
         }
     }
 
-    std::string VideoCaptureReader::getFrameName()
+    std::string VideoCaptureReader::getNextFrameName()
     {
         try
         {

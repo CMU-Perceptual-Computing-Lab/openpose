@@ -137,6 +137,7 @@ namespace op
                     }
                 }
                 // 3D reconstruction
+                keypoints3D.reset({ 1, numberBodyParts, 4 }, 0);
                 if (!xyPoints.empty())
                 {
                     // Do 3D reconstruction
@@ -154,7 +155,6 @@ namespace op
                     // cv::Mat reconstructedPoints{4, firstcv::Points.size(), CV_64F};
                     // cv::triangulatecv::Points(cv::Mat::eye(3,4, CV_64F), M_3_1, firstcv::Points, secondcv::Points,
                     //                           reconstructedcv::Points);
-                    keypoints3D.reset({ 1, numberBodyParts, 4 }, 0);
                     const auto lastChannelLength = keypoints3D.getSize(2);
                     for (auto index = 0u; index < indexesUsed.size(); index++)
                     {

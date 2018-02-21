@@ -52,7 +52,7 @@ namespace op
          * frame counter for webcam, the image name for image directory reader, etc.).
          * @return std::string with an unique frame name.
          */
-        virtual std::string getFrameName() = 0;
+        virtual std::string getNextFrameName() = 0;
 
         /**
          * This function sets whether the producer must keep the original fps frame rate or extract the frames as quick

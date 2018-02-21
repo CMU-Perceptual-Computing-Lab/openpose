@@ -52,6 +52,10 @@ DEFINE_string(video,                    "",             "Use a video file instea
                                                         " example video.");
 DEFINE_string(image_dir,                "",             "Process a directory of images. Use `examples/media/` for our default example folder with 20"
                                                         " images. Read all standard formats (jpg, png, bmp, etc.).");
+DEFINE_int32(image_dir_stereo,          1,              "Complementary option to `--image_dir`. OpenPose will read as many images per iteration,"
+                                                        " allowing tasks such as stereo camera processing. Note that `--camera_parameters_folder`"
+                                                        " must be set. OpenPose must find as many `xml` files in the parameter folder as this"
+                                                        " number indicates.");
 DEFINE_bool(flir_camera,                false,          "Whether to use FLIR (Point-Grey) stereo camera.");
 DEFINE_string(ip_camera,                "",             "String with the IP camera URL. It supports protocols like RTSP and HTTP.");
 DEFINE_uint64(frame_first,              0,              "Start on desired frame number. Indexes are 0-based, i.e. the first frame has index 0.");
@@ -62,7 +66,7 @@ DEFINE_int32(frame_rotate,              0,              "Rotate each frame, 4 po
 DEFINE_bool(frames_repeat,              false,          "Repeat frames when finished.");
 DEFINE_bool(process_real_time,          false,          "Enable to keep the original source frame rate (e.g. for video). If the processing time is"
                                                         " too long, it will skip frames. If it is too fast, it will slow it down.");
-DEFINE_string(camera_parameter_folder,  "models/cameraParameters/", "String with the folder where the camera parameters are located.");
+DEFINE_string(camera_parameter_folder,  "models/cameraParameters/flir/", "String with the folder where the camera parameters are located.");
 // OpenPose
 DEFINE_string(model_folder,             "models/",      "Folder path (absolute or relative) where the models (pose, face, ...) are located.");
 DEFINE_string(output_resolution,        "-1x-1",        "The image resolution (display and output). Use \"-1x-1\" to force the program to use the"
@@ -194,7 +198,7 @@ DEFINE_string(write_images_format,      "png",          "File extension and form
 DEFINE_string(write_video,              "",             "Full file path to write rendered frames in motion JPEG video format. It might fail if the"
                                                         " final path does not finish in `.avi`. It internally uses cv::VideoWriter.");
 DEFINE_string(write_json,               "",             "Directory to write OpenPose output in JSON format. It includes body, hand, and face pose"
-                                                        " keypoints, as well as pose candidates (if `--part_candidates` enabled).");
+                                                        " keypoints (2-D and 3-D), as well as pose candidates (if `--part_candidates` enabled).");
 DEFINE_string(write_coco_json,          "",             "Full file path to write people pose data with JSON COCO validation format.");
 DEFINE_string(write_heatmaps,           "",             "Directory to write body pose heatmaps in PNG format. At least 1 `add_heatmaps_X` flag"
                                                         " must be enabled.");
@@ -236,7 +240,8 @@ int openPoseDemo()
     // producerType
     const auto producerSharedPtr = op::flagsToProducer(FLAGS_image_dir, FLAGS_video, FLAGS_ip_camera, FLAGS_camera,
                                                        FLAGS_flir_camera, FLAGS_camera_resolution, FLAGS_camera_fps,
-                                                       FLAGS_camera_parameter_folder);
+                                                       FLAGS_camera_parameter_folder,
+                                                       (unsigned int) FLAGS_image_dir_stereo);
     // poseModel
     const auto poseModel = op::flagsToPoseModel(FLAGS_model_pose);
     // JSON saving

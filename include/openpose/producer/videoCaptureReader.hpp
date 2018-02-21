@@ -34,7 +34,7 @@ namespace op
          */
         virtual ~VideoCaptureReader();
 
-        virtual std::string getFrameName() = 0;
+        virtual std::string getNextFrameName() = 0;
 
         inline bool isOpened() const
         {

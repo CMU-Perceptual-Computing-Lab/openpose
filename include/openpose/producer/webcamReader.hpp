@@ -31,7 +31,7 @@ namespace op
 
         std::vector<cv::Mat> getCameraMatrices();
 
-        std::string getFrameName();
+        std::string getNextFrameName();
 
         double get(const int capProperty);
 
