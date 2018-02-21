@@ -67,10 +67,10 @@ namespace op
 
                     const std::vector<std::pair<Array<float>, std::string>> keypointVector{
                         // 2D
-                        std::make_pair(tDatum.poseKeypoints, "pose_keypoints"),
-                        std::make_pair(tDatum.faceKeypoints, "face_keypoints"),
-                        std::make_pair(tDatum.handKeypoints[0], "hand_left_keypoints"),
-                        std::make_pair(tDatum.handKeypoints[1], "hand_right_keypoints"),
+                        std::make_pair(tDatum.poseKeypoints, "pose_keypoints_2d"),
+                        std::make_pair(tDatum.faceKeypoints, "face_keypoints_2d"),
+                        std::make_pair(tDatum.handKeypoints[0], "hand_left_keypoints_2d"),
+                        std::make_pair(tDatum.handKeypoints[1], "hand_right_keypoints_2d"),
                         // 3D
                         std::make_pair(tDatum.poseKeypoints3D, "pose_keypoints_3d"),
                         std::make_pair(tDatum.faceKeypoints3D, "face_keypoints_3d"),
