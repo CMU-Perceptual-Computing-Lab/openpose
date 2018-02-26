@@ -2,7 +2,7 @@
     #include <openpose/gpu/cuda.hpp>
 #endif
 #ifdef USE_OPENCL
-    #include <openpose/gpu/opencl.hpp>
+    #include <openpose/gpu/opencl.hcl>
 #endif
 #include <openpose/gpu/gpu.hpp>
 

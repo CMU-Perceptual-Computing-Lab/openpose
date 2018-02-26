@@ -25,13 +25,6 @@ const std::string OPEN_POSE_NAME_AND_VERSION = OPEN_POSE_NAME_STRING + " " + OPE
     #pragma warning( disable: 4275 ) // non dll-interface structXXX used as base
 #endif
 
-#define MULTI_LINE_STRING(ARG) #ARG
-
-#define DATUM_BASE_NO_PTR std::vector<Datum>
-#define DATUM_BASE std::shared_ptr<DATUM_BASE_NO_PTR>
-#define DEFINE_TEMPLATE_DATUM(templateName) template class OP_API templateName<DATUM_BASE>
-#define COMPILE_TEMPLATE_DATUM(templateName) extern DEFINE_TEMPLATE_DATUM(templateName)
-
 #define UNUSED(unusedVariable) (void)(unusedVariable)
 
 #define DELETE_COPY(className) \
@@ -86,20 +79,6 @@ namespace caffe
 namespace boost
 {
     template <typename T> class shared_ptr; // E.g., boost::shared_ptr<caffe::Blob<float>>
-}
-typedef struct _cl_buffer_region cl_buffer_region;
-typedef struct _cl_mem *            cl_mem;
-#define CL_DEVICE_TYPE_GPU                          (1 << 2)
-namespace cl
-{
-    class Error;
-    class Buffer;
-    class Program;
-    class Device;
-    class CommandQueue;
-    class Context;
-    class Kernel;
-    template <typename... Ts> class KernelFunctor;
 }
 
 #endif // OPENPOSE_CORE_MACROS_HPP

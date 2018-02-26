@@ -5,6 +5,9 @@
 #include <openpose/core/nmsCaffe.hpp>
 #include <openpose/core/resizeAndMergeCaffe.hpp>
 #include <openpose/gpu/cuda.hpp>
+#ifdef USE_OPENCL
+    #include <openpose/gpu/opencl.hcl>
+#endif
 #include <openpose/pose/bodyPartConnectorCaffe.hpp>
 #include <openpose/pose/poseParameters.hpp>
 #include <openpose/utilities/check.hpp>
@@ -12,9 +15,6 @@
 #include <openpose/utilities/openCv.hpp>
 #include <openpose/utilities/standard.hpp>
 #include <openpose/pose/poseExtractorCaffe.hpp>
-#ifdef USE_OPENCL
-    #include <openpose/gpu/opencl.hpp>
-#endif
 
 namespace op
 {

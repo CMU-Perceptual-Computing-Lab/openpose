@@ -1,15 +1,13 @@
-#include <openpose/core/common.hpp>
-#include <openpose/core/nmsBase.hpp>
-
+#include <algorithm>
+#include <bitset>
+#include <numeric>
+#include <opencv2/opencv.hpp>
 #ifdef USE_OPENCL
-    #include <openpose/gpu/opencl.hpp>
+    #include <openpose/gpu/opencl.hcl>
     #include <openpose/gpu/cl2.hpp>
 #endif
-
-#include <opencv2/opencv.hpp>
-#include <bitset>
-#include <algorithm>
-#include <numeric>
+#include <openpose/core/common.hpp>
+#include <openpose/core/nmsBase.hpp>
 
 namespace op
 {

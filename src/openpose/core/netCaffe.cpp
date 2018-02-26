@@ -10,7 +10,7 @@
 #include <openpose/utilities/standard.hpp>
 #include <openpose/core/netCaffe.hpp>
 #ifdef USE_OPENCL
-    #include <openpose/gpu/opencl.hpp>
+    #include <openpose/gpu/opencl.hcl>
     #include <openpose/gpu/cl2.hpp>
 #endif
 

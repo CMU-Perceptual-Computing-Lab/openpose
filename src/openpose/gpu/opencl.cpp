@@ -1,4 +1,5 @@
-#include <openpose/gpu/opencl.hpp>
+#include <mutex>
+#include <openpose/gpu/opencl.hcl> // Must be before below includes
 #ifdef USE_OPENCL
     #include <openpose/gpu/cl2.hpp>
     #include <viennacl/backend/opencl.hpp>
@@ -180,35 +181,12 @@ namespace op
 
     OpenCL::~OpenCL()
     {
-
-    }
-
-    cl::Context& OpenCL::getContext()
-    {
-        #ifdef USE_OPENCL
-            return upImpl->mContext;
-        #else
-            error("OpenPose must be compiled with the `USE_OPENCL` macro definition in order to use this"
-                  " functionality.", __LINE__, __FUNCTION__, __FILE__);
-            throw std::runtime_error("");
-        #endif
     }
 
     cl::CommandQueue& OpenCL::getQueue()
     {
         #ifdef USE_OPENCL
             return upImpl->mQueue;
-        #else
-            error("OpenPose must be compiled with the `USE_OPENCL` macro definition in order to use this"
-                  " functionality.", __LINE__, __FUNCTION__, __FILE__);
-            throw std::runtime_error("");
-        #endif
-    }
-
-    cl::Device& OpenCL::getDevice()
-    {
-        #ifdef USE_OPENCL
-            return upImpl->mDevice;
         #else
             error("OpenPose must be compiled with the `USE_OPENCL` macro definition in order to use this"
                   " functionality.", __LINE__, __FUNCTION__, __FILE__);

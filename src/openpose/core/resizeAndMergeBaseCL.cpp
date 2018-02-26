@@ -1,11 +1,9 @@
-#include <openpose/core/common.hpp>
-#include <openpose/core/resizeAndMergeBase.hpp>
-
 #ifdef USE_OPENCL
-    #define CL_HPP_ENABLE_EXCEPTIONS
-    #include <openpose/gpu/opencl.hpp>
+    #include <openpose/gpu/opencl.hcl>
     #include <openpose/gpu/cl2.hpp>
 #endif
+#include <openpose/core/common.hpp>
+#include <openpose/core/resizeAndMergeBase.hpp>
 
 namespace op
 {
