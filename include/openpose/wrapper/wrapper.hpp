@@ -473,7 +473,7 @@ namespace op
                 if (numberThreads < 0)
                 {
                     // Get total number GPUs
-                    int totalGpuNumber = getGpuNumber();
+                    const auto totalGpuNumber = getGpuNumber();
                     if (totalGpuNumber <= gpuNumberStart)
                         error("Number of initial GPUs (`--number_gpu_start`) must be lower than the total number of used"
                               " GPUs (`--number_gpu`)", __LINE__, __FUNCTION__, __FILE__);
