@@ -82,8 +82,12 @@ namespace op
                 for (auto i = 0u ; i < mBottomSizes.size() ; i++)
                     mBottomSizes[i] = std::array<int, 4>{bottom[i]->shape(0), bottom[i]->shape(1),
                                                          bottom[i]->shape(2), bottom[i]->shape(3)};
-                // GPU ID
-                mGpuID = gpuID;
+                #ifdef USE_OPENCL
+                    // GPU ID
+                    mGpuID = gpuID;
+                #else
+                    UNUSED(mGpuID);
+                #endif
             #else
                 UNUSED(bottom);
                 UNUSED(top);

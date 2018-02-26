@@ -92,11 +92,11 @@ namespace op
                 #ifdef USE_OPENCL
                     upImpl->mKernelBlobT = {std::make_shared<caffe::Blob<int>>(1,1,1,1)};
                     upImpl->mKernelBlobT->Reshape(bottomShape);
+                    // GPU ID
+                    mGpuID = gpuID;
+                #else
+                    UNUSED(mGpuID);
                 #endif
-
-                // GPU ID
-                mGpuID = gpuID;
-
                 // Array sizes
                 upImpl->mTopSize = std::array<int, 4>{topBlob->shape(0), topBlob->shape(1),
                                                       topBlob->shape(2), topBlob->shape(3)};
