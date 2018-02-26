@@ -1,3 +1,4 @@
+#include <map>
 #include <mutex>
 #include <openpose/gpu/opencl.hcl> // Must be before below includes
 #ifdef USE_OPENCL
@@ -8,6 +9,71 @@
 
 namespace op
 {
+    #ifdef USE_OPENCL
+        void replaceAll(std::string &s, const std::string &search, const std::string &replace)
+        {
+            for (size_t pos = 0; ; pos += replace.length())
+            {
+                // Locate the substring to replace
+                pos = s.find( search, pos );
+                if ( pos == std::string::npos ) break;
+                // Replace by erasing and inserting
+                s.erase( pos, search.length() );
+                s.insert( pos, replace );
+            }
+        }
+
+        template <typename T> inline std::string getType()
+        {
+            std::string type = "";
+            if ((std::is_same<T, float>::value))
+                type = "float";
+            else if ((std::is_same<T, double>::value))
+                type = "double";
+            else
+                throw std::runtime_error("Error: Invalid CL type");
+            return type;
+        }
+
+        template <typename T>
+        bool buildProgramFromSource(cl::Program& program, cl::Context& context, std::string src, bool isFile = false)
+        {
+            #ifdef USE_OPENCL
+                try
+                {
+                    std::string type = getType<T>();
+                    if (isFile)
+                    {
+                        std::ifstream programFile((char*) src.c_str());
+                        std::string programString(std::istreambuf_iterator<char>(programFile),
+                                                          (std::istreambuf_iterator<char>()));
+                        src = programString;
+                    }
+                    //src = std::regex_replace(src, std::regex("Type"), std::string(type));
+                    replaceAll(src, "Type", type);
+                    program = cl::Program(context, src, true);
+                }
+                catch (cl::BuildError e)
+                {
+                    auto buildInfo = e.getBuildLog();
+                    for (auto &pair : buildInfo)
+                        std::cerr << "Device: " << pair.first.getInfo<CL_DEVICE_NAME>() << std::endl <<
+                                     pair.second << std::endl;
+                        error("OpenCL error: OpenPose crashed due to the previously printed errors.",
+                              __LINE__, __FUNCTION__, __FILE__);
+                }
+                return true;
+            #else
+                UNUSED(program);
+                UNUSED(src);
+                UNUSED(isFile);
+                error("OpenPose must be compiled with the `USE_OPENCL` macro definition in order to use this"
+                      " functionality.", __LINE__, __FUNCTION__, __FILE__);
+                return false;
+            #endif
+        }
+    #endif
+
     std::shared_ptr<OpenCL> OpenCL::getInstance(const int deviceId, const int deviceType, bool getFromVienna)
     {
         static std::mutex managerMutex;
@@ -191,68 +257,6 @@ namespace op
             error("OpenPose must be compiled with the `USE_OPENCL` macro definition in order to use this"
                   " functionality.", __LINE__, __FUNCTION__, __FILE__);
             throw std::runtime_error("");
-        #endif
-    }
-
-    void replaceAll(std::string &s, const std::string &search, const std::string &replace)
-    {
-        for (size_t pos = 0; ; pos += replace.length())
-        {
-            // Locate the substring to replace
-            pos = s.find( search, pos );
-            if ( pos == std::string::npos ) break;
-            // Replace by erasing and inserting
-            s.erase( pos, search.length() );
-            s.insert( pos, replace );
-        }
-    }
-
-    template <typename T> inline std::string getType()
-    {
-        std::string type = "";
-        if ((std::is_same<T, float>::value))
-            type = "float";
-        else if ((std::is_same<T, double>::value))
-            type = "double";
-        else
-            throw std::runtime_error("Error: Invalid CL type");
-        return type;
-    }
-
-    template <typename T>
-    bool buildProgramFromSource(cl::Program& program, cl::Context& context, std::string src, bool isFile = false)
-    {
-        #ifdef USE_OPENCL
-            try{
-                std::string type = getType<T>();
-
-                if (isFile)
-                {
-                    std::ifstream programFile((char*) src.c_str());
-                    std::string programString(std::istreambuf_iterator<char>(programFile),
-                                                      (std::istreambuf_iterator<char>()));
-                    src = programString;
-                }
-                //src = std::regex_replace(src, std::regex("Type"), std::string(type));
-                replaceAll(src, "Type", type);
-                program = cl::Program(context, src, true);
-            }
-            catch (cl::BuildError e)
-            {
-                auto buildInfo = e.getBuildLog();
-                for (auto &pair : buildInfo)
-                    std::cerr << "Device: " << pair.first.getInfo<CL_DEVICE_NAME>() << std::endl <<
-                                 pair.second << std::endl;
-                exit(-1);
-            }
-            return true;
-        #else
-            UNUSED(program);
-            UNUSED(src);
-            UNUSED(isFile);
-            error("OpenPose must be compiled with the `USE_OPENCL` macro definition in order to use this"
-                  " functionality.", __LINE__, __FUNCTION__, __FILE__);
-            return false;
         #endif
     }
 
