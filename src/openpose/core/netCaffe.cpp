@@ -5,14 +5,16 @@
     #include <caffe/net.hpp>
     #include <glog/logging.h> // google::InitGoogleLogging
 #endif
-#include <openpose/gpu/cuda.hpp>
-#include <openpose/utilities/fileSystem.hpp>
-#include <openpose/utilities/standard.hpp>
-#include <openpose/core/netCaffe.hpp>
+#ifdef USE_CUDA
+    #include <openpose/gpu/cuda.hpp>
+#endif
 #ifdef USE_OPENCL
     #include <openpose/gpu/opencl.hcl>
     #include <openpose/gpu/cl2.hpp>
 #endif
+#include <openpose/utilities/fileSystem.hpp>
+#include <openpose/utilities/standard.hpp>
+#include <openpose/core/netCaffe.hpp>
 
 namespace op
 {
@@ -69,12 +71,12 @@ namespace op
                         {
                             caffe::Caffe::set_mode(caffe::Caffe::GPU);
                             std::vector<int> devices;
-                            int maxNumberGpu = op::OpenCL::getTotalGPU();
-                            for (int i=0; i<maxNumberGpu; i++)
-                                devices.push_back(i);
+                            const int maxNumberGpu = op::OpenCL::getTotalGPU();
+                            for (auto i = 0; i < maxNumberGpu; i++)
+                                devices.emplace_back(i);
                             caffe::Caffe::SetDevices(devices);
                             if (mGpuId >= maxNumberGpu)
-                                error("Notify us");
+                                error("Unexpected error. Please, notify us.", __LINE__, __FUNCTION__, __FILE__);
                             sOpenCLInitialized = true;
                         }
                     }

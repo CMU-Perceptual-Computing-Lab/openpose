@@ -38,14 +38,6 @@ if (UNIX AND NOT APPLE)
     add_library(openpose_core ${SOURCES_OP_CORE})
   endif ()
 
-  #if (${GPU_MODE} MATCHES "OPENCL")
-  #   add_custom_command(TARGET openpose_core POST_BUILD
-  #   COMMAND ${CMAKE_COMMAND} -E copy
-  #       ${CMAKE_CURRENT_SOURCE_DIR}/*.cl
-  #       $<TARGET_FILE_DIR:openpose_core>
-  #   )
-  #endif()
-
   add_library(caffe SHARED IMPORTED)
   set_property(TARGET caffe PROPERTY IMPORTED_LOCATION ${Caffe_LIBS}) 
   target_link_libraries(openpose_core caffe ${MKL_LIBS})

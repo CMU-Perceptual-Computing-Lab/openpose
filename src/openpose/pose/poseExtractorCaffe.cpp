@@ -87,7 +87,8 @@ namespace op
                 // Caffe modifies bottom - Heatmap gets resized
                 const auto caffeNetOutputBlobs = caffeNetSharedToPtr(caffeNetOutputBlob);
                 resizeAndMergeCaffe->Reshape(caffeNetOutputBlobs, {heatMapsBlob.get()},
-                                             getPoseNetDecreaseFactor(poseModel), 1.f/scaleInputToNetInput, true, gpuID);
+                                             getPoseNetDecreaseFactor(poseModel), 1.f/scaleInputToNetInput, true,
+                                             gpuID);
                 // Pose extractor blob and layer
                 nmsCaffe->Reshape({heatMapsBlob.get()}, {peaksBlob.get()}, getPoseMaxPeaks(poseModel),
                                   getPoseNumberBodyParts(poseModel), gpuID);

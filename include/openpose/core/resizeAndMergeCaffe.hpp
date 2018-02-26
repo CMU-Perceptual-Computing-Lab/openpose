@@ -24,7 +24,8 @@ namespace op
         virtual void LayerSetUp(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top);
 
         virtual void Reshape(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top,
-                             const T netFactor, const T scaleFactor, const bool mergeFirstDimension = true, const int gpuID = 0);
+                             const T netFactor, const T scaleFactor, const bool mergeFirstDimension = true,
+                             const int gpuID = 0);
 
         virtual inline const char* type() const { return "ResizeAndMerge"; }
 

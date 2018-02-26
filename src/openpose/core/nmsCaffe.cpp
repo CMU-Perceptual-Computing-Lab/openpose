@@ -10,13 +10,18 @@ namespace op
     struct NmsCaffe<T>::ImplNmsCaffe
     {
         #ifdef USE_CAFFE
-            std::shared_ptr<caffe::Blob<int>> mKernelBlobT;
             caffe::Blob<int> mKernelBlob;
             std::array<int, 4> mBottomSize;
             std::array<int, 4> mTopSize;
+            // Special Kernel for OpenCL NMS
+            #ifdef USE_OPENCL
+                std::shared_ptr<caffe::Blob<int>> mKernelBlobT;
+            #endif
         #endif
 
-        ImplNmsCaffe(){};
+        ImplNmsCaffe()
+        {
+        }
     };
 
     template <typename T>
