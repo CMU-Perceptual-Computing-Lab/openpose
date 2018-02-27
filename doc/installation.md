@@ -90,7 +90,7 @@ The instructions in this section describe the steps to build OpenPose using CMak
 2. [**CUDA 8**](https://developer.nvidia.com/cuda-80-ga2-download-archive):
     - Ubuntu: Run `ubuntu/install_cuda.sh` or alternatively download and install it from their website.
     - Windows: Install CUDA 8.0 after Visual Studio 2015 is installed to assure that the CUDA installation will generate all necessary files for VS. If CUDA was already installed, re-install CUDA after installing VS!
-    - **IMPORTANT**: As of a recent windows update, you have to download the Nvidia [drivers](http://www.nvidia.com/Download/index.aspx) drivers first, and then install CUDA without the Graphics Driver flag or else your system will hang.
+    - **IMPORTANT**: As of a recent Windows update, you have to download the Nvidia [drivers](http://www.nvidia.com/Download/index.aspx) drivers first, and then install CUDA without the Graphics Driver flag or else your system might hang.
 3. [**cuDNN 5.1**](https://developer.nvidia.com/cudnn):
     - Ubuntu: Run `ubuntu/install_cudnn.sh` or alternatively download and install it from their website.
     - Windows (and Ubuntu if manual installation): In order to manually install it, just unzip it and copy (merge) the contents on the CUDA folder, usually `/usr/local/cuda/` in Ubuntu and `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0` in Windows.
