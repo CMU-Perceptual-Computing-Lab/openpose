@@ -188,6 +188,7 @@ OpenPose Library - Release Notes
     16. 3-D reconstruction module can be implemented with different camera brands or custom image sources.
     17. Flag `--write_json` includes 3-D keypoints.
     18. Flag `--image_dir_stereo` added to allow `--image_dir` to load stereo images.
+    19. Flag `--camera_resolution` applicable to `--flir_camera`.
 2. Functions or parameters renamed:
     1. Flag `no_display` renamed as `display`, able to select between `NoDisplay`, `Display2D`, `Display3D`, and `DisplayAll`.
     2. 3-D reconstruction demo is now inside the OpenPose demo binary.

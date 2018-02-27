@@ -269,7 +269,7 @@ int openPoseDemo()
     const op::WrapperStructPose wrapperStructPose{!FLAGS_body_disable, netInputSize, outputSize, keypointScale,
                                                   FLAGS_num_gpu, FLAGS_num_gpu_start, FLAGS_scale_number,
                                                   (float)FLAGS_scale_gap,
-                                                  op::flagsToRenderMode(FLAGS_render_pose, FLAGS_3d, FLAGS_render_pose),
+                                                  op::flagsToRenderMode(FLAGS_render_pose, FLAGS_3d),
                                                   poseModel, !FLAGS_disable_blending, (float)FLAGS_alpha_pose,
                                                   (float)FLAGS_alpha_heatmap, FLAGS_part_to_show, FLAGS_model_folder,
                                                   heatMapTypes, heatMapScale, FLAGS_part_candidates,

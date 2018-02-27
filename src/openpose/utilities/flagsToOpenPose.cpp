@@ -156,14 +156,16 @@ namespace op
             if (type == ProducerType::FlirCamera)
             {
                 // cameraFrameSize
-                const auto cameraFrameSize = op::flagsToPoint(cameraResolution, "-1x-1");
+                const auto cameraFrameSize = flagsToPoint(cameraResolution, "-1x-1");
                 return std::make_shared<FlirReader>(cameraParameterPath, cameraFrameSize);
             }
             // Webcam
             if (type == ProducerType::Webcam)
             {
                 // cameraFrameSize
-                const auto cameraFrameSize = op::flagsToPoint(cameraResolution, "1280x720");
+                auto cameraFrameSize = flagsToPoint(cameraResolution, "1280x720");
+                if (cameraFrameSize.x < 0 || cameraFrameSize.y < 0)
+                    cameraFrameSize = Point<int>{1280,720};
                 if (webcamIndex >= 0)
                 {
                     const auto throwExceptionIfNoOpened = true;
@@ -235,7 +237,7 @@ namespace op
             }
             // Face and hand: to pick same than body
             else if (renderFlag == -1 && renderPoseFlag != -2)
-                return flagsToRenderMode(renderPoseFlag, -2);
+                return flagsToRenderMode(renderPoseFlag, gpuBuggy, -2);
             // No render
             else if (renderFlag == 0)
                 return RenderMode::None;
