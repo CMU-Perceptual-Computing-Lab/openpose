@@ -4,14 +4,16 @@
 
 namespace op
 {
-    FlirReader::FlirReader(const std::string& cameraParametersPath) :
+    FlirReader::FlirReader(const std::string& cameraParametersPath, const Point<int>& cameraResolution) :
         Producer{ProducerType::FlirCamera},
-        mSpinnakerWrapper{cameraParametersPath},
+        mSpinnakerWrapper{cameraParametersPath, cameraResolution},
         mFrameNameCounter{0}
     {
         try
         {
+            // Get resolution
             const auto resolution = mSpinnakerWrapper.getResolution();
+            // Set resolution
             set(CV_CAP_PROP_FRAME_WIDTH, resolution.x);
             set(CV_CAP_PROP_FRAME_HEIGHT, resolution.y);
         }
@@ -140,7 +142,7 @@ namespace op
                 return -1.;
             else
             {
-                log("Unknown property", Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                log("Unknown property.", Priority::Max, __LINE__, __FUNCTION__, __FILE__);
                 return -1.;
             }
         }
@@ -164,7 +166,7 @@ namespace op
             else if (capProperty == CV_CAP_PROP_FRAME_COUNT || capProperty == CV_CAP_PROP_FPS)
                 log("This property is read-only.", Priority::Max, __LINE__, __FUNCTION__, __FILE__);
             else
-                log("Unknown property", Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                log("Unknown property.", Priority::Max, __LINE__, __FUNCTION__, __FILE__);
         }
         catch (const std::exception& e)
         {

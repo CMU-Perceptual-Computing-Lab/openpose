@@ -334,7 +334,7 @@ namespace op
         #endif
     };
 
-    SpinnakerWrapper::SpinnakerWrapper(const std::string& cameraParameterPath)
+    SpinnakerWrapper::SpinnakerWrapper(const std::string& cameraParameterPath, const Point<int>& resolution)
         #ifdef WITH_FLIR_CAMERA
             : upImpl{new ImplSpinnakerWrapper{}}
         #endif
@@ -342,6 +342,9 @@ namespace op
         #ifdef WITH_FLIR_CAMERA
             try
             {
+                // Clean previous unclosed builds (e.g. if core dumped in the previous code using the cameras)
+                release();
+
                 upImpl->mInitialized = true;
 
                 // Print application build information
@@ -485,6 +488,44 @@ namespace op
 
                     log("Camera " + std::to_string(i) + " acquisition mode set to continuous...", Priority::High);
 
+                    // Set camera resolution
+                    // Retrieve GenICam nodemap
+                    auto& iNodeMap = cameraPtr->GetNodeMap();
+                    // Set offset
+                    Spinnaker::GenApi::CIntegerPtr ptrOffsetX = iNodeMap.GetNode("OffsetX");
+                    ptrOffsetX->SetValue(0);
+                    Spinnaker::GenApi::CIntegerPtr ptrOffsetY = iNodeMap.GetNode("OffsetY");
+                    ptrOffsetY->SetValue(0);
+                    // Set resolution
+                    if (resolution.x > 0 && resolution.y > 0)
+                    {
+                        // WARNING: setting the obset would require auto-change in the camera matrix parameters
+                        // Set offset
+                        // const Spinnaker::GenApi::CIntegerPtr ptrWidthMax = iNodeMap.GetNode("WidthMax");
+                        // const Spinnaker::GenApi::CIntegerPtr ptrHeightMax = iNodeMap.GetNode("HeightMax");
+                        // ptrOffsetX->SetValue((ptrWidthMax->GetValue() - resolution.x) / 2);
+                        // ptrOffsetY->SetValue((ptrHeightMax->GetValue() - resolution.y) / 2);
+                        // Set Width
+                        Spinnaker::GenApi::CIntegerPtr ptrWidth = iNodeMap.GetNode("Width");
+                        ptrWidth->SetValue(resolution.x);
+                        // Set width
+                        Spinnaker::GenApi::CIntegerPtr ptrHeight = iNodeMap.GetNode("Height");
+                        ptrHeight->SetValue(resolution.y);
+                    }
+                    else
+                    {
+                        const Spinnaker::GenApi::CIntegerPtr ptrWidthMax = iNodeMap.GetNode("WidthMax");
+                        const Spinnaker::GenApi::CIntegerPtr ptrHeightMax = iNodeMap.GetNode("HeightMax");
+                        // Set Width
+                        Spinnaker::GenApi::CIntegerPtr ptrWidth = iNodeMap.GetNode("Width");
+                        ptrWidth->SetValue(ptrWidthMax->GetValue());
+                        // Set width
+                        Spinnaker::GenApi::CIntegerPtr ptrHeight = iNodeMap.GetNode("Height");
+                        ptrHeight->SetValue(ptrHeightMax->GetValue());
+                        log("Choosing maximum resolution for flir camera (" + std::to_string(ptrWidth->GetValue())
+                            + " x " + std::to_string(ptrHeight->GetValue()) + ").", Priority::High);
+                    }
+
                     // Begin acquiring images
                     cameraPtr->BeginAcquisition();
 
@@ -523,6 +564,7 @@ namespace op
                     upImpl->mResolution = Point<int>{cvMats[0].cols, cvMats[0].rows};
 
                 log("\nRunning for all cameras...\n\n*** IMAGE ACQUISITION ***\n", Priority::High);
+
             }
             catch (const Spinnaker::Exception& e)
             {
@@ -650,12 +692,11 @@ namespace op
                     // Spinnaker::CameraPtr objects that can be quick and easy for small tasks.
                     //
                     for (auto i = 0; i < upImpl->mCameraList.GetSize(); i++)
-                        upImpl->mCameraList.GetByIndex(i)->EndAcquisition();
-
-                    for (auto i = 0; i < upImpl->mCameraList.GetSize(); i++)
                     {
                         // Select camera
                         auto cameraPtr = upImpl->mCameraList.GetByIndex(i);
+
+                        cameraPtr->EndAcquisition();
 
                         // Retrieve GenICam nodemap
                         auto& iNodeMap = cameraPtr->GetNodeMap();
@@ -688,6 +729,29 @@ namespace op
                     upImpl->mInitialized = false;
 
                     log("Cameras released! Exiting program.", Priority::High);
+                }
+                else
+                {
+                    // Open general system
+                    auto systemPtr = Spinnaker::System::GetInstance();
+                    auto cameraList = systemPtr->GetCameras();
+                    if (cameraList.GetSize() > 0)
+                    {
+
+                        for (int i = 0; i < cameraList.GetSize(); i++)
+                        {
+                            // Select camera
+                            auto cameraPtr = cameraList.GetByIndex(i);
+                            // Begin
+                            cameraPtr->Init();
+                            cameraPtr->BeginAcquisition();
+                            // End
+                            cameraPtr->EndAcquisition();
+                            cameraPtr->DeInit();
+                        }
+                    }
+                    cameraList.Clear();
+                    systemPtr->ReleaseInstance();
                 }
             }
             catch (const Spinnaker::Exception& e)

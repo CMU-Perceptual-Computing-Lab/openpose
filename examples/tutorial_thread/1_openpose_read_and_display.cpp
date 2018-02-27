@@ -31,7 +31,9 @@ DEFINE_int32(logging_level,             3,              "The logging level. Inte
 // Producer
 DEFINE_int32(camera,                    -1,             "The camera index for cv::VideoCapture. Integer in the range [0, 9]. Select a negative"
                                                         " number (by default), to auto-detect and open the first available camera.");
-DEFINE_string(camera_resolution,        "1280x720",     "Size of the camera frames to ask for.");
+DEFINE_string(camera_resolution,        "-1x-1",        "Set the camera resolution (either `--camera` or `--flir_camera`). `-1x-1` will use the"
+                                                        " default 1280x720 for `--camera`, or the maximum flir camera resolution available for"
+                                                        " `--flir_camera`");
 DEFINE_double(camera_fps,               30.0,           "Frame rate for the webcam (only used when saving video from webcam). Set this value to the"
                                                         " minimum value between the OpenPose displayed speed and the webcam real frame rate.");
 DEFINE_string(video,                    "",             "Use a video file instead of the camera. Use `examples/media/video.avi` for our default"

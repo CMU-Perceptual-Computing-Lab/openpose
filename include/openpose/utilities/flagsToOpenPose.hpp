@@ -23,7 +23,7 @@ namespace op
     OP_API std::shared_ptr<Producer> flagsToProducer(const std::string& imageDirectory, const std::string& videoPath,
                                                      const std::string& ipCameraPath, const int webcamIndex,
                                                      const bool flirCamera = false,
-                                                     const std::string& webcamResolution = "1280x720",
+                                                     const std::string& cameraResolution = "-1x-1",
                                                      const double webcamFps = 30.,
                                                      const std::string& cameraParameterPath = "models/cameraParameters/",
                                                      const unsigned int imageDirectoryStereo = 1);
@@ -32,7 +32,8 @@ namespace op
                                                     const bool heatMapsAddBkg = false,
                                                     const bool heatMapsAddPAFs = false);
 
-    OP_API RenderMode flagsToRenderMode(const int renderFlag, const int renderPoseFlag = -2);
+    OP_API RenderMode flagsToRenderMode(const int renderFlag, const bool gpuBuggy = false,
+                                        const int renderPoseFlag = -2);
 
     OP_API DisplayMode flagsToDisplayMode(const int display, const bool enabled3d);
 

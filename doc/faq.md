@@ -9,6 +9,7 @@ OpenPose - Frequently Asked Question (FAQ)
     4. [Vide/Webcam Not Working](#video-webcam-not-working)
     5. [Cannot Find OpenPose.dll Error](#cannot-find-openpose.dll-error-windows)
     6. [Free Invalid Pointer Error](#free-invalid-pointer-error)
+    7. [Source Directory does not Contain CMakeLists.txt (Windows)](#source-directory-does-not-contain-cmakelists.txt-windows)
 
 
 
@@ -66,3 +67,10 @@ Note: OpenPose library is not an executable, but a library. So instead clicking 
 **Q: I am getting an error of the type: munmap_chunk()/free/invalid pointer.**
 
 **A**: In order to run OpenCV 3.X and Caffe simultaneously, [OpenCV must be compiled without `WITH_GTK` and with `WITH_QT` flags](https://github.com/BVLC/caffe/issues/5282#issuecomment-306063718). On Ubuntu 16.04 the qt5 package is "qt5-default" and the OpenCV cmake option is WITH_QT.
+
+
+
+### Source Directory does not Contain CMakeLists.txt (Windows)
+**Q: I am getting an error of the type: `The source directory {path to file} does not contain a CMakeLists.txt file.`.**
+
+**A**: You might not have writing access to that folder. If you are in Windows, you should not try to install it in `Program Files`.

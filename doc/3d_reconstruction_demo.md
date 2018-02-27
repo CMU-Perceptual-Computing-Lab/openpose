@@ -43,9 +43,10 @@ This demo assumes n arbitrary stereo cameras from the FLIR company (formerly Poi
     - (Ubuntu-only) Open your USB ports following section `Configuring USBFS` in [http://www.ptgrey.com/KB/10685](http://www.ptgrey.com/KB/10685).
     - Install the Spinnaker SDK for your operating system: [https://www.ptgrey.com/support/downloads](https://www.ptgrey.com/support/downloads).
 2. Fujinon 3 MP Varifocal Lens (3.8-13mm, 3.4x Zoom) for each camera.
-    - E.g. [https://www.bhphotovideo.com/c/product/736855-REG/Fujinon_DV3_4X3_8SA_1_3_MP_Varifocal_Lens.html](https://www.bhphotovideo.com/c/product/736855-REG/Fujinon_DV3_4X3_8SA_1_3_MP_Varifocal_Lens.html).
+    - E.g., [https://www.bhphotovideo.com/c/product/736855-REG/Fujinon_DV3_4X3_8SA_1_3_MP_Varifocal_Lens.html](https://www.bhphotovideo.com/c/product/736855-REG/Fujinon_DV3_4X3_8SA_1_3_MP_Varifocal_Lens.html).
 3. 4-Port PCI Express (PCIe) USB 3.0 Card Adapter with 4 dedicated channels.
-    - E.g. [https://www.startech.com/Cards-Adapters/USB-3.0/Cards/PCI-Express-USB-3-Card-4-Dedicated-Channels-4-Port~PEXUSB3S44V](https://www.startech.com/Cards-Adapters/USB-3.0/Cards/PCI-Express-USB-3-Card-4-Dedicated-Channels-4-Port~PEXUSB3S44V).
+    - E.g., the 4 Ext Quad Bus version, PCI Express, from: [https://www.amazon.com/Express-SuperSpeed-Adapter-Dedicated-Channels/dp/B00HJZEA2S/ref=sr_1_1?ie=UTF8&qid=1492197599&sr=8-1&keywords=4%2BPort%2BPCI%2BExpress%2B(PCIe)%2Bdedicated%2Bports&th=1](https://www.amazon.com/Express-SuperSpeed-Adapter-Dedicated-Channels/dp/B00HJZEA2S/ref=sr_1_1?ie=UTF8&qid=1492197599&sr=8-1&keywords=4%2BPort%2BPCI%2BExpress%2B(PCIe)%2Bdedicated%2Bports&th=1).
+    - Alternative: [https://www.startech.com/Cards-Adapters/USB-3.0/Cards/PCI-Express-USB-3-Card-4-Dedicated-Channels-4-Port~PEXUSB3S44V](https://www.startech.com/Cards-Adapters/USB-3.0/Cards/PCI-Express-USB-3-Card-4-Dedicated-Channels-4-Port~PEXUSB3S44V).
 4. USB 3.0 cable for each FLIR camera.
     - From their official website: [https://www.ptgrey.com/5-meter-type-a-to-micro-b-locking-usb-30-cable](https://www.ptgrey.com/5-meter-type-a-to-micro-b-locking-usb-30-cable).
 
@@ -73,7 +74,7 @@ In order to verify that the camera parameters introduced by the user are sorted 
 
 
 ## Installing the OpenPose 3-D Reconstruction Module
-Check the [doc/installation.md#openpose-3d-reconstruction-module](./quick_start.md#openpose-3d-reconstruction-module) for installation steps.
+Check the [doc/installation.md#3d-reconstruction-module](./quick_start.md#3d-reconstruction-module) for installation steps.
 
 
 

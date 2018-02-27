@@ -45,7 +45,9 @@ DEFINE_int32(profile_speed,             1000,           "If PROFILER_ENABLED was
 // Producer
 DEFINE_int32(camera,                    -1,             "The camera index for cv::VideoCapture. Integer in the range [0, 9]. Select a negative"
                                                         " number (by default), to auto-detect and open the first available camera.");
-DEFINE_string(camera_resolution,        "1280x720",     "Size of the camera frames to ask for.");
+DEFINE_string(camera_resolution,        "-1x-1",        "Set the camera resolution (either `--camera` or `--flir_camera`). `-1x-1` will use the"
+                                                        " default 1280x720 for `--camera`, or the maximum flir camera resolution available for"
+                                                        " `--flir_camera`");
 DEFINE_double(camera_fps,               30.0,           "Frame rate for the webcam (only used when saving video from webcam). Set this value to the"
                                                         " minimum value between the OpenPose displayed speed and the webcam real frame rate.");
 DEFINE_string(video,                    "",             "Use a video file instead of the camera. Use `examples/media/video.avi` for our default"
@@ -266,7 +268,8 @@ int openPoseDemo()
     // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
     const op::WrapperStructPose wrapperStructPose{!FLAGS_body_disable, netInputSize, outputSize, keypointScale,
                                                   FLAGS_num_gpu, FLAGS_num_gpu_start, FLAGS_scale_number,
-                                                  (float)FLAGS_scale_gap, op::flagsToRenderMode(FLAGS_render_pose),
+                                                  (float)FLAGS_scale_gap,
+                                                  op::flagsToRenderMode(FLAGS_render_pose, FLAGS_3d, FLAGS_render_pose),
                                                   poseModel, !FLAGS_disable_blending, (float)FLAGS_alpha_pose,
                                                   (float)FLAGS_alpha_heatmap, FLAGS_part_to_show, FLAGS_model_folder,
                                                   heatMapTypes, heatMapScale, FLAGS_part_candidates,
@@ -274,13 +277,13 @@ int openPoseDemo()
                                                   enableGoogleLogging, FLAGS_3d, FLAGS_identification};
     // Face configuration (use op::WrapperStructFace{} to disable it)
     const op::WrapperStructFace wrapperStructFace{FLAGS_face, faceNetInputSize,
-                                                  op::flagsToRenderMode(FLAGS_face_render, FLAGS_render_pose),
+                                                  op::flagsToRenderMode(FLAGS_face_render, FLAGS_3d, FLAGS_render_pose),
                                                   (float)FLAGS_face_alpha_pose, (float)FLAGS_face_alpha_heatmap,
                                                   (float)FLAGS_face_render_threshold};
     // Hand configuration (use op::WrapperStructHand{} to disable it)
     const op::WrapperStructHand wrapperStructHand{FLAGS_hand, handNetInputSize, FLAGS_hand_scale_number,
                                                   (float)FLAGS_hand_scale_range, FLAGS_hand_tracking,
-                                                  op::flagsToRenderMode(FLAGS_hand_render, FLAGS_render_pose),
+                                                  op::flagsToRenderMode(FLAGS_hand_render, FLAGS_3d, FLAGS_render_pose),
                                                   (float)FLAGS_hand_alpha_pose, (float)FLAGS_hand_alpha_heatmap,
                                                   (float)FLAGS_hand_render_threshold};
     // Producer (use default to disable any input)

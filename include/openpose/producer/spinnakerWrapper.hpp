@@ -15,7 +15,7 @@ namespace op
         /**
          * Constructor of SpinnakerWrapper. It opens all the available FLIR cameras
          */
-        explicit SpinnakerWrapper(const std::string& cameraParameterPath);
+        explicit SpinnakerWrapper(const std::string& cameraParameterPath, const Point<int>& cameraResolution);
 
         ~SpinnakerWrapper();
 

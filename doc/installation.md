@@ -12,7 +12,7 @@ OpenPose - Installation
 8. [Uninstallation](#uninstallation)
 9. [Optional Settings](#optional-settings)
     1. [MPI Model](#mpi-model)
-    2. [OpenPose 3D Reconstruction Module](#openpose-3d-reconstruction-module)
+    2. [3D Reconstruction Module](#3d-reconstruction-module)
     3. [Compiling without cuDNN](#compiling-without-cudnn)
     4. [Custom Caffe (Ubuntu Only)](#custom-caffe-ubuntu-only)
     5. [Custom OpenCV (Ubuntu Only)](#custom-opencv-ubuntu-only)
@@ -214,7 +214,7 @@ By default, the body MPI model is not downloaded. You can download it by turning
 
 
 
-#### OpenPose 3D Reconstruction Module
+#### 3D Reconstruction Module
 You can include the 3D reconstruction module by:
 
 1. Install the FLIR camera software, Spinnaker SDK. It is a propietary software, so we cannot provide direct download link. Note: You might skip this step if you intend to use the 3-D OpenPose module with a different camera brand.

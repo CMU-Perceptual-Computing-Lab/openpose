@@ -86,7 +86,7 @@ namespace op
                     // GPU ID
                     mGpuID = gpuID;
                 #else
-                    UNUSED(mGpuID);
+                    UNUSED(gpuID);
                 #endif
             #else
                 UNUSED(bottom);

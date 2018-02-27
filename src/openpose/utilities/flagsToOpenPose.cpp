@@ -136,7 +136,7 @@ namespace op
 
     std::shared_ptr<Producer> flagsToProducer(const std::string& imageDirectory, const std::string& videoPath,
                                               const std::string& ipCameraPath, const int webcamIndex,
-                                              const bool flirCamera, const std::string& webcamResolution,
+                                              const bool flirCamera, const std::string& cameraResolution,
                                               const double webcamFps, const std::string& cameraParameterPath,
                                               const unsigned int imageDirectoryStereo)
     {
@@ -152,16 +152,22 @@ namespace op
                 return std::make_shared<VideoReader>(videoPath);
             else if (type == ProducerType::IPCamera)
                 return std::make_shared<IpCameraReader>(ipCameraPath);
-            else if (type == ProducerType::FlirCamera)
-                return std::make_shared<FlirReader>(cameraParameterPath);
-            else if (type == ProducerType::Webcam)
+            // Flir camera
+            if (type == ProducerType::FlirCamera)
             {
                 // cameraFrameSize
-                const auto webcamFrameSize = op::flagsToPoint(webcamResolution, "1280x720");
+                const auto cameraFrameSize = op::flagsToPoint(cameraResolution, "-1x-1");
+                return std::make_shared<FlirReader>(cameraParameterPath, cameraFrameSize);
+            }
+            // Webcam
+            if (type == ProducerType::Webcam)
+            {
+                // cameraFrameSize
+                const auto cameraFrameSize = op::flagsToPoint(cameraResolution, "1280x720");
                 if (webcamIndex >= 0)
                 {
                     const auto throwExceptionIfNoOpened = true;
-                    return std::make_shared<WebcamReader>(webcamIndex, webcamFrameSize, webcamFps,
+                    return std::make_shared<WebcamReader>(webcamIndex, cameraFrameSize, webcamFps,
                                                           throwExceptionIfNoOpened);
                 }
                 else
@@ -170,7 +176,7 @@ namespace op
                     std::shared_ptr<WebcamReader> webcamReader;
                     for (auto index = 0 ; index < 10 ; index++)
                     {
-                        webcamReader = std::make_shared<WebcamReader>(index, webcamFrameSize, webcamFps,
+                        webcamReader = std::make_shared<WebcamReader>(index, cameraFrameSize, webcamFps,
                                                                       throwExceptionIfNoOpened);
                         if (webcamReader->isOpened())
                         {
@@ -214,7 +220,7 @@ namespace op
         }
     }
 
-    RenderMode flagsToRenderMode(const int renderFlag, const int renderPoseFlag)
+    RenderMode flagsToRenderMode(const int renderFlag, const bool gpuBuggy, const int renderPoseFlag)
     {
         try
         {
@@ -222,7 +228,7 @@ namespace op
             if (renderFlag == -1 && renderPoseFlag == -2)
             {
                 #ifdef USE_CUDA
-                    return RenderMode::Gpu;
+                    return (gpuBuggy ? RenderMode::Cpu : RenderMode::Gpu);
                 #else
                     return RenderMode::Cpu;
                 #endif

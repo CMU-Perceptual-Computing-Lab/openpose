@@ -95,7 +95,7 @@ namespace op
                     // GPU ID
                     mGpuID = gpuID;
                 #else
-                    UNUSED(mGpuID);
+                    UNUSED(gpuID);
                 #endif
                 // Array sizes
                 upImpl->mTopSize = std::array<int, 4>{topBlob->shape(0), topBlob->shape(1),

@@ -275,7 +275,7 @@ namespace op
 
             glTranslatef(-gMouseXPan, gMouseYPan, -gMouseZPan);
 
-            renderFloor();
+            // renderFloor(); // Disabled, how to know where the floor is?
             std::unique_lock<std::mutex> lock{gKeypoints3D.mutex};
             if (gKeypoints3D.validKeypoints)
             {
