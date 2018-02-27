@@ -2,7 +2,7 @@
     #include <openpose/gpu/cuda.hpp>
 #endif
 #ifdef USE_OPENCL
-    #include <openpose/core/clManager.hpp>
+    #include <openpose/gpu/opencl.hcl>
 #endif
 #include <openpose/gpu/gpu.hpp>
 
@@ -15,7 +15,7 @@ namespace op
             #ifdef USE_CUDA
                 return getCudaGpuNumber();
             #elif defined USE_OPENCL
-                return CLManager::getTotalGPU();
+                return OpenCL::getTotalGPU();
             #else
                 error("OpenPose must be compiled with the `USE_CUDA` or `USE_OPENCL` macro definition in order to use"
                       " this functionality.", __LINE__, __FUNCTION__, __FILE__);

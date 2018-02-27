@@ -98,18 +98,35 @@ if (WIN32)
   endif (${INSTRUCTION_SET} MATCHES "SSE")
 endif (WIN32)
 
+# Look for CUDA
+find_package(CUDA)
+# Look for OpenCL
+set(OpenCL_FOUND FALSE)
+find_package(OpenCL)
+
 # Set the acceleration library
 set(GPU_MODE CUDA CACHE STRING "Select the acceleration GPU library or CPU otherwise.")
-# set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA CPU_ONLY)
-
-# # Test for CUDA or OpenCL
-# find_package(CUDA)
-# if (CUDA_FOUND)
+# Display proper options to user
+# if (CUDA_FOUND AND OpenCL_FOUND)
+#   set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA OPENCL CPU_ONLY)
+# elseif (CUDA_FOUND)
 #   set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA CPU_ONLY)
+# elseif (OpenCL_FOUND)
+#   set_property(CACHE GPU_MODE PROPERTY STRINGS OPENCL CPU_ONLY)
+# else ()
+#   set_property(CACHE GPU_MODE PROPERTY STRINGS CPU_ONLY)
 # endif ()
-# # set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA OPENCL CPU_ONLY)
 set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA)
 
+# Code to avoid crash at compiling time if OpenCL is not found
+if (NOT OpenCL_FOUND)
+  set(OpenCL_LIBRARIES "")
+endif (NOT OpenCL_FOUND)
+# Required for OpenCL in Nvidia graphic cards
+if (CUDA_FOUND AND OpenCL_FOUND AND ${CUDA_VERSION_MAJOR} LESS 9)
+  add_definitions(-DLOWER_CL_VERSION)
+endif ()
+# Handle desired GPU mode option
 if (${GPU_MODE} MATCHES "CUDA")
   # OpenPose flags
   add_definitions(-DUSE_CUDA)
@@ -118,13 +135,12 @@ elseif (${GPU_MODE} MATCHES "CPU_ONLY")
   # OpenPose flag for Caffe
   add_definitions(-DCPU_ONLY)
   message(STATUS "Building CPU Only.")
+elseif (${GPU_MODE} MATCHES "OPENCL")
+  # OpenPose flag for Caffe
+  add_definitions(-DUSE_OPENCL)
+  add_definitions(-DUSE_GREENTEA)
+  message(STATUS "Building with OpenCL.")
 endif ()
-
-if (${USE_MKL})
-  # OpenPose flags
-  add_definitions(-DUSE_MKL)
-  message(STATUS "Building with MKL support.")
-endif (${USE_MKL})
 
 # Intel branch with MKL Support
 if (${GPU_MODE} MATCHES "CPU_ONLY")
@@ -132,6 +148,12 @@ if (${GPU_MODE} MATCHES "CPU_ONLY")
     OPTION(USE_MKL "Use MKL Intel Branch." ON)
   endif ()
 endif ()
+
+if (${USE_MKL})
+  # OpenPose flags
+  add_definitions(-DUSE_MKL)
+  message(STATUS "Building with MKL support.")
+endif (${USE_MKL})
 
 # Set/disable profiler
 if (PROFILER_ENABLED)
@@ -169,6 +191,13 @@ option(BUILD_SHARED_LIBS "Build as shared lib" ON)
 # Speed profiler
 option(PROFILER_ENABLED "If enabled, OpenPose will be able to print out speed information at runtime." OFF)
 
+# Threads
+if (${GPU_MODE} MATCHES "OPENCL")
+  unset(CMAKE_THREAD_LIBS_INIT CACHE)
+  find_package(Threads)
+else ()
+  set(CMAKE_THREAD_LIBS_INIT "")
+endif ()
 
 ### FIND REQUIRED PACKAGES
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
@@ -282,8 +311,12 @@ if (WIN32)
 
   #TODO Add hashes
   download_zip("opencv_310.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 1e5240a64b814b3c0b822f136be78ad7)
-  download_zip("caffe3rdparty_2017_07_14.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} ec0f800c8fb337e33304f3375bd06a80)
-  download_zip("caffe_2018_01_18.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 4b8e548cc7ea20abea472950dd5301bd)
+  download_zip("caffe3rdparty_2018_02_13.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 6653E07E3D2D7226D64FAD2DF0B407FB)
+  if (${GPU_MODE} MATCHES "OPENCL")
+    download_zip("caffe_opencl_2018_02_13.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 3ac3e1acf5ee6a4e57920be73053067a)
+  else ()
+    download_zip("caffe_2018_01_18.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 4b8e548cc7ea20abea472950dd5301bd)
+  endif ()
   if (WITH_3D_RENDERER)
     download_zip("freeglut_2018_01_14.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} BB182187285E06880F0EDE3A39530091)
   endif (WITH_3D_RENDERER)
@@ -295,8 +328,35 @@ if (WIN32)
   find_library(GLOG_LIBRARY_RELEASE glog HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
   find_library(GLOG_LIBRARY_DEBUG glogd HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
   find_library(OpenCV_LIBS opencv_world310 HINTS ${FIND_LIB_PREFIX}/opencv/x64/vc14/lib)
-  find_library(Caffe_LIB caffe HINTS ${FIND_LIB_PREFIX}/caffe/lib)
-  find_library(Caffe_Proto_LIB caffeproto HINTS ${FIND_LIB_PREFIX}/caffe/lib)
+
+  if (${GPU_MODE} MATCHES "OPENCL")
+    SET(CAFFE_CL_CHECKED True CACHE BOOL "")
+    unset(Caffe_LIB CACHE)
+    unset(Caffe_Proto_LIB CACHE)
+    set(CL "_CL")
+    find_library(Caffe_LIB caffe HINTS ${FIND_LIB_PREFIX}/caffe_opencl/lib)
+    find_library(Caffe_Proto_LIB caffeproto HINTS ${FIND_LIB_PREFIX}/caffe_opencl/lib)
+  else ()
+    if (CAFFE_CL_CHECKED)
+      unset(Caffe_LIB CACHE)
+      unset(Caffe_Proto_LIB CACHE)
+    endif ()
+    set(CAFFE_CL_CHECKED 0)
+    set(CL "")
+    find_library(Caffe_LIB caffe HINTS ${FIND_LIB_PREFIX}/caffe/lib)
+    find_library(Caffe_Proto_LIB caffeproto HINTS ${FIND_LIB_PREFIX}/caffe/lib)
+  endif ()
+
+  if (${GPU_MODE} MATCHES "OPENCL")
+    unset(BOOST_SYSTEM_LIB_RELEASE CACHE)
+    unset(BOOST_SYSTEM_LIB_DEBUG CACHE)
+    find_library(BOOST_SYSTEM_LIB_RELEASE boost_system-vc140-mt-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
+    find_library(BOOST_SYSTEM_LIB_DEBUG boost_system-vc140-mt-gd-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
+  else ()
+    set(BOOST_SYSTEM_LIB_RELEASE "")
+    set(BOOST_SYSTEM_LIB_DEBUG "")
+  endif ()
+
   if (WITH_3D_RENDERER)
     find_library(GLUT_LIBRARY freeglut HINTS ${FIND_LIB_PREFIX}/freeglut/lib)
     message(STATUS "\${GLUT_LIBRARY} = ${GLUT_LIBRARY}")
@@ -306,7 +366,17 @@ if (WIN32)
   endif (WITH_FLIR_CAMERA)
   set(Caffe_LIBS ${Caffe_LIB};${Caffe_Proto_LIB})
   set(OpenCV_INCLUDE_DIRS "3rdparty/windows/opencv/include")
-  set(Caffe_INCLUDE_DIRS "3rdparty/windows/caffe/include;3rdparty/windows/caffe/include2")
+  if (${GPU_MODE} MATCHES "OPENCL")
+    SET(CAFFE_CL_CHECKED2 True CACHE BOOL "")
+    unset(Caffe_INCLUDE_DIRS CACHE)
+    set(Caffe_INCLUDE_DIRS "3rdparty/windows/caffe_opencl/include;3rdparty/windows/caffe_opencl/include2" CACHE FILEPATH "Caffe_INCLUDE_DIRS")
+  else ()
+    if (CAFFE_CL_CHECKED2)
+      unset(Caffe_INCLUDE_DIRS CACHE)
+    endif ()
+    set(CAFFE_CL_CHECKED2 0)
+    set(Caffe_INCLUDE_DIRS "3rdparty/windows/caffe/include;3rdparty/windows/caffe/include2" CACHE FILEPATH "Caffe_INCLUDE_DIRS")
+  endif ()
   set(Boost_INCLUDE_DIRS "3rdparty/windows/caffe3rdparty/include/boost-1_61")
   set(WINDOWS_INCLUDE_DIRS "3rdparty/windows/caffe3rdparty/include")
   if (WITH_3D_RENDERER)
@@ -359,6 +429,7 @@ if (UNIX AND NOT APPLE)
           set( MLIST ${rv} )
           separate_arguments(MLIST)
           list(GET MLIST 0 MKL_PATH)
+          message(STATUS ${MKL_PATH})
           file(GLOB MKL_SO
             "${MKL_PATH}lib/*"
             )
@@ -375,6 +446,9 @@ if (UNIX AND NOT APPLE)
           execute_process(COMMAND git checkout master WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
         endif ()
         set(CAFFE_CPU_ONLY ON)
+        set(USE_CUDNN OFF)
+      elseif (${GPU_MODE} MATCHES "OPENCL")
+        execute_process(COMMAND git checkout opencl WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
         set(USE_CUDNN OFF)
       endif ()
 
@@ -443,7 +517,6 @@ if (UNIX AND NOT APPLE)
 
 endif (UNIX AND NOT APPLE)
 
-
 ### PROJECT INCLUDES
 # Specify the include directories
 include_directories(
@@ -451,6 +524,11 @@ include_directories(
   ${GFLAGS_INCLUDE_DIR}
   ${GLOG_INCLUDE_DIR}
   ${OpenCV_INCLUDE_DIRS})
+
+if(USE_MKL)
+ include_directories(
+     "${MKL_PATH}/include/")
+endif (USE_MKL)
 
 if (Caffe_FOUND)
   include_directories(
@@ -460,6 +538,10 @@ endif (Caffe_FOUND)
 if (${GPU_MODE} MATCHES "CUDA")
   include_directories(
       ${CUDA_INCLUDE_DIRS})
+endif ()
+if (${GPU_MODE} MATCHES "OPENCL")
+  include_directories(
+    ${OpenCL_INCLUDE_DIRS})
 endif ()
 # 3D
 if (WITH_3D_RENDERER)

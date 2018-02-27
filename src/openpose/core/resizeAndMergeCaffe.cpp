@@ -51,7 +51,8 @@ namespace op
                                          const std::vector<caffe::Blob<T>*>& top,
                                          const T netFactor,
                                          const T scaleFactor,
-                                         const bool mergeFirstDimension)
+                                         const bool mergeFirstDimension,
+                                         const int gpuID)
     {
         try
         {
@@ -81,6 +82,12 @@ namespace op
                 for (auto i = 0u ; i < mBottomSizes.size() ; i++)
                     mBottomSizes[i] = std::array<int, 4>{bottom[i]->shape(0), bottom[i]->shape(1),
                                                          bottom[i]->shape(2), bottom[i]->shape(3)};
+                #ifdef USE_OPENCL
+                    // GPU ID
+                    mGpuID = gpuID;
+                #else
+                    UNUSED(mGpuID);
+                #endif
             #else
                 UNUSED(bottom);
                 UNUSED(top);
@@ -147,6 +154,31 @@ namespace op
                 UNUSED(bottom);
                 UNUSED(top);
                 error("OpenPose must be compiled with the `USE_CAFFE` & `USE_CUDA` macro definitions in order to run"
+                      " this functionality.", __LINE__, __FUNCTION__, __FILE__);
+            #endif
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    template <typename T>
+    void ResizeAndMergeCaffe<T>::Forward_ocl(const std::vector<caffe::Blob<T>*>& bottom,
+                                             const std::vector<caffe::Blob<T>*>& top)
+    {
+        try
+        {
+            #if defined USE_CAFFE && defined USE_OPENCL
+                std::vector<const T*> sourcePtrs(bottom.size());
+                for (auto i = 0u ; i < sourcePtrs.size() ; i++)
+                    sourcePtrs[i] = bottom[i]->gpu_data();
+                resizeAndMergeOcl(top.at(0)->mutable_gpu_data(), sourcePtrs, mTopSize, mBottomSizes,
+                                  mScaleRatios, mGpuID);
+            #else
+                UNUSED(bottom);
+                UNUSED(top);
+                error("OpenPose must be compiled with the `USE_CAFFE` & `USE_OPENCL` macro definitions in order to run"
                       " this functionality.", __LINE__, __FUNCTION__, __FILE__);
             #endif
         }

@@ -1,6 +1,7 @@
 set(SOURCES_OP_GPU
     cuda.cpp
-    gpu.cpp)
+    gpu.cpp
+    opencl.cpp)
 
 include(${CMAKE_SOURCE_DIR}/cmake/Utils.cmake)
 prepend(SOURCES_OP_GPU_WITH_CP ${CMAKE_CURRENT_SOURCE_DIR} ${SOURCES_OP_GPU})

@@ -19,7 +19,7 @@ namespace op
         virtual void LayerSetUp(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top);
 
         virtual void Reshape(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top,
-                             const int maxPeaks, const int outputChannels = -1);
+                             const int maxPeaks, const int outputChannels = -1, const int gpuID = 0);
 
         virtual inline const char* type() const { return "Nms"; }
 
@@ -29,6 +29,8 @@ namespace op
 
         virtual void Forward_gpu(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top);
 
+        virtual void Forward_ocl(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top);
+
         virtual void Backward_cpu(const std::vector<caffe::Blob<T>*>& top, const std::vector<bool>& propagate_down,
                                   const std::vector<caffe::Blob<T>*>& bottom);
 
@@ -37,6 +39,7 @@ namespace op
 
     private:
         T mThreshold;
+        int mGpuID;
 
         // PIMPL idiom
         // http://www.cppsamples.com/common-tasks/pimpl.html

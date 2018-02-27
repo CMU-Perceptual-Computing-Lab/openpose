@@ -13,9 +13,15 @@ namespace op
             caffe::Blob<int> mKernelBlob;
             std::array<int, 4> mBottomSize;
             std::array<int, 4> mTopSize;
+            // Special Kernel for OpenCL NMS
+            #ifdef USE_OPENCL
+                std::shared_ptr<caffe::Blob<int>> mKernelBlobT;
+            #endif
         #endif
 
-        ImplNmsCaffe(){};
+        ImplNmsCaffe()
+        {
+        }
     };
 
     template <typename T>
@@ -63,7 +69,7 @@ namespace op
 
     template <typename T>
     void NmsCaffe<T>::Reshape(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top,
-                              const int maxPeaks, const int outputChannels)
+                              const int maxPeaks, const int outputChannels, const int gpuID)
     {
         try
         {
@@ -82,6 +88,15 @@ namespace op
                 topBlob->Reshape(topShape);
                 upImpl->mKernelBlob.Reshape(bottomShape);
 
+                // Special Kernel for OpenCL NMS
+                #ifdef USE_OPENCL
+                    upImpl->mKernelBlobT = {std::make_shared<caffe::Blob<int>>(1,1,1,1)};
+                    upImpl->mKernelBlobT->Reshape(bottomShape);
+                    // GPU ID
+                    mGpuID = gpuID;
+                #else
+                    UNUSED(mGpuID);
+                #endif
                 // Array sizes
                 upImpl->mTopSize = std::array<int, 4>{topBlob->shape(0), topBlob->shape(1),
                                                       topBlob->shape(2), topBlob->shape(3)};
@@ -143,6 +158,27 @@ namespace op
                 UNUSED(bottom);
                 UNUSED(top);
                 error("OpenPose must be compiled with the `USE_CAFFE` & `USE_CUDA` macro definitions in order to run"
+                      " this functionality.", __LINE__, __FUNCTION__, __FILE__);
+            #endif
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    template <typename T>
+    void NmsCaffe<T>::Forward_ocl(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top)
+    {
+        try
+        {
+            #if defined USE_CAFFE && defined USE_OPENCL
+                nmsOcl(top.at(0)->mutable_gpu_data(), upImpl->mKernelBlobT->mutable_gpu_data(),
+                       bottom.at(0)->gpu_data(), mThreshold, upImpl->mTopSize, upImpl->mBottomSize, mGpuID);
+            #else
+                UNUSED(bottom);
+                UNUSED(top);
+                error("OpenPose must be compiled with the `USE_CAFFE` & `USE_OPENCL` macro definitions in order to run"
                       " this functionality.", __LINE__, __FUNCTION__, __FILE__);
             #endif
         }

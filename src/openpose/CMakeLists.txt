@@ -35,9 +35,12 @@ if(UNIX AND NOT APPLE)
 # Windows
 elseif (WIN32)
   set_property(TARGET openpose PROPERTY DEBUG_POSTFIX d)
-  target_link_libraries(openpose ${OpenCV_LIBS} ${Caffe_LIBS} ${GLUT_LIBRARY} ${SPINNAKER_LIB}
+  target_link_libraries(openpose ${OpenCV_LIBS} ${Caffe_LIBS} ${GLUT_LIBRARY} ${SPINNAKER_LIB} ${OpenCL_LIBRARIES}
       debug ${GFLAGS_LIBRARY_DEBUG} optimized ${GFLAGS_LIBRARY_RELEASE}
       debug ${GLOG_LIBRARY_DEBUG} optimized ${GLOG_LIBRARY_RELEASE})
+  if (${GPU_MODE} MATCHES "OPENCL")
+    target_link_libraries(openpose debug ${BOOST_SYSTEM_LIB_DEBUG} optimized ${BOOST_SYSTEM_LIB_RELEASE})
+  endif (${GPU_MODE} MATCHES "OPENCL")
   if (${DL_FRAMEWORK} MATCHES "CAFFE")
     target_compile_definitions(openpose PRIVATE BOOST_ALL_NO_LIB)
   endif(${DL_FRAMEWORK} MATCHES "CAFFE")

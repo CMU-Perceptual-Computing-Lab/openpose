@@ -1,3 +1,4 @@
+set(CMAKE_CXX_SOURCE_FILE_EXTENSIONS C;M;c++;cc;cpp;cxx;mm;CPP;cl)
 set(SOURCES_OP_CORE
     array.cpp
     cvMatToOpInput.cpp
@@ -13,6 +14,7 @@ set(SOURCES_OP_CORE
     netCaffe.cpp
     nmsBase.cpp
     nmsBase.cu
+    nmsBaseCL.cpp
     nmsCaffe.cpp
     opOutputToCvMat.cpp
     point.cpp
@@ -20,6 +22,7 @@ set(SOURCES_OP_CORE
     renderer.cpp
     resizeAndMergeBase.cpp
     resizeAndMergeBase.cu
+    resizeAndMergeBaseCL.cpp
     resizeAndMergeCaffe.cpp
     scaleAndSizeExtractor.cpp)
 
