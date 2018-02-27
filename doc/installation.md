@@ -12,14 +12,12 @@ OpenPose - Installation
 8. [Uninstallation](#uninstallation)
 9. [Optional Settings](#optional-settings)
     1. [MPI Model](#mpi-model)
-    2. [CPU Version](#cpu-version)
-    3. [OpenCL Version](#opencl-version)
-    4. [OpenPose 3D Reconstruction Module](#openpose-3d-reconstruction-module)
-    5. [Compiling without cuDNN](#compiling-without-cudnn)
-    6. [Custom Caffe (Ubuntu Only)](#custom-caffe-ubuntu-only)
-    7. [Custom OpenCV (Ubuntu Only)](#custom-opencv-ubuntu-only)
-    8. [Doxygen Documentation Autogeneration (Ubuntu Only)](#doxygen-documentation-autogeneration-ubuntu-only)
-    9. [CMake Command Line Configuration (Ubuntu Only)](#cmake-command-line-configuration-ubuntu-only)
+    2. [OpenPose 3D Reconstruction Module](#openpose-3d-reconstruction-module)
+    3. [Compiling without cuDNN](#compiling-without-cudnn)
+    4. [Custom Caffe (Ubuntu Only)](#custom-caffe-ubuntu-only)
+    5. [Custom OpenCV (Ubuntu Only)](#custom-opencv-ubuntu-only)
+    6. [Doxygen Documentation Autogeneration (Ubuntu Only)](#doxygen-documentation-autogeneration-ubuntu-only)
+    7. [CMake Command Line Configuration (Ubuntu Only)](#cmake-command-line-configuration-ubuntu-only)
 
 
 
@@ -39,7 +37,7 @@ This installation section is only intended if you plan to modify the OpenPose co
 
 
 ## Requirements
-- NVIDIA graphics card with at least 1.6 GB available (the `nvidia-smi` command checks the available GPU memory in Ubuntu), or equivalent AMD graphics card, or 6th generation Intel CPU with at least 8 cores.
+- NVIDIA graphics card with at least 1.6 GB available (the `nvidia-smi` command checks the available GPU memory in Ubuntu).
 - At least 2 GB of free RAM memory.
 - Highly recommended: cuDNN and a CPU with at least 8 cores.
 
@@ -89,21 +87,17 @@ The instructions in this section describe the steps to build OpenPose using CMak
 1. Download and install CMake GUI:
     - Ubuntu: run the command `sudo apt-get install cmake-qt-gui`. Note: If you prefer to use CMake through the command line, see [Cmake Command Line Build](#cmake-command-line-build-ubuntu-only).
     - Windows: download and install the latest CMake win64-x64 msi installer from the [CMake website](https://cmake.org/download/), called `cmake-X.X.X-win64-x64.msi`.
-2. [**NVIDIA - CUDA 8**](https://developer.nvidia.com/cuda-80-ga2-download-archive):
+2. [**CUDA 8**](https://developer.nvidia.com/cuda-80-ga2-download-archive):
     - Ubuntu: Run `ubuntu/install_cuda.sh` or alternatively download and install it from their website.
     - Windows: Install CUDA 8.0 after Visual Studio 2015 is installed to assure that the CUDA installation will generate all necessary files for VS. If CUDA was already installed, re-install CUDA after installing VS!
     - **IMPORTANT**: As of a recent windows update, you have to download the Nvidia [drivers](http://www.nvidia.com/Download/index.aspx) drivers first, and then install CUDA without the Graphics Driver flag or else your system will hang.
-3. [**NVIDIA - cuDNN 5.1**](https://developer.nvidia.com/cudnn):
+3. [**cuDNN 5.1**](https://developer.nvidia.com/cudnn):
     - Ubuntu: Run `ubuntu/install_cudnn.sh` or alternatively download and install it from their website.
     - Windows (and Ubuntu if manual installation): In order to manually install it, just unzip it and copy (merge) the contents on the CUDA folder, usually `/usr/local/cuda/` in Ubuntu and `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0` in Windows.
-4. [**AMD - Driver**](https://support.amd.com/en-us/download):
-    - Ubuntu and Windows:  Download and install driver from website
-5. [**AMD - OpenCL**](https://support.amd.com/en-us/kb-articles/Pages/OpenCL2-Driver.aspx):
-    - Ubuntu and Windows: Download and install driver from website
-6. Ubuntu - Other prerequisites:
+4. Ubuntu - Other prerequisites:
     - Caffe prerequisites: By default, OpenPose uses Caffe under the hood. If you have not used Caffe previously, install its dependencies by running `bash ./ubuntu/install_cmake.sh`.
     - OpenCV must be already installed on your machine. It can be installed with `apt-get install libopencv-dev`. You can also use your own compiled OpenCV version.
-7. Windows - **Microsoft Visual Studio (VS) 2015 Enterprise Update 3**:
+5. Windows - **Microsoft Visual Studio (VS) 2015 Enterprise Update 3**:
     - If **Visual Studio 2017 Community** is desired, we do not officially support it, but it might be compiled by firstly [enabling CUDA 8.0 in VS2017](https://stackoverflow.com/questions/43745099/using-cuda-with-visual-studio-2017?answertab=active#tab-top) or use **VS2017 with CUDA 9** by checking the `.vcxproj` file and changing the necessary paths from CUDA 8 to 9.
     - VS 2015 Enterprise Update 1 will give some compiler errors and VS 2015 Community has not been tested.
 5. Windows - **Caffe, OpenCV, and Caffe prerequisites**:
@@ -217,32 +211,6 @@ In order to uninstall OpenPose:
 ### Optional Settings
 #### MPI Model
 By default, the body MPI model is not downloaded. You can download it by turning on the `DOWNLOAD_MPI_MODEL`. It's slightly faster but less accurate and has less keypoints than the COCO body model.
-
-
-
-#### CPU Version
-OpenPose will automatically use CPU mode if no Nvidia GPU is found in your system. To manually select the CPU Version, open CMake GUI mentioned above, and set the `GPU_MODE` flag to `CPU_ONLY`.
-
-- On Ubuntu, OpenPose will link against the Intel MKL version (Math Kernel Library) of Caffe. Alternatively, the user can choose his own Caffe version, by unselecting `USE_MKL` and selecting his own Caffe path. 
-- On Windows, it will use the default version of Caffe or one provided by the user on the CPU.
-
-The default CPU version takes ~0.2 seconds per image on Ubuntu (~50x slower than GPU) while the MKL version provides a roughly 2x speedup at ~0.4 seconds. As of now OpenPose does not support MKL on Windows but will at a later date. Also, MKL version does not support unfixed resolution. So a folder of images of different resolutions with openpose, requires the `--net_resolution 656x368` flag for example.
-
-The user can configure the environmental variables `MKL_NUM_THREADS` and `OMP_NUM_THREADS`. They are set at an optimum parameter level by default (i.e., to the number of threads of the machine). However, they can be tweak by running the following commands into the terminal window, right before running any OpenPose application. Eg:
-```
-# Optimal number = Number of threads (used by default)
-export MKL_NUM_THREADS="8"
-export OMP_NUM_THREADS="8"
-```
-
-Do note that increasing the number of threads results in more memory use. You can check the [OpenPose benchmark](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/faq.md#speed-up-and-benchmark) for more information about speed and memory requirements in several CPUs and GPUs.
-
-
-
-#### OpenCL Version
-OpenPose will automatically use OpenCL mode if hardware that supports OpenCL is available (eg. AMD Card). To manually select the OpenCL Version, open CMake GUI mentioned above, and set the `GPU_MODE` flag to `OPENCL`. 
-
-Also, OpenCL version does not support unfixed resolution. So a folder of images of different resolutions with openpose, requires the `--net_resolution 656x368` flag for example. This should be fixed by the Caffe author in a future patch.
 
 
 

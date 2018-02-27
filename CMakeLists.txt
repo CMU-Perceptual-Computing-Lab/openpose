@@ -98,29 +98,33 @@ if (WIN32)
   endif (${INSTRUCTION_SET} MATCHES "SSE")
 endif (WIN32)
 
-# Set the acceleration library
-set(GPU_MODE CUDA CACHE STRING "Select the acceleration GPU library or CPU otherwise.")
 # Look for CUDA
 find_package(CUDA)
 # Look for OpenCL
 set(OpenCL_FOUND FALSE)
 find_package(OpenCL)
+
+# Set the acceleration library
+set(GPU_MODE CUDA CACHE STRING "Select the acceleration GPU library or CPU otherwise.")
+# Display proper options to user
+# if (CUDA_FOUND AND OpenCL_FOUND)
+#   set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA OPENCL CPU_ONLY)
+# elseif (CUDA_FOUND)
+#   set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA CPU_ONLY)
+# elseif (OpenCL_FOUND)
+#   set_property(CACHE GPU_MODE PROPERTY STRINGS OPENCL CPU_ONLY)
+# else ()
+#   set_property(CACHE GPU_MODE PROPERTY STRINGS CPU_ONLY)
+# endif ()
+set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA)
+
 # Code to avoid crash at compiling time if OpenCL is not found
 if (NOT OpenCL_FOUND)
   set(OpenCL_LIBRARIES "")
 endif (NOT OpenCL_FOUND)
-# Display proper options to user
-if (CUDA_FOUND AND OpenCL_FOUND)
-  if (${CUDA_VERSION_MAJOR} LESS 9)
-    add_definitions(-DLOWER_CL_VERSION)
-  endif ()
-  set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA OPENCL CPU_ONLY)
-elseif (CUDA_FOUND)
-  set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA CPU_ONLY)
-elseif (OpenCL_FOUND)
-  set_property(CACHE GPU_MODE PROPERTY STRINGS OPENCL CPU_ONLY)
-else ()
-  set_property(CACHE GPU_MODE PROPERTY STRINGS CPU_ONLY)
+# Required for OpenCL in Nvidia graphic cards
+if (CUDA_FOUND AND OpenCL_FOUND AND ${CUDA_VERSION_MAJOR} LESS 9)
+  add_definitions(-DLOWER_CL_VERSION)
 endif ()
 # Handle desired GPU mode option
 if (${GPU_MODE} MATCHES "CUDA")
