@@ -90,7 +90,7 @@ bin\OpenPoseDemo.exe --video examples\media\video.avi
 
 - **OpenPose C++ API**: See [doc/library_introduction.md](doc/library_introduction.md).
 
-- **Adding an extra module**: Check [doc/library_add_new_module.md](./library_add_new_module.md).
+- **Adding an extra module**: Check [doc/library_add_new_module.md](./doc/library_add_new_module.md).
 
 - **Standalone face or hand detector**:
     - **Face** keypoint detection **without body** keypoint detection: If you want to speed it up (but also reduce amount of detected faces), check the OpenCV-face-detector approach in [doc/standalone_face_or_hand_keypoint_detector.md](doc/standalone_face_or_hand_keypoint_detector.md).
