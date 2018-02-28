@@ -4,6 +4,11 @@
 
 namespace op
 {
+    CvMatToOpInput::CvMatToOpInput(const PoseModel poseModel) :
+        mPoseModel{poseModel}
+    {
+    }
+
     std::vector<Array<float>> CvMatToOpInput::createArray(const cv::Mat& cvInputData,
                                                           const std::vector<double>& scaleInputToNetInputs,
                                                           const std::vector<Point<int>>& netInputSizes) const
@@ -27,7 +32,7 @@ namespace op
                 const cv::Mat frameWithNetSize = resizeFixedAspectRatio(cvInputData, scaleInputToNetInputs[i],
                                                                         netInputSizes[i]);
                 // Fill inputNetData[i]
-                uCharCvMatToFloatPtr(inputNetData[i].getPtr(), frameWithNetSize, true);
+                uCharCvMatToFloatPtr(inputNetData[i].getPtr(), frameWithNetSize, (mPoseModel == PoseModel::BODY_19N ? 2 : 1));
             }
             return inputNetData;
         }

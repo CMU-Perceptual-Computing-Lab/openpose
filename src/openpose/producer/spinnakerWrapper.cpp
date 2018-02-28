@@ -576,6 +576,7 @@ namespace op
             }
         #else
             UNUSED(cameraParameterPath);
+            UNUSED(resolution);
             error(WITH_FLIR_CAMERA_ERROR, __LINE__, __FUNCTION__, __FILE__);
         #endif
     }

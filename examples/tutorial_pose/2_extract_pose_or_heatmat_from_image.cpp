@@ -92,7 +92,7 @@ int openPoseTutorialPose2()
     op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
     // Step 3 - Initialize all required classes
     op::ScaleAndSizeExtractor scaleAndSizeExtractor(netInputSize, outputSize, FLAGS_scale_number, FLAGS_scale_gap);
-    op::CvMatToOpInput cvMatToOpInput;
+    op::CvMatToOpInput cvMatToOpInput{poseModel};
     op::CvMatToOpOutput cvMatToOpOutput;
     auto poseExtractorPtr = std::make_shared<op::PoseExtractorCaffe>(poseModel, FLAGS_model_folder,
                                                                      FLAGS_num_gpu_start);
