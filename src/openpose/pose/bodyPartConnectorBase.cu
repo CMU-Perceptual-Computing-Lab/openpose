@@ -1,7 +1,7 @@
-#include <openpose/utilities/check.hpp>
-#include <openpose/utilities/cuda.hpp>
-#include <openpose/utilities/fastMath.hpp>
+#include <openpose/gpu/cuda.hpp>
 #include <openpose/pose/poseParameters.hpp>
+#include <openpose/utilities/check.hpp>
+#include <openpose/utilities/fastMath.hpp>
 #include <openpose/pose/bodyPartConnectorBase.hpp>
 
 namespace op

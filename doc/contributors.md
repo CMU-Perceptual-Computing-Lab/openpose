@@ -11,5 +11,6 @@ OpenPose is authored by [Gines Hidalgo](https://www.gineshidalgo.com/), [Zhe Cao
 ### Contributors
 We would also like to thank the following people who have highly contributed to OpenPose:
 
-1. [Bikramjot Hanzra](https://www.linkedin.com/in/bikz05): OpenPose maintainer and CMake version creator.
-2. [Helen Medina](https://github.com/helen-medina): Windows version creator.
+1. [Bikramjot Hanzra](https://www.linkedin.com/in/bikz05): OpenPose maintainer, CMake (Ubuntu and Windows) version, and Travis Build.
+2. [Yaadhav Raaj](https://www.linkedin.com/in/yaadhavraaj): OpenPose maintainer, CPU version, and OpenCL version.
+3. [Helen Medina](https://github.com/helen-medina): Initial Windows version.

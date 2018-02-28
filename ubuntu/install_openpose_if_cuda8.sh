@@ -64,7 +64,8 @@ echo ""
 echo "------------------------- Compiling OpenPose -------------------------"
 # Go back to main folder
 cd ..
-# Copy Makefile.config
+# Copy Makefile & Makefile.config
+cp ubuntu/Makefile.example Makefile
 if [[ $ubuntu_le_14 == true ]]; then
     cp ubuntu/Makefile.config.Ubuntu14_cuda8.example Makefile.config
 else

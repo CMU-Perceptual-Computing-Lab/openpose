@@ -33,7 +33,8 @@ namespace op
 namespace op
 {
     template<typename TDatums>
-    WScaleAndSizeExtractor<TDatums>::WScaleAndSizeExtractor(const std::shared_ptr<ScaleAndSizeExtractor>& scaleAndSizeExtractor) :
+    WScaleAndSizeExtractor<TDatums>::WScaleAndSizeExtractor(
+                                     const std::shared_ptr<ScaleAndSizeExtractor>& scaleAndSizeExtractor) :
         spScaleAndSizeExtractor{scaleAndSizeExtractor}
     {
     }

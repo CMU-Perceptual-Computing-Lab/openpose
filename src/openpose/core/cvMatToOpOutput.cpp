@@ -12,6 +12,10 @@ namespace op
                 error("Wrong input element (empty cvInputData).", __LINE__, __FUNCTION__, __FILE__);
             if (cvInputData.channels() != 3)
                 error("Input images must be 3-channel BGR.", __LINE__, __FUNCTION__, __FILE__);
+            if (cvInputData.cols <= 0 || cvInputData.rows <= 0)
+                error("Input images has 0 area.", __LINE__, __FUNCTION__, __FILE__);
+            if (outputResolution.x <= 0 || outputResolution.y <= 0)
+                error("Output resolution has 0 area.", __LINE__, __FUNCTION__, __FILE__);
             // outputData - Reescale keeping aspect ratio and transform to float the output image
             const cv::Mat frameWithOutputSize = resizeFixedAspectRatio(cvInputData, scaleInputToOutput,
                                                                        outputResolution);

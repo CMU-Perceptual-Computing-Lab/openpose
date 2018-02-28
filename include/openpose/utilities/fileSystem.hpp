@@ -5,13 +5,11 @@
 
 namespace op
 {
-    OP_API void mkdir(const std::string& directoryPath);
+    OP_API void makeDirectory(const std::string& directoryPath);
 
-    OP_API bool existDir(const std::string& directoryPath);
+    OP_API bool existDirectory(const std::string& directoryPath);
 
     OP_API bool existFile(const std::string& filePath);
-
-    OP_API bool isDirectory(const std::string& directoryPath);
 
     /**
      * This function makes sure that the directoryPathString is properly formatted. I.e., it

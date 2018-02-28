@@ -34,7 +34,7 @@ namespace op
          */
         virtual ~VideoCaptureReader();
 
-        virtual std::string getFrameName() = 0;
+        virtual std::string getNextFrameName() = 0;
 
         inline bool isOpened() const
         {
@@ -47,18 +47,10 @@ namespace op
 
         virtual void set(const int capProperty, const double value) = 0;
 
-        inline double get(const ProducerProperty property)
-        {
-            return Producer::get(property);
-        }
-
-        inline void set(const ProducerProperty property, const double value)
-        {
-            Producer::set(property, value);
-        }
-
     protected:
         virtual cv::Mat getRawFrame() = 0;
+
+        virtual std::vector<cv::Mat> getRawFrames() = 0;
 
     private:
         cv::VideoCapture mVideoCapture;

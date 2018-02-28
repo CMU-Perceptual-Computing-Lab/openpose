@@ -19,6 +19,11 @@ namespace op
     {
         try
         {
+            // Security checks
+            if (*spNumberElementsToRender == 0)
+                error("Number elements to render cannot be 0 for this function.",
+                      __LINE__, __FUNCTION__, __FILE__);
+            // Get current element to be rendered
             auto elementToRender = (((int)(*spElementToRender) + increment) % (int)(*spNumberElementsToRender));
             // Handling negative increments
             while (elementToRender < 0)

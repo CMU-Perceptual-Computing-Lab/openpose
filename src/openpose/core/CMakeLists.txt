@@ -1,10 +1,12 @@
-cuda_add_library(openpose_core
+set(CMAKE_CXX_SOURCE_FILE_EXTENSIONS C;M;c++;cc;cpp;cxx;mm;CPP;cl)
+set(SOURCES_OP_CORE
     array.cpp
     cvMatToOpInput.cpp
     cvMatToOpOutput.cpp
     datum.cpp
     defineTemplates.cpp
     gpuRenderer.cpp
+    keepTopNPeople.cpp
     keypointScaler.cpp
     maximumBase.cpp
     maximumBase.cu
@@ -12,6 +14,7 @@ cuda_add_library(openpose_core
     netCaffe.cpp
     nmsBase.cpp
     nmsBase.cu
+    nmsBaseCL.cpp
     nmsCaffe.cpp
     opOutputToCvMat.cpp
     point.cpp
@@ -19,20 +22,33 @@ cuda_add_library(openpose_core
     renderer.cpp
     resizeAndMergeBase.cpp
     resizeAndMergeBase.cu
+    resizeAndMergeBaseCL.cpp
     resizeAndMergeCaffe.cpp
     scaleAndSizeExtractor.cpp)
 
-add_library(caffe SHARED IMPORTED)
-set_property(TARGET caffe PROPERTY IMPORTED_LOCATION ${Caffe_LIBS})
+include(${CMAKE_SOURCE_DIR}/cmake/Utils.cmake)
+prepend(SOURCES_OP_CORE_WITH_CP ${CMAKE_CURRENT_SOURCE_DIR} ${SOURCES_OP_CORE})
+set(SOURCES_OP_CORE_WITH_CP ${SOURCES_OP_CORE_WITH_CP} PARENT_SCOPE)
+set(SOURCES_OPENPOSE ${SOURCES_OPENPOSE} ${SOURCES_OP_CORE_WITH_CP} PARENT_SCOPE)
 
-target_link_libraries(openpose_core caffe)
+if (UNIX AND NOT APPLE)
+  if (${GPU_MODE} MATCHES "CUDA")
+    cuda_add_library(openpose_core ${SOURCES_OP_CORE})
+  else()
+    add_library(openpose_core ${SOURCES_OP_CORE})
+  endif ()
 
-if (BUILD_CAFFE)
-  add_dependencies(openpose_core openpose_caffe)
-endif (BUILD_CAFFE)
+  add_library(caffe SHARED IMPORTED)
+  set_property(TARGET caffe PROPERTY IMPORTED_LOCATION ${Caffe_LIBS}) 
+  target_link_libraries(openpose_core caffe ${MKL_LIBS})
 
-install(TARGETS openpose_core
-    EXPORT OpenPose
-    RUNTIME DESTINATION bin
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib/openpose)
+  if (BUILD_CAFFE)
+    add_dependencies(openpose_core openpose_caffe)
+  endif (BUILD_CAFFE)
+
+  install(TARGETS openpose_core
+      EXPORT OpenPose
+      RUNTIME DESTINATION bin
+      LIBRARY DESTINATION lib
+      ARCHIVE DESTINATION lib/openpose)
+endif (UNIX AND NOT APPLE)

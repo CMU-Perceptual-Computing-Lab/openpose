@@ -3,13 +3,16 @@
 
 namespace op
 {
-    inline __device__ void renderKeypoints(float* targetPtr, float2* sharedMaxs, float2* sharedMins, float* sharedScaleF,
-                                           const int globalIdx, const int x, const int y, const int targetWidth, const int targetHeight,
+    inline __device__ void renderKeypoints(float* targetPtr, float2* sharedMaxs, float2* sharedMins,
+                                           float* sharedScaleF, const int globalIdx, const int x, const int y,
+                                           const int targetWidth, const int targetHeight,
                                            const float* const keypointsPtr, const unsigned int* const partPairsPtr,
                                            const int numberPeople, const int numberParts, const int numberPartPairs,
-                                           const float* const rgbColorsPtr, const int numberColors,
-                                           const float radius, const float stickwidth, const float threshold, const float alphaColorToAdd,
-                                           const bool blendOriginalFrame = true, const int googlyEye1 = -1, const int googlyEye2 = -1)
+                                           const float* const rgbColorsPtr, const int numberColors, const float radius,
+                                           const float lineWidth, const float* const keypointScalePtr,
+                                           const int numberScales, const float threshold,
+                                           const float alphaColorToAdd, const bool blendOriginalFrame = true,
+                                           const int googlyEye1 = -1, const int googlyEye2 = -1)
     {
         // Fill shared parameters
         if (globalIdx < numberPeople)
@@ -40,7 +43,8 @@ namespace op
             {
                 const auto averageX = sharedMaxs[globalIdx].x - sharedMins[globalIdx].x;
                 const auto averageY = sharedMaxs[globalIdx].y - sharedMins[globalIdx].y;
-                sharedScaleF[globalIdx] = fastTruncate((averageX + averageY) / 400.f, 0.33f, 1.f);    // (averageX + averageY) / 2.f / 400.f
+                // (averageX + averageY) / 2.f / 400.f
+                sharedScaleF[globalIdx] = fastTruncate((averageX + averageY) / 400.f, 0.33f, 1.f);
                 const auto constantToAdd = 50.f;
                 sharedMaxs[globalIdx].x += constantToAdd;
                 sharedMaxs[globalIdx].y += constantToAdd;
@@ -65,17 +69,19 @@ namespace op
                 r = 0.f;
             }
 
+            const auto lineWidthSquared = lineWidth * lineWidth;
+            const auto radiusSquared = radius * radius;
             for (auto person = 0; person < numberPeople; person++)
             {
                 // Make sure person x,y in the limits
                 // Make sure person is not empty. Assume all joints are below threshold. Then
                 // maxs = 0 and mins = width/height. So if statement would be false
-                if (x <= sharedMaxs[person].x && x >= sharedMins[person].x && y <= sharedMaxs[person].y && y >= sharedMins[person].y)
+                if (x <= sharedMaxs[person].x && x >= sharedMins[person].x
+                    && y <= sharedMaxs[person].y && y >= sharedMins[person].y)
                 {
                     // Part pair connections
                     for (auto partPair = 0; partPair < numberPartPairs; partPair++)
                     {
-                        const auto bSqrt = sharedScaleF[person] * sharedScaleF[person] * stickwidth * stickwidth;
                         const auto partA = partPairsPtr[2*partPair];
                         const auto partB = partPairsPtr[2*partPair+1];
                         const auto indexA = person*numberParts*3 + partA*3;
@@ -89,6 +95,12 @@ namespace op
 
                         if (scoreA > threshold && scoreB > threshold)
                         {
+                            const auto keypointScale = keypointScalePtr[partB%numberScales]
+                                                     * keypointScalePtr[partB%numberScales]
+                                                     * keypointScalePtr[partB%numberScales];
+                            const auto lineWidthScaled = lineWidthSquared * keypointScale;
+                            const auto bSqrt = sharedScaleF[person] * sharedScaleF[person] * lineWidthScaled;
+
                             const auto xP = (xA + xB) / 2.f;
                             const auto yP = (yA + yB) / 2.f;
                             const auto aSqrt = (xA - xP) * (xA - xP) + (yA - yP) * (yA - yP);
@@ -103,27 +115,33 @@ namespace op
                             const auto minV = 0.f;
                             const auto maxV = 1.f;
                             if (minV <= judge && judge <= maxV)
-                                addColorWeighted(r, g, b, &rgbColorsPtr[(partB%numberColors)*3], alphaColorToAdd); // Before used partPair vs partB
+                                // Before used partPair vs partB
+                                addColorWeighted(r, g, b, &rgbColorsPtr[(partB%numberColors)*3], alphaColorToAdd);
                         }
                     }
 
                     // Part circles
-                    for (auto i = 0u; i < numberParts; i++)
+                    for (auto part = 0u; part < numberParts; part++)
                     {
-                        const auto index = 3 * (person*numberParts + i);
+                        const auto index = 3 * (person*numberParts + part);
                         const auto localX = keypointsPtr[index];
                         const auto localY = keypointsPtr[index + 1];
                         const auto score = keypointsPtr[index + 2];
 
                         if (score > threshold)
                         {
+                            const auto keypointScale = keypointScalePtr[part%numberScales]
+                                                     * keypointScalePtr[part%numberScales]
+                                                     * keypointScalePtr[part%numberScales];
+                            const auto radiusScaled = radiusSquared * keypointScale;
                             const auto dist2 = (x - localX) * (x - localX) + (y - localY) * (y - localY);
                             // Googly eyes
-                            if (googlyEye1 == i || googlyEye2 == i)
+                            if (googlyEye1 == part || googlyEye2 == part)
                             {
-                                const auto ratio = 2.5f * radius;
-                                const auto minr2 = sharedScaleF[person] * sharedScaleF[person] * (ratio - 2) * (ratio - 2);
-                                const auto maxr2 = sharedScaleF[person] * sharedScaleF[person] * ratio * ratio;
+                                const auto eyeRatio = 2.5f * sqrt(radiusScaled);
+                                const auto minr2 = sharedScaleF[person] * sharedScaleF[person]
+                                                 * (eyeRatio - 2) * (eyeRatio - 2);
+                                const auto maxr2 = sharedScaleF[person] * sharedScaleF[person] * eyeRatio * eyeRatio;
                                 if (dist2 <= maxr2)
                                 {
                                     float colorToAdd [3] = {0., 0., 0.};
@@ -132,8 +150,9 @@ namespace op
                                             color = {255.f};
                                     if (dist2 <= minr2*0.6f)
                                     {
-                                        const auto dist3 = (x-4 - localX) * (x-4 - localX) + (y - localY+4) * (y - localY+4);
-                                        if (dist3 > 3.75f*3.75f)
+                                        const auto dist3 = (x-4 - localX)
+                                                         * (x-4 - localX) + (y - localY+4) * (y - localY+4);
+                                        if (dist3 > 14.0625f) // 3.75f^2
                                             for (auto& color : colorToAdd)
                                                 color = {0.f};
                                     }
@@ -145,9 +164,9 @@ namespace op
                             else
                             {
                                 const auto minr2 = 0.f;
-                                const auto maxr2 = sharedScaleF[person] * sharedScaleF[person] * radius * radius;
+                                const auto maxr2 = sharedScaleF[person] * sharedScaleF[person] * radiusScaled;
                                 if (minr2 <= dist2 && dist2 <= maxr2)
-                                    addColorWeighted(r, g, b, &rgbColorsPtr[(i%numberColors)*3], alphaColorToAdd);
+                                    addColorWeighted(r, g, b, &rgbColorsPtr[(part%numberColors)*3], alphaColorToAdd);
                             }
                         }
                     }

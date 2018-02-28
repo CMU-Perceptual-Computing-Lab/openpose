@@ -4,7 +4,6 @@
 #include <map>
 #include <openpose/core/common.hpp>
 #include <openpose/pose/enumClasses.hpp>
-#include <openpose/pose/poseParametersRender.hpp>
 
 namespace op
 {
@@ -12,7 +11,6 @@ namespace op
     const auto POSE_MAX_PEOPLE = 96u;
 
     // Model functions
-    // POSE_BODY_PART_MAPPING on HPP crashes on Windows at dynamic initialization
     OP_API const std::map<unsigned int, std::string>& getPoseBodyPartMapping(const PoseModel poseModel);
     OP_API const std::string& getPoseProtoTxt(const PoseModel poseModel);
     OP_API const std::string& getPoseTrainedModel(const PoseModel poseModel);

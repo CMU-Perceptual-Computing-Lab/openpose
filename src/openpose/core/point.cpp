@@ -1,6 +1,6 @@
-#include <openpose/core/macros.hpp>
 #include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/core/point.hpp>
+#include <ostream>
 
 namespace op
 {

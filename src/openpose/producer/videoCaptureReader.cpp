@@ -54,7 +54,7 @@ namespace op
         }
     }
 
-    std::string VideoCaptureReader::getFrameName()
+    std::string VideoCaptureReader::getNextFrameName()
     {
         try
         {
@@ -83,6 +83,19 @@ namespace op
         }
     }
 
+    std::vector<cv::Mat> VideoCaptureReader::getRawFrames()
+    {
+        try
+        {
+            return std::vector<cv::Mat>{getRawFrame()};
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return {};
+        }
+    }
+
     void VideoCaptureReader::release()
     {
         try
@@ -105,7 +118,9 @@ namespace op
         {
             // Specific cases
             // If rotated 90 or 270 degrees, then width and height is exchanged
-            if ((capProperty == CV_CAP_PROP_FRAME_WIDTH || capProperty == CV_CAP_PROP_FRAME_HEIGHT) && (get(ProducerProperty::Rotation) != 0. && get(ProducerProperty::Rotation) != 180.))
+            if ((capProperty == CV_CAP_PROP_FRAME_WIDTH || capProperty == CV_CAP_PROP_FRAME_HEIGHT)
+                && (Producer::get(ProducerProperty::Rotation) != 0.
+                    && Producer::get(ProducerProperty::Rotation) != 180.))
             {
                 if (capProperty == CV_CAP_PROP_FRAME_WIDTH)
                     return mVideoCapture.get(CV_CAP_PROP_FRAME_HEIGHT);

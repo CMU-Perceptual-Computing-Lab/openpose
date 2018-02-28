@@ -1,10 +1,17 @@
-set(SOURCES
+set(SOURCES_OP_THREAD
     defineTemplates.cpp)
 
-add_library(openpose_thread ${SOURCES})
+include(${CMAKE_SOURCE_DIR}/cmake/Utils.cmake)
+prepend(SOURCES_OP_THREAD_WITH_CP ${CMAKE_CURRENT_SOURCE_DIR} ${SOURCES_OP_THREAD})
+set(SOURCES_OP_THREAD_WITH_CP ${SOURCES_OP_THREAD_WITH_CP} PARENT_SCOPE)
+set(SOURCES_OPENPOSE ${SOURCES_OPENPOSE} ${SOURCES_OP_THREAD_WITH_CP} PARENT_SCOPE)
 
-install(TARGETS openpose_thread
-    EXPORT OpenPose
-    RUNTIME DESTINATION bin
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib/openpose)
+if (UNIX AND NOT APPLE)
+	add_library(openpose_thread ${SOURCES_OP_THREAD})
+	
+	install(TARGETS openpose_thread 
+	    EXPORT OpenPose
+	    RUNTIME DESTINATION bin
+	    LIBRARY DESTINATION lib
+	    ARCHIVE DESTINATION lib/openpose)
+endif (UNIX AND NOT APPLE)

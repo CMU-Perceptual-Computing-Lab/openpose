@@ -1,22 +1,44 @@
 #include <cstdio> // fopen
-#include <boost/filesystem.hpp>
-#include <boost/range/iterator_range_core.hpp>
+#ifdef _WIN32
+    #include <direct.h> // _mkdir
+    #include <windows.h> // DWORD, GetFileAttributesA
+#elif defined __unix__
+    #include <dirent.h> // opendir
+    #include <sys/stat.h> // mkdir
+#else
+    #error Unknown environment!
+#endif
 #include <openpose/utilities/string.hpp>
 #include <openpose/utilities/fileSystem.hpp>
 
 namespace op
 {
-    void mkdir(const std::string& directoryPath)
+    void makeDirectory(const std::string& directoryPath)
     {
         try
         {
             if (!directoryPath.empty())
             {
-                // Create folder if it does not exist
-                const boost::filesystem::path directory{directoryPath};
-                if (!isDirectory(directoryPath) && !boost::filesystem::create_directory(directory))
-                    error("Could not write to or create directory to save processed frames.", __LINE__, __FUNCTION__, __FILE__);
-            };
+				// Format the path first
+				const auto formatedPath = formatAsDirectory(directoryPath);
+				// Create dir if it doesn't exist yet
+                if (!existDirectory(formatedPath))
+                {
+                    #ifdef _WIN32
+                        const auto status = _mkdir(formatedPath.c_str());
+                    #elif defined __unix__
+                        // Create folder
+                        // Access permission - 775 (7, 7, 4+1)
+                        // https://www.gnu.org/software/libc/manual/html_node/Permission-Bits.html
+                        const auto status = mkdir(formatedPath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+                    #endif
+                    // Error if folder cannot be created
+                    if (status != 0)
+                        error("Could not create directory: " + formatedPath + ". Status error = "
+                              + std::to_string(status) + ". Does the parent folder exist and/or do you have writting"
+                              " access to that path?", __LINE__, __FUNCTION__, __FILE__);
+                }
+            }
         }
         catch (const std::exception& e)
         {
@@ -24,12 +46,35 @@ namespace op
         }
     }
 
-    bool existDir(const std::string& directoryPath)
+    bool existDirectory(const std::string& directoryPath)
     {
         try
         {
-            // Maybe existFile also works for directories in Ubuntu/Windows/Mac?
-            return boost::filesystem::exists(directoryPath);
+			// Format the path first
+			const auto formatedPath = formatAsDirectory(directoryPath);
+			#ifdef _WIN32
+				DWORD status = GetFileAttributesA(formatedPath.c_str());
+				// It is not a directory
+				if (status == INVALID_FILE_ATTRIBUTES)
+					return false;
+				// It is a directory
+				else if (status & FILE_ATTRIBUTE_DIRECTORY)
+					return true;
+				// It is not a directory
+				return false;    // this is not a directory!
+			#elif defined __unix__
+				// It is a directory
+				if (auto* directory = opendir(formatedPath.c_str()))
+				{
+					closedir(directory);
+					return true;
+				}
+				// It is not a directory
+				else
+					return false;
+			#else
+				#error Unknown environment!
+			#endif
         }
         catch (const std::exception& e)
         {
@@ -57,19 +102,6 @@ namespace op
         }
     }
 
-    bool isDirectory(const std::string& directoryPath)
-    {
-        try
-        {
-            return (!directoryPath.empty() && boost::filesystem::is_directory(directoryPath));
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return false;
-        }
-    }
-
     std::string formatAsDirectory(const std::string& directoryPathString)
     {
         try
@@ -77,9 +109,14 @@ namespace op
             std::string directoryPath = directoryPathString;
             if (!directoryPath.empty())
             {
-                std::replace(directoryPath.begin(), directoryPath.end(), '\\', '/'); // replace all '\\' to '/';
-                if (directoryPath.back() != '/')
+				// Replace all '\\' to '/'
+				std::replace(directoryPath.begin(), directoryPath.end(), '\\', '/');
+				if (directoryPath.back() != '/')
                     directoryPath = directoryPath + "/";
+				// Windows - Replace all '/' to '\\'
+				#ifdef _WIN32
+					std::replace(directoryPath.begin(), directoryPath.end(), '/', '\\');
+				#endif
             }
             return directoryPath;
         }
@@ -94,7 +131,11 @@ namespace op
     {
         try
         {
-            return boost::filesystem::path{fullPath}.filename().string();
+            size_t lastSlashPos = fullPath.find_last_of("\\/");
+            if (lastSlashPos != std::string::npos)
+                return fullPath.substr(lastSlashPos+1, fullPath.size() - lastSlashPos - 1);
+            else
+                return fullPath;
         }
         catch (const std::exception& e)
         {
@@ -107,7 +148,14 @@ namespace op
     {
         try
         {
-            return boost::filesystem::path{fullPath}.stem().string();
+            // Name + extension
+            std::string nameExt = getFileNameAndExtension(fullPath);
+            // Name
+            size_t dotPos = nameExt.find_last_of(".");
+            if (dotPos != std::string::npos)
+                return nameExt.substr(0, dotPos);
+            else
+                return nameExt;
         }
         catch (const std::exception& e)
         {
@@ -120,7 +168,14 @@ namespace op
     {
         try
         {
-            return boost::filesystem::path{fullPath}.extension().string();
+            // Name + extension
+            std::string nameExt = getFileNameAndExtension(fullPath);
+            // Extension
+            size_t dotPos = nameExt.find_last_of(".");
+            if (dotPos != std::string::npos)
+                return nameExt.substr(dotPos + 1, nameExt.size() - dotPos - 1);
+            else
+                return "";
         }
         catch (const std::exception& e)
         {
@@ -174,18 +229,44 @@ namespace op
     {
         try
         {
+            // Format the path first
+            const auto formatedPath = formatAsDirectory(directoryPath);
             // Check folder exits
-            if (!existDir(directoryPath))
-                error("Folder " + directoryPath + " does not exist.", __LINE__, __FUNCTION__, __FILE__);
-            // Read images
-            std::vector<std::string> filePaths;
-            for (const auto& file : boost::make_iterator_range(boost::filesystem::directory_iterator{directoryPath}, {}))
-                if (!boost::filesystem::is_directory(file.status()))                // Skip directories
-                    filePaths.emplace_back(file.path().string());
+            if (!existDirectory(formatedPath))
+                error("Folder " + formatedPath + " does not exist.", __LINE__, __FUNCTION__, __FILE__);
+            // Read all files in folder
+			std::vector<std::string> filePaths;
+			#ifdef _WIN32
+				auto formatedPathWindows = formatedPath;
+				formatedPathWindows.append("\\*");
+				WIN32_FIND_DATA data;
+				HANDLE hFind;
+				if ((hFind = FindFirstFile(formatedPathWindows.c_str(), &data)) != INVALID_HANDLE_VALUE)
+				{
+					do
+						filePaths.emplace_back(formatedPath + data.cFileName);
+					while (FindNextFile(hFind, &data) != 0);
+					FindClose(hFind);
+				}
+			#elif defined __unix__
+				std::shared_ptr<DIR> directoryPtr(
+					opendir(formatedPath.c_str()),
+					[](DIR* formatedPath){ formatedPath && closedir(formatedPath); }
+				);
+				struct dirent* direntPtr;
+				while ((direntPtr = readdir(directoryPtr.get())) != nullptr)
+				{
+					std::string currentPath = formatedPath + direntPtr->d_name;
+					if ((strncmp(direntPtr->d_name, ".", 1) == 0) || existDirectory(currentPath))
+							continue;
+					filePaths.emplace_back(currentPath);
+				}
+			#else
+			    #error Unknown environment!
+			#endif
             // Check #files > 0
             if (filePaths.empty())
-                error("No files were found on " + directoryPath, __LINE__, __FUNCTION__, __FILE__);
-
+                error("No files were found on " + formatedPath, __LINE__, __FUNCTION__, __FILE__);
             // If specific extensions specified
             if (!extensions.empty())
             {
@@ -197,10 +278,9 @@ namespace op
                         specificExtensionPaths.emplace_back(filePath);
                 std::swap(filePaths, specificExtensionPaths);
             }
-
             // Sort alphabetically
             std::sort(filePaths.begin(), filePaths.end());
-
+            // Return result
             return filePaths;
         }
         catch (const std::exception& e)

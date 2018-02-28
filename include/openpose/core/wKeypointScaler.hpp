@@ -55,8 +55,10 @@ namespace op
                 // Rescale pose data
                 for (auto& tDatum : *tDatums)
                 {
-                    std::vector<Array<float>> arraysToScale{tDatum.poseKeypoints, tDatum.handKeypoints[0], tDatum.handKeypoints[1], tDatum.faceKeypoints};
-                    spKeypointScaler->scale(arraysToScale, tDatum.scaleInputToOutput, tDatum.scaleNetToOutput, Point<int>{tDatum.cvInputData.cols, tDatum.cvInputData.rows});
+                    std::vector<Array<float>> arraysToScale{tDatum.poseKeypoints, tDatum.handKeypoints[0],
+                                                            tDatum.handKeypoints[1], tDatum.faceKeypoints};
+                    spKeypointScaler->scale(arraysToScale, tDatum.scaleInputToOutput, tDatum.scaleNetToOutput,
+                                            Point<int>{tDatum.cvInputData.cols, tDatum.cvInputData.rows});
                 }
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);

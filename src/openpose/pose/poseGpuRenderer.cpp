@@ -4,7 +4,7 @@
 #endif
 #include <openpose/pose/poseParameters.hpp>
 #include <openpose/pose/renderPose.hpp>
-#include <openpose/utilities/cuda.hpp>
+#include <openpose/gpu/cuda.hpp>
 #include <openpose/utilities/keypoint.hpp>
 #include <openpose/pose/poseGpuRenderer.hpp>
 
@@ -18,8 +18,7 @@ namespace op
         //                          + 3 (+whole pose +whole heatmaps +PAFs)
         // POSE_BODY_PART_MAPPING crashes on Windows, replaced by getPoseBodyPartMapping
         GpuRenderer{renderThreshold, alphaKeypoint, alphaHeatMap, blendOriginalFrame, elementToRender,
-                    (unsigned int)(getPoseBodyPartMapping(poseModel).size()
-                                   + getPosePartPairs(poseModel).size()/2 + 3)}, // mNumberElementsToRender
+                    getNumberElementsToRender(poseModel)}, // mNumberElementsToRender
         PoseRenderer{poseModel},
         spPoseExtractor{poseExtractor},
         pGpuPose{nullptr}
@@ -153,12 +152,13 @@ namespace op
                 gpuToCpuMemoryIfLastRenderer(outputData.getPtr(), outputData.getVolume());
                 cudaCheck(__LINE__, __FUNCTION__, __FILE__);
             #else
-                UNUSED(elementRendered);
                 UNUSED(outputData);
                 UNUSED(poseKeypoints);
+                UNUSED(scaleInputToOutput);
                 UNUSED(scaleNetToOutput);
                 error("OpenPose must be compiled with the `USE_CUDA` macro definitions in order to run this"
-                      " functionality.", __LINE__, __FUNCTION__, __FILE__);
+                      " functionality. You can alternatively use CPU rendering (flag `--render_pose 1`).",
+                      __LINE__, __FUNCTION__, __FILE__);
             #endif
             // Return result
             return std::make_pair(elementRendered, elementRenderedName);

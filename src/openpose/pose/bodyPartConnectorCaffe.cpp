@@ -23,53 +23,26 @@ namespace op
     }
 
     template <typename T>
-    void BodyPartConnectorCaffe<T>::LayerSetUp(const std::vector<caffe::Blob<T>*>& bottom,
-                                               const std::vector<caffe::Blob<T>*>& top)
-    {
-        try
-        {
-            #ifdef USE_CAFFE
-                if (top.size() != 1)
-                    error("top.size() != 1", __LINE__, __FUNCTION__, __FILE__);
-                if (bottom.size() != 2)
-                    error("bottom.size() != 2", __LINE__, __FUNCTION__, __FILE__);
-            #else
-                UNUSED(bottom);
-                UNUSED(top);
-            #endif
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-        }
-    }
-
-    template <typename T>
-    void BodyPartConnectorCaffe<T>::Reshape(const std::vector<caffe::Blob<T>*>& bottom,
-                                            const std::vector<caffe::Blob<T>*>& top)
+    void BodyPartConnectorCaffe<T>::Reshape(const std::vector<caffe::Blob<T>*>& bottom)
     {
         try
         {
             #ifdef USE_CAFFE
                 auto heatMapsBlob = bottom.at(0);
                 auto peaksBlob = bottom.at(1);
-                auto topBlob = top.at(0);
 
                 // Top shape
                 const auto maxPeaks = peaksBlob->shape(2) - 1;
                 const auto numberBodyParts = peaksBlob->shape(1);
-                topBlob->Reshape({1, maxPeaks, numberBodyParts, 3});
 
                 // Array sizes
-                mTopSize = std::array<int, 4>{topBlob->shape(0), topBlob->shape(1), topBlob->shape(2),
-                                              topBlob->shape(3)};
+                mTopSize = std::array<int, 4>{1, maxPeaks, numberBodyParts, 3};
                 mHeatMapsSize = std::array<int, 4>{heatMapsBlob->shape(0), heatMapsBlob->shape(1),
                                                    heatMapsBlob->shape(2), heatMapsBlob->shape(3)};
                 mPeaksSize = std::array<int, 4>{peaksBlob->shape(0), peaksBlob->shape(1), peaksBlob->shape(2),
                                                 peaksBlob->shape(3)};
             #else
                 UNUSED(bottom);
-                UNUSED(top);
             #endif
         }
         catch (const std::exception& e)
@@ -202,8 +175,8 @@ namespace op
                                     heatMapsGpuPtr, peaksGpuPtr);
             #else
                 UNUSED(bottom);
-                UNUSED(top);
                 UNUSED(poseKeypoints);
+                UNUSED(poseScores);
                 error("OpenPose must be compiled with the `USE_CAFFE` & `USE_CUDA` macro definitions in order to run"
                       " this functionality.", __LINE__, __FUNCTION__, __FILE__);
             #endif

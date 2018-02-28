@@ -114,7 +114,7 @@ namespace op
         }
     }
 
-    void uCharCvMatToFloatPtr(float* floatPtrImage, const cv::Mat& cvImage, const bool normalize)
+    void uCharCvMatToFloatPtr(float* floatPtrImage, const cv::Mat& cvImage, const int normalize)
     {
         try
         {
@@ -142,11 +142,24 @@ namespace op
                 // Empirically tested - OpenCV is more efficient normalizing a whole matrix/image (it uses AVX and
                 // other optimized instruction sets).
                 // In addition, the following if statement does not copy the pointer to a cv::Mat, just wrapps it.
-            if (normalize)
+            if (normalize == 1)
             {
                 cv::Mat floatPtrImageCvWrapper(height, width, CV_32FC3, floatPtrImage);
                 floatPtrImageCvWrapper = floatPtrImageCvWrapper/256.f - 0.5f;
             }
+            else if (normalize == 2)
+            {
+                const int imageArea = width * height;
+                const std::array<float,3> means{102.9801, 115.9465, 122.7717};
+                for (auto i = 0 ; i < 3 ; i++)
+                {
+                    cv::Mat floatPtrImageCvWrapper(height, width, CV_32FC1, floatPtrImage + i*imageArea);
+                    floatPtrImageCvWrapper = floatPtrImageCvWrapper - means[i];
+                }
+            }
+            else if (normalize != 0)
+                error("Unknown normalization value (" + std::to_string(normalize) + ").",
+                      __LINE__, __FUNCTION__, __FILE__);
         }
         catch (const std::exception& e)
         {
