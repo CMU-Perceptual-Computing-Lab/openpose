@@ -469,14 +469,14 @@ namespace op
             // GPU --> user picks (<= #GPUs)
             else
             {
+                // Get total number GPUs
+                const auto totalGpuNumber = getGpuNumber();
                 // If number GPU < 0 --> set it to all the available GPUs
                 if (numberThreads < 0)
                 {
-                    // Get total number GPUs
-                    const auto totalGpuNumber = getGpuNumber();
                     if (totalGpuNumber <= gpuNumberStart)
-                        error("Number of initial GPUs (`--number_gpu_start`) must be lower than the total number of used"
-                              " GPUs (`--number_gpu`)", __LINE__, __FUNCTION__, __FILE__);
+                        error("Number of initial GPU (`--number_gpu_start`) must be lower than the total number of"
+                              " used GPUs (`--number_gpu`)", __LINE__, __FUNCTION__, __FILE__);
                     numberThreads = totalGpuNumber - gpuNumberStart;
                     // Reset initial GPU to 0 (we want them all)
                     // Logging message
@@ -484,6 +484,14 @@ namespace op
                         + " GPU(s), using " + std::to_string(numberThreads) + " of them starting at GPU "
                         + std::to_string(gpuNumberStart) + ".", Priority::High);
                 }
+                // Security check
+                if (gpuNumberStart + numberThreads > totalGpuNumber)
+                    error("Initial GPU selected (`--number_gpu_start`) + number GPUs to use (`--number_gpu`) must"
+                          " be lower or equal than the total number of GPUs in your machine ("
+                          + std::to_string(gpuNumberStart) + " + "
+                          + std::to_string(numberThreads) + " vs. "
+                          + std::to_string(totalGpuNumber) + ").",
+                          __LINE__, __FUNCTION__, __FILE__);
             }
 
             // Proper format
