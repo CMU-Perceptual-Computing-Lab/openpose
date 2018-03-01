@@ -13,7 +13,7 @@ namespace op
 
     OP_API void unrollArrayToUCharCvMat(cv::Mat& cvMatResult, const Array<float>& array);
 
-    OP_API void uCharCvMatToFloatPtr(float* floatPtrImage, const cv::Mat& cvImage, const bool normalize);
+    OP_API void uCharCvMatToFloatPtr(float* floatPtrImage, const cv::Mat& cvImage, const int normalize);
 
     OP_API double resizeGetScaleFactor(const Point<int>& initialSize, const Point<int>& targetSize);
 

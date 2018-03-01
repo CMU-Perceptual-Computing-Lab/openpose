@@ -15,6 +15,7 @@ namespace op
         {
             if (isOpened())
             {
+                mFrameNameCounter = 0;
                 if (webcamResolution != Point<int>{})
                 {
                     set(CV_CAP_PROP_FRAME_WIDTH, webcamResolution.x);
@@ -58,11 +59,24 @@ namespace op
         }
     }
 
-    std::string WebcamReader::getFrameName()
+    std::vector<cv::Mat> WebcamReader::getCameraMatrices()
     {
         try
         {
-            return VideoCaptureReader::getFrameName();
+            return {};
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return {};
+        }
+    }
+
+    std::string WebcamReader::getNextFrameName()
+    {
+        try
+        {
+            return VideoCaptureReader::getNextFrameName();
         }
         catch (const std::exception& e)
         {
@@ -138,6 +152,19 @@ namespace op
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             return cv::Mat();
+        }
+    }
+
+    std::vector<cv::Mat> WebcamReader::getRawFrames()
+    {
+        try
+        {
+            return std::vector<cv::Mat>{getRawFrame()};
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return {};
         }
     }
 

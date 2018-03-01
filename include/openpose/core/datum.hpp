@@ -85,7 +85,7 @@ namespace op
 
         /**
          * Body pose heatmaps (body parts, background and/or PAFs) for the whole image.
-         * This parameters is by default empty and disabled for performance. Each group (body parts, background and
+         * This parameter is by default empty and disabled for performance. Each group (body parts, background and
          * PAFs) can be individually enabled.
          * #heatmaps = #body parts (if enabled) + 1 (if background enabled) + 2 x #PAFs (if enabled). Each PAF has 2
          * consecutive channels, one for x- and one for y-coordinates.
@@ -96,6 +96,17 @@ namespace op
          * Size: #heatmaps x output_net_height x output_net_width
          */
         Array<float> poseHeatMaps;
+
+        /**
+         * Body pose candidates for the whole image.
+         * This parameter is by default empty and disabled for performance. It can be enabled with `candidates_body`.
+         * Candidates refer to all the detected body parts, before being assembled into people. Note that the number
+         * of candidates is equal or higher than the number of body parts after being assembled into people.
+         * Size: #body parts x min(part candidates, POSE_MAX_PEOPLE) x 3 (x,y,score).
+         * Rather than vector, it should ideally be:
+         * std::array<std::vector<std::array<float,3>>, #BP> poseCandidates;
+         */
+        std::vector<std::vector<std::array<float,3>>> poseCandidates;
 
         /**
          * Face detection locations (x,y,width,height) for each person in the image.
@@ -134,13 +145,40 @@ namespace op
         std::array<Array<float>, 2> handKeypoints;
 
         /**
-         * Face pose heatmaps (hand parts and/or background) for the whole image.
+         * Hand pose heatmaps (hand parts and/or background) for the whole image.
          * Analogous of faceHeatMaps applied to face.
          * Size each Array: #people x #hand parts (21) x output_net_height x output_net_width
          */
         std::array<Array<float>, 2> handHeatMaps;
 
-        // ---------------------------------------- Other parameters ---------------------------------------- //
+        // ---------------------------------------- 3-D Reconstruction parameters ---------------------------------------- //
+        /**
+         * Body pose (x,y,z,score) locations for each person in the image.
+         * Size: #people x #body parts (e.g. 18 for COCO or 15 for MPI) x 4 ((x,y,z) coordinates + score)
+         */
+        Array<float> poseKeypoints3D;
+
+        /**
+         * Face keypoints (x,y,z,score) locations for each person in the image.
+         * It has been resized to the same resolution as `poseKeypoints3D`.
+         * Size: #people x #face parts (70) x 4 ((x,y,z) coordinates + score)
+         */
+        Array<float> faceKeypoints3D;
+
+        /**
+         * Hand keypoints (x,y,z,score) locations for each person in the image.
+         * It has been resized to the same resolution as `poseKeypoints3D`.
+         * handKeypoints[0] corresponds to left hands, and handKeypoints[1] to right ones.
+         * Size each Array: #people x #hand parts (21) x 4 ((x,y,z) coordinates + score)
+         */
+        std::array<Array<float>, 2> handKeypoints3D;
+
+        /**
+         * 3x4 camera matrix of the camera.
+         */
+        cv::Mat cameraMatrix;
+
+        // ---------------------------------------- Other (internal) parameters ---------------------------------------- //
         /**
          * Scale ratio between the input Datum::cvInputData and the net input size.
          */
@@ -293,6 +331,12 @@ namespace op
             return id != datum.id;
         }
     };
+
+    // Defines for Datum. Added here rather than in `macros.hpp` to avoid circular dependencies
+    #define DATUM_BASE_NO_PTR std::vector<Datum>
+    #define DATUM_BASE std::shared_ptr<DATUM_BASE_NO_PTR>
+    #define DEFINE_TEMPLATE_DATUM(templateName) template class OP_API templateName<DATUM_BASE>
+    #define COMPILE_TEMPLATE_DATUM(templateName) extern DEFINE_TEMPLATE_DATUM(templateName)
 }
 
 #endif // OPENPOSE_CORE_DATUM_HPP

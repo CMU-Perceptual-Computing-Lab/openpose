@@ -19,7 +19,7 @@ namespace op
     OP_API void renderKeypointsCpu(Array<float>& frameArray, const Array<float>& keypoints,
                                    const std::vector<unsigned int>& pairs, const std::vector<float> colors,
                                    const float thicknessCircleRatio, const float thicknessLineRatioWRTCircle,
-                                   const float threshold);
+                                   const std::vector<float>& poseScales, const float threshold);
 
     OP_API Rectangle<float> getKeypointsRectangle(const Array<float>& keypoints, const int person,
                                                   const float threshold);

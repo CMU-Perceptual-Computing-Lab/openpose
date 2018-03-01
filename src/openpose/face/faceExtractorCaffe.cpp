@@ -1,4 +1,4 @@
-#if defined USE_CAFFE && defined USE_CUDA
+#if defined USE_CAFFE
     #include <caffe/blob.hpp>
 #endif
 #include <opencv2/opencv.hpp> // CV_WARP_INVERSE_MAP, CV_INTER_LINEAR
@@ -6,7 +6,7 @@
 #include <openpose/core/netCaffe.hpp>
 #include <openpose/core/resizeAndMergeCaffe.hpp>
 #include <openpose/face/faceParameters.hpp>
-#include <openpose/utilities/cuda.hpp>
+#include <openpose/gpu/cuda.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/openCv.hpp>
 #include <openpose/face/faceExtractorCaffe.hpp>
@@ -15,8 +15,9 @@ namespace op
 {
     struct FaceExtractorCaffe::ImplFaceExtractorCaffe
     {
-        #if defined USE_CAFFE && defined USE_CUDA
+        #if defined USE_CAFFE
             bool netInitialized;
+            const int mGpuId;
             std::shared_ptr<NetCaffe> spNetCaffe;
             std::shared_ptr<ResizeAndMergeCaffe<float>> spResizeAndMergeCaffe;
             std::shared_ptr<MaximumCaffe<float>> spMaximumCaffe;
@@ -27,6 +28,7 @@ namespace op
 
             ImplFaceExtractorCaffe(const std::string& modelFolder, const int gpuId, const bool enableGoogleLogging) :
                 netInitialized{false},
+                mGpuId{gpuId},
                 spNetCaffe{std::make_shared<NetCaffe>(modelFolder + FACE_PROTOTXT, modelFolder + FACE_TRAINED_MODEL,
                                                       gpuId, enableGoogleLogging)},
                 spResizeAndMergeCaffe{std::make_shared<ResizeAndMergeCaffe<float>>()},
@@ -36,7 +38,7 @@ namespace op
         #endif
     };
 
-    #if defined USE_CAFFE && defined USE_CUDA
+    #if defined USE_CAFFE
         void updateFaceHeatMapsForPerson(Array<float>& heatMaps, const int person, const ScaleMode heatMapScaleMode,
                                          const float* heatMapsGpuPtr)
         {
@@ -47,8 +49,13 @@ namespace op
                 const auto volumeBodyParts = FACE_NUMBER_PARTS * channelOffset;
                 auto totalOffset = 0u;
                 auto* heatMapsPtr = &heatMaps.getPtr()[person*volumeBodyParts];
-                // Copy face parts
-                cudaMemcpy(heatMapsPtr, heatMapsGpuPtr, volumeBodyParts * sizeof(float), cudaMemcpyDeviceToHost);
+                // Copy face parts                                      
+                #ifdef USE_CUDA
+                    cudaMemcpy(heatMapsPtr, heatMapsGpuPtr, volumeBodyParts * sizeof(float), cudaMemcpyDeviceToHost);
+                #else
+                    //std::memcpy(heatMapsPtr, heatMapsGpuPtr, volumeBodyParts * sizeof(float));
+                    std::copy(heatMapsGpuPtr, heatMapsGpuPtr + volumeBodyParts, heatMapsPtr);
+                #endif
                 // Change from [0,1] to [-1,1]
                 if (heatMapScaleMode == ScaleMode::PlusMinusOne)
                     for (auto i = 0u ; i < volumeBodyParts ; i++)
@@ -73,18 +80,21 @@ namespace op
                                               std::shared_ptr<MaximumCaffe<float>>& maximumCaffe,
                                               boost::shared_ptr<caffe::Blob<float>>& caffeNetOutputBlob,
                                               std::shared_ptr<caffe::Blob<float>>& heatMapsBlob,
-                                              std::shared_ptr<caffe::Blob<float>>& peaksBlob)
+                                              std::shared_ptr<caffe::Blob<float>>& peaksBlob,
+                                              const int gpuID)
         {
             try
             {
                 // HeatMaps extractor blob and layer
                 const bool mergeFirstDimension = true;
                 resizeAndMergeCaffe->Reshape({caffeNetOutputBlob.get()}, {heatMapsBlob.get()},
-                                             FACE_CCN_DECREASE_FACTOR, 1.f, mergeFirstDimension);
+                                             FACE_CCN_DECREASE_FACTOR, 1.f, mergeFirstDimension, gpuID);
                 // Pose extractor blob and layer
                 maximumCaffe->Reshape({heatMapsBlob.get()}, {peaksBlob.get()});
                 // Cuda check
-                cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+                #ifdef USE_CUDA
+                    cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+                #endif
             }
             catch (const std::exception& e)
             {
@@ -98,13 +108,13 @@ namespace op
                                            const std::vector<HeatMapType>& heatMapTypes,
                                            const ScaleMode heatMapScale, const bool enableGoogleLogging) :
         FaceExtractor{netInputSize, netOutputSize, heatMapTypes, heatMapScale}
-        #if defined USE_CAFFE && defined USE_CUDA
+        #if defined USE_CAFFE
         , upImpl{new ImplFaceExtractorCaffe{modelFolder, gpuId, enableGoogleLogging}}
         #endif
     {
         try
         {
-            #if !defined USE_CAFFE || !defined USE_CUDA
+            #if !defined USE_CAFFE
                 UNUSED(netInputSize);
                 UNUSED(netOutputSize);
                 UNUSED(modelFolder);
@@ -129,17 +139,21 @@ namespace op
     {
         try
         {
-            #if defined USE_CAFFE && defined USE_CUDA
+            #if defined USE_CAFFE
                 // Logging
                 log("Starting initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 // Initialize Caffe net
                 upImpl->spNetCaffe->initializationOnThread();
-                cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+                #ifdef USE_CUDA
+                    cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+                #endif
                 // Initialize blobs
                 upImpl->spCaffeNetOutputBlob = upImpl->spNetCaffe->getOutputBlob();
                 upImpl->spHeatMapsBlob = {std::make_shared<caffe::Blob<float>>(1,1,1,1)};
                 upImpl->spPeaksBlob = {std::make_shared<caffe::Blob<float>>(1,1,1,1)};
-                cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+                #ifdef USE_CUDA
+                    cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+                #endif
                 // Logging
                 log("Finished initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             #endif
@@ -156,7 +170,7 @@ namespace op
     {
         try
         {
-            #if defined USE_CAFFE && defined USE_CUDA
+            #if defined USE_CAFFE
                 if (!faceRectangles.empty())
                 {
                     // Security checks
@@ -230,7 +244,7 @@ namespace op
                                 upImpl->netInitialized = true;
                                 reshapeFaceExtractorCaffe(upImpl->spResizeAndMergeCaffe, upImpl->spMaximumCaffe,
                                                           upImpl->spCaffeNetOutputBlob, upImpl->spHeatMapsBlob,
-                                                          upImpl->spPeaksBlob);
+                                                          upImpl->spPeaksBlob, upImpl->mGpuId);
                             }
 
                             // 2. Resize heat maps + merge different scales
@@ -238,6 +252,9 @@ namespace op
                                 upImpl->spResizeAndMergeCaffe->Forward_gpu({upImpl->spCaffeNetOutputBlob.get()},
                                                                            {upImpl->spHeatMapsBlob.get()});
                                 cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+                            #elif USE_OPENCL
+                                upImpl->spResizeAndMergeCaffe->Forward_ocl({upImpl->spCaffeNetOutputBlob.get()},
+                                                                           {upImpl->spHeatMapsBlob.get()});
                             #else
                                 upImpl->spResizeAndMergeCaffe->Forward_cpu({upImpl->spCaffeNetOutputBlob.get()},
                                                                            {upImpl->spHeatMapsBlob.get()});
@@ -248,6 +265,9 @@ namespace op
                                 upImpl->spMaximumCaffe->Forward_gpu({upImpl->spHeatMapsBlob.get()},
                                                                     {upImpl->spPeaksBlob.get()});
                                 cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+                            #elif USE_OPENCL
+                                // CPU Version is already very fast (4ms) and data is sent to connectKeypoints as CPU for now anyway
+                                upImpl->spMaximumCaffe->Forward_cpu({upImpl->spHeatMapsBlob.get()}, {upImpl->spPeaksBlob.get()});
                             #else
                                 upImpl->spMaximumCaffe->Forward_cpu({upImpl->spHeatMapsBlob.get()},
                                                                     {upImpl->spPeaksBlob.get()});
@@ -273,9 +293,15 @@ namespace op
                                 mFaceKeypoints[baseIndex+2] = score;
                             }
                             // HeatMaps: storing
-                            if (!mHeatMapTypes.empty())
-                                updateFaceHeatMapsForPerson(mHeatMaps, person, mHeatMapScaleMode,
-                                                            upImpl->spHeatMapsBlob->gpu_data());
+                            if (!mHeatMapTypes.empty()){
+                                #ifdef USE_CUDA
+                                    updateFaceHeatMapsForPerson(mHeatMaps, person, mHeatMapScaleMode,
+                                                                upImpl->spHeatMapsBlob->gpu_data());
+                                #else
+                                    updateFaceHeatMapsForPerson(mHeatMaps, person, mHeatMapScaleMode,
+                                                                upImpl->spHeatMapsBlob->cpu_data());
+                                #endif
+                            }
                         }
                     }
                     // // Debugging

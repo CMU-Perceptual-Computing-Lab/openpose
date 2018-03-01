@@ -21,6 +21,8 @@ namespace op
 
         void arrayClose();
 
+        void version(const std::string& version);
+
         void key(const std::string& string);
 
         template <typename T>

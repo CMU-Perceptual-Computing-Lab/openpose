@@ -71,19 +71,22 @@ tags
 *.opendb
 *.pdb
 
-######################### Windows (Visual Studio) Folders #########################
+######################### Windows (Visual Studio) Folders and Compressed files #########################
 *.vs/
 *x64/
 3rdparty/windows/caffe/
+3rdparty/windows/caffe_opencl/
 3rdparty/windows/caffe3rdparty/
 3rdparty/windows/opencv/
 3rdparty/windows/freeglut/
 3rdparty/windows/spinnaker/
+3rdparty/windows/*zip
 # Allowing this file (removed *.user for Qt)
 !*.vcxproj.user
 
 ######################### Caffe Files / Folders #########################
 # User's build configuration
+Makefile
 Makefile.config
 
 # Data and models are either
@@ -92,8 +95,6 @@ Makefile.config
 3rdparty/caffe/.git
 3rdparty/caffe/.github
 distribute/
-.build_release/
-.build_debug/
 *.caffemodel
 *.caffemodel.h5
 *.solverstate
@@ -102,12 +103,15 @@ distribute/
 *leveldb
 *lmdb
 
+# Camera parameters
+*.xml
+
 ######################### Compilation (build, distribute & bins) Files / Folders #########################
 *.bin
 *.testbin
 build
-*build_debug/
-*build_release/
+build*
+.build*
 *cmake_build
 distribute/*
 python/caffe/proto/

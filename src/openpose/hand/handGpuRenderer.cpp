@@ -2,8 +2,8 @@
     #include <cuda.h>
     #include <cuda_runtime_api.h>
 #endif
+#include <openpose/gpu/cuda.hpp>
 #include <openpose/hand/renderHand.hpp>
-#include <openpose/utilities/cuda.hpp>
 #include <openpose/hand/handGpuRenderer.hpp>
 
 namespace op

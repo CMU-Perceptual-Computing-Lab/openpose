@@ -62,7 +62,8 @@ namespace op
         try
         {
             mIsLastRenderer = false;
-            return std::make_tuple(spGpuMemory, spGpuMemoryAllocated, spElementToRender, spVolume, spNumberElementsToRender);
+            return std::make_tuple(spGpuMemory, spGpuMemoryAllocated, spElementToRender, spVolume,
+                                   spNumberElementsToRender);
         }
         catch (const std::exception& e)
         {

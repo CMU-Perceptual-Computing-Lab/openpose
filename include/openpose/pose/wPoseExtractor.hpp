@@ -61,7 +61,8 @@ namespace op
                     spPoseExtractor->forwardPass(tDatum.inputNetData,
                                                  Point<int>{tDatum.cvInputData.cols, tDatum.cvInputData.rows},
                                                  tDatum.scaleInputToNetInputs);
-                    tDatum.poseHeatMaps = spPoseExtractor->getHeatMaps().clone();
+                    tDatum.poseCandidates = spPoseExtractor->getCandidatesCopy();
+                    tDatum.poseHeatMaps = spPoseExtractor->getHeatMapsCopy();
                     tDatum.poseKeypoints = spPoseExtractor->getPoseKeypoints().clone();
                     tDatum.poseScores = spPoseExtractor->getPoseScores().clone();
                     tDatum.scaleNetToOutput = spPoseExtractor->getScaleNetToOutput();

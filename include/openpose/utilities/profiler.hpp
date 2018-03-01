@@ -21,15 +21,22 @@ namespace op
     class OP_API Profiler
     {
     public:
-        static const unsigned long long DEFAULT_X;
+        static unsigned long long DEFAULT_X;
+
+        // Non-thread safe, it must be performed at the beginning of the code before any parallelization occurs
+        static void setDefaultX(const unsigned long long defaultX);
 
         static const std::string timerInit(const int line, const std::string& function, const std::string& file);
 
         static void timerEnd(const std::string& key);
 
-        static void printAveragedTimeMsOnIterationX(const std::string& key, const int line, const std::string& function, const std::string& file, const unsigned long long x = DEFAULT_X);
+        static void printAveragedTimeMsOnIterationX(const std::string& key, const int line,
+                                                    const std::string& function, const std::string& file,
+                                                    const unsigned long long x = DEFAULT_X);
 
-        static void printAveragedTimeMsEveryXIterations(const std::string& key, const int line, const std::string& function, const std::string& file, const unsigned long long x = DEFAULT_X);
+        static void printAveragedTimeMsEveryXIterations(const std::string& key, const int line,
+                                                        const std::string& function, const std::string& file,
+                                                        const unsigned long long x = DEFAULT_X);
 
         static void profileGpuMemory(const int line, const std::string& function, const std::string& file);
     };

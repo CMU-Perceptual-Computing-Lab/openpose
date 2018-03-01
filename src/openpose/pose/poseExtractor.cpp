@@ -44,11 +44,12 @@ namespace op
     }
 
     PoseExtractor::PoseExtractor(const PoseModel poseModel, const std::vector<HeatMapType>& heatMapTypes,
-                                 const ScaleMode heatMapScale) :
+                                 const ScaleMode heatMapScale, const bool addPartCandidates) :
         mPoseModel{poseModel},
         mNetOutputSize{0,0},
         mHeatMapTypes{heatMapTypes},
-        mHeatMapScaleMode{heatMapScale}
+        mHeatMapScaleMode{heatMapScale},
+        mAddPartCandidates{addPartCandidates}
     {
         try
         {
@@ -93,7 +94,7 @@ namespace op
         }
     }
 
-    Array<float> PoseExtractor::getHeatMaps() const
+    Array<float> PoseExtractor::getHeatMapsCopy() const
     {
         try
         {
@@ -212,6 +213,43 @@ namespace op
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             return Array<float>{};
+        }
+    }
+
+    std::vector<std::vector<std::array<float,3>>> PoseExtractor::getCandidatesCopy() const
+    {
+        try
+        {
+            // Security check
+            checkThread();
+            // Initialization
+            std::vector<std::vector<std::array<float,3>>> candidates;
+            // Fill candidates
+            if (mAddPartCandidates)
+            {
+                const auto numberBodyParts = getPoseNumberBodyParts(mPoseModel);
+                candidates.resize(numberBodyParts);
+                const auto peaksArea = (POSE_MAX_PEOPLE+1) * 3;
+                // Memory copy
+                const auto* candidatesCpuPtr = getCandidatesCpuConstPtr();
+                for (auto part = 0u ; part < numberBodyParts ; part++)
+                {
+                    const auto numberPartCandidates = candidatesCpuPtr[part*peaksArea];
+                    candidates[part].resize(numberPartCandidates);
+                    const auto* partCandidatesPtr = &candidatesCpuPtr[part*peaksArea+3];
+                    for (auto candidate = 0 ; candidate < numberPartCandidates ; candidate++)
+                        candidates[part][candidate] = {partCandidatesPtr[3*candidate],
+                                                       partCandidatesPtr[3*candidate+1],
+                                                       partCandidatesPtr[3*candidate+2]};
+                }
+            }
+            // Return
+            return candidates;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return std::vector<std::vector<std::array<float,3>>>{};
         }
     }
 

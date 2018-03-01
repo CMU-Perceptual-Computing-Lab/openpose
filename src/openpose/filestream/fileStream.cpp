@@ -12,17 +12,131 @@ namespace op
     const auto errorMessage = "Json format only implemented in OpenCV for versions >= 3.0. Check savePoseJson"
                               " instead.";
 
-    std::string dataFormatToString(const DataFormat format)
+    std::string getFullName(const std::string& fileNameNoExtension, const DataFormat dataFormat)
+    {
+        return fileNameNoExtension + "." + dataFormatToString(dataFormat);
+    }
+
+    void addKeypointsToJson(JsonOfstream& jsonOfstream,
+                            const std::vector<std::pair<Array<float>, std::string>>& keypointVector)
     {
         try
         {
-            if (format == DataFormat::Json)
+            // Security checks
+            for (const auto& keypointPair : keypointVector)
+                if (!keypointPair.first.empty() && keypointPair.first.getNumberDimensions() != 3 )
+                    error("keypointVector.getNumberDimensions() != 3.", __LINE__, __FUNCTION__, __FILE__);
+            // Add people keypoints
+            jsonOfstream.key("people");
+            jsonOfstream.arrayOpen();
+            // Ger max numberPeople
+            auto numberPeople = 0;
+            for (auto vectorIndex = 0u ; vectorIndex < keypointVector.size() ; vectorIndex++)
+                numberPeople = fastMax(numberPeople, keypointVector[vectorIndex].first.getSize(0));
+            for (auto person = 0 ; person < numberPeople ; person++)
+            {
+                jsonOfstream.objectOpen();
+                for (auto vectorIndex = 0u ; vectorIndex < keypointVector.size() ; vectorIndex++)
+                {
+                    const auto& keypoints = keypointVector[vectorIndex].first;
+                    const auto& keypointName = keypointVector[vectorIndex].second;
+                    const auto numberElementsPerRaw = keypoints.getSize(1) * keypoints.getSize(2);
+                    jsonOfstream.key(keypointName);
+                    jsonOfstream.arrayOpen();
+                    // Body parts
+                    if (numberElementsPerRaw > 0)
+                    {
+                        const auto finalIndex = person*numberElementsPerRaw;
+                        for (auto element = 0 ; element < numberElementsPerRaw - 1 ; element++)
+                        {
+                            jsonOfstream.plainText(keypoints[finalIndex + element]);
+                            jsonOfstream.comma();
+                        }
+                        // Last element (no comma)
+                        jsonOfstream.plainText(keypoints[finalIndex + numberElementsPerRaw - 1]);
+                    }
+                    // Close array
+                    jsonOfstream.arrayClose();
+                    if (vectorIndex < keypointVector.size()-1)
+                        jsonOfstream.comma();
+                }
+                jsonOfstream.objectClose();
+                if (person < numberPeople-1)
+                {
+                    jsonOfstream.comma();
+                    jsonOfstream.enter();
+                }
+            }
+            // Close bodies array
+            jsonOfstream.arrayClose();
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    void addCandidatesToJson(JsonOfstream& jsonOfstream,
+                             const std::vector<std::vector<std::array<float,3>>>& candidates)
+    {
+        try
+        {
+            // Add body part candidates
+            jsonOfstream.key("part_candidates");
+            jsonOfstream.arrayOpen();
+            // Ger max numberParts
+            auto numberParts = candidates.size();
+            jsonOfstream.objectOpen();
+            for (auto part = 0u ; part < numberParts ; part++)
+            {
+                // Open array
+                jsonOfstream.key(std::to_string(part));
+                jsonOfstream.arrayOpen();
+                // Iterate over part candidates
+                const auto& partCandidates = candidates[part];
+                const auto numberPartCandidates = partCandidates.size();
+                // Body part candidates
+                for (auto bodyPart = 0u ; bodyPart < numberPartCandidates ; bodyPart++)
+                {
+                    const auto& candidate = partCandidates[bodyPart];
+                    jsonOfstream.plainText(candidate[0]);
+                    jsonOfstream.comma();
+                    jsonOfstream.plainText(candidate[1]);
+                    jsonOfstream.comma();
+                    jsonOfstream.plainText(candidate[2]);
+                    if (bodyPart < numberPartCandidates-1)
+                        jsonOfstream.comma();
+                }
+                jsonOfstream.arrayClose();
+                if (part < numberParts-1)
+                    jsonOfstream.comma();
+            }
+            jsonOfstream.objectClose();
+            // Close array
+            jsonOfstream.arrayClose();
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+
+
+
+
+    // Public classes (on *.hpp)
+    std::string dataFormatToString(const DataFormat dataFormat)
+    {
+        try
+        {
+            if (dataFormat == DataFormat::Json)
                 return "json";
-            else if (format == DataFormat::Xml)
+            else if (dataFormat == DataFormat::Xml)
                 return "xml";
-            else if (format == DataFormat::Yaml)
+            else if (dataFormat == DataFormat::Yaml)
                 return "yaml";
-            else if (format == DataFormat::Yml)
+            else if (dataFormat == DataFormat::Yml)
                 return "yml";
             else
             {
@@ -37,16 +151,6 @@ namespace op
         }
     }
 
-    std::string getFullName(const std::string& fileNameNoExtension, const DataFormat format)
-    {
-        return fileNameNoExtension + "." + dataFormatToString(format);
-    }
-
-
-
-
-
-    // Public classes (on *.hpp)
     DataFormat stringToDataFormat(const std::string& dataFormat)
     {
         try
@@ -61,7 +165,7 @@ namespace op
                 return DataFormat::Yml;
             else
             {
-                error("String does not correspond to any format (json, xml, yaml, yml)",
+                error("String does not correspond to any known format (json, xml, yaml, yml)",
                       __LINE__, __FUNCTION__, __FILE__);
                 return DataFormat::Json;
             }
@@ -101,17 +205,18 @@ namespace op
     }
 
     void saveData(const std::vector<cv::Mat>& cvMats, const std::vector<std::string>& cvMatNames,
-                  const std::string& fileNameNoExtension, const DataFormat format)
+                  const std::string& fileNameNoExtension, const DataFormat dataFormat)
     {
         try
         {
             // Security checks
-            if (format == DataFormat::Json && CV_MAJOR_VERSION < 3)
+            if (dataFormat == DataFormat::Json && CV_MAJOR_VERSION < 3)
                 error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
             if (cvMats.size() != cvMatNames.size())
-                error("cvMats.size() != cvMatNames.size()", __LINE__, __FUNCTION__, __FILE__);
+                error("cvMats.size() != cvMatNames.size() (" + std::to_string(cvMats.size())
+                      + " vs. " + std::to_string(cvMatNames.size()) + ")", __LINE__, __FUNCTION__, __FILE__);
             // Save cv::Mat data
-            cv::FileStorage fileStorage{getFullName(fileNameNoExtension, format), cv::FileStorage::WRITE};
+            cv::FileStorage fileStorage{getFullName(fileNameNoExtension, dataFormat), cv::FileStorage::WRITE};
             for (auto i = 0u ; i < cvMats.size() ; i++)
                 fileStorage << cvMatNames[i] << (cvMats[i].empty() ? cv::Mat() : cvMats[i]);
             // Release file
@@ -124,11 +229,12 @@ namespace op
     }
 
     void saveData(const cv::Mat& cvMat, const std::string cvMatName, const std::string& fileNameNoExtension,
-                  const DataFormat format)
+                  const DataFormat dataFormat)
     {
         try
         {
-            saveData(std::vector<cv::Mat>{cvMat}, std::vector<std::string>{cvMatName}, fileNameNoExtension, format);
+            saveData(std::vector<cv::Mat>{cvMat}, std::vector<std::string>{cvMatName}, fileNameNoExtension,
+                     dataFormat);
         }
         catch (const std::exception& e)
         {
@@ -137,14 +243,19 @@ namespace op
     }
 
     std::vector<cv::Mat> loadData(const std::vector<std::string>& cvMatNames, const std::string& fileNameNoExtension,
-                                  const DataFormat format)
+                                  const DataFormat dataFormat)
     {
         try
         {
-            if (format == DataFormat::Json && CV_MAJOR_VERSION < 3)
+            // Security checks
+            if (dataFormat == DataFormat::Json && CV_MAJOR_VERSION < 3)
                 error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
-
-            cv::FileStorage fileStorage{getFullName(fileNameNoExtension, format), cv::FileStorage::READ};
+            const auto fileName = getFullName(fileNameNoExtension, dataFormat);
+            // Security checks
+            if (!existFile(fileName))
+                error("File to be read does not exist: " + fileName + ".", __LINE__, __FUNCTION__, __FILE__);
+            // Read file
+            cv::FileStorage fileStorage{fileName, cv::FileStorage::READ};
             std::vector<cv::Mat> cvMats(cvMatNames.size());
             for (auto i = 0u ; i < cvMats.size() ; i++)
                 fileStorage[cvMatNames[i]] >> cvMats[i];
@@ -158,11 +269,11 @@ namespace op
         }
     }
 
-    cv::Mat loadData(const std::string& cvMatName, const std::string& fileNameNoExtension, const DataFormat format)
+    cv::Mat loadData(const std::string& cvMatName, const std::string& fileNameNoExtension, const DataFormat dataFormat)
     {
         try
         {
-            return loadData(std::vector<std::string>{cvMatName}, fileNameNoExtension, format)[0];
+            return loadData(std::vector<std::string>{cvMatName}, fileNameNoExtension, dataFormat)[0];
         }
         catch (const std::exception& e)
         {
@@ -171,13 +282,15 @@ namespace op
         }
     }
 
-    void saveKeypointsJson(const Array<float>& keypoints, const std::string& keypointName, const std::string& fileName,
-                           const bool humanReadable)
+    void savePeopleJson(const Array<float>& keypoints,
+                        const std::vector<std::vector<std::array<float,3>>>& candidates,
+                        const std::string& keypointName, const std::string& fileName,
+                        const bool humanReadable)
     {
         try
         {
-            saveKeypointsJson(
-                std::vector<std::pair<Array<float>, std::string>>{std::make_pair(keypoints, keypointName)},
+            savePeopleJson(
+                std::vector<std::pair<Array<float>, std::string>>{std::make_pair(keypoints, keypointName)}, candidates,
                 fileName, humanReadable
             );
         }
@@ -187,8 +300,9 @@ namespace op
         }
     }
 
-    void saveKeypointsJson(const std::vector<std::pair<Array<float>, std::string>>& keypointVector,
-                           const std::string& fileName, const bool humanReadable)
+    void savePeopleJson(const std::vector<std::pair<Array<float>, std::string>>& keypointVector,
+                        const std::vector<std::vector<std::array<float,3>>>& candidates,
+                        const std::string& fileName, const bool humanReadable)
     {
         try
         {
@@ -199,52 +313,21 @@ namespace op
             // Record frame on desired path
             JsonOfstream jsonOfstream{fileName, humanReadable};
             jsonOfstream.objectOpen();
-            // Version
-            jsonOfstream.key("version");
-            jsonOfstream.plainText("1.0");
+            // Add version
+            // Version 0.1: Body keypoints (2-D)
+            // Version 1.0: Added face and hands (2-D)
+            // Version 1.1: Added candidates
+            // Version 1.2: Added body, face, and hands (3-D)
+            jsonOfstream.version("1.2");
             jsonOfstream.comma();
-            // Bodies
-            jsonOfstream.key("people");
-            jsonOfstream.arrayOpen();
-            // Ger max numberPeople
-            auto numberPeople = 0;
-            for (auto vectorIndex = 0u ; vectorIndex < keypointVector.size() ; vectorIndex++)
-                numberPeople = fastMax(numberPeople, keypointVector[vectorIndex].first.getSize(0));
-            for (auto person = 0 ; person < numberPeople ; person++)
+            // Add people keypoints
+            addKeypointsToJson(jsonOfstream, keypointVector);
+            // Add body part candidates
+            if (!candidates.empty())
             {
-                jsonOfstream.objectOpen();
-                for (auto vectorIndex = 0u ; vectorIndex < keypointVector.size() ; vectorIndex++)
-                {
-                    const auto& keypoints = keypointVector[vectorIndex].first;
-                    const auto& keypointName = keypointVector[vectorIndex].second;
-                    const auto numberBodyParts = keypoints.getSize(1);
-                    jsonOfstream.key(keypointName);
-                    jsonOfstream.arrayOpen();
-                    // Body parts
-                    for (auto bodyPart = 0 ; bodyPart < numberBodyParts ; bodyPart++)
-                    {
-                        const auto finalIndex = 3*(person*numberBodyParts + bodyPart);
-                        jsonOfstream.plainText(keypoints[finalIndex]);
-                        jsonOfstream.comma();
-                        jsonOfstream.plainText(keypoints[finalIndex+1]);
-                        jsonOfstream.comma();
-                        jsonOfstream.plainText(keypoints[finalIndex+2]);
-                        if (bodyPart < numberBodyParts-1)
-                            jsonOfstream.comma();
-                    }
-                    jsonOfstream.arrayClose();
-                    if (vectorIndex < keypointVector.size()-1)
-                        jsonOfstream.comma();
-                }
-                jsonOfstream.objectClose();
-                if (person < numberPeople-1)
-                {
-                    jsonOfstream.comma();
-                    jsonOfstream.enter();
-                }
+                jsonOfstream.comma();
+                addCandidatesToJson(jsonOfstream, candidates);
             }
-            // Close array
-            jsonOfstream.arrayClose();
             // Close object
             jsonOfstream.objectClose();
         }

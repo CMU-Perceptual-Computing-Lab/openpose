@@ -69,7 +69,7 @@ namespace op
                 std::vector<int> indexesInCocoOrder;
                 if (numberBodyParts == 18)
                     indexesInCocoOrder = std::vector<int>{0, 15,14,17,16,    5,2,6,3,7,    4,11,8,12, 9,    13,10};
-                else if (numberBodyParts == 19)
+                else if (numberBodyParts == 19 || numberBodyParts == 59)
                     indexesInCocoOrder = std::vector<int>{0, 16,15,18,17,    5,2,6,3,7,    4,12,9,13,10,    14,11};
                 else if (numberBodyParts == 23)
                     indexesInCocoOrder = std::vector<int>{18,21,19,22,20,    4,1,5,2,6,    3,13,8,14, 9,    15,10};

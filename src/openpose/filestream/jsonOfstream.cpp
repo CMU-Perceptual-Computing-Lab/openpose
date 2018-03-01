@@ -116,6 +116,19 @@ namespace op
         }
     }
 
+    void JsonOfstream::version(const std::string& version)
+    {
+        try
+        {
+            key("version");
+            plainText(version);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
     void JsonOfstream::key(const std::string& string)
     {
         try

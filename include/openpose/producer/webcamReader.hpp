@@ -29,7 +29,9 @@ namespace op
 
         ~WebcamReader();
 
-        std::string getFrameName();
+        std::vector<cv::Mat> getCameraMatrices();
+
+        std::string getNextFrameName();
 
         double get(const int capProperty);
 
@@ -45,6 +47,8 @@ namespace op
         std::thread mThread;
 
         cv::Mat getRawFrame();
+
+        std::vector<cv::Mat> getRawFrames();
 
         void bufferingThread();
 

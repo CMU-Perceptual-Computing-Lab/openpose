@@ -3,7 +3,6 @@
 
 // utilities module
 #include <openpose/utilities/check.hpp>
-#include <openpose/utilities/cuda.hpp>
 #include <openpose/utilities/enumClasses.hpp>
 #include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/utilities/fastMath.hpp>
