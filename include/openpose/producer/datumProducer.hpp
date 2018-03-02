@@ -89,13 +89,12 @@ namespace op
                 if (spVideoSeek != nullptr)
                 {
                     // Fake pause vs. normal mode
-                    const auto increment = spVideoSeek->second  + (spVideoSeek->first ? 1 : 0);
+                    const auto increment = spVideoSeek->second - (spVideoSeek->first ? 1 : 0);
                     // Normal mode
                     if (increment != 0)
-                    {
                         spProducer->set(CV_CAP_PROP_POS_FRAMES, spProducer->get(CV_CAP_PROP_POS_FRAMES) + increment);
-                        spVideoSeek->second = 0;
-                    }
+                    // It must be always reset or bug in fake pause
+                    spVideoSeek->second = 0;
                 }
                 auto nextFrameName = spProducer->getNextFrameName();
                 auto cvMats = spProducer->getFrames();

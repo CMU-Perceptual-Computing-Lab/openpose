@@ -31,7 +31,7 @@ namespace op
                        std::vector<std::shared_ptr<PoseExtractor>>& poseExtractors,
                        std::vector<std::shared_ptr<Renderer>>& renderers,
                        std::shared_ptr<std::atomic<bool>>& isRunningSharedPtr,
-                       std::shared_ptr<std::pair<std::atomic<bool>, std::atomic<int>>>& spVideoSeek)
+                       std::shared_ptr<std::pair<std::atomic<bool>, std::atomic<int>>>& videoSeekSharedPtr)
     {
         try
         {
@@ -63,20 +63,20 @@ namespace op
                 // Fake pause
                 else if (castedKey=='m')
                 {
-                    if (spVideoSeek != nullptr)
-                        spVideoSeek->first = !spVideoSeek->first;
+                    if (videoSeekSharedPtr != nullptr)
+                        videoSeekSharedPtr->first = !videoSeekSharedPtr->first;
                 }
                 // Seeking in video
                 else if (castedKey=='l' || castedKey=='k')
                 {
-                    if (spVideoSeek != nullptr)
+                    if (videoSeekSharedPtr != nullptr)
                     {
                         // Normal case, +-30 frames
-                        if (!spVideoSeek->first)
-                            spVideoSeek->second += 30 * (castedKey=='l' ? -2 : 1);
+                        if (!videoSeekSharedPtr->first)
+                            videoSeekSharedPtr->second += 30 * (castedKey=='l' ? -2 : 1);
                         // Frame by frame (if forced paused)
                         else
-                            spVideoSeek->second += (castedKey=='l' ? -1 : 1);
+                            videoSeekSharedPtr->second += (castedKey=='l' ? -1 : 1);
                     }
                 }
                 // Enable/disable blending
@@ -136,17 +136,17 @@ namespace op
     void handleUserInput(FrameDisplayer& frameDisplayer, std::vector<std::shared_ptr<PoseExtractor>>& poseExtractors,
                          std::vector<std::shared_ptr<Renderer>>& renderers,
                          std::shared_ptr<std::atomic<bool>>& isRunningSharedPtr,
-                         std::shared_ptr<std::pair<std::atomic<bool>, std::atomic<int>>>& spVideoSeek)
+                         std::shared_ptr<std::pair<std::atomic<bool>, std::atomic<int>>>& videoSeekSharedPtr)
     {
         try
         {
             // The handleUserInput must be always performed, even if no tDatum is detected
             bool guiPaused = false;
-            handleWaitKey(guiPaused, frameDisplayer, poseExtractors, renderers, isRunningSharedPtr, spVideoSeek);
+            handleWaitKey(guiPaused, frameDisplayer, poseExtractors, renderers, isRunningSharedPtr, videoSeekSharedPtr);
             while (guiPaused)
             {
                 std::this_thread::sleep_for(std::chrono::milliseconds{1});
-                handleWaitKey(guiPaused, frameDisplayer, poseExtractors, renderers, isRunningSharedPtr, spVideoSeek);
+                handleWaitKey(guiPaused, frameDisplayer, poseExtractors, renderers, isRunningSharedPtr, videoSeekSharedPtr);
             }
         }
         catch (const std::exception& e)
