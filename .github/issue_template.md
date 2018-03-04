@@ -40,6 +40,7 @@ You might select multiple topics, delete the rest:
 **Installation mode**: CMake, sh script, manual Makefile installation, ... (Ubuntu); VS2015, VS2017, CMake, ... (Windows); ...?
 **CUDA version** (`cat /usr/local/cuda/version.txt` in most cases):
 **cuDNN version**:
+**CMake version** (`cmake --version` in Ubuntu):
 **Release or Debug mode**? (by defualt: release):
 **3-D Reconstruction module added**? (by default: no):
 **GPU model** (`nvidia-smi` in Ubuntu):
