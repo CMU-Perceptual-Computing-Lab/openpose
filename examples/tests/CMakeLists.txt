@@ -1,6 +1,7 @@
 set(EXAMPLE_FILES
     handFromJsonTest.cpp
     resizeTest.cpp)
+add_subdirectory(tracking)
 
 foreach(EXAMPLE_FILE ${EXAMPLE_FILES})
 

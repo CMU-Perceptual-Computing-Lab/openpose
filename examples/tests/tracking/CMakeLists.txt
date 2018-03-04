@@ -1,5 +1,6 @@
 set(EXAMPLE_FILES
-    test_of.cpp)
+    test_of.cpp
+    test_of_speed.cpp)
 include_directories( ${OpenCV_INCLUDE_DIRS} )
 include_directories( "/home/lfragago/Documents/openpose/include" )
 foreach(EXAMPLE_FILE ${EXAMPLE_FILES})
