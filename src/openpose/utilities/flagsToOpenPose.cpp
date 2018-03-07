@@ -151,7 +151,7 @@ namespace op
                 return std::make_shared<ImageDirectoryReader>(imageDirectory, imageDirectoryStereo,
                                                               cameraParameterPath);
             else if (type == ProducerType::Video)
-                return std::make_shared<VideoReader>(videoPath);
+                return std::make_shared<VideoReader>(videoPath, imageDirectoryStereo, cameraParameterPath);
             else if (type == ProducerType::IPCamera)
                 return std::make_shared<IpCameraReader>(ipCameraPath);
             // Flir camera

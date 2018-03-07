@@ -187,9 +187,10 @@ OpenPose Library - Release Notes
     15. Camera parameters (flir camera) are read from disk at runtime rather than being compiled.
     16. 3-D reconstruction module can be implemented with different camera brands or custom image sources.
     17. Flag `--write_json` includes 3-D keypoints.
-    18. Flag `--image_dir_stereo` added to allow `--image_dir` to load stereo images.
+    18. 3-D reconstruction module can be used with images and videos. Flag `--3d_views` added to allow `--image_dir` and `--video` allow loading stereo images.
     19. Flag `--camera_resolution` applicable to `--flir_camera`.
     20. Throw error message if requested GPU IDs does not exist (e.g. asking for 2 GPUs starting in ID 1 if there is only 2 GPUs in total).
+    21. VideoSaver (`--write_video`) compatible with multi-camera setting. It will save all the different views concatenated.
 2. Functions or parameters renamed:
     1. Flag `no_display` renamed as `display`, able to select between `NoDisplay`, `Display2D`, `Display3D`, and `DisplayAll`.
     2. 3-D reconstruction demo is now inside the OpenPose demo binary.

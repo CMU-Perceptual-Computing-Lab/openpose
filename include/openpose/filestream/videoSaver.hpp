@@ -12,8 +12,6 @@ namespace op
     public:
         VideoSaver(const std::string& videoSaverPath, const int cvFourcc, const double fps, const Point<int>& cvSize);
 
-        VideoSaver(const std::vector<std::string>& videoSaverPaths, const int cvFourcc, const double fps, const Point<int>& cvSize);
-
         bool isOpened();
 
         void write(const cv::Mat& cvMat);
@@ -21,7 +19,12 @@ namespace op
         void write(const std::vector<cv::Mat>& cvMats);
 
     private:
-        std::vector<cv::VideoWriter> mVideoWriters;
+        const std::string mVideoSaverPath;
+        const int mCvFourcc;
+        const double mFps;
+        const Point<int> mCvSize;
+        cv::VideoWriter mVideoWriter;
+        unsigned int mNumberImages;
 
         DELETE_COPY(VideoSaver);
     };

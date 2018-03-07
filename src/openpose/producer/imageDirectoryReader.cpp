@@ -46,10 +46,10 @@ namespace op
             // Security check
             if (serialNumbers.size() != mImageDirectoryStereo && mImageDirectoryStereo > 1)
                 error("Found different number of camera parameter files than the number indicated by"
-                      " `--image_dir_stereo` ("
+                      " `--3d_views` ("
                       + std::to_string(serialNumbers.size()) + " vs. "
                       + std::to_string(mImageDirectoryStereo) + "). Make them equal or add"
-                      + " `--image_dir_stereo 1`",
+                      + " `--3d_views 1`",
                       __LINE__, __FUNCTION__, __FILE__);
             // Get serial numbers
             for (auto& serialNumber : serialNumbers)
