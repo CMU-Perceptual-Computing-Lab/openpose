@@ -257,6 +257,8 @@ int openPoseDemo()
     const auto heatMapTypes = op::flagsToHeatMaps(FLAGS_heatmaps_add_parts, FLAGS_heatmaps_add_bkg,
                                                   FLAGS_heatmaps_add_PAFs);
     const auto heatMapScale = op::flagsToHeatMapScaleMode(FLAGS_heatmaps_scale);
+    // >1 camera view?
+    const auto multipleView = (FLAGS_3d || FLAGS_3d_views > 1 || FLAGS_flir_camera);
     // Enabling Google Logging
     const bool enableGoogleLogging = true;
     // Logging
@@ -269,7 +271,7 @@ int openPoseDemo()
     const op::WrapperStructPose wrapperStructPose{!FLAGS_body_disable, netInputSize, outputSize, keypointScale,
                                                   FLAGS_num_gpu, FLAGS_num_gpu_start, FLAGS_scale_number,
                                                   (float)FLAGS_scale_gap,
-                                                  op::flagsToRenderMode(FLAGS_render_pose, FLAGS_3d),
+                                                  op::flagsToRenderMode(FLAGS_render_pose, multipleView),
                                                   poseModel, !FLAGS_disable_blending, (float)FLAGS_alpha_pose,
                                                   (float)FLAGS_alpha_heatmap, FLAGS_part_to_show, FLAGS_model_folder,
                                                   heatMapTypes, heatMapScale, FLAGS_part_candidates,
@@ -277,13 +279,13 @@ int openPoseDemo()
                                                   enableGoogleLogging, FLAGS_3d, FLAGS_identification};
     // Face configuration (use op::WrapperStructFace{} to disable it)
     const op::WrapperStructFace wrapperStructFace{FLAGS_face, faceNetInputSize,
-                                                  op::flagsToRenderMode(FLAGS_face_render, FLAGS_3d, FLAGS_render_pose),
+                                                  op::flagsToRenderMode(FLAGS_face_render, multipleView, FLAGS_render_pose),
                                                   (float)FLAGS_face_alpha_pose, (float)FLAGS_face_alpha_heatmap,
                                                   (float)FLAGS_face_render_threshold};
     // Hand configuration (use op::WrapperStructHand{} to disable it)
     const op::WrapperStructHand wrapperStructHand{FLAGS_hand, handNetInputSize, FLAGS_hand_scale_number,
                                                   (float)FLAGS_hand_scale_range, FLAGS_hand_tracking,
-                                                  op::flagsToRenderMode(FLAGS_hand_render, FLAGS_3d, FLAGS_render_pose),
+                                                  op::flagsToRenderMode(FLAGS_hand_render, multipleView, FLAGS_render_pose),
                                                   (float)FLAGS_hand_alpha_pose, (float)FLAGS_hand_alpha_heatmap,
                                                   (float)FLAGS_hand_render_threshold};
     // Producer (use default to disable any input)
