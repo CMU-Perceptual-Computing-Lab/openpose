@@ -54,7 +54,7 @@ For further details, check [all released features](doc/released_features.md) and
 ## Results
 ### 3-D Reconstruction Module
 <p align="center">
-    <img src="media/openpose3d.png", width="360">
+    <img src="examples/media/openpose3d.png", width="360">
 </p>
 
 ### Body Estimation
