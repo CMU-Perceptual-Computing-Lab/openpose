@@ -42,7 +42,7 @@ namespace op
     {
         try
         {
-            return {};
+            return mCameraParameterReader.getCameraMatrices();
         }
         catch (const std::exception& e)
         {

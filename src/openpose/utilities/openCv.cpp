@@ -4,15 +4,16 @@
 namespace op
 {
     void putTextOnCvMat(cv::Mat& cvMat, const std::string& textToDisplay, const Point<int>& position,
-                        const cv::Scalar& color, const bool normalizeWidth)
+                        const cv::Scalar& color, const bool normalizeWidth, const int imageWidth)
     {
         try
         {
             const auto font = cv::FONT_HERSHEY_SIMPLEX;
+            const auto ratio = imageWidth/1280.;
             // const auto fontScale = 0.75;
-            const auto fontScale = 0.8;
-            const auto fontThickness = 2;
-            const auto shadowOffset = 2;
+            const auto fontScale = 0.8 * std::sqrt(ratio);
+            const auto fontThickness = std::max(1, intRound(2*ratio));
+            const auto shadowOffset = std::max(1, intRound(2*ratio));
             int baseline = 0;
             const auto textSize = cv::getTextSize(textToDisplay, font, fontScale, fontThickness, &baseline);
             const cv::Size finalPosition{position.x - (normalizeWidth ? textSize.width : 0),

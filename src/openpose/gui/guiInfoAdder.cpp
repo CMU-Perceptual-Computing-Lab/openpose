@@ -59,7 +59,7 @@ namespace op
     }
 
     void GuiInfoAdder::addInfo(cv::Mat& cvOutputData, const int numberPeople, const unsigned long long id,
-                               const std::string& elementRenderedName)
+                               const std::string& elementRenderedName, const unsigned long long frameNumber)
     {
         try
         {
@@ -78,7 +78,7 @@ namespace op
             // Recording inverse: sec/gpu
             // std::snprintf(charArrayAux, 15, "%4.2f s/gpu", (mFps != 0. ? mNumberGpus/mFps : 0.));
             putTextOnCvMat(cvOutputData, charArrayAux, {intRound(cvOutputData.cols - borderMargin), borderMargin},
-                           white, true);
+                           white, true, cvOutputData.cols);
             // Part to show
             // Allowing some buffer when changing the part to show (if >= 2 GPUs)
             // I.e. one GPU might return a previous part after the other GPU returns the new desired part, it looks
@@ -96,14 +96,14 @@ namespace op
             putTextOnCvMat(cvOutputData, "OpenPose - " +
                            (!mLastElementRenderedName.empty() ?
                                 mLastElementRenderedName : (mGuiEnabled ? "'h' for help" : "")),
-                           {borderMargin, borderMargin}, white, false);
+                           {borderMargin, borderMargin}, white, false, cvOutputData.cols);
             // Frame number
-            putTextOnCvMat(cvOutputData, "Frame: " + std::to_string(id),
-                           {borderMargin, (int)(cvOutputData.rows - borderMargin)}, white, false);
+            putTextOnCvMat(cvOutputData, "Frame: " + std::to_string(frameNumber),
+                           {borderMargin, (int)(cvOutputData.rows - borderMargin)}, white, false, cvOutputData.cols);
             // Number people
             putTextOnCvMat(cvOutputData, "People: " + std::to_string(numberPeople),
                            {(int)(cvOutputData.cols - borderMargin), (int)(cvOutputData.rows - borderMargin)},
-                           white, true);
+                           white, true, cvOutputData.cols);
         }
         catch (const std::exception& e)
         {

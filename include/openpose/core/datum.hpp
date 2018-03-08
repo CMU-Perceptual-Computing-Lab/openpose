@@ -22,6 +22,13 @@ namespace op
          */
         std::string name;
 
+        /**
+         * Corresponding frame number.
+         * If the producer (e.g., video) starts from frame 0 and does not repeat any frame, then frameNumber should
+         * match the field id.
+         */
+        unsigned long long frameNumber;
+
         // ------------------------------ Input image and rendered version parameters ------------------------------ //
         /**
          * Original image to be processed in cv::Mat uchar format.

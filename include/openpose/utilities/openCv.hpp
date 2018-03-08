@@ -7,9 +7,11 @@
 
 namespace op
 {
-    OP_API void putTextOnCvMat(cv::Mat& cvMat, const std::string& textToDisplay, const Point<int>& position, const cv::Scalar& color, const bool normalizeWidth);
+    OP_API void putTextOnCvMat(cv::Mat& cvMat, const std::string& textToDisplay, const Point<int>& position,
+                   const cv::Scalar& color, const bool normalizeWidth, const int imageWidth);
 
-    OP_API void floatPtrToUCharCvMat(cv::Mat& uCharCvMat, const float* const floatPtrImage, const std::array<int, 3> resolutionSize);
+    OP_API void floatPtrToUCharCvMat(cv::Mat& uCharCvMat, const float* const floatPtrImage,
+                                     const std::array<int, 3> resolutionSize);
 
     OP_API void unrollArrayToUCharCvMat(cv::Mat& cvMatResult, const Array<float>& array);
 
@@ -17,7 +19,8 @@ namespace op
 
     OP_API double resizeGetScaleFactor(const Point<int>& initialSize, const Point<int>& targetSize);
 
-    OP_API cv::Mat resizeFixedAspectRatio(const cv::Mat& cvMat, const double scaleFactor, const Point<int>& targetSize, const int borderMode = cv::BORDER_CONSTANT,
+    OP_API cv::Mat resizeFixedAspectRatio(const cv::Mat& cvMat, const double scaleFactor, const Point<int>& targetSize,
+                                          const int borderMode = cv::BORDER_CONSTANT,
                                           const cv::Scalar& borderValue = cv::Scalar{0,0,0});
 }
 

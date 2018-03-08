@@ -73,10 +73,10 @@ namespace op
                     {
                         // Normal case, +-30 frames
                         if (!videoSeekSharedPtr->first)
-                            videoSeekSharedPtr->second += 30 * (castedKey=='l' ? -2 : 1);
+                            videoSeekSharedPtr->second += 30 * (castedKey=='k' ? -2 : 1);
                         // Frame by frame (if forced paused)
                         else
-                            videoSeekSharedPtr->second += (castedKey=='l' ? -1 : 1);
+                            videoSeekSharedPtr->second += (castedKey=='k' ? -1 : 1);
                     }
                 }
                 // Enable/disable blending
