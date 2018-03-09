@@ -1,13 +1,10 @@
 #ifdef USE_CAFFE
     #include <caffe/blob.hpp>
 #endif
-#include <openpose/core/netCaffe.hpp>
-#include <openpose/core/nmsCaffe.hpp>
-#include <openpose/core/resizeAndMergeCaffe.hpp>
 #include <openpose/gpu/cuda.hpp>
-#ifdef USE_OPENCL
-    #include <openpose/gpu/opencl.hcl>
-#endif
+#include <openpose/net/netCaffe.hpp>
+#include <openpose/net/nmsCaffe.hpp>
+#include <openpose/net/resizeAndMergeCaffe.hpp>
 #include <openpose/pose/bodyPartConnectorCaffe.hpp>
 #include <openpose/pose/poseParameters.hpp>
 #include <openpose/utilities/check.hpp>

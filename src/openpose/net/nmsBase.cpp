@@ -1,5 +1,5 @@
-#include <openpose/core/nmsBase.hpp>
 #include <opencv2/opencv.hpp>
+#include <openpose/net/nmsBase.hpp>
 
 namespace op
 {

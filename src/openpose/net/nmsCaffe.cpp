@@ -1,8 +1,8 @@
 #ifdef USE_CAFFE
     #include <caffe/blob.hpp>
 #endif
-#include <openpose/core/nmsBase.hpp>
-#include <openpose/core/nmsCaffe.hpp>
+#include <openpose/net/nmsBase.hpp>
+#include <openpose/net/nmsCaffe.hpp>
 
 namespace op
 {

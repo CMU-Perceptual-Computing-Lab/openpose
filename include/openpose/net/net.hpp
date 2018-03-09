@@ -1,5 +1,5 @@
-#ifndef OPENPOSE_CORE_NET_HPP
-#define OPENPOSE_CORE_NET_HPP
+#ifndef OPENPOSE_NET_NET_HPP
+#define OPENPOSE_NET_NET_HPP
 
 #include <openpose/core/common.hpp>
 
@@ -14,4 +14,4 @@ namespace op
     };
 }
 
-#endif // OPENPOSE_CORE_NET_HPP
+#endif // OPENPOSE_NET_NET_HPP

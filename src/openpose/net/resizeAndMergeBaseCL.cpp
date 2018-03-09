@@ -3,7 +3,7 @@
     #include <openpose/gpu/cl2.hpp>
 #endif
 #include <openpose/core/common.hpp>
-#include <openpose/core/resizeAndMergeBase.hpp>
+#include <openpose/net/resizeAndMergeBase.hpp>
 
 namespace op
 {

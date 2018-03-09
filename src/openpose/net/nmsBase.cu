@@ -2,7 +2,7 @@
 #include <thrust/scan.h>
 #include <openpose/gpu/cuda.hpp>
 #include <openpose/gpu/cuda.hu>
-#include <openpose/core/nmsBase.hpp>
+#include <openpose/net/nmsBase.hpp>
 
 namespace op
 {

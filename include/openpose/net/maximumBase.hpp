@@ -1,5 +1,5 @@
-#ifndef OPENPOSE_CORE_MAXIMUM_BASE_HPP
-#define OPENPOSE_CORE_MAXIMUM_BASE_HPP
+#ifndef OPENPOSE_NET_MAXIMUM_BASE_HPP
+#define OPENPOSE_NET_MAXIMUM_BASE_HPP
 
 #include <openpose/core/common.hpp>
 
@@ -14,4 +14,4 @@ namespace op
                            const std::array<int, 4>& sourceSize);
 }
 
-#endif // OPENPOSE_CORE_MAXIMUM_BASE_HPP
+#endif // OPENPOSE_NET_MAXIMUM_BASE_HPP

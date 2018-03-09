@@ -200,6 +200,7 @@ OpenPose Library - Release Notes
     2. 3-D reconstruction demo is now inside the OpenPose demo binary.
     3. Renamed `*_keypoints` by `*_keypoints_2d` to avoid confusion with 3d ones in `--write_json` output file.
     4. CvMatToOpInput requires PoseModel to know the normalization to be performed.
+    5. Created `net/` module in order to reduce `core/` number of classes and files and for future scalability.
 3. Main bugs fixed:
     1. Slight speed up (~1%) for performing the non-maximum suppression stage only in the body part heatmaps channels, and not also in the PAF channels.
     2. Fixed core-dumped in PoseRenderer with GUI when changed element to be rendered to something else than skeleton.

@@ -1,6 +1,6 @@
 #include <openpose/gpu/cuda.hpp>
 #include <openpose/gpu/cuda.hu>
-#include <openpose/core/resizeAndMergeBase.hpp>
+#include <openpose/net/resizeAndMergeBase.hpp>
 
 namespace op
 {

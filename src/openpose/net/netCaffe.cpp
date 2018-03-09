@@ -14,7 +14,7 @@
 #endif
 #include <openpose/utilities/fileSystem.hpp>
 #include <openpose/utilities/standard.hpp>
-#include <openpose/core/netCaffe.hpp>
+#include <openpose/net/netCaffe.hpp>
 
 namespace op
 {

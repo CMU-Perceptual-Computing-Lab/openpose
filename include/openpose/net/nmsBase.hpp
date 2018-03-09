@@ -1,5 +1,5 @@
-#ifndef OPENPOSE_CORE_NMS_BASE_HPP
-#define OPENPOSE_CORE_NMS_BASE_HPP
+#ifndef OPENPOSE_NET_NMS_BASE_HPP
+#define OPENPOSE_NET_NMS_BASE_HPP
 
 #include <openpose/core/common.hpp>
 
@@ -19,4 +19,4 @@ namespace op
                        const int gpuID = 0);
 }
 
-#endif // OPENPOSE_CORE_NMS_BASE_HPP
+#endif // OPENPOSE_NET_NMS_BASE_HPP

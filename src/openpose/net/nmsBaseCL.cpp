@@ -7,7 +7,7 @@
     #include <openpose/gpu/cl2.hpp>
 #endif
 #include <openpose/core/common.hpp>
-#include <openpose/core/nmsBase.hpp>
+#include <openpose/net/nmsBase.hpp>
 
 namespace op
 {
