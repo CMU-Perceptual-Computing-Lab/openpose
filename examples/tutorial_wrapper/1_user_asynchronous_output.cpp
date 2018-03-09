@@ -146,6 +146,8 @@ DEFINE_bool(3d,                         false,          "Running OpenPose 3-D re
                                                         " 2) Performing 3-D reconstruction from the multiple views. 3) Displaying 3-D reconstruction"
                                                         " results. Note that it will only display 1 person. If multiple people is present, it will"
                                                         " fail.");
+DEFINE_int32(3d_min_views,              -1,             "Minimum number of views required to reconstruct each keypoint. By default (-1), it will"
+                                                        " require all the cameras to see the keypoint in order to reconstruct it.");
 DEFINE_int32(3d_views,                  1,              "Complementary option to `--image_dir` or `--video`. OpenPose will read as many images per"
                                                         " iteration, allowing tasks such as stereo camera processing (`--3d`). Note that"
                                                         " `--camera_parameters_folder` must be set. OpenPose must find as many `xml` files in the"
@@ -353,7 +355,7 @@ int openPoseTutorialWrapper1()
                                                   (float)FLAGS_alpha_heatmap, FLAGS_part_to_show, FLAGS_model_folder,
                                                   heatMapTypes, heatMapScale, FLAGS_part_candidates,
                                                   (float)FLAGS_render_threshold, FLAGS_number_people_max,
-                                                  enableGoogleLogging, FLAGS_3d};
+                                                  enableGoogleLogging, FLAGS_3d, FLAGS_3d_min_views};
     // Face configuration (use op::WrapperStructFace{} to disable it)
     const op::WrapperStructFace wrapperStructFace{FLAGS_face, faceNetInputSize,
                                                   op::flagsToRenderMode(FLAGS_face_render, multipleView, FLAGS_render_pose),

@@ -176,6 +176,12 @@ namespace op
         bool reconstruct3d;
 
         /**
+         * Minimum number of views required to reconstruct each keypoint.
+         * By default (-1), it will require all the cameras to see the keypoint in order to reconstruct it.
+         */
+        int minViews3d;
+
+        /**
          * Whether to return a person ID for each body skeleton, providing temporal consistency.
          */
         bool identification;
@@ -198,7 +204,7 @@ namespace op
                           const ScaleMode heatMapScale = ScaleMode::ZeroToOne, const bool addPartCandidates = false,
                           const float renderThreshold = 0.05f, const int numberPeopleMax = -1,
                           const bool enableGoogleLogging = true, const bool reconstruct3d = false,
-                          const bool identification = false);
+                          const int minViews3d = -1, const bool identification = false);
     };
 }
 

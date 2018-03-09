@@ -115,6 +115,14 @@ namespace op
                 if (wrapperStructPose.gpuNumber > 0)
                     error("GPU number must be negative or 0 if CPU_ONLY is enabled.",
                           __LINE__, __FUNCTION__, __FILE__);
+            // If num_gpu 0 --> output_resolution has no effect
+            if (wrapperStructPose.gpuNumber == 0 &&
+                (wrapperStructPose.outputSize.x > 0 || wrapperStructPose.outputSize.y > 0))
+                error("If `--num_gpu 0`, then `--output_resolution` has no effect, so either disable it or use"
+                      " `--output_resolution -1x-1`. Current output size: ("
+                      + std::to_string(wrapperStructPose.outputSize.x) + "x"
+                      + std::to_string(wrapperStructPose.outputSize.y) + ").",
+                      __LINE__, __FUNCTION__, __FILE__);
             // Net input resolution cannot be reshaped for Caffe OpenCL and MKL versions, only for CUDA version
             #if defined USE_MKL || defined CPU_ONLY
                 // If image_dir and netInputSize == -1 --> error

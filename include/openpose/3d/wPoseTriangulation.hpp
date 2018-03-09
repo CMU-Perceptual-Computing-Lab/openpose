@@ -11,13 +11,15 @@ namespace op
     class WPoseTriangulation : public Worker<TDatums>
     {
     public:
-        explicit WPoseTriangulation();
+        explicit WPoseTriangulation(const std::shared_ptr<PoseTriangulation>& poseTriangulation);
 
         void initializationOnThread();
 
         void work(TDatums& tDatums);
 
     private:
+        const std::shared_ptr<PoseTriangulation> spPoseTriangulation;
+
         DELETE_COPY(WPoseTriangulation);
     };
 }
@@ -31,7 +33,8 @@ namespace op
 namespace op
 {
     template<typename TDatums>
-    WPoseTriangulation<TDatums>::WPoseTriangulation()
+    WPoseTriangulation<TDatums>::WPoseTriangulation(const std::shared_ptr<PoseTriangulation>& poseTriangulation) :
+        spPoseTriangulation{poseTriangulation}
     {
     }
 
@@ -66,10 +69,12 @@ namespace op
                     cameraMatrices.emplace_back(datumsElement.cameraMatrix);
                 }
                 // Pose 3-D reconstruction
-                auto poseKeypoints3D = reconstructArray(poseKeypointVector, cameraMatrices);
-                auto faceKeypoints3D = reconstructArray(faceKeypointVector, cameraMatrices);
-                auto leftHandKeypoints3D = reconstructArray(leftHandKeypointVector, cameraMatrices);
-                auto rightHandKeypoints3D = reconstructArray(rightHandKeypointVector, cameraMatrices);
+                auto poseKeypoints3D = spPoseTriangulation->reconstructArray(poseKeypointVector, cameraMatrices);
+                auto faceKeypoints3D = spPoseTriangulation->reconstructArray(faceKeypointVector, cameraMatrices);
+                auto leftHandKeypoints3D = spPoseTriangulation->reconstructArray(leftHandKeypointVector,
+                                                                                 cameraMatrices);
+                auto rightHandKeypoints3D = spPoseTriangulation->reconstructArray(rightHandKeypointVector,
+                                                                                  cameraMatrices);
                 // Assign to all tDatums
                 for (auto& datumsElement : *tDatums)
                 {

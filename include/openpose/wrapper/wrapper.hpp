@@ -798,8 +798,9 @@ namespace op
                 // 3-D reconstruction
                 if (wrapperStructPose.reconstruct3d)
                 {
+                    const auto poseTriangulation = std::make_shared<PoseTriangulation>(wrapperStructPose.minViews3d);
                     mPostProcessingWs.emplace_back(
-                        std::make_shared<WPoseTriangulation<TDatumsPtr>>()
+                        std::make_shared<WPoseTriangulation<TDatumsPtr>>(poseTriangulation)
                     );
                 }
                 // Frames processor (OpenPose format -> cv::Mat format)

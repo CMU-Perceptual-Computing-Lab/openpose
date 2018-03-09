@@ -49,6 +49,11 @@ namespace op
          */
         void displayFrame(const cv::Mat& frame, const int waitKeyValue = -1);
 
+        /**
+         * Analogous to the previous displayFrame, but first it horizontally concatenates all the frames
+         */
+        void displayFrame(const std::vector<cv::Mat>& frames, const int waitKeyValue = -1);
+
     private:
         const std::string mWindowName;
         Point<int> mWindowedSize;

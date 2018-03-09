@@ -6,8 +6,17 @@
 
 namespace op
 {
-    OP_API Array<float> reconstructArray(const std::vector<Array<float>>& keypointsVector,
-                                         const std::vector<cv::Mat>& matrixEachCamera);
+    class OP_API PoseTriangulation
+    {
+    public:
+        PoseTriangulation(const int minViews3d);
+
+        Array<float> reconstructArray(const std::vector<Array<float>>& keypointsVector,
+                                      const std::vector<cv::Mat>& cameraMatrices) const;
+
+    private:
+        const int mMinViews3d;
+    };
 }
 
 #endif // OPENPOSE_3D_POSE_TRIANGULATION_HPP

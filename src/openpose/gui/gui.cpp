@@ -177,12 +177,7 @@ namespace op
     {
         try
         {
-            // Check tDatum integrity
-            const bool returnedIsValidFrame = ((spIsRunning == nullptr || *spIsRunning) && !cvMatOutput.empty());
-
-            // Display
-            if (returnedIsValidFrame)
-                mFrameDisplayer.displayFrame(cvMatOutput, -1);
+            setImage(std::vector<cv::Mat>{cvMatOutput});
         }
         catch (const std::exception& e)
         {
@@ -194,36 +189,20 @@ namespace op
     {
         try
         {
-            // 0 image
-            if (cvMatOutputs.empty())
-                setImage(cvMatOutputs[0]);
-            // 1 image
-            else if (cvMatOutputs.size() == 1)
-                setImage(cvMatOutputs[0]);
-            // > 1 image
-            else
+            // Check tDatum integrity
+            bool returnedIsValidFrame = ((spIsRunning == nullptr || *spIsRunning) && !cvMatOutputs.empty());
+            for (const auto& cvMatOutput : cvMatOutputs)
             {
-                // Check tDatum integrity
-                bool returnedIsValidFrame = ((spIsRunning == nullptr || *spIsRunning) && !cvMatOutputs.empty());
-                if (returnedIsValidFrame)
+                if (cvMatOutput.empty())
                 {
-                    // Security checks
-                    for (const auto& cvMatOutput : cvMatOutputs)
-                        if (cvMatOutput.empty())
-                            returnedIsValidFrame = false;
-                    // Prepare final cvMat
-                    if (returnedIsValidFrame)
-                    {
-                        // Concat (0)
-                        cv::Mat cvMat = cvMatOutputs[0].clone();
-                        // Concat (1,size()-1)
-                        for (auto i = 1u; i < cvMatOutputs.size(); i++)
-                            cv::hconcat(cvMat, cvMatOutputs[i], cvMat);
-                        // Display
-                        mFrameDisplayer.displayFrame(cvMat, -1);
-                    }
+                    returnedIsValidFrame = false;
+                    break;
                 }
             }
+
+            // Display
+            if (returnedIsValidFrame)
+                mFrameDisplayer.displayFrame(cvMatOutputs, -1);
         }
         catch (const std::exception& e)
         {

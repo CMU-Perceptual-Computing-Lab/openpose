@@ -147,11 +147,18 @@ build\x64\Release\OpenPoseDemo.exe --flir_camera --3d --number_people_max 1 --fa
 # Ubuntu (same flags for Windows version)
 # Optionally add `--face` and/or `--hand` to include face and/or hands
 # Assuming 3 cameras
-# Note: We highly recommend to reduce `--output_resolution`. E.g. for 3 cameras recording at 1920x1080, the resulting image is (3x1920)x1080, so we recommend e.g. 1920x360 (x3 reduction).
+# Note: We highly recommend to reduce `--output_resolution`. E.g. for 3 cameras recording at 1920x1080, the resulting image is (3x1920)x1080, so we recommend e.g. 640x360 (x3 reduction).
 # Video
 ./build/examples/openpose/openpose.bin --video output_folder_path/video.avi --3d_views 3 --3d --number_people_max 1 --output_resolution {desired_output_resolution}
 # Images
 ./build/examples/openpose/openpose.bin --image_dir output_folder_path/ --3d_views 3 --3d --number_people_max 1 --output_resolution {desired_output_resolution}
+```
+
+5. Reconstruction when at least n visible views
+```
+# Ubuntu (same flags for Windows version)
+# Assuming >=2 cameras and reconstruction when at least 2 visible views
+./build/examples/openpose/openpose.bin --flir_camera --3d --number_people_max 1 --3d_min_views 2 --output_resolution {desired_output_resolution}
 ```
 
 

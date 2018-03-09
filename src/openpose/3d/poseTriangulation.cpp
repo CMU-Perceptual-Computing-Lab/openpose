@@ -3,7 +3,7 @@
 
 namespace op
 {
-    double calcReprojectionError(const cv::Mat& X, const std::vector<cv::Mat>& M,
+    double calcReprojectionError(const cv::Mat& reconstructedPoint, const std::vector<cv::Mat>& M,
                                  const std::vector<cv::Point2d>& points2d)
     {
         try
@@ -11,7 +11,7 @@ namespace op
             auto averageError = 0.;
             for (auto i = 0u ; i < M.size() ; i++)
             {
-                cv::Mat imageX = M[i] * X;
+                cv::Mat imageX = M[i] * reconstructedPoint;
                 imageX /= imageX.at<double>(2,0);
                 const auto error = std::sqrt(std::pow(imageX.at<double>(0,0) -  points2d[i].x,2)
                                              + std::pow(imageX.at<double>(1,0) - points2d[i].y,2));
@@ -27,30 +27,34 @@ namespace op
         }
     }
 
-    void triangulate(cv::Mat& X, const std::vector<cv::Mat>& matrixEachCamera,
+    void triangulate(cv::Mat& reconstructedPoint, const std::vector<cv::Mat>& cameraMatrices,
                      const std::vector<cv::Point2d>& pointsOnEachCamera)
     {
         try
         {
             // Security checks
-            if (matrixEachCamera.empty() || matrixEachCamera.size() != pointsOnEachCamera.size())
-                error("numberCameras.empty() || numberCameras.size() != pointsOnEachCamera.size()",
-                          __LINE__, __FUNCTION__, __FILE__);
+            if (cameraMatrices.size() != pointsOnEachCamera.size())
+                error("numberCameras.size() != pointsOnEachCamera.size() (" + std::to_string(cameraMatrices.size())
+                      + " vs. " + std::to_string(pointsOnEachCamera.size()) + ").",
+                      __LINE__, __FUNCTION__, __FILE__);
+            if (cameraMatrices.empty())
+                error("numberCameras.empty()",
+                      __LINE__, __FUNCTION__, __FILE__);
             // Create and fill A
-            const auto numberCameras = (int)matrixEachCamera.size();
+            const auto numberCameras = (int)cameraMatrices.size();
             cv::Mat A = cv::Mat::zeros(numberCameras*2, 4, CV_64F);
             for (auto i = 0 ; i < numberCameras ; i++)
             {
-                cv::Mat temp = pointsOnEachCamera[i].x*matrixEachCamera[i].rowRange(2,3)
-                             - matrixEachCamera[i].rowRange(0,1);
+                cv::Mat temp = pointsOnEachCamera[i].x*cameraMatrices[i].rowRange(2,3)
+                             - cameraMatrices[i].rowRange(0,1);
                 temp.copyTo(A.rowRange(i*2, i*2+1));
-                temp = pointsOnEachCamera[i].y*matrixEachCamera[i].rowRange(2,3) - matrixEachCamera[i].rowRange(1,2);
+                temp = pointsOnEachCamera[i].y*cameraMatrices[i].rowRange(2,3) - cameraMatrices[i].rowRange(1,2);
                 temp.copyTo(A.rowRange(i*2+1, i*2+2));
             }
             // SVD on A
             cv::SVD svd{A};
-            svd.solveZ(A,X);
-            X /= X.at<double>(3);
+            svd.solveZ(A,reconstructedPoint);
+            reconstructedPoint /= reconstructedPoint.at<double>(3);
         }
         catch (const std::exception& e)
         {
@@ -59,20 +63,20 @@ namespace op
     }
 
     // TODO: ask for the missing function: TriangulationOptimization
-    double triangulateWithOptimization(cv::Mat& X, const std::vector<cv::Mat>& matrixEachCamera,
+    double triangulateWithOptimization(cv::Mat& reconstructedPoint, const std::vector<cv::Mat>& cameraMatrices,
                                        const std::vector<cv::Point2d>& pointsOnEachCamera)
     {
         try
         {
-            triangulate(X, matrixEachCamera, pointsOnEachCamera);
+            triangulate(reconstructedPoint, cameraMatrices, pointsOnEachCamera);
 
             return 0.;
-            // return calcReprojectionError(X, matrixEachCamera, pointsOnEachCamera);
+            // return calcReprojectionError(X, cameraMatrices, pointsOnEachCamera);
 
-            // //if (matrixEachCamera.size() >= 3)
-            // //double beforeError = calcReprojectionError(&matrixEachCamera, pointsOnEachCamera, X);
-            // double change = TriangulationOptimization(&matrixEachCamera, pointsOnEachCamera, X);
-            // //double afterError = calcReprojectionError(&matrixEachCamera,pointsOnEachCamera,X);
+            // //if (cameraMatrices.size() >= 3)
+            // //double beforeError = calcReprojectionError(&cameraMatrices, pointsOnEachCamera, X);
+            // double change = TriangulationOptimization(&cameraMatrices, pointsOnEachCamera, X);
+            // //double afterError = calcReprojectionError(&cameraMatrices,pointsOnEachCamera,X);
             // //printfLog("!!Mine %.8f , inFunc %.8f \n",beforeError-afterError,change);
             // return change;
         }
@@ -83,14 +87,30 @@ namespace op
         }
     }
 
-    Array<float> reconstructArray(const std::vector<Array<float>>& keypointsVector,
-                                  const std::vector<cv::Mat>& matrixEachCamera)
+    PoseTriangulation::PoseTriangulation(const int minViews3d) :
+        mMinViews3d{minViews3d}
+    {
+        try
+        {
+            // Security checks
+            if (0 <= mMinViews3d && mMinViews3d < 2)
+                error("Minimum number of views must be at least 2 (e.g., `--3d_min_views 2`) or negative.",
+                      __LINE__, __FUNCTION__, __FILE__);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    Array<float> PoseTriangulation::reconstructArray(const std::vector<Array<float>>& keypointsVector,
+                                                     const std::vector<cv::Mat>& cameraMatrices) const
     {
         try
         {
             Array<float> keypoints3D;
             // Security checks
-            if (matrixEachCamera.size() < 2)
+            if (cameraMatrices.size() < 2)
                 error("Only 1 camera detected. The 3-D reconstruction module can only be used with > 1 cameras"
                       " simultaneously. E.g., using FLIR stereo cameras (`--flir_camera`).",
                       __LINE__, __FUNCTION__, __FILE__);
@@ -113,27 +133,33 @@ namespace op
                 const auto threshold = 0.2f;
                 std::vector<int> indexesUsed;
                 std::vector<std::vector<cv::Point2d>> xyPoints;
+                std::vector<std::vector<cv::Mat>> cameraMatricesPerPoint;
                 for (auto part = 0; part < numberBodyParts; part++)
                 {
                     // Create vector of points
-                    auto missedPoint = false;
+                    // auto missedPoint = false;
                     std::vector<cv::Point2d> xyPointsElement;
+                    std::vector<cv::Mat> cameraMatricesElement;
                     const auto baseIndex = part * lastChannelLength;
-                    for (auto& keypoints : keypointsVector)
+                    // for (auto& keypoints : keypointsVector)
+                    for (auto i = 0u ; i < keypointsVector.size() ; i++)
                     {
+                        const auto& keypoints = keypointsVector[i];
                         if (keypoints[baseIndex+2] > threshold)
-                            xyPointsElement.emplace_back(cv::Point2d{ keypoints[baseIndex],
-                                                                      keypoints[baseIndex+1]});
-                        else
                         {
-                            missedPoint = true;
-                            break;
+                            xyPointsElement.emplace_back(cv::Point2d{keypoints[baseIndex],
+                                                                     keypoints[baseIndex+1]});
+                            cameraMatricesElement.emplace_back(cameraMatrices[i]);
                         }
                     }
-                    if (!missedPoint)
+                    // If visible from all views (mMinViews3d < 0)
+                    // or if visible for at least mMinViews3d views
+                    if ((mMinViews3d < 0 && cameraMatricesElement.size() == cameraMatrices.size())
+                        || (mMinViews3d > 1 && mMinViews3d <= (int)xyPointsElement.size()))
                     {
                         indexesUsed.emplace_back(part);
                         xyPoints.emplace_back(xyPointsElement);
+                        cameraMatricesPerPoint.emplace_back(cameraMatricesElement);
                     }
                 }
                 // 3D reconstruction
@@ -144,16 +170,17 @@ namespace op
                     std::vector<cv::Point3f> xyzPoints(xyPoints.size());
                     for (auto i = 0u; i < xyPoints.size(); i++)
                     {
-                        cv::Mat X;
-                        triangulateWithOptimization(X, matrixEachCamera, xyPoints[i]);
-                        xyzPoints[i] = cv::Point3d{ X.at<double>(0), X.at<double>(1), X.at<double>(2) };
+                        cv::Mat reconstructedPoint;
+                        triangulateWithOptimization(reconstructedPoint, cameraMatricesPerPoint[i], xyPoints[i]);
+                        xyzPoints[i] = cv::Point3d{reconstructedPoint.at<double>(0), reconstructedPoint.at<double>(1),
+                            reconstructedPoint.at<double>(2)};
                     }
 
                     // 3D points to pose
                     // OpenCV alternative:
                     // http://docs.opencv.org/2.4/modules/calib3d/doc/camera_calibration_and_3d_reconstruction.html#triangulatepoints
                     // cv::Mat reconstructedPoints{4, firstcv::Points.size(), CV_64F};
-                    // cv::triangulatecv::Points(cv::Mat::eye(3,4, CV_64F), M_3_1, firstcv::Points, secondcv::Points,
+                    // cv::triangulatePoints(cv::Mat::eye(3,4, CV_64F), M_3_1, firstcv::Points, secondcv::Points,
                     //                           reconstructedcv::Points);
                     const auto lastChannelLength = keypoints3D.getSize(2);
                     for (auto index = 0u; index < indexesUsed.size(); index++)

@@ -193,7 +193,8 @@ OpenPose Library - Release Notes
     21. VideoSaver (`--write_video`) compatible with multi-camera setting. It will save all the different views concatenated.
     22. OpenPose small GUI rescale the verbose text to the displayed image, to avoid the text to be either too big or small.
     23. OpenPose small GUI shows the frame number w.r.t. the original producer, rather than the frame id. E.g., if video is started at frame 30, OpenPose will display 30 rather than 0 in the first frame.
-    23. OpenPose GUI: 'l' and 'k' functionality swapped.
+    24. OpenPose GUI: 'l' and 'k' functionality swapped.
+    25. 3-D reconstruction module: Added flag `--3d_min_views` to select minimum number of cameras required for 3-D reconstruction.
 2. Functions or parameters renamed:
     1. Flag `no_display` renamed as `display`, able to select between `NoDisplay`, `Display2D`, `Display3D`, and `DisplayAll`.
     2. 3-D reconstruction demo is now inside the OpenPose demo binary.
