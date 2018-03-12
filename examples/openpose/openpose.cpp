@@ -48,8 +48,9 @@ DEFINE_int32(camera,                    -1,             "The camera index for cv
 DEFINE_string(camera_resolution,        "-1x-1",        "Set the camera resolution (either `--camera` or `--flir_camera`). `-1x-1` will use the"
                                                         " default 1280x720 for `--camera`, or the maximum flir camera resolution available for"
                                                         " `--flir_camera`");
-DEFINE_double(camera_fps,               30.0,           "Frame rate for the webcam (only used when saving video from webcam). Set this value to the"
-                                                        " minimum value between the OpenPose displayed speed and the webcam real frame rate.");
+DEFINE_double(camera_fps,               30.0,           "Frame rate for the webcam/flir_camera (also used when saving video). Set this"
+                                                        " value to the minimum value between the OpenPose displayed speed and the webcam real"
+                                                        " frame rate.");
 DEFINE_string(video,                    "",             "Use a video file instead of the camera. Use `examples/media/video.avi` for our default"
                                                         " example video.");
 DEFINE_string(image_dir,                "",             "Process a directory of images. Use `examples/media/` for our default example folder with 20"
@@ -301,7 +302,8 @@ int openPoseDemo()
                                                       op::stringToDataFormat(FLAGS_write_keypoint_format),
                                                       writeJson, FLAGS_write_coco_json,
                                                       FLAGS_write_images, FLAGS_write_images_format, FLAGS_write_video,
-                                                      FLAGS_write_heatmaps, FLAGS_write_heatmaps_format};
+                                                      FLAGS_camera_fps, FLAGS_write_heatmaps,
+                                                      FLAGS_write_heatmaps_format};
     // Configure wrapper
     opWrapper.configure(wrapperStructPose, wrapperStructFace, wrapperStructHand, wrapperStructInput,
                         wrapperStructOutput);

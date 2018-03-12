@@ -123,6 +123,9 @@ namespace op
                       + std::to_string(wrapperStructPose.outputSize.x) + "x"
                       + std::to_string(wrapperStructPose.outputSize.y) + ").",
                       __LINE__, __FUNCTION__, __FILE__);
+            if (wrapperStructOutput.writeVideoFps <= 0 && wrapperStructInput.producerSharedPtr->get(CV_CAP_PROP_FPS) > 0)
+                error("Set `--camera_fps` for this producer, as its frame rate is unknown.",
+                      __LINE__, __FUNCTION__, __FILE__);
             // Net input resolution cannot be reshaped for Caffe OpenCL and MKL versions, only for CUDA version
             #if defined USE_MKL || defined CPU_ONLY
                 // If image_dir and netInputSize == -1 --> error

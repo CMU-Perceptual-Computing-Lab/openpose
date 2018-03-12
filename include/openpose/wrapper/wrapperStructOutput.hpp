@@ -101,6 +101,11 @@ namespace op
         std::string writeHeatMapsFormat;
 
         /**
+         * Frame rate of the recorded video.
+         */
+        double writeVideoFps;
+
+        /**
          * Constructor of the struct.
          * It has the recommended and default values we recommend for each element of the struct.
          * Since all the elements of the struct are public, they can also be manually filled.
@@ -110,8 +115,8 @@ namespace op
                             const DataFormat writeKeypointFormat = DataFormat::Xml,
                             const std::string& writeJson = "", const std::string& writeCocoJson = "",
                             const std::string& writeImages = "", const std::string& writeImagesFormat = "",
-                            const std::string& writeVideo = "", const std::string& writeHeatMaps = "",
-                            const std::string& writeHeatMapsFormat = "");
+                            const std::string& writeVideo = "", const double writeVideoFps = 30.,
+                            const std::string& writeHeatMaps = "", const std::string& writeHeatMapsFormat = "");
     };
 }
 

@@ -28,9 +28,9 @@ namespace op
         {
             // Security checks
             if (cvSize.x <= 0 || cvSize.y <= 0)
-                error("Desired frame size to save frames is <= 0.", __LINE__, __FUNCTION__, __FILE__);
+                error("Desired frame size to save the video is <= 0.", __LINE__, __FUNCTION__, __FILE__);
             if (fps <= 0.)
-                error("Desired fps to save frames is <= 0.", __LINE__, __FUNCTION__, __FILE__);
+                error("Desired fps (frame rate) to save the video is <= 0.", __LINE__, __FUNCTION__, __FILE__);
             // Open video-writter
             mVideoWriter = openVideo(mVideoSaverPath, mCvFourcc, mFps, mCvSize, mNumberImages);
             // Check it was successfully opened
