@@ -43,9 +43,8 @@ DEFINE_int32(profile_speed,             1000,           "If PROFILER_ENABLED was
                                                         " runtime statistics at this frame number.");
 // Producer
 DEFINE_string(image_dir,                "examples/media/",      "Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).");
-DEFINE_double(camera_fps,               30.0,           "Frame rate for the webcam/flir_camera (also used when saving video). Set this"
-                                                        " value to the minimum value between the OpenPose displayed speed and the webcam real"
-                                                        " frame rate.");
+DEFINE_double(camera_fps,               30.0,           "Frame rate for the webcam (also used when saving video). Set this value to the minimum"
+                                                        " value between the OpenPose displayed speed and the webcam real frame rate.");
 // OpenPose
 DEFINE_string(model_folder,             "models/",      "Folder path (absolute or relative) where the models (pose, face, ...) are located.");
 DEFINE_string(output_resolution,        "-1x-1",        "The image resolution (display and output). Use \"-1x-1\" to force the program to use the"

@@ -24,6 +24,8 @@ namespace op
                 return PoseModel::BODY_18;
             else if (poseModeString == "BODY_19")
                 return PoseModel::BODY_19;
+            else if (poseModeString == "BODY_19b")
+                return PoseModel::BODY_19b;
             else if (poseModeString == "BODY_19N")
                 return PoseModel::BODY_19N;
             else if (poseModeString == "BODY_19_X2")
