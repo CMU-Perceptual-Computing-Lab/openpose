@@ -67,6 +67,8 @@ There are 2 alternatives to save the OpenPose output.
 
 2. (Deprecated) The `write_keypoint` flag uses the OpenCV cv::FileStorage default formats, i.e. JSON (available after OpenCV 3.0), XML, and YML. Note that it does not include any other information othern than keypoints.
 
+Both of them follow the keypoint ordering described in the [Keypoint Ordering](#keypoint-ordering) section.
+
 
 
 ### Keypoint Ordering

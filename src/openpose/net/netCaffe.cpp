@@ -137,27 +137,27 @@ namespace op
         try
         {
             #ifdef USE_CAFFE
-               // Initialize net
-               #ifdef USE_OPENCL
-                   caffe::Caffe::set_mode(caffe::Caffe::GPU);
-                   caffe::Caffe::SelectDevice(upImpl->mGpuId, true);
-                   upImpl->upCaffeNet.reset(new caffe::Net<float>{upImpl->mCaffeProto, caffe::TEST,
-                                            caffe::Caffe::GetDefaultDevice()});
-                   upImpl->upCaffeNet->CopyTrainedLayersFrom(upImpl->mCaffeTrainedModel);
-                   op::OpenCL::getInstance(upImpl->mGpuId, CL_DEVICE_TYPE_GPU, true);
-               #else
-                   #ifdef USE_CUDA
-                       caffe::Caffe::set_mode(caffe::Caffe::GPU);
-                       caffe::Caffe::SetDevice(upImpl->mGpuId);
-                   #else
-                       caffe::Caffe::set_mode(caffe::Caffe::CPU);
-                   #endif
-                   upImpl->upCaffeNet.reset(new caffe::Net<float>{upImpl->mCaffeProto, caffe::TEST});
-                   upImpl->upCaffeNet->CopyTrainedLayersFrom(upImpl->mCaffeTrainedModel);
-                   #ifdef USE_CUDA
-                       cudaCheck(__LINE__, __FUNCTION__, __FILE__);
-                   #endif
-               #endif
+                // Initialize net
+                #ifdef USE_OPENCL
+                    caffe::Caffe::set_mode(caffe::Caffe::GPU);
+                    caffe::Caffe::SelectDevice(upImpl->mGpuId, true);
+                    upImpl->upCaffeNet.reset(new caffe::Net<float>{upImpl->mCaffeProto, caffe::TEST,
+                                             caffe::Caffe::GetDefaultDevice()});
+                    upImpl->upCaffeNet->CopyTrainedLayersFrom(upImpl->mCaffeTrainedModel);
+                    op::OpenCL::getInstance(upImpl->mGpuId, CL_DEVICE_TYPE_GPU, true);
+                #else
+                    #ifdef USE_CUDA
+                        caffe::Caffe::set_mode(caffe::Caffe::GPU);
+                        caffe::Caffe::SetDevice(upImpl->mGpuId);
+                    #else
+                        caffe::Caffe::set_mode(caffe::Caffe::CPU);
+                    #endif
+                    upImpl->upCaffeNet.reset(new caffe::Net<float>{upImpl->mCaffeProto, caffe::TEST});
+                    upImpl->upCaffeNet->CopyTrainedLayersFrom(upImpl->mCaffeTrainedModel);
+                    #ifdef USE_CUDA
+                        cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+                    #endif
+                #endif
                 // Set spOutputBlob
                 upImpl->spOutputBlob = upImpl->upCaffeNet->blob_by_name(upImpl->mLastBlobName);
                 if (upImpl->spOutputBlob == nullptr)

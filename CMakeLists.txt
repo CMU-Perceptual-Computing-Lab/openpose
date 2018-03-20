@@ -110,14 +110,16 @@ set(GPU_MODE CUDA CACHE STRING "Select the acceleration GPU library or CPU other
 # else ()
 #   set_property(CACHE GPU_MODE PROPERTY STRINGS CPU_ONLY)
 # endif ()
-set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA)
+set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA CPU_ONLY)
 
 # Look for CUDA
+set(CUDA_FOUND FALSE)
 if (${GPU_MODE} MATCHES "CUDA")
   find_package(CUDA)
 endif (${GPU_MODE} MATCHES "CUDA")
 # Look for OpenCL
 set(OpenCL_FOUND FALSE)
+set(CUDA_VERSION_MAJOR 0)
 if (${GPU_MODE} MATCHES "OPENCL")
   find_package(OpenCL)
 endif (${GPU_MODE} MATCHES "OPENCL")
@@ -136,9 +138,10 @@ if (${GPU_MODE} MATCHES "CUDA")
   add_definitions(-DUSE_CUDA)
   message(STATUS "Building with CUDA.")
 elseif (${GPU_MODE} MATCHES "CPU_ONLY")
+  add_definitions(-DUSE_CPU_ONLY)
+  message(STATUS "Building CPU Only.")
   # OpenPose flag for Caffe
   add_definitions(-DCPU_ONLY)
-  message(STATUS "Building CPU Only.")
 elseif (${GPU_MODE} MATCHES "OPENCL")
   # OpenPose flag for Caffe
   add_definitions(-DUSE_OPENCL)
