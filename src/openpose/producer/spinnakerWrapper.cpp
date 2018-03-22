@@ -1,3 +1,6 @@
+#ifdef WITH_FLIR_CAMERA
+    #include <thread>
+#endif
 #include <opencv2/imgproc/imgproc.hpp> // cv::undistort
 #ifdef WITH_FLIR_CAMERA
     #include <Spinnaker.h>
@@ -8,6 +11,127 @@
 namespace op
 {
     #ifdef WITH_FLIR_CAMERA
+        // This function prints the device information of the camera from the transport
+        // layer; please see NodeMapInfo example for more in-depth comments on printing
+        // device information from the nodemap.
+        int printDeviceInfo(Spinnaker::GenApi::INodeMap &iNodeMap, const unsigned int camNum)
+        {
+            int result = 0;
+
+            log("Printing device information for camera " + std::to_string(camNum) + "...\n", Priority::High);
+
+            Spinnaker::GenApi::FeatureList_t features;
+            Spinnaker::GenApi::CCategoryPtr cCategoryPtr = iNodeMap.GetNode("DeviceInformation");
+            if (Spinnaker::GenApi::IsAvailable(cCategoryPtr) && Spinnaker::GenApi::IsReadable(cCategoryPtr))
+            {
+                cCategoryPtr->GetFeatures(features);
+
+                Spinnaker::GenApi::FeatureList_t::const_iterator it;
+                for (it = features.begin(); it != features.end(); ++it)
+                {
+                    Spinnaker::GenApi::CNodePtr pfeatureNode = *it;
+                    const auto cValuePtr = (Spinnaker::GenApi::CValuePtr)pfeatureNode;
+                    log(pfeatureNode->GetName() + " : " +
+                            (IsReadable(cValuePtr) ? cValuePtr->ToString() : "Node not readable"), Priority::High);
+                }
+            }
+            else
+                log("Device control information not available.", Priority::High);
+            log(" ", Priority::High);
+
+            return result;
+        }
+
+        // This function returns the camera to a normal state by turning off trigger
+        // mode.
+        int resetTrigger(Spinnaker::GenApi::INodeMap &iNodeMap)
+        {
+            try
+            {
+                int result = 0;
+                //
+                // Turn trigger mode back off
+                //
+                // *** NOTES ***
+                // Once all images have been captured, turn trigger mode back off to
+                // restore the camera to a clean state.
+                //
+                Spinnaker::GenApi::CEnumerationPtr ptrTriggerMode = iNodeMap.GetNode("TriggerMode");
+                if (!Spinnaker::GenApi::IsAvailable(ptrTriggerMode)
+                    || !Spinnaker::GenApi::IsReadable(ptrTriggerMode))
+                    error("Unable to disable trigger mode (node retrieval). Non-fatal error...",
+                              __LINE__, __FUNCTION__, __FILE__);
+
+                Spinnaker::GenApi::CEnumEntryPtr ptrTriggerModeOff = ptrTriggerMode->GetEntryByName("Off");
+                if (!Spinnaker::GenApi::IsAvailable(ptrTriggerModeOff)
+                    || !Spinnaker::GenApi::IsReadable(ptrTriggerModeOff))
+                    error("Unable to disable trigger mode (enum entry retrieval). Non-fatal error...",
+                              __LINE__, __FUNCTION__, __FILE__);
+
+                ptrTriggerMode->SetIntValue(ptrTriggerModeOff->GetValue());
+
+                // log("Trigger mode disabled...", Priority::High);
+
+                return result;
+            }
+            catch (Spinnaker::Exception &e)
+            {
+                error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+                return -1;
+            }
+            catch (const std::exception& e)
+            {
+                error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+                return -1;
+            }
+        }
+
+        Spinnaker::ImagePtr spinnakerImagePtrToColor(const Spinnaker::ImagePtr &imagePtr)
+        {
+            // Original image --> BGR uchar image
+            // Print image information
+            // Convert image to RGB
+            // Interpolation methods
+            // http://softwareservices.ptgrey.com/Spinnaker/latest/group___spinnaker_defs.html
+            // DEFAULT     Default method.
+            // NO_COLOR_PROCESSING     No color processing.
+            // NEAREST_NEIGHBOR    Fastest but lowest quality. Equivalent to
+            //                     FLYCAPTURE_NEAREST_NEIGHBOR_FAST in FlyCapture.
+            // EDGE_SENSING    Weights surrounding pixels based on localized edge orientation.
+            // HQ_LINEAR   Well-balanced speed and quality.
+            // RIGOROUS    Slowest but produces good results.
+            // IPP     Multi-threaded with similar results to edge sensing.
+            // DIRECTIONAL_FILTER  Best quality but much faster than rigorous.
+            // Colors
+            // http://softwareservices.ptgrey.com/Spinnaker/latest/group___camera_defs__h.html#ggabd5af55aaa20bcb0644c46241c2cbad1a33a1c8a1f6dbcb4a4eaaaf6d4d7ff1d1
+            // PixelFormat_BGR8
+            // Time tests
+            // const auto reps = 1e3;
+            // const auto begin = std::chrono::high_resolution_clock::now();
+            // for (auto asdf = 0 ; asdf < reps ; asdf++){
+            // ~ 1.5 ms but pixeled
+            // imagePtr = imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::DEFAULT);
+            return imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::DEFAULT);
+            // ~0.5 ms but BW
+            // imagePtr = imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::NO_COLOR_PROCESSING);
+            // ~6 ms, looks as good as best
+            // imagePtr = imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::HQ_LINEAR);
+            // ~2 ms default << edge << best
+            // imagePtr = imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::EDGE_SENSING);
+            // ~115, too slow
+            // imagePtr = imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::RIGOROUS);
+            // ~2 ms, slightly worse than HQ_LINEAR
+            // imagePtr = imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::IPP);
+            // ~30 ms, ideally best quality?
+            // imagePtr = imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::DIRECTIONAL_FILTER);
+            // imagePtr = imagePtr;
+            // }
+            // durationMs = std::chrono::duration_cast<std::chrono::nanoseconds>(
+            //     std::chrono::high_resolution_clock::now()-begin
+            // ).count() * 1e-6;
+            // log("Time conversion (ms): " + std::to_string(durationMs / reps), Priority::High);
+        }
+
         /*
          * This function converts between Spinnaker::ImagePtr container to cv::Mat container used in OpenCV.
         */
@@ -113,209 +237,9 @@ namespace op
                 return -1;
             }
         }
-
-        // This function returns the camera to a normal state by turning off trigger
-        // mode.
-        int resetTrigger(Spinnaker::GenApi::INodeMap &iNodeMap)
-        {
-            try
-            {
-                int result = 0;
-                //
-                // Turn trigger mode back off
-                //
-                // *** NOTES ***
-                // Once all images have been captured, turn trigger mode back off to
-                // restore the camera to a clean state.
-                //
-                Spinnaker::GenApi::CEnumerationPtr ptrTriggerMode = iNodeMap.GetNode("TriggerMode");
-                if (!Spinnaker::GenApi::IsAvailable(ptrTriggerMode)
-                    || !Spinnaker::GenApi::IsReadable(ptrTriggerMode))
-                    error("Unable to disable trigger mode (node retrieval). Non-fatal error...",
-                              __LINE__, __FUNCTION__, __FILE__);
-
-                Spinnaker::GenApi::CEnumEntryPtr ptrTriggerModeOff = ptrTriggerMode->GetEntryByName("Off");
-                if (!Spinnaker::GenApi::IsAvailable(ptrTriggerModeOff)
-                    || !Spinnaker::GenApi::IsReadable(ptrTriggerModeOff))
-                    error("Unable to disable trigger mode (enum entry retrieval). Non-fatal error...",
-                              __LINE__, __FUNCTION__, __FILE__);
-
-                ptrTriggerMode->SetIntValue(ptrTriggerModeOff->GetValue());
-
-                // log("Trigger mode disabled...", Priority::High);
-
-                return result;
-            }
-            catch (Spinnaker::Exception &e)
-            {
-                error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-                return -1;
-            }
-            catch (const std::exception& e)
-            {
-                error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-                return -1;
-            }
-        }
-
-        // This function acquires and displays images from each device.
-        std::vector<cv::Mat> acquireImages(Spinnaker::CameraList &cameraList,
-                                           const std::vector<cv::Mat>& cameraIntrinsics,
-                                           const std::vector<cv::Mat>& cameraDistorsions)
-        {
-            try
-            {
-                std::vector<cv::Mat> cvMats;
-
-                // Retrieve, convert, and return an image for each camera
-                // In order to work with simultaneous camera streams, nested loops are
-                // needed. It is important that the inner loop be the one iterating
-                // through the cameras; otherwise, all images will be grabbed from a
-                // single camera before grabbing any images from another.
-
-                // Get cameras
-                std::vector<Spinnaker::CameraPtr> cameraPtrs(cameraList.GetSize());
-                for (auto i = 0u; i < cameraPtrs.size(); i++)
-                    cameraPtrs.at(i) = cameraList.GetByIndex(i);
-
-                std::vector<Spinnaker::ImagePtr> imagePtrs(cameraPtrs.size());
-
-                // Getting frames
-                // Retrieve next received image and ensure image completion
-                // Spinnaker::ImagePtr imagePtr = cameraPtrs.at(i)->GetNextImage();
-                // Clean buffer + retrieve next received image + ensure image completion
-                auto durationMs = 0.;
-                // for (auto counter = 0 ; counter < 10 ; counter++)
-                while (durationMs < 1.)
-                {
-                    const auto begin = std::chrono::high_resolution_clock::now();
-                    for (auto i = 0u; i < cameraPtrs.size(); i++)
-                        imagePtrs.at(i) = cameraPtrs.at(i)->GetNextImage();
-                    durationMs = std::chrono::duration_cast<std::chrono::nanoseconds>(
-                        std::chrono::high_resolution_clock::now()-begin
-                    ).count() * 1e-6;
-                    // log("Time extraction (ms): " + std::to_string(durationMs), Priority::High);
-                }
-
-                // Original format -> RGB8
-                bool imagesExtracted = true;
-                for (auto& imagePtr : imagePtrs)
-                {
-                    if (imagePtr->IsIncomplete())
-                    {
-                        log("Image incomplete with image status " + std::to_string(imagePtr->GetImageStatus()) + "...",
-                            Priority::High, __LINE__, __FUNCTION__, __FILE__);
-                        imagesExtracted = false;
-                        break;
-                    }
-                    else
-                    {
-                        // Print image information
-                        // Convert image to RGB
-                        // Interpolation methods
-                        // http://softwareservices.ptgrey.com/Spinnaker/latest/group___spinnaker_defs.html
-                        // DEFAULT     Default method.
-                        // NO_COLOR_PROCESSING     No color processing.
-                        // NEAREST_NEIGHBOR    Fastest but lowest quality. Equivalent to
-                        //                     FLYCAPTURE_NEAREST_NEIGHBOR_FAST in FlyCapture.
-                        // EDGE_SENSING    Weights surrounding pixels based on localized edge orientation.
-                        // HQ_LINEAR   Well-balanced speed and quality.
-                        // RIGOROUS    Slowest but produces good results.
-                        // IPP     Multi-threaded with similar results to edge sensing.
-                        // DIRECTIONAL_FILTER  Best quality but much faster than rigorous.
-                        // Colors
-                        // http://softwareservices.ptgrey.com/Spinnaker/latest/group___camera_defs__h.html#ggabd5af55aaa20bcb0644c46241c2cbad1a33a1c8a1f6dbcb4a4eaaaf6d4d7ff1d1
-                        // PixelFormat_BGR8
-                        // Time tests
-                        // const auto reps = 1e3;
-                        // // const auto reps = 1e2; // for RIGOROUS & DIRECTIONAL_FILTER
-                        // const auto begin = std::chrono::high_resolution_clock::now();
-                        // for (auto asdf = 0 ; asdf < reps ; asdf++){
-                        // ~ 1.5 ms but pixeled
-                        // imagePtr = imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::DEFAULT);
-                        // ~0.5 ms but BW
-                        // imagePtr = imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::NO_COLOR_PROCESSING);
-                        // ~6 ms, looks as good as best
-                        imagePtr = imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::HQ_LINEAR);
-                        // ~2 ms default << edge << best
-                        // imagePtr = imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::EDGE_SENSING);
-                        // ~115, too slow
-                        // imagePtr = imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::RIGOROUS);
-                        // ~2 ms, slightly worse than HQ_LINEAR
-                        // imagePtr = imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::IPP);
-                        // ~30 ms, ideally best quality?
-                        // imagePtr = imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::DIRECTIONAL_FILTER);
-                        // imagePtr = imagePtr;
-                        // }
-                        // durationMs = std::chrono::duration_cast<std::chrono::nanoseconds>(
-                        //     std::chrono::high_resolution_clock::now()-begin
-                        // ).count() * 1e-6;
-                        // log("Time conversion (ms): " + std::to_string(durationMs / reps), Priority::High);
-                    }
-                }
-
-                // Convert to cv::Mat
-                if (imagesExtracted)
-                {
-                    for (auto i = 0u; i < imagePtrs.size(); i++)
-                    {
-                        // Baseline
-                        // cvMats.emplace_back(spinnakerWrapperToCvMat(imagePtrs.at(i)).clone());
-                        // Undistort
-                        // http://docs.opencv.org/2.4/modules/imgproc/doc/geometric_transformations.html#undistort
-                        auto auxCvMat = spinnakerWrapperToCvMat(imagePtrs.at(i));
-                        cvMats.emplace_back();
-                        cv::undistort(auxCvMat, cvMats[i], cameraIntrinsics[i], cameraDistorsions[i]);
-                    }
-                }
-
-                return cvMats;
-            }
-            catch (Spinnaker::Exception &e)
-            {
-                error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-                return {};
-            }
-            catch (const std::exception& e)
-            {
-                error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-                return {};
-            }
-        }
-
-        // This function prints the device information of the camera from the transport
-        // layer; please see NodeMapInfo example for more in-depth comments on printing
-        // device information from the nodemap.
-        int printDeviceInfo(Spinnaker::GenApi::INodeMap &iNodeMap, const unsigned int camNum)
-        {
-            int result = 0;
-
-            log("Printing device information for camera " + std::to_string(camNum) + "...\n", Priority::High);
-
-            Spinnaker::GenApi::FeatureList_t features;
-            Spinnaker::GenApi::CCategoryPtr cCategoryPtr = iNodeMap.GetNode("DeviceInformation");
-            if (Spinnaker::GenApi::IsAvailable(cCategoryPtr) && Spinnaker::GenApi::IsReadable(cCategoryPtr))
-            {
-                cCategoryPtr->GetFeatures(features);
-
-                Spinnaker::GenApi::FeatureList_t::const_iterator it;
-                for (it = features.begin(); it != features.end(); ++it)
-                {
-                    Spinnaker::GenApi::CNodePtr pfeatureNode = *it;
-                    const auto cValuePtr = (Spinnaker::GenApi::CValuePtr)pfeatureNode;
-                    log(pfeatureNode->GetName() + " : " +
-                            (IsReadable(cValuePtr) ? cValuePtr->ToString() : "Node not readable"), Priority::High);
-                }
-            }
-            else
-                log("Device control information not available.", Priority::High);
-            log(" ", Priority::High);
-
-            return result;
-        }
     #else
-        const std::string WITH_FLIR_CAMERA_ERROR{"OpenPose CMake must be compiled with the `WITH_FLIR_CAMERA` flag in"
-            " order to use the FLIR camera. Alternatively, disable `--flir_camera`."};
+        const std::string WITH_FLIR_CAMERA_ERROR{"OpenPose CMake must be compiled with the `WITH_FLIR_CAMERA`"
+            " flag in order to use the FLIR camera. Alternatively, disable `--flir_camera`."};
     #endif
 
     struct SpinnakerWrapper::ImplSpinnakerWrapper
@@ -326,10 +250,121 @@ namespace op
             Point<int> mResolution;
             Spinnaker::CameraList mCameraList;
             Spinnaker::SystemPtr mSystemPtr;
+            std::vector<cv::Mat> mCvMats;
 
             ImplSpinnakerWrapper() :
                 mInitialized{false}
             {
+            }
+
+            void undistortImage(const int i, const Spinnaker::ImagePtr& imagePtr,
+                                const cv::Mat& cameraIntrinsics, const cv::Mat& cameraDistorsions)
+            {
+                // Original image --> BGR uchar image
+                const auto imagePtrColor = spinnakerImagePtrToColor(imagePtr);
+                // Spinnaker to cv::Mat
+                const auto cvMatDistorted = spinnakerWrapperToCvMat(imagePtrColor);
+                // const auto cvMatDistorted = spinnakerWrapperToCvMat(imagePtr);
+                // Baseline
+                // mCvMats[i] = cvMatDistorted.clone();
+                // Undistort
+                // http://docs.opencv.org/2.4/modules/imgproc/doc/geometric_transformations.html#undistort
+                cv::undistort(cvMatDistorted, mCvMats[i], cameraIntrinsics, cameraDistorsions);
+            }
+
+            // This function acquires and displays images from each device.
+            std::vector<cv::Mat> acquireImages(Spinnaker::CameraList &cameraList,
+                                               const std::vector<cv::Mat>& cameraIntrinsics,
+                                               const std::vector<cv::Mat>& cameraDistorsions)
+            {
+                try
+                {
+                    // std::vector<cv::Mat> cvMats;
+
+                    // Retrieve, convert, and return an image for each camera
+                    // In order to work with simultaneous camera streams, nested loops are
+                    // needed. It is important that the inner loop be the one iterating
+                    // through the cameras; otherwise, all images will be grabbed from a
+                    // single camera before grabbing any images from another.
+
+                    // Get cameras - ~0.005 ms (3 cameras)
+                    std::vector<Spinnaker::CameraPtr> cameraPtrs(cameraList.GetSize());
+                    for (auto i = 0u; i < cameraPtrs.size(); i++)
+                        cameraPtrs.at(i) = cameraList.GetByIndex(i);
+
+                    // Read raw images - ~0.15 ms (3 cameras)
+                    std::vector<Spinnaker::ImagePtr> imagePtrs(cameraPtrs.size());
+                    for (auto i = 0u; i < cameraPtrs.size(); i++)
+                        imagePtrs.at(i) = cameraPtrs.at(i)->GetNextImage();
+                    // Commented code was supposed to clean buffer, but `NewestFirstOverwrite` does that
+                    // Getting frames
+                    // Retrieve next received image and ensure image completion
+                    // Spinnaker::ImagePtr imagePtr = cameraPtrs.at(i)->GetNextImage();
+                    // Clean buffer + retrieve next received image + ensure image completion
+                    // auto durationMs = 0.;
+                    // // for (auto counter = 0 ; counter < 10 ; counter++)
+                    // while (durationMs < 1.)
+                    // {
+                    //     const auto begin = std::chrono::high_resolution_clock::now();
+                    //     for (auto i = 0u; i < cameraPtrs.size(); i++)
+                    //         imagePtrs.at(i) = cameraPtrs.at(i)->GetNextImage();
+                    //     durationMs = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                    //         std::chrono::high_resolution_clock::now()-begin
+                    //     ).count() * 1e-6;
+                    //     // log("Time extraction (ms): " + std::to_string(durationMs), Priority::High);
+                    // }
+
+                    // All images completed
+                    bool imagesExtracted = true;
+                    for (auto& imagePtr : imagePtrs)
+                    {
+                        if (imagePtr->IsIncomplete())
+                        {
+                            log("Image incomplete with image status " + std::to_string(imagePtr->GetImageStatus())
+                                + "...", Priority::High, __LINE__, __FUNCTION__, __FILE__);
+                            imagesExtracted = false;
+                            break;
+                        }
+                    }
+                    // Convert to cv::Mat
+                    if (imagesExtracted)
+                    {
+                        // // Original image --> BGR uchar image - ~4 ms (3 cameras)
+                        // for (auto& imagePtr : imagePtrs)
+                        //     imagePtr = spinnakerImagePtrToColor(imagePtr);
+
+                        // Multi-thread undistort (slowest function in the class)
+                        //     ~35msec (3 cameras + multi-thread)
+                        //     ~59msec (2 cameras + single-thread)
+                        //     ~75msec (3 cameras + single-thread)
+                        std::vector<std::thread> threads(imagePtrs.size()-1);
+                        mCvMats.clear();
+                        mCvMats.resize(imagePtrs.size());
+                        for (auto i = 0u; i < imagePtrs.size()-1; i++)
+                            // Multi-thread option
+                            threads.at(i) = std::thread{&ImplSpinnakerWrapper::undistortImage, this, i, imagePtrs.at(i),
+                                                        cameraIntrinsics.at(i), cameraDistorsions.at(i)};
+                            // // Single-thread option
+                            // undistortImage(i, imagePtrs.at(i), cameraIntrinsics.at(i), cameraDistorsions.at(i));
+                        undistortImage(imagePtrs.size()-1, imagePtrs.back(), cameraIntrinsics.back(),
+                                       cameraDistorsions.back());
+                        // Close threads
+                        for (auto& thread : threads)
+                            if (thread.joinable())
+                                thread.join();
+                    }
+                    return mCvMats;
+                }
+                catch (Spinnaker::Exception &e)
+                {
+                    error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+                    return {};
+                }
+                catch (const std::exception& e)
+                {
+                    error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+                    return {};
+                }
             }
         #endif
     };
@@ -417,14 +452,14 @@ namespace op
                     // acquired.
                     cameraPtr->Init();
 
-                    // Retrieve GenICam nodemap
+                    // // Retrieve GenICam nodemap
                     // auto& iNodeMap = cameraPtr->GetNodeMap();
 
                     // // Configure trigger
-                    // result = configureTrigger(iNodeMap);
+                    // int result = configureTrigger(iNodeMap);
                     // if (result < 0)
-                    // error("Result > 0, error " + std::to_string(result) + " occurred...",
-                    //           __LINE__, __FUNCTION__, __FILE__);
+                    //     error("Result > 0, error " + std::to_string(result) + " occurred...",
+                    //               __LINE__, __FUNCTION__, __FILE__);
 
                     // // Configure chunk data
                     // result = configureChunkData(iNodeMap);
@@ -605,9 +640,9 @@ namespace op
                             != upImpl->mCameraParameterReader.getNumberCameras())
                         error("The number of cameras must be the same as the INTRINSICS vector size.",
                           __LINE__, __FUNCTION__, __FILE__);
-                    return acquireImages(upImpl->mCameraList,
-                                         upImpl->mCameraParameterReader.getCameraIntrinsics(),
-                                         upImpl->mCameraParameterReader.getCameraDistortions());
+                    return upImpl->acquireImages(upImpl->mCameraList,
+                                                 upImpl->mCameraParameterReader.getCameraIntrinsics(),
+                                                 upImpl->mCameraParameterReader.getCameraDistortions());
                 }
                 catch (const Spinnaker::Exception& e)
                 {
