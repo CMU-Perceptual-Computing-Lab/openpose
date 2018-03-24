@@ -217,7 +217,7 @@ In order to uninstall OpenPose:
 
 ### Optional Settings
 #### Profiling Speed
-In order to obtain speed metrics from the command line while running OpenPose, compile it with the `PROFILER_ENABLED` flag. OpenPose will automatically display time measurements for each subthread after processing `F` frames (by default `F = 1000`, but it can be modified with the `--profile_speed` flag).
+OpenPose displays the FPS in the basic GUI. However, more complex speed metrics can be obtained from the command line while running OpenPose. In order to obtain those, compile OpenPose with the `PROFILER_ENABLED` flag. OpenPose will automatically display time measurements for each subthread after processing `F` frames (by default `F = 1000`, but it can be modified with the `--profile_speed` flag).
 
 - Time measurement for 1 graphic card: The FPS will be the slowest time displayed in your terminal command line (as OpenPose is multi-threaded). Times are in milliseconds, so `FPS = 1000/millisecond_measurement`.
 - Time measurement for >1 graphic cards: Assuming `n` graphic cards, you will have to wait up to `n` x `F` frames to visualize each graphic card speed (as the frames are splitted among them). In addition, the FPS would be: `FPS = minFPS(speed_per_GPU/n, worst_time_measurement_other_than_GPUs)`. For < 4 GPUs, this is usually `FPS = speed_per_GPU/n`.

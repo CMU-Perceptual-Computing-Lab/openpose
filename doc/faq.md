@@ -5,11 +5,12 @@ OpenPose - Frequently Asked Question (FAQ)
 1. [FAQ](#faq)
     1. [Out of Memory Error](#out-of-memory-error)
     2. [Speed Up and Benchmark](#speed-up-and-benchmark)
-    3. [Webcam Slower than Images](#webcam-slower-than-images)
-    4. [Vide/Webcam Not Working](#video-webcam-not-working)
-    5. [Cannot Find OpenPose.dll Error](#cannot-find-openpose.dll-error-windows)
-    6. [Free Invalid Pointer Error](#free-invalid-pointer-error)
-    7. [Source Directory does not Contain CMakeLists.txt (Windows)](#source-directory-does-not-contain-cmakelists.txt-windows)
+    3. [Estimating FPS without Display](#estimating-fps-without-display)
+    4. [Webcam Slower than Images](#webcam-slower-than-images)
+    5. [Vide/Webcam Not Working](#video-webcam-not-working)
+    6. [Cannot Find OpenPose.dll Error](#cannot-find-openpose.dll-error-windows)
+    7. [Free Invalid Pointer Error](#free-invalid-pointer-error)
+    8. [Source Directory does not Contain CMakeLists.txt (Windows)](#source-directory-does-not-contain-cmakelists.txt-windows)
 
 
 
@@ -33,6 +34,11 @@ OpenPose - Frequently Asked Question (FAQ)
     3. For face, reduce the `--face_net_resolution`. The resolution 320x320 usually works pretty decently.
     4. Use the `MPI_4_layers` model (lower accuracy and lower number of parts).
     5. Change GPU rendering by CPU rendering to get approximately +0.5 FPS (`--render_pose 1`).
+
+
+
+### Estimating FPS without Display
+Check the [doc/installation.md#profiling-speed](./installation.md#profiling-speed) section.
 
 
 
@@ -74,8 +80,3 @@ Note: OpenPose library is not an executable, but a library. So instead clicking 
 **Q: I am getting an error of the type: `The source directory {path to file} does not contain a CMakeLists.txt file.`.**
 
 **A**: You might not have writing access to that folder. If you are in Windows, you should not try to install it in `Program Files`.
-
-
-
-### Estimating FPS without Display
-Check the [doc/installation.md#profiling-speed](./installation.md#profiling-speed) section.
