@@ -74,3 +74,8 @@ Note: OpenPose library is not an executable, but a library. So instead clicking 
 **Q: I am getting an error of the type: `The source directory {path to file} does not contain a CMakeLists.txt file.`.**
 
 **A**: You might not have writing access to that folder. If you are in Windows, you should not try to install it in `Program Files`.
+
+
+
+### Estimating FPS without Display
+Check the [doc/installation.md#profiling-speed](./installation.md#profiling-speed) section.

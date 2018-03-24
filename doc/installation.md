@@ -11,14 +11,15 @@ OpenPose - Installation
 7. [Reinstallation](#reinstallation)
 8. [Uninstallation](#uninstallation)
 9. [Optional Settings](#optional-settings)
-    1. [MPI Model](#mpi-model)
-    2. [CPU Version](#cpu-version)
-    3. [3D Reconstruction Module](#3d-reconstruction-module)
-    4. [Compiling without cuDNN](#compiling-without-cudnn)
-    5. [Custom Caffe (Ubuntu Only)](#custom-caffe-ubuntu-only)
-    6. [Custom OpenCV (Ubuntu Only)](#custom-opencv-ubuntu-only)
-    7. [Doxygen Documentation Autogeneration (Ubuntu Only)](#doxygen-documentation-autogeneration-ubuntu-only)
-    8. [CMake Command Line Configuration (Ubuntu Only)](#cmake-command-line-configuration-ubuntu-only)
+    1. [Profiling Speed](#profiling-speed)
+    2. [MPI Model](#mpi-model)
+    3. [CPU Version](#cpu-version)
+    4. [3D Reconstruction Module](#3d-reconstruction-module)
+    5. [Compiling without cuDNN](#compiling-without-cudnn)
+    6. [Custom Caffe (Ubuntu Only)](#custom-caffe-ubuntu-only)
+    7. [Custom OpenCV (Ubuntu Only)](#custom-opencv-ubuntu-only)
+    8. [Doxygen Documentation Autogeneration (Ubuntu Only)](#doxygen-documentation-autogeneration-ubuntu-only)
+    9. [CMake Command Line Configuration (Ubuntu Only)](#cmake-command-line-configuration-ubuntu-only)
 
 
 
@@ -215,6 +216,14 @@ In order to uninstall OpenPose:
 
 
 ### Optional Settings
+#### Profiling Speed
+In order to obtain speed metrics from the command line while running OpenPose, compile it with the `PROFILER_ENABLED` flag. OpenPose will automatically display time measurements for each subthread after processing `F` frames (by default `F = 1000`, but it can be modified with the `--profile_speed` flag).
+
+- Time measurement for 1 graphic card: The FPS will be the slowest time displayed in your terminal command line (as OpenPose is multi-threaded). Times are in milliseconds, so `FPS = 1000/millisecond_measurement`.
+- Time measurement for >1 graphic cards: Assuming `n` graphic cards, you will have to wait up to `n` x `F` frames to visualize each graphic card speed (as the frames are splitted among them). In addition, the FPS would be: `FPS = minFPS(speed_per_GPU/n, worst_time_measurement_other_than_GPUs)`. For < 4 GPUs, this is usually `FPS = speed_per_GPU/n`.
+
+
+
 #### MPI Model
 By default, the body MPI model is not downloaded. You can download it by turning on the `DOWNLOAD_MPI_MODEL`. It's slightly faster but less accurate and has less keypoints than the COCO body model.
 

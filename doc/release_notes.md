@@ -196,6 +196,7 @@ OpenPose Library - Release Notes
     24. OpenPose GUI: 'l' and 'k' functionality swapped.
     25. 3-D reconstruction module: Added flag `--3d_min_views` to select minimum number of cameras required for 3-D reconstruction.
     26. Flag `--camera_fps` also applies to recorded video (`--write_video`).
+    27. Flir camera producer `n` times faster for `n` cameras (multi-threaded). If the number of cameras is greater than the number of the computer threads, the speed up might not be exactly `n` times.
 2. Functions or parameters renamed:
     1. Flag `no_display` renamed as `display`, able to select between `NoDisplay`, `Display2D`, `Display3D`, and `DisplayAll`.
     2. 3-D reconstruction demo is now inside the OpenPose demo binary.
