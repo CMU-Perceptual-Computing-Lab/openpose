@@ -168,7 +168,7 @@ OpenPose Library - Release Notes
 
 
 
-## Current version (future OpenPose 1.3.0)
+## OpenPose 1.3.0 (Mar 24, 2018)
 1. Main improvements:
     1. Output of `--write_json` uses less hard disk space (enters and tabs removed).
     2. Removed Boost dependencies.
@@ -208,6 +208,13 @@ OpenPose Library - Release Notes
     2. Fixed core-dumped in PoseRenderer with GUI when changed element to be rendered to something else than skeleton.
     3. 3-D visualizer does not crash on exit anymore.
     4. Fake pause ('m' key pressed) works again.
+
+
+
+## Current version - future OpenPose 1.3.1
+1. Main improvements:
+2. Functions or parameters renamed:
+3. Main bugs fixed:
 
 
 
