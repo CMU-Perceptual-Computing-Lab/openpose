@@ -1,12 +1,12 @@
-set(EXAMPLE_FILES
-    1_custom_post_processing.cpp)
-
+set(EXAMPLE_FILES 
+    adam.cpp)
+  
 include(${CMAKE_SOURCE_DIR}/cmake/Utils.cmake)
 
 foreach(EXAMPLE_FILE ${EXAMPLE_FILES})
 
   get_filename_component(SOURCE_NAME ${EXAMPLE_FILE} NAME_WE)
-
+  
   if (UNIX AND NOT APPLE)
     set(EXE_NAME "${SOURCE_NAME}.bin")
   elseif (WIN32)
@@ -15,11 +15,10 @@ foreach(EXAMPLE_FILE ${EXAMPLE_FILES})
 
   message(STATUS "Adding Example ${EXE_NAME}")
   add_executable(${EXE_NAME} ${EXAMPLE_FILE})
-  target_link_libraries( ${EXE_NAME} openpose ${GLOG_LIBRARY} ${GFLAGS_LIBRARY}
-      ${Caffe_LIBS} ${MKL_LIBS} ${GLUT_LIBRARY} ${SPINNAKER_LIB} ${CMAKE_THREAD_LIBS_INIT} ${CERES_LIBRARIES} ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} ${GLEW_LIBRARY} ${FREE_IMAGE_LIBRARY})
-
+  target_link_libraries( ${EXE_NAME} openpose ${GLOG_LIBRARY} ${GFLAGS_LIBRARY} ${Caffe_LIBS} ${MKL_LIBS} ${GLUT_LIBRARY} ${SPINNAKER_LIB} ${CMAKE_THREAD_LIBS_INIT} ${CERES_LIBRARIES} ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} ${GLEW_LIBRARY} ${FREE_IMAGE_LIBRARY})
+  
   if (WIN32)
-    set_property(TARGET ${EXE_NAME} PROPERTY FOLDER "Examples/Tutorial/AddModule")
+    set_property(TARGET ${EXE_NAME} PROPERTY FOLDER "Examples/Tutorial/Wrapper")
     configure_file(${CMAKE_SOURCE_DIR}/cmake/OpenPose${CL}.vcxproj.user
         ${CMAKE_CURRENT_BINARY_DIR}/${EXE_NAME}.vcxproj.user @ONLY)
     # Properties->General->Output Directory

@@ -181,6 +181,7 @@ endif (${GPU_MODE} MATCHES "CUDA")
 # Suboptions for OpenPose 3D Reconstruction demo
 option(WITH_3D_RENDERER "Add OpenPose 3D renderer module (it requires FreeGLUT library)." OFF)
 option(WITH_FLIR_CAMERA "Add FLIR (formerly Point Grey) camera code (requires Spinnaker SDK already installed)." OFF)
+option(WITH_3D_ADAM_MODEL "Add 3-D Adam model (requires OpenGL, Ceres, Eigen, OpenMP, FreeImage, GLEW, and IGL already installed)." OFF)
 
 # Download the models
 option(DOWNLOAD_COCO_MODEL "Download COCO model." ON)
@@ -222,6 +223,10 @@ if (WITH_FLIR_CAMERA)
   # OpenPose flags
   add_definitions(-DWITH_FLIR_CAMERA)
 endif (WITH_FLIR_CAMERA)
+if (WITH_3D_ADAM_MODEL)
+  # OpenPose flags
+  add_definitions(-DWITH_3D_ADAM_MODEL)
+endif (WITH_3D_ADAM_MODEL)
 
 if (UNIX AND NOT APPLE)
   if (${GPU_MODE} MATCHES "CUDA")
@@ -255,6 +260,20 @@ if (UNIX AND NOT APPLE)
   else (WITH_FLIR_CAMERA)
     set(SPINNAKER_LIB "")
   endif (WITH_FLIR_CAMERA)
+  if (WITH_3D_ADAM_MODEL)
+    find_package(PkgConfig)
+    pkg_check_modules(EIGEN3 REQUIRED eigen3)
+    find_package(Ceres REQUIRED COMPONENTS SuiteSparse)
+    find_package(GLEW REQUIRED)
+    find_package(GLUT REQUIRED)
+    find_package(LIBIGL REQUIRED)
+    find_package(OpenGL REQUIRED)
+    find_package(OpenMP REQUIRED)
+    FIND_LIBRARY(FREE_IMAGE_LIBRARY NAMES libfreeimage.so)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+  endif (WITH_3D_ADAM_MODEL)
 
   # OpenMP
   if (${GPU_MODE} MATCHES "CPU_ONLY")
@@ -557,6 +576,14 @@ endif (WITH_3D_RENDERER)
 if (WITH_FLIR_CAMERA)
   include_directories(${SPINNAKER_INCLUDE_DIRS})
 endif (WITH_FLIR_CAMERA)
+if (WITH_3D_ADAM_MODEL)
+                                    include_directories(include/adam) # TEMPORARY - TO BE REMOVED IN THE FUTURE
+  include_directories(${CERES_INCLUDE_DIRS})
+  include_directories(${EIGEN3_INCLUDE_DIRS})
+  include_directories(${IGL_INCLUDE_DIRS})
+  include_directories(${LIBIGL_INCLUDE_DIRS})
+  include_directories(${OPENGL_INCLUDE_DIRS} ${GLUT_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS})
+endif (WITH_3D_ADAM_MODEL)
 # Windows includes
 if (WIN32)
   include_directories(
