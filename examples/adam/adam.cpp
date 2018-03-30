@@ -403,8 +403,7 @@ public:
         render = std::make_shared<Renderer>(&argc, nullptr);
         // render = std::make_shared<Renderer>(&argc, argv);
         render->options.nRange=150;
-        // render->options.yrot=180;
-        render->options.yrot=225;
+        render->options.yrot=45;
         render->options.xrot=25;
         render->options.meshSolid = true;
         read_buffer.reset(new GLubyte[render->options.width * render->options.height * 3]);
@@ -464,103 +463,9 @@ public:
                 return 18;
             else if (oPPart == 18)
                 return 16;
-            // // Nose
-            // if (oPPart == 0)
-            //     return 1;
-            // // Neck
-            // else if (oPPart == 1)
-            //     return 0;
-            // // Right arm
-            // else if (oPPart == 2)
-            //     return 3;
-            // else if (oPPart == 3)
-            //     return 4;
-            // else if (oPPart == 4)
-            //     return 5;
-            // // Left arm
-            // else if (oPPart == 5)
-            //     return 9;
-            // else if (oPPart == 6)
-            //     return 10;
-            // else if (oPPart == 7)
-            //     return 11;
-            // // Mid-hip
-            // else if (oPPart == 8)
-            //     return 2;
-            // // Right leg
-            // else if (oPPart == 9)
-            //     return 6;
-            // else if (oPPart == 10)
-            //     return 7;
-            // else if (oPPart == 11)
-            //     return 8;
-            // // Left leg
-            // else if (oPPart == 12)
-            //     return 12;
-            // else if (oPPart == 13)
-            //     return 13;
-            // else if (oPPart == 14)
-            //     return 14;
-            // // Face
-            // else if (oPPart == 15)
-            //     return 15;
-            // else if (oPPart == 16)
-            //     return 17;
-            // else if (oPPart == 17)
-            //     return 16;
-            // else if (oPPart == 18)
-            //     return 18;
-//     const std::map<unsigned int, std::string> POSE_BODY_19_BODY_PARTS {
-//         {0,  "Nose"},
-//         {1,  "Neck"},
-//         {2,  "RShoulder"},
-//         {3,  "RElbow"},
-//         {4,  "RWrist"},
-//         {5,  "LShoulder"},
-//         {6,  "LElbow"},
-//         {7,  "LWrist"},
-//         {8,  "LowerAbs"},
-//         {9,  "RHip"},
-//         {10, "RKnee"},
-//         {11, "RAnkle"},
-//         {12, "LHip"},
-//         {13, "LKnee"},
-//         {14, "LAnkle"},
-//         {15, "REye"},
-//         {16, "LEye"},
-//         {17, "REar"},
-//         {18, "LEar"},
-//         {19, "Background"}
-//     };
-//     //This is the 3D labels for 15 joint case
-// enum SMC_BodyJointEnum 
-// {
-//    SMC_BodyJoint_neck=0,  //0
-//    SMC_BodyJoint_headTop =1,
-   
-//    SMC_BodyJoint_bodyCenter,  //2
-//    //left
-//     SMC_BodyJoint_lShoulder, //3
-//     SMC_BodyJoint_lElbow,//4
-//     SMC_BodyJoint_lHand,//5
-//     SMC_BodyJoint_lHip,  //6
-//     SMC_BodyJoint_lKnee,  //7
-//     SMC_BodyJoint_lFoot,  //8
-//    //right
-//     SMC_BodyJoint_rShoulder, //9
-//     SMC_BodyJoint_rElbow,//10
-//     SMC_BodyJoint_rHand,//11
-//     SMC_BodyJoint_rHip,  //12
-//     SMC_BodyJoint_rKnee,  //13
-//     SMC_BodyJoint_rFoot,  //14
-//     //Additional by COCO
-//     SMC_BodyJoint_lEye, //15
-//     SMC_BodyJoint_lEar, //16
-//     SMC_BodyJoint_rEye, //17
-//     SMC_BodyJoint_rEar, //18
-// };
-            
-            return oPPart;
+            else
+                op::error("Wrong body part (" + std::to_string(oPPart) + ").",
+                          __LINE__, __FUNCTION__, __FILE__);
         }
         op::error("Wrong body part (" + std::to_string(oPPart) + ").",
                   __LINE__, __FUNCTION__, __FILE__);
@@ -576,13 +481,12 @@ public:
                 // datum.poseKeypoints: Array<float> with the estimated pose
             if (datumsPtr != nullptr && !datumsPtr->empty())
             {
-// op::log(__LINE__);
                 auto& datum = datumsPtr->at(0);
                 const auto& poseKeypoints3D = datum.poseKeypoints3D;
                 const auto& faceKeypoints3D = datum.faceKeypoints3D;
                 const auto& handKeypoints3D = datum.handKeypoints3D;
-                const auto& leftHandKeypoints3D = datum.handKeypoints3D[0];
-                const auto& rightHandKeypoints3D = datum.handKeypoints3D[1];
+                // const auto& leftHandKeypoints3D = datum.handKeypoints3D[0];
+                // const auto& rightHandKeypoints3D = datum.handKeypoints3D[1];
                 if (poseKeypoints3D.getSize(1) != 19)
                     op::error("Only working for BODY_19 (#parts = "
                               + std::to_string(poseKeypoints3D.getSize(2)) + ").",
@@ -591,39 +495,55 @@ public:
                 for (auto part = 0 ; part < poseKeypoints3D.getSize(1); part++)
                     if (poseKeypoints3D[{0, part, poseKeypoints3D.getSize(2)-1}] > 0.5 /*|| !mInitialized*/)
                         for (auto xyz = 0 ; xyz < poseKeypoints3D.getSize(2)-1 ; xyz++)
-                            targetJoint[mapOPToDome(part)*(poseKeypoints3D.getSize(2)-1) + xyz] = poseKeypoints3D[{0, part, xyz}] * 1e-1;
+                            targetJoint[mapOPToDome(part)*(poseKeypoints3D.getSize(2)-1) + xyz] = poseKeypoints3D[{0, part, xyz}];
                 // Update left/right hand
-                const auto handOffset = poseKeypoints3D.getSize(1)*(poseKeypoints3D.getSize(2)-1);
+                const auto bodyOffset = poseKeypoints3D.getSize(1)*(poseKeypoints3D.getSize(2)-1);
+                const auto handOffset = handKeypoints3D[0].getSize(1)*(handKeypoints3D[0].getSize(2)-1);
                 for (auto hand = 0u ; hand < handKeypoints3D.size(); hand++)
+                {
                     for (auto part = 0 ; part < handKeypoints3D[hand].getSize(1); part++)
+                    {
+                        const auto baseIndex = bodyOffset + hand*handOffset + part*(handKeypoints3D[hand].getSize(2)-1);
                         if (handKeypoints3D[hand][{0, part, 3}] > 0.5 || !mInitialized)
                             for (auto xyz = 0 ; xyz < handKeypoints3D[hand].getSize(2)-1 ; xyz++)
-                                targetJoint[handOffset + part*(handKeypoints3D[hand].getSize(2)-1) + xyz] = handKeypoints3D[hand][{0, part, xyz}] * 1e-1;
+                                targetJoint[baseIndex + xyz] = handKeypoints3D[hand][{0, part, xyz}];
+                        else
+                        {
+                            targetJoint[baseIndex] = 0;
+                            targetJoint[baseIndex+1] = 0;
+                            targetJoint[baseIndex+2] = 0;
+                        }
+                    }
+                }
                 // Update face
                 // Not available
 // HACK --> FIX!!!!!
+// mm --> cm
+for (auto i = 0 ; i < 183 ; i++)
+targetJoint[i] *= 0.1;
 // Invert z-axis
 for (auto i = 0 ; i < 183/3 ; i++)
-targetJoint[3*i] *= -1;
+targetJoint[3*i+2] *= -1;
+// targetJoint[3*i] *= -1;
 // Increase scale
 for (auto i = 0 ; i < 183 ; i++)
 targetJoint[i] *= 1.4;
                 // Update keypoints
                 updateKeypoints(bodyJoints, LHandJoints, RHandJoints, targetJoint);
 
-                // // Cout keypoints
-                // std::cout << "Body:\n";
-                // for (auto i = 0 ; i < 183 ; i++)
-                // {
-                //     std::cout << targetJoint[i] << " ";
-                //     if (i % 3 == 2)
-                //         std::cout << "\n";
-                //     if (i == 19*3-1)
-                //         std::cout << "Left hand:\n";
-                //     if (i == 19*3-1+21*3)
-                //         std::cout << "Right hand:\n";
-                // }
-                // std::cout << std::endl;
+                // Cout keypoints
+                std::cout << "Body:\n";
+                for (auto i = 0 ; i < 183 ; i++)
+                {
+                    std::cout << targetJoint[i] << " ";
+                    if (i % 3 == 2)
+                        std::cout << "\n";
+                    if (i == 19*3-1)
+                        std::cout << "Left hand:\n";
+                    if (i == 19*3-1+21*3)
+                        std::cout << "Right hand:\n";
+                }
+                std::cout << std::endl;
 
                 // First frame
 const auto start = std::chrono::high_resolution_clock::now();
@@ -672,32 +592,29 @@ g_vis_data.resultJoint = nullptr;
                 // g_vis_data.read_buffer = read_buffer;
                 g_vis_data.read_buffer = read_buffer.get();
                 CopyMesh(mesh, g_vis_data);
-// op::log(__LINE__);
                 // ~0.001 ms
                 render->RenderHand(g_vis_data);
-// op::log(__LINE__);
                 // ~60 ms
                 render->RenderAndRead(); // read the image into read_buffer
-// op::log(__LINE__);
                 // render->Display();
 const auto duration2 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start2).count();
 const auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start).count();
 
-                // Display in opencv window
-                cv::Mat img(render->options.height, render->options.width, CV_8UC3, read_buffer.get()); // img is y-flipped, and in RGB order
-                cv::flip(img, img, 0);
-                cv::cvtColor(img, img, cv::COLOR_RGB2BGR);
-                if (videoSaver == nullptr)
-                {
-                    const auto originalVideoFps = 30;
-                    videoSaver = std::make_shared<op::VideoSaver>(
-                        "/media/posefs3b/Users/gines/cvpr2018/adam.avi", CV_FOURCC('M','J','P','G'),
-                        originalVideoFps, op::Point<int>{img.cols, img.rows}
-                    );
-                }
-                videoSaver->write(img);
-                // cv::imshow( "Display window", img );
-                // cv::waitKey(16);
+                // // Display in opencv window
+                // cv::Mat img(render->options.height, render->options.width, CV_8UC3, read_buffer.get()); // img is y-flipped, and in RGB order
+                // cv::flip(img, img, 0);
+                // cv::cvtColor(img, img, cv::COLOR_RGB2BGR);
+                // if (videoSaver == nullptr)
+                // {
+                //     const auto originalVideoFps = 30;
+                //     videoSaver = std::make_shared<op::VideoSaver>(
+                //         "/media/posefs3b/Users/gines/cvpr2018/adam.avi", CV_FOURCC('M','J','P','G'),
+                //         originalVideoFps, op::Point<int>{img.cols, img.rows}
+                //     );
+                // }
+                // videoSaver->write(img);
+                // // cv::imshow( "Display window", img );
+                // // cv::waitKey(16);
 std::cout << "IK:         " << duration0 * 1e-6
           << "\nRender1:    " << duration1 * 1e-6
           << "\nRenderRest: " << duration2 * 1e-6
@@ -857,30 +774,8 @@ int openPoseDemo()
     // Start processing
     // Two different ways of running the program on multithread environment
     op::log("Starting thread(s)", op::Priority::High);
-    // Option a) Recommended - Also using the main thread (this thread) for processing (it saves 1 thread)
     // Start, run & stop threads
     opWrapper.exec();  // It blocks this thread until all threads have finished
-
-    // // Option b) Keeping this thread free in case you want to do something else meanwhile, e.g. profiling the GPU
-    // memory
-    // // VERY IMPORTANT NOTE: if OpenCV is compiled with Qt support, this option will not work. Qt needs the main
-    // // thread to plot visual results, so the final GUI (which uses OpenCV) would return an exception similar to:
-    // // `QMetaMethod::invoke: Unable to invoke methods with return values in queued connections`
-    // // Start threads
-    // opWrapper.start();
-    // // Profile used GPU memory
-    //     // 1: wait ~10sec so the memory has been totally loaded on GPU
-    //     // 2: profile the GPU memory
-    // const auto sleepTimeMs = 10;
-    // for (auto i = 0 ; i < 10000/sleepTimeMs && opWrapper.isRunning() ; i++)
-    //     std::this_thread::sleep_for(std::chrono::milliseconds{sleepTimeMs});
-    // op::Profiler::profileGpuMemory(__LINE__, __FUNCTION__, __FILE__);
-    // // Keep program alive while running threads
-    // while (opWrapper.isRunning())
-    //     std::this_thread::sleep_for(std::chrono::milliseconds{sleepTimeMs});
-    // // Stop and join threads
-    // op::log("Stopping thread(s)", op::Priority::High);
-    // opWrapper.stop();
 
     // Measuring total time
     const auto now = std::chrono::high_resolution_clock::now();
