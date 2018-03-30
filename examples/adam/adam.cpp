@@ -5,6 +5,7 @@
 #include "Renderer.h"
 #include "totalmodel.h"
 #include "utils.h"
+#include "BVHWriter.h"
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -386,13 +387,15 @@ public:
         g_total_model_path{"./model/adam_v1_plus2.json"},
         pca_path{"./model/adam_blendshapes_348_delta_norm.json"},
         obj_path{"./model/mesh_nofeet.obj"},
-        correspondence_path{"./model/correspondences_nofeet.txt"}
+        correspondence_path{"./model/correspondences_nofeet.txt"},
+        count_frame(0)
     {
         for (auto i = 0 ; i < 183 ; i++)
             targetJoint[i] = 0;
         // Load g_total_model (model + data)
         LoadTotalModelFromObj(g_total_model, obj_path);
         LoadTotalDataFromJson(g_total_model, g_total_model_path, pca_path, correspondence_path);
+        pbvh_writer = std::make_shared<BVHWriter>(g_total_model.m_parent);
     }
 
     // Purely Visualization
@@ -582,6 +585,8 @@ const auto duration1 = std::chrono::duration_cast<std::chrono::nanoseconds>(std:
 // op::log(__LINE__);
 const auto start2 = std::chrono::high_resolution_clock::now();
                 // ~20 ms
+                ts.push_back(frame_params.m_adam_t);
+                poses.push_back(frame_params.m_adam_pose);
                 VisualizedData g_vis_data;
                 g_vis_data.targetJoint = targetJoint;
 g_vis_data.targetJoint = nullptr;
@@ -630,6 +635,15 @@ std::cout << "IK:         " << duration0 * 1e-6
                     while (key == -1);
                 if (key == 27)
                     this->stop();
+
+                std::cout << count_frame << std::endl;
+                if (count_frame >= 60)
+                {
+// std::cout << J0_vec << std::endl;
+                    this->callBVHWriter("temp.bvh", 0.0333333);
+                    this->stop();
+                }
+                count_frame++;
             }
         }
         catch (const std::exception& e)
@@ -639,6 +653,15 @@ std::cout << "IK:         " << duration0 * 1e-6
             op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
     }
+
+    void callBVHWriter(const char* filename, double frame_time)
+    {
+// std::cout << J0_vec << std::endl;
+        std::cout << J0_vec.rows() << std::endl;
+        pbvh_writer->parseInput(J0_vec, ts, poses);
+        pbvh_writer->writeBVH(std::string(filename), frame_time);
+    }
+
 private:
     // Processing
     bool mInitialized;
@@ -659,6 +682,12 @@ private:
     const std::string obj_path;
     const std::string correspondence_path;
     TotalModel g_total_model;
+
+    // Write BVH file
+    std::shared_ptr<BVHWriter> pbvh_writer;
+    std::vector<Eigen::Matrix<double, 3, 1>> ts; // record the translation across frames
+    std::vector<Eigen::Matrix<double, TotalModel::NUM_JOINTS, 3, Eigen::RowMajor>> poses; // record the pose change
+    int count_frame;
 
     // Visualization
     double resultBody[183];
