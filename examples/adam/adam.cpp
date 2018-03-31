@@ -493,25 +493,51 @@ public:
                               __LINE__, __FUNCTION__, __FILE__);
                 // Update body
                 for (auto part = 0 ; part < poseKeypoints3D.getSize(1); part++)
+                {
+                    const auto baseIndex = mapOPToDome(part)*(poseKeypoints3D.getSize(2)-1);
                     if (poseKeypoints3D[{0, part, poseKeypoints3D.getSize(2)-1}] > 0.5 /*|| !mInitialized*/)
                         for (auto xyz = 0 ; xyz < poseKeypoints3D.getSize(2)-1 ; xyz++)
-                            targetJoint[mapOPToDome(part)*(poseKeypoints3D.getSize(2)-1) + xyz] = poseKeypoints3D[{0, part, xyz}];
+                            targetJoint[baseIndex + xyz] = poseKeypoints3D[{0, part, xyz}];
+                    else
+                    {
+                        targetJoint[baseIndex] = 0;
+                        targetJoint[baseIndex+1] = 0;
+                        targetJoint[baseIndex+2] = 0;
+                    }
+                }
                 // Update left/right hand
                 const auto bodyOffset = poseKeypoints3D.getSize(1)*(poseKeypoints3D.getSize(2)-1);
                 const auto handOffset = handKeypoints3D[0].getSize(1)*(handKeypoints3D[0].getSize(2)-1);
-                for (auto hand = 0u ; hand < handKeypoints3D.size(); hand++)
+                if (!handKeypoints3D.at(0).empty())
                 {
-                    for (auto part = 0 ; part < handKeypoints3D[hand].getSize(1); part++)
+                    for (auto hand = 0u ; hand < handKeypoints3D.size(); hand++)
                     {
-                        const auto baseIndex = bodyOffset + hand*handOffset + part*(handKeypoints3D[hand].getSize(2)-1);
-                        if (handKeypoints3D[hand][{0, part, 3}] > 0.5 || !mInitialized)
-                            for (auto xyz = 0 ; xyz < handKeypoints3D[hand].getSize(2)-1 ; xyz++)
-                                targetJoint[baseIndex + xyz] = handKeypoints3D[hand][{0, part, xyz}];
+                        // const std::array<double,3> offsetWrist = {0,0,0};
+                        const auto wristPart = (hand == 0 ? 7 : 4);
+                        // const auto offsetWristIndex = wristPart*(poseKeypoints3D.getSize(2)-1);
+                        std::array<double,3> offsetWrist;
+                        if (poseKeypoints3D[{0, wristPart, 3}] < 0.5 || handKeypoints3D[hand][{0, 0, 3}] < 0.5)
+                            offsetWrist = {0,0,0};
                         else
                         {
-                            targetJoint[baseIndex] = 0;
-                            targetJoint[baseIndex+1] = 0;
-                            targetJoint[baseIndex+2] = 0;
+                            offsetWrist = {
+                                poseKeypoints3D[{0, wristPart, 0}] - handKeypoints3D[hand][{0, 0, 0}],
+                                poseKeypoints3D[{0, wristPart, 1}] - handKeypoints3D[hand][{0, 0, 1}],
+                                poseKeypoints3D[{0, wristPart, 2}] - handKeypoints3D[hand][{0, 0, 2}]
+                            };
+                        }
+                        for (auto part = 0 ; part < handKeypoints3D[hand].getSize(1); part++)
+                        {
+                            const auto baseIndex = bodyOffset + hand*handOffset + part*(handKeypoints3D[hand].getSize(2)-1);
+                            if (handKeypoints3D[hand][{0, part, 3}] > 0.5 || !mInitialized)
+                                for (auto xyz = 0 ; xyz < handKeypoints3D[hand].getSize(2)-1 ; xyz++)
+                                    targetJoint[baseIndex + xyz] = handKeypoints3D[hand][{0, part, xyz}] + offsetWrist[xyz];
+                            else
+                            {
+                                targetJoint[baseIndex] = 0;
+                                targetJoint[baseIndex+1] = 0;
+                                targetJoint[baseIndex+2] = 0;
+                            }
                         }
                     }
                 }
@@ -526,8 +552,10 @@ for (auto i = 0 ; i < 183/3 ; i++)
 targetJoint[3*i+2] *= -1;
 // targetJoint[3*i] *= -1;
 // Increase scale
+const auto myHeight = 1.85; // Gines
+// const auto myHeight = 1.75; // Donglai?
 for (auto i = 0 ; i < 183 ; i++)
-targetJoint[i] *= 1.4;
+targetJoint[i] *= 1.418918919*myHeight;
                 // Update keypoints
                 updateKeypoints(bodyJoints, LHandJoints, RHandJoints, targetJoint);
 
