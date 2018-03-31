@@ -166,7 +166,8 @@ namespace op
             {
                 int result = 0;
                 log("*** CONFIGURING TRIGGER ***", Priority::High);
-                log("Configuring hardware trigger...", Priority::High);
+                log("Configuring trigger...", Priority::High);
+                // log("Configuring hardware trigger...", Priority::High);
                 // Ensure trigger mode off
                 // *** NOTES ***
                 // The trigger must be disabled in order to configure whether the source
@@ -196,16 +197,23 @@ namespace op
                     error("Unable to set trigger mode (node retrieval). Aborting...",
                           __LINE__, __FUNCTION__, __FILE__);
 
-                // Set trigger mode to hardware ('Line0')
-                Spinnaker::GenApi::CEnumEntryPtr ptrTriggerSourceHardware = ptrTriggerSource->GetEntryByName("Line0");
-                if (!Spinnaker::GenApi::IsAvailable(ptrTriggerSourceHardware)
-                    || !Spinnaker::GenApi::IsReadable(ptrTriggerSourceHardware))
+                // // Set trigger mode to hardware ('Line0')
+                // Spinnaker::GenApi::CEnumEntryPtr ptrTriggerSourceHardware = ptrTriggerSource->GetEntryByName("Line0");
+                // if (!Spinnaker::GenApi::IsAvailable(ptrTriggerSourceHardware)
+                //     || !Spinnaker::GenApi::IsReadable(ptrTriggerSourceHardware))
+                //     error("Unable to set trigger mode (enum entry retrieval). Aborting...",
+                //               __LINE__, __FUNCTION__, __FILE__);
+                // ptrTriggerSource->SetIntValue(ptrTriggerSourceHardware->GetValue());
+                // log("Trigger source set to hardware...", Priority::High);
+
+                // Set trigger mode to sofware
+                Spinnaker::GenApi::CEnumEntryPtr ptrTriggerSourceSoftware = ptrTriggerSource->GetEntryByName("Software");
+                if (!Spinnaker::GenApi::IsAvailable(ptrTriggerSourceSoftware)
+                    || !Spinnaker::GenApi::IsReadable(ptrTriggerSourceSoftware))
                     error("Unable to set trigger mode (enum entry retrieval). Aborting...",
                               __LINE__, __FUNCTION__, __FILE__);
-
-                ptrTriggerSource->SetIntValue(ptrTriggerSourceHardware->GetValue());
-
-                log("Trigger source set to hardware...", Priority::High);
+                ptrTriggerSource->SetIntValue(ptrTriggerSourceSoftware->GetValue());
+                // log("Trigger source set to source...", Priority::High);
 
                 // Turn trigger mode on
                 // *** LATER ***
@@ -237,6 +245,34 @@ namespace op
                 return -1;
             }
         }
+
+        int GrabNextImageByTrigger(Spinnaker::GenApi::INodeMap& nodeMap)
+        {
+            try
+            {
+                int result = 0;
+
+                // Execute software trigger
+                Spinnaker::GenApi::CCommandPtr ptrSoftwareTriggerCommand = nodeMap.GetNode("TriggerSoftware");
+                if (!IsAvailable(ptrSoftwareTriggerCommand) || !IsWritable(ptrSoftwareTriggerCommand))
+                    error("Unable to enable trigger. Aborting...",
+                              __LINE__, __FUNCTION__, __FILE__);
+
+                ptrSoftwareTriggerCommand->Execute();
+
+                return result;
+            }
+            catch (const Spinnaker::Exception& e)
+            {
+                error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+                return -1;
+            }
+            catch (const std::exception& e)
+            {
+                error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+                return -1;
+            }
+        }
     #else
         const std::string WITH_FLIR_CAMERA_ERROR{"OpenPose CMake must be compiled with the `WITH_FLIR_CAMERA`"
             " flag in order to use the FLIR camera. Alternatively, disable `--flir_camera`."};
@@ -251,6 +287,12 @@ namespace op
             Spinnaker::CameraList mCameraList;
             Spinnaker::SystemPtr mSystemPtr;
             std::vector<cv::Mat> mCvMats;
+            // Thread
+            bool mThreadOpened;
+            std::vector<Spinnaker::ImagePtr> mBuffer;
+            std::mutex mBufferMutex;
+            std::atomic<bool> mCloseThread;
+            std::thread mThread;
 
             ImplSpinnakerWrapper() :
                 mInitialized{false}
@@ -272,9 +314,60 @@ namespace op
                 cv::undistort(cvMatDistorted, mCvMats[i], cameraIntrinsics, cameraDistorsions);
             }
 
+            void bufferingThread()
+            {
+                #ifdef WITH_FLIR_CAMERA
+                    try
+                    {
+                        mCloseThread = false;
+                        // Get cameras - ~0.005 ms (3 cameras)
+                        std::vector<Spinnaker::CameraPtr> cameraPtrs(mCameraList.GetSize());
+                        for (auto i = 0u; i < cameraPtrs.size(); i++)
+                            cameraPtrs.at(i) = mCameraList.GetByIndex(i);
+                        while (!mCloseThread)
+                        {
+                            // Trigger
+                            for (auto i = 0u; i < cameraPtrs.size(); i++)
+                            {
+                                // Retrieve GenICam nodemap
+                                auto& iNodeMap = cameraPtrs[i]->GetNodeMap();
+                                Spinnaker::GenApi::CEnumerationPtr ptrAcquisitionMode = iNodeMap.GetNode("AcquisitionMode");
+                                const auto result = GrabNextImageByTrigger(iNodeMap);
+                                if (result != 0)
+                                    error("Error in GrabNextImageByTrigger.", __LINE__, __FUNCTION__, __FILE__);
+                            }
+                            // Get frame
+                            std::vector<Spinnaker::ImagePtr> imagePtrs(cameraPtrs.size());
+                            for (auto i = 0u; i < cameraPtrs.size(); i++)
+                                imagePtrs.at(i) = cameraPtrs.at(i)->GetNextImage();
+                            // Move to buffer
+                            bool imagesExtracted = true;
+                            for (auto& imagePtr : imagePtrs)
+                            {
+                                if (imagePtr->IsIncomplete())
+                                {
+                                    log("Image incomplete with image status " + std::to_string(imagePtr->GetImageStatus())
+                                        + "...", Priority::High, __LINE__, __FUNCTION__, __FILE__);
+                                    imagesExtracted = false;
+                                    break;
+                                }
+                            }
+                            if (imagesExtracted)
+                            {
+                                const std::lock_guard<std::mutex> lock{mBufferMutex};
+                                std::swap(mBuffer, imagePtrs);
+                            }
+                        }
+                    }
+                    catch (const std::exception& e)
+                    {
+                        error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+                    }
+                #endif
+            }
+
             // This function acquires and displays images from each device.
-            std::vector<cv::Mat> acquireImages(Spinnaker::CameraList &cameraList,
-                                               const std::vector<cv::Mat>& cameraIntrinsics,
+            std::vector<cv::Mat> acquireImages(const std::vector<cv::Mat>& cameraIntrinsics,
                                                const std::vector<cv::Mat>& cameraDistorsions)
             {
                 try
@@ -287,15 +380,34 @@ namespace op
                     // through the cameras; otherwise, all images will be grabbed from a
                     // single camera before grabbing any images from another.
 
-                    // Get cameras - ~0.005 ms (3 cameras)
-                    std::vector<Spinnaker::CameraPtr> cameraPtrs(cameraList.GetSize());
-                    for (auto i = 0u; i < cameraPtrs.size(); i++)
-                        cameraPtrs.at(i) = cameraList.GetByIndex(i);
+                    // // Get cameras - ~0.005 ms (3 cameras)
+                    // std::vector<Spinnaker::CameraPtr> cameraPtrs(cameraList.GetSize());
+                    // for (auto i = 0u; i < cameraPtrs.size(); i++)
+                    //     cameraPtrs.at(i) = cameraList.GetByIndex(i);
 
                     // Read raw images - ~0.15 ms (3 cameras)
-                    std::vector<Spinnaker::ImagePtr> imagePtrs(cameraPtrs.size());
-                    for (auto i = 0u; i < cameraPtrs.size(); i++)
-                        imagePtrs.at(i) = cameraPtrs.at(i)->GetNextImage();
+                    // std::vector<Spinnaker::ImagePtr> imagePtrs(cameraPtrs.size());
+                    // for (auto i = 0u; i < cameraPtrs.size(); i++)
+                    //     imagePtrs.at(i) = cameraPtrs.at(i)->GetNextImage();
+                    std::vector<Spinnaker::ImagePtr> imagePtrs;
+                    // Retrieve frame
+                    auto cvMatRetrieved = false;
+                    while (!cvMatRetrieved)
+                    {
+                        // Retrieve frame
+                        std::unique_lock<std::mutex> lock{mBufferMutex};
+                        if (!mBuffer.empty())
+                        {
+                            std::swap(imagePtrs, mBuffer);
+                            cvMatRetrieved = true;
+                        }
+                        // No frames available -> sleep & wait
+                        else
+                        {
+                            lock.unlock();
+                            std::this_thread::sleep_for(std::chrono::microseconds{5});
+                        }
+                    }
                     // Commented code was supposed to clean buffer, but `NewestFirstOverwrite` does that
                     // Getting frames
                     // Retrieve next received image and ensure image completion
@@ -452,37 +564,37 @@ namespace op
                     // acquired.
                     cameraPtr->Init();
 
-                    // // Retrieve GenICam nodemap
-                    // auto& iNodeMap = cameraPtr->GetNodeMap();
+                    // Retrieve GenICam nodemap
+                    auto& iNodeMap = cameraPtr->GetNodeMap();
 
-                    // // Configure trigger
-                    // int result = configureTrigger(iNodeMap);
-                    // if (result < 0)
-                    //     error("Result > 0, error " + std::to_string(result) + " occurred...",
-                    //               __LINE__, __FUNCTION__, __FILE__);
+                    // Configure trigger
+                    int result = configureTrigger(iNodeMap);
+                    if (result < 0)
+                        error("Result > 0, error " + std::to_string(result) + " occurred...",
+                                  __LINE__, __FUNCTION__, __FILE__);
 
                     // // Configure chunk data
                     // result = configureChunkData(iNodeMap);
                     // if (result < 0)
                     //     return result;
 
-                    // Remove buffer --> Always get newest frame
-                    Spinnaker::GenApi::INodeMap& snodeMap = cameraPtr->GetTLStreamNodeMap();
-                    Spinnaker::GenApi::CEnumerationPtr ptrBufferHandlingMode = snodeMap.GetNode(
-                        "StreamBufferHandlingMode");
-                    if (!Spinnaker::GenApi::IsAvailable(ptrBufferHandlingMode)
-                        || !Spinnaker::GenApi::IsWritable(ptrBufferHandlingMode))
-                        error("Unable to change buffer handling mode", __LINE__, __FUNCTION__, __FILE__);
+                    // // Remove buffer --> Always get newest frame
+                    // Spinnaker::GenApi::INodeMap& snodeMap = cameraPtr->GetTLStreamNodeMap();
+                    // Spinnaker::GenApi::CEnumerationPtr ptrBufferHandlingMode = snodeMap.GetNode(
+                    //     "StreamBufferHandlingMode");
+                    // if (!Spinnaker::GenApi::IsAvailable(ptrBufferHandlingMode)
+                    //     || !Spinnaker::GenApi::IsWritable(ptrBufferHandlingMode))
+                    //     error("Unable to change buffer handling mode", __LINE__, __FUNCTION__, __FILE__);
 
-                    Spinnaker::GenApi::CEnumEntryPtr ptrBufferHandlingModeNewest = ptrBufferHandlingMode->GetEntryByName(
-                        "NewestFirstOverwrite");
-                    if (!Spinnaker::GenApi::IsAvailable(ptrBufferHandlingModeNewest)
-                        || !IsReadable(ptrBufferHandlingModeNewest))
-                        error("Unable to set buffer handling mode to newest (entry 'NewestFirstOverwrite' retrieval)."
-                                  " Aborting...", __LINE__, __FUNCTION__, __FILE__);
-                    int64_t bufferHandlingModeNewest = ptrBufferHandlingModeNewest->GetValue();
+                    // Spinnaker::GenApi::CEnumEntryPtr ptrBufferHandlingModeNewest = ptrBufferHandlingMode->GetEntryByName(
+                    //     "NewestFirstOverwrite");
+                    // if (!Spinnaker::GenApi::IsAvailable(ptrBufferHandlingModeNewest)
+                    //     || !IsReadable(ptrBufferHandlingModeNewest))
+                    //     error("Unable to set buffer handling mode to newest (entry 'NewestFirstOverwrite' retrieval)."
+                    //               " Aborting...", __LINE__, __FUNCTION__, __FILE__);
+                    // int64_t bufferHandlingModeNewest = ptrBufferHandlingModeNewest->GetValue();
 
-                    ptrBufferHandlingMode->SetIntValue(bufferHandlingModeNewest);
+                    // ptrBufferHandlingMode->SetIntValue(bufferHandlingModeNewest);
                 }
 
                 // Prepare each camera to acquire images
@@ -589,6 +701,10 @@ namespace op
                     serialNumbers[i] = strSerialNumbers[i];
                 upImpl->mCameraParameterReader.readParameters(cameraParameterPath, serialNumbers);
 
+                // Start buffering thread
+                upImpl->mThreadOpened = true;
+                upImpl->mThread = std::thread{&SpinnakerWrapper::ImplSpinnakerWrapper::bufferingThread, this->upImpl};
+
                 // Get resolution + security checks
                 const auto cvMats = getRawFrames();
                 // Security checks
@@ -599,7 +715,6 @@ namespace op
                     upImpl->mResolution = Point<int>{cvMats[0].cols, cvMats[0].rows};
 
                 log("\nRunning for all cameras...\n\n*** IMAGE ACQUISITION ***\n", Priority::High);
-
             }
             catch (const Spinnaker::Exception& e)
             {
@@ -640,8 +755,7 @@ namespace op
                             != upImpl->mCameraParameterReader.getNumberCameras())
                         error("The number of cameras must be the same as the INTRINSICS vector size.",
                           __LINE__, __FUNCTION__, __FILE__);
-                    return upImpl->acquireImages(upImpl->mCameraList,
-                                                 upImpl->mCameraParameterReader.getCameraIntrinsics(),
+                    return upImpl->acquireImages(upImpl->mCameraParameterReader.getCameraIntrinsics(),
                                                  upImpl->mCameraParameterReader.getCameraDistortions());
                 }
                 catch (const Spinnaker::Exception& e)
@@ -719,6 +833,14 @@ namespace op
             {
                 if (upImpl->mInitialized)
                 {
+                    // Stop thread
+                    // Close and join thread
+                    if (upImpl->mThreadOpened)
+                    {
+                        upImpl->mCloseThread = true;
+                        upImpl->mThread.join();
+                    }
+
                     // End acquisition for each camera
                     // Notice that what is usually a one-step process is now two steps
                     // because of the additional step of selecting the camera. It is worth

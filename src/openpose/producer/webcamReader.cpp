@@ -170,17 +170,24 @@ namespace op
 
     void WebcamReader::bufferingThread()
     {
-        mCloseThread = false;
-        while (!mCloseThread)
+        try
         {
-            // Get frame
-            auto cvMat = VideoCaptureReader::getRawFrame();
-            // Move to buffer
-            if (!cvMat.empty())
+            mCloseThread = false;
+            while (!mCloseThread)
             {
-                const std::lock_guard<std::mutex> lock{mBufferMutex};
-                std::swap(mBuffer, cvMat);
+                // Get frame
+                auto cvMat = VideoCaptureReader::getRawFrame();
+                // Move to buffer
+                if (!cvMat.empty())
+                {
+                    const std::lock_guard<std::mutex> lock{mBufferMutex};
+                    std::swap(mBuffer, cvMat);
+                }
             }
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
     }
 }
