@@ -256,6 +256,8 @@ DEFINE_string(write_keypoint_format,    "yml",          "(Deprecated, use `write
                                                         " yaml & yml. Json not available for OpenCV < 3.0, use `write_keypoint_json` instead.");
 DEFINE_string(write_keypoint_json,      "",             "(Deprecated, use `write_json`) Directory to write people pose data in JSON format,"
                                                         " compatible with any OpenCV version.");
+DEFINE_string(write_bvh,                "",             "E.g.: /media/posefs3b/Users/gines/cvpr2018/temp.bvh");
+DEFINE_string(write_adam,               "",             "E.g.: /media/posefs3b/Users/gines/cvpr2018/adam.avi");
 
 // If the user needs his own variables, he can inherit the op::Datum struct and add them
 // UserDatum can be directly used by the OpenPose wrapper because it inherits from op::Datum, just define
@@ -396,6 +398,13 @@ public:
         LoadTotalModelFromObj(g_total_model, obj_path);
         LoadTotalDataFromJson(g_total_model, g_total_model_path, pca_path, correspondence_path);
         pbvh_writer = std::make_shared<BVHWriter>(g_total_model.m_parent);
+    }
+
+    ~WUserOutput()
+    {
+
+        this->callBVHWriter(FLAGS_write_bvh, 0.0333333);
+        this->stop();
     }
 
     // Purely Visualization
@@ -633,21 +642,24 @@ g_vis_data.resultJoint = nullptr;
 const auto duration2 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start2).count();
 const auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start).count();
 
-                // // Display in opencv window
-                // cv::Mat img(render->options.height, render->options.width, CV_8UC3, read_buffer.get()); // img is y-flipped, and in RGB order
-                // cv::flip(img, img, 0);
-                // cv::cvtColor(img, img, cv::COLOR_RGB2BGR);
-                // if (videoSaver == nullptr)
-                // {
-                //     const auto originalVideoFps = 30;
-                //     videoSaver = std::make_shared<op::VideoSaver>(
-                //         "/media/posefs3b/Users/gines/cvpr2018/adam.avi", CV_FOURCC('M','J','P','G'),
-                //         originalVideoFps, op::Point<int>{img.cols, img.rows}
-                //     );
-                // }
-                // videoSaver->write(img);
-                // // cv::imshow( "Display window", img );
-                // // cv::waitKey(16);
+                // Save/display in opencv window
+                if (!FLAGS_write_adam.empty())
+                {
+                    cv::Mat img(render->options.height, render->options.width, CV_8UC3, read_buffer.get()); // img is y-flipped, and in RGB order
+                    cv::flip(img, img, 0);
+                    cv::cvtColor(img, img, cv::COLOR_RGB2BGR);
+                    if (videoSaver == nullptr)
+                    {
+                        const auto originalVideoFps = 30;
+                        videoSaver = std::make_shared<op::VideoSaver>(
+                            FLAGS_write_adam, CV_FOURCC('M','J','P','G'),
+                            originalVideoFps, op::Point<int>{img.cols, img.rows}
+                        );
+                    }
+                    videoSaver->write(img);
+                    // // cv::imshow( "Display window", img );
+                    // // cv::waitKey(16);
+                }
 std::cout << "IK:         " << duration0 * 1e-6
           << "\nRender1:    " << duration1 * 1e-6
           << "\nRenderRest: " << duration2 * 1e-6
@@ -663,15 +675,6 @@ std::cout << "IK:         " << duration0 * 1e-6
                     while (key == -1);
                 if (key == 27)
                     this->stop();
-
-                std::cout << count_frame << std::endl;
-                if (count_frame >= 60)
-                {
-// std::cout << J0_vec << std::endl;
-                    this->callBVHWriter("temp.bvh", 0.0333333);
-                    this->stop();
-                }
-                count_frame++;
             }
         }
         catch (const std::exception& e)
@@ -682,12 +685,12 @@ std::cout << "IK:         " << duration0 * 1e-6
         }
     }
 
-    void callBVHWriter(const char* filename, double frame_time)
+    void callBVHWriter(const std::string& filename, double frame_time)
     {
 // std::cout << J0_vec << std::endl;
         std::cout << J0_vec.rows() << std::endl;
         pbvh_writer->parseInput(J0_vec, ts, poses);
-        pbvh_writer->writeBVH(std::string(filename), frame_time);
+        pbvh_writer->writeBVH(filename, frame_time);
     }
 
 private:
