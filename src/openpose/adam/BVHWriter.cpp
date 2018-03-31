@@ -71,7 +71,7 @@ void BVHWriter::writeBVH(std::string output_file, double frame_time)
 	for (int i = 0; i < this->num_frame; i++)
 		dynamicStr[i] += std::to_string(this->trans[i](0) + this->root->offset[0]) + " " + std::to_string(this->trans[i](1) + this->root->offset[1]) + " " + std::to_string(this->trans[i](2) + this->root->offset[2]);
 	for (int i = 0; i < this->num_frame; i++)
-		dynamicStr[i] += " 0.0 0.0 0.0";
+		dynamicStr[i] += " 0.0 0.0 180.0";
 
 	writeData(this->root, 0);
 
