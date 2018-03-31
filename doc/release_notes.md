@@ -213,6 +213,7 @@ OpenPose Library - Release Notes
 
 ## Current version - future OpenPose 1.3.1
 1. Main improvements:
+    1. Flir cameras: Added software trigger and a dedicated thread to keep reading images to remove latency (analogously to webcamReader).
 2. Functions or parameters renamed:
 3. Main bugs fixed:
 

@@ -19,9 +19,9 @@ namespace op
         {
             if (!directoryPath.empty())
             {
-				// Format the path first
-				const auto formatedPath = formatAsDirectory(directoryPath);
-				// Create dir if it doesn't exist yet
+                // Format the path first
+                const auto formatedPath = formatAsDirectory(directoryPath);
+                // Create dir if it doesn't exist yet
                 if (!existDirectory(formatedPath))
                 {
                     #ifdef _WIN32
@@ -50,31 +50,31 @@ namespace op
     {
         try
         {
-			// Format the path first
-			const auto formatedPath = formatAsDirectory(directoryPath);
-			#ifdef _WIN32
-				DWORD status = GetFileAttributesA(formatedPath.c_str());
-				// It is not a directory
-				if (status == INVALID_FILE_ATTRIBUTES)
-					return false;
-				// It is a directory
-				else if (status & FILE_ATTRIBUTE_DIRECTORY)
-					return true;
-				// It is not a directory
-				return false;    // this is not a directory!
-			#elif defined __unix__
-				// It is a directory
-				if (auto* directory = opendir(formatedPath.c_str()))
-				{
-					closedir(directory);
-					return true;
-				}
-				// It is not a directory
-				else
-					return false;
-			#else
-				#error Unknown environment!
-			#endif
+            // Format the path first
+            const auto formatedPath = formatAsDirectory(directoryPath);
+            #ifdef _WIN32
+                DWORD status = GetFileAttributesA(formatedPath.c_str());
+                // It is not a directory
+                if (status == INVALID_FILE_ATTRIBUTES)
+                    return false;
+                // It is a directory
+                else if (status & FILE_ATTRIBUTE_DIRECTORY)
+                    return true;
+                // It is not a directory
+                return false;    // this is not a directory!
+            #elif defined __unix__
+                // It is a directory
+                if (auto* directory = opendir(formatedPath.c_str()))
+                {
+                    closedir(directory);
+                    return true;
+                }
+                // It is not a directory
+                else
+                    return false;
+            #else
+                #error Unknown environment!
+            #endif
         }
         catch (const std::exception& e)
         {
@@ -109,14 +109,14 @@ namespace op
             std::string directoryPath = directoryPathString;
             if (!directoryPath.empty())
             {
-				// Replace all '\\' to '/'
-				std::replace(directoryPath.begin(), directoryPath.end(), '\\', '/');
-				if (directoryPath.back() != '/')
+                // Replace all '\\' to '/'
+                std::replace(directoryPath.begin(), directoryPath.end(), '\\', '/');
+                if (directoryPath.back() != '/')
                     directoryPath = directoryPath + "/";
-				// Windows - Replace all '/' to '\\'
-				#ifdef _WIN32
-					std::replace(directoryPath.begin(), directoryPath.end(), '/', '\\');
-				#endif
+                // Windows - Replace all '/' to '\\'
+                #ifdef _WIN32
+                    std::replace(directoryPath.begin(), directoryPath.end(), '/', '\\');
+                #endif
             }
             return directoryPath;
         }
@@ -235,35 +235,35 @@ namespace op
             if (!existDirectory(formatedPath))
                 error("Folder " + formatedPath + " does not exist.", __LINE__, __FUNCTION__, __FILE__);
             // Read all files in folder
-			std::vector<std::string> filePaths;
-			#ifdef _WIN32
-				auto formatedPathWindows = formatedPath;
-				formatedPathWindows.append("\\*");
-				WIN32_FIND_DATA data;
-				HANDLE hFind;
-				if ((hFind = FindFirstFile(formatedPathWindows.c_str(), &data)) != INVALID_HANDLE_VALUE)
-				{
-					do
-						filePaths.emplace_back(formatedPath + data.cFileName);
-					while (FindNextFile(hFind, &data) != 0);
-					FindClose(hFind);
-				}
-			#elif defined __unix__
-				std::shared_ptr<DIR> directoryPtr(
-					opendir(formatedPath.c_str()),
-					[](DIR* formatedPath){ formatedPath && closedir(formatedPath); }
-				);
-				struct dirent* direntPtr;
-				while ((direntPtr = readdir(directoryPtr.get())) != nullptr)
-				{
-					std::string currentPath = formatedPath + direntPtr->d_name;
-					if ((strncmp(direntPtr->d_name, ".", 1) == 0) || existDirectory(currentPath))
-							continue;
-					filePaths.emplace_back(currentPath);
-				}
-			#else
-			    #error Unknown environment!
-			#endif
+            std::vector<std::string> filePaths;
+            #ifdef _WIN32
+                auto formatedPathWindows = formatedPath;
+                formatedPathWindows.append("\\*");
+                WIN32_FIND_DATA data;
+                HANDLE hFind;
+                if ((hFind = FindFirstFile(formatedPathWindows.c_str(), &data)) != INVALID_HANDLE_VALUE)
+                {
+                    do
+                        filePaths.emplace_back(formatedPath + data.cFileName);
+                    while (FindNextFile(hFind, &data) != 0);
+                    FindClose(hFind);
+                }
+            #elif defined __unix__
+                std::shared_ptr<DIR> directoryPtr(
+                    opendir(formatedPath.c_str()),
+                    [](DIR* formatedPath){ formatedPath && closedir(formatedPath); }
+                );
+                struct dirent* direntPtr;
+                while ((direntPtr = readdir(directoryPtr.get())) != nullptr)
+                {
+                    std::string currentPath = formatedPath + direntPtr->d_name;
+                    if ((strncmp(direntPtr->d_name, ".", 1) == 0) || existDirectory(currentPath))
+                            continue;
+                    filePaths.emplace_back(currentPath);
+                }
+            #else
+                #error Unknown environment!
+            #endif
             // Check #files > 0
             if (filePaths.empty())
                 error("No files were found on " + formatedPath, __LINE__, __FUNCTION__, __FILE__);
