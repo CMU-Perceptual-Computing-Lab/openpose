@@ -354,8 +354,10 @@ namespace op
                             }
                             if (imagesExtracted)
                             {
-                                const std::lock_guard<std::mutex> lock{mBufferMutex};
+                                std::unique_lock<std::mutex> lock{mBufferMutex};
                                 std::swap(mBuffer, imagePtrs);
+                                lock.unlock();
+                                std::this_thread::sleep_for(std::chrono::microseconds{1});
                             }
                         }
                     }
@@ -408,23 +410,9 @@ namespace op
                             std::this_thread::sleep_for(std::chrono::microseconds{5});
                         }
                     }
-                    // Commented code was supposed to clean buffer, but `NewestFirstOverwrite` does that
                     // Getting frames
                     // Retrieve next received image and ensure image completion
                     // Spinnaker::ImagePtr imagePtr = cameraPtrs.at(i)->GetNextImage();
-                    // Clean buffer + retrieve next received image + ensure image completion
-                    // auto durationMs = 0.;
-                    // // for (auto counter = 0 ; counter < 10 ; counter++)
-                    // while (durationMs < 1.)
-                    // {
-                    //     const auto begin = std::chrono::high_resolution_clock::now();
-                    //     for (auto i = 0u; i < cameraPtrs.size(); i++)
-                    //         imagePtrs.at(i) = cameraPtrs.at(i)->GetNextImage();
-                    //     durationMs = std::chrono::duration_cast<std::chrono::nanoseconds>(
-                    //         std::chrono::high_resolution_clock::now()-begin
-                    //     ).count() * 1e-6;
-                    //     // log("Time extraction (ms): " + std::to_string(durationMs), Priority::High);
-                    // }
 
                     // All images completed
                     bool imagesExtracted = true;
