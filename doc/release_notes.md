@@ -215,7 +215,9 @@ OpenPose Library - Release Notes
 1. Main improvements:
     1. Flir cameras: Added software trigger and a dedicated thread to keep reading images to remove latency (analogously to webcamReader).
 2. Functions or parameters renamed:
+    1. Removed scale parameter from hand and face rectangle extractor (causing wrong results if custom `--output_resolution`).
 3. Main bugs fixed:
+    1. Hand and face work properly again with any `--output_resolution`.
 
 
 

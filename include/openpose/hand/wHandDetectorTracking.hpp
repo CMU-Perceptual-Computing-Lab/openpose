@@ -56,7 +56,7 @@ namespace op
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                 // Detect people hand
                 for (auto& tDatum : *tDatums)
-                    tDatum.handRectangles = spHandDetector->trackHands(tDatum.poseKeypoints, tDatum.scaleInputToOutput);
+                    tDatum.handRectangles = spHandDetector->trackHands(tDatum.poseKeypoints);
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
                 Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);
