@@ -6,8 +6,8 @@
 
 #define PI 3.1415926
 
-const char* joint_name[] = {"center", "right_hip", "left_hip", "spine1", "right_knee", "left_knee", "spine2", "right_ankle", "left_ankle", "neck", "right_feet", "left_feet", "head1",
-    "right_armpit", "left_armpit", "head2", "right_shoulder", "left_shoulder", "right_elbow", "left_elbow", "right_wrist", "left_wrist",
+const char* joint_name[] = {"center", "left_hip", "right_hip", "spine1", "left_knee", "right_knee", "spine2", "left_ankle", "right_ankle", "neck", "left_feet", "right_feet", "head1",
+    "left_armpit", "right_armpit", "head2", "left_shoulder", "right_shoulder", "left_elbow", "right_elbow", "left_wrist", "right_wrist",
     "left_thumb1", "left_thumb2", "left_thumb3", "left_thumb4", "left_index1", "left_index2", "left_index3", "left_index4",
     "left_middle1", "left_middle2", "left_middle3", "left_middle4", "left_ring1", "left_ring2", "left_ring3", "left_ring4",
     "left_little1", "left_little2", "left_little3", "left_little4",
@@ -59,6 +59,10 @@ void BVHWriter::parseInput(const Eigen::Matrix<double, 3 * TotalModel::NUM_JOINT
 
 void BVHWriter::writeBVH(std::string output_file, double frame_time)
 {
+	// first swap the order of left/right
+	std::swap(this->root->children[0], this->root->children[1]);
+	std::swap(this->data[9]->children[1], this->data[9]->children[2]);
+
 	outStr.clear();
 	for (int i = 0; i < this->num_frame; i++) dynamicStr.push_back(std::string());
 
