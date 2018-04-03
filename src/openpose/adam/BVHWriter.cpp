@@ -57,8 +57,7 @@ void BVHWriter::parseInput(const Eigen::Matrix<double, 3 * TotalModel::NUM_JOINT
 	}
 	// add additional joints
 	// left_hand
-	double offset[3] = {0.0, 0.0, 0.0};
-	std::shared_ptr<BVHData> left_hand_node = std::make_shared<BVHData>(std::string("left_hand"), offset);
+	std::shared_ptr<BVHData> left_hand_node = std::make_shared<BVHData>(std::string("left_hand"), this->data[20]->offset.data());
 	for (int time = 0; time < this->num_frame; time++)
 	{
 		std::array<double, 3> left_hand_angle = {0.0, 0.0, 0.0};
@@ -67,9 +66,10 @@ void BVHWriter::parseInput(const Eigen::Matrix<double, 3 * TotalModel::NUM_JOINT
 	left_hand_node->children = this->data[20]->children;
 	this->data[20]->children.clear();
 	this->data[20]->children.push_back(left_hand_node);
+	for(int i = 0; i < 3; i++) this->data[20]->offset[i] = 0.0;
 
 	// right_hand
-	std::shared_ptr<BVHData> right_hand_node = std::make_shared<BVHData>(std::string("right_hand"), offset);
+	std::shared_ptr<BVHData> right_hand_node = std::make_shared<BVHData>(std::string("right_hand"), this->data[21]->offset.data());
 	for (int time = 0; time < this->num_frame; time++)
 	{
 		std::array<double, 3> right_hand_angle = {0.0, 0.0, 0.0};
@@ -78,6 +78,7 @@ void BVHWriter::parseInput(const Eigen::Matrix<double, 3 * TotalModel::NUM_JOINT
 	right_hand_node->children = this->data[21]->children;
 	this->data[21]->children.clear();
 	this->data[21]->children.push_back(right_hand_node);
+	for(int i = 0; i < 3; i++) this->data[21]->offset[i] = 0.0;
 }
 
 void BVHWriter::writeBVH(std::string output_file, double frame_time)
