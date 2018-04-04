@@ -4,26 +4,28 @@
 namespace op
 {
     const std::array<std::vector<float>, (int)PoseModel::Size> POSE_SCALES{
-        std::vector<float>{POSE_COCO_SCALES_RENDER_GPU},
-        std::vector<float>{POSE_MPI_SCALES_RENDER_GPU},
-        std::vector<float>{POSE_MPI_SCALES_RENDER_GPU},
-        std::vector<float>{POSE_COCO_SCALES_RENDER_GPU},
-        std::vector<float>{POSE_BODY_19_SCALES_RENDER_GPU},
-        std::vector<float>{POSE_BODY_19_SCALES_RENDER_GPU},
-        std::vector<float>{POSE_BODY_23_SCALES_RENDER_GPU},
-        std::vector<float>{POSE_BODY_59_SCALES_RENDER_GPU},
-        std::vector<float>{POSE_BODY_19_SCALES_RENDER_GPU},
+        std::vector<float>{POSE_COCO_SCALES_RENDER_GPU},          // COCO
+        std::vector<float>{POSE_MPI_SCALES_RENDER_GPU},           // MPI_15
+        std::vector<float>{POSE_MPI_SCALES_RENDER_GPU},           // MPI_15_4
+        std::vector<float>{POSE_COCO_SCALES_RENDER_GPU},          // BODY_18
+        std::vector<float>{POSE_BODY_19_SCALES_RENDER_GPU},       // BODY_19
+        std::vector<float>{POSE_BODY_19_SCALES_RENDER_GPU},       // BODY_19_X2
+        std::vector<float>{POSE_BODY_23_SCALES_RENDER_GPU},       // BODY_23
+        std::vector<float>{POSE_BODY_59_SCALES_RENDER_GPU},       // BODY_59
+        std::vector<float>{POSE_BODY_19_SCALES_RENDER_GPU},       // BODY_19N
+        std::vector<float>{POSE_BODY_19_SCALES_RENDER_GPU},       // BODY_19b
     };
     const std::array<std::vector<float>, (int)PoseModel::Size> POSE_COLORS{
-        std::vector<float>{POSE_COCO_COLORS_RENDER_GPU},
-        std::vector<float>{POSE_MPI_COLORS_RENDER_GPU},
-        std::vector<float>{POSE_MPI_COLORS_RENDER_GPU},
-        std::vector<float>{POSE_COCO_COLORS_RENDER_GPU},
-        std::vector<float>{POSE_BODY_19_COLORS_RENDER_GPU},
-        std::vector<float>{POSE_BODY_19_COLORS_RENDER_GPU},
-        std::vector<float>{POSE_BODY_23_COLORS_RENDER_GPU},
-        std::vector<float>{POSE_BODY_19_COLORS_RENDER_GPU},
-        std::vector<float>{POSE_BODY_59_COLORS_RENDER_GPU},
+        std::vector<float>{POSE_COCO_COLORS_RENDER_GPU},          // COCO
+        std::vector<float>{POSE_MPI_COLORS_RENDER_GPU},           // MPI_15
+        std::vector<float>{POSE_MPI_COLORS_RENDER_GPU},           // MPI_15_4
+        std::vector<float>{POSE_COCO_COLORS_RENDER_GPU},          // BODY_18
+        std::vector<float>{POSE_BODY_19_COLORS_RENDER_GPU},       // BODY_19
+        std::vector<float>{POSE_BODY_19_COLORS_RENDER_GPU},       // BODY_19_X2
+        std::vector<float>{POSE_BODY_23_COLORS_RENDER_GPU},       // BODY_23
+        std::vector<float>{POSE_BODY_59_COLORS_RENDER_GPU},       // BODY_59
+        std::vector<float>{POSE_BODY_19_COLORS_RENDER_GPU},       // BODY_19N
+        std::vector<float>{POSE_BODY_19_COLORS_RENDER_GPU},       // BODY_19b
     };
     const std::array<std::vector<unsigned int>, (int)PoseModel::Size> POSE_BODY_PART_PAIRS_RENDER{
         std::vector<unsigned int>{POSE_COCO_PAIRS_RENDER_GPU},          // COCO
@@ -35,6 +37,7 @@ namespace op
         std::vector<unsigned int>{POSE_BODY_23_PAIRS_RENDER_GPU},       // BODY_23
         std::vector<unsigned int>{POSE_BODY_59_PAIRS_RENDER_GPU},       // BODY_59
         std::vector<unsigned int>{POSE_BODY_19_PAIRS_RENDER_GPU},       // BODY_19N
+        std::vector<unsigned int>{POSE_BODY_19_PAIRS_RENDER_GPU},       // BODY_19b
     };
 
     // Rendering functions

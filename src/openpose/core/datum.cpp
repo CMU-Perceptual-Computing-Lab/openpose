@@ -209,7 +209,7 @@ namespace op
             datum.faceRectangles = faceRectangles;
             datum.faceKeypoints = faceKeypoints.clone();
             datum.faceHeatMaps = faceHeatMaps.clone();
-            datum.handRectangles = datum.handRectangles;
+            datum.handRectangles = handRectangles;
             for (auto i = 0u ; i < datum.handKeypoints.size() ; i++)
                 datum.handKeypoints[i] = handKeypoints[i].clone();
             for (auto i = 0u ; i < datum.handKeypoints.size() ; i++)

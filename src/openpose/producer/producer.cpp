@@ -67,7 +67,7 @@ namespace op
                     flipAndRotate(frame);
                     // Check frame integrity
                     checkFrameIntegrity(frame);
-                    // If any frame unvalid --> exit
+                    // If any frame invalid --> exit
                     if (frame.empty())
                     {
                         frames.clear();

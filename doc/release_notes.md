@@ -168,7 +168,7 @@ OpenPose Library - Release Notes
 
 
 
-## Current version (future OpenPose 1.3.0)
+## OpenPose 1.3.0 (Mar 24, 2018)
 1. Main improvements:
     1. Output of `--write_json` uses less hard disk space (enters and tabs removed).
     2. Removed Boost dependencies.
@@ -187,19 +187,37 @@ OpenPose Library - Release Notes
     15. Camera parameters (flir camera) are read from disk at runtime rather than being compiled.
     16. 3-D reconstruction module can be implemented with different camera brands or custom image sources.
     17. Flag `--write_json` includes 3-D keypoints.
-    18. Flag `--image_dir_stereo` added to allow `--image_dir` to load stereo images.
+    18. 3-D reconstruction module can be used with images and videos. Flag `--3d_views` added to allow `--image_dir` and `--video` allow loading stereo images.
     19. Flag `--camera_resolution` applicable to `--flir_camera`.
     20. Throw error message if requested GPU IDs does not exist (e.g. asking for 2 GPUs starting in ID 1 if there is only 2 GPUs in total).
+    21. VideoSaver (`--write_video`) compatible with multi-camera setting. It will save all the different views concatenated.
+    22. OpenPose small GUI rescale the verbose text to the displayed image, to avoid the text to be either too big or small.
+    23. OpenPose small GUI shows the frame number w.r.t. the original producer, rather than the frame id. E.g., if video is started at frame 30, OpenPose will display 30 rather than 0 in the first frame.
+    24. OpenPose GUI: 'l' and 'k' functionality swapped.
+    25. 3-D reconstruction module: Added flag `--3d_min_views` to select minimum number of cameras required for 3-D reconstruction.
+    26. Flag `--camera_fps` also applies to recorded video (`--write_video`).
+    27. Flir camera producer `n` times faster for `n` cameras (multi-threaded). If the number of cameras is greater than the number of the computer threads, the speed up might not be exactly `n` times.
 2. Functions or parameters renamed:
     1. Flag `no_display` renamed as `display`, able to select between `NoDisplay`, `Display2D`, `Display3D`, and `DisplayAll`.
     2. 3-D reconstruction demo is now inside the OpenPose demo binary.
     3. Renamed `*_keypoints` by `*_keypoints_2d` to avoid confusion with 3d ones in `--write_json` output file.
     4. CvMatToOpInput requires PoseModel to know the normalization to be performed.
+    5. Created `net/` module in order to reduce `core/` number of classes and files and for future scalability.
 3. Main bugs fixed:
     1. Slight speed up (~1%) for performing the non-maximum suppression stage only in the body part heatmaps channels, and not also in the PAF channels.
     2. Fixed core-dumped in PoseRenderer with GUI when changed element to be rendered to something else than skeleton.
     3. 3-D visualizer does not crash on exit anymore.
     4. Fake pause ('m' key pressed) works again.
+
+
+
+## Current version - future OpenPose 1.3.1
+1. Main improvements:
+    1. Flir cameras: Added software trigger and a dedicated thread to keep reading images to remove latency (analogously to webcamReader).
+2. Functions or parameters renamed:
+    1. Removed scale parameter from hand and face rectangle extractor (causing wrong results if custom `--output_resolution`).
+3. Main bugs fixed:
+    1. Hand and face work properly again with any `--output_resolution`.
 
 
 

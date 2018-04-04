@@ -20,7 +20,7 @@ namespace op
      * @param userOutputWsEmpty
      * @param threadManagerMode
      */
-	OP_API void wrapperConfigureSecurityChecks(const WrapperStructPose& wrapperStructPose,
+    OP_API void wrapperConfigureSecurityChecks(const WrapperStructPose& wrapperStructPose,
                                                const WrapperStructFace& wrapperStructFace,
                                                const WrapperStructHand& wrapperStructHand,
                                                const WrapperStructInput& wrapperStructInput,

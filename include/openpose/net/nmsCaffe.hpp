@@ -1,14 +1,7 @@
-#ifndef OPENPOSE_CORE_RESIZE_AND_MERGE_CAFFE_HPP
-#define OPENPOSE_CORE_RESIZE_AND_MERGE_CAFFE_HPP
+#ifndef OPENPOSE_NET_NMS_CAFFE_HPP
+#define OPENPOSE_NET_NMS_CAFFE_HPP
 
 #include <openpose/core/common.hpp>
-
-// PIMPL does not work here. Alternative:
-// stackoverflow.com/questions/13978775/how-to-avoid-include-dependency-to-external-library?answertab=active#tab-top
-namespace caffe
-{
-    template <typename T> class Blob;
-}
 
 namespace op
 {
@@ -16,20 +9,21 @@ namespace op
     // the compatibility with any generic Caffe version, we keep this 'layer' inside our library rather than in the
     // Caffe code.
     template <typename T>
-    class OP_API ResizeAndMergeCaffe
+    class OP_API NmsCaffe
     {
     public:
-        explicit ResizeAndMergeCaffe();
+        explicit NmsCaffe();
+
+        virtual ~NmsCaffe();
 
         virtual void LayerSetUp(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top);
 
         virtual void Reshape(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top,
-                             const T netFactor, const T scaleFactor, const bool mergeFirstDimension = true,
-                             const int gpuID = 0);
+                             const int maxPeaks, const int outputChannels = -1, const int gpuID = 0);
 
-        virtual inline const char* type() const { return "ResizeAndMerge"; }
+        virtual inline const char* type() const { return "Nms"; }
 
-        void setScaleRatios(const std::vector<T>& scaleRatios);
+        void setThreshold(const T threshold);
 
         virtual void Forward_cpu(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top);
 
@@ -44,13 +38,18 @@ namespace op
                                   const std::vector<caffe::Blob<T>*>& bottom);
 
     private:
-        std::vector<T> mScaleRatios;
-        std::vector<std::array<int, 4>> mBottomSizes;
-        std::array<int, 4> mTopSize;
+        T mThreshold;
         int mGpuID;
 
-        DELETE_COPY(ResizeAndMergeCaffe);
+        // PIMPL idiom
+        // http://www.cppsamples.com/common-tasks/pimpl.html
+        struct ImplNmsCaffe;
+        std::unique_ptr<ImplNmsCaffe> upImpl;
+
+        // PIMP requires DELETE_COPY & destructor, or extra code
+        // http://oliora.github.io/2015/12/29/pimpl-and-rule-of-zero.html
+        DELETE_COPY(NmsCaffe);
     };
 }
 
-#endif // OPENPOSE_CORE_RESIZE_AND_MERGE_CAFFE_HPP
+#endif // OPENPOSE_NET_NMS_CAFFE_HPP

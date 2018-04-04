@@ -24,6 +24,8 @@ namespace op
                 return PoseModel::BODY_18;
             else if (poseModeString == "BODY_19")
                 return PoseModel::BODY_19;
+            else if (poseModeString == "BODY_19b")
+                return PoseModel::BODY_19b;
             else if (poseModeString == "BODY_19N")
                 return PoseModel::BODY_19N;
             else if (poseModeString == "BODY_19_X2")
@@ -151,7 +153,7 @@ namespace op
                 return std::make_shared<ImageDirectoryReader>(imageDirectory, imageDirectoryStereo,
                                                               cameraParameterPath);
             else if (type == ProducerType::Video)
-                return std::make_shared<VideoReader>(videoPath);
+                return std::make_shared<VideoReader>(videoPath, imageDirectoryStereo, cameraParameterPath);
             else if (type == ProducerType::IPCamera)
                 return std::make_shared<IpCameraReader>(ipCameraPath);
             // Flir camera

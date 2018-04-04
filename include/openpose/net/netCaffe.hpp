@@ -1,8 +1,8 @@
-#ifndef OPENPOSE_CORE_NET_CAFFE_HPP
-#define OPENPOSE_CORE_NET_CAFFE_HPP
+#ifndef OPENPOSE_NET_NET_CAFFE_HPP
+#define OPENPOSE_NET_NET_CAFFE_HPP
 
 #include <openpose/core/common.hpp>
-#include <openpose/core/net.hpp>
+#include <openpose/net/net.hpp>
 
 namespace op
 {
@@ -32,4 +32,4 @@ namespace op
     };
 }
 
-#endif // OPENPOSE_CORE_NET_CAFFE_HPP
+#endif // OPENPOSE_NET_NET_CAFFE_HPP

@@ -175,8 +175,8 @@ namespace op
                         const auto thicknessRatio = fastMax(intRound(std::sqrt(area)
                                                                      * thicknessCircleRatio * ratioAreas), 2);
                         // Negative thickness in cv::circle means that a filled circle is to be drawn.
-                        const auto thicknessCircle = (ratioAreas > 0.05f ? thicknessRatio : -1);
-                        const auto thicknessLine = intRound(thicknessRatio * thicknessLineRatioWRTCircle);
+                        const auto thicknessCircle = fastMax(1, (ratioAreas > 0.05f ? thicknessRatio : -1));
+                        const auto thicknessLine = fastMax(1, intRound(thicknessRatio * thicknessLineRatioWRTCircle));
                         const auto radius = thicknessRatio / 2;
 
                         // Draw lines

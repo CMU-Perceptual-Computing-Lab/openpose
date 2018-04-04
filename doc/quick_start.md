@@ -134,6 +134,10 @@ build\x64\Release\OpenPoseDemo.exe --flir_camera --3d --number_people_max 1 --fa
 3. Fast stereo camera image saving (without keypoint detection) for later post-processing
 ```
 # Ubuntu (same flags for Windows version)
+# Saving video
+# Note: saving in PNG rather than JPG will improve image quality, but slow down FPS (depending on hard disk writing speed and camera number)
+./build/examples/openpose/openpose.bin --flir_camera --num_gpu 0 --write_video output_folder_path/video.avi --camera_fps 5
+# Saving images
 # Note: saving in PNG rather than JPG will improve image quality, but slow down FPS (depending on hard disk writing speed and camera number)
 ./build/examples/openpose/openpose.bin --flir_camera --num_gpu 0 --write_images output_folder_path/ --write_images_format jpg
 ```
@@ -143,7 +147,18 @@ build\x64\Release\OpenPoseDemo.exe --flir_camera --3d --number_people_max 1 --fa
 # Ubuntu (same flags for Windows version)
 # Optionally add `--face` and/or `--hand` to include face and/or hands
 # Assuming 3 cameras
-./build/examples/openpose/openpose.bin --image_dir output_folder_path/ --image_dir_stereo 3 --3d --number_people_max 1
+# Note: We highly recommend to reduce `--output_resolution`. E.g. for 3 cameras recording at 1920x1080, the resulting image is (3x1920)x1080, so we recommend e.g. 640x360 (x3 reduction).
+# Video
+./build/examples/openpose/openpose.bin --video output_folder_path/video.avi --3d_views 3 --3d --number_people_max 1 --output_resolution {desired_output_resolution}
+# Images
+./build/examples/openpose/openpose.bin --image_dir output_folder_path/ --3d_views 3 --3d --number_people_max 1 --output_resolution {desired_output_resolution}
+```
+
+5. Reconstruction when at least n visible views
+```
+# Ubuntu (same flags for Windows version)
+# Assuming >=2 cameras and reconstruction when at least 2 visible views
+./build/examples/openpose/openpose.bin --flir_camera --3d --number_people_max 1 --3d_min_views 2 --output_resolution {desired_output_resolution}
 ```
 
 

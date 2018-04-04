@@ -57,16 +57,12 @@ DEFINE_int32(camera,                    -1,             "The camera index for cv
 DEFINE_string(camera_resolution,        "-1x-1",        "Set the camera resolution (either `--camera` or `--flir_camera`). `-1x-1` will use the"
                                                         " default 1280x720 for `--camera`, or the maximum flir camera resolution available for"
                                                         " `--flir_camera`");
-DEFINE_double(camera_fps,               30.0,           "Frame rate for the webcam (only used when saving video from webcam). Set this value to the"
-                                                        " minimum value between the OpenPose displayed speed and the webcam real frame rate.");
+DEFINE_double(camera_fps,               30.0,           "Frame rate for the webcam (also used when saving video). Set this value to the minimum"
+                                                        " value between the OpenPose displayed speed and the webcam real frame rate.");
 DEFINE_string(video,                    "",             "Use a video file instead of the camera. Use `examples/media/video.avi` for our default"
                                                         " example video.");
 DEFINE_string(image_dir,                "",             "Process a directory of images. Use `examples/media/` for our default example folder with 20"
                                                         " images. Read all standard formats (jpg, png, bmp, etc.).");
-DEFINE_int32(image_dir_stereo,          1,              "Complementary option to `--image_dir`. OpenPose will read as many images per iteration,"
-                                                        " allowing tasks such as stereo camera processing. Note that `--camera_parameters_folder`"
-                                                        " must be set. OpenPose must find as many `xml` files in the parameter folder as this"
-                                                        " number indicates.");
 DEFINE_bool(flir_camera,                false,          "Whether to use FLIR (Point-Grey) stereo camera.");
 DEFINE_string(ip_camera,                "",             "String with the IP camera URL. It supports protocols like RTSP and HTTP.");
 DEFINE_uint64(frame_first,              0,              "Start on desired frame number. Indexes are 0-based, i.e. the first frame has index 0.");
@@ -160,6 +156,12 @@ DEFINE_bool(3d,                         false,          "Running OpenPose 3-D re
                                                         " 2) Performing 3-D reconstruction from the multiple views. 3) Displaying 3-D reconstruction"
                                                         " results. Note that it will only display 1 person. If multiple people is present, it will"
                                                         " fail.");
+DEFINE_int32(3d_min_views,              -1,             "Minimum number of views required to reconstruct each keypoint. By default (-1), it will"
+                                                        " require all the cameras to see the keypoint in order to reconstruct it.");
+DEFINE_int32(3d_views,                  1,              "Complementary option to `--image_dir` or `--video`. OpenPose will read as many images per"
+                                                        " iteration, allowing tasks such as stereo camera processing (`--3d`). Note that"
+                                                        " `--camera_parameters_folder` must be set. OpenPose must find as many `xml` files in the"
+                                                        " parameter folder as this number indicates.");
 // OpenPose Rendering
 DEFINE_int32(part_to_show,              0,              "Prediction channel to visualize (default: 0). 0 for all the body parts, 1-18 for each body"
                                                         " part heat map, 19 for the background heat map, 20 for all the body part heat maps"
@@ -245,7 +247,7 @@ int openPoseTutorialWrapper4()
     const auto producerSharedPtr = op::flagsToProducer(FLAGS_image_dir, FLAGS_video, FLAGS_ip_camera, FLAGS_camera,
                                                        FLAGS_flir_camera, FLAGS_camera_resolution, FLAGS_camera_fps,
                                                        FLAGS_camera_parameter_folder,
-                                                       (unsigned int) FLAGS_image_dir_stereo);
+                                                       (unsigned int) FLAGS_3d_views);
     // poseModel
     const auto poseModel = op::flagsToPoseModel(FLAGS_model_pose);
     // JSON saving
@@ -259,6 +261,8 @@ int openPoseTutorialWrapper4()
     const auto heatMapTypes = op::flagsToHeatMaps(FLAGS_heatmaps_add_parts, FLAGS_heatmaps_add_bkg,
                                                   FLAGS_heatmaps_add_PAFs);
     const auto heatMapScale = op::flagsToHeatMapScaleMode(FLAGS_heatmaps_scale);
+    // >1 camera view?
+    const auto multipleView = (FLAGS_3d || FLAGS_3d_views > 1 || FLAGS_flir_camera);
     // Enabling Google Logging
     const bool enableGoogleLogging = true;
     // Logging
@@ -270,21 +274,22 @@ int openPoseTutorialWrapper4()
     // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
     const op::WrapperStructPose wrapperStructPose{!FLAGS_body_disable, netInputSize, outputSize, keypointScale,
                                                   FLAGS_num_gpu, FLAGS_num_gpu_start, FLAGS_scale_number,
-                                                  (float)FLAGS_scale_gap, op::flagsToRenderMode(FLAGS_render_pose, FLAGS_3d),
+                                                  (float)FLAGS_scale_gap,
+                                                  op::flagsToRenderMode(FLAGS_render_pose, multipleView),
                                                   poseModel, !FLAGS_disable_blending, (float)FLAGS_alpha_pose,
                                                   (float)FLAGS_alpha_heatmap, FLAGS_part_to_show, FLAGS_model_folder,
                                                   heatMapTypes, heatMapScale, FLAGS_part_candidates,
                                                   (float)FLAGS_render_threshold, FLAGS_number_people_max,
-                                                  enableGoogleLogging, FLAGS_3d};
+                                                  enableGoogleLogging, FLAGS_3d, FLAGS_3d_min_views};
     // Face configuration (use op::WrapperStructFace{} to disable it)
     const op::WrapperStructFace wrapperStructFace{FLAGS_face, faceNetInputSize,
-                                                  op::flagsToRenderMode(FLAGS_face_render, FLAGS_3d, FLAGS_render_pose),
+                                                  op::flagsToRenderMode(FLAGS_face_render, multipleView, FLAGS_render_pose),
                                                   (float)FLAGS_face_alpha_pose, (float)FLAGS_face_alpha_heatmap,
                                                   (float)FLAGS_face_render_threshold};
     // Hand configuration (use op::WrapperStructHand{} to disable it)
     const op::WrapperStructHand wrapperStructHand{FLAGS_hand, handNetInputSize, FLAGS_hand_scale_number,
                                                   (float)FLAGS_hand_scale_range, FLAGS_hand_tracking,
-                                                  op::flagsToRenderMode(FLAGS_hand_render, FLAGS_3d, FLAGS_render_pose),
+                                                  op::flagsToRenderMode(FLAGS_hand_render, multipleView, FLAGS_render_pose),
                                                   (float)FLAGS_hand_alpha_pose, (float)FLAGS_hand_alpha_heatmap,
                                                   (float)FLAGS_hand_render_threshold};
     // Producer (use default to disable any input)
@@ -297,7 +302,8 @@ int openPoseTutorialWrapper4()
                                                       op::stringToDataFormat(FLAGS_write_keypoint_format),
                                                       writeJson, FLAGS_write_coco_json,
                                                       FLAGS_write_images, FLAGS_write_images_format, FLAGS_write_video,
-                                                      FLAGS_write_heatmaps, FLAGS_write_heatmaps_format};
+                                                      FLAGS_camera_fps, FLAGS_write_heatmaps,
+                                                      FLAGS_write_heatmaps_format};
 
     // Custom post-processing
     auto userPostProcessing = std::make_shared<op::UserPostProcessing>(/* Your class arguments here */);

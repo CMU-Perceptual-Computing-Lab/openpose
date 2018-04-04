@@ -1,9 +1,9 @@
 #ifdef USE_CAFFE
     #include <caffe/blob.hpp>
 #endif
-#include <openpose/core/resizeAndMergeBase.hpp>
+#include <openpose/net/resizeAndMergeBase.hpp>
 #include <openpose/utilities/fastMath.hpp>
-#include <openpose/core/resizeAndMergeCaffe.hpp>
+#include <openpose/net/resizeAndMergeCaffe.hpp>
 
 namespace op
 {

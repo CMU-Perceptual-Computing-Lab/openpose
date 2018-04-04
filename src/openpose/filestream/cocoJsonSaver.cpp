@@ -74,7 +74,7 @@ namespace op
                 else if (numberBodyParts == 23)
                     indexesInCocoOrder = std::vector<int>{18,21,19,22,20,    4,1,5,2,6,    3,13,8,14, 9,    15,10};
                 else
-                    error("Unvalid number of body parts (" + std::to_string(numberBodyParts) + ").",
+                    error("Invalid number of body parts (" + std::to_string(numberBodyParts) + ").",
                           __LINE__, __FUNCTION__, __FILE__);
                 for (auto bodyPart = 0u ; bodyPart < indexesInCocoOrder.size() ; bodyPart++)
                 {

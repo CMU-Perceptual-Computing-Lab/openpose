@@ -2,7 +2,7 @@
 #include <thrust/extrema.h>
 #include <openpose/gpu/cuda.hpp>
 #include <openpose/gpu/cuda.hpp>
-#include <openpose/core/maximumBase.hpp>
+#include <openpose/net/maximumBase.hpp>
 
 namespace op
 {

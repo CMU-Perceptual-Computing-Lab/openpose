@@ -179,12 +179,16 @@ namespace op
         std::vector<unsigned int>{
             20,21, 34,35, 42,43, 36,37, 38,39, 44,45, 46,47, 26,27, 22,23, 24,25, 28,29, 30,31, 32,33, 50,51, 52,53, 56,57, 54,55, 58,59, 40,41, 48,49
         },
+        // BODY_19b
+        std::vector<unsigned int>{
+            20,21, 34,35, 42,43, 36,37, 38,39, 44,45, 46,47, 26,27, 22,23, 24,25, 28,29, 30,31, 32,33, 50,51, 52,53, 56,57, 54,55, 58,59, 40,41, 48,49, 60,61, 62,63
+        },
     };
     // POSE_BODY_PART_MAPPING on HPP crashes on Windows at dynamic initialization if it's on hpp
     const std::array<std::map<unsigned int, std::string>, (int)PoseModel::Size>   POSE_BODY_PART_MAPPING{
         POSE_COCO_BODY_PARTS,   POSE_MPI_BODY_PARTS,    POSE_MPI_BODY_PARTS,    POSE_COCO_BODY_PARTS,
         POSE_BODY_19_BODY_PARTS,POSE_BODY_19_BODY_PARTS,POSE_BODY_23_BODY_PARTS,POSE_BODY_59_BODY_PARTS,
-        POSE_BODY_19_BODY_PARTS
+        POSE_BODY_19_BODY_PARTS,POSE_BODY_19_BODY_PARTS
     };
 
     const std::array<std::string, (int)PoseModel::Size> POSE_PROTOTXT{
@@ -197,6 +201,7 @@ namespace op
         "pose/body_23/pose_deploy.prototxt",
         "pose/body_59/pose_deploy.prototxt",
         "pose/body_19n/pose_deploy.prototxt",
+        "pose/body_19b/pose_deploy.prototxt",
     };
     const std::array<std::string, (int)PoseModel::Size> POSE_TRAINED_MODEL{
         "pose/coco/pose_iter_440000.caffemodel",
@@ -208,12 +213,13 @@ namespace op
         "pose/body_23/pose_iter_XXXXXX.caffemodel",
         "pose/body_59/pose_iter_XXXXXX.caffemodel",
         "pose/body_19n/pose_iter_XXXXXX.caffemodel",
+        "pose/body_19b/pose_iter_XXXXXX.caffemodel",
     };
 
     // Constant Array Parameters
     // POSE_NUMBER_BODY_PARTS equivalent to size of std::map POSE_BODY_XX_BODY_PARTS - 1 (removing background)
     const std::array<unsigned int, (int)PoseModel::Size> POSE_NUMBER_BODY_PARTS{
-        18, 15, 15, 18, 19, 19, 23, 59, 19
+        18, 15, 15, 18, 19, 19, 23, 59, 19, 19
     };
     const std::array<std::vector<unsigned int>, (int)PoseModel::Size> POSE_BODY_PART_PAIRS{
         // COCO
@@ -250,6 +256,10 @@ namespace op
         std::vector<unsigned int>{
             1,8,   1,2,   1,5,   2,3,   3,4,   5,6,   6,7,   8,9,   9,10,  10,11, 8,12,  12,13, 13,14,  1,0,   0,15, 15,17,  0,16, 16,18,   2,17,  5,18
         },
+        // BODY_19b
+        std::vector<unsigned int>{
+            1,8,   1,2,   1,5,   2,3,   3,4,   5,6,   6,7,   8,9,   9,10,  10,11, 8,12,  12,13, 13,14,  1,0,   0,15, 15,17,  0,16, 16,18,   2,17,  5,18, 2,9, 5,12
+        },
     };
     const std::array<unsigned int, (int)PoseModel::Size> POSE_MAX_PEAKS{
         POSE_MAX_PEOPLE,    // COCO
@@ -261,6 +271,7 @@ namespace op
         POSE_MAX_PEOPLE,    // BODY_23
         POSE_MAX_PEOPLE,    // BODY_59
         POSE_MAX_PEOPLE,    // BODY_19N
+        POSE_MAX_PEOPLE,    // BODY_19b
     };
     const std::array<float, (int)PoseModel::Size> POSE_CCN_DECREASE_FACTOR{
         8.f,    // COCO
@@ -272,25 +283,26 @@ namespace op
         8.f,    // BODY_23
         8.f,    // BODY_59
         8.f,    // BODY_19N
+        8.f,    // BODY_19b
     };
 
     // Default Model Parameters
     // They might be modified on running time
     const std::array<float, (int)PoseModel::Size>           POSE_DEFAULT_NMS_THRESHOLD{
-        0.05f,      0.6f,       0.3f,       0.05f,      0.05f,      0.05f,      0.05f,      0.05f,      0.05f
+        0.05f,      0.6f,       0.3f,       0.05f,      0.05f,      0.05f,      0.05f,      0.05f,      0.05f,      0.05f
     };
     const std::array<float, (int)PoseModel::Size>    POSE_DEFAULT_CONNECT_INTER_MIN_ABOVE_THRESHOLD{
-        0.95f,      0.95f,      0.95f,      0.95f,      0.95f,      0.95f,      0.95f,      0.95f,      0.95f
+        0.95f,      0.95f,      0.95f,      0.95f,      0.95f,      0.95f,      0.95f,      0.95f,      0.95f,      0.95f
         // 0.85f,      0.85f,      0.85f,      0.85f,      0.85f,      0.85f // Matlab version
     };
     const std::array<float, (int)PoseModel::Size>           POSE_DEFAULT_CONNECT_INTER_THRESHOLD{
-        0.05f,      0.01f,      0.01f,      0.05f,      0.05f,      0.05f,      0.05f,      0.05f,      0.05f
+        0.05f,      0.01f,      0.01f,      0.05f,      0.05f,      0.05f,      0.05f,      0.05f,      0.05f,      0.05f
     };
     const std::array<unsigned int, (int)PoseModel::Size>    POSE_DEFAULT_CONNECT_MIN_SUBSET_CNT{
-        3,          3,          3,          3,          3,          3,          3,          3,          3
+        3,          3,          3,          3,          3,          3,          3,          3,          3,          3
     };
     const std::array<float, (int)PoseModel::Size>           POSE_DEFAULT_CONNECT_MIN_SUBSET_SCORE{
-        0.4f,       0.4f,       0.4f,       0.4f,       0.4f,       0.4f,       0.4f,       0.4f,       0.4f
+        0.4f,       0.4f,       0.4f,       0.4f,       0.4f,       0.4f,       0.4f,       0.4f,       0.4f,       0.4f
         // 0.2f,       0.4f,       0.4f,       0.4f,       0.4f,       0.4f // Matlab version
     };
 

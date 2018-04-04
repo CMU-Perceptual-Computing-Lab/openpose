@@ -59,8 +59,8 @@ namespace op
     }
 
     void GuiInfoAdder::addInfo(cv::Mat& cvOutputData, const int numberPeople, const unsigned long long id,
-                               const std::string& elementRenderedName, const Array<long long>& poseIds,
-                               const Array<float>& poseKeypoints)
+                               const std::string& elementRenderedName, const unsigned long long frameNumber,
+                               const Array<long long>& poseIds, const Array<float>& poseKeypoints)
     {
         try
         {
@@ -79,7 +79,7 @@ namespace op
             // Recording inverse: sec/gpu
             // std::snprintf(charArrayAux, 15, "%4.2f s/gpu", (mFps != 0. ? mNumberGpus/mFps : 0.));
             putTextOnCvMat(cvOutputData, charArrayAux, {intRound(cvOutputData.cols - borderMargin), borderMargin},
-                           white, true);
+                           white, true, cvOutputData.cols);
             // Part to show
             // Allowing some buffer when changing the part to show (if >= 2 GPUs)
             // I.e. one GPU might return a previous part after the other GPU returns the new desired part, it looks
@@ -124,21 +124,21 @@ namespace op
                         x = xB + intRound(0.25f*borderMargin);
                         y = yB - intRound(0.5f*borderMargin);
                     }
-                    putTextOnCvMat(cvOutputData, std::to_string(poseIds[i]), {x, y}, white, false);
+                    putTextOnCvMat(cvOutputData, std::to_string(poseIds[i]), {x, y}, white, false, cvOutputData.cols);
                 }
             }
             // OpenPose name as well as help or part to show
             putTextOnCvMat(cvOutputData, "OpenPose - " +
                            (!mLastElementRenderedName.empty() ?
                                 mLastElementRenderedName : (mGuiEnabled ? "'h' for help" : "")),
-                           {borderMargin, borderMargin}, white, false);
+                           {borderMargin, borderMargin}, white, false, cvOutputData.cols);
             // Frame number
-            putTextOnCvMat(cvOutputData, "Frame: " + std::to_string(id),
-                           {borderMargin, (int)(cvOutputData.rows - borderMargin)}, white, false);
+            putTextOnCvMat(cvOutputData, "Frame: " + std::to_string(frameNumber),
+                           {borderMargin, (int)(cvOutputData.rows - borderMargin)}, white, false, cvOutputData.cols);
             // Number people
             putTextOnCvMat(cvOutputData, "People: " + std::to_string(numberPeople),
                            {(int)(cvOutputData.cols - borderMargin), (int)(cvOutputData.rows - borderMargin)},
-                           white, true);
+                           white, true, cvOutputData.cols);
         }
         catch (const std::exception& e)
         {

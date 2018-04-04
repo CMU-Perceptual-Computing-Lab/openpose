@@ -1,5 +1,5 @@
 // #include <thrust/extrema.h>
-#include <openpose/core/maximumBase.hpp>
+#include <openpose/net/maximumBase.hpp>
 
 namespace op
 {

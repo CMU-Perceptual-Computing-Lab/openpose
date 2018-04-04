@@ -7,7 +7,7 @@ namespace op
                                              const DataFormat writeKeypointFormat_, const std::string& writeJson_,
                                              const std::string& writeCocoJson_, const std::string& writeImages_,
                                              const std::string& writeImagesFormat_, const std::string& writeVideo_,
-                                             const std::string& writeHeatMaps_,
+                                             const double writeVideoFps_, const std::string& writeHeatMaps_,
                                              const std::string& writeHeatMapsFormat_) :
         displayMode{displayMode_},
         guiVerbose{guiVerbose_},
@@ -20,7 +20,8 @@ namespace op
         writeImagesFormat{writeImagesFormat_},
         writeVideo{writeVideo_},
         writeHeatMaps{writeHeatMaps_},
-        writeHeatMapsFormat{writeHeatMapsFormat_}
+        writeHeatMapsFormat{writeHeatMapsFormat_},
+        writeVideoFps{writeVideoFps_}
     {
     }
 }

@@ -1,5 +1,5 @@
-#ifndef OPENPOSE_CORE_MAXIMUM_CAFFE_HPP
-#define OPENPOSE_CORE_MAXIMUM_CAFFE_HPP
+#ifndef OPENPOSE_NET_MAXIMUM_CAFFE_HPP
+#define OPENPOSE_NET_MAXIMUM_CAFFE_HPP
 
 #include <openpose/core/common.hpp>
 
@@ -36,4 +36,4 @@ namespace op
     };
 }
 
-#endif // OPENPOSE_CORE_MAXIMUM_CAFFE_HPP
+#endif // OPENPOSE_NET_MAXIMUM_CAFFE_HPP

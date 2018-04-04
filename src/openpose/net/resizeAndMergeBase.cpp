@@ -2,7 +2,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/openCv.hpp>
-#include <openpose/core/resizeAndMergeBase.hpp>
+#include <openpose/net/resizeAndMergeBase.hpp>
 
 namespace op
 {

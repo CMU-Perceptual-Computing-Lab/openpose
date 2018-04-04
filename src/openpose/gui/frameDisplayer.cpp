@@ -87,6 +87,9 @@ namespace op
     {
         try
         {
+            // Security check
+            if (frame.empty())
+                error("Empty frame introduced.", __LINE__, __FUNCTION__, __FILE__);
             // If frame > window size --> Resize window
             if (mWindowedSize.x < frame.cols || mWindowedSize.y < frame.rows)
             {
@@ -100,6 +103,35 @@ namespace op
             cv::imshow(mWindowName, frame);
             if (waitKeyValue != -1)
                 cv::waitKey(waitKeyValue);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    void FrameDisplayer::displayFrame(const std::vector<cv::Mat>& frames, const int waitKeyValue)
+    {
+        try
+        {
+            // No frames
+            if (frames.empty())
+                displayFrame(cv::Mat(), waitKeyValue);
+            // 1 frame
+            else if (frames.size() == 1u)
+                displayFrame(frames[0], waitKeyValue);
+            // >= 2 frames
+            else
+            {
+                // Prepare final cvMat
+                // Concat (0)
+                cv::Mat cvMat = frames[0].clone();
+                // Concat (1,size()-1)
+                for (auto i = 1u; i < frames.size(); i++)
+                    cv::hconcat(cvMat, frames[i], cvMat);
+                // Display it
+                displayFrame(cvMat, waitKeyValue);
+            }
         }
         catch (const std::exception& e)
         {
