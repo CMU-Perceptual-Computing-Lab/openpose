@@ -74,7 +74,7 @@ In order to verify that the camera parameters introduced by the user are sorted 
 
 
 ## Installing the OpenPose 3-D Reconstruction Module
-Check the [doc/installation.md#3d-reconstruction-module](./quick_start.md#3d-reconstruction-module) for installation steps.
+Check the [doc/installation.md#3d-reconstruction-module](./installation.md#3d-reconstruction-module) for installation steps.
 
 
 

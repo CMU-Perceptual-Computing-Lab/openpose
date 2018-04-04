@@ -334,10 +334,8 @@ namespace op
                     const auto bodyPartIndex = subsetI[bodyPart];
                     if (bodyPartIndex > 0)
                     {
-                        // Best results for 1 scale: x + 0, y + 0.5
-                        // +0.5 to both to keep Matlab format
-                        poseKeypoints[baseOffset] = peaksPtr[bodyPartIndex-2] * scaleFactor + 0.5f;
-                        poseKeypoints[baseOffset + 1] = peaksPtr[bodyPartIndex-1] * scaleFactor + 0.5f;
+                        poseKeypoints[baseOffset] = peaksPtr[bodyPartIndex-2] * scaleFactor;
+                        poseKeypoints[baseOffset + 1] = peaksPtr[bodyPartIndex-1] * scaleFactor;
                         poseKeypoints[baseOffset + 2] = peaksPtr[bodyPartIndex];
                     }
                     else

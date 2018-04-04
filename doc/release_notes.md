@@ -218,6 +218,7 @@ OpenPose Library - Release Notes
     1. Removed scale parameter from hand and face rectangle extractor (causing wrong results if custom `--output_resolution`).
 3. Main bugs fixed:
     1. Hand and face work properly again with any `--output_resolution`.
+    2. Part candidates (`--part_candidates`) are saved with the same scale than the final keypoints itself.
 
 
 
