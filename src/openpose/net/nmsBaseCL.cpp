@@ -13,8 +13,9 @@ namespace op
 {
     #ifdef USE_OPENCL
         const std::string nmsOclCommonFunctions = MULTI_LINE_STRING(
-            void nmsAccuratePeakPosition(__global const Type* sourcePtr, const int peakLocX, const int peakLocY,
-                                         const int width, const int height, Type* fx, Type* fy, Type* fscore)
+            void nmsAccuratePeakPosition(__global const Type* sourcePtr, Type* fx, Type* fy, Type* fscore,
+                                         const int peakLocX, const int peakLocY, const int width, const int height,
+                                         const T offsetX, const T offsetY)
             {
                 Type xAcc = 0.f;
                 Type yAcc = 0.f;
@@ -43,8 +44,11 @@ namespace op
                     }
                 }
 
-                *fx = xAcc / scoreAcc;
-                *fy = yAcc / scoreAcc;
+                // Offset to keep Matlab format (empirically higher acc)
+                // Best results for 1 scale: x + 0, y + 0.5
+                // +0.5 to both to keep Matlab format
+                *fx = xAcc / scoreAcc + offsetX;
+                *fy = yAcc / scoreAcc + offsetY;
                 *fscore = sourcePtr[peakLocY*width + peakLocX];
             }
 
@@ -85,10 +89,7 @@ namespace op
                             && value > left && value > right
                             && value > bottomLeft && value > bottom && value > bottomRight)
                         {
-                            //Type fx = 0; Type fy = 0; Type fscore = 0;
-                            //nmsAccuratePeakPosition(sourcePtr, x, y, w, h, &fx, &fy, &fscore);
                             kernelPtr[index] = 1;
-                            //if(debug) printf("%d %d \n", x,y);
                         }
                         else
                             kernelPtr[index] = 0;
@@ -104,7 +105,8 @@ namespace op
         typedef cl::KernelFunctor<cl::Buffer, cl::Buffer, cl::Buffer, int, int, int, int> NMSWriteKernelFunctor;
         const std::string nmsWriteKernel = MULTI_LINE_STRING(
             __kernel void nmsWriteKernel(__global Type* targetPtr, __global int* kernelPtr, __global const Type* sourcePtr,
-                                         const int w, const int h, const int maxPeaks, const int debug)
+                                         const int w, const int h, const int maxPeaks, const int debug,
+                                         const T offsetX, const T offsetY)
             {
                 int x = get_global_id(0);
                 int y = get_global_id(1);
@@ -118,7 +120,7 @@ namespace op
                         if (prev - curr)
                         {
                             Type fx = 0; Type fy = 0; Type fscore = 0;
-                            nmsAccuratePeakPosition(sourcePtr, x, y, w, h, &fx, &fy, &fscore);
+                            nmsAccuratePeakPosition(sourcePtr, &fx, &fy, &fscore, x, y, w, h, offsetX, offsetY);
                             //if (debug) printf("C %d %d %d \n", x,y,kernelPtr[index]);
                             __global Type* output = &targetPtr[curr*3];
                             output[0] = fx; output[1] = fy; output[2] = fscore;
@@ -144,7 +146,8 @@ namespace op
 
     template <typename T>
     void nmsOcl(T* targetPtr, int* kernelPtr, const T* const sourcePtr, const T threshold,
-                const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize, const int gpuID)
+                const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize, const Point<T>& offset,
+                const int gpuID)
     {
         try
         {
@@ -229,7 +232,8 @@ namespace op
                                                                                       sizeof(int) *  width * height, &kernelCPU[0]);
                         // Write Kernel
                         nmsWriteKernel(cl::EnqueueArgs(op::OpenCL::getInstance(gpuID)->getQueue(), cl::NDRange(width, height)),
-                                          targetBuffer, kernelBuffer, sourceBuffer, width, height, targetPeaks-1, debug);
+                                          targetBuffer, kernelBuffer, sourceBuffer, width, height, targetPeaks-1, debug,
+                                          offset.x, offset.y);
                     }
                 }
             #else
@@ -239,6 +243,7 @@ namespace op
                 UNUSED(threshold);
                 UNUSED(targetSize);
                 UNUSED(sourceSize);
+                UNUSED(offset);
                 UNUSED(gpuID);
                 error("OpenPose must be compiled with the `USE_OPENCL` macro definition in order to use this"
                       " functionality.", __LINE__, __FUNCTION__, __FILE__);
@@ -258,7 +263,9 @@ namespace op
     }
 
     template void nmsOcl(float* targetPtr, int* kernelPtr, const float* const sourcePtr, const float threshold,
-                         const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize, int gpuID);
+                         const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize,
+                         const Point<float>& offset, const int gpuID);
     template void nmsOcl(double* targetPtr, int* kernelPtr, const double* const sourcePtr, const double threshold,
-                         const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize, int gpuID);
+                         const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize,
+                         const Point<double>& offset, const int gpuID);
 }

@@ -567,7 +567,7 @@ targetJoint[3*i+2] *= -1;
 const auto myHeight = 1.85; // Gines
 // const auto myHeight = 1.75; // Donglai?
 for (auto i = 0 ; i < 183 ; i++)
-targetJoint[i] *= 1.418918919*myHeight;
+targetJoint[i] *= 1.225*1.418918919*myHeight;
                 // Update keypoints
                 updateKeypoints(bodyJoints, LHandJoints, RHandJoints, targetJoint);
 

@@ -60,7 +60,10 @@ CAFFE_DIR := 3rdparty/caffe/distribute
 
 # OpenPose 3-D Reconstruction
 # WITH_3D_RENDERER := 1
+# WITH_CERES := 1
 # WITH_FLIR_CAMERA := 1
+# Eigen directory (Ceres)
+EIGEN_DIR := /usr/include/eigen3/
 # Spinnaker directory
 SPINNAKER_DIR := /usr/include/spinnaker
 
