@@ -3,20 +3,33 @@
 
 ## Contents
 1. [Introduction](#introduction)
-2. [Features](#features)
-3. [Required Hardware](#required-hardware)
-4. [Camera Calibration](#camera-calibration)
-5. [Camera Ordering](#camera-ordering)
-6. [Installing the OpenPose 3-D Reconstruction Module](#installing-the-openpose-3-d-reconstruction-module)
-7. [Quick Start](#quick-start)
-8. [Expected Visual Results](#expected-visual-results)
-9. [Using a Different Camera Brand](#using-a-different-camera-brand)
-10. [Known Bug](#known-bug)
+2. [Installing the OpenPose 3-D Reconstruction Module](#installing-the-openpose-3-d-reconstruction-module)
+3. [Non Linear Optimization](#non-linear-optimization)
+4. [Features](#features)
+5. [Required Hardware](#required-hardware)
+6. [Camera Calibration](#camera-calibration)
+7. [Camera Ordering](#camera-ordering)
+8. [Quick Start](#quick-start)
+9. [Expected Visual Results](#expected-visual-results)
+10. [Using a Different Camera Brand](#using-a-different-camera-brand)
+11. [Known Bug](#known-bug)
 
 
 
 ## Introduction
 This experimental module performs 3-D keypoint (body, face, and hand) reconstruction and rendering for 1 person. We will not keep updating it nor solving questions/issues about it at the moment. It requires the user to be familiar with computer vision and camera calibration, including extraction of intrinsic and extrinsic parameters.
+
+
+
+
+## Installing the OpenPose 3-D Reconstruction Module
+Check [doc/installation.md#3d-reconstruction-module](./installation.md#3d-reconstruction-module) for installation steps.
+
+
+
+
+## Non Linear Optimization
+In order to increase the 3-D reconstruction accuracy, OpenPose optionally performs non-linear optimization if Ceres solver support is enabled (only available in Ubuntu for now). To enable it, check [doc/installation.md#3d-reconstruction-module](./installation.md#3d-reconstruction-module) for more details.
 
 
 
@@ -69,12 +82,6 @@ In order to verify that the camera parameters introduced by the user are sorted 
 1. Initially, introduce the camera parameters sorted by serial number. By default (in Spinnaker 1.8), they are sorted by serial number.
 2. When the program is run, OpenPose displays the camera serial number associated to each index of each detected camera. If the number of cameras detected is different to the number of actual cameras, make sure the hardware is properly connected and the camera leds are on.
 3. Make sure that the order in which you introduced your camera parameters matches this index ordering displayed by OpenPose. Again, it should be sorted by serial number, but different Spinnaker versions might work differently.
-
-
-
-
-## Installing the OpenPose 3-D Reconstruction Module
-Check the [doc/installation.md#3d-reconstruction-module](./installation.md#3d-reconstruction-module) for installation steps.
 
 
 
