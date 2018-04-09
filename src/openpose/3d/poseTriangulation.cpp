@@ -1,24 +1,28 @@
+#ifdef WITH_CERES
+    #include <ceres/ceres.h>
+    #include <ceres/rotation.h>
+#endif
 #include <opencv2/calib3d/calib3d.hpp>
 #include <openpose/3d/poseTriangulation.hpp>
 
 namespace op
 {
-    double calcReprojectionError(const cv::Mat& reconstructedPoint, const std::vector<cv::Mat>& M,
-                                 const std::vector<cv::Point2d>& points2d)
+    double calcReprojectionError(const cv::Mat& reconstructedPoint, const std::vector<cv::Mat>& cameraMatrices,
+                                 const std::vector<cv::Point2d>& pointsOnEachCamera)
     {
         try
         {
             auto averageError = 0.;
-            for (auto i = 0u ; i < M.size() ; i++)
+            for (auto i = 0u ; i < cameraMatrices.size() ; i++)
             {
-                cv::Mat imageX = M[i] * reconstructedPoint;
+                cv::Mat imageX = cameraMatrices[i] * reconstructedPoint;
                 imageX /= imageX.at<double>(2,0);
-                const auto error = std::sqrt(std::pow(imageX.at<double>(0,0) -  points2d[i].x,2)
-                                             + std::pow(imageX.at<double>(1,0) - points2d[i].y,2));
+                const auto error = std::sqrt(std::pow(imageX.at<double>(0,0) -  pointsOnEachCamera[i].x,2)
+                                             + std::pow(imageX.at<double>(1,0) - pointsOnEachCamera[i].y,2));
                 // log("Error: " + std::to_string(error));
                 averageError += error;
             }
-            return averageError / M.size();
+            return averageError / cameraMatrices.size();
         }
         catch (const std::exception& e)
         {
@@ -27,8 +31,96 @@ namespace op
         }
     }
 
-    void triangulate(cv::Mat& reconstructedPoint, const std::vector<cv::Mat>& cameraMatrices,
-                     const std::vector<cv::Point2d>& pointsOnEachCamera)
+    #ifdef WITH_CERES
+        // Nonlinear Optimization for 3D Triangulation
+        struct ReprojectionErrorForTriangulation
+        {
+            ReprojectionErrorForTriangulation(double x,double y,double* param)
+            {
+                observed_x = x;
+                observed_y = y;
+                memcpy(camParam,param,sizeof(double)*12);
+            }
+
+            template <typename T>
+            bool operator()(const T* const pt,
+                            T* residuals) const ;
+
+            inline virtual bool Evaluate(double const* const* pt,
+                                         double* residuals,
+                                         double** jacobians) const;
+
+            double observed_x;
+            double observed_y;
+            double camParam[12];
+        };
+
+        template <typename T>
+        bool ReprojectionErrorForTriangulation::operator()(const T* const pt,
+                                                           T* residuals) const
+        {
+            try
+            {
+                T predicted[3];
+                predicted[0] = T(camParam[0])*pt[0]+ T(camParam[1])*pt[1] + T(camParam[2])*pt[2] + T(camParam[3]);
+                predicted[1] = T(camParam[4])*pt[0]+ T(camParam[5])*pt[1] + T(camParam[6])*pt[2] + T(camParam[7]);
+                predicted[2] = T(camParam[8])*pt[0]+ T(camParam[9])*pt[1] + T(camParam[10])*pt[2] + T(camParam[11]);
+
+                predicted[0] = predicted[0]/predicted[2];
+                predicted[1] = predicted[1]/predicted[2];
+
+                residuals[0] = T(observed_x) - predicted[0];
+                residuals[1] = T(observed_y) - predicted[1];
+
+                // residuals[0] = T(pow(predicted[0] - observed_x,2) + pow(predicted[1] - observed_y,2));
+                // residuals[0] = -pow(predicted[0] - T(observed_x),2);
+                // residuals[1] = -pow(predicted[1] - T(observed_y),2);
+
+                return  true;
+            }
+            catch (const std::exception& e)
+            {
+                error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+                return false;
+            }
+        }
+
+        bool ReprojectionErrorForTriangulation::Evaluate(double const* const* pt,
+            double* residuals,
+            double** jacobians) const
+        {
+            try
+            {
+                UNUSED(jacobians);
+
+                double predicted[3];
+                predicted[0] = camParam[0]*pt[0][0]+ camParam[1]*pt[0][1] + camParam[2]*pt[0][2] + camParam[3];
+                predicted[1] = camParam[4]*pt[0][0]+ camParam[5]*pt[0][1] + camParam[6]*pt[0][2] + camParam[7];
+                predicted[2] = camParam[8]*pt[0][0]+ camParam[9]*pt[0][1] + camParam[10]*pt[0][2] + camParam[11];
+
+                predicted[0] /= predicted[2];
+                predicted[1] /= predicted[2];
+
+                //residuals[0] = predicted[0] - observed_x;
+                //residuals[1] = predicted[1] - observed_y;
+
+                residuals[0] = std::sqrt(std::pow(predicted[0] - observed_x,2) + std::pow(predicted[1] - observed_y,2));
+                // log("Residuals:");
+                // residuals[0]= pow(predicted[0] - (observed_x),2);
+                // residuals[1]= pow(predicted[1] - (observed_y),2);
+
+                return true;
+            }
+            catch (const std::exception& e)
+            {
+                error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+                return false;
+            }
+        }
+    #endif
+
+    double triangulate(cv::Mat& reconstructedPoint, const std::vector<cv::Mat>& cameraMatrices,
+                       const std::vector<cv::Point2d>& pointsOnEachCamera)
     {
         try
         {
@@ -55,30 +147,71 @@ namespace op
             cv::SVD svd{A};
             svd.solveZ(A,reconstructedPoint);
             reconstructedPoint /= reconstructedPoint.at<double>(3);
+
+            return calcReprojectionError(reconstructedPoint, cameraMatrices, pointsOnEachCamera);
         }
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return -1.;
         }
     }
 
-    // TODO: ask for the missing function: TriangulationOptimization
     double triangulateWithOptimization(cv::Mat& reconstructedPoint, const std::vector<cv::Mat>& cameraMatrices,
                                        const std::vector<cv::Point2d>& pointsOnEachCamera)
     {
         try
         {
+            // Information for 3 cameras:
+            //     - Speed: triangulate ~0.01 ms vs. optimization ~0.2 ms
+            //     - Accuracy: initial reprojection error ~14-21, reduced ~5% with non-linear optimization
+
+            // Basic triangulation
             triangulate(reconstructedPoint, cameraMatrices, pointsOnEachCamera);
 
-            return 0.;
-            // return calcReprojectionError(X, cameraMatrices, pointsOnEachCamera);
+            #ifdef WITH_CERES
+                double paramX[3];
+                paramX[0] = reconstructedPoint.at<double>(0,0);
+                paramX[1] = reconstructedPoint.at<double>(1,0);
+                paramX[2] = reconstructedPoint.at<double>(2,0);
+                ceres::Problem problem;
+                for (auto i = 0u; i < cameraMatrices.size(); ++i)
+                {
+                    double camParam[12];
+                    memcpy(camParam, cameraMatrices[i].data, sizeof(double)*12);
+                    // Each Residual block takes a point and a camera as input and outputs a 2
+                    // dimensional residual. Internally, the cost function stores the observed
+                    // image location and compares the reprojection against the observation.
+                    ceres::CostFunction* cost_function =
+                        new ceres::AutoDiffCostFunction<ReprojectionErrorForTriangulation, 2, 3>(
+                        new ReprojectionErrorForTriangulation(pointsOnEachCamera[i].x, pointsOnEachCamera[i].y, camParam));
+                    // Add to problem
+                    problem.AddResidualBlock(cost_function,
+                        //NULL, //squared loss
+                        new ceres::HuberLoss(2.0),
+                        paramX);
+                }
 
-            // //if (cameraMatrices.size() >= 3)
-            // //double beforeError = calcReprojectionError(&cameraMatrices, pointsOnEachCamera, X);
-            // double change = TriangulationOptimization(&cameraMatrices, pointsOnEachCamera, X);
-            // //double afterError = calcReprojectionError(&cameraMatrices,pointsOnEachCamera,X);
-            // //printfLog("!!Mine %.8f , inFunc %.8f \n",beforeError-afterError,change);
-            // return change;
+                ceres::Solver::Options options;
+                options.linear_solver_type = ceres::DENSE_NORMAL_CHOLESKY;
+                // options.minimizer_progress_to_stdout = true;
+                // options.parameter_tolerance = 1e-20;
+                // options.function_tolerance = 1e-20;
+                ceres::Solver::Summary summary;
+                ceres::Solve(options, &problem, &summary);
+                // if (summary.initial_cost > summary.final_cost)
+                //     std::cout << summary.FullReport() << "\n";
+
+                reconstructedPoint.at<double>(0,0) = paramX[0];
+                reconstructedPoint.at<double>(1,0) = paramX[1];
+                reconstructedPoint.at<double>(2,0) = paramX[2];
+                reconstructedPoint.at<double>(3,0) = 1;
+
+                // const auto reprojectionErrorDecrease = std::sqrt((summary.initial_cost - summary.final_cost)/double(cameraMatrices.size()));
+                // return reprojectionErrorDecrease;
+            #endif
+
+            return calcReprojectionError(reconstructedPoint, cameraMatrices, pointsOnEachCamera);
         }
         catch (const std::exception& e)
         {

@@ -37,7 +37,7 @@ if (WIN32)
   # sdl flags causes error -- error : unknown attribute \"guard\"
 
   set(CMAKE_CONFIGURATION_TYPES Debug Release CACHE TYPE INTERNAL FORCE)
-  
+
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
   string(REPLACE "/W3" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
   string(REPLACE "/GR" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
@@ -47,7 +47,7 @@ if (WIN32)
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Ot /Oi /Gy /Z7")
 
   set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /LTCG:incremental /OPT:REF /OPT:ICF")
-  
+
   string(REPLACE "/MDd" "/MD" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
   string(REPLACE "/Zi" "/Z7" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
   string(REPLACE "/RTC1" "" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
@@ -180,12 +180,15 @@ endif (${GPU_MODE} MATCHES "CUDA")
 
 # Suboptions for OpenPose 3D Reconstruction demo
 option(WITH_3D_RENDERER "Add OpenPose 3D renderer module (it requires FreeGLUT library)." OFF)
+if (UNIX AND NOT APPLE)
+  option(WITH_CERES "Add Ceres support. Used e.g., for advanced 3-D reconstruction." OFF)
+endif (UNIX AND NOT APPLE)
 option(WITH_FLIR_CAMERA "Add FLIR (formerly Point Grey) camera code (requires Spinnaker SDK already installed)." OFF)
 
 # Download the models
 option(DOWNLOAD_COCO_MODEL "Download COCO model." ON)
 option(DOWNLOAD_MPI_MODEL "Download MPI model." OFF)
-option(DOWNLOAD_HAND_MODEL "Download hand model." ON)  
+option(DOWNLOAD_HAND_MODEL "Download hand model." ON)
 option(DOWNLOAD_FACE_MODEL "Download face model." ON)
 
 # More options
@@ -202,8 +205,6 @@ option(PROFILER_ENABLED "If enabled, OpenPose will be able to print out speed in
 if (${GPU_MODE} MATCHES "OPENCL")
   unset(CMAKE_THREAD_LIBS_INIT CACHE)
   find_package(Threads)
-else ()
-  set(CMAKE_THREAD_LIBS_INIT "")
 endif ()
 
 ### FIND REQUIRED PACKAGES
@@ -218,6 +219,9 @@ if (WITH_3D_RENDERER)
   # OpenPose flags
   add_definitions(-DWITH_3D_RENDERER)
 endif (WITH_3D_RENDERER)
+if (WITH_CERES)
+  add_definitions(-DWITH_CERES)
+endif (WITH_CERES)
 if (WITH_FLIR_CAMERA)
   # OpenPose flags
   add_definitions(-DWITH_FLIR_CAMERA)
@@ -244,6 +248,12 @@ if (UNIX AND NOT APPLE)
     # GLUT
     find_package(GLUT REQUIRED)
   endif (WITH_3D_RENDERER)
+  if (WITH_CERES)
+    # Eigen + Ceres
+    find_package(PkgConfig)
+    pkg_check_modules(EIGEN3 REQUIRED eigen3)
+    find_package(Ceres REQUIRED COMPONENTS SuiteSparse)
+  endif (WITH_CERES)
   if (WITH_FLIR_CAMERA)
     # Spinnaker
     find_package(Spinnaker)
@@ -251,9 +261,6 @@ if (UNIX AND NOT APPLE)
       message(FATAL_ERROR "Spinnaker not found. Either turn off the `WITH_FLIR_CAMERA` option or specify the path to
         the Spinnaker includes and libs.")
     endif (NOT SPINNAKER_FOUND)
-  # Otherwise error if 3D module enabled, and then disabled (with Spinnaker not installed)
-  else (WITH_FLIR_CAMERA)
-    set(SPINNAKER_LIB "")
   endif (WITH_FLIR_CAMERA)
 
   # OpenMP
@@ -359,9 +366,6 @@ if (WIN32)
     unset(BOOST_SYSTEM_LIB_DEBUG CACHE)
     find_library(BOOST_SYSTEM_LIB_RELEASE boost_system-vc140-mt-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
     find_library(BOOST_SYSTEM_LIB_DEBUG boost_system-vc140-mt-gd-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
-  else ()
-    set(BOOST_SYSTEM_LIB_RELEASE "")
-    set(BOOST_SYSTEM_LIB_DEBUG "")
   endif ()
 
   if (WITH_3D_RENDERER)
@@ -507,7 +511,7 @@ if (UNIX AND NOT APPLE)
       if (NOT Caffe_FOUND)
         add_custom_command(TARGET openpose_caffe
             POST_BUILD
-            COMMAND ${CMAKE_COMMAND} ${CMAKE_SOURCE_DIR} 
+            COMMAND ${CMAKE_COMMAND} ${CMAKE_SOURCE_DIR}
             COMMAND $(MAKE)
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
             COMMENT "Rerunning cmake after building Caffe submodule")
@@ -554,6 +558,10 @@ endif ()
 if (WITH_3D_RENDERER)
   include_directories(${GLUT_INCLUDE_DIRS})
 endif (WITH_3D_RENDERER)
+if (WITH_CERES)
+  include_directories(${CERES_INCLUDE_DIRS})
+  include_directories(${EIGEN3_INCLUDE_DIRS})
+endif (WITH_CERES)
 if (WITH_FLIR_CAMERA)
   include_directories(${SPINNAKER_INCLUDE_DIRS})
 endif (WITH_FLIR_CAMERA)
@@ -563,6 +571,44 @@ if (WIN32)
     ${Boost_INCLUDE_DIRS}
     ${WINDOWS_INCLUDE_DIRS})
 endif (WIN32)
+
+
+### COLLECT ALL 3RD-PARTY LIBRARIES TO BE LINKED AGAINST
+set(OpenPose_3rdparty_libraries ${OpenCV_LIBS} ${GLOG_LIBRARY})
+if (UNIX AND NOT APPLE)
+  set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries} ${GLOG_LIBRARY})
+elseif (WIN32)
+  set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries}
+      debug ${GFLAGS_LIBRARY_DEBUG} optimized ${GFLAGS_LIBRARY_RELEASE}
+      debug ${GLOG_LIBRARY_DEBUG} optimized ${GLOG_LIBRARY_RELEASE})
+endif (UNIX AND NOT APPLE)
+# Deep net Framework
+if (${DL_FRAMEWORK} MATCHES "CAFFE")
+  set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries} ${Caffe_LIBS} ${GFLAGS_LIBRARY})
+endif (${DL_FRAMEWORK} MATCHES "CAFFE")
+# CPU vs. GPU
+if (USE_MKL)
+  set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries} ${MKL_LIBS})
+endif (USE_MKL)
+if (${GPU_MODE} MATCHES "OPENCL")
+  set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries} ${CMAKE_THREAD_LIBS_INIT} ${OpenCL_LIBRARIES})
+  if (WIN32)
+    set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries}
+        debug ${BOOST_SYSTEM_LIB_DEBUG} optimized ${BOOST_SYSTEM_LIB_RELEASE})
+  endif (WIN32)
+endif (${GPU_MODE} MATCHES "OPENCL")
+# 3-D
+if (WITH_3D_RENDERER)
+  set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries} ${GLUT_LIBRARY})
+endif (WITH_3D_RENDERER)
+if (WITH_CERES)
+  set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries} ${CERES_LIBRARIES})
+endif (WITH_CERES)
+if (WITH_FLIR_CAMERA)
+  set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries} ${SPINNAKER_LIB})
+endif (WITH_FLIR_CAMERA)
+
+set(examples_3rdparty_libraries ${OpenPose_3rdparty_libraries} ${GFLAGS_LIBRARY})
 
 
 ### ADD SUBDIRECTORIES
@@ -609,7 +655,7 @@ if (UNIX AND NOT APPLE)
         COMMENT "Generating API documentation with Doxygen"
         VERBATIM)
     else (DOXYGEN_FOUND)
-      message(FATAL_ERROR "Doxygen need to be installed to generate the doxygen documentation.")
+      message(FATAL_ERROR "Doxygen needs to be installed to generate the doxygen documentation.")
     endif (DOXYGEN_FOUND)
   endif (BUILD_DOCS)
 
