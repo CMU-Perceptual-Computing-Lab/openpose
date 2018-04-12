@@ -201,11 +201,11 @@ option(BUILD_SHARED_LIBS "Build as shared lib" ON)
 # Speed profiler
 option(PROFILER_ENABLED "If enabled, OpenPose will be able to print out speed information at runtime." OFF)
 
-# Threads
-if (${GPU_MODE} MATCHES "OPENCL")
+# Threads - Pthread
+if (${GPU_MODE} MATCHES "OPENCL" OR (UNIX AND NOT APPLE))
   unset(CMAKE_THREAD_LIBS_INIT CACHE)
   find_package(Threads)
-endif ()
+endif (${GPU_MODE} MATCHES "OPENCL" OR (UNIX AND NOT APPLE))
 
 ### FIND REQUIRED PACKAGES
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
@@ -607,6 +607,10 @@ endif (WITH_CERES)
 if (WITH_FLIR_CAMERA)
   set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries} ${SPINNAKER_LIB})
 endif (WITH_FLIR_CAMERA)
+# Pthread
+if (UNIX AND NOT APPLE)
+  set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries} pthread)
+endif (UNIX AND NOT APPLE)
 
 set(examples_3rdparty_libraries ${OpenPose_3rdparty_libraries} ${GFLAGS_LIBRARY})
 
