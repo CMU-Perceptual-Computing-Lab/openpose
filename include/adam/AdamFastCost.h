@@ -3,6 +3,7 @@
 #include <cassert>
 #include "pose_to_transforms.h"
 #include <cstring>
+#include <chrono>
 
 class AdamFastCost: public ceres::CostFunction
 {
@@ -208,19 +209,50 @@ public:
 
 		// 1st step: forward kinematics
 		const int num_t = (TotalModel::NUM_JOINTS) * 3 * 5;  // transform 3 * 4 + joint location 3 * 1
+
+		// uncomment these lines for comparison with the old code
+		// Matrix<double, Dynamic, 3 * TotalModel::NUM_JOINTS, RowMajor> old_dTrdP(num_t, 3 * TotalModel::NUM_JOINTS);
+		// Matrix<double, Dynamic, 3 * TotalModel::NUM_JOINTS, RowMajor> old_dTrdJ(num_t, 3 * TotalModel::NUM_JOINTS);
+		// old_dTrdP.setZero(); old_dTrdJ.setZero();
+		// VectorXd old_transforms_joint(3 * TotalModel::NUM_JOINTS * 4 + 3 * TotalModel::NUM_JOINTS); // the first part is transform, the second part is outJoint
+
+		// ceres::AutoDiffCostFunction<smpl::PoseToTransformsNoLR_Eulers_adamModel,
+		// (TotalModel::NUM_JOINTS) * 3 * 4 + 3 * TotalModel::NUM_JOINTS,
+		// (TotalModel::NUM_JOINTS) * 3,
+		// (TotalModel::NUM_JOINTS) * 3> old_p2t(new smpl::PoseToTransformsNoLR_Eulers_adamModel(m_adam));
+
+		// const double* old_p2t_parameters[2] = { p_eulers, m_J0.data() };
+		// double* old_p2t_residuals = old_transforms_joint.data();
+		// double* old_p2t_jacobians[2] = { old_dTrdP.data(), old_dTrdJ.data() };
+		// std::clock_t start1 = std::clock();
+		// old_p2t.Evaluate(old_p2t_parameters, old_p2t_residuals, old_p2t_jacobians);
+		// std::clock_t end1 = std::clock();
+
 		Matrix<double, Dynamic, 3 * TotalModel::NUM_JOINTS, RowMajor> dTrdP(num_t, 3 * TotalModel::NUM_JOINTS);
-		Matrix<double, Dynamic, 3 * TotalModel::NUM_JOINTS, RowMajor> dTrdJ(num_t, 3 * TotalModel::NUM_JOINTS);
 		VectorXd transforms_joint(3 * TotalModel::NUM_JOINTS * 4 + 3 * TotalModel::NUM_JOINTS); // the first part is transform, the second part is outJoint
 
-		ceres::AutoDiffCostFunction<smpl::PoseToTransformsNoLR_Eulers_adamModel,
-		(TotalModel::NUM_JOINTS) * 3 * 4 + 3 * TotalModel::NUM_JOINTS,
-		(TotalModel::NUM_JOINTS) * 3,
-		(TotalModel::NUM_JOINTS) * 3> p2t(new smpl::PoseToTransformsNoLR_Eulers_adamModel(m_adam));
-
-		const double* p2t_parameters[2] = { p_eulers, m_J0.data() };
-		double* p2t_residuals = transforms_joint.data();
-		double* p2t_jacobians[2] = { dTrdP.data(), dTrdJ.data() };
+		smpl::PoseToTransformsNoLR_Eulers_adamModel_withDiff p2t(m_adam, m_J0);
+		const double* p2t_parameters[1] = { p_eulers };
+		double* p2t_residuals = transforms_joint.data() + (TotalModel::NUM_JOINTS) * 3 * 4;
+		double* p2t_jacobians[1] = { dTrdP.data() + TotalModel::NUM_JOINTS * 3 * 4 * TotalModel::NUM_JOINTS * 3 };
+		std::clock_t start2 = std::clock();
 		p2t.Evaluate(p2t_parameters, p2t_residuals, p2t_jacobians);
+		std::clock_t end2 = std::clock();
+
+		// uncomment these lines for comparison with the old code
+		// old_dTrdP.block(0, 0, 3 * TotalModel::NUM_JOINTS * 4, 3 * TotalModel::NUM_JOINTS).setZero();
+		// dTrdP.block(0, 0, 3 * TotalModel::NUM_JOINTS * 4, 3 * TotalModel::NUM_JOINTS).setZero();
+
+		// std::cout << "J" << std::endl;
+		// std::cout << "max diff: " << (old_transforms_joint - transforms_joint).block(3 * TotalModel::NUM_JOINTS * 4, 0, 3 * TotalModel::NUM_JOINTS, 1).maxCoeff() << std::endl;
+		// std::cout << "min diff: " << (old_transforms_joint - transforms_joint).block(3 * TotalModel::NUM_JOINTS * 4, 0, 3 * TotalModel::NUM_JOINTS, 1).minCoeff() << std::endl;
+
+		// std::cout << "DJ" << std::endl;
+		// std::cout << "max diff: " << (old_dTrdP - dTrdP).maxCoeff() << std::endl;
+		// std::cout << "min diff: " << (old_dTrdP - dTrdP).minCoeff() << std::endl;
+
+		// std::cout << "time 1: " << (end1 - start1) / (double)CLOCKS_PER_SEC << std::endl;
+		// std::cout << "time 2: " << (end2 - start2) / (double)CLOCKS_PER_SEC << std::endl;
 
 		// Jacobian: d(Joint) / d(pose)
 		Matrix<double, Dynamic, Dynamic, RowMajor> dTJdP = dTrdP.block(3 * TotalModel::NUM_JOINTS * 4, 0, 3 * TotalModel::NUM_JOINTS, 3 * TotalModel::NUM_JOINTS);
