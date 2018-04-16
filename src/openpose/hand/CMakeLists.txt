@@ -6,6 +6,7 @@ set(SOURCES_OP_HAND
     handExtractorCaffe.cpp
     handCpuRenderer.cpp
     handGpuRenderer.cpp
+    handRenderer.cpp
     renderHand.cpp
     renderHand.cu)
 
