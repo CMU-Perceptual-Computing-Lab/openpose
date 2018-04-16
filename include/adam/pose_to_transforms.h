@@ -4,6 +4,7 @@
 #include "ceres/ceres.h"
 #include "ceres/rotation.h"
 #include <iostream>
+#include <chrono>
 #include "FKDerivative.h"
 
 namespace smpl {
@@ -216,6 +217,7 @@ struct PoseToTransformsNoLR_Eulers_adamModel {
 		Map< Matrix<T, 3 * TotalModel::NUM_JOINTS, 4, RowMajor> > outT(transforms);
 		Map< Matrix<T, TotalModel::NUM_JOINTS, 3, RowMajor> > outJoint(transforms + 3 * TotalModel::NUM_JOINTS * 4);
 		Matrix<T, Dynamic, 4, RowMajor> Ms(4 * TotalModel::NUM_JOINTS, 4);
+		// Matrix<T, 3, 3, ColMajor> R; // Interface with ceres
 		Matrix<T, 3, 3, RowMajor> R; // Interface with ceres
 
 		ceres::AngleAxisToRotationMatrix(pose, R.data());
@@ -265,7 +267,7 @@ struct PoseToTransformsNoLR_Eulers_adamModel {
 
 			Ms.block(idj * 4, 0, 3, 3) = Ms.block(ipar * 4, 0, 3, 3)*R;
 			Ms.block(idj * 4, 3, 3, 1) = Ms.block(ipar * 4, 3, 3, 1) +
-			Ms.block(ipar * 4, 0, 3, 3)*(J.row(idj).transpose() - J.row(ipar).transpose());
+										Ms.block(ipar * 4, 0, 3, 3)*(J.row(idj).transpose() - J.row(ipar).transpose());
 			Ms(idj * 4 + 3, 3) = T(1.0);
 		}
 		for (int idj = 0; idj < mod_.NUM_JOINTS; idj++) {

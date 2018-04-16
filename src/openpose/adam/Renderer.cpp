@@ -252,19 +252,11 @@ void Renderer::reshape(int w, int h)
     glLoadIdentity();
     // this section allows for window reshaping while
     // maintaining a "normal" GLUT shape
-    if(!options.CameraMode)
+    if(options.CameraMode == 0u)
     {
-        // usual mode
-        if (w <= h)
-        {
-            glFrustum(-options.nRange/2, options.nRange/2, -options.nRange*h/w/2, options.nRange*h/w/2, -options.nRange + options.view_dist, options.nRange + options.view_dist);
-        }
-        else
-        {
-            glFrustum(-options.nRange/2, options.nRange/2, -options.nRange*h/w/2, options.nRange*h/w/2, -options.nRange + options.view_dist, options.nRange + options.view_dist);
-        }
+        glFrustum(-options.nRange/2, options.nRange/2, -options.nRange*h/w/2, options.nRange*h/w/2, -options.nRange + options.view_dist, options.nRange + options.view_dist);
     }
-    else
+    else if(options.CameraMode == 1u)
     {
         // camera model: set the perspective parameters according to K
         assert(options.K != NULL); // The K matrix must have been provided.
@@ -291,11 +283,11 @@ void Renderer::reshape(int w, int h)
         GLdouble projMatrix[16];
         for (int i = 0; i < 16; i++) projMatrix[i] = ((double*)Frustrum.data)[i];
         glLoadMatrixd(projMatrix);
-        // const GLdouble perspMatrix[16] = {2*options.K[0]/options.width, 0., 0., 0.,
-        //                             2*options.K[1]/options.width, 2*options.K[4]/options.height, 0., 0.,
-        //                             2*options.K[2]/options.width - 1, 2*options.K[5]/options.height - 1, (options.zmax + options.zmin) / (options.zmax - options.zmin), 1.,
-        //                             0., 0., 2*options.zmax*options.zmin/(options.zmin - options.zmax), 0.};
-        // glMultMatrixd(perspMatrix);
+    }
+    else
+    {
+        assert(options.CameraMode == 2u);
+        glOrtho(-w * options.ortho_scale/2, w * options.ortho_scale/2, -h * options.ortho_scale/2, h * options.ortho_scale/2, -options.view_dist, options.view_dist);
     }
 }
 
@@ -389,28 +381,56 @@ void Renderer::MeshRender()
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glPushMatrix();
-    if (!options.CameraMode) gluLookAt(0, -options.view_dist * sin(0.0), -options.view_dist * cos(0.0), 0, 0, 0, 0, -1, 0);
-    else
+    if (options.CameraMode == 0u)
     {
-        // glRotatef(180.f, 1.0f, 0.0f, 0.0f); //camera at origin, looks at z direction, up is -y direction 
-        // gluLookAt(0., 0., 0., 0., 0., 0., 0., -1., 0.); 
+        gluLookAt(0, -options.view_dist * sin(0.0), -options.view_dist * cos(0.0), 0, 0, 0, 0, -1, 0);
+        glRotatef(options.xrot, 1.0, 0.0, 0.0);
+        glRotatef(options.yrot, 0.0, 1.0, 0.0);
     }
-    glRotatef(options.xrot, 1.0, 0.0, 0.0);
-    glRotatef(options.yrot, 0.0, 1.0, 0.0);
+    else if (options.CameraMode == 2u)
+    {
+        glRotatef(options.xrot, 1.0, 0.0, 0.0);
+        glRotatef(options.yrot, 0.0, 1.0, 0.0);
+        const float centerx = 1920 * options.ortho_scale / 2;
+        const float centery = 1080 * options.ortho_scale / 2;
+        gluLookAt(centerx, centery, 0, centerx, centery, 1, 0, -1, 0);
+    }
 
     std::vector<cv::Point3d>& meshVertices = pData->m_meshVertices;
-    if (!options.CameraMode)
+    if (options.CameraMode == 0u)
     {
         cv::Point3d min_s(10000., 10000., 10000.);
         cv::Point3d max_s(-10000., -10000., -10000.);
-        for(uint i = 0; i < meshVertices.size(); i++)
+        if (pData->targetJoint)
         {
-            if (meshVertices[i].x < min_s.x) min_s.x = meshVertices[i].x;
-            if (meshVertices[i].x > max_s.x) max_s.x = meshVertices[i].x;
-            if (meshVertices[i].y < min_s.y) min_s.y = meshVertices[i].y;
-            if (meshVertices[i].y > max_s.y) max_s.y = meshVertices[i].y;
-            if (meshVertices[i].z < min_s.z) min_s.z = meshVertices[i].z;
-            if (meshVertices[i].z > max_s.z) max_s.z = meshVertices[i].z;
+            int num_joint;
+            if (pData->vis_type == 0)  // for hand
+                num_joint = 21;
+            else if(pData->vis_type == 1)  // for body (SMC order)
+                num_joint = 19;
+            else if (pData->vis_type == 2) // for hand and body
+                num_joint = 61;
+            for (uint i = 0; i < num_joint; i++)
+            {
+                if (pData->targetJoint[3*i+0] < min_s.x) min_s.x = pData->targetJoint[3*i+0];
+                if (pData->targetJoint[3*i+0] > max_s.x) max_s.x = pData->targetJoint[3*i+0];
+                if (pData->targetJoint[3*i+1] < min_s.y) min_s.y = pData->targetJoint[3*i+1];
+                if (pData->targetJoint[3*i+1] > max_s.y) max_s.y = pData->targetJoint[3*i+1];
+                if (pData->targetJoint[3*i+2] < min_s.z) min_s.z = pData->targetJoint[3*i+2];
+                if (pData->targetJoint[3*i+2] > max_s.z) max_s.z = pData->targetJoint[3*i+2];
+            }
+        }
+        else
+        {
+            for(uint i = 0; i < meshVertices.size(); i++)
+            {
+                if (meshVertices[i].x < min_s.x) min_s.x = meshVertices[i].x;
+                if (meshVertices[i].x > max_s.x) max_s.x = meshVertices[i].x;
+                if (meshVertices[i].y < min_s.y) min_s.y = meshVertices[i].y;
+                if (meshVertices[i].y > max_s.y) max_s.y = meshVertices[i].y;
+                if (meshVertices[i].z < min_s.z) min_s.z = meshVertices[i].z;
+                if (meshVertices[i].z > max_s.z) max_s.z = meshVertices[i].z;
+            }
         }
         const GLfloat centerx = (min_s.x + max_s.x) / 2;
         const GLfloat centery = (min_s.y + max_s.y) / 2;
@@ -545,7 +565,7 @@ void Renderer::DrawSkeleton(double* joint, uint vis_type, std::vector<int> connM
     else if (vis_type == 2) // for hand and body
     {
         num_joint = 61;
-        rad = 0.6f;
+        rad = 1.0f;
         cone_rad = 0.3f;
     }
 
@@ -587,7 +607,8 @@ void Renderer::IdleSaveImage()
 void Renderer::RenderAndRead()
 {
     glutMainLoopEvent();
-    // glutMainLoop();
+    glPixelStorei(GL_PACK_ALIGNMENT, 1);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glReadPixels(0, 0, options.width, options.height, GL_RGB, GL_UNSIGNED_BYTE, pData->read_buffer);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glutPostRedisplay();
@@ -598,7 +619,7 @@ void Renderer::CameraMode(int width, int height, double* calibK)
     options.width = width; options.height = height;
     if(calibK != NULL) options.K = calibK;
     glutReshapeWindow(width, height);
-    options.CameraMode = true;
+    options.CameraMode = 1u;
     options.xrot = options.yrot = 0;
 }
 
@@ -629,5 +650,31 @@ void Renderer::NormalMode(uint position, int width, int height)
     }
     options.width = width; options.height = height;
     glutReshapeWindow(width, height);
-    options.CameraMode = false;
+    options.CameraMode = 0u;
+}
+
+void Renderer::OrthoMode(float scale, uint position)
+{
+    options.width = 1920; options.height = 1080;
+    glutReshapeWindow(options.width, options.height);
+    options.ortho_scale = scale;
+    options.CameraMode = 2u;
+    if (position == 0)
+    {
+        // look from the front
+        options.xrot = 0;
+        options.yrot = 0;
+    }
+    else if (position == 1)
+    {
+        // look down
+        options.xrot = 90;
+        options.yrot = 0;
+    }
+    else if (position == 2)
+    {
+        // look from the left
+        options.xrot = 0;
+        options.yrot = 90;
+    }
 }

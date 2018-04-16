@@ -11,8 +11,9 @@ public:
 	static void RenderAndRead();
 	void Display();
 	static VisualizationOptions options;
-	void NormalMode(uint position=0, int width=600, int height=600);
+	void NormalMode(uint position=0u, int width=600, int height=600);
 	void CameraMode(int width=1920, int height=1080, double* calibK=NULL);
+	void OrthoMode(float scale, uint position=0u);
 private:
 	//initialization functions
 	void simpleInit(); // my simple way of initialization

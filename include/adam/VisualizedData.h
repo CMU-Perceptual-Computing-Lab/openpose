@@ -199,14 +199,16 @@ public:
 
 struct VisualizationOptions
 {
-	VisualizationOptions(): K(NULL), xrot(0.0f), yrot(0.0f), view_dist(300.0f), nRange(40.0f), CameraMode(false), width(600), height(600), zmin(0.01f), zmax(1000.0f), meshSolid(false) {}
-	GLint width, height;	
+	VisualizationOptions(): K(NULL), xrot(0.0f), yrot(0.0f), view_dist(300.0f), nRange(40.0f), CameraMode(0u),
+		ortho_scale(1.0f), width(600), height(600), zmin(0.01f), zmax(1000.0f), meshSolid(false) {}
+	GLint width, height;
 	double* K;
 	GLfloat view_dist, nRange;
 	GLfloat	xrot, yrot;
-	bool CameraMode; 
+	uint CameraMode;
 	GLfloat zmin, zmax; // used only in camera mode (to determine the range of objects in z direction)
 	bool meshSolid;
+	float ortho_scale;
 };
 
 #endif

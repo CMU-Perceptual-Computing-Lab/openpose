@@ -267,8 +267,7 @@ void adam_reconstruct_Eulers(const TotalModel& totalm,
 		(TotalModel::NUM_JOINTS) * 3> p2t(new PoseToTransformsNoLR_Eulers_adamModel(totalm));
 	const double * parameters[2] = { parm_pose_eulers, J.data() };
 	double * residuals = transforms_joint.data();
-	double * jacobians[2] = { dTrdP.data(), dTrdJ.data() };
-	p2t.Evaluate(parameters, residuals, jacobians);		//automatically compute residuals and jacobians (dTdP and dTdJ)
+	p2t.Evaluate(parameters, residuals, nullptr);		//automatically compute residuals and jacobians (dTdP and dTdJ)
 
 	transforms.block(0, 0, num_t, 1) = transforms_joint.block(0, 0, num_t, 1);
 
