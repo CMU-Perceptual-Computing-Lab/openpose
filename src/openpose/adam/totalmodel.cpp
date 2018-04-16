@@ -170,9 +170,6 @@ void LoadTotalDataFromJson(TotalModel &totalm, const std::string &path, const st
 		fin >> target_vertex_index >> source_mesh >> source_v[0] >> source_v[1] >> source_v[2];			//indices are 0-based. 
 		fin >> source_w[0] >> source_w[1] >> source_w[2];			//weight are zeros
 
-		//normalize
-		double sum = source_w[0] + source_w[1] + source_w[2];
-
 		if (fin.eof())
 			break;
 
@@ -207,12 +204,12 @@ void LoadTotalDataFromJson(TotalModel &totalm, const std::string &path, const st
 	std::vector<Eigen::Triplet<double> > A_IJV;
 	A_IJV.reserve(NUM_FACE_POINTS * 3);
 
-	for (int v = 0; v < totalm.m_vertexCorresSources.size(); ++v)
+	for (auto v = 0u; v < totalm.m_vertexCorresSources.size(); ++v)
 	{
 		if (totalm.m_vertexCorresSources[v].m_sourceMeshType != CMeshModelInstance::MESH_TYPE_FACE)
 			continue;
 
-		for (int j = 0; j < totalm.m_vertexCorresSources[v].m_corresWeight.size(); ++j)
+		for (auto j = 0u; j < totalm.m_vertexCorresSources[v].m_corresWeight.size(); ++j)
 		{
 			int sourceV_idx = totalm.m_vertexCorresSources[v].m_corresWeight[j].first;
 			double sourceV_weight = totalm.m_vertexCorresSources[v].m_corresWeight[j].second;
@@ -404,8 +401,8 @@ void LoadTotalModelFromObj(TotalModel &totalm, const std::string &path)
 	totalm.m_uvs.setZero();
 	
 	int verCnt = 0;
-	int uvCnt = 0;
-	int normalCnt = 0;
+	// int uvCnt = 0;
+	// int normalCnt = 0;
 	int faceCnt = 0;
 	while(fin.eof()==false)
 	{
@@ -571,7 +568,6 @@ void adam_reconstruct_Eulers_Fast(const TotalModel& totalm,
 	using namespace smpl;
 	using namespace Eigen;
 
-	double *VTd = NULL;
 	Matrix<double, Dynamic, Dynamic, RowMajor> Vt_with_face(TotalModel::NUM_VERTICES, 3);
 	Map< Matrix<double, Dynamic, 1> > Vt_vec_with_face(Vt_with_face.data(), 3 * TotalModel::NUM_VERTICES);
 

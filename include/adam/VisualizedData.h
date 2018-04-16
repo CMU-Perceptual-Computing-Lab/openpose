@@ -79,9 +79,9 @@ public:
 		connMat.push_back(connMat_body);
 
 		std::vector<int> connMat_total(body, body + sizeof(body) / sizeof(int));
-		for (int i = 0; i < connMat_hand.size(); i++)
+		for (auto i = 0u; i < connMat_hand.size(); i++)
 			connMat_total.push_back(connMat_hand[i] + 19); // left hand
-		for (int i = 0; i < connMat_hand.size(); i++)
+		for (auto i = 0u; i < connMat_hand.size(); i++)
 			connMat_total.push_back(connMat_hand[i] + 40); // right hand
 		connMat.push_back(connMat_total);
 	}
@@ -201,14 +201,14 @@ struct VisualizationOptions
 {
 	VisualizationOptions(): K(NULL), xrot(0.0f), yrot(0.0f), view_dist(300.0f), nRange(40.0f), CameraMode(0u),
 		ortho_scale(1.0f), width(600), height(600), zmin(0.01f), zmax(1000.0f), meshSolid(false) {}
-	GLint width, height;
 	double* K;
-	GLfloat view_dist, nRange;
 	GLfloat	xrot, yrot;
+	GLfloat view_dist, nRange;
 	uint CameraMode;
+	float ortho_scale;
+	GLint width, height;
 	GLfloat zmin, zmax; // used only in camera mode (to determine the range of objects in z direction)
 	bool meshSolid;
-	float ortho_scale;
 };
 
 #endif

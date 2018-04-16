@@ -266,8 +266,8 @@ public:
 		bool fit_face=false,
 		uint projection=0u
 		)		//3x2, //Heel, Toe
-		: m_adam(adam), m_bodyJoints(Joints), m_rfoot_joints(rFoot), m_lfoot_joints(lFoot), m_FaceJoints(faceJoints),
-			m_lHandJoints(lHandJoints), m_rHandJoints(rHandJoints), pK_(K), projection_(projection), fit_face_(fit_face)
+		: m_adam(adam), m_rfoot_joints(rFoot), m_lfoot_joints(lFoot), m_bodyJoints(Joints), m_FaceJoints(faceJoints),
+			m_lHandJoints(lHandJoints), m_rHandJoints(rHandJoints), projection_(projection), pK_(K), fit_face_(fit_face)
 	{   
 		if (projection_ == 0u) res_dim = 3;
 		else if(projection_ == 1u) res_dim = 2;
@@ -586,7 +586,7 @@ public:
 			// Vertex Constraints //////////////////////
 			if (!this->joint_only)
 			{
-				for (int i = 0; i < corres_vertex2targetpt.size(); ++i)
+				for (auto i = 0u; i < corres_vertex2targetpt.size(); ++i)
 				{
 					if (corres_vertex2targetpt[i].second[0] == 0.0 && corres_vertex2targetpt[i].second[1] == 0.0 && corres_vertex2targetpt[i].second[2] == 0.0) continue;
 					res[vertexCons_res_startIdx + 3 * i + 0] = WEAK_WEIGHT * (V_vec(3 * corres_vertex2targetpt[i].first + 0) - corres_vertex2targetpt[i].second[0]); //- m_targetPts(res_offset + 3 * i + 0));
@@ -617,7 +617,7 @@ public:
 
 					if (!this->joint_only)
 					{
-						for (int i = 0; i < corres_vertex2targetpt.size(); ++i)
+						for (auto i = 0u; i < corres_vertex2targetpt.size(); ++i)
 						{
 							if (corres_vertex2targetpt[i].second[0] == 0.0 && corres_vertex2targetpt[i].second[1] == 0.0 && corres_vertex2targetpt[i].second[2] == 0.0) continue;
 							drdt.row(vertexCons_res_startIdx + 3 * i + 0) = WEAK_WEIGHT * m_dVdt.row(3 * corres_vertex2targetpt[i].first + 0);
@@ -666,7 +666,7 @@ public:
 
 					if(!this->joint_only)
 					{
-						for (int i = 0; i < corres_vertex2targetpt.size(); ++i)
+						for (auto i = 0u; i < corres_vertex2targetpt.size(); ++i)
 						{
 							if (corres_vertex2targetpt[i].second[0] == 0.0 && corres_vertex2targetpt[i].second[1] == 0.0 && corres_vertex2targetpt[i].second[2] == 0.0) continue;
 							dr_dPose.row(vertexCons_res_startIdx + 3 * i + 0) = WEAK_WEIGHT* dVdPfr.row(3 * corres_vertex2targetpt[i].first + 0);
@@ -714,7 +714,7 @@ public:
 
 					if (!this->joint_only)
 					{
-						for (int i = 0; i < corres_vertex2targetpt.size(); ++i)
+						for (auto i = 0u; i < corres_vertex2targetpt.size(); ++i)
 						{
 							if (corres_vertex2targetpt[i].second[0] == 0.0 && corres_vertex2targetpt[i].second[1] == 0.0 && corres_vertex2targetpt[i].second[2] == 0.0) continue;
 							dr_dCoeff.row(vertexCons_res_startIdx + 3 * i + 0) = WEAK_WEIGHT* dVdcfr.row(3 * corres_vertex2targetpt[i].first + 0);
@@ -736,7 +736,7 @@ public:
 
 					if (!this->joint_only)
 					{
-						for (int i = 0; i < corres_vertex2targetpt.size(); ++i)
+						for (auto i = 0u; i < corres_vertex2targetpt.size(); ++i)
 						{
 							if (corres_vertex2targetpt[i].second[0] == 0.0 && corres_vertex2targetpt[i].second[1] == 0.0 && corres_vertex2targetpt[i].second[2] == 0.0) continue;
 							dr_dFaceCoef.row(vertexCons_res_startIdx + 3 * i + 0) = WEAK_WEIGHT * dVdfc.row(3 * corres_vertex2targetpt[i].first + 0);
@@ -774,7 +774,7 @@ public:
 			if (!this->joint_only)
 			{
 				double x, y, X, Y, Z;
-				for (int i = 0; i < corres_vertex2targetpt.size(); i++)
+				for (auto i = 0u; i < corres_vertex2targetpt.size(); i++)
 				{
 					if (corres_vertex2targetpt[i].second[3] == 0.0)
 						res.block(vertexCons_res_startIdx + 2 * i, 0, 2, 1).setZero();
@@ -817,7 +817,7 @@ public:
 					// set the vertex gradient
 					if (!this->joint_only)
 					{
-						for (int i = 0; i < corres_vertex2targetpt.size(); ++i)
+						for (auto i = 0u; i < corres_vertex2targetpt.size(); ++i)
 						{
 							if (corres_vertex2targetpt[i].second[3] == 0.0) continue;
 							double XYZ[3] = {V_vec(3 * corres_vertex2targetpt[i].first + 0), V_vec(3 * corres_vertex2targetpt[i].first + 1), V_vec(3 * corres_vertex2targetpt[i].first + 2)};
@@ -877,7 +877,7 @@ public:
 
 					if(!this->joint_only)
 					{
-						for (int i = 0; i < corres_vertex2targetpt.size(); ++i)
+						for (auto i = 0u; i < corres_vertex2targetpt.size(); ++i)
 						{
 							if (corres_vertex2targetpt[i].second[3] == 0.0) continue;
 							double XYZ[3] = {V_vec(3 * corres_vertex2targetpt[i].first + 0), V_vec(3 * corres_vertex2targetpt[i].first + 1), V_vec(3 * corres_vertex2targetpt[i].first + 2)};
@@ -937,7 +937,7 @@ public:
 
 					if(!this->joint_only)
 					{
-						for (int i = 0; i < corres_vertex2targetpt.size(); ++i)
+						for (auto i = 0u; i < corres_vertex2targetpt.size(); ++i)
 						{
 							if (corres_vertex2targetpt[i].second[3] == 0.0) continue;
 							double XYZ[3] = {V_vec(3 * corres_vertex2targetpt[i].first + 0), V_vec(3 * corres_vertex2targetpt[i].first + 1), V_vec(3 * corres_vertex2targetpt[i].first + 2)};
@@ -958,7 +958,7 @@ public:
 					// only related to vertex weights
 					if(!this->joint_only)
 					{
-						for (int i = 0; i < corres_vertex2targetpt.size(); ++i)
+						for (auto i = 0u; i < corres_vertex2targetpt.size(); ++i)
 						{
 							if (corres_vertex2targetpt[i].second[3] == 0.0) continue;
 							double XYZ[3] = {V_vec(3 * corres_vertex2targetpt[i].first + 0), V_vec(3 * corres_vertex2targetpt[i].first + 1), V_vec(3 * corres_vertex2targetpt[i].first + 2)};
@@ -999,7 +999,7 @@ public:
 			if (!this->joint_only)
 			{
 				double X, Y, Z, x, y;
-				for (int i = 0; i < corres_vertex2targetpt.size(); ++i)
+				for (auto i = 0u; i < corres_vertex2targetpt.size(); ++i)
 				{
 					res[vertexCons_res_startIdx + res_dim * i + 0] = WEAK_WEIGHT * (V_vec(3 * corres_vertex2targetpt[i].first + 0) - tempJoints(3 * root_index + 0) - corres_vertex2targetpt[i].second[0] + m_targetPts(5 * root_index)); //- m_targetPts(res_offset + 3 * i + 0));
 					res[vertexCons_res_startIdx + res_dim * i + 1] = WEAK_WEIGHT * (V_vec(3 * corres_vertex2targetpt[i].first + 1) - tempJoints(3 * root_index + 1) - corres_vertex2targetpt[i].second[1] + m_targetPts(5 * root_index + 1)); //- m_targetPts(res_offset + 3 * i + 1));
@@ -1045,7 +1045,7 @@ public:
 					// No jacobian from 3D vertex
 					if (!this->joint_only)
 					{
-						for (int i = 0; i < corres_vertex2targetpt.size(); ++i)
+						for (auto i = 0u; i < corres_vertex2targetpt.size(); ++i)
 						{
 							if (corres_vertex2targetpt[i].second[3] == 0.0) continue;
 							double XYZ[3] = {V_vec(3 * corres_vertex2targetpt[i].first + 0), V_vec(3 * corres_vertex2targetpt[i].first + 1), V_vec(3 * corres_vertex2targetpt[i].first + 2)};
@@ -1109,7 +1109,7 @@ public:
 
 					if(!this->joint_only)
 					{
-						for (int i = 0; i < corres_vertex2targetpt.size(); ++i)
+						for (auto i = 0u; i < corres_vertex2targetpt.size(); ++i)
 						{
 							dr_dPose.row(vertexCons_res_startIdx + res_dim * i + 0) = WEAK_WEIGHT * (dVdPfr.row(3 * corres_vertex2targetpt[i].first + 0) - dJdP.row(3 * root_index + 0));
 							dr_dPose.row(vertexCons_res_startIdx + res_dim * i + 1) = WEAK_WEIGHT * (dVdPfr.row(3 * corres_vertex2targetpt[i].first + 1) - dJdP.row(3 * root_index + 1));
@@ -1180,7 +1180,7 @@ public:
 
 					if (!this->joint_only)
 					{
-						for (int i = 0; i < corres_vertex2targetpt.size(); ++i)
+						for (auto i = 0u; i < corres_vertex2targetpt.size(); ++i)
 						{
 							// face coeffs do not influence body vertex at all
 							dr_dCoeff.row(vertexCons_res_startIdx + res_dim * i + 0) = WEAK_WEIGHT * (dVdcfr.row(3 * corres_vertex2targetpt[i].first + 0) - dJdC.row(3 * root_index + 0));
@@ -1204,7 +1204,7 @@ public:
 
 					if (!this->joint_only)
 					{
-						for (int i = 0; i < corres_vertex2targetpt.size(); ++i)
+						for (auto i = 0u; i < corres_vertex2targetpt.size(); ++i)
 						{
 							// face coeff has no influence on the root joint location
 							dr_dFaceCoef.row(vertexCons_res_startIdx + res_dim * i + 0) = WEAK_WEIGHT * dVdfc.row(3 * corres_vertex2targetpt[i].first + 0);

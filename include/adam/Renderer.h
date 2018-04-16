@@ -43,6 +43,6 @@ private:
 	static void SimpleRenderer();
 	static void MeshRender();
 	static void DrawSkeleton(double* joints, uint vis_type, std::vector<int> connMat);
-	static void SpecialKeys(int key, int x, int y);
+	static void SpecialKeys(const int key, const int x, const int y);
 	static void IdleReadBuffer();
 };

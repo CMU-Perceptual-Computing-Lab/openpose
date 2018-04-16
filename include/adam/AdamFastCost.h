@@ -16,7 +16,7 @@ public:
 		Eigen::MatrixXd &lHandJoints,
 		Eigen::MatrixXd &rHandJoints,
 		double* p_adam_coeff
-	): m_adam(adam), m_bodyJoints(Joints), m_rfoot_joints(rFoot), m_lfoot_joints(lFoot), m_FaceJoints(faceJoints),
+	): m_adam(adam), m_rfoot_joints(rFoot), m_lfoot_joints(lFoot), m_bodyJoints(Joints), m_FaceJoints(faceJoints),
 		m_lHandJoints(lHandJoints), m_rHandJoints(rHandJoints), res_dim(3)
 	{
 		assert(p_adam_coeff != NULL);
@@ -235,9 +235,9 @@ public:
 		const double* p2t_parameters[1] = { p_eulers };
 		double* p2t_residuals = transforms_joint.data() + (TotalModel::NUM_JOINTS) * 3 * 4;
 		double* p2t_jacobians[1] = { dTrdP.data() + TotalModel::NUM_JOINTS * 3 * 4 * TotalModel::NUM_JOINTS * 3 };
-		std::clock_t start2 = std::clock();
+		// std::clock_t start2 = std::clock();
 		p2t.Evaluate(p2t_parameters, p2t_residuals, p2t_jacobians);
-		std::clock_t end2 = std::clock();
+		// std::clock_t end2 = std::clock();
 
 		// uncomment these lines for comparison with the old code
 		// old_dTrdP.block(0, 0, 3 * TotalModel::NUM_JOINTS * 4, 3 * TotalModel::NUM_JOINTS).setZero();

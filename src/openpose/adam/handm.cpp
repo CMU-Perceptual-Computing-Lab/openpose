@@ -249,7 +249,6 @@ void reconstruct_joints(const HandModel &handm,
 
     Map< Matrix<double, Dynamic, Dynamic, RowMajor> >
         outJ(outJoints, HandModel::NUM_JOINTS, 3);
-    const int num_t = (HandModel::NUM_JOINTS) * 3 * 4 * 2;      //note *2
 
     VectorXd transformsNJoints(3 * HandModel::NUM_JOINTS * 4 * 2);      //Transform + Joints
     Map< Matrix<double, 3 * HandModel::NUM_JOINTS, 4, RowMajor> > Tf(transformsNJoints.data());

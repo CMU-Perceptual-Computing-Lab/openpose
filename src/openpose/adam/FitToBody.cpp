@@ -10,7 +10,7 @@ void FreezeJoint(ceres::Problem& problem, double* dataPtr, int index)
 	problem.SetParameterUpperBound(dataPtr, index, 0.00001);
 }
 
-void SetSolverOptions(ceres::Problem *problem, ceres::Solver::Options *options) {
+void SetSolverOptions(ceres::Solver::Options *options) {
 	CHECK(StringToLinearSolverType("sparse_normal_cholesky",
 		&options->linear_solver_type));
 	CHECK(StringToPreconditionerType("jacobi",
@@ -60,7 +60,7 @@ void FitToHandCeres_Right_Naive(
 		hand_pose_reg_loss,
 		parm_hand_pose.data());
 
-	SetSolverOptions(&problem, &options);
+	SetSolverOptions(&options);
 	options.update_state_every_iteration = true;
 	options.max_num_iterations = 100;
 	options.max_solver_time_in_seconds = 8200;
@@ -136,7 +136,7 @@ void FitToProjectionCeres(
 		hand_coeff_reg_loss,
 		parm_hand_coeffs.data());
 
-	SetSolverOptions(&problem, &options);
+	SetSolverOptions(&options);
 	options.update_state_every_iteration = true;
 	options.max_num_iterations = 100;
 	options.max_solver_time_in_seconds = 8200;
@@ -211,7 +211,7 @@ void Adam_FitTotalBodyCeres(TotalModel &adam,
 
 	ceres::Solver::Options options_init;
 	ceres::Solver::Summary summary;
-	SetSolverOptions(&problem_init, &options_init);
+	SetSolverOptions(&options_init);
 	options_init.max_num_iterations = 10;
 	options_init.use_nonmonotonic_steps = false;
 	options_init.num_linear_solver_threads = 10;
@@ -262,7 +262,7 @@ void Adam_FitTotalBodyCeres(TotalModel &adam,
 
 	ceres::Solver::Options options;
 	// ceres::Solver::Summary summary;
-	SetSolverOptions(&problem, &options);
+	SetSolverOptions(&options);
 	options.function_tolerance = 1e-4;
 	options.max_num_iterations = 20;
 	options.use_nonmonotonic_steps = false;
@@ -308,7 +308,7 @@ void Adam_FitTotalBodyCeres2d(TotalModel &adam,
 
 	ceres::Solver::Options options_init;
 	ceres::Solver::Summary summary_init;
-	SetSolverOptions(&problem_init, &options_init);
+	SetSolverOptions(&options_init);
 	options_init.function_tolerance = 1e-4;
 	options_init.max_num_iterations = 20;
 	options_init.use_nonmonotonic_steps = false;
@@ -441,7 +441,7 @@ void Adam_FitTotalBodyCeres3d2d(TotalModel &adam,
 
 	ceres::Solver::Options options_init;
 	ceres::Solver::Summary summary_init;
-	SetSolverOptions(&problem_init, &options_init);
+	SetSolverOptions(&options_init);
 	options_init.function_tolerance = 1e-4;
 	options_init.max_num_iterations = 20;
 	options_init.use_nonmonotonic_steps = false;
@@ -594,7 +594,7 @@ void Adam_FastFit(TotalModel &adam,
 	std::copy(frame_param.m_adam_pose.data(), frame_param.m_adam_pose.data() + 62 * 3, g_params.m_adam_pose.data());
 
 	ceres::Solver::Options options;
-	SetSolverOptions(&g_problem, &options);
+	SetSolverOptions(&options);
 	options.max_num_iterations = 20;
 	options.use_nonmonotonic_steps = false;
 	options.num_linear_solver_threads = 10;

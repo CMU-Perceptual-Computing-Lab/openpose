@@ -41,12 +41,12 @@ void GenerateMesh(CMeshModelInstance& returnMesh, double* resultJoint, smpl::SMP
 	}
 	for (int r = 0; r < pHandm->F_.rows(); ++r)		//Faces
 	{
-		int idxvect[3];
+		// int idxvect[3];
 		for (int c = 0; c < pHandm->F_.cols(); ++c)
 		{
-			int idx = pHandm->F_(r, c);  //0based (applied -1 on loading)
+			const int idx = pHandm->F_(r, c);  //0based (applied -1 on loading)
 			returnMesh.m_face_vertexIndices.push_back(idx);
-			idxvect[c] = idx;
+			// idxvect[c] = idx;
 		}
 	}
 	//Compute Normal
@@ -89,12 +89,11 @@ void GenerateMesh(CMeshModelInstance& returnMesh, double* resultJoint, smpl::SMP
 
 	//Visualize SMPL Skeletons
 	Eigen::Matrix<double, Eigen::Dynamic, 1> joints = g_total_model.m_J_reg * outV;
-	int jointCnt = 0;
-	int jointIdx = 0;
+	// int jointIdx = 0;
 	for (int r = 0; r < joints.rows(); r += 3)		//Faces
 	{
 		returnMesh.m_joints.push_back(cv::Point3f(joints(r), joints(r + 1), joints(r + 2)));
-		jointIdx++;
+		// jointIdx++;
 	}
 	Eigen::Matrix<double, Eigen::Dynamic, 1> joints_smc = g_total_model.m_J_reg_smc * outV;
 	for (int r = 0; r < joints.rows(); r += 3)		//Faces
@@ -151,12 +150,11 @@ void GenerateMesh_Fast(CMeshModelInstance& returnMesh, double* resultJoint, smpl
 
 	//Visualize SMPL Skeletons
 	Eigen::Matrix<double, Eigen::Dynamic, 1> joints = g_total_model.m_J_reg * outV;
-	int jointCnt = 0;
-	int jointIdx = 0;
+	// int jointIdx = 0;
 	for (int r = 0; r < joints.rows(); r += 3)		//Faces
 	{
 		returnMesh.m_joints.push_back(cv::Point3f(joints(r), joints(r + 1), joints(r + 2)));
-		jointIdx++;
+		// jointIdx++;
 	}
 	Eigen::Matrix<double, Eigen::Dynamic, 1> joints_smc = g_total_model.m_J_reg_smc * outV;
 	for (int r = 0; r < joints.rows(); r += 3)		//Faces
@@ -194,7 +192,7 @@ void CopyMesh(CMeshModelInstance& mesh, VisualizedData& g_visData)
 	g_visData.m_meshVerticesUV.insert(g_visData.m_meshVerticesUV.end(), mesh.m_uvs.begin(), mesh.m_uvs.end());
 
 	g_visData.m_meshIndices.reserve(g_visData.m_meshVertices.size());
-	for (int i = 0; i < mesh.m_face_vertexIndices.size(); i++)
+	for (auto i = 0u; i < mesh.m_face_vertexIndices.size(); i++)
 	{
 		g_visData.m_meshIndices.push_back(mesh.m_face_vertexIndices[i] + vertexCnt);
 	}

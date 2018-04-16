@@ -360,17 +360,21 @@ void Renderer::Display()
 
 }
 
-void Renderer::SpecialKeys(int key, int x, int y)
+void Renderer::SpecialKeys(const int key, const int x, const int y)
 {
     if(key == GLUT_KEY_UP)
         Renderer::options.xrot -= 2.0;
     else if(key == GLUT_KEY_DOWN)
         Renderer::options.xrot += 2.0;
     else if(key == GLUT_KEY_LEFT)
-        Renderer:options.yrot -= 2.0;
+        Renderer::options.yrot -= 2.0;
     else if(key == GLUT_KEY_RIGHT)
         Renderer::options.yrot += 2.0;
     glutPostRedisplay();
+    // Unused arguments (to avoid unused warning)
+    (void)key;
+    (void)x;
+    (void)y;
 }
 
 void Renderer::MeshRender()
@@ -410,7 +414,7 @@ void Renderer::MeshRender()
                 num_joint = 19;
             else if (pData->vis_type == 2) // for hand and body
                 num_joint = 61;
-            for (uint i = 0; i < num_joint; i++)
+            for (int i = 0; i < num_joint; i++)
             {
                 if (pData->targetJoint[3*i+0] < min_s.x) min_s.x = pData->targetJoint[3*i+0];
                 if (pData->targetJoint[3*i+0] > max_s.x) max_s.x = pData->targetJoint[3*i+0];
@@ -465,7 +469,7 @@ void Renderer::MeshRender()
     int offset = sizeof(cv::Point3d) * (pData->m_meshVertices.size());
     void *ptr = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
 
-    for (int i = 0; i< (pData->m_meshVertices).size(); ++i)     //Actual Data copy is done here
+    for (auto i = 0u; i< (pData->m_meshVertices).size(); ++i)     //Actual Data copy is done here
     {
         memcpy((char*)ptr + sizeof(cv::Point3d)*i, &(pData->m_meshVertices[i]), sizeof(cv::Point3d));
         memcpy((char*)ptr + sizeof(cv::Point3d)*i + offset, &(pData->m_meshVerticesColor[i]), sizeof(cv::Point3d));
@@ -569,7 +573,7 @@ void Renderer::DrawSkeleton(double* joint, uint vis_type, std::vector<int> connM
         cone_rad = 0.3f;
     }
 
-    for (uint i = 0; i < num_joint; i++)
+    for (int i = 0; i < num_joint; i++)
     {
         glPushMatrix();
         glTranslated(joint[3*i], joint[3*i+1], joint[3*i+2]);
