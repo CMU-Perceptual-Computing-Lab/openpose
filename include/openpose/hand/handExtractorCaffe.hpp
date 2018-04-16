@@ -51,11 +51,8 @@ namespace op
          * op::Rectangle<float> (similar to cv::Rect for floating values) with the position of that hand (or 0,0,0,0 if
          * some hand is missing, e.g. if a specific person has only half of the body inside the image).
          * @param cvInputData Original image in cv::Mat format and BGR format.
-         * @param scaleInputToOutput Desired scale of the final keypoints. Set to 1 if the desired size is the
-         * cvInputData size.
          */
-        void forwardPass(const std::vector<std::array<Rectangle<float>, 2>> handRectangles, const cv::Mat& cvInputData,
-                         const double scaleInputToOutput);
+        void forwardPass(const std::vector<std::array<Rectangle<float>, 2>> handRectangles, const cv::Mat& cvInputData);
 
     private:
         // PIMPL idiom
@@ -63,7 +60,7 @@ namespace op
         struct ImplHandExtractorCaffe;
         std::unique_ptr<ImplHandExtractorCaffe> upImpl;
 
-        void detectHandKeypoints(Array<float>& handCurrent, const double scaleInputToOutput, const int person,
+        void detectHandKeypoints(Array<float>& handCurrent, const int person,
                                  const cv::Mat& affineMatrix);
 
         Array<float> getHeatMapsFromLastPass() const;

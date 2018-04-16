@@ -57,7 +57,8 @@ namespace op
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                 // Render people hands
                 for (auto& tDatum : *tDatums)
-                    spHandRenderer->renderHand(tDatum.outputData, tDatum.handKeypoints);
+                    spHandRenderer->renderHand(tDatum.outputData, tDatum.handKeypoints,
+                                               (float)tDatum.scaleInputToOutput);
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
                 Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);
