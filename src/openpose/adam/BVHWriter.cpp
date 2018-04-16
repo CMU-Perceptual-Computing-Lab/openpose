@@ -55,30 +55,33 @@ void BVHWriter::parseInput(const Eigen::Matrix<double, 3 * TotalModel::NUM_JOINT
 		Eigen::Matrix<double, TotalModel::NUM_JOINTS, 3, Eigen::RowMajor>& pose_frame = pose[time];
 		getDynamic(pose_frame);
 	}
-	// add additional joints
-	// left_hand
-	std::shared_ptr<BVHData> left_hand_node = std::make_shared<BVHData>(std::string("left_hand"), this->data[20]->offset.data());
-	for (int time = 0; time < this->num_frame; time++)
+	if (mUnityCompatible)
 	{
-		std::array<double, 3> left_hand_angle = {0.0, 0.0, 0.0};
-		left_hand_node->euler.push_back(left_hand_angle);
-	}
-	left_hand_node->children = this->data[20]->children;
-	this->data[20]->children.clear();
-	this->data[20]->children.push_back(left_hand_node);
-	for(int i = 0; i < 3; i++) this->data[20]->offset[i] = 0.0;
+		// add additional joints
+		// left_hand
+		std::shared_ptr<BVHData> left_hand_node = std::make_shared<BVHData>(std::string("left_hand"), this->data[20]->offset.data());
+		for (int time = 0; time < this->num_frame; time++)
+		{
+			std::array<double, 3> left_hand_angle = {0.0, 0.0, 0.0};
+			left_hand_node->euler.push_back(left_hand_angle);
+		}
+		left_hand_node->children = this->data[20]->children;
+		this->data[20]->children.clear();
+		this->data[20]->children.push_back(left_hand_node);
+		for(int i = 0; i < 3; i++) this->data[20]->offset[i] = 0.0;
 
-	// right_hand
-	std::shared_ptr<BVHData> right_hand_node = std::make_shared<BVHData>(std::string("right_hand"), this->data[21]->offset.data());
-	for (int time = 0; time < this->num_frame; time++)
-	{
-		std::array<double, 3> right_hand_angle = {0.0, 0.0, 0.0};
-		right_hand_node->euler.push_back(right_hand_angle);
+		// right_hand
+		std::shared_ptr<BVHData> right_hand_node = std::make_shared<BVHData>(std::string("right_hand"), this->data[21]->offset.data());
+		for (int time = 0; time < this->num_frame; time++)
+		{
+			std::array<double, 3> right_hand_angle = {0.0, 0.0, 0.0};
+			right_hand_node->euler.push_back(right_hand_angle);
+		}
+		right_hand_node->children = this->data[21]->children;
+		this->data[21]->children.clear();
+		this->data[21]->children.push_back(right_hand_node);
+		for(int i = 0; i < 3; i++) this->data[21]->offset[i] = 0.0;
 	}
-	right_hand_node->children = this->data[21]->children;
-	this->data[21]->children.clear();
-	this->data[21]->children.push_back(right_hand_node);
-	for(int i = 0; i < 3; i++) this->data[21]->offset[i] = 0.0;
 }
 
 void BVHWriter::writeBVH(std::string output_file, double frame_time)
@@ -94,8 +97,12 @@ void BVHWriter::writeBVH(std::string output_file, double frame_time)
 
 	for (int i = 0; i < this->num_frame; i++)
 		dynamicStr[i] += std::to_string(this->trans[i](0) + this->root->offset[0]) + " " + std::to_string(this->trans[i](1) + this->root->offset[1]) + " " + std::to_string(this->trans[i](2) + this->root->offset[2]);
-	for (int i = 0; i < this->num_frame; i++)
-		dynamicStr[i] += " 0.0 0.0 180.0";
+	if (mUnityCompatible)
+		for (int i = 0; i < this->num_frame; i++)
+			dynamicStr[i] += " 0.0 0.0 180.0";
+	else
+		for (int i = 0; i < this->num_frame; i++)
+			dynamicStr[i] += " 0.0 0.0 0.0";
 
 	writeData(this->root, 0);
 

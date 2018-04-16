@@ -1,44 +1,3 @@
-#include <iostream>
-#include <FitToBody.h>
-#include <KinematicModel.h>
-#include <VisualizedData.h>
-#include "Renderer.h"
-#include "totalmodel.h"
-#include "utils.h"
-#include "BVHWriter.h"
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-using namespace std;
-#define SMPL_VIS_SCALING 100.0f
-
-std::shared_ptr<Renderer> render;
-const int num_body_joint = 19;
-const int num_hand_joint = 21;
-const int num_face_landmark = 70;
-
-void updateKeypoints(Eigen::MatrixXd& bodyJoints, Eigen::MatrixXd& LHandJoints, Eigen::MatrixXd& RHandJoints, const double* const targetJoint)
-{
-    for (int i = 0; i < num_body_joint; i++)
-    {
-        bodyJoints(0, i) = targetJoint[3 * i];
-        bodyJoints(1, i) = targetJoint[3 * i + 1];
-        bodyJoints(2, i) = targetJoint[3 * i + 2];
-    }
-    for (int i = 0; i < num_hand_joint; i++)
-    {
-        LHandJoints(0, i) = targetJoint[3 * (i + num_body_joint)];
-        LHandJoints(1, i) = targetJoint[3 * (i + num_body_joint) + 1];
-        LHandJoints(2, i) = targetJoint[3 * (i + num_body_joint) + 2];
-    }
-    for (int i = 0; i < num_hand_joint; i++)
-    {
-        RHandJoints(0, i) = targetJoint[3 * (i + num_hand_joint + num_body_joint)];
-        RHandJoints(1, i) = targetJoint[3 * (i + num_hand_joint + num_body_joint) + 1];
-        RHandJoints(2, i) = targetJoint[3 * (i + num_hand_joint + num_body_joint) + 2];
-    } 
-}
-
 // ------------------------- OpenPose Library Tutorial - Real Time Pose Estimation -------------------------
 // If the user wants to learn to use the OpenPose library, we highly recommend to start with the `examples/tutorial_*/`
 // folders.
@@ -259,6 +218,42 @@ DEFINE_string(write_keypoint_json,      "",             "(Deprecated, use `write
 DEFINE_string(write_bvh,                "",             "E.g.: /media/posefs3b/Users/gines/cvpr2018/temp.bvh");
 DEFINE_string(write_adam,               "",             "E.g.: /media/posefs3b/Users/gines/cvpr2018/adam.avi");
 
+#include <BVHWriter.h>
+#include <FitToBody.h>
+#include <KinematicModel.h>
+#include <Renderer.h>
+#include <totalmodel.h>
+#include <utils.h>
+#include <VisualizedData.h>
+#define SMPL_VIS_SCALING 100.0f
+
+std::shared_ptr<Renderer> render;
+const int num_body_joint = 19;
+const int num_hand_joint = 21;
+const int num_face_landmark = 70;
+
+void updateKeypoints(Eigen::MatrixXd& bodyJoints, Eigen::MatrixXd& LHandJoints, Eigen::MatrixXd& RHandJoints, const double* const targetJoint)
+{
+    for (int i = 0; i < num_body_joint; i++)
+    {
+        bodyJoints(0, i) = targetJoint[3 * i];
+        bodyJoints(1, i) = targetJoint[3 * i + 1];
+        bodyJoints(2, i) = targetJoint[3 * i + 2];
+    }
+    for (int i = 0; i < num_hand_joint; i++)
+    {
+        LHandJoints(0, i) = targetJoint[3 * (i + num_body_joint)];
+        LHandJoints(1, i) = targetJoint[3 * (i + num_body_joint) + 1];
+        LHandJoints(2, i) = targetJoint[3 * (i + num_body_joint) + 2];
+    }
+    for (int i = 0; i < num_hand_joint; i++)
+    {
+        RHandJoints(0, i) = targetJoint[3 * (i + num_hand_joint + num_body_joint)];
+        RHandJoints(1, i) = targetJoint[3 * (i + num_hand_joint + num_body_joint) + 1];
+        RHandJoints(2, i) = targetJoint[3 * (i + num_hand_joint + num_body_joint) + 2];
+    }
+}
+
 // If the user needs his own variables, he can inherit the op::Datum struct and add them
 // UserDatum can be directly used by the OpenPose wrapper because it inherits from op::Datum, just define
 // Wrapper<UserDatum> instead of Wrapper<op::Datum>
@@ -397,7 +392,8 @@ public:
         // Load g_total_model (model + data)
         LoadTotalModelFromObj(g_total_model, obj_path);
         LoadTotalDataFromJson(g_total_model, g_total_model_path, pca_path, correspondence_path);
-        pbvh_writer = std::make_shared<BVHWriter>(g_total_model.m_parent);
+        const bool unityCompatible = true;
+        spBvhWriter = std::make_shared<BVHWriter>(g_total_model.m_parent, unityCompatible);
     }
 
     ~WUserOutput()
@@ -689,8 +685,8 @@ std::cout << "IK:         " << duration0 * 1e-6
     {
 // std::cout << J0_vec << std::endl;
         std::cout << J0_vec.rows() << std::endl;
-        pbvh_writer->parseInput(J0_vec, ts, poses);
-        pbvh_writer->writeBVH(filename, frame_time);
+        spBvhWriter->parseInput(J0_vec, ts, poses);
+        spBvhWriter->writeBVH(filename, frame_time);
     }
 
 private:
@@ -715,7 +711,7 @@ private:
     TotalModel g_total_model;
 
     // Write BVH file
-    std::shared_ptr<BVHWriter> pbvh_writer;
+    std::shared_ptr<BVHWriter> spBvhWriter;
     std::vector<Eigen::Matrix<double, 3, 1>> ts; // record the translation across frames
     std::vector<Eigen::Matrix<double, TotalModel::NUM_JOINTS, 3, Eigen::RowMajor>> poses; // record the pose change
     int count_frame;

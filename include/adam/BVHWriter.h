@@ -23,7 +23,8 @@ struct BVHData
 class BVHWriter
 {
 public:
-	BVHWriter(int* _m_parent)
+	BVHWriter(int* _m_parent, const bool unityCompatible = false) :
+		mUnityCompatible{unityCompatible}
 	{
 		std::copy(_m_parent, _m_parent + TotalModel::NUM_JOINTS, m_parent);
 	}
@@ -33,6 +34,7 @@ private:
 	void getHierarchy(const Eigen::Matrix<double, 3 * TotalModel::NUM_JOINTS, 1>& J0);
 	void getDynamic(Eigen::Matrix<double, TotalModel::NUM_JOINTS, 3, Eigen::RowMajor>& pose);
 	void writeData(std::shared_ptr<BVHData> node, int depth);
+	const bool mUnityCompatible;
 	int m_parent[TotalModel::NUM_JOINTS];
 	int num_frame;
 	std::vector<Eigen::Matrix<double, 3, 1>> trans;
