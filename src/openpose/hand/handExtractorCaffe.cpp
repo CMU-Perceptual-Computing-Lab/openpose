@@ -73,7 +73,7 @@ namespace op
             }
         }
 
-        void connectKeypoints(Array<float>& handCurrent, const double scaleInputToOutput, const int person,
+        void connectKeypoints(Array<float>& handCurrent, const int person,
                               const cv::Mat& affineMatrix, const float* handPeaks)
         {
             try
@@ -86,12 +86,10 @@ namespace op
                     const auto y = handPeaks[xyIndex + 1];
                     const auto score = handPeaks[xyIndex + 2];
                     const auto baseIndex = handCurrent.getSize(2) * (part + person * handCurrent.getSize(1));
-                    handCurrent[baseIndex] = (float)(scaleInputToOutput
-                                           * (affineMatrix.at<double>(0,0)*x + affineMatrix.at<double>(0,1)*y
-                                               + affineMatrix.at<double>(0,2)));
-                    handCurrent[baseIndex+1] = (float)(scaleInputToOutput
-                                             * (affineMatrix.at<double>(1,0)*x + affineMatrix.at<double>(1,1)*y
-                                                 + affineMatrix.at<double>(1,2)));
+                    handCurrent[baseIndex] = (float)(affineMatrix.at<double>(0,0)*x + affineMatrix.at<double>(0,1)*y
+                                                     + affineMatrix.at<double>(0,2));
+                    handCurrent[baseIndex+1] = (float)(affineMatrix.at<double>(1,0)*x + affineMatrix.at<double>(1,1)*y
+                                                       + affineMatrix.at<double>(1,2));
                     handCurrent[baseIndex+2] = score;
                 }
             }
@@ -255,8 +253,7 @@ namespace op
     }
 
     void HandExtractorCaffe::forwardPass(const std::vector<std::array<Rectangle<float>, 2>> handRectangles,
-                                         const cv::Mat& cvInputData,
-                                         const double scaleInputToOutput)
+                                         const cv::Mat& cvInputData)
     {
         try
         {
@@ -322,7 +319,7 @@ namespace op
                                     cropFrame(mHandImageCrop, affineMatrix, cvInputData, handRectangle, netInputSide,
                                               mNetOutputSize, mirrorImage);
                                     // Deep net + Estimate keypoint locations
-                                    detectHandKeypoints(handCurrent, scaleInputToOutput, person, affineMatrix);
+                                    detectHandKeypoints(handCurrent, person, affineMatrix);
                                 }
                                 // Multi-scale detection
                                 else
@@ -359,7 +356,7 @@ namespace op
                                         cropFrame(mHandImageCrop, affineMatrix, cvInputData, handRectangleScale,
                                                   netInputSide, mNetOutputSize, mirrorImage);
                                         // Deep net + Estimate keypoint locations
-                                        detectHandKeypoints(handEstimated, scaleInputToOutput, 0, affineMatrix);
+                                        detectHandKeypoints(handEstimated, 0, affineMatrix);
                                         if (i == 0
                                             || getAverageScore(handEstimated,0) > getAverageScore(handCurrent,person))
                                             std::copy(handEstimated.getConstPtr(),
@@ -390,7 +387,6 @@ namespace op
             #else
                 UNUSED(handRectangles);
                 UNUSED(cvInputData);
-                UNUSED(scaleInputToOutput);
             #endif
         }
         catch (const std::exception& e)
@@ -399,8 +395,8 @@ namespace op
         }
     }
 
-    void HandExtractorCaffe::detectHandKeypoints(Array<float>& handCurrent, const double scaleInputToOutput,
-                                                 const int person, const cv::Mat& affineMatrix)
+    void HandExtractorCaffe::detectHandKeypoints(Array<float>& handCurrent, const int person,
+                                                 const cv::Mat& affineMatrix)
     {
         try
         {
@@ -442,11 +438,10 @@ namespace op
                 #endif
 
                 // Estimate keypoint locations
-                connectKeypoints(handCurrent, scaleInputToOutput, person, affineMatrix,
+                connectKeypoints(handCurrent, person, affineMatrix,
                                  upImpl->spPeaksBlob->mutable_cpu_data());
             #else
                 UNUSED(handCurrent);
-                UNUSED(scaleInputToOutput);
                 UNUSED(person);
                 UNUSED(affineMatrix);
             #endif

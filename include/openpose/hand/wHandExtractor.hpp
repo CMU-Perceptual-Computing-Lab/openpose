@@ -58,7 +58,7 @@ namespace op
                 // Extract people hands
                 for (auto& tDatum : *tDatums)
                 {
-                    spHandExtractor->forwardPass(tDatum.handRectangles, tDatum.cvInputData, tDatum.scaleInputToOutput);
+                    spHandExtractor->forwardPass(tDatum.handRectangles, tDatum.cvInputData);
                     for (auto hand = 0 ; hand < 2 ; hand++)
                     {
                         tDatum.handHeatMaps[hand] = spHandExtractor->getHeatMaps()[hand].clone();

@@ -165,8 +165,7 @@ namespace op
     }
 
     void FaceExtractorCaffe::forwardPass(const std::vector<Rectangle<float>>& faceRectangles,
-                                         const cv::Mat& cvInputData,
-                                         const double scaleInputToOutput)
+                                         const cv::Mat& cvInputData)
     {
         try
         {
@@ -282,14 +281,12 @@ namespace op
                                 const auto score = facePeaksPtr[xyIndex + 2];
                                 const auto baseIndex = mFaceKeypoints.getSize(2)
                                                      * (part + person * mFaceKeypoints.getSize(1));
-                                mFaceKeypoints[baseIndex] = (float)(scaleInputToOutput
-                                                                    * (Mscaling.at<double>(0,0) * x
-                                                                       + Mscaling.at<double>(0,1) * y
-                                                                       + Mscaling.at<double>(0,2)));
-                                mFaceKeypoints[baseIndex+1] = (float)(scaleInputToOutput
-                                                                      * (Mscaling.at<double>(1,0) * x
-                                                                         + Mscaling.at<double>(1,1) * y
-                                                                         + Mscaling.at<double>(1,2)));
+                                mFaceKeypoints[baseIndex] = (float)(Mscaling.at<double>(0,0) * x
+                                                                    + Mscaling.at<double>(0,1) * y
+                                                                    + Mscaling.at<double>(0,2));
+                                mFaceKeypoints[baseIndex+1] = (float)(Mscaling.at<double>(1,0) * x
+                                                                      + Mscaling.at<double>(1,1) * y
+                                                                      + Mscaling.at<double>(1,2));
                                 mFaceKeypoints[baseIndex+2] = score;
                             }
                             // HeatMaps: storing
@@ -312,7 +309,6 @@ namespace op
             #else
                 UNUSED(faceRectangles);
                 UNUSED(cvInputData);
-                UNUSED(scaleInputToOutput);
             #endif
         }
         catch (const std::exception& e)
