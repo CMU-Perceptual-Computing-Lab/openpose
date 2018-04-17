@@ -567,19 +567,19 @@ targetJoint[i] *= 1.225*1.418918919*myHeight;
                 // Update keypoints
                 updateKeypoints(bodyJoints, LHandJoints, RHandJoints, targetJoint);
 
-                // Cout keypoints
-                std::cout << "Body:\n";
-                for (auto i = 0 ; i < 183 ; i++)
-                {
-                    std::cout << targetJoint[i] << " ";
-                    if (i % 3 == 2)
-                        std::cout << "\n";
-                    if (i == 19*3-1)
-                        std::cout << "Left hand:\n";
-                    if (i == 19*3-1+21*3)
-                        std::cout << "Right hand:\n";
-                }
-                std::cout << std::endl;
+// // Cout keypoints
+// std::cout << "Body:\n";
+// for (auto i = 0 ; i < 183 ; i++)
+// {
+//     std::cout << targetJoint[i] << " ";
+//     if (i % 3 == 2)
+//         std::cout << "\n";
+//     if (i == 19*3-1)
+//         std::cout << "Left hand:\n";
+//     if (i == 19*3-1+21*3)
+//         std::cout << "Right hand:\n";
+// }
+// std::cout << std::endl;
 
                 // First frame
 const auto start = std::chrono::high_resolution_clock::now();
