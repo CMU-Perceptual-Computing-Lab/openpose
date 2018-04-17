@@ -100,6 +100,8 @@ namespace op
                 auto nextFrameNumber = (unsigned long long)spProducer->get(CV_CAP_PROP_POS_FRAMES);
                 auto cvMats = spProducer->getFrames();
                 auto cameraMatrices = spProducer->getCameraMatrices();
+                auto cameraExtrinsics = spProducer->getCameraExtrinsics();
+                auto cameraIntrinsics = spProducer->getCameraIntrinsics();
                 // Check frames are not empty
                 checkIfTooManyConsecutiveEmptyFrames(mNumberConsecutiveEmptyFrames, cvMats.empty() || cvMats[0].empty());
                 if (!cvMats.empty())
@@ -112,7 +114,11 @@ namespace op
                     datum.frameNumber = nextFrameNumber;
                     datum.cvInputData = cvMats[0];
                     if (!cameraMatrices.empty())
+                    {
                         datum.cameraMatrix = cameraMatrices[0];
+                        datum.cameraExtrinsics = cameraExtrinsics[0];
+                        datum.cameraIntrinsics = cameraIntrinsics[0];
+                    }
                     // Image integrity
                     if (datum.cvInputData.channels() != 3)
                     {
@@ -139,7 +145,11 @@ namespace op
                             datumI.cvInputData = cvMats[i];
                             datumI.cvOutputData = datumI.cvInputData;
                             if (cameraMatrices.size() > i)
+                            {
                                 datumI.cameraMatrix = cameraMatrices[i];
+                                datumI.cameraExtrinsics = cameraExtrinsics[i];
+                                datumI.cameraIntrinsics = cameraIntrinsics[i];
+                            }
                         }
                     }
                     // Check producer is running

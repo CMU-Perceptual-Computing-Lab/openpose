@@ -18,6 +18,8 @@ namespace op
 
         const std::vector<cv::Mat>& getCameraMatrices() const;
 
+        const std::vector<cv::Mat>& getCameraExtrinsics() const;
+
         const std::vector<cv::Mat>& getCameraIntrinsics() const;
 
         const std::vector<cv::Mat>& getCameraDistortions() const;
@@ -26,6 +28,7 @@ namespace op
         std::vector<std::string> mSerialNumbers;
         unsigned long long mNumberCameras;
         std::vector<cv::Mat> mCameraMatrices;
+        std::vector<cv::Mat> mCameraExtrinsics;
         std::vector<cv::Mat> mCameraIntrinsics;
         std::vector<cv::Mat> mCameraDistortions;
 

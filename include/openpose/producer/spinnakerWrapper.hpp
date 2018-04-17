@@ -23,6 +23,10 @@ namespace op
 
         std::vector<cv::Mat> getCameraMatrices() const;
 
+        std::vector<cv::Mat> getCameraExtrinsics() const;
+
+        std::vector<cv::Mat> getCameraIntrinsics() const;
+
         Point<int> getResolution() const;
 
         bool isOpened() const;

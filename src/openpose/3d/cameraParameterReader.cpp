@@ -111,6 +111,7 @@ namespace op
             // Load parameters
             mNumberCameras = serialNumbers.size();
             mCameraMatrices.clear();
+            mCameraExtrinsics.clear();
             mCameraIntrinsics.clear();
             mCameraDistortions.clear();
             // log("Camera matrices:");
@@ -118,7 +119,6 @@ namespace op
             {
                 const auto parameterPath = fileNameNoExtension + mSerialNumbers.at(i);
                 const auto cameraParameters = loadData(cvMatNames, parameterPath, dataFormat);
-                const auto& intrinsics = cameraParameters.at(1);
                 // Error if empty element
                 if (cameraParameters.empty() || cameraParameters.at(0).empty()
                     || cameraParameters.at(1).empty() || cameraParameters.at(2).empty())
@@ -140,9 +140,10 @@ namespace op
                         error("Error at reading the camera distortion parameters" + errorMessage,
                               __LINE__, __FUNCTION__, __FILE__);
                 }
-                mCameraMatrices.emplace_back(intrinsics * cameraParameters.at(0));
-                mCameraIntrinsics.emplace_back(intrinsics);
+                mCameraExtrinsics.emplace_back(cameraParameters.at(0));
+                mCameraIntrinsics.emplace_back(cameraParameters.at(1));
                 mCameraDistortions.emplace_back(cameraParameters.at(2));
+                mCameraMatrices.emplace_back(mCameraIntrinsics.back() * mCameraExtrinsics.back());
                 // log(cameraParameters.at(0));
             }
             // // mCameraMatrices
@@ -187,6 +188,19 @@ namespace op
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             return mCameraMatrices;
+        }
+    }
+
+    const std::vector<cv::Mat>& CameraParameterReader::getCameraExtrinsics() const
+    {
+        try
+        {
+            return mCameraExtrinsics;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return mCameraExtrinsics;
         }
     }
 
