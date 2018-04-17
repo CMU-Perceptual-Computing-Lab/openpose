@@ -48,6 +48,18 @@ namespace op
         virtual std::vector<cv::Mat> getCameraMatrices() = 0;
 
         /**
+         * It retrieves and returns the camera extrinsic parameters from the frames producer.
+         * @return std::vector<cv::Mat> with the camera extrinsic parameters.
+         */
+        virtual std::vector<cv::Mat> getCameraExtrinsics() = 0;
+
+        /**
+         * It retrieves and returns the camera intrinsic parameters from the frames producer.
+         * @return std::vector<cv::Mat> with the camera intrinsic parameters.
+         */
+        virtual std::vector<cv::Mat> getCameraIntrinsics() = 0;
+
+        /**
          * This function returns a unique frame name (e.g. the frame number for video, the
          * frame counter for webcam, the image name for image directory reader, etc.).
          * @return std::string with an unique frame name.

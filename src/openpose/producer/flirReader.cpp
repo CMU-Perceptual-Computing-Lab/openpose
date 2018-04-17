@@ -48,6 +48,32 @@ namespace op
         }
     }
 
+    std::vector<cv::Mat> FlirReader::getCameraExtrinsics()
+    {
+        try
+        {
+            return mSpinnakerWrapper.getCameraExtrinsics();
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return {};
+        }
+    }
+
+    std::vector<cv::Mat> FlirReader::getCameraIntrinsics()
+    {
+        try
+        {
+            return mSpinnakerWrapper.getCameraIntrinsics();
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return {};
+        }
+    }
+
     std::string FlirReader::getNextFrameName()
     {
         try
