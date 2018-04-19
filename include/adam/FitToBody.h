@@ -57,3 +57,14 @@ void Adam_FastFit(TotalModel &adam,
 	Eigen::MatrixXd &rHandJoints,
 	Eigen::MatrixXd &lHandJoints,
 	Eigen::MatrixXd &faceJoints);
+
+void Adam_Fit_PAF(TotalModel &adam,
+	smpl::SMPLParams &frame_param,
+	Eigen::MatrixXd &BodyJoints,
+	Eigen::MatrixXd &rFoot,
+	Eigen::MatrixXd &lFoot,
+	Eigen::MatrixXd &rHandJoints,
+	Eigen::MatrixXd &lHandJoints,
+	Eigen::MatrixXd &faceJoints,
+	Eigen::MatrixXd &PAF,
+	double* K=nullptr);

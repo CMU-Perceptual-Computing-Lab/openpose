@@ -117,10 +117,11 @@ void EulerAnglesToRotationMatrix_Derivative(const double* pose, double* dR_data,
 void Product_Derivative(const double* const A_data, const double* const dA_data, const double* const B_data,
                         const double* const dB_data, double* dAB_data, const int B_col)
 {
+    assert(dA_data != NULL || dB_data != NULL);
     assert(B_col == 3 || B_col == 1);  // matrix multiplication or matrix-vector multiplication
-    const Eigen::Map<const Eigen::Matrix<double, 9, TotalModel::NUM_JOINTS * 3, Eigen::RowMajor> > dA(dA_data);
-    if (dB_data != NULL && A_data != NULL)
+    if (dA_data != NULL && dB_data != NULL)
     {
+        const Eigen::Map<const Eigen::Matrix<double, 9, TotalModel::NUM_JOINTS * 3, Eigen::RowMajor> > dA(dA_data);
         if (B_col == 1)
         {
             // B_col == 1
@@ -152,8 +153,9 @@ void Product_Derivative(const double* const A_data, const double* const dA_data,
             }
         }
     }
-    else  // B is a constant matrix / vector, no derivative
+    else if (dA_data != NULL && dB_data == NULL)  // B is a constant matrix / vector, no derivative
     {
+        const Eigen::Map<const Eigen::Matrix<double, 9, TotalModel::NUM_JOINTS * 3, Eigen::RowMajor> > dA(dA_data);
         if (B_col == 1)
         {
             // d(AB) = AdB + (dA)B
@@ -175,6 +177,29 @@ void Product_Derivative(const double* const A_data, const double* const dA_data,
             for (int r = 0; r < 3; r++)
                 for (int c = 0; c < 3; c++)
                     dAB.row(3 * r + c) = B_data[c] * dA.row(3 * r) + B_data[3 + c] * dA.row(3 * r + 1) + B_data[6 + c] * dA.row(3 * r + 2);  // d(AB) = AdB + (dA)B
+        }
+    }
+    else // A is a constant matrix, no derivative
+    {
+        const Eigen::Map<const Eigen::Matrix<double, 3, 3, Eigen::RowMajor> > A(A_data);
+        // dA_data == NULL && dB_data != NULL
+        if (B_col == 1)
+        {
+            const Eigen::Map<const Eigen::Matrix<double, 3, TotalModel::NUM_JOINTS * 3, Eigen::RowMajor> > dB(dB_data);
+            Eigen::Map< Eigen::Matrix<double, 3, TotalModel::NUM_JOINTS * 3, Eigen::RowMajor> > dAB(dAB_data);
+            dAB.setZero();
+            for (int r = 0; r < 3; r++)
+                dAB.row(r) = A(r, 0) * dB.row(0) + A(r, 1) * dB.row(1) + A(r, 2) * dB.row(2);
+        }
+        else
+        {
+            // B_col == 3
+            const Eigen::Map<const Eigen::Matrix<double, 9, TotalModel::NUM_JOINTS * 3, Eigen::RowMajor> > dB(dB_data);
+            Eigen::Map< Eigen::Matrix<double, 9, TotalModel::NUM_JOINTS * 3, Eigen::RowMajor> > dAB(dAB_data);
+            dAB.setZero();
+            for (int r = 0; r < 3; r++)
+                for (int c = 0; c < 3; c++)
+                    dAB.row(3 * r + c) = A(r, 0) * dB.row(0 + c) + A(r, 1) * dB.row(3 + c) + A(r, 2) * dB.row(6 + c);
         }
     }
 }

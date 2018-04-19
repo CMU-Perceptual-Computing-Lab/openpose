@@ -13,25 +13,14 @@ void SparseProductDerivative(const double* const dA_data, const double* const B_
                              const std::vector<int>& parentIndexes, double* dAB_data);
 void SparseAdd(const double* const B_data, const std::vector<int>& parentIndexes, double* A_data);
 
-struct CallAngleAxis
+template<typename Derived, int rows, int cols, int option>
+void projection_Derivative(Eigen::Map<Eigen::Matrix<Derived, rows, cols, option>>& dPdI, Eigen::Matrix<Derived, rows, cols, option>& dJdI, double* XYZ, double* pK_, int offsetP, int offsetJ, float weight=1.0f)
 {
-    CallAngleAxis() {}
-
-    template <typename T>
-    bool operator()(const T* const pose,
-        T* residual
-    ) const
-    {
-        using namespace Eigen;
-        Matrix<T, 3, 3, RowMajor> A(3, 3);
-        T angles[3] = {pose[3], pose[4], pose[5]};
-        ceres::AngleAxisToRotationMatrix(angles, A.data());
-        Matrix<T, 3, 1> B(3, 1);
-        B[0] = T(-10);
-        B[1] = T(0);
-        B[2] = T(-25);
-        Map< Matrix<T, 3, 1> > R(residual);
-        R = A * B;
-        return true;
-    }
-};
+	// Dx/Dt = dx/dX * dX/dt + dx/dY * dY/dt + dx/dZ * dZ/dt
+	const double X = XYZ[0], Y = XYZ[1], Z = XYZ[2];
+	dPdI.row(offsetP + 0) = weight * (pK_[0] / Z * dJdI.row(offsetJ + 0)
+						 + pK_[1] / Z * dJdI.row(offsetJ + 1)
+						 - (pK_[0] * X + pK_[1] * Y) / Z / Z * dJdI.row(offsetJ + 2));
+	dPdI.row(offsetP + 1) = weight * (pK_[4] / Z * dJdI.row(offsetJ + 1)
+						 - pK_[4] * Y / Z / Z * dJdI.row(offsetJ + 2));
+}

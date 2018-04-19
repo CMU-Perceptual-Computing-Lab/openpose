@@ -274,9 +274,9 @@ void Adam_FitTotalBodyCeres(TotalModel &adam,
 	std::cout << summary.FullReport() << std::endl;
 
 	// cost_body_keypoints->joint_only = false;
-	cost_body_keypoints->toggle_activate(true, true);
-	ceres::Solve(options, &problem, &summary);
-	std::cout << summary.FullReport() << std::endl;
+	// cost_body_keypoints->toggle_activate(true, true);
+	// ceres::Solve(options, &problem, &summary);
+	// std::cout << summary.FullReport() << std::endl;
 
 	// options.max_num_iterations = 5;
 	// cost_body_keypoints->joint_only = false;
@@ -633,4 +633,65 @@ void Adam_FastFit(TotalModel &adam,
 // 		  << __FILE__ << " " << duration3 * 1e-6 << "\n"
 // 		  << __FILE__ << " " << duration4 * 1e-6 << "\n"
 // 		  << __FILE__ << " " << duration5 * 1e-6 << "\n" << std::endl;
+}
+
+void Adam_Fit_PAF(TotalModel &adam, smpl::SMPLParams &frame_param, Eigen::MatrixXd &BodyJoints, Eigen::MatrixXd &rFoot, Eigen::MatrixXd &lFoot,
+	Eigen::MatrixXd &rHandJoints, Eigen::MatrixXd &lHandJoints, Eigen::MatrixXd &faceJoints, Eigen::MatrixXd &PAF, double* calibK)
+{
+	using namespace Eigen;	
+	ceres::Problem problem;
+
+	AdamFitData data(adam, BodyJoints, rFoot, lFoot, faceJoints, lHandJoints, rHandJoints, PAF, false, true, calibK);
+	AdamFullCost* adam_cost = new AdamFullCost(data);
+
+	problem.AddResidualBlock(adam_cost,
+		NULL,
+		frame_param.m_adam_t.data(),
+		frame_param.m_adam_pose.data(),
+		frame_param.m_adam_coeffs.data());
+
+
+	//Body Prior (coef) //////////////////////////////////////////////////////////////////////////
+	ceres::CostFunction *cost_prior_body_coeffs = new ceres::AutoDiffCostFunction
+		<CoeffsParameterNorm,
+		TotalModel::NUM_SHAPE_COEFFICIENTS,
+		TotalModel::NUM_SHAPE_COEFFICIENTS>(new CoeffsParameterNorm(TotalModel::NUM_SHAPE_COEFFICIENTS));
+	ceres::LossFunction* loss_weight_prior_body_coeffs = new ceres::ScaledLoss(NULL,
+		1e-2,
+		ceres::TAKE_OWNERSHIP);
+	problem.AddResidualBlock(cost_prior_body_coeffs,
+		loss_weight_prior_body_coeffs,
+		frame_param.m_adam_coeffs.data());
+
+	//Body Prior (pose) //////////////////////////////////////////////////////////////////////////
+	ceres::CostFunction *cost_prior_body_pose = new ceres::AutoDiffCostFunction
+		<AdamBodyPoseParamPrior,
+		TotalModel::NUM_POSE_PARAMETERS,
+		TotalModel::NUM_POSE_PARAMETERS>(new AdamBodyPoseParamPrior(TotalModel::NUM_POSE_PARAMETERS));
+	ceres::LossFunction* loss_weight_prior_body_pose = new ceres::ScaledLoss(NULL,
+		1e-2,
+		ceres::TAKE_OWNERSHIP);
+	problem.AddResidualBlock(cost_prior_body_pose,
+		loss_weight_prior_body_pose,
+		frame_param.m_adam_pose.data());
+
+	ceres::Solver::Options options;
+	ceres::Solver::Summary summary;
+	SetSolverOptions(&options);
+	options.max_num_iterations = 30;
+	options.use_nonmonotonic_steps = false;
+	options.num_linear_solver_threads = 10;
+	options.minimizer_progress_to_stdout = true;
+	problem.SetParameterBlockConstant(frame_param.m_adam_pose.data());
+	problem.SetParameterBlockConstant(frame_param.m_adam_coeffs.data());
+	adam_cost->toggle_activate(false, false);
+
+	ceres::Solve(options, &problem, &summary);
+	std::cout << summary.FullReport() << std::endl;
+
+	problem.SetParameterBlockVariable(frame_param.m_adam_pose.data());
+	problem.SetParameterBlockVariable(frame_param.m_adam_coeffs.data());
+	adam_cost->toggle_activate(true, false);
+	ceres::Solve(options, &problem, &summary);
+	std::cout << summary.FullReport() << std::endl;
 }
