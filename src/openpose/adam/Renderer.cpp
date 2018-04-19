@@ -38,7 +38,7 @@ Renderer::Renderer(int* argc, char** argv)
     glutInitWindowPosition(200, 0);
     glutInitDisplayMode ( GLUT_RGBA  | GLUT_DOUBLE | GLUT_DEPTH | GLUT_MULTISAMPLE);
     glEnable(GL_MULTISAMPLE);
-    window_id = glutCreateWindow("Donglai Renderer");
+    window_id = glutCreateWindow("Adam Model Renderer");
     this->InitGraphics();
     this->simpleInit();
 }

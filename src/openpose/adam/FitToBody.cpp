@@ -562,6 +562,7 @@ void Adam_FastFit(TotalModel &adam,
 	Eigen::MatrixXd &lHandJoints,		//
 	Eigen::MatrixXd &faceJoints)
 {
+// const auto start1 = std::chrono::high_resolution_clock::now();
 	// use the existing shape coeff in frame_param, fit the pose and trans fast
 	using namespace Eigen;
 	if (g_cost_body_keypoints == NULL)
@@ -589,9 +590,13 @@ void Adam_FastFit(TotalModel &adam,
 		std::copy(frame_param.m_adam_coeffs.data(), frame_param.m_adam_coeffs.data() + 30, g_params.m_adam_coeffs.data());  // always use the shape coeff of first frame
 	}
 	else g_cost_body_keypoints->UpdateJoints(BodyJoints, rFoot, lFoot, faceJoints, lHandJoints, rHandJoints);
+// const auto duration1 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start1).count();
+// const auto start2 = std::chrono::high_resolution_clock::now();
 
 	std::copy(frame_param.m_adam_t.data(), frame_param.m_adam_t.data() + 3, g_params.m_adam_t.data());
 	std::copy(frame_param.m_adam_pose.data(), frame_param.m_adam_pose.data() + 62 * 3, g_params.m_adam_pose.data());
+// const auto duration2 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start2).count();
+// const auto start3 = std::chrono::high_resolution_clock::now();
 
 	ceres::Solver::Options options;
 	SetSolverOptions(&options);
@@ -613,9 +618,19 @@ void Adam_FastFit(TotalModel &adam,
 	// std::cout << summary.FullReport() << std::endl;
 
 	g_cost_body_keypoints->toggle_activate(true, true);
+// const auto duration3 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start3).count();
+// const auto start4 = std::chrono::high_resolution_clock::now();
 	ceres::Solve(options, &g_problem, &summary);
+// const auto duration4 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start4).count();
+// const auto start5 = std::chrono::high_resolution_clock::now();
 	std::cout << summary.FullReport() << std::endl;
 
 	std::copy(g_params.m_adam_t.data(), g_params.m_adam_t.data() + 3, frame_param.m_adam_t.data());
 	std::copy(g_params.m_adam_pose.data(), g_params.m_adam_pose.data() + 62 * 3, frame_param.m_adam_pose.data());
+// const auto duration5 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start5).count();
+// std::cout << __FILE__ << " " << duration1 * 1e-6 << "\n"
+// 		  << __FILE__ << " " << duration2 * 1e-6 << "\n"
+// 		  << __FILE__ << " " << duration3 * 1e-6 << "\n"
+// 		  << __FILE__ << " " << duration4 * 1e-6 << "\n"
+// 		  << __FILE__ << " " << duration5 * 1e-6 << "\n" << std::endl;
 }

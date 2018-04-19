@@ -19,7 +19,6 @@ struct PoseToTransformsNoLR_Eulers	{
 		) const {
 
 		using namespace Eigen;
-		Map< const Matrix<T, SMPLModel::NUM_JOINTS, 3, RowMajor> > P(pose);
 		Map< const Matrix<T, SMPLModel::NUM_JOINTS, 3, RowMajor> > J(joints);
 		Map< Matrix<T, 3 * SMPLModel::NUM_JOINTS, 4, RowMajor> > outT(transforms);
 		Matrix<T, Dynamic, 4, RowMajor> Ms(4 * SMPLModel::NUM_JOINTS, 4);
@@ -105,7 +104,6 @@ struct PoseToTransformsHand {
 	{
 		using namespace Eigen;
 		Map< const Matrix<T, HandModel::NUM_JOINTS, 3, RowMajor> > C(coeffs);
-		Map< const Matrix<T, HandModel::NUM_JOINTS, 3, RowMajor> > P(pose);
 
 		Map< Matrix<T, 3 * HandModel::NUM_JOINTS, 4, RowMajor> > outT(transforms);		//Transforms
 		Map< Matrix<T, 3 * HandModel::NUM_JOINTS, 4, RowMajor> > outJoint(transforms + 3 * HandModel::NUM_JOINTS * 4);		//Joint location
@@ -157,7 +155,6 @@ struct ForwardKinematics {
 	{
 		using namespace Eigen;
 		Map< const Matrix<double, HandModel::NUM_JOINTS, 3, RowMajor> > C(coeffs);
-		Map< const Matrix<double, HandModel::NUM_JOINTS, 3, RowMajor> > P(pose);
 
 		Map< Matrix<double, 3 * HandModel::NUM_JOINTS, 4, RowMajor> > outT(transforms);		//Transforms
 		Map< Matrix<double, 3 * HandModel::NUM_JOINTS, 4, RowMajor> > outJoint(transforms + 3 * HandModel::NUM_JOINTS * 4);		//Joint location
@@ -203,7 +200,9 @@ struct ForwardKinematics {
 
 struct PoseToTransformsNoLR_Eulers_adamModel {
 	PoseToTransformsNoLR_Eulers_adamModel(const TotalModel &mod)
-		: mod_(mod) {}
+		: mod_(mod)
+	{
+	}
 
 	template <typename T>
 	bool operator()(const T* const pose,  // SMPLModel::NUM_JOINTS*3
@@ -212,7 +211,6 @@ struct PoseToTransformsNoLR_Eulers_adamModel {
 		) const
 	{
 		using namespace Eigen;
-		Map< const Matrix<T, TotalModel::NUM_JOINTS, 3, RowMajor> > P(pose);
 		Map< const Matrix<T, TotalModel::NUM_JOINTS, 3, RowMajor> > J(joints);
 		Map< Matrix<T, 3 * TotalModel::NUM_JOINTS, 4, RowMajor> > outT(transforms);
 		Map< Matrix<T, TotalModel::NUM_JOINTS, 3, RowMajor> > outJoint(transforms + 3 * TotalModel::NUM_JOINTS * 4);
@@ -292,124 +290,30 @@ public:
 		CostFunction::set_num_residuals(3 * TotalModel::NUM_JOINTS);
 		auto parameter_block_sizes = CostFunction::mutable_parameter_block_sizes();
 		parameter_block_sizes->clear();
-		parameter_block_sizes->push_back(TotalModel::NUM_JOINTS * 3); // SMPL Pose  
+		parameter_block_sizes->push_back(TotalModel::NUM_JOINTS * 3); // SMPL Pose
+		// mParentIndexes
+		// Resize
+		mParentIndexes.resize(mod_.NUM_JOINTS);
+		// Rest
+        for (auto idj = 1; idj < mod_.NUM_JOINTS; idj++)
+        {
+            const int ipar = mod_.m_parent[idj];
+            mParentIndexes[idj] = std::vector<int>(1, ipar);
+            while (mParentIndexes[idj].back() != 0)
+                mParentIndexes[idj].emplace_back(mod_.m_parent[mParentIndexes[idj].back()]);
+            // Sort by index
+            std::sort(mParentIndexes[idj].begin(), mParentIndexes[idj].end());
+        }
 	}
 	virtual ~PoseToTransformsNoLR_Eulers_adamModel_withDiff() {}
 
 	virtual bool Evaluate(double const* const* parameters,
 		double* residuals,
-		double** jacobians) const
-	{
-		using namespace Eigen;
-		const double* pose = parameters[0];
-		Eigen::Map< const Eigen::Matrix<double, TotalModel::NUM_JOINTS, 3, Eigen::RowMajor> > P(pose);
-		Eigen::Map< Eigen::Matrix<double, TotalModel::NUM_JOINTS, 3, Eigen::RowMajor> > outJoint(residuals);
-
-		Map< Matrix<double, TotalModel::NUM_JOINTS * 3, TotalModel::NUM_JOINTS * 3, RowMajor> > dJdP(jacobians[0]);
-		dJdP.setZero();
-
-		Matrix<double, 3, 3, RowMajor> R; // Interface with ceres
-		Matrix<double, 9, 3 * TotalModel::NUM_JOINTS, RowMajor> dRdP(9, 3 * TotalModel::NUM_JOINTS);
-		Matrix<double, 3, 1> offset; // a buffer for 3D vector
-		Matrix<double, 3, 3 * TotalModel::NUM_JOINTS, Eigen::RowMajor> dtdP(3, 3 * TotalModel::NUM_JOINTS); // a buffer for the derivative
-
-		std::vector<Eigen::Matrix<double, 3, 3, Eigen::RowMajor>> MR(TotalModel::NUM_JOINTS, Eigen::Matrix<double, 3, 3, Eigen::RowMajor>(3, 3));
-		std::vector<Eigen::Matrix<double, 3, 1>> Mt(TotalModel::NUM_JOINTS, Eigen::Matrix<double, 3, 1>(3, 1));
-
-		std::vector<Eigen::Matrix<double, 9, 3 * TotalModel::NUM_JOINTS, Eigen::RowMajor>> dMRdP(TotalModel::NUM_JOINTS, Eigen::Matrix<double, 9, 3 * TotalModel::NUM_JOINTS, Eigen::RowMajor>(9, 3 * TotalModel::NUM_JOINTS));
-		std::vector<Eigen::Matrix<double, 3, 3 * TotalModel::NUM_JOINTS, Eigen::RowMajor>> dMtdP(TotalModel::NUM_JOINTS, Eigen::Matrix<double, 3, 3 * TotalModel::NUM_JOINTS, Eigen::RowMajor>(3, 3 * TotalModel::NUM_JOINTS));
-
-		ceres::AngleAxisToRotationMatrix(pose, R.data());
-		MR.at(0) = R;
-		Mt.at(0) = J0_.row(0).transpose();
-		dMRdP.at(0).setZero();
-		dMtdP.at(0).setZero();
-		AngleAxisToRotationMatrix_Derivative(pose, dMRdP.at(0).data(), 0);	
-
-		typedef double T;
-		for (int idj = 1; idj < mod_.NUM_JOINTS; idj++)
-		{
-			int ipar = mod_.m_parent[idj];
-			//std::cout << idj << " " << ipar << "\n\n";
-			// ceres::AngleAxisToRotationMatrix(pose + idj * 3, R.data());
-
-			T angles[3];
-			angles[0] = pose[idj * 3];
-			angles[1] = pose[idj * 3 + 1];
-			angles[2] = pose[idj * 3 + 2];
-
-			//Freezing joints here  //////////////////////////////////////////////////////
-			if (idj == 10 || idj == 11)	//foot ends
-			{
-				//R.setIdentity();
-				angles[0] = T(0.0);
-				angles[1] = T(0.0);
-				angles[2] = T(0.0);
-			}
-			if (idj == 7 || idj == 8)	//foot ankle. Restrict side movement
-			{
-				angles[2] = T(0.0);
-			}
-
-			if (idj == 24 || idj == 27 || idj == 28 || idj == 31 || idj == 32 || idj == 35 || idj == 26 || idj == 39 || idj == 40)	//all hands
-			{
-				angles[0] = T(0.0);
-				angles[1] = T(0.0);
-			}
-
-			if (idj == 44 || idj == 47 || idj == 48 || idj == 51 || idj == 52 || idj == 55 || idj == 56 || idj == 59 || idj == 60)	//all hands
-			{
-				angles[0] = T(0.0);
-				angles[1] = T(0.0);
-			}
-
-			dMRdP.at(idj).setZero();
-			dMtdP.at(idj).setZero();
-
-			ceres::EulerAnglesToRotationMatrix(angles, 3, R.data());
-			dRdP.setZero();
-			EulerAnglesToRotationMatrix_Derivative(angles, dRdP.data(), idj);
-
-			if (idj == 10 || idj == 11)	//foot ends
-				dRdP.block(0, 3 * idj, 9, 3).setZero();
-			if (idj == 7 || idj == 8)	//foot ankle. Restrict side movement
-				dRdP.block(0, 3 * idj + 2, 9, 1).setZero();
-			if (idj == 24 || idj == 27 || idj == 28 || idj == 31 || idj == 32 || idj == 35 || idj == 26 || idj == 39 || idj == 40)	//all hands
-				dRdP.block(0, 3 * idj, 9, 2).setZero();
-			if (idj == 44 || idj == 47 || idj == 48 || idj == 51 || idj == 52 || idj == 55 || idj == 56 || idj == 59 || idj == 60)	//all hands
-				dRdP.block(0, 3 * idj, 9, 2).setZero();
-
-			MR.at(idj) = MR.at(ipar) * R;
-			Product_Derivative(MR.at(ipar).data(), dMRdP.at(ipar).data(), R.data(), dRdP.data(), dMRdP.at(idj).data()); // Compute the product of matrix multiplication
-
-			offset = (J0_.row(idj) - J0_.row(ipar)).transpose();
-			Mt.at(idj) = Mt.at(ipar) + MR.at(ipar) * offset;
-			Product_Derivative(MR.at(ipar).data(), dMRdP.at(ipar).data(), offset.data(), NULL, dMtdP.at(idj).data(), 1); // dB_data is NULL since offset is a constant
-			dMtdP.at(idj) = dMtdP.at(idj) + dMtdP.at(ipar);
-		}
-
-		for (int idj = 0; idj < mod_.NUM_JOINTS; idj++) {
-			offset = J0_.row(idj).transpose();
-			Mt.at(idj) -= MR.at(idj) * offset;
-			dtdP.setZero();
-			Product_Derivative(MR.at(idj).data(), dMRdP.at(idj).data(), offset.data(), NULL, dtdP.data(), 1);
-			dMtdP.at(idj) -= dtdP;
-		}
-
-		for (int idj = 0; idj < mod_.NUM_JOINTS; idj++) {
-			offset = J0_.row(idj).transpose();
-			outJoint.row(idj) = (MR.at(idj) * offset + Mt.at(idj)).transpose();
-			dtdP.setZero();
-			Product_Derivative(MR.at(idj).data(), dMRdP.at(idj).data(), offset.data(), NULL, dtdP.data(), 1);
-			dtdP += dMtdP.at(idj);
-			dJdP.block(3 * idj, 0, 3, TotalModel::NUM_JOINTS * 3) = dtdP;
-		}
-
-		return true;
-	}
+		double** jacobians) const;
 
 	const TotalModel &mod_;
 	const Eigen::Matrix<double, TotalModel::NUM_JOINTS, 3, Eigen::RowMajor>& J0_;
+    std::vector<std::vector<int>> mParentIndexes;
 };
 
 }

@@ -6,6 +6,7 @@
 #include "ceres/rotation.h"
 #include <unsupported/Eigen/KroneckerProduct>
 #include <cassert>
+#include <chrono>
 #define SMPL_VIS_SCALING 100.0f
 
 struct CoeffsParameterNorm {
@@ -190,6 +191,7 @@ struct AdamBodyPoseParamPrior {
 
 	template <typename T>
 	bool operator()(const T* const p, T* residuals) const {
+// const auto start1 = std::chrono::high_resolution_clock::now();
 		//Put stronger prior for spine body joints
 		for (int i = 0; i < num_parameters_; i++)
 		{
@@ -199,9 +201,7 @@ struct AdamBodyPoseParamPrior {
 				// residuals[i] = T(3)*p[i];
 			}
 			else if ((i >= 9 && i < 12) || (i >= 18 && i < 21) || (i >= 27 && i < 30))
-			{
 				residuals[i] = T(12)*p[i];
-			}
 			else if ((i >= 42 && i < 45) || (i >= 39 && i < 41))
 				residuals[i] = T(2)*p[i];
 			else if (i >= 54 && i < 60)		//18, 19 (elbows)
@@ -214,15 +214,20 @@ struct AdamBodyPoseParamPrior {
 			else if (i >= 60 && i < 66)		//20, 21 (wrist)
 			{
 				if (i == 60 || i == 63)		//twist of wrist
-					residuals[i] = T(1)*p[i];
+					residuals[i] = p[i];
 				else
 					residuals[i] = T(0.1)*p[i];
 			}
 			else if (i >= 66) //fingers
-				residuals[i] = T(1.0)*p[i];
+				residuals[i] = p[i];
 			else
-				residuals[i] = T(1.0)*p[i];;// *p[i];	//Do nothing*/
+				residuals[i] = p[i];		//Do nothing
 		}
+// const auto duration1 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start1).count();
+// std::cout << __FILE__ << " " << duration1 * 1e-6 << "\n"
+//           << __FILE__ << " " << num_parameters_ << "\n"
+//           << __FILE__ << " " << sizeof(T) << std::endl;
+// 8 ms --> 2 ms. Problem: sizeof(T) = 1504. No problem: #param = 186
 		return true;
 	}
 	const double num_parameters_;
