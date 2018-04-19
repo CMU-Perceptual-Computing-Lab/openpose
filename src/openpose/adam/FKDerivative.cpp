@@ -123,7 +123,6 @@ void Product_Derivative(const double* const A_data, const double* const dA_data,
     {
         if (B_col == 1)
         {
-            assert(false); // Unused in code...
             // B_col == 1
             // d(AB) = AdB + (dA)B
             const Eigen::Map<const Eigen::Matrix<double, 3, 3, Eigen::RowMajor> > A(A_data);
@@ -171,7 +170,6 @@ void Product_Derivative(const double* const A_data, const double* const dA_data,
         }
         else
         {
-            assert(false); // Unused in code...
             // B_col == 3
             Eigen::Map< Eigen::Matrix<double, 9, TotalModel::NUM_JOINTS * 3, Eigen::RowMajor> > dAB(dAB_data);
             for (int r = 0; r < 3; r++)

@@ -22,15 +22,19 @@ namespace smpl
         std::vector<Eigen::Matrix<double, 3, 3, Eigen::RowMajor>> MR(TotalModel::NUM_JOINTS, Eigen::Matrix<double, 3, 3, Eigen::RowMajor>(3, 3));
         ceres::AngleAxisToRotationMatrix(pose, MR.at(0).data());
         std::vector<Eigen::Matrix<double, 9, 3 * TotalModel::NUM_JOINTS, Eigen::RowMajor>> dMRdP(TotalModel::NUM_JOINTS, Eigen::Matrix<double, 9, 3 * TotalModel::NUM_JOINTS, Eigen::RowMajor>(9, 3 * TotalModel::NUM_JOINTS));
-        Map< Matrix<double, TotalModel::NUM_JOINTS * 3, TotalModel::NUM_JOINTS * 3, RowMajor> > dJdP(jacobians[0]);
-// const auto duration1 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start1).count();
-// const auto start2 = std::chrono::high_resolution_clock::now();
-        dJdP.block<3, TotalModel::NUM_JOINTS * 3>(0, 0).setZero();
-        AngleAxisToRotationMatrix_Derivative(pose, dMRdP.at(0).data(), 0);
-        Matrix<double, 9, 3 * TotalModel::NUM_JOINTS, RowMajor> dRdP(9, 3 * TotalModel::NUM_JOINTS);
         Eigen::Map< Eigen::Matrix<double, TotalModel::NUM_JOINTS, 3, Eigen::RowMajor> > outJoint(residuals);
         outJoint.row(0) = J0_.row(0);
         Matrix<double, 3, 3, RowMajor> R; // Interface with ceres
+// const auto duration1 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start1).count();
+// const auto start2 = std::chrono::high_resolution_clock::now();
+        Map< Matrix<double, TotalModel::NUM_JOINTS * 3, TotalModel::NUM_JOINTS * 3, RowMajor> > dJdP((jacobians ? jacobians[0] : nullptr));
+        // Matrix<double, 9, 3 * TotalModel::NUM_JOINTS, RowMajor> dRdP((jacobians ? 9 : 1), (jacobians ? 3 * TotalModel::NUM_JOINTS : 1));
+        Matrix<double, 9, 3 * TotalModel::NUM_JOINTS, RowMajor> dRdP(9, 3 * TotalModel::NUM_JOINTS);
+        if (jacobians)
+        {
+            dJdP.block<3, TotalModel::NUM_JOINTS * 3>(0, 0).setZero();
+            AngleAxisToRotationMatrix_Derivative(pose, dMRdP.at(0).data(), 0);
+        }
 // const auto duration2 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start2).count();
 // auto duration7 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start).count();
 // auto duration8 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start).count();
@@ -79,50 +83,52 @@ namespace smpl
                 angles[0] = 0.0;
                 angles[1] = 0.0;
             }
-            ceres::EulerAnglesToRotationMatrix(angles, 3, R.data());
 // duration7 += std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start7).count();
 // const auto start8 = std::chrono::high_resolution_clock::now();
-            EulerAnglesToRotationMatrix_Derivative(angles, dRdP.data(), idj);
+            ceres::EulerAnglesToRotationMatrix(angles, 3, R.data());
 // duration8 += std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start8).count();
 // const auto start9 = std::chrono::high_resolution_clock::now();
-
-            if (idj == 10 || idj == 11) //foot ends
-                dRdP.block<9, 3>(0, 3 * idj).setZero();
-            if (idj == 7 || idj == 8)   //foot ankle. Restrict side movement
-                dRdP.block<9, 1>(0, 3 * idj + 2).setZero();
-            if (idj == 24 || idj == 27 || idj == 28 || idj == 31 || idj == 32 || idj == 35 || idj == 26 || idj == 39 || idj == 40
-                || idj == 44 || idj == 47 || idj == 48 || idj == 51 || idj == 52 || idj == 55 || idj == 56 || idj == 59 || idj == 60)   //all hands
-                dRdP.block<9, 2>(0, 3 * idj).setZero();
+            MR.at(idj) = MR.at(ipar) * R;
 // duration9 += std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start9).count();
 // const auto start10 = std::chrono::high_resolution_clock::now();
-
-            MR.at(idj) = MR.at(ipar) * R;
-            if (idj == 10 || idj == 11) //foot ends
-                dMRdP.at(idj) = dMRdP.at(ipar);
-            else
-            {
-                // Sparse derivative
-                SparseProductDerivative(MR.at(ipar).data(), dMRdP.at(ipar).data(), R.data(), dRdP.data(), idj, mParentIndexes[idj], dMRdP.at(idj).data());
-                // // Slower but equivalent - Dense derivative
-                // Product_Derivative(MR.at(ipar).data(), dMRdP.at(ipar).data(), R.data(), dRdP.data(), dMRdP.at(idj).data()); // Compute the product of matrix multiplication
-            }
-// duration10 += std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start10).count();
-// const auto start11 = std::chrono::high_resolution_clock::now();
-// duration11 += std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start11).count();
-// const auto start12 = std::chrono::high_resolution_clock::now();
-
             const Matrix<double, 3, 1> offset = (J0_.row(idj) - J0_.row(ipar)).transpose();
             outJoint.row(idj) = outJoint.row(ipar) + (MR.at(ipar) * offset).transpose();
+            if (jacobians)
+            {
+// duration10 += std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start10).count();
+// const auto start11 = std::chrono::high_resolution_clock::now();
+                EulerAnglesToRotationMatrix_Derivative(angles, dRdP.data(), idj);
+
+                if (idj == 10 || idj == 11) //foot ends
+                    dRdP.block<9, 3>(0, 3 * idj).setZero();
+                if (idj == 7 || idj == 8)   //foot ankle. Restrict side movement
+                    dRdP.block<9, 1>(0, 3 * idj + 2).setZero();
+                if (idj == 24 || idj == 27 || idj == 28 || idj == 31 || idj == 32 || idj == 35 || idj == 26 || idj == 39 || idj == 40
+                    || idj == 44 || idj == 47 || idj == 48 || idj == 51 || idj == 52 || idj == 55 || idj == 56 || idj == 59 || idj == 60)   //all hands
+                    dRdP.block<9, 2>(0, 3 * idj).setZero();
+// duration11 += std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start11).count();
+// const auto start12 = std::chrono::high_resolution_clock::now();
+                if (idj == 10 || idj == 11) //foot ends
+                    dMRdP.at(idj) = dMRdP.at(ipar);
+                else
+                {
+                    // Sparse derivative
+                    SparseProductDerivative(MR.at(ipar).data(), dMRdP.at(ipar).data(), R.data(), dRdP.data(), idj, mParentIndexes[idj], dMRdP.at(idj).data());
+                    // // Slower but equivalent - Dense derivative
+                    // Product_Derivative(MR.at(ipar).data(), dMRdP.at(ipar).data(), R.data(), dRdP.data(), dMRdP.at(idj).data()); // Compute the product of matrix multiplication
+                }
+
 // duration12 += std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start12).count();
 // const auto start13 = std::chrono::high_resolution_clock::now();
-            auto dMtdPIdj = dJdP.block<3, TotalModel::NUM_JOINTS * 3>(3 * idj, 0);
+                auto dMtdPIdj = dJdP.block<3, TotalModel::NUM_JOINTS * 3>(3 * idj, 0);
 // duration13 += std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start13).count();
 // const auto start14 = std::chrono::high_resolution_clock::now();
-            // Product_Derivative(NULL, dMRdP.at(ipar).data(), offset.data(), NULL, dMtdPIdj.data(), 1); // dB_data is NULL since offset is a constant
-            SparseProductDerivative(dMRdP.at(ipar).data(), offset.data(), mParentIndexes[idj], dMtdPIdj.data()); // dB_data is NULL since offset is a constant
+                // Product_Derivative(NULL, dMRdP.at(ipar).data(), offset.data(), NULL, dMtdPIdj.data(), 1); // dB_data is NULL since offset is a constant
+                SparseProductDerivative(dMRdP.at(ipar).data(), offset.data(), mParentIndexes[idj], dMtdPIdj.data()); // dB_data is NULL since offset is a constant
 // duration14 += std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start14).count();
 // const auto start15 = std::chrono::high_resolution_clock::now();
-            SparseAdd(dJdP.block<3, TotalModel::NUM_JOINTS * 3>(3 * ipar, 0).data(), mParentIndexes[idj], dMtdPIdj.data());
+                SparseAdd(dJdP.block<3, TotalModel::NUM_JOINTS * 3>(3 * ipar, 0).data(), mParentIndexes[idj], dMtdPIdj.data());
+            }
 // duration15 += std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start15).count();
         }
 // const auto duration5 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start5).count();

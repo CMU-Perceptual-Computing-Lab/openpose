@@ -47,11 +47,16 @@ bool AdamFastCost::Evaluate(double const* const* parameters,
     smpl::PoseToTransformsNoLR_Eulers_adamModel_withDiff p2t(m_adam, m_J0);
     const double* p2t_parameters[1] = { p_eulers };
     double* p2t_residuals = transforms_joint.data() + (TotalModel::NUM_JOINTS) * 3 * 4;
-    double* p2t_jacobians[1] = { dTrdP.data() + TotalModel::NUM_JOINTS * 3 * 4 * TotalModel::NUM_JOINTS * 3 };
     #ifdef COMPARE_AUTOMATIC_VS_MANUAL
         std::clock_t startComparison2 = std::clock();
     #endif // COMPARE_AUTOMATIC_VS_MANUAL
-    p2t.Evaluate(p2t_parameters, p2t_residuals, p2t_jacobians);
+    if (jacobians)
+    {
+        double* p2t_jacobians[1] = { dTrdP.data() + TotalModel::NUM_JOINTS * 3 * 4 * TotalModel::NUM_JOINTS * 3 };
+        p2t.Evaluate(p2t_parameters, p2t_residuals, p2t_jacobians);
+    }
+    else
+        p2t.Evaluate(p2t_parameters, p2t_residuals, nullptr);
     #ifdef COMPARE_AUTOMATIC_VS_MANUAL
         std::clock_t endComparison2 = std::clock();
     #endif // COMPARE_AUTOMATIC_VS_MANUAL
@@ -70,16 +75,19 @@ bool AdamFastCost::Evaluate(double const* const* parameters,
         assert(maxCoeffJ < 1e-12);
         assert(minCoeffJ < 1e-12);
 
-        std::cout << "DJ" << std::endl;
-        const auto maxCoeffDJ = (old_dTrdP - dTrdP).maxCoeff();
-        const auto minCoeffDJ = (old_dTrdP - dTrdP).minCoeff();
-        std::cout << "max diff: " << maxCoeffDJ << std::endl;
-        std::cout << "min diff: " << minCoeffDJ << std::endl;
-        assert(maxCoeffDJ < 1e-12);
-        assert(minCoeffDJ < 1e-12);
+        if (jacobians)
+        {
+            std::cout << "DJ" << std::endl;
+            const auto maxCoeffDJ = (old_dTrdP - dTrdP).maxCoeff();
+            const auto minCoeffDJ = (old_dTrdP - dTrdP).minCoeff();
+            std::cout << "max diff: " << maxCoeffDJ << std::endl;
+            std::cout << "min diff: " << minCoeffDJ << std::endl;
+            assert(maxCoeffDJ < 1e-12);
+            assert(minCoeffDJ < 1e-12);
 
-        std::cout << "time 1: " << (endComparison1 - startComparison1) / (double)CLOCKS_PER_SEC << std::endl;
-        std::cout << "time 2: " << (endComparison2 - startComparison2) / (double)CLOCKS_PER_SEC << std::endl;
+            std::cout << "time 1: " << (endComparison1 - startComparison1) / (double)CLOCKS_PER_SEC << std::endl;
+            std::cout << "time 2: " << (endComparison2 - startComparison2) / (double)CLOCKS_PER_SEC << std::endl;
+        }
     #endif // COMPARE_AUTOMATIC_VS_MANUAL
 
 // const auto start4 = std::chrono::high_resolution_clock::now();
@@ -108,17 +116,29 @@ bool AdamFastCost::Evaluate(double const* const* parameters,
 // const auto duration7 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start7).count();
 // const auto start8 = std::chrono::high_resolution_clock::now();
 
-    Map< VectorXd > res(residuals, m_nResiduals);
+    const auto* tempJointsPts = tempJoints.data();
+    const auto* targetPts = m_targetPts.data();
+    const auto* targetPtsWeight = m_targetPts_weight.data();
     std::fill(residuals, residuals + m_nResiduals, 0.0);
 // const auto duration8 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start8).count();
 // const auto start9 = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < m_nCorrespond_adam2joints; i++)
+    {
         if (!m_targetPts.block<3,1>(5 * i, 0).isZero(0))
-            res.block<3,1>(3 * i, 0) = (tempJoints.block<3,1>(3 * i, 0) - m_targetPts.block<3,1>(5 * i, 0)).cwiseProduct(m_targetPts_weight.block<3,1>(3 * i, 0));
+        {
+            for (int r = 0; r < 3 ; r++)
+            {
+                const int baseIndex = 3 * i + r;
+                residuals[baseIndex] = (tempJointsPts[baseIndex] - targetPts[5 * i + r]) * targetPtsWeight[baseIndex];
+            }
+            // Vectorized (slower) equivalent
+            // Map< VectorXd > res(residuals, m_nResiduals);
+            // res.block<3,1>(3 * i, 0) = (tempJoints.block<3,1>(3 * i, 0) - m_targetPts.block<3,1>(5 * i, 0)).cwiseProduct(m_targetPts_weight.block<3,1>(3 * i, 0));
+        }
+    }
 // const auto duration9 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start9).count();
 // auto duration10a = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start9).count() * 0;
 // auto duration10b = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start9).count() * 0;
-// auto duration10c = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start9).count() * 0;
 // auto duration10d = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start9).count() * 0;
 // auto duration10e = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start9).count() * 0;
 // auto duration10f = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start9).count() * 0;
@@ -131,19 +151,33 @@ bool AdamFastCost::Evaluate(double const* const* parameters,
         if (jacobians[0])  // jacobian w.r.t translation
         {
 // const auto start10a = std::chrono::high_resolution_clock::now();
-            Map< Matrix<double, Dynamic, Dynamic, RowMajor> > drdt(jacobians[0], m_nResiduals, 3);
             std::fill(jacobians[0], jacobians[0] + m_nResiduals*3, 0.0);
 // duration10a += std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start10a).count();
 // const auto start10b = std::chrono::high_resolution_clock::now();
             for (int i = 0; i < m_nCorrespond_adam2joints; i++)
-                if (!m_targetPts.block<3,1>(5 * i, 0).isZero(0))
-                    drdt.block<3,3>(3 * i, 0).setIdentity();
+            {
+                if (targetPts[5 * i] != 0 || targetPts[5 * i + 1] != 0 || targetPts[5 * i + 2] != 0)
+                // if (!m_targetPts.block<3,1>(5 * i, 0).isZero(0))
+                {
+                    for (int r = 0; r < 3; r++)
+                        jacobians[0][(3*i+r)*3+r] = targetPtsWeight[3*i+r];
+                }
+            }
 // duration10b += std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start10b).count();
-// const auto start10c = std::chrono::high_resolution_clock::now();
-            for (int j = 0; j < 3 * m_nCorrespond_adam2joints; ++j)
-                drdt.row(j) *= m_targetPts_weight[j];
-// duration10c += std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start10c).count();
-        }   
+            // // 2-for equivalent
+            // // 1st loop
+            // // Map< Matrix<double, Dynamic, Dynamic, RowMajor> > drdt(jacobians[0], m_nResiduals, 3);
+            // Matrix<double, Dynamic, Dynamic, RowMajor> drdt(m_nResiduals, 3);
+            // drdt.setZero();
+            // for (int i = 0; i < m_nCorrespond_adam2joints; i++)
+            //     if (!m_targetPts.block<3,1>(5 * i, 0).isZero(0))
+            //         drdt.block<3,3>(3 * i, 0).setIdentity();
+            // // 2nd loop
+            // drdt = m_targetPts_weight.asDiagonal() * drdt;
+            // // Slower for loop equivalent of 2nd loop
+            // for (int j = 0; j < 3 * m_nCorrespond_adam2joints; ++j)
+            //     drdt.row(j) *= m_targetPts_weight[j];
+        }
 
         if (jacobians[1]) // jacobian w.r.t pose
         {
@@ -172,7 +206,16 @@ bool AdamFastCost::Evaluate(double const* const* parameters,
 // duration10g += std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start10g).count();
 // const auto start10h = std::chrono::high_resolution_clock::now();
             for (int j = 0; j < 3 * m_nCorrespond_adam2joints; ++j)
-                dr_dPose.row(j) *= m_targetPts_weight[j];
+            {
+                const auto numberRows = dr_dPose.rows();
+                for (int r = 0; r < numberRows; ++r)
+                    jacobians[1][j*numberRows+r] *= targetPtsWeight[j];
+            }
+            // // Slow for loop equivalent
+            // for (int j = 0; j < 3 * m_nCorrespond_adam2joints; ++j)
+            //     dr_dPose.row(j) *= m_targetPts_weight[j];
+            // // Even slower option
+            // dr_dPose = m_targetPts_weight.asDiagonal() * dr_dPose;
 // duration10h += std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start10h).count();
         }
     }
@@ -190,7 +233,6 @@ bool AdamFastCost::Evaluate(double const* const* parameters,
 //           << __FILE__ << " " << duration10* 1e-6 << " 10\n"
 //           << __FILE__ << " " << duration10a* 1e-6 << " 10a\n"
 //           << __FILE__ << " " << duration10b* 1e-6 << " 10b\n"
-//           << __FILE__ << " " << duration10c* 1e-6 << " 10c\n"
 //           << __FILE__ << " " << duration10d* 1e-6 << " 10d\n"
 //           << __FILE__ << " " << duration10e* 1e-6 << " 10e\n"
 //           << __FILE__ << " " << duration10f* 1e-6 << " 10f\n"
