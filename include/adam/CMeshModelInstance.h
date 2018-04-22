@@ -3,6 +3,8 @@
 #ifndef CMESHMODELINSTANCE
 #define CMESHMODELINSTANCE
 
+struct TotalModel;
+
 class CMeshModelInstance
 {
 public:
@@ -10,10 +12,10 @@ public:
 	enum EnumMeshType
 	{
 		MESH_TYPE_UNKNOWN = -1,
-		MESH_TYPE_SMPL = 0,			
-		MESH_TYPE_FACE,			
-		MESH_TYPE_RHAND,		
-		MESH_TYPE_LHAND,		
+		MESH_TYPE_SMPL = 0,
+		MESH_TYPE_FACE,
+		MESH_TYPE_RHAND,
+		MESH_TYPE_LHAND,
 		MESH_TYPE_TOTAL,
 		MESH_TYPE_ADAM
 	};
@@ -30,7 +32,7 @@ public:
 		m_frameIdx = -1;
 	}
 
-	void RecomputeNomral(void* ptr_model);
+	void RecomputeNormal(const TotalModel& model);
 
 	std::vector<unsigned int> m_face_vertexIndices;
 	std::vector<cv::Point3d> m_vertices;

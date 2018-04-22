@@ -1,6 +1,7 @@
 #pragma once
 #include <Eigen/Dense>
 #include <ceres/rotation.h>
+#include <iostream>
 
 void AngleAxisToRotationMatrix_Derivative(const double* pose, double* dR_data, const int idj);
 void EulerAnglesToRotationMatrix_Derivative(const double* pose, double* dR_data, const int idj);

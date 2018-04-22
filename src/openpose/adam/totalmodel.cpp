@@ -275,37 +275,58 @@ void adam_reconstruct_Eulers(const TotalModel& totalm,
 }
 
 void adam_lbs(const TotalModel &totalm,
-	const double *verts,
-	const MatrixXdr& T,
-	double *outVerts)
+    const double *verts,
+    const MatrixXdr& T,
+    double *outVerts)
 {
-	using namespace Eigen;
-	Map< const Matrix<double, Dynamic, Dynamic, RowMajor> >
-		Vs(verts, TotalModel::NUM_VERTICES, 3);
-	Map< Matrix<double, Dynamic, Dynamic, RowMajor> >
-		outV(outVerts, TotalModel::NUM_VERTICES, 3);
+    const Eigen::Map< const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> >
+        Vs(verts, TotalModel::NUM_VERTICES, 3);
+    Eigen::Map< Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> >
+        outV(outVerts, TotalModel::NUM_VERTICES, 3);
 
-	Map< const VectorXd > Tv(T.data(), T.rows()*T.cols());
-	#pragma omp parallel
-	{
-		#pragma omp for
-		for (int idv = 0; idv < TotalModel::NUM_VERTICES; idv++) {
-			outV(idv, 0) = 0;
-			outV(idv, 1) = 0;
-			outV(idv, 2) = 0;
-			for (int idj = 0; idj < TotalModel::NUM_JOINTS; idj++) {
-				if (totalm.m_blendW(idv, idj)) {
-					double w = totalm.m_blendW(idv, idj);
-					for (int idd = 0; idd < 3; idd++) {
-						outV(idv, idd) += w*Vs(idv, 0)*Tv(idj * 3 * 4 + idd * 4 + 0);
-						outV(idv, idd) += w*Vs(idv, 1)*Tv(idj * 3 * 4 + idd * 4 + 1);
-						outV(idv, idd) += w*Vs(idv, 2)*Tv(idj * 3 * 4 + idd * 4 + 2);
-						outV(idv, idd) += w*Tv(idj * 3 * 4 + idd * 4 + 3);
-					}
-				}
-			}
-		}
-	}
+    const Eigen::Map<const Eigen::VectorXd> Tv(T.data(), T.rows()*T.cols());
+    const auto* T_data = T.data();
+    #pragma omp parallel
+    {
+        #pragma omp for
+        for (int idv = 0; idv < TotalModel::NUM_VERTICES; idv++)
+        {
+            auto* outVrow_data = &outVerts[3*idv];
+            outVrow_data[0] = 0; // outV(idv, 0)
+            outVrow_data[1] = 0; // outV(idv, 1)
+            outVrow_data[2] = 0; // outV(idv, 2)
+            const auto* const Vsrow_data = &verts[3*idv];
+            for (int idj = 0; idj < TotalModel::NUM_JOINTS; idj++)
+            {
+                const double w = totalm.m_blendW(idv, idj);
+                if (w)
+                {
+                    const auto baseIndex = idj * 3 * 4;
+                    const auto* const Trow_data = &T_data[baseIndex];
+                    outVrow_data[0] += w*(Vsrow_data[0]*Trow_data[0]
+                                          + Vsrow_data[1]*Trow_data[1]
+                                          + Vsrow_data[2]*Trow_data[2]
+                                          + Trow_data[3]);
+                    outVrow_data[1] += w*(Vsrow_data[0]*Trow_data[4]
+                                          + Vsrow_data[1]*Trow_data[5]
+                                          + Vsrow_data[2]*Trow_data[6]
+                                          + Trow_data[7]);
+                    outVrow_data[2] += w*(Vsrow_data[0]*Trow_data[8]
+                                          + Vsrow_data[1]*Trow_data[9]
+                                          + Vsrow_data[2]*Trow_data[10]
+                                          + Trow_data[11]);
+                    // Original code
+                    // for (int idd = 0; idd < 3; idd++)
+                    // {
+                    //     outV(idv, idd) += w*Vs(idv, 0)*Tv(idj * 3 * 4 + idd * 4 + 0);
+                    //     outV(idv, idd) += w*Vs(idv, 1)*Tv(idj * 3 * 4 + idd * 4 + 1);
+                    //     outV(idv, idd) += w*Vs(idv, 2)*Tv(idj * 3 * 4 + idd * 4 + 2);
+                    //     outV(idv, idd) += w*Tv(idj * 3 * 4 + idd * 4 + 3);
+                    // }
+                }
+            }
+        }
+    }
 }
 
 void adam_lbs(const TotalModel &smpl,
@@ -565,31 +586,53 @@ void adam_reconstruct_Eulers_Fast(const TotalModel& totalm,
 	double *outVerts,
 	Eigen::VectorXd &transforms)
 {
-	using namespace smpl;
-	using namespace Eigen;
+// const auto start1 = std::chrono::high_resolution_clock::now();
+    using namespace smpl;
 
-	Matrix<double, Dynamic, Dynamic, RowMajor> Vt_with_face(TotalModel::NUM_VERTICES, 3);
-	Map< Matrix<double, Dynamic, 1> > Vt_vec_with_face(Vt_with_face.data(), 3 * TotalModel::NUM_VERTICES);
+    transforms.resize(3 * TotalModel::NUM_JOINTS * 4);
+    Eigen::VectorXd transforms_joint(3 * TotalModel::NUM_JOINTS * 4 + 3 * TotalModel::NUM_JOINTS); // the first part is transform, the second part is outJoint
 
-	transforms.resize(3 * TotalModel::NUM_JOINTS * 4);
-	VectorXd transforms_joint(3 * TotalModel::NUM_JOINTS * 4 + 3 * TotalModel::NUM_JOINTS); // the first part is transform, the second part is outJoint
+// const auto duration1 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start1).count();
+// const auto start2 = std::chrono::high_resolution_clock::now();
+    const int num_t = (TotalModel::NUM_JOINTS) * 3 * 4;
+    Eigen::Matrix<double, Eigen::Dynamic, 3 * TotalModel::NUM_JOINTS, Eigen::RowMajor> dTrdP((TotalModel::NUM_JOINTS) * 3 * 5, 3 * TotalModel::NUM_JOINTS);
+    Eigen::Matrix<double, Eigen::Dynamic, 3 * TotalModel::NUM_JOINTS, Eigen::RowMajor> dTrdJ((TotalModel::NUM_JOINTS) * 3 * 5, 3 * TotalModel::NUM_JOINTS);
 
-	const int num_t = (TotalModel::NUM_JOINTS) * 3 * 4;
-	Matrix<double, Dynamic, 3 * TotalModel::NUM_JOINTS, RowMajor> dTrdP((TotalModel::NUM_JOINTS) * 3 * 5, 3 * TotalModel::NUM_JOINTS);
-	Matrix<double, Dynamic, 3 * TotalModel::NUM_JOINTS, RowMajor> dTrdJ((TotalModel::NUM_JOINTS) * 3 * 5, 3 * TotalModel::NUM_JOINTS);
+// const auto duration2 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start2).count();
+// const auto start3 = std::chrono::high_resolution_clock::now();
+    ceres::AutoDiffCostFunction<PoseToTransformsNoLR_Eulers_adamModel,
+        (TotalModel::NUM_JOINTS) * 3 * 5,
+        (TotalModel::NUM_JOINTS) * 3,
+        (TotalModel::NUM_JOINTS) * 3> p2t(new PoseToTransformsNoLR_Eulers_adamModel(totalm));
+    const double * parameters[2] = { parm_pose_eulers, J0_vec.data() };
+    double * residuals = transforms_joint.data();
+// const auto duration3 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start3).count();
+// const auto start4 = std::chrono::high_resolution_clock::now();
+    p2t.Evaluate(parameters, residuals, nullptr);       //automatically compute residuals and jacobians (dTdP and dTdJ)
 
-	ceres::AutoDiffCostFunction<PoseToTransformsNoLR_Eulers_adamModel,
-		(TotalModel::NUM_JOINTS) * 3 * 5,
-		(TotalModel::NUM_JOINTS) * 3,
-		(TotalModel::NUM_JOINTS) * 3> p2t(new PoseToTransformsNoLR_Eulers_adamModel(totalm));
-	const double * parameters[2] = { parm_pose_eulers, J0_vec.data() };
-	double * residuals = transforms_joint.data();
-	p2t.Evaluate(parameters, residuals, nullptr);		//automatically compute residuals and jacobians (dTdP and dTdJ)
+// const auto duration4 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start4).count();
+// const auto start5 = std::chrono::high_resolution_clock::now();
+    transforms.block(0, 0, num_t, 1) = transforms_joint.block(0, 0, num_t, 1);
 
-	transforms.block(0, 0, num_t, 1) = transforms_joint.block(0, 0, num_t, 1);
+// const auto duration5 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start5).count();
+// const auto start6 = std::chrono::high_resolution_clock::now();
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> Vt_with_face(TotalModel::NUM_VERTICES, 3);
+    Eigen::Map< Eigen::Matrix<double, Eigen::Dynamic, 1> > Vt_vec_with_face(Vt_with_face.data(), 3 * TotalModel::NUM_VERTICES);
+    Eigen::Map< const Eigen::Matrix<double, Eigen::Dynamic, 1> > c_faceEx(parm_faceEx_coeffs, TotalModel::NUM_EXP_BASIS_COEFFICIENTS);
+// const auto duration6 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start6).count();
+// const auto start7 = std::chrono::high_resolution_clock::now();
+    Vt_vec_with_face = Vt_vec + totalm.m_dVdFaceEx * c_faceEx;      // m_C_face2total*facem.U_exp_
 
-	Map< const Matrix<double, Dynamic, 1> > c_faceEx(parm_faceEx_coeffs, TotalModel::NUM_EXP_BASIS_COEFFICIENTS);
-	Vt_vec_with_face = Vt_vec + totalm.m_dVdFaceEx * c_faceEx;		// m_C_face2total*facem.U_exp_
-	
-	adam_lbs(totalm, Vt_vec_with_face.data(), transforms, outVerts);
+// const auto duration7 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start7).count();
+// const auto start8 = std::chrono::high_resolution_clock::now();
+    adam_lbs(totalm, Vt_vec_with_face.data(), transforms, outVerts);
+// const auto duration8 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start8).count();
+// std::cout << __FILE__ << " " << duration1 * 1e-6 << " 1\n"
+//           << __FILE__ << " " << duration2 * 1e-6 << " 2\n"
+//           << __FILE__ << " " << duration3 * 1e-6 << " 3\n"
+//           << __FILE__ << " " << duration4 * 1e-6 << " 4\n"
+//           << __FILE__ << " " << duration5 * 1e-6 << " 5\n"
+//           << __FILE__ << " " << duration6 * 1e-6 << " 6\n"
+//           << __FILE__ << " " << duration7 * 1e-6 << " 7\n"
+//           << __FILE__ << " " << duration8 * 1e-6 << " 8\n" << std::endl;
 }

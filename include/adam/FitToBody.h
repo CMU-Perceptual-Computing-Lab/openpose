@@ -49,6 +49,15 @@ void Adam_FitTotalBodyCeres3d2d( TotalModel &adam,
 	Eigen::MatrixXd &faceJoints,
 	double* calibK);
 
+void Adam_FastFit_Initialize(TotalModel &adam,
+	smpl::SMPLParams &frame_param,
+	Eigen::MatrixXd &BodyJoints,
+	Eigen::MatrixXd &rFoot,
+	Eigen::MatrixXd &lFoot,
+	Eigen::MatrixXd &rHandJoints,
+	Eigen::MatrixXd &lHandJoints,
+	Eigen::MatrixXd &faceJoints);
+
 void Adam_FastFit(TotalModel &adam,
 	smpl::SMPLParams &frame_param,
 	Eigen::MatrixXd &BodyJoints,
@@ -67,4 +76,5 @@ void Adam_Fit_PAF(TotalModel &adam,
 	Eigen::MatrixXd &lHandJoints,
 	Eigen::MatrixXd &faceJoints,
 	Eigen::MatrixXd &PAF,
-	double* K=nullptr);
+	double* K=nullptr,
+	bool fit3Dfirst=false);

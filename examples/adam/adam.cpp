@@ -227,6 +227,7 @@ DEFINE_string(write_adam,               "",             "E.g.: /media/posefs3b/U
 #include <VisualizedData.h>
 #define SMPL_VIS_SCALING 100.0f
 
+smpl::SMPLParams frame_params;
 std::shared_ptr<Renderer> render;
 const int num_body_joint = 19;
 const int num_hand_joint = 21;
@@ -254,6 +255,65 @@ void updateKeypoints(Eigen::MatrixXd& bodyJoints, Eigen::MatrixXd& LHandJoints, 
     }
 }
 
+int mapOPToDome(const int oPPart)
+{
+    if (oPPart >= 0 && oPPart < 19)
+    {
+        // Nose
+        if (oPPart == 0)
+            return 1;
+        // Neck
+        else if (oPPart == 1)
+            return 0;
+        // Right arm
+        else if (oPPart == 2)
+            return 9;
+        else if (oPPart == 3)
+            return 10;
+        else if (oPPart == 4)
+            return 11;
+        // Left arm
+        else if (oPPart == 5)
+            return 3;
+        else if (oPPart == 6)
+            return 4;
+        else if (oPPart == 7)
+            return 5;
+        // Mid-hip
+        else if (oPPart == 8)
+            return 2;
+        // Right leg
+        else if (oPPart == 9)
+            return 12;
+        else if (oPPart == 10)
+            return 13;
+        else if (oPPart == 11)
+            return 14;
+        // Left leg
+        else if (oPPart == 12)
+            return 6;
+        else if (oPPart == 13)
+            return 7;
+        else if (oPPart == 14)
+            return 8;
+        // Face
+        else if (oPPart == 15)
+            return 17;
+        else if (oPPart == 16)
+            return 15;
+        else if (oPPart == 17)
+            return 18;
+        else if (oPPart == 18)
+            return 16;
+        else
+            op::error("Wrong body part (" + std::to_string(oPPart) + ").",
+                      __LINE__, __FUNCTION__, __FILE__);
+    }
+    op::error("Wrong body part (" + std::to_string(oPPart) + ").",
+              __LINE__, __FUNCTION__, __FILE__);
+    return -1;
+}
+
 // If the user needs his own variables, he can inherit the op::Datum struct and add them
 // UserDatum can be directly used by the OpenPose wrapper because it inherits from op::Datum, just define
 // Wrapper<UserDatum> instead of Wrapper<op::Datum>
@@ -261,120 +321,29 @@ struct UserDatum : public op::Datum
 {
     // TotalModel g_total_model;
     // smpl::SMPLParams frame_params;
-    // double targetJoint[183];
+    std::array<double, 183> targetJoint;
     // Eigen::Matrix<double, Eigen::Dynamic, 1> Vt_vec;
     // Eigen::Matrix<double, Eigen::Dynamic, 1> J0_vec;
 
-    UserDatum()// :
+    UserDatum() //:
         // boolThatUserNeedsForSomeReason{boolThatUserNeedsForSomeReason_}
-    {}
+    {
+        for (auto i = 0 ; i < 183 ; i++)
+            targetJoint[i] = 0;
+    }
 };
 
-// // This worker will just invert the image
-// class WUserPostProcessing : public op::Worker<std::shared_ptr<std::vector<UserDatum>>>
-// {
-// public:
-//     WUserPostProcessing() :
-//         mInitialized{false},
-//         bodyJoints(5, num_body_joint),// (3, targetJoint.size());
-//         Joints_face(5, num_face_landmark),// (3, landmarks_face.size());
-//         LHandJoints(5, num_hand_joint),// (3, HandModel::NUM_JOINTS);
-//         RHandJoints(5, num_hand_joint),// (3, HandModel::NUM_JOINTS);
-//         LFootJoints(5, 3),// (3, 3);        //Heel, Toe
-//         RFootJoints(5, 3),// (3, 3);        //Heel, Toe
-//         g_total_model_path{"./model/adam_v1_plus2.json"},
-//         pca_path{"./model/adam_blendshapes_348_delta_norm.json"},
-//         obj_path{"./model/mesh_nofeet.obj"},
-//         correspondence_path{"./model/correspondences_nofeet.txt"}
-//     {
-//         // Load g_total_model (model + data)
-//         LoadTotalModelFromObj(g_total_model, obj_path);
-//         LoadTotalDataFromJson(g_total_model, g_total_model_path, pca_path, correspondence_path);
-//     }
+Eigen::Matrix<double, Eigen::Dynamic, 1> Vt_vec;
+Eigen::Matrix<double, Eigen::Dynamic, 1> J0_vec;
+TotalModel g_total_model;
 
-//     void initializationOnThread() {}
-
-//     void work(std::shared_ptr<std::vector<UserDatum>>& datumsPtr)
-//     {
-//         // User's post-processing (after OpenPose processing & before OpenPose outputs) here
-//             // datum.cvOutputData: rendered frame with pose or heatmaps
-//             // datum.poseKeypoints: Array<float> with the estimated pose
-//         try
-//         {
-//             if (datumsPtr != nullptr && !datumsPtr->empty())
-//             {
-// op::log(__LINE__);
-//                 auto& datum = datumsPtr->at(0);
-//                 // ~0.01 msec
-//                 // /media/posefs0c/panopticdb/a4/projected_imgs/171204_pose1/00_00/00002520
-//                 double targetJoint[183] = {133.438, 83.399, 94.5189, 116.759, 66.7192, 77.8391, 127.879, 125.099, 127.879, 138.998, 94.5189, 77.8391, 144.558, 127.879, 88.959, 144.558, 144.558, 100.079, 133.438, 133.438, 122.319, 127.879, 166.798, 127.879, 133.438, 189.038, 150.118, 133.438, 72.2792, 105.639, 133.438, 66.7192, 133.438, 127.879, 38.9195, 122.319, 122.319, 116.759, 133.438, 105.639, 138.998, 161.238, 122.319, 183.478, 166.798, 116.759, 66.7192, 77.8391, 127.879, 72.2792, 66.7192, 116.759, 66.7192, 77.8391, 127.879, 61.1593, 88.959, 144.558, 144.558, 100.079, 143.083, 147.017, 98.1122, 142.592, 149.966, 95.654, 143.575, 152.916, 94.1791, 144.558, 154.391, 92.7041, 147.017, 151.441, 94.6707, 148.491, 154.391, 93.1958, 148.983, 156.849, 93.1958, 148.983, 158.324, 93.1958, 148, 151.441, 96.6373, 150.458, 154.883, 95.1624, 150.458, 157.341, 95.1624, 149.966, 159.799, 95.1624, 148.983, 151.441, 98.6039, 151.441, 154.391, 97.129, 150.95, 157.341, 96.6373, 150.95, 159.308, 96.6373, 149.475, 151.441, 101.062, 151.441, 154.391, 99.5872, 151.933, 156.358, 99.0955, 151.933, 157.833, 98.6039, 127.879, 38.9195, 122.319, 126.929, 38.9195, 119.469, 125.979, 37.9698, 113.771, 125.979, 34.6458, 113.296, 126.454, 32.2714, 111.397, 130.253, 36.0704, 113.771, 131.203, 33.2212, 111.397, 130.253, 31.3217, 109.972, 129.778, 29.8971, 109.497, 131.203, 35.1206, 115.67, 131.677, 31.3217, 113.296, 129.778, 29.4222, 112.346, 127.879, 27.9976, 111.872, 131.677, 34.1709, 117.57, 131.677, 30.8468, 115.67, 129.778, 28.9474, 114.246, 128.828, 27.0479, 114.246, 131.677, 33.696, 119.469, 131.677, 30.8468, 118.995, 131.203, 28.9474, 118.52, 130.253, 27.5228, 118.52};
-//                 updateKeypoints(bodyJoints, LHandJoints, RHandJoints, targetJoint);
-
-//                 // First frame
-//                 if (!mInitialized)
-//                 {
-//                     mInitialized = true;
-//                     // Fit initialization
-//                     Adam_FitTotalBodyCeres(g_total_model, frame_params, bodyJoints, RFootJoints, LFootJoints, RHandJoints, LHandJoints, Joints_face);
-//                     Vt_vec = g_total_model.m_meanshape + g_total_model.m_shapespace_u * frame_params.m_adam_coeffs;
-//                     J0_vec = g_total_model.J_mu_ + g_total_model.dJdc_ * frame_params.m_adam_coeffs;
-//                 }
-//                 // Other frames
-//                 else
-//                 {
-//                     // ~470 msec
-//                     // inside for loop
-//                     // Here ! read the pose data into bodyJoints, RFootJoints, LFootJoints, RHandJoints, LHandJoints, Joints_face.
-//                     // call fitting function
-//                     Adam_FastFit(g_total_model, frame_params, bodyJoints, RFootJoints, LFootJoints, RHandJoints, LHandJoints, Joints_face);
-//                 }
-//                 // Fill params
-//                 datum.g_total_model = g_total_model;
-//                 datum.frame_params = frame_params;
-//                 for (auto i = 0 ; i < 183 ; i++)
-//                     datum.targetJoint[i] = targetJoint[i];
-//                 datum.Vt_vec = Vt_vec;
-//                 datum.J0_vec = J0_vec;
-// op::log(__LINE__);
-//             }
-//         }
-//         catch (const std::exception& e)
-//         {
-//             op::log("Some kind of unexpected error happened.");
-//             this->stop();
-//             op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-//         }
-//     }
-
-// private:
-//     bool mInitialized;
-//     smpl::SMPLParams frame_params;
-//     Eigen::Matrix<double, Eigen::Dynamic, 1> Vt_vec;
-//     Eigen::Matrix<double, Eigen::Dynamic, 1> J0_vec;
-
-//     double targetJoint[183];
-//     Eigen::MatrixXd bodyJoints;
-//     Eigen::MatrixXd Joints_face;
-//     Eigen::MatrixXd LHandJoints;
-//     Eigen::MatrixXd RHandJoints;
-//     Eigen::MatrixXd LFootJoints;
-//     Eigen::MatrixXd RFootJoints;
-
-//     const std::string g_total_model_path;
-//     const std::string pca_path;
-//     const std::string obj_path;
-//     const std::string correspondence_path;
-//     TotalModel g_total_model;
-// };
-
-// This worker will just read and return all the jpg files in a directory
-class WUserOutput : public op::WorkerConsumer<std::shared_ptr<std::vector<UserDatum>>>
+// Adam IK processing
+class WUserPostProcessing : public op::Worker<std::shared_ptr<std::vector<UserDatum>>>
 {
 public:
     // Purely processing
-    WUserOutput() :
+    WUserPostProcessing() :
         mInitialized{false},
-        // targetJoint{133.438, 83.399, 94.5189, 116.759, 66.7192, 77.8391, 127.879, 125.099, 127.879, 138.998, 94.5189, 77.8391, 144.558, 127.879, 88.959, 144.558, 144.558, 100.079, 133.438, 133.438, 122.319, 127.879, 166.798, 127.879, 133.438, 189.038, 150.118, 133.438, 72.2792, 105.639, 133.438, 66.7192, 133.438, 127.879, 38.9195, 122.319, 122.319, 116.759, 133.438, 105.639, 138.998, 161.238, 122.319, 183.478, 166.798, 116.759, 66.7192, 77.8391, 127.879, 72.2792, 66.7192, 116.759, 66.7192, 77.8391, 127.879, 61.1593, 88.959, 144.558, 144.558, 100.079, 143.083, 147.017, 98.1122, 142.592, 149.966, 95.654, 143.575, 152.916, 94.1791, 144.558, 154.391, 92.7041, 147.017, 151.441, 94.6707, 148.491, 154.391, 93.1958, 148.983, 156.849, 93.1958, 148.983, 158.324, 93.1958, 148, 151.441, 96.6373, 150.458, 154.883, 95.1624, 150.458, 157.341, 95.1624, 149.966, 159.799, 95.1624, 148.983, 151.441, 98.6039, 151.441, 154.391, 97.129, 150.95, 157.341, 96.6373, 150.95, 159.308, 96.6373, 149.475, 151.441, 101.062, 151.441, 154.391, 99.5872, 151.933, 156.358, 99.0955, 151.933, 157.833, 98.6039, 127.879, 38.9195, 122.319, 126.929, 38.9195, 119.469, 125.979, 37.9698, 113.771, 125.979, 34.6458, 113.296, 126.454, 32.2714, 111.397, 130.253, 36.0704, 113.771, 131.203, 33.2212, 111.397, 130.253, 31.3217, 109.972, 129.778, 29.8971, 109.497, 131.203, 35.1206, 115.67, 131.677, 31.3217, 113.296, 129.778, 29.4222, 112.346, 127.879, 27.9976, 111.872, 131.677, 34.1709, 117.57, 131.677, 30.8468, 115.67, 129.778, 28.9474, 114.246, 128.828, 27.0479, 114.246, 131.677, 33.696, 119.469, 131.677, 30.8468, 118.995, 131.203, 28.9474, 118.52, 130.253, 27.5228, 118.52},
         bodyJoints(5, num_body_joint),// (3, targetJoint.size());
         Joints_face(5, num_face_landmark),// (3, landmarks_face.size());
         LHandJoints(5, num_hand_joint),// (3, HandModel::NUM_JOINTS);
@@ -384,103 +353,19 @@ public:
         g_total_model_path{"./model/adam_v1_plus2.json"},
         pca_path{"./model/adam_blendshapes_348_delta_norm.json"},
         obj_path{"./model/mesh_nofeet.obj"},
-        correspondence_path{"./model/correspondences_nofeet.txt"},
-        count_frame(0)
+        correspondence_path{"./model/correspondences_nofeet.txt"}
     {
-        for (auto i = 0 ; i < 183 ; i++)
-            targetJoint[i] = 0;
         // Load g_total_model (model + data)
         LoadTotalModelFromObj(g_total_model, obj_path);
         LoadTotalDataFromJson(g_total_model, g_total_model_path, pca_path, correspondence_path);
-        const bool unityCompatible = true;
-        spBvhWriter = std::make_shared<BVHWriter>(g_total_model.m_parent, unityCompatible);
-    }
-
-    ~WUserOutput()
-    {
-
-        this->callBVHWriter(FLAGS_write_bvh, 0.0333333);
-        this->stop();
     }
 
     // Purely Visualization
     void initializationOnThread()
     {
-        int argc = 0;
-        // char* argv[0];
-        render = std::make_shared<Renderer>(&argc, nullptr);
-        // render = std::make_shared<Renderer>(&argc, argv);
-        render->options.nRange=150;
-        render->options.yrot=45;
-        render->options.xrot=25;
-        render->options.meshSolid = true;
-        read_buffer.reset(new GLubyte[render->options.width * render->options.height * 3]);
-        // GLubyte read_buffer[render->options.width * render->options.height * 3]; // 600 * 600 RGB image
-
-        // // Display in opencv window
-        // cv::namedWindow("Display window", cv::WINDOW_AUTOSIZE);
     }
 
-    int mapOPToDome(const int oPPart)
-    {
-        if (oPPart >= 0 && oPPart < 19)
-        {
-            // Nose
-            if (oPPart == 0)
-                return 1;
-            // Neck
-            else if (oPPart == 1)
-                return 0;
-            // Right arm
-            else if (oPPart == 2)
-                return 9;
-            else if (oPPart == 3)
-                return 10;
-            else if (oPPart == 4)
-                return 11;
-            // Left arm
-            else if (oPPart == 5)
-                return 3;
-            else if (oPPart == 6)
-                return 4;
-            else if (oPPart == 7)
-                return 5;
-            // Mid-hip
-            else if (oPPart == 8)
-                return 2;
-            // Right leg
-            else if (oPPart == 9)
-                return 12;
-            else if (oPPart == 10)
-                return 13;
-            else if (oPPart == 11)
-                return 14;
-            // Left leg
-            else if (oPPart == 12)
-                return 6;
-            else if (oPPart == 13)
-                return 7;
-            else if (oPPart == 14)
-                return 8;
-            // Face
-            else if (oPPart == 15)
-                return 17;
-            else if (oPPart == 16)
-                return 15;
-            else if (oPPart == 17)
-                return 18;
-            else if (oPPart == 18)
-                return 16;
-            else
-                op::error("Wrong body part (" + std::to_string(oPPart) + ").",
-                          __LINE__, __FUNCTION__, __FILE__);
-        }
-        op::error("Wrong body part (" + std::to_string(oPPart) + ").",
-                  __LINE__, __FUNCTION__, __FILE__);
-        return -1;
-    }
-
-    void workConsumer(const std::shared_ptr<std::vector<UserDatum>>& datumsPtr)
+    void work(std::shared_ptr<std::vector<UserDatum>>& datumsPtr)
     {
         try
         {
@@ -493,6 +378,7 @@ public:
                 const auto& poseKeypoints3D = datum.poseKeypoints3D;
                 const auto& faceKeypoints3D = datum.faceKeypoints3D;
                 const auto& handKeypoints3D = datum.handKeypoints3D;
+                auto& targetJoint = datum.targetJoint;
                 // const auto& leftHandKeypoints3D = datum.handKeypoints3D[0];
                 // const auto& rightHandKeypoints3D = datum.handKeypoints3D[1];
                 if (poseKeypoints3D.getSize(1) != 19)
@@ -565,7 +451,11 @@ const auto myHeight = 1.85; // Gines
 for (auto i = 0 ; i < 183 ; i++)
 targetJoint[i] *= 1.225*1.418918919*myHeight;
                 // Update keypoints
-                updateKeypoints(bodyJoints, LHandJoints, RHandJoints, targetJoint);
+                updateKeypoints(bodyJoints, LHandJoints, RHandJoints, targetJoint.data());
+
+                // Copy to datum
+                for (auto i = 0 ; i < 183 ; i++)
+                    datum.targetJoint[i] = targetJoint[i];
 
 // // Cout keypoints
 // std::cout << "Body:\n";
@@ -588,7 +478,7 @@ const auto start0 = std::chrono::high_resolution_clock::now();
                 {
                     mInitialized = true;
                     // Fit initialization
-                    Adam_FitTotalBodyCeres(g_total_model, frame_params, bodyJoints, RFootJoints, LFootJoints, RHandJoints, LHandJoints, Joints_face);
+                    Adam_FastFit_Initialize(g_total_model, frame_params, bodyJoints, RFootJoints, LFootJoints, RHandJoints, LHandJoints, Joints_face);
                     Vt_vec = g_total_model.m_meanshape + g_total_model.m_shapespace_u * frame_params.m_adam_coeffs;
                     J0_vec = g_total_model.J_mu_ + g_total_model.dJdc_ * frame_params.m_adam_coeffs;
                 }
@@ -600,36 +490,124 @@ const auto start0 = std::chrono::high_resolution_clock::now();
                     // Here ! read the pose data into bodyJoints, RFootJoints, LFootJoints, RHandJoints, LHandJoints, Joints_face.
                     // call fitting function
                     Adam_FastFit(g_total_model, frame_params, bodyJoints, RFootJoints, LFootJoints, RHandJoints, LHandJoints, Joints_face);
-                    // Adam_FitTotalBodyCeres(g_total_model, frame_params, bodyJoints, RFootJoints, LFootJoints, RHandJoints, LHandJoints, Joints_face);
-                    // Vt_vec = g_total_model.m_meanshape + g_total_model.m_shapespace_u * frame_params.m_adam_coeffs;
-                    // J0_vec = g_total_model.J_mu_ + g_total_model.dJdc_ * frame_params.m_adam_coeffs;
                 }
 const auto duration0 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start0).count();
+std::cout << "IK:         " << duration0 * 1e-6 << std::endl;
+            }
+        }
+        catch (const std::exception& e)
+        {
+            op::log("Some kind of unexpected error happened.");
+            this->stop();
+            op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+private:
+    // Processing
+    bool mInitialized;
+
+    Eigen::MatrixXd bodyJoints;
+    Eigen::MatrixXd Joints_face;
+    Eigen::MatrixXd LHandJoints;
+    Eigen::MatrixXd RHandJoints;
+    Eigen::MatrixXd LFootJoints;
+    Eigen::MatrixXd RFootJoints;
+
+    const std::string g_total_model_path;
+    const std::string pca_path;
+    const std::string obj_path;
+    const std::string correspondence_path;
+};
+
+// This worker will just read and return all the jpg files in a directory
+class WUserOutput : public op::WorkerConsumer<std::shared_ptr<std::vector<UserDatum>>>
+{
+public:
+    // Purely processing
+    WUserOutput() :
+        count_frame(0)
+    {
+        // Load g_total_model (model + data)
+        const bool unityCompatible = true;
+        spBvhWriter = std::make_shared<BVHWriter>(g_total_model.m_parent, unityCompatible);
+    }
+
+    ~WUserOutput()
+    {
+
+        this->callBVHWriter(FLAGS_write_bvh, 0.0333333);
+        this->stop();
+    }
+
+    // Purely Visualization
+    void initializationOnThread()
+    {
+        int argc = 0;
+        // char* argv[0];
+        render = std::make_shared<Renderer>(&argc, nullptr);
+        // render = std::make_shared<Renderer>(&argc, argv);
+        render->options.nRange=150;
+        render->options.yrot=45;
+        render->options.xrot=25;
+        render->options.meshSolid = true;
+        upReadBuffer.reset(new GLubyte[render->options.width * render->options.height * 3]);
+        // GLubyte read_buffer[render->options.width * render->options.height * 3]; // 600 * 600 RGB image
+
+        // // Display in opencv window
+        // cv::namedWindow("Display window", cv::WINDOW_AUTOSIZE);
+    }
+
+    void workConsumer(const std::shared_ptr<std::vector<UserDatum>>& datumsPtr)
+    {
+        try
+        {
+            // User's displaying/saving/other processing here
+                // datum.cvOutputData: rendered frame with pose or heatmaps
+                // datum.poseKeypoints: Array<float> with the estimated pose
+            if (datumsPtr != nullptr && !datumsPtr->empty())
+            {
+                auto& datum = datumsPtr->at(0);
+                const auto& poseKeypoints3D = datum.poseKeypoints3D;
+                const auto& faceKeypoints3D = datum.faceKeypoints3D;
+                const auto& handKeypoints3D = datum.handKeypoints3D;
+                auto& targetJoint = datum.targetJoint;
+
+                // First frame
+const auto start = std::chrono::high_resolution_clock::now();
 
 // op::log(__LINE__);
                 // Visualization - ~800 msec
-// op::log(__LINE__);
+// Constructor arguments: g_total_model (big, always fixed, never changed), Vt_vec (big, constant after frame 1), J0_vec (~small, constant after frame 1)
+// t1 <-- frame_params (~small)
+// t1 --> g_vis_data (huge), resultBody
 const auto start1 = std::chrono::high_resolution_clock::now();
                 CMeshModelInstance mesh;
                 GenerateMesh_Fast(mesh, resultBody, frame_params, g_total_model, Vt_vec, J0_vec);
 const auto duration1 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start1).count();
+                VisualizedData g_vis_data; // --> Into op::Datum
+                CopyMesh(mesh, g_vis_data);
                 // GenerateMesh_Fast(mesh, resultBody, datum.frame_params, datum.g_total_model, datum.Vt_vec, datum.J0_vec);
                 // ~0.0005 ms
 // op::log(__LINE__);
+// BELOW IS PURELY OPENGL
+// t2 <-- g_vis_data (huge), frame_params (~small), targetJoint (optional, small), resultJoint (optional, small)
+// t2 --> g_vis_data (pts modified, struct, big)
 const auto start2 = std::chrono::high_resolution_clock::now();
                 // ~20 ms
-                ts.push_back(frame_params.m_adam_t);
-                poses.push_back(frame_params.m_adam_pose);
-                VisualizedData g_vis_data;
-                g_vis_data.targetJoint = targetJoint;
+                // BVH generation
+                ts.push_back(frame_params.m_adam_t); // BVH generation
+                poses.push_back(frame_params.m_adam_pose); // BVH generation
+                // OpenGL Display
+                g_vis_data.targetJoint = targetJoint.data();
 g_vis_data.targetJoint = nullptr;
                 // g_vis_data.targetJoint = datum.targetJoint;
                 g_vis_data.resultJoint = resultBody;
 g_vis_data.resultJoint = nullptr;
                 g_vis_data.vis_type = 2;
-                // g_vis_data.read_buffer = read_buffer;
-                g_vis_data.read_buffer = read_buffer.get();
-                CopyMesh(mesh, g_vis_data);
+                g_vis_data.read_buffer = upReadBuffer.get();
+// BELOW IS PURELY OPENGL
+// t3 <-- g_vis_data (struct, big)
                 // ~0.001 ms
                 render->RenderHand(g_vis_data);
                 // ~60 ms
@@ -641,7 +619,7 @@ const auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(std::
                 // Save/display in opencv window
                 if (!FLAGS_write_adam.empty())
                 {
-                    cv::Mat img(render->options.height, render->options.width, CV_8UC3, read_buffer.get()); // img is y-flipped, and in RGB order
+                    cv::Mat img(render->options.height, render->options.width, CV_8UC3, upReadBuffer.get()); // img is y-flipped, and in RGB order
                     cv::flip(img, img, 0);
                     cv::cvtColor(img, img, cv::COLOR_RGB2BGR);
                     if (videoSaver == nullptr)
@@ -656,8 +634,7 @@ const auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(std::
                     // // cv::imshow( "Display window", img );
                     // // cv::waitKey(16);
                 }
-std::cout << "IK:         " << duration0 * 1e-6
-          << "\nRender1:    " << duration1 * 1e-6
+std::cout << "\nRender1:    " << duration1 * 1e-6
           << "\nRenderRest: " << duration2 * 1e-6
           << "\nTotal:      " << duration * 1e-6 << std::endl;
 
@@ -683,33 +660,12 @@ std::cout << "IK:         " << duration0 * 1e-6
 
     void callBVHWriter(const std::string& filename, double frame_time)
     {
-// std::cout << J0_vec << std::endl;
         std::cout << J0_vec.rows() << std::endl;
         spBvhWriter->parseInput(J0_vec, ts, poses);
         spBvhWriter->writeBVH(filename, frame_time);
     }
 
 private:
-    // Processing
-    bool mInitialized;
-    smpl::SMPLParams frame_params;
-    Eigen::Matrix<double, Eigen::Dynamic, 1> Vt_vec;
-    Eigen::Matrix<double, Eigen::Dynamic, 1> J0_vec;
-
-    double targetJoint[183];
-    Eigen::MatrixXd bodyJoints;
-    Eigen::MatrixXd Joints_face;
-    Eigen::MatrixXd LHandJoints;
-    Eigen::MatrixXd RHandJoints;
-    Eigen::MatrixXd LFootJoints;
-    Eigen::MatrixXd RFootJoints;
-
-    const std::string g_total_model_path;
-    const std::string pca_path;
-    const std::string obj_path;
-    const std::string correspondence_path;
-    TotalModel g_total_model;
-
     // Write BVH file
     std::shared_ptr<BVHWriter> spBvhWriter;
     std::vector<Eigen::Matrix<double, 3, 1>> ts; // record the translation across frames
@@ -718,7 +674,7 @@ private:
 
     // Visualization
     double resultBody[183];
-    std::unique_ptr<GLubyte[]> read_buffer;
+    std::unique_ptr<GLubyte[]> upReadBuffer;
 
     std::shared_ptr<op::VideoSaver> videoSaver;
 };
@@ -778,9 +734,9 @@ int openPoseDemo()
     op::Wrapper<std::vector<UserDatum>> opWrapper;
 
     // Adam added
-    // auto wUserPostProcessing = std::make_shared<WUserPostProcessing>();
-    // const auto workerProcessingOnNewThread = true;
-    // opWrapper.setWorkerPostProcessing(wUserPostProcessing, workerProcessingOnNewThread);
+    auto wUserPostProcessing = std::make_shared<WUserPostProcessing>();
+    const auto workerProcessingOnNewThread = true;
+    opWrapper.setWorkerPostProcessing(wUserPostProcessing, workerProcessingOnNewThread);
     auto wUserOutput = std::make_shared<WUserOutput>();
     const auto workerOutputOnNewThread = true;
     opWrapper.setWorkerOutput(wUserOutput, workerOutputOnNewThread);
@@ -852,119 +808,3 @@ int main(int argc, char *argv[])
     // Running openPoseDemo
     return openPoseDemo();
 }
-
-// int main(int argc, char* argv[])
-// {
-//     // Adam fitting
-//     smpl::SMPLParams frame_params;
-//     Eigen::Matrix<double, Eigen::Dynamic, 1> Vt_vec;
-//     Eigen::Matrix<double, Eigen::Dynamic, 1> J0_vec;
-
-//     double targetJoint[183] = {};
-//     Eigen::MatrixXd bodyJoints(5, num_body_joint);// (3, targetJoint.size());
-//     Eigen::MatrixXd Joints_face(5, num_face_landmark);// (3, landmarks_face.size());
-//     Eigen::MatrixXd LHandJoints(5, num_hand_joint);// (3, HandModel::NUM_JOINTS);
-//     Eigen::MatrixXd RHandJoints(5, num_hand_joint);// (3, HandModel::NUM_JOINTS);
-//     Eigen::MatrixXd LFootJoints(5, 3);// (3, 3);        //Heel, Toe
-//     Eigen::MatrixXd RFootJoints(5, 3);// (3, 3);        //Heel, Toe
-
-//     const std::string g_total_model_path = "./model/adam_v1_plus2.json";
-//     const std::string pca_path = "./model/adam_blendshapes_348_delta_norm.json";
-//     const std::string obj_path = "./model/mesh_nofeet.obj";
-//     const std::string correspondence_path = "./model/correspondences_nofeet.txt";
-//     TotalModel g_total_model;
-//     LoadTotalModelFromObj(g_total_model, obj_path);
-//     LoadTotalDataFromJson(g_total_model, g_total_model_path, pca_path, correspondence_path);
-
-//     double resultBody[183] = {};
-//     // Visualization
-//     render = std::make_shared<Renderer>(&argc, argv);
-//     render->options.nRange=150;
-//     GLubyte read_buffer[render->options.width * render->options.height * 3]; // 600 * 600 RGB image
-
-//     // // Display in opencv window
-//     // cv::namedWindow("Display window", cv::WINDOW_AUTOSIZE);
-
-//     const auto iterations = 10;
-//     double duration0 = 0.;
-//     double duration1 = 0.;
-//     double duration2 = 0.;
-//     double duration3 = 0.;
-//     double duration4 = 0.;
-//     double duration5 = 0.;
-//     double durationR = 0.;
-//     double duration = 0.;
-//     for (int i = 0; i < iterations+1; i++)
-//     {
-// std::cout << "It #" << i << std::endl;
-
-//         // ~0.01 msec
-//         // /media/posefs0c/panopticdb/a4/projected_imgs/171204_pose1/00_00/00002520
-//         double targetJoint[183] = {133.438, 83.399, 94.5189, 116.759, 66.7192, 77.8391, 127.879, 125.099, 127.879, 138.998, 94.5189, 77.8391, 144.558, 127.879, 88.959, 144.558, 144.558, 100.079, 133.438, 133.438, 122.319, 127.879, 166.798, 127.879, 133.438, 189.038, 150.118, 133.438, 72.2792, 105.639, 133.438, 66.7192, 133.438, 127.879, 38.9195, 122.319, 122.319, 116.759, 133.438, 105.639, 138.998, 161.238, 122.319, 183.478, 166.798, 116.759, 66.7192, 77.8391, 127.879, 72.2792, 66.7192, 116.759, 66.7192, 77.8391, 127.879, 61.1593, 88.959, 144.558, 144.558, 100.079, 143.083, 147.017, 98.1122, 142.592, 149.966, 95.654, 143.575, 152.916, 94.1791, 144.558, 154.391, 92.7041, 147.017, 151.441, 94.6707, 148.491, 154.391, 93.1958, 148.983, 156.849, 93.1958, 148.983, 158.324, 93.1958, 148, 151.441, 96.6373, 150.458, 154.883, 95.1624, 150.458, 157.341, 95.1624, 149.966, 159.799, 95.1624, 148.983, 151.441, 98.6039, 151.441, 154.391, 97.129, 150.95, 157.341, 96.6373, 150.95, 159.308, 96.6373, 149.475, 151.441, 101.062, 151.441, 154.391, 99.5872, 151.933, 156.358, 99.0955, 151.933, 157.833, 98.6039, 127.879, 38.9195, 122.319, 126.929, 38.9195, 119.469, 125.979, 37.9698, 113.771, 125.979, 34.6458, 113.296, 126.454, 32.2714, 111.397, 130.253, 36.0704, 113.771, 131.203, 33.2212, 111.397, 130.253, 31.3217, 109.972, 129.778, 29.8971, 109.497, 131.203, 35.1206, 115.67, 131.677, 31.3217, 113.296, 129.778, 29.4222, 112.346, 127.879, 27.9976, 111.872, 131.677, 34.1709, 117.57, 131.677, 30.8468, 115.67, 129.778, 28.9474, 114.246, 128.828, 27.0479, 114.246, 131.677, 33.696, 119.469, 131.677, 30.8468, 118.995, 131.203, 28.9474, 118.52, 130.253, 27.5228, 118.52};
-//         updateKeypoints(bodyJoints, LHandJoints, RHandJoints, targetJoint);
-
-//         // First frame
-// const auto start = std::chrono::high_resolution_clock::now();
-//         if (i == 0)
-//         {
-//             // Fit initialization
-//             Adam_FitTotalBodyCeres(g_total_model, frame_params, bodyJoints, RFootJoints, LFootJoints, RHandJoints, LHandJoints, Joints_face);
-//             Vt_vec = g_total_model.m_meanshape + g_total_model.m_shapespace_u * frame_params.m_adam_coeffs;
-//             J0_vec = g_total_model.J_mu_ + g_total_model.dJdc_ * frame_params.m_adam_coeffs;
-//         }
-//         // Other frames
-//         else
-//         {
-//             // ~470 msec
-//             // inside for loop
-//             // Here ! read the pose data into bodyJoints, RFootJoints, LFootJoints, RHandJoints, LHandJoints, Joints_face.
-//             // call fitting function
-// const auto start0 = std::chrono::high_resolution_clock::now();
-//             Adam_FastFit(g_total_model, frame_params, bodyJoints, RFootJoints, LFootJoints, RHandJoints, LHandJoints, Joints_face);
-// duration0 += std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start0).count();
-//         }
-
-//         // ~800 msec
-//         // Visualization
-// const auto startR = std::chrono::high_resolution_clock::now();
-// const auto start1 = std::chrono::high_resolution_clock::now();
-//         CMeshModelInstance mesh;
-//         GenerateMesh_Fast(mesh, resultBody, frame_params, g_total_model, Vt_vec, J0_vec);
-// if (i > 0)
-// duration1 += std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start1).count();
-//         // ~0.0005 ms
-// const auto start3 = std::chrono::high_resolution_clock::now();
-//         VisualizedData g_vis_data;
-//         g_vis_data.targetJoint = targetJoint;
-//         g_vis_data.resultJoint = resultBody;
-//         g_vis_data.vis_type = 2;
-//         g_vis_data.read_buffer = read_buffer;
-//         CopyMesh(mesh, g_vis_data);
-// if (i > 0)
-// duration3 += std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start3).count();
-//             // ~0.001 ms
-//         render->RenderHand(g_vis_data);
-// const auto start5 = std::chrono::high_resolution_clock::now();
-//         render->RenderAndRead(); // read the image into read_buffer
-//         // render->Display();
-// if (i > 0)
-// duration5 += std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start5).count();
-// if (i > 0)
-// durationR += std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - startR).count();
-
-//         // // Display in opencv window
-//         // cv::Mat img(render->options.height, render->options.width, CV_8UC3, read_buffer); // img is y-flipped, and in RGB order
-//         // cv::flip(img, img, 0);
-//         // cv::cvtColor(img, img, cv::COLOR_RGB2BGR);
-//         // cv::imshow( "Display window", img );
-//         // cv::waitKey(16);
-// if (i > 0)
-// duration += std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start).count();
-//     }
-// std::cout << "IK:     " << duration0 * 1e-6 / iterations << std::endl;
-// std::cout << "Render1:" << duration1 * 1e-6 / iterations << std::endl;
-// std::cout << "Render3:" << duration3 * 1e-6 / iterations << std::endl;
-// std::cout << "Render5:" << duration5 * 1e-6 / iterations << std::endl;
-// std::cout << "RenderR:" << durationR * 1e-6 / iterations << std::endl;
-// std::cout << "Total:  " << duration * 1e-6 / iterations << std::endl;
-// }

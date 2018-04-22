@@ -44,7 +44,7 @@ struct TotalModel
 
 	//Mesh Model
 	Eigen::Matrix<double, Eigen::Dynamic, 3, Eigen::RowMajor> m_vertices;
-	Eigen::Matrix<int, Eigen::Dynamic, 3> m_faces;		//has zero-based indexing
+	Eigen::Matrix<int, Eigen::Dynamic, 3, Eigen::RowMajor> m_faces;		//has zero-based indexing
 
 	Eigen::Matrix<double, Eigen::Dynamic, 2> m_uvs;		//uv map
 	Eigen::Matrix<double, Eigen::Dynamic, 3> m_normals;		//uv map

@@ -113,7 +113,7 @@ void GenerateMesh(CMeshModelInstance& returnMesh, double* resultJoint, smpl::SMP
 		returnMesh.m_face_vertexIndices.push_back(idxvect[1]);
 		returnMesh.m_face_vertexIndices.push_back(idxvect[2]);
 	}
-	returnMesh.RecomputeNomral((void*)(&g_total_model));
+	returnMesh.RecomputeNormal(g_total_model);
 	for (int i = 0; i < 61; i++)
 	{
 		resultJoint[3 * i] = joints_smc(3* map_adam_to_measure[i]);
@@ -125,8 +125,12 @@ void GenerateMesh(CMeshModelInstance& returnMesh, double* resultJoint, smpl::SMP
 void GenerateMesh_Fast(CMeshModelInstance& returnMesh, double* resultJoint, smpl::SMPLParams& targetParam, TotalModel& g_total_model,
 	const Eigen::Matrix<double, Eigen::Dynamic, 1> &Vt_vec, const Eigen::Matrix<double, Eigen::Dynamic, 1> &J0_vec)
 {
+// const auto start = std::chrono::high_resolution_clock::now();
+// const auto start1 = std::chrono::high_resolution_clock::now();
 	Eigen::Matrix<double, Eigen::Dynamic, 1> outV(TotalModel::NUM_VERTICES * 3);
 	Eigen::VectorXd transforms;
+// const auto duration1 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start1).count();
+// const auto start2 = std::chrono::high_resolution_clock::now();
 	adam_reconstruct_Eulers_Fast(g_total_model,
 		Vt_vec,
 		J0_vec,
@@ -134,58 +138,102 @@ void GenerateMesh_Fast(CMeshModelInstance& returnMesh, double* resultJoint, smpl
 		targetParam.m_adam_facecoeffs_exp.data(),
 		outV.data(),
 		transforms);
-	Eigen::SparseMatrix<double, Eigen::ColMajor> eye3(3, 3); eye3.setIdentity();
-	Eigen::SparseMatrix<double, Eigen::ColMajor> dVdt = Eigen::kroneckerProduct(Eigen::VectorXd::Ones(TotalModel::NUM_VERTICES), eye3);
+// const auto duration2 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start2).count();
+// const auto start3 = std::chrono::high_resolution_clock::now();
+    Eigen::SparseMatrix<double, Eigen::ColMajor> eye3(3, 3);
+    eye3.setIdentity();
+    Eigen::SparseMatrix<double, Eigen::ColMajor> dVdt = Eigen::kroneckerProduct(Eigen::VectorXd::Ones(TotalModel::NUM_VERTICES), eye3);
+// const auto duration3 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start3).count();
+// const auto start4 = std::chrono::high_resolution_clock::now();
 	outV += dVdt * targetParam.m_adam_t; //translation is applied at the end
+// const auto duration4 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start4).count();
+// const auto start5 = std::chrono::high_resolution_clock::now();
 	returnMesh.m_meshType = CMeshModelInstance::MESH_TYPE_ADAM;
 	returnMesh.m_vertices.resize(TotalModel::NUM_VERTICES);
-	returnMesh.m_colors.resize(TotalModel::NUM_VERTICES);
+	returnMesh.m_colors.resize(TotalModel::NUM_VERTICES, cv::Point3f(1.0, 1.0, 0.9)); // Adam color
 	returnMesh.m_uvs.resize(TotalModel::NUM_VERTICES);
+// const auto duration5 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start5).count();
+// const auto start6 = std::chrono::high_resolution_clock::now();
 
+    const auto* outV_data = outV.data();
 	for (int idx = 0; idx < TotalModel::NUM_VERTICES; idx++)  //Vertices
 	{
-		returnMesh.m_vertices[idx] = cv::Point3f(outV(3 * idx), outV(3 * idx + 1), outV(3 * idx + 2));
-		returnMesh.m_colors[idx] = cv::Point3f(1.0, 1.0, 0.9);			//Adam color
+        const auto* outVrow_data = &outV_data[3*idx];
+        returnMesh.m_vertices[idx] = cv::Point3f(outVrow_data[0], outVrow_data[1], outVrow_data[2]);
+        // Slow equivalent
+        // returnMesh.m_vertices[idx] = cv::Point3f(outV(3 * idx), outV(3 * idx + 1), outV(3 * idx + 2));
 	}
+// const auto duration6 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start6).count();
+// const auto start7 = std::chrono::high_resolution_clock::now();
 
 	//Visualize SMPL Skeletons
 	Eigen::Matrix<double, Eigen::Dynamic, 1> joints = g_total_model.m_J_reg * outV;
+// const auto duration7 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start7).count();
+// const auto start8 = std::chrono::high_resolution_clock::now();
 	// int jointIdx = 0;
 	for (int r = 0; r < joints.rows(); r += 3)		//Faces
 	{
 		returnMesh.m_joints.push_back(cv::Point3f(joints(r), joints(r + 1), joints(r + 2)));
 		// jointIdx++;
 	}
+// const auto duration8 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start8).count();
+// const auto start9 = std::chrono::high_resolution_clock::now();
 	Eigen::Matrix<double, Eigen::Dynamic, 1> joints_smc = g_total_model.m_J_reg_smc * outV;
-	for (int r = 0; r < joints.rows(); r += 3)		//Faces
-	{
-		returnMesh.m_joints_regress.push_back(cv::Point3f(joints_smc(r), joints_smc(r + 1), joints_smc(r + 2)));
-	}
+// const auto duration9 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start9).count();
+// const auto start10 = std::chrono::high_resolution_clock::now();
+    for (int r = 0; r < joints.rows(); r += 3)		//Faces
+    {
+        returnMesh.m_joints_regress.push_back(cv::Point3f(joints_smc(r), joints_smc(r + 1), joints_smc(r + 2)));
+    }
+// const auto duration10 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start10).count();
+// const auto start11 = std::chrono::high_resolution_clock::now();
 	returnMesh.m_face_vertexIndices.reserve(g_total_model.m_faces.size() * 3);
-	for (int r = 0; r < g_total_model.m_faces.rows(); ++r)		//Faces
-	{
-		int idxvect[3];
-		for (int c = 0; c < g_total_model.m_faces.cols(); ++c)
-		{
-			int idx = g_total_model.m_faces(r, c);
-			idxvect[c] = idx;
-		}
-		returnMesh.m_face_vertexIndices.push_back(idxvect[0]);
-		returnMesh.m_face_vertexIndices.push_back(idxvect[1]);
-		returnMesh.m_face_vertexIndices.push_back(idxvect[2]);
-	}
-	returnMesh.RecomputeNomral((void*)(&g_total_model));
+// const auto duration11 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start11).count();
+// const auto start12 = std::chrono::high_resolution_clock::now();
+    for (int r = 0; r < g_total_model.m_faces.rows(); ++r)		//Faces
+    {
+        const auto* facesPtr = &g_total_model.m_faces.data()[3*r];
+        returnMesh.m_face_vertexIndices.push_back(facesPtr[0]);
+        returnMesh.m_face_vertexIndices.push_back(facesPtr[1]);
+        returnMesh.m_face_vertexIndices.push_back(facesPtr[2]);
+        // Slow equivalent
+        // returnMesh.m_face_vertexIndices.push_back(g_total_model.m_faces(r, 0));
+        // returnMesh.m_face_vertexIndices.push_back(g_total_model.m_faces(r, 1));
+        // returnMesh.m_face_vertexIndices.push_back(g_total_model.m_faces(r, 2));
+    }
+// const auto duration12 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start12).count();
+// const auto start13 = std::chrono::high_resolution_clock::now();
+	returnMesh.RecomputeNormal(g_total_model);
+// const auto duration13 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start13).count();
+// const auto start14 = std::chrono::high_resolution_clock::now();
 	for (int i = 0; i < 61; i++)
 	{
 		resultJoint[3 * i] = joints_smc(3* map_adam_to_measure[i]);
 		resultJoint[3 * i + 1] = joints_smc(3 * map_adam_to_measure[i] + 1);
 		resultJoint[3 * i + 2] = joints_smc(3 * map_adam_to_measure[i] + 2);
 	}
+// const auto duration14 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start14).count();
+// const auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start).count();
+// std::cout << __FILE__ << " " << duration1 * 1e-6 << " 1\n"
+//           << __FILE__ << " " << duration2 * 1e-6 << " 2\n"
+//           << __FILE__ << " " << duration3 * 1e-6 << " 3\n"
+//           << __FILE__ << " " << duration4 * 1e-6 << " 4\n"
+//           << __FILE__ << " " << duration5 * 1e-6 << " 5\n"
+//           << __FILE__ << " " << duration6 * 1e-6 << " 6\n"
+//           << __FILE__ << " " << duration7 * 1e-6 << " 7\n"
+//           << __FILE__ << " " << duration8 * 1e-6 << " 8\n"
+//           << __FILE__ << " " << duration9 * 1e-6 << " 9\n"
+//           << __FILE__ << " " << duration10 * 1e-6 << " 10\n"
+//           << __FILE__ << " " << duration11 * 1e-6 << " 11\n"
+//           << __FILE__ << " " << duration12 * 1e-6 << " 12\n"
+//           << __FILE__ << " " << duration13 * 1e-6 << " 13\n"
+//           << __FILE__ << " " << duration14 * 1e-6 << " 14\n"
+//           << __FILE__ << "T: " << duration* 1e-6 << " \n" << std::endl;
 }
 
-void CopyMesh(CMeshModelInstance& mesh, VisualizedData& g_visData)
+void CopyMesh(const CMeshModelInstance& mesh, VisualizedData& g_visData)
 {
-	int vertexCnt = g_visData.m_meshVertices.size();
+	const int vertexCnt = g_visData.m_meshVertices.size();
 	g_visData.m_meshVertices.insert(g_visData.m_meshVertices.end(), mesh.m_vertices.begin(), mesh.m_vertices.end());
 	g_visData.m_meshVerticesColor.insert(g_visData.m_meshVerticesColor.end(), mesh.m_colors.begin(), mesh.m_colors.end());
 	g_visData.m_meshVerticesNormal.insert(g_visData.m_meshVerticesNormal.end(), mesh.m_normals.begin(), mesh.m_normals.end());

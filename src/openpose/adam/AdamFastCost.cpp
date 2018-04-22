@@ -72,8 +72,8 @@ bool AdamFastCost::Evaluate(double const* const* parameters,
         const auto minCoeffJ = (old_transforms_joint - transforms_joint).block(3 * TotalModel::NUM_JOINTS * 4, 0, 3 * TotalModel::NUM_JOINTS, 1).minCoeff();
         std::cout << "max diff: " << maxCoeffJ << std::endl;
         std::cout << "min diff: " << minCoeffJ << std::endl;
-        assert(maxCoeffJ < 1e-12);
-        assert(minCoeffJ < 1e-12);
+        assert(std::abs(maxCoeffJ) < 1e-12);
+        assert(std::abs(minCoeffJ) < 1e-12);
 
         if (jacobians)
         {
@@ -82,8 +82,8 @@ bool AdamFastCost::Evaluate(double const* const* parameters,
             const auto minCoeffDJ = (old_dTrdP - dTrdP).minCoeff();
             std::cout << "max diff: " << maxCoeffDJ << std::endl;
             std::cout << "min diff: " << minCoeffDJ << std::endl;
-            assert(maxCoeffDJ < 1e-12);
-            assert(minCoeffDJ < 1e-12);
+            assert(std::abs(maxCoeffDJ) < 1e-12);
+            assert(std::abs(minCoeffDJ) < 1e-12);
 
             std::cout << "time 1: " << (endComparison1 - startComparison1) / (double)CLOCKS_PER_SEC << std::endl;
             std::cout << "time 2: " << (endComparison2 - startComparison2) / (double)CLOCKS_PER_SEC << std::endl;
