@@ -1,8 +1,8 @@
 Unix:
     - Caffe:
-        - Version 1.0.0, extracted from GitHub on 11/07/2017 from the current master branch.
+        - Version 1.0.0, extracted from GitHub on 04/26/2018 from the current master branch.
         - Link: https://github.com/BVLC/caffe
-        - GitHub SHA: c430690aa5528e94e019971b94de325539984e77
+        - GitHub SHA: 864520713a4c5ffae7382ced5d34e4cadc608473
 
 Windows:
     - Caffe & Caffe dependencies (caffe3rdparty):
