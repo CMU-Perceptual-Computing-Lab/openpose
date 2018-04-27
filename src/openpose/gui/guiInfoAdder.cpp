@@ -59,8 +59,7 @@ namespace op
     }
 
     void GuiInfoAdder::addInfo(cv::Mat& cvOutputData, const int numberPeople, const unsigned long long id,
-                               const std::string& elementRenderedName, const unsigned long long frameNumber,
-                               const Array<long long>& poseIds, const Array<float>& poseKeypoints)
+                               const std::string& elementRenderedName, const unsigned long long frameNumber)
     {
         try
         {
@@ -93,40 +92,6 @@ namespace op
             }
             mLastElementRenderedCounter = fastMin(mLastElementRenderedCounter, std::numeric_limits<int>::max() - 5);
             mLastElementRenderedCounter++;
-            // Add each person ID
-            const auto poseKeypointsArea = poseKeypoints.getSize(1)*poseKeypoints.getSize(2);
-            for (auto i = 0u ; i < poseIds.getVolume() ; i++)
-            {
-                const auto indexMain = i * poseKeypointsArea;
-                const auto indexSecondary = i * poseKeypointsArea + poseKeypoints.getSize(2);
-                const auto isVisible = 0.05f;
-                if (poseKeypoints[indexMain+2] > isVisible || poseKeypoints[indexSecondary+2] > isVisible)
-                {
-                    const auto xA = intRound(poseKeypoints[indexMain]);
-                    const auto yA = intRound(poseKeypoints[indexMain+1]);
-                    const auto xB = intRound(poseKeypoints[indexSecondary]);
-                    const auto yB = intRound(poseKeypoints[indexSecondary+1]);
-                    int x;
-                    int y;
-                    if (poseKeypoints[indexMain+2] > isVisible && poseKeypoints[indexSecondary+2] > isVisible)
-                    {
-                        const auto keypointRatio = intRound(0.15f * std::sqrt((xA-xB)*(xA-xB) + (yA-yB)*(yA-yB)));
-                        x = xA + 3*keypointRatio;
-                        y = yA - 3*keypointRatio;
-                    }
-                    else if (poseKeypoints[indexMain+2] > isVisible)
-                    {
-                        x = xA + intRound(0.25f*borderMargin);
-                        y = yA - intRound(0.25f*borderMargin);
-                    }
-                    else //if (poseKeypoints[indexSecondary+2] > isVisible)
-                    {
-                        x = xB + intRound(0.25f*borderMargin);
-                        y = yB - intRound(0.5f*borderMargin);
-                    }
-                    putTextOnCvMat(cvOutputData, std::to_string(poseIds[i]), {x, y}, white, false, cvOutputData.cols);
-                }
-            }
             // OpenPose name as well as help or part to show
             putTextOnCvMat(cvOutputData, "OpenPose - " +
                            (!mLastElementRenderedName.empty() ?

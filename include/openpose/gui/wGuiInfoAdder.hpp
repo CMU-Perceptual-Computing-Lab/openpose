@@ -58,8 +58,7 @@ namespace op
                 for (auto& tDatum : *tDatums)
                     spGuiInfoAdder->addInfo(tDatum.cvOutputData, std::max(tDatum.poseKeypoints.getSize(0),
                                                                           tDatum.faceKeypoints.getSize(0)),
-                                            tDatum.id, tDatum.elementRendered.second, tDatum.frameNumber,
-                                            tDatum.poseIds, tDatum.poseKeypoints);
+                                            tDatum.id, tDatum.elementRendered.second, tDatum.frameNumber);
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
                 Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);
