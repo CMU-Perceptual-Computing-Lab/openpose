@@ -1,4 +1,3 @@
-#include <iostream>
 #include <openpose/experimental/tracking/pyramidalLK.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/experimental/tracking/personIdExtractor.hpp>
@@ -236,6 +235,15 @@ namespace op
         mNumberFramesToDeletePerson{numberFramesToDeletePerson},
         mNextPersonId{0ll}
     {
+        try
+        {
+            error("PersonIdExtractor (`identification` flag) not available yet, but we are working on it! Coming"
+                  " soon!", __LINE__, __FUNCTION__, __FILE__);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
     }
 
     PersonIdExtractor::~PersonIdExtractor()
