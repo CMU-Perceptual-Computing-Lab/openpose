@@ -2,7 +2,6 @@
 #include <opencv2/core/core.hpp> // cv::Point2f, cv::Mat
 #include <opencv2/imgproc/imgproc.hpp> // cv::pyrDown
 #include <openpose/experimental/tracking/pyramidalLK.hpp>
-#include "CycleTimer.h"
 
 #if defined ( __SSE4_1__)
 #include <emmintrin.h>
