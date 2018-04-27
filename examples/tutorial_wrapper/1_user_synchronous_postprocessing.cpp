@@ -1,13 +1,14 @@
-// ------------------------- OpenPose Library Tutorial - Wrapper - Example 2 - Synchronous -------------------------
-// Synchronous mode: ideal for performance. The user can add his own frames producer / post-processor / consumer to the OpenPose wrapper or use the
-// default ones.
-
-// This example shows the user how to use the OpenPose wrapper class:
-    // 1. User reads images
-    // 2. Extract and render keypoint / heatmap / PAF of that image
-    // 3. Save the results on disk
-    // 4. User displays the rendered pose
-    // Everything in a multi-thread scenario
+// ------------------------- OpenPose Library Tutorial - Real Time Pose Estimation -------------------------
+// If the user wants to learn to use the OpenPose library, we highly recommend to start with the `examples/tutorial_*/`
+// folders.
+// This example summarizes all the funcitonality of the OpenPose library:
+    // 1. Read folder of images / video / webcam  (`producer` module)
+    // 2. Extract and render body keypoint / heatmap / PAF of that image (`pose` module)
+    // 3. Extract and render face keypoint / heatmap / PAF of that image (`face` module)
+    // 4. Save the results on disk (`filestream` module)
+    // 5. Display the rendered pose (`gui` module)
+    // Everything in a multi-thread scenario (`thread` module)
+    // Points 2 to 5 are included in the `wrapper` module
 // In addition to the previous OpenPose modules, we also need to use:
     // 1. `core` module:
         // For the Array<float> class that the `pose` module needs
@@ -42,9 +43,28 @@ DEFINE_bool(disable_multi_thread,       false,          "It would slightly reduc
 DEFINE_int32(profile_speed,             1000,           "If PROFILER_ENABLED was set in CMake or Makefile.config files, OpenPose will show some"
                                                         " runtime statistics at this frame number.");
 // Producer
-DEFINE_string(image_dir,                "examples/media/",      "Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).");
+DEFINE_int32(camera,                    -1,             "The camera index for cv::VideoCapture. Integer in the range [0, 9]. Select a negative"
+                                                        " number (by default), to auto-detect and open the first available camera.");
+DEFINE_string(camera_resolution,        "-1x-1",        "Set the camera resolution (either `--camera` or `--flir_camera`). `-1x-1` will use the"
+                                                        " default 1280x720 for `--camera`, or the maximum flir camera resolution available for"
+                                                        " `--flir_camera`");
 DEFINE_double(camera_fps,               30.0,           "Frame rate for the webcam (also used when saving video). Set this value to the minimum"
                                                         " value between the OpenPose displayed speed and the webcam real frame rate.");
+DEFINE_string(video,                    "",             "Use a video file instead of the camera. Use `examples/media/video.avi` for our default"
+                                                        " example video.");
+DEFINE_string(image_dir,                "",             "Process a directory of images. Use `examples/media/` for our default example folder with 20"
+                                                        " images. Read all standard formats (jpg, png, bmp, etc.).");
+DEFINE_bool(flir_camera,                false,          "Whether to use FLIR (Point-Grey) stereo camera.");
+DEFINE_string(ip_camera,                "",             "String with the IP camera URL. It supports protocols like RTSP and HTTP.");
+DEFINE_uint64(frame_first,              0,              "Start on desired frame number. Indexes are 0-based, i.e. the first frame has index 0.");
+DEFINE_uint64(frame_last,               -1,             "Finish on desired frame number. Select -1 to disable. Indexes are 0-based, e.g. if set to"
+                                                        " 10, it will process 11 frames (0-10).");
+DEFINE_bool(frame_flip,                 false,          "Flip/mirror each frame (e.g. for real time webcam demonstrations).");
+DEFINE_int32(frame_rotate,              0,              "Rotate each frame, 4 possible values: 0, 90, 180, 270.");
+DEFINE_bool(frames_repeat,              false,          "Repeat frames when finished.");
+DEFINE_bool(process_real_time,          false,          "Enable to keep the original source frame rate (e.g. for video). If the processing time is"
+                                                        " too long, it will skip frames. If it is too fast, it will slow it down.");
+DEFINE_string(camera_parameter_folder,  "models/cameraParameters/flir/", "String with the folder where the camera parameters are located.");
 // OpenPose
 DEFINE_string(model_folder,             "models/",      "Folder path (absolute or relative) where the models (pose, face, ...) are located.");
 DEFINE_string(output_resolution,        "-1x-1",        "The image resolution (display and output). Use \"-1x-1\" to force the program to use the"
@@ -133,6 +153,8 @@ DEFINE_int32(3d_views,                  1,              "Complementary option to
                                                         " iteration, allowing tasks such as stereo camera processing (`--3d`). Note that"
                                                         " `--camera_parameters_folder` must be set. OpenPose must find as many `xml` files in the"
                                                         " parameter folder as this number indicates.");
+// OpenPose identification
+DEFINE_bool(identification,             false,          "Whether to enable people identification across frames. Not available yet, coming soon.");
 // OpenPose Rendering
 DEFINE_int32(part_to_show,              0,              "Prediction channel to visualize (default: 0). 0 for all the body parts, 1-18 for each body"
                                                         " part heat map, 19 for the background heat map, 20 for all the body part heat maps"
@@ -166,6 +188,13 @@ DEFINE_int32(hand_render,               -1,             "Analogous to `render_po
                                                         " configuration that `render_pose` is using.");
 DEFINE_double(hand_alpha_pose,          0.6,            "Analogous to `alpha_pose` but applied to hand.");
 DEFINE_double(hand_alpha_heatmap,       0.7,            "Analogous to `alpha_heatmap` but applied to hand.");
+// Display
+DEFINE_bool(fullscreen,                 false,          "Run in full-screen mode (press f during runtime to toggle).");
+DEFINE_bool(no_gui_verbose,             false,          "Do not write text on output images on GUI (e.g. number of current frame and people). It"
+                                                        " does not affect the pose rendering.");
+DEFINE_int32(display,                   -1,             "Display mode: -1 for automatic selection; 0 for no display (useful if there is no X server"
+                                                        " and/or to slightly speed up the processing if visual output is not required); 2 for 2-D"
+                                                        " display; 3 for 3-D display (if `--3d` enabled); and 1 for both 2-D and 3-D display.");
 // Result Saving
 DEFINE_string(write_images,             "",             "Directory to write rendered frames in `write_images_format` image format.");
 DEFINE_string(write_images_format,      "png",          "File extension and format for `write_images`, e.g. png, jpg or bmp. Check the OpenCV"
@@ -204,72 +233,6 @@ struct UserDatum : public op::Datum
 // that the user usually knows which kind of data he will move between the queues,
 // in this case we assume a std::shared_ptr of a std::vector of UserDatum
 
-// This worker will just read and return all the jpg files in a directory
-class WUserInput : public op::WorkerProducer<std::shared_ptr<std::vector<UserDatum>>>
-{
-public:
-    WUserInput(const std::string& directoryPath) :
-        mImageFiles{op::getFilesOnDirectory(directoryPath, "jpg")},
-        // If we want "jpg" + "png" images
-        // mImageFiles{op::getFilesOnDirectory(directoryPath, std::vector<std::string>{"jpg", "png"})},
-        mCounter{0}
-    {
-        if (mImageFiles.empty())
-            op::error("No images found on: " + directoryPath, __LINE__, __FUNCTION__, __FILE__);
-    }
-
-    void initializationOnThread() {}
-
-    std::shared_ptr<std::vector<UserDatum>> workProducer()
-    {
-        try
-        {
-            // Close program when empty frame
-            if (mImageFiles.size() <= mCounter)
-            {
-                op::log("Last frame read and added to queue. Closing program after it is processed.",
-                        op::Priority::High);
-                // This funtion stops this worker, which will eventually stop the whole thread system once all the
-                // frames have been processed
-                this->stop();
-                return nullptr;
-            }
-            else
-            {
-                // Create new datum
-                auto datumsPtr = std::make_shared<std::vector<UserDatum>>();
-                datumsPtr->emplace_back();
-                auto& datum = datumsPtr->at(0);
-
-                // Fill datum
-                datum.cvInputData = cv::imread(mImageFiles.at(mCounter++));
-
-                // If empty frame -> return nullptr
-                if (datum.cvInputData.empty())
-                {
-                    op::log("Empty frame detected on path: " + mImageFiles.at(mCounter-1) + ". Closing program.",
-                        op::Priority::High);
-                    this->stop();
-                    datumsPtr = nullptr;
-                }
-
-                return datumsPtr;
-            }
-        }
-        catch (const std::exception& e)
-        {
-            op::log("Some kind of unexpected error happened.");
-            this->stop();
-            op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return nullptr;
-        }
-    }
-
-private:
-    const std::vector<std::string> mImageFiles;
-    unsigned long long mCounter;
-};
-
 // This worker will just invert the image
 class WUserPostProcessing : public op::Worker<std::shared_ptr<std::vector<UserDatum>>>
 {
@@ -294,98 +257,24 @@ public:
         }
         catch (const std::exception& e)
         {
-            op::log("Some kind of unexpected error happened.");
             this->stop();
             op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
     }
 };
 
-// This worker will just read and return all the jpg files in a directory
-class WUserOutput : public op::WorkerConsumer<std::shared_ptr<std::vector<UserDatum>>>
-{
-public:
-    void initializationOnThread() {}
-
-    void workConsumer(const std::shared_ptr<std::vector<UserDatum>>& datumsPtr)
-    {
-        try
-        {
-            // User's displaying/saving/other processing here
-                // datum.cvOutputData: rendered frame with pose or heatmaps
-                // datum.poseKeypoints: Array<float> with the estimated pose
-            if (datumsPtr != nullptr && !datumsPtr->empty())
-            {
-                // Show in command line the resulting pose keypoints for body, face and hands
-                op::log("\nKeypoints:");
-                // Accesing each element of the keypoints
-                const auto& poseKeypoints = datumsPtr->at(0).poseKeypoints;
-                op::log("Person pose keypoints:");
-                for (auto person = 0 ; person < poseKeypoints.getSize(0) ; person++)
-                {
-                    op::log("Person " + std::to_string(person) + " (x, y, score):");
-                    for (auto bodyPart = 0 ; bodyPart < poseKeypoints.getSize(1) ; bodyPart++)
-                    {
-                        std::string valueToPrint;
-                        for (auto xyscore = 0 ; xyscore < poseKeypoints.getSize(2) ; xyscore++)
-                        {
-                            valueToPrint += std::to_string(   poseKeypoints[{person, bodyPart, xyscore}]   ) + " ";
-                        }
-                        op::log(valueToPrint);
-                    }
-                }
-                op::log(" ");
-                // Alternative: just getting std::string equivalent
-                op::log("Face keypoints: " + datumsPtr->at(0).faceKeypoints.toString());
-                op::log("Left hand keypoints: " + datumsPtr->at(0).handKeypoints[0].toString());
-                op::log("Right hand keypoints: " + datumsPtr->at(0).handKeypoints[1].toString());
-                // Heatmaps
-                const auto& poseHeatMaps = datumsPtr->at(0).poseHeatMaps;
-                if (!poseHeatMaps.empty())
-                {
-                    op::log("Pose heatmaps size: [" + std::to_string(poseHeatMaps.getSize(0)) + ", "
-                            + std::to_string(poseHeatMaps.getSize(1)) + ", "
-                            + std::to_string(poseHeatMaps.getSize(2)) + "]");
-                    const auto& faceHeatMaps = datumsPtr->at(0).faceHeatMaps;
-                    op::log("Face heatmaps size: [" + std::to_string(faceHeatMaps.getSize(0)) + ", "
-                            + std::to_string(faceHeatMaps.getSize(1)) + ", "
-                            + std::to_string(faceHeatMaps.getSize(2)) + ", "
-                            + std::to_string(faceHeatMaps.getSize(3)) + "]");
-                    const auto& handHeatMaps = datumsPtr->at(0).handHeatMaps;
-                    op::log("Left hand heatmaps size: [" + std::to_string(handHeatMaps[0].getSize(0)) + ", "
-                            + std::to_string(handHeatMaps[0].getSize(1)) + ", "
-                            + std::to_string(handHeatMaps[0].getSize(2)) + ", "
-                            + std::to_string(handHeatMaps[0].getSize(3)) + "]");
-                    op::log("Right hand heatmaps size: [" + std::to_string(handHeatMaps[1].getSize(0)) + ", "
-                            + std::to_string(handHeatMaps[1].getSize(1)) + ", "
-                            + std::to_string(handHeatMaps[1].getSize(2)) + ", "
-                            + std::to_string(handHeatMaps[1].getSize(3)) + "]");
-                }
-
-                // Display rendered output image
-                cv::imshow("User worker GUI", datumsPtr->at(0).cvOutputData);
-                // Display image and sleeps at least 1 ms (it usually sleeps ~5-10 msec to display the image)
-                const char key = (char)cv::waitKey(1);
-                if (key == 27)
-                    this->stop();
-            }
-        }
-        catch (const std::exception& e)
-        {
-            op::log("Some kind of unexpected error happened.");
-            this->stop();
-            op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-        }
-    }
-};
-
-int openPoseTutorialWrapper2()
+int openPoseDemo()
 {
     // logging_level
     op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.",
               __LINE__, __FUNCTION__, __FILE__);
     op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
     op::Profiler::setDefaultX(FLAGS_profile_speed);
+    // // For debugging
+    // // Print all logging messages
+    // op::ConfigureLog::setPriorityThreshold(op::Priority::None);
+    // // Print out speed values faster
+    // op::Profiler::setDefaultX(100);
 
     op::log("Starting pose estimation demo.", op::Priority::High);
     const auto timerBegin = std::chrono::high_resolution_clock::now();
@@ -399,6 +288,11 @@ int openPoseTutorialWrapper2()
     const auto faceNetInputSize = op::flagsToPoint(FLAGS_face_net_resolution, "368x368 (multiples of 16)");
     // handNetInputSize
     const auto handNetInputSize = op::flagsToPoint(FLAGS_hand_net_resolution, "368x368 (multiples of 16)");
+    // producerType
+    const auto producerSharedPtr = op::flagsToProducer(FLAGS_image_dir, FLAGS_video, FLAGS_ip_camera, FLAGS_camera,
+                                                       FLAGS_flir_camera, FLAGS_camera_resolution, FLAGS_camera_fps,
+                                                       FLAGS_camera_parameter_folder,
+                                                       (unsigned int) FLAGS_3d_views);
     // poseModel
     const auto poseModel = op::flagsToPoseModel(FLAGS_model_pose);
     // JSON saving
@@ -413,32 +307,25 @@ int openPoseTutorialWrapper2()
                                                   FLAGS_heatmaps_add_PAFs);
     const auto heatMapScale = op::flagsToHeatMapScaleMode(FLAGS_heatmaps_scale);
     // >1 camera view?
-    const auto multipleView = (FLAGS_3d || FLAGS_3d_views > 1);
+    const auto multipleView = (FLAGS_3d || FLAGS_3d_views > 1 || FLAGS_flir_camera);
     // Enabling Google Logging
     const bool enableGoogleLogging = true;
     // Logging
     op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
+    // OpenPose wrapper
+    op::log("Configuring OpenPose wrapper.", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+    // op::Wrapper<std::vector<op::Datum>> opWrapper;
+    op::Wrapper<std::vector<UserDatum>> opWrapper;
+
     // Initializing the user custom classes
-    // Frames producer (e.g. video, webcam, ...)
-    auto wUserInput = std::make_shared<WUserInput>(FLAGS_image_dir);
     // Processing
     auto wUserPostProcessing = std::make_shared<WUserPostProcessing>();
-    // GUI (Display)
-    auto wUserOutput = std::make_shared<WUserOutput>();
-
-    op::Wrapper<std::vector<UserDatum>> opWrapper;
-    // Add custom input
-    const auto workerInputOnNewThread = false;
-    opWrapper.setWorkerInput(wUserInput, workerInputOnNewThread);
     // Add custom processing
-    const auto workerProcessingOnNewThread = false;
+    const auto workerProcessingOnNewThread = true;
     opWrapper.setWorkerPostProcessing(wUserPostProcessing, workerProcessingOnNewThread);
-    // Add custom output
-    const auto workerOutputOnNewThread = true;
-    opWrapper.setWorkerOutput(wUserOutput, workerOutputOnNewThread);
-    // Configure OpenPose
-    op::log("Configuring OpenPose wrapper.", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+
+    // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
     const op::WrapperStructPose wrapperStructPose{!FLAGS_body_disable, netInputSize, outputSize, keypointScale,
                                                   FLAGS_num_gpu, FLAGS_num_gpu_start, FLAGS_scale_number,
                                                   (float)FLAGS_scale_gap,
@@ -447,7 +334,8 @@ int openPoseTutorialWrapper2()
                                                   (float)FLAGS_alpha_heatmap, FLAGS_part_to_show, FLAGS_model_folder,
                                                   heatMapTypes, heatMapScale, FLAGS_part_candidates,
                                                   (float)FLAGS_render_threshold, FLAGS_number_people_max,
-                                                  enableGoogleLogging, FLAGS_3d, FLAGS_3d_min_views};
+                                                  enableGoogleLogging, FLAGS_3d, FLAGS_3d_min_views,
+                                                  FLAGS_identification};
     // Face configuration (use op::WrapperStructFace{} to disable it)
     const op::WrapperStructFace wrapperStructFace{FLAGS_face, faceNetInputSize,
                                                   op::flagsToRenderMode(FLAGS_face_render, multipleView, FLAGS_render_pose),
@@ -459,30 +347,34 @@ int openPoseTutorialWrapper2()
                                                   op::flagsToRenderMode(FLAGS_hand_render, multipleView, FLAGS_render_pose),
                                                   (float)FLAGS_hand_alpha_pose, (float)FLAGS_hand_alpha_heatmap,
                                                   (float)FLAGS_hand_render_threshold};
+    // Producer (use default to disable any input)
+    const op::WrapperStructInput wrapperStructInput{producerSharedPtr, FLAGS_frame_first, FLAGS_frame_last,
+                                                    FLAGS_process_real_time, FLAGS_frame_flip, FLAGS_frame_rotate,
+                                                    FLAGS_frames_repeat};
     // Consumer (comment or use default argument to disable any output)
-    const auto displayMode = op::DisplayMode::NoDisplay;
-    const bool guiVerbose = false;
-    const bool fullScreen = false;
-    const op::WrapperStructOutput wrapperStructOutput{displayMode, guiVerbose, fullScreen, FLAGS_write_keypoint,
+    const op::WrapperStructOutput wrapperStructOutput{op::flagsToDisplayMode(FLAGS_display, FLAGS_3d),
+                                                      !FLAGS_no_gui_verbose, FLAGS_fullscreen, FLAGS_write_keypoint,
                                                       op::stringToDataFormat(FLAGS_write_keypoint_format),
                                                       writeJson, FLAGS_write_coco_json,
                                                       FLAGS_write_images, FLAGS_write_images_format, FLAGS_write_video,
                                                       FLAGS_camera_fps, FLAGS_write_heatmaps,
                                                       FLAGS_write_heatmaps_format};
     // Configure wrapper
-    opWrapper.configure(wrapperStructPose, wrapperStructFace, wrapperStructHand, op::WrapperStructInput{},
+    opWrapper.configure(wrapperStructPose, wrapperStructFace, wrapperStructHand, wrapperStructInput,
                         wrapperStructOutput);
     // Set to single-thread running (to debug and/or reduce latency)
     if (FLAGS_disable_multi_thread)
-       opWrapper.disableMultiThreading();
+        opWrapper.disableMultiThreading();
 
-    op::log("Starting thread(s)", op::Priority::High);
+    // Start processing
     // Two different ways of running the program on multithread environment
-    // // Option a) Recommended - Also using the main thread (this thread) for processing (it saves 1 thread)
-    // // Start, run & stop threads
+    op::log("Starting thread(s)", op::Priority::High);
+    // Option a) Recommended - Also using the main thread (this thread) for processing (it saves 1 thread)
+    // Start, run & stop threads
     opWrapper.exec();  // It blocks this thread until all threads have finished
 
-    // Option b) Keeping this thread free in case you want to do something else meanwhile, e.g. profiling the GPU memory
+    // // Option b) Keeping this thread free in case you want to do something else meanwhile, e.g. profiling the GPU
+    // memory
     // // VERY IMPORTANT NOTE: if OpenCV is compiled with Qt support, this option will not work. Qt needs the main
     // // thread to plot visual results, so the final GUI (which uses OpenCV) would return an exception similar to:
     // // `QMetaMethod::invoke: Unable to invoke methods with return values in queued connections`
@@ -491,11 +383,13 @@ int openPoseTutorialWrapper2()
     // // Profile used GPU memory
     //     // 1: wait ~10sec so the memory has been totally loaded on GPU
     //     // 2: profile the GPU memory
-    // std::this_thread::sleep_for(std::chrono::milliseconds{1000});
-    // op::log("Random task here...", op::Priority::High);
+    // const auto sleepTimeMs = 10;
+    // for (auto i = 0 ; i < 10000/sleepTimeMs && opWrapper.isRunning() ; i++)
+    //     std::this_thread::sleep_for(std::chrono::milliseconds{sleepTimeMs});
+    // op::Profiler::profileGpuMemory(__LINE__, __FUNCTION__, __FILE__);
     // // Keep program alive while running threads
     // while (opWrapper.isRunning())
-    //     std::this_thread::sleep_for(std::chrono::milliseconds{33});
+    //     std::this_thread::sleep_for(std::chrono::milliseconds{sleepTimeMs});
     // // Stop and join threads
     // op::log("Stopping thread(s)", op::Priority::High);
     // opWrapper.stop();
@@ -516,6 +410,6 @@ int main(int argc, char *argv[])
     // Parsing command line flags
     gflags::ParseCommandLineFlags(&argc, &argv, true);
 
-    // Running openPoseTutorialWrapper2
-    return openPoseTutorialWrapper2();
+    // Running openPoseDemo
+    return openPoseDemo();
 }
