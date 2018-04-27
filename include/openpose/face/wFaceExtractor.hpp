@@ -58,7 +58,7 @@ namespace op
                 // Extract people face
                 for (auto& tDatum : *tDatums)
                 {
-                    spFaceExtractor->forwardPass(tDatum.faceRectangles, tDatum.cvInputData, tDatum.scaleInputToOutput);
+                    spFaceExtractor->forwardPass(tDatum.faceRectangles, tDatum.cvInputData);
                     tDatum.faceHeatMaps = spFaceExtractor->getHeatMaps().clone();
                     tDatum.faceKeypoints = spFaceExtractor->getFaceKeypoints().clone();
                 }

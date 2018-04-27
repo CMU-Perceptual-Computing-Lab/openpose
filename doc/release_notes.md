@@ -214,10 +214,14 @@ OpenPose Library - Release Notes
 ## Current version - future OpenPose 1.3.1
 1. Main improvements:
     1. Flir cameras: Added software trigger and a dedicated thread to keep reading images to remove latency (analogously to webcamReader).
+    2. 3-D reconstruction: Added non-linear minimization to further improve 3-D triangulation accuracy by ~5% (Ubuntu only).
+    3. CMake: All libraries as single variable (simpler to add/remove libraries).
+    4. Datum includes extrinsic and intrinsic camera parameters.
 2. Functions or parameters renamed:
     1. Removed scale parameter from hand and face rectangle extractor (causing wrong results if custom `--output_resolution`).
 3. Main bugs fixed:
-    1. Hand and face work properly again with any `--output_resolution`.
+    1. Fixed hand and face extraction and rendering scaling issues when `--output_resolution` is not the default one.
+    2. Part candidates (`--part_candidates`) are saved with the same scale than the final keypoints itself.
 
 
 

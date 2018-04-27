@@ -780,6 +780,40 @@ namespace op
         }
     }
 
+    std::vector<cv::Mat> SpinnakerWrapper::getCameraExtrinsics() const
+    {
+        try
+        {
+            #ifdef WITH_FLIR_CAMERA
+                return upImpl->mCameraParameterReader.getCameraExtrinsics();
+            #else
+                return {};
+            #endif
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return {};
+        }
+    }
+
+    std::vector<cv::Mat> SpinnakerWrapper::getCameraIntrinsics() const
+    {
+        try
+        {
+            #ifdef WITH_FLIR_CAMERA
+                return upImpl->mCameraParameterReader.getCameraIntrinsics();
+            #else
+                return {};
+            #endif
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return {};
+        }
+    }
+
     Point<int> SpinnakerWrapper::getResolution() const
     {
         try

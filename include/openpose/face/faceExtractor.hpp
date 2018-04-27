@@ -42,11 +42,8 @@ namespace op
          * (similar to cv::Rect for floating values) with the position of that face (or 0,0,0,0 if
          * some face is missing, e.g. if a specific person has only half of the body inside the image).
          * @param cvInputData Original image in cv::Mat format and BGR format.
-         * @param scaleInputToOutput Desired scale of the final keypoints. Set to 1 if the desired size is the
-         * cvInputData size.
          */
-        virtual void forwardPass(const std::vector<Rectangle<float>>& faceRectangles, const cv::Mat& cvInputData,
-                                 const double scaleInputToOutput) = 0;
+        virtual void forwardPass(const std::vector<Rectangle<float>>& faceRectangles, const cv::Mat& cvInputData) = 0;
 
         Array<float> getHeatMaps() const;
 

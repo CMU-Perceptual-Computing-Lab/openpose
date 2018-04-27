@@ -72,6 +72,32 @@ namespace op
         }
     }
 
+    std::vector<cv::Mat> WebcamReader::getCameraExtrinsics()
+    {
+        try
+        {
+            return {};
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return {};
+        }
+    }
+
+    std::vector<cv::Mat> WebcamReader::getCameraIntrinsics()
+    {
+        try
+        {
+            return {};
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return {};
+        }
+    }
+
     std::string WebcamReader::getNextFrameName()
     {
         try

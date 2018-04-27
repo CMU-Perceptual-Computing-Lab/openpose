@@ -6,6 +6,7 @@ set(SOURCES_OP_FACE
     faceExtractorCaffe.cpp
     faceCpuRenderer.cpp
     faceGpuRenderer.cpp
+    faceRenderer.cpp
     renderFace.cpp
     renderFace.cu)
 

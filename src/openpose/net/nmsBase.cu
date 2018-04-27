@@ -48,7 +48,8 @@ namespace op
 
     template <typename T>
     __global__ void writeResultKernel(T* output, const int length, const int* const kernelPtr,
-                                      const T* const sourcePtr, const int width, const int height, const int maxPeaks)
+                                      const T* const sourcePtr, const int width, const int height, const int maxPeaks,
+                                      const T offsetX, const T offsetY)
     {
         __shared__ int local[THREADS_PER_BLOCK+1]; // one more
         const auto globalIdx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -101,9 +102,12 @@ namespace op
                             }
                         }
 
+                        // Offset to keep Matlab format (empirically higher acc)
+                        // Best results for 1 scale: x + 0, y + 0.5
+                        // +0.5 to both to keep Matlab format
                         const auto outputIndex = (peakIndex + 1) * 3;
-                        output[outputIndex] = xAcc / scoreAcc;
-                        output[outputIndex + 1] = yAcc / scoreAcc;
+                        output[outputIndex] = xAcc / scoreAcc + offsetX;
+                        output[outputIndex + 1] = yAcc / scoreAcc + offsetY;
                         output[outputIndex + 2] = sourcePtr[peakLocY*width + peakLocX];
                     }
                 }
@@ -115,7 +119,7 @@ namespace op
 
     template <typename T>
     void nmsGpu(T* targetPtr, int* kernelPtr, const T* const sourcePtr, const T threshold,
-                const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize)
+                const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize, const Point<T>& offset)
     {
         try
         {
@@ -177,7 +181,7 @@ namespace op
                     // This returns targetPtrOffsetted, with the NMS applied over it
                     writeResultKernel<<<numBlocks1D, threadsPerBlock1D>>>(targetPtrOffsetted, imageOffset,
                                                                           kernelPtrOffsetted, sourcePtrOffsetted,
-                                                                          width, height, maxPeaks);
+                                                                          width, height, maxPeaks, offset.x, offset.y);
                 }
             }
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
@@ -189,7 +193,9 @@ namespace op
     }
 
     template void nmsGpu(float* targetPtr, int* kernelPtr, const float* const sourcePtr, const float threshold,
-                         const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize);
+                         const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize,
+                         const Point<float>& offset);
     template void nmsGpu(double* targetPtr, int* kernelPtr, const double* const sourcePtr, const double threshold,
-                         const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize);
+                         const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize,
+                         const Point<double>& offset);
 }
