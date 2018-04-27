@@ -237,8 +237,8 @@ namespace op
     {
         try
         {
-            error("PersonIdExtractor (`identification` flag) not available yet, but we are working on it! Coming"
-                  " soon!", __LINE__, __FUNCTION__, __FILE__);
+            error("PersonIdExtractor (`identification` flag) buggy and not working yet, but we are working on it!"
+                  " Coming soon!", __LINE__, __FUNCTION__, __FILE__);
         }
         catch (const std::exception& e)
         {
