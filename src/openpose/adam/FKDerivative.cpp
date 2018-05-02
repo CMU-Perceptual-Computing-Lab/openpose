@@ -300,6 +300,28 @@ void SparseProductDerivative(const double* const dA_data, const double* const B_
     // }
 }
 
+void SparseProductDerivativeConstA(const double* const A_data, const double* const dB_data,
+                             const std::vector<int>& parentIndexes, double* dAB_data)
+{
+	// d(AB) = AdB (A is a constant.)
+	const auto numberColumns = TotalModel::NUM_JOINTS * 3;
+    // Sparse for loop form
+    std::fill(dAB_data, dAB_data + 9*TotalModel::NUM_JOINTS, 0.0);
+    for (int r = 0; r < 3; r++)
+    {
+		for (const auto& parentIndex : parentIndexes)
+	    {
+	    	const auto parentOffset = 3*parentIndex;
+	    	for (int subIndex = 0; subIndex < 3; subIndex++)
+            {
+            	const auto finalOffset = parentOffset + subIndex;
+            	dAB_data[numberColumns * r + finalOffset] = A_data[3 * r + 0] * dB_data[finalOffset] + A_data[3 * r + 1] * dB_data[finalOffset + numberColumns] +
+            		A_data[3 * r + 2] * dB_data[finalOffset + numberColumns + numberColumns];
+            }
+		}
+	}
+}
+
 void SparseAdd(const double* const B_data, const std::vector<int>& parentIndexes, double* A_data)
 {
     // d(AB) += d(AB)_parent
@@ -322,4 +344,49 @@ void SparseAdd(const double* const B_data, const std::vector<int>& parentIndexes
     // // Dense equivalent
     // dMtdPIdj += dJdP.block<3, numberColumns>(3 * ipar, 0);
     // A += B;
+}
+
+void SparseSubtract(const double* const B_data, const std::vector<int>& parentIndexes, double* A_data)
+{
+    // d(AB) += d(AB)_parent
+    const auto numberColumns = TotalModel::NUM_JOINTS * 3;
+    Eigen::Map< Eigen::Matrix<double, 3, numberColumns, Eigen::RowMajor>> A(A_data);
+    const Eigen::Map<const Eigen::Matrix<double, 3, numberColumns, Eigen::RowMajor>> B(B_data);
+    // Sparse for loop
+    for (int r = 0; r < 3; r++)
+    {
+        for (const auto& parentIndex : parentIndexes)
+        {
+            const auto parentOffset = 3*parentIndex;
+            for (int subIndex = 0; subIndex < 3; subIndex++)
+            {
+                const auto finalOffset = parentOffset + subIndex;
+                A_data[numberColumns*r + finalOffset] -= B_data[numberColumns*r + finalOffset];
+            }
+        }
+    }
+    // // Dense equivalent
+    // dMtdPIdj -= dJdP.block<3, numberColumns>(3 * ipar, 0);
+    // A -= B;
+}
+
+void projection_Derivative(double* dPdI_data, const double* dJdI_data, const int ncol, double* XYZ, const double* pK_, int offsetP, int offsetJ, float weight)
+{
+	// Dx/Dt = dx/dX * dX/dt + dx/dY * dY/dt + dx/dZ * dZ/dt
+	const double X = XYZ[0], Y = XYZ[1], Z = XYZ[2];
+	double* P_row0 = dPdI_data + offsetP * ncol;
+	double* P_row1 = dPdI_data + (offsetP + 1) * ncol;
+	const double* J_row0 = dJdI_data + offsetJ * ncol;
+	const double* J_row1 = dJdI_data + (offsetJ + 1) * ncol;
+	const double* J_row2 = dJdI_data + (offsetJ + 2) * ncol;
+	for (int i = 0; i < ncol; i++)
+		P_row0[i] = weight * ( pK_[0] * J_row0[i] + pK_[1] * J_row1[i] - (pK_[0] * X + pK_[1] * Y) * J_row2[i] / Z ) / Z;
+	for (int i = 0; i < ncol; i++)
+		P_row1[i] = weight * pK_[4] * ( J_row1[i] - Y / Z * J_row2[i] ) / Z;
+	// equivalent to
+	// dPdI.row(offsetP + 0) = weight * (pK_[0] / Z * dJdI.row(offsetJ + 0)
+	// 					 + pK_[1] / Z * dJdI.row(offsetJ + 1)
+	// 					 - (pK_[0] * X + pK_[1] * Y) / Z / Z * dJdI.row(offsetJ + 2));
+	// dPdI.row(offsetP + 1) = weight * (pK_[4] / Z * dJdI.row(offsetJ + 1)
+	// 					 - pK_[4] * Y / Z / Z * dJdI.row(offsetJ + 2));
 }

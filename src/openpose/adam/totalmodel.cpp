@@ -23,24 +23,26 @@ void initMatrix(Eigen::Matrix<Derived, rows, cols>& m, const Json::Value& value)
 {
     if(m.cols() == 1) { // a vector
         m.resize(value.size(), 1);
-        for (uint i = 0; i < value.size(); i++)
-        {
-            if (strcmp(typeid(Derived).name(), "i") == 0) // the passed in matrix is Int
-                m(i, 0) = value[i].asInt();
-            else // the passed in matrix is should be double
-                m(i, 0) = value[i].asDouble();
-        }
+        auto* m_data = m.data();
+        if (strcmp(typeid(Derived).name(), "i") == 0) // the passed in matrix is Int
+		    for (uint i = 0; i < value.size(); i++)
+	            m_data[i] = value[i].asInt();
+        else // the passed in matrix should be double
+		    for (uint i = 0; i < value.size(); i++)
+                m_data[i] = value[i].asDouble();
     }
-    else  { // a matrix
-        m.resize(value.size(), value[0u].size());
-        for (uint i = 0; i < value.size(); i++)
-            for (uint j = 0; j < value[i].size(); j++)
-            {
-                if (strcmp(typeid(Derived).name(), "i") == 0)
-                    m(i, j) = value[i][j].asInt();
-                else
-                    m(i, j) = value[i][j].asDouble();
-            }
+    else  { // a matrix (column major)
+    	const int nrow = value.size(), ncol = value[0u].size();
+        m.resize(nrow, ncol);
+        auto* m_data = m.data();
+        if (strcmp(typeid(Derived).name(), "i") == 0)
+	        for (uint i = 0; i < value.size(); i++)
+	            for (uint j = 0; j < value[i].size(); j++)
+	            	m_data[j * nrow + i] = value[i][j].asInt();
+        else
+	        for (uint i = 0; i < value.size(); i++)
+	            for (uint j = 0; j < value[i].size(); j++)
+                    m_data[j * nrow + i] = value[i][j].asDouble();
     }
     std::cout << "rows " << m.rows() << " cols " << m.cols() << std::endl;
 }
@@ -50,24 +52,26 @@ void initRowMajorMatrix(Eigen::Matrix<Derived, rows, cols, option>& m, const Jso
 {
     if(m.cols() == 1) { // a vector
         m.resize(value.size(), 1);
-        for (uint i = 0; i < value.size(); i++)
-        {
-            if (strcmp(typeid(Derived).name(), "i") == 0) // the passed in matrix is Int
-                m(i, 0) = value[i].asInt();
-            else // the passed in matrix is should be double
-                m(i, 0) = value[i].asDouble();
-        }
+        auto* m_data = m.data();
+        if (strcmp(typeid(Derived).name(), "i") == 0) // the passed in matrix is Int
+		    for (uint i = 0; i < value.size(); i++)
+	            m_data[i] = value[i].asInt();
+        else // the passed in matrix should be double
+		    for (uint i = 0; i < value.size(); i++)
+                m_data[i] = value[i].asDouble();
     }
-    else  { // a matrix
-        m.resize(value.size(), value[0u].size());
-        for (uint i = 0; i < value.size(); i++)
-            for (uint j = 0; j < value[i].size(); j++)
-            {
-                if (strcmp(typeid(Derived).name(), "i") == 0)
-                    m(i, j) = value[i][j].asInt();
-                else
-                    m(i, j) = value[i][j].asDouble();
-            }
+    else  { // a matrix (column major)
+    	const int nrow = value.size(), ncol = value[0u].size();
+        m.resize(nrow, ncol);
+        auto* m_data = m.data();
+        if (strcmp(typeid(Derived).name(), "i") == 0)
+	        for (uint i = 0; i < value.size(); i++)
+	            for (uint j = 0; j < value[i].size(); j++)
+	            	m_data[i * ncol + j] = value[i][j].asInt();
+        else
+	        for (uint i = 0; i < value.size(); i++)
+	            for (uint j = 0; j < value[i].size(); j++)
+                    m_data[i * ncol + j] = value[i][j].asDouble();
     }
     std::cout << "rows " << m.rows() << " cols " << m.cols() << std::endl;
 }
@@ -75,23 +79,31 @@ void initRowMajorMatrix(Eigen::Matrix<Derived, rows, cols, option>& m, const Jso
 template<typename Derived, int option>
 void initSparseMatrix(Eigen::SparseMatrix<Derived, option>& m, const Json::Value& value)
 {
-	uint i, j;
-	for (uint k = 0; k < value.size(); k++)
+	if (strcmp(typeid(Derived).name(), "i") == 0)
 	{
-		assert(value[k].size() == 3);
-		if (k == 0)
+		// The first row specifies the size of the sparse matrix
+		m.resize(value[0u][0u].asInt(), value[0u][1u].asInt());
+		for (uint k = 1u; k < value.size(); k++)
 		{
-			// The first row specifies the size of the sparse matrix
-			m.resize(value[k][0u].asInt(), value[k][1u].asInt());
-			continue;
-		}
-		// From the second row on, triplet correspond to matrix entries
-		i = (uint)value[k][0u].asInt();
-		j = (uint)value[k][1u].asInt();
-		if (strcmp(typeid(Derived).name(), "i") == 0)
+			assert(value[k].size() == 3);
+			// From the second row on, triplet correspond to matrix entries
+			const int i = value[k][0u].asInt();
+			const int j = value[k][1u].asInt();
 			m.insert(i, j) = value[k][2u].asInt();
-		else
+		}
+	}
+	else
+	{
+		// The first row specifies the size of the sparse matrix
+		m.resize(value[0u][0u].asInt(), value[0u][1u].asInt());
+		for (uint k = 1u; k < value.size(); k++)
+		{
+			assert(value[k].size() == 3);
+			// From the second row on, triplet correspond to matrix entries
+			const int i = value[k][0u].asInt();
+			const int j = value[k][1u].asInt();
 			m.insert(i, j) = value[k][2u].asDouble();
+		}
 	}
 	std::cout << "rows " << m.rows() << " cols " << m.cols() << std::endl;
 }
@@ -106,9 +118,7 @@ void LoadTotalDataFromJson(TotalModel &totalm, const std::string &path, const st
 
     // Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> stmp;
     initSparseMatrix(totalm.m_J_reg, root["adam_J_regressor_big"]);
-    // totalm.m_J_reg = stmp.sparseView();
     initSparseMatrix(totalm.m_J_reg_smc, root["adam_J_regressor_big_smc"]);
-    // totalm.m_J_reg_smc = stmp.sparseView();
 
     initMatrix(totalm.m_blendW, root["blendW"]);
     initMatrix(totalm.m_kintree_table, root["kintree_table"]);

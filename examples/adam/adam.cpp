@@ -229,7 +229,7 @@ DEFINE_string(write_adam,               "",             "E.g.: /media/posefs3b/U
 
 smpl::SMPLParams frame_params;
 std::shared_ptr<Renderer> render;
-const int num_body_joint = 19;
+const int num_body_joint = 20;
 const int num_hand_joint = 21;
 const int num_face_landmark = 70;
 
@@ -321,14 +321,14 @@ struct UserDatum : public op::Datum
 {
     // TotalModel g_total_model;
     // smpl::SMPLParams frame_params;
-    std::array<double, 183> targetJoint;
+    std::array<double, 186> targetJoint;
     // Eigen::Matrix<double, Eigen::Dynamic, 1> Vt_vec;
     // Eigen::Matrix<double, Eigen::Dynamic, 1> J0_vec;
 
     UserDatum() //:
         // boolThatUserNeedsForSomeReason{boolThatUserNeedsForSomeReason_}
     {
-        for (auto i = 0 ; i < 183 ; i++)
+        for (auto i = 0 ; i < 186 ; i++)
             targetJoint[i] = 0;
     }
 };
@@ -400,7 +400,7 @@ public:
                     }
                 }
                 // Update left/right hand
-                const auto bodyOffset = poseKeypoints3D.getSize(1)*(poseKeypoints3D.getSize(2)-1);
+                const auto bodyOffset = num_body_joint*(poseKeypoints3D.getSize(2)-1); // num_body_joint = #parts_OP + 1 (top_head)
                 const auto handOffset = handKeypoints3D[0].getSize(1)*(handKeypoints3D[0].getSize(2)-1);
                 if (!handKeypoints3D.at(0).empty())
                 {
@@ -439,27 +439,23 @@ public:
                 // Not available
 // HACK --> FIX!!!!!
 // mm --> cm
-for (auto i = 0 ; i < 183 ; i++)
+for (auto i = 0 ; i < 186 ; i++)
 targetJoint[i] *= 0.1;
 // Invert z-axis
-for (auto i = 0 ; i < 183/3 ; i++)
+for (auto i = 0 ; i < 186/3 ; i++)
 targetJoint[3*i+2] *= -1;
 // targetJoint[3*i] *= -1;
 // Increase scale
 const auto myHeight = 1.85; // Gines
 // const auto myHeight = 1.75; // Donglai?
-for (auto i = 0 ; i < 183 ; i++)
+for (auto i = 0 ; i < 186 ; i++)
 targetJoint[i] *= 1.225*1.418918919*myHeight;
                 // Update keypoints
                 updateKeypoints(bodyJoints, LHandJoints, RHandJoints, targetJoint.data());
 
-                // Copy to datum
-                for (auto i = 0 ; i < 183 ; i++)
-                    datum.targetJoint[i] = targetJoint[i];
-
 // // Cout keypoints
 // std::cout << "Body:\n";
-// for (auto i = 0 ; i < 183 ; i++)
+// for (auto i = 0 ; i < 186 ; i++)
 // {
 //     std::cout << targetJoint[i] << " ";
 //     if (i % 3 == 2)
@@ -583,11 +579,10 @@ const auto start = std::chrono::high_resolution_clock::now();
 // t1 --> g_vis_data (huge), resultBody
 const auto start1 = std::chrono::high_resolution_clock::now();
                 CMeshModelInstance mesh;
-                GenerateMesh_Fast(mesh, resultBody, frame_params, g_total_model, Vt_vec, J0_vec);
+                GenerateMesh_Fast(mesh, resultBody.data(), frame_params, g_total_model, Vt_vec, J0_vec);
 const auto duration1 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start1).count();
                 VisualizedData g_vis_data; // --> Into op::Datum
                 CopyMesh(mesh, g_vis_data);
-                // GenerateMesh_Fast(mesh, resultBody, datum.frame_params, datum.g_total_model, datum.Vt_vec, datum.J0_vec);
                 // ~0.0005 ms
 // op::log(__LINE__);
 // BELOW IS PURELY OPENGL
@@ -602,7 +597,7 @@ const auto start2 = std::chrono::high_resolution_clock::now();
                 g_vis_data.targetJoint = targetJoint.data();
 g_vis_data.targetJoint = nullptr;
                 // g_vis_data.targetJoint = datum.targetJoint;
-                g_vis_data.resultJoint = resultBody;
+                g_vis_data.resultJoint = resultBody.data();
 g_vis_data.resultJoint = nullptr;
                 g_vis_data.vis_type = 2;
                 g_vis_data.read_buffer = upReadBuffer.get();
@@ -643,9 +638,11 @@ std::cout << "\nRender1:    " << duration1 * 1e-6
                 // Display image and sleeps at least 1 ms (it usually sleeps ~5-10 msec to display the image)
                 char key = (char)cv::waitKey(33);
                 if (key == ' ')
+                {
                     do
                         key = (char)cv::waitKey(33);
                     while (key == -1);
+                }
                 if (key == 27)
                     this->stop();
             }
@@ -660,9 +657,17 @@ std::cout << "\nRender1:    " << duration1 * 1e-6
 
     void callBVHWriter(const std::string& filename, double frame_time)
     {
-        std::cout << J0_vec.rows() << std::endl;
         spBvhWriter->parseInput(J0_vec, ts, poses);
         spBvhWriter->writeBVH(filename, frame_time);
+        // // Debugging
+        // std::cout << J0_vec.rows() << std::endl;
+        // for (const auto& pose : poses)
+        // {
+        //     // Left arm
+        //     std::cout << pose.row(16) << " " << pose.row(18) << " " << pose.row(20)
+        //     // Right arm
+        //      << " " << pose.row(17) << " " << pose.row(19) << " " << pose.row(21) << std::endl;
+        // }
     }
 
 private:
@@ -673,7 +678,7 @@ private:
     int count_frame;
 
     // Visualization
-    double resultBody[183];
+    std::array<double, 186> resultBody;
     std::unique_ptr<GLubyte[]> upReadBuffer;
 
     std::shared_ptr<op::VideoSaver> videoSaver;

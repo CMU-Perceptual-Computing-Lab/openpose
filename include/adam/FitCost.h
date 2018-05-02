@@ -25,6 +25,36 @@ struct CoeffsParameterNorm {
 	const double num_parameters_;
 };
 
+class CoeffsParameterNormDiff: public ceres::CostFunction
+{
+public:
+	CoeffsParameterNormDiff(int num_parameters): num_parameters_(num_parameters)
+	{
+		assert(num_parameters == TotalModel::NUM_SHAPE_COEFFICIENTS); // Adam model
+		CostFunction::set_num_residuals(num_parameters_);
+		CostFunction::mutable_parameter_block_sizes()->clear();
+		CostFunction::mutable_parameter_block_sizes()->push_back(num_parameters_);
+	}
+	virtual bool Evaluate(double const* const* parameters, double* residuals, double** jacobians) const
+	{
+		double const* p = parameters[0];
+		std::copy(p, p + num_parameters_, residuals);
+		if (jacobians)
+		{
+			if (jacobians[0])
+			{
+				double* jac = jacobians[0];
+				std::fill(jac, jac + num_parameters_ * num_parameters_, 0);
+				for (int i = 0; i < num_parameters_; i++)
+					jac[i * num_parameters_ + i] = 1.0;
+			}
+		}
+		return true;
+	}
+private:
+	const int num_parameters_;
+};
+
 struct CoeffsParameterLogNorm {
 	CoeffsParameterLogNorm(int num_parameters)
 		: num_parameters_(num_parameters) {}
@@ -231,6 +261,89 @@ struct AdamBodyPoseParamPrior {
 		return true;
 	}
 	const double num_parameters_;
+};
+
+class AdamBodyPoseParamPriorDiff: public ceres::CostFunction
+{
+public:
+	AdamBodyPoseParamPriorDiff (int num_parameters): num_parameters_(num_parameters)
+	{
+		assert(num_parameters == TotalModel::NUM_POSE_PARAMETERS);  // for adam
+		CostFunction::set_num_residuals(num_parameters_);
+		CostFunction::mutable_parameter_block_sizes()->clear();
+		CostFunction::mutable_parameter_block_sizes()->push_back(num_parameters_);
+	}
+	virtual bool Evaluate(double const* const* parameters, double* residuals, double** jacobians) const
+	{
+		double const* p = parameters[0];
+		residuals[0] = residuals[1] = residuals[2] = 0;
+		for (int i = 3; i < 66; i++)
+		{
+			if ((i >= 9 && i < 12) || (i >= 18 && i < 21) || (i >= 27 && i < 30))
+				residuals[i] = 12 * p[i];
+			else if (i == 36) // neck
+				residuals[i] = 2 * p[i];
+			else if ((i >= 42 && i < 45) || (i >= 39 && i < 41))
+				residuals[i] = 2 * p[i];
+			else if (i >= 54 && i < 60)		//18, 19 (elbows)
+			{
+				if (i == 54 || i == 57)		//twist 
+					residuals[i] = 3 * p[i];
+				else
+					residuals[i] = 0.1 * p[i];
+			}
+			else if (i >= 60 && i < 66)		//20, 21 (wrist)
+			{
+				if (i == 60 || i == 63)		//twist of wrist
+					residuals[i] = p[i];
+				else
+					residuals[i] = 0.1 * p[i];
+			}
+			else
+				residuals[i] = p[i];		//Do nothing
+		}
+		std::copy(p + 66, p + num_parameters_, residuals + 66);
+
+		if (jacobians)
+		{
+			if (jacobians[0])
+			{
+				double* jac = jacobians[0];
+				std::fill(jac, jac + num_parameters_ * num_parameters_, 0);
+				for (int i = 0; i < num_parameters_; i++)
+				{
+					double* jac_row = jac + i * num_parameters_;
+					if (i < 3)
+						continue;
+					else if ((i >= 9 && i < 12) || (i >= 18 && i < 21) || (i >= 27 && i < 30))
+						jac_row[i] = 12;
+					else if (i >= 36) // neck
+						jac_row[i] = 2;
+					else if ((i >= 42 && i < 45) || (i >= 39 && i < 41))
+						jac_row[i] = 2;
+					else if (i >= 54 && i < 60)		//18, 19 (elbows)
+					{
+						if (i == 54 || i == 57)		//twist 
+							jac_row[i] = 3;
+						else
+							jac_row[i] = 0.1;
+					}
+					else if (i >= 60 && i < 66)		//20, 21 (wrist)
+					{
+						if (i == 60 || i == 63)		//twist of wrist
+							jac_row[i] = 1;
+						else
+							jac_row[i] = 0.1;
+					}
+					else
+						jac_row[i] = 1.0;		//Do nothing
+				}
+			}
+		}
+		return true;
+	}
+private:
+	const int num_parameters_;
 };
 
 template<typename Derived, int rows, int cols, int option>

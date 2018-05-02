@@ -227,33 +227,39 @@ public:
 struct AdamFitData
 {
 	AdamFitData(TotalModel &adam, Eigen::MatrixXd &Joints, Eigen::MatrixXd &rFoot, Eigen::MatrixXd &lFoot,
-		Eigen::MatrixXd &faceJoints, Eigen::MatrixXd &lHandJoints, Eigen::MatrixXd &rHandJoints, Eigen::MatrixXd PAF,
+		Eigen::MatrixXd &faceJoints, Eigen::MatrixXd &lHandJoints, Eigen::MatrixXd &rHandJoints, Eigen::MatrixXd& PAF,
 		bool fit3D=false, bool fit2D=false, double* K=nullptr, bool fitPAF=false): 
 		adam(adam), bodyJoints(Joints), rFoot(rFoot), lFoot(lFoot), faceJoints(faceJoints), lHandJoints(lHandJoints), rHandJoints(rHandJoints), PAF(PAF),
-		fit3D(fit3D), fit2D(fit2D), K(K), fitPAF(fitPAF) {}
-	TotalModel &adam;
-	Eigen::MatrixXd &bodyJoints;
-	Eigen::MatrixXd &rFoot;     //3x2 //Heel, Toe
-	Eigen::MatrixXd &lFoot;
-	Eigen::MatrixXd &faceJoints;
-	Eigen::MatrixXd &lHandJoints;
-	Eigen::MatrixXd &rHandJoints;
-	Eigen::MatrixXd &PAF;
-	bool fit3D;
-	bool fit2D;
-	double* K;
-	bool fitPAF;
+		fit3D(fit3D), fit2D(fit2D), K(K), fitPAF(fitPAF)
+		{
+			inner_weight.clear();
+			inner_weight.push_back(5.0f);
+		}
+	const TotalModel &adam;
+	const Eigen::MatrixXd& bodyJoints;
+	const Eigen::MatrixXd& rFoot;     //3x2 //Heel, Toe
+	const Eigen::MatrixXd& lFoot;
+	const Eigen::MatrixXd& faceJoints;
+	const Eigen::MatrixXd& lHandJoints;
+	const Eigen::MatrixXd& rHandJoints;
+	const Eigen::MatrixXd& PAF;
+	const bool fit3D;
+	const bool fit2D;
+	const double* K;
+	const bool fitPAF;
+	std::vector<float> inner_weight;
 };
 
 class AdamFullCost: public ceres::CostFunction
 {
 public:
-	AdamFullCost(const AdamFitData& fit_data): fit_data_(fit_data), res_dim(0), start_2d_dim(0), rigid_body(false), num_PAF_constraint(12)
+	AdamFullCost(const AdamFitData& fit_data): fit_data_(fit_data), res_dim(0), start_2d_dim(0), rigid_body(false),
+		num_PAF_constraint(fit_data.PAF.cols()), num_inner(fit_data.inner_weight.size()), total_inner_dim(0)
 	{
 		if(fit_data_.fit3D)
 		{
 			res_dim += 3;
-			start_2d_dim += 2;
+			start_2d_dim += 3;
 		}
 		if(fit_data_.fit2D)
 		{
@@ -263,33 +269,84 @@ public:
 		if(fit_data_.fitPAF)
 		{
 			assert(fit_data_.PAF.size() > 0 && fit_data_.PAF.rows() == 3);
+			assert(fit_data_.PAF.cols() == PAF_connection.size());
+			assert(fit_data_.PAF.cols() == PAF_weight.size());
 		}
+		assert(num_inner == DEFINED_INNER_CONSTRAINTS);
+		inner_dim.clear();
+		inner_dim.push_back(3);
+		assert(inner_dim.size() == DEFINED_INNER_CONSTRAINTS);
+
 		SetupCost();
-		std::cout << "PAF--------------------\n" << fit_data_.PAF << std::endl;
+
+		// setup parent indexes, for fast LBS jacobian computation
+		parentIndexes[0].clear();
+		parentIndexes[0].push_back(0);
+		for(auto i = 0u; i < TotalModel::NUM_JOINTS; i++)
+		{
+            parentIndexes[i] = std::vector<int>(1, i);
+            while (parentIndexes[i].back() != 0)
+                parentIndexes[i].emplace_back(fit_data_.adam.m_parent[parentIndexes[i].back()]);
+            std::sort(parentIndexes[i].begin(), parentIndexes[i].end());
+        }
+
+        dVdP_data = new double[3 * corres_vertex2targetpt.size() * TotalModel::NUM_POSE_PARAMETERS];
+        dVdc_data = new double[3 * corres_vertex2targetpt.size() * TotalModel::NUM_SHAPE_COEFFICIENTS];
 	}
+
+	~AdamFullCost() {delete[] dVdc_data; delete[] dVdP_data;}
 
 	void SetupCost()
 	{
 		using namespace cv;
 		using namespace Eigen;
 
+		// calculating the dim for 3D / 2D constraints
 		m_nCorrespond_adam2joints = fit_data_.adam.m_indices_jointConst_adamIdx.rows();
 		if(fit_data_.lHandJoints.size() > 0) m_nCorrespond_adam2joints += fit_data_.adam.m_correspond_adam2lHand_adamIdx.rows();
 		if(fit_data_.rHandJoints.size() > 0) m_nCorrespond_adam2joints += fit_data_.adam.m_correspond_adam2rHand_adamIdx.rows();
+		int count_dim = res_dim * m_nCorrespond_adam2joints;
 
 		m_targetPts.resize(m_nCorrespond_adam2joints * 5);
 		m_targetPts.setZero();
 		m_targetPts_weight.resize(m_nCorrespond_adam2joints * res_dim);
 		m_targetPts_weight_buffer.resize(m_nCorrespond_adam2joints * res_dim);
+		SetupWeight();
 
+		// setting up the vertex
+		start_vertex = count_dim;
+		corres_vertex2targetpt.push_back(std::make_pair(8130, std::vector<double>(5))); //nose
+		corres_vertex2targetpt.push_back(std::make_pair(6970, std::vector<double>(5))); //left ear
+		corres_vertex2targetpt.push_back(std::make_pair(10088, std::vector<double>(5))); //right ear
+		corres_vertex2targetpt.push_back(std::make_pair(1372, std::vector<double>(5))); //head top
 		m_nCorrespond_adam2pts = corres_vertex2targetpt.size();
+		count_dim += m_nCorrespond_adam2pts * res_dim;
 
-		UpdateWeight();
+		// copy the fitting target in place
 		UpdateTarget();
 
-		m_nResiduals = m_nCorrespond_adam2joints * res_dim;
-		if (fit_data_.fitPAF) m_nResiduals += 3 * num_PAF_constraint;
+		// start counting from PAF
+		start_PAF = count_dim;
+		if (fit_data_.fitPAF) count_dim += 3 * num_PAF_constraint;
+
+		// counting for inner constraints
+		start_inner = count_dim;
+		for (auto& n: inner_dim)
+		{
+			count_dim += n;
+			total_inner_dim += n;
+		}
+
+		// setting num_residuals
+		m_nResiduals = count_dim;
+		std::cout << "m_nCorrespond_adam2joints " << m_nCorrespond_adam2joints << std::endl;
+		std::cout << "m_nCorrespond_adam2pts " << m_nCorrespond_adam2pts << std::endl;
 		std::cout << "m_nResiduals " << m_nResiduals << std::endl;
+		std::cout << "res_dim " << res_dim << std::endl;
+		std::cout << "start_2d_dim " << start_2d_dim << std::endl;
+		std::cout << "start_PAF " << start_PAF << std::endl;
+		std::cout << "start_vertex " << start_vertex << std::endl;
+		std::cout << "start_inner " << start_inner << std::endl;
 		CostFunction::set_num_residuals(m_nResiduals);
 		auto parameter_block_sizes = CostFunction::mutable_parameter_block_sizes();
 		parameter_block_sizes->clear();
@@ -298,12 +355,11 @@ public:
 		parameter_block_sizes->push_back(TotalModel::NUM_SHAPE_COEFFICIENTS); // SMPL Pose  
 	}
 
-	void UpdateWeight()
+	void SetupWeight()
 	{
 		double BODYJOINT_WEIGHT_Strong = 1;
 		double BODYJOINT_WEIGHT = 1;
-		double HANDJOINT_WEIGHT = 1;
-		WEAK_WEIGHT = 1;
+		double HANDJOINT_WEIGHT = 0.2;
 
 		int offset = 0;
 		for (int ic = 0; ic < fit_data_.adam.m_indices_jointConst_adamIdx.rows(); ic++)
@@ -352,13 +408,6 @@ public:
 				}
 			}
 		}
-
-		if (fit_data_.bodyJoints(0, 1) != 0.0)      //nose
-			corres_vertex2targetpt.push_back(std::make_pair(8130, std::vector<double>(5)));     
-		if (fit_data_.bodyJoints(0, 16) != 0.0)     //left ear
-			corres_vertex2targetpt.push_back(std::make_pair(6970, std::vector<double>(5)));     
-		if (fit_data_.bodyJoints(0, 18) != 0.0)     //right ear
-			corres_vertex2targetpt.push_back(std::make_pair(10088, std::vector<double>(5)));        
 	}
 
 	void UpdateTarget()
@@ -381,26 +430,10 @@ public:
 				m_targetPts.block((offset + ic) * 5, 0, 5, 1) = fit_data_.rHandJoints.block(0, fit_data_.adam.m_correspond_adam2rHand_rHandIdx(ic), 5, 1);
 		}
 
-		offset = 0;
-		if (fit_data_.bodyJoints(0, 1) != 0.0)
-		{
-			std::vector<double> targetPt = {fit_data_.bodyJoints(0, 1), fit_data_.bodyJoints(1, 1), fit_data_.bodyJoints(2, 1), fit_data_.bodyJoints(3, 1), fit_data_.bodyJoints(4, 1)};
-			corres_vertex2targetpt[offset].second = targetPt;
-			offset++;
-		}
-		if (fit_data_.bodyJoints(0, 16) != 0.0)     //left ear
-		{
-			std::vector<double> targetPt = {fit_data_.bodyJoints(0, 16), fit_data_.bodyJoints(1, 16), fit_data_.bodyJoints(2, 16), fit_data_.bodyJoints(3, 16), fit_data_.bodyJoints(4, 16)};
-			corres_vertex2targetpt[offset].second = targetPt;
-			offset++;
-		}
-
-		if (fit_data_.bodyJoints(0, 18) != 0.0)     //right ear
-		{
-			std::vector<double> targetPt = {fit_data_.bodyJoints(0, 18), fit_data_.bodyJoints(1, 18), fit_data_.bodyJoints(2, 18), fit_data_.bodyJoints(3, 18), fit_data_.bodyJoints(4, 18)};
-			corres_vertex2targetpt[offset].second = targetPt;
-			offset++;
-		}
+		corres_vertex2targetpt[0].second = {fit_data_.bodyJoints(0, 1), fit_data_.bodyJoints(1, 1), fit_data_.bodyJoints(2, 1), fit_data_.bodyJoints(3, 1), fit_data_.bodyJoints(4, 1)};
+		corres_vertex2targetpt[1].second = {fit_data_.bodyJoints(0, 16), fit_data_.bodyJoints(1, 16), fit_data_.bodyJoints(2, 16), fit_data_.bodyJoints(3, 16), fit_data_.bodyJoints(4, 16)};
+		corres_vertex2targetpt[2].second = {fit_data_.bodyJoints(0, 18), fit_data_.bodyJoints(1, 18), fit_data_.bodyJoints(2, 18), fit_data_.bodyJoints(3, 18), fit_data_.bodyJoints(4, 18)};
+		corres_vertex2targetpt[3].second = {fit_data_.bodyJoints(0, 19), fit_data_.bodyJoints(1, 19), fit_data_.bodyJoints(2, 19), fit_data_.bodyJoints(3, 19), fit_data_.bodyJoints(4, 19)};
 	}
 
 	void toggle_activate(bool limb, bool finger)
@@ -427,368 +460,91 @@ public:
 		rigid_body = rigid;
 	}
 
-	virtual bool Evaluate(double const* const* parameters,
-		double* residuals,
-		double** jacobians) const
-	{
-		using namespace Eigen;
-		typedef double T;
-		const T* t = parameters[0];
-		const T* p_eulers = parameters[1];
-		const T* c = parameters[2];
+	void select_lbs(
+		const double* c,
+		const Eigen::VectorXd& T,  // transformation
+		const MatrixXdr &dTdP,
+		const MatrixXdr &dTdc,
+		MatrixXdr &outVert,
+	    double* dVdP_data,    //output
+	    double* dVdc_data     //output
+		// MatrixXdr &dVdP,	//output
+		// MatrixXdr &dVdc     //output
+	) const;
 
-		Map< const Vector3d > t_vec(t);
-		Map< const Matrix<double, Dynamic, 1> > c_bodyshape(c, TotalModel::NUM_SHAPE_COEFFICIENTS);
+	void select_lbs(
+	    const double* c,
+	    const Eigen::VectorXd& T,  // transformation
+	    MatrixXdr &outVert
+	) const;
 
-		// 0st step: Compute all the current joints
-		Matrix<double, TotalModel::NUM_JOINTS, 3, RowMajor> J;
-		Map< Matrix<double, Dynamic, 1> > J_vec(J.data(), TotalModel::NUM_JOINTS * 3);
-		J_vec = fit_data_.adam.J_mu_ + fit_data_.adam.dJdc_ * c_bodyshape;
+	virtual bool Evaluate(double const* const* parameters, double* residuals, double** jacobians) const;
 
-		// 1st step: forward kinematics
-		const int num_t = (TotalModel::NUM_JOINTS) * 3 * 5;  // transform 3 * 4 + joint location 3 * 1
-
-		// Matrix<double, Dynamic, 3 * TotalModel::NUM_JOINTS, RowMajor> old_dTrdP(num_t, 3 * TotalModel::NUM_JOINTS);
-		// Matrix<double, Dynamic, 3 * TotalModel::NUM_JOINTS, RowMajor> old_dTrdJ(num_t, 3 * TotalModel::NUM_JOINTS);
-		// old_dTrdP.setZero(); old_dTrdJ.setZero();
-		// VectorXd old_transforms_joint(3 * TotalModel::NUM_JOINTS * 4 + 3 * TotalModel::NUM_JOINTS); // the first part is transform, the second part is outJoint
-
-		// ceres::AutoDiffCostFunction<smpl::PoseToTransformsNoLR_Eulers_adamModel,
-		// (TotalModel::NUM_JOINTS) * 3 * 4 + 3 * TotalModel::NUM_JOINTS,
-		// (TotalModel::NUM_JOINTS) * 3,
-		// (TotalModel::NUM_JOINTS) * 3> old_p2t(new smpl::PoseToTransformsNoLR_Eulers_adamModel(fit_data_.adam));
-
-		// const double* old_p2t_parameters[2] = { p_eulers, J.data() };
-		// double* old_p2t_residuals = old_transforms_joint.data();
-		// double* old_p2t_jacobians[2] = { old_dTrdP.data(), old_dTrdJ.data() };
-		// old_p2t.Evaluate(old_p2t_parameters, old_p2t_residuals, old_p2t_jacobians);
-
-		Matrix<double, Dynamic, 3 * TotalModel::NUM_JOINTS, RowMajor> dTrdP(num_t, 3 * TotalModel::NUM_JOINTS);
-		Matrix<double, Dynamic, 3 * TotalModel::NUM_JOINTS, RowMajor> dTrdJ(num_t, 3 * TotalModel::NUM_JOINTS);
-
-		VectorXd transforms_joint(3 * TotalModel::NUM_JOINTS * 4 + 3 * TotalModel::NUM_JOINTS);
-		const double* p2t_parameters[2] = { p_eulers, J.data() };
-		double* p2t_residuals = transforms_joint.data();
-		double* p2t_jacobians[2] = { dTrdP.data(), dTrdJ.data() };
-
-		smpl::PoseToTransform_AdamFull_withDiff p2t(fit_data_.adam);
-		p2t.Evaluate(p2t_parameters, p2t_residuals, p2t_jacobians);
-
-		// std::cout << "J" << std::endl;
-		// std::cout << "max diff: " << (old_transforms_joint - transforms_joint).maxCoeff() << std::endl;
-		// std::cout << "min diff: " << (old_transforms_joint - transforms_joint).minCoeff() << std::endl;
-
-		// std::cout << "dJdP" << std::endl;
-		// std::cout << "max diff: " << (old_dTrdP - dTrdP).maxCoeff() << std::endl;
-		// std::cout << "min diff: " << (old_dTrdP - dTrdP).minCoeff() << std::endl;
-
-		// std::cout << "dJdJ" << std::endl;
-		// std::cout << "max diff: " << (old_dTrdJ - dTrdJ).maxCoeff() << std::endl;
-		// std::cout << "min diff: " << (old_dTrdJ - dTrdJ).minCoeff() << std::endl;
-
-		Matrix<double, Dynamic, Dynamic, RowMajor> dTJdP = dTrdP.block(3 * TotalModel::NUM_JOINTS * 4, 0, 3 * TotalModel::NUM_JOINTS, 3 * TotalModel::NUM_JOINTS);
-		Matrix<double, Dynamic, Dynamic, RowMajor> dTJdJ = dTrdJ.block(3 * TotalModel::NUM_JOINTS * 4, 0, 3 * TotalModel::NUM_JOINTS, 3 * TotalModel::NUM_JOINTS);
-		Matrix<double, Dynamic, Dynamic, RowMajor> dTJdc = dTJdJ * fit_data_.adam.dJdc_;
-		VectorXd outJoint = transforms_joint.block(3 * TotalModel::NUM_JOINTS * 4, 0, 3 * TotalModel::NUM_JOINTS, 1);  // outJoint
-
-		// 2nd step: compute the target joints (copy from FK)
-		// Joint Constraints
-		VectorXd tempJoints(3 * m_nCorrespond_adam2joints);  // predicted joint given current parameter
-		for (int i = 0; i < fit_data_.adam.m_indices_jointConst_adamIdx.rows(); i++)
-		{
-			tempJoints.block(3 * i, 0, 3, 1) = outJoint.block(3 * fit_data_.adam.m_indices_jointConst_adamIdx(i), 0, 3, 1) + t_vec;
-		}
-		int offset = fit_data_.adam.m_indices_jointConst_adamIdx.rows();
-		for (int i = 0; i < fit_data_.adam.m_correspond_adam2lHand_adamIdx.rows(); i++)
-		{
-			tempJoints.block(3*(i + offset), 0, 3, 1) = outJoint.block(3 * fit_data_.adam.m_correspond_adam2lHand_adamIdx(i), 0, 3, 1) + t_vec;
-		}
-		offset += fit_data_.adam.m_correspond_adam2lHand_adamIdx.rows();
-		for (int i = 0; i < fit_data_.adam.m_correspond_adam2rHand_adamIdx.rows(); i++)
-		{
-			tempJoints.block(3*(i + offset), 0, 3, 1) = outJoint.block(3 * fit_data_.adam.m_correspond_adam2rHand_adamIdx(i), 0, 3, 1) + t_vec;
-		}
-
-		// 3rd step: set residuals
-		Map< VectorXd > res(residuals, m_nResiduals);
-
-		if (fit_data_.fit3D)  // put constrains on 3D
-			for(int i = 0; i < m_nCorrespond_adam2joints; i++)
-			{
-				if (m_targetPts.block(5 * i, 0, 3, 1).isZero(0)) res.block(res_dim * i, 0, 3, 1).setZero();
-				else res.block(res_dim * i, 0, 3, 1) = (tempJoints.block(3 * i, 0, 3, 1) - m_targetPts.block(5 * i, 0, 3, 1)).cwiseProduct(m_targetPts_weight.block(3 * i, 0, 3, 1));
-			}
-
-		if (fit_data_.fit2D)
-		{
-			Eigen::Map< Matrix<double, Dynamic, 3, RowMajor> > jointArray(tempJoints.data(), m_nCorrespond_adam2joints, 3);
-			Eigen::Map< Matrix<double, 3, 3, RowMajor> > K(fit_data_.K);
-			Matrix<double, Dynamic, Dynamic, RowMajor> jointProjection = jointArray * K.transpose();
-			for(int i = 0; i < m_nCorrespond_adam2joints; i++)
-			{
-				if (m_targetPts.block(5 * i + 3, 0, 2, 1).isZero(0)) res.block(res_dim * i + start_2d_dim, 0, 2, 1).setZero();
-				else
-				{
-					residuals[res_dim * i + start_2d_dim + 0] = (jointProjection(i, 0) / jointProjection(i, 2) - m_targetPts(5 * i + 3)) * m_targetPts_weight[res_dim * i + start_2d_dim + 0];
-					residuals[res_dim * i + start_2d_dim + 1] = (jointProjection(i, 1) / jointProjection(i, 2) - m_targetPts(5 * i + 4)) * m_targetPts_weight[res_dim * i + start_2d_dim + 1];;
-				}
-			}
-		}
-
-		if (fit_data_.fitPAF)
-		{
-			const int offset = res_dim * m_nCorrespond_adam2joints;
-			// std::cout << "PAF--------------------\n";
-			// std::cout << fit_data_.PAF << std::endl;
-			for (auto i = 0; i < num_PAF_constraint; i++)
-			{
-				if (fit_data_.PAF.col(i).isZero(0))
-				{
-					residuals[offset + 3 * i + 0] = residuals[offset + 3 * i + 1] = residuals[offset + 3 * i + 2] = 0.0;
-					continue;
-				}
-				auto AB = outJoint.block(3 * PAF_connection[2 * i + 1], 0, 3, 1) - outJoint.block(3 * PAF_connection[2 * i], 0, 3, 1);
-				auto length = sqrt(AB(0, 0) * AB(0, 0) + AB(1, 0) * AB(1, 0) + AB(2, 0) * AB(2, 0));
-				residuals[offset + 3 * i + 0] = AB(0, 0) / length - fit_data_.PAF(0, i);
-				residuals[offset + 3 * i + 1] = AB(1, 0) / length - fit_data_.PAF(1, i);
-				residuals[offset + 3 * i + 2] = AB(2, 0) / length - fit_data_.PAF(2, i);
-			}
-		}
-
-		// 4th step: set jacobians
-		if (jacobians)
-		{
-			if (jacobians[0])
-			{
-				Map< Matrix<double, Dynamic, Dynamic, RowMajor> > drdt(jacobians[0], m_nResiduals, 3);
-
-				if (fit_data_.fit3D)
-					for (int i = 0; i < m_nCorrespond_adam2joints; i++)
-					{
-						if (m_targetPts.block(5 * i, 0, 3, 1).isZero(0)) drdt.block(res_dim * i, 0, 3, 3).setZero();
-						else drdt.block(res_dim * i, 0, 3, 3).setIdentity();
-					}
-
-				if (fit_data_.fit2D)
-				{
-					Eigen::Map< Matrix<double, Dynamic, 3, RowMajor> > jointArray(tempJoints.data(), m_nCorrespond_adam2joints, 3);
-					Matrix<double, Dynamic, Dynamic, RowMajor> dJdt(3, 3);
-					dJdt.setIdentity();
-					for (int i = 0; i < m_nCorrespond_adam2joints; i++)
-					{
-						if (m_targetPts.block(5 * i + 3, 0, 2, 1).isZero(0)) drdt.block(res_dim * i + start_2d_dim, 0, 2, 3).setZero();
-						else
-						{
-							projection_Derivative(drdt, dJdt, (double*)(jointArray.data() + 3 * i), fit_data_.K, res_dim * i + start_2d_dim, 0);
-						}
-					}
-				}
-
-				for (int j = 0; j < res_dim * m_nCorrespond_adam2joints; j++)
-					drdt.row(j) *= m_targetPts_weight[j];
-
-				if (fit_data_.fitPAF)
-					drdt.block(res_dim * m_nCorrespond_adam2joints, 0, 3 * num_PAF_constraint, 3).setZero();
-			}
-
-			if (jacobians[1])
-			{
-				Map< Matrix<double, Dynamic, Dynamic, RowMajor> > dr_dPose(jacobians[1], m_nResiduals, TotalModel::NUM_JOINTS * 3); 
-				if (fit_data_.fit3D)
-				{
-					int offset = 0;
-					for (int i = 0; i < fit_data_.adam.m_indices_jointConst_adamIdx.rows(); i++)
-					{
-						if (m_targetPts.block(5 * (i + offset), 0, 3, 1).isZero(0))
-							dr_dPose.block(res_dim * (i + offset), 0, 3, TotalModel::NUM_POSE_PARAMETERS).setZero();
-						else dr_dPose.block(res_dim * (i + offset), 0, 3, TotalModel::NUM_POSE_PARAMETERS) =
-							dTJdP.block(3 * fit_data_.adam.m_indices_jointConst_adamIdx(i), 0, 3, TotalModel::NUM_POSE_PARAMETERS);
-					}
-					offset = fit_data_.adam.m_indices_jointConst_adamIdx.rows();
-
-					for (int i = 0; i < fit_data_.adam.m_correspond_adam2lHand_adamIdx.rows(); i++)
-					{
-						if (m_targetPts.block(5 * (i + offset), 0, 3, 1).isZero(0))
-							dr_dPose.block(res_dim * (i + offset), 0, 2, TotalModel::NUM_POSE_PARAMETERS).setZero();
-						else dr_dPose.block(res_dim * (i + offset), 0, 3, TotalModel::NUM_POSE_PARAMETERS) =
-							dTJdP.block(3 * fit_data_.adam.m_correspond_adam2lHand_adamIdx(i), 0, 3, TotalModel::NUM_POSE_PARAMETERS);
-					}
-					offset += fit_data_.adam.m_correspond_adam2lHand_adamIdx.rows();
-
-					for (int i = 0; i < fit_data_.adam.m_correspond_adam2rHand_adamIdx.rows(); i++)
-					{
-						if (m_targetPts.block(5 * (i + offset), 0, 3, 1).isZero(0))
-							dr_dPose.block(res_dim * (i + offset), 0, 2, TotalModel::NUM_POSE_PARAMETERS).setZero();
-						else dr_dPose.block(res_dim * (i + offset), 0, 3, TotalModel::NUM_POSE_PARAMETERS) =
-							dTJdP.block(3 * fit_data_.adam.m_correspond_adam2rHand_adamIdx(i), 0, 3, TotalModel::NUM_POSE_PARAMETERS);
-					}
-				}
-
-				if (fit_data_.fit2D)
-				{
-					int offset = 0;
-					Eigen::Map< Matrix<double, Dynamic, 3, RowMajor> > jointArray(tempJoints.data(), m_nCorrespond_adam2joints, 3);
-					for (int i = 0; i < fit_data_.adam.m_indices_jointConst_adamIdx.rows(); i++)
-					{
-						if (m_targetPts.block(5 * (i + offset) + 3, 0, 2, 1).isZero(0))
-							dr_dPose.block(res_dim * (i + offset) + start_2d_dim, 0, 2, TotalModel::NUM_POSE_PARAMETERS).setZero();
-						else projection_Derivative(dr_dPose, dTJdP, (double*)(jointArray.data() + 3 * (i + offset)), fit_data_.K,
-												   res_dim * (i + offset) + start_2d_dim, 3 * fit_data_.adam.m_indices_jointConst_adamIdx(i));
-					}
-
-					offset = fit_data_.adam.m_indices_jointConst_adamIdx.rows();
-					for (int i = 0; i < fit_data_.adam.m_correspond_adam2lHand_adamIdx.rows(); i++)
-					{
-						if (m_targetPts.block(5 * (i + offset) + 3, 0, 2, 1).isZero(0))
-							dr_dPose.block(res_dim * (i + offset) + start_2d_dim, 0, 2, TotalModel::NUM_POSE_PARAMETERS).setZero();
-						else projection_Derivative(dr_dPose, dTJdP, (double*)(jointArray.data() + 3 * (i + offset)), fit_data_.K,
-												   res_dim * (i + offset) + start_2d_dim, 3 * fit_data_.adam.m_correspond_adam2lHand_adamIdx(i));
-					}
-
-					offset += fit_data_.adam.m_correspond_adam2lHand_adamIdx.rows();
-					for (int i = 0; i < fit_data_.adam.m_correspond_adam2rHand_adamIdx.rows(); i++)
-					{
-						if (m_targetPts.block(5 * (i + offset) + 3, 0, 2, 1).isZero(0))
-							dr_dPose.block(res_dim * (i + offset) + start_2d_dim, 0, 2, TotalModel::NUM_POSE_PARAMETERS).setZero();
-						else projection_Derivative(dr_dPose, dTJdP, (double*)(jointArray.data() + 3 * (i + offset)), fit_data_.K,
-												   res_dim * (i + offset) + start_2d_dim, 3 * fit_data_.adam.m_correspond_adam2rHand_adamIdx(i));
-					}
-				}
-
-				for (int j = 0; j < res_dim * m_nCorrespond_adam2joints; j++)
-					dr_dPose.row(j) *= m_targetPts_weight[j];
-
-				if (fit_data_.fitPAF)
-				{
-					const int offset = res_dim * m_nCorrespond_adam2joints;
-					for (auto i = 0; i < num_PAF_constraint; i++)
-					{
-						if (fit_data_.PAF.col(i).isZero(0))
-						{
-							dr_dPose.block(offset + 3 * i, 0, 3, TotalModel::NUM_POSE_PARAMETERS).setZero();
-							continue;
-						}
-						auto AB = outJoint.block(3 * PAF_connection[2 * i + 1], 0, 3, 1) - outJoint.block(3 * PAF_connection[2 * i], 0, 3, 1);
-						auto length2 = AB(0, 0) * AB(0, 0) + AB(1, 0) * AB(1, 0) + AB(2, 0) * AB(2, 0);
-						auto length = sqrt(length2);
-						const Eigen::Matrix<double, 3, 3, RowMajor> dudJ = Eigen::Matrix<double, 3, 3>::Identity() / length - AB * AB.transpose() / length2 / length;
-						dr_dPose.block(offset + 3 * i, 0, 3, TotalModel::NUM_POSE_PARAMETERS) = dudJ * 
-							(dTJdP.block(3 * PAF_connection[2 * i + 1], 0, 3, TotalModel::NUM_POSE_PARAMETERS) - dTJdP.block(3 * PAF_connection[2 * i], 0, 3, TotalModel::NUM_POSE_PARAMETERS));
-					}
-				}
-
-				if (rigid_body)
-					dr_dPose.block(0, 3, m_nResiduals, TotalModel::NUM_POSE_PARAMETERS - 3).setZero();
-			}
-
-			if (jacobians[2])
-			{
-				Map< Matrix<double, Dynamic, Dynamic, RowMajor> > dr_dCoeff(jacobians[2], m_nResiduals, TotalModel::NUM_SHAPE_COEFFICIENTS);    
-				if (fit_data_.fit3D)
-				{
-					int offset = 0;
-					for (int i = 0; i < fit_data_.adam.m_indices_jointConst_adamIdx.rows(); i++)
-					{
-						if (m_targetPts.block(5 * (i + offset), 0, 3, 1).isZero(0))
-							dr_dCoeff.block(res_dim * (i + offset), 0, 3, TotalModel::NUM_SHAPE_COEFFICIENTS).setZero();
-						else dr_dCoeff.block(res_dim * (i + offset), 0, 3, TotalModel::NUM_SHAPE_COEFFICIENTS) = 
-							dTJdc.block(3 * fit_data_.adam.m_indices_jointConst_adamIdx(i), 0, 3, TotalModel::NUM_SHAPE_COEFFICIENTS);
-					}
-					offset = fit_data_.adam.m_indices_jointConst_adamIdx.rows();
-
-					for (int i = 0; i < fit_data_.adam.m_correspond_adam2lHand_adamIdx.rows(); i++)
-					{
-						if (m_targetPts.block(5 * (i + offset), 0, 3, 1).isZero(0))
-							dr_dCoeff.block(res_dim * (i + offset), 0, 2, TotalModel::NUM_SHAPE_COEFFICIENTS).setZero();
-						else dr_dCoeff.block(res_dim * (i + offset), 0, 3, TotalModel::NUM_SHAPE_COEFFICIENTS) =
-							dTJdc.block(3 * fit_data_.adam.m_correspond_adam2lHand_adamIdx(i), 0, 3, TotalModel::NUM_SHAPE_COEFFICIENTS);
-					}
-					offset += fit_data_.adam.m_correspond_adam2lHand_adamIdx.rows();
-
-					for (int i = 0; i < fit_data_.adam.m_correspond_adam2rHand_adamIdx.rows(); i++)
-					{
-						if (m_targetPts.block(5 * (i + offset), 0, 3, 1).isZero(0))
-							dr_dCoeff.block(res_dim * (i + offset), 0, 2, TotalModel::NUM_SHAPE_COEFFICIENTS).setZero();
-						else dr_dCoeff.block(res_dim * (i + offset), 0, 3, TotalModel::NUM_SHAPE_COEFFICIENTS) =
-							dTJdc.block(3 * fit_data_.adam.m_correspond_adam2rHand_adamIdx(i), 0, 3, TotalModel::NUM_SHAPE_COEFFICIENTS);
-					}
-				}
-
-				if (fit_data_.fit2D)
-				{
-					int offset = 0;
-					Eigen::Map< Matrix<double, Dynamic, 3, RowMajor> > jointArray(tempJoints.data(), m_nCorrespond_adam2joints, 3);
-					for (int i = 0; i < fit_data_.adam.m_indices_jointConst_adamIdx.rows(); i++)
-					{
-						if (m_targetPts.block(5 * (i + offset) + 3, 0, 2, 1).isZero(0))
-							dr_dCoeff.block(res_dim * (i + offset) + start_2d_dim, 0, 2, TotalModel::NUM_SHAPE_COEFFICIENTS).setZero();
-						else projection_Derivative(dr_dCoeff, dTJdc, (double*)(jointArray.data() + 3 * (i + offset)), fit_data_.K,
-												   res_dim * (i + offset) + start_2d_dim, 3 * fit_data_.adam.m_indices_jointConst_adamIdx(i));
-					}
-
-					offset = fit_data_.adam.m_indices_jointConst_adamIdx.rows();
-					for (int i = 0; i < fit_data_.adam.m_correspond_adam2lHand_adamIdx.rows(); i++)
-					{
-						if (m_targetPts.block(5 * (i + offset) + 3, 0, 2, 1).isZero(0))
-							dr_dCoeff.block(res_dim * (i + offset) + start_2d_dim, 0, 2, TotalModel::NUM_SHAPE_COEFFICIENTS).setZero();
-						else projection_Derivative(dr_dCoeff, dTJdc, (double*)(jointArray.data() + 3 * (i + offset)), fit_data_.K,
-												   res_dim * (i + offset) + start_2d_dim, 3 * fit_data_.adam.m_correspond_adam2lHand_adamIdx(i));
-					}
-
-					offset += fit_data_.adam.m_correspond_adam2lHand_adamIdx.rows();
-					for (int i = 0; i < fit_data_.adam.m_correspond_adam2rHand_adamIdx.rows(); i++)
-					{
-						if (m_targetPts.block(5 * (i + offset) + 3, 0, 2, 1).isZero(0))
-							dr_dCoeff.block(res_dim * (i + offset) + start_2d_dim, 0, 2, TotalModel::NUM_SHAPE_COEFFICIENTS).setZero();
-						else projection_Derivative(dr_dCoeff, dTJdc, (double*)(jointArray.data() + 3 * (i + offset)), fit_data_.K,
-												   res_dim * (i + offset) + start_2d_dim, 3 * fit_data_.adam.m_correspond_adam2rHand_adamIdx(i));
-					}
-				}
-
-				for (int j = 0; j < res_dim * m_nCorrespond_adam2joints; j++)
-					dr_dCoeff.row(j) *= m_targetPts_weight[j];
-
-				if (fit_data_.fitPAF)
-				{
-					const int offset = res_dim * m_nCorrespond_adam2joints;
-					for (auto i = 0; i < num_PAF_constraint; i++)
-					{
-						if (fit_data_.PAF.col(i).isZero(0))
-						{
-							dr_dCoeff.block(offset + 3 * i, 0, 3, TotalModel::NUM_SHAPE_COEFFICIENTS).setZero();
-							continue;
-						}
-						auto AB = outJoint.block(3 * PAF_connection[2 * i + 1], 0, 3, 1) - outJoint.block(3 * PAF_connection[2 * i], 0, 3, 1);
-						auto length2 = AB(0, 0) * AB(0, 0) + AB(1, 0) * AB(1, 0) + AB(2, 0) * AB(2, 0);
-						auto length = sqrt(length2);
-						const Eigen::Matrix<double, 3, 3, RowMajor> dudJ = Eigen::Matrix<double, 3, 3>::Identity() / length - AB * AB.transpose() / length2 / length;
-						dr_dCoeff.block(offset + 3 * i, 0, 3, TotalModel::NUM_SHAPE_COEFFICIENTS) = dudJ * 
-							(dTJdP.block(3 * PAF_connection[2 * i + 1], 0, 3, TotalModel::NUM_SHAPE_COEFFICIENTS) - dTJdP.block(3 * PAF_connection[2 * i], 0, 3, TotalModel::NUM_SHAPE_COEFFICIENTS));
-					}
-				}
-
-				if (rigid_body)
-					dr_dCoeff.setZero();
-			}
-		}
-
-		return true;
-	}
-private:
-	const AdamFitData& fit_data_;
-	Eigen::VectorXd m_targetPts;
 	Eigen::VectorXd m_targetPts_weight;
 	Eigen::VectorXd m_targetPts_weight_buffer;
+	std::array<float, 4> vertex_weight{{0.0, 0.0, 0.0, 0.0}};
+	std::array<float, 54> PAF_weight{{ 150., 150., 150., 150., 150., 150.,
+										 150., 150., 150.,
+										 150., 150., 150.,
+										 0., 0.,
+										 5., 5., 5., 5.,  // left hand
+										 5., 5., 5., 5.,
+										 5., 5., 5., 5.,
+										 5., 5., 5., 5.,
+										 5., 5., 5., 5.,
+										 5., 5., 5., 5.,  // right hand
+										 5., 5., 5., 5.,
+										 5., 5., 5., 5.,
+										 5., 5., 5., 5.,
+										 5., 5., 5., 5.
+										}};
+
+private:
+	// input data
+	const AdamFitData& fit_data_;
+	// setting
+	bool rigid_body;
+	// data for joint / projection fitting
+	Eigen::VectorXd m_targetPts;
+	int start_2d_dim;
+	// data for vertex fitting
 	std::vector< std::pair<int, std::vector<double>> > corres_vertex2targetpt;
-	float WEAK_WEIGHT;
+	int start_vertex;
+	// counter
 	int m_nCorrespond_adam2joints;
 	int m_nCorrespond_adam2pts;
 	int m_nResiduals;
 	int res_dim;  // number of residuals per joint / vertex constraints
-	int start_2d_dim;
-	bool rigid_body;
+	// data for PAF fitting
 	const int num_PAF_constraint;
-	const std::array<uint, 24> PAF_connection{{12, 2, 2, 5, 5, 8, 12, 1, 1, 4, 4, 7,
-											   12, 17, 17, 19, 19, 21,
-											   12, 16, 16, 18, 18, 20}};
+	const std::array<std::array<uint, 4>, 54> PAF_connection{{ {{0, 12, 0, 2}}, {{0, 2, 0, 5}}, {{0, 5, 0, 8}}, {{0, 12, 0, 1}}, {{0, 1, 0, 4}}, {{0, 4, 0, 7}},
+											   {{0, 12, 0, 17}}, {{0, 17, 0, 19}}, {{0, 19, 0, 21}},  // right arm
+											   {{0, 12, 0, 16}}, {{0, 16, 0, 18}}, {{0, 18, 0, 20}},  // left arm
+											   {{0, 12, 1, 0}}, {{0, 12, 1, 3}},  // neck -> nose, neck -> head top
+											   {{0, 20, 0, 22}}, {{0, 22, 0, 23}}, {{0, 23, 0, 24}}, {{0, 24, 0, 25}},  // left hand
+											   {{0, 20, 0, 26}}, {{0, 26, 0, 27}}, {{0, 27, 0, 28}}, {{0, 28, 0, 29}},
+											   {{0, 20, 0, 30}}, {{0, 30, 0, 31}}, {{0, 31, 0, 32}}, {{0, 32, 0, 33}},
+											   {{0, 20, 0, 34}}, {{0, 34, 0, 35}}, {{0, 35, 0, 36}}, {{0, 36, 0, 37}},
+											   {{0, 20, 0, 38}}, {{0, 38, 0, 39}}, {{0, 39, 0, 40}}, {{0, 40, 0, 41}},
+   											   {{0, 21, 0, 22 + 20}}, {{0, 22 + 20, 0, 23 + 20}}, {{0, 23 + 20, 0, 24 + 20}}, {{0, 24 + 20, 0, 25 + 20}},  // right hand
+											   {{0, 21, 0, 26 + 20}}, {{0, 26 + 20, 0, 27 + 20}}, {{0, 27 + 20, 0, 28 + 20}}, {{0, 28 + 20, 0, 29 + 20}},
+											   {{0, 21, 0, 30 + 20}}, {{0, 30 + 20, 0, 31 + 20}}, {{0, 31 + 20, 0, 32 + 20}}, {{0, 32 + 20, 0, 33 + 20}},
+											   {{0, 21, 0, 34 + 20}}, {{0, 34 + 20, 0, 35 + 20}}, {{0, 35 + 20, 0, 36 + 20}}, {{0, 36 + 20, 0, 37 + 20}},
+											   {{0, 21, 0, 38 + 20}}, {{0, 38 + 20, 0, 39 + 20}}, {{0, 39 + 20, 0, 40 + 20}}, {{0, 40 + 20, 0, 41 + 20}},
+											   }};
+
+	int start_PAF;
+	// data for inner fitting
+	std::vector<uint> inner_dim;
+	const int num_inner;
+	int total_inner_dim;
+	static const int DEFINED_INNER_CONSTRAINTS = 1;
+	int start_inner;
+
+	// parent index
+	std::array<std::vector<int>, TotalModel::NUM_JOINTS> parentIndexes;
+	
+	// jacobians
+	double* dVdP_data;
+	double* dVdc_data;
 };

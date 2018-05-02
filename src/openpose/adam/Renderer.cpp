@@ -399,13 +399,21 @@ void Renderer::MeshRender()
         const float centery = 1080 * options.ortho_scale / 2;
         gluLookAt(centerx, centery, 0, centerx, centery, 1, 0, -1, 0);
     }
+    else
+    {
+        assert(options.CameraMode == 1u);
+        glTranslatef(0, 0, options.view_dist);
+        glRotatef(options.xrot, 1.0, 0.0, 0.0);
+        glRotatef(options.yrot, 0.0, 1.0, 0.0);
+        glTranslatef(0, 0, -options.view_dist);
+    }
 
     std::vector<cv::Point3d>& meshVertices = pData->m_meshVertices;
     if (options.CameraMode == 0u)
     {
         cv::Point3d min_s(10000., 10000., 10000.);
         cv::Point3d max_s(-10000., -10000., -10000.);
-        if (pData->targetJoint)
+        if (pData->resultJoint)
         {
             int num_joint;
             if (pData->vis_type == 0)  // for hand
@@ -416,12 +424,12 @@ void Renderer::MeshRender()
                 num_joint = 61;
             for (int i = 0; i < num_joint; i++)
             {
-                if (pData->targetJoint[3*i+0] < min_s.x) min_s.x = pData->targetJoint[3*i+0];
-                if (pData->targetJoint[3*i+0] > max_s.x) max_s.x = pData->targetJoint[3*i+0];
-                if (pData->targetJoint[3*i+1] < min_s.y) min_s.y = pData->targetJoint[3*i+1];
-                if (pData->targetJoint[3*i+1] > max_s.y) max_s.y = pData->targetJoint[3*i+1];
-                if (pData->targetJoint[3*i+2] < min_s.z) min_s.z = pData->targetJoint[3*i+2];
-                if (pData->targetJoint[3*i+2] > max_s.z) max_s.z = pData->targetJoint[3*i+2];
+                if (pData->resultJoint[3*i+0] < min_s.x) min_s.x = pData->resultJoint[3*i+0];
+                if (pData->resultJoint[3*i+0] > max_s.x) max_s.x = pData->resultJoint[3*i+0];
+                if (pData->resultJoint[3*i+1] < min_s.y) min_s.y = pData->resultJoint[3*i+1];
+                if (pData->resultJoint[3*i+1] > max_s.y) max_s.y = pData->resultJoint[3*i+1];
+                if (pData->resultJoint[3*i+2] < min_s.z) min_s.z = pData->resultJoint[3*i+2];
+                if (pData->resultJoint[3*i+2] > max_s.z) max_s.z = pData->resultJoint[3*i+2];
             }
         }
         else
@@ -618,17 +626,36 @@ void Renderer::RenderAndRead()
     glutPostRedisplay();
 }
 
-void Renderer::CameraMode(int width, int height, double* calibK)
+void Renderer::CameraMode(uint position, int width, int height, double* calibK)
 {
     options.width = width; options.height = height;
     if(calibK != NULL) options.K = calibK;
     glutReshapeWindow(width, height);
     options.CameraMode = 1u;
-    options.xrot = options.yrot = 0;
+    if (position == 0)
+    {
+        // look from the front
+        options.xrot = 0;
+        options.yrot = 0;
+    }
+    else if (position == 1)
+    {
+        // look down
+        options.xrot = 90;
+        options.yrot = 0;
+    }
+    else if (position == 2)
+    {
+        // look from the left
+        options.xrot = 0;
+        options.yrot = 90;
+    }
 }
 
 void Renderer::NormalMode(uint position, int width, int height)
 {
+    options.nRange = 120;
+    options.view_dist = 300;
     if (position == 0)
     {
         // look from the front

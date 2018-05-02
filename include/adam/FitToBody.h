@@ -77,4 +77,5 @@ void Adam_Fit_PAF(TotalModel &adam,
 	Eigen::MatrixXd &faceJoints,
 	Eigen::MatrixXd &PAF,
 	double* K=nullptr,
-	bool fit3Dfirst=false);
+	bool fit3Dfirst=false,
+	bool quan=false);

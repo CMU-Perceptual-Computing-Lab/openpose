@@ -127,7 +127,8 @@ namespace smpl
                 SparseProductDerivative(dMRdP.at(ipar).data(), offset.data(), mParentIndexes[idj], dMtdPIdj.data()); // dB_data is NULL since offset is a constant
 // duration14 += std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start14).count();
 // const auto start15 = std::chrono::high_resolution_clock::now();
-                SparseAdd(dJdP.block<3, TotalModel::NUM_JOINTS * 3>(3 * ipar, 0).data(), mParentIndexes[idj], dMtdPIdj.data());
+                // SparseAdd(dJdP.block<3, TotalModel::NUM_JOINTS * 3>(3 * ipar, 0).data(), mParentIndexes[idj], dMtdPIdj.data());
+                SparseAdd(&dJdP.data()[3 * ipar * TotalModel::NUM_JOINTS * 3], mParentIndexes[idj], dMtdPIdj.data()); // Equivalent: dJdP.block<3, TotalModel::NUM_JOINTS * 3>(3 * ipar, 0).data()
             }
 // duration15 += std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start15).count();
         }
@@ -149,6 +150,185 @@ namespace smpl
 // }
 // const auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start).count();
 // std::cout << __FILE__ << " " << duration * 1e-6 / reps << "\n" << std::endl;
+
+        return true;
+    }
+
+
+    bool PoseToTransform_AdamFull_withDiff::Evaluate(double const* const* parameters,
+        double* residuals,
+        double** jacobians) const
+    {
+        using namespace Eigen;
+        const double* pose = parameters[0];
+        const double* joints = parameters[1];
+        Eigen::Map< const Eigen::Matrix<double, TotalModel::NUM_JOINTS, 3, Eigen::RowMajor> > P(pose);
+        Eigen::Map< const Matrix<double, TotalModel::NUM_JOINTS, 3, RowMajor> > J0(joints);
+        Eigen::Map< Matrix<double, 3 * TotalModel::NUM_JOINTS, 4, RowMajor> > outT(residuals);
+        Eigen::Map< Matrix<double, TotalModel::NUM_JOINTS, 3, RowMajor> > outJoint(residuals + 3 * TotalModel::NUM_JOINTS * 4);
+
+        Map< Matrix<double, 4 * TotalModel::NUM_JOINTS * 3, TotalModel::NUM_JOINTS * 3, RowMajor> > dTrdP(jacobians? jacobians[0] : nullptr);
+        Map< Matrix<double, TotalModel::NUM_JOINTS * 3, TotalModel::NUM_JOINTS * 3, RowMajor> > dJdP(jacobians? jacobians[0] + TotalModel::NUM_JOINTS * TotalModel::NUM_JOINTS * 36 : nullptr);
+
+        Map< Matrix<double, 4 * TotalModel::NUM_JOINTS * 3, TotalModel::NUM_JOINTS * 3, RowMajor> > dTrdJ(jacobians? jacobians[1] : nullptr);
+        Map< Matrix<double, TotalModel::NUM_JOINTS * 3, TotalModel::NUM_JOINTS * 3, RowMajor> > dJdJ(jacobians? jacobians[1] + TotalModel::NUM_JOINTS * TotalModel::NUM_JOINTS * 36 : nullptr);
+        // fill in dTrdJ first, because it is sparse, only dMtdJ is none-0.
+        if (jacobians) std::fill(jacobians[1], jacobians[1] + 36 * TotalModel::NUM_JOINTS * TotalModel::NUM_JOINTS, 0.0);
+
+        Matrix<double, 3, 3, RowMajor> R; // Interface with ceres
+        Matrix<double, 9, 3 * TotalModel::NUM_JOINTS, RowMajor> dRdP(9, 3 * TotalModel::NUM_JOINTS);
+        Matrix<double, 3, 1> offset; // a buffer for 3D vector
+        Matrix<double, 3, 3 * TotalModel::NUM_JOINTS, Eigen::RowMajor> dtdP(3, 3 * TotalModel::NUM_JOINTS); // a buffer for the derivative
+        Matrix<double, 3, 3 * TotalModel::NUM_JOINTS, Eigen::RowMajor> dtdJ(3, 3 * TotalModel::NUM_JOINTS); // a buffer for the derivative
+        Matrix<double, 3, 3 * TotalModel::NUM_JOINTS, Eigen::RowMajor> dtdJ2(3, 3 * TotalModel::NUM_JOINTS); // a buffer for the derivative
+
+        std::vector<Eigen::Matrix<double, 3, 3, Eigen::RowMajor>> MR(TotalModel::NUM_JOINTS, Eigen::Matrix<double, 3, 3, Eigen::RowMajor>(3, 3));
+        std::vector<Eigen::Matrix<double, 3, 1>> Mt(TotalModel::NUM_JOINTS, Eigen::Matrix<double, 3, 1>(3, 1));
+
+        std::vector<Eigen::Matrix<double, 9, 3 * TotalModel::NUM_JOINTS, Eigen::RowMajor>> dMRdP(TotalModel::NUM_JOINTS, Eigen::Matrix<double, 9, 3 * TotalModel::NUM_JOINTS, Eigen::RowMajor>(9, 3 * TotalModel::NUM_JOINTS));
+        std::vector<Eigen::Matrix<double, 3, 3 * TotalModel::NUM_JOINTS, Eigen::RowMajor>> dMtdP(TotalModel::NUM_JOINTS, Eigen::Matrix<double, 3, 3 * TotalModel::NUM_JOINTS, Eigen::RowMajor>(3, 3 * TotalModel::NUM_JOINTS));
+        std::vector<Eigen::Matrix<double, 3, 3 * TotalModel::NUM_JOINTS, Eigen::RowMajor>> dMtdJ(TotalModel::NUM_JOINTS, Eigen::Matrix<double, 3, 3 * TotalModel::NUM_JOINTS, Eigen::RowMajor>(3, 3 * TotalModel::NUM_JOINTS));
+
+        ceres::AngleAxisToRotationMatrix(pose, R.data());
+        outJoint.row(0) = J0.row(0);
+        MR.at(0) = R;
+        Mt.at(0) = J0.row(0).transpose();
+        outT.block(0, 0, 3, 3) = MR[0];
+        outT.block(0, 3, 3, 1) = Mt[0];
+
+        if (jacobians)
+        {
+            AngleAxisToRotationMatrix_Derivative(pose, dMRdP.at(0).data(), 0);  
+            std::fill(dMtdP[0].data(), dMtdP[0].data() + 9 * TotalModel::NUM_JOINTS, 0.0); // dMtdP.at(0).setZero();
+            std::fill(dMtdJ[0].data(), dMtdJ[0].data() + 9 * TotalModel::NUM_JOINTS, 0.0); // dMtdJ.at(0).setZero();
+            dMtdJ.at(0).block(0, 0, 3, 3).setIdentity();
+            std::copy(dMtdP[0].data(), dMtdP[0].data() + 9 * TotalModel::NUM_JOINTS, dJdP.data()); // dJdP.block(0, 0, 3, TotalModel::NUM_JOINTS * 3) = dMtdP[0];
+            std::copy(dMtdJ[0].data(), dMtdJ[0].data() + 9 * TotalModel::NUM_JOINTS, dJdJ.data()); // dJdJ.block(0, 0, 3, TotalModel::NUM_JOINTS * 3) = dMtdJ[0];
+        }
+
+        for (int idj = 1; idj < mod_.NUM_JOINTS; idj++)
+        {
+            const int ipar = mod_.m_parent[idj];
+            const auto baseIndex = idj * 3;
+            double angles[3] = {pose[baseIndex], pose[baseIndex+1], pose[baseIndex+2]};
+
+            //Freezing joints here  //////////////////////////////////////////////////////
+            if (idj == 10 || idj == 11) //foot ends
+            {
+                angles[0] = 0;
+                angles[1] = 0;
+                angles[2] = 0;
+            }
+            else if (idj == 7 || idj == 8)   //foot ankle. Restrict side movement
+            {
+                angles[2] = 0;
+            }
+            else if (idj == 24 || idj == 27 || idj == 28 || idj == 31 || idj == 32 || idj == 35 || idj == 26 || idj == 39 || idj == 40 ||
+                idj == 44 || idj == 47 || idj == 48 || idj == 51 || idj == 52 || idj == 55 || idj == 56 || idj == 59 || idj == 60)  //all hands
+            {
+                angles[0] = 0.0;
+                angles[1] = 0.0;
+            }
+
+            ceres::EulerAnglesToRotationMatrix(angles, 3, R.data());
+            MR.at(idj) = MR.at(ipar) * R;
+            offset = (J0.row(idj) - J0.row(ipar)).transpose();
+            Mt.at(idj) = Mt.at(ipar) + MR.at(ipar) * offset;
+            outJoint.row(idj) = Mt.at(idj).transpose();
+            outT.block(0, 0, 3, 3) = MR[0];
+            outT.block(0, 3, 3, 1) = Mt[0];
+
+            if(jacobians)
+            {
+                EulerAnglesToRotationMatrix_Derivative(angles, dRdP.data(), idj);
+
+                if (idj == 10 || idj == 11) //foot ends
+                    dRdP.block(0, 3 * idj, 9, 3).setZero();
+                if (idj == 7 || idj == 8)   //foot ankle. Restrict side movement
+                    dRdP.block(0, 3 * idj + 2, 9, 1).setZero();
+                if (idj == 24 || idj == 27 || idj == 28 || idj == 31 || idj == 32 || idj == 35 || idj == 26 || idj == 39 || idj == 40)  //all hands
+                    dRdP.block(0, 3 * idj, 9, 2).setZero();
+                if (idj == 44 || idj == 47 || idj == 48 || idj == 51 || idj == 52 || idj == 55 || idj == 56 || idj == 59 || idj == 60)  //all hands
+                    dRdP.block(0, 3 * idj, 9, 2).setZero();
+
+                if (idj == 10 || idj == 11) //foot ends
+                    dMRdP.at(idj) = dMRdP.at(ipar);
+                else
+                {
+                    // Sparse derivative
+                    SparseProductDerivative(MR.at(ipar).data(), dMRdP.at(ipar).data(), R.data(), dRdP.data(), idj, mParentIndexes.at(idj), dMRdP.at(idj).data());
+                    // // Slower but equivalent - Dense derivative
+                    // Product_Derivative(MR.at(ipar).data(), dMRdP.at(ipar).data(), R.data(), dRdP.data(), dMRdP.at(idj).data()); // Compute the product of matrix multiplication
+                }
+                SparseProductDerivative(dMRdP.at(ipar).data(), offset.data(), mParentIndexes.at(ipar), dMtdP.at(idj).data());
+                // the following line is equivalent to dMtdP.at(idj) = dMtdP.at(idj) + dMtdP.at(ipar);
+                SparseAdd(dMtdP.at(ipar).data(), mParentIndexes.at(ipar), dMtdP.at(idj).data());
+
+                std::fill(dtdJ.data(), dtdJ.data() + 9 * TotalModel::NUM_JOINTS, 0.0); // dtdJ.setZero();
+                // the following two lines are equiv to: dtdJ.block(0, 3 * idj, 3, 3).setIdentity(); dtdJ.block(0, 3 * ipar, 3, 3) -= Matrix<double, 3, 3>::Identity(); // derivative of offset wrt J
+                dtdJ.data()[3 * idj] = 1; dtdJ.data()[3 * idj + 3 * TotalModel::NUM_JOINTS + 1] = 1; dtdJ.data()[3 * idj + 6 * TotalModel::NUM_JOINTS + 2] = 1;
+                dtdJ.data()[3 * ipar] = -1; dtdJ.data()[3 * ipar + 3 * TotalModel::NUM_JOINTS + 1] = -1; dtdJ.data()[3 * ipar + 6 * TotalModel::NUM_JOINTS + 2] = -1;
+                // the following line is equivalent to Product_Derivative(MR.at(ipar).data(), NULL, offset.data(), dtdJ.data(), dMtdJ.at(idj).data(), 1); // dA_data is NULL since rotation is not related to joint
+                SparseProductDerivativeConstA(MR.at(ipar).data(), dtdJ.data(), mParentIndexes.at(idj), dMtdJ.at(idj).data());
+                // the following line is equivalent to dMtdJ.at(idj) = dMtdJ.at(idj) + dMtdJ.at(ipar);
+                SparseAdd(dMtdJ.at(ipar).data(), mParentIndexes.at(idj), dMtdJ.at(idj).data());
+
+                std::copy(dMtdP[idj].data(), dMtdP[idj].data() + 9 * TotalModel::NUM_JOINTS, dJdP.data() + 9 * idj * TotalModel::NUM_JOINTS); // dJdP.block(3 * idj, 0, 3, TotalModel::NUM_JOINTS * 3) = dMtdP[idj];
+                std::copy(dMtdJ[idj].data(), dMtdJ[idj].data() + 9 * TotalModel::NUM_JOINTS, dJdJ.data() + 9 * idj * TotalModel::NUM_JOINTS); // dJdJ.block(3 * idj, 0, 3, TotalModel::NUM_JOINTS * 3) = dMtdJ[idj];
+            }
+        }
+
+        for (int idj = 0; idj < mod_.NUM_JOINTS; idj++) {
+            offset = J0.row(idj).transpose();
+            Mt.at(idj) -= MR.at(idj) * offset;
+
+            outT.block(3 * idj, 0, 3, 3) = MR.at(idj);
+            outT.block(3 * idj, 3, 3, 1) = Mt.at(idj);
+
+            if (jacobians)
+            {
+                // The following line is equivalent to Product_Derivative(MR.at(idj).data(), dMRdP.at(idj).data(), offset.data(), NULL, dtdP.data(), 1);
+                SparseProductDerivative(dMRdP.at(idj).data(), offset.data(), mParentIndexes.at(idj), dtdP.data());
+                // The following line is equivalent to dMtdP.at(idj) -= dtdP;
+                SparseSubtract(dtdP.data(), mParentIndexes.at(idj), dMtdP.at(idj).data());
+
+                std::fill(dtdJ.data(), dtdJ.data() + 9 * TotalModel::NUM_JOINTS, 0.0); // dtdJ.setZero();
+                // The follwing line is equivalent to dtdJ.block(0, 3 * idj, 3, 3).setIdentity();
+                dtdJ.data()[3 * idj] = 1; dtdJ.data()[3 * idj + 3 * TotalModel::NUM_JOINTS + 1] = 1; dtdJ.data()[3 * idj + 6 * TotalModel::NUM_JOINTS + 2] = 1;
+                // The following line is equivalent to Product_Derivative(MR.at(idj).data(), NULL, offset.data(), dtdJ.data(), dtdJ2.data(), 1);
+                SparseProductDerivativeConstA(MR.at(idj).data(), dtdJ.data(), mParentIndexes.at(idj), dtdJ2.data());
+                // The following line is equivalent to dMtdJ.at(idj) -= dtdJ2;
+                SparseSubtract(dtdJ2.data(), mParentIndexes.at(idj), dMtdJ.at(idj).data());
+
+                // The following lines are copying jacobian from dMRdP and dMtdP to dTrdP, equivalent to
+                // dTrdP.block(12 * idj + 0, 0, 3, TotalModel::NUM_JOINTS * 3) = dMRdP.at(idj).block(0, 0, 3, TotalModel::NUM_JOINTS * 3);
+                // dTrdP.block(12 * idj + 4, 0, 3, TotalModel::NUM_JOINTS * 3) = dMRdP.at(idj).block(3, 0, 3, TotalModel::NUM_JOINTS * 3);
+                // dTrdP.block(12 * idj + 8, 0, 3, TotalModel::NUM_JOINTS * 3) = dMRdP.at(idj).block(6, 0, 3, TotalModel::NUM_JOINTS * 3);
+                // dTrdP.block(12 * idj + 3, 0, 1, TotalModel::NUM_JOINTS * 3) = dMtdP.at(idj).block(0, 0, 1, TotalModel::NUM_JOINTS * 3);
+                // dTrdP.block(12 * idj + 7, 0, 1, TotalModel::NUM_JOINTS * 3) = dMtdP.at(idj).block(1, 0, 1, TotalModel::NUM_JOINTS * 3);
+                // dTrdP.block(12 * idj + 11, 0, 1, TotalModel::NUM_JOINTS * 3) = dMtdP.at(idj).block(2, 0, 1, TotalModel::NUM_JOINTS * 3);
+                std::copy(dMRdP.at(idj).data(), dMRdP.at(idj).data() + 9 * TotalModel::NUM_JOINTS, dTrdP.data() + 12 * idj * TotalModel::NUM_JOINTS * 3);
+                std::copy(dMtdP.at(idj).data(), dMtdP.at(idj).data() + 3 * TotalModel::NUM_JOINTS, dTrdP.data() + (12 * idj + 3) * TotalModel::NUM_JOINTS * 3);
+                std::copy(dMRdP.at(idj).data() + 9 * TotalModel::NUM_JOINTS, dMRdP.at(idj).data() + 18 * TotalModel::NUM_JOINTS,
+                    dTrdP.data() + (12 * idj + 4)* TotalModel::NUM_JOINTS * 3);
+                std::copy(dMtdP.at(idj).data() + 3 * TotalModel::NUM_JOINTS, dMtdP.at(idj).data() + 6 * TotalModel::NUM_JOINTS,
+                    dTrdP.data() + (12 * idj + 7) * TotalModel::NUM_JOINTS * 3);
+                std::copy(dMRdP.at(idj).data() + 18 * TotalModel::NUM_JOINTS, dMRdP.at(idj).data() + 27 * TotalModel::NUM_JOINTS,
+                    dTrdP.data() + (12 * idj + 8)* TotalModel::NUM_JOINTS * 3);
+                std::copy(dMtdP.at(idj).data() + 6 * TotalModel::NUM_JOINTS, dMtdP.at(idj).data() + 9 * TotalModel::NUM_JOINTS,
+                    dTrdP.data() + (12 * idj + 11) * TotalModel::NUM_JOINTS * 3);
+
+                // The following lines are copying jacobian from and dMtdJ to dTrdJ, equivalent to
+                // dTrdJ.block(12 * idj + 3, 0, 1, TotalModel::NUM_JOINTS * 3) = dMtdJ.at(idj).block(0, 0, 1, TotalModel::NUM_JOINTS * 3);
+                // dTrdJ.block(12 * idj + 7, 0, 1, TotalModel::NUM_JOINTS * 3) = dMtdJ.at(idj).block(1, 0, 1, TotalModel::NUM_JOINTS * 3);
+                // dTrdJ.block(12 * idj + 11, 0, 1, TotalModel::NUM_JOINTS * 3) = dMtdJ.at(idj).block(2, 0, 1, TotalModel::NUM_JOINTS * 3);
+                std::copy(dMtdJ.at(idj).data(), dMtdJ.at(idj).data() + 3 * TotalModel::NUM_JOINTS, dTrdJ.data() + (12 * idj + 3) * TotalModel::NUM_JOINTS * 3);
+                std::copy(dMtdJ.at(idj).data() + 3 * TotalModel::NUM_JOINTS, dMtdJ.at(idj).data() + 6 * TotalModel::NUM_JOINTS,
+                    dTrdJ.data() + (12 * idj + 7) * TotalModel::NUM_JOINTS * 3);
+                std::copy(dMtdJ.at(idj).data() + 6 * TotalModel::NUM_JOINTS, dMtdJ.at(idj).data() + 9 * TotalModel::NUM_JOINTS,
+                    dTrdJ.data() + (12 * idj + 11) * TotalModel::NUM_JOINTS * 3);
+            }
+        }
 
         return true;
     }
