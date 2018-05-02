@@ -434,7 +434,8 @@ if (UNIX AND NOT APPLE)
         execute_process(COMMAND git checkout master WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
       elseif (${GPU_MODE} MATCHES "CPU_ONLY")
         if (USE_MKL)
-          execute_process(COMMAND git checkout intel WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
+          #execute_process(COMMAND git checkout intel WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
+          execute_process(COMMAND git checkout b6712ce WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
           execute_process(COMMAND sh prepare_mkl.sh WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe/external/mkl
               OUTPUT_VARIABLE rv)
           set( MLIST ${rv} )
@@ -446,12 +447,23 @@ if (UNIX AND NOT APPLE)
             )
           file(COPY ${MKL_SO} DESTINATION ${CMAKE_BINARY_DIR}/caffe)
 
+          # New MLSL Lib
+          #execute_process(COMMAND sh prepare_mlsl.sh WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe/external/mlsl
+          #    OUTPUT_VARIABLE rv)
+          #set( MLIST ${rv} )
+          #separate_arguments(MLIST)
+          #list(GET MLIST 0 MLSL_PATH)
+          #message(STATUS ${MLSL_PATH})
+          #file(GLOB MLSL_SO
+          #  "${MLSL_PATH}/intel64/lib/*"
+          #  )
+          #file(COPY ${MLSL_SO} DESTINATION ${CMAKE_BINARY_DIR}/caffe)
+
           set(MKL_LIBS
+            #"${CMAKE_BINARY_DIR}/caffe/libmlsl.so"
             "${CMAKE_BINARY_DIR}/caffe/libiomp5.so"
             "${CMAKE_BINARY_DIR}/caffe/libmklml_intel.so"
-            "${CMAKE_BINARY_DIR}/caffe/lib/libmkldnn.so.0"
             "${CMAKE_BINARY_DIR}/caffe/lib/libmkldnn.so"
-            "${CMAKE_BINARY_DIR}/caffe/lib/libmkldnn.so.0.12.0"
             )
         else ()
           execute_process(COMMAND git checkout master WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
