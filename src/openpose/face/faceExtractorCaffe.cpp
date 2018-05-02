@@ -1,4 +1,4 @@
-#if defined USE_CAFFE
+#ifdef USE_CAFFE
     #include <caffe/blob.hpp>
 #endif
 #include <opencv2/opencv.hpp> // CV_WARP_INVERSE_MAP, CV_INTER_LINEAR
@@ -15,7 +15,7 @@ namespace op
 {
     struct FaceExtractorCaffe::ImplFaceExtractorCaffe
     {
-        #if defined USE_CAFFE
+        #ifdef USE_CAFFE
             bool netInitialized;
             const int mGpuId;
             std::shared_ptr<NetCaffe> spNetCaffe;
@@ -38,7 +38,7 @@ namespace op
         #endif
     };
 
-    #if defined USE_CAFFE
+    #ifdef USE_CAFFE
         void updateFaceHeatMapsForPerson(Array<float>& heatMaps, const int person, const ScaleMode heatMapScaleMode,
                                          const float* heatMapsGpuPtr)
         {
@@ -108,13 +108,13 @@ namespace op
                                            const std::vector<HeatMapType>& heatMapTypes,
                                            const ScaleMode heatMapScale, const bool enableGoogleLogging) :
         FaceExtractor{netInputSize, netOutputSize, heatMapTypes, heatMapScale}
-        #if defined USE_CAFFE
+        #ifdef USE_CAFFE
         , upImpl{new ImplFaceExtractorCaffe{modelFolder, gpuId, enableGoogleLogging}}
         #endif
     {
         try
         {
-            #if !defined USE_CAFFE
+            #ifndef USE_CAFFE
                 UNUSED(netInputSize);
                 UNUSED(netOutputSize);
                 UNUSED(modelFolder);
@@ -123,6 +123,10 @@ namespace op
                 UNUSED(heatMapScale);
                 error("OpenPose must be compiled with the `USE_CAFFE` & `USE_CUDA` macro definitions in order to run"
                       " this functionality.", __LINE__, __FUNCTION__, __FILE__);
+            #endif
+            #ifdef COMMERCIAL_LICENSE
+                error("Face is not included in the commercial version of OpenPose yet. We might include it in the future after some"
+                      " commercial issues have been solved. Thanks!", __LINE__, __FUNCTION__, __FILE__);
             #endif
         }
         catch (const std::exception& e)
@@ -139,7 +143,7 @@ namespace op
     {
         try
         {
-            #if defined USE_CAFFE
+            #ifdef USE_CAFFE
                 // Logging
                 log("Starting initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 // Initialize Caffe net
@@ -169,7 +173,7 @@ namespace op
     {
         try
         {
-            #if defined USE_CAFFE
+            #ifdef USE_CAFFE
                 if (!faceRectangles.empty())
                 {
                     // Security checks

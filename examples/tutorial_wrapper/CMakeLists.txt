@@ -1,8 +1,11 @@
-set(EXAMPLE_FILES 
-    1_user_asynchronous_output.cpp
-    2_user_synchronous.cpp
-    3_user_asynchronous.cpp)
-  
+set(EXAMPLE_FILES
+    1_user_synchronous_postprocessing.cpp
+    2_user_synchronous_input.cpp
+    3_user_synchronous_output.cpp
+    4_user_synchronous_all.cpp
+    5_user_asynchronous.cpp
+    6_user_asynchronous_output.cpp)
+
 include(${CMAKE_SOURCE_DIR}/cmake/Utils.cmake)
 
 foreach(EXAMPLE_FILE ${EXAMPLE_FILES})
