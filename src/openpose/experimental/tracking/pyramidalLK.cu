@@ -7,6 +7,7 @@
     #include <opencv2/gpu/gpu.hpp>
     #define cvCuda cv::gpu
 #else
+    #include <opencv2/cudawarping.hpp>
     #include <opencv2/cudaimgproc.hpp>
     #include <opencv2/core/cuda.hpp>
     #define cvCuda cv::cuda
