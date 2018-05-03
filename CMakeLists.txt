@@ -178,12 +178,17 @@ if (${GPU_MODE} MATCHES "CUDA")
   option(USE_CUDNN "Build OpenPose with cuDNN library support." ON)
 endif (${GPU_MODE} MATCHES "CUDA")
 
-# Suboptions for OpenPose 3D Reconstruction demo
+# Suboptions for OpenPose 3D Reconstruction module and demo
 option(WITH_3D_RENDERER "Add OpenPose 3D renderer module (it requires FreeGLUT library)." OFF)
 if (UNIX AND NOT APPLE)
-  option(WITH_CERES "Add Ceres support. Used e.g., for advanced 3-D reconstruction." OFF)
+  option(WITH_CERES "Add Ceres support for advanced 3-D reconstruction." OFF)
 endif (UNIX AND NOT APPLE)
 option(WITH_FLIR_CAMERA "Add FLIR (formerly Point Grey) camera code (requires Spinnaker SDK already installed)." OFF)
+
+# # Suboptions for OpenPose tracking
+# if (UNIX AND NOT APPLE)
+#   option(WITH_TRACKING "Add OpenPose 3D tracking module (it requires OpenCV with CUDA support)." OFF)
+# endif (UNIX AND NOT APPLE)
 
 # Download the models
 option(DOWNLOAD_COCO_MODEL "Download COCO model." ON)
@@ -226,6 +231,12 @@ if (WITH_FLIR_CAMERA)
   # OpenPose flags
   add_definitions(-DWITH_FLIR_CAMERA)
 endif (WITH_FLIR_CAMERA)
+
+# Adding tracking
+if (WITH_TRACKING)
+  # OpenPose flags
+  add_definitions(-DWITH_TRACKING)
+endif (WITH_TRACKING)
 
 if (UNIX AND NOT APPLE)
   if (${GPU_MODE} MATCHES "CUDA")

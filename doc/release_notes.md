@@ -217,8 +217,11 @@ OpenPose Library - Release Notes
     2. 3-D reconstruction: Added non-linear minimization to further improve 3-D triangulation accuracy by ~5% (Ubuntu only).
     3. CMake: All libraries as single variable (simpler to add/remove libraries).
     4. Datum includes extrinsic and intrinsic camera parameters.
+    5. Function `scaleKeypoints(Array<float>& keypoints, const float scale)` also accepts 3D keypoints.
+    6. 3D keypoints and camera parameters in meters (instead of millimeters) in order to reduce numerical errors.
 2. Functions or parameters renamed:
     1. Removed scale parameter from hand and face rectangle extractor (causing wrong results if custom `--output_resolution`).
+    2. Functions `scaleKeypoints`, other than `scaleKeypoints(Array<float>& keypoints, const float scale)`, renamed as `scaleKeypoints2d`.
 3. Main bugs fixed:
     1. Fixed hand and face extraction and rendering scaling issues when `--output_resolution` is not the default one.
     2. Part candidates (`--part_candidates`) are saved with the same scale than the final keypoints itself.
