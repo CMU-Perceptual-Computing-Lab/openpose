@@ -219,9 +219,11 @@ OpenPose Library - Release Notes
     4. Datum includes extrinsic and intrinsic camera parameters.
     5. Function `scaleKeypoints(Array<float>& keypoints, const float scale)` also accepts 3D keypoints.
     6. 3D keypoints and camera parameters in meters (instead of millimeters) in order to reduce numerical errors.
+    7. New `PoseExtractor` class to contain future ID and tracking algorithms as well as the current OpenPose keypoint detection algorithm.
 2. Functions or parameters renamed:
     1. Removed scale parameter from hand and face rectangle extractor (causing wrong results if custom `--output_resolution`).
     2. Functions `scaleKeypoints`, other than `scaleKeypoints(Array<float>& keypoints, const float scale)`, renamed as `scaleKeypoints2d`.
+    3. `(W)PoseExtractor` renamed to `(W)PoseExtractorNet` to distinguish from new `PoseExtractor`. Analogously with `(W)FaceExtractorNet` and `(W)HandExtractorNet`.
 3. Main bugs fixed:
     1. Fixed hand and face extraction and rendering scaling issues when `--output_resolution` is not the default one.
     2. Part candidates (`--part_candidates`) are saved with the same scale than the final keypoints itself.

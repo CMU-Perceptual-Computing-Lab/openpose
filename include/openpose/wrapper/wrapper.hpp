@@ -534,7 +534,7 @@ namespace op
             else
                 wDatumProducer = nullptr;
 
-            std::vector<std::shared_ptr<PoseExtractor>> poseExtractors;
+            std::vector<std::shared_ptr<PoseExtractorNet>> poseExtractorNets;
             std::vector<std::shared_ptr<PoseGpuRenderer>> poseGpuRenderers;
             std::shared_ptr<PoseCpuRenderer> poseCpuRenderer;
             if (numberThreads > 0)
@@ -563,7 +563,7 @@ namespace op
                 {
                     // Pose estimators
                     for (auto gpuId = 0; gpuId < numberThreads; gpuId++)
-                        poseExtractors.emplace_back(std::make_shared<PoseExtractorCaffe>(
+                        poseExtractorNets.emplace_back(std::make_shared<PoseExtractorCaffe>(
                             wrapperStructPose.poseModel, modelFolder, gpuId + gpuNumberStart,
                             wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale,
                             wrapperStructPose.addPartCandidates, wrapperStructPose.enableGoogleLogging
@@ -581,10 +581,10 @@ namespace op
                         // GPU rendering
                         if (renderOutputGpu)
                         {
-                            for (const auto& poseExtractor : poseExtractors)
+                            for (const auto& poseExtractorNet : poseExtractorNets)
                             {
                                 poseGpuRenderers.emplace_back(std::make_shared<PoseGpuRenderer>(
-                                    wrapperStructPose.poseModel, poseExtractor, wrapperStructPose.renderThreshold,
+                                    wrapperStructPose.poseModel, poseExtractorNet, wrapperStructPose.renderThreshold,
                                     wrapperStructPose.blendOriginalFrame, alphaKeypoint,
                                     alphaHeatMap, wrapperStructPose.defaultPartToRender
                                 ));
@@ -603,16 +603,16 @@ namespace op
                     log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
                     // Pose extractor(s)
-                    spWPoses.resize(poseExtractors.size());
+                    spWPoses.resize(poseExtractorNets.size());
                     for (auto i = 0u; i < spWPoses.size(); i++)
-                        spWPoses.at(i) = {std::make_shared<WPoseExtractor<TDatumsPtr>>(poseExtractors.at(i))};
+                        spWPoses.at(i) = {std::make_shared<WPoseExtractorNet<TDatumsPtr>>(poseExtractorNets.at(i))};
 
-                    // Added right after PoseExtractor to avoid:
+                    // Added right after PoseExtractorNet to avoid:
                     // 1) Rendering people that are later deleted (wrong visualization).
                     // 2) Processing faces and hands on people that will be deleted (speed up).
                     if (wrapperStructPose.numberPeopleMax > 0)
                     {
-                        // Add KeepTopNPeople for each PoseExtractor
+                        // Add KeepTopNPeople for each PoseExtractorNet
                         const auto keepTopNPeople = std::make_shared<KeepTopNPeople>(wrapperStructPose.numberPeopleMax);
                         for (auto& wPose : spWPoses)
                             wPose.emplace_back(std::make_shared<WKeepTopNPeople<TDatumsPtr>>(keepTopNPeople));
@@ -650,12 +650,12 @@ namespace op
                     {
                         // Face keypoint extractor
                         const auto netOutputSize = wrapperStructFace.netInputSize;
-                        const auto faceExtractor = std::make_shared<FaceExtractorCaffe>(
+                        const auto faceExtractorNet = std::make_shared<FaceExtractorCaffe>(
                             wrapperStructFace.netInputSize, netOutputSize, modelFolder,
                             gpu + gpuNumberStart, wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale,
                             wrapperStructPose.enableGoogleLogging
                         );
-                        spWPoses.at(gpu).emplace_back(std::make_shared<WFaceExtractor<TDatumsPtr>>(faceExtractor));
+                        spWPoses.at(gpu).emplace_back(std::make_shared<WFaceExtractorNet<TDatumsPtr>>(faceExtractorNet));
                     }
                 }
 
@@ -676,14 +676,14 @@ namespace op
                             spWPoses.at(gpu).emplace_back(std::make_shared<WHandDetector<TDatumsPtr>>(handDetector));
                         // Hand keypoint extractor
                         const auto netOutputSize = wrapperStructHand.netInputSize;
-                        const auto handExtractor = std::make_shared<HandExtractorCaffe>(
+                        const auto handExtractorNet = std::make_shared<HandExtractorCaffe>(
                             wrapperStructHand.netInputSize, netOutputSize, modelFolder,
                             gpu + gpuNumberStart, wrapperStructHand.scalesNumber, wrapperStructHand.scaleRange,
                             wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale,
                             wrapperStructPose.enableGoogleLogging
                         );
                         spWPoses.at(gpu).emplace_back(
-                            std::make_shared<WHandExtractor<TDatumsPtr>>(handExtractor)
+                            std::make_shared<WHandExtractorNet<TDatumsPtr>>(handExtractorNet)
                             );
                         // If tracking
                         if (wrapperStructHand.tracking)
@@ -912,7 +912,7 @@ namespace op
                     // Gui
                     auto gui = std::make_shared<Gui3D>(
                         finalOutputSize, wrapperStructOutput.fullScreen, mThreadManager.getIsRunningSharedPtr(),
-                        spVideoSeek, poseExtractors, renderers, wrapperStructPose.poseModel,
+                        spVideoSeek, poseExtractorNets, renderers, wrapperStructPose.poseModel,
                         wrapperStructOutput.displayMode
                     );
                     // WGui
@@ -924,7 +924,7 @@ namespace op
                     // Gui
                     auto gui = std::make_shared<Gui>(
                         finalOutputSize, wrapperStructOutput.fullScreen, mThreadManager.getIsRunningSharedPtr(),
-                        spVideoSeek, poseExtractors, renderers
+                        spVideoSeek, poseExtractorNets, renderers
                     );
                     // WGui
                     spWGui = {std::make_shared<WGui<TDatumsPtr>>(gui)};

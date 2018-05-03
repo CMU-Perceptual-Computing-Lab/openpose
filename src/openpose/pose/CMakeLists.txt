@@ -4,8 +4,8 @@ set(SOURCES_OP_POSE
     bodyPartConnectorCaffe.cpp
     defineTemplates.cpp
     poseCpuRenderer.cpp
-    poseExtractor.cpp
     poseExtractorCaffe.cpp
+    poseExtractorNet.cpp
     poseGpuRenderer.cpp
     poseParameters.cpp
     poseParametersRender.cpp

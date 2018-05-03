@@ -1,5 +1,5 @@
-#ifndef OPENPOSE_FACE_W_FACE_DETECTOR_HPP
-#define OPENPOSE_FACE_W_FACE_DETECTOR_HPP
+#ifndef OPENPOSE_FACE_W_FACE_DETECTOR_NET_HPP
+#define OPENPOSE_FACE_W_FACE_DETECTOR_NET_HPP
 
 #include <openpose/core/common.hpp>
 #include <openpose/face/faceRenderer.hpp>
@@ -8,19 +8,19 @@
 namespace op
 {
     template<typename TDatums>
-    class WFaceExtractor : public Worker<TDatums>
+    class WFaceExtractorNet : public Worker<TDatums>
     {
     public:
-        explicit WFaceExtractor(const std::shared_ptr<FaceExtractor>& faceExtractor);
+        explicit WFaceExtractorNet(const std::shared_ptr<FaceExtractorNet>& faceExtractorNet);
 
         void initializationOnThread();
 
         void work(TDatums& tDatums);
 
     private:
-        std::shared_ptr<FaceExtractor> spFaceExtractor;
+        std::shared_ptr<FaceExtractorNet> spFaceExtractorNet;
 
-        DELETE_COPY(WFaceExtractor);
+        DELETE_COPY(WFaceExtractorNet);
     };
 }
 
@@ -33,19 +33,19 @@ namespace op
 namespace op
 {
     template<typename TDatums>
-    WFaceExtractor<TDatums>::WFaceExtractor(const std::shared_ptr<FaceExtractor>& faceExtractor) :
-        spFaceExtractor{faceExtractor}
+    WFaceExtractorNet<TDatums>::WFaceExtractorNet(const std::shared_ptr<FaceExtractorNet>& faceExtractorNet) :
+        spFaceExtractorNet{faceExtractorNet}
     {
     }
 
     template<typename TDatums>
-    void WFaceExtractor<TDatums>::initializationOnThread()
+    void WFaceExtractorNet<TDatums>::initializationOnThread()
     {
-        spFaceExtractor->initializationOnThread();
+        spFaceExtractorNet->initializationOnThread();
     }
 
     template<typename TDatums>
-    void WFaceExtractor<TDatums>::work(TDatums& tDatums)
+    void WFaceExtractorNet<TDatums>::work(TDatums& tDatums)
     {
         try
         {
@@ -58,9 +58,9 @@ namespace op
                 // Extract people face
                 for (auto& tDatum : *tDatums)
                 {
-                    spFaceExtractor->forwardPass(tDatum.faceRectangles, tDatum.cvInputData);
-                    tDatum.faceHeatMaps = spFaceExtractor->getHeatMaps().clone();
-                    tDatum.faceKeypoints = spFaceExtractor->getFaceKeypoints().clone();
+                    spFaceExtractorNet->forwardPass(tDatum.faceRectangles, tDatum.cvInputData);
+                    tDatum.faceHeatMaps = spFaceExtractorNet->getHeatMaps().clone();
+                    tDatum.faceKeypoints = spFaceExtractorNet->getFaceKeypoints().clone();
                 }
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
@@ -77,7 +77,7 @@ namespace op
         }
     }
 
-    COMPILE_TEMPLATE_DATUM(WFaceExtractor);
+    COMPILE_TEMPLATE_DATUM(WFaceExtractorNet);
 }
 
-#endif // OPENPOSE_FACE_W_FACE_DETECTOR_HPP
+#endif // OPENPOSE_FACE_W_FACE_DETECTOR_NET_HPP

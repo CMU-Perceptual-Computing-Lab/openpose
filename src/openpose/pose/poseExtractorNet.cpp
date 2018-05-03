@@ -3,7 +3,7 @@
 #endif
 #include <openpose/core/enumClasses.hpp>
 #include <openpose/utilities/fastMath.hpp>
-#include <openpose/pose/poseExtractor.hpp>
+#include <openpose/pose/poseExtractorNet.hpp>
 
 namespace op
 {
@@ -43,8 +43,8 @@ namespace op
         }
     }
 
-    PoseExtractor::PoseExtractor(const PoseModel poseModel, const std::vector<HeatMapType>& heatMapTypes,
-                                 const ScaleMode heatMapScale, const bool addPartCandidates) :
+    PoseExtractorNet::PoseExtractorNet(const PoseModel poseModel, const std::vector<HeatMapType>& heatMapTypes,
+                                       const ScaleMode heatMapScale, const bool addPartCandidates) :
         mPoseModel{poseModel},
         mNetOutputSize{0,0},
         mHeatMapTypes{heatMapTypes},
@@ -75,11 +75,11 @@ namespace op
         }
     }
 
-    PoseExtractor::~PoseExtractor()
+    PoseExtractorNet::~PoseExtractorNet()
     {
     }
 
-    void PoseExtractor::initializationOnThread()
+    void PoseExtractorNet::initializationOnThread()
     {
         try
         {
@@ -94,7 +94,7 @@ namespace op
         }
     }
 
-    Array<float> PoseExtractor::getHeatMapsCopy() const
+    Array<float> PoseExtractorNet::getHeatMapsCopy() const
     {
         try
         {
@@ -216,7 +216,7 @@ namespace op
         }
     }
 
-    std::vector<std::vector<std::array<float,3>>> PoseExtractor::getCandidatesCopy() const
+    std::vector<std::vector<std::array<float,3>>> PoseExtractorNet::getCandidatesCopy() const
     {
         try
         {
@@ -253,7 +253,7 @@ namespace op
         }
     }
 
-    Array<float> PoseExtractor::getPoseKeypoints() const
+    Array<float> PoseExtractorNet::getPoseKeypoints() const
     {
         try
         {
@@ -267,7 +267,7 @@ namespace op
         }
     }
 
-    Array<float> PoseExtractor::getPoseScores() const
+    Array<float> PoseExtractorNet::getPoseScores() const
     {
         try
         {
@@ -281,7 +281,7 @@ namespace op
         }
     }
 
-    float PoseExtractor::getScaleNetToOutput() const
+    float PoseExtractorNet::getScaleNetToOutput() const
     {
         try
         {
@@ -295,7 +295,7 @@ namespace op
         }
     }
 
-    double PoseExtractor::get(const PoseProperty property) const
+    double PoseExtractorNet::get(const PoseProperty property) const
     {
         try
         {
@@ -308,7 +308,7 @@ namespace op
         }
     }
 
-    void PoseExtractor::set(const PoseProperty property, const double value)
+    void PoseExtractorNet::set(const PoseProperty property, const double value)
     {
         try
         {
@@ -320,7 +320,7 @@ namespace op
         }
     }
 
-    void PoseExtractor::increase(const PoseProperty property, const double value)
+    void PoseExtractorNet::increase(const PoseProperty property, const double value)
     {
         try
         {
@@ -332,7 +332,7 @@ namespace op
         }
     }
 
-    void PoseExtractor::checkThread() const
+    void PoseExtractorNet::checkThread() const
     {
         try
         {

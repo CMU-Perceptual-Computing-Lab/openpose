@@ -1,5 +1,5 @@
-#ifndef OPENPOSE_POSE_POSE_EXTRACTOR_HPP
-#define OPENPOSE_POSE_POSE_EXTRACTOR_HPP
+#ifndef OPENPOSE_POSE_POSE_EXTRACTOR_NET_HPP
+#define OPENPOSE_POSE_POSE_EXTRACTOR_NET_HPP
 
 #include <atomic>
 #include <thread>
@@ -9,15 +9,15 @@
 
 namespace op
 {
-    class OP_API PoseExtractor
+    class OP_API PoseExtractorNet
     {
     public:
-        PoseExtractor(const PoseModel poseModel,
-                      const std::vector<HeatMapType>& heatMapTypes = {},
-                      const ScaleMode heatMapScale = ScaleMode::ZeroToOne,
-                      const bool addPartCandidates = false);
+        PoseExtractorNet(const PoseModel poseModel,
+                         const std::vector<HeatMapType>& heatMapTypes = {},
+                         const ScaleMode heatMapScale = ScaleMode::ZeroToOne,
+                         const bool addPartCandidates = false);
 
-        virtual ~PoseExtractor();
+        virtual ~PoseExtractorNet();
 
         void initializationOnThread();
 
@@ -70,8 +70,8 @@ namespace op
         std::array<std::atomic<double>, (int)PoseProperty::Size> mProperties;
         std::thread::id mThreadId;
 
-        DELETE_COPY(PoseExtractor);
+        DELETE_COPY(PoseExtractorNet);
     };
 }
 
-#endif // OPENPOSE_POSE_POSE_EXTRACTOR_HPP
+#endif // OPENPOSE_POSE_POSE_EXTRACTOR_NET_HPP

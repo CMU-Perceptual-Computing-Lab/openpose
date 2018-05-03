@@ -1,26 +1,26 @@
-#ifndef OPENPOSE_POSE_W_POSE_EXTRACTOR_HPP
-#define OPENPOSE_POSE_W_POSE_EXTRACTOR_HPP
+#ifndef OPENPOSE_POSE_W_POSE_EXTRACTOR_NET_HPP
+#define OPENPOSE_POSE_W_POSE_EXTRACTOR_NET_HPP
 
 #include <openpose/core/common.hpp>
-#include <openpose/pose/poseExtractor.hpp>
+#include <openpose/pose/poseExtractorNet.hpp>
 #include <openpose/thread/worker.hpp>
 
 namespace op
 {
     template<typename TDatums>
-    class WPoseExtractor : public Worker<TDatums>
+    class WPoseExtractorNet : public Worker<TDatums>
     {
     public:
-        explicit WPoseExtractor(const std::shared_ptr<PoseExtractor>& poseExtractorSharedPtr);
+        explicit WPoseExtractorNet(const std::shared_ptr<PoseExtractorNet>& poseExtractorSharedPtr);
 
         void initializationOnThread();
 
         void work(TDatums& tDatums);
 
     private:
-        std::shared_ptr<PoseExtractor> spPoseExtractor;
+        std::shared_ptr<PoseExtractorNet> spPoseExtractorNet;
 
-        DELETE_COPY(WPoseExtractor);
+        DELETE_COPY(WPoseExtractorNet);
     };
 }
 
@@ -33,19 +33,19 @@ namespace op
 namespace op
 {
     template<typename TDatums>
-    WPoseExtractor<TDatums>::WPoseExtractor(const std::shared_ptr<PoseExtractor>& poseExtractorSharedPtr) :
-        spPoseExtractor{poseExtractorSharedPtr}
+    WPoseExtractorNet<TDatums>::WPoseExtractorNet(const std::shared_ptr<PoseExtractorNet>& poseExtractorSharedPtr) :
+        spPoseExtractorNet{poseExtractorSharedPtr}
     {
     }
 
     template<typename TDatums>
-    void WPoseExtractor<TDatums>::initializationOnThread()
+    void WPoseExtractorNet<TDatums>::initializationOnThread()
     {
-        spPoseExtractor->initializationOnThread();
+        spPoseExtractorNet->initializationOnThread();
     }
 
     template<typename TDatums>
-    void WPoseExtractor<TDatums>::work(TDatums& tDatums)
+    void WPoseExtractorNet<TDatums>::work(TDatums& tDatums)
     {
         try
         {
@@ -58,14 +58,14 @@ namespace op
                 // Extract people pose
                 for (auto& tDatum : *tDatums)
                 {
-                    spPoseExtractor->forwardPass(tDatum.inputNetData,
+                    spPoseExtractorNet->forwardPass(tDatum.inputNetData,
                                                  Point<int>{tDatum.cvInputData.cols, tDatum.cvInputData.rows},
                                                  tDatum.scaleInputToNetInputs);
-                    tDatum.poseCandidates = spPoseExtractor->getCandidatesCopy();
-                    tDatum.poseHeatMaps = spPoseExtractor->getHeatMapsCopy();
-                    tDatum.poseKeypoints = spPoseExtractor->getPoseKeypoints().clone();
-                    tDatum.poseScores = spPoseExtractor->getPoseScores().clone();
-                    tDatum.scaleNetToOutput = spPoseExtractor->getScaleNetToOutput();
+                    tDatum.poseCandidates = spPoseExtractorNet->getCandidatesCopy();
+                    tDatum.poseHeatMaps = spPoseExtractorNet->getHeatMapsCopy();
+                    tDatum.poseKeypoints = spPoseExtractorNet->getPoseKeypoints().clone();
+                    tDatum.poseScores = spPoseExtractorNet->getPoseScores().clone();
+                    tDatum.scaleNetToOutput = spPoseExtractorNet->getScaleNetToOutput();
                 }
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
@@ -82,7 +82,7 @@ namespace op
         }
     }
 
-    COMPILE_TEMPLATE_DATUM(WPoseExtractor);
+    COMPILE_TEMPLATE_DATUM(WPoseExtractorNet);
 }
 
-#endif // OPENPOSE_POSE_W_POSE_EXTRACTOR_HPP
+#endif // OPENPOSE_POSE_W_POSE_EXTRACTOR_NET_HPP
