@@ -160,7 +160,7 @@ namespace op
             }
         }
 
-        inline void reshapeFaceExtractorCaffe(std::shared_ptr<ResizeAndMergeCaffe<float>>& resizeAndMergeCaffe,
+        inline void reshapeHandExtractorCaffe(std::shared_ptr<ResizeAndMergeCaffe<float>>& resizeAndMergeCaffe,
                                               std::shared_ptr<MaximumCaffe<float>>& maximumCaffe,
                                               boost::shared_ptr<caffe::Blob<float>>& caffeNetOutputBlob,
                                               std::shared_ptr<caffe::Blob<float>>& heatMapsBlob,
@@ -193,7 +193,7 @@ namespace op
                                            const float rangeScales, const std::vector<HeatMapType>& heatMapTypes,
                                            const ScaleMode heatMapScale,
                                            const bool enableGoogleLogging) :
-        HandExtractor{netInputSize, netOutputSize, numberScales, rangeScales, heatMapTypes, heatMapScale}
+        HandExtractorNet{netInputSize, netOutputSize, numberScales, rangeScales, heatMapTypes, heatMapScale}
         #if defined USE_CAFFE
         , upImpl{new ImplHandExtractorCaffe{modelFolder, gpuId, enableGoogleLogging}}
         #endif
@@ -408,7 +408,7 @@ namespace op
                 if (!upImpl->netInitialized)
                 {
                     upImpl->netInitialized = true;
-                    reshapeFaceExtractorCaffe(upImpl->spResizeAndMergeCaffe, upImpl->spMaximumCaffe,
+                    reshapeHandExtractorCaffe(upImpl->spResizeAndMergeCaffe, upImpl->spMaximumCaffe,
                                               upImpl->spCaffeNetOutputBlob, upImpl->spHeatMapsBlob,
                                               upImpl->spPeaksBlob, upImpl->mGpuId);
                 }

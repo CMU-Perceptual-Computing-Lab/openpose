@@ -10,6 +10,7 @@
 #include <openpose/face/faceParameters.hpp>
 #include <openpose/hand/handParameters.hpp>
 #include <openpose/pose/poseParameters.hpp>
+#include <openpose/utilities/keypoint.hpp>
 #include <openpose/gui/gui3D.hpp>
 
 namespace op
@@ -52,8 +53,8 @@ namespace op
         auto gXClick = 0.f;
         auto gYClick = 0.f;
         auto gGViewDistance = -250.f; // -82.3994f; //-45;
-        auto gMouseXRotate = -915.f; // -63.2f; //0;
-        auto gMouseYRotate = -5.f; // 7.f; //60;
+        auto gMouseXRotateDeg = 0.f; // -63.2f; //0;
+        auto gMouseYRotateDeg = -5.f; // 7.f; //60;
         auto gMouseXPan = -70.f; // 0;
         auto gMouseYPan = -30.f; // 0;
         auto gMouseZPan = 0.f;
@@ -98,7 +99,7 @@ namespace op
             const auto numberPeople = keypoints.getSize(0);
             const auto numberBodyParts = keypoints.getSize(1);
             const auto numberColors = colors.size();
-            const auto xOffset = -3000; // 640.f;
+            const auto xOffset = 3000; // 640.f;
             const auto yOffset = 360.f;
             const auto zOffset = 1000; // 360.f;
             const auto xScale = 43.f;
@@ -126,7 +127,7 @@ namespace op
                     if (keypoints[baseIndex + 3] > 0)
                     {
                         cv::Point3f keypoint{
-                            -(keypoints[baseIndex] - xOffset) / xScale,
+                            (keypoints[baseIndex] - xOffset) / xScale,
                             -(keypoints[baseIndex + 1] - yOffset) / yScale,
                             (keypoints[baseIndex + 2] - zOffset) / zScale
                         };
@@ -158,12 +159,12 @@ namespace op
                     if (keypoints[baseIndexPairA + 3] > 0 && keypoints[baseIndexPairB + 3] > 0)
                     {
                         cv::Point3f pairKeypointA{
-                            -(keypoints[baseIndexPairA] - xOffset) / xScale,
+                            (keypoints[baseIndexPairA] - xOffset) / xScale,
                             -(keypoints[baseIndexPairA + 1] - yOffset) / yScale,
                             (keypoints[baseIndexPairA + 2] - zOffset) / zScale
                         };
                         cv::Point3f pairKeypointB{
-                            -(keypoints[baseIndexPairB] - xOffset) / xScale,
+                            (keypoints[baseIndexPairB] - xOffset) / xScale,
                             -(keypoints[baseIndexPairB + 1] - yOffset) / yScale,
                             (keypoints[baseIndexPairB + 2] - zOffset) / zScale
                         };
@@ -270,8 +271,8 @@ namespace op
             );
 
             glTranslatef(0, 0, gGViewDistance);
-            glRotatef(-gMouseYRotate, 1.f, 0.f, 0.f);
-            glRotatef(-gMouseXRotate, 0.f, 1.f, 0.f);
+            glRotatef(-gMouseYRotateDeg, 1.f, 0.f, 0.f);
+            glRotatef(-gMouseXRotateDeg, 0.f, 1.f, 0.f);
 
             glTranslatef(-gMouseXPan, gMouseYPan, -gMouseZPan);
 
@@ -329,8 +330,8 @@ namespace op
             {
                 if (gCameraMode == CameraMode::CAM_ROTATE)
                 {
-                    gMouseXRotate += (x - gXClick)*0.2f;
-                    gMouseYRotate -= (y - gYClick)*0.2f;
+                    gMouseXRotateDeg += (x - gXClick)*0.2f;
+                    gMouseYRotateDeg -= (y - gYClick)*0.2f;
                 }
                 else if (gCameraMode == CameraMode::CAM_PAN)
                 {
@@ -351,8 +352,8 @@ namespace op
                 glutPostRedisplay();
                 if (LOG_VERBOSE_3D_RENDERER)
                 {
-                    log("gMouseXRotate = " + std::to_string(gMouseXRotate));
-                    log("gMouseYRotate = " + std::to_string(gMouseYRotate));
+                    log("gMouseXRotateDeg = " + std::to_string(gMouseXRotateDeg));
+                    log("gMouseYRotateDeg = " + std::to_string(gMouseYRotateDeg));
                     log("gMouseXPan = " + std::to_string(gMouseXPan));
                     log("gMouseYPan = " + std::to_string(gMouseYPan));
                     log("gMouseZPan = " + std::to_string(gMouseZPan));
@@ -416,10 +417,10 @@ namespace op
     Gui3D::Gui3D(const Point<int>& outputSize, const bool fullScreen,
                  const std::shared_ptr<std::atomic<bool>>& isRunningSharedPtr,
                  const std::shared_ptr<std::pair<std::atomic<bool>, std::atomic<int>>>& videoSeekSharedPtr,
-                 const std::vector<std::shared_ptr<PoseExtractor>>& poseExtractors,
+                 const std::vector<std::shared_ptr<PoseExtractorNet>>& poseExtractorNets,
                  const std::vector<std::shared_ptr<Renderer>>& renderers, const PoseModel poseModel,
                  const DisplayMode displayMode) :
-        Gui{outputSize, fullScreen, isRunningSharedPtr, videoSeekSharedPtr, poseExtractors, renderers},
+        Gui{outputSize, fullScreen, isRunningSharedPtr, videoSeekSharedPtr, poseExtractorNets, renderers},
         mDisplayMode{displayMode}
     {
         try
@@ -487,12 +488,19 @@ namespace op
                         || !leftHandKeypoints3D.empty() || !rightHandKeypoints3D.empty())
                     {
                         // OpenGL Rendering
+                        // Copy new keypoints
                         std::unique_lock<std::mutex> lock{gKeypoints3D.mutex};
                         gKeypoints3D.poseKeypoints = poseKeypoints3D;
                         gKeypoints3D.faceKeypoints = faceKeypoints3D;
                         gKeypoints3D.leftHandKeypoints = leftHandKeypoints3D;
                         gKeypoints3D.rightHandKeypoints = rightHandKeypoints3D;
                         gKeypoints3D.validKeypoints = true;
+                        // From m to mm
+                        scaleKeypoints(gKeypoints3D.poseKeypoints, 1e3);
+                        scaleKeypoints(gKeypoints3D.faceKeypoints, 1e3);
+                        scaleKeypoints(gKeypoints3D.leftHandKeypoints, 1e3);
+                        scaleKeypoints(gKeypoints3D.rightHandKeypoints, 1e3);
+                        // Unlock mutex
                         lock.unlock();
                     }
                 }

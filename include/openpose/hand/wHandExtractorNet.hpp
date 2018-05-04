@@ -1,5 +1,5 @@
-#ifndef OPENPOSE_HAND_W_HAND_EXTRACTOR_HPP
-#define OPENPOSE_HAND_W_HAND_EXTRACTOR_HPP
+#ifndef OPENPOSE_HAND_W_HAND_EXTRACTOR_NET_HPP
+#define OPENPOSE_HAND_W_HAND_EXTRACTOR_NET_HPP
 
 #include <openpose/core/common.hpp>
 #include <openpose/hand/handRenderer.hpp>
@@ -8,19 +8,19 @@
 namespace op
 {
     template<typename TDatums>
-    class WHandExtractor : public Worker<TDatums>
+    class WHandExtractorNet : public Worker<TDatums>
     {
     public:
-        explicit WHandExtractor(const std::shared_ptr<HandExtractor>& handExtractor);
+        explicit WHandExtractorNet(const std::shared_ptr<HandExtractorNet>& handExtractorNet);
 
         void initializationOnThread();
 
         void work(TDatums& tDatums);
 
     private:
-        std::shared_ptr<HandExtractor> spHandExtractor;
+        std::shared_ptr<HandExtractorNet> spHandExtractorNet;
 
-        DELETE_COPY(WHandExtractor);
+        DELETE_COPY(WHandExtractorNet);
     };
 }
 
@@ -33,19 +33,19 @@ namespace op
 namespace op
 {
     template<typename TDatums>
-    WHandExtractor<TDatums>::WHandExtractor(const std::shared_ptr<HandExtractor>& handExtractor) :
-        spHandExtractor{handExtractor}
+    WHandExtractorNet<TDatums>::WHandExtractorNet(const std::shared_ptr<HandExtractorNet>& handExtractorNet) :
+        spHandExtractorNet{handExtractorNet}
     {
     }
 
     template<typename TDatums>
-    void WHandExtractor<TDatums>::initializationOnThread()
+    void WHandExtractorNet<TDatums>::initializationOnThread()
     {
-        spHandExtractor->initializationOnThread();
+        spHandExtractorNet->initializationOnThread();
     }
 
     template<typename TDatums>
-    void WHandExtractor<TDatums>::work(TDatums& tDatums)
+    void WHandExtractorNet<TDatums>::work(TDatums& tDatums)
     {
         try
         {
@@ -58,11 +58,11 @@ namespace op
                 // Extract people hands
                 for (auto& tDatum : *tDatums)
                 {
-                    spHandExtractor->forwardPass(tDatum.handRectangles, tDatum.cvInputData);
+                    spHandExtractorNet->forwardPass(tDatum.handRectangles, tDatum.cvInputData);
                     for (auto hand = 0 ; hand < 2 ; hand++)
                     {
-                        tDatum.handHeatMaps[hand] = spHandExtractor->getHeatMaps()[hand].clone();
-                        tDatum.handKeypoints[hand] = spHandExtractor->getHandKeypoints()[hand].clone();
+                        tDatum.handHeatMaps[hand] = spHandExtractorNet->getHeatMaps()[hand].clone();
+                        tDatum.handKeypoints[hand] = spHandExtractorNet->getHandKeypoints()[hand].clone();
                     }
                 }
                 // Profiling speed
@@ -80,7 +80,7 @@ namespace op
         }
     }
 
-    COMPILE_TEMPLATE_DATUM(WHandExtractor);
+    COMPILE_TEMPLATE_DATUM(WHandExtractorNet);
 }
 
-#endif // OPENPOSE_HAND_W_HAND_EXTRACTOR_HPP
+#endif // OPENPOSE_HAND_W_HAND_EXTRACTOR_NET_HPP

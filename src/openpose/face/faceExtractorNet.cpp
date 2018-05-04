@@ -1,14 +1,12 @@
 #include <openpose/utilities/check.hpp>
-#include <openpose/hand/handExtractor.hpp>
+#include <openpose/face/faceExtractorNet.hpp>
 
 namespace op
 {
-    HandExtractor::HandExtractor(const Point<int>& netInputSize, const Point<int>& netOutputSize,
-                                 const unsigned short numberScales, const float rangeScales,
-                                 const std::vector<HeatMapType>& heatMapTypes, const ScaleMode heatMapScale) :
-        mMultiScaleNumberAndRange{std::make_pair(numberScales, rangeScales)},
+    FaceExtractorNet::FaceExtractorNet(const Point<int>& netInputSize, const Point<int>& netOutputSize,
+                                       const std::vector<HeatMapType>& heatMapTypes, const ScaleMode heatMapScale) :
         mNetOutputSize{netOutputSize},
-        mHandImageCrop{{1, 3, mNetOutputSize.y, mNetOutputSize.x}},
+        mFaceImageCrop{{1, 3, mNetOutputSize.y, mNetOutputSize.x}},
         mHeatMapScaleMode{heatMapScale},
         mHeatMapTypes{heatMapTypes}
     {
@@ -27,7 +25,7 @@ namespace op
                    __LINE__, __FUNCTION__, __FILE__);
             // Warnings
             if (!mHeatMapTypes.empty())
-                log("Note only keypoint heatmaps are available with hand heatmaps (no background nor PAFs).",
+                log("Note only keypoint heatmaps are available with face heatmaps (no background nor PAFs).",
                     Priority::High);
         }
         catch (const std::exception& e)
@@ -36,11 +34,11 @@ namespace op
         }
     }
 
-    HandExtractor::~HandExtractor()
+    FaceExtractorNet::~FaceExtractorNet()
     {
     }
 
-    void HandExtractor::initializationOnThread()
+    void FaceExtractorNet::initializationOnThread()
     {
         try
         {
@@ -55,21 +53,21 @@ namespace op
         }
     }
 
-    std::array<Array<float>, 2> HandExtractor::getHandKeypoints() const
+    Array<float> FaceExtractorNet::getFaceKeypoints() const
     {
         try
         {
             checkThread();
-            return mHandKeypoints;
+            return mFaceKeypoints;
         }
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return std::array<Array<float>, 2>(); // Parentheses instead of braces to avoid error in GCC 4.8
+            return Array<float>{};
         }
     }
 
-    std::array<Array<float>, 2> HandExtractor::getHeatMaps() const
+    Array<float> FaceExtractorNet::getHeatMaps() const
     {
         try
         {
@@ -79,11 +77,11 @@ namespace op
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return std::array<Array<float>, 2>(); // Parentheses instead of braces to avoid error in GCC 4.8
+            return Array<float>{};
         }
     }
 
-    void HandExtractor::checkThread() const
+    void FaceExtractorNet::checkThread() const
     {
         try
         {

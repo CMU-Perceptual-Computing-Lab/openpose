@@ -2,8 +2,8 @@ set(SOURCES_OP_FACE
     defineTemplates.cpp
     faceDetector.cpp
     faceDetectorOpenCV.cpp
-    faceExtractor.cpp
     faceExtractorCaffe.cpp
+    faceExtractorNet.cpp
     faceCpuRenderer.cpp
     faceGpuRenderer.cpp
     faceRenderer.cpp

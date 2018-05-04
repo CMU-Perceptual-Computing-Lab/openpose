@@ -11,10 +11,10 @@ namespace op
 
     OP_API void scaleKeypoints(Array<float>& keypoints, const float scale);
 
-    OP_API void scaleKeypoints(Array<float>& keypoints, const float scaleX, const float scaleY);
+    OP_API void scaleKeypoints2d(Array<float>& keypoints, const float scaleX, const float scaleY);
 
-    OP_API void scaleKeypoints(Array<float>& keypoints, const float scaleX, const float scaleY, const float offsetX,
-                               const float offsetY);
+    OP_API void scaleKeypoints2d(Array<float>& keypoints, const float scaleX, const float scaleY, const float offsetX,
+                                 const float offsetY);
 
     OP_API void renderKeypointsCpu(Array<float>& frameArray, const Array<float>& keypoints,
                                    const std::vector<unsigned int>& pairs, const std::vector<float> colors,

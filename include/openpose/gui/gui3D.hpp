@@ -16,7 +16,7 @@ namespace op
         Gui3D(const Point<int>& outputSize, const bool fullScreen,
               const std::shared_ptr<std::atomic<bool>>& isRunningSharedPtr,
               const std::shared_ptr<std::pair<std::atomic<bool>, std::atomic<int>>>& videoSeekSharedPtr = nullptr,
-              const std::vector<std::shared_ptr<PoseExtractor>>& poseExtractors = {},
+              const std::vector<std::shared_ptr<PoseExtractorNet>>& poseExtractorNets = {},
               const std::vector<std::shared_ptr<Renderer>>& renderers = {},
               const PoseModel poseModel = PoseModel::COCO_18,
               const DisplayMode displayMode = DisplayMode::DisplayAll);
