@@ -4,7 +4,6 @@
 #include <atomic>
 #include <unordered_map>
 #include <openpose/core/common.hpp>
-#include <openpose/experimental/tracking/personIdExtractor.hpp>
 
 namespace op
 {
@@ -48,7 +47,6 @@ namespace op
         std::vector<cv::Mat> mPyramidImagesPrevious;
         std::unordered_map<int, PersonEntry> mPersonEntries;
         // Thread-safe variables
-        std::mutex mPersonIdExtractorMutex;
         std::atomic<long long> mLastFrameId;
 
         DELETE_COPY(PersonIdExtractor);

@@ -11,7 +11,7 @@ namespace op
     class WPersonIdExtractor : public Worker<TDatums>
     {
     public:
-        explicit WPersonIdExtractor(const std::shared_ptr<PersonIdExtractor>& personIdExtractorSharedPtr);
+        explicit WPersonIdExtractor(const std::shared_ptr<PersonIdExtractor>& personIdExtractor);
 
         void initializationOnThread();
 
@@ -33,8 +33,8 @@ namespace op
 namespace op
 {
     template<typename TDatums>
-    WPersonIdExtractor<TDatums>::WPersonIdExtractor(const std::shared_ptr<PersonIdExtractor>& personIdExtractorSharedPtr) :
-        spPersonIdExtractor{personIdExtractorSharedPtr}
+    WPersonIdExtractor<TDatums>::WPersonIdExtractor(const std::shared_ptr<PersonIdExtractor>& personIdExtractor) :
+        spPersonIdExtractor{personIdExtractor}
     {
     }
 

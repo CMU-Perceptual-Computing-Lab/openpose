@@ -313,10 +313,10 @@ namespace op
             if (imageViewIndex > 0)
                 error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
             // Wait for desired order
-            while (mLastFrameId != frameId - 1)
+            while (mLastFrameId < frameId - 1)
                 std::this_thread::sleep_for(std::chrono::microseconds{100});
             // Extract IDs
-            const auto ids = extractIds(poseKeypoints, cvMatInput);
+            const auto ids = extractIds(poseKeypoints, cvMatInput, imageViewIndex);
             // Update last frame id
             mLastFrameId = frameId;
             // Return person ids
