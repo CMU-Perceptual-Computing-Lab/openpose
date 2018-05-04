@@ -1,3 +1,4 @@
+#include <thread>
 #include <openpose/experimental/tracking/pyramidalLK.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/experimental/tracking/personIdExtractor.hpp>
@@ -6,6 +7,9 @@
 
 namespace op
 {
+    const std::string errorMessage = "ID extractor function (`--identification` flag) not implemented"
+                                     " for multiple-view processing.";
+
     float getEuclideanDistance(const cv::Point2f& a, const cv::Point2f& b)
     {
         try
@@ -233,7 +237,8 @@ namespace op
         mInlierRatioThreshold{inlierRatioThreshold},
         mDistanceThreshold{distanceThreshold},
         mNumberFramesToDeletePerson{numberFramesToDeletePerson},
-        mNextPersonId{0ll}
+        mNextPersonId{0ll},
+        mLastFrameId{-1ll}
     {
         try
         {
@@ -250,10 +255,16 @@ namespace op
     {
     }
 
-    Array<long long> PersonIdExtractor::extractIds(const Array<float>& poseKeypoints, const cv::Mat& cvMatInput)
+    Array<long long> PersonIdExtractor::extractIds(const Array<float>& poseKeypoints, const cv::Mat& cvMatInput,
+                                                   const unsigned long long imageViewIndex)
     {
         try
         {
+            // Security check
+            if (imageViewIndex > 0)
+                error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
+
+            // Result initialization
             Array<long long> poseIds;
             const auto openposePersonEntries = captureKeypoints(poseKeypoints, mConfidenceThreshold);
 // log(mPersonEntries.size());
@@ -283,6 +294,33 @@ namespace op
                                    mInlierRatioThreshold, mDistanceThreshold);
 
             return poseIds;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return Array<long long>{};
+        }
+    }
+
+    Array<long long> PersonIdExtractor::extractIdsLockThread(const Array<float>& poseKeypoints,
+                                                             const cv::Mat& cvMatInput,
+                                                             const unsigned long long imageViewIndex,
+                                                             const long long frameId)
+    {
+        try
+        {
+            // Security check
+            if (imageViewIndex > 0)
+                error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
+            // Wait for desired order
+            while (mLastFrameId != frameId - 1)
+                std::this_thread::sleep_for(std::chrono::microseconds{100});
+            // Extract IDs
+            const auto ids = extractIds(poseKeypoints, cvMatInput);
+            // Update last frame id
+            mLastFrameId = frameId;
+            // Return person ids
+            return ids;
         }
         catch (const std::exception& e)
         {
