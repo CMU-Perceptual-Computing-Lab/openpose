@@ -156,13 +156,15 @@ namespace op
     {
         try
         {
-            // Security check
-            if (!poseKeypoints.empty() && poseIds.empty() && mNumberPeopleMax != 1)
-                error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
-            // Run person ID extractor
             if (!spPersonTrackers.empty() && spPersonTrackers.at(imageViewIndex))
+            {
+                // Security check
+                if (!poseKeypoints.empty() && poseIds.empty() && mNumberPeopleMax != 1)
+                    error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
+                // Run person ID extractor
                 spPersonTrackers[imageViewIndex]->track(
                     poseKeypoints, cvMatInput, (poseIds.empty() ? Array<long long>{1, 0} : poseIds));
+            }
         }
         catch (const std::exception& e)
         {
@@ -176,12 +178,12 @@ namespace op
     {
         try
         {
-            // Security check
-            if (!poseKeypoints.empty() && poseIds.empty() && mNumberPeopleMax != 1)
-                error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
-            // Run person ID extractor
             if (!spPersonTrackers.empty() && spPersonTrackers.at(imageViewIndex))
             {
+                // Security check
+                if (!poseKeypoints.empty() && poseIds.empty() && mNumberPeopleMax != 1)
+                    error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
+                // Run person ID extractor
                 spPersonTrackers[imageViewIndex]->trackLockThread(
                     poseKeypoints, cvMatInput, (poseIds.empty() ? Array<long long>{1, 0} : poseIds),
                     frameId);
