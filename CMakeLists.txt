@@ -128,11 +128,13 @@ set(GPU_MODE CUDA CACHE STRING "Select the acceleration GPU library or CPU other
 set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA CPU_ONLY)
 
 # Look for CUDA
+set(CUDA_FOUND FALSE)
 if (${GPU_MODE} MATCHES "CUDA")
   find_package(CUDA)
 endif (${GPU_MODE} MATCHES "CUDA")
 # Look for OpenCL
 set(OpenCL_FOUND FALSE)
+set(CUDA_VERSION_MAJOR 0)
 if (${GPU_MODE} MATCHES "OPENCL")
   find_package(OpenCL)
 endif (${GPU_MODE} MATCHES "OPENCL")
