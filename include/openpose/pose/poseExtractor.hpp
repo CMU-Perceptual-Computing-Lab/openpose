@@ -15,7 +15,7 @@ namespace op
     public:
         PoseExtractor(const std::shared_ptr<PoseExtractorNet>& poseExtractorNet,
                       const std::shared_ptr<PersonIdExtractor>& personIdExtractor = nullptr,
-                      const std::shared_ptr<PersonTracker>& personTracker = nullptr,
+                      const std::vector<std::shared_ptr<PersonTracker>>& personTracker = {},
                       const int numberPeopleMax = -1, const int tracking = -1);
 
         virtual ~PoseExtractor();
@@ -61,7 +61,7 @@ namespace op
         const int mTracking;
         const std::shared_ptr<PoseExtractorNet> spPoseExtractorNet;
         const std::shared_ptr<PersonIdExtractor> spPersonIdExtractor;
-        const std::shared_ptr<PersonTracker> spPersonTracker;
+        const std::vector<std::shared_ptr<PersonTracker>> spPersonTrackers;
 
         DELETE_COPY(PoseExtractor);
     };

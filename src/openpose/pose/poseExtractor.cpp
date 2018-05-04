@@ -7,13 +7,13 @@ namespace op
 
     PoseExtractor::PoseExtractor(const std::shared_ptr<PoseExtractorNet>& poseExtractorNet,
                                  const std::shared_ptr<PersonIdExtractor>& personIdExtractor,
-                                 const std::shared_ptr<PersonTracker>& personTracker,
+                                 const std::vector<std::shared_ptr<PersonTracker>>& personTrackers,
                                  const int numberPeopleMax, const int tracking) :
         mNumberPeopleMax{numberPeopleMax},
         mTracking{tracking},
         spPoseExtractorNet{poseExtractorNet},
         spPersonIdExtractor{personIdExtractor},
-        spPersonTracker{personTracker}
+        spPersonTrackers{personTrackers}
     {
     }
 
@@ -160,10 +160,9 @@ namespace op
             if (!poseKeypoints.empty() && poseIds.empty() && mNumberPeopleMax != 1)
                 error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
             // Run person ID extractor
-            if (spPersonTracker)
-                spPersonTracker->track(poseKeypoints, cvMatInput,
-                                       (poseIds.empty() ? Array<long long>{1, 0} : poseIds),
-                                       imageViewIndex);
+            if (!spPersonTrackers.empty() && spPersonTrackers.at(imageViewIndex))
+                spPersonTrackers[imageViewIndex]->track(
+                    poseKeypoints, cvMatInput, (poseIds.empty() ? Array<long long>{1, 0} : poseIds));
         }
         catch (const std::exception& e)
         {
@@ -181,11 +180,11 @@ namespace op
             if (!poseKeypoints.empty() && poseIds.empty() && mNumberPeopleMax != 1)
                 error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
             // Run person ID extractor
-            if (spPersonTracker)
+            if (!spPersonTrackers.empty() && spPersonTrackers.at(imageViewIndex))
             {
-                spPersonTracker->trackLockThread(poseKeypoints, cvMatInput,
-                                                 (poseIds.empty() ? Array<long long>{1, 0} : poseIds),
-                                                 imageViewIndex, frameId);
+                spPersonTrackers[imageViewIndex]->trackLockThread(
+                    poseKeypoints, cvMatInput, (poseIds.empty() ? Array<long long>{1, 0} : poseIds),
+                    frameId);
             }
         }
         catch (const std::exception& e)

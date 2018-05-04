@@ -607,14 +607,16 @@ namespace op
                     const auto personIdExtractor = (wrapperStructPose.identification
                         ? std::make_shared<PersonIdExtractor>() : nullptr);
                     // Person tracker
-                    const auto personTracker = (wrapperStructPose.tracking > -1
-                        ? std::make_shared<PersonTracker>(wrapperStructPose.tracking == 0) : nullptr);
+                    std::vector<std::shared_ptr<PersonTracker>> personTrackers;
+                    if (wrapperStructPose.tracking > -1)
+                        personTrackers.resize(spWPoseExtractors.size(),
+                                              std::make_shared<PersonTracker>(wrapperStructPose.tracking == 0));
                     for (auto i = 0u; i < spWPoseExtractors.size(); i++)
                     {
 
                         // OpenPose keypoint detector + ID extractor (experimental) + tracking (experimental)
                         const auto poseExtractor = std::make_shared<PoseExtractor>(
-                            poseExtractorNets.at(i), personIdExtractor, personTracker,
+                            poseExtractorNets.at(i), personIdExtractor, personTrackers,
                             wrapperStructPose.numberPeopleMax, wrapperStructPose.tracking);
                         spWPoseExtractors.at(i) = {std::make_shared<WPoseExtractor<TDatumsPtr>>(poseExtractor)};
                         // // Just OpenPose keypoint detector

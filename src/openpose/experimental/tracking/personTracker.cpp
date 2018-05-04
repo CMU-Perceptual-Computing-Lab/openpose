@@ -24,18 +24,15 @@ namespace op
     }
 
     void PersonTracker::track(Array<float>& poseKeypoints, const cv::Mat& cvMatInput,
-                              const Array<long long>& poseIds, const unsigned long long imageViewIndex)
+                              const Array<long long>& poseIds)
     {
         try
         {
             // if mergeResults == true --> Combine OP + LK tracker
             // if mergeResults == false --> Run LK tracker ONLY IF poseKeypoints.empty()
-            // imageViewIndex has camera view index (for 3D, i.e. index 2 means that there are at least
-            //     3 cameras and this is camera index 2)
             UNUSED(poseKeypoints);
             UNUSED(cvMatInput);
             UNUSED(poseIds);
-            UNUSED(imageViewIndex);
         }
         catch (const std::exception& e)
         {
@@ -44,8 +41,7 @@ namespace op
     }
 
     void PersonTracker::trackLockThread(Array<float>& poseKeypoints, const cv::Mat& cvMatInput,
-                                        const Array<long long>& poseIds, const unsigned long long imageViewIndex,
-                                        const long long frameId)
+                                        const Array<long long>& poseIds, const long long frameId)
     {
         try
         {
@@ -53,7 +49,7 @@ namespace op
             while (mLastFrameId < frameId - 1)
                 std::this_thread::sleep_for(std::chrono::microseconds{100});
             // Extract IDs
-            track(poseKeypoints, cvMatInput, poseIds, imageViewIndex);
+            track(poseKeypoints, cvMatInput, poseIds);
             // Update last frame id
             mLastFrameId = frameId;
         }
