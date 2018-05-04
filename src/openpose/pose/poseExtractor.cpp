@@ -71,7 +71,7 @@ namespace op
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return std::vector<std::vector<std::array<float,3>>>{};
+            return std::vector<std::vector<std::array<float, 3>>>{};
         }
     }
 
