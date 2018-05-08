@@ -71,7 +71,7 @@ namespace op
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return std::vector<std::vector<std::array<float, 3>>>{};
+            return std::vector<std::vector<std::array<float,3>>>{};
         }
     }
 
@@ -150,21 +150,18 @@ namespace op
         }
     }
 
-    void PoseExtractor::track(Array<float>& poseKeypoints, const cv::Mat& cvMatInput,
-                              const Array<long long>& poseIds,
+    void PoseExtractor::track(Array<float>& poseKeypoints, Array<long long>& poseIds,
+                              const cv::Mat& cvMatInput,
                               const unsigned long long imageViewIndex)
     {
         try
         {
+            // Security check
+            if (!poseKeypoints.empty() && poseIds.empty() && mNumberPeopleMax != 1)
+                error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
+            // Run person ID extractor
             if (!spPersonTrackers.empty() && spPersonTrackers.at(imageViewIndex))
-            {
-                // Security check
-                if (!poseKeypoints.empty() && poseIds.empty() && mNumberPeopleMax != 1)
-                    error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
-                // Run person ID extractor
-                spPersonTrackers[imageViewIndex]->track(
-                    poseKeypoints, cvMatInput, (poseIds.empty() ? Array<long long>{1, 0} : poseIds));
-            }
+                spPersonTrackers[imageViewIndex]->track(poseKeypoints, poseIds, cvMatInput);
         }
         catch (const std::exception& e)
         {
@@ -172,21 +169,20 @@ namespace op
         }
     }
 
-    void PoseExtractor::trackLockThread(Array<float>& poseKeypoints, const cv::Mat& cvMatInput,
-                                       const Array<long long>& poseIds,
-                                       const unsigned long long imageViewIndex, const long long frameId)
+    void PoseExtractor::trackLockThread(Array<float>& poseKeypoints, Array<long long>& poseIds,
+                                        const cv::Mat& cvMatInput,
+                                        const unsigned long long imageViewIndex, const long long frameId)
     {
         try
         {
+            // Security check
+            if (!poseKeypoints.empty() && poseIds.empty() && mNumberPeopleMax != 1)
+                error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
+            // Run person ID extractor
             if (!spPersonTrackers.empty() && spPersonTrackers.at(imageViewIndex))
             {
-                // Security check
-                if (!poseKeypoints.empty() && poseIds.empty() && mNumberPeopleMax != 1)
-                    error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
-                // Run person ID extractor
                 spPersonTrackers[imageViewIndex]->trackLockThread(
-                    poseKeypoints, cvMatInput, (poseIds.empty() ? Array<long long>{1, 0} : poseIds),
-                    frameId);
+                    poseKeypoints, poseIds, cvMatInput, frameId);
             }
         }
         catch (const std::exception& e)
