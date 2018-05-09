@@ -42,6 +42,8 @@ namespace op
         {
             if (mTracking < 1 || frameId % (mTracking+1) == 0)
                 spPoseExtractorNet->forwardPass(inputNetData, inputDataSize, scaleInputToNetInputs);
+            else
+                spPoseExtractorNet->clear();
         }
         catch (const std::exception& e)
         {

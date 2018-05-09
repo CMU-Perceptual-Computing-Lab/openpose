@@ -52,6 +52,8 @@ namespace op
 
         void increase(const PoseProperty property, const double value);
 
+        void clear();
+
     protected:
         const PoseModel mPoseModel;
         Point<int> mNetOutputSize;
