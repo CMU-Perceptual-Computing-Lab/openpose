@@ -28,7 +28,9 @@ namespace op
     {
     }
 
-    void personEntriesFromOP(std::unordered_map<int, PersonTrackerEntry>& personEntries, const Array<float>& poseKeypoints, const Array<long long>& poseIds)
+    void personEntriesFromOP(std::unordered_map<int, PersonTrackerEntry>& personEntries,
+                             const Array<float>& poseKeypoints, const Array<long long>& poseIds,
+                             float confidenceThreshold)
     {
         personEntries.clear();
         for(int i=0; i<poseKeypoints.getSize()[0]; i++)
@@ -48,10 +50,17 @@ namespace op
                 float prob = poseKeypoints[
                         i*poseKeypoints.getSize()[1]*poseKeypoints.getSize()[2] +
                         j*poseKeypoints.getSize()[2] + 2];
-                if(prob < 0.05) personEntries[id].status[j] = 0;
+                if(prob < confidenceThreshold) personEntries[id].status[j] = 0;
                 else personEntries[id].status[j] = 1;
             }
         }
+    }
+
+    void syncPersonEntriesWithOP(std::unordered_map<int, PersonTrackerEntry>& personEntries,
+                                 const Array<float>& poseKeypoints, const Array<long long>& poseIds,
+                                 float confidenceThreshold)
+    {
+
     }
 
     void OPFromPersonEntries(Array<float>& poseKeypoints, std::unordered_map<int, PersonTrackerEntry>& personEntries)
@@ -91,14 +100,22 @@ namespace op
                 if(poseKeypoints.getSize()[0] != poseIds.getSize()[0])
                      error("poseKeypoints and poseIds should have the same number of people", __LINE__, __FUNCTION__, __FILE__);
 
-//            // First frame
-//            if(mImagePrevious.empty()){
-//                // Create mPersonEntries
-//                personEntriesFromOP(mPersonEntries, poseKeypoints, poseIds);
+            // First frame
+            if(mImagePrevious.empty())
+            {
+                // Create mPersonEntries
+                personEntriesFromOP(mPersonEntries, poseKeypoints, poseIds, mConfidenceThreshold);
+                // Capture current frame as floating point
+                cvMatInput.convertTo(mImagePrevious, CV_32F);
+            }
+            else
+            {
+                // There is new OP Data
+                if(!poseKeypoints.empty() && !poseIds.empty())
+                {
 
-
-//            }
-
+                }
+            }
 
             // REMEMBER TO FLIP THE LK VALUES!!
 

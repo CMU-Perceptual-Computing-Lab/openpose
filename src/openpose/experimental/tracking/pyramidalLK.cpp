@@ -437,15 +437,15 @@ namespace op
             for(size_t i=0; i<status.size(); i++)
             {
                 // If its 0 to begin with (Because OP lost track?)
-                if(status[i] == 1){
+                if(status[i] == 0){
                     continue;
                 }
 
-                if(st[i] == 0) st[i] = 1;
-                else if(st[i] == 1) st[i] = 0;
-                else{
-                    throw std::runtime_error("Wrong CV Type");
-                }
+//                if(st[i] == 0) st[i] = 1;
+//                else if(st[i] == 1) st[i] = 0;
+//                else{
+//                    throw std::runtime_error("Wrong CV Type");
+//                }
                 status[i] = st[i];
             }
 

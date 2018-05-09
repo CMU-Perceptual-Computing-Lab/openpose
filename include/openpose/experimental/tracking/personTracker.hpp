@@ -42,6 +42,7 @@ namespace op
         const int mLevels;
         const int mPatchSize;
         const bool mTrackVelocity;
+        const float mConfidenceThreshold = 0.05;
 
         cv::Mat mImagePrevious;
         std::vector<cv::Mat> mPyramidImagesPrevious;
