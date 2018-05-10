@@ -47,6 +47,7 @@ namespace op
         cv::Mat mImagePrevious;
         std::vector<cv::Mat> mPyramidImagesPrevious;
         std::unordered_map<int, PersonTrackerEntry> mPersonEntries;
+        Array<long long> mLastPoseIds;
 
         // Thread-safe variables
         std::atomic<long long> mLastFrameId;

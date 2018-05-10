@@ -1,6 +1,8 @@
 #include <thread>
 #include <openpose/experimental/tracking/personTracker.hpp>
 #include <iostream>
+#include <opencv2/opencv.hpp>
+#include <openpose/experimental/tracking/pyramidalLK.hpp>
 
 namespace op
 {
@@ -26,6 +28,65 @@ namespace op
 
     PersonTracker::~PersonTracker()
     {
+    }
+
+    void updateLK(std::unordered_map<int,PersonTrackerEntry>& personEntries,
+                  std::vector<cv::Mat>& pyramidImagesPrevious, std::vector<cv::Mat>& pyramidImagesCurrent,
+                  const cv::Mat& imagePrevious, const cv::Mat& imageCurrent,
+                  const int levels, const int patchSize, const bool trackVelocity)
+    {
+        try
+        {
+            // Inefficient version, do it per person
+            for(auto& kv : personEntries)
+            {
+                PersonTrackerEntry newPersonEntry;
+                PersonTrackerEntry& oldPersonEntry = kv.second;
+                if (trackVelocity)
+                {
+                    newPersonEntry.keypoints = oldPersonEntry.getPredicted();
+                    pyramidalLKOcv(oldPersonEntry.keypoints, newPersonEntry.keypoints, pyramidImagesPrevious, pyramidImagesCurrent,
+                                   oldPersonEntry.status, imagePrevious, imageCurrent, levels, patchSize, true);
+                }
+                else
+                    pyramidalLKOcv(oldPersonEntry.keypoints, newPersonEntry.keypoints, pyramidImagesPrevious, pyramidImagesCurrent,
+                                   oldPersonEntry.status, imagePrevious, imageCurrent, levels, patchSize, false);
+
+                newPersonEntry.lastKeypoints = oldPersonEntry.keypoints;
+                newPersonEntry.status = oldPersonEntry.status;
+                oldPersonEntry = newPersonEntry;
+            }
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    void vizPersonEntries(cv::Mat& debugImage, std::unordered_map<int, PersonTrackerEntry>& personEntries, bool mTrackVelocity)
+    {
+        for (auto& kv : personEntries)
+        {
+            PersonTrackerEntry& pe = kv.second;
+            std::vector<cv::Point2f> predictedKeypoints = pe.getPredicted();
+            for (size_t i=0; i<pe.keypoints.size(); i++)
+            {
+                cv::circle(debugImage, pe.keypoints[i], 3, cv::Scalar(255,0,0),CV_FILLED);
+                cv::putText(debugImage, std::to_string((int)pe.status[i]), pe.keypoints[i],
+                            cv::FONT_HERSHEY_DUPLEX, 0.4, cv::Scalar(0,0,255),1);
+
+                if (pe.lastKeypoints.size())
+                {
+                    cv::line(debugImage, pe.keypoints[i], pe.lastKeypoints[i],cv::Scalar(255,0,0));
+                    cv::circle(debugImage, pe.lastKeypoints[i], 3, cv::Scalar(255,255,0),CV_FILLED);
+                }
+                if (predictedKeypoints.size() && mTrackVelocity)
+                {
+                    cv::line(debugImage, pe.keypoints[i], predictedKeypoints[i],cv::Scalar(255,0,0));
+                    cv::circle(debugImage, predictedKeypoints[i], 3, cv::Scalar(255,0,255),CV_FILLED);
+                }
+            }
+        }
     }
 
     void personEntriesFromOP(std::unordered_map<int, PersonTrackerEntry>& personEntries,
@@ -58,30 +119,124 @@ namespace op
 
     void syncPersonEntriesWithOP(std::unordered_map<int, PersonTrackerEntry>& personEntries,
                                  const Array<float>& poseKeypoints, const Array<long long>& poseIds,
-                                 float confidenceThreshold)
+                                 float confidenceThreshold, bool mergeResults)
     {
+        if(poseIds.empty()) return;
+
+        // Print
+        for(auto& kv : personEntries) std::cout << kv.first << " ";
+        std::cout << std::endl;
+        for(int i=0; i<poseIds.getSize()[0]; i++) std::cout << poseIds.at(i) << " ";
+        std::cout << std::endl;
+        std::cout << "---" << std::endl;
+
+        // Delete
+        for (auto kv = personEntries.cbegin(); kv != personEntries.cend() /* not hoisted */; /* no increment */)
+        {
+            bool exists = false;
+            for(int i=0; i<poseIds.getSize()[0]; i++){
+                auto id = poseIds[i];
+                if(id == kv->first) exists = true;
+            }
+            if(!exists){
+                personEntries.erase(kv++);
+            }else{
+                ++kv;
+            }
+        }
+
+        // Print
+        for(auto& kv : personEntries) std::cout << kv.first << " ";
+        std::cout << std::endl;
+        for(int i=0; i<poseIds.getSize()[0]; i++) std::cout << poseIds.at(i) << " ";
+        std::cout << std::endl;
+        std::cout << "---" << std::endl;
+
+        // Update or Add
+        for(int i=0; i<poseIds.getSize()[0]; i++){
+            auto id = poseIds[i];
+
+            // Update
+            if(personEntries.count(id) && mergeResults){
+
+                op::error("Not implemeneted");
+                personEntries[id] = PersonTrackerEntry();
+                personEntries[id].keypoints.resize(poseKeypoints.getSize()[1]);
+                personEntries[id].status.resize(poseKeypoints.getSize()[1]);
+                for(int j=0; j<poseKeypoints.getSize()[1]; j++)
+                {
+                    personEntries[id].keypoints[j].x = poseKeypoints[
+                            i*poseKeypoints.getSize()[1]*poseKeypoints.getSize()[2] +
+                            j*poseKeypoints.getSize()[2] + 0];
+                    personEntries[id].keypoints[j].y = poseKeypoints[
+                            i*poseKeypoints.getSize()[1]*poseKeypoints.getSize()[2] +
+                            j*poseKeypoints.getSize()[2] + 1];
+                    float prob = poseKeypoints[
+                            i*poseKeypoints.getSize()[1]*poseKeypoints.getSize()[2] +
+                            j*poseKeypoints.getSize()[2] + 2];
+                    if(prob < confidenceThreshold) personEntries[id].status[j] = 0;
+                    else personEntries[id].status[j] = 1;
+                }
+
+
+            }
+            // Add
+            else{
+
+                personEntries[id] = PersonTrackerEntry();
+                personEntries[id].keypoints.resize(poseKeypoints.getSize()[1]);
+                personEntries[id].status.resize(poseKeypoints.getSize()[1]);
+                for(int j=0; j<poseKeypoints.getSize()[1]; j++)
+                {
+                    personEntries[id].keypoints[j].x = poseKeypoints[
+                            i*poseKeypoints.getSize()[1]*poseKeypoints.getSize()[2] +
+                            j*poseKeypoints.getSize()[2] + 0];
+                    personEntries[id].keypoints[j].y = poseKeypoints[
+                            i*poseKeypoints.getSize()[1]*poseKeypoints.getSize()[2] +
+                            j*poseKeypoints.getSize()[2] + 1];
+                    float prob = poseKeypoints[
+                            i*poseKeypoints.getSize()[1]*poseKeypoints.getSize()[2] +
+                            j*poseKeypoints.getSize()[2] + 2];
+                    if(prob < confidenceThreshold) personEntries[id].status[j] = 0;
+                    else personEntries[id].status[j] = 1;
+                }
+
+            }
+        }
+
+        // Print
+        for(auto& kv : personEntries) std::cout << kv.first << " ";
+        std::cout << std::endl;
+        for(int i=0; i<poseIds.getSize()[0]; i++) std::cout << poseIds.at(i) << " ";
+        std::cout << std::endl;
+        std::cout << "---" << std::endl;
+
+        // Sanity Check Start
+        if(personEntries.size() != poseIds.getSize()[0])
+            op::error("Size Mismatch 2");
+
 
     }
 
-    void OPFromPersonEntries(Array<float>& poseKeypoints, std::unordered_map<int, PersonTrackerEntry>& personEntries)
+    void opFromPersonEntries(Array<float>& poseKeypoints,
+                             const std::unordered_map<int, PersonTrackerEntry>& personEntries,
+                             const Array<long long>& poseIds)
     {
-        if (!personEntries.size())
+        if (!personEntries.size() || poseIds.empty())
             return;
         int dims[] = { (int)personEntries.size(), (int)personEntries.begin()->second.keypoints.size(), 3 };
         cv::Mat opArrayMat(3,dims,CV_32FC1);
-        int i=0;
-        for (auto& kv : personEntries)
-        {
-            const PersonTrackerEntry& pe = kv.second;
+        for(int i=0; i<poseIds.getSize()[0]; i++){
+            int id = poseIds[i];
+            const PersonTrackerEntry& pe = personEntries.at(id);
             for (int j=0; j<dims[1]; j++)
             {
                 opArrayMat.at<float>(i*dims[1]*dims[2] + j*dims[2] + 0) = pe.keypoints[j].x;
                 opArrayMat.at<float>(i*dims[1]*dims[2] + j*dims[2] + 1) = pe.keypoints[j].y;
-                opArrayMat.at<float>(i*dims[1]*dims[2] + j*dims[2] + 2) = !(int)pe.status[j];
+                opArrayMat.at<float>(i*dims[1]*dims[2] + j*dims[2] + 2) = (int)pe.status[j];
                 if (pe.keypoints[j].x == 0 && pe.keypoints[j].y == 0)
                     opArrayMat.at<float>(i*dims[1]*dims[2] + j*dims[2] + 2) = 0;
             }
-            i++;
         }
         poseKeypoints.setFrom(opArrayMat);
     }
@@ -91,9 +246,14 @@ namespace op
     {
         try
         {
-            std::cout << poseKeypoints.getSize()[0] << std::endl;
-            std::cout << mMergeResults << std::endl;
-            std::cout << "---" << std::endl;
+            if(poseIds.empty()) return;
+            for(int i=0; i<poseIds.getSize()[0]; i++) std::cout << poseIds.at(i) << " ";
+            std::cout << std::endl;
+            return;
+
+            //std::cout << !poseKeypoints.empty() << std::endl;
+            //std::cout << mMergeResults << std::endl;
+            //std::cout << "---" << std::endl;
 
             // Sanity Checks
             if(!poseKeypoints.empty() && !poseIds.empty())
@@ -107,15 +267,44 @@ namespace op
                 personEntriesFromOP(mPersonEntries, poseKeypoints, poseIds, mConfidenceThreshold);
                 // Capture current frame as floating point
                 cvMatInput.convertTo(mImagePrevious, CV_32F);
+                // Save Last Ids
+                mLastPoseIds = poseIds;
             }
             else
             {
-                // There is new OP Data
-                if(!poseKeypoints.empty() && !poseIds.empty())
+                // Update LK
+                bool newOPData = !poseKeypoints.empty() && !poseIds.empty();
+                if((newOPData && mMergeResults) || (!newOPData))
                 {
+                    cv::Mat imageCurrent;
+                    std::vector<cv::Mat> pyramidImagesCurrent;
+                    cvMatInput.convertTo(imageCurrent, CV_32F);
+                    updateLK(mPersonEntries, mPyramidImagesPrevious, pyramidImagesCurrent, mImagePrevious,
+                             imageCurrent, mLevels, mPatchSize, mTrackVelocity);
+                    mImagePrevious = imageCurrent;
+                    mPyramidImagesPrevious = pyramidImagesCurrent;
+                }
 
+                // There is new OP Data
+                if(newOPData)
+                {
+                    mLastPoseIds = poseIds;
+
+                    syncPersonEntriesWithOP(mPersonEntries, poseKeypoints, mLastPoseIds, mConfidenceThreshold, false);
+                    opFromPersonEntries(poseKeypoints, mPersonEntries, mLastPoseIds);
+                }
+                // There is no new OP Data
+                else
+                {
+                    opFromPersonEntries(poseKeypoints, mPersonEntries, mLastPoseIds);
                 }
             }
+
+//            cv::Mat debugImage = cvMatInput.clone();
+//            vizPersonEntries(debugImage, mPersonEntries, mTrackVelocity);
+//            cv::imshow("win", debugImage);
+//            cv::waitKey(200);
+//            std::cout << "end" << std::endl;
 
             // REMEMBER TO FLIP THE LK VALUES!!
 
@@ -124,17 +313,14 @@ namespace op
              * 2. If last image is empty or mPersonEntries is empty (and poseKeypoints and poseIds has data or crash it)
              *      Create mPersonEntries referencing poseIds
              *      Initialize LK points
+             *
+             *
              * 3. If poseKeypoints is not empty and poseIds has data
-             *      1. Reference poseIds against internal mPersonEntries
-             *      2. CRUD where required
-             *      3. If mergeResults:
-             *            Run LK update on mPersonEntries
-             *            smooth out with poseKeypoints
-             *         else
-             *            replace with poseKeypoints
-             * 4. Else if poseKeypoints is empty
-             *      1. Run LK update on mPersonEntries
-             *      2. replace with poseKeypoints
+             *      1. Update LK
+             *      2. CRUD/Sync - Check mergeResults flag to smooth or not
+             * 4. If poseKeypoints is empty
+             *      1. Update LK
+             *      2. replace poseKeypoints
              */
 
 
