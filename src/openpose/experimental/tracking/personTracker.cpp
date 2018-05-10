@@ -172,7 +172,6 @@ namespace op
                     }
                 }
 
-
             }
             // Add
             else{
@@ -239,15 +238,12 @@ namespace op
     {
         try
         {
+            bool mergeResults = mMergeResults;
+            mergeResults = true;
+
             // Sanity Checks
             if(poseKeypoints.getSize(0) != poseIds.getSize(0))
                  error("poseKeypoints and poseIds should have the same number of people", __LINE__, __FUNCTION__, __FILE__);
-
-//            std::cout << poseKeypoints.getSize(0) << std::endl;
-//            std::cout << poseIds.getSize(0) << std::endl;
-//            for(int i=0; i<poseIds.getSize(0); i++) std::cout << poseIds.at(i) << " ";
-//            std::cout << std::endl;
-//            std::cout << "---" << std::endl;
 
             // First frame
             if(mImagePrevious.empty())
@@ -263,7 +259,7 @@ namespace op
             {
                 // Update LK
                 bool newOPData = !poseKeypoints.empty() && !poseIds.empty();
-                if((newOPData && mMergeResults) || (!newOPData))
+                if((newOPData && mergeResults) || (!newOPData))
                 {
                     cv::Mat imageCurrent;
                     std::vector<cv::Mat> pyramidImagesCurrent;
@@ -278,13 +274,14 @@ namespace op
                 if(newOPData)
                 {
                     mLastPoseIds = poseIds;
-                    syncPersonEntriesWithOP(mPersonEntries, poseKeypoints, mLastPoseIds, mConfidenceThreshold, true);
+                    syncPersonEntriesWithOP(mPersonEntries, poseKeypoints, mLastPoseIds, mConfidenceThreshold, mergeResults);
                     opFromPersonEntries(poseKeypoints, mPersonEntries, mLastPoseIds);
                 }
                 // There is no new OP Data
                 else
                 {
                     opFromPersonEntries(poseKeypoints, mPersonEntries, mLastPoseIds);
+                    poseIds = mLastPoseIds;
                 }
             }
 
@@ -298,8 +295,6 @@ namespace op
              * 2. If last image is empty or mPersonEntries is empty (and poseKeypoints and poseIds has data or crash it)
              *      Create mPersonEntries referencing poseIds
              *      Initialize LK points
-             *
-             *
              * 3. If poseKeypoints is not empty and poseIds has data
              *      1. Update LK
              *      2. CRUD/Sync - Check mergeResults flag to smooth or not
