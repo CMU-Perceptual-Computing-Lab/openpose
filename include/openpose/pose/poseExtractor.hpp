@@ -3,6 +3,7 @@
 
 #include <openpose/core/common.hpp>
 #include <openpose/core/enumClasses.hpp>
+#include <openpose/core/keepTopNPeople.hpp>
 #include <openpose/pose/poseParameters.hpp>
 #include <openpose/pose/poseExtractorNet.hpp>
 #include <openpose/experimental/tracking/personIdExtractor.hpp>
@@ -14,6 +15,7 @@ namespace op
     {
     public:
         PoseExtractor(const std::shared_ptr<PoseExtractorNet>& poseExtractorNet,
+                      const std::shared_ptr<KeepTopNPeople>& keepTopNPeople = nullptr,
                       const std::shared_ptr<PersonIdExtractor>& personIdExtractor = nullptr,
                       const std::vector<std::shared_ptr<PersonTracker>>& personTracker = {},
                       const int numberPeopleMax = -1, const int tracking = -1);
@@ -38,6 +40,9 @@ namespace op
 
         float getScaleNetToOutput() const;
 
+        // KeepTopNPeople functions
+        void keepTopPeople(Array<float>& poseKeypoints, const Array<float>& poseScores) const;
+
         // PersonIdExtractor functions
         // Not thread-safe
         Array<long long> extractIds(const Array<float>& poseKeypoints, const cv::Mat& cvMatInput,
@@ -60,6 +65,7 @@ namespace op
         const int mNumberPeopleMax;
         const int mTracking;
         const std::shared_ptr<PoseExtractorNet> spPoseExtractorNet;
+        const std::shared_ptr<KeepTopNPeople> spKeepTopNPeople;
         const std::shared_ptr<PersonIdExtractor> spPersonIdExtractor;
         const std::vector<std::shared_ptr<PersonTracker>> spPersonTrackers;
 

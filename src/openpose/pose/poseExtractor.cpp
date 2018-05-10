@@ -6,12 +6,14 @@ namespace op
                                      " `--number_people_max 1` in order to run the person tracker (`--tracking`).";
 
     PoseExtractor::PoseExtractor(const std::shared_ptr<PoseExtractorNet>& poseExtractorNet,
+                                 const std::shared_ptr<KeepTopNPeople>& keepTopNPeople,
                                  const std::shared_ptr<PersonIdExtractor>& personIdExtractor,
                                  const std::vector<std::shared_ptr<PersonTracker>>& personTrackers,
                                  const int numberPeopleMax, const int tracking) :
         mNumberPeopleMax{numberPeopleMax},
         mTracking{tracking},
         spPoseExtractorNet{poseExtractorNet},
+        spKeepTopNPeople{keepTopNPeople},
         spPersonIdExtractor{personIdExtractor},
         spPersonTrackers{personTrackers}
     {
@@ -113,6 +115,20 @@ namespace op
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             return 0.;
+        }
+    }
+
+    void PoseExtractor::keepTopPeople(Array<float>& poseKeypoints, const Array<float>& poseScores) const
+    {
+        try
+        {
+            // Keep only top N people
+            if (spKeepTopNPeople)
+                poseKeypoints = spKeepTopNPeople->keepTopPeople(poseKeypoints, poseScores);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
     }
 
