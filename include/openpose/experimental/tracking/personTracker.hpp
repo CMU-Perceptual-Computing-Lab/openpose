@@ -20,8 +20,8 @@ namespace op
                 return predictedKeypoints;
             for (size_t i=0; i<keypoints.size(); i++)
             {
-                predictedKeypoints[i] = cv::Point{predictedKeypoints[i].x + (keypoints[i].x-lastKeypoints[i].x),
-                                                  predictedKeypoints[i].y + (keypoints[i].y-lastKeypoints[i].y)};
+                predictedKeypoints[i] = cv::Point2f{predictedKeypoints[i].x + (keypoints[i].x-lastKeypoints[i].x),
+                                                    predictedKeypoints[i].y + (keypoints[i].y-lastKeypoints[i].y)};
             }
             return predictedKeypoints;
         }
@@ -31,8 +31,8 @@ namespace op
     {
 
     public:
-        PersonTracker(const bool mergeResults, const int levels = 3, const int patchSize = 21,
-                      const bool trackVelocity = false);
+        PersonTracker(const bool mergeResults, const int levels = 3, const int patchSize = 101,
+                      const float confidenceThreshold = 0.05f, const bool trackVelocity = false);
 
         virtual ~PersonTracker();
 
@@ -48,7 +48,7 @@ namespace op
         const int mLevels;
         const int mPatchSize;
         const bool mTrackVelocity;
-        const float mConfidenceThreshold = 0.05;
+        const float mConfidenceThreshold;
 
         cv::Mat mImagePrevious;
         std::vector<cv::Mat> mPyramidImagesPrevious;

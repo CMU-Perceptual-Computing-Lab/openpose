@@ -256,11 +256,13 @@ namespace op
     }
 
     PersonTracker::PersonTracker(const bool mergeResults, const int levels,
-                                 const int patchSize, const bool trackVelocity) :
+                                 const int patchSize, const float confidenceThreshold,
+                                 const bool trackVelocity) :
         mMergeResults{mergeResults},
         mLevels{levels},
         mPatchSize{patchSize},
         mTrackVelocity{trackVelocity},
+        mConfidenceThreshold{confidenceThreshold},
         mLastFrameId{-1ll}
     {
         // try
