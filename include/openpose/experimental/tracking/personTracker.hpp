@@ -31,7 +31,8 @@ namespace op
     {
 
     public:
-        PersonTracker(const bool mergeResults, const int levels = 3, const int patchSize = 21, const bool trackVelocity = false);
+        PersonTracker(const bool mergeResults, const int levels = 3, const int patchSize = 21,
+                      const bool trackVelocity = false);
 
         virtual ~PersonTracker();
 

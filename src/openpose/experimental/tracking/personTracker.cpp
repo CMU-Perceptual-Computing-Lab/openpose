@@ -127,8 +127,9 @@ namespace op
                 bool exists = false;
                 for (int i=0; i<poseIds.getSize()[0]; i++)
                 {
-                    auto id = poseIds[i];
-                    if (id == kv->first) exists = true;
+                    const auto id = poseIds[i];
+                    if (id == kv->first)
+                        exists = true;
                 }
                 if (!exists)
                     personEntries.erase(kv++);
@@ -139,7 +140,7 @@ namespace op
             // Update or Add
             for (int i=0; i<poseIds.getSize()[0]; i++)
             {
-                auto id = poseIds[i];
+                const auto id = poseIds[i];
 
                 // Update
                 if (personEntries.count(id) && mergeResults){
@@ -147,19 +148,20 @@ namespace op
                     PersonTrackerEntry& personEntry = personEntries[id];
                     for (int j=0; j<poseKeypoints.getSize()[1]; j++)
                     {
-                        float x = poseKeypoints[
+                        const float x = poseKeypoints[
                                 i*poseKeypoints.getSize()[1]*poseKeypoints.getSize()[2] +
                                 j*poseKeypoints.getSize()[2] + 0];
-                        float y = poseKeypoints[
+                        const float y = poseKeypoints[
                                 i*poseKeypoints.getSize()[1]*poseKeypoints.getSize()[2] +
                                 j*poseKeypoints.getSize()[2] + 1];
-                        float prob = poseKeypoints[
+                        const float prob = poseKeypoints[
                                 i*poseKeypoints.getSize()[1]*poseKeypoints.getSize()[2] +
                                 j*poseKeypoints.getSize()[2] + 2];
-                        cv::Point lkPoint = personEntry.keypoints[j];
-                        cv::Point opPoint = cv::Point(x,y);
+                        const cv::Point lkPoint = personEntry.keypoints[j];
+                        const cv::Point opPoint = cv::Point(x,y);
 
-                        if (prob < confidenceThreshold) personEntries[id].status[j] = 0;
+                        if (prob < confidenceThreshold)
+                            personEntries[id].status[j] = 0;
                         else
                         {
                             personEntries[id].status[j] = 1;
@@ -188,11 +190,13 @@ namespace op
                         personEntries[id].keypoints[j].y = poseKeypoints[
                                 i*poseKeypoints.getSize()[1]*poseKeypoints.getSize()[2] +
                                 j*poseKeypoints.getSize()[2] + 1];
-                        float prob = poseKeypoints[
+                        const float prob = poseKeypoints[
                                 i*poseKeypoints.getSize()[1]*poseKeypoints.getSize()[2] +
                                 j*poseKeypoints.getSize()[2] + 2];
-                        if (prob < confidenceThreshold) personEntries[id].status[j] = 0;
-                        else personEntries[id].status[j] = 1;
+                        if (prob < confidenceThreshold)
+                            personEntries[id].status[j] = 0;
+                        else
+                            personEntries[id].status[j] = 1;
                     }
 
                 }
@@ -202,12 +206,15 @@ namespace op
             if ((int)personEntries.size() != poseIds.getSize()[0])
             {
                 // Print
-                for (auto& kv : personEntries) std::cout << kv.first << " ";
+                for (auto& kv : personEntries)
+                    std::cout << kv.first << " ";
                 std::cout << std::endl;
-                for (int i=0; i<poseIds.getSize()[0]; i++) std::cout << poseIds.at(i) << " ";
+                for (int i=0; i<poseIds.getSize()[0]; i++)
+                    std::cout << poseIds.at(i) << " ";
                 std::cout << std::endl;
                 std::cout << "---" << std::endl;
-                op::error("Size Mismatch. THere is an error in your poseId formatting");
+                error("Size Mismatch. THere is an error in your poseId formatting.",
+                      __LINE__, __FUNCTION__, __FILE__);
             }
         }
         catch (const std::exception& e)
@@ -226,17 +233,18 @@ namespace op
                 return;
             int dims[] = { (int)personEntries.size(), (int)personEntries.begin()->second.keypoints.size(), 3 };
             cv::Mat opArrayMat(3,dims,CV_32FC1);
-            for (int i=0; i<poseIds.getSize()[0]; i++)
+            for (auto i=0; i<poseIds.getSize()[0]; i++)
             {
-                int id = poseIds[i];
+                const int id = poseIds[i];
                 const PersonTrackerEntry& pe = personEntries.at(id);
                 for (int j=0; j<dims[1]; j++)
                 {
-                    opArrayMat.at<float>(i*dims[1]*dims[2] + j*dims[2] + 0) = pe.keypoints[j].x;
-                    opArrayMat.at<float>(i*dims[1]*dims[2] + j*dims[2] + 1) = pe.keypoints[j].y;
-                    opArrayMat.at<float>(i*dims[1]*dims[2] + j*dims[2] + 2) = (int)pe.status[j];
+                    const auto baseIndex = i*dims[1]*dims[2] + j*dims[2];
+                    opArrayMat.at<float>(baseIndex + 0) = pe.keypoints[j].x;
+                    opArrayMat.at<float>(baseIndex + 1) = pe.keypoints[j].y;
+                    opArrayMat.at<float>(baseIndex + 2) = (int)pe.status[j];
                     if (pe.keypoints[j].x == 0 && pe.keypoints[j].y == 0)
-                        opArrayMat.at<float>(i*dims[1]*dims[2] + j*dims[2] + 2) = 0;
+                        opArrayMat.at<float>(baseIndex + 2) = 0;
                 }
             }
             poseKeypoints.setFrom(opArrayMat);
