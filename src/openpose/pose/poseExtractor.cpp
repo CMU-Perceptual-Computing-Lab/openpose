@@ -8,7 +8,7 @@ namespace op
     PoseExtractor::PoseExtractor(const std::shared_ptr<PoseExtractorNet>& poseExtractorNet,
                                  const std::shared_ptr<KeepTopNPeople>& keepTopNPeople,
                                  const std::shared_ptr<PersonIdExtractor>& personIdExtractor,
-                                 const std::vector<std::shared_ptr<PersonTracker>>& personTrackers,
+                                 const std::shared_ptr<std::vector<std::shared_ptr<PersonTracker>>>& personTrackers,
                                  const int numberPeopleMax, const int tracking) :
         mNumberPeopleMax{numberPeopleMax},
         mTracking{tracking},
@@ -174,15 +174,24 @@ namespace op
     {
         try
         {
-            // Security check
-            if (!poseKeypoints.empty() && poseIds.empty() && mNumberPeopleMax != 1)
-                error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
-            // Reset poseIds if keypoints is empty
-            if (poseKeypoints.empty())
-                poseIds.reset();
-            // Run person ID extractor
-            if (!spPersonTrackers.empty() && spPersonTrackers.at(imageViewIndex))
-                spPersonTrackers[imageViewIndex]->track(poseKeypoints, poseIds, cvMatInput);
+            if (!spPersonTrackers->empty())
+            {
+                // Resize if required
+                while (spPersonTrackers->size() <= imageViewIndex)
+                    spPersonTrackers->emplace_back(std::make_shared<PersonTracker>(
+                        (*spPersonTrackers)[0]->getMergeResults()));
+                // Security check
+                if (!poseKeypoints.empty() && poseIds.empty() && mNumberPeopleMax != 1)
+                    error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
+                // Reset poseIds if keypoints is empty
+                if (poseKeypoints.empty())
+                    poseIds.reset();
+                // Run person tracker
+                if (spPersonTrackers->at(imageViewIndex))
+                    (*spPersonTrackers)[imageViewIndex]->track(poseKeypoints, poseIds, cvMatInput);
+                // Run person tracker
+                (*spPersonTrackers)[imageViewIndex]->track(poseKeypoints, poseIds, cvMatInput);
+            }
         }
         catch (const std::exception& e)
         {
@@ -196,17 +205,22 @@ namespace op
     {
         try
         {
-            // Security check
-            if (!poseKeypoints.empty() && poseIds.empty() && mNumberPeopleMax != 1)
-                error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
-            // Reset poseIds if keypoints is empty
-            if (poseKeypoints.empty())
-                poseIds.reset();
-            // Run person ID extractor
-            if (!spPersonTrackers.empty() && spPersonTrackers.at(imageViewIndex))
+            if (!spPersonTrackers->empty())
             {
-                spPersonTrackers[imageViewIndex]->trackLockThread(
-                    poseKeypoints, poseIds, cvMatInput, frameId);
+                // Resize if required
+                while (spPersonTrackers->size() <= imageViewIndex)
+                    spPersonTrackers->emplace_back(std::make_shared<PersonTracker>(
+                        (*spPersonTrackers)[0]->getMergeResults()));
+                // Security check
+                if (!poseKeypoints.empty() && poseIds.empty() && mNumberPeopleMax != 1)
+                    error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
+                // Reset poseIds if keypoints is empty
+                if (poseKeypoints.empty())
+                    poseIds.reset();
+                // Run person tracker
+                if (spPersonTrackers->at(imageViewIndex))
+                    (*spPersonTrackers)[imageViewIndex]->trackLockThread(
+                        poseKeypoints, poseIds, cvMatInput, frameId);
             }
         }
         catch (const std::exception& e)
