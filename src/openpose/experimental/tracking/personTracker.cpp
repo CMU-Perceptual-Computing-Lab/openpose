@@ -365,7 +365,7 @@ namespace op
         }
     }
 
-    void PersonTracker::trackLockThread(Array<float>& poseKeypoints, Array<long long>& poseIds, 
+    void PersonTracker::trackLockThread(Array<float>& poseKeypoints, Array<long long>& poseIds,
                                         const cv::Mat& cvMatInput, const long long frameId)
     {
         try
