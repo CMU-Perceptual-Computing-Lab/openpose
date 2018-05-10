@@ -23,8 +23,8 @@ namespace op
     {
     }
 
-    void PersonTracker::track(Array<float>& poseKeypoints, const cv::Mat& cvMatInput,
-                              const Array<long long>& poseIds)
+    void PersonTracker::track(Array<float>& poseKeypoints, Array<long long>& poseIds,
+                              const cv::Mat& cvMatInput)
     {
         try
         {
@@ -40,8 +40,8 @@ namespace op
         }
     }
 
-    void PersonTracker::trackLockThread(Array<float>& poseKeypoints, const cv::Mat& cvMatInput,
-                                        const Array<long long>& poseIds, const long long frameId)
+    void PersonTracker::trackLockThread(Array<float>& poseKeypoints, Array<long long>& poseIds,
+                                        const cv::Mat& cvMatInput, const long long frameId)
     {
         try
         {
@@ -49,7 +49,7 @@ namespace op
             while (mLastFrameId < frameId - 1)
                 std::this_thread::sleep_for(std::chrono::microseconds{100});
             // Extract IDs
-            track(poseKeypoints, cvMatInput, poseIds);
+            track(poseKeypoints, poseIds, cvMatInput);
             // Update last frame id
             mLastFrameId = frameId;
         }

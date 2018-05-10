@@ -76,8 +76,8 @@ namespace op
                     tDatum.poseIds = spPoseExtractor->extractIdsLockThread(tDatum.poseKeypoints, tDatum.cvInputData,
                                                                            i, tDatum.id);
                     // Tracking (experimental)
-                    spPoseExtractor->trackLockThread(tDatum.poseKeypoints, tDatum.cvInputData,
-                                                     tDatum.poseIds, i, tDatum.id);
+                    spPoseExtractor->trackLockThread(tDatum.poseKeypoints, tDatum.poseIds, tDatum.cvInputData, i,
+                                                     tDatum.id);
                 }
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);

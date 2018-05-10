@@ -15,9 +15,9 @@ namespace op
 
         virtual ~PersonTracker();
 
-        void track(Array<float>& poseKeypoints, const cv::Mat& cvMatInput, const Array<long long>& poseIds);
+        void track(Array<float>& poseKeypoints, Array<long long>& poseIds, const cv::Mat& cvMatInput);
 
-        void trackLockThread(Array<float>& poseKeypoints, const cv::Mat& cvMatInput, const Array<long long>& poseIds,
+        void trackLockThread(Array<float>& poseKeypoints, Array<long long>& poseIds, const cv::Mat& cvMatInput,
                              const long long frameId);
 
         bool getMergeResults() const;
