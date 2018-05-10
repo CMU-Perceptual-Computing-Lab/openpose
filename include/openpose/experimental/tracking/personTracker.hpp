@@ -20,6 +20,8 @@ namespace op
         void trackLockThread(Array<float>& poseKeypoints, const cv::Mat& cvMatInput, const Array<long long>& poseIds,
                              const long long frameId);
 
+        bool getMergeResults() const;
+
     private:
         const bool mMergeResults;
 

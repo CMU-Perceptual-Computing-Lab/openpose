@@ -8,7 +8,7 @@ namespace op
     PoseExtractor::PoseExtractor(const std::shared_ptr<PoseExtractorNet>& poseExtractorNet,
                                  const std::shared_ptr<KeepTopNPeople>& keepTopNPeople,
                                  const std::shared_ptr<PersonIdExtractor>& personIdExtractor,
-                                 const std::vector<std::shared_ptr<PersonTracker>>& personTrackers,
+                                 const std::shared_ptr<std::vector<std::shared_ptr<PersonTracker>>>& personTrackers,
                                  const int numberPeopleMax, const int tracking) :
         mNumberPeopleMax{numberPeopleMax},
         mTracking{tracking},
@@ -174,13 +174,17 @@ namespace op
     {
         try
         {
-            if (!spPersonTrackers.empty() && spPersonTrackers.at(imageViewIndex))
+            if (!spPersonTrackers->empty())
             {
+                // Resize if required
+                while (spPersonTrackers->size() <= imageViewIndex)
+                    spPersonTrackers->emplace_back(std::make_shared<PersonTracker>(
+                        (*spPersonTrackers)[0]->getMergeResults()));
                 // Security check
                 if (!poseKeypoints.empty() && poseIds.empty() && mNumberPeopleMax != 1)
                     error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
                 // Run person ID extractor
-                spPersonTrackers[imageViewIndex]->track(
+                (*spPersonTrackers)[imageViewIndex]->track(
                     poseKeypoints, cvMatInput, (poseIds.empty() ? Array<long long>{1, 0} : poseIds));
             }
         }
@@ -196,13 +200,17 @@ namespace op
     {
         try
         {
-            if (!spPersonTrackers.empty() && spPersonTrackers.at(imageViewIndex))
+            if (!spPersonTrackers->empty())
             {
+                // Resize if required
+                while (spPersonTrackers->size() <= imageViewIndex)
+                    spPersonTrackers->emplace_back(std::make_shared<PersonTracker>(
+                        (*spPersonTrackers)[0]->getMergeResults()));
                 // Security check
                 if (!poseKeypoints.empty() && poseIds.empty() && mNumberPeopleMax != 1)
                     error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
                 // Run person ID extractor
-                spPersonTrackers[imageViewIndex]->trackLockThread(
+                (*spPersonTrackers)[imageViewIndex]->trackLockThread(
                     poseKeypoints, cvMatInput, (poseIds.empty() ? Array<long long>{1, 0} : poseIds),
                     frameId);
             }

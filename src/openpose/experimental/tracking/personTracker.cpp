@@ -58,4 +58,17 @@ namespace op
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
     }
+
+    bool PersonTracker::getMergeResults() const
+    {
+        try
+        {
+            return mMergeResults;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return false;
+        }
+    }
 }

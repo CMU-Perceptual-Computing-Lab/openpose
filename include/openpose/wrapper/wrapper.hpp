@@ -616,10 +616,10 @@ namespace op
                         std::make_shared<KeepTopNPeople>(wrapperStructPose.numberPeopleMax)
                         : nullptr);
                     // Person tracker
-                    std::vector<std::shared_ptr<PersonTracker>> personTrackers;
+                    auto personTrackers = std::make_shared<std::vector<std::shared_ptr<PersonTracker>>>();
                     if (wrapperStructPose.tracking > -1)
-                        personTrackers.resize(spWPoseExtractors.size(),
-                                              std::make_shared<PersonTracker>(wrapperStructPose.tracking == 0));
+                        personTrackers->emplace_back(
+                            std::make_shared<PersonTracker>(wrapperStructPose.tracking == 0));
                     for (auto i = 0u; i < spWPoseExtractors.size(); i++)
                     {
                         // OpenPose keypoint detector + keepTopNPeople
