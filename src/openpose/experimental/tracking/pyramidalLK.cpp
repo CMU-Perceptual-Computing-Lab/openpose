@@ -284,13 +284,12 @@ namespace op
             std::vector<std::vector<float>> patchIt(patchSize, std::vector<float>(patchSize));
 
             status = extractPatch(patch, (int)pointI.x,(int)pointI.y, patchSize + 2, I);
-        //    if (status)
-        //        return result;
+            // if (status)
+            //     return result;
 
             status = extractPatchIt(patchIt, pointI.x, pointI.y, pointJ.x, pointJ.y, I, J, patchSize);
-
-        //    if (status)
-        //        return result;
+            // if (status)
+            //     return result;
 
             // Get the Ix, Iy and It vectors
             std::vector<float> ix, iy, it;
@@ -300,8 +299,8 @@ namespace op
             cv::Point2f delta;
             status = computeLK(delta, ix, iy, it);
 
-        //    if (status)
-        //        return result;
+            // if (status)
+            //     return result;
 
             result = pointJ + delta;
 
@@ -347,14 +346,11 @@ namespace op
                 for (auto l = levels - 1; l >= 0; l--)
                 {
                     char status_point = 0;
-                    cv::Point2f result;
 
-                    result = pyramidIteration(status_point, I[i], coordJ[i],pyramidImagesPrevious[l],
-                                              pyramidImagesCurrent[l], patchSize);
+                    coordJ[i] = pyramidIteration(status_point, I[i], coordJ[i],pyramidImagesPrevious[l],
+                                                 pyramidImagesCurrent[l], patchSize);
                     if (status_point)
                         status[i] = status_point;
-
-                    coordJ[i] = result;
 
                     if (l == 0)
                         break;
@@ -381,78 +377,81 @@ namespace op
         try
         {
             // Empty coordinates
-            if (coordI.size() == 0)
-                return;
-
-            std::vector<cv::Point2f> I;
-            I.assign(coordI.begin(), coordI.end());
-
-            if(!initFlow)
+            if (!coordI.empty())
             {
-                coordJ.clear();
-                coordJ.assign(I.begin(), I.end());
-            }
+                std::vector<cv::Point2f> I;
+                I.assign(coordI.begin(), coordI.end());
 
-            // Need to convert everytime BAD (Eats 1ms)
-            cv::Mat imagePrevGray;
-            imagePrevious.convertTo(imagePrevGray, CV_8UC3);
-            cv::Mat imageCurrGray;
-            imageCurrent.convertTo(imageCurrGray, CV_8UC3);
-
-            if (pyramidImagesPrevious.empty())
-                cv::buildOpticalFlowPyramid(imagePrevGray, pyramidImagesPrevious, cv::Size(patchSize,patchSize), levels);
-
-            if (pyramidImagesCurrent.empty())
-                cv::buildOpticalFlowPyramid(imageCurrGray, pyramidImagesCurrent, cv::Size(patchSize,patchSize), levels);
-
-            std::vector<uchar> st;
-            std::vector<float> err;
-            if(initFlow)
-                cv::calcOpticalFlowPyrLK(pyramidImagesPrevious, pyramidImagesCurrent, coordI, coordJ, st, err, cv::Size(patchSize,patchSize),levels
-                                     ,cv::TermCriteria(cv::TermCriteria::COUNT+cv::TermCriteria::EPS,30,0.01), cv::OPTFLOW_USE_INITIAL_FLOW);
-            else
-                cv::calcOpticalFlowPyrLK(pyramidImagesPrevious, pyramidImagesCurrent, coordI, coordJ, st, err, cv::Size(patchSize,patchSize),levels);
-
-            //std::cout << "ERR: ";
-            //for(int i=0; i<err.size(); i++) std::cout << err[i] << " ";
-            //std::cout << std::endl;
-
-            // Check distance
-            for(size_t i=0; i<status.size(); i++)
-            {
-                float distance = sqrt(pow(coordI[i].x-coordJ[i].x,2)+pow(coordI[i].y-coordJ[i].y,2));
-
-                // Check if lk loss track, if distance is close keep it
-                if(st[i] != (!status[i])){
-                    if(distance <= patchSize*2) st[i] = 1;
+                if (!initFlow)
+                {
+                    coordJ.clear();
+                    coordJ.assign(I.begin(), I.end());
                 }
 
-                // If distance too far discard it
-                if(distance > patchSize*2) st[i] = 0;
-            }
+                // Need to convert everytime BAD (Eats 1ms)
+                cv::Mat imagePrevGray;
+                imagePrevious.convertTo(imagePrevGray, CV_8UC3);
+                cv::Mat imageCurrGray;
+                imageCurrent.convertTo(imageCurrGray, CV_8UC3);
 
-            // Stupid hack because apparently in this tracker 0 means 1 and 1 is 0 wtf
-            if(st.size() != status.size())
-                throw;
-            for(size_t i=0; i<status.size(); i++)
-            {
-                // If its 0 to begin with (Because OP lost track?)
-                if(status[i] == 0){
-                    continue;
+                if (pyramidImagesPrevious.empty())
+                    cv::buildOpticalFlowPyramid(imagePrevGray, pyramidImagesPrevious, cv::Size{patchSize,patchSize}, levels);
+
+                if (pyramidImagesCurrent.empty())
+                    cv::buildOpticalFlowPyramid(imageCurrGray, pyramidImagesCurrent, cv::Size{patchSize,patchSize}, levels);
+
+                std::vector<uchar> st;
+                std::vector<float> err;
+                if (initFlow)
+                    cv::calcOpticalFlowPyrLK(pyramidImagesPrevious, pyramidImagesCurrent, coordI, coordJ, st, err,
+                                             cv::Size{patchSize,patchSize}, levels,
+                                             cv::TermCriteria(cv::TermCriteria::COUNT+cv::TermCriteria::EPS, 30, 0.01),
+                                             cv::OPTFLOW_USE_INITIAL_FLOW);
+                else
+                    cv::calcOpticalFlowPyrLK(pyramidImagesPrevious, pyramidImagesCurrent, coordI, coordJ, st, err,
+                                             cv::Size{patchSize,patchSize}, levels);
+
+                // std::cout << "ERR: ";
+                // for (int i=0; i<err.size(); i++) std::cout << err[i] << " ";
+                // std::cout << std::endl;
+
+                // Check distance
+                for (size_t i=0; i<status.size(); i++)
+                {
+                    const float distance = sqrt(pow(coordI[i].x-coordJ[i].x,2)+pow(coordI[i].y-coordJ[i].y,2));
+
+                    // Check if lk loss track, if distance is close keep it
+                    if (st[i] != (!status[i]))
+                        if (distance <= patchSize*2)
+                            st[i] = 1;
+
+                    // If distance too far discard it
+                    if (distance > patchSize*2)
+                        st[i] = 0;
                 }
 
-//                if(st[i] == 0) st[i] = 1;
-//                else if(st[i] == 1) st[i] = 0;
-//                else{
-//                    throw std::runtime_error("Wrong CV Type");
-//                }
-                status[i] = st[i];
-            }
+                // Stupid hack because apparently in this tracker 0 means 1 and 1 is 0 wtf
+                if (st.size() != status.size())
+                    error("Unknown error. Please, notify us.", __LINE__, __FUNCTION__, __FILE__);
+                for (size_t i=0; i<status.size(); i++)
+                {
+                    // If its 0 to begin with (Because OP lost track?)
+                    if (status[i] != 0)
+                    {
+                        // if (st[i] == 0) st[i] = 1;
+                        // else if (st[i] == 1) st[i] = 0;
+                        // else{
+                        //     throw std::runtime_error("Wrong CV Type");
+                        // }
+                        status[i] = st[i];
+                    }
+                }
 
-            // Debug
-            //std::cout << "LK: ";
-            //for(int i=0; i<status.size(); i++) std::cout << !(int)status[i];
-            //std::cout << std::endl;
+                // Debug
+                // std::cout << "LK: ";
+                // for (int i=0; i<status.size(); i++) std::cout << !(int)status[i];
+                // std::cout << std::endl;
+            }
         }
         catch (const std::exception& e)
         {

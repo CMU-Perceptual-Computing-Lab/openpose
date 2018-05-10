@@ -20,8 +20,8 @@ namespace op
                 return predictedKeypoints;
             for (size_t i=0; i<keypoints.size(); i++)
             {
-                predictedKeypoints[i] = cv::Point(predictedKeypoints[i].x + (keypoints[i].x-lastKeypoints[i].x),
-                                                  predictedKeypoints[i].y + (keypoints[i].y-lastKeypoints[i].y));
+                predictedKeypoints[i] = cv::Point{predictedKeypoints[i].x + (keypoints[i].x-lastKeypoints[i].x),
+                                                  predictedKeypoints[i].y + (keypoints[i].y-lastKeypoints[i].y)};
             }
             return predictedKeypoints;
         }
