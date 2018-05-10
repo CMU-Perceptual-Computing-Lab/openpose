@@ -170,16 +170,16 @@ namespace op
 
     void PoseExtractor::track(Array<float>& poseKeypoints, Array<long long>& poseIds,
                               const cv::Mat& cvMatInput,
-                              const unsigned long long imageViewIndex,
-                              const long long frameId)
+                              const unsigned long long imageViewIndex)
     {
         try
         {
-            if (!(mTracking < 1 || frameId % (mTracking+1) == 0))
-                poseIds.reset();
             // Security check
             if (!poseKeypoints.empty() && poseIds.empty() && mNumberPeopleMax != 1)
                 error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
+            // Reset poseIds if keypoints is empty
+            if (poseKeypoints.empty())
+                poseIds.reset();
             // Run person ID extractor
             if (!spPersonTrackers.empty() && spPersonTrackers.at(imageViewIndex))
                 spPersonTrackers[imageViewIndex]->track(poseKeypoints, poseIds, cvMatInput);
@@ -196,11 +196,12 @@ namespace op
     {
         try
         {
-            if (!(mTracking < 1 || frameId % (mTracking+1) == 0))
-                poseIds.reset();
             // Security check
             if (!poseKeypoints.empty() && poseIds.empty() && mNumberPeopleMax != 1)
                 error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
+            // Reset poseIds if keypoints is empty
+            if (poseKeypoints.empty())
+                poseIds.reset();
             // Run person ID extractor
             if (!spPersonTrackers.empty() && spPersonTrackers.at(imageViewIndex))
             {

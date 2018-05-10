@@ -13,10 +13,13 @@ namespace op
         std::vector<cv::Point2f> keypoints;
         std::vector<cv::Point2f> lastKeypoints;
         std::vector<char> status;
-        std::vector<cv::Point2f> getPredicted(){
+        std::vector<cv::Point2f> getPredicted() const
+        {
             std::vector<cv::Point2f> predictedKeypoints(keypoints);
-            if(!lastKeypoints.size()) return predictedKeypoints;
-            for(size_t i=0; i<keypoints.size(); i++){
+            if (!lastKeypoints.size())
+                return predictedKeypoints;
+            for (size_t i=0; i<keypoints.size(); i++)
+            {
                 predictedKeypoints[i] = cv::Point(predictedKeypoints[i].x + (keypoints[i].x-lastKeypoints[i].x),
                                                   predictedKeypoints[i].y + (keypoints[i].y-lastKeypoints[i].y));
             }

@@ -55,8 +55,7 @@ namespace op
 
         // PersonTracker functions
         void track(Array<float>& poseKeypoints, Array<long long>& poseIds,
-                   const cv::Mat& cvMatInput, const unsigned long long imageViewIndex,
-                   const long long frameId);
+                   const cv::Mat& cvMatInput, const unsigned long long imageViewIndex = 0ull);
 
         void trackLockThread(Array<float>& poseKeypoints, Array<long long>& poseIds,
                              const cv::Mat& cvMatInput,
