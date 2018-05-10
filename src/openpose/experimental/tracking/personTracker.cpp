@@ -123,34 +123,18 @@ namespace op
     {
         if(poseIds.empty()) return;
 
-        // Print
-        for(auto& kv : personEntries) std::cout << kv.first << " ";
-        std::cout << std::endl;
-        for(int i=0; i<poseIds.getSize()[0]; i++) std::cout << poseIds.at(i) << " ";
-        std::cout << std::endl;
-        std::cout << "---" << std::endl;
-
         // Delete
         for (auto kv = personEntries.cbegin(); kv != personEntries.cend() /* not hoisted */; /* no increment */)
         {
             bool exists = false;
-            for(int i=0; i<poseIds.getSize()[0]; i++){
+            for(int i=0; i<poseIds.getSize()[0]; i++)
+            {
                 auto id = poseIds[i];
                 if(id == kv->first) exists = true;
             }
-            if(!exists){
-                personEntries.erase(kv++);
-            }else{
-                ++kv;
-            }
+            if(!exists) personEntries.erase(kv++);
+            else ++kv;
         }
-
-        // Print
-        for(auto& kv : personEntries) std::cout << kv.first << " ";
-        std::cout << std::endl;
-        for(int i=0; i<poseIds.getSize()[0]; i++) std::cout << poseIds.at(i) << " ";
-        std::cout << std::endl;
-        std::cout << "---" << std::endl;
 
         // Update or Add
         for(int i=0; i<poseIds.getSize()[0]; i++){
@@ -159,23 +143,33 @@ namespace op
             // Update
             if(personEntries.count(id) && mergeResults){
 
-                op::error("Not implemeneted");
-                personEntries[id] = PersonTrackerEntry();
-                personEntries[id].keypoints.resize(poseKeypoints.getSize()[1]);
-                personEntries[id].status.resize(poseKeypoints.getSize()[1]);
+                PersonTrackerEntry& personEntry = personEntries[id];
                 for(int j=0; j<poseKeypoints.getSize()[1]; j++)
                 {
-                    personEntries[id].keypoints[j].x = poseKeypoints[
+                    float x = poseKeypoints[
                             i*poseKeypoints.getSize()[1]*poseKeypoints.getSize()[2] +
                             j*poseKeypoints.getSize()[2] + 0];
-                    personEntries[id].keypoints[j].y = poseKeypoints[
+                    float y = poseKeypoints[
                             i*poseKeypoints.getSize()[1]*poseKeypoints.getSize()[2] +
                             j*poseKeypoints.getSize()[2] + 1];
                     float prob = poseKeypoints[
                             i*poseKeypoints.getSize()[1]*poseKeypoints.getSize()[2] +
                             j*poseKeypoints.getSize()[2] + 2];
+                    cv::Point lkPoint = personEntry.keypoints[j];
+                    cv::Point opPoint = cv::Point(x,y);
+
                     if(prob < confidenceThreshold) personEntries[id].status[j] = 0;
-                    else personEntries[id].status[j] = 1;
+                    else
+                    {
+                        personEntries[id].status[j] = 1;
+                        float distance = sqrt(pow(lkPoint.x-opPoint.x,2)+pow(lkPoint.y-opPoint.y,2));
+                        if (distance < 5)
+                            personEntries[id].keypoints[j] = lkPoint;
+                        else if (distance < 10)
+                            personEntries[id].keypoints[j] = cv::Point((lkPoint.x+opPoint.x)/2.,(lkPoint.y+opPoint.y)/2.);
+                        else
+                            personEntries[id].keypoints[j] = opPoint;
+                    }
                 }
 
 
@@ -204,18 +198,17 @@ namespace op
             }
         }
 
-        // Print
-        for(auto& kv : personEntries) std::cout << kv.first << " ";
-        std::cout << std::endl;
-        for(int i=0; i<poseIds.getSize()[0]; i++) std::cout << poseIds.at(i) << " ";
-        std::cout << std::endl;
-        std::cout << "---" << std::endl;
-
         // Sanity Check Start
-        if(personEntries.size() != poseIds.getSize()[0])
-            op::error("Size Mismatch 2");
-
-
+        if((int)personEntries.size() != poseIds.getSize()[0])
+        {
+            // Print
+            for(auto& kv : personEntries) std::cout << kv.first << " ";
+            std::cout << std::endl;
+            for(int i=0; i<poseIds.getSize()[0]; i++) std::cout << poseIds.at(i) << " ";
+            std::cout << std::endl;
+            std::cout << "---" << std::endl;
+            op::error("Size Mismatch. THere is an error in your poseId formatting");
+        }
     }
 
     void opFromPersonEntries(Array<float>& poseKeypoints,
@@ -246,19 +239,15 @@ namespace op
     {
         try
         {
-            if(poseIds.empty()) return;
-            for(int i=0; i<poseIds.getSize()[0]; i++) std::cout << poseIds.at(i) << " ";
-            std::cout << std::endl;
-            return;
-
-            //std::cout << !poseKeypoints.empty() << std::endl;
-            //std::cout << mMergeResults << std::endl;
-            //std::cout << "---" << std::endl;
-
             // Sanity Checks
-            if(!poseKeypoints.empty() && !poseIds.empty())
-                if(poseKeypoints.getSize()[0] != poseIds.getSize()[0])
-                     error("poseKeypoints and poseIds should have the same number of people", __LINE__, __FUNCTION__, __FILE__);
+            if(poseKeypoints.getSize(0) != poseIds.getSize(0))
+                 error("poseKeypoints and poseIds should have the same number of people", __LINE__, __FUNCTION__, __FILE__);
+
+//            std::cout << poseKeypoints.getSize(0) << std::endl;
+//            std::cout << poseIds.getSize(0) << std::endl;
+//            for(int i=0; i<poseIds.getSize(0); i++) std::cout << poseIds.at(i) << " ";
+//            std::cout << std::endl;
+//            std::cout << "---" << std::endl;
 
             // First frame
             if(mImagePrevious.empty())
@@ -289,8 +278,7 @@ namespace op
                 if(newOPData)
                 {
                     mLastPoseIds = poseIds;
-
-                    syncPersonEntriesWithOP(mPersonEntries, poseKeypoints, mLastPoseIds, mConfidenceThreshold, false);
+                    syncPersonEntriesWithOP(mPersonEntries, poseKeypoints, mLastPoseIds, mConfidenceThreshold, true);
                     opFromPersonEntries(poseKeypoints, mPersonEntries, mLastPoseIds);
                 }
                 // There is no new OP Data
@@ -300,13 +288,10 @@ namespace op
                 }
             }
 
-//            cv::Mat debugImage = cvMatInput.clone();
-//            vizPersonEntries(debugImage, mPersonEntries, mTrackVelocity);
-//            cv::imshow("win", debugImage);
-//            cv::waitKey(200);
-//            std::cout << "end" << std::endl;
-
-            // REMEMBER TO FLIP THE LK VALUES!!
+            //cv::Mat debugImage = cvMatInput.clone();
+            //vizPersonEntries(debugImage, mPersonEntries, mTrackVelocity);
+            //cv::imshow("win", debugImage);
+            //cv::waitKey(15);
 
             /*
              * 1. Get poseKeypoints for all people - Checks
