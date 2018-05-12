@@ -458,7 +458,7 @@ namespace op
                 float distance = sqrt(pow(coordI[i].x-coordJ[i].x,2)+pow(coordI[i].y-coordJ[i].y,2));
 
                 // Check if lk loss track, if distance is close keep it
-                if(st[i] != (!status[i])){
+                if(st[i] != (status[i])){
                     if(distance <= patchSize*2) st[i] = 1;
                 }
 
