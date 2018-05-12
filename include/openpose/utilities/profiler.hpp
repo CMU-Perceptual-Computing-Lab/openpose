@@ -2,6 +2,7 @@
 #define OPENPOSE_UTILITIES_PROFILER_HPP
 
 #include <string>
+#include <chrono>
 #include <openpose/core/macros.hpp>
 
 // Enable PROFILER_ENABLED on Makefile.config in order to use this function. Otherwise nothing will be outputted.
@@ -21,6 +22,12 @@ namespace op
     class OP_API Profiler
     {
     public:
+        typedef std::chrono::steady_clock::time_point optime;
+
+        static Profiler::optime getTime();
+
+        static float getTimeElapsedMs(optime& start);
+
         static unsigned long long DEFAULT_X;
 
         // Non-thread safe, it must be performed at the beginning of the code before any parallelization occurs

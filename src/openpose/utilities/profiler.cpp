@@ -10,6 +10,18 @@
 
 namespace op
 {
+    Profiler::optime Profiler::getTime()
+    {
+        return std::chrono::steady_clock::now();
+    }
+
+    float Profiler::getTimeElapsedMs(optime& start)
+    {
+        float t = std::chrono::duration_cast<std::chrono::microseconds>(getTime() - start).count() / 1000.;
+        start = getTime();
+        return t;
+    }
+
     unsigned long long Profiler::DEFAULT_X = 1000;
 
     #ifdef PROFILER_ENABLED

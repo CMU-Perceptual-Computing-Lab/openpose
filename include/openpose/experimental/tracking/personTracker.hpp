@@ -32,7 +32,8 @@ namespace op
 
     public:
         PersonTracker(const bool mergeResults, const int levels = 3, const int patchSize = 21,
-                      const float confidenceThreshold = 0.05f, const bool trackVelocity = false);
+                      const float confidenceThreshold = 0.05f, const bool trackVelocity = false,
+                      const bool scaleVarying = false, const float rescale = 640);
 
         virtual ~PersonTracker();
 
@@ -49,6 +50,8 @@ namespace op
         const int mPatchSize;
         const bool mTrackVelocity;
         const float mConfidenceThreshold;
+        const bool mScaleVarying;
+        const float mRescale;
 
         cv::Mat mImagePrevious;
         std::vector<cv::Mat> mPyramidImagesPrevious;

@@ -3,6 +3,7 @@
 #include <opencv2/imgproc/imgproc.hpp> // cv::pyrDown
 #include <openpose/experimental/tracking/pyramidalLK.hpp>
 #include <opencv2/opencv.hpp>
+#include <openpose/utilities/profiler.hpp>
 
 #if defined ( __SSE4_1__)
 #include <emmintrin.h>
@@ -284,12 +285,13 @@ namespace op
             std::vector<std::vector<float>> patchIt(patchSize, std::vector<float>(patchSize));
 
             status = extractPatch(patch, (int)pointI.x,(int)pointI.y, patchSize + 2, I);
-            // if (status)
-            //     return result;
+        //    if (status)
+        //        return result;
 
             status = extractPatchIt(patchIt, pointI.x, pointI.y, pointJ.x, pointJ.y, I, J, patchSize);
-            // if (status)
-            //     return result;
+
+        //    if (status)
+        //        return result;
 
             // Get the Ix, Iy and It vectors
             std::vector<float> ix, iy, it;
@@ -299,8 +301,8 @@ namespace op
             cv::Point2f delta;
             status = computeLK(delta, ix, iy, it);
 
-            // if (status)
-            //     return result;
+        //    if (status)
+        //        return result;
 
             result = pointJ + delta;
 
@@ -346,11 +348,14 @@ namespace op
                 for (auto l = levels - 1; l >= 0; l--)
                 {
                     char status_point = 0;
+                    cv::Point2f result;
 
-                    coordJ[i] = pyramidIteration(status_point, I[i], coordJ[i],pyramidImagesPrevious[l],
-                                                 pyramidImagesCurrent[l], patchSize);
+                    result = pyramidIteration(status_point, I[i], coordJ[i],pyramidImagesPrevious[l],
+                                              pyramidImagesCurrent[l], patchSize);
                     if (status_point)
                         status[i] = status_point;
+
+                    coordJ[i] = result;
 
                     if (l == 0)
                         break;
@@ -372,86 +377,119 @@ namespace op
     void pyramidalLKOcv(std::vector<cv::Point2f>& coordI, std::vector<cv::Point2f>& coordJ,
                         std::vector<cv::Mat>& pyramidImagesPrevious, std::vector<cv::Mat>& pyramidImagesCurrent,
                         std::vector<char>& status, const cv::Mat& imagePrevious,
-                        const cv::Mat& imageCurrent, const int levels, const int patchSize, bool initFlow)
+                        const cv::Mat& imageCurrent, const int levels, const int patchSize, bool initFlow,
+                        cv::Size requiredSize)
     {
         try
         {
+            //Profiler::optime start = Profiler::getTime();
+
             // Empty coordinates
-            if (!coordI.empty())
+            if (coordI.size() == 0)
+                return;
+
+            std::vector<cv::Point2f> I;
+            I.assign(coordI.begin(), coordI.end());
+
+            if(!initFlow)
             {
-                std::vector<cv::Point2f> I;
-                I.assign(coordI.begin(), coordI.end());
-
-                if (!initFlow)
-                {
-                    coordJ.clear();
-                    coordJ.assign(I.begin(), I.end());
-                }
-
-                // Need to convert everytime BAD (Eats 1ms)
-                cv::Mat imagePrevGray;
-                imagePrevious.convertTo(imagePrevGray, CV_8UC3);
-                cv::Mat imageCurrGray;
-                imageCurrent.convertTo(imageCurrGray, CV_8UC3);
-
-                if (pyramidImagesPrevious.empty())
-                    cv::buildOpticalFlowPyramid(imagePrevGray, pyramidImagesPrevious, cv::Size{patchSize,patchSize}, levels);
-
-                if (pyramidImagesCurrent.empty())
-                    cv::buildOpticalFlowPyramid(imageCurrGray, pyramidImagesCurrent, cv::Size{patchSize,patchSize}, levels);
-
-                std::vector<uchar> st;
-                std::vector<float> err;
-                if (initFlow)
-                    cv::calcOpticalFlowPyrLK(pyramidImagesPrevious, pyramidImagesCurrent, coordI, coordJ, st, err,
-                                             cv::Size{patchSize,patchSize}, levels,
-                                             cv::TermCriteria(cv::TermCriteria::COUNT+cv::TermCriteria::EPS, 30, 0.01),
-                                             cv::OPTFLOW_USE_INITIAL_FLOW);
-                else
-                    cv::calcOpticalFlowPyrLK(pyramidImagesPrevious, pyramidImagesCurrent, coordI, coordJ, st, err,
-                                             cv::Size{patchSize,patchSize}, levels);
-
-                // std::cout << "ERR: ";
-                // for (int i=0; i<err.size(); i++) std::cout << err[i] << " ";
-                // std::cout << std::endl;
-
-                // Check distance
-                for (size_t i=0; i<status.size(); i++)
-                {
-                    const float distance = sqrt(pow(coordI[i].x-coordJ[i].x,2)+pow(coordI[i].y-coordJ[i].y,2));
-
-                    // Check if lk loss track, if distance is close keep it
-                    if (st[i] != (!status[i]))
-                        if (distance <= patchSize*2)
-                            st[i] = 1;
-
-                    // If distance too far discard it
-                    if (distance > patchSize*2)
-                        st[i] = 0;
-                }
-
-                // Stupid hack because apparently in this tracker 0 means 1 and 1 is 0 wtf
-                if (st.size() != status.size())
-                    error("Unknown error. Please, notify us.", __LINE__, __FUNCTION__, __FILE__);
-                for (size_t i=0; i<status.size(); i++)
-                {
-                    // If its 0 to begin with (Because OP lost track?)
-                    if (status[i] != 0)
-                    {
-                        // if (st[i] == 0) st[i] = 1;
-                        // else if (st[i] == 1) st[i] = 0;
-                        // else{
-                        //     throw std::runtime_error("Wrong CV Type");
-                        // }
-                        status[i] = st[i];
-                    }
-                }
-
-                // Debug
-                // std::cout << "LK: ";
-                // for (int i=0; i<status.size(); i++) std::cout << !(int)status[i];
-                // std::cout << std::endl;
+                coordJ.clear();
+                coordJ.assign(I.begin(), I.end());
             }
+
+            // Resize
+            cv::Mat imagePrevGray, imageCurrGray;
+            float xScale, yScale;
+            bool resize = false;
+            if(requiredSize.width != 0 && requiredSize.height != 0)
+            {
+                resize = true;
+                xScale = (float)imageCurrent.size().width / (float)requiredSize.width;
+                yScale = (float)imageCurrent.size().height / (float)requiredSize.height;
+                cv::resize(imagePrevious, imagePrevGray, requiredSize);
+                cv::resize(imageCurrent, imageCurrGray, requiredSize);
+            }
+            else
+            {
+                imagePrevGray = imagePrevious;
+                imageCurrGray = imageCurrent;
+            }
+            //const cv::Mat& imagePrevGray = imagePrevious;
+            //const cv::Mat& imageCurrGray = imageCurrent;
+
+            // Compute Pyramids
+            if (pyramidImagesPrevious.empty())
+                cv::buildOpticalFlowPyramid(imagePrevGray, pyramidImagesPrevious, cv::Size(patchSize,patchSize), levels);
+            if (pyramidImagesCurrent.empty())
+                cv::buildOpticalFlowPyramid(imageCurrGray, pyramidImagesCurrent, cv::Size(patchSize,patchSize), levels);
+
+            // Rescale
+            if(resize)
+                for(size_t i=0; i<status.size(); i++)
+                {
+                    coordI[i].x /= xScale;
+                    coordI[i].y /= yScale;
+                    coordJ[i].x /= xScale;
+                    coordJ[i].y /= yScale;
+                }
+
+            // Compute Flow
+            std::vector<uchar> st;
+            std::vector<float> err;
+            if(initFlow)
+                cv::calcOpticalFlowPyrLK(pyramidImagesPrevious, pyramidImagesCurrent, coordI, coordJ, st, err, cv::Size(patchSize,patchSize),levels
+                                     ,cv::TermCriteria(cv::TermCriteria::COUNT+cv::TermCriteria::EPS,30,0.01), cv::OPTFLOW_USE_INITIAL_FLOW);
+            else
+                cv::calcOpticalFlowPyrLK(pyramidImagesPrevious, pyramidImagesCurrent, coordI, coordJ, st, err, cv::Size(patchSize,patchSize),levels);
+
+            // Rescale
+            if(resize)
+                for(size_t i=0; i<status.size(); i++)
+                {
+                    coordI[i].x *= xScale;
+                    coordI[i].y *= yScale;
+                    coordJ[i].x *= xScale;
+                    coordJ[i].y *= yScale;
+                }
+
+            // Check distance
+            for(size_t i=0; i<status.size(); i++)
+            {
+                float distance = sqrt(pow(coordI[i].x-coordJ[i].x,2)+pow(coordI[i].y-coordJ[i].y,2));
+
+                // Check if lk loss track, if distance is close keep it
+                if(st[i] != (!status[i])){
+                    if(distance <= patchSize*2) st[i] = 1;
+                }
+
+                // If distance too far discard it
+                if(distance > patchSize*2) st[i] = 0;
+            }
+
+            // Stupid hack because apparently in this tracker 0 means 1 and 1 is 0 wtf
+            if(st.size() != status.size())
+                throw;
+            for(size_t i=0; i<status.size(); i++)
+            {
+                // If its 0 to begin with (Because OP lost track?)
+                if(status[i] == 0){
+                    continue;
+                }
+
+                if(st[i] == 0) st[i] = 0;
+                else if(st[i] == 1) st[i] = 1;
+                else{
+                    throw std::runtime_error("Wrong CV Type");
+                }
+                status[i] = st[i];
+            }
+
+            //op::log(std::to_string(Profiler::getTimeElapsedMs(start)));
+
+            // Debug
+            //std::cout << "LK: ";
+            //for(int i=0; i<status.size(); i++) std::cout << !(int)status[i];
+            //std::cout << std::endl;
         }
         catch (const std::exception& e)
         {

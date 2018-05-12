@@ -6,10 +6,60 @@
 
 namespace op
 {
+    int roundUp(int numToRound, int multiple)
+    {
+        if (multiple == 0)
+            return numToRound;
+
+        int remainder = numToRound % multiple;
+        if (remainder == 0)
+            return numToRound;
+
+        return numToRound + multiple - remainder;
+    }
+
+    float computePersonScale(const PersonTrackerEntry& personEntry, const cv::Mat& imageCurrent)
+    {
+        int layerCount = 0;
+        if( personEntry.status[0] || personEntry.status[14] ||
+            personEntry.status[15] || personEntry.status[16] || personEntry.status[17])
+            layerCount++;
+        if( personEntry.status[2] || personEntry.status[3] || personEntry.status[4] ||
+            personEntry.status[5] || personEntry.status[6] || personEntry.status[7])
+            layerCount++;
+        if( personEntry.status[8] || personEntry.status[11])
+            layerCount++;
+        if( personEntry.status[9] || personEntry.status[10] ||
+            personEntry.status[12] || personEntry.status[13])
+            layerCount++;
+
+        float minX = imageCurrent.size().width, maxX = 0, minY = imageCurrent.size().height, maxY = 0;
+        int totalKp = 0;
+        for(size_t i=0; i<personEntry.keypoints.size(); i++)
+        {
+            if(!personEntry.status[i]) continue;
+            auto kp = personEntry.keypoints[i];
+            if(kp.x < minX) minX = kp.x;
+            if(kp.x > maxX) maxX = kp.x;
+            if(kp.y < minY) minY = kp.y;
+            if(kp.y > maxY) maxY = kp.y;
+            totalKp++;
+        }
+        float xDist = (maxX - minX);
+        float yDist = (maxY - minY);
+        float maxDist;
+        if(xDist > yDist) maxDist = (xDist)*(4/layerCount);
+        if(yDist > xDist) maxDist = (yDist)*(4/layerCount);
+        float lkSize = roundUp(maxDist / 10., 3);
+        //std::cout << lkSize << std::endl;
+        return lkSize;
+    }
+
     void updateLK(std::unordered_map<int,PersonTrackerEntry>& personEntries,
                   std::vector<cv::Mat>& pyramidImagesPrevious, std::vector<cv::Mat>& pyramidImagesCurrent,
                   const cv::Mat& imagePrevious, const cv::Mat& imageCurrent,
-                  const int levels, const int patchSize, const bool trackVelocity)
+                  const int levels, const int patchSize, const bool trackVelocity, const bool scaleVarying,
+                  const float rescale)
     {
         try
         {
@@ -18,17 +68,28 @@ namespace op
             {
                 PersonTrackerEntry newPersonEntry;
                 PersonTrackerEntry& oldPersonEntry = kv.second;
+                int lkSize = patchSize;
+                cv::Size rescaleSize(0,0);
+                if(scaleVarying)
+                {
+                    pyramidImagesPrevious.clear();
+                    lkSize = computePersonScale(oldPersonEntry, imageCurrent);
+                }
+                if(rescale)
+                {
+                    rescaleSize = cv::Size(rescale,imageCurrent.size().height/(imageCurrent.size().width/rescale));
+                }
                 if (trackVelocity)
                 {
                     newPersonEntry.keypoints = oldPersonEntry.getPredicted();
                     pyramidalLKOcv(oldPersonEntry.keypoints, newPersonEntry.keypoints, pyramidImagesPrevious,
                                    pyramidImagesCurrent, oldPersonEntry.status, imagePrevious, imageCurrent, levels,
-                                   patchSize, true);
+                                   patchSize, true, rescaleSize);
                 }
                 else
                     pyramidalLKOcv(oldPersonEntry.keypoints, newPersonEntry.keypoints, pyramidImagesPrevious,
                                    pyramidImagesCurrent, oldPersonEntry.status, imagePrevious, imageCurrent, levels,
-                                   patchSize, false);
+                                   lkSize, false, rescaleSize);
 
                 newPersonEntry.lastKeypoints = oldPersonEntry.keypoints;
                 newPersonEntry.status = oldPersonEntry.status;
@@ -257,12 +318,15 @@ namespace op
 
     PersonTracker::PersonTracker(const bool mergeResults, const int levels,
                                  const int patchSize, const float confidenceThreshold,
-                                 const bool trackVelocity) :
+                                 const bool trackVelocity, const bool scaleVarying,
+                                 const float rescale) :
         mMergeResults{mergeResults},
         mLevels{levels},
         mPatchSize{patchSize},
         mTrackVelocity{trackVelocity},
         mConfidenceThreshold{confidenceThreshold},
+        mScaleVarying{scaleVarying},
+        mRescale{rescale},
         mLastFrameId{-1ll}
     {
         // try
@@ -304,8 +368,8 @@ namespace op
             // if mMergeResults == true --> Combine OP + LK tracker
             // if mMergeResults == false --> Run LK tracker ONLY IF poseKeypoints.empty()
 
-            // bool mergeResults = mMergeResults;
-            // mergeResults = true;
+            bool mergeResults = mMergeResults;
+            mergeResults = true;
 
             // Sanity Checks
             if (poseKeypoints.getSize(0) != poseIds.getSize(0))
@@ -318,7 +382,7 @@ namespace op
                 // Create mPersonEntries
                 personEntriesFromOP(mPersonEntries, poseKeypoints, poseIds, mConfidenceThreshold);
                 // Capture current frame as floating point
-                cvMatInput.convertTo(mImagePrevious, CV_32F);
+                cvMatInput.convertTo(mImagePrevious, CV_8UC3);
                 // Save Last Ids
                 mLastPoseIds = poseIds.clone();
             }
@@ -327,13 +391,13 @@ namespace op
             {
                 // Update LK
                 const bool newOPData = !poseKeypoints.empty() && !poseIds.empty();
-                if ((newOPData && mMergeResults) || (!newOPData))
+                if ((newOPData && mergeResults) || (!newOPData))
                 {
                     cv::Mat imageCurrent;
                     std::vector<cv::Mat> pyramidImagesCurrent;
-                    cvMatInput.convertTo(imageCurrent, CV_32F);
+                    cvMatInput.convertTo(imageCurrent, CV_8UC3);
                     updateLK(mPersonEntries, mPyramidImagesPrevious, pyramidImagesCurrent, mImagePrevious,
-                             imageCurrent, mLevels, mPatchSize, mTrackVelocity);
+                             imageCurrent, mLevels, mPatchSize, mTrackVelocity, mScaleVarying, mRescale);
                     mImagePrevious = imageCurrent;
                     mPyramidImagesPrevious = pyramidImagesCurrent;
                 }
@@ -343,7 +407,7 @@ namespace op
                 {
                     mLastPoseIds = poseIds.clone();
                     syncPersonEntriesWithOP(mPersonEntries, poseKeypoints, mLastPoseIds, mConfidenceThreshold,
-                                            mMergeResults);
+                                            mergeResults);
                     opFromPersonEntries(poseKeypoints, mPersonEntries, mLastPoseIds);
                 }
                 // There is no new OP Data
