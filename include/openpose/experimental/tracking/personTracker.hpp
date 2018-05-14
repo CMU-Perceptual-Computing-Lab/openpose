@@ -31,7 +31,7 @@ namespace op
     {
 
     public:
-        PersonTracker(const bool mergeResults, const int levels = 3, const int patchSize = 21,
+        PersonTracker(const bool mergeResults, const int levels = 3, const int patchSize = 31,
                       const float confidenceThreshold = 0.05f, const bool trackVelocity = false,
                       const bool scaleVarying = false, const float rescale = 640);
 

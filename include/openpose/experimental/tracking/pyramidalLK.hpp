@@ -18,7 +18,7 @@ namespace op
                                    std::vector<cv::Mat>& pyramidImagesCurrent,
                                    std::vector<char>& status, const cv::Mat& imagePrevious,
                                    const cv::Mat& imageCurrent, const int levels = 3, const int patchSize = 21,
-                                   bool initFlow = false, cv::Size requiredSize = cv::Size(0,0));
+                                   bool initFlow = false);
 }
 
 #endif // OPENPOSE_TRACKING_LKPYRAMIDAL_HPP

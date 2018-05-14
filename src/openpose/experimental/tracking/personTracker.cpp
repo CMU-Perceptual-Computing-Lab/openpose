@@ -58,8 +58,7 @@ namespace op
     void updateLK(std::unordered_map<int,PersonTrackerEntry>& personEntries,
                   std::vector<cv::Mat>& pyramidImagesPrevious, std::vector<cv::Mat>& pyramidImagesCurrent,
                   const cv::Mat& imagePrevious, const cv::Mat& imageCurrent,
-                  const int levels, const int patchSize, const bool trackVelocity, const bool scaleVarying,
-                  const float rescale)
+                  const int levels, const int patchSize, const bool trackVelocity, const bool scaleVarying)
     {
         try
         {
@@ -69,27 +68,22 @@ namespace op
                 PersonTrackerEntry newPersonEntry;
                 PersonTrackerEntry& oldPersonEntry = kv.second;
                 int lkSize = patchSize;
-                cv::Size rescaleSize(0,0);
                 if(scaleVarying)
                 {
                     pyramidImagesPrevious.clear();
                     lkSize = computePersonScale(oldPersonEntry, imageCurrent);
-                }
-                if(rescale)
-                {
-                    rescaleSize = cv::Size(rescale,imageCurrent.size().height/(imageCurrent.size().width/rescale));
                 }
                 if (trackVelocity)
                 {
                     newPersonEntry.keypoints = oldPersonEntry.getPredicted();
                     pyramidalLKOcv(oldPersonEntry.keypoints, newPersonEntry.keypoints, pyramidImagesPrevious,
                                    pyramidImagesCurrent, oldPersonEntry.status, imagePrevious, imageCurrent, levels,
-                                   patchSize, true, rescaleSize);
+                                   patchSize, true);
                 }
                 else
                     pyramidalLKOcv(oldPersonEntry.keypoints, newPersonEntry.keypoints, pyramidImagesPrevious,
                                    pyramidImagesCurrent, oldPersonEntry.status, imagePrevious, imageCurrent, levels,
-                                   lkSize, false, rescaleSize);
+                                   lkSize, false);
 
                 newPersonEntry.lastKeypoints = oldPersonEntry.keypoints;
                 newPersonEntry.status = oldPersonEntry.status;
@@ -316,6 +310,18 @@ namespace op
         }
     }
 
+    void scaleKeypoints(std::unordered_map<int, PersonTrackerEntry>& personEntries, float xScale, float yScale)
+    {
+        for (auto& kv : personEntries)
+        {
+            for(size_t i=0; i<kv.second.keypoints.size(); i++)
+            {
+                kv.second.keypoints[i].x *= xScale;
+                kv.second.keypoints[i].y *= yScale;
+            }
+        }
+    }
+
     PersonTracker::PersonTracker(const bool mergeResults, const int levels,
                                  const int patchSize, const float confidenceThreshold,
                                  const bool trackVelocity, const bool scaleVarying,
@@ -383,6 +389,12 @@ namespace op
                 personEntriesFromOP(mPersonEntries, poseKeypoints, poseIds, mConfidenceThreshold);
                 // Capture current frame as floating point
                 cvMatInput.convertTo(mImagePrevious, CV_8UC3);
+                // Rescale
+                if(mRescale)
+                {
+                    cv::Size rescaleSize(mRescale,mImagePrevious.size().height/(mImagePrevious.size().width/mRescale));
+                    cv::resize(mImagePrevious, mImagePrevious, rescaleSize, 0, 0, cv::INTER_CUBIC);
+                }
                 // Save Last Ids
                 mLastPoseIds = poseIds.clone();
             }
@@ -396,8 +408,18 @@ namespace op
                     cv::Mat imageCurrent;
                     std::vector<cv::Mat> pyramidImagesCurrent;
                     cvMatInput.convertTo(imageCurrent, CV_8UC3);
+                    float xScale = 1., yScale = 1.;
+                    if(mRescale)
+                    {
+                        cv::Size rescaleSize(mRescale,imageCurrent.size().height/(imageCurrent.size().width/mRescale));
+                        xScale = (float)imageCurrent.size().width / (float)rescaleSize.width;
+                        yScale = (float)imageCurrent.size().height / (float)rescaleSize.height;
+                        cv::resize(imageCurrent, imageCurrent, rescaleSize, 0, 0, cv::INTER_CUBIC);
+                    }
+                    scaleKeypoints(mPersonEntries, 1./xScale, 1./yScale);
                     updateLK(mPersonEntries, mPyramidImagesPrevious, pyramidImagesCurrent, mImagePrevious,
-                             imageCurrent, mLevels, mPatchSize, mTrackVelocity, mScaleVarying, mRescale);
+                             imageCurrent, mLevels, mPatchSize, mTrackVelocity, mScaleVarying);
+                    scaleKeypoints(mPersonEntries, xScale, yScale);
                     mImagePrevious = imageCurrent;
                     mPyramidImagesPrevious = pyramidImagesCurrent;
                 }

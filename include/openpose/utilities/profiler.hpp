@@ -22,11 +22,6 @@ namespace op
     class OP_API Profiler
     {
     public:
-        typedef std::chrono::steady_clock::time_point optime;
-
-        static Profiler::optime getTime();
-
-        static float getTimeElapsedMs(optime& start);
 
         static unsigned long long DEFAULT_X;
 

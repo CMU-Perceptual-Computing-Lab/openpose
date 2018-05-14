@@ -377,12 +377,11 @@ namespace op
     void pyramidalLKOcv(std::vector<cv::Point2f>& coordI, std::vector<cv::Point2f>& coordJ,
                         std::vector<cv::Mat>& pyramidImagesPrevious, std::vector<cv::Mat>& pyramidImagesCurrent,
                         std::vector<char>& status, const cv::Mat& imagePrevious,
-                        const cv::Mat& imageCurrent, const int levels, const int patchSize, bool initFlow,
-                        cv::Size requiredSize)
+                        const cv::Mat& imageCurrent, const int levels, const int patchSize, bool initFlow)
     {
         try
         {
-            //Profiler::optime start = Profiler::getTime();
+            const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
 
             // Empty coordinates
             if (coordI.size() == 0)
@@ -397,41 +396,14 @@ namespace op
                 coordJ.assign(I.begin(), I.end());
             }
 
-            // Resize
-            cv::Mat imagePrevGray, imageCurrGray;
-            float xScale, yScale;
-            bool resize = false;
-            if(requiredSize.width != 0 && requiredSize.height != 0)
-            {
-                resize = true;
-                xScale = (float)imageCurrent.size().width / (float)requiredSize.width;
-                yScale = (float)imageCurrent.size().height / (float)requiredSize.height;
-                cv::resize(imagePrevious, imagePrevGray, requiredSize);
-                cv::resize(imageCurrent, imageCurrGray, requiredSize);
-            }
-            else
-            {
-                imagePrevGray = imagePrevious;
-                imageCurrGray = imageCurrent;
-            }
-            //const cv::Mat& imagePrevGray = imagePrevious;
-            //const cv::Mat& imageCurrGray = imageCurrent;
+            const cv::Mat& imagePrevGray = imagePrevious;
+            const cv::Mat& imageCurrGray = imageCurrent;
 
             // Compute Pyramids
             if (pyramidImagesPrevious.empty())
                 cv::buildOpticalFlowPyramid(imagePrevGray, pyramidImagesPrevious, cv::Size(patchSize,patchSize), levels);
             if (pyramidImagesCurrent.empty())
                 cv::buildOpticalFlowPyramid(imageCurrGray, pyramidImagesCurrent, cv::Size(patchSize,patchSize), levels);
-
-            // Rescale
-            if(resize)
-                for(size_t i=0; i<status.size(); i++)
-                {
-                    coordI[i].x /= xScale;
-                    coordI[i].y /= yScale;
-                    coordJ[i].x /= xScale;
-                    coordJ[i].y /= yScale;
-                }
 
             // Compute Flow
             std::vector<uchar> st;
@@ -441,16 +413,6 @@ namespace op
                                      ,cv::TermCriteria(cv::TermCriteria::COUNT+cv::TermCriteria::EPS,30,0.01), cv::OPTFLOW_USE_INITIAL_FLOW);
             else
                 cv::calcOpticalFlowPyrLK(pyramidImagesPrevious, pyramidImagesCurrent, coordI, coordJ, st, err, cv::Size(patchSize,patchSize),levels);
-
-            // Rescale
-            if(resize)
-                for(size_t i=0; i<status.size(); i++)
-                {
-                    coordI[i].x *= xScale;
-                    coordI[i].y *= yScale;
-                    coordJ[i].x *= xScale;
-                    coordJ[i].y *= yScale;
-                }
 
             // Check distance
             for(size_t i=0; i<status.size(); i++)
@@ -484,7 +446,8 @@ namespace op
                 status[i] = st[i];
             }
 
-            //op::log(std::to_string(Profiler::getTimeElapsedMs(start)));
+            Profiler::timerEnd(profilerKey);
+            Profiler::printAveragedTimeMsEveryXIterations(profilerKey, __LINE__, __FUNCTION__, __FILE__, 5);
 
             // Debug
             //std::cout << "LK: ";
