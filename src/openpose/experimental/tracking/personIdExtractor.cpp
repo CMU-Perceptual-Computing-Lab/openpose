@@ -240,15 +240,15 @@ namespace op
         mNextPersonId{0ll},
         mLastFrameId{-1ll}
     {
-//        try
-//        {
-//            error("PersonIdExtractor (`identification` flag) buggy and not working yet, but we are working on it!"
-//                  " Coming soon!", __LINE__, __FUNCTION__, __FILE__);
-//        }
-//        catch (const std::exception& e)
-//        {
-//            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-//        }
+       try
+       {
+           error("PersonIdExtractor (`identification` flag) buggy and not working yet, but we are working on it!"
+                 " Coming soon!", __LINE__, __FUNCTION__, __FILE__);
+       }
+       catch (const std::exception& e)
+       {
+           error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+       }
     }
 
     PersonIdExtractor::~PersonIdExtractor()
