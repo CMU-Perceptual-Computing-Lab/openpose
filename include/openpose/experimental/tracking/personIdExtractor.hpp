@@ -1,7 +1,10 @@
 #ifndef OPENPOSE_TRACKING_PERSON_ID_EXTRACTOR_HPP
 #define OPENPOSE_TRACKING_PERSON_ID_EXTRACTOR_HPP
 
+#include <iostream>
 #include <unordered_map>
+#include <unordered_set>
+#include <tuple>
 #include <openpose/core/common.hpp>
 #include <openpose/experimental/tracking/personIdExtractor.hpp>
 
