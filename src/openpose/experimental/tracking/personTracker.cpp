@@ -320,7 +320,8 @@ namespace op
         }
     }
 
-    void scaleKeypoints(std::unordered_map<int, PersonTrackerEntry>& personEntries, float xScale, float yScale)
+    void scaleKeypoints(std::unordered_map<int, PersonTrackerEntry>& personEntries,
+                        const float xScale, const float yScale)
     {
         for (auto& kv : personEntries)
         {
@@ -345,15 +346,15 @@ namespace op
         mRescale{rescale},
         mLastFrameId{-1ll}
     {
-        // try
-        // {
-        //     error("PersonTracker (`tracking` flag) buggy and not working yet, but we are working on it!"
-        //           " Coming soon!", __LINE__, __FUNCTION__, __FILE__);
-        // }
-        // catch (const std::exception& e)
-        // {
-        //     error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-        // }
+        try
+        {
+            error("PersonTracker (`tracking` flag) buggy and not working yet, but we are working on it!"
+                  " Coming soon!", __LINE__, __FUNCTION__, __FILE__);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
     }
 
     PersonTracker::~PersonTracker()
@@ -367,7 +368,7 @@ namespace op
         {
             /*
              * 1. Get poseKeypoints for all people - Checks
-             * 2. If last image is empty or mPersonEntries is empty (and poseKeypoints and poseIds has data or crash it)
+             * 2. If last image is empty or mPersonEntries is empty (& poseKeypoints and poseIds has data or crash it)
              *      Create mPersonEntries referencing poseIds
              *      Initialize LK points
              * 3. If poseKeypoints is not empty and poseIds has data
@@ -378,8 +379,8 @@ namespace op
              *      2. replace poseKeypoints
              */
 
-            // TODO: This case: if mMergeResults == false --> Run LK tracker ONLY IF poseKeypoints.empty() doesn't consider the case
-            // of poseKeypoints being empty BECAUSE there were no people on the image
+            // TODO: This case: if mMergeResults == false --> Run LK tracker ONLY IF poseKeypoints.empty() doesn't
+            // consider the case of poseKeypoints being empty BECAUSE there were no people on the image
 
             // if mMergeResults == true --> Combine OP + LK tracker
             // if mMergeResults == false --> Run LK tracker ONLY IF poseKeypoints.empty()

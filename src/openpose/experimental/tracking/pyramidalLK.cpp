@@ -1,7 +1,7 @@
 // #include <iostream>
 #include <opencv2/core/core.hpp> // cv::Point2f, cv::Mat
 #include <opencv2/imgproc/imgproc.hpp> // cv::pyrDown
-#include <opencv2/opencv.hpp>
+#include <opencv2/video/video.hpp> // cv::buildOpticalFlowPyramid
 #include <openpose/utilities/profiler.hpp>
 #include <openpose/experimental/tracking/pyramidalLK.hpp>
 
