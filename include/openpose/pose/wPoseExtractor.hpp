@@ -63,17 +63,21 @@ namespace op
                     // OpenPose net forward pass
                     spPoseExtractor->forwardPass(tDatum.inputNetData,
                                                  Point<int>{tDatum.cvInputData.cols, tDatum.cvInputData.rows},
-                                                 tDatum.scaleInputToNetInputs);
+                                                 tDatum.scaleInputToNetInputs, tDatum.id);
                     // OpenPose keypoint detector
                     tDatum.poseCandidates = spPoseExtractor->getCandidatesCopy();
                     tDatum.poseHeatMaps = spPoseExtractor->getHeatMapsCopy();
                     tDatum.poseKeypoints = spPoseExtractor->getPoseKeypoints().clone();
                     tDatum.poseScores = spPoseExtractor->getPoseScores().clone();
                     tDatum.scaleNetToOutput = spPoseExtractor->getScaleNetToOutput();
+                    // Keep desired top N people
+                    spPoseExtractor->keepTopPeople(tDatum.poseKeypoints, tDatum.poseScores);
                     // ID extractor (experimental)
-                    tDatum.poseIds = spPoseExtractor->extractIdsLockThread(tDatum.poseKeypoints, tDatum.cvInputData, i, tDatum.id);
+                    tDatum.poseIds = spPoseExtractor->extractIdsLockThread(tDatum.poseKeypoints, tDatum.cvInputData,
+                                                                           i, tDatum.id);
                     // Tracking (experimental)
-                    // [...add here...]
+                    spPoseExtractor->trackLockThread(tDatum.poseKeypoints, tDatum.poseIds, tDatum.cvInputData, i,
+                                                     tDatum.id);
                 }
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);

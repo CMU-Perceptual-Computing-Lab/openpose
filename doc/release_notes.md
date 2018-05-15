@@ -227,6 +227,7 @@ OpenPose Library - Release Notes
 3. Main bugs fixed:
     1. Fixed hand and face extraction and rendering scaling issues when `--output_resolution` is not the default one.
     2. Part candidates (`--part_candidates`) are saved with the same scale than the final keypoints itself.
+    3. Fixed bug in keepTopNPeople.hpp (`--number_people_max`) that provoked core dumped if lots of values equal to the threshold.
 
 
 

@@ -14,7 +14,8 @@ namespace op
                                          const ScaleMode heatMapScale_, const bool addPartCandidates_,
                                          const float renderThreshold_, const int numberPeopleMax_,
                                          const bool enableGoogleLogging_, const bool reconstruct3d_,
-                                         const int minViews3d_, const bool identification_) :
+                                         const int minViews3d_, const bool identification_,
+                                         const int tracking_) :
         enable{enable_},
         netInputSize{netInputSize_},
         outputSize{outputSize_},
@@ -38,7 +39,8 @@ namespace op
         enableGoogleLogging{enableGoogleLogging_},
         reconstruct3d{reconstruct3d_},
         minViews3d{minViews3d_},
-        identification{identification_}
+        identification{identification_},
+        tracking{tracking_}
     {
     }
 }

@@ -1,6 +1,7 @@
 set(SOURCES_OP_TRACKING
     defineTemplates.cpp
     personIdExtractor.cpp
+    personTracker.cpp
     pyramidalLK.cpp
     pyramidalLK.cu)
 

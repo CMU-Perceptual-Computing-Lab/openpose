@@ -606,29 +606,45 @@ namespace op
                     spWPoseExtractors.resize(poseExtractorNets.size());
                     const auto personIdExtractor = (wrapperStructPose.identification
                         ? std::make_shared<PersonIdExtractor>() : nullptr);
+                    // Keep top N people
+                    // Added right after PoseExtractorNet to avoid:
+                    // 1) Rendering people that are later deleted (wrong visualization).
+                    // 2) Processing faces and hands on people that will be deleted (speed up).
+                    // 3) Running tracking before deleting the people.
+                    // Add KeepTopNPeople for each PoseExtractorNet
+                    const auto keepTopNPeople = (wrapperStructPose.numberPeopleMax > 0 ?
+                        std::make_shared<KeepTopNPeople>(wrapperStructPose.numberPeopleMax)
+                        : nullptr);
+                    // Person tracker
+                    auto personTrackers = std::make_shared<std::vector<std::shared_ptr<PersonTracker>>>();
+                    if (wrapperStructPose.tracking > -1)
+                        personTrackers->emplace_back(
+                            std::make_shared<PersonTracker>(wrapperStructPose.tracking == 0));
                     for (auto i = 0u; i < spWPoseExtractors.size(); i++)
                     {
-
-                        // OpenPose keypoint detector + ID extractor (experimental) + tracking (experimental)
+                        // OpenPose keypoint detector + keepTopNPeople
+                        //    + ID extractor (experimental) + tracking (experimental)
                         const auto poseExtractor = std::make_shared<PoseExtractor>(
-                            poseExtractorNets.at(i), personIdExtractor, wrapperStructPose.numberPeopleMax);
+                            poseExtractorNets.at(i), keepTopNPeople, personIdExtractor, personTrackers,
+                            wrapperStructPose.numberPeopleMax, wrapperStructPose.tracking);
                         spWPoseExtractors.at(i) = {std::make_shared<WPoseExtractor<TDatumsPtr>>(poseExtractor)};
                         // // Just OpenPose keypoint detector
                         // spWPoseExtractors.at(i) = {std::make_shared<WPoseExtractorNet<TDatumsPtr>>(
                         //     poseExtractorNets.at(i))};
                     }
 
-                    // Added right after PoseExtractorNet to avoid:
-                    // 1) Rendering people that are later deleted (wrong visualization).
-                    // 2) Processing faces and hands on people that will be deleted (speed up).
-                    if (wrapperStructPose.numberPeopleMax > 0)
-                    {
-                        // Add KeepTopNPeople for each PoseExtractorNet
-                        const auto keepTopNPeople = std::make_shared<KeepTopNPeople>(
-                            wrapperStructPose.numberPeopleMax);
-                        for (auto& wPose : spWPoseExtractors)
-                            wPose.emplace_back(std::make_shared<WKeepTopNPeople<TDatumsPtr>>(keepTopNPeople));
-                    }
+                    // // (Before tracking / id extractor)
+                    // // Added right after PoseExtractorNet to avoid:
+                    // // 1) Rendering people that are later deleted (wrong visualization).
+                    // // 2) Processing faces and hands on people that will be deleted (speed up).
+                    // if (wrapperStructPose.numberPeopleMax > 0)
+                    // {
+                    //     // Add KeepTopNPeople for each PoseExtractorNet
+                    //     const auto keepTopNPeople = std::make_shared<KeepTopNPeople>(
+                    //         wrapperStructPose.numberPeopleMax);
+                    //     for (auto& wPose : spWPoseExtractors)
+                    //         wPose.emplace_back(std::make_shared<WKeepTopNPeople<TDatumsPtr>>(keepTopNPeople));
+                    // }
                 }
 
 

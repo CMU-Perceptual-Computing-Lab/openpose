@@ -3,9 +3,11 @@
 
 #include <openpose/core/common.hpp>
 #include <openpose/core/enumClasses.hpp>
+#include <openpose/core/keepTopNPeople.hpp>
 #include <openpose/pose/poseParameters.hpp>
 #include <openpose/pose/poseExtractorNet.hpp>
 #include <openpose/experimental/tracking/personIdExtractor.hpp>
+#include <openpose/experimental/tracking/personTracker.hpp>
 
 namespace op
 {
@@ -13,8 +15,10 @@ namespace op
     {
     public:
         PoseExtractor(const std::shared_ptr<PoseExtractorNet>& poseExtractorNet,
-                      const std::shared_ptr<PersonIdExtractor>& personIdExtractor,
-                      const int numberPeopleMax = -1);
+                      const std::shared_ptr<KeepTopNPeople>& keepTopNPeople = nullptr,
+                      const std::shared_ptr<PersonIdExtractor>& personIdExtractor = nullptr,
+                      const std::shared_ptr<std::vector<std::shared_ptr<PersonTracker>>>& personTracker = {},
+                      const int numberPeopleMax = -1, const int tracking = -1);
 
         virtual ~PoseExtractor();
 
@@ -22,18 +26,22 @@ namespace op
 
         void forwardPass(const std::vector<Array<float>>& inputNetData,
                          const Point<int>& inputDataSize,
-                         const std::vector<double>& scaleRatios);
+                         const std::vector<double>& scaleRatios,
+                         const long long frameId = -1ll);
 
         // PoseExtractorNet functions
         Array<float> getHeatMapsCopy() const;
 
-        std::vector<std::vector<std::array<float,3>>> getCandidatesCopy() const;
+        std::vector<std::vector<std::array<float, 3>>> getCandidatesCopy() const;
 
         Array<float> getPoseKeypoints() const;
 
         Array<float> getPoseScores() const;
 
         float getScaleNetToOutput() const;
+
+        // KeepTopNPeople functions
+        void keepTopPeople(Array<float>& poseKeypoints, const Array<float>& poseScores) const;
 
         // PersonIdExtractor functions
         // Not thread-safe
@@ -45,10 +53,22 @@ namespace op
                                               const unsigned long long imageIndex,
                                               const long long frameId);
 
+        // PersonTracker functions
+        void track(Array<float>& poseKeypoints, Array<long long>& poseIds,
+                   const cv::Mat& cvMatInput, const unsigned long long imageViewIndex = 0ull);
+
+        void trackLockThread(Array<float>& poseKeypoints, Array<long long>& poseIds,
+                             const cv::Mat& cvMatInput,
+                             const unsigned long long imageViewIndex,
+                             const long long frameId);
+
     private:
         const int mNumberPeopleMax;
+        const int mTracking;
         const std::shared_ptr<PoseExtractorNet> spPoseExtractorNet;
+        const std::shared_ptr<KeepTopNPeople> spKeepTopNPeople;
         const std::shared_ptr<PersonIdExtractor> spPersonIdExtractor;
+        const std::shared_ptr<std::vector<std::shared_ptr<PersonTracker>>> spPersonTrackers;
 
         DELETE_COPY(PoseExtractor);
     };

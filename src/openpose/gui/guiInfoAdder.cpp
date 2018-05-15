@@ -60,36 +60,39 @@ namespace op
             if (!poseIds.empty())
             {
                 const auto poseKeypointsArea = poseKeypoints.getSize(1)*poseKeypoints.getSize(2);
+                const auto isVisible = 0.05f;
                 for (auto i = 0u ; i < poseIds.getVolume() ; i++)
                 {
-                    const auto indexMain = i * poseKeypointsArea;
-                    const auto indexSecondary = i * poseKeypointsArea + poseKeypoints.getSize(2);
-                    const auto isVisible = 0.05f;
-                    if (poseKeypoints[indexMain+2] > isVisible || poseKeypoints[indexSecondary+2] > isVisible)
+                    if (poseIds[i] > -1)
                     {
-                        const auto xA = intRound(poseKeypoints[indexMain]);
-                        const auto yA = intRound(poseKeypoints[indexMain+1]);
-                        const auto xB = intRound(poseKeypoints[indexSecondary]);
-                        const auto yB = intRound(poseKeypoints[indexSecondary+1]);
-                        int x;
-                        int y;
-                        if (poseKeypoints[indexMain+2] > isVisible && poseKeypoints[indexSecondary+2] > isVisible)
+                        const auto indexMain = i * poseKeypointsArea;
+                        const auto indexSecondary = i * poseKeypointsArea + poseKeypoints.getSize(2);
+                        if (poseKeypoints[indexMain+2] > isVisible || poseKeypoints[indexSecondary+2] > isVisible)
                         {
-                            const auto keypointRatio = intRound(0.15f * std::sqrt((xA-xB)*(xA-xB) + (yA-yB)*(yA-yB)));
-                            x = xA + 3*keypointRatio;
-                            y = yA - 3*keypointRatio;
+                            const auto xA = intRound(poseKeypoints[indexMain]);
+                            const auto yA = intRound(poseKeypoints[indexMain+1]);
+                            const auto xB = intRound(poseKeypoints[indexSecondary]);
+                            const auto yB = intRound(poseKeypoints[indexSecondary+1]);
+                            int x;
+                            int y;
+                            if (poseKeypoints[indexMain+2] > isVisible && poseKeypoints[indexSecondary+2] > isVisible)
+                            {
+                                const auto keypointRatio = intRound(0.15f * std::sqrt((xA-xB)*(xA-xB) + (yA-yB)*(yA-yB)));
+                                x = xA + 3*keypointRatio;
+                                y = yA - 3*keypointRatio;
+                            }
+                            else if (poseKeypoints[indexMain+2] > isVisible)
+                            {
+                                x = xA + intRound(0.25f*borderMargin);
+                                y = yA - intRound(0.25f*borderMargin);
+                            }
+                            else //if (poseKeypoints[indexSecondary+2] > isVisible)
+                            {
+                                x = xB + intRound(0.25f*borderMargin);
+                                y = yB - intRound(0.5f*borderMargin);
+                            }
+                            putTextOnCvMat(cvOutputData, std::to_string(poseIds[i]), {x, y}, WHITE_SCALAR, false, cvOutputData.cols);
                         }
-                        else if (poseKeypoints[indexMain+2] > isVisible)
-                        {
-                            x = xA + intRound(0.25f*borderMargin);
-                            y = yA - intRound(0.25f*borderMargin);
-                        }
-                        else //if (poseKeypoints[indexSecondary+2] > isVisible)
-                        {
-                            x = xB + intRound(0.25f*borderMargin);
-                            y = yB - intRound(0.5f*borderMargin);
-                        }
-                        putTextOnCvMat(cvOutputData, std::to_string(poseIds[i]), {x, y}, WHITE_SCALAR, false, cvOutputData.cols);
                     }
                 }
             }

@@ -153,8 +153,12 @@ DEFINE_int32(3d_views,                  1,              "Complementary option to
                                                         " iteration, allowing tasks such as stereo camera processing (`--3d`). Note that"
                                                         " `--camera_parameters_folder` must be set. OpenPose must find as many `xml` files in the"
                                                         " parameter folder as this number indicates.");
-// OpenPose identification
-DEFINE_bool(identification,             false,          "Whether to enable people identification across frames. Not available yet, coming soon.");
+// Extra algorithms
+DEFINE_bool(identification,             false,          "Not available yet, coming soon. Whether to enable people identification across frames.");
+DEFINE_int32(tracking,                  -1,             "Not available yet, coming soon. Whether to enable people tracking across frames. The"
+                                                        " value indicates the number of frames where tracking is run between each OpenPose keypoint"
+                                                        " detection. Select -1 (default) to disable it or 0 to run simultaneously OpenPose keypoint"
+                                                        " detector and tracking for potentially higher accurary than only OpenPose.");
 // OpenPose Rendering
 DEFINE_int32(part_to_show,              0,              "Prediction channel to visualize (default: 0). 0 for all the body parts, 1-18 for each body"
                                                         " part heat map, 19 for the background heat map, 20 for all the body part heat maps"
@@ -279,7 +283,7 @@ int openPoseDemo()
                                                   heatMapTypes, heatMapScale, FLAGS_part_candidates,
                                                   (float)FLAGS_render_threshold, FLAGS_number_people_max,
                                                   enableGoogleLogging, FLAGS_3d, FLAGS_3d_min_views,
-                                                  FLAGS_identification};
+                                                  FLAGS_identification, FLAGS_tracking};
     // Face configuration (use op::WrapperStructFace{} to disable it)
     const op::WrapperStructFace wrapperStructFace{FLAGS_face, faceNetInputSize,
                                                   op::flagsToRenderMode(FLAGS_face_render, multipleView, FLAGS_render_pose),
