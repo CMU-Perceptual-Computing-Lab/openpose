@@ -10,7 +10,8 @@
 
 namespace op
 {
-    PoseGpuRenderer::PoseGpuRenderer(const PoseModel poseModel, const std::shared_ptr<PoseExtractor>& poseExtractor,
+    PoseGpuRenderer::PoseGpuRenderer(const PoseModel poseModel,
+                                     const std::shared_ptr<PoseExtractorNet>& poseExtractorNet,
                                      const float renderThreshold, const bool blendOriginalFrame,
                                      const float alphaKeypoint, const float alphaHeatMap,
                                      const unsigned int elementToRender) :
@@ -20,7 +21,7 @@ namespace op
         GpuRenderer{renderThreshold, alphaKeypoint, alphaHeatMap, blendOriginalFrame, elementToRender,
                     getNumberElementsToRender(poseModel)}, // mNumberElementsToRender
         PoseRenderer{poseModel},
-        spPoseExtractor{poseExtractor},
+        spPoseExtractorNet{poseExtractorNet},
         pGpuPose{nullptr}
     {
     }
@@ -105,14 +106,14 @@ namespace op
                         if (scaleNetToOutput == -1.f)
                             error("Non valid scaleNetToOutput.", __LINE__, __FUNCTION__, __FILE__);
                         // Parameters
-                        const auto& heatMapSizes = spPoseExtractor->getHeatMapSize();
+                        const auto& heatMapSizes = spPoseExtractorNet->getHeatMapSize();
                         const Point<int> heatMapSize{heatMapSizes[3], heatMapSizes[2]};
                         // Draw specific body part or bkg
                         if (elementRendered <= numberBodyPartsPlusBkg)
                         {
                             elementRenderedName = mPartIndexToName.at(elementRendered-1);
                             renderPoseHeatMapGpu(*spGpuMemory, mPoseModel, frameSize,
-                                                 spPoseExtractor->getHeatMapGpuConstPtr(),
+                                                 spPoseExtractorNet->getHeatMapGpuConstPtr(),
                                                  heatMapSize, scaleNetToOutput * scaleInputToOutput, elementRendered,
                                                  (mBlendOriginalFrame ? getAlphaHeatMap() : 1.f));
                         }
@@ -121,7 +122,7 @@ namespace op
                         {
                             elementRenderedName = "Heatmaps";
                             renderPoseHeatMapsGpu(*spGpuMemory, mPoseModel, frameSize,
-                                                  spPoseExtractor->getHeatMapGpuConstPtr(),
+                                                  spPoseExtractorNet->getHeatMapGpuConstPtr(),
                                                   heatMapSize, scaleNetToOutput * scaleInputToOutput,
                                                   (mBlendOriginalFrame ? getAlphaHeatMap() : 1.f));
                         }
@@ -130,7 +131,7 @@ namespace op
                         {
                             elementRenderedName = "PAFs (Part Affinity Fields)";
                             renderPosePAFsGpu(*spGpuMemory, mPoseModel, frameSize,
-                                              spPoseExtractor->getHeatMapGpuConstPtr(),
+                                              spPoseExtractorNet->getHeatMapGpuConstPtr(),
                                               heatMapSize, scaleNetToOutput * scaleInputToOutput,
                                               (mBlendOriginalFrame ? getAlphaHeatMap() : 1.f));
                         }
@@ -142,7 +143,7 @@ namespace op
                             elementRenderedName = mPartIndexToName.at(affinityPartMapped);
                             elementRenderedName = elementRenderedName.substr(0, elementRenderedName.find("("));
                             renderPosePAFGpu(*spGpuMemory, mPoseModel, frameSize,
-                                             spPoseExtractor->getHeatMapGpuConstPtr(),
+                                             spPoseExtractorNet->getHeatMapGpuConstPtr(),
                                              heatMapSize, scaleNetToOutput * scaleInputToOutput, affinityPartMapped,
                                              (mBlendOriginalFrame ? getAlphaHeatMap() : 1.f));
                         }

@@ -11,23 +11,23 @@ namespace op
     /**
      * Face keypoint extractor class.
      */
-    class OP_API FaceExtractor
+    class OP_API FaceExtractorNet
     {
     public:
         /**
-         * Constructor of the FaceExtractor class.
+         * Constructor of the FaceExtractorNet class.
          * @param netInputSize Size at which the cropped image (where the face is located) is resized.
          * @param netOutputSize Size of the final results. At the moment, it must be equal than netOutputSize.
          */
-        explicit FaceExtractor(const Point<int>& netInputSize, const Point<int>& netOutputSize,
-                               const std::vector<HeatMapType>& heatMapTypes = {},
-                               const ScaleMode heatMapScale = ScaleMode::ZeroToOne);
+        explicit FaceExtractorNet(const Point<int>& netInputSize, const Point<int>& netOutputSize,
+                                  const std::vector<HeatMapType>& heatMapTypes = {},
+                                  const ScaleMode heatMapScale = ScaleMode::ZeroToOne);
 
         /**
          * Virtual destructor of the HandExtractor class.
          * Required to allow inheritance.
          */
-        virtual ~FaceExtractor();
+        virtual ~FaceExtractorNet();
 
         /**
          * This function must be call before using any other function. It must also be called inside the thread in
@@ -73,7 +73,7 @@ namespace op
 
         void checkThread() const;
 
-        DELETE_COPY(FaceExtractor);
+        DELETE_COPY(FaceExtractorNet);
     };
 }
 

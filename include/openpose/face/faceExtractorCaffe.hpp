@@ -4,14 +4,14 @@
 #include <opencv2/core/core.hpp> // cv::Mat
 #include <openpose/core/common.hpp>
 #include <openpose/core/enumClasses.hpp>
-#include <openpose/face/faceExtractor.hpp>
+#include <openpose/face/faceExtractorNet.hpp>
 
 namespace op
 {
     /**
      * Face keypoint extractor class for Caffe framework.
      */
-    class OP_API FaceExtractorCaffe : public FaceExtractor
+    class OP_API FaceExtractorCaffe : public FaceExtractorNet
     {
     public:
         /**

@@ -3,11 +3,11 @@
 
 #include <openpose/core/common.hpp>
 #include <openpose/pose/enumClasses.hpp>
-#include <openpose/pose/poseExtractor.hpp>
+#include <openpose/pose/poseExtractorNet.hpp>
 
 namespace op
 {
-    class OP_API PoseExtractorCaffe : public PoseExtractor
+    class OP_API PoseExtractorCaffe : public PoseExtractorNet
     {
     public:
         PoseExtractorCaffe(const PoseModel poseModel, const std::string& modelFolder, const int gpuId,

@@ -4,14 +4,14 @@
 #include <opencv2/core/core.hpp> // cv::Mat
 #include <openpose/core/common.hpp>
 #include <openpose/core/enumClasses.hpp>
-#include <openpose/hand/handExtractor.hpp>
+#include <openpose/hand/handExtractorNet.hpp>
 
 namespace op
 {
     /**
      * Hand keypoint extractor class for Caffe framework.
      */
-    class OP_API HandExtractorCaffe : public HandExtractor
+    class OP_API HandExtractorCaffe : public HandExtractorNet
     {
     public:
         /**

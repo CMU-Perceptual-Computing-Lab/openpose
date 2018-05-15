@@ -1,7 +1,7 @@
 ### VERSION INFO
 set(OpenPose_VERSION_MAJOR 1)
-set(OpenPose_VERSION_MINOR 2)
-set(OpenPose_VERSION_PATCH 1)
+set(OpenPose_VERSION_MINOR 3)
+set(OpenPose_VERSION_PATCH 0)
 set(OpenPose_VERSION ${OpenPose_VERSION_MAJOR}.${OpenPose_VERSION_MINOR}.${OpenPose_VERSION_PATCH})
 
 
@@ -125,14 +125,16 @@ set(GPU_MODE CUDA CACHE STRING "Select the acceleration GPU library or CPU other
 # else ()
 #   set_property(CACHE GPU_MODE PROPERTY STRINGS CPU_ONLY)
 # endif ()
-set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA)
+set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA CPU_ONLY)
 
 # Look for CUDA
+set(CUDA_FOUND FALSE)
 if (${GPU_MODE} MATCHES "CUDA")
   find_package(CUDA)
 endif (${GPU_MODE} MATCHES "CUDA")
 # Look for OpenCL
 set(OpenCL_FOUND FALSE)
+set(CUDA_VERSION_MAJOR 0)
 if (${GPU_MODE} MATCHES "OPENCL")
   find_package(OpenCL)
 endif (${GPU_MODE} MATCHES "OPENCL")
@@ -151,9 +153,10 @@ if (${GPU_MODE} MATCHES "CUDA")
   add_definitions(-DUSE_CUDA)
   message(STATUS "Building with CUDA.")
 elseif (${GPU_MODE} MATCHES "CPU_ONLY")
+  add_definitions(-DUSE_CPU_ONLY)
+  message(STATUS "Building CPU Only.")
   # OpenPose flag for Caffe
   add_definitions(-DCPU_ONLY)
-  message(STATUS "Building CPU Only.")
 elseif (${GPU_MODE} MATCHES "OPENCL")
   # OpenPose flag for Caffe
   add_definitions(-DUSE_OPENCL)
@@ -190,12 +193,17 @@ if (${GPU_MODE} MATCHES "CUDA")
   option(USE_CUDNN "Build OpenPose with cuDNN library support." ON)
 endif (${GPU_MODE} MATCHES "CUDA")
 
-# Suboptions for OpenPose 3D Reconstruction demo
+# Suboptions for OpenPose 3D Reconstruction module and demo
 option(WITH_3D_RENDERER "Add OpenPose 3D renderer module (it requires FreeGLUT library)." OFF)
 if (UNIX AND NOT APPLE)
-  option(WITH_CERES "Add Ceres support. Used e.g., for advanced 3-D reconstruction." OFF)
+  option(WITH_CERES "Add Ceres support for advanced 3-D reconstruction." OFF)
 endif (UNIX AND NOT APPLE)
 option(WITH_FLIR_CAMERA "Add FLIR (formerly Point Grey) camera code (requires Spinnaker SDK already installed)." OFF)
+
+# # Suboptions for OpenPose tracking
+# if (UNIX AND NOT APPLE)
+#   option(WITH_TRACKING "Add OpenPose 3D tracking module (it requires OpenCV with CUDA support)." OFF)
+# endif (UNIX AND NOT APPLE)
 
 # Download the models
 option(DOWNLOAD_COCO_MODEL "Download COCO model." ON)
@@ -238,6 +246,12 @@ if (WITH_FLIR_CAMERA)
   # OpenPose flags
   add_definitions(-DWITH_FLIR_CAMERA)
 endif (WITH_FLIR_CAMERA)
+
+# Adding tracking
+if (WITH_TRACKING)
+  # OpenPose flags
+  add_definitions(-DWITH_TRACKING)
+endif (WITH_TRACKING)
 
 if (UNIX AND NOT APPLE)
   if (${GPU_MODE} MATCHES "CUDA")
@@ -446,7 +460,8 @@ if (UNIX AND NOT APPLE)
         execute_process(COMMAND git checkout master WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
       elseif (${GPU_MODE} MATCHES "CPU_ONLY")
         if (USE_MKL)
-          execute_process(COMMAND git checkout intel WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
+          #execute_process(COMMAND git checkout intel WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
+          execute_process(COMMAND git checkout b6712ce WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
           execute_process(COMMAND sh prepare_mkl.sh WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe/external/mkl
               OUTPUT_VARIABLE rv)
           set( MLIST ${rv} )
@@ -458,12 +473,23 @@ if (UNIX AND NOT APPLE)
             )
           file(COPY ${MKL_SO} DESTINATION ${CMAKE_BINARY_DIR}/caffe)
 
+          # New MLSL Lib
+          #execute_process(COMMAND sh prepare_mlsl.sh WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe/external/mlsl
+          #    OUTPUT_VARIABLE rv)
+          #set( MLIST ${rv} )
+          #separate_arguments(MLIST)
+          #list(GET MLIST 0 MLSL_PATH)
+          #message(STATUS ${MLSL_PATH})
+          #file(GLOB MLSL_SO
+          #  "${MLSL_PATH}/intel64/lib/*"
+          #  )
+          #file(COPY ${MLSL_SO} DESTINATION ${CMAKE_BINARY_DIR}/caffe)
+
           set(MKL_LIBS
+            #"${CMAKE_BINARY_DIR}/caffe/libmlsl.so"
             "${CMAKE_BINARY_DIR}/caffe/libiomp5.so"
             "${CMAKE_BINARY_DIR}/caffe/libmklml_intel.so"
-            "${CMAKE_BINARY_DIR}/caffe/lib/libmkldnn.so.0"
             "${CMAKE_BINARY_DIR}/caffe/lib/libmkldnn.so"
-            "${CMAKE_BINARY_DIR}/caffe/lib/libmkldnn.so.0.12.0"
             )
         else ()
           execute_process(COMMAND git checkout master WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)

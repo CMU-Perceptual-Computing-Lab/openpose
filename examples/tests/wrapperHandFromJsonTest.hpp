@@ -211,7 +211,7 @@ namespace op
                         wrapperStructHand.netInputSize, netOutputSize, wrapperStructPose.modelFolder,
                         gpuId + gpuNumberStart, wrapperStructHand.scalesNumber, wrapperStructHand.scaleRange
                     );
-                    spWPoses.at(gpuId).emplace_back(std::make_shared<WHandExtractor<TDatumsPtr>>(handExtractor));
+                    spWPoses.at(gpuId).emplace_back(std::make_shared<WHandExtractorNet<TDatumsPtr>>(handExtractor));
                 }
             }
 

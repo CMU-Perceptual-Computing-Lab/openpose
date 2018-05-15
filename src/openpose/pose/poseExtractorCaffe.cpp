@@ -137,7 +137,7 @@ namespace op
                                            const int gpuId, const std::vector<HeatMapType>& heatMapTypes,
                                            const ScaleMode heatMapScale, const bool addPartCandidates,
                                            const bool enableGoogleLogging) :
-        PoseExtractor{poseModel, heatMapTypes, heatMapScale, addPartCandidates}
+        PoseExtractorNet{poseModel, heatMapTypes, heatMapScale, addPartCandidates}
         #ifdef USE_CAFFE
         , upImpl{new ImplPoseExtractorCaffe{poseModel, gpuId, modelFolder, enableGoogleLogging}}
         #endif
