@@ -108,9 +108,9 @@ namespace op
     }
 
     void initializeLK(std::unordered_map<int,PersonEntry>& personEntries,
-                     long long& mNextPersonId,
-                     const Array<float>& poseKeypoints,
-                     const float confidenceThreshold)
+                      long long& mNextPersonId,
+                      const Array<float>& poseKeypoints,
+                      const float confidenceThreshold)
     {
         try
         {
@@ -148,11 +148,11 @@ namespace op
     }
 
     Array<long long> matchLKAndOPGreedy(std::unordered_map<int,PersonEntry>& personEntries,
-                                  long long& nextPersonId,
-                                  const std::vector<PersonEntry>& openposePersonEntries,
-                                  const cv::Mat& imagePrevious,
-                                  const float inlierRatioThreshold,
-                                  const float distanceThreshold)
+                                        long long& nextPersonId,
+                                        const std::vector<PersonEntry>& openposePersonEntries,
+                                        const cv::Mat& imagePrevious,
+                                        const float inlierRatioThreshold,
+                                        const float distanceThreshold)
     {
         try
         {
@@ -272,95 +272,95 @@ namespace op
     }
 
 
-    Array<long long> matchLKAndOP(std::unordered_map<int,PersonEntry>& personEntries,
-                                  long long& nextPersonId,
-                                  const std::vector<PersonEntry>& openposePersonEntries,
-                                  const cv::Mat& imagePrevious,
-                                  const float inlierRatioThreshold,
-                                  const float distanceThreshold)
-    {
-        try
-        {
-            Array<long long> poseIds{(int)openposePersonEntries.size(), -1};
-            std::unordered_map<int, PersonEntry> pendingQueue;
+    // Array<long long> matchLKAndOP(std::unordered_map<int,PersonEntry>& personEntries,
+    //                               long long& nextPersonId,
+    //                               const std::vector<PersonEntry>& openposePersonEntries,
+    //                               const cv::Mat& imagePrevious,
+    //                               const float inlierRatioThreshold,
+    //                               const float distanceThreshold)
+    // {
+    //     try
+    //     {
+    //         Array<long long> poseIds{(int)openposePersonEntries.size(), -1};
+    //         std::unordered_map<int, PersonEntry> pendingQueue;
 
-            if (!openposePersonEntries.empty())
-            {
-                const auto numberKeypoints = openposePersonEntries[0].keypoints.size();
-                for (auto i = 0u; i < openposePersonEntries.size(); i++)
-                {
-                    auto& poseId = poseIds.at(i);
-                  
-                    const auto& openposePersonEntry = openposePersonEntries.at(i);
-                    const auto personDistanceThreshold = fastMax(10.f,
-                        distanceThreshold*float(std::sqrt(imagePrevious.cols*imagePrevious.rows)) / 960.f);
+    //         if (!openposePersonEntries.empty())
+    //         {
+    //             const auto numberKeypoints = openposePersonEntries[0].keypoints.size();
+    //             for (auto i = 0u; i < openposePersonEntries.size(); i++)
+    //             {
+    //                 auto& poseId = poseIds.at(i);
 
-                    // Find best correspondance in the LK set
-                    auto bestMatch = -1ll;
-                    auto bestScore = 0.f;
-                    for (const auto& personEntry : personEntries)
-                    {
-                        const auto& element = personEntry.second;
-                        auto inliers = 0;
-                        auto active = 0;
+    //                 const auto& openposePersonEntry = openposePersonEntries.at(i);
+    //                 const auto personDistanceThreshold = fastMax(10.f,
+    //                     distanceThreshold*float(std::sqrt(imagePrevious.cols*imagePrevious.rows)) / 960.f);
 
-                        // Security checks
-                        if (element.status.size() != numberKeypoints)
-                            error("element.status.size() != numberKeypoints ||", __LINE__, __FUNCTION__, __FILE__);
-                        if (openposePersonEntry.status.size() != numberKeypoints)
-                            error("openposePersonEntry.status.size() != numberKeypoints",
-                                  __LINE__, __FUNCTION__, __FILE__);
-                        if (element.keypoints.size() != numberKeypoints)
-                            error("element.keypoints.size() != numberKeypoints ||", __LINE__, __FUNCTION__, __FILE__);
-                        if (openposePersonEntry.keypoints.size() != numberKeypoints)
-                            error("openposePersonEntry.keypoints.size() != numberKeypoints",
-                                  __LINE__, __FUNCTION__, __FILE__);
-                        // Iterate through all keypoints
-                        for (auto kp = 0u; kp < numberKeypoints; kp++)
-                        {
-                            // If enough threshold
-                            if (!element.status[kp] && !openposePersonEntry.status[kp])
-                            {
-                                active++;
-                                const auto distance = getEuclideanDistance(element.keypoints[kp],
-                                                                           openposePersonEntry.keypoints[kp]);
-                                if (distance < personDistanceThreshold)
-                                    inliers++;
-                            }
-                        }
+    //                 // Find best correspondance in the LK set
+    //                 auto bestMatch = -1ll;
+    //                 auto bestScore = 0.f;
+    //                 for (const auto& personEntry : personEntries)
+    //                 {
+    //                     const auto& element = personEntry.second;
+    //                     auto inliers = 0;
+    //                     auto active = 0;
 
-                        if (active > 0)
-                        {
-                            const auto score = inliers / (float)active;
-                            if (score > bestScore && score >= inlierRatioThreshold)
-                            {
-                                bestScore = score;
-                                bestMatch = personEntry.first;
-                            }
-                        }
-                    }
-                    // Found a best match, update LK table and poseIds
-                    if (bestMatch != -1)
-                        poseId = bestMatch;
-                    else
-                        poseId = nextPersonId++;
+    //                     // Security checks
+    //                     if (element.status.size() != numberKeypoints)
+    //                         error("element.status.size() != numberKeypoints ||", __LINE__, __FUNCTION__, __FILE__);
+    //                     if (openposePersonEntry.status.size() != numberKeypoints)
+    //                         error("openposePersonEntry.status.size() != numberKeypoints",
+    //                               __LINE__, __FUNCTION__, __FILE__);
+    //                     if (element.keypoints.size() != numberKeypoints)
+    //                         error("element.keypoints.size() != numberKeypoints ||", __LINE__, __FUNCTION__, __FILE__);
+    //                     if (openposePersonEntry.keypoints.size() != numberKeypoints)
+    //                         error("openposePersonEntry.keypoints.size() != numberKeypoints",
+    //                               __LINE__, __FUNCTION__, __FILE__);
+    //                     // Iterate through all keypoints
+    //                     for (auto kp = 0u; kp < numberKeypoints; kp++)
+    //                     {
+    //                         // If enough threshold
+    //                         if (!element.status[kp] && !openposePersonEntry.status[kp])
+    //                         {
+    //                             active++;
+    //                             const auto distance = getEuclideanDistance(element.keypoints[kp],
+    //                                                                        openposePersonEntry.keypoints[kp]);
+    //                             if (distance < personDistanceThreshold)
+    //                                 inliers++;
+    //                         }
+    //                     }
 
-                    pendingQueue[poseId] = openposePersonEntry;
-                }
-            }
+    //                     if (active > 0)
+    //                     {
+    //                         const auto score = inliers / (float)active;
+    //                         if (score > bestScore && score >= inlierRatioThreshold)
+    //                         {
+    //                             bestScore = score;
+    //                             bestMatch = personEntry.first;
+    //                         }
+    //                     }
+    //                 }
+    //                 // Found a best match, update LK table and poseIds
+    //                 if (bestMatch != -1)
+    //                     poseId = bestMatch;
+    //                 else
+    //                     poseId = nextPersonId++;
 
-            // Update LK table with pending queue
-            for (auto& pendingQueueEntry: pendingQueue)
-                personEntries[pendingQueueEntry.first] = pendingQueueEntry.second;
+    //                 pendingQueue[poseId] = openposePersonEntry;
+    //             }
+    //         }
 
-            return poseIds;
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return Array<long long>{};
-        }
-    }
+    //         // Update LK table with pending queue
+    //         for (auto& pendingQueueEntry: pendingQueue)
+    //             personEntries[pendingQueueEntry.first] = pendingQueueEntry.second;
+
+    //         return poseIds;
+    //     }
+    //     catch (const std::exception& e)
+    //     {
+    //         error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+    //         return Array<long long>{};
+    //     }
+    // }
 
     PersonIdExtractor::PersonIdExtractor(const float confidenceThreshold, const float inlierRatioThreshold,
                                          const float distanceThreshold, const int numberFramesToDeletePerson) :
@@ -371,6 +371,15 @@ namespace op
         mNextPersonId{0ll},
         mLastFrameId{-1ll}
     {
+        try    
+        {  
+            error("PersonIdExtractor (`identification` flag) buggy and not working yet, but we are working on it!" 
+                  " Coming soon!", __LINE__, __FUNCTION__, __FILE__);  
+        }  
+        catch (const std::exception& e)    
+        {  
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__); 
+        }
     }
 
     PersonIdExtractor::~PersonIdExtractor()
@@ -412,8 +421,10 @@ namespace op
             }
 
             // Get poseIds and update LKset according to OpenPose set
-            poseIds = matchLKAndOPGreedy(mPersonEntries, mNextPersonId, openposePersonEntries, mImagePrevious,
-                                   mInlierRatioThreshold, mDistanceThreshold);
+            // poseIds = matchLKAndOP(
+            poseIds = matchLKAndOPGreedy(
+                mPersonEntries, mNextPersonId, openposePersonEntries, mImagePrevious, mInlierRatioThreshold,
+                mDistanceThreshold);
 
             return poseIds;
         }
