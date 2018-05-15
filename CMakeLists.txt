@@ -66,16 +66,16 @@ if (CMAKE_COMPILER_IS_GNUCXX)
 
   if (${INSTRUCTION_SET} MATCHES "SSE4")
     add_definitions("-DWITH_SSE4")
-    set(OP_SIMD_FLAGS "${OP_SIMD_FLAGS} -msse4.1")
+    set(SIMD_FLAGS "${SIMD_FLAGS} -msse4.1")
   endif(${INSTRUCTION_SET} MATCHES "SSE4")
 
   if (${INSTRUCTION_SET} MATCHES "AVX")
     add_definitions("-DWITH_AVX")
-    set(OP_SIMD_FLAGS "${OP_SIMD_FLAGS} -mavx")
+    set(SIMD_FLAGS "${SIMD_FLAGS} -mavx")
   endif(${INSTRUCTION_SET} MATCHES "AVX")
 
   message(STATUS "GCC detected, adding compile flags")
-  set(OP_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OP_SIMD_FLAGS} -fopenmp -Wpedantic -Wall -Wextra -Wfatal-errors")
+  set(OP_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SIMD_FLAGS} -fopenmp -Wpedantic -Wall -Wextra -Wfatal-errors")
 endif (CMAKE_COMPILER_IS_GNUCXX)
 
 
