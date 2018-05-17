@@ -2,7 +2,9 @@
 #define OPENPOSE_TRACKING_PERSON_ID_EXTRACTOR_HPP
 
 #include <atomic>
+#include <tuple>
 #include <unordered_map>
+#include <unordered_set>
 #include <openpose/core/common.hpp>
 
 namespace op

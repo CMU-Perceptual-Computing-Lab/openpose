@@ -59,8 +59,23 @@ endif (WIN32)
 
 # C++ additional flags
 if (CMAKE_COMPILER_IS_GNUCXX)
+
+  # Select the Enhanced Instruction Set
+  set(INSTRUCTION_SET NONE CACHE STRING "Enable Enhanced Instruction Set")
+  set_property(CACHE INSTRUCTION_SET PROPERTY STRINGS NONE SSE4 AVX)
+
+  if (${INSTRUCTION_SET} MATCHES "SSE4")
+    add_definitions("-DWITH_SSE4")
+    set(SIMD_FLAGS "${SIMD_FLAGS} -msse4.1")
+  endif(${INSTRUCTION_SET} MATCHES "SSE4")
+
+  if (${INSTRUCTION_SET} MATCHES "AVX")
+    add_definitions("-DWITH_AVX")
+    set(SIMD_FLAGS "${SIMD_FLAGS} -mavx")
+  endif(${INSTRUCTION_SET} MATCHES "AVX")
+
   message(STATUS "GCC detected, adding compile flags")
-  set(OP_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp -Wpedantic -Wall -Wextra -Wfatal-errors")
+  set(OP_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SIMD_FLAGS} -fopenmp -Wpedantic -Wall -Wextra -Wfatal-errors")
 endif (CMAKE_COMPILER_IS_GNUCXX)
 
 

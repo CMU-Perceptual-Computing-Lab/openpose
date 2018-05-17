@@ -5,12 +5,12 @@
 #include <openpose/utilities/profiler.hpp>
 #include <openpose/experimental/tracking/pyramidalLK.hpp>
 
-#if defined ( __SSE4_1__)
+#if defined (WITH_SSE4)
 #include <emmintrin.h>
 #include "smmintrin.h"
 #endif
 
-#if defined (__AVX__)
+#if defined (WITH_AVX)
 #include <immintrin.h>
 #endif
 
@@ -32,7 +32,7 @@
 
 namespace op
 {
-#if defined ( __SSE4_1__)
+#if defined (WITH_SSE4)
     float sse_dot_product(std::vector<float> &av, std::vector<float> &bv)
     {
 
@@ -68,7 +68,7 @@ namespace op
     }
 #endif
 
-#if defined (__AVX__)
+#if defined (WITH_AVX)
 
     float avx_dot_product(std::vector<float> &av, std::vector<float> &bv)
     {
@@ -114,13 +114,13 @@ namespace op
             auto sumYT = 0.f;
             auto sumXY = 0.f;
 
-#if defined (__AVX__)
+#if defined (WITH_AVX)
             sumXX = avx_dot_product(ix,ix);
             sumYY = avx_dot_product(iy,iy);
             sumXY = avx_dot_product(ix,iy);
             sumXT = avx_dot_product(ix,it);
             sumYT = avx_dot_product(iy,it);
-#elif defined ( __SSE4_1__)
+#elif defined (WITH_SSE4)
             sumXX = sse_dot_product(ix,ix);
             sumYY = sse_dot_product(iy,iy);
             sumXY = sse_dot_product(ix,iy);
