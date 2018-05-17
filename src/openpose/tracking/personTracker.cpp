@@ -2,6 +2,7 @@
 #include <thread>
 #include <opencv2/imgproc/imgproc.hpp> // cv::resize
 #include <openpose/tracking/personTracker.hpp>
+#include <openpose/utilities/fastMath.hpp>
 #include <openpose/tracking/pyramidalLK.hpp>
 
 namespace op
@@ -40,18 +41,19 @@ namespace op
         int totalKp = 0;
         for (size_t i=0; i<personEntry.keypoints.size(); i++)
         {
-            if (!personEntry.status[i])
-                continue;
-            const auto kp = personEntry.keypoints[i];
-            if (kp.x < minX)
-                minX = kp.x;
-            if (kp.x > maxX)
-                maxX = kp.x;
-            if (kp.y < minY)
-                minY = kp.y;
-            if (kp.y > maxY)
-                maxY = kp.y;
-            totalKp++;
+            if (personEntry.status[i])
+            {
+                const auto kp = personEntry.keypoints[i];
+                if (kp.x < minX)
+                    minX = kp.x;
+                if (kp.x > maxX)
+                    maxX = kp.x;
+                if (kp.y < minY)
+                    minY = kp.y;
+                if (kp.y > maxY)
+                    maxY = kp.y;
+                totalKp++;
+            }
         }
         const float xDist = (maxX - minX);
         const float yDist = (maxY - minY);
@@ -147,23 +149,23 @@ namespace op
         try
         {
             personEntries.clear();
-            for (int i=0; i<poseKeypoints.getSize()[0]; i++)
+            for (int i=0; i<poseKeypoints.getSize(0); i++)
             {
                 const auto id = poseIds[i];
                 personEntries[id] = PersonTrackerEntry();
-                personEntries[id].keypoints.resize(poseKeypoints.getSize()[1]);
-                personEntries[id].status.resize(poseKeypoints.getSize()[1]);
-                for (int j=0; j<poseKeypoints.getSize()[1]; j++)
+                personEntries[id].keypoints.resize(poseKeypoints.getSize(1));
+                personEntries[id].status.resize(poseKeypoints.getSize(1));
+                for (int j=0; j<poseKeypoints.getSize(1); j++)
                 {
                     personEntries[id].keypoints[j].x = poseKeypoints[
-                            i*poseKeypoints.getSize()[1]*poseKeypoints.getSize()[2] +
-                            j*poseKeypoints.getSize()[2] + 0];
+                            i*poseKeypoints.getSize(1)*poseKeypoints.getSize(2) +
+                            j*poseKeypoints.getSize(2) + 0];
                     personEntries[id].keypoints[j].y = poseKeypoints[
-                            i*poseKeypoints.getSize()[1]*poseKeypoints.getSize()[2] +
-                            j*poseKeypoints.getSize()[2] + 1];
+                            i*poseKeypoints.getSize(1)*poseKeypoints.getSize(2) +
+                            j*poseKeypoints.getSize(2) + 1];
                     const float prob = poseKeypoints[
-                            i*poseKeypoints.getSize()[1]*poseKeypoints.getSize()[2] +
-                            j*poseKeypoints.getSize()[2] + 2];
+                            i*poseKeypoints.getSize(1)*poseKeypoints.getSize(2) +
+                            j*poseKeypoints.getSize(2) + 2];
                     if (prob < confidenceThreshold)
                         personEntries[id].status[j] = 0;
                     else
@@ -183,103 +185,104 @@ namespace op
     {
         try
         {
-            if (poseIds.empty())
-                return;
-
-            // Delete
-            for (auto kv = personEntries.cbegin(); kv != personEntries.cend() /* not hoisted */; /* no increment */)
+            if (!poseIds.empty())
             {
-                bool exists = false;
-                for (int i=0; i<poseIds.getSize()[0]; i++)
+                // Delete
+                for (auto kv = personEntries.cbegin(); kv != personEntries.cend() /* not hoisted */; /* no increment */)
+                {
+                    bool exists = false;
+                    for (int i=0; i<poseIds.getSize(0); i++)
+                    {
+                        const auto id = poseIds[i];
+                        if (id == kv->first)
+                            exists = true;
+                    }
+                    if (!exists)
+                        personEntries.erase(kv++);
+                    else
+                        ++kv;
+                }
+
+                // Update or Add
+                for (int i=0; i<poseIds.getSize(0); i++)
                 {
                     const auto id = poseIds[i];
-                    if (id == kv->first)
-                        exists = true;
-                }
-                if (!exists)
-                    personEntries.erase(kv++);
-                else
-                    ++kv;
-            }
 
-            // Update or Add
-            for (int i=0; i<poseIds.getSize()[0]; i++)
-            {
-                const auto id = poseIds[i];
-
-                // Update
-                if (personEntries.count(id) && mergeResults)
-                {
-                    PersonTrackerEntry& personEntry = personEntries[id];
-                    for (int j=0; j<poseKeypoints.getSize()[1]; j++)
+                    // Update
+                    if (personEntries.count(id) && mergeResults)
                     {
-                        const float x = poseKeypoints[
-                                i*poseKeypoints.getSize()[1]*poseKeypoints.getSize()[2] +
-                                j*poseKeypoints.getSize()[2] + 0];
-                        const float y = poseKeypoints[
-                                i*poseKeypoints.getSize()[1]*poseKeypoints.getSize()[2] +
-                                j*poseKeypoints.getSize()[2] + 1];
-                        const float prob = poseKeypoints[
-                                i*poseKeypoints.getSize()[1]*poseKeypoints.getSize()[2] +
-                                j*poseKeypoints.getSize()[2] + 2];
-                        const cv::Point lkPoint = personEntry.keypoints[j];
-                        const cv::Point opPoint = cv::Point(x,y);
-
-                        if (prob < confidenceThreshold)
-                            personEntries[id].status[j] = 0;
-                        else
+                        PersonTrackerEntry& personEntry = personEntries[id];
+                        for (int j=0; j<poseKeypoints.getSize(1); j++)
                         {
-                            personEntries[id].status[j] = 1;
-                            float distance = sqrt(pow(lkPoint.x-opPoint.x,2)+pow(lkPoint.y-opPoint.y,2));
-                            if (distance < 5)
-                                personEntries[id].keypoints[j] = lkPoint;
-                            else if (distance < 10)
-                                personEntries[id].keypoints[j] = cv::Point((lkPoint.x+opPoint.x)/2.,(lkPoint.y+opPoint.y)/2.);
+                            const float x = poseKeypoints[
+                                    i*poseKeypoints.getSize(1)*poseKeypoints.getSize(2) +
+                                    j*poseKeypoints.getSize(2) + 0];
+                            const float y = poseKeypoints[
+                                    i*poseKeypoints.getSize(1)*poseKeypoints.getSize(2) +
+                                    j*poseKeypoints.getSize(2) + 1];
+                            const float prob = poseKeypoints[
+                                    i*poseKeypoints.getSize(1)*poseKeypoints.getSize(2) +
+                                    j*poseKeypoints.getSize(2) + 2];
+                            const cv::Point lkPoint = personEntry.keypoints[j];
+                            const cv::Point opPoint = cv::Point(x,y);
+
+                            if (prob < confidenceThreshold)
+                                personEntries[id].status[j] = 0;
                             else
-                                personEntries[id].keypoints[j] = opPoint;
+                            {
+                                personEntries[id].status[j] = 1;
+                                float distance = sqrt(pow(lkPoint.x-opPoint.x,2)+pow(lkPoint.y-opPoint.y,2));
+                                if (distance < 5)
+                                    personEntries[id].keypoints[j] = lkPoint;
+                                else if (distance < 10)
+                                    personEntries[id].keypoints[j] = cv::Point{intRound((lkPoint.x+opPoint.x)/2.),
+                                                                               intRound((lkPoint.y+opPoint.y)/2.)};
+                                else
+                                    personEntries[id].keypoints[j] = opPoint;
+                            }
                         }
-                    }
 
-                }
-                // Add
-                else
-                {
-                    personEntries[id] = PersonTrackerEntry();
-                    personEntries[id].keypoints.resize(poseKeypoints.getSize()[1]);
-                    personEntries[id].status.resize(poseKeypoints.getSize()[1]);
-                    for (int j=0; j<poseKeypoints.getSize()[1]; j++)
+                    }
+                    // Add
+                    else
                     {
-                        personEntries[id].keypoints[j].x = poseKeypoints[
-                                i*poseKeypoints.getSize()[1]*poseKeypoints.getSize()[2] +
-                                j*poseKeypoints.getSize()[2] + 0];
-                        personEntries[id].keypoints[j].y = poseKeypoints[
-                                i*poseKeypoints.getSize()[1]*poseKeypoints.getSize()[2] +
-                                j*poseKeypoints.getSize()[2] + 1];
-                        const float prob = poseKeypoints[
-                                i*poseKeypoints.getSize()[1]*poseKeypoints.getSize()[2] +
-                                j*poseKeypoints.getSize()[2] + 2];
-                        if (prob < confidenceThreshold)
-                            personEntries[id].status[j] = 0;
-                        else
-                            personEntries[id].status[j] = 1;
+                        personEntries[id] = PersonTrackerEntry();
+                        personEntries[id].keypoints.resize(poseKeypoints.getSize(1));
+                        personEntries[id].status.resize(poseKeypoints.getSize(1));
+                        for (int j=0; j<poseKeypoints.getSize(1); j++)
+                        {
+                            personEntries[id].keypoints[j].x = poseKeypoints[
+                                    i*poseKeypoints.getSize(1)*poseKeypoints.getSize(2) +
+                                    j*poseKeypoints.getSize(2) + 0];
+                            personEntries[id].keypoints[j].y = poseKeypoints[
+                                    i*poseKeypoints.getSize(1)*poseKeypoints.getSize(2) +
+                                    j*poseKeypoints.getSize(2) + 1];
+                            const float prob = poseKeypoints[
+                                    i*poseKeypoints.getSize(1)*poseKeypoints.getSize(2) +
+                                    j*poseKeypoints.getSize(2) + 2];
+                            if (prob < confidenceThreshold)
+                                personEntries[id].status[j] = 0;
+                            else
+                                personEntries[id].status[j] = 1;
+                        }
+
                     }
-
                 }
-            }
 
-            // Sanity Check Start
-            if ((int)personEntries.size() != poseIds.getSize()[0])
-            {
-                // Print
-                for (auto& kv : personEntries)
-                    std::cout << kv.first << " ";
-                std::cout << std::endl;
-                for (int i=0; i<poseIds.getSize()[0]; i++)
-                    std::cout << poseIds.at(i) << " ";
-                std::cout << std::endl;
-                std::cout << "---" << std::endl;
-                error("Size Mismatch. THere is an error in your poseId formatting.",
-                      __LINE__, __FUNCTION__, __FILE__);
+                // Sanity Check Start
+                if ((int)personEntries.size() != poseIds.getSize(0))
+                {
+                    // Print
+                    for (auto& kv : personEntries)
+                        std::cout << kv.first << " ";
+                    std::cout << std::endl;
+                    for (int i=0; i<poseIds.getSize(0); i++)
+                        std::cout << poseIds.at(i) << " ";
+                    std::cout << std::endl;
+                    std::cout << "---" << std::endl;
+                    error("Size Mismatch. THere is an error in your poseId formatting.",
+                          __LINE__, __FUNCTION__, __FILE__);
+                }
             }
         }
         catch (const std::exception& e)
@@ -294,25 +297,26 @@ namespace op
     {
         try
         {
-            if (!personEntries.size() || poseIds.empty())
-                return;
-            int dims[] = { (int)personEntries.size(), (int)personEntries.begin()->second.keypoints.size(), 3 };
-            cv::Mat opArrayMat(3,dims,CV_32FC1);
-            for (auto i=0; i<poseIds.getSize()[0]; i++)
+            if (personEntries.size() && !poseIds.empty())
             {
-                const int id = poseIds[i];
-                const PersonTrackerEntry& pe = personEntries.at(id);
-                for (int j=0; j<dims[1]; j++)
+                int dims[] = { (int)personEntries.size(), (int)personEntries.begin()->second.keypoints.size(), 3 };
+                cv::Mat opArrayMat(3,dims,CV_32FC1);
+                for (auto i=0; i<poseIds.getSize(0); i++)
                 {
-                    const auto baseIndex = i*dims[1]*dims[2] + j*dims[2];
-                    opArrayMat.at<float>(baseIndex + 0) = pe.keypoints[j].x;
-                    opArrayMat.at<float>(baseIndex + 1) = pe.keypoints[j].y;
-                    opArrayMat.at<float>(baseIndex + 2) = (int)pe.status[j];
-                    if (pe.keypoints[j].x == 0 && pe.keypoints[j].y == 0)
-                        opArrayMat.at<float>(baseIndex + 2) = 0;
+                    const int id = poseIds[i];
+                    const PersonTrackerEntry& pe = personEntries.at(id);
+                    for (int j=0; j<dims[1]; j++)
+                    {
+                        const auto baseIndex = i*dims[1]*dims[2] + j*dims[2];
+                        opArrayMat.at<float>(baseIndex + 0) = pe.keypoints[j].x;
+                        opArrayMat.at<float>(baseIndex + 1) = pe.keypoints[j].y;
+                        opArrayMat.at<float>(baseIndex + 2) = (int)pe.status[j];
+                        if (pe.keypoints[j].x == 0 && pe.keypoints[j].y == 0)
+                            opArrayMat.at<float>(baseIndex + 2) = 0;
+                    }
                 }
+                poseKeypoints.setFrom(opArrayMat);
             }
-            poseKeypoints.setFrom(opArrayMat);
         }
         catch (const std::exception& e)
         {
@@ -323,13 +327,20 @@ namespace op
     void scaleKeypoints(std::unordered_map<int, PersonTrackerEntry>& personEntries,
                         const float xScale, const float yScale)
     {
-        for (auto& kv : personEntries)
+        try
         {
-            for (size_t i=0; i<kv.second.keypoints.size(); i++)
+            for (auto& kv : personEntries)
             {
-                kv.second.keypoints[i].x *= xScale;
-                kv.second.keypoints[i].y *= yScale;
+                for (size_t i=0; i<kv.second.keypoints.size(); i++)
+                {
+                    kv.second.keypoints[i].x *= xScale;
+                    kv.second.keypoints[i].y *= yScale;
+                }
             }
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
     }
 
