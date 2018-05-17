@@ -6,8 +6,8 @@
 #include <openpose/core/keepTopNPeople.hpp>
 #include <openpose/pose/poseParameters.hpp>
 #include <openpose/pose/poseExtractorNet.hpp>
-#include <openpose/experimental/tracking/personIdExtractor.hpp>
-#include <openpose/experimental/tracking/personTracker.hpp>
+#include <openpose/tracking/personIdExtractor.hpp>
+#include <openpose/tracking/personTracker.hpp>
 
 namespace op
 {

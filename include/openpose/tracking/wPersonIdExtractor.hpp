@@ -3,7 +3,7 @@
 
 #include <openpose/core/common.hpp>
 #include <openpose/thread/worker.hpp>
-#include <openpose/experimental/tracking/personIdExtractor.hpp>
+#include <openpose/tracking/personIdExtractor.hpp>
 
 namespace op
 {

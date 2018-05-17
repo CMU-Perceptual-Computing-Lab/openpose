@@ -1,8 +1,8 @@
 #include <iostream>
 #include <thread>
 #include <opencv2/imgproc/imgproc.hpp> // cv::resize
-#include <openpose/experimental/tracking/personTracker.hpp>
-#include <openpose/experimental/tracking/pyramidalLK.hpp>
+#include <openpose/tracking/personTracker.hpp>
+#include <openpose/tracking/pyramidalLK.hpp>
 
 namespace op
 {

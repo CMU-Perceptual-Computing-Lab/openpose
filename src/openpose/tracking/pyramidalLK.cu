@@ -14,7 +14,7 @@
         #define cvCuda cv::cuda
     #endif
 #endif
-#include <openpose/experimental/tracking/pyramidalLK.hpp>
+#include <openpose/tracking/pyramidalLK.hpp>
 
 // Error codes for kernel caller
 #define IMAGE_SIZES_NEQUAL -1

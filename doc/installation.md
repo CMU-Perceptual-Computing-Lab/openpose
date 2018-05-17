@@ -235,7 +235,7 @@ To manually select the CPU Version, open CMake GUI mentioned above, and set the 
 - On Ubuntu, OpenPose will link against the Intel MKL version (Math Kernel Library) of Caffe. Alternatively, the user can choose his own Caffe version, by unselecting `USE_MKL` and selecting his own Caffe path. 
 - On Windows, it will use the default version of Caffe or one provided by the user on the CPU.
 
-The default CPU version takes ~0.2 seconds per image on Ubuntu (~50x slower than GPU) while the MKL version provides a roughly 2x speedup at ~0.4 seconds. As of now OpenPose does not support MKL on Windows but will at a later date. Also, MKL version does not support unfixed resolution. So a folder of images of different resolutions with openpose, requires the `--net_resolution 656x368` flag for example.
+The default CPU version takes ~0.2 images per second on Ubuntu (~50x slower than GPU) while the MKL version provides a roughly 2x speedup at ~0.4 images per second. As of now OpenPose does not support MKL on Windows but will at a later date. Also, MKL version does not support unfixed resolution. So a folder of images of different resolutions requires a fixed net resolution (e.g., `--net_resolution 656x368`).
 
 The user can configure the environmental variables `MKL_NUM_THREADS` and `OMP_NUM_THREADS`. They are set at an optimum parameter level by default (i.e., to the number of threads of the machine). However, they can be tweak by running the following commands into the terminal window, right before running any OpenPose application. Eg:
 ```

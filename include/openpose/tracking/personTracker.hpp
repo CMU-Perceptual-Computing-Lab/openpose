@@ -4,7 +4,6 @@
 #include <atomic>
 #include <unordered_map>
 #include <openpose/core/common.hpp>
-#include <openpose/experimental/tracking/personTracker.hpp>
 
 namespace op
 {

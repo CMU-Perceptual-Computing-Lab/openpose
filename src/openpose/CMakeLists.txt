@@ -10,11 +10,12 @@ file(GLOB_RECURSE OP_HEADERS_UNFILTERED "${CMAKE_SOURCE_DIR}/include/openpose/*.
     "${CMAKE_SOURCE_DIR}/include/openpose/*.hu")
 
 set(OP_HEADERS "")
-foreach (FILE ${OP_HEADERS_UNFILTERED})
-  if (NOT FILE MATCHES "${CMAKE_SOURCE_DIR}/include/openpose/experimental/*")
-      list(APPEND OP_HEADERS ${FILE})
-  endif ()
-endforeach(FILE ${OP_HEADERS_UNFILTERED})
+# # Add experimental sub-folders
+# foreach (FILE ${OP_HEADERS_UNFILTERED})
+#   if (NOT FILE MATCHES "${CMAKE_SOURCE_DIR}/include/openpose/experimental/*")
+#       list(APPEND OP_HEADERS ${FILE})
+#   endif ()
+# endforeach(FILE ${OP_HEADERS_UNFILTERED})
 
 if (${GPU_MODE} MATCHES "CUDA")
     cuda_add_library(openpose ${SOURCES_OPENPOSE} ${OP_HEADERS})
