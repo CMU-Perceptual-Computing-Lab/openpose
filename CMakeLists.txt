@@ -59,8 +59,23 @@ endif (WIN32)
 
 # C++ additional flags
 if (CMAKE_COMPILER_IS_GNUCXX)
+
+  # Select the Enhanced Instruction Set
+  set(INSTRUCTION_SET NONE CACHE STRING "Enable Enhanced Instruction Set")
+  set_property(CACHE INSTRUCTION_SET PROPERTY STRINGS NONE SSE4 AVX)
+
+  if (${INSTRUCTION_SET} MATCHES "SSE4")
+    add_definitions("-DWITH_SSE4")
+    set(SIMD_FLAGS "${SIMD_FLAGS} -msse4.1")
+  endif(${INSTRUCTION_SET} MATCHES "SSE4")
+
+  if (${INSTRUCTION_SET} MATCHES "AVX")
+    add_definitions("-DWITH_AVX")
+    set(SIMD_FLAGS "${SIMD_FLAGS} -mavx")
+  endif(${INSTRUCTION_SET} MATCHES "AVX")
+
   message(STATUS "GCC detected, adding compile flags")
-  set(OP_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp -Wpedantic -Wall -Wextra -Wfatal-errors")
+  set(OP_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SIMD_FLAGS} -fopenmp -Wpedantic -Wall -Wextra -Wfatal-errors")
 endif (CMAKE_COMPILER_IS_GNUCXX)
 
 
@@ -178,13 +193,18 @@ if (${GPU_MODE} MATCHES "CUDA")
   option(USE_CUDNN "Build OpenPose with cuDNN library support." ON)
 endif (${GPU_MODE} MATCHES "CUDA")
 
-# Suboptions for OpenPose 3D Reconstruction demo
+# Suboptions for OpenPose 3D Reconstruction module and demo
 option(WITH_3D_RENDERER "Add OpenPose 3D renderer module (it requires FreeGLUT library)." OFF)
 if (UNIX AND NOT APPLE)
-  option(WITH_CERES "Add Ceres support. Used e.g., for advanced 3-D reconstruction." OFF)
+  option(WITH_CERES "Add Ceres support for advanced 3-D reconstruction." OFF)
 endif (UNIX AND NOT APPLE)
 option(WITH_FLIR_CAMERA "Add FLIR (formerly Point Grey) camera code (requires Spinnaker SDK already installed)." OFF)
 option(WITH_3D_ADAM_MODEL "Add 3-D Adam model (requires OpenGL, Ceres, Eigen, OpenMP, FreeImage, GLEW, and IGL already installed)." OFF)
+
+# # Suboptions for OpenPose tracking
+# if (UNIX AND NOT APPLE)
+#   option(WITH_TRACKING "Add OpenPose 3D tracking module (it requires OpenCV with CUDA support)." OFF)
+# endif (UNIX AND NOT APPLE)
 
 # Download the models
 option(DOWNLOAD_COCO_MODEL "Download COCO model." ON)
@@ -231,6 +251,12 @@ if (WITH_3D_ADAM_MODEL)
   # OpenPose flags
   add_definitions(-DWITH_3D_ADAM_MODEL)
 endif (WITH_3D_ADAM_MODEL)
+
+# Adding tracking
+if (WITH_TRACKING)
+  # OpenPose flags
+  add_definitions(-DWITH_TRACKING)
+endif (WITH_TRACKING)
 
 if (UNIX AND NOT APPLE)
   if (${GPU_MODE} MATCHES "CUDA")

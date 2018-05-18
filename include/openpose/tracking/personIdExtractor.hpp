@@ -1,9 +1,11 @@
 #ifndef OPENPOSE_TRACKING_PERSON_ID_EXTRACTOR_HPP
 #define OPENPOSE_TRACKING_PERSON_ID_EXTRACTOR_HPP
 
+#include <atomic>
+#include <tuple>
 #include <unordered_map>
+#include <unordered_set>
 #include <openpose/core/common.hpp>
-#include <openpose/experimental/tracking/personIdExtractor.hpp>
 
 namespace op
 {
@@ -30,7 +32,12 @@ namespace op
 
         virtual ~PersonIdExtractor();
 
-        Array<long long> extractIds(const Array<float>& poseKeypoints, const cv::Mat& cvMatInput);
+        Array<long long> extractIds(const Array<float>& poseKeypoints, const cv::Mat& cvMatInput,
+                                    const unsigned long long imageViewIndex = 0ull);
+
+        Array<long long> extractIdsLockThread(const Array<float>& poseKeypoints, const cv::Mat& cvMatInput,
+                                              const unsigned long long imageViewIndex,
+                                              const long long frameId);
 
     private:
         const float mConfidenceThreshold;
@@ -41,6 +48,9 @@ namespace op
         cv::Mat mImagePrevious;
         std::vector<cv::Mat> mPyramidImagesPrevious;
         std::unordered_map<int, PersonEntry> mPersonEntries;
+        // Thread-safe variables
+        std::atomic<long long> mLastFrameId;
+
         DELETE_COPY(PersonIdExtractor);
     };
 }

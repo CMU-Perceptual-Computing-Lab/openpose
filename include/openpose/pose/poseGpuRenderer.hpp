@@ -4,7 +4,7 @@
 #include <openpose/core/common.hpp>
 #include <openpose/core/gpuRenderer.hpp>
 #include <openpose/pose/enumClasses.hpp>
-#include <openpose/pose/poseExtractor.hpp>
+#include <openpose/pose/poseExtractorNet.hpp>
 #include <openpose/pose/poseParameters.hpp>
 #include <openpose/pose/poseRenderer.hpp>
 
@@ -13,7 +13,7 @@ namespace op
     class OP_API PoseGpuRenderer : public GpuRenderer, public PoseRenderer
     {
     public:
-        PoseGpuRenderer(const PoseModel poseModel, const std::shared_ptr<PoseExtractor>& poseExtractor,
+        PoseGpuRenderer(const PoseModel poseModel, const std::shared_ptr<PoseExtractorNet>& poseExtractorNet,
                         const float renderThreshold, const bool blendOriginalFrame = true,
                         const float alphaKeypoint = POSE_DEFAULT_ALPHA_KEYPOINT,
                         const float alphaHeatMap = POSE_DEFAULT_ALPHA_HEAT_MAP,
@@ -28,7 +28,7 @@ namespace op
                                                const float scaleNetToOutput = -1.f);
 
     private:
-        const std::shared_ptr<PoseExtractor> spPoseExtractor;
+        const std::shared_ptr<PoseExtractorNet> spPoseExtractorNet;
         // Init with thread
         float* pGpuPose; // GPU aux memory
 

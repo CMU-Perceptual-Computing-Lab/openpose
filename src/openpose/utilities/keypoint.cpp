@@ -5,8 +5,8 @@
 
 namespace op
 {
-    const std::string errorMessage = "The Array<float> is not a RGB image. This function is only for array of"
-                                     " dimension: [sizeA x sizeB x 3].";
+    const std::string errorMessage = "The Array<float> is not a RGB image or 3-channel keypoint array. This function"
+                                     " is only for array of dimension: [sizeA x sizeB x 3].";
 
     float getDistance(const Array<float>& keypoints, const int person, const int elementA, const int elementB)
     {
@@ -59,7 +59,29 @@ namespace op
     {
         try
         {
-            scaleKeypoints(keypoints, scale, scale);
+            if (!keypoints.empty() && scale != 1.f)
+            {
+                // Error check
+                if (keypoints.getSize(2) != 3 && keypoints.getSize(2) != 4)
+                    error("The Array<float> is not a (x,y,score) or (x,y,z,score) format array. This"
+                          " function is only for those 2 dimensions: [sizeA x sizeB x 3or4].",
+                          __LINE__, __FUNCTION__, __FILE__);
+                // Get #people and #parts
+                const auto numberPeople = keypoints.getSize(0);
+                const auto numberParts = keypoints.getSize(1);
+                const auto xyzChannels = keypoints.getSize(2);
+                // For each person
+                for (auto person = 0 ; person < numberPeople ; person++)
+                {
+                    // For each body part
+                    for (auto part = 0 ; part < numberParts ; part++)
+                    {
+                        const auto finalIndex = xyzChannels*(person*numberParts + part);
+                        for (auto xyz = 0 ; xyz < xyzChannels-1 ; xyz++)
+                            keypoints[finalIndex+xyz] *= scale;
+                    }
+                }
+            }
         }
         catch (const std::exception& e)
         {
@@ -67,14 +89,14 @@ namespace op
         }
     }
 
-    void scaleKeypoints(Array<float>& keypoints, const float scaleX, const float scaleY)
+    void scaleKeypoints2d(Array<float>& keypoints, const float scaleX, const float scaleY)
     {
         try
         {
-            if (scaleX != 1. && scaleY != 1.)
+            if (!keypoints.empty() && scaleX != 1.f && scaleY != 1.f)
             {
                 // Error check
-                if (!keypoints.empty() && keypoints.getSize(2) != 3)
+                if (keypoints.getSize(2) != 3)
                     error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
                 // Get #people and #parts
                 const auto numberPeople = keypoints.getSize(0);
@@ -98,15 +120,15 @@ namespace op
         }
     }
 
-    void scaleKeypoints(Array<float>& keypoints, const float scaleX, const float scaleY, const float offsetX,
-                        const float offsetY)
+    void scaleKeypoints2d(Array<float>& keypoints, const float scaleX, const float scaleY, const float offsetX,
+                          const float offsetY)
     {
         try
         {
-            if (scaleX != 1. && scaleY != 1.)
+            if (!keypoints.empty() && scaleX != 1.f && scaleY != 1.f)
             {
                 // Error check
-                if (!keypoints.empty() && keypoints.getSize(2) != 3)
+                if (keypoints.getSize(2) != 3)
                     error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
                 // Get #people and #parts
                 const auto numberPeople = keypoints.getSize(0);

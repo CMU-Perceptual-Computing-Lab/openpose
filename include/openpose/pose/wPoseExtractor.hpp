@@ -56,16 +56,28 @@ namespace op
                 // Profiling speed
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                 // Extract people pose
-                for (auto& tDatum : *tDatums)
+                for (auto i = 0u ; i < tDatums->size() ; i++)
+                // for (auto& tDatum : *tDatums)
                 {
+                    auto& tDatum = (*tDatums)[i];
+                    // OpenPose net forward pass
                     spPoseExtractor->forwardPass(tDatum.inputNetData,
                                                  Point<int>{tDatum.cvInputData.cols, tDatum.cvInputData.rows},
-                                                 tDatum.scaleInputToNetInputs);
+                                                 tDatum.scaleInputToNetInputs, tDatum.id);
+                    // OpenPose keypoint detector
                     tDatum.poseCandidates = spPoseExtractor->getCandidatesCopy();
                     tDatum.poseHeatMaps = spPoseExtractor->getHeatMapsCopy();
                     tDatum.poseKeypoints = spPoseExtractor->getPoseKeypoints().clone();
                     tDatum.poseScores = spPoseExtractor->getPoseScores().clone();
                     tDatum.scaleNetToOutput = spPoseExtractor->getScaleNetToOutput();
+                    // Keep desired top N people
+                    spPoseExtractor->keepTopPeople(tDatum.poseKeypoints, tDatum.poseScores);
+                    // ID extractor (experimental)
+                    tDatum.poseIds = spPoseExtractor->extractIdsLockThread(tDatum.poseKeypoints, tDatum.cvInputData,
+                                                                           i, tDatum.id);
+                    // Tracking (experimental)
+                    spPoseExtractor->trackLockThread(tDatum.poseKeypoints, tDatum.poseIds, tDatum.cvInputData, i,
+                                                     tDatum.id);
                 }
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);

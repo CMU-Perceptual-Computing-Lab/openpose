@@ -187,6 +187,13 @@ namespace op
         bool identification;
 
         /**
+         * Whether to enable people tracking across frames. The value indicates the number of frames where tracking
+         * is run between each OpenPose keypoint detection. Select -1 (default) to disable it or 0 to run
+         * simultaneously OpenPose keypoint detector and tracking for potentially higher accurary than only OpenPose.
+         */
+        int tracking;
+
+        /**
          * Constructor of the struct.
          * It has the recommended and default values we recommend for each element of the struct.
          * Since all the elements of the struct are public, they can also be manually filled.
@@ -204,7 +211,8 @@ namespace op
                           const ScaleMode heatMapScale = ScaleMode::ZeroToOne, const bool addPartCandidates = false,
                           const float renderThreshold = 0.05f, const int numberPeopleMax = -1,
                           const bool enableGoogleLogging = true, const bool reconstruct3d = false,
-                          const int minViews3d = -1, const bool identification = false);
+                          const int minViews3d = -1, const bool identification = false,
+                          const int tracking = -1);
     };
 }
 

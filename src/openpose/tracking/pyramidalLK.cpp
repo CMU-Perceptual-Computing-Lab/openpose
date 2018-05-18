@@ -1,14 +1,16 @@
 // #include <iostream>
 #include <opencv2/core/core.hpp> // cv::Point2f, cv::Mat
 #include <opencv2/imgproc/imgproc.hpp> // cv::pyrDown
-#include <openpose/experimental/tracking/pyramidalLK.hpp>
+#include <opencv2/video/video.hpp> // cv::buildOpticalFlowPyramid
+#include <openpose/utilities/profiler.hpp>
+#include <openpose/tracking/pyramidalLK.hpp>
 
-#if defined ( __SSE4_1__)
+#if defined (WITH_SSE4)
 #include <emmintrin.h>
 #include "smmintrin.h"
 #endif
 
-#if defined (__AVX__)
+#if defined (WITH_AVX)
 #include <immintrin.h>
 #endif
 
@@ -30,7 +32,7 @@
 
 namespace op
 {
-#if defined ( __SSE4_1__)
+#if defined (WITH_SSE4)
     float sse_dot_product(std::vector<float> &av, std::vector<float> &bv)
     {
 
@@ -66,7 +68,7 @@ namespace op
     }
 #endif
 
-#if defined (__AVX__)
+#if defined (WITH_AVX)
 
     float avx_dot_product(std::vector<float> &av, std::vector<float> &bv)
     {
@@ -112,13 +114,13 @@ namespace op
             auto sumYT = 0.f;
             auto sumXY = 0.f;
 
-#if defined (__AVX__)
+#if defined (WITH_AVX)
             sumXX = avx_dot_product(ix,ix);
             sumYY = avx_dot_product(iy,iy);
             sumXY = avx_dot_product(ix,iy);
             sumXT = avx_dot_product(ix,it);
             sumYT = avx_dot_product(iy,it);
-#elif defined ( __SSE4_1__)
+#elif defined (WITH_SSE4)
             sumXX = sse_dot_product(ix,ix);
             sumYY = sse_dot_product(iy,iy);
             sumXY = sse_dot_product(ix,iy);
@@ -364,6 +366,98 @@ namespace op
             }
      
 
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    // old, nwekp, pyramidPrev, pyramidCurr, status, imagePrev, imageCurr
+    void pyramidalLKOcv(std::vector<cv::Point2f>& coordI, std::vector<cv::Point2f>& coordJ,
+                        std::vector<cv::Mat>& pyramidImagesPrevious, std::vector<cv::Mat>& pyramidImagesCurrent,
+                        std::vector<char>& status, const cv::Mat& imagePrevious,
+                        const cv::Mat& imageCurrent, const int levels, const int patchSize, const bool initFlow)
+    {
+        try
+        {
+            // Empty coordinates
+            if (coordI.size() != 0)
+            {
+                // const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
+
+                std::vector<cv::Point2f> I;
+                I.assign(coordI.begin(), coordI.end());
+
+                if (!initFlow)
+                {
+                    coordJ.clear();
+                    coordJ.assign(I.begin(), I.end());
+                }
+
+                const cv::Mat& imagePrevGray = imagePrevious;
+                const cv::Mat& imageCurrGray = imageCurrent;
+
+                // Compute Pyramids
+                if (pyramidImagesPrevious.empty())
+                    cv::buildOpticalFlowPyramid(imagePrevGray, pyramidImagesPrevious, cv::Size{patchSize,patchSize}, levels);
+                if (pyramidImagesCurrent.empty())
+                    cv::buildOpticalFlowPyramid(imageCurrGray, pyramidImagesCurrent, cv::Size{patchSize,patchSize}, levels);
+
+                // Compute Flow
+                std::vector<uchar> st;
+                std::vector<float> err;
+                if (initFlow)
+                    cv::calcOpticalFlowPyrLK(pyramidImagesPrevious, pyramidImagesCurrent, coordI, coordJ, st, err,
+                                             cv::Size{patchSize,patchSize},levels,
+                                             cv::TermCriteria(cv::TermCriteria::COUNT+cv::TermCriteria::EPS,30,0.01),
+                                             cv::OPTFLOW_USE_INITIAL_FLOW);
+                else
+                    cv::calcOpticalFlowPyrLK(pyramidImagesPrevious, pyramidImagesCurrent, coordI, coordJ, st, err,
+                                             cv::Size{patchSize,patchSize},levels);
+
+                // Check distance
+                for (size_t i=0; i<status.size(); i++)
+                {
+                    const float distance = std::sqrt(
+                        std::pow(coordI[i].x-coordJ[i].x,2) + std::pow(coordI[i].y-coordJ[i].y,2));
+
+                    // Check if lk loss track, if distance is close keep it
+                    if (st[i] != (status[i]))
+                        if (distance <= patchSize*2)
+                            st[i] = 1;
+
+                    // If distance too far discard it
+                    if (distance > patchSize*2)
+                        st[i] = 0;
+                }
+
+                // Stupid hack because apparently in this tracker 0 means 1 and 1 is 0 wtf
+                if (st.size() != status.size())
+                    error("st.size() != status.size().", __LINE__, __FUNCTION__, __FILE__);
+                for (size_t i=0; i<status.size(); i++)
+                {
+                    // If its 0 to begin with (Because OP lost track?)
+                    if (status[i] != 0)
+                    {
+                        if (st[i] == 0)
+                            st[i] = 0;
+                        else if (st[i] == 1)
+                            st[i] = 1;
+                        else
+                            error("Wrong CV Type.", __LINE__, __FUNCTION__, __FILE__);
+                        status[i] = st[i];
+                    }
+                }
+
+                // Profiler::timerEnd(profilerKey);
+                // Profiler::printAveragedTimeMsEveryXIterations(profilerKey, __LINE__, __FUNCTION__, __FILE__, 5);
+
+                // // Debug
+                // std::cout << "LK: ";
+                // for (int i=0; i<status.size(); i++) std::cout << !(int)status[i];
+                // std::cout << std::endl;
+            }
         }
         catch (const std::exception& e)
         {

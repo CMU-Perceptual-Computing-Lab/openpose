@@ -217,11 +217,19 @@ OpenPose Library - Release Notes
     2. 3-D reconstruction: Added non-linear minimization to further improve 3-D triangulation accuracy by ~5% (Ubuntu only).
     3. CMake: All libraries as single variable (simpler to add/remove libraries).
     4. Datum includes extrinsic and intrinsic camera parameters.
+    5. Function `scaleKeypoints(Array<float>& keypoints, const float scale)` also accepts 3D keypoints.
+    6. 3D keypoints and camera parameters in meters (instead of millimeters) in order to reduce numerical errors.
+    7. New `PoseExtractor` class to contain future ID and tracking algorithms as well as the current OpenPose keypoint detection algorithm.
+    8. Added initial alpha versions of the `tracking` and `identification` modules (for now disabled but available in the source code), including `PersonIdExtractor` and `PersonTracker`. `PersonIdExtractor` includes greedy matrix OP-LK matching.
 2. Functions or parameters renamed:
     1. Removed scale parameter from hand and face rectangle extractor (causing wrong results if custom `--output_resolution`).
+    2. Functions `scaleKeypoints`, other than `scaleKeypoints(Array<float>& keypoints, const float scale)`, renamed as `scaleKeypoints2d`.
+    3. `(W)PoseExtractor` renamed to `(W)PoseExtractorNet` to distinguish from new `PoseExtractor`. Analogously with `(W)FaceExtractorNet` and `(W)HandExtractorNet`.
+    4. Experimental module removed and internal `tracking` folder moved to main openpose folder.
 3. Main bugs fixed:
     1. Fixed hand and face extraction and rendering scaling issues when `--output_resolution` is not the default one.
     2. Part candidates (`--part_candidates`) are saved with the same scale than the final keypoints itself.
+    3. Fixed bug in keepTopNPeople.hpp (`--number_people_max`) that provoked core dumped if lots of values equal to the threshold.
 
 
 

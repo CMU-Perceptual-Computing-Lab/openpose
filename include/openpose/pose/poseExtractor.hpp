@@ -1,44 +1,38 @@
 #ifndef OPENPOSE_POSE_POSE_EXTRACTOR_HPP
 #define OPENPOSE_POSE_POSE_EXTRACTOR_HPP
 
-#include <atomic>
-#include <thread>
 #include <openpose/core/common.hpp>
 #include <openpose/core/enumClasses.hpp>
+#include <openpose/core/keepTopNPeople.hpp>
 #include <openpose/pose/poseParameters.hpp>
+#include <openpose/pose/poseExtractorNet.hpp>
+#include <openpose/tracking/personIdExtractor.hpp>
+#include <openpose/tracking/personTracker.hpp>
 
 namespace op
 {
     class OP_API PoseExtractor
     {
     public:
-        PoseExtractor(const PoseModel poseModel,
-                      const std::vector<HeatMapType>& heatMapTypes = {},
-                      const ScaleMode heatMapScale = ScaleMode::ZeroToOne,
-                      const bool addPartCandidates = false);
+        PoseExtractor(const std::shared_ptr<PoseExtractorNet>& poseExtractorNet,
+                      const std::shared_ptr<KeepTopNPeople>& keepTopNPeople = nullptr,
+                      const std::shared_ptr<PersonIdExtractor>& personIdExtractor = nullptr,
+                      const std::shared_ptr<std::vector<std::shared_ptr<PersonTracker>>>& personTracker = {},
+                      const int numberPeopleMax = -1, const int tracking = -1);
 
         virtual ~PoseExtractor();
 
         void initializationOnThread();
 
-        virtual void forwardPass(const std::vector<Array<float>>& inputNetData, const Point<int>& inputDataSize,
-                                 const std::vector<double>& scaleRatios = {1.f}) = 0;
+        void forwardPass(const std::vector<Array<float>>& inputNetData,
+                         const Point<int>& inputDataSize,
+                         const std::vector<double>& scaleRatios,
+                         const long long frameId = -1ll);
 
-        virtual const float* getCandidatesCpuConstPtr() const = 0;
-
-        virtual const float* getCandidatesGpuConstPtr() const = 0;
-
-        virtual const float* getHeatMapCpuConstPtr() const = 0;
-
-        virtual const float* getHeatMapGpuConstPtr() const = 0;
-
-        virtual std::vector<int> getHeatMapSize() const = 0;
-
+        // PoseExtractorNet functions
         Array<float> getHeatMapsCopy() const;
 
-        std::vector<std::vector<std::array<float,3>>> getCandidatesCopy() const;
-
-        virtual const float* getPoseGpuConstPtr() const = 0;
+        std::vector<std::vector<std::array<float, 3>>> getCandidatesCopy() const;
 
         Array<float> getPoseKeypoints() const;
 
@@ -46,29 +40,35 @@ namespace op
 
         float getScaleNetToOutput() const;
 
-        double get(const PoseProperty property) const;
+        // KeepTopNPeople functions
+        void keepTopPeople(Array<float>& poseKeypoints, const Array<float>& poseScores) const;
 
-        void set(const PoseProperty property, const double value);
+        // PersonIdExtractor functions
+        // Not thread-safe
+        Array<long long> extractIds(const Array<float>& poseKeypoints, const cv::Mat& cvMatInput,
+                                    const unsigned long long imageIndex = 0ull);
 
-        void increase(const PoseProperty property, const double value);
+        // Same than extractIds but thread-safe
+        Array<long long> extractIdsLockThread(const Array<float>& poseKeypoints, const cv::Mat& cvMatInput,
+                                              const unsigned long long imageIndex,
+                                              const long long frameId);
 
-    protected:
-        const PoseModel mPoseModel;
-        Point<int> mNetOutputSize;
-        Array<float> mPoseKeypoints;
-        Array<float> mPoseScores;
-        float mScaleNetToOutput;
+        // PersonTracker functions
+        void track(Array<float>& poseKeypoints, Array<long long>& poseIds,
+                   const cv::Mat& cvMatInput, const unsigned long long imageViewIndex = 0ull);
 
-        void checkThread() const;
-
-        virtual void netInitializationOnThread() = 0;
+        void trackLockThread(Array<float>& poseKeypoints, Array<long long>& poseIds,
+                             const cv::Mat& cvMatInput,
+                             const unsigned long long imageViewIndex,
+                             const long long frameId);
 
     private:
-        const std::vector<HeatMapType> mHeatMapTypes;
-        const ScaleMode mHeatMapScaleMode;
-        const bool mAddPartCandidates;
-        std::array<std::atomic<double>, (int)PoseProperty::Size> mProperties;
-        std::thread::id mThreadId;
+        const int mNumberPeopleMax;
+        const int mTracking;
+        const std::shared_ptr<PoseExtractorNet> spPoseExtractorNet;
+        const std::shared_ptr<KeepTopNPeople> spKeepTopNPeople;
+        const std::shared_ptr<PersonIdExtractor> spPersonIdExtractor;
+        const std::shared_ptr<std::vector<std::shared_ptr<PersonTracker>>> spPersonTrackers;
 
         DELETE_COPY(PoseExtractor);
     };

@@ -26177,7 +26177,7 @@
 									"_parent": {
 										"$ref": "AAAAAAFbHFxkJJWoCjs="
 									},
-									"name": "wPoseExtractor.hpp",
+									"name": "wPoseExtractorNet.hpp",
 									"ownedElements": [
 										{
 											"_type": "UMLGeneralization",
@@ -27489,7 +27489,7 @@
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "wPoseExtractor.hpp",
+											"text": "wPoseExtractorNet.hpp",
 											"horizontalAlignment": 2,
 											"verticalAlignment": 5,
 											"wordWrap": false
