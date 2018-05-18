@@ -356,7 +356,9 @@ public:
         correspondence_path{"./model/correspondences_nofeet.txt"}
     {
         // Load g_total_model (model + data)
+        // ~100 milliseconds
         LoadTotalModelFromObj(g_total_model, obj_path);
+        // ~25 seconds
         LoadTotalDataFromJson(g_total_model, g_total_model_path, pca_path, correspondence_path);
     }
 
@@ -468,7 +470,6 @@ targetJoint[i] *= 1.225*1.418918919*myHeight;
 // std::cout << std::endl;
 
                 // First frame
-const auto start = std::chrono::high_resolution_clock::now();
 const auto start0 = std::chrono::high_resolution_clock::now();
                 if (!mInitialized)
                 {
@@ -660,7 +661,7 @@ std::cout << "\nRender1:    " << duration1 * 1e-6
         spBvhWriter->parseInput(J0_vec, ts, poses);
         spBvhWriter->writeBVH(filename, frame_time);
         // // Debugging
-        // std::cout << J0_vec.rows() << std::endl;
+        // // std::cout << J0_vec.rows() << std::endl;
         // for (const auto& pose : poses)
         // {
         //     // Left arm
