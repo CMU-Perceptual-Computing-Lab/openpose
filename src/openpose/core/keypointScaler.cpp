@@ -69,12 +69,12 @@ namespace op
                 // Only scaling
                 if (scaleAndOffset.x == 0 && scaleAndOffset.y == 0)
                     for (auto& arrayToScale : arrayToScalesToScale)
-                        scaleKeypoints(arrayToScale, scaleAndOffset.width, scaleAndOffset.height);
+                        scaleKeypoints2d(arrayToScale, scaleAndOffset.width, scaleAndOffset.height);
                 // Scaling + offset
                 else
                     for (auto& arrayToScale : arrayToScalesToScale)
-                        scaleKeypoints(arrayToScale, scaleAndOffset.width, scaleAndOffset.height,
-                                       scaleAndOffset.x, scaleAndOffset.y);
+                        scaleKeypoints2d(arrayToScale, scaleAndOffset.width, scaleAndOffset.height,
+                                         scaleAndOffset.x, scaleAndOffset.y);
             }
         }
         catch (const std::exception& e)

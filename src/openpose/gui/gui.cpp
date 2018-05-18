@@ -28,7 +28,7 @@ namespace op
     }
 
     void handleWaitKey(bool& guiPaused, FrameDisplayer& frameDisplayer,
-                       std::vector<std::shared_ptr<PoseExtractor>>& poseExtractors,
+                       std::vector<std::shared_ptr<PoseExtractorNet>>& poseExtractorNets,
                        std::vector<std::shared_ptr<Renderer>>& renderers,
                        std::shared_ptr<std::atomic<bool>>& isRunningSharedPtr,
                        std::shared_ptr<std::pair<std::atomic<bool>, std::atomic<int>>>& videoSeekSharedPtr)
@@ -88,23 +88,23 @@ namespace op
                 // ------------------------- OpenPose-Related ------------------------- //
                 // Modifying thresholds
                 else if (castedKey=='-' || castedKey=='=')
-                    for (auto& poseExtractor : poseExtractors)
-                        poseExtractor->increase(PoseProperty::NMSThreshold, 0.005f * (castedKey=='-' ? -1 : 1));
+                    for (auto& poseExtractorNet : poseExtractorNets)
+                        poseExtractorNet->increase(PoseProperty::NMSThreshold, 0.005f * (castedKey=='-' ? -1 : 1));
                 else if (castedKey=='_' || castedKey=='+')
-                    for (auto& poseExtractor : poseExtractors)
-                        poseExtractor->increase(PoseProperty::ConnectMinSubsetScore,
+                    for (auto& poseExtractorNet : poseExtractorNets)
+                        poseExtractorNet->increase(PoseProperty::ConnectMinSubsetScore,
                                                 0.005f * (castedKey=='_' ? -1 : 1));
                 else if (castedKey=='[' || castedKey==']')
-                    for (auto& poseExtractor : poseExtractors)
-                        poseExtractor->increase(PoseProperty::ConnectInterThreshold,
+                    for (auto& poseExtractorNet : poseExtractorNets)
+                        poseExtractorNet->increase(PoseProperty::ConnectInterThreshold,
                                                 0.005f * (castedKey=='[' ? -1 : 1));
                 else if (castedKey=='{' || castedKey=='}')
-                    for (auto& poseExtractor : poseExtractors)
-                        poseExtractor->increase(PoseProperty::ConnectInterMinAboveThreshold,
+                    for (auto& poseExtractorNet : poseExtractorNets)
+                        poseExtractorNet->increase(PoseProperty::ConnectInterMinAboveThreshold,
                                                 (castedKey=='{' ? -0.1f : 0.1f));
                 else if (castedKey==';' || castedKey=='\'')
-                    for (auto& poseExtractor : poseExtractors)
-                        poseExtractor->increase(PoseProperty::ConnectMinSubsetCnt, (castedKey==';' ? -1 : 1));
+                    for (auto& poseExtractorNet : poseExtractorNets)
+                        poseExtractorNet->increase(PoseProperty::ConnectMinSubsetCnt, (castedKey==';' ? -1 : 1));
                 // ------------------------- Miscellaneous ------------------------- //
                 // Show googly eyes
                 else if (castedKey=='g')
@@ -133,7 +133,8 @@ namespace op
         }
     }
 
-    void handleUserInput(FrameDisplayer& frameDisplayer, std::vector<std::shared_ptr<PoseExtractor>>& poseExtractors,
+    void handleUserInput(FrameDisplayer& frameDisplayer,
+                         std::vector<std::shared_ptr<PoseExtractorNet>>& poseExtractorNets,
                          std::vector<std::shared_ptr<Renderer>>& renderers,
                          std::shared_ptr<std::atomic<bool>>& isRunningSharedPtr,
                          std::shared_ptr<std::pair<std::atomic<bool>, std::atomic<int>>>& videoSeekSharedPtr)
@@ -142,11 +143,13 @@ namespace op
         {
             // The handleUserInput must be always performed, even if no tDatum is detected
             bool guiPaused = false;
-            handleWaitKey(guiPaused, frameDisplayer, poseExtractors, renderers, isRunningSharedPtr, videoSeekSharedPtr);
+            handleWaitKey(guiPaused, frameDisplayer, poseExtractorNets, renderers, isRunningSharedPtr,
+                          videoSeekSharedPtr);
             while (guiPaused)
             {
                 std::this_thread::sleep_for(std::chrono::milliseconds{1});
-                handleWaitKey(guiPaused, frameDisplayer, poseExtractors, renderers, isRunningSharedPtr, videoSeekSharedPtr);
+                handleWaitKey(guiPaused, frameDisplayer, poseExtractorNets, renderers, isRunningSharedPtr,
+                              videoSeekSharedPtr);
             }
         }
         catch (const std::exception& e)
@@ -158,11 +161,11 @@ namespace op
     Gui::Gui(const Point<int>& outputSize, const bool fullScreen,
              const std::shared_ptr<std::atomic<bool>>& isRunningSharedPtr,
              const std::shared_ptr<std::pair<std::atomic<bool>, std::atomic<int>>>& videoSeekSharedPtr,
-             const std::vector<std::shared_ptr<PoseExtractor>>& poseExtractors,
+             const std::vector<std::shared_ptr<PoseExtractorNet>>& poseExtractorNets,
              const std::vector<std::shared_ptr<Renderer>>& renderers) :
         spIsRunning{isRunningSharedPtr},
         mFrameDisplayer{OPEN_POSE_NAME_AND_VERSION, outputSize, fullScreen},
-        mPoseExtractors{poseExtractors},
+        mPoseExtractorNets{poseExtractorNets},
         mRenderers{renderers},
         spVideoSeek{videoSeekSharedPtr}
     {
@@ -215,7 +218,7 @@ namespace op
         try
         {
             // Handle user input
-            handleUserInput(mFrameDisplayer, mPoseExtractors, mRenderers, spIsRunning, spVideoSeek);
+            handleUserInput(mFrameDisplayer, mPoseExtractorNets, mRenderers, spIsRunning, spVideoSeek);
         }
         catch (const std::exception& e)
         {

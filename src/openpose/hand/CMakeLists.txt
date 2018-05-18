@@ -2,8 +2,8 @@ set(SOURCES_OP_HAND
     defineTemplates.cpp
     handDetector.cpp
     handDetectorFromTxt.cpp
-    handExtractor.cpp
     handExtractorCaffe.cpp
+    handExtractorNet.cpp
     handCpuRenderer.cpp
     handGpuRenderer.cpp
     handRenderer.cpp

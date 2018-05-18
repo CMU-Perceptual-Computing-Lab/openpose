@@ -34,11 +34,11 @@ namespace op
                           std::greater<float>());
                 const auto threshold = poseScoresSorted[mNumberPeopleMax-1];
 
-                // Get number people in threshold
-                auto numberPeopleOnThreshold = 0;
+                // Get number people above threshold
+                auto numberPeopleAboveThreshold = 0;
                 for (auto person = 0 ; person < (int)poseFinalScores.getVolume() ; person ++)
-                    if (poseFinalScores[person] == threshold)
-                        numberPeopleOnThreshold++;
+                    if (poseFinalScores[person] > threshold)
+                        numberPeopleAboveThreshold++;
 
                 // Remove extra people - Fille topPeopleArray
                 // assignedPeopleOnThreshold avoids that people with repeated threshold remove higher elements. 
@@ -51,6 +51,7 @@ namespace op
                 const auto personArea = peopleArray.getSize(1) * peopleArray.getSize(2);
                 auto assignedPeopleOnThreshold = 0;
                 auto nextPersonIndex = 0;
+                const auto numberPeopleOnThresholdToBeAdded = mNumberPeopleMax - numberPeopleAboveThreshold;
                 for (auto person = 0 ; person < (int)poseFinalScores.getVolume() ; person++)
                 {
                     if (poseFinalScores[person] >= threshold)
@@ -61,7 +62,7 @@ namespace op
 
                         // Copy person into people array
                         if (poseFinalScores[person] > threshold
-                            || assignedPeopleOnThreshold <= numberPeopleOnThreshold)
+                            || assignedPeopleOnThreshold <= numberPeopleOnThresholdToBeAdded)
                         {
                             const auto peopleArrayIndex = personArea*person;
                             const auto topArrayIndex = personArea*nextPersonIndex++;

@@ -7,9 +7,6 @@
 // core module
 #include <openpose/core/headers.hpp>
 
-// experimental module
-#include <openpose/experimental/headers.hpp>
-
 // face module
 #include <openpose/face/headers.hpp>
 
@@ -32,6 +29,9 @@
 #include <openpose/producer/headers.hpp>
 
 // threading module
+#include <openpose/thread/headers.hpp>
+
+// tracking module
 #include <openpose/thread/headers.hpp>
 
 // utilities module

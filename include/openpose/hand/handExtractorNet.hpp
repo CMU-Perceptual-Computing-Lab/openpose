@@ -11,27 +11,27 @@ namespace op
     /**
      * Hand keypoint extractor class.
      */
-    class OP_API HandExtractor
+    class OP_API HandExtractorNet
     {
     public:
         /**
-         * Constructor of the HandExtractor class.
+         * Constructor of the HandExtractorNet class.
          * @param netInputSize Size at which the cropped image (where the hand is located) is resized.
          * @param netOutputSize Size of the final results. At the moment, it must be equal than netOutputSize.
          * @param numberScales Number of scales to run. The more scales, the slower it will be but possibly also more
          * accurate.
          * @param rangeScales The range between the smaller and bigger scale.
          */
-        explicit HandExtractor(const Point<int>& netInputSize, const Point<int>& netOutputSize,
+        explicit HandExtractorNet(const Point<int>& netInputSize, const Point<int>& netOutputSize,
                                const unsigned short numberScales = 1, const float rangeScales = 0.4f,
                                const std::vector<HeatMapType>& heatMapTypes = {},
                                const ScaleMode heatMapScale = ScaleMode::ZeroToOne);
 
         /**
-         * Virtual destructor of the HandExtractor class.
+         * Virtual destructor of the HandExtractorNet class.
          * Required to allow inheritance.
          */
-        virtual ~HandExtractor();
+        virtual ~HandExtractorNet();
 
         /**
          * This function must be call before using any other function. It must also be called inside the thread in
@@ -80,7 +80,7 @@ namespace op
 
         void checkThread() const;
 
-        DELETE_COPY(HandExtractor);
+        DELETE_COPY(HandExtractorNet);
     };
 }
 

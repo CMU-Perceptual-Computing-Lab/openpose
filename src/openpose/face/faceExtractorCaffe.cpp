@@ -107,7 +107,7 @@ namespace op
                                            const std::string& modelFolder, const int gpuId,
                                            const std::vector<HeatMapType>& heatMapTypes,
                                            const ScaleMode heatMapScale, const bool enableGoogleLogging) :
-        FaceExtractor{netInputSize, netOutputSize, heatMapTypes, heatMapScale}
+        FaceExtractorNet{netInputSize, netOutputSize, heatMapTypes, heatMapScale}
         #ifdef USE_CAFFE
         , upImpl{new ImplFaceExtractorCaffe{modelFolder, gpuId, enableGoogleLogging}}
         #endif

@@ -35,7 +35,7 @@ namespace op
         // Nonlinear Optimization for 3D Triangulation
         struct ReprojectionErrorForTriangulation
         {
-            ReprojectionErrorForTriangulation(double x,double y,double* param)
+            ReprojectionErrorForTriangulation(const double x, const double y, const double* const param)
             {
                 observed_x = x;
                 observed_y = y;
@@ -61,13 +61,13 @@ namespace op
         {
             try
             {
-                T predicted[3];
-                predicted[0] = T(camParam[0])*pt[0]+ T(camParam[1])*pt[1] + T(camParam[2])*pt[2] + T(camParam[3]);
-                predicted[1] = T(camParam[4])*pt[0]+ T(camParam[5])*pt[1] + T(camParam[6])*pt[2] + T(camParam[7]);
-                predicted[2] = T(camParam[8])*pt[0]+ T(camParam[9])*pt[1] + T(camParam[10])*pt[2] + T(camParam[11]);
+                T predicted[3] = {
+                    T(camParam[0])*pt[0] + T(camParam[1])*pt[1] + T(camParam[2])*pt[2] + T(camParam[3]),
+                    T(camParam[4])*pt[0] + T(camParam[5])*pt[1] + T(camParam[6])*pt[2] + T(camParam[7]),
+                    T(camParam[8])*pt[0] + T(camParam[9])*pt[1] + T(camParam[10])*pt[2] + T(camParam[11])};
 
-                predicted[0] = predicted[0]/predicted[2];
-                predicted[1] = predicted[1]/predicted[2];
+                predicted[0] /= predicted[2];
+                predicted[1] /= predicted[2];
 
                 residuals[0] = T(observed_x) - predicted[0];
                 residuals[1] = T(observed_y) - predicted[1];
@@ -93,16 +93,16 @@ namespace op
             {
                 UNUSED(jacobians);
 
-                double predicted[3];
-                predicted[0] = camParam[0]*pt[0][0]+ camParam[1]*pt[0][1] + camParam[2]*pt[0][2] + camParam[3];
-                predicted[1] = camParam[4]*pt[0][0]+ camParam[5]*pt[0][1] + camParam[6]*pt[0][2] + camParam[7];
-                predicted[2] = camParam[8]*pt[0][0]+ camParam[9]*pt[0][1] + camParam[10]*pt[0][2] + camParam[11];
+                double predicted[3] = {
+                    camParam[0]*pt[0][0] + camParam[1]*pt[0][1] + camParam[2]*pt[0][2] + camParam[3],
+                    camParam[4]*pt[0][0] + camParam[5]*pt[0][1] + camParam[6]*pt[0][2] + camParam[7],
+                    camParam[8]*pt[0][0] + camParam[9]*pt[0][1] + camParam[10]*pt[0][2] + camParam[11]};
 
                 predicted[0] /= predicted[2];
                 predicted[1] /= predicted[2];
 
-                //residuals[0] = predicted[0] - observed_x;
-                //residuals[1] = predicted[1] - observed_y;
+                // residuals[0] = predicted[0] - observed_x;
+                // residuals[1] = predicted[1] - observed_y;
 
                 residuals[0] = std::sqrt(std::pow(predicted[0] - observed_x,2) + std::pow(predicted[1] - observed_y,2));
                 // log("Residuals:");
@@ -170,26 +170,25 @@ namespace op
             triangulate(reconstructedPoint, cameraMatrices, pointsOnEachCamera);
 
             #ifdef WITH_CERES
-                double paramX[3];
-                paramX[0] = reconstructedPoint.at<double>(0,0);
-                paramX[1] = reconstructedPoint.at<double>(1,0);
-                paramX[2] = reconstructedPoint.at<double>(2,0);
+                // Slow equivalent: double paramX[3]; paramX[i] = reconstructedPoint.at<double>(i);
+                double* paramX = (double*)reconstructedPoint.data;
                 ceres::Problem problem;
                 for (auto i = 0u; i < cameraMatrices.size(); ++i)
                 {
-                    double camParam[12];
-                    memcpy(camParam, cameraMatrices[i].data, sizeof(double)*12);
+                    // Slow equivalent: double camParam[12]; memcpy(camParam, cameraMatrices[i].data, sizeof(double)*12);
+                    const double* const camParam = (double*)cameraMatrices[i].data;
                     // Each Residual block takes a point and a camera as input and outputs a 2
                     // dimensional residual. Internally, the cost function stores the observed
                     // image location and compares the reprojection against the observation.
                     ceres::CostFunction* cost_function =
                         new ceres::AutoDiffCostFunction<ReprojectionErrorForTriangulation, 2, 3>(
-                        new ReprojectionErrorForTriangulation(pointsOnEachCamera[i].x, pointsOnEachCamera[i].y, camParam));
+                            new ReprojectionErrorForTriangulation(
+                                pointsOnEachCamera[i].x, pointsOnEachCamera[i].y, camParam));
                     // Add to problem
                     problem.AddResidualBlock(cost_function,
                         //NULL, //squared loss
                         new ceres::HuberLoss(2.0),
-                        paramX);
+                        paramX); // paramX[0,1,2]
                 }
 
                 ceres::Solver::Options options;
@@ -202,14 +201,10 @@ namespace op
                 // if (summary.initial_cost > summary.final_cost)
                 //     std::cout << summary.FullReport() << "\n";
 
-                reconstructedPoint.at<double>(0,0) = paramX[0];
-                reconstructedPoint.at<double>(1,0) = paramX[1];
-                reconstructedPoint.at<double>(2,0) = paramX[2];
-                reconstructedPoint.at<double>(3,0) = 1;
-
                 // const auto reprojectionErrorDecrease = std::sqrt((summary.initial_cost - summary.final_cost)/double(cameraMatrices.size()));
                 // return reprojectionErrorDecrease;
             #endif
+            // assert(reconstructedPoint.at<double>(3) == 1.);
 
             return calcReprojectionError(reconstructedPoint, cameraMatrices, pointsOnEachCamera);
         }

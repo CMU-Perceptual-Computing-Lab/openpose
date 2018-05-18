@@ -36,14 +36,29 @@ You might select multiple topics, delete the rest:
 
 
 ### Your System Configuration
-**Operating system** (`lsb_release -a` in Ubuntu):
-**Installation mode**: CMake, sh script, manual Makefile installation, ... (Ubuntu); VS2015, VS2017, CMake, ... (Windows); ...?
-**CUDA version** (`cat /usr/local/cuda/version.txt` in most cases):
-**cuDNN version**:
-**CMake version** (`cmake --version` in Ubuntu):
-**Release or Debug mode**? (by defualt: release):
-**3-D Reconstruction module added**? (by default: no):
-**GPU model** (`nvidia-smi` in Ubuntu):
-**Caffe version**: Default from OpenPose, custom version, ...?
-**OpenCV version**: pre-compiled `apt-get install libopencv-dev` (only Ubuntu); OpenPose default (only Windows); compiled from source? If so, 2.4.9, 2.4.12, 3.1, 3.2?; ...?
-Compiler (`gcc --version` in Ubuntu):
+1. **General configuration**:
+    - **Installation mode**: CMake, sh script, manual Makefile installation, ... (Ubuntu); CMake, ... (Windows); ...?
+    - **Operating system** (`lsb_release -a` in Ubuntu):
+    - **Release or Debug mode**? (by defualt: release):
+    - Compiler (`gcc --version` in Ubuntu or VS version in Windows): 5.4.0, ... (Ubuntu); VS2015 Enterprise Update 3, VS2017 community, ... (Windows); ...?
+
+2. **Non-default settings**:
+    - **3-D Reconstruction module added**? (by default: no):
+    - Any other custom CMake configuration with respect to the default version? (by default: no):
+
+3. **3rd-party software**:
+    - **Caffe version**: Default from OpenPose, custom version, ...?
+    - **CMake version** (`cmake --version` in Ubuntu):
+    - **OpenCV version**: pre-compiled `apt-get install libopencv-dev` (only Ubuntu); OpenPose default (only Windows); compiled from source? If so, 2.4.9, 2.4.12, 3.1, 3.2?; ...?
+
+4. If **GPU mode** issue:
+    - **CUDA version** (`cat /usr/local/cuda/version.txt` in most cases):
+    - **cuDNN version**:
+    - **GPU model** (`nvidia-smi` in Ubuntu):
+
+5. If **CPU-only mode** issue:
+    - **CPU model**:
+    - Total **RAM memory** available:
+
+6. If **speed performance** issue:
+    - Report OpenPose timing speed based on [this link](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/installation.md#profiling-speed).
