@@ -442,7 +442,7 @@ public:
 // HACK --> FIX!!!!!
 // mm --> cm
 for (auto i = 0 ; i < 186 ; i++)
-targetJoint[i] *= 0.1;
+targetJoint[i] *= 1e2;
 // Invert z-axis
 for (auto i = 0 ; i < 186/3 ; i++)
 targetJoint[3*i+2] *= -1;
@@ -592,8 +592,8 @@ const auto duration1 = std::chrono::duration_cast<std::chrono::nanoseconds>(std:
 const auto start2 = std::chrono::high_resolution_clock::now();
                 // ~20 ms
                 // BVH generation
-                ts.push_back(frame_params.m_adam_t); // BVH generation
-                poses.push_back(frame_params.m_adam_pose); // BVH generation
+                ts.push_back(frame_params.m_adam_t); // BVH generation, Eigen::Vector3d(3, 1)
+                poses.push_back(frame_params.m_adam_pose); // BVH generation, Eigen::Matrix<double, 62, 3, Eigen::RowMajor>
                 // OpenGL Display
                 g_vis_data.targetJoint = targetJoint.data();
 g_vis_data.targetJoint = nullptr;
