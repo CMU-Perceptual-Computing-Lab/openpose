@@ -16,7 +16,7 @@ void SetSolverOptions(ceres::Solver::Options *options) {
 		&options->linear_solver_type));
 	CHECK(StringToPreconditionerType("jacobi",
 		&options->preconditioner_type));
-	options->num_linear_solver_threads = 4;
+	// options->num_linear_solver_threads = 4;
 	options->max_num_iterations = 15;
 	options->num_threads = 10;
 	options->dynamic_sparsity = true;
@@ -211,7 +211,7 @@ void Adam_FitTotalBodyCeres(TotalModel &adam,
 	SetSolverOptions(&options_init);
 	options_init.max_num_iterations = 20;
 	options_init.use_nonmonotonic_steps = false;
-	options_init.num_linear_solver_threads = 10;
+	// options_init.num_linear_solver_threads = 10;
 	options_init.minimizer_progress_to_stdout = true;
 	adam_cost->toggle_activate(false, false);
 	adam_cost->toggle_rigid_body(true);
@@ -256,7 +256,7 @@ void Adam_FitTotalBodyCeres2d(TotalModel &adam,
 	options_init.function_tolerance = 1e-4;
 	options_init.max_num_iterations = 20;
 	options_init.use_nonmonotonic_steps = false;
-	options_init.num_linear_solver_threads = 10;
+	// options_init.num_linear_solver_threads = 10;
 	options_init.minimizer_progress_to_stdout = true;
 	cost_body_keypoints_init->joint_only = true;
 	// Pure Translation, fit body only!
@@ -352,7 +352,7 @@ void Adam_FitTotalBodyCeres2d(TotalModel &adam,
 	// problem.SetParameterBlockConstant(frame_param.m_adam_facecoeffs_exp.data());
 	options.max_num_iterations = 10;
 	options.use_nonmonotonic_steps = false;
-	options.num_linear_solver_threads = 10;
+	// options.num_linear_solver_threads = 10;
 	options.minimizer_progress_to_stdout = true;
 	cost_body_keypoints->joint_only = false;
 	ceres::Solve(options, &problem, &summary);
@@ -389,7 +389,7 @@ void Adam_FitTotalBodyCeres3d2d(TotalModel &adam,
 	options_init.function_tolerance = 1e-4;
 	options_init.max_num_iterations = 20;
 	options_init.use_nonmonotonic_steps = false;
-	options_init.num_linear_solver_threads = 10;
+	// options_init.num_linear_solver_threads = 10;
 	options_init.minimizer_progress_to_stdout = true;
 	cost_body_keypoints_init->joint_only = true;
 	// Pure Translation, fit body only!
@@ -486,7 +486,7 @@ void Adam_FitTotalBodyCeres3d2d(TotalModel &adam,
 	// problem.SetParameterBlockConstant(frame_param.m_adam_facecoeffs_exp.data());
 	options.max_num_iterations = 10;
 	options.use_nonmonotonic_steps = false;
-	options.num_linear_solver_threads = 10;
+	// options.num_linear_solver_threads = 10;
 	options.minimizer_progress_to_stdout = true;
 	cost_body_keypoints->joint_only = false;
 	cost_body_keypoints->weight2d = weight2d;
@@ -541,7 +541,7 @@ void Adam_FastFit_Initialize(TotalModel &adam,
 	SetSolverOptions(&options_init);
 	options_init.max_num_iterations = 20;
 	options_init.use_nonmonotonic_steps = false;
-	options_init.num_linear_solver_threads = 10;
+	// options_init.num_linear_solver_threads = 10;
 	options_init.minimizer_progress_to_stdout = true;
 	adam_cost->toggle_activate(false, false);
 	adam_cost->toggle_rigid_body(true);
@@ -611,7 +611,7 @@ void Adam_FastFit(TotalModel &adam,
 	SetSolverOptions(&options);
 	options.max_num_iterations = 20;
 	options.use_nonmonotonic_steps = false;
-	options.num_linear_solver_threads = 10;
+	// options.num_linear_solver_threads = 10;
 	options.minimizer_progress_to_stdout = true;
 	ceres::Solver::Summary summary;
 
@@ -676,7 +676,7 @@ const auto start = std::chrono::high_resolution_clock::now();
 		init_options.function_tolerance = 1e-2;
 		init_options.max_num_iterations = 20;
 		init_options.use_nonmonotonic_steps = true;
-		init_options.num_linear_solver_threads = 10;
+		// init_options.num_linear_solver_threads = 10;
 		init_options.minimizer_progress_to_stdout = true;
 		adam_cost->toggle_activate(false, false);
 		adam_cost->toggle_rigid_body(true);
@@ -737,7 +737,7 @@ std::cout << "3D solve time: " << duration_solve * 1e-6 << "\n";
 	options.function_tolerance = 1e-4;
 	options.max_num_iterations = 30;
 	options.use_nonmonotonic_steps = true;
-	options.num_linear_solver_threads = 10;
+	// options.num_linear_solver_threads = 10;
 	options.minimizer_progress_to_stdout = true;
 	adam_cost->toggle_activate(false, false);
 	adam_cost->toggle_rigid_body(true);

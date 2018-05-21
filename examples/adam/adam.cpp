@@ -18,6 +18,7 @@
 
 // C++ std library dependencies
 #include <chrono> // `std::chrono::` functions and classes, e.g. std::chrono::milliseconds
+#include <iostream>
 #include <thread> // std::this_thread
 // Other 3rdparty dependencies
 // GFlags: DEFINE_bool, _int32, _int64, _uint64, _double, _string
@@ -28,6 +29,7 @@
 #endif
 // OpenPose dependencies
 #include <openpose/headers.hpp>
+#include <asio.hpp>
 
 // See all the available parameter options withe the `--help` flag. E.g. `build/examples/openpose/openpose.bin --help`
 // Note: This command will show you flags for other unnecessary 3rdparty files. Check only the flags for the OpenPose
@@ -217,6 +219,37 @@ DEFINE_string(write_keypoint_json,      "",             "(Deprecated, use `write
                                                         " compatible with any OpenCV version.");
 DEFINE_string(write_bvh,                "",             "E.g.: /media/posefs3b/Users/gines/cvpr2018/temp.bvh");
 DEFINE_string(write_adam,               "",             "E.g.: /media/posefs3b/Users/gines/cvpr2018/adam.avi");
+// Unity - UDP communication
+DEFINE_string(udp_host,                 "127.0.0.1",    "IP for UDP communication.");
+DEFINE_string(udp_port,                 "8051",         "Port number for UDP communication.");
+
+class UDPClient
+{
+public:
+    UDPClient(asio::io_service& io_service, const std::string& host, const std::string& port)
+        : io_service_(io_service), socket_(io_service, asio::ip::udp::endpoint(asio::ip::udp::v4(), 0))
+    {
+        asio::ip::udp::resolver resolver(io_service_);
+        asio::ip::udp::resolver::query query(asio::ip::udp::v4(), host, port);
+        asio::ip::udp::resolver::iterator iter = resolver.resolve(query);
+        endpoint_ = *iter;
+    }
+
+    ~UDPClient()
+    {
+        socket_.close();
+    }
+
+    void send(const std::string& msg) {
+        socket_.send_to(asio::buffer(msg, msg.size()), endpoint_);
+        //std::cout << "sent data: " << msg << std::endl;
+    }
+
+private:
+    asio::io_service& io_service_;
+    asio::ip::udp::socket socket_;
+    asio::ip::udp::endpoint endpoint_;
+};
 
 #include <BVHWriter.h>
 #include <FitToBody.h>
@@ -523,7 +556,8 @@ class WUserOutput : public op::WorkerConsumer<std::shared_ptr<std::vector<UserDa
 public:
     // Purely processing
     WUserOutput() :
-        count_frame(0)
+        count_frame(0),
+        mUdpClient(mService, FLAGS_udp_host, FLAGS_udp_port)
     {
         // Load g_total_model (model + data)
         const bool unityCompatible = true;
@@ -646,6 +680,25 @@ std::cout << "\nRender1:    " << duration1 * 1e-6
                 }
                 if (key == 27)
                     this->stop();
+
+                // Add ASIO thing
+                const auto& totalPosition = frame_params.m_adam_t; // Eigen::Vector3d(3, 1)
+                const auto& jointAngles = frame_params.m_adam_pose; // Eigen::Matrix<double, 62, 3, Eigen::RowMajor>
+
+                const std::string prefix = "AnimData:";
+                std::string totalPositionString = "\"totalPosition\":" + vectorToJson(totalPosition(0), totalPosition(1), totalPosition(2));
+                std::string jointAnglesString = "\"jointAngles\":[";
+                for (int i = 0; i < 62; i++){
+                    jointAnglesString += vectorToJson(jointAngles(i, 0), jointAngles(i, 1), jointAngles(i, 2));
+                    if (i != 62 - 1){
+                        jointAnglesString += ",";
+                    }
+                }
+                jointAnglesString += "]";
+
+                std::string data = prefix + "{" + totalPositionString + "," + jointAnglesString + "}";
+
+                mUdpClient.send(data);
             }
         }
         catch (const std::exception& e)
@@ -671,6 +724,15 @@ std::cout << "\nRender1:    " << duration1 * 1e-6
         // }
     }
 
+    std::string vectorToJson(float x, float y, float z)
+    {
+        std::string res = (std::string)"{" + 
+            "\"x\":" + std::to_string(x) + "," + 
+            "\"y\":" + std::to_string(y) + "," + 
+            "\"z\":" + std::to_string(z) + "}";
+        return res;
+    }
+
 private:
     // Write BVH file
     std::shared_ptr<BVHWriter> spBvhWriter;
@@ -683,6 +745,10 @@ private:
     std::unique_ptr<GLubyte[]> upReadBuffer;
 
     std::shared_ptr<op::VideoSaver> videoSaver;
+
+    // Unity - UDP communication
+    asio::io_service mService;
+    UDPClient mUdpClient;
 };
 
 int openPoseDemo()

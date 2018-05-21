@@ -212,6 +212,9 @@ option(DOWNLOAD_MPI_MODEL "Download MPI model." OFF)
 option(DOWNLOAD_HAND_MODEL "Download hand model." ON)
 option(DOWNLOAD_FACE_MODEL "Download face model." ON)
 
+# Asio
+option(USE_ASIO "Include Asio header-only library." OFF)
+
 # More options
 option(BUILD_EXAMPLES "Build OpenPose examples." ON)
 option(BUILD_DOCS "Build OpenPose documentation." OFF)
@@ -592,6 +595,12 @@ include_directories(
   ${GFLAGS_INCLUDE_DIR}
   ${GLOG_INCLUDE_DIR}
   ${OpenCV_INCLUDE_DIRS})
+
+if (USE_ASIO)
+  include_directories(${CMAKE_SOURCE_DIR}/3rdparty/asio/include/)
+  # OpenPose flags
+  add_definitions(-DASIO_STANDALONE)
+endif (USE_ASIO)
 
 if(USE_MKL)
  include_directories(
