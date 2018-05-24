@@ -19,6 +19,8 @@ namespace op
 
         ~SpinnakerWrapper();
 
+        void setCameraIndex(const int cameraIndex);
+
         std::vector<cv::Mat> getRawFrames();
 
         std::vector<cv::Mat> getCameraMatrices() const;

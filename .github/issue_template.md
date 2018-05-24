@@ -57,8 +57,11 @@ You might select multiple topics, delete the rest:
     - **GPU model** (`nvidia-smi` in Ubuntu):
 
 5. If **CPU-only mode** issue:
-    - **CPU model**:
+    - **CPU brand & model**:
     - Total **RAM memory** available:
 
-6. If **speed performance** issue:
+6. If **Windows** system:
+    - Portable demo or compiled library?
+
+7. If **speed performance** issue:
     - Report OpenPose timing speed based on [this link](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/installation.md#profiling-speed).

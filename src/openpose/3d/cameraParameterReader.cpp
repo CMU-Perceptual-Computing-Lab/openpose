@@ -65,6 +65,35 @@ namespace op
     {
     }
 
+    CameraParameterReader::CameraParameterReader(const std::string& serialNumber,
+                                                 const cv::Mat& cameraIntrinsics,
+                                                 const cv::Mat& cameraDistortion,
+                                                 const cv::Mat& cameraExtrinsics)
+    {
+        try
+        {
+            // Security checks
+            if (serialNumber.empty() || cameraIntrinsics.empty() || cameraDistortion.empty())
+                error("Camera intrinsics, distortion, and/or serialNumber cannot be empty.",
+                      __LINE__, __FUNCTION__, __FILE__);
+            // Add new matrices
+            mSerialNumbers.emplace_back(serialNumber);
+            mCameraIntrinsics.emplace_back(cameraIntrinsics.clone());
+            mCameraDistortions.emplace_back(cameraDistortion.clone());
+            // Add extrinsics if not empty
+            if (!cameraExtrinsics.empty())
+                mCameraExtrinsics.emplace_back(cameraExtrinsics.clone());
+            // Otherwise, add cv::eye
+            else
+                mCameraExtrinsics.emplace_back(cv::Mat::eye(3, 4, cameraIntrinsics.type()));
+            mCameraMatrices.emplace_back(mCameraIntrinsics.back() * mCameraExtrinsics.back());
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
     void CameraParameterReader::readParameters(const std::string& cameraParameterPath,
                                                const std::vector<std::string>& serialNumbers)
     {
@@ -80,42 +109,13 @@ namespace op
                 "CameraMatrix", "Intrinsics", "Distortion"
             };
 
-            // // Temporary code to save the parameters in disk
-            // // #cameras
-            // mNumberCameras = INTRINSICS.size();
-            // // Camera matrices
-            // mCameraMatrices.resize(mNumberCameras);
-            // for (auto i = 0ull ; i < mNumberCameras ; i++)
-            //     mCameraMatrices[i] = INTRINSICS.at(i) * M.at(i);
-            //     // Not working on Windows
-            //     // mCameraMatrices[i] = M_EACH_CAMERA.at(i);
-            // // Camera intrinsics
-            // mCameraIntrinsics.resize(mNumberCameras);
-            // for (auto i = 0ull ; i < mNumberCameras ; i++)
-            //     mCameraIntrinsics[i] = INTRINSICS.at(i);
-            // // Camera extrinsics
-            // mCameraDistortions.resize(mNumberCameras);
-            // for (auto i = 0ull ; i < mNumberCameras ; i++)
-            //     mCameraDistortions[i] = DISTORTIONS.at(i);
-
-            // // Saving
-            // for (auto i = 0ull ; i < mNumberCameras ; i++)
-            // {
-            //     std::vector<cv::Mat> cameraParameters;
-            //     cameraParameters.emplace_back(M.at(i));
-            //     cameraParameters.emplace_back(mCameraIntrinsics.at(i));
-            //     cameraParameters.emplace_back(mCameraDistortions.at(i));
-            //     saveData(cameraParameters, cvMatNames, fileNameNoExtension + mSerialNumbers.at(i), dataFormat);
-            // }
-
             // Load parameters
-            mNumberCameras = serialNumbers.size();
             mCameraMatrices.clear();
             mCameraExtrinsics.clear();
             mCameraIntrinsics.clear();
             mCameraDistortions.clear();
             // log("Camera matrices:");
-            for (auto i = 0ull ; i < mNumberCameras ; i++)
+            for (auto i = 0ull ; i < serialNumbers.size() ; i++)
             {
                 const auto parameterPath = fileNameNoExtension + mSerialNumbers.at(i);
                 const auto cameraParameters = loadData(cvMatNames, parameterPath, dataFormat);
@@ -165,11 +165,41 @@ namespace op
         }
     }
 
+    void CameraParameterReader::writeParameters(const std::string& cameraParameterPath) const
+    {
+        try
+        {
+            // Security check
+            if (mSerialNumbers.size() != mCameraIntrinsics.size() || mSerialNumbers.size() != mCameraDistortions.size()
+                || (mSerialNumbers.size() != mCameraIntrinsics.size() && !mCameraExtrinsics.empty()))
+                error("Arguments must have same size (mSerialNumbers, mCameraIntrinsics, mCameraDistortions,"
+                      " and mCameraExtrinsics).", __LINE__, __FUNCTION__, __FILE__);
+            // Commong saving/loading
+            const auto dataFormat = DataFormat::Xml;
+            const std::vector<std::string> cvMatNames {
+                "CameraMatrix", "Intrinsics", "Distortion"
+            };
+            // Saving
+            for (auto i = 0ull ; i < mSerialNumbers.size() ; i++)
+            {
+                std::vector<cv::Mat> cameraParameters;
+                cameraParameters.emplace_back(mCameraExtrinsics[i]);
+                cameraParameters.emplace_back(mCameraIntrinsics[i]);
+                cameraParameters.emplace_back(mCameraDistortions[i]);
+                saveData(cameraParameters, cvMatNames, cameraParameterPath + mSerialNumbers[i], dataFormat);
+            }
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
     unsigned long long CameraParameterReader::getNumberCameras() const
     {
         try
         {
-            return mNumberCameras;
+            return mSerialNumbers.size();
         }
         catch (const std::exception& e)
         {

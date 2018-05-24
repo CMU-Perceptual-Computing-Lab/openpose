@@ -134,7 +134,7 @@ namespace op
                 }
             }
             else
-                error("Profiler::printAveragedTimeMsOnIterationX called with a non-existing key.",
+                error("Profiler::printAveragedTimeMsEveryXIterations called with a non-existing key.",
                       __LINE__, __FUNCTION__, __FILE__);
         #else
             UNUSED(key);

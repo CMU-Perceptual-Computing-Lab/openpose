@@ -186,7 +186,7 @@ ifeq ($(USE_LMDB), 1)
 	LIBRARIES += lmdb
 endif
 ifeq ($(USE_OPENCV), 1)
-	LIBRARIES += opencv_core opencv_highgui opencv_imgproc opencv_objdetect opencv_video
+	LIBRARIES += opencv_core opencv_highgui opencv_imgproc opencv_objdetect opencv_video opencv_calib3d
 
 	ifeq ($(OPENCV_VERSION), 3)
 		LIBRARIES += opencv_imgcodecs opencv_videoio opencv_cudawarping

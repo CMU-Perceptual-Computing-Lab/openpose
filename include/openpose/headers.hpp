@@ -4,6 +4,9 @@
 // 3d module
 #include <openpose/3d/headers.hpp>
 
+// calibration module
+#include <openpose/calibration/headers.hpp>
+
 // core module
 #include <openpose/core/headers.hpp>
 

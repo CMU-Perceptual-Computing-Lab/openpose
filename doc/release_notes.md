@@ -213,14 +213,18 @@ OpenPose Library - Release Notes
 
 ## Current version - future OpenPose 1.3.1
 1. Main improvements:
-    1. Flir cameras: Added software trigger and a dedicated thread to keep reading images to remove latency (analogously to webcamReader).
-    2. 3-D reconstruction: Added non-linear minimization to further improve 3-D triangulation accuracy by ~5% (Ubuntu only).
-    3. CMake: All libraries as single variable (simpler to add/remove libraries).
-    4. Datum includes extrinsic and intrinsic camera parameters.
-    5. Function `scaleKeypoints(Array<float>& keypoints, const float scale)` also accepts 3D keypoints.
-    6. 3D keypoints and camera parameters in meters (instead of millimeters) in order to reduce numerical errors.
-    7. New `PoseExtractor` class to contain future ID and tracking algorithms as well as the current OpenPose keypoint detection algorithm.
-    8. Added initial alpha versions of the `tracking` and `identification` modules (for now disabled but available in the source code), including `PersonIdExtractor` and `PersonTracker`. `PersonIdExtractor` includes greedy matrix OP-LK matching.
+    1. New calibration module: Intrinsic and extrinsic camera calibration toolbox based on OpenCV.
+    2. Flir cameras: Added software trigger and a dedicated thread to keep reading images so latency is removed and runtime is faster (analogously to webcamReader).
+    3. Flir cameras: Undistortion of the images is x3.5 faster per camera, i.e., x3.5 Flir camera producer reading (it was multi-threaded).
+    4. Flir cameras: Added flag `flir_camera_index` to allow running on all the cameras at once, or only on 1 camera at the time.
+    5. 3-D reconstruction: Added non-linear minimization to further improve 3-D triangulation accuracy by ~5% (Ubuntu only).
+    6. CMake: All libraries as single variable (simpler to add/remove libraries).
+    7. Datum includes extrinsic and intrinsic camera parameters.
+    8. Function `scaleKeypoints(Array<float>& keypoints, const float scale)` also accepts 3D keypoints.
+    9. 3D keypoints and camera parameters in meters (instead of millimeters) in order to reduce numerical errors.
+    10. New `PoseExtractor` class to contain future ID and tracking algorithms as well as the current OpenPose keypoint detection algorithm.
+    11. Added initial alpha versions of the `tracking` and `identification` modules (for now disabled but available in the source code), including `PersonIdExtractor` and `PersonTracker`. `PersonIdExtractor` includes greedy matrix OP-LK matching.
+    12. Added catchs to all demos for higher debug information.
 2. Functions or parameters renamed:
     1. Removed scale parameter from hand and face rectangle extractor (causing wrong results if custom `--output_resolution`).
     2. Functions `scaleKeypoints`, other than `scaleKeypoints(Array<float>& keypoints, const float scale)`, renamed as `scaleKeypoints2d`.

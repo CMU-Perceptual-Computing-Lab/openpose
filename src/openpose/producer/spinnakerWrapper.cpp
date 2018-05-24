@@ -1,7 +1,7 @@
 #ifdef WITH_FLIR_CAMERA
     #include <thread>
 #endif
-#include <opencv2/imgproc/imgproc.hpp> // cv::undistort
+#include <opencv2/imgproc/imgproc.hpp> // cv::undistort, cv::initUndistortRectifyMap
 #ifdef WITH_FLIR_CAMERA
     #include <Spinnaker.h>
 #endif
@@ -287,6 +287,11 @@ namespace op
             Spinnaker::CameraList mCameraList;
             Spinnaker::SystemPtr mSystemPtr;
             std::vector<cv::Mat> mCvMats;
+            // Camera index
+            int mCameraIndex;
+            // Undistortion
+            std::vector<cv::Mat> mRemoveDistortionMaps1;
+            std::vector<cv::Mat> mRemoveDistortionMaps2;
             // Thread
             bool mThreadOpened;
             std::vector<Spinnaker::ImagePtr> mBuffer;
@@ -295,23 +300,62 @@ namespace op
             std::thread mThread;
 
             ImplSpinnakerWrapper() :
-                mInitialized{false}
+                mInitialized{false},
+                mCameraIndex{-1}
             {
             }
 
             void undistortImage(const int i, const Spinnaker::ImagePtr& imagePtr,
                                 const cv::Mat& cameraIntrinsics, const cv::Mat& cameraDistorsions)
             {
-                // Original image --> BGR uchar image
-                const auto imagePtrColor = spinnakerImagePtrToColor(imagePtr);
-                // Spinnaker to cv::Mat
-                const auto cvMatDistorted = spinnakerWrapperToCvMat(imagePtrColor);
-                // const auto cvMatDistorted = spinnakerWrapperToCvMat(imagePtr);
-                // Baseline
-                // mCvMats[i] = cvMatDistorted.clone();
-                // Undistort
-                // http://docs.opencv.org/2.4/modules/imgproc/doc/geometric_transformations.html#undistort
-                cv::undistort(cvMatDistorted, mCvMats[i], cameraIntrinsics, cameraDistorsions);
+                try
+                {
+                    // Original image --> BGR uchar image
+                    const auto imagePtrColor = spinnakerImagePtrToColor(imagePtr);
+                    // Spinnaker to cv::Mat
+                    const auto cvMatDistorted = spinnakerWrapperToCvMat(imagePtrColor);
+                    // const auto cvMatDistorted = spinnakerWrapperToCvMat(imagePtr);
+                    // Baseline
+                    // mCvMats[i] = cvMatDistorted.clone();
+                    // Undistort
+                    // // Option a - 80 ms / 3 images
+                    // // http://docs.opencv.org/2.4/modules/imgproc/doc/geometric_transformations.html#undistort
+                    // cv::undistort(cvMatDistorted, mCvMats[i], cameraIntrinsics, cameraDistorsions);
+                    // // In OpenCV 2.4, cv::undistort is exactly equal than cv::initUndistortRectifyMap
+                    // (with CV_16SC2) + cv::remap (with LINEAR). I.e., log(cv::norm(cvMatMethod1-cvMatMethod2)) = 0.
+                    // Option b - 15 ms / 3 images (LINEAR) or 25 ms (CUBIC)
+                    // Distorsion removal - not required and more expensive (applied to the whole image instead of
+                    // only to our interest points)
+                    if (mRemoveDistortionMaps1[i].empty() || mRemoveDistortionMaps2[i].empty())
+                    {
+                        const auto imageSize = cvMatDistorted.size();
+                        cv::initUndistortRectifyMap(cameraIntrinsics,
+                                                    cameraDistorsions,
+                                                    cv::Mat(),
+                                                    // cameraIntrinsics instead of cv::getOptimalNewCameraMatrix to
+                                                    // avoid black borders
+                                                    cameraIntrinsics,
+                                                    // cv::getOptimalNewCameraMatrix(cameraIntrinsics,
+                                                    //                               cameraDistorsions,
+                                                    //                               imageSize, 1,
+                                                    //                               imageSize, 0),
+                                                    imageSize,
+                                                    CV_16SC2, // Faster, less memory
+                                                    // CV_32FC1, // More accurate
+                                                    mRemoveDistortionMaps1[i],
+                                                    mRemoveDistortionMaps2[i]);
+                    }
+                    cv::remap(cvMatDistorted, mCvMats[i],
+                              mRemoveDistortionMaps1[i], mRemoveDistortionMaps2[i],
+                              // cv::INTER_NEAREST);
+                              cv::INTER_LINEAR);
+                              // cv::INTER_CUBIC);
+                              // cv::INTER_LANCZOS4); // Smoother, but we do not need this quality & its >>expensive
+                }
+                catch (const std::exception& e)
+                {
+                    error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+                }
             }
 
             void bufferingThread()
@@ -370,7 +414,8 @@ namespace op
 
             // This function acquires and displays images from each device.
             std::vector<cv::Mat> acquireImages(const std::vector<cv::Mat>& cameraIntrinsics,
-                                               const std::vector<cv::Mat>& cameraDistorsions)
+                                               const std::vector<cv::Mat>& cameraDistorsions,
+                                               const int cameraIndex = -1)
             {
                 try
                 {
@@ -426,6 +471,7 @@ namespace op
                             break;
                         }
                     }
+                    mCvMats.clear();
                     // Convert to cv::Mat
                     if (imagesExtracted)
                     {
@@ -433,25 +479,54 @@ namespace op
                         // for (auto& imagePtr : imagePtrs)
                         //     imagePtr = spinnakerImagePtrToColor(imagePtr);
 
+                        // Init anti-distortion matrices first time
+                        if (mRemoveDistortionMaps1.empty())
+                            mRemoveDistortionMaps1.resize(imagePtrs.size());
+                        if (mRemoveDistortionMaps2.empty())
+                            mRemoveDistortionMaps2.resize(imagePtrs.size());
+
                         // Multi-thread undistort (slowest function in the class)
-                        //     ~35msec (3 cameras + multi-thread)
-                        //     ~59msec (2 cameras + single-thread)
-                        //     ~75msec (3 cameras + single-thread)
-                        std::vector<std::thread> threads(imagePtrs.size()-1);
-                        mCvMats.clear();
+                        //     ~7.7msec (3 cameras + multi-thread + (initUndistortRectifyMap + remap) + LINEAR)
+                        //     ~23.2msec (3 cameras + multi-thread + (initUndistortRectifyMap + remap) + CUBIC)
+                        //     ~35msec (3 cameras + multi-thread + undistort)
+                        //     ~59msec (2 cameras + single-thread + undistort)
+                        //     ~75msec (3 cameras + single-thread + undistort)
                         mCvMats.resize(imagePtrs.size());
-                        for (auto i = 0u; i < imagePtrs.size()-1; i++)
-                            // Multi-thread option
-                            threads.at(i) = std::thread{&ImplSpinnakerWrapper::undistortImage, this, i, imagePtrs.at(i),
-                                                        cameraIntrinsics.at(i), cameraDistorsions.at(i)};
-                            // // Single-thread option
-                            // undistortImage(i, imagePtrs.at(i), cameraIntrinsics.at(i), cameraDistorsions.at(i));
-                        undistortImage(imagePtrs.size()-1, imagePtrs.back(), cameraIntrinsics.back(),
-                                       cameraDistorsions.back());
-                        // Close threads
-                        for (auto& thread : threads)
-                            if (thread.joinable())
-                                thread.join();
+                        // All cameras
+                        if (cameraIndex < 0)
+                        {
+                            std::vector<std::thread> threads(imagePtrs.size()-1);
+                            for (auto i = 0u; i < imagePtrs.size()-1; i++)
+                            {
+                                // Multi-thread option
+                                threads.at(i) = std::thread{&ImplSpinnakerWrapper::undistortImage, this, i,
+                                                            imagePtrs.at(i), cameraIntrinsics.at(i),
+                                                            cameraDistorsions.at(i)};
+                                // // Single-thread option
+                                // undistortImage(i, imagePtrs.at(i), cameraIntrinsics.at(i), cameraDistorsions.at(i));
+                            }
+                            undistortImage(imagePtrs.size()-1, imagePtrs.back(), cameraIntrinsics.back(),
+                                           cameraDistorsions.back());
+                            // Close threads
+                            for (auto& thread : threads)
+                                if (thread.joinable())
+                                    thread.join();
+                        }
+                        // Only 1 camera
+                        else
+                        {
+                            // Security checks
+                            if ((unsigned int)cameraIndex >= imagePtrs.size())
+                                error("There are only " + std::to_string(imagePtrs.size())
+                                      + " cameras, but you asked for the "
+                                      + std::to_string(cameraIndex+1) +"-th camera (i.e., `--flir_camera_index "
+                                      + std::to_string(cameraIndex) +"`), which doesn't exist. Note that the index is"
+                                      + " 0-based.", __LINE__, __FUNCTION__, __FILE__);
+                            // Undistort image
+                            undistortImage(cameraIndex, imagePtrs.at(cameraIndex), cameraIntrinsics.at(cameraIndex),
+                                           cameraDistorsions.at(cameraIndex));
+                            mCvMats = std::vector<cv::Mat>{mCvMats[cameraIndex]};
+                        }
                     }
                     return mCvMats;
                 }
@@ -731,6 +806,23 @@ namespace op
         }
     }
 
+    void SpinnakerWrapper::setCameraIndex(const int cameraIndex)
+    {
+        try
+        {
+            #ifdef WITH_FLIR_CAMERA
+                upImpl->mCameraIndex = cameraIndex;
+            #else
+                UNUSED(cameraIndex);
+                error(WITH_FLIR_CAMERA_ERROR, __LINE__, __FUNCTION__, __FILE__);
+            #endif
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
     std::vector<cv::Mat> SpinnakerWrapper::getRawFrames()
     {
         try
@@ -744,7 +836,8 @@ namespace op
                         error("The number of cameras must be the same as the INTRINSICS vector size.",
                           __LINE__, __FUNCTION__, __FILE__);
                     return upImpl->acquireImages(upImpl->mCameraParameterReader.getCameraIntrinsics(),
-                                                 upImpl->mCameraParameterReader.getCameraDistortions());
+                                                 upImpl->mCameraParameterReader.getCameraDistortions(),
+                                                 upImpl->mCameraIndex);
                 }
                 catch (const Spinnaker::Exception& e)
                 {

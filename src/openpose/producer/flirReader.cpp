@@ -35,6 +35,18 @@ namespace op
         }
     }
 
+    void FlirReader::setCameraIndex(const int cameraIndex)
+    {
+        try
+        {
+            return mSpinnakerWrapper.setCameraIndex(cameraIndex);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
     std::vector<cv::Mat> FlirReader::getCameraMatrices()
     {
         try

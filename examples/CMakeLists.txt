@@ -1,3 +1,4 @@
+add_subdirectory(calibration)
 add_subdirectory(openpose)
 add_subdirectory(tutorial_add_module)
 add_subdirectory(tutorial_pose)

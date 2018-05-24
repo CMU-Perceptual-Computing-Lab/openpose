@@ -41,6 +41,20 @@ namespace op
     OP_API std::string getFileExtension(const std::string& fullPath);
 
     /**
+     * This function extracts the full file path without its extension from a full file path.
+     * @param fullPath std::string with the full path.
+     * @return std::string with the full file path without extension.
+     */
+    OP_API std::string getFullFilePathNoExtension(const std::string& fullPath);
+
+    /**
+     * This function extracts the full file path of the folder where it is contained.
+     * @param fullPath std::string with the full path.
+     * @return std::string with the full file path of the folder.
+     */
+    OP_API std::string getFileParentFolderPath(const std::string& fullPath);
+
+    /**
      * This function extracts all the files in a directory path with the desired
      * extensions. If no extensions is specified, then all the file names are returned.
      * @param directoryPath std::string with the directory path.
@@ -59,6 +73,12 @@ namespace op
      */
     OP_API std::vector<std::string> getFilesOnDirectory(const std::string& directoryPath,
                                                         const std::string& extension);
+
+    OP_API std::string removeSpecialsCharacters(const std::string& stringToVariate);
+
+    OP_API void removeAllOcurrencesOfSubString(std::string& stringToModify, const std::string& substring);
+
+    OP_API void replaceAll(std::string& stringText, const char charToChange, const char charToAdd);
 }
 
 #endif // OPENPOSE_UTILITIES_FILE_SYSTEM_HPP

@@ -16,12 +16,13 @@ cmake_minimum_required(VERSION 2.8.7 FATAL_ERROR) # min. cmake version recommend
 
 
 ### FIND THE OS
-if (WIN32) # OS is Windows
-  message(STATUS "Windows OS support currently is experimental.")
-  message(STATUS "Feel free to send us any suggestion or bug you encounter.")
-elseif (APPLE) # OS is Apple
+if (APPLE) # OS is Apple
   message(FATAL_ERROR "Apple OS is not currently supported.")
-endif ()
+endif (APPLE)
+
+
+### Extra functionality
+include(cmake/Utils.cmake)
 
 
 ### FLAGS
@@ -67,12 +68,12 @@ if (CMAKE_COMPILER_IS_GNUCXX)
   if (${INSTRUCTION_SET} MATCHES "SSE4")
     add_definitions("-DWITH_SSE4")
     set(SIMD_FLAGS "${SIMD_FLAGS} -msse4.1")
-  endif(${INSTRUCTION_SET} MATCHES "SSE4")
+  endif (${INSTRUCTION_SET} MATCHES "SSE4")
 
   if (${INSTRUCTION_SET} MATCHES "AVX")
     add_definitions("-DWITH_AVX")
     set(SIMD_FLAGS "${SIMD_FLAGS} -mavx")
-  endif(${INSTRUCTION_SET} MATCHES "AVX")
+  endif (${INSTRUCTION_SET} MATCHES "AVX")
 
   message(STATUS "GCC detected, adding compile flags")
   set(OP_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SIMD_FLAGS} -fopenmp -Wpedantic -Wall -Wextra -Wfatal-errors")
@@ -124,7 +125,7 @@ set(GPU_MODE CUDA CACHE STRING "Select the acceleration GPU library or CPU other
 #   set_property(CACHE GPU_MODE PROPERTY STRINGS OPENCL CPU_ONLY)
 # else ()
 #   set_property(CACHE GPU_MODE PROPERTY STRINGS CPU_ONLY)
-# endif ()
+# endif (CUDA_FOUND AND OpenCL_FOUND)
 set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA CPU_ONLY)
 
 # Look for CUDA
@@ -146,7 +147,7 @@ endif (NOT OpenCL_FOUND)
 # Required for OpenCL in Nvidia graphic cards
 if (CUDA_FOUND AND OpenCL_FOUND AND ${CUDA_VERSION_MAJOR} LESS 9)
   add_definitions(-DLOWER_CL_VERSION)
-endif ()
+endif (CUDA_FOUND AND OpenCL_FOUND AND ${CUDA_VERSION_MAJOR} LESS 9)
 # Handle desired GPU mode option
 if (${GPU_MODE} MATCHES "CUDA")
   # OpenPose flags
@@ -162,14 +163,14 @@ elseif (${GPU_MODE} MATCHES "OPENCL")
   add_definitions(-DUSE_OPENCL)
   add_definitions(-DUSE_GREENTEA)
   message(STATUS "Building with OpenCL.")
-endif ()
+endif (${GPU_MODE} MATCHES "CUDA")
 
 # Intel branch with MKL Support
 if (${GPU_MODE} MATCHES "CPU_ONLY")
   if (UNIX AND NOT APPLE)
     OPTION(USE_MKL "Use MKL Intel Branch." ON)
-  endif ()
-endif ()
+  endif (UNIX AND NOT APPLE)
+endif (${GPU_MODE} MATCHES "CPU_ONLY")
 
 if (${USE_MKL})
   # OpenPose flags
@@ -199,6 +200,15 @@ if (UNIX AND NOT APPLE)
   option(WITH_CERES "Add Ceres support for advanced 3-D reconstruction." OFF)
 endif (UNIX AND NOT APPLE)
 option(WITH_FLIR_CAMERA "Add FLIR (formerly Point Grey) camera code (requires Spinnaker SDK already installed)." OFF)
+
+# Set the acceleration library
+if (WIN32)
+  set(WITH_EIGEN NONE CACHE STRING "Select the Eigen mode (NONE if not required or DOWNLOAD to let OpenPose download it).")
+  set_property(CACHE WITH_EIGEN PROPERTY STRINGS NONE BUILD)
+elseif (UNIX AND NOT APPLE)
+  set(WITH_EIGEN NONE CACHE STRING "Select the Eigen mode (NONE if not required, APT_GET if you used `sudo apt-get install libeigen3-dev`, BUILD to let OpenPose download it).")
+  set_property(CACHE WITH_EIGEN PROPERTY STRINGS NONE APT_GET BUILD)
+endif (WIN32)
 
 # # Suboptions for OpenPose tracking
 # if (UNIX AND NOT APPLE)
@@ -232,7 +242,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
 
 if (${GPU_MODE} MATCHES "CUDA")
   find_package(CUDA)
-endif ()
+endif (${GPU_MODE} MATCHES "CUDA")
 
 # Adding 3D
 if (WITH_3D_RENDERER)
@@ -253,11 +263,37 @@ if (WITH_TRACKING)
   add_definitions(-DWITH_TRACKING)
 endif (WITH_TRACKING)
 
+# Calibration
+# No Eigen
+if (${WITH_EIGEN} MATCHES "NONE")
+  if (WITH_CERES)
+    message(FATAL_ERROR "Eigen is required (enable `WITH_EIGEN`) if CERES is enabled.")
+  endif (WITH_CERES)
+# If Eigen used
+else (${WITH_EIGEN} MATCHES "NONE")
+  # OpenPose flags
+  add_definitions(-DWITH_EIGEN)
+  # OpenPose download/builds Eigen
+  if (${WITH_EIGEN} MATCHES "BUILD")
+    # Download it
+    set(OP_URL "http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/")
+    set(FIND_LIB_PREFIX ${CMAKE_SOURCE_DIR}/3rdparty/)
+    download_zip("eigen_2018_05_23.zip" ${OP_URL} ${FIND_LIB_PREFIX} 29B9B2FD4679D587BB67467F09EE8365)
+    # Set path
+    set(EIGEN3_INCLUDE_DIRS "3rdparty/eigen/include/")
+  # Alread installed with apt-get
+  elseif (${WITH_EIGEN} MATCHES "APT_GET")
+    # Eigen
+    find_package(PkgConfig)
+    pkg_check_modules(EIGEN3 REQUIRED eigen3)
+  endif (${WITH_EIGEN} MATCHES "BUILD")
+endif (${WITH_EIGEN} MATCHES "NONE")
+
 if (UNIX AND NOT APPLE)
   if (${GPU_MODE} MATCHES "CUDA")
     include(cmake/Cuda.cmake)
     find_package(CuDNN)
-  endif ()
+  endif (${GPU_MODE} MATCHES "CUDA")
   find_package(GFlags)
   find_package(Glog)
   if (OpenCV_CONFIG_FILE)
@@ -276,8 +312,6 @@ if (UNIX AND NOT APPLE)
   endif (WITH_3D_RENDERER)
   if (WITH_CERES)
     # Eigen + Ceres
-    find_package(PkgConfig)
-    pkg_check_modules(EIGEN3 REQUIRED eigen3)
     find_package(Ceres REQUIRED COMPONENTS SuiteSparse)
   endif (WITH_CERES)
   if (WITH_FLIR_CAMERA)
@@ -296,8 +330,8 @@ if (UNIX AND NOT APPLE)
       set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
       set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
-    endif ()
-  endif ()
+    endif (OPENMP_FOUND)
+  endif (${GPU_MODE} MATCHES "CPU_ONLY")
 
   if (${GPU_MODE} MATCHES "CUDA")
     # Set CUDA Flags
@@ -314,7 +348,7 @@ if (UNIX AND NOT APPLE)
       execute_process(COMMAND cat install_cudnn.sh WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/ubuntu)
       message(FATAL_ERROR "Install cuDNN using the above commands. or turn off cuDNN by setting USE_CUDNN to OFF.")
     endif (USE_CUDNN AND NOT CUDNN_FOUND)
-  endif ()
+  endif (${GPU_MODE} MATCHES "CUDA")
 
   if (NOT GLOG_FOUND)
     message(FATAL_ERROR "Glog not found. Install Glog from the command line using the command(s) -\
@@ -333,8 +367,6 @@ if (UNIX AND NOT APPLE)
 
 endif (UNIX AND NOT APPLE)
 
-include(cmake/Utils.cmake)
-
 if (WIN32)
 
   if ("${CMAKE_VERSION}" VERSION_GREATER 3.6.3)
@@ -349,14 +381,14 @@ if (WIN32)
   set(OP_WIN_URL "http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows")
   set(OP_WIN_DIR "${CMAKE_SOURCE_DIR}/3rdparty/windows")
 
-  #TODO Add hashes
+  # Download required zip files
   download_zip("opencv_310.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 1e5240a64b814b3c0b822f136be78ad7)
   download_zip("caffe3rdparty_2018_02_13.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 6653E07E3D2D7226D64FAD2DF0B407FB)
   if (${GPU_MODE} MATCHES "OPENCL")
     download_zip("caffe_opencl_2018_02_13.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 3ac3e1acf5ee6a4e57920be73053067a)
-  else ()
+  else (${GPU_MODE} MATCHES "OPENCL")
     download_zip("caffe_2018_01_18.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 4b8e548cc7ea20abea472950dd5301bd)
-  endif ()
+  endif (${GPU_MODE} MATCHES "OPENCL")
   if (WITH_3D_RENDERER)
     download_zip("freeglut_2018_01_14.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} BB182187285E06880F0EDE3A39530091)
   endif (WITH_3D_RENDERER)
@@ -376,23 +408,23 @@ if (WIN32)
     set(CL "_CL")
     find_library(Caffe_LIB caffe HINTS ${FIND_LIB_PREFIX}/caffe_opencl/lib)
     find_library(Caffe_Proto_LIB caffeproto HINTS ${FIND_LIB_PREFIX}/caffe_opencl/lib)
-  else ()
+  else (${GPU_MODE} MATCHES "OPENCL")
     if (CAFFE_CL_CHECKED)
       unset(Caffe_LIB CACHE)
       unset(Caffe_Proto_LIB CACHE)
-    endif ()
+    endif (CAFFE_CL_CHECKED)
     set(CAFFE_CL_CHECKED 0)
     set(CL "")
     find_library(Caffe_LIB caffe HINTS ${FIND_LIB_PREFIX}/caffe/lib)
     find_library(Caffe_Proto_LIB caffeproto HINTS ${FIND_LIB_PREFIX}/caffe/lib)
-  endif ()
+  endif (${GPU_MODE} MATCHES "OPENCL")
 
   if (${GPU_MODE} MATCHES "OPENCL")
     unset(BOOST_SYSTEM_LIB_RELEASE CACHE)
     unset(BOOST_SYSTEM_LIB_DEBUG CACHE)
     find_library(BOOST_SYSTEM_LIB_RELEASE boost_system-vc140-mt-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
     find_library(BOOST_SYSTEM_LIB_DEBUG boost_system-vc140-mt-gd-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
-  endif ()
+  endif (${GPU_MODE} MATCHES "OPENCL")
 
   if (WITH_3D_RENDERER)
     find_library(GLUT_LIBRARY freeglut HINTS ${FIND_LIB_PREFIX}/freeglut/lib)
@@ -407,13 +439,13 @@ if (WIN32)
     SET(CAFFE_CL_CHECKED2 True CACHE BOOL "")
     unset(Caffe_INCLUDE_DIRS CACHE)
     set(Caffe_INCLUDE_DIRS "3rdparty/windows/caffe_opencl/include;3rdparty/windows/caffe_opencl/include2" CACHE FILEPATH "Caffe_INCLUDE_DIRS")
-  else ()
+  else (${GPU_MODE} MATCHES "OPENCL")
     if (CAFFE_CL_CHECKED2)
       unset(Caffe_INCLUDE_DIRS CACHE)
-    endif ()
+    endif (CAFFE_CL_CHECKED2)
     set(CAFFE_CL_CHECKED2 0)
     set(Caffe_INCLUDE_DIRS "3rdparty/windows/caffe/include;3rdparty/windows/caffe/include2" CACHE FILEPATH "Caffe_INCLUDE_DIRS")
-  endif ()
+  endif (${GPU_MODE} MATCHES "OPENCL")
   set(Boost_INCLUDE_DIRS "3rdparty/windows/caffe3rdparty/include/boost-1_61")
   set(WINDOWS_INCLUDE_DIRS "3rdparty/windows/caffe3rdparty/include")
   if (WITH_3D_RENDERER)
@@ -450,9 +482,9 @@ if (UNIX AND NOT APPLE)
       list(LENGTH CAFFE_DIR_VALID CAFFE_DIR_VALID_LENGTH)
       if (CAFFE_DIR_VALID_LENGTH EQUAL 0)
         execute_process(COMMAND git submodule update --init --recursive)
-      else()
+      else (CAFFE_DIR_VALID_LENGTH EQUAL 0)
         message(STATUS "Caffe has already been downloaded.")
-      endif ()
+      endif (CAFFE_DIR_VALID_LENGTH EQUAL 0)
 
       # Build Process
       set(CAFFE_CPU_ONLY OFF)
@@ -491,15 +523,15 @@ if (UNIX AND NOT APPLE)
             "${CMAKE_BINARY_DIR}/caffe/libmklml_intel.so"
             "${CMAKE_BINARY_DIR}/caffe/lib/libmkldnn.so"
             )
-        else ()
+        else (USE_MKL)
           execute_process(COMMAND git checkout master WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
-        endif ()
+        endif (USE_MKL)
         set(CAFFE_CPU_ONLY ON)
         set(USE_CUDNN OFF)
       elseif (${GPU_MODE} MATCHES "OPENCL")
         execute_process(COMMAND git checkout opencl WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
         set(USE_CUDNN OFF)
-      endif ()
+      endif (${GPU_MODE} MATCHES "CUDA")
 
       # Build Caffe
       message(STATUS "Caffe will be built from source now.")
@@ -527,7 +559,7 @@ if (UNIX AND NOT APPLE)
           -DUSE_LMDB=OFF
           -DUSE_OPENCV=OFF)
           # -DOpenCV_DIR=${OpenCV_DIR})
-      else ()
+      else (USE_MKL)
         ExternalProject_Add(openpose_caffe
           SOURCE_DIR ${CAFFE_URL}
           PREFIX ${CAFFE_PREFIX}
@@ -542,7 +574,7 @@ if (UNIX AND NOT APPLE)
           -DUSE_LMDB=OFF
           -DUSE_OPENCV=OFF)
           # -DOpenCV_DIR=${OpenCV_DIR})
-      endif ()
+      endif (USE_MKL)
 
       ExternalProject_Get_Property(openpose_caffe install_dir)
 
@@ -574,7 +606,13 @@ include_directories(
   ${GLOG_INCLUDE_DIR}
   ${OpenCV_INCLUDE_DIRS})
 
-if(USE_MKL)
+# Calibration
+if (NOT ${WITH_EIGEN} MATCHES "NONE")
+  include_directories(
+      ${EIGEN3_INCLUDE_DIRS})
+endif (NOT ${WITH_EIGEN} MATCHES "NONE")
+
+if (USE_MKL)
  include_directories(
      "${MKL_PATH}/include/")
 endif (USE_MKL)
@@ -587,18 +625,16 @@ endif (Caffe_FOUND)
 if (${GPU_MODE} MATCHES "CUDA")
   include_directories(
       ${CUDA_INCLUDE_DIRS})
-endif ()
-if (${GPU_MODE} MATCHES "OPENCL")
+elseif (${GPU_MODE} MATCHES "OPENCL")
   include_directories(
     ${OpenCL_INCLUDE_DIRS})
-endif ()
+endif (${GPU_MODE} MATCHES "CUDA")
 # 3D
 if (WITH_3D_RENDERER)
   include_directories(${GLUT_INCLUDE_DIRS})
 endif (WITH_3D_RENDERER)
 if (WITH_CERES)
   include_directories(${CERES_INCLUDE_DIRS})
-  include_directories(${EIGEN3_INCLUDE_DIRS})
 endif (WITH_CERES)
 if (WITH_FLIR_CAMERA)
   include_directories(${SPINNAKER_INCLUDE_DIRS})

@@ -171,64 +171,79 @@ public:
 
 int openPoseTutorialThread3()
 {
-    op::log("OpenPose Library Tutorial - Example 3.", op::Priority::High);
-    // ------------------------- INITIALIZATION -------------------------
-    // Step 1 - Set logging level
-        // - 0 will output all the logging messages
-        // - 255 will output nothing
-    op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.",
-              __LINE__, __FUNCTION__, __FILE__);
-    op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
-    // Step 2 - Setting thread workers && manager
-    typedef std::shared_ptr<std::vector<op::Datum>> TypedefDatums;
-    typedef std::shared_ptr<op::Worker<TypedefDatums>> TypedefWorker;
-    op::ThreadManager<TypedefDatums> threadManager;
-    // Step 3 - Initializing the worker classes
-    // Frames producer (e.g. video, webcam, ...)
-    TypedefWorker wUserInput = std::make_shared<WUserInput>(FLAGS_image_dir);
-    // Processing
-    TypedefWorker wUserProcessing = std::make_shared<WUserPostProcessing>();
-    // GUI (Display)
-    TypedefWorker wUserOutput = std::make_shared<WUserOutput>();
+    try
+    {
+        op::log("Starting OpenPose demo...", op::Priority::High);
+        const auto timerBegin = std::chrono::high_resolution_clock::now();
 
-    // ------------------------- CONFIGURING THREADING -------------------------
-    // In this simple multi-thread example, we will do the following:
-        // 3 (virtual) queues: 0, 1, 2
-        // 1 real queue: 1. The first and last queue ids (in this case 0 and 2) are not actual queues, but the
-        // beginning and end of the processing sequence
-        // 2 threads: 0, 1
-        // wUserInput will generate frames (there is no real queue 0) and push them on queue 1
-        // wGui will pop frames from queue 1 and process them (there is no real queue 2)
-    auto threadId = 0ull;
-    auto queueIn = 0ull;
-    auto queueOut = 1ull;
-    threadManager.add(threadId++, wUserInput, queueIn++, queueOut++);       // Thread 0, queues 0 -> 1
-    threadManager.add(threadId++, wUserProcessing, queueIn++, queueOut++);  // Thread 1, queues 1 -> 2
-    threadManager.add(threadId++, wUserOutput, queueIn++, queueOut++);      // Thread 2, queues 2 -> 3
+        // ------------------------- INITIALIZATION -------------------------
+        // Step 1 - Set logging level
+            // - 0 will output all the logging messages
+            // - 255 will output nothing
+        op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.",
+                  __LINE__, __FUNCTION__, __FILE__);
+        op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
+        // Step 2 - Setting thread workers && manager
+        typedef std::shared_ptr<std::vector<op::Datum>> TypedefDatums;
+        typedef std::shared_ptr<op::Worker<TypedefDatums>> TypedefWorker;
+        op::ThreadManager<TypedefDatums> threadManager;
+        // Step 3 - Initializing the worker classes
+        // Frames producer (e.g. video, webcam, ...)
+        TypedefWorker wUserInput = std::make_shared<WUserInput>(FLAGS_image_dir);
+        // Processing
+        TypedefWorker wUserProcessing = std::make_shared<WUserPostProcessing>();
+        // GUI (Display)
+        TypedefWorker wUserOutput = std::make_shared<WUserOutput>();
 
-    // ------------------------- STARTING AND STOPPING THREADING -------------------------
-    op::log("Starting thread(s)", op::Priority::High);
-    // Two different ways of running the program on multithread environment
-        // Option a) Using the main thread (this thread) for processing (it saves 1 thread, recommended)
-    threadManager.exec();  // It blocks this thread until all threads have finished
-        // Option b) Giving to the user the control of this thread
-    // // VERY IMPORTANT NOTE: if OpenCV is compiled with Qt support, this option will not work. Qt needs the main
-    // // thread to plot visual results, so the final GUI (which uses OpenCV) would return an exception similar to:
-    // // `QMetaMethod::invoke: Unable to invoke methods with return values in queued connections`
-    // // Start threads
-    // threadManager.start();
-    // // Keep program alive while running threads. Here the user could perform any other desired function
-    // while (threadManager.isRunning())
-    //     std::this_thread::sleep_for(std::chrono::milliseconds{33});
-    // // Stop and join threads
-    // op::log("Stopping thread(s)", op::Priority::High);
-    // threadManager.stop();
+        // ------------------------- CONFIGURING THREADING -------------------------
+        // In this simple multi-thread example, we will do the following:
+            // 3 (virtual) queues: 0, 1, 2
+            // 1 real queue: 1. The first and last queue ids (in this case 0 and 2) are not actual queues, but the
+            // beginning and end of the processing sequence
+            // 2 threads: 0, 1
+            // wUserInput will generate frames (there is no real queue 0) and push them on queue 1
+            // wGui will pop frames from queue 1 and process them (there is no real queue 2)
+        auto threadId = 0ull;
+        auto queueIn = 0ull;
+        auto queueOut = 1ull;
+        threadManager.add(threadId++, wUserInput, queueIn++, queueOut++);       // Thread 0, queues 0 -> 1
+        threadManager.add(threadId++, wUserProcessing, queueIn++, queueOut++);  // Thread 1, queues 1 -> 2
+        threadManager.add(threadId++, wUserOutput, queueIn++, queueOut++);      // Thread 2, queues 2 -> 3
 
-    // ------------------------- CLOSING -------------------------
-    // Logging information message
-    op::log("Example 3 successfully finished.", op::Priority::High);
-    // Return successful message
-    return 0;
+        // ------------------------- STARTING AND STOPPING THREADING -------------------------
+        op::log("Starting thread(s)...", op::Priority::High);
+        // Two different ways of running the program on multithread environment
+            // Option a) Using the main thread (this thread) for processing (it saves 1 thread, recommended)
+        threadManager.exec();  // It blocks this thread until all threads have finished
+            // Option b) Giving to the user the control of this thread
+        // // VERY IMPORTANT NOTE: if OpenCV is compiled with Qt support, this option will not work. Qt needs the main
+        // // thread to plot visual results, so the final GUI (which uses OpenCV) would return an exception similar to:
+        // // `QMetaMethod::invoke: Unable to invoke methods with return values in queued connections`
+        // // Start threads
+        // threadManager.start();
+        // // Keep program alive while running threads. Here the user could perform any other desired function
+        // while (threadManager.isRunning())
+        //     std::this_thread::sleep_for(std::chrono::milliseconds{33});
+        // // Stop and join threads
+        // op::log("Stopping thread(s)", op::Priority::High);
+        // threadManager.stop();
+
+        // ------------------------- CLOSING -------------------------
+        // Measuring total time
+        const auto now = std::chrono::high_resolution_clock::now();
+        const auto totalTimeSec = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(now-timerBegin).count()
+                                * 1e-9;
+        const auto message = "OpenPose demo successfully finished. Total time: "
+                           + std::to_string(totalTimeSec) + " seconds.";
+        op::log(message, op::Priority::High);
+        // Return successful message
+        return 0;
+    }
+    catch (const std::exception& e)
+    {
+        op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        return -1;
+    }
 }
 
 int main(int argc, char *argv[])

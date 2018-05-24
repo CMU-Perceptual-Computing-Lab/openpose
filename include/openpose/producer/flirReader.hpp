@@ -22,6 +22,8 @@ namespace op
 
         ~FlirReader();
 
+        void setCameraIndex(const int cameraIndex);
+
         std::vector<cv::Mat> getCameraMatrices();
 
         std::vector<cv::Mat> getCameraExtrinsics();
