@@ -167,31 +167,50 @@ namespace op
             // Colors
             // http://softwareservices.ptgrey.com/Spinnaker/latest/group___camera_defs__h.html#ggabd5af55aaa20bcb0644c46241c2cbad1a33a1c8a1f6dbcb4a4eaaaf6d4d7ff1d1
             // PixelFormat_BGR8
-            // Time tests
-            // const auto reps = 1e3;
-            // const auto begin = std::chrono::high_resolution_clock::now();
-            // for (auto asdf = 0 ; asdf < reps ; asdf++){
-            // ~ 1.5 ms but pixeled
-            // imagePtr = imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::DEFAULT);
-            return imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::DEFAULT);
-            // ~0.5 ms but BW
-            // imagePtr = imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::NO_COLOR_PROCESSING);
-            // ~6 ms, looks as good as best
-            // imagePtr = imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::HQ_LINEAR);
-            // ~2 ms default << edge << best
-            // imagePtr = imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::EDGE_SENSING);
-            // ~115, too slow
-            // imagePtr = imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::RIGOROUS);
-            // ~2 ms, slightly worse than HQ_LINEAR
-            // imagePtr = imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::IPP);
-            // ~30 ms, ideally best quality?
-            // imagePtr = imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::DIRECTIONAL_FILTER);
-            // imagePtr = imagePtr;
-            // }
-            // durationMs = std::chrono::duration_cast<std::chrono::nanoseconds>(
-            //     std::chrono::high_resolution_clock::now()-begin
+
+            // // Time tests
+            // // DEFAULT
+            // const auto reps = 1e2;
+            // const auto begin1 = std::chrono::high_resolution_clock::now();
+            // for (auto asdf = 0 ; asdf < reps ; asdf++)
+            //     const auto imagePtrTemp = imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::DEFAULT);
+            // const auto durationMs1 = std::chrono::duration_cast<std::chrono::nanoseconds>(
+            //     std::chrono::high_resolution_clock::now()-begin1
             // ).count() * 1e-6;
-            // log("Time conversion (ms): " + std::to_string(durationMs / reps), Priority::High);
+            // // EDGE_SENSING
+            // const auto begin2 = std::chrono::high_resolution_clock::now();
+            // for (auto asdf = 0 ; asdf < reps ; asdf++)
+            //     const auto imagePtrTemp = imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::EDGE_SENSING);
+            // const auto durationMs2 = std::chrono::duration_cast<std::chrono::nanoseconds>(
+            //     std::chrono::high_resolution_clock::now()-begin2
+            // ).count() * 1e-6;
+            // // IPP
+            // const auto begin3 = std::chrono::high_resolution_clock::now();
+            // for (auto asdf = 0 ; asdf < reps ; asdf++)
+            //     const auto imagePtrTemp = imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::IPP);
+            // const auto durationMs3 = std::chrono::duration_cast<std::chrono::nanoseconds>(
+            //     std::chrono::high_resolution_clock::now()-begin3
+            // ).count() * 1e-6;
+            // // Print times
+            // log("Time (ms) 1: " + std::to_string(durationMs1 / reps), Priority::High);
+            // log("Time (ms) 2: " + std::to_string(durationMs2 / reps), Priority::High);
+            // log("Time (ms) 3: " + std::to_string(durationMs3 / reps), Priority::High);
+
+            // Return right one
+            // ~ 1.3 ms but pixeled
+            // return imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::DEFAULT);
+            // ~0.5 ms but BW
+            // return imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::NO_COLOR_PROCESSING);
+            // ~6 ms, looks as good as best
+            // return imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::HQ_LINEAR);
+            // ~2.2 ms default << edge << best
+            // return imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::EDGE_SENSING);
+            // ~115, too slow
+            // return imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::RIGOROUS);
+            // ~1.7 ms, slightly worse than HQ_LINEAR
+            return imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::IPP);
+            // ~30 ms, ideally best quality?
+            // return imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::DIRECTIONAL_FILTER);
         }
 
         /*
@@ -404,6 +423,7 @@ namespace op
                                                         // cameraIntrinsics instead of cv::getOptimalNewCameraMatrix to
                                                         // avoid black borders
                                                         cameraIntrinsics,
+                                                        // #include <opencv2/calib3d/calib3d.hpp> for next line
                                                         // cv::getOptimalNewCameraMatrix(cameraIntrinsics,
                                                         //                               cameraDistorsions,
                                                         //                               imageSize, 1,
@@ -838,6 +858,9 @@ namespace op
                 for (auto i = 0u; i < serialNumbers.size(); i++)
                     log("Camera " + std::to_string(i) + " serial number set to "
                         + serialNumbers[i] + "...", Priority::High);
+                if (upImpl->mCameraIndex >= 0)
+                    log("Only using camera index " + std::to_string(upImpl->mCameraIndex) + ", i.e., serial number "
+                        + serialNumbers[upImpl->mCameraIndex] + "...", Priority::High);
 
                 // Read camera parameters from SN
                 if (upImpl->mUndistortImage)
@@ -867,7 +890,9 @@ namespace op
                 else
                     upImpl->mResolution = Point<int>{cvMats[0].cols, cvMats[0].rows};
 
-                log("\nRunning for all cameras...\n\n*** IMAGE ACQUISITION ***\n", Priority::High);
+                const std::string numberCameras = std::to_string(upImpl->mCameraIndex < 0 ? serialNumbers.size() : 1);
+                log("\nRunning for " + numberCameras + " out of " + std::to_string(serialNumbers.size())
+                    + " camera(s)...\n\n*** IMAGE ACQUISITION ***\n", Priority::High);
             }
             catch (const Spinnaker::Exception& e)
             {
