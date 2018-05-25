@@ -142,7 +142,8 @@ namespace op
                                               const std::string& ipCameraPath, const int webcamIndex,
                                               const bool flirCamera, const std::string& cameraResolution,
                                               const double webcamFps, const std::string& cameraParameterPath,
-                                              const unsigned int imageDirectoryStereo, const int flirCameraIndex)
+                                              const bool undistortImage, const unsigned int imageDirectoryStereo,
+                                              const int flirCameraIndex)
     {
         try
         {
@@ -161,9 +162,8 @@ namespace op
             {
                 // cameraFrameSize
                 const auto cameraFrameSize = flagsToPoint(cameraResolution, "-1x-1");
-                auto flirReader = std::make_shared<FlirReader>(cameraParameterPath, cameraFrameSize);
-                flirReader->setCameraIndex(flirCameraIndex);
-                return flirReader;
+                return std::make_shared<FlirReader>(cameraParameterPath, cameraFrameSize, undistortImage,
+                                                    flirCameraIndex);
             }
             // Webcam
             if (type == ProducerType::Webcam)
