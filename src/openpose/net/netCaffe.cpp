@@ -153,7 +153,6 @@ namespace op
                     #else
                         caffe::Caffe::set_mode(caffe::Caffe::CPU);
                         #ifdef _WIN32
-                            // upImpl->upCaffeNet.reset(new caffe::Net<float>{upImpl->mCaffeProto, caffe::TEST});
                             upImpl->upCaffeNet.reset(new caffe::Net<float>{upImpl->mCaffeProto, caffe::TEST,
                                                                            caffe::Caffe::GetCPUDevice()});
                         #else
