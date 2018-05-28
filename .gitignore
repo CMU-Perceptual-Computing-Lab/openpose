@@ -102,6 +102,7 @@ distribute/
 3rdparty/caffe/.github
 3rdparty/eigen/
 3rdparty/windows/caffe/
+3rdparty/windows/caffe_cpu/
 3rdparty/windows/caffe_opencl/
 3rdparty/windows/caffe3rdparty/
 3rdparty/windows/opencv/

@@ -24,7 +24,7 @@ foreach(EXAMPLE_FILE ${EXAMPLE_FILES})
 
   if (WIN32)
     set_property(TARGET ${EXE_NAME} PROPERTY FOLDER "Examples/Tutorial/Wrapper")
-    configure_file(${CMAKE_SOURCE_DIR}/cmake/OpenPose${CL}.vcxproj.user
+    configure_file(${CMAKE_SOURCE_DIR}/cmake/OpenPose${VCXPROJ_FILE_GPU_MODE}.vcxproj.user
         ${CMAKE_CURRENT_BINARY_DIR}/${EXE_NAME}.vcxproj.user @ONLY)
     # Properties->General->Output Directory
     set_property(TARGET ${EXE_NAME} PROPERTY RUNTIME_OUTPUT_DIRECTORY_RELEASE ${PROJECT_BINARY_DIR}/$(Platform)/$(Configuration))
