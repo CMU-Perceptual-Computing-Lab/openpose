@@ -149,10 +149,16 @@ namespace op
                     #ifdef USE_CUDA
                         caffe::Caffe::set_mode(caffe::Caffe::GPU);
                         caffe::Caffe::SetDevice(upImpl->mGpuId);
+                        upImpl->upCaffeNet.reset(new caffe::Net<float>{upImpl->mCaffeProto, caffe::TEST});
                     #else
                         caffe::Caffe::set_mode(caffe::Caffe::CPU);
+                        #ifdef _WIN32
+                            upImpl->upCaffeNet.reset(new caffe::Net<float>{upImpl->mCaffeProto, caffe::TEST,
+                                                                           caffe::Caffe::GetCPUDevice()});
+                        #else
+                            upImpl->upCaffeNet.reset(new caffe::Net<float>{upImpl->mCaffeProto, caffe::TEST});
+                        #endif
                     #endif
-                    upImpl->upCaffeNet.reset(new caffe::Net<float>{upImpl->mCaffeProto, caffe::TEST});
                     upImpl->upCaffeNet->CopyTrainedLayersFrom(upImpl->mCaffeTrainedModel);
                     #ifdef USE_CUDA
                         cudaCheck(__LINE__, __FUNCTION__, __FILE__);
