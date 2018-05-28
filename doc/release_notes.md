@@ -238,6 +238,7 @@ OpenPose Library - Release Notes
     2. Part candidates (`--part_candidates`) are saved with the same scale than the final keypoints itself.
     3. Fixed bug in keepTopNPeople.hpp (`--number_people_max`) that provoked core dumped if lots of values equal to the threshold.
     4. Flir cameras: Cameras sorted by serial number. Video and images recorded from flir cameras were (and are) assigned the camera parameters based on serial number order, so it would fail if the cameras order was not the same than if sorted by serial number.
+    5. CPU version working in non-Nvidia Windows machines.
 
 
 

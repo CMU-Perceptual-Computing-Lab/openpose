@@ -54,10 +54,12 @@ DEFINE_int32(num_gpu,                   -1,             "The number of GPU devic
 DEFINE_int32(num_gpu_start,             0,              "GPU device start number.");
 DEFINE_int32(keypoint_scale,            0,              "Scaling of the (x,y) coordinates of the final pose data array, i.e. the scale of the (x,y)"
                                                         " coordinates that will be saved with the `write_keypoint` & `write_keypoint_json` flags."
-                                                        " Select `0` to scale it to the original source resolution, `1`to scale it to the net output"
-                                                        " size (set with `net_resolution`), `2` to scale it to the final output size (set with"
-                                                        " `resolution`), `3` to scale it in the range [0,1], and 4 for range [-1,1]. Non related"
-                                                        " with `scale_number` and `scale_gap`.");
+                                                        " Select `0` to scale it to the original source resolution; `1`to scale it to the net output"
+                                                        " size (set with `net_resolution`); `2` to scale it to the final output size (set with"
+                                                        " `resolution`); `3` to scale it in the range [0,1], where (0,0) would be the top-left"
+                                                        " corner of the image, and (1,1) the bottom-right one; and 4 for range [-1,1], where"
+                                                        " (-1,-1) would be the top-left corner of the image, and (1,1) the bottom-right one. Non"
+                                                        " related with `scale_number` and `scale_gap`.");
 DEFINE_int32(number_people_max,         -1,             "This parameter will limit the maximum number of people detected, by keeping the people with"
                                                         " top scores. The score is based in person area over the image, body part score, as well as"
                                                         " joint score (between each pair of connected body parts). Useful if you know the exact"
