@@ -54,6 +54,20 @@ Note: This example will assume that the target are 3 Flir/Point Grey cameras, bu
 # Without distortion (lines should look as lines)
 ./build/examples/openpose/openpose.bin --num_gpu 0 --flir_camera --flir_camera_index 0
 ```
+    7. Full example for 4 flir cameras:
+```
+# Get images for calibration
+./build/examples/openpose/openpose.bin --num_gpu 0 --frame_keep_distortion --flir_camera --flir_camera_index 0 --write_images ~/Desktop/intrinsics_0
+./build/examples/openpose/openpose.bin --num_gpu 0 --frame_keep_distortion --flir_camera --flir_camera_index 1 --write_images ~/Desktop/intrinsics_1
+./build/examples/openpose/openpose.bin --num_gpu 0 --frame_keep_distortion --flir_camera --flir_camera_index 2 --write_images ~/Desktop/intrinsics_2
+./build/examples/openpose/openpose.bin --num_gpu 0 --frame_keep_distortion --flir_camera --flir_camera_index 3 --write_images ~/Desktop/intrinsics_3
+# Run calibration
+# Note: If your computer has enough RAM memory, you can run all of them at the same time in order to speed up the time (they are not internally multi-threaded).
+./build/examples/calibration/calibration.bin --mode 1 --grid_square_size_mm 127.0 --grid_number_inner_corners "9x6" --camera_serial_number 17012332 --intrinsics_image_dir ~/Desktop/intrinsics_0
+./build/examples/calibration/calibration.bin --mode 1 --grid_square_size_mm 127.0 --grid_number_inner_corners "9x6" --camera_serial_number 17092861 --intrinsics_image_dir ~/Desktop/intrinsics_1
+./build/examples/calibration/calibration.bin --mode 1 --grid_square_size_mm 127.0 --grid_number_inner_corners "9x6" --camera_serial_number 17092865 --intrinsics_image_dir ~/Desktop/intrinsics_2
+./build/examples/calibration/calibration.bin --mode 1 --grid_square_size_mm 127.0 --grid_number_inner_corners "9x6" --camera_serial_number 18079957 --intrinsics_image_dir ~/Desktop/intrinsics_3
+```
 
 2. Extrinsic parameter calibration:
     1. We are still implementing this part. Documentation will be available after completing it.

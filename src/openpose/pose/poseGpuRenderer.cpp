@@ -139,7 +139,7 @@ namespace op
                         else
                         {
                             const auto affinityPart = (elementRendered-numberBodyPartsPlusBkg-3)*2;
-                            const auto affinityPartMapped = getPoseMapIndex(mPoseModel).at(affinityPart);
+                            const auto affinityPartMapped = numberBodyPartsPlusBkg+getPoseMapIndex(mPoseModel).at(affinityPart);
                             elementRenderedName = mPartIndexToName.at(affinityPartMapped);
                             elementRenderedName = elementRenderedName.substr(0, elementRenderedName.find("("));
                             renderPosePAFGpu(*spGpuMemory, mPoseModel, frameSize,
