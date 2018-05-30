@@ -28,10 +28,10 @@ Note: This example will assume that the target are 3 Flir/Point Grey cameras, bu
     1. Run OpenPose and save images for your desired camera. Use a grid (chessboard) pattern and move around all the image area.
         1. Quality tips:
             1. Keep the same orientation of the chessboard, i.e., do not rotate it circularly more than ~15-30 degress. Our algorithm assumes that the origin is the corner at the top left, so rotating the chessboard circularly will change this origin across frames, resulting in many frames being rejected for the final calibration, i.e., lower calibration accuracy.
-            2. You should get at least 100-150 images for a good calibration.
+            2. You should get at least 100-200 images for a good calibration (and no more than 500).
             3. Cover several distances, and within each distance, cover all parts of the image view (all corners and center).
             4. Save the images in PNG format (default behavior) in order to improve calibration quality. 
-            5. Calibration of about 100 images takes about 3 minutes.
+            5. The calibration of a camera takes about 3 minutes with about 100 images, about 1.5h with 200 images, and about 9.5h with 450 images. Required RAM memory also grows exponentially.
         2. Changing image source:
             1. Webcam calibration: `./build/examples/openpose/openpose.bin --num_gpu 0 --frame_keep_distortion --write_images {intrinsic_images_folder_path}`.
             2. Flir camera calibration: Add the flags `--flir_camera --flir_camera_index 0` (or the desired flir camera index) to the webcam command.
@@ -62,11 +62,14 @@ Note: This example will assume that the target are 3 Flir/Point Grey cameras, bu
 ./build/examples/openpose/openpose.bin --num_gpu 0 --frame_keep_distortion --flir_camera --flir_camera_index 2 --write_images ~/Desktop/intrinsics_2
 ./build/examples/openpose/openpose.bin --num_gpu 0 --frame_keep_distortion --flir_camera --flir_camera_index 3 --write_images ~/Desktop/intrinsics_3
 # Run calibration
-# Note: If your computer has enough RAM memory, you can run all of them at the same time in order to speed up the time (they are not internally multi-threaded).
+#     - Note: If your computer has enough RAM memory, you can run all of them at the same time in order to speed up the time (they are not internally multi-threaded).
 ./build/examples/calibration/calibration.bin --mode 1 --grid_square_size_mm 127.0 --grid_number_inner_corners "9x6" --camera_serial_number 17012332 --intrinsics_image_dir ~/Desktop/intrinsics_0
 ./build/examples/calibration/calibration.bin --mode 1 --grid_square_size_mm 127.0 --grid_number_inner_corners "9x6" --camera_serial_number 17092861 --intrinsics_image_dir ~/Desktop/intrinsics_1
 ./build/examples/calibration/calibration.bin --mode 1 --grid_square_size_mm 127.0 --grid_number_inner_corners "9x6" --camera_serial_number 17092865 --intrinsics_image_dir ~/Desktop/intrinsics_2
 ./build/examples/calibration/calibration.bin --mode 1 --grid_square_size_mm 127.0 --grid_number_inner_corners "9x6" --camera_serial_number 18079957 --intrinsics_image_dir ~/Desktop/intrinsics_3
+# Visualize undistorted images
+#     - Camera parameters will be saved on their respective serial number files, so OpenPose will automatically find them
+./build/examples/openpose/openpose.bin --num_gpu 0 --flir_camera
 ```
 
 2. Extrinsic parameter calibration:

@@ -8,7 +8,8 @@ namespace op
                                              const std::string& writeCocoJson_, const std::string& writeImages_,
                                              const std::string& writeImagesFormat_, const std::string& writeVideo_,
                                              const double writeVideoFps_, const std::string& writeHeatMaps_,
-                                             const std::string& writeHeatMapsFormat_) :
+                                             const std::string& writeHeatMapsFormat_,
+                                             const std::string& writeCocoFootJson_) :
         displayMode{displayMode_},
         guiVerbose{guiVerbose_},
         fullScreen{fullScreen_},
@@ -21,7 +22,8 @@ namespace op
         writeVideo{writeVideo_},
         writeHeatMaps{writeHeatMaps_},
         writeHeatMapsFormat{writeHeatMapsFormat_},
-        writeVideoFps{writeVideoFps_}
+        writeVideoFps{writeVideoFps_},
+        writeCocoFootJson{writeCocoFootJson_}
     {
     }
 }

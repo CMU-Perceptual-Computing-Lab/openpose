@@ -59,6 +59,7 @@ namespace op
                     !wrapperStructOutput.writeImages.empty() || !wrapperStructOutput.writeVideo.empty()
                         || !wrapperStructOutput.writeKeypoint.empty() || !wrapperStructOutput.writeJson.empty()
                         || !wrapperStructOutput.writeCocoJson.empty() || !wrapperStructOutput.writeHeatMaps.empty()
+                        || !wrapperStructOutput.writeCocoFootJson.empty()
                 );
                 const bool guiEnabled = (wrapperStructOutput.displayMode != DisplayMode::NoDisplay);
                 if (!guiEnabled && !savingSomething)

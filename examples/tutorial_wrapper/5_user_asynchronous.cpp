@@ -177,6 +177,7 @@ DEFINE_string(write_video,              "",             "Full file path to write
 DEFINE_string(write_json,               "",             "Directory to write OpenPose output in JSON format. It includes body, hand, and face pose"
                                                         " keypoints (2-D and 3-D), as well as pose candidates (if `--part_candidates` enabled).");
 DEFINE_string(write_coco_json,          "",             "Full file path to write people pose data with JSON COCO validation format.");
+DEFINE_string(write_coco_foot_json,     "",             "Full file path to write people foot pose data with JSON COCO validation format.");
 DEFINE_string(write_heatmaps,           "",             "Directory to write body pose heatmaps in PNG format. At least 1 `add_heatmaps_X` flag"
                                                         " must be enabled.");
 DEFINE_string(write_heatmaps_format,    "png",          "File extension and format for `write_heatmaps`, analogous to `write_images_format`."
@@ -413,7 +414,7 @@ int openPoseTutorialWrapper3()
                                                           writeJson, FLAGS_write_coco_json,
                                                           FLAGS_write_images, FLAGS_write_images_format, FLAGS_write_video,
                                                           FLAGS_camera_fps, FLAGS_write_heatmaps,
-                                                          FLAGS_write_heatmaps_format};
+                                                          FLAGS_write_heatmaps_format, FLAGS_write_coco_foot_json};
         // Configure wrapper
         op::log("Configuring OpenPose wrapper...", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
         opWrapper.configure(wrapperStructPose, wrapperStructFace, wrapperStructHand, op::WrapperStructInput{},

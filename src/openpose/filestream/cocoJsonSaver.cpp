@@ -3,12 +3,19 @@
 
 namespace op
 {
-    CocoJsonSaver::CocoJsonSaver(const std::string& filePathToSave, const bool humanReadable) :
+    CocoJsonSaver::CocoJsonSaver(const std::string& filePathToSave, const bool humanReadable,
+                                 const CocoJsonFormat cocoJsonFormat) :
+        mCocoJsonFormat{cocoJsonFormat},
         mJsonOfstream{filePathToSave, humanReadable},
         mFirstElementAdded{false}
     {
         try
         {
+            // Security checks
+            if (filePathToSave.empty())
+                error("Empty path given as output file path for saving COCO JSON format.",
+                      __LINE__, __FUNCTION__, __FILE__);
+            // Open array
             mJsonOfstream.arrayOpen();
         }
         catch (const std::exception& e)
@@ -67,13 +74,19 @@ namespace op
                 mJsonOfstream.key("keypoints");
                 mJsonOfstream.arrayOpen();
                 std::vector<int> indexesInCocoOrder;
-                if (numberBodyParts == 18)
-                    indexesInCocoOrder = std::vector<int>{0, 15,14,17,16,    5,2,6,3,7,    4,11,8,12, 9,    13,10};
-                else if (numberBodyParts == 19 || numberBodyParts == 59)
-                    indexesInCocoOrder = std::vector<int>{0, 16,15,18,17,    5,2,6,3,7,    4,12,9,13,10,    14,11};
-                else if (numberBodyParts == 23)
-                    indexesInCocoOrder = std::vector<int>{18,21,19,22,20,    4,1,5,2,6,    3,13,8,14, 9,    15,10};
-                else
+                if (mCocoJsonFormat == CocoJsonFormat::Body)
+                {
+                    if (numberBodyParts == 18)
+                        indexesInCocoOrder = std::vector<int>{0, 15,14,17,16,    5,2,6,3,7,    4,11,8,12, 9,    13,10};
+                    else if (numberBodyParts == 19 || numberBodyParts == 59)
+                        indexesInCocoOrder = std::vector<int>{0, 16,15,18,17,    5,2,6,3,7,    4,12,9,13,10,    14,11};
+                    else if (numberBodyParts == 23)
+                        indexesInCocoOrder = std::vector<int>{18,21,19,22,20,    4,1,5,2,6,    3,13,8,14, 9,    15,10};
+                }
+                else if (mCocoJsonFormat == CocoJsonFormat::Foot)
+                    if (numberBodyParts == 25)
+                        indexesInCocoOrder = std::vector<int>{19,20,21, 22,23,24};
+                if (indexesInCocoOrder.empty())
                     error("Invalid number of body parts (" + std::to_string(numberBodyParts) + ").",
                           __LINE__, __FUNCTION__, __FILE__);
                 for (auto bodyPart = 0u ; bodyPart < indexesInCocoOrder.size() ; bodyPart++)
