@@ -53,6 +53,7 @@ namespace op
                     replaceAll(src, "Type", type);
                     program = cl::Program(context, src, true);
                 }
+                #if defined(USE_OPENCL) && defined(CL_HPP_ENABLE_EXCEPTIONS)
                 catch (cl::BuildError e)
                 {
                     auto buildInfo = e.getBuildLog();
@@ -61,6 +62,11 @@ namespace op
                                      pair.second << std::endl;
                         error("OpenCL error: OpenPose crashed due to the previously printed errors.",
                               __LINE__, __FUNCTION__, __FILE__);
+                }
+                #endif
+                catch (const std::exception& e)
+                {
+                    error(e.what(), __LINE__, __FUNCTION__, __FILE__);
                 }
                 return true;
             #else
@@ -231,9 +237,15 @@ namespace op
                         }
                     }
                 }
+                #if defined(USE_OPENCL) && defined(CL_HPP_ENABLE_EXCEPTIONS)
                 catch (cl::Error e)
                 {
                     op::log("Error: " + std::string(e.what()));
+                }
+                #endif
+                catch (const std::exception& e)
+                {
+                    error(e.what(), __LINE__, __FUNCTION__, __FILE__);
                 }
             }
         #else
@@ -427,9 +439,15 @@ namespace op
                 else
                     return -1;
             }
+            #if defined(USE_OPENCL) && defined(CL_HPP_ENABLE_EXCEPTIONS)
             catch (cl::Error& e)
             {
                 op::log("Error: " + std::string(e.what()));
+            }
+            #endif
+            catch (const std::exception& e)
+            {
+                error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             }
         #else
             error("OpenPose must be compiled with the `USE_OPENCL` macro definition in order to use this"

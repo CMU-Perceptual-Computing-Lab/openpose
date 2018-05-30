@@ -57,6 +57,7 @@ MANIFEST-*
 
 # OSX dir files
 .DS_Store
+._.DS_Store
 
 # Vim files
 cscope.*

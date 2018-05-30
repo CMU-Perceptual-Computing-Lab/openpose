@@ -326,7 +326,7 @@ namespace op
                       " functionality.", __LINE__, __FUNCTION__, __FILE__);
             #endif
         }
-        #ifdef USE_OPENCL
+        #if defined(USE_OPENCL) && defined(CL_HPP_ENABLE_EXCEPTIONS)
         catch (const cl::Error& e)
         {
             error(std::string(e.what()) + " : " + op::OpenCL::clErrorToString(e.err()) + " ID: " +
