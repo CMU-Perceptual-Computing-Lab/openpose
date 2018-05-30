@@ -15,7 +15,7 @@ namespace op
         const std::string nmsOclCommonFunctions = MULTI_LINE_STRING(
             void nmsAccuratePeakPosition(__global const Type* sourcePtr, Type* fx, Type* fy, Type* fscore,
                                          const int peakLocX, const int peakLocY, const int width, const int height,
-                                         const T offsetX, const T offsetY)
+                                         const Type offsetX, const Type offsetY)
             {
                 Type xAcc = 0.f;
                 Type yAcc = 0.f;
@@ -102,11 +102,11 @@ namespace op
             }
         );
 
-        typedef cl::KernelFunctor<cl::Buffer, cl::Buffer, cl::Buffer, int, int, int, int> NMSWriteKernelFunctor;
+        typedef cl::KernelFunctor<cl::Buffer, cl::Buffer, cl::Buffer, int, int, int, int, float, float> NMSWriteKernelFunctor;
         const std::string nmsWriteKernel = MULTI_LINE_STRING(
             __kernel void nmsWriteKernel(__global Type* targetPtr, __global int* kernelPtr, __global const Type* sourcePtr,
                                          const int w, const int h, const int maxPeaks, const int debug,
-                                         const T offsetX, const T offsetY)
+                                         const Type offsetX, const Type offsetY)
             {
                 int x = get_global_id(0);
                 int y = get_global_id(1);
