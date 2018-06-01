@@ -2,7 +2,7 @@
 #ifdef _WIN32
     #include <direct.h> // _mkdir
     #include <windows.h> // DWORD, GetFileAttributesA
-#elif defined __unix__
+#elif defined __unix__ || defined __APPLE__
     #include <dirent.h> // opendir
     #include <sys/stat.h> // mkdir
 #else
@@ -26,7 +26,7 @@ namespace op
                 {
                     #ifdef _WIN32
                         const auto status = _mkdir(formatedPath.c_str());
-                    #elif defined __unix__
+                    #elif defined __unix__ || defined __APPLE__
                         // Create folder
                         // Access permission - 775 (7, 7, 4+1)
                         // https://www.gnu.org/software/libc/manual/html_node/Permission-Bits.html
@@ -62,7 +62,7 @@ namespace op
                     return true;
                 // It is not a directory
                 return false;    // this is not a directory!
-            #elif defined __unix__
+            #elif defined __unix__ || defined __APPLE__
                 // It is a directory
                 if (auto* directory = opendir(formatedPath.c_str()))
                 {
@@ -291,7 +291,7 @@ namespace op
                     while (FindNextFile(hFind, &data) != 0);
                     FindClose(hFind);
                 }
-            #elif defined __unix__
+            #elif defined __unix__ || defined __APPLE__
                 std::shared_ptr<DIR> directoryPtr(
                     opendir(formatedPath.c_str()),
                     [](DIR* formatedPath){ formatedPath && closedir(formatedPath); }

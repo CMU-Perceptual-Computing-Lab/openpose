@@ -5,6 +5,10 @@ set(OpenPose_VERSION_PATCH 0)
 set(OpenPose_VERSION ${OpenPose_VERSION_MAJOR}.${OpenPose_VERSION_MINOR}.${OpenPose_VERSION_PATCH})
 
 
+### OS-DEPENDENT FLAGS
+set(CMAKE_MACOSX_RPATH 1)
+
+
 ### CMAKE HEADERS
 if (${CMAKE_VERSION} VERSION_GREATER 3.0.0)
  cmake_policy(SET CMP0048 NEW)
@@ -13,12 +17,6 @@ else (${CMAKE_VERSION} VERSION_GREATER 3.0.0)
  project(OpenPose)
 endif (${CMAKE_VERSION} VERSION_GREATER 3.0.0)
 cmake_minimum_required(VERSION 2.8.7 FATAL_ERROR) # min. cmake version recommended by Caffe
-
-
-### FIND THE OS
-if (APPLE) # OS is Apple
-  message(FATAL_ERROR "Apple OS is not currently supported.")
-endif (APPLE)
 
 
 ### Extra functionality
@@ -52,9 +50,13 @@ if (WIN32)
   string(REPLACE "/MDd" "/MD" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
   string(REPLACE "/Zi" "/Z7" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
   string(REPLACE "/RTC1" "" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
-elseif (UNIX AND NOT APPLE)
+elseif (UNIX)
   # Turn on C++11
   add_definitions(-std=c++11)
+  set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+elseif (APPLE)
+  # Turn on C++11
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
   set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 endif (WIN32)
 
@@ -232,10 +234,20 @@ option(BUILD_SHARED_LIBS "Build as shared lib" ON)
 option(PROFILER_ENABLED "If enabled, OpenPose will be able to print out speed information at runtime." OFF)
 
 # Threads - Pthread
-if (${GPU_MODE} MATCHES "OPENCL" OR (UNIX AND NOT APPLE))
+if (${GPU_MODE} MATCHES "OPENCL" OR (UNIX OR APPLE))
   unset(CMAKE_THREAD_LIBS_INIT CACHE)
   find_package(Threads)
-endif (${GPU_MODE} MATCHES "OPENCL" OR (UNIX AND NOT APPLE))
+endif (${GPU_MODE} MATCHES "OPENCL" OR (UNIX OR APPLE))
+
+# Caffe OpenCL Boost Issue
+if (APPLE)
+  if (${GPU_MODE} MATCHES "OPENCL")
+    unset(Boost_SYSTEM_LIBRARY CACHE)
+    find_package(Boost COMPONENTS system REQUIRED)
+  else ()
+    set(Boost_SYSTEM_LIBRARY "")
+  endif ()
+endif ()
 
 ### FIND REQUIRED PACKAGES
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
@@ -289,7 +301,7 @@ else (${WITH_EIGEN} MATCHES "NONE")
   endif (${WITH_EIGEN} MATCHES "BUILD")
 endif (${WITH_EIGEN} MATCHES "NONE")
 
-if (UNIX AND NOT APPLE)
+if (UNIX OR APPLE)
   if (${GPU_MODE} MATCHES "CUDA")
     include(cmake/Cuda.cmake)
     find_package(CuDNN)
@@ -365,7 +377,7 @@ if (UNIX AND NOT APPLE)
       sudo apt-get install libopencv-dev")
   endif (NOT OpenCV_FOUND)
 
-endif (UNIX AND NOT APPLE)
+endif (UNIX OR APPLE)
 
 if (WIN32)
 
@@ -472,7 +484,7 @@ endif (WIN32)
 
 
 ### CAFFE
-if (UNIX AND NOT APPLE)
+if (UNIX OR APPLE)
 
   if (${DL_FRAMEWORK} MATCHES "CAFFE")
 
@@ -609,7 +621,7 @@ if (UNIX AND NOT APPLE)
 
   endif (${DL_FRAMEWORK} MATCHES "CAFFE")
 
-endif (UNIX AND NOT APPLE)
+endif (UNIX OR APPLE)
 
 ### PROJECT INCLUDES
 # Specify the include directories
@@ -624,6 +636,11 @@ if (NOT ${WITH_EIGEN} MATCHES "NONE")
   include_directories(
       ${EIGEN3_INCLUDE_DIRS})
 endif (NOT ${WITH_EIGEN} MATCHES "NONE")
+
+if (APPLE)
+  include_directories(
+      "/usr/local/opt/openblas/include")
+endif (APPLE)
 
 if (USE_MKL)
  include_directories(
@@ -662,13 +679,13 @@ endif (WIN32)
 
 ### COLLECT ALL 3RD-PARTY LIBRARIES TO BE LINKED AGAINST
 set(OpenPose_3rdparty_libraries ${OpenCV_LIBS} ${GLOG_LIBRARY})
-if (UNIX AND NOT APPLE)
+if (UNIX OR APPLE)
   set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries} ${GLOG_LIBRARY})
 elseif (WIN32)
   set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries}
       debug ${GFLAGS_LIBRARY_DEBUG} optimized ${GFLAGS_LIBRARY_RELEASE}
       debug ${GLOG_LIBRARY_DEBUG} optimized ${GLOG_LIBRARY_RELEASE})
-endif (UNIX AND NOT APPLE)
+endif (UNIX OR APPLE)
 # Deep net Framework
 if (${DL_FRAMEWORK} MATCHES "CAFFE")
   set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries} ${Caffe_LIBS} ${GFLAGS_LIBRARY})
@@ -695,9 +712,9 @@ if (WITH_FLIR_CAMERA)
   set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries} ${SPINNAKER_LIB})
 endif (WITH_FLIR_CAMERA)
 # Pthread
-if (UNIX AND NOT APPLE)
+if (UNIX OR APPLE)
   set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries} pthread)
-endif (UNIX AND NOT APPLE)
+endif (UNIX OR APPLE)
 
 set(examples_3rdparty_libraries ${OpenPose_3rdparty_libraries} ${GFLAGS_LIBRARY})
 
@@ -731,7 +748,7 @@ message(STATUS "Models Downloaded.")
 
 
 ### GENERATE DOCUMENTATION
-if (UNIX AND NOT APPLE)
+if (UNIX OR APPLE)
 
   if (BUILD_DOCS)
     find_package(Doxygen)
@@ -750,11 +767,11 @@ if (UNIX AND NOT APPLE)
     endif (DOXYGEN_FOUND)
   endif (BUILD_DOCS)
 
-endif (UNIX AND NOT APPLE)
+endif (UNIX OR APPLE)
 
 
 ### INSTALL
-if (UNIX AND NOT APPLE)
+if (UNIX OR APPLE)
   if (Caffe_FOUND)
     # Install the headers
     install(DIRECTORY ${CMAKE_SOURCE_DIR}/include/openpose DESTINATION include)
@@ -781,4 +798,4 @@ if (UNIX AND NOT APPLE)
     add_custom_target(uninstall
         COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
   endif (Caffe_FOUND)
-endif (UNIX AND NOT APPLE)
+endif (UNIX OR APPLE)
