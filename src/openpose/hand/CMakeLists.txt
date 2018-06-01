@@ -22,7 +22,6 @@ if (UNIX OR APPLE)
     add_library(openpose_hand ${SOURCES_OP_HAND})
   endif ()
 
-  # Required for OSX
   target_link_libraries(openpose_hand openpose_core)
   
   if (BUILD_CAFFE)

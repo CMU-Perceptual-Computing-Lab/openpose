@@ -9,8 +9,7 @@ set(SOURCES_OPENPOSE ${SOURCES_OPENPOSE} ${SOURCES_OP_THREAD_WITH_CP} PARENT_SCO
 if (UNIX OR APPLE)
 	add_library(openpose_thread ${SOURCES_OP_THREAD})
 
-        # Required for OSX
-        target_link_libraries(openpose_thread openpose_core)
+    target_link_libraries(openpose_thread openpose_core)
 	
 	install(TARGETS openpose_thread 
 	    EXPORT OpenPose

@@ -15,7 +15,6 @@ if (UNIX OR APPLE)
     add_library(openpose_gpu ${SOURCES_OP_GPU})
   endif ()
 
-  # Required for OSX
   target_link_libraries(openpose_gpu openpose_core)
 
   install(TARGETS openpose_gpu

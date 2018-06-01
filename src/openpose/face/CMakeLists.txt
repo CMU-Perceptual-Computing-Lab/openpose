@@ -22,7 +22,6 @@ if (UNIX OR APPLE)
     add_library(openpose_face ${SOURCES_OP_FACE})
   endif ()
 
-  # Required for OSX
   target_link_libraries(openpose_face openpose_core)
   
   if (BUILD_CAFFE)
