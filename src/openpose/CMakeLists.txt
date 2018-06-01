@@ -19,7 +19,7 @@ set(OP_HEADERS "")
 
 if (${GPU_MODE} MATCHES "CUDA")
     cuda_add_library(openpose ${SOURCES_OPENPOSE} ${OP_HEADERS})
-else()
+else ()
     add_library(openpose ${SOURCES_OPENPOSE} ${OP_HEADERS})
 endif ()
 

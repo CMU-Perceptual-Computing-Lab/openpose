@@ -22,17 +22,18 @@ set(SOURCES_OPENPOSE ${SOURCES_OPENPOSE} ${SOURCES_OP_CORE_WITH_CP} PARENT_SCOPE
 if (UNIX OR APPLE)
   if (${GPU_MODE} MATCHES "CUDA")
     cuda_add_library(openpose_core ${SOURCES_OP_CORE})
-  else()
+  else ()
     add_library(openpose_core ${SOURCES_OP_CORE})
   endif ()
 
-  # Require for OSX
-  if (APPLE)
-  add_library(caffe SHARED IMPORTED)
-  set_property(TARGET caffe PROPERTY IMPORTED_LOCATION ${Caffe_LIBS})
   target_link_libraries(openpose_core openpose caffe  ${OpenCV_LIBS} ${Caffe_LIBS} ${GLUT_LIBRARY} ${SPINNAKER_LIB} ${OpenCL_LIBRARIES}
         ${GLOG_LIBRARY} ${OpenCV_LIBS} ${Caffe_LIBS} ${GFLAGS_LIBRARY} ${GLOG_LIBRARY} ${MKL_LIBS} ${GLUT_LIBRARY} ${SPINNAKER_LIB})
-  endif ()
+
+  # Required for OSX
+  if (APPLE)
+    add_library(caffe SHARED IMPORTED)
+    set_property(TARGET caffe PROPERTY IMPORTED_LOCATION ${Caffe_LIBS})
+  endif (APPLE)
 
   if (BUILD_CAFFE)
     add_dependencies(openpose_core openpose_caffe)

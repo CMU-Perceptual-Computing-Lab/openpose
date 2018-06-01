@@ -32,7 +32,7 @@ This installation section is only intended if you plan to modify the OpenPose co
 ## Operating Systems
 - **Ubuntu** 14 and 16.
 - **Windows** 8 and 10.
-- **OSX** Mavericks and above (Only CPU Version tested). If you want to test GPU version, email gines@cmu.edu.
+- **Mac / OSX** Mavericks and above (only CPU version tested). If you want to test our Mac GPU version, email gines@cmu.edu.
 - **Nvidia Jetson TX2**, installation instructions in [doc/installation_jetson_tx2.md](./installation_jetson_tx2.md).
 - OpenPose has also been used on **Windows 7**, **CentOS**, and **Nvidia Jetson (TK1 and TX1)** embedded systems. However, we do not officially support them at the moment.
 
@@ -122,9 +122,9 @@ The instructions in this section describe the steps to build OpenPose using CMak
             - [Caffe dependencies](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe3rdparty_2017_07_14.zip): Unzip as `3rdparty/windows/caffe3rdparty/`.
             - [OpenCV 3.1](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/opencv_310.zip): Unzip as `3rdparty/windows/opencv/`.
 6. OSX - **Caffe, OpenCV, and Caffe prerequisites**:
+    - Install deps by running `sudo bash 3rdparty/osx/install_deps.sh` on your terminal.
     - Current OSX has only been tested with the CPU Version, and hence must be compiled with the `-DGPU_MODE=CPU_ONLY` flag.
-    - Install deps with `sudo bash 3rdparty/osx/install_deps.sh`
-5. **Eigen prerequisite**:
+7. **Eigen prerequisite**:
     - Note: This step is optional, only required for some specific extra functionality, such as extrinsic camera calibration.
     - If you enable the `WITH_EIGEN` flag when running CMake. You can either:
         1. Do not do anything if you set the `WITH_EIGEN` flag to `BUILD`, CMake will automatically download Eigen. Alternatively, you might prefer to download it manually:

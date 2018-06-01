@@ -11,11 +11,11 @@ set(SOURCES_OPENPOSE ${SOURCES_OPENPOSE} ${SOURCES_OP_CALIBRATION_WITH_CP} PAREN
 if (UNIX OR APPLE)
   if (${GPU_MODE} MATCHES "CUDA")
     cuda_add_library(openpose_calibration ${SOURCES_OP_CALIBRATION})
-  else()
+  else ()
     add_library(openpose_calibration ${SOURCES_OP_CALIBRATION})
   endif ()
 
-  # Require for OSX
+  # Required for OSX
   target_link_libraries(openpose_calibration openpose_core)
 
   if (BUILD_CAFFE)

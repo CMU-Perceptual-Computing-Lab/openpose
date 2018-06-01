@@ -429,14 +429,16 @@ namespace op
             std::vector<cl::Platform> platforms;
             std::vector<cl::Device> devices;
             cl_uint type;
-            try {
+            try
+            {
                 cl::Platform::get(&platforms);
                 if (!platforms.size())
                     return -1;
                 type = platforms[0].getDevices(CL_DEVICE_TYPE_GPU, &devices);
                 if (type == CL_SUCCESS)
                     return devices.size();
-                else{
+                else
+                {
                     error("No GPU Devices were found. OpenPose only supports GPU OpenCL", __LINE__, __FUNCTION__, __FILE__);
                     return -1;
                 }

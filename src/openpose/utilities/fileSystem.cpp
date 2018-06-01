@@ -2,10 +2,7 @@
 #ifdef _WIN32
     #include <direct.h> // _mkdir
     #include <windows.h> // DWORD, GetFileAttributesA
-#elif defined __unix__
-    #include <dirent.h> // opendir
-    #include <sys/stat.h> // mkdir
-#elif defined __APPLE__
+#elif defined __unix__ || defined __APPLE__
     #include <dirent.h> // opendir
     #include <sys/stat.h> // mkdir
 #else

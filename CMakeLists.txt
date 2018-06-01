@@ -3,7 +3,11 @@ set(OpenPose_VERSION_MAJOR 1)
 set(OpenPose_VERSION_MINOR 3)
 set(OpenPose_VERSION_PATCH 0)
 set(OpenPose_VERSION ${OpenPose_VERSION_MAJOR}.${OpenPose_VERSION_MINOR}.${OpenPose_VERSION_PATCH})
+
+
+### OS-DEPENDENT FLAGS
 set(CMAKE_MACOSX_RPATH 1)
+
 
 ### CMAKE HEADERS
 if (${CMAKE_VERSION} VERSION_GREATER 3.0.0)
@@ -636,7 +640,7 @@ endif (NOT ${WITH_EIGEN} MATCHES "NONE")
 if (APPLE)
   include_directories(
       "/usr/local/opt/openblas/include")
-endif ()
+endif (APPLE)
 
 if (USE_MKL)
  include_directories(

@@ -11,11 +11,11 @@ set(SOURCES_OPENPOSE ${SOURCES_OPENPOSE} ${SOURCES_OP_GPU_WITH_CP} PARENT_SCOPE)
 if (UNIX OR APPLE)
   if (${GPU_MODE} MATCHES "CUDA")
     cuda_add_library(openpose_gpu ${SOURCES_OP_GPU})
-  else()
+  else ()
     add_library(openpose_gpu ${SOURCES_OP_GPU})
   endif ()
 
-  # Require for OSX
+  # Required for OSX
   target_link_libraries(openpose_gpu openpose_core)
 
   install(TARGETS openpose_gpu
