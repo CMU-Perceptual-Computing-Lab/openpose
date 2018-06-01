@@ -436,8 +436,10 @@ namespace op
                 type = platforms[0].getDevices(CL_DEVICE_TYPE_GPU, &devices);
                 if (type == CL_SUCCESS)
                     return devices.size();
-                else
+                else{
+                    error("No GPU Devices were found. OpenPose only supports GPU OpenCL", __LINE__, __FUNCTION__, __FILE__);
                     return -1;
+                }
             }
             #if defined(USE_OPENCL) && defined(CL_HPP_ENABLE_EXCEPTIONS)
             catch (cl::Error& e)
