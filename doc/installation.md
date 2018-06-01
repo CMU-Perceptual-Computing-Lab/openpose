@@ -32,7 +32,7 @@ This installation section is only intended if you plan to modify the OpenPose co
 ## Operating Systems
 - **Ubuntu** 14 and 16.
 - **Windows** 8 and 10.
-- **Mac / OSX** Mavericks and above (only CPU version tested). If you want to test our Mac GPU version, email gines@cmu.edu.
+- **Mac OSX** Mavericks and above (only CPU version tested). If you want to test our Mac GPU version, email gines@cmu.edu.
 - **Nvidia Jetson TX2**, installation instructions in [doc/installation_jetson_tx2.md](./installation_jetson_tx2.md).
 - OpenPose has also been used on **Windows 7**, **CentOS**, and **Nvidia Jetson (TK1 and TX1)** embedded systems. However, we do not officially support them at the moment.
 

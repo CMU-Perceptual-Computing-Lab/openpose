@@ -140,10 +140,10 @@ namespace op
                      || wrapperStructInput.producerSharedPtr->getType() == ProducerType::ImageDirectory)
                     // If netInputSize is -1
                     && (wrapperStructPose.netInputSize.x == -1 || wrapperStructPose.netInputSize.y == -1))
-                    error("Dynamic `--net_resolution` is not supported in MKL (CPU) and OpenCL Caffe versions. Please"
-                          " remove `-1` from `net_resolution` or use the Caffe master branch when processing images"
-                          " and when using your custom image reader.",
-                          __LINE__, __FUNCTION__, __FILE__);
+                    error("The default dynamic `--net_resolution` is not supported in MKL (CPU Caffe) and OpenCL Caffe"
+                          " versions. Please, use a static `net_resolution` (recommended `--net_resolution 656x368`)"
+                          " or use the Caffe CUDA master branch when processing images and/or when using your custom"
+                          " image reader.", __LINE__, __FUNCTION__, __FILE__);
             #endif
 
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);

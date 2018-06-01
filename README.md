@@ -23,11 +23,12 @@
 - **Input**: Image, video, webcam, and IP camera. Included C++ demos to add your custom input.
 - **Output**: Basic image + keypoint display/saving (PNG, JPG, AVI, ...), keypoint saving (JSON, XML, YML, ...), and/or keypoints as array class.
 - Available: command-line demo, C++ wrapper, and C++ API.
-- **OS**: Ubuntu (14, 16), Windows (8, 10), Nvidia TX2.
+- **OS**: Ubuntu (14, 16), Windows (8, 10), Mac OSX, Nvidia TX2.
 
 
 
 ## Latest Features
+- Jun 2018: [**Mac OSX version (CPU)**](doc/installation.md)!
 - Mar 2018: [**CPU version**](doc/installation.md#cpu-version)!
 - Mar 2018: Improved [**3-D keypoint reconstruction module**](doc/3d_reconstruction_demo.md) (from multiple camera views)!
 - Sep 2017: [**CMake**](doc/installation.md) installer and **IP camera** support!

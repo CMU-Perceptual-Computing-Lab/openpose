@@ -30,16 +30,15 @@ Note: In order to maximize calibration quality, **do not reuse the same video se
 1. Run OpenPose and save images for your desired camera. Use a grid (chessboard) pattern and move around all the image area.
     1. Quality tips:
         1. Keep the same orientation of the chessboard, i.e., do not rotate it circularly more than ~15-30 degress. Our algorithm assumes that the origin is the corner at the top left, so rotating the chessboard circularly will change this origin across frames, resulting in many frames being rejected for the final calibration, i.e., lower calibration accuracy.
-        2. You should get at least 100-200 images for a good calibration (and no more than 500).
-        3. Cover several distances, and within each distance, cover all parts of the image view (all corners and center).
-        4. Save the images in PNG format (default behavior) in order to improve calibration quality. 
-        5. The calibration of a camera takes about 3 minutes with about 100 images, about 1.5h with 200 images, and about 9.5h with 450 images. Required RAM memory also grows exponentially.
+        2. Cover several distances, and within each distance, cover all parts of the image view (all corners and center).
+        3. Save the images in PNG format (default behavior) in order to improve calibration quality. PNG images are bigger than JPG equivalent, but do not lose information by compression.
+        4. Recommended about 400 image views for high quality calibration. You should get at least 150 images for a good calibration, while no more than 500. The calibration of a camera takes about 3 minutes with about 100 images, about 1.5h with 200 images, and about 9.5h with 450 images. Required RAM memory also grows exponentially.
     2. Changing image source:
         1. Webcam calibration: `./build/examples/openpose/openpose.bin --num_gpu 0 --frame_keep_distortion --write_images {intrinsic_images_folder_path}`.
         2. Flir camera calibration: Add the flags `--flir_camera --flir_camera_index 0` (or the desired flir camera index) to the webcam command.
         3. Calibration from video sequence: Add the flag `--video {video_path}` to the webcam command.
         4. Any other camera brand: Simply save your images in {intrinsic_images_folder_path}, file names are not relevant.
-2. Get familiar with the calibration parameters used in point 3 (i.e., `grid_square_size_mm`, `grid_number_inner_corners`, etc.) by running:
+2. Get familiar with the calibration parameters used in point 3 (i.e., `grid_square_size_mm`, `grid_number_inner_corners`, etc.) by running the `--help` flag:
 ```
 ./build/examples/calibration/calibration.bin --help
 ```

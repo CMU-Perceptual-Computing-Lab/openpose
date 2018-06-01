@@ -1,6 +1,7 @@
 OpenPose Library - Latest Released Features
 ====================================
 
+- Jun 2018: [**Mac OSX version (CPU)**](./installation.md)!
 - Mar 2018: [**CPU version**](./installation.md#cpu-version)!
 - Mar 2018: Improved [**3-D keypoint reconstruction module**](./3d_reconstruction_demo.md) (from multiple camera views)!
 - Sep 2017: [**CMake**](./installation.md) installer and **IP camera** support!

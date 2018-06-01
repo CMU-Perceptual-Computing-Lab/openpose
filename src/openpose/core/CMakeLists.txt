@@ -26,10 +26,9 @@ if (UNIX OR APPLE)
     add_library(openpose_core ${SOURCES_OP_CORE})
   endif ()
 
-  target_link_libraries(openpose_core openpose caffe  ${OpenCV_LIBS} ${Caffe_LIBS} ${GLUT_LIBRARY} ${SPINNAKER_LIB} ${OpenCL_LIBRARIES}
-        ${GLOG_LIBRARY} ${OpenCV_LIBS} ${Caffe_LIBS} ${GFLAGS_LIBRARY} ${GLOG_LIBRARY} ${MKL_LIBS} ${GLUT_LIBRARY} ${SPINNAKER_LIB})
-
   if (APPLE)
+    target_link_libraries(openpose_core openpose caffe  ${OpenCV_LIBS} ${Caffe_LIBS} ${GLUT_LIBRARY} ${SPINNAKER_LIB} ${OpenCL_LIBRARIES}
+          ${GLOG_LIBRARY} ${OpenCV_LIBS} ${Caffe_LIBS} ${GFLAGS_LIBRARY} ${GLOG_LIBRARY} ${MKL_LIBS} ${GLUT_LIBRARY} ${SPINNAKER_LIB})
     add_library(caffe SHARED IMPORTED)
     set_property(TARGET caffe PROPERTY IMPORTED_LOCATION ${Caffe_LIBS})
   endif (APPLE)
