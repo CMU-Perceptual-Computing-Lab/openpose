@@ -328,21 +328,28 @@ namespace op
 
     // Default Model Parameters
     // They might be modified on running time
+    // const bool COCO_CHALLENGE = true;
+    const bool COCO_CHALLENGE = false;
+    const auto nmsT = (COCO_CHALLENGE ? 0.04f : 0.05f);
     const std::array<float, (int)PoseModel::Size>           POSE_DEFAULT_NMS_THRESHOLD{
-        0.05f,      0.6f,       0.3f,       0.05f,      0.05f,      0.05f,      0.05f,      0.05f,      0.05f,      0.05f,      0.05f
+        nmsT,       0.6f,       0.3f,       nmsT,       nmsT,       nmsT,       nmsT,       nmsT,       nmsT,       nmsT,       nmsT
     };
+    const auto minAT = (COCO_CHALLENGE ? 0.75f : 0.95f); // Matlab version: 0.85f
     const std::array<float, (int)PoseModel::Size>    POSE_DEFAULT_CONNECT_INTER_MIN_ABOVE_THRESHOLD{
-        0.95f,      0.95f,      0.95f,      0.95f,      0.95f,      0.95f,      0.95f,      0.95f,      0.95f,      0.95f,      0.95f
+        minAT,      minAT,      minAT,      minAT,     minAT,      minAT,      minAT,      minAT,      minAT,      minAT,      minAT
         // 0.85f,      0.85f,      0.85f,      0.85f,      0.85f,      0.85f // Matlab version
     };
+    const auto conIT = (COCO_CHALLENGE ? 0.01f : 0.05f);
     const std::array<float, (int)PoseModel::Size>           POSE_DEFAULT_CONNECT_INTER_THRESHOLD{
-        0.05f,      0.01f,      0.01f,      0.05f,      0.05f,      0.05f,      0.05f,      0.05f,      0.05f,      0.05f,      0.05f
+        conIT,      0.01f,      0.01f,      conIT,      conIT,      conIT,      conIT,      conIT,      conIT,      conIT,      conIT
     };
+    const auto minSC = (COCO_CHALLENGE ? 2 : 3);
     const std::array<unsigned int, (int)PoseModel::Size>    POSE_DEFAULT_CONNECT_MIN_SUBSET_CNT{
-        3,          3,          3,          3,          3,          3,          3,          3,          3,          3,          3
+        minSC,      minSC,      minSC,      minSC,      minSC,      minSC,      minSC,      minSC,      minSC,      minSC,      minSC
     };
+    const auto minSS = (COCO_CHALLENGE ? 0.05f : 0.4f);
     const std::array<float, (int)PoseModel::Size>           POSE_DEFAULT_CONNECT_MIN_SUBSET_SCORE{
-        0.4f,       0.4f,       0.4f,       0.4f,       0.4f,       0.4f,       0.4f,       0.4f,       0.4f,       0.4f,       0.4f
+        minSS,      minSS,      minSS,      minSS,      minSS,      minSS,      minSS,      minSS,      minSS,      minSS,      minSS
         // 0.2f,       0.4f,       0.4f,       0.4f,       0.4f,       0.4f // Matlab version
     };
 

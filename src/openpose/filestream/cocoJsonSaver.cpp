@@ -92,11 +92,12 @@ namespace op
                 for (auto bodyPart = 0u ; bodyPart < indexesInCocoOrder.size() ; bodyPart++)
                 {
                     const auto finalIndex = 3*(person*numberBodyParts + indexesInCocoOrder.at(bodyPart));
-                    mJsonOfstream.plainText(poseKeypoints[finalIndex]);
+                    const auto validPoint = (poseKeypoints[finalIndex+2] > 0.f);
+                    mJsonOfstream.plainText(validPoint ? poseKeypoints[finalIndex] : -1.f);
                     mJsonOfstream.comma();
-                    mJsonOfstream.plainText(poseKeypoints[finalIndex+1]);
+                    mJsonOfstream.plainText(validPoint ? poseKeypoints[finalIndex+1] : -1.f);
                     mJsonOfstream.comma();
-                    mJsonOfstream.plainText((poseKeypoints[finalIndex+2] > 0.f ? 1 : 0));
+                    mJsonOfstream.plainText(validPoint ? 1 : 0);
                     // mJsonOfstream.plainText(poseKeypoints[finalIndex+2]); // For debugging
                     if (bodyPart < indexesInCocoOrder.size() - 1u)
                         mJsonOfstream.comma();

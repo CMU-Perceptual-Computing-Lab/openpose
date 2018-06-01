@@ -22,7 +22,7 @@ Check [doc/installation.md#calibration-module](./installation.md#calibration-mod
 
 
 ## Quick Start
-Note: This example will assume that the target are 3 Flir/Point Grey cameras, but it can be generalized to any camera model.
+Note: In order to maximize calibration quality, **do not reuse the same video sequence for both intrinsic and extrinsic parameter estimation**. The intrinsic parameter calibration should be run camera by camera, where each recorded video sequence should be focused in covering all regions of the camera view and repeated from several distances. In the extrinsic sequence, this video sequence should be focused in making sure that the checkboard is visible from at least 2 cameras at the time. So for 3-camera calibration, you would need 1 video sequence per camera as well as a final sequence for the extrinsic parameter calibration.
 
 1. Distortion and intrinsic parameter calibration:
     1. Run OpenPose and save images for your desired camera. Use a grid (chessboard) pattern and move around all the image area.
@@ -41,10 +41,12 @@ Note: This example will assume that the target are 3 Flir/Point Grey cameras, bu
 ```
 ./build/examples/calibration/calibration.bin --help
 ```
+
     3. Extract and save the intrinsic parameters:
 ```
 ./build/examples/calibration/calibration.bin --mode 1 --grid_square_size_mm 40.0 --grid_number_inner_corners "9x5" --camera_serial_number 18079958 --intrinsics_image_dir {intrinsic_images_folder_path}
 ```
+
     4. In this case, the intrinsic parameters would have been generated as {intrinsic_images_folder_path}/18079958.xml.
     5. Run steps 1-4 for each one of your cameras.
     6. After you calibrate the camera intrinsics, when you run OpenPose with those cameras, you should see the lines in real-life to be (almost) perfect lines in the image. Otherwise, the calibration was not good. Try checking straight patterns such us wall corners or ceilings:
@@ -54,7 +56,8 @@ Note: This example will assume that the target are 3 Flir/Point Grey cameras, bu
 # Without distortion (lines should look as lines)
 ./build/examples/openpose/openpose.bin --num_gpu 0 --flir_camera --flir_camera_index 0
 ```
-    7. Full example for 4 flir cameras:
+
+    7. Full example for 4 Flir/Point Grey cameras:
 ```
 # Get images for calibration
 ./build/examples/openpose/openpose.bin --num_gpu 0 --frame_keep_distortion --flir_camera --flir_camera_index 0 --write_images ~/Desktop/intrinsics_0
@@ -78,4 +81,6 @@ Note: This example will assume that the target are 3 Flir/Point Grey cameras, bu
 
 
 ## Using a Different Camera Brand
-You can use any camera brand, check [doc/3d_reconstruction_demo.md#using-a-different-camera-brand](./3d_reconstruction_demo.md#using-a-different-camera-brand).
+If you plan to use the calibration tool without using OpenPose, you can manually save a video sequence of your desired camera into each of the camera image folders (i.e., in the above example, the `~/Desktop/intrinsics_0`, `~/Desktop/intrinsics_1`, etc. folders).
+
+If you wanna eventually run that camera with OpenPose, check [doc/3d_reconstruction_demo.md#using-a-different-camera-brand](./3d_reconstruction_demo.md#using-a-different-camera-brand).
