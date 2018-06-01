@@ -13,7 +13,7 @@ set(SOURCES_OPENPOSE ${SOURCES_OPENPOSE} ${SOURCES_OP_TRACKING_WITH_CP} PARENT_S
 if (UNIX OR APPLE)
 	add_library(openpose_tracking ${SOURCES_OP_TRACKING})
 
-	set_target_properties(openpose_tracking PROPERTIES COMPILE_FLAGS ${OP_CXX_FLAGS})
+	#set_target_properties(openpose_tracking PROPERTIES COMPILE_FLAGS ${OP_CXX_FLAGS})
 
         # Required for OSX
         target_link_libraries(openpose_tracking openpose_core)

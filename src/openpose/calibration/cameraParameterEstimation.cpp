@@ -15,8 +15,8 @@ namespace op
         cv::Mat distortionCoefficients;
 
         Intrinsics() :
-            cameraMatrix{cv::Mat::eye(3, 3, CV_64F)},
-            distortionCoefficients{cv::Mat::zeros(14, 1, CV_64F)}
+            cameraMatrix(cv::Mat::eye(3, 3, CV_64F)),
+            distortionCoefficients(cv::Mat::zeros(14, 1, CV_64F))
         {
         }
 

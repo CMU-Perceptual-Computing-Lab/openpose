@@ -27,7 +27,7 @@ if (UNIX OR APPLE)
 
   add_library(caffe SHARED IMPORTED)
   set_property(TARGET caffe PROPERTY IMPORTED_LOCATION ${Caffe_LIBS}) 
-  target_link_libraries(openpose_net caffe ${MKL_LIBS})
+  target_link_libraries(openpose_net caffe ${MKL_LIBS} openpose_core)
 
   if (BUILD_CAFFE)
     add_dependencies(openpose_net openpose_caffe)
