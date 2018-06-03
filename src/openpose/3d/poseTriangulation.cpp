@@ -132,18 +132,17 @@ namespace op
             if (cameraMatrices.empty())
                 error("numberCameras.empty()",
                       __LINE__, __FUNCTION__, __FILE__);
-            // Create and fill A
+            // Create and fill A for homogenous equation system Ax = 0
             const auto numberCameras = (int)cameraMatrices.size();
             cv::Mat A = cv::Mat::zeros(numberCameras*2, 4, CV_64F);
             for (auto i = 0 ; i < numberCameras ; i++)
             {
-                cv::Mat temp = pointsOnEachCamera[i].x*cameraMatrices[i].rowRange(2,3)
-                             - cameraMatrices[i].rowRange(0,1);
-                temp.copyTo(A.rowRange(i*2, i*2+1));
-                temp = pointsOnEachCamera[i].y*cameraMatrices[i].rowRange(2,3) - cameraMatrices[i].rowRange(1,2);
-                temp.copyTo(A.rowRange(i*2+1, i*2+2));
+                A.rowRange(i*2, i*2+1) = pointsOnEachCamera[i].x*cameraMatrices[i].rowRange(2,3)
+                                       - cameraMatrices[i].rowRange(0,1);
+                A.rowRange(i*2+1, i*2+2) = pointsOnEachCamera[i].y*cameraMatrices[i].rowRange(2,3)
+                                         - cameraMatrices[i].rowRange(1,2);
             }
-            // SVD on A
+            // Solve x for Ax = 0 --> SVD on A
             cv::SVD svd{A};
             svd.solveZ(A,reconstructedPoint);
             reconstructedPoint /= reconstructedPoint.at<double>(3);
@@ -175,7 +174,8 @@ namespace op
                 ceres::Problem problem;
                 for (auto i = 0u; i < cameraMatrices.size(); ++i)
                 {
-                    // Slow equivalent: double camParam[12]; memcpy(camParam, cameraMatrices[i].data, sizeof(double)*12);
+                    // Slow copy equivalent:
+                    //     double camParam[12]; memcpy(camParam, cameraMatrices[i].data, sizeof(double)*12);
                     const double* const camParam = (double*)cameraMatrices[i].data;
                     // Each Residual block takes a point and a camera as input and outputs a 2
                     // dimensional residual. Internally, the cost function stores the observed
@@ -201,10 +201,25 @@ namespace op
                 // if (summary.initial_cost > summary.final_cost)
                 //     std::cout << summary.FullReport() << "\n";
 
-                // const auto reprojectionErrorDecrease = std::sqrt((summary.initial_cost - summary.final_cost)/double(cameraMatrices.size()));
+                // const auto reprojectionErrorDecrease = std::sqrt((summary.initial_cost - summary.final_cost)
+                //                                      / double(cameraMatrices.size()));
                 // return reprojectionErrorDecrease;
             #endif
             // assert(reconstructedPoint.at<double>(3) == 1.);
+
+            // // Check that our implementation gives similar result than OpenCV
+            // // But we apply bundle adjustment + >2 views, so it should be better (and slower) than OpenCV one
+            // if (cameraMatrices.size() == 4)
+            // {
+            //     cv::Mat triangCoords4D;
+            //     cv::triangulatePoints(cameraMatrices.at(0), cameraMatrices.at(3),
+            //                           std::vector<cv::Point2d>{pointsOnEachCamera.at(0)},
+            //                           std::vector<cv::Point2d>{pointsOnEachCamera.at(3)}, triangCoords4D);
+            //     triangCoords4D /= triangCoords4D.at<double>(3);
+            //     std::cout << reconstructedPoint << "\n"
+            //               << triangCoords4D << "\n"
+            //               << cv::norm(reconstructedPoint-triangCoords4D) << "\n" << std::endl;
+            // }
 
             return calcReprojectionError(reconstructedPoint, cameraMatrices, pointsOnEachCamera);
         }

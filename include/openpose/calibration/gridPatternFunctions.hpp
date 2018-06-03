@@ -32,7 +32,6 @@ namespace op
 
     OP_API void plotGridCorners(const cv::Size& gridInnerCorners,
                                 const std::vector<cv::Point2f>& points2DVector,
-                                const bool gridIsMirrored,
                                 const std::string& imagePath,
                                 const cv::Mat& image);
 }

@@ -20,6 +20,20 @@ namespace op
                                           const std::string& imagesFolder,
                                           const std::string& serialNumber,
                                           const bool saveImagesWithCorners = false);
+
+    OP_API void estimateAndSaveExtrinsics(const std::string& intrinsicsFolder,
+                                          const std::string& extrinsicsImagesFolder,
+                                          const Point<int>& gridInnerCorners,
+                                          const float gridSquareSizeMm,
+                                          const int index0,
+                                          const int index1,
+                                          const bool imagesAreUndistorted,
+                                          const bool combineCam0Extrinsics);
+
+    OP_API void estimateAndSaveSiftFile(const Point<int>& gridInnerCorners,
+                                        const std::string& imagesFolder,
+                                        const int numberCameras,
+                                        const bool saveImagesWithCorners = false);
 }
 
 #endif // OPENPOSE_CALIBRATION_CAMERA_PARAMETER_ESTIMATION_HPP

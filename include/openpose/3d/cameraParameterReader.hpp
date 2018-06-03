@@ -17,12 +17,16 @@ namespace op
                                        const cv::Mat& cameraDistortion,
                                        const cv::Mat& cameraExtrinsics = cv::Mat());
 
+        // serialNumbers is optional. If empty, it will load all the XML files available in the
+        // cameraParameterPath folder
         void readParameters(const std::string& cameraParameterPath,
-                            const std::vector<std::string>& serialNumbers);
+                            const std::vector<std::string>& serialNumbers = {});
 
         void writeParameters(const std::string& cameraParameterPath) const;
 
         unsigned long long getNumberCameras() const;
+
+        const std::vector<std::string>& getCameraSerialNumbers() const;
 
         const std::vector<cv::Mat>& getCameraMatrices() const;
 

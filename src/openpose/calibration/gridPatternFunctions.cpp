@@ -357,7 +357,6 @@ namespace op
 
     void plotGridCorners(const cv::Size& gridInnerCorners,
                          const std::vector<cv::Point2f>& points2DVector,
-                         const bool gridIsMirrored,
                          const std::string& imagePath,
                          const cv::Mat& image)
     {
@@ -369,8 +368,7 @@ namespace op
             drawGridCorners(imageToPlot, gridInnerCorners, points2DVector);
 
             // Plotting results
-            const std::string windowName{
-                getFileNameAndExtension(imagePath) + " - " + (gridIsMirrored ? "" : "no") + " mirrored grid"};
+            const std::string windowName = getFileNameAndExtension(imagePath);
             cv::pyrDown(imageToPlot, imageToPlot);
             cv::imshow(windowName, imageToPlot);
         }

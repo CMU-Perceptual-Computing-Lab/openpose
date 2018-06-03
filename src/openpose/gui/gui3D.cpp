@@ -53,7 +53,7 @@ namespace op
         auto gXClick = 0.f;
         auto gYClick = 0.f;
         auto gGViewDistance = -250.f; // -82.3994f; //-45;
-        auto gMouseXRotateDeg = 0.f; // -63.2f; //0;
+        auto gMouseXRotateDeg = 180.f; // -63.2f; //0;
         auto gMouseYRotateDeg = -5.f; // 7.f; //60;
         auto gMouseXPan = -70.f; // 0;
         auto gMouseYPan = -30.f; // 0;
@@ -99,9 +99,9 @@ namespace op
             const auto numberPeople = keypoints.getSize(0);
             const auto numberBodyParts = keypoints.getSize(1);
             const auto numberColors = colors.size();
-            const auto xOffset = 3000; // 640.f;
-            const auto yOffset = 360.f;
-            const auto zOffset = 1000; // 360.f;
+            const auto xOffset = -3000.f; // 640.f;
+            const auto yOffset = 1000.f; // 360.f;
+            const auto zOffset = 1000.f; // 360.f;
             const auto xScale = 43.f;
             const auto yScale = 24.f;
             const auto zScale = 24.f;
@@ -127,7 +127,7 @@ namespace op
                     if (keypoints[baseIndex + 3] > 0)
                     {
                         cv::Point3f keypoint{
-                            (keypoints[baseIndex] - xOffset) / xScale,
+                            -(keypoints[baseIndex] - xOffset) / xScale,
                             -(keypoints[baseIndex + 1] - yOffset) / yScale,
                             (keypoints[baseIndex + 2] - zOffset) / zScale
                         };
@@ -159,12 +159,12 @@ namespace op
                     if (keypoints[baseIndexPairA + 3] > 0 && keypoints[baseIndexPairB + 3] > 0)
                     {
                         cv::Point3f pairKeypointA{
-                            (keypoints[baseIndexPairA] - xOffset) / xScale,
+                            -(keypoints[baseIndexPairA] - xOffset) / xScale,
                             -(keypoints[baseIndexPairA + 1] - yOffset) / yScale,
                             (keypoints[baseIndexPairA + 2] - zOffset) / zScale
                         };
                         cv::Point3f pairKeypointB{
-                            (keypoints[baseIndexPairB] - xOffset) / xScale,
+                            -(keypoints[baseIndexPairB] - xOffset) / xScale,
                             -(keypoints[baseIndexPairB + 1] - yOffset) / yScale,
                             (keypoints[baseIndexPairB + 2] - zOffset) / zScale
                         };
