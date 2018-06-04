@@ -684,6 +684,11 @@ std::cout << "\nRender1:    " << duration1 * 1e-6
                 // Add ASIO thing
                 const auto& totalPosition = frame_params.m_adam_t; // Eigen::Vector3d(3, 1)
                 const auto& jointAngles = frame_params.m_adam_pose; // Eigen::Matrix<double, 62, 3, Eigen::RowMajor>
+                // m_adam_t:
+                //     1. Total translation (centimeters) of the root in camera/global coordinate representation.
+                // m_adam_pose:
+                //     1. First row is global rotation, in AngleAxis representation. Radians (not degrees!)
+                //     2. Rest are joint-angles in Euler-Angle representation. Degrees.
 
                 const std::string prefix = "AnimData:";
                 std::string totalPositionString = "\"totalPosition\":" + vectorToJson(totalPosition(0), totalPosition(1), totalPosition(2));
