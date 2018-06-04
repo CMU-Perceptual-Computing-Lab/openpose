@@ -19,7 +19,11 @@ namespace op
             const auto& bodyPartPairs = getPosePartPairs(poseModel);
             const auto& mapIdx = getPoseMapIndex(poseModel);
             const auto numberBodyParts = getPoseNumberBodyParts(poseModel);
+            const auto numberBodyPartsAndBkg = numberBodyParts + 1;
             const auto numberBodyPartPairs = bodyPartPairs.size() / 2;
+            if (numberBodyParts == 0)
+                error("Invalid value of numberBodyParts, it must be positive, not " + std::to_string(numberBodyParts),
+                      __LINE__, __FUNCTION__, __FILE__);
 
             // Vector<int> = Each body part + body parts counter; double = subsetScore
             std::vector<std::pair<std::vector<int>, double>> subset;
@@ -136,8 +140,8 @@ namespace op
                 else // if (numberA != 0 && numberB != 0)
                 {
                     std::vector<std::tuple<double, int, int>> temp;
-                    const auto* mapX = heatMapPtr + mapIdx[2*pairIndex] * heatMapOffset;
-                    const auto* mapY = heatMapPtr + mapIdx[2*pairIndex+1] * heatMapOffset;
+                    const auto* mapX = heatMapPtr + (numberBodyPartsAndBkg + mapIdx[2*pairIndex]) * heatMapOffset;
+                    const auto* mapY = heatMapPtr + (numberBodyPartsAndBkg + mapIdx[2*pairIndex+1]) * heatMapOffset;
                     for (auto i = 1; i <= numberA; i++)
                     {
                         for (auto j = 1; j <= numberB; j++)
@@ -232,7 +236,7 @@ namespace op
                         // Add ears connections (in case person is looking to opposite direction to camera)
                         else if (
                             (numberBodyParts == 18 && (pairIndex==17 || pairIndex==18))
-                            || ((numberBodyParts == 19 || numberBodyParts == 59)
+                            || ((numberBodyParts == 19 || numberBodyParts == 25 || numberBodyParts == 59)
                                 && (pairIndex==18 || pairIndex==19))
                             || (numberBodyParts == 23 && (pairIndex==22 || pairIndex==23))
                             || (poseModel == PoseModel::BODY_19b

@@ -26,7 +26,9 @@ namespace op
                                                      const std::string& cameraResolution = "-1x-1",
                                                      const double webcamFps = 30.,
                                                      const std::string& cameraParameterPath = "models/cameraParameters/",
-                                                     const unsigned int imageDirectoryStereo = 1);
+                                                     const bool undistortImage = true,
+                                                     const unsigned int imageDirectoryStereo = 1,
+                                                     const int flirCameraIndex = -1);
 
     OP_API std::vector<HeatMapType> flagsToHeatMaps(const bool heatMapsAddParts = false,
                                                     const bool heatMapsAddBkg = false,

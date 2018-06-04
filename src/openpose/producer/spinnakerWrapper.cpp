@@ -1,7 +1,7 @@
 #ifdef WITH_FLIR_CAMERA
     #include <thread>
 #endif
-#include <opencv2/imgproc/imgproc.hpp> // cv::undistort
+#include <opencv2/imgproc/imgproc.hpp> // cv::undistort, cv::initUndistortRectifyMap
 #ifdef WITH_FLIR_CAMERA
     #include <Spinnaker.h>
 #endif
@@ -11,35 +11,97 @@
 namespace op
 {
     #ifdef WITH_FLIR_CAMERA
+        std::vector<std::string> getSerialNumbers(const Spinnaker::CameraList& cameraList,
+                                                  const bool sorted)
+        {
+            try
+            {
+                // Get strSerialNumbers
+                std::vector<Spinnaker::GenICam::gcstring> strSerialNumbers(cameraList.GetSize());
+                for (auto i = 0u; i < strSerialNumbers.size(); i++)
+                {
+                    // Select camera
+                    auto cameraPtr = cameraList.GetByIndex(i);
+
+                    strSerialNumbers[i] = "";
+
+                    Spinnaker::GenApi::CStringPtr ptrStringSerial = cameraPtr->GetTLDeviceNodeMap().GetNode(
+                        "DeviceSerialNumber"
+                    );
+
+                    if (Spinnaker::GenApi::IsAvailable(ptrStringSerial)
+                        && Spinnaker::GenApi::IsReadable(ptrStringSerial))
+                    {
+                        strSerialNumbers[i] = ptrStringSerial->GetValue();
+                    }
+                }
+
+                // Spinnaker::GenICam::gcstring to std::string
+                std::vector<std::string> serialNumbers(strSerialNumbers.size());
+                for (auto i = 0u ; i < serialNumbers.size() ; i++)
+                    serialNumbers[i] = strSerialNumbers[i];
+
+                // Sort serial numbers
+                if (sorted)
+                    std::sort(serialNumbers.begin(), serialNumbers.end());
+
+                // Return result
+                return serialNumbers;
+            }
+            catch (Spinnaker::Exception &e)
+            {
+                error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+                return {};
+            }
+            catch (const std::exception& e)
+            {
+                error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+                return {};
+            }
+        }
+
         // This function prints the device information of the camera from the transport
         // layer; please see NodeMapInfo example for more in-depth comments on printing
         // device information from the nodemap.
         int printDeviceInfo(Spinnaker::GenApi::INodeMap &iNodeMap, const unsigned int camNum)
         {
-            int result = 0;
-
-            log("Printing device information for camera " + std::to_string(camNum) + "...\n", Priority::High);
-
-            Spinnaker::GenApi::FeatureList_t features;
-            Spinnaker::GenApi::CCategoryPtr cCategoryPtr = iNodeMap.GetNode("DeviceInformation");
-            if (Spinnaker::GenApi::IsAvailable(cCategoryPtr) && Spinnaker::GenApi::IsReadable(cCategoryPtr))
+            try
             {
-                cCategoryPtr->GetFeatures(features);
+                int result = 0;
 
-                Spinnaker::GenApi::FeatureList_t::const_iterator it;
-                for (it = features.begin(); it != features.end(); ++it)
+                log("Printing device information for camera " + std::to_string(camNum) + "...\n", Priority::High);
+
+                Spinnaker::GenApi::FeatureList_t features;
+                Spinnaker::GenApi::CCategoryPtr cCategoryPtr = iNodeMap.GetNode("DeviceInformation");
+                if (Spinnaker::GenApi::IsAvailable(cCategoryPtr) && Spinnaker::GenApi::IsReadable(cCategoryPtr))
                 {
-                    Spinnaker::GenApi::CNodePtr pfeatureNode = *it;
-                    const auto cValuePtr = (Spinnaker::GenApi::CValuePtr)pfeatureNode;
-                    log(pfeatureNode->GetName() + " : " +
-                            (IsReadable(cValuePtr) ? cValuePtr->ToString() : "Node not readable"), Priority::High);
-                }
-            }
-            else
-                log("Device control information not available.", Priority::High);
-            log(" ", Priority::High);
+                    cCategoryPtr->GetFeatures(features);
 
-            return result;
+                    Spinnaker::GenApi::FeatureList_t::const_iterator it;
+                    for (it = features.begin(); it != features.end(); ++it)
+                    {
+                        Spinnaker::GenApi::CNodePtr pfeatureNode = *it;
+                        const auto cValuePtr = (Spinnaker::GenApi::CValuePtr)pfeatureNode;
+                        log(pfeatureNode->GetName() + " : " +
+                                (IsReadable(cValuePtr) ? cValuePtr->ToString() : "Node not readable"), Priority::High);
+                    }
+                }
+                else
+                    log("Device control information not available.", Priority::High);
+                log(" ", Priority::High);
+
+                return result;
+            }
+            catch (Spinnaker::Exception &e)
+            {
+                error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+                return -1;
+            }
+            catch (const std::exception& e)
+            {
+                error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+                return -1;
+            }
         }
 
         // This function returns the camera to a normal state by turning off trigger
@@ -105,31 +167,50 @@ namespace op
             // Colors
             // http://softwareservices.ptgrey.com/Spinnaker/latest/group___camera_defs__h.html#ggabd5af55aaa20bcb0644c46241c2cbad1a33a1c8a1f6dbcb4a4eaaaf6d4d7ff1d1
             // PixelFormat_BGR8
-            // Time tests
-            // const auto reps = 1e3;
-            // const auto begin = std::chrono::high_resolution_clock::now();
-            // for (auto asdf = 0 ; asdf < reps ; asdf++){
-            // ~ 1.5 ms but pixeled
-            // imagePtr = imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::DEFAULT);
-            return imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::DEFAULT);
-            // ~0.5 ms but BW
-            // imagePtr = imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::NO_COLOR_PROCESSING);
-            // ~6 ms, looks as good as best
-            // imagePtr = imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::HQ_LINEAR);
-            // ~2 ms default << edge << best
-            // imagePtr = imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::EDGE_SENSING);
-            // ~115, too slow
-            // imagePtr = imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::RIGOROUS);
-            // ~2 ms, slightly worse than HQ_LINEAR
-            // imagePtr = imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::IPP);
-            // ~30 ms, ideally best quality?
-            // imagePtr = imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::DIRECTIONAL_FILTER);
-            // imagePtr = imagePtr;
-            // }
-            // durationMs = std::chrono::duration_cast<std::chrono::nanoseconds>(
-            //     std::chrono::high_resolution_clock::now()-begin
+
+            // // Time tests
+            // // DEFAULT
+            // const auto reps = 1e2;
+            // const auto begin1 = std::chrono::high_resolution_clock::now();
+            // for (auto asdf = 0 ; asdf < reps ; asdf++)
+            //     const auto imagePtrTemp = imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::DEFAULT);
+            // const auto durationMs1 = std::chrono::duration_cast<std::chrono::nanoseconds>(
+            //     std::chrono::high_resolution_clock::now()-begin1
             // ).count() * 1e-6;
-            // log("Time conversion (ms): " + std::to_string(durationMs / reps), Priority::High);
+            // // EDGE_SENSING
+            // const auto begin2 = std::chrono::high_resolution_clock::now();
+            // for (auto asdf = 0 ; asdf < reps ; asdf++)
+            //     const auto imagePtrTemp = imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::EDGE_SENSING);
+            // const auto durationMs2 = std::chrono::duration_cast<std::chrono::nanoseconds>(
+            //     std::chrono::high_resolution_clock::now()-begin2
+            // ).count() * 1e-6;
+            // // IPP
+            // const auto begin3 = std::chrono::high_resolution_clock::now();
+            // for (auto asdf = 0 ; asdf < reps ; asdf++)
+            //     const auto imagePtrTemp = imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::IPP);
+            // const auto durationMs3 = std::chrono::duration_cast<std::chrono::nanoseconds>(
+            //     std::chrono::high_resolution_clock::now()-begin3
+            // ).count() * 1e-6;
+            // // Print times
+            // log("Time (ms) 1: " + std::to_string(durationMs1 / reps), Priority::High);
+            // log("Time (ms) 2: " + std::to_string(durationMs2 / reps), Priority::High);
+            // log("Time (ms) 3: " + std::to_string(durationMs3 / reps), Priority::High);
+
+            // Return right one
+            // ~ 1.3 ms but pixeled
+            // return imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::DEFAULT);
+            // ~0.5 ms but BW
+            // return imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::NO_COLOR_PROCESSING);
+            // ~6 ms, looks as good as best
+            // return imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::HQ_LINEAR);
+            // ~2.2 ms default << edge << best
+            // return imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::EDGE_SENSING);
+            // ~115, too slow
+            // return imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::RIGOROUS);
+            // ~1.7 ms, slightly worse than HQ_LINEAR
+            return imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::IPP);
+            // ~30 ms, ideally best quality?
+            // return imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::DIRECTIONAL_FILTER);
         }
 
         /*
@@ -287,6 +368,13 @@ namespace op
             Spinnaker::CameraList mCameraList;
             Spinnaker::SystemPtr mSystemPtr;
             std::vector<cv::Mat> mCvMats;
+            std::vector<std::string> mSerialNumbers;
+            // Camera index
+            const int mCameraIndex;
+            // Undistortion
+            const bool mUndistortImage;
+            std::vector<cv::Mat> mRemoveDistortionMaps1;
+            std::vector<cv::Mat> mRemoveDistortionMaps2;
             // Thread
             bool mThreadOpened;
             std::vector<Spinnaker::ImagePtr> mBuffer;
@@ -294,24 +382,73 @@ namespace op
             std::atomic<bool> mCloseThread;
             std::thread mThread;
 
-            ImplSpinnakerWrapper() :
-                mInitialized{false}
+            ImplSpinnakerWrapper(const bool undistortImage, const int cameraIndex) :
+                mInitialized{false},
+                mCameraIndex{cameraIndex},
+                mUndistortImage{undistortImage}
             {
             }
 
-            void undistortImage(const int i, const Spinnaker::ImagePtr& imagePtr,
-                                const cv::Mat& cameraIntrinsics, const cv::Mat& cameraDistorsions)
+            void readAndUndistortImage(const int i, const Spinnaker::ImagePtr& imagePtr,
+                                       const cv::Mat& cameraIntrinsics = cv::Mat(),
+                                       const cv::Mat& cameraDistorsions = cv::Mat())
             {
-                // Original image --> BGR uchar image
-                const auto imagePtrColor = spinnakerImagePtrToColor(imagePtr);
-                // Spinnaker to cv::Mat
-                const auto cvMatDistorted = spinnakerWrapperToCvMat(imagePtrColor);
-                // const auto cvMatDistorted = spinnakerWrapperToCvMat(imagePtr);
-                // Baseline
-                // mCvMats[i] = cvMatDistorted.clone();
-                // Undistort
-                // http://docs.opencv.org/2.4/modules/imgproc/doc/geometric_transformations.html#undistort
-                cv::undistort(cvMatDistorted, mCvMats[i], cameraIntrinsics, cameraDistorsions);
+                try
+                {
+                    // Original image --> BGR uchar image
+                    const auto imagePtrColor = spinnakerImagePtrToColor(imagePtr);
+                    // Spinnaker to cv::Mat
+                    const auto cvMatDistorted = spinnakerWrapperToCvMat(imagePtrColor);
+                    // const auto cvMatDistorted = spinnakerWrapperToCvMat(imagePtr);
+                    // Undistort
+                    if (mUndistortImage)
+                    {
+                        // Security check
+                        if (cameraIntrinsics.empty() || cameraDistorsions.empty())
+                            error("Camera intrinsics/distortions were empty.", __LINE__, __FUNCTION__, __FILE__);
+                        // // Option a - 80 ms / 3 images
+                        // // http://docs.opencv.org/2.4/modules/imgproc/doc/geometric_transformations.html#undistort
+                        // cv::undistort(cvMatDistorted, mCvMats[i], cameraIntrinsics, cameraDistorsions);
+                        // // In OpenCV 2.4, cv::undistort is exactly equal than cv::initUndistortRectifyMap
+                        // (with CV_16SC2) + cv::remap (with LINEAR). I.e., log(cv::norm(cvMatMethod1-cvMatMethod2)) = 0.
+                        // Option b - 15 ms / 3 images (LINEAR) or 25 ms (CUBIC)
+                        // Distorsion removal - not required and more expensive (applied to the whole image instead of
+                        // only to our interest points)
+                        if (mRemoveDistortionMaps1[i].empty() || mRemoveDistortionMaps2[i].empty())
+                        {
+                            const auto imageSize = cvMatDistorted.size();
+                            cv::initUndistortRectifyMap(cameraIntrinsics,
+                                                        cameraDistorsions,
+                                                        cv::Mat(),
+                                                        // cameraIntrinsics instead of cv::getOptimalNewCameraMatrix to
+                                                        // avoid black borders
+                                                        cameraIntrinsics,
+                                                        // #include <opencv2/calib3d/calib3d.hpp> for next line
+                                                        // cv::getOptimalNewCameraMatrix(cameraIntrinsics,
+                                                        //                               cameraDistorsions,
+                                                        //                               imageSize, 1,
+                                                        //                               imageSize, 0),
+                                                        imageSize,
+                                                        CV_16SC2, // Faster, less memory
+                                                        // CV_32FC1, // More accurate
+                                                        mRemoveDistortionMaps1[i],
+                                                        mRemoveDistortionMaps2[i]);
+                        }
+                        cv::remap(cvMatDistorted, mCvMats[i],
+                                  mRemoveDistortionMaps1[i], mRemoveDistortionMaps2[i],
+                                  // cv::INTER_NEAREST);
+                                  cv::INTER_LINEAR);
+                                  // cv::INTER_CUBIC);
+                                  // cv::INTER_LANCZOS4); // Smoother, but we do not need this quality & its >>expensive
+                    }
+                    // Baseline (do not undistort)
+                    else
+                        mCvMats[i] = cvMatDistorted.clone();
+                }
+                catch (const std::exception& e)
+                {
+                    error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+                }
             }
 
             void bufferingThread()
@@ -323,7 +460,8 @@ namespace op
                         // Get cameras - ~0.005 ms (3 cameras)
                         std::vector<Spinnaker::CameraPtr> cameraPtrs(mCameraList.GetSize());
                         for (auto i = 0u; i < cameraPtrs.size(); i++)
-                            cameraPtrs.at(i) = mCameraList.GetByIndex(i);
+                            cameraPtrs.at(i) = mCameraList.GetBySerial(mSerialNumbers.at(i)); // Sorted by Serial Number
+                            // cameraPtrs.at(i) = mCameraList.GetByIndex(i); // Sorted by however Spinnaker decided
                         while (!mCloseThread)
                         {
                             // Trigger
@@ -370,7 +508,8 @@ namespace op
 
             // This function acquires and displays images from each device.
             std::vector<cv::Mat> acquireImages(const std::vector<cv::Mat>& cameraIntrinsics,
-                                               const std::vector<cv::Mat>& cameraDistorsions)
+                                               const std::vector<cv::Mat>& cameraDistorsions,
+                                               const int cameraIndex = -1)
             {
                 try
                 {
@@ -426,6 +565,7 @@ namespace op
                             break;
                         }
                     }
+                    mCvMats.clear();
                     // Convert to cv::Mat
                     if (imagesExtracted)
                     {
@@ -433,25 +573,68 @@ namespace op
                         // for (auto& imagePtr : imagePtrs)
                         //     imagePtr = spinnakerImagePtrToColor(imagePtr);
 
+                        // Init anti-distortion matrices first time
+                        if (mRemoveDistortionMaps1.empty())
+                            mRemoveDistortionMaps1.resize(imagePtrs.size());
+                        if (mRemoveDistortionMaps2.empty())
+                            mRemoveDistortionMaps2.resize(imagePtrs.size());
+
                         // Multi-thread undistort (slowest function in the class)
-                        //     ~35msec (3 cameras + multi-thread)
-                        //     ~59msec (2 cameras + single-thread)
-                        //     ~75msec (3 cameras + single-thread)
-                        std::vector<std::thread> threads(imagePtrs.size()-1);
-                        mCvMats.clear();
+                        //     ~7.7msec (3 cameras + multi-thread + (initUndistortRectifyMap + remap) + LINEAR)
+                        //     ~23.2msec (3 cameras + multi-thread + (initUndistortRectifyMap + remap) + CUBIC)
+                        //     ~35msec (3 cameras + multi-thread + undistort)
+                        //     ~59msec (2 cameras + single-thread + undistort)
+                        //     ~75msec (3 cameras + single-thread + undistort)
                         mCvMats.resize(imagePtrs.size());
-                        for (auto i = 0u; i < imagePtrs.size()-1; i++)
-                            // Multi-thread option
-                            threads.at(i) = std::thread{&ImplSpinnakerWrapper::undistortImage, this, i, imagePtrs.at(i),
-                                                        cameraIntrinsics.at(i), cameraDistorsions.at(i)};
-                            // // Single-thread option
-                            // undistortImage(i, imagePtrs.at(i), cameraIntrinsics.at(i), cameraDistorsions.at(i));
-                        undistortImage(imagePtrs.size()-1, imagePtrs.back(), cameraIntrinsics.back(),
-                                       cameraDistorsions.back());
-                        // Close threads
-                        for (auto& thread : threads)
-                            if (thread.joinable())
-                                thread.join();
+                        // All cameras
+                        if (cameraIndex < 0)
+                        {
+                            // Undistort image
+                            if (mUndistortImage)
+                            {
+                                std::vector<std::thread> threads(imagePtrs.size()-1);
+                                for (auto i = 0u; i < imagePtrs.size()-1; i++)
+                                {
+                                    // Multi-thread option
+                                    threads.at(i) = std::thread{&ImplSpinnakerWrapper::readAndUndistortImage, this, i,
+                                                                imagePtrs.at(i), cameraIntrinsics.at(i),
+                                                                cameraDistorsions.at(i)};
+                                    // // Single-thread option
+                                    // readAndUndistortImage(i, imagePtrs.at(i), cameraIntrinsics.at(i), cameraDistorsions.at(i));
+                                }
+                                readAndUndistortImage(imagePtrs.size()-1, imagePtrs.back(), cameraIntrinsics.back(),
+                                                      cameraDistorsions.back());
+                                // Close threads
+                                for (auto& thread : threads)
+                                    if (thread.joinable())
+                                        thread.join();
+                            }
+                            // Do not undistort image
+                            else
+                            {
+                                for (auto i = 0u; i < imagePtrs.size(); i++)
+                                    readAndUndistortImage(i, imagePtrs.at(i));
+                            }
+                        }
+                        // Only 1 camera
+                        else
+                        {
+                            // Security checks
+                            if ((unsigned int)cameraIndex >= imagePtrs.size())
+                                error("There are only " + std::to_string(imagePtrs.size())
+                                      + " cameras, but you asked for the "
+                                      + std::to_string(cameraIndex+1) +"-th camera (i.e., `--flir_camera_index "
+                                      + std::to_string(cameraIndex) +"`), which doesn't exist. Note that the index is"
+                                      + " 0-based.", __LINE__, __FUNCTION__, __FILE__);
+                            // Undistort image
+                            if (mUndistortImage)
+                                readAndUndistortImage(cameraIndex, imagePtrs.at(cameraIndex), cameraIntrinsics.at(cameraIndex),
+                                                      cameraDistorsions.at(cameraIndex));
+                            // Do not undistort image
+                            else
+                                readAndUndistortImage(cameraIndex, imagePtrs.at(cameraIndex));
+                            mCvMats = std::vector<cv::Mat>{mCvMats[cameraIndex]};
+                        }
                     }
                     return mCvMats;
                 }
@@ -469,9 +652,10 @@ namespace op
         #endif
     };
 
-    SpinnakerWrapper::SpinnakerWrapper(const std::string& cameraParameterPath, const Point<int>& resolution)
+    SpinnakerWrapper::SpinnakerWrapper(const std::string& cameraParameterPath, const Point<int>& resolution,
+                                       const bool undistortImage, const int cameraIndex)
         #ifdef WITH_FLIR_CAMERA
-            : upImpl{new ImplSpinnakerWrapper{}}
+            : upImpl{new ImplSpinnakerWrapper{undistortImage, cameraIndex}}
         #endif
     {
         #ifdef WITH_FLIR_CAMERA
@@ -491,7 +675,7 @@ namespace op
                 // Retrieve list of cameras from the upImpl->mSystemPtr
                 upImpl->mCameraList = upImpl->mSystemPtr->GetCameras();
 
-                unsigned int numCameras = upImpl->mCameraList.GetSize();
+                const unsigned int numCameras = upImpl->mCameraList.GetSize();
 
                 log("Number of cameras detected: " + std::to_string(numCameras), Priority::High);
 
@@ -504,8 +688,8 @@ namespace op
                     // Release upImpl->mSystemPtr
                     upImpl->mSystemPtr->ReleaseInstance();
 
-                    log("Not enough cameras!\nPress Enter to exit...", Priority::High);
-                    getchar();
+                    // log("Not enough cameras!\nPress Enter to exit...", Priority::High);
+                    // getchar();
 
                     error("No cameras detected.", __LINE__, __FUNCTION__, __FILE__);
                 }
@@ -596,8 +780,7 @@ namespace op
                 //
                 // Serial numbers are the only persistent objects we gather in this
                 // example, which is why a std::vector is created.
-                std::vector<Spinnaker::GenICam::gcstring> strSerialNumbers(upImpl->mCameraList.GetSize());
-                for (auto i = 0u; i < strSerialNumbers.size(); i++)
+                for (auto i = 0; i < upImpl->mCameraList.GetSize(); i++)
                 {
                     // Select camera
                     auto cameraPtr = upImpl->mCameraList.GetByIndex(i);
@@ -617,7 +800,7 @@ namespace op
                         error("Unable to set acquisition mode to continuous (entry 'continuous' retrieval "
                                   + std::to_string(i) + "). Aborting...", __LINE__, __FUNCTION__, __FILE__);
 
-                    int64_t acquisitionModeContinuous = ptrAcquisitionModeContinuous->GetValue();
+                    const int64_t acquisitionModeContinuous = ptrAcquisitionModeContinuous->GetValue();
 
                     ptrAcquisitionMode->SetIntValue(acquisitionModeContinuous);
 
@@ -665,29 +848,34 @@ namespace op
                     cameraPtr->BeginAcquisition();
 
                     log("Camera " + std::to_string(i) + " started acquiring images...", Priority::High);
-
-                    // Retrieve device serial number for filename
-                    strSerialNumbers[i] = "";
-
-                    Spinnaker::GenApi::CStringPtr ptrStringSerial = cameraPtr->GetTLDeviceNodeMap().GetNode(
-                        "DeviceSerialNumber"
-                    );
-
-                    if (Spinnaker::GenApi::IsAvailable(ptrStringSerial)
-                        && Spinnaker::GenApi::IsReadable(ptrStringSerial))
-                    {
-                        strSerialNumbers[i] = ptrStringSerial->GetValue();
-                        log("Camera " + std::to_string(i) + " serial number set to "
-                                + strSerialNumbers[i].c_str() + "...", Priority::High);
-                    }
-                    log(" ", Priority::High);
                 }
 
+                // Retrieve device serial number for filename
+                log("\nReading (and sorting by) serial numbers...", Priority::High);
+                const bool sorted = true;
+                upImpl->mSerialNumbers = getSerialNumbers(upImpl->mCameraList, sorted);
+                const auto& serialNumbers = upImpl->mSerialNumbers;
+                for (auto i = 0u; i < serialNumbers.size(); i++)
+                    log("Camera " + std::to_string(i) + " serial number set to "
+                        + serialNumbers[i] + "...", Priority::High);
+                if (upImpl->mCameraIndex >= 0)
+                    log("Only using camera index " + std::to_string(upImpl->mCameraIndex) + ", i.e., serial number "
+                        + serialNumbers[upImpl->mCameraIndex] + "...", Priority::High);
+
                 // Read camera parameters from SN
-                std::vector<std::string> serialNumbers(strSerialNumbers.size());
-                for (auto i = 0u ; i < serialNumbers.size() ; i++)
-                    serialNumbers[i] = strSerialNumbers[i];
-                upImpl->mCameraParameterReader.readParameters(cameraParameterPath, serialNumbers);
+                if (upImpl->mUndistortImage)
+                {
+                    // If all images required
+                    if (upImpl->mCameraIndex < 0)
+                        upImpl->mCameraParameterReader.readParameters(cameraParameterPath, serialNumbers);
+                    // If only one required
+                    else
+                    {
+                        upImpl->mCameraParameterReader.readParameters(
+                            cameraParameterPath,
+                            std::vector<std::string>(serialNumbers.size(), serialNumbers.at(upImpl->mCameraIndex)));
+                    }
+                }
 
                 // Start buffering thread
                 upImpl->mThreadOpened = true;
@@ -702,7 +890,9 @@ namespace op
                 else
                     upImpl->mResolution = Point<int>{cvMats[0].cols, cvMats[0].rows};
 
-                log("\nRunning for all cameras...\n\n*** IMAGE ACQUISITION ***\n", Priority::High);
+                const std::string numberCameras = std::to_string(upImpl->mCameraIndex < 0 ? serialNumbers.size() : 1);
+                log("\nRunning for " + numberCameras + " out of " + std::to_string(serialNumbers.size())
+                    + " camera(s)...\n\n*** IMAGE ACQUISITION ***\n", Priority::High);
             }
             catch (const Spinnaker::Exception& e)
             {
@@ -715,6 +905,8 @@ namespace op
         #else
             UNUSED(cameraParameterPath);
             UNUSED(resolution);
+            UNUSED(undistortImage);
+            UNUSED(cameraIndex);
             error(WITH_FLIR_CAMERA_ERROR, __LINE__, __FUNCTION__, __FILE__);
         #endif
     }
@@ -739,12 +931,14 @@ namespace op
                 try
                 {
                     // Security checks
-                    if ((unsigned long long) upImpl->mCameraList.GetSize()
+                    if (upImpl->mUndistortImage &&
+                        (unsigned long long) upImpl->mCameraList.GetSize()
                             != upImpl->mCameraParameterReader.getNumberCameras())
                         error("The number of cameras must be the same as the INTRINSICS vector size.",
                           __LINE__, __FUNCTION__, __FILE__);
                     return upImpl->acquireImages(upImpl->mCameraParameterReader.getCameraIntrinsics(),
-                                                 upImpl->mCameraParameterReader.getCameraDistortions());
+                                                 upImpl->mCameraParameterReader.getCameraDistortions(),
+                                                 upImpl->mCameraIndex);
                 }
                 catch (const Spinnaker::Exception& e)
                 {

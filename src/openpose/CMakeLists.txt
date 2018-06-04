@@ -19,12 +19,12 @@ set(OP_HEADERS "")
 
 if (${GPU_MODE} MATCHES "CUDA")
     cuda_add_library(openpose ${SOURCES_OPENPOSE} ${OP_HEADERS})
-else()
+else ()
     add_library(openpose ${SOURCES_OPENPOSE} ${OP_HEADERS})
 endif ()
 
 # Ubuntu
-if (UNIX AND NOT APPLE)
+if (UNIX OR APPLE)
   target_link_libraries(openpose ${OpenPose_3rdparty_libraries})
   if (CMAKE_COMPILER_IS_GNUCXX)
     foreach (SUB_DIR ${SUB_DIRS})
@@ -54,12 +54,12 @@ elseif (WIN32)
   set_property(TARGET openpose PROPERTY RUNTIME_OUTPUT_DIRECTORY_RELEASE ${PROJECT_BINARY_DIR}/$(Platform)/$(Configuration))
   set_property(TARGET openpose PROPERTY RUNTIME_OUTPUT_DIRECTORY_DEBUG ${PROJECT_BINARY_DIR}/$(Platform)/$(Configuration))
 
-endif (UNIX AND NOT APPLE)
+endif (UNIX OR APPLE)
 
-if (UNIX AND NOT APPLE)
+if (UNIX OR APPLE)
   add_library(caffe SHARED IMPORTED)
   set_property(TARGET caffe PROPERTY IMPORTED_LOCATION ${Caffe_LIBS})
-  target_link_libraries(openpose caffe)
+  target_link_libraries(openpose caffe ${Boost_SYSTEM_LIBRARY} ${OpenCL_LIBRARIES})
 
   if (BUILD_CAFFE)
     add_dependencies(openpose openpose_caffe)
@@ -72,4 +72,4 @@ if (UNIX AND NOT APPLE)
       RUNTIME DESTINATION bin
       LIBRARY DESTINATION lib
       ARCHIVE DESTINATION lib/openpose)
-endif (UNIX AND NOT APPLE)
+endif (UNIX OR APPLE)

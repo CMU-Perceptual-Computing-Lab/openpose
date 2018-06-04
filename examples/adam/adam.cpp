@@ -55,6 +55,9 @@ DEFINE_string(video,                    "",             "Use a video file instea
 DEFINE_string(image_dir,                "",             "Process a directory of images. Use `examples/media/` for our default example folder with 20"
                                                         " images. Read all standard formats (jpg, png, bmp, etc.).");
 DEFINE_bool(flir_camera,                false,          "Whether to use FLIR (Point-Grey) stereo camera.");
+DEFINE_int32(flir_camera_index,         -1,             "Select -1 (default) to run on all detected flir cameras at once. Otherwise, select the flir"
+                                                        " camera index to run, where 0 corresponds to the detected flir camera with the lowest"
+                                                        " serial number, and `n` to the `n`-th lowest serial number camera.");
 DEFINE_string(ip_camera,                "",             "String with the IP camera URL. It supports protocols like RTSP and HTTP.");
 DEFINE_uint64(frame_first,              0,              "Start on desired frame number. Indexes are 0-based, i.e. the first frame has index 0.");
 DEFINE_uint64(frame_last,               -1,             "Finish on desired frame number. Select -1 to disable. Indexes are 0-based, e.g. if set to"
@@ -65,6 +68,9 @@ DEFINE_bool(frames_repeat,              false,          "Repeat frames when fini
 DEFINE_bool(process_real_time,          false,          "Enable to keep the original source frame rate (e.g. for video). If the processing time is"
                                                         " too long, it will skip frames. If it is too fast, it will slow it down.");
 DEFINE_string(camera_parameter_folder,  "models/cameraParameters/flir/", "String with the folder where the camera parameters are located.");
+DEFINE_bool(frame_keep_distortion,      false,          "If false (default), it will undistortionate the image based on the"
+                                                        " `camera_parameter_folder` camera parameters; if true, it will not undistortionate, i.e.,"
+                                                        " it will leave it as it is.");
 // OpenPose
 DEFINE_string(model_folder,             "models/",      "Folder path (absolute or relative) where the models (pose, face, ...) are located.");
 DEFINE_string(output_resolution,        "-1x-1",        "The image resolution (display and output). Use \"-1x-1\" to force the program to use the"
@@ -74,10 +80,12 @@ DEFINE_int32(num_gpu,                   -1,             "The number of GPU devic
 DEFINE_int32(num_gpu_start,             0,              "GPU device start number.");
 DEFINE_int32(keypoint_scale,            0,              "Scaling of the (x,y) coordinates of the final pose data array, i.e. the scale of the (x,y)"
                                                         " coordinates that will be saved with the `write_keypoint` & `write_keypoint_json` flags."
-                                                        " Select `0` to scale it to the original source resolution, `1`to scale it to the net output"
-                                                        " size (set with `net_resolution`), `2` to scale it to the final output size (set with"
-                                                        " `resolution`), `3` to scale it in the range [0,1], and 4 for range [-1,1]. Non related"
-                                                        " with `scale_number` and `scale_gap`.");
+                                                        " Select `0` to scale it to the original source resolution; `1`to scale it to the net output"
+                                                        " size (set with `net_resolution`); `2` to scale it to the final output size (set with"
+                                                        " `resolution`); `3` to scale it in the range [0,1], where (0,0) would be the top-left"
+                                                        " corner of the image, and (1,1) the bottom-right one; and 4 for range [-1,1], where"
+                                                        " (-1,-1) would be the top-left corner of the image, and (1,1) the bottom-right one. Non"
+                                                        " related with `scale_number` and `scale_gap`.");
 DEFINE_int32(number_people_max,         -1,             "This parameter will limit the maximum number of people detected, by keeping the people with"
                                                         " top scores. The score is based in person area over the image, body part score, as well as"
                                                         " joint score (between each pair of connected body parts). Useful if you know the exact"
@@ -100,8 +108,8 @@ DEFINE_double(scale_gap,                0.3,            "Scale gap between scale
                                                         " If you want to change the initial scale, you actually want to multiply the"
                                                         " `net_resolution` by your desired initial scale.");
 // OpenPose Body Pose Heatmaps and Part Candidates
-DEFINE_bool(heatmaps_add_parts,         false,          "If true, it will fill UserDatum::poseHeatMaps array with the body part heatmaps, and"
-                                                        " analogously face & hand heatmaps to UserDatum::faceHeatMaps & UserDatum::handHeatMaps."
+DEFINE_bool(heatmaps_add_parts,         false,          "If true, it will fill op::Datum::poseHeatMaps array with the body part heatmaps, and"
+                                                        " analogously face & hand heatmaps to op::Datum::faceHeatMaps & op::Datum::handHeatMaps."
                                                         " If more than one `add_heatmaps_X` flag is enabled, it will place then in sequential"
                                                         " memory order: body parts + bkg + PAFs. It will follow the order on"
                                                         " POSE_BODY_PART_MAPPING in `src/openpose/pose/poseParameters.cpp`. Program speed will"
@@ -110,10 +118,10 @@ DEFINE_bool(heatmaps_add_parts,         false,          "If true, it will fill U
 DEFINE_bool(heatmaps_add_bkg,           false,          "Same functionality as `add_heatmaps_parts`, but adding the heatmap corresponding to"
                                                         " background.");
 DEFINE_bool(heatmaps_add_PAFs,          false,          "Same functionality as `add_heatmaps_parts`, but adding the PAFs.");
-DEFINE_int32(heatmaps_scale,            2,              "Set 0 to scale UserDatum::poseHeatMaps in the range [-1,1], 1 for [0,1]; 2 for integer"
+DEFINE_int32(heatmaps_scale,            2,              "Set 0 to scale op::Datum::poseHeatMaps in the range [-1,1], 1 for [0,1]; 2 for integer"
                                                         " rounded [0,255]; and 3 for no scaling.");
 DEFINE_bool(part_candidates,            false,          "Also enable `write_json` in order to save this information. If true, it will fill the"
-                                                        " UserDatum::poseCandidates array with the body part candidates. Candidates refer to all"
+                                                        " op::Datum::poseCandidates array with the body part candidates. Candidates refer to all"
                                                         " the detected body parts, before being assembled into people. Note that the number of"
                                                         " candidates is equal or higher than the number of final body parts (i.e. after being"
                                                         " assembled into people). The empty body parts are filled with 0s. Program speed will"
@@ -153,8 +161,12 @@ DEFINE_int32(3d_views,                  1,              "Complementary option to
                                                         " iteration, allowing tasks such as stereo camera processing (`--3d`). Note that"
                                                         " `--camera_parameters_folder` must be set. OpenPose must find as many `xml` files in the"
                                                         " parameter folder as this number indicates.");
-// OpenPose identification
-DEFINE_bool(identification,             false,          "Whether to enable people identification across frames. Not available yet, coming soon.");
+// Extra algorithms
+DEFINE_bool(identification,             false,          "Not available yet, coming soon. Whether to enable people identification across frames.");
+DEFINE_int32(tracking,                  -1,             "Not available yet, coming soon. Whether to enable people tracking across frames. The"
+                                                        " value indicates the number of frames where tracking is run between each OpenPose keypoint"
+                                                        " detection. Select -1 (default) to disable it or 0 to run simultaneously OpenPose keypoint"
+                                                        " detector and tracking for potentially higher accurary than only OpenPose.");
 // OpenPose Rendering
 DEFINE_int32(part_to_show,              0,              "Prediction channel to visualize (default: 0). 0 for all the body parts, 1-18 for each body"
                                                         " part heat map, 19 for the background heat map, 20 for all the body part heat maps"
@@ -204,6 +216,7 @@ DEFINE_string(write_video,              "",             "Full file path to write
 DEFINE_string(write_json,               "",             "Directory to write OpenPose output in JSON format. It includes body, hand, and face pose"
                                                         " keypoints (2-D and 3-D), as well as pose candidates (if `--part_candidates` enabled).");
 DEFINE_string(write_coco_json,          "",             "Full file path to write people pose data with JSON COCO validation format.");
+DEFINE_string(write_coco_foot_json,     "",             "Full file path to write people foot pose data with JSON COCO validation format.");
 DEFINE_string(write_heatmaps,           "",             "Directory to write body pose heatmaps in PNG format. At least 1 `add_heatmaps_X` flag"
                                                         " must be enabled.");
 DEFINE_string(write_heatmaps_format,    "png",          "File extension and format for `write_heatmaps`, analogous to `write_images_format`."
@@ -229,29 +242,30 @@ DEFINE_string(write_adam,               "",             "E.g.: /media/posefs3b/U
 
 smpl::SMPLParams frame_params;
 std::shared_ptr<Renderer> render;
-const int num_body_joint = 20;
-const int num_hand_joint = 21;
-const int num_face_landmark = 70;
+const int NUMBER_BODY_KEYPOINTS = 20;
+const int NUMBER_HAND_KEYPOINTS = 21;
+const int NUMBER_FACE_KEYPOINTS = 70;
+const int NUMBER_KEYPOINTS = 3*(NUMBER_BODY_KEYPOINTS + 2*NUMBER_HAND_KEYPOINTS);
 
-void updateKeypoints(Eigen::MatrixXd& bodyJoints, Eigen::MatrixXd& LHandJoints, Eigen::MatrixXd& RHandJoints, const double* const targetJoint)
+void updateKeypoints(Eigen::MatrixXd& bodyJoints, Eigen::MatrixXd& LHandJoints, Eigen::MatrixXd& RHandJoints, const double* const targetJoints)
 {
-    for (int i = 0; i < num_body_joint; i++)
+    for (int i = 0; i < NUMBER_BODY_KEYPOINTS; i++)
     {
-        bodyJoints(0, i) = targetJoint[3 * i];
-        bodyJoints(1, i) = targetJoint[3 * i + 1];
-        bodyJoints(2, i) = targetJoint[3 * i + 2];
+        bodyJoints(0, i) = targetJoints[3 * i];
+        bodyJoints(1, i) = targetJoints[3 * i + 1];
+        bodyJoints(2, i) = targetJoints[3 * i + 2];
     }
-    for (int i = 0; i < num_hand_joint; i++)
+    for (int i = 0; i < NUMBER_HAND_KEYPOINTS; i++)
     {
-        LHandJoints(0, i) = targetJoint[3 * (i + num_body_joint)];
-        LHandJoints(1, i) = targetJoint[3 * (i + num_body_joint) + 1];
-        LHandJoints(2, i) = targetJoint[3 * (i + num_body_joint) + 2];
+        LHandJoints(0, i) = targetJoints[3 * (i + NUMBER_BODY_KEYPOINTS)];
+        LHandJoints(1, i) = targetJoints[3 * (i + NUMBER_BODY_KEYPOINTS) + 1];
+        LHandJoints(2, i) = targetJoints[3 * (i + NUMBER_BODY_KEYPOINTS) + 2];
     }
-    for (int i = 0; i < num_hand_joint; i++)
+    for (int i = 0; i < NUMBER_HAND_KEYPOINTS; i++)
     {
-        RHandJoints(0, i) = targetJoint[3 * (i + num_hand_joint + num_body_joint)];
-        RHandJoints(1, i) = targetJoint[3 * (i + num_hand_joint + num_body_joint) + 1];
-        RHandJoints(2, i) = targetJoint[3 * (i + num_hand_joint + num_body_joint) + 2];
+        RHandJoints(0, i) = targetJoints[3 * (i + NUMBER_HAND_KEYPOINTS + NUMBER_BODY_KEYPOINTS)];
+        RHandJoints(1, i) = targetJoints[3 * (i + NUMBER_HAND_KEYPOINTS + NUMBER_BODY_KEYPOINTS) + 1];
+        RHandJoints(2, i) = targetJoints[3 * (i + NUMBER_HAND_KEYPOINTS + NUMBER_BODY_KEYPOINTS) + 2];
     }
 }
 
@@ -321,15 +335,15 @@ struct UserDatum : public op::Datum
 {
     // TotalModel g_total_model;
     // smpl::SMPLParams frame_params;
-    std::array<double, 186> targetJoint;
+    std::array<double, NUMBER_KEYPOINTS> targetJoints;
     // Eigen::Matrix<double, Eigen::Dynamic, 1> Vt_vec;
     // Eigen::Matrix<double, Eigen::Dynamic, 1> J0_vec;
 
     UserDatum() //:
         // boolThatUserNeedsForSomeReason{boolThatUserNeedsForSomeReason_}
     {
-        for (auto i = 0 ; i < 186 ; i++)
-            targetJoint[i] = 0;
+        for (auto& targetJoint : targetJoints)
+            targetJoint = 0;
     }
 };
 
@@ -344,10 +358,10 @@ public:
     // Purely processing
     WUserPostProcessing() :
         mInitialized{false},
-        bodyJoints(5, num_body_joint),// (3, targetJoint.size());
-        Joints_face(5, num_face_landmark),// (3, landmarks_face.size());
-        LHandJoints(5, num_hand_joint),// (3, HandModel::NUM_JOINTS);
-        RHandJoints(5, num_hand_joint),// (3, HandModel::NUM_JOINTS);
+        bodyJoints(5, NUMBER_BODY_KEYPOINTS),// (3, targetJoints.size());
+        Joints_face(5, NUMBER_FACE_KEYPOINTS),// (3, landmarks_face.size());
+        LHandJoints(5, NUMBER_HAND_KEYPOINTS),// (3, HandModel::NUM_JOINTS);
+        RHandJoints(5, NUMBER_HAND_KEYPOINTS),// (3, HandModel::NUM_JOINTS);
         LFootJoints(5, 3),// (3, 3);        //Heel, Toe
         RFootJoints(5, 3),// (3, 3);        //Heel, Toe
         g_total_model_path{"./model/adam_v1_plus2.json"},
@@ -380,7 +394,7 @@ public:
                 const auto& poseKeypoints3D = datum.poseKeypoints3D;
                 const auto& faceKeypoints3D = datum.faceKeypoints3D;
                 const auto& handKeypoints3D = datum.handKeypoints3D;
-                auto& targetJoint = datum.targetJoint;
+                auto& targetJoints = datum.targetJoints;
                 // const auto& leftHandKeypoints3D = datum.handKeypoints3D[0];
                 // const auto& rightHandKeypoints3D = datum.handKeypoints3D[1];
                 if (poseKeypoints3D.getSize(1) != 19)
@@ -393,16 +407,16 @@ public:
                     const auto baseIndex = mapOPToDome(part)*(poseKeypoints3D.getSize(2)-1);
                     if (poseKeypoints3D[{0, part, poseKeypoints3D.getSize(2)-1}] > 0.5 /*|| !mInitialized*/)
                         for (auto xyz = 0 ; xyz < poseKeypoints3D.getSize(2)-1 ; xyz++)
-                            targetJoint[baseIndex + xyz] = poseKeypoints3D[{0, part, xyz}];
+                            targetJoints[baseIndex + xyz] = poseKeypoints3D[{0, part, xyz}];
                     else
                     {
-                        targetJoint[baseIndex] = 0;
-                        targetJoint[baseIndex+1] = 0;
-                        targetJoint[baseIndex+2] = 0;
+                        targetJoints[baseIndex] = 0;
+                        targetJoints[baseIndex+1] = 0;
+                        targetJoints[baseIndex+2] = 0;
                     }
                 }
                 // Update left/right hand
-                const auto bodyOffset = num_body_joint*(poseKeypoints3D.getSize(2)-1); // num_body_joint = #parts_OP + 1 (top_head)
+                const auto bodyOffset = NUMBER_BODY_KEYPOINTS*(poseKeypoints3D.getSize(2)-1); // NUMBER_BODY_KEYPOINTS = #parts_OP + 1 (top_head)
                 const auto handOffset = handKeypoints3D[0].getSize(1)*(handKeypoints3D[0].getSize(2)-1);
                 if (!handKeypoints3D.at(0).empty())
                 {
@@ -427,47 +441,41 @@ public:
                             const auto baseIndex = bodyOffset + hand*handOffset + part*(handKeypoints3D[hand].getSize(2)-1);
                             if (handKeypoints3D[hand][{0, part, 3}] > 0.5 || !mInitialized)
                                 for (auto xyz = 0 ; xyz < handKeypoints3D[hand].getSize(2)-1 ; xyz++)
-                                    targetJoint[baseIndex + xyz] = handKeypoints3D[hand][{0, part, xyz}] + offsetWrist[xyz];
+                                    targetJoints[baseIndex + xyz] = handKeypoints3D[hand][{0, part, xyz}] + offsetWrist[xyz];
                             else
                             {
-                                targetJoint[baseIndex] = 0;
-                                targetJoint[baseIndex+1] = 0;
-                                targetJoint[baseIndex+2] = 0;
+                                targetJoints[baseIndex] = 0;
+                                targetJoints[baseIndex+1] = 0;
+                                targetJoints[baseIndex+2] = 0;
                             }
                         }
                     }
                 }
+// HACK --> FIX!!!!!
+// Nose, ears, eyes to 0 or AdamFastFit crashes
+for (auto i : {3*1,3*1+1,3*1+2,   15*3,15*3+1,15*3+2,   16*3,16*3+1,16*3+2,   17*3,17*3+1,17*3+2,   18*3,18*3+1,18*3+2})
+targetJoints[i] = 0;
                 // Update face
                 // Not available
-// HACK --> FIX!!!!!
 // mm --> cm
-for (auto i = 0 ; i < 186 ; i++)
-targetJoint[i] *= 1e2;
-// Invert z-axis
-for (auto i = 0 ; i < 186/3 ; i++)
-targetJoint[3*i+2] *= -1;
-// targetJoint[3*i] *= -1;
-// Increase scale
-const auto myHeight = 1.85; // Gines
-// const auto myHeight = 1.75; // Donglai?
-for (auto i = 0 ; i < 186 ; i++)
-targetJoint[i] *= 1.225*1.418918919*myHeight;
+for (auto& targetJoint : targetJoints)
+targetJoint *= 1e2;
                 // Update keypoints
-                updateKeypoints(bodyJoints, LHandJoints, RHandJoints, targetJoint.data());
+                updateKeypoints(bodyJoints, LHandJoints, RHandJoints, targetJoints.data());
 
-// // Cout keypoints
-// std::cout << "Body:\n";
-// for (auto i = 0 ; i < 186 ; i++)
-// {
-//     std::cout << targetJoint[i] << " ";
-//     if (i % 3 == 2)
-//         std::cout << "\n";
-//     if (i == 19*3-1)
-//         std::cout << "Left hand:\n";
-//     if (i == 19*3-1+21*3)
-//         std::cout << "Right hand:\n";
-// }
-// std::cout << std::endl;
+// Cout keypoints
+std::cout << "Body:\n";
+for (auto i = 0 ; i < targetJoints.size() ; i++)
+{
+    std::cout << targetJoints[i] << " ";
+    if (i % 3 == 2)
+        std::cout << "\n";
+    if (i == NUMBER_BODY_KEYPOINTS*3-1)
+        std::cout << "Left hand:\n";
+    if (i == NUMBER_BODY_KEYPOINTS*3-1+22*3)
+        std::cout << "Right hand:\n";
+}
+std::cout << std::endl;
 
                 // First frame
 const auto start0 = std::chrono::high_resolution_clock::now();
@@ -568,7 +576,7 @@ public:
                 const auto& poseKeypoints3D = datum.poseKeypoints3D;
                 const auto& faceKeypoints3D = datum.faceKeypoints3D;
                 const auto& handKeypoints3D = datum.handKeypoints3D;
-                auto& targetJoint = datum.targetJoint;
+                auto& targetJoints = datum.targetJoints;
 
                 // First frame
 const auto start = std::chrono::high_resolution_clock::now();
@@ -587,7 +595,7 @@ const auto duration1 = std::chrono::duration_cast<std::chrono::nanoseconds>(std:
                 // ~0.0005 ms
 // op::log(__LINE__);
 // BELOW IS PURELY OPENGL
-// t2 <-- g_vis_data (huge), frame_params (~small), targetJoint (optional, small), resultJoint (optional, small)
+// t2 <-- g_vis_data (huge), frame_params (~small), targetJoints (optional, small), resultJoint (optional, small)
 // t2 --> g_vis_data (pts modified, struct, big)
 const auto start2 = std::chrono::high_resolution_clock::now();
                 // ~20 ms
@@ -595,9 +603,9 @@ const auto start2 = std::chrono::high_resolution_clock::now();
                 ts.push_back(frame_params.m_adam_t); // BVH generation, Eigen::Vector3d(3, 1)
                 poses.push_back(frame_params.m_adam_pose); // BVH generation, Eigen::Matrix<double, 62, 3, Eigen::RowMajor>
                 // OpenGL Display
-                g_vis_data.targetJoint = targetJoint.data();
+                g_vis_data.targetJoint = targetJoints.data();
 g_vis_data.targetJoint = nullptr;
-                // g_vis_data.targetJoint = datum.targetJoint;
+                // g_vis_data.targetJoint = datum.targetJoints;
                 g_vis_data.resultJoint = resultBody.data();
 g_vis_data.resultJoint = nullptr;
                 g_vis_data.vis_type = 2;
@@ -679,7 +687,7 @@ private:
     int count_frame;
 
     // Visualization
-    std::array<double, 186> resultBody;
+    std::array<double, NUMBER_KEYPOINTS> resultBody;
     std::unique_ptr<GLubyte[]> upReadBuffer;
 
     std::shared_ptr<op::VideoSaver> videoSaver;
@@ -687,123 +695,132 @@ private:
 
 int openPoseDemo()
 {
-    // logging_level
-    op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.",
-              __LINE__, __FUNCTION__, __FILE__);
-    op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
-    op::Profiler::setDefaultX(FLAGS_profile_speed);
-    // // For debugging
-    // // Print all logging messages
-    // op::ConfigureLog::setPriorityThreshold(op::Priority::None);
-    // // Print out speed values faster
-    // op::Profiler::setDefaultX(100);
+    try
+    {
+        op::log("Starting OpenPose demo...", op::Priority::High);
+        const auto timerBegin = std::chrono::high_resolution_clock::now();
 
-    op::log("Starting pose estimation demo.", op::Priority::High);
-    const auto timerBegin = std::chrono::high_resolution_clock::now();
+        // logging_level
+        op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.",
+                  __LINE__, __FUNCTION__, __FILE__);
+        op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
+        op::Profiler::setDefaultX(FLAGS_profile_speed);
+        // // For debugging
+        // // Print all logging messages
+        // op::ConfigureLog::setPriorityThreshold(op::Priority::None);
+        // // Print out speed values faster
+        // op::Profiler::setDefaultX(100);
 
-    // Applying user defined configuration - Google flags to program variables
-    // outputSize
-    const auto outputSize = op::flagsToPoint(FLAGS_output_resolution, "-1x-1");
-    // netInputSize
-    const auto netInputSize = op::flagsToPoint(FLAGS_net_resolution, "-1x368");
-    // faceNetInputSize
-    const auto faceNetInputSize = op::flagsToPoint(FLAGS_face_net_resolution, "368x368 (multiples of 16)");
-    // handNetInputSize
-    const auto handNetInputSize = op::flagsToPoint(FLAGS_hand_net_resolution, "368x368 (multiples of 16)");
-    // producerType
-    const auto producerSharedPtr = op::flagsToProducer(FLAGS_image_dir, FLAGS_video, FLAGS_ip_camera, FLAGS_camera,
-                                                       FLAGS_flir_camera, FLAGS_camera_resolution, FLAGS_camera_fps,
-                                                       FLAGS_camera_parameter_folder,
-                                                       (unsigned int) FLAGS_3d_views);
-    // poseModel
-    const auto poseModel = op::flagsToPoseModel(FLAGS_model_pose);
-    // JSON saving
-    const auto writeJson = (!FLAGS_write_json.empty() ? FLAGS_write_json : FLAGS_write_keypoint_json);
-    if (!FLAGS_write_keypoint.empty() || !FLAGS_write_keypoint_json.empty())
-        op::log("Flags `write_keypoint` and `write_keypoint_json` are deprecated and will eventually be removed."
-                " Please, use `write_json` instead.", op::Priority::Max);
-    // keypointScale
-    const auto keypointScale = op::flagsToScaleMode(FLAGS_keypoint_scale);
-    // heatmaps to add
-    const auto heatMapTypes = op::flagsToHeatMaps(FLAGS_heatmaps_add_parts, FLAGS_heatmaps_add_bkg,
-                                                  FLAGS_heatmaps_add_PAFs);
-    const auto heatMapScale = op::flagsToHeatMapScaleMode(FLAGS_heatmaps_scale);
-    // >1 camera view?
-    const auto multipleView = (FLAGS_3d || FLAGS_3d_views > 1 || FLAGS_flir_camera);
-    // Enabling Google Logging
-    const bool enableGoogleLogging = true;
-    // Logging
-    op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+        // Applying user defined configuration - Google flags to program variables
+        // outputSize
+        const auto outputSize = op::flagsToPoint(FLAGS_output_resolution, "-1x-1");
+        // netInputSize
+        const auto netInputSize = op::flagsToPoint(FLAGS_net_resolution, "-1x368");
+        // faceNetInputSize
+        const auto faceNetInputSize = op::flagsToPoint(FLAGS_face_net_resolution, "368x368 (multiples of 16)");
+        // handNetInputSize
+        const auto handNetInputSize = op::flagsToPoint(FLAGS_hand_net_resolution, "368x368 (multiples of 16)");
+        // producerType
+        const auto producerSharedPtr = op::flagsToProducer(FLAGS_image_dir, FLAGS_video, FLAGS_ip_camera, FLAGS_camera,
+                                                           FLAGS_flir_camera, FLAGS_camera_resolution, FLAGS_camera_fps,
+                                                           FLAGS_camera_parameter_folder, !FLAGS_frame_keep_distortion,
+                                                           (unsigned int) FLAGS_3d_views, FLAGS_flir_camera_index);
+        // poseModel
+        const auto poseModel = op::flagsToPoseModel(FLAGS_model_pose);
+        // JSON saving
+        const auto writeJson = (!FLAGS_write_json.empty() ? FLAGS_write_json : FLAGS_write_keypoint_json);
+        if (!FLAGS_write_keypoint.empty() || !FLAGS_write_keypoint_json.empty())
+            op::log("Flags `write_keypoint` and `write_keypoint_json` are deprecated and will eventually be removed."
+                    " Please, use `write_json` instead.", op::Priority::Max);
+        // keypointScale
+        const auto keypointScale = op::flagsToScaleMode(FLAGS_keypoint_scale);
+        // heatmaps to add
+        const auto heatMapTypes = op::flagsToHeatMaps(FLAGS_heatmaps_add_parts, FLAGS_heatmaps_add_bkg,
+                                                      FLAGS_heatmaps_add_PAFs);
+        const auto heatMapScale = op::flagsToHeatMapScaleMode(FLAGS_heatmaps_scale);
+        // >1 camera view?
+        const auto multipleView = (FLAGS_3d || FLAGS_3d_views > 1 || FLAGS_flir_camera);
+        // Enabling Google Logging
+        const bool enableGoogleLogging = true;
+        // Logging
+        op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
-    // OpenPose wrapper
-    op::log("Configuring OpenPose wrapper.", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-    op::Wrapper<std::vector<UserDatum>> opWrapper;
+        // OpenPose wrapper
+        op::log("Configuring OpenPose wrapper.", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+        op::Wrapper<std::vector<UserDatum>> opWrapper;
 
-    // Adam added
-    auto wUserPostProcessing = std::make_shared<WUserPostProcessing>();
-    const auto workerProcessingOnNewThread = true;
-    opWrapper.setWorkerPostProcessing(wUserPostProcessing, workerProcessingOnNewThread);
-    auto wUserOutput = std::make_shared<WUserOutput>();
-    const auto workerOutputOnNewThread = true;
-    opWrapper.setWorkerOutput(wUserOutput, workerOutputOnNewThread);
+        // Adam added
+        auto wUserPostProcessing = std::make_shared<WUserPostProcessing>();
+        const auto workerProcessingOnNewThread = true;
+        opWrapper.setWorkerPostProcessing(wUserPostProcessing, workerProcessingOnNewThread);
+        auto wUserOutput = std::make_shared<WUserOutput>();
+        const auto workerOutputOnNewThread = true;
+        opWrapper.setWorkerOutput(wUserOutput, workerOutputOnNewThread);
 
-    // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
-    const op::WrapperStructPose wrapperStructPose{!FLAGS_body_disable, netInputSize, outputSize, keypointScale,
-                                                  FLAGS_num_gpu, FLAGS_num_gpu_start, FLAGS_scale_number,
-                                                  (float)FLAGS_scale_gap,
-                                                  op::flagsToRenderMode(FLAGS_render_pose, multipleView),
-                                                  poseModel, !FLAGS_disable_blending, (float)FLAGS_alpha_pose,
-                                                  (float)FLAGS_alpha_heatmap, FLAGS_part_to_show, FLAGS_model_folder,
-                                                  heatMapTypes, heatMapScale, FLAGS_part_candidates,
-                                                  (float)FLAGS_render_threshold, FLAGS_number_people_max,
-                                                  enableGoogleLogging, FLAGS_3d, FLAGS_3d_min_views,
-                                                  FLAGS_identification};
-    // Face configuration (use op::WrapperStructFace{} to disable it)
-    const op::WrapperStructFace wrapperStructFace{FLAGS_face, faceNetInputSize,
-                                                  op::flagsToRenderMode(FLAGS_face_render, multipleView, FLAGS_render_pose),
-                                                  (float)FLAGS_face_alpha_pose, (float)FLAGS_face_alpha_heatmap,
-                                                  (float)FLAGS_face_render_threshold};
-    // Hand configuration (use op::WrapperStructHand{} to disable it)
-    const op::WrapperStructHand wrapperStructHand{FLAGS_hand, handNetInputSize, FLAGS_hand_scale_number,
-                                                  (float)FLAGS_hand_scale_range, FLAGS_hand_tracking,
-                                                  op::flagsToRenderMode(FLAGS_hand_render, multipleView, FLAGS_render_pose),
-                                                  (float)FLAGS_hand_alpha_pose, (float)FLAGS_hand_alpha_heatmap,
-                                                  (float)FLAGS_hand_render_threshold};
-    // Producer (use default to disable any input)
-    const op::WrapperStructInput wrapperStructInput{producerSharedPtr, FLAGS_frame_first, FLAGS_frame_last,
-                                                    FLAGS_process_real_time, FLAGS_frame_flip, FLAGS_frame_rotate,
-                                                    FLAGS_frames_repeat};
-    // Consumer (comment or use default argument to disable any output)
-    // const op::WrapperStructOutput wrapperStructOutput{op::flagsToDisplayMode(FLAGS_display, FLAGS_3d),
-    const op::WrapperStructOutput wrapperStructOutput{op::DisplayMode::NoDisplay,
-                                                      !FLAGS_no_gui_verbose, FLAGS_fullscreen, FLAGS_write_keypoint,
-                                                      op::stringToDataFormat(FLAGS_write_keypoint_format),
-                                                      writeJson, FLAGS_write_coco_json,
-                                                      FLAGS_write_images, FLAGS_write_images_format, FLAGS_write_video,
-                                                      FLAGS_camera_fps, FLAGS_write_heatmaps,
-                                                      FLAGS_write_heatmaps_format};
-    // Configure wrapper
-    opWrapper.configure(wrapperStructPose, wrapperStructFace, wrapperStructHand, wrapperStructInput,
-                        wrapperStructOutput);
-    // Set to single-thread running (to debug and/or reduce latency)
-    if (FLAGS_disable_multi_thread)
-        opWrapper.disableMultiThreading();
+        // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
+        const op::WrapperStructPose wrapperStructPose{!FLAGS_body_disable, netInputSize, outputSize, keypointScale,
+                                                      FLAGS_num_gpu, FLAGS_num_gpu_start, FLAGS_scale_number,
+                                                      (float)FLAGS_scale_gap,
+                                                      op::flagsToRenderMode(FLAGS_render_pose, multipleView),
+                                                      poseModel, !FLAGS_disable_blending, (float)FLAGS_alpha_pose,
+                                                      (float)FLAGS_alpha_heatmap, FLAGS_part_to_show, FLAGS_model_folder,
+                                                      heatMapTypes, heatMapScale, FLAGS_part_candidates,
+                                                      (float)FLAGS_render_threshold, FLAGS_number_people_max,
+                                                      enableGoogleLogging, FLAGS_3d, FLAGS_3d_min_views,
+                                                      FLAGS_identification, FLAGS_tracking};
+        // Face configuration (use op::WrapperStructFace{} to disable it)
+        const op::WrapperStructFace wrapperStructFace{FLAGS_face, faceNetInputSize,
+                                                      op::flagsToRenderMode(FLAGS_face_render, multipleView, FLAGS_render_pose),
+                                                      (float)FLAGS_face_alpha_pose, (float)FLAGS_face_alpha_heatmap,
+                                                      (float)FLAGS_face_render_threshold};
+        // Hand configuration (use op::WrapperStructHand{} to disable it)
+        const op::WrapperStructHand wrapperStructHand{FLAGS_hand, handNetInputSize, FLAGS_hand_scale_number,
+                                                      (float)FLAGS_hand_scale_range, FLAGS_hand_tracking,
+                                                      op::flagsToRenderMode(FLAGS_hand_render, multipleView, FLAGS_render_pose),
+                                                      (float)FLAGS_hand_alpha_pose, (float)FLAGS_hand_alpha_heatmap,
+                                                      (float)FLAGS_hand_render_threshold};
+        // Producer (use default to disable any input)
+        const op::WrapperStructInput wrapperStructInput{producerSharedPtr, FLAGS_frame_first, FLAGS_frame_last,
+                                                        FLAGS_process_real_time, FLAGS_frame_flip, FLAGS_frame_rotate,
+                                                        FLAGS_frames_repeat};
+        // Consumer (comment or use default argument to disable any output)
+        // const op::WrapperStructOutput wrapperStructOutput{op::flagsToDisplayMode(FLAGS_display, FLAGS_3d),
+        const op::WrapperStructOutput wrapperStructOutput{op::DisplayMode::NoDisplay,
+                                                          !FLAGS_no_gui_verbose, FLAGS_fullscreen, FLAGS_write_keypoint,
+                                                          op::stringToDataFormat(FLAGS_write_keypoint_format),
+                                                          writeJson, FLAGS_write_coco_json,
+                                                          FLAGS_write_images, FLAGS_write_images_format, FLAGS_write_video,
+                                                          FLAGS_camera_fps, FLAGS_write_heatmaps,
+                                                          FLAGS_write_heatmaps_format, FLAGS_write_coco_foot_json};
+        // Configure wrapper
+        opWrapper.configure(wrapperStructPose, wrapperStructFace, wrapperStructHand, wrapperStructInput,
+                            wrapperStructOutput);
+        // Set to single-thread running (to debug and/or reduce latency)
+        if (FLAGS_disable_multi_thread)
+            opWrapper.disableMultiThreading();
 
-    // Start processing
-    // Two different ways of running the program on multithread environment
-    op::log("Starting thread(s)", op::Priority::High);
-    // Start, run & stop threads
-    opWrapper.exec();  // It blocks this thread until all threads have finished
+        // Start processing
+        // Two different ways of running the program on multithread environment
+        op::log("Starting thread(s)", op::Priority::High);
+        // Start, run & stop threads
+        opWrapper.exec();  // It blocks this thread until all threads have finished
 
-    // Measuring total time
-    const auto now = std::chrono::high_resolution_clock::now();
-    const auto totalTimeSec = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(now-timerBegin).count()
-                            * 1e-9;
-    const auto message = "Real-time pose estimation demo successfully finished. Total time: "
-                       + std::to_string(totalTimeSec) + " seconds.";
-    op::log(message, op::Priority::High);
+        // Measuring total time
+        const auto now = std::chrono::high_resolution_clock::now();
+        const auto totalTimeSec = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(now-timerBegin).count()
+                                * 1e-9;
+        const auto message = "OpenPose demo successfully finished. Total time: "
+                           + std::to_string(totalTimeSec) + " seconds.";
+        op::log(message, op::Priority::High);
 
-    return 0;
+        // Return successful message
+        return 0;
+    }
+    catch (const std::exception& e)
+    {
+        op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        return -1;
+    }
 }
 
 int main(int argc, char *argv[])

@@ -10,14 +10,14 @@ prepend(SOURCES_OP_TRACKING_WITH_CP ${CMAKE_CURRENT_SOURCE_DIR} ${SOURCES_OP_TRA
 set(SOURCES_OP_TRACKING_WITH_CP ${SOURCES_OP_TRACKING_WITH_CP} PARENT_SCOPE)
 set(SOURCES_OPENPOSE ${SOURCES_OPENPOSE} ${SOURCES_OP_TRACKING_WITH_CP} PARENT_SCOPE)
 
-if (UNIX AND NOT APPLE)
+if (UNIX OR APPLE)
 	add_library(openpose_tracking ${SOURCES_OP_TRACKING})
 
-	set_target_properties(openpose_tracking PROPERTIES COMPILE_FLAGS ${OP_CXX_FLAGS})
+    target_link_libraries(openpose_tracking openpose_core)
 
 	install(TARGETS openpose_tracking
 	    EXPORT OpenPose
 	    RUNTIME DESTINATION bin
 	    LIBRARY DESTINATION lib
 	    ARCHIVE DESTINATION lib/openpose)
-endif (UNIX AND NOT APPLE)
+endif (UNIX OR APPLE)

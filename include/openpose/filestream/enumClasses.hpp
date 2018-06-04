@@ -10,6 +10,11 @@ namespace op
         Yaml,
         Yml,
     };
+    enum class CocoJsonFormat : bool
+    {
+        Body,
+        Foot,
+    };
 }
 
 #endif // OPENPOSE_FILESTREAM_ENUM_CLASSES_HPP

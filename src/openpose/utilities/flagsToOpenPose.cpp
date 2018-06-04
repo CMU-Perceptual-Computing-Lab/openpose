@@ -32,6 +32,8 @@ namespace op
                 return PoseModel::BODY_19_X2;
             else if (poseModeString == "BODY_23")
                 return PoseModel::BODY_23;
+            else if (poseModeString == "BODY_25")
+                return PoseModel::BODY_25;
             else if (poseModeString == "BODY_59")
                 return PoseModel::BODY_59;
             // else
@@ -142,7 +144,8 @@ namespace op
                                               const std::string& ipCameraPath, const int webcamIndex,
                                               const bool flirCamera, const std::string& cameraResolution,
                                               const double webcamFps, const std::string& cameraParameterPath,
-                                              const unsigned int imageDirectoryStereo)
+                                              const bool undistortImage, const unsigned int imageDirectoryStereo,
+                                              const int flirCameraIndex)
     {
         try
         {
@@ -161,7 +164,8 @@ namespace op
             {
                 // cameraFrameSize
                 const auto cameraFrameSize = flagsToPoint(cameraResolution, "-1x-1");
-                return std::make_shared<FlirReader>(cameraParameterPath, cameraFrameSize);
+                return std::make_shared<FlirReader>(cameraParameterPath, cameraFrameSize, undistortImage,
+                                                    flirCameraIndex);
             }
             // Webcam
             if (type == ProducerType::Webcam)

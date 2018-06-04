@@ -15,11 +15,12 @@ OpenPose - Installation
     2. [MPI Model](#mpi-model)
     3. [CPU Version](#cpu-version)
     4. [3D Reconstruction Module](#3d-reconstruction-module)
-    5. [Compiling without cuDNN](#compiling-without-cudnn)
-    6. [Custom Caffe (Ubuntu Only)](#custom-caffe-ubuntu-only)
-    7. [Custom OpenCV (Ubuntu Only)](#custom-opencv-ubuntu-only)
-    8. [Doxygen Documentation Autogeneration (Ubuntu Only)](#doxygen-documentation-autogeneration-ubuntu-only)
-    9. [CMake Command Line Configuration (Ubuntu Only)](#cmake-command-line-configuration-ubuntu-only)
+    5. [Calibration Module](#calibration-module)
+    6. [Compiling without cuDNN](#compiling-without-cudnn)
+    7. [Custom Caffe (Ubuntu Only)](#custom-caffe-ubuntu-only)
+    8. [Custom OpenCV (Ubuntu Only)](#custom-opencv-ubuntu-only)
+    9. [Doxygen Documentation Autogeneration (Ubuntu Only)](#doxygen-documentation-autogeneration-ubuntu-only)
+    10. [CMake Command Line Configuration (Ubuntu Only)](#cmake-command-line-configuration-ubuntu-only)
 
 
 
@@ -31,8 +32,9 @@ This installation section is only intended if you plan to modify the OpenPose co
 ## Operating Systems
 - **Ubuntu** 14 and 16.
 - **Windows** 8 and 10.
+- **Mac OSX** Mavericks and above (only CPU version tested). If you want to test our Mac GPU version, email gines@cmu.edu.
 - **Nvidia Jetson TX2**, installation instructions in [doc/installation_jetson_tx2.md](./installation_jetson_tx2.md).
-- OpenPose has also been used on **Windows 7**, **Mac**, **CentOS**, and **Nvidia Jetson (TK1 and TX1)** embedded systems. However, we do not officially support them at the moment.
+- OpenPose has also been used on **Windows 7**, **CentOS**, and **Nvidia Jetson (TK1 and TX1)** embedded systems. However, we do not officially support them at the moment.
 
 
 
@@ -119,6 +121,16 @@ The instructions in this section describe the steps to build OpenPose using CMak
             - [Caffe](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe_2018_01_18.zip): Unzip as `3rdparty/windows/caffe/`.
             - [Caffe dependencies](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe3rdparty_2017_07_14.zip): Unzip as `3rdparty/windows/caffe3rdparty/`.
             - [OpenCV 3.1](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/opencv_310.zip): Unzip as `3rdparty/windows/opencv/`.
+6. OSX - **Caffe, OpenCV, and Caffe prerequisites**:
+    - Install deps by running `sudo bash 3rdparty/osx/install_deps.sh` on your terminal.
+    - Current OSX has only been tested with the CPU Version, and hence must be compiled with the `-DGPU_MODE=CPU_ONLY` flag.
+7. **Eigen prerequisite**:
+    - Note: This step is optional, only required for some specific extra functionality, such as extrinsic camera calibration.
+    - If you enable the `WITH_EIGEN` flag when running CMake. You can either:
+        1. Do not do anything if you set the `WITH_EIGEN` flag to `BUILD`, CMake will automatically download Eigen. Alternatively, you might prefer to download it manually:
+            - [Eigen3](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/eigen_2018_05_23.zip): Unzip as `3rdparty/eigen/`.
+        2. Run `sudo apt-get install libeigen3-dev` (Ubuntu only) if you prefer to set `WITH_EIGEN` to `APT_GET` (Ubuntu only).
+        3. Use your own version of Eigen by setting `WITH_EIGEN` to `BUILD`, run CMake so that OpenPose downloads the zip file, and then replace the contents of `3rdparty/eigen/` by your own version.
 
 
 
@@ -273,6 +285,13 @@ You can include the 3D reconstruction module by:
 4. Increased accuracy with Ceres solver (Ubuntu only): For extra 3-D reconstruction accuracy, run `sudo apt-get install libeigen3-dev`, install [Ceres solver](http://ceres-solver.org/installation.html), and enable `WITH_CERES` in CMake when installing OpenPose. Ceres is harder to install in Windows, so we have not tested it so far in there. Feel free to make a pull request if you do.
 
 After installation, check the [doc/3d_reconstruction_demo.md](./3d_reconstruction_demo.md) instructions.
+
+
+
+#### Calibration Module
+The calibration module is included by default, but you must also enable `WITH_EIGEN` if you intend to use the extrinsic camera parameter estimation tool. You can set that flag to 2 different values: `APT_GET` or `BUILD`, check [Requirements](#requirements) for more information.
+
+After installation, check the [doc/calibration_demo.md](./calibration_demo.md) instructions.
 
 
 

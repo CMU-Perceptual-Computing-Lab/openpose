@@ -5,13 +5,16 @@
 
 #define MULTI_LINE_STRING(ARG) #ARG
 
-#define CL_HPP_ENABLE_EXCEPTIONS
+#ifndef __APPLE__
+    #define CL_HPP_ENABLE_EXCEPTIONS
+#endif
+
 #ifdef LOWER_CL_VERSION
     #define CL_HPP_MINIMUM_OPENCL_VERSION 120
     #define CL_HPP_TARGET_OPENCL_VERSION 120
 #else
-    #define CL_HPP_MINIMUM_OPENCL_VERSION 200
-    #define CL_HPP_TARGET_OPENCL_VERSION 200
+    #define CL_HPP_MINIMUM_OPENCL_VERSION 120
+    #define CL_HPP_TARGET_OPENCL_VERSION 120
 #endif
 
 typedef struct _cl_buffer_region cl_buffer_region;

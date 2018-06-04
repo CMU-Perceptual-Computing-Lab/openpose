@@ -1,3 +1,6 @@
+Eigen:
+    - Version 3.3.4 (15.06.2017)
+    - Link: http://eigen.tuxfamily.org/index.php?title=Main_Page
 Unix:
     - Caffe:
         - Version 1.0.0, extracted from GitHub on 04/26/2018 from the current master branch.

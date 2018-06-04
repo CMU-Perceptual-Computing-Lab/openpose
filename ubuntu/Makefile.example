@@ -88,6 +88,11 @@ ifneq ($(WITH_CERES), 0)
 	LIBRARIES += ceres
 	INCLUDE_DIRS += $(EIGEN_DIR)
 endif
+# Eigen support
+WITH_EIGEN ?= 0
+ifneq ($(WITH_EIGEN), 0)
+	COMMON_FLAGS += -DWITH_EIGEN
+endif
 # Spinnaker SDK
 WITH_FLIR_CAMERA ?= 0
 ifneq ($(WITH_FLIR_CAMERA), 0)
@@ -186,7 +191,7 @@ ifeq ($(USE_LMDB), 1)
 	LIBRARIES += lmdb
 endif
 ifeq ($(USE_OPENCV), 1)
-	LIBRARIES += opencv_core opencv_highgui opencv_imgproc opencv_objdetect opencv_video
+	LIBRARIES += opencv_core opencv_highgui opencv_imgproc opencv_objdetect opencv_video opencv_calib3d
 
 	ifeq ($(OPENCV_VERSION), 3)
 		LIBRARIES += opencv_imgcodecs opencv_videoio opencv_cudawarping
