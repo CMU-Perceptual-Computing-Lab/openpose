@@ -462,10 +462,6 @@ public:
 // Nose, ears, eyes to 0 or AdamFastFit crashes
 for (auto i : {3*1,3*1+1,3*1+2,   15*3,15*3+1,15*3+2,   16*3,16*3+1,16*3+2,   17*3,17*3+1,17*3+2,   18*3,18*3+1,18*3+2})
 targetJoints[i] = 0;
-                // Update face
-                // Not available
-                // Update keypoints
-                updateKeypoints(bodyJoints, LHandJoints, RHandJoints, targetJoints);
 
 // // Cout keypoints
 // std::cout << "Body:\n";
@@ -480,6 +476,11 @@ targetJoints[i] = 0;
 //         std::cout << "Right hand:\n";
 // }
 // std::cout << std::endl;
+
+                // Update face
+                // Not available
+                // Update keypoints
+                updateKeypoints(bodyJoints, LHandJoints, RHandJoints, targetJoints);
 
                 // First frame
 const auto start0 = std::chrono::high_resolution_clock::now();
