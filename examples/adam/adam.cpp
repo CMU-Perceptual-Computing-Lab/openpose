@@ -247,25 +247,28 @@ const int NUMBER_HAND_KEYPOINTS = 21;
 const int NUMBER_FACE_KEYPOINTS = 70;
 const int NUMBER_KEYPOINTS = 3*(NUMBER_BODY_KEYPOINTS + 2*NUMBER_HAND_KEYPOINTS);
 
-void updateKeypoints(Eigen::MatrixXd& bodyJoints, Eigen::MatrixXd& LHandJoints, Eigen::MatrixXd& RHandJoints, const double* const targetJoints)
+void updateKeypoints(Eigen::MatrixXd& bodyJoints, Eigen::MatrixXd& LHandJoints, Eigen::MatrixXd& RHandJoints, const std::array<double, NUMBER_KEYPOINTS>& targetJoints)
 {
     for (int i = 0; i < NUMBER_BODY_KEYPOINTS; i++)
     {
-        bodyJoints(0, i) = targetJoints[3 * i];
-        bodyJoints(1, i) = targetJoints[3 * i + 1];
-        bodyJoints(2, i) = targetJoints[3 * i + 2];
+        const auto index = 3*i;
+        bodyJoints(0, i) = targetJoints[index];
+        bodyJoints(1, i) = targetJoints[index + 1];
+        bodyJoints(2, i) = targetJoints[index + 2];
     }
     for (int i = 0; i < NUMBER_HAND_KEYPOINTS; i++)
     {
-        LHandJoints(0, i) = targetJoints[3 * (i + NUMBER_BODY_KEYPOINTS)];
-        LHandJoints(1, i) = targetJoints[3 * (i + NUMBER_BODY_KEYPOINTS) + 1];
-        LHandJoints(2, i) = targetJoints[3 * (i + NUMBER_BODY_KEYPOINTS) + 2];
+        const auto index = 3 * (i + NUMBER_BODY_KEYPOINTS);
+        LHandJoints(0, i) = targetJoints[index];
+        LHandJoints(1, i) = targetJoints[index + 1];
+        LHandJoints(2, i) = targetJoints[index + 2];
     }
     for (int i = 0; i < NUMBER_HAND_KEYPOINTS; i++)
     {
-        RHandJoints(0, i) = targetJoints[3 * (i + NUMBER_HAND_KEYPOINTS + NUMBER_BODY_KEYPOINTS)];
-        RHandJoints(1, i) = targetJoints[3 * (i + NUMBER_HAND_KEYPOINTS + NUMBER_BODY_KEYPOINTS) + 1];
-        RHandJoints(2, i) = targetJoints[3 * (i + NUMBER_HAND_KEYPOINTS + NUMBER_BODY_KEYPOINTS) + 2];
+        const auto index = 3 * (i + NUMBER_HAND_KEYPOINTS + NUMBER_BODY_KEYPOINTS);
+        RHandJoints(0, i) = targetJoints[index];
+        RHandJoints(1, i) = targetJoints[index + 1];
+        RHandJoints(2, i) = targetJoints[index + 2];
     }
 }
 
@@ -451,31 +454,32 @@ public:
                         }
                     }
                 }
+                // Meters --> cm
+                for (auto& targetJoint : targetJoints)
+                targetJoint *= 1e2;
+
 // HACK --> FIX!!!!!
 // Nose, ears, eyes to 0 or AdamFastFit crashes
 for (auto i : {3*1,3*1+1,3*1+2,   15*3,15*3+1,15*3+2,   16*3,16*3+1,16*3+2,   17*3,17*3+1,17*3+2,   18*3,18*3+1,18*3+2})
 targetJoints[i] = 0;
                 // Update face
                 // Not available
-// mm --> cm
-for (auto& targetJoint : targetJoints)
-targetJoint *= 1e2;
                 // Update keypoints
-                updateKeypoints(bodyJoints, LHandJoints, RHandJoints, targetJoints.data());
+                updateKeypoints(bodyJoints, LHandJoints, RHandJoints, targetJoints);
 
-// Cout keypoints
-std::cout << "Body:\n";
-for (auto i = 0 ; i < targetJoints.size() ; i++)
-{
-    std::cout << targetJoints[i] << " ";
-    if (i % 3 == 2)
-        std::cout << "\n";
-    if (i == NUMBER_BODY_KEYPOINTS*3-1)
-        std::cout << "Left hand:\n";
-    if (i == NUMBER_BODY_KEYPOINTS*3-1+22*3)
-        std::cout << "Right hand:\n";
-}
-std::cout << std::endl;
+// // Cout keypoints
+// std::cout << "Body:\n";
+// for (auto i = 0 ; i < targetJoints.size() ; i++)
+// {
+//     std::cout << targetJoints[i] << " ";
+//     if (i % 3 == 2)
+//         std::cout << "\n";
+//     if (i == NUMBER_BODY_KEYPOINTS*3-1)
+//         std::cout << "Left hand:\n";
+//     if (i == NUMBER_BODY_KEYPOINTS*3-1+21*3)
+//         std::cout << "Right hand:\n";
+// }
+// std::cout << std::endl;
 
                 // First frame
 const auto start0 = std::chrono::high_resolution_clock::now();
