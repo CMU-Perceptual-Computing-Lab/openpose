@@ -14,16 +14,24 @@
     <img src="doc/media/pose_face_hands.gif", width="480">
 </p>
 
-**Functionality**:
-
-- **Real-time multi-person keypoint detection**.
-    - 15 or **18-keypoint body estimation**. **Running time invariant to number of detected people**.
-    - **2x21-keypoint hand** estimation. Currently, **running time depends** on **number of detected people**.
-    - **70-keypoint face** estimation. Currently, **running time depends** on **number of detected people**.
-- **Input**: Image, video, webcam, and IP camera. Included C++ demos to add your custom input.
+## Features
+- **Functionality**:
+    - **2D real-time multi-person keypoint detection**:
+        - 15 or **18-keypoint body keypoint estimation**. **Running time invariant to number of detected people**.
+        - **2x21-keypoint hand keypoint estimation**. Currently, **running time depends** on **number of detected people**.
+        - **70-keypoint face keypoint estimation**. Currently, **running time depends** on **number of detected people**.
+    - **3D real-time multi-person keypoint detection**:
+        - 3-D triangulation from multiple single views.
+        - Synchronization of Flir cameras handled.
+        - Compatible with Flir/Point Grey cameras, but provided C++ demos to add your custom input.
+    - **Calibration toolbox**:
+        - Easy estimation of distortion, intrinsic, and extrinsic camera parameters.
+- **Input**: Image, video, webcam, Flir/Point Grey and IP camera. Included C++ demos to add your custom input.
 - **Output**: Basic image + keypoint display/saving (PNG, JPG, AVI, ...), keypoint saving (JSON, XML, YML, ...), and/or keypoints as array class.
-- Available: command-line demo, C++ wrapper, and C++ API.
 - **OS**: Ubuntu (14, 16), Windows (8, 10), Mac OSX, Nvidia TX2.
+- **Others**:
+    - Available: command-line demo, C++ wrapper, and C++ API.
+    - CUDA (Nvidia GPU) and CPU versions.
 
 
 
@@ -93,6 +101,8 @@ Most users do not need the [OpenPose C++ API](#openpose-c-api), but they can sim
 :: Windows - Portable Demo
 bin\OpenPoseDemo.exe --video examples\media\video.avi
 ```
+
+- **Calibration toolbox**: To easily calibrate your cameras for 3-D OpenPose or any other stereo vision task. See [doc/calibration_demo.md](doc/calibration_demo.md).
 
 - **OpenPose Wrapper**: If you want to read a specific input, and/or add your custom post-processing function, and/or implement your own display/saving, check the `Wrapper` tutorial on [examples/tutorial_wrapper/](examples/tutorial_wrapper/). You can create your custom code on [examples/user_code/](examples/user_code/) and quickly compile it by using `make all` in the OpenPose folder (assuming Makefile installer).
 
