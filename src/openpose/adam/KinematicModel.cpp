@@ -251,11 +251,11 @@ void GenerateMesh_Fast(CMeshModelInstance& returnMesh, double* resultJoint, smpl
 	returnMesh.RecomputeNormal(g_total_model);
 // const auto duration13 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start13).count();
 // const auto start14 = std::chrono::high_resolution_clock::now();
-	for (int i = 0; i < 61; i++)
+	for (int i = 0; i < 62; i++)
 	{
-		resultJoint[3 * i] = joints_smc(3* map_adam_to_measure[i]);
-		resultJoint[3 * i + 1] = joints_smc(3 * map_adam_to_measure[i] + 1);
-		resultJoint[3 * i + 2] = joints_smc(3 * map_adam_to_measure[i] + 2);
+		resultJoint[3 * i] = joints(3* map_adam_to_measure[i]);
+		resultJoint[3 * i + 1] = joints(3 * map_adam_to_measure[i] + 1);
+		resultJoint[3 * i + 2] = joints(3 * map_adam_to_measure[i] + 2);
 	}
 // const auto duration14 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start14).count();
 // const auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start).count();

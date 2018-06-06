@@ -245,9 +245,11 @@ std::shared_ptr<Renderer> render;
 const int NUMBER_BODY_KEYPOINTS = 20;
 const int NUMBER_HAND_KEYPOINTS = 21;
 const int NUMBER_FACE_KEYPOINTS = 70;
-const int NUMBER_KEYPOINTS = 3*(NUMBER_BODY_KEYPOINTS + 2*NUMBER_HAND_KEYPOINTS);
+const int NUMBER_FOOT_KEYPOINTS = 3;
+const int NUMBER_KEYPOINTS = 3*(NUMBER_BODY_KEYPOINTS + 2*NUMBER_HAND_KEYPOINTS); // targetJoints: Only for Body, LHand, RHand. No Face, no Foot
 
-void updateKeypoints(Eigen::MatrixXd& bodyJoints, Eigen::MatrixXd& LHandJoints, Eigen::MatrixXd& RHandJoints, const std::array<double, NUMBER_KEYPOINTS>& targetJoints)
+void updateKeypoints(Eigen::MatrixXd& bodyJoints, Eigen::MatrixXd& LHandJoints, Eigen::MatrixXd& RHandJoints,
+                     const std::array<double, NUMBER_KEYPOINTS>& targetJoints)
 {
     for (int i = 0; i < NUMBER_BODY_KEYPOINTS; i++)
     {
@@ -338,7 +340,7 @@ struct UserDatum : public op::Datum
 {
     // TotalModel g_total_model;
     // smpl::SMPLParams frame_params;
-    std::array<double, NUMBER_KEYPOINTS> targetJoints;
+    std::array<double, NUMBER_KEYPOINTS> targetJoints; // Only for Body, LHand, RHand. No Face, no Foot
     // Eigen::Matrix<double, Eigen::Dynamic, 1> Vt_vec;
     // Eigen::Matrix<double, Eigen::Dynamic, 1> J0_vec;
 
@@ -400,14 +402,16 @@ public:
                 auto& targetJoints = datum.targetJoints;
                 // const auto& leftHandKeypoints3D = datum.handKeypoints3D[0];
                 // const auto& rightHandKeypoints3D = datum.handKeypoints3D[1];
-                if (poseKeypoints3D.getSize(1) != 19)
-                    op::error("Only working for BODY_19 (#parts = "
+                if (poseKeypoints3D.getSize(1) != 19 && poseKeypoints3D.getSize(1) != 25)
+                    op::error("Only working for BODY_19 or BODY_25 (#parts = "
                               + std::to_string(poseKeypoints3D.getSize(2)) + ").",
                               __LINE__, __FUNCTION__, __FILE__);
                 // Update body
-                for (auto part = 0 ; part < poseKeypoints3D.getSize(1); part++)
+                for (auto part = 0 ; part < 19; part++)
+                // for (auto part = 0 ; part < poseKeypoints3D.getSize(1); part++)
                 {
-                    const auto baseIndex = mapOPToDome(part)*(poseKeypoints3D.getSize(2)-1);
+                    const auto adamPart = mapOPToDome(part);
+                    const auto baseIndex = adamPart*(poseKeypoints3D.getSize(2)-1);
                     if (poseKeypoints3D[{0, part, poseKeypoints3D.getSize(2)-1}] > 0.5 /*|| !mInitialized*/)
                         for (auto xyz = 0 ; xyz < poseKeypoints3D.getSize(2)-1 ; xyz++)
                             targetJoints[baseIndex + xyz] = poseKeypoints3D[{0, part, xyz}];
@@ -454,14 +458,48 @@ public:
                         }
                     }
                 }
-                // Meters --> cm
-                for (auto& targetJoint : targetJoints)
-                targetJoint *= 1e2;
 
+                // Update Foot data
+                if (poseKeypoints3D.getSize(1) == 25)
+                {
+                    // Update LFoot
+                    for (auto adamPart = 0 ; adamPart < NUMBER_FOOT_KEYPOINTS; adamPart++)
+                    {
+                        const auto part = adamPart + 19;
+                        if (poseKeypoints3D[{0, part, poseKeypoints3D.getSize(2)-1}] > 0.5 /*|| !mInitialized*/)
+                            for (auto xyz = 0 ; xyz < poseKeypoints3D.getSize(2)-1 ; xyz++)
+                                LFootJoints(xyz, adamPart) = poseKeypoints3D[{0, part, xyz}];
+                        else
+                        {
+                            LFootJoints(0, adamPart) = 0;
+                            LFootJoints(1, adamPart) = 0;
+                            LFootJoints(2, adamPart) = 0;
+                        }
+                    }
+                    // Update RFoot
+                    for (auto adamPart = 0 ; adamPart < NUMBER_FOOT_KEYPOINTS; adamPart++)
+                    {
+                        const auto part = adamPart + 19 + NUMBER_FOOT_KEYPOINTS;
+                        if (poseKeypoints3D[{0, part, poseKeypoints3D.getSize(2)-1}] > 0.5 /*|| !mInitialized*/)
+                            for (auto xyz = 0 ; xyz < poseKeypoints3D.getSize(2)-1 ; xyz++)
+                                RFootJoints(xyz, adamPart) = poseKeypoints3D[{0, part, xyz}];
+                        else
+                        {
+                            RFootJoints(0, adamPart) = 0;
+                            RFootJoints(1, adamPart) = 0;
+                            RFootJoints(2, adamPart) = 0;
+                        }
+                    }
+                }
 // HACK --> FIX!!!!!
 // Nose, ears, eyes to 0 or AdamFastFit crashes
 for (auto i : {3*1,3*1+1,3*1+2,   15*3,15*3+1,15*3+2,   16*3,16*3+1,16*3+2,   17*3,17*3+1,17*3+2,   18*3,18*3+1,18*3+2})
 targetJoints[i] = 0;
+
+                // Meters --> cm
+                for (auto& targetJoint : targetJoints)
+                targetJoint *= 1e2;
+
 
 // // Cout keypoints
 // std::cout << "Body:\n";
@@ -608,11 +646,9 @@ const auto start2 = std::chrono::high_resolution_clock::now();
                 ts.push_back(frame_params.m_adam_t); // BVH generation, Eigen::Vector3d(3, 1)
                 poses.push_back(frame_params.m_adam_pose); // BVH generation, Eigen::Matrix<double, 62, 3, Eigen::RowMajor>
                 // OpenGL Display
-                g_vis_data.targetJoint = targetJoints.data();
-g_vis_data.targetJoint = nullptr;
-                // g_vis_data.targetJoint = datum.targetJoints;
+                g_vis_data.targetJoint = targetJoints.data(); // Only for Body, LHand, RHand. No Face, no Foot
+                g_vis_data.targetJoint = nullptr;
                 g_vis_data.resultJoint = resultBody.data();
-g_vis_data.resultJoint = nullptr;
                 g_vis_data.vis_type = 2;
                 g_vis_data.read_buffer = upReadBuffer.get();
 // BELOW IS PURELY OPENGL
