@@ -57,7 +57,8 @@ struct TotalModel
 	std::vector<double> m_vertex_laplacianWeight;	//size should be same as vertice size
 
 	Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> m_blendW;
-
+	Eigen::SparseMatrix<double> m_cocoplus_reg;
+	Eigen::SparseMatrix<double> m_small_coco_reg;  // regressor used by Donglai to implement fast COCO keypoint fitting (SIGGAsia)
 
 	Eigen::Matrix<int, 2, Eigen::Dynamic> m_kintree_table;
 	int m_parent[NUM_JOINTS];
@@ -99,6 +100,7 @@ struct TotalModel
 	Eigen::Matrix<double, NUM_JOINTS * 3, 1> J_mu_;
 	Eigen::Matrix<double, Eigen::Dynamic, NUM_SHAPE_COEFFICIENTS, Eigen::RowMajor> dJdc_;
 
+	const std::array<int, 19> h36m_jointConst_smcIdx{{ 14, 13, 12, 6, 7, 8, 11, 10, 9, 3, 4, 5, 0, 19, 1, 15, 17, 16, 18 }};
 
 	bool m_bInit;
 
@@ -111,6 +113,7 @@ struct TotalModel
 
 void LoadTotalDataFromJson(TotalModel &totalm, const std::string &path, const std::string &pca_path, const std::string &correspondence_path);
 void LoadTotalModelFromObj(TotalModel &totalm, const std::string &path);
+void LoadCocoplusRegressor(TotalModel &totalm, const std::string &path);
 void adam_reconstruct_Eulers(const TotalModel& smpl,
 	const double *parm_coeffs,
 	const double *parm_pose_eulers,

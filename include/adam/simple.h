@@ -14,6 +14,8 @@ namespace smpl {
         static const int NUM_VERTICES = 6890;
         static const int NUM_JOINTS = 24;
         static const int NUM_POSE_PARAMETERS = NUM_JOINTS * 3;
+        static const int NUM_LSP_JOINTS = 14;
+        static const int NUM_COCO_JOINTS = 19;
 
         // Template vertices (vector) <NUM_VERTICES*3, 1>
         Eigen::Matrix<double, Eigen::Dynamic, 1> mu_;
@@ -38,6 +40,11 @@ namespace smpl {
 
         // Pose regressor, <NUM_VERTICES*3, (NUM_JOINTS-1)*9>
         Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> pose_reg_;
+
+        // Final regressor for LSP (Human3.6M) 14 * NUM_JOINTS
+        Eigen::SparseMatrix<double, Eigen::RowMajor> J_reg_lsp_;
+        // Final regressor for COCO 19 * NUM_JOINTS
+        Eigen::SparseMatrix<double, Eigen::RowMajor> J_reg_coco_;
 
         // Shape coefficient weights
         Eigen::Matrix<double, Eigen::Dynamic, 1> d_;
@@ -256,6 +263,7 @@ namespace smpl {
         const MatrixXdr& T,
         double *outVerts);
 
+    void init_smpl(SMPLModel& smplmodel);
 }
 
 #endif

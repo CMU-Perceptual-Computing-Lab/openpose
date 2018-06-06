@@ -221,14 +221,19 @@ namespace smpl
             }
             else if (idj == 7 || idj == 8)   //foot ankle. Restrict side movement
             {
-                angles[2] = 0;
+                angles[1] = 0.0;
+                angles[2] = 0.0;
             }
-            else if (idj == 24 || idj == 27 || idj == 28 || idj == 31 || idj == 32 || idj == 35 || idj == 26 || idj == 39 || idj == 40 ||
+            else if (idj == 24 || idj == 27 || idj == 28 || idj == 31 || idj == 32 || idj == 35 || idj == 36 || idj == 39 || idj == 40 ||
                 idj == 44 || idj == 47 || idj == 48 || idj == 51 || idj == 52 || idj == 55 || idj == 56 || idj == 59 || idj == 60)  //all hands
             {
                 angles[0] = 0.0;
                 angles[1] = 0.0;
             }
+            // else if (idj == 23 || idj == 26 || idj == 30 || idj == 34 || idj == 38 || idj == 43 || idj == 46 || idj == 50 || idj == 54 || idj == 58)
+            // {
+            //     angles[0] = 0.0;
+            // }
 
             ceres::EulerAnglesToRotationMatrix(angles, 3, R.data());
             MR.at(idj) = MR.at(ipar) * R;
@@ -245,11 +250,15 @@ namespace smpl
                 if (idj == 10 || idj == 11) //foot ends
                     dRdP.block(0, 3 * idj, 9, 3).setZero();
                 if (idj == 7 || idj == 8)   //foot ankle. Restrict side movement
-                    dRdP.block(0, 3 * idj + 2, 9, 1).setZero();
-                if (idj == 24 || idj == 27 || idj == 28 || idj == 31 || idj == 32 || idj == 35 || idj == 26 || idj == 39 || idj == 40)  //all hands
+                    dRdP.block(0, 3 * idj + 1, 9, 2).setZero();
+                if (idj == 24 || idj == 27 || idj == 28 || idj == 31 || idj == 32 || idj == 35 || idj == 36 || idj == 39 || idj == 40)  //all hands
                     dRdP.block(0, 3 * idj, 9, 2).setZero();
                 if (idj == 44 || idj == 47 || idj == 48 || idj == 51 || idj == 52 || idj == 55 || idj == 56 || idj == 59 || idj == 60)  //all hands
                     dRdP.block(0, 3 * idj, 9, 2).setZero();
+                // if (idj == 23 || idj == 26 || idj == 30 || idj == 34 || idj == 38 || idj == 43 || idj == 46 || idj == 50 || idj == 54 || idj == 58)
+                // {
+                //     dRdP.block(0, 3 * idj, 9, 1).setZero();
+                // }
 
                 if (idj == 10 || idj == 11) //foot ends
                     dMRdP.at(idj) = dMRdP.at(ipar);

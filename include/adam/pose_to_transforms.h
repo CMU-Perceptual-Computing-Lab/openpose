@@ -110,7 +110,7 @@ struct PoseToTransformsHand {
 		Matrix<T, Dynamic, 4, RowMajor> Ms(4 * HandModel::NUM_JOINTS, 4);
 		Matrix<T, 4, 4, RowMajor> Mthis;
 
-		Matrix<T, 3, 3, ColMajor> R; // Interface with ceres
+		Matrix<T, 3, 3, RowMajor> R; // Interface with ceres
 		Matrix<T, 3, 3, RowMajor> Rr; // Interface with ceres
 		Mthis.setZero();
 		Mthis(3, 3) = T(1.0);
@@ -118,6 +118,7 @@ struct PoseToTransformsHand {
 		int idj = mod_.update_inds_(0);
 		ceres::AngleAxisToRotationMatrix(pose + idj * 3, R.data());
 		Mthis.block(0, 0, 3, 3) = R * DiagonalMatrix<T, 3>(T(C(idj, 0)), T(C(idj, 0)), T(C(idj, 0)));
+		// Mthis.block(0, 0, 3, 3) = R * DiagonalMatrix<T, 3>(exp(T(C(idj, 0))), exp(T(C(idj, 0))), exp(T(C(idj, 0))));
 		// Mthis.block(0, 0, 3, 3) = R * DiagonalMatrix<T, 3>(T(C(idj, 0)), T(C(idj, 1)), T(C(idj, 2)));
 		Ms.block(idj * 4, 0, 4, 4) = mod_.m_M_l2pl.block(idj * 4, 0, 4, 4).cast<T>()*Mthis;
 		outT.block(idj * 3, 0, 3, 4) = Ms.block(idj * 4, 0, 3, 4)*mod_.m_M_w2l.block(idj * 4, 0, 4, 4).cast<T>();
@@ -129,7 +130,8 @@ struct PoseToTransformsHand {
 
 			ceres::EulerAnglesToRotationMatrix(pose + idj * 3, 3, Rr.data());
 			// Mthis.block(0, 0, 3, 3) = Rr * DiagonalMatrix<T, 3>(T(C(idj, 0)), T(C(idj, 0)), T(C(idj, 0)));
-			Mthis.block(0, 0, 3, 3) = Rr * DiagonalMatrix<T, 3>(T(C(idj, 0)), T(1), T(1));
+			// Mthis.block(0, 0, 3, 3) = Rr * DiagonalMatrix<T, 3>(exp(T((C(idj, 0)))), T(1), T(1));
+			Mthis.block(0, 0, 3, 3) = Rr * DiagonalMatrix<T, 3>(T((C(idj, 0))), T(1), T(1));
 
 			Ms.block(idj * 4, 0, 4, 4) = Ms.block(ipar * 4, 0, 4, 4)*mod_.m_M_l2pl.block(idj * 4, 0, 4, 4).cast<T>()*Mthis;
 			outT.block(idj * 3, 0, 3, 4) = Ms.block(idj * 4, 0, 3, 4)*mod_.m_M_w2l.block(idj * 4, 0, 4, 4).cast<T>();
@@ -250,7 +252,7 @@ struct PoseToTransformsNoLR_Eulers_adamModel {
 				angles[2] = T(0.0);
 			}
 
-			if (idj == 24 || idj == 27 || idj == 28 || idj == 31 || idj == 32 || idj == 35 || idj == 26 || idj == 39 || idj == 40)	//all hands
+			if (idj == 24 || idj == 27 || idj == 28 || idj == 31 || idj == 32 || idj == 35 || idj == 36 || idj == 39 || idj == 40)	//all hands
 			{
 				angles[0] = T(0.0);
 				angles[1] = T(0.0);

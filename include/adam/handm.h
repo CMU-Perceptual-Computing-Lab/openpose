@@ -1,7 +1,7 @@
 #ifndef HANDM_H
 #define HANDM_H
 
-// #include <Eigen/Sparse>
+#include <Eigen/Sparse>
 #include "simple.h"
 #include <json/json.h>
 #include <Eigen/Dense>
@@ -55,7 +55,7 @@ namespace smpl {
         Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> W_;
 
         Eigen::Matrix<double, Eigen::Dynamic, 2> uv;      //uv map
-
+        Eigen::SparseMatrix<double> STB_wrist_reg;  // root regressor for STB dataset
 
         // A model is fully specified by its coefficients, pose, and a translation
         Eigen::Matrix<double, NUM_SHAPE_COEFFICIENTS, 1> coeffs;
@@ -83,7 +83,8 @@ namespace smpl {
         double *outJoints,
         double *out_v,
         MatrixXdr &dJdc,
-        MatrixXdr &dJdP);
+        MatrixXdr &dJdP,
+        const int regressor_type=0);
 
     void lbs_hand(const HandModel &handm, double* V, double* out_v);
 

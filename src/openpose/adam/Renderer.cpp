@@ -379,6 +379,7 @@ void Renderer::SpecialKeys(const int key, const int x, const int y)
 
 void Renderer::MeshRender()
 {
+    glClearColor(1, 1, 1, 1);
     // mesh renderer
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
@@ -413,36 +414,37 @@ void Renderer::MeshRender()
     {
         cv::Point3d min_s(10000., 10000., 10000.);
         cv::Point3d max_s(-10000., -10000., -10000.);
-        if (pData->resultJoint)
+        assert(pData->resultJoint);
+        int start_idx, end_idx;
+        if (pData->vis_type <= 2)
         {
-            int num_joint;
+            start_idx = 0;
             if (pData->vis_type == 0)  // for hand
-                num_joint = 21;
+                end_idx = 21;
             else if(pData->vis_type == 1)  // for body (SMC order)
-                num_joint = 19;
+                end_idx = 20;
             else if (pData->vis_type == 2) // for hand and body
-                num_joint = 61;
-            for (int i = 0; i < num_joint; i++)
-            {
-                if (pData->resultJoint[3*i+0] < min_s.x) min_s.x = pData->resultJoint[3*i+0];
-                if (pData->resultJoint[3*i+0] > max_s.x) max_s.x = pData->resultJoint[3*i+0];
-                if (pData->resultJoint[3*i+1] < min_s.y) min_s.y = pData->resultJoint[3*i+1];
-                if (pData->resultJoint[3*i+1] > max_s.y) max_s.y = pData->resultJoint[3*i+1];
-                if (pData->resultJoint[3*i+2] < min_s.z) min_s.z = pData->resultJoint[3*i+2];
-                if (pData->resultJoint[3*i+2] > max_s.z) max_s.z = pData->resultJoint[3*i+2];
-            }
+                end_idx = 62;
+        }
+        else if(pData->vis_type == 3)
+        {
+            start_idx = 20;
+            end_idx = 20 + 21;
         }
         else
         {
-            for(uint i = 0; i < meshVertices.size(); i++)
-            {
-                if (meshVertices[i].x < min_s.x) min_s.x = meshVertices[i].x;
-                if (meshVertices[i].x > max_s.x) max_s.x = meshVertices[i].x;
-                if (meshVertices[i].y < min_s.y) min_s.y = meshVertices[i].y;
-                if (meshVertices[i].y > max_s.y) max_s.y = meshVertices[i].y;
-                if (meshVertices[i].z < min_s.z) min_s.z = meshVertices[i].z;
-                if (meshVertices[i].z > max_s.z) max_s.z = meshVertices[i].z;
-            }
+            assert(pData->vis_type == 4);
+            start_idx = 20 + 21;
+            end_idx = 20 + 21 + 21;
+        }
+        for (int i = start_idx; i < end_idx; i++)
+        {
+            if (pData->resultJoint[3*i+0] < min_s.x) min_s.x = pData->resultJoint[3*i+0];
+            if (pData->resultJoint[3*i+0] > max_s.x) max_s.x = pData->resultJoint[3*i+0];
+            if (pData->resultJoint[3*i+1] < min_s.y) min_s.y = pData->resultJoint[3*i+1];
+            if (pData->resultJoint[3*i+1] > max_s.y) max_s.y = pData->resultJoint[3*i+1];
+            if (pData->resultJoint[3*i+2] < min_s.z) min_s.z = pData->resultJoint[3*i+2];
+            if (pData->resultJoint[3*i+2] > max_s.z) max_s.z = pData->resultJoint[3*i+2];
         }
         const GLfloat centerx = (min_s.x + max_s.x) / 2;
         const GLfloat centery = (min_s.y + max_s.y) / 2;
@@ -464,7 +466,7 @@ void Renderer::MeshRender()
     glUniformMatrix4fv(MV_id, 1, GL_FALSE, &mvMat[0][0]);
 
     // mesh part
-    glLineWidth((GLfloat)0.1);
+    glLineWidth((GLfloat)0.5);
     glUseProgram(g_shaderProgramID[MODE_DRAW_MESH]);
     glEnable(GL_TEXTURE_2D);
 
@@ -541,15 +543,15 @@ void Renderer::MeshRender()
 
     glUseProgram(0);
     //Draw the target joint
-    if (pData->targetJoint != NULL)
+    if (options.show_joint && pData->targetJoint != NULL)
     {
-        glColor3ub(0u, 0u, 255u);
+        glColor3ub(0u, 255u, 0u);
         DrawSkeleton(pData->targetJoint, pData->vis_type, pData->connMat[pData->vis_type]);
     }
     //Draw the predicted joint
-    if (pData->resultJoint != NULL)
+    if (options.show_joint && pData->resultJoint != NULL)
     {
-        glColor3ub(0u, 255u, 0u);
+        glColor3ub(50u, 0u, 255u);
         DrawSkeleton(pData->resultJoint, pData->vis_type, pData->connMat[pData->vis_type]);
     }
 
@@ -560,28 +562,43 @@ void Renderer::MeshRender()
 
 void Renderer::DrawSkeleton(double* joint, uint vis_type, std::vector<int> connMat)
 {
-    int num_joint;
+    int start_idx = 0, end_idx;
     float rad, cone_rad;
     if (vis_type == 0)  // for hand
     {
-        num_joint = 21;
+        end_idx = 21;
         rad = 0.2f;
         cone_rad = 0.1f;
     }
     else if(vis_type == 1)  // for body (SMC order)
     {
-        num_joint = 19;
+        end_idx = 20;
         rad = 4.0f;
         cone_rad = 2.0f;
     }
     else if (vis_type == 2) // for hand and body
     {
-        num_joint = 61;
+        end_idx = 62;
         rad = 1.0f;
         cone_rad = 0.3f;
     }
+    else if(vis_type == 3)
+    {
+        start_idx = 20;
+        end_idx = 20 + 21;
+        rad = 0.2f;
+        cone_rad = 0.1;
+    }
+    else
+    {
+        assert(vis_type == 4);
+        start_idx = 20 + 21;
+        end_idx = 20 + 21 + 21;
+        rad = 0.2f;
+        cone_rad = 0.1;
+    }
 
-    for (int i = 0; i < num_joint; i++)
+    for (int i = start_idx; i < end_idx; i++)
     {
         glPushMatrix();
         glTranslated(joint[3*i], joint[3*i+1], joint[3*i+2]);
@@ -654,8 +671,6 @@ void Renderer::CameraMode(uint position, int width, int height, double* calibK)
 
 void Renderer::NormalMode(uint position, int width, int height)
 {
-    options.nRange = 120;
-    options.view_dist = 300;
     if (position == 0)
     {
         // look from the front
@@ -670,13 +685,25 @@ void Renderer::NormalMode(uint position, int width, int height)
     }
     else if (position == 2)
     {
-        // look from the left
+        // look from the right
         options.xrot = 0;
         options.yrot = 90;
     }
+    else if (position == 3)
+    {
+        // look from the bottom
+        options.xrot = -90;
+        options.yrot = 0;
+    }
+    else if (position == 4)
+    {
+        // look from the left
+        options.xrot = 0;
+        options.yrot = -90;
+    }
     else
     {
-        printf("Invalid position type(0, 1, 2).\n");
+        printf("Invalid position type(0, 1, 2, 3, 4).\n");
         exit(1);
     }
     options.width = width; options.height = height;

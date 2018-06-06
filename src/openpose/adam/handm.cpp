@@ -73,6 +73,38 @@ void initMatrixRowMajor(Eigen::Matrix<Derived, rows, cols, option>& m, const Jso
     // std::cout << m << std::endl;
 }
 
+template<typename Derived, int option>
+void initSparseMatrix(Eigen::SparseMatrix<Derived, option>& m, const Json::Value& value)
+{
+    if (strcmp(typeid(Derived).name(), "i") == 0)
+    {
+        // The first row specifies the size of the sparse matrix
+        m.resize(value[0u][0u].asInt(), value[0u][1u].asInt());
+        for (uint k = 1u; k < value.size(); k++)
+        {
+            assert(value[k].size() == 3);
+            // From the second row on, triplet correspond to matrix entries
+            const int i = value[k][0u].asInt();
+            const int j = value[k][1u].asInt();
+            m.insert(i, j) = value[k][2u].asInt();
+        }
+    }
+    else
+    {
+        // The first row specifies the size of the sparse matrix
+        m.resize(value[0u][0u].asInt(), value[0u][1u].asInt());
+        for (uint k = 1u; k < value.size(); k++)
+        {
+            assert(value[k].size() == 3);
+            // From the second row on, triplet correspond to matrix entries
+            const int i = value[k][0u].asInt();
+            const int j = value[k][1u].asInt();
+            m.insert(i, j) = value[k][2u].asDouble();
+        }
+    }
+    std::cout << "rows " << m.rows() << " cols " << m.cols() << std::endl;
+}
+
 void LoadHandModelFromJson( HandModel &handm, const std::string &path ) 
 {
     printf("Loading from: %s\n", path.c_str());
@@ -99,6 +131,8 @@ void LoadHandModelFromJson( HandModel &handm, const std::string &path )
     Eigen::Matrix<double, Eigen::Dynamic, 4> F_quad;
     initMatrix(F_quad, root["F"]);
     handm.F_ = Eigen::Matrix<double, Eigen::Dynamic, 3>(F_quad.rows()*2, 3);
+    initSparseMatrix(handm.STB_wrist_reg, root["regressor_hand_wrist_zerobased"]);
+    handm.STB_wrist_reg.makeCompressed();
 
     file.close();
 
@@ -125,7 +159,8 @@ void reconstruct_joints_mesh(const HandModel &handm,
     double *outJoints,
     double *out_v,
     MatrixXdr &dJdc,
-    MatrixXdr &dJdP)
+    MatrixXdr &dJdP,
+    const int regressor_type)
 {
     using namespace Eigen;
     Map< const Matrix<double, 3, 1> > Trans(trans_);
@@ -171,26 +206,12 @@ void reconstruct_joints_mesh(const HandModel &handm,
             outJ(idji, 1) += Trans(1, 0);
             outJ(idji, 2) += Trans(2, 0);
         }
-
-        // //Jacobian out
-        // for (int idi = 0; idi < 3 * HandModel::NUM_JOINTS; idi++)
-        // {
-        //     dJdP(idji * 3 + 0, idi) = dTdP((idj * 3 + 0) * 4 + 3, idi);
-        //     dJdP(idji * 3 + 1, idi) = dTdP((idj * 3 + 1) * 4 + 3, idi);
-        //     dJdP(idji * 3 + 2, idi) = dTdP((idj * 3 + 2) * 4 + 3, idi);
-        //     dJdc(idji * 3 + 0, idi) = dTdc((idj * 3 + 0) * 4 + 3, idi);
-        //     dJdc(idji * 3 + 1, idi) = dTdc((idj * 3 + 1) * 4 + 3, idi);
-        //     dJdc(idji * 3 + 2, idi) = dTdc((idj * 3 + 2) * 4 + 3, idi);
-        // }
     }
 
-    // std::cout << "Trans\n" << Trans << std::endl;
-    // std::cout << "Coffs\n" << p << std::endl;
-    // std::cout << "Pose\n" << c << std::endl;
-    std::cout << "outJoints\n" << outJ << std::endl;
     lbs_hand(handm, transformsNJoints.data(), out_v);
     Map< Matrix<double, HandModel::NUM_VERTICES, 3, RowMajor> > outV(out_v);
 
+    //Transforming Vertices
     if (trans_ != NULL)
     {
         // Map< Matrix<double, HandModel::NUM_VERTICES, 3, RowMajor> > outV(out_v);
@@ -201,7 +222,12 @@ void reconstruct_joints_mesh(const HandModel &handm,
             outV(r, 2) += Trans(2, 0);
         }
     }
-  //Transforming Vertices
+
+    if (regressor_type == 1)
+    {
+        // update the wrist
+        outJ.row(0) = handm.STB_wrist_reg * outV;
+    }
 }
 
 void lbs_hand(const HandModel &handm, double* T, double* out_v_)
