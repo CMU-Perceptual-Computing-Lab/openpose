@@ -88,7 +88,7 @@ The instructions in this section describe the steps to build OpenPose using CMak
 1. [Prerequisites](#prerequisites)
 2. [OpenPose Configuration](#openpose-configuration)
 3. [OpenPose Building](#openpose-building)
-4. [OpenPose from other Projects (Ubuntu Only)](#openpose-from-other-projects-ubuntu-only) 
+4. [OpenPose from other Projects (Ubuntu and Mac)](#openpose-from-other-projects-ubuntu-and-mac) 
 5. [Run OpenPose](#run-openpose)
 
 
@@ -123,7 +123,7 @@ The instructions in this section describe the steps to build OpenPose using CMak
             - [Caffe](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe_2018_01_18.zip): Unzip as `3rdparty/windows/caffe/`.
             - [Caffe dependencies](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe3rdparty_2017_07_14.zip): Unzip as `3rdparty/windows/caffe3rdparty/`.
             - [OpenCV 3.1](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/opencv_310.zip): Unzip as `3rdparty/windows/opencv/`.
-6. OSX - **Caffe, OpenCV, and Caffe prerequisites**:
+6. Mac - **Caffe, OpenCV, and Caffe prerequisites**:
     - Install deps by running `sudo bash 3rdparty/osx/install_deps.sh` on your terminal.
     - Current OSX has only been tested with the CPU Version, and hence must be compiled with the `-DGPU_MODE=CPU_ONLY` flag.
 7. **Eigen prerequisite**:
@@ -162,7 +162,7 @@ Note: If you prefer to use your own custom Caffe or OpenCV versions, see [Custom
 
 
 ### OpenPose Building
-#### Ubuntu
+#### Ubuntu and Mac
 Finally, build the project by running the following commands.
 ```
 cd build/
@@ -174,7 +174,7 @@ In order to build the project, open the Visual Studio solution (Windows), called
 
 
 
-### OpenPose from other Projects (Ubuntu Only)
+### OpenPose from other Projects (Ubuntu and Mac)
 If you only intend to use the OpenPose demo, you might skip this step. This step is only recommended if you plan to use the OpenPose API from other projects.
 
 To install the OpenPose headers and libraries into the system environment path (e.g. `/usr/local/` or `/usr/`), run the following command.
@@ -215,7 +215,7 @@ Check OpenPose was properly installed by running it on the default images, video
 
 ## Reinstallation
 In order to re-install OpenPose:
-1. (Ubuntu only) If you ran `sudo make install`, then run `sudo make uninstall` in `build/`.
+1. (Ubuntu and Mac) If you ran `sudo make install`, then run `sudo make uninstall` in `build/`.
 2. Delete the `build/` folder.
 3. In CMake GUI, click on `File` --> `Delete Cache`.
 4. Follow the [Installation](#installation) steps again.
@@ -224,7 +224,7 @@ In order to re-install OpenPose:
 
 ## Uninstallation
 In order to uninstall OpenPose:
-1. (Ubuntu only) If you ran `sudo make install`, then run `sudo make uninstall` in `build/`.
+1. (Ubuntu and Mac) If you ran `sudo make install`, then run `sudo make uninstall` in `build/`.
 2. Remove the OpenPose folder.
 
 
