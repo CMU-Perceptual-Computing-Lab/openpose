@@ -27,6 +27,8 @@ OpenPose - Installation
 ## Windows Portable Demo
 This installation section is only intended if you plan to modify the OpenPose code or integrate it with another library or project. If you just want to use the OpenPose demo in Windows, simply use the latest version of the OpenPose binaries which you can find in the [Releases](https://github.com/CMU-Perceptual-Computing-Lab/openpose/releases) section.
 
+**NOTE**: Read the `Instructions.txt` to learn to download the models required by OpenPose (about 500 Mb).
+
 
 
 ## Operating Systems

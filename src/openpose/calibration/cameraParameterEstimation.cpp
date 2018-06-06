@@ -1,4 +1,5 @@
 #include <fstream>
+#include <numeric> // std::accumulate
 #include <opencv2/core/core.hpp>
 #ifdef WITH_EIGEN
     #include <Eigen/Dense>

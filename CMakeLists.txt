@@ -21,6 +21,9 @@ cmake_minimum_required(VERSION 2.8.7 FATAL_ERROR) # min. cmake version recommend
 
 ### Extra functionality
 include(cmake/Utils.cmake)
+if (NOT WIN32 AND NOT UNIX AND NOT APPLE)
+  message(FATAL_ERROR "Unsupported operating system. Only Windows, Mac and Unix systems supported.")
+endif (NOT WIN32 AND NOT UNIX AND NOT APPLE)
 
 
 ### FLAGS
@@ -204,13 +207,13 @@ endif (UNIX AND NOT APPLE)
 option(WITH_FLIR_CAMERA "Add FLIR (formerly Point Grey) camera code (requires Spinnaker SDK already installed)." OFF)
 
 # Set the acceleration library
-if (WIN32)
+if (WIN32 OR APPLE)
   set(WITH_EIGEN NONE CACHE STRING "Select the Eigen mode (NONE if not required or DOWNLOAD to let OpenPose download it).")
   set_property(CACHE WITH_EIGEN PROPERTY STRINGS NONE BUILD)
 elseif (UNIX AND NOT APPLE)
   set(WITH_EIGEN NONE CACHE STRING "Select the Eigen mode (NONE if not required, APT_GET if you used `sudo apt-get install libeigen3-dev`, BUILD to let OpenPose download it).")
   set_property(CACHE WITH_EIGEN PROPERTY STRINGS NONE APT_GET BUILD)
-endif (WIN32)
+endif (WIN32 OR APPLE)
 
 # # Suboptions for OpenPose tracking
 # if (UNIX AND NOT APPLE)
