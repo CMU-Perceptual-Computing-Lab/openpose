@@ -61,7 +61,17 @@ namespace op
                         || !wrapperStructOutput.writeCocoJson.empty() || !wrapperStructOutput.writeHeatMaps.empty()
                         || !wrapperStructOutput.writeCocoFootJson.empty()
                 );
+                const auto savingCvOutput = (
+                    !wrapperStructOutput.writeImages.empty() || !wrapperStructOutput.writeVideo.empty()
+                );
                 const bool guiEnabled = (wrapperStructOutput.displayMode != DisplayMode::NoDisplay);
+                if (!guiEnabled && !savingCvOutput && renderOutput)
+                {
+                    const auto message = "GUI is not enabled and you are not saving the output frames. You should then"
+                                         " disable rendering for a faster code. I.e., add `--render_pose 0`."
+                                         + additionalMessage;
+                    error(message, __LINE__, __FUNCTION__, __FILE__);
+                }
                 if (!guiEnabled && !savingSomething)
                 {
                     const auto message = "No output is selected (`--display 0`) and no results are generated (no"

@@ -1,5 +1,6 @@
 #include <fstream>
 #include <numeric> // std::accumulate
+#include <thread>
 #include <opencv2/core/core.hpp>
 #ifdef WITH_EIGEN
     #include <Eigen/Dense>
@@ -732,6 +733,127 @@ namespace op
             log("Cannot write on " + fileName, Priority::High);
     }
 
+    std::string getFileNameFromCameraIndex(const int cameraIndex)
+    {
+        try
+        {
+            // Security checks
+            if (cameraIndex >= 100)
+                error("Only implemented for up to 99 cameras.", __LINE__, __FUNCTION__, __FILE__);
+            // Return result
+            return (cameraIndex < 10 ? "00_0" : "00_") + std::to_string(cameraIndex);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return "";
+        }
+    }
+
+    void estimateAndSaveSiftFileSubThread(std::vector<cv::Point2f>* points2DExtrinsicPtr,
+                                          std::vector<unsigned int>* matchIndexesCameraPtr,
+                                          const int cameraIndex,
+                                          const int numberCameras,
+                                          const int numberCorners,
+                                          const unsigned int numberViews,
+                                          const bool saveImagesWithCorners,
+                                          const std::string& imagesFolder,
+                                          const cv::Size& gridInnerCornersCvSize,
+                                          const cv::Size& imageSize,
+                                          const std::vector<std::pair<cv::Mat, std::string>>& imageAndPaths)
+    {
+        try
+        {
+            // Security checks
+            if (points2DExtrinsicPtr == nullptr || matchIndexesCameraPtr == nullptr)
+                error("Make sure than points2DExtrinsicPtr != nullptr && matchIndexesCameraPtr != nullptr.",
+                      __LINE__, __FUNCTION__, __FILE__);
+            std::vector<cv::Point2f>& points2DExtrinsic = *points2DExtrinsicPtr;
+            std::vector<unsigned int>& matchIndexesCamera = *matchIndexesCameraPtr;
+            std::vector<cv::Mat> imagesWithCorners;
+            for (auto viewIndex = 0u ; viewIndex < numberViews ; viewIndex++)
+            {
+                // Get right image
+                const auto& imageAndPath = imageAndPaths.at(viewIndex * numberCameras + cameraIndex);
+                const auto& image = imageAndPath.first;
+
+                if (viewIndex % std::max(1, int(numberViews/6)) == 0)
+                    log("Camera " + std::to_string(cameraIndex) + " - Image view "
+                        + std::to_string(viewIndex+1) + "/" + std::to_string(numberViews),
+                        Priority::High);
+
+                // Security check
+                if (imageSize.width != image.cols || imageSize.height != image.rows)
+                    error("Detected images with different sizes in `" + imagesFolder + "` All images"
+                          " must have the same resolution.", __LINE__, __FUNCTION__, __FILE__);
+
+                // Find grid corners
+                bool found;
+                std::vector<cv::Point2f> points2DVector;
+                std::tie(found, points2DVector) = findAccurateGridCorners(image, gridInnerCornersCvSize);
+
+                // Reorder & save 2D pixels points
+                if (found)
+                {
+                    reorderPoints(points2DVector, gridInnerCornersCvSize, Points2DOrigin::TopLeft);
+                    for (auto i = 0 ; i < numberCorners ; i++)
+                        matchIndexesCamera.emplace_back(viewIndex * numberCorners + i);
+                }
+                else
+                {
+                    points2DVector.clear();
+                    points2DVector.resize(numberCorners, cv::Point2f{-1.f,-1.f});
+                    log("Camera " + std::to_string(cameraIndex) + " - Image view "
+                        + std::to_string(viewIndex+1) + "/" + std::to_string(numberViews)
+                        + " - Chessboard not found.", Priority::High);
+                }
+                points2DExtrinsic.insert(points2DExtrinsic.end(), points2DVector.begin(), points2DVector.end());
+
+                // Show image (with chessboard corners if found)
+                if (saveImagesWithCorners)
+                {
+                    cv::Mat imageToPlot = image.clone();
+                    if (found)
+                        drawGridCorners(imageToPlot, gridInnerCornersCvSize, points2DVector);
+                    imagesWithCorners.emplace_back(imageToPlot);
+                }
+            }
+
+            // Save *.sift file for camera
+            // const auto fileName = getFullFilePathNoExtension(imageAndPaths.at(cameraIndex).second) + ".sift";
+            const auto fileName = getFileParentFolderPath(imageAndPaths.at(cameraIndex).second)
+                                + getFileNameFromCameraIndex(cameraIndex) + ".sift";
+            writeVisualSFMSiftGPU(fileName, points2DExtrinsic);
+
+            // Save images with corners
+            if (saveImagesWithCorners)
+            {
+                const auto folderWhereSavingImages = imagesFolder + "images_with_corners/";
+                // Create directory in case it did not exist
+                makeDirectory(folderWhereSavingImages);
+                const auto pathWhereSavingImages = folderWhereSavingImages + std::to_string(cameraIndex) + "_";
+                // Save new images
+                const std::string extension{".png"};
+                auto fileRemoved = true;
+                for (auto i = 0u ; i < imagesWithCorners.size() || fileRemoved; i++)
+                {
+                    const auto finalPath = pathWhereSavingImages + std::to_string(i+1) + extension;
+                    // remove leftovers/previous files
+                    // Note: If file is not deleted before cv::imwrite, Windows considers that the file
+                    // was "only" modified at that time, not created
+                    fileRemoved = {remove(finalPath.c_str()) == 0};
+                    // save images on hhd in the desired place
+                    if (i < imagesWithCorners.size())
+                        saveImage(imagesWithCorners.at(i), finalPath);
+                }
+            }
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
 
 
 
@@ -782,13 +904,16 @@ namespace op
                     std::cerr << "Chessboard not found in this image." << std::endl;
 
                 // Show image (with chessboard corners if found)
-                cv::Mat imageToPlot = image.clone();
-                if (found)
-                    drawGridCorners(imageToPlot, gridInnerCornersCvSize, points2DVector);
-                // cv::pyrDown(imageToPlot, imageToPlot);
-                // cv::imshow("Image View", imageToPlot);
-                // cv::waitKey(delayMilliseconds);
-                imagesWithCorners.emplace_back(imageToPlot);
+                if (saveImagesWithCorners)
+                {
+                    cv::Mat imageToPlot = image.clone();
+                    if (found)
+                        drawGridCorners(imageToPlot, gridInnerCornersCvSize, points2DVector);
+                    // cv::pyrDown(imageToPlot, imageToPlot);
+                    // cv::imshow("Image View", imageToPlot);
+                    // cv::waitKey(delayMilliseconds);
+                    imagesWithCorners.emplace_back(imageToPlot);
+                }
             }
 
             // Run calibration
@@ -1083,58 +1208,27 @@ namespace op
             std::vector<cv::Mat> imagesWithCorners;
             const auto imageSize = imageAndPaths.at(0).first.size();
             const auto numberViews = imageAndPaths.size() / numberCameras;
+            log("Processing cameras...", Priority::High);
+            std::vector<std::thread> threads;
             for (auto cameraIndex = 0 ; cameraIndex < numberCameras ; cameraIndex++)
             {
-                log("Processing camera " + std::to_string(cameraIndex) + "...", Priority::High);
-                auto& points2DExtrinsic = points2DVectorsExtrinsic[cameraIndex];
-                auto& matchIndexesCamera = matchIndexes[cameraIndex];
-                for (auto viewIndex = 0u ; viewIndex < numberViews ; viewIndex++)
-                {
-                    // Get right image
-                    const auto& imageAndPath = imageAndPaths.at(viewIndex * numberCameras + cameraIndex);
-                    const auto& image = imageAndPath.first;
-
-                    if (viewIndex % std::max(1, int(numberViews/10)) == 0)
-                        log("Image view " + std::to_string(viewIndex+1) + "/" + std::to_string(numberViews),
-                            Priority::High);
-
-                    // Security check
-                    if (imageSize.width != image.cols || imageSize.height != image.rows)
-                        error("Detected images with different sizes in `" + imagesFolder + "` All images"
-                              " must have the same resolution.", __LINE__, __FUNCTION__, __FILE__);
-
-                    // Find grid corners
-                    bool found;
-                    std::vector<cv::Point2f> points2DVector;
-                    std::tie(found, points2DVector) = findAccurateGridCorners(image, gridInnerCornersCvSize);
-
-                    // Reorder & save 2D pixels points
-                    if (found)
-                    {
-                        reorderPoints(points2DVector, gridInnerCornersCvSize, Points2DOrigin::TopLeft);
-                        for (auto i = 0 ; i < numberCorners ; i++)
-                            matchIndexesCamera.emplace_back(viewIndex * numberCorners + i);
-                    }
-                    else
-                    {
-                        points2DVector.clear();
-                        points2DVector.resize(numberCorners, cv::Point2f{-1.f,-1.f});
-                        log("Chessboard not found in view " + std::to_string(viewIndex)
-                            + ", camera " + std::to_string(cameraIndex) + ".", Priority::High);
-                    }
-                    points2DExtrinsic.insert(points2DExtrinsic.end(), points2DVector.begin(), points2DVector.end());
-
-                    // Show image (with chessboard corners if found)
-                    cv::Mat imageToPlot = image.clone();
-                    if (found)
-                        drawGridCorners(imageToPlot, gridInnerCornersCvSize, points2DVector);
-                    imagesWithCorners.emplace_back(imageToPlot);
-                }
-
-                // Save *.sift file for camera
-                const auto fileName = getFullFilePathNoExtension(imageAndPaths.at(cameraIndex).second) + ".sift";
-                writeVisualSFMSiftGPU(fileName, points2DExtrinsic);
+                auto* points2DExtrinsic = &points2DVectorsExtrinsic[cameraIndex];
+                auto* matchIndexesCamera = &matchIndexes[cameraIndex];
+                // Threaded version
+                threads.emplace_back(estimateAndSaveSiftFileSubThread, points2DExtrinsic,
+                                     matchIndexesCamera, cameraIndex, numberCameras,
+                                     numberCorners, numberViews, saveImagesWithCorners, imagesFolder,
+                                     gridInnerCornersCvSize, imageSize, imageAndPaths);
+                // // Non-threaded version
+                // estimateAndSaveSiftFileSubThread(points2DExtrinsic, matchIndexesCamera, cameraIndex, numberCameras,
+                //                                  numberCorners, numberViews, saveImagesWithCorners, imagesFolder,
+                //                                  gridInnerCornersCvSize, imageSize, imageAndPaths);
             }
+            // Threaded version
+            for (auto& thread : threads)
+                if (thread.joinable())
+                    thread.join();
+
             // Matching file
             std::ofstream ofstreamMatches{getFileParentFolderPath(imageAndPaths.at(0).second) + "FeatureMatches.txt"};
             for (auto cameraIndex = 0 ; cameraIndex < numberCameras ; cameraIndex++)
@@ -1146,8 +1240,10 @@ namespace op
                                           matchIndexes[cameraIndex2].begin(), matchIndexes[cameraIndex2].end(),
                                           std::back_inserter(matchIndexesIntersection));
 
-                    ofstreamMatches << getFileNameAndExtension(imageAndPaths.at(cameraIndex).second)
-                                    << " " << getFileNameAndExtension(imageAndPaths.at(cameraIndex2).second)
+                    ofstreamMatches << getFileNameFromCameraIndex(cameraIndex) << ".jpg"
+                                    << " " << getFileNameFromCameraIndex(cameraIndex2) << ".jpg"
+                    // ofstreamMatches << getFileNameAndExtension(imageAndPaths.at(cameraIndex).second)
+                    //                 << " " << getFileNameAndExtension(imageAndPaths.at(cameraIndex2).second)
                                     << " " << matchIndexesIntersection.size() << "\n";
                     for (auto reps = 0 ; reps < 2 ; reps++)
                     {
@@ -1166,28 +1262,6 @@ namespace op
             for (auto i = 1 ; i < numberCameras ; i++)
                 if (points2DVectorsExtrinsic[i].size() != points2DVectorsExtrinsic[0].size())
                     error("Something went wrong. Notify us.", __LINE__, __FUNCTION__, __FILE__);
-
-            // Save images with corners
-            if (saveImagesWithCorners)
-            {
-                const auto folderWhereSavingImages = imagesFolder + "images_with_corners/";
-                // Create directory in case it did not exist
-                makeDirectory(folderWhereSavingImages);
-                // Save new images
-                const std::string extension{".png"};
-                auto fileRemoved = true;
-                for (auto i = 0u ; i < imagesWithCorners.size() || fileRemoved; i++)
-                {
-                    const auto finalPath = folderWhereSavingImages + std::to_string(i+1) + extension;
-                    // remove leftovers/previous files
-                    // Note: If file is not deleted before cv::imwrite, Windows considers that the file
-                    // was "only" modified at that time, not created
-                    fileRemoved = {remove(finalPath.c_str()) == 0};
-                    // save images on hhd in the desired place
-                    if (i < imagesWithCorners.size())
-                        saveImage(imagesWithCorners.at(i), finalPath);
-                }
-            }
         }
         catch (const std::exception& e)
         {

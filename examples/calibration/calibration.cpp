@@ -24,7 +24,7 @@ DEFINE_int32(logging_level,             3,              "The logging level. Inte
                                                         " 255 will not output any. Current OpenPose library messages are in the range 0-4: 1 for"
                                                         " low priority messages and 4 for important ones.");
 // Calibration
-DEFINE_int32(mode,                      1,              "Select 1 for intrinsic camera parameter calibration, 2 for extrinsic ones.");
+DEFINE_int32(mode,                      1,              "Select 1 for intrinsic camera parameter calibration, 2 for extrinsic calibration.");
 DEFINE_string(calibration_image_dir,    "images/intrinsics/", "Directory where the images for camera parameter calibration are placed.");
 DEFINE_double(grid_square_size_mm,      127.0,          "Chessboard square length (in millimeters).");
 DEFINE_string(grid_number_inner_corners,"9x6",          "Number of inner corners in width and height, i.e., number of total squares in width"
@@ -95,7 +95,7 @@ int openPoseDemo()
             op::log("Extrinsic calibration completed!", op::Priority::High);
         }
 
-        // // Calibration - Extrinsics for Visual SFM
+        // // Calibration - Extrinsics Refinement with Visual SFM
         // else if (FLAGS_mode == 3)
         // {
         //     op::log("Running calibration (intrinsic parameters)...", op::Priority::High);
@@ -105,7 +105,7 @@ int openPoseDemo()
         //     // const auto saveImagesWithCorners = true;
         //     // Run camera calibration code
         //     op::estimateAndSaveSiftFile(gridInnerCorners,
-        //                                 op::formatAsDirectory(FLAGS_camera_parameter_folder),
+        //                                 op::formatAsDirectory(FLAGS_calibration_image_dir),
         //                                 FLAGS_number_cameras,
         //                                 saveImagesWithCorners);
         //     op::log("Intrinsic calibration completed!", op::Priority::High);

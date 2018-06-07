@@ -124,7 +124,7 @@ The instructions in this section describe the steps to build OpenPose using CMak
             - [Caffe dependencies](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe3rdparty_2017_07_14.zip): Unzip as `3rdparty/windows/caffe3rdparty/`.
             - [OpenCV 3.1](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/opencv_310.zip): Unzip as `3rdparty/windows/opencv/`.
 6. Mac - **Caffe, OpenCV, and Caffe prerequisites**:
-    - Install deps by running `sudo bash 3rdparty/osx/install_deps.sh` on your terminal.
+    - Install deps by running `bash 3rdparty/osx/install_deps.sh` on your terminal.
     - Current OSX has only been tested with the CPU Version, and hence must be compiled with the `-DGPU_MODE=CPU_ONLY` flag.
 7. **Eigen prerequisite**:
     - Note: This step is optional, only required for some specific extra functionality, such as extrinsic camera calibration.
