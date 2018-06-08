@@ -229,7 +229,7 @@ namespace op
                         {
 
                             resizeAndMergeFullKernel(cl::EnqueueArgs(op::OpenCL::getInstance(gpuID)->getQueue(),
-                                                 cl::NDRange(channels, targetWidth, targetHeight)),
+                                                 cl::NDRange(channels, targetHeight, targetWidth)),
                                                  targetPtrBuffer, sourcePtrBuffer,
                                                  sourceWidth, sourceHeight, targetWidth, targetHeight);
 
