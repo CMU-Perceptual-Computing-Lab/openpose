@@ -278,8 +278,8 @@ namespace op
                     upImpl->spNmsCaffe->Forward_gpu({upImpl->spHeatMapsBlob.get()}, {upImpl->spPeaksBlob.get()});// ~2ms
                     cudaCheck(__LINE__, __FUNCTION__, __FILE__);
                 #elif USE_OPENCL
-                    upImpl->spNmsCaffe->Forward_cpu({upImpl->spHeatMapsBlob.get()}, {upImpl->spPeaksBlob.get()}); // ~ 7ms
-                    //upImpl->spNmsCaffe->Forward_ocl({upImpl->spHeatMapsBlob.get()}, {upImpl->spPeaksBlob.get()});
+                    //upImpl->spNmsCaffe->Forward_cpu({upImpl->spHeatMapsBlob.get()}, {upImpl->spPeaksBlob.get()}); // ~ 7ms
+                    upImpl->spNmsCaffe->Forward_ocl({upImpl->spHeatMapsBlob.get()}, {upImpl->spPeaksBlob.get()});
                 #else
                     upImpl->spNmsCaffe->Forward_cpu({upImpl->spHeatMapsBlob.get()}, {upImpl->spPeaksBlob.get()}); // ~ 7ms
                 #endif
