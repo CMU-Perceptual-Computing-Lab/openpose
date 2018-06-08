@@ -249,7 +249,9 @@ int main(int argc, char *argv[])
     gflags::ParseCommandLineFlags(&argc, &argv, true);
 
     // Running handFromJsonTest
-    return clTest();
+    std::thread t(&clTest);
+    t.join();
+    return 0;
 #else
     op::error("OpenPose must be compiled with the `USE_CAFFE` & `USE_OPENCL` macro definitions in order to run"
               " this functionality.", __LINE__, __FUNCTION__, __FILE__);
