@@ -22,7 +22,7 @@ namespace op
                 Type scoreAcc = 0.f;
                 const int dWidth = 3;
                 const int dHeight = 3;
-                for (auto dy = -dHeight ; dy <= dHeight ; dy++)
+                for (int dy = -dHeight ; dy <= dHeight ; dy++)
                 {
                     const int y = peakLocY + dy;
                     if (0 <= y && y < height) // Default height = 368

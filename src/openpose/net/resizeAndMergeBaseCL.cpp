@@ -67,7 +67,7 @@ namespace op
                 Type temp[4];
                 for (unsigned char i = 0; i < 4; i++)
                 {
-                    const auto offset = yIntArray[i]*widthSourcePtr;
+                    const int offset = yIntArray[i]*widthSourcePtr;
                     temp[i] = cubicInterpolate(sourcePtr[offset + xIntArray[0]], sourcePtr[offset + xIntArray[1]],
                                                sourcePtr[offset + xIntArray[2]], sourcePtr[offset + xIntArray[3]], dx);
                 }
@@ -214,7 +214,7 @@ namespace op
                 const auto sourceWidth = sourceSize[3];
 
                 // No multi-scale merging or no merging required
-                if (sourceSizes.size() == 10)
+                if (sourceSizes.size() == 1)
                 {
                     const auto num = sourceSize[0];
                     if (targetSize[0] > 1 || num == 1)

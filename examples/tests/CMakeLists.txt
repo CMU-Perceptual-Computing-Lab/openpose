@@ -1,6 +1,7 @@
 set(EXAMPLE_FILES
     handFromJsonTest.cpp
-    resizeTest.cpp)
+    resizeTest.cpp
+    clTest.cpp)
 
 foreach(EXAMPLE_FILE ${EXAMPLE_FILES})
 
