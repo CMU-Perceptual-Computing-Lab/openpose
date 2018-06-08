@@ -88,18 +88,59 @@ const std::string scaleKernelString = MULTI_LINE_STRING(
     }
 );
 
+template<typename Dtype>
+void matToCaffe(Dtype* caffeImg, const cv::Mat& imgAug){
+    const int imageAugmentedArea = imgAug.rows * imgAug.cols;
+    auto* uCharPtrCvMat = (unsigned char*)(imgAug.data);
+    //caffeImg = new Dtype[imgAug.channels()*imgAug.size().width*imgAug.size().height];
+    for (auto y = 0; y < imgAug.rows; y++)
+    {
+        const auto yOffset = y*imgAug.cols;
+        for (auto x = 0; x < imgAug.cols; x++)
+        {
+            const auto xyOffset = yOffset + x;
+            // const cv::Vec3b& bgr = imageAugmented.at<cv::Vec3b>(y, x);
+            auto* bgr = &uCharPtrCvMat[3*xyOffset];
+            caffeImg[xyOffset] = (bgr[0] - 128) / 256.0;
+            caffeImg[xyOffset + imageAugmentedArea] = (bgr[1] - 128) / 256.0;
+            caffeImg[xyOffset + 2*imageAugmentedArea] = (bgr[2] - 128) / 256.0;
+        }
+    }
+}
+
+template<typename Dtype>
+void caffeToMat(cv::Mat& img, const Dtype* caffeImg, cv::Size imageSize){
+    // Need a function to convert back
+    img = cv::Mat(imageSize, CV_8UC3);
+    const int imageAugmentedArea = img.rows * img.cols;
+    auto* imgPtr = (unsigned char*)(img.data);
+    for (auto y = 0; y < img.rows; y++)
+    {
+        const auto yOffset = y*img.cols;
+        for (auto x = 0; x < img.cols; x++)
+        {
+            const auto xyOffset = yOffset + x;
+            auto* bgr = &imgPtr[3*xyOffset];
+            bgr[0] = (caffeImg[xyOffset]*256.) + 128;
+            bgr[1] = (caffeImg[xyOffset + imageAugmentedArea]*256.) + 128;
+            bgr[2] = (caffeImg[xyOffset + 2*imageAugmentedArea]*256.) + 128;
+        }
+    }
+}
+
 int clTest()
 {
     try
     {
         // logging_level
-        cv::Mat img = op::loadImage(FLAGS_image_path, CV_LOAD_IMAGE_GRAYSCALE);
+        cv::Mat img = cv::imread(FLAGS_image_path);
         if(img.empty())
             op::error("Could not open or find the image: " + FLAGS_image_path, __LINE__, __FUNCTION__, __FILE__);
         cv::Mat imgResize; cv::resize(img, imgResize, cv::Size(368,368));
-        cv::Mat imgFloat; imgResize.convertTo(imgFloat, CV_32FC1);
+        cv::Mat imgFloat; imgResize.convertTo(imgFloat, CV_32FC3);
         imgFloat /= 255.;
-        int imageVolume = imgResize.size().width * imgResize.size().height;
+        int imageVolume = imgFloat.size().width * imgFloat.size().height * imgFloat.channels();
+        std::cout << imgFloat.channels() << std::endl;
 
         // Setup caffe
         caffe::Caffe::set_mode(caffe::Caffe::GPU);
@@ -120,11 +161,11 @@ int clTest()
         op::OpenCL::getInstance(0, CL_DEVICE_TYPE_GPU, true);
 
         // Reshape net to image size
-        upCaffeNet->blobs()[0]->Reshape({1,3,imgResize.size().width,imgResize.size().height});
+        upCaffeNet->blobs()[0]->Reshape({1,imgFloat.channels(),imgResize.size().width,imgResize.size().height});
         upCaffeNet->Reshape();
 
         // GPU Test
-        cv::Mat finalImage;
+        cv::Mat finalImage = imgFloat;
         try{
 
             // Create my Kernel
@@ -136,26 +177,30 @@ int clTest()
             auto* gpuImagePtr = upCaffeNet->blobs().at(0)->mutable_gpu_data();
             cl::Buffer imageBuffer = cl::Buffer((cl_mem)gpuImagePtr, true);
             op::OpenCL::getInstance(0)->getQueue().enqueueWriteBuffer(imageBuffer, true, 0,
-                                                                      imgResize.size().width * imgResize.size().height * sizeof(float),
+                                                                      imgResize.size().width * imgResize.size().height * imgFloat.channels() * sizeof(float),
                                                                       &imgFloat.at<float>(0));
 
-            // Run a Kernel (Scale down intensity by 0.5)
-            scaleKernel(cl::EnqueueArgs(op::OpenCL::getInstance(0)->getQueue(),
-                                             cl::NDRange(imgResize.size().width, imgResize.size().height, 1)),
-                                             imageBuffer, imgResize.size().width, imgResize.size().height, 0.5);
+            for(int i=0; i<imgFloat.channels() - 1; i++){
+
+                // Read subbuffer
+                cl_buffer_region sourceRegion;
+                op::OpenCL::getBufferRegion<float>(sourceRegion, i * imgResize.size().width * imgResize.size().height, imgResize.size().width * imgResize.size().height);
+                cl::Buffer regionBuffer = imageBuffer.createSubBuffer(CL_MEM_READ_WRITE,
+                                                                      CL_BUFFER_CREATE_TYPE_REGION,
+                                                                      &sourceRegion);
+
+                // Run a Kernel (Scale down intensity by 0.5)
+                scaleKernel(cl::EnqueueArgs(op::OpenCL::getInstance(0)->getQueue(),
+                                                 cl::NDRange(imgResize.size().width, imgResize.size().height, 1)),
+                                                 regionBuffer, imgResize.size().width, imgResize.size().height, 0.5);
+
+
+            }
 
             // Read back image to GPU
-            finalImage = cv::Mat(imgResize.size(),CV_32FC1);
+            finalImage = cv::Mat(imgResize.size(),CV_32FC3);
             op::OpenCL::getInstance(0)->getQueue().enqueueReadBuffer(imageBuffer, CL_TRUE, 0,
-                                                                     imgResize.size().width * imgResize.size().height * sizeof(float), &finalImage.at<float>(0));
-
-            // Read subbuffer
-            cl_buffer_region sourceRegion;
-            op::OpenCL::getBufferRegion<float>(sourceRegion, 0, imgResize.size().width * imgResize.size().height / 2);
-            cl::Buffer sourceBuffer = imageBuffer.createSubBuffer(CL_MEM_READ_ONLY,
-                                                                  CL_BUFFER_CREATE_TYPE_REGION,
-                                                                  &sourceRegion);
-
+                                                                     imgResize.size().width * imgResize.size().height * imgFloat.channels() * sizeof(float), &finalImage.at<float>(0));
 
         }
         #if defined(USE_OPENCL) && defined(CL_HPP_ENABLE_EXCEPTIONS)
