@@ -142,7 +142,13 @@ int clTest()
         input_layer->FromProto(blob_proto);
         upCaffeNet->Forward(0);
 
-        boost::shared_ptr<caffe::Blob<float> > output_blob = upCaffeNet->blob_by_name("image");
+        boost::shared_ptr<caffe::Blob<float> > output_blob = upCaffeNet->blob_by_name("net_output");
+
+        // Test
+        cl::Device& device = op::OpenCL::getInstance(0)->getDevice();
+        cl_uint mem_align;
+        clGetDeviceInfo(device.get(), CL_DEVICE_MEM_BASE_ADDR_ALIGN, sizeof(mem_align), &mem_align, nullptr);
+        std::cout << "Alignment in bits of the base address : " << mem_align << std::endl;
 
         // GPU Test
         cv::Mat finalImage = imgFloat;

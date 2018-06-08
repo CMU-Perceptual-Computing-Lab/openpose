@@ -23,6 +23,7 @@ namespace cl
 {
     class CommandQueue;
     class Kernel;
+    class Device;
 }
 
 // Singleton structure
@@ -38,6 +39,8 @@ namespace op
         ~OpenCL();
 
         cl::CommandQueue& getQueue();
+
+        cl::Device& getDevice();
 
         template <typename T>
         bool buildKernelIntoManager(const std::string& kernelName, const std::string& src = "", bool isFile = false);

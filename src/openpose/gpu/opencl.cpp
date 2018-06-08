@@ -272,6 +272,17 @@ namespace op
         #endif
     }
 
+    cl::Device& OpenCL::getDevice()
+    {
+        #ifdef USE_OPENCL
+            return upImpl->mDevice;
+        #else
+            error("OpenPose must be compiled with the `USE_OPENCL` macro definition in order to use this"
+                  " functionality.", __LINE__, __FUNCTION__, __FILE__);
+            throw std::runtime_error("");
+        #endif
+    }
+
     template <typename T>
     bool OpenCL::buildKernelIntoManager(const std::string& kernelName, const std::string& src, bool isFile)
     {
