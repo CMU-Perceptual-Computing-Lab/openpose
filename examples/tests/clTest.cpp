@@ -117,7 +117,6 @@ int clTest()
         caffe::Caffe::set_mode(caffe::Caffe::GPU);
         caffe::Caffe::SelectDevice(0, true);
         upCaffeNet.reset(new caffe::Net<float>{"models/pose/coco/pose_deploy_linevec.prototxt", caffe::TEST, caffe::Caffe::GetDefaultDevice()});
-        upCaffeNet->CopyTrainedLayersFrom("models/pose/coco/pose_iter_440000.caffemodel");
         op::OpenCL::getInstance(0, CL_DEVICE_TYPE_GPU, true);
 
         // Reshape net to image size
@@ -142,7 +141,7 @@ int clTest()
         input_layer->FromProto(blob_proto);
         upCaffeNet->Forward(0);
 
-        boost::shared_ptr<caffe::Blob<float> > output_blob = upCaffeNet->blob_by_name("image");
+        boost::shared_ptr<caffe::Blob<float> > output_blob = upCaffeNet->blob_by_name("pool2_stage1");
 
         // GPU Test
         cv::Mat finalImage = imgFloat;
