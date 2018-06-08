@@ -9,7 +9,7 @@ namespace op
 {
     // Constant Global Parameters
     // For OpenCL-NMS, (POSE_MAX_PEOPLE+1)*3(x,y,score) must be divisible by 32. Easy fix: POSE_MAX_PEOPLE = 32n - 1
-    const auto POSE_MAX_PEOPLE = 95u;
+    const auto POSE_MAX_PEOPLE = 127u;
 
     // Model functions
     OP_API const std::map<unsigned int, std::string>& getPoseBodyPartMapping(const PoseModel poseModel);
