@@ -8,7 +8,7 @@ namespace smpl
 {
     bool PoseToTransformsNoLR_Eulers_adamModel_withDiff::Evaluate(double const* const* parameters,
         double* residuals,
-        double** jacobians) const
+        double** jacobians)
     {
 // // t_original = [54,67] // over 100
 // // t_optimized = [3.9,4.2] // over 100
@@ -19,9 +19,7 @@ namespace smpl
 // const auto start1 = std::chrono::high_resolution_clock::now();
         using namespace Eigen;
         const double* pose = parameters[0];
-        std::vector<Eigen::Matrix<double, 3, 3, Eigen::RowMajor>> MR(TotalModel::NUM_JOINTS, Eigen::Matrix<double, 3, 3, Eigen::RowMajor>(3, 3));
-        ceres::AngleAxisToRotationMatrix(pose, MR.at(0).data());
-        std::vector<Eigen::Matrix<double, 9, 3 * TotalModel::NUM_JOINTS, Eigen::RowMajor>> dMRdP(TotalModel::NUM_JOINTS, Eigen::Matrix<double, 9, 3 * TotalModel::NUM_JOINTS, Eigen::RowMajor>(9, 3 * TotalModel::NUM_JOINTS));
+        ceres::AngleAxisToRotationMatrix(pose, (double*)MR[0].data());
         Eigen::Map< Eigen::Matrix<double, TotalModel::NUM_JOINTS, 3, Eigen::RowMajor> > outJoint(residuals);
         outJoint.row(0) = J0_.row(0);
         Matrix<double, 3, 3, RowMajor> R; // Interface with ceres
@@ -33,7 +31,7 @@ namespace smpl
         if (jacobians)
         {
             dJdP.block<3, TotalModel::NUM_JOINTS * 3>(0, 0).setZero();
-            AngleAxisToRotationMatrix_Derivative(pose, dMRdP.at(0).data(), 0);
+            AngleAxisToRotationMatrix_Derivative(pose, (double*)dMRdP.at(0).data(), 0);
         }
 // const auto duration2 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start2).count();
 // auto duration7 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start).count();
@@ -151,9 +149,67 @@ namespace smpl
 // const auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start).count();
 // std::cout << __FILE__ << " " << duration * 1e-6 / reps << "\n" << std::endl;
 
+        for(int idj = 0; idj < mod_.NUM_JOINTS; idj++)
+        {
+            Eigen::Matrix<double, 3, TotalModel::NUM_POSE_PARAMETERS, Eigen::RowMajor> dtdP;
+            Mt[idj] = outJoint.row(idj).transpose() - MR[idj] * J0_.row(idj).transpose();  // compute Mt for LBS
+            if (jacobians)
+            {
+                SparseProductDerivative(dMRdP.at(idj).data(), J0_.row(idj).data(), mParentIndexes[idj], dtdP.data());
+                std::copy(dJdP.data() + 3 * idj * TotalModel::NUM_POSE_PARAMETERS, dJdP.data() + 3 * (idj + 1) * TotalModel::NUM_POSE_PARAMETERS, dMtdP[idj].data());
+                SparseSubtract(dtdP.data(), mParentIndexes[idj], dMtdP[idj].data());
+            }
+        }
+
         return true;
     }
 
+    void PoseToTransformsNoLR_Eulers_adamModel_withDiff::sparse_lbs(
+        const Eigen::Matrix<double, Eigen::Dynamic, 3, Eigen::RowMajor>& Vt,
+        const std::vector<int>& total_vertex,
+        double* outV,
+        double* dVdP)
+    {
+        const int num_vertex = total_vertex.size();
+        if (dVdP) std::fill(dVdP, dVdP + 3 * num_vertex * TotalModel::NUM_POSE_PARAMETERS, 0);
+        for(auto i = 0u; i < num_vertex; i++)
+        {
+            const int idv = total_vertex[i];
+            const auto* v0_data = Vt.data() + idv * 3;
+            auto* outVrow_data = outV + 3 * i;
+            outVrow_data[0] = outVrow_data[1] = outVrow_data[2] = 0;
+            for (int idj = 0; idj < TotalModel::NUM_JOINTS; idj++)
+            {
+                const double w = mod_.m_blendW(idv, idj);
+                if (w)
+                {
+                    outVrow_data[0] += w * (MR[idj].data()[0] * v0_data[0] + MR[idj].data()[1] * v0_data[1] + MR[idj].data()[2] * v0_data[2] + Mt[idj].data()[0]);
+                    outVrow_data[1] += w * (MR[idj].data()[3] * v0_data[0] + MR[idj].data()[4] * v0_data[1] + MR[idj].data()[5] * v0_data[2] + Mt[idj].data()[1]);
+                    outVrow_data[2] += w * (MR[idj].data()[6] * v0_data[0] + MR[idj].data()[7] * v0_data[1] + MR[idj].data()[8] * v0_data[2] + Mt[idj].data()[2]);
+                    int ncol = TotalModel::NUM_POSE_PARAMETERS;
+                    double* dVdP_row0 = dVdP + (i * 3 + 0) * TotalModel::NUM_POSE_PARAMETERS;
+                    double* dVdP_row1 = dVdP + (i * 3 + 1) * TotalModel::NUM_POSE_PARAMETERS;
+                    double* dVdP_row2 = dVdP + (i * 3 + 2) * TotalModel::NUM_POSE_PARAMETERS;
+                    if (dVdP)
+                    {
+                        for (int j = 0; j < mParentIndexes[idj].size(); j++)
+                        {
+                            const int idp = mParentIndexes[idj][j];
+                            dVdP_row0[3 * idp + 0] += w * (v0_data[0] * dMRdP[idj].data()[(0 * 3 + 0) * ncol + 3 * idp + 0] + v0_data[1] * dMRdP[idj].data()[(0 * 3 + 1) * ncol + 3 * idp + 0] + v0_data[2] * dMRdP[idj].data()[(0 * 3 + 2) * ncol + 3 * idp + 0] + dMtdP[idj].data()[0 * ncol + 3 * idp + 0]);
+                            dVdP_row1[3 * idp + 0] += w * (v0_data[0] * dMRdP[idj].data()[(1 * 3 + 0) * ncol + 3 * idp + 0] + v0_data[1] * dMRdP[idj].data()[(1 * 3 + 1) * ncol + 3 * idp + 0] + v0_data[2] * dMRdP[idj].data()[(1 * 3 + 2) * ncol + 3 * idp + 0] + dMtdP[idj].data()[1 * ncol + 3 * idp + 0]);
+                            dVdP_row2[3 * idp + 0] += w * (v0_data[0] * dMRdP[idj].data()[(2 * 3 + 0) * ncol + 3 * idp + 0] + v0_data[1] * dMRdP[idj].data()[(2 * 3 + 1) * ncol + 3 * idp + 0] + v0_data[2] * dMRdP[idj].data()[(2 * 3 + 2) * ncol + 3 * idp + 0] + dMtdP[idj].data()[2 * ncol + 3 * idp + 0]);
+                            dVdP_row0[3 * idp + 1] += w * (v0_data[0] * dMRdP[idj].data()[(0 * 3 + 0) * ncol + 3 * idp + 1] + v0_data[1] * dMRdP[idj].data()[(0 * 3 + 1) * ncol + 3 * idp + 1] + v0_data[2] * dMRdP[idj].data()[(0 * 3 + 2) * ncol + 3 * idp + 1] + dMtdP[idj].data()[0 * ncol + 3 * idp + 1]);
+                            dVdP_row1[3 * idp + 1] += w * (v0_data[0] * dMRdP[idj].data()[(1 * 3 + 0) * ncol + 3 * idp + 1] + v0_data[1] * dMRdP[idj].data()[(1 * 3 + 1) * ncol + 3 * idp + 1] + v0_data[2] * dMRdP[idj].data()[(1 * 3 + 2) * ncol + 3 * idp + 1] + dMtdP[idj].data()[1 * ncol + 3 * idp + 1]);
+                            dVdP_row2[3 * idp + 1] += w * (v0_data[0] * dMRdP[idj].data()[(2 * 3 + 0) * ncol + 3 * idp + 1] + v0_data[1] * dMRdP[idj].data()[(2 * 3 + 1) * ncol + 3 * idp + 1] + v0_data[2] * dMRdP[idj].data()[(2 * 3 + 2) * ncol + 3 * idp + 1] + dMtdP[idj].data()[2 * ncol + 3 * idp + 1]);
+                            dVdP_row0[3 * idp + 2] += w * (v0_data[0] * dMRdP[idj].data()[(0 * 3 + 0) * ncol + 3 * idp + 2] + v0_data[1] * dMRdP[idj].data()[(0 * 3 + 1) * ncol + 3 * idp + 2] + v0_data[2] * dMRdP[idj].data()[(0 * 3 + 2) * ncol + 3 * idp + 2] + dMtdP[idj].data()[0 * ncol + 3 * idp + 2]);
+                            dVdP_row1[3 * idp + 2] += w * (v0_data[0] * dMRdP[idj].data()[(1 * 3 + 0) * ncol + 3 * idp + 2] + v0_data[1] * dMRdP[idj].data()[(1 * 3 + 1) * ncol + 3 * idp + 2] + v0_data[2] * dMRdP[idj].data()[(1 * 3 + 2) * ncol + 3 * idp + 2] + dMtdP[idj].data()[1 * ncol + 3 * idp + 2]);
+                            dVdP_row2[3 * idp + 2] += w * (v0_data[0] * dMRdP[idj].data()[(2 * 3 + 0) * ncol + 3 * idp + 2] + v0_data[1] * dMRdP[idj].data()[(2 * 3 + 1) * ncol + 3 * idp + 2] + v0_data[2] * dMRdP[idj].data()[(2 * 3 + 2) * ncol + 3 * idp + 2] + dMtdP[idj].data()[2 * ncol + 3 * idp + 2]);
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     bool PoseToTransform_AdamFull_withDiff::Evaluate(double const* const* parameters,
         double* residuals,

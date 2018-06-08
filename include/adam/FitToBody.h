@@ -67,7 +67,8 @@ void Adam_FastFit(TotalModel &adam,
 	Eigen::MatrixXd &lFoot,
 	Eigen::MatrixXd &rHandJoints,
 	Eigen::MatrixXd &lHandJoints,
-	Eigen::MatrixXd &faceJoints);
+	Eigen::MatrixXd &faceJoints,
+	bool verbose=false);
 
 void Adam_Fit_PAF(TotalModel &adam,
 	smpl::SMPLParams &frame_param,

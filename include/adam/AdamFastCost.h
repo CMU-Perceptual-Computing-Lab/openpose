@@ -17,7 +17,7 @@ public:
 		Eigen::MatrixXd &rHandJoints,
 		double* p_adam_coeff
 	): m_adam(adam), m_rfoot_joints(rFoot), m_lfoot_joints(lFoot), m_bodyJoints(Joints), m_FaceJoints(faceJoints),
-		m_lHandJoints(lHandJoints), m_rHandJoints(rHandJoints), res_dim(3)
+		m_lHandJoints(lHandJoints), m_rHandJoints(rHandJoints), res_dim(3), verbose(false)
 	{
 		assert(p_adam_coeff != NULL);
 		std::copy(p_adam_coeff, p_adam_coeff + TotalModel::NUM_SHAPE_COEFFICIENTS, m_pCoeff);
@@ -45,80 +45,77 @@ public:
 		double BODYJOINT_WEIGHT_Strong = 1;
 		double BODYJOINT_WEIGHT = 1;
 		double HANDJOINT_WEIGHT = 1;
-		WEAK_WEIGHT = 1;
+		double VERTEX_WEIGHT = 1;
 
 		m_nCorrespond_adam2joints = m_adam.m_indices_jointConst_adamIdx.rows();
-		if(m_lHandJoints.size() > 0) m_nCorrespond_adam2joints += m_adam.m_correspond_adam2lHand_adamIdx.rows();
-		if(m_rHandJoints.size() > 0) m_nCorrespond_adam2joints += m_adam.m_correspond_adam2rHand_adamIdx.rows();
+		m_nCorrespond_adam2joints += m_adam.m_correspond_adam2lHand_adamIdx.rows();
+		m_nCorrespond_adam2joints += m_adam.m_correspond_adam2rHand_adamIdx.rows();
 
-		m_targetPts.resize(m_nCorrespond_adam2joints * 5);
+		// 13 vertices in 11 constraints
+		total_vertex.push_back(8130); // nose
+		total_vertex.push_back(6731); // left eye
+		total_vertex.push_back(6970); // left ear
+		total_vertex.push_back(4131); // right eye
+		total_vertex.push_back(10088); // right ear
+		total_vertex.push_back(14328); // right bigtoe
+		total_vertex.push_back(14288); // right littletoe
+		total_vertex.push_back(14357); // right heel
+		total_vertex.push_back(14361); // right heel
+		total_vertex.push_back(12239); // left bigtoe
+		total_vertex.push_back(12289); // left littletoe
+		total_vertex.push_back(12368); // left heel
+		total_vertex.push_back(12357); // left heel
+		m_nCorrespond_adam2pts = 11;
+
+		m_targetPts.resize((m_nCorrespond_adam2joints + m_nCorrespond_adam2pts) * 5);
 		m_targetPts.setZero();
-		m_targetPts_weight.resize(m_nCorrespond_adam2joints * res_dim);
-		m_targetPts_weight_buffer.resize(m_nCorrespond_adam2joints * res_dim);
+		m_targetPts_weight.resize(m_nCorrespond_adam2joints + m_nCorrespond_adam2pts);
+		m_targetPts_weight_buffer.resize(m_nCorrespond_adam2joints + m_nCorrespond_adam2pts);
 
-		int offset = 0;
-		for (int ic = 0; ic<m_adam.m_indices_jointConst_adamIdx.rows(); ic++)
+		UpdateTarget();  // copy target
+
+		int offset = 0;  // set up the weights
+		for (int ic = 0; ic < m_adam.m_indices_jointConst_adamIdx.rows(); ic++)
 		{
 			int smcjoint = m_adam.m_indices_jointConst_smcIdx(ic);
 			if (smcjoint == 4 || smcjoint == 10 || smcjoint == 3 || smcjoint == 9 || smcjoint == 7 || smcjoint == 13)
 			{
-				for (int i = 0; i < res_dim; i++)
-				{
-					m_targetPts_weight[ic * res_dim + i] = BODYJOINT_WEIGHT_Strong;
-					m_targetPts_weight_buffer[ic * res_dim + i] = BODYJOINT_WEIGHT_Strong;
-				}
+				m_targetPts_weight[ic] = BODYJOINT_WEIGHT_Strong;
+				m_targetPts_weight_buffer[ic] = BODYJOINT_WEIGHT_Strong;
 			}
 			else
 			{
-				for (int i = 0; i < res_dim; i++)
-				{
-					m_targetPts_weight[ic * res_dim + i] = BODYJOINT_WEIGHT;
-					m_targetPts_weight_buffer[ic * res_dim + i] = BODYJOINT_WEIGHT;
-				}
+				m_targetPts_weight[ic] = BODYJOINT_WEIGHT;
+				m_targetPts_weight_buffer[ic] = BODYJOINT_WEIGHT;
 			}
 		}
 		offset += m_adam.m_indices_jointConst_adamIdx.rows();
 
-		if (m_lHandJoints.size() > 0)
+		for (int ic = 0; ic < m_adam.m_correspond_adam2lHand_adamIdx.rows(); ic++)
 		{
-			//correspondences.reserve(nCorrespond_);
-			for (int ic = 0; ic < m_adam.m_correspond_adam2lHand_adamIdx.rows(); ic++)
-			{
-				for (int i = 0; i < res_dim; i++)
-				{
-					m_targetPts_weight[(ic + offset) * res_dim + i] = HANDJOINT_WEIGHT;
-					m_targetPts_weight_buffer[(ic + offset) * res_dim + i] = HANDJOINT_WEIGHT;
-				}
-			}
-			offset += m_adam.m_correspond_adam2lHand_adamIdx.rows();
+			m_targetPts_weight[ic + offset] = HANDJOINT_WEIGHT;
+			m_targetPts_weight_buffer[ic + offset] = HANDJOINT_WEIGHT;
 		}
+		offset += m_adam.m_correspond_adam2lHand_adamIdx.rows();
 
-		if (m_rHandJoints.size() > 0)
+		for (int ic = 0; ic < m_adam.m_correspond_adam2rHand_adamIdx.rows(); ic++)
 		{
-			//correspondences.reserve(nCorrespond_);
-			for (int ic = 0; ic < m_adam.m_correspond_adam2rHand_adamIdx.rows(); ic++)
+			for (int i = 0; i < res_dim; i++)
 			{
-				for (int i = 0; i < res_dim; i++)
-				{
-					m_targetPts_weight[(ic + offset) * res_dim + i] = HANDJOINT_WEIGHT;
-					m_targetPts_weight_buffer[(ic + offset) * res_dim + i] = HANDJOINT_WEIGHT;
-				}
+				m_targetPts_weight[ic + offset] = HANDJOINT_WEIGHT;
+				m_targetPts_weight_buffer[ic + offset] = HANDJOINT_WEIGHT;
 			}
 		}
+		offset += m_adam.m_correspond_adam2rHand_adamIdx.rows();
 
-		if (m_bodyJoints(0, 1) != 0.0)      //nose
-			corres_vertex2targetpt.push_back(std::make_pair(8130, std::vector<double>(5)));     
-		if (m_bodyJoints(0, 16) != 0.0)     //left ear
-			corres_vertex2targetpt.push_back(std::make_pair(6970, std::vector<double>(5)));     
-		if (m_bodyJoints(0, 18) != 0.0)     //right ear
-			corres_vertex2targetpt.push_back(std::make_pair(10088, std::vector<double>(5)));        
-		m_nCorrespond_adam2pts = corres_vertex2targetpt.size();
+		for (int ic = 0; ic < m_nCorrespond_adam2pts; ic++)
+		{
+			m_targetPts_weight[offset + ic] = VERTEX_WEIGHT;
+			m_targetPts_weight_buffer[offset + ic] = VERTEX_WEIGHT;
+		}
 
-		UpdateTarget();  // copy target
-
-		// m_nResiduals = m_nCorrespond_adam2joints * res_dim + m_nCorrespond_adam2pts * res_dim;
-		m_nResiduals = m_nCorrespond_adam2joints * res_dim;
-		std::cout << "m_nResiduals " << m_nResiduals << std::endl;
+		m_nResiduals = (m_nCorrespond_adam2joints + m_nCorrespond_adam2pts) * res_dim;
+		if(verbose) std::cout << "m_nResiduals " << m_nResiduals << std::endl;
 		CostFunction::set_num_residuals(m_nResiduals);
 		auto parameter_block_sizes = CostFunction::mutable_parameter_block_sizes();
 		parameter_block_sizes->clear();
@@ -143,39 +140,25 @@ public:
 			m_targetPts.block(ic * 5, 0, 5, 1) = m_bodyJoints.block(0, m_adam.m_indices_jointConst_smcIdx(ic), 5, 1);
 		offset += m_adam.m_indices_jointConst_adamIdx.rows();
 
-		if (m_lHandJoints.size() > 0)
-		{
-			for (int ic = 0; ic < m_adam.m_correspond_adam2lHand_adamIdx.rows(); ic++)
-				m_targetPts.block((offset + ic) * 5, 0, 5, 1) = m_lHandJoints.block(0, m_adam.m_correspond_adam2lHand_lHandIdx(ic), 5, 1);
-		}
+		for (int ic = 0; ic < m_adam.m_correspond_adam2lHand_adamIdx.rows(); ic++)
+			m_targetPts.block((offset + ic) * 5, 0, 5, 1) = m_lHandJoints.block(0, m_adam.m_correspond_adam2lHand_lHandIdx(ic), 5, 1);
 		offset += m_adam.m_correspond_adam2lHand_adamIdx.rows();
 
-		if (m_rHandJoints.size() > 0)
-		{
-			for (int ic = 0; ic < m_adam.m_correspond_adam2rHand_adamIdx.rows(); ic++)
-				m_targetPts.block((offset + ic) * 5, 0, 5, 1) = m_rHandJoints.block(0, m_adam.m_correspond_adam2rHand_rHandIdx(ic), 5, 1);
-		}
+		for (int ic = 0; ic < m_adam.m_correspond_adam2rHand_adamIdx.rows(); ic++)
+			m_targetPts.block((offset + ic) * 5, 0, 5, 1) = m_rHandJoints.block(0, m_adam.m_correspond_adam2rHand_rHandIdx(ic), 5, 1);
+		offset += m_adam.m_correspond_adam2rHand_adamIdx.rows();
 
-		offset = 0;
-		if (m_bodyJoints(0, 1) != 0.0)
-		{
-			std::vector<double> targetPt = {m_bodyJoints(0, 1), m_bodyJoints(1, 1), m_bodyJoints(2, 1), m_bodyJoints(3, 1), m_bodyJoints(4, 1)};
-			corres_vertex2targetpt[offset].second = targetPt;
-			offset++;
-		}
-		if (m_bodyJoints(0, 16) != 0.0)     //left ear
-		{
-			std::vector<double> targetPt = {m_bodyJoints(0, 16), m_bodyJoints(1, 16), m_bodyJoints(2, 16), m_bodyJoints(3, 16), m_bodyJoints(4, 16)};
-			corres_vertex2targetpt[offset].second = targetPt;
-			offset++;
-		}
-
-		if (m_bodyJoints(0, 18) != 0.0)     //right ear
-		{
-			std::vector<double> targetPt = {m_bodyJoints(0, 18), m_bodyJoints(1, 18), m_bodyJoints(2, 18), m_bodyJoints(3, 18), m_bodyJoints(4, 18)};
-			corres_vertex2targetpt[offset].second = targetPt;
-			offset++;
-		}
+		m_targetPts.block<5, 1>(offset * 5, 0) = m_bodyJoints.block<5, 1>(0, 1); offset++;
+		m_targetPts.block<5, 1>(offset * 5, 0) = m_bodyJoints.block<5, 1>(0, 15); offset++;
+		m_targetPts.block<5, 1>(offset * 5, 0) = m_bodyJoints.block<5, 1>(0, 16); offset++;
+		m_targetPts.block<5, 1>(offset * 5, 0) = m_bodyJoints.block<5, 1>(0, 17); offset++;
+		m_targetPts.block<5, 1>(offset * 5, 0) = m_bodyJoints.block<5, 1>(0, 18); offset++;
+		m_targetPts.block<5, 1>(offset * 5, 0) = m_rfoot_joints.block<5, 1>(0, 0); offset++;
+		m_targetPts.block<5, 1>(offset * 5, 0) = m_rfoot_joints.block<5, 1>(0, 1); offset++;
+		m_targetPts.block<5, 1>(offset * 5, 0) = m_rfoot_joints.block<5, 1>(0, 2); offset++;
+		m_targetPts.block<5, 1>(offset * 5, 0) = m_lfoot_joints.block<5, 1>(0, 0); offset++;
+		m_targetPts.block<5, 1>(offset * 5, 0) = m_lfoot_joints.block<5, 1>(0, 1); offset++;
+		m_targetPts.block<5, 1>(offset * 5, 0) = m_lfoot_joints.block<5, 1>(0, 2); offset++;
 	}
 
 	void toggle_activate(bool limb, bool finger)
@@ -185,16 +168,16 @@ public:
 			int smcjoint = m_adam.m_indices_jointConst_smcIdx(ic);
 			if (smcjoint != 3 && smcjoint != 6 && smcjoint != 9 && smcjoint != 12)
 			{
-				m_targetPts_weight.block(ic * res_dim, 0, res_dim, 1) = double(limb) * m_targetPts_weight_buffer.block(ic * res_dim, 0, res_dim, 1);
+				m_targetPts_weight[ic] = double(limb) * m_targetPts_weight_buffer[ic];
 			}
 		}
 
 		int offset = m_adam.m_indices_jointConst_smcIdx.rows();
 		for (int ic = 0; ic < m_adam.m_correspond_adam2lHand_adamIdx.rows(); ic++)
-			m_targetPts_weight.block((ic + offset) * res_dim, 0, res_dim, 1) = m_targetPts_weight_buffer.block((ic + offset) * res_dim, 0, res_dim, 1) * double(finger);
+			m_targetPts_weight[ic + offset] = m_targetPts_weight_buffer[ic + offset] * double(finger);
 		offset += m_adam.m_correspond_adam2lHand_adamIdx.rows();
 		for (int ic = 0; ic < m_adam.m_correspond_adam2rHand_adamIdx.rows(); ic++)
-			m_targetPts_weight.block((ic + offset) * res_dim, 0, res_dim, 1) = m_targetPts_weight_buffer.block((ic + offset) * res_dim, 0, res_dim, 1) * double(finger);
+			m_targetPts_weight[ic + offset] = m_targetPts_weight_buffer[ic + offset] * double(finger);
 	}
 
 	virtual bool Evaluate(double const* const* parameters,
@@ -212,16 +195,16 @@ public:
 	Eigen::VectorXd m_targetPts_weight;
 	Eigen::VectorXd m_targetPts_weight_buffer;
 	double m_pCoeff[TotalModel::NUM_SHAPE_COEFFICIENTS];
-	float WEAK_WEIGHT;
 
-	std::vector< std::pair<int, std::vector<double>> > corres_vertex2targetpt;
+	std::vector<int> total_vertex;
 	int m_nCorrespond_adam2joints;
 	int m_nCorrespond_adam2pts;
 	int m_nResiduals;
 
-	Eigen::Matrix<double, Eigen::Dynamic, 3, Eigen::RowMajor> m_Vt;  // the vertex given current shape
+	Eigen::Matrix<double, Eigen::Dynamic, 3, Eigen::RowMajor> m_Vt;  // the vertex given current shape (before translation)
 	Eigen::Matrix<double, TotalModel::NUM_JOINTS, 3, Eigen::RowMajor> m_J0; // correspondent default joint given current shape
 	int res_dim;
+	bool verbose;
 };
 
 struct AdamFitData

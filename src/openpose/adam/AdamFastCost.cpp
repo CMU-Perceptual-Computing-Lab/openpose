@@ -44,6 +44,8 @@ bool AdamFastCost::Evaluate(double const* const* parameters,
 // const auto start3 = std::chrono::high_resolution_clock::now();
     Matrix<double, Dynamic, 3 * TotalModel::NUM_JOINTS, RowMajor> dTrdP(num_t, 3 * TotalModel::NUM_JOINTS);
     VectorXd transforms_joint(3 * TotalModel::NUM_JOINTS * 4 + 3 * TotalModel::NUM_JOINTS); // the first part is transform, the second part is outJoint
+    Matrix<double, Dynamic, 3, RowMajor> outV(total_vertex.size(), 3);
+    Matrix<double, Dynamic, TotalModel::NUM_POSE_PARAMETERS, RowMajor> dVdP(total_vertex.size() * 3, TotalModel::NUM_POSE_PARAMETERS);
 
     smpl::PoseToTransformsNoLR_Eulers_adamModel_withDiff p2t(m_adam, m_J0);
     const double* p2t_parameters[1] = { p_eulers };
@@ -62,6 +64,9 @@ bool AdamFastCost::Evaluate(double const* const* parameters,
         std::clock_t endComparison2 = std::clock();
     #endif // COMPARE_AUTOMATIC_VS_MANUAL
 // const auto duration3 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start3).count();
+
+    // perform LBS based on the transformation already computed
+    p2t.sparse_lbs(m_Vt, total_vertex, outV.data(), jacobians? dVdP.data() : nullptr);
 
     #ifdef COMPARE_AUTOMATIC_VS_MANUAL
         // uncomment these lines for comparison with the old code
@@ -99,7 +104,7 @@ bool AdamFastCost::Evaluate(double const* const* parameters,
 
     // 2nd step: set residuals
     // Joint Constraints
-    VectorXd tempJoints(3 * m_nCorrespond_adam2joints);  // predicted joint given current parameter
+    VectorXd tempJoints(3 * m_nCorrespond_adam2joints + 3 * m_nCorrespond_adam2pts);  // predicted joint given current parameter
     const double* const t = parameters[0];
     const Map<const Vector3d> t_vec(t);
     for (int i = 0; i < m_adam.m_indices_jointConst_adamIdx.rows(); i++)
@@ -116,6 +121,19 @@ bool AdamFastCost::Evaluate(double const* const* parameters,
         tempJoints.block<3,1>(3*(i + offset), 0) = outJoint.block<3,1>(3 * m_adam.m_correspond_adam2rHand_adamIdx(i), 0) + t_vec;
 // const auto duration7 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start7).count();
 // const auto start8 = std::chrono::high_resolution_clock::now();
+    offset += m_adam.m_correspond_adam2rHand_adamIdx.rows();
+    // updating the vertex data
+    tempJoints.block<3, 1>(3 * (0 + offset), 0) = outV.block<1, 3>(0, 0).transpose() + t_vec; // nose
+    tempJoints.block<3, 1>(3 * (1 + offset), 0) = outV.block<1, 3>(1, 0).transpose() + t_vec; // eye
+    tempJoints.block<3, 1>(3 * (2 + offset), 0) = outV.block<1, 3>(2, 0).transpose() + t_vec; // ear
+    tempJoints.block<3, 1>(3 * (3 + offset), 0) = outV.block<1, 3>(3, 0).transpose() + t_vec; // eye
+    tempJoints.block<3, 1>(3 * (4 + offset), 0) = outV.block<1, 3>(4, 0).transpose() + t_vec; // ear
+    tempJoints.block<3, 1>(3 * (5 + offset), 0) = outV.block<1, 3>(5, 0).transpose() + t_vec; // bigtoe
+    tempJoints.block<3, 1>(3 * (6 + offset), 0) = outV.block<1, 3>(6, 0).transpose() + t_vec; // smalltoe
+    tempJoints.block<3, 1>(3 * (7 + offset), 0) = 0.5 * (outV.block<1, 3>(7, 0) + outV.block<1, 3>(8, 0)).transpose() + t_vec;  // heel
+    tempJoints.block<3, 1>(3 * (8 + offset), 0) = outV.block<1, 3>(9, 0).transpose() + t_vec; // bigtoe
+    tempJoints.block<3, 1>(3 * (9 + offset), 0) = outV.block<1, 3>(10, 0).transpose() + t_vec; // smalltoe
+    tempJoints.block<3, 1>(3 * (10 + offset), 0) = 0.5 * (outV.block<1, 3>(11, 0) + outV.block<1, 3>(12, 0)).transpose() + t_vec;  // heel
 
     const auto* tempJointsPts = tempJoints.data();
     const auto* targetPts = m_targetPts.data();
@@ -123,14 +141,14 @@ bool AdamFastCost::Evaluate(double const* const* parameters,
     std::fill(residuals, residuals + m_nResiduals, 0.0);
 // const auto duration8 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start8).count();
 // const auto start9 = std::chrono::high_resolution_clock::now();
-    for (int i = 0; i < m_nCorrespond_adam2joints; i++)
+    for (int i = 0; i < m_nCorrespond_adam2joints + m_nCorrespond_adam2pts; i++)
     {
         if (!m_targetPts.block<3,1>(5 * i, 0).isZero(0))
         {
             for (int r = 0; r < 3 ; r++)
             {
                 const int baseIndex = 3 * i + r;
-                residuals[baseIndex] = (tempJointsPts[baseIndex] - targetPts[5 * i + r]) * targetPtsWeight[baseIndex];
+                residuals[baseIndex] = (tempJointsPts[baseIndex] - targetPts[5 * i + r]) * targetPtsWeight[i];
             }
             // Vectorized (slower) equivalent
             // Map< VectorXd > res(residuals, m_nResiduals);
@@ -155,13 +173,13 @@ bool AdamFastCost::Evaluate(double const* const* parameters,
             std::fill(jacobians[0], jacobians[0] + m_nResiduals*3, 0.0);
 // duration10a += std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start10a).count();
 // const auto start10b = std::chrono::high_resolution_clock::now();
-            for (int i = 0; i < m_nCorrespond_adam2joints; i++)
+            for (int i = 0; i < m_nCorrespond_adam2joints + m_nCorrespond_adam2pts; i++)
             {
                 if (targetPts[5 * i] != 0 || targetPts[5 * i + 1] != 0 || targetPts[5 * i + 2] != 0)
                 // if (!m_targetPts.block<3,1>(5 * i, 0).isZero(0))
                 {
                     for (int r = 0; r < 3; r++)
-                        jacobians[0][(3*i+r)*3+r] = targetPtsWeight[3*i+r];
+                        jacobians[0][(3*i+r)*3+r] = targetPtsWeight[i];
                 }
             }
 // duration10b += std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start10b).count();
@@ -191,32 +209,40 @@ bool AdamFastCost::Evaluate(double const* const* parameters,
 // const auto start10e = std::chrono::high_resolution_clock::now();
             for (int i = 0; i < m_adam.m_indices_jointConst_adamIdx.rows(); i++)
                 if (!m_targetPts.block<3,1>(5 * i, 0).isZero(0))
-                    dr_dPose.block<3,TotalModel::NUM_POSE_PARAMETERS>(3 * i, 0) = dTJdP.block<3,TotalModel::NUM_POSE_PARAMETERS>(3 * m_adam.m_indices_jointConst_adamIdx(i), 0);
+                    dr_dPose.block<3,TotalModel::NUM_POSE_PARAMETERS>(3 * i, 0) = targetPtsWeight[i] * dTJdP.block<3,TotalModel::NUM_POSE_PARAMETERS>(3 * m_adam.m_indices_jointConst_adamIdx(i), 0);
 // duration10e += std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start10e).count();
 // const auto start10f = std::chrono::high_resolution_clock::now();
             int offset = m_adam.m_indices_jointConst_adamIdx.rows();
             for (int i = 0; i < m_adam.m_correspond_adam2lHand_adamIdx.rows(); i++)
                 if (!m_targetPts.block<3,1>(5 * (i + offset), 0).isZero(0))
-                    dr_dPose.block<3,TotalModel::NUM_POSE_PARAMETERS>(3*(i + offset), 0) = dTJdP.block<3,TotalModel::NUM_POSE_PARAMETERS>(3 * m_adam.m_correspond_adam2lHand_adamIdx(i), 0);
+                    dr_dPose.block<3,TotalModel::NUM_POSE_PARAMETERS>(3*(i + offset), 0) = targetPtsWeight[i + offset] * dTJdP.block<3,TotalModel::NUM_POSE_PARAMETERS>(3 * m_adam.m_correspond_adam2lHand_adamIdx(i), 0);
 // duration10f += std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start10f).count();
 // const auto start10g = std::chrono::high_resolution_clock::now();
             offset += m_adam.m_correspond_adam2lHand_adamIdx.rows();
             for (int i = 0; i < m_adam.m_correspond_adam2rHand_adamIdx.rows(); i++)
                 if (!m_targetPts.block<3,1>(5 * (i + offset), 0).isZero(0))
-                    dr_dPose.block<3,TotalModel::NUM_POSE_PARAMETERS>(3*(i + offset), 0) = dTJdP.block<3,TotalModel::NUM_POSE_PARAMETERS>(3 * m_adam.m_correspond_adam2rHand_adamIdx(i), 0);
+                    dr_dPose.block<3,TotalModel::NUM_POSE_PARAMETERS>(3*(i + offset), 0) = targetPtsWeight[i + offset] * dTJdP.block<3,TotalModel::NUM_POSE_PARAMETERS>(3 * m_adam.m_correspond_adam2rHand_adamIdx(i), 0);
 // duration10g += std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start10g).count();
 // const auto start10h = std::chrono::high_resolution_clock::now();
-            for (int j = 0; j < 3 * m_nCorrespond_adam2joints; ++j)
-            {
-                const auto numberRows = dr_dPose.rows();
-                for (int r = 0; r < numberRows; ++r)
-                    jacobians[1][j*numberRows+r] *= targetPtsWeight[j];
-            }
-            // // Slow for loop equivalent
-            // for (int j = 0; j < 3 * m_nCorrespond_adam2joints; ++j)
-            //     dr_dPose.row(j) *= m_targetPts_weight[j];
-            // // Even slower option
-            // dr_dPose = m_targetPts_weight.asDiagonal() * dr_dPose;
+            offset += m_adam.m_correspond_adam2rHand_adamIdx.rows();  
+            if (!m_targetPts.block<3,1>(5 * (0 + offset), 0).isZero(0)) dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(3*(0 + offset), 0) = targetPtsWeight[0 + offset] * dVdP.block<3, TotalModel::NUM_POSE_PARAMETERS>(3 * 0, 0);
+            else dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(3*(0 + offset), 0).setZero();
+            if (!m_targetPts.block<3,1>(5 * (1 + offset), 0).isZero(0)) dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(3*(1 + offset), 0) = targetPtsWeight[1 + offset] * dVdP.block<3, TotalModel::NUM_POSE_PARAMETERS>(3 * 1, 0);
+            else dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(3*(1 + offset), 0).setZero();
+            if (!m_targetPts.block<3,1>(5 * (2 + offset), 0).isZero(0)) dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(3*(2 + offset), 0) = targetPtsWeight[2 + offset] * dVdP.block<3, TotalModel::NUM_POSE_PARAMETERS>(3 * 2, 0);
+            else dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(3*(2 + offset), 0).setZero();
+            if (!m_targetPts.block<3,1>(5 * (3 + offset), 0).isZero(0)) dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(3*(3 + offset), 0) = targetPtsWeight[3 + offset] * dVdP.block<3, TotalModel::NUM_POSE_PARAMETERS>(3 * 3, 0);
+            else dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(3*(3 + offset), 0).setZero();
+            if (!m_targetPts.block<3,1>(5 * (4 + offset), 0).isZero(0)) dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(3*(4 + offset), 0) = targetPtsWeight[4 + offset] * dVdP.block<3, TotalModel::NUM_POSE_PARAMETERS>(3 * 4, 0);
+            else dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(3*(4 + offset), 0).setZero();
+            if (!m_targetPts.block<3,1>(5 * (5 + offset), 0).isZero(0)) dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(3*(5 + offset), 0) = targetPtsWeight[5 + offset] * 0.5 * (dVdP.block<3, TotalModel::NUM_POSE_PARAMETERS>(3 * 5, 0) + dVdP.block<3, TotalModel::NUM_POSE_PARAMETERS>(3 * 6, 0));
+            else dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(3*(5 + offset), 0).setZero();
+            if (!m_targetPts.block<3,1>(5 * (6 + offset), 0).isZero(0)) dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(3*(6 + offset), 0) = targetPtsWeight[6 + offset] * dVdP.block<3, TotalModel::NUM_POSE_PARAMETERS>(3 * 7, 0);
+            else dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(3*(6 + offset), 0).setZero();
+            if (!m_targetPts.block<3,1>(5 * (7 + offset), 0).isZero(0)) dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(3*(7 + offset), 0) = targetPtsWeight[7 + offset] * dVdP.block<3, TotalModel::NUM_POSE_PARAMETERS>(3 * 8, 0);
+            else dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(3*(7 + offset), 0).setZero();
+            if (!m_targetPts.block<3,1>(5 * (8 + offset), 0).isZero(0)) dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(3*(8 + offset), 0) = targetPtsWeight[8 + offset] * 0.5 * (dVdP.block<3, TotalModel::NUM_POSE_PARAMETERS>(3 * 9, 0) + dVdP.block<3, TotalModel::NUM_POSE_PARAMETERS>(3 * 10, 0));
+            else dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(3*(8 + offset), 0).setZero();
 // duration10h += std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start10h).count();
         }
     }

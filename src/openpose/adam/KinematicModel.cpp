@@ -116,6 +116,11 @@ void GenerateMesh(CMeshModelInstance& returnMesh, double* resultJoint, smpl::SMP
 			resultJoint[3 * i + 1] = joints(3 * map_adam_to_measure[i] + 1);
 			resultJoint[3 * i + 2] = joints(3 * map_adam_to_measure[i] + 2);
 		}
+		std::copy(outV.data() + 3 * 8130, outV.data() + 3 * 8131, resultJoint + 3 * 1); // nose
+		std::copy(outV.data() + 3 * 6731, outV.data() + 3 * 6732, resultJoint + 3 * 15); // leye
+		std::copy(outV.data() + 3 * 6970, outV.data() + 3 * 6971, resultJoint + 3 * 16); // lear
+		std::copy(outV.data() + 3 * 4131, outV.data() + 3 * 4132, resultJoint + 3 * 17); // reye
+		std::copy(outV.data() + 3 * 10088, outV.data() + 3 * 10089, resultJoint + 3 * 18); // rear
 	}
 	else if (regressor_type == 1)
 	{
@@ -257,6 +262,11 @@ void GenerateMesh_Fast(CMeshModelInstance& returnMesh, double* resultJoint, smpl
 		resultJoint[3 * i + 1] = joints(3 * map_adam_to_measure[i] + 1);
 		resultJoint[3 * i + 2] = joints(3 * map_adam_to_measure[i] + 2);
 	}
+	std::copy(outV.data() + 3 * 8130, outV.data() + 3 * 8131, resultJoint + 3 * 1); // nose
+	std::copy(outV.data() + 3 * 6731, outV.data() + 3 * 6732, resultJoint + 3 * 15); // leye
+	std::copy(outV.data() + 3 * 6970, outV.data() + 3 * 6971, resultJoint + 3 * 16); // lear
+	std::copy(outV.data() + 3 * 4131, outV.data() + 3 * 4132, resultJoint + 3 * 17); // reye
+	std::copy(outV.data() + 3 * 10088, outV.data() + 3 * 10089, resultJoint + 3 * 18); // rear
 // const auto duration14 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start14).count();
 // const auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start).count();
 // std::cout << __FILE__ << " " << duration1 * 1e-6 << " 1\n"

@@ -695,7 +695,8 @@ void Adam_FastFit(TotalModel &adam,
 	Eigen::MatrixXd &lFoot,		//2points
 	Eigen::MatrixXd &rHandJoints,	   //
 	Eigen::MatrixXd &lHandJoints,		//
-	Eigen::MatrixXd &faceJoints)
+	Eigen::MatrixXd &faceJoints,
+	bool verbose)
 {
 // const auto start1 = std::chrono::high_resolution_clock::now();
 	// use the existing shape coeff in frame_param, fit the pose and trans fast
@@ -737,9 +738,8 @@ void Adam_FastFit(TotalModel &adam,
 	ceres::Solver::Options options;
 	SetSolverOptions(&options);
 	options.max_num_iterations = 20;
-	options.use_nonmonotonic_steps = false;
-	options.num_linear_solver_threads = 10;
-	options.minimizer_progress_to_stdout = true;
+	options.use_nonmonotonic_steps = true;
+	options.minimizer_progress_to_stdout = verbose;
 	ceres::Solver::Summary summary;
 
 	// g_problem.SetParameterBlockConstant(g_params.m_adam_t.data());
@@ -759,7 +759,7 @@ void Adam_FastFit(TotalModel &adam,
 	ceres::Solve(options, &g_problem, &summary);
 // const auto duration4 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start4).count();
 // const auto start5 = std::chrono::high_resolution_clock::now();
-	std::cout << summary.FullReport() << std::endl;
+	if(verbose) std::cout << summary.FullReport() << std::endl;
 
 	std::copy(g_params.m_adam_t.data(), g_params.m_adam_t.data() + 3, frame_param.m_adam_t.data());
 	std::copy(g_params.m_adam_pose.data(), g_params.m_adam_pose.data() + 62 * 3, frame_param.m_adam_pose.data());

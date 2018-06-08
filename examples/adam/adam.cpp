@@ -468,7 +468,7 @@ public:
                         const auto part = adamPart + 19;
                         if (poseKeypoints3D[{0, part, poseKeypoints3D.getSize(2)-1}] > 0.5 /*|| !mInitialized*/)
                             for (auto xyz = 0 ; xyz < poseKeypoints3D.getSize(2)-1 ; xyz++)
-                                LFootJoints(xyz, adamPart) = poseKeypoints3D[{0, part, xyz}];
+                                LFootJoints(xyz, adamPart) = 1e2 * poseKeypoints3D[{0, part, xyz}];
                         else
                         {
                             LFootJoints(0, adamPart) = 0;
@@ -482,7 +482,7 @@ public:
                         const auto part = adamPart + 19 + NUMBER_FOOT_KEYPOINTS;
                         if (poseKeypoints3D[{0, part, poseKeypoints3D.getSize(2)-1}] > 0.5 /*|| !mInitialized*/)
                             for (auto xyz = 0 ; xyz < poseKeypoints3D.getSize(2)-1 ; xyz++)
-                                RFootJoints(xyz, adamPart) = poseKeypoints3D[{0, part, xyz}];
+                                RFootJoints(xyz, adamPart) = 1e2 * poseKeypoints3D[{0, part, xyz}];
                         else
                         {
                             RFootJoints(0, adamPart) = 0;
@@ -493,8 +493,8 @@ public:
                 }
 // HACK --> FIX!!!!!
 // Nose, ears, eyes to 0 or AdamFastFit crashes
-for (auto i : {3*1,3*1+1,3*1+2,   15*3,15*3+1,15*3+2,   16*3,16*3+1,16*3+2,   17*3,17*3+1,17*3+2,   18*3,18*3+1,18*3+2})
-targetJoints[i] = 0;
+// for (auto i : {3*1,3*1+1,3*1+2,   15*3,15*3+1,15*3+2,   16*3,16*3+1,16*3+2,   17*3,17*3+1,17*3+2,   18*3,18*3+1,18*3+2})
+// targetJoints[i] = 0;
 
                 // Meters --> cm
                 for (auto& targetJoint : targetJoints)
@@ -537,7 +537,7 @@ const auto start0 = std::chrono::high_resolution_clock::now();
                     // inside for loop
                     // Here ! read the pose data into bodyJoints, RFootJoints, LFootJoints, RHandJoints, LHandJoints, Joints_face.
                     // call fitting function
-                    Adam_FastFit(g_total_model, frame_params, bodyJoints, RFootJoints, LFootJoints, RHandJoints, LHandJoints, Joints_face);
+                    Adam_FastFit(g_total_model, frame_params, bodyJoints, RFootJoints, LFootJoints, RHandJoints, LHandJoints, Joints_face, false);
                 }
 const auto duration0 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start0).count();
 std::cout << "IK:         " << duration0 * 1e-6 << std::endl;
@@ -598,7 +598,8 @@ public:
         render->options.nRange=150;
         render->options.yrot=45;
         render->options.xrot=25;
-        render->options.meshSolid = true;
+        // render->options.meshSolid = true;
+        render->options.meshSolid = false;
         upReadBuffer.reset(new GLubyte[render->options.width * render->options.height * 3]);
         // GLubyte read_buffer[render->options.width * render->options.height * 3]; // 600 * 600 RGB image
 
@@ -647,7 +648,7 @@ const auto start2 = std::chrono::high_resolution_clock::now();
                 poses.push_back(frame_params.m_adam_pose); // BVH generation, Eigen::Matrix<double, 62, 3, Eigen::RowMajor>
                 // OpenGL Display
                 g_vis_data.targetJoint = targetJoints.data(); // Only for Body, LHand, RHand. No Face, no Foot
-                g_vis_data.targetJoint = nullptr;
+                // g_vis_data.targetJoint = nullptr;
                 g_vis_data.resultJoint = resultBody.data();
                 g_vis_data.vis_type = 2;
                 g_vis_data.read_buffer = upReadBuffer.get();
