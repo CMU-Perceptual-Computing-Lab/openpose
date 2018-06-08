@@ -88,28 +88,6 @@ const std::string scaleKernelString = MULTI_LINE_STRING(
             }
             );
 
-void func(std::vector<float*>& gpuPtrs, caffe::Blob<float>* output_blob){
-    cl::Buffer outputBuffer((cl_mem)gpuPtrs[0], true);
-
-    // Read it
-    // Read back image to GPU
-    float* heatmaps = new float[output_blob->shape()[1] * output_blob->shape()[2] * output_blob->shape()[3]];
-    op::OpenCL::getInstance(0)->getQueue().enqueueReadBuffer(outputBuffer, CL_TRUE, 0,
-                                                             output_blob->shape()[1] * output_blob->shape()[2] * output_blob->shape()[3] * sizeof(float), heatmaps);
-
-    int heatmapChannels = output_blob->shape()[1];
-    int shape = output_blob->shape()[2] * output_blob->shape()[3];
-    for(int i=0; i<heatmapChannels; i++){
-        cv::Mat hm(cv::Size(output_blob->shape()[2], output_blob->shape()[3]), CV_32FC1);
-        // Read subbuffer
-        cl_buffer_region sourceRegion;
-        op::OpenCL::getBufferRegion<float>(sourceRegion, i * shape, shape);
-        cl::Buffer regionBuffer = outputBuffer.createSubBuffer(CL_MEM_READ_WRITE,
-                                                              CL_BUFFER_CREATE_TYPE_REGION,
-                                                              &sourceRegion);
-    }
-}
-
 int clTest()
 {
     try
@@ -164,7 +142,7 @@ int clTest()
         input_layer->FromProto(blob_proto);
         upCaffeNet->Forward(0);
 
-        caffe::Blob<float>* output_blob = upCaffeNet->output_blobs()[0];
+        boost::shared_ptr<caffe::Blob<float> > output_blob = upCaffeNet->blob_by_name("image");
 
         // GPU Test
         cv::Mat finalImage = imgFloat;
@@ -172,46 +150,25 @@ int clTest()
 
             // Get
             float* gpuPtr = output_blob->mutable_gpu_data();
-            std::vector<float*> gpuPtrs;
-            gpuPtrs.emplace_back(gpuPtr);
-            func(gpuPtrs, output_blob);
+            cl::Buffer outputBuffer((cl_mem)gpuPtr, true);
 
+            // Read it
+            // Read back image to GPU
+            float* heatmaps = new float[output_blob->shape()[1] * output_blob->shape()[2] * output_blob->shape()[3]];
+            op::OpenCL::getInstance(0)->getQueue().enqueueReadBuffer(outputBuffer, CL_TRUE, 0,
+                                                                     output_blob->shape()[1] * output_blob->shape()[2] * output_blob->shape()[3] * sizeof(float), heatmaps);
 
-
-//            // Create my Kernel
-//            auto scaleKernel = op::OpenCL::getInstance(0)->getKernelFunctorFromManager
-//                    <ScaleFunctor, float>(
-//                        "scaleKernel",scaleKernelString);
-
-//            // Write image to GPU from Caffe
-//            auto* gpuImagePtr = upCaffeNet->blobs().at(0)->mutable_gpu_data();
-//            cl::Buffer imageBuffer = cl::Buffer((cl_mem)gpuImagePtr, true);
-//            op::OpenCL::getInstance(0)->getQueue().enqueueWriteBuffer(imageBuffer, true, 0,
-//                                                                      imgResize.size().width * imgResize.size().height * imgFloat.channels() * sizeof(float),
-//                                                                      &imgFloat.at<float>(0));
-
-//            for(int i=0; i<imgFloat.channels() - 1; i++){
-
-//                // Read subbuffer
-//                cl_buffer_region sourceRegion;
-//                op::OpenCL::getBufferRegion<float>(sourceRegion, i * imgResize.size().width * imgResize.size().height, imgResize.size().width * imgResize.size().height);
-//                cl::Buffer regionBuffer = imageBuffer.createSubBuffer(CL_MEM_READ_WRITE,
-//                                                                      CL_BUFFER_CREATE_TYPE_REGION,
-//                                                                      &sourceRegion);
-
-//                // Run a Kernel (Scale down intensity by 0.5)
-//                scaleKernel(cl::EnqueueArgs(op::OpenCL::getInstance(0)->getQueue(),
-//                                            cl::NDRange(imgResize.size().width, imgResize.size().height, 1)),
-//                            regionBuffer, imgResize.size().width, imgResize.size().height, 0.5);
-
-
-//            }
-
-//            // Read back image to GPU
-//            finalImage = cv::Mat(imgResize.size(),CV_32FC3);
-//            op::OpenCL::getInstance(0)->getQueue().enqueueReadBuffer(imageBuffer, CL_TRUE, 0,
-//                                                                     imgResize.size().width * imgResize.size().height * imgFloat.channels() * sizeof(float), &finalImage.at<float>(0));
-
+            int heatmapChannels = output_blob->shape()[1];
+            int shape = output_blob->shape()[2] * output_blob->shape()[3];
+            for(int i=0; i<heatmapChannels; i++){
+                cv::Mat hm(cv::Size(output_blob->shape()[2], output_blob->shape()[3]), CV_32FC1);
+                // Read subbuffer
+                cl_buffer_region sourceRegion;
+                op::OpenCL::getBufferRegion<float>(sourceRegion, i * shape, shape);
+                cl::Buffer regionBuffer = outputBuffer.createSubBuffer(CL_MEM_READ_WRITE,
+                                                                      CL_BUFFER_CREATE_TYPE_REGION,
+                                                                      &sourceRegion);
+            }
         }
         #if defined(USE_OPENCL) && defined(CL_HPP_ENABLE_EXCEPTIONS)
         catch (const cl::Error& e)
