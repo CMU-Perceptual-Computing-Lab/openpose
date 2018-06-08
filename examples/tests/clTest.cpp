@@ -77,54 +77,36 @@ DEFINE_string(image_path,               "examples/media/COCO_val2014_00000000019
 
 typedef cl::KernelFunctor<cl::Buffer, int, int, float> ScaleFunctor;
 const std::string scaleKernelString = MULTI_LINE_STRING(
-    __kernel void scaleKernel(__global float* targetPtr, const int targetWidth, const int targetHeight, const float scale)
-    {
-        int x = get_global_id(0);
-        int y = get_global_id(1);
-        int c = get_global_id(2);
+            __kernel void scaleKernel(__global float* targetPtr, const int targetWidth, const int targetHeight, const float scale)
+{
+                int x = get_global_id(0);
+                int y = get_global_id(1);
+                int c = get_global_id(2);
 
-        __global float* targetPtrC = &targetPtr[c*targetWidth*targetHeight];
-        targetPtrC[y*targetWidth+x] *= scale;
-    }
-);
+                __global float* targetPtrC = &targetPtr[c*targetWidth*targetHeight];
+                targetPtrC[y*targetWidth+x] *= scale;
+            }
+            );
 
-template<typename Dtype>
-void matToCaffe(Dtype* caffeImg, const cv::Mat& imgAug){
-    const int imageAugmentedArea = imgAug.rows * imgAug.cols;
-    auto* uCharPtrCvMat = (unsigned char*)(imgAug.data);
-    //caffeImg = new Dtype[imgAug.channels()*imgAug.size().width*imgAug.size().height];
-    for (auto y = 0; y < imgAug.rows; y++)
-    {
-        const auto yOffset = y*imgAug.cols;
-        for (auto x = 0; x < imgAug.cols; x++)
-        {
-            const auto xyOffset = yOffset + x;
-            // const cv::Vec3b& bgr = imageAugmented.at<cv::Vec3b>(y, x);
-            auto* bgr = &uCharPtrCvMat[3*xyOffset];
-            caffeImg[xyOffset] = (bgr[0] - 128) / 256.0;
-            caffeImg[xyOffset + imageAugmentedArea] = (bgr[1] - 128) / 256.0;
-            caffeImg[xyOffset + 2*imageAugmentedArea] = (bgr[2] - 128) / 256.0;
-        }
-    }
-}
+void func(std::vector<float*>& gpuPtrs, caffe::Blob<float>* output_blob){
+    cl::Buffer outputBuffer((cl_mem)gpuPtrs[0], true);
 
-template<typename Dtype>
-void caffeToMat(cv::Mat& img, const Dtype* caffeImg, cv::Size imageSize){
-    // Need a function to convert back
-    img = cv::Mat(imageSize, CV_8UC3);
-    const int imageAugmentedArea = img.rows * img.cols;
-    auto* imgPtr = (unsigned char*)(img.data);
-    for (auto y = 0; y < img.rows; y++)
-    {
-        const auto yOffset = y*img.cols;
-        for (auto x = 0; x < img.cols; x++)
-        {
-            const auto xyOffset = yOffset + x;
-            auto* bgr = &imgPtr[3*xyOffset];
-            bgr[0] = (caffeImg[xyOffset]*256.) + 128;
-            bgr[1] = (caffeImg[xyOffset + imageAugmentedArea]*256.) + 128;
-            bgr[2] = (caffeImg[xyOffset + 2*imageAugmentedArea]*256.) + 128;
-        }
+    // Read it
+    // Read back image to GPU
+    float* heatmaps = new float[output_blob->shape()[1] * output_blob->shape()[2] * output_blob->shape()[3]];
+    op::OpenCL::getInstance(0)->getQueue().enqueueReadBuffer(outputBuffer, CL_TRUE, 0,
+                                                             output_blob->shape()[1] * output_blob->shape()[2] * output_blob->shape()[3] * sizeof(float), heatmaps);
+
+    int heatmapChannels = output_blob->shape()[1];
+    int shape = output_blob->shape()[2] * output_blob->shape()[3];
+    for(int i=0; i<heatmapChannels; i++){
+        cv::Mat hm(cv::Size(output_blob->shape()[2], output_blob->shape()[3]), CV_32FC1);
+        // Read subbuffer
+        cl_buffer_region sourceRegion;
+        op::OpenCL::getBufferRegion<float>(sourceRegion, i * shape, shape);
+        cl::Buffer regionBuffer = outputBuffer.createSubBuffer(CL_MEM_READ_WRITE,
+                                                              CL_BUFFER_CREATE_TYPE_REGION,
+                                                              &sourceRegion);
     }
 }
 
@@ -164,50 +146,78 @@ int clTest()
         upCaffeNet->blobs()[0]->Reshape({1,imgFloat.channels(),imgResize.size().width,imgResize.size().height});
         upCaffeNet->Reshape();
 
+        // Convert to caffe image
+        caffe::BlobProto blob_proto;
+        blob_proto.set_channels(3);
+        blob_proto.set_height(imgResize.size().width);
+        blob_proto.set_width(imgResize.size().height);
+        blob_proto.clear_data();
+        for (int c = 0; c < 3; ++c) {
+            for (int h = 0; h < imgResize.size().height; ++h) {
+                for (int w = 0; w < imgResize.size().width; ++w) {
+                    blob_proto.add_data(imgResize.at<cv::Vec3f>(h, w)[c]);
+                }
+            }
+        }
+        blob_proto.set_num(1);
+        caffe::Blob<float>* input_layer = upCaffeNet->input_blobs()[0];
+        input_layer->FromProto(blob_proto);
+        upCaffeNet->Forward(0);
+
+        caffe::Blob<float>* output_blob = upCaffeNet->output_blobs()[0];
+
         // GPU Test
         cv::Mat finalImage = imgFloat;
         try{
 
-            // Create my Kernel
-            auto scaleKernel = op::OpenCL::getInstance(0)->getKernelFunctorFromManager
-                    <ScaleFunctor, float>(
-                        "scaleKernel",scaleKernelString);
-
-            // Write image to GPU from Caffe
-            auto* gpuImagePtr = upCaffeNet->blobs().at(0)->mutable_gpu_data();
-            cl::Buffer imageBuffer = cl::Buffer((cl_mem)gpuImagePtr, true);
-            op::OpenCL::getInstance(0)->getQueue().enqueueWriteBuffer(imageBuffer, true, 0,
-                                                                      imgResize.size().width * imgResize.size().height * imgFloat.channels() * sizeof(float),
-                                                                      &imgFloat.at<float>(0));
-
-            for(int i=0; i<imgFloat.channels() - 1; i++){
-
-                // Read subbuffer
-                cl_buffer_region sourceRegion;
-                op::OpenCL::getBufferRegion<float>(sourceRegion, i * imgResize.size().width * imgResize.size().height, imgResize.size().width * imgResize.size().height);
-                cl::Buffer regionBuffer = imageBuffer.createSubBuffer(CL_MEM_READ_WRITE,
-                                                                      CL_BUFFER_CREATE_TYPE_REGION,
-                                                                      &sourceRegion);
-
-                // Run a Kernel (Scale down intensity by 0.5)
-                scaleKernel(cl::EnqueueArgs(op::OpenCL::getInstance(0)->getQueue(),
-                                                 cl::NDRange(imgResize.size().width, imgResize.size().height, 1)),
-                                                 regionBuffer, imgResize.size().width, imgResize.size().height, 0.5);
+            // Get
+            float* gpuPtr = output_blob->mutable_gpu_data();
+            std::vector<float*> gpuPtrs;
+            gpuPtrs.emplace_back(gpuPtr);
+            func(gpuPtrs, output_blob);
 
 
-            }
 
-            // Read back image to GPU
-            finalImage = cv::Mat(imgResize.size(),CV_32FC3);
-            op::OpenCL::getInstance(0)->getQueue().enqueueReadBuffer(imageBuffer, CL_TRUE, 0,
-                                                                     imgResize.size().width * imgResize.size().height * imgFloat.channels() * sizeof(float), &finalImage.at<float>(0));
+//            // Create my Kernel
+//            auto scaleKernel = op::OpenCL::getInstance(0)->getKernelFunctorFromManager
+//                    <ScaleFunctor, float>(
+//                        "scaleKernel",scaleKernelString);
+
+//            // Write image to GPU from Caffe
+//            auto* gpuImagePtr = upCaffeNet->blobs().at(0)->mutable_gpu_data();
+//            cl::Buffer imageBuffer = cl::Buffer((cl_mem)gpuImagePtr, true);
+//            op::OpenCL::getInstance(0)->getQueue().enqueueWriteBuffer(imageBuffer, true, 0,
+//                                                                      imgResize.size().width * imgResize.size().height * imgFloat.channels() * sizeof(float),
+//                                                                      &imgFloat.at<float>(0));
+
+//            for(int i=0; i<imgFloat.channels() - 1; i++){
+
+//                // Read subbuffer
+//                cl_buffer_region sourceRegion;
+//                op::OpenCL::getBufferRegion<float>(sourceRegion, i * imgResize.size().width * imgResize.size().height, imgResize.size().width * imgResize.size().height);
+//                cl::Buffer regionBuffer = imageBuffer.createSubBuffer(CL_MEM_READ_WRITE,
+//                                                                      CL_BUFFER_CREATE_TYPE_REGION,
+//                                                                      &sourceRegion);
+
+//                // Run a Kernel (Scale down intensity by 0.5)
+//                scaleKernel(cl::EnqueueArgs(op::OpenCL::getInstance(0)->getQueue(),
+//                                            cl::NDRange(imgResize.size().width, imgResize.size().height, 1)),
+//                            regionBuffer, imgResize.size().width, imgResize.size().height, 0.5);
+
+
+//            }
+
+//            // Read back image to GPU
+//            finalImage = cv::Mat(imgResize.size(),CV_32FC3);
+//            op::OpenCL::getInstance(0)->getQueue().enqueueReadBuffer(imageBuffer, CL_TRUE, 0,
+//                                                                     imgResize.size().width * imgResize.size().height * imgFloat.channels() * sizeof(float), &finalImage.at<float>(0));
 
         }
         #if defined(USE_OPENCL) && defined(CL_HPP_ENABLE_EXCEPTIONS)
         catch (const cl::Error& e)
         {
             op::error(std::string(e.what()) + " : " + op::OpenCL::clErrorToString(e.err()) + " ID: " +
-                  std::to_string(0), __LINE__, __FUNCTION__, __FILE__);
+                      std::to_string(0), __LINE__, __FUNCTION__, __FILE__);
         }
         #endif
         catch (const std::exception& e)
