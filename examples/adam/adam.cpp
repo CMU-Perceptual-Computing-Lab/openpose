@@ -551,6 +551,15 @@ const auto start0 = std::chrono::high_resolution_clock::now();
                 if (!mInitialized)
                 {
                     mInitialized = true;
+                    // We make T-pose start with:
+                    // 1. Root translation similar to current 3-d location of the mid-hip
+                    // 2. x-orientation = 180, i.e., person standing up & looking to the camera
+                    // 3. Because otherwise, if we call Adam_FastFit_Initialize twice (e.g., if a new person appears),
+                    // it would use the latest ones from the last Adam_FastFit
+                    frame_params.m_adam_t(0) = bodyJoints(0, 2);
+                    frame_params.m_adam_t(1) = bodyJoints(1, 2);
+                    frame_params.m_adam_t(2) = bodyJoints(2, 2);
+                    frame_params.m_adam_pose(0, 0) = 3.14159265358979323846264338327950288419716939937510582097494459;
                     // Fit initialization
                     Adam_FastFit_Initialize(g_total_model, frame_params, bodyJoints, RFootJoints, LFootJoints, RHandJoints, LHandJoints, faceJoints);
                     Vt_vec = g_total_model.m_meanshape + g_total_model.m_shapespace_u * frame_params.m_adam_coeffs;
