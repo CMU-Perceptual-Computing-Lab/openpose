@@ -716,6 +716,10 @@ void Adam_FastFit(TotalModel &adam,
 		// 	TotalModel::NUM_POSE_PARAMETERS,
 		// 	TotalModel::NUM_POSE_PARAMETERS>(new AdamBodyPoseParamPrior(TotalModel::NUM_POSE_PARAMETERS));
 		AdamBodyPoseParamPriorDiff *cost_prior_body_pose = new AdamBodyPoseParamPriorDiff(TotalModel::NUM_POSE_PARAMETERS);
+		for (int i = 22; i < 62; i++)
+		{
+			cost_prior_body_pose->weight[3 * i + 2] = 1e-2; // set regularization of finger bend small
+		}
 
 		ceres::LossFunction* loss_weight_prior_body_pose = new ceres::ScaledLoss(NULL,
 			1e-2,
