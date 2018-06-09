@@ -247,6 +247,7 @@ const int NUMBER_HAND_KEYPOINTS = 21;
 const int NUMBER_FACE_KEYPOINTS = 70;
 const int NUMBER_FOOT_KEYPOINTS = 3;
 const int NUMBER_KEYPOINTS = 3*(NUMBER_BODY_KEYPOINTS + 2*NUMBER_HAND_KEYPOINTS); // targetJoints: Only for Body, LHand, RHand. No Face, no Foot
+const bool CERES_COUT_REPORT = false;
 
 void updateKeypoints(Eigen::MatrixXd& bodyJoints, Eigen::MatrixXd& LHandJoints, Eigen::MatrixXd& RHandJoints,
                      const std::array<double, NUMBER_KEYPOINTS>& targetJoints)
@@ -362,9 +363,10 @@ class WUserPostProcessing : public op::Worker<std::shared_ptr<std::vector<UserDa
 public:
     // Purely processing
     WUserPostProcessing() :
+        mCeresDisplayReport{CERES_COUT_REPORT},
         mInitialized{false},
         bodyJoints(5, NUMBER_BODY_KEYPOINTS),// (3, targetJoints.size());
-        Joints_face(5, NUMBER_FACE_KEYPOINTS),// (3, landmarks_face.size());
+        faceJoints(5, NUMBER_FACE_KEYPOINTS),// (3, landmarks_face.size());
         LHandJoints(5, NUMBER_HAND_KEYPOINTS),// (3, HandModel::NUM_JOINTS);
         RHandJoints(5, NUMBER_HAND_KEYPOINTS),// (3, HandModel::NUM_JOINTS);
         LFootJoints(5, 3),// (3, 3);        //Heel, Toe
@@ -374,6 +376,13 @@ public:
         obj_path{"./model/mesh_nofeet.obj"},
         correspondence_path{"./model/correspondences_nofeet.txt"}
     {
+        // Reset to 0 all keypoints - Otherwise undefined behavior when fitting
+        bodyJoints.setZero();
+        faceJoints.setZero();
+        LHandJoints.setZero();
+        RHandJoints.setZero();
+        LFootJoints.setZero();
+        RFootJoints.setZero();
         // Load g_total_model (model + data)
         // ~100 milliseconds
         LoadTotalModelFromObj(g_total_model, obj_path);
@@ -468,7 +477,7 @@ public:
                         const auto part = adamPart + 19;
                         if (poseKeypoints3D[{0, part, poseKeypoints3D.getSize(2)-1}] > 0.5 /*|| !mInitialized*/)
                             for (auto xyz = 0 ; xyz < poseKeypoints3D.getSize(2)-1 ; xyz++)
-                                LFootJoints(xyz, adamPart) = 1e2 * poseKeypoints3D[{0, part, xyz}];
+                                LFootJoints(xyz, adamPart) = poseKeypoints3D[{0, part, xyz}];
                         else
                         {
                             LFootJoints(0, adamPart) = 0;
@@ -482,7 +491,7 @@ public:
                         const auto part = adamPart + 19 + NUMBER_FOOT_KEYPOINTS;
                         if (poseKeypoints3D[{0, part, poseKeypoints3D.getSize(2)-1}] > 0.5 /*|| !mInitialized*/)
                             for (auto xyz = 0 ; xyz < poseKeypoints3D.getSize(2)-1 ; xyz++)
-                                RFootJoints(xyz, adamPart) = 1e2 * poseKeypoints3D[{0, part, xyz}];
+                                RFootJoints(xyz, adamPart) = poseKeypoints3D[{0, part, xyz}];
                         else
                         {
                             RFootJoints(0, adamPart) = 0;
@@ -491,14 +500,31 @@ public:
                         }
                     }
                 }
-// HACK --> FIX!!!!!
-// Nose, ears, eyes to 0 or AdamFastFit crashes
-// for (auto i : {3*1,3*1+1,3*1+2,   15*3,15*3+1,15*3+2,   16*3,16*3+1,16*3+2,   17*3,17*3+1,17*3+2,   18*3,18*3+1,18*3+2})
-// targetJoints[i] = 0;
+
+                // Update Face data
+                if (!faceKeypoints3D.empty())
+                {
+                    for (auto part = 0 ; part < NUMBER_FACE_KEYPOINTS; part++)
+                    {
+                        if (faceKeypoints3D[{0, part, faceKeypoints3D.getSize(2)-1}] > 0.5 /*|| !mInitialized*/)
+                            for (auto xyz = 0 ; xyz < faceKeypoints3D.getSize(2)-1 ; xyz++)
+                                faceJoints(xyz, part) = faceKeypoints3D[{0, part, xyz}];
+                        else
+                        {
+                            faceJoints(0, part) = 0;
+                            faceJoints(1, part) = 0;
+                            faceJoints(2, part) = 0;
+                        }
+                    }
+                }
 
                 // Meters --> cm
                 for (auto& targetJoint : targetJoints)
-                targetJoint *= 1e2;
+                    targetJoint *= 1e2;
+                if (!faceKeypoints3D.empty())
+                    faceJoints *= 1e2;
+                LFootJoints *= 1e2;
+                RFootJoints *= 1e2;
 
 
 // // Cout keypoints
@@ -526,7 +552,7 @@ const auto start0 = std::chrono::high_resolution_clock::now();
                 {
                     mInitialized = true;
                     // Fit initialization
-                    Adam_FastFit_Initialize(g_total_model, frame_params, bodyJoints, RFootJoints, LFootJoints, RHandJoints, LHandJoints, Joints_face);
+                    Adam_FastFit_Initialize(g_total_model, frame_params, bodyJoints, RFootJoints, LFootJoints, RHandJoints, LHandJoints, faceJoints);
                     Vt_vec = g_total_model.m_meanshape + g_total_model.m_shapespace_u * frame_params.m_adam_coeffs;
                     J0_vec = g_total_model.J_mu_ + g_total_model.dJdc_ * frame_params.m_adam_coeffs;
                 }
@@ -535,9 +561,9 @@ const auto start0 = std::chrono::high_resolution_clock::now();
                 {
                     // ~470 msec
                     // inside for loop
-                    // Here ! read the pose data into bodyJoints, RFootJoints, LFootJoints, RHandJoints, LHandJoints, Joints_face.
+                    // Here ! read the pose data into bodyJoints, RFootJoints, LFootJoints, RHandJoints, LHandJoints, faceJoints.
                     // call fitting function
-                    Adam_FastFit(g_total_model, frame_params, bodyJoints, RFootJoints, LFootJoints, RHandJoints, LHandJoints, Joints_face, false);
+                    Adam_FastFit(g_total_model, frame_params, bodyJoints, RFootJoints, LFootJoints, RHandJoints, LHandJoints, faceJoints, mCeresDisplayReport);
                 }
 const auto duration0 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start0).count();
 std::cout << "IK:         " << duration0 * 1e-6 << std::endl;
@@ -553,10 +579,11 @@ std::cout << "IK:         " << duration0 * 1e-6 << std::endl;
 
 private:
     // Processing
+    const bool mCeresDisplayReport;
     bool mInitialized;
 
     Eigen::MatrixXd bodyJoints;
-    Eigen::MatrixXd Joints_face;
+    Eigen::MatrixXd faceJoints;
     Eigen::MatrixXd LHandJoints;
     Eigen::MatrixXd RHandJoints;
     Eigen::MatrixXd LFootJoints;
