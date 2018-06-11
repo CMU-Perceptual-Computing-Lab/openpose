@@ -58,7 +58,8 @@ void Adam_FastFit_Initialize(TotalModel &adam,
 	Eigen::MatrixXd &lFoot,
 	Eigen::MatrixXd &rHandJoints,
 	Eigen::MatrixXd &lHandJoints,
-	Eigen::MatrixXd &faceJoints);
+	Eigen::MatrixXd &faceJoints,
+	bool verbose=false);
 
 void Adam_FastFit(TotalModel &adam,
 	smpl::SMPLParams &frame_param,

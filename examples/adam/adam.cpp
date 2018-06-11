@@ -597,7 +597,7 @@ const auto start0 = std::chrono::high_resolution_clock::now();
                     sFrameParams.m_adam_t(2) = mBodyJoints(2, 2);
                     sFrameParams.m_adam_pose(0, 0) = 3.14159265358979323846264338327950288419716939937510582097494459;
                     // Fit initialization
-                    Adam_FastFit_Initialize(sTotalModel, sFrameParams, mBodyJoints, mRFootJoints, mLFootJoints, mRHandJoints, mLHandJoints, mFaceJoints);
+                    Adam_FastFit_Initialize(sTotalModel, sFrameParams, mBodyJoints, mRFootJoints, mLFootJoints, mRHandJoints, mLHandJoints, mFaceJoints, mCeresDisplayReport);
                     Vt_vec = sTotalModel.m_meanshape + sTotalModel.m_shapespace_u * sFrameParams.m_adam_coeffs;
                     J0_vec = sTotalModel.J_mu_ + sTotalModel.dJdc_ * sFrameParams.m_adam_coeffs;
                 }
@@ -739,10 +739,8 @@ const auto start2 = std::chrono::high_resolution_clock::now();
                     }
                     g_vis_data.faceKeypoints *= 100;
                 }
-                g_vis_data.faceKeypoints.block(0, 0, 62, 3).setZero();
-                g_vis_data.faceKeypoints.block(63, 0, 3, 3).setZero();
-                g_vis_data.faceKeypoints.block(67, 0, 3, 3).setZero();
-                g_vis_data.vis_type = 5;
+                // g_vis_data: 2 for full body, 3 for left hand, 4 for right hand, 5 for face
+                g_vis_data.vis_type = 2;
                 g_vis_data.read_buffer = upReadBuffer.get();
 // BELOW IS PURELY OPENGL
 // t3 <-- g_vis_data (struct, big)

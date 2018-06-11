@@ -205,7 +205,7 @@ namespace smpl {
         bool m_bValidLHand;
         bool m_bValidAdam;
 
-        float mouse_open;
+        float mouth_open;
         float leye_open;
         float reye_open;
 
@@ -253,9 +253,9 @@ namespace smpl {
             m_bVisualized = false;
 
             m_bIsTotalModel = false;        //total model needs different way of visualization 
-            mouse_open = 0.0;
-            leye_open = 0.0;
-            reye_open = 0.0;
+            mouth_open = 0.0;
+            leye_open = 1.0;
+            reye_open = 1.0;
         }
     };
 

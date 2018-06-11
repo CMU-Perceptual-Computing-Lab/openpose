@@ -626,7 +626,8 @@ void Adam_FastFit_Initialize(TotalModel &adam,
 	Eigen::MatrixXd &lFoot,		//2points
 	Eigen::MatrixXd &rHandJoints,	   //
 	Eigen::MatrixXd &lHandJoints,		//
-	Eigen::MatrixXd &faceJoints)
+	Eigen::MatrixXd &faceJoints,
+	bool verbose)
 {
 	using namespace Eigen;
 	MatrixXd PAF(3, 54);
@@ -669,20 +670,51 @@ void Adam_FastFit_Initialize(TotalModel &adam,
 	options_init.max_num_iterations = 20;
 	options_init.use_nonmonotonic_steps = false;
 	options_init.num_linear_solver_threads = 10;
-	options_init.minimizer_progress_to_stdout = true;
+	options_init.minimizer_progress_to_stdout = verbose;
 	adam_cost->toggle_activate(false, false, false);
 	adam_cost->toggle_rigid_body(true);
 	ceres::Solve(options_init, &problem_init, &summary);
-	std::cout << summary.FullReport() << std::endl;
+	if(verbose) std::cout << summary.FullReport() << std::endl;
 
 	adam_cost->toggle_rigid_body(false);
 	adam_cost->toggle_activate(true, false, false);
 	ceres::Solve(options_init, &problem_init, &summary);
-	std::cout << summary.FullReport() << std::endl;
+	if(verbose) std::cout << summary.FullReport() << std::endl;
 
 	adam_cost->toggle_activate(true, true, true);
 	ceres::Solve(options_init, &problem_init, &summary);
-	std::cout << summary.FullReport() << std::endl;
+	if(verbose) std::cout << summary.FullReport() << std::endl;
+
+	// get face (mouth_open, leye_open, reye_open) in a naive way
+	if (!(faceJoints.block<3, 8>(0, 60).array() == 0.0).any())  // if none of these keypoints is zero
+	{
+		const double mouth_width = (faceJoints.block<3, 1>(0, 60) - faceJoints.block<3, 1>(0, 64)).norm();
+		const double mouth_height = (faceJoints.block<3, 1>(0, 62) - faceJoints.block<3, 1>(0, 66)).norm();
+		if (mouth_width) frame_param.mouth_open = mouth_height / mouth_width;
+	}
+	else frame_param.mouth_open = 0.0;
+	if (!(faceJoints.block<3, 6>(0, 36).array() == 0.0).any())
+	{
+		const double reye_width = (faceJoints.block<3, 1>(0, 36) - faceJoints.block<3, 1>(0, 39)).norm();
+		const double reye_height1 = (faceJoints.block<3, 1>(0, 37) - faceJoints.block<3, 1>(0, 41)).norm();
+		const double reye_height2 = (faceJoints.block<3, 1>(0, 38) - faceJoints.block<3, 1>(0, 40)).norm();
+		if (reye_width) frame_param.reye_open = (reye_height1 + reye_height2) / reye_width;
+	}
+	else frame_param.reye_open = 1.0;
+	if (!(faceJoints.block<3, 6>(0, 42).array() == 0.0).any())
+	{
+		const double leye_width = (faceJoints.block<3, 1>(0, 42) - faceJoints.block<3, 1>(0, 45)).norm();
+		const double leye_height1 = (faceJoints.block<3, 1>(0, 44) - faceJoints.block<3, 1>(0, 46)).norm();
+		const double leye_height2 = (faceJoints.block<3, 1>(0, 43) - faceJoints.block<3, 1>(0, 47)).norm();
+		if (leye_width) frame_param.leye_open = (leye_height1 + leye_height2) / leye_width;
+	}
+	else frame_param.leye_open = 1.0;
+	if (verbose)
+	{
+		std::cout << "mouth: " << frame_param.mouth_open << std::endl;
+		std::cout << "reye: " << frame_param.reye_open << std::endl;
+		std::cout << "leye: " << frame_param.leye_open << std::endl;
+	}
 }
 
 ceres::Problem g_problem;
@@ -790,11 +822,11 @@ void Adam_FastFit(TotalModel &adam,
 	// get face (mouth_open, leye_open, reye_open) in a naive way
 	if (!(faceJoints.block<3, 8>(0, 60).array() == 0.0).any())  // if none of these keypoints is zero
 	{
-		const double mouse_width = (faceJoints.block<3, 1>(0, 60) - faceJoints.block<3, 1>(0, 64)).norm();
-		const double mouse_height = (faceJoints.block<3, 1>(0, 62) - faceJoints.block<3, 1>(0, 66)).norm();
-		if (mouse_width) frame_param.mouse_open = mouse_height / mouse_width;
+		const double mouth_width = (faceJoints.block<3, 1>(0, 60) - faceJoints.block<3, 1>(0, 64)).norm();
+		const double mouth_height = (faceJoints.block<3, 1>(0, 62) - faceJoints.block<3, 1>(0, 66)).norm();
+		if (mouth_width) frame_param.mouth_open = mouth_height / mouth_width;
 	}
-	else frame_param.mouse_open = 0.0;
+	else frame_param.mouth_open = 0.0;
 	if (!(faceJoints.block<3, 6>(0, 36).array() == 0.0).any())
 	{
 		const double reye_width = (faceJoints.block<3, 1>(0, 36) - faceJoints.block<3, 1>(0, 39)).norm();
@@ -811,9 +843,12 @@ void Adam_FastFit(TotalModel &adam,
 		if (leye_width) frame_param.leye_open = (leye_height1 + leye_height2) / leye_width;
 	}
 	else frame_param.leye_open = 1.0;
-	std::cout << "mouse: " << frame_param.mouse_open << std::endl;
-	std::cout << "reye: " << frame_param.reye_open << std::endl;
-	std::cout << "leye: " << frame_param.leye_open << std::endl;
+	if (verbose)
+	{
+		std::cout << "mouth: " << frame_param.mouth_open << std::endl;
+		std::cout << "reye: " << frame_param.reye_open << std::endl;
+		std::cout << "leye: " << frame_param.leye_open << std::endl;
+	}
 }
 
 void Adam_Fit_PAF(TotalModel &adam, smpl::SMPLParams &frame_param, Eigen::MatrixXd &BodyJoints, Eigen::MatrixXd &rFoot, Eigen::MatrixXd &lFoot, Eigen::MatrixXd &rHandJoints,
