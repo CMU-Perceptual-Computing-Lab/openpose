@@ -409,7 +409,6 @@ void Renderer::MeshRender()
         glTranslatef(0, 0, -options.view_dist);
     }
 
-    std::vector<cv::Point3d>& meshVertices = pData->m_meshVertices;
     if (options.CameraMode == 0u)
     {
         cv::Point3d min_s(10000., 10000., 10000.);

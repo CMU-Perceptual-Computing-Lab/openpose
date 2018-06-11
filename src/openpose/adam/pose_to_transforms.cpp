@@ -172,7 +172,7 @@ namespace smpl
     {
         const int num_vertex = total_vertex.size();
         if (dVdP) std::fill(dVdP, dVdP + 3 * num_vertex * TotalModel::NUM_POSE_PARAMETERS, 0);
-        for(auto i = 0u; i < num_vertex; i++)
+        for (auto i = 0; i < num_vertex; i++)
         {
             const int idv = total_vertex[i];
             const auto* v0_data = Vt.data() + idv * 3;
@@ -192,7 +192,7 @@ namespace smpl
                     double* dVdP_row2 = dVdP + (i * 3 + 2) * TotalModel::NUM_POSE_PARAMETERS;
                     if (dVdP)
                     {
-                        for (int j = 0; j < mParentIndexes[idj].size(); j++)
+                        for (auto j = 0u; j < mParentIndexes[idj].size(); j++)
                         {
                             const int idp = mParentIndexes[idj][j];
                             dVdP_row0[3 * idp + 0] += w * (v0_data[0] * dMRdP[idj].data()[(0 * 3 + 0) * ncol + 3 * idp + 0] + v0_data[1] * dMRdP[idj].data()[(0 * 3 + 1) * ncol + 3 * idp + 0] + v0_data[2] * dMRdP[idj].data()[(0 * 3 + 2) * ncol + 3 * idp + 0] + dMtdP[idj].data()[0 * ncol + 3 * idp + 0]);
