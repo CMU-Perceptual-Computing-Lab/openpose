@@ -798,6 +798,7 @@ const auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(std::
 // spFrameParams->mouth_open;
 // spFrameParams->reye_open;
 // spFrameParams->leye_open;
+// spFrameParams->dist_root_foot;
 std::cout << "\nRender1:    " << duration1 * 1e-6
           << "\nRenderRest: " << duration2 * 1e-6
           << "\nTotal:      " << duration * 1e-6 << std::endl;
