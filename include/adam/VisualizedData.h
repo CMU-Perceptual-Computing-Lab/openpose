@@ -5,6 +5,7 @@
 #include <vector>
 #include <utility>
 #include <GL/glut.h>
+#include <Eigen/Dense>
 
 using namespace std;
 
@@ -18,7 +19,7 @@ enum EnumRenderType
 class VisualizedData
 {
 public:
-	VisualizedData()
+	VisualizedData(): faceKeypoints(0, 0)
 	{
 		//Init color Map
 		cv::Mat colorMapSource = cv::Mat::zeros(256,1,CV_8U);
@@ -95,6 +96,7 @@ public:
 		connMat.push_back(connMat_total);
 		connMat.push_back(connMat_lhand);
 		connMat.push_back(connMat_rhand);
+		connMat.push_back(connMat_body); // vis_type = 5
 	}
 
 	~VisualizedData() {}
@@ -199,8 +201,9 @@ public:
 
 	double* targetJoint;
 	double* resultJoint;
-	uint vis_type; // 0 for hand, 1 for body, 2 for body with hands
+	uint vis_type; // 0 for hand, 1 for body, 2 for body with hands, 3 for left hand, 4 for right hand, 5 for face
 	std::vector<std::vector<int>> connMat;
+	Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> faceKeypoints;
 
 	//Shader
 	//bool m_reloadShader;

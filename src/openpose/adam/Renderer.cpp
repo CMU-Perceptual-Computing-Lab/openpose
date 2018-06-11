@@ -431,11 +431,16 @@ void Renderer::MeshRender()
             start_idx = 20;
             end_idx = 20 + 21;
         }
-        else
+        else if (pData->vis_type == 4)
         {
-            assert(pData->vis_type == 4);
             start_idx = 20 + 21;
             end_idx = 20 + 21 + 21;
+        }
+        else
+        {
+            assert(pData->vis_type == 5);
+            start_idx = 15;
+            end_idx = 19;
         }
         for (int i = start_idx; i < end_idx; i++)
         {
@@ -554,6 +559,19 @@ void Renderer::MeshRender()
         glColor3ub(50u, 0u, 255u);
         DrawSkeleton(pData->resultJoint, pData->vis_type, pData->connMat[pData->vis_type]);
     }
+    // Show the face keypoints
+    if (pData->faceKeypoints.size() > 0)
+    {
+        glColor3ub(0u, 255u, 255u);
+        assert(pData->faceKeypoints.cols() == 3);
+        for (auto i = 0; i < pData->faceKeypoints.rows(); i++)
+        {
+            glPushMatrix();
+            glTranslated(pData->faceKeypoints(i, 0), pData->faceKeypoints(i, 1), pData->faceKeypoints(i, 2));
+            glutSolidSphere(0.5, 10, 10);
+            glPopMatrix();
+        }
+    }
 
     glPopMatrix();
     glutSwapBuffers();
@@ -589,13 +607,20 @@ void Renderer::DrawSkeleton(double* joint, uint vis_type, std::vector<int> connM
         rad = 0.2f;
         cone_rad = 0.1;
     }
-    else
+    else if(vis_type == 4)
     {
-        assert(vis_type == 4);
         start_idx = 20 + 21;
         end_idx = 20 + 21 + 21;
         rad = 0.2f;
         cone_rad = 0.1;
+    }
+    else
+    {
+        assert(vis_type == 5);
+        start_idx = 0;
+        end_idx = 19;
+        rad = 1.0f;
+        cone_rad = 0.3;
     }
 
     for (int i = start_idx; i < end_idx; i++)

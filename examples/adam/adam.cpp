@@ -526,7 +526,6 @@ public:
                 LFootJoints *= 1e2;
                 RFootJoints *= 1e2;
 
-
 // // Cout keypoints
 // std::cout << "Body:\n";
 // for (auto i = 0 ; i < targetJoints.size() ; i++)
@@ -631,9 +630,10 @@ public:
         // char* argv[0];
         render = std::make_shared<Renderer>(&argc, nullptr);
         // render = std::make_shared<Renderer>(&argc, argv);
-        render->options.nRange=150;
-        render->options.yrot=45;
-        render->options.xrot=25;
+        render->options.nRange=40;
+        // render->options.nRange=150;
+        render->options.yrot=-45;
+        // render->options.xrot=25;
         // render->options.meshSolid = true;
         render->options.meshSolid = false;
         upReadBuffer.reset(new GLubyte[render->options.width * render->options.height * 3]);
@@ -686,7 +686,27 @@ const auto start2 = std::chrono::high_resolution_clock::now();
                 g_vis_data.targetJoint = targetJoints.data(); // Only for Body, LHand, RHand. No Face, no Foot
                 // g_vis_data.targetJoint = nullptr;
                 g_vis_data.resultJoint = resultBody.data();
-                g_vis_data.vis_type = 2;
+                g_vis_data.faceKeypoints.resize(70, 3);
+                if (!faceKeypoints3D.empty())
+                {
+                    for (auto part = 0 ; part < NUMBER_FACE_KEYPOINTS; part++)
+                    {
+                        if (faceKeypoints3D[{0, part, faceKeypoints3D.getSize(2)-1}] > 0.5 /*|| !mInitialized*/)
+                            for (auto xyz = 0 ; xyz < faceKeypoints3D.getSize(2)-1 ; xyz++)
+                                g_vis_data.faceKeypoints(part, xyz) = faceKeypoints3D[{0, part, xyz}];
+                        else
+                        {
+                            g_vis_data.faceKeypoints(part, 0) = 0;
+                            g_vis_data.faceKeypoints(part, 1) = 0;
+                            g_vis_data.faceKeypoints(part, 2) = 0;
+                        }
+                    }
+                    g_vis_data.faceKeypoints *= 100;
+                }
+                g_vis_data.faceKeypoints.block(0, 0, 62, 3).setZero();
+                g_vis_data.faceKeypoints.block(63, 0, 3, 3).setZero();
+                g_vis_data.faceKeypoints.block(67, 0, 3, 3).setZero();
+                g_vis_data.vis_type = 5;
                 g_vis_data.read_buffer = upReadBuffer.get();
 // BELOW IS PURELY OPENGL
 // t3 <-- g_vis_data (struct, big)

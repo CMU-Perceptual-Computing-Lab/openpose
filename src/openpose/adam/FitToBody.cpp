@@ -734,6 +734,20 @@ void Adam_FastFit(TotalModel &adam,
 // const auto duration1 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start1).count();
 // const auto start2 = std::chrono::high_resolution_clock::now();
 
+	auto twist = false;
+	for (int i = 1; i < TotalModel::NUM_JOINTS; i++)
+	{
+		auto count_axis = 0u;
+		if (frame_param.m_adam_pose.data()[3 * i + 0] > 90 || frame_param.m_adam_pose.data()[3 * i + 0] < -90) count_axis++;
+		if (frame_param.m_adam_pose.data()[3 * i + 1] > 90 || frame_param.m_adam_pose.data()[3 * i + 1] < -90) count_axis++;
+		if (frame_param.m_adam_pose.data()[3 * i + 2] > 90 || frame_param.m_adam_pose.data()[3 * i + 2] < -90) count_axis++;
+		if (count_axis >= 2)  // this joint is twisted
+		{
+			twist = true;
+			frame_param.m_adam_pose.data()[3 * i + 0] = frame_param.m_adam_pose.data()[3 * i + 1] = frame_param.m_adam_pose.data()[3 * i + 2] = 0.0;
+		}
+	}
+
 	std::copy(frame_param.m_adam_t.data(), frame_param.m_adam_t.data() + 3, g_params.m_adam_t.data());
 	std::copy(frame_param.m_adam_pose.data(), frame_param.m_adam_pose.data() + 62 * 3, g_params.m_adam_pose.data());
 // const auto duration2 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start2).count();
@@ -753,16 +767,15 @@ void Adam_FastFit(TotalModel &adam,
 	// ceres::Solve(options, &g_problem, &summary);
 	// std::cout << summary.FullReport() << std::endl;
 
-	// g_cost_body_keypoints->toggle_activate(true, false);
-	// ceres::Solve(options, &g_problem, &summary);
-	// std::cout << summary.FullReport() << std::endl;
-
-	g_cost_body_keypoints->toggle_activate(true, true);
-// const auto duration3 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start3).count();
-// const auto start4 = std::chrono::high_resolution_clock::now();
+	if (!twist) g_cost_body_keypoints->toggle_activate(true, true);   // if no twist is detected, perform a single fitting
+	else
+	{
+		std::cout << "twist detected, multiple stage fitting" << std::endl;
+		g_cost_body_keypoints->toggle_activate(true, false);
+		ceres::Solve(options, &g_problem, &summary);
+		if(verbose) std::cout << summary.FullReport() << std::endl;
+	}
 	ceres::Solve(options, &g_problem, &summary);
-// const auto duration4 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start4).count();
-// const auto start5 = std::chrono::high_resolution_clock::now();
 	if(verbose) std::cout << summary.FullReport() << std::endl;
 
 	std::copy(g_params.m_adam_t.data(), g_params.m_adam_t.data() + 3, frame_param.m_adam_t.data());
@@ -773,6 +786,34 @@ void Adam_FastFit(TotalModel &adam,
 // 		  << __FILE__ << " " << duration3 * 1e-6 << "\n"
 // 		  << __FILE__ << " " << duration4 * 1e-6 << "\n"
 // 		  << __FILE__ << " " << duration5 * 1e-6 << "\n" << std::endl;
+
+	// get face (mouth_open, leye_open, reye_open) in a naive way
+	if (!(faceJoints.block<3, 8>(0, 60).array() == 0.0).any())  // if none of these keypoints is zero
+	{
+		const double mouse_width = (faceJoints.block<3, 1>(0, 60) - faceJoints.block<3, 1>(0, 64)).norm();
+		const double mouse_height = (faceJoints.block<3, 1>(0, 62) - faceJoints.block<3, 1>(0, 66)).norm();
+		if (mouse_width) frame_param.mouse_open = mouse_height / mouse_width;
+	}
+	else frame_param.mouse_open = 0.0;
+	if (!(faceJoints.block<3, 6>(0, 36).array() == 0.0).any())
+	{
+		const double reye_width = (faceJoints.block<3, 1>(0, 36) - faceJoints.block<3, 1>(0, 39)).norm();
+		const double reye_height1 = (faceJoints.block<3, 1>(0, 37) - faceJoints.block<3, 1>(0, 41)).norm();
+		const double reye_height2 = (faceJoints.block<3, 1>(0, 38) - faceJoints.block<3, 1>(0, 40)).norm();
+		if (reye_width) frame_param.reye_open = (reye_height1 + reye_height2) / reye_width;
+	}
+	else frame_param.reye_open = 1.0;
+	if (!(faceJoints.block<3, 6>(0, 42).array() == 0.0).any())
+	{
+		const double leye_width = (faceJoints.block<3, 1>(0, 42) - faceJoints.block<3, 1>(0, 45)).norm();
+		const double leye_height1 = (faceJoints.block<3, 1>(0, 44) - faceJoints.block<3, 1>(0, 46)).norm();
+		const double leye_height2 = (faceJoints.block<3, 1>(0, 43) - faceJoints.block<3, 1>(0, 47)).norm();
+		if (leye_width) frame_param.leye_open = (leye_height1 + leye_height2) / leye_width;
+	}
+	else frame_param.leye_open = 1.0;
+	std::cout << "mouse: " << frame_param.mouse_open << std::endl;
+	std::cout << "reye: " << frame_param.reye_open << std::endl;
+	std::cout << "leye: " << frame_param.leye_open << std::endl;
 }
 
 void Adam_Fit_PAF(TotalModel &adam, smpl::SMPLParams &frame_param, Eigen::MatrixXd &BodyJoints, Eigen::MatrixXd &rFoot, Eigen::MatrixXd &lFoot, Eigen::MatrixXd &rHandJoints,
