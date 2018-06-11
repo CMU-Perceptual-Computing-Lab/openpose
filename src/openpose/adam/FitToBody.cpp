@@ -710,11 +710,14 @@ void Adam_FastFit_Initialize(const TotalModel &adam,
 		if (leye_width) frame_param.leye_open = (leye_height1 + leye_height2) / leye_width;
 	}
 	else frame_param.leye_open = 1.0;
+	auto foot_vertex = adam.m_shapespace_u(14331 * 3 + 1) * frame_param.m_adam_coeffs;
+	frame_param.dist_root_foot = adam.m_meanshape(14331 * 3 + 1) + foot_vertex(0, 0);
 	if (verbose)
 	{
 		std::cout << "mouth: " << frame_param.mouth_open << std::endl;
 		std::cout << "reye: " << frame_param.reye_open << std::endl;
 		std::cout << "leye: " << frame_param.leye_open << std::endl;
+		std::cout << "distance root -> foot: " << frame_param.dist_root_foot << std::endl;
 	}
 }
 
@@ -858,11 +861,13 @@ void Adam_FastFit(const TotalModel &adam,
 		if (leye_width) frame_param.leye_open = (leye_height1 + leye_height2) / leye_width;
 	}
 	else frame_param.leye_open = 1.0;
+	frame_param.dist_root_foot = abs(g_cost_body_keypoints->m_Vt(14331, 1));
 	if (verbose)
 	{
 		std::cout << "mouth: " << frame_param.mouth_open << std::endl;
 		std::cout << "reye: " << frame_param.reye_open << std::endl;
 		std::cout << "leye: " << frame_param.leye_open << std::endl;
+		std::cout << "distance root -> foot: " << frame_param.dist_root_foot << std::endl;
 	}
 }
 
