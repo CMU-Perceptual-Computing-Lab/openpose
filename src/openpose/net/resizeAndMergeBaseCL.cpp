@@ -407,6 +407,7 @@ namespace op
                 UNUSED(sourceSizes);
                 UNUSED(scaleInputToNetInputs);
                 UNUSED(gpuID);
+                UNUSED(sourceTempPtrs);
                 error("OpenPose must be compiled with the `USE_OPENCL` macro definition in order to use this"
                       " functionality.", __LINE__, __FUNCTION__, __FILE__);
             #endif
