@@ -820,7 +820,7 @@ void Adam_FastFit(const TotalModel &adam,
 	if (!twist) g_cost_body_keypoints->toggle_activate(true, true);   // if no twist is detected, perform a single fitting
 	else
 	{
-		std::cout << "twist detected, multiple stage fitting" << std::endl;
+		std::cout << "Twist detected, multiple stage fitting." << std::endl;
 		g_cost_body_keypoints->toggle_activate(true, false);
 		ceres::Solve(options, &g_problem, &summary);
 		if(verbose) std::cout << summary.FullReport() << std::endl;

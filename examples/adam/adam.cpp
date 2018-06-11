@@ -436,8 +436,8 @@ public:
         mFaceJoints(5, NUMBER_FACE_KEYPOINTS),// (3, landmarks_face.size());
         mLHandJoints(5, NUMBER_HAND_KEYPOINTS),// (3, HandModel::NUM_JOINTS);
         mRHandJoints(5, NUMBER_HAND_KEYPOINTS),// (3, HandModel::NUM_JOINTS);
-        mLFootJoints(5, 3),// (3, 3);        //Heel, Toe
-        mRFootJoints(5, 3),// (3, 3);        //Heel, Toe
+        mLFootJoints(5, 3),// (3, 3);        // Heel, Toe
+        mRFootJoints(5, 3),// (3, 3);        // Heel, Toe
         spFrameParams{frameParams},
         spVtVec{vtVec},
         spJ0Vec{j0Vec},
@@ -474,21 +474,19 @@ public:
             {
                 auto& datum = datumsPtr->at(0);
                 const auto& poseKeypoints3D = datum.poseKeypoints3D;
-                const auto& faceKeypoints3D = datum.faceKeypoints3D;
-                const auto& handKeypoints3D = datum.handKeypoints3D;
-                auto& targetJoints = datum.targetJoints;
-                // const auto& leftHandKeypoints3D = datum.handKeypoints3D[0];
-                // const auto& rightHandKeypoints3D = datum.handKeypoints3D[1];
                 if (poseKeypoints3D.getSize(1) != 19 && poseKeypoints3D.getSize(1) != 25)
                     op::error("Only working for BODY_19 or BODY_25 (#parts = "
                               + std::to_string(poseKeypoints3D.getSize(2)) + ").",
                               __LINE__, __FUNCTION__, __FILE__);
+
                 // Update body
+                auto& targetJoints = datum.targetJoints;
                 for (auto part = 0 ; part < 19; part++)
                     updateOrResetKeypoint(&targetJoints[mapOPToDome(part)*(poseKeypoints3D.getSize(2)-1)],
                                           mFoundTargetJoints[part],
                                           &poseKeypoints3D[{0, part, 0}]);
                 // Update left/right hand
+                const auto& handKeypoints3D = datum.handKeypoints3D;
                 const auto bodyOffset = NUMBER_BODY_KEYPOINTS*(poseKeypoints3D.getSize(2)-1); // NUMBER_BODY_KEYPOINTS = #parts_OP + 1 (top_head)
                 const auto handOffset = handKeypoints3D[0].getSize(1)*(handKeypoints3D[0].getSize(2)-1);
                 if (!handKeypoints3D.at(0).empty())
@@ -534,6 +532,7 @@ public:
                 }
 
                 // Update Face data
+                const auto& faceKeypoints3D = datum.faceKeypoints3D;
                 if (!faceKeypoints3D.empty())
                     for (auto part = 0 ; part < NUMBER_FACE_KEYPOINTS; part++)
                         updateOrResetKeypoint(mFaceJoints,
@@ -583,6 +582,7 @@ const auto start0 = std::chrono::high_resolution_clock::now();
                     spFrameParams->m_adam_t(2) = mBodyJoints(2, 2);
                     spFrameParams->m_adam_pose(0, 0) = 3.14159265358979323846264338327950288419716939937510582097494459;
                     // Fit initialization
+                    // Adam_FastFit_Initialize only changes spFrameParams
                     Adam_FastFit_Initialize(*spTotalModel, *spFrameParams, mBodyJoints, mRFootJoints, mLFootJoints,
                                             mRHandJoints, mLHandJoints, mFaceJoints, mCeresDisplayReport);
                     *spVtVec = spTotalModel->m_meanshape + spTotalModel->m_shapespace_u * spFrameParams->m_adam_coeffs;
@@ -595,8 +595,8 @@ const auto start0 = std::chrono::high_resolution_clock::now();
                     // inside for loop
                     // Here I read the pose data into mBodyJoints, mRFootJoints, mLFootJoints, mRHandJoints, mLHandJoints, mFaceJoints.
                     // call fitting function
-                    Adam_FastFit(*spTotalModel, *spFrameParams, mBodyJoints, mRFootJoints, mLFootJoints, mRHandJoints, mLHandJoints, mFaceJoints, mCeresDisplayReport);
                     // Adam_FastFit only changes spFrameParams
+                    Adam_FastFit(*spTotalModel, *spFrameParams, mBodyJoints, mRFootJoints, mLFootJoints, mRHandJoints, mLHandJoints, mFaceJoints, mCeresDisplayReport);
                 }
 const auto duration0 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start0).count();
 std::cout << "IK:         " << duration0 * 1e-6 << std::endl;
