@@ -23,11 +23,12 @@
 - **Input**: Image, video, webcam, and IP camera. Included C++ demos to add your custom input.
 - **Output**: Basic image + keypoint display/saving (PNG, JPG, AVI, ...), keypoint saving (JSON, XML, YML, ...), and/or keypoints as array class.
 - Available: command-line demo, C++ wrapper, and C++ API.
-- **OS**: Ubuntu (14, 16), Windows (8, 10), Nvidia TX2.
+- **OS**: Ubuntu (14, 16), Windows (8, 10), Mac OSX, Nvidia TX2.
 
 
 
 ## Latest Features
+- Jun 2018: [**Mac OSX version (CPU)**](doc/installation.md)!
 - Mar 2018: [**CPU version**](doc/installation.md#cpu-version)!
 - Mar 2018: Improved [**3-D keypoint reconstruction module**](doc/3d_reconstruction_demo.md) (from multiple camera views)!
 - Sep 2017: [**CMake**](doc/installation.md) installer and **IP camera** support!
@@ -113,7 +114,7 @@ Output (format, keypoint index ordering, etc.) in [doc/output.md](doc/output.md)
 
 
 ## Speeding Up OpenPose and Benchmark
-Check the OpenPose Benchmark and some hints to speed up OpenPose on [doc/faq.md#speed-up-and-benchmark](doc/faq.md#speed-up-and-benchmark).
+Check the OpenPose Benchmark as well as some hints to speed up and/or reduce the memory requirements for OpenPose on [doc/faq.md#speed-up-memory-reduction-and-benchmark](doc/faq.md#speed-up-memory-reduction-and-benchmark).
 
 
 

@@ -4,7 +4,7 @@ OpenPose - Frequently Asked Question (FAQ)
 ## Contents
 1. [FAQ](#faq)
     1. [Out of Memory Error](#out-of-memory-error)
-    2. [Speed Up and Benchmark](#speed-up-and-benchmark)
+    2. [Speed Up, Memory Reduction, and Benchmark](#speed-up-memory-reduction-and-benchmark)
     3. [Estimating FPS without Display](#estimating-fps-without-display)
     4. [Webcam Slower than Images](#webcam-slower-than-images)
     5. [Video/Webcam Not Working](#videowebcam-not-working)
@@ -25,7 +25,7 @@ OpenPose - Frequently Asked Question (FAQ)
 
 
 
-### Speed Up and Benchmark
+### Speed Up, Memory Reduction, and Benchmark
 **Q: Low speed** - OpenPose is quite slow, is it normal? How can I speed it up?
 
 **A**: Check the [OpenPose Benchmark](https://docs.google.com/spreadsheets/d/1-DynFGvoScvfWDA1P4jDInCkbD4lg0IKOYbXgEq0sK0/edit#gid=0) to discover the approximate speed of your graphics card. Some speed tips:
@@ -35,6 +35,7 @@ OpenPose - Frequently Asked Question (FAQ)
     3. For face, reduce the `--face_net_resolution`. The resolution 320x320 usually works pretty decently.
     4. Use the `MPI_4_layers` model (lower accuracy and lower number of parts).
     5. Change GPU rendering by CPU rendering to get approximately +0.5 FPS (`--render_pose 1`).
+    6. Points 2-4 will also help reducing GPU memory (or RAM memory for CPU version).
 
 
 

@@ -53,6 +53,7 @@ namespace op
                     replaceAll(src, "Type", type);
                     program = cl::Program(context, src, true);
                 }
+                #if defined(USE_OPENCL) && defined(CL_HPP_ENABLE_EXCEPTIONS)
                 catch (cl::BuildError e)
                 {
                     auto buildInfo = e.getBuildLog();
@@ -61,6 +62,11 @@ namespace op
                                      pair.second << std::endl;
                         error("OpenCL error: OpenPose crashed due to the previously printed errors.",
                               __LINE__, __FUNCTION__, __FILE__);
+                }
+                #endif
+                catch (const std::exception& e)
+                {
+                    error(e.what(), __LINE__, __FUNCTION__, __FILE__);
                 }
                 return true;
             #else
@@ -231,9 +237,15 @@ namespace op
                         }
                     }
                 }
+                #if defined(USE_OPENCL) && defined(CL_HPP_ENABLE_EXCEPTIONS)
                 catch (cl::Error e)
                 {
                     op::log("Error: " + std::string(e.what()));
+                }
+                #endif
+                catch (const std::exception& e)
+                {
+                    error(e.what(), __LINE__, __FUNCTION__, __FILE__);
                 }
             }
         #else
@@ -417,7 +429,8 @@ namespace op
             std::vector<cl::Platform> platforms;
             std::vector<cl::Device> devices;
             cl_uint type;
-            try {
+            try
+            {
                 cl::Platform::get(&platforms);
                 if (!platforms.size())
                     return -1;
@@ -425,11 +438,20 @@ namespace op
                 if (type == CL_SUCCESS)
                     return devices.size();
                 else
+                {
+                    error("No GPU Devices were found. OpenPose only supports GPU OpenCL", __LINE__, __FUNCTION__, __FILE__);
                     return -1;
+                }
             }
+            #if defined(USE_OPENCL) && defined(CL_HPP_ENABLE_EXCEPTIONS)
             catch (cl::Error& e)
             {
                 op::log("Error: " + std::string(e.what()));
+            }
+            #endif
+            catch (const std::exception& e)
+            {
+                error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             }
         #else
             error("OpenPose must be compiled with the `USE_OPENCL` macro definition in order to use this"

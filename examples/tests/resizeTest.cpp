@@ -75,23 +75,31 @@
 
     int resizeTest()
     {
-        // logging_level
-        cv::Mat img = op::loadImage(FLAGS_image_path, CV_LOAD_IMAGE_GRAYSCALE);
-        if(img.empty())
-            op::error("Could not open or find the image: " + FLAGS_image_path, __LINE__, __FUNCTION__, __FILE__);
-        img.convertTo(img, CV_32FC1);
-        img = cpuResize(img, cv::Size(img.size().width/4,img.size().height/4));
-        img*=0.005;
+        try
+        {
+            // logging_level
+            cv::Mat img = op::loadImage(FLAGS_image_path, CV_LOAD_IMAGE_GRAYSCALE);
+            if(img.empty())
+                op::error("Could not open or find the image: " + FLAGS_image_path, __LINE__, __FUNCTION__, __FILE__);
+            img.convertTo(img, CV_32FC1);
+            img = cpuResize(img, cv::Size(img.size().width/4,img.size().height/4));
+            img*=0.005;
 
-        cv::Mat gpuImg = gpuResize(img, cv::Size(img.size().width*8,img.size().height*8));
-        cv::Mat cpuImg = cpuResize(img, cv::Size(img.size().width*8,img.size().height*8));
-        cv::imshow("gpuImg", gpuImg);
-        cv::imshow("cpuImg", cpuImg);
+            cv::Mat gpuImg = gpuResize(img, cv::Size(img.size().width*8,img.size().height*8));
+            cv::Mat cpuImg = cpuResize(img, cv::Size(img.size().width*8,img.size().height*8));
+            cv::imshow("gpuImg", gpuImg);
+            cv::imshow("cpuImg", cpuImg);
 
-        op::log("Done");
-        cv::waitKey(0);
+            op::log("Done");
+            cv::waitKey(0);
 
-        return 0;
+            return 0;
+        }
+        catch (const std::exception& e)
+        {
+            op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return -1;
+        }
     }
 #endif
 

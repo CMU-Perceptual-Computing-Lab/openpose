@@ -1,5 +1,5 @@
-﻿#ifndef OPENPOSE_EXPERIMENTAL_3D_CAMERA_PARAMETER_READER_HPP
-#define OPENPOSE_EXPERIMENTAL_3D_CAMERA_PARAMETER_READER_HPP
+﻿#ifndef OPENPOSE_3D_CAMERA_PARAMETER_READER_HPP
+#define OPENPOSE_3D_CAMERA_PARAMETER_READER_HPP
 
 #include <opencv2/core/core.hpp>
 #include <openpose/core/common.hpp>
@@ -11,10 +11,22 @@ namespace op
     public:
         explicit CameraParameterReader();
 
+        // cameraExtrinsics is optional
+        explicit CameraParameterReader(const std::string& serialNumber,
+                                       const cv::Mat& cameraIntrinsics,
+                                       const cv::Mat& cameraDistortion,
+                                       const cv::Mat& cameraExtrinsics = cv::Mat());
+
+        // serialNumbers is optional. If empty, it will load all the XML files available in the
+        // cameraParameterPath folder
         void readParameters(const std::string& cameraParameterPath,
-                            const std::vector<std::string>& serialNumbers);
+                            const std::vector<std::string>& serialNumbers = {});
+
+        void writeParameters(const std::string& cameraParameterPath) const;
 
         unsigned long long getNumberCameras() const;
+
+        const std::vector<std::string>& getCameraSerialNumbers() const;
 
         const std::vector<cv::Mat>& getCameraMatrices() const;
 
@@ -36,4 +48,4 @@ namespace op
     };
 }
 
-#endif // OPENPOSE_EXPERIMENTAL_3D_CAMERA_PARAMETER_READER_HPP
+#endif // OPENPOSE_3D_CAMERA_PARAMETER_READER_HPP

@@ -8,16 +8,16 @@ prepend(SOURCES_OP_3D_WITH_CP ${CMAKE_CURRENT_SOURCE_DIR} ${SOURCES_OP_3D})
 set(SOURCES_OP_3D_WITH_CP ${SOURCES_OP_3D_WITH_CP} PARENT_SCOPE)
 set(SOURCES_OPENPOSE ${SOURCES_OPENPOSE} ${SOURCES_OP_3D_WITH_CP} PARENT_SCOPE)
 
-if (UNIX AND NOT APPLE)
+if (UNIX OR APPLE)
   if (${GPU_MODE} MATCHES "CUDA")
     cuda_add_library(openpose_3d ${SOURCES_OP_3D})
-  else()
+  else ()
     add_library(openpose_3d ${SOURCES_OP_3D})
   endif ()
 
   add_library(caffe SHARED IMPORTED)
   set_property(TARGET caffe PROPERTY IMPORTED_LOCATION ${Caffe_LIBS}) 
-  target_link_libraries(openpose_3d caffe ${MKL_LIBS})
+  target_link_libraries(openpose_3d caffe openpose_core ${MKL_LIBS})
 
   if (BUILD_CAFFE)
     add_dependencies(openpose_3d openpose_caffe)
@@ -28,4 +28,4 @@ if (UNIX AND NOT APPLE)
       RUNTIME DESTINATION bin
       LIBRARY DESTINATION lib
       ARCHIVE DESTINATION lib/openpose)
-endif (UNIX AND NOT APPLE)
+endif (UNIX OR APPLE)

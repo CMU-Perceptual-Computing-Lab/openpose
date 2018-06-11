@@ -19,12 +19,14 @@ prepend(SOURCES_OP_POSE_WITH_CP ${CMAKE_CURRENT_SOURCE_DIR} ${SOURCES_OP_POSE})
 set(SOURCES_OP_POSE_WITH_CP ${SOURCES_OP_POSE_WITH_CP} PARENT_SCOPE)
 set(SOURCES_OPENPOSE ${SOURCES_OPENPOSE} ${SOURCES_OP_POSE_WITH_CP} PARENT_SCOPE)
 
-if (UNIX AND NOT APPLE)
+if (UNIX OR APPLE)
   if (${GPU_MODE} MATCHES "CUDA")
     cuda_add_library(openpose_pose ${SOURCES_OP_POSE})
-  else()
+  else ()
     add_library(openpose_pose ${SOURCES_OP_POSE})
   endif ()
+
+  target_link_libraries(openpose_pose openpose_core)
   
   if (BUILD_CAFFE)
     add_dependencies(openpose_pose openpose_caffe)
@@ -35,4 +37,4 @@ if (UNIX AND NOT APPLE)
       RUNTIME DESTINATION bin
       LIBRARY DESTINATION lib
       ARCHIVE DESTINATION lib/openpose)
-endif (UNIX AND NOT APPLE)
+endif (UNIX OR APPLE)

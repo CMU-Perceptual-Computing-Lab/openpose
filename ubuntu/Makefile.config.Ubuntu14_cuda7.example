@@ -57,6 +57,7 @@ CAFFE_DIR := 3rdparty/caffe/distribute
 # WITH_CERES := 1
 # WITH_FLIR_CAMERA := 1
 # Eigen directory (Ceres)
+# WITH_EIGEN := 1
 EIGEN_DIR := /usr/include/eigen3/
 # Spinnaker directory
 SPINNAKER_DIR := /usr/include/spinnaker

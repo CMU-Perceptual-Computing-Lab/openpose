@@ -106,6 +106,11 @@ namespace op
         double writeVideoFps;
 
         /**
+         * Analogous to writeCocoJson but for foot keypoints.
+         */
+        std::string writeCocoFootJson;
+
+        /**
          * Constructor of the struct.
          * It has the recommended and default values we recommend for each element of the struct.
          * Since all the elements of the struct are public, they can also be manually filled.
@@ -116,7 +121,8 @@ namespace op
                             const std::string& writeJson = "", const std::string& writeCocoJson = "",
                             const std::string& writeImages = "", const std::string& writeImagesFormat = "",
                             const std::string& writeVideo = "", const double writeVideoFps = 30.,
-                            const std::string& writeHeatMaps = "", const std::string& writeHeatMapsFormat = "");
+                            const std::string& writeHeatMaps = "", const std::string& writeHeatMapsFormat = "",
+                            const std::string& writeCocoFootJson = "");
     };
 }
 
