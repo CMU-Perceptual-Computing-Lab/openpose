@@ -1,9 +1,10 @@
+#include <chrono>
+#include <iostream>
+#include <mutex>
 #include "FitToBody.h"
 #include "ceres/normal_prior.h"
-#include <iostream>
 #include "FitCost.h"
 #include "AdamFastCost.h"
-#include <chrono>
 #include "HandFastCost.h"
 
 void FreezeJoint(ceres::Problem& problem, double* dataPtr, int index)
@@ -619,15 +620,15 @@ void Adam_FitTotalBodyCeres3d2d(TotalModel &adam,
 	// std::cout << summary.FullReport() << std::endl;
 }
 
-void Adam_FastFit_Initialize(TotalModel &adam,
+void Adam_FastFit_Initialize(const TotalModel &adam,
 	smpl::SMPLParams &frame_param,
-	Eigen::MatrixXd &BodyJoints,
-	Eigen::MatrixXd &rFoot,	   //2points
-	Eigen::MatrixXd &lFoot,		//2points
-	Eigen::MatrixXd &rHandJoints,	   //
-	Eigen::MatrixXd &lHandJoints,		//
-	Eigen::MatrixXd &faceJoints,
-	bool verbose)
+	const Eigen::MatrixXd &BodyJoints,
+	const Eigen::MatrixXd &rFoot,	   //2points
+	const Eigen::MatrixXd &lFoot,		//2points
+	const Eigen::MatrixXd &rHandJoints,	   //
+	const Eigen::MatrixXd &lHandJoints,		//
+	const Eigen::MatrixXd &faceJoints,
+	const bool verbose)
 {
 	using namespace Eigen;
 	MatrixXd PAF(3, 54);
@@ -717,19 +718,33 @@ void Adam_FastFit_Initialize(TotalModel &adam,
 	}
 }
 
-ceres::Problem g_problem;
-smpl::SMPLParams g_params;
-AdamFastCost* g_cost_body_keypoints = NULL;
-void Adam_FastFit(TotalModel &adam,
+std::mutex g_mutex;
+std::vector<std::shared_ptr<ceres::Problem>> g_problems;
+std::vector<std::shared_ptr<smpl::SMPLParams>> g_paramss;
+std::vector<AdamFastCost*> g_cost_body_keypointss;
+void Adam_FastFit(const TotalModel &adam,
 	smpl::SMPLParams &frame_param,
-	Eigen::MatrixXd &BodyJoints,
-	Eigen::MatrixXd &rFoot,	   //2points
-	Eigen::MatrixXd &lFoot,		//2points
-	Eigen::MatrixXd &rHandJoints,	   //
-	Eigen::MatrixXd &lHandJoints,		//
-	Eigen::MatrixXd &faceJoints,
-	bool verbose)
+	const Eigen::MatrixXd &BodyJoints,
+	const Eigen::MatrixXd &rFoot,	   //2points
+	const Eigen::MatrixXd &lFoot,		//2points
+	const Eigen::MatrixXd &rHandJoints,	   //
+	const Eigen::MatrixXd &lHandJoints,		//
+	const Eigen::MatrixXd &faceJoints,
+	const bool verbose,
+	const unsigned int threadId)
 {
+	// Resize threads
+	std::unique_lock<std::mutex> lock{g_mutex};
+	while (g_problems.size() <= threadId)
+	{
+		g_problems.emplace_back(std::make_shared<ceres::Problem>());
+		g_paramss.emplace_back(std::make_shared<smpl::SMPLParams>());
+		g_cost_body_keypointss.emplace_back(nullptr);
+	}
+	auto& g_problem = *g_problems.at(threadId);
+	auto& g_params = *g_paramss.at(threadId);
+	auto& g_cost_body_keypoints = g_cost_body_keypointss.at(threadId);
+	lock.unlock();
 // const auto start1 = std::chrono::high_resolution_clock::now();
 	// use the existing shape coeff in frame_param, fit the pose and trans fast
 	using namespace Eigen;

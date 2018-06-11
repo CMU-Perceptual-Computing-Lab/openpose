@@ -9,8 +9,8 @@ class HandFastCost: public ceres::CostFunction
 {
 public:
 	HandFastCost(smpl::HandModel& handm, Eigen::MatrixXd &HandJoints, Eigen::MatrixXd &PAF, bool fit3d, bool fit2d, bool fitPAF, const double* K=nullptr, int regressor_type=0):
-		handm_(handm), HandJoints_(HandJoints), PAF_(PAF), res_dim(0), num_PAF_constraint(PAF.cols()),
-		fit3d_(fit3d), fit2d_(fit2d), fitPAF_(fitPAF), K_(K), start_2d_dim(fit3d?3:0), regressor_type(regressor_type)
+		fit3d_(fit3d), fit2d_(fit2d), fitPAF_(fitPAF), res_dim(0), start_2d_dim(fit3d?3:0), K_(K), handm_(handm),
+		HandJoints_(HandJoints), PAF_(PAF), num_PAF_constraint(PAF.cols()), regressor_type(regressor_type)
 	{
 		assert(HandJoints_.rows() == 5);
 		assert(HandJoints_.cols() == 21);

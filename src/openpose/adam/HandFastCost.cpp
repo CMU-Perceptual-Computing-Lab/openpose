@@ -7,7 +7,6 @@ bool HandFastCost::Evaluate(double const* const* parameters,
     double** jacobians) const
 {
 	using namespace Eigen;
-	typedef double T;
 	const double* t = parameters[0];
 	const double* p_euler = parameters[1];
 	const double* c = parameters[2];
@@ -536,7 +535,7 @@ void HandFastCost::select_lbs(
 	MatrixXdr &outVert, double* dVdP_data, double* dVdc_data) const
 {
 	using namespace Eigen;
-	assert(outVert.rows()== total_vertex.size());
+	assert((unsigned int)outVert.rows() == total_vertex.size());
     std::fill(dVdc_data, dVdc_data + 3 * total_vertex.size() * smpl::HandModel::NUM_SHAPE_COEFFICIENTS, 0); // dVdc.setZero();
     std::fill(dVdP_data, dVdP_data + 3 * total_vertex.size() * smpl::HandModel::NUM_POSE_PARAMETERS, 0); // dVdP.setZero();
 
@@ -559,7 +558,7 @@ void HandFastCost::select_lbs(
                 double* dVdP_row0 = dVdP_data + (i * 3 + 0) * smpl::HandModel::NUM_POSE_PARAMETERS;
                 double* dVdP_row1 = dVdP_data + (i * 3 + 1) * smpl::HandModel::NUM_POSE_PARAMETERS;
                 double* dVdP_row2 = dVdP_data + (i * 3 + 2) * smpl::HandModel::NUM_POSE_PARAMETERS;
-                for (int j = 0; j < parentIndexes[idj].size(); j++)
+                for (auto j = 0u; j < parentIndexes[idj].size(); j++)
                 {
                     const int idp = parentIndexes[idj][j];
                     dVdP_row0[3 * idp + 0] += w * (v0_data[0] * dMRdP[idj].data()[(0 * 3 + 0) * ncol + 3 * idp + 0] + v0_data[1] * dMRdP[idj].data()[(0 * 3 + 1) * ncol + 3 * idp + 0] + v0_data[2] * dMRdP[idj].data()[(0 * 3 + 2) * ncol + 3 * idp + 0] + dMtdP[idj].data()[0 * ncol + 3 * idp + 0]);
@@ -577,7 +576,7 @@ void HandFastCost::select_lbs(
                 double* dVdc_row0 = dVdc_data + (i * 3 + 0) * smpl::HandModel::NUM_SHAPE_COEFFICIENTS;
                 double* dVdc_row1 = dVdc_data + (i * 3 + 1) * smpl::HandModel::NUM_SHAPE_COEFFICIENTS;
                 double* dVdc_row2 = dVdc_data + (i * 3 + 2) * smpl::HandModel::NUM_SHAPE_COEFFICIENTS;
-                for (int j = 0; j < parentIndexes[idj].size(); j++)
+                for (auto j = 0u; j < parentIndexes[idj].size(); j++)
                 {
                     const int idp = parentIndexes[idj][j];
                     dVdc_row0[3 * idp + 0] += w * (v0_data[0] * dMRdc[idj].data()[(0 * 3 + 0) * ncol + 3 * idp + 0] + v0_data[1] * dMRdc[idj].data()[(0 * 3 + 1) * ncol + 3 * idp + 0] + v0_data[2] * dMRdc[idj].data()[(0 * 3 + 2) * ncol + 3 * idp + 0] + dMtdc[idj].data()[0 * ncol + 3 * idp + 0]);
@@ -601,7 +600,7 @@ void HandFastCost::SparseRegress(const Eigen::SparseMatrix<double>& reg, const d
 	const int num_J = reg.rows();
 	std::fill(J_data, J_data + 3 * num_J, 0);
 
-    for (int ic = 0; ic < total_vertex.size(); ic++)
+    for (auto ic = 0u; ic < total_vertex.size(); ic++)
     {
 	    const int c = total_vertex[ic];
 	    for (Eigen::SparseMatrix<double>::InnerIterator it(reg, c); it; ++it)
@@ -619,7 +618,7 @@ void HandFastCost::SparseRegress(const Eigen::SparseMatrix<double>& reg, const d
         assert(dVdc_data != nullptr && dJdP_data != nullptr && dJdc_data != nullptr);
         std::fill(dJdP_data, dJdP_data + 3 * num_J * smpl::HandModel::NUM_POSE_PARAMETERS, 0.0);
         std::fill(dJdc_data, dJdc_data + 3 * num_J * smpl::HandModel::NUM_SHAPE_COEFFICIENTS, 0.0);
-        for (int ic = 0; ic < total_vertex.size(); ic++)
+        for (auto ic = 0u; ic < total_vertex.size(); ic++)
         {
             const int c = total_vertex[ic];
             for (Eigen::SparseMatrix<double>::InnerIterator it(reg, c); it; ++it)
