@@ -430,7 +430,7 @@ public:
         mPcaPath{"./model/adam_blendshapes_348_delta_norm.json"},
         mObjectPath{"./model/mesh_nofeet.obj"},
         mCorrespondencePath{"./model/correspondences_nofeet.txt"},
-        mCeresDisplayReport{CERES_COUT_REPORT},
+        mCeresDisplayReport{ceresDisplayReport},
         mInitialized{false},
         mBodyJoints(5, NUMBER_BODY_KEYPOINTS),// (3, targetJoints.size());
         mFaceJoints(5, NUMBER_FACE_KEYPOINTS),// (3, landmarks_face.size());
@@ -596,6 +596,7 @@ const auto start0 = std::chrono::high_resolution_clock::now();
                     // Here I read the pose data into mBodyJoints, mRFootJoints, mLFootJoints, mRHandJoints, mLHandJoints, mFaceJoints.
                     // call fitting function
                     Adam_FastFit(*spTotalModel, *spFrameParams, mBodyJoints, mRFootJoints, mLFootJoints, mRHandJoints, mLHandJoints, mFaceJoints, mCeresDisplayReport);
+                    // Adam_FastFit only changes spFrameParams
                 }
 const auto duration0 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start0).count();
 std::cout << "IK:         " << duration0 * 1e-6 << std::endl;
