@@ -84,48 +84,75 @@ class OpenPose(object):
         return array, displayImage
 
     @staticmethod
-    def pad_image(image, padValue, bbox):
-        h = image.shape[0]
-        h = min(bbox[0], h);
-        w = image.shape[1]
-        bbox[0] = (np.ceil(bbox[0]/8.))*8;
-        bbox[1] = max(bbox[1], w);
-        bbox[1] = (np.ceil(bbox[1]/8.))*8;
-        pad = np.zeros(shape=(4))
-        pad[0] = 0;
-        pad[1] = 0;
-        pad[2] = int(bbox[0]-h);
-        pad[3] = int(bbox[1]-w);
-        imagePadded = image
-        padDown = np.tile(imagePadded[imagePadded.shape[0]-2:imagePadded.shape[0]-1,:,:], [int(pad[2]), 1, 1])*0
-        imagePadded = np.vstack((imagePadded,padDown))
-        padRight = np.tile(imagePadded[:,imagePadded.shape[1]-2:imagePadded.shape[1]-1,:], [1, int(pad[3]), 1])*0 + padValue
-        imagePadded = np.hstack((imagePadded,padRight))
-        return imagePadded, pad
+    def process_frames(frame, boxsize = 368, scales = [1]):
+        base_net_res = None
+        imagesForNet = []
+        imagesOrig = []
+        for idx, scale in enumerate(scales):
+            # Calculate net resolution (width, height)
+            if idx == 0:
+                net_res = (16 * int((boxsize * frame.shape[1] / float(frame.shape[0]) / 16) + 0.5), boxsize)
+                base_net_res = net_res
+
+            else:
+                net_res = ((min(base_net_res[0], max(1, int((base_net_res[0] * scale)+0.5)/16*16))),
+                          (min(base_net_res[1], max(1, int((base_net_res[1] * scale)+0.5)/16*16))))
+            input_res = [frame.shape[1], frame.shape[0]]
+            scale_factor = min((net_res[0] - 1) / float(input_res[0] - 1), (net_res[1] - 1) / float(input_res[1] - 1))
+            warp_matrix = np.array([[scale_factor,0,0],
+                                    [0,scale_factor,0]])
+            if scale_factor != 1:
+                imageForNet = cv2.warpAffine(frame, warp_matrix, net_res, flags=(cv2.INTER_AREA if scale_factor < 1. else cv2.INTER_CUBIC), borderMode=cv2.BORDER_CONSTANT, borderValue=(0,0,0))
+            else:
+                imageForNet = frame.copy()
+
+            imageOrig = imageForNet.copy()
+            imageForNet = imageForNet.astype(float)
+            imageForNet = imageForNet/256. - 0.5
+            imageForNet = np.transpose(imageForNet, (2,0,1))
+
+            imagesForNet.append(imageForNet)
+            imagesOrig.append(imageOrig)
+
+        return imagesForNet, imagesOrig
 
     @staticmethod
-    def unpad_image(image, padding):
-        if padding[2] < 0:
-            pass
-        elif padding[2] > 0:
-            image = image[0:image.shape[0]-int(padding[2]),:]
-        if padding[3] < 0:
-            pass
-        elif padding[3] > 0:
-            image = image[:,0:image.shape[1]-int(padding[3])]
-        return image
+    def draw_all(imageForNet, heatmaps, currIndex, div=4., norm=False):
+        netDecreaseFactor = float(imageForNet.shape[0]) / float(heatmaps.shape[2]) # 8
+        resized_heatmaps = np.zeros(shape=(heatmaps.shape[0], heatmaps.shape[1], imageForNet.shape[0], imageForNet.shape[1]))
+        num_maps = heatmaps.shape[1]
+        combined = None
+        for i in range(0, num_maps):
+            heatmap = heatmaps[0,i,:,:]
+            resizedHeatmap = cv2.resize(heatmap, (0,0), fx=netDecreaseFactor, fy=netDecreaseFactor)
 
-    @staticmethod
-    def process_frame(frame, boxsize, padvalue):
-        height, width, channels = frame.shape
-        scaleImage = float(boxsize) / float(height)
-        rframe = cv2.resize(frame, (0,0), fx=scaleImage, fy=scaleImage)
-        bbox = [boxsize, max(rframe.shape[1], boxsize)];
-        imageForNet, padding = OpenPose.pad_image(rframe, padvalue, bbox)
-        imageForNet = imageForNet.astype(float)
-        imageForNet = imageForNet/256. - 0.5
-        imageForNet = np.transpose(imageForNet, (2,0,1))
-        return rframe, imageForNet, padding
+            minVal, maxVal, minLoc, maxLoc = cv2.minMaxLoc(resizedHeatmap)
+
+            if i==currIndex and currIndex >=0:
+                resizedHeatmap = np.abs(resizedHeatmap)
+                resizedHeatmap = (resizedHeatmap*255.).astype(dtype='uint8')
+                im_color = cv2.applyColorMap(resizedHeatmap, cv2.COLORMAP_JET)
+                resizedHeatmap = cv2.addWeighted(imageForNet, 1, im_color, 0.3, 0)
+                cv2.circle(resizedHeatmap, (int(maxLoc[0]),int(maxLoc[1])), 5, (255,0,0), -1)
+                return resizedHeatmap
+            else:
+                resizedHeatmap = np.abs(resizedHeatmap)
+                if combined is None:
+                    combined = np.copy(resizedHeatmap);
+                else:
+                    if i <= num_maps-2:
+                        combined += resizedHeatmap;
+                        if norm:
+                            combined = np.maximum(0, np.minimum(1, combined));
+
+        if currIndex < 0:
+            combined /= div
+            combined = (combined*255.).astype(dtype='uint8')
+            im_color = cv2.applyColorMap(combined, cv2.COLORMAP_JET)
+            combined = cv2.addWeighted(imageForNet, 0.5, im_color, 0.5, 0)
+            cv2.circle(combined, (int(maxLoc[0]),int(maxLoc[1])), 5, (255,0,0), -1)
+            return combined
+
 
 if __name__ == "__main__":
     params = dict()

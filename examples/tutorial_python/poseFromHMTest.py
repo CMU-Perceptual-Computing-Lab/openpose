@@ -10,29 +10,22 @@ sys.path.append('../../python')
 dir_path + "/../../models/"
 from openpose import OpenPose
 
-# Params
-class Param_a:
+# Params for change
+defRes = 736
+scales = [1,0.5]
+class Param:
     caffemodel = dir_path + "/../../../models/pose/coco/pose_iter_440000.caffemodel"
     prototxt = dir_path + "/../../../models/pose/coco/pose_deploy_linevec.prototxt"
-    boxsize = 368
-    padValue = 0
 
-# Params
-class Param_b:
-    caffemodel = dir_path + "/../../../models/pose/coco/pose_iter_440000.caffemodel"
-    prototxt = dir_path + "/../../../models/pose/coco/pose_deploy_linevec.prototxt"
-    boxsize = 368/2
-    padValue = 0
-
-# Load net
+# Load OpenPose object and Caffe Nets
 params = dict()
 params["logging_level"] = 3
 params["output_resolution"] = "-1x-1"
-params["net_resolution"] = "-1x368"
+params["net_resolution"] = "-1x"+str(defRes)
 params["model_pose"] = "COCO"
 params["alpha_pose"] = 0.6
 params["scale_gap"] = 0.5
-params["scale_number"] = 2
+params["scale_number"] = len(scales)
 params["render_threshold"] = 0.05
 params["num_gpu_start"] = 0
 params["disable_blending"] = False
@@ -40,45 +33,47 @@ params["default_model_folder"] = dir_path + "/../../../models/"
 openpose = OpenPose(params)
 caffe.set_mode_gpu()
 caffe.set_device(0)
-net_a = caffe.Net(Param_a.prototxt, Param_a.caffemodel, caffe.TEST)
-net_b = caffe.Net(Param_b.prototxt, Param_b.caffemodel, caffe.TEST)
+nets = []
+for scale in scales:
+    nets.append(caffe.Net(Param.prototxt, Param.caffemodel, caffe.TEST))
 print "Net loaded"
 
-currIndex = 0
+# Test Function
 first_run = True
 def func(frame):
+
+    # Get image processed for network, and scaled image
+    imagesForNet, imagesOrig = OpenPose.process_frames(frame, defRes, scales)
+
     # Reshape
-    #height, width, channels = frame.shape
-
-    rframe_a, imageForNet_a, padding_a = OpenPose.process_frame(frame, Param_a.boxsize, Param_a.padValue)
-    rframe_b, imageForNet_b, padding_b = OpenPose.process_frame(frame, Param_b.boxsize, Param_b.padValue)
-
     global first_run
     if first_run:
-        in_shape = net_a.blobs['image'].data.shape
-        in_shape = (1, 3, imageForNet_a.shape[1], imageForNet_a.shape[2])
-        net_a.blobs['image'].reshape(*in_shape)
-        net_a.reshape()
-
-        in_shape = net_b.blobs['image'].data.shape
-        in_shape = (1, 3, imageForNet_b.shape[1], imageForNet_b.shape[2])
-        net_b.blobs['image'].reshape(*in_shape)
-        net_b.reshape()
+        for i in range(0, len(scales)):
+            net = nets[i]
+            imageForNet = imagesForNet[i]
+            in_shape = net.blobs['image'].data.shape
+            in_shape = (1, 3, imageForNet.shape[1], imageForNet.shape[2])
+            net.blobs['image'].reshape(*in_shape)
+            net.reshape()
 
         first_run = False
         print "Reshaped"
 
-    net_a.blobs['image'].data[0,:,:,:] = imageForNet_a
-    net_a.forward()
-    heatmaps_a = net_a.blobs['net_output'].data[:,:,:,:]
-
-    net_b.blobs['image'].data[0,:,:,:] = imageForNet_b
-    net_b.forward()
-    heatmaps_b = net_b.blobs['net_output'].data[:,:,:,:]
+    # Forward pass to get heatmaps
+    heatmaps = []
+    for i in range(0, len(scales)):
+        net = nets[i]
+        imageForNet = imagesForNet[i]
+        net.blobs['image'].data[0,:,:,:] = imageForNet
+        net.forward()
+        heatmaps.append(net.blobs['net_output'].data[:,:,:,:])
 
     # Pose from HM Test
-    array, frame = openpose.poseFromHM(frame, [heatmaps_a, heatmaps_b], [1,0.5])
-    #array, frame = openpose.poseFromHM(frame, [heatmaps_a], [2])
+    array, frame = openpose.poseFromHM(frame, heatmaps, scales)
+
+    # Draw Heatmaps instead
+    #hm = heatmaps[0][:,0:18,:,:]; frame = OpenPose.draw_all(imagesOrig[0], hm, -1, 1, True)
+    #paf = heatmaps[0][:,20:,:,:]; frame = OpenPose.draw_all(imagesOrig[0], paf, -1, 4, False)
 
     return frame
 
