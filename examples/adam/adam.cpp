@@ -240,17 +240,12 @@ DEFINE_string(write_adam,               "",             "E.g.: /media/posefs3b/U
 #include <VisualizedData.h>
 #define SMPL_VIS_SCALING 100.0f
 
-smpl::SMPLParams sFrameParams;
-Eigen::Matrix<double, Eigen::Dynamic, 1> Vt_vec;
-Eigen::Matrix<double, Eigen::Dynamic, 1> J0_vec;
-TotalModel sTotalModel;
 const int NUMBER_BODY_KEYPOINTS = 20;
 const int NUMBER_HAND_KEYPOINTS = 21;
 const int NUMBER_FACE_KEYPOINTS = 70;
 const int NUMBER_FOOT_KEYPOINTS = 3;
 const int NUMBER_KEYPOINTS = 3*(NUMBER_BODY_KEYPOINTS + 2*NUMBER_HAND_KEYPOINTS); // targetJoints: Only for Body, LHand, RHand. No Face, no Foot
 const int NUMBER_TOTAL_KEYPOINTS = NUMBER_BODY_KEYPOINTS + 2*NUMBER_HAND_KEYPOINTS + 2*NUMBER_FOOT_KEYPOINTS + NUMBER_FACE_KEYPOINTS;
-const bool CERES_COUT_REPORT = false;
 
 void updateKeypoints(Eigen::MatrixXd& bodyJoints, Eigen::MatrixXd& lHandJoints, Eigen::MatrixXd& rHandJoints,
                      const std::array<double, NUMBER_KEYPOINTS>& targetJoints)
@@ -412,14 +407,9 @@ void updateOrResetKeypoint(Eigen::MatrixXd& targetJoint, short& foundTargetJoint
 // Wrapper<UserDatum> instead of Wrapper<op::Datum>
 struct UserDatum : public op::Datum
 {
-    // TotalModel sTotalModel;
-    // smpl::SMPLParams sFrameParams;
     std::array<double, NUMBER_KEYPOINTS> targetJoints; // Only for Body, LHand, RHand. No Face, no Foot
-    // Eigen::Matrix<double, Eigen::Dynamic, 1> Vt_vec;
-    // Eigen::Matrix<double, Eigen::Dynamic, 1> J0_vec;
 
-    UserDatum() //:
-        // boolThatUserNeedsForSomeReason{boolThatUserNeedsForSomeReason_}
+    UserDatum()
     {
         for (auto& targetJoint : targetJoints)
             targetJoint = 0;
@@ -431,7 +421,11 @@ class WUserPostProcessing : public op::Worker<std::shared_ptr<std::vector<UserDa
 {
 public:
     // Purely processing
-    WUserPostProcessing() :
+    WUserPostProcessing(const std::shared_ptr<smpl::SMPLParams>& frameParams,
+                        const std::shared_ptr<Eigen::Matrix<double, Eigen::Dynamic, 1>>& vtVec,
+                        const std::shared_ptr<Eigen::Matrix<double, Eigen::Dynamic, 1>>& j0Vec,
+                        const std::shared_ptr<TotalModel>& totalModel,
+                        const bool ceresDisplayReport) :
         mGTotalModelPath{"./model/adam_v1_plus2.json"},
         mPcaPath{"./model/adam_blendshapes_348_delta_norm.json"},
         mObjectPath{"./model/mesh_nofeet.obj"},
@@ -443,7 +437,11 @@ public:
         mLHandJoints(5, NUMBER_HAND_KEYPOINTS),// (3, HandModel::NUM_JOINTS);
         mRHandJoints(5, NUMBER_HAND_KEYPOINTS),// (3, HandModel::NUM_JOINTS);
         mLFootJoints(5, 3),// (3, 3);        //Heel, Toe
-        mRFootJoints(5, 3)// (3, 3);        //Heel, Toe
+        mRFootJoints(5, 3),// (3, 3);        //Heel, Toe
+        spFrameParams{frameParams},
+        spVtVec{vtVec},
+        spJ0Vec{j0Vec},
+        spTotalModel{totalModel}
     {
         // Reset to 0 all keypoints - Otherwise undefined behavior when fitting
         mBodyJoints.setZero();
@@ -454,14 +452,13 @@ public:
         mRFootJoints.setZero();
         for (auto& foundTargetJoint : mFoundTargetJoints)
             foundTargetJoint = -1;
-        // Load sTotalModel (model + data)
+        // Load spTotalModel (model + data)
         // ~100 milliseconds
-        LoadTotalModelFromObj(sTotalModel, mObjectPath);
+        LoadTotalModelFromObj(*spTotalModel, mObjectPath);
         // ~25 seconds
-        LoadTotalDataFromJson(sTotalModel, mGTotalModelPath, mPcaPath, mCorrespondencePath);
+        LoadTotalDataFromJson(*spTotalModel, mGTotalModelPath, mPcaPath, mCorrespondencePath);
     }
 
-    // Purely Visualization
     void initializationOnThread()
     {
     }
@@ -559,9 +556,9 @@ public:
 //     std::cout << targetJoints[i] << " ";
 //     if (i % 3 == 2)
 //         std::cout << "\n";
-//     if (i == NUMBER_BODY_KEYPOINTS*3-1)
+//     if (i == 3*NUMBER_BODY_KEYPOINTS-1)
 //         std::cout << "Left hand:\n";
-//     if (i == NUMBER_BODY_KEYPOINTS*3-1+21*3)
+//     if (i == 3*NUMBER_BODY_KEYPOINTS-1+3*NUMBER_HAND_KEYPOINTS)
 //         std::cout << "Right hand:\n";
 // }
 // std::cout << std::endl;
@@ -581,15 +578,15 @@ const auto start0 = std::chrono::high_resolution_clock::now();
                     // 2. x-orientation = 180, i.e., person standing up & looking to the camera
                     // 3. Because otherwise, if we call Adam_FastFit_Initialize twice (e.g., if a new person appears),
                     // it would use the latest ones from the last Adam_FastFit
-                    sFrameParams.m_adam_t(0) = mBodyJoints(0, 2);
-                    sFrameParams.m_adam_t(1) = mBodyJoints(1, 2);
-                    sFrameParams.m_adam_t(2) = mBodyJoints(2, 2);
-                    sFrameParams.m_adam_pose(0, 0) = 3.14159265358979323846264338327950288419716939937510582097494459;
+                    spFrameParams->m_adam_t(0) = mBodyJoints(0, 2);
+                    spFrameParams->m_adam_t(1) = mBodyJoints(1, 2);
+                    spFrameParams->m_adam_t(2) = mBodyJoints(2, 2);
+                    spFrameParams->m_adam_pose(0, 0) = 3.14159265358979323846264338327950288419716939937510582097494459;
                     // Fit initialization
-                    Adam_FastFit_Initialize(sTotalModel, sFrameParams, mBodyJoints, mRFootJoints, mLFootJoints,
+                    Adam_FastFit_Initialize(*spTotalModel, *spFrameParams, mBodyJoints, mRFootJoints, mLFootJoints,
                                             mRHandJoints, mLHandJoints, mFaceJoints, mCeresDisplayReport);
-                    Vt_vec = sTotalModel.m_meanshape + sTotalModel.m_shapespace_u * sFrameParams.m_adam_coeffs;
-                    J0_vec = sTotalModel.J_mu_ + sTotalModel.dJdc_ * sFrameParams.m_adam_coeffs;
+                    *spVtVec = spTotalModel->m_meanshape + spTotalModel->m_shapespace_u * spFrameParams->m_adam_coeffs;
+                    *spJ0Vec = spTotalModel->J_mu_ + spTotalModel->dJdc_ * spFrameParams->m_adam_coeffs;
                 }
                 // Other frames
                 else
@@ -598,7 +595,7 @@ const auto start0 = std::chrono::high_resolution_clock::now();
                     // inside for loop
                     // Here I read the pose data into mBodyJoints, mRFootJoints, mLFootJoints, mRHandJoints, mLHandJoints, mFaceJoints.
                     // call fitting function
-                    Adam_FastFit(sTotalModel, sFrameParams, mBodyJoints, mRFootJoints, mLFootJoints, mRHandJoints, mLHandJoints, mFaceJoints, mCeresDisplayReport);
+                    Adam_FastFit(*spTotalModel, *spFrameParams, mBodyJoints, mRFootJoints, mLFootJoints, mRHandJoints, mLHandJoints, mFaceJoints, mCeresDisplayReport);
                 }
 const auto duration0 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start0).count();
 std::cout << "IK:         " << duration0 * 1e-6 << std::endl;
@@ -630,6 +627,12 @@ private:
     Eigen::MatrixXd mLFootJoints;
     Eigen::MatrixXd mRFootJoints;
     std::array<short, NUMBER_TOTAL_KEYPOINTS> mFoundTargetJoints;
+
+    // Shared parameters
+    std::shared_ptr<smpl::SMPLParams> spFrameParams;
+    std::shared_ptr<Eigen::Matrix<double, Eigen::Dynamic, 1>> spVtVec;
+    std::shared_ptr<Eigen::Matrix<double, Eigen::Dynamic, 1>> spJ0Vec;
+    std::shared_ptr<TotalModel> spTotalModel;
 };
 
 // This worker will just read and return all the jpg files in a directory
@@ -637,11 +640,18 @@ class WUserOutput : public op::WorkerConsumer<std::shared_ptr<std::vector<UserDa
 {
 public:
     // Purely processing
-    WUserOutput()
+    WUserOutput(const std::shared_ptr<smpl::SMPLParams>& frameParams,
+                const std::shared_ptr<Eigen::Matrix<double, Eigen::Dynamic, 1>>& vtVec,
+                const std::shared_ptr<Eigen::Matrix<double, Eigen::Dynamic, 1>>& j0Vec,
+                const std::shared_ptr<TotalModel>& totalModel) :
+        spFrameParams{frameParams},
+        spVtVec{vtVec},
+        spJ0Vec{j0Vec},
+        spTotalModel{totalModel}
     {
-        // Load sTotalModel (model + data)
+        // Load spTotalModel (model + data)
         const bool unityCompatible = true;
-        spBvhWriter.reset(new BVHWriter{sTotalModel.m_parent, unityCompatible});
+        spBvhWriter.reset(new BVHWriter{spTotalModel->m_parent, unityCompatible});
     }
 
     ~WUserOutput()
@@ -693,21 +703,21 @@ const auto start = std::chrono::high_resolution_clock::now();
 
 // op::log(__LINE__);
                 // Visualization - ~800 msec
-// Constructor arguments: sTotalModel (big, always fixed, never changed), Vt_vec (big, constant after frame 1), J0_vec (~small, constant after frame 1)
-// t1 <-- sFrameParams (~small)
+// Constructor arguments: spTotalModel (big, always fixed, never changed), spVtVec (big, constant after frame 1), spJ0Vec (~small, constant after frame 1)
+// t1 <-- spFrameParams (~small)
 // t1 --> g_vis_data (huge), mResultBody
 const auto start1 = std::chrono::high_resolution_clock::now();
                 // ~20 ms
                 // BVH-Unity generation
-                ts.push_back(sFrameParams.m_adam_t); // BVH generation, Eigen::Vector3d(3, 1)
-                poses.push_back(sFrameParams.m_adam_pose); // BVH generation, Eigen::Matrix<double, 62, 3, Eigen::RowMajor>
+                mTrans.push_back(spFrameParams->m_adam_t); // BVH generation, Eigen::Vector3d(3, 1)
+                mPoses.push_back(spFrameParams->m_adam_pose); // BVH generation, Eigen::Matrix<double, 62, 3, Eigen::RowMajor>
 const auto duration1 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start1).count();
                 // OpenGL display/rendering
 const auto start2 = std::chrono::high_resolution_clock::now();
                 if (FLAGS_display == -1)
                 {
                     CMeshModelInstance cMeshModelInstance;
-                    GenerateMesh_Fast(cMeshModelInstance, mResultBody.data(), sFrameParams, sTotalModel, Vt_vec, J0_vec);
+                    GenerateMesh_Fast(cMeshModelInstance, mResultBody.data(), *spFrameParams, *spTotalModel, *spVtVec, *spJ0Vec);
                     VisualizedData g_vis_data; // --> Into op::Datum
                     CopyMesh(cMeshModelInstance, g_vis_data);
                     g_vis_data.targetJoint = targetJoints.data(); // Only for Body, LHand, RHand. No Face, no Foot
@@ -716,7 +726,7 @@ const auto start2 = std::chrono::high_resolution_clock::now();
                     g_vis_data.faceKeypoints.resize(70, 3);
                     if (!faceKeypoints3D.empty())
                     {
-                        for (auto part = 0 ; part < NUMBER_FACE_KEYPOINTS; part++)
+                        for (auto part = 0 ; part < faceKeypoints3D.getSize(1); part++)
                         {
                             if (faceKeypoints3D[{0, part, faceKeypoints3D.getSize(2)-1}] > 0.5)
                                 for (auto xyz = 0 ; xyz < faceKeypoints3D.getSize(2)-1 ; xyz++)
@@ -784,9 +794,9 @@ const auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(std::
                         this->stop();
                 }
 
-// sFrameParams.mouth_open;
-// sFrameParams.reye_open;
-// sFrameParams.leye_open;
+// spFrameParams->mouth_open;
+// spFrameParams->reye_open;
+// spFrameParams->leye_open;
 std::cout << "\nRender1:    " << duration1 * 1e-6
           << "\nRenderRest: " << duration2 * 1e-6
           << "\nTotal:      " << duration * 1e-6 << std::endl;
@@ -800,13 +810,13 @@ std::cout << "\nRender1:    " << duration1 * 1e-6
         }
     }
 
-    void callBVHWriter(const std::string& filename, double frame_time)
+    void callBVHWriter(const std::string& fileName, const double frameTime)
     {
-        spBvhWriter->parseInput(J0_vec, ts, poses);
-        spBvhWriter->writeBVH(filename, frame_time);
+        spBvhWriter->parseInput(*spJ0Vec, mTrans, mPoses);
+        spBvhWriter->writeBVH(fileName, frameTime);
         // // Debugging
-        // // std::cout << J0_vec.rows() << std::endl;
-        // for (const auto& pose : poses)
+        // // std::cout << spJ0Vec.rows() << std::endl;
+        // for (const auto& pose : mPoses)
         // {
         //     // Left arm
         //     std::cout << pose.row(16) << " " << pose.row(18) << " " << pose.row(20)
@@ -818,8 +828,8 @@ std::cout << "\nRender1:    " << duration1 * 1e-6
 private:
     // Write BVH file
     std::unique_ptr<BVHWriter> spBvhWriter;
-    std::vector<Eigen::Matrix<double, 3, 1>> ts; // record the translation across frames
-    std::vector<Eigen::Matrix<double, TotalModel::NUM_JOINTS, 3, Eigen::RowMajor>> poses; // record the pose change
+    std::vector<Eigen::Matrix<double, 3, 1>> mTrans; // record the translation across frames
+    std::vector<Eigen::Matrix<double, TotalModel::NUM_JOINTS, 3, Eigen::RowMajor>> mPoses; // record the pose change
 
     // Visualization
     std::unique_ptr<Renderer> spRender;
@@ -828,6 +838,12 @@ private:
 
     // Video AVI writing
     std::shared_ptr<op::VideoSaver> spVideoSaver;
+
+    // Shared parameters
+    std::shared_ptr<smpl::SMPLParams> spFrameParams;
+    std::shared_ptr<Eigen::Matrix<double, Eigen::Dynamic, 1>> spVtVec;
+    std::shared_ptr<Eigen::Matrix<double, Eigen::Dynamic, 1>> spJ0Vec;
+    std::shared_ptr<TotalModel> spTotalModel;
 };
 
 int openPoseDemo()
@@ -887,10 +903,15 @@ int openPoseDemo()
         op::Wrapper<std::vector<UserDatum>> opWrapper;
 
         // Adam added
-        auto wUserPostProcessing = std::make_shared<WUserPostProcessing>();
+        const auto frameParams = std::make_shared<smpl::SMPLParams>();
+        const auto vtVec = std::make_shared<Eigen::Matrix<double, Eigen::Dynamic, 1>>();
+        const auto j0Vec = std::make_shared<Eigen::Matrix<double, Eigen::Dynamic, 1>>();
+        const auto totalModel = std::make_shared<TotalModel>();
+        const bool ceresDisplayReport = false;
+        auto wUserPostProcessing = std::make_shared<WUserPostProcessing>(frameParams, vtVec, j0Vec, totalModel, ceresDisplayReport);
         const auto workerProcessingOnNewThread = true;
         opWrapper.setWorkerPostProcessing(wUserPostProcessing, workerProcessingOnNewThread);
-        auto wUserOutput = std::make_shared<WUserOutput>();
+        auto wUserOutput = std::make_shared<WUserOutput>(frameParams, vtVec, j0Vec, totalModel);
         const auto workerOutputOnNewThread = true;
         opWrapper.setWorkerOutput(wUserOutput, workerOutputOnNewThread);
 
