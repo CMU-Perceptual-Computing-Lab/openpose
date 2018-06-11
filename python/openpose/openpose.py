@@ -1,3 +1,8 @@
+"""
+Wrap the OpenPose library with Python.
+To install run `make install` and library will be stored in /usr/local/python
+"""
+
 import numpy as np
 import ctypes as ct
 import cv2
@@ -5,6 +10,9 @@ import os
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
 class OpenPose(object):
+    """
+    Ctypes linkiage
+    """
     _libop= np.ctypeslib.load_library('_openpose', dir_path+'/_openpose.so')
     _libop.newOP.argtypes = [
         ct.c_int, ct.c_char_p, ct.c_char_p, ct.c_char_p, ct.c_float, ct.c_float, ct.c_int, ct.c_float, ct.c_int, ct.c_bool, ct.c_char_p]
@@ -30,6 +38,17 @@ class OpenPose(object):
     _libop.poseFromHeatmap.restype = None
 
     def __init__(self, params):
+        """
+        OpenPose Constructor: Prepares OpenPose object
+
+        Parameters
+        ----------
+        params : dict of required parameters. refer to openpose example for more details
+
+        Returns
+        -------
+        outs: OpenPose object
+        """
         self.op = self._libop.newOP(params["logging_level"],
                                     params["output_resolution"],
                                     params["net_resolution"],
@@ -43,9 +62,25 @@ class OpenPose(object):
                                     params["default_model_folder"])
 
     def __del__(self):
+        """
+        OpenPose Destructor: Destroys OpenPose object
+        """
         self._libop.delOP(self.op)
 
     def forward(self, image, display = False):
+        """
+        Forward: Takes in an image and returns the human 2D poses, along with drawn image if required
+
+        Parameters
+        ----------
+        image : color image of type ndarray
+        display : If set to true, we return both the pose and an annotated image for visualization
+
+        Returns
+        -------
+        array: ndarray of human 2D poses [People * BodyPart * XYConfidence]
+        displayImage : image for visualization
+        """
         shape = image.shape
         displayImage = np.zeros(shape=(image.shape),dtype=np.uint8)
         size = np.zeros(shape=(3),dtype=np.int32)
@@ -57,6 +92,20 @@ class OpenPose(object):
         return array
 
     def poseFromHM(self, image, hm, ratios=[1]):
+        """
+        Pose From Heatmap: Takes in an image, computed heatmaps, and require scales and computes pose
+
+        Parameters
+        ----------
+        image : color image of type ndarray
+        hm : heatmap of type ndarray with heatmaps and part affinity fields
+        ratios : scaling ration if needed to fuse multiple scales
+
+        Returns
+        -------
+        array: ndarray of human 2D poses [People * BodyPart * XYConfidence]
+        displayImage : image for visualization
+        """
         if len(ratios) != len(hm):
             raise Exception("Ratio shape mismatch")
 
