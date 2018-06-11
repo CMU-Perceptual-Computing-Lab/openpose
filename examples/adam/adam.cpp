@@ -666,10 +666,8 @@ public:
         int argc = 0;
         // char* argv[0];
         spRender.reset(new Renderer{&argc, nullptr});
-        spRender->options.nRange=40;
-        // spRender->options.nRange=150;
-        spRender->options.yrot=-45;
-        // spRender->options.xrot=25;
+        spRender->options.yrot=45;
+        spRender->options.xrot=25;
         // spRender->options.meshSolid = true;
         spRender->options.meshSolid = false;
         upReadBuffer.reset(new GLubyte[spRender->options.width * spRender->options.height * 3]);
@@ -741,6 +739,8 @@ const auto start2 = std::chrono::high_resolution_clock::now();
                 }
                 // g_vis_data: 2 for full body, 3 for left hand, 4 for right hand, 5 for face
                 g_vis_data.vis_type = 2;
+                if (g_vis_data.vis_type <= 2) spRender->options.nRange=150;
+                else spRender->options.nRange=40;
                 g_vis_data.read_buffer = upReadBuffer.get();
 // BELOW IS PURELY OPENGL
 // t3 <-- g_vis_data (struct, big)
