@@ -337,7 +337,7 @@ int mapOPToDome(const int oPPart)
     return -1;
 }
 
-const auto NUMBER_TO_RESET_KEYPOINT = 4;
+const auto NUMBER_TO_RESET_KEYPOINT = 0;
 void updateOrResetKeypoint(double* targetJoint, short& foundTargetJoint, const float* const poseKeypoint3D)
 {
     try
@@ -432,6 +432,10 @@ class WUserPostProcessing : public op::Worker<std::shared_ptr<std::vector<UserDa
 public:
     // Purely processing
     WUserPostProcessing() :
+        mGTotalModelPath{"./model/adam_v1_plus2.json"},
+        mPcaPath{"./model/adam_blendshapes_348_delta_norm.json"},
+        mObjectPath{"./model/mesh_nofeet.obj"},
+        mCorrespondencePath{"./model/correspondences_nofeet.txt"},
         mCeresDisplayReport{CERES_COUT_REPORT},
         mInitialized{false},
         mBodyJoints(5, NUMBER_BODY_KEYPOINTS),// (3, targetJoints.size());
@@ -439,11 +443,7 @@ public:
         mLHandJoints(5, NUMBER_HAND_KEYPOINTS),// (3, HandModel::NUM_JOINTS);
         mRHandJoints(5, NUMBER_HAND_KEYPOINTS),// (3, HandModel::NUM_JOINTS);
         mLFootJoints(5, 3),// (3, 3);        //Heel, Toe
-        mRFootJoints(5, 3),// (3, 3);        //Heel, Toe
-        mGTotalModelPath{"./model/adam_v1_plus2.json"},
-        mPcaPath{"./model/adam_blendshapes_348_delta_norm.json"},
-        mObjectPath{"./model/mesh_nofeet.obj"},
-        mCorrespondencePath{"./model/correspondences_nofeet.txt"}
+        mRFootJoints(5, 3)// (3, 3);        //Heel, Toe
     {
         // Reset to 0 all keypoints - Otherwise undefined behavior when fitting
         mBodyJoints.setZero();
@@ -452,6 +452,8 @@ public:
         mRHandJoints.setZero();
         mLFootJoints.setZero();
         mRFootJoints.setZero();
+        for (auto& foundTargetJoint : mFoundTargetJoints)
+            foundTargetJoint = -1;
         // Load sTotalModel (model + data)
         // ~100 milliseconds
         LoadTotalModelFromObj(sTotalModel, mObjectPath);
@@ -486,13 +488,9 @@ public:
                               __LINE__, __FUNCTION__, __FILE__);
                 // Update body
                 for (auto part = 0 ; part < 19; part++)
-                // for (auto part = 0 ; part < poseKeypoints3D.getSize(1); part++)
-                {
-                    const auto adamPart = mapOPToDome(part);
-                    const auto baseIndex = adamPart*(poseKeypoints3D.getSize(2)-1);
-                    updateOrResetKeypoint(&targetJoints[baseIndex], mFoundTargetJoints[part],
+                    updateOrResetKeypoint(&targetJoints[mapOPToDome(part)*(poseKeypoints3D.getSize(2)-1)],
+                                          mFoundTargetJoints[part],
                                           &poseKeypoints3D[{0, part, 0}]);
-                }
                 // Update left/right hand
                 const auto bodyOffset = NUMBER_BODY_KEYPOINTS*(poseKeypoints3D.getSize(2)-1); // NUMBER_BODY_KEYPOINTS = #parts_OP + 1 (top_head)
                 const auto handOffset = handKeypoints3D[0].getSize(1)*(handKeypoints3D[0].getSize(2)-1);
@@ -515,12 +513,9 @@ public:
                             };
                         }
                         for (auto part = 0 ; part < handKeypoints3D[hand].getSize(1); part++)
-                        {
-                            const auto baseIndex = bodyOffset + hand*handOffset + part*(handKeypoints3D[hand].getSize(2)-1);
-                            updateOrResetKeypoint(&targetJoints[baseIndex],
+                            updateOrResetKeypoint(&targetJoints[bodyOffset + hand*handOffset + part*(handKeypoints3D[hand].getSize(2)-1)],
                                                   mFoundTargetJoints[part + NUMBER_BODY_KEYPOINTS + hand*NUMBER_HAND_KEYPOINTS],
                                                   &handKeypoints3D[hand][{0, part, 0}]);
-                        }
                     }
                 }
 
@@ -529,22 +524,16 @@ public:
                 {
                     // Update LFoot
                     for (auto adamPart = 0 ; adamPart < NUMBER_FOOT_KEYPOINTS; adamPart++)
-                    {
-                        const auto part = adamPart + 19;
                         updateOrResetKeypoint(mLFootJoints,
                                               mFoundTargetJoints[adamPart + NUMBER_BODY_KEYPOINTS + 2*NUMBER_HAND_KEYPOINTS],
-                                              &poseKeypoints3D[{0, part, 0}],
+                                              &poseKeypoints3D[{0, adamPart + 19, 0}],
                                               adamPart);
-                    }
                     // Update RFoot
                     for (auto adamPart = 0 ; adamPart < NUMBER_FOOT_KEYPOINTS; adamPart++)
-                    {
-                        const auto part = adamPart + 19 + NUMBER_FOOT_KEYPOINTS;
                         updateOrResetKeypoint(mRFootJoints,
                                               mFoundTargetJoints[adamPart + NUMBER_BODY_KEYPOINTS + 2*NUMBER_HAND_KEYPOINTS + NUMBER_FOOT_KEYPOINTS],
-                                              &poseKeypoints3D[{0, part, 0}],
+                                              &poseKeypoints3D[{0, adamPart + 19 + NUMBER_FOOT_KEYPOINTS, 0}],
                                               adamPart);
-                    }
                 }
 
                 // Update Face data
@@ -597,7 +586,8 @@ const auto start0 = std::chrono::high_resolution_clock::now();
                     sFrameParams.m_adam_t(2) = mBodyJoints(2, 2);
                     sFrameParams.m_adam_pose(0, 0) = 3.14159265358979323846264338327950288419716939937510582097494459;
                     // Fit initialization
-                    Adam_FastFit_Initialize(sTotalModel, sFrameParams, mBodyJoints, mRFootJoints, mLFootJoints, mRHandJoints, mLHandJoints, mFaceJoints, mCeresDisplayReport);
+                    Adam_FastFit_Initialize(sTotalModel, sFrameParams, mBodyJoints, mRFootJoints, mLFootJoints,
+                                            mRHandJoints, mLHandJoints, mFaceJoints, mCeresDisplayReport);
                     Vt_vec = sTotalModel.m_meanshape + sTotalModel.m_shapespace_u * sFrameParams.m_adam_coeffs;
                     J0_vec = sTotalModel.J_mu_ + sTotalModel.dJdc_ * sFrameParams.m_adam_coeffs;
                 }
@@ -623,6 +613,12 @@ std::cout << "IK:         " << duration0 * 1e-6 << std::endl;
     }
 
 private:
+    // Adam model files
+    const std::string mGTotalModelPath;
+    const std::string mPcaPath;
+    const std::string mObjectPath;
+    const std::string mCorrespondencePath;
+
     // Processing
     const bool mCeresDisplayReport;
     bool mInitialized;
@@ -634,11 +630,6 @@ private:
     Eigen::MatrixXd mLFootJoints;
     Eigen::MatrixXd mRFootJoints;
     std::array<short, NUMBER_TOTAL_KEYPOINTS> mFoundTargetJoints;
-
-    const std::string mGTotalModelPath;
-    const std::string mPcaPath;
-    const std::string mObjectPath;
-    const std::string mCorrespondencePath;
 };
 
 // This worker will just read and return all the jpg files in a directory
@@ -655,23 +646,28 @@ public:
 
     ~WUserOutput()
     {
-
+        // Write BVH file
         this->callBVHWriter(FLAGS_write_bvh, 0.0333333);
-        this->stop();
     }
 
     // Purely Visualization
     void initializationOnThread()
     {
-        int argc = 0;
-        // char* argv[0];
-        spRender.reset(new Renderer{&argc, nullptr});
-        spRender->options.yrot=45;
-        spRender->options.xrot=25;
-        // spRender->options.meshSolid = true;
-        spRender->options.meshSolid = false;
-        upReadBuffer.reset(new GLubyte[spRender->options.width * spRender->options.height * 3]);
-        // GLubyte read_buffer[spRender->options.width * spRender->options.height * 3]; // 600 * 600 RGB image
+        // OpenGL display/rendering
+        if (FLAGS_display == -1)
+        {
+            int argc = 0;
+            // char* argv[0];
+            spRender.reset(new Renderer{&argc, nullptr});
+            spRender->options.nRange=40;
+            // spRender->options.yrot=-45;
+            spRender->options.yrot=45;
+            spRender->options.xrot=25;
+            // spRender->options.meshSolid = true;
+            spRender->options.meshSolid = false;
+            upReadBuffer.reset(new GLubyte[spRender->options.width * spRender->options.height * 3]);
+            // GLubyte read_buffer[spRender->options.width * spRender->options.height * 3]; // 600 * 600 RGB image
+        }
 
         // // Display in opencv window
         // cv::namedWindow("Display window", cv::WINDOW_AUTOSIZE);
@@ -701,94 +697,99 @@ const auto start = std::chrono::high_resolution_clock::now();
 // t1 <-- sFrameParams (~small)
 // t1 --> g_vis_data (huge), mResultBody
 const auto start1 = std::chrono::high_resolution_clock::now();
-                CMeshModelInstance mesh;
-                GenerateMesh_Fast(mesh, mResultBody.data(), sFrameParams, sTotalModel, Vt_vec, J0_vec);
-const auto duration1 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start1).count();
-                VisualizedData g_vis_data; // --> Into op::Datum
-                CopyMesh(mesh, g_vis_data);
-                // ~0.0005 ms
-// op::log(__LINE__);
-// BELOW IS PURELY OPENGL
-// t2 <-- g_vis_data (huge), sFrameParams (~small), targetJoints (optional, small), resultJoint (optional, small)
-// t2 --> g_vis_data (pts modified, struct, big)
-const auto start2 = std::chrono::high_resolution_clock::now();
                 // ~20 ms
-                // BVH generation
+                // BVH-Unity generation
                 ts.push_back(sFrameParams.m_adam_t); // BVH generation, Eigen::Vector3d(3, 1)
                 poses.push_back(sFrameParams.m_adam_pose); // BVH generation, Eigen::Matrix<double, 62, 3, Eigen::RowMajor>
-                // OpenGL Display
-                g_vis_data.targetJoint = targetJoints.data(); // Only for Body, LHand, RHand. No Face, no Foot
-                // g_vis_data.targetJoint = nullptr;
-                g_vis_data.resultJoint = mResultBody.data();
-                g_vis_data.faceKeypoints.resize(70, 3);
-                if (!faceKeypoints3D.empty())
+const auto duration1 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start1).count();
+                // OpenGL display/rendering
+const auto start2 = std::chrono::high_resolution_clock::now();
+                if (FLAGS_display == -1)
                 {
-                    for (auto part = 0 ; part < NUMBER_FACE_KEYPOINTS; part++)
+                    CMeshModelInstance cMeshModelInstance;
+                    GenerateMesh_Fast(cMeshModelInstance, mResultBody.data(), sFrameParams, sTotalModel, Vt_vec, J0_vec);
+                    VisualizedData g_vis_data; // --> Into op::Datum
+                    CopyMesh(cMeshModelInstance, g_vis_data);
+                    g_vis_data.targetJoint = targetJoints.data(); // Only for Body, LHand, RHand. No Face, no Foot
+                    // g_vis_data.targetJoint = nullptr;
+                    g_vis_data.resultJoint = mResultBody.data();
+                    g_vis_data.faceKeypoints.resize(70, 3);
+                    if (!faceKeypoints3D.empty())
                     {
-                        if (faceKeypoints3D[{0, part, faceKeypoints3D.getSize(2)-1}] > 0.5)
-                            for (auto xyz = 0 ; xyz < faceKeypoints3D.getSize(2)-1 ; xyz++)
-                                g_vis_data.faceKeypoints(part, xyz) = faceKeypoints3D[{0, part, xyz}];
-                        else
+                        for (auto part = 0 ; part < NUMBER_FACE_KEYPOINTS; part++)
                         {
-                            g_vis_data.faceKeypoints(part, 0) = 0;
-                            g_vis_data.faceKeypoints(part, 1) = 0;
-                            g_vis_data.faceKeypoints(part, 2) = 0;
+                            if (faceKeypoints3D[{0, part, faceKeypoints3D.getSize(2)-1}] > 0.5)
+                                for (auto xyz = 0 ; xyz < faceKeypoints3D.getSize(2)-1 ; xyz++)
+                                    g_vis_data.faceKeypoints(part, xyz) = faceKeypoints3D[{0, part, xyz}];
+                            else
+                            {
+                                g_vis_data.faceKeypoints(part, 0) = 0;
+                                g_vis_data.faceKeypoints(part, 1) = 0;
+                                g_vis_data.faceKeypoints(part, 2) = 0;
+                            }
                         }
+                        g_vis_data.faceKeypoints *= 100;
                     }
-                    g_vis_data.faceKeypoints *= 100;
+                    // g_vis_data: 2 for full body, 3 for left hand, 4 for right hand, 5 for face
+                    g_vis_data.vis_type = 2;
+                    // If full body --> nRange > whole body object
+                    if (g_vis_data.vis_type <= 2)
+                        spRender->options.nRange=150;
+                    // Otherwise (hand/face) --> ~zoom in
+                    else
+                        spRender->options.nRange=40;
+                    g_vis_data.read_buffer = upReadBuffer.get();
+                    // ~0.001 ms
+                    spRender->RenderHand(g_vis_data);
+                    // ~60 ms
+                    spRender->RenderAndRead(); // read the image into read_buffer
+                    // spRender->Display();
+
+                    // Save/display Adam display in opencv window
+                    if (!FLAGS_write_adam.empty())
+                    {
+                        // img is y-flipped, and in RGB order
+                        cv::Mat img(spRender->options.height, spRender->options.width, CV_8UC3, upReadBuffer.get());
+                        cv::flip(img, img, 0);
+                        cv::cvtColor(img, img, cv::COLOR_RGB2BGR);
+                        if (spVideoSaver == nullptr)
+                        {
+                            const auto originalVideoFps = 30;
+                            spVideoSaver = std::make_shared<op::VideoSaver>(
+                                FLAGS_write_adam, CV_FOURCC('M','J','P','G'),
+                                originalVideoFps, op::Point<int>{img.cols, img.rows}
+                            );
+                        }
+                        spVideoSaver->write(img);
+                        // // cv::imshow( "Display window", img );
+                        // // cv::waitKey(16);
+                    }
                 }
-                // g_vis_data: 2 for full body, 3 for left hand, 4 for right hand, 5 for face
-                g_vis_data.vis_type = 2;
-                if (g_vis_data.vis_type <= 2) spRender->options.nRange=150;
-                else spRender->options.nRange=40;
-                g_vis_data.read_buffer = upReadBuffer.get();
-// BELOW IS PURELY OPENGL
-// t3 <-- g_vis_data (struct, big)
-                // ~0.001 ms
-                spRender->RenderHand(g_vis_data);
-                // ~60 ms
-                spRender->RenderAndRead(); // read the image into read_buffer
-                // spRender->Display();
 const auto duration2 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start2).count();
 const auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start).count();
 
-                // Save/display in opencv window
-                if (!FLAGS_write_adam.empty())
+                // Display rendered output image
+                if (FLAGS_display != 0)
                 {
-                    cv::Mat img(spRender->options.height, spRender->options.width, CV_8UC3, upReadBuffer.get()); // img is y-flipped, and in RGB order
-                    cv::flip(img, img, 0);
-                    cv::cvtColor(img, img, cv::COLOR_RGB2BGR);
-                    if (spVideoSaver == nullptr)
+                    cv::imshow("OpenPose 2-D view", datum.cvOutputData);
+                    // Display image and sleeps at least 1 ms (it usually sleeps ~5-10 msec to display the image)
+                    char key = (char)cv::waitKey(33);
+                    if (key == ' ')
                     {
-                        const auto originalVideoFps = 30;
-                        spVideoSaver = std::make_shared<op::VideoSaver>(
-                            FLAGS_write_adam, CV_FOURCC('M','J','P','G'),
-                            originalVideoFps, op::Point<int>{img.cols, img.rows}
-                        );
+                        do
+                            key = (char)cv::waitKey(33);
+                        while (key == -1);
                     }
-                    spVideoSaver->write(img);
-                    // // cv::imshow( "Display window", img );
-                    // // cv::waitKey(16);
+                    if (key == 27)
+                        this->stop();
                 }
-// sFrameParams.mouse_open;
+
+// sFrameParams.mouth_open;
 // sFrameParams.reye_open;
 // sFrameParams.leye_open;
 std::cout << "\nRender1:    " << duration1 * 1e-6
           << "\nRenderRest: " << duration2 * 1e-6
           << "\nTotal:      " << duration * 1e-6 << std::endl;
-
-                // Display rendered output image
-                cv::imshow("OpenPose 2-D view", datum.cvOutputData);
-                // Display image and sleeps at least 1 ms (it usually sleeps ~5-10 msec to display the image)
-                char key = (char)cv::waitKey(33);
-                if (key == ' ')
-                {
-                    do
-                        key = (char)cv::waitKey(33);
-                    while (key == -1);
-                }
-                if (key == 27)
-                    this->stop();
             }
         }
         catch (const std::exception& e)
