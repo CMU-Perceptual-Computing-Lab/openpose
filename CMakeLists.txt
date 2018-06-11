@@ -229,6 +229,7 @@ option(DOWNLOAD_FACE_MODEL "Download face model." ON)
 # More options
 option(BUILD_EXAMPLES "Build OpenPose examples." ON)
 option(BUILD_DOCS "Build OpenPose documentation." OFF)
+option(BUILD_PYTHON "Build OpenPose python." ON)
 
 # Build as shared library
 option(BUILD_SHARED_LIBS "Build as shared lib" ON)
@@ -751,7 +752,9 @@ message(STATUS "Models Downloaded.")
 
 ### PYTHON
 if (Caffe_FOUND)
-  add_subdirectory(python)
+  if(BUILD_PYTHON)
+    add_subdirectory(python)
+  endif ()
 endif()
 
 ### GENERATE DOCUMENTATION
