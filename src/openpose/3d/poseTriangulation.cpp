@@ -306,6 +306,7 @@ namespace op
                     }
                 }
                 // 3D reconstruction
+                auto reprojectionErrorTotal = 0.0;
                 keypoints3D.reset({ 1, numberBodyParts, 4 }, 0);
                 if (!xyPoints.empty())
                 {
@@ -314,10 +315,13 @@ namespace op
                     for (auto i = 0u; i < xyPoints.size(); i++)
                     {
                         cv::Mat reconstructedPoint;
-                        triangulateWithOptimization(reconstructedPoint, cameraMatricesPerPoint[i], xyPoints[i]);
+                        reprojectionErrorTotal += triangulateWithOptimization(reconstructedPoint,
+                                                                              cameraMatricesPerPoint[i],
+                                                                              xyPoints[i]);
                         xyzPoints[i] = cv::Point3d{reconstructedPoint.at<double>(0), reconstructedPoint.at<double>(1),
                             reconstructedPoint.at<double>(2)};
                     }
+                    reprojectionErrorTotal /= xyPoints.size();
 
                     // 3D points to pose
                     // OpenCV alternative:
@@ -339,6 +343,7 @@ namespace op
                         }
                     }
                 }
+                // log("Reprojection error: " + std::to_string(reprojectionErrorTotal)); // To debug reprojection error
             }
             return keypoints3D;
         }
