@@ -51,25 +51,26 @@ void Adam_FitTotalBodyCeres3d2d( TotalModel &adam,
 	Eigen::MatrixXd &faceJoints,
 	double* calibK);
 
-void Adam_FastFit_Initialize(TotalModel &adam,
+void Adam_FastFit_Initialize(const TotalModel &adam,
 	smpl::SMPLParams &frame_param,
-	Eigen::MatrixXd &BodyJoints,
-	Eigen::MatrixXd &rFoot,
-	Eigen::MatrixXd &lFoot,
-	Eigen::MatrixXd &rHandJoints,
-	Eigen::MatrixXd &lHandJoints,
-	Eigen::MatrixXd &faceJoints,
-	bool verbose=false);
+	const Eigen::MatrixXd &BodyJoints,
+	const Eigen::MatrixXd &rFoot,
+	const Eigen::MatrixXd &lFoot,
+	const Eigen::MatrixXd &rHandJoints,
+	const Eigen::MatrixXd &lHandJoints,
+	const Eigen::MatrixXd &faceJoints,
+	const bool verbose=false);
 
-void Adam_FastFit(TotalModel &adam,
+void Adam_FastFit(const TotalModel &adam,
 	smpl::SMPLParams &frame_param,
-	Eigen::MatrixXd &BodyJoints,
-	Eigen::MatrixXd &rFoot,
-	Eigen::MatrixXd &lFoot,
-	Eigen::MatrixXd &rHandJoints,
-	Eigen::MatrixXd &lHandJoints,
-	Eigen::MatrixXd &faceJoints,
-	bool verbose=false);
+	const Eigen::MatrixXd &BodyJoints,
+	const Eigen::MatrixXd &rFoot,
+	const Eigen::MatrixXd &lFoot,
+	const Eigen::MatrixXd &rHandJoints,
+	const Eigen::MatrixXd &lHandJoints,
+	const Eigen::MatrixXd &faceJoints,
+	const bool verbose=false,
+	const unsigned int threadId=0);
 
 void Adam_Fit_PAF(TotalModel &adam,
 	smpl::SMPLParams &frame_param,

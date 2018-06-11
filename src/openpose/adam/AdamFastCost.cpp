@@ -428,7 +428,7 @@ bool AdamFullCost::Evaluate(double const* const* parameters,
             tempJoints.block(3*(i + offset), 0, 3, 1) = outJoint.block(3 * fit_data_.adam.m_correspond_adam2rHand_adamIdx(i), 0, 3, 1);
         }
         offset += fit_data_.adam.m_correspond_adam2rHand_adamIdx.rows();
-        for (int i = 0; i < corres_vertex2targetpt.size(); i++)
+        for (auto i = 0u; i < corres_vertex2targetpt.size(); i++)
         {
             tempJoints.block(3*(i + offset), 0, 3, 1) = outVert.row(i).transpose();
         }
@@ -491,7 +491,7 @@ bool AdamFullCost::Evaluate(double const* const* parameters,
         // SparseRegressor only set the data for body & face, we need to copy finger data from FK output
         std::copy(outJoint.data() + 3 * 22, outJoint.data() + 3 * 62,  tempJoints.data() + 3 * fit_data_.adam.h36m_jointConst_smcIdx.size()); // 22-42 are left hand, 42 - 62 are right hand
         // copy foot & face vertex
-        for (auto i = 0; i < corres_vertex2targetpt.size(); i++)
+        for (auto i = 0u; i < corres_vertex2targetpt.size(); i++)
         {
             tempJoints[(m_nCorrespond_adam2joints + i) * 3 + 0] = outVert(corres_vertex2targetpt[i].first, 0);
             tempJoints[(m_nCorrespond_adam2joints + i) * 3 + 1] = outVert(corres_vertex2targetpt[i].first, 1);
@@ -504,7 +504,7 @@ bool AdamFullCost::Evaluate(double const* const* parameters,
                       dOdP_data + 3 * fit_data_.adam.h36m_jointConst_smcIdx.size() * TotalModel::NUM_POSE_PARAMETERS);
             std::copy(dTJdc.data() + 3 * 22 * TotalModel::NUM_SHAPE_COEFFICIENTS, dTJdc.data() + 3 * 62 * TotalModel::NUM_SHAPE_COEFFICIENTS,
                       dOdc_data + 3 * fit_data_.adam.h36m_jointConst_smcIdx.size() * TotalModel::NUM_SHAPE_COEFFICIENTS);
-            for (auto i = 0; i < corres_vertex2targetpt.size(); i++)
+            for (auto i = 0u; i < corres_vertex2targetpt.size(); i++)
             {
                 std::copy(dVdP_data + (corres_vertex2targetpt[i].first) * 3 * TotalModel::NUM_POSE_PARAMETERS,
                           dVdP_data + (corres_vertex2targetpt[i].first + 1) * 3 * TotalModel::NUM_POSE_PARAMETERS,
@@ -864,7 +864,7 @@ void AdamFullCost::select_lbs(
 {
     // read adam model and corres_vertex2targetpt from the class member
     using namespace Eigen;
-    assert(outVert.rows() == total_vertex.size());
+    assert((unsigned int)outVert.rows() == total_vertex.size());
     std::fill(dVdc_data, dVdc_data + 3 * total_vertex.size() * TotalModel::NUM_SHAPE_COEFFICIENTS, 0); // dVdc.setZero();
     std::fill(dVdP_data, dVdP_data + 3 * total_vertex.size() * TotalModel::NUM_POSE_PARAMETERS, 0); // dVdP.setZero();
     const double* dTdc_data = dTdc.data();
@@ -908,7 +908,7 @@ void AdamFullCost::select_lbs(
                 double* dVdP_row1 = dVdP_data + (i * 3 + 1) * TotalModel::NUM_POSE_PARAMETERS;
                 double* dVdP_row2 = dVdP_data + (i * 3 + 2) * TotalModel::NUM_POSE_PARAMETERS;
                 const double* dTdP_base = dTdP_data + idj * 12 * TotalModel::NUM_POSE_PARAMETERS;
-                for (int j = 0; j < parentIndexes[idj].size(); j++)
+                for (auto j = 0u; j < parentIndexes[idj].size(); j++)
                 {
                     const int idp = parentIndexes[idj][j];
                     // The following lines are equiv to
@@ -976,7 +976,7 @@ void AdamFullCost::select_lbs(
     // read adam model and total_vertex from the class member
     using namespace Eigen;
     // Map< const Matrix<double, Dynamic, 1> > c_bodyshape(c, TotalModel::NUM_SHAPE_COEFFICIENTS);
-    assert(outVert.rows() == total_vertex.size());
+    assert((unsigned int)outVert.rows() == total_vertex.size());
     // const Eigen::MatrixXd& dV0dc = fit_data_.adam.m_shapespace_u;
     const double* dV0dc_data = fit_data_.adam.m_shapespace_u.data();
     const double* meanshape_data = fit_data_.adam.m_meanshape.data();
@@ -1021,7 +1021,7 @@ void AdamFullCost::SparseRegress(const Eigen::SparseMatrix<double>& reg, const d
 {
     const int num_J = m_nCorrespond_adam2joints;
     std::fill(J_data, J_data + 3 * num_J, 0);
-    for (int ic = 0; ic < total_vertex.size(); ic++)
+    for (auto ic = 0u; ic < total_vertex.size(); ic++)
     {
         const int c = total_vertex[ic];
         for (Eigen::SparseMatrix<double>::InnerIterator it(reg, c); it; ++it)
@@ -1042,7 +1042,7 @@ void AdamFullCost::SparseRegress(const Eigen::SparseMatrix<double>& reg, const d
         assert(dVdc_data != nullptr && dJdP_data != nullptr && dJdc_data != nullptr);
         std::fill(dJdP_data, dJdP_data + 3 * num_J * TotalModel::NUM_POSE_PARAMETERS, 0.0);
         std::fill(dJdc_data, dJdc_data + 3 * num_J * TotalModel::NUM_SHAPE_COEFFICIENTS, 0.0);
-        for (int ic = 0; ic < total_vertex.size(); ic++)
+        for (auto ic = 0u; ic < total_vertex.size(); ic++)
         {
             const int c = total_vertex[ic];
             for (Eigen::SparseMatrix<double>::InnerIterator it(reg, c); it; ++it)

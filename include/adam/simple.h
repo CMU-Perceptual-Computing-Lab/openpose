@@ -205,9 +205,11 @@ namespace smpl {
         bool m_bValidLHand;
         bool m_bValidAdam;
 
+        // for Unity
         float mouth_open;
         float leye_open;
         float reye_open;
+        float dist_root_foot;
 
         // TODO refactor to remove hard coded sizes
         SMPLParams() {

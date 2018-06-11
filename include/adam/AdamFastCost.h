@@ -8,14 +8,14 @@
 class AdamFastCost: public ceres::CostFunction
 {
 public:
-	AdamFastCost(TotalModel &adam,
-		Eigen::MatrixXd &Joints,
-		Eigen::MatrixXd &rFoot,     //3x2 //Heel, Toe
-		Eigen::MatrixXd &lFoot,
-		Eigen::MatrixXd &faceJoints,
-		Eigen::MatrixXd &lHandJoints,
-		Eigen::MatrixXd &rHandJoints,
-		double* p_adam_coeff
+	AdamFastCost(const TotalModel &adam,
+		const Eigen::MatrixXd &Joints,
+		const Eigen::MatrixXd &rFoot,     //3x2 //Heel, Toe
+		const Eigen::MatrixXd &lFoot,
+		const Eigen::MatrixXd &faceJoints,
+		const Eigen::MatrixXd &lHandJoints,
+		const Eigen::MatrixXd &rHandJoints,
+		const double* const p_adam_coeff
 	): m_adam(adam), m_rfoot_joints(rFoot), m_lfoot_joints(lFoot), m_bodyJoints(Joints), m_FaceJoints(faceJoints),
 		m_lHandJoints(lHandJoints), m_rHandJoints(rHandJoints), res_dim(3), verbose(false)
 	{
@@ -25,8 +25,8 @@ public:
 	}
 	virtual ~AdamFastCost() {}
 
-	void UpdateJoints(Eigen::MatrixXd &Joints, Eigen::MatrixXd &rFoot, Eigen::MatrixXd &lFoot, Eigen::MatrixXd &faceJoints,
-		Eigen::MatrixXd &lHandJoints, Eigen::MatrixXd &rHandJoints)
+	void UpdateJoints(const Eigen::MatrixXd &Joints, const Eigen::MatrixXd &rFoot, const Eigen::MatrixXd &lFoot, const Eigen::MatrixXd &faceJoints,
+		const Eigen::MatrixXd &lHandJoints, const Eigen::MatrixXd &rHandJoints)
 	{
 		m_bodyJoints << Joints;
 		m_rfoot_joints << rFoot;
@@ -42,10 +42,10 @@ public:
 		using namespace cv;
 		using namespace Eigen;
 
-		double BODYJOINT_WEIGHT_Strong = 1;
-		double BODYJOINT_WEIGHT = 1;
-		double HANDJOINT_WEIGHT = 1;
-		double VERTEX_WEIGHT = 1;
+		const double BODYJOINT_WEIGHT_Strong = 1;
+		const double BODYJOINT_WEIGHT = 1;
+		const double HANDJOINT_WEIGHT = 1;
+		const double VERTEX_WEIGHT = 1;
 
 		m_nCorrespond_adam2joints = m_adam.m_indices_jointConst_adamIdx.rows();
 		m_nCorrespond_adam2joints += m_adam.m_correspond_adam2lHand_adamIdx.rows();
@@ -209,15 +209,13 @@ public:
 
 struct AdamFitData
 {
-	AdamFitData(TotalModel &adam, Eigen::MatrixXd &Joints, Eigen::MatrixXd &rFoot, Eigen::MatrixXd &lFoot,
-		Eigen::MatrixXd &faceJoints, Eigen::MatrixXd &lHandJoints, Eigen::MatrixXd &rHandJoints, Eigen::MatrixXd& PAF,
-		bool fit3D=false, bool fit2D=false, double* K=nullptr, bool fitPAF=false): 
+	AdamFitData(const TotalModel &adam, const Eigen::MatrixXd &Joints, const Eigen::MatrixXd &rFoot, const Eigen::MatrixXd &lFoot,
+		const Eigen::MatrixXd &faceJoints, const Eigen::MatrixXd &lHandJoints, const Eigen::MatrixXd &rHandJoints, const Eigen::MatrixXd& PAF,
+		const bool fit3D=false, const bool fit2D=false, const double* const K=nullptr, const bool fitPAF=false) :
 		adam(adam), bodyJoints(Joints), rFoot(rFoot), lFoot(lFoot), faceJoints(faceJoints), lHandJoints(lHandJoints), rHandJoints(rHandJoints), PAF(PAF),
-		fit3D(fit3D), fit2D(fit2D), K(K), fitPAF(fitPAF)
-		{
-			inner_weight.clear();
-			inner_weight.push_back(5.0f);
-		}
+		fit3D(fit3D), fit2D(fit2D), K(K), fitPAF(fitPAF), inner_weight(1, 5.0f)
+	{
+	}
 	const TotalModel &adam;
 	const Eigen::MatrixXd& bodyJoints;
 	const Eigen::MatrixXd& rFoot;     //3x2 //Heel, Toe
@@ -230,26 +228,27 @@ struct AdamFitData
 	const bool fit2D;
 	const double* K;
 	const bool fitPAF;
-	std::vector<float> inner_weight;
+	const std::vector<float> inner_weight;
 };
 
 class AdamFullCost: public ceres::CostFunction
 {
 public:
-	AdamFullCost(const AdamFitData& fit_data, const int regressor_type=0): fit_data_(fit_data), res_dim(0), start_2d_dim(0), rigid_body(false),
-		num_PAF_constraint(fit_data.PAF.cols()), num_inner(fit_data.inner_weight.size()), total_inner_dim(0), regressor_type(regressor_type)
+	AdamFullCost(const AdamFitData& fit_data, const int regressor_type=0) :
+		res_dim(0), fit_data_(fit_data), regressor_type(regressor_type), rigid_body(false), start_2d_dim(0),
+		num_PAF_constraint(fit_data.PAF.cols()), num_inner(fit_data.inner_weight.size()), total_inner_dim(0)
 	{
-		if(fit_data_.fit3D)
+		if (fit_data_.fit3D)
 		{
 			res_dim += 3;
 			start_2d_dim += 3;
 		}
-		if(fit_data_.fit2D)
+		if (fit_data_.fit2D)
 		{
 			assert(fit_data_.K);
 			res_dim += 2;
 		}
-		if(fit_data_.fitPAF)
+		if (fit_data_.fitPAF)
 		{
 			assert(fit_data_.PAF.size() > 0 && fit_data_.PAF.rows() == 3);
 		}
@@ -595,7 +594,7 @@ public:
 				offset += fit_data_.adam.m_correspond_adam2rHand_adamIdx.rows();
 			}
 
-			for (int i = 0; i < corres_vertex2targetpt.size(); i++)
+			for (auto i = 0u; i < corres_vertex2targetpt.size(); i++)
 			{
 				m_targetPts_weight[i + offset] = VERTEX_WEIGHT;
 				m_targetPts_weight_buffer[i + offset] = VERTEX_WEIGHT;
@@ -603,7 +602,7 @@ public:
 		}
 		else if (regressor_type == 1)
 		{
-			for(int i = 0; i < fit_data_.adam.h36m_jointConst_smcIdx.size(); i++)
+			for (auto i = 0u; i < fit_data_.adam.h36m_jointConst_smcIdx.size(); i++)
 			{
 				m_targetPts_weight[i] = BODYJOINT_WEIGHT;
 				m_targetPts_weight_buffer[i] = BODYJOINT_WEIGHT;
@@ -612,7 +611,7 @@ public:
 		else
 		{
 			assert(regressor_type == 2);
-			for(int i = 0; i < fit_data_.adam.h36m_jointConst_smcIdx.size(); i++)
+			for (auto i = 0u; i < fit_data_.adam.h36m_jointConst_smcIdx.size(); i++)
 			{
 				m_targetPts_weight[i] = BODYJOINT_WEIGHT;
 				m_targetPts_weight_buffer[i] = BODYJOINT_WEIGHT;
@@ -624,7 +623,7 @@ public:
 				m_targetPts_weight_buffer[offset + i] = HANDJOINT_WEIGHT;
 			}
 			offset += 40;
-			for (int i = 0; i < corres_vertex2targetpt.size(); i++)
+			for (auto i = 0u; i < corres_vertex2targetpt.size(); i++)
 			{
 				m_targetPts_weight[i + offset] = VERTEX_WEIGHT;
 				m_targetPts_weight_buffer[i + offset] = VERTEX_WEIGHT;
@@ -675,20 +674,20 @@ public:
 					corres_vertex2targetpt[12 + r].second = {{fit_data_.faceJoints(0, face70ID), fit_data_.faceJoints(1, face70ID), fit_data_.faceJoints(2, face70ID), fit_data_.faceJoints(3, face70ID), fit_data_.faceJoints(4, face70ID)}};
 			}
 
-			for (int i = 0; i < corres_vertex2targetpt.size(); i++)
+			for (auto i = 0u; i < corres_vertex2targetpt.size(); i++)
 			{
 				std::copy(corres_vertex2targetpt[i].second.data(), corres_vertex2targetpt[i].second.data() + 5, m_targetPts.data() + 5 * (i + offset));
 			}
 		}
 		else if (regressor_type == 1)
 		{
-			for(int i = 0; i < fit_data_.adam.h36m_jointConst_smcIdx.size(); i++)
+			for(auto i = 0u; i < fit_data_.adam.h36m_jointConst_smcIdx.size(); i++)
 				m_targetPts.block(5 * i, 0, 5, 1) = fit_data_.bodyJoints.col(fit_data_.adam.h36m_jointConst_smcIdx[i]);
 		}
 		else
 		{
 			assert (regressor_type == 2);
-			for(int i = 0; i < fit_data_.adam.h36m_jointConst_smcIdx.size(); i++)
+			for(auto i = 0u; i < fit_data_.adam.h36m_jointConst_smcIdx.size(); i++)
 				m_targetPts.block(5 * i, 0, 5, 1) = fit_data_.bodyJoints.col(fit_data_.adam.h36m_jointConst_smcIdx[i]);
 
 			int offset = fit_data_.adam.h36m_jointConst_smcIdx.size();
@@ -726,7 +725,7 @@ public:
 			assert(offset == m_nCorrespond_adam2pts); // check the number of constraints
 
 			offset = m_nCorrespond_adam2joints;
-			for (int i = 0; i < corres_vertex2targetpt.size(); i++)
+			for (auto i = 0u; i < corres_vertex2targetpt.size(); i++)
 			{
 				std::copy(corres_vertex2targetpt[i].second.data(), corres_vertex2targetpt[i].second.data() + 5, m_targetPts.data() + 5 * (i + offset));
 			}
@@ -765,7 +764,7 @@ public:
 		}
 		else if (regressor_type == 1)
 		{
-			for (int ic = 0; ic < fit_data_.adam.h36m_jointConst_smcIdx.size(); ic++)
+			for (auto ic = 0u; ic < fit_data_.adam.h36m_jointConst_smcIdx.size(); ic++)
 			{
 				int smcjoint = fit_data_.adam.h36m_jointConst_smcIdx[ic];
 				if (smcjoint != 3 && smcjoint != 6 && smcjoint != 9 && smcjoint != 12)
@@ -778,7 +777,7 @@ public:
 		else
 		{
 			assert(regressor_type == 2);
-			for (int ic = 0; ic < fit_data_.adam.h36m_jointConst_smcIdx.size(); ic++)
+			for (auto ic = 0u; ic < fit_data_.adam.h36m_jointConst_smcIdx.size(); ic++)
 			{
 				int smcjoint = fit_data_.adam.h36m_jointConst_smcIdx[ic];
 				if (smcjoint != 3 && smcjoint != 6 && smcjoint != 9 && smcjoint != 12)

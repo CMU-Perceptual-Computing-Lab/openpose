@@ -211,7 +211,7 @@ OpenPose Library - Release Notes
 
 
 
-## Current version - future OpenPose 1.3.1
+## Current version - future OpenPose 1.4.0
 1. Main improvements:
     1. New calibration module: Intrinsic and extrinsic camera calibration toolbox based on OpenCV.
     2. Improvements involving Flir cameras:
