@@ -11,7 +11,7 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 
 class OpenPose(object):
     """
-    Ctypes linkiage
+    Ctypes linkage
     """
     _libop= np.ctypeslib.load_library('_openpose', dir_path+'/_openpose.so')
     _libop.newOP.argtypes = [
