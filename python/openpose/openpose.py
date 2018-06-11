@@ -142,7 +142,6 @@ class OpenPose(object):
             if idx == 0:
                 net_res = (16 * int((boxsize * frame.shape[1] / float(frame.shape[0]) / 16) + 0.5), boxsize)
                 base_net_res = net_res
-
             else:
                 net_res = ((min(base_net_res[0], max(1, int((base_net_res[0] * scale)+0.5)/16*16))),
                           (min(base_net_res[1], max(1, int((base_net_res[1] * scale)+0.5)/16*16))))
