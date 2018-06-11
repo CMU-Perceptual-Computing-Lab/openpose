@@ -4,12 +4,13 @@
 #include <igl/per_vertex_normals.h>
 #include <unsupported/Eigen/KroneckerProduct>
 
-int map_adam_to_measure[] = {12, 15, 0, 16, 18, 20, 1, 4, 7, 17, 19, 21, 2, 5, 8, 15, 15, 15, 15,
+std::array<int, 62> map_adam_to_measure = {12, 15, 0, 16, 18, 20, 1, 4, 7, 17, 19, 21, 2, 5, 8, 15, 15, 15, 15, 15,
 							 20, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41,
 							 21, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61};
+std::array<int, 20> map_cocoreg_to_measure = {12, 14, 12, 9, 10, 11, 3, 4, 5, 8, 7, 6, 2, 1, 0, 15, 17, 16, 18, 13};
 
 							 
-void GenerateMesh(CMeshModelInstance& returnMesh, double* resultJoint, smpl::SMPLParams& targetParam, smpl::HandModel& g_handl_model)
+void GenerateMesh(CMeshModelInstance& returnMesh, double* resultJoint, smpl::SMPLParams& targetParam, smpl::HandModel& g_handl_model, const int regressor_type)
 {
 	Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> out_v(smpl::HandModel::NUM_VERTICES, 3);
 	Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> outJ(smpl::HandModel::NUM_JOINTS, 3);
@@ -19,7 +20,7 @@ void GenerateMesh(CMeshModelInstance& returnMesh, double* resultJoint, smpl::SMP
 	smpl::HandModel* pHandm = NULL;
 
 	pHandm = &g_handl_model;
-	reconstruct_joints_mesh(g_handl_model, targetParam.handl_t.data(), targetParam.hand_coeffs.data(), targetParam.handl_pose.data(), outJ.data(), out_v.data(), dJdc, dJdP);
+	reconstruct_joints_mesh(g_handl_model, targetParam.handl_t.data(), targetParam.hand_coeffs.data(), targetParam.handl_pose.data(), outJ.data(), out_v.data(), dJdc, dJdP, regressor_type);
 
 	// std::cout << targetParam.handl_t << std::endl;
 	// std::cout << "here" << std::endl;
@@ -63,7 +64,7 @@ void GenerateMesh(CMeshModelInstance& returnMesh, double* resultJoint, smpl::SMP
 }
 
 
-void GenerateMesh(CMeshModelInstance& returnMesh, double* resultJoint, smpl::SMPLParams& targetParam, TotalModel& g_total_model)
+void GenerateMesh(CMeshModelInstance& returnMesh, double* resultJoint, smpl::SMPLParams& targetParam, TotalModel& g_total_model, const int regressor_type)
 {
 	Eigen::Matrix<double, Eigen::Dynamic, 1> outV(TotalModel::NUM_VERTICES * 3);
 	Eigen::VectorXd transforms;
@@ -89,16 +90,9 @@ void GenerateMesh(CMeshModelInstance& returnMesh, double* resultJoint, smpl::SMP
 
 	//Visualize SMPL Skeletons
 	Eigen::Matrix<double, Eigen::Dynamic, 1> joints = g_total_model.m_J_reg * outV;
-	// int jointIdx = 0;
 	for (int r = 0; r < joints.rows(); r += 3)		//Faces
 	{
 		returnMesh.m_joints.push_back(cv::Point3f(joints(r), joints(r + 1), joints(r + 2)));
-		// jointIdx++;
-	}
-	Eigen::Matrix<double, Eigen::Dynamic, 1> joints_smc = g_total_model.m_J_reg_smc * outV;
-	for (int r = 0; r < joints.rows(); r += 3)		//Faces
-	{
-		returnMesh.m_joints_regress.push_back(cv::Point3f(joints_smc(r), joints_smc(r + 1), joints_smc(r + 2)));
 	}
 	returnMesh.m_face_vertexIndices.reserve(g_total_model.m_faces.size() * 3);
 	for (int r = 0; r < g_total_model.m_faces.rows(); ++r)		//Faces
@@ -114,11 +108,67 @@ void GenerateMesh(CMeshModelInstance& returnMesh, double* resultJoint, smpl::SMP
 		returnMesh.m_face_vertexIndices.push_back(idxvect[2]);
 	}
 	returnMesh.RecomputeNormal(g_total_model);
-	for (int i = 0; i < 61; i++)
+	if (regressor_type == 0)
 	{
-		resultJoint[3 * i] = joints_smc(3* map_adam_to_measure[i]);
-		resultJoint[3 * i + 1] = joints_smc(3 * map_adam_to_measure[i] + 1);
-		resultJoint[3 * i + 2] = joints_smc(3 * map_adam_to_measure[i] + 2);
+		for (int i = 0; i < 62; i++)
+		{
+			resultJoint[3 * i] = joints(3* map_adam_to_measure[i]);
+			resultJoint[3 * i + 1] = joints(3 * map_adam_to_measure[i] + 1);
+			resultJoint[3 * i + 2] = joints(3 * map_adam_to_measure[i] + 2);
+		}
+		std::copy(outV.data() + 3 * 8130, outV.data() + 3 * 8131, resultJoint + 3 * 1); // nose
+		std::copy(outV.data() + 3 * 6731, outV.data() + 3 * 6732, resultJoint + 3 * 15); // leye
+		std::copy(outV.data() + 3 * 6970, outV.data() + 3 * 6971, resultJoint + 3 * 16); // lear
+		std::copy(outV.data() + 3 * 4131, outV.data() + 3 * 4132, resultJoint + 3 * 17); // reye
+		std::copy(outV.data() + 3 * 10088, outV.data() + 3 * 10089, resultJoint + 3 * 18); // rear
+	}
+	else if (regressor_type == 1)
+	{
+		Eigen::Map<MatrixXdr> m_outV(outV.data(), TotalModel::NUM_VERTICES, 3);
+		MatrixXdr J_coco = g_total_model.m_cocoplus_reg * m_outV;
+		for (int i = 0; i < 20; i++)
+		{
+			resultJoint[3 * i] = J_coco(map_cocoreg_to_measure[i], 0);
+			resultJoint[3 * i + 1] = J_coco(map_cocoreg_to_measure[i], 1);
+			resultJoint[3 * i + 2] = J_coco(map_cocoreg_to_measure[i], 2);
+		}
+		resultJoint[3 * 2 + 0] = 0.5 * (resultJoint[3 * 6 + 0] + resultJoint[3 * 12 + 0]);
+		resultJoint[3 * 2 + 1] = 0.5 * (resultJoint[3 * 6 + 1] + resultJoint[3 * 12 + 1]);
+		resultJoint[3 * 2 + 2] = 0.5 * (resultJoint[3 * 6 + 2] + resultJoint[3 * 12 + 2]);
+		for (int i = 20; i < 61; i++)
+		{
+			resultJoint[3 * i] = joints(3 * map_adam_to_measure[i]);
+			resultJoint[3 * i + 1] = joints(3 * map_adam_to_measure[i] + 1);
+			resultJoint[3 * i + 2] = joints(3 * map_adam_to_measure[i] + 2);
+		}
+	}
+	else
+	{
+		assert(regressor_type == 2);
+		std:cout << "Reconstruct mesh using regressor_type 2" << std::endl;
+		Eigen::Map<MatrixXdr> m_outV(outV.data(), TotalModel::NUM_VERTICES, 3);
+		MatrixXdr J_coco = g_total_model.m_small_coco_reg * m_outV;
+		for (int i = 0; i < 20; i++)
+		{
+			resultJoint[3 * i] = J_coco(map_cocoreg_to_measure[i], 0);
+			resultJoint[3 * i + 1] = J_coco(map_cocoreg_to_measure[i], 1);
+			resultJoint[3 * i + 2] = J_coco(map_cocoreg_to_measure[i], 2);
+		}
+		resultJoint[3 * 2 + 0] = 0.5 * (resultJoint[3 * 6 + 0] + resultJoint[3 * 12 + 0]);
+		resultJoint[3 * 2 + 1] = 0.5 * (resultJoint[3 * 6 + 1] + resultJoint[3 * 12 + 1]);
+		resultJoint[3 * 2 + 2] = 0.5 * (resultJoint[3 * 6 + 2] + resultJoint[3 * 12 + 2]);
+		for (int i = 20; i < 62; i++)
+		{
+			resultJoint[3 * i] = joints(3 * map_adam_to_measure[i]);
+			resultJoint[3 * i + 1] = joints(3 * map_adam_to_measure[i] + 1);
+			resultJoint[3 * i + 2] = joints(3 * map_adam_to_measure[i] + 2);
+		}
+		resultJoint[3 * 20 + 0] = J_coco(11, 0);
+		resultJoint[3 * 20 + 1] = J_coco(11, 1);
+		resultJoint[3 * 20 + 2] = J_coco(11, 2);
+		resultJoint[3 * 41 + 0] = J_coco(6, 0);
+		resultJoint[3 * 41 + 1] = J_coco(6, 1);
+		resultJoint[3 * 41 + 2] = J_coco(6, 2);
 	}
 }
 
@@ -206,12 +256,17 @@ void GenerateMesh_Fast(CMeshModelInstance& returnMesh, double* resultJoint, smpl
 	returnMesh.RecomputeNormal(g_total_model);
 // const auto duration13 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start13).count();
 // const auto start14 = std::chrono::high_resolution_clock::now();
-	for (int i = 0; i < 61; i++)
+	for (int i = 0; i < 62; i++)
 	{
-		resultJoint[3 * i] = joints_smc(3* map_adam_to_measure[i]);
-		resultJoint[3 * i + 1] = joints_smc(3 * map_adam_to_measure[i] + 1);
-		resultJoint[3 * i + 2] = joints_smc(3 * map_adam_to_measure[i] + 2);
+		resultJoint[3 * i] = joints(3* map_adam_to_measure[i]);
+		resultJoint[3 * i + 1] = joints(3 * map_adam_to_measure[i] + 1);
+		resultJoint[3 * i + 2] = joints(3 * map_adam_to_measure[i] + 2);
 	}
+	std::copy(outV.data() + 3 * 8130, outV.data() + 3 * 8131, resultJoint + 3 * 1); // nose
+	std::copy(outV.data() + 3 * 6731, outV.data() + 3 * 6732, resultJoint + 3 * 15); // leye
+	std::copy(outV.data() + 3 * 6970, outV.data() + 3 * 6971, resultJoint + 3 * 16); // lear
+	std::copy(outV.data() + 3 * 4131, outV.data() + 3 * 4132, resultJoint + 3 * 17); // reye
+	std::copy(outV.data() + 3 * 10088, outV.data() + 3 * 10089, resultJoint + 3 * 18); // rear
 // const auto duration14 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start14).count();
 // const auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start).count();
 // std::cout << __FILE__ << " " << duration1 * 1e-6 << " 1\n"

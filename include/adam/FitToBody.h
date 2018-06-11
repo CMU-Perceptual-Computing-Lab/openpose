@@ -2,7 +2,7 @@
 #include "totalmodel.h"
 #include "ceres/ceres.h"
 
-void SetSolverOptions(ceres::Problem *problem, ceres::Solver::Options *options);
+void SetSolverOptions(ceres::Solver::Options *options);
 
 void FitToHandCeres_Right_Naive(
 	smpl::HandModel &handr_model,
@@ -10,15 +10,17 @@ void FitToHandCeres_Right_Naive(
 	Eigen::Vector3d& parm_handr_t,
 	Eigen::Matrix<double, Eigen::Dynamic, 3, Eigen::RowMajor>& parm_hand_pose,
 	Eigen::Matrix<double, Eigen::Dynamic, 3, Eigen::RowMajor>& parm_hand_coeffs,
-	MatrixXdr &outV);
+	int regressor_type=0);
 
 void FitToProjectionCeres(
 	smpl::HandModel &handr_model,
 	Eigen::MatrixXd &Joints2d,
-	Eigen::MatrixXd &K,
+	const double* K,
+	Eigen::MatrixXd &PAF,
 	Eigen::Vector3d& parm_handr_t,
 	Eigen::Matrix<double, Eigen::Dynamic, 3, Eigen::RowMajor>& parm_hand_pose,
-	Eigen::Matrix<double, Eigen::Dynamic, 3, Eigen::RowMajor>& parm_hand_coeffs);
+	Eigen::Matrix<double, Eigen::Dynamic, 3, Eigen::RowMajor>& parm_hand_coeffs,
+	int regressor_type=0);
 
 void Adam_FitTotalBodyCeres( TotalModel &adam,
 	smpl::SMPLParams &frame_param,
@@ -56,7 +58,8 @@ void Adam_FastFit_Initialize(TotalModel &adam,
 	Eigen::MatrixXd &lFoot,
 	Eigen::MatrixXd &rHandJoints,
 	Eigen::MatrixXd &lHandJoints,
-	Eigen::MatrixXd &faceJoints);
+	Eigen::MatrixXd &faceJoints,
+	bool verbose=false);
 
 void Adam_FastFit(TotalModel &adam,
 	smpl::SMPLParams &frame_param,
@@ -65,7 +68,8 @@ void Adam_FastFit(TotalModel &adam,
 	Eigen::MatrixXd &lFoot,
 	Eigen::MatrixXd &rHandJoints,
 	Eigen::MatrixXd &lHandJoints,
-	Eigen::MatrixXd &faceJoints);
+	Eigen::MatrixXd &faceJoints,
+	bool verbose=false);
 
 void Adam_Fit_PAF(TotalModel &adam,
 	smpl::SMPLParams &frame_param,
@@ -77,5 +81,32 @@ void Adam_Fit_PAF(TotalModel &adam,
 	Eigen::MatrixXd &faceJoints,
 	Eigen::MatrixXd &PAF,
 	double* K=nullptr,
-	bool fit3Dfirst=false,
-	bool quan=false);
+	uint regressor_type=0u,
+	bool quan=false,
+	bool fitPAFfirst=false);
+
+void Adam_Fit_H36M(TotalModel &adam,
+	smpl::SMPLParams &frame_param,
+	Eigen::MatrixXd &BodyJoints);
+
+void Adam_skeletal_refit(TotalModel &adam,
+	smpl::SMPLParams &frame_param,
+	Eigen::MatrixXd &BodyJoints,
+	Eigen::MatrixXd &rFoot,
+	Eigen::MatrixXd &lFoot,
+	Eigen::MatrixXd &rHandJoints,
+	Eigen::MatrixXd &lHandJoints,
+	Eigen::MatrixXd &faceJoints,
+	Eigen::MatrixXd &PAF,
+	uint regressor_type=0u);
+
+void Adam_skeletal_init(TotalModel &adam,
+	smpl::SMPLParams &frame_param,
+	Eigen::MatrixXd &BodyJoints,
+	Eigen::MatrixXd &rFoot,
+	Eigen::MatrixXd &lFoot,
+	Eigen::MatrixXd &rHandJoints,
+	Eigen::MatrixXd &lHandJoints,
+	Eigen::MatrixXd &faceJoints,
+	Eigen::MatrixXd &PAF,
+	uint regressor_type=0u);

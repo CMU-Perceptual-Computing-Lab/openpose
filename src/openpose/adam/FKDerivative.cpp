@@ -7,10 +7,10 @@
 
 using namespace Eigen;
 
-void AngleAxisToRotationMatrix_Derivative(const double* pose, double* dR_data, const int idj)
+void AngleAxisToRotationMatrix_Derivative(const double* pose, double* dR_data, const int idj, const int numberColumns)
 {
-    Eigen::Map< Eigen::Matrix<double, 9, TotalModel::NUM_JOINTS * 3, Eigen::RowMajor> > dR(dR_data);
-    std::fill(dR_data, dR_data + 27*TotalModel::NUM_JOINTS, 0.0);
+    Eigen::Map< Eigen::Matrix<double, 9, Eigen::Dynamic, Eigen::RowMajor> > dR(dR_data, 9, numberColumns);
+    std::fill(dR_data, dR_data + 9 * numberColumns, 0.0);
     const double theta2 = pose[0] * pose[0] + pose[1] * pose[1] + pose[2] * pose[2];
     if (theta2 > std::numeric_limits<double>::epsilon())
     {
@@ -72,7 +72,7 @@ void AngleAxisToRotationMatrix_Derivative(const double* pose, double* dR_data, c
     }
 }
 
-void EulerAnglesToRotationMatrix_Derivative(const double* pose, double* dR_data, const int idj)
+void EulerAnglesToRotationMatrix_Derivative(const double* pose, double* dR_data, const int idj, const int numberColumns)
 {
     const double degrees_to_radians = 3.14159265358979323846 / 180.0;
     const double pitch(pose[0] * degrees_to_radians);
@@ -109,8 +109,8 @@ void EulerAnglesToRotationMatrix_Derivative(const double* pose, double* dR_data,
         c2 * c3,                  -s2 * s3,      0,
         -c2 * s3,                 -s2 * c3,      0;
 
-    Eigen::Map< Eigen::Matrix<double, 9, TotalModel::NUM_JOINTS * 3, Eigen::RowMajor> > dR(dR_data);
-    std::fill(dR_data, dR_data + 27*TotalModel::NUM_JOINTS, 0.0);
+    Eigen::Map< Eigen::Matrix<double, 9, Eigen::Dynamic, Eigen::RowMajor> > dR(dR_data, 9, numberColumns);
+    std::fill(dR_data, dR_data + 9 * numberColumns, 0.0);
     dR.block(0, 3 * idj, 9, 3) = degrees_to_radians * dRdp;
 }
 
@@ -205,13 +205,12 @@ void Product_Derivative(const double* const A_data, const double* const dA_data,
 }
 
 void SparseProductDerivative(const double* const A_data, const double* const dA_data, const double* const B_data,
-                             const double* const dB_data, const int colIndex, const std::vector<int>& parentIndexes, double* dAB_data)
+                             const double* const dB_data, const int colIndex, const std::vector<int>& parentIndexes, double* dAB_data, const int numberColumns)
 {
     // d(AB) = AdB + (dA)B
-    const auto numberColumns = TotalModel::NUM_JOINTS * 3;
-    Eigen::Map< Eigen::Matrix<double, 9, numberColumns, Eigen::RowMajor> > dAB(dAB_data);
+    Eigen::Map< Eigen::Matrix<double, 9, Eigen::Dynamic, Eigen::RowMajor> > dAB(dAB_data, 9, numberColumns);
 
-    std::fill(dAB_data, dAB_data + 27*TotalModel::NUM_JOINTS, 0.0);
+    std::fill(dAB_data, dAB_data + 9 * numberColumns, 0.0);
     // // Dense dAB (sparse dB) version
     // const Eigen::Map<const Eigen::Matrix<double, 9, numberColumns, Eigen::RowMajor> > dA(dA_data);
     // const Eigen::Map<const Eigen::Matrix<double, 9, numberColumns, Eigen::RowMajor> > dB(dB_data);
@@ -265,12 +264,11 @@ void SparseProductDerivative(const double* const A_data, const double* const dA_
 }
 
 void SparseProductDerivative(const double* const dA_data, const double* const B_data,
-                             const std::vector<int>& parentIndexes, double* dAB_data)
+                             const std::vector<int>& parentIndexes, double* dAB_data, const int numberColumns)
 {
     // d(AB) = AdB + (dA)B
-    const auto numberColumns = TotalModel::NUM_JOINTS * 3;
     // Sparse for loop form
-    std::fill(dAB_data, dAB_data + 9*TotalModel::NUM_JOINTS, 0.0);
+    std::fill(dAB_data, dAB_data + 3 * numberColumns, 0.0);
     for (int r = 0; r < 3; r++)
     {
         const int baseIndex = 3*r;
@@ -301,12 +299,11 @@ void SparseProductDerivative(const double* const dA_data, const double* const B_
 }
 
 void SparseProductDerivativeConstA(const double* const A_data, const double* const dB_data,
-                             const std::vector<int>& parentIndexes, double* dAB_data)
+                             const std::vector<int>& parentIndexes, double* dAB_data, const int numberColumns)
 {
 	// d(AB) = AdB (A is a constant.)
-	const auto numberColumns = TotalModel::NUM_JOINTS * 3;
     // Sparse for loop form
-    std::fill(dAB_data, dAB_data + 9*TotalModel::NUM_JOINTS, 0.0);
+    std::fill(dAB_data, dAB_data + 3 * numberColumns, 0.0);
     for (int r = 0; r < 3; r++)
     {
 		for (const auto& parentIndex : parentIndexes)
@@ -322,12 +319,11 @@ void SparseProductDerivativeConstA(const double* const A_data, const double* con
 	}
 }
 
-void SparseAdd(const double* const B_data, const std::vector<int>& parentIndexes, double* A_data)
+void SparseAdd(const double* const B_data, const std::vector<int>& parentIndexes, double* A_data, const int numberColumns)
 {
     // d(AB) += d(AB)_parent
-    const auto numberColumns = TotalModel::NUM_JOINTS * 3;
-    Eigen::Map< Eigen::Matrix<double, 3, numberColumns, Eigen::RowMajor>> A(A_data);
-    const Eigen::Map<const Eigen::Matrix<double, 3, numberColumns, Eigen::RowMajor>> B(B_data);
+    Eigen::Map< Eigen::Matrix<double, 3, Eigen::Dynamic, Eigen::RowMajor>> A(A_data, 3, numberColumns);
+    const Eigen::Map<const Eigen::Matrix<double, 3, Eigen::Dynamic, Eigen::RowMajor>> B(B_data, 3, numberColumns);
     // Sparse for loop
     for (int r = 0; r < 3; r++)
     {
@@ -346,12 +342,11 @@ void SparseAdd(const double* const B_data, const std::vector<int>& parentIndexes
     // A += B;
 }
 
-void SparseSubtract(const double* const B_data, const std::vector<int>& parentIndexes, double* A_data)
+void SparseSubtract(const double* const B_data, const std::vector<int>& parentIndexes, double* A_data, const int numberColumns)
 {
     // d(AB) += d(AB)_parent
-    const auto numberColumns = TotalModel::NUM_JOINTS * 3;
-    Eigen::Map< Eigen::Matrix<double, 3, numberColumns, Eigen::RowMajor>> A(A_data);
-    const Eigen::Map<const Eigen::Matrix<double, 3, numberColumns, Eigen::RowMajor>> B(B_data);
+    Eigen::Map< Eigen::Matrix<double, 3, Eigen::Dynamic, Eigen::RowMajor>> A(A_data, 3, numberColumns);
+    const Eigen::Map<const Eigen::Matrix<double, 3, Eigen::Dynamic, Eigen::RowMajor>> B(B_data, 3, numberColumns);
     // Sparse for loop
     for (int r = 0; r < 3; r++)
     {

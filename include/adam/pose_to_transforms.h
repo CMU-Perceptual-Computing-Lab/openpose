@@ -110,7 +110,7 @@ struct PoseToTransformsHand {
 		Matrix<T, Dynamic, 4, RowMajor> Ms(4 * HandModel::NUM_JOINTS, 4);
 		Matrix<T, 4, 4, RowMajor> Mthis;
 
-		Matrix<T, 3, 3, ColMajor> R; // Interface with ceres
+		Matrix<T, 3, 3, RowMajor> R; // Interface with ceres
 		Matrix<T, 3, 3, RowMajor> Rr; // Interface with ceres
 		Mthis.setZero();
 		Mthis(3, 3) = T(1.0);
@@ -118,6 +118,7 @@ struct PoseToTransformsHand {
 		int idj = mod_.update_inds_(0);
 		ceres::AngleAxisToRotationMatrix(pose + idj * 3, R.data());
 		Mthis.block(0, 0, 3, 3) = R * DiagonalMatrix<T, 3>(T(C(idj, 0)), T(C(idj, 0)), T(C(idj, 0)));
+		// Mthis.block(0, 0, 3, 3) = R * DiagonalMatrix<T, 3>(exp(T(C(idj, 0))), exp(T(C(idj, 0))), exp(T(C(idj, 0))));
 		// Mthis.block(0, 0, 3, 3) = R * DiagonalMatrix<T, 3>(T(C(idj, 0)), T(C(idj, 1)), T(C(idj, 2)));
 		Ms.block(idj * 4, 0, 4, 4) = mod_.m_M_l2pl.block(idj * 4, 0, 4, 4).cast<T>()*Mthis;
 		outT.block(idj * 3, 0, 3, 4) = Ms.block(idj * 4, 0, 3, 4)*mod_.m_M_w2l.block(idj * 4, 0, 4, 4).cast<T>();
@@ -129,7 +130,8 @@ struct PoseToTransformsHand {
 
 			ceres::EulerAnglesToRotationMatrix(pose + idj * 3, 3, Rr.data());
 			// Mthis.block(0, 0, 3, 3) = Rr * DiagonalMatrix<T, 3>(T(C(idj, 0)), T(C(idj, 0)), T(C(idj, 0)));
-			Mthis.block(0, 0, 3, 3) = Rr * DiagonalMatrix<T, 3>(T(C(idj, 0)), T(1), T(1));
+			// Mthis.block(0, 0, 3, 3) = Rr * DiagonalMatrix<T, 3>(exp(T((C(idj, 0)))), T(1), T(1));
+			Mthis.block(0, 0, 3, 3) = Rr * DiagonalMatrix<T, 3>(T((C(idj, 0))), T(1), T(1));
 
 			Ms.block(idj * 4, 0, 4, 4) = Ms.block(ipar * 4, 0, 4, 4)*mod_.m_M_l2pl.block(idj * 4, 0, 4, 4).cast<T>()*Mthis;
 			outT.block(idj * 3, 0, 3, 4) = Ms.block(idj * 4, 0, 3, 4)*mod_.m_M_w2l.block(idj * 4, 0, 4, 4).cast<T>();
@@ -250,7 +252,7 @@ struct PoseToTransformsNoLR_Eulers_adamModel {
 				angles[2] = T(0.0);
 			}
 
-			if (idj == 24 || idj == 27 || idj == 28 || idj == 31 || idj == 32 || idj == 35 || idj == 26 || idj == 39 || idj == 40)	//all hands
+			if (idj == 24 || idj == 27 || idj == 28 || idj == 31 || idj == 32 || idj == 35 || idj == 36 || idj == 39 || idj == 40)	//all hands
 			{
 				angles[0] = T(0.0);
 				angles[1] = T(0.0);
@@ -281,39 +283,50 @@ struct PoseToTransformsNoLR_Eulers_adamModel {
 	const TotalModel &mod_;
 };
 
-class PoseToTransformsNoLR_Eulers_adamModel_withDiff: public ceres::CostFunction
+class PoseToTransformsNoLR_Eulers_adamModel_withDiff
 {
 public:
 	PoseToTransformsNoLR_Eulers_adamModel_withDiff(const TotalModel &mod, const Eigen::Matrix<double, TotalModel::NUM_JOINTS, 3, Eigen::RowMajor>& J0):
 		mod_(mod), J0_(J0)
 	{
-		CostFunction::set_num_residuals(3 * TotalModel::NUM_JOINTS);
-		auto parameter_block_sizes = CostFunction::mutable_parameter_block_sizes();
-		parameter_block_sizes->clear();
-		parameter_block_sizes->push_back(TotalModel::NUM_JOINTS * 3); // SMPL Pose
+		// CostFunction::set_num_residuals(3 * TotalModel::NUM_JOINTS);
+		// auto parameter_block_sizes = CostFunction::mutable_parameter_block_sizes();
+		// parameter_block_sizes->clear();
+		// parameter_block_sizes->push_back(TotalModel::NUM_JOINTS * 3); // SMPL Pose
 		// mParentIndexes
 		// Resize
 		mParentIndexes.resize(mod_.NUM_JOINTS);
 		// Rest
         for (auto idj = 1; idj < mod_.NUM_JOINTS; idj++)
         {
-            const int ipar = mod_.m_parent[idj];
-            mParentIndexes[idj] = std::vector<int>(1, ipar);
+            // const int ipar = mod_.m_parent[idj];
+            // mParentIndexes[idj] = std::vector<int>(1, ipar);
+            mParentIndexes[idj] = std::vector<int>(1, idj);  // include this joint itself
             while (mParentIndexes[idj].back() != 0)
                 mParentIndexes[idj].emplace_back(mod_.m_parent[mParentIndexes[idj].back()]);
             // Sort by index
             std::sort(mParentIndexes[idj].begin(), mParentIndexes[idj].end());
         }
 	}
-	virtual ~PoseToTransformsNoLR_Eulers_adamModel_withDiff() {}
+	~PoseToTransformsNoLR_Eulers_adamModel_withDiff() {}
 
-	virtual bool Evaluate(double const* const* parameters,
+	bool Evaluate(double const* const* parameters,
 		double* residuals,
-		double** jacobians) const;
+		double** jacobians);
+
+	void sparse_lbs(
+		const Eigen::Matrix<double, Eigen::Dynamic, 3, Eigen::RowMajor>& Vt,
+		const std::vector<int>& total_vertex,
+		double* outV,
+		double* dVdP=nullptr);
 
 	const TotalModel &mod_;
 	const Eigen::Matrix<double, TotalModel::NUM_JOINTS, 3, Eigen::RowMajor>& J0_;
     std::vector<std::vector<int>> mParentIndexes;
+    std::array<Eigen::Matrix<double, 3, 3, Eigen::RowMajor>, TotalModel::NUM_JOINTS> MR;
+    std::array<Eigen::Matrix<double, 9, 3 * TotalModel::NUM_JOINTS, Eigen::RowMajor>, TotalModel::NUM_JOINTS> dMRdP;
+    std::array<Eigen::Matrix<double, 3, 1>, TotalModel::NUM_JOINTS> Mt;
+    std::array<Eigen::Matrix<double, 3, 3 * TotalModel::NUM_JOINTS, Eigen::RowMajor>, TotalModel::NUM_JOINTS> dMtdP;
 };
 
 class PoseToTransform_AdamFull_withDiff: public ceres::CostFunction

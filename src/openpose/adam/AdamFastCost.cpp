@@ -44,6 +44,8 @@ bool AdamFastCost::Evaluate(double const* const* parameters,
 // const auto start3 = std::chrono::high_resolution_clock::now();
     Matrix<double, Dynamic, 3 * TotalModel::NUM_JOINTS, RowMajor> dTrdP(num_t, 3 * TotalModel::NUM_JOINTS);
     VectorXd transforms_joint(3 * TotalModel::NUM_JOINTS * 4 + 3 * TotalModel::NUM_JOINTS); // the first part is transform, the second part is outJoint
+    Matrix<double, Dynamic, 3, RowMajor> outV(total_vertex.size(), 3);
+    Matrix<double, Dynamic, TotalModel::NUM_POSE_PARAMETERS, RowMajor> dVdP(total_vertex.size() * 3, TotalModel::NUM_POSE_PARAMETERS);
 
     smpl::PoseToTransformsNoLR_Eulers_adamModel_withDiff p2t(m_adam, m_J0);
     const double* p2t_parameters[1] = { p_eulers };
@@ -62,6 +64,9 @@ bool AdamFastCost::Evaluate(double const* const* parameters,
         std::clock_t endComparison2 = std::clock();
     #endif // COMPARE_AUTOMATIC_VS_MANUAL
 // const auto duration3 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start3).count();
+
+    // perform LBS based on the transformation already computed
+    p2t.sparse_lbs(m_Vt, total_vertex, outV.data(), jacobians? dVdP.data() : nullptr);
 
     #ifdef COMPARE_AUTOMATIC_VS_MANUAL
         // uncomment these lines for comparison with the old code
@@ -99,7 +104,7 @@ bool AdamFastCost::Evaluate(double const* const* parameters,
 
     // 2nd step: set residuals
     // Joint Constraints
-    VectorXd tempJoints(3 * m_nCorrespond_adam2joints);  // predicted joint given current parameter
+    VectorXd tempJoints(3 * m_nCorrespond_adam2joints + 3 * m_nCorrespond_adam2pts);  // predicted joint given current parameter
     const double* const t = parameters[0];
     const Map<const Vector3d> t_vec(t);
     for (int i = 0; i < m_adam.m_indices_jointConst_adamIdx.rows(); i++)
@@ -116,6 +121,19 @@ bool AdamFastCost::Evaluate(double const* const* parameters,
         tempJoints.block<3,1>(3*(i + offset), 0) = outJoint.block<3,1>(3 * m_adam.m_correspond_adam2rHand_adamIdx(i), 0) + t_vec;
 // const auto duration7 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start7).count();
 // const auto start8 = std::chrono::high_resolution_clock::now();
+    offset += m_adam.m_correspond_adam2rHand_adamIdx.rows();
+    // updating the vertex data
+    tempJoints.block<3, 1>(3 * (0 + offset), 0) = outV.block<1, 3>(0, 0).transpose() + t_vec; // nose
+    tempJoints.block<3, 1>(3 * (1 + offset), 0) = outV.block<1, 3>(1, 0).transpose() + t_vec; // eye
+    tempJoints.block<3, 1>(3 * (2 + offset), 0) = outV.block<1, 3>(2, 0).transpose() + t_vec; // ear
+    tempJoints.block<3, 1>(3 * (3 + offset), 0) = outV.block<1, 3>(3, 0).transpose() + t_vec; // eye
+    tempJoints.block<3, 1>(3 * (4 + offset), 0) = outV.block<1, 3>(4, 0).transpose() + t_vec; // ear
+    tempJoints.block<3, 1>(3 * (5 + offset), 0) = outV.block<1, 3>(5, 0).transpose() + t_vec; // bigtoe
+    tempJoints.block<3, 1>(3 * (6 + offset), 0) = outV.block<1, 3>(6, 0).transpose() + t_vec; // smalltoe
+    tempJoints.block<3, 1>(3 * (7 + offset), 0) = 0.5 * (outV.block<1, 3>(7, 0) + outV.block<1, 3>(8, 0)).transpose() + t_vec;  // heel
+    tempJoints.block<3, 1>(3 * (8 + offset), 0) = outV.block<1, 3>(9, 0).transpose() + t_vec; // bigtoe
+    tempJoints.block<3, 1>(3 * (9 + offset), 0) = outV.block<1, 3>(10, 0).transpose() + t_vec; // smalltoe
+    tempJoints.block<3, 1>(3 * (10 + offset), 0) = 0.5 * (outV.block<1, 3>(11, 0) + outV.block<1, 3>(12, 0)).transpose() + t_vec;  // heel
 
     const auto* tempJointsPts = tempJoints.data();
     const auto* targetPts = m_targetPts.data();
@@ -123,14 +141,14 @@ bool AdamFastCost::Evaluate(double const* const* parameters,
     std::fill(residuals, residuals + m_nResiduals, 0.0);
 // const auto duration8 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start8).count();
 // const auto start9 = std::chrono::high_resolution_clock::now();
-    for (int i = 0; i < m_nCorrespond_adam2joints; i++)
+    for (int i = 0; i < m_nCorrespond_adam2joints + m_nCorrespond_adam2pts; i++)
     {
         if (!m_targetPts.block<3,1>(5 * i, 0).isZero(0))
         {
             for (int r = 0; r < 3 ; r++)
             {
                 const int baseIndex = 3 * i + r;
-                residuals[baseIndex] = (tempJointsPts[baseIndex] - targetPts[5 * i + r]) * targetPtsWeight[baseIndex];
+                residuals[baseIndex] = (tempJointsPts[baseIndex] - targetPts[5 * i + r]) * targetPtsWeight[i];
             }
             // Vectorized (slower) equivalent
             // Map< VectorXd > res(residuals, m_nResiduals);
@@ -155,13 +173,13 @@ bool AdamFastCost::Evaluate(double const* const* parameters,
             std::fill(jacobians[0], jacobians[0] + m_nResiduals*3, 0.0);
 // duration10a += std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start10a).count();
 // const auto start10b = std::chrono::high_resolution_clock::now();
-            for (int i = 0; i < m_nCorrespond_adam2joints; i++)
+            for (int i = 0; i < m_nCorrespond_adam2joints + m_nCorrespond_adam2pts; i++)
             {
                 if (targetPts[5 * i] != 0 || targetPts[5 * i + 1] != 0 || targetPts[5 * i + 2] != 0)
                 // if (!m_targetPts.block<3,1>(5 * i, 0).isZero(0))
                 {
                     for (int r = 0; r < 3; r++)
-                        jacobians[0][(3*i+r)*3+r] = targetPtsWeight[3*i+r];
+                        jacobians[0][(3*i+r)*3+r] = targetPtsWeight[i];
                 }
             }
 // duration10b += std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start10b).count();
@@ -191,32 +209,40 @@ bool AdamFastCost::Evaluate(double const* const* parameters,
 // const auto start10e = std::chrono::high_resolution_clock::now();
             for (int i = 0; i < m_adam.m_indices_jointConst_adamIdx.rows(); i++)
                 if (!m_targetPts.block<3,1>(5 * i, 0).isZero(0))
-                    dr_dPose.block<3,TotalModel::NUM_POSE_PARAMETERS>(3 * i, 0) = dTJdP.block<3,TotalModel::NUM_POSE_PARAMETERS>(3 * m_adam.m_indices_jointConst_adamIdx(i), 0);
+                    dr_dPose.block<3,TotalModel::NUM_POSE_PARAMETERS>(3 * i, 0) = targetPtsWeight[i] * dTJdP.block<3,TotalModel::NUM_POSE_PARAMETERS>(3 * m_adam.m_indices_jointConst_adamIdx(i), 0);
 // duration10e += std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start10e).count();
 // const auto start10f = std::chrono::high_resolution_clock::now();
             int offset = m_adam.m_indices_jointConst_adamIdx.rows();
             for (int i = 0; i < m_adam.m_correspond_adam2lHand_adamIdx.rows(); i++)
                 if (!m_targetPts.block<3,1>(5 * (i + offset), 0).isZero(0))
-                    dr_dPose.block<3,TotalModel::NUM_POSE_PARAMETERS>(3*(i + offset), 0) = dTJdP.block<3,TotalModel::NUM_POSE_PARAMETERS>(3 * m_adam.m_correspond_adam2lHand_adamIdx(i), 0);
+                    dr_dPose.block<3,TotalModel::NUM_POSE_PARAMETERS>(3*(i + offset), 0) = targetPtsWeight[i + offset] * dTJdP.block<3,TotalModel::NUM_POSE_PARAMETERS>(3 * m_adam.m_correspond_adam2lHand_adamIdx(i), 0);
 // duration10f += std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start10f).count();
 // const auto start10g = std::chrono::high_resolution_clock::now();
             offset += m_adam.m_correspond_adam2lHand_adamIdx.rows();
             for (int i = 0; i < m_adam.m_correspond_adam2rHand_adamIdx.rows(); i++)
                 if (!m_targetPts.block<3,1>(5 * (i + offset), 0).isZero(0))
-                    dr_dPose.block<3,TotalModel::NUM_POSE_PARAMETERS>(3*(i + offset), 0) = dTJdP.block<3,TotalModel::NUM_POSE_PARAMETERS>(3 * m_adam.m_correspond_adam2rHand_adamIdx(i), 0);
+                    dr_dPose.block<3,TotalModel::NUM_POSE_PARAMETERS>(3*(i + offset), 0) = targetPtsWeight[i + offset] * dTJdP.block<3,TotalModel::NUM_POSE_PARAMETERS>(3 * m_adam.m_correspond_adam2rHand_adamIdx(i), 0);
 // duration10g += std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start10g).count();
 // const auto start10h = std::chrono::high_resolution_clock::now();
-            for (int j = 0; j < 3 * m_nCorrespond_adam2joints; ++j)
-            {
-                const auto numberRows = dr_dPose.rows();
-                for (int r = 0; r < numberRows; ++r)
-                    jacobians[1][j*numberRows+r] *= targetPtsWeight[j];
-            }
-            // // Slow for loop equivalent
-            // for (int j = 0; j < 3 * m_nCorrespond_adam2joints; ++j)
-            //     dr_dPose.row(j) *= m_targetPts_weight[j];
-            // // Even slower option
-            // dr_dPose = m_targetPts_weight.asDiagonal() * dr_dPose;
+            offset += m_adam.m_correspond_adam2rHand_adamIdx.rows();  
+            if (!m_targetPts.block<3,1>(5 * (0 + offset), 0).isZero(0)) dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(3*(0 + offset), 0) = targetPtsWeight[0 + offset] * dVdP.block<3, TotalModel::NUM_POSE_PARAMETERS>(3 * 0, 0);
+            else dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(3*(0 + offset), 0).setZero();
+            if (!m_targetPts.block<3,1>(5 * (1 + offset), 0).isZero(0)) dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(3*(1 + offset), 0) = targetPtsWeight[1 + offset] * dVdP.block<3, TotalModel::NUM_POSE_PARAMETERS>(3 * 1, 0);
+            else dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(3*(1 + offset), 0).setZero();
+            if (!m_targetPts.block<3,1>(5 * (2 + offset), 0).isZero(0)) dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(3*(2 + offset), 0) = targetPtsWeight[2 + offset] * dVdP.block<3, TotalModel::NUM_POSE_PARAMETERS>(3 * 2, 0);
+            else dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(3*(2 + offset), 0).setZero();
+            if (!m_targetPts.block<3,1>(5 * (3 + offset), 0).isZero(0)) dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(3*(3 + offset), 0) = targetPtsWeight[3 + offset] * dVdP.block<3, TotalModel::NUM_POSE_PARAMETERS>(3 * 3, 0);
+            else dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(3*(3 + offset), 0).setZero();
+            if (!m_targetPts.block<3,1>(5 * (4 + offset), 0).isZero(0)) dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(3*(4 + offset), 0) = targetPtsWeight[4 + offset] * dVdP.block<3, TotalModel::NUM_POSE_PARAMETERS>(3 * 4, 0);
+            else dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(3*(4 + offset), 0).setZero();
+            if (!m_targetPts.block<3,1>(5 * (5 + offset), 0).isZero(0)) dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(3*(5 + offset), 0) = targetPtsWeight[5 + offset] * 0.5 * (dVdP.block<3, TotalModel::NUM_POSE_PARAMETERS>(3 * 5, 0) + dVdP.block<3, TotalModel::NUM_POSE_PARAMETERS>(3 * 6, 0));
+            else dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(3*(5 + offset), 0).setZero();
+            if (!m_targetPts.block<3,1>(5 * (6 + offset), 0).isZero(0)) dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(3*(6 + offset), 0) = targetPtsWeight[6 + offset] * dVdP.block<3, TotalModel::NUM_POSE_PARAMETERS>(3 * 7, 0);
+            else dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(3*(6 + offset), 0).setZero();
+            if (!m_targetPts.block<3,1>(5 * (7 + offset), 0).isZero(0)) dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(3*(7 + offset), 0) = targetPtsWeight[7 + offset] * dVdP.block<3, TotalModel::NUM_POSE_PARAMETERS>(3 * 8, 0);
+            else dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(3*(7 + offset), 0).setZero();
+            if (!m_targetPts.block<3,1>(5 * (8 + offset), 0).isZero(0)) dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(3*(8 + offset), 0) = targetPtsWeight[8 + offset] * 0.5 * (dVdP.block<3, TotalModel::NUM_POSE_PARAMETERS>(3 * 9, 0) + dVdP.block<3, TotalModel::NUM_POSE_PARAMETERS>(3 * 10, 0));
+            else dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(3*(8 + offset), 0).setZero();
 // duration10h += std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start10h).count();
         }
     }
@@ -367,39 +393,129 @@ bool AdamFullCost::Evaluate(double const* const* parameters,
     for (auto i = 0u; i < TotalModel::NUM_JOINTS; i++) outJoint.block(3 * i, 0, 3, 1) += t_vec;
 // const auto duration_transJ = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start_transJ).count();
 
-    MatrixXdr outVert(corres_vertex2targetpt.size(), 3);
-    // double* dVdP_data = new double[3 * corres_vertex2targetpt.size() * TotalModel::NUM_POSE_PARAMETERS];
-    // double* dVdc_data = new double[3 * corres_vertex2targetpt.size() * TotalModel::NUM_SHAPE_COEFFICIENTS];
-    Map<MatrixXdr> dVdP(dVdP_data, 3 * corres_vertex2targetpt.size(), TotalModel::NUM_POSE_PARAMETERS);
-    Map<MatrixXdr> dVdc(dVdc_data, 3 * corres_vertex2targetpt.size(), TotalModel::NUM_SHAPE_COEFFICIENTS);
-    // MatrixXdr dVdP(3 * corres_vertex2targetpt.size(), TotalModel::NUM_POSE_PARAMETERS);
-    // MatrixXdr dVdc(3 * corres_vertex2targetpt.size(), TotalModel::NUM_SHAPE_COEFFICIENTS);
+    MatrixXdr outVert(total_vertex.size(), 3);
+    Map<MatrixXdr> dVdP(dVdP_data, 3 * total_vertex.size(), TotalModel::NUM_POSE_PARAMETERS);
+    Map<MatrixXdr> dVdc(dVdc_data, 3 * total_vertex.size(), TotalModel::NUM_SHAPE_COEFFICIENTS);
 // const auto start_LBS = std::chrono::high_resolution_clock::now();
     if (jacobians) select_lbs(c, transforms_joint, dTrdP, dTrdc, outVert, dVdP_data, dVdc_data);
     else select_lbs(c, transforms_joint, outVert);
 // const auto duration_LBS = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start_LBS).count();
     outVert.rowwise() += t_vec.transpose();
-    const std::array<double*, 2> out_data{{ outJoint.data(), outVert.data() }};
-    const std::array<Map<MatrixXdr>*, 2> dodP = {{ &dTJdP, &dVdP }};  // array of reference is not allowed, only array of pointer
-    const std::array<Map<MatrixXdr>*, 2> dodc = {{ &dTJdc, &dVdc }};
+    std::array<double*, 3> out_data{{ outJoint.data(), outVert.data(), nullptr }};
+    std::array<Map<MatrixXdr>*, 3> dodP = {{ &dTJdP, &dVdP, nullptr }};  // array of reference is not allowed, only array of pointer
+    std::array<Map<MatrixXdr>*, 3> dodc = {{ &dTJdc, &dVdc, nullptr }};
 
     // 2nd step: compute the target joints (copy from FK)
-    // Joint Constraints
 // const auto start_target = std::chrono::high_resolution_clock::now();
-    VectorXd tempJoints(3 * m_nCorrespond_adam2joints);  // predicted joint given current parameter
-    for (int i = 0; i < fit_data_.adam.m_indices_jointConst_adamIdx.rows(); i++)
+    // Arrange the Output Joints & Vertex to the order of constraints
+    VectorXd tempJoints(3 * (m_nCorrespond_adam2joints + m_nCorrespond_adam2pts));
+    Map<MatrixXdr> dOdP(dOdP_data, 3 * (m_nCorrespond_adam2joints + m_nCorrespond_adam2pts), TotalModel::NUM_POSE_PARAMETERS);
+    Map<MatrixXdr> dOdc(dOdc_data, 3 * (m_nCorrespond_adam2joints + m_nCorrespond_adam2pts), TotalModel::NUM_SHAPE_COEFFICIENTS);
+    if (regressor_type == 0)
     {
-        tempJoints.block(3 * i, 0, 3, 1) = outJoint.block(3 * fit_data_.adam.m_indices_jointConst_adamIdx(i), 0, 3, 1);
+        for (int i = 0; i < fit_data_.adam.m_indices_jointConst_adamIdx.rows(); i++)
+        {
+            tempJoints.block(3 * i, 0, 3, 1) = outJoint.block(3 * fit_data_.adam.m_indices_jointConst_adamIdx(i), 0, 3, 1);
+        }
+        int offset = fit_data_.adam.m_indices_jointConst_adamIdx.rows();
+        for (int i = 0; i < fit_data_.adam.m_correspond_adam2lHand_adamIdx.rows(); i++)
+        {
+            tempJoints.block(3*(i + offset), 0, 3, 1) = outJoint.block(3 * fit_data_.adam.m_correspond_adam2lHand_adamIdx(i), 0, 3, 1);
+        }
+        offset += fit_data_.adam.m_correspond_adam2lHand_adamIdx.rows();
+        for (int i = 0; i < fit_data_.adam.m_correspond_adam2rHand_adamIdx.rows(); i++)
+        {
+            tempJoints.block(3*(i + offset), 0, 3, 1) = outJoint.block(3 * fit_data_.adam.m_correspond_adam2rHand_adamIdx(i), 0, 3, 1);
+        }
+        offset += fit_data_.adam.m_correspond_adam2rHand_adamIdx.rows();
+        for (int i = 0; i < corres_vertex2targetpt.size(); i++)
+        {
+            tempJoints.block(3*(i + offset), 0, 3, 1) = outVert.row(i).transpose();
+        }
+
+        if (jacobians)
+        {
+            int offset = 0;
+            for (int i = 0; i < fit_data_.adam.m_indices_jointConst_adamIdx.rows(); i++)
+            {
+                std::copy(dTJdP.data() + 3 * fit_data_.adam.m_indices_jointConst_adamIdx(i) * TotalModel::NUM_POSE_PARAMETERS,
+                          dTJdP.data() + 3 * (fit_data_.adam.m_indices_jointConst_adamIdx(i) + 1) * TotalModel::NUM_POSE_PARAMETERS,
+                          dOdP.data() + 3 * (i + offset) * TotalModel::NUM_POSE_PARAMETERS);
+                std::copy(dTJdc.data() + 3 * fit_data_.adam.m_indices_jointConst_adamIdx(i) * TotalModel::NUM_SHAPE_COEFFICIENTS,
+                          dTJdc.data() + 3 * (fit_data_.adam.m_indices_jointConst_adamIdx(i) + 1) * TotalModel::NUM_SHAPE_COEFFICIENTS,
+                          dOdc.data() + 3 * (i + offset) * TotalModel::NUM_SHAPE_COEFFICIENTS);
+            }
+            offset += fit_data_.adam.m_indices_jointConst_adamIdx.rows();
+            for (int i = 0; i < fit_data_.adam.m_correspond_adam2lHand_adamIdx.rows(); i++)
+            {
+                std::copy(dTJdP.data() + 3 * fit_data_.adam.m_correspond_adam2lHand_adamIdx(i) * TotalModel::NUM_POSE_PARAMETERS,
+                          dTJdP.data() + 3 * (fit_data_.adam.m_correspond_adam2lHand_adamIdx(i) + 1) * TotalModel::NUM_POSE_PARAMETERS,
+                          dOdP.data() + 3 * (i + offset) * TotalModel::NUM_POSE_PARAMETERS);
+                std::copy(dTJdc.data() + 3 * fit_data_.adam.m_correspond_adam2lHand_adamIdx(i) * TotalModel::NUM_SHAPE_COEFFICIENTS,
+                          dTJdc.data() + 3 * (fit_data_.adam.m_correspond_adam2lHand_adamIdx(i) + 1) * TotalModel::NUM_SHAPE_COEFFICIENTS,
+                          dOdc.data() + 3 * (i + offset) * TotalModel::NUM_SHAPE_COEFFICIENTS);
+            }
+            offset += fit_data_.adam.m_correspond_adam2lHand_adamIdx.rows();
+            for (int i = 0; i < fit_data_.adam.m_correspond_adam2rHand_adamIdx.rows(); i++)
+            {
+                std::copy(dTJdP.data() + 3 * fit_data_.adam.m_correspond_adam2rHand_adamIdx(i) * TotalModel::NUM_POSE_PARAMETERS,
+                          dTJdP.data() + 3 * (fit_data_.adam.m_correspond_adam2rHand_adamIdx(i) + 1) * TotalModel::NUM_POSE_PARAMETERS,
+                          dOdP.data() + 3 * (i + offset) * TotalModel::NUM_POSE_PARAMETERS);
+                std::copy(dTJdc.data() + 3 * fit_data_.adam.m_correspond_adam2rHand_adamIdx(i) * TotalModel::NUM_SHAPE_COEFFICIENTS,
+                          dTJdc.data() + 3 * (fit_data_.adam.m_correspond_adam2rHand_adamIdx(i) + 1) * TotalModel::NUM_SHAPE_COEFFICIENTS,
+                          dOdc.data() + 3 * (i + offset) * TotalModel::NUM_SHAPE_COEFFICIENTS);
+            }
+            offset += fit_data_.adam.m_correspond_adam2rHand_adamIdx.rows();
+            std::copy(dVdP_data, dVdP_data + 3 * corres_vertex2targetpt.size() * TotalModel::NUM_POSE_PARAMETERS,
+                      dOdP.data() + 3 * offset * TotalModel::NUM_POSE_PARAMETERS);
+            std::copy(dVdc_data, dVdc_data + 3 * corres_vertex2targetpt.size() * TotalModel::NUM_SHAPE_COEFFICIENTS,
+                      dOdc.data() + 3 * offset * TotalModel::NUM_SHAPE_COEFFICIENTS);
+        }
     }
-    int offset = fit_data_.adam.m_indices_jointConst_adamIdx.rows();
-    for (int i = 0; i < fit_data_.adam.m_correspond_adam2lHand_adamIdx.rows(); i++)
+    else if (regressor_type == 1) // use Human 3.6M regressor
     {
-        tempJoints.block(3*(i + offset), 0, 3, 1) = outJoint.block(3 * fit_data_.adam.m_correspond_adam2lHand_adamIdx(i), 0, 3, 1);
+        if(jacobians) SparseRegress(fit_data_.adam.m_cocoplus_reg, outVert.data(), dVdP_data, dVdc_data, tempJoints.data(), dOdP.data(), dOdc.data());
+        else SparseRegress(fit_data_.adam.m_cocoplus_reg, outVert.data(), nullptr, nullptr, tempJoints.data(), nullptr, nullptr);
+        out_data[2] = tempJoints.data();
+        if (jacobians)
+        {
+            dodP[2] = &dOdP;
+            dodc[2] = &dOdc;
+        }
     }
-    offset += fit_data_.adam.m_correspond_adam2lHand_adamIdx.rows();
-    for (int i = 0; i < fit_data_.adam.m_correspond_adam2rHand_adamIdx.rows(); i++)
+    else
     {
-        tempJoints.block(3*(i + offset), 0, 3, 1) = outJoint.block(3 * fit_data_.adam.m_correspond_adam2rHand_adamIdx(i), 0, 3, 1);
+        assert(regressor_type == 2); // use COCO regressor
+        if(jacobians) SparseRegress(fit_data_.adam.m_small_coco_reg, outVert.data(), dVdP_data, dVdc_data, tempJoints.data(), dOdP.data(), dOdc.data());
+        else SparseRegress(fit_data_.adam.m_small_coco_reg, outVert.data(), nullptr, nullptr, tempJoints.data(), nullptr, nullptr);
+        // SparseRegressor only set the data for body & face, we need to copy finger data from FK output
+        std::copy(outJoint.data() + 3 * 22, outJoint.data() + 3 * 62,  tempJoints.data() + 3 * fit_data_.adam.h36m_jointConst_smcIdx.size()); // 22-42 are left hand, 42 - 62 are right hand
+        // copy foot & face vertex
+        for (auto i = 0; i < corres_vertex2targetpt.size(); i++)
+        {
+            tempJoints[(m_nCorrespond_adam2joints + i) * 3 + 0] = outVert(corres_vertex2targetpt[i].first, 0);
+            tempJoints[(m_nCorrespond_adam2joints + i) * 3 + 1] = outVert(corres_vertex2targetpt[i].first, 1);
+            tempJoints[(m_nCorrespond_adam2joints + i) * 3 + 2] = outVert(corres_vertex2targetpt[i].first, 2);
+        }
+        out_data[2] = tempJoints.data();
+        if (jacobians)
+        {
+            std::copy(dTJdP.data() + 3 * 22 * TotalModel::NUM_POSE_PARAMETERS, dTJdP.data() + 3 * 62 * TotalModel::NUM_POSE_PARAMETERS,
+                      dOdP_data + 3 * fit_data_.adam.h36m_jointConst_smcIdx.size() * TotalModel::NUM_POSE_PARAMETERS);
+            std::copy(dTJdc.data() + 3 * 22 * TotalModel::NUM_SHAPE_COEFFICIENTS, dTJdc.data() + 3 * 62 * TotalModel::NUM_SHAPE_COEFFICIENTS,
+                      dOdc_data + 3 * fit_data_.adam.h36m_jointConst_smcIdx.size() * TotalModel::NUM_SHAPE_COEFFICIENTS);
+            for (auto i = 0; i < corres_vertex2targetpt.size(); i++)
+            {
+                std::copy(dVdP_data + (corres_vertex2targetpt[i].first) * 3 * TotalModel::NUM_POSE_PARAMETERS,
+                          dVdP_data + (corres_vertex2targetpt[i].first + 1) * 3 * TotalModel::NUM_POSE_PARAMETERS,
+                          dOdP_data + (m_nCorrespond_adam2joints + i) * 3 * TotalModel::NUM_POSE_PARAMETERS);
+                std::copy(dVdc_data + (corres_vertex2targetpt[i].first) * 3 * TotalModel::NUM_SHAPE_COEFFICIENTS,
+                          dVdc_data + (corres_vertex2targetpt[i].first + 1) * 3 * TotalModel::NUM_SHAPE_COEFFICIENTS,
+                          dOdc_data + (m_nCorrespond_adam2joints + i) * 3 * TotalModel::NUM_SHAPE_COEFFICIENTS);
+            }
+            dodP[2] = &dOdP;
+            dodc[2] = &dOdc;
+        }
     }
 // const auto duration_target = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start_target).count();
 
@@ -409,55 +525,30 @@ bool AdamFullCost::Evaluate(double const* const* parameters,
 // const auto start_res = std::chrono::high_resolution_clock::now();
     if (fit_data_.fit3D)  // put constrains on 3D
     {
-        for(int i = 0; i < m_nCorrespond_adam2joints; i++)
+        for(int i = 0; i < m_nCorrespond_adam2joints + m_nCorrespond_adam2pts; i++)
         {
             if (targetPts[5 * i] == 0 && targetPts[5 * i + 1] == 0 && targetPts[5 * i + 2] == 0) res.block(res_dim * i, 0, 3, 1).setZero();
-            else res.block(res_dim * i, 0, 3, 1) = (tempJoints.block(3 * i, 0, 3, 1) - m_targetPts.block(5 * i, 0, 3, 1)).cwiseProduct(m_targetPts_weight.block(3 * i, 0, 3, 1));
-        }
-
-        for(int i = 0; i < m_nCorrespond_adam2pts; i++)
-        {
-            if (corres_vertex2targetpt[i].second[0] == 0 && corres_vertex2targetpt[i].second[1] == 0 && corres_vertex2targetpt[i].second[2] == 0)
-                residuals[start_vertex + res_dim * i + 0] = residuals[start_vertex + res_dim * i + 1] = residuals[start_vertex + res_dim * i + 2] = 0;
-            else
-            {
-                residuals[start_vertex + res_dim * i + 0] = vertex_weight[i] * (outVert(i, 0) - corres_vertex2targetpt[i].second[0]);
-                residuals[start_vertex + res_dim * i + 1] = vertex_weight[i] * (outVert(i, 1) - corres_vertex2targetpt[i].second[1]);
-                residuals[start_vertex + res_dim * i + 2] = vertex_weight[i] * (outVert(i, 2) - corres_vertex2targetpt[i].second[2]);
-            }
+            else res.block(res_dim * i, 0, 3, 1) = m_targetPts_weight[i] * (tempJoints.block(3 * i, 0, 3, 1) - m_targetPts.block(5 * i, 0, 3, 1));
         }
     }
 
     if (fit_data_.fit2D)
     {
-        Eigen::Map< Matrix<double, Dynamic, 3, RowMajor> > jointArray(tempJoints.data(), m_nCorrespond_adam2joints, 3);
+        Eigen::Map< Matrix<double, Dynamic, 3, RowMajor> > jointArray(tempJoints.data(), m_nCorrespond_adam2joints + m_nCorrespond_adam2pts, 3);
         // const Eigen::Map< const Matrix<double, 3, 3, RowMajor> > K(fit_data_.K);
         const Eigen::Map< const Matrix<double, 3, 3> > K(fit_data_.K);
         const MatrixXdr jointProjection = jointArray * K;
         const auto* JP = jointProjection.data();
-        for(int i = 0; i < m_nCorrespond_adam2joints; i++)
+        for(int i = 0; i < m_nCorrespond_adam2joints + m_nCorrespond_adam2pts; i++)
         {
-            // if (m_targetPts.block(5 * i + 3, 0, 2, 1).isZero(0)) res.block(res_dim * i + start_2d_dim, 0, 2, 1).setZero();
             if (targetPts[5 * i + 3] == 0 && targetPts[5 * i + 4] == 0) res.block(res_dim * i + start_2d_dim, 0, 2, 1).setZero();
             else
             {
                 // the following two lines are equivalent to
                 // residuals[res_dim * i + start_2d_dim + 0] = (jointProjection(i, 0) / jointProjection(i, 2) - m_targetPts(5 * i + 3)) * m_targetPts_weight[res_dim * i + start_2d_dim + 0];
                 // residuals[res_dim * i + start_2d_dim + 1] = (jointProjection(i, 1) / jointProjection(i, 2) - m_targetPts(5 * i + 4)) * m_targetPts_weight[res_dim * i + start_2d_dim + 1];
-                residuals[res_dim * i + start_2d_dim + 0] = (JP[3 * i + 0] / JP[3 * i + 2] - targetPts[5 * i + 3]) * m_targetPts_weight[res_dim * i + start_2d_dim + 0];
-                residuals[res_dim * i + start_2d_dim + 1] = (JP[3 * i + 1] / JP[3 * i + 2] - targetPts[5 * i + 4]) * m_targetPts_weight[res_dim * i + start_2d_dim + 1];
-            }
-        }
-
-        auto vertexProjection = outVert * K;
-        for(int i = 0; i < m_nCorrespond_adam2pts; i++)
-        {
-            if (corres_vertex2targetpt[i].second[3] == 0 && corres_vertex2targetpt[i].second[4] == 0)
-                residuals[start_vertex + res_dim * i + start_2d_dim + 0] = residuals[start_vertex + res_dim * i + start_2d_dim + 1] = 0;
-            else
-            {
-                residuals[start_vertex + res_dim * i + start_2d_dim + 0] = vertex_weight[i] * (vertexProjection(i, 0) / vertexProjection(i, 2) - corres_vertex2targetpt[i].second[3]);
-                residuals[start_vertex + res_dim * i + start_2d_dim + 1] = vertex_weight[i] * (vertexProjection(i, 1) / vertexProjection(i, 2) - corres_vertex2targetpt[i].second[4]);
+                residuals[res_dim * i + start_2d_dim + 0] = (JP[3 * i + 0] / JP[3 * i + 2] - targetPts[5 * i + 3]) * m_targetPts_weight[i];
+                residuals[res_dim * i + start_2d_dim + 1] = (JP[3 * i + 1] / JP[3 * i + 2] - targetPts[5 * i + 4]) * m_targetPts_weight[i];
             }
         }
     }
@@ -508,46 +599,27 @@ bool AdamFullCost::Evaluate(double const* const* parameters,
 
             if (fit_data_.fit3D)
             {
-                for (int i = 0; i < m_nCorrespond_adam2joints; i++)
+                for (int i = 0; i < m_nCorrespond_adam2joints + m_nCorrespond_adam2pts; i++)
                 {
                     if (targetPts[5 * i] == 0 && targetPts[5 * i + 1] == 0 && targetPts[5 * i + 2] == 0) drdt.block(res_dim * i, 0, 3, 3).setZero();
-                    else drdt.block(res_dim * i, 0, 3, 3).setIdentity();
-                }
-
-                for (int i = 0; i < m_nCorrespond_adam2pts; i++)
-                {
-                    if (corres_vertex2targetpt[i].second[0] == 0 && corres_vertex2targetpt[i].second[1] == 0 && corres_vertex2targetpt[i].second[2] == 0)
-                        std::fill(drdt.data() + (start_vertex + res_dim * i) * 3, drdt.data() + (start_vertex + res_dim * i + 3) * 3, 0);
-                    else
-                        drdt.block(start_vertex + res_dim * i, 0, 3, 3) = vertex_weight[i] * Matrix<double, 3, 3>::Identity();
+                    else drdt.block(res_dim * i, 0, 3, 3) = m_targetPts_weight[i] * Matrix<double, 3, 3>::Identity();
                 }
             }
 
             if (fit_data_.fit2D)
             {
-                Eigen::Map< Matrix<double, Dynamic, 3, RowMajor> > jointArray(tempJoints.data(), m_nCorrespond_adam2joints, 3);
+                Eigen::Map< Matrix<double, Dynamic, 3, RowMajor> > jointArray(tempJoints.data(), m_nCorrespond_adam2joints + m_nCorrespond_adam2pts, 3);
                 Matrix<double, Dynamic, Dynamic, RowMajor> dJdt(3, 3);
                 dJdt.setIdentity();
-                for (int i = 0; i < m_nCorrespond_adam2joints; i++)
+                for (int i = 0; i < m_nCorrespond_adam2joints + m_nCorrespond_adam2pts; i++)
                 {
                     if (targetPts[5 * i + 3] == 0 && targetPts[5 * i + 4] == 0) drdt.block(res_dim * i + start_2d_dim, 0, 2, 3).setZero();
                     else
                     {
-                        projection_Derivative(drdt.data(), dJdt.data(), drdt.cols(), (double*)(jointArray.data() + 3 * i), fit_data_.K, res_dim * i + start_2d_dim, 0);
+                        projection_Derivative(drdt.data(), dJdt.data(), drdt.cols(), (double*)(jointArray.data() + 3 * i), fit_data_.K, res_dim * i + start_2d_dim, 0, m_targetPts_weight[i]);
                     }
                 }
-
-                for (int i = 0; i < m_nCorrespond_adam2pts; i++)
-                {
-                    if (corres_vertex2targetpt[i].second[3] == 0 && corres_vertex2targetpt[i].second[4] == 0)
-                        std::fill(drdt.data() + (start_vertex + res_dim * i + start_2d_dim) * 3, drdt.data() + (start_vertex + res_dim * i + start_2d_dim + 2) * 3, 0);
-                    else
-                        projection_Derivative(drdt.data(), dJdt.data(), drdt.cols(), (double*)(outVert.data() + 3 * i), fit_data_.K, start_vertex + res_dim * i + start_2d_dim, 0, vertex_weight[i]);
-                }
             }
-
-            for (int j = 0; j < res_dim * m_nCorrespond_adam2joints; j++)
-                drdt.row(j) *= m_targetPts_weight[j];
 
             if (fit_data_.fitPAF)
             {
@@ -565,111 +637,34 @@ bool AdamFullCost::Evaluate(double const* const* parameters,
             Map< Matrix<double, Dynamic, Dynamic, RowMajor> > dr_dPose(jacobians[1], m_nResiduals, TotalModel::NUM_JOINTS * 3); 
             if (fit_data_.fit3D)
             {
-                int offset = 0;
-                for (int i = 0; i < fit_data_.adam.m_indices_jointConst_adamIdx.rows(); i++)
+                for (int i = 0; i < m_nCorrespond_adam2joints + m_nCorrespond_adam2pts; i++)
                 {
-                    if (targetPts[5 * (i + offset)] == 0 && targetPts[5 * (i + offset) + 1] == 0 && targetPts[5 * (i + offset) + 2] == 0)
+                    if (targetPts[5 * i] == 0 && targetPts[5 * i + 1] == 0 && targetPts[5 * i + 2] == 0)
                     {
-                        std::fill(dr_dPose.data() + res_dim * (i + offset) * TotalModel::NUM_POSE_PARAMETERS,
-                                  dr_dPose.data() + (3 + res_dim * (i + offset)) * TotalModel::NUM_POSE_PARAMETERS, 0);
+                        std::fill(dr_dPose.data() + res_dim * i * TotalModel::NUM_POSE_PARAMETERS,
+                                  dr_dPose.data() + (3 + res_dim * i) * TotalModel::NUM_POSE_PARAMETERS, 0);
                         // dr_dPose.block(res_dim * (i + offset), 0, 3, TotalModel::NUM_POSE_PARAMETERS).setZero();
                     }
-                    else dr_dPose.block(res_dim * (i + offset), 0, 3, TotalModel::NUM_POSE_PARAMETERS) = m_targetPts_weight[res_dim * (i + offset)] *
-                        dTJdP.block(3 * fit_data_.adam.m_indices_jointConst_adamIdx(i), 0, 3, TotalModel::NUM_POSE_PARAMETERS);
-                }
-                offset = fit_data_.adam.m_indices_jointConst_adamIdx.rows();
-
-                for (int i = 0; i < fit_data_.adam.m_correspond_adam2lHand_adamIdx.rows(); i++)
-                {
-                    if (targetPts[5 * (i + offset)] == 0 && targetPts[5 * (i + offset) + 1] == 0 && targetPts[5 * (i + offset) + 2] == 0)
-                    {
-                        std::fill(dr_dPose.data() + res_dim * (i + offset) * TotalModel::NUM_POSE_PARAMETERS,
-                                  dr_dPose.data() + (3 + res_dim * (i + offset)) * TotalModel::NUM_POSE_PARAMETERS, 0);
-                        // dr_dPose.block(res_dim * (i + offset), 0, 3, TotalModel::NUM_POSE_PARAMETERS).setZero();
-                    }
-                    else dr_dPose.block(res_dim * (i + offset), 0, 3, TotalModel::NUM_POSE_PARAMETERS) = m_targetPts_weight[res_dim * (i + offset)] *
-                        dTJdP.block(3 * fit_data_.adam.m_correspond_adam2lHand_adamIdx(i), 0, 3, TotalModel::NUM_POSE_PARAMETERS);
-                }
-                offset += fit_data_.adam.m_correspond_adam2lHand_adamIdx.rows();
-
-                for (int i = 0; i < fit_data_.adam.m_correspond_adam2rHand_adamIdx.rows(); i++)
-                {
-                    if (targetPts[5 * (i + offset)] == 0 && targetPts[5 * (i + offset) + 1] == 0 && targetPts[5 * (i + offset) + 2] == 0)
-                    {
-                        std::fill(dr_dPose.data() + res_dim * (i + offset) * TotalModel::NUM_POSE_PARAMETERS,
-                                  dr_dPose.data() + (3 + res_dim * (i + offset)) * TotalModel::NUM_POSE_PARAMETERS, 0);
-                        // dr_dPose.block(res_dim * (i + offset), 0, 3, TotalModel::NUM_POSE_PARAMETERS).setZero();
-                    }
-                    else dr_dPose.block(res_dim * (i + offset), 0, 3, TotalModel::NUM_POSE_PARAMETERS) = m_targetPts_weight[res_dim * (i + offset)] *
-                        dTJdP.block(3 * fit_data_.adam.m_correspond_adam2rHand_adamIdx(i), 0, 3, TotalModel::NUM_POSE_PARAMETERS);
-                }
-
-                for (int i = 0; i < m_nCorrespond_adam2pts; i++)
-                {
-                    if (corres_vertex2targetpt[i].second[0] == 0 && corres_vertex2targetpt[i].second[1] == 0 && corres_vertex2targetpt[i].second[2] == 0)
-                        std::fill(dr_dPose.data() + (start_vertex + res_dim * i) * TotalModel::NUM_POSE_PARAMETERS,
-                                  dr_dPose.data() + (start_vertex + res_dim * i + 3) * TotalModel::NUM_POSE_PARAMETERS, 0);
-                    else
-                        dr_dPose.block(start_vertex + res_dim * i, 0, 3, TotalModel::NUM_POSE_PARAMETERS) = vertex_weight[i] * dVdP.block(3 * i, 0, 3, TotalModel::NUM_POSE_PARAMETERS);
+                    else dr_dPose.block(res_dim * i, 0, 3, TotalModel::NUM_POSE_PARAMETERS) = m_targetPts_weight[i] *
+                        dOdP.block(3 * i, 0, 3, TotalModel::NUM_POSE_PARAMETERS);
                 }
             }
 
             if (fit_data_.fit2D)
             {
-                int offset = 0;
-                Eigen::Map< Matrix<double, Dynamic, 3, RowMajor> > jointArray(tempJoints.data(), m_nCorrespond_adam2joints, 3);
-                for (int i = 0; i < fit_data_.adam.m_indices_jointConst_adamIdx.rows(); i++)
+                Eigen::Map< Matrix<double, Dynamic, 3, RowMajor> > jointArray(tempJoints.data(), m_nCorrespond_adam2joints + m_nCorrespond_adam2pts, 3);
+                for (int i = 0; i < m_nCorrespond_adam2joints + m_nCorrespond_adam2pts; i++)
                 {
-                    if (targetPts[5 * (i + offset) + 3] == 0 && targetPts[5 * (i + offset) + 4] == 0)
+                    if (targetPts[5 * i + 3] == 0 && targetPts[5 * i + 4] == 0)
                     {
-                        std::fill(dr_dPose.data() + (start_2d_dim + res_dim * (i + offset)) * TotalModel::NUM_POSE_PARAMETERS,
-                                  dr_dPose.data() + (2 + start_2d_dim + res_dim * (i + offset)) * TotalModel::NUM_POSE_PARAMETERS, 0);
+                        std::fill(dr_dPose.data() + (start_2d_dim + res_dim * i) * TotalModel::NUM_POSE_PARAMETERS,
+                                  dr_dPose.data() + (2 + start_2d_dim + res_dim * i) * TotalModel::NUM_POSE_PARAMETERS, 0);
                         // dr_dPose.block(res_dim * (i + offset), 0, 3, TotalModel::NUM_POSE_PARAMETERS).setZero();
                     }
-                    else projection_Derivative(dr_dPose.data(), dTJdP.data(), dr_dPose.cols(), (double*)(jointArray.data() + 3 * (i + offset)), fit_data_.K,
-                                               res_dim * (i + offset) + start_2d_dim, 3 * fit_data_.adam.m_indices_jointConst_adamIdx(i), m_targetPts_weight[res_dim * (i + offset)]);
-                }
-
-                offset = fit_data_.adam.m_indices_jointConst_adamIdx.rows();
-                for (int i = 0; i < fit_data_.adam.m_correspond_adam2lHand_adamIdx.rows(); i++)
-                {
-                    if (targetPts[5 * (i + offset) + 3] == 0 && targetPts[5 * (i + offset) + 4] == 0)
-                    {
-                        std::fill(dr_dPose.data() + (start_2d_dim + res_dim * (i + offset)) * TotalModel::NUM_POSE_PARAMETERS,
-                                  dr_dPose.data() + (2 + start_2d_dim + res_dim * (i + offset)) * TotalModel::NUM_POSE_PARAMETERS, 0);
-                        // dr_dPose.block(res_dim * (i + offset), 0, 3, TotalModel::NUM_POSE_PARAMETERS).setZero();
-                    }
-                    else projection_Derivative(dr_dPose.data(), dTJdP.data(), dr_dPose.cols(), (double*)(jointArray.data() + 3 * (i + offset)), fit_data_.K,
-                                               res_dim * (i + offset) + start_2d_dim, 3 * fit_data_.adam.m_correspond_adam2lHand_adamIdx(i), m_targetPts_weight[res_dim * (i + offset)]);
-                }
-
-                offset += fit_data_.adam.m_correspond_adam2lHand_adamIdx.rows();
-                for (int i = 0; i < fit_data_.adam.m_correspond_adam2rHand_adamIdx.rows(); i++)
-                {
-                    if (targetPts[5 * (i + offset) + 3] == 0 && targetPts[5 * (i + offset) + 4] == 0)
-                    {
-                        std::fill(dr_dPose.data() + (start_2d_dim + res_dim * (i + offset)) * TotalModel::NUM_POSE_PARAMETERS,
-                                  dr_dPose.data() + (2 + start_2d_dim + res_dim * (i + offset)) * TotalModel::NUM_POSE_PARAMETERS, 0);
-                        // dr_dPose.block(res_dim * (i + offset), 0, 3, TotalModel::NUM_POSE_PARAMETERS).setZero();
-                    }
-                    else projection_Derivative(dr_dPose.data(), dTJdP.data(), dr_dPose.cols(), (double*)(jointArray.data() + 3 * (i + offset)), fit_data_.K,
-                                               res_dim * (i + offset) + start_2d_dim, 3 * fit_data_.adam.m_correspond_adam2rHand_adamIdx(i), m_targetPts_weight[res_dim * (i + offset)]);
-                }
-
-                for (int i = 0; i < m_nCorrespond_adam2pts; i++)
-                {
-                    if (corres_vertex2targetpt[i].second[3] == 0 && corres_vertex2targetpt[i].second[4] == 0)
-                    {
-                        std::fill(dr_dPose.data() + (start_vertex + res_dim * i + start_2d_dim) * TotalModel::NUM_POSE_PARAMETERS,
-                                  dr_dPose.data() + (start_vertex + res_dim * i + start_2d_dim + 2) * TotalModel::NUM_POSE_PARAMETERS, 0);
-                    }
-                    else
-                        projection_Derivative(dr_dPose.data(), dVdP.data(), dr_dPose.cols(), (double*)(outVert.data() + 3 * i), fit_data_.K, start_vertex + res_dim * i + start_2d_dim, 3 * i, vertex_weight[i]);
+                    else projection_Derivative(dr_dPose.data(), dOdP.data(), dr_dPose.cols(), (double*)(jointArray.data() + 3 * i), fit_data_.K,
+                                               res_dim * i + start_2d_dim, 3 * i, m_targetPts_weight[i]);
                 }
             }
-
-            // for (int j = 0; j < res_dim * m_nCorrespond_adam2joints; j++)
-            //     dr_dPose.row(j) *= m_targetPts_weight[j];
 
             if (fit_data_.fitPAF)
             {
@@ -775,100 +770,30 @@ bool AdamFullCost::Evaluate(double const* const* parameters,
 
             if (fit_data_.fit3D)
             {
-                int offset = 0;
-                for (int i = 0; i < fit_data_.adam.m_indices_jointConst_adamIdx.rows(); i++)
+                for (int i = 0; i < m_nCorrespond_adam2joints + m_nCorrespond_adam2pts; i++)
                 {
-                    if (targetPts[5 * (i + offset)] == 0 && targetPts[5 * (i + offset) + 1] == 0 && targetPts[5 * (i + offset) + 2] == 0)
+                    if (targetPts[5 * i] == 0 && targetPts[5 * i + 1] == 0 && targetPts[5 * i + 2] == 0)
                     {
-                        std::fill(dr_dCoeff.data() + res_dim * (i + offset) * TotalModel::NUM_SHAPE_COEFFICIENTS,
-                                  dr_dCoeff.data() + (3 + res_dim * (i + offset)) * TotalModel::NUM_SHAPE_COEFFICIENTS, 0);
+                        std::fill(dr_dCoeff.data() + res_dim * i * TotalModel::NUM_SHAPE_COEFFICIENTS,
+                                  dr_dCoeff.data() + (3 + res_dim * i) * TotalModel::NUM_SHAPE_COEFFICIENTS, 0);
                     }
-                    else dr_dCoeff.block(res_dim * (i + offset), 0, 3, TotalModel::NUM_SHAPE_COEFFICIENTS) = m_targetPts_weight[res_dim * (i + offset)] *
-                        dTJdc.block(3 * fit_data_.adam.m_indices_jointConst_adamIdx(i), 0, 3, TotalModel::NUM_SHAPE_COEFFICIENTS);
-                }
-                offset = fit_data_.adam.m_indices_jointConst_adamIdx.rows();
-
-                for (int i = 0; i < fit_data_.adam.m_correspond_adam2lHand_adamIdx.rows(); i++)
-                {
-                   if (targetPts[5 * (i + offset)] == 0 && targetPts[5 * (i + offset) + 1] == 0 && targetPts[5 * (i + offset) + 2] == 0)
-                    {
-                        std::fill(dr_dCoeff.data() + res_dim * (i + offset) * TotalModel::NUM_SHAPE_COEFFICIENTS,
-                                  dr_dCoeff.data() + (3 + res_dim * (i + offset)) * TotalModel::NUM_SHAPE_COEFFICIENTS, 0);
-                    }
-                    else dr_dCoeff.block(res_dim * (i + offset), 0, 3, TotalModel::NUM_SHAPE_COEFFICIENTS) = m_targetPts_weight[res_dim * (i + offset)] *
-                        dTJdc.block(3 * fit_data_.adam.m_correspond_adam2lHand_adamIdx(i), 0, 3, TotalModel::NUM_SHAPE_COEFFICIENTS);
-                }
-                offset += fit_data_.adam.m_correspond_adam2lHand_adamIdx.rows();
-
-                for (int i = 0; i < fit_data_.adam.m_correspond_adam2rHand_adamIdx.rows(); i++)
-                {
-                    if (targetPts[5 * (i + offset)] == 0 && targetPts[5 * (i + offset) + 1] == 0 && targetPts[5 * (i + offset) + 2] == 0)
-                    {
-                        std::fill(dr_dCoeff.data() + res_dim * (i + offset) * TotalModel::NUM_SHAPE_COEFFICIENTS,
-                                  dr_dCoeff.data() + (3 + res_dim * (i + offset)) * TotalModel::NUM_SHAPE_COEFFICIENTS, 0);
-                    }
-                    else dr_dCoeff.block(res_dim * (i + offset), 0, 3, TotalModel::NUM_SHAPE_COEFFICIENTS) = m_targetPts_weight[res_dim * (i + offset)] *
-                        dTJdc.block(3 * fit_data_.adam.m_correspond_adam2rHand_adamIdx(i), 0, 3, TotalModel::NUM_SHAPE_COEFFICIENTS);
-                }
-
-                for (int i = 0; i < m_nCorrespond_adam2pts; i++)
-                {
-                    if (corres_vertex2targetpt[i].second[0] == 0 && corres_vertex2targetpt[i].second[1] == 0 && corres_vertex2targetpt[i].second[2] == 0)
-                        std::fill(dr_dCoeff.data() + (start_vertex + res_dim * i) * TotalModel::NUM_SHAPE_COEFFICIENTS,
-                                  dr_dCoeff.data() + (start_vertex + res_dim * i + 3) * TotalModel::NUM_SHAPE_COEFFICIENTS, 0);
-                    else
-                        dr_dCoeff.block(start_vertex + res_dim * i, 0, 3, TotalModel::NUM_SHAPE_COEFFICIENTS) = vertex_weight[i] * dVdc.block(3 * i, 0, 3, TotalModel::NUM_SHAPE_COEFFICIENTS);
+                    else dr_dCoeff.block(res_dim * i, 0, 3, TotalModel::NUM_SHAPE_COEFFICIENTS) = m_targetPts_weight[i] *
+                        dOdc.block(3 * i, 0, 3, TotalModel::NUM_SHAPE_COEFFICIENTS);
                 }
             }
 
             if (fit_data_.fit2D)
             {
-                int offset = 0;
-                Eigen::Map< Matrix<double, Dynamic, 3, RowMajor> > jointArray(tempJoints.data(), m_nCorrespond_adam2joints, 3);
-                for (int i = 0; i < fit_data_.adam.m_indices_jointConst_adamIdx.rows(); i++)
+                Eigen::Map< Matrix<double, Dynamic, 3, RowMajor> > jointArray(tempJoints.data(), m_nCorrespond_adam2joints + m_nCorrespond_adam2pts, 3);
+                for (int i = 0; i < m_nCorrespond_adam2joints + m_nCorrespond_adam2pts; i++)
                 {
-                    if (targetPts[5 * (i + offset) + 3] == 0 && targetPts[5 * (i + offset) + 4] == 0)
+                    if (targetPts[5 * i + 3] == 0 && targetPts[5 * i + 4] == 0)
                     {
-                        std::fill(dr_dCoeff.data() + (start_2d_dim + res_dim * (i + offset)) * TotalModel::NUM_SHAPE_COEFFICIENTS,
-                                  dr_dCoeff.data() + (2 + start_2d_dim + res_dim * (i + offset)) * TotalModel::NUM_SHAPE_COEFFICIENTS, 0);
+                        std::fill(dr_dCoeff.data() + (start_2d_dim + res_dim * i) * TotalModel::NUM_SHAPE_COEFFICIENTS,
+                                  dr_dCoeff.data() + (2 + start_2d_dim + res_dim * i) * TotalModel::NUM_SHAPE_COEFFICIENTS, 0);
                     }
-                    else projection_Derivative(dr_dCoeff.data(), dTJdc.data(), dr_dCoeff.cols(), (double*)(jointArray.data() + 3 * (i + offset)), fit_data_.K,
-                                               res_dim * (i + offset) + start_2d_dim, 3 * fit_data_.adam.m_indices_jointConst_adamIdx(i), m_targetPts_weight[res_dim * (i + offset)]);
-                }
-
-                offset = fit_data_.adam.m_indices_jointConst_adamIdx.rows();
-                for (int i = 0; i < fit_data_.adam.m_correspond_adam2lHand_adamIdx.rows(); i++)
-                {
-                    if (targetPts[5 * (i + offset) + 3] == 0 && targetPts[5 * (i + offset) + 4] == 0)
-                    {
-                        std::fill(dr_dCoeff.data() + (start_2d_dim + res_dim * (i + offset)) * TotalModel::NUM_SHAPE_COEFFICIENTS,
-                                  dr_dCoeff.data() + (2 + start_2d_dim + res_dim * (i + offset)) * TotalModel::NUM_SHAPE_COEFFICIENTS, 0);
-                    }
-                    else projection_Derivative(dr_dCoeff.data(), dTJdc.data(), dr_dCoeff.cols(), (double*)(jointArray.data() + 3 * (i + offset)), fit_data_.K,
-                                               res_dim * (i + offset) + start_2d_dim, 3 * fit_data_.adam.m_correspond_adam2lHand_adamIdx(i), m_targetPts_weight[res_dim * (i + offset)]);
-                }
-
-                offset += fit_data_.adam.m_correspond_adam2lHand_adamIdx.rows();
-                for (int i = 0; i < fit_data_.adam.m_correspond_adam2rHand_adamIdx.rows(); i++)
-                {
-                    if (targetPts[5 * (i + offset) + 3] == 0 && targetPts[5 * (i + offset) + 4] == 0)
-                    {
-                        std::fill(dr_dCoeff.data() + (start_2d_dim + res_dim * (i + offset)) * TotalModel::NUM_SHAPE_COEFFICIENTS,
-                                  dr_dCoeff.data() + (2 + start_2d_dim + res_dim * (i + offset)) * TotalModel::NUM_SHAPE_COEFFICIENTS, 0);
-                    }
-                    else projection_Derivative(dr_dCoeff.data(), dTJdc.data(), dr_dCoeff.cols(), (double*)(jointArray.data() + 3 * (i + offset)), fit_data_.K,
-                                               res_dim * (i + offset) + start_2d_dim, 3 * fit_data_.adam.m_correspond_adam2rHand_adamIdx(i), m_targetPts_weight[res_dim * (i + offset)]);
-                }
-
-                for (int i = 0; i < m_nCorrespond_adam2pts; i++)
-                {
-                    if (corres_vertex2targetpt[i].second[3] == 0 && corres_vertex2targetpt[i].second[4] == 0)
-                    {
-                        std::fill(dr_dCoeff.data() + (start_vertex + res_dim * i + start_2d_dim) * TotalModel::NUM_SHAPE_COEFFICIENTS,
-                                  dr_dCoeff.data() + (start_vertex + res_dim * i + start_2d_dim + 2) * TotalModel::NUM_SHAPE_COEFFICIENTS, 0);
-                    }
-                    else
-                        projection_Derivative(dr_dCoeff.data(), dVdc.data(), dr_dCoeff.cols(), (double*)(outVert.data() + 3 * i), fit_data_.K, start_vertex + res_dim * i + start_2d_dim, 3 * i, vertex_weight[i]);
+                    else projection_Derivative(dr_dCoeff.data(), dOdc.data(), dr_dCoeff.cols(), (double*)(jointArray.data() + 3 * i), fit_data_.K,
+                                               res_dim * i + start_2d_dim, 3 * i, m_targetPts_weight[i]);
                 }
             }
 
@@ -939,25 +864,17 @@ void AdamFullCost::select_lbs(
 {
     // read adam model and corres_vertex2targetpt from the class member
     using namespace Eigen;
-    // Map< const Matrix<double, Dynamic, 1> > c_bodyshape(c, TotalModel::NUM_SHAPE_COEFFICIENTS);
-    assert(outVert.rows() == corres_vertex2targetpt.size());
-    // assert(dVdc.rows() == 3 * corres_vertex2targetpt.size());
-    // assert(dVdP.rows() == 3 * corres_vertex2targetpt.size());
-    // double* dVdc_data = dVdc.data();
-    // double* dVdP_data = dVdP.data();
-    std::fill(dVdc_data, dVdc_data + 3 * corres_vertex2targetpt.size() * TotalModel::NUM_SHAPE_COEFFICIENTS, 0); // dVdc.setZero();
-    std::fill(dVdP_data, dVdP_data + 3 * corres_vertex2targetpt.size() * TotalModel::NUM_POSE_PARAMETERS, 0); // dVdP.setZero();
-    // std::fill(dVdc_data, dVdc_data + dVdc.rows() * dVdc.cols(), 0); // dVdc.setZero();
-    // std::fill(dVdP_data, dVdP_data + dVdP.rows() * dVdP.cols(), 0); // dVdP.setZero();
+    assert(outVert.rows() == total_vertex.size());
+    std::fill(dVdc_data, dVdc_data + 3 * total_vertex.size() * TotalModel::NUM_SHAPE_COEFFICIENTS, 0); // dVdc.setZero();
+    std::fill(dVdP_data, dVdP_data + 3 * total_vertex.size() * TotalModel::NUM_POSE_PARAMETERS, 0); // dVdP.setZero();
     const double* dTdc_data = dTdc.data();
     const double* dTdP_data = dTdP.data();
-    // const Eigen::MatrixXd& dV0dc = fit_data_.adam.m_shapespace_u;
     const double* dV0dc_data = fit_data_.adam.m_shapespace_u.data();
     const double* meanshape_data = fit_data_.adam.m_meanshape.data();
 
-    for (auto i = 0u; i < corres_vertex2targetpt.size(); i++)
+    for (auto i = 0u; i < total_vertex.size(); i++)
     {
-        const int idv = corres_vertex2targetpt[i].first;
+        const int idv = total_vertex[i];
         // compute the default vertex, v0 is a column vector
         // The following lines are equivalent to
         // MatrixXd v0 = fit_data_.adam.m_meanshape.block(3 * idv, 0, 3, 1) + fit_data_.adam.m_shapespace_u.block(3 * idv, 0, 3, TotalModel::NUM_SHAPE_COEFFICIENTS) * c_bodyshape;
@@ -1056,17 +973,17 @@ void AdamFullCost::select_lbs(
     MatrixXdr &outVert
 ) const
 {
-    // read adam model and corres_vertex2targetpt from the class member
+    // read adam model and total_vertex from the class member
     using namespace Eigen;
     // Map< const Matrix<double, Dynamic, 1> > c_bodyshape(c, TotalModel::NUM_SHAPE_COEFFICIENTS);
-    assert(outVert.rows() == corres_vertex2targetpt.size());
+    assert(outVert.rows() == total_vertex.size());
     // const Eigen::MatrixXd& dV0dc = fit_data_.adam.m_shapespace_u;
     const double* dV0dc_data = fit_data_.adam.m_shapespace_u.data();
     const double* meanshape_data = fit_data_.adam.m_meanshape.data();
 
-    for (auto i = 0u; i < corres_vertex2targetpt.size(); i++)
+    for (auto i = 0u; i < total_vertex.size(); i++)
     {
-        const int idv = corres_vertex2targetpt[i].first;
+        const int idv = total_vertex[i];
         // compute the default vertex, v0 is a column vector
         // The following lines are equivalent to
         // MatrixXd v0 = fit_data_.adam.m_meanshape.block(3 * idv, 0, 3, 1) + fit_data_.adam.m_shapespace_u.block(3 * idv, 0, 3, TotalModel::NUM_SHAPE_COEFFICIENTS) * c_bodyshape;
@@ -1094,6 +1011,59 @@ void AdamFullCost::select_lbs(
                 outVrow_data[0] += w * (Trow_data[0] * v0_data[0] + Trow_data[1] * v0_data[1] + Trow_data[2] * v0_data[2] + Trow_data[3]);
                 outVrow_data[1] += w * (Trow_data[4] * v0_data[0] + Trow_data[5] * v0_data[1] + Trow_data[6] * v0_data[2] + Trow_data[7]);
                 outVrow_data[2] += w * (Trow_data[8] * v0_data[0] + Trow_data[9] * v0_data[1] + Trow_data[10] * v0_data[2] + Trow_data[11]);
+            }
+        }
+    }
+}
+
+void AdamFullCost::SparseRegress(const Eigen::SparseMatrix<double>& reg, const double* V_data, const double* dVdP_data, const double* dVdc_data,
+                                 double* J_data, double* dJdP_data, double* dJdc_data) const
+{
+    const int num_J = m_nCorrespond_adam2joints;
+    std::fill(J_data, J_data + 3 * num_J, 0);
+    for (int ic = 0; ic < total_vertex.size(); ic++)
+    {
+        const int c = total_vertex[ic];
+        for (Eigen::SparseMatrix<double>::InnerIterator it(reg, c); it; ++it)
+        {
+            const int r = it.row();
+            auto search = map_regressor_to_constraint.find(r);
+            if (search == map_regressor_to_constraint.end()) continue;  // This joint is not used for constraint
+            const int ind_constraint = search->second;
+            const double value = it.value();
+            J_data[3 * ind_constraint + 0] += value * V_data[3 * ic + 0];
+            J_data[3 * ind_constraint + 1] += value * V_data[3 * ic + 1];
+            J_data[3 * ind_constraint + 2] += value * V_data[3 * ic + 2];
+        }
+    }
+
+    if (dVdP_data != nullptr)  // need to pass back the correct Jacobian
+    {
+        assert(dVdc_data != nullptr && dJdP_data != nullptr && dJdc_data != nullptr);
+        std::fill(dJdP_data, dJdP_data + 3 * num_J * TotalModel::NUM_POSE_PARAMETERS, 0.0);
+        std::fill(dJdc_data, dJdc_data + 3 * num_J * TotalModel::NUM_SHAPE_COEFFICIENTS, 0.0);
+        for (int ic = 0; ic < total_vertex.size(); ic++)
+        {
+            const int c = total_vertex[ic];
+            for (Eigen::SparseMatrix<double>::InnerIterator it(reg, c); it; ++it)
+            {
+                const int r = it.row();
+                auto search = map_regressor_to_constraint.find(r);
+                if (search == map_regressor_to_constraint.end()) continue;  // This joint is not used for constraint
+                const int ind_constraint = search->second;
+                const double value = it.value();
+                for (int i = 0; i < TotalModel::NUM_POSE_PARAMETERS; i++)
+                {
+                    dJdP_data[(3 * ind_constraint + 0) * TotalModel::NUM_POSE_PARAMETERS + i] += value * dVdP_data[(3 * ic + 0) * TotalModel::NUM_POSE_PARAMETERS + i];
+                    dJdP_data[(3 * ind_constraint + 1) * TotalModel::NUM_POSE_PARAMETERS + i] += value * dVdP_data[(3 * ic + 1) * TotalModel::NUM_POSE_PARAMETERS + i];
+                    dJdP_data[(3 * ind_constraint + 2) * TotalModel::NUM_POSE_PARAMETERS + i] += value * dVdP_data[(3 * ic + 2) * TotalModel::NUM_POSE_PARAMETERS + i];
+                }
+                for (int i = 0; i < TotalModel::NUM_SHAPE_COEFFICIENTS; i++)
+                {
+                    dJdc_data[(3 * ind_constraint + 0) * TotalModel::NUM_SHAPE_COEFFICIENTS + i] += value * dVdc_data[(3 * ic + 0) * TotalModel::NUM_SHAPE_COEFFICIENTS + i];
+                    dJdc_data[(3 * ind_constraint + 1) * TotalModel::NUM_SHAPE_COEFFICIENTS + i] += value * dVdc_data[(3 * ic + 1) * TotalModel::NUM_SHAPE_COEFFICIENTS + i];
+                    dJdc_data[(3 * ind_constraint + 2) * TotalModel::NUM_SHAPE_COEFFICIENTS + i] += value * dVdc_data[(3 * ic + 2) * TotalModel::NUM_SHAPE_COEFFICIENTS + i];
+                }
             }
         }
     }

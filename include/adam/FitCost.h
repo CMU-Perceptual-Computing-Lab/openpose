@@ -25,6 +25,61 @@ struct CoeffsParameterNorm {
 	const double num_parameters_;
 };
 
+struct HandCoeffsParameterNorm {
+	HandCoeffsParameterNorm(int num_parameters)
+		: num_parameters_(num_parameters)
+	{
+		assert(num_parameters_ == 3 * smpl::HandModel::NUM_JOINTS);
+	}
+
+	// no constraint on the first root (global rotation)
+	template <typename T>
+	inline bool operator()(const T* const p,
+		T* residuals) const {
+			for (int i = 0; i < smpl::HandModel::NUM_JOINTS; i++) 
+			{
+				residuals[3 * i + 0] = exp(abs(p[3 * i + 0]));
+				residuals[3 * i + 1] = exp(abs(p[3 * i + 1]));
+				residuals[3 * i + 2] = exp(abs(p[3 * i + 2]));
+			}
+		return true;
+	}
+	const double num_parameters_;
+};
+
+struct HandPoseParameterNorm {
+	HandPoseParameterNorm(int num_parameters, const smpl::HandModel& handm)
+		: num_parameters_(num_parameters), handm_(handm)
+	{
+		assert(num_parameters_ == 3 * smpl::HandModel::NUM_JOINTS);
+	}
+
+	// no constraint on the first root (global rotation)
+	template <typename T>
+	inline bool operator()(const T* const p,
+		T* residuals) const {
+			for (int i = 0; i < smpl::HandModel::NUM_JOINTS; i++) 
+			{
+				const int idj = handm_.m_jointmap_pm2model(i);
+				if (i == 0)
+				{
+					residuals[3 * idj + 0] = T(0);
+					residuals[3 * idj + 1] = T(0);
+					residuals[3 * idj + 2] = T(0);
+				}
+				else
+				{
+					residuals[3 * idj + 0] = T(1) * p[3 * idj + 0];
+					residuals[3 * idj + 1] = T(10) * p[3 * idj + 1];
+					residuals[3 * idj + 2] = T(1) * p[3 * idj + 2];
+				}
+			}
+		return true;
+	}
+	const double num_parameters_;
+	const smpl::HandModel& handm_;
+};
+
 class CoeffsParameterNormDiff: public ceres::CostFunction
 {
 public:
@@ -98,7 +153,7 @@ struct Hand3DCostPose
 
 		Matrix<T, Dynamic, 4, RowMajor> Ms(4 * HandModel::NUM_JOINTS, 4);
 		Matrix<T, 4, 4, RowMajor> Mthis;
-		Matrix<T, 3, 3, ColMajor> R; // Interface with ceres
+		Matrix<T, 3, 3, RowMajor> R; // Interface with ceres
 		Matrix<T, 3, 3, RowMajor> Rr; // Interface with ceres
 		Mthis.setZero();
 		Mthis(3, 3) = T(1.0);
@@ -106,14 +161,15 @@ struct Hand3DCostPose
 		int idj = handm_.update_inds_(0);
 		ceres::AngleAxisToRotationMatrix(pose + idj * 3, R.data());
 		Mthis.block(0, 0, 3, 3) = R * DiagonalMatrix<T, 3>(T(C(idj, 0)), T(C(idj, 0)), T(C(idj, 0)));
+		// Mthis.block(0, 0, 3, 3) = R * DiagonalMatrix<T, 3>(exp(T(C(idj, 0))), exp(T(C(idj, 0))), exp(T(C(idj, 0))));
 		// Mthis.block(0, 0, 3, 3) = R * DiagonalMatrix<T, 3>(T(C(idj, 0)), T(C(idj, 1)), T(C(idj, 2)));
 		Ms.block(idj * 4, 0, 4, 4) = handm_.m_M_l2pl.block(idj * 4, 0, 4, 4).cast<T>()*Mthis;
 		outJoint.block(idj * 3, 0, 3, 4) = Ms.block(idj * 4, 0, 3, 4);
 
 		int idji = 0;
-		residuals[idj * 3 + 0] = outJoint(idj * 3, 3) + Tr(0, 0)  - T(Joints_(0, idji)) ;
-		residuals[idj * 3 + 1] = outJoint(idj * 3 + 1, 3) + Tr(1, 0)  - T(Joints_(1, idji));
-		residuals[idj * 3 + 2] = outJoint(idj * 3 + 2, 3) + Tr(2, 0) - T(Joints_(2, idji)) ;
+		residuals[idj * 3 + 0] = outJoint(idj * 3 + 0, 3) + Tr(0, 0) - T(Joints_(0, idji));
+		residuals[idj * 3 + 1] = outJoint(idj * 3 + 1, 3) + Tr(1, 0) - T(Joints_(1, idji));
+		residuals[idj * 3 + 2] = outJoint(idj * 3 + 2, 3) + Tr(2, 0) - T(Joints_(2, idji));
 
 		for (int idji = 1; idji < handm_.NUM_JOINTS; idji++)
 		{
@@ -122,20 +178,32 @@ struct Hand3DCostPose
 
 			ceres::EulerAnglesToRotationMatrix(pose + idj * 3, 3, Rr.data());
 			// Mthis.block(0, 0, 3, 3) = Rr * DiagonalMatrix<T, 3>(T(C(idj, 0)), T(C(idj, 0)), T(C(idj, 0)));
+			// Mthis.block(0, 0, 3, 3) = Rr * DiagonalMatrix<T, 3>(exp(T(C(idj, 0))), T(1), T(1));
 			Mthis.block(0, 0, 3, 3) = Rr * DiagonalMatrix<T, 3>(T(C(idj, 0)), T(1), T(1));
 
 			Ms.block(idj * 4, 0, 4, 4) = Ms.block(ipar * 4, 0, 4, 4)*handm_.m_M_l2pl.block(idj * 4, 0, 4, 4).cast<T>()*Mthis;
 			outJoint.block(idj * 3, 0, 3, 4) = Ms.block(idj * 4, 0, 3, 4);
+// if (idji == 20)
+// {
+// std::cout << "idj: " << idj << std::endl;
+// std::cout << "(0, 0)\n" <<  Ms(0 + idj * 4, 0) << std::endl;
+// std::cout << "(0, 1)\n" <<  Ms(0 + idj * 4, 1) << std::endl;
+// std::cout << "(0, 2)\n" <<  Ms(0 + idj * 4, 2) << std::endl;
+// std::cout << "(1, 0)\n" <<  Ms(1 + idj * 4, 0) << std::endl;
+// std::cout << "(1, 1)\n" <<  Ms(1 + idj * 4, 1) << std::endl;
+// std::cout << "(1, 2)\n" <<  Ms(1 + idj * 4, 2) << std::endl;
+// std::cout << "(2, 0)\n" <<  Ms(2 + idj * 4, 0) << std::endl;
+// std::cout << "(2, 1)\n" <<  Ms(2 + idj * 4, 1) << std::endl;
+// std::cout << "(2, 2)\n" <<  Ms(2 + idj * 4, 2) << std::endl;
+// }
 		}
 
 		for (int idji = 1; idji < handm_.NUM_JOINTS; idji++)
 		{
 			idj = handm_.m_jointmap_pm2model(idji);  // joint_order vs update_inds_ // joint_order(SMC -> idj)
-			{
-				residuals[idj * 3 + 0] = outJoint(idj * 3, 3) + Tr(0, 0) - T(Joints_(0, idji));
-				residuals[idj * 3 + 1] = outJoint(idj * 3 + 1, 3) + Tr(1, 0) - T(Joints_(1, idji));
-				residuals[idj * 3 + 2] = outJoint(idj * 3 + 2, 3) + Tr(2, 0) - T(Joints_(2, idji));
-			}
+			residuals[idj * 3 + 0] = outJoint(idj * 3 + 0, 3) + Tr(0, 0) - T(Joints_(0, idji));
+			residuals[idj * 3 + 1] = outJoint(idj * 3 + 1, 3) + Tr(1, 0) - T(Joints_(1, idji));
+			residuals[idj * 3 + 2] = outJoint(idj * 3 + 2, 3) + Tr(2, 0) - T(Joints_(2, idji));
 		}
 		return true;
 	}
@@ -215,49 +283,48 @@ struct Hand2DProjectionCost
 	}
 };
 
-struct AdamBodyPoseParamPrior {
+struct AdamBodyPoseParamPrior {  // used by refitting
 	AdamBodyPoseParamPrior(int num_parameters)
 		: num_parameters_(num_parameters) {}
 
+	// <Residuals, block1 params, block2 params>  = <2, 6, nIntrinsicParams, 3>
 	template <typename T>
-	bool operator()(const T* const p, T* residuals) const {
-// const auto start1 = std::chrono::high_resolution_clock::now();
+	inline bool operator()(const T* const p,
+		T* residuals) const {
+
+
 		//Put stronger prior for spine body joints
 		for (int i = 0; i < num_parameters_; i++)
 		{
 			if (i >= 0 && i < 3)
 			{
-				residuals[i] = T(0.0);
-				// residuals[i] = T(3)*p[i];
+				residuals[i] = T(3)*p[i];
 			}
 			else if ((i >= 9 && i < 12) || (i >= 18 && i < 21) || (i >= 27 && i < 30))
-				residuals[i] = T(12)*p[i];
+			{
+				residuals[i] = T(3)*p[i];
+			}
 			else if ((i >= 42 && i < 45) || (i >= 39 && i < 41))
 				residuals[i] = T(2)*p[i];
 			else if (i >= 54 && i < 60)		//18, 19 (elbows)
 			{
 				if (i == 54 || i == 57)		//twist 
-					residuals[i] = T(3)*p[i];
+					residuals[i] = T(1)*p[i];
 				else
 					residuals[i] = T(0.1)*p[i];
 			}
 			else if (i >= 60 && i < 66)		//20, 21 (wrist)
 			{
 				if (i == 60 || i == 63)		//twist of wrist
-					residuals[i] = p[i];
+					residuals[i] = T(1)*p[i];
 				else
 					residuals[i] = T(0.1)*p[i];
 			}
 			else if (i >= 66) //fingers
-				residuals[i] = p[i];
+				residuals[i] = T(1.0)*p[i];
 			else
-				residuals[i] = p[i];		//Do nothing
+				residuals[i] = T(1.0)*p[i];;// *p[i];	//Do nothing*/
 		}
-// const auto duration1 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start1).count();
-// std::cout << __FILE__ << " " << duration1 * 1e-6 << "\n"
-//           << __FILE__ << " " << num_parameters_ << "\n"
-//           << __FILE__ << " " << sizeof(T) << std::endl;
-// 8 ms --> 2 ms. Problem: sizeof(T) = 1504. No problem: #param = 186
 		return true;
 	}
 	const double num_parameters_;
@@ -272,37 +339,49 @@ public:
 		CostFunction::set_num_residuals(num_parameters_);
 		CostFunction::mutable_parameter_block_sizes()->clear();
 		CostFunction::mutable_parameter_block_sizes()->push_back(num_parameters_);
-	}
-	virtual bool Evaluate(double const* const* parameters, double* residuals, double** jacobians) const
-	{
-		double const* p = parameters[0];
-		residuals[0] = residuals[1] = residuals[2] = 0;
+		weight[0] = weight[1] = weight[2] = 0.0;
 		for (int i = 3; i < 66; i++)
 		{
 			if ((i >= 9 && i < 12) || (i >= 18 && i < 21) || (i >= 27 && i < 30))
-				residuals[i] = 12 * p[i];
+				weight[i] = 12;
 			else if (i == 36) // neck
-				residuals[i] = 2 * p[i];
+				weight[i] = 2;
 			else if ((i >= 42 && i < 45) || (i >= 39 && i < 41))
-				residuals[i] = 2 * p[i];
+				weight[i] = 2;
+			else if (i == 48 || i == 51)
+			{
+				weight[i] = 3;
+			}
 			else if (i >= 54 && i < 60)		//18, 19 (elbows)
 			{
 				if (i == 54 || i == 57)		//twist 
-					residuals[i] = 3 * p[i];
+					weight[i] = 5;
 				else
-					residuals[i] = 0.1 * p[i];
+					weight[i] = 0.1;
 			}
 			else if (i >= 60 && i < 66)		//20, 21 (wrist)
 			{
 				if (i == 60 || i == 63)		//twist of wrist
-					residuals[i] = p[i];
+					weight[i] = 3;
 				else
-					residuals[i] = 0.1 * p[i];
+					weight[i] = 0.1;
+			}
+			else if (i == 4 || i == 7 || i == 13 || i == 16)
+			{
+				weight[i] = 3;  // twist of legs
 			}
 			else
-				residuals[i] = p[i];		//Do nothing
+				weight[i] = 1;		//Do nothing
 		}
-		std::copy(p + 66, p + num_parameters_, residuals + 66);
+		std::fill(weight.data() + 66, weight.data() + num_parameters_, 1);  // less weight on fingers
+	}
+	virtual bool Evaluate(double const* const* parameters, double* residuals, double** jacobians) const
+	{
+		double const* p = parameters[0];
+		for (int i = 0; i < num_parameters_; i++)
+		{
+			residuals[i] = p[i] * weight[i];
+		}
 
 		if (jacobians)
 		{
@@ -313,35 +392,13 @@ public:
 				for (int i = 0; i < num_parameters_; i++)
 				{
 					double* jac_row = jac + i * num_parameters_;
-					if (i < 3)
-						continue;
-					else if ((i >= 9 && i < 12) || (i >= 18 && i < 21) || (i >= 27 && i < 30))
-						jac_row[i] = 12;
-					else if (i >= 36) // neck
-						jac_row[i] = 2;
-					else if ((i >= 42 && i < 45) || (i >= 39 && i < 41))
-						jac_row[i] = 2;
-					else if (i >= 54 && i < 60)		//18, 19 (elbows)
-					{
-						if (i == 54 || i == 57)		//twist 
-							jac_row[i] = 3;
-						else
-							jac_row[i] = 0.1;
-					}
-					else if (i >= 60 && i < 66)		//20, 21 (wrist)
-					{
-						if (i == 60 || i == 63)		//twist of wrist
-							jac_row[i] = 1;
-						else
-							jac_row[i] = 0.1;
-					}
-					else
-						jac_row[i] = 1.0;		//Do nothing
+					jac_row[i] = weight[i];
 				}
 			}
 		}
 		return true;
 	}
+	std::array<float, TotalModel::NUM_POSE_PARAMETERS> weight;
 private:
 	const int num_parameters_;
 };
@@ -1384,4 +1441,170 @@ public:
 	bool fit_face_;
 	float weight2d;
 	int res_dim; // set to 3 for 3D fitting, 2 for 2D fitting, 5 for fit 2D with relative 3D
+};
+
+struct Hand3DCostPose_LBS
+{
+	Hand3DCostPose_LBS(smpl::HandModel &handm,
+		bool is_left,
+		Eigen::MatrixXd &Joints)
+		: handm_(handm), is_left_(is_left), Joints_(Joints)
+	{
+		total_vertex.clear();
+		for (int k = 0; k < handm_.STB_wrist_reg.outerSize(); ++k)
+		{
+			for (Eigen::SparseMatrix<double>::InnerIterator it(handm_.STB_wrist_reg, k); it; ++it)
+		    {
+				total_vertex.push_back(k);
+				break;  // now this vertex is used, go to next vertex
+		    }
+		}
+	}
+
+	template <typename T>
+	bool operator()(
+		const T* const trans,
+		const T* const pose,  // SMPLModel::NUM_JOINTS*3
+		const T* const coeffs,
+		T* residuals) 
+		const 
+	{
+		using namespace Eigen;
+		// using namespace kinoptic;
+		using namespace smpl;
+
+		Map< const Matrix<T, 3, 1> > Tr(trans);
+		Map< const Matrix<T, HandModel::NUM_JOINTS, 3, RowMajor> > P(pose);
+		Map< const Matrix<T, HandModel::NUM_JOINTS, 3, RowMajor> > C(coeffs);
+
+		Matrix<T, Dynamic, 4, RowMajor>  outJoint(3 * HandModel::NUM_JOINTS,4);		//Joint location
+
+		Matrix<T, Dynamic, 4, RowMajor> Ms(4 * HandModel::NUM_JOINTS, 4);
+		Matrix<T, 4, 4, RowMajor> Mthis;
+		Matrix<T, 3, 3, RowMajor> R; // Interface with ceres
+		Matrix<T, 3, 3, RowMajor> Rr; // Interface with ceres
+		Mthis.setZero();
+		Mthis(3, 3) = T(1.0);
+		Ms.setZero();
+		int idj = handm_.update_inds_(0);
+		ceres::AngleAxisToRotationMatrix(pose + idj * 3, R.data());
+		Mthis.block(0, 0, 3, 3) = R * DiagonalMatrix<T, 3>(T(C(idj, 0)), T(C(idj, 0)), T(C(idj, 0)));
+		// Mthis.block(0, 0, 3, 3) = R * DiagonalMatrix<T, 3>(exp(T(C(idj, 0))), exp(T(C(idj, 0))), exp(T(C(idj, 0))));
+		// Mthis.block(0, 0, 3, 3) = R * DiagonalMatrix<T, 3>(T(C(idj, 0)), T(C(idj, 1)), T(C(idj, 2)));
+		Ms.block(idj * 4, 0, 4, 4) = handm_.m_M_l2pl.block(idj * 4, 0, 4, 4).cast<T>()*Mthis;
+		outJoint.block(idj * 3, 0, 3, 4) = Ms.block(idj * 4, 0, 3, 4);
+
+		for (int idji = 1; idji < handm_.NUM_JOINTS; idji++)
+		{
+			idj = handm_.update_inds_(idji);		//mine -> matlab
+			int ipar = handm_.parents_(idj);
+
+			ceres::EulerAnglesToRotationMatrix(pose + idj * 3, 3, Rr.data());
+			// Mthis.block(0, 0, 3, 3) = Rr * DiagonalMatrix<T, 3>(T(C(idj, 0)), T(C(idj, 0)), T(C(idj, 0)));
+			// Mthis.block(0, 0, 3, 3) = Rr * DiagonalMatrix<T, 3>(exp(T(C(idj, 0))), T(1), T(1));
+			Mthis.block(0, 0, 3, 3) = Rr * DiagonalMatrix<T, 3>(T(C(idj, 0)), T(1), T(1));
+
+			Ms.block(idj * 4, 0, 4, 4) = Ms.block(ipar * 4, 0, 4, 4)*handm_.m_M_l2pl.block(idj * 4, 0, 4, 4).cast<T>()*Mthis;
+			outJoint.block(idj * 3, 0, 3, 4) = Ms.block(idj * 4, 0, 3, 4);
+		}
+
+		std::vector<Eigen::Matrix<T, 3, 3, Eigen::RowMajor>> MR(smpl::HandModel::NUM_JOINTS);
+		std::vector<Eigen::Matrix<T, 3, 1>> Mt(smpl::HandModel::NUM_JOINTS);
+		for (int idj = 0; idj < smpl::HandModel::NUM_JOINTS; idj++)
+		{
+			Mt[idj] = Ms.block(idj * 4, 0, 3, 3) * handm_.m_M_w2l.block(idj * 4, 3, 3, 1).cast<T>() + Ms.block(idj * 4, 3, 3, 1);
+			MR[idj] = Ms.block(idj * 4, 0, 3, 3) * handm_.m_M_w2l.block(idj * 4, 0, 3, 3).cast<T>();
+		}
+// std::cout << "0 0\n" << MR[1](0, 0) << "\n";
+// std::cout << "0 1\n" << MR[1](0, 1) << "\n";
+// std::cout << "0 2\n" << MR[1](0, 2) << "\n";
+// std::cout << "1 0\n" << MR[1](1, 0) << "\n";
+// std::cout << "1 1\n" << MR[1](1, 1) << "\n";
+// std::cout << "1 2\n" << MR[1](1, 2) << "\n";
+// std::cout << "2 0\n" << MR[1](2, 0) << "\n";
+// std::cout << "2 1\n" << MR[1](2, 1) << "\n";
+// std::cout << "2 2\n" << MR[1](2, 2) << "\n";
+// std::cout << "0 0\n" << Mt[1](0, 0) << "\n";
+// std::cout << "0 1\n" << Mt[1](1, 0) << "\n";
+// std::cout << "0 2\n" << Mt[1](2, 0) << "\n";
+// auto t = Ms.block(1 * 4, 0, 3, 3) * handm_.m_M_w2l.block(1 * 4, 3, 3, 1).cast<T>();
+// std::cout << "0 0\n" << t(0, 0) << "\n";
+// std::cout << "0 1\n" << t(1, 0) << "\n";
+// std::cout << "0 2\n" << t(2, 0) << "\n";
+
+		Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> outVert(total_vertex.size(), 3);
+		select_lbs(MR, Mt, outVert);
+		Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> outJ(1, 3);
+		SparseRegress(handm_.STB_wrist_reg, outVert, outJ);
+		int idji = 0;
+		idj = handm_.update_inds_(0);
+		outJoint.block(idj * 3, 3, 3, 1) = outJ.transpose();
+		residuals[idj * 3 + 0] = outJoint(idj * 3 + 0, 3) + Tr(0, 0) - T(Joints_(0, idji));
+		residuals[idj * 3 + 1] = outJoint(idj * 3 + 1, 3) + Tr(1, 0) - T(Joints_(1, idji));
+		residuals[idj * 3 + 2] = outJoint(idj * 3 + 2, 3) + Tr(2, 0) - T(Joints_(2, idji));
+
+		for (int idji = 1; idji < handm_.NUM_JOINTS; idji++)
+		{
+			idj = handm_.m_jointmap_pm2model(idji);  // joint_order vs update_inds_ // joint_order(SMC -> idj)
+			residuals[idj * 3 + 0] = outJoint(idj * 3 + 0, 3) + Tr(0, 0) - T(Joints_(0, idji));
+			residuals[idj * 3 + 1] = outJoint(idj * 3 + 1, 3) + Tr(1, 0) - T(Joints_(1, idji));
+			residuals[idj * 3 + 2] = outJoint(idj * 3 + 2, 3) + Tr(2, 0) - T(Joints_(2, idji));
+		}
+		return true;
+	}
+
+	template <typename T>
+	void select_lbs(
+		std::vector<Eigen::Matrix<T, 3, 3, Eigen::RowMajor>>& MR,
+		std::vector<Eigen::Matrix<T, 3, 1>>& Mt,
+		Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>& outVert) const
+	{
+		for (auto i = 0u; i < total_vertex.size(); i++)
+	    {
+	    	const int idv = total_vertex[i];
+	        outVert(i, 0) = T(0);
+	        outVert(i, 1) = T(0);
+	        outVert(i, 2) = T(0);
+	        for (int idj = 0; idj < smpl::HandModel::NUM_JOINTS; idj++)
+	        {
+	            if (handm_.W_(idv, idj))
+	            {
+	                T w = T(handm_.W_(idv, idj));
+	                for (int idd = 0; idd < 3; idd++)
+	                {
+	                    outVert(i, idd) += w * handm_.V_(idv, 0) * MR[idj](idd, 0);
+	                    outVert(i, idd) += w * handm_.V_(idv, 1) * MR[idj](idd, 1);
+	                    outVert(i, idd) += w * handm_.V_(idv, 2) * MR[idj](idd, 2);
+	                    outVert(i, idd) += w * Mt[idj](idd, 0);
+	                }
+	            }
+	        }
+	    }
+	}
+
+	template <typename T>
+	void SparseRegress(const Eigen::SparseMatrix<double>& reg,
+		const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>& outVert,
+		Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>& outJ) const
+	{
+		const int num_J = reg.rows();
+		outJ.setZero();
+	    for (int ic = 0; ic < total_vertex.size(); ic++)
+	    {
+		    const int c = total_vertex[ic];
+		    for (Eigen::SparseMatrix<double>::InnerIterator it(reg, c); it; ++it)
+		    {
+		        const int r = it.row();
+		        const T value = T(it.value());
+		        outJ(r, 0) += value * outVert(ic, 0);
+		        outJ(r, 1) += value * outVert(ic, 1);
+		        outJ(r, 2) += value * outVert(ic, 2);
+		    }
+		}
+	}
+
+	std::vector<int> total_vertex;
+	smpl::HandModel &handm_;
+	bool is_left_;
+	Eigen::Matrix<double, 3, Eigen::Dynamic, Eigen::RowMajor> Joints_;
 };

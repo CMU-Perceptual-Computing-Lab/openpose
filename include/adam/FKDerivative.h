@@ -3,20 +3,22 @@
 #include <Eigen/Dense>
 #include <ceres/rotation.h>
 #include <iostream>
+#include <vector>
+#include <totalmodel.h>
 
-void AngleAxisToRotationMatrix_Derivative(const double* pose, double* dR_data, const int idj);
-void EulerAnglesToRotationMatrix_Derivative(const double* pose, double* dR_data, const int idj);
+void AngleAxisToRotationMatrix_Derivative(const double* pose, double* dR_data, const int idj, const int numberColumns=TotalModel::NUM_JOINTS * 3);
+void EulerAnglesToRotationMatrix_Derivative(const double* pose, double* dR_data, const int idj, const int numberColumns=TotalModel::NUM_JOINTS * 3);
 void Product_Derivative(const double* const A_data, const double* const dA_data, const double* const B_data,
                         const double* const dB_data, double* dAB_data, const int B_col=3);
 void SparseProductDerivative(const double* const A_data, const double* const dA_data, const double* const B_data,
                              const double* const dB_data, const int colIndex,
-                             const std::vector<int>& parentIndexes, double* dAB_data);
+                             const std::vector<int>& parentIndexes, double* dAB_data, const int numberColumns=TotalModel::NUM_JOINTS * 3);
 void SparseProductDerivative(const double* const dA_data, const double* const B_data,
-                             const std::vector<int>& parentIndexes, double* dAB_data);
+                             const std::vector<int>& parentIndexes, double* dAB_data, const int numberColumns=TotalModel::NUM_JOINTS * 3);
 void SparseProductDerivativeConstA(const double* const A_data, const double* const dB_data,
-                             const std::vector<int>& parentIndexes, double* dAB_data);
-void SparseAdd(const double* const B_data, const std::vector<int>& parentIndexes, double* A_data);
-void SparseSubtract(const double* const B_data, const std::vector<int>& parentIndexes, double* A_data);
+                             const std::vector<int>& parentIndexes, double* dAB_data, const int numberColumns=TotalModel::NUM_JOINTS * 3);
+void SparseAdd(const double* const B_data, const std::vector<int>& parentIndexes, double* A_data, const int numberColumns=TotalModel::NUM_JOINTS * 3);
+void SparseSubtract(const double* const B_data, const std::vector<int>& parentIndexes, double* A_data, const int numberColumns=TotalModel::NUM_JOINTS * 3);
 
 void projection_Derivative(double* dPdI_data, const double* dJdI_data, const int ncol, double* XYZ, const double* pK_, int offsetP, int offsetJ, float weight=1.0f);
 

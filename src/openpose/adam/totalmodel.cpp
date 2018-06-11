@@ -119,6 +119,8 @@ void LoadTotalDataFromJson(TotalModel &totalm, const std::string &path, const st
     // Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> stmp;
     initSparseMatrix(totalm.m_J_reg, root["adam_J_regressor_big"]);
     initSparseMatrix(totalm.m_J_reg_smc, root["adam_J_regressor_big_smc"]);
+    initSparseMatrix(totalm.m_small_coco_reg, root["small_coco_reg"]);
+    totalm.m_small_coco_reg.makeCompressed();
 
     initMatrix(totalm.m_blendW, root["blendW"]);
     initMatrix(totalm.m_kintree_table, root["kintree_table"]);
@@ -496,6 +498,17 @@ void LoadTotalModelFromObj(TotalModel &totalm, const std::string &path)
 	totalm.m_bInit = true;
 	fin.close();
 	printf("Finishing loading Total Model\n");
+}
+
+void LoadCocoplusRegressor(TotalModel &totalm, const std::string &path)
+{
+	printf("Loading from: %s\n", path.c_str());
+	std::ifstream file(path.c_str(), std::ifstream::in);
+    Json::Value root;
+    file >> root;
+    file.close();
+    initSparseMatrix(totalm.m_cocoplus_reg, root["cocoplus_regressor"]);
+    totalm.m_cocoplus_reg.makeCompressed();
 }
 
 Eigen::VectorXd adam_reconstruct_withDerivative_eulers(const TotalModel &totalm,
