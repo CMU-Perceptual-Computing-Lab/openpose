@@ -716,6 +716,10 @@ void Adam_FastFit(TotalModel &adam,
 		// 	TotalModel::NUM_POSE_PARAMETERS,
 		// 	TotalModel::NUM_POSE_PARAMETERS>(new AdamBodyPoseParamPrior(TotalModel::NUM_POSE_PARAMETERS));
 		AdamBodyPoseParamPriorDiff *cost_prior_body_pose = new AdamBodyPoseParamPriorDiff(TotalModel::NUM_POSE_PARAMETERS);
+		for (int i = 22; i < 62; i++)
+		{
+			cost_prior_body_pose->weight[3 * i + 2] = 1e-2; // set regularization of finger bend small
+		}
 
 		ceres::LossFunction* loss_weight_prior_body_pose = new ceres::ScaledLoss(NULL,
 			1e-2,
@@ -729,6 +733,20 @@ void Adam_FastFit(TotalModel &adam,
 	else g_cost_body_keypoints->UpdateJoints(BodyJoints, rFoot, lFoot, faceJoints, lHandJoints, rHandJoints);
 // const auto duration1 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start1).count();
 // const auto start2 = std::chrono::high_resolution_clock::now();
+
+	auto twist = false;
+	for (int i = 1; i < TotalModel::NUM_JOINTS; i++)
+	{
+		auto count_axis = 0u;
+		if (frame_param.m_adam_pose.data()[3 * i + 0] > 90 || frame_param.m_adam_pose.data()[3 * i + 0] < -90) count_axis++;
+		if (frame_param.m_adam_pose.data()[3 * i + 1] > 90 || frame_param.m_adam_pose.data()[3 * i + 1] < -90) count_axis++;
+		if (frame_param.m_adam_pose.data()[3 * i + 2] > 90 || frame_param.m_adam_pose.data()[3 * i + 2] < -90) count_axis++;
+		if (count_axis >= 2)  // this joint is twisted
+		{
+			twist = true;
+			frame_param.m_adam_pose.data()[3 * i + 0] = frame_param.m_adam_pose.data()[3 * i + 1] = frame_param.m_adam_pose.data()[3 * i + 2] = 0.0;
+		}
+	}
 
 	std::copy(frame_param.m_adam_t.data(), frame_param.m_adam_t.data() + 3, g_params.m_adam_t.data());
 	std::copy(frame_param.m_adam_pose.data(), frame_param.m_adam_pose.data() + 62 * 3, g_params.m_adam_pose.data());
@@ -749,16 +767,15 @@ void Adam_FastFit(TotalModel &adam,
 	// ceres::Solve(options, &g_problem, &summary);
 	// std::cout << summary.FullReport() << std::endl;
 
-	// g_cost_body_keypoints->toggle_activate(true, false);
-	// ceres::Solve(options, &g_problem, &summary);
-	// std::cout << summary.FullReport() << std::endl;
-
-	g_cost_body_keypoints->toggle_activate(true, true);
-// const auto duration3 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start3).count();
-// const auto start4 = std::chrono::high_resolution_clock::now();
+	if (!twist) g_cost_body_keypoints->toggle_activate(true, true);   // if no twist is detected, perform a single fitting
+	else
+	{
+		std::cout << "twist detected, multiple stage fitting" << std::endl;
+		g_cost_body_keypoints->toggle_activate(true, false);
+		ceres::Solve(options, &g_problem, &summary);
+		if(verbose) std::cout << summary.FullReport() << std::endl;
+	}
 	ceres::Solve(options, &g_problem, &summary);
-// const auto duration4 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start4).count();
-// const auto start5 = std::chrono::high_resolution_clock::now();
 	if(verbose) std::cout << summary.FullReport() << std::endl;
 
 	std::copy(g_params.m_adam_t.data(), g_params.m_adam_t.data() + 3, frame_param.m_adam_t.data());
