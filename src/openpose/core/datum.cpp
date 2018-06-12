@@ -42,6 +42,22 @@ namespace op
         scaleInputToOutput{datum.scaleInputToOutput},
         scaleNetToOutput{datum.scaleNetToOutput},
         elementRendered{datum.elementRendered}
+        // 3D/Adam parameters
+        #ifdef WITH_3D_ADAM_MODEL
+            ,
+            // Adam params (Jacobians)
+            vtVec{datum.vtVec},
+            j0Vec{datum.j0Vec},
+            adamFaceCoeffsExp{datum.adamFaceCoeffsExp},
+            // Adam/Unity params
+            adamPose{datum.adamPose},
+            adamTranslation{datum.adamTranslation},
+            // Unity params
+            mouthOpening{datum.mouthOpening},
+            rightEyeOpening{datum.rightEyeOpening},
+            leftEyeOpening{datum.leftEyeOpening},
+            distanceRootFoot{datum.distanceRootFoot}
+        #endif
     {
     }
 
@@ -81,6 +97,21 @@ namespace op
             scaleInputToOutput = datum.scaleInputToOutput;
             scaleNetToOutput = datum.scaleNetToOutput;
             elementRendered = datum.elementRendered;
+            // 3D/Adam parameters
+            #ifdef WITH_3D_ADAM_MODEL
+                // Adam params (Jacobians)
+                vtVec = datum.vtVec;
+                j0Vec = datum.j0Vec;
+                adamFaceCoeffsExp = datum.adamFaceCoeffsExp;
+                // Adam/Unity params
+                adamPose = datum.adamPose;
+                adamTranslation = datum.adamTranslation;
+                // Unity params
+                mouthOpening = datum.mouthOpening;
+                rightEyeOpening = datum.rightEyeOpening;
+                leftEyeOpening = datum.leftEyeOpening;
+                distanceRootFoot = datum.distanceRootFoot;
+            #endif
             // Return
             return *this;
         }
@@ -129,6 +160,21 @@ namespace op
             std::swap(scaleInputToNetInputs, datum.scaleInputToNetInputs);
             std::swap(netInputSizes, datum.netInputSizes);
             std::swap(elementRendered, datum.elementRendered);
+            // 3D/Adam parameters
+            #ifdef WITH_3D_ADAM_MODEL
+                // Adam params (Jacobians)
+                std::swap(vtVec, datum.vtVec);
+                std::swap(j0Vec, datum.j0Vec);
+                std::swap(adamFaceCoeffsExp, datum.adamFaceCoeffsExp);
+                // Adam/Unity params
+                std::swap(adamPose, datum.adamPose);
+                std::swap(adamTranslation, datum.adamTranslation);
+                // Unity params
+                std::swap(mouthOpening, datum.mouthOpening);
+                std::swap(rightEyeOpening, datum.rightEyeOpening);
+                std::swap(leftEyeOpening, datum.leftEyeOpening);
+                std::swap(distanceRootFoot, datum.distanceRootFoot);
+            #endif
         }
         catch (const std::exception& e)
         {
@@ -170,6 +216,21 @@ namespace op
             std::swap(scaleInputToNetInputs, datum.scaleInputToNetInputs);
             std::swap(netInputSizes, datum.netInputSizes);
             std::swap(elementRendered, datum.elementRendered);
+            // 3D/Adam parameters
+            #ifdef WITH_3D_ADAM_MODEL
+                // Adam params (Jacobians)
+                std::swap(vtVec, datum.vtVec);
+                std::swap(j0Vec, datum.j0Vec);
+                std::swap(adamFaceCoeffsExp, datum.adamFaceCoeffsExp);
+                // Adam/Unity params
+                std::swap(adamPose, datum.adamPose);
+                std::swap(adamTranslation, datum.adamTranslation);
+                // Unity params
+                std::swap(mouthOpening, datum.mouthOpening);
+                std::swap(rightEyeOpening, datum.rightEyeOpening);
+                std::swap(leftEyeOpening, datum.leftEyeOpening);
+                std::swap(distanceRootFoot, datum.distanceRootFoot);
+            #endif
             // Return
             return *this;
         }
@@ -226,6 +287,21 @@ namespace op
             datum.scaleInputToOutput = scaleInputToOutput;
             datum.scaleNetToOutput = scaleNetToOutput;
             datum.elementRendered = elementRendered;
+            // 3D/Adam parameters
+            #ifdef WITH_3D_ADAM_MODEL
+                // Adam params (Jacobians)
+                datum.vtVec = vtVec;
+                datum.j0Vec = j0Vec;
+                datum.adamFaceCoeffsExp = adamFaceCoeffsExp;
+                // Adam/Unity params
+                datum.adamPose = adamPose;
+                datum.adamTranslation = adamTranslation;
+                // Unity params
+                datum.mouthOpening = mouthOpening;
+                datum.rightEyeOpening = rightEyeOpening;
+                datum.leftEyeOpening = leftEyeOpening;
+                datum.distanceRootFoot = distanceRootFoot;
+            #endif
             // Return
             return std::move(datum);
         }

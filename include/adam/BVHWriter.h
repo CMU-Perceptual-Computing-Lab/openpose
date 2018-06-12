@@ -7,7 +7,7 @@
 
 struct BVHData
 {
-	BVHData(std::string _name, double* _offset): name(_name), num_children(0)
+	BVHData(const std::string& _name, const double* const _offset): name(_name), num_children(0)
 	{
 		offset[0] = _offset[0];
 		offset[1] = _offset[1];
@@ -23,17 +23,19 @@ struct BVHData
 class BVHWriter
 {
 public:
-	BVHWriter(int* _m_parent, const bool unityCompatible = false) :
+	BVHWriter(const int* const _m_parent, const bool unityCompatible = false) :
 		mUnityCompatible{unityCompatible}
 	{
 		std::copy(_m_parent, _m_parent + TotalModel::NUM_JOINTS, m_parent);
 	}
-	void parseInput(const Eigen::Matrix<double, 3 * TotalModel::NUM_JOINTS, 1>& J0, std::vector<Eigen::Matrix<double, 3, 1>>& t, std::vector<Eigen::Matrix<double, TotalModel::NUM_JOINTS, 3, Eigen::RowMajor>>& pose);
-	void writeBVH(std::string output_file, double frame_time);
+	void parseInput(const Eigen::Matrix<double, 3 * TotalModel::NUM_JOINTS, 1>& J0, 
+					const std::vector<Eigen::Matrix<double, 3, 1>>& t,
+					const std::vector<Eigen::Matrix<double, TotalModel::NUM_JOINTS, 3, Eigen::RowMajor>>& pose);
+	void writeBVH(const std::string& output_file, const double frame_time);
 private:
 	void getHierarchy(const Eigen::Matrix<double, 3 * TotalModel::NUM_JOINTS, 1>& J0);
-	void getDynamic(Eigen::Matrix<double, TotalModel::NUM_JOINTS, 3, Eigen::RowMajor>& pose);
-	void writeData(std::shared_ptr<BVHData> node, int depth);
+	void getDynamic(const Eigen::Matrix<double, TotalModel::NUM_JOINTS, 3, Eigen::RowMajor>& pose);
+	void writeData(const std::shared_ptr<BVHData>& node, const int depth);
 	const bool mUnityCompatible;
 	int m_parent[TotalModel::NUM_JOINTS];
 	int num_frame;
