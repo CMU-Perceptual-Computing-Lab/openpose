@@ -45,13 +45,13 @@ namespace op
         // 3D/Adam parameters
         #ifdef WITH_3D_ADAM_MODEL
             ,
+            // Adam/Unity params
+            adamPose{datum.adamPose},
+            adamTranslation{datum.adamTranslation},
             // Adam params (Jacobians)
             vtVec{datum.vtVec},
             j0Vec{datum.j0Vec},
             adamFaceCoeffsExp{datum.adamFaceCoeffsExp},
-            // Adam/Unity params
-            adamPose{datum.adamPose},
-            adamTranslation{datum.adamTranslation},
             // Unity params
             mouthOpening{datum.mouthOpening},
             rightEyeOpening{datum.rightEyeOpening},
@@ -99,13 +99,13 @@ namespace op
             elementRendered = datum.elementRendered;
             // 3D/Adam parameters
             #ifdef WITH_3D_ADAM_MODEL
+                // Adam/Unity params
+                adamPose = datum.adamPose;
+                adamTranslation = datum.adamTranslation;
                 // Adam params (Jacobians)
                 vtVec = datum.vtVec;
                 j0Vec = datum.j0Vec;
                 adamFaceCoeffsExp = datum.adamFaceCoeffsExp;
-                // Adam/Unity params
-                adamPose = datum.adamPose;
-                adamTranslation = datum.adamTranslation;
                 // Unity params
                 mouthOpening = datum.mouthOpening;
                 rightEyeOpening = datum.rightEyeOpening;
@@ -162,13 +162,13 @@ namespace op
             std::swap(elementRendered, datum.elementRendered);
             // 3D/Adam parameters
             #ifdef WITH_3D_ADAM_MODEL
+                // Adam/Unity params
+                std::swap(adamPose, datum.adamPose);
+                std::swap(adamTranslation, datum.adamTranslation);
                 // Adam params (Jacobians)
                 std::swap(vtVec, datum.vtVec);
                 std::swap(j0Vec, datum.j0Vec);
                 std::swap(adamFaceCoeffsExp, datum.adamFaceCoeffsExp);
-                // Adam/Unity params
-                std::swap(adamPose, datum.adamPose);
-                std::swap(adamTranslation, datum.adamTranslation);
                 // Unity params
                 std::swap(mouthOpening, datum.mouthOpening);
                 std::swap(rightEyeOpening, datum.rightEyeOpening);
@@ -218,13 +218,13 @@ namespace op
             std::swap(elementRendered, datum.elementRendered);
             // 3D/Adam parameters
             #ifdef WITH_3D_ADAM_MODEL
+                // Adam/Unity params
+                std::swap(adamPose, datum.adamPose);
+                std::swap(adamTranslation, datum.adamTranslation);
                 // Adam params (Jacobians)
                 std::swap(vtVec, datum.vtVec);
                 std::swap(j0Vec, datum.j0Vec);
                 std::swap(adamFaceCoeffsExp, datum.adamFaceCoeffsExp);
-                // Adam/Unity params
-                std::swap(adamPose, datum.adamPose);
-                std::swap(adamTranslation, datum.adamTranslation);
                 // Unity params
                 std::swap(mouthOpening, datum.mouthOpening);
                 std::swap(rightEyeOpening, datum.rightEyeOpening);
@@ -289,13 +289,13 @@ namespace op
             datum.elementRendered = elementRendered;
             // 3D/Adam parameters
             #ifdef WITH_3D_ADAM_MODEL
+                // Adam/Unity params
+                datum.adamPose = adamPose;
+                datum.adamTranslation = adamTranslation;
                 // Adam params (Jacobians)
                 datum.vtVec = vtVec;
                 datum.j0Vec = j0Vec;
                 datum.adamFaceCoeffsExp = adamFaceCoeffsExp;
-                // Adam/Unity params
-                datum.adamPose = adamPose;
-                datum.adamTranslation = adamTranslation;
                 // Unity params
                 datum.mouthOpening = mouthOpening;
                 datum.rightEyeOpening = rightEyeOpening;

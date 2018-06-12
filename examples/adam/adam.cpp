@@ -234,11 +234,10 @@ DEFINE_string(write_keypoint_json,      "",             "(Deprecated, use `write
 DEFINE_string(write_bvh,                "",             "E.g.: /media/posefs3b/Users/gines/cvpr2018/temp.bvh");
 DEFINE_string(write_adam,               "",             "E.g.: /media/posefs3b/Users/gines/cvpr2018/adam.avi");
 
-#include <BVHWriter.h>
-#include <FitToBody.h>
 #include <KinematicModel.h>
-#include <Renderer.h>
 #include <totalmodel.h>
+#include <BVHWriter.h>
+#include <Renderer.h>
 #include <utils.h>
 #include <VisualizedData.h>
 #define SMPL_VIS_SCALING 100.0f
@@ -246,308 +245,7 @@ DEFINE_string(write_adam,               "",             "E.g.: /media/posefs3b/U
 const int NUMBER_BODY_KEYPOINTS = 20;
 const int NUMBER_HAND_KEYPOINTS = 21;
 const int NUMBER_FACE_KEYPOINTS = 70;
-const int NUMBER_FOOT_KEYPOINTS = 3;
 const int NUMBER_KEYPOINTS = 3*(NUMBER_BODY_KEYPOINTS + 2*NUMBER_HAND_KEYPOINTS); // targetJoints: Only for Body, LHand, RHand. No Face, no Foot
-
-int mapOPToAdam(const int oPPart)
-{
-    if (oPPart >= 0 && oPPart < 19)
-    {
-        // Nose
-        if (oPPart == 0)
-            return 1;
-        // Neck
-        else if (oPPart == 1)
-            return 0;
-        // Right arm
-        else if (oPPart == 2)
-            return 9;
-        else if (oPPart == 3)
-            return 10;
-        else if (oPPart == 4)
-            return 11;
-        // Left arm
-        else if (oPPart == 5)
-            return 3;
-        else if (oPPart == 6)
-            return 4;
-        else if (oPPart == 7)
-            return 5;
-        // Mid-hip
-        else if (oPPart == 8)
-            return 2;
-        // Right leg
-        else if (oPPart == 9)
-            return 12;
-        else if (oPPart == 10)
-            return 13;
-        else if (oPPart == 11)
-            return 14;
-        // Left leg
-        else if (oPPart == 12)
-            return 6;
-        else if (oPPart == 13)
-            return 7;
-        else if (oPPart == 14)
-            return 8;
-        // Face
-        else if (oPPart == 15)
-            return 17;
-        else if (oPPart == 16)
-            return 15;
-        else if (oPPart == 17)
-            return 18;
-        else if (oPPart == 18)
-            return 16;
-        else
-            op::error("Wrong body part (" + std::to_string(oPPart) + ").",
-                      __LINE__, __FUNCTION__, __FILE__);
-    }
-    op::error("Wrong body part (" + std::to_string(oPPart) + ").",
-              __LINE__, __FUNCTION__, __FILE__);
-    return -1;
-}
-
-// Adam IK processing
-class WUserPostProcessing : public op::Worker<std::shared_ptr<std::vector<op::Datum>>>
-{
-public:
-    // Purely processing
-    WUserPostProcessing(const bool fillVtAndJ0Vecs = true,
-                        const bool ceresDisplayReport = false) :
-        mGTotalModelPath{"./model/adam_v1_plus2.json"},
-        mPcaPath{"./model/adam_blendshapes_348_delta_norm.json"},
-        mObjectPath{"./model/mesh_nofeet.obj"},
-        mCorrespondencePath{"./model/correspondences_nofeet.txt"},
-        mFillVtAndJ0Vecs{fillVtAndJ0Vecs},
-        mCeresDisplayReport{ceresDisplayReport},
-        mInitialized{false},
-        mBodyJoints(5, NUMBER_BODY_KEYPOINTS),
-        mFaceJoints(5, NUMBER_FACE_KEYPOINTS),// (3, landmarks_face.size());
-        mLHandJoints(5, NUMBER_HAND_KEYPOINTS),// (3, HandModel::NUM_JOINTS);
-        mRHandJoints(5, NUMBER_HAND_KEYPOINTS),// (3, HandModel::NUM_JOINTS);
-        mLFootJoints(5, 3),// (3, 3);        // Heel, Toe
-        mRFootJoints(5, 3),// (3, 3);        // Heel, Toe
-        spTotalModel{loadTotalModel(mObjectPath, mGTotalModelPath, mPcaPath, mCorrespondencePath)}
-    {
-    }
-
-    void initializationOnThread()
-    {
-    }
-
-    const std::shared_ptr<const TotalModel> getTotalModel()
-    {
-        try
-        {
-            return spTotalModel;
-        }
-        catch (const std::exception& e)
-        {
-            op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return spTotalModel;
-        }
-    }
-
-    void work(std::shared_ptr<std::vector<op::Datum>>& datumsPtr)
-    {
-        try
-        {
-            // User's displaying/saving/other processing here
-                // datum.cvOutputData: rendered frame with pose or heatmaps
-                // datum.poseKeypoints: Array<float> with the estimated pose
-            if (datumsPtr != nullptr && !datumsPtr->empty())
-            {
-                // Datum --> Adam input format
-                auto& datum = datumsPtr->at(0);
-                const auto& poseKeypoints3D = datum.poseKeypoints3D;
-                if (poseKeypoints3D.getSize(1) != 19 && poseKeypoints3D.getSize(1) != 25)
-                    op::error("Only working for BODY_19 or BODY_25 (#parts = "
-                              + std::to_string(poseKeypoints3D.getSize(2)) + ").",
-                              __LINE__, __FUNCTION__, __FILE__);
-                // Reset to 0 all keypoints - Otherwise undefined behavior when fitting
-                // It must be done on every iteration, otherwise errors, e.g., if face
-                // was detected in frame i-1 but not in i
-                mBodyJoints.setZero();
-                mFaceJoints.setZero();
-                mLHandJoints.setZero();
-                mRHandJoints.setZero();
-                mLFootJoints.setZero();
-                mRFootJoints.setZero();
-                // If keypoints detected
-                if (!poseKeypoints3D.empty())
-                {
-                    // Update body
-                    for (auto part = 0 ; part < 19; part++)
-                        updateKeypoint(mBodyJoints,
-                                       &poseKeypoints3D[{0, part, 0}],
-                                       mapOPToAdam(part));
-                    // Update left/right hand
-                    const auto& handKeypoints3D = datum.handKeypoints3D;
-                    for (auto hand = 0u ; hand < handKeypoints3D.size(); hand++)
-                        if (!handKeypoints3D.at(hand).empty())
-                            for (auto part = 0 ; part < handKeypoints3D[hand].getSize(1); part++)
-                                updateKeypoint((hand == 0 ? mLHandJoints : mRHandJoints),
-                                               &handKeypoints3D[hand][{0, part, 0}],
-                                               part);
-                    // Update Foot data
-                    if (poseKeypoints3D.getSize(1) == 25)
-                    {
-                        // Update LFoot
-                        for (auto adamPart = 0 ; adamPart < NUMBER_FOOT_KEYPOINTS; adamPart++)
-                            updateKeypoint(mLFootJoints,
-                                           &poseKeypoints3D[{0, adamPart + 19, 0}],
-                                           adamPart);
-                        // Update RFoot
-                        for (auto adamPart = 0 ; adamPart < NUMBER_FOOT_KEYPOINTS; adamPart++)
-                            updateKeypoint(mRFootJoints,
-                                           &poseKeypoints3D[{0, adamPart + 19 + NUMBER_FOOT_KEYPOINTS, 0}],
-                                           adamPart);
-                    }
-                    // Update Face data
-                    const auto& faceKeypoints3D = datum.faceKeypoints3D;
-                    if (!faceKeypoints3D.empty())
-                        for (auto part = 0 ; part < NUMBER_FACE_KEYPOINTS; part++)
-                            updateKeypoint(mFaceJoints,
-                                           &faceKeypoints3D[{0, part, 0}],
-                                           part);
-                    // Meters --> cm
-                    mBodyJoints *= 1e2;
-                    if (!handKeypoints3D.at(0).empty())
-                        mLHandJoints *= 1e2;
-                    if (!handKeypoints3D.at(1).empty())
-                        mRHandJoints *= 1e2;
-                    if (!faceKeypoints3D.empty())
-                        mFaceJoints *= 1e2;
-                    mLFootJoints *= 1e2;
-                    mRFootJoints *= 1e2;
-                }
-
-                // Initialization (e.g., first frame)
-const auto start0 = std::chrono::high_resolution_clock::now();
-                if (!mInitialized)
-                {
-                    mInitialized = true;
-                    // We make T-pose start with:
-                    // 1. Root translation similar to current 3-d location of the mid-hip
-                    // 2. x-orientation = 180, i.e., person standing up & looking to the camera
-                    // 3. Because otherwise, if we call Adam_FastFit_Initialize twice (e.g., if a new person appears),
-                    // it would use the latest ones from the last Adam_FastFit
-                    mFrameParams.m_adam_t(0) = mBodyJoints(0, 2);
-                    mFrameParams.m_adam_t(1) = mBodyJoints(1, 2);
-                    mFrameParams.m_adam_t(2) = mBodyJoints(2, 2);
-                    mFrameParams.m_adam_pose(0, 0) = 3.14159265358979323846264338327950288419716939937510582097494459;
-                    // Fit initialization
-                    // Adam_FastFit_Initialize only changes mFrameParams
-                    Adam_FastFit_Initialize(*spTotalModel, mFrameParams, mBodyJoints, mRFootJoints, mLFootJoints,
-                                            mRHandJoints, mLHandJoints, mFaceJoints, mCeresDisplayReport);
-                    mVtVec = spTotalModel->m_meanshape + spTotalModel->m_shapespace_u * mFrameParams.m_adam_coeffs;
-                    mJ0Vec = spTotalModel->J_mu_ + spTotalModel->dJdc_ * mFrameParams.m_adam_coeffs;
-                }
-                // Other frames
-                else
-                {
-                    // ~470 msec
-                    // inside for loop
-                    // Here I read the pose data into mBodyJoints, mRFootJoints, mLFootJoints, mRHandJoints, mLHandJoints, mFaceJoints.
-                    // call fitting function
-                    // Adam_FastFit only changes mFrameParams
-                    Adam_FastFit(*spTotalModel, mFrameParams, mBodyJoints, mRFootJoints, mLFootJoints, mRHandJoints,
-                                 mLHandJoints, mFaceJoints, mCeresDisplayReport);
-                }
-                // Fill Datum
-                datum.adamPose = mFrameParams.m_adam_pose;
-                datum.adamTranslation = mFrameParams.m_adam_t;
-                datum.adamFaceCoeffsExp = mFrameParams.m_adam_facecoeffs_exp;
-                datum.mouthOpening = mFrameParams.mouth_open;
-                datum.rightEyeOpening = mFrameParams.reye_open;
-                datum.leftEyeOpening = mFrameParams.leye_open;
-                datum.distanceRootFoot = mFrameParams.dist_root_foot;
-                // ~0.5 ms
-                if (mFillVtAndJ0Vecs)
-                {
-                    datum.vtVec = mVtVec;
-                    datum.j0Vec = mJ0Vec;
-                }
-const auto duration0 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start0).count();
-std::cout << "IK:         " << duration0 * 1e-6 << std::endl;
-            }
-        }
-        catch (const std::exception& e)
-        {
-            this->stop();
-            op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-        }
-    }
-
-private:
-    // Adam model files
-    const std::string mGTotalModelPath;
-    const std::string mPcaPath;
-    const std::string mObjectPath;
-    const std::string mCorrespondencePath;
-
-    // Processing
-    const bool mFillVtAndJ0Vecs;
-    const bool mCeresDisplayReport;
-    bool mInitialized;
-
-    Eigen::MatrixXd mBodyJoints;
-    Eigen::MatrixXd mFaceJoints;
-    Eigen::MatrixXd mLHandJoints;
-    Eigen::MatrixXd mRHandJoints;
-    Eigen::MatrixXd mLFootJoints;
-    Eigen::MatrixXd mRFootJoints;
-
-    // Other parameters
-    smpl::SMPLParams mFrameParams;
-
-    // Shared parameters
-    Eigen::Matrix<double, Eigen::Dynamic, 1> mVtVec;
-    Eigen::Matrix<double, Eigen::Dynamic, 1> mJ0Vec;
-    const std::shared_ptr<const TotalModel> spTotalModel;
-
-    std::shared_ptr<TotalModel> loadTotalModel(const std::string& mObjectPath, const std::string& mGTotalModelPath,
-                                               const std::string& mPcaPath, const std::string& mCorrespondencePath)
-    {
-        try
-        {
-            // Initialize model
-            const auto totalModel = std::make_shared<TotalModel>();
-            // Load spTotalModel (model + data)
-            // ~100 milliseconds
-            LoadTotalModelFromObj(*totalModel, mObjectPath);
-            // ~25 seconds
-            LoadTotalDataFromJson(*totalModel, mGTotalModelPath, mPcaPath, mCorrespondencePath);
-            // Return result
-            return totalModel;
-        }
-        catch (const std::exception& e)
-        {
-            op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-        }
-    }
-
-    void updateKeypoint(Eigen::MatrixXd& targetJoint, const float* const poseKeypoint3D, const int part)
-    {
-        try
-        {
-            // Keypoint found
-            if (poseKeypoint3D[2] > 0.5)
-            {
-                targetJoint(0, part) = poseKeypoint3D[0];
-                targetJoint(1, part) = poseKeypoint3D[1];
-                targetJoint(2, part) = poseKeypoint3D[2];
-            }
-            // Keypoint not found - Keep last known keypoint or 0
-            // Implicitly done with the initial setZero()
-        }
-        catch (const std::exception& e)
-        {
-            op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-        }
-    }
-};
 
 // This worker will just read and return all the jpg files in a directory
 class WUserOutput : public op::WorkerConsumer<std::shared_ptr<std::vector<op::Datum>>>
@@ -566,7 +264,8 @@ public:
     ~WUserOutput()
     {
         // Write BVH file
-        this->callBVHWriter(FLAGS_write_bvh, 0.0333333);
+        const auto secondsPerFrame = 1 / 30.;
+        this->callBVHWriter(FLAGS_write_bvh, secondsPerFrame);
     }
 
     // Purely Visualization
@@ -595,9 +294,6 @@ public:
     {
         try
         {
-            // User's displaying/saving/other processing here
-                // datum.cvOutputData: rendered frame with pose or heatmaps
-                // datum.poseKeypoints: Array<float> with the estimated pose
             if (datumsPtr != nullptr && !datumsPtr->empty())
             {
                 auto& datum = datumsPtr->at(0);
@@ -638,7 +334,7 @@ const auto start2 = std::chrono::high_resolution_clock::now();
                     {
                         // Update body
                         for (auto part = 0 ; part < 19; part++)
-                            updateKeypoint(&targetJoints[mapOPToAdam(part)*(poseKeypoints3D.getSize(2)-1)],
+                            updateKeypoint(&targetJoints[op::mapOPToAdam(part)*(poseKeypoints3D.getSize(2)-1)],
                                            &poseKeypoints3D[{0, part, 0}]);
                         // Update left/right hand
                         const auto& handKeypoints3D = datum.handKeypoints3D;
@@ -861,10 +557,11 @@ int openPoseDemo()
         // Adam added
         const bool fillVtAndJ0Vecs = true;
         const bool ceresDisplayReport = false;
-        auto wUserPostProcessing = std::make_shared<WUserPostProcessing>(fillVtAndJ0Vecs, ceresDisplayReport);
+        const auto jointAngleEstimation = std::make_shared<op::JointAngleEstimation>(fillVtAndJ0Vecs, ceresDisplayReport);
+        auto wUserPostProcessing = std::make_shared<op::WJointAngleEstimation<std::shared_ptr<std::vector<op::Datum>>>>(jointAngleEstimation);
         const auto workerProcessingOnNewThread = true;
         opWrapper.setWorkerPostProcessing(wUserPostProcessing, workerProcessingOnNewThread);
-        auto wUserOutput = std::make_shared<WUserOutput>(wUserPostProcessing->getTotalModel());
+        auto wUserOutput = std::make_shared<WUserOutput>(jointAngleEstimation->getTotalModel());
         const auto workerOutputOnNewThread = true;
         opWrapper.setWorkerOutput(wUserOutput, workerOutputOnNewThread);
 
