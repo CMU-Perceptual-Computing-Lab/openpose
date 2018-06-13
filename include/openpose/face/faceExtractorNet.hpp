@@ -1,6 +1,7 @@
 #ifndef OPENPOSE_FACE_FACE_EXTRACTOR_HPP
 #define OPENPOSE_FACE_FACE_EXTRACTOR_HPP
 
+#include <atomic>
 #include <thread>
 #include <opencv2/core/core.hpp> // cv::Mat
 #include <openpose/core/common.hpp>
@@ -56,6 +57,10 @@ namespace op
          */
         Array<float> getFaceKeypoints() const;
 
+        bool getEnabled() const;
+
+        void setEnabled(const bool enabled);
+
     protected:
         const Point<int> mNetOutputSize;
         Array<float> mFaceImageCrop;
@@ -64,6 +69,8 @@ namespace op
         Array<float> mHeatMaps;
         const ScaleMode mHeatMapScaleMode;
         const std::vector<HeatMapType> mHeatMapTypes;
+        // Temporarily disable it
+        std::atomic<bool> mEnabled;
 
         virtual void netInitializationOnThread() = 0;
 

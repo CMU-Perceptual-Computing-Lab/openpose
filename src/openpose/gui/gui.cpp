@@ -29,6 +29,8 @@ namespace op
 
     void handleWaitKey(bool& guiPaused, FrameDisplayer& frameDisplayer,
                        std::vector<std::shared_ptr<PoseExtractorNet>>& poseExtractorNets,
+                       std::vector<std::shared_ptr<FaceExtractorNet>>& faceExtractorNets,
+                       std::vector<std::shared_ptr<HandExtractorNet>>& handExtractorNets,
                        std::vector<std::shared_ptr<Renderer>>& renderers,
                        std::shared_ptr<std::atomic<bool>>& isRunningSharedPtr,
                        std::shared_ptr<std::pair<std::atomic<bool>, std::atomic<int>>>& videoSeekSharedPtr)
@@ -105,6 +107,27 @@ namespace op
                 else if (castedKey==';' || castedKey=='\'')
                     for (auto& poseExtractorNet : poseExtractorNets)
                         poseExtractorNet->increase(PoseProperty::ConnectMinSubsetCnt, (castedKey==';' ? -1 : 1));
+                // ------------------------- Face/hands-Related ------------------------- //
+                // Enable/disable face
+                else if (castedKey=='z')
+                {
+                    for (auto& faceExtractorNet : faceExtractorNets)
+                        faceExtractorNet->setEnabled(!faceExtractorNet->getEnabled());
+                    // Warning if not enabled
+                    if (faceExtractorNets.empty())
+                        log("OpenPose must be run with face keypoint estimation enabled (`--face` flag).",
+                            Priority::High);
+                }
+                // Enable/disable hands
+                else if (castedKey=='x')
+                {
+                    for (auto& handExtractorNet : handExtractorNets)
+                        handExtractorNet->setEnabled(!handExtractorNet->getEnabled());
+                    // Warning if not enabled
+                    if (handExtractorNets.empty())
+                        log("OpenPose must be run with face keypoint estimation enabled (`--hand` flag).",
+                            Priority::High);
+                }
                 // ------------------------- Miscellaneous ------------------------- //
                 // Show googly eyes
                 else if (castedKey=='g')
@@ -135,6 +158,8 @@ namespace op
 
     void handleUserInput(FrameDisplayer& frameDisplayer,
                          std::vector<std::shared_ptr<PoseExtractorNet>>& poseExtractorNets,
+                         std::vector<std::shared_ptr<FaceExtractorNet>>& faceExtractorNets,
+                         std::vector<std::shared_ptr<HandExtractorNet>>& handExtractorNets,
                          std::vector<std::shared_ptr<Renderer>>& renderers,
                          std::shared_ptr<std::atomic<bool>>& isRunningSharedPtr,
                          std::shared_ptr<std::pair<std::atomic<bool>, std::atomic<int>>>& videoSeekSharedPtr)
@@ -143,13 +168,13 @@ namespace op
         {
             // The handleUserInput must be always performed, even if no tDatum is detected
             bool guiPaused = false;
-            handleWaitKey(guiPaused, frameDisplayer, poseExtractorNets, renderers, isRunningSharedPtr,
-                          videoSeekSharedPtr);
+            handleWaitKey(guiPaused, frameDisplayer, poseExtractorNets, faceExtractorNets, handExtractorNets,
+                          renderers, isRunningSharedPtr, videoSeekSharedPtr);
             while (guiPaused)
             {
                 std::this_thread::sleep_for(std::chrono::milliseconds{1});
-                handleWaitKey(guiPaused, frameDisplayer, poseExtractorNets, renderers, isRunningSharedPtr,
-                              videoSeekSharedPtr);
+                handleWaitKey(guiPaused, frameDisplayer, poseExtractorNets, faceExtractorNets, handExtractorNets,
+                              renderers, isRunningSharedPtr, videoSeekSharedPtr);
             }
         }
         catch (const std::exception& e)
@@ -162,10 +187,14 @@ namespace op
              const std::shared_ptr<std::atomic<bool>>& isRunningSharedPtr,
              const std::shared_ptr<std::pair<std::atomic<bool>, std::atomic<int>>>& videoSeekSharedPtr,
              const std::vector<std::shared_ptr<PoseExtractorNet>>& poseExtractorNets,
+             const std::vector<std::shared_ptr<FaceExtractorNet>>& faceExtractorNets,
+             const std::vector<std::shared_ptr<HandExtractorNet>>& handExtractorNets,
              const std::vector<std::shared_ptr<Renderer>>& renderers) :
         spIsRunning{isRunningSharedPtr},
         mFrameDisplayer{OPEN_POSE_NAME_AND_VERSION, outputSize, fullScreen},
         mPoseExtractorNets{poseExtractorNets},
+        mFaceExtractorNets{faceExtractorNets},
+        mHandExtractorNets{handExtractorNets},
         mRenderers{renderers},
         spVideoSeek{videoSeekSharedPtr}
     {
@@ -218,7 +247,8 @@ namespace op
         try
         {
             // Handle user input
-            handleUserInput(mFrameDisplayer, mPoseExtractorNets, mRenderers, spIsRunning, spVideoSeek);
+            handleUserInput(mFrameDisplayer, mPoseExtractorNets, mFaceExtractorNets, mHandExtractorNets,
+                            mRenderers, spIsRunning, spVideoSeek);
         }
         catch (const std::exception& e)
         {

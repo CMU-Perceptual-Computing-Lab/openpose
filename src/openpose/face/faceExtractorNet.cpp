@@ -8,7 +8,8 @@ namespace op
         mNetOutputSize{netOutputSize},
         mFaceImageCrop{{1, 3, mNetOutputSize.y, mNetOutputSize.x}},
         mHeatMapScaleMode{heatMapScale},
-        mHeatMapTypes{heatMapTypes}
+        mHeatMapTypes{heatMapTypes},
+        mEnabled{true}
     {
         try
         {
@@ -64,6 +65,31 @@ namespace op
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             return Array<float>{};
+        }
+    }
+
+    bool FaceExtractorNet::getEnabled() const
+    {
+        try
+        {
+            return mEnabled;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return false;
+        }
+    }
+
+    void FaceExtractorNet::setEnabled(const bool enabled)
+    {
+        try
+        {
+            mEnabled = enabled;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
     }
 
