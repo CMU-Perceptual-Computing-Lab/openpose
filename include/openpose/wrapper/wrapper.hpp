@@ -543,6 +543,8 @@ namespace op
                 wDatumProducer = nullptr;
 
             std::vector<std::shared_ptr<PoseExtractorNet>> poseExtractorNets;
+            std::vector<std::shared_ptr<FaceExtractorNet>> faceExtractorNets;
+            std::vector<std::shared_ptr<HandExtractorNet>> handExtractorNets;
             std::vector<std::shared_ptr<PoseGpuRenderer>> poseGpuRenderers;
             std::shared_ptr<PoseCpuRenderer> poseCpuRenderer;
             if (numberThreads > 0)
@@ -691,6 +693,7 @@ namespace op
                             gpu + gpuNumberStart, wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale,
                             wrapperStructPose.enableGoogleLogging
                         );
+                        faceExtractorNets.emplace_back(faceExtractorNet);
                         spWPoseExtractors.at(gpu).emplace_back(
                             std::make_shared<WFaceExtractorNet<TDatumsPtr>>(faceExtractorNet));
                     }
@@ -720,6 +723,7 @@ namespace op
                             wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale,
                             wrapperStructPose.enableGoogleLogging
                         );
+                        handExtractorNets.emplace_back(handExtractorNet);
                         spWPoseExtractors.at(gpu).emplace_back(
                             std::make_shared<WHandExtractorNet<TDatumsPtr>>(handExtractorNet)
                             );
@@ -993,10 +997,11 @@ namespace op
                 if (displayAdam)
                 {
                     // Gui
-                    auto gui = std::make_shared<GuiAdam>(
+                    const auto gui = std::make_shared<GuiAdam>(
                         finalOutputSize, wrapperStructOutput.fullScreen, mThreadManager.getIsRunningSharedPtr(),
-                        spVideoSeek, poseExtractorNets, renderers, wrapperStructOutput.displayMode,
-                        JointAngleEstimation::getTotalModel(), wrapperStructOutput.writeVideoAdam
+                        spVideoSeek, poseExtractorNets, faceExtractorNets, handExtractorNets, renderers,
+                        wrapperStructOutput.displayMode, JointAngleEstimation::getTotalModel(),
+                        wrapperStructOutput.writeVideoAdam
                     );
                     // WGui
                     spWGui = {std::make_shared<WGuiAdam<TDatumsPtr>>(gui)};
@@ -1006,10 +1011,10 @@ namespace op
                     || wrapperStructOutput.displayMode == DisplayMode::DisplayAll)
                 {
                     // Gui
-                    auto gui = std::make_shared<Gui3D>(
+                    const auto gui = std::make_shared<Gui3D>(
                         finalOutputSize, wrapperStructOutput.fullScreen, mThreadManager.getIsRunningSharedPtr(),
-                        spVideoSeek, poseExtractorNets, renderers, wrapperStructPose.poseModel,
-                        wrapperStructOutput.displayMode
+                        spVideoSeek, poseExtractorNets, faceExtractorNets, handExtractorNets, renderers,
+                        wrapperStructPose.poseModel, wrapperStructOutput.displayMode
                     );
                     // WGui
                     spWGui = {std::make_shared<WGui3D<TDatumsPtr>>(gui)};
@@ -1018,9 +1023,9 @@ namespace op
                 else if (wrapperStructOutput.displayMode == DisplayMode::Display2D)
                 {
                     // Gui
-                    auto gui = std::make_shared<Gui>(
+                    const auto gui = std::make_shared<Gui>(
                         finalOutputSize, wrapperStructOutput.fullScreen, mThreadManager.getIsRunningSharedPtr(),
-                        spVideoSeek, poseExtractorNets, renderers
+                        spVideoSeek, poseExtractorNets, faceExtractorNets, handExtractorNets, renderers
                     );
                     // WGui
                     spWGui = {std::make_shared<WGui<TDatumsPtr>>(gui)};

@@ -418,9 +418,12 @@ namespace op
                  const std::shared_ptr<std::atomic<bool>>& isRunningSharedPtr,
                  const std::shared_ptr<std::pair<std::atomic<bool>, std::atomic<int>>>& videoSeekSharedPtr,
                  const std::vector<std::shared_ptr<PoseExtractorNet>>& poseExtractorNets,
+                 const std::vector<std::shared_ptr<FaceExtractorNet>>& faceExtractorNets,
+                 const std::vector<std::shared_ptr<HandExtractorNet>>& handExtractorNets,
                  const std::vector<std::shared_ptr<Renderer>>& renderers, const PoseModel poseModel,
                  const DisplayMode displayMode) :
-        Gui{outputSize, fullScreen, isRunningSharedPtr, videoSeekSharedPtr, poseExtractorNets, renderers},
+        Gui{outputSize, fullScreen, isRunningSharedPtr, videoSeekSharedPtr, poseExtractorNets, faceExtractorNets,
+            handExtractorNets, renderers},
         mDisplayMode{displayMode}
     {
         try

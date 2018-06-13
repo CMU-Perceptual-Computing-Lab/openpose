@@ -1,6 +1,7 @@
 #ifndef OPENPOSE_HAND_HAND_EXTRACTOR_HPP
 #define OPENPOSE_HAND_HAND_EXTRACTOR_HPP
 
+#include <atomic>
 #include <thread>
 #include <opencv2/core/core.hpp> // cv::Mat
 #include <openpose/core/common.hpp>
@@ -62,6 +63,10 @@ namespace op
          */
         std::array<Array<float>, 2> getHandKeypoints() const;
 
+        bool getEnabled() const;
+
+        void setEnabled(const bool enabled);
+
     protected:
         const std::pair<unsigned short, float> mMultiScaleNumberAndRange;
         const Point<int> mNetOutputSize;
@@ -71,6 +76,8 @@ namespace op
         const ScaleMode mHeatMapScaleMode;
         const std::vector<HeatMapType> mHeatMapTypes;
         std::array<Array<float>, 2> mHeatMaps;
+        // Temporarily disable it
+        std::atomic<bool> mEnabled;
 
         virtual void netInitializationOnThread() = 0;
 
