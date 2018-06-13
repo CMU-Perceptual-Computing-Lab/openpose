@@ -21,7 +21,8 @@ namespace op
             const std::vector<std::shared_ptr<PoseExtractorNet>>& poseExtractorNets = {},
             const std::vector<std::shared_ptr<FaceExtractorNet>>& faceExtractorNets = {},
             const std::vector<std::shared_ptr<HandExtractorNet>>& handExtractorNets = {},
-            const std::vector<std::shared_ptr<Renderer>>& renderers = {});
+            const std::vector<std::shared_ptr<Renderer>>& renderers = {},
+            const DisplayMode displayMode = DisplayMode::Display2D);
 
         virtual void initializationOnThread();
 
@@ -33,6 +34,8 @@ namespace op
 
     protected:
         std::shared_ptr<std::atomic<bool>> spIsRunning;
+        DisplayMode mDisplayMode;
+        DisplayMode mDisplayModeOriginal;
 
     private:
         // Frames display

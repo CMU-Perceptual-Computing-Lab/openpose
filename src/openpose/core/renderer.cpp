@@ -2,9 +2,9 @@
 
 namespace op
 {
-    Renderer::Renderer(const float renderThreshold, const float alphaKeypoint, const float alphaHeatMap,
-                       const bool blendOriginalFrame, const unsigned int elementToRender,
-                       const unsigned int numberElementsToRender) :
+    Renderer::Renderer(const float renderThreshold, const float alphaKeypoint,
+                       const float alphaHeatMap, const bool blendOriginalFrame,
+                       const unsigned int elementToRender, const unsigned int numberElementsToRender) :
         mRenderThreshold{renderThreshold},
         mBlendOriginalFrame{blendOriginalFrame},
         spElementToRender{std::make_shared<std::atomic<unsigned int>>(elementToRender)},
@@ -42,6 +42,27 @@ namespace op
         try
         {
             *spElementToRender = elementToRender % *spNumberElementsToRender;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    void Renderer::setElementToRender(const ElementToRender elementToRender)
+    {
+        try
+        {
+            if (elementToRender == ElementToRender::Skeleton)
+                *spElementToRender = 0;
+            else if (elementToRender == ElementToRender::Background)
+                *spElementToRender = 1;
+            else if (elementToRender == ElementToRender::AddKeypoints)
+                *spElementToRender = 2;
+            else if (elementToRender == ElementToRender::AddPAFs)
+                *spElementToRender = 3;
+            else
+                error("Unknown ElementToRender value.", __LINE__, __FUNCTION__, __FILE__);
         }
         catch (const std::exception& e)
         {

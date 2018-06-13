@@ -82,8 +82,8 @@ namespace op
 
         /**
          * Pose model, it affects the number of body parts to render
-         * Select PoseModel::COCO_18 for 18 body-part COCO, PoseModel::MPI_15 for 15 body-part MPI, PoseModel::MPI_15_4
-         * for faster version of MPI, etc.).
+         * Select PoseModel::BODY_25 for 25 body-part COCO + foot model; PoseModel::COCO_18 for 18 body-part COCO;
+         * PoseModel::MPI_15 for 15 body-part MPI; PoseModel::MPI_15_4 for faster version of MPI; etc..
          */
         PoseModel poseModel;
 
@@ -177,7 +177,7 @@ namespace op
                           const ScaleMode keypointScale = ScaleMode::InputResolution,
                           const int gpuNumber = -1, const int gpuNumberStart = 0, const int scalesNumber = 1,
                           const float scaleGap = 0.15f, const RenderMode renderMode = RenderMode::None,
-                          const PoseModel poseModel = PoseModel::COCO_18, const bool blendOriginalFrame = true,
+                          const PoseModel poseModel = PoseModel::BODY_25, const bool blendOriginalFrame = true,
                           const float alphaKeypoint = POSE_DEFAULT_ALPHA_KEYPOINT,
                           const float alphaHeatMap = POSE_DEFAULT_ALPHA_HEAT_MAP,
                           const int defaultPartToRender = 0, const std::string& modelFolder = "models/",

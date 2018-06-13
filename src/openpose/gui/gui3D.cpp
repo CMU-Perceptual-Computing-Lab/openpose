@@ -37,7 +37,7 @@ namespace op
         };
 
         Keypoints3D gKeypoints3D;
-        PoseModel sPoseModel = PoseModel::COCO_18;
+        PoseModel sPoseModel = PoseModel::BODY_25;
         int sLastKeyPressed = -1;
 
         CameraMode gCameraMode = CameraMode::CAM_DEFAULT;
@@ -423,8 +423,7 @@ namespace op
                  const std::vector<std::shared_ptr<Renderer>>& renderers, const PoseModel poseModel,
                  const DisplayMode displayMode) :
         Gui{outputSize, fullScreen, isRunningSharedPtr, videoSeekSharedPtr, poseExtractorNets, faceExtractorNets,
-            handExtractorNets, renderers},
-        mDisplayMode{displayMode}
+            handExtractorNets, renderers, displayMode}
     {
         try
         {

@@ -3,6 +3,7 @@
 
 #include <atomic>
 #include <openpose/core/common.hpp>
+#include <openpose/core/enumClasses.hpp>
 
 namespace op
 {
@@ -16,6 +17,8 @@ namespace op
         void increaseElementToRender(const int increment);
 
         void setElementToRender(const int elementToRender);
+
+        void setElementToRender(const ElementToRender elementToRender);
 
         bool getBlendOriginalFrame() const;
 
