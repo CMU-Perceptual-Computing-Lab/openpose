@@ -11,10 +11,13 @@ namespace op
         const int NUMBER_HAND_KEYPOINTS = 21;
         const int NUMBER_FACE_KEYPOINTS = 70;
         const int NUMBER_FOOT_KEYPOINTS = 3;
-        const int NUMBER_KEYPOINTS = 3*(NUMBER_BODY_KEYPOINTS + 2*NUMBER_HAND_KEYPOINTS); // targetJoints: Only for Body, LHand, RHand. No Face, no Foot
+        // targetJoints: Only for Body, LHand, RHand. No Face, no Foot
+        const int NUMBER_KEYPOINTS = 3*(NUMBER_BODY_KEYPOINTS + 2*NUMBER_HAND_KEYPOINTS);
 
-        const std::shared_ptr<const TotalModel> loadTotalModel(const std::string& mObjectPath, const std::string& mGTotalModelPath,
-                                                               const std::string& mPcaPath, const std::string& mCorrespondencePath)
+        const std::shared_ptr<const TotalModel> loadTotalModel(const std::string& mObjectPath,
+                                                               const std::string& mGTotalModelPath,
+                                                               const std::string& mPcaPath,
+                                                               const std::string& mCorrespondencePath)
         {
             try
             {
@@ -296,7 +299,8 @@ namespace op
                 Adam_FastFit_Initialize(*spImpl->spTotalModel, frameParams, spImpl->mBodyJoints, spImpl->mRFootJoints,
                                         spImpl->mLFootJoints, spImpl->mRHandJoints, spImpl->mLHandJoints,
                                         spImpl->mFaceJoints, spImpl->mCeresDisplayReport);
-                vtVec = spImpl->spTotalModel->m_meanshape + spImpl->spTotalModel->m_shapespace_u * frameParams.m_adam_coeffs;
+                vtVec = spImpl->spTotalModel->m_meanshape
+                      + spImpl->spTotalModel->m_shapespace_u * frameParams.m_adam_coeffs;
                 j0Vec = spImpl->spTotalModel->J_mu_ + spImpl->spTotalModel->dJdc_ * frameParams.m_adam_coeffs;
                 if (fastVersion)
                 {
@@ -324,9 +328,11 @@ namespace op
                 else
                 {
                     // Adam_FastFit_Initialize only changes frameParams
-                    Adam_FastFit_Initialize(*spImpl->spTotalModel, frameParams, spImpl->mBodyJoints, spImpl->mRFootJoints, spImpl->mLFootJoints,
-                                            spImpl->mRHandJoints, spImpl->mLHandJoints, spImpl->mFaceJoints, spImpl->mCeresDisplayReport);
-                    vtVec = spImpl->spTotalModel->m_meanshape + spImpl->spTotalModel->m_shapespace_u * frameParams.m_adam_coeffs;
+                    Adam_FastFit_Initialize(*spImpl->spTotalModel, frameParams, spImpl->mBodyJoints,
+                                            spImpl->mRFootJoints, spImpl->mLFootJoints, spImpl->mRHandJoints,
+                                            spImpl->mLHandJoints, spImpl->mFaceJoints, spImpl->mCeresDisplayReport);
+                    vtVec = spImpl->spTotalModel->m_meanshape
+                          + spImpl->spTotalModel->m_shapespace_u * frameParams.m_adam_coeffs;
                     j0Vec = spImpl->spTotalModel->J_mu_ + spImpl->spTotalModel->dJdc_ * frameParams.m_adam_coeffs;
                 }
             }

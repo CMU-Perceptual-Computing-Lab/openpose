@@ -23,8 +23,8 @@ namespace op
 
         std::tuple<Eigen::MatrixXd, Eigen::Vector3d, Eigen::MatrixXd, Eigen::MatrixXd, Eigen::VectorXd,
             float, float, float, float> adamFastFit(const Array<float>& poseKeypoints3D,
-                                                const Array<float>& faceKeypoints3D,
-                                                const std::array<Array<float>, 2>& handKeypoints3D);
+                                                    const Array<float>& faceKeypoints3D,
+                                                    const std::array<Array<float>, 2>& handKeypoints3D);
 
     private:
         // PIMPL idiom
