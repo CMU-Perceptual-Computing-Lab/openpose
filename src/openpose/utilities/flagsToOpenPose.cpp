@@ -37,7 +37,7 @@ namespace op
             else if (poseModeString == "BODY_59")
                 return PoseModel::BODY_59;
             // else
-            error("String does not correspond to any model (COCO, MPI, MPI_4_layers)",
+            error("String does not correspond to any model (BODY_25, COCO, MPI, MPI_4_layers)",
                   __LINE__, __FUNCTION__, __FILE__);
             return PoseModel::BODY_25;
         }
