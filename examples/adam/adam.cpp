@@ -234,18 +234,8 @@ DEFINE_string(write_keypoint_json,      "",             "(Deprecated, use `write
 DEFINE_string(write_bvh,                "",             "E.g.: /media/posefs3b/Users/gines/cvpr2018/temp.bvh");
 DEFINE_string(write_adam,               "",             "E.g.: /media/posefs3b/Users/gines/cvpr2018/adam.avi");
 
-#include <KinematicModel.h>
-#include <totalmodel.h>
 #include <BVHWriter.h>
-#include <Renderer.h>
-#include <utils.h>
-#include <VisualizedData.h>
-#define SMPL_VIS_SCALING 100.0f
-
-const int NUMBER_BODY_KEYPOINTS = 20;
-const int NUMBER_HAND_KEYPOINTS = 21;
-const int NUMBER_FACE_KEYPOINTS = 70;
-const int NUMBER_KEYPOINTS = 3*(NUMBER_BODY_KEYPOINTS + 2*NUMBER_HAND_KEYPOINTS); // targetJoints: Only for Body, LHand, RHand. No Face, no Foot
+#include <totalmodel.h>
 
 // This worker will just read and return all the jpg files in a directory
 class WUserOutput : public op::WorkerConsumer<std::shared_ptr<std::vector<op::Datum>>>

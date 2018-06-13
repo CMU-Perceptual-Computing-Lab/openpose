@@ -159,52 +159,52 @@ namespace op
                                       adamPose.data(), adamFaceCoeffsExpPtr, adamTranslation);
                     CopyMesh(cMeshModelInstance, visualizedData);
 
-                    // // Fill data
-                    // // Body and hands
-                    // std::array<double, NUMBER_KEYPOINTS> targetJoints;
-                    // targetJoints.fill(0.);
-                    // // If keypoints detected
-                    // if (!poseKeypoints3D.empty())
-                    // {
-                    //     // Update body
-                    //     for (auto part = 0 ; part < 19; part++)
-                    //         updateKeypoint(&targetJoints[mapOPToAdam(part)*(poseKeypoints3D.getSize(2)-1)],
-                    //                        &poseKeypoints3D[{0, part, 0}]);
-                    //     // Update left/right hand
-                    //     const auto bodyOffset = NUMBER_BODY_KEYPOINTS*(poseKeypoints3D.getSize(2)-1); // NUMBER_BODY_KEYPOINTS = #parts_OP + 1 (top_head)
-                    //     const auto handOffset = handKeypoints3D[0].getSize(1)*(handKeypoints3D[0].getSize(2)-1);
-                    //     for (auto hand = 0u ; hand < handKeypoints3D.size(); hand++)
-                    //         if (!handKeypoints3D.at(hand).empty())
-                    //             for (auto part = 0 ; part < handKeypoints3D[hand].getSize(1); part++)
-                    //                 updateKeypoint(&targetJoints[bodyOffset + hand*handOffset + part*(handKeypoints3D[hand].getSize(2)-1)],
-                    //                                &handKeypoints3D[hand][{0, part, 0}]);
+                    // Fill data
+                    // Body and hands
+                    std::array<double, NUMBER_KEYPOINTS> targetJoints;
+                    targetJoints.fill(0.);
+                    // If keypoints detected
+                    if (!poseKeypoints3D.empty())
+                    {
+                        // Update body
+                        for (auto part = 0 ; part < 19; part++)
+                            updateKeypoint(&targetJoints[mapOPToAdam(part)*(poseKeypoints3D.getSize(2)-1)],
+                                           &poseKeypoints3D[{0, part, 0}]);
+                        // Update left/right hand
+                        const auto bodyOffset = NUMBER_BODY_KEYPOINTS*(poseKeypoints3D.getSize(2)-1); // NUMBER_BODY_KEYPOINTS = #parts_OP + 1 (top_head)
+                        const auto handOffset = handKeypoints3D[0].getSize(1)*(handKeypoints3D[0].getSize(2)-1);
+                        for (auto hand = 0u ; hand < handKeypoints3D.size(); hand++)
+                            if (!handKeypoints3D.at(hand).empty())
+                                for (auto part = 0 ; part < handKeypoints3D[hand].getSize(1); part++)
+                                    updateKeypoint(&targetJoints[bodyOffset + hand*handOffset + part*(handKeypoints3D[hand].getSize(2)-1)],
+                                                   &handKeypoints3D[hand][{0, part, 0}]);
 
-                    //     // Meters --> cm
-                    //     for (auto i = 0 ; i < NUMBER_KEYPOINTS ; i++)
-                    //         targetJoints[i] *= 1e2;
-                    // }
-                    // visualizedData.targetJoint = targetJoints.data();
-                    // // visualizedData.targetJoint = nullptr;
-                    // // Update face
-                    // if (!faceKeypoints3D.empty())
-                    // {
-                    //     visualizedData.faceKeypoints.resize(faceKeypoints3D.getSize(1), 3);
-                    //     for (auto part = 0 ; part < faceKeypoints3D.getSize(1); part++)
-                    //     {
-                    //         if (faceKeypoints3D[{0, part, faceKeypoints3D.getSize(2)-1}] > 0.5)
-                    //             for (auto xyz = 0 ; xyz < faceKeypoints3D.getSize(2)-1 ; xyz++)
-                    //                 visualizedData.faceKeypoints(part, xyz) = faceKeypoints3D[{0, part, xyz}];
-                    //         else
-                    //         {
-                    //             visualizedData.faceKeypoints(part, 0) = 0;
-                    //             visualizedData.faceKeypoints(part, 1) = 0;
-                    //             visualizedData.faceKeypoints(part, 2) = 0;
-                    //         }
-                    //     }
-                    //     visualizedData.faceKeypoints *= 100;
-                    // }
-                    // else
-                    //     visualizedData.faceKeypoints.setZero();
+                        // Meters --> cm
+                        for (auto i = 0 ; i < NUMBER_KEYPOINTS ; i++)
+                            targetJoints[i] *= 1e2;
+                    }
+                    visualizedData.targetJoint = targetJoints.data();
+                    // visualizedData.targetJoint = nullptr;
+                    // Update face
+                    if (!faceKeypoints3D.empty())
+                    {
+                        visualizedData.faceKeypoints.resize(faceKeypoints3D.getSize(1), 3);
+                        for (auto part = 0 ; part < faceKeypoints3D.getSize(1); part++)
+                        {
+                            if (faceKeypoints3D[{0, part, faceKeypoints3D.getSize(2)-1}] > 0.5)
+                                for (auto xyz = 0 ; xyz < faceKeypoints3D.getSize(2)-1 ; xyz++)
+                                    visualizedData.faceKeypoints(part, xyz) = faceKeypoints3D[{0, part, xyz}];
+                            else
+                            {
+                                visualizedData.faceKeypoints(part, 0) = 0;
+                                visualizedData.faceKeypoints(part, 1) = 0;
+                                visualizedData.faceKeypoints(part, 2) = 0;
+                            }
+                        }
+                        visualizedData.faceKeypoints *= 100;
+                    }
+                    else
+                        visualizedData.faceKeypoints.setZero();
                     visualizedData.resultJoint = spImpl->mResultBody.data();
 
                     // visualizedData: 2 for full body, 3 for left hand, 4 for right hand, 5 for face
