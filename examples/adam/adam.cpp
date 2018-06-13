@@ -843,6 +843,7 @@ std::cout << "\nRender1:    " << duration1 * 1e-6
                 const float mouth_open = spFrameParams->mouth_open; // spFrameParams->mouth_open;
                 const float leye_open = spFrameParams->leye_open; // spFrameParams->leye_open;
                 const float reye_open = spFrameParams->reye_open; // spFrameParams->reye_open;
+                const float dist_root_foot = spFrameParams->dist_root_foot; // spFrameParams->dist_root_foot;
                 // m_adam_t:
                 //     1. Total translation (centimeters) of the root in camera/global coordinate representation.
                 // m_adam_pose:
@@ -862,7 +863,9 @@ std::cout << "\nRender1:    " << duration1 * 1e-6
 
                 std::string facialParamsString = "\"facialParams\":[" + std::to_string(mouth_open) + "," + std::to_string(leye_open) + "," + std::to_string(reye_open) + "]";
 
-                std::string data = prefix + "{" + facialParamsString + "," + totalPositionString + "," + jointAnglesString + "}";
+                std::string rootHeightString = "\"rootHeight\":" + std::to_string(dist_root_foot);
+
+                std::string data = prefix + "{" + rootHeightString + "," + facialParamsString + "," + totalPositionString + "," + jointAnglesString + "}";
 
                 mUdpClient.send(data);
             }
