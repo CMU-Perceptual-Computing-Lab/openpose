@@ -30,9 +30,6 @@ namespace op
                           const Array<float>& leftHandKeypoints3D, const Array<float>& rightHandKeypoints3D);
 
         virtual void update();
-
-    private:
-        DisplayMode mDisplayMode;
     };
 }
 

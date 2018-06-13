@@ -228,11 +228,13 @@ OpenPose Library - Release Notes
     8. New `PoseExtractor` class to contain future ID and tracking algorithms as well as the current OpenPose keypoint detection algorithm.
     9. Added initial alpha versions of the `tracking` and `identification` modules (for now disabled but available in the source code), including `PersonIdExtractor` and `PersonTracker`. `PersonIdExtractor` includes greedy matrix OP-LK matching.
     10. Added catchs to all demos for higher debug information.
+    11. GUI includes the capability of dynamically enable/disable the face, hand, and 3-D rendering, as well as more clear visualization for skeleton, background, heatmap addition, and PAF addition channels.
 2. Functions or parameters renamed:
     1. Removed scale parameter from hand and face rectangle extractor (causing wrong results if custom `--output_resolution`).
     2. Functions `scaleKeypoints`, other than `scaleKeypoints(Array<float>& keypoints, const float scale)`, renamed as `scaleKeypoints2d`.
     3. `(W)PoseExtractor` renamed to `(W)PoseExtractorNet` to distinguish from new `PoseExtractor`. Analogously with `(W)FaceExtractorNet` and `(W)HandExtractorNet`.
     4. Experimental module removed and internal `tracking` folder moved to main openpose folder.
+    5. Switched GUI shortcuts for the kind of channel to render (skeleton, heatmap, PAF, ...) in order to make it more intuitive: 1 for skeleton, 1 for background heatmap, 2 for adding all heatmaps, 3 for adding all PAFs, and 4 to 0 for the initial heatmaps.
 3. Main bugs fixed:
     1. Fixed hand and face extraction and rendering scaling issues when `--output_resolution` is not the default one.
     2. Part candidates (`--part_candidates`) are saved with the same scale than the final keypoints itself.

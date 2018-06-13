@@ -33,7 +33,8 @@ namespace op
                        std::vector<std::shared_ptr<HandExtractorNet>>& handExtractorNets,
                        std::vector<std::shared_ptr<Renderer>>& renderers,
                        std::shared_ptr<std::atomic<bool>>& isRunningSharedPtr,
-                       std::shared_ptr<std::pair<std::atomic<bool>, std::atomic<int>>>& videoSeekSharedPtr)
+                       std::shared_ptr<std::pair<std::atomic<bool>, std::atomic<int>>>& videoSeekSharedPtr,
+                       DisplayMode& displayMode, DisplayMode& displayModeOriginal)
     {
         try
         {
@@ -128,6 +129,12 @@ namespace op
                         log("OpenPose must be run with face keypoint estimation enabled (`--hand` flag).",
                             Priority::High);
                 }
+                // Enable/disable extra rendering (3D/Adam), while keeping 2D rendering
+                else if (castedKey=='c')
+                {
+                    displayMode = (displayMode == DisplayMode::DisplayAll
+                                   ? displayModeOriginal : DisplayMode::DisplayAll);
+                }
                 // ------------------------- Miscellaneous ------------------------- //
                 // Show googly eyes
                 else if (castedKey=='g')
@@ -142,11 +149,37 @@ namespace op
                 }
                 else
                 {
-                    const std::string key2part = "0123456789qwertyuiopasd";
+                    // Skeleton / Background / Add keypoints / Add PAFs
+                    const std::string key2part = "1234";
                     const auto newElementToRender = key2part.find(castedKey);
                     if (newElementToRender != std::string::npos)
+                    {
+                        ElementToRender elementToRender;
+                        if (castedKey=='1')
+                            elementToRender = ElementToRender::Skeleton;
+                        else if (castedKey=='2')
+                            elementToRender = ElementToRender::Background;
+                        else if (castedKey=='3')
+                            elementToRender = ElementToRender::AddKeypoints;
+                        else if (castedKey=='4')
+                            elementToRender = ElementToRender::AddPAFs;
+                        else
+                            error("Unknown ElementToRender value.", __LINE__, __FUNCTION__, __FILE__);
                         for (auto& renderer : renderers)
-                            renderer->setElementToRender((int)newElementToRender);
+                            renderer->setElementToRender(elementToRender);
+                    }
+
+                    // Heatmap visualization
+                    else
+                    {
+                        // Other rendering options
+                        // const std::string key2partHeatmaps = "0123456789qwertyuiopasd";
+                        const std::string key2partHeatmaps = "567890";
+                        const auto newElementToRender = key2partHeatmaps.find(castedKey);
+                        if (newElementToRender != std::string::npos)
+                            for (auto& renderer : renderers)
+                                renderer->setElementToRender((int)newElementToRender+key2part.size());
+                    }
                 }
             }
         }
@@ -162,19 +195,20 @@ namespace op
                          std::vector<std::shared_ptr<HandExtractorNet>>& handExtractorNets,
                          std::vector<std::shared_ptr<Renderer>>& renderers,
                          std::shared_ptr<std::atomic<bool>>& isRunningSharedPtr,
-                         std::shared_ptr<std::pair<std::atomic<bool>, std::atomic<int>>>& videoSeekSharedPtr)
+                         std::shared_ptr<std::pair<std::atomic<bool>, std::atomic<int>>>& videoSeekSharedPtr,
+                         DisplayMode& displayMode, DisplayMode& displayModeOriginal)
     {
         try
         {
             // The handleUserInput must be always performed, even if no tDatum is detected
             bool guiPaused = false;
             handleWaitKey(guiPaused, frameDisplayer, poseExtractorNets, faceExtractorNets, handExtractorNets,
-                          renderers, isRunningSharedPtr, videoSeekSharedPtr);
+                          renderers, isRunningSharedPtr, videoSeekSharedPtr, displayMode, displayModeOriginal);
             while (guiPaused)
             {
                 std::this_thread::sleep_for(std::chrono::milliseconds{1});
                 handleWaitKey(guiPaused, frameDisplayer, poseExtractorNets, faceExtractorNets, handExtractorNets,
-                              renderers, isRunningSharedPtr, videoSeekSharedPtr);
+                              renderers, isRunningSharedPtr, videoSeekSharedPtr, displayMode, displayModeOriginal);
             }
         }
         catch (const std::exception& e)
@@ -189,8 +223,11 @@ namespace op
              const std::vector<std::shared_ptr<PoseExtractorNet>>& poseExtractorNets,
              const std::vector<std::shared_ptr<FaceExtractorNet>>& faceExtractorNets,
              const std::vector<std::shared_ptr<HandExtractorNet>>& handExtractorNets,
-             const std::vector<std::shared_ptr<Renderer>>& renderers) :
+             const std::vector<std::shared_ptr<Renderer>>& renderers,
+             const DisplayMode displayMode) :
         spIsRunning{isRunningSharedPtr},
+        mDisplayMode{displayMode},
+        mDisplayModeOriginal{displayMode},
         mFrameDisplayer{OPEN_POSE_NAME_AND_VERSION, outputSize, fullScreen},
         mPoseExtractorNets{poseExtractorNets},
         mFaceExtractorNets{faceExtractorNets},
@@ -248,7 +285,7 @@ namespace op
         {
             // Handle user input
             handleUserInput(mFrameDisplayer, mPoseExtractorNets, mFaceExtractorNets, mHandExtractorNets,
-                            mRenderers, spIsRunning, spVideoSeek);
+                            mRenderers, spIsRunning, spVideoSeek, mDisplayMode, mDisplayModeOriginal);
         }
         catch (const std::exception& e)
         {

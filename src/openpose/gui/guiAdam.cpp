@@ -52,15 +52,10 @@ namespace op
             // Shared parameters
             const std::shared_ptr<const TotalModel> spTotalModel;
 
-            // Display mode
-            DisplayMode mDisplayMode; // Whether to also display 2D keypoints
-
             ImplGuiAdam(const std::shared_ptr<const TotalModel>& totalModel,
-                        const DisplayMode displayMode = DisplayMode::DisplayAll,
                         const std::string& adamRenderedVideoPath = "") :
                 mWriteAdamRenderAsVideo{adamRenderedVideoPath},
-                spTotalModel{totalModel},
-                mDisplayMode{displayMode}
+                spTotalModel{totalModel}
             {
                 try
                 {
@@ -86,8 +81,8 @@ namespace op
                      const DisplayMode displayMode, const std::shared_ptr<const TotalModel>& totalModel,
                      const std::string& adamRenderedVideoPath) :
         Gui{outputSize, fullScreen, isRunningSharedPtr, videoSeekSharedPtr, poseExtractorNets, faceExtractorNets,
-            handExtractorNets, renderers},
-        spImpl{std::make_shared<ImplGuiAdam>(totalModel, displayMode, adamRenderedVideoPath)}
+            handExtractorNets, renderers, displayMode},
+        spImpl{std::make_shared<ImplGuiAdam>(totalModel, adamRenderedVideoPath)}
     {
         try
         {
@@ -121,11 +116,11 @@ namespace op
         try
         {
             // Init parent class
-            if (spImpl->mDisplayMode == DisplayMode::DisplayAll || spImpl->mDisplayMode == DisplayMode::Display2D)
+            if (mDisplayMode == DisplayMode::DisplayAll || mDisplayMode == DisplayMode::Display2D)
                 Gui::initializationOnThread();
             #ifdef WITH_3D_ADAM_MODEL
-                if (spImpl->mDisplayMode == DisplayMode::DisplayAll
-                    || spImpl->mDisplayMode == DisplayMode::DisplayAdam)
+                if (mDisplayMode == DisplayMode::DisplayAll
+                    || mDisplayMode == DisplayMode::DisplayAdam)
                 {
                     int argc = 0;
                     // char* argv[0];
@@ -158,8 +153,8 @@ namespace op
         {
             // Adam rendering
             #ifdef WITH_3D_ADAM_MODEL
-                if (spImpl->mDisplayMode == DisplayMode::DisplayAll
-                    || spImpl->mDisplayMode == DisplayMode::DisplayAdam)
+                if (mDisplayMode == DisplayMode::DisplayAll
+                    || mDisplayMode == DisplayMode::DisplayAdam)
                 {
                     CMeshModelInstance cMeshModelInstance;
                     VisualizedData visualizedData;
@@ -277,7 +272,7 @@ namespace op
         try
         {   
             // 2-D rendering
-            if (spImpl->mDisplayMode == DisplayMode::DisplayAll || spImpl->mDisplayMode == DisplayMode::Display2D)
+            if (mDisplayMode == DisplayMode::DisplayAll || mDisplayMode == DisplayMode::Display2D)
                 Gui::update();
         }
         catch (const std::exception& e)

@@ -423,8 +423,7 @@ namespace op
                  const std::vector<std::shared_ptr<Renderer>>& renderers, const PoseModel poseModel,
                  const DisplayMode displayMode) :
         Gui{outputSize, fullScreen, isRunningSharedPtr, videoSeekSharedPtr, poseExtractorNets, faceExtractorNets,
-            handExtractorNets, renderers},
-        mDisplayMode{displayMode}
+            handExtractorNets, renderers, displayMode}
     {
         try
         {
