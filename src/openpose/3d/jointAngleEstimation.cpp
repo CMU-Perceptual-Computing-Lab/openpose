@@ -69,7 +69,6 @@ namespace op
             const std::string mCorrespondencePath;
 
             // Processing
-            const bool mFillVtAndJ0Vecs;
             const bool mCeresDisplayReport;
             bool mInitialized;
 
@@ -88,13 +87,11 @@ namespace op
             Eigen::Matrix<double, Eigen::Dynamic, 1> mJ0Vec;
             const std::shared_ptr<const TotalModel> spTotalModel;
 
-            ImplJointAngleEstimation(const bool fillVtAndJ0Vecs,
-                                     const bool ceresDisplayReport) :
+            ImplJointAngleEstimation(const bool ceresDisplayReport) :
                 mGTotalModelPath{"./model/adam_v1_plus2.json"},
                 mPcaPath{"./model/adam_blendshapes_348_delta_norm.json"},
                 mObjectPath{"./model/mesh_nofeet.obj"},
                 mCorrespondencePath{"./model/correspondences_nofeet.txt"},
-                mFillVtAndJ0Vecs{fillVtAndJ0Vecs},
                 mCeresDisplayReport{ceresDisplayReport},
                 mInitialized{false},
                 mBodyJoints(5, NUMBER_BODY_KEYPOINTS),
@@ -181,10 +178,9 @@ namespace op
         }
     }
 
-    JointAngleEstimation::JointAngleEstimation(const bool fillVtAndJ0Vecs,
-                                               const bool ceresDisplayReport)
+    JointAngleEstimation::JointAngleEstimation(const bool ceresDisplayReport)
         #ifdef WITH_3D_ADAM_MODEL
-            : spImpl{std::make_shared<ImplJointAngleEstimation>(fillVtAndJ0Vecs, ceresDisplayReport)}
+            : spImpl{std::make_shared<ImplJointAngleEstimation>(ceresDisplayReport)}
         #endif
     {
         try
@@ -193,7 +189,6 @@ namespace op
             //       " Coming soon!", __LINE__, __FUNCTION__, __FILE__);
             #ifdef WITH_3D_ADAM_MODEL
             #else
-                UNUSED(fillVtAndJ0Vecs);
                 UNUSED(ceresDisplayReport);
                 error("OpenPose must be compiled with the `WITH_3D_ADAM_MODEL` macro definition in order to use this"
                       " functionality.", __LINE__, __FUNCTION__, __FILE__);
@@ -277,6 +272,10 @@ namespace op
             }
 
             // Initialization (e.g., first frame)
+            const bool fastVersion = false;
+            // Fill Datum
+            Eigen::MatrixXd vtVec;
+            Eigen::MatrixXd j0Vec;
             if (!spImpl->mInitialized)
             {
                 spImpl->mInitialized = true;
@@ -291,33 +290,42 @@ namespace op
                 frameParams.m_adam_pose(0, 0) = 3.14159265358979323846264338327950288419716939937510582097494459;
                 // Fit initialization
                 // Adam_FastFit_Initialize only changes frameParams
-                Adam_FastFit_Initialize(*spImpl->spTotalModel, frameParams, spImpl->mBodyJoints, spImpl->mRFootJoints, spImpl->mLFootJoints,
-                                        spImpl->mRHandJoints, spImpl->mLHandJoints, spImpl->mFaceJoints, spImpl->mCeresDisplayReport);
-                spImpl->mVtVec = spImpl->spTotalModel->m_meanshape + spImpl->spTotalModel->m_shapespace_u * frameParams.m_adam_coeffs;
-                spImpl->mJ0Vec = spImpl->spTotalModel->J_mu_ + spImpl->spTotalModel->dJdc_ * frameParams.m_adam_coeffs;
+                Adam_FastFit_Initialize(*spImpl->spTotalModel, frameParams, spImpl->mBodyJoints, spImpl->mRFootJoints,
+                                        spImpl->mLFootJoints, spImpl->mRHandJoints, spImpl->mLHandJoints,
+                                        spImpl->mFaceJoints, spImpl->mCeresDisplayReport);
+                vtVec = spImpl->spTotalModel->m_meanshape + spImpl->spTotalModel->m_shapespace_u * frameParams.m_adam_coeffs;
+                j0Vec = spImpl->spTotalModel->J_mu_ + spImpl->spTotalModel->dJdc_ * frameParams.m_adam_coeffs;
+                if (fastVersion)
+                {
+                    spImpl->mVtVec = vtVec;
+                    spImpl->mJ0Vec = j0Vec;
+                }
             }
             // Other frames
             else
             {
-                // // Fast way (it doesn't look right)
-                // // Adam_FastFit only changes frameParams
-                // Adam_FastFit(*spImpl->spTotalModel, frameParams, spImpl->mBodyJoints, spImpl->mRFootJoints, spImpl->mLFootJoints, spImpl->mRHandJoints,
-                //              spImpl->mLHandJoints, spImpl->mFaceJoints, spImpl->mCeresDisplayReport);
+                // Fast way (it doesn't look right)
+                if (fastVersion)
+                {
+                    // Adam_FastFit only changes frameParams
+                    Adam_FastFit(*spImpl->spTotalModel, frameParams, spImpl->mBodyJoints, spImpl->mRFootJoints,
+                                 spImpl->mLFootJoints, spImpl->mRHandJoints, spImpl->mLHandJoints,
+                                 spImpl->mFaceJoints, spImpl->mCeresDisplayReport);
+                    if (fastVersion)
+                    {
+                        vtVec = spImpl->mVtVec;
+                        j0Vec = spImpl->mJ0Vec;
+                    }
+                }
                 // Slow way
-                // Adam_FastFit_Initialize only changes frameParams
-                Adam_FastFit_Initialize(*spImpl->spTotalModel, frameParams, spImpl->mBodyJoints, spImpl->mRFootJoints, spImpl->mLFootJoints,
-                                        spImpl->mRHandJoints, spImpl->mLHandJoints, spImpl->mFaceJoints, spImpl->mCeresDisplayReport);
-                spImpl->mVtVec = spImpl->spTotalModel->m_meanshape + spImpl->spTotalModel->m_shapespace_u * frameParams.m_adam_coeffs;
-                spImpl->mJ0Vec = spImpl->spTotalModel->J_mu_ + spImpl->spTotalModel->dJdc_ * frameParams.m_adam_coeffs;
-            }
-            // Fill Datum
-            Eigen::MatrixXd vtVec;
-            Eigen::MatrixXd j0Vec;
-            // ~0.5 ms
-            if (spImpl->mFillVtAndJ0Vecs)
-            {
-                vtVec = spImpl->mVtVec;
-                j0Vec = spImpl->mJ0Vec;
+                else
+                {
+                    // Adam_FastFit_Initialize only changes frameParams
+                    Adam_FastFit_Initialize(*spImpl->spTotalModel, frameParams, spImpl->mBodyJoints, spImpl->mRFootJoints, spImpl->mLFootJoints,
+                                            spImpl->mRHandJoints, spImpl->mLHandJoints, spImpl->mFaceJoints, spImpl->mCeresDisplayReport);
+                    vtVec = spImpl->spTotalModel->m_meanshape + spImpl->spTotalModel->m_shapespace_u * frameParams.m_adam_coeffs;
+                    j0Vec = spImpl->spTotalModel->J_mu_ + spImpl->spTotalModel->dJdc_ * frameParams.m_adam_coeffs;
+                }
             }
             return std::make_tuple(
                 frameParams.m_adam_pose, frameParams.m_adam_t, vtVec, j0Vec, frameParams.m_adam_facecoeffs_exp,

@@ -21,9 +21,9 @@ namespace op
                 const std::shared_ptr<std::pair<std::atomic<bool>, std::atomic<int>>>& videoSeekSharedPtr = nullptr,
                 const std::vector<std::shared_ptr<PoseExtractorNet>>& poseExtractorNets = {},
                 const std::vector<std::shared_ptr<Renderer>>& renderers = {},
-                const std::shared_ptr<const TotalModel>& totalModel = nullptr
-                // , const std::string& adamRenderedVideoPath = ""
-                );
+                const DisplayMode displayMode = DisplayMode::DisplayAll,
+                const std::shared_ptr<const TotalModel>& totalModel = nullptr,
+                const std::string& adamRenderedVideoPath = "");
 
         virtual ~GuiAdam();
 

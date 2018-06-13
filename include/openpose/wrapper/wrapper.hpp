@@ -874,10 +874,10 @@ namespace op
                 // Pose extractor(s)
                 for (auto i = 0u; i < spWJointAngleEstimations.size(); i++)
                 {
-                    const bool fillVtAndJ0Vecs = true;
                     const bool ceresDisplayReport = false;
-                    const auto jointAngleEstimation = std::make_shared<JointAngleEstimation>(fillVtAndJ0Vecs, ceresDisplayReport);
-                    spWJointAngleEstimations.at(i) = {std::make_shared<WJointAngleEstimation<TDatumsPtr>>(jointAngleEstimation)};
+                    const auto jointAngleEstimation = std::make_shared<JointAngleEstimation>(ceresDisplayReport);
+                    spWJointAngleEstimations.at(i) = {std::make_shared<WJointAngleEstimation<TDatumsPtr>>(
+                        jointAngleEstimation)};
                 }
             }
 
@@ -972,13 +972,16 @@ namespace op
                         renderers.emplace_back(std::static_pointer_cast<Renderer>(poseGpuRenderer));
                 // Display
                 // Adam (+3-D/2-D) display
-                if (wrapperStructExtra.ikThreads > 0)
+                const auto displayAdam = wrapperStructOutput.displayMode == DisplayMode::DisplayAdam
+                                         || (wrapperStructOutput.displayMode == DisplayMode::DisplayAll
+                                             && wrapperStructExtra.ikThreads > 0);
+                if (displayAdam)
                 {
                     // Gui
                     auto gui = std::make_shared<GuiAdam>(
                         finalOutputSize, wrapperStructOutput.fullScreen, mThreadManager.getIsRunningSharedPtr(),
-                        spVideoSeek, poseExtractorNets, renderers,
-                        JointAngleEstimation::getTotalModel()
+                        spVideoSeek, poseExtractorNets, renderers, wrapperStructOutput.displayMode,
+                        JointAngleEstimation::getTotalModel(), wrapperStructOutput.writeVideoAdam
                     );
                     // WGui
                     spWGui = {std::make_shared<WGuiAdam<TDatumsPtr>>(gui)};

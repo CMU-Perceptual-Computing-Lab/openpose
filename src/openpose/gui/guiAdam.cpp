@@ -7,7 +7,7 @@
     #define SMPL_VIS_SCALING 100.0f
 #endif
 #include <openpose/3d/jointAngleEstimation.hpp>
-// #include <openpose/filestream/videoSaver.hpp>
+#include <openpose/filestream/videoSaver.hpp>
 #include <openpose/gui/guiAdam.hpp>
 
 namespace op
@@ -36,10 +36,6 @@ namespace op
                 error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             }
         }
-    #else
-        const std::string WITH_3D_ADAM_MODEL_ERROR{"OpenPose CMake must be compiled with the `WITH_3D_ADAM_MODEL` flag"
-            " in order to use the Adam visualization renderer. Alternatively, set 2-D/3-D rendering with `--display 2`"
-            " or `--display 3`."};
     #endif
 
     struct GuiAdam::ImplGuiAdam
@@ -50,17 +46,22 @@ namespace op
             std::array<double, NUMBER_KEYPOINTS> mResultBody;
             std::unique_ptr<GLubyte[]> upReadBuffer;
 
-            // // Video AVI writing
-            // const std::string mWriteAdamRenderAsVideo;
-            // std::shared_ptr<VideoSaver> spVideoSaver;
+            // Video AVI writing
+            const std::string mWriteAdamRenderAsVideo;
+            std::shared_ptr<VideoSaver> spVideoSaver;
 
             // Shared parameters
             const std::shared_ptr<const TotalModel> spTotalModel;
 
-            ImplGuiAdam(const std::shared_ptr<const TotalModel>& totalModel) :
-                        // const std::string& adamRenderedVideoPath) :
-                // mWriteAdamRenderAsVideo{adamRenderedVideoPath},
-                spTotalModel{totalModel}
+            // Display mode
+            DisplayMode mDisplayMode; // Whether to also display 2D keypoints
+
+            ImplGuiAdam(const std::shared_ptr<const TotalModel>& totalModel,
+                        const DisplayMode displayMode = DisplayMode::DisplayAll,
+                        const std::string& adamRenderedVideoPath = "") :
+                mWriteAdamRenderAsVideo{adamRenderedVideoPath},
+                spTotalModel{totalModel},
+                mDisplayMode{displayMode}
             {
                 try
                 {
@@ -81,24 +82,26 @@ namespace op
                      const std::shared_ptr<std::pair<std::atomic<bool>, std::atomic<int>>>& videoSeekSharedPtr,
                      const std::vector<std::shared_ptr<PoseExtractorNet>>& poseExtractorNets,
                      const std::vector<std::shared_ptr<Renderer>>& renderers,
-                     const std::shared_ptr<const TotalModel>& totalModel) :
-                     // const std::string& adamRenderedVideoPath) :
+                     const DisplayMode displayMode, const std::shared_ptr<const TotalModel>& totalModel,
+                     const std::string& adamRenderedVideoPath) :
         Gui{outputSize, fullScreen, isRunningSharedPtr, videoSeekSharedPtr, poseExtractorNets, renderers},
-        spImpl{std::make_shared<ImplGuiAdam>(totalModel)}//, adamRenderedVideoPath)}
+        spImpl{std::make_shared<ImplGuiAdam>(totalModel, displayMode, adamRenderedVideoPath)}
     {
         try
         {
-            #ifdef WITH_3D_ADAM_MODEL
-            #else
+            #ifndef WITH_3D_ADAM_MODEL
                 UNUSED(outputSize);
                 UNUSED(fullScreen);
                 UNUSED(isRunningSharedPtr);
                 UNUSED(videoSeekSharedPtr);
                 UNUSED(poseExtractorNets);
                 UNUSED(renderers);
+                UNUSED(displayMode);
                 UNUSED(totalModel);
                 // UNUSED(adamRenderedVideoPath);
-                error(WITH_3D_ADAM_MODEL_ERROR, __LINE__, __FUNCTION__, __FILE__);
+                error("OpenPose CMake must be compiled with the `WITH_3D_ADAM_MODEL` flag in order to use the"
+                      " Adam visualization renderer. Alternatively, set 2-D/3-D rendering with `--display 2`"
+                      " or `--display 3`.", __LINE__, __FUNCTION__, __FILE__);
             #endif
         }
         catch (const std::exception& e)
@@ -116,17 +119,23 @@ namespace op
         try
         {
             // Init parent class
-            Gui::initializationOnThread();
+            if (spImpl->mDisplayMode == DisplayMode::DisplayAll || spImpl->mDisplayMode == DisplayMode::Display2D)
+                Gui::initializationOnThread();
             #ifdef WITH_3D_ADAM_MODEL
-                int argc = 0;
-                // char* argv[0];
-                spImpl->spRender.reset(new adam::Renderer{&argc, nullptr});
-                // spImpl->spRender->options.yrot=-45;
-                spImpl->spRender->options.yrot=45;
-                spImpl->spRender->options.xrot=25;
-                spImpl->spRender->options.meshSolid = true;
-                // spImpl->spRender->options.meshSolid = false;
-                spImpl->upReadBuffer.reset(new GLubyte[spImpl->spRender->options.width * spImpl->spRender->options.height * 3]);
+                if (spImpl->mDisplayMode == DisplayMode::DisplayAll
+                    || spImpl->mDisplayMode == DisplayMode::DisplayAdam)
+                {
+                    int argc = 0;
+                    // char* argv[0];
+                    spImpl->spRender.reset(new adam::Renderer{&argc, nullptr});
+                    // spImpl->spRender->options.yrot=-45;
+                    spImpl->spRender->options.yrot=45;
+                    spImpl->spRender->options.xrot=25;
+                    spImpl->spRender->options.meshSolid = true;
+                    // spImpl->spRender->options.meshSolid = false;
+                    spImpl->upReadBuffer.reset(new GLubyte[spImpl->spRender->options.width
+                                                           * spImpl->spRender->options.height * 3]);
+                }
             #endif
         }
         catch (const std::exception& e)
@@ -144,19 +153,18 @@ namespace op
                                const double* const adamFaceCoeffsExpPtr)
     {
         try
-        {   
-            // 3-D rendering
-            // Gui::setKeypoints(poseKeypoints3D, faceKeypoints3D, handKeypoints3D[0], handKeypoints3D[1]);
+        {
             // Adam rendering
             #ifdef WITH_3D_ADAM_MODEL
-                // if (mDisplayMode == DisplayMode::DisplayAll || mDisplayMode == DisplayMode::Display3D)
+                if (spImpl->mDisplayMode == DisplayMode::DisplayAll
+                    || spImpl->mDisplayMode == DisplayMode::DisplayAdam)
                 {
                     CMeshModelInstance cMeshModelInstance;
                     VisualizedData visualizedData;
                     // auto& visualizedData = spImpl->mVisualizedData;
                     // GenerateMesh_Fast modifies cMeshModelInstance & spImpl->mResultBody
-                    GenerateMesh_Fast(cMeshModelInstance, spImpl->mResultBody.data(), *spImpl->spTotalModel, vtVec, j0Vec,
-                                      adamPose.data(), adamFaceCoeffsExpPtr, adamTranslation);
+                    GenerateMesh_Fast(cMeshModelInstance, spImpl->mResultBody.data(), *spImpl->spTotalModel, vtVec,
+                                    j0Vec, adamPose.data(), adamFaceCoeffsExpPtr, adamTranslation);
                     CopyMesh(cMeshModelInstance, visualizedData);
 
                     // Fill data
@@ -171,12 +179,14 @@ namespace op
                             updateKeypoint(&targetJoints[mapOPToAdam(part)*(poseKeypoints3D.getSize(2)-1)],
                                            &poseKeypoints3D[{0, part, 0}]);
                         // Update left/right hand
-                        const auto bodyOffset = NUMBER_BODY_KEYPOINTS*(poseKeypoints3D.getSize(2)-1); // NUMBER_BODY_KEYPOINTS = #parts_OP + 1 (top_head)
+                        // NUMBER_BODY_KEYPOINTS = #parts_OP + 1 (top_head)
+                        const auto bodyOffset = NUMBER_BODY_KEYPOINTS*(poseKeypoints3D.getSize(2)-1);
                         const auto handOffset = handKeypoints3D[0].getSize(1)*(handKeypoints3D[0].getSize(2)-1);
                         for (auto hand = 0u ; hand < handKeypoints3D.size(); hand++)
                             if (!handKeypoints3D.at(hand).empty())
                                 for (auto part = 0 ; part < handKeypoints3D[hand].getSize(1); part++)
-                                    updateKeypoint(&targetJoints[bodyOffset + hand*handOffset + part*(handKeypoints3D[hand].getSize(2)-1)],
+                                    updateKeypoint(&targetJoints[bodyOffset + hand*handOffset
+                                                    + part*(handKeypoints3D[hand].getSize(2)-1)],
                                                    &handKeypoints3D[hand][{0, part, 0}]);
 
                         // Meters --> cm
@@ -222,32 +232,36 @@ namespace op
                     spImpl->spRender->RenderAndRead(); // read the image into read_buffer
                     // spImpl->spRender->Display();
 
-                    // // Save/display Adam display in opencv window
-                    // if (!spImpl->mWriteAdamRenderAsVideo.empty())
-                    // {
-                    //     // img is y-flipped, and in RGB order
-                    //     cv::Mat img(spImpl->spRender->options.height, spImpl->spRender->options.width,
-                    //                 CV_8UC3, spImpl->upReadBuffer.get());
-                    //     cv::flip(img, img, 0);
-                    //     cv::cvtColor(img, img, cv::COLOR_RGB2BGR);
-                    //     if (spImpl->spVideoSaver == nullptr)
-                    //     {
-                    //         const auto originalVideoFps = 30;
-                    //         spImpl->spVideoSaver = std::make_shared<VideoSaver>(
-                    //             spImpl->mWriteAdamRenderAsVideo, CV_FOURCC('M','J','P','G'),
-                    //             originalVideoFps, Point<int>{img.cols, img.rows}
-                    //         );
-                    //     }
-                    //     spImpl->spVideoSaver->write(img);
-                    //     // cv::imshow( "Display window", img );
-                    //     // cv::waitKey(16);
-                    // }
+                    // Save/display Adam display in opencv window
+                    if (!spImpl->mWriteAdamRenderAsVideo.empty())
+                    {
+                        // img is y-flipped, and in RGB order
+                        cv::Mat img(spImpl->spRender->options.height, spImpl->spRender->options.width,
+                                    CV_8UC3, spImpl->upReadBuffer.get());
+                        cv::flip(img, img, 0);
+                        cv::cvtColor(img, img, cv::COLOR_RGB2BGR);
+                        if (spImpl->spVideoSaver == nullptr)
+                        {
+                            const auto originalVideoFps = 30;
+                            spImpl->spVideoSaver = std::make_shared<VideoSaver>(
+                                spImpl->mWriteAdamRenderAsVideo, CV_FOURCC('M','J','P','G'),
+                                originalVideoFps, Point<int>{img.cols, img.rows}
+                            );
+                        }
+                        spImpl->spVideoSaver->write(img);
+                        // cv::imshow( "Display window", img );
+                        // cv::waitKey(16);
+                    }
                 }
             #else
                 UNUSED(poseKeypoints3D);
                 UNUSED(faceKeypoints3D);
-                UNUSED(leftHandKeypoints3D);
-                UNUSED(rightHandKeypoints3D);
+                UNUSED(handKeypoints3D);
+                UNUSED(adamPose);
+                UNUSED(adamTranslation);
+                UNUSED(vtVec);
+                UNUSED(j0Vec);
+                UNUSED(adamFaceCoeffsExpPtr);
             #endif
         }
         catch (const std::exception& e)
@@ -261,7 +275,8 @@ namespace op
         try
         {   
             // 2-D rendering
-            Gui::update();
+            if (spImpl->mDisplayMode == DisplayMode::DisplayAll || spImpl->mDisplayMode == DisplayMode::Display2D)
+                Gui::update();
         }
         catch (const std::exception& e)
         {

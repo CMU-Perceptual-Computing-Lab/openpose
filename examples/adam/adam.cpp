@@ -161,13 +161,13 @@ DEFINE_int32(3d_views,                  1,              "Complementary option to
                                                         " iteration, allowing tasks such as stereo camera processing (`--3d`). Note that"
                                                         " `--camera_parameters_folder` must be set. OpenPose must find as many `xml` files in the"
                                                         " parameter folder as this number indicates.");
-// Extra algorithms
-DEFINE_bool(identification,             false,          "Not available yet, coming soon. Whether to enable people identification across frames.");
-DEFINE_int32(tracking,                  -1,             "Not available yet, coming soon. Whether to enable people tracking across frames. The"
+// Extra Algorithms
+DEFINE_bool(identification,             false,          "Experimental, not available yet. Whether to enable people identification across frames.");
+DEFINE_int32(tracking,                  -1,             "Experimental, not available yet. Whether to enable people tracking across frames. The"
                                                         " value indicates the number of frames where tracking is run between each OpenPose keypoint"
                                                         " detection. Select -1 (default) to disable it or 0 to run simultaneously OpenPose keypoint"
                                                         " detector and tracking for potentially higher accurary than only OpenPose.");
-DEFINE_int32(ik_threads,                0,              "Not available yet, coming soon. Whether to enable inverse kinematics (IK) from 3-D"
+DEFINE_int32(ik_threads,                0,              "Experimental, not available yet. Whether to enable inverse kinematics (IK) from 3-D"
                                                         " keypoints to obtain 3-D joint angles. By default (0 threads), it is disabled. Increasing"
                                                         " the number of threads will increase the speed but also the global system latency.");
 // OpenPose Rendering
@@ -215,7 +215,8 @@ DEFINE_string(write_images,             "",             "Directory to write rend
 DEFINE_string(write_images_format,      "png",          "File extension and format for `write_images`, e.g. png, jpg or bmp. Check the OpenCV"
                                                         " function cv::imwrite for all compatible extensions.");
 DEFINE_string(write_video,              "",             "Full file path to write rendered frames in motion JPEG video format. It might fail if the"
-                                                        " final path does not finish in `.avi`. It internally uses cv::VideoWriter.");
+                                                        " final path does not finish in `.avi`. It internally uses cv::VideoWriter. Flag"
+                                                        " `camera_fps` controls FPS.");
 DEFINE_string(write_json,               "",             "Directory to write OpenPose output in JSON format. It includes body, hand, and face pose"
                                                         " keypoints (2-D and 3-D), as well as pose candidates (if `--part_candidates` enabled).");
 DEFINE_string(write_coco_json,          "",             "Full file path to write people pose data with JSON COCO validation format.");
@@ -231,8 +232,10 @@ DEFINE_string(write_keypoint_format,    "yml",          "(Deprecated, use `write
                                                         " yaml & yml. Json not available for OpenCV < 3.0, use `write_keypoint_json` instead.");
 DEFINE_string(write_keypoint_json,      "",             "(Deprecated, use `write_json`) Directory to write people pose data in JSON format,"
                                                         " compatible with any OpenCV version.");
-DEFINE_string(write_bvh,                "",             "E.g.: /media/posefs3b/Users/gines/cvpr2018/temp.bvh");
-DEFINE_string(write_adam,               "",             "E.g.: /media/posefs3b/Users/gines/cvpr2018/adam.avi");
+// Result Saving - Extra Algorithms
+DEFINE_string(write_video_adam,         "",             "Experimental, not available yet. E.g.: `~/Desktop/adamResult.avi`. Flag `camera_fps`"
+                                                        " controls FPS.");
+DEFINE_string(write_bvh,                "",             "Experimental, not available yet. E.g.: `~/Desktop/mocapResult.bvh`.");
 
 #include <BVHWriter.h>
 #include <totalmodel.h>
@@ -364,7 +367,7 @@ int openPoseDemo()
         op::Wrapper<std::vector<op::Datum>> opWrapper;
 
         // Adam added
-        const auto jointAngleEstimation = std::make_shared<op::JointAngleEstimation>(false, false);
+        const auto jointAngleEstimation = std::make_shared<op::JointAngleEstimation>();
         const auto wUserOutput = std::make_shared<WUserOutput>(op::JointAngleEstimation::getTotalModel());
         const auto workerOutputOnNewThread = false;
         opWrapper.setWorkerOutput(wUserOutput, workerOutputOnNewThread);
@@ -399,13 +402,13 @@ int openPoseDemo()
                                                         FLAGS_frames_repeat};
         // Consumer (comment or use default argument to disable any output)
         const op::WrapperStructOutput wrapperStructOutput{op::flagsToDisplayMode(FLAGS_display, FLAGS_3d),
-        // const op::WrapperStructOutput wrapperStructOutput{op::DisplayMode::NoDisplay,
                                                           !FLAGS_no_gui_verbose, FLAGS_fullscreen, FLAGS_write_keypoint,
                                                           op::stringToDataFormat(FLAGS_write_keypoint_format),
-                                                          writeJson, FLAGS_write_coco_json,
+                                                          writeJson, FLAGS_write_coco_json, FLAGS_write_coco_foot_json,
                                                           FLAGS_write_images, FLAGS_write_images_format, FLAGS_write_video,
                                                           FLAGS_camera_fps, FLAGS_write_heatmaps,
-                                                          FLAGS_write_heatmaps_format, FLAGS_write_coco_foot_json};
+                                                          FLAGS_write_heatmaps_format, FLAGS_write_video_adam,
+                                                          FLAGS_write_bvh};
         // Configure wrapper
         opWrapper.configure(wrapperStructPose, wrapperStructFace, wrapperStructHand, wrapperStructExtra,
                             wrapperStructInput, wrapperStructOutput);
