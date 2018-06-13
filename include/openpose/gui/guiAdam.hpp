@@ -7,8 +7,6 @@
 #include <openpose/core/common.hpp>
 #include <openpose/gui/enumClasses.hpp>
 #include <openpose/gui/gui.hpp>
-#include <openpose/pose/enumClasses.hpp>
-#include <openpose/thread/workerConsumer.hpp>
 
 namespace op
 {

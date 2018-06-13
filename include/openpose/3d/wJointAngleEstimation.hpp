@@ -41,6 +41,14 @@ namespace op
     template<typename TDatums>
     void WJointAngleEstimation<TDatums>::initializationOnThread()
     {
+        try
+        {
+            spJointAngleEstimation->initializationOnThread();
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
     }
 
     template<typename TDatums>
@@ -63,7 +71,7 @@ namespace op
                 std::tie(datum.adamPose, datum.adamTranslation, datum.vtVec, datum.j0Vec,
                          datum.adamFaceCoeffsExp, datum.mouthOpening, datum.rightEyeOpening,
                          datum.leftEyeOpening, datum.distanceRootFoot)
-                    = spJointAngleEstimation->runAdam(poseKeypoints3D, faceKeypoints3D, handKeypoints3D);
+                    = spJointAngleEstimation->adamFastFit(poseKeypoints3D, faceKeypoints3D, handKeypoints3D);
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
                 Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);

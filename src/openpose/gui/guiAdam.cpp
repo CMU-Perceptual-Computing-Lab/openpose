@@ -1,5 +1,4 @@
 #ifdef WITH_3D_ADAM_MODEL
-    #include <adam/BVHWriter.h>
     #include <adam/KinematicModel.h>
     #include <adam/Renderer.h>
     #include <adam/utils.h>

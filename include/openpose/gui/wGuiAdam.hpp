@@ -72,7 +72,7 @@ namespace op
                         cvOutputDatas.emplace_back(tDatum.cvOutputData);
                     spGuiAdam->setImage(cvOutputDatas);
                     // Update keypoints
-                    auto& tDatum = (*tDatums)[0];
+                    const auto& tDatum = (*tDatums)[0];
                     spGuiAdam->generateMesh(tDatum.poseKeypoints3D, tDatum.faceKeypoints3D, tDatum.handKeypoints3D,
                                             tDatum.adamPose, tDatum.adamTranslation, tDatum.vtVec, tDatum.j0Vec,
                                             tDatum.adamFaceCoeffsExp.data());

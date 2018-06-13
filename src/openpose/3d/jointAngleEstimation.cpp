@@ -187,8 +187,7 @@ namespace op
         {
             // error("JointAngleEstimation (`ik_threads` flag) buggy and not working yet, but we are working on it!"
             //       " Coming soon!", __LINE__, __FUNCTION__, __FILE__);
-            #ifdef WITH_3D_ADAM_MODEL
-            #else
+            #ifndef WITH_3D_ADAM_MODEL
                 UNUSED(ceresDisplayReport);
                 error("OpenPose must be compiled with the `WITH_3D_ADAM_MODEL` macro definition in order to use this"
                       " functionality.", __LINE__, __FUNCTION__, __FILE__);
@@ -200,8 +199,12 @@ namespace op
         }
     }
 
+    void JointAngleEstimation::initializationOnThread()
+    {
+    }
+
     std::tuple<Eigen::MatrixXd, Eigen::Vector3d, Eigen::MatrixXd, Eigen::MatrixXd, Eigen::VectorXd,
-        float, float, float, float> JointAngleEstimation::runAdam(
+        float, float, float, float> JointAngleEstimation::adamFastFit(
             const Array<float>& poseKeypoints3D,
             const Array<float>& faceKeypoints3D,
             const std::array<Array<float>, 2>& handKeypoints3D)

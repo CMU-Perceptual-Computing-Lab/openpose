@@ -41,6 +41,14 @@ namespace op
     template<typename TDatums>
     void WPoseTriangulation<TDatums>::initializationOnThread()
     {
+        try
+        {
+            spPoseTriangulation->initializationOnThread();
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
     }
 
     template<typename TDatums>

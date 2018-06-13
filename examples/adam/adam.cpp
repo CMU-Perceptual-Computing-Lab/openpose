@@ -237,27 +237,18 @@ DEFINE_string(write_video_adam,         "",             "Experimental, not avail
                                                         " controls FPS.");
 DEFINE_string(write_bvh,                "",             "Experimental, not available yet. E.g.: `~/Desktop/mocapResult.bvh`.");
 
-#include <BVHWriter.h>
-#include <totalmodel.h>
-
 // This worker will just read and return all the jpg files in a directory
 class WUserOutput : public op::WorkerConsumer<std::shared_ptr<std::vector<op::Datum>>>
 {
 public:
-    WUserOutput(const std::shared_ptr<const TotalModel>& totalModel) :
-        mInitialized{false},
-        spTotalModel{totalModel}
+    WUserOutput()
     {
     }
 
     ~WUserOutput()
     {
-        // Write BVH file
-        const auto secondsPerFrame = 1 / 30.;
-        this->callBVHWriter(FLAGS_write_bvh, secondsPerFrame);
     }
 
-    // Purely Visualization
     void initializationOnThread()
     {
     }
@@ -269,15 +260,7 @@ public:
             if (datumsPtr != nullptr && !datumsPtr->empty())
             {
                 auto& datum = datumsPtr->at(0);
-
-                // BVH-Unity generation
-                mTrans.push_back(datum.adamTranslation); // BVH generation, Eigen::Vector3d(3, 1)
-                mPoses.push_back(datum.adamPose); // BVH generation, Eigen::Matrix<double, 62, 3, Eigen::RowMajor>
-                if (!mInitialized)
-                {
-                    mJ0VecFrame0 = datum.j0Vec;
-                    mInitialized = true;
-                }
+                UNUSED(datum);
             }
         }
         catch (const std::exception& e)
@@ -288,26 +271,12 @@ public:
     }
 
 private:
-    // Write BVH file
-    std::unique_ptr<BVHWriter> spBvhWriter;
-    std::vector<Eigen::Matrix<double, 3, 1>> mTrans; // record the translation across frames
-    std::vector<Eigen::Matrix<double, TotalModel::NUM_JOINTS, 3, Eigen::RowMajor>> mPoses; // record the pose change
-    Eigen::Matrix<double, Eigen::Dynamic, 1> mJ0VecFrame0;
-    bool mInitialized;
-
-    // Shared parameters
-    const std::shared_ptr<const TotalModel> spTotalModel;
-
-    void callBVHWriter(const std::string& fileName, const double frameTime)
-    {
-        if (!fileName.empty())
-        {
-            const bool unityCompatible = true;
-            spBvhWriter.reset(new BVHWriter{spTotalModel->m_parent, unityCompatible});
-            spBvhWriter->parseInput(mJ0VecFrame0, mTrans, mPoses);
-            spBvhWriter->writeBVH(fileName, frameTime);
-        }
-    }
+    // // Write BVH file
+    // std::unique_ptr<BVHWriter> spBvhWriter;
+    // std::vector<Eigen::Matrix<double, 3, 1>> mTranslations; // record the translation across frames
+    // std::vector<Eigen::Matrix<double, TotalModel::NUM_JOINTS, 3, Eigen::RowMajor>> mPoses; // record the pose change
+    // Eigen::Matrix<double, Eigen::Dynamic, 1> mJ0VecFrame0;
+    // bool mInitialized;
 };
 
 int openPoseDemo()
@@ -367,8 +336,7 @@ int openPoseDemo()
         op::Wrapper<std::vector<op::Datum>> opWrapper;
 
         // Adam added
-        const auto jointAngleEstimation = std::make_shared<op::JointAngleEstimation>();
-        const auto wUserOutput = std::make_shared<WUserOutput>(op::JointAngleEstimation::getTotalModel());
+        const auto wUserOutput = std::make_shared<WUserOutput>();
         const auto workerOutputOnNewThread = false;
         opWrapper.setWorkerOutput(wUserOutput, workerOutputOnNewThread);
 

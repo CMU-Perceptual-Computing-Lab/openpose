@@ -246,6 +246,10 @@ namespace op
         }
     }
 
+    void PoseTriangulation::initializationOnThread()
+    {
+    }
+
     Array<float> PoseTriangulation::reconstructArray(const std::vector<Array<float>>& keypointsVector,
                                                      const std::vector<cv::Mat>& cameraMatrices) const
     {

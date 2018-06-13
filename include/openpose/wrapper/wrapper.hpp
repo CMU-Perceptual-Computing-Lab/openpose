@@ -511,7 +511,8 @@ namespace op
             // Common parameters
             auto finalOutputSize = wrapperStructPose.outputSize;
             Point<int> producerSize{-1,-1};
-            if (wrapperStructInput.producerSharedPtr != nullptr)
+            const auto oPProducer = (wrapperStructInput.producerSharedPtr != nullptr);
+            if (oPProducer)
             {
                 // 1. Set producer properties
                 const auto displayProducerFpsMode = (wrapperStructInput.realTimeProcessing
@@ -530,7 +531,7 @@ namespace op
             }
 
             // Producer
-            if (wrapperStructInput.producerSharedPtr != nullptr)
+            if (oPProducer)
             {
                 const auto datumProducer = std::make_shared<DatumProducer<TDatums>>(
                     wrapperStructInput.producerSharedPtr, wrapperStructInput.frameFirst, wrapperStructInput.frameLast,
@@ -928,18 +929,32 @@ namespace op
                 mOutputWs.emplace_back(std::make_shared<WImageSaver<TDatumsPtr>>(imageSaver));
             }
             // Write frames as *.avi video on hard disk
-            if (!wrapperStructOutput.writeVideo.empty() && wrapperStructInput.producerSharedPtr != nullptr)
+            const auto producerFps = (wrapperStructInput.producerSharedPtr == nullptr ?
+                                        0. : wrapperStructInput.producerSharedPtr->get(CV_CAP_PROP_FPS));
+            const auto originalVideoFps = (wrapperStructOutput.writeVideoFps > 0 ?
+                                            wrapperStructOutput.writeVideoFps
+                                            : producerFps);
+            if (!wrapperStructOutput.writeVideo.empty())
             {
+                if (oPProducer)
+                    error("Video file can only be recorded inside `wrapper/wrapper.hpp` if the producer"
+                          " is one of the default ones (e.g. video, webcam, images, ...).",
+                          __LINE__, __FUNCTION__, __FILE__);
                 if (finalOutputSize.x <= 0 || finalOutputSize.y <= 0)
                     error("Video can only be recorded if outputSize is fixed (e.g. video, webcam, IP camera),"
                           "but not for a image directory.", __LINE__, __FUNCTION__, __FILE__);
-                const auto originalVideoFps = (wrapperStructOutput.writeVideoFps > 0 ?
-                                                wrapperStructOutput.writeVideoFps
-                                                : wrapperStructInput.producerSharedPtr->get(CV_CAP_PROP_FPS));
                 const auto videoSaver = std::make_shared<VideoSaver>(
                     wrapperStructOutput.writeVideo, CV_FOURCC('M','J','P','G'), originalVideoFps, finalOutputSize
                 );
                 mOutputWs.emplace_back(std::make_shared<WVideoSaver<TDatumsPtr>>(videoSaver));
+            }
+            // Write joint angles as *.bvh file on hard disk
+            if (!wrapperStructOutput.writeBvh.empty())
+            {
+                const auto bvhSaver = std::make_shared<BvhSaver>(
+                    wrapperStructOutput.writeBvh, JointAngleEstimation::getTotalModel(), originalVideoFps
+                );
+                mOutputWs.emplace_back(std::make_shared<WBvhSaver<TDatumsPtr>>(bvhSaver));
             }
             // Write heat maps as desired image format on hard disk
             if (!writeHeatMapsCleaned.empty())
