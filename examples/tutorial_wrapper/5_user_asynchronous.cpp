@@ -135,6 +135,15 @@ DEFINE_int32(3d_views,                  1,              "Complementary option to
                                                         " iteration, allowing tasks such as stereo camera processing (`--3d`). Note that"
                                                         " `--camera_parameters_folder` must be set. OpenPose must find as many `xml` files in the"
                                                         " parameter folder as this number indicates.");
+// Extra algorithms
+DEFINE_bool(identification,             false,          "Not available yet, coming soon. Whether to enable people identification across frames.");
+DEFINE_int32(tracking,                  -1,             "Not available yet, coming soon. Whether to enable people tracking across frames. The"
+                                                        " value indicates the number of frames where tracking is run between each OpenPose keypoint"
+                                                        " detection. Select -1 (default) to disable it or 0 to run simultaneously OpenPose keypoint"
+                                                        " detector and tracking for potentially higher accurary than only OpenPose.");
+DEFINE_int32(ik_threads,                0,              "Not available yet, coming soon. Whether to enable inverse kinematics (IK) from 3-D"
+                                                        " keypoints to obtain 3-D joint angles. By default (0 threads), it is disabled. Increasing"
+                                                        " the number of threads will increase the speed but also the global system latency.");
 // OpenPose Rendering
 DEFINE_int32(part_to_show,              0,              "Prediction channel to visualize (default: 0). 0 for all the body parts, 1-18 for each body"
                                                         " part heat map, 19 for the background heat map, 20 for all the body part heat maps"
@@ -393,7 +402,7 @@ int openPoseTutorialWrapper3()
                                                       (float)FLAGS_alpha_heatmap, FLAGS_part_to_show, FLAGS_model_folder,
                                                       heatMapTypes, heatMapScale, FLAGS_part_candidates,
                                                       (float)FLAGS_render_threshold, FLAGS_number_people_max,
-                                                      enableGoogleLogging, FLAGS_3d, FLAGS_3d_min_views};
+                                                      enableGoogleLogging};
         // Face configuration (use op::WrapperStructFace{} to disable it)
         const op::WrapperStructFace wrapperStructFace{FLAGS_face, faceNetInputSize,
                                                       op::flagsToRenderMode(FLAGS_face_render, multipleView, FLAGS_render_pose),
@@ -405,6 +414,9 @@ int openPoseTutorialWrapper3()
                                                       op::flagsToRenderMode(FLAGS_hand_render, multipleView, FLAGS_render_pose),
                                                       (float)FLAGS_hand_alpha_pose, (float)FLAGS_hand_alpha_heatmap,
                                                       (float)FLAGS_hand_render_threshold};
+        // Extra functionality configuration (use op::WrapperStructExtra{} to disable it)
+        const op::WrapperStructExtra wrapperStructExtra{FLAGS_3d, FLAGS_3d_min_views, FLAGS_identification,
+                                                        FLAGS_tracking, FLAGS_ik_threads};
         // Consumer (comment or use default argument to disable any output)
         const auto displayMode = op::DisplayMode::NoDisplay;
         const bool guiVerbose = false;
@@ -417,8 +429,8 @@ int openPoseTutorialWrapper3()
                                                           FLAGS_write_heatmaps_format, FLAGS_write_coco_foot_json};
         // Configure wrapper
         op::log("Configuring OpenPose wrapper...", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-        opWrapper.configure(wrapperStructPose, wrapperStructFace, wrapperStructHand, op::WrapperStructInput{},
-                            wrapperStructOutput);
+        opWrapper.configure(wrapperStructPose, wrapperStructFace, wrapperStructHand, wrapperStructExtra,
+                            op::WrapperStructInput{}, wrapperStructOutput);
         // Set to single-thread running (to debug and/or reduce latency)
         if (FLAGS_disable_multi_thread)
            opWrapper.disableMultiThreading();

@@ -235,13 +235,10 @@ namespace op
         #ifdef WITH_3D_ADAM_MODEL
             // Adam/Unity params
             Eigen::Matrix<double, 62, 3, Eigen::RowMajor> adamPose;
-            // Eigen::MatrixXd adamPose;
             Eigen::Vector3d adamTranslation;
             // Adam params (Jacobians)
             Eigen::Matrix<double, Eigen::Dynamic, 1> vtVec;
             Eigen::Matrix<double, Eigen::Dynamic, 1> j0Vec;
-            // Eigen::MatrixXd vtVec;
-            // Eigen::MatrixXd j0Vec;
             Eigen::VectorXd adamFaceCoeffsExp;
             // Unity params
             float mouthOpening;

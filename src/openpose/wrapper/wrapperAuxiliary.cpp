@@ -7,6 +7,7 @@ namespace op
     void wrapperConfigureSecurityChecks(const WrapperStructPose& wrapperStructPose,
                                         const WrapperStructFace& wrapperStructFace,
                                         const WrapperStructHand& wrapperStructHand,
+                                        const WrapperStructExtra& wrapperStructExtra,
                                         const WrapperStructInput& wrapperStructInput,
                                         const WrapperStructOutput& wrapperStructOutput,
                                         const bool renderOutput,
@@ -116,7 +117,7 @@ namespace op
                           __LINE__, __FUNCTION__, __FILE__);
             }
             // If 3-D module, 1 person is the maximum
-            if (wrapperStructPose.reconstruct3d && wrapperStructPose.numberPeopleMax != 1)
+            if (wrapperStructExtra.reconstruct3d && wrapperStructPose.numberPeopleMax != 1)
             {
                 error("Set `--number_people_max 1` when using `--3d`. The 3-D reconstruction demo assumes there is"
                       " at most 1 person on each image.", __LINE__, __FUNCTION__, __FILE__);

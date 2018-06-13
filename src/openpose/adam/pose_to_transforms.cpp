@@ -75,7 +75,7 @@ namespace smpl
             {
                 angles[2] = 0.0;
             }
-            if (idj == 24 || idj == 27 || idj == 28 || idj == 31 || idj == 32 || idj == 35 || idj == 26 || idj == 39 || idj == 40
+            if (idj == 24 || idj == 27 || idj == 28 || idj == 31 || idj == 32 || idj == 35 || idj == 36 || idj == 39 || idj == 40
                 || idj == 44 || idj == 47 || idj == 48 || idj == 51 || idj == 52 || idj == 55 || idj == 56 || idj == 59 || idj == 60)   //all hands
             {
                 angles[0] = 0.0;
@@ -101,7 +101,7 @@ namespace smpl
                     dRdP.block<9, 3>(0, 3 * idj).setZero();
                 if (idj == 7 || idj == 8)   //foot ankle. Restrict side movement
                     dRdP.block<9, 1>(0, 3 * idj + 2).setZero();
-                if (idj == 24 || idj == 27 || idj == 28 || idj == 31 || idj == 32 || idj == 35 || idj == 26 || idj == 39 || idj == 40
+                if (idj == 24 || idj == 27 || idj == 28 || idj == 31 || idj == 32 || idj == 35 || idj == 36 || idj == 39 || idj == 40
                     || idj == 44 || idj == 47 || idj == 48 || idj == 51 || idj == 52 || idj == 55 || idj == 56 || idj == 59 || idj == 60)   //all hands
                     dRdP.block<9, 2>(0, 3 * idj).setZero();
 // duration11 += std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start11).count();

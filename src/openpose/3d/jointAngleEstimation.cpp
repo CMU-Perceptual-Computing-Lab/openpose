@@ -6,30 +6,34 @@
 namespace op
 {
     #ifdef WITH_3D_ADAM_MODEL
+        std::shared_ptr<TotalModel> sTotalModel;
         const int NUMBER_BODY_KEYPOINTS = 20;
         const int NUMBER_HAND_KEYPOINTS = 21;
         const int NUMBER_FACE_KEYPOINTS = 70;
         const int NUMBER_FOOT_KEYPOINTS = 3;
         const int NUMBER_KEYPOINTS = 3*(NUMBER_BODY_KEYPOINTS + 2*NUMBER_HAND_KEYPOINTS); // targetJoints: Only for Body, LHand, RHand. No Face, no Foot
 
-        std::shared_ptr<TotalModel> loadTotalModel(const std::string& mObjectPath, const std::string& mGTotalModelPath,
-                                                   const std::string& mPcaPath, const std::string& mCorrespondencePath)
+        const std::shared_ptr<const TotalModel> loadTotalModel(const std::string& mObjectPath, const std::string& mGTotalModelPath,
+                                                               const std::string& mPcaPath, const std::string& mCorrespondencePath)
         {
             try
             {
-                // Initialize model
-                const auto totalModel = std::make_shared<TotalModel>();
-                // Load spTotalModel (model + data)
-                // ~100 milliseconds
-                LoadTotalModelFromObj(*totalModel, mObjectPath);
-                // ~25 seconds
-                LoadTotalDataFromJson(*totalModel, mGTotalModelPath, mPcaPath, mCorrespondencePath);
+                if (sTotalModel == nullptr)
+                {
+                    // Initialize model
+                    sTotalModel = std::make_shared<TotalModel>();
+                    // Load spTotalModel (model + data)
+                    // ~100 milliseconds
+                    LoadTotalModelFromObj(*sTotalModel, mObjectPath);
+                    // ~25 seconds
+                    LoadTotalDataFromJson(*sTotalModel, mGTotalModelPath, mPcaPath, mCorrespondencePath);
+                }
                 // Return result
-                return totalModel;
+                return sTotalModel;
             }
             catch (const std::exception& e)
             {
-                op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+                error(e.what(), __LINE__, __FUNCTION__, __FILE__);
                 return nullptr;
             }
         }
@@ -50,7 +54,7 @@ namespace op
             }
             catch (const std::exception& e)
             {
-                op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+                error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             }
         }
     #endif
@@ -156,12 +160,25 @@ namespace op
             else if (oPPart == 18)
                 return 16;
             else
-                op::error("Wrong body part (" + std::to_string(oPPart) + ").",
+                error("Wrong body part (" + std::to_string(oPPart) + ").",
                           __LINE__, __FUNCTION__, __FILE__);
         }
-        op::error("Wrong body part (" + std::to_string(oPPart) + ").",
+        error("Wrong body part (" + std::to_string(oPPart) + ").",
                   __LINE__, __FUNCTION__, __FILE__);
         return -1;
+    }
+
+    const std::shared_ptr<const TotalModel> JointAngleEstimation::getTotalModel()
+    {
+        try
+        {
+            return sTotalModel;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return nullptr;
+        }
     }
 
     JointAngleEstimation::JointAngleEstimation(const bool fillVtAndJ0Vecs,
@@ -188,19 +205,6 @@ namespace op
         }
     }
 
-    const std::shared_ptr<const TotalModel> JointAngleEstimation::getTotalModel()
-    {
-        try
-        {
-            return spImpl->spTotalModel;
-        }
-        catch (const std::exception& e)
-        {
-            op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return nullptr;
-        }
-    }
-
     std::tuple<Eigen::MatrixXd, Eigen::Vector3d, Eigen::MatrixXd, Eigen::MatrixXd, Eigen::VectorXd,
         float, float, float, float> JointAngleEstimation::runAdam(
             const Array<float>& poseKeypoints3D,
@@ -210,10 +214,10 @@ namespace op
         try
         {
             // Security checks
-            if (poseKeypoints3D.getSize(1) != 19 && poseKeypoints3D.getSize(1) != 25)
-                op::error("Only working for BODY_19 or BODY_25 (#parts = "
-                          + std::to_string(poseKeypoints3D.getSize(2)) + ").",
-                          __LINE__, __FUNCTION__, __FILE__);
+            if (!poseKeypoints3D.empty() && poseKeypoints3D.getSize(1) != 19 && poseKeypoints3D.getSize(1) != 25)
+                error("Only working for BODY_19 or BODY_25 (#parts = "
+                      + std::to_string(poseKeypoints3D.getSize(2)) + ").",
+                      __LINE__, __FUNCTION__, __FILE__);
             // Shorter naming
             auto& frameParams = spImpl->mFrameParams;
             // Reset to 0 all keypoints - Otherwise undefined behavior when fitting
@@ -273,7 +277,6 @@ namespace op
             }
 
             // Initialization (e.g., first frame)
-const auto start0 = std::chrono::high_resolution_clock::now();
             if (!spImpl->mInitialized)
             {
                 spImpl->mInitialized = true;
@@ -296,13 +299,16 @@ const auto start0 = std::chrono::high_resolution_clock::now();
             // Other frames
             else
             {
-                // ~470 msec
-                // inside for loop
-                // Here I read the pose data into mBodyJoints, mRFootJoints, mLFootJoints, mRHandJoints, mLHandJoints, mFaceJoints.
-                // call fitting function
-                // Adam_FastFit only changes frameParams
-                Adam_FastFit(*spImpl->spTotalModel, frameParams, spImpl->mBodyJoints, spImpl->mRFootJoints, spImpl->mLFootJoints, spImpl->mRHandJoints,
-                             spImpl->mLHandJoints, spImpl->mFaceJoints, spImpl->mCeresDisplayReport);
+                // // Fast way (it doesn't look right)
+                // // Adam_FastFit only changes frameParams
+                // Adam_FastFit(*spImpl->spTotalModel, frameParams, spImpl->mBodyJoints, spImpl->mRFootJoints, spImpl->mLFootJoints, spImpl->mRHandJoints,
+                //              spImpl->mLHandJoints, spImpl->mFaceJoints, spImpl->mCeresDisplayReport);
+                // Slow way
+                // Adam_FastFit_Initialize only changes frameParams
+                Adam_FastFit_Initialize(*spImpl->spTotalModel, frameParams, spImpl->mBodyJoints, spImpl->mRFootJoints, spImpl->mLFootJoints,
+                                        spImpl->mRHandJoints, spImpl->mLHandJoints, spImpl->mFaceJoints, spImpl->mCeresDisplayReport);
+                spImpl->mVtVec = spImpl->spTotalModel->m_meanshape + spImpl->spTotalModel->m_shapespace_u * frameParams.m_adam_coeffs;
+                spImpl->mJ0Vec = spImpl->spTotalModel->J_mu_ + spImpl->spTotalModel->dJdc_ * frameParams.m_adam_coeffs;
             }
             // Fill Datum
             Eigen::MatrixXd vtVec;
@@ -313,8 +319,6 @@ const auto start0 = std::chrono::high_resolution_clock::now();
                 vtVec = spImpl->mVtVec;
                 j0Vec = spImpl->mJ0Vec;
             }
-const auto duration0 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start0).count();
-std::cout << "IK:         " << duration0 * 1e-6 << std::endl;
             return std::make_tuple(
                 frameParams.m_adam_pose, frameParams.m_adam_t, vtVec, j0Vec, frameParams.m_adam_facecoeffs_exp,
                 frameParams.mouth_open, frameParams.reye_open, frameParams.leye_open, frameParams.dist_root_foot
@@ -322,7 +326,7 @@ std::cout << "IK:         " << duration0 * 1e-6 << std::endl;
         }
         catch (const std::exception& e)
         {
-            op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             return std::make_tuple(Eigen::MatrixXd{}, Eigen::Vector3d{}, Eigen::MatrixXd{}, Eigen::MatrixXd{},
                                    Eigen::VectorXd{}, -1.f, -1.f, -1.f, -1.f);
         }

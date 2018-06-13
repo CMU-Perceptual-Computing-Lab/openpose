@@ -533,13 +533,13 @@ public:
 
 		// setting num_residuals
 		m_nResiduals = count_dim;
-		std::cout << "m_nCorrespond_adam2joints " << m_nCorrespond_adam2joints << std::endl;
-		std::cout << "m_nCorrespond_adam2pts " << m_nCorrespond_adam2pts << std::endl;
-		std::cout << "m_nResiduals " << m_nResiduals << std::endl;
-		std::cout << "res_dim " << res_dim << std::endl;
-		std::cout << "start_2d_dim " << start_2d_dim << std::endl;
-		std::cout << "start_PAF " << start_PAF << std::endl;
-		std::cout << "start_inner " << start_inner << std::endl;
+		// std::cout << "m_nCorrespond_adam2joints " << m_nCorrespond_adam2joints << std::endl;
+		// std::cout << "m_nCorrespond_adam2pts " << m_nCorrespond_adam2pts << std::endl;
+		// std::cout << "m_nResiduals " << m_nResiduals << std::endl;
+		// std::cout << "res_dim " << res_dim << std::endl;
+		// std::cout << "start_2d_dim " << start_2d_dim << std::endl;
+		// std::cout << "start_PAF " << start_PAF << std::endl;
+		// std::cout << "start_inner " << start_inner << std::endl;
 		CostFunction::set_num_residuals(m_nResiduals);
 		auto parameter_block_sizes = CostFunction::mutable_parameter_block_sizes();
 		parameter_block_sizes->clear();

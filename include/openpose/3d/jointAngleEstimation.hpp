@@ -15,10 +15,10 @@ namespace op
     class OP_API JointAngleEstimation
     {
     public:
+        static const std::shared_ptr<const TotalModel> getTotalModel();
+
         JointAngleEstimation(const bool fillVtAndJ0Vecs = true,
                              const bool ceresDisplayReport = false);
-
-        const std::shared_ptr<const TotalModel> getTotalModel();
 
         std::tuple<Eigen::MatrixXd, Eigen::Vector3d, Eigen::MatrixXd, Eigen::MatrixXd, Eigen::VectorXd,
             float, float, float, float> runAdam(const Array<float>& poseKeypoints3D,

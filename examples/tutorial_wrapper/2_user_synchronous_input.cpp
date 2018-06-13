@@ -161,8 +161,15 @@ DEFINE_int32(3d_views,                  1,              "Complementary option to
                                                         " iteration, allowing tasks such as stereo camera processing (`--3d`). Note that"
                                                         " `--camera_parameters_folder` must be set. OpenPose must find as many `xml` files in the"
                                                         " parameter folder as this number indicates.");
-// OpenPose identification
-DEFINE_bool(identification,             false,          "Whether to enable people identification across frames. Not available yet, coming soon.");
+// Extra algorithms
+DEFINE_bool(identification,             false,          "Not available yet, coming soon. Whether to enable people identification across frames.");
+DEFINE_int32(tracking,                  -1,             "Not available yet, coming soon. Whether to enable people tracking across frames. The"
+                                                        " value indicates the number of frames where tracking is run between each OpenPose keypoint"
+                                                        " detection. Select -1 (default) to disable it or 0 to run simultaneously OpenPose keypoint"
+                                                        " detector and tracking for potentially higher accurary than only OpenPose.");
+DEFINE_int32(ik_threads,                0,              "Not available yet, coming soon. Whether to enable inverse kinematics (IK) from 3-D"
+                                                        " keypoints to obtain 3-D joint angles. By default (0 threads), it is disabled. Increasing"
+                                                        " the number of threads will increase the speed but also the global system latency.");
 // OpenPose Rendering
 DEFINE_int32(part_to_show,              0,              "Prediction channel to visualize (default: 0). 0 for all the body parts, 1-18 for each body"
                                                         " part heat map, 19 for the background heat map, 20 for all the body part heat maps"
@@ -380,8 +387,7 @@ int openPoseDemo()
                                                       (float)FLAGS_alpha_heatmap, FLAGS_part_to_show, FLAGS_model_folder,
                                                       heatMapTypes, heatMapScale, FLAGS_part_candidates,
                                                       (float)FLAGS_render_threshold, FLAGS_number_people_max,
-                                                      enableGoogleLogging, FLAGS_3d, FLAGS_3d_min_views,
-                                                      FLAGS_identification};
+                                                      enableGoogleLogging};
         // Face configuration (use op::WrapperStructFace{} to disable it)
         const op::WrapperStructFace wrapperStructFace{FLAGS_face, faceNetInputSize,
                                                       op::flagsToRenderMode(FLAGS_face_render, multipleView, FLAGS_render_pose),
@@ -393,6 +399,9 @@ int openPoseDemo()
                                                       op::flagsToRenderMode(FLAGS_hand_render, multipleView, FLAGS_render_pose),
                                                       (float)FLAGS_hand_alpha_pose, (float)FLAGS_hand_alpha_heatmap,
                                                       (float)FLAGS_hand_render_threshold};
+        // Extra functionality configuration (use op::WrapperStructExtra{} to disable it)
+        const op::WrapperStructExtra wrapperStructExtra{FLAGS_3d, FLAGS_3d_min_views, FLAGS_identification,
+                                                        FLAGS_tracking, FLAGS_ik_threads};
         // Producer (use default to disable any input)
         // const op::WrapperStructInput wrapperStructInput{producerSharedPtr, FLAGS_frame_first, FLAGS_frame_last,
         //                                                 FLAGS_process_real_time, FLAGS_frame_flip, FLAGS_frame_rotate,
@@ -407,8 +416,9 @@ int openPoseDemo()
                                                           FLAGS_camera_fps, FLAGS_write_heatmaps,
                                                           FLAGS_write_heatmaps_format, FLAGS_write_coco_foot_json};
         // Configure wrapper
-        opWrapper.configure(wrapperStructPose, wrapperStructFace, wrapperStructHand, wrapperStructInput,
-                            wrapperStructOutput);
+
+        opWrapper.configure(wrapperStructPose, wrapperStructFace, wrapperStructHand, wrapperStructExtra,
+                            wrapperStructInput, wrapperStructOutput);
         // Set to single-thread running (to debug and/or reduce latency)
         if (FLAGS_disable_multi_thread)
             opWrapper.disableMultiThreading();
