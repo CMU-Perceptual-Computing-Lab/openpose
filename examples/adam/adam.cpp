@@ -167,7 +167,7 @@ DEFINE_int32(tracking,                  -1,             "Experimental, not avail
                                                         " value indicates the number of frames where tracking is run between each OpenPose keypoint"
                                                         " detection. Select -1 (default) to disable it or 0 to run simultaneously OpenPose keypoint"
                                                         " detector and tracking for potentially higher accurary than only OpenPose.");
-DEFINE_int32(ik_threads,                0,              "Experimental, not available yet. Whether to enable inverse kinematics (IK) from 3-D"
+DEFINE_int32(ik_threads,                8,              "Experimental, not available yet. Whether to enable inverse kinematics (IK) from 3-D"
                                                         " keypoints to obtain 3-D joint angles. By default (0 threads), it is disabled. Increasing"
                                                         " the number of threads will increase the speed but also the global system latency.");
 // OpenPose Rendering
