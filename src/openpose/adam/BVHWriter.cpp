@@ -43,7 +43,9 @@ void RotationMatrixToEulerAngle(const Eigen::Matrix<double, 3, 3, Eigen::ColMajo
 	for (int i = 0; i < 3; i++) angle.at(i) = angle.at(i) * 180 / PI;
 }
 
-void BVHWriter::parseInput(const Eigen::Matrix<double, 3 * TotalModel::NUM_JOINTS, 1>& J0, std::vector<Eigen::Matrix<double, 3, 1>>& t, std::vector<Eigen::Matrix<double, TotalModel::NUM_JOINTS, 3, Eigen::RowMajor>>& pose)
+void BVHWriter::parseInput(const Eigen::Matrix<double, 3 * TotalModel::NUM_JOINTS, 1>& J0,
+	const std::vector<Eigen::Matrix<double, 3, 1>>& t,
+	const std::vector<Eigen::Matrix<double, TotalModel::NUM_JOINTS, 3, Eigen::RowMajor>>& pose)
 {
 	assert(t.size() == pose.size());
 	this->num_frame = t.size();
@@ -52,7 +54,7 @@ void BVHWriter::parseInput(const Eigen::Matrix<double, 3 * TotalModel::NUM_JOINT
 	getHierarchy(J0);
 	for (int time = 0; time < this->num_frame; time++)
 	{
-		Eigen::Matrix<double, TotalModel::NUM_JOINTS, 3, Eigen::RowMajor>& pose_frame = pose[time];
+		const Eigen::Matrix<double, TotalModel::NUM_JOINTS, 3, Eigen::RowMajor>& pose_frame = pose[time];
 		getDynamic(pose_frame);
 	}
 	if (mUnityCompatible)
@@ -84,7 +86,7 @@ void BVHWriter::parseInput(const Eigen::Matrix<double, 3 * TotalModel::NUM_JOINT
 	}
 }
 
-void BVHWriter::writeBVH(std::string output_file, double frame_time)
+void BVHWriter::writeBVH(const std::string& output_file, const double frame_time)
 {
 	outStr.clear();
 	for (int i = 0; i < this->num_frame; i++) dynamicStr.push_back(std::string());
@@ -138,7 +140,7 @@ void BVHWriter::getHierarchy(const Eigen::Matrix<double, 3 * TotalModel::NUM_JOI
 	}
 }
 
-void BVHWriter::getDynamic(Eigen::Matrix<double, TotalModel::NUM_JOINTS, 3, Eigen::RowMajor>& pose)
+void BVHWriter::getDynamic(const Eigen::Matrix<double, TotalModel::NUM_JOINTS, 3, Eigen::RowMajor>& pose)
 {
 	int idj = 0;
 	Eigen::Matrix<double, 3, 3, Eigen::RowMajor> R;
@@ -159,7 +161,7 @@ void BVHWriter::getDynamic(Eigen::Matrix<double, TotalModel::NUM_JOINTS, 3, Eige
 	}
 }
 
-void BVHWriter::writeData(std::shared_ptr<BVHData> node, int depth)
+void BVHWriter::writeData(const std::shared_ptr<BVHData>& node, const int depth)
 {
 	if (node->children.size() > 0)
 	{

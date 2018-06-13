@@ -9,7 +9,6 @@
 
 namespace op
 {
-    // This worker will do 3-D rendering
     class OP_API Gui3D : public Gui
     {
     public:
@@ -21,14 +20,14 @@ namespace op
               const PoseModel poseModel = PoseModel::COCO_18,
               const DisplayMode displayMode = DisplayMode::DisplayAll);
 
-        ~Gui3D();
+        virtual ~Gui3D();
 
-        void initializationOnThread();
+        virtual void initializationOnThread();
 
         void setKeypoints(const Array<float>& poseKeypoints3D, const Array<float>& faceKeypoints3D,
                           const Array<float>& leftHandKeypoints3D, const Array<float>& rightHandKeypoints3D);
 
-        void update();
+        virtual void update();
 
     private:
         DisplayMode mDisplayMode;

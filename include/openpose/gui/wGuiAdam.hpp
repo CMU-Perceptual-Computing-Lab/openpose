@@ -1,27 +1,26 @@
-#ifndef OPENPOSE_GUI_W_GUI_3D_HPP
-#define OPENPOSE_GUI_W_GUI_3D_HPP
+#ifndef OPENPOSE_GUI_W_GUI_ADAM_HPP
+#define OPENPOSE_GUI_W_GUI_ADAM_HPP
 
 #include <openpose/core/common.hpp>
-#include <openpose/gui/gui3D.hpp>
+#include <openpose/gui/guiAdam.hpp>
 #include <openpose/thread/workerConsumer.hpp>
 
 namespace op
 {
-    // This worker will do 3-D rendering
     template<typename TDatums>
-    class WGui3D : public WorkerConsumer<TDatums>
+    class WGuiAdam : public WorkerConsumer<TDatums>
     {
     public:
-        explicit WGui3D(const std::shared_ptr<Gui3D>& gui3D);
+        explicit WGuiAdam(const std::shared_ptr<GuiAdam>& guiAdam);
 
         void initializationOnThread();
 
         void workConsumer(const TDatums& tDatums);
 
     private:
-        std::shared_ptr<Gui3D> spGui3D;
+        std::shared_ptr<GuiAdam> spGuiAdam;
 
-        DELETE_COPY(WGui3D);
+        DELETE_COPY(WGuiAdam);
     };
 }
 
@@ -34,17 +33,17 @@ namespace op
 namespace op
 {
     template<typename TDatums>
-    WGui3D<TDatums>::WGui3D(const std::shared_ptr<Gui3D>& gui3D) :
-        spGui3D{gui3D}
+    WGuiAdam<TDatums>::WGuiAdam(const std::shared_ptr<GuiAdam>& guiAdam) :
+        spGuiAdam{guiAdam}
     {
     }
 
     template<typename TDatums>
-    void WGui3D<TDatums>::initializationOnThread()
+    void WGuiAdam<TDatums>::initializationOnThread()
     {
         try
         {
-            spGui3D->initializationOnThread();
+            spGuiAdam->initializationOnThread();
         }
         catch (const std::exception& e)
         {
@@ -53,7 +52,7 @@ namespace op
     }
 
     template<typename TDatums>
-    void WGui3D<TDatums>::workConsumer(const TDatums& tDatums)
+    void WGuiAdam<TDatums>::workConsumer(const TDatums& tDatums)
     {
         try
         {
@@ -71,14 +70,15 @@ namespace op
                     std::vector<cv::Mat> cvOutputDatas;
                     for (auto& tDatum : *tDatums)
                         cvOutputDatas.emplace_back(tDatum.cvOutputData);
-                    spGui3D->setImage(cvOutputDatas);
+                    spGuiAdam->setImage(cvOutputDatas);
                     // Update keypoints
-                    auto& tDatum = (*tDatums)[0];
-                    spGui3D->setKeypoints(tDatum.poseKeypoints3D, tDatum.faceKeypoints3D, tDatum.handKeypoints3D[0],
-                                          tDatum.handKeypoints3D[1]);
+                    const auto& tDatum = (*tDatums)[0];
+                    spGuiAdam->generateMesh(tDatum.poseKeypoints3D, tDatum.faceKeypoints3D, tDatum.handKeypoints3D,
+                                            tDatum.adamPose, tDatum.adamTranslation, tDatum.vtVec, tDatum.j0Vec,
+                                            tDatum.adamFaceCoeffsExp.data());
                 }
                 // Refresh/update GUI
-                spGui3D->update();
+                spGuiAdam->update();
                 // Profiling speed
                 if (!tDatums->empty())
                 {
@@ -96,7 +96,7 @@ namespace op
         }
     }
 
-    COMPILE_TEMPLATE_DATUM(WGui3D);
+    COMPILE_TEMPLATE_DATUM(WGuiAdam);
 }
 
-#endif // OPENPOSE_GUI_W_GUI_3D_HPP
+#endif // OPENPOSE_GUI_W_GUI_ADAM_HPP

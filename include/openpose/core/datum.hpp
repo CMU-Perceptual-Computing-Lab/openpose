@@ -1,6 +1,9 @@
 #ifndef OPENPOSE_CORE_DATUM_HPP
 #define OPENPOSE_CORE_DATUM_HPP
 
+#ifdef WITH_3D_ADAM_MODEL
+    #include <Eigen/Core>
+#endif
 #include <opencv2/core/core.hpp> // cv::Mat
 #include <openpose/core/common.hpp>
 
@@ -227,6 +230,22 @@ namespace op
          * 1 and "Neck").
          */
         std::pair<int, std::string> elementRendered;
+
+        // 3D/Adam parameters
+        #ifdef WITH_3D_ADAM_MODEL
+            // Adam/Unity params
+            Eigen::Matrix<double, 62, 3, Eigen::RowMajor> adamPose;
+            Eigen::Vector3d adamTranslation;
+            // Adam params (Jacobians)
+            Eigen::Matrix<double, Eigen::Dynamic, 1> vtVec;
+            Eigen::Matrix<double, Eigen::Dynamic, 1> j0Vec;
+            Eigen::VectorXd adamFaceCoeffsExp;
+            // Unity params
+            float mouthOpening;
+            float rightEyeOpening;
+            float leftEyeOpening;
+            float distanceRootFoot;
+        #endif
 
 
 

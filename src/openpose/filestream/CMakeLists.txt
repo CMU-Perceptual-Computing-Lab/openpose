@@ -1,4 +1,5 @@
-set(SOURCES_OP_FILESTREAM cocoJsonSaver.cpp
+set(SOURCES_OP_FILESTREAM bvhSaver.cpp
+    cocoJsonSaver.cpp
     defineTemplates.cpp
     fileSaver.cpp
     fileStream.cpp

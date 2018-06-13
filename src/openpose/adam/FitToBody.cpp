@@ -655,7 +655,9 @@ void Adam_FastFit_Initialize(const TotalModel &adam,
 	//Body Prior (pose) //////////////////////////////////////////////////////////////////////////
 	AdamBodyPoseParamPriorDiff* cost_prior_body_pose_init = new AdamBodyPoseParamPriorDiff(TotalModel::NUM_POSE_PARAMETERS);
 	ceres::LossFunction* loss_weight_prior_body_pose_init = new ceres::ScaledLoss(NULL,
-		1e-2,
+		// 1e-2, // Default
+		5e-3,
+		// 1e-3, // Too much noise
 		ceres::TAKE_OWNERSHIP);
 	problem_init.AddResidualBlock(cost_prior_body_pose_init,
 		loss_weight_prior_body_pose_init,

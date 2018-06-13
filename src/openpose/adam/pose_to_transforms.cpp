@@ -75,7 +75,7 @@ namespace smpl
             {
                 angles[2] = 0.0;
             }
-            if (idj == 24 || idj == 27 || idj == 28 || idj == 31 || idj == 32 || idj == 35 || idj == 26 || idj == 39 || idj == 40
+            if (idj == 24 || idj == 27 || idj == 28 || idj == 31 || idj == 32 || idj == 35 || idj == 36 || idj == 39 || idj == 40
                 || idj == 44 || idj == 47 || idj == 48 || idj == 51 || idj == 52 || idj == 55 || idj == 56 || idj == 59 || idj == 60)   //all hands
             {
                 angles[0] = 0.0;
@@ -101,7 +101,7 @@ namespace smpl
                     dRdP.block<9, 3>(0, 3 * idj).setZero();
                 if (idj == 7 || idj == 8)   //foot ankle. Restrict side movement
                     dRdP.block<9, 1>(0, 3 * idj + 2).setZero();
-                if (idj == 24 || idj == 27 || idj == 28 || idj == 31 || idj == 32 || idj == 35 || idj == 26 || idj == 39 || idj == 40
+                if (idj == 24 || idj == 27 || idj == 28 || idj == 31 || idj == 32 || idj == 35 || idj == 36 || idj == 39 || idj == 40
                     || idj == 44 || idj == 47 || idj == 48 || idj == 51 || idj == 52 || idj == 55 || idj == 56 || idj == 59 || idj == 60)   //all hands
                     dRdP.block<9, 2>(0, 3 * idj).setZero();
 // duration11 += std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start11).count();
@@ -172,7 +172,7 @@ namespace smpl
     {
         const int num_vertex = total_vertex.size();
         if (dVdP) std::fill(dVdP, dVdP + 3 * num_vertex * TotalModel::NUM_POSE_PARAMETERS, 0);
-        for(auto i = 0u; i < num_vertex; i++)
+        for (auto i = 0; i < num_vertex; i++)
         {
             const int idv = total_vertex[i];
             const auto* v0_data = Vt.data() + idv * 3;
@@ -192,7 +192,7 @@ namespace smpl
                     double* dVdP_row2 = dVdP + (i * 3 + 2) * TotalModel::NUM_POSE_PARAMETERS;
                     if (dVdP)
                     {
-                        for (int j = 0; j < mParentIndexes[idj].size(); j++)
+                        for (auto j = 0u; j < mParentIndexes[idj].size(); j++)
                         {
                             const int idp = mParentIndexes[idj][j];
                             dVdP_row0[3 * idp + 0] += w * (v0_data[0] * dMRdP[idj].data()[(0 * 3 + 0) * ncol + 3 * idp + 0] + v0_data[1] * dMRdP[idj].data()[(0 * 3 + 1) * ncol + 3 * idp + 0] + v0_data[2] * dMRdP[idj].data()[(0 * 3 + 2) * ncol + 3 * idp + 0] + dMtdP[idj].data()[0 * ncol + 3 * idp + 0]);

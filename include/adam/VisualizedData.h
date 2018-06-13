@@ -213,8 +213,8 @@ public:
 
 struct VisualizationOptions
 {
-	VisualizationOptions(): K(NULL), xrot(0.0f), yrot(0.0f), view_dist(300.0f), nRange(40.0f), CameraMode(0u), show_joint(true),
-		ortho_scale(1.0f), width(600), height(600), zmin(0.01f), zmax(1000.0f), meshSolid(false) {}
+	VisualizationOptions(): K(NULL), xrot(0.0f), yrot(0.0f), view_dist(300.0f), nRange(40.0f), CameraMode(0u),
+		ortho_scale(1.0f), width(600), height(600), zmin(0.01f), zmax(1000.0f), meshSolid(false), show_joint(true) {}
 	double* K;
 	GLfloat	xrot, yrot;
 	GLfloat view_dist, nRange;

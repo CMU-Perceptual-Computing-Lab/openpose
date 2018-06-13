@@ -10,16 +10,14 @@ std::array<int, 62> map_adam_to_measure = {12, 15, 0, 16, 18, 20, 1, 4, 7, 17, 1
 std::array<int, 20> map_cocoreg_to_measure = {12, 14, 12, 9, 10, 11, 3, 4, 5, 8, 7, 6, 2, 1, 0, 15, 17, 16, 18, 13};
 
 							 
-void GenerateMesh(CMeshModelInstance& returnMesh, double* resultJoint, smpl::SMPLParams& targetParam, smpl::HandModel& g_handl_model, const int regressor_type)
+void GenerateMesh(CMeshModelInstance& returnMesh, double* resultJoint, const smpl::SMPLParams& targetParam, const smpl::HandModel& g_handl_model, const int regressor_type)
 {
 	Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> out_v(smpl::HandModel::NUM_VERTICES, 3);
 	Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> outJ(smpl::HandModel::NUM_JOINTS, 3);
 	MatrixXdr dJdc;
 	MatrixXdr dJdP;
 
-	smpl::HandModel* pHandm = NULL;
-
-	pHandm = &g_handl_model;
+	const smpl::HandModel* const pHandm = &g_handl_model;
 	reconstruct_joints_mesh(g_handl_model, targetParam.handl_t.data(), targetParam.hand_coeffs.data(), targetParam.handl_pose.data(), outJ.data(), out_v.data(), dJdc, dJdP, regressor_type);
 
 	// std::cout << targetParam.handl_t << std::endl;
@@ -64,7 +62,7 @@ void GenerateMesh(CMeshModelInstance& returnMesh, double* resultJoint, smpl::SMP
 }
 
 
-void GenerateMesh(CMeshModelInstance& returnMesh, double* resultJoint, smpl::SMPLParams& targetParam, TotalModel& g_total_model, const int regressor_type)
+void GenerateMesh(CMeshModelInstance& returnMesh, double* resultJoint, const smpl::SMPLParams& targetParam, const TotalModel& g_total_model, const int regressor_type)
 {
 	Eigen::Matrix<double, Eigen::Dynamic, 1> outV(TotalModel::NUM_VERTICES * 3);
 	Eigen::VectorXd transforms;
@@ -145,7 +143,7 @@ void GenerateMesh(CMeshModelInstance& returnMesh, double* resultJoint, smpl::SMP
 	else
 	{
 		assert(regressor_type == 2);
-		std:cout << "Reconstruct mesh using regressor_type 2" << std::endl;
+		std::cout << "Reconstruct mesh using regressor_type 2" << std::endl;
 		Eigen::Map<MatrixXdr> m_outV(outV.data(), TotalModel::NUM_VERTICES, 3);
 		MatrixXdr J_coco = g_total_model.m_small_coco_reg * m_outV;
 		for (int i = 0; i < 20; i++)
@@ -172,8 +170,9 @@ void GenerateMesh(CMeshModelInstance& returnMesh, double* resultJoint, smpl::SMP
 	}
 }
 
-void GenerateMesh_Fast(CMeshModelInstance& returnMesh, double* resultJoint, smpl::SMPLParams& targetParam, TotalModel& g_total_model,
-	const Eigen::Matrix<double, Eigen::Dynamic, 1> &Vt_vec, const Eigen::Matrix<double, Eigen::Dynamic, 1> &J0_vec)
+void GenerateMesh_Fast(CMeshModelInstance& returnMesh, double* resultJoint, const TotalModel& g_total_model,
+	const Eigen::Matrix<double, Eigen::Dynamic, 1> &Vt_vec, const Eigen::Matrix<double, Eigen::Dynamic, 1> &J0_vec,
+	const double* const ptr_adam_pose, const double* const ptr_adam_facecoeffs_exp, const Eigen::Vector3d& adam_t)
 {
 // const auto start = std::chrono::high_resolution_clock::now();
 // const auto start1 = std::chrono::high_resolution_clock::now();
@@ -184,8 +183,8 @@ void GenerateMesh_Fast(CMeshModelInstance& returnMesh, double* resultJoint, smpl
 	adam_reconstruct_Eulers_Fast(g_total_model,
 		Vt_vec,
 		J0_vec,
-		targetParam.m_adam_pose.data(),
-		targetParam.m_adam_facecoeffs_exp.data(),
+		ptr_adam_pose,
+		ptr_adam_facecoeffs_exp,
 		outV.data(),
 		transforms);
 // const auto duration2 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start2).count();
@@ -195,7 +194,7 @@ void GenerateMesh_Fast(CMeshModelInstance& returnMesh, double* resultJoint, smpl
     Eigen::SparseMatrix<double, Eigen::ColMajor> dVdt = Eigen::kroneckerProduct(Eigen::VectorXd::Ones(TotalModel::NUM_VERTICES), eye3);
 // const auto duration3 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start3).count();
 // const auto start4 = std::chrono::high_resolution_clock::now();
-	outV += dVdt * targetParam.m_adam_t; //translation is applied at the end
+	outV += dVdt * adam_t; //translation is applied at the end
 // const auto duration4 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start4).count();
 // const auto start5 = std::chrono::high_resolution_clock::now();
 	returnMesh.m_meshType = CMeshModelInstance::MESH_TYPE_ADAM;

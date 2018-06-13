@@ -1,6 +1,7 @@
 set(SOURCES_OP_3D
     cameraParameterReader.cpp
     defineTemplates.cpp
+    jointAngleEstimation.cpp
     poseTriangulation.cpp)
 
 include(${CMAKE_SOURCE_DIR}/cmake/Utils.cmake)

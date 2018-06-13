@@ -163,12 +163,15 @@ DEFINE_int32(3d_views,                  1,              "Complementary option to
                                                         " iteration, allowing tasks such as stereo camera processing (`--3d`). Note that"
                                                         " `--camera_parameters_folder` must be set. OpenPose must find as many `xml` files in the"
                                                         " parameter folder as this number indicates.");
-// Extra algorithms
-DEFINE_bool(identification,             false,          "Not available yet, coming soon. Whether to enable people identification across frames.");
-DEFINE_int32(tracking,                  -1,             "Not available yet, coming soon. Whether to enable people tracking across frames. The"
+// Extra Algorithms
+DEFINE_bool(identification,             false,          "Experimental, not available yet. Whether to enable people identification across frames.");
+DEFINE_int32(tracking,                  -1,             "Experimental, not available yet. Whether to enable people tracking across frames. The"
                                                         " value indicates the number of frames where tracking is run between each OpenPose keypoint"
                                                         " detection. Select -1 (default) to disable it or 0 to run simultaneously OpenPose keypoint"
                                                         " detector and tracking for potentially higher accurary than only OpenPose.");
+DEFINE_int32(ik_threads,                8,              "Experimental, not available yet. Whether to enable inverse kinematics (IK) from 3-D"
+                                                        " keypoints to obtain 3-D joint angles. By default (0 threads), it is disabled. Increasing"
+                                                        " the number of threads will increase the speed but also the global system latency.");
 // OpenPose Rendering
 DEFINE_int32(part_to_show,              0,              "Prediction channel to visualize (default: 0). 0 for all the body parts, 1-18 for each body"
                                                         " part heat map, 19 for the background heat map, 20 for all the body part heat maps"
@@ -214,7 +217,8 @@ DEFINE_string(write_images,             "",             "Directory to write rend
 DEFINE_string(write_images_format,      "png",          "File extension and format for `write_images`, e.g. png, jpg or bmp. Check the OpenCV"
                                                         " function cv::imwrite for all compatible extensions.");
 DEFINE_string(write_video,              "",             "Full file path to write rendered frames in motion JPEG video format. It might fail if the"
-                                                        " final path does not finish in `.avi`. It internally uses cv::VideoWriter.");
+                                                        " final path does not finish in `.avi`. It internally uses cv::VideoWriter. Flag"
+                                                        " `camera_fps` controls FPS.");
 DEFINE_string(write_json,               "",             "Directory to write OpenPose output in JSON format. It includes body, hand, and face pose"
                                                         " keypoints (2-D and 3-D), as well as pose candidates (if `--part_candidates` enabled).");
 DEFINE_string(write_coco_json,          "",             "Full file path to write people pose data with JSON COCO validation format.");
@@ -230,8 +234,10 @@ DEFINE_string(write_keypoint_format,    "yml",          "(Deprecated, use `write
                                                         " yaml & yml. Json not available for OpenCV < 3.0, use `write_keypoint_json` instead.");
 DEFINE_string(write_keypoint_json,      "",             "(Deprecated, use `write_json`) Directory to write people pose data in JSON format,"
                                                         " compatible with any OpenCV version.");
-DEFINE_string(write_bvh,                "",             "E.g.: /media/posefs3b/Users/gines/cvpr2018/temp.bvh");
-DEFINE_string(write_adam,               "",             "E.g.: /media/posefs3b/Users/gines/cvpr2018/adam.avi");
+// Result Saving - Extra Algorithms
+DEFINE_string(write_video_adam,         "",             "Experimental, not available yet. E.g.: `~/Desktop/adamResult.avi`. Flag `camera_fps`"
+                                                        " controls FPS.");
+DEFINE_string(write_bvh,                "",             "Experimental, not available yet. E.g.: `~/Desktop/mocapResult.bvh`.");
 // Unity - UDP communication
 DEFINE_string(udp_host,                 "127.0.0.1",    "IP for UDP communication.");
 DEFINE_string(udp_port,                 "8051",         "Port number for UDP communication.");
@@ -264,586 +270,39 @@ private:
     asio::ip::udp::endpoint endpoint_;
 };
 
-#include <BVHWriter.h>
-#include <FitToBody.h>
-#include <KinematicModel.h>
-#include <Renderer.h>
-#include <totalmodel.h>
-#include <utils.h>
-#include <VisualizedData.h>
-#define SMPL_VIS_SCALING 100.0f
-
-const int NUMBER_BODY_KEYPOINTS = 20;
-const int NUMBER_HAND_KEYPOINTS = 21;
-const int NUMBER_FACE_KEYPOINTS = 70;
-const int NUMBER_FOOT_KEYPOINTS = 3;
-const int NUMBER_KEYPOINTS = 3*(NUMBER_BODY_KEYPOINTS + 2*NUMBER_HAND_KEYPOINTS); // targetJoints: Only for Body, LHand, RHand. No Face, no Foot
-const int NUMBER_TOTAL_KEYPOINTS = NUMBER_BODY_KEYPOINTS + 2*NUMBER_HAND_KEYPOINTS + 2*NUMBER_FOOT_KEYPOINTS + NUMBER_FACE_KEYPOINTS;
-
-void updateKeypoints(Eigen::MatrixXd& bodyJoints, Eigen::MatrixXd& lHandJoints, Eigen::MatrixXd& rHandJoints,
-                     const std::array<double, NUMBER_KEYPOINTS>& targetJoints)
-{
-    for (int i = 0; i < NUMBER_BODY_KEYPOINTS; i++)
-    {
-        const auto index = 3*i;
-        bodyJoints(0, i) = targetJoints[index];
-        bodyJoints(1, i) = targetJoints[index + 1];
-        bodyJoints(2, i) = targetJoints[index + 2];
-    }
-    for (int i = 0; i < NUMBER_HAND_KEYPOINTS; i++)
-    {
-        const auto index = 3 * (i + NUMBER_BODY_KEYPOINTS);
-        lHandJoints(0, i) = targetJoints[index];
-        lHandJoints(1, i) = targetJoints[index + 1];
-        lHandJoints(2, i) = targetJoints[index + 2];
-    }
-    for (int i = 0; i < NUMBER_HAND_KEYPOINTS; i++)
-    {
-        const auto index = 3 * (i + NUMBER_HAND_KEYPOINTS + NUMBER_BODY_KEYPOINTS);
-        rHandJoints(0, i) = targetJoints[index];
-        rHandJoints(1, i) = targetJoints[index + 1];
-        rHandJoints(2, i) = targetJoints[index + 2];
-    }
-}
-
-int mapOPToDome(const int oPPart)
-{
-    if (oPPart >= 0 && oPPart < 19)
-    {
-        // Nose
-        if (oPPart == 0)
-            return 1;
-        // Neck
-        else if (oPPart == 1)
-            return 0;
-        // Right arm
-        else if (oPPart == 2)
-            return 9;
-        else if (oPPart == 3)
-            return 10;
-        else if (oPPart == 4)
-            return 11;
-        // Left arm
-        else if (oPPart == 5)
-            return 3;
-        else if (oPPart == 6)
-            return 4;
-        else if (oPPart == 7)
-            return 5;
-        // Mid-hip
-        else if (oPPart == 8)
-            return 2;
-        // Right leg
-        else if (oPPart == 9)
-            return 12;
-        else if (oPPart == 10)
-            return 13;
-        else if (oPPart == 11)
-            return 14;
-        // Left leg
-        else if (oPPart == 12)
-            return 6;
-        else if (oPPart == 13)
-            return 7;
-        else if (oPPart == 14)
-            return 8;
-        // Face
-        else if (oPPart == 15)
-            return 17;
-        else if (oPPart == 16)
-            return 15;
-        else if (oPPart == 17)
-            return 18;
-        else if (oPPart == 18)
-            return 16;
-        else
-            op::error("Wrong body part (" + std::to_string(oPPart) + ").",
-                      __LINE__, __FUNCTION__, __FILE__);
-    }
-    op::error("Wrong body part (" + std::to_string(oPPart) + ").",
-              __LINE__, __FUNCTION__, __FILE__);
-    return -1;
-}
-
-const auto NUMBER_TO_RESET_KEYPOINT = 0;
-void updateOrResetKeypoint(double* targetJoint, short& foundTargetJoint, const float* const poseKeypoint3D)
-{
-    try
-    {
-        // Keypoint found
-        if (poseKeypoint3D[2] > 0.5) // For 3-D keypoint, it's either 0 or 1.
-        {
-            foundTargetJoint = 0;
-            targetJoint[0] = poseKeypoint3D[0];
-            targetJoint[1] = poseKeypoint3D[1];
-            targetJoint[2] = poseKeypoint3D[2];
-        }
-        // Keypoint not found - Keep last known keypoint or 0
-        else
-        {
-            if (foundTargetJoint > -1)
-            {
-                foundTargetJoint++;
-                if (foundTargetJoint > NUMBER_TO_RESET_KEYPOINT)
-                {
-                    foundTargetJoint = -1;
-                    targetJoint[0] = 0;
-                    targetJoint[1] = 0;
-                    targetJoint[2] = 0;
-                }
-            }
-        }
-    }
-    catch (const std::exception& e)
-    {
-        op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-    }
-}
-
-void updateOrResetKeypoint(Eigen::MatrixXd& targetJoint, short& foundTargetJoint, const float* const poseKeypoint3D,
-                           const int part)
-{
-    try
-    {
-        // Keypoint found
-        if (poseKeypoint3D[2] > 0.5)
-        {
-            foundTargetJoint = 0;
-            targetJoint(0, part) = poseKeypoint3D[0];
-            targetJoint(1, part) = poseKeypoint3D[1];
-            targetJoint(2, part) = poseKeypoint3D[2];
-        }
-        // Keypoint not found - Keep last known keypoint or 0
-        else
-        {
-            if (foundTargetJoint > -1)
-            {
-                foundTargetJoint++;
-                if (foundTargetJoint > NUMBER_TO_RESET_KEYPOINT)
-                {
-                    foundTargetJoint = -1;
-                    targetJoint(0, part) = 0;
-                    targetJoint(1, part) = 0;
-                    targetJoint(2, part) = 0;
-                }
-            }
-        }
-    }
-    catch (const std::exception& e)
-    {
-        op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-    }
-}
-
-// If the user needs his own variables, he can inherit the op::Datum struct and add them
-// UserDatum can be directly used by the OpenPose wrapper because it inherits from op::Datum, just define
-// Wrapper<UserDatum> instead of Wrapper<op::Datum>
-struct UserDatum : public op::Datum
-{
-    std::array<double, NUMBER_KEYPOINTS> targetJoints; // Only for Body, LHand, RHand. No Face, no Foot
-
-    UserDatum()
-    {
-        for (auto& targetJoint : targetJoints)
-            targetJoint = 0;
-    }
-};
-
-// Adam IK processing
-class WUserPostProcessing : public op::Worker<std::shared_ptr<std::vector<UserDatum>>>
-{
-public:
-    // Purely processing
-    WUserPostProcessing(const std::shared_ptr<smpl::SMPLParams>& frameParams,
-                        const std::shared_ptr<Eigen::Matrix<double, Eigen::Dynamic, 1>>& vtVec,
-                        const std::shared_ptr<Eigen::Matrix<double, Eigen::Dynamic, 1>>& j0Vec,
-                        const std::shared_ptr<TotalModel>& totalModel,
-                        const bool ceresDisplayReport) :
-        mGTotalModelPath{"./model/adam_v1_plus2.json"},
-        mPcaPath{"./model/adam_blendshapes_348_delta_norm.json"},
-        mObjectPath{"./model/mesh_nofeet.obj"},
-        mCorrespondencePath{"./model/correspondences_nofeet.txt"},
-        mCeresDisplayReport{ceresDisplayReport},
-        mInitialized{false},
-        mBodyJoints(5, NUMBER_BODY_KEYPOINTS),// (3, targetJoints.size());
-        mFaceJoints(5, NUMBER_FACE_KEYPOINTS),// (3, landmarks_face.size());
-        mLHandJoints(5, NUMBER_HAND_KEYPOINTS),// (3, HandModel::NUM_JOINTS);
-        mRHandJoints(5, NUMBER_HAND_KEYPOINTS),// (3, HandModel::NUM_JOINTS);
-        mLFootJoints(5, 3),// (3, 3);        // Heel, Toe
-        mRFootJoints(5, 3),// (3, 3);        // Heel, Toe
-        spFrameParams{frameParams},
-        spVtVec{vtVec},
-        spJ0Vec{j0Vec},
-        spTotalModel{totalModel}
-    {
-        // Reset to 0 all keypoints - Otherwise undefined behavior when fitting
-        mBodyJoints.setZero();
-        mFaceJoints.setZero();
-        mLHandJoints.setZero();
-        mRHandJoints.setZero();
-        mLFootJoints.setZero();
-        mRFootJoints.setZero();
-        for (auto& foundTargetJoint : mFoundTargetJoints)
-            foundTargetJoint = -1;
-        // Load spTotalModel (model + data)
-        // ~100 milliseconds
-        LoadTotalModelFromObj(*spTotalModel, mObjectPath);
-        // ~25 seconds
-        LoadTotalDataFromJson(*spTotalModel, mGTotalModelPath, mPcaPath, mCorrespondencePath);
-    }
-
-    void initializationOnThread()
-    {
-    }
-
-    void work(std::shared_ptr<std::vector<UserDatum>>& datumsPtr)
-    {
-        try
-        {
-            // User's displaying/saving/other processing here
-                // datum.cvOutputData: rendered frame with pose or heatmaps
-                // datum.poseKeypoints: Array<float> with the estimated pose
-            if (datumsPtr != nullptr && !datumsPtr->empty())
-            {
-                auto& datum = datumsPtr->at(0);
-                const auto& poseKeypoints3D = datum.poseKeypoints3D;
-                if (poseKeypoints3D.getSize(1) != 19 && poseKeypoints3D.getSize(1) != 25)
-                    op::error("Only working for BODY_19 or BODY_25 (#parts = "
-                              + std::to_string(poseKeypoints3D.getSize(2)) + ").",
-                              __LINE__, __FUNCTION__, __FILE__);
-
-                // Update body
-                auto& targetJoints = datum.targetJoints;
-                for (auto part = 0 ; part < 19; part++)
-                    updateOrResetKeypoint(&targetJoints[mapOPToDome(part)*(poseKeypoints3D.getSize(2)-1)],
-                                          mFoundTargetJoints[part],
-                                          &poseKeypoints3D[{0, part, 0}]);
-                // Update left/right hand
-                const auto& handKeypoints3D = datum.handKeypoints3D;
-                const auto bodyOffset = NUMBER_BODY_KEYPOINTS*(poseKeypoints3D.getSize(2)-1); // NUMBER_BODY_KEYPOINTS = #parts_OP + 1 (top_head)
-                const auto handOffset = handKeypoints3D[0].getSize(1)*(handKeypoints3D[0].getSize(2)-1);
-                if (!handKeypoints3D.at(0).empty())
-                {
-                    for (auto hand = 0u ; hand < handKeypoints3D.size(); hand++)
-                    {
-                        // const std::array<double,3> offsetWrist = {0,0,0};
-                        const auto wristPart = (hand == 0 ? 7 : 4);
-                        // const auto offsetWristIndex = wristPart*(poseKeypoints3D.getSize(2)-1);
-                        std::array<double,3> offsetWrist;
-                        if (poseKeypoints3D[{0, wristPart, 3}] < 0.5 || handKeypoints3D[hand][{0, 0, 3}] < 0.5)
-                            offsetWrist = {0,0,0};
-                        else
-                        {
-                            offsetWrist = {
-                                poseKeypoints3D[{0, wristPart, 0}] - handKeypoints3D[hand][{0, 0, 0}],
-                                poseKeypoints3D[{0, wristPart, 1}] - handKeypoints3D[hand][{0, 0, 1}],
-                                poseKeypoints3D[{0, wristPart, 2}] - handKeypoints3D[hand][{0, 0, 2}]
-                            };
-                        }
-                        for (auto part = 0 ; part < handKeypoints3D[hand].getSize(1); part++)
-                            updateOrResetKeypoint(&targetJoints[bodyOffset + hand*handOffset + part*(handKeypoints3D[hand].getSize(2)-1)],
-                                                  mFoundTargetJoints[part + NUMBER_BODY_KEYPOINTS + hand*NUMBER_HAND_KEYPOINTS],
-                                                  &handKeypoints3D[hand][{0, part, 0}]);
-                    }
-                }
-
-                // Update Foot data
-                if (poseKeypoints3D.getSize(1) == 25)
-                {
-                    // Update LFoot
-                    for (auto adamPart = 0 ; adamPart < NUMBER_FOOT_KEYPOINTS; adamPart++)
-                        updateOrResetKeypoint(mLFootJoints,
-                                              mFoundTargetJoints[adamPart + NUMBER_BODY_KEYPOINTS + 2*NUMBER_HAND_KEYPOINTS],
-                                              &poseKeypoints3D[{0, adamPart + 19, 0}],
-                                              adamPart);
-                    // Update RFoot
-                    for (auto adamPart = 0 ; adamPart < NUMBER_FOOT_KEYPOINTS; adamPart++)
-                        updateOrResetKeypoint(mRFootJoints,
-                                              mFoundTargetJoints[adamPart + NUMBER_BODY_KEYPOINTS + 2*NUMBER_HAND_KEYPOINTS + NUMBER_FOOT_KEYPOINTS],
-                                              &poseKeypoints3D[{0, adamPart + 19 + NUMBER_FOOT_KEYPOINTS, 0}],
-                                              adamPart);
-                }
-
-                // Update Face data
-                const auto& faceKeypoints3D = datum.faceKeypoints3D;
-                if (!faceKeypoints3D.empty())
-                    for (auto part = 0 ; part < NUMBER_FACE_KEYPOINTS; part++)
-                        updateOrResetKeypoint(mFaceJoints,
-                                              mFoundTargetJoints[part + NUMBER_BODY_KEYPOINTS + 2*NUMBER_HAND_KEYPOINTS + 2*NUMBER_FOOT_KEYPOINTS],
-                                              &faceKeypoints3D[{0, part, 0}],
-                                              part);
-
-                // Meters --> cm
-                for (auto& targetJoint : targetJoints)
-                    targetJoint *= 1e2;
-                if (!faceKeypoints3D.empty())
-                    mFaceJoints *= 1e2;
-                mLFootJoints *= 1e2;
-                mRFootJoints *= 1e2;
-
-// // Cout keypoints
-// std::cout << "Body:\n";
-// for (auto i = 0 ; i < targetJoints.size() ; i++)
-// {
-//     std::cout << targetJoints[i] << " ";
-//     if (i % 3 == 2)
-//         std::cout << "\n";
-//     if (i == 3*NUMBER_BODY_KEYPOINTS-1)
-//         std::cout << "Left hand:\n";
-//     if (i == 3*NUMBER_BODY_KEYPOINTS-1+3*NUMBER_HAND_KEYPOINTS)
-//         std::cout << "Right hand:\n";
-// }
-// std::cout << std::endl;
-
-                // Update face
-                // Not available
-                // Update keypoints
-                updateKeypoints(mBodyJoints, mLHandJoints, mRHandJoints, targetJoints);
-
-                // First frame
-const auto start0 = std::chrono::high_resolution_clock::now();
-                if (!mInitialized)
-                {
-                    mInitialized = true;
-                    // We make T-pose start with:
-                    // 1. Root translation similar to current 3-d location of the mid-hip
-                    // 2. x-orientation = 180, i.e., person standing up & looking to the camera
-                    // 3. Because otherwise, if we call Adam_FastFit_Initialize twice (e.g., if a new person appears),
-                    // it would use the latest ones from the last Adam_FastFit
-                    spFrameParams->m_adam_t(0) = mBodyJoints(0, 2);
-                    spFrameParams->m_adam_t(1) = mBodyJoints(1, 2);
-                    spFrameParams->m_adam_t(2) = mBodyJoints(2, 2);
-                    spFrameParams->m_adam_pose(0, 0) = 3.14159265358979323846264338327950288419716939937510582097494459;
-                    // Fit initialization
-                    // Adam_FastFit_Initialize only changes spFrameParams
-                    Adam_FastFit_Initialize(*spTotalModel, *spFrameParams, mBodyJoints, mRFootJoints, mLFootJoints,
-                                            mRHandJoints, mLHandJoints, mFaceJoints, mCeresDisplayReport);
-                    *spVtVec = spTotalModel->m_meanshape + spTotalModel->m_shapespace_u * spFrameParams->m_adam_coeffs;
-                    *spJ0Vec = spTotalModel->J_mu_ + spTotalModel->dJdc_ * spFrameParams->m_adam_coeffs;
-                }
-                // Other frames
-                else
-                {
-                    // ~470 msec
-                    // inside for loop
-                    // Here I read the pose data into mBodyJoints, mRFootJoints, mLFootJoints, mRHandJoints, mLHandJoints, mFaceJoints.
-                    // call fitting function
-                    // Adam_FastFit only changes spFrameParams
-                    Adam_FastFit(*spTotalModel, *spFrameParams, mBodyJoints, mRFootJoints, mLFootJoints, mRHandJoints, mLHandJoints, mFaceJoints, mCeresDisplayReport);
-                }
-const auto duration0 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start0).count();
-std::cout << "IK:         " << duration0 * 1e-6 << std::endl;
-            }
-        }
-        catch (const std::exception& e)
-        {
-            op::log("Some kind of unexpected error happened.");
-            this->stop();
-            op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-        }
-    }
-
-private:
-    // Adam model files
-    const std::string mGTotalModelPath;
-    const std::string mPcaPath;
-    const std::string mObjectPath;
-    const std::string mCorrespondencePath;
-
-    // Processing
-    const bool mCeresDisplayReport;
-    bool mInitialized;
-
-    Eigen::MatrixXd mBodyJoints;
-    Eigen::MatrixXd mFaceJoints;
-    Eigen::MatrixXd mLHandJoints;
-    Eigen::MatrixXd mRHandJoints;
-    Eigen::MatrixXd mLFootJoints;
-    Eigen::MatrixXd mRFootJoints;
-    std::array<short, NUMBER_TOTAL_KEYPOINTS> mFoundTargetJoints;
-
-    // Shared parameters
-    std::shared_ptr<smpl::SMPLParams> spFrameParams;
-    std::shared_ptr<Eigen::Matrix<double, Eigen::Dynamic, 1>> spVtVec;
-    std::shared_ptr<Eigen::Matrix<double, Eigen::Dynamic, 1>> spJ0Vec;
-    std::shared_ptr<TotalModel> spTotalModel;
-};
-
 // This worker will just read and return all the jpg files in a directory
-class WUserOutput : public op::WorkerConsumer<std::shared_ptr<std::vector<UserDatum>>>
+class WUserOutput : public op::WorkerConsumer<std::shared_ptr<std::vector<op::Datum>>>
 {
 public:
     // Purely processing
-    WUserOutput(const std::shared_ptr<smpl::SMPLParams>& frameParams,
-                const std::shared_ptr<Eigen::Matrix<double, Eigen::Dynamic, 1>>& vtVec,
-                const std::shared_ptr<Eigen::Matrix<double, Eigen::Dynamic, 1>>& j0Vec,
-                const std::shared_ptr<TotalModel>& totalModel) :
-        spFrameParams{frameParams},
-        spVtVec{vtVec},
-        spJ0Vec{j0Vec},
-        spTotalModel{totalModel},
+    WUserOutput() :
         mUdpClient(mService, FLAGS_udp_host, FLAGS_udp_port)
     {
-        // Load spTotalModel (model + data)
-        const bool unityCompatible = true;
-        spBvhWriter.reset(new BVHWriter{spTotalModel->m_parent, unityCompatible});
     }
 
     ~WUserOutput()
     {
-        // Write BVH file
-        this->callBVHWriter(FLAGS_write_bvh, 0.0333333);
     }
 
-    // Purely Visualization
     void initializationOnThread()
     {
-        // OpenGL display/rendering
-        if (FLAGS_display == -1)
-        {
-            int argc = 0;
-            // char* argv[0];
-            spRender.reset(new Renderer{&argc, nullptr});
-            spRender->options.nRange=40;
-            // spRender->options.yrot=-45;
-            spRender->options.yrot=45;
-            spRender->options.xrot=25;
-            // spRender->options.meshSolid = true;
-            spRender->options.meshSolid = false;
-            upReadBuffer.reset(new GLubyte[spRender->options.width * spRender->options.height * 3]);
-            // GLubyte read_buffer[spRender->options.width * spRender->options.height * 3]; // 600 * 600 RGB image
-        }
-
-        // // Display in opencv window
-        // cv::namedWindow("Display window", cv::WINDOW_AUTOSIZE);
     }
 
-    void workConsumer(const std::shared_ptr<std::vector<UserDatum>>& datumsPtr)
+    void workConsumer(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr)
     {
         try
         {
-            // User's displaying/saving/other processing here
-                // datum.cvOutputData: rendered frame with pose or heatmaps
-                // datum.poseKeypoints: Array<float> with the estimated pose
             if (datumsPtr != nullptr && !datumsPtr->empty())
             {
                 auto& datum = datumsPtr->at(0);
-                const auto& poseKeypoints3D = datum.poseKeypoints3D;
-                const auto& faceKeypoints3D = datum.faceKeypoints3D;
-                const auto& handKeypoints3D = datum.handKeypoints3D;
-                auto& targetJoints = datum.targetJoints;
-
-                // First frame
-const auto start = std::chrono::high_resolution_clock::now();
-
-// op::log(__LINE__);
-                // Visualization - ~800 msec
-// Constructor arguments: spTotalModel (big, always fixed, never changed), spVtVec (big, constant after frame 1), spJ0Vec (~small, constant after frame 1)
-// t1 <-- spFrameParams (~small)
-// t1 --> g_vis_data (huge), mResultBody
-const auto start1 = std::chrono::high_resolution_clock::now();
-                // ~20 ms
-                // BVH-Unity generation
-                mTrans.push_back(spFrameParams->m_adam_t); // BVH generation, Eigen::Vector3d(3, 1)
-                mPoses.push_back(spFrameParams->m_adam_pose); // BVH generation, Eigen::Matrix<double, 62, 3, Eigen::RowMajor>
-const auto duration1 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start1).count();
-                // OpenGL display/rendering
-const auto start2 = std::chrono::high_resolution_clock::now();
-                if (FLAGS_display == -1)
-                {
-                    CMeshModelInstance cMeshModelInstance;
-                    GenerateMesh_Fast(cMeshModelInstance, mResultBody.data(), *spFrameParams, *spTotalModel, *spVtVec, *spJ0Vec);
-                    VisualizedData g_vis_data; // --> Into op::Datum
-                    CopyMesh(cMeshModelInstance, g_vis_data);
-                    g_vis_data.targetJoint = targetJoints.data(); // Only for Body, LHand, RHand. No Face, no Foot
-                    // g_vis_data.targetJoint = nullptr;
-                    g_vis_data.resultJoint = mResultBody.data();
-                    g_vis_data.faceKeypoints.resize(70, 3);
-                    if (!faceKeypoints3D.empty())
-                    {
-                        for (auto part = 0 ; part < faceKeypoints3D.getSize(1); part++)
-                        {
-                            if (faceKeypoints3D[{0, part, faceKeypoints3D.getSize(2)-1}] > 0.5)
-                                for (auto xyz = 0 ; xyz < faceKeypoints3D.getSize(2)-1 ; xyz++)
-                                    g_vis_data.faceKeypoints(part, xyz) = faceKeypoints3D[{0, part, xyz}];
-                            else
-                            {
-                                g_vis_data.faceKeypoints(part, 0) = 0;
-                                g_vis_data.faceKeypoints(part, 1) = 0;
-                                g_vis_data.faceKeypoints(part, 2) = 0;
-                            }
-                        }
-                        g_vis_data.faceKeypoints *= 100;
-                    }
-                    // g_vis_data: 2 for full body, 3 for left hand, 4 for right hand, 5 for face
-                    g_vis_data.vis_type = 2;
-                    // If full body --> nRange > whole body object
-                    if (g_vis_data.vis_type <= 2)
-                        spRender->options.nRange=150;
-                    // Otherwise (hand/face) --> ~zoom in
-                    else
-                        spRender->options.nRange=40;
-                    g_vis_data.read_buffer = upReadBuffer.get();
-                    // ~0.001 ms
-                    spRender->RenderHand(g_vis_data);
-                    // ~60 ms
-                    spRender->RenderAndRead(); // read the image into read_buffer
-                    // spRender->Display();
-
-                    // Save/display Adam display in opencv window
-                    if (!FLAGS_write_adam.empty())
-                    {
-                        // img is y-flipped, and in RGB order
-                        cv::Mat img(spRender->options.height, spRender->options.width, CV_8UC3, upReadBuffer.get());
-                        cv::flip(img, img, 0);
-                        cv::cvtColor(img, img, cv::COLOR_RGB2BGR);
-                        if (spVideoSaver == nullptr)
-                        {
-                            const auto originalVideoFps = 30;
-                            spVideoSaver = std::make_shared<op::VideoSaver>(
-                                FLAGS_write_adam, CV_FOURCC('M','J','P','G'),
-                                originalVideoFps, op::Point<int>{img.cols, img.rows}
-                            );
-                        }
-                        spVideoSaver->write(img);
-                        // // cv::imshow( "Display window", img );
-                        // // cv::waitKey(16);
-                    }
-                }
-const auto duration2 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start2).count();
-const auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start).count();
-
-                // Display rendered output image
-                if (FLAGS_display != 0)
-                {
-                    cv::imshow("OpenPose 2-D view", datum.cvOutputData);
-                    // Display image and sleeps at least 1 ms (it usually sleeps ~5-10 msec to display the image)
-                    char key = (char)cv::waitKey(33);
-                    if (key == ' ')
-                    {
-                        do
-                            key = (char)cv::waitKey(33);
-                        while (key == -1);
-                    }
-                    if (key == 27)
-                        this->stop();
-                }
-
-// spFrameParams->mouth_open;
-// spFrameParams->reye_open;
-// spFrameParams->leye_open;
-// spFrameParams->dist_root_foot;
-std::cout << "\nRender1:    " << duration1 * 1e-6
-          << "\nRenderRest: " << duration2 * 1e-6
-          << "\nTotal:      " << duration * 1e-6 << std::endl;
 
                 // Add ASIO thing
-                const auto& totalPosition = spFrameParams->m_adam_t; // Eigen::Vector3d(3, 1)
-                const auto& jointAngles = spFrameParams->m_adam_pose; // Eigen::Matrix<double, 62, 3, Eigen::RowMajor>
-                const float mouth_open = spFrameParams->mouth_open; // spFrameParams->mouth_open;
-                const float leye_open = spFrameParams->leye_open; // spFrameParams->leye_open;
-                const float reye_open = spFrameParams->reye_open; // spFrameParams->reye_open;
-                const float dist_root_foot = spFrameParams->dist_root_foot; // spFrameParams->dist_root_foot;
+                const auto& totalPosition = datum.adamTranslation; // Eigen::Vector3d(3, 1)
+                const auto& jointAngles = datum.adamPose; // Eigen::Matrix<double, 62, 3, Eigen::RowMajor>
+                const float mouth_open = datum.mouthOpening; // datum.mouth_open;
+                const float leye_open = datum.rightEyeOpening; // datum.leye_open;
+                const float reye_open = datum.leftEyeOpening; // datum.reye_open;
+                const float dist_root_foot = datum.distanceRootFoot; // datum.dist_root_foot;
                 // m_adam_t:
                 //     1. Total translation (centimeters) of the root in camera/global coordinate representation.
                 // m_adam_pose:
@@ -872,25 +331,9 @@ std::cout << "\nRender1:    " << duration1 * 1e-6
         }
         catch (const std::exception& e)
         {
-            op::log("Some kind of unexpected error happened.");
             this->stop();
             op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
-    }
-
-    void callBVHWriter(const std::string& fileName, const double frameTime)
-    {
-        spBvhWriter->parseInput(*spJ0Vec, mTrans, mPoses);
-        spBvhWriter->writeBVH(fileName, frameTime);
-        // // Debugging
-        // // std::cout << spJ0Vec.rows() << std::endl;
-        // for (const auto& pose : mPoses)
-        // {
-        //     // Left arm
-        //     std::cout << pose.row(16) << " " << pose.row(18) << " " << pose.row(20)
-        //     // Right arm
-        //      << " " << pose.row(17) << " " << pose.row(19) << " " << pose.row(21) << std::endl;
-        // }
     }
 
     std::string vectorToJson(float x, float y, float z)
@@ -903,25 +346,6 @@ std::cout << "\nRender1:    " << duration1 * 1e-6
     }
 
 private:
-    // Write BVH file
-    std::unique_ptr<BVHWriter> spBvhWriter;
-    std::vector<Eigen::Matrix<double, 3, 1>> mTrans; // record the translation across frames
-    std::vector<Eigen::Matrix<double, TotalModel::NUM_JOINTS, 3, Eigen::RowMajor>> mPoses; // record the pose change
-
-    // Visualization
-    std::unique_ptr<Renderer> spRender;
-    std::array<double, NUMBER_KEYPOINTS> mResultBody;
-    std::unique_ptr<GLubyte[]> upReadBuffer;
-
-    // Video AVI writing
-    std::shared_ptr<op::VideoSaver> spVideoSaver;
-
-    // Shared parameters
-    std::shared_ptr<smpl::SMPLParams> spFrameParams;
-    std::shared_ptr<Eigen::Matrix<double, Eigen::Dynamic, 1>> spVtVec;
-    std::shared_ptr<Eigen::Matrix<double, Eigen::Dynamic, 1>> spJ0Vec;
-    std::shared_ptr<TotalModel> spTotalModel;
-
     // Unity - UDP communication
     asio::io_service mService;
     UDPClient mUdpClient;
@@ -981,19 +405,11 @@ int openPoseDemo()
 
         // OpenPose wrapper
         op::log("Configuring OpenPose wrapper.", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-        op::Wrapper<std::vector<UserDatum>> opWrapper;
+        op::Wrapper<std::vector<op::Datum>> opWrapper;
 
         // Adam added
-        const auto frameParams = std::make_shared<smpl::SMPLParams>();
-        const auto vtVec = std::make_shared<Eigen::Matrix<double, Eigen::Dynamic, 1>>();
-        const auto j0Vec = std::make_shared<Eigen::Matrix<double, Eigen::Dynamic, 1>>();
-        const auto totalModel = std::make_shared<TotalModel>();
-        const bool ceresDisplayReport = false;
-        auto wUserPostProcessing = std::make_shared<WUserPostProcessing>(frameParams, vtVec, j0Vec, totalModel, ceresDisplayReport);
-        const auto workerProcessingOnNewThread = true;
-        opWrapper.setWorkerPostProcessing(wUserPostProcessing, workerProcessingOnNewThread);
-        auto wUserOutput = std::make_shared<WUserOutput>(frameParams, vtVec, j0Vec, totalModel);
-        const auto workerOutputOnNewThread = true;
+        const auto wUserOutput = std::make_shared<WUserOutput>();
+        const auto workerOutputOnNewThread = false;
         opWrapper.setWorkerOutput(wUserOutput, workerOutputOnNewThread);
 
         // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
@@ -1005,8 +421,7 @@ int openPoseDemo()
                                                       (float)FLAGS_alpha_heatmap, FLAGS_part_to_show, FLAGS_model_folder,
                                                       heatMapTypes, heatMapScale, FLAGS_part_candidates,
                                                       (float)FLAGS_render_threshold, FLAGS_number_people_max,
-                                                      enableGoogleLogging, FLAGS_3d, FLAGS_3d_min_views,
-                                                      FLAGS_identification, FLAGS_tracking};
+                                                      enableGoogleLogging};
         // Face configuration (use op::WrapperStructFace{} to disable it)
         const op::WrapperStructFace wrapperStructFace{FLAGS_face, faceNetInputSize,
                                                       op::flagsToRenderMode(FLAGS_face_render, multipleView, FLAGS_render_pose),
@@ -1018,22 +433,25 @@ int openPoseDemo()
                                                       op::flagsToRenderMode(FLAGS_hand_render, multipleView, FLAGS_render_pose),
                                                       (float)FLAGS_hand_alpha_pose, (float)FLAGS_hand_alpha_heatmap,
                                                       (float)FLAGS_hand_render_threshold};
+        // Extra functionality configuration (use op::WrapperStructExtra{} to disable it)
+        const op::WrapperStructExtra wrapperStructExtra{FLAGS_3d, FLAGS_3d_min_views, FLAGS_identification,
+                                                        FLAGS_tracking, FLAGS_ik_threads};
         // Producer (use default to disable any input)
         const op::WrapperStructInput wrapperStructInput{producerSharedPtr, FLAGS_frame_first, FLAGS_frame_last,
                                                         FLAGS_process_real_time, FLAGS_frame_flip, FLAGS_frame_rotate,
                                                         FLAGS_frames_repeat};
         // Consumer (comment or use default argument to disable any output)
-        // const op::WrapperStructOutput wrapperStructOutput{op::flagsToDisplayMode(FLAGS_display, FLAGS_3d),
-        const op::WrapperStructOutput wrapperStructOutput{op::DisplayMode::NoDisplay,
+        const op::WrapperStructOutput wrapperStructOutput{op::flagsToDisplayMode(FLAGS_display, FLAGS_3d),
                                                           !FLAGS_no_gui_verbose, FLAGS_fullscreen, FLAGS_write_keypoint,
                                                           op::stringToDataFormat(FLAGS_write_keypoint_format),
-                                                          writeJson, FLAGS_write_coco_json,
+                                                          writeJson, FLAGS_write_coco_json, FLAGS_write_coco_foot_json,
                                                           FLAGS_write_images, FLAGS_write_images_format, FLAGS_write_video,
                                                           FLAGS_camera_fps, FLAGS_write_heatmaps,
-                                                          FLAGS_write_heatmaps_format, FLAGS_write_coco_foot_json};
+                                                          FLAGS_write_heatmaps_format, FLAGS_write_video_adam,
+                                                          FLAGS_write_bvh};
         // Configure wrapper
-        opWrapper.configure(wrapperStructPose, wrapperStructFace, wrapperStructHand, wrapperStructInput,
-                            wrapperStructOutput);
+        opWrapper.configure(wrapperStructPose, wrapperStructFace, wrapperStructHand, wrapperStructExtra,
+                            wrapperStructInput, wrapperStructOutput);
         // Set to single-thread running (to debug and/or reduce latency)
         if (FLAGS_disable_multi_thread)
             opWrapper.disableMultiThreading();
