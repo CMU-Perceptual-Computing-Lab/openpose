@@ -19,7 +19,7 @@ namespace op
               const std::vector<std::shared_ptr<FaceExtractorNet>>& faceExtractorNets = {},
               const std::vector<std::shared_ptr<HandExtractorNet>>& handExtractorNets = {},
               const std::vector<std::shared_ptr<Renderer>>& renderers = {},
-              const PoseModel poseModel = PoseModel::COCO_18,
+              const PoseModel poseModel = PoseModel::BODY_25,
               const DisplayMode displayMode = DisplayMode::DisplayAll);
 
         virtual ~Gui3D();

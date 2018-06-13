@@ -211,25 +211,26 @@ OpenPose Library - Release Notes
 
 
 
-## Current version - future OpenPose 1.4.0
+## Current version - future OpenPose 2.0.0
 1. Main improvements:
-    1. New calibration module: Intrinsic and extrinsic camera calibration toolbox based on OpenCV.
-    2. Improvements involving Flir cameras:
+    1. Model BODY_25 released, that includes the 17 COCO keypoints + neck + midhip + 6 foot keypoints. It is also about 3% more accurate and 30% faster than the original `COCO` model.
+    2. New calibration module: Intrinsic and extrinsic camera calibration toolbox based on OpenCV.
+    3. Improvements involving Flir cameras:
         1. Added software trigger and a dedicated thread to keep reading images so latency is removed and runtime is faster (analogously to webcamReader).
         2. Undistortion of the images is x3.5 faster per camera, i.e., x3.5 Flir camera producer reading w.r.t previous multi-threaded version, which was x number_cameras faster than the original version.
         3. Added flag `flir_camera_index` to allow running on all the cameras at once, or only on 1 camera at the time.
         4. Added flag `frame_keep_distortion` not to undistort the images. E.g., useful when recording images for camera calibration.
         5. Changed Spinnaker::DEFAULT image extraction mode by Spinnaker::IPP, which does not show a pixelated image while keeping very similar runtime.
-    3. 3-D reconstruction: Added non-linear minimization to further improve 3-D triangulation accuracy by ~5% (Ubuntu only).
-    4. CMake: All libraries as single variable (simpler to add/remove libraries).
-    5. Datum includes extrinsic and intrinsic camera parameters.
-    6. Function `scaleKeypoints(Array<float>& keypoints, const float scale)` also accepts 3D keypoints.
-    7. 3D keypoints and camera parameters in meters (instead of millimeters) in order to reduce numerical errors.
-    8. New `PoseExtractor` class to contain future ID and tracking algorithms as well as the current OpenPose keypoint detection algorithm.
-    9. Added initial alpha versions of the `tracking` and `identification` modules (for now disabled but available in the source code), including `PersonIdExtractor` and `PersonTracker`. `PersonIdExtractor` includes greedy matrix OP-LK matching.
-    10. Added catchs to all demos for higher debug information.
-    11. GUI includes the capability of dynamically enable/disable the face, hand, and 3-D rendering, as well as more clear visualization for skeleton, background, heatmap addition, and PAF addition channels.
-    12. When GUI changes some parameter from PoseExtractorNet, there is a log to notify the user of the change.
+    4. 3-D reconstruction: Added non-linear minimization to further improve 3-D triangulation accuracy by ~5% (Ubuntu only).
+    5. CMake: All libraries as single variable (simpler to add/remove libraries).
+    6. Datum includes extrinsic and intrinsic camera parameters.
+    7. Function `scaleKeypoints(Array<float>& keypoints, const float scale)` also accepts 3D keypoints.
+    8. 3D keypoints and camera parameters in meters (instead of millimeters) in order to reduce numerical errors.
+    9. New `PoseExtractor` class to contain future ID and tracking algorithms as well as the current OpenPose keypoint detection algorithm.
+    10. Added initial alpha versions of the `tracking` and `identification` modules (for now disabled but available in the source code), including `PersonIdExtractor` and `PersonTracker`. `PersonIdExtractor` includes greedy matrix OP-LK matching.
+    11. Added catchs to all demos for higher debug information.
+    12. GUI includes the capability of dynamically enable/disable the face, hand, and 3-D rendering, as well as more clear visualization for skeleton, background, heatmap addition, and PAF addition channels.
+    13. When GUI changes some parameter from PoseExtractorNet, there is a log to notify the user of the change.
 2. Functions or parameters renamed:
     1. Removed scale parameter from hand and face rectangle extractor (causing wrong results if custom `--output_resolution`).
     2. Functions `scaleKeypoints`, other than `scaleKeypoints(Array<float>& keypoints, const float scale)`, renamed as `scaleKeypoints2d`.

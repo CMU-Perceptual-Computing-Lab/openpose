@@ -76,11 +76,12 @@ The body part mapping order of any body model (e.g. COCO, MPI) can be extracted 
 ```
 // C++ API call
 #include <openpose/pose/poseParameters.hpp>
+const auto& poseBodyPartMappingBody25 = getPoseBodyPartMapping(PoseModel::BODY_25);
 const auto& poseBodyPartMappingCoco = getPoseBodyPartMapping(PoseModel::COCO_18);
 const auto& poseBodyPartMappingMpi = getPoseBodyPartMapping(PoseModel::MPI_15);
 
-// Result for COCO (18 body parts)
-// POSE_COCO_BODY_PARTS {
+// Result for BODY_25 (25 body parts consisting of COCO + foot)
+// const std::map<unsigned int, std::string> POSE_BODY_25_BODY_PARTS {
 //     {0,  "Nose"},
 //     {1,  "Neck"},
 //     {2,  "RShoulder"},
@@ -89,18 +90,25 @@ const auto& poseBodyPartMappingMpi = getPoseBodyPartMapping(PoseModel::MPI_15);
 //     {5,  "LShoulder"},
 //     {6,  "LElbow"},
 //     {7,  "LWrist"},
-//     {8,  "RHip"},
-//     {9,  "RKnee"},
-//     {10, "RAnkle"},
-//     {11, "LHip"},
-//     {12, "LKnee"},
-//     {13, "LAnkle"},
-//     {14, "REye"},
-//     {15, "LEye"},
-//     {16, "REar"},
-//     {17, "LEar"},
-//     {18, "Background"},
-// }
+//     {8,  "MidHip"},
+//     {9,  "RHip"},
+//     {10, "RKnee"},
+//     {11, "RAnkle"},
+//     {12, "LHip"},
+//     {13, "LKnee"},
+//     {14, "LAnkle"},
+//     {15, "REye"},
+//     {16, "LEye"},
+//     {17, "REar"},
+//     {18, "LEar"},
+//     {19, "LBigToe"},
+//     {20, "LSmallToe"},
+//     {21, "LHeel"},
+//     {22, "RBigToe"},
+//     {23, "RSmallToe"},
+//     {24, "RHeel"},
+//     {25, "Background"}
+// };
 ```
 
 
@@ -114,15 +122,16 @@ The PAFs follow the order specified on `getPosePartPairs(const PoseModel poseMod
 ```
 // C++ API call
 #include <openpose/pose/poseParameters.hpp>
+const auto& posePartPairsBody25 = getPosePartPairs(PoseModel::BODY_25);
 const auto& posePartPairsCoco = getPosePartPairs(PoseModel::COCO_18);
 const auto& posePartPairsMpi = getPosePartPairs(PoseModel::MPI_15);
 
-// getPosePartPairs(PoseModel::COCO_18) result
+// getPosePartPairs(PoseModel::BODY_25) result
 // Each index is the key value corresponding to each body part in `getPoseBodyPartMapping`. E.g., 1 for "Neck", 2 for "RShoulder", etc.
-// 1,2,   1,5,   2,3,   3,4,   5,6,   6,7,   1,8,   8,9,   9,10,  1,11,  11,12, 12,13,  1,0,   0,14, 14,16,  0,15, 15,17,  2,16,  5,17
+// 1,8,   1,2,   1,5,   2,3,   3,4,   5,6,   6,7,   8,9,   9,10,  10,11, 8,12,  12,13, 13,14,  1,0,   0,15, 15,17,  0,16, 16,18,   2,17,  5,18,   14,19,19,20,14,21, 11,22,22,23,11,24
 
-// getPoseMapIndex(PoseModel::COCO_18) result
-// 31,32, 39,40, 33,34, 35,36, 41,42, 43,44, 19,20, 21,22, 23,24, 25,26, 27,28, 29,30, 47,48, 49,50, 53,54, 51,52, 55,56, 37,38, 45,46
+// getPoseMapIndex(PoseModel::BODY_25) result
+// 0,1, 14,15, 22,23, 16,17, 18,19, 24,25, 26,27, 6,7, 2,3, 4,5, 8,9, 10,11, 12,13, 30,31, 32,33, 36,37, 34,35, 38,39, 20,21, 28,29, 40,41,42,43,44,45, 46,47,48,49,50,51
 ```
 
 

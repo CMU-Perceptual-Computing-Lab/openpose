@@ -353,7 +353,7 @@ namespace op
     {
         try
         {
-            if(mThreadId != std::this_thread::get_id())
+            if (mThreadId != std::this_thread::get_id())
                 error("The CPU/GPU pointer data cannot be accessed from a different thread.",
                       __LINE__, __FUNCTION__, __FILE__);
         }

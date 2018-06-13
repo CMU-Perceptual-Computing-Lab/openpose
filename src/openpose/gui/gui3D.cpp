@@ -37,7 +37,7 @@ namespace op
         };
 
         Keypoints3D gKeypoints3D;
-        PoseModel sPoseModel = PoseModel::COCO_18;
+        PoseModel sPoseModel = PoseModel::BODY_25;
         int sLastKeyPressed = -1;
 
         CameraMode gCameraMode = CameraMode::CAM_DEFAULT;

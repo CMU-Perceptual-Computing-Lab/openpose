@@ -60,7 +60,7 @@ int handFromJsonTest()
         // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
         op::WrapperStructPose wrapperStructPose{false, op::flagsToPoint("656x368"), op::flagsToPoint("1280x720"),
                                                 op::ScaleMode::InputResolution, FLAGS_num_gpu, FLAGS_num_gpu_start,
-                                                1, 0.15f, op::RenderMode::None, op::PoseModel::COCO_18,
+                                                1, 0.15f, op::RenderMode::None, op::PoseModel::BODY_25,
                                                 true, 0.f, 0.f, 0, "models/", {}, op::ScaleMode::ZeroToOne, false,
                                                 0.05f, -1, enableGoogleLogging};
         wrapperStructPose.modelFolder = FLAGS_model_folder;
