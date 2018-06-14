@@ -74,7 +74,7 @@ int handFromJsonTest()
 
         // Start processing
         op::log("Starting thread(s)...", op::Priority::High);
-        opWrapper.exec();  // It blocks this thread until all threads have finished
+        opWrapper.exec();
 
         // Measuring total time
         const auto now = std::chrono::high_resolution_clock::now();

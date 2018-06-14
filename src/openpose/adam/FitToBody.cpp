@@ -667,6 +667,9 @@ void Adam_FastFit_Initialize(const TotalModel &adam,
 	adam_cost->m_targetPts_weight[adam_cost->m_nCorrespond_adam2joints + 1] = 
 	adam_cost->m_targetPts_weight[adam_cost->m_nCorrespond_adam2joints + 2] = 1.0;
 	adam_cost->m_targetPts_weight[adam_cost->m_nCorrespond_adam2joints + 2] = 0;
+	// To include foot keypoints weights
+	for (int i = 0; i < 12; i++)
+		adam_cost->m_targetPts_weight[adam_cost->m_nCorrespond_adam2joints + i] = 1.0;
 	ceres::Solver::Options options_init;
 	ceres::Solver::Summary summary;
 	SetSolverOptions(&options_init);

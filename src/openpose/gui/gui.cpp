@@ -132,8 +132,8 @@ namespace op
                 // Enable/disable extra rendering (3D/Adam), while keeping 2D rendering
                 else if (castedKey=='c')
                 {
-                    displayMode = (displayMode == DisplayMode::DisplayAll
-                                   ? displayModeOriginal : DisplayMode::DisplayAll);
+                    displayMode = (displayMode == displayModeOriginal
+                                   ? DisplayMode::Display2D : displayModeOriginal);
                 }
                 // ------------------------- Miscellaneous ------------------------- //
                 // Show googly eyes

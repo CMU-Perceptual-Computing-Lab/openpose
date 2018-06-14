@@ -231,6 +231,7 @@ OpenPose Library - Release Notes
     11. Added catchs to all demos for higher debug information.
     12. GUI includes the capability of dynamically enable/disable the face, hand, and 3-D rendering, as well as more clear visualization for skeleton, background, heatmap addition, and PAF addition channels.
     13. When GUI changes some parameter from PoseExtractorNet, there is a log to notify the user of the change.
+    14. Deprecated flag `--write_keypoint_json` removed (`--write_json` is the equivalent since version 1.2.1).
 2. Functions or parameters renamed:
     1. Removed scale parameter from hand and face rectangle extractor (causing wrong results if custom `--output_resolution`).
     2. Functions `scaleKeypoints`, other than `scaleKeypoints(Array<float>& keypoints, const float scale)`, renamed as `scaleKeypoints2d`.
