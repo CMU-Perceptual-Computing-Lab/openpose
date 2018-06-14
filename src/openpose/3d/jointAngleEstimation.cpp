@@ -72,6 +72,7 @@ namespace op
             const std::string mCorrespondencePath;
 
             // Processing
+            const bool mFreezeMissing;
             const bool mCeresDisplayReport;
             bool mInitialized;
 
@@ -95,6 +96,7 @@ namespace op
                 mPcaPath{"./model/adam_blendshapes_348_delta_norm.json"},
                 mObjectPath{"./model/mesh_nofeet.obj"},
                 mCorrespondencePath{"./model/correspondences_nofeet.txt"},
+                mFreezeMissing{true},
                 mCeresDisplayReport{ceresDisplayReport},
                 mInitialized{false},
                 mBodyJoints(5, NUMBER_BODY_KEYPOINTS),
@@ -298,7 +300,7 @@ namespace op
                 // Adam_FastFit_Initialize only changes frameParams
                 Adam_FastFit_Initialize(*spImpl->spTotalModel, frameParams, spImpl->mBodyJoints, spImpl->mRFootJoints,
                                         spImpl->mLFootJoints, spImpl->mRHandJoints, spImpl->mLHandJoints,
-                                        spImpl->mFaceJoints, spImpl->mCeresDisplayReport);
+                                        spImpl->mFaceJoints, spImpl->mFreezeMissing, spImpl->mCeresDisplayReport);
                 vtVec = spImpl->spTotalModel->m_meanshape
                       + spImpl->spTotalModel->m_shapespace_u * frameParams.m_adam_coeffs;
                 j0Vec = spImpl->spTotalModel->J_mu_ + spImpl->spTotalModel->dJdc_ * frameParams.m_adam_coeffs;
@@ -308,33 +310,15 @@ namespace op
                     spImpl->mJ0Vec = j0Vec;
                 }
             }
-            // Other frames
-            else
+            // Other frames if fastVersion
+            else // if (spImpl->mInitialized && fastVersion)
             {
-                // Fast way (it doesn't look right)
-                // if (fastVersion)
-                // {
-                    // Adam_FastFit only changes frameParams
-                    Adam_FastFit(*spImpl->spTotalModel, frameParams, spImpl->mBodyJoints, spImpl->mRFootJoints,
-                                 spImpl->mLFootJoints, spImpl->mRHandJoints, spImpl->mLHandJoints,
-                                 spImpl->mFaceJoints, spImpl->mCeresDisplayReport);
-                    if (fastVersion)
-                    {
-                        vtVec = spImpl->mVtVec;
-                        j0Vec = spImpl->mJ0Vec;
-                    }
-                // }
-                // // Slow way
-                // else
-                // {
-                //     // Adam_FastFit_Initialize only changes frameParams
-                //     Adam_FastFit_Initialize(*spImpl->spTotalModel, frameParams, spImpl->mBodyJoints,
-                //                             spImpl->mRFootJoints, spImpl->mLFootJoints, spImpl->mRHandJoints,
-                //                             spImpl->mLHandJoints, spImpl->mFaceJoints, spImpl->mCeresDisplayReport);
-                //     vtVec = spImpl->spTotalModel->m_meanshape
-                //           + spImpl->spTotalModel->m_shapespace_u * frameParams.m_adam_coeffs;
-                //     j0Vec = spImpl->spTotalModel->J_mu_ + spImpl->spTotalModel->dJdc_ * frameParams.m_adam_coeffs;
-                // }
+                // Adam_FastFit only changes frameParams
+                Adam_FastFit(*spImpl->spTotalModel, frameParams, spImpl->mBodyJoints, spImpl->mRFootJoints,
+                             spImpl->mLFootJoints, spImpl->mRHandJoints, spImpl->mLHandJoints,
+                             spImpl->mFaceJoints, spImpl->mCeresDisplayReport);
+                vtVec = spImpl->mVtVec;
+                j0Vec = spImpl->mJ0Vec;
             }
             return std::make_tuple(
                 frameParams.m_adam_pose, frameParams.m_adam_t, vtVec, j0Vec, frameParams.m_adam_facecoeffs_exp,

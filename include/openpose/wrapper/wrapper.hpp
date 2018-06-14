@@ -940,9 +940,9 @@ namespace op
                                             : producerFps);
             if (!wrapperStructOutput.writeVideo.empty())
             {
-                if (oPProducer)
+                if (!oPProducer)
                     error("Video file can only be recorded inside `wrapper/wrapper.hpp` if the producer"
-                          " is one of the default ones (e.g. video, webcam, images, ...).",
+                          " is one of the default ones (e.g. video, webcam, ...).",
                           __LINE__, __FUNCTION__, __FILE__);
                 if (finalOutputSize.x <= 0 || finalOutputSize.y <= 0)
                     error("Video can only be recorded if outputSize is fixed (e.g. video, webcam, IP camera),"

@@ -237,7 +237,7 @@ namespace op
         "pose/body_19_25/pose_deploy_25.prototxt",
     };
     const std::array<std::string, (int)PoseModel::Size> POSE_TRAINED_MODEL{
-        "pose/body_25/pose_iter_XXXXXX.caffemodel",
+        "pose/body_25/pose_iter_584000.caffemodel",
         "pose/coco/pose_iter_440000.caffemodel",
         "pose/mpi/pose_iter_160000.caffemodel",
         "pose/mpi/pose_iter_160000.caffemodel",

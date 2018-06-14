@@ -59,6 +59,7 @@ void Adam_FastFit_Initialize(const TotalModel &adam,
 	const Eigen::MatrixXd &rHandJoints,
 	const Eigen::MatrixXd &lHandJoints,
 	const Eigen::MatrixXd &faceJoints,
+	const bool freeze_missing=false,
 	const bool verbose=false);
 
 void Adam_FastFit(const TotalModel &adam,
