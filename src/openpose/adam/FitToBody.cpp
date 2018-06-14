@@ -9,8 +9,8 @@
 
 void FreezeJoint(ceres::Problem& problem, double* dataPtr, int index)
 {
-	problem.SetParameterLowerBound(dataPtr, index, -0.00001);
-	problem.SetParameterUpperBound(dataPtr, index, 0.00001);
+	problem.SetParameterLowerBound(dataPtr, index, dataPtr[index]-0.00001);
+	problem.SetParameterUpperBound(dataPtr, index, dataPtr[index]+0.00001);
 }
 
 void SetSolverOptions(ceres::Solver::Options *options) {
@@ -18,9 +18,8 @@ void SetSolverOptions(ceres::Solver::Options *options) {
 		&options->linear_solver_type));
 	CHECK(StringToPreconditionerType("jacobi",
 		&options->preconditioner_type));
-	options->num_linear_solver_threads = 4;
 	options->max_num_iterations = 15;
-	options->num_threads = 10;
+	options->num_threads = 10; // num_linear_solver_threads Deprecated
 	options->dynamic_sparsity = true;
 	options->use_nonmonotonic_steps = true;
 	CHECK(StringToTrustRegionStrategyType("levenberg_marquardt",
@@ -109,7 +108,7 @@ void FitToHandCeres_Right_Naive(
 	// options.function_tolerance = 1e-8;
 	// options.max_num_iterations = 50;
 	// options.use_nonmonotonic_steps = false;
-	// options.num_linear_solver_threads = 10;
+	// options.num_threads = 10; // num_threads deprecated
 	// options.minimizer_progress_to_stdout = true;
 	options.update_state_every_iteration = true;
 	options.max_num_iterations = 30;
@@ -209,7 +208,7 @@ void FitToProjectionCeres(
 	options_init.function_tolerance = 1e-8;
 	options_init.max_num_iterations = 30;
 	options_init.use_nonmonotonic_steps = true;
-	options_init.num_linear_solver_threads = 10;
+	options_init.num_threads = 10; // num_linear_solver_threads deprecated
 	options_init.minimizer_progress_to_stdout = true;
 
 	problem_init.SetParameterBlockConstant(parm_hand_coeffs.data());
@@ -272,7 +271,7 @@ void FitToProjectionCeres(
 	options.function_tolerance = 1e-8;
 	options.max_num_iterations = 30;
 	options.use_nonmonotonic_steps = true;
-	options.num_linear_solver_threads = 10;
+	options.num_threads = 10; // num_linear_solver_threads deprecated
 	options.minimizer_progress_to_stdout = true;
 
 	CHECK(StringToLinearSolverType("sparse_normal_cholesky",
@@ -337,7 +336,7 @@ void Adam_FitTotalBodyCeres(TotalModel &adam,
 	SetSolverOptions(&options_init);
 	options_init.max_num_iterations = 20;
 	options_init.use_nonmonotonic_steps = false;
-	options_init.num_linear_solver_threads = 10;
+	options_init.num_threads = 10; // num_linear_solver_threads deprecated
 	options_init.minimizer_progress_to_stdout = true;
 	adam_cost->toggle_activate(false, false, false);
 	adam_cost->toggle_rigid_body(true);
@@ -382,7 +381,7 @@ void Adam_FitTotalBodyCeres2d(TotalModel &adam,
 	options_init.function_tolerance = 1e-4;
 	options_init.max_num_iterations = 20;
 	options_init.use_nonmonotonic_steps = false;
-	options_init.num_linear_solver_threads = 10;
+	options_init.num_threads = 10; // num_linear_solver_threads deprecated
 	options_init.minimizer_progress_to_stdout = true;
 	cost_body_keypoints_init->joint_only = true;
 	// Pure Translation, fit body only!
@@ -478,7 +477,7 @@ void Adam_FitTotalBodyCeres2d(TotalModel &adam,
 	// problem.SetParameterBlockConstant(frame_param.m_adam_facecoeffs_exp.data());
 	options.max_num_iterations = 10;
 	options.use_nonmonotonic_steps = false;
-	options.num_linear_solver_threads = 10;
+	options.num_threads = 10; // num_linear_solver_threads deprecated
 	options.minimizer_progress_to_stdout = true;
 	cost_body_keypoints->joint_only = false;
 	ceres::Solve(options, &problem, &summary);
@@ -515,7 +514,7 @@ void Adam_FitTotalBodyCeres3d2d(TotalModel &adam,
 	options_init.function_tolerance = 1e-4;
 	options_init.max_num_iterations = 20;
 	options_init.use_nonmonotonic_steps = false;
-	options_init.num_linear_solver_threads = 10;
+	options_init.num_threads = 10; // num_linear_solver_threads deprecated
 	options_init.minimizer_progress_to_stdout = true;
 	cost_body_keypoints_init->joint_only = true;
 	// Pure Translation, fit body only!
@@ -612,7 +611,7 @@ void Adam_FitTotalBodyCeres3d2d(TotalModel &adam,
 	// problem.SetParameterBlockConstant(frame_param.m_adam_facecoeffs_exp.data());
 	options.max_num_iterations = 10;
 	options.use_nonmonotonic_steps = false;
-	options.num_linear_solver_threads = 10;
+	options.num_threads = 10; // num_linear_solver_threads deprecated
 	options.minimizer_progress_to_stdout = true;
 	cost_body_keypoints->joint_only = false;
 	cost_body_keypoints->weight2d = weight2d;
@@ -628,6 +627,7 @@ void Adam_FastFit_Initialize(const TotalModel &adam,
 	const Eigen::MatrixXd &rHandJoints,	   //
 	const Eigen::MatrixXd &lHandJoints,		//
 	const Eigen::MatrixXd &faceJoints,
+	const bool freeze_missing,
 	const bool verbose)
 {
 	using namespace Eigen;
@@ -635,13 +635,14 @@ void Adam_FastFit_Initialize(const TotalModel &adam,
 	// std::fill(PAF.data(), PAF.data() + PAF.size(), 0);
 	const AdamFitData data(adam, BodyJoints, rFoot, lFoot, faceJoints, lHandJoints, rHandJoints, PAF, true);
 	ceres::Problem problem_init;
-	AdamFullCost* adam_cost = new AdamFullCost(data);
+	AdamFullCost* adam_cost = new AdamFullCost(data, 0, true);
 
 	problem_init.AddResidualBlock(adam_cost,
 		NULL,
 		frame_param.m_adam_t.data(),
 		frame_param.m_adam_pose.data(),
-		frame_param.m_adam_coeffs.data());	
+		frame_param.m_adam_coeffs.data(),
+		frame_param.m_adam_facecoeffs_exp.data());	
 
 	//Body Prior (coef) //////////////////////////////////////////////////////////////////////////
 	CoeffsParameterNormDiff* cost_prior_body_coeffs_init = new CoeffsParameterNormDiff(TotalModel::NUM_SHAPE_COEFFICIENTS);
@@ -663,19 +664,63 @@ void Adam_FastFit_Initialize(const TotalModel &adam,
 		loss_weight_prior_body_pose_init,
 		frame_param.m_adam_pose.data());
 
-	adam_cost->m_targetPts_weight[adam_cost->m_nCorrespond_adam2joints + 0] = 
-	adam_cost->m_targetPts_weight[adam_cost->m_nCorrespond_adam2joints + 1] = 
-	adam_cost->m_targetPts_weight[adam_cost->m_nCorrespond_adam2joints + 2] = 1.0;
-	adam_cost->m_targetPts_weight[adam_cost->m_nCorrespond_adam2joints + 2] = 0;
+	//Face regularization
+	ceres::NormalPrior *cost_prior_face_exp = new ceres::NormalPrior(adam.face_prior_A_exp.asDiagonal(), Eigen::Matrix<double, TotalModel::NUM_EXP_BASIS_COEFFICIENTS, 1>::Zero());
+	ceres::LossFunction *loss_weight_prior_face_exp = new ceres::ScaledLoss(NULL,
+		8,		//original
+		ceres::TAKE_OWNERSHIP);
+	problem_init.AddResidualBlock(cost_prior_face_exp,
+		loss_weight_prior_face_exp,
+		frame_param.m_adam_facecoeffs_exp.data());
+
+	for (int j = 0; j < 22 * 3; j++) cost_prior_body_pose_init->weight[j] *= 2;
+
+	if (freeze_missing)
+	{
+        for (int ic = 0; ic < adam.m_indices_jointConst_adamIdx.rows(); ic++)
+        {
+            const int smcjoint = adam.m_indices_jointConst_smcIdx(ic);
+            const int adam_index = adam.m_parent[adam.m_indices_jointConst_adamIdx(ic)];
+            if (BodyJoints.col(smcjoint).isZero(0))
+            	std::fill(cost_prior_body_pose_init->weight.data() + 3 * adam_index,
+            			  cost_prior_body_pose_init->weight.data() + 3 * adam_index + 3,
+            			  0.0);
+        }
+
+        for (int ic = 0; ic < adam.m_correspond_adam2lHand_adamIdx.rows(); ic++)
+        {
+            const int smcjoint = adam.m_correspond_adam2lHand_lHandIdx(ic);
+            const int adam_index = adam.m_parent[adam.m_correspond_adam2lHand_adamIdx(ic)];
+            if (lHandJoints.col(smcjoint).isZero(0))
+            	std::fill(cost_prior_body_pose_init->weight.data() + 3 * adam_index,
+            			  cost_prior_body_pose_init->weight.data() + 3 * adam_index + 3,
+            			  0.0);
+        }
+
+        for (int ic = 0; ic < adam.m_correspond_adam2rHand_adamIdx.rows(); ic++)
+        {
+            const int smcjoint = adam.m_correspond_adam2rHand_rHandIdx(ic);
+            const int adam_index = adam.m_parent[adam.m_correspond_adam2rHand_adamIdx(ic)];
+            if (rHandJoints.col(smcjoint).isZero(0))
+            	std::fill(cost_prior_body_pose_init->weight.data() + 3 * adam_index,
+            			  cost_prior_body_pose_init->weight.data() + 3 * adam_index + 3,
+            			  0.0);
+        }
+	}
+	adam_cost->freeze_missing = freeze_missing;
+
 	// To include foot keypoints weights
-	for (int i = 0; i < 12; i++)
-		adam_cost->m_targetPts_weight[adam_cost->m_nCorrespond_adam2joints + i] = 1.0;
+	for (int i = 0; i < 12 + adam.m_correspond_adam2face70_adamIdx.rows(); i++)
+	{
+		if (i >= 12 && i < 24) adam_cost->m_targetPts_weight[adam_cost->m_nCorrespond_adam2joints + i] = 5.0;  // larger weight for eyes
+		else adam_cost->m_targetPts_weight[adam_cost->m_nCorrespond_adam2joints + i] = 1.0;
+	}
 	ceres::Solver::Options options_init;
 	ceres::Solver::Summary summary;
 	SetSolverOptions(&options_init);
 	options_init.max_num_iterations = 20;
 	options_init.use_nonmonotonic_steps = false;
-	options_init.num_linear_solver_threads = 10;
+	options_init.num_threads = 10; // num_linear_solver_threads deprecated
 	options_init.minimizer_progress_to_stdout = verbose;
 	adam_cost->toggle_activate(false, false, false);
 	adam_cost->toggle_rigid_body(true);
@@ -909,7 +954,7 @@ const auto start = std::chrono::high_resolution_clock::now();
 		init_options.function_tolerance = 1e-4;
 		init_options.max_num_iterations = 20;
 		init_options.use_nonmonotonic_steps = true;
-		init_options.num_linear_solver_threads = 10;
+		init_options.num_threads = 10; // num_linear_solver_threads deprecated
 		init_options.minimizer_progress_to_stdout = true;
 		// if (quan) init_problem.SetParameterBlockConstant(frame_param.m_adam_coeffs.data());
 		adam_cost->toggle_activate(false, false, false);
@@ -967,7 +1012,7 @@ std::cout << "3D solve time: " << duration_solve * 1e-6 << "\n";
 	options.function_tolerance = 1e-4;
 	options.max_num_iterations = 30;
 	options.use_nonmonotonic_steps = true;
-	options.num_linear_solver_threads = 10;
+	options.num_threads = 10; // num_linear_solver_threads deprecated
 	options.minimizer_progress_to_stdout = true;
 	adam_cost->toggle_activate(false, false, false);
 	adam_cost->toggle_rigid_body(true);
@@ -1076,7 +1121,7 @@ void Adam_Fit_H36M(TotalModel &adam,
 	init_options.function_tolerance = 1e-4;
 	init_options.max_num_iterations = 30;
 	init_options.use_nonmonotonic_steps = true;
-	init_options.num_linear_solver_threads = 10;
+	init_options.num_threads = 10; // num_linear_solver_threads deprecated
 	init_options.minimizer_progress_to_stdout = true;
 	adam_cost->toggle_activate(false, false, false);
 	adam_cost->toggle_rigid_body(true);
@@ -1138,7 +1183,7 @@ void Adam_skeletal_refit(TotalModel &adam,
 	options.function_tolerance = 1e-4;
 	options.max_num_iterations = 30;
 	options.use_nonmonotonic_steps = true;
-	options.num_linear_solver_threads = 10;
+	options.num_threads = 10; // num_linear_solver_threads deprecated
 	options.minimizer_progress_to_stdout = true;
 
 	//Body Prior (coef) //////////////////////////////////////////////////////////////////////////
@@ -1221,7 +1266,7 @@ void Adam_skeletal_refit(TotalModel &adam,
 	options_new.function_tolerance = 1e-4;
 	options_new.max_num_iterations = 30;
 	options_new.use_nonmonotonic_steps = true;
-	options_new.num_linear_solver_threads = 10;
+	options_new.num_threads = 10; // num_linear_solver_threads deprecated
 	options_new.minimizer_progress_to_stdout = true;
 	adam_cost_new->toggle_activate(true, true, false);
 	ceres::Solve(options_new, &problem_new, &summary_new);
@@ -1260,7 +1305,7 @@ void Adam_skeletal_init(TotalModel &adam,
 	options.function_tolerance = 1e-4;
 	options.max_num_iterations = 30;
 	options.use_nonmonotonic_steps = false;
-	options.num_linear_solver_threads = 10;
+	options.num_threads = 10; // num_linear_solver_threads deprecated
 	options.minimizer_progress_to_stdout = true;
 
 	adam_cost->toggle_activate(false, false, false);

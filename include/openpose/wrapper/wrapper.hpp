@@ -221,10 +221,12 @@ namespace op
         TWorker spWScaleAndSizeExtractor;
         TWorker spWCvMatToOpInput;
         TWorker spWCvMatToOpOutput;
-        TWorker mFirstQueueOrderer;
-        std::vector<std::vector<TWorker>> spWJointAngleEstimations;
         std::vector<std::vector<TWorker>> spWPoseExtractors;
+        TWorker mWQueueOrdererTriangulation;
+        std::vector<std::vector<TWorker>> spWPoseTriangulations;
         std::vector<TWorker> mPostProcessingWs;
+        TWorker mWQueueOrdererJointAngle;
+        std::vector<std::vector<TWorker>> spWJointAngleEstimations;
         std::vector<TWorker> mUserPostProcessingWs;
         std::vector<TWorker> mOutputWs;
         TWorker spWGui;
@@ -826,6 +828,19 @@ namespace op
                         error("Unknown RenderMode.", __LINE__, __FUNCTION__, __FILE__);
                 }
 
+                // 3-D reconstruction
+                spWPoseTriangulations.clear();
+                if (wrapperStructExtra.reconstruct3d)
+                {
+                    spWPoseTriangulations.resize(2*spWPoseExtractors.size());
+                    if (spWPoseTriangulations.size() > 1)
+                        mWQueueOrdererTriangulation = std::make_shared<WQueueOrderer<TDatumsPtr>>();
+                    for (auto i = 0u ; i < spWPoseTriangulations.size() ; i++)
+                    {
+                        const auto poseTriangulation = std::make_shared<PoseTriangulation>(wrapperStructExtra.minViews3d);
+                        spWPoseTriangulations.at(i) = {std::make_shared<WPoseTriangulation<TDatumsPtr>>(poseTriangulation)};
+                    }
+                }
                 // Itermediate workers (e.g. OpenPose format to cv::Mat, json & frames recorder, ...)
                 mPostProcessingWs.clear();
                 // Frame buffer and ordering
@@ -839,14 +854,6 @@ namespace op
                 //         std::make_shared<WPersonIdExtractor<TDatumsPtr>>(personIdExtractor)
                 //     );
                 // }
-                // 3-D reconstruction
-                if (wrapperStructExtra.reconstruct3d)
-                {
-                    const auto poseTriangulation = std::make_shared<PoseTriangulation>(wrapperStructExtra.minViews3d);
-                    mPostProcessingWs.emplace_back(
-                        std::make_shared<WPoseTriangulation<TDatumsPtr>>(poseTriangulation)
-                    );
-                }
                 // Frames processor (OpenPose format -> cv::Mat format)
                 if (renderOutput)
                 {
@@ -871,10 +878,12 @@ namespace op
             }
 
             // IK/Adam
+            spWJointAngleEstimations.clear();
             if (wrapperStructExtra.ikThreads > 0)
             {
-                spWJointAngleEstimations.clear();
                 spWJointAngleEstimations.resize(wrapperStructExtra.ikThreads);
+                if (spWJointAngleEstimations.size() > 1)
+                    mWQueueOrdererJointAngle = std::make_shared<WQueueOrderer<TDatumsPtr>>();
 
                 // Pose extractor(s)
                 for (auto i = 0u; i < spWJointAngleEstimations.size(); i++)
@@ -886,8 +895,9 @@ namespace op
                 }
             }
 
+            // Output workers
             mOutputWs.clear();
-            if (spWPoseExtractors.size() > 1u)
+            if (spWJointAngleEstimations.size() > 1u)
                 mOutputWs.emplace_back(std::make_shared<WQueueOrderer<TDatumsPtr>>());
             // Write people pose data on disk (json for OpenCV >= 3, xml, yml...)
             if (!writeKeypointCleaned.empty())
@@ -940,9 +950,9 @@ namespace op
                                             : producerFps);
             if (!wrapperStructOutput.writeVideo.empty())
             {
-                if (oPProducer)
+                if (!oPProducer)
                     error("Video file can only be recorded inside `wrapper/wrapper.hpp` if the producer"
-                          " is one of the default ones (e.g. video, webcam, images, ...).",
+                          " is one of the default ones (e.g. video, webcam, ...).",
                           __LINE__, __FUNCTION__, __FILE__);
                 if (finalOutputSize.x <= 0 || finalOutputSize.y <= 0)
                     error("Video can only be recorded if outputSize is fixed (e.g. video, webcam, IP camera),"
@@ -1217,8 +1227,10 @@ namespace op
             spWCvMatToOpInput = nullptr;
             spWCvMatToOpOutput = nullptr;
             spWPoseExtractors.clear();
-            mFirstQueueOrderer = nullptr;
+            mWQueueOrdererTriangulation = nullptr;
+            spWPoseTriangulations.clear();
             mPostProcessingWs.clear();
+            mWQueueOrdererJointAngle = nullptr;
             spWJointAngleEstimations.clear();
             mUserPostProcessingWs.clear();
             mOutputWs.clear();
@@ -1334,6 +1346,28 @@ namespace op
                 queueIn++;
                 queueOut++;
             }
+            // Adam/IK step
+            if (!spWPoseTriangulations.empty())
+            {
+                if (mMultiThreadEnabled)
+                {
+                    if (mWQueueOrdererTriangulation != nullptr)
+                        mThreadManager.add(mThreadId, mWQueueOrdererTriangulation, queueIn++, queueOut++);
+                    for (auto& wPoseTriangulations : spWPoseTriangulations)
+                    {
+                        mThreadManager.add(mThreadId, wPoseTriangulations, queueIn, queueOut);
+                        threadIdPP();
+                    }
+                }
+                else
+                {
+                    if (spWPoseTriangulations.size() > 1)
+                        log("Multi-threading disabled, only 1 thread running for IK.", Priority::High);
+                    mThreadManager.add(mThreadId, spWPoseTriangulations.at(0), queueIn, queueOut);
+                }
+                queueIn++;
+                queueOut++;
+            }
             // Post processing workers
             if (!mPostProcessingWs.empty())
             {
@@ -1342,12 +1376,12 @@ namespace op
                 threadIdPP();
             }
             // Adam/IK step
-            if (mFirstQueueOrderer != nullptr && !spWJointAngleEstimations.empty())
-                mThreadManager.add(mThreadId, mFirstQueueOrderer, queueIn++, queueOut++);
             if (!spWJointAngleEstimations.empty())
             {
                 if (mMultiThreadEnabled)
                 {
+                    if (mWQueueOrdererJointAngle != nullptr)
+                        mThreadManager.add(mThreadId, mWQueueOrdererJointAngle, queueIn++, queueOut++);
                     for (auto& wJointAngleEstimator : spWJointAngleEstimations)
                     {
                         mThreadManager.add(mThreadId, wJointAngleEstimator, queueIn, queueOut);

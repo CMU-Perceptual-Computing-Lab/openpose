@@ -561,7 +561,7 @@ namespace adam
             DrawSkeleton(pData->resultJoint, pData->vis_type, pData->connMat[pData->vis_type]);
         }
         // Show the face keypoints
-        if (pData->faceKeypoints.size() > 0)
+        if (options.show_joint && pData->faceKeypoints.size() > 0)
         {
             glColor3ub(0u, 255u, 255u);
             assert(pData->faceKeypoints.cols() == 3);

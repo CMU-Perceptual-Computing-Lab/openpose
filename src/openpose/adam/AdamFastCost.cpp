@@ -333,6 +333,7 @@ bool AdamFullCost::Evaluate(double const* const* parameters,
     const T* t = parameters[0];
     const T* p_eulers = parameters[1];
     const T* c = parameters[2];
+    const T* face_coeff = fit_face_exp? parameters[3]: nullptr;
 
     Map< const Vector3d > t_vec(t);
     Map< const Matrix<double, Dynamic, 1> > c_bodyshape(c, TotalModel::NUM_SHAPE_COEFFICIENTS);
@@ -396,14 +397,16 @@ bool AdamFullCost::Evaluate(double const* const* parameters,
     MatrixXdr outVert(total_vertex.size(), 3);
     Map<MatrixXdr> dVdP(dVdP_data, 3 * total_vertex.size(), TotalModel::NUM_POSE_PARAMETERS);
     Map<MatrixXdr> dVdc(dVdc_data, 3 * total_vertex.size(), TotalModel::NUM_SHAPE_COEFFICIENTS);
+    Map<MatrixXdr> dVdfc(dVdfc_data, 3 * total_vertex.size(), TotalModel::NUM_EXP_BASIS_COEFFICIENTS);
 // const auto start_LBS = std::chrono::high_resolution_clock::now();
-    if (jacobians) select_lbs(c, transforms_joint, dTrdP, dTrdc, outVert, dVdP_data, dVdc_data);
-    else select_lbs(c, transforms_joint, outVert);
+    if (jacobians) select_lbs(c, transforms_joint, dTrdP, dTrdc, outVert, dVdP_data, dVdc_data, face_coeff, dVdfc_data);
+    else select_lbs(c, transforms_joint, outVert, face_coeff);
 // const auto duration_LBS = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start_LBS).count();
     outVert.rowwise() += t_vec.transpose();
     std::array<double*, 3> out_data{{ outJoint.data(), outVert.data(), nullptr }};
     std::array<Map<MatrixXdr>*, 3> dodP = {{ &dTJdP, &dVdP, nullptr }};  // array of reference is not allowed, only array of pointer
     std::array<Map<MatrixXdr>*, 3> dodc = {{ &dTJdc, &dVdc, nullptr }};
+    std::array<Map<MatrixXdr>*, 3> dodfc = {{ nullptr, &dVdfc, nullptr }};
 
     // 2nd step: compute the target joints (copy from FK)
 // const auto start_target = std::chrono::high_resolution_clock::now();
@@ -411,6 +414,7 @@ bool AdamFullCost::Evaluate(double const* const* parameters,
     VectorXd tempJoints(3 * (m_nCorrespond_adam2joints + m_nCorrespond_adam2pts));
     Map<MatrixXdr> dOdP(dOdP_data, 3 * (m_nCorrespond_adam2joints + m_nCorrespond_adam2pts), TotalModel::NUM_POSE_PARAMETERS);
     Map<MatrixXdr> dOdc(dOdc_data, 3 * (m_nCorrespond_adam2joints + m_nCorrespond_adam2pts), TotalModel::NUM_SHAPE_COEFFICIENTS);
+    Map<MatrixXdr> dOdfc(dOdfc_data, 3 * (m_nCorrespond_adam2joints + m_nCorrespond_adam2pts), TotalModel::NUM_EXP_BASIS_COEFFICIENTS);
     if (regressor_type == 0)
     {
         for (int i = 0; i < fit_data_.adam.m_indices_jointConst_adamIdx.rows(); i++)
@@ -470,6 +474,12 @@ bool AdamFullCost::Evaluate(double const* const* parameters,
                       dOdP.data() + 3 * offset * TotalModel::NUM_POSE_PARAMETERS);
             std::copy(dVdc_data, dVdc_data + 3 * corres_vertex2targetpt.size() * TotalModel::NUM_SHAPE_COEFFICIENTS,
                       dOdc.data() + 3 * offset * TotalModel::NUM_SHAPE_COEFFICIENTS);
+
+            if (fit_face_exp)
+            {
+                std::fill(dOdfc_data, dOdfc_data + 3 * m_nCorrespond_adam2joints * TotalModel::NUM_EXP_BASIS_COEFFICIENTS, 0.0);
+                std::copy(dVdfc_data, dVdfc_data + 3 * m_nCorrespond_adam2pts * TotalModel::NUM_EXP_BASIS_COEFFICIENTS, dOdfc_data + 3 * m_nCorrespond_adam2joints * TotalModel::NUM_EXP_BASIS_COEFFICIENTS);
+            }
         }
     }
     else if (regressor_type == 1) // use Human 3.6M regressor
@@ -515,6 +525,11 @@ bool AdamFullCost::Evaluate(double const* const* parameters,
             }
             dodP[2] = &dOdP;
             dodc[2] = &dOdc;
+            if (fit_face_exp)
+            {
+                std::fill(dOdfc_data, dOdfc_data + 3 * m_nCorrespond_adam2joints * TotalModel::NUM_EXP_BASIS_COEFFICIENTS, 0.0);
+                std::copy(dVdfc_data, dVdfc_data + 3 * m_nCorrespond_adam2pts * TotalModel::NUM_EXP_BASIS_COEFFICIENTS, dOdfc_data + 3 * m_nCorrespond_adam2joints * TotalModel::NUM_EXP_BASIS_COEFFICIENTS);
+            }
         }
     }
 // const auto duration_target = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start_target).count();
@@ -756,17 +771,45 @@ bool AdamFullCost::Evaluate(double const* const* parameters,
 
             if (rigid_body)
                 dr_dPose.block(0, 3, m_nResiduals, TotalModel::NUM_POSE_PARAMETERS - 3).setZero();
+
+            if (freeze_missing)
+            {
+                // used for the demo, when a joint target (smc) is missing, freeze the parent joint angle.
+                for (int ic = 0; ic < fit_data_.adam.m_indices_jointConst_adamIdx.rows(); ic++)
+                {
+                    const int smcjoint = fit_data_.adam.m_indices_jointConst_smcIdx(ic);
+                    const int adam_index = fit_data_.adam.m_parent[fit_data_.adam.m_indices_jointConst_adamIdx(ic)];
+                    if (fit_data_.bodyJoints.col(smcjoint).isZero(0)) dr_dPose.block(0, 3 * adam_index, m_nResiduals, 3).setZero();
+                }
+
+                for (int ic = 0; ic < fit_data_.adam.m_correspond_adam2lHand_adamIdx.rows(); ic++)
+                {
+                    const int smcjoint = fit_data_.adam.m_correspond_adam2lHand_lHandIdx(ic);
+                    const int adam_index = fit_data_.adam.m_parent[fit_data_.adam.m_correspond_adam2lHand_adamIdx(ic)];
+                    if (fit_data_.lHandJoints.col(smcjoint).isZero(0)) dr_dPose.block(0, 3 * adam_index, m_nResiduals, 3).setZero();
+                }
+
+                for (int ic = 0; ic < fit_data_.adam.m_correspond_adam2rHand_adamIdx.rows(); ic++)
+                {
+                    const int smcjoint = fit_data_.adam.m_correspond_adam2rHand_rHandIdx(ic);
+                    const int adam_index = fit_data_.adam.m_parent[fit_data_.adam.m_correspond_adam2rHand_adamIdx(ic)];
+                    if (fit_data_.rHandJoints.col(smcjoint).isZero(0)) dr_dPose.block(0, 3 * adam_index, m_nResiduals, 3).setZero();
+                }
+            }
+        }
+
+        if (rigid_body)
+        {
+            if (jacobians[2])
+                std::fill(jacobians[2], jacobians[2] + m_nResiduals * TotalModel::NUM_SHAPE_COEFFICIENTS, 0);
+            if (fit_face_exp && jacobians[3]) 
+                std::fill(jacobians[3], jacobians[3] + m_nResiduals * TotalModel::NUM_EXP_BASIS_COEFFICIENTS, 0);
+            return true;
         }
 
         if (jacobians[2])
         {
             Map< Matrix<double, Dynamic, Dynamic, RowMajor> > dr_dCoeff(jacobians[2], m_nResiduals, TotalModel::NUM_SHAPE_COEFFICIENTS);    
-
-            if (rigid_body)
-            {
-                std::fill(dr_dCoeff.data(), dr_dCoeff.data() + dr_dCoeff.size(), 0); // dr_dCoeff.setZero();
-                return true;
-            }
 
             if (fit_data_.fit3D)
             {
@@ -835,6 +878,71 @@ bool AdamFullCost::Evaluate(double const* const* parameters,
             else
                 dr_dCoeff.block(offset_inner, 0, inner_dim[0], TotalModel::NUM_SHAPE_COEFFICIENTS).setZero();
         }
+
+        if (fit_face_exp && jacobians[3])
+        {
+            Map< Matrix<double, Dynamic, Dynamic, RowMajor> > dr_dfc(jacobians[3], m_nResiduals, TotalModel::NUM_EXP_BASIS_COEFFICIENTS);    
+
+            if (fit_data_.fit3D)
+            {
+                for (int i = 0; i < m_nCorrespond_adam2joints + m_nCorrespond_adam2pts; i++)
+                {
+                    if (targetPts[5 * i] == 0 && targetPts[5 * i + 1] == 0 && targetPts[5 * i + 2] == 0)
+                    {
+                        std::fill(dr_dfc.data() + res_dim * i * TotalModel::NUM_EXP_BASIS_COEFFICIENTS,
+                                  dr_dfc.data() + (3 + res_dim * i) * TotalModel::NUM_EXP_BASIS_COEFFICIENTS, 0);
+                    }
+                    else dr_dfc.block(res_dim * i, 0, 3, TotalModel::NUM_EXP_BASIS_COEFFICIENTS) = m_targetPts_weight[i] *
+                        dOdfc.block(3 * i, 0, 3, TotalModel::NUM_EXP_BASIS_COEFFICIENTS);
+                }
+            }
+
+            if (fit_data_.fit2D)
+            {
+                Eigen::Map< Matrix<double, Dynamic, 3, RowMajor> > jointArray(tempJoints.data(), m_nCorrespond_adam2joints + m_nCorrespond_adam2pts, 3);
+                for (int i = 0; i < m_nCorrespond_adam2joints + m_nCorrespond_adam2pts; i++)
+                {
+                    if (targetPts[5 * i + 3] == 0 && targetPts[5 * i + 4] == 0)
+                    {
+                        std::fill(dr_dfc.data() + (start_2d_dim + res_dim * i) * TotalModel::NUM_EXP_BASIS_COEFFICIENTS,
+                                  dr_dfc.data() + (2 + start_2d_dim + res_dim * i) * TotalModel::NUM_EXP_BASIS_COEFFICIENTS, 0);
+                    }
+                    else projection_Derivative(dr_dfc.data(), dOdfc.data(), dr_dfc.cols(), (double*)(jointArray.data() + 3 * i), fit_data_.K,
+                                               res_dim * i + start_2d_dim, 3 * i, m_targetPts_weight[i]);
+                }
+            }
+
+            if (fit_data_.fitPAF)
+            {
+                const int offset = start_PAF;
+                for (auto i = 0; i < num_PAF_constraint; i++)
+                {
+                    if (fit_data_.PAF.col(i).isZero(0))
+                    {
+                        std::fill(dr_dfc.data() + (offset + 3 * i) * TotalModel::NUM_EXP_BASIS_COEFFICIENTS,
+                                  dr_dfc.data() + (offset + 3 * i + 3) * TotalModel::NUM_EXP_BASIS_COEFFICIENTS, 0);
+                        // dr_dCoeff.block(offset + 3 * i, 0, 3, TotalModel::NUM_SHAPE_COEFFICIENTS).setZero();
+                        continue;
+                    }
+                    if (out_data[PAF_connection[i][0]] == nullptr || out_data[PAF_connection[i][2]] == nullptr)
+                        continue;
+                    const std::array<double, 3> AB{{
+                        out_data[PAF_connection[i][2]][3 * PAF_connection[i][3] + 0] - out_data[PAF_connection[i][0]][3 * PAF_connection[i][1] + 0], 
+                        out_data[PAF_connection[i][2]][3 * PAF_connection[i][3] + 1] - out_data[PAF_connection[i][0]][3 * PAF_connection[i][1] + 1], 
+                        out_data[PAF_connection[i][2]][3 * PAF_connection[i][3] + 2] - out_data[PAF_connection[i][0]][3 * PAF_connection[i][1] + 2], 
+                    }};
+                    const auto length2 = AB[0] * AB[0] + AB[1] * AB[1] + AB[2] * AB[2];
+                    const auto length = sqrt(length2);
+                    const Eigen::Map< const Matrix<double, 3, 1> > AB_vec(AB.data());
+                    const Eigen::Matrix<double, 3, 3, RowMajor> dudJ = Eigen::Matrix<double, 3, 3>::Identity() / length - AB_vec * AB_vec.transpose() / length2 / length;
+                    dr_dfc.block(offset + 3 * i, 0, 3, TotalModel::NUM_EXP_BASIS_COEFFICIENTS) = PAF_weight[i] * dudJ * 
+                        ( dodfc[PAF_connection[i][2]]->block(3 * PAF_connection[i][3], 0, 3, TotalModel::NUM_EXP_BASIS_COEFFICIENTS) -
+                        dodfc[PAF_connection[i][0]]->block(3 * PAF_connection[i][1], 0, 3, TotalModel::NUM_EXP_BASIS_COEFFICIENTS) );
+                }
+            }
+
+            dr_dfc.block(start_inner, 0, inner_dim[0], TotalModel::NUM_EXP_BASIS_COEFFICIENTS).setZero();
+        }
     }
 // const auto duration_jacob = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start_jacob).count();
 // const auto duration_iter = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start_iter).count();
@@ -857,9 +965,9 @@ void AdamFullCost::select_lbs(
     const MatrixXdr &dTdc,
     MatrixXdr &outVert,
     double* dVdP_data,    //output
-    double* dVdc_data     //output
-    // MatrixXdr &dVdP,    //output
-    // MatrixXdr &dVdc     //output
+    double* dVdc_data,
+    const double* face_coeff,
+    double* dVdfc_data
 ) const
 {
     // read adam model and corres_vertex2targetpt from the class member
@@ -871,6 +979,8 @@ void AdamFullCost::select_lbs(
     const double* dTdP_data = dTdP.data();
     const double* dV0dc_data = fit_data_.adam.m_shapespace_u.data();
     const double* meanshape_data = fit_data_.adam.m_meanshape.data();
+    const double* face_basis_data = fit_data_.adam.m_dVdFaceEx.data();
+    if (fit_face_exp) assert(face_coeff != nullptr && dVdfc_data != nullptr);
 
     for (auto i = 0u; i < total_vertex.size(); i++)
     {
@@ -889,6 +999,16 @@ void AdamFullCost::select_lbs(
             v0_data[0] += dV0dc_data[ic * nrow + 3 * idv + 0] * c[ic];
             v0_data[1] += dV0dc_data[ic * nrow + 3 * idv + 1] * c[ic];
             v0_data[2] += dV0dc_data[ic * nrow + 3 * idv + 2] * c[ic];
+        }
+        if (fit_face_exp)
+        {
+            const int nrow = fit_data_.adam.m_dVdFaceEx.rows();
+            for(int ic = 0; ic < TotalModel::NUM_EXP_BASIS_COEFFICIENTS; ic++)
+            {
+                v0_data[0] += face_basis_data[ic * nrow + 3 * idv + 0] * face_coeff[ic];
+                v0_data[1] += face_basis_data[ic * nrow + 3 * idv + 1] * face_coeff[ic];
+                v0_data[2] += face_basis_data[ic * nrow + 3 * idv + 2] * face_coeff[ic];
+            }
         }
 
         auto* outVrow_data = outVert.data() + 3 * i;
@@ -963,6 +1083,28 @@ void AdamFullCost::select_lbs(
                 }
             }
         }
+
+        if (fit_face_exp)
+        {
+            const int idj = 15;
+            const double w = fit_data_.adam.m_blendW(idv, idj);
+            if (w)
+            {
+                const auto* const Trow_data = T.data() + 12 * idj;
+                const int ncolc = TotalModel::NUM_EXP_BASIS_COEFFICIENTS;
+                double* dVdfc_row0 = dVdfc_data + (i * 3 + 0) * ncolc;
+                double* dVdfc_row1 = dVdfc_data + (i * 3 + 1) * ncolc;
+                double* dVdfc_row2 = dVdfc_data + (i * 3 + 2) * ncolc;
+                for (int idc = 0; idc < TotalModel::NUM_EXP_BASIS_COEFFICIENTS; idc++) {
+                    dVdfc_row0[idc] = w * (face_basis_data[idc * nrow + idv * 3 + 0] * Trow_data[0 * 4 + 0] + face_basis_data[idc * nrow + idv * 3 + 1] * Trow_data[0 * 4 + 1] + face_basis_data[idc * nrow + idv * 3 + 2] * Trow_data[0 * 4 + 2]);
+                    dVdfc_row1[idc] = w * (face_basis_data[idc * nrow + idv * 3 + 0] * Trow_data[1 * 4 + 0] + face_basis_data[idc * nrow + idv * 3 + 1] * Trow_data[1 * 4 + 1] + face_basis_data[idc * nrow + idv * 3 + 2] * Trow_data[1 * 4 + 2]);
+                    dVdfc_row2[idc] = w * (face_basis_data[idc * nrow + idv * 3 + 0] * Trow_data[2 * 4 + 0] + face_basis_data[idc * nrow + idv * 3 + 1] * Trow_data[2 * 4 + 1] + face_basis_data[idc * nrow + idv * 3 + 2] * Trow_data[2 * 4 + 2]);
+                }
+            }
+            else std::fill(dVdfc_data + 3 * i * TotalModel::NUM_EXP_BASIS_COEFFICIENTS,
+                           dVdfc_data + 3 * (i + 1) * TotalModel::NUM_EXP_BASIS_COEFFICIENTS,
+                           0.0);
+        }
     }
 }
 
@@ -970,7 +1112,8 @@ void AdamFullCost::select_lbs(
 void AdamFullCost::select_lbs(
     const double* c,
     const Eigen::VectorXd& T,  // transformation
-    MatrixXdr &outVert
+    MatrixXdr &outVert,
+    const double* face_coeff
 ) const
 {
     // read adam model and total_vertex from the class member
@@ -980,6 +1123,8 @@ void AdamFullCost::select_lbs(
     // const Eigen::MatrixXd& dV0dc = fit_data_.adam.m_shapespace_u;
     const double* dV0dc_data = fit_data_.adam.m_shapespace_u.data();
     const double* meanshape_data = fit_data_.adam.m_meanshape.data();
+    const double* face_basis_data = fit_data_.adam.m_dVdFaceEx.data();
+    if (fit_face_exp) assert(face_coeff != nullptr);
 
     for (auto i = 0u; i < total_vertex.size(); i++)
     {
@@ -998,6 +1143,16 @@ void AdamFullCost::select_lbs(
             v0_data[0] += dV0dc_data[ic * nrow + 3 * idv + 0] * c[ic];
             v0_data[1] += dV0dc_data[ic * nrow + 3 * idv + 1] * c[ic];
             v0_data[2] += dV0dc_data[ic * nrow + 3 * idv + 2] * c[ic];
+        }
+        if (fit_face_exp)
+        {
+            const int nrow = fit_data_.adam.m_dVdFaceEx.rows();
+            for(int ic = 0; ic < TotalModel::NUM_EXP_BASIS_COEFFICIENTS; ic++)
+            {
+                v0_data[0] += face_basis_data[ic * nrow + 3 * idv + 0] * face_coeff[ic];
+                v0_data[1] += face_basis_data[ic * nrow + 3 * idv + 1] * face_coeff[ic];
+                v0_data[2] += face_basis_data[ic * nrow + 3 * idv + 2] * face_coeff[ic];
+            }
         }
 
         auto* outVrow_data = outVert.data() + 3 * i;
