@@ -85,7 +85,7 @@ class CoeffsParameterNormDiff: public ceres::CostFunction
 public:
 	CoeffsParameterNormDiff(int num_parameters): num_parameters_(num_parameters)
 	{
-		assert(num_parameters == TotalModel::NUM_SHAPE_COEFFICIENTS); // Adam model
+		assert(num_parameters == TotalModel::NUM_SHAPE_COEFFICIENTS || num_parameters == TotalModel::NUM_EXP_BASIS_COEFFICIENTS); // Adam model
 		CostFunction::set_num_residuals(num_parameters_);
 		CostFunction::mutable_parameter_block_sizes()->clear();
 		CostFunction::mutable_parameter_block_sizes()->push_back(num_parameters_);

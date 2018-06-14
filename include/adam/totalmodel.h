@@ -99,6 +99,7 @@ struct TotalModel
 
 	Eigen::Matrix<double, NUM_JOINTS * 3, 1> J_mu_;
 	Eigen::Matrix<double, Eigen::Dynamic, NUM_SHAPE_COEFFICIENTS, Eigen::RowMajor> dJdc_;
+	Eigen::VectorXd face_prior_A_exp;
 
 	const std::array<int, 19> h36m_jointConst_smcIdx{{ 14, 13, 12, 6, 7, 8, 11, 10, 9, 3, 4, 5, 0, 19, 1, 15, 17, 16, 18 }};
 

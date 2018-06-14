@@ -234,9 +234,10 @@ struct AdamFitData
 class AdamFullCost: public ceres::CostFunction
 {
 public:
-	AdamFullCost(const AdamFitData& fit_data, const int regressor_type=0) :
+	AdamFullCost(const AdamFitData& fit_data, const int regressor_type=0, const bool fit_face_exp=false):
 		res_dim(0), freeze_missing(true), fit_data_(fit_data), regressor_type(regressor_type), rigid_body(false), start_2d_dim(0),
-		num_PAF_constraint(fit_data.PAF.cols()), num_inner(fit_data.inner_weight.size()), total_inner_dim(0)
+		num_PAF_constraint(fit_data.PAF.cols()), num_inner(fit_data.inner_weight.size()), total_inner_dim(0),
+		dVdfc_data(nullptr), dOdfc_data(nullptr), fit_face_exp(fit_face_exp)
 	{
 		if (fit_data_.fit3D)
 		{
@@ -257,6 +258,7 @@ public:
 		inner_dim.push_back(3);
 		assert(inner_dim.size() == DEFINED_INNER_CONSTRAINTS);
 		assert(regressor_type >= 0 && regressor_type <= 2); // 0 for the default joints, 1 for Human3.6M regressor, 2 for COCO style output
+		if (fit_face_exp) assert(regressor_type == 0 || regressor_type == 2); // must have face constraints in order to fit face expression.
 
 		SetupCost();
 
@@ -275,9 +277,22 @@ public:
         dVdc_data = new double[3 * total_vertex.size() * TotalModel::NUM_SHAPE_COEFFICIENTS];
         dOdP_data = new double[3 * (m_nCorrespond_adam2joints + m_nCorrespond_adam2pts) * TotalModel::NUM_POSE_PARAMETERS];
         dOdc_data = new double[3 * (m_nCorrespond_adam2joints + m_nCorrespond_adam2pts) * TotalModel::NUM_SHAPE_COEFFICIENTS];
+        if(fit_face_exp)
+    	{
+    		dVdfc_data = new double[3 * total_vertex.size() * TotalModel::NUM_EXP_BASIS_COEFFICIENTS];
+	        dOdfc_data = new double[3 * (m_nCorrespond_adam2joints + m_nCorrespond_adam2pts) * TotalModel::NUM_EXP_BASIS_COEFFICIENTS];
+    	}
 	}
 
-	~AdamFullCost() {delete[] dVdc_data; delete[] dVdP_data; delete[] dOdP_data; delete[] dOdc_data;}
+	~AdamFullCost()
+	{
+		delete[] dVdc_data; delete[] dVdP_data; delete[] dOdP_data; delete[] dOdc_data;
+		if (fit_face_exp)
+		{
+			delete[] dVdfc_data;
+			delete[] dOdfc_data;
+		}
+	}
 
 	void SetupCost()
 	{
@@ -546,6 +561,7 @@ public:
 		parameter_block_sizes->push_back(3); // Translation
 		parameter_block_sizes->push_back(TotalModel::NUM_JOINTS * 3); // SMPL Pose  
 		parameter_block_sizes->push_back(TotalModel::NUM_SHAPE_COEFFICIENTS); // SMPL Pose  
+		if (fit_face_exp) parameter_block_sizes->push_back(TotalModel::NUM_EXP_BASIS_COEFFICIENTS); // facial expression
 	}
 
 	void SetupWeight()
@@ -816,15 +832,16 @@ public:
 		const MatrixXdr &dTdc,
 		MatrixXdr &outVert,
 	    double* dVdP_data,    //output
-	    double* dVdc_data     //output
-		// MatrixXdr &dVdP,	//output
-		// MatrixXdr &dVdc     //output
+	    double* dVdc_data,     //output
+	    const double* face_coeff,
+	    double* dVdfc_data
 	) const;
 
 	void select_lbs(
 	    const double* c,
 	    const Eigen::VectorXd& T,  // transformation
-	    MatrixXdr &outVert
+	    MatrixXdr &outVert,
+	    const double* face_coeff
 	) const;
 
 	void SparseRegress(const Eigen::SparseMatrix<double>& reg, const double* V_data, const double* dVdP_data, const double* dVdc_data,
@@ -874,6 +891,9 @@ private:
 	double* dVdc_data;
 	double* dOdP_data;
 	double* dOdc_data;
+	double* dVdfc_data;
+	double* dOdfc_data;
 
 	std::map<int, int> map_regressor_to_constraint;
+	const bool fit_face_exp;
 };

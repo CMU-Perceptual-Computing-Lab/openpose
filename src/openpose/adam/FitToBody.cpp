@@ -636,13 +636,14 @@ void Adam_FastFit_Initialize(const TotalModel &adam,
 	// std::fill(PAF.data(), PAF.data() + PAF.size(), 0);
 	const AdamFitData data(adam, BodyJoints, rFoot, lFoot, faceJoints, lHandJoints, rHandJoints, PAF, true);
 	ceres::Problem problem_init;
-	AdamFullCost* adam_cost = new AdamFullCost(data);
+	AdamFullCost* adam_cost = new AdamFullCost(data, 0, true);
 
 	problem_init.AddResidualBlock(adam_cost,
 		NULL,
 		frame_param.m_adam_t.data(),
 		frame_param.m_adam_pose.data(),
-		frame_param.m_adam_coeffs.data());	
+		frame_param.m_adam_coeffs.data(),
+		frame_param.m_adam_facecoeffs_exp.data());	
 
 	//Body Prior (coef) //////////////////////////////////////////////////////////////////////////
 	CoeffsParameterNormDiff* cost_prior_body_coeffs_init = new CoeffsParameterNormDiff(TotalModel::NUM_SHAPE_COEFFICIENTS);
@@ -663,7 +664,17 @@ void Adam_FastFit_Initialize(const TotalModel &adam,
 	problem_init.AddResidualBlock(cost_prior_body_pose_init,
 		loss_weight_prior_body_pose_init,
 		frame_param.m_adam_pose.data());
-	for (int j = 0; j < 21 * 3; j++) cost_prior_body_pose_init->weight[j] *= 2;
+
+	//Face regularization
+	ceres::NormalPrior *cost_prior_face_exp = new ceres::NormalPrior(adam.face_prior_A_exp.asDiagonal(), Eigen::Matrix<double, TotalModel::NUM_EXP_BASIS_COEFFICIENTS, 1>::Zero());
+	ceres::LossFunction *loss_weight_prior_face_exp = new ceres::ScaledLoss(NULL,
+		8,		//original
+		ceres::TAKE_OWNERSHIP);
+	problem_init.AddResidualBlock(cost_prior_face_exp,
+		loss_weight_prior_face_exp,
+		frame_param.m_adam_facecoeffs_exp.data());
+
+	for (int j = 0; j < 22 * 3; j++) cost_prior_body_pose_init->weight[j] *= 2;
 
 	if (freeze_missing)
 	{
@@ -675,12 +686,6 @@ void Adam_FastFit_Initialize(const TotalModel &adam,
             	std::fill(cost_prior_body_pose_init->weight.data() + 3 * adam_index,
             			  cost_prior_body_pose_init->weight.data() + 3 * adam_index + 3,
             			  0.0);
-            // if (BodyJoints.col(smcjoint).isZero(0))
-            // {
-            // 	FreezeJoint(problem_init, frame_param.m_adam_pose.data(), 3 * adam_index);
-            // 	FreezeJoint(problem_init, frame_param.m_adam_pose.data(), 3 * adam_index + 1);
-            // 	FreezeJoint(problem_init, frame_param.m_adam_pose.data(), 3 * adam_index + 2);
-            // }
         }
 
         for (int ic = 0; ic < adam.m_correspond_adam2lHand_adamIdx.rows(); ic++)
@@ -691,12 +696,6 @@ void Adam_FastFit_Initialize(const TotalModel &adam,
             	std::fill(cost_prior_body_pose_init->weight.data() + 3 * adam_index,
             			  cost_prior_body_pose_init->weight.data() + 3 * adam_index + 3,
             			  0.0);
-            // if (lHandJoints.col(smcjoint).isZero(0))
-            // {
-            // 	FreezeJoint(problem_init, frame_param.m_adam_pose.data(), 3 * adam_index);
-            // 	FreezeJoint(problem_init, frame_param.m_adam_pose.data(), 3 * adam_index + 1);
-            // 	FreezeJoint(problem_init, frame_param.m_adam_pose.data(), 3 * adam_index + 2);
-            // }
         }
 
         for (int ic = 0; ic < adam.m_correspond_adam2rHand_adamIdx.rows(); ic++)
@@ -707,19 +706,16 @@ void Adam_FastFit_Initialize(const TotalModel &adam,
             	std::fill(cost_prior_body_pose_init->weight.data() + 3 * adam_index,
             			  cost_prior_body_pose_init->weight.data() + 3 * adam_index + 3,
             			  0.0);
-            // if (rHandJoints.col(smcjoint).isZero(0))
-            // {
-            // 	FreezeJoint(problem_init, frame_param.m_adam_pose.data(), 3 * adam_index);
-            // 	FreezeJoint(problem_init, frame_param.m_adam_pose.data(), 3 * adam_index + 1);
-            // 	FreezeJoint(problem_init, frame_param.m_adam_pose.data(), 3 * adam_index + 2);
-            // }
         }
 	}
 	adam_cost->freeze_missing = freeze_missing;
 
 	// To include foot keypoints weights
-	for (int i = 0; i < 12; i++)
-		adam_cost->m_targetPts_weight[adam_cost->m_nCorrespond_adam2joints + i] = 1.0;
+	for (int i = 0; i < 12 + adam.m_correspond_adam2face70_adamIdx.rows(); i++)
+	{
+		if (i >= 12 && i < 24) adam_cost->m_targetPts_weight[adam_cost->m_nCorrespond_adam2joints + i] = 5.0;  // larger weight for eyes
+		else adam_cost->m_targetPts_weight[adam_cost->m_nCorrespond_adam2joints + i] = 1.0;
+	}
 	ceres::Solver::Options options_init;
 	ceres::Solver::Summary summary;
 	SetSolverOptions(&options_init);
