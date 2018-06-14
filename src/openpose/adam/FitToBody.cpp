@@ -628,10 +628,10 @@ void Adam_FastFit_Initialize(const TotalModel &adam,
 	const Eigen::MatrixXd &rHandJoints,	   //
 	const Eigen::MatrixXd &lHandJoints,		//
 	const Eigen::MatrixXd &faceJoints,
+	const bool freeze_missing,
 	const bool verbose)
 {
 	using namespace Eigen;
-	const bool freeze_missing = true;
 	MatrixXd PAF(3, 54);
 	// std::fill(PAF.data(), PAF.data() + PAF.size(), 0);
 	const AdamFitData data(adam, BodyJoints, rFoot, lFoot, faceJoints, lHandJoints, rHandJoints, PAF, true);
