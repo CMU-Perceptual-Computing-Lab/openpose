@@ -18,9 +18,8 @@ void SetSolverOptions(ceres::Solver::Options *options) {
 		&options->linear_solver_type));
 	CHECK(StringToPreconditionerType("jacobi",
 		&options->preconditioner_type));
-	options->num_linear_solver_threads = 4;
 	options->max_num_iterations = 15;
-	options->num_threads = 10;
+	options->num_threads = 10; // num_linear_solver_threads Deprecated
 	options->dynamic_sparsity = true;
 	options->use_nonmonotonic_steps = true;
 	CHECK(StringToTrustRegionStrategyType("levenberg_marquardt",
@@ -109,7 +108,7 @@ void FitToHandCeres_Right_Naive(
 	// options.function_tolerance = 1e-8;
 	// options.max_num_iterations = 50;
 	// options.use_nonmonotonic_steps = false;
-	// options.num_linear_solver_threads = 10;
+	// options.num_threads = 10; // num_threads deprecated
 	// options.minimizer_progress_to_stdout = true;
 	options.update_state_every_iteration = true;
 	options.max_num_iterations = 30;
@@ -209,7 +208,7 @@ void FitToProjectionCeres(
 	options_init.function_tolerance = 1e-8;
 	options_init.max_num_iterations = 30;
 	options_init.use_nonmonotonic_steps = true;
-	options_init.num_linear_solver_threads = 10;
+	options_init.num_threads = 10; // num_linear_solver_threads deprecated
 	options_init.minimizer_progress_to_stdout = true;
 
 	problem_init.SetParameterBlockConstant(parm_hand_coeffs.data());
@@ -272,7 +271,7 @@ void FitToProjectionCeres(
 	options.function_tolerance = 1e-8;
 	options.max_num_iterations = 30;
 	options.use_nonmonotonic_steps = true;
-	options.num_linear_solver_threads = 10;
+	options.num_threads = 10; // num_linear_solver_threads deprecated
 	options.minimizer_progress_to_stdout = true;
 
 	CHECK(StringToLinearSolverType("sparse_normal_cholesky",
@@ -337,7 +336,7 @@ void Adam_FitTotalBodyCeres(TotalModel &adam,
 	SetSolverOptions(&options_init);
 	options_init.max_num_iterations = 20;
 	options_init.use_nonmonotonic_steps = false;
-	options_init.num_linear_solver_threads = 10;
+	options_init.num_threads = 10; // num_linear_solver_threads deprecated
 	options_init.minimizer_progress_to_stdout = true;
 	adam_cost->toggle_activate(false, false, false);
 	adam_cost->toggle_rigid_body(true);
@@ -382,7 +381,7 @@ void Adam_FitTotalBodyCeres2d(TotalModel &adam,
 	options_init.function_tolerance = 1e-4;
 	options_init.max_num_iterations = 20;
 	options_init.use_nonmonotonic_steps = false;
-	options_init.num_linear_solver_threads = 10;
+	options_init.num_threads = 10; // num_linear_solver_threads deprecated
 	options_init.minimizer_progress_to_stdout = true;
 	cost_body_keypoints_init->joint_only = true;
 	// Pure Translation, fit body only!
@@ -478,7 +477,7 @@ void Adam_FitTotalBodyCeres2d(TotalModel &adam,
 	// problem.SetParameterBlockConstant(frame_param.m_adam_facecoeffs_exp.data());
 	options.max_num_iterations = 10;
 	options.use_nonmonotonic_steps = false;
-	options.num_linear_solver_threads = 10;
+	options.num_threads = 10; // num_linear_solver_threads deprecated
 	options.minimizer_progress_to_stdout = true;
 	cost_body_keypoints->joint_only = false;
 	ceres::Solve(options, &problem, &summary);
@@ -515,7 +514,7 @@ void Adam_FitTotalBodyCeres3d2d(TotalModel &adam,
 	options_init.function_tolerance = 1e-4;
 	options_init.max_num_iterations = 20;
 	options_init.use_nonmonotonic_steps = false;
-	options_init.num_linear_solver_threads = 10;
+	options_init.num_threads = 10; // num_linear_solver_threads deprecated
 	options_init.minimizer_progress_to_stdout = true;
 	cost_body_keypoints_init->joint_only = true;
 	// Pure Translation, fit body only!
@@ -612,7 +611,7 @@ void Adam_FitTotalBodyCeres3d2d(TotalModel &adam,
 	// problem.SetParameterBlockConstant(frame_param.m_adam_facecoeffs_exp.data());
 	options.max_num_iterations = 10;
 	options.use_nonmonotonic_steps = false;
-	options.num_linear_solver_threads = 10;
+	options.num_threads = 10; // num_linear_solver_threads deprecated
 	options.minimizer_progress_to_stdout = true;
 	cost_body_keypoints->joint_only = false;
 	cost_body_keypoints->weight2d = weight2d;
@@ -721,7 +720,7 @@ void Adam_FastFit_Initialize(const TotalModel &adam,
 	SetSolverOptions(&options_init);
 	options_init.max_num_iterations = 20;
 	options_init.use_nonmonotonic_steps = false;
-	options_init.num_linear_solver_threads = 10;
+	options_init.num_threads = 10; // num_linear_solver_threads deprecated
 	options_init.minimizer_progress_to_stdout = verbose;
 	adam_cost->toggle_activate(false, false, false);
 	adam_cost->toggle_rigid_body(true);
@@ -955,7 +954,7 @@ const auto start = std::chrono::high_resolution_clock::now();
 		init_options.function_tolerance = 1e-4;
 		init_options.max_num_iterations = 20;
 		init_options.use_nonmonotonic_steps = true;
-		init_options.num_linear_solver_threads = 10;
+		init_options.num_threads = 10; // num_linear_solver_threads deprecated
 		init_options.minimizer_progress_to_stdout = true;
 		// if (quan) init_problem.SetParameterBlockConstant(frame_param.m_adam_coeffs.data());
 		adam_cost->toggle_activate(false, false, false);
@@ -1013,7 +1012,7 @@ std::cout << "3D solve time: " << duration_solve * 1e-6 << "\n";
 	options.function_tolerance = 1e-4;
 	options.max_num_iterations = 30;
 	options.use_nonmonotonic_steps = true;
-	options.num_linear_solver_threads = 10;
+	options.num_threads = 10; // num_linear_solver_threads deprecated
 	options.minimizer_progress_to_stdout = true;
 	adam_cost->toggle_activate(false, false, false);
 	adam_cost->toggle_rigid_body(true);
@@ -1122,7 +1121,7 @@ void Adam_Fit_H36M(TotalModel &adam,
 	init_options.function_tolerance = 1e-4;
 	init_options.max_num_iterations = 30;
 	init_options.use_nonmonotonic_steps = true;
-	init_options.num_linear_solver_threads = 10;
+	init_options.num_threads = 10; // num_linear_solver_threads deprecated
 	init_options.minimizer_progress_to_stdout = true;
 	adam_cost->toggle_activate(false, false, false);
 	adam_cost->toggle_rigid_body(true);
@@ -1184,7 +1183,7 @@ void Adam_skeletal_refit(TotalModel &adam,
 	options.function_tolerance = 1e-4;
 	options.max_num_iterations = 30;
 	options.use_nonmonotonic_steps = true;
-	options.num_linear_solver_threads = 10;
+	options.num_threads = 10; // num_linear_solver_threads deprecated
 	options.minimizer_progress_to_stdout = true;
 
 	//Body Prior (coef) //////////////////////////////////////////////////////////////////////////
@@ -1267,7 +1266,7 @@ void Adam_skeletal_refit(TotalModel &adam,
 	options_new.function_tolerance = 1e-4;
 	options_new.max_num_iterations = 30;
 	options_new.use_nonmonotonic_steps = true;
-	options_new.num_linear_solver_threads = 10;
+	options_new.num_threads = 10; // num_linear_solver_threads deprecated
 	options_new.minimizer_progress_to_stdout = true;
 	adam_cost_new->toggle_activate(true, true, false);
 	ceres::Solve(options_new, &problem_new, &summary_new);
@@ -1306,7 +1305,7 @@ void Adam_skeletal_init(TotalModel &adam,
 	options.function_tolerance = 1e-4;
 	options.max_num_iterations = 30;
 	options.use_nonmonotonic_steps = false;
-	options.num_linear_solver_threads = 10;
+	options.num_threads = 10; // num_linear_solver_threads deprecated
 	options.minimizer_progress_to_stdout = true;
 
 	adam_cost->toggle_activate(false, false, false);
