@@ -20,6 +20,10 @@ namespace op
         // ---------------------------------------- ID parameters ---------------------------------------- //
         unsigned long long id; /**< Datum ID. Internally used to sort the Datums if multi-threading is used. */
 
+        unsigned long long subId; /**< Datum sub-ID. Internally used to sort the Datums if multi-threading is used. */
+
+        unsigned long long subIdMax; /**< Datum maximum sub-ID. Used to sort the Datums if multi-threading is used. */
+
         /**
          * Name used when saving the data to disk (e.g. `write_images` or `write_keypoint` flags in the demo).
          */
@@ -319,7 +323,8 @@ namespace op
          */
         inline bool operator<(const Datum& datum) const
         {
-            return id < datum.id;
+            // return id < datum.id;
+            return id < datum.id || (id == datum.id && subId < datum.subId);
         }
         /**
          * Greater comparison operator.
@@ -328,7 +333,8 @@ namespace op
          */
         inline bool operator>(const Datum& datum) const
         {
-            return id > datum.id;
+            // return id > datum.id;
+            return id > datum.id || (id == datum.id && subId > datum.subId);
         }
         /**
          * Less or equal comparison operator.
@@ -337,7 +343,8 @@ namespace op
          */
         inline bool operator<=(const Datum& datum) const
         {
-            return id <= datum.id;
+            // return id <= datum.id;
+            return id < datum.id || (id == datum.id && subId <= datum.subId);
         }
         /**
          * Greater or equal comparison operator.
@@ -346,7 +353,8 @@ namespace op
          */
         inline bool operator>=(const Datum& datum) const
         {
-            return id >= datum.id;
+            // return id >= datum.id;
+            return id > datum.id || (id == datum.id && subId >= datum.subId);
         }
         /**
          * Equal comparison operator.
@@ -355,7 +363,8 @@ namespace op
          */
         inline bool operator==(const Datum& datum) const
         {
-            return id == datum.id;
+            // return id == datum.id;
+            return id == datum.id && subId == datum.subId;
         }
         /**
          * Not equal comparison operator.
@@ -364,7 +373,8 @@ namespace op
          */
         inline bool operator!=(const Datum& datum) const
         {
-            return id != datum.id;
+            // return id != datum.id;
+            return id != datum.id || subId != datum.subId;
         }
     };
 

@@ -5,6 +5,8 @@ namespace op
 {
     Datum::Datum() :
         id{std::numeric_limits<unsigned long long>::max()},
+        subId{0},
+        subIdMax{0},
         poseIds{-1}
     {
     }
@@ -13,6 +15,8 @@ namespace op
     Datum::Datum(const Datum& datum) :
         // ID
         id{datum.id},
+        subId{datum.subId},
+        subIdMax{datum.subIdMax},
         name{datum.name},
         // Input image and rendered version
         cvInputData{datum.cvInputData},
@@ -68,6 +72,8 @@ namespace op
         {
             // ID
             id = datum.id;
+            subId = datum.subId;
+            subIdMax = datum.subIdMax;
             name = datum.name;
             // Input image and rendered version
             cvInputData = datum.cvInputData;
@@ -126,6 +132,8 @@ namespace op
     Datum::Datum(Datum&& datum) :
         // ID
         id{datum.id},
+        subId{datum.subId},
+        subIdMax{datum.subIdMax},
         // Other parameters
         scaleInputToOutput{datum.scaleInputToOutput},
         scaleNetToOutput{datum.scaleNetToOutput}
@@ -189,6 +197,8 @@ namespace op
         {
             // ID
             id = datum.id;
+            subId = datum.subId;
+            subIdMax = datum.subIdMax;
             std::swap(name, datum.name);
             // Input image and rendered version
             std::swap(cvInputData, datum.cvInputData);
@@ -253,6 +263,8 @@ namespace op
             Datum datum;
             // ID
             datum.id = id;
+            datum.subId = subId;
+            datum.subIdMax = subIdMax;
             datum.name = name;
             // Input image and rendered version
             datum.cvInputData = cvInputData.clone();
