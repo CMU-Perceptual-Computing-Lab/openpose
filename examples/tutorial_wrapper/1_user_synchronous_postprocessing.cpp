@@ -79,7 +79,7 @@ DEFINE_int32(num_gpu,                   -1,             "The number of GPU devic
                                                         " machine.");
 DEFINE_int32(num_gpu_start,             0,              "GPU device start number.");
 DEFINE_int32(keypoint_scale,            0,              "Scaling of the (x,y) coordinates of the final pose data array, i.e. the scale of the (x,y)"
-                                                        " coordinates that will be saved with the `write_keypoint` & `write_keypoint_json` flags."
+                                                        " coordinates that will be saved with the `write_json` & `write_keypoint` flags."
                                                         " Select `0` to scale it to the original source resolution; `1`to scale it to the net output"
                                                         " size (set with `net_resolution`); `2` to scale it to the final output size (set with"
                                                         " `resolution`); `3` to scale it in the range [0,1], where (0,0) would be the top-left"
@@ -229,9 +229,7 @@ DEFINE_string(write_heatmaps_format,    "png",          "File extension and form
 DEFINE_string(write_keypoint,           "",             "(Deprecated, use `write_json`) Directory to write the people pose keypoint data. Set format"
                                                         " with `write_keypoint_format`.");
 DEFINE_string(write_keypoint_format,    "yml",          "(Deprecated, use `write_json`) File extension and format for `write_keypoint`: json, xml,"
-                                                        " yaml & yml. Json not available for OpenCV < 3.0, use `write_keypoint_json` instead.");
-DEFINE_string(write_keypoint_json,      "",             "(Deprecated, use `write_json`) Directory to write people pose data in JSON format,"
-                                                        " compatible with any OpenCV version.");
+                                                        " yaml & yml. Json not available for OpenCV < 3.0, use `write_json` instead.");
 // Result Saving - Extra Algorithms
 DEFINE_string(write_video_adam,         "",             "Experimental, not available yet. E.g.: `~/Desktop/adamResult.avi`. Flag `camera_fps`"
                                                         " controls FPS.");
@@ -319,9 +317,8 @@ int openPoseDemo()
         // poseModel
         const auto poseModel = op::flagsToPoseModel(FLAGS_model_pose);
         // JSON saving
-        const auto writeJson = (!FLAGS_write_json.empty() ? FLAGS_write_json : FLAGS_write_keypoint_json);
-        if (!FLAGS_write_keypoint.empty() || !FLAGS_write_keypoint_json.empty())
-            op::log("Flags `write_keypoint` and `write_keypoint_json` are deprecated and will eventually be removed."
+        if (!FLAGS_write_keypoint.empty())
+            op::log("Flag `write_keypoint` is deprecated and will eventually be removed."
                     " Please, use `write_json` instead.", op::Priority::Max);
         // keypointScale
         const auto keypointScale = op::flagsToScaleMode(FLAGS_keypoint_scale);
@@ -349,42 +346,35 @@ int openPoseDemo()
         opWrapper.setWorkerPostProcessing(wUserPostProcessing, workerProcessingOnNewThread);
 
         // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
-        const op::WrapperStructPose wrapperStructPose{!FLAGS_body_disable, netInputSize, outputSize, keypointScale,
-                                                      FLAGS_num_gpu, FLAGS_num_gpu_start, FLAGS_scale_number,
-                                                      (float)FLAGS_scale_gap,
-                                                      op::flagsToRenderMode(FLAGS_render_pose, multipleView),
-                                                      poseModel, !FLAGS_disable_blending, (float)FLAGS_alpha_pose,
-                                                      (float)FLAGS_alpha_heatmap, FLAGS_part_to_show, FLAGS_model_folder,
-                                                      heatMapTypes, heatMapScale, FLAGS_part_candidates,
-                                                      (float)FLAGS_render_threshold, FLAGS_number_people_max,
-                                                      enableGoogleLogging};
+        const op::WrapperStructPose wrapperStructPose{
+            !FLAGS_body_disable, netInputSize, outputSize, keypointScale, FLAGS_num_gpu, FLAGS_num_gpu_start,
+            FLAGS_scale_number, (float)FLAGS_scale_gap, op::flagsToRenderMode(FLAGS_render_pose, multipleView),
+            poseModel, !FLAGS_disable_blending, (float)FLAGS_alpha_pose, (float)FLAGS_alpha_heatmap,
+            FLAGS_part_to_show, FLAGS_model_folder, heatMapTypes, heatMapScale, FLAGS_part_candidates,
+            (float)FLAGS_render_threshold, FLAGS_number_people_max, enableGoogleLogging};
         // Face configuration (use op::WrapperStructFace{} to disable it)
-        const op::WrapperStructFace wrapperStructFace{FLAGS_face, faceNetInputSize,
-                                                      op::flagsToRenderMode(FLAGS_face_render, multipleView, FLAGS_render_pose),
-                                                      (float)FLAGS_face_alpha_pose, (float)FLAGS_face_alpha_heatmap,
-                                                      (float)FLAGS_face_render_threshold};
+        const op::WrapperStructFace wrapperStructFace{
+            FLAGS_face, faceNetInputSize, op::flagsToRenderMode(FLAGS_face_render, multipleView, FLAGS_render_pose),
+            (float)FLAGS_face_alpha_pose, (float)FLAGS_face_alpha_heatmap, (float)FLAGS_face_render_threshold};
         // Hand configuration (use op::WrapperStructHand{} to disable it)
-        const op::WrapperStructHand wrapperStructHand{FLAGS_hand, handNetInputSize, FLAGS_hand_scale_number,
-                                                      (float)FLAGS_hand_scale_range, FLAGS_hand_tracking,
-                                                      op::flagsToRenderMode(FLAGS_hand_render, multipleView, FLAGS_render_pose),
-                                                      (float)FLAGS_hand_alpha_pose, (float)FLAGS_hand_alpha_heatmap,
-                                                      (float)FLAGS_hand_render_threshold};
+        const op::WrapperStructHand wrapperStructHand{
+            FLAGS_hand, handNetInputSize, FLAGS_hand_scale_number, (float)FLAGS_hand_scale_range, FLAGS_hand_tracking,
+            op::flagsToRenderMode(FLAGS_hand_render, multipleView, FLAGS_render_pose), (float)FLAGS_hand_alpha_pose,
+            (float)FLAGS_hand_alpha_heatmap, (float)FLAGS_hand_render_threshold};
         // Producer (use default to disable any input)
-        const op::WrapperStructInput wrapperStructInput{producerSharedPtr, FLAGS_frame_first, FLAGS_frame_last,
-                                                        FLAGS_process_real_time, FLAGS_frame_flip, FLAGS_frame_rotate,
-                                                        FLAGS_frames_repeat};
+        const op::WrapperStructInput wrapperStructInput{
+            producerSharedPtr, FLAGS_frame_first, FLAGS_frame_last, FLAGS_process_real_time, FLAGS_frame_flip, 
+            FLAGS_frame_rotate, FLAGS_frames_repeat};
         // Extra functionality configuration (use op::WrapperStructExtra{} to disable it)
-        const op::WrapperStructExtra wrapperStructExtra{FLAGS_3d, FLAGS_3d_min_views, FLAGS_identification,
-                                                        FLAGS_tracking, FLAGS_ik_threads};
+        const op::WrapperStructExtra wrapperStructExtra{
+            FLAGS_3d, FLAGS_3d_min_views, FLAGS_identification, FLAGS_tracking, FLAGS_ik_threads};
         // Consumer (comment or use default argument to disable any output)
-        const op::WrapperStructOutput wrapperStructOutput{op::flagsToDisplayMode(FLAGS_display, FLAGS_3d),
-                                                          !FLAGS_no_gui_verbose, FLAGS_fullscreen, FLAGS_write_keypoint,
-                                                          op::stringToDataFormat(FLAGS_write_keypoint_format),
-                                                          writeJson, FLAGS_write_coco_json, FLAGS_write_coco_foot_json,
-                                                          FLAGS_write_images, FLAGS_write_images_format, FLAGS_write_video,
-                                                          FLAGS_camera_fps, FLAGS_write_heatmaps,
-                                                          FLAGS_write_heatmaps_format, FLAGS_write_video_adam,
-                                                          FLAGS_write_bvh};
+        const op::WrapperStructOutput wrapperStructOutput{
+            op::flagsToDisplayMode(FLAGS_display, FLAGS_3d), !FLAGS_no_gui_verbose, FLAGS_fullscreen,
+            FLAGS_write_keypoint, op::stringToDataFormat(FLAGS_write_keypoint_format), FLAGS_write_json,
+            FLAGS_write_coco_json, FLAGS_write_coco_foot_json, FLAGS_write_images, FLAGS_write_images_format,
+            FLAGS_write_video, FLAGS_camera_fps, FLAGS_write_heatmaps, FLAGS_write_heatmaps_format,
+            FLAGS_write_video_adam, FLAGS_write_bvh};
         // Configure wrapper
         opWrapper.configure(wrapperStructPose, wrapperStructFace, wrapperStructHand, wrapperStructExtra,
                             wrapperStructInput, wrapperStructOutput);
@@ -396,8 +386,8 @@ int openPoseDemo()
         // Two different ways of running the program on multithread environment
         op::log("Starting thread(s)...", op::Priority::High);
         // Option a) Recommended - Also using the main thread (this thread) for processing (it saves 1 thread)
-        // Start, run & stop threads
-        opWrapper.exec();  // It blocks this thread until all threads have finished
+        // Start, run & stop threads - it blocks this thread until all others have finished
+        opWrapper.exec();
 
         // // Option b) Keeping this thread free in case you want to do something else meanwhile, e.g. profiling the GPU
         // memory

@@ -40,9 +40,9 @@ Since the Windows 10 Anniversary, Kinect 2.0 can be read as a normal webcam. All
 The following example runs the demo video `video.avi` and outputs JSON files in `output/`. Note: see [doc/output.md](./output.md) to understand the format of the JSON files.
 ```
 # Only body
-./build/examples/openpose/openpose.bin --video examples/media/video.avi --write_keypoint_json output/ --display 0 --render_pose 0
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --write_json output/ --display 0 --render_pose 0
 # Body + face + hands
-./build/examples/openpose/openpose.bin --video examples/media/video.avi --write_keypoint_json output/ --display 0 --render_pose 0 --face --hand
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --write_json output/ --display 0 --render_pose 0 --face --hand
 ```
 
 
@@ -50,7 +50,7 @@ The following example runs the demo video `video.avi` and outputs JSON files in 
 ## JSON Output + Rendered Images Saving
 The following example runs the demo video `video.avi`, renders image frames on `output/result.avi`, and outputs JSON files in `output/`. Note: see [doc/output.md](./output.md) to understand the format of the JSON files.
 ```
-./build/examples/openpose/openpose.bin --video examples/media/video.avi --write_video output/result.avi --write_keypoint_json output/
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --write_video output/result.avi --write_json output/
 ```
 
 
@@ -158,7 +158,7 @@ Each flag is divided into flag name, default value, and description.
 - DEFINE_string(output_resolution,        "-1x-1",        "The image resolution (display and output). Use \"-1x-1\" to force the program to use the input image resolution.");
 - DEFINE_int32(num_gpu,                   -1,             "The number of GPU devices to use. If negative, it will use all the available GPUs in your machine.");
 - DEFINE_int32(num_gpu_start,             0,              "GPU device start number.");
-- DEFINE_int32(keypoint_scale,            0,              "Scaling of the (x,y) coordinates of the final pose data array, i.e. the scale of the (x,y) coordinates that will be saved with the `write_keypoint` & `write_keypoint_json` flags. Select `0` to scale it to the original source resolution; `1`to scale it to the net output size (set with `net_resolution`); `2` to scale it to the final output size (set with `resolution`); `3` to scale it in the range [0,1], where (0,0) would be the top-left corner of the image, and (1,1) the bottom-right one; and 4 for range [-1,1], where (-1,-1) would be the top-left corner of the image, and (1,1) the bottom-right one. Non related with `scale_number` and `scale_gap`.");
+- DEFINE_int32(keypoint_scale,            0,              "Scaling of the (x,y) coordinates of the final pose data array, i.e. the scale of the (x,y) coordinates that will be saved with the `write_json` & `write_keypoint` flags. Select `0` to scale it to the original source resolution; `1`to scale it to the net output size (set with `net_resolution`); `2` to scale it to the final output size (set with `resolution`); `3` to scale it in the range [0,1], where (0,0) would be the top-left corner of the image, and (1,1) the bottom-right one; and 4 for range [-1,1], where (-1,-1) would be the top-left corner of the image, and (1,1) the bottom-right one. Non related with `scale_number` and `scale_gap`.");
 - DEFINE_int32(number_people_max,         -1,             "This parameter will limit the maximum number of people detected, by keeping the people with top scores. The score is based in person area over the image, body part score, as well as joint score (between each pair of connected body parts). Useful if you know the exact number of people in the scene, so it can remove false positives (if all the people have been detected. However, it might also include false negatives by removing very small or highly occluded people. -1 will keep them all.");
 
 4. OpenPose Body Pose
@@ -228,5 +228,4 @@ Each flag is divided into flag name, default value, and description.
 - DEFINE_string(write_heatmaps,           "",             "Directory to write body pose heatmaps in PNG format. At least 1 `add_heatmaps_X` flag must be enabled.");
 - DEFINE_string(write_heatmaps_format,    "png",          "File extension and format for `write_heatmaps`, analogous to `write_images_format`. For lossless compression, recommended `png` for integer `heatmaps_scale` and `float` for floating values.");
 - DEFINE_string(write_keypoint,           "",             "(Deprecated, use `write_json`) Directory to write the people pose keypoint data. Set format with `write_keypoint_format`.");
-- DEFINE_string(write_keypoint_format,    "yml",          "(Deprecated, use `write_json`) File extension and format for `write_keypoint`: json, xml, yaml & yml. Json not available for OpenCV < 3.0, use `write_keypoint_json` instead.");
-- DEFINE_string(write_keypoint_json,      "",             "(Deprecated, use `write_json`) Directory to write people pose data in JSON format, compatible with any OpenCV version.");
+- DEFINE_string(write_keypoint_format,    "yml",          "(Deprecated, use `write_json`) File extension and format for `write_keypoint`: json, xml, yaml & yml. Json not available for OpenCV < 3.0, use `write_json` instead.");

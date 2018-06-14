@@ -178,7 +178,7 @@ int openPoseTutorialThread2()
         op::log("Starting thread(s)...", op::Priority::High);
         // Two different ways of running the program on multithread environment
             // Option a) Using the main thread (this thread) for processing (it saves 1 thread, recommended)
-        threadManager.exec();  // It blocks this thread until all threads have finished
+        threadManager.exec();
             // Option b) Giving to the user the control of this thread
         // // VERY IMPORTANT NOTE: if OpenCV is compiled with Qt support, this option will not work. Qt needs the main
         // // thread to plot visual results, so the final GUI (which uses OpenCV) would return an exception similar to:
