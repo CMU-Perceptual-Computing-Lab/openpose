@@ -235,7 +235,7 @@ class AdamFullCost: public ceres::CostFunction
 {
 public:
 	AdamFullCost(const AdamFitData& fit_data, const int regressor_type=0) :
-		res_dim(0), fit_data_(fit_data), regressor_type(regressor_type), rigid_body(false), start_2d_dim(0),
+		res_dim(0), freeze_missing(true), fit_data_(fit_data), regressor_type(regressor_type), rigid_body(false), start_2d_dim(0),
 		num_PAF_constraint(fit_data.PAF.cols()), num_inner(fit_data.inner_weight.size()), total_inner_dim(0)
 	{
 		if (fit_data_.fit3D)
@@ -839,6 +839,7 @@ public:
 	int m_nCorrespond_adam2pts;
 	int m_nResiduals;
 	int res_dim;  // number of residuals per joint / vertex constraints
+	bool freeze_missing;
 
 private:
 	// input data

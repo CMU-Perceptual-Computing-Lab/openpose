@@ -756,6 +756,31 @@ bool AdamFullCost::Evaluate(double const* const* parameters,
 
             if (rigid_body)
                 dr_dPose.block(0, 3, m_nResiduals, TotalModel::NUM_POSE_PARAMETERS - 3).setZero();
+
+            if (freeze_missing)
+            {
+                // used for the demo, when a joint target (smc) is missing, freeze the parent joint angle.
+                for (int ic = 0; ic < fit_data_.adam.m_indices_jointConst_adamIdx.rows(); ic++)
+                {
+                    const int smcjoint = fit_data_.adam.m_indices_jointConst_smcIdx(ic);
+                    const int adam_index = fit_data_.adam.m_parent[fit_data_.adam.m_indices_jointConst_adamIdx(ic)];
+                    if (fit_data_.bodyJoints.col(smcjoint).isZero(0)) dr_dPose.block(0, 3 * adam_index, m_nResiduals, 3).setZero();
+                }
+
+                for (int ic = 0; ic < fit_data_.adam.m_correspond_adam2lHand_adamIdx.rows(); ic++)
+                {
+                    const int smcjoint = fit_data_.adam.m_correspond_adam2lHand_lHandIdx(ic);
+                    const int adam_index = fit_data_.adam.m_parent[fit_data_.adam.m_correspond_adam2lHand_adamIdx(ic)];
+                    if (fit_data_.lHandJoints.col(smcjoint).isZero(0)) dr_dPose.block(0, 3 * adam_index, m_nResiduals, 3).setZero();
+                }
+
+                for (int ic = 0; ic < fit_data_.adam.m_correspond_adam2rHand_adamIdx.rows(); ic++)
+                {
+                    const int smcjoint = fit_data_.adam.m_correspond_adam2rHand_rHandIdx(ic);
+                    const int adam_index = fit_data_.adam.m_parent[fit_data_.adam.m_correspond_adam2rHand_adamIdx(ic)];
+                    if (fit_data_.rHandJoints.col(smcjoint).isZero(0)) dr_dPose.block(0, 3 * adam_index, m_nResiduals, 3).setZero();
+                }
+            }
         }
 
         if (jacobians[2])

@@ -9,8 +9,8 @@
 
 void FreezeJoint(ceres::Problem& problem, double* dataPtr, int index)
 {
-	problem.SetParameterLowerBound(dataPtr, index, -0.00001);
-	problem.SetParameterUpperBound(dataPtr, index, 0.00001);
+	problem.SetParameterLowerBound(dataPtr, index, dataPtr[index]-0.00001);
+	problem.SetParameterUpperBound(dataPtr, index, dataPtr[index]+0.00001);
 }
 
 void SetSolverOptions(ceres::Solver::Options *options) {
@@ -631,6 +631,7 @@ void Adam_FastFit_Initialize(const TotalModel &adam,
 	const bool verbose)
 {
 	using namespace Eigen;
+	const bool freeze_missing = true;
 	MatrixXd PAF(3, 54);
 	// std::fill(PAF.data(), PAF.data() + PAF.size(), 0);
 	const AdamFitData data(adam, BodyJoints, rFoot, lFoot, faceJoints, lHandJoints, rHandJoints, PAF, true);
@@ -662,11 +663,60 @@ void Adam_FastFit_Initialize(const TotalModel &adam,
 	problem_init.AddResidualBlock(cost_prior_body_pose_init,
 		loss_weight_prior_body_pose_init,
 		frame_param.m_adam_pose.data());
+	for (int j = 0; j < 21 * 3; j++) cost_prior_body_pose_init->weight[j] *= 2;
 
-	adam_cost->m_targetPts_weight[adam_cost->m_nCorrespond_adam2joints + 0] = 
-	adam_cost->m_targetPts_weight[adam_cost->m_nCorrespond_adam2joints + 1] = 
-	adam_cost->m_targetPts_weight[adam_cost->m_nCorrespond_adam2joints + 2] = 1.0;
-	adam_cost->m_targetPts_weight[adam_cost->m_nCorrespond_adam2joints + 2] = 0;
+	if (freeze_missing)
+	{
+        for (int ic = 0; ic < adam.m_indices_jointConst_adamIdx.rows(); ic++)
+        {
+            const int smcjoint = adam.m_indices_jointConst_smcIdx(ic);
+            const int adam_index = adam.m_parent[adam.m_indices_jointConst_adamIdx(ic)];
+            if (BodyJoints.col(smcjoint).isZero(0))
+            	std::fill(cost_prior_body_pose_init->weight.data() + 3 * adam_index,
+            			  cost_prior_body_pose_init->weight.data() + 3 * adam_index + 3,
+            			  0.0);
+            // if (BodyJoints.col(smcjoint).isZero(0))
+            // {
+            // 	FreezeJoint(problem_init, frame_param.m_adam_pose.data(), 3 * adam_index);
+            // 	FreezeJoint(problem_init, frame_param.m_adam_pose.data(), 3 * adam_index + 1);
+            // 	FreezeJoint(problem_init, frame_param.m_adam_pose.data(), 3 * adam_index + 2);
+            // }
+        }
+
+        for (int ic = 0; ic < adam.m_correspond_adam2lHand_adamIdx.rows(); ic++)
+        {
+            const int smcjoint = adam.m_correspond_adam2lHand_lHandIdx(ic);
+            const int adam_index = adam.m_parent[adam.m_correspond_adam2lHand_adamIdx(ic)];
+            if (lHandJoints.col(smcjoint).isZero(0))
+            	std::fill(cost_prior_body_pose_init->weight.data() + 3 * adam_index,
+            			  cost_prior_body_pose_init->weight.data() + 3 * adam_index + 3,
+            			  0.0);
+            // if (lHandJoints.col(smcjoint).isZero(0))
+            // {
+            // 	FreezeJoint(problem_init, frame_param.m_adam_pose.data(), 3 * adam_index);
+            // 	FreezeJoint(problem_init, frame_param.m_adam_pose.data(), 3 * adam_index + 1);
+            // 	FreezeJoint(problem_init, frame_param.m_adam_pose.data(), 3 * adam_index + 2);
+            // }
+        }
+
+        for (int ic = 0; ic < adam.m_correspond_adam2rHand_adamIdx.rows(); ic++)
+        {
+            const int smcjoint = adam.m_correspond_adam2rHand_rHandIdx(ic);
+            const int adam_index = adam.m_parent[adam.m_correspond_adam2rHand_adamIdx(ic)];
+            if (rHandJoints.col(smcjoint).isZero(0))
+            	std::fill(cost_prior_body_pose_init->weight.data() + 3 * adam_index,
+            			  cost_prior_body_pose_init->weight.data() + 3 * adam_index + 3,
+            			  0.0);
+            // if (rHandJoints.col(smcjoint).isZero(0))
+            // {
+            // 	FreezeJoint(problem_init, frame_param.m_adam_pose.data(), 3 * adam_index);
+            // 	FreezeJoint(problem_init, frame_param.m_adam_pose.data(), 3 * adam_index + 1);
+            // 	FreezeJoint(problem_init, frame_param.m_adam_pose.data(), 3 * adam_index + 2);
+            // }
+        }
+	}
+	adam_cost->freeze_missing = freeze_missing;
+
 	// To include foot keypoints weights
 	for (int i = 0; i < 12; i++)
 		adam_cost->m_targetPts_weight[adam_cost->m_nCorrespond_adam2joints + i] = 1.0;
