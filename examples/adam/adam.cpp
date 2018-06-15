@@ -297,10 +297,11 @@ public:
                 // Add ASIO thing
                 const auto& totalPosition = datum.adamTranslation; // Eigen::Vector3d(3, 1)
                 const auto& jointAngles = datum.adamPose; // Eigen::Matrix<double, 62, 3, Eigen::RowMajor>
-                const float mouth_open = datum.mouthOpening; // datum.mouth_open;
-                const float leye_open = datum.rightEyeOpening; // datum.leye_open;
-                const float reye_open = datum.leftEyeOpening; // datum.reye_open;
-                const float dist_root_foot = datum.distanceRootFoot; // datum.dist_root_foot;
+                //const float mouth_open = datum.mouthOpening; // datum.mouth_open;
+                //const float leye_open = datum.rightEyeOpening; // datum.leye_open;
+                //const float reye_open = datum.leftEyeOpening; // datum.reye_open;
+                //const float dist_root_foot = datum.distanceRootFoot; // datum.dist_root_foot;
+                const auto adamFaceCoeffsExp = datum.adamFaceCoeffsExp; // Eigen::VectorXd resized to (200, 1)
                 // m_adam_t:
                 //     1. Total translation (centimeters) of the root in camera/global coordinate representation.
                 // m_adam_pose:
@@ -318,11 +319,20 @@ public:
                 }
                 jointAnglesString += "]";
 
-                std::string facialParamsString = "\"facialParams\":[" + std::to_string(mouth_open) + "," + std::to_string(leye_open) + "," + std::to_string(reye_open) + "]";
+                std::string facialParamsString = "\"facialParams\":[";
+                for (int i = 0; i < 200; i++){
+                    facialParamsString += std::to_string(adamFaceCoeffsExp(i));
+                    if (i != 200 - 1){
+                        facialParamsString += ",";
+                    }
+                }
+                facialParamsString += "]";
 
-                std::string rootHeightString = "\"rootHeight\":" + std::to_string(dist_root_foot);
+                //facialParamsString + std::to_string(mouth_open) + "," + std::to_string(leye_open) + "," + std::to_string(reye_open) + "]";
 
-                std::string data = prefix + "{" + rootHeightString + "," + facialParamsString + "," + totalPositionString + "," + jointAnglesString + "}";
+                //std::string rootHeightString = "\"rootHeight\":" + std::to_string(dist_root_foot);
+
+                std::string data = prefix + "{" + facialParamsString + "," + totalPositionString + "," + jointAnglesString + "}";
 
                 mUdpClient.send(data);
             }
