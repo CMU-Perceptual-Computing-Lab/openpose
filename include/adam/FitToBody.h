@@ -62,7 +62,8 @@ void Adam_FastFit_Initialize(const TotalModel &adam,
 	const bool freeze_missing=false,
 	const bool verbose=false,
 	const bool multistage=true,
-	const bool fit_face_exp=true);
+	const bool fit_face_exp=true,
+	const bool fast_solver=false);
 
 void Adam_FastFit(const TotalModel &adam,
 	smpl::SMPLParams &frame_param,

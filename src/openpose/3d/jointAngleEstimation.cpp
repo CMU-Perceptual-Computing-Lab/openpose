@@ -301,9 +301,13 @@ namespace op
                 // it would use the latest ones from the last Adam_FastFit
                 // Fit initialization
                 // Adam_FastFit_Initialize only changes frameParams
+                const auto fitFaceExponents = !faceKeypoints3D.empty();
+                const auto multistageFitting = true;
+                const auto fastSolver = true;
                 Adam_FastFit_Initialize(*spImpl->spTotalModel, frameParams, spImpl->mBodyJoints, spImpl->mRFootJoints,
                                         spImpl->mLFootJoints, spImpl->mRHandJoints, spImpl->mLHandJoints,
-                                        spImpl->mFaceJoints, spImpl->mFreezeMissing, spImpl->mCeresDisplayReport);
+                                        spImpl->mFaceJoints, spImpl->mFreezeMissing, spImpl->mCeresDisplayReport,
+                                        multistageFitting, fitFaceExponents, fastSolver);
                 // The following 2 operations takes ~12 msec
                 vtVec = spImpl->spTotalModel->m_meanshape
                       + spImpl->spTotalModel->m_shapespace_u * frameParams.m_adam_coeffs;

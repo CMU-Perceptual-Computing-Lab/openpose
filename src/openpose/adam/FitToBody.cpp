@@ -630,7 +630,8 @@ void Adam_FastFit_Initialize(const TotalModel &adam,
 	const bool freeze_missing,
 	const bool verbose,
 	const bool multistage,
-	const bool fit_face_exp)
+	const bool fit_face_exp,
+	const bool fast_solver)
 {
 // const auto start = std::chrono::high_resolution_clock::now();
 // const auto start1 = std::chrono::high_resolution_clock::now();
@@ -693,8 +694,9 @@ void Adam_FastFit_Initialize(const TotalModel &adam,
 	{
         for (int ic = 0; ic < adam.m_indices_jointConst_adamIdx.rows(); ic++)
         {
+        	// Only applied to arms (shoulder, elbow, wrist)
             const int smcjoint = adam.m_indices_jointConst_smcIdx(ic);
-        	if (smcjoint == 4 || smcjoint == 5 || smcjoint == 10 || smcjoint == 11)
+            if (smcjoint == 4 || smcjoint == 5 || smcjoint == 10 || smcjoint == 11)
             {
 	            const int adam_index = adam.m_parent[adam.m_indices_jointConst_adamIdx(ic)];
 	            if (BodyJoints.col(smcjoint).isZero(0))
@@ -735,9 +737,20 @@ void Adam_FastFit_Initialize(const TotalModel &adam,
 	ceres::Solver::Options options_init;
 	ceres::Solver::Summary summary;
 	SetSolverOptions(&options_init);
-	options_init.max_num_iterations = 20;
+	if (!fast_solver)
+		options_init.max_num_iterations = 20;
+	else
+	{
+		options_init.max_num_iterations = 4;
+		options_init.function_tolerance = 1e-3;
+		options_init.gradient_tolerance = 1e-5;
+		options_init.parameter_tolerance = 1e-5;
+		options_init.function_tolerance = 1e-3;
+		options_init.inner_iteration_tolerance = 1e-2;
+	}
 	options_init.use_nonmonotonic_steps = false;
-	options_init.num_threads = 10; // num_linear_solver_threads deprecated
+	// options_init.num_threads = 10; // num_linear_solver_threads deprecated
+options_init.num_threads = 1; // num_linear_solver_threads deprecated
 	options_init.minimizer_progress_to_stdout = verbose;
 
 	if (multistage)
@@ -765,6 +778,8 @@ void Adam_FastFit_Initialize(const TotalModel &adam,
 		if(verbose) std::cout << summary.FullReport() << std::endl;
 	}
 
+	if (fast_solver)
+		options_init.max_num_iterations = 16;
 // const auto duration4 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start4).count();
 // const auto start5 = std::chrono::high_resolution_clock::now();
 	adam_cost->toggle_activate(true, true, true);
