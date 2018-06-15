@@ -911,16 +911,19 @@ bool AdamFullCost::Evaluate(double const* const* parameters,
                 for (int ic = 0; ic < fit_data_.adam.m_indices_jointConst_adamIdx.rows(); ic++)
                 {
                     const int smcjoint = fit_data_.adam.m_indices_jointConst_smcIdx(ic);
-                    const int adam_index = fit_data_.adam.m_parent[indicesJointConstAdamIdxPtr[ic]];
-                    if (fit_data_.bodyJoints.col(smcjoint).isZero(0))
+                    if (smcjoint == 4 || smcjoint == 5 || smcjoint == 10 || smcjoint == 11)
                     {
-                        for (auto j = 0 ; j < m_nResiduals ; j++)
+                        const int adam_index = fit_data_.adam.m_parent[indicesJointConstAdamIdxPtr[ic]];
+                        if (fit_data_.bodyJoints.col(smcjoint).isZero(0))
                         {
-                            std::fill(jac1 + j*jac1Cols + 3 * adam_index,
-                                      jac1 + j*jac1Cols + 3 * adam_index + 3, 0.0);
+                            for (auto j = 0 ; j < m_nResiduals ; j++)
+                            {
+                                std::fill(jac1 + j*jac1Cols + 3 * adam_index,
+                                          jac1 + j*jac1Cols + 3 * adam_index + 3, 0.0);
+                            }
+                            // // Vectorized (slower) equivalent of above code
+                            // dr_dPose.block(0, 3 * adam_index, m_nResiduals, 3).setZero();
                         }
-                        // // Vectorized (slower) equivalent of above code
-                        // dr_dPose.block(0, 3 * adam_index, m_nResiduals, 3).setZero();
                     }
                 }
 
