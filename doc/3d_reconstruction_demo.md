@@ -81,11 +81,7 @@ There are 2 alternatives to calibrate the cameras:
 
 
 ## Camera Ordering
-In order to verify that the camera parameters introduced by the user are sorted in the same way that OpenPose reads the cameras, make sure of the following points:
-
-1. Initially, introduce the camera parameters sorted by serial number. By default (in Spinnaker 1.8), they are sorted by serial number.
-2. When the program is run, OpenPose displays the camera serial number associated to each index of each detected camera. If the number of cameras detected is different to the number of actual cameras, make sure the hardware is properly connected and the camera leds are on.
-3. Make sure that the order in which you introduced your camera parameters matches this index ordering displayed by OpenPose. Again, it should be sorted by serial number, but different Spinnaker versions might work differently.
+OpenPose will display the cameras sorted by serial number, starting in the left with the image corresponding to the lowest serial number. When the program is run, OpenPose displays the camera serial number associated to each index of each detected camera. If the number of cameras detected is different to the number of actual cameras, make sure the hardware is properly connected and the camera leds are on.
 
 
 

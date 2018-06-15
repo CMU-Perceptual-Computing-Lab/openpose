@@ -312,7 +312,6 @@ namespace op
                 {
                     resultIsOK = {false};
                     log("There are outliers in the angles.", Priority::High);
-                    // error("There are outliers in the angles.", __LINE__, __FUNCTION__, __FILE__);
                 }
 
                 // If the difference between them is <= 180 degrees, then we just return the traditional average.
@@ -386,8 +385,6 @@ namespace op
                     if (!pairAverageAngle.first)
                         log("Outlies in the result. Something went wrong when estimating the average of different"
                               " projection matrices.", Priority::High);
-                        // error("Outlies in the result. Something went wrong when estimating the average of different"
-                        //       " projection matrices.", __LINE__, __FUNCTION__, __FILE__);
                     rotationVector.at<double>(i,0) = {pairAverageAngle.second};
                 }
                 cv::Mat rotationMatrix;

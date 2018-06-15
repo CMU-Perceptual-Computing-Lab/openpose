@@ -707,7 +707,7 @@ namespace op
                 //
                 log("\n*** DEVICE INFORMATION ***\n", Priority::High);
 
-                for (int i = 0; i < upImpl->mCameraList.GetSize(); i++)
+                for (auto i = 0u; i < upImpl->mCameraList.GetSize(); i++)
                 {
                     // Select camera
                     auto cameraPtr = upImpl->mCameraList.GetByIndex(i);
@@ -722,7 +722,7 @@ namespace op
                                   __LINE__, __FUNCTION__, __FILE__);
                 }
 
-                for (auto i = 0; i < upImpl->mCameraList.GetSize(); i++)
+                for (auto i = 0u; i < upImpl->mCameraList.GetSize(); i++)
                 {
                     // Select camera
                     auto cameraPtr = upImpl->mCameraList.GetByIndex(i);
@@ -780,7 +780,7 @@ namespace op
                 //
                 // Serial numbers are the only persistent objects we gather in this
                 // example, which is why a std::vector is created.
-                for (auto i = 0; i < upImpl->mCameraList.GetSize(); i++)
+                for (auto i = 0u; i < upImpl->mCameraList.GetSize(); i++)
                 {
                     // Select camera
                     auto cameraPtr = upImpl->mCameraList.GetByIndex(i);
@@ -1065,7 +1065,7 @@ namespace op
                     // GetByIndex(); this is an alternative to retrieving cameras as
                     // Spinnaker::CameraPtr objects that can be quick and easy for small tasks.
                     //
-                    for (auto i = 0; i < upImpl->mCameraList.GetSize(); i++)
+                    for (auto i = 0u; i < upImpl->mCameraList.GetSize(); i++)
                     {
                         // Select camera
                         auto cameraPtr = upImpl->mCameraList.GetByIndex(i);
@@ -1112,7 +1112,7 @@ namespace op
                     if (cameraList.GetSize() > 0)
                     {
 
-                        for (int i = 0; i < cameraList.GetSize(); i++)
+                        for (auto i = 0u; i < cameraList.GetSize(); i++)
                         {
                             // Select camera
                             auto cameraPtr = cameraList.GetByIndex(i);

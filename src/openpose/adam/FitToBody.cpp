@@ -640,21 +640,13 @@ void Adam_FastFit_Initialize(const TotalModel &adam,
 	// std::fill(PAF.data(), PAF.data() + PAF.size(), 0);
 	const AdamFitData data(adam, BodyJoints, rFoot, lFoot, faceJoints, lHandJoints, rHandJoints, PAF, true);
 	ceres::Problem problem_init;
-	AdamFullCost* adam_cost = new AdamFullCost(data, 0, fit_face_exp);
+	AdamFullCost* adam_cost = new AdamFullCost(data, 0, false);
 
-	if (fit_face_exp)
-		problem_init.AddResidualBlock(adam_cost,
-									  NULL,
-									  frame_param.m_adam_t.data(),
-									  frame_param.m_adam_pose.data(),
-									  frame_param.m_adam_coeffs.data(),
-									  frame_param.m_adam_facecoeffs_exp.data());
-	else
-		problem_init.AddResidualBlock(adam_cost,
-									  NULL,
-									  frame_param.m_adam_t.data(),
-									  frame_param.m_adam_pose.data(),
-									  frame_param.m_adam_coeffs.data());
+	problem_init.AddResidualBlock(adam_cost,
+								  NULL,
+								  frame_param.m_adam_t.data(),
+								  frame_param.m_adam_pose.data(),
+								  frame_param.m_adam_coeffs.data());
 
 	//Body Prior (coef) //////////////////////////////////////////////////////////////////////////
 	CoeffsParameterNormDiff* cost_prior_body_coeffs_init = new CoeffsParameterNormDiff(TotalModel::NUM_SHAPE_COEFFICIENTS);
@@ -675,18 +667,6 @@ void Adam_FastFit_Initialize(const TotalModel &adam,
 	problem_init.AddResidualBlock(cost_prior_body_pose_init,
 		loss_weight_prior_body_pose_init,
 		frame_param.m_adam_pose.data());
-
-	if (fit_face_exp)
-	{
-		//Face regularization
-		ceres::NormalPrior *cost_prior_face_exp = new ceres::NormalPrior(adam.face_prior_A_exp.asDiagonal(), Eigen::Matrix<double, TotalModel::NUM_EXP_BASIS_COEFFICIENTS, 1>::Zero());
-		ceres::LossFunction *loss_weight_prior_face_exp = new ceres::ScaledLoss(NULL,
-			8,		//original
-			ceres::TAKE_OWNERSHIP);
-		problem_init.AddResidualBlock(cost_prior_face_exp,
-			loss_weight_prior_face_exp,
-			frame_param.m_adam_facecoeffs_exp.data());
-	}
 
 	for (int j = 0; j < 22 * 3; j++) cost_prior_body_pose_init->weight[j] *= 2;
 
@@ -785,6 +765,63 @@ options_init.num_threads = 1; // num_linear_solver_threads deprecated
 	adam_cost->toggle_activate(true, true, true);
 	ceres::Solve(options_init, &problem_init, &summary);
 	if(verbose) std::cout << summary.FullReport() << std::endl;
+
+	if (fit_face_exp)
+	{
+		ceres::Problem problem_init;
+		AdamFullCost* adam_cost = new AdamFullCost(data, 0, true);
+
+		problem_init.AddResidualBlock(adam_cost,
+									  NULL,
+									  frame_param.m_adam_t.data(),
+									  frame_param.m_adam_pose.data(),
+									  frame_param.m_adam_coeffs.data(),
+									  frame_param.m_adam_facecoeffs_exp.data());
+
+		//Face regularization
+		ceres::NormalPrior *cost_prior_face_exp = new ceres::NormalPrior(adam.face_prior_A_exp.asDiagonal(), Eigen::Matrix<double, TotalModel::NUM_EXP_BASIS_COEFFICIENTS, 1>::Zero());
+		ceres::LossFunction *loss_weight_prior_face_exp = new ceres::ScaledLoss(NULL,
+			8,		//original
+			ceres::TAKE_OWNERSHIP);
+		problem_init.AddResidualBlock(cost_prior_face_exp,
+			loss_weight_prior_face_exp,
+			frame_param.m_adam_facecoeffs_exp.data());
+
+		// To include foot keypoints weights
+		for (int i = 0; i < 12 + adam.m_correspond_adam2face70_adamIdx.rows(); i++)
+		{
+			if (i >= 12 && i < 24) adam_cost->m_targetPts_weight[adam_cost->m_nCorrespond_adam2joints + i] = 5.0;  // larger weight for eyes
+			else adam_cost->m_targetPts_weight[adam_cost->m_nCorrespond_adam2joints + i] = 1.0;
+		}
+		ceres::Solver::Options options_init;
+		ceres::Solver::Summary summary;
+		SetSolverOptions(&options_init);
+		if (!fast_solver)
+			options_init.max_num_iterations = 20;
+		else
+		{
+			options_init.max_num_iterations = 4;
+			options_init.function_tolerance = 1e-3;
+			options_init.gradient_tolerance = 1e-5;
+			options_init.parameter_tolerance = 1e-5;
+			options_init.function_tolerance = 1e-3;
+			options_init.inner_iteration_tolerance = 1e-2;
+		}
+		options_init.use_nonmonotonic_steps = false;
+		// options_init.num_threads = 10; // num_linear_solver_threads deprecated
+		options_init.num_threads = 1; // num_linear_solver_threads deprecated
+		options_init.minimizer_progress_to_stdout = verbose;
+
+		if (fast_solver)
+			options_init.max_num_iterations = 16;
+
+		adam_cost->toggle_activate(false, false, false);
+		problem_init.SetParameterBlockConstant(frame_param.m_adam_pose.data());
+		problem_init.SetParameterBlockConstant(frame_param.m_adam_t.data());
+		problem_init.SetParameterBlockConstant(frame_param.m_adam_coeffs.data());
+		ceres::Solve(options_init, &problem_init, &summary);
+		if(verbose) std::cout << summary.FullReport() << std::endl;
+	}
 
 // const auto duration5 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start5).count();
 // const auto start6 = std::chrono::high_resolution_clock::now();
