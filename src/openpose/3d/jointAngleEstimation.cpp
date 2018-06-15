@@ -286,16 +286,19 @@ namespace op
             Eigen::MatrixXd j0Vec;
             if (!spImpl->mInitialized || !fastVersion)
             {
-                spImpl->mInitialized = true;
+                if (!spImpl->mInitialized)
+                {
+                    frameParams.m_adam_t(0) = spImpl->mBodyJoints(0, 2);
+                    frameParams.m_adam_t(1) = spImpl->mBodyJoints(1, 2);
+                    frameParams.m_adam_t(2) = spImpl->mBodyJoints(2, 2);
+                    frameParams.m_adam_pose(0, 0) = 3.14159265358979323846264338327950288419716939937510582097494459;
+                    spImpl->mInitialized = true;
+                }
                 // We make T-pose start with:
                 // 1. Root translation similar to current 3-d location of the mid-hip
                 // 2. x-orientation = 180, i.e., person standing up & looking to the camera
                 // 3. Because otherwise, if we call Adam_FastFit_Initialize twice (e.g., if a new person appears),
                 // it would use the latest ones from the last Adam_FastFit
-                frameParams.m_adam_t(0) = spImpl->mBodyJoints(0, 2);
-                frameParams.m_adam_t(1) = spImpl->mBodyJoints(1, 2);
-                frameParams.m_adam_t(2) = spImpl->mBodyJoints(2, 2);
-                frameParams.m_adam_pose(0, 0) = 3.14159265358979323846264338327950288419716939937510582097494459;
                 // Fit initialization
                 // Adam_FastFit_Initialize only changes frameParams
                 Adam_FastFit_Initialize(*spImpl->spTotalModel, frameParams, spImpl->mBodyJoints, spImpl->mRFootJoints,

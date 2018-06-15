@@ -735,6 +735,12 @@ void Adam_FastFit_Initialize(const TotalModel &adam,
 // const auto start3 = std::chrono::high_resolution_clock::now();
 	adam_cost->toggle_rigid_body(false);
 	adam_cost->toggle_activate(true, false, false);
+	// options_init.function_tolerance = 1e-4;
+	// options_init.gradient_tolerance = 1e-6;
+	// options_init.parameter_tolerance = 1e-6;
+	// options_init.function_tolerance = 1e-4;
+	// options_init.inner_iteration_tolerance = 1e-2;
+	// options_init.max_solver_time_in_seconds = 100e-3;
 // const auto duration3 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start3).count();
 // const auto start4 = std::chrono::high_resolution_clock::now();
 	ceres::Solve(options_init, &problem_init, &summary);
