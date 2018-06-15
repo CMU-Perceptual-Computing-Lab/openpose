@@ -628,21 +628,33 @@ void Adam_FastFit_Initialize(const TotalModel &adam,
 	const Eigen::MatrixXd &lHandJoints,		//
 	const Eigen::MatrixXd &faceJoints,
 	const bool freeze_missing,
-	const bool verbose)
+	const bool verbose,
+	const bool multistage,
+	const bool fit_face_exp,
+	const bool fast_solver)
 {
+// const auto start = std::chrono::high_resolution_clock::now();
+// const auto start1 = std::chrono::high_resolution_clock::now();
 	using namespace Eigen;
 	MatrixXd PAF(3, 54);
 	// std::fill(PAF.data(), PAF.data() + PAF.size(), 0);
 	const AdamFitData data(adam, BodyJoints, rFoot, lFoot, faceJoints, lHandJoints, rHandJoints, PAF, true);
 	ceres::Problem problem_init;
-	AdamFullCost* adam_cost = new AdamFullCost(data, 0, true);
+	AdamFullCost* adam_cost = new AdamFullCost(data, 0, fit_face_exp);
 
-	problem_init.AddResidualBlock(adam_cost,
-		NULL,
-		frame_param.m_adam_t.data(),
-		frame_param.m_adam_pose.data(),
-		frame_param.m_adam_coeffs.data(),
-		frame_param.m_adam_facecoeffs_exp.data());	
+	if (fit_face_exp)
+		problem_init.AddResidualBlock(adam_cost,
+									  NULL,
+									  frame_param.m_adam_t.data(),
+									  frame_param.m_adam_pose.data(),
+									  frame_param.m_adam_coeffs.data(),
+									  frame_param.m_adam_facecoeffs_exp.data());
+	else
+		problem_init.AddResidualBlock(adam_cost,
+									  NULL,
+									  frame_param.m_adam_t.data(),
+									  frame_param.m_adam_pose.data(),
+									  frame_param.m_adam_coeffs.data());
 
 	//Body Prior (coef) //////////////////////////////////////////////////////////////////////////
 	CoeffsParameterNormDiff* cost_prior_body_coeffs_init = new CoeffsParameterNormDiff(TotalModel::NUM_SHAPE_COEFFICIENTS);
@@ -664,14 +676,17 @@ void Adam_FastFit_Initialize(const TotalModel &adam,
 		loss_weight_prior_body_pose_init,
 		frame_param.m_adam_pose.data());
 
-	//Face regularization
-	ceres::NormalPrior *cost_prior_face_exp = new ceres::NormalPrior(adam.face_prior_A_exp.asDiagonal(), Eigen::Matrix<double, TotalModel::NUM_EXP_BASIS_COEFFICIENTS, 1>::Zero());
-	ceres::LossFunction *loss_weight_prior_face_exp = new ceres::ScaledLoss(NULL,
-		8,		//original
-		ceres::TAKE_OWNERSHIP);
-	problem_init.AddResidualBlock(cost_prior_face_exp,
-		loss_weight_prior_face_exp,
-		frame_param.m_adam_facecoeffs_exp.data());
+	if (fit_face_exp)
+	{
+		//Face regularization
+		ceres::NormalPrior *cost_prior_face_exp = new ceres::NormalPrior(adam.face_prior_A_exp.asDiagonal(), Eigen::Matrix<double, TotalModel::NUM_EXP_BASIS_COEFFICIENTS, 1>::Zero());
+		ceres::LossFunction *loss_weight_prior_face_exp = new ceres::ScaledLoss(NULL,
+			8,		//original
+			ceres::TAKE_OWNERSHIP);
+		problem_init.AddResidualBlock(cost_prior_face_exp,
+			loss_weight_prior_face_exp,
+			frame_param.m_adam_facecoeffs_exp.data());
+	}
 
 	for (int j = 0; j < 22 * 3; j++) cost_prior_body_pose_init->weight[j] *= 2;
 
@@ -679,12 +694,16 @@ void Adam_FastFit_Initialize(const TotalModel &adam,
 	{
         for (int ic = 0; ic < adam.m_indices_jointConst_adamIdx.rows(); ic++)
         {
+        	// Only applied to arms (shoulder, elbow, wrist)
             const int smcjoint = adam.m_indices_jointConst_smcIdx(ic);
-            const int adam_index = adam.m_parent[adam.m_indices_jointConst_adamIdx(ic)];
-            if (BodyJoints.col(smcjoint).isZero(0))
-            	std::fill(cost_prior_body_pose_init->weight.data() + 3 * adam_index,
-            			  cost_prior_body_pose_init->weight.data() + 3 * adam_index + 3,
-            			  0.0);
+            if (smcjoint == 4 || smcjoint == 5 || smcjoint == 10 || smcjoint == 11)
+            {
+	            const int adam_index = adam.m_parent[adam.m_indices_jointConst_adamIdx(ic)];
+	            if (BodyJoints.col(smcjoint).isZero(0))
+	            	std::fill(cost_prior_body_pose_init->weight.data() + 3 * adam_index,
+	            			  cost_prior_body_pose_init->weight.data() + 3 * adam_index + 3,
+	            			  0.0);
+	        }
         }
 
         for (int ic = 0; ic < adam.m_correspond_adam2lHand_adamIdx.rows(); ic++)
@@ -718,24 +737,57 @@ void Adam_FastFit_Initialize(const TotalModel &adam,
 	ceres::Solver::Options options_init;
 	ceres::Solver::Summary summary;
 	SetSolverOptions(&options_init);
-	options_init.max_num_iterations = 20;
+	if (!fast_solver)
+		options_init.max_num_iterations = 20;
+	else
+	{
+		options_init.max_num_iterations = 4;
+		options_init.function_tolerance = 1e-3;
+		options_init.gradient_tolerance = 1e-5;
+		options_init.parameter_tolerance = 1e-5;
+		options_init.function_tolerance = 1e-3;
+		options_init.inner_iteration_tolerance = 1e-2;
+	}
 	options_init.use_nonmonotonic_steps = false;
-	options_init.num_threads = 10; // num_linear_solver_threads deprecated
+	// options_init.num_threads = 10; // num_linear_solver_threads deprecated
+options_init.num_threads = 1; // num_linear_solver_threads deprecated
 	options_init.minimizer_progress_to_stdout = verbose;
-	adam_cost->toggle_activate(false, false, false);
-	adam_cost->toggle_rigid_body(true);
-	ceres::Solve(options_init, &problem_init, &summary);
-	if(verbose) std::cout << summary.FullReport() << std::endl;
 
-	adam_cost->toggle_rigid_body(false);
-	adam_cost->toggle_activate(true, false, false);
-	ceres::Solve(options_init, &problem_init, &summary);
-	if(verbose) std::cout << summary.FullReport() << std::endl;
+	if (multistage)
+	{
+		adam_cost->toggle_activate(false, false, false);
+		adam_cost->toggle_rigid_body(true);
+		// const auto duration1 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start1).count();
+		// const auto start2 = std::chrono::high_resolution_clock::now();
+		ceres::Solve(options_init, &problem_init, &summary);
+		if(verbose) std::cout << summary.FullReport() << std::endl;
 
+		// const auto duration2 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start2).count();
+		// const auto start3 = std::chrono::high_resolution_clock::now();
+		adam_cost->toggle_rigid_body(false);
+		adam_cost->toggle_activate(true, false, false);
+		// options_init.function_tolerance = 1e-4;
+		// options_init.gradient_tolerance = 1e-6;
+		// options_init.parameter_tolerance = 1e-6;
+		// options_init.function_tolerance = 1e-4;
+		// options_init.inner_iteration_tolerance = 1e-2;
+		// options_init.max_solver_time_in_seconds = 100e-3;
+		// const auto duration3 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start3).count();
+		// const auto start4 = std::chrono::high_resolution_clock::now();
+		ceres::Solve(options_init, &problem_init, &summary);
+		if(verbose) std::cout << summary.FullReport() << std::endl;
+	}
+
+	if (fast_solver)
+		options_init.max_num_iterations = 16;
+// const auto duration4 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start4).count();
+// const auto start5 = std::chrono::high_resolution_clock::now();
 	adam_cost->toggle_activate(true, true, true);
 	ceres::Solve(options_init, &problem_init, &summary);
 	if(verbose) std::cout << summary.FullReport() << std::endl;
 
+// const auto duration5 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start5).count();
+// const auto start6 = std::chrono::high_resolution_clock::now();
 	// get face (mouth_open, leye_open, reye_open) in a naive way
 	if (!(faceJoints.block<3, 8>(0, 60).array() == 0.0).any())  // if none of these keypoints is zero
 	{
@@ -752,6 +804,8 @@ void Adam_FastFit_Initialize(const TotalModel &adam,
 		if (reye_width) frame_param.reye_open = (reye_height1 + reye_height2) / reye_width;
 	}
 	else frame_param.reye_open = 1.0;
+// const auto duration6 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start6).count();
+// const auto start7 = std::chrono::high_resolution_clock::now();
 	if (!(faceJoints.block<3, 6>(0, 42).array() == 0.0).any())
 	{
 		const double leye_width = (faceJoints.block<3, 1>(0, 42) - faceJoints.block<3, 1>(0, 45)).norm();
@@ -769,6 +823,16 @@ void Adam_FastFit_Initialize(const TotalModel &adam,
 		std::cout << "leye: " << frame_param.leye_open << std::endl;
 		std::cout << "distance root -> foot: " << frame_param.dist_root_foot << std::endl;
 	}
+// const auto duration7 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start7).count();
+// const auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start).count();
+// std::cout << __FILE__ << " 1:" << duration1 * 1e-6 << "\n"
+// 		  << __FILE__ << " 2:" << duration2 * 1e-6 << "\n"
+// 		  << __FILE__ << " 3:" << duration3 * 1e-6 << "\n"
+// 		  << __FILE__ << " 4:" << duration4 * 1e-6 << "\n"
+// 		  << __FILE__ << " 5:" << duration5 * 1e-6 << "\n"
+// 		  << __FILE__ << " 6:" << duration6 * 1e-6 << "\n"
+// 		  << __FILE__ << " 7:" << duration7 * 1e-6 << "\n"
+// 		  << __FILE__ << " T:" << duration * 1e-6 << std::endl;
 }
 
 std::mutex g_mutex;

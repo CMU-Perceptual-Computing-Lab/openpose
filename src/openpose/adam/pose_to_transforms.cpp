@@ -215,6 +215,8 @@ namespace smpl
         double* residuals,
         double** jacobians) const
     {
+// const auto start = std::chrono::high_resolution_clock::now();
+// const auto start1 = std::chrono::high_resolution_clock::now();
         using namespace Eigen;
         const double* pose = parameters[0];
         const double* joints = parameters[1];
@@ -229,39 +231,45 @@ namespace smpl
         Map< Matrix<double, 4 * TotalModel::NUM_JOINTS * 3, TotalModel::NUM_JOINTS * 3, RowMajor> > dTrdJ(jacobians? jacobians[1] : nullptr);
         Map< Matrix<double, TotalModel::NUM_JOINTS * 3, TotalModel::NUM_JOINTS * 3, RowMajor> > dJdJ(jacobians? jacobians[1] + TotalModel::NUM_JOINTS * TotalModel::NUM_JOINTS * 36 : nullptr);
         // fill in dTrdJ first, because it is sparse, only dMtdJ is none-0.
-        if (jacobians) std::fill(jacobians[1], jacobians[1] + 36 * TotalModel::NUM_JOINTS * TotalModel::NUM_JOINTS, 0.0);
+        if (jacobians)
+            std::fill(jacobians[1], jacobians[1] + 36 * TotalModel::NUM_JOINTS * TotalModel::NUM_JOINTS, 0.0);
 
+// const auto duration1 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start1).count();
+// const auto start2 = std::chrono::high_resolution_clock::now();
         Matrix<double, 3, 3, RowMajor> R; // Interface with ceres
         Matrix<double, 9, 3 * TotalModel::NUM_JOINTS, RowMajor> dRdP(9, 3 * TotalModel::NUM_JOINTS);
-        Matrix<double, 3, 1> offset; // a buffer for 3D vector
-        Matrix<double, 3, 3 * TotalModel::NUM_JOINTS, Eigen::RowMajor> dtdP(3, 3 * TotalModel::NUM_JOINTS); // a buffer for the derivative
         Matrix<double, 3, 3 * TotalModel::NUM_JOINTS, Eigen::RowMajor> dtdJ(3, 3 * TotalModel::NUM_JOINTS); // a buffer for the derivative
         Matrix<double, 3, 3 * TotalModel::NUM_JOINTS, Eigen::RowMajor> dtdJ2(3, 3 * TotalModel::NUM_JOINTS); // a buffer for the derivative
 
         std::vector<Eigen::Matrix<double, 3, 3, Eigen::RowMajor>> MR(TotalModel::NUM_JOINTS, Eigen::Matrix<double, 3, 3, Eigen::RowMajor>(3, 3));
-        std::vector<Eigen::Matrix<double, 3, 1>> Mt(TotalModel::NUM_JOINTS, Eigen::Matrix<double, 3, 1>(3, 1));
 
         std::vector<Eigen::Matrix<double, 9, 3 * TotalModel::NUM_JOINTS, Eigen::RowMajor>> dMRdP(TotalModel::NUM_JOINTS, Eigen::Matrix<double, 9, 3 * TotalModel::NUM_JOINTS, Eigen::RowMajor>(9, 3 * TotalModel::NUM_JOINTS));
         std::vector<Eigen::Matrix<double, 3, 3 * TotalModel::NUM_JOINTS, Eigen::RowMajor>> dMtdP(TotalModel::NUM_JOINTS, Eigen::Matrix<double, 3, 3 * TotalModel::NUM_JOINTS, Eigen::RowMajor>(3, 3 * TotalModel::NUM_JOINTS));
         std::vector<Eigen::Matrix<double, 3, 3 * TotalModel::NUM_JOINTS, Eigen::RowMajor>> dMtdJ(TotalModel::NUM_JOINTS, Eigen::Matrix<double, 3, 3 * TotalModel::NUM_JOINTS, Eigen::RowMajor>(3, 3 * TotalModel::NUM_JOINTS));
 
+// const auto duration2 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start2).count();
+// const auto start3 = std::chrono::high_resolution_clock::now();
         ceres::AngleAxisToRotationMatrix(pose, R.data());
         outJoint.row(0) = J0.row(0);
         MR.at(0) = R;
-        Mt.at(0) = J0.row(0).transpose();
-        outT.block(0, 0, 3, 3) = MR[0];
-        outT.block(0, 3, 3, 1) = Mt[0];
+        outT.block<3,3>(0, 0) = MR[0];
+        outT.block<3,1>(0, 3) = J0.row(0).transpose();
 
+// const auto duration3 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start3).count();
+// const auto start4 = std::chrono::high_resolution_clock::now();
         if (jacobians)
         {
             AngleAxisToRotationMatrix_Derivative(pose, dMRdP.at(0).data(), 0);  
             std::fill(dMtdP[0].data(), dMtdP[0].data() + 9 * TotalModel::NUM_JOINTS, 0.0); // dMtdP.at(0).setZero();
             std::fill(dMtdJ[0].data(), dMtdJ[0].data() + 9 * TotalModel::NUM_JOINTS, 0.0); // dMtdJ.at(0).setZero();
-            dMtdJ.at(0).block(0, 0, 3, 3).setIdentity();
+            dMtdJ.at(0).block<3,3>(0, 0).setIdentity();
             std::copy(dMtdP[0].data(), dMtdP[0].data() + 9 * TotalModel::NUM_JOINTS, dJdP.data()); // dJdP.block(0, 0, 3, TotalModel::NUM_JOINTS * 3) = dMtdP[0];
             std::copy(dMtdJ[0].data(), dMtdJ[0].data() + 9 * TotalModel::NUM_JOINTS, dJdJ.data()); // dJdJ.block(0, 0, 3, TotalModel::NUM_JOINTS * 3) = dMtdJ[0];
         }
 
+// const auto duration4 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start4).count();
+// const auto start5 = std::chrono::high_resolution_clock::now();
+        auto* dtdJPtr = dtdJ.data();
         for (int idj = 1; idj < mod_.NUM_JOINTS; idj++)
         {
             const int ipar = mod_.m_parent[idj];
@@ -271,49 +279,44 @@ namespace smpl
             //Freezing joints here  //////////////////////////////////////////////////////
             if (idj == 10 || idj == 11) //foot ends
             {
-                angles[0] = 0;
-                angles[1] = 0;
-                angles[2] = 0;
+                angles[0] = 0.0;
+                angles[1] = 0.0;
+                angles[2] = 0.0;
             }
             else if (idj == 7 || idj == 8)   //foot ankle. Restrict side movement
             {
                 angles[1] = 0.0;
                 angles[2] = 0.0;
             }
-            else if (idj == 24 || idj == 27 || idj == 28 || idj == 31 || idj == 32 || idj == 35 || idj == 36 || idj == 39 || idj == 40 ||
-                idj == 44 || idj == 47 || idj == 48 || idj == 51 || idj == 52 || idj == 55 || idj == 56 || idj == 59 || idj == 60)  //all hands
+            else if (idj == 24 || idj == 27 || idj == 28 || idj == 31 || idj == 32 || idj == 35 || idj == 36 || idj == 39 || idj == 40
+                || idj == 44 || idj == 47 || idj == 48 || idj == 51 || idj == 52 || idj == 55 || idj == 56 || idj == 59 || idj == 60)  //all hands
             {
                 angles[0] = 0.0;
                 angles[1] = 0.0;
             }
             // else if (idj == 23 || idj == 26 || idj == 30 || idj == 34 || idj == 38 || idj == 43 || idj == 46 || idj == 50 || idj == 54 || idj == 58)
-            // {
             //     angles[0] = 0.0;
-            // }
 
             ceres::EulerAnglesToRotationMatrix(angles, 3, R.data());
             MR.at(idj) = MR.at(ipar) * R;
-            offset = (J0.row(idj) - J0.row(ipar)).transpose();
-            Mt.at(idj) = Mt.at(ipar) + MR.at(ipar) * offset;
-            outJoint.row(idj) = Mt.at(idj).transpose();
-            outT.block(0, 0, 3, 3) = MR[0];
-            outT.block(0, 3, 3, 1) = Mt[0];
+            const Matrix<double, 3, 1> offset = (J0.row(idj) - J0.row(ipar)).transpose();
+            outJoint.row(idj) = outJoint.row(ipar) + (MR.at(ipar) * offset).transpose();
 
-            if(jacobians)
+            if (jacobians)
             {
                 EulerAnglesToRotationMatrix_Derivative(angles, dRdP.data(), idj);
 
                 if (idj == 10 || idj == 11) //foot ends
-                    dRdP.block(0, 3 * idj, 9, 3).setZero();
+                    dRdP.block<9,3>(0, 3 * idj).setZero();
                 if (idj == 7 || idj == 8)   //foot ankle. Restrict side movement
-                    dRdP.block(0, 3 * idj + 1, 9, 2).setZero();
+                    dRdP.block<9,2>(0, 3 * idj + 1).setZero();
                 if (idj == 24 || idj == 27 || idj == 28 || idj == 31 || idj == 32 || idj == 35 || idj == 36 || idj == 39 || idj == 40)  //all hands
-                    dRdP.block(0, 3 * idj, 9, 2).setZero();
+                    dRdP.block<9,2>(0, 3 * idj).setZero();
                 if (idj == 44 || idj == 47 || idj == 48 || idj == 51 || idj == 52 || idj == 55 || idj == 56 || idj == 59 || idj == 60)  //all hands
-                    dRdP.block(0, 3 * idj, 9, 2).setZero();
+                    dRdP.block<9,2>(0, 3 * idj).setZero();
                 // if (idj == 23 || idj == 26 || idj == 30 || idj == 34 || idj == 38 || idj == 43 || idj == 46 || idj == 50 || idj == 54 || idj == 58)
                 // {
-                //     dRdP.block(0, 3 * idj, 9, 1).setZero();
+                //     dRdP.block<9,1>(0, 3 * idj).setZero();
                 // }
 
                 if (idj == 10 || idj == 11) //foot ends
@@ -329,12 +332,16 @@ namespace smpl
                 // the following line is equivalent to dMtdP.at(idj) = dMtdP.at(idj) + dMtdP.at(ipar);
                 SparseAdd(dMtdP.at(ipar).data(), mParentIndexes.at(ipar), dMtdP.at(idj).data());
 
-                std::fill(dtdJ.data(), dtdJ.data() + 9 * TotalModel::NUM_JOINTS, 0.0); // dtdJ.setZero();
-                // the following two lines are equiv to: dtdJ.block(0, 3 * idj, 3, 3).setIdentity(); dtdJ.block(0, 3 * ipar, 3, 3) -= Matrix<double, 3, 3>::Identity(); // derivative of offset wrt J
-                dtdJ.data()[3 * idj] = 1; dtdJ.data()[3 * idj + 3 * TotalModel::NUM_JOINTS + 1] = 1; dtdJ.data()[3 * idj + 6 * TotalModel::NUM_JOINTS + 2] = 1;
-                dtdJ.data()[3 * ipar] = -1; dtdJ.data()[3 * ipar + 3 * TotalModel::NUM_JOINTS + 1] = -1; dtdJ.data()[3 * ipar + 6 * TotalModel::NUM_JOINTS + 2] = -1;
-                // the following line is equivalent to Product_Derivative(MR.at(ipar).data(), NULL, offset.data(), dtdJ.data(), dMtdJ.at(idj).data(), 1); // dA_data is NULL since rotation is not related to joint
-                SparseProductDerivativeConstA(MR.at(ipar).data(), dtdJ.data(), mParentIndexes.at(idj), dMtdJ.at(idj).data());
+                std::fill(dtdJPtr, dtdJPtr + 9 * TotalModel::NUM_JOINTS, 0.0); // dtdJ.setZero();
+                // the following two lines are equiv to: dtdJ.block<3,3>(0, 3 * idj).setIdentity(); dtdJ.block<3,3>(0, 3 * ipar) -= Matrix<double, 3, 3>::Identity(); // derivative of offset wrt J
+                dtdJPtr[3 * idj] = 1;
+                dtdJPtr[3 * idj + 3 * TotalModel::NUM_JOINTS + 1] = 1;
+                dtdJPtr[3 * idj + 6 * TotalModel::NUM_JOINTS + 2] = 1;
+                dtdJPtr[3 * ipar] = -1;
+                dtdJPtr[3 * ipar + 3 * TotalModel::NUM_JOINTS + 1] = -1;
+                dtdJPtr[3 * ipar + 6 * TotalModel::NUM_JOINTS + 2] = -1;
+                // the following line is equivalent to Product_Derivative(MR.at(ipar).data(), NULL, offset.data(), dtdJPtr, dMtdJ.at(idj).data(), 1); // dA_data is NULL since rotation is not related to joint
+                SparseProductDerivativeConstA(MR.at(ipar).data(), dtdJPtr, mParentIndexes.at(idj), dMtdJ.at(idj).data());
                 // the following line is equivalent to dMtdJ.at(idj) = dMtdJ.at(idj) + dMtdJ.at(ipar);
                 SparseAdd(dMtdJ.at(ipar).data(), mParentIndexes.at(idj), dMtdJ.at(idj).data());
 
@@ -343,25 +350,28 @@ namespace smpl
             }
         }
 
-        for (int idj = 0; idj < mod_.NUM_JOINTS; idj++) {
-            offset = J0.row(idj).transpose();
-            Mt.at(idj) -= MR.at(idj) * offset;
+// const auto duration5 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start5).count();
+// const auto start6 = std::chrono::high_resolution_clock::now();
+        for (int idj = 0; idj < mod_.NUM_JOINTS; idj++)
+        {
+            const Matrix<double, 3, 1> offset = J0.row(idj).transpose();
 
-            outT.block(3 * idj, 0, 3, 3) = MR.at(idj);
-            outT.block(3 * idj, 3, 3, 1) = Mt.at(idj);
+            outT.block<3,3>(3 * idj, 0) = MR.at(idj);
+            outT.block<3,1>(3 * idj, 3) = outJoint.row(idj).transpose() - MR.at(idj) * offset;
 
             if (jacobians)
             {
+                Matrix<double, 3, 3 * TotalModel::NUM_JOINTS, Eigen::RowMajor> dtdP(3, 3 * TotalModel::NUM_JOINTS); // a buffer for the derivative
                 // The following line is equivalent to Product_Derivative(MR.at(idj).data(), dMRdP.at(idj).data(), offset.data(), NULL, dtdP.data(), 1);
                 SparseProductDerivative(dMRdP.at(idj).data(), offset.data(), mParentIndexes.at(idj), dtdP.data());
                 // The following line is equivalent to dMtdP.at(idj) -= dtdP;
                 SparseSubtract(dtdP.data(), mParentIndexes.at(idj), dMtdP.at(idj).data());
 
-                std::fill(dtdJ.data(), dtdJ.data() + 9 * TotalModel::NUM_JOINTS, 0.0); // dtdJ.setZero();
-                // The follwing line is equivalent to dtdJ.block(0, 3 * idj, 3, 3).setIdentity();
-                dtdJ.data()[3 * idj] = 1; dtdJ.data()[3 * idj + 3 * TotalModel::NUM_JOINTS + 1] = 1; dtdJ.data()[3 * idj + 6 * TotalModel::NUM_JOINTS + 2] = 1;
-                // The following line is equivalent to Product_Derivative(MR.at(idj).data(), NULL, offset.data(), dtdJ.data(), dtdJ2.data(), 1);
-                SparseProductDerivativeConstA(MR.at(idj).data(), dtdJ.data(), mParentIndexes.at(idj), dtdJ2.data());
+                std::fill(dtdJPtr, dtdJPtr + 9 * TotalModel::NUM_JOINTS, 0.0); // dtdJ.setZero();
+                // The follwing line is equivalent to dtdJ.block<3,3>(0, 3 * idj).setIdentity();
+                dtdJPtr[3 * idj] = 1; dtdJPtr[3 * idj + 3 * TotalModel::NUM_JOINTS + 1] = 1; dtdJPtr[3 * idj + 6 * TotalModel::NUM_JOINTS + 2] = 1;
+                // The following line is equivalent to Product_Derivative(MR.at(idj).data(), NULL, offset.data(), dtdJPtr, dtdJ2.data(), 1);
+                SparseProductDerivativeConstA(MR.at(idj).data(), dtdJPtr, mParentIndexes.at(idj), dtdJ2.data());
                 // The following line is equivalent to dMtdJ.at(idj) -= dtdJ2;
                 SparseSubtract(dtdJ2.data(), mParentIndexes.at(idj), dMtdJ.at(idj).data());
 
@@ -394,6 +404,15 @@ namespace smpl
                     dTrdJ.data() + (12 * idj + 11) * TotalModel::NUM_JOINTS * 3);
             }
         }
+// const auto duration6 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start6).count();
+// const auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start).count();
+// std::cout << __FILE__ << " 1:" << duration1 * 1e-6 << "\n"
+//           << __FILE__ << " 2:" << duration2 * 1e-6 << "\n"
+//           << __FILE__ << " 3:" << duration3 * 1e-6 << "\n"
+//           << __FILE__ << " 4:" << duration4 * 1e-6 << "\n"
+//           << __FILE__ << " 5:" << duration5 * 1e-6 << "\n"
+//           << __FILE__ << " 6:" << duration6 * 1e-6 << "\n"
+//           << __FILE__ << " T:" << duration * 1e-6 << std::endl;
 
         return true;
     }

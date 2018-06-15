@@ -152,7 +152,7 @@ bool AdamFastCost::Evaluate(double const* const* parameters,
             }
             // Vectorized (slower) equivalent
             // Map< VectorXd > res(residuals, m_nResiduals);
-            // res.block<3,1>(3 * i, 0) = (tempJoints.block<3,1>(3 * i, 0) - m_targetPts.block<3,1>(5 * i, 0)).cwiseProduct(m_targetPts_weight.block<3,1>(3 * i, 0));
+            // res.block<3,1>(3 * i, 0) = (tempJoints.block<3,1>(3 * i, 0) - m_targetPts.block<3,1>(5 * i, 0)).cwiseProduct(targetPtsWeight.block<3,1>(3 * i, 0));
         }
     }
 // const auto duration9 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start9).count();
@@ -192,10 +192,10 @@ bool AdamFastCost::Evaluate(double const* const* parameters,
             //     if (!m_targetPts.block<3,1>(5 * i, 0).isZero(0))
             //         drdt.block<3,3>(3 * i, 0).setIdentity();
             // // 2nd loop
-            // drdt = m_targetPts_weight.asDiagonal() * drdt;
+            // drdt = targetPtsWeight.asDiagonal() * drdt;
             // // Slower for loop equivalent of 2nd loop
             // for (int j = 0; j < 3 * m_nCorrespond_adam2joints; ++j)
-            //     drdt.row(j) *= m_targetPts_weight[j];
+            //     drdt.row(j) *= targetPtsWeight[j];
         }
 
         if (jacobians[1]) // jacobian w.r.t pose
@@ -224,7 +224,7 @@ bool AdamFastCost::Evaluate(double const* const* parameters,
                     dr_dPose.block<3,TotalModel::NUM_POSE_PARAMETERS>(3*(i + offset), 0) = targetPtsWeight[i + offset] * dTJdP.block<3,TotalModel::NUM_POSE_PARAMETERS>(3 * m_adam.m_correspond_adam2rHand_adamIdx(i), 0);
 // duration10g += std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start10g).count();
 // const auto start10h = std::chrono::high_resolution_clock::now();
-            offset += m_adam.m_correspond_adam2rHand_adamIdx.rows();  
+            offset += m_adam.m_correspond_adam2rHand_adamIdx.rows();
             if (!m_targetPts.block<3,1>(5 * (0 + offset), 0).isZero(0)) dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(3*(0 + offset), 0) = targetPtsWeight[0 + offset] * dVdP.block<3, TotalModel::NUM_POSE_PARAMETERS>(3 * 0, 0);
             else dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(3*(0 + offset), 0).setZero();
             if (!m_targetPts.block<3,1>(5 * (1 + offset), 0).isZero(0)) dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(3*(1 + offset), 0) = targetPtsWeight[1 + offset] * dVdP.block<3, TotalModel::NUM_POSE_PARAMETERS>(3 * 1, 0);
@@ -270,7 +270,8 @@ bool AdamFastCost::Evaluate(double const* const* parameters,
     return true;
 }
 
-void ComputedTrdc(const double* dTrdJ_data, const double* dJdc_data, double* dTrdc_data, const std::array<std::vector<int>, TotalModel::NUM_JOINTS>& parentIndexes)
+void ComputedTrdc(const double* dTrdJ_data, const double* dJdc_data, double* dTrdc_data,
+                  const std::array<std::vector<int>, TotalModel::NUM_JOINTS>& parentIndexes)
 {
     // const Eigen::Map<const Eigen::Matrix<double, 5 * 3 * TotalModel::NUM_JOINTS, 3 * TotalModel::NUM_JOINTS, Eigen::RowMajor>> dTrdJ(dTrdJ_data);
     // const Eigen::Map<const Eigen::Matrix<double, 3 * TotalModel::NUM_JOINTS, TotalModel::NUM_SHAPE_COEFFICIENTS, Eigen::RowMajor>> dJdc(dJdc_data);
@@ -280,41 +281,29 @@ void ComputedTrdc(const double* dTrdJ_data, const double* dJdc_data, double* dTr
     std::fill(dTrdc_data, dTrdc_data + 5 * 3 * TotalModel::NUM_JOINTS * TotalModel::NUM_SHAPE_COEFFICIENTS, 0);
     for (int i = 0; i < TotalModel::NUM_JOINTS; i++)
     {
-        // 12 rows to take care of
-        // only row 12 * i + 4 * j + 3 is non-zero
         for (int j = 0; j < 3; j++)
         {
+            // 12 rows to take care of
+            // only row 12 * i + 4 * j + 3 is non-zero
             const auto* dTrdJ_row = dTrdJ_data + (12 * i + 4 * j + 3) * ncol;
             auto* dTrdc_row = dTrdc_data + (12 * i + 4 * j + 3) * ncol_out;
+            // 3 rows to take care of
+            // only row 12 * i + 4 * j + 3 is non-zero
+            const auto* dTrdJ_row2 = dTrdJ_data + 4 * 3 * TotalModel::NUM_JOINTS * 3 * TotalModel::NUM_JOINTS + (3 * i + j) * ncol;
+            auto* dTrdc_row2 = dTrdc_data + 4 * 3 * TotalModel::NUM_JOINTS * TotalModel::NUM_SHAPE_COEFFICIENTS + (3 * i + j) * ncol_out;
             for (auto& ipar: parentIndexes[i])
             {
                 const auto ipar3 = 3 * ipar;
                 for(int c = 0; c < ncol_out; c++)
                 {
+                    // 12 rows to take care of
                     dTrdc_row[c] += dTrdJ_row[ipar3] * dJdc_data[ipar3 * ncol_out + c]
                                   + dTrdJ_row[ipar3 + 1] * dJdc_data[(ipar3 + 1) * ncol_out + c]
                                   + dTrdJ_row[ipar3 + 2] * dJdc_data[(ipar3 + 2) * ncol_out + c];
-                }
-            }
-        }
-    }
-
-    for (int i = 0; i < TotalModel::NUM_JOINTS; i++)
-    {
-        // 3 rows to take care of
-        // only row 12 * i + 4 * j + 3 is non-zero
-        for (int j = 0; j < 3; j++)
-        {
-            const auto* dTrdJ_row = dTrdJ_data + 4 * 3 * TotalModel::NUM_JOINTS * 3 * TotalModel::NUM_JOINTS + (3 * i + j) * ncol;
-            auto* dTrdc_row = dTrdc_data + 4 * 3 * TotalModel::NUM_JOINTS * TotalModel::NUM_SHAPE_COEFFICIENTS + (3 * i + j) * ncol_out;
-            for (auto& ipar: parentIndexes[i])
-            {
-                const auto ipar3 = 3 * ipar;
-                for(int c = 0; c < ncol_out; c++)
-                {
-                    dTrdc_row[c] += dTrdJ_row[ipar3] * dJdc_data[ipar3 * ncol_out + c]
-                                  + dTrdJ_row[ipar3 + 1] * dJdc_data[(ipar3 + 1) * ncol_out + c]
-                                  + dTrdJ_row[ipar3 + 2] * dJdc_data[(ipar3 + 2) * ncol_out + c];
+                    // 3 rows to take care of
+                    dTrdc_row2[c] += dTrdJ_row2[ipar3] * dJdc_data[ipar3 * ncol_out + c]
+                                   + dTrdJ_row2[ipar3 + 1] * dJdc_data[(ipar3 + 1) * ncol_out + c]
+                                   + dTrdJ_row2[ipar3 + 2] * dJdc_data[(ipar3 + 2) * ncol_out + c];
                 }
             }
         }
@@ -327,6 +316,7 @@ bool AdamFullCost::Evaluate(double const* const* parameters,
         double* residuals,
         double** jacobians) const
 {
+// const auto start = std::chrono::high_resolution_clock::now();
 // const auto start_iter = std::chrono::high_resolution_clock::now();
     using namespace Eigen;
     typedef double T;
@@ -341,7 +331,21 @@ bool AdamFullCost::Evaluate(double const* const* parameters,
     // 0st step: Compute all the current joints
     Matrix<double, TotalModel::NUM_JOINTS, 3, RowMajor> J;
     Map< Matrix<double, Dynamic, 1> > J_vec(J.data(), TotalModel::NUM_JOINTS * 3);
+    // Vector form faster than below loop
     J_vec = fit_data_.adam.J_mu_ + fit_data_.adam.dJdc_ * c_bodyshape;
+    // const auto* jMuPtr = fit_data_.adam.J_mu_.data();
+    // const auto* dJdcPtr = fit_data_.adam.dJdc_.data();
+    // const auto dJdcCols = fit_data_.adam.dJdc_.cols();
+    // // Note: Eigen::Matrix<double, Eigen::Dynamic, NUM_SHAPE_COEFFICIENTS, Eigen::RowMajor> dJdc_;
+    // for (auto i = 0u; i < TotalModel::NUM_JOINTS * 3; i++)
+    // {
+    //     J_vec[i] = jMuPtr[i];
+    //     const auto rowIndex = i*dJdcCols;
+    //     for (auto j = 0u; j < TotalModel::NUM_SHAPE_COEFFICIENTS; j++)
+    //     {
+    //         J_vec[i] += dJdcPtr[rowIndex + j] * c[j];
+    //     }
+    // }
 
     // 1st step: forward kinematics
     const int num_t = (TotalModel::NUM_JOINTS) * 3 * 5;  // transform 3 * 4 + joint location 3 * 1
@@ -368,6 +372,7 @@ bool AdamFullCost::Evaluate(double const* const* parameters,
     double* p2t_jacobians[2] = { dTrdP.data(), dTrdJ.data() };
 
     smpl::PoseToTransform_AdamFull_withDiff p2t(fit_data_.adam, parentIndexes);
+// const auto duration_iter = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start_iter).count();
 // const auto start_FK = std::chrono::high_resolution_clock::now();
     p2t.Evaluate(p2t_parameters, p2t_residuals, jacobians ? p2t_jacobians : nullptr );
 // const auto duration_FK = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start_FK).count();
@@ -390,83 +395,121 @@ bool AdamFullCost::Evaluate(double const* const* parameters,
     if (jacobians) ComputedTrdc(dTrdJ.data(), fit_data_.adam.dJdc_.data(), dTrdc.data(), parentIndexes);
     // MatrixXdr dTJdc = dTrdc.block(3 * TotalModel::NUM_JOINTS * 4, 0, 3 * TotalModel::NUM_JOINTS, TotalModel::NUM_SHAPE_COEFFICIENTS);
     Map<MatrixXdr> dTJdc(dTrdc.data() + 3 * TotalModel::NUM_JOINTS * 4 * TotalModel::NUM_SHAPE_COEFFICIENTS, 3 * TotalModel::NUM_JOINTS, TotalModel::NUM_SHAPE_COEFFICIENTS);
-    VectorXd outJoint = transforms_joint.block(3 * TotalModel::NUM_JOINTS * 4, 0, 3 * TotalModel::NUM_JOINTS, 1);  // outJoint
-    for (auto i = 0u; i < TotalModel::NUM_JOINTS; i++) outJoint.block(3 * i, 0, 3, 1) += t_vec;
-// const auto duration_transJ = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start_transJ).count();
+    VectorXd outJoint = transforms_joint.block<3 * TotalModel::NUM_JOINTS, 1>(3 * TotalModel::NUM_JOINTS * 4, 0);  // outJoint
+    auto* outJointPtr = outJoint.data();
+    for (auto i = 0u; i < TotalModel::NUM_JOINTS; i++) outJoint.block<3,1>(3 * i, 0) += t_vec;
 
     MatrixXdr outVert(total_vertex.size(), 3);
+    auto* outVertPtr = outVert.data();
     Map<MatrixXdr> dVdP(dVdP_data, 3 * total_vertex.size(), TotalModel::NUM_POSE_PARAMETERS);
     Map<MatrixXdr> dVdc(dVdc_data, 3 * total_vertex.size(), TotalModel::NUM_SHAPE_COEFFICIENTS);
     Map<MatrixXdr> dVdfc(dVdfc_data, 3 * total_vertex.size(), TotalModel::NUM_EXP_BASIS_COEFFICIENTS);
+// const auto duration_transJ = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start_transJ).count();
 // const auto start_LBS = std::chrono::high_resolution_clock::now();
     if (jacobians) select_lbs(c, transforms_joint, dTrdP, dTrdc, outVert, dVdP_data, dVdc_data, face_coeff, dVdfc_data);
     else select_lbs(c, transforms_joint, outVert, face_coeff);
 // const auto duration_LBS = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start_LBS).count();
-    outVert.rowwise() += t_vec.transpose();
-    std::array<double*, 3> out_data{{ outJoint.data(), outVert.data(), nullptr }};
+// const auto start_target = std::chrono::high_resolution_clock::now();
+    // Next for loop is a much faster equivalent of the following vector operation
+    // outVert.rowwise() += t_vec.transpose();
+    for (auto i = 0u; i < total_vertex.size(); i++)
+    {
+        // Remember that MatrixXdr outVert(total_vertex.size(), 3);
+        const auto baseIndex = 3*i;
+        outVertPtr[baseIndex  ] += t[0];
+        outVertPtr[baseIndex+1] += t[1];
+        outVertPtr[baseIndex+2] += t[2];
+    }
+    std::array<double*, 3> out_data{{ outJointPtr, outVertPtr, nullptr }};
     std::array<Map<MatrixXdr>*, 3> dodP = {{ &dTJdP, &dVdP, nullptr }};  // array of reference is not allowed, only array of pointer
     std::array<Map<MatrixXdr>*, 3> dodc = {{ &dTJdc, &dVdc, nullptr }};
     std::array<Map<MatrixXdr>*, 3> dodfc = {{ nullptr, &dVdfc, nullptr }};
 
     // 2nd step: compute the target joints (copy from FK)
-// const auto start_target = std::chrono::high_resolution_clock::now();
     // Arrange the Output Joints & Vertex to the order of constraints
     VectorXd tempJoints(3 * (m_nCorrespond_adam2joints + m_nCorrespond_adam2pts));
+    auto* tempJointsPtr = tempJoints.data();
     Map<MatrixXdr> dOdP(dOdP_data, 3 * (m_nCorrespond_adam2joints + m_nCorrespond_adam2pts), TotalModel::NUM_POSE_PARAMETERS);
     Map<MatrixXdr> dOdc(dOdc_data, 3 * (m_nCorrespond_adam2joints + m_nCorrespond_adam2pts), TotalModel::NUM_SHAPE_COEFFICIENTS);
     Map<MatrixXdr> dOdfc(dOdfc_data, 3 * (m_nCorrespond_adam2joints + m_nCorrespond_adam2pts), TotalModel::NUM_EXP_BASIS_COEFFICIENTS);
+    const auto* indicesJointConstAdamIdxPtr = fit_data_.adam.m_indices_jointConst_adamIdx.data();
+    const auto* correspondAdam2lHandAdamIdx = fit_data_.adam.m_correspond_adam2lHand_adamIdx.data();
+    const auto* correspondAdam2rHandAdamIdx = fit_data_.adam.m_correspond_adam2rHand_adamIdx.data();
     if (regressor_type == 0)
     {
         for (int i = 0; i < fit_data_.adam.m_indices_jointConst_adamIdx.rows(); i++)
         {
-            tempJoints.block(3 * i, 0, 3, 1) = outJoint.block(3 * fit_data_.adam.m_indices_jointConst_adamIdx(i), 0, 3, 1);
+            const auto baseIndex = 3*i;
+            tempJointsPtr[baseIndex  ] = outJointPtr[3*indicesJointConstAdamIdxPtr[i]  ];
+            tempJointsPtr[baseIndex+1] = outJointPtr[3*indicesJointConstAdamIdxPtr[i]+1];
+            tempJointsPtr[baseIndex+2] = outJointPtr[3*indicesJointConstAdamIdxPtr[i]+2];
+            // // Much slower vector equivalent
+            // tempJoints.block<3,1>(baseIndex, 0) = outJoint.block<3,1>(3 * fit_data_.adam.m_indices_jointConst_adamIdx(i), 0);
         }
         int offset = fit_data_.adam.m_indices_jointConst_adamIdx.rows();
         for (int i = 0; i < fit_data_.adam.m_correspond_adam2lHand_adamIdx.rows(); i++)
         {
-            tempJoints.block(3*(i + offset), 0, 3, 1) = outJoint.block(3 * fit_data_.adam.m_correspond_adam2lHand_adamIdx(i), 0, 3, 1);
+            const auto baseIndex = 3*(i + offset);
+            tempJointsPtr[baseIndex  ] = outJointPtr[3*correspondAdam2lHandAdamIdx[i]  ];
+            tempJointsPtr[baseIndex+1] = outJointPtr[3*correspondAdam2lHandAdamIdx[i]+1];
+            tempJointsPtr[baseIndex+2] = outJointPtr[3*correspondAdam2lHandAdamIdx[i]+2];
+            // // Much slower vector equivalent
+            // tempJoints.block<3,1>(3*(i + offset), 0) = outJoint.block<3,1>(3 * fit_data_.adam.m_correspond_adam2lHand_adamIdx(i), 0);
         }
         offset += fit_data_.adam.m_correspond_adam2lHand_adamIdx.rows();
         for (int i = 0; i < fit_data_.adam.m_correspond_adam2rHand_adamIdx.rows(); i++)
         {
-            tempJoints.block(3*(i + offset), 0, 3, 1) = outJoint.block(3 * fit_data_.adam.m_correspond_adam2rHand_adamIdx(i), 0, 3, 1);
+            const auto baseIndex = 3*(i + offset);
+            tempJointsPtr[baseIndex  ] = outJointPtr[3*correspondAdam2rHandAdamIdx[i]  ];
+            tempJointsPtr[baseIndex+1] = outJointPtr[3*correspondAdam2rHandAdamIdx[i]+1];
+            tempJointsPtr[baseIndex+2] = outJointPtr[3*correspondAdam2rHandAdamIdx[i]+2];
+            // // Much slower vector equivalent
+            // tempJoints.block<3,1>(3*(i + offset), 0) = outJoint.block<3,1>(3 * fit_data_.adam.m_correspond_adam2rHand_adamIdx(i), 0);
         }
         offset += fit_data_.adam.m_correspond_adam2rHand_adamIdx.rows();
         for (auto i = 0u; i < corres_vertex2targetpt.size(); i++)
         {
-            tempJoints.block(3*(i + offset), 0, 3, 1) = outVert.row(i).transpose();
+            // Remember that MatrixXdr outVert(total_vertex.size(), 3);
+            const auto baseIndex = 3*(i + offset);
+            tempJointsPtr[baseIndex  ] = outVertPtr[3*i  ];
+            tempJointsPtr[baseIndex+1] = outVertPtr[3*i+1];
+            tempJointsPtr[baseIndex+2] = outVertPtr[3*i+2];
+            // // Much slower vector equivalent
+            // tempJoints.block<3,1>(3*(i + offset), 0) = outVert.row(i).transpose();
         }
 
         if (jacobians)
         {
+            const auto* dTJdPPtr = dTJdP.data();
+            const auto* dTJdcPtr = dTJdc.data();
             int offset = 0;
             for (int i = 0; i < fit_data_.adam.m_indices_jointConst_adamIdx.rows(); i++)
             {
-                std::copy(dTJdP.data() + 3 * fit_data_.adam.m_indices_jointConst_adamIdx(i) * TotalModel::NUM_POSE_PARAMETERS,
-                          dTJdP.data() + 3 * (fit_data_.adam.m_indices_jointConst_adamIdx(i) + 1) * TotalModel::NUM_POSE_PARAMETERS,
+                std::copy(dTJdPPtr + 3 * indicesJointConstAdamIdxPtr[i] * TotalModel::NUM_POSE_PARAMETERS,
+                          dTJdPPtr + 3 * (indicesJointConstAdamIdxPtr[i] + 1) * TotalModel::NUM_POSE_PARAMETERS,
                           dOdP.data() + 3 * (i + offset) * TotalModel::NUM_POSE_PARAMETERS);
-                std::copy(dTJdc.data() + 3 * fit_data_.adam.m_indices_jointConst_adamIdx(i) * TotalModel::NUM_SHAPE_COEFFICIENTS,
-                          dTJdc.data() + 3 * (fit_data_.adam.m_indices_jointConst_adamIdx(i) + 1) * TotalModel::NUM_SHAPE_COEFFICIENTS,
+                std::copy(dTJdcPtr + 3 * indicesJointConstAdamIdxPtr[i] * TotalModel::NUM_SHAPE_COEFFICIENTS,
+                          dTJdcPtr + 3 * (indicesJointConstAdamIdxPtr[i] + 1) * TotalModel::NUM_SHAPE_COEFFICIENTS,
                           dOdc.data() + 3 * (i + offset) * TotalModel::NUM_SHAPE_COEFFICIENTS);
             }
             offset += fit_data_.adam.m_indices_jointConst_adamIdx.rows();
             for (int i = 0; i < fit_data_.adam.m_correspond_adam2lHand_adamIdx.rows(); i++)
             {
-                std::copy(dTJdP.data() + 3 * fit_data_.adam.m_correspond_adam2lHand_adamIdx(i) * TotalModel::NUM_POSE_PARAMETERS,
-                          dTJdP.data() + 3 * (fit_data_.adam.m_correspond_adam2lHand_adamIdx(i) + 1) * TotalModel::NUM_POSE_PARAMETERS,
+                std::copy(dTJdPPtr + 3 * correspondAdam2lHandAdamIdx[i] * TotalModel::NUM_POSE_PARAMETERS,
+                          dTJdPPtr + 3 * (correspondAdam2lHandAdamIdx[i] + 1) * TotalModel::NUM_POSE_PARAMETERS,
                           dOdP.data() + 3 * (i + offset) * TotalModel::NUM_POSE_PARAMETERS);
-                std::copy(dTJdc.data() + 3 * fit_data_.adam.m_correspond_adam2lHand_adamIdx(i) * TotalModel::NUM_SHAPE_COEFFICIENTS,
-                          dTJdc.data() + 3 * (fit_data_.adam.m_correspond_adam2lHand_adamIdx(i) + 1) * TotalModel::NUM_SHAPE_COEFFICIENTS,
+                std::copy(dTJdcPtr + 3 * correspondAdam2lHandAdamIdx[i] * TotalModel::NUM_SHAPE_COEFFICIENTS,
+                          dTJdcPtr + 3 * (correspondAdam2lHandAdamIdx[i] + 1) * TotalModel::NUM_SHAPE_COEFFICIENTS,
                           dOdc.data() + 3 * (i + offset) * TotalModel::NUM_SHAPE_COEFFICIENTS);
             }
             offset += fit_data_.adam.m_correspond_adam2lHand_adamIdx.rows();
             for (int i = 0; i < fit_data_.adam.m_correspond_adam2rHand_adamIdx.rows(); i++)
             {
-                std::copy(dTJdP.data() + 3 * fit_data_.adam.m_correspond_adam2rHand_adamIdx(i) * TotalModel::NUM_POSE_PARAMETERS,
-                          dTJdP.data() + 3 * (fit_data_.adam.m_correspond_adam2rHand_adamIdx(i) + 1) * TotalModel::NUM_POSE_PARAMETERS,
+                std::copy(dTJdPPtr + 3 * correspondAdam2rHandAdamIdx[i] * TotalModel::NUM_POSE_PARAMETERS,
+                          dTJdPPtr + 3 * (correspondAdam2rHandAdamIdx[i] + 1) * TotalModel::NUM_POSE_PARAMETERS,
                           dOdP.data() + 3 * (i + offset) * TotalModel::NUM_POSE_PARAMETERS);
-                std::copy(dTJdc.data() + 3 * fit_data_.adam.m_correspond_adam2rHand_adamIdx(i) * TotalModel::NUM_SHAPE_COEFFICIENTS,
-                          dTJdc.data() + 3 * (fit_data_.adam.m_correspond_adam2rHand_adamIdx(i) + 1) * TotalModel::NUM_SHAPE_COEFFICIENTS,
+                std::copy(dTJdcPtr + 3 * correspondAdam2rHandAdamIdx[i] * TotalModel::NUM_SHAPE_COEFFICIENTS,
+                          dTJdcPtr + 3 * (correspondAdam2rHandAdamIdx[i] + 1) * TotalModel::NUM_SHAPE_COEFFICIENTS,
                           dOdc.data() + 3 * (i + offset) * TotalModel::NUM_SHAPE_COEFFICIENTS);
             }
             offset += fit_data_.adam.m_correspond_adam2rHand_adamIdx.rows();
@@ -478,15 +521,16 @@ bool AdamFullCost::Evaluate(double const* const* parameters,
             if (fit_face_exp)
             {
                 std::fill(dOdfc_data, dOdfc_data + 3 * m_nCorrespond_adam2joints * TotalModel::NUM_EXP_BASIS_COEFFICIENTS, 0.0);
-                std::copy(dVdfc_data, dVdfc_data + 3 * m_nCorrespond_adam2pts * TotalModel::NUM_EXP_BASIS_COEFFICIENTS, dOdfc_data + 3 * m_nCorrespond_adam2joints * TotalModel::NUM_EXP_BASIS_COEFFICIENTS);
+                std::copy(dVdfc_data, dVdfc_data + 3 * m_nCorrespond_adam2pts * TotalModel::NUM_EXP_BASIS_COEFFICIENTS,
+                          dOdfc_data + 3 * m_nCorrespond_adam2joints * TotalModel::NUM_EXP_BASIS_COEFFICIENTS);
             }
         }
     }
     else if (regressor_type == 1) // use Human 3.6M regressor
     {
-        if(jacobians) SparseRegress(fit_data_.adam.m_cocoplus_reg, outVert.data(), dVdP_data, dVdc_data, tempJoints.data(), dOdP.data(), dOdc.data());
-        else SparseRegress(fit_data_.adam.m_cocoplus_reg, outVert.data(), nullptr, nullptr, tempJoints.data(), nullptr, nullptr);
-        out_data[2] = tempJoints.data();
+        if(jacobians) SparseRegress(fit_data_.adam.m_cocoplus_reg, outVertPtr, dVdP_data, dVdc_data, tempJointsPtr, dOdP.data(), dOdc.data());
+        else SparseRegress(fit_data_.adam.m_cocoplus_reg, outVertPtr, nullptr, nullptr, tempJointsPtr, nullptr, nullptr);
+        out_data[2] = tempJointsPtr;
         if (jacobians)
         {
             dodP[2] = &dOdP;
@@ -496,10 +540,10 @@ bool AdamFullCost::Evaluate(double const* const* parameters,
     else
     {
         assert(regressor_type == 2); // use COCO regressor
-        if(jacobians) SparseRegress(fit_data_.adam.m_small_coco_reg, outVert.data(), dVdP_data, dVdc_data, tempJoints.data(), dOdP.data(), dOdc.data());
-        else SparseRegress(fit_data_.adam.m_small_coco_reg, outVert.data(), nullptr, nullptr, tempJoints.data(), nullptr, nullptr);
+        if(jacobians) SparseRegress(fit_data_.adam.m_small_coco_reg, outVertPtr, dVdP_data, dVdc_data, tempJointsPtr, dOdP.data(), dOdc.data());
+        else SparseRegress(fit_data_.adam.m_small_coco_reg, outVertPtr, nullptr, nullptr, tempJointsPtr, nullptr, nullptr);
         // SparseRegressor only set the data for body & face, we need to copy finger data from FK output
-        std::copy(outJoint.data() + 3 * 22, outJoint.data() + 3 * 62,  tempJoints.data() + 3 * fit_data_.adam.h36m_jointConst_smcIdx.size()); // 22-42 are left hand, 42 - 62 are right hand
+        std::copy(outJointPtr + 3 * 22, outJointPtr + 3 * 62,  tempJointsPtr + 3 * fit_data_.adam.h36m_jointConst_smcIdx.size()); // 22-42 are left hand, 42 - 62 are right hand
         // copy foot & face vertex
         for (auto i = 0u; i < corres_vertex2targetpt.size(); i++)
         {
@@ -507,7 +551,7 @@ bool AdamFullCost::Evaluate(double const* const* parameters,
             tempJoints[(m_nCorrespond_adam2joints + i) * 3 + 1] = outVert(corres_vertex2targetpt[i].first, 1);
             tempJoints[(m_nCorrespond_adam2joints + i) * 3 + 2] = outVert(corres_vertex2targetpt[i].first, 2);
         }
-        out_data[2] = tempJoints.data();
+        out_data[2] = tempJointsPtr;
         if (jacobians)
         {
             std::copy(dTJdP.data() + 3 * 22 * TotalModel::NUM_POSE_PARAMETERS, dTJdP.data() + 3 * 62 * TotalModel::NUM_POSE_PARAMETERS,
@@ -528,42 +572,64 @@ bool AdamFullCost::Evaluate(double const* const* parameters,
             if (fit_face_exp)
             {
                 std::fill(dOdfc_data, dOdfc_data + 3 * m_nCorrespond_adam2joints * TotalModel::NUM_EXP_BASIS_COEFFICIENTS, 0.0);
-                std::copy(dVdfc_data, dVdfc_data + 3 * m_nCorrespond_adam2pts * TotalModel::NUM_EXP_BASIS_COEFFICIENTS, dOdfc_data + 3 * m_nCorrespond_adam2joints * TotalModel::NUM_EXP_BASIS_COEFFICIENTS);
+                std::copy(dVdfc_data, dVdfc_data + 3 * m_nCorrespond_adam2pts * TotalModel::NUM_EXP_BASIS_COEFFICIENTS,
+                          dOdfc_data + 3 * m_nCorrespond_adam2joints * TotalModel::NUM_EXP_BASIS_COEFFICIENTS);
             }
         }
     }
 // const auto duration_target = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start_target).count();
 
     // 3rd step: set residuals
+// const auto start_res = std::chrono::high_resolution_clock::now();
     Map< VectorXd > res(residuals, m_nResiduals);
     const auto* targetPts = m_targetPts.data();
-// const auto start_res = std::chrono::high_resolution_clock::now();
+    const auto* targetPtsWeight = m_targetPts_weight.data();
     if (fit_data_.fit3D)  // put constrains on 3D
     {
         for(int i = 0; i < m_nCorrespond_adam2joints + m_nCorrespond_adam2pts; i++)
         {
-            if (targetPts[5 * i] == 0 && targetPts[5 * i + 1] == 0 && targetPts[5 * i + 2] == 0) res.block(res_dim * i, 0, 3, 1).setZero();
-            else res.block(res_dim * i, 0, 3, 1) = m_targetPts_weight[i] * (tempJoints.block(3 * i, 0, 3, 1) - m_targetPts.block(5 * i, 0, 3, 1));
+            const int residualIndex = res_dim * i;
+            const int index3 = 3*i;
+            const int index5 = 5*i;
+            if (targetPts[index5] == 0 && targetPts[index5 + 1] == 0 && targetPts[index5 + 2] == 0)
+            {
+                residuals[residualIndex  ] = 0;
+                residuals[residualIndex+1] = 0;
+                residuals[residualIndex+2] = 0;
+                // // Vectorized (slower) equivalent
+                // res.block<3,1>(res_dim * i, 0).setZero();
+            }
+            else
+            {
+                residuals[residualIndex  ] = targetPtsWeight[i] * (tempJointsPtr[index3  ] - targetPts[index5]);
+                residuals[residualIndex+1] = targetPtsWeight[i] * (tempJointsPtr[index3+1] - targetPts[index5+1]);
+                residuals[residualIndex+2] = targetPtsWeight[i] * (tempJointsPtr[index3+2] - targetPts[index5+2]);
+                // // Vectorized (slower) equivalent
+                // res.block<3,1>(res_dim * i, 0) = targetPtsWeight[i] * (tempJoints.block<3,1>(3 * i, 0) - m_targetPts.block<3,1>(5 * i, 0));
+            }
         }
     }
 
     if (fit_data_.fit2D)
     {
-        Eigen::Map< Matrix<double, Dynamic, 3, RowMajor> > jointArray(tempJoints.data(), m_nCorrespond_adam2joints + m_nCorrespond_adam2pts, 3);
+        Eigen::Map< Matrix<double, Dynamic, 3, RowMajor> > jointArray(tempJointsPtr, m_nCorrespond_adam2joints + m_nCorrespond_adam2pts, 3);
         // const Eigen::Map< const Matrix<double, 3, 3, RowMajor> > K(fit_data_.K);
         const Eigen::Map< const Matrix<double, 3, 3> > K(fit_data_.K);
         const MatrixXdr jointProjection = jointArray * K;
         const auto* JP = jointProjection.data();
         for(int i = 0; i < m_nCorrespond_adam2joints + m_nCorrespond_adam2pts; i++)
         {
-            if (targetPts[5 * i + 3] == 0 && targetPts[5 * i + 4] == 0) res.block(res_dim * i + start_2d_dim, 0, 2, 1).setZero();
+            if (targetPts[5 * i + 3] == 0 && targetPts[5 * i + 4] == 0)
+                res.block<2,1>(res_dim * i + start_2d_dim, 0).setZero();
             else
             {
                 // the following two lines are equivalent to
-                // residuals[res_dim * i + start_2d_dim + 0] = (jointProjection(i, 0) / jointProjection(i, 2) - m_targetPts(5 * i + 3)) * m_targetPts_weight[res_dim * i + start_2d_dim + 0];
-                // residuals[res_dim * i + start_2d_dim + 1] = (jointProjection(i, 1) / jointProjection(i, 2) - m_targetPts(5 * i + 4)) * m_targetPts_weight[res_dim * i + start_2d_dim + 1];
-                residuals[res_dim * i + start_2d_dim + 0] = (JP[3 * i + 0] / JP[3 * i + 2] - targetPts[5 * i + 3]) * m_targetPts_weight[i];
-                residuals[res_dim * i + start_2d_dim + 1] = (JP[3 * i + 1] / JP[3 * i + 2] - targetPts[5 * i + 4]) * m_targetPts_weight[i];
+                // residuals[res_dim * i + start_2d_dim + 0] = (jointProjection(i, 0) / jointProjection(i, 2) - m_targetPts(5 * i + 3)) * targetPtsWeight[res_dim * i + start_2d_dim + 0];
+                // residuals[res_dim * i + start_2d_dim + 1] = (jointProjection(i, 1) / jointProjection(i, 2) - m_targetPts(5 * i + 4)) * targetPtsWeight[res_dim * i + start_2d_dim + 1];
+                const auto residualIndex = res_dim * i + start_2d_dim;
+                const auto baseIndex = 3*i;
+                residuals[residualIndex    ] = (JP[baseIndex    ] / JP[baseIndex + 2] - targetPts[5 * i + 3]) * targetPtsWeight[i];
+                residuals[residualIndex + 1] = (JP[baseIndex + 1] / JP[baseIndex + 2] - targetPts[5 * i + 4]) * targetPtsWeight[i];
             }
         }
     }
@@ -573,111 +639,163 @@ bool AdamFullCost::Evaluate(double const* const* parameters,
         const int offset = start_PAF;
         for (auto i = 0; i < num_PAF_constraint; i++)
         {
+            const auto residualIndex = offset + 3 * i;
             if (fit_data_.PAF.col(i).isZero(0))
             {
-                residuals[offset + 3 * i + 0] = residuals[offset + 3 * i + 1] = residuals[offset + 3 * i + 2] = 0.0;
-                continue;
+                residuals[residualIndex] = residuals[residualIndex + 1] = residuals[residualIndex + 2] = 0.0;
             }
-            const std::array<double, 3> AB{{
-                out_data[PAF_connection[i][2]][3 * PAF_connection[i][3] + 0] - out_data[PAF_connection[i][0]][3 * PAF_connection[i][1] + 0], 
-                out_data[PAF_connection[i][2]][3 * PAF_connection[i][3] + 1] - out_data[PAF_connection[i][0]][3 * PAF_connection[i][1] + 1], 
-                out_data[PAF_connection[i][2]][3 * PAF_connection[i][3] + 2] - out_data[PAF_connection[i][0]][3 * PAF_connection[i][1] + 2], 
-            }};
-            const auto length = sqrt(AB[0] * AB[0] + AB[1] * AB[1] + AB[2] * AB[2]);
-            residuals[offset + 3 * i + 0] = (AB[0] / length - fit_data_.PAF(0, i)) * PAF_weight[i];
-            residuals[offset + 3 * i + 1] = (AB[1] / length - fit_data_.PAF(1, i)) * PAF_weight[i];
-            residuals[offset + 3 * i + 2] = (AB[2] / length - fit_data_.PAF(2, i)) * PAF_weight[i];
+            else
+            {
+                const auto& pafConnectionI = PAF_connection[i];
+                const std::array<double, 3> AB{{
+                    out_data[pafConnectionI[2]][3 * pafConnectionI[3] + 0] - out_data[pafConnectionI[0]][3 * pafConnectionI[1] + 0],
+                    out_data[pafConnectionI[2]][3 * pafConnectionI[3] + 1] - out_data[pafConnectionI[0]][3 * pafConnectionI[1] + 1],
+                    out_data[pafConnectionI[2]][3 * pafConnectionI[3] + 2] - out_data[pafConnectionI[0]][3 * pafConnectionI[1] + 2],
+                }};
+                const auto length = sqrt(AB[0] * AB[0] + AB[1] * AB[1] + AB[2] * AB[2]);
+                residuals[residualIndex    ] = (AB[0] / length - fit_data_.PAF(0, i)) * PAF_weight[i];
+                residuals[residualIndex + 1] = (AB[1] / length - fit_data_.PAF(1, i)) * PAF_weight[i];
+                residuals[residualIndex + 2] = (AB[2] / length - fit_data_.PAF(2, i)) * PAF_weight[i];
+            }
         }
     }
 
-    int offset_inner = start_inner;
     if (fit_data_.inner_weight[0] > 0)
     {
         // the first defined inner constraints: should not bend (adam joint 6 should be close to the middle of central hip and neck)
-        residuals[offset_inner + 0] = (outJoint.data()[3 * 6 + 0] - 0.5 * (outJoint.data()[3 * 0 + 0] + outJoint.data()[3 * 12 + 0])) * fit_data_.inner_weight[0];
-        residuals[offset_inner + 1] = (outJoint.data()[3 * 6 + 1] - 0.5 * (outJoint.data()[3 * 0 + 1] + outJoint.data()[3 * 12 + 1])) * fit_data_.inner_weight[0];
-        residuals[offset_inner + 2] = (outJoint.data()[3 * 6 + 2] - 0.5 * (outJoint.data()[3 * 0 + 2] + outJoint.data()[3 * 12 + 2])) * fit_data_.inner_weight[0];
+        residuals[start_inner    ] = (outJointPtr[3 * 6    ] - 0.5 * (outJointPtr[0] + outJointPtr[3 * 12 + 0])) * fit_data_.inner_weight[0];
+        residuals[start_inner + 1] = (outJointPtr[3 * 6 + 1] - 0.5 * (outJointPtr[1] + outJointPtr[3 * 12 + 1])) * fit_data_.inner_weight[0];
+        residuals[start_inner + 2] = (outJointPtr[3 * 6 + 2] - 0.5 * (outJointPtr[2] + outJointPtr[3 * 12 + 2])) * fit_data_.inner_weight[0];
     }
     else
     {
-        residuals[offset_inner + 0] = residuals[offset_inner + 1] = residuals[offset_inner + 2] = 0.0;
+        residuals[start_inner] = residuals[start_inner + 1] = residuals[start_inner + 2] = 0.0;
     }
 // const auto duration_res = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start_res).count();
 
     // 4th step: set jacobians
 // const auto start_jacob = std::chrono::high_resolution_clock::now();
+// auto start_jacob0 = start_jacob;
+// auto start_jacob1 = start_jacob;
+// auto start_jacob2 = start_jacob;
+// auto start_jacob3 = start_jacob;
+// auto duration_jacob0 = 0.;
+// auto duration_jacob1 = 0.;
+// auto duration_jacob2 = 0.;
+// auto duration_jacob3 = 0.;
     if (jacobians)
     {
+// start_jacob0 = std::chrono::high_resolution_clock::now();
         if (jacobians[0])
         {
-            Map< Matrix<double, Dynamic, Dynamic, RowMajor> > drdt(jacobians[0], m_nResiduals, 3);
+            auto* jac0 = jacobians[0];
+            const auto jac0Cols = 3;
+            // Map< Matrix<double, Dynamic, Dynamic, RowMajor> > drdt(jac0, m_nResiduals, jac0Cols);
 
             if (fit_data_.fit3D)
             {
-                for (int i = 0; i < m_nCorrespond_adam2joints + m_nCorrespond_adam2pts; i++)
+                const auto maximumIndex = m_nCorrespond_adam2joints + m_nCorrespond_adam2pts;
+                // Set to 0
+                std::fill(jac0,
+                          jac0 + res_dim * maximumIndex * jac0Cols,
+                          0.0);
+                for (int i = 0; i < maximumIndex; i++)
                 {
-                    if (targetPts[5 * i] == 0 && targetPts[5 * i + 1] == 0 && targetPts[5 * i + 2] == 0) drdt.block(res_dim * i, 0, 3, 3).setZero();
-                    else drdt.block(res_dim * i, 0, 3, 3) = m_targetPts_weight[i] * Matrix<double, 3, 3>::Identity();
+                    // Set identity if required
+                    const int index5 = 5*i;
+                    if (targetPts[index5] != 0 || targetPts[index5 + 1] != 0 || targetPts[index5 + 2] != 0)
+                    {
+                        const auto baseIndex = res_dim * i;
+                        for (auto col = 0 ; col < jac0Cols ; col++)
+                            jac0[baseIndex*jac0Cols + jac0Cols*col + col] = targetPtsWeight[i];
+                    }
+
                 }
+                // // Vectorized (slower) equivalent of above code
+                // for (int i = 0; i < m_nCorrespond_adam2joints + m_nCorrespond_adam2pts; i++)
+                // {
+                //     if (targetPts[5 * i] == 0 && targetPts[5 * i + 1] == 0 && targetPts[5 * i + 2] == 0)
+                //         drdt.block<3,3>(res_dim * i, 0).setZero();
+                //     else
+                //         drdt.block<3,3>(res_dim * i, 0) = m_targetPts_weight[i] * Matrix<double, 3, 3>::Identity();
+                // }
             }
 
             if (fit_data_.fit2D)
             {
-                Eigen::Map< Matrix<double, Dynamic, 3, RowMajor> > jointArray(tempJoints.data(), m_nCorrespond_adam2joints + m_nCorrespond_adam2pts, 3);
+                Eigen::Map< Matrix<double, Dynamic, 3, RowMajor> > jointArray(tempJointsPtr, m_nCorrespond_adam2joints + m_nCorrespond_adam2pts, 3);
                 Matrix<double, Dynamic, Dynamic, RowMajor> dJdt(3, 3);
                 dJdt.setIdentity();
                 for (int i = 0; i < m_nCorrespond_adam2joints + m_nCorrespond_adam2pts; i++)
                 {
-                    if (targetPts[5 * i + 3] == 0 && targetPts[5 * i + 4] == 0) drdt.block(res_dim * i + start_2d_dim, 0, 2, 3).setZero();
+                    const int index5 = 5*i;
+                    if (targetPts[index5 + 3] == 0 && targetPts[index5 + 4] == 0)
+                    {
+                        // drdt.block<2,3>(res_dim * i + start_2d_dim, 0).setZero();
+                        const auto jacIndex = jac0Cols * (res_dim * i + start_2d_dim);
+                        std::fill(jac0 + jacIndex,
+                                  jac0 + jacIndex + inner_dim[0]*jac0Cols, 0.0);
+                    }
                     else
                     {
-                        projection_Derivative(drdt.data(), dJdt.data(), drdt.cols(), (double*)(jointArray.data() + 3 * i), fit_data_.K, res_dim * i + start_2d_dim, 0, m_targetPts_weight[i]);
+                        projection_Derivative(jac0, dJdt.data(), jac0Cols, (double*)(jointArray.data() + 3 * i),
+                                              fit_data_.K, res_dim * i + start_2d_dim, 0, targetPtsWeight[i]);
                     }
                 }
             }
 
             if (fit_data_.fitPAF)
             {
-                // drdt.block(start_PAF, 0, 3 * num_PAF_constraint, 3).setZero();
-                std::fill(jacobians[0] + 3 * start_PAF, jacobians[0] + 3 * start_PAF + 9 * num_PAF_constraint, 0);
+                // drdt.block<3 * num_PAF_constraint, 3>(start_PAF, 0).setZero();
+                std::fill(jac0 + jac0Cols * start_PAF, jac0 + jac0Cols * start_PAF + 9 * num_PAF_constraint, 0.0);
+                // Note by Gines: The 2 above lines are not equivalent (at least generically) to each other. Is this a bug?
             }
 
             // inner constraint 1
-            offset_inner = start_inner;
-            drdt.block(offset_inner, 0, inner_dim[0], 3).setZero();
+            // drdt.block(start_inner, 0, inner_dim[0], 3).setZero();
+            std::fill(jac0 + jac0Cols * start_inner,
+                      jac0 + jac0Cols * start_inner + inner_dim[0]*jac0Cols, 0.0);
         }
 
+// duration_jacob0 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start_jacob0).count();
+// start_jacob2 = std::chrono::high_resolution_clock::now();
         if (jacobians[1])
         {
-            Map< Matrix<double, Dynamic, Dynamic, RowMajor> > dr_dPose(jacobians[1], m_nResiduals, TotalModel::NUM_JOINTS * 3); 
+            auto* jac1 = jacobians[1];
+            const auto jac1Cols = TotalModel::NUM_JOINTS * 3;
+            Map< Matrix<double, Dynamic, Dynamic, RowMajor> > dr_dPose(jac1, m_nResiduals, jac1Cols);
             if (fit_data_.fit3D)
             {
                 for (int i = 0; i < m_nCorrespond_adam2joints + m_nCorrespond_adam2pts; i++)
                 {
                     if (targetPts[5 * i] == 0 && targetPts[5 * i + 1] == 0 && targetPts[5 * i + 2] == 0)
                     {
-                        std::fill(dr_dPose.data() + res_dim * i * TotalModel::NUM_POSE_PARAMETERS,
-                                  dr_dPose.data() + (3 + res_dim * i) * TotalModel::NUM_POSE_PARAMETERS, 0);
-                        // dr_dPose.block(res_dim * (i + offset), 0, 3, TotalModel::NUM_POSE_PARAMETERS).setZero();
+                        std::fill(jac1 + res_dim * i * TotalModel::NUM_POSE_PARAMETERS,
+                                  jac1 + (3 + res_dim * i) * TotalModel::NUM_POSE_PARAMETERS, 0);
+                        // dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(res_dim * (i + offset), 0).setZero();
                     }
-                    else dr_dPose.block(res_dim * i, 0, 3, TotalModel::NUM_POSE_PARAMETERS) = m_targetPts_weight[i] *
-                        dOdP.block(3 * i, 0, 3, TotalModel::NUM_POSE_PARAMETERS);
+                    else
+                    {
+                        dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(res_dim * i, 0) = targetPtsWeight[i] *
+                            dOdP.block<3, TotalModel::NUM_POSE_PARAMETERS>(3 * i, 0);
+                    }
                 }
             }
 
             if (fit_data_.fit2D)
             {
-                Eigen::Map< Matrix<double, Dynamic, 3, RowMajor> > jointArray(tempJoints.data(), m_nCorrespond_adam2joints + m_nCorrespond_adam2pts, 3);
+                Eigen::Map< Matrix<double, Dynamic, 3, RowMajor> > jointArray(tempJointsPtr, m_nCorrespond_adam2joints + m_nCorrespond_adam2pts, 3);
                 for (int i = 0; i < m_nCorrespond_adam2joints + m_nCorrespond_adam2pts; i++)
                 {
                     if (targetPts[5 * i + 3] == 0 && targetPts[5 * i + 4] == 0)
                     {
-                        std::fill(dr_dPose.data() + (start_2d_dim + res_dim * i) * TotalModel::NUM_POSE_PARAMETERS,
-                                  dr_dPose.data() + (2 + start_2d_dim + res_dim * i) * TotalModel::NUM_POSE_PARAMETERS, 0);
-                        // dr_dPose.block(res_dim * (i + offset), 0, 3, TotalModel::NUM_POSE_PARAMETERS).setZero();
+                        std::fill(jac1 + (start_2d_dim + res_dim * i) * TotalModel::NUM_POSE_PARAMETERS,
+                                  jac1 + (2 + start_2d_dim + res_dim * i) * TotalModel::NUM_POSE_PARAMETERS, 0);
+                        // dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(res_dim * (i + offset), 0).setZero();
                     }
-                    else projection_Derivative(dr_dPose.data(), dOdP.data(), dr_dPose.cols(), (double*)(jointArray.data() + 3 * i), fit_data_.K,
-                                               res_dim * i + start_2d_dim, 3 * i, m_targetPts_weight[i]);
+                    else
+                        projection_Derivative(jac1, dOdP.data(), jac1Cols, (double*)(jointArray.data() + 3 * i), fit_data_.K,
+                                              res_dim * i + start_2d_dim, 3 * i, targetPtsWeight[i]);
                 }
             }
 
@@ -688,15 +806,15 @@ bool AdamFullCost::Evaluate(double const* const* parameters,
                 {
                     if (fit_data_.PAF.col(i).isZero(0))
                     {
-                        // dr_dPose.block(offset + 3 * i, 0, 3, TotalModel::NUM_POSE_PARAMETERS).setZero();
-                        std::fill(dr_dPose.data() + (offset + 3 * i) * TotalModel::NUM_POSE_PARAMETERS,
-                                  dr_dPose.data() + (offset + 3 * i + 3) * TotalModel::NUM_POSE_PARAMETERS, 0);
+                        // dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(offset + 3 * i, 0).setZero();
+                        std::fill(jac1 + (offset + 3 * i) * TotalModel::NUM_POSE_PARAMETERS,
+                                  jac1 + (offset + 3 * i + 3) * TotalModel::NUM_POSE_PARAMETERS, 0);
                         continue;
                     }
                     const std::array<double, 3> AB{{
-                        out_data[PAF_connection[i][2]][3 * PAF_connection[i][3] + 0] - out_data[PAF_connection[i][0]][3 * PAF_connection[i][1] + 0], 
-                        out_data[PAF_connection[i][2]][3 * PAF_connection[i][3] + 1] - out_data[PAF_connection[i][0]][3 * PAF_connection[i][1] + 1], 
-                        out_data[PAF_connection[i][2]][3 * PAF_connection[i][3] + 2] - out_data[PAF_connection[i][0]][3 * PAF_connection[i][1] + 2], 
+                        out_data[PAF_connection[i][2]][3 * PAF_connection[i][3] + 0] - out_data[PAF_connection[i][0]][3 * PAF_connection[i][1] + 0],
+                        out_data[PAF_connection[i][2]][3 * PAF_connection[i][3] + 1] - out_data[PAF_connection[i][0]][3 * PAF_connection[i][1] + 1],
+                        out_data[PAF_connection[i][2]][3 * PAF_connection[i][3] + 2] - out_data[PAF_connection[i][0]][3 * PAF_connection[i][1] + 2],
                     }};
                     const auto length2 = AB[0] * AB[0] + AB[1] * AB[1] + AB[2] * AB[2];
                     const auto length = sqrt(length2);
@@ -704,11 +822,11 @@ bool AdamFullCost::Evaluate(double const* const* parameters,
                     const Eigen::Matrix<double, 3, 3, RowMajor> dudJ = Eigen::Matrix<double, 3, 3>::Identity() / length - AB_vec * AB_vec.transpose() / length2 / length;
                     if (PAF_connection[i][0] == 0 && PAF_connection[i][2] == 0)
                     {
-                        std::fill(dr_dPose.data() + (offset + 3 * i) * TotalModel::NUM_POSE_PARAMETERS, dr_dPose.data() + (offset + 3 * i + 3) * TotalModel::NUM_POSE_PARAMETERS, 0);
+                        std::fill(jac1 + (offset + 3 * i) * TotalModel::NUM_POSE_PARAMETERS, jac1 + (offset + 3 * i + 3) * TotalModel::NUM_POSE_PARAMETERS, 0);
                         const double* dudJ_data = dudJ.data();
-                        double* drdp_row0 = dr_dPose.data() + (offset + 3 * i) * TotalModel::NUM_POSE_PARAMETERS;
-                        double* drdp_row1 = dr_dPose.data() + (offset + 3 * i + 1) * TotalModel::NUM_POSE_PARAMETERS;
-                        double* drdp_row2 = dr_dPose.data() + (offset + 3 * i + 2) * TotalModel::NUM_POSE_PARAMETERS;
+                        double* drdp_row0 = jac1 + (offset + 3 * i) * TotalModel::NUM_POSE_PARAMETERS;
+                        double* drdp_row1 = jac1 + (offset + 3 * i + 1) * TotalModel::NUM_POSE_PARAMETERS;
+                        double* drdp_row2 = jac1 + (offset + 3 * i + 2) * TotalModel::NUM_POSE_PARAMETERS;
                         {
                             const double* dJdP_row0 = dTJdP.data() + (3 * PAF_connection[i][3]) * TotalModel::NUM_POSE_PARAMETERS;
                             const double* dJdP_row1 = dTJdP.data() + (3 * PAF_connection[i][3] + 1) * TotalModel::NUM_POSE_PARAMETERS;
@@ -751,26 +869,41 @@ bool AdamFullCost::Evaluate(double const* const* parameters,
                     else
                     {
                         // slow
-                        dr_dPose.block(offset + 3 * i, 0, 3, TotalModel::NUM_POSE_PARAMETERS) = PAF_weight[i] * dudJ * 
+                        dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(offset + 3 * i, 0) = PAF_weight[i] * dudJ *
                             ( dodP[PAF_connection[i][2]]->block(3 * PAF_connection[i][3], 0, 3, TotalModel::NUM_POSE_PARAMETERS) -
                             dodP[PAF_connection[i][0]]->block(3 * PAF_connection[i][1], 0, 3, TotalModel::NUM_POSE_PARAMETERS) );
                     }
                 }
             }
 
-            offset_inner = start_inner;
             if (fit_data_.inner_weight[0] > 0)
             {
                 // the first defined inner constraints: should not bend (adam joint 6 should be close to the middle of central hip and neck)
-                dr_dPose.block(offset_inner, 0, inner_dim[0], TotalModel::NUM_POSE_PARAMETERS) =
-                    fit_data_.inner_weight[0] * (dTJdP.block(6 * 3, 0, 3, TotalModel::NUM_POSE_PARAMETERS) -
-                    0.5 * (dTJdP.block(0 * 3, 0, 3, TotalModel::NUM_POSE_PARAMETERS) + dTJdP.block(12 * 3, 0, 3, TotalModel::NUM_POSE_PARAMETERS)));
+                dr_dPose.block(start_inner, 0, inner_dim[0], TotalModel::NUM_POSE_PARAMETERS) =
+                    fit_data_.inner_weight[0] * (dTJdP.block<3, TotalModel::NUM_POSE_PARAMETERS>(6 * 3, 0) -
+                    0.5 * (dTJdP.block<3, TotalModel::NUM_POSE_PARAMETERS>(0 * 3, 0) + dTJdP.block<3, TotalModel::NUM_POSE_PARAMETERS>(12 * 3, 0)));
             }
             else
-                dr_dPose.block(offset_inner, 0, inner_dim[0], TotalModel::NUM_POSE_PARAMETERS).setZero();
+            {
+                for (auto j = (unsigned int)start_inner ; j < start_inner+inner_dim[0] ; j++)
+                {
+                    std::fill(jac1 + j*jac1Cols,
+                              jac1 + j*jac1Cols + TotalModel::NUM_POSE_PARAMETERS, 0.0);
+                }
+                // // Vectorized (slower) equivalent of above code
+                // dr_dPose.block(start_inner, 0, inner_dim[0], TotalModel::NUM_POSE_PARAMETERS).setZero();
+            }
 
             if (rigid_body)
-                dr_dPose.block(0, 3, m_nResiduals, TotalModel::NUM_POSE_PARAMETERS - 3).setZero();
+            {
+                for (auto j = 0 ; j < m_nResiduals ; j++)
+                {
+                    std::fill(jac1 + j*jac1Cols + 3,
+                              jac1 + j*jac1Cols + TotalModel::NUM_POSE_PARAMETERS, 0.0);
+                }
+                // // Vectorized (slower) equivalent of above code
+                // dr_dPose.block(0, 3, m_nResiduals, TotalModel::NUM_POSE_PARAMETERS - 3).setZero();
+            }
 
             if (freeze_missing)
             {
@@ -778,22 +911,52 @@ bool AdamFullCost::Evaluate(double const* const* parameters,
                 for (int ic = 0; ic < fit_data_.adam.m_indices_jointConst_adamIdx.rows(); ic++)
                 {
                     const int smcjoint = fit_data_.adam.m_indices_jointConst_smcIdx(ic);
-                    const int adam_index = fit_data_.adam.m_parent[fit_data_.adam.m_indices_jointConst_adamIdx(ic)];
-                    if (fit_data_.bodyJoints.col(smcjoint).isZero(0)) dr_dPose.block(0, 3 * adam_index, m_nResiduals, 3).setZero();
+                    if (smcjoint == 4 || smcjoint == 5 || smcjoint == 10 || smcjoint == 11)
+                    {
+                        const int adam_index = fit_data_.adam.m_parent[indicesJointConstAdamIdxPtr[ic]];
+                        if (fit_data_.bodyJoints.col(smcjoint).isZero(0))
+                        {
+                            for (auto j = 0 ; j < m_nResiduals ; j++)
+                            {
+                                std::fill(jac1 + j*jac1Cols + 3 * adam_index,
+                                          jac1 + j*jac1Cols + 3 * adam_index + 3, 0.0);
+                            }
+                            // // Vectorized (slower) equivalent of above code
+                            // dr_dPose.block(0, 3 * adam_index, m_nResiduals, 3).setZero();
+                        }
+                    }
                 }
 
                 for (int ic = 0; ic < fit_data_.adam.m_correspond_adam2lHand_adamIdx.rows(); ic++)
                 {
                     const int smcjoint = fit_data_.adam.m_correspond_adam2lHand_lHandIdx(ic);
-                    const int adam_index = fit_data_.adam.m_parent[fit_data_.adam.m_correspond_adam2lHand_adamIdx(ic)];
-                    if (fit_data_.lHandJoints.col(smcjoint).isZero(0)) dr_dPose.block(0, 3 * adam_index, m_nResiduals, 3).setZero();
+                    const int adam_index = fit_data_.adam.m_parent[correspondAdam2lHandAdamIdx[ic]];
+                    if (fit_data_.lHandJoints.col(smcjoint).isZero(0))
+                    {
+                        for (auto j = 0 ; j < m_nResiduals ; j++)
+                        {
+                            std::fill(jac1 + j*jac1Cols + 3 * adam_index,
+                                      jac1 + j*jac1Cols + 3 * adam_index + 3, 0.0);
+                        }
+                        // // Vectorized (slower) equivalent of above code
+                        // dr_dPose.block(0, 3 * adam_index, m_nResiduals, 3).setZero();
+                    }
                 }
 
                 for (int ic = 0; ic < fit_data_.adam.m_correspond_adam2rHand_adamIdx.rows(); ic++)
                 {
                     const int smcjoint = fit_data_.adam.m_correspond_adam2rHand_rHandIdx(ic);
-                    const int adam_index = fit_data_.adam.m_parent[fit_data_.adam.m_correspond_adam2rHand_adamIdx(ic)];
-                    if (fit_data_.rHandJoints.col(smcjoint).isZero(0)) dr_dPose.block(0, 3 * adam_index, m_nResiduals, 3).setZero();
+                    const int adam_index = fit_data_.adam.m_parent[correspondAdam2rHandAdamIdx[ic]];
+                    if (fit_data_.rHandJoints.col(smcjoint).isZero(0))
+                    {
+                        for (auto j = 0 ; j < m_nResiduals ; j++)
+                        {
+                            std::fill(jac1 + j*jac1Cols + 3 * adam_index,
+                                      jac1 + j*jac1Cols + 3 * adam_index + 3, 0.0);
+                        }
+                        // // Vectorized (slower) equivalent of above code
+                        // dr_dPose.block(0, 3 * adam_index, m_nResiduals, 3).setZero();
+                    }
                 }
             }
         }
@@ -802,14 +965,16 @@ bool AdamFullCost::Evaluate(double const* const* parameters,
         {
             if (jacobians[2])
                 std::fill(jacobians[2], jacobians[2] + m_nResiduals * TotalModel::NUM_SHAPE_COEFFICIENTS, 0);
-            if (fit_face_exp && jacobians[3]) 
+            if (fit_face_exp && jacobians[3])
                 std::fill(jacobians[3], jacobians[3] + m_nResiduals * TotalModel::NUM_EXP_BASIS_COEFFICIENTS, 0);
             return true;
         }
 
+// duration_jacob1 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start_jacob1).count();
+// start_jacob2 = std::chrono::high_resolution_clock::now();
         if (jacobians[2])
         {
-            Map< Matrix<double, Dynamic, Dynamic, RowMajor> > dr_dCoeff(jacobians[2], m_nResiduals, TotalModel::NUM_SHAPE_COEFFICIENTS);    
+            Map< Matrix<double, Dynamic, Dynamic, RowMajor> > dr_dCoeff(jacobians[2], m_nResiduals, TotalModel::NUM_SHAPE_COEFFICIENTS);
 
             if (fit_data_.fit3D)
             {
@@ -820,14 +985,15 @@ bool AdamFullCost::Evaluate(double const* const* parameters,
                         std::fill(dr_dCoeff.data() + res_dim * i * TotalModel::NUM_SHAPE_COEFFICIENTS,
                                   dr_dCoeff.data() + (3 + res_dim * i) * TotalModel::NUM_SHAPE_COEFFICIENTS, 0);
                     }
-                    else dr_dCoeff.block(res_dim * i, 0, 3, TotalModel::NUM_SHAPE_COEFFICIENTS) = m_targetPts_weight[i] *
-                        dOdc.block(3 * i, 0, 3, TotalModel::NUM_SHAPE_COEFFICIENTS);
+                    else
+                        dr_dCoeff.block<3, TotalModel::NUM_SHAPE_COEFFICIENTS>(res_dim * i, 0) = targetPtsWeight[i] *
+                            dOdc.block<3, TotalModel::NUM_SHAPE_COEFFICIENTS>(3 * i, 0);
                 }
             }
 
             if (fit_data_.fit2D)
             {
-                Eigen::Map< Matrix<double, Dynamic, 3, RowMajor> > jointArray(tempJoints.data(), m_nCorrespond_adam2joints + m_nCorrespond_adam2pts, 3);
+                Eigen::Map< Matrix<double, Dynamic, 3, RowMajor> > jointArray(tempJointsPtr, m_nCorrespond_adam2joints + m_nCorrespond_adam2pts, 3);
                 for (int i = 0; i < m_nCorrespond_adam2joints + m_nCorrespond_adam2pts; i++)
                 {
                     if (targetPts[5 * i + 3] == 0 && targetPts[5 * i + 4] == 0)
@@ -836,7 +1002,7 @@ bool AdamFullCost::Evaluate(double const* const* parameters,
                                   dr_dCoeff.data() + (2 + start_2d_dim + res_dim * i) * TotalModel::NUM_SHAPE_COEFFICIENTS, 0);
                     }
                     else projection_Derivative(dr_dCoeff.data(), dOdc.data(), dr_dCoeff.cols(), (double*)(jointArray.data() + 3 * i), fit_data_.K,
-                                               res_dim * i + start_2d_dim, 3 * i, m_targetPts_weight[i]);
+                                               res_dim * i + start_2d_dim, 3 * i, targetPtsWeight[i]);
                 }
             }
 
@@ -853,35 +1019,38 @@ bool AdamFullCost::Evaluate(double const* const* parameters,
                         continue;
                     }
                     const std::array<double, 3> AB{{
-                        out_data[PAF_connection[i][2]][3 * PAF_connection[i][3] + 0] - out_data[PAF_connection[i][0]][3 * PAF_connection[i][1] + 0], 
-                        out_data[PAF_connection[i][2]][3 * PAF_connection[i][3] + 1] - out_data[PAF_connection[i][0]][3 * PAF_connection[i][1] + 1], 
-                        out_data[PAF_connection[i][2]][3 * PAF_connection[i][3] + 2] - out_data[PAF_connection[i][0]][3 * PAF_connection[i][1] + 2], 
+                        out_data[PAF_connection[i][2]][3 * PAF_connection[i][3] + 0] - out_data[PAF_connection[i][0]][3 * PAF_connection[i][1] + 0],
+                        out_data[PAF_connection[i][2]][3 * PAF_connection[i][3] + 1] - out_data[PAF_connection[i][0]][3 * PAF_connection[i][1] + 1],
+                        out_data[PAF_connection[i][2]][3 * PAF_connection[i][3] + 2] - out_data[PAF_connection[i][0]][3 * PAF_connection[i][1] + 2],
                     }};
                     const auto length2 = AB[0] * AB[0] + AB[1] * AB[1] + AB[2] * AB[2];
                     const auto length = sqrt(length2);
                     const Eigen::Map< const Matrix<double, 3, 1> > AB_vec(AB.data());
                     const Eigen::Matrix<double, 3, 3, RowMajor> dudJ = Eigen::Matrix<double, 3, 3>::Identity() / length - AB_vec * AB_vec.transpose() / length2 / length;
-                    dr_dCoeff.block(offset + 3 * i, 0, 3, TotalModel::NUM_SHAPE_COEFFICIENTS) = PAF_weight[i] * dudJ * 
+                    dr_dCoeff.block<3, TotalModel::NUM_SHAPE_COEFFICIENTS>(offset + 3 * i, 0) = PAF_weight[i] * dudJ *
                         ( dodc[PAF_connection[i][2]]->block(3 * PAF_connection[i][3], 0, 3, TotalModel::NUM_SHAPE_COEFFICIENTS) -
                         dodc[PAF_connection[i][0]]->block(3 * PAF_connection[i][1], 0, 3, TotalModel::NUM_SHAPE_COEFFICIENTS) );
                 }
             }
 
-            offset_inner = start_inner;
             if (fit_data_.inner_weight[0] > 0)
             {
                 // the first defined inner constraints: should not bend (adam joint 6 should be close to the middle of central hip and neck)
-                dr_dCoeff.block(offset_inner, 0, inner_dim[0], TotalModel::NUM_SHAPE_COEFFICIENTS) =
-                    fit_data_.inner_weight[0] * (dTJdc.block(6 * 3, 0, 3, TotalModel::NUM_SHAPE_COEFFICIENTS) -
-                    0.5 * (dTJdc.block(0 * 3, 0, 3, TotalModel::NUM_SHAPE_COEFFICIENTS) + dTJdc.block(12 * 3, 0, 3, TotalModel::NUM_SHAPE_COEFFICIENTS)));
+                dr_dCoeff.block(start_inner, 0, inner_dim[0], TotalModel::NUM_SHAPE_COEFFICIENTS) =
+                    fit_data_.inner_weight[0] * (dTJdc.block<3, TotalModel::NUM_SHAPE_COEFFICIENTS>(6 * 3, 0) -
+                    0.5 * (dTJdc.block<3, TotalModel::NUM_SHAPE_COEFFICIENTS>(0 * 3, 0) + dTJdc.block<3, TotalModel::NUM_SHAPE_COEFFICIENTS>(12 * 3, 0)));
             }
             else
-                dr_dCoeff.block(offset_inner, 0, inner_dim[0], TotalModel::NUM_SHAPE_COEFFICIENTS).setZero();
+                dr_dCoeff.block(start_inner, 0, inner_dim[0], TotalModel::NUM_SHAPE_COEFFICIENTS).setZero();
         }
+// duration_jacob2 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start_jacob2).count();
+// start_jacob3 = std::chrono::high_resolution_clock::now();
 
         if (fit_face_exp && jacobians[3])
         {
-            Map< Matrix<double, Dynamic, Dynamic, RowMajor> > dr_dfc(jacobians[3], m_nResiduals, TotalModel::NUM_EXP_BASIS_COEFFICIENTS);    
+            auto* jac3 = jacobians[3];
+            const auto jac3Cols = TotalModel::NUM_EXP_BASIS_COEFFICIENTS;
+            Map< Matrix<double, Dynamic, Dynamic, RowMajor> > dr_dfc(jac3, m_nResiduals, jac3Cols);
 
             if (fit_data_.fit3D)
             {
@@ -889,26 +1058,26 @@ bool AdamFullCost::Evaluate(double const* const* parameters,
                 {
                     if (targetPts[5 * i] == 0 && targetPts[5 * i + 1] == 0 && targetPts[5 * i + 2] == 0)
                     {
-                        std::fill(dr_dfc.data() + res_dim * i * TotalModel::NUM_EXP_BASIS_COEFFICIENTS,
-                                  dr_dfc.data() + (3 + res_dim * i) * TotalModel::NUM_EXP_BASIS_COEFFICIENTS, 0);
+                        std::fill(jac3 + res_dim * i * TotalModel::NUM_EXP_BASIS_COEFFICIENTS,
+                                  jac3 + (3 + res_dim * i) * TotalModel::NUM_EXP_BASIS_COEFFICIENTS, 0);
                     }
-                    else dr_dfc.block(res_dim * i, 0, 3, TotalModel::NUM_EXP_BASIS_COEFFICIENTS) = m_targetPts_weight[i] *
-                        dOdfc.block(3 * i, 0, 3, TotalModel::NUM_EXP_BASIS_COEFFICIENTS);
+                    else dr_dfc.block<3, TotalModel::NUM_EXP_BASIS_COEFFICIENTS>(res_dim * i, 0) = targetPtsWeight[i] *
+                        dOdfc.block<3, TotalModel::NUM_EXP_BASIS_COEFFICIENTS>(3 * i, 0);
                 }
             }
 
             if (fit_data_.fit2D)
             {
-                Eigen::Map< Matrix<double, Dynamic, 3, RowMajor> > jointArray(tempJoints.data(), m_nCorrespond_adam2joints + m_nCorrespond_adam2pts, 3);
+                Eigen::Map< Matrix<double, Dynamic, 3, RowMajor> > jointArray(tempJointsPtr, m_nCorrespond_adam2joints + m_nCorrespond_adam2pts, 3);
                 for (int i = 0; i < m_nCorrespond_adam2joints + m_nCorrespond_adam2pts; i++)
                 {
                     if (targetPts[5 * i + 3] == 0 && targetPts[5 * i + 4] == 0)
                     {
-                        std::fill(dr_dfc.data() + (start_2d_dim + res_dim * i) * TotalModel::NUM_EXP_BASIS_COEFFICIENTS,
-                                  dr_dfc.data() + (2 + start_2d_dim + res_dim * i) * TotalModel::NUM_EXP_BASIS_COEFFICIENTS, 0);
+                        std::fill(jac3 + (start_2d_dim + res_dim * i) * TotalModel::NUM_EXP_BASIS_COEFFICIENTS,
+                                  jac3 + (2 + start_2d_dim + res_dim * i) * TotalModel::NUM_EXP_BASIS_COEFFICIENTS, 0);
                     }
-                    else projection_Derivative(dr_dfc.data(), dOdfc.data(), dr_dfc.cols(), (double*)(jointArray.data() + 3 * i), fit_data_.K,
-                                               res_dim * i + start_2d_dim, 3 * i, m_targetPts_weight[i]);
+                    else projection_Derivative(jac3, dOdfc.data(), jac3Cols, (double*)(jointArray.data() + 3 * i), fit_data_.K,
+                                               res_dim * i + start_2d_dim, 3 * i, targetPtsWeight[i]);
                 }
             }
 
@@ -919,40 +1088,50 @@ bool AdamFullCost::Evaluate(double const* const* parameters,
                 {
                     if (fit_data_.PAF.col(i).isZero(0))
                     {
-                        std::fill(dr_dfc.data() + (offset + 3 * i) * TotalModel::NUM_EXP_BASIS_COEFFICIENTS,
-                                  dr_dfc.data() + (offset + 3 * i + 3) * TotalModel::NUM_EXP_BASIS_COEFFICIENTS, 0);
+                        std::fill(jac3 + (offset + 3 * i) * TotalModel::NUM_EXP_BASIS_COEFFICIENTS,
+                                  jac3 + (offset + 3 * i + 3) * TotalModel::NUM_EXP_BASIS_COEFFICIENTS, 0);
                         // dr_dCoeff.block(offset + 3 * i, 0, 3, TotalModel::NUM_SHAPE_COEFFICIENTS).setZero();
                         continue;
                     }
                     if (out_data[PAF_connection[i][0]] == nullptr || out_data[PAF_connection[i][2]] == nullptr)
                         continue;
+                    const auto& pafConnectionI = PAF_connection[i];
                     const std::array<double, 3> AB{{
-                        out_data[PAF_connection[i][2]][3 * PAF_connection[i][3] + 0] - out_data[PAF_connection[i][0]][3 * PAF_connection[i][1] + 0], 
-                        out_data[PAF_connection[i][2]][3 * PAF_connection[i][3] + 1] - out_data[PAF_connection[i][0]][3 * PAF_connection[i][1] + 1], 
-                        out_data[PAF_connection[i][2]][3 * PAF_connection[i][3] + 2] - out_data[PAF_connection[i][0]][3 * PAF_connection[i][1] + 2], 
+                        out_data[pafConnectionI[2]][3 * pafConnectionI[3]    ] - out_data[pafConnectionI[0]][3 * pafConnectionI[1]],
+                        out_data[pafConnectionI[2]][3 * pafConnectionI[3] + 1] - out_data[pafConnectionI[0]][3 * pafConnectionI[1] + 1],
+                        out_data[pafConnectionI[2]][3 * pafConnectionI[3] + 2] - out_data[pafConnectionI[0]][3 * pafConnectionI[1] + 2],
                     }};
                     const auto length2 = AB[0] * AB[0] + AB[1] * AB[1] + AB[2] * AB[2];
                     const auto length = sqrt(length2);
                     const Eigen::Map< const Matrix<double, 3, 1> > AB_vec(AB.data());
                     const Eigen::Matrix<double, 3, 3, RowMajor> dudJ = Eigen::Matrix<double, 3, 3>::Identity() / length - AB_vec * AB_vec.transpose() / length2 / length;
-                    dr_dfc.block(offset + 3 * i, 0, 3, TotalModel::NUM_EXP_BASIS_COEFFICIENTS) = PAF_weight[i] * dudJ * 
+                    dr_dfc.block<3, TotalModel::NUM_EXP_BASIS_COEFFICIENTS>(offset + 3 * i, 0) = PAF_weight[i] * dudJ *
                         ( dodfc[PAF_connection[i][2]]->block(3 * PAF_connection[i][3], 0, 3, TotalModel::NUM_EXP_BASIS_COEFFICIENTS) -
                         dodfc[PAF_connection[i][0]]->block(3 * PAF_connection[i][1], 0, 3, TotalModel::NUM_EXP_BASIS_COEFFICIENTS) );
                 }
             }
 
-            dr_dfc.block(start_inner, 0, inner_dim[0], TotalModel::NUM_EXP_BASIS_COEFFICIENTS).setZero();
+            std::fill(jac3 + start_inner*jac3Cols,
+                      jac3 + (start_inner+inner_dim[0])*jac3Cols, 0.0);
+            // // Vectorized (slower) equivalent of above code
+            // dr_dfc.block(start_inner, 0, inner_dim[0], jac3Cols).setZero();
         }
+// duration_jacob3 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start_jacob3).count();
     }
 // const auto duration_jacob = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start_jacob).count();
-// const auto duration_iter = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start_iter).count();
-// std::cout << "iter " << duration_iter * 1e-6 << "\n";
-// std::cout << "FK " << duration_FK * 1e-6 << "\n";
-// std::cout << "transJ " << duration_transJ * 1e-6 << "\n";
-// std::cout << "LBS " << duration_LBS * 1e-6 << "\n";
-// std::cout << "target " << duration_target * 1e-6 << "\n";
-// std::cout << "Residual " << duration_res * 1e-6 << "\n";
-// std::cout << "Jacobian " << duration_jacob * 1e-6 << "\n";
+// const auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start).count();
+// std::cout << "iter     " << duration_iter * 1e-6 << "\n"
+//           << "FK       " << duration_FK * 1e-6 << "\n"
+//           << "transJ   " << duration_transJ * 1e-6 << "\n"
+//           << "LBS      " << duration_LBS * 1e-6 << "\n"
+//           << "target   " << duration_target * 1e-6 << "\n"
+//           << "Residual " << duration_res * 1e-6 << "\n"
+//           << "Jacobian " << duration_jacob * 1e-6 << "\n"
+//           << "    Jac0 " << duration_jacob0 * 1e-6 << "\n"
+//           << "    Jac1 " << duration_jacob1 * 1e-6 << "\n"
+//           << "    Jac2 " << duration_jacob2 * 1e-6 << "\n"
+//           << "    Jac3 " << duration_jacob3 * 1e-6 << "\n"
+//           << "Total    " << duration * 1e-6 << std::endl;
 // std::cout << "------------------------------------------\n";
     return true;
 }
@@ -1049,7 +1228,7 @@ void AdamFullCost::select_lbs(
                     // dVdP(i * 3 + 1, 3 * idp + 2) +=
                     //     w * (v0_data[0] * dTdP(idj * 3 * 4 + 1 * 4 + 0, 3 * idp + 2) + v0_data[1] * dTdP(idj * 3 * 4 + 1 * 4 + 1, 3 * idp + 2) + v0_data[2] * dTdP(idj * 3 * 4 + 1 * 4 + 2, 3 * idp + 2) + dTdP(idj * 12 + 1 * 4 + 3, 3 * idp + 2));
                     // dVdP(i * 3 + 2, 3 * idp + 2) +=
-                    //     w * (v0_data[0] * dTdP(idj * 3 * 4 + 2 * 4 + 0, 3 * idp + 2) + v0_data[1] * dTdP(idj * 3 * 4 + 2 * 4 + 1, 3 * idp + 2) + v0_data[2] * dTdP(idj * 3 * 4 + 2 * 4 + 2, 3 * idp + 2) + dTdP(idj * 12 + 2 * 4 + 3, 3 * idp + 2));                        
+                    //     w * (v0_data[0] * dTdP(idj * 3 * 4 + 2 * 4 + 0, 3 * idp + 2) + v0_data[1] * dTdP(idj * 3 * 4 + 2 * 4 + 1, 3 * idp + 2) + v0_data[2] * dTdP(idj * 3 * 4 + 2 * 4 + 2, 3 * idp + 2) + dTdP(idj * 12 + 2 * 4 + 3, 3 * idp + 2));
                     dVdP_row0[3 * idp + 0] += w * (v0_data[0] * dTdP_base[(0 * 4 + 0) * ncol + 3 * idp + 0] + v0_data[1] * dTdP_base[(0 * 4 + 1) * ncol + 3 * idp + 0] + v0_data[2] * dTdP_base[(0 * 4 + 2) * ncol + 3 * idp + 0] + dTdP_base[(0 * 4 + 3) * ncol + 3 * idp + 0]);
                     dVdP_row1[3 * idp + 0] += w * (v0_data[0] * dTdP_base[(1 * 4 + 0) * ncol + 3 * idp + 0] + v0_data[1] * dTdP_base[(1 * 4 + 1) * ncol + 3 * idp + 0] + v0_data[2] * dTdP_base[(1 * 4 + 2) * ncol + 3 * idp + 0] + dTdP_base[(1 * 4 + 3) * ncol + 3 * idp + 0]);
                     dVdP_row2[3 * idp + 0] += w * (v0_data[0] * dTdP_base[(2 * 4 + 0) * ncol + 3 * idp + 0] + v0_data[1] * dTdP_base[(2 * 4 + 1) * ncol + 3 * idp + 0] + v0_data[2] * dTdP_base[(2 * 4 + 2) * ncol + 3 * idp + 0] + dTdP_base[(2 * 4 + 3) * ncol + 3 * idp + 0]);
@@ -1071,11 +1250,11 @@ void AdamFullCost::select_lbs(
                 const double* dTdc_row2 = dTdc_data + (idj * 12 + 2 * 4 + 3) * ncolc;
                 for (int idc = 0; idc < TotalModel::NUM_SHAPE_COEFFICIENTS; idc++) {
                     // The following lines are equiv to
-                    // dVdc(i * 3 + 0, idc) += 
+                    // dVdc(i * 3 + 0, idc) +=
                     //     w * (dV0dc(idv * 3 + 0, idc) * Trow_data[0 * 4 + 0] + dV0dc(idv * 3 + 1, idc) * Trow_data[0 * 4 + 1] + dV0dc(idv * 3 + 2, idc) * Trow_data[0 * 4 + 2] + dTdc(idj * 12 + 0 * 4 + 3, idc));
-                    // dVdc(i * 3 + 1, idc) += 
+                    // dVdc(i * 3 + 1, idc) +=
                     //     w * (dV0dc(idv * 3 + 0, idc) * Trow_data[1 * 4 + 0] + dV0dc(idv * 3 + 1, idc) * Trow_data[1 * 4 + 1] + dV0dc(idv * 3 + 2, idc) * Trow_data[1 * 4 + 2] + dTdc(idj * 12 + 1 * 4 + 3, idc));
-                    // dVdc(i * 3 + 2, idc) += 
+                    // dVdc(i * 3 + 2, idc) +=
                     //     w * (dV0dc(idv * 3 + 0, idc) * Trow_data[2 * 4 + 0] + dV0dc(idv * 3 + 1, idc) * Trow_data[2 * 4 + 1] + dV0dc(idv * 3 + 2, idc) * Trow_data[2 * 4 + 2] + dTdc(idj * 12 + 2 * 4 + 3, idc));
                     dVdc_row0[idc] += w * (dV0dc_data[idc * nrow + idv * 3 + 0] * Trow_data[0 * 4 + 0] + dV0dc_data[idc * nrow + idv * 3 + 1] * Trow_data[0 * 4 + 1] + dV0dc_data[idc * nrow + idv * 3 + 2] * Trow_data[0 * 4 + 2] + dTdc_row0[idc]);
                     dVdc_row1[idc] += w * (dV0dc_data[idc * nrow + idv * 3 + 0] * Trow_data[1 * 4 + 0] + dV0dc_data[idc * nrow + idv * 3 + 1] * Trow_data[1 * 4 + 1] + dV0dc_data[idc * nrow + idv * 3 + 2] * Trow_data[1 * 4 + 2] + dTdc_row1[idc]);
