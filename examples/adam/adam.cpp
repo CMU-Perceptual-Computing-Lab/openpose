@@ -18,6 +18,7 @@
 
 // C++ std library dependencies
 #include <chrono> // `std::chrono::` functions and classes, e.g. std::chrono::milliseconds
+#include <iostream>
 #include <thread> // std::this_thread
 // Other 3rdparty dependencies
 // GFlags: DEFINE_bool, _int32, _int64, _uint64, _double, _string
@@ -28,6 +29,7 @@
 #endif
 // OpenPose dependencies
 #include <openpose/headers.hpp>
+#include <asio.hpp>
 
 // See all the available parameter options withe the `--help` flag. E.g. `build/examples/openpose/openpose.bin --help`
 // Note: This command will show you flags for other unnecessary 3rdparty files. Check only the flags for the OpenPose
@@ -234,12 +236,45 @@ DEFINE_string(write_keypoint_format,    "yml",          "(Deprecated, use `write
 DEFINE_string(write_video_adam,         "",             "Experimental, not available yet. E.g.: `~/Desktop/adamResult.avi`. Flag `camera_fps`"
                                                         " controls FPS.");
 DEFINE_string(write_bvh,                "",             "Experimental, not available yet. E.g.: `~/Desktop/mocapResult.bvh`.");
+// Unity - UDP communication
+DEFINE_string(udp_host,                 "127.0.0.1",    "IP for UDP communication.");
+DEFINE_string(udp_port,                 "8051",         "Port number for UDP communication.");
+
+class UDPClient
+{
+public:
+    UDPClient(asio::io_service& io_service, const std::string& host, const std::string& port)
+        : io_service_(io_service), socket_(io_service, asio::ip::udp::endpoint(asio::ip::udp::v4(), 0))
+    {
+        asio::ip::udp::resolver resolver(io_service_);
+        asio::ip::udp::resolver::query query(asio::ip::udp::v4(), host, port);
+        asio::ip::udp::resolver::iterator iter = resolver.resolve(query);
+        endpoint_ = *iter;
+    }
+
+    ~UDPClient()
+    {
+        socket_.close();
+    }
+
+    void send(const std::string& msg) {
+        socket_.send_to(asio::buffer(msg, msg.size()), endpoint_);
+        //std::cout << "sent data: " << msg << std::endl;
+    }
+
+private:
+    asio::io_service& io_service_;
+    asio::ip::udp::socket socket_;
+    asio::ip::udp::endpoint endpoint_;
+};
 
 // This worker will just read and return all the jpg files in a directory
 class WUserOutput : public op::WorkerConsumer<std::shared_ptr<std::vector<op::Datum>>>
 {
 public:
-    WUserOutput()
+    // Purely processing
+    WUserOutput() :
+        mUdpClient(mService, FLAGS_udp_host, FLAGS_udp_port)
     {
     }
 
@@ -258,7 +293,48 @@ public:
             if (datumsPtr != nullptr && !datumsPtr->empty())
             {
                 auto& datum = datumsPtr->at(0);
-                UNUSED(datum);
+
+                // Add ASIO thing
+                const auto& totalPosition = datum.adamTranslation; // Eigen::Vector3d(3, 1)
+                const auto& jointAngles = datum.adamPose; // Eigen::Matrix<double, 62, 3, Eigen::RowMajor>
+                //const float mouth_open = datum.mouthOpening; // datum.mouth_open;
+                //const float leye_open = datum.rightEyeOpening; // datum.leye_open;
+                //const float reye_open = datum.leftEyeOpening; // datum.reye_open;
+                //const float dist_root_foot = datum.distanceRootFoot; // datum.dist_root_foot;
+                const auto adamFaceCoeffsExp = datum.adamFaceCoeffsExp; // Eigen::VectorXd resized to (200, 1)
+                // m_adam_t:
+                //     1. Total translation (centimeters) of the root in camera/global coordinate representation.
+                // m_adam_pose:
+                //     1. First row is global rotation, in AngleAxis representation. Radians (not degrees!)
+                //     2. Rest are joint-angles in Euler-Angle representation. Degrees.
+
+                const std::string prefix = "AnimData:";
+                std::string totalPositionString = "\"totalPosition\":" + vectorToJson(totalPosition(0), totalPosition(1), totalPosition(2));
+                std::string jointAnglesString = "\"jointAngles\":[";
+                for (int i = 0; i < 62; i++){
+                    jointAnglesString += vectorToJson(jointAngles(i, 0), jointAngles(i, 1), jointAngles(i, 2));
+                    if (i != 62 - 1){
+                        jointAnglesString += ",";
+                    }
+                }
+                jointAnglesString += "]";
+
+                std::string facialParamsString = "\"facialParams\":[";
+                for (int i = 0; i < 200; i++){
+                    facialParamsString += std::to_string(adamFaceCoeffsExp(i));
+                    if (i != 200 - 1){
+                        facialParamsString += ",";
+                    }
+                }
+                facialParamsString += "]";
+
+                //facialParamsString + std::to_string(mouth_open) + "," + std::to_string(leye_open) + "," + std::to_string(reye_open) + "]";
+
+                //std::string rootHeightString = "\"rootHeight\":" + std::to_string(dist_root_foot);
+
+                std::string data = prefix + "{" + facialParamsString + "," + totalPositionString + "," + jointAnglesString + "}";
+
+                mUdpClient.send(data);
             }
         }
         catch (const std::exception& e)
@@ -268,13 +344,19 @@ public:
         }
     }
 
+    std::string vectorToJson(float x, float y, float z)
+    {
+        std::string res = (std::string)"{" + 
+            "\"x\":" + std::to_string(x) + "," + 
+            "\"y\":" + std::to_string(y) + "," + 
+            "\"z\":" + std::to_string(z) + "}";
+        return res;
+    }
+
 private:
-    // // Write BVH file
-    // std::unique_ptr<BVHWriter> spBvhWriter;
-    // std::vector<Eigen::Matrix<double, 3, 1>> mTranslations; // record the translation across frames
-    // std::vector<Eigen::Matrix<double, TotalModel::NUM_JOINTS, 3, Eigen::RowMajor>> mPoses; // record the pose change
-    // Eigen::Matrix<double, Eigen::Dynamic, 1> mJ0VecFrame0;
-    // bool mInitialized;
+    // Unity - UDP communication
+    asio::io_service mService;
+    UDPClient mUdpClient;
 };
 
 int openPoseDemo()

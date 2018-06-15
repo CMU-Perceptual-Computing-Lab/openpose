@@ -7,6 +7,10 @@ Unix:
         - Link: https://github.com/BVLC/caffe
         - GitHub SHA: 864520713a4c5ffae7382ced5d34e4cadc608473
 
+    - Asio:
+        - Version 1.12.1.
+        - Link: https://think-async.com/Asio/Download
+
 Windows:
     - Caffe & Caffe dependencies (caffe3rdparty):
         - Version 1.0.0, extracted from GitHub on 07/11/2017 from the current master branch.
