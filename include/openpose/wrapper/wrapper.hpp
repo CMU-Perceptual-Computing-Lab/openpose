@@ -1362,7 +1362,8 @@ namespace op
                 else
                 {
                     if (spWPoseTriangulations.size() > 1)
-                        log("Multi-threading disabled, only 1 thread running for IK.", Priority::High);
+                        log("Multi-threading disabled, only 1 thread running for 3-D triangulation.",
+                            Priority::High);
                     mThreadManager.add(mThreadId, spWPoseTriangulations.at(0), queueIn, queueOut);
                 }
                 queueIn++;
@@ -1391,7 +1392,8 @@ namespace op
                 else
                 {
                     if (spWJointAngleEstimations.size() > 1)
-                        log("Multi-threading disabled, only 1 thread running for IK.", Priority::High);
+                        log("Multi-threading disabled, only 1 thread running for joint angle estimation.",
+                            Priority::High);
                     mThreadManager.add(mThreadId, spWJointAngleEstimations.at(0), queueIn, queueOut);
                 }
                 queueIn++;

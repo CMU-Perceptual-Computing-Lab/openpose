@@ -301,6 +301,7 @@ namespace op
                 Adam_FastFit_Initialize(*spImpl->spTotalModel, frameParams, spImpl->mBodyJoints, spImpl->mRFootJoints,
                                         spImpl->mLFootJoints, spImpl->mRHandJoints, spImpl->mLHandJoints,
                                         spImpl->mFaceJoints, spImpl->mFreezeMissing, spImpl->mCeresDisplayReport);
+                // The following 2 operations takes ~12 msec
                 vtVec = spImpl->spTotalModel->m_meanshape
                       + spImpl->spTotalModel->m_shapespace_u * frameParams.m_adam_coeffs;
                 j0Vec = spImpl->spTotalModel->J_mu_ + spImpl->spTotalModel->dJdc_ * frameParams.m_adam_coeffs;

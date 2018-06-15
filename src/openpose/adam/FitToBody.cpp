@@ -630,6 +630,8 @@ void Adam_FastFit_Initialize(const TotalModel &adam,
 	const bool freeze_missing,
 	const bool verbose)
 {
+// const auto start = std::chrono::high_resolution_clock::now();
+// const auto start1 = std::chrono::high_resolution_clock::now();
 	using namespace Eigen;
 	MatrixXd PAF(3, 54);
 	// std::fill(PAF.data(), PAF.data() + PAF.size(), 0);
@@ -724,18 +726,28 @@ void Adam_FastFit_Initialize(const TotalModel &adam,
 	options_init.minimizer_progress_to_stdout = verbose;
 	adam_cost->toggle_activate(false, false, false);
 	adam_cost->toggle_rigid_body(true);
+// const auto duration1 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start1).count();
+// const auto start2 = std::chrono::high_resolution_clock::now();
 	ceres::Solve(options_init, &problem_init, &summary);
 	if(verbose) std::cout << summary.FullReport() << std::endl;
 
+// const auto duration2 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start2).count();
+// const auto start3 = std::chrono::high_resolution_clock::now();
 	adam_cost->toggle_rigid_body(false);
 	adam_cost->toggle_activate(true, false, false);
+// const auto duration3 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start3).count();
+// const auto start4 = std::chrono::high_resolution_clock::now();
 	ceres::Solve(options_init, &problem_init, &summary);
 	if(verbose) std::cout << summary.FullReport() << std::endl;
 
+// const auto duration4 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start4).count();
+// const auto start5 = std::chrono::high_resolution_clock::now();
 	adam_cost->toggle_activate(true, true, true);
 	ceres::Solve(options_init, &problem_init, &summary);
 	if(verbose) std::cout << summary.FullReport() << std::endl;
 
+// const auto duration5 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start5).count();
+// const auto start6 = std::chrono::high_resolution_clock::now();
 	// get face (mouth_open, leye_open, reye_open) in a naive way
 	if (!(faceJoints.block<3, 8>(0, 60).array() == 0.0).any())  // if none of these keypoints is zero
 	{
@@ -752,6 +764,8 @@ void Adam_FastFit_Initialize(const TotalModel &adam,
 		if (reye_width) frame_param.reye_open = (reye_height1 + reye_height2) / reye_width;
 	}
 	else frame_param.reye_open = 1.0;
+// const auto duration6 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start6).count();
+// const auto start7 = std::chrono::high_resolution_clock::now();
 	if (!(faceJoints.block<3, 6>(0, 42).array() == 0.0).any())
 	{
 		const double leye_width = (faceJoints.block<3, 1>(0, 42) - faceJoints.block<3, 1>(0, 45)).norm();
@@ -769,6 +783,16 @@ void Adam_FastFit_Initialize(const TotalModel &adam,
 		std::cout << "leye: " << frame_param.leye_open << std::endl;
 		std::cout << "distance root -> foot: " << frame_param.dist_root_foot << std::endl;
 	}
+// const auto duration7 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start7).count();
+// const auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start).count();
+// std::cout << __FILE__ << " 1:" << duration1 * 1e-6 << "\n"
+// 		  << __FILE__ << " 2:" << duration2 * 1e-6 << "\n"
+// 		  << __FILE__ << " 3:" << duration3 * 1e-6 << "\n"
+// 		  << __FILE__ << " 4:" << duration4 * 1e-6 << "\n"
+// 		  << __FILE__ << " 5:" << duration5 * 1e-6 << "\n"
+// 		  << __FILE__ << " 6:" << duration6 * 1e-6 << "\n"
+// 		  << __FILE__ << " 7:" << duration7 * 1e-6 << "\n"
+// 		  << __FILE__ << " T:" << duration * 1e-6 << std::endl;
 }
 
 std::mutex g_mutex;
