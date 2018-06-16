@@ -365,6 +365,8 @@ namespace op
                     // cv::Mat reconstructedPoints{4, firstcv::Points.size(), CV_64F};
                     // cv::triangulatePoints(cv::Mat::eye(3,4, CV_64F), M_3_1, firstcv::Points, secondcv::Points,
                     //                           reconstructedcv::Points);
+                    // 20 pixels for 1280x1024 image
+                    const auto reprojectionMaxAcceptable = 25 * std::sqrt(imageSizes[0].x * imageSizes[0].y / 1310720);
                     const auto lastChannelLength = keypoints3D.getSize(2);
                     for (auto index = 0u; index < indexesUsed.size(); index++)
                     {
@@ -372,7 +374,7 @@ namespace op
                             && std::isfinite(xyzPoints[index].z)
                             // Remove outliers
                             && (reprojectionErrors[index] < 5 * reprojectionErrorTotal
-                                && reprojectionErrors[index] < 30))
+                                && reprojectionErrors[index] < reprojectionMaxAcceptable))
                         {
                             const auto baseIndex = indexesUsed[index] * lastChannelLength;
                             keypoints3D[baseIndex] = xyzPoints[index].x;

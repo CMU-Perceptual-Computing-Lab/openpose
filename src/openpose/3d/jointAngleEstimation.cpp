@@ -72,8 +72,6 @@ namespace op
             const std::string mCorrespondencePath;
 
             // Processing
-            const bool mFreezeMissing;
-            const bool mCeresDisplayReport;
             bool mInitialized;
 
             Eigen::MatrixXd mBodyJoints;
@@ -91,13 +89,11 @@ namespace op
             Eigen::Matrix<double, Eigen::Dynamic, 1> mJ0Vec;
             const std::shared_ptr<const TotalModel> spTotalModel;
 
-            ImplJointAngleEstimation(const bool ceresDisplayReport) :
+            ImplJointAngleEstimation() :
                 mGTotalModelPath{"./model/adam_v1_plus2.json"},
                 mPcaPath{"./model/adam_blendshapes_348_delta_norm.json"},
                 mObjectPath{"./model/mesh_nofeet.obj"},
                 mCorrespondencePath{"./model/correspondences_nofeet.txt"},
-                mFreezeMissing{true},
-                mCeresDisplayReport{ceresDisplayReport},
                 mInitialized{false},
                 mBodyJoints(5, NUMBER_BODY_KEYPOINTS),
                 mFaceJoints(5, NUMBER_FACE_KEYPOINTS),// (3, landmarks_face.size());
@@ -183,9 +179,9 @@ namespace op
         }
     }
 
-    JointAngleEstimation::JointAngleEstimation(const bool ceresDisplayReport)
+    JointAngleEstimation::JointAngleEstimation()
         #ifdef USE_3D_ADAM_MODEL
-            : spImpl{std::make_shared<ImplJointAngleEstimation>(ceresDisplayReport)}
+            : spImpl{std::make_shared<ImplJointAngleEstimation>()}
         #endif
     {
         try
@@ -281,6 +277,8 @@ namespace op
 
             // Initialization (e.g., first frame)
             const bool fastVersion = false;
+            const bool freezeMissing = false;
+            const bool ceresDisplayReport = false;
             // Fill Datum
             Eigen::MatrixXd vtVec;
             Eigen::MatrixXd j0Vec;
@@ -301,13 +299,14 @@ namespace op
                 // it would use the latest ones from the last Adam_FastFit
                 // Fit initialization
                 // Adam_FastFit_Initialize only changes frameParams
+                const auto handEnabled = !handKeypoints3D[0].empty() || !handKeypoints3D[1].empty();
                 const auto fitFaceExponents = !faceKeypoints3D.empty();
                 const auto multistageFitting = true;
                 const auto fastSolver = true;
                 Adam_FastFit_Initialize(*spImpl->spTotalModel, frameParams, spImpl->mBodyJoints, spImpl->mRFootJoints,
                                         spImpl->mLFootJoints, spImpl->mRHandJoints, spImpl->mLHandJoints,
-                                        spImpl->mFaceJoints, spImpl->mFreezeMissing, spImpl->mCeresDisplayReport,
-                                        multistageFitting, fitFaceExponents, fastSolver);
+                                        spImpl->mFaceJoints, freezeMissing, ceresDisplayReport,
+                                        multistageFitting, handEnabled, fitFaceExponents, fastSolver);
                 // The following 2 operations takes ~12 msec
                 vtVec = spImpl->spTotalModel->m_meanshape
                       + spImpl->spTotalModel->m_shapespace_u * frameParams.m_adam_coeffs;
@@ -324,7 +323,7 @@ namespace op
                 // Adam_FastFit only changes frameParams
                 Adam_FastFit(*spImpl->spTotalModel, frameParams, spImpl->mBodyJoints, spImpl->mRFootJoints,
                              spImpl->mLFootJoints, spImpl->mRHandJoints, spImpl->mLHandJoints,
-                             spImpl->mFaceJoints, spImpl->mCeresDisplayReport);
+                             spImpl->mFaceJoints, ceresDisplayReport);
                 vtVec = spImpl->mVtVec;
                 j0Vec = spImpl->mJ0Vec;
             }

@@ -19,7 +19,7 @@ namespace op
     public:
         static const std::shared_ptr<const TotalModel> getTotalModel();
 
-        JointAngleEstimation(const bool ceresDisplayReport = false);
+        JointAngleEstimation();
 
         void initializationOnThread();
 

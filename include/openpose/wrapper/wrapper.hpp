@@ -891,8 +891,7 @@ namespace op
                 // Pose extractor(s)
                 for (auto i = 0u; i < spWJointAngleEstimations.size(); i++)
                 {
-                    const bool ceresDisplayReport = false;
-                    const auto jointAngleEstimation = std::make_shared<JointAngleEstimation>(ceresDisplayReport);
+                    const auto jointAngleEstimation = std::make_shared<JointAngleEstimation>();
                     spWJointAngleEstimations.at(i) = {std::make_shared<WJointAngleEstimation<TDatumsPtr>>(
                         jointAngleEstimation)};
                 }
