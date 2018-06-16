@@ -154,7 +154,8 @@ namespace op
     }
 
     double triangulateWithOptimization(cv::Mat& reconstructedPoint, const std::vector<cv::Mat>& cameraMatrices,
-                                       const std::vector<cv::Point2d>& pointsOnEachCamera)
+                                       const std::vector<cv::Point2d>& pointsOnEachCamera,
+                                       const double reprojectionMaxAcceptable)
     {
         try
         {
@@ -172,7 +173,8 @@ namespace op
                 // Therefore, we disable it for already accurate samples in order to get both:
                 //     - Speed
                 //     - Accuracy for already accurate samples
-                if (projectionErrorLinear > 3.0)
+                if (projectionErrorLinear > 3.0
+                    && projectionErrorLinear < 1.5*reprojectionMaxAcceptable)
                 {
                     // Slow equivalent: double paramX[3]; paramX[i] = reconstructedPoint.at<double>(i);
                     double* paramX = (double*)reconstructedPoint.data;
@@ -333,6 +335,8 @@ namespace op
                     }
                 }
                 // 3D reconstruction
+                const auto imageRatio = std::sqrt(imageSizes[0].x * imageSizes[0].y / 1310720);
+                const auto reprojectionMaxAcceptable = 25 * imageRatio;
                 std::vector<double> reprojectionErrors(xyPoints.size());
                 keypoints3D.reset({ 1, numberBodyParts, 4 }, 0);
                 if (!xyPoints.empty())
@@ -344,7 +348,8 @@ namespace op
                         cv::Mat reconstructedPoint;
                         reprojectionErrors[i] = triangulateWithOptimization(reconstructedPoint,
                                                                             cameraMatricesPerPoint[i],
-                                                                            xyPoints[i]);
+                                                                            xyPoints[i],
+                                                                            reprojectionMaxAcceptable);
                         xyzPoints[i] = cv::Point3d{
                             reconstructedPoint.at<double>(0),
                             reconstructedPoint.at<double>(1),
@@ -366,7 +371,6 @@ namespace op
                     // cv::triangulatePoints(cv::Mat::eye(3,4, CV_64F), M_3_1, firstcv::Points, secondcv::Points,
                     //                           reconstructedcv::Points);
                     // 20 pixels for 1280x1024 image
-                    const auto reprojectionMaxAcceptable = 25 * std::sqrt(imageSizes[0].x * imageSizes[0].y / 1310720);
                     const auto lastChannelLength = keypoints3D.getSize(2);
                     for (auto index = 0u; index < indexesUsed.size(); index++)
                     {
