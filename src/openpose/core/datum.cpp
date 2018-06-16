@@ -47,7 +47,7 @@ namespace op
         scaleNetToOutput{datum.scaleNetToOutput},
         elementRendered{datum.elementRendered}
         // 3D/Adam parameters
-        #ifdef WITH_3D_ADAM_MODEL
+        #ifdef USE_EIGEN
             ,
             // Adam/Unity params
             adamPose{datum.adamPose},
@@ -104,7 +104,7 @@ namespace op
             scaleNetToOutput = datum.scaleNetToOutput;
             elementRendered = datum.elementRendered;
             // 3D/Adam parameters
-            #ifdef WITH_3D_ADAM_MODEL
+            #ifdef USE_EIGEN
                 // Adam/Unity params
                 adamPose = datum.adamPose;
                 adamTranslation = datum.adamTranslation;
@@ -169,7 +169,7 @@ namespace op
             std::swap(netInputSizes, datum.netInputSizes);
             std::swap(elementRendered, datum.elementRendered);
             // 3D/Adam parameters
-            #ifdef WITH_3D_ADAM_MODEL
+            #ifdef USE_EIGEN
                 // Adam/Unity params
                 std::swap(adamPose, datum.adamPose);
                 std::swap(adamTranslation, datum.adamTranslation);
@@ -227,7 +227,7 @@ namespace op
             std::swap(netInputSizes, datum.netInputSizes);
             std::swap(elementRendered, datum.elementRendered);
             // 3D/Adam parameters
-            #ifdef WITH_3D_ADAM_MODEL
+            #ifdef USE_EIGEN
                 // Adam/Unity params
                 std::swap(adamPose, datum.adamPose);
                 std::swap(adamTranslation, datum.adamTranslation);
@@ -300,7 +300,7 @@ namespace op
             datum.scaleNetToOutput = scaleNetToOutput;
             datum.elementRendered = elementRendered;
             // 3D/Adam parameters
-            #ifdef WITH_3D_ADAM_MODEL
+            #ifdef USE_EIGEN
                 // Adam/Unity params
                 datum.adamPose = adamPose;
                 datum.adamTranslation = adamTranslation;

@@ -1,6 +1,3 @@
-if (WITH_3D_ADAM_MODEL)
-  add_subdirectory(adam)
-endif (WITH_3D_ADAM_MODEL)
 add_subdirectory(calibration)
 add_subdirectory(openpose)
 add_subdirectory(tutorial_add_module)

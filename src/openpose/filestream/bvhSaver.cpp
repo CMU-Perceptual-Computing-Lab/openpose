@@ -1,4 +1,4 @@
-#ifdef WITH_3D_ADAM_MODEL
+#ifdef USE_3D_ADAM_MODEL
     #include <adam/BVHWriter.h>
 #endif
 #include <openpose/filestream/bvhSaver.hpp>
@@ -7,7 +7,7 @@ namespace op
 {
     struct BvhSaver::ImplBvhSaver
     {
-        #ifdef WITH_3D_ADAM_MODEL
+        #ifdef USE_3D_ADAM_MODEL
             // Write BVH file
             const std::string mBvhFilePath;
             const double mFps;
@@ -68,11 +68,11 @@ namespace op
     {
         try
         {
-            #ifndef WITH_3D_ADAM_MODEL
+            #ifndef USE_3D_ADAM_MODEL
                 UNUSED(bvhFilePath);
                 UNUSED(totalModel);
                 UNUSED(fps);
-                error("OpenPose CMake must be compiled with the `WITH_3D_ADAM_MODEL` flag in order to use the"
+                error("OpenPose CMake must be compiled with the `USE_3D_ADAM_MODEL` flag in order to use the"
                       " Adam visualization renderer. Alternatively, set 2-D/3-D rendering with `--display 2`"
                       " or `--display 3`.", __LINE__, __FUNCTION__, __FILE__);
             #endif
@@ -87,7 +87,7 @@ namespace op
     {
         try
         {
-            #ifdef WITH_3D_ADAM_MODEL
+            #ifdef USE_3D_ADAM_MODEL
                 spImpl->writeBvhOnDisk();
             #endif
         }
@@ -107,7 +107,7 @@ namespace op
     {
         try
         {
-            #ifdef WITH_3D_ADAM_MODEL
+            #ifdef USE_3D_ADAM_MODEL
                 // BVH-Unity generation
                 spImpl->mPoses.push_back(adamPose);
                 spImpl->mTranslations.push_back(adamTranslation);

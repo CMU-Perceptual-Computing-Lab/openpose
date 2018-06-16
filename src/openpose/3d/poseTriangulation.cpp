@@ -1,5 +1,5 @@
 #include <thread>
-#ifdef WITH_CERES
+#ifdef USE_CERES
     #include <ceres/ceres.h>
     #include <ceres/rotation.h>
 #endif
@@ -32,7 +32,7 @@ namespace op
         }
     }
 
-    #ifdef WITH_CERES
+    #ifdef USE_CERES
         // Nonlinear Optimization for 3D Triangulation
         struct ReprojectionErrorForTriangulation
         {
@@ -165,7 +165,7 @@ namespace op
             // Basic triangulation
             triangulate(reconstructedPoint, cameraMatrices, pointsOnEachCamera);
 
-            #ifdef WITH_CERES
+            #ifdef USE_CERES
                 // Slow equivalent: double paramX[3]; paramX[i] = reconstructedPoint.at<double>(i);
                 double* paramX = (double*)reconstructedPoint.data;
                 ceres::Problem problem;

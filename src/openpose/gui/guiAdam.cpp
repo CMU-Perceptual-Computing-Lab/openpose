@@ -1,4 +1,4 @@
-#ifdef WITH_3D_ADAM_MODEL
+#ifdef USE_3D_ADAM_MODEL
     #include <adam/KinematicModel.h>
     #include <adam/Renderer.h>
     #include <adam/utils.h>
@@ -11,7 +11,7 @@
 
 namespace op
 {
-    #ifdef WITH_3D_ADAM_MODEL
+    #ifdef USE_3D_ADAM_MODEL
         const int NUMBER_BODY_KEYPOINTS = 20;
         const int NUMBER_HAND_KEYPOINTS = 21;
         const int NUMBER_FACE_KEYPOINTS = 70;
@@ -39,7 +39,7 @@ namespace op
 
     struct GuiAdam::ImplGuiAdam
     {
-        #ifdef WITH_3D_ADAM_MODEL
+        #ifdef USE_3D_ADAM_MODEL
             // Visualization
             std::unique_ptr<adam::Renderer> spRender;
             std::array<double, NUMBER_KEYPOINTS> mResultBody;
@@ -86,7 +86,7 @@ namespace op
     {
         try
         {
-            #ifndef WITH_3D_ADAM_MODEL
+            #ifndef USE_3D_ADAM_MODEL
                 UNUSED(outputSize);
                 UNUSED(fullScreen);
                 UNUSED(isRunningSharedPtr);
@@ -96,7 +96,7 @@ namespace op
                 UNUSED(displayMode);
                 UNUSED(totalModel);
                 // UNUSED(adamRenderedVideoPath);
-                error("OpenPose CMake must be compiled with the `WITH_3D_ADAM_MODEL` flag in order to use the"
+                error("OpenPose CMake must be compiled with the `USE_3D_ADAM_MODEL` flag in order to use the"
                       " Adam visualization renderer. Alternatively, set 2-D/3-D rendering with `--display 2`"
                       " or `--display 3`.", __LINE__, __FUNCTION__, __FILE__);
             #endif
@@ -118,7 +118,7 @@ namespace op
             // Init parent class
             if (mDisplayMode == DisplayMode::DisplayAll || mDisplayMode == DisplayMode::Display2D)
                 Gui::initializationOnThread();
-            #ifdef WITH_3D_ADAM_MODEL
+            #ifdef USE_3D_ADAM_MODEL
                 if (mDisplayMode == DisplayMode::DisplayAll
                     || mDisplayMode == DisplayMode::DisplayAdam)
                 {
@@ -152,7 +152,7 @@ namespace op
         try
         {
             // Adam rendering
-            #ifdef WITH_3D_ADAM_MODEL
+            #ifdef USE_3D_ADAM_MODEL
                 if (mDisplayMode == DisplayMode::DisplayAll
                     || mDisplayMode == DisplayMode::DisplayAdam)
                 {

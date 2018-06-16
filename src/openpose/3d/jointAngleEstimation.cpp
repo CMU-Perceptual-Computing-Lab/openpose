@@ -1,11 +1,11 @@
-#ifdef WITH_3D_ADAM_MODEL
+#ifdef USE_3D_ADAM_MODEL
     #include <adam/FitToBody.h>
 #endif
 #include <openpose/3d/jointAngleEstimation.hpp>
 
 namespace op
 {
-    #ifdef WITH_3D_ADAM_MODEL
+    #ifdef USE_3D_ADAM_MODEL
         std::shared_ptr<TotalModel> sTotalModel;
         const int NUMBER_BODY_KEYPOINTS = 20;
         const int NUMBER_HAND_KEYPOINTS = 21;
@@ -64,7 +64,7 @@ namespace op
 
     struct JointAngleEstimation::ImplJointAngleEstimation
     {
-        #ifdef WITH_3D_ADAM_MODEL
+        #ifdef USE_3D_ADAM_MODEL
             // Adam model files
             const std::string mGTotalModelPath;
             const std::string mPcaPath;
@@ -184,7 +184,7 @@ namespace op
     }
 
     JointAngleEstimation::JointAngleEstimation(const bool ceresDisplayReport)
-        #ifdef WITH_3D_ADAM_MODEL
+        #ifdef USE_3D_ADAM_MODEL
             : spImpl{std::make_shared<ImplJointAngleEstimation>(ceresDisplayReport)}
         #endif
     {
@@ -192,9 +192,9 @@ namespace op
         {
             // error("JointAngleEstimation (`ik_threads` flag) buggy and not working yet, but we are working on it!"
             //       " Coming soon!", __LINE__, __FUNCTION__, __FILE__);
-            #ifndef WITH_3D_ADAM_MODEL
+            #ifndef USE_3D_ADAM_MODEL
                 UNUSED(ceresDisplayReport);
-                error("OpenPose must be compiled with the `WITH_3D_ADAM_MODEL` macro definition in order to use this"
+                error("OpenPose must be compiled with the `USE_3D_ADAM_MODEL` macro definition in order to use this"
                       " functionality.", __LINE__, __FUNCTION__, __FILE__);
             #endif
         }

@@ -1,7 +1,7 @@
 #ifndef OPENPOSE_GUI_GUI_ADAM_HPP
 #define OPENPOSE_GUI_GUI_ADAM_HPP
 
-#ifdef WITH_3D_ADAM_MODEL
+#ifdef USE_3D_ADAM_MODEL
     #include <adam/totalmodel.h>
 #endif
 #include <openpose/core/common.hpp>

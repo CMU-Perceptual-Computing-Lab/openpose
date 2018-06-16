@@ -2,6 +2,9 @@
     #include <iostream>
     #include <asio.hpp>
 #endif
+#ifdef USE_EIGEN
+    #include <Eigen/Core>
+#endif
 #include <openpose/filestream/fileStream.hpp>
 #include <openpose/filestream/udpSender.hpp>
 
@@ -13,7 +16,7 @@ namespace op
         public:
             UdpClient(const std::string& host, const std::string& port) :
                 mIoService{},
-                mUdpSocket{io_service, asio::ip::udp::endpoint(asio::ip::udp::v4(), 0)}
+                mUdpSocket{mIoService, asio::ip::udp::endpoint(asio::ip::udp::v4(), 0)}
             {
                 try
                 {
@@ -54,17 +57,26 @@ namespace op
             }
 
         private:
-            asio::io_service& mIoService;
+            asio::io_service mIoService;
             asio::ip::udp::socket mUdpSocket;
             asio::ip::udp::endpoint mUdpEndpoint;
         };
+
+
+        std::string vectorToJson(const float x, const float y, const float z)
+        {
+            return std::string{"{"} +
+                "\"x\":" + std::to_string(x) + "," +
+                "\"y\":" + std::to_string(y) + "," +
+                "\"z\":" + std::to_string(z) + "}";
+        }
     #endif
 
     struct UdpSender::ImplUdpSender
     {
         #ifdef USE_ASIO
             // Used when increasing spCaffeNets
-            const UdpClient mUdpClient;
+            UdpClient mUdpClient;
 
             ImplUdpSender(const std::string& udpHost, const std::string& udpPort) :
                 mUdpClient(udpHost, udpPort)
@@ -82,7 +94,9 @@ namespace op
         {
             // error("UdpSender (`--udp_host` and `--udp_port` flags) buggy and not working yet, but we are"
             //       "working on it! Coming soon!", __LINE__, __FUNCTION__, __FILE__);
-            #ifndef USE_ASIO
+            #if !defined(USE_ASIO) || !defined(USE_EIGEN)
+                error("Both `WITH_ASIO` and `WITH_EIGEN` flags must be enabled in CMake for UDP sender.",
+                      __LINE__, __FUNCTION__, __FILE__);
                 UNUSED(udpHost);
                 UNUSED(udpPort);
             #endif
@@ -97,12 +111,13 @@ namespace op
                                     const double* const adamTranslationPtr,
                                     const double* const adamFaceCoeffsExpPtr, const int faceCoeffRows)
     {
-        #ifdef USE_ASIO
+        #if defined(USE_ASIO) && defined(USE_EIGEN)
             try
             {
-                const Eigen::Map<Vector3d> adamTranslation(adamTranslationPtr);
-                const Eigen::Map<Eigen::Matrix<double, adamPoseRows, 3, Eigen::RowMajor>> adamPose(adamPosePtr, adamPoseRows);
-                const Eigen::Map<VectorXd> adamFaceCoeffsExpPtr(adamFaceCoeffsExpPtr, faceCoeffRows);
+                const Eigen::Map<const Eigen::Vector3d> adamTranslation(adamTranslationPtr);
+                const Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> adamPose(
+                    adamPosePtr, adamPoseRows, 3);
+                const Eigen::Map<const Eigen::VectorXd> adamFaceCoeffsExp(adamFaceCoeffsExpPtr, faceCoeffRows);
 
                 const std::string prefix = "AnimData:";
                 const std::string totalPositionString = "\"totalPosition\":"

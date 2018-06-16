@@ -2,7 +2,7 @@
 #include <numeric> // std::accumulate
 #include <thread>
 #include <opencv2/core/core.hpp>
-#ifdef WITH_EIGEN
+#ifdef USE_EIGEN
     #include <Eigen/Dense>
     #include <opencv2/core/eigen.hpp>
 #endif
@@ -41,7 +41,7 @@ namespace op
         }
     };
 
-    #ifdef WITH_EIGEN
+    #ifdef USE_EIGEN
         struct Extrinsics
         {
             Eigen::Matrix3d Rotation;
@@ -249,7 +249,7 @@ namespace op
         }
     }
 
-    #ifdef WITH_EIGEN
+    #ifdef USE_EIGEN
         cv::Mat getRodriguesVector(const Eigen::Matrix3d& rotationMatrix)
         {
             try
@@ -967,7 +967,7 @@ namespace op
     {
         try
         {
-            #ifdef WITH_EIGEN
+            #ifdef USE_EIGEN
                 // For debugging
                 const auto coutResults = false;
                 // const auto coutResults = true;
@@ -1174,7 +1174,7 @@ namespace op
                 UNUSED(index1);
                 UNUSED(imagesAreUndistorted);
                 UNUSED(combineCam0Extrinsics);
-                error("CMake flag `WITH_EIGEN` required when compiling OpenPose`.", __LINE__, __FUNCTION__, __FILE__);
+                error("CMake flag `USE_EIGEN` required when compiling OpenPose`.", __LINE__, __FUNCTION__, __FILE__);
             #endif
         }
         catch (const std::exception& e)

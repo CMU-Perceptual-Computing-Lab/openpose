@@ -1,7 +1,7 @@
 #ifndef OPENPOSE_FILESTREAM_BVH_SAVER_HPP
 #define OPENPOSE_FILESTREAM_BVH_SAVER_HPP
 
-#ifdef WITH_3D_ADAM_MODEL
+#ifdef USE_3D_ADAM_MODEL
     #include <adam/totalmodel.h>
 #endif
 #include <openpose/core/common.hpp>

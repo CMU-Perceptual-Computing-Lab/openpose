@@ -266,24 +266,24 @@ endif (${GPU_MODE} MATCHES "CUDA")
 # Adding 3D
 if (WITH_3D_RENDERER)
   # OpenPose flags
-  add_definitions(-DWITH_3D_RENDERER)
+  add_definitions(-DUSE_3D_RENDERER)
 endif (WITH_3D_RENDERER)
 if (WITH_CERES)
-  add_definitions(-DWITH_CERES)
+  add_definitions(-DUSE_CERES)
 endif (WITH_CERES)
 if (WITH_FLIR_CAMERA)
   # OpenPose flags
-  add_definitions(-DWITH_FLIR_CAMERA)
+  add_definitions(-DUSE_FLIR_CAMERA)
 endif (WITH_FLIR_CAMERA)
 if (WITH_3D_ADAM_MODEL)
   # OpenPose flags
-  add_definitions(-DWITH_3D_ADAM_MODEL)
+  add_definitions(-DUSE_3D_ADAM_MODEL)
 endif (WITH_3D_ADAM_MODEL)
 
 # Adding tracking
 if (WITH_TRACKING)
   # OpenPose flags
-  add_definitions(-DWITH_TRACKING)
+  add_definitions(-DUSE_TRACKING)
 endif (WITH_TRACKING)
 
 # Calibration
@@ -295,7 +295,7 @@ if (${WITH_EIGEN} MATCHES "NONE")
 # If Eigen used
 else (${WITH_EIGEN} MATCHES "NONE")
   # OpenPose flags
-  add_definitions(-DWITH_EIGEN)
+  add_definitions(-DUSE_EIGEN)
   # OpenPose download/builds Eigen
   if (${WITH_EIGEN} MATCHES "BUILD")
     # Download it
@@ -659,6 +659,8 @@ include_directories(
 if (USE_ASIO)
   include_directories(${CMAKE_SOURCE_DIR}/3rdparty/asio/include/)
   # OpenPose flags
+  add_definitions(-DUSE_ASIO)
+  # Tell Asio it is not using Boost
   add_definitions(-DASIO_STANDALONE)
 endif (USE_ASIO)
 

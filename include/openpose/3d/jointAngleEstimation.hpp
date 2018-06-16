@@ -1,8 +1,10 @@
 #ifndef OPENPOSE_3D_JOINT_ANGLE_ESTIMATION_HPP
 #define OPENPOSE_3D_JOINT_ANGLE_ESTIMATION_HPP
 
-#ifdef WITH_3D_ADAM_MODEL
+#ifdef USE_EIGEN
     #include <Eigen/Core>
+#endif
+#ifdef USE_3D_ADAM_MODEL
     #include <adam/totalmodel.h>
 #endif
 #include <opencv2/core/core.hpp>

@@ -1,7 +1,7 @@
 #ifndef OPENPOSE_CORE_DATUM_HPP
 #define OPENPOSE_CORE_DATUM_HPP
 
-#ifdef WITH_3D_ADAM_MODEL
+#ifdef USE_EIGEN
     #include <Eigen/Core>
 #endif
 #include <opencv2/core/core.hpp> // cv::Mat
@@ -236,7 +236,7 @@ namespace op
         std::pair<int, std::string> elementRendered;
 
         // 3D/Adam parameters
-        #ifdef WITH_3D_ADAM_MODEL
+        #ifdef USE_EIGEN
             // Adam/Unity params
             Eigen::Matrix<double, 62, 3, Eigen::RowMajor> adamPose;
             Eigen::Vector3d adamTranslation;

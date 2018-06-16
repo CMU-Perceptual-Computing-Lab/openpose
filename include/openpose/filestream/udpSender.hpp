@@ -18,7 +18,7 @@ namespace op
         // PIMPL idiom
         // http://www.cppsamples.com/common-tasks/pimpl.html
         struct ImplUdpSender;
-        std::shared_ptr<ImplUdpSender> upImpl;
+        std::shared_ptr<ImplUdpSender> spImpl;
 
         // PIMP requires DELETE_COPY & destructor, or extra code
         // http://oliora.github.io/2015/12/29/pimpl-and-rule-of-zero.html

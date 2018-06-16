@@ -1,7 +1,7 @@
 ﻿#include <atomic>
 #include <mutex>
 #include <stdio.h>
-#ifdef WITH_3D_RENDERER
+#ifdef USE_3D_RENDERER
     #include <GL/glut.h>
     #include <GL/freeglut_ext.h> // glutLeaveMainLoop
     #include <GL/freeglut_std.h>
@@ -15,7 +15,7 @@
 
 namespace op
 {
-    #ifdef WITH_3D_RENDERER
+    #ifdef USE_3D_RENDERER
         const bool LOG_VERBOSE_3D_RENDERER = false;
         std::atomic<bool> sConstructorSet{false};
 
@@ -410,7 +410,7 @@ namespace op
             }
         }
     #else
-        const std::string WITH_3D_RENDERER_ERROR{"OpenPose CMake must be compiled with the `WITH_3D_RENDERER` flag in"
+        const std::string USE_3D_RENDERER_ERROR{"OpenPose CMake must be compiled with the `USE_3D_RENDERER` flag in"
             " order to use the 3-D visualization renderer. Alternatively, set 2-D rendering with `--display 2`."};
     #endif
 
@@ -427,7 +427,7 @@ namespace op
     {
         try
         {
-            #ifdef WITH_3D_RENDERER
+            #ifdef USE_3D_RENDERER
                 // Update sPoseModel
                 sPoseModel = poseModel;
                 if (!sConstructorSet)
@@ -437,7 +437,7 @@ namespace op
             #else
                 UNUSED(poseModel);
                 if (mDisplayMode == DisplayMode::DisplayAll || mDisplayMode == DisplayMode::Display3D)
-                    error(WITH_3D_RENDERER_ERROR, __LINE__, __FUNCTION__, __FILE__);
+                    error(USE_3D_RENDERER_ERROR, __LINE__, __FUNCTION__, __FILE__);
             #endif
         }
         catch (const std::exception& e)
@@ -448,7 +448,7 @@ namespace op
 
     Gui3D::~Gui3D()
     {
-        #ifdef WITH_3D_RENDERER
+        #ifdef USE_3D_RENDERER
             try
             {
                 glutLeaveMainLoop();
@@ -466,7 +466,7 @@ namespace op
         {
             // Init parent class
             Gui::initializationOnThread();
-            #ifdef WITH_3D_RENDERER
+            #ifdef USE_3D_RENDERER
                 // OpenGL - Initialization
                 initializeVisualization();
             #endif
@@ -483,7 +483,7 @@ namespace op
         try
         {   
             // 3-D rendering
-            #ifdef WITH_3D_RENDERER
+            #ifdef USE_3D_RENDERER
                 if (mDisplayMode == DisplayMode::DisplayAll || mDisplayMode == DisplayMode::Display3D)
                 {
                     if (!poseKeypoints3D.empty() || !faceKeypoints3D.empty()
@@ -528,7 +528,7 @@ namespace op
             if (mDisplayMode == DisplayMode::DisplayAll || mDisplayMode == DisplayMode::Display2D)
                 Gui::update();
             // 3-D rendering
-            #ifdef WITH_3D_RENDERER
+            #ifdef USE_3D_RENDERER
                 if (mDisplayMode == DisplayMode::DisplayAll || mDisplayMode == DisplayMode::Display3D)
                 {
                     // OpenGL Rendering
