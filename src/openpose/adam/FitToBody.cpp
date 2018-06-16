@@ -630,6 +630,7 @@ void Adam_FastFit_Initialize(const TotalModel &adam,
 	const bool freeze_missing,
 	const bool verbose,
 	const bool multistage,
+	const bool hand_enabled,
 	const bool fit_face_exp,
 	const bool fast_solver)
 {
@@ -821,6 +822,11 @@ options_init.num_threads = 1; // num_linear_solver_threads deprecated
 		problem_init.SetParameterBlockConstant(frame_param.m_adam_coeffs.data());
 		ceres::Solve(options_init, &problem_init, &summary);
 		if(verbose) std::cout << summary.FullReport() << std::endl;
+	}
+
+	if (!hand_enabled)
+	{
+		std::fill(frame_param.m_adam_pose.data() + 20 * 3, frame_param.m_adam_pose.data() + 62 * 3, 0.0);
 	}
 
 // const auto duration5 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start5).count();
