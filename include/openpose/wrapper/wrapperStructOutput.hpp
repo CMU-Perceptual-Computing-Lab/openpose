@@ -125,6 +125,16 @@ namespace op
         std::string writeBvh;
 
         /**
+         * Target server IP address for UDP client-server communication.
+         */
+        std::string udpHost;
+
+        /**
+         * Target server IP port for UDP client-server communication.
+         */
+        std::string udpPort;
+
+        /**
          * Constructor of the struct.
          * It has the recommended and default values we recommend for each element of the struct.
          * Since all the elements of the struct are public, they can also be manually filled.
@@ -137,7 +147,8 @@ namespace op
                             const std::string& writeImagesFormat = "", const std::string& writeVideo = "",
                             const double writeVideoFps = 30., const std::string& writeHeatMaps = "",
                             const std::string& writeHeatMapsFormat = "", const std::string& writeVideoAdam = "",
-                            const std::string& writeBvh = "");
+                            const std::string& writeBvh = "", const std::string& udpHost = "",
+                            const std::string& udpPort = "");
     };
 }
 

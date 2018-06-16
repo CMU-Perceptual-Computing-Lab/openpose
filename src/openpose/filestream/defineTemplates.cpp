@@ -10,5 +10,6 @@ namespace op
     DEFINE_TEMPLATE_DATUM(WImageSaver);
     DEFINE_TEMPLATE_DATUM(WPeopleJsonSaver);
     DEFINE_TEMPLATE_DATUM(WPoseSaver);
+    DEFINE_TEMPLATE_DATUM(WUdpSender);
     DEFINE_TEMPLATE_DATUM(WVideoSaver);
 }

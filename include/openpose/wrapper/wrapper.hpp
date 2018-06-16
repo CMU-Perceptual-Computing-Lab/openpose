@@ -899,6 +899,13 @@ namespace op
             mOutputWs.clear();
             if (spWJointAngleEstimations.size() > 1u)
                 mOutputWs.emplace_back(std::make_shared<WQueueOrderer<TDatumsPtr>>());
+            // Send information (e.g., to Unity) though UDP client-server communication
+            if (!wrapperStructOutput.udpHost.empty() && !wrapperStructOutput.udpPort.empty())
+            {
+                const auto udpSender = std::make_shared<UdpSender>(wrapperStructOutput.udpHost,
+                                                                   wrapperStructOutput.udpPort);
+                mOutputWs.emplace_back(std::make_shared<WUdpSender<TDatumsPtr>>(udpSender));
+            }
             // Write people pose data on disk (json for OpenCV >= 3, xml, yml...)
             if (!writeKeypointCleaned.empty())
             {

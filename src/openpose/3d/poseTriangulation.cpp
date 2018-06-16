@@ -1,3 +1,4 @@
+#include <thread>
 #ifdef WITH_CERES
     #include <ceres/ceres.h>
     #include <ceres/rotation.h>
@@ -35,11 +36,11 @@ namespace op
         // Nonlinear Optimization for 3D Triangulation
         struct ReprojectionErrorForTriangulation
         {
-            ReprojectionErrorForTriangulation(const double x, const double y, const double* const param)
+            ReprojectionErrorForTriangulation(const double x, const double y, const double* const param) :
+                observed_x{x},
+                observed_y{y}
             {
-                observed_x = x;
-                observed_y = y;
-                memcpy(camParam,param,sizeof(double)*12);
+                memcpy(camParam, param, sizeof(double)*12);
             }
 
             template <typename T>
@@ -50,8 +51,8 @@ namespace op
                                          double* residuals,
                                          double** jacobians) const;
 
-            double observed_x;
-            double observed_y;
+            const double observed_x;
+            const double observed_y;
             double camParam[12];
         };
 
@@ -61,22 +62,19 @@ namespace op
         {
             try
             {
-                T predicted[3] = {
+                const T predicted[3] = {
                     T(camParam[0])*pt[0] + T(camParam[1])*pt[1] + T(camParam[2])*pt[2] + T(camParam[3]),
                     T(camParam[4])*pt[0] + T(camParam[5])*pt[1] + T(camParam[6])*pt[2] + T(camParam[7]),
                     T(camParam[8])*pt[0] + T(camParam[9])*pt[1] + T(camParam[10])*pt[2] + T(camParam[11])};
 
-                predicted[0] /= predicted[2];
-                predicted[1] /= predicted[2];
-
-                residuals[0] = T(observed_x) - predicted[0];
-                residuals[1] = T(observed_y) - predicted[1];
+                residuals[0] = T(observed_x) - predicted[0] / predicted[2];
+                residuals[1] = T(observed_y) - predicted[1] / predicted[2];
 
                 // residuals[0] = T(pow(predicted[0] - observed_x,2) + pow(predicted[1] - observed_y,2));
                 // residuals[0] = -pow(predicted[0] - T(observed_x),2);
                 // residuals[1] = -pow(predicted[1] - T(observed_y),2);
 
-                return  true;
+                return true;
             }
             catch (const std::exception& e)
             {
@@ -93,18 +91,17 @@ namespace op
             {
                 UNUSED(jacobians);
 
-                double predicted[3] = {
+                const double predicted[3] = {
                     camParam[0]*pt[0][0] + camParam[1]*pt[0][1] + camParam[2]*pt[0][2] + camParam[3],
                     camParam[4]*pt[0][0] + camParam[5]*pt[0][1] + camParam[6]*pt[0][2] + camParam[7],
                     camParam[8]*pt[0][0] + camParam[9]*pt[0][1] + camParam[10]*pt[0][2] + camParam[11]};
 
-                predicted[0] /= predicted[2];
-                predicted[1] /= predicted[2];
+                // residuals[0] = predicted[0] / predicted[2] - observed_x;
+                // residuals[1] = predicted[1] / predicted[2] - observed_y;
 
-                // residuals[0] = predicted[0] - observed_x;
-                // residuals[1] = predicted[1] - observed_y;
+                residuals[0] = std::sqrt(std::pow(predicted[0] / predicted[2] - observed_x,2)
+                                         + std::pow(predicted[1] / predicted[2] - observed_y,2));
 
-                residuals[0] = std::sqrt(std::pow(predicted[0] - observed_x,2) + std::pow(predicted[1] - observed_y,2));
                 // log("Residuals:");
                 // residuals[0]= pow(predicted[0] - (observed_x),2);
                 // residuals[1]= pow(predicted[1] - (observed_y),2);
@@ -230,15 +227,17 @@ namespace op
         }
     }
 
-    PoseTriangulation::PoseTriangulation(const int minViews3d) :
-        mMinViews3d{minViews3d}
+    inline bool isValidKeypoint(const float* const keypointPtr, const Point<int>& imageSize)
     {
         try
         {
-            // Security checks
-            if (0 <= mMinViews3d && mMinViews3d < 2)
-                error("Minimum number of views must be at least 2 (e.g., `--3d_min_views 2`) or negative.",
-                      __LINE__, __FUNCTION__, __FILE__);
+            const auto threshold = 0.35f;
+            return (keypointPtr[2] > threshold
+                    // If keypoint in border --> most probably it is actually out of the image, reduce that noise
+                    && keypointPtr[0] > 8
+                    && keypointPtr[0] < imageSize.x - 8
+                    && keypointPtr[1] > 8
+                    && keypointPtr[1] < imageSize.y - 8);
         }
         catch (const std::exception& e)
         {
@@ -246,16 +245,16 @@ namespace op
         }
     }
 
-    void PoseTriangulation::initializationOnThread()
-    {
-    }
-
-    Array<float> PoseTriangulation::reconstructArray(const std::vector<Array<float>>& keypointsVector,
-                                                     const std::vector<cv::Mat>& cameraMatrices) const
+    void reconstructArrayThread(Array<float>* keypoints3DPtr,
+                                const std::vector<Array<float>>& keypointsVector,
+                                const std::vector<cv::Mat>& cameraMatrices,
+                                const std::vector<Point<int>>& imageSizes,
+                                const int minViews3d)
     {
         try
         {
-            Array<float> keypoints3D;
+            auto& keypoints3D = *keypoints3DPtr;
+
             // Security checks
             if (cameraMatrices.size() < 2)
                 error("Only 1 camera detected. The 3-D reconstruction module can only be used with > 1 cameras"
@@ -277,7 +276,6 @@ namespace op
                 const auto numberBodyParts = keypointsVector.at(0).getSize(1);
                 const auto lastChannelLength = keypointsVector.at(0).getSize(2);
                 // Create x-y vector from high score results
-                const auto threshold = 0.2f;
                 std::vector<int> indexesUsed;
                 std::vector<std::vector<cv::Point2d>> xyPoints;
                 std::vector<std::vector<cv::Mat>> cameraMatricesPerPoint;
@@ -292,17 +290,17 @@ namespace op
                     for (auto i = 0u ; i < keypointsVector.size() ; i++)
                     {
                         const auto& keypoints = keypointsVector[i];
-                        if (keypoints[baseIndex+2] > threshold)
+                        if (isValidKeypoint(&keypoints[baseIndex], imageSizes[i]))
                         {
                             xyPointsElement.emplace_back(cv::Point2d{keypoints[baseIndex],
                                                                      keypoints[baseIndex+1]});
                             cameraMatricesElement.emplace_back(cameraMatrices[i]);
                         }
                     }
-                    // If visible from all views (mMinViews3d < 0)
-                    // or if visible for at least mMinViews3d views
-                    if ((mMinViews3d < 0 && cameraMatricesElement.size() == cameraMatrices.size())
-                        || (mMinViews3d > 1 && mMinViews3d <= (int)xyPointsElement.size()))
+                    // If visible from all views (minViews3d < 0)
+                    // or if visible for at least minViews3d views
+                    if ((minViews3d < 0 && cameraMatricesElement.size() == cameraMatrices.size())
+                        || (minViews3d > 1 && minViews3d <= (int)xyPointsElement.size()))
                     {
                         indexesUsed.emplace_back(part);
                         xyPoints.emplace_back(xyPointsElement);
@@ -349,12 +347,81 @@ namespace op
                 }
                 // log("Reprojection error: " + std::to_string(reprojectionErrorTotal)); // To debug reprojection error
             }
-            return keypoints3D;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    PoseTriangulation::PoseTriangulation(const int minViews3d) :
+        mMinViews3d{minViews3d}
+    {
+        try
+        {
+            // Security checks
+            if (0 <= mMinViews3d && mMinViews3d < 2)
+                error("Minimum number of views must be at least 2 (e.g., `--3d_min_views 2`) or negative.",
+                      __LINE__, __FUNCTION__, __FILE__);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    void PoseTriangulation::initializationOnThread()
+    {
+    }
+
+    Array<float> PoseTriangulation::reconstructArray(const std::vector<Array<float>>& keypointsVector,
+                                                     const std::vector<cv::Mat>& cameraMatrices,
+                                                     const std::vector<Point<int>>& imageSizes) const
+    {
+        try
+        {
+            return reconstructArray(std::vector<std::vector<Array<float>>>{keypointsVector},
+                                    cameraMatrices, imageSizes).at(0);
         }
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             return Array<float>{};
+        }
+    }
+
+    std::vector<Array<float>> PoseTriangulation::reconstructArray(
+        const std::vector<std::vector<Array<float>>>& keypointsVectors,
+        const std::vector<cv::Mat>& cameraMatrices,
+        const std::vector<Point<int>>& imageSizes) const
+    {
+        try
+        {
+            std::vector<Array<float>> keypoints3Ds(keypointsVectors.size());
+            std::vector<std::thread> threads(keypointsVectors.size()-1);
+            for (auto i = 0u; i < threads.size(); i++)
+            {
+                // // Multi-thread option
+                // threads.at(i) = std::thread{&reconstructArrayThread,
+                //                             &keypoints3Ds[i], keypointsVectors[i], cameraMatrices,
+                //                             imageSizes, mMinViews3d};
+                // Single-thread option
+                reconstructArrayThread(&keypoints3Ds[i], keypointsVectors[i], cameraMatrices,
+                                       imageSizes, mMinViews3d);
+            }
+            reconstructArrayThread(&keypoints3Ds.back(), keypointsVectors.back(), cameraMatrices,
+                                   imageSizes, mMinViews3d);
+            // Close threads
+            for (auto& thread : threads)
+                if (thread.joinable())
+                    thread.join();
+            // Return results
+            return keypoints3Ds;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return {};
         }
     }
 }

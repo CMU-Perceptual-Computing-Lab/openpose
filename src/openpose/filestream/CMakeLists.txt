@@ -8,6 +8,7 @@ set(SOURCES_OP_FILESTREAM bvhSaver.cpp
     jsonOfstream.cpp
     keypointSaver.cpp
     peopleJsonSaver.cpp
+    udpSender.cpp
     videoSaver.cpp)
 
 include(${CMAKE_SOURCE_DIR}/cmake/Utils.cmake)

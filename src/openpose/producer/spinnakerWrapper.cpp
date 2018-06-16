@@ -593,7 +593,7 @@ namespace op
                             if (mUndistortImage)
                             {
                                 std::vector<std::thread> threads(imagePtrs.size()-1);
-                                for (auto i = 0u; i < imagePtrs.size()-1; i++)
+                                for (auto i = 0u; i < threads.size(); i++)
                                 {
                                     // Multi-thread option
                                     threads.at(i) = std::thread{&ImplSpinnakerWrapper::readAndUndistortImage, this, i,

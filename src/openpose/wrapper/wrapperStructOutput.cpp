@@ -10,7 +10,8 @@ namespace op
                                              const std::string& writeVideo_, const double writeVideoFps_,
                                              const std::string& writeHeatMaps_,
                                              const std::string& writeHeatMapsFormat_,
-                                             const std::string& writeVideoAdam_, const std::string& writeBvh_) :
+                                             const std::string& writeVideoAdam_, const std::string& writeBvh_,
+                                             const std::string& udpHost_, const std::string& udpPort_) :
         displayMode{displayMode_},
         guiVerbose{guiVerbose_},
         fullScreen{fullScreen_},
@@ -26,7 +27,9 @@ namespace op
         writeHeatMapsFormat{writeHeatMapsFormat_},
         writeVideoFps{writeVideoFps_},
         writeVideoAdam{writeVideoAdam_},
-        writeBvh{writeBvh_}
+        writeBvh{writeBvh_},
+        udpHost{udpHost_},
+        udpPort{udpPort_}
     {
     }
 }

@@ -236,36 +236,38 @@ DEFINE_string(write_keypoint_format,    "yml",          "(Deprecated, use `write
 DEFINE_string(write_video_adam,         "",             "Experimental, not available yet. E.g.: `~/Desktop/adamResult.avi`. Flag `camera_fps`"
                                                         " controls FPS.");
 DEFINE_string(write_bvh,                "",             "Experimental, not available yet. E.g.: `~/Desktop/mocapResult.bvh`.");
-// Unity - UDP communication
+// UDP communication
 DEFINE_string(udp_host,                 "127.0.0.1",    "IP for UDP communication.");
 DEFINE_string(udp_port,                 "8051",         "Port number for UDP communication.");
 
 class UDPClient
 {
 public:
-    UDPClient(asio::io_service& io_service, const std::string& host, const std::string& port)
-        : io_service_(io_service), socket_(io_service, asio::ip::udp::endpoint(asio::ip::udp::v4(), 0))
+    UDPClient(const std::string& host, const std::string& port) :
+        mIoService{},
+        mUdpSocket{mIoService, asio::ip::udp::endpoint(asio::ip::udp::v4(), 0)}
     {
-        asio::ip::udp::resolver resolver(io_service_);
-        asio::ip::udp::resolver::query query(asio::ip::udp::v4(), host, port);
+        asio::ip::udp::resolver resolver{mIoService};
+        asio::ip::udp::resolver::query query{asio::ip::udp::v4(), host, port};
         asio::ip::udp::resolver::iterator iter = resolver.resolve(query);
-        endpoint_ = *iter;
+        mUdpEndpoint = *iter;
     }
 
     ~UDPClient()
     {
-        socket_.close();
+        mUdpSocket.close();
     }
 
-    void send(const std::string& msg) {
-        socket_.send_to(asio::buffer(msg, msg.size()), endpoint_);
+    void send(const std::string& msg)
+    {
+        mUdpSocket.send_to(asio::buffer(msg, msg.size()), mUdpEndpoint);
         //std::cout << "sent data: " << msg << std::endl;
     }
 
 private:
-    asio::io_service& io_service_;
-    asio::ip::udp::socket socket_;
-    asio::ip::udp::endpoint endpoint_;
+    asio::io_service mIoService;
+    asio::ip::udp::socket mUdpSocket;
+    asio::ip::udp::endpoint mUdpEndpoint;
 };
 
 // This worker will just read and return all the jpg files in a directory
@@ -274,7 +276,7 @@ class WUserOutput : public op::WorkerConsumer<std::shared_ptr<std::vector<op::Da
 public:
     // Purely processing
     WUserOutput() :
-        mUdpClient(mService, FLAGS_udp_host, FLAGS_udp_port)
+        mUdpClient(FLAGS_udp_host, FLAGS_udp_port)
     {
     }
 
@@ -355,7 +357,6 @@ public:
 
 private:
     // Unity - UDP communication
-    asio::io_service mService;
     UDPClient mUdpClient;
 };
 

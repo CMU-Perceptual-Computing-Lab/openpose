@@ -725,7 +725,6 @@ void Adam_FastFit_Initialize(const TotalModel &adam,
 		options_init.function_tolerance = 1e-3;
 		options_init.gradient_tolerance = 1e-5;
 		options_init.parameter_tolerance = 1e-5;
-		options_init.function_tolerance = 1e-3;
 		options_init.inner_iteration_tolerance = 1e-2;
 	}
 	options_init.use_nonmonotonic_steps = false;
@@ -749,7 +748,6 @@ options_init.num_threads = 1; // num_linear_solver_threads deprecated
 		// options_init.function_tolerance = 1e-4;
 		// options_init.gradient_tolerance = 1e-6;
 		// options_init.parameter_tolerance = 1e-6;
-		// options_init.function_tolerance = 1e-4;
 		// options_init.inner_iteration_tolerance = 1e-2;
 		// options_init.max_solver_time_in_seconds = 100e-3;
 		// const auto duration3 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start3).count();
@@ -804,7 +802,6 @@ options_init.num_threads = 1; // num_linear_solver_threads deprecated
 			options_init.function_tolerance = 1e-3;
 			options_init.gradient_tolerance = 1e-5;
 			options_init.parameter_tolerance = 1e-5;
-			options_init.function_tolerance = 1e-3;
 			options_init.inner_iteration_tolerance = 1e-2;
 		}
 		options_init.use_nonmonotonic_steps = false;

@@ -234,6 +234,9 @@ DEFINE_string(write_keypoint_format,    "yml",          "(Deprecated, use `write
 DEFINE_string(write_video_adam,         "",             "Experimental, not available yet. E.g.: `~/Desktop/adamResult.avi`. Flag `camera_fps`"
                                                         " controls FPS.");
 DEFINE_string(write_bvh,                "",             "Experimental, not available yet. E.g.: `~/Desktop/mocapResult.bvh`.");
+// UDP communication
+DEFINE_string(udp_host,                 "127.0.0.1",    "IP for UDP communication.");
+DEFINE_string(udp_port,                 "8051",         "Port number for UDP communication.");
 
 
 // If the user needs his own variables, he can inherit the op::Datum struct and add them
@@ -426,7 +429,7 @@ int openPoseDemo()
             op::stringToDataFormat(FLAGS_write_keypoint_format), FLAGS_write_json, FLAGS_write_coco_json,
             FLAGS_write_coco_foot_json, FLAGS_write_images, FLAGS_write_images_format, FLAGS_write_video,
             FLAGS_camera_fps, FLAGS_write_heatmaps, FLAGS_write_heatmaps_format, FLAGS_write_video_adam,
-            FLAGS_write_bvh};
+            FLAGS_write_bvh, udp_host, udp_port};
         // Configure wrapper
         opWrapper.configure(wrapperStructPose, wrapperStructFace, wrapperStructHand, wrapperStructExtra,
                             wrapperStructInput, wrapperStructOutput);
