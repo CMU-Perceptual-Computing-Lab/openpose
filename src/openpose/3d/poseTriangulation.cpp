@@ -211,6 +211,7 @@ namespace op
                         options.gradient_tolerance = 1e-7; //1e-10
                         options.parameter_tolerance = 1e-6; //1e-8
                         options.inner_iteration_tolerance = 1e-4; //1e-6
+                        // Default (none of the above) ~42 ms
                     }
                     // options.minimizer_progress_to_stdout = true;
                     // options.parameter_tolerance = 1e-20;
@@ -332,7 +333,7 @@ namespace op
                     }
                 }
                 // 3D reconstruction
-                auto reprojectionErrorTotal = 0.0;
+                std::vector<double> reprojectionErrors(xyPoints.size());
                 keypoints3D.reset({ 1, numberBodyParts, 4 }, 0);
                 if (!xyPoints.empty())
                 {
@@ -341,22 +342,22 @@ namespace op
                     for (auto i = 0u; i < xyPoints.size(); i++)
                     {
                         cv::Mat reconstructedPoint;
-                        reprojectionErrorTotal += triangulateWithOptimization(reconstructedPoint,
-                                                                              cameraMatricesPerPoint[i],
-                                                                              xyPoints[i]);
-                        xyzPoints[i] = cv::Point3d{reconstructedPoint.at<double>(0), reconstructedPoint.at<double>(1),
+                        reprojectionErrors[i] = triangulateWithOptimization(reconstructedPoint,
+                                                                            cameraMatricesPerPoint[i],
+                                                                            xyPoints[i]);
+                        xyzPoints[i] = cv::Point3d{
+                            reconstructedPoint.at<double>(0),
+                            reconstructedPoint.at<double>(1),
                             reconstructedPoint.at<double>(2)};
                     }
-                    reprojectionErrorTotal /= xyPoints.size();
-                    if (reprojectionErrorTotal > 30)
-                        log("Unusual high re-projection error (averaged over the whole keypoints) of value "
-                            + std::to_string(reprojectionErrorTotal) + ", while the average for 4 cameras is about"
-                            " 2-3. If this message only appears a few times every video, it might be simply due to"
-                            " a wrong OpenPose detection. If it appears very frequently, your calibration parameters"
-                            " might be wrong or the OpenPose results are much noisier than usual."
-                            " TODOOOOOOOO - GINESSSSSSSSSSSS: IF PROJ ERROR 5X BIGGER THAN AVERAGE --> REMOVE SAMPLE TOO!!!!!!!!"
-                            " I.E. VECTOR WITH RE-PROJ ERRORS AND REMOVE HIGH ONES based on average.",
-                            Priority::High);
+                    const auto reprojectionErrorTotal = std::accumulate(
+                        reprojectionErrors.begin(), reprojectionErrors.end(), 0.0) / xyPoints.size();
+                    if (reprojectionErrorTotal > 60)
+                        log("Unusual high re-projection error (averaged over #keypoints) of value "
+                            + std::to_string(reprojectionErrorTotal) + " pixels, while the average for a good OpenPose"
+                            " detection from 4 cameras is about 2-3 pixels. It might be simply a wrong OpenPose"
+                            " detection. If this message appears very frequently, your calibration parameters"
+                            " might be wrong.", Priority::High);
 
                     // 3D points to pose
                     // OpenCV alternative:
@@ -368,7 +369,10 @@ namespace op
                     for (auto index = 0u; index < indexesUsed.size(); index++)
                     {
                         if (std::isfinite(xyzPoints[index].x) && std::isfinite(xyzPoints[index].y)
-                            && std::isfinite(xyzPoints[index].z))
+                            && std::isfinite(xyzPoints[index].z)
+                            // Remove outliers
+                            && (reprojectionErrors[index] < 5 * reprojectionErrorTotal
+                                && reprojectionErrors[index] < 30))
                         {
                             const auto baseIndex = indexesUsed[index] * lastChannelLength;
                             keypoints3D[baseIndex] = xyzPoints[index].x;
