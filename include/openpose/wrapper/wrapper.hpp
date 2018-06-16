@@ -832,13 +832,16 @@ namespace op
                 spWPoseTriangulations.clear();
                 if (wrapperStructExtra.reconstruct3d)
                 {
-                    spWPoseTriangulations.resize(2*spWPoseExtractors.size());
+                    // For all (body/face/hands): PoseTriangulations ~30 msec, 8 GPUS ~30 msec for keypoint estimation
+                    spWPoseTriangulations.resize(fastMax(1, int(spWPoseExtractors.size() / 4)));
                     if (spWPoseTriangulations.size() > 1)
                         mWQueueOrdererTriangulation = std::make_shared<WQueueOrderer<TDatumsPtr>>();
                     for (auto i = 0u ; i < spWPoseTriangulations.size() ; i++)
                     {
-                        const auto poseTriangulation = std::make_shared<PoseTriangulation>(wrapperStructExtra.minViews3d);
-                        spWPoseTriangulations.at(i) = {std::make_shared<WPoseTriangulation<TDatumsPtr>>(poseTriangulation)};
+                        const auto poseTriangulation = std::make_shared<PoseTriangulation>(
+                            wrapperStructExtra.minViews3d);
+                        spWPoseTriangulations.at(i) = {std::make_shared<WPoseTriangulation<TDatumsPtr>>(
+                            poseTriangulation)};
                     }
                 }
                 // Itermediate workers (e.g. OpenPose format to cv::Mat, json & frames recorder, ...)

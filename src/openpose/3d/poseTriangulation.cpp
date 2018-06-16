@@ -1,4 +1,4 @@
-#include <thread>
+// #include <thread>
 #ifdef USE_CERES
     #include <ceres/ceres.h>
     #include <ceres/rotation.h>
@@ -164,43 +164,66 @@ namespace op
 
             // Basic triangulation
             triangulate(reconstructedPoint, cameraMatrices, pointsOnEachCamera);
+            const auto projectionErrorLinear = calcReprojectionError(reconstructedPoint, cameraMatrices, pointsOnEachCamera);
 
             #ifdef USE_CERES
-                // Slow equivalent: double paramX[3]; paramX[i] = reconstructedPoint.at<double>(i);
-                double* paramX = (double*)reconstructedPoint.data;
-                ceres::Problem problem;
-                for (auto i = 0u; i < cameraMatrices.size(); ++i)
+                // Empirically detected that reprojection error (for 4 cameras) only minimizes the error if initial
+                // project error > ~2.5, and that it improves more the higher that error actually is
+                // Therefore, we disable it for already accurate samples in order to get both:
+                //     - Speed
+                //     - Accuracy for already accurate samples
+                if (projectionErrorLinear > 3.0)
                 {
-                    // Slow copy equivalent:
-                    //     double camParam[12]; memcpy(camParam, cameraMatrices[i].data, sizeof(double)*12);
-                    const double* const camParam = (double*)cameraMatrices[i].data;
-                    // Each Residual block takes a point and a camera as input and outputs a 2
-                    // dimensional residual. Internally, the cost function stores the observed
-                    // image location and compares the reprojection against the observation.
-                    ceres::CostFunction* cost_function =
-                        new ceres::AutoDiffCostFunction<ReprojectionErrorForTriangulation, 2, 3>(
-                            new ReprojectionErrorForTriangulation(
-                                pointsOnEachCamera[i].x, pointsOnEachCamera[i].y, camParam));
-                    // Add to problem
-                    problem.AddResidualBlock(cost_function,
-                        //NULL, //squared loss
-                        new ceres::HuberLoss(2.0),
-                        paramX); // paramX[0,1,2]
+                    // Slow equivalent: double paramX[3]; paramX[i] = reconstructedPoint.at<double>(i);
+                    double* paramX = (double*)reconstructedPoint.data;
+                    ceres::Problem problem;
+                    for (auto i = 0u; i < cameraMatrices.size(); ++i)
+                    {
+                        // Slow copy equivalent:
+                        //     double camParam[12]; memcpy(camParam, cameraMatrices[i].data, sizeof(double)*12);
+                        const double* const camParam = (double*)cameraMatrices[i].data;
+                        // Each Residual block takes a point and a camera as input and outputs a 2
+                        // dimensional residual. Internally, the cost function stores the observed
+                        // image location and compares the reprojection against the observation.
+                        ceres::CostFunction* cost_function =
+                            new ceres::AutoDiffCostFunction<ReprojectionErrorForTriangulation, 2, 3>(
+                                new ReprojectionErrorForTriangulation(
+                                    pointsOnEachCamera[i].x, pointsOnEachCamera[i].y, camParam));
+                        // Add to problem
+                        problem.AddResidualBlock(cost_function,
+                            //NULL, //squared loss
+                            new ceres::HuberLoss(2.0),
+                            paramX); // paramX[0,1,2]
+                    }
+
+                    ceres::Solver::Options options;
+                    options.linear_solver_type = ceres::DENSE_NORMAL_CHOLESKY;
+                    // options.num_threads = 2; // It does not affect speed
+                    // if (fastVersion)
+                    {
+                        // ~22 ms
+                        // options.function_tolerance = 1e-3; //1e-6
+                        // options.gradient_tolerance = 1e-5; //1e-10
+                        // options.parameter_tolerance = 1e-5; //1e-8
+                        // options.inner_iteration_tolerance = 1e-3; //1e-6
+                        // ~30 ms (~30 FPS)
+                        options.function_tolerance = 1e-4; //1e-6
+                        options.gradient_tolerance = 1e-7; //1e-10
+                        options.parameter_tolerance = 1e-6; //1e-8
+                        options.inner_iteration_tolerance = 1e-4; //1e-6
+                    }
+                    // options.minimizer_progress_to_stdout = true;
+                    // options.parameter_tolerance = 1e-20;
+                    // options.function_tolerance = 1e-20;
+                    ceres::Solver::Summary summary;
+                    ceres::Solve(options, &problem, &summary);
+                    // if (summary.initial_cost > summary.final_cost)
+                    //     std::cout << summary.FullReport() << "\n";
+
+                    // const auto reprojectionErrorDecrease = std::sqrt((summary.initial_cost - summary.final_cost)
+                    //                                      / double(cameraMatrices.size()));
+                    // return reprojectionErrorDecrease;
                 }
-
-                ceres::Solver::Options options;
-                options.linear_solver_type = ceres::DENSE_NORMAL_CHOLESKY;
-                // options.minimizer_progress_to_stdout = true;
-                // options.parameter_tolerance = 1e-20;
-                // options.function_tolerance = 1e-20;
-                ceres::Solver::Summary summary;
-                ceres::Solve(options, &problem, &summary);
-                // if (summary.initial_cost > summary.final_cost)
-                //     std::cout << summary.FullReport() << "\n";
-
-                // const auto reprojectionErrorDecrease = std::sqrt((summary.initial_cost - summary.final_cost)
-                //                                      / double(cameraMatrices.size()));
-                // return reprojectionErrorDecrease;
             #endif
             // assert(reconstructedPoint.at<double>(3) == 1.);
 
@@ -233,7 +256,8 @@ namespace op
         {
             const auto threshold = 0.35f;
             return (keypointPtr[2] > threshold
-                    // If keypoint in border --> most probably it is actually out of the image, reduce that noise
+                    // If keypoint in border --> most probably it is actually out of the image,
+                    // so removed to reduce that noise
                     && keypointPtr[0] > 8
                     && keypointPtr[0] < imageSize.x - 8
                     && keypointPtr[1] > 8
@@ -324,6 +348,15 @@ namespace op
                             reconstructedPoint.at<double>(2)};
                     }
                     reprojectionErrorTotal /= xyPoints.size();
+                    if (reprojectionErrorTotal > 30)
+                        log("Unusual high re-projection error (averaged over the whole keypoints) of value "
+                            + std::to_string(reprojectionErrorTotal) + ", while the average for 4 cameras is about"
+                            " 2-3. If this message only appears a few times every video, it might be simply due to"
+                            " a wrong OpenPose detection. If it appears very frequently, your calibration parameters"
+                            " might be wrong or the OpenPose results are much noisier than usual."
+                            " TODOOOOOOOO - GINESSSSSSSSSSSS: IF PROJ ERROR 5X BIGGER THAN AVERAGE --> REMOVE SAMPLE TOO!!!!!!!!"
+                            " I.E. VECTOR WITH RE-PROJ ERRORS AND REMOVE HIGH ONES based on average.",
+                            Priority::High);
 
                     // 3D points to pose
                     // OpenCV alternative:
@@ -398,10 +431,11 @@ namespace op
         try
         {
             std::vector<Array<float>> keypoints3Ds(keypointsVectors.size());
-            std::vector<std::thread> threads(keypointsVectors.size()-1);
-            for (auto i = 0u; i < threads.size(); i++)
+            // std::vector<std::thread> threads(keypointsVectors.size()-1);
+            for (auto i = 0u; i < keypointsVectors.size()-1; i++)
             {
-                // // Multi-thread option
+                // // Multi-thread option - ~15% slower
+                // // Ceres seems to be super slow if run concurrently in different threads
                 // threads.at(i) = std::thread{&reconstructArrayThread,
                 //                             &keypoints3Ds[i], keypointsVectors[i], cameraMatrices,
                 //                             imageSizes, mMinViews3d};
@@ -411,10 +445,10 @@ namespace op
             }
             reconstructArrayThread(&keypoints3Ds.back(), keypointsVectors.back(), cameraMatrices,
                                    imageSizes, mMinViews3d);
-            // Close threads
-            for (auto& thread : threads)
-                if (thread.joinable())
-                    thread.join();
+            // // Close threads
+            // for (auto& thread : threads)
+            //     if (thread.joinable())
+            //         thread.join();
             // Return results
             return keypoints3Ds;
         }
