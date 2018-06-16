@@ -101,8 +101,8 @@ void BVHWriter::writeBVH(const std::string& output_file, const double frame_time
 		dynamicStr[i] += std::to_string(this->trans[i](0) + this->root->offset[0]) + " " + std::to_string(this->trans[i](1) + this->root->offset[1]) + " " + std::to_string(this->trans[i](2) + this->root->offset[2]);
 	if (mUnityCompatible)
 		for (int i = 0; i < this->num_frame; i++)
-			// dynamicStr[i] += " 0.0 0.0 0.0";
-			dynamicStr[i] += " 0.0 0.0 180.0";
+			dynamicStr[i] += " 0.0 0.0 0.0";
+			// dynamicStr[i] += " 0.0 0.0 180.0";
 	else
 		for (int i = 0; i < this->num_frame; i++)
 			dynamicStr[i] += " 0.0 0.0 0.0";
@@ -147,17 +147,13 @@ void BVHWriter::getDynamic(const Eigen::Matrix<double, TotalModel::NUM_JOINTS, 3
 	Eigen::Matrix<double, 3, 3, Eigen::RowMajor> R;
 	std::array<double, 3> angle;
 	ceres::AngleAxisToRotationMatrix(pose.data() + 3 * idj, R.data());
-	Eigen::Matrix<double, 3, 3, Eigen::RowMajor> RT;
-	RT << R.transpose();
-	RotationMatrixToEulerAngle(RT, angle);
+	RotationMatrixToEulerAngle(R, angle);
 	this->root->euler.push_back(angle);
 
 	for (idj = 1; idj < TotalModel::NUM_JOINTS; idj++)
 	{
 		ceres::EulerAnglesToRotationMatrix(pose.data() + 3 * idj, 3, R.data());
-		RT << R.transpose();
-		std::array<double, 3> angle;
-		RotationMatrixToEulerAngle(RT, angle);
+		std::array<double, 3> angle{{ pose.data()[3 * idj + 0], pose.data()[3 * idj + 1], pose.data()[3 * idj + 2] }};
 		this->data[idj]->euler.push_back(angle);
 	}
 }
