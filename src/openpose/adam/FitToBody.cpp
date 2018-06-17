@@ -739,11 +739,13 @@ options_init.num_threads = 1; // num_linear_solver_threads deprecated
 		adam_cost->toggle_rigid_body(true);
 		// const auto duration1 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start1).count();
 		// const auto start2 = std::chrono::high_resolution_clock::now();
+		problem_init.SetParameterBlockConstant(frame_param.m_adam_coeffs.data());
 		ceres::Solve(options_init, &problem_init, &summary);
 		if(verbose) std::cout << summary.FullReport() << std::endl;
 
 		// const auto duration2 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start2).count();
 		// const auto start3 = std::chrono::high_resolution_clock::now();
+		problem_init.SetParameterBlockVariable(frame_param.m_adam_coeffs.data());
 		adam_cost->toggle_rigid_body(false);
 		adam_cost->toggle_activate(true, false, false);
 		// options_init.function_tolerance = 1e-4;

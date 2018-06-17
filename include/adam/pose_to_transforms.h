@@ -332,8 +332,10 @@ public:
 class PoseToTransform_AdamFull_withDiff: public ceres::CostFunction
 {
 public:
-	PoseToTransform_AdamFull_withDiff(const TotalModel &mod, const std::array<std::vector<int>, TotalModel::NUM_JOINTS>& parentIndexes):
-		mod_(mod), mParentIndexes(parentIndexes)
+	PoseToTransform_AdamFull_withDiff(const TotalModel &mod,
+		const std::array<std::vector<int>, TotalModel::NUM_JOINTS>& parentIndexes,
+		const bool rigid_body):
+		mod_(mod), mParentIndexes(parentIndexes), m_rigid_body(rigid_body)
 	{
 		CostFunction::set_num_residuals(3 * 5 * TotalModel::NUM_JOINTS);
 		auto parameter_block_sizes = CostFunction::mutable_parameter_block_sizes();
@@ -349,6 +351,7 @@ public:
 
 	const TotalModel &mod_;
 	const std::array<std::vector<int>, TotalModel::NUM_JOINTS>& mParentIndexes;
+	const bool m_rigid_body;
 };
 
 }

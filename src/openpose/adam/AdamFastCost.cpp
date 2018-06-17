@@ -369,9 +369,9 @@ bool AdamFullCost::Evaluate(double const* const* parameters,
     VectorXd transforms_joint(3 * TotalModel::NUM_JOINTS * 4 + 3 * TotalModel::NUM_JOINTS);
     const double* p2t_parameters[2] = { p_eulers, J.data() };
     double* p2t_residuals = transforms_joint.data();
-    double* p2t_jacobians[2] = { dTrdP.data(), dTrdJ.data() };
+    double* p2t_jacobians[2] = { dTrdP.data(), jacobians && jacobians[2]? dTrdJ.data(): nullptr };
 
-    smpl::PoseToTransform_AdamFull_withDiff p2t(fit_data_.adam, parentIndexes);
+    smpl::PoseToTransform_AdamFull_withDiff p2t(fit_data_.adam, parentIndexes, rigid_body);
 // const auto duration_iter = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start_iter).count();
 // const auto start_FK = std::chrono::high_resolution_clock::now();
     p2t.Evaluate(p2t_parameters, p2t_residuals, jacobians ? p2t_jacobians : nullptr );
@@ -392,7 +392,7 @@ bool AdamFullCost::Evaluate(double const* const* parameters,
     Map<MatrixXdr> dTJdP(dTrdP.data() + 3 * TotalModel::NUM_JOINTS * 4 * 3 * TotalModel::NUM_JOINTS, 3 * TotalModel::NUM_JOINTS, 3 * TotalModel::NUM_JOINTS);
     // The following lines are equiv to MatrixXdr dTrdc = dTrdJ * fit_data_.adam.dJdc_;
     MatrixXdr dTrdc(num_t, TotalModel::NUM_SHAPE_COEFFICIENTS);
-    if (jacobians) ComputedTrdc(dTrdJ.data(), fit_data_.adam.dJdc_.data(), dTrdc.data(), parentIndexes);
+    if (jacobians && jacobians[1]) ComputedTrdc(dTrdJ.data(), fit_data_.adam.dJdc_.data(), dTrdc.data(), parentIndexes);
     // MatrixXdr dTJdc = dTrdc.block(3 * TotalModel::NUM_JOINTS * 4, 0, 3 * TotalModel::NUM_JOINTS, TotalModel::NUM_SHAPE_COEFFICIENTS);
     Map<MatrixXdr> dTJdc(dTrdc.data() + 3 * TotalModel::NUM_JOINTS * 4 * TotalModel::NUM_SHAPE_COEFFICIENTS, 3 * TotalModel::NUM_JOINTS, TotalModel::NUM_SHAPE_COEFFICIENTS);
     VectorXd outJoint = transforms_joint.block<3 * TotalModel::NUM_JOINTS, 1>(3 * TotalModel::NUM_JOINTS * 4, 0);  // outJoint
@@ -482,41 +482,80 @@ bool AdamFullCost::Evaluate(double const* const* parameters,
         {
             const auto* dTJdPPtr = dTJdP.data();
             const auto* dTJdcPtr = dTJdc.data();
-            int offset = 0;
-            for (int i = 0; i < fit_data_.adam.m_indices_jointConst_adamIdx.rows(); i++)
+            if (rigid_body)
             {
-                std::copy(dTJdPPtr + 3 * indicesJointConstAdamIdxPtr[i] * TotalModel::NUM_POSE_PARAMETERS,
-                          dTJdPPtr + 3 * (indicesJointConstAdamIdxPtr[i] + 1) * TotalModel::NUM_POSE_PARAMETERS,
-                          dOdP.data() + 3 * (i + offset) * TotalModel::NUM_POSE_PARAMETERS);
-                std::copy(dTJdcPtr + 3 * indicesJointConstAdamIdxPtr[i] * TotalModel::NUM_SHAPE_COEFFICIENTS,
-                          dTJdcPtr + 3 * (indicesJointConstAdamIdxPtr[i] + 1) * TotalModel::NUM_SHAPE_COEFFICIENTS,
-                          dOdc.data() + 3 * (i + offset) * TotalModel::NUM_SHAPE_COEFFICIENTS);
+                int offset = 0;
+                for (int i = 0; i < fit_data_.adam.m_indices_jointConst_adamIdx.rows(); i++)
+                {
+                    dOdP.block<3, 3>(3 * (i + offset), 0) = dTJdP.block<3, 3>(3 * indicesJointConstAdamIdxPtr[i], 0);
+                }
+                offset += fit_data_.adam.m_indices_jointConst_adamIdx.rows();
+                for (int i = 0; i < fit_data_.adam.m_correspond_adam2lHand_adamIdx.rows(); i++)
+                {
+                    dOdP.block<3, 3>(3 * (i + offset), 0) = dTJdP.block<3, 3>(3 * correspondAdam2lHandAdamIdx[i], 0);
+                }
+                offset += fit_data_.adam.m_correspond_adam2lHand_adamIdx.rows();
+                for (int i = 0; i < fit_data_.adam.m_correspond_adam2rHand_adamIdx.rows(); i++)
+                {
+                    dOdP.block<3, 3>(3 * (i + offset), 0) = dTJdP.block<3, 3>(3 * correspondAdam2rHandAdamIdx[i], 0);
+                }
+                offset += fit_data_.adam.m_correspond_adam2rHand_adamIdx.rows();
+                dOdP.block(3 * offset, 0, 3 * corres_vertex2targetpt.size(), 3) = dVdP.block(0, 0, 3 * corres_vertex2targetpt.size(), 3);
             }
-            offset += fit_data_.adam.m_indices_jointConst_adamIdx.rows();
-            for (int i = 0; i < fit_data_.adam.m_correspond_adam2lHand_adamIdx.rows(); i++)
+            else
             {
-                std::copy(dTJdPPtr + 3 * correspondAdam2lHandAdamIdx[i] * TotalModel::NUM_POSE_PARAMETERS,
-                          dTJdPPtr + 3 * (correspondAdam2lHandAdamIdx[i] + 1) * TotalModel::NUM_POSE_PARAMETERS,
-                          dOdP.data() + 3 * (i + offset) * TotalModel::NUM_POSE_PARAMETERS);
-                std::copy(dTJdcPtr + 3 * correspondAdam2lHandAdamIdx[i] * TotalModel::NUM_SHAPE_COEFFICIENTS,
-                          dTJdcPtr + 3 * (correspondAdam2lHandAdamIdx[i] + 1) * TotalModel::NUM_SHAPE_COEFFICIENTS,
-                          dOdc.data() + 3 * (i + offset) * TotalModel::NUM_SHAPE_COEFFICIENTS);
+                int offset = 0;
+                for (int i = 0; i < fit_data_.adam.m_indices_jointConst_adamIdx.rows(); i++)
+                {
+                    std::copy(dTJdPPtr + 3 * indicesJointConstAdamIdxPtr[i] * TotalModel::NUM_POSE_PARAMETERS,
+                              dTJdPPtr + 3 * (indicesJointConstAdamIdxPtr[i] + 1) * TotalModel::NUM_POSE_PARAMETERS,
+                              dOdP.data() + 3 * (i + offset) * TotalModel::NUM_POSE_PARAMETERS);
+                }
+                offset += fit_data_.adam.m_indices_jointConst_adamIdx.rows();
+                for (int i = 0; i < fit_data_.adam.m_correspond_adam2lHand_adamIdx.rows(); i++)
+                {
+                    std::copy(dTJdPPtr + 3 * correspondAdam2lHandAdamIdx[i] * TotalModel::NUM_POSE_PARAMETERS,
+                              dTJdPPtr + 3 * (correspondAdam2lHandAdamIdx[i] + 1) * TotalModel::NUM_POSE_PARAMETERS,
+                              dOdP.data() + 3 * (i + offset) * TotalModel::NUM_POSE_PARAMETERS);
+                }
+                offset += fit_data_.adam.m_correspond_adam2lHand_adamIdx.rows();
+                for (int i = 0; i < fit_data_.adam.m_correspond_adam2rHand_adamIdx.rows(); i++)
+                {
+                    std::copy(dTJdPPtr + 3 * correspondAdam2rHandAdamIdx[i] * TotalModel::NUM_POSE_PARAMETERS,
+                              dTJdPPtr + 3 * (correspondAdam2rHandAdamIdx[i] + 1) * TotalModel::NUM_POSE_PARAMETERS,
+                              dOdP.data() + 3 * (i + offset) * TotalModel::NUM_POSE_PARAMETERS);
+                }
+                offset += fit_data_.adam.m_correspond_adam2rHand_adamIdx.rows();
+                std::copy(dVdP_data, dVdP_data + 3 * corres_vertex2targetpt.size() * TotalModel::NUM_POSE_PARAMETERS,
+                          dOdP.data() + 3 * offset * TotalModel::NUM_POSE_PARAMETERS);
             }
-            offset += fit_data_.adam.m_correspond_adam2lHand_adamIdx.rows();
-            for (int i = 0; i < fit_data_.adam.m_correspond_adam2rHand_adamIdx.rows(); i++)
+            if (jacobians[2])
             {
-                std::copy(dTJdPPtr + 3 * correspondAdam2rHandAdamIdx[i] * TotalModel::NUM_POSE_PARAMETERS,
-                          dTJdPPtr + 3 * (correspondAdam2rHandAdamIdx[i] + 1) * TotalModel::NUM_POSE_PARAMETERS,
-                          dOdP.data() + 3 * (i + offset) * TotalModel::NUM_POSE_PARAMETERS);
-                std::copy(dTJdcPtr + 3 * correspondAdam2rHandAdamIdx[i] * TotalModel::NUM_SHAPE_COEFFICIENTS,
-                          dTJdcPtr + 3 * (correspondAdam2rHandAdamIdx[i] + 1) * TotalModel::NUM_SHAPE_COEFFICIENTS,
+                int offset = 0;
+                for (int i = 0; i < fit_data_.adam.m_indices_jointConst_adamIdx.rows(); i++)
+                {
+                    std::copy(dTJdcPtr + 3 * indicesJointConstAdamIdxPtr[i] * TotalModel::NUM_SHAPE_COEFFICIENTS,
+                              dTJdcPtr + 3 * (indicesJointConstAdamIdxPtr[i] + 1) * TotalModel::NUM_SHAPE_COEFFICIENTS,
+                              dOdc.data() + 3 * (i + offset) * TotalModel::NUM_SHAPE_COEFFICIENTS);
+                }
+                offset += fit_data_.adam.m_indices_jointConst_adamIdx.rows();
+                for (int i = 0; i < fit_data_.adam.m_correspond_adam2lHand_adamIdx.rows(); i++)
+                {
+                    std::copy(dTJdcPtr + 3 * correspondAdam2lHandAdamIdx[i] * TotalModel::NUM_SHAPE_COEFFICIENTS,
+                              dTJdcPtr + 3 * (correspondAdam2lHandAdamIdx[i] + 1) * TotalModel::NUM_SHAPE_COEFFICIENTS,
                           dOdc.data() + 3 * (i + offset) * TotalModel::NUM_SHAPE_COEFFICIENTS);
+                }
+                offset += fit_data_.adam.m_correspond_adam2lHand_adamIdx.rows();
+                for (int i = 0; i < fit_data_.adam.m_correspond_adam2rHand_adamIdx.rows(); i++)
+                {
+                    std::copy(dTJdcPtr + 3 * correspondAdam2rHandAdamIdx[i] * TotalModel::NUM_SHAPE_COEFFICIENTS,
+                              dTJdcPtr + 3 * (correspondAdam2rHandAdamIdx[i] + 1) * TotalModel::NUM_SHAPE_COEFFICIENTS,
+                              dOdc.data() + 3 * (i + offset) * TotalModel::NUM_SHAPE_COEFFICIENTS);
+                }
+                offset += fit_data_.adam.m_correspond_adam2rHand_adamIdx.rows();
+                std::copy(dVdc_data, dVdc_data + 3 * corres_vertex2targetpt.size() * TotalModel::NUM_SHAPE_COEFFICIENTS,
+                          dOdc.data() + 3 * offset * TotalModel::NUM_SHAPE_COEFFICIENTS);
             }
-            offset += fit_data_.adam.m_correspond_adam2rHand_adamIdx.rows();
-            std::copy(dVdP_data, dVdP_data + 3 * corres_vertex2targetpt.size() * TotalModel::NUM_POSE_PARAMETERS,
-                      dOdP.data() + 3 * offset * TotalModel::NUM_POSE_PARAMETERS);
-            std::copy(dVdc_data, dVdc_data + 3 * corres_vertex2targetpt.size() * TotalModel::NUM_SHAPE_COEFFICIENTS,
-                      dOdc.data() + 3 * offset * TotalModel::NUM_SHAPE_COEFFICIENTS);
 
             if (fit_face_exp)
             {
@@ -776,8 +815,12 @@ bool AdamFullCost::Evaluate(double const* const* parameters,
                     }
                     else
                     {
-                        dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(res_dim * i, 0) = targetPtsWeight[i] *
-                            dOdP.block<3, TotalModel::NUM_POSE_PARAMETERS>(3 * i, 0);
+                        if (rigid_body)
+                            dr_dPose.block<3, 3>(res_dim * i, 0) = targetPtsWeight[i] *
+                                dOdP.block<3, 3>(3 * i, 0);
+                        else
+                            dr_dPose.block<3, TotalModel::NUM_POSE_PARAMETERS>(res_dim * i, 0) = targetPtsWeight[i] *
+                                dOdP.block<3, TotalModel::NUM_POSE_PARAMETERS>(3 * i, 0);
                     }
                 }
             }
