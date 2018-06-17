@@ -129,7 +129,7 @@ namespace op
                                               (mBlendOriginalFrame ? getAlphaHeatMap() : 1.f));
                         }
                         // Draw specific body part or background
-                        else if (elementRendered <= numberBodyPartsPlusBkg)
+                        else if (elementRendered <= numberBodyPartsPlusBkg+2)
                         {
                             const auto realElementRendered = (elementRendered == 1
                                                                 ? numberBodyPartsPlusBkg
