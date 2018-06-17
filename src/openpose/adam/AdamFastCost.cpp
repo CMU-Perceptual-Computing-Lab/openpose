@@ -954,7 +954,7 @@ bool AdamFullCost::Evaluate(double const* const* parameters,
                 for (int ic = 0; ic < fit_data_.adam.m_indices_jointConst_adamIdx.rows(); ic++)
                 {
                     const int smcjoint = fit_data_.adam.m_indices_jointConst_smcIdx(ic);
-                    if (smcjoint == 4 || smcjoint == 5 || smcjoint == 10 || smcjoint == 11)
+                    // if (smcjoint == 4 || smcjoint == 5 || smcjoint == 10 || smcjoint == 11)
                     {
                         const int adam_index = fit_data_.adam.m_parent[indicesJointConstAdamIdxPtr[ic]];
                         if (fit_data_.bodyJoints.col(smcjoint).isZero(0))

@@ -677,7 +677,7 @@ void Adam_FastFit_Initialize(const TotalModel &adam,
         {
         	// Only applied to arms (shoulder, elbow, wrist)
             const int smcjoint = adam.m_indices_jointConst_smcIdx(ic);
-            if (smcjoint == 4 || smcjoint == 5 || smcjoint == 10 || smcjoint == 11)
+            // if (smcjoint == 4 || smcjoint == 5 || smcjoint == 10 || smcjoint == 11)
             {
 	            const int adam_index = adam.m_parent[adam.m_indices_jointConst_adamIdx(ic)];
 	            if (BodyJoints.col(smcjoint).isZero(0))
@@ -827,6 +827,12 @@ options_init.num_threads = 1; // num_linear_solver_threads deprecated
 	{
 		std::fill(frame_param.m_adam_pose.data() + 20 * 3, frame_param.m_adam_pose.data() + 62 * 3, 0.0);
 	}
+	if (frame_param.m_adam_pose.data()[4 * 3 + 0] <  -10) frame_param.m_adam_pose.data()[4 * 3 + 0] = -10;
+	if (frame_param.m_adam_pose.data()[4 * 3 + 2] > 10) frame_param.m_adam_pose.data()[4 * 3 + 2] = 10;
+	if (frame_param.m_adam_pose.data()[4 * 3 + 2] < -10) frame_param.m_adam_pose.data()[4 * 3 + 2] = -10;
+	if (frame_param.m_adam_pose.data()[5 * 3 + 0] <  -10) frame_param.m_adam_pose.data()[5 * 3 + 0] = -10;
+	if (frame_param.m_adam_pose.data()[5 * 3 + 2] > 10) frame_param.m_adam_pose.data()[5 * 3 + 2] = 10;
+	if (frame_param.m_adam_pose.data()[5 * 3 + 2] < -10) frame_param.m_adam_pose.data()[5 * 3 + 2] = -10;
 
 // const auto duration5 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start5).count();
 // const auto start6 = std::chrono::high_resolution_clock::now();
