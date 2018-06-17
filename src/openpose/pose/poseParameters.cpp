@@ -195,7 +195,7 @@ namespace op
         {57, "RRing1Knuckles"},     {58, "RRing2PIP"},      {59, "RRing3DIP"},  {60, "RRing4FingerTip"},
         {61, "RPinky1Knuckles"},    {62, "RPinky2PIP"},     {63, "RPinky3DIP"}, {64, "RPinky4FingerTip"},
         // Background
-        {59, "Background"},
+        {65, "Background"},
     };
     // Hand legend:
     //     - Thumb:
@@ -243,7 +243,7 @@ namespace op
             40,41, 42,43, 44,45, 46,47, 48,49, 14,51, 52,53, 54,55, 56,57, 58,59,
             60,61, 62,63, 64,65, 66,67, 68,69, 70,71, 72,73, 74,75, 76,77, 78,79,// Left hand
             80,81, 82,83, 84,85, 86,87, 88,89, 90,91, 92,93, 94,95, 96,97, 98,99,
-            100,101, 102,103, 104,105, 106,107, 108,109, 160,161, 162,163, 164,165, 166,167, 168,169 // Right hand
+            100,101, 102,103, 104,105, 106,107, 108,109, 110,111, 112,113, 114,115, 116,117, 118,119 // Right hand
         },
         // BODY_19N
         std::vector<unsigned int>{
@@ -259,7 +259,11 @@ namespace op
         },
         // BODY_65
         std::vector<unsigned int>{
-            0,1, 14,15, 22,23, 16,17, 18,19, 24,25, 26,27, 6,7, 2,3, 4,5, 8,9, 10,11, 12,13, 30,31, 32,33, 36,37, 34,35, 38,39, 20,21, 28,29, 40,41,42,43,44,45, 46,47,48,49,50,51
+            0,1, 14,15, 22,23, 16,17, 18,19, 24,25, 26,27, 6,7, 2,3, 4,5, 8,9, 10,11, 12,13, 30,31, 32,33, 36,37, 34,35, 38,39, 20,21, 28,29, 40,41,42,43,44,45, 46,47,48,49,50,51, // Body
+            52,53, 54,55, 56,57, 58,59, 60,61, 62,63, 64,65, 66,67, 68,69, 70,71,
+            72,73, 74,75, 76,77, 78,79, 80,81, 82,83, 84,85, 86,87, 88,89, 90,91,                                                                                                   // Left hand
+            92,93, 94,95, 96,97, 98,99, 100,101, 102,103, 104,105, 106,107, 108,109, 110,111,
+            112,113, 114,115, 116,117, 118,119, 120,121, 122,123, 124,125, 126,127, 128,129, 130,131                                                                                // Right hand
         },
     };
     // POSE_BODY_PART_MAPPING on HPP crashes on Windows at dynamic initialization if it's on hpp
@@ -281,7 +285,7 @@ namespace op
         "pose/body_19n/pose_deploy.prototxt",
         "pose/body_19b/pose_deploy.prototxt",
         "pose/body_19_25/pose_deploy_25.prototxt",
-        "pose/body_65/pose_deploy_25.prototxt",
+        "pose/body_65/pose_deploy.prototxt",
     };
     const std::array<std::string, (int)PoseModel::Size> POSE_TRAINED_MODEL{
         "pose/body_25/pose_iter_584000.caffemodel",
