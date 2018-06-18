@@ -192,18 +192,18 @@ namespace op
 
                 // Get Kernels
                 cl::Buffer targetPtrBuffer = cl::Buffer((cl_mem)(targetPtr), true);
-                auto resizeAndMergeKernel = op::OpenCL::getInstance(gpuID)->getKernelFunctorFromManager
-                        <op::ResizeAndMergeFunctor, T>(
-                            "resizeAndMergeKernel",op::resizeAndMergeOclCommonFunctions+op::resizeAndMergeKernel);
-                auto resizeAndAddKernel = op::OpenCL::getInstance(gpuID)->getKernelFunctorFromManager
-                        <op::ResizeAndAddFunctor, T>(
-                            "resizeAndAddKernel",op::resizeAndMergeOclCommonFunctions+op::resizeAndAddKernel);
-                auto resizeAndAverageKernel = op::OpenCL::getInstance(gpuID)->getKernelFunctorFromManager
-                        <op::ResizeAndAverageFunctor, T>(
-                            "resizeAndAverageKernel",op::resizeAndMergeOclCommonFunctions+op::resizeAndAverageKernel);
-                auto zeroBufferKernel = op::OpenCL::getInstance(gpuID)->getKernelFunctorFromManager
-                        <op::ZeroBufferFunctor, T>(
-                            "zeroBufferKernel",op::zeroBufferKernel);
+                auto resizeAndMergeKernel = OpenCL::getInstance(gpuID)->getKernelFunctorFromManager
+                        <ResizeAndMergeFunctor, T>(
+                         "resizeAndMergeKernel", resizeAndMergeOclCommonFunctions+resizeAndMergeKernel);
+                auto resizeAndAddKernel = OpenCL::getInstance(gpuID)->getKernelFunctorFromManager
+                        <ResizeAndAddFunctor, T>(
+                         "resizeAndAddKernel", resizeAndMergeOclCommonFunctions+resizeAndAddKernel);
+                auto resizeAndAverageKernel = OpenCL::getInstance(gpuID)->getKernelFunctorFromManager
+                        <ResizeAndAverageFunctor, T>(
+                         "resizeAndAverageKernel", resizeAndMergeOclCommonFunctions+resizeAndAverageKernel);
+                auto zeroBufferKernel = OpenCL::getInstance(gpuID)->getKernelFunctorFromManager
+                        <ZeroBufferFunctor, T>(
+                         "zeroBufferKernel", zeroBufferKernel);
 
                 // Parameters
                 const auto channels = targetSize[1];
@@ -229,15 +229,15 @@ namespace op
                             {
                                 const auto offset = offsetBase + c;
                                 cl_buffer_region targerRegion, sourceRegion;
-                                op::OpenCL::getBufferRegion<T>(targerRegion, offset * targetChannelOffset, targetChannelOffset);
+                                OpenCL::getBufferRegion<T>(targerRegion, offset * targetChannelOffset, targetChannelOffset);
                                 cl::Buffer targetBuffer = targetPtrBuffer.createSubBuffer(CL_MEM_READ_WRITE,
                                                                                           CL_BUFFER_CREATE_TYPE_REGION,
                                                                                           &targerRegion);
-                                op::OpenCL::getBufferRegion<T>(sourceRegion, offset * sourceChannelOffset, sourceChannelOffset);
+                                OpenCL::getBufferRegion<T>(sourceRegion, offset * sourceChannelOffset, sourceChannelOffset);
                                 cl::Buffer sourceBuffer = sourcePtrBuffer.createSubBuffer(CL_MEM_READ_ONLY,
                                                                                           CL_BUFFER_CREATE_TYPE_REGION,
                                                                                           &sourceRegion);
-                                resizeAndMergeKernel(cl::EnqueueArgs(op::OpenCL::getInstance(gpuID)->getQueue(),
+                                resizeAndMergeKernel(cl::EnqueueArgs(OpenCL::getInstance(gpuID)->getQueue(),
                                                      cl::NDRange(targetWidth, targetHeight)),
                                                      targetBuffer, sourceBuffer,
                                                      sourceWidth, sourceHeight, targetWidth, targetHeight);
@@ -253,7 +253,7 @@ namespace op
                 {
                     const auto targetChannelOffset = targetWidth * targetHeight;
                     //cudaMemset(targetPtr, 0.f, channels*targetChannelOffset * sizeof(T));
-                    zeroBufferKernel(cl::EnqueueArgs(op::OpenCL::getInstance(gpuID)->getQueue(),
+                    zeroBufferKernel(cl::EnqueueArgs(OpenCL::getInstance(gpuID)->getQueue(),
                                                      cl::NDRange(targetWidth, targetHeight, channels)),
                                                      targetPtrBuffer, targetWidth, targetHeight);
                     const auto scaleToMainScaleWidth = targetWidth / T(sourceWidth);
@@ -275,15 +275,15 @@ namespace op
                             for (auto c = 0 ; c < channels ; c++)
                             {
                                 cl_buffer_region targerRegion, sourceRegion;
-                                op::OpenCL::getBufferRegion<T>(targerRegion, c * targetChannelOffset, targetChannelOffset);
-                                op::OpenCL::getBufferRegion<T>(sourceRegion, c * sourceChannelOffset, sourceChannelOffset);
+                                OpenCL::getBufferRegion<T>(targerRegion, c * targetChannelOffset, targetChannelOffset);
+                                OpenCL::getBufferRegion<T>(sourceRegion, c * sourceChannelOffset, sourceChannelOffset);
                                 cl::Buffer targetBuffer = targetPtrBuffer.createSubBuffer(CL_MEM_READ_WRITE,
                                                                                           CL_BUFFER_CREATE_TYPE_REGION,
                                                                                           &targerRegion);
                                 cl::Buffer sourceBuffer = sourcePtrBuffer.createSubBuffer(CL_MEM_READ_WRITE,
                                                                                           CL_BUFFER_CREATE_TYPE_REGION,
                                                                                           &sourceRegion);
-                                resizeAndAddKernel(cl::EnqueueArgs(op::OpenCL::getInstance(gpuID)->getQueue(),
+                                resizeAndAddKernel(cl::EnqueueArgs(OpenCL::getInstance(gpuID)->getQueue(),
                                                                    cl::NDRange(targetWidth, targetHeight)),
                                                                    targetBuffer, sourceBuffer,
                                                                    scaleWidth, scaleHeight,
@@ -297,15 +297,15 @@ namespace op
                             for (auto c = 0 ; c < channels ; c++)
                             {
                                 cl_buffer_region targerRegion, sourceRegion;
-                                op::OpenCL::getBufferRegion<T>(targerRegion, c * targetChannelOffset, targetChannelOffset);
-                                op::OpenCL::getBufferRegion<T>(sourceRegion, c * sourceChannelOffset, sourceChannelOffset);
+                                OpenCL::getBufferRegion<T>(targerRegion, c * targetChannelOffset, targetChannelOffset);
+                                OpenCL::getBufferRegion<T>(sourceRegion, c * sourceChannelOffset, sourceChannelOffset);
                                 cl::Buffer targetBuffer = targetPtrBuffer.createSubBuffer(CL_MEM_READ_WRITE,
                                                                                           CL_BUFFER_CREATE_TYPE_REGION,
                                                                                           &targerRegion);
                                 cl::Buffer sourceBuffer = sourcePtrBuffer.createSubBuffer(CL_MEM_READ_WRITE,
                                                                                           CL_BUFFER_CREATE_TYPE_REGION,
                                                                                           &sourceRegion);
-                                resizeAndAverageKernel(cl::EnqueueArgs(op::OpenCL::getInstance(gpuID)->getQueue(),
+                                resizeAndAverageKernel(cl::EnqueueArgs(OpenCL::getInstance(gpuID)->getQueue(),
                                                                        cl::NDRange(targetWidth, targetHeight)),
                                                                        targetBuffer, sourceBuffer,
                                                                        scaleWidth, scaleHeight,
@@ -329,7 +329,7 @@ namespace op
         #if defined(USE_OPENCL) && defined(CL_HPP_ENABLE_EXCEPTIONS)
         catch (const cl::Error& e)
         {
-            error(std::string(e.what()) + " : " + op::OpenCL::clErrorToString(e.err()) + " ID: " +
+            error(std::string(e.what()) + " : " + OpenCL::clErrorToString(e.err()) + " ID: " +
                   std::to_string(gpuID), __LINE__, __FUNCTION__, __FILE__);
         }
         #endif

@@ -9,7 +9,6 @@
 
 namespace op
 {
-    // This worker will do 3-D rendering
     class OP_API Gui3D : public Gui
     {
     public:
@@ -17,21 +16,20 @@ namespace op
               const std::shared_ptr<std::atomic<bool>>& isRunningSharedPtr,
               const std::shared_ptr<std::pair<std::atomic<bool>, std::atomic<int>>>& videoSeekSharedPtr = nullptr,
               const std::vector<std::shared_ptr<PoseExtractorNet>>& poseExtractorNets = {},
+              const std::vector<std::shared_ptr<FaceExtractorNet>>& faceExtractorNets = {},
+              const std::vector<std::shared_ptr<HandExtractorNet>>& handExtractorNets = {},
               const std::vector<std::shared_ptr<Renderer>>& renderers = {},
-              const PoseModel poseModel = PoseModel::COCO_18,
+              const PoseModel poseModel = PoseModel::BODY_25,
               const DisplayMode displayMode = DisplayMode::DisplayAll);
 
-        ~Gui3D();
+        virtual ~Gui3D();
 
-        void initializationOnThread();
+        virtual void initializationOnThread();
 
         void setKeypoints(const Array<float>& poseKeypoints3D, const Array<float>& faceKeypoints3D,
                           const Array<float>& leftHandKeypoints3D, const Array<float>& rightHandKeypoints3D);
 
-        void update();
-
-    private:
-        DisplayMode mDisplayMode;
+        virtual void update();
     };
 }
 

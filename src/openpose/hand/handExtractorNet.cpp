@@ -10,7 +10,8 @@ namespace op
         mNetOutputSize{netOutputSize},
         mHandImageCrop{{1, 3, mNetOutputSize.y, mNetOutputSize.x}},
         mHeatMapScaleMode{heatMapScale},
-        mHeatMapTypes{heatMapTypes}
+        mHeatMapTypes{heatMapTypes},
+        mEnabled{true}
     {
         try
         {
@@ -55,6 +56,20 @@ namespace op
         }
     }
 
+    std::array<Array<float>, 2> HandExtractorNet::getHeatMaps() const
+    {
+        try
+        {
+            checkThread();
+            return mHeatMaps;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return std::array<Array<float>, 2>(); // Parentheses instead of braces to avoid error in GCC 4.8
+        }
+    }
+
     std::array<Array<float>, 2> HandExtractorNet::getHandKeypoints() const
     {
         try
@@ -69,17 +84,28 @@ namespace op
         }
     }
 
-    std::array<Array<float>, 2> HandExtractorNet::getHeatMaps() const
+    bool HandExtractorNet::getEnabled() const
     {
         try
         {
-            checkThread();
-            return mHeatMaps;
+            return mEnabled;
         }
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return std::array<Array<float>, 2>(); // Parentheses instead of braces to avoid error in GCC 4.8
+            return false;
+        }
+    }
+
+    void HandExtractorNet::setEnabled(const bool enabled)
+    {
+        try
+        {
+            mEnabled = enabled;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
     }
 

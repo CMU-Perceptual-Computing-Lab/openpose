@@ -2,5 +2,8 @@
 
 namespace op
 {
+#ifdef USE_3D_ADAM_MODEL
+    DEFINE_TEMPLATE_DATUM(WJointAngleEstimation);
+#endif
     DEFINE_TEMPLATE_DATUM(WPoseTriangulation);
 }

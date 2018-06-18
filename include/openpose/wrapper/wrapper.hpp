@@ -3,6 +3,7 @@
 
 #include <openpose/core/common.hpp>
 #include <openpose/thread/headers.hpp>
+#include <openpose/wrapper/wrapperStructExtra.hpp>
 #include <openpose/wrapper/wrapperStructFace.hpp>
 #include <openpose/wrapper/wrapperStructHand.hpp>
 #include <openpose/wrapper/wrapperStructInput.hpp>
@@ -111,6 +112,8 @@ namespace op
                        const WrapperStructFace& wrapperStructFace = WrapperStructFace{},
                        // Hand (use the default WrapperStructHand{} to disable any hand detector)
                        const WrapperStructHand& wrapperStructHand = WrapperStructHand{},
+                       // Hand (use the default WrapperStructExtra{} to disable any hand detector)
+                       const WrapperStructExtra& wrapperStructExtra = WrapperStructExtra{},
                        // Producer: set producerSharedPtr=nullptr or use default WrapperStructInput{} to disable input
                        const WrapperStructInput& wrapperStructInput = WrapperStructInput{},
                        // Consumer (keep default values to disable any output)
@@ -219,7 +222,11 @@ namespace op
         TWorker spWCvMatToOpInput;
         TWorker spWCvMatToOpOutput;
         std::vector<std::vector<TWorker>> spWPoseExtractors;
+        TWorker mWQueueOrdererTriangulation;
+        std::vector<std::vector<TWorker>> spWPoseTriangulations;
         std::vector<TWorker> mPostProcessingWs;
+        TWorker mWQueueOrdererJointAngle;
+        std::vector<std::vector<TWorker>> spWJointAngleEstimations;
         std::vector<TWorker> mUserPostProcessingWs;
         std::vector<TWorker> mOutputWs;
         TWorker spWGui;
@@ -381,7 +388,7 @@ namespace op
         try
         {
             configure(wrapperStructPose, WrapperStructFace{}, WrapperStructHand{},
-                      wrapperStructInput, wrapperStructOutput);
+                      WrapperStructExtra{}, wrapperStructInput, wrapperStructOutput);
         }
         catch (const std::exception& e)
         {
@@ -398,7 +405,7 @@ namespace op
         try
         {
             configure(wrapperStructPose, wrapperStructFace, WrapperStructHand{},
-                      wrapperStructInput, wrapperStructOutput);
+                      WrapperStructExtra{}, wrapperStructInput, wrapperStructOutput);
         }
         catch (const std::exception& e)
         {
@@ -415,7 +422,7 @@ namespace op
         try
         {
             configure(wrapperStructPose, WrapperStructFace{}, wrapperStructHand,
-                      wrapperStructInput, wrapperStructOutput);
+                      WrapperStructExtra{}, wrapperStructInput, wrapperStructOutput);
         }
         catch (const std::exception& e)
         {
@@ -427,6 +434,7 @@ namespace op
     void Wrapper<TDatums, TWorker, TQueue>::configure(const WrapperStructPose& wrapperStructPose,
                                                       const WrapperStructFace& wrapperStructFace,
                                                       const WrapperStructHand& wrapperStructHand,
+                                                      const WrapperStructExtra& wrapperStructExtra,
                                                       const WrapperStructInput& wrapperStructInput,
                                                       const WrapperStructOutput& wrapperStructOutput)
     {
@@ -450,8 +458,9 @@ namespace op
 
             // Check no wrong/contradictory flags enabled
             const auto userOutputWsEmpty = mUserOutputWs.empty();
-            wrapperConfigureSecurityChecks(wrapperStructPose, wrapperStructFace, wrapperStructHand, wrapperStructInput,
-                                           wrapperStructOutput, renderOutput, userOutputWsEmpty, mThreadManagerMode);
+            wrapperConfigureSecurityChecks(wrapperStructPose, wrapperStructFace, wrapperStructHand, wrapperStructExtra,
+                                           wrapperStructInput, wrapperStructOutput, renderOutput, userOutputWsEmpty,
+                                           mThreadManagerMode);
 
             // Get number threads
             auto numberThreads = wrapperStructPose.gpuNumber;
@@ -504,7 +513,8 @@ namespace op
             // Common parameters
             auto finalOutputSize = wrapperStructPose.outputSize;
             Point<int> producerSize{-1,-1};
-            if (wrapperStructInput.producerSharedPtr != nullptr)
+            const auto oPProducer = (wrapperStructInput.producerSharedPtr != nullptr);
+            if (oPProducer)
             {
                 // 1. Set producer properties
                 const auto displayProducerFpsMode = (wrapperStructInput.realTimeProcessing
@@ -523,7 +533,7 @@ namespace op
             }
 
             // Producer
-            if (wrapperStructInput.producerSharedPtr != nullptr)
+            if (oPProducer)
             {
                 const auto datumProducer = std::make_shared<DatumProducer<TDatums>>(
                     wrapperStructInput.producerSharedPtr, wrapperStructInput.frameFirst, wrapperStructInput.frameLast,
@@ -535,6 +545,8 @@ namespace op
                 wDatumProducer = nullptr;
 
             std::vector<std::shared_ptr<PoseExtractorNet>> poseExtractorNets;
+            std::vector<std::shared_ptr<FaceExtractorNet>> faceExtractorNets;
+            std::vector<std::shared_ptr<HandExtractorNet>> handExtractorNets;
             std::vector<std::shared_ptr<PoseGpuRenderer>> poseGpuRenderers;
             std::shared_ptr<PoseCpuRenderer> poseCpuRenderer;
             if (numberThreads > 0)
@@ -604,7 +616,7 @@ namespace op
 
                     // Pose extractor(s)
                     spWPoseExtractors.resize(poseExtractorNets.size());
-                    const auto personIdExtractor = (wrapperStructPose.identification
+                    const auto personIdExtractor = (wrapperStructExtra.identification
                         ? std::make_shared<PersonIdExtractor>() : nullptr);
                     // Keep top N people
                     // Added right after PoseExtractorNet to avoid:
@@ -617,16 +629,16 @@ namespace op
                         : nullptr);
                     // Person tracker
                     auto personTrackers = std::make_shared<std::vector<std::shared_ptr<PersonTracker>>>();
-                    if (wrapperStructPose.tracking > -1)
+                    if (wrapperStructExtra.tracking > -1)
                         personTrackers->emplace_back(
-                            std::make_shared<PersonTracker>(wrapperStructPose.tracking == 0));
+                            std::make_shared<PersonTracker>(wrapperStructExtra.tracking == 0));
                     for (auto i = 0u; i < spWPoseExtractors.size(); i++)
                     {
                         // OpenPose keypoint detector + keepTopNPeople
                         //    + ID extractor (experimental) + tracking (experimental)
                         const auto poseExtractor = std::make_shared<PoseExtractor>(
                             poseExtractorNets.at(i), keepTopNPeople, personIdExtractor, personTrackers,
-                            wrapperStructPose.numberPeopleMax, wrapperStructPose.tracking);
+                            wrapperStructPose.numberPeopleMax, wrapperStructExtra.tracking);
                         spWPoseExtractors.at(i) = {std::make_shared<WPoseExtractor<TDatumsPtr>>(poseExtractor)};
                         // // Just OpenPose keypoint detector
                         // spWPoseExtractors.at(i) = {std::make_shared<WPoseExtractorNet<TDatumsPtr>>(
@@ -683,6 +695,7 @@ namespace op
                             gpu + gpuNumberStart, wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale,
                             wrapperStructPose.enableGoogleLogging
                         );
+                        faceExtractorNets.emplace_back(faceExtractorNet);
                         spWPoseExtractors.at(gpu).emplace_back(
                             std::make_shared<WFaceExtractorNet<TDatumsPtr>>(faceExtractorNet));
                     }
@@ -712,6 +725,7 @@ namespace op
                             wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale,
                             wrapperStructPose.enableGoogleLogging
                         );
+                        handExtractorNets.emplace_back(handExtractorNet);
                         spWPoseExtractors.at(gpu).emplace_back(
                             std::make_shared<WHandExtractorNet<TDatumsPtr>>(handExtractorNet)
                             );
@@ -814,27 +828,35 @@ namespace op
                         error("Unknown RenderMode.", __LINE__, __FUNCTION__, __FILE__);
                 }
 
+                // 3-D reconstruction
+                spWPoseTriangulations.clear();
+                if (wrapperStructExtra.reconstruct3d)
+                {
+                    // For all (body/face/hands): PoseTriangulations ~30 msec, 8 GPUS ~30 msec for keypoint estimation
+                    spWPoseTriangulations.resize(fastMax(1, int(spWPoseExtractors.size() / 4)));
+                    if (spWPoseTriangulations.size() > 1)
+                        mWQueueOrdererTriangulation = std::make_shared<WQueueOrderer<TDatumsPtr>>();
+                    for (auto i = 0u ; i < spWPoseTriangulations.size() ; i++)
+                    {
+                        const auto poseTriangulation = std::make_shared<PoseTriangulation>(
+                            wrapperStructExtra.minViews3d);
+                        spWPoseTriangulations.at(i) = {std::make_shared<WPoseTriangulation<TDatumsPtr>>(
+                            poseTriangulation)};
+                    }
+                }
                 // Itermediate workers (e.g. OpenPose format to cv::Mat, json & frames recorder, ...)
                 mPostProcessingWs.clear();
                 // Frame buffer and ordering
                 if (spWPoseExtractors.size() > 1u)
                     mPostProcessingWs.emplace_back(std::make_shared<WQueueOrderer<TDatumsPtr>>());
                 // // Person ID identification (when no multi-thread and no dependency on tracking)
-                // if (wrapperStructPose.identification)
+                // if (wrapperStructExtra.identification)
                 // {
                 //     const auto personIdExtractor = std::make_shared<PersonIdExtractor>();
                 //     mPostProcessingWs.emplace_back(
                 //         std::make_shared<WPersonIdExtractor<TDatumsPtr>>(personIdExtractor)
                 //     );
                 // }
-                // 3-D reconstruction
-                if (wrapperStructPose.reconstruct3d)
-                {
-                    const auto poseTriangulation = std::make_shared<PoseTriangulation>(wrapperStructPose.minViews3d);
-                    mPostProcessingWs.emplace_back(
-                        std::make_shared<WPoseTriangulation<TDatumsPtr>>(poseTriangulation)
-                    );
-                }
                 // Frames processor (OpenPose format -> cv::Mat format)
                 if (renderOutput)
                 {
@@ -858,7 +880,39 @@ namespace op
                 }
             }
 
+            // IK/Adam
+            const auto displayAdam = wrapperStructOutput.displayMode == DisplayMode::DisplayAdam
+                                     || (wrapperStructOutput.displayMode == DisplayMode::DisplayAll
+                                         && wrapperStructExtra.ikThreads > 0);
+            spWJointAngleEstimations.clear();
+#ifdef USE_3D_ADAM_MODEL
+            if (wrapperStructExtra.ikThreads > 0)
+            {
+                spWJointAngleEstimations.resize(wrapperStructExtra.ikThreads);
+                if (spWJointAngleEstimations.size() > 1)
+                    mWQueueOrdererJointAngle = std::make_shared<WQueueOrderer<TDatumsPtr>>();
+
+                // Pose extractor(s)
+                for (auto i = 0u; i < spWJointAngleEstimations.size(); i++)
+                {
+                    const auto jointAngleEstimation = std::make_shared<JointAngleEstimation>(displayAdam);
+                    spWJointAngleEstimations.at(i) = {std::make_shared<WJointAngleEstimation<TDatumsPtr>>(
+                        jointAngleEstimation)};
+                }
+            }
+#endif
+
+            // Output workers
             mOutputWs.clear();
+            if (spWJointAngleEstimations.size() > 1u)
+                mOutputWs.emplace_back(std::make_shared<WQueueOrderer<TDatumsPtr>>());
+            // Send information (e.g., to Unity) though UDP client-server communication
+            if (!wrapperStructOutput.udpHost.empty() && !wrapperStructOutput.udpPort.empty())
+            {
+                const auto udpSender = std::make_shared<UdpSender>(wrapperStructOutput.udpHost,
+                                                                   wrapperStructOutput.udpPort);
+                mOutputWs.emplace_back(std::make_shared<WUdpSender<TDatumsPtr>>(udpSender));
+            }
             // Write people pose data on disk (json for OpenCV >= 3, xml, yml...)
             if (!writeKeypointCleaned.empty())
             {
@@ -903,19 +957,35 @@ namespace op
                 mOutputWs.emplace_back(std::make_shared<WImageSaver<TDatumsPtr>>(imageSaver));
             }
             // Write frames as *.avi video on hard disk
-            if (!wrapperStructOutput.writeVideo.empty() && wrapperStructInput.producerSharedPtr != nullptr)
+            const auto producerFps = (wrapperStructInput.producerSharedPtr == nullptr ?
+                                        0. : wrapperStructInput.producerSharedPtr->get(CV_CAP_PROP_FPS));
+            const auto originalVideoFps = (wrapperStructOutput.writeVideoFps > 0 ?
+                                            wrapperStructOutput.writeVideoFps
+                                            : producerFps);
+            if (!wrapperStructOutput.writeVideo.empty())
             {
+                if (!oPProducer)
+                    error("Video file can only be recorded inside `wrapper/wrapper.hpp` if the producer"
+                          " is one of the default ones (e.g. video, webcam, ...).",
+                          __LINE__, __FUNCTION__, __FILE__);
                 if (finalOutputSize.x <= 0 || finalOutputSize.y <= 0)
                     error("Video can only be recorded if outputSize is fixed (e.g. video, webcam, IP camera),"
                           "but not for a image directory.", __LINE__, __FUNCTION__, __FILE__);
-                const auto originalVideoFps = (wrapperStructOutput.writeVideoFps > 0 ?
-                                                wrapperStructOutput.writeVideoFps
-                                                : wrapperStructInput.producerSharedPtr->get(CV_CAP_PROP_FPS));
                 const auto videoSaver = std::make_shared<VideoSaver>(
                     wrapperStructOutput.writeVideo, CV_FOURCC('M','J','P','G'), originalVideoFps, finalOutputSize
                 );
                 mOutputWs.emplace_back(std::make_shared<WVideoSaver<TDatumsPtr>>(videoSaver));
             }
+            // Write joint angles as *.bvh file on hard disk
+#ifdef USE_3D_ADAM_MODEL
+            if (!wrapperStructOutput.writeBvh.empty())
+            {
+                const auto bvhSaver = std::make_shared<BvhSaver>(
+                    wrapperStructOutput.writeBvh, JointAngleEstimation::getTotalModel(), originalVideoFps
+                );
+                mOutputWs.emplace_back(std::make_shared<WBvhSaver<TDatumsPtr>>(bvhSaver));
+            }
+#endif
             // Write heat maps as desired image format on hard disk
             if (!writeHeatMapsCleaned.empty())
             {
@@ -946,15 +1016,30 @@ namespace op
                     for (const auto& poseGpuRenderer : poseGpuRenderers)
                         renderers.emplace_back(std::static_pointer_cast<Renderer>(poseGpuRenderer));
                 // Display
+                // Adam (+3-D/2-D) display
+                if (displayAdam)
+                {
+#ifdef USE_3D_ADAM_MODEL
+                    // Gui
+                    const auto gui = std::make_shared<GuiAdam>(
+                        finalOutputSize, wrapperStructOutput.fullScreen, mThreadManager.getIsRunningSharedPtr(),
+                        spVideoSeek, poseExtractorNets, faceExtractorNets, handExtractorNets, renderers,
+                        wrapperStructOutput.displayMode, JointAngleEstimation::getTotalModel(),
+                        wrapperStructOutput.writeVideoAdam
+                    );
+                    // WGui
+                    spWGui = {std::make_shared<WGuiAdam<TDatumsPtr>>(gui)};
+#endif
+                }
                 // 3-D (+2-D) display
-                if (wrapperStructOutput.displayMode == DisplayMode::Display3D
+                else if (wrapperStructOutput.displayMode == DisplayMode::Display3D
                     || wrapperStructOutput.displayMode == DisplayMode::DisplayAll)
                 {
                     // Gui
-                    auto gui = std::make_shared<Gui3D>(
+                    const auto gui = std::make_shared<Gui3D>(
                         finalOutputSize, wrapperStructOutput.fullScreen, mThreadManager.getIsRunningSharedPtr(),
-                        spVideoSeek, poseExtractorNets, renderers, wrapperStructPose.poseModel,
-                        wrapperStructOutput.displayMode
+                        spVideoSeek, poseExtractorNets, faceExtractorNets, handExtractorNets, renderers,
+                        wrapperStructPose.poseModel, wrapperStructOutput.displayMode
                     );
                     // WGui
                     spWGui = {std::make_shared<WGui3D<TDatumsPtr>>(gui)};
@@ -963,9 +1048,9 @@ namespace op
                 else if (wrapperStructOutput.displayMode == DisplayMode::Display2D)
                 {
                     // Gui
-                    auto gui = std::make_shared<Gui>(
+                    const auto gui = std::make_shared<Gui>(
                         finalOutputSize, wrapperStructOutput.fullScreen, mThreadManager.getIsRunningSharedPtr(),
-                        spVideoSeek, poseExtractorNets, renderers
+                        spVideoSeek, poseExtractorNets, faceExtractorNets, handExtractorNets, renderers
                     );
                     // WGui
                     spWGui = {std::make_shared<WGui<TDatumsPtr>>(gui)};
@@ -1157,7 +1242,11 @@ namespace op
             spWCvMatToOpInput = nullptr;
             spWCvMatToOpOutput = nullptr;
             spWPoseExtractors.clear();
+            mWQueueOrdererTriangulation = nullptr;
+            spWPoseTriangulations.clear();
             mPostProcessingWs.clear();
+            mWQueueOrdererJointAngle = nullptr;
+            spWJointAngleEstimations.clear();
             mUserPostProcessingWs.clear();
             mOutputWs.clear();
             spWGui = nullptr;
@@ -1272,40 +1361,79 @@ namespace op
                 queueIn++;
                 queueOut++;
             }
-            // If custom user Worker and uses its own thread
-            if (!mUserPostProcessingWs.empty() && mUserPostProcessingWsOnNewThread)
+            // Adam/IK step
+            if (!spWPoseTriangulations.empty())
             {
-                // Post processing workers
-                if (!mPostProcessingWs.empty())
+                if (mMultiThreadEnabled)
                 {
-                    // Thread 2 or 3, queues 2 -> 3
-                    mThreadManager.add(mThreadId, mPostProcessingWs, queueIn++, queueOut++);
-                    threadIdPP();
+                    if (mWQueueOrdererTriangulation != nullptr)
+                        mThreadManager.add(mThreadId, mWQueueOrdererTriangulation, queueIn++, queueOut++);
+                    for (auto& wPoseTriangulations : spWPoseTriangulations)
+                    {
+                        mThreadManager.add(mThreadId, wPoseTriangulations, queueIn, queueOut);
+                        threadIdPP();
+                    }
                 }
-                // User processing workers
-                // Thread 3 or 4, queues 3 -> 4
-                mThreadManager.add(mThreadId, mUserPostProcessingWs, queueIn++, queueOut++);
-                threadIdPP();
-                // Output workers
-                if (!mOutputWs.empty())
+                else
                 {
-                    // Thread 4 or 5, queues 4 -> 5
-                    mThreadManager.add(mThreadId, mOutputWs, queueIn++, queueOut++);
-                    threadIdPP();
+                    if (spWPoseTriangulations.size() > 1)
+                        log("Multi-threading disabled, only 1 thread running for 3-D triangulation.",
+                            Priority::High);
+                    mThreadManager.add(mThreadId, spWPoseTriangulations.at(0), queueIn, queueOut);
                 }
+                queueIn++;
+                queueOut++;
             }
-            // If custom user Worker in same thread or producer on same thread
-            else
+            // Post processing workers
+            if (!mPostProcessingWs.empty())
             {
-                // Post processing workers + User post processing workers + Output workers
-                auto workersAux = mergeVectors(mPostProcessingWs, mUserPostProcessingWs);
-                workersAux = mergeVectors(workersAux, mOutputWs);
-                if (!workersAux.empty())
+                // Thread 2 or 3, queues 2 -> 3
+                mThreadManager.add(mThreadId, mPostProcessingWs, queueIn++, queueOut++);
+                threadIdPP();
+            }
+            // Adam/IK step
+            if (!spWJointAngleEstimations.empty())
+            {
+                if (mMultiThreadEnabled)
                 {
-                    // Thread 2 or 3, queues 2 -> 3
-                    mThreadManager.add(mThreadId, workersAux, queueIn++, queueOut++);
+                    if (mWQueueOrdererJointAngle != nullptr)
+                        mThreadManager.add(mThreadId, mWQueueOrdererJointAngle, queueIn++, queueOut++);
+                    for (auto& wJointAngleEstimator : spWJointAngleEstimations)
+                    {
+                        mThreadManager.add(mThreadId, wJointAngleEstimator, queueIn, queueOut);
+                        threadIdPP();
+                    }
+                }
+                else
+                {
+                    if (spWJointAngleEstimations.size() > 1)
+                        log("Multi-threading disabled, only 1 thread running for joint angle estimation.",
+                            Priority::High);
+                    mThreadManager.add(mThreadId, spWJointAngleEstimations.at(0), queueIn, queueOut);
+                }
+                queueIn++;
+                queueOut++;
+            }
+            // If custom user Worker and uses its own thread
+            if (!mUserPostProcessingWs.empty())
+            {
+                // If custom user Worker in its own thread
+                if (mUserPostProcessingWsOnNewThread)
+                {
+                    mThreadManager.add(mThreadId, mUserPostProcessingWs, queueIn++, queueOut++);
                     threadIdPP();
                 }
+                // If custom user Worker in same thread
+                // Merge with mOutputWs
+                else
+                    mOutputWs = mergeVectors(mOutputWs, mUserPostProcessingWs);
+            }
+            // Output workers
+            if (!mOutputWs.empty())
+            {
+                // Thread 4 or 5, queues 4 -> 5
+                mThreadManager.add(mThreadId, mOutputWs, queueIn++, queueOut++);
+                threadIdPP();
             }
             // User output worker
             // Thread Y, queues Q -> Q+1

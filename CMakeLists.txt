@@ -205,6 +205,7 @@ if (UNIX AND NOT APPLE)
   option(WITH_CERES "Add Ceres support for advanced 3-D reconstruction." OFF)
 endif (UNIX AND NOT APPLE)
 option(WITH_FLIR_CAMERA "Add FLIR (formerly Point Grey) camera code (requires Spinnaker SDK already installed)." OFF)
+option(WITH_3D_ADAM_MODEL "Add 3-D Adam model (requires OpenGL, Ceres, Eigen, OpenMP, FreeImage, GLEW, and IGL already installed)." OFF)
 
 # Set the acceleration library
 if (WIN32 OR APPLE)
@@ -221,10 +222,14 @@ endif (WIN32 OR APPLE)
 # endif (UNIX AND NOT APPLE)
 
 # Download the models
-option(DOWNLOAD_COCO_MODEL "Download COCO model." ON)
-option(DOWNLOAD_MPI_MODEL "Download MPI model." OFF)
-option(DOWNLOAD_HAND_MODEL "Download hand model." ON)
+option(DOWNLOAD_BODY_25_MODEL "Download body 25-keypoint (body COCO and 6-keypoint foot) model." ON)
+option(DOWNLOAD_BODY_COCO_MODEL "Download body 18-keypoint COCO model." OFF)
+option(DOWNLOAD_BODY_MPI_MODEL "Download body 15-keypoint MPI model." OFF)
 option(DOWNLOAD_FACE_MODEL "Download face model." ON)
+option(DOWNLOAD_HAND_MODEL "Download hand model." ON)
+
+# Asio
+option(USE_ASIO "Include Asio header-only library." OFF)
 
 # More options
 option(BUILD_EXAMPLES "Build OpenPose examples." ON)
@@ -262,20 +267,24 @@ endif (${GPU_MODE} MATCHES "CUDA")
 # Adding 3D
 if (WITH_3D_RENDERER)
   # OpenPose flags
-  add_definitions(-DWITH_3D_RENDERER)
+  add_definitions(-DUSE_3D_RENDERER)
 endif (WITH_3D_RENDERER)
 if (WITH_CERES)
-  add_definitions(-DWITH_CERES)
+  add_definitions(-DUSE_CERES)
 endif (WITH_CERES)
 if (WITH_FLIR_CAMERA)
   # OpenPose flags
-  add_definitions(-DWITH_FLIR_CAMERA)
+  add_definitions(-DUSE_FLIR_CAMERA)
 endif (WITH_FLIR_CAMERA)
+if (WITH_3D_ADAM_MODEL)
+  # OpenPose flags
+  add_definitions(-DUSE_3D_ADAM_MODEL)
+endif (WITH_3D_ADAM_MODEL)
 
 # Adding tracking
 if (WITH_TRACKING)
   # OpenPose flags
-  add_definitions(-DWITH_TRACKING)
+  add_definitions(-DUSE_TRACKING)
 endif (WITH_TRACKING)
 
 # Calibration
@@ -287,7 +296,7 @@ if (${WITH_EIGEN} MATCHES "NONE")
 # If Eigen used
 else (${WITH_EIGEN} MATCHES "NONE")
   # OpenPose flags
-  add_definitions(-DWITH_EIGEN)
+  add_definitions(-DUSE_EIGEN)
   # OpenPose download/builds Eigen
   if (${WITH_EIGEN} MATCHES "BUILD")
     # Download it
@@ -337,6 +346,20 @@ if (UNIX OR APPLE)
         the Spinnaker includes and libs.")
     endif (NOT SPINNAKER_FOUND)
   endif (WITH_FLIR_CAMERA)
+  if (WITH_3D_ADAM_MODEL)
+    find_package(PkgConfig)
+    pkg_check_modules(EIGEN3 REQUIRED eigen3)
+    find_package(Ceres REQUIRED COMPONENTS SuiteSparse)
+    find_package(GLEW REQUIRED)
+    find_package(GLUT REQUIRED)
+    find_package(LIBIGL REQUIRED)
+    find_package(OpenGL REQUIRED)
+    find_package(OpenMP REQUIRED)
+    FIND_LIBRARY(FREE_IMAGE_LIBRARY NAMES libfreeimage.so)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+  endif (WITH_3D_ADAM_MODEL)
 
   # OpenMP
   if (${GPU_MODE} MATCHES "CPU_ONLY")
@@ -634,6 +657,14 @@ include_directories(
   ${GLOG_INCLUDE_DIR}
   ${OpenCV_INCLUDE_DIRS})
 
+if (USE_ASIO)
+  include_directories(${CMAKE_SOURCE_DIR}/3rdparty/asio/include/)
+  # OpenPose flags
+  add_definitions(-DUSE_ASIO)
+  # Tell Asio it is not using Boost
+  add_definitions(-DASIO_STANDALONE)
+endif (USE_ASIO)
+
 # Calibration
 if (NOT ${WITH_EIGEN} MATCHES "NONE")
   include_directories(
@@ -672,6 +703,14 @@ endif (WITH_CERES)
 if (WITH_FLIR_CAMERA)
   include_directories(${SPINNAKER_INCLUDE_DIRS})
 endif (WITH_FLIR_CAMERA)
+if (WITH_3D_ADAM_MODEL)
+                                    include_directories(include/adam) # TEMPORARY - TO BE REMOVED IN THE FUTURE
+  include_directories(${CERES_INCLUDE_DIRS})
+  include_directories(${EIGEN3_INCLUDE_DIRS})
+  include_directories(${IGL_INCLUDE_DIRS})
+  include_directories(${LIBIGL_INCLUDE_DIRS})
+  include_directories(${OPENGL_INCLUDE_DIRS} ${GLUT_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS})
+endif (WITH_3D_ADAM_MODEL)
 # Windows includes
 if (WIN32)
   include_directories(
@@ -705,6 +744,10 @@ if (${GPU_MODE} MATCHES "OPENCL")
   endif (WIN32)
 endif (${GPU_MODE} MATCHES "OPENCL")
 # 3-D
+if (WITH_3D_ADAM_MODEL)
+  set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries}
+      ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} ${GLEW_LIBRARY} ${FREE_IMAGE_LIBRARY})
+endif (WITH_3D_ADAM_MODEL)
 if (WITH_3D_RENDERER)
   set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries} ${GLUT_LIBRARY})
 endif (WITH_3D_RENDERER)
@@ -738,9 +781,11 @@ message(STATUS "Download the models.")
 # URL to the models
 set(OPENPOSE_URL "http://posefs1.perception.cs.cmu.edu/OpenPose/models/")
 
-download_model("body (COCO)" ${DOWNLOAD_COCO_MODEL} pose/coco/pose_iter_440000.caffemodel
+download_model("BODY_25" ${DOWNLOAD_BODY_25_MODEL} pose/body_25/pose_iter_584000.caffemodel
+  78287B57CF85FA89C03F1393D368E5B7) # Body (BODY_25)
+download_model("body (COCO)" ${DOWNLOAD_BODY_COCO_MODEL} pose/coco/pose_iter_440000.caffemodel
   5156d31f670511fce9b4e28b403f2939) # Body (COCO)
-download_model("body (MPI)" ${DOWNLOAD_MPI_MODEL} pose/mpi/pose_iter_160000.caffemodel
+download_model("body (MPI)" ${DOWNLOAD_BODY_MPI_MODEL} pose/mpi/pose_iter_160000.caffemodel
   2ca0990c7562bd7ae03f3f54afa96e00) # Body (MPI)
 download_model("face" ${DOWNLOAD_FACE_MODEL} face/pose_iter_116000.caffemodel
   e747180d728fa4e4418c465828384333) # Face

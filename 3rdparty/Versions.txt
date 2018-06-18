@@ -1,11 +1,20 @@
+Asio:
+    - Version 1.12.1.
+    - Link: https://think-async.com/Asio/Download
+
 Eigen:
     - Version 3.3.4 (15.06.2017)
     - Link: http://eigen.tuxfamily.org/index.php?title=Main_Page
+
 Unix:
     - Caffe:
         - Version 1.0.0, extracted from GitHub on 04/26/2018 from the current master branch.
         - Link: https://github.com/BVLC/caffe
         - GitHub SHA: 864520713a4c5ffae7382ced5d34e4cadc608473
+
+    - Spinnaker:
+        - Tested on Spinnaker 1.13.0.31 SDK - Linux Ubuntu 16.04 (64-bit) — 05/25/2018 - 41.580MB.
+        - Prerequisites: https://www.ptgrey.com/tan/10685
 
 Windows:
     - Caffe & Caffe dependencies (caffe3rdparty):

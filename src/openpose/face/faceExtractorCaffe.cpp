@@ -174,7 +174,7 @@ namespace op
         try
         {
             #ifdef USE_CAFFE
-                if (!faceRectangles.empty())
+                if (mEnabled && !faceRectangles.empty())
                 {
                     // Security checks
                     if (cvInputData.empty())

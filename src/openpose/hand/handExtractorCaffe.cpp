@@ -258,7 +258,7 @@ namespace op
         try
         {
             #if defined USE_CAFFE
-                if (!handRectangles.empty())
+                if (mEnabled && !handRectangles.empty())
                 {
                     // Security checks
                     if (cvInputData.empty())

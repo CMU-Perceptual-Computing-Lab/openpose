@@ -86,7 +86,8 @@ namespace op
             if (!checkNoNullNorEmpty(tDatums))
             {
                 // Retrieve frame if next is desired frame or if we want to stop this worker
-                if (!mPriorityQueueBuffer.empty()   &&   ((*mPriorityQueueBuffer.top())[0].id == mNextExpectedId || mStopWhenEmpty))
+                if (!mPriorityQueueBuffer.empty()
+                    && ((*mPriorityQueueBuffer.top())[0].id == mNextExpectedId || mStopWhenEmpty))
                 {
                     tDatums = { mPriorityQueueBuffer.top() };
                     mPriorityQueueBuffer.pop();

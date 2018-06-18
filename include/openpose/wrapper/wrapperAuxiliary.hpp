@@ -1,6 +1,7 @@
 #ifndef OPENPOSE_WRAPPER_WRAPPER_AUXILIARY_HPP
 #define OPENPOSE_WRAPPER_WRAPPER_AUXILIARY_HPP
 
+#include <openpose/wrapper/wrapperStructExtra.hpp>
 #include <openpose/wrapper/wrapperStructFace.hpp>
 #include <openpose/wrapper/wrapperStructHand.hpp>
 #include <openpose/wrapper/wrapperStructInput.hpp>
@@ -14,6 +15,7 @@ namespace op
      * @param wrapperStructPose
      * @param wrapperStructFace
      * @param wrapperStructHand
+     * @param wrapperStructExtra
      * @param wrapperStructInput
      * @param wrapperStructOutput
      * @param renderOutput
@@ -23,6 +25,7 @@ namespace op
     OP_API void wrapperConfigureSecurityChecks(const WrapperStructPose& wrapperStructPose,
                                                const WrapperStructFace& wrapperStructFace,
                                                const WrapperStructHand& wrapperStructHand,
+                                               const WrapperStructExtra& wrapperStructExtra,
                                                const WrapperStructInput& wrapperStructInput,
                                                const WrapperStructOutput& wrapperStructOutput,
                                                const bool renderOutput,

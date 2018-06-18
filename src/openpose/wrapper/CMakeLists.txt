@@ -1,6 +1,7 @@
 set(SOURCES_OP_WRAPPER
     defineTemplates.cpp
     wrapperAuxiliary.cpp
+    wrapperStructExtra.cpp
     wrapperStructFace.cpp
     wrapperStructHand.cpp
     wrapperStructInput.cpp
