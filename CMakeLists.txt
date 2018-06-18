@@ -234,7 +234,7 @@ option(USE_ASIO "Include Asio header-only library." OFF)
 # More options
 option(BUILD_EXAMPLES "Build OpenPose examples." ON)
 option(BUILD_DOCS "Build OpenPose documentation." OFF)
-option(BUILD_PYTHON "Build OpenPose python." ON)
+option(BUILD_PYTHON "Build OpenPose python." OFF)
 
 # Build as shared library
 option(BUILD_SHARED_LIBS "Build as shared lib" ON)
