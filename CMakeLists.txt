@@ -222,10 +222,11 @@ endif (WIN32 OR APPLE)
 # endif (UNIX AND NOT APPLE)
 
 # Download the models
-option(DOWNLOAD_COCO_MODEL "Download COCO model." ON)
-option(DOWNLOAD_MPI_MODEL "Download MPI model." OFF)
-option(DOWNLOAD_HAND_MODEL "Download hand model." ON)
+option(DOWNLOAD_BODY_25_MODEL "Download body 25-keypoint (body COCO and 6-keypoint foot) model." ON)
+option(DOWNLOAD_BODY_COCO_MODEL "Download body 18-keypoint COCO model." OFF)
+option(DOWNLOAD_BODY_MPI_MODEL "Download body 15-keypoint MPI model." OFF)
 option(DOWNLOAD_FACE_MODEL "Download face model." ON)
+option(DOWNLOAD_HAND_MODEL "Download hand model." ON)
 
 # Asio
 option(USE_ASIO "Include Asio header-only library." OFF)
@@ -780,9 +781,11 @@ message(STATUS "Download the models.")
 # URL to the models
 set(OPENPOSE_URL "http://posefs1.perception.cs.cmu.edu/OpenPose/models/")
 
-download_model("body (COCO)" ${DOWNLOAD_COCO_MODEL} pose/coco/pose_iter_440000.caffemodel
+download_model("BODY_25" ${DOWNLOAD_BODY_25_MODEL} pose/body_25/pose_iter_584000.caffemodel
+  78287B57CF85FA89C03F1393D368E5B7) # Body (BODY_25)
+download_model("body (COCO)" ${DOWNLOAD_BODY_COCO_MODEL} pose/coco/pose_iter_440000.caffemodel
   5156d31f670511fce9b4e28b403f2939) # Body (COCO)
-download_model("body (MPI)" ${DOWNLOAD_MPI_MODEL} pose/mpi/pose_iter_160000.caffemodel
+download_model("body (MPI)" ${DOWNLOAD_BODY_MPI_MODEL} pose/mpi/pose_iter_160000.caffemodel
   2ca0990c7562bd7ae03f3f54afa96e00) # Body (MPI)
 download_model("face" ${DOWNLOAD_FACE_MODEL} face/pose_iter_116000.caffemodel
   e747180d728fa4e4418c465828384333) # Face

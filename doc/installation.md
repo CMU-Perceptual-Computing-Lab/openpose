@@ -12,7 +12,7 @@ OpenPose - Installation
 8. [Uninstallation](#uninstallation)
 9. [Optional Settings](#optional-settings)
     1. [Profiling Speed](#profiling-speed)
-    2. [MPI Model](#mpi-model)
+    2. [COCO and MPI Model](#coco-and-mpi-model)
     3. [CPU Version](#cpu-version)
     4. [3D Reconstruction Module](#3d-reconstruction-module)
     5. [Calibration Module](#calibration-module)
@@ -47,7 +47,7 @@ Requirements for the default configuration (you might need more resources with a
 
 - Nvidia GPU version:
     - NVIDIA graphics card with at least 1.6 GB available (the `nvidia-smi` command checks the available GPU memory in Ubuntu).
-    - At least 2 GB of free RAM memory.
+    - At least 2.5 GB of free RAM memory for BODY_25 model or 2 GB for COCO model (assuming cuDNN installed).
     - Highly recommended: cuDNN.
 - CPU version:
     - Around 8GB of free RAM memory.
@@ -238,8 +238,8 @@ OpenPose displays the FPS in the basic GUI. However, more complex speed metrics 
 
 
 
-#### MPI Model
-By default, the body MPI model is not downloaded. You can download it by turning on the `DOWNLOAD_MPI_MODEL`. It's slightly faster but less accurate and has less keypoints than the COCO body model.
+#### COCO and MPI Model
+By default, the body COCO and MPI models are not downloaded. You can download them by turning on the `DOWNLOAD_BODY_COCO_MODEL` or `DOWNLOAD_BODY_MPI_MODEL` flags. It's slightly faster but less accurate and has less keypoints than the COCO body model.
 
 
 
