@@ -221,7 +221,11 @@ OpenPose Library - Release Notes
         3. Added flag `flir_camera_index` to allow running on all the cameras at once, or only on 1 camera at the time.
         4. Added flag `frame_keep_distortion` not to undistort the images. E.g., useful when recording images for camera calibration.
         5. Changed Spinnaker::DEFAULT image extraction mode by Spinnaker::IPP, which does not show a pixelated image while keeping very similar runtime.
-    4. 3-D reconstruction: Added non-linear minimization to further improve 3-D triangulation accuracy by ~5% (Ubuntu only).
+    4. 3-D reconstruction:
+        1. Added non-linear minimization to further improve 3-D triangulation accuracy by ~5% (Ubuntu only).
+        2. It is only run if reprojction error is more than a minimum threshold (improve speed with already good quality results) and also less than another outlier threshold.
+        3. Outliers are removed from final result if >= 3 camera views.
+        4. Applied RANSAC if >=4 camera views.
     5. CMake: All libraries as single variable (simpler to add/remove libraries).
     6. Datum includes extrinsic and intrinsic camera parameters.
     7. Function `scaleKeypoints(Array<float>& keypoints, const float scale)` also accepts 3D keypoints.

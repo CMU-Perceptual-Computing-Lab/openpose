@@ -58,11 +58,11 @@ namespace op
                 const auto& tDatum = (*tDatums)[0];
                 const auto& adamPose = tDatum.adamPose; // Eigen::Matrix<double, 62, 3, Eigen::RowMajor>
                 const auto& adamTranslation = tDatum.adamTranslation; // Eigen::Vector3d(3, 1)
+                const auto adamFaceCoeffsExp = tDatum.adamFaceCoeffsExp; // Eigen::VectorXd resized to (200, 1)
                 //const float mouth_open = tDatum.mouthOpening; // tDatum.mouth_open;
                 //const float leye_open = tDatum.rightEyeOpening; // tDatum.leye_open;
                 //const float reye_open = tDatum.leftEyeOpening; // tDatum.reye_open;
                 //const float dist_root_foot = Datum.distanceRootFoot; // tDatum.dist_root_foot;
-                const auto adamFaceCoeffsExp = tDatum.adamFaceCoeffsExp; // Eigen::VectorXd resized to (200, 1)
                 // m_adam_t:
                 //     1. Total translation (centimeters) of the root in camera/global coordinate representation.
                 // m_adam_pose:

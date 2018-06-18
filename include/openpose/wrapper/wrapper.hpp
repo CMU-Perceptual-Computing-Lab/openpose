@@ -881,6 +881,9 @@ namespace op
             }
 
             // IK/Adam
+            const auto displayAdam = wrapperStructOutput.displayMode == DisplayMode::DisplayAdam
+                                     || (wrapperStructOutput.displayMode == DisplayMode::DisplayAll
+                                         && wrapperStructExtra.ikThreads > 0);
             spWJointAngleEstimations.clear();
             if (wrapperStructExtra.ikThreads > 0)
             {
@@ -891,7 +894,7 @@ namespace op
                 // Pose extractor(s)
                 for (auto i = 0u; i < spWJointAngleEstimations.size(); i++)
                 {
-                    const auto jointAngleEstimation = std::make_shared<JointAngleEstimation>();
+                    const auto jointAngleEstimation = std::make_shared<JointAngleEstimation>(displayAdam);
                     spWJointAngleEstimations.at(i) = {std::make_shared<WJointAngleEstimation<TDatumsPtr>>(
                         jointAngleEstimation)};
                 }
@@ -1010,9 +1013,6 @@ namespace op
                         renderers.emplace_back(std::static_pointer_cast<Renderer>(poseGpuRenderer));
                 // Display
                 // Adam (+3-D/2-D) display
-                const auto displayAdam = wrapperStructOutput.displayMode == DisplayMode::DisplayAdam
-                                         || (wrapperStructOutput.displayMode == DisplayMode::DisplayAll
-                                             && wrapperStructExtra.ikThreads > 0);
                 if (displayAdam)
                 {
                     // Gui

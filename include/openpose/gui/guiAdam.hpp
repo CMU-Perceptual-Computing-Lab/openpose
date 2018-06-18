@@ -31,11 +31,11 @@ namespace op
 
         void generateMesh(const Array<float>& poseKeypoints3D, const Array<float>& faceKeypoints3D,
                           const std::array<Array<float>, 2>& handKeypoints3D,
-                          const Eigen::Matrix<double, 62, 3, Eigen::RowMajor>& adamPose,
-                          const Eigen::Vector3d& adamTranslation,
-                          const Eigen::Matrix<double, Eigen::Dynamic, 1>& vtVec,
-                          const Eigen::Matrix<double, Eigen::Dynamic, 1>& j0Vec,
-                          const double* const adamFaceCoeffsExp);
+                          const double* const adamPosePtr,
+                          const double* const adamTranslationPtr,
+                          const double* const vtVecPtr, const int vtVecRows,
+                          const double* const j0VecPtr, const int j0VecRows,
+                          const double* const adamFaceCoeffsExpPtr);
 
         virtual void update();
 

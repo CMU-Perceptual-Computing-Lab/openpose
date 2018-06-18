@@ -68,10 +68,9 @@ namespace op
                 const auto& faceKeypoints3D = datum.faceKeypoints3D;
                 const auto& handKeypoints3D = datum.handKeypoints3D;
                 // Running Adam model
-                std::tie(datum.adamPose, datum.adamTranslation, datum.vtVec, datum.j0Vec,
-                         datum.adamFaceCoeffsExp, datum.mouthOpening, datum.rightEyeOpening,
-                         datum.leftEyeOpening, datum.distanceRootFoot)
-                    = spJointAngleEstimation->adamFastFit(poseKeypoints3D, faceKeypoints3D, handKeypoints3D);
+                spJointAngleEstimation->adamFastFit(
+                    datum.adamPose, datum.adamTranslation, datum.vtVec, datum.j0Vec,
+                    datum.adamFaceCoeffsExp, poseKeypoints3D, faceKeypoints3D, handKeypoints3D);
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
                 Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);

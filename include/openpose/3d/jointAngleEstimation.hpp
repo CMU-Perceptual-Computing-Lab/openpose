@@ -19,14 +19,18 @@ namespace op
     public:
         static const std::shared_ptr<const TotalModel> getTotalModel();
 
-        JointAngleEstimation();
+        JointAngleEstimation(const bool returnJacobian);
 
         void initializationOnThread();
 
-        std::tuple<Eigen::MatrixXd, Eigen::Vector3d, Eigen::MatrixXd, Eigen::MatrixXd, Eigen::VectorXd,
-            float, float, float, float> adamFastFit(const Array<float>& poseKeypoints3D,
-                                                    const Array<float>& faceKeypoints3D,
-                                                    const std::array<Array<float>, 2>& handKeypoints3D);
+        void adamFastFit(Eigen::Matrix<double, 62, 3, Eigen::RowMajor>& adamPose,
+                         Eigen::Vector3d& adamTranslation,
+                         Eigen::Matrix<double, Eigen::Dynamic, 1>& vtVec,
+                         Eigen::Matrix<double, Eigen::Dynamic, 1>& j0Vec,
+                         Eigen::VectorXd& adamFacecoeffsExp,
+                         const Array<float>& poseKeypoints3D,
+                         const Array<float>& faceKeypoints3D,
+                         const std::array<Array<float>, 2>& handKeypoints3D);
 
     private:
         // PIMPL idiom

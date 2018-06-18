@@ -74,7 +74,9 @@ namespace op
                     // Update keypoints
                     const auto& tDatum = (*tDatums)[0];
                     spGuiAdam->generateMesh(tDatum.poseKeypoints3D, tDatum.faceKeypoints3D, tDatum.handKeypoints3D,
-                                            tDatum.adamPose, tDatum.adamTranslation, tDatum.vtVec, tDatum.j0Vec,
+                                            tDatum.adamPose.data(), tDatum.adamTranslation.data(),
+                                            tDatum.vtVec.data(), tDatum.vtVec.rows(),
+                                            tDatum.j0Vec.data(), tDatum.j0Vec.rows(),
                                             tDatum.adamFaceCoeffsExp.data());
                 }
                 // Refresh/update GUI
