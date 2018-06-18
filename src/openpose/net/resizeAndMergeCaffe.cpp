@@ -4,6 +4,10 @@
 #include <openpose/net/resizeAndMergeBase.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/net/resizeAndMergeCaffe.hpp>
+#ifdef USE_OPENCL
+    #include <openpose/gpu/opencl.hcl>
+    #include <openpose/gpu/cl2.hpp>
+#endif
 
 namespace op
 {
@@ -85,6 +89,7 @@ namespace op
                 #ifdef USE_OPENCL
                     // GPU ID
                     mGpuID = gpuID;
+                    mTempGPUData.resize(mBottomSizes.size(), nullptr);
                 #else
                     UNUSED(gpuID);
                 #endif
@@ -173,7 +178,7 @@ namespace op
                 std::vector<const T*> sourcePtrs(bottom.size());
                 for (auto i = 0u ; i < sourcePtrs.size() ; i++)
                     sourcePtrs[i] = bottom[i]->gpu_data();
-                resizeAndMergeOcl(top.at(0)->mutable_gpu_data(), sourcePtrs, mTopSize, mBottomSizes,
+                resizeAndMergeOcl(top.at(0)->mutable_gpu_data(), sourcePtrs, mTempGPUData, mTopSize, mBottomSizes,
                                   mScaleRatios, mGpuID);
             #else
                 UNUSED(bottom);

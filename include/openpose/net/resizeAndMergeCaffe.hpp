@@ -44,6 +44,7 @@ namespace op
                                   const std::vector<caffe::Blob<T>*>& bottom);
 
     private:
+        std::vector<T*> mTempGPUData;
         std::vector<T> mScaleRatios;
         std::vector<std::array<int, 4>> mBottomSizes;
         std::array<int, 4> mTopSize;

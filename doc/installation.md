@@ -14,13 +14,14 @@ OpenPose - Installation
     1. [Profiling Speed](#profiling-speed)
     2. [COCO and MPI Model](#coco-and-mpi-model)
     3. [CPU Version](#cpu-version)
-    4. [3D Reconstruction Module](#3d-reconstruction-module)
-    5. [Calibration Module](#calibration-module)
-    6. [Compiling without cuDNN](#compiling-without-cudnn)
-    7. [Custom Caffe (Ubuntu Only)](#custom-caffe-ubuntu-only)
-    8. [Custom OpenCV (Ubuntu Only)](#custom-opencv-ubuntu-only)
-    9. [Doxygen Documentation Autogeneration (Ubuntu Only)](#doxygen-documentation-autogeneration-ubuntu-only)
-    10. [CMake Command Line Configuration (Ubuntu Only)](#cmake-command-line-configuration-ubuntu-only)
+    4. [OpenCL Version](#opencl-version)
+    5. [3D Reconstruction Module](#3d-reconstruction-module)
+    6. [Calibration Module](#calibration-module)
+    7. [Compiling without cuDNN](#compiling-without-cudnn)
+    8. [Custom Caffe (Ubuntu Only)](#custom-caffe-ubuntu-only)
+    9. [Custom OpenCV (Ubuntu Only)](#custom-opencv-ubuntu-only)
+    10. [Doxygen Documentation Autogeneration (Ubuntu Only)](#doxygen-documentation-autogeneration-ubuntu-only)
+    11. [CMake Command Line Configuration (Ubuntu Only)](#cmake-command-line-configuration-ubuntu-only)
 
 
 
@@ -49,6 +50,9 @@ Requirements for the default configuration (you might need more resources with a
     - NVIDIA graphics card with at least 1.6 GB available (the `nvidia-smi` command checks the available GPU memory in Ubuntu).
     - At least 2.5 GB of free RAM memory for BODY_25 model or 2 GB for COCO model (assuming cuDNN installed).
     - Highly recommended: cuDNN.
+ - AMD GPU version:
+    - Vega series graphics card
+    - At least 2 GB of free RAM memory.
 - CPU version:
     - Around 8GB of free RAM memory.
 - Highly recommended: a CPU with at least 8 cores.
@@ -105,13 +109,19 @@ The instructions in this section describe the steps to build OpenPose using CMak
     2. [**cuDNN 5.1**](https://developer.nvidia.com/cudnn):
         - Ubuntu: Run `sudo ubuntu/install_cudnn.sh` or alternatively download and install it from their website.
         - Windows (and Ubuntu if manual installation): In order to manually install it, just unzip it and copy (merge) the contents on the CUDA folder, usually `/usr/local/cuda/` in Ubuntu and `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0` in Windows.
-3. Ubuntu - Other prerequisites:
+3. AMD GPU version prerequisites:
+    1. [**AMD - Windows**](https://support.amd.com/en-us/download):
+        - Download official AMD drivers for Windows
+    2. [**AMD - OpenCL**](https://rocm.github.io/ROCmInstall.html):
+        - Download 3rd party ROCM driver for Ubuntu
+    3. AMD Drivers have not been tested on OSX. Please email us if you wish to test it. This has only been tested on Vega series cards
+4. Ubuntu - Other prerequisites:
     - Caffe prerequisites: By default, OpenPose uses Caffe under the hood. If you have not used Caffe previously, install its dependencies by running `sudo bash ./ubuntu/install_cmake.sh`.
     - OpenCV must be already installed on your machine. It can be installed with `apt-get install libopencv-dev`. You can also use your own compiled OpenCV version.
-4. Windows - **Microsoft Visual Studio (VS) 2015 Enterprise Update 3**:
+5. Windows - **Microsoft Visual Studio (VS) 2015 Enterprise Update 3**:
     - If **Visual Studio 2017 Community** is desired, we do not officially support it, but it might be compiled by firstly [enabling CUDA 8.0 in VS2017](https://stackoverflow.com/questions/43745099/using-cuda-with-visual-studio-2017?answertab=active#tab-top) or use **VS2017 with CUDA 9** by checking the `.vcxproj` file and changing the necessary paths from CUDA 8 to 9.
     - VS 2015 Enterprise Update 1 will give some compiler errors and VS 2015 Community has not been tested.
-5. Windows - **Caffe, OpenCV, and Caffe prerequisites**:
+6. Windows - **Caffe, OpenCV, and Caffe prerequisites**:
     - CMake automatically downloads all the Windows DLLs. Alternatively, you might prefer to download them manually:
         - Models:
             - [COCO model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/coco/pose_iter_440000.caffemodel): download in `models/pose/coco/`.
@@ -123,10 +133,10 @@ The instructions in this section describe the steps to build OpenPose using CMak
             - [Caffe](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe_2018_01_18.zip): Unzip as `3rdparty/windows/caffe/`.
             - [Caffe dependencies](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe3rdparty_2017_07_14.zip): Unzip as `3rdparty/windows/caffe3rdparty/`.
             - [OpenCV 3.1](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/opencv_310.zip): Unzip as `3rdparty/windows/opencv/`.
-6. Mac - **Caffe, OpenCV, and Caffe prerequisites**:
+7. Mac - **Caffe, OpenCV, and Caffe prerequisites**:
     - Install deps by running `bash 3rdparty/osx/install_deps.sh` on your terminal.
     - Current OSX has only been tested with the CPU Version, and hence must be compiled with the `-DGPU_MODE=CPU_ONLY` flag.
-7. **Eigen prerequisite**:
+8. **Eigen prerequisite**:
     - Note: This step is optional, only required for some specific extra functionality, such as extrinsic camera calibration.
     - If you enable the `WITH_EIGEN` flag when running CMake. You can either:
         1. Do not do anything if you set the `WITH_EIGEN` flag to `BUILD`, CMake will automatically download Eigen. Alternatively, you might prefer to download it manually:
@@ -259,6 +269,15 @@ export OMP_NUM_THREADS="8"
 ```
 
 Do note that increasing the number of threads results in more memory use. You can check the [OpenPose benchmark](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/faq.md#speed-up-and-benchmark) for more information about speed and memory requirements in several CPUs and GPUs.
+
+
+
+#### OpenCL Version
+If you have an AMD graphics card, you can compile OpenPose with the OpenCL option. To manually select the OpenCL Version, open CMake GUI mentioned above, and set the `GPU_MODE` flag to `OPENCL`. 
+
+The OpenCL version has been tested on Ubuntu and Windows. The OpenCL version requires `libviennacl-dev` which can be installed via apt-get on Ubuntu. This comes packaged with Windows. This has been tested only on AMD Vega series and NVIDIA 10 series graphics cards. Please email us if you have issues with other operating systems or graphics cards.
+
+Lastly, OpenCL version does not support unfixed resolution. So a folder of images of different resolutions with openpose, requires the `--net_resolution 656x368` flag for example. This should be fixed by the Caffe author in a future patch.
 
 
 

@@ -131,7 +131,7 @@ set(GPU_MODE CUDA CACHE STRING "Select the acceleration GPU library or CPU other
 # else ()
 #   set_property(CACHE GPU_MODE PROPERTY STRINGS CPU_ONLY)
 # endif (CUDA_FOUND AND OpenCL_FOUND)
-set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA CPU_ONLY)
+set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA OPENCL CPU_ONLY)
 
 # Look for CUDA
 set(CUDA_FOUND FALSE)
@@ -234,6 +234,7 @@ option(USE_ASIO "Include Asio header-only library." OFF)
 # More options
 option(BUILD_EXAMPLES "Build OpenPose examples." ON)
 option(BUILD_DOCS "Build OpenPose documentation." OFF)
+option(BUILD_PYTHON "Build OpenPose python." OFF)
 
 # Build as shared library
 option(BUILD_SHARED_LIBS "Build as shared lib" ON)
@@ -794,6 +795,12 @@ download_model("hand" ${DOWNLOAD_HAND_MODEL} hand/pose_iter_102000.caffemodel
 
 message(STATUS "Models Downloaded.")
 
+### PYTHON
+if (Caffe_FOUND)
+  if(BUILD_PYTHON)
+    add_subdirectory(python)
+  endif ()
+endif()
 
 ### GENERATE DOCUMENTATION
 if (UNIX OR APPLE)

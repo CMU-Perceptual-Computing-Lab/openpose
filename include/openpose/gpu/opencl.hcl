@@ -23,6 +23,8 @@ namespace cl
 {
     class CommandQueue;
     class Kernel;
+    class Device;
+    class Context;
 }
 
 // Singleton structure
@@ -39,6 +41,10 @@ namespace op
 
         cl::CommandQueue& getQueue();
 
+        cl::Device& getDevice();
+
+        cl::Context& getContext();
+
         template <typename T>
         bool buildKernelIntoManager(const std::string& kernelName, const std::string& src = "", bool isFile = false);
 
@@ -52,6 +58,8 @@ namespace op
         }
       
         template <typename T> static void getBufferRegion(cl_buffer_region& region, const int origin, const int size);
+
+        int getAlignment();
 
         static std::string clErrorToString(int err);
 
