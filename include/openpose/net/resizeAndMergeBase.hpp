@@ -19,6 +19,7 @@ namespace op
 
     template <typename T>
     OP_API void resizeAndMergeOcl(T* targetPtr, const std::vector<const T*>& sourcePtrs,
+                                  std::vector<T*>& sourceTempPtrs,
                                   const std::array<int, 4>& targetSize,
                                   const std::vector<std::array<int, 4>>& sourceSizes,
                                   const std::vector<T>& scaleInputToNetInputs = {1.f},

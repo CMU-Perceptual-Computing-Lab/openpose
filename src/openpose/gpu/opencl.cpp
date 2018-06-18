@@ -272,6 +272,28 @@ namespace op
         #endif
     }
 
+    cl::Device& OpenCL::getDevice()
+    {
+        #ifdef USE_OPENCL
+            return upImpl->mDevice;
+        #else
+            error("OpenPose must be compiled with the `USE_OPENCL` macro definition in order to use this"
+                  " functionality.", __LINE__, __FUNCTION__, __FILE__);
+            throw std::runtime_error("");
+        #endif
+    }
+
+    cl::Context& OpenCL::getContext()
+    {
+        #ifdef USE_OPENCL
+            return upImpl->mContext;
+        #else
+            error("OpenPose must be compiled with the `USE_OPENCL` macro definition in order to use this"
+                  " functionality.", __LINE__, __FUNCTION__, __FILE__);
+            throw std::runtime_error("");
+        #endif
+    }
+
     template <typename T>
     bool OpenCL::buildKernelIntoManager(const std::string& kernelName, const std::string& src, bool isFile)
     {
@@ -471,6 +493,20 @@ namespace op
             UNUSED(region);
             error("OpenPose must be compiled with the `USE_OPENCL` macro definition in order to use this"
                   " functionality.", __LINE__, __FUNCTION__, __FILE__);
+        #endif
+    }
+
+    int OpenCL::getAlignment()
+    {
+        #ifdef USE_OPENCL
+        cl::Device& device = this->getDevice();
+        cl_uint mem_align;
+        clGetDeviceInfo(device.get(), CL_DEVICE_MEM_BASE_ADDR_ALIGN, sizeof(mem_align), &mem_align, nullptr);
+        return mem_align;
+        #else
+        error("OpenPose must be compiled with the `USE_OPENCL` macro definition in order to use this"
+              " functionality.", __LINE__, __FUNCTION__, __FILE__);
+        return 0;
         #endif
     }
 

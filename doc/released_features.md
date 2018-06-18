@@ -1,9 +1,12 @@
 OpenPose Library - Latest Released Features
 ====================================
 
-- Jun 2018: [**Mac OSX version (CPU)**](./installation.md)!
+- Jun 2018: [**Combined body-foot model released! Faster and more accurate.**](./installation.md)!
+- Jun 2018: [**AMD graphic card version**](./calibration_demo.md) released!
+- Jun 2018: [**Calibration toolbox**](./calibration_demo.md) released!
+- Jun 2018: [**Mac OSX version (CPU)**](./installation.md) released!
 - Mar 2018: [**CPU version**](./installation.md#cpu-version)!
-- Mar 2018: Improved [**3-D keypoint reconstruction module**](./3d_reconstruction_demo.md) (from multiple camera views)!
+- Mar 2018: [**3-D keypoint reconstruction module**](./3d_reconstruction_demo.md) (from multiple camera views)!
 - Sep 2017: [**CMake**](./installation.md) installer and **IP camera** support!
 - Jul 2017: [**Windows portable binaries and demo**](https://github.com/CMU-Perceptual-Computing-Lab/openpose/releases)!
 - Jul 2017: **Hands** released!
