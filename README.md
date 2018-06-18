@@ -37,8 +37,8 @@
 
 ## Latest Features
 - Jun 2018: [**Combined body-foot model released! Faster and more accurate.**](doc/installation.md)!
-- Jun 2018: [**Python version**](doc/calibration_demo.md) released!
-- Jun 2018: [**AMD graphic card version**](doc/calibration_demo.md) released!
+- Jun 2018: [**Python version**](doc/python_module.md.md) released!
+- Jun 2018: [**AMD graphic card version**](doc/installation.md) released!
 - Jun 2018: [**Calibration toolbox**](doc/calibration_demo.md) released!
 - Jun 2018: [**Mac OSX version (CPU)**](doc/installation.md) released!
 - Mar 2018: [**CPU version**](doc/installation.md#cpu-version)!
@@ -47,6 +47,7 @@
 - Jul 2017: [**Windows portable binaries and demo**](https://github.com/CMU-Perceptual-Computing-Lab/openpose/releases)!
 - Jul 2017: **Hands** released!
 - Jun 2017: **Face** released!
+
 For further details, check [all released features](doc/released_features.md) and [release notes](doc/release_notes.md).
 
 
