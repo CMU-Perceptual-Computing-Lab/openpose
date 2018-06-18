@@ -1,5 +1,7 @@
 #ifdef USE_3D_ADAM_MODEL
+#ifdef USE_3D_ADAM_MODEL
     #include <adam/FitToBody.h>
+    #include <adam/totalmodel.h>
 #endif
 #include <openpose/3d/jointAngleEstimation.hpp>
 
@@ -72,6 +74,7 @@ namespace op
             const std::string mCorrespondencePath;
 
             // Processing
+            const bool mReturnJacobian;
             bool mInitialized;
 
             Eigen::MatrixXd mBodyJoints;
@@ -89,11 +92,12 @@ namespace op
             Eigen::Matrix<double, Eigen::Dynamic, 1> mJ0Vec;
             const std::shared_ptr<const TotalModel> spTotalModel;
 
-            ImplJointAngleEstimation() :
+            ImplJointAngleEstimation(const bool returnJacobian) :
                 mGTotalModelPath{"./model/adam_v1_plus2.json"},
                 mPcaPath{"./model/adam_blendshapes_348_delta_norm.json"},
                 mObjectPath{"./model/mesh_nofeet.obj"},
                 mCorrespondencePath{"./model/correspondences_nofeet.txt"},
+                mReturnJacobian{returnJacobian},
                 mInitialized{false},
                 mBodyJoints(5, NUMBER_BODY_KEYPOINTS),
                 mFaceJoints(5, NUMBER_FACE_KEYPOINTS),// (3, landmarks_face.size());
@@ -179,15 +183,15 @@ namespace op
         }
     }
 
-    JointAngleEstimation::JointAngleEstimation()
+    JointAngleEstimation::JointAngleEstimation(const bool returnJacobian)
         #ifdef USE_3D_ADAM_MODEL
-            : spImpl{std::make_shared<ImplJointAngleEstimation>()}
+            : spImpl{std::make_shared<ImplJointAngleEstimation>(returnJacobian)}
         #endif
     {
         try
         {
             // error("JointAngleEstimation (`ik_threads` flag) buggy and not working yet, but we are working on it!"
-            //       " Coming soon!", __LINE__, __FUNCTION__, __FILE__);
+            //       " No coming soon...", __LINE__, __FUNCTION__, __FILE__);
             #ifndef USE_3D_ADAM_MODEL
                 UNUSED(ceresDisplayReport);
                 error("OpenPose must be compiled with the `USE_3D_ADAM_MODEL` macro definition in order to use this"
@@ -204,11 +208,14 @@ namespace op
     {
     }
 
-    std::tuple<Eigen::MatrixXd, Eigen::Vector3d, Eigen::MatrixXd, Eigen::MatrixXd, Eigen::VectorXd,
-        float, float, float, float> JointAngleEstimation::adamFastFit(
-            const Array<float>& poseKeypoints3D,
-            const Array<float>& faceKeypoints3D,
-            const std::array<Array<float>, 2>& handKeypoints3D)
+    void JointAngleEstimation::adamFastFit(Eigen::Matrix<double, 62, 3, Eigen::RowMajor>& adamPose,
+                                           Eigen::Vector3d& adamTranslation,
+                                           Eigen::Matrix<double, Eigen::Dynamic, 1>& vtVec,
+                                           Eigen::Matrix<double, Eigen::Dynamic, 1>& j0Vec,
+                                           Eigen::VectorXd& adamFacecoeffsExp,
+                                           const Array<float>& poseKeypoints3D,
+                                           const Array<float>& faceKeypoints3D,
+                                           const std::array<Array<float>, 2>& handKeypoints3D)
     {
         try
         {
@@ -280,8 +287,6 @@ namespace op
             const bool freezeMissing = false;
             const bool ceresDisplayReport = false;
             // Fill Datum
-            Eigen::MatrixXd vtVec;
-            Eigen::MatrixXd j0Vec;
             if (!spImpl->mInitialized || !fastVersion)
             {
                 if (!spImpl->mInitialized)
@@ -308,13 +313,16 @@ namespace op
                                         spImpl->mFaceJoints, freezeMissing, ceresDisplayReport,
                                         multistageFitting, handEnabled, fitFaceExponents, fastSolver);
                 // The following 2 operations takes ~12 msec
-                vtVec = spImpl->spTotalModel->m_meanshape
-                      + spImpl->spTotalModel->m_shapespace_u * frameParams.m_adam_coeffs;
-                j0Vec = spImpl->spTotalModel->J_mu_ + spImpl->spTotalModel->dJdc_ * frameParams.m_adam_coeffs;
-                if (fastVersion)
+                if (spImpl->mReturnJacobian)
                 {
-                    spImpl->mVtVec = vtVec;
-                    spImpl->mJ0Vec = j0Vec;
+                    vtVec = spImpl->spTotalModel->m_meanshape
+                          + spImpl->spTotalModel->m_shapespace_u * frameParams.m_adam_coeffs;
+                    j0Vec = spImpl->spTotalModel->J_mu_ + spImpl->spTotalModel->dJdc_ * frameParams.m_adam_coeffs;
+                    if (fastVersion)
+                    {
+                        spImpl->mVtVec = vtVec;
+                        spImpl->mJ0Vec = j0Vec;
+                    }
                 }
             }
             // Other frames if fastVersion
@@ -324,19 +332,22 @@ namespace op
                 Adam_FastFit(*spImpl->spTotalModel, frameParams, spImpl->mBodyJoints, spImpl->mRFootJoints,
                              spImpl->mLFootJoints, spImpl->mRHandJoints, spImpl->mLHandJoints,
                              spImpl->mFaceJoints, ceresDisplayReport);
-                vtVec = spImpl->mVtVec;
-                j0Vec = spImpl->mJ0Vec;
+                if (spImpl->mReturnJacobian)
+                {
+                    vtVec = spImpl->mVtVec;
+                    j0Vec = spImpl->mJ0Vec;
+                }
             }
-            return std::make_tuple(
-                frameParams.m_adam_pose, frameParams.m_adam_t, vtVec, j0Vec, frameParams.m_adam_facecoeffs_exp,
-                frameParams.mouth_open, frameParams.reye_open, frameParams.leye_open, frameParams.dist_root_foot
-            );
+            adamPose = frameParams.m_adam_pose;
+            adamTranslation = frameParams.m_adam_t;
+            adamFacecoeffsExp = frameParams.m_adam_facecoeffs_exp;
+            // // Not used anymore
+            // frameParams.mouth_open, frameParams.reye_open, frameParams.leye_open, frameParams.dist_root_foot
         }
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return std::make_tuple(Eigen::MatrixXd{}, Eigen::Vector3d{}, Eigen::MatrixXd{}, Eigen::MatrixXd{},
-                                   Eigen::VectorXd{}, -1.f, -1.f, -1.f, -1.f);
         }
     }
 }
+#endif

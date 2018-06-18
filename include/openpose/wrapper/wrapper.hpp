@@ -881,7 +881,11 @@ namespace op
             }
 
             // IK/Adam
+            const auto displayAdam = wrapperStructOutput.displayMode == DisplayMode::DisplayAdam
+                                     || (wrapperStructOutput.displayMode == DisplayMode::DisplayAll
+                                         && wrapperStructExtra.ikThreads > 0);
             spWJointAngleEstimations.clear();
+#ifdef USE_3D_ADAM_MODEL
             if (wrapperStructExtra.ikThreads > 0)
             {
                 spWJointAngleEstimations.resize(wrapperStructExtra.ikThreads);
@@ -891,23 +895,26 @@ namespace op
                 // Pose extractor(s)
                 for (auto i = 0u; i < spWJointAngleEstimations.size(); i++)
                 {
-                    const auto jointAngleEstimation = std::make_shared<JointAngleEstimation>();
+                    const auto jointAngleEstimation = std::make_shared<JointAngleEstimation>(displayAdam);
                     spWJointAngleEstimations.at(i) = {std::make_shared<WJointAngleEstimation<TDatumsPtr>>(
                         jointAngleEstimation)};
                 }
             }
+#endif
 
             // Output workers
             mOutputWs.clear();
             if (spWJointAngleEstimations.size() > 1u)
                 mOutputWs.emplace_back(std::make_shared<WQueueOrderer<TDatumsPtr>>());
             // Send information (e.g., to Unity) though UDP client-server communication
+#ifdef USE_3D_ADAM_MODEL
             if (!wrapperStructOutput.udpHost.empty() && !wrapperStructOutput.udpPort.empty())
             {
                 const auto udpSender = std::make_shared<UdpSender>(wrapperStructOutput.udpHost,
                                                                    wrapperStructOutput.udpPort);
                 mOutputWs.emplace_back(std::make_shared<WUdpSender<TDatumsPtr>>(udpSender));
             }
+#endif
             // Write people pose data on disk (json for OpenCV >= 3, xml, yml...)
             if (!writeKeypointCleaned.empty())
             {
@@ -972,6 +979,7 @@ namespace op
                 mOutputWs.emplace_back(std::make_shared<WVideoSaver<TDatumsPtr>>(videoSaver));
             }
             // Write joint angles as *.bvh file on hard disk
+#ifdef USE_3D_ADAM_MODEL
             if (!wrapperStructOutput.writeBvh.empty())
             {
                 const auto bvhSaver = std::make_shared<BvhSaver>(
@@ -979,6 +987,7 @@ namespace op
                 );
                 mOutputWs.emplace_back(std::make_shared<WBvhSaver<TDatumsPtr>>(bvhSaver));
             }
+#endif
             // Write heat maps as desired image format on hard disk
             if (!writeHeatMapsCleaned.empty())
             {
@@ -1010,11 +1019,9 @@ namespace op
                         renderers.emplace_back(std::static_pointer_cast<Renderer>(poseGpuRenderer));
                 // Display
                 // Adam (+3-D/2-D) display
-                const auto displayAdam = wrapperStructOutput.displayMode == DisplayMode::DisplayAdam
-                                         || (wrapperStructOutput.displayMode == DisplayMode::DisplayAll
-                                             && wrapperStructExtra.ikThreads > 0);
                 if (displayAdam)
                 {
+#ifdef USE_3D_ADAM_MODEL
                     // Gui
                     const auto gui = std::make_shared<GuiAdam>(
                         finalOutputSize, wrapperStructOutput.fullScreen, mThreadManager.getIsRunningSharedPtr(),
@@ -1024,6 +1031,7 @@ namespace op
                     );
                     // WGui
                     spWGui = {std::make_shared<WGuiAdam<TDatumsPtr>>(gui)};
+#endif
                 }
                 // 3-D (+2-D) display
                 else if (wrapperStructOutput.displayMode == DisplayMode::Display3D

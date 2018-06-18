@@ -236,6 +236,16 @@ namespace op
         std::pair<int, std::string> elementRendered;
 
         // 3D/Adam parameters
+        // Adam/Unity params
+        std::vector<double> adamPosePtr;
+        int adamPoseRows;
+        std::vector<double> adamTranslationPtr;
+        std::vector<double> vtVecPtr;
+        int vtVecRows;
+        std::vector<double> j0VecPtr;
+        int j0VecRows;
+        std::vector<double> adamFaceCoeffsExpPtr;
+        int adamFaceCoeffsExpRows;
         #ifdef USE_EIGEN
             // Adam/Unity params
             Eigen::Matrix<double, 62, 3, Eigen::RowMajor> adamPose;
@@ -244,11 +254,6 @@ namespace op
             Eigen::Matrix<double, Eigen::Dynamic, 1> vtVec;
             Eigen::Matrix<double, Eigen::Dynamic, 1> j0Vec;
             Eigen::VectorXd adamFaceCoeffsExp;
-            // Unity params
-            float mouthOpening;
-            float rightEyeOpening;
-            float leftEyeOpening;
-            float distanceRootFoot;
         #endif
 
 

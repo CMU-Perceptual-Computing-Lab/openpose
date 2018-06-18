@@ -1,4 +1,5 @@
 #ifdef USE_3D_ADAM_MODEL
+#ifdef USE_3D_ADAM_MODEL
     #include <adam/KinematicModel.h>
     #include <adam/Renderer.h>
     #include <adam/utils.h>
@@ -143,10 +144,9 @@ namespace op
 
     void GuiAdam::generateMesh(const Array<float>& poseKeypoints3D, const Array<float>& faceKeypoints3D,
                                const std::array<Array<float>, 2>& handKeypoints3D,
-                               const Eigen::Matrix<double, 62, 3, Eigen::RowMajor>& adamPose,
-                               const Eigen::Vector3d& adamTranslation,
-                               const Eigen::Matrix<double, Eigen::Dynamic, 1>& vtVec,
-                               const Eigen::Matrix<double, Eigen::Dynamic, 1>& j0Vec,
+                               const double* const adamPosePtr, const double* const adamTranslationPtr,
+                               const double* const vtVecPtr, const int vtVecRows,
+                               const double* const j0VecPtr, const int j0VecRows,
                                const double* const adamFaceCoeffsExpPtr)
     {
         try
@@ -156,12 +156,17 @@ namespace op
                 if (mDisplayMode == DisplayMode::DisplayAll
                     || mDisplayMode == DisplayMode::DisplayAdam)
                 {
+                    const Eigen::Map<const Eigen::Vector3d> adamTranslation(adamTranslationPtr);
+                    const Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, 1>> vtVec(
+                        vtVecPtr, vtVecRows);
+                    const Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, 1>> j0Vec(
+                        j0VecPtr, j0VecRows);
                     CMeshModelInstance cMeshModelInstance;
                     VisualizedData visualizedData;
                     // auto& visualizedData = spImpl->mVisualizedData;
                     // GenerateMesh_Fast modifies cMeshModelInstance & spImpl->mResultBody
                     GenerateMesh_Fast(cMeshModelInstance, spImpl->mResultBody.data(), *spImpl->spTotalModel, vtVec,
-                                    j0Vec, adamPose.data(), adamFaceCoeffsExpPtr, adamTranslation);
+                                    j0Vec, adamPosePtr, adamFaceCoeffsExpPtr, adamTranslation);
                     CopyMesh(cMeshModelInstance, visualizedData);
 
                     // Fill data
@@ -281,3 +286,4 @@ namespace op
         }
     }
 }
+#endif

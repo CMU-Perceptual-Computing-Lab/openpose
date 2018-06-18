@@ -1,4 +1,5 @@
 #ifdef USE_3D_ADAM_MODEL
+#ifdef USE_3D_ADAM_MODEL
     #include <adam/BVHWriter.h>
 #endif
 #include <openpose/filestream/bvhSaver.hpp>
@@ -128,3 +129,5 @@ namespace op
         }
     }
 }
+
+#endif

@@ -2,7 +2,9 @@
 
 namespace op
 {
+#ifdef USE_3D_ADAM_MODEL
     DEFINE_TEMPLATE_DATUM(WBvhSaver);
+#endif
     DEFINE_TEMPLATE_DATUM(WCocoJsonSaver);
     DEFINE_TEMPLATE_DATUM(WFaceSaver);
     DEFINE_TEMPLATE_DATUM(WHandSaver);

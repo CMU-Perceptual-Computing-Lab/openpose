@@ -164,7 +164,10 @@ namespace op
                         else if (castedKey=='4')
                             elementToRender = ElementToRender::AddPAFs;
                         else
+                        {
                             error("Unknown ElementToRender value.", __LINE__, __FUNCTION__, __FILE__);
+                            elementToRender = ElementToRender::Skeleton;
+                        }
                         for (auto& renderer : renderers)
                             renderer->setElementToRender(elementToRender);
                     }
