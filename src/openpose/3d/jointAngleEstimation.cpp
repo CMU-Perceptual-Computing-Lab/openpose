@@ -329,7 +329,8 @@ namespace op
                 // Fit initialization
                 // Adam_FastFit_Initialize only changes frameParams
                 const auto multistageFitting = true;
-                const auto handEnabled = !handKeypoints3D[0].empty() || !handKeypoints3D[1].empty() || poseKeypoints3D.getSize(1) == 65;
+                const auto handEnabled = !handKeypoints3D[0].empty() || !handKeypoints3D[1].empty()
+                    || poseKeypoints3D.getSize(1) == 65;
                 const auto fitFaceExponents = !faceKeypoints3D.empty();
                 const auto fastSolver = true;
                 Adam_FastFit_Initialize(*spImpl->spTotalModel, frameParams, spImpl->mBodyJoints, spImpl->mRFootJoints,

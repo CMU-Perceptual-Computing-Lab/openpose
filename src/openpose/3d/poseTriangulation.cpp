@@ -164,17 +164,43 @@ namespace op
             //     - Accuracy: initial reprojection error ~14-21, reduced ~5% with non-linear optimization
 
             // Basic triangulation
-            triangulate(reconstructedPoint, cameraMatrices, pointsOnEachCamera);
+            auto projectionError = triangulate(reconstructedPoint, cameraMatrices, pointsOnEachCamera);
+
+//             // Basic RANSAC (for >= 4 cameras)
+//             // 1. Run with all cameras (already done)
+//             // 2. Run with all but 1 camera for each camera.
+//             // 3. Use the one with minimum average reprojection error.
+//             if (cameraMatrices.size() >= 4 && projectionError > 0.5 * reprojectionMaxAcceptable)
+//             {
+//                 auto bestReprojection = projectionError;
+//                 auto bestReprojectionIndex = -1; // -1 means with all camera views
+//                 for (auto i = 0u; i < cameraMatrices.size(); ++i)
+//                 {
+//                     // Remove camera i
+//                     auto cameraMatricesSubset = cameraMatrices;
+//                     cameraMatricesSubset.erase(cameraMatricesSubset.begin() + i);
+//                     auto pointsOnEachCameraSubset = pointsOnEachCamera;
+//                     pointsOnEachCameraSubset.erase(pointsOnEachCameraSubset.begin() + i);
+//                     // Remove camera i
+//                     const auto projectionErrorSubset = triangulate(reconstructedPoint, cameraMatricesSubset,
+//                                                                    pointsOnEachCameraSubset);
+//                     if (bestReprojection > projectionErrorSubset)
+//                     {
+//                         bestReprojection = projectionErrorSubset;
+//                         bestReprojectionIndex = i;
+//                     }
+// std::cout << bestReprojectionIndex << " " << bestReprojection << " vs. " << projectionError << "\n" << std::endl;
+//                 }
+//             }
 
             #ifdef USE_CERES
-                const auto projectionErrorLinear = calcReprojectionError(reconstructedPoint, cameraMatrices, pointsOnEachCamera);
                 // Empirically detected that reprojection error (for 4 cameras) only minimizes the error if initial
                 // project error > ~2.5, and that it improves more the higher that error actually is
                 // Therefore, we disable it for already accurate samples in order to get both:
                 //     - Speed
                 //     - Accuracy for already accurate samples
-                if (projectionErrorLinear > 3.0
-                    && projectionErrorLinear < 1.5*reprojectionMaxAcceptable)
+                if (projectionError > 3.0
+                    && projectionError < 1.5*reprojectionMaxAcceptable)
                 {
                     // Slow equivalent: double paramX[3]; paramX[i] = reconstructedPoint.at<double>(i);
                     double* paramX = (double*)reconstructedPoint.data;
@@ -223,9 +249,9 @@ namespace op
                     // if (summary.initial_cost > summary.final_cost)
                     //     std::cout << summary.FullReport() << "\n";
 
+                    projectionError = calcReprojectionError(reconstructedPoint, cameraMatrices, pointsOnEachCamera);
                     // const auto reprojectionErrorDecrease = std::sqrt((summary.initial_cost - summary.final_cost)
                     //                                      / double(cameraMatrices.size()));
-                    // return reprojectionErrorDecrease;
                 }
             #else
                 UNUSED(reprojectionMaxAcceptable);
@@ -246,7 +272,7 @@ namespace op
             //               << cv::norm(reconstructedPoint-triangCoords4D) << "\n" << std::endl;
             // }
 
-            return calcReprojectionError(reconstructedPoint, cameraMatrices, pointsOnEachCamera);
+            return projectionError;
         }
         catch (const std::exception& e)
         {
