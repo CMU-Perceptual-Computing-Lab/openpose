@@ -309,7 +309,7 @@ namespace op
             // Initialization (e.g., first frame)
             const bool fastVersion = false;
             const bool freezeMissing = true;
-            const bool ceresDisplayReport = false;
+            const bool ceresDisplayReport = true;
             // Fill Datum
             if (!spImpl->mInitialized || !fastVersion)
             {

@@ -36,8 +36,8 @@
 
 
 ## Latest Features
-- Jun 2018: [**Combined body-foot model released! Faster and more accurate.**](doc/installation.md)!
-- Jun 2018: [**Python version**](doc/calibration_demo.md) released!
+- Jun 2018: [**Combined body-foot model released! Faster and more accurate**](doc/installation.md)!
+- Jun 2018: [**Python API**](doc/calibration_demo.md) released!
 - Jun 2018: [**AMD graphic card version**](doc/calibration_demo.md) released!
 - Jun 2018: [**Calibration toolbox**](doc/calibration_demo.md) released!
 - Jun 2018: [**Mac OSX version (CPU)**](doc/installation.md) released!

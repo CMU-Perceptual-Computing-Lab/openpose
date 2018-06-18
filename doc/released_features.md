@@ -1,7 +1,8 @@
 OpenPose Library - Latest Released Features
 ====================================
 
-- Jun 2018: [**Combined body-foot model released! Faster and more accurate.**](./installation.md)!
+- Jun 2018: [**Combined body-foot model released! Faster and more accurate**](./installation.md)!
+- Jun 2018: [**Python API**](./calibration_demo.md) released!
 - Jun 2018: [**AMD graphic card version**](./calibration_demo.md) released!
 - Jun 2018: [**Calibration toolbox**](./calibration_demo.md) released!
 - Jun 2018: [**Mac OSX version (CPU)**](./installation.md) released!
