@@ -897,3 +897,96 @@ private:
 	std::map<int, int> map_regressor_to_constraint;
 	const bool fit_face_exp;
 };
+
+class AdamFaceCost: public ceres::CostFunction
+{
+public:
+	AdamFaceCost(const TotalModel& adam, const smpl::SMPLParams& frame_param, const Eigen::MatrixXd& faceJoints):
+		adam_(adam), frame_param_(frame_param), faceJoints_(faceJoints), m_nResiduals(3 * adam_.m_correspond_adam2face70_face70Idx.size()),
+			meanVert(adam_.m_correspond_adam2face70_face70Idx.size(), 3), transforms_joint(TotalModel::NUM_JOINTS * 3 * 5), dVdfc(adam_.m_correspond_adam2face70_face70Idx.size() * 3, TotalModel::NUM_EXP_BASIS_COEFFICIENTS)
+	{
+		CostFunction::set_num_residuals(m_nResiduals);
+		auto parameter_block_sizes = CostFunction::mutable_parameter_block_sizes();
+		parameter_block_sizes->clear();
+		parameter_block_sizes->push_back(TotalModel::NUM_EXP_BASIS_COEFFICIENTS);
+
+		// setup parent indexes, for fast LBS jacobian computation
+		parentIndexes[0].clear();
+		parentIndexes[0].push_back(0);
+		for(auto i = 0u; i < TotalModel::NUM_JOINTS; i++)
+		{
+            parentIndexes[i] = std::vector<int>(1, i);
+            while (parentIndexes[i].back() != 0)
+                parentIndexes[i].emplace_back(adam_.m_parent[parentIndexes[i].back()]);
+            std::sort(parentIndexes[i].begin(), parentIndexes[i].end());
+        }
+
+		// forward kinematics
+		using namespace Eigen;
+	    Matrix<double, TotalModel::NUM_JOINTS, 3, RowMajor> J;
+	    Map< Matrix<double, Dynamic, 1> > J_vec(J.data(), TotalModel::NUM_JOINTS * 3);
+	    J_vec = adam.J_mu_ + adam.dJdc_ * frame_param_.m_adam_coeffs;
+
+	    const double* p2t_parameters[2] = { frame_param_.m_adam_pose.data(), J.data() };
+	    double* p2t_residuals = transforms_joint.data();
+
+	    smpl::PoseToTransform_AdamFull_withDiff p2t(adam_, parentIndexes, false);
+	    p2t.Evaluate(p2t_parameters, p2t_residuals, nullptr );
+
+	    // LBS for the face vertices
+	    total_vertex.clear();
+		for (int r = 0; r < adam_.m_correspond_adam2face70_adamIdx.rows(); ++r)
+		{
+			const int adamVertexIdx = adam_.m_correspond_adam2face70_adamIdx(r);
+			total_vertex.push_back(adamVertexIdx);
+		}
+
+	    select_lbs(frame_param_.m_adam_coeffs.data(), transforms_joint, meanVert);
+
+        std::fill(dVdfc.data(),
+                  dVdfc.data() + 3 * total_vertex.size() * TotalModel::NUM_EXP_BASIS_COEFFICIENTS,
+                  0.0);
+	    const double* face_basis_data = adam_.m_dVdFaceEx.data();
+        const int nrow = adam_.m_dVdFaceEx.rows();
+        const int ncolc = TotalModel::NUM_EXP_BASIS_COEFFICIENTS;
+	    for (auto i = 0u; i < total_vertex.size(); ++i)  // precompute the jacobian w.r.t face coefficients
+	    {
+	        const int idv = total_vertex[i];
+		    for (int idj = 0; idj < TotalModel::NUM_JOINTS; idj++)
+		    {	    	
+	            const double w = adam_.m_blendW(idv, idj);
+	            if (w)
+	            {
+		            const auto* const Trow_data = transforms_joint.data() + 12 * idj;
+		            double* dVdfc_row0 = dVdfc.data() + (i * 3 + 0) * ncolc;
+		            double* dVdfc_row1 = dVdfc.data() + (i * 3 + 1) * ncolc;
+		            double* dVdfc_row2 = dVdfc.data() + (i * 3 + 2) * ncolc;
+		            for (int idc = 0; idc < TotalModel::NUM_EXP_BASIS_COEFFICIENTS; idc++) {
+		                dVdfc_row0[idc] += w * (face_basis_data[idc * nrow + idv * 3 + 0] * Trow_data[0 * 4 + 0] + face_basis_data[idc * nrow + idv * 3 + 1] * Trow_data[0 * 4 + 1] + face_basis_data[idc * nrow + idv * 3 + 2] * Trow_data[0 * 4 + 2]);
+		                dVdfc_row1[idc] += w * (face_basis_data[idc * nrow + idv * 3 + 0] * Trow_data[1 * 4 + 0] + face_basis_data[idc * nrow + idv * 3 + 1] * Trow_data[1 * 4 + 1] + face_basis_data[idc * nrow + idv * 3 + 2] * Trow_data[1 * 4 + 2]);
+		                dVdfc_row2[idc] += w * (face_basis_data[idc * nrow + idv * 3 + 0] * Trow_data[2 * 4 + 0] + face_basis_data[idc * nrow + idv * 3 + 1] * Trow_data[2 * 4 + 1] + face_basis_data[idc * nrow + idv * 3 + 2] * Trow_data[2 * 4 + 2]);
+		            }
+		        }
+	        }
+	    }
+	}
+
+	virtual bool Evaluate(double const* const* parameters, double* residuals, double** jacobians) const;
+
+	void select_lbs(
+	    const double* c,
+	    const Eigen::VectorXd& T,  // transformation
+	    MatrixXdr &outVert
+	) const;
+
+private:
+	const TotalModel& adam_;
+	const smpl::SMPLParams& frame_param_;
+	const Eigen::MatrixXd& faceJoints_;
+	const int m_nResiduals;
+	std::array<std::vector<int>, TotalModel::NUM_JOINTS> parentIndexes;
+	std::vector<int> total_vertex; // all vertices that needs to be computed
+	MatrixXdr meanVert;  // mean vertex when face coeff is 0
+    Eigen::VectorXd transforms_joint;
+    MatrixXdr dVdfc;
+};

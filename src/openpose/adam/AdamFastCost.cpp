@@ -1445,3 +1445,108 @@ void AdamFullCost::SparseRegress(const Eigen::SparseMatrix<double>& reg, const d
         }
     }
 }
+
+// LBS w/o jacobian
+void AdamFaceCost::select_lbs(
+    const double* c,
+    const Eigen::VectorXd& T,  // transformation
+    MatrixXdr &outVert
+) const
+{
+    // read adam model and total_vertex from the class member
+    using namespace Eigen;
+    assert((unsigned int)meanVert.rows() == total_vertex.size());
+    const double* dV0dc_data = adam_.m_shapespace_u.data();
+    const double* meanshape_data = adam_.m_meanshape.data();
+
+    for (auto i = 0u; i < total_vertex.size(); i++)
+    {
+        const int idv = total_vertex[i];
+        // compute the default vertex, v0 is a column vector
+        // The following lines are equivalent to
+        // MatrixXd v0 = fit_data_.adam.m_meanshape.block(3 * idv, 0, 3, 1) + fit_data_.adam.m_shapespace_u.block(3 * idv, 0, 3, TotalModel::NUM_SHAPE_COEFFICIENTS) * c_bodyshape;
+        MatrixXd v0(3, 1);
+        auto* v0_data = v0.data();
+        v0_data[0] = meanshape_data[3 * idv + 0];
+        v0_data[1] = meanshape_data[3 * idv + 1];
+        v0_data[2] = meanshape_data[3 * idv + 2];
+        const int nrow = adam_.m_shapespace_u.rows();
+        for(int ic = 0; ic < TotalModel::NUM_SHAPE_COEFFICIENTS; ic++)
+        {
+            v0_data[0] += dV0dc_data[ic * nrow + 3 * idv + 0] * c[ic];
+            v0_data[1] += dV0dc_data[ic * nrow + 3 * idv + 1] * c[ic];
+            v0_data[2] += dV0dc_data[ic * nrow + 3 * idv + 2] * c[ic];
+        }
+
+        auto* outVrow_data = outVert.data() + 3 * i;
+        outVrow_data[0] = outVrow_data[1] = outVrow_data[2] = 0;
+        for (int idj = 0; idj < TotalModel::NUM_JOINTS; idj++)
+        {
+            const double w = adam_.m_blendW(idv, idj);
+            if (w)
+            {
+                const auto* const Trow_data = T.data() + 12 * idj;
+                outVrow_data[0] += w * (Trow_data[0] * v0_data[0] + Trow_data[1] * v0_data[1] + Trow_data[2] * v0_data[2] + Trow_data[3]);
+                outVrow_data[1] += w * (Trow_data[4] * v0_data[0] + Trow_data[5] * v0_data[1] + Trow_data[6] * v0_data[2] + Trow_data[7]);
+                outVrow_data[2] += w * (Trow_data[8] * v0_data[0] + Trow_data[9] * v0_data[1] + Trow_data[10] * v0_data[2] + Trow_data[11]);
+            }
+        }
+        outVrow_data[0] += frame_param_.m_adam_t.data()[0];  // plus global translation
+        outVrow_data[1] += frame_param_.m_adam_t.data()[1];  // plus global translation
+        outVrow_data[2] += frame_param_.m_adam_t.data()[2];  // plus global translation
+    }
+}
+
+bool AdamFaceCost::Evaluate(double const* const* parameters, double* residuals, double** jacobians) const
+{
+    using namespace Eigen;
+    const double* const fc = parameters[0];
+    const double* face_basis_data = adam_.m_dVdFaceEx.data();  // PCA basis
+    const int nrow = adam_.m_dVdFaceEx.rows();
+    const double* const faceJoints_data = faceJoints_.data();
+
+    for (auto i = 0u; i < total_vertex.size(); ++i)
+    {
+        const int face70Idx = adam_.m_correspond_adam2face70_face70Idx(i);
+        if (faceJoints_data[5 * face70Idx + 0] == 0 && faceJoints_data[5 * face70Idx + 1] == 0 && faceJoints_data[5 * face70Idx + 2] == 0)
+        {
+            std::fill(residuals + 3 * i, residuals + 3 * (i + 1), 0.0);
+            continue;
+        }
+
+        const int idv = total_vertex[i];
+        const auto* const v0_data = meanVert.data() + 3 * i;
+        auto* vt_data = residuals + 3 * i;
+        vt_data[0] = v0_data[0]; vt_data[1] = v0_data[1]; vt_data[2] = v0_data[2];
+
+        Vector3d vf;  // vertex component from face coefficients
+        auto* vf_data = vf.data();
+        vf_data[0] = vf_data[1] = vf_data[2] = 0.0;
+        for(int ic = 0; ic < TotalModel::NUM_EXP_BASIS_COEFFICIENTS; ic++)
+        {
+            vf_data[0] += face_basis_data[ic * nrow + 3 * idv + 0] * fc[ic];
+            vf_data[1] += face_basis_data[ic * nrow + 3 * idv + 1] * fc[ic];
+            vf_data[2] += face_basis_data[ic * nrow + 3 * idv + 2] * fc[ic];
+        }
+        for (int idj = 0; idj < TotalModel::NUM_JOINTS; idj++)
+        {
+            const double w = adam_.m_blendW(idv, idj);
+            if (w)
+            {
+                const auto* const Trow_data = transforms_joint.data() + 12 * idj;
+                vt_data[0] += w * (Trow_data[0] * vf_data[0] + Trow_data[1] * vf_data[1] + Trow_data[2] * vf_data[2]);
+                vt_data[1] += w * (Trow_data[4] * vf_data[0] + Trow_data[5] * vf_data[1] + Trow_data[6] * vf_data[2]);
+                vt_data[2] += w * (Trow_data[8] * vf_data[0] + Trow_data[9] * vf_data[1] + Trow_data[10] * vf_data[2]);
+            }
+        }
+
+        vt_data[0] -= faceJoints_data[5 * face70Idx + 0];
+        vt_data[1] -= faceJoints_data[5 * face70Idx + 1];
+        vt_data[2] -= faceJoints_data[5 * face70Idx + 2];
+    }
+
+    if (jacobians && jacobians[0])
+        std::copy(dVdfc.data(), dVdfc.data() + 3 * total_vertex.size() * TotalModel::NUM_EXP_BASIS_COEFFICIENTS, jacobians[0]);
+
+    return true;
+}
