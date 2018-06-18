@@ -885,6 +885,7 @@ namespace op
                                      || (wrapperStructOutput.displayMode == DisplayMode::DisplayAll
                                          && wrapperStructExtra.ikThreads > 0);
             spWJointAngleEstimations.clear();
+#ifdef USE_3D_ADAM_MODEL
             if (wrapperStructExtra.ikThreads > 0)
             {
                 spWJointAngleEstimations.resize(wrapperStructExtra.ikThreads);
@@ -899,18 +900,21 @@ namespace op
                         jointAngleEstimation)};
                 }
             }
+#endif
 
             // Output workers
             mOutputWs.clear();
             if (spWJointAngleEstimations.size() > 1u)
                 mOutputWs.emplace_back(std::make_shared<WQueueOrderer<TDatumsPtr>>());
             // Send information (e.g., to Unity) though UDP client-server communication
+#ifdef USE_3D_ADAM_MODEL
             if (!wrapperStructOutput.udpHost.empty() && !wrapperStructOutput.udpPort.empty())
             {
                 const auto udpSender = std::make_shared<UdpSender>(wrapperStructOutput.udpHost,
                                                                    wrapperStructOutput.udpPort);
                 mOutputWs.emplace_back(std::make_shared<WUdpSender<TDatumsPtr>>(udpSender));
             }
+#endif
             // Write people pose data on disk (json for OpenCV >= 3, xml, yml...)
             if (!writeKeypointCleaned.empty())
             {
@@ -975,6 +979,7 @@ namespace op
                 mOutputWs.emplace_back(std::make_shared<WVideoSaver<TDatumsPtr>>(videoSaver));
             }
             // Write joint angles as *.bvh file on hard disk
+#ifdef USE_3D_ADAM_MODEL
             if (!wrapperStructOutput.writeBvh.empty())
             {
                 const auto bvhSaver = std::make_shared<BvhSaver>(
@@ -982,6 +987,7 @@ namespace op
                 );
                 mOutputWs.emplace_back(std::make_shared<WBvhSaver<TDatumsPtr>>(bvhSaver));
             }
+#endif
             // Write heat maps as desired image format on hard disk
             if (!writeHeatMapsCleaned.empty())
             {
@@ -1015,6 +1021,7 @@ namespace op
                 // Adam (+3-D/2-D) display
                 if (displayAdam)
                 {
+#ifdef USE_3D_ADAM_MODEL
                     // Gui
                     const auto gui = std::make_shared<GuiAdam>(
                         finalOutputSize, wrapperStructOutput.fullScreen, mThreadManager.getIsRunningSharedPtr(),
@@ -1024,6 +1031,7 @@ namespace op
                     );
                     // WGui
                     spWGui = {std::make_shared<WGuiAdam<TDatumsPtr>>(gui)};
+#endif
                 }
                 // 3-D (+2-D) display
                 else if (wrapperStructOutput.displayMode == DisplayMode::Display3D

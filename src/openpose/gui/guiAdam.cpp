@@ -1,4 +1,5 @@
 #ifdef USE_3D_ADAM_MODEL
+#ifdef USE_3D_ADAM_MODEL
     #include <adam/KinematicModel.h>
     #include <adam/Renderer.h>
     #include <adam/utils.h>
@@ -285,3 +286,4 @@ namespace op
         }
     }
 }
+#endif
