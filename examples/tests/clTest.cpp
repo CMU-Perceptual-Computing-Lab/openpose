@@ -215,7 +215,7 @@ int clTest()
 }
 #endif
 
-int main(int argc, char *argv[])
+int main()
 {
 #ifdef USE_OPENCL
     // Parsing command line flags
