@@ -165,9 +165,9 @@ namespace op
 
             // Basic triangulation
             triangulate(reconstructedPoint, cameraMatrices, pointsOnEachCamera);
-            const auto projectionErrorLinear = calcReprojectionError(reconstructedPoint, cameraMatrices, pointsOnEachCamera);
 
             #ifdef USE_CERES
+                const auto projectionErrorLinear = calcReprojectionError(reconstructedPoint, cameraMatrices, pointsOnEachCamera);
                 // Empirically detected that reprojection error (for 4 cameras) only minimizes the error if initial
                 // project error > ~2.5, and that it improves more the higher that error actually is
                 // Therefore, we disable it for already accurate samples in order to get both:
@@ -227,6 +227,8 @@ namespace op
                     //                                      / double(cameraMatrices.size()));
                     // return reprojectionErrorDecrease;
                 }
+            #else
+                UNUSED(reprojectionMaxAcceptable);
             #endif
             // assert(reconstructedPoint.at<double>(3) == 1.);
 

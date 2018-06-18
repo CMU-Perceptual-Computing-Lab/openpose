@@ -17,7 +17,7 @@
 ## Features
 - **Functionality**:
     - **2D real-time multi-person keypoint detection**:
-        - 15 or **18-keypoint body keypoint estimation**. **Running time invariant to number of detected people**.
+        - 15 or 18 or **25-keypoint body/foot keypoint estimation**. **Running time invariant to number of detected people**.
         - **2x21-keypoint hand keypoint estimation**. Currently, **running time depends** on **number of detected people**.
         - **70-keypoint face keypoint estimation**. Currently, **running time depends** on **number of detected people**.
     - **3D real-time multi-person keypoint detection**:
@@ -36,9 +36,13 @@
 
 
 ## Latest Features
-- Jun 2018: [**Mac OSX version (CPU)**](doc/installation.md)!
+- Jun 2018: [**Combined body-foot model released! Faster and more accurate.**](doc/installation.md)!
+- Jun 2018: [**Python version**](doc/calibration_demo.md) released!
+- Jun 2018: [**AMD graphic card version**](doc/calibration_demo.md) released!
+- Jun 2018: [**Calibration toolbox**](doc/calibration_demo.md) released!
+- Jun 2018: [**Mac OSX version (CPU)**](doc/installation.md) released!
 - Mar 2018: [**CPU version**](doc/installation.md#cpu-version)!
-- Mar 2018: Improved [**3-D keypoint reconstruction module**](doc/3d_reconstruction_demo.md) (from multiple camera views)!
+- Mar 2018: [**3-D keypoint reconstruction module**](doc/3d_reconstruction_demo.md) (from multiple camera views)!
 - Sep 2017: [**CMake**](doc/installation.md) installer and **IP camera** support!
 - Jul 2017: [**Windows portable binaries and demo**](https://github.com/CMU-Perceptual-Computing-Lab/openpose/releases)!
 - Jul 2017: **Hands** released!

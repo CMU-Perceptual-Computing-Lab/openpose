@@ -205,7 +205,7 @@ if (UNIX AND NOT APPLE)
   option(WITH_CERES "Add Ceres support for advanced 3-D reconstruction." OFF)
 endif (UNIX AND NOT APPLE)
 option(WITH_FLIR_CAMERA "Add FLIR (formerly Point Grey) camera code (requires Spinnaker SDK already installed)." OFF)
-option(WITH_3D_ADAM_MODEL "Add 3-D Adam model (requires OpenGL, Ceres, Eigen, OpenMP, FreeImage, GLEW, and IGL already installed)." OFF)
+# option(WITH_3D_ADAM_MODEL "Add 3-D Adam model (requires OpenGL, Ceres, Eigen, OpenMP, FreeImage, GLEW, and IGL already installed)." OFF)
 
 # Set the acceleration library
 if (WIN32 OR APPLE)
@@ -229,7 +229,7 @@ option(DOWNLOAD_FACE_MODEL "Download face model." ON)
 option(DOWNLOAD_HAND_MODEL "Download hand model." ON)
 
 # Asio
-option(USE_ASIO "Include Asio header-only library." OFF)
+# option(USE_ASIO "Include Asio header-only library." OFF)
 
 # More options
 option(BUILD_EXAMPLES "Build OpenPose examples." ON)
