@@ -220,8 +220,9 @@ namespace op
         try
         {
             // Security checks
-            if (!poseKeypoints3D.empty() && poseKeypoints3D.getSize(1) != 19 && poseKeypoints3D.getSize(1) != 25)
-                error("Only working for BODY_19 or BODY_25/BODY_25_19 (#parts = "
+            if (!poseKeypoints3D.empty() && poseKeypoints3D.getSize(1) != 19 && poseKeypoints3D.getSize(1) != 25
+                 && poseKeypoints3D.getSize(1) != 65)
+                error("Only working for BODY_19 or BODY_25/BODY_25_19 or BODY_65 (#parts = "
                       + std::to_string(poseKeypoints3D.getSize(2)) + ").",
                       __LINE__, __FUNCTION__, __FILE__);
             // Shorter naming
@@ -244,12 +245,35 @@ namespace op
                                    &poseKeypoints3D[{0, part, 0}],
                                    mapOPToAdam(part));
                 // Update left/right hand
-                for (auto hand = 0u ; hand < handKeypoints3D.size(); hand++)
-                    if (!handKeypoints3D.at(hand).empty())
-                        for (auto part = 0 ; part < handKeypoints3D[hand].getSize(1); part++)
-                            updateKeypoint((hand == 0 ? spImpl->mLHandJoints : spImpl->mRHandJoints),
-                                           &handKeypoints3D[hand][{0, part, 0}],
-                                           part);
+                if (poseKeypoints3D.getSize(1) == 65)
+                {
+                    // Wrists
+                    updateKeypoint(spImpl->mLHandJoints,
+                                   &poseKeypoints3D[{0, 7, 0}],
+                                   0);
+                    updateKeypoint(spImpl->mRHandJoints,
+                                   &poseKeypoints3D[{0, 4, 0}],
+                                   0);
+                    // Left
+                    for (auto part = 0 ; part < 20; part++)
+                        updateKeypoint(spImpl->mLHandJoints,
+                                       &poseKeypoints3D[{0, part+25, 0}],
+                                       part+1);
+                    // Right
+                    for (auto part = 0 ; part < 20; part++)
+                        updateKeypoint(spImpl->mRHandJoints,
+                                       &poseKeypoints3D[{0, part+25+20, 0}],
+                                       part+1);
+                }
+                else
+                {
+                    for (auto hand = 0u ; hand < handKeypoints3D.size(); hand++)
+                        if (!handKeypoints3D.at(hand).empty())
+                            for (auto part = 0 ; part < handKeypoints3D[hand].getSize(1); part++)
+                                updateKeypoint((hand == 0 ? spImpl->mLHandJoints : spImpl->mRHandJoints),
+                                               &handKeypoints3D[hand][{0, part, 0}],
+                                               part);
+                }
                 // Update Foot data
                 if (poseKeypoints3D.getSize(1) == 25)
                 {
@@ -272,9 +296,9 @@ namespace op
                                        part);
                 // Meters --> cm
                 spImpl->mBodyJoints *= 1e2;
-                if (!handKeypoints3D.at(0).empty())
+                if (!handKeypoints3D.at(0).empty() || poseKeypoints3D.getSize(1) == 65)
                     spImpl->mLHandJoints *= 1e2;
-                if (!handKeypoints3D.at(1).empty())
+                if (!handKeypoints3D.at(1).empty() || poseKeypoints3D.getSize(1) == 65)
                     spImpl->mRHandJoints *= 1e2;
                 if (!faceKeypoints3D.empty())
                     spImpl->mFaceJoints *= 1e2;
@@ -284,7 +308,7 @@ namespace op
 
             // Initialization (e.g., first frame)
             const bool fastVersion = false;
-            const bool freezeMissing = false;
+            const bool freezeMissing = true;
             const bool ceresDisplayReport = false;
             // Fill Datum
             if (!spImpl->mInitialized || !fastVersion)
@@ -304,9 +328,9 @@ namespace op
                 // it would use the latest ones from the last Adam_FastFit
                 // Fit initialization
                 // Adam_FastFit_Initialize only changes frameParams
-                const auto handEnabled = !handKeypoints3D[0].empty() || !handKeypoints3D[1].empty();
-                const auto fitFaceExponents = !faceKeypoints3D.empty();
                 const auto multistageFitting = true;
+                const auto handEnabled = !handKeypoints3D[0].empty() || !handKeypoints3D[1].empty() || poseKeypoints3D.getSize(1) == 65;
+                const auto fitFaceExponents = !faceKeypoints3D.empty();
                 const auto fastSolver = true;
                 Adam_FastFit_Initialize(*spImpl->spTotalModel, frameParams, spImpl->mBodyJoints, spImpl->mRFootJoints,
                                         spImpl->mLFootJoints, spImpl->mRHandJoints, spImpl->mLHandJoints,
