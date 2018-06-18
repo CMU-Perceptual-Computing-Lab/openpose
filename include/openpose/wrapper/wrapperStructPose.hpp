@@ -82,8 +82,8 @@ namespace op
 
         /**
          * Pose model, it affects the number of body parts to render
-         * Select PoseModel::COCO_18 for 18 body-part COCO, PoseModel::MPI_15 for 15 body-part MPI, PoseModel::MPI_15_4
-         * for faster version of MPI, etc.).
+         * Select PoseModel::BODY_25 for 25 body-part COCO + foot model; PoseModel::COCO_18 for 18 body-part COCO;
+         * PoseModel::MPI_15 for 15 body-part MPI; PoseModel::MPI_15_4 for faster version of MPI; etc..
          */
         PoseModel poseModel;
 
@@ -168,32 +168,6 @@ namespace op
         bool enableGoogleLogging;
 
         /**
-         * Whether to run the 3-D reconstruction demo, i.e.,
-         * 1) Reading from a stereo camera system.
-         * 2) Performing 3-D reconstruction from the multiple views.
-         * 3) Displaying 3-D reconstruction results.
-         */
-        bool reconstruct3d;
-
-        /**
-         * Minimum number of views required to reconstruct each keypoint.
-         * By default (-1), it will require all the cameras to see the keypoint in order to reconstruct it.
-         */
-        int minViews3d;
-
-        /**
-         * Whether to return a person ID for each body skeleton, providing temporal consistency.
-         */
-        bool identification;
-
-        /**
-         * Whether to enable people tracking across frames. The value indicates the number of frames where tracking
-         * is run between each OpenPose keypoint detection. Select -1 (default) to disable it or 0 to run
-         * simultaneously OpenPose keypoint detector and tracking for potentially higher accurary than only OpenPose.
-         */
-        int tracking;
-
-        /**
          * Constructor of the struct.
          * It has the recommended and default values we recommend for each element of the struct.
          * Since all the elements of the struct are public, they can also be manually filled.
@@ -203,16 +177,14 @@ namespace op
                           const ScaleMode keypointScale = ScaleMode::InputResolution,
                           const int gpuNumber = -1, const int gpuNumberStart = 0, const int scalesNumber = 1,
                           const float scaleGap = 0.15f, const RenderMode renderMode = RenderMode::None,
-                          const PoseModel poseModel = PoseModel::COCO_18, const bool blendOriginalFrame = true,
+                          const PoseModel poseModel = PoseModel::BODY_25, const bool blendOriginalFrame = true,
                           const float alphaKeypoint = POSE_DEFAULT_ALPHA_KEYPOINT,
                           const float alphaHeatMap = POSE_DEFAULT_ALPHA_HEAT_MAP,
                           const int defaultPartToRender = 0, const std::string& modelFolder = "models/",
                           const std::vector<HeatMapType>& heatMapTypes = {},
                           const ScaleMode heatMapScale = ScaleMode::ZeroToOne, const bool addPartCandidates = false,
                           const float renderThreshold = 0.05f, const int numberPeopleMax = -1,
-                          const bool enableGoogleLogging = true, const bool reconstruct3d = false,
-                          const int minViews3d = -1, const bool identification = false,
-                          const int tracking = -1);
+                          const bool enableGoogleLogging = true);
     };
 }
 

@@ -2,7 +2,7 @@
 #include <numeric> // std::accumulate
 #include <thread>
 #include <opencv2/core/core.hpp>
-#ifdef WITH_EIGEN
+#ifdef USE_EIGEN
     #include <Eigen/Dense>
     #include <opencv2/core/eigen.hpp>
 #endif
@@ -41,7 +41,7 @@ namespace op
         }
     };
 
-    #ifdef WITH_EIGEN
+    #ifdef USE_EIGEN
         struct Extrinsics
         {
             Eigen::Matrix3d Rotation;
@@ -249,7 +249,7 @@ namespace op
         }
     }
 
-    #ifdef WITH_EIGEN
+    #ifdef USE_EIGEN
         cv::Mat getRodriguesVector(const Eigen::Matrix3d& rotationMatrix)
         {
             try
@@ -311,7 +311,7 @@ namespace op
                 if (maxElement - minElement >= PI)
                 {
                     resultIsOK = {false};
-                    error("There are outliers in the angles.", __LINE__, __FUNCTION__, __FILE__);
+                    log("There are outliers in the angles.", Priority::High);
                 }
 
                 // If the difference between them is <= 180 degrees, then we just return the traditional average.
@@ -383,8 +383,8 @@ namespace op
                 {
                     const auto pairAverageAngle = estimateAverageAngle(rotationVectors.at(i));
                     if (!pairAverageAngle.first)
-                        error("Outlies in the result. Something went wrong when estimating the average of different"
-                              " projection matrices.", __LINE__, __FUNCTION__, __FILE__);
+                        log("Outlies in the result. Something went wrong when estimating the average of different"
+                              " projection matrices.", Priority::High);
                     rotationVector.at<double>(i,0) = {pairAverageAngle.second};
                 }
                 cv::Mat rotationMatrix;
@@ -967,7 +967,7 @@ namespace op
     {
         try
         {
-            #ifdef WITH_EIGEN
+            #ifdef USE_EIGEN
                 // For debugging
                 const auto coutResults = false;
                 // const auto coutResults = true;
@@ -1174,7 +1174,7 @@ namespace op
                 UNUSED(index1);
                 UNUSED(imagesAreUndistorted);
                 UNUSED(combineCam0Extrinsics);
-                error("CMake flag `WITH_EIGEN` required when compiling OpenPose`.", __LINE__, __FUNCTION__, __FILE__);
+                error("CMake flag `USE_EIGEN` required when compiling OpenPose`.", __LINE__, __FUNCTION__, __FILE__);
             #endif
         }
         catch (const std::exception& e)

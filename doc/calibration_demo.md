@@ -36,12 +36,11 @@ Note: In order to maximize calibration quality, **do not reuse the same video se
 6. Extrinsics: Recommended at least 250 images per camera for high quality calibration.
 
 ### Step 1 - Distortion and Intrinsic Parameter Calibration
-1. Run OpenPose and save images for your desired camera. Use a grid (chessboard) pattern and move around all the image area.
-    2. Changing image source:
-        1. Webcam calibration: `./build/examples/openpose/openpose.bin --num_gpu 0 --frame_keep_distortion --write_images {intrinsic_images_folder_path}`.
-        2. Flir camera calibration: Add the flags `--flir_camera --flir_camera_index 0` (or the desired flir camera index) to the webcam command.
-        3. Calibration from video sequence: Add the flag `--video {video_path}` to the webcam command.
-        4. Any other camera brand: Simply save your images in {intrinsic_images_folder_path}, file names are not relevant.
+1. Run OpenPose and save images for your desired camera. Use a grid (chessboard) pattern and move around all the image area. Depending on the images source:
+    1. Webcam calibration: `./build/examples/openpose/openpose.bin --num_gpu 0 --frame_keep_distortion --write_images {intrinsic_images_folder_path}`.
+    2. Flir camera calibration: Add the flags `--flir_camera --flir_camera_index 0` (or the desired flir camera index) to the webcam command.
+    3. Calibration from video sequence: Add the flag `--video {video_path}` to the webcam command.
+    4. Any other camera brand: Simply save your images in {intrinsic_images_folder_path}, file names are not relevant.
 2. Get familiar with the calibration parameters used in point 3 (i.e., `grid_square_size_mm`, `grid_number_inner_corners`, etc.) by running the `--help` flag:
 ```
 ./build/examples/calibration/calibration.bin --help

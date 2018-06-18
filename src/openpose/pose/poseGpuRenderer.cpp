@@ -108,17 +108,9 @@ namespace op
                         // Parameters
                         const auto& heatMapSizes = spPoseExtractorNet->getHeatMapSize();
                         const Point<int> heatMapSize{heatMapSizes[3], heatMapSizes[2]};
-                        // Draw specific body part or bkg
-                        if (elementRendered <= numberBodyPartsPlusBkg)
-                        {
-                            elementRenderedName = mPartIndexToName.at(elementRendered-1);
-                            renderPoseHeatMapGpu(*spGpuMemory, mPoseModel, frameSize,
-                                                 spPoseExtractorNet->getHeatMapGpuConstPtr(),
-                                                 heatMapSize, scaleNetToOutput * scaleInputToOutput, elementRendered,
-                                                 (mBlendOriginalFrame ? getAlphaHeatMap() : 1.f));
-                        }
-                        // Draw PAFs (Part Affinity Fields)
-                        else if (elementRendered == numberBodyPartsPlusBkg+1)
+                        // Add all heatmaps
+                        if (elementRendered == 2)
+                        // if (elementRendered == numberBodyPartsPlusBkg+1)
                         {
                             elementRenderedName = "Heatmaps";
                             renderPoseHeatMapsGpu(*spGpuMemory, mPoseModel, frameSize,
@@ -127,13 +119,26 @@ namespace op
                                                   (mBlendOriginalFrame ? getAlphaHeatMap() : 1.f));
                         }
                         // Draw PAFs (Part Affinity Fields)
-                        else if (elementRendered == numberBodyPartsPlusBkg+2)
+                        else if (elementRendered == 3)
+                        // else if (elementRendered == numberBodyPartsPlusBkg+2)
                         {
                             elementRenderedName = "PAFs (Part Affinity Fields)";
                             renderPosePAFsGpu(*spGpuMemory, mPoseModel, frameSize,
                                               spPoseExtractorNet->getHeatMapGpuConstPtr(),
                                               heatMapSize, scaleNetToOutput * scaleInputToOutput,
                                               (mBlendOriginalFrame ? getAlphaHeatMap() : 1.f));
+                        }
+                        // Draw specific body part or background
+                        else if (elementRendered <= numberBodyPartsPlusBkg+2)
+                        {
+                            const auto realElementRendered = (elementRendered == 1
+                                                                ? numberBodyPartsPlusBkg
+                                                                : elementRendered - 3);
+                            elementRenderedName = mPartIndexToName.at(realElementRendered-1);
+                            renderPoseHeatMapGpu(*spGpuMemory, mPoseModel, frameSize,
+                                                 spPoseExtractorNet->getHeatMapGpuConstPtr(),
+                                                 heatMapSize, scaleNetToOutput * scaleInputToOutput, realElementRendered,
+                                                 (mBlendOriginalFrame ? getAlphaHeatMap() : 1.f));
                         }
                         // Draw affinity between 2 body parts
                         else

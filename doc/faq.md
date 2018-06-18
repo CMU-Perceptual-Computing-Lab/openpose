@@ -21,7 +21,7 @@ OpenPose - Frequently Asked Question (FAQ)
 ### Out of Memory Error
 **Q: Out of memory error** - I get an error similar to: `Check failed: error == cudaSuccess (2 vs. 0)  out of memory`.
 
-**A**: Most probably cuDNN is not installed/enabled, the default Caffe model uses >12 GB of GPU memory, cuDNN reduces it to ~1.5 GB.
+**A**: Most probably cuDNN is not installed/enabled, the default Caffe model uses >12 GB of GPU memory, cuDNN reduces it to ~2 GB for BODY_25 and ~1.5 GB for COCO.
 
 
 

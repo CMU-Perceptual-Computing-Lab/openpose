@@ -1,6 +1,9 @@
 #ifndef OPENPOSE_CORE_DATUM_HPP
 #define OPENPOSE_CORE_DATUM_HPP
 
+#ifdef USE_EIGEN
+    #include <Eigen/Core>
+#endif
 #include <opencv2/core/core.hpp> // cv::Mat
 #include <openpose/core/common.hpp>
 
@@ -16,6 +19,10 @@ namespace op
     {
         // ---------------------------------------- ID parameters ---------------------------------------- //
         unsigned long long id; /**< Datum ID. Internally used to sort the Datums if multi-threading is used. */
+
+        unsigned long long subId; /**< Datum sub-ID. Internally used to sort the Datums if multi-threading is used. */
+
+        unsigned long long subIdMax; /**< Datum maximum sub-ID. Used to sort the Datums if multi-threading is used. */
 
         /**
          * Name used when saving the data to disk (e.g. `write_images` or `write_keypoint` flags in the demo).
@@ -228,6 +235,27 @@ namespace op
          */
         std::pair<int, std::string> elementRendered;
 
+        // 3D/Adam parameters
+        // Adam/Unity params
+        std::vector<double> adamPosePtr;
+        int adamPoseRows;
+        std::vector<double> adamTranslationPtr;
+        std::vector<double> vtVecPtr;
+        int vtVecRows;
+        std::vector<double> j0VecPtr;
+        int j0VecRows;
+        std::vector<double> adamFaceCoeffsExpPtr;
+        int adamFaceCoeffsExpRows;
+        #ifdef USE_EIGEN
+            // Adam/Unity params
+            Eigen::Matrix<double, 62, 3, Eigen::RowMajor> adamPose;
+            Eigen::Vector3d adamTranslation;
+            // Adam params (Jacobians)
+            Eigen::Matrix<double, Eigen::Dynamic, 1> vtVec;
+            Eigen::Matrix<double, Eigen::Dynamic, 1> j0Vec;
+            Eigen::VectorXd adamFaceCoeffsExp;
+        #endif
+
 
 
 
@@ -300,7 +328,8 @@ namespace op
          */
         inline bool operator<(const Datum& datum) const
         {
-            return id < datum.id;
+            // return id < datum.id;
+            return id < datum.id || (id == datum.id && subId < datum.subId);
         }
         /**
          * Greater comparison operator.
@@ -309,7 +338,8 @@ namespace op
          */
         inline bool operator>(const Datum& datum) const
         {
-            return id > datum.id;
+            // return id > datum.id;
+            return id > datum.id || (id == datum.id && subId > datum.subId);
         }
         /**
          * Less or equal comparison operator.
@@ -318,7 +348,8 @@ namespace op
          */
         inline bool operator<=(const Datum& datum) const
         {
-            return id <= datum.id;
+            // return id <= datum.id;
+            return id < datum.id || (id == datum.id && subId <= datum.subId);
         }
         /**
          * Greater or equal comparison operator.
@@ -327,7 +358,8 @@ namespace op
          */
         inline bool operator>=(const Datum& datum) const
         {
-            return id >= datum.id;
+            // return id >= datum.id;
+            return id > datum.id || (id == datum.id && subId >= datum.subId);
         }
         /**
          * Equal comparison operator.
@@ -336,7 +368,8 @@ namespace op
          */
         inline bool operator==(const Datum& datum) const
         {
-            return id == datum.id;
+            // return id == datum.id;
+            return id == datum.id && subId == datum.subId;
         }
         /**
          * Not equal comparison operator.
@@ -345,7 +378,8 @@ namespace op
          */
         inline bool operator!=(const Datum& datum) const
         {
-            return id != datum.id;
+            // return id != datum.id;
+            return id != datum.id || subId != datum.subId;
         }
     };
 

@@ -14,14 +14,14 @@ namespace op
         try
         {
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-            if (poseModeString == "COCO")
+            if (poseModeString == "BODY_25")
+                return PoseModel::BODY_25;
+            else if (poseModeString == "COCO")
                 return PoseModel::COCO_18;
             else if (poseModeString == "MPI")
                 return PoseModel::MPI_15;
             else if (poseModeString == "MPI_4_layers")
                 return PoseModel::MPI_15_4;
-            else if (poseModeString == "BODY_18")
-                return PoseModel::BODY_18;
             else if (poseModeString == "BODY_19")
                 return PoseModel::BODY_19;
             else if (poseModeString == "BODY_19b")
@@ -30,21 +30,23 @@ namespace op
                 return PoseModel::BODY_19N;
             else if (poseModeString == "BODY_19_X2")
                 return PoseModel::BODY_19_X2;
+            else if (poseModeString == "BODY_25_19")
+                return PoseModel::BODY_25_19;
             else if (poseModeString == "BODY_23")
                 return PoseModel::BODY_23;
-            else if (poseModeString == "BODY_25")
-                return PoseModel::BODY_25;
             else if (poseModeString == "BODY_59")
                 return PoseModel::BODY_59;
+            else if (poseModeString == "BODY_65")
+                return PoseModel::BODY_65;
             // else
-            error("String does not correspond to any model (COCO, MPI, MPI_4_layers)",
+            error("String does not correspond to any model (BODY_25, COCO, MPI, MPI_4_layers)",
                   __LINE__, __FUNCTION__, __FILE__);
-            return PoseModel::COCO_18;
+            return PoseModel::BODY_25;
         }
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return PoseModel::COCO_18;
+            return PoseModel::BODY_25;
         }
     }
 

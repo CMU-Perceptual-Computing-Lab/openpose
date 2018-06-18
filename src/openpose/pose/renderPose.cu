@@ -9,28 +9,31 @@ namespace op
     // PI digits: http://www.piday.org/million/
     __constant__ const float PI = 3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745f;
     // Keypoint pairs
+    __constant__ const unsigned int BODY_25_PAIRS_GPU[] = {POSE_BODY_25_PAIRS_RENDER_GPU};
     __constant__ const unsigned int COCO_PAIRS_GPU[] = {POSE_COCO_PAIRS_RENDER_GPU};
     __constant__ const unsigned int BODY_19_PAIRS_GPU[] = {POSE_BODY_19_PAIRS_RENDER_GPU};
     __constant__ const unsigned int BODY_19b_PAIRS_GPU[] = {POSE_BODY_19b_PAIRS_RENDER_GPU};
     __constant__ const unsigned int BODY_23_PAIRS_GPU[] = {POSE_BODY_23_PAIRS_RENDER_GPU};
-    __constant__ const unsigned int BODY_25_PAIRS_GPU[] = {POSE_BODY_25_PAIRS_RENDER_GPU};
     __constant__ const unsigned int BODY_59_PAIRS_GPU[] = {POSE_BODY_59_PAIRS_RENDER_GPU};
+    __constant__ const unsigned int BODY_65_PAIRS_GPU[] = {POSE_BODY_65_PAIRS_RENDER_GPU};
     __constant__ const unsigned int MPI_PAIRS_GPU[] = {POSE_MPI_PAIRS_RENDER_GPU};
     // Keypoint scales
+    __constant__ const float BODY_25_SCALES[] = {POSE_BODY_25_SCALES_RENDER_GPU};
     __constant__ const float COCO_SCALES[] = {POSE_COCO_SCALES_RENDER_GPU};
     __constant__ const float BODY_19_SCALES[] = {POSE_BODY_19_SCALES_RENDER_GPU};
     __constant__ const float BODY_19b_SCALES[] = {POSE_BODY_19b_SCALES_RENDER_GPU};
     __constant__ const float BODY_23_SCALES[] = {POSE_BODY_23_SCALES_RENDER_GPU};
-    __constant__ const float BODY_25_SCALES[] = {POSE_BODY_25_SCALES_RENDER_GPU};
     __constant__ const float BODY_59_SCALES[] = {POSE_BODY_59_SCALES_RENDER_GPU};
+    __constant__ const float BODY_65_SCALES[] = {POSE_BODY_65_SCALES_RENDER_GPU};
     __constant__ const float MPI_SCALES[] = {POSE_MPI_SCALES_RENDER_GPU};
     // RGB colors
+    __constant__ const float BODY_25_COLORS[] = {POSE_BODY_25_COLORS_RENDER_GPU};
     __constant__ const float COCO_COLORS[] = {POSE_COCO_COLORS_RENDER_GPU};
     __constant__ const float BODY_19_COLORS[] = {POSE_BODY_19_COLORS_RENDER_GPU};
     __constant__ const float BODY_19b_COLORS[] = {POSE_BODY_19b_COLORS_RENDER_GPU};
     __constant__ const float BODY_23_COLORS[] = {POSE_BODY_23_COLORS_RENDER_GPU};
-    __constant__ const float BODY_25_COLORS[] = {POSE_BODY_25_COLORS_RENDER_GPU};
     __constant__ const float BODY_59_COLORS[] = {POSE_BODY_59_COLORS_RENDER_GPU};
+    __constant__ const float BODY_65_COLORS[] = {POSE_BODY_65_COLORS_RENDER_GPU};
     __constant__ const float MPI_COLORS[] = {POSE_MPI_COLORS_RENDER_GPU};
 
 
@@ -274,6 +277,33 @@ namespace op
                         blendOriginalFrame, (googlyEyes ? 15 : -1), (googlyEyes ? 16 : -1));
     }
 
+    __global__ void renderPoseBody65(float* targetPtr, const int targetWidth, const int targetHeight,
+                                     const float* const posePtr, const int numberPeople, const float threshold,
+                                     const bool googlyEyes, const bool blendOriginalFrame, const float alphaColorToAdd)
+    {
+        const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
+        const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
+        const auto globalIdx = threadIdx.y * blockDim.x + threadIdx.x;
+
+        // Shared parameters
+        __shared__ float2 sharedMins[POSE_MAX_PEOPLE];
+        __shared__ float2 sharedMaxs[POSE_MAX_PEOPLE];
+        __shared__ float sharedScaleF[POSE_MAX_PEOPLE];
+
+        // Other parameters
+        const auto numberPartPairs = sizeof(BODY_65_PAIRS_GPU) / (2*sizeof(BODY_65_PAIRS_GPU[0]));
+        const auto numberScales = sizeof(BODY_65_SCALES) / sizeof(BODY_65_SCALES[0]);
+        const auto numberColors = sizeof(BODY_65_COLORS) / (3*sizeof(BODY_65_COLORS[0]));
+        const auto radius = fastMin(targetWidth, targetHeight) / 100.f;
+        const auto lineWidth = fastMin(targetWidth, targetHeight) / 120.f;
+
+        // Render key points
+        renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight,
+                        posePtr, BODY_65_PAIRS_GPU, numberPeople, 65, numberPartPairs, BODY_65_COLORS, numberColors,
+                        radius, lineWidth, BODY_65_SCALES, numberScales, threshold, alphaColorToAdd,
+                        blendOriginalFrame, (googlyEyes ? 15 : -1), (googlyEyes ? 16 : -1));
+    }
+
     __global__ void renderPoseMpi29Parts(float* targetPtr, const int targetWidth, const int targetHeight,
                                          const float* const posePtr, const int numberPeople, const float threshold,
                                          const bool blendOriginalFrame, const float alphaColorToAdd)
@@ -464,18 +494,23 @@ namespace op
         {
             if (numberPeople > 0 || !blendOriginalFrame)
             {
-                //framePtr      =   width * height * 3
-                //heatMapPtr    =   heatMapSize.x * heatMapSize.y * #body parts
-                //posePtr       =   3 (x,y,score) * #Body parts * numberPeople
-                if (googlyEyes && poseModel != PoseModel::COCO_18 && poseModel != PoseModel::BODY_18)
-                    error("Bool googlyEyes only compatible with PoseModel::COCO_18.",
+                // framePtr      =   width * height * 3
+                // heatMapPtr    =   heatMapSize.x * heatMapSize.y * #body parts
+                // posePtr       =   3 (x,y,score) * #Body parts * numberPeople
+                if (googlyEyes && (poseModel == PoseModel::MPI_15 || poseModel == PoseModel::MPI_15_4))
+                    error("Bool googlyEyes not compatible with MPI models.",
                           __LINE__, __FUNCTION__, __FILE__);
 
                 dim3 threadsPerBlock;
                 dim3 numBlocks;
                 getNumberCudaThreadsAndBlocks(threadsPerBlock, numBlocks, frameSize);
 
-                if (poseModel == PoseModel::COCO_18 || poseModel == PoseModel::BODY_18)
+                if (poseModel == PoseModel::BODY_25 || poseModel == PoseModel::BODY_25_19)
+                    renderPoseBody25<<<threadsPerBlock, numBlocks>>>(
+                        framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
+                        blendOriginalFrame, alphaBlending
+                    );
+                else if (poseModel == PoseModel::COCO_18)
                     renderPoseCoco<<<threadsPerBlock, numBlocks>>>(
                         framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
                         blendOriginalFrame, alphaBlending
@@ -496,13 +531,13 @@ namespace op
                         framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
                         blendOriginalFrame, alphaBlending
                     );
-                else if (poseModel == PoseModel::BODY_25)
-                    renderPoseBody25<<<threadsPerBlock, numBlocks>>>(
+                else if (poseModel == PoseModel::BODY_59)
+                    renderPoseBody59<<<threadsPerBlock, numBlocks>>>(
                         framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
                         blendOriginalFrame, alphaBlending
                     );
-                else if (poseModel == PoseModel::BODY_59)
-                    renderPoseBody59<<<threadsPerBlock, numBlocks>>>(
+                else if (poseModel == PoseModel::BODY_65)
+                    renderPoseBody65<<<threadsPerBlock, numBlocks>>>(
                         framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
                         blendOriginalFrame, alphaBlending
                     );

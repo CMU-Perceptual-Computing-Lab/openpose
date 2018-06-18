@@ -11,8 +11,15 @@ namespace op
     public:
         PoseTriangulation(const int minViews3d);
 
+        void initializationOnThread();
+
         Array<float> reconstructArray(const std::vector<Array<float>>& keypointsVector,
-                                      const std::vector<cv::Mat>& cameraMatrices) const;
+                                      const std::vector<cv::Mat>& cameraMatrices,
+                                      const std::vector<Point<int>>& imageSizes) const;
+
+        std::vector<Array<float>> reconstructArray(const std::vector<std::vector<Array<float>>>& keypointsVector,
+                                                   const std::vector<cv::Mat>& cameraMatrices,
+                                                   const std::vector<Point<int>>& imageSizes) const;
 
     private:
         const int mMinViews3d;

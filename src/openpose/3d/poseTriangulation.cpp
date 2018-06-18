@@ -1,4 +1,5 @@
-#ifdef WITH_CERES
+// #include <thread>
+#ifdef USE_CERES
     #include <ceres/ceres.h>
     #include <ceres/rotation.h>
 #endif
@@ -31,15 +32,15 @@ namespace op
         }
     }
 
-    #ifdef WITH_CERES
+    #ifdef USE_CERES
         // Nonlinear Optimization for 3D Triangulation
         struct ReprojectionErrorForTriangulation
         {
-            ReprojectionErrorForTriangulation(const double x, const double y, const double* const param)
+            ReprojectionErrorForTriangulation(const double x, const double y, const double* const param) :
+                observed_x{x},
+                observed_y{y}
             {
-                observed_x = x;
-                observed_y = y;
-                memcpy(camParam,param,sizeof(double)*12);
+                memcpy(camParam, param, sizeof(double)*12);
             }
 
             template <typename T>
@@ -50,8 +51,8 @@ namespace op
                                          double* residuals,
                                          double** jacobians) const;
 
-            double observed_x;
-            double observed_y;
+            const double observed_x;
+            const double observed_y;
             double camParam[12];
         };
 
@@ -61,22 +62,19 @@ namespace op
         {
             try
             {
-                T predicted[3] = {
+                const T predicted[3] = {
                     T(camParam[0])*pt[0] + T(camParam[1])*pt[1] + T(camParam[2])*pt[2] + T(camParam[3]),
                     T(camParam[4])*pt[0] + T(camParam[5])*pt[1] + T(camParam[6])*pt[2] + T(camParam[7]),
                     T(camParam[8])*pt[0] + T(camParam[9])*pt[1] + T(camParam[10])*pt[2] + T(camParam[11])};
 
-                predicted[0] /= predicted[2];
-                predicted[1] /= predicted[2];
-
-                residuals[0] = T(observed_x) - predicted[0];
-                residuals[1] = T(observed_y) - predicted[1];
+                residuals[0] = T(observed_x) - predicted[0] / predicted[2];
+                residuals[1] = T(observed_y) - predicted[1] / predicted[2];
 
                 // residuals[0] = T(pow(predicted[0] - observed_x,2) + pow(predicted[1] - observed_y,2));
                 // residuals[0] = -pow(predicted[0] - T(observed_x),2);
                 // residuals[1] = -pow(predicted[1] - T(observed_y),2);
 
-                return  true;
+                return true;
             }
             catch (const std::exception& e)
             {
@@ -93,18 +91,17 @@ namespace op
             {
                 UNUSED(jacobians);
 
-                double predicted[3] = {
+                const double predicted[3] = {
                     camParam[0]*pt[0][0] + camParam[1]*pt[0][1] + camParam[2]*pt[0][2] + camParam[3],
                     camParam[4]*pt[0][0] + camParam[5]*pt[0][1] + camParam[6]*pt[0][2] + camParam[7],
                     camParam[8]*pt[0][0] + camParam[9]*pt[0][1] + camParam[10]*pt[0][2] + camParam[11]};
 
-                predicted[0] /= predicted[2];
-                predicted[1] /= predicted[2];
+                // residuals[0] = predicted[0] / predicted[2] - observed_x;
+                // residuals[1] = predicted[1] / predicted[2] - observed_y;
 
-                // residuals[0] = predicted[0] - observed_x;
-                // residuals[1] = predicted[1] - observed_y;
+                residuals[0] = std::sqrt(std::pow(predicted[0] / predicted[2] - observed_x,2)
+                                         + std::pow(predicted[1] / predicted[2] - observed_y,2));
 
-                residuals[0] = std::sqrt(std::pow(predicted[0] - observed_x,2) + std::pow(predicted[1] - observed_y,2));
                 // log("Residuals:");
                 // residuals[0]= pow(predicted[0] - (observed_x),2);
                 // residuals[1]= pow(predicted[1] - (observed_y),2);
@@ -157,7 +154,8 @@ namespace op
     }
 
     double triangulateWithOptimization(cv::Mat& reconstructedPoint, const std::vector<cv::Mat>& cameraMatrices,
-                                       const std::vector<cv::Point2d>& pointsOnEachCamera)
+                                       const std::vector<cv::Point2d>& pointsOnEachCamera,
+                                       const double reprojectionMaxAcceptable)
     {
         try
         {
@@ -167,43 +165,68 @@ namespace op
 
             // Basic triangulation
             triangulate(reconstructedPoint, cameraMatrices, pointsOnEachCamera);
+            const auto projectionErrorLinear = calcReprojectionError(reconstructedPoint, cameraMatrices, pointsOnEachCamera);
 
-            #ifdef WITH_CERES
-                // Slow equivalent: double paramX[3]; paramX[i] = reconstructedPoint.at<double>(i);
-                double* paramX = (double*)reconstructedPoint.data;
-                ceres::Problem problem;
-                for (auto i = 0u; i < cameraMatrices.size(); ++i)
+            #ifdef USE_CERES
+                // Empirically detected that reprojection error (for 4 cameras) only minimizes the error if initial
+                // project error > ~2.5, and that it improves more the higher that error actually is
+                // Therefore, we disable it for already accurate samples in order to get both:
+                //     - Speed
+                //     - Accuracy for already accurate samples
+                if (projectionErrorLinear > 3.0
+                    && projectionErrorLinear < 1.5*reprojectionMaxAcceptable)
                 {
-                    // Slow copy equivalent:
-                    //     double camParam[12]; memcpy(camParam, cameraMatrices[i].data, sizeof(double)*12);
-                    const double* const camParam = (double*)cameraMatrices[i].data;
-                    // Each Residual block takes a point and a camera as input and outputs a 2
-                    // dimensional residual. Internally, the cost function stores the observed
-                    // image location and compares the reprojection against the observation.
-                    ceres::CostFunction* cost_function =
-                        new ceres::AutoDiffCostFunction<ReprojectionErrorForTriangulation, 2, 3>(
-                            new ReprojectionErrorForTriangulation(
-                                pointsOnEachCamera[i].x, pointsOnEachCamera[i].y, camParam));
-                    // Add to problem
-                    problem.AddResidualBlock(cost_function,
-                        //NULL, //squared loss
-                        new ceres::HuberLoss(2.0),
-                        paramX); // paramX[0,1,2]
+                    // Slow equivalent: double paramX[3]; paramX[i] = reconstructedPoint.at<double>(i);
+                    double* paramX = (double*)reconstructedPoint.data;
+                    ceres::Problem problem;
+                    for (auto i = 0u; i < cameraMatrices.size(); ++i)
+                    {
+                        // Slow copy equivalent:
+                        //     double camParam[12]; memcpy(camParam, cameraMatrices[i].data, sizeof(double)*12);
+                        const double* const camParam = (double*)cameraMatrices[i].data;
+                        // Each Residual block takes a point and a camera as input and outputs a 2
+                        // dimensional residual. Internally, the cost function stores the observed
+                        // image location and compares the reprojection against the observation.
+                        ceres::CostFunction* cost_function =
+                            new ceres::AutoDiffCostFunction<ReprojectionErrorForTriangulation, 2, 3>(
+                                new ReprojectionErrorForTriangulation(
+                                    pointsOnEachCamera[i].x, pointsOnEachCamera[i].y, camParam));
+                        // Add to problem
+                        problem.AddResidualBlock(cost_function,
+                            //NULL, //squared loss
+                            new ceres::HuberLoss(2.0),
+                            paramX); // paramX[0,1,2]
+                    }
+
+                    ceres::Solver::Options options;
+                    options.linear_solver_type = ceres::DENSE_NORMAL_CHOLESKY;
+                    // options.num_threads = 2; // It does not affect speed
+                    // if (fastVersion)
+                    {
+                        // ~22 ms
+                        // options.function_tolerance = 1e-3; //1e-6
+                        // options.gradient_tolerance = 1e-5; //1e-10
+                        // options.parameter_tolerance = 1e-5; //1e-8
+                        // options.inner_iteration_tolerance = 1e-3; //1e-6
+                        // ~30 ms (~30 FPS)
+                        options.function_tolerance = 1e-4; //1e-6
+                        options.gradient_tolerance = 1e-7; //1e-10
+                        options.parameter_tolerance = 1e-6; //1e-8
+                        options.inner_iteration_tolerance = 1e-4; //1e-6
+                        // Default (none of the above) ~42 ms
+                    }
+                    // options.minimizer_progress_to_stdout = true;
+                    // options.parameter_tolerance = 1e-20;
+                    // options.function_tolerance = 1e-20;
+                    ceres::Solver::Summary summary;
+                    ceres::Solve(options, &problem, &summary);
+                    // if (summary.initial_cost > summary.final_cost)
+                    //     std::cout << summary.FullReport() << "\n";
+
+                    // const auto reprojectionErrorDecrease = std::sqrt((summary.initial_cost - summary.final_cost)
+                    //                                      / double(cameraMatrices.size()));
+                    // return reprojectionErrorDecrease;
                 }
-
-                ceres::Solver::Options options;
-                options.linear_solver_type = ceres::DENSE_NORMAL_CHOLESKY;
-                // options.minimizer_progress_to_stdout = true;
-                // options.parameter_tolerance = 1e-20;
-                // options.function_tolerance = 1e-20;
-                ceres::Solver::Summary summary;
-                ceres::Solve(options, &problem, &summary);
-                // if (summary.initial_cost > summary.final_cost)
-                //     std::cout << summary.FullReport() << "\n";
-
-                // const auto reprojectionErrorDecrease = std::sqrt((summary.initial_cost - summary.final_cost)
-                //                                      / double(cameraMatrices.size()));
-                // return reprojectionErrorDecrease;
             #endif
             // assert(reconstructedPoint.at<double>(3) == 1.);
 
@@ -230,15 +253,18 @@ namespace op
         }
     }
 
-    PoseTriangulation::PoseTriangulation(const int minViews3d) :
-        mMinViews3d{minViews3d}
+    inline bool isValidKeypoint(const float* const keypointPtr, const Point<int>& imageSize)
     {
         try
         {
-            // Security checks
-            if (0 <= mMinViews3d && mMinViews3d < 2)
-                error("Minimum number of views must be at least 2 (e.g., `--3d_min_views 2`) or negative.",
-                      __LINE__, __FUNCTION__, __FILE__);
+            const auto threshold = 0.35f;
+            return (keypointPtr[2] > threshold
+                    // If keypoint in border --> most probably it is actually out of the image,
+                    // so removed to reduce that noise
+                    && keypointPtr[0] > 8
+                    && keypointPtr[0] < imageSize.x - 8
+                    && keypointPtr[1] > 8
+                    && keypointPtr[1] < imageSize.y - 8);
         }
         catch (const std::exception& e)
         {
@@ -246,12 +272,16 @@ namespace op
         }
     }
 
-    Array<float> PoseTriangulation::reconstructArray(const std::vector<Array<float>>& keypointsVector,
-                                                     const std::vector<cv::Mat>& cameraMatrices) const
+    void reconstructArrayThread(Array<float>* keypoints3DPtr,
+                                const std::vector<Array<float>>& keypointsVector,
+                                const std::vector<cv::Mat>& cameraMatrices,
+                                const std::vector<Point<int>>& imageSizes,
+                                const int minViews3d)
     {
         try
         {
-            Array<float> keypoints3D;
+            auto& keypoints3D = *keypoints3DPtr;
+
             // Security checks
             if (cameraMatrices.size() < 2)
                 error("Only 1 camera detected. The 3-D reconstruction module can only be used with > 1 cameras"
@@ -273,7 +303,6 @@ namespace op
                 const auto numberBodyParts = keypointsVector.at(0).getSize(1);
                 const auto lastChannelLength = keypointsVector.at(0).getSize(2);
                 // Create x-y vector from high score results
-                const auto threshold = 0.2f;
                 std::vector<int> indexesUsed;
                 std::vector<std::vector<cv::Point2d>> xyPoints;
                 std::vector<std::vector<cv::Mat>> cameraMatricesPerPoint;
@@ -288,17 +317,17 @@ namespace op
                     for (auto i = 0u ; i < keypointsVector.size() ; i++)
                     {
                         const auto& keypoints = keypointsVector[i];
-                        if (keypoints[baseIndex+2] > threshold)
+                        if (isValidKeypoint(&keypoints[baseIndex], imageSizes[i]))
                         {
                             xyPointsElement.emplace_back(cv::Point2d{keypoints[baseIndex],
                                                                      keypoints[baseIndex+1]});
                             cameraMatricesElement.emplace_back(cameraMatrices[i]);
                         }
                     }
-                    // If visible from all views (mMinViews3d < 0)
-                    // or if visible for at least mMinViews3d views
-                    if ((mMinViews3d < 0 && cameraMatricesElement.size() == cameraMatrices.size())
-                        || (mMinViews3d > 1 && mMinViews3d <= (int)xyPointsElement.size()))
+                    // If visible from all views (minViews3d < 0)
+                    // or if visible for at least minViews3d views
+                    if ((minViews3d < 0 && cameraMatricesElement.size() == cameraMatrices.size())
+                        || (minViews3d > 1 && minViews3d <= (int)xyPointsElement.size()))
                     {
                         indexesUsed.emplace_back(part);
                         xyPoints.emplace_back(xyPointsElement);
@@ -306,7 +335,9 @@ namespace op
                     }
                 }
                 // 3D reconstruction
-                auto reprojectionErrorTotal = 0.0;
+                const auto imageRatio = std::sqrt(imageSizes[0].x * imageSizes[0].y / 1310720);
+                const auto reprojectionMaxAcceptable = 25 * imageRatio;
+                std::vector<double> reprojectionErrors(xyPoints.size());
                 keypoints3D.reset({ 1, numberBodyParts, 4 }, 0);
                 if (!xyPoints.empty())
                 {
@@ -315,13 +346,23 @@ namespace op
                     for (auto i = 0u; i < xyPoints.size(); i++)
                     {
                         cv::Mat reconstructedPoint;
-                        reprojectionErrorTotal += triangulateWithOptimization(reconstructedPoint,
-                                                                              cameraMatricesPerPoint[i],
-                                                                              xyPoints[i]);
-                        xyzPoints[i] = cv::Point3d{reconstructedPoint.at<double>(0), reconstructedPoint.at<double>(1),
+                        reprojectionErrors[i] = triangulateWithOptimization(reconstructedPoint,
+                                                                            cameraMatricesPerPoint[i],
+                                                                            xyPoints[i],
+                                                                            reprojectionMaxAcceptable);
+                        xyzPoints[i] = cv::Point3d{
+                            reconstructedPoint.at<double>(0),
+                            reconstructedPoint.at<double>(1),
                             reconstructedPoint.at<double>(2)};
                     }
-                    reprojectionErrorTotal /= xyPoints.size();
+                    const auto reprojectionErrorTotal = std::accumulate(
+                        reprojectionErrors.begin(), reprojectionErrors.end(), 0.0) / xyPoints.size();
+                    if (reprojectionErrorTotal > 60)
+                        log("Unusual high re-projection error (averaged over #keypoints) of value "
+                            + std::to_string(reprojectionErrorTotal) + " pixels, while the average for a good OpenPose"
+                            " detection from 4 cameras is about 2-3 pixels. It might be simply a wrong OpenPose"
+                            " detection. If this message appears very frequently, your calibration parameters"
+                            " might be wrong.", Priority::High);
 
                     // 3D points to pose
                     // OpenCV alternative:
@@ -329,11 +370,15 @@ namespace op
                     // cv::Mat reconstructedPoints{4, firstcv::Points.size(), CV_64F};
                     // cv::triangulatePoints(cv::Mat::eye(3,4, CV_64F), M_3_1, firstcv::Points, secondcv::Points,
                     //                           reconstructedcv::Points);
+                    // 20 pixels for 1280x1024 image
                     const auto lastChannelLength = keypoints3D.getSize(2);
                     for (auto index = 0u; index < indexesUsed.size(); index++)
                     {
                         if (std::isfinite(xyzPoints[index].x) && std::isfinite(xyzPoints[index].y)
-                            && std::isfinite(xyzPoints[index].z))
+                            && std::isfinite(xyzPoints[index].z)
+                            // Remove outliers
+                            && (reprojectionErrors[index] < 5 * reprojectionErrorTotal
+                                && reprojectionErrors[index] < reprojectionMaxAcceptable))
                         {
                             const auto baseIndex = indexesUsed[index] * lastChannelLength;
                             keypoints3D[baseIndex] = xyzPoints[index].x;
@@ -345,12 +390,82 @@ namespace op
                 }
                 // log("Reprojection error: " + std::to_string(reprojectionErrorTotal)); // To debug reprojection error
             }
-            return keypoints3D;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    PoseTriangulation::PoseTriangulation(const int minViews3d) :
+        mMinViews3d{minViews3d}
+    {
+        try
+        {
+            // Security checks
+            if (0 <= mMinViews3d && mMinViews3d < 2)
+                error("Minimum number of views must be at least 2 (e.g., `--3d_min_views 2`) or negative.",
+                      __LINE__, __FUNCTION__, __FILE__);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    void PoseTriangulation::initializationOnThread()
+    {
+    }
+
+    Array<float> PoseTriangulation::reconstructArray(const std::vector<Array<float>>& keypointsVector,
+                                                     const std::vector<cv::Mat>& cameraMatrices,
+                                                     const std::vector<Point<int>>& imageSizes) const
+    {
+        try
+        {
+            return reconstructArray(std::vector<std::vector<Array<float>>>{keypointsVector},
+                                    cameraMatrices, imageSizes).at(0);
         }
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             return Array<float>{};
+        }
+    }
+
+    std::vector<Array<float>> PoseTriangulation::reconstructArray(
+        const std::vector<std::vector<Array<float>>>& keypointsVectors,
+        const std::vector<cv::Mat>& cameraMatrices,
+        const std::vector<Point<int>>& imageSizes) const
+    {
+        try
+        {
+            std::vector<Array<float>> keypoints3Ds(keypointsVectors.size());
+            // std::vector<std::thread> threads(keypointsVectors.size()-1);
+            for (auto i = 0u; i < keypointsVectors.size()-1; i++)
+            {
+                // // Multi-thread option - ~15% slower
+                // // Ceres seems to be super slow if run concurrently in different threads
+                // threads.at(i) = std::thread{&reconstructArrayThread,
+                //                             &keypoints3Ds[i], keypointsVectors[i], cameraMatrices,
+                //                             imageSizes, mMinViews3d};
+                // Single-thread option
+                reconstructArrayThread(&keypoints3Ds[i], keypointsVectors[i], cameraMatrices,
+                                       imageSizes, mMinViews3d);
+            }
+            reconstructArrayThread(&keypoints3Ds.back(), keypointsVectors.back(), cameraMatrices,
+                                   imageSizes, mMinViews3d);
+            // // Close threads
+            // for (auto& thread : threads)
+            //     if (thread.joinable())
+            //         thread.join();
+            // Return results
+            return keypoints3Ds;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return {};
         }
     }
 }

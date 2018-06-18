@@ -41,7 +41,14 @@ namespace op
     template<typename TDatums>
     void WPoseExtractorNet<TDatums>::initializationOnThread()
     {
-        spPoseExtractorNet->initializationOnThread();
+        try
+        {
+            spPoseExtractorNet->initializationOnThread();
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
     }
 
     template<typename TDatums>

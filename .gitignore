@@ -101,6 +101,7 @@ distribute/
 ######################### 3rd-party Folders and Zip Files #########################
 3rdparty/caffe/.git
 3rdparty/caffe/.github
+3rdparty/asio/
 3rdparty/eigen/
 3rdparty/windows/caffe/
 3rdparty/windows/caffe_cpu/

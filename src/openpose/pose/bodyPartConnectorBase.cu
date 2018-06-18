@@ -236,7 +236,8 @@ namespace op
                         // Add ears connections (in case person is looking to opposite direction to camera)
                         else if (
                             (numberBodyParts == 18 && (pairIndex==17 || pairIndex==18))
-                            || ((numberBodyParts == 19 || numberBodyParts == 25 || numberBodyParts == 59)
+                            || ((numberBodyParts == 19 || numberBodyParts == 25 || numberBodyParts == 59
+                                 || numberBodyParts == 65)
                                 && (pairIndex==18 || pairIndex==19))
                             || (numberBodyParts == 23 && (pairIndex==22 || pairIndex==23))
                             || (poseModel == PoseModel::BODY_19b

@@ -67,6 +67,11 @@ namespace op
         std::string writeCocoJson;
 
         /**
+         * Analogous to writeCocoJson but for foot keypoints.
+         */
+        std::string writeCocoFootJson;
+
+        /**
          * Rendered image saving folder.
          * If it is empty (default), it is disabled.
          */
@@ -106,9 +111,28 @@ namespace op
         double writeVideoFps;
 
         /**
-         * Analogous to writeCocoJson but for foot keypoints.
+         * Rendered Adam images saving video path.
+         * Please, use *.avi format.
+         * If it is empty (default), it is disabled.
          */
-        std::string writeCocoFootJson;
+        std::string writeVideoAdam;
+
+        /**
+         * Path to save a 3-D joint angle BVH file.
+         * Please, use *.bvh format.
+         * If it is empty (default), it is disabled.
+         */
+        std::string writeBvh;
+
+        /**
+         * Target server IP address for UDP client-server communication.
+         */
+        std::string udpHost;
+
+        /**
+         * Target server IP port for UDP client-server communication.
+         */
+        std::string udpPort;
 
         /**
          * Constructor of the struct.
@@ -119,10 +143,12 @@ namespace op
                             const bool fullScreen = false, const std::string& writeKeypoint = "",
                             const DataFormat writeKeypointFormat = DataFormat::Xml,
                             const std::string& writeJson = "", const std::string& writeCocoJson = "",
-                            const std::string& writeImages = "", const std::string& writeImagesFormat = "",
-                            const std::string& writeVideo = "", const double writeVideoFps = 30.,
-                            const std::string& writeHeatMaps = "", const std::string& writeHeatMapsFormat = "",
-                            const std::string& writeCocoFootJson = "");
+                            const std::string& writeCocoFootJson = "", const std::string& writeImages = "",
+                            const std::string& writeImagesFormat = "", const std::string& writeVideo = "",
+                            const double writeVideoFps = 30., const std::string& writeHeatMaps = "",
+                            const std::string& writeHeatMapsFormat = "", const std::string& writeVideoAdam = "",
+                            const std::string& writeBvh = "", const std::string& udpHost = "",
+                            const std::string& udpPort = "");
     };
 }
 

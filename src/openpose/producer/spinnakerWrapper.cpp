@@ -1,8 +1,8 @@
-#ifdef WITH_FLIR_CAMERA
+#ifdef USE_FLIR_CAMERA
     #include <thread>
 #endif
 #include <opencv2/imgproc/imgproc.hpp> // cv::undistort, cv::initUndistortRectifyMap
-#ifdef WITH_FLIR_CAMERA
+#ifdef USE_FLIR_CAMERA
     #include <Spinnaker.h>
 #endif
 #include <openpose/3d/cameraParameterReader.hpp>
@@ -10,7 +10,7 @@
 
 namespace op
 {
-    #ifdef WITH_FLIR_CAMERA
+    #ifdef USE_FLIR_CAMERA
         std::vector<std::string> getSerialNumbers(const Spinnaker::CameraList& cameraList,
                                                   const bool sorted)
         {
@@ -355,13 +355,13 @@ namespace op
             }
         }
     #else
-        const std::string WITH_FLIR_CAMERA_ERROR{"OpenPose CMake must be compiled with the `WITH_FLIR_CAMERA`"
+        const std::string USE_FLIR_CAMERA_ERROR{"OpenPose CMake must be compiled with the `USE_FLIR_CAMERA`"
             " flag in order to use the FLIR camera. Alternatively, disable `--flir_camera`."};
     #endif
 
     struct SpinnakerWrapper::ImplSpinnakerWrapper
     {
-        #ifdef WITH_FLIR_CAMERA
+        #ifdef USE_FLIR_CAMERA
             bool mInitialized;
             CameraParameterReader mCameraParameterReader;
             Point<int> mResolution;
@@ -453,7 +453,7 @@ namespace op
 
             void bufferingThread()
             {
-                #ifdef WITH_FLIR_CAMERA
+                #ifdef USE_FLIR_CAMERA
                     try
                     {
                         mCloseThread = false;
@@ -593,7 +593,7 @@ namespace op
                             if (mUndistortImage)
                             {
                                 std::vector<std::thread> threads(imagePtrs.size()-1);
-                                for (auto i = 0u; i < imagePtrs.size()-1; i++)
+                                for (auto i = 0u; i < threads.size(); i++)
                                 {
                                     // Multi-thread option
                                     threads.at(i) = std::thread{&ImplSpinnakerWrapper::readAndUndistortImage, this, i,
@@ -654,11 +654,11 @@ namespace op
 
     SpinnakerWrapper::SpinnakerWrapper(const std::string& cameraParameterPath, const Point<int>& resolution,
                                        const bool undistortImage, const int cameraIndex)
-        #ifdef WITH_FLIR_CAMERA
+        #ifdef USE_FLIR_CAMERA
             : upImpl{new ImplSpinnakerWrapper{undistortImage, cameraIndex}}
         #endif
     {
-        #ifdef WITH_FLIR_CAMERA
+        #ifdef USE_FLIR_CAMERA
             try
             {
                 // Clean previous unclosed builds (e.g. if core dumped in the previous code using the cameras)
@@ -707,7 +707,7 @@ namespace op
                 //
                 log("\n*** DEVICE INFORMATION ***\n", Priority::High);
 
-                for (int i = 0; i < upImpl->mCameraList.GetSize(); i++)
+                for (auto i = 0u; i < upImpl->mCameraList.GetSize(); i++)
                 {
                     // Select camera
                     auto cameraPtr = upImpl->mCameraList.GetByIndex(i);
@@ -722,7 +722,7 @@ namespace op
                                   __LINE__, __FUNCTION__, __FILE__);
                 }
 
-                for (auto i = 0; i < upImpl->mCameraList.GetSize(); i++)
+                for (auto i = 0u; i < upImpl->mCameraList.GetSize(); i++)
                 {
                     // Select camera
                     auto cameraPtr = upImpl->mCameraList.GetByIndex(i);
@@ -780,7 +780,7 @@ namespace op
                 //
                 // Serial numbers are the only persistent objects we gather in this
                 // example, which is why a std::vector is created.
-                for (auto i = 0; i < upImpl->mCameraList.GetSize(); i++)
+                for (auto i = 0u; i < upImpl->mCameraList.GetSize(); i++)
                 {
                     // Select camera
                     auto cameraPtr = upImpl->mCameraList.GetByIndex(i);
@@ -907,7 +907,7 @@ namespace op
             UNUSED(resolution);
             UNUSED(undistortImage);
             UNUSED(cameraIndex);
-            error(WITH_FLIR_CAMERA_ERROR, __LINE__, __FUNCTION__, __FILE__);
+            error(USE_FLIR_CAMERA_ERROR, __LINE__, __FUNCTION__, __FILE__);
         #endif
     }
 
@@ -927,7 +927,7 @@ namespace op
     {
         try
         {
-            #ifdef WITH_FLIR_CAMERA
+            #ifdef USE_FLIR_CAMERA
                 try
                 {
                     // Security checks
@@ -946,7 +946,7 @@ namespace op
                     return {};
                 }
             #else
-                error(WITH_FLIR_CAMERA_ERROR, __LINE__, __FUNCTION__, __FILE__);
+                error(USE_FLIR_CAMERA_ERROR, __LINE__, __FUNCTION__, __FILE__);
                 return {};
             #endif
         }
@@ -961,7 +961,7 @@ namespace op
     {
         try
         {
-            #ifdef WITH_FLIR_CAMERA
+            #ifdef USE_FLIR_CAMERA
                 return upImpl->mCameraParameterReader.getCameraMatrices();
             #else
                 return {};
@@ -978,7 +978,7 @@ namespace op
     {
         try
         {
-            #ifdef WITH_FLIR_CAMERA
+            #ifdef USE_FLIR_CAMERA
                 return upImpl->mCameraParameterReader.getCameraExtrinsics();
             #else
                 return {};
@@ -995,7 +995,7 @@ namespace op
     {
         try
         {
-            #ifdef WITH_FLIR_CAMERA
+            #ifdef USE_FLIR_CAMERA
                 return upImpl->mCameraParameterReader.getCameraIntrinsics();
             #else
                 return {};
@@ -1012,7 +1012,7 @@ namespace op
     {
         try
         {
-            #ifdef WITH_FLIR_CAMERA
+            #ifdef USE_FLIR_CAMERA
                 return upImpl->mResolution;
             #else
                 return Point<int>{};
@@ -1029,7 +1029,7 @@ namespace op
     {
         try
         {
-            #ifdef WITH_FLIR_CAMERA
+            #ifdef USE_FLIR_CAMERA
                 return upImpl->mInitialized;
             #else
                 return false;
@@ -1044,7 +1044,7 @@ namespace op
 
     void SpinnakerWrapper::release()
     {
-        #ifdef WITH_FLIR_CAMERA
+        #ifdef USE_FLIR_CAMERA
             try
             {
                 if (upImpl->mInitialized)
@@ -1065,7 +1065,7 @@ namespace op
                     // GetByIndex(); this is an alternative to retrieving cameras as
                     // Spinnaker::CameraPtr objects that can be quick and easy for small tasks.
                     //
-                    for (auto i = 0; i < upImpl->mCameraList.GetSize(); i++)
+                    for (auto i = 0u; i < upImpl->mCameraList.GetSize(); i++)
                     {
                         // Select camera
                         auto cameraPtr = upImpl->mCameraList.GetByIndex(i);
@@ -1112,7 +1112,7 @@ namespace op
                     if (cameraList.GetSize() > 0)
                     {
 
-                        for (int i = 0; i < cameraList.GetSize(); i++)
+                        for (auto i = 0u; i < cameraList.GetSize(); i++)
                         {
                             // Select camera
                             auto cameraPtr = cameraList.GetByIndex(i);

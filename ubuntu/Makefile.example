@@ -75,7 +75,7 @@ endif
 # 3-D renderer
 WITH_3D_RENDERER ?= 0
 ifneq ($(WITH_3D_RENDERER), 0)
-	COMMON_FLAGS += -DWITH_3D_RENDERER
+	COMMON_FLAGS += -DUSE_3D_RENDERER
 	# FreeGLUT
 	LIBRARIES += glut
 	# LIBRARIES += GLU GL glut
@@ -83,7 +83,7 @@ endif
 # Ceres support
 WITH_CERES ?= 0
 ifneq ($(WITH_CERES), 0)
-	COMMON_FLAGS += -DWITH_CERES
+	COMMON_FLAGS += -DUSE_CERES
 	# Ceres
 	LIBRARIES += ceres
 	INCLUDE_DIRS += $(EIGEN_DIR)
@@ -91,12 +91,12 @@ endif
 # Eigen support
 WITH_EIGEN ?= 0
 ifneq ($(WITH_EIGEN), 0)
-	COMMON_FLAGS += -DWITH_EIGEN
+	COMMON_FLAGS += -DUSE_EIGEN
 endif
 # Spinnaker SDK
 WITH_FLIR_CAMERA ?= 0
 ifneq ($(WITH_FLIR_CAMERA), 0)
-	COMMON_FLAGS += -DWITH_FLIR_CAMERA
+	COMMON_FLAGS += -DUSE_FLIR_CAMERA
 	# Spinnaker SDK
 	LIBRARIES += Spinnaker
 	INCLUDE_DIRS += $(SPINNAKER_DIR)
