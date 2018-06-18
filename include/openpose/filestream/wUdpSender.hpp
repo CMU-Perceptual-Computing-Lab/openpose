@@ -55,6 +55,7 @@ namespace op
                 // Profiling speed
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                 // Send though UDP communication
+#ifdef USE_3D_ADAM_MODEL
                 const auto& tDatum = (*tDatums)[0];
                 const auto& adamPose = tDatum.adamPose; // Eigen::Matrix<double, 62, 3, Eigen::RowMajor>
                 const auto& adamTranslation = tDatum.adamTranslation; // Eigen::Vector3d(3, 1)
@@ -71,6 +72,7 @@ namespace op
                 spUdpSender->sendJointAngles(adamPose.data(), adamPose.rows(),
                                              adamTranslation.data(),
                                              adamFaceCoeffsExp.data(), adamFaceCoeffsExp.rows());
+#endif
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
                 Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);

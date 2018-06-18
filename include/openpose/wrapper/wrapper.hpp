@@ -885,6 +885,7 @@ namespace op
                                      || (wrapperStructOutput.displayMode == DisplayMode::DisplayAll
                                          && wrapperStructExtra.ikThreads > 0);
             spWJointAngleEstimations.clear();
+#ifdef USE_3D_ADAM_MODEL
             if (wrapperStructExtra.ikThreads > 0)
             {
                 spWJointAngleEstimations.resize(wrapperStructExtra.ikThreads);
@@ -899,6 +900,7 @@ namespace op
                         jointAngleEstimation)};
                 }
             }
+#endif
 
             // Output workers
             mOutputWs.clear();
@@ -975,6 +977,7 @@ namespace op
                 mOutputWs.emplace_back(std::make_shared<WVideoSaver<TDatumsPtr>>(videoSaver));
             }
             // Write joint angles as *.bvh file on hard disk
+#ifdef USE_3D_ADAM_MODEL
             if (!wrapperStructOutput.writeBvh.empty())
             {
                 const auto bvhSaver = std::make_shared<BvhSaver>(
@@ -982,6 +985,7 @@ namespace op
                 );
                 mOutputWs.emplace_back(std::make_shared<WBvhSaver<TDatumsPtr>>(bvhSaver));
             }
+#endif
             // Write heat maps as desired image format on hard disk
             if (!writeHeatMapsCleaned.empty())
             {
@@ -1015,6 +1019,7 @@ namespace op
                 // Adam (+3-D/2-D) display
                 if (displayAdam)
                 {
+#ifdef USE_3D_ADAM_MODEL
                     // Gui
                     const auto gui = std::make_shared<GuiAdam>(
                         finalOutputSize, wrapperStructOutput.fullScreen, mThreadManager.getIsRunningSharedPtr(),
@@ -1024,6 +1029,7 @@ namespace op
                     );
                     // WGui
                     spWGui = {std::make_shared<WGuiAdam<TDatumsPtr>>(gui)};
+#endif
                 }
                 // 3-D (+2-D) display
                 else if (wrapperStructOutput.displayMode == DisplayMode::Display3D

@@ -1,3 +1,4 @@
+#ifdef USE_3D_ADAM_MODEL
 #ifndef OPENPOSE_GUI_W_GUI_ADAM_HPP
 #define OPENPOSE_GUI_W_GUI_ADAM_HPP
 
@@ -102,3 +103,4 @@ namespace op
 }
 
 #endif // OPENPOSE_GUI_W_GUI_ADAM_HPP
+#endif

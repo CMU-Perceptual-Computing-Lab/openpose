@@ -1,4 +1,5 @@
 #ifdef USE_3D_ADAM_MODEL
+#ifdef USE_3D_ADAM_MODEL
     #include <adam/FitToBody.h>
     #include <adam/totalmodel.h>
 #endif
@@ -349,3 +350,4 @@ namespace op
         }
     }
 }
+#endif
