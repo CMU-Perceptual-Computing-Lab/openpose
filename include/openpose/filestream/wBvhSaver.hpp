@@ -57,7 +57,8 @@ namespace op
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                 // Record BVH file
                 const auto& tDatum = (*tDatums)[0];
-                spBvhSaver->updateBvh(tDatum.adamPose, tDatum.adamTranslation, tDatum.j0Vec);
+                if (!tDatum.poseKeypoints3D.empty())
+                    spBvhSaver->updateBvh(tDatum.adamPose, tDatum.adamTranslation, tDatum.j0Vec);
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
                 Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);
