@@ -166,32 +166,32 @@ namespace op
             // Basic triangulation
             auto projectionError = triangulate(reconstructedPoint, cameraMatrices, pointsOnEachCamera);
 
-//             // Basic RANSAC (for >= 4 cameras)
-//             // 1. Run with all cameras (already done)
-//             // 2. Run with all but 1 camera for each camera.
-//             // 3. Use the one with minimum average reprojection error.
-//             if (cameraMatrices.size() >= 4 && projectionError > 0.5 * reprojectionMaxAcceptable)
-//             {
-//                 auto bestReprojection = projectionError;
-//                 auto bestReprojectionIndex = -1; // -1 means with all camera views
-//                 for (auto i = 0u; i < cameraMatrices.size(); ++i)
-//                 {
-//                     // Remove camera i
-//                     auto cameraMatricesSubset = cameraMatrices;
-//                     cameraMatricesSubset.erase(cameraMatricesSubset.begin() + i);
-//                     auto pointsOnEachCameraSubset = pointsOnEachCamera;
-//                     pointsOnEachCameraSubset.erase(pointsOnEachCameraSubset.begin() + i);
-//                     // Remove camera i
-//                     const auto projectionErrorSubset = triangulate(reconstructedPoint, cameraMatricesSubset,
-//                                                                    pointsOnEachCameraSubset);
-//                     if (bestReprojection > projectionErrorSubset)
-//                     {
-//                         bestReprojection = projectionErrorSubset;
-//                         bestReprojectionIndex = i;
-//                     }
+            // Basic RANSAC (for >= 4 cameras)
+            // 1. Run with all cameras (already done)
+            // 2. Run with all but 1 camera for each camera.
+            // 3. Use the one with minimum average reprojection error.
+            if (cameraMatrices.size() >= 4 && projectionError > 0.5 * reprojectionMaxAcceptable)
+            {
+                auto bestReprojection = projectionError;
+                auto bestReprojectionIndex = -1; // -1 means with all camera views
+                for (auto i = 0u; i < cameraMatrices.size(); ++i)
+                {
+                    // Remove camera i
+                    auto cameraMatricesSubset = cameraMatrices;
+                    cameraMatricesSubset.erase(cameraMatricesSubset.begin() + i);
+                    auto pointsOnEachCameraSubset = pointsOnEachCamera;
+                    pointsOnEachCameraSubset.erase(pointsOnEachCameraSubset.begin() + i);
+                    // Remove camera i
+                    const auto projectionErrorSubset = triangulate(reconstructedPoint, cameraMatricesSubset,
+                                                                   pointsOnEachCameraSubset);
+                    if (bestReprojection > projectionErrorSubset)
+                    {
+                        bestReprojection = projectionErrorSubset;
+                        bestReprojectionIndex = i;
+                    }
 // std::cout << bestReprojectionIndex << " " << bestReprojection << " vs. " << projectionError << "\n" << std::endl;
-//                 }
-//             }
+                }
+            }
 
             #ifdef USE_CERES
                 // Empirically detected that reprojection error (for 4 cameras) only minimizes the error if initial
@@ -385,12 +385,6 @@ namespace op
                     }
                     const auto reprojectionErrorTotal = std::accumulate(
                         reprojectionErrors.begin(), reprojectionErrors.end(), 0.0) / xyPoints.size();
-                    if (reprojectionErrorTotal > 60)
-                        log("Unusual high re-projection error (averaged over #keypoints) of value "
-                            + std::to_string(reprojectionErrorTotal) + " pixels, while the average for a good OpenPose"
-                            " detection from 4 cameras is about 2-3 pixels. It might be simply a wrong OpenPose"
-                            " detection. If this message appears very frequently, your calibration parameters"
-                            " might be wrong.", Priority::High);
 
                     // 3D points to pose
                     // OpenCV alternative:
@@ -399,6 +393,7 @@ namespace op
                     // cv::triangulatePoints(cv::Mat::eye(3,4, CV_64F), M_3_1, firstcv::Points, secondcv::Points,
                     //                           reconstructedcv::Points);
                     // 20 pixels for 1280x1024 image
+                    bool atLeastOnePointProjected = false;
                     const auto lastChannelLength = keypoints3D.getSize(2);
                     for (auto index = 0u; index < indexesUsed.size(); index++)
                     {
@@ -413,8 +408,15 @@ namespace op
                             keypoints3D[baseIndex + 1] = xyzPoints[index].y;
                             keypoints3D[baseIndex + 2] = xyzPoints[index].z;
                             keypoints3D[baseIndex + 3] = 1.f;
+                            atLeastOnePointProjected = true;
                         }
                     }
+                    if (!atLeastOnePointProjected || reprojectionErrorTotal > 60)
+                        log("Unusual high re-projection error (averaged over #keypoints) of value "
+                            + std::to_string(reprojectionErrorTotal) + " pixels, while the average for a good OpenPose"
+                            " detection from 4 cameras is about 2-3 pixels. It might be simply a wrong OpenPose"
+                            " detection. If this message appears very frequently, your calibration parameters"
+                            " might be wrong.", Priority::High);
                 }
                 // log("Reprojection error: " + std::to_string(reprojectionErrorTotal)); // To debug reprojection error
             }

@@ -193,7 +193,6 @@ namespace op
             // error("JointAngleEstimation (`ik_threads` flag) buggy and not working yet, but we are working on it!"
             //       " No coming soon...", __LINE__, __FUNCTION__, __FILE__);
             #ifndef USE_3D_ADAM_MODEL
-                UNUSED(ceresDisplayReport);
                 error("OpenPose must be compiled with the `USE_3D_ADAM_MODEL` macro definition in order to use this"
                       " functionality.", __LINE__, __FUNCTION__, __FILE__);
             #endif
@@ -309,7 +308,7 @@ namespace op
             // Initialization (e.g., first frame)
             const bool fastVersion = false;
             const bool freezeMissing = true;
-            const bool ceresDisplayReport = true;
+            const bool ceresDisplayReport = false;
             // Fill Datum
             if (!spImpl->mInitialized || !fastVersion)
             {
