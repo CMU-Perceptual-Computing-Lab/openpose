@@ -1504,10 +1504,11 @@ bool AdamFaceCost::Evaluate(double const* const* parameters, double* residuals, 
     const double* face_basis_data = adam_.m_dVdFaceEx.data();  // PCA basis
     const int nrow = adam_.m_dVdFaceEx.rows();
     const double* const faceJoints_data = faceJoints_.data();
+    assert(face70_indexes.size() == total_vertex.size());
 
     for (auto i = 0u; i < total_vertex.size(); ++i)
     {
-        const int face70Idx = adam_.m_correspond_adam2face70_face70Idx(i);
+        const int face70Idx = face70_indexes[i];
         if (faceJoints_data[5 * face70Idx + 0] == 0 && faceJoints_data[5 * face70Idx + 1] == 0 && faceJoints_data[5 * face70Idx + 2] == 0)
         {
             std::fill(residuals + 3 * i, residuals + 3 * (i + 1), 0.0);
@@ -1546,7 +1547,15 @@ bool AdamFaceCost::Evaluate(double const* const* parameters, double* residuals, 
     }
 
     if (jacobians && jacobians[0])
+    {
         std::copy(dVdfc.data(), dVdfc.data() + 3 * total_vertex.size() * TotalModel::NUM_EXP_BASIS_COEFFICIENTS, jacobians[0]);
+        for (auto i = 0u; i < total_vertex.size(); ++i)
+        {
+            const int face70Idx = face70_indexes[i];
+            if (faceJoints_data[5 * face70Idx + 0] == 0 && faceJoints_data[5 * face70Idx + 1] == 0 && faceJoints_data[5 * face70Idx + 2] == 0)
+                std::fill(jacobians[0] + 3 * i * TotalModel::NUM_EXP_BASIS_COEFFICIENTS, jacobians[0] + 3 * (i + 1) * TotalModel::NUM_EXP_BASIS_COEFFICIENTS, 0.0);
+        }
+    }
 
     return true;
 }

@@ -902,10 +902,8 @@ class AdamFaceCost: public ceres::CostFunction
 {
 public:
 	AdamFaceCost(const TotalModel& adam, const smpl::SMPLParams& frame_param, const Eigen::MatrixXd& faceJoints):
-		adam_(adam), frame_param_(frame_param), faceJoints_(faceJoints), m_nResiduals(3 * adam_.m_correspond_adam2face70_face70Idx.size()),
-			meanVert(adam_.m_correspond_adam2face70_face70Idx.size(), 3), transforms_joint(TotalModel::NUM_JOINTS * 3 * 5), dVdfc(adam_.m_correspond_adam2face70_face70Idx.size() * 3, TotalModel::NUM_EXP_BASIS_COEFFICIENTS)
+		adam_(adam), frame_param_(frame_param), faceJoints_(faceJoints), meanVert(0, 0), transforms_joint(TotalModel::NUM_JOINTS * 3 * 5), dVdfc(0, 0)
 	{
-		CostFunction::set_num_residuals(m_nResiduals);
 		auto parameter_block_sizes = CostFunction::mutable_parameter_block_sizes();
 		parameter_block_sizes->clear();
 		parameter_block_sizes->push_back(TotalModel::NUM_EXP_BASIS_COEFFICIENTS);
@@ -935,14 +933,22 @@ public:
 
 	    // LBS for the face vertices
 	    total_vertex.clear();
+	    face70_indexes.clear();
 		for (int r = 0; r < adam_.m_correspond_adam2face70_adamIdx.rows(); ++r)
 		{
 			const int adamVertexIdx = adam_.m_correspond_adam2face70_adamIdx(r);
-			total_vertex.push_back(adamVertexIdx);
+			const int face70Idx = adam_.m_correspond_adam2face70_face70Idx(r);
+			if (face70Idx >= 0)
+			{
+				total_vertex.push_back(adamVertexIdx);
+				face70_indexes.push_back(face70Idx);
+			}
 		}
 
+		meanVert.resize(total_vertex.size(), 3);
 	    select_lbs(frame_param_.m_adam_coeffs.data(), transforms_joint, meanVert);
 
+		dVdfc.resize(3 * total_vertex.size(), TotalModel::NUM_EXP_BASIS_COEFFICIENTS);
         std::fill(dVdfc.data(),
                   dVdfc.data() + 3 * total_vertex.size() * TotalModel::NUM_EXP_BASIS_COEFFICIENTS,
                   0.0);
@@ -969,6 +975,8 @@ public:
 		        }
 	        }
 	    }
+		m_nResiduals = 3 * total_vertex.size();
+		CostFunction::set_num_residuals(m_nResiduals);
 	}
 
 	virtual bool Evaluate(double const* const* parameters, double* residuals, double** jacobians) const;
@@ -983,9 +991,10 @@ private:
 	const TotalModel& adam_;
 	const smpl::SMPLParams& frame_param_;
 	const Eigen::MatrixXd& faceJoints_;
-	const int m_nResiduals;
+	int m_nResiduals;
 	std::array<std::vector<int>, TotalModel::NUM_JOINTS> parentIndexes;
 	std::vector<int> total_vertex; // all vertices that needs to be computed
+	std::vector<int> face70_indexes; // all vertices that needs to be computed
 	MatrixXdr meanVert;  // mean vertex when face coeff is 0
     Eigen::VectorXd transforms_joint;
     MatrixXdr dVdfc;
