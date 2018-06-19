@@ -342,6 +342,20 @@ public:
 		parameter_block_sizes->clear();
 		parameter_block_sizes->push_back(TotalModel::NUM_JOINTS * 3); // SMPL Pose  
 		parameter_block_sizes->push_back(TotalModel::NUM_JOINTS * 3); // SMPL Joint  
+		std::fill(m_FK_joint_list.data(), m_FK_joint_list.data() + TotalModel::NUM_JOINTS, true);
+	}
+	PoseToTransform_AdamFull_withDiff(const TotalModel &mod,
+		const std::array<std::vector<int>, TotalModel::NUM_JOINTS>& parentIndexes,
+		const bool rigid_body,
+		const std::array<bool, TotalModel::NUM_JOINTS>& FK_joint_list):
+		mod_(mod), mParentIndexes(parentIndexes), m_rigid_body(rigid_body)
+	{
+		CostFunction::set_num_residuals(3 * 5 * TotalModel::NUM_JOINTS);
+		auto parameter_block_sizes = CostFunction::mutable_parameter_block_sizes();
+		parameter_block_sizes->clear();
+		parameter_block_sizes->push_back(TotalModel::NUM_JOINTS * 3); // SMPL Pose  
+		parameter_block_sizes->push_back(TotalModel::NUM_JOINTS * 3); // SMPL Joint  
+		m_FK_joint_list = FK_joint_list;
 	}
 	virtual ~PoseToTransform_AdamFull_withDiff() {}
 
@@ -352,6 +366,7 @@ public:
 	const TotalModel &mod_;
 	const std::array<std::vector<int>, TotalModel::NUM_JOINTS>& mParentIndexes;
 	const bool m_rigid_body;
+	std::array<bool, TotalModel::NUM_JOINTS> m_FK_joint_list;
 };
 
 }

@@ -638,7 +638,19 @@ void Adam_FastFit_Initialize(const TotalModel &adam,
 // const auto start1 = std::chrono::high_resolution_clock::now();
 	using namespace Eigen;
 	MatrixXd PAF(3, 54);
-	// std::fill(PAF.data(), PAF.data() + PAF.size(), 0);
+
+	for (int i = 1; i < TotalModel::NUM_JOINTS; i++)
+	{
+		auto count_axis = 0u;
+		if (frame_param.m_adam_pose.data()[3 * i + 0] > 90 || frame_param.m_adam_pose.data()[3 * i + 0] < -90) count_axis++;
+		if (frame_param.m_adam_pose.data()[3 * i + 1] > 90 || frame_param.m_adam_pose.data()[3 * i + 1] < -90) count_axis++;
+		if (frame_param.m_adam_pose.data()[3 * i + 2] > 90 || frame_param.m_adam_pose.data()[3 * i + 2] < -90) count_axis++;
+		if (count_axis >= 2)  // this joint is twisted
+		{
+			frame_param.m_adam_pose.data()[3 * i + 0] = frame_param.m_adam_pose.data()[3 * i + 1] = frame_param.m_adam_pose.data()[3 * i + 2] = 0.0;
+		}
+	}
+
 	const AdamFitData data(adam, BodyJoints, rFoot, lFoot, faceJoints, lHandJoints, rHandJoints, PAF, true);
 	ceres::Problem problem_init;
 	AdamFullCost* adam_cost = new AdamFullCost(data, 0, false);
@@ -670,6 +682,8 @@ void Adam_FastFit_Initialize(const TotalModel &adam,
 		frame_param.m_adam_pose.data());
 
 	for (int j = 0; j < 22 * 3; j++) cost_prior_body_pose_init->weight[j] *= 2;
+	cost_prior_body_pose_init->weight[18 * 3] *= 2;  cost_prior_body_pose_init->weight[18 * 3 + 1] *= 2; cost_prior_body_pose_init->weight[18 * 3 + 2] *= 2;
+	cost_prior_body_pose_init->weight[19 * 3] *= 2;  cost_prior_body_pose_init->weight[19 * 3 + 1] *= 2; cost_prior_body_pose_init->weight[19 * 3 + 2] *= 2;
 
 	if (freeze_missing)
 	{

@@ -282,6 +282,8 @@ public:
     		dVdfc_data = new double[3 * total_vertex.size() * TotalModel::NUM_EXP_BASIS_COEFFICIENTS];
 	        dOdfc_data = new double[3 * (m_nCorrespond_adam2joints + m_nCorrespond_adam2pts) * TotalModel::NUM_EXP_BASIS_COEFFICIENTS];
     	}
+
+    	std::fill(FK_joint_list.data(), FK_joint_list.data() + TotalModel::NUM_JOINTS, true);
 	}
 
 	~AdamFullCost()
@@ -818,6 +820,34 @@ public:
 					m_targetPts_weight[ic + offset] = m_targetPts_weight_buffer[ic + offset] * double(finger);
 			}
 		}
+
+        if (!limb) 
+        {   
+            assert(!palm && !finger); 
+            std::fill(FK_joint_list.data(), FK_joint_list.data() + 18, true); 
+            std::fill(FK_joint_list.data() + 18, FK_joint_list.data() + 62, false); 
+        } 
+        else 
+        {   
+            if (!palm) 
+            {   
+                assert(!finger); 
+                std::fill(FK_joint_list.data(), FK_joint_list.data() + 22, true); 
+                std::fill(FK_joint_list.data() + 22, FK_joint_list.data() + 62, false); 
+            } 
+            else 
+            {   
+                if (!finger) 
+                {   
+                    std::fill(FK_joint_list.data(), FK_joint_list.data() + 22, true); 
+                    std::fill(FK_joint_list.data() + 22, FK_joint_list.data() + 62, false); 
+                    FK_joint_list[22] = FK_joint_list[26] = FK_joint_list[30] = FK_joint_list[34] = FK_joint_list[38] = true;        
+                    FK_joint_list[42] = FK_joint_list[46] = FK_joint_list[50] = FK_joint_list[54] = FK_joint_list[58] = true;        
+                } 
+                else 
+                    std::fill(FK_joint_list.data(), FK_joint_list.data() + 62, true); 
+            } 
+        }
 	}
 
 	void toggle_rigid_body(bool rigid)
@@ -896,6 +926,7 @@ private:
 
 	std::map<int, int> map_regressor_to_constraint;
 	const bool fit_face_exp;
+	std::array<bool, TotalModel::NUM_JOINTS> FK_joint_list;
 };
 
 class AdamFaceCost: public ceres::CostFunction

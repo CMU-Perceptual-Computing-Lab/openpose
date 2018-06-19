@@ -371,7 +371,7 @@ bool AdamFullCost::Evaluate(double const* const* parameters,
     double* p2t_residuals = transforms_joint.data();
     double* p2t_jacobians[2] = { dTrdP.data(), jacobians && jacobians[2]? dTrdJ.data(): nullptr };
 
-    smpl::PoseToTransform_AdamFull_withDiff p2t(fit_data_.adam, parentIndexes, rigid_body);
+    smpl::PoseToTransform_AdamFull_withDiff p2t(fit_data_.adam, parentIndexes, rigid_body, FK_joint_list);
 // const auto duration_iter = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start_iter).count();
 // const auto start_FK = std::chrono::high_resolution_clock::now();
     p2t.Evaluate(p2t_parameters, p2t_residuals, jacobians ? p2t_jacobians : nullptr );
