@@ -8,7 +8,7 @@ HAND_FOLDER="hand/"
 # ------------------------- POSE MODELS -------------------------
 # Body (BODY_25)
 BODY_25_FOLDER=${POSE_FOLDER}"body_25/"
-BODY_25_MODEL=${BODY_25_FOLDER}"pose_iter_585000.caffemodel"
+BODY_25_MODEL=${BODY_25_FOLDER}"pose_iter_584000.caffemodel"
 wget -c ${OPENPOSE_URL}${BODY_25_MODEL} -P ${BODY_25_FOLDER}
 
 # Body (COCO)
