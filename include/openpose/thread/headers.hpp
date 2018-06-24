@@ -17,6 +17,8 @@
 #include <openpose/thread/workerProducer.hpp>
 #include <openpose/thread/workerConsumer.hpp>
 #include <openpose/thread/wIdGenerator.hpp>
+#include <openpose/thread/wQueueAssembler.hpp>
 #include <openpose/thread/wQueueOrderer.hpp>
+#include <openpose/thread/wQueueSplitter.hpp>
 
 #endif // OPENPOSE_THREAD_HEADERS_HPP

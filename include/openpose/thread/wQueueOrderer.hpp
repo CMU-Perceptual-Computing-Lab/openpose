@@ -99,7 +99,7 @@ namespace op
                 const auto& tDatumsNoPtr = *tDatums;
                 mNextExpectedId = tDatumsNoPtr[0].id + 1;
             }
-            // Sleep if no new tDatums to either pop
+            // Sleep if no new tDatums to either pop or push
             if (!checkNoNullNorEmpty(tDatums) && mPriorityQueueBuffer.size() < mMaxBufferSize / 2u)
                 std::this_thread::sleep_for(std::chrono::milliseconds{1});
             // If TDatum popped and/or pushed

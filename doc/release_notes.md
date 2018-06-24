@@ -226,6 +226,7 @@ OpenPose Library - Release Notes
         2. It is only run if reprojction error is more than a minimum threshold (improve speed with already good quality results) and also less than another outlier threshold.
         3. Outliers are removed from final result if >= 3 camera views.
         4. Applied RANSAC if >=4 camera views.
+        5. Latency highly reduced in multi-GPU setting. Each GPU process a different camera view, instead of a different time-instant sequence.
     5. CMake: All libraries as single variable (simpler to add/remove libraries).
     6. Datum includes extrinsic and intrinsic camera parameters.
     7. Function `scaleKeypoints(Array<float>& keypoints, const float scale)` also accepts 3D keypoints.
