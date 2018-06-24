@@ -1,5 +1,5 @@
 // ------------------------- OpenPose Calibration Toolbox -------------------------
-// Check `doc/calibration_demo.md`.
+// Check `doc/modules/calibration_module.md`.
 // Implemented on top of OpenCV.
 // It computes and saves the intrinsics parameters of the input images.
 
@@ -35,7 +35,7 @@ DEFINE_string(camera_serial_number,     "18079958",     "Camera serial number.")
 DEFINE_bool(omit_distortion,            false,          "Set to true if image views are already undistorted (e.g., if recorded from OpenPose"
                                                         " after intrinsic parameter calibration).");
 DEFINE_bool(combine_cam0_extrinsics,    false,          "Set to true if cam0 extrinsics are not [R=I, t=0]. I will make no effect if cam0 is"
-                                                        " already the origin. See doc/calibration_demo.md for an example.");
+                                                        " already the origin. See doc/modules/calibration_module.md for an example.");
 DEFINE_int32(cam0,                      1,              "Baseline camera for extrinsic calibration, cam1 will be calibrated assuming cam0 the"
                                                         " world coordinate origin.");
 DEFINE_int32(cam1,                      0,              "Target camera to estimate its extrinsic parameters, it will be calibrated assuming cam0"

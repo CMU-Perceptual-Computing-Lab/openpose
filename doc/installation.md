@@ -12,16 +12,17 @@ OpenPose - Installation
 8. [Uninstallation](#uninstallation)
 9. [Optional Settings](#optional-settings)
     1. [Profiling Speed](#profiling-speed)
-    2. [COCO and MPI Model](#coco-and-mpi-model)
-    3. [CPU Version](#cpu-version)
-    4. [OpenCL Version](#opencl-version)
-    5. [3D Reconstruction Module](#3d-reconstruction-module)
-    6. [Calibration Module](#calibration-module)
-    7. [Compiling without cuDNN](#compiling-without-cudnn)
-    8. [Custom Caffe (Ubuntu Only)](#custom-caffe-ubuntu-only)
-    9. [Custom OpenCV (Ubuntu Only)](#custom-opencv-ubuntu-only)
-    10. [Doxygen Documentation Autogeneration (Ubuntu Only)](#doxygen-documentation-autogeneration-ubuntu-only)
-    11. [CMake Command Line Configuration (Ubuntu Only)](#cmake-command-line-configuration-ubuntu-only)
+    2. [COCO and MPI Models](#coco-and-mpi-models)
+    3. [Python API](#python-api)
+    4. [CPU Version](#cpu-version)
+    5. [OpenCL Version](#opencl-version)
+    6. [3D Reconstruction Module](#3d-reconstruction-module)
+    7. [Calibration Module](#calibration-module)
+    8. [Compiling without cuDNN](#compiling-without-cudnn)
+    9. [Custom Caffe (Ubuntu Only)](#custom-caffe-ubuntu-only)
+    10. [Custom OpenCV (Ubuntu Only)](#custom-opencv-ubuntu-only)
+    11. [Doxygen Documentation Autogeneration (Ubuntu Only)](#doxygen-documentation-autogeneration-ubuntu-only)
+    12. [CMake Command Line Configuration (Ubuntu Only)](#cmake-command-line-configuration-ubuntu-only)
 
 
 
@@ -248,8 +249,13 @@ OpenPose displays the FPS in the basic GUI. However, more complex speed metrics 
 
 
 
-#### COCO and MPI Model
+#### COCO and MPI Models
 By default, the body COCO and MPI models are not downloaded. You can download them by turning on the `DOWNLOAD_BODY_COCO_MODEL` or `DOWNLOAD_BODY_MPI_MODEL` flags. It's slightly faster but less accurate and has less keypoints than the COCO body model.
+
+
+
+#### Python API
+To install the Python API, ensure that the `BUILD_PYTHON` flag is turned on while running CMake GUI. Check [doc/modules/python_module.md](./modules/python_module.md) for further details.
 
 
 
@@ -305,14 +311,14 @@ You can include the 3D reconstruction module by:
 3. Follow the CMake installation steps. In addition, set the `WITH_FLIR_CAMERA` (only if Spinnaker was installed) and `WITH_3D_RENDERER` options.
 4. Increased accuracy with Ceres solver (Ubuntu only): For extra 3-D reconstruction accuracy, run `sudo apt-get install libeigen3-dev`, install [Ceres solver](http://ceres-solver.org/installation.html), and enable `WITH_CERES` in CMake when installing OpenPose. Ceres is harder to install in Windows, so we have not tested it so far in there. Feel free to make a pull request if you do.
 
-After installation, check the [doc/3d_reconstruction_demo.md](./3d_reconstruction_demo.md) instructions.
+After installation, check the [doc/modules/3d_reconstruction_module.md](./modules/3d_reconstruction_module.md) instructions.
 
 
 
 #### Calibration Module
 The calibration module is included by default, but you must also enable `WITH_EIGEN` if you intend to use the extrinsic camera parameter estimation tool. You can set that flag to 2 different values: `APT_GET` or `BUILD`, check [Requirements](#requirements) for more information.
 
-After installation, check the [doc/calibration_demo.md](./calibration_demo.md) instructions.
+After installation, check the [doc/modules/calibration_module.md](./modules/calibration_module.md) instructions.
 
 
 
