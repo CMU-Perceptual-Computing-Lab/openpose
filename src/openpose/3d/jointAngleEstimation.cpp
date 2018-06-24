@@ -193,7 +193,6 @@ namespace op
             // error("JointAngleEstimation (`ik_threads` flag) buggy and not working yet, but we are working on it!"
             //       " No coming soon...", __LINE__, __FUNCTION__, __FILE__);
             #ifndef USE_3D_ADAM_MODEL
-                UNUSED(ceresDisplayReport);
                 error("OpenPose must be compiled with the `USE_3D_ADAM_MODEL` macro definition in order to use this"
                       " functionality.", __LINE__, __FUNCTION__, __FILE__);
             #endif
@@ -227,18 +226,18 @@ namespace op
                       __LINE__, __FUNCTION__, __FILE__);
             // Shorter naming
             auto& frameParams = spImpl->mFrameParams;
-            // Reset to 0 all keypoints - Otherwise undefined behavior when fitting
-            // It must be done on every iteration, otherwise errors, e.g., if face
-            // was detected in frame i-1 but not in i
-            spImpl->mBodyJoints.setZero();
-            spImpl->mFaceJoints.setZero();
-            spImpl->mLHandJoints.setZero();
-            spImpl->mRHandJoints.setZero();
-            spImpl->mLFootJoints.setZero();
-            spImpl->mRFootJoints.setZero();
             // If keypoints detected
             if (!poseKeypoints3D.empty())
             {
+                // Reset to 0 all keypoints - Otherwise undefined behavior when fitting
+                // It must be done on every iteration, otherwise errors, e.g., if face
+                // was detected in frame i-1 but not in i
+                spImpl->mBodyJoints.setZero();
+                spImpl->mFaceJoints.setZero();
+                spImpl->mLHandJoints.setZero();
+                spImpl->mRHandJoints.setZero();
+                spImpl->mLFootJoints.setZero();
+                spImpl->mRFootJoints.setZero();
                 // Update body
                 for (auto part = 0 ; part < 19; part++)
                     updateKeypoint(spImpl->mBodyJoints,
@@ -304,70 +303,72 @@ namespace op
                     spImpl->mFaceJoints *= 1e2;
                 spImpl->mLFootJoints *= 1e2;
                 spImpl->mRFootJoints *= 1e2;
-            }
 
-            // Initialization (e.g., first frame)
-            const bool fastVersion = false;
-            const bool freezeMissing = true;
-            const bool ceresDisplayReport = true;
-            // Fill Datum
-            if (!spImpl->mInitialized || !fastVersion)
-            {
-                if (!spImpl->mInitialized)
+                // Initialization (e.g., first frame)
+                const bool fastVersion = false;
+                const bool freezeMissing = true;
+                const bool ceresDisplayReport = false;
+                // Fill Datum
+                if (!spImpl->mInitialized || !fastVersion)
                 {
-                    frameParams.m_adam_t(0) = spImpl->mBodyJoints(0, 2);
-                    frameParams.m_adam_t(1) = spImpl->mBodyJoints(1, 2);
-                    frameParams.m_adam_t(2) = spImpl->mBodyJoints(2, 2);
-                    frameParams.m_adam_pose(0, 0) = 3.14159265358979323846264338327950288419716939937510582097494459;
-                    spImpl->mInitialized = true;
-                }
-                // We make T-pose start with:
-                // 1. Root translation similar to current 3-d location of the mid-hip
-                // 2. x-orientation = 180, i.e., person standing up & looking to the camera
-                // 3. Because otherwise, if we call Adam_FastFit_Initialize twice (e.g., if a new person appears),
-                // it would use the latest ones from the last Adam_FastFit
-                // Fit initialization
-                // Adam_FastFit_Initialize only changes frameParams
-                const auto multistageFitting = true;
-                const auto handEnabled = !handKeypoints3D[0].empty() || !handKeypoints3D[1].empty()
-                    || poseKeypoints3D.getSize(1) == 65;
-                const auto fitFaceExponents = !faceKeypoints3D.empty();
-                const auto fastSolver = true;
-                Adam_FastFit_Initialize(*spImpl->spTotalModel, frameParams, spImpl->mBodyJoints, spImpl->mRFootJoints,
-                                        spImpl->mLFootJoints, spImpl->mRHandJoints, spImpl->mLHandJoints,
-                                        spImpl->mFaceJoints, freezeMissing, ceresDisplayReport,
-                                        multistageFitting, handEnabled, fitFaceExponents, fastSolver);
-                // The following 2 operations takes ~12 msec
-                if (spImpl->mReturnJacobian)
-                {
-                    vtVec = spImpl->spTotalModel->m_meanshape
-                          + spImpl->spTotalModel->m_shapespace_u * frameParams.m_adam_coeffs;
-                    j0Vec = spImpl->spTotalModel->J_mu_ + spImpl->spTotalModel->dJdc_ * frameParams.m_adam_coeffs;
-                    if (fastVersion)
+                    if (!spImpl->mInitialized)
                     {
-                        spImpl->mVtVec = vtVec;
-                        spImpl->mJ0Vec = j0Vec;
+                        frameParams.m_adam_t(0) = spImpl->mBodyJoints(0, 2);
+                        frameParams.m_adam_t(1) = spImpl->mBodyJoints(1, 2);
+                        frameParams.m_adam_t(2) = spImpl->mBodyJoints(2, 2);
+                        frameParams.m_adam_pose(0, 0) = 3.14159265358979323846264338327950288419716939937510582097494459;
+                        spImpl->mInitialized = true;
+                    }
+                    // We make T-pose start with:
+                    // 1. Root translation similar to current 3-d location of the mid-hip
+                    // 2. x-orientation = 180, i.e., person standing up & looking to the camera
+                    // 3. Because otherwise, if we call Adam_FastFit_Initialize twice (e.g., if a new person appears),
+                    // it would use the latest ones from the last Adam_FastFit
+                    // Fit initialization
+                    // Adam_FastFit_Initialize only changes frameParams
+                    const auto multistageFitting = true;
+                    const auto handEnabled = !handKeypoints3D[0].empty() || !handKeypoints3D[1].empty()
+                        || poseKeypoints3D.getSize(1) == 65;
+                    const auto fitFaceExponents = !faceKeypoints3D.empty();
+                    const auto fastSolver = true;
+                    Adam_FastFit_Initialize(*spImpl->spTotalModel, frameParams, spImpl->mBodyJoints, spImpl->mRFootJoints,
+                                            spImpl->mLFootJoints, spImpl->mRHandJoints, spImpl->mLHandJoints,
+                                            spImpl->mFaceJoints, freezeMissing, ceresDisplayReport,
+                                            multistageFitting, handEnabled, fitFaceExponents, fastSolver);
+                    // The following 2 operations takes ~12 msec
+                    if (spImpl->mReturnJacobian)
+                    {
+                        vtVec = spImpl->spTotalModel->m_meanshape
+                              + spImpl->spTotalModel->m_shapespace_u * frameParams.m_adam_coeffs;
+                        j0Vec = spImpl->spTotalModel->J_mu_ + spImpl->spTotalModel->dJdc_ * frameParams.m_adam_coeffs;
+                        if (fastVersion)
+                        {
+                            spImpl->mVtVec = vtVec;
+                            spImpl->mJ0Vec = j0Vec;
+                        }
                     }
                 }
-            }
-            // Other frames if fastVersion
-            else // if (spImpl->mInitialized && fastVersion)
-            {
-                // Adam_FastFit only changes frameParams
-                Adam_FastFit(*spImpl->spTotalModel, frameParams, spImpl->mBodyJoints, spImpl->mRFootJoints,
-                             spImpl->mLFootJoints, spImpl->mRHandJoints, spImpl->mLHandJoints,
-                             spImpl->mFaceJoints, ceresDisplayReport);
-                if (spImpl->mReturnJacobian)
+                // Other frames if fastVersion
+                else // if (spImpl->mInitialized && fastVersion)
                 {
-                    vtVec = spImpl->mVtVec;
-                    j0Vec = spImpl->mJ0Vec;
+                    // Adam_FastFit only changes frameParams
+                    Adam_FastFit(*spImpl->spTotalModel, frameParams, spImpl->mBodyJoints, spImpl->mRFootJoints,
+                                 spImpl->mLFootJoints, spImpl->mRHandJoints, spImpl->mLHandJoints,
+                                 spImpl->mFaceJoints, ceresDisplayReport);
+                    if (spImpl->mReturnJacobian)
+                    {
+                        vtVec = spImpl->mVtVec;
+                        j0Vec = spImpl->mJ0Vec;
+                    }
                 }
+                adamPose = frameParams.m_adam_pose;
+                adamTranslation = frameParams.m_adam_t;
+                adamFacecoeffsExp = frameParams.m_adam_facecoeffs_exp;
+                // // Not used anymore
+                // frameParams.mouth_open, frameParams.reye_open, frameParams.leye_open, frameParams.dist_root_foot
             }
-            adamPose = frameParams.m_adam_pose;
-            adamTranslation = frameParams.m_adam_t;
-            adamFacecoeffsExp = frameParams.m_adam_facecoeffs_exp;
-            // // Not used anymore
-            // frameParams.mouth_open, frameParams.reye_open, frameParams.leye_open, frameParams.dist_root_foot
+            else
+                spImpl->mInitialized = false;
         }
         catch (const std::exception& e)
         {

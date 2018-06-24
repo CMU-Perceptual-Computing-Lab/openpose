@@ -638,7 +638,19 @@ void Adam_FastFit_Initialize(const TotalModel &adam,
 // const auto start1 = std::chrono::high_resolution_clock::now();
 	using namespace Eigen;
 	MatrixXd PAF(3, 54);
-	// std::fill(PAF.data(), PAF.data() + PAF.size(), 0);
+
+	for (int i = 1; i < TotalModel::NUM_JOINTS; i++)
+	{
+		auto count_axis = 0u;
+		if (frame_param.m_adam_pose.data()[3 * i + 0] > 90 || frame_param.m_adam_pose.data()[3 * i + 0] < -90) count_axis++;
+		if (frame_param.m_adam_pose.data()[3 * i + 1] > 90 || frame_param.m_adam_pose.data()[3 * i + 1] < -90) count_axis++;
+		if (frame_param.m_adam_pose.data()[3 * i + 2] > 90 || frame_param.m_adam_pose.data()[3 * i + 2] < -90) count_axis++;
+		if (count_axis >= 2)  // this joint is twisted
+		{
+			frame_param.m_adam_pose.data()[3 * i + 0] = frame_param.m_adam_pose.data()[3 * i + 1] = frame_param.m_adam_pose.data()[3 * i + 2] = 0.0;
+		}
+	}
+
 	const AdamFitData data(adam, BodyJoints, rFoot, lFoot, faceJoints, lHandJoints, rHandJoints, PAF, true);
 	ceres::Problem problem_init;
 	AdamFullCost* adam_cost = new AdamFullCost(data, 0, false);
@@ -670,6 +682,8 @@ void Adam_FastFit_Initialize(const TotalModel &adam,
 		frame_param.m_adam_pose.data());
 
 	for (int j = 0; j < 22 * 3; j++) cost_prior_body_pose_init->weight[j] *= 2;
+	cost_prior_body_pose_init->weight[18 * 3] *= 2;  cost_prior_body_pose_init->weight[18 * 3 + 1] *= 2; cost_prior_body_pose_init->weight[18 * 3 + 2] *= 2;
+	cost_prior_body_pose_init->weight[19 * 3] *= 2;  cost_prior_body_pose_init->weight[19 * 3 + 1] *= 2; cost_prior_body_pose_init->weight[19 * 3 + 2] *= 2;
 
 	if (freeze_missing)
 	{
@@ -815,43 +829,43 @@ options_init.num_threads = 1; // num_linear_solver_threads deprecated
 	if (frame_param.m_adam_pose.data()[5 * 3 + 2] > 10) frame_param.m_adam_pose.data()[5 * 3 + 2] = 10;
 	if (frame_param.m_adam_pose.data()[5 * 3 + 2] < -10) frame_param.m_adam_pose.data()[5 * 3 + 2] = -10;
 
-// const auto duration5 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start5).count();
-// const auto start6 = std::chrono::high_resolution_clock::now();
-	// get face (mouth_open, leye_open, reye_open) in a naive way
-	if (!(faceJoints.block<3, 8>(0, 60).array() == 0.0).any())  // if none of these keypoints is zero
-	{
-		const double mouth_width = (faceJoints.block<3, 1>(0, 60) - faceJoints.block<3, 1>(0, 64)).norm();
-		const double mouth_height = (faceJoints.block<3, 1>(0, 62) - faceJoints.block<3, 1>(0, 66)).norm();
-		if (mouth_width) frame_param.mouth_open = mouth_height / mouth_width;
-	}
-	else frame_param.mouth_open = 0.0;
-	if (!(faceJoints.block<3, 6>(0, 36).array() == 0.0).any())
-	{
-		const double reye_width = (faceJoints.block<3, 1>(0, 36) - faceJoints.block<3, 1>(0, 39)).norm();
-		const double reye_height1 = (faceJoints.block<3, 1>(0, 37) - faceJoints.block<3, 1>(0, 41)).norm();
-		const double reye_height2 = (faceJoints.block<3, 1>(0, 38) - faceJoints.block<3, 1>(0, 40)).norm();
-		if (reye_width) frame_param.reye_open = (reye_height1 + reye_height2) / reye_width;
-	}
-	else frame_param.reye_open = 1.0;
-// const auto duration6 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start6).count();
-// const auto start7 = std::chrono::high_resolution_clock::now();
-	if (!(faceJoints.block<3, 6>(0, 42).array() == 0.0).any())
-	{
-		const double leye_width = (faceJoints.block<3, 1>(0, 42) - faceJoints.block<3, 1>(0, 45)).norm();
-		const double leye_height1 = (faceJoints.block<3, 1>(0, 44) - faceJoints.block<3, 1>(0, 46)).norm();
-		const double leye_height2 = (faceJoints.block<3, 1>(0, 43) - faceJoints.block<3, 1>(0, 47)).norm();
-		if (leye_width) frame_param.leye_open = (leye_height1 + leye_height2) / leye_width;
-	}
-	else frame_param.leye_open = 1.0;
-	auto foot_vertex = adam.m_shapespace_u(14331 * 3 + 1) * frame_param.m_adam_coeffs;
-	frame_param.dist_root_foot = adam.m_meanshape(14331 * 3 + 1) + foot_vertex(0, 0);
-	if (verbose)
-	{
-		std::cout << "mouth: " << frame_param.mouth_open << std::endl;
-		std::cout << "reye: " << frame_param.reye_open << std::endl;
-		std::cout << "leye: " << frame_param.leye_open << std::endl;
-		std::cout << "distance root -> foot: " << frame_param.dist_root_foot << std::endl;
-	}
+// // const auto duration5 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start5).count();
+// // const auto start6 = std::chrono::high_resolution_clock::now();
+// 	// get face (mouth_open, leye_open, reye_open) in a naive way
+// 	if (!(faceJoints.block<3, 8>(0, 60).array() == 0.0).any())  // if none of these keypoints is zero
+// 	{
+// 		const double mouth_width = (faceJoints.block<3, 1>(0, 60) - faceJoints.block<3, 1>(0, 64)).norm();
+// 		const double mouth_height = (faceJoints.block<3, 1>(0, 62) - faceJoints.block<3, 1>(0, 66)).norm();
+// 		if (mouth_width) frame_param.mouth_open = mouth_height / mouth_width;
+// 	}
+// 	else frame_param.mouth_open = 0.0;
+// 	if (!(faceJoints.block<3, 6>(0, 36).array() == 0.0).any())
+// 	{
+// 		const double reye_width = (faceJoints.block<3, 1>(0, 36) - faceJoints.block<3, 1>(0, 39)).norm();
+// 		const double reye_height1 = (faceJoints.block<3, 1>(0, 37) - faceJoints.block<3, 1>(0, 41)).norm();
+// 		const double reye_height2 = (faceJoints.block<3, 1>(0, 38) - faceJoints.block<3, 1>(0, 40)).norm();
+// 		if (reye_width) frame_param.reye_open = (reye_height1 + reye_height2) / reye_width;
+// 	}
+// 	else frame_param.reye_open = 1.0;
+// // const auto duration6 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start6).count();
+// // const auto start7 = std::chrono::high_resolution_clock::now();
+// 	if (!(faceJoints.block<3, 6>(0, 42).array() == 0.0).any())
+// 	{
+// 		const double leye_width = (faceJoints.block<3, 1>(0, 42) - faceJoints.block<3, 1>(0, 45)).norm();
+// 		const double leye_height1 = (faceJoints.block<3, 1>(0, 44) - faceJoints.block<3, 1>(0, 46)).norm();
+// 		const double leye_height2 = (faceJoints.block<3, 1>(0, 43) - faceJoints.block<3, 1>(0, 47)).norm();
+// 		if (leye_width) frame_param.leye_open = (leye_height1 + leye_height2) / leye_width;
+// 	}
+// 	else frame_param.leye_open = 1.0;
+// 	auto foot_vertex = adam.m_shapespace_u(14331 * 3 + 1) * frame_param.m_adam_coeffs;
+// 	frame_param.dist_root_foot = adam.m_meanshape(14331 * 3 + 1) + foot_vertex(0, 0);
+// 	if (verbose)
+// 	{
+// 		std::cout << "mouth: " << frame_param.mouth_open << std::endl;
+// 		std::cout << "reye: " << frame_param.reye_open << std::endl;
+// 		std::cout << "leye: " << frame_param.leye_open << std::endl;
+// 		std::cout << "distance root -> foot: " << frame_param.dist_root_foot << std::endl;
+// 	}
 // const auto duration7 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start7).count();
 // const auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start).count();
 // std::cout << __FILE__ << " 1:" << duration1 * 1e-6 << "\n"

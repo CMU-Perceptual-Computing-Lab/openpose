@@ -249,32 +249,50 @@ namespace smpl
 
 // const auto duration2 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start2).count();
 // const auto start3 = std::chrono::high_resolution_clock::now();
-        ceres::AngleAxisToRotationMatrix(pose, R.data());
-        outJoint.row(0) = J0.row(0);
-        MR.at(0) = R;
-        outT.block<3,3>(0, 0) = MR[0];
-        outT.block<3,1>(0, 3) = J0.row(0).transpose();
-
-// const auto duration3 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start3).count();
-// const auto start4 = std::chrono::high_resolution_clock::now();
-        if (jacobians)
+        if (m_FK_joint_list[0])
         {
-            AngleAxisToRotationMatrix_Derivative(pose, dMRdP.at(0).data(), 0);  
-            if (m_rigid_body)
+            ceres::AngleAxisToRotationMatrix(pose, R.data());
+            outJoint.row(0) = J0.row(0);
+            MR.at(0) = R;
+            outT.block<3,3>(0, 0) = MR[0];
+            outT.block<3,1>(0, 3) = J0.row(0).transpose();
+
+    // const auto duration3 = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start3).count();
+    // const auto start4 = std::chrono::high_resolution_clock::now();
+            if (jacobians)
             {
-                dMtdP[0].block<3, 3>(0, 0).setZero();
-                dJdP.block<3, 3>(0, 0).setZero();
+                AngleAxisToRotationMatrix_Derivative(pose, dMRdP.at(0).data(), 0);  
+                if (m_rigid_body)
+                {
+                    dMtdP[0].block<3, 3>(0, 0).setZero();
+                    dJdP.block<3, 3>(0, 0).setZero();
+                }
+                else
+                {
+                    std::fill(dMtdP[0].data(), dMtdP[0].data() + 9 * TotalModel::NUM_JOINTS, 0.0); // dMtdP.at(0).setZero();
+                    std::copy(dMtdP[0].data(), dMtdP[0].data() + 9 * TotalModel::NUM_JOINTS, dJdP.data()); // dJdP.block(0, 0, 3, TotalModel::NUM_JOINTS * 3) = dMtdP[0];
+                }
+                if (jacobians[1])
+                {
+                    std::fill(dMtdJ[0].data(), dMtdJ[0].data() + 9 * TotalModel::NUM_JOINTS, 0.0); // dMtdJ.at(0).setZero();
+                    dMtdJ.at(0).block<3,3>(0, 0).setIdentity();
+                    std::copy(dMtdJ[0].data(), dMtdJ[0].data() + 9 * TotalModel::NUM_JOINTS, dJdJ.data()); // dJdJ.block(0, 0, 3, TotalModel::NUM_JOINTS * 3) = dMtdJ[0];
+                }
             }
-            else
+        }
+        else
+        {
+            std::fill(outJoint.data(), outJoint.data() + 3, 0.0);
+            std::fill(outT.data(), outT.data() + 12, 0.0);
+            if (jacobians)
             {
-                std::fill(dMtdP[0].data(), dMtdP[0].data() + 9 * TotalModel::NUM_JOINTS, 0.0); // dMtdP.at(0).setZero();
-                std::copy(dMtdP[0].data(), dMtdP[0].data() + 9 * TotalModel::NUM_JOINTS, dJdP.data()); // dJdP.block(0, 0, 3, TotalModel::NUM_JOINTS * 3) = dMtdP[0];
-            }
-            if (jacobians[1])
-            {
-                std::fill(dMtdJ[0].data(), dMtdJ[0].data() + 9 * TotalModel::NUM_JOINTS, 0.0); // dMtdJ.at(0).setZero();
-                dMtdJ.at(0).block<3,3>(0, 0).setIdentity();
-                std::copy(dMtdJ[0].data(), dMtdJ[0].data() + 9 * TotalModel::NUM_JOINTS, dJdJ.data()); // dJdJ.block(0, 0, 3, TotalModel::NUM_JOINTS * 3) = dMtdJ[0];
+                std::fill(dTrdP.data(), dTrdP.data() + 12 * TotalModel::NUM_POSE_PARAMETERS, 0.0);
+                std::fill(dJdP.data(), dJdP.data() + 3 * TotalModel::NUM_POSE_PARAMETERS, 0.0);
+                if (jacobians[1])
+                {
+                    std::fill(dTrdJ.data(), dTrdJ.data() + 12 * TotalModel::NUM_POSE_PARAMETERS, 0.0);
+                    std::fill(dJdJ.data(), dJdJ.data() + 3 * TotalModel::NUM_POSE_PARAMETERS, 0.0);
+                }
             }
         }
 
@@ -283,6 +301,22 @@ namespace smpl
         auto* dtdJPtr = dtdJ.data();
         for (int idj = 1; idj < mod_.NUM_JOINTS; idj++)
         {
+            if (!m_FK_joint_list[idj])
+            {
+                std::fill(outJoint.data() + 3 * idj, outJoint.data() + 3 * idj + 3, 0.0);
+                std::fill(outT.data() + 12 * idj, outT.data() + 12 * idj + 12, 0.0);
+                if (jacobians)
+                {
+                    std::fill(dTrdP.data() + 12 * idj * TotalModel::NUM_POSE_PARAMETERS, dTrdP.data() + 12 * (idj + 1) * TotalModel::NUM_POSE_PARAMETERS, 0.0);
+                    std::fill(dJdP.data() + 3 * idj * TotalModel::NUM_POSE_PARAMETERS, dJdP.data() + 3 * (idj + 1) * TotalModel::NUM_POSE_PARAMETERS, 0.0);
+                    if (jacobians[1])
+                    {
+                        std::fill(dTrdJ.data() + 12 * idj * TotalModel::NUM_POSE_PARAMETERS, dTrdJ.data() + 12 * (idj + 1) * TotalModel::NUM_POSE_PARAMETERS, 0.0);
+                        std::fill(dJdJ.data() + 3 * idj * TotalModel::NUM_POSE_PARAMETERS, dJdJ.data() + 3 * (idj + 1) * TotalModel::NUM_POSE_PARAMETERS, 0.0);
+                    }
+                }
+                continue;
+            }
             const int ipar = mod_.m_parent[idj];
             const auto baseIndex = idj * 3;
             double angles[3] = {pose[baseIndex], pose[baseIndex+1], pose[baseIndex+2]};
@@ -367,6 +401,7 @@ namespace smpl
 // const auto start6 = std::chrono::high_resolution_clock::now();
         for (int idj = 0; idj < mod_.NUM_JOINTS; idj++)
         {
+            if (!m_FK_joint_list[idj]) continue;
             const Matrix<double, 3, 1> offset = J0.row(idj).transpose();
 
             outT.block<3,3>(3 * idj, 0) = MR.at(idj);
