@@ -36,13 +36,13 @@
 
 
 ## Latest Features
-- Jun 2018: [**Combined body-foot model released! Faster and more accurate.**](doc/installation.md)!
-- Jun 2018: [**Python version**](doc/python_module.md) released!
+- Jun 2018: [**Combined body-foot model released! Faster and more accurate**](doc/installation.md)!
+- Jun 2018: [**Python version**](doc/modules/python_module.md) released!
 - Jun 2018: [**AMD graphic card version**](doc/installation.md) released!
-- Jun 2018: [**Calibration toolbox**](doc/calibration_demo.md) released!
+- Jun 2018: [**Calibration toolbox**](doc/modules/calibration_module.md) released!
 - Jun 2018: [**Mac OSX version (CPU)**](doc/installation.md) released!
 - Mar 2018: [**CPU version**](doc/installation.md#cpu-version)!
-- Mar 2018: [**3-D keypoint reconstruction module**](doc/3d_reconstruction_demo.md) (from multiple camera views)!
+- Mar 2018: [**3-D keypoint reconstruction module**](doc/modules/3d_reconstruction_module.md) (from multiple camera views)!
 - Sep 2017: [**CMake**](doc/installation.md) installer and **IP camera** support!
 - Jul 2017: [**Windows portable binaries and demo**](https://github.com/CMU-Perceptual-Computing-Lab/openpose/releases)!
 - Jul 2017: **Hands** released!
@@ -67,14 +67,9 @@ For further details, check [all released features](doc/released_features.md) and
 
 
 ## Results
-### 3-D Reconstruction Module
+### Body-Foot Estimation
 <p align="center">
-    <img src="doc/media/openpose3d.png", width="360">
-</p>
-
-### Body Estimation
-<p align="center">
-    <img src="doc/media/dance.gif", width="360">
+    <img src="doc/media/dance_foot.gif", width="360">
 </p>
 
 ### Body, Face, and Hands Estimation
@@ -82,9 +77,19 @@ For further details, check [all released features](doc/released_features.md) and
     <img src="doc/media/pose_face.gif", width="360">
 </p>
 
+### 3-D Reconstruction Module
+<p align="center">
+    <img src="doc/media/openpose3d.gif", width="360">
+</p>
+
 ### Body and Hands Estimation
 <p align="center">
     <img src="doc/media/pose_hands.gif", width="360">
+</p>
+
+### Body Estimation
+<p align="center">
+    <img src="doc/media/dance.gif", width="360">
 </p>
 
 
@@ -107,9 +112,9 @@ Most users do not need the [OpenPose C++ API](#openpose-c-api), but they can sim
 bin\OpenPoseDemo.exe --video examples\media\video.avi
 ```
 
-- **Calibration toolbox**: To easily calibrate your cameras for 3-D OpenPose or any other stereo vision task. See [doc/calibration_demo.md](doc/calibration_demo.md).
+- **Calibration toolbox**: To easily calibrate your cameras for 3-D OpenPose or any other stereo vision task. See [doc/modules/calibration_module.md](doc/modules/calibration_module.md).
 
-- **OpenPose Wrapper**: If you want to read a specific input, and/or add your custom post-processing function, and/or implement your own display/saving, check the `Wrapper` tutorial on [examples/tutorial_wrapper/](examples/tutorial_wrapper/). You can create your custom code on [examples/user_code/](examples/user_code/) and quickly compile it by using `make all` in the OpenPose folder (assuming Makefile installer).
+- **OpenPose Wrapper**: If you want to read a specific input, and/or add your custom post-processing function, and/or implement your own display/saving, check the `Wrapper` tutorial on [examples/tutorial_wrapper/](examples/tutorial_wrapper/). You can create your custom code on [examples/user_code/](examples/user_code/) and quickly compile it with CMake when compiling the whole OpenPose project. Quickly **add your custom code**: See [examples/user_code/README.md](examples/user_code/README.md) for further details.
 
 - **OpenPose C++ API**: See [doc/library_introduction.md](doc/library_introduction.md).
 
