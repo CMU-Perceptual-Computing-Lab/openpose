@@ -1281,8 +1281,7 @@ namespace op
             // After producer
             // ID generator (before any multi-threading or any function that requires the ID)
             const auto wIdGenerator = std::make_shared<WIdGenerator<TDatumsSP>>();
-            const auto wQueueSplitter = std::make_shared<WQueueSplitter<TDatumsSP, TDatums>>();
-            std::vector<TWorker> workersAux{wIdGenerator, wQueueSplitter};
+            std::vector<TWorker> workersAux{wIdGenerator};
             // Scale & cv::Mat to OP format
             if (spWScaleAndSizeExtractor != nullptr)
                 workersAux = mergeVectors(workersAux, {spWScaleAndSizeExtractor});
@@ -1347,11 +1346,13 @@ namespace op
             }
             // Assemble all frames from same time instant (3-D module)
             const auto wQueueAssembler = std::make_shared<WQueueAssembler<TDatumsSP, TDatums>>();
-            mThreadManager.add(mThreadId, wQueueAssembler, queueIn++, queueOut++);
-            threadIdPP();
             // 3-D reconstruction
             if (!spWPoseTriangulations.empty())
             {
+                // Assemble frames
+                mThreadManager.add(mThreadId, wQueueAssembler, queueIn++, queueOut++);
+                threadIdPP();
+                // 3-D reconstruction
                 if (mMultiThreadEnabled)
                 {
                     for (auto& wPoseTriangulations : spWPoseTriangulations)
@@ -1378,6 +1379,7 @@ namespace op
                 }
             }
             // Post processing workers
+            mPostProcessingWs = mergeVectors({wQueueAssembler}, mPostProcessingWs);
             if (!mPostProcessingWs.empty())
             {
                 // Thread 2 or 3, queues 2 -> 3

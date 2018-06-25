@@ -19,5 +19,4 @@ namespace op
     DEFINE_TEMPLATE_DATUM(WIdGenerator);
     template class OP_API WQueueAssembler<DATUM_BASE, DATUM_BASE_NO_PTR>;
     DEFINE_TEMPLATE_DATUM(WQueueOrderer);
-    template class OP_API WQueueSplitter<DATUM_BASE, DATUM_BASE_NO_PTR>;
 }
