@@ -20,6 +20,13 @@ To simply test the OpenPose API in your project without installation, ensure tha
 
 On an Ubuntu or OSX based system, you may use it globally. Running `sudo make install` will install OpenPose by default into `/usr/local/python`. You can set this into your python path and start using it at any location.
 
+The Python API requires Numpy for array management, and OpenCV for image loading.  They can be installed via:
+
+```
+pip install numpy
+pip install opencv-python
+```
+
 ## Compatibility
 The OpenPose Python module is compatible with both Python 2 and Python 3. In addition, it will also run in all OpenPose compatible operating systems.
 
