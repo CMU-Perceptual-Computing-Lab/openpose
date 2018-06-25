@@ -1,15 +1,17 @@
 import sys
 import cv2
 import os
+from sys import platform
 dir_path = os.path.dirname(os.path.realpath(__file__))
-sys.path.append('../../python')
+if platform == "win32": sys.path.append(dir_path + '/../../python/openpose/');
+else: sys.path.append('../../python');
 from openpose import *
 
 params = dict()
 params["logging_level"] = 3
 params["output_resolution"] = "-1x-1"
 params["net_resolution"] = "-1x368"
-params["model_pose"] = "COCO"
+params["model_pose"] = "BODY_25"
 params["alpha_pose"] = 0.6
 params["scale_gap"] = 0.3
 params["scale_number"] = 1
@@ -20,7 +22,7 @@ params["default_model_folder"] = dir_path + "/../../../models/"
 openpose = OpenPose(params)
 img = cv2.imread(dir_path + "/../../../examples/media/COCO_val2014_000000000192.jpg")
 arr, output_image = openpose.forward(img, True)
-print arr
+print(arr)
 
 while 1:
     cv2.imshow("output", output_image)

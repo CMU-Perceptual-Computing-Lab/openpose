@@ -2,13 +2,16 @@
 Wrap the OpenPose library with Python.
 To install run `make install` and library will be stored in /usr/local/python
 """
-
 import numpy as np
 import ctypes as ct
 import cv2
 import os
 from sys import platform
 dir_path = os.path.dirname(os.path.realpath(__file__))
+
+if platform == "win32":
+    os.environ['PATH'] = dir_path + "/../../lib;" + os.environ['PATH']
+    os.environ['PATH'] = dir_path + "/../../x64/Release;" + os.environ['PATH']
 
 class OpenPose(object):
     """

@@ -504,6 +504,16 @@ if (WIN32)
     set(SPINNAKER_INCLUDE_DIRS "3rdparty/windows/spinnaker/include")
   endif (WITH_FLIR_CAMERA)
   set(Caffe_FOUND 1)
+
+  # Auto copy DLLs
+  file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+  file(GLOB CAFFE_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe/bin/*.dll")
+  file(GLOB OPENCV_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/opencv/x64/vc14/bin/*.dll")
+  file(GLOB OPENCV3PTY_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/lib/*.dll")
+  file(COPY ${CAFFE_DLL} DESTINATION ${CMAKE_BINARY_DIR}/lib)
+  file(COPY ${OPENCV_DLL} DESTINATION ${CMAKE_BINARY_DIR}/lib)
+  file(COPY ${OPENCV3PTY_DLL} DESTINATION ${CMAKE_BINARY_DIR}/lib)
+
 endif (WIN32)
 
 
@@ -740,9 +750,9 @@ endif (${GPU_MODE} MATCHES "OPENCL")
 # Boost
 if (WIN32)
     set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries}
-        debug ${BOOST_SYSTEM_LIB_DEBUG} optimized ${BOOST_SYSTEM_LIB_RELEASE})
+        debug ${BOOST_SYSTEM_LIB_RELEASE} optimized ${BOOST_SYSTEM_LIB_RELEASE})
         set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries}
-        debug ${BOOST_FILESYSTEM_LIB_DEBUG} optimized ${BOOST_FILESYSTEM_LIB_RELEASE})
+        debug ${BOOST_SYSTEM_LIB_RELEASE} optimized ${BOOST_FILESYSTEM_LIB_RELEASE})
 endif (WIN32)
 # 3-D
 if (WITH_3D_ADAM_MODEL)
