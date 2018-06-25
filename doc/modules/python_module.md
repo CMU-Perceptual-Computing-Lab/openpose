@@ -14,7 +14,7 @@ This experimental module exposes a Python API for OpenPose. This allows you to c
 
 
 ## Installation
-To install the Python API, ensure that the `BUILD_PYTHON` flag is turned on while running CMake GUI. 
+To install the Python API, ensure that the `BUILD_PYTHON` flag is turned on while running CMake GUI.  Check [doc/installation.md#python-module](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/modules/installation.md#python-module)  for installation steps.
 
 To simply test the OpenPose API in your project without installation, ensure that the line `sys.path.append('{OpenPose_path}/python')` is set where `{OpenPose_path}` points to your build folder of OpenPose. Take a look at `build/examples/tutorial_pose/1_extract_pose.py` for an example.
 
