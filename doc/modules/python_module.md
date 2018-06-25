@@ -11,7 +11,7 @@ OpenPose Python Module
 ## Introduction
 This experimental module exposes a Python API for OpenPose. This allows you to construct an OpenPose object, pass in a numpy array for an image, and get a numpy array of the pose positions. This API also exposes an API that allows you to directly pass in heatmaps from a network and extract poses out of it (Requires Python Caffe to be installed seperately)
 
-
+At present the Python API only supports Body pose. Hands and Face will be added in the future.
 
 ## Installation
 To install the Python API, ensure that the `BUILD_PYTHON` flag is turned on while running CMake GUI.  Check [doc/installation.md#python-module](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/modules/installation.md#python-module)  for installation steps.
