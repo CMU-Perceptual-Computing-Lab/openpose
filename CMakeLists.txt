@@ -471,7 +471,7 @@ if (WIN32)
     endif (${GPU_MODE} MATCHES "CPU_ONLY")
   endif (${GPU_MODE} MATCHES "OPENCL")
   # Boost Dep
-  if (${GPU_MODE} MATCHES "CPU_ONLY" OR ${GPU_MODE} MATCHES "OPENCL" OR )
+  if (${GPU_MODE} MATCHES "CPU_ONLY" OR ${GPU_MODE} MATCHES "OPENCL" OR BUILD_PYTHON)
       find_library(BOOST_SYSTEM_LIB_RELEASE libboost_system-vc140-mt-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
       find_library(BOOST_SYSTEM_LIB_DEBUG libboost_system-vc140-mt-gd-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
       find_library(BOOST_FILESYSTEM_LIB_RELEASE libboost_filesystem-vc140-mt-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
