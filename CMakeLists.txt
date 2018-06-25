@@ -775,10 +775,12 @@ if (${GPU_MODE} MATCHES "OPENCL")
 endif (${GPU_MODE} MATCHES "OPENCL")
 # Boost
 if (WIN32)
+    if (${GPU_MODE} MATCHES "CPU_ONLY" OR ${GPU_MODE} MATCHES "OPENCL" OR BUILD_PYTHON)
     set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries}
         debug ${BOOST_SYSTEM_LIB_RELEASE} optimized ${BOOST_SYSTEM_LIB_RELEASE})
         set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries}
         debug ${BOOST_FILESYSTEM_LIB_RELEASE} optimized ${BOOST_FILESYSTEM_LIB_RELEASE})
+    endif ()
 endif (WIN32)
 # 3-D
 if (WITH_3D_ADAM_MODEL)
