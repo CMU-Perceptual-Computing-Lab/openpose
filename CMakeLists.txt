@@ -507,7 +507,14 @@ if (WIN32)
 
   # Auto copy DLLs
   file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-  file(GLOB CAFFE_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe/bin/*.dll")
+  # Auto copy DLLs
+  if (${GPU_MODE} MATCHES "CUDA")
+      file(GLOB CAFFE_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe/bin/*.dll")
+  elseif (${GPU_MODE} MATCHES "OPENCL")
+      file(GLOB CAFFE_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe_opencl/bin/*.dll")
+  elseif (${GPU_MODE} MATCHES "CPU_ONLY")
+      file(GLOB CAFFE_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe_cpu/bin/*.dll")
+  endif ()
   file(GLOB OPENCV_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/opencv/x64/vc14/bin/*.dll")
   file(GLOB OPENCV3PTY_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/lib/*.dll")
   file(COPY ${CAFFE_DLL} DESTINATION ${CMAKE_BINARY_DIR}/lib)
