@@ -70,10 +70,8 @@ namespace op
                     auto& tDatum = (*tDatums)[i];
                     tDatum.subId = i;
                     tDatum.subIdMax = tDatums->size()-1;
-// std::cout << __LINE__ << " " << tDatum.id << " " << tDatum.subId << " " << tDatum.subIdMax << std::endl;
                     mQueuedElements.emplace(
                         std::make_shared<TDatumsNoPtr>(TDatumsNoPtr{tDatum}));
-// std::cout << __LINE__ << " " << mQueuedElements.back()->at(0).id << " " << mQueuedElements.back()->at(0).subId << " " << mQueuedElements.back()->at(0).subIdMax << std::endl << std::endl;
                 }
                 tDatums = nullptr;
                 // Return oldest view
@@ -81,9 +79,6 @@ namespace op
                 {
                     tDatums = mQueuedElements.front();
                     mQueuedElements.pop();
-// for (auto& tDatum : *tDatums)
-// std::cout << __LINE__ << " " << tDatum.id << " " << tDatum.subId << " " << tDatum.subIdMax << std::endl;
-// std::cout << __LINE__ << " " << tDatums->size() << std::endl;
                 }
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);

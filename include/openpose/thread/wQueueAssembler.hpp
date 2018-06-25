@@ -65,7 +65,6 @@ namespace op
                     error("This function assumes that QueueSplitter was applied in the first place, i.e.,"
                           " that there is only 1 element per TDatums.", __LINE__, __FUNCTION__, __FILE__);
                 auto tDatum = (*tDatums)[0];
-// std::cout << __LINE__ << " " << tDatum.id << " " << tDatum.subId << " " << tDatum.subIdMax << std::endl;
                 // Single view --> Return
                 if (mNextTDatums == nullptr && tDatum.subIdMax == 0)
                     return;
@@ -79,18 +78,12 @@ namespace op
                 // Multiple view --> Merge views into different TDatums
                 else
                 {
-// std::cout << __LINE__ << " " << tDatum.id << " " << tDatum.subId << " " << tDatum.subIdMax << std::endl;
                     mNextTDatums->emplace_back(tDatum);
-// std::cout << __LINE__ << " " << mNextTDatums->back().id << " " << mNextTDatums->back().subId << " " << mNextTDatums->back().subIdMax << std::endl;
-for (auto& tDatum : *mNextTDatums)
-std::cout << __LINE__ << " " << tDatum.id << " " << tDatum.subId << " " << tDatum.subIdMax << std::endl;
                     // Last view - Return frame
                     if (mNextTDatums->back().subId == mNextTDatums->back().subIdMax)
                     {
                         tDatums = mNextTDatums;
                         mNextTDatums = nullptr;
-for (auto& tDatum : *tDatums)
-std::cout << __LINE__ << " " << tDatum.id << " " << tDatum.subId << " " << tDatum.subIdMax << std::endl;
                     }
                     // Non-last view - Return nothing
                     else
