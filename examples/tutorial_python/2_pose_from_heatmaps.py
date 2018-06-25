@@ -1,12 +1,11 @@
 from sys import platform
 import sys
-if platform == "win32":
-    try:
-        import caffe
-    except ImportError:
-        print("This sample can only be run if Caffe if available on your system")
-        print("Currently OpenPose does not compile Python Caffe. This may be supported in the future")
-        sys.exit(-1)
+try:
+    import caffe
+except ImportError:
+    print("This sample can only be run if Python Caffe if available on your system")
+    print("Currently OpenPose does not compile Python Caffe. This may be supported in the future")
+    sys.exit(-1)
     
 import os
 os.environ["GLOG_minloglevel"] = "1"

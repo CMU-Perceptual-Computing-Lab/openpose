@@ -752,7 +752,7 @@ if (WIN32)
     set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries}
         debug ${BOOST_SYSTEM_LIB_RELEASE} optimized ${BOOST_SYSTEM_LIB_RELEASE})
         set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries}
-        debug ${BOOST_SYSTEM_LIB_RELEASE} optimized ${BOOST_FILESYSTEM_LIB_RELEASE})
+        debug ${BOOST_FILESYSTEM_LIB_RELEASE} optimized ${BOOST_FILESYSTEM_LIB_RELEASE})
 endif (WIN32)
 # 3-D
 if (WITH_3D_ADAM_MODEL)
