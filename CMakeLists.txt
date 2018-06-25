@@ -467,14 +467,11 @@ if (WIN32)
       find_library(Caffe_Proto_LIB caffeproto HINTS ${FIND_LIB_PREFIX}/caffe/lib)
     endif (${GPU_MODE} MATCHES "CPU_ONLY")
   endif (${GPU_MODE} MATCHES "OPENCL")
-
-  if (${GPU_MODE} MATCHES "OPENCL")
-    unset(BOOST_SYSTEM_LIB_RELEASE CACHE)
-    unset(BOOST_SYSTEM_LIB_DEBUG CACHE)
-    find_library(BOOST_SYSTEM_LIB_RELEASE boost_system-vc140-mt-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
-    find_library(BOOST_SYSTEM_LIB_DEBUG boost_system-vc140-mt-gd-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
-  endif (${GPU_MODE} MATCHES "OPENCL")
-
+  # Boost Dep
+  find_library(BOOST_SYSTEM_LIB_RELEASE libboost_system-vc140-mt-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
+  find_library(BOOST_SYSTEM_LIB_DEBUG libboost_system-vc140-mt-gd-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
+  find_library(BOOST_FILESYSTEM_LIB_RELEASE libboost_filesystem-vc140-mt-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
+  find_library(BOOST_FILESYSTEM_LIB_DEBUG libboost_filesystem-vc140-mt-gd-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
   if (WITH_3D_RENDERER)
     find_library(GLUT_LIBRARY freeglut HINTS ${FIND_LIB_PREFIX}/freeglut/lib)
     message(STATUS "\${GLUT_LIBRARY} = ${GLUT_LIBRARY}")
@@ -739,11 +736,14 @@ if (USE_MKL)
 endif (USE_MKL)
 if (${GPU_MODE} MATCHES "OPENCL")
   set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries} ${CMAKE_THREAD_LIBS_INIT} ${OpenCL_LIBRARIES})
-  if (WIN32)
+endif (${GPU_MODE} MATCHES "OPENCL")
+# Boost
+if (WIN32)
     set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries}
         debug ${BOOST_SYSTEM_LIB_DEBUG} optimized ${BOOST_SYSTEM_LIB_RELEASE})
-  endif (WIN32)
-endif (${GPU_MODE} MATCHES "OPENCL")
+        set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries}
+        debug ${BOOST_FILESYSTEM_LIB_DEBUG} optimized ${BOOST_FILESYSTEM_LIB_RELEASE})
+endif (WIN32)
 # 3-D
 if (WITH_3D_ADAM_MODEL)
   set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries}
