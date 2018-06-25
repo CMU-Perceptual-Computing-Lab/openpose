@@ -35,7 +35,7 @@
 #include <openpose/thread/headers.hpp>
 
 // tracking module
-#include <openpose/thread/headers.hpp>
+#include <openpose/tracking/headers.hpp>
 
 // utilities module
 #include <openpose/utilities/headers.hpp>
