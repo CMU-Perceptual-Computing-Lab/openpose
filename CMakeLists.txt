@@ -235,6 +235,9 @@ option(DOWNLOAD_HAND_MODEL "Download hand model." ON)
 option(BUILD_EXAMPLES "Build OpenPose examples." ON)
 option(BUILD_DOCS "Build OpenPose documentation." OFF)
 option(BUILD_PYTHON "Build OpenPose python." OFF)
+if (WIN32)
+  option(BUILD_DLL "Copy over required DLL Files" ON)
+endif ()
 
 # Build as shared library
 option(BUILD_SHARED_LIBS "Build as shared lib" ON)
@@ -468,7 +471,7 @@ if (WIN32)
     endif (${GPU_MODE} MATCHES "CPU_ONLY")
   endif (${GPU_MODE} MATCHES "OPENCL")
   # Boost Dep
-  if (${GPU_MODE} MATCHES "CPU_ONLY" OR ${GPU_MODE} MATCHES "OPENCL" OR BUILD_PYTHON)
+  if (${GPU_MODE} MATCHES "CPU_ONLY" OR ${GPU_MODE} MATCHES "OPENCL" OR )
       find_library(BOOST_SYSTEM_LIB_RELEASE libboost_system-vc140-mt-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
       find_library(BOOST_SYSTEM_LIB_DEBUG libboost_system-vc140-mt-gd-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
       find_library(BOOST_FILESYSTEM_LIB_RELEASE libboost_filesystem-vc140-mt-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
@@ -512,21 +515,30 @@ if (WIN32)
   endif (WITH_FLIR_CAMERA)
   set(Caffe_FOUND 1)
 
-  # Auto copy DLLs
-  file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-  # Auto copy DLLs
-  if (${GPU_MODE} MATCHES "CUDA")
-      file(GLOB CAFFE_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe/bin/*.dll")
-  elseif (${GPU_MODE} MATCHES "OPENCL")
-      file(GLOB CAFFE_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe_opencl/bin/*.dll")
-  elseif (${GPU_MODE} MATCHES "CPU_ONLY")
-      file(GLOB CAFFE_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe_cpu/bin/*.dll")
+  # Build DLL Must be on if Build Python is on
+  if (BUILD_PYTHON)
+    if (NOT BUILD_DLL)
+      message(FATAL_ERROR "BUILD_DLL must be turned on to as well to build python library")
+    endif ()
   endif ()
-  file(GLOB OPENCV_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/opencv/x64/vc14/bin/*.dll")
-  file(GLOB OPENCV3PTY_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/lib/*.dll")
-  file(COPY ${CAFFE_DLL} DESTINATION ${CMAKE_BINARY_DIR}/lib)
-  file(COPY ${OPENCV_DLL} DESTINATION ${CMAKE_BINARY_DIR}/lib)
-  file(COPY ${OPENCV3PTY_DLL} DESTINATION ${CMAKE_BINARY_DIR}/lib)
+
+  # Auto copy DLLs
+  if (BUILD_DLL)
+    file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+    # Auto copy DLLs
+    if (${GPU_MODE} MATCHES "CUDA")
+      file(GLOB CAFFE_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe/bin/*.dll")
+    elseif (${GPU_MODE} MATCHES "OPENCL")
+      file(GLOB CAFFE_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe_opencl/bin/*.dll")
+    elseif (${GPU_MODE} MATCHES "CPU_ONLY")
+      file(GLOB CAFFE_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe_cpu/bin/*.dll")
+    endif ()
+    file(GLOB OPENCV_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/opencv/x64/vc14/bin/*.dll")
+    file(GLOB OPENCV3PTY_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/lib/*.dll")
+    file(COPY ${CAFFE_DLL} DESTINATION ${CMAKE_BINARY_DIR}/lib)
+    file(COPY ${OPENCV_DLL} DESTINATION ${CMAKE_BINARY_DIR}/lib)
+    file(COPY ${OPENCV3PTY_DLL} DESTINATION ${CMAKE_BINARY_DIR}/lib)
+  endif ()
 
 endif (WIN32)
 
