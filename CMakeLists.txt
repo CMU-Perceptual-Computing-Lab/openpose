@@ -425,7 +425,7 @@ if (WIN32)
 
   # Download required zip files
   download_zip("opencv_310.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 1e5240a64b814b3c0b822f136be78ad7)
-  download_zip("caffe3rdparty_2018_02_13.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 6653E07E3D2D7226D64FAD2DF0B407FB)
+  download_zip("caffe3rdparty_2018_06_26.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 892A39C0CFBAA11CA8648B125852E01F)
   if (${GPU_MODE} MATCHES "OPENCL")
     download_zip("caffe_opencl_2018_02_13.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 3ac3e1acf5ee6a4e57920be73053067a)
   elseif (${GPU_MODE} MATCHES "CPU_ONLY")
