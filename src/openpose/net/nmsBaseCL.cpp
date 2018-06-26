@@ -176,10 +176,10 @@ namespace op
                 cl::Buffer targetPtrBuffer = cl::Buffer((cl_mem)(targetPtr), true);
                 auto nmsRegisterKernel = OpenCL::getInstance(gpuID)->getKernelFunctorFromManager
                         <NMSRegisterKernelFunctor, T>(
-                         "nmsRegisterKernel",nmsOclCommonFunctions + nmsRegisterKernel);
+                         "nmsRegisterKernel", op::nmsOclCommonFunctions + op::nmsRegisterKernel);
                 auto nmsWriteKernel = OpenCL::getInstance(gpuID)->getKernelFunctorFromManager
                         <NMSWriteKernelFunctor, T>(
-                         "nmsWriteKernel", nmsOclCommonFunctions + nmsWriteKernel);
+                         "nmsWriteKernel", op::nmsOclCommonFunctions + op::nmsWriteKernel);
 
                 // log("num_b: " + std::to_string(bottom->shape(0)));       // = 1
                 // log("channel_b: " + std::to_string(bottom->shape(1)));   // = 57 = 18 body parts + bkg + 19x2 PAFs

@@ -1,3 +1,12 @@
+from sys import platform
+import sys
+try:
+    import caffe
+except ImportError:
+    print("This sample can only be run if Python Caffe if available on your system")
+    print("Currently OpenPose does not compile Python Caffe. This may be supported in the future")
+    sys.exit(-1)
+    
 import os
 os.environ["GLOG_minloglevel"] = "1"
 import caffe
@@ -36,7 +45,7 @@ caffe.set_device(0)
 nets = []
 for scale in scales:
     nets.append(caffe.Net(Param.prototxt, Param.caffemodel, caffe.TEST))
-print "Net loaded"
+print("Net loaded")
 
 # Test Function
 first_run = True
@@ -57,7 +66,7 @@ def func(frame):
             net.reshape()
 
         first_run = False
-        print "Reshaped"
+        print("Reshaped")
 
     # Forward pass to get heatmaps
     heatmaps = []

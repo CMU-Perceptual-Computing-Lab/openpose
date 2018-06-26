@@ -235,9 +235,12 @@ option(DOWNLOAD_HAND_MODEL "Download hand model." ON)
 option(BUILD_EXAMPLES "Build OpenPose examples." ON)
 option(BUILD_DOCS "Build OpenPose documentation." OFF)
 option(BUILD_PYTHON "Build OpenPose python." OFF)
+if (WIN32)
+  option(BUILD_DLL "Copy all required DLL files into the same folder." ON)
+endif ()
 
 # Build as shared library
-option(BUILD_SHARED_LIBS "Build as shared lib" ON)
+option(BUILD_SHARED_LIBS "Build as shared lib." ON)
 
 # Speed profiler
 option(PROFILER_ENABLED "If enabled, OpenPose will be able to print out speed information at runtime." OFF)
@@ -467,14 +470,18 @@ if (WIN32)
       find_library(Caffe_Proto_LIB caffeproto HINTS ${FIND_LIB_PREFIX}/caffe/lib)
     endif (${GPU_MODE} MATCHES "CPU_ONLY")
   endif (${GPU_MODE} MATCHES "OPENCL")
-
-  if (${GPU_MODE} MATCHES "OPENCL")
-    unset(BOOST_SYSTEM_LIB_RELEASE CACHE)
-    unset(BOOST_SYSTEM_LIB_DEBUG CACHE)
-    find_library(BOOST_SYSTEM_LIB_RELEASE boost_system-vc140-mt-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
-    find_library(BOOST_SYSTEM_LIB_DEBUG boost_system-vc140-mt-gd-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
-  endif (${GPU_MODE} MATCHES "OPENCL")
-
+  # Boost DepCopy over required DLL F
+  if (${GPU_MODE} MATCHES "CPU_ONLY" OR ${GPU_MODE} MATCHES "OPENCL" OR BUILD_PYTHON)
+      find_library(BOOST_SYSTEM_LIB_RELEASE libboost_system-vc140-mt-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
+      find_library(BOOST_SYSTEM_LIB_DEBUG libboost_system-vc140-mt-gd-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
+      find_library(BOOST_FILESYSTEM_LIB_RELEASE libboost_filesystem-vc140-mt-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
+      find_library(BOOST_FILESYSTEM_LIB_DEBUG libboost_filesystem-vc140-mt-gd-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
+  else ()
+      set(BOOST_SYSTEM_LIB_RELEASE "")
+      set(BOOST_SYSTEM_LIB_DEBUG "")
+      set(BOOST_FILESYSTEM_LIB_RELEASE "")
+      set(BOOST_FILESYSTEM_LIB_DEBUG "")
+  endif ()
   if (WITH_3D_RENDERER)
     find_library(GLUT_LIBRARY freeglut HINTS ${FIND_LIB_PREFIX}/freeglut/lib)
     message(STATUS "\${GLUT_LIBRARY} = ${GLUT_LIBRARY}")
@@ -507,6 +514,32 @@ if (WIN32)
     set(SPINNAKER_INCLUDE_DIRS "3rdparty/windows/spinnaker/include")
   endif (WITH_FLIR_CAMERA)
   set(Caffe_FOUND 1)
+
+  # Build DLL Must be on if Build Python is on
+  if (BUILD_PYTHON)
+    if (NOT BUILD_DLL)
+      message(FATAL_ERROR "BUILD_DLL must be turned on to as well to build python library")
+    endif ()
+  endif ()
+
+  # Auto copy DLLs
+  if (BUILD_DLL)
+    file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+    # Auto copy DLLs
+    if (${GPU_MODE} MATCHES "CUDA")
+      file(GLOB CAFFE_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe/bin/*.dll")
+    elseif (${GPU_MODE} MATCHES "OPENCL")
+      file(GLOB CAFFE_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe_opencl/bin/*.dll")
+    elseif (${GPU_MODE} MATCHES "CPU_ONLY")
+      file(GLOB CAFFE_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe_cpu/bin/*.dll")
+    endif ()
+    file(GLOB OPENCV_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/opencv/x64/vc14/bin/*.dll")
+    file(GLOB OPENCV3PTY_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/lib/*.dll")
+    file(COPY ${CAFFE_DLL} DESTINATION ${CMAKE_BINARY_DIR}/lib)
+    file(COPY ${OPENCV_DLL} DESTINATION ${CMAKE_BINARY_DIR}/lib)
+    file(COPY ${OPENCV3PTY_DLL} DESTINATION ${CMAKE_BINARY_DIR}/lib)
+  endif ()
+
 endif (WIN32)
 
 
@@ -739,11 +772,16 @@ if (USE_MKL)
 endif (USE_MKL)
 if (${GPU_MODE} MATCHES "OPENCL")
   set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries} ${CMAKE_THREAD_LIBS_INIT} ${OpenCL_LIBRARIES})
-  if (WIN32)
-    set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries}
-        debug ${BOOST_SYSTEM_LIB_DEBUG} optimized ${BOOST_SYSTEM_LIB_RELEASE})
-  endif (WIN32)
 endif (${GPU_MODE} MATCHES "OPENCL")
+# Boost
+if (WIN32)
+    if (${GPU_MODE} MATCHES "CPU_ONLY" OR ${GPU_MODE} MATCHES "OPENCL" OR BUILD_PYTHON)
+    set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries}
+        debug ${BOOST_SYSTEM_LIB_RELEASE} optimized ${BOOST_SYSTEM_LIB_RELEASE})
+        set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries}
+        debug ${BOOST_FILESYSTEM_LIB_RELEASE} optimized ${BOOST_FILESYSTEM_LIB_RELEASE})
+    endif ()
+endif (WIN32)
 # 3-D
 if (WITH_3D_ADAM_MODEL)
   set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries}

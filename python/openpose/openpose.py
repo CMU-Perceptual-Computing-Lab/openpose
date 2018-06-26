@@ -2,18 +2,27 @@
 Wrap the OpenPose library with Python.
 To install run `make install` and library will be stored in /usr/local/python
 """
-
 import numpy as np
 import ctypes as ct
 import cv2
 import os
+from sys import platform
 dir_path = os.path.dirname(os.path.realpath(__file__))
+
+if platform == "win32":
+    os.environ['PATH'] = dir_path + "/../../lib;" + os.environ['PATH']
+    os.environ['PATH'] = dir_path + "/../../x64/Release;" + os.environ['PATH']
 
 class OpenPose(object):
     """
     Ctypes linkage
     """
-    _libop= np.ctypeslib.load_library('_openpose', dir_path+'/_openpose.so')
+    if platform == "linux" or platform == "linux2":
+        _libop= np.ctypeslib.load_library('_openpose', dir_path+'/_openpose.so')
+    elif platform == "darwin":
+        _libop= np.ctypeslib.load_library('_openpose', dir_path+'/_openpose.dylib')
+    elif platform == "win32":
+        _libop= np.ctypeslib.load_library('_openpose', dir_path+'/Release/_openpose.dll')
     _libop.newOP.argtypes = [
         ct.c_int, ct.c_char_p, ct.c_char_p, ct.c_char_p, ct.c_float, ct.c_float, ct.c_int, ct.c_float, ct.c_int, ct.c_bool, ct.c_char_p]
     _libop.newOP.restype = ct.c_void_p
@@ -37,6 +46,9 @@ class OpenPose(object):
         np.ctypeslib.ndpointer(dtype=np.float32), np.ctypeslib.ndpointer(dtype=np.int32), np.ctypeslib.ndpointer(dtype=np.float32)]
     _libop.poseFromHeatmap.restype = None
 
+    def encode(self, string):
+        return ct.c_char_p(string.encode('utf-8'))
+
     def __init__(self, params):
         """
         OpenPose Constructor: Prepares OpenPose object
@@ -50,16 +62,16 @@ class OpenPose(object):
         outs: OpenPose object
         """
         self.op = self._libop.newOP(params["logging_level"],
-                                    params["output_resolution"],
-                                    params["net_resolution"],
-                                    params["model_pose"],
+		                            self.encode(params["output_resolution"]),
+                                    self.encode(params["net_resolution"]),
+                                    self.encode(params["model_pose"]),
                                     params["alpha_pose"],
                                     params["scale_gap"],
                                     params["scale_number"],
                                     params["render_threshold"],
                                     params["num_gpu_start"],
                                     params["disable_blending"],
-                                    params["default_model_folder"])
+                                    self.encode(params["default_model_folder"]))
 
     def __del__(self):
         """
@@ -206,20 +218,20 @@ if __name__ == "__main__":
     params = dict()
     params["logging_level"] = 3
     params["output_resolution"] = "-1x-1"
-    params["net_resolution"] = "-1x736"
-    params["model_pose"] = "COCO"
+    params["net_resolution"] = "-1x368"
+    params["model_pose"] = "BODY_25"
     params["alpha_pose"] = 0.6
     params["scale_gap"] = 0.3
-    params["scale_number"] = 2
+    params["scale_number"] = 1
     params["render_threshold"] = 0.05
     params["num_gpu_start"] = 0
     params["disable_blending"] = False
-    params["default_model_folder"] = "models/"
+    params["default_model_folder"] = "../../../models/"
     openpose = OpenPose(params)
 
-    img = cv2.imread("examples/media/COCO_val2014_000000000192.jpg")
+    img = cv2.imread("../../../examples/media/COCO_val2014_000000000192.jpg")
     arr, output_image = openpose.forward(img, True)
-    print arr
+    print(arr)
 
     while 1:
         cv2.imshow("output", output_image)

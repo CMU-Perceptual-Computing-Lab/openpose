@@ -4,7 +4,7 @@ set(PYTHON_FILES
     _openpose.cpp)
 
 add_library(_openpose SHARED ${PYTHON_FILES})
-target_link_libraries(_openpose openpose ${GLOG_LIBRARY} ${GFLAGS_LIBRARY} ${Caffe_LIBS} ${MKL_LIBS} ${GLUT_LIBRARY} ${SPINNAKER_LIB} ${OpenCL_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(_openpose openpose ${OpenPose_3rdparty_libraries})
 SET_TARGET_PROPERTIES(_openpose PROPERTIES PREFIX "")
 configure_file(openpose.py openpose.py)
 configure_file(__init__.py __init__.py)
