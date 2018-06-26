@@ -236,11 +236,11 @@ option(BUILD_EXAMPLES "Build OpenPose examples." ON)
 option(BUILD_DOCS "Build OpenPose documentation." OFF)
 option(BUILD_PYTHON "Build OpenPose python." OFF)
 if (WIN32)
-  option(BUILD_DLL "Copy over required DLL Files" ON)
+  option(BUILD_DLL "Copy all required DLL files into the same folder." ON)
 endif ()
 
 # Build as shared library
-option(BUILD_SHARED_LIBS "Build as shared lib" ON)
+option(BUILD_SHARED_LIBS "Build as shared lib." ON)
 
 # Speed profiler
 option(PROFILER_ENABLED "If enabled, OpenPose will be able to print out speed information at runtime." OFF)
@@ -470,7 +470,7 @@ if (WIN32)
       find_library(Caffe_Proto_LIB caffeproto HINTS ${FIND_LIB_PREFIX}/caffe/lib)
     endif (${GPU_MODE} MATCHES "CPU_ONLY")
   endif (${GPU_MODE} MATCHES "OPENCL")
-  # Boost Dep
+  # Boost DepCopy over required DLL F
   if (${GPU_MODE} MATCHES "CPU_ONLY" OR ${GPU_MODE} MATCHES "OPENCL" OR BUILD_PYTHON)
       find_library(BOOST_SYSTEM_LIB_RELEASE libboost_system-vc140-mt-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
       find_library(BOOST_SYSTEM_LIB_DEBUG libboost_system-vc140-mt-gd-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
