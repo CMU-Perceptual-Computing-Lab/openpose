@@ -63,7 +63,8 @@ namespace op
                 if (tDatums->size() > 1)
                     error("This function assumes that WQueueSplitter (inside WDatumProducer)"
                           " was applied in the first place, i.e., that there is only 1 element"
-                          " per TDatums.", __LINE__, __FUNCTION__, __FILE__);
+                          " per TDatums (size = " + std::to_string(tDatums->size()) + ").",
+                          __LINE__, __FUNCTION__, __FILE__);
                 auto tDatum = (*tDatums)[0];
                 // Single view --> Return
                 if (tDatum.subIdMax == 0)

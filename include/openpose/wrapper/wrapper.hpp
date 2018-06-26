@@ -1378,8 +1378,9 @@ namespace op
                     mThreadManager.add(mThreadId, spWPoseTriangulations.at(0), queueIn++, queueOut++);
                 }
             }
+            else
+                mPostProcessingWs = mergeVectors({wQueueAssembler}, mPostProcessingWs);
             // Post processing workers
-            mPostProcessingWs = mergeVectors({wQueueAssembler}, mPostProcessingWs);
             if (!mPostProcessingWs.empty())
             {
                 // Thread 2 or 3, queues 2 -> 3
