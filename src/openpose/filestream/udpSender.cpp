@@ -114,45 +114,48 @@ namespace op
         #if defined(USE_ASIO) && defined(USE_EIGEN)
             try
             {
-                const Eigen::Map<const Eigen::Vector3d> adamTranslation(adamTranslationPtr);
-                const Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> adamPose(
-                    adamPosePtr, adamPoseRows, 3);
-                const Eigen::Map<const Eigen::VectorXd> adamFaceCoeffsExp(adamFaceCoeffsExpPtr, faceCoeffRows);
-
-                const std::string prefix = "AnimData:";
-                const std::string totalPositionString = "\"totalPosition\":"
-                    + vectorToJson(adamTranslation(0), adamTranslation(1), adamTranslation(2));
-                std::string jointAnglesString = "\"jointAngles\":[";
-                for (int i = 0; i < adamPoseRows; i++)
+                if (adamPosePtr != nullptr && adamTranslationPtr != nullptr && adamFaceCoeffsExpPtr != nullptr)
                 {
-                    jointAnglesString += vectorToJson(adamPose(i, 0), adamPose(i, 1), adamPose(i, 2));
-                    if (i != adamPoseRows - 1)
+                    const Eigen::Map<const Eigen::Vector3d> adamTranslation(adamTranslationPtr);
+                    const Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> adamPose(
+                        adamPosePtr, adamPoseRows, 3);
+                    const Eigen::Map<const Eigen::VectorXd> adamFaceCoeffsExp(adamFaceCoeffsExpPtr, faceCoeffRows);
+
+                    const std::string prefix = "AnimData:";
+                    const std::string totalPositionString = "\"totalPosition\":"
+                        + vectorToJson(adamTranslation(0), adamTranslation(1), adamTranslation(2));
+                    std::string jointAnglesString = "\"jointAngles\":[";
+                    for (int i = 0; i < adamPoseRows; i++)
                     {
-                        jointAnglesString += ",";
+                        jointAnglesString += vectorToJson(adamPose(i, 0), adamPose(i, 1), adamPose(i, 2));
+                        if (i != adamPoseRows - 1)
+                        {
+                            jointAnglesString += ",";
+                        }
                     }
-                }
-                jointAnglesString += "]";
+                    jointAnglesString += "]";
 
-                std::string facialParamsString = "\"facialParams\":[";
-                for (int i = 0; i < faceCoeffRows; i++)
-                {
-                    facialParamsString += std::to_string(adamFaceCoeffsExp(i));
-                    if (i != faceCoeffRows - 1)
+                    std::string facialParamsString = "\"facialParams\":[";
+                    for (int i = 0; i < faceCoeffRows; i++)
                     {
-                        facialParamsString += ",";
+                        facialParamsString += std::to_string(adamFaceCoeffsExp(i));
+                        if (i != faceCoeffRows - 1)
+                        {
+                            facialParamsString += ",";
+                        }
                     }
+                    facialParamsString += "]";
+
+                    // facialParamsString + std::to_string(mouth_open) + "," + std::to_string(leye_open) + "," + std::to_string(reye_open) + "]";
+
+                    // std::string rootHeightString = "\"rootHeight\":" + std::to_string(dist_root_foot);
+
+                    const std::string data = prefix + "{" + facialParamsString
+                                           + "," + totalPositionString
+                                           + "," + jointAnglesString + "}";
+
+                    spImpl->mUdpClient.send(data);
                 }
-                facialParamsString += "]";
-
-                // facialParamsString + std::to_string(mouth_open) + "," + std::to_string(leye_open) + "," + std::to_string(reye_open) + "]";
-
-                // std::string rootHeightString = "\"rootHeight\":" + std::to_string(dist_root_foot);
-
-                const std::string data = prefix + "{" + facialParamsString
-                                       + "," + totalPositionString
-                                       + "," + jointAnglesString + "}";
-
-                spImpl->mUdpClient.send(data);
             }
             catch (const std::exception& e)
             {

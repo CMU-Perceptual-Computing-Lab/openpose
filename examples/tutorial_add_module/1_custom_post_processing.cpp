@@ -244,8 +244,8 @@ DEFINE_string(write_video_adam,         "",             "Experimental, not avail
                                                         " controls FPS.");
 DEFINE_string(write_bvh,                "",             "Experimental, not available yet. E.g.: `~/Desktop/mocapResult.bvh`.");
 // UDP communication
-DEFINE_string(udp_host,                 "127.0.0.1",    "IP for UDP communication.");
-DEFINE_string(udp_port,                 "8051",         "Port number for UDP communication.");
+DEFINE_string(udp_host,                 "",             "Experimental, not available yet. IP for UDP communication. E.g., `192.168.0.1`.");
+DEFINE_string(udp_port,                 "8051",         "Experimental, not available yet. Port number for UDP communication.");
 
 int openPoseTutorialWrapper4()
 {

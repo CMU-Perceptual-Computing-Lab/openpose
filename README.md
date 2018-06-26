@@ -20,7 +20,7 @@
         - 15 or 18 or **25-keypoint body/foot keypoint estimation**. **Running time invariant to number of detected people**.
         - **2x21-keypoint hand keypoint estimation**. Currently, **running time depends** on **number of detected people**.
         - **70-keypoint face keypoint estimation**. Currently, **running time depends** on **number of detected people**.
-    - **3D real-time multi-person keypoint detection**:
+    - **3D real-time single-person keypoint detection**:
         - 3-D triangulation from multiple single views.
         - Synchronization of Flir cameras handled.
         - Compatible with Flir/Point Grey cameras, but provided C++ demos to add your custom input.
@@ -37,8 +37,8 @@
 
 ## Latest Features
 - Jun 2018: [**Combined body-foot model released! Faster and more accurate**](doc/installation.md)!
-- Jun 2018: [**Python version**](doc/modules/python_module.md) released!
-- Jun 2018: [**AMD graphic card version**](doc/installation.md) released!
+- Jun 2018: [**Python API**](doc/modules/python_module.md) released!
+- Jun 2018: [**OpenCL/AMD graphic card version**](doc/installation.md) released!
 - Jun 2018: [**Calibration toolbox**](doc/modules/calibration_module.md) released!
 - Jun 2018: [**Mac OSX version (CPU)**](doc/installation.md) released!
 - Mar 2018: [**CPU version**](doc/installation.md#cpu-version)!

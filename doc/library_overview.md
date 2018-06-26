@@ -70,8 +70,8 @@ The `Datum` class has all the variables that our Workers need to share to each o
 UserDatum : public op::Datum {/* op::Datum + extra variables */}
 
 // Worker and ThreadManager example initialization
-op::WGui<std::vector<UserDatum>> userGUI(/* constructor arguments */);
-op::ThreadManager<std::vector<UserDatum>> userThreadManager;
+op::WGui<std::shared_ptr<std::vector<UserDatum>> userGUI(/* constructor arguments */);
+op::ThreadManager<std::shared_ptr<std::vector<UserDatum>> userThreadManager;
 ```
 
 Since `UserDatum` inherits from `op::Datum`, all the original OpenPose code will compile and run with your inherited version of `op::Datum`.
@@ -147,7 +147,7 @@ Classes starting by the letter `W` + upper case letter (e.g. `WGui`) directly or
 
 The easiest way to create your own Worker is to inherit Worker<T>, and implement the work() function such us it just calls a wrapper to your desired functionality (check the source code of some of our basic Workers). Since the Worker classes are templates, they are always compiled. Therefore, including your desired functionality in a different file will let you compile it only once. Otherwise, it would be compiled any time that any code which uses your worker is compiled.
 
-All OpenPose Workers are templates, i.e. they are not only limited to work with the default std::vector<op::Datum>. However, if you intend to use some of our Workers, your custom `TDatums` class (the one substituting std::vector<op::Datum>) should implement the same variables and functions that those Workers use. The easiest solution is to inherit from `op::Datum` and extend its functionality.
+All OpenPose Workers are templates, i.e. they are not only limited to work with the default op::Datum. However, if you intend to use some of our Workers, your custom `TDatums` class (the one substituting op::Datum) should implement the same variables and functions that those Workers use. The easiest solution is to inherit from `op::Datum` and extend its functionality.
 
 
 ### Creating New Workers
@@ -171,7 +171,7 @@ All Workers wrap and call a non-Worker non-template equivalent which actually pe
 
 By separating functionality and their `Worker<T>` wrappers, we get the good of both points, eliminating the cons. In this way, the user is able to:
 
-1. Change `std::vector<op::Datum>` for a custom class, implementing his own `Worker` templates, but using the already implemented functionality to create new custom `Worker` templates.
+1. Change `std::shared_ptr<std::vector<op::Datum>>` for a custom class, implementing his own `Worker` templates, but using the already implemented functionality to create new custom `Worker` templates.
 
 2. Create a `Worker` which wraps several non-`Worker`s classes.
 

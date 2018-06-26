@@ -18,6 +18,7 @@ namespace op
         subId{datum.subId},
         subIdMax{datum.subIdMax},
         name{datum.name},
+        frameNumber{datum.frameNumber},
         // Input image and rendered version
         cvInputData{datum.cvInputData},
         inputNetData{datum.inputNetData},
@@ -81,6 +82,7 @@ namespace op
             subId = datum.subId;
             subIdMax = datum.subIdMax;
             name = datum.name;
+            frameNumber = datum.frameNumber;
             // Input image and rendered version
             cvInputData = datum.cvInputData;
             inputNetData = datum.inputNetData;
@@ -146,6 +148,7 @@ namespace op
         id{datum.id},
         subId{datum.subId},
         subIdMax{datum.subIdMax},
+        frameNumber{datum.frameNumber},
         // Other parameters
         scaleInputToOutput{datum.scaleInputToOutput},
         scaleNetToOutput{datum.scaleNetToOutput}
@@ -218,6 +221,7 @@ namespace op
             subId = datum.subId;
             subIdMax = datum.subIdMax;
             std::swap(name, datum.name);
+            frameNumber = datum.frameNumber;
             // Input image and rendered version
             std::swap(cvInputData, datum.cvInputData);
             std::swap(inputNetData, datum.inputNetData);
@@ -290,6 +294,7 @@ namespace op
             datum.subId = subId;
             datum.subIdMax = subIdMax;
             datum.name = name;
+            datum.frameNumber = frameNumber;
             // Input image and rendered version
             datum.cvInputData = cvInputData.clone();
             datum.inputNetData.resize(inputNetData.size());

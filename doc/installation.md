@@ -102,6 +102,7 @@ The instructions in this section describe the steps to build OpenPose using CMak
 1. Download and install CMake GUI:
     - Ubuntu: run the command `sudo apt-get install cmake-qt-gui`. Note: If you prefer to use CMake through the command line, see [Cmake Command Line Build](#cmake-command-line-build-ubuntu-only).
     - Windows: download and install the latest CMake win64-x64 msi installer from the [CMake website](https://cmake.org/download/), called `cmake-X.X.X-win64-x64.msi`.
+    - Mac: `brew cask install cmake`.
 2. Nvidia GPU version prerequisites:
     1. [**CUDA 8**](https://developer.nvidia.com/cuda-80-ga2-download-archive):
         - Ubuntu: Run `sudo ubuntu/install_cuda.sh` or alternatively download and install it from their website.

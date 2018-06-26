@@ -303,7 +303,17 @@ namespace op
             validSubsetIndexes.reserve(fastMin((size_t)POSE_MAX_PEOPLE, subset.size()));
             for (auto index = 0u ; index < subset.size() ; index++)
             {
-                const auto subsetCounter = subset[index].first[subsetCounterIndex];
+                auto subsetCounter = subset[index].first[subsetCounterIndex];
+                // Foot keypoints do not affect subsetCounter (too many false positives,
+                // same foot usually appears as both left and right keypoints)
+                // Pros: Removed tons of false positives
+                // Cons: Standalone leg will never be recorded
+                if (!COCO_CHALLENGE && numberBodyParts == 25)
+                {
+                    // No consider foot keypoints for that
+                    for (auto i = 19 ; i < 25 ; i++)
+                        subsetCounter -= (subset[index].first.at(i) > 0);
+                }
                 const auto subsetScore = subset[index].second;
                 if (subsetCounter >= minSubsetCnt && (subsetScore/subsetCounter) >= minSubsetScore)
                 {
@@ -312,7 +322,7 @@ namespace op
                     if (numberPeople == POSE_MAX_PEOPLE)
                         break;
                 }
-                else if (subsetCounter < 1)
+                else if ((subsetCounter < 1 && numberBodyParts != 25) || subsetCounter < 0)
                     error("Bad subsetCounter. Bug in this function if this happens.",
                           __LINE__, __FUNCTION__, __FILE__);
             }
