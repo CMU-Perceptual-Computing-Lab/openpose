@@ -120,7 +120,11 @@ if (WIN32)
 endif (WIN32)
 
 # Set the acceleration library
-set(GPU_MODE CUDA CACHE STRING "Select the acceleration GPU library or CPU otherwise.")
+if (APPLE)
+  set(GPU_MODE CPU_ONLY CACHE STRING "Select the acceleration GPU library or CPU otherwise.")
+else (APPLE)
+  set(GPU_MODE CUDA CACHE STRING "Select the acceleration GPU library or CPU otherwise.")
+endif (APPLE)
 # Display proper options to user
 # if (CUDA_FOUND AND OpenCL_FOUND)
 #   set_property(CACHE GPU_MODE PROPERTY STRINGS CUDA OPENCL CPU_ONLY)
@@ -259,7 +263,7 @@ if (APPLE)
   else ()
     set(Boost_SYSTEM_LIBRARY "")
   endif ()
-endif ()
+endif (APPLE)
 
 ### FIND REQUIRED PACKAGES
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
