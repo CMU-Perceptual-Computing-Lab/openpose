@@ -56,7 +56,9 @@ namespace op
                     if (tDatum.id == std::numeric_limits<unsigned long long>::max())
                         tDatum.id = mGlobalCounter;
                 // Increase ID
-                mGlobalCounter++;
+                const auto& tDatum = (*tDatums)[0];
+                if (tDatum.subId == tDatum.subIdMax)
+                    mGlobalCounter++;
             }
         }
         catch (const std::exception& e)
