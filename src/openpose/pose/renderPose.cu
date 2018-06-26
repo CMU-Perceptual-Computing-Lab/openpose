@@ -220,7 +220,7 @@ namespace op
         renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight,
                         posePtr, BODY_23_PAIRS_GPU, numberPeople, 23, numberPartPairs, BODY_23_COLORS, numberColors,
                         radius, lineWidth, BODY_23_SCALES, numberScales, threshold, alphaColorToAdd,
-                        blendOriginalFrame, (googlyEyes ? 15 : -1), (googlyEyes ? 16 : -1));
+                        blendOriginalFrame, (googlyEyes ? 19 : -1), (googlyEyes ? 21 : -1));
     }
 
     __global__ void renderPoseBody25(float* targetPtr, const int targetWidth, const int targetHeight,
