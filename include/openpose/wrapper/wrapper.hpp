@@ -223,8 +223,8 @@ namespace op
         TWorker spWCvMatToOpOutput;
         std::vector<std::vector<TWorker>> spWPoseExtractors;
         std::vector<std::vector<TWorker>> spWPoseTriangulations;
-        std::vector<TWorker> mPostProcessingWs;
         std::vector<std::vector<TWorker>> spWJointAngleEstimations;
+        std::vector<TWorker> mPostProcessingWs;
         std::vector<TWorker> mUserPostProcessingWs;
         std::vector<TWorker> mOutputWs;
         TWorker spWGui;
@@ -1232,8 +1232,8 @@ namespace op
             spWCvMatToOpOutput = nullptr;
             spWPoseExtractors.clear();
             spWPoseTriangulations.clear();
-            mPostProcessingWs.clear();
             spWJointAngleEstimations.clear();
+            mPostProcessingWs.clear();
             mUserPostProcessingWs.clear();
             mOutputWs.clear();
             spWGui = nullptr;
@@ -1389,14 +1389,6 @@ namespace op
             }
             else
                 mPostProcessingWs = mergeVectors({wQueueAssembler}, mPostProcessingWs);
-            // Post processing workers
-            if (!mPostProcessingWs.empty())
-            {
-                // Thread 2 or 3, queues 2 -> 3
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-                mThreadManager.add(mThreadId, mPostProcessingWs, queueIn++, queueOut++);
-                threadIdPP();
-            }
             // Adam/IK step
             if (!spWJointAngleEstimations.empty())
             {
@@ -1427,6 +1419,16 @@ namespace op
                     log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     mThreadManager.add(mThreadId, spWJointAngleEstimations.at(0), queueIn++, queueOut++);
                 }
+            }
+            // Post processing workers
+            if (!mPostProcessingWs.empty())
+            {
+                // Combining mPostProcessingWs and mOutputWs
+                mOutputWs = mergeVectors(mPostProcessingWs, mOutputWs);
+                // // If I wanna split them
+                // log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                // mThreadManager.add(mThreadId, mPostProcessingWs, queueIn++, queueOut++);
+                // threadIdPP();
             }
             // If custom user Worker and uses its own thread
             if (!mUserPostProcessingWs.empty())
