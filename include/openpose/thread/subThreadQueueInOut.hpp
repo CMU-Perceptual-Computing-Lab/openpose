@@ -56,27 +56,34 @@ namespace op
             // If output queue running -> normal operation
             else
             {
-                // Pop TDatums
-                TDatums tDatums;
-                bool workersAreRunning = spTQueueIn->tryPop(tDatums);
-                // Check queue not stopped
-                if (!workersAreRunning)
-                    workersAreRunning = spTQueueIn->isRunning();
-                // Process TDatums
-                workersAreRunning = this->workTWorkers(tDatums, workersAreRunning);
-                // Push/emplace tDatums if successfully processed
-                if (workersAreRunning)
+                // Don't work until next queue is not full
+                // This reduces latency to half
+                if (!spTQueueOut->isFull())
                 {
-                    if (tDatums != nullptr)
-                        spTQueueOut->waitAndEmplace(tDatums);
+                    // Pop TDatums
+                    TDatums tDatums;
+                    bool workersAreRunning = spTQueueIn->tryPop(tDatums);
+                    // Check queue not stopped
+                    if (!workersAreRunning)
+                        workersAreRunning = spTQueueIn->isRunning();
+                    // Process TDatums
+                    workersAreRunning = this->workTWorkers(tDatums, workersAreRunning);
+                    // Push/emplace tDatums if successfully processed
+                    if (workersAreRunning)
+                    {
+                        if (tDatums != nullptr)
+                            spTQueueOut->waitAndEmplace(tDatums);
+                    }
+                    // Close both queues otherwise
+                    else
+                    {
+                        spTQueueIn->stop();
+                        spTQueueOut->stopPusher();
+                    }
+                    return workersAreRunning;
                 }
-                // Close both queues otherwise
                 else
-                {
-                    spTQueueIn->stop();
-                    spTQueueOut->stopPusher();
-                }
-                return workersAreRunning;
+                    return true;
             }
         }
         catch (const std::exception& e)

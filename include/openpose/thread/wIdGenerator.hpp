@@ -4,6 +4,7 @@
 #include <queue> // std::priority_queue
 #include <openpose/core/common.hpp>
 #include <openpose/thread/worker.hpp>
+#include <openpose/utilities/pointerContainer.hpp>
 
 namespace op
 {
@@ -50,6 +51,10 @@ namespace op
         {
             if (checkNoNullNorEmpty(tDatums))
             {
+                // Debugging log
+                dLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                // Profiling speed
+                const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                 // Add ID
                 for (auto& tDatum : *tDatums)
                     // To avoid overwritting ID if e.g., custom input has already filled it
@@ -59,6 +64,11 @@ namespace op
                 const auto& tDatum = (*tDatums)[0];
                 if (tDatum.subId == tDatum.subIdMax)
                     mGlobalCounter++;
+                // Profiling speed
+                Profiler::timerEnd(profilerKey);
+                Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);
+                // Debugging log
+                dLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             }
         }
         catch (const std::exception& e)

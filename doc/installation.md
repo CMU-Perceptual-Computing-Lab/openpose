@@ -15,14 +15,15 @@ OpenPose - Installation
     2. [COCO and MPI Models](#coco-and-mpi-models)
     3. [Python API](#python-api)
     4. [CPU Version](#cpu-version)
-    5. [OpenCL Version](#opencl-version)
-    6. [3D Reconstruction Module](#3d-reconstruction-module)
-    7. [Calibration Module](#calibration-module)
-    8. [Compiling without cuDNN](#compiling-without-cudnn)
-    9. [Custom Caffe (Ubuntu Only)](#custom-caffe-ubuntu-only)
-    10. [Custom OpenCV (Ubuntu Only)](#custom-opencv-ubuntu-only)
-    11. [Doxygen Documentation Autogeneration (Ubuntu Only)](#doxygen-documentation-autogeneration-ubuntu-only)
-    12. [CMake Command Line Configuration (Ubuntu Only)](#cmake-command-line-configuration-ubuntu-only)
+    5. [Mac OSX Version](#mac-osx-version)
+    6. [OpenCL Version](#opencl-version)
+    7. [3D Reconstruction Module](#3d-reconstruction-module)
+    8. [Calibration Module](#calibration-module)
+    9. [Compiling without cuDNN](#compiling-without-cudnn)
+    10. [Custom Caffe (Ubuntu Only)](#custom-caffe-ubuntu-only)
+    11. [Custom OpenCV (Ubuntu Only)](#custom-opencv-ubuntu-only)
+    12. [Doxygen Documentation Autogeneration (Ubuntu Only)](#doxygen-documentation-autogeneration-ubuntu-only)
+    13. [CMake Command Line Configuration (Ubuntu Only)](#cmake-command-line-configuration-ubuntu-only)
 
 
 
@@ -36,7 +37,7 @@ This installation section is only intended if you plan to modify the OpenPose co
 ## Operating Systems
 - **Ubuntu** 14 and 16.
 - **Windows** 8 and 10.
-- **Mac OSX** Mavericks and above (only CPU version tested). If you want to test our Mac GPU version, email gines@cmu.edu.
+- **Mac OSX** Mavericks and above (only CPU version).
 - **Nvidia Jetson TX2**, installation instructions in [doc/installation_jetson_tx2.md](./installation_jetson_tx2.md).
 - OpenPose has also been used on **Windows 7**, **CentOS**, and **Nvidia Jetson (TK1 and TX1)** embedded systems. However, we do not officially support them at the moment.
 
@@ -93,7 +94,7 @@ The instructions in this section describe the steps to build OpenPose using CMak
 1. [Prerequisites](#prerequisites)
 2. [OpenPose Configuration](#openpose-configuration)
 3. [OpenPose Building](#openpose-building)
-4. [OpenPose from other Projects (Ubuntu and Mac)](#openpose-from-other-projects-ubuntu-and-mac) 
+4. [OpenPose from other Projects (Ubuntu and Mac)](#openpose-from-other-projects-ubuntu-and-mac)
 5. [Run OpenPose](#run-openpose)
 
 
@@ -137,7 +138,6 @@ The instructions in this section describe the steps to build OpenPose using CMak
             - [OpenCV 3.1](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/opencv_310.zip): Unzip as `3rdparty/windows/opencv/`.
 7. Mac - **Caffe, OpenCV, and Caffe prerequisites**:
     - Install deps by running `bash 3rdparty/osx/install_deps.sh` on your terminal.
-    - Current OSX has only been tested with the CPU Version, and hence must be compiled with the `-DGPU_MODE=CPU_ONLY` flag.
 8. **Eigen prerequisite**:
     - Note: This step is optional, only required for some specific extra functionality, such as extrinsic camera calibration.
     - If you enable the `WITH_EIGEN` flag when running CMake. You can either:
@@ -217,7 +217,7 @@ target_link_libraries(example.bin ${OpenPose_LIBS} ${GFLAGS_LIBRARY} ${GLOG_LIBR
 
 If Caffe was built with OpenPose, it will automatically find it. Otherwise, you will need to link Caffe again as shown below (otherwise, you might get an error like `/usr/bin/ld: cannot find -lcaffe`).
 ```
-link_directories(<path_to_caffe_installation>/caffe/build/install/lib) 
+link_directories(<path_to_caffe_installation>/caffe/build/install/lib)
 ```
 
 ### Run OpenPose
@@ -263,7 +263,7 @@ To install the Python API, ensure that the `BUILD_PYTHON` flag is turned on whil
 #### CPU Version
 To manually select the CPU Version, open CMake GUI mentioned above, and set the `GPU_MODE` flag to `CPU_ONLY`. **NOTE: Accuracy of the CPU version is ~1% higher than CUDA version, so the results will vary.**
 
-- On Ubuntu, OpenPose will link against the Intel MKL version (Math Kernel Library) of Caffe. Alternatively, the user can choose his own Caffe version, by unselecting `USE_MKL` and selecting his own Caffe path. 
+- On Ubuntu, OpenPose will link against the Intel MKL version (Math Kernel Library) of Caffe. Alternatively, the user can choose his own Caffe version, by unselecting `USE_MKL` and selecting his own Caffe path.
 - On Windows, it will use the default version of Caffe or one provided by the user on the CPU.
 
 The default CPU version takes ~0.2 images per second on Ubuntu (~50x slower than GPU) while the MKL version provides a roughly 2x speedup at ~0.4 images per second. As of now OpenPose does not support MKL on Windows but will at a later date. Also, MKL version does not support unfixed resolution. So a folder of images of different resolutions requires a fixed net resolution (e.g., `--net_resolution 656x368`).
@@ -279,8 +279,27 @@ Do note that increasing the number of threads results in more memory use. You ca
 
 
 
+#### Mac OSX Version
+Note: Current OSX has only been tested with the CPU Version, and hence must be compiled with the `CPU_ONLY` flag, which is set by default for Mac devices. If you want to test our Mac GPU version, email gines@cmu.edu and ryaadhav@andrew.cmu.edu with your Mac model and hardware configuration (OS version, GPU and CPU model, and total RAM memory).
+
+If the default installation fails (i.e., the one explained above), instal Caffe separately and set `BUILD_CAFFE` to false in the CMake config. Steps:
+- Re-create the build folder: `rm -rf build; mkdir build; cd build`.
+- `brew uninstall caffe` to remove the version of Caffe previously installed via cmake.
+- `brew install caffe` to install Caffe separately.
+- Run `cmake-gui` and make the following adjustments to the cmake config:
+    1. `BUILD_CAFFE` set to false
+    2. `Caffe_INCLUDE_DIRS` set to `/usr/local/include/caffe`
+    3. `Caffe_LIBS` set to `/usr/local/lib/libcaffe.dylib`
+
+
+<img width="1280" alt="screen shot 2018-06-26 at 9 25 57 pm" src="https://user-images.githubusercontent.com/339120/41949647-f3b6c64e-7987-11e8-890a-b4a8ad6d3576.png">
+
+@takaya1219 I tried downgrading protobuf to v3.5.1 before implementing the above changes, and that did not fix the build for me.
+
+
+
 #### OpenCL Version
-If you have an AMD graphics card, you can compile OpenPose with the OpenCL option. To manually select the OpenCL Version, open CMake GUI mentioned above, and set the `GPU_MODE` flag to `OPENCL`. 
+If you have an AMD graphics card, you can compile OpenPose with the OpenCL option. To manually select the OpenCL Version, open CMake GUI mentioned above, and set the `GPU_MODE` flag to `OPENCL`.
 
 The OpenCL version has been tested on Ubuntu and Windows. The OpenCL version requires `libviennacl-dev` which can be installed via apt-get on Ubuntu. This comes packaged with Windows. This has been tested only on AMD Vega series and NVIDIA 10 series graphics cards. Please email us if you have issues with other operating systems or graphics cards.
 

@@ -228,15 +228,16 @@ OpenPose Library - Release Notes
         4. Applied RANSAC if >=4 camera views.
         5. Latency highly reduced in multi-GPU setting. Each GPU process a different camera view, instead of a different time-instant sequence.
     5. CMake: All libraries as single variable (simpler to add/remove libraries).
-    6. Datum includes extrinsic and intrinsic camera parameters.
-    7. Function `scaleKeypoints(Array<float>& keypoints, const float scale)` also accepts 3D keypoints.
-    8. 3D keypoints and camera parameters in meters (instead of millimeters) in order to reduce numerical errors.
-    9. New `PoseExtractor` class to contain future ID and tracking algorithms as well as the current OpenPose keypoint detection algorithm.
-    10. Added initial alpha versions of the `tracking` and `identification` modules (for now disabled but available in the source code), including `PersonIdExtractor` and `PersonTracker`. `PersonIdExtractor` includes greedy matrix OP-LK matching.
-    11. Added catchs to all demos for higher debug information.
-    12. GUI includes the capability of dynamically enable/disable the face, hand, and 3-D rendering, as well as more clear visualization for skeleton, background, heatmap addition, and PAF addition channels.
-    13. When GUI changes some parameter from PoseExtractorNet, there is a log to notify the user of the change.
-    14. Deprecated flag `--write_keypoint_json` removed (`--write_json` is the equivalent since version 1.2.1).
+    6. Averaged latency reduced to half.
+    7. Datum includes extrinsic and intrinsic camera parameters.
+    8. Function `scaleKeypoints(Array<float>& keypoints, const float scale)` also accepts 3D keypoints.
+    9. 3D keypoints and camera parameters in meters (instead of millimeters) in order to reduce numerical errors.
+    10. New `PoseExtractor` class to contain future ID and tracking algorithms as well as the current OpenPose keypoint detection algorithm.
+    11. Added initial alpha versions of the `tracking` and `identification` modules (for now disabled but available in the source code), including `PersonIdExtractor` and `PersonTracker`. `PersonIdExtractor` includes greedy matrix OP-LK matching.
+    12. Added catchs to all demos for higher debug information.
+    13. GUI includes the capability of dynamically enable/disable the face, hand, and 3-D rendering, as well as more clear visualization for skeleton, background, heatmap addition, and PAF addition channels.
+    14. When GUI changes some parameter from PoseExtractorNet, there is a log to notify the user of the change.
+    15. Deprecated flag `--write_keypoint_json` removed (`--write_json` is the equivalent since version 1.2.1).
 2. Functions or parameters renamed:
     1. Removed scale parameter from hand and face rectangle extractor (causing wrong results if custom `--output_resolution`).
     2. Functions `scaleKeypoints`, other than `scaleKeypoints(Array<float>& keypoints, const float scale)`, renamed as `scaleKeypoints2d`.

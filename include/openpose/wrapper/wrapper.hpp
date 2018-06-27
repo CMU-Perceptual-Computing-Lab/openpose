@@ -1296,6 +1296,7 @@ namespace op
             if (!mUserInputWs.empty() && mUserInputWsOnNewThread)
             {
                 // Thread 0, queues 0 -> 1
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 mThreadManager.add(mThreadId, mUserInputWs, queueIn++, queueOut++);
                 threadIdPP();
             }
@@ -1310,6 +1311,7 @@ namespace op
                         && mThreadManagerMode != ThreadManagerMode::AsynchronousIn)
                 error("No input selected.", __LINE__, __FUNCTION__, __FILE__);
             // Thread 0 or 1, queues 0 -> 1
+            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             mThreadManager.add(mThreadId, workersAux, queueIn++, queueOut++);
             // Increase thread
             threadIdPP();
@@ -1322,6 +1324,7 @@ namespace op
                 {
                     for (auto& wPose : spWPoseExtractors)
                     {
+                        log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                         mThreadManager.add(mThreadId, wPose, queueIn, queueOut);
                         threadIdPP();
                     }
@@ -1331,6 +1334,7 @@ namespace op
                     if (spWPoseExtractors.size() > 1u)
                     {
                         const auto wQueueOrderer = std::make_shared<WQueueOrderer<TDatumsSP>>();
+                        log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                         mThreadManager.add(mThreadId, wQueueOrderer, queueIn++, queueOut++);
                         threadIdPP();
                     }
@@ -1341,6 +1345,7 @@ namespace op
                         log("Multi-threading disabled, only 1 thread running. All GPUs have been disabled but the"
                             " first one, which is defined by gpuNumberStart (e.g. in the OpenPose demo, it is set"
                             " with the `--num_gpu_start` flag).", Priority::High);
+                    log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     mThreadManager.add(mThreadId, spWPoseExtractors.at(0), queueIn++, queueOut++);
                 }
             }
@@ -1350,6 +1355,7 @@ namespace op
             if (!spWPoseTriangulations.empty())
             {
                 // Assemble frames
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 mThreadManager.add(mThreadId, wQueueAssembler, queueIn++, queueOut++);
                 threadIdPP();
                 // 3-D reconstruction
@@ -1357,6 +1363,7 @@ namespace op
                 {
                     for (auto& wPoseTriangulations : spWPoseTriangulations)
                     {
+                        log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                         mThreadManager.add(mThreadId, wPoseTriangulations, queueIn, queueOut);
                         threadIdPP();
                     }
@@ -1366,6 +1373,7 @@ namespace op
                     if (spWPoseTriangulations.size() > 1u)
                     {
                         const auto wQueueOrderer = std::make_shared<WQueueOrderer<TDatumsSP>>();
+                        log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                         mThreadManager.add(mThreadId, wQueueOrderer, queueIn++, queueOut++);
                         threadIdPP();
                     }
@@ -1375,6 +1383,7 @@ namespace op
                     if (spWPoseTriangulations.size() > 1)
                         log("Multi-threading disabled, only 1 thread running for 3-D triangulation.",
                             Priority::High);
+                    log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     mThreadManager.add(mThreadId, spWPoseTriangulations.at(0), queueIn++, queueOut++);
                 }
             }
@@ -1384,6 +1393,7 @@ namespace op
             if (!mPostProcessingWs.empty())
             {
                 // Thread 2 or 3, queues 2 -> 3
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 mThreadManager.add(mThreadId, mPostProcessingWs, queueIn++, queueOut++);
                 threadIdPP();
             }
@@ -1394,6 +1404,7 @@ namespace op
                 {
                     for (auto& wJointAngleEstimator : spWJointAngleEstimations)
                     {
+                        log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                         mThreadManager.add(mThreadId, wJointAngleEstimator, queueIn, queueOut);
                         threadIdPP();
                     }
@@ -1403,6 +1414,7 @@ namespace op
                     if (spWJointAngleEstimations.size() > 1)
                     {
                         const auto wQueueOrderer = std::make_shared<WQueueOrderer<TDatumsSP>>();
+                        log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                         mThreadManager.add(mThreadId, wQueueOrderer, queueIn++, queueOut++);
                         threadIdPP();
                     }
@@ -1412,6 +1424,7 @@ namespace op
                     if (spWJointAngleEstimations.size() > 1)
                         log("Multi-threading disabled, only 1 thread running for joint angle estimation.",
                             Priority::High);
+                    log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     mThreadManager.add(mThreadId, spWJointAngleEstimations.at(0), queueIn++, queueOut++);
                 }
             }
@@ -1421,6 +1434,7 @@ namespace op
                 // If custom user Worker in its own thread
                 if (mUserPostProcessingWsOnNewThread)
                 {
+                    log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     mThreadManager.add(mThreadId, mUserPostProcessingWs, queueIn++, queueOut++);
                     threadIdPP();
                 }
@@ -1433,6 +1447,7 @@ namespace op
             if (!mOutputWs.empty())
             {
                 // Thread 4 or 5, queues 4 -> 5
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 mThreadManager.add(mThreadId, mOutputWs, queueIn++, queueOut++);
                 threadIdPP();
             }
@@ -1442,16 +1457,21 @@ namespace op
             {
                 if (mUserOutputWsOnNewThread)
                 {
+                    log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     mThreadManager.add(mThreadId, mUserOutputWs, queueIn++, queueOut++);
                     threadIdPP();
                 }
                 else
+                {
+                    log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     mThreadManager.add(mThreadId-1, mUserOutputWs, queueIn++, queueOut++);
+                }
             }
             // OpenPose GUI
             if (spWGui != nullptr)
             {
                 // Thread Y+1, queues Q+1 -> Q+2
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 mThreadManager.add(mThreadId, spWGui, queueIn++, queueOut++);
                 threadIdPP();
             }

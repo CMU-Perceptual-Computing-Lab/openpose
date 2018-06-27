@@ -97,9 +97,9 @@ namespace op
                     spVideoSeek->second = 0;
                 }
                 auto nextFrameName = spProducer->getNextFrameName();
-                auto nextFrameNumber = (unsigned long long)spProducer->get(CV_CAP_PROP_POS_FRAMES);
-                auto cvMats = spProducer->getFrames();
-                auto cameraMatrices = spProducer->getCameraMatrices();
+                const auto nextFrameNumber = (unsigned long long)spProducer->get(CV_CAP_PROP_POS_FRAMES);
+                const auto cvMats = spProducer->getFrames();
+                const auto cameraMatrices = spProducer->getCameraMatrices();
                 auto cameraExtrinsics = spProducer->getCameraExtrinsics();
                 auto cameraIntrinsics = spProducer->getCameraIntrinsics();
                 // Check frames are not empty

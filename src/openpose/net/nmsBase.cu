@@ -14,8 +14,8 @@ namespace op
                                       const T threshold)
     {
         // get pixel location (x,y)
-        const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
-        const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
+        const auto x = blockIdx.x * blockDim.x + threadIdx.x;
+        const auto y = blockIdx.y * blockDim.y + threadIdx.y;
         const auto index = y*w + x;
 
         if (0 < x && x < (w-1) && 0 < y && y < (h-1))
