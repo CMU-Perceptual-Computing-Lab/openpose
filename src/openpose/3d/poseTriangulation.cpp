@@ -6,6 +6,7 @@
 #endif
 #include <opencv2/calib3d/calib3d.hpp>
 #include <openpose/3d/poseTriangulation.hpp>
+#include <numeric>
 
 namespace op
 {
