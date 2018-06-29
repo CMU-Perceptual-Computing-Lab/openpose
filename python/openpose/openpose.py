@@ -10,7 +10,8 @@ from sys import platform
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
 if platform == "win32":
-    os.environ['PATH'] = dir_path + "/../../lib;" + os.environ['PATH']
+    os.environ['PATH'] = dir_path + "/../../bin;" + os.environ['PATH']
+    os.environ['PATH'] = dir_path + "/../../x64/Debug;" + os.environ['PATH']
     os.environ['PATH'] = dir_path + "/../../x64/Release;" + os.environ['PATH']
 
 class OpenPose(object):
