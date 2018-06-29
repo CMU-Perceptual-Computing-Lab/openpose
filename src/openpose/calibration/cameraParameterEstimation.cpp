@@ -870,13 +870,16 @@ namespace op
         try
         {
             // Point<int> --> cv::Size
+            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             const cv::Size gridInnerCornersCvSize{gridInnerCorners.x, gridInnerCorners.y};
 
             // Read images in folder
+            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             std::vector<std::vector<cv::Point2f>> points2DVectors;
             const auto imageAndPaths = getImageAndPaths(imagesFolder);
 
             // Get 2D grid corners of each image
+            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             std::vector<cv::Mat> imagesWithCorners;
             const auto imageSize = imageAndPaths.at(0).first.size();
             for (auto i = 0u ; i < imageAndPaths.size() ; i++)
@@ -917,6 +920,7 @@ namespace op
             }
 
             // Run calibration
+            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             // objects3DVector is the same one for each image
             const std::vector<std::vector<cv::Point3f>> objects3DVectors(points2DVectors.size(),
                                                                          getObjects3DVector(gridInnerCornersCvSize,
@@ -924,11 +928,13 @@ namespace op
             const auto intrinsics = calcIntrinsicParameters(imageSize, points2DVectors, objects3DVectors, flags);
 
             // Save intrinsics/results
+            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             CameraParameterReader cameraParameterReader{serialNumber, intrinsics.cameraMatrix,
                                                         intrinsics.distortionCoefficients};
             cameraParameterReader.writeParameters(outputParameterFolder);
 
             // Save images with corners
+            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             if (saveImagesWithCorners)
             {
                 const auto folderWhereSavingImages = imagesFolder + "images_with_corners/";

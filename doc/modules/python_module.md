@@ -16,7 +16,7 @@ At present the Python API only supports body pose. Hands and Face will be added 
 ## Installation
 Check [doc/installation.md#python-module](./installation.md#python-module) for installation steps.
 
-To simply test the OpenPose API in your project without installation, ensure that the line `sys.path.append('{OpenPose_path}/python')` is set in your *.py files, where `{OpenPose_path}` points to your build folder of OpenPose. Take a look at `build/examples/tutorial_pose/1_extract_pose.py` for an example.
+To simply test the OpenPose API in your project without installation, ensure that the line `sys.path.append('{OpenPose_path}/python')` is set in your `*.py` files, where `{OpenPose_path}` points to your build folder of OpenPose. Take a look at `build/examples/tutorial_pose/1_extract_pose.py` for an example.
 
 On an Ubuntu or OSX based system, you may use it globally. Running `sudo make install` will install OpenPose by default into `/usr/local/python`. You can set this into your python path and start using it at any location.
 
@@ -47,4 +47,4 @@ python 1_extract_pose.py
 
 
 ## Code Sample
-See `examples/tutorial_python/1_extract_pose.py`.
+See [examples/tutorial_python/1_extract_pose.py](../../../master/examples/tutorial_python/1_extract_pose.py).

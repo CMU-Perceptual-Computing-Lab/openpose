@@ -240,7 +240,7 @@ option(BUILD_EXAMPLES "Build OpenPose examples." ON)
 option(BUILD_DOCS "Build OpenPose documentation." OFF)
 option(BUILD_PYTHON "Build OpenPose python." OFF)
 if (WIN32)
-  option(BUILD_DLL "Copy all required DLL files into the same folder." ON)
+  option(BUILD_BIN_FOLDER "Copy all required 3rd-party DLL files into {build_directory}/bin. Disable to save some memory." ON)
 endif ()
 
 # Build as shared library
@@ -521,15 +521,15 @@ if (WIN32)
 
   # Build DLL Must be on if Build Python is on
   if (BUILD_PYTHON)
-    if (NOT BUILD_DLL)
-      message(FATAL_ERROR "BUILD_DLL must be turned on to as well to build python library")
+    if (NOT BUILD_BIN_FOLDER)
+      message(FATAL_ERROR "BUILD_BIN_FOLDER must be turned on to as well to build python library")
     endif ()
   endif ()
 
   # Auto copy DLLs
-  if (BUILD_DLL)
-    file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-    # Auto copy DLLs
+  if (BUILD_BIN_FOLDER)
+    # Locate DLLs
+    # Caffe DLLs
     if (${GPU_MODE} MATCHES "CUDA")
       file(GLOB CAFFE_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe/bin/*.dll")
     elseif (${GPU_MODE} MATCHES "OPENCL")
@@ -537,12 +537,17 @@ if (WIN32)
     elseif (${GPU_MODE} MATCHES "CPU_ONLY")
       file(GLOB CAFFE_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe_cpu/bin/*.dll")
     endif ()
-    file(GLOB OPENCV_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/opencv/x64/vc14/bin/*.dll")
+    # Caffe 3rd-party DLLs
     file(GLOB OPENCV3PTY_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/lib/*.dll")
-    file(COPY ${CAFFE_DLL} DESTINATION ${CMAKE_BINARY_DIR}/lib)
-    file(COPY ${OPENCV_DLL} DESTINATION ${CMAKE_BINARY_DIR}/lib)
-    file(COPY ${OPENCV3PTY_DLL} DESTINATION ${CMAKE_BINARY_DIR}/lib)
-  endif ()
+    # OpenCV DLLs
+    file(GLOB OPENCV_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/opencv/x64/vc14/bin/*.dll")
+    # Copy DLLs into same folder
+    set(BIN_FOLDER ${CMAKE_BINARY_DIR}/bin)
+    file(MAKE_DIRECTORY ${BIN_FOLDER})
+    file(COPY ${CAFFE_DLL} DESTINATION ${BIN_FOLDER})
+    file(COPY ${OPENCV_DLL} DESTINATION ${BIN_FOLDER})
+    file(COPY ${OPENCV3PTY_DLL} DESTINATION ${BIN_FOLDER})
+  endif (BUILD_BIN_FOLDER)
 
 endif (WIN32)
 

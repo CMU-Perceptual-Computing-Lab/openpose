@@ -113,11 +113,9 @@ The instructions in this section describe the steps to build OpenPose using CMak
         - Ubuntu: Run `sudo ubuntu/install_cudnn.sh` or alternatively download and install it from their website.
         - Windows (and Ubuntu if manual installation): In order to manually install it, just unzip it and copy (merge) the contents on the CUDA folder, usually `/usr/local/cuda/` in Ubuntu and `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0` in Windows.
 3. AMD GPU version prerequisites:
-    1. [**AMD - Windows**](https://support.amd.com/en-us/download):
-        - Download official AMD drivers for Windows
-    2. [**AMD - OpenCL**](https://rocm.github.io/ROCmInstall.html):
-        - Download 3rd party ROCM driver for Ubuntu
-    3. AMD Drivers have not been tested on OSX. Please email us if you wish to test it. This has only been tested on Vega series cards
+    1. Download official AMD drivers for Windows from [**AMD - Windows**](https://support.amd.com/en-us/download).
+    2. Download 3rd party ROCM driver for Ubuntu from [**AMD - OpenCL**](https://rocm.github.io/ROCmInstall.html).
+    3. AMD Drivers have not been tested on OSX. Please email us if you wish to test it. This has only been tested on Vega series cards.
 4. Ubuntu - Other prerequisites:
     - Caffe prerequisites: By default, OpenPose uses Caffe under the hood. If you have not used Caffe previously, install its dependencies by running `sudo bash ./ubuntu/install_cmake.sh`.
     - OpenCV must be already installed on your machine. It can be installed with `apt-get install libopencv-dev`. You can also use your own compiled OpenCV version.
@@ -183,6 +181,8 @@ make -j`nproc`
 
 #### Windows
 In order to build the project, open the Visual Studio solution (Windows), called `build/OpenPose.sln`. Then, set the configuration from `Debug` to `Release` and press the green triangle icon (alternatively press <kbd>F5</kbd>).
+
+**VERY IMPORTANT NOTE**: In order to use OpenPose outside Visual Studio, and assuming you have not unchecked the `BUILD_BIN_FOLDER` flag in CMake, copy all DLLs from `{build_directory}/bin` into the folder where the generated `openpose.dll` and `*.exe` demos are, e.g., `{build_directory}x64/Release` for the 64-bit release version.
 
 
 

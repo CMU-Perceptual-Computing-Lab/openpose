@@ -79,11 +79,12 @@ Note: In order to maximize calibration quality, **do not reuse the same video se
 
 
 ### Step 2 - Extrinsic Parameter Calibration
-1. After intrinsics calibration, save undirtoted images for all the camera views:
+1. **VERY IMPORTANT NOTE**: If you want to re-run the extrinsic parameter calibration over the same intrinsic XML files (e.g., if you move the camera location, but you know the instrinsics are the same), you must manually re-set to `1 0 0 0  0 1 0 0  0 0 1 0` the camera matrix of each XML file.
+2. After intrinsics calibration, save undirtoted images for all the camera views:
 ```sh
 ./build/examples/openpose/openpose.bin --num_gpu 0 --flir_camera --write_images ~/Desktop/extrinsics
 ```
-2. Run the extrinsic calibration tool between each pair of close cameras. In this example:
+3. Run the extrinsic calibration tool between each pair of close cameras. In this example:
 	- We assume camera 0 to the right, 1 in the middle-right, 2 in the middle-left, and 3 in the left.
 	- We assume camera 1 as the coordinate origin.
 ```sh
@@ -94,7 +95,7 @@ Note: In order to maximize calibration quality, **do not reuse the same video se
 # Note: Wait until calibration of camera index 2 with respect to 1 is completed, as information from camera 2 XML calibration file will be used:
 ./build/examples/calibration/calibration.bin --mode 2 --grid_square_size_mm 127.0 --grid_number_inner_corners 9x6 --omit_distortion --calibration_image_dir ~/Desktop/extrinsics/ --cam0 2 --cam1 3 --combine_cam0_extrinsics
 ```
-3. Hint to verify extrinsic calibration is successful:
+4. Hint to verify extrinsic calibration is successful:
     1. Translation vector - Global distance:
         1. Manually open each one of the generated XML files from the folder indicated by the flag `--camera_parameter_folder` (or the default one indicated by the `--help` flag if the former was not used).
         2. The field `CameraMatrix` is a 3 x 4 matrix (you can see that the subfield `rows` in that file is 3 and `cols` is 4).
