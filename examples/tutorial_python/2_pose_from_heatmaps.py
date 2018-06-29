@@ -17,7 +17,10 @@ import time
 dir_path = os.path.dirname(os.path.realpath(__file__))
 sys.path.append('../../python')
 dir_path + "/../../models/"
-from openpose import OpenPose
+try:
+    from openpose import OpenPose
+except:
+    raise Exception('Error: OpenPose library could not be found. Did you enable `BUILD_PYTHON` in CMake and have this Python script in the right folder?')
 
 # Params for change
 defRes = 736

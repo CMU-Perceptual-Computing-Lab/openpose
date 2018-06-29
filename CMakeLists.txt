@@ -538,15 +538,21 @@ if (WIN32)
       file(GLOB CAFFE_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe_cpu/bin/*.dll")
     endif ()
     # Caffe 3rd-party DLLs
-    file(GLOB OPENCV3PTY_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/lib/*.dll")
+    file(GLOB CAFFE_3RD_PARTY_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/lib/*.dll")
     # OpenCV DLLs
     file(GLOB OPENCV_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/opencv/x64/vc14/bin/*.dll")
+    # GLUT DLLs
+    file(GLOB GLUT_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/freeglut/bin/*.dll")
+    # Spinnaker DLLs and other files
+    file(GLOB SPINNAKER_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/spinnaker/bin/*")
     # Copy DLLs into same folder
     set(BIN_FOLDER ${CMAKE_BINARY_DIR}/bin)
     file(MAKE_DIRECTORY ${BIN_FOLDER})
     file(COPY ${CAFFE_DLL} DESTINATION ${BIN_FOLDER})
     file(COPY ${OPENCV_DLL} DESTINATION ${BIN_FOLDER})
-    file(COPY ${OPENCV3PTY_DLL} DESTINATION ${BIN_FOLDER})
+    file(COPY ${CAFFE_3RD_PARTY_DLL} DESTINATION ${BIN_FOLDER})
+    file(COPY ${GLUT_DLL} DESTINATION ${BIN_FOLDER})
+    file(COPY ${SPINNAKER_DLL} DESTINATION ${BIN_FOLDER})
   endif (BUILD_BIN_FOLDER)
 
 endif (WIN32)

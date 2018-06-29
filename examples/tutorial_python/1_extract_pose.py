@@ -15,7 +15,10 @@ else: sys.path.append('../../python');
 # sys.path.append('/usr/local/python')
 
 # Parameters for OpenPose. Take a look at C++ OpenPose example for meaning of components. Ensure all below are filled
-from openpose import *
+try:
+    from openpose import *
+except:
+    raise Exception('Error: OpenPose library could not be found. Did you enable `BUILD_PYTHON` in CMake and have this Python script in the right folder?')
 params = dict()
 params["logging_level"] = 3
 params["output_resolution"] = "-1x-1"

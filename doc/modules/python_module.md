@@ -1,11 +1,13 @@
-OpenPose Python Module
+OpenPose Python Module and Demo
 =============================================
 
 ## Contents
 1. [Introduction](#introduction)
-2. [Installation](#installation)
-3. [Compatibility](#compatibility)
+2. [Compatibility](#compatibility)
+3. [Installation](#installation)
 4. [Testing](#testing)
+5. [Exporting Python OpenPose](#exporting-python-openpose)
+
 
 
 ## Introduction
@@ -13,12 +15,15 @@ This experimental module exposes a Python API for OpenPose. This allows you to c
 
 At present the Python API only supports body pose. Hands and Face will be added in the future.
 
+
+
+## Compatibility
+The OpenPose Python module is compatible with both Python 2 and Python 3. In addition, it will also run in all OpenPose compatible operating systems.
+
+
+
 ## Installation
 Check [doc/installation.md#python-module](./installation.md#python-module) for installation steps.
-
-To simply test the OpenPose API in your project without installation, ensure that the line `sys.path.append('{OpenPose_path}/python')` is set in your `*.py` files, where `{OpenPose_path}` points to your build folder of OpenPose. Take a look at `build/examples/tutorial_pose/1_extract_pose.py` for an example.
-
-On an Ubuntu or OSX based system, you may use it globally. Running `sudo make install` will install OpenPose by default into `/usr/local/python`. You can set this into your python path and start using it at any location.
 
 The Python API requires Numpy for array management, and OpenCV for image loading. They can be installed via:
 
@@ -26,9 +31,6 @@ The Python API requires Numpy for array management, and OpenCV for image loading
 pip install numpy
 pip install opencv-python
 ```
-
-## Compatibility
-The OpenPose Python module is compatible with both Python 2 and Python 3. In addition, it will also run in all OpenPose compatible operating systems.
 
 
 
@@ -46,5 +48,8 @@ python 1_extract_pose.py
 
 
 
-## Code Sample
-See [examples/tutorial_python/1_extract_pose.py](../../../master/examples/tutorial_python/1_extract_pose.py).
+## Exporting Python OpenPose
+Note: This step is only required if you are moving the `*.py` files outside their original location, or writting new `*.py` scripts outside `build/examples/tutorial_python`.
+
+- Option a, installing OpenPose: On an Ubuntu or OSX based system, you could install OpenPose by running `sudo make install`, you could then set the OpenPose path in your python scripts to the OpenPose installation path (default: `/usr/local/python`) and start using OpenPose at any location. Take a look at `build/examples/tutorial_pose/1_extract_pose.py` for an example.
+- Option b, not Installing OpenPose: To move the OpenPose Python API demos to a different folder, ensure that the line `sys.path.append('{OpenPose_path}/python')` is properly set in your `*.py` files, where `{OpenPose_path}` points to your build folder of OpenPose. Take a look at `build/examples/tutorial_pose/1_extract_pose.py` for an example.
