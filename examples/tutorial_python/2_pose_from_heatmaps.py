@@ -23,15 +23,15 @@ from openpose import OpenPose
 defRes = 736
 scales = [1,0.5]
 class Param:
-    caffemodel = dir_path + "/../../../models/pose/coco/pose_iter_440000.caffemodel"
-    prototxt = dir_path + "/../../../models/pose/coco/pose_deploy_linevec.prototxt"
+    caffemodel = dir_path + "/../../../models/pose/body_25/pose_iter_584000.caffemodel"
+    prototxt = dir_path + "/../../../models/pose/body_25/pose_deploy.prototxt"
 
 # Load OpenPose object and Caffe Nets
 params = dict()
 params["logging_level"] = 3
 params["output_resolution"] = "-1x-1"
 params["net_resolution"] = "-1x"+str(defRes)
-params["model_pose"] = "COCO"
+params["model_pose"] = "BODY_25"
 params["alpha_pose"] = 0.6
 params["scale_gap"] = 0.5
 params["scale_number"] = len(scales)
