@@ -257,7 +257,7 @@ endif (${GPU_MODE} MATCHES "OPENCL" OR (UNIX OR APPLE))
 
 # Caffe OpenCL Boost Issue
 if (APPLE)
-  if (${GPU_MODE} MATCHES "OPENCL")
+  if (${GPU_MODE} MATCHES "OPENCL" OR BUILD_PYTHON)
     unset(Boost_SYSTEM_LIBRARY CACHE)
     find_package(Boost COMPONENTS system REQUIRED)
   else ()
