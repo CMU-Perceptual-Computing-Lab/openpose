@@ -969,6 +969,7 @@ namespace op
         {
             #ifdef USE_EIGEN
                 // For debugging
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 const auto coutResults = false;
                 // const auto coutResults = true;
                 const bool coutAndImshowVerbose = false;
@@ -977,6 +978,7 @@ namespace op
                 const cv::Size gridInnerCornersCvSize{gridInnerCorners.x, gridInnerCorners.y};
 
                 // Load intrinsic parameters
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 CameraParameterReader cameraParameterReader;
                 cameraParameterReader.readParameters(intrinsicsFolder);
                 const auto cameraSerialNumbers = cameraParameterReader.getCameraSerialNumbers();
@@ -986,9 +988,11 @@ namespace op
                     std::vector<cv::Mat>{realCameraDistortions.size()}
                     : realCameraDistortions);
                 // Only use the 2 desired ones
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 cameraIntrinsicsSubset = {cameraIntrinsicsSubset.at(index0), cameraIntrinsicsSubset.at(index1)};
                 cameraDistortionsSubset = {cameraDistortionsSubset.at(index0), cameraDistortionsSubset.at(index1)};
                 // Base extrinsics
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 cv::Mat extrinsicsCam0 = cv::Mat::eye(4, 4, realCameraDistortions.at(0).type());
                 bool cam0IsOrigin = true;
                 if (combineCam0Extrinsics)
@@ -998,6 +1002,7 @@ namespace op
                 }
 
                 // Number cameras and image paths
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 const auto numberCameras = cameraParameterReader.getNumberCameras();
                 log("\nDetected " + std::to_string(numberCameras) + " cameras from your XML files on:\n"
                     + intrinsicsFolder + "\nRemove wrong/extra XML files if this number of cameras does not"
@@ -1013,6 +1018,7 @@ namespace op
                           __LINE__, __FUNCTION__, __FILE__);
 
                 // Estimate extrinsic parameters per image
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 log("Calibrating camera " + cameraSerialNumbers.at(index1) + " with respect to camera "
                     + cameraSerialNumbers.at(index0) + "...", Priority::High);
                 const auto numberViews = imagePaths.size() / numberCameras;
@@ -1020,6 +1026,7 @@ namespace op
                 std::vector<Eigen::Matrix4d> MCam1ToCam0s;
                 for (auto i = 0u ; i < imagePaths.size() ; i+=numberCameras)
                 {
+                    log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     const auto pathCam0 = imagePaths[i+index0];
                     const auto pathCam1 = imagePaths[i+index1];
                     if (coutResults || i/numberCameras % int(numberViews/10) == 0)
@@ -1079,6 +1086,7 @@ namespace op
                 log("Finished processing images.", Priority::High);
 
                 // Pseudo RANSAC calibration
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 const auto MCam1ToCam0Noisy = getMAverage(MCam1ToCam0s);
                 log("Estimated initial (noisy?) projection matrix.", Priority::High);
                 auto MCam1ToCam0 = getMAverage(MCam1ToCam0s, MCam1ToCam0Noisy);
@@ -1095,11 +1103,13 @@ namespace op
 
 
                 // Show errors
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 if (coutAndImshowVerbose)
                 {
                     log("\n-----------------------------------------------------------------------------------"
                         "-------------------\nErrors:", Priority::High);
                     // Errors
+                    log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     for (auto i = 0u ; i < MCam1ToCam0s.size() ; i++)
                     {
                         log("tCam1WrtCam0:", Priority::High);
@@ -1112,6 +1122,7 @@ namespace op
                     log(" ", Priority::High);
 
                     // Rotation matrix in degrees Rodrigues(InputArray src, OutputArray dst
+                    log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     const auto rad2deg = 180 / PI;
                     for (auto i = 0u ; i < MCam1ToCam0s.size() ; i++)
                     {
@@ -1125,6 +1136,7 @@ namespace op
                 }
 
                 // Show final result
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 if (coutResults)
                 {
                     log("\n\n\n---------------------------------------------------------------------------"
@@ -1138,9 +1150,11 @@ namespace op
                 }
 
                 // mm --> m
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 MCam1ToCam0.block<3,1>(0,3) *= 1e-3;
 
                 // Eigen --> cv::Mat
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 cv::Mat cvMatExtrinsics;
                 Eigen::MatrixXd eigenExtrinsics = MCam1ToCam0.block<3,4>(0,0);
                 cv::eigen2cv(eigenExtrinsics, cvMatExtrinsics);
@@ -1151,11 +1165,13 @@ namespace op
                     cvMatExtrinsics *= extrinsicsCam0;
 
                 // Final projection matrix
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 log("\nFinal projection matrix w.r.t. global origin (m):", Priority::High);
                 log(cvMatExtrinsics, Priority::High);
                 log(" ", Priority::High);
 
                 // Save result
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 CameraParameterReader camera2ParameterReader{
                     cameraSerialNumbers.at(index1),
                     cameraIntrinsicsSubset.at(1),
@@ -1163,6 +1179,8 @@ namespace op
                     cvMatExtrinsics};
                 camera2ParameterReader.writeParameters(intrinsicsFolder);
 
+                // Let the rendered image to be displayed
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 if (coutAndImshowVerbose)
                     cv::waitKey(0);
             #else
