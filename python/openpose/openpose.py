@@ -23,7 +23,10 @@ class OpenPose(object):
     elif platform == "darwin":
         _libop= np.ctypeslib.load_library('_openpose', dir_path+'/_openpose.dylib')
     elif platform == "win32":
-        _libop= np.ctypeslib.load_library('_openpose', dir_path+'/Release/_openpose.dll')
+        try:
+            _libop= np.ctypeslib.load_library('_openpose', dir_path+'/Release/_openpose.dll')
+        except OSError as e:
+            _libop= np.ctypeslib.load_library('_openpose', dir_path+'/Debug/_openpose.dll')
     _libop.newOP.argtypes = [
         ct.c_int, ct.c_char_p, ct.c_char_p, ct.c_char_p, ct.c_float, ct.c_float, ct.c_int, ct.c_float, ct.c_int, ct.c_bool, ct.c_char_p]
     _libop.newOP.restype = ct.c_void_p
