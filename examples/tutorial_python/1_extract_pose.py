@@ -35,7 +35,7 @@ openpose = OpenPose(params)
 
 while 1:
     # Read new image
-    img = cv2.imread("image.png")
+    img = cv2.imread("../../../examples/media/COCO_val2014_000000000192.jpg")
     # Output keypoints and the image with the human skeleton blended on it
     keypoints, output_image = openpose.forward(img, True)
     # Print the human pose keypoints, i.e., a [#people x #keypoints x 3]-dimensional numpy object with the keypoints of all the people on that image
