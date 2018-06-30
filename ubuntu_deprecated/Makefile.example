@@ -71,6 +71,15 @@ else
 endif
 
 
+# Faster GUI display
+WITH_OPENCV_WITH_OPENGL ?= 0
+ifneq ($(WITH_OPENCV_WITH_OPENGL), 0)
+	COMMON_FLAGS += -DUSE_OPENCV_WITH_OPENGL
+	# FreeGLUT
+	LIBRARIES += glut
+	# LIBRARIES += GLU GL glut
+endif
+
 # 3-D
 # 3-D renderer
 WITH_3D_RENDERER ?= 0

@@ -212,7 +212,9 @@ option(WITH_FLIR_CAMERA "Add FLIR (formerly Point Grey) camera code (requires Sp
 # option(WITH_3D_ADAM_MODEL "Add 3-D Adam model (requires OpenGL, Ceres, Eigen, OpenMP, FreeImage, GLEW, and IGL already installed)." OFF)
 
 # Faster GUI rendering
-option(WITH_OPENCV_WITH_OPENGL "Faster GUI display. You must also enable OpenGL support in OpenCV, by configuring OpenCV using CMake with WITH_OPENGL=ON flag." OFF)
+# Note: It seems to work by default in Windows and Ubuntu, but not in Mac nor Android.
+# More info: https://stackoverflow.com/questions/21129683/does-opengl-display-image-faster-than-opencv?answertab=active#tab-top
+option(WITH_OPENCV_WITH_OPENGL "Much faster GUI display, but you must also enable OpenGL support in OpenCV by configuring OpenCV using CMake with WITH_OPENGL=ON flag." OFF)
 
 # Set the acceleration library
 if (WIN32 OR APPLE)

@@ -165,7 +165,7 @@ namespace op
                 auto frame = frameArray.getCvMat();
 
                 // Security check
-                if (frame.dims != 3 || frame.size[2] != 3)
+                if (frame.channels() != 3)
                     error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
 
                 // Get frame channels
