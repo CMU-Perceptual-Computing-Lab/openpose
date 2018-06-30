@@ -11,7 +11,7 @@ namespace op
             const auto font = cv::FONT_HERSHEY_SIMPLEX;
             const auto ratio = imageWidth/1280.;
             // const auto fontScale = 0.75;
-            const auto fontScale = 0.8 * std::sqrt(ratio);
+            const auto fontScale = 0.8 * ratio;
             const auto fontThickness = std::max(1, intRound(2*ratio));
             const auto shadowOffset = std::max(1, intRound(2*ratio));
             int baseline = 0;

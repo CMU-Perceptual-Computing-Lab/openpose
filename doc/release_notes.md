@@ -239,6 +239,7 @@ OpenPose Library - Release Notes
     14. When GUI changes some parameter from PoseExtractorNet, there is a log to notify the user of the change.
     15. Deprecated flag `--write_keypoint_json` removed (`--write_json` is the equivalent since version 1.2.1).
     16. Speed up of cvMatToOpOutput and opOutputToCvMat: op::Datum::outputData is now H x W x C instead of C x H x W, making it much faster to be copied to/from op::Datum::cvOutputData.
+    17. Faster GUI display by adding the `WITH_OPENCV_WITH_OPENGL` flag to tell whether to use OpenGL support for OpenCV.
 2. Functions or parameters renamed:
     1. Removed scale parameter from hand and face rectangle extractor (causing wrong results if custom `--output_resolution`).
     2. Functions `scaleKeypoints`, other than `scaleKeypoints(Array<float>& keypoints, const float scale)`, renamed as `scaleKeypoints2d`.

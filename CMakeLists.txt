@@ -211,6 +211,9 @@ endif (UNIX AND NOT APPLE)
 option(WITH_FLIR_CAMERA "Add FLIR (formerly Point Grey) camera code (requires Spinnaker SDK already installed)." OFF)
 # option(WITH_3D_ADAM_MODEL "Add 3-D Adam model (requires OpenGL, Ceres, Eigen, OpenMP, FreeImage, GLEW, and IGL already installed)." OFF)
 
+# Faster GUI rendering
+option(WITH_OPENCV_WITH_OPENGL "Faster GUI display. You must also enable OpenGL support in OpenCV, by configuring OpenCV using CMake with WITH_OPENGL=ON flag." OFF)
+
 # Set the acceleration library
 if (WIN32 OR APPLE)
   set(WITH_EIGEN NONE CACHE STRING "Select the Eigen mode (NONE if not required or DOWNLOAD to let OpenPose download it).")
@@ -273,6 +276,10 @@ if (${GPU_MODE} MATCHES "CUDA")
 endif (${GPU_MODE} MATCHES "CUDA")
 
 # Adding 3D
+if (WITH_OPENCV_WITH_OPENGL)
+  # OpenPose flags
+  add_definitions(-DUSE_OPENCV_WITH_OPENGL)
+endif (WITH_OPENCV_WITH_OPENGL)
 if (WITH_3D_RENDERER)
   # OpenPose flags
   add_definitions(-DUSE_3D_RENDERER)
@@ -355,15 +362,24 @@ if (UNIX OR APPLE)
     endif (NOT SPINNAKER_FOUND)
   endif (WITH_FLIR_CAMERA)
   if (WITH_3D_ADAM_MODEL)
+    if (NOT WITH_3D_RENDERER)
+      message(FATAL_ERROR "WITH_3D_RENDERER is required if WITH_3D_ADAM_MODEL is enabled.")
+    endif (WITH_3D_RENDERER)
     find_package(PkgConfig)
     pkg_check_modules(EIGEN3 REQUIRED eigen3)
+    # Others: sudo apt-get install libglm-dev
+    # http://ceres-solver.org
     find_package(Ceres REQUIRED COMPONENTS SuiteSparse)
+    # sudo apt-get install libglew-dev
     find_package(GLEW REQUIRED)
-    find_package(GLUT REQUIRED)
+    # find_package(GLUT REQUIRED) # TODO: Duplicated of WITH_3D_RENDERER, clean somehow (like Eigen)
+    # git clone --recursive https://github.com/libigl/libigl.git
+    # No installation, it's header only
+    # TODO: It's header only (as Eigen), do BUILD option too to download it
     find_package(LIBIGL REQUIRED)
-    find_package(OpenGL REQUIRED)
     find_package(OpenMP REQUIRED)
-    FIND_LIBRARY(FREE_IMAGE_LIBRARY NAMES libfreeimage.so)
+    # Only adam/renderer::Renderer::IdleSaveImage() uses it. Make dependency optional in hand_model
+    # FIND_LIBRARY(FREE_IMAGE_LIBRARY NAMES libfreeimage.so)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")

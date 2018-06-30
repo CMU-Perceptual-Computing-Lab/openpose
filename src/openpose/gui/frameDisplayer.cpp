@@ -49,7 +49,11 @@ namespace op
             mFullScreenMode = fullScreenMode;
 
             // Setting output resolution
-            cv::namedWindow(mWindowName, CV_WINDOW_NORMAL | CV_WINDOW_KEEPRATIO);
+            auto flags = CV_WINDOW_NORMAL | CV_WINDOW_KEEPRATIO;
+            #ifdef USE_OPENCV_WITH_OPENGL
+                flags |= CV_WINDOW_OPENGL;
+            #endif
+            cv::namedWindow(mWindowName, flags);
             if (mFullScreenMode == FullScreenMode::FullScreen)
                 cv::setWindowProperty(mWindowName, CV_WND_PROP_FULLSCREEN, CV_WINDOW_FULLSCREEN);
             else if (mFullScreenMode == FullScreenMode::Windowed)
