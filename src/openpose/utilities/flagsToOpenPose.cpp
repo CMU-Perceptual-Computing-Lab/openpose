@@ -14,6 +14,7 @@ namespace op
         try
         {
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            // Body pose
             if (poseModeString == "BODY_25")
                 return PoseModel::BODY_25;
             else if (poseModeString == "COCO")
@@ -32,12 +33,13 @@ namespace op
                 return PoseModel::BODY_19_X2;
             else if (poseModeString == "BODY_25_19")
                 return PoseModel::BODY_25_19;
-            else if (poseModeString == "BODY_23")
-                return PoseModel::BODY_23;
             else if (poseModeString == "BODY_59")
                 return PoseModel::BODY_59;
             else if (poseModeString == "BODY_65")
                 return PoseModel::BODY_65;
+            // Car pose
+            else if (poseModeString == "CAR_12")
+                return PoseModel::CAR_12;
             // else
             error("String does not correspond to any model (BODY_25, COCO, MPI, MPI_4_layers)",
                   __LINE__, __FUNCTION__, __FILE__);

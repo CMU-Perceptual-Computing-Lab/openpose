@@ -17,12 +17,12 @@ namespace op
         MPI_15_4,       /**< Variation of the MPI model, reduced number of CNN stages to 4: faster but less accurate.*/
         BODY_19,        /**< Experimental. Do not use. */
         BODY_19_X2,     /**< Experimental. Do not use. */
-        BODY_23,        /**< Experimental. Do not use. */
         BODY_59,        /**< Experimental. Do not use. */
         BODY_19N,       /**< Experimental. Do not use. */
         BODY_19b,       /**< Experimental. Do not use. */
         BODY_25_19,     /**< Experimental. Do not use. */
         BODY_65,        /**< Experimental. Do not use. */
+        CAR_12,         /**< Experimental. Do not use. */
         Size,
     };
 

@@ -239,7 +239,6 @@ namespace op
                             || ((numberBodyParts == 19 || numberBodyParts == 25 || numberBodyParts == 59
                                  || numberBodyParts == 65)
                                 && (pairIndex==18 || pairIndex==19))
-                            || (numberBodyParts == 23 && (pairIndex==22 || pairIndex==23))
                             || (poseModel == PoseModel::BODY_19b
                                 && (pairIndex == numberBodyPartPairs-1 || pairIndex == numberBodyPartPairs-2))
                             )

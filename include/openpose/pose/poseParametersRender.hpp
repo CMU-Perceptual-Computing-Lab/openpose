@@ -134,34 +134,6 @@ namespace op
         170.f,     0.f,   255.f, \
         255.f,     0.f,   255.f, \
          85.f,     0.f,   255.f
-    // BODY_23
-    #define POSE_BODY_23_PAIRS_RENDER_GPU \
-        0,1,  0,4,  1,2,  2,3,  4,5,  5,6,  0,7,  7,8,  7,13, 8,9,  9,10,10,11,11,12,13,14,14,15,15,16,16,17, 0,18,18,19,18,21,19,20,21,22
-    #define POSE_BODY_23_SCALES_RENDER_GPU 1
-    #define POSE_BODY_23_COLORS_RENDER_GPU \
-        255.f,     0.f,     0.f, \
-        255.f,    55.f,     0.f, \
-        255.f,   110.f,     0.f, \
-        255.f,   165.f,     0.f, \
-        255.f,   215.f,     0.f, \
-        255.f,   235.f,     0.f, \
-        255.f,   255.f,     0.f, \
-        255.f,     0.f,     0.f, \
-        175.f,   255.f,     0.f, \
-         85.f,   255.f,     0.f, \
-          0.f,   255.f,     0.f, \
-          0.f,   255.f,    85.f, \
-          0.f,   255.f,   170.f, \
-         25.f,    25.f,   128.f, \
-          0.f,    85.f,   255.f, \
-          0.f,   170.f,   255.f, \
-          0.f,  212.5f,   255.f, \
-          0.f,   255.f,   255.f, \
-        255.f,     0.f,     0.f, \
-        255.f,     0.f,   255.f, \
-        238.f,   130.f,   238.f, \
-        138.f,    43.f,   226.f, \
-         75.f,     0.f,   130.f
     // BODY_59
     // Body + left hand + right hand
     #define POSE_BODY_59_PAIRS_RENDER_GPU \
@@ -312,7 +284,6 @@ namespace op
           0.f,  191.f,  191.f, \
           0.f,  127.f,  127.f, \
           0.f,   63.f,   63.f
-
     // Hand color selection
     // http://www.perbang.dk/rgbgradient/
     // 1. Main color
@@ -323,6 +294,27 @@ namespace op
     // 2. Gradient color from wrist to finger tips
     //     - Inside each finger: 5 steps from main color to 000000, and selecting first 4 from RGB gradient.
     //     Note: Used HSV gradient for red finger.
+
+    // CAR_12
+    #define POSE_CAR_12_PAIRS_RENDER_GPU \
+        4,5,   4,6,   4,0,   0,2,   4,8,   8,10,   5,7,   5,1,   1,3,  5,9, 9,11,     2,3, 6,7, 10,11,     6,2,7,3, 6,10,7,11
+        // 4,5,   4,6,   4,0,   0,2,   4,8,   8,10,   5,7,   5,1,   1,3,  5,9, 9,11
+    #define POSE_CAR_12_SCALES_RENDER_GPU 1
+    #define POSE_CAR_12_COLORS_RENDER_GPU \
+          0.f,   255.f,     0.f, \
+          0.f,   255.f,     0.f, \
+        255.f,   255.f,     0.f, \
+        255.f,   255.f,     0.f, \
+        \
+        255.f,     0.f,     0.f, \
+        255.f,     0.f,     0.f, \
+        255.f,    75.f,    75.f, \
+        255.f,    75.f,    75.f, \
+        \
+          0.f,     0.f,   255.f, \
+          0.f,     0.f,   255.f, \
+        255.f,     0.f,   255.f, \
+        255.f,     0.f,   255.f
 
     // Rendering functions
     OP_API const std::vector<float>& getPoseScales(const PoseModel poseModel);
