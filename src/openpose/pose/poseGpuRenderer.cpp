@@ -81,7 +81,7 @@ namespace op
                     cudaCheck(__LINE__, __FUNCTION__, __FILE__);
                     const auto numberBodyParts = getPoseNumberBodyParts(mPoseModel);
                     const auto numberBodyPartsPlusBkg = numberBodyParts+1;
-                    const Point<int> frameSize{outputData.getSize(2), outputData.getSize(1)};
+                    const Point<int> frameSize{outputData.getSize(1), outputData.getSize(0)};
                     // Draw poseKeypoints
                     if (elementRendered == 0)
                     {

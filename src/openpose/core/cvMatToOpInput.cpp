@@ -32,7 +32,8 @@ namespace op
                 const cv::Mat frameWithNetSize = resizeFixedAspectRatio(cvInputData, scaleInputToNetInputs[i],
                                                                         netInputSizes[i]);
                 // Fill inputNetData[i]
-                uCharCvMatToFloatPtr(inputNetData[i].getPtr(), frameWithNetSize, (mPoseModel == PoseModel::BODY_19N ? 2 : 1));
+                uCharCvMatToFloatPtr(inputNetData[i].getPtr(), frameWithNetSize,
+                                     (mPoseModel == PoseModel::BODY_19N ? 2 : 1));
             }
             return inputNetData;
         }

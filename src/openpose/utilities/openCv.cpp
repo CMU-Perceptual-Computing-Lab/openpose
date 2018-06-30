@@ -29,46 +29,6 @@ namespace op
         }
     }
 
-    void floatPtrToUCharCvMat(cv::Mat& uCharCvMat, const float* const floatPtrImage,
-                              const std::array<int, 3> resolutionSize)
-    {
-        try
-        {
-            // Info:
-                // float* (deep net format): C x H x W
-                // cv::Mat (OpenCV format): H x W x C
-            // Allocate cv::Mat if it was not initialized yet
-            if (uCharCvMat.empty() || uCharCvMat.rows != resolutionSize[1]
-                || uCharCvMat.cols != resolutionSize[0] || uCharCvMat.type() != CV_8UC3)
-                uCharCvMat = cv::Mat(resolutionSize[1], resolutionSize[0], CV_8UC3);
-            // Fill uCharCvMat from floatPtrImage
-            auto* uCharPtrCvMat = (unsigned char*)(uCharCvMat.data);
-            const auto offsetBetweenChannels = resolutionSize[0] * resolutionSize[1];
-            const auto stepSize = uCharCvMat.step; // step = cols * channels
-            for (auto c = 0; c < resolutionSize[2]; c++)
-            {
-                const auto offsetChannelC = c*offsetBetweenChannels;
-                for (auto y = 0; y < resolutionSize[1]; y++)
-                {
-                    const auto yOffset = y * stepSize;
-                    const auto floatPtrImageOffsetY = offsetChannelC + y*resolutionSize[0];
-                    for (auto x = 0; x < resolutionSize[0]; x++)
-                    {
-                        const auto value = uchar(
-                            fastTruncate(intRound(floatPtrImage[floatPtrImageOffsetY + x]), 0, 255)
-                        );
-                        uCharPtrCvMat[yOffset + x * resolutionSize[2] + c] = value;
-                        // *(uCharCvMat.ptr<uchar>(y, x) + c) = value; // Slower but safer and cleaner equivalent
-                    }
-                }
-            }
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-        }
-    }
-
     void unrollArrayToUCharCvMat(cv::Mat& cvMatResult, const Array<float>& array)
     {
         try
@@ -120,7 +80,7 @@ namespace op
         try
         {
             // float* (deep net format): C x H x W
-            // cv::Mat (OpenCV format): H x W x C 
+            // cv::Mat (OpenCV format): H x W x C
             const int width = cvImage.cols;
             const int height = cvImage.rows;
             const int channels = cvImage.channels();

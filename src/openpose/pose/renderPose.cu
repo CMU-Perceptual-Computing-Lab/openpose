@@ -359,10 +359,8 @@ namespace op
                 rgbColor[2] += value*COCO_COLORS[rgbColorIndex+2];
             }
 
-            const auto blueIndex = y * targetWidth + x;
-            const auto greenIndex = targetWidth * targetHeight + blueIndex;
-            const auto redIndex = targetWidth * targetHeight + greenIndex;
-            addColorWeighted(targetPtr[redIndex], targetPtr[greenIndex], targetPtr[blueIndex], rgbColor,
+            const auto blueIndex = 3*(y * targetWidth + x);
+            addColorWeighted(targetPtr[blueIndex+2], targetPtr[blueIndex+1], targetPtr[blueIndex], rgbColor,
                              alphaColorToAdd);
         }
     }
@@ -387,10 +385,8 @@ namespace op
             float rgbColor[3];
             getColorHeatMap(rgbColor, interpolatedValue, 0.f, 1.f);
 
-            const auto blueIndex = y * targetWidth + x;
-            const auto greenIndex = targetWidth * targetHeight + blueIndex;
-            const auto redIndex = targetWidth * targetHeight + greenIndex;
-            addColorWeighted(targetPtr[redIndex], targetPtr[greenIndex], targetPtr[blueIndex], rgbColor,
+            const auto blueIndex = 3*(y * targetWidth + x);
+            addColorWeighted(targetPtr[blueIndex+2], targetPtr[blueIndex+1], targetPtr[blueIndex], rgbColor,
                              alphaColorToAdd);
         }
     }
@@ -447,10 +443,8 @@ namespace op
                 rgbColor[2] += rgbColor2.z;
             }
 
-            const auto blueIndex = y * targetWidth + x;
-            const auto greenIndex = blueIndex + targetWidth * targetHeight;
-            const auto redIndex = greenIndex + targetWidth * targetHeight;
-            addColorWeighted(targetPtr[redIndex], targetPtr[greenIndex], targetPtr[blueIndex], rgbColor,
+            const auto blueIndex = 3*(y * targetWidth + x);
+            addColorWeighted(targetPtr[blueIndex+2], targetPtr[blueIndex+1], targetPtr[blueIndex], rgbColor,
                              alphaColorToAdd);
         }
     }

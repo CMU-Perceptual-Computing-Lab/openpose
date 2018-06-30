@@ -58,10 +58,10 @@ namespace op
         // Fill each (x,y) target pixel
         if (x < targetWidth && y < targetHeight)
         {
-            const auto baseIndex = y * targetWidth + x;
-            auto& b = targetPtr[                                 baseIndex];
-            auto& g = targetPtr[    targetWidth * targetHeight + baseIndex];
-            auto& r = targetPtr[2 * targetWidth * targetHeight + baseIndex];
+            const auto baseIndex = 3*(y * targetWidth + x);
+            auto& b = targetPtr[baseIndex];
+            auto& g = targetPtr[baseIndex+1];
+            auto& r = targetPtr[baseIndex+2];
             if (!blendOriginalFrame)
             {
                 b = 0.f;

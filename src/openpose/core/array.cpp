@@ -480,26 +480,50 @@ namespace op
     {
         try
         {
-            // Prepare cv::Mat
             mCvMatData.first = true;
-            auto cvFormat = CV_32FC1;
-            if (typeid(T) == typeid(float))
-                cvFormat = CV_32FC1;
-            else if (typeid(T) == typeid(double))
-                cvFormat = CV_64FC1;
-            else if (typeid(T) == typeid(unsigned char))
-                cvFormat = CV_8UC1;
-            else if (typeid(T) == typeid(signed char))
-                cvFormat = CV_8SC1;
-            else if (typeid(T) == typeid(int))
-                cvFormat = CV_32SC1;
-            else
-                mCvMatData.first = false;
+            mCvMatData.second = cv::Mat();
+            // BGR image
+            if (mSize.size() == 3 && mSize[2] == 3)
+            {
+                // Prepare cv::Mat
+                auto cvFormat = CV_32FC3;
+                if (typeid(T) == typeid(float))
+                    cvFormat = CV_32FC3;
+                else if (typeid(T) == typeid(double))
+                    cvFormat = CV_64FC3;
+                else if (typeid(T) == typeid(unsigned char))
+                    cvFormat = CV_8UC3;
+                else if (typeid(T) == typeid(signed char))
+                    cvFormat = CV_8SC3;
+                else if (typeid(T) == typeid(int))
+                    cvFormat = CV_32SC3;
+                else
+                    mCvMatData.first = false;
 
-            if (mCvMatData.first)
-                mCvMatData.second = cv::Mat((int)mSize.size(), mSize.data(), cvFormat, spData.get());
+                if (mCvMatData.first)
+                    mCvMatData.second = cv::Mat(mSize[0], mSize[1], cvFormat, spData.get());
+            }
+            // Any other type
             else
-                mCvMatData.second = cv::Mat();
+            {
+                // Prepare cv::Mat
+                auto cvFormat = CV_32FC1;
+                if (typeid(T) == typeid(float))
+                    cvFormat = CV_32FC1;
+                else if (typeid(T) == typeid(double))
+                    cvFormat = CV_64FC1;
+                else if (typeid(T) == typeid(unsigned char))
+                    cvFormat = CV_8UC1;
+                else if (typeid(T) == typeid(signed char))
+                    cvFormat = CV_8SC1;
+                else if (typeid(T) == typeid(int))
+                    cvFormat = CV_32SC1;
+                else
+                    mCvMatData.first = false;
+
+                if (mCvMatData.first)
+                    mCvMatData.second = cv::Mat((int)mSize.size(), mSize.data(), cvFormat, spData.get());
+            }
         }
         catch (const std::exception& e)
         {

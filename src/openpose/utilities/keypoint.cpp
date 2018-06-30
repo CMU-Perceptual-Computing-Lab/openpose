@@ -165,17 +165,14 @@ namespace op
                 auto frame = frameArray.getCvMat();
 
                 // Security check
-                if (frame.dims != 3 || frame.size[0] != 3)
+                if (frame.dims != 3 || frame.size[2] != 3)
                     error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
 
                 // Get frame channels
-                const auto width = frame.size[2];
-                const auto height = frame.size[1];
+                const auto width = frame.size[1];
+                const auto height = frame.size[0];
                 const auto area = width * height;
-                const auto channelOffset = area * sizeof(float) / sizeof(uchar);
-                cv::Mat frameB(height, width, CV_32FC1, &frame.data[0]);
-                cv::Mat frameG(height, width, CV_32FC1, &frame.data[channelOffset]);
-                cv::Mat frameR(height, width, CV_32FC1, &frame.data[2 * channelOffset]);
+                cv::Mat frameBGR(height, width, CV_32FC3, frame.data);
 
                 // Parameters
                 const auto lineType = 8;
@@ -211,14 +208,14 @@ namespace op
                                 const auto thicknessLineScaled = thicknessLine
                                                                * poseScales[pairs[pair+1] % numberScales];
                                 const auto colorIndex = pairs[pair+1]*3; // Before: colorIndex = pair/2*3;
-                                const cv::Scalar color{colors[colorIndex % numberColors],
-                                                       colors[(colorIndex+1) % numberColors],
-                                                       colors[(colorIndex+2) % numberColors]};
+                                const cv::Scalar color{
+                                    colors[(colorIndex+2) % numberColors],
+                                    colors[(colorIndex+1) % numberColors],
+                                    colors[colorIndex % numberColors]
+                                };
                                 const cv::Point keypoint1{intRound(keypoints[index1]), intRound(keypoints[index1+1])};
                                 const cv::Point keypoint2{intRound(keypoints[index2]), intRound(keypoints[index2+1])};
-                                cv::line(frameR, keypoint1, keypoint2, color[0], thicknessLineScaled, lineType, shift);
-                                cv::line(frameG, keypoint1, keypoint2, color[1], thicknessLineScaled, lineType, shift);
-                                cv::line(frameB, keypoint1, keypoint2, color[2], thicknessLineScaled, lineType, shift);
+                                cv::line(frameBGR, keypoint1, keypoint2, color, thicknessLineScaled, lineType, shift);
                             }
                         }
 
@@ -231,16 +228,14 @@ namespace op
                                 const auto radiusScaled = radius * poseScales[part % numberScales];
                                 const auto thicknessCircleScaled = thicknessCircle * poseScales[part % numberScales];
                                 const auto colorIndex = part*3;
-                                const cv::Scalar color{colors[colorIndex % numberColors],
-                                                       colors[(colorIndex+1) % numberColors],
-                                                       colors[(colorIndex+2) % numberColors]};
+                                const cv::Scalar color{
+                                    colors[(colorIndex+2) % numberColors],
+                                    colors[(colorIndex+1) % numberColors],
+                                    colors[colorIndex % numberColors]
+                                };
                                 const cv::Point center{intRound(keypoints[faceIndex]),
                                                        intRound(keypoints[faceIndex+1])};
-                                cv::circle(frameR, center, radiusScaled, color[0], thicknessCircleScaled, lineType,
-                                           shift);
-                                cv::circle(frameG, center, radiusScaled, color[1], thicknessCircleScaled, lineType,
-                                           shift);
-                                cv::circle(frameB, center, radiusScaled, color[2], thicknessCircleScaled, lineType,
+                                cv::circle(frameBGR, center, radiusScaled, color, thicknessCircleScaled, lineType,
                                            shift);
                             }
                         }

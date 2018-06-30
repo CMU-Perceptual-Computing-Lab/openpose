@@ -3,7 +3,8 @@
 
 namespace op
 {
-    Array<float> CvMatToOpOutput::createArray(const cv::Mat& cvInputData, const double scaleInputToOutput, const Point<int>& outputResolution) const
+    Array<float> CvMatToOpOutput::createArray(const cv::Mat& cvInputData, const double scaleInputToOutput,
+                                              const Point<int>& outputResolution) const
     {
         try
         {
@@ -19,8 +20,8 @@ namespace op
             // outputData - Reescale keeping aspect ratio and transform to float the output image
             const cv::Mat frameWithOutputSize = resizeFixedAspectRatio(cvInputData, scaleInputToOutput,
                                                                        outputResolution);
-            Array<float> outputData({3, outputResolution.y, outputResolution.x});
-            uCharCvMatToFloatPtr(outputData.getPtr(), frameWithOutputSize, false);
+            Array<float> outputData({outputResolution.y, outputResolution.x, 3});
+            frameWithOutputSize.convertTo(outputData.getCvMat(), CV_32FC3);
             // Return result
             return outputData;
         }
