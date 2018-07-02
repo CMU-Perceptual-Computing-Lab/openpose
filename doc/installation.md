@@ -94,8 +94,8 @@ The instructions in this section describe the steps to build OpenPose using CMak
 1. [Prerequisites](#prerequisites)
 2. [OpenPose Configuration](#openpose-configuration)
 3. [OpenPose Building](#openpose-building)
-4. [OpenPose from other Projects (Ubuntu and Mac)](#openpose-from-other-projects-ubuntu-and-mac)
-5. [Run OpenPose](#run-openpose)
+4. [Run OpenPose](#run-openpose)
+5. [OpenPose from other Projects (Ubuntu and Mac)](#openpose-from-other-projects-ubuntu-and-mac)
 
 
 
@@ -186,6 +186,11 @@ In order to build the project, open the Visual Studio solution (Windows), called
 
 
 
+### Run OpenPose
+Check OpenPose was properly installed by running it on the default images, video, or webcam: [doc/quick_start.md#quick-start](./quick_start.md#quick-start).
+
+
+
 ### OpenPose from other Projects (Ubuntu and Mac)
 If you only intend to use the OpenPose demo, you might skip this step. This step is only recommended if you plan to use the OpenPose API from other projects.
 
@@ -219,9 +224,6 @@ If Caffe was built with OpenPose, it will automatically find it. Otherwise, you 
 ```
 link_directories(<path_to_caffe_installation>/caffe/build/install/lib)
 ```
-
-### Run OpenPose
-Check OpenPose was properly installed by running it on the default images, video, or webcam: [doc/quick_start.md#quick-start](./quick_start.md#quick-start).
 
 
 
