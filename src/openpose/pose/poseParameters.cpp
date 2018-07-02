@@ -234,9 +234,10 @@ namespace op
         std::vector<unsigned int>{
             0,1, 14,15, 22,23, 16,17, 18,19, 24,25, 26,27, 6,7, 2,3, 4,5, 8,9, 10,11, 12,13, 30,31, 32,33, 36,37, 34,35, 38,39, 20,21, 28,29
         },
-        // BODY_19b
+        // BODY_25E
         std::vector<unsigned int>{
-            0,1, 14,15, 22,23, 16,17, 18,19, 24,25, 26,27, 6,7, 2,3, 4,5, 8,9, 10,11, 12,13, 30,31, 32,33, 36,37, 34,35, 38,39, 20,21, 28,29, 60,61, 62,63
+            0,1, 14,15, 20,21, 16,17, 18,19, 22,23, 24,25, 6,7, 2,3, 4,5, 8,9, 10,11, 12,13, 26,27, 28,29, 32,33, 30,31, 34,35, 36,37,38,39,40,41, 42,43,44,45,46,47,
+            48,49,50,51,52,53,54,55,56,57, 58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87
         },
         // BODY_25_19
         std::vector<unsigned int>{
@@ -259,7 +260,7 @@ namespace op
     const std::array<std::map<unsigned int, std::string>, (int)PoseModel::Size> POSE_BODY_PART_MAPPING{
         POSE_BODY_25_BODY_PARTS,POSE_COCO_BODY_PARTS,   POSE_MPI_BODY_PARTS,    POSE_MPI_BODY_PARTS,
         POSE_BODY_19_BODY_PARTS,POSE_BODY_19_BODY_PARTS,POSE_BODY_59_BODY_PARTS,POSE_BODY_19_BODY_PARTS,
-        POSE_BODY_19_BODY_PARTS,POSE_BODY_25_BODY_PARTS,POSE_BODY_65_BODY_PARTS,POSE_CAR_12_PARTS
+        POSE_BODY_25_BODY_PARTS,POSE_BODY_25_BODY_PARTS,POSE_BODY_65_BODY_PARTS,POSE_CAR_12_PARTS
     };
 
     const std::array<std::string, (int)PoseModel::Size> POSE_PROTOTXT{
@@ -271,7 +272,7 @@ namespace op
         "pose/body_19_x2/pose_deploy.prototxt",
         "pose/body_59/pose_deploy.prototxt",
         "pose/body_19n/pose_deploy.prototxt",
-        "pose/body_19b/pose_deploy.prototxt",
+        "pose/body_25e/pose_deploy.prototxt",
         "pose/body_19_25/pose_deploy_25.prototxt",
         "pose/body_65/pose_deploy.prototxt",
         "car/car_12/pose_deploy.prototxt",
@@ -285,7 +286,7 @@ namespace op
         "pose/body_19_x2/pose_iter_XXXXXX.caffemodel",
         "pose/body_59/pose_iter_XXXXXX.caffemodel",
         "pose/body_19n/pose_iter_XXXXXX.caffemodel",
-        "pose/body_19b/pose_iter_XXXXXX.caffemodel",
+        "pose/body_25e/pose_iter_XXXXXX.caffemodel",
         "pose/body_19_25/pose_iter_XXXXXX.caffemodel",
         "pose/body_65/pose_iter_XXXXXX.caffemodel",
         "car/car_12/pose_iter_XXXXXX.caffemodel",
@@ -294,7 +295,7 @@ namespace op
     // Constant Array Parameters
     // POSE_NUMBER_BODY_PARTS equivalent to size of std::map POSE_BODY_XX_BODY_PARTS - 1 (removing background)
     const std::array<unsigned int, (int)PoseModel::Size> POSE_NUMBER_BODY_PARTS{
-        25, 18, 15, 15, 19, 19, 59, 19, 19, 25, 65, 12
+        25, 18, 15, 15, 19, 19, 59, 19, 25, 25, 65, 12
     };
     const std::array<std::vector<unsigned int>, (int)PoseModel::Size> POSE_BODY_PART_PAIRS{
         // BODY_25
@@ -327,9 +328,10 @@ namespace op
         std::vector<unsigned int>{
             1,8,   1,2,   1,5,   2,3,   3,4,   5,6,   6,7,   8,9,   9,10,  10,11, 8,12,  12,13, 13,14,  1,0,   0,15, 15,17,  0,16, 16,18,   2,17,  5,18
         },
-        // BODY_19b
+        // BODY_25E
         std::vector<unsigned int>{
-            1,8,   1,2,   1,5,   2,3,   3,4,   5,6,   6,7,   8,9,   9,10,  10,11, 8,12,  12,13, 13,14,  1,0,   0,15, 15,17,  0,16, 16,18,   2,17,  5,18, 2,9, 5,12
+            1,8,   1,2,   1,5,   2,3,   3,4,   5,6,   6,7, 8,9, 9,10,10,11,8,12,12,13,13,14,  1,0,   0,15, 15,17,  0,16, 16,18, 14,19,19,20,14,21, 11,22,22,23,11,24,
+            1,3,  1,4,  1,6,  1,7,  1,9,   1,10, 1,11, 1,12, 1,13, 1,14, 1,15, 1,16, 1,17, 1,18, 1,19, 1,20, 1,21, 1,22, 1,23, 1,24
         },
         // BODY_25_19
         std::vector<unsigned int>{
@@ -355,7 +357,7 @@ namespace op
         POSE_MAX_PEOPLE,    // BODY_19_X2
         POSE_MAX_PEOPLE,    // BODY_59
         POSE_MAX_PEOPLE,    // BODY_19N
-        POSE_MAX_PEOPLE,    // BODY_19b
+        POSE_MAX_PEOPLE,    // BODY_25E
         POSE_MAX_PEOPLE,    // BODY_25_19
         POSE_MAX_PEOPLE,    // BODY_65
         POSE_MAX_PEOPLE,    // CAR_12
@@ -369,7 +371,7 @@ namespace op
         4.f,    // BODY_19_X2
         8.f,    // BODY_59
         8.f,    // BODY_19N
-        8.f,    // BODY_19b
+        8.f,    // BODY_25E
         8.f,    // BODY_25_19
         8.f,    // BODY_65
         8.f,    // CAR_12

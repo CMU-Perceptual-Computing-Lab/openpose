@@ -12,7 +12,7 @@ namespace op
     __constant__ const unsigned int BODY_25_PAIRS_GPU[] = {POSE_BODY_25_PAIRS_RENDER_GPU};
     __constant__ const unsigned int COCO_PAIRS_GPU[] = {POSE_COCO_PAIRS_RENDER_GPU};
     __constant__ const unsigned int BODY_19_PAIRS_GPU[] = {POSE_BODY_19_PAIRS_RENDER_GPU};
-    __constant__ const unsigned int BODY_19b_PAIRS_GPU[] = {POSE_BODY_19b_PAIRS_RENDER_GPU};
+    __constant__ const unsigned int BODY_25E_PAIRS_GPU[] = {POSE_BODY_25E_PAIRS_RENDER_GPU};
     __constant__ const unsigned int BODY_59_PAIRS_GPU[] = {POSE_BODY_59_PAIRS_RENDER_GPU};
     __constant__ const unsigned int BODY_65_PAIRS_GPU[] = {POSE_BODY_65_PAIRS_RENDER_GPU};
     __constant__ const unsigned int MPI_PAIRS_GPU[] = {POSE_MPI_PAIRS_RENDER_GPU};
@@ -21,7 +21,7 @@ namespace op
     __constant__ const float BODY_25_SCALES[] = {POSE_BODY_25_SCALES_RENDER_GPU};
     __constant__ const float COCO_SCALES[] = {POSE_COCO_SCALES_RENDER_GPU};
     __constant__ const float BODY_19_SCALES[] = {POSE_BODY_19_SCALES_RENDER_GPU};
-    __constant__ const float BODY_19b_SCALES[] = {POSE_BODY_19b_SCALES_RENDER_GPU};
+    __constant__ const float BODY_25E_SCALES[] = {POSE_BODY_25E_SCALES_RENDER_GPU};
     __constant__ const float BODY_59_SCALES[] = {POSE_BODY_59_SCALES_RENDER_GPU};
     __constant__ const float BODY_65_SCALES[] = {POSE_BODY_65_SCALES_RENDER_GPU};
     __constant__ const float MPI_SCALES[] = {POSE_MPI_SCALES_RENDER_GPU};
@@ -30,7 +30,7 @@ namespace op
     __constant__ const float BODY_25_COLORS[] = {POSE_BODY_25_COLORS_RENDER_GPU};
     __constant__ const float COCO_COLORS[] = {POSE_COCO_COLORS_RENDER_GPU};
     __constant__ const float BODY_19_COLORS[] = {POSE_BODY_19_COLORS_RENDER_GPU};
-    __constant__ const float BODY_19b_COLORS[] = {POSE_BODY_19b_COLORS_RENDER_GPU};
+    __constant__ const float BODY_25E_COLORS[] = {POSE_BODY_25E_COLORS_RENDER_GPU};
     __constant__ const float BODY_59_COLORS[] = {POSE_BODY_59_COLORS_RENDER_GPU};
     __constant__ const float BODY_65_COLORS[] = {POSE_BODY_65_COLORS_RENDER_GPU};
     __constant__ const float MPI_COLORS[] = {POSE_MPI_COLORS_RENDER_GPU};
@@ -169,7 +169,7 @@ namespace op
                         blendOriginalFrame, (googlyEyes ? 15 : -1), (googlyEyes ? 16 : -1));
     }
 
-    __global__ void renderPoseBody19b(float* targetPtr, const int targetWidth, const int targetHeight,
+    __global__ void renderPoseBody25E(float* targetPtr, const int targetWidth, const int targetHeight,
                                       const float* const posePtr, const int numberPeople, const float threshold,
                                       const bool googlyEyes, const bool blendOriginalFrame, const float alphaColorToAdd)
     {
@@ -183,16 +183,16 @@ namespace op
         __shared__ float sharedScaleF[POSE_MAX_PEOPLE];
 
         // Other parameters
-        const auto numberPartPairs = sizeof(BODY_19b_PAIRS_GPU) / (2*sizeof(BODY_19b_PAIRS_GPU[0]));
-        const auto numberScales = sizeof(BODY_19b_SCALES) / sizeof(BODY_19b_SCALES[0]);
-        const auto numberColors = sizeof(BODY_19b_COLORS) / (3*sizeof(BODY_19b_COLORS[0]));
+        const auto numberPartPairs = sizeof(BODY_25E_PAIRS_GPU) / (2*sizeof(BODY_25E_PAIRS_GPU[0]));
+        const auto numberScales = sizeof(BODY_25E_SCALES) / sizeof(BODY_25E_SCALES[0]);
+        const auto numberColors = sizeof(BODY_25E_COLORS) / (3*sizeof(BODY_25E_COLORS[0]));
         const auto radius = fastMin(targetWidth, targetHeight) / 100.f;
         const auto lineWidth = fastMin(targetWidth, targetHeight) / 120.f;
 
         // Render key points
         renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight,
-                        posePtr, BODY_19b_PAIRS_GPU, numberPeople, 19, numberPartPairs, BODY_19b_COLORS, numberColors,
-                        radius, lineWidth, BODY_19b_SCALES, numberScales, threshold, alphaColorToAdd,
+                        posePtr, BODY_25E_PAIRS_GPU, numberPeople, 25, numberPartPairs, BODY_25E_COLORS, numberColors,
+                        radius, lineWidth, BODY_25E_SCALES, numberScales, threshold, alphaColorToAdd,
                         blendOriginalFrame, (googlyEyes ? 15 : -1), (googlyEyes ? 16 : -1));
     }
 
@@ -516,8 +516,8 @@ namespace op
                         framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
                         blendOriginalFrame, alphaBlending
                     );
-                else if (poseModel == PoseModel::BODY_19b)
-                    renderPoseBody19b<<<threadsPerBlock, numBlocks>>>(
+                else if (poseModel == PoseModel::BODY_25E)
+                    renderPoseBody25E<<<threadsPerBlock, numBlocks>>>(
                         framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
                         blendOriginalFrame, alphaBlending
                     );

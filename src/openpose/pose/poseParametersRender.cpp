@@ -12,7 +12,7 @@ namespace op
         std::vector<float>{POSE_BODY_19_SCALES_RENDER_GPU},       // BODY_19_X2
         std::vector<float>{POSE_BODY_59_SCALES_RENDER_GPU},       // BODY_59
         std::vector<float>{POSE_BODY_19_SCALES_RENDER_GPU},       // BODY_19N
-        std::vector<float>{POSE_BODY_19_SCALES_RENDER_GPU},       // BODY_19b
+        std::vector<float>{POSE_BODY_25E_SCALES_RENDER_GPU},      // BODY_25E
         std::vector<float>{POSE_BODY_25_SCALES_RENDER_GPU},       // BODY_25_19
         std::vector<float>{POSE_BODY_65_SCALES_RENDER_GPU},       // BODY_65
         std::vector<float>{POSE_CAR_12_SCALES_RENDER_GPU},        // CAR_12
@@ -26,7 +26,7 @@ namespace op
         std::vector<float>{POSE_BODY_19_COLORS_RENDER_GPU},       // BODY_19_X2
         std::vector<float>{POSE_BODY_59_COLORS_RENDER_GPU},       // BODY_59
         std::vector<float>{POSE_BODY_19_COLORS_RENDER_GPU},       // BODY_19N
-        std::vector<float>{POSE_BODY_19_COLORS_RENDER_GPU},       // BODY_19b
+        std::vector<float>{POSE_BODY_25E_COLORS_RENDER_GPU},      // BODY_25E
         std::vector<float>{POSE_BODY_25_COLORS_RENDER_GPU},       // BODY_25_19
         std::vector<float>{POSE_BODY_65_COLORS_RENDER_GPU},       // BODY_65
         std::vector<float>{POSE_CAR_12_COLORS_RENDER_GPU},        // CAR_12
@@ -40,7 +40,7 @@ namespace op
         std::vector<unsigned int>{POSE_BODY_19_PAIRS_RENDER_GPU},       // BODY_19_X2
         std::vector<unsigned int>{POSE_BODY_59_PAIRS_RENDER_GPU},       // BODY_59
         std::vector<unsigned int>{POSE_BODY_19_PAIRS_RENDER_GPU},       // BODY_19N
-        std::vector<unsigned int>{POSE_BODY_19_PAIRS_RENDER_GPU},       // BODY_19b
+        std::vector<unsigned int>{POSE_BODY_25E_PAIRS_RENDER_GPU},      // BODY_25E
         std::vector<unsigned int>{POSE_BODY_25_PAIRS_RENDER_GPU},       // BODY_25_19
         std::vector<unsigned int>{POSE_BODY_65_PAIRS_RENDER_GPU},       // BODY_65
         std::vector<unsigned int>{POSE_CAR_12_PAIRS_RENDER_GPU},        // CAR_12

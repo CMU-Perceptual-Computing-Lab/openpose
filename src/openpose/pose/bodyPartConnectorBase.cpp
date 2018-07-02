@@ -6,31 +6,24 @@
 namespace op
 {
     template <typename T>
-    void connectBodyPartsCpu(Array<T>& poseKeypoints, Array<T>& poseScores, const T* const heatMapPtr,
-                             const T* const peaksPtr, const PoseModel poseModel, const Point<int>& heatMapSize,
-                             const int maxPeaks, const T interMinAboveThreshold, const T interThreshold,
-                             const int minSubsetCnt, const T minSubsetScore, const T scaleFactor)
+    std::vector<std::pair<std::vector<int>, double>> generateInitialSubsets(
+        const T* const heatMapPtr, const T* const peaksPtr, const PoseModel poseModel, const Point<int>& heatMapSize,
+        const int maxPeaks, const T interThreshold, const T interMinAboveThreshold,
+        const std::vector<unsigned int>& bodyPartPairs, const unsigned int numberBodyParts,
+        const unsigned int numberBodyPartPairs, const unsigned int subsetCounterIndex)
     {
         try
         {
-            // Parts Connection
-            const auto& bodyPartPairs = getPosePartPairs(poseModel);
+            // std::vector<std::pair<std::vector<int>, double>> refers to:
+            //     - std::vector<int>: [body parts locations, #body parts found]
+            //     - double: subset score
+            std::vector<std::pair<std::vector<int>, double>> subsets;
             const auto& mapIdx = getPoseMapIndex(poseModel);
-            const auto numberBodyParts = getPoseNumberBodyParts(poseModel);
             const auto numberBodyPartsAndBkg = numberBodyParts + 1;
-            const auto numberBodyPartPairs = bodyPartPairs.size() / 2;
-            if (numberBodyParts == 0)
-                error("Invalid value of numberBodyParts, it must be positive, not " + std::to_string(numberBodyParts),
-                      __LINE__, __FUNCTION__, __FILE__);
-
-            // Vector<int> = Each body part + body parts counter; double = subsetScore
-            std::vector<std::pair<std::vector<int>, double>> subset;
-            const auto subsetCounterIndex = numberBodyParts;
             const auto subsetSize = numberBodyParts+1;
-
             const auto peaksOffset = 3*(maxPeaks+1);
             const auto heatMapOffset = heatMapSize.area();
-
+            // Iterate over it PAF connection, e.g. neck-nose, neck-Lshoulder, etc.
             for (auto pairIndex = 0u; pairIndex < numberBodyPartPairs; pairIndex++)
             {
                 const auto bodyPartA = bodyPartPairs[2*pairIndex];
@@ -40,9 +33,11 @@ namespace op
                 const auto numberA = intRound(candidateAPtr[0]);
                 const auto numberB = intRound(candidateBPtr[0]);
 
-                // Add parts into the subset in special case
+                // E.g. neck-nose connection. If one of them is empty (e.g. no noses de-tected)
+                // Add the non-empty elements into the subsets
                 if (numberA == 0 || numberB == 0)
                 {
+                    // E.g. neck-nose connection. If no necks, add all noses
                     // Change w.r.t. other
                     if (numberA == 0) // numberB == 0 or not
                     {
@@ -52,10 +47,10 @@ namespace op
                             {
                                 bool num = false;
                                 const auto indexB = bodyPartB;
-                                for (auto j = 0u; j < subset.size(); j++)
+                                for (const auto& subset : subsets)
                                 {
                                     const auto off = (int)bodyPartB*peaksOffset + i*3 + 2;
-                                    if (subset[j].first[indexB] == off)
+                                    if (subset.first[indexB] == off)
                                     {
                                         num = true;
                                         break;
@@ -70,7 +65,7 @@ namespace op
                                     rowVector[subsetCounterIndex] = 1;
                                     const auto subsetScore = candidateBPtr[i*3+2];
                                     // Second last number in each row is the total score
-                                    subset.emplace_back(std::make_pair(rowVector, subsetScore));
+                                    subsets.emplace_back(std::make_pair(rowVector, subsetScore));
                                 }
                             }
                         }
@@ -85,10 +80,11 @@ namespace op
                                 rowVector[subsetCounterIndex] = 1;
                                 // Second last number in each row is the total score
                                 const auto subsetScore = candidateBPtr[i*3+2];
-                                subset.emplace_back(std::make_pair(rowVector, subsetScore));
+                                subsets.emplace_back(std::make_pair(rowVector, subsetScore));
                             }
                         }
                     }
+                    // E.g. neck-nose connection. If no noses, add all necks
                     else // if (numberA != 0 && numberB == 0)
                     {
                         if (numberBodyParts != 15)
@@ -97,10 +93,10 @@ namespace op
                             {
                                 bool num = false;
                                 const auto indexA = bodyPartA;
-                                for (auto j = 0u; j < subset.size(); j++)
+                                for (const auto& subset : subsets)
                                 {
                                     const auto off = (int)bodyPartA*peaksOffset + i*3 + 2;
-                                    if (subset[j].first[indexA] == off)
+                                    if (subset.first[indexA] == off)
                                     {
                                         num = true;
                                         break;
@@ -115,7 +111,7 @@ namespace op
                                     rowVector[subsetCounterIndex] = 1;
                                     // Second last number in each row is the total score
                                     const auto subsetScore = candidateAPtr[i*3+2];
-                                    subset.emplace_back(std::make_pair(rowVector, subsetScore));
+                                    subsets.emplace_back(std::make_pair(rowVector, subsetScore));
                                 }
                             }
                         }
@@ -130,105 +126,111 @@ namespace op
                                 rowVector[subsetCounterIndex] = 1;
                                 // Second last number in each row is the total score
                                 const auto subsetScore = candidateAPtr[i*3+2];
-                                subset.emplace_back(std::make_pair(rowVector, subsetScore));
+                                subsets.emplace_back(std::make_pair(rowVector, subsetScore));
                             }
                         }
                     }
                 }
+                // E.g. neck-nose connection. If necks and noses, look for maximums
                 else // if (numberA != 0 && numberB != 0)
                 {
-                    std::vector<std::tuple<double, int, int>> temp;
-                    const auto* mapX = heatMapPtr + (numberBodyPartsAndBkg + mapIdx[2*pairIndex]) * heatMapOffset;
-                    const auto* mapY = heatMapPtr + (numberBodyPartsAndBkg + mapIdx[2*pairIndex+1]) * heatMapOffset;
-                    for (auto i = 1; i <= numberA; i++)
+                    std::vector<std::tuple<double, int, int>> allABConnections; // (score, x, y). Inverted order for easy std::sort
                     {
-                        for (auto j = 1; j <= numberB; j++)
+                        const auto* mapX = heatMapPtr + (numberBodyPartsAndBkg + mapIdx[2*pairIndex]) * heatMapOffset;
+                        const auto* mapY = heatMapPtr + (numberBodyPartsAndBkg + mapIdx[2*pairIndex+1]) * heatMapOffset;
+                        // E.g. neck-nose connection. For each neck
+                        for (auto i = 1; i <= numberA; i++)
                         {
-                            const auto vectorAToBX = candidateBPtr[j*3] - candidateAPtr[i*3];
-                            const auto vectorAToBY = candidateBPtr[j*3+1] - candidateAPtr[i*3+1];
-                            const auto vectorAToBMax = fastMax(std::abs(vectorAToBX), std::abs(vectorAToBY));
-                            const auto numberPointsInLine = fastMax(5, fastMin(25, intRound(std::sqrt(5*vectorAToBMax))));
-                            const auto vectorNorm = T(std::sqrt( vectorAToBX*vectorAToBX + vectorAToBY*vectorAToBY ));
-                            // If the peaksPtr are coincident. Don't connect them.
-                            if (vectorNorm > 1e-6)
+                            // E.g. neck-nose connection. For each nose
+                            for (auto j = 1; j <= numberB; j++)
                             {
-                                const auto sX = candidateAPtr[i*3];
-                                const auto sY = candidateAPtr[i*3+1];
-                                const auto vectorAToBNormX = vectorAToBX/vectorNorm;
-                                const auto vectorAToBNormY = vectorAToBY/vectorNorm;
-
-                                auto sum = 0.;
-                                auto count = 0;
-                                const auto vectorAToBXInLine = vectorAToBX/numberPointsInLine;
-                                const auto vectorAToBYInLine = vectorAToBY/numberPointsInLine;
-                                for (auto lm = 0; lm < numberPointsInLine; lm++)
+                                const auto vectorAToBX = candidateBPtr[j*3] - candidateAPtr[i*3];
+                                const auto vectorAToBY = candidateBPtr[j*3+1] - candidateAPtr[i*3+1];
+                                const auto vectorAToBMax = fastMax(std::abs(vectorAToBX), std::abs(vectorAToBY));
+                                const auto numberPointsInLine = fastMax(5, fastMin(25, intRound(std::sqrt(5*vectorAToBMax))));
+                                const auto vectorNorm = T(std::sqrt( vectorAToBX*vectorAToBX + vectorAToBY*vectorAToBY ));
+                                // If the peaksPtr are coincident. Don't connect them.
+                                if (vectorNorm > 1e-6)
                                 {
-                                    const auto mX = fastMin(heatMapSize.x-1, intRound(sX + lm*vectorAToBXInLine));
-                                    const auto mY = fastMin(heatMapSize.y-1, intRound(sY + lm*vectorAToBYInLine));
-                                    checkGE(mX, 0, "", __LINE__, __FUNCTION__, __FILE__);
-                                    checkGE(mY, 0, "", __LINE__, __FUNCTION__, __FILE__);
-                                    const auto idx = mY * heatMapSize.x + mX;
-                                    const auto score = (vectorAToBNormX*mapX[idx] + vectorAToBNormY*mapY[idx]);
-                                    if (score > interThreshold)
-                                    {
-                                        sum += score;
-                                        count++;
-                                    }
-                                }
+                                    const auto sX = candidateAPtr[i*3];
+                                    const auto sY = candidateAPtr[i*3+1];
+                                    const auto vectorAToBNormX = vectorAToBX/vectorNorm;
+                                    const auto vectorAToBNormY = vectorAToBY/vectorNorm;
 
-                                // parts score + connection score
-                                if (count/(float)numberPointsInLine > interMinAboveThreshold)
-                                    temp.emplace_back(std::make_tuple(sum/count, i, j));
+                                    auto sum = 0.;
+                                    auto count = 0;
+                                    const auto vectorAToBXInLine = vectorAToBX/numberPointsInLine;
+                                    const auto vectorAToBYInLine = vectorAToBY/numberPointsInLine;
+                                    for (auto lm = 0; lm < numberPointsInLine; lm++)
+                                    {
+                                        const auto mX = fastMax(0, fastMin(heatMapSize.x-1, intRound(sX + lm*vectorAToBXInLine)));
+                                        const auto mY = fastMax(0, fastMin(heatMapSize.y-1, intRound(sY + lm*vectorAToBYInLine)));
+                                        const auto idx = mY * heatMapSize.x + mX;
+                                        const auto score = (vectorAToBNormX*mapX[idx] + vectorAToBNormY*mapY[idx]);
+                                        if (score > interThreshold)
+                                        {
+                                            sum += score;
+                                            count++;
+                                        }
+                                    }
+
+                                    // E.g. neck-nose connection. If possible PAF between neck i, nose j --> add
+                                    // parts score + connection score
+                                    if (count/(float)numberPointsInLine > interMinAboveThreshold)
+                                        allABConnections.emplace_back(std::make_tuple(sum/count, i, j));
+                                }
                             }
                         }
                     }
 
                     // select the top minAB connection, assuming that each part occur only once
                     // sort rows in descending order based on parts + connection score
-                    if (!temp.empty())
-                        std::sort(temp.begin(), temp.end(), std::greater<std::tuple<T, int, int>>());
+                    if (!allABConnections.empty())
+                        std::sort(allABConnections.begin(), allABConnections.end(), std::greater<std::tuple<double, int, int>>());
 
-                    std::vector<std::tuple<int, int, double>> connectionK;
-                    const auto minAB = fastMin(numberA, numberB);
-                    std::vector<int> occurA(numberA, 0);
-                    std::vector<int> occurB(numberB, 0);
-                    auto counter = 0;
-                    for (auto row = 0u; row < temp.size(); row++)
+                    std::vector<std::tuple<int, int, double>> abConnections; // (x, y, score)
                     {
-                        const auto score = std::get<0>(temp[row]);
-                        const auto x = std::get<1>(temp[row]);
-                        const auto y = std::get<2>(temp[row]);
-                        if (!occurA[x-1] && !occurB[y-1])
+                        const auto minAB = fastMin(numberA, numberB);
+                        std::vector<int> occurA(numberA, 0);
+                        std::vector<int> occurB(numberB, 0);
+                        auto counter = 0;
+                        for (auto row = 0u; row < allABConnections.size(); row++)
                         {
-                            connectionK.emplace_back(std::make_tuple(bodyPartA*peaksOffset + x*3 + 2,
-                                                                     bodyPartB*peaksOffset + y*3 + 2,
-                                                                     score));
-                            counter++;
-                            if (counter==minAB)
-                                break;
-                            occurA[x-1] = 1;
-                            occurB[y-1] = 1;
+                            const auto score = std::get<0>(allABConnections[row]);
+                            const auto x = std::get<1>(allABConnections[row]);
+                            const auto y = std::get<2>(allABConnections[row]);
+                            if (!occurA[x-1] && !occurB[y-1])
+                            {
+                                abConnections.emplace_back(std::make_tuple(bodyPartA*peaksOffset + x*3 + 2,
+                                                                           bodyPartB*peaksOffset + y*3 + 2,
+                                                                           score));
+                                counter++;
+                                if (counter==minAB)
+                                    break;
+                                occurA[x-1] = 1;
+                                occurB[y-1] = 1;
+                            }
                         }
                     }
 
-                    // Cluster all the body part candidates into subset based on the part connection
-                    if (!connectionK.empty())
+                    // Cluster all the body part candidates into subsets based on the part connection
+                    if (!abConnections.empty())
                     {
                         // initialize first body part connection 15&16
                         if (pairIndex==0)
                         {
-                            for (const auto connectionKI : connectionK)
+                            for (const auto& abConnection : abConnections)
                             {
                                 std::vector<int> rowVector(numberBodyParts+3, 0);
-                                const auto indexA = std::get<0>(connectionKI);
-                                const auto indexB = std::get<1>(connectionKI);
-                                const auto score = std::get<2>(connectionKI);
+                                const auto indexA = std::get<0>(abConnection);
+                                const auto indexB = std::get<1>(abConnection);
+                                const auto score = std::get<2>(abConnection);
                                 rowVector[bodyPartPairs[0]] = indexA;
                                 rowVector[bodyPartPairs[1]] = indexB;
                                 rowVector[subsetCounterIndex] = 2;
                                 // add the score of parts and the connection
                                 const auto subsetScore = peaksPtr[indexA] + peaksPtr[indexB] + score;
-                                subset.emplace_back(std::make_pair(rowVector, subsetScore));
+                                subsets.emplace_back(std::make_pair(rowVector, subsetScore));
                             }
                         }
                         // Add ears connections (in case person is looking to opposite direction to camera)
@@ -237,45 +239,46 @@ namespace op
                             || ((numberBodyParts == 19 || numberBodyParts == 25 || numberBodyParts == 59
                                  || numberBodyParts == 65)
                                 && (pairIndex==18 || pairIndex==19))
-                            || (poseModel == PoseModel::BODY_19b
+                            || (poseModel == PoseModel::BODY_25E
                                 && (pairIndex == numberBodyPartPairs-1 || pairIndex == numberBodyPartPairs-2))
                             )
                         {
-                            for (const auto& connectionKI : connectionK)
+                            for (const auto& abConnection : abConnections)
                             {
-                                const auto indexA = std::get<0>(connectionKI);
-                                const auto indexB = std::get<1>(connectionKI);
-                                for (auto& subsetJ : subset)
+                                const auto indexA = std::get<0>(abConnection);
+                                const auto indexB = std::get<1>(abConnection);
+                                for (auto& subset : subsets)
                                 {
-                                    auto& subsetJFirst = subsetJ.first[bodyPartA];
-                                    auto& subsetJFirstPlus1 = subsetJ.first[bodyPartB];
-                                    if (subsetJFirst == indexA && subsetJFirstPlus1 == 0)
-                                        subsetJFirstPlus1 = indexB;
-                                    else if (subsetJFirstPlus1 == indexB && subsetJFirst == 0)
-                                        subsetJFirst = indexA;
+                                    auto& subsetA = subset.first[bodyPartA];
+                                    auto& subsetB = subset.first[bodyPartB];
+                                    if (subsetA == indexA && subsetB == 0)
+                                        subsetB = indexB;
+                                    else if (subsetB == indexB && subsetA == 0)
+                                        subsetA = indexA;
                                 }
                             }
                         }
                         else
                         {
-                            // A is already in the subset, find its connection B
-                            for (const auto& connectionKI : connectionK)
+                            // A is already in the subsets, find its connection B
+                            for (const auto& abConnection : abConnections)
                             {
-                                const auto indexA = std::get<0>(connectionKI);
-                                const auto indexB = std::get<1>(connectionKI);
-                                const auto score = std::get<2>(connectionKI);
+                                const auto indexA = std::get<0>(abConnection);
+                                const auto indexB = std::get<1>(abConnection);
+                                const auto score = std::get<2>(abConnection);
                                 auto num = 0;
-                                for (auto& subsetJ : subset)
+                                for (auto& subset : subsets)
                                 {
-                                    if (subsetJ.first[bodyPartA] == indexA)
+                                    // Found partA in a subsets, add partB to same one.
+                                    if (subset.first[bodyPartA] == indexA)
                                     {
-                                        subsetJ.first[bodyPartB] = indexB;
+                                        subset.first[bodyPartB] = indexB;
                                         num++;
-                                        subsetJ.first[subsetCounterIndex] = subsetJ.first[subsetCounterIndex] + 1;
-                                        subsetJ.second += peaksPtr[indexB] + score;
+                                        subset.first[subsetCounterIndex]++;
+                                        subset.second += peaksPtr[indexB] + score;
                                     }
                                 }
-                                // if can not find partA in the subset, create a new subset
+                                // Not found partA in subsets, add new subsets element
                                 if (num==0)
                                 {
                                     std::vector<int> rowVector(subsetSize, 0);
@@ -283,24 +286,40 @@ namespace op
                                     rowVector[bodyPartB] = indexB;
                                     rowVector[subsetCounterIndex] = 2;
                                     const auto subsetScore = peaksPtr[indexA] + peaksPtr[indexB] + score;
-                                    subset.emplace_back(std::make_pair(rowVector, subsetScore));
+                                    subsets.emplace_back(std::make_pair(rowVector, subsetScore));
                                 }
                             }
                         }
                     }
                 }
             }
+            return subsets;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return {};
+        }
+    }
 
+    template <typename T>
+    void removeSubsetsBelowThresholds(std::vector<int>& validSubsetIndexes, int& numberPeople,
+                                      const std::vector<std::pair<std::vector<int>, double>>& subsets,
+                                      const unsigned int subsetCounterIndex, const unsigned int numberBodyParts,
+                                      const int minSubsetCnt, const T minSubsetScore)
+    {
+        try
+        {
             // Delete people below the following thresholds:
                 // a) minSubsetCnt: removed if less than minSubsetCnt body parts
                 // b) minSubsetScore: removed if global score smaller than this
                 // c) POSE_MAX_PEOPLE: keep first POSE_MAX_PEOPLE people above thresholds
-            auto numberPeople = 0;
-            std::vector<int> validSubsetIndexes;
-            validSubsetIndexes.reserve(fastMin((size_t)POSE_MAX_PEOPLE, subset.size()));
-            for (auto index = 0u ; index < subset.size() ; index++)
+            numberPeople = 0;
+            validSubsetIndexes.clear();
+            validSubsetIndexes.reserve(fastMin((size_t)POSE_MAX_PEOPLE, subsets.size()));
+            for (auto index = 0u ; index < subsets.size() ; index++)
             {
-                auto subsetCounter = subset[index].first[subsetCounterIndex];
+                auto subsetCounter = subsets[index].first[subsetCounterIndex];
                 // Foot keypoints do not affect subsetCounter (too many false positives,
                 // same foot usually appears as both left and right keypoints)
                 // Pros: Removed tons of false positives
@@ -309,9 +328,9 @@ namespace op
                 {
                     // No consider foot keypoints for that
                     for (auto i = 19 ; i < 25 ; i++)
-                        subsetCounter -= (subset[index].first.at(i) > 0);
+                        subsetCounter -= (subsets[index].first.at(i) > 0);
                 }
-                const auto subsetScore = subset[index].second;
+                const auto subsetScore = subsets[index].second;
                 if (subsetCounter >= minSubsetCnt && (subsetScore/subsetCounter) >= minSubsetScore)
                 {
                     numberPeople++;
@@ -320,14 +339,29 @@ namespace op
                         break;
                 }
                 else if ((subsetCounter < 1 && numberBodyParts != 25) || subsetCounter < 0)
-                    error("Bad subsetCounter. Bug in this function if this happens.",
-                          __LINE__, __FUNCTION__, __FILE__);
+                    error("Bad subsetCounter (" + std::to_string(subsetCounter) + "). Bug in this"
+                          " function if this happens.", __LINE__, __FUNCTION__, __FILE__);
             }
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
 
-            // Fill and return poseKeypoints
+    template <typename T>
+    void subsetsToPoseKeypointsAndScores(Array<T>& poseKeypoints, Array<T>& poseScores, const T scaleFactor,
+                                         const std::vector<std::pair<std::vector<int>, double>>& subsets,
+                                         const std::vector<int>& validSubsetIndexes, const T* const peaksPtr,
+                                         const int numberPeople, const unsigned int numberBodyParts,
+                                         const unsigned int numberBodyPartPairs)
+    {
+        try
+        {
             if (numberPeople > 0)
             {
-                poseKeypoints.reset({numberPeople, (int)numberBodyParts, 3});
+                // Initialized to 0 for non-found keypoints in people
+                poseKeypoints.reset({numberPeople, (int)numberBodyParts, 3}, 0);
                 poseScores.reset(numberPeople);
             }
             else
@@ -338,27 +372,65 @@ namespace op
             const auto numberBodyPartsAndPAFs = numberBodyParts + numberBodyPartPairs;
             for (auto person = 0u ; person < validSubsetIndexes.size() ; person++)
             {
-                const auto& subsetPair = subset[validSubsetIndexes[person]];
-                const auto& subsetI = subsetPair.first;
+                const auto& subsetPair = subsets[validSubsetIndexes[person]];
+                const auto& subset = subsetPair.first;
                 for (auto bodyPart = 0u; bodyPart < numberBodyParts; bodyPart++)
                 {
                     const auto baseOffset = (person*numberBodyParts + bodyPart) * 3;
-                    const auto bodyPartIndex = subsetI[bodyPart];
+                    const auto bodyPartIndex = subset[bodyPart];
                     if (bodyPartIndex > 0)
                     {
                         poseKeypoints[baseOffset] = peaksPtr[bodyPartIndex-2] * scaleFactor;
                         poseKeypoints[baseOffset + 1] = peaksPtr[bodyPartIndex-1] * scaleFactor;
                         poseKeypoints[baseOffset + 2] = peaksPtr[bodyPartIndex];
                     }
-                    else
-                    {
-                        poseKeypoints[baseOffset] = 0.f;
-                        poseKeypoints[baseOffset + 1] = 0.f;
-                        poseKeypoints[baseOffset + 2] = 0.f;
-                    }
                 }
                 poseScores[person] = subsetPair.second / (float)(numberBodyPartsAndPAFs);
             }
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    template <typename T>
+    void connectBodyPartsCpu(Array<T>& poseKeypoints, Array<T>& poseScores, const T* const heatMapPtr,
+                             const T* const peaksPtr, const PoseModel poseModel, const Point<int>& heatMapSize,
+                             const int maxPeaks, const T interMinAboveThreshold, const T interThreshold,
+                             const int minSubsetCnt, const T minSubsetScore, const T scaleFactor)
+    {
+        try
+        {
+            // Parts Connection
+            const auto& bodyPartPairs = getPosePartPairs(poseModel);
+            const auto numberBodyParts = getPoseNumberBodyParts(poseModel);
+            const auto numberBodyPartPairs = bodyPartPairs.size() / 2;
+            const auto subsetCounterIndex = numberBodyParts;
+            if (numberBodyParts == 0)
+                error("Invalid value of numberBodyParts, it must be positive, not " + std::to_string(numberBodyParts),
+                      __LINE__, __FUNCTION__, __FILE__);
+
+            // std::vector<std::pair<std::vector<int>, double>> refers to:
+            //     - std::vector<int>: [body parts locations, #body parts found]
+            //     - double: subset score
+            const auto subsets = generateInitialSubsets(
+                heatMapPtr, peaksPtr, poseModel, heatMapSize, maxPeaks, interThreshold, interMinAboveThreshold,
+                bodyPartPairs, numberBodyParts, numberBodyPartPairs, subsetCounterIndex);
+
+            // Delete people below the following thresholds:
+                // a) minSubsetCnt: removed if less than minSubsetCnt body parts
+                // b) minSubsetScore: removed if global score smaller than this
+                // c) POSE_MAX_PEOPLE: keep first POSE_MAX_PEOPLE people above thresholds
+            int numberPeople;
+            std::vector<int> validSubsetIndexes;
+            validSubsetIndexes.reserve(fastMin((size_t)POSE_MAX_PEOPLE, subsets.size()));
+            removeSubsetsBelowThresholds(validSubsetIndexes, numberPeople, subsets, subsetCounterIndex,
+                                         numberBodyParts, minSubsetCnt, minSubsetScore);
+
+            // Fill and return poseKeypoints
+            subsetsToPoseKeypointsAndScores(poseKeypoints, poseScores, scaleFactor, subsets, validSubsetIndexes,
+                                            peaksPtr, numberPeople, numberBodyParts, numberBodyPartPairs);
         }
         catch (const std::exception& e)
         {

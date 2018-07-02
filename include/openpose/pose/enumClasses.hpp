@@ -19,7 +19,7 @@ namespace op
         BODY_19_X2,     /**< Experimental. Do not use. */
         BODY_59,        /**< Experimental. Do not use. */
         BODY_19N,       /**< Experimental. Do not use. */
-        BODY_19b,       /**< Experimental. Do not use. */
+        BODY_25E,       /**< Experimental. Do not use. */
         BODY_25_19,     /**< Experimental. Do not use. */
         BODY_65,        /**< Experimental. Do not use. */
         CAR_12,         /**< Experimental. Do not use. */

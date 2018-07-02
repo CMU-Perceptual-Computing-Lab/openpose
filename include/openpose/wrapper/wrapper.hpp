@@ -431,7 +431,7 @@ namespace op
     }
 
     template<typename TDatums, typename TDatumsSP, typename TWorker, typename TQueue>
-    void Wrapper<TDatums, TDatumsSP, TWorker, TQueue>::configure(const WrapperStructPose& wrapperStructPose,
+    void Wrapper<TDatums, TDatumsSP, TWorker, TQueue>::configure(const WrapperStructPose& wrapperStructPoseTemp,
                                                                  const WrapperStructFace& wrapperStructFace,
                                                                  const WrapperStructHand& wrapperStructHand,
                                                                  const WrapperStructExtra& wrapperStructExtra,
@@ -440,6 +440,7 @@ namespace op
     {
         try
         {
+            auto wrapperStructPose = wrapperStructPoseTemp;
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
             // Required parameters

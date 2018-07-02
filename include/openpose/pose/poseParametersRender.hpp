@@ -110,30 +110,36 @@ namespace op
         170.f,     0.f,   255.f, \
         255.f,     0.f,   255.f, \
          85.f,     0.f,   255.f
-    // BODY_19b
-    #define POSE_BODY_19b_PAIRS_RENDER_GPU \
-        1,2,   1,5,   2,3,   3,4,   5,6,   6,7,   8,9,   9,10,  10,11, 8,12,  12,13, 13,14,  1,0,   0,15, 15,17,  0,16, 16,18, 2,9, 5,12
-    #define POSE_BODY_19b_SCALES_RENDER_GPU 1
-    #define POSE_BODY_19b_COLORS_RENDER_GPU \
+    // BODY_25E
+    #define POSE_BODY_25E_PAIRS_RENDER_GPU \
+        1,8,   1,2,   1,5,   2,3,   3,4,   5,6,   6,7,   8,9,   9,10,  10,11, 8,12,  12,13, 13,14,  1,0,   0,15, 15,17,  0,16, 16,18,   14,19,19,20,14,21, 11,22,22,23,11,24
+    #define POSE_BODY_25E_SCALES_RENDER_GPU 1
+    #define POSE_BODY_25E_COLORS_RENDER_GPU \
         255.f,     0.f,    85.f, \
-        255.f,     0.f,     0.f, \
         255.f,     0.f,     0.f, \
         255.f,    85.f,     0.f, \
         255.f,   170.f,     0.f, \
-        255.f,     0.f,     0.f, \
         255.f,   255.f,     0.f, \
+        170.f,   255.f,     0.f, \
          85.f,   255.f,     0.f, \
-        255.f,     0.f,     0.f, \
-        255.f,     0.f,     0.f, \
           0.f,   255.f,     0.f, \
-          0.f,   255.f,   255.f, \
         255.f,     0.f,     0.f, \
+          0.f,   255.f,    85.f, \
+          0.f,   255.f,   170.f, \
+          0.f,   255.f,   255.f, \
+          0.f,   170.f,   255.f, \
           0.f,    85.f,   255.f, \
           0.f,     0.f,   255.f, \
         255.f,     0.f,   170.f, \
         170.f,     0.f,   255.f, \
         255.f,     0.f,   255.f, \
-         85.f,     0.f,   255.f
+         85.f,     0.f,   255.f, \
+          0.f,     0.f,   255.f, \
+          0.f,     0.f,   255.f, \
+          0.f,     0.f,   255.f, \
+          0.f,   255.f,   255.f, \
+          0.f,   255.f,   255.f, \
+          0.f,   255.f,   255.f
     // BODY_59
     // Body + left hand + right hand
     #define POSE_BODY_59_PAIRS_RENDER_GPU \
@@ -297,9 +303,9 @@ namespace op
 
     // CAR_12
     #define POSE_CAR_12_PAIRS_RENDER_GPU \
-        4,5,   4,6,   4,0,   0,2,   4,8,   8,10,   5,7,   5,1,   1,3,  5,9, 9,11,     2,3, 6,7, 10,11,     6,2,7,3, 6,10,7,11
+        4,5,   4,6,   4,0,   0,2,   4,8,   8,10,   5,7,   5,1,   1,3,  5,9, 9,11,     0,1, 8,9,     2,3, 6,7, 10,11,     6,2,7,3, 6,10,7,11
         // 4,5,   4,6,   4,0,   0,2,   4,8,   8,10,   5,7,   5,1,   1,3,  5,9, 9,11
-    #define POSE_CAR_12_SCALES_RENDER_GPU 1
+    #define POSE_CAR_12_SCALES_RENDER_GPU 0.5
     #define POSE_CAR_12_COLORS_RENDER_GPU \
           0.f,   255.f,     0.f, \
           0.f,   255.f,     0.f, \

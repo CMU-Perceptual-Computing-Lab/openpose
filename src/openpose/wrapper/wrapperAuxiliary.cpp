@@ -4,7 +4,7 @@
 
 namespace op
 {
-    void wrapperConfigureSecurityChecks(const WrapperStructPose& wrapperStructPose,
+    void wrapperConfigureSecurityChecks(WrapperStructPose& wrapperStructPose,
                                         const WrapperStructFace& wrapperStructFace,
                                         const WrapperStructHand& wrapperStructHand,
                                         const WrapperStructExtra& wrapperStructExtra,
@@ -151,10 +151,14 @@ namespace op
                      || wrapperStructInput.producerSharedPtr->getType() == ProducerType::ImageDirectory)
                     // If netInputSize is -1
                     && (wrapperStructPose.netInputSize.x == -1 || wrapperStructPose.netInputSize.y == -1))
-                    error("The default dynamic `--net_resolution` is not supported in MKL (CPU Caffe) and OpenCL Caffe"
-                          " versions. Please, use a static `net_resolution` (recommended `--net_resolution 656x368`)"
-                          " or use the Caffe CUDA master branch when processing images and/or when using your custom"
-                          " image reader.", __LINE__, __FUNCTION__, __FILE__);
+                {
+                    wrapperStructPose.netInputSize.x = 656;
+                    wrapperStructPose.netInputSize.y = 368;
+                    log("The default dynamic `--net_resolution` is not supported in MKL (CPU Caffe) and OpenCL Caffe"
+                        " versions. Please, use a static `net_resolution` (recommended `--net_resolution 656x368`)"
+                        " or use the Caffe CUDA master branch when processing images and/or when using your custom"
+                        " image reader. OpenPose has automatically set the resolution to 656x368.", Priority::High);
+                }
             #endif
 
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);

@@ -1,12 +1,14 @@
 ### Posting rules
 1. **Fill** the **Your System Configuration section (all of it!)** if you have some kind of error or performance question.
 2. **No** questions about **training**. OpenPose only implements testing.
-3. **No** questions about **Caffe installation errors/issues**. Check [Caffe](http://caffe.berkeleyvision.org) documentation and help for those errors.
-4. **No** questions about **CUDA check failed errors**. These errors are usually fixed by re-installing CUDA, re-installing the proper cuDNN version, and re-compiling (or re-installing) OpenPose. Otherwise, check for help in CUDA forums.
-5. **No duplicated** posts.
-6. **No** posts about **questions already answered / clearly explained in** the **documentation** (e.g. **no more low-speed nor out-of-memory questions**).
-7. Set a **proper issue title**: add the Ubuntu/Windows word and be specific (e.g. do not simple call it: `Compile error`).
-8. Only English comments.
+3. **No** questions about **3rd party libraries**.
+    - Caffe errors/issues, check [Caffe](http://caffe.berkeleyvision.org) documentation.
+    - CUDA check failed errors: They are usually fixed by re-installing CUDA, then re-installing the proper cuDNN version, and then re-compiling (or re-installing) OpenPose. Otherwise, check for help in CUDA forums.
+    - OpenCV errors: Install the default/pre-compiled OpenCV or check for online help.
+4. **No duplicated** posts.
+5. **No** posts about **questions already answered / clearly explained in** the **documentation** (e.g. **no more low-speed nor out-of-memory questions**).
+6. Set a **proper issue title**: add the Ubuntu/Windows word and be specific (e.g. do not simple call it: `Compile error`).
+7. Only English comments.
 Issues/comments which do not follow these rules will be **ignored or removed** with no further clarification.
 
 
