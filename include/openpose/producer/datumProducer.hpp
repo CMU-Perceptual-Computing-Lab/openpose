@@ -60,7 +60,7 @@ namespace op
         try
         {
             if (spProducer->getType() != ProducerType::Webcam)
-                spProducer->set(CV_CAP_PROP_POS_FRAMES, (double)frameFirst);
+                spProducer->set(cv::CAP_PROP_POS_FRAMES, (double)frameFirst);
         }
         catch (const std::exception& e)
         {
@@ -92,12 +92,12 @@ namespace op
                     const auto increment = spVideoSeek->second - (spVideoSeek->first ? 1 : 0);
                     // Normal mode
                     if (increment != 0)
-                        spProducer->set(CV_CAP_PROP_POS_FRAMES, spProducer->get(CV_CAP_PROP_POS_FRAMES) + increment);
+                        spProducer->set(cv::CAP_PROP_POS_FRAMES, spProducer->get(cv::CAP_PROP_POS_FRAMES) + increment);
                     // It must be always reset or bug in fake pause
                     spVideoSeek->second = 0;
                 }
                 auto nextFrameName = spProducer->getNextFrameName();
-                const auto nextFrameNumber = (unsigned long long)spProducer->get(CV_CAP_PROP_POS_FRAMES);
+                const auto nextFrameNumber = (unsigned long long)spProducer->get(cv::CAP_PROP_POS_FRAMES);
                 const auto cvMats = spProducer->getFrames();
                 const auto cameraMatrices = spProducer->getCameraMatrices();
                 auto cameraExtrinsics = spProducer->getCameraExtrinsics();
@@ -127,7 +127,7 @@ namespace op
                         if (datum.cvInputData.channels() == 1)
                         {
                             log(commonMessage + " Converting grey image into BGR.", Priority::High);
-                            cv::cvtColor(datum.cvInputData, datum.cvInputData, CV_GRAY2BGR);
+                            cv::cvtColor(datum.cvInputData, datum.cvInputData, cv::COLOR_GRAY2BGR);
                         }
                         else
                             error(commonMessage, __LINE__, __FUNCTION__, __FILE__);

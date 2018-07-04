@@ -523,8 +523,8 @@ namespace op
                 wrapperStructInput.producerSharedPtr->set(ProducerProperty::AutoRepeat,
                                                           wrapperStructInput.framesRepeat);
                 // 2. Set finalOutputSize
-                producerSize = Point<int>{(int)wrapperStructInput.producerSharedPtr->get(CV_CAP_PROP_FRAME_WIDTH),
-                                          (int)wrapperStructInput.producerSharedPtr->get(CV_CAP_PROP_FRAME_HEIGHT)};
+                producerSize = Point<int>{(int)wrapperStructInput.producerSharedPtr->get(cv::CAP_PROP_FRAME_WIDTH),
+                                          (int)wrapperStructInput.producerSharedPtr->get(cv::CAP_PROP_FRAME_HEIGHT)};
                 // Set finalOutputSize to input size if desired
                 if (finalOutputSize.x == -1 || finalOutputSize.y == -1)
                     finalOutputSize = producerSize;
@@ -948,7 +948,7 @@ namespace op
             }
             // Write frames as *.avi video on hard disk
             const auto producerFps = (wrapperStructInput.producerSharedPtr == nullptr ?
-                                        0. : wrapperStructInput.producerSharedPtr->get(CV_CAP_PROP_FPS));
+                                        0. : wrapperStructInput.producerSharedPtr->get(cv::CAP_PROP_FPS));
             const auto originalVideoFps = (wrapperStructOutput.writeVideoFps > 0 ?
                                             wrapperStructOutput.writeVideoFps
                                             : producerFps);
@@ -962,7 +962,7 @@ namespace op
                     error("Video can only be recorded if outputSize is fixed (e.g. video, webcam, IP camera),"
                           "but not for a image directory.", __LINE__, __FUNCTION__, __FILE__);
                 const auto videoSaver = std::make_shared<VideoSaver>(
-                    wrapperStructOutput.writeVideo, CV_FOURCC('M','J','P','G'), originalVideoFps, finalOutputSize
+                    wrapperStructOutput.writeVideo, -1, originalVideoFps, finalOutputSize
                 );
                 mOutputWs.emplace_back(std::make_shared<WVideoSaver<TDatumsSP>>(videoSaver));
             }

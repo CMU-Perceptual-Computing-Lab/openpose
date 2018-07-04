@@ -59,7 +59,7 @@ namespace op
         try
         {
             const auto stringLength = 12u;
-            return toFixedLengthString(   fastMax(0ll, longLongRound(get(CV_CAP_PROP_POS_FRAMES))),   stringLength);
+            return toFixedLengthString(   fastMax(0ll, longLongRound(get(cv::CAP_PROP_POS_FRAMES))),   stringLength);
         }
         catch (const std::exception& e)
         {
@@ -118,14 +118,14 @@ namespace op
         {
             // Specific cases
             // If rotated 90 or 270 degrees, then width and height is exchanged
-            if ((capProperty == CV_CAP_PROP_FRAME_WIDTH || capProperty == CV_CAP_PROP_FRAME_HEIGHT)
+            if ((capProperty == cv::CAP_PROP_FRAME_WIDTH || capProperty == cv::CAP_PROP_FRAME_HEIGHT)
                 && (Producer::get(ProducerProperty::Rotation) != 0.
                     && Producer::get(ProducerProperty::Rotation) != 180.))
             {
-                if (capProperty == CV_CAP_PROP_FRAME_WIDTH)
-                    return mVideoCapture.get(CV_CAP_PROP_FRAME_HEIGHT);
+                if (capProperty == cv::CAP_PROP_FRAME_WIDTH)
+                    return mVideoCapture.get(cv::CAP_PROP_FRAME_HEIGHT);
                 else
-                    return mVideoCapture.get(CV_CAP_PROP_FRAME_WIDTH);
+                    return mVideoCapture.get(cv::CAP_PROP_FRAME_WIDTH);
             }
 
             // Generic cases

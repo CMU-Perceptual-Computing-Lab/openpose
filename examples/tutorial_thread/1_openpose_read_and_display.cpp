@@ -91,8 +91,8 @@ int openPoseTutorialThread1()
         auto videoSeekSharedPtr = std::make_shared<std::pair<std::atomic<bool>, std::atomic<int>>>();
         videoSeekSharedPtr->first = false;
         videoSeekSharedPtr->second = 0;
-        const op::Point<int> producerSize{(int)producerSharedPtr->get(CV_CAP_PROP_FRAME_WIDTH),
-                                          (int)producerSharedPtr->get(CV_CAP_PROP_FRAME_HEIGHT)};
+        const op::Point<int> producerSize{(int)producerSharedPtr->get(cv::CAP_PROP_FRAME_WIDTH),
+                                          (int)producerSharedPtr->get(cv::CAP_PROP_FRAME_HEIGHT)};
         // Step 4 - Setting thread workers && manager
         typedef std::vector<op::Datum> TypedefDatumsNoPtr;
         typedef std::shared_ptr<TypedefDatumsNoPtr> TypedefDatums;

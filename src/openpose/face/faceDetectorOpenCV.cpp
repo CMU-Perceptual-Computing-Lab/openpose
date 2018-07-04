@@ -34,7 +34,8 @@ namespace op
             // Face detection - Example from:
             // http://docs.opencv.org/2.4/doc/tutorials/objdetect/cascade_classifier/cascade_classifier.html
             std::vector<cv::Rect> detectedFaces;
-            mFaceCascade.detectMultiScale(frameGray, detectedFaces, 1.2, 3, 0|CV_HAAR_SCALE_IMAGE);
+            //mFaceCascade.detectMultiScale(frameGray, detectedFaces, 1.2, 3, 0|CV_HAAR_SCALE_IMAGE);
+            mFaceCascade.detectMultiScale(frameGray, detectedFaces, 1.2, 3, 0|cv::CASCADE_SCALE_IMAGE);
             // Rescale rectangles
             std::vector<Rectangle<float>> faceRectangles(detectedFaces.size());
             for(auto i = 0u; i < detectedFaces.size(); i++)

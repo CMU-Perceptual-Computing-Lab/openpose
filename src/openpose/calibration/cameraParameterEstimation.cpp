@@ -94,7 +94,7 @@ namespace op
             std::vector<std::pair<cv::Mat, std::string>> imageAndPaths;
             for (const auto& imagePath : imagePaths)
             {
-                imageAndPaths.emplace_back(std::make_pair(cv::imread(imagePath, CV_LOAD_IMAGE_COLOR), imagePath));
+                imageAndPaths.emplace_back(std::make_pair(cv::imread(imagePath, cv::IMREAD_COLOR), imagePath));
                 if (imageAndPaths.back().first.empty())
                     error("Image could not be opened from path `" + imagePath + "`.",
                           __LINE__, __FUNCTION__, __FILE__);
@@ -132,7 +132,7 @@ namespace op
                                   intrinsics.cameraMatrix,
                                   intrinsics.distortionCoefficients,
                                   points2DVectors2);
-                const auto err = cv::norm(cv::Mat(points2DVectors.at(i)), cv::Mat(points2DVectors2), CV_L2);
+                const auto err = cv::norm(cv::Mat(points2DVectors.at(i)), cv::Mat(points2DVectors2), cv::NORM_L2);
 
                 const auto n = objects3DVectors.at(i).size();
                 perViewErrors.at(i) = {std::sqrt(err*err/n)};

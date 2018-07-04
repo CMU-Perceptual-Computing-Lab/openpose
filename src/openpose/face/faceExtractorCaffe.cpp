@@ -228,7 +228,7 @@ namespace op
                             cv::Mat faceImage;
                             cv::warpAffine(cvInputData, faceImage, Mscaling,
                                            cv::Size{mNetOutputSize.x, mNetOutputSize.y},
-                                           CV_INTER_LINEAR | CV_WARP_INVERSE_MAP,
+                                           cv::INTER_LINEAR | cv::WARP_INVERSE_MAP,
                                            cv::BORDER_CONSTANT, cv::Scalar(0,0,0));
 
                             // cv::Mat -> float*

@@ -163,8 +163,8 @@ namespace op
 
             // Common parameters
             const auto finalOutputSize = wrapperStructPose.outputSize;
-            const Point<int> producerSize{(int)producerSharedPtr->get(CV_CAP_PROP_FRAME_WIDTH),
-                                          (int)producerSharedPtr->get(CV_CAP_PROP_FRAME_HEIGHT)};
+            const Point<int> producerSize{(int)producerSharedPtr->get(cv::CAP_PROP_FRAME_WIDTH),
+                                          (int)producerSharedPtr->get(cv::CAP_PROP_FRAME_HEIGHT)};
             if (finalOutputSize.x == -1 || finalOutputSize.y == -1)
             {
                 const auto message = "Output resolution cannot be (-1 x -1) unless producerSharedPtr is also set.";

@@ -2,7 +2,7 @@
 #define OPENPOSE_FILESTREAM_FILE_STREAM_HPP
 
 #include <opencv2/core/core.hpp> // cv::Mat
-#include <opencv2/highgui/highgui.hpp> // CV_LOAD_IMAGE_ANYDEPTH, CV_IMWRITE_PNG_COMPRESSION
+#include <opencv2/highgui/highgui.hpp> // CV_LOAD_IMAGE_ANYDEPTH, cv::IMWRITE_PNG_COMPRESSION
 #include <openpose/core/common.hpp>
 #include <openpose/filestream/enumClasses.hpp>
 
@@ -51,9 +51,9 @@ namespace op
     // Save/load image
     OP_API void saveImage(const cv::Mat& cvMat, const std::string& fullFilePath,
                           const std::vector<int>& openCvCompressionParams
-                            = {CV_IMWRITE_JPEG_QUALITY, 100, CV_IMWRITE_PNG_COMPRESSION, 9});
+                            = {cv::IMWRITE_JPEG_QUALITY, 100, cv::IMWRITE_PNG_COMPRESSION, 9});
 
-    OP_API cv::Mat loadImage(const std::string& fullFilePath, const int openCvFlags = CV_LOAD_IMAGE_ANYDEPTH);
+    OP_API cv::Mat loadImage(const std::string& fullFilePath, const int openCvFlags = cv::IMREAD_ANYDEPTH);
 
     OP_API std::vector<std::array<Rectangle<float>, 2>> loadHandDetectorTxt(const std::string& txtFilePath);
 }

@@ -105,7 +105,7 @@ namespace op
             // If no webcam
             else
             {
-                check(fpsMode == ProducerFpsMode::RetrievalFps || get(CV_CAP_PROP_FPS) > 0,
+                check(fpsMode == ProducerFpsMode::RetrievalFps || get(cv::CAP_PROP_FPS) > 0,
                       "Selected to keep the source fps but get(CV_CAP_PROP_FPS) <= 0, i.e. the source did not set"
                       " its fps property.", __LINE__, __FUNCTION__, __FILE__);
                 mProducerFpsMode = {fpsMode};
@@ -174,8 +174,8 @@ namespace op
             // Process wrong frames
             if (frame.empty())
             {
-                log("Empty frame detected, frame number " + std::to_string((int)get(CV_CAP_PROP_POS_FRAMES))
-                    + " of " + std::to_string((int)get(CV_CAP_PROP_FRAME_COUNT)) + ".",
+                log("Empty frame detected, frame number " + std::to_string((int)get(cv::CAP_PROP_POS_FRAMES))
+                    + " of " + std::to_string((int)get(cv::CAP_PROP_FRAME_COUNT)) + ".",
                     Priority::Max, __LINE__, __FUNCTION__, __FILE__);
                 mNumberEmptyFrames++;
             }
@@ -184,7 +184,7 @@ namespace op
                 mNumberEmptyFrames = 0;
 
                 if (mType != ProducerType::ImageDirectory
-                      && (frame.cols != get(CV_CAP_PROP_FRAME_WIDTH) || frame.rows != get(CV_CAP_PROP_FRAME_HEIGHT)))
+                      && (frame.cols != get(cv::CAP_PROP_FRAME_WIDTH) || frame.rows != get(cv::CAP_PROP_FRAME_HEIGHT)))
                 {
                     log("Frame size changed. Returning empty frame.", Priority::Max, __LINE__, __FUNCTION__, __FILE__);
                     frame = cv::Mat();
@@ -254,11 +254,11 @@ namespace op
                 if (mNumberEmptyFrames > 2
                     || (mType != ProducerType::FlirCamera && mType != ProducerType::IPCamera
                         && mType != ProducerType::Webcam
-                        && get(CV_CAP_PROP_POS_FRAMES) >= get(CV_CAP_PROP_FRAME_COUNT)))
+                        && get(cv::CAP_PROP_POS_FRAMES) >= get(cv::CAP_PROP_FRAME_COUNT)))
                 {
                     // Repeat video
                     if (mProperties[(unsigned char)ProducerProperty::AutoRepeat])
-                        set(CV_CAP_PROP_POS_FRAMES, 0);
+                        set(cv::CAP_PROP_POS_FRAMES, 0);
 
                     // Warning + release mVideoCapture
                     else
@@ -286,9 +286,9 @@ namespace op
                     {
                         mNumberFramesTrackingFps++;
                         // Current #frames
-                        const auto currentFrames = get(CV_CAP_PROP_POS_FRAMES) - mFirstFrameTrackingFps;
+                        const auto currentFrames = get(cv::CAP_PROP_POS_FRAMES) - mFirstFrameTrackingFps;
                         // Expected #frames
-                        const auto nsPerFrame = 1e9/get(CV_CAP_PROP_FPS);
+                        const auto nsPerFrame = 1e9/get(cv::CAP_PROP_FPS);
                         const auto timeNs = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(
                             std::chrono::high_resolution_clock::now()-mClockTrackingFps
                         ).count();
@@ -301,7 +301,7 @@ namespace op
                         {
                             if (difference > 15)
                             {
-                                set(CV_CAP_PROP_POS_FRAMES, std::floor(expectedFrames) + mFirstFrameTrackingFps);
+                                set(cv::CAP_PROP_POS_FRAMES, std::floor(expectedFrames) + mFirstFrameTrackingFps);
                                 mNumberSetPositionTrackingFps = fastMin(mNumberSetPositionTrackingFps+1,
                                                                         numberSetPositionThreshold);
                             }

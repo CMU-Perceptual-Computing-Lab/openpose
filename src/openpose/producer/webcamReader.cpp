@@ -18,16 +18,16 @@ namespace op
                 mFrameNameCounter = 0;
                 if (webcamResolution != Point<int>{})
                 {
-                    set(CV_CAP_PROP_FRAME_WIDTH, webcamResolution.x);
-                    set(CV_CAP_PROP_FRAME_HEIGHT, webcamResolution.y);
-                    if ((int)get(CV_CAP_PROP_FRAME_WIDTH) != webcamResolution.x
-                        || (int)get(CV_CAP_PROP_FRAME_HEIGHT) != webcamResolution.y)
+                    set(cv::CAP_PROP_FRAME_WIDTH, webcamResolution.x);
+                    set(cv::CAP_PROP_FRAME_HEIGHT, webcamResolution.y);
+                    if ((int)get(cv::CAP_PROP_FRAME_WIDTH) != webcamResolution.x
+                        || (int)get(cv::CAP_PROP_FRAME_HEIGHT) != webcamResolution.y)
                     {
                         const std::string logMessage{ "Desired webcam resolution " + std::to_string(webcamResolution.x)
                                                       + "x" + std::to_string(webcamResolution.y)
                                                       + " could not being set. Final resolution: "
-                                                      + std::to_string(intRound(get(CV_CAP_PROP_FRAME_WIDTH))) + "x"
-                                                      + std::to_string(intRound(get(CV_CAP_PROP_FRAME_HEIGHT))) };
+                                                      + std::to_string(intRound(get(cv::CAP_PROP_FRAME_WIDTH))) + "x"
+                                                      + std::to_string(intRound(get(cv::CAP_PROP_FRAME_HEIGHT))) };
                         log(logMessage, Priority::Max, __LINE__, __FUNCTION__, __FILE__);
                     }
                 }
@@ -115,9 +115,9 @@ namespace op
     {
         try
         {
-            if (capProperty == CV_CAP_PROP_POS_FRAMES)
+            if (capProperty == cv::CAP_PROP_POS_FRAMES)
                 return (double)mFrameNameCounter;
-            else if (capProperty == CV_CAP_PROP_FPS)
+            else if (capProperty == cv::CAP_PROP_FPS)
                 return mFps;
             else
                 return VideoCaptureReader::get(capProperty);
@@ -133,7 +133,7 @@ namespace op
     {
         try
         {
-            if (capProperty == CV_CAP_PROP_FPS)
+            if (capProperty == cv::CAP_PROP_FPS)
                 mFps = value;
             else
                 VideoCaptureReader::set(capProperty, value);

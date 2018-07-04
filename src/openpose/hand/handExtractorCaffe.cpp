@@ -62,7 +62,7 @@ namespace op
                 affineMatrix.at<double>(1,2) = handRectangle.y;
                 cv::Mat handImage;
                 cv::warpAffine(cvInputData, handImage, affineMatrix, cv::Size{netOutputSize.x, netOutputSize.y},
-                               CV_INTER_LINEAR | CV_WARP_INVERSE_MAP, cv::BORDER_CONSTANT, cv::Scalar{0,0,0});
+                               cv::INTER_LINEAR | cv::WARP_INVERSE_MAP, cv::BORDER_CONSTANT, cv::Scalar{0,0,0});
                                // CV_INTER_CUBIC | CV_WARP_INVERSE_MAP, cv::BORDER_CONSTANT, cv::Scalar{0,0,0});
                 // cv::Mat -> float*
                 uCharCvMatToFloatPtr(handImageCrop.getPtr(), handImage, true);

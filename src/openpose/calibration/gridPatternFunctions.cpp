@@ -11,7 +11,7 @@ namespace op
             if (!image.empty() && points2DVector.size() > 1)
             {
                 // cv::Mat imageGray;
-                // cv::cvtColor(image, imageGray, CV_BGR2GRAY);
+                // cv::cvtColor(image, imageGray, cv::COLOR_BGR2GRAY);
                 const auto winSize = std::max(5,
                     (int)std::round(cv::norm(cv::Mat(points2DVector.at(0) - points2DVector.at(1)), cv::NORM_INF) / 4));
                 cv::cornerSubPix(image,
@@ -19,7 +19,7 @@ namespace op
                                  cv::Size{winSize, winSize}, // Depending on the chessboard size;
                                  // cv::Size{11,11}, // Default in code I got, used above one
                                  cv::Size{-1,-1},
-                                 cv::TermCriteria{ CV_TERMCRIT_EPS+CV_TERMCRIT_ITER, 1000, 1e-9 });
+                                 cv::TermCriteria{  cv::TermCriteria::Type::EPS+cv::TermCriteria::Type::MAX_ITER, 1000, 1e-9 });
                                  // cv::TermCriteria{ CV_TERMCRIT_EPS+CV_TERMCRIT_ITER, 30, 0.1 });  // Default
             }
         }
@@ -39,9 +39,9 @@ namespace op
             const auto chessboardFound = cv::findChessboardCorners(image,
                                                                    gridInnerCorners,
                                                                    points2DVector,
-                                                                   CV_CALIB_CB_ADAPTIVE_THRESH
-                                                                    | CV_CALIB_CB_NORMALIZE_IMAGE
-                                                                    | CV_CALIB_CB_FILTER_QUADS);
+                                                                   cv::CALIB_CB_ADAPTIVE_THRESH
+                                                                    | cv::CALIB_CB_NORMALIZE_IMAGE
+                                                                    | cv::CALIB_CB_FILTER_QUADS);
 
             return std::make_pair(chessboardFound, points2DVector);
         }
@@ -217,7 +217,7 @@ namespace op
         {
             // Grayscale for speeding up
             cv::Mat imageGray;
-            cv::cvtColor(image, imageGray, CV_BGR2GRAY);
+            cv::cvtColor(image, imageGray, cv::COLOR_BGR2GRAY);
 
             // Find chessboard corners
             auto foundGridCornersAndLocations = heavilyTryToFindGridCorners(imageGray, gridInnerCorners);

@@ -49,7 +49,7 @@ namespace op
                                    const_cast<T*>(&sourcePtr[c*sourceChannelOffset]));
                     cv::Mat target(cv::Size(targetWidth, targetHeight), CV_32FC1,
                                    (&targetPtr[c*targetChannelOffset]));
-                    cv::resize(source, target, {targetWidth, targetHeight}, 0, 0, CV_INTER_CUBIC);
+                    cv::resize(source, target, {targetWidth, targetHeight}, 0, 0, cv::INTER_CUBIC);
                 }
             }
             // Multi-scale merging
@@ -86,7 +86,7 @@ namespace op
                                        const_cast<T*>(&sourcePtr[c*sourceChannelOffset]));
                         cv::Mat target(cv::Size(targetWidth, targetHeight), CV_32FC1,
                                        (&tempTargetPtr[c*targetChannelOffset]));
-                        cv::resize(source, target, {targetWidth, targetHeight}, 0, 0, CV_INTER_CUBIC);
+                        cv::resize(source, target, {targetWidth, targetHeight}, 0, 0, cv::INTER_CUBIC);
 
                         // Add
                         if (n != 0)
