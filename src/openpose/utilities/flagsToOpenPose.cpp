@@ -41,8 +41,8 @@ namespace op
             else if (poseModeString == "CAR_12")
                 return PoseModel::CAR_12;
             // else
-            error("String does not correspond to any model (BODY_25, COCO, MPI, MPI_4_layers)",
-                  __LINE__, __FUNCTION__, __FILE__);
+            error("String (`" + poseModeString + "`) does not correspond to any model (BODY_25, COCO, MPI,"
+                  " MPI_4_layers).", __LINE__, __FUNCTION__, __FILE__);
             return PoseModel::BODY_25;
         }
         catch (const std::exception& e)

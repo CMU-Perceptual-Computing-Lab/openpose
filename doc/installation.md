@@ -104,7 +104,10 @@ The instructions in this section describe the steps to build OpenPose using CMak
     - Ubuntu: run the command `sudo apt-get install cmake-qt-gui`. Note: If you prefer to use CMake through the command line, see [Cmake Command Line Build](#cmake-command-line-build-ubuntu-only).
     - Windows: download and install the latest CMake win64-x64 msi installer from the [CMake website](https://cmake.org/download/), called `cmake-X.X.X-win64-x64.msi`.
     - Mac: `brew cask install cmake`.
-2. Nvidia GPU version prerequisites:
+2. Windows - **Microsoft Visual Studio (VS) 2015 Enterprise Update 3**:
+    - If **Visual Studio 2017 Community** is desired, we do not officially support it, but it might be compiled by firstly [enabling CUDA 8.0 in VS2017](https://stackoverflow.com/questions/43745099/using-cuda-with-visual-studio-2017?answertab=active#tab-top) or use **VS2017 with CUDA 9** by checking the `.vcxproj` file and changing the necessary paths from CUDA 8 to 9.
+    - VS 2015 Enterprise Update 1 will give some compiler errors and VS 2015 Community has not been tested.
+3. Nvidia GPU version prerequisites:
     1. [**CUDA 8**](https://developer.nvidia.com/cuda-80-ga2-download-archive):
         - Ubuntu: Run `sudo ubuntu/install_cuda.sh` or alternatively download and install it from their website.
         - Windows: Install CUDA 8.0 after Visual Studio 2015 is installed to assure that the CUDA installation will generate all necessary files for VS. If CUDA was already installed, re-install CUDA after installing VS!
@@ -112,16 +115,14 @@ The instructions in this section describe the steps to build OpenPose using CMak
     2. [**cuDNN 5.1**](https://developer.nvidia.com/cudnn):
         - Ubuntu: Run `sudo ubuntu/install_cudnn.sh` or alternatively download and install it from their website.
         - Windows (and Ubuntu if manual installation): In order to manually install it, just unzip it and copy (merge) the contents on the CUDA folder, usually `/usr/local/cuda/` in Ubuntu and `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0` in Windows.
-3. AMD GPU version prerequisites:
+4. AMD GPU version prerequisites:
     1. Download official AMD drivers for Windows from [**AMD - Windows**](https://support.amd.com/en-us/download).
     2. Download 3rd party ROCM driver for Ubuntu from [**AMD - OpenCL**](https://rocm.github.io/ROCmInstall.html).
-    3. AMD Drivers have not been tested on OSX. Please email us if you wish to test it. This has only been tested on Vega series cards.
-4. Ubuntu - Other prerequisites:
+    3. Ubuntu only: Install `sudo apt-get install libviennacl-dev`. This comes packaged inside OpenPose for Windows.
+    4. AMD Drivers have not been tested on OSX. Please email us if you wish to test it. This has only been tested on Vega series cards.
+5. Ubuntu - Other prerequisites:
     - Caffe prerequisites: By default, OpenPose uses Caffe under the hood. If you have not used Caffe previously, install its dependencies by running `sudo bash ./ubuntu/install_cmake.sh`.
     - OpenCV must be already installed on your machine. It can be installed with `apt-get install libopencv-dev`. You can also use your own compiled OpenCV version.
-5. Windows - **Microsoft Visual Studio (VS) 2015 Enterprise Update 3**:
-    - If **Visual Studio 2017 Community** is desired, we do not officially support it, but it might be compiled by firstly [enabling CUDA 8.0 in VS2017](https://stackoverflow.com/questions/43745099/using-cuda-with-visual-studio-2017?answertab=active#tab-top) or use **VS2017 with CUDA 9** by checking the `.vcxproj` file and changing the necessary paths from CUDA 8 to 9.
-    - VS 2015 Enterprise Update 1 will give some compiler errors and VS 2015 Community has not been tested.
 6. Windows - **Caffe, OpenCV, and Caffe prerequisites**:
     - CMake automatically downloads all the Windows DLLs. Alternatively, you might prefer to download them manually:
         - Models:
@@ -289,23 +290,19 @@ If the default installation fails (i.e., the one explained above), instal Caffe 
 - `brew uninstall caffe` to remove the version of Caffe previously installed via cmake.
 - `brew install caffe` to install Caffe separately.
 - Run `cmake-gui` and make the following adjustments to the cmake config:
-    1. `BUILD_CAFFE` set to false
-    2. `Caffe_INCLUDE_DIRS` set to `/usr/local/include/caffe`
-    3. `Caffe_LIBS` set to `/usr/local/lib/libcaffe.dylib`
-
-
-<img width="1280" alt="screen shot 2018-06-26 at 9 25 57 pm" src="https://user-images.githubusercontent.com/339120/41949647-f3b6c64e-7987-11e8-890a-b4a8ad6d3576.png">
-
-@takaya1219 I tried downgrading protobuf to v3.5.1 before implementing the above changes, and that did not fix the build for me.
+    1. `BUILD_CAFFE` set to false.
+    2. `Caffe_INCLUDE_DIRS` set to `/usr/local/include/caffe`.
+    3. `Caffe_LIBS` set to `/usr/local/lib/libcaffe.dylib`.
+    4. Run `Configure` and `Generate` from CMake GUI.
 
 
 
 #### OpenCL Version
 If you have an AMD graphics card, you can compile OpenPose with the OpenCL option. To manually select the OpenCL Version, open CMake GUI mentioned above, and set the `GPU_MODE` flag to `OPENCL`.
 
-The OpenCL version has been tested on Ubuntu and Windows. The OpenCL version requires `libviennacl-dev` which can be installed via apt-get on Ubuntu. This comes packaged with Windows. This has been tested only on AMD Vega series and NVIDIA 10 series graphics cards. Please email us if you have issues with other operating systems or graphics cards.
+The OpenCL version has been tested on Ubuntu and Windows. This has been tested only on AMD Vega series and NVIDIA 10 series graphics cards. Please email us if you have issues with other operating systems or graphics cards.
 
-Lastly, OpenCL version does not support unfixed resolution. So a folder of images of different resolutions with openpose, requires the `--net_resolution 656x368` flag for example. This should be fixed by the Caffe author in a future patch.
+Lastly, OpenCL version does not support unfixed `--net_resolution`. So a folder of images of different resolutions with OpenPose, requires the `--net_resolution 656x368` flag for example. This should be fixed by the Caffe author in a future patch.
 
 
 

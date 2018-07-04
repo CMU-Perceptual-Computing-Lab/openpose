@@ -229,19 +229,20 @@ OpenPose Library - Release Notes
         5. Latency highly reduced in multi-GPU setting. Each GPU process a different camera view, instead of a different time-instant sequence.
     5. CMake: All libraries as single variable (simpler to add/remove libraries).
     6. Averaged latency reduced to half.
-    7. Light speed up, and body approach much more invariant to number of people. Removed `checkEQ` from tight loop in bodyPartConnectorBase, which took a huge time exponential to the number of people.
-    8. Datum includes extrinsic and intrinsic camera parameters.
-    9. Function `scaleKeypoints(Array<float>& keypoints, const float scale)` also accepts 3D keypoints.
-    10. 3D keypoints and camera parameters in meters (instead of millimeters) in order to reduce numerical errors.
-    11. New `PoseExtractor` class to contain future ID and tracking algorithms as well as the current OpenPose keypoint detection algorithm.
-    12. Added initial alpha versions of the `tracking` and `identification` modules (for now disabled but available in the source code), including `PersonIdExtractor` and `PersonTracker`. `PersonIdExtractor` includes greedy matrix OP-LK matching.
-    13. Added catchs to all demos for higher debug information.
-    14. GUI includes the capability of dynamically enable/disable the face, hand, and 3-D rendering, as well as more clear visualization for skeleton, background, heatmap addition, and PAF addition channels.
-    15. When GUI changes some parameter from PoseExtractorNet, there is a log to notify the user of the change.
-    16. Deprecated flag `--write_keypoint_json` removed (`--write_json` is the equivalent since version 1.2.1).
-    17. Speed up of cvMatToOpOutput and opOutputToCvMat: op::Datum::outputData is now H x W x C instead of C x H x W, making it much faster to be copied to/from op::Datum::cvOutputData.
-    18. Much faster GUI display by adding the `WITH_OPENCV_WITH_OPENGL` flag to tell whether to use OpenGL support for OpenCV.
-    19. Turned security check error into warning when using dynamic `net_resolution` for `image_dir` in CPU/OpenCL versions.
+    7. 15% speed up for default CMake version. CMake was not setting `Release` mode by default.
+    8. Light speed up, and body approach much more invariant to number of people. Removed `checkEQ` from tight loop in bodyPartConnectorBase, which took a huge time exponential to the number of people.
+    9. Datum includes extrinsic and intrinsic camera parameters.
+    10. Function `scaleKeypoints(Array<float>& keypoints, const float scale)` also accepts 3D keypoints.
+    11. 3D keypoints and camera parameters in meters (instead of millimeters) in order to reduce numerical errors.
+    12. New `PoseExtractor` class to contain future ID and tracking algorithms as well as the current OpenPose keypoint detection algorithm.
+    13. Added initial alpha versions of the `tracking` and `identification` modules (for now disabled but available in the source code), including `PersonIdExtractor` and `PersonTracker`. `PersonIdExtractor` includes greedy matrix OP-LK matching.
+    14. Added catchs to all demos for higher debug information.
+    15. GUI includes the capability of dynamically enable/disable the face, hand, and 3-D rendering, as well as more clear visualization for skeleton, background, heatmap addition, and PAF addition channels.
+    16. When GUI changes some parameter from PoseExtractorNet, there is a log to notify the user of the change.
+    17. Deprecated flag `--write_keypoint_json` removed (`--write_json` is the equivalent since version 1.2.1).
+    18. Speed up of cvMatToOpOutput and opOutputToCvMat: op::Datum::outputData is now H x W x C instead of C x H x W, making it much faster to be copied to/from op::Datum::cvOutputData.
+    19. Much faster GUI display by adding the `WITH_OPENCV_WITH_OPENGL` flag to tell whether to use OpenGL support for OpenCV.
+    20. Turned security check error into warning when using dynamic `net_resolution` for `image_dir` in CPU/OpenCL versions.
 2. Functions or parameters renamed:
     1. Removed scale parameter from hand and face rectangle extractor (causing wrong results if custom `--output_resolution`).
     2. Functions `scaleKeypoints`, other than `scaleKeypoints(Array<float>& keypoints, const float scale)`, renamed as `scaleKeypoints2d`.

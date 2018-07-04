@@ -8,7 +8,7 @@
 |-------------|
 |[![Build Status](https://travis-ci.org/CMU-Perceptual-Computing-Lab/openpose.svg?branch=master)](https://travis-ci.org/CMU-Perceptual-Computing-Lab/openpose)|
 
-[OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose) represents the **first real-time multi-person system to jointly detect human body, hand, and facial keypoints (in total 130 keypoints) on single images**.
+[OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose) represents the **first real-time multi-person system to jointly detect human body, hand, and facial keypoints (in total 135 keypoints) on single images**.
 
 <p align="center">
     <img src="doc/media/pose_face_hands.gif", width="480">
@@ -31,7 +31,7 @@
 - **OS**: Ubuntu (14, 16), Windows (8, 10), Mac OSX, Nvidia TX2.
 - **Others**:
     - Available: command-line demo, C++ wrapper, and C++ API.
-    - CUDA (Nvidia GPU) and CPU versions.
+    - CUDA (Nvidia GPU), OpenCL (AMD GPU), and CPU versions.
 
 
 
