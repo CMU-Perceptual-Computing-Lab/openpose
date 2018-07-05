@@ -61,6 +61,8 @@ namespace op
                 if (!spTQueueOut->isFull())
                 {
                     // Pop TDatums
+                    if (spTQueueIn->empty())
+                        std::this_thread::sleep_for(std::chrono::microseconds{100});
                     TDatums tDatums;
                     bool workersAreRunning = spTQueueIn->tryPop(tDatums);
                     // Check queue not stopped
@@ -83,7 +85,10 @@ namespace op
                     return workersAreRunning;
                 }
                 else
+                {
+                    std::this_thread::sleep_for(std::chrono::microseconds{100});
                     return true;
+                }
             }
         }
         catch (const std::exception& e)

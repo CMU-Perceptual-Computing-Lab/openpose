@@ -243,6 +243,7 @@ OpenPose Library - Release Notes
     18. Speed up of cvMatToOpOutput and opOutputToCvMat: op::Datum::outputData is now H x W x C instead of C x H x W, making it much faster to be copied to/from op::Datum::cvOutputData.
     19. Much faster GUI display by adding the `WITH_OPENCV_WITH_OPENGL` flag to tell whether to use OpenGL support for OpenCV.
     20. Turned security check error into warning when using dynamic `net_resolution` for `image_dir` in CPU/OpenCL versions.
+    21. Minimized CPU usage when queues are empty or full, in order to prevent problems such as general computer slow down, overheating, or excesive power usage.
 2. Functions or parameters renamed:
     1. Removed scale parameter from hand and face rectangle extractor (causing wrong results if custom `--output_resolution`).
     2. Functions `scaleKeypoints`, other than `scaleKeypoints(Array<float>& keypoints, const float scale)`, renamed as `scaleKeypoints2d`.
