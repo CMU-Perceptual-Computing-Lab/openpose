@@ -1,7 +1,6 @@
 FROM nvidia/cuda:8.0-cudnn5-devel-ubuntu16.04
 
-RUN apt-get update
-RUN apt-get install -y \
+RUN apt-get update && apt-get install -y \
     libatlas-base-dev \
     libopencv-dev \
     lsb-release \
@@ -10,8 +9,10 @@ RUN apt-get install -y \
     sudo \
     wget
 
+RUN apt-get install -y python-pip
+RUN apt-get install -y cmake
 WORKDIR /usr/local
 
 COPY . .
 
-RUN ./install_caffe_and_openpose.sh
+RUN ./install.sh
