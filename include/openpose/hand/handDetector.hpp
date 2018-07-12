@@ -1,30 +1,24 @@
 #ifndef OPENPOSE_HAND_HAND_DETECTOR_HPP
 #define OPENPOSE_HAND_HAND_DETECTOR_HPP
 
-#include <array>
 #include <mutex>
-#include <vector>
-#include <openpose/core/array.hpp>
-#include <openpose/core/point.hpp>
-#include <openpose/core/rectangle.hpp>
+#include <openpose/core/common.hpp>
 #include <openpose/pose/enumClasses.hpp>
-#include <openpose/utilities/macros.hpp>
-#include "enumClasses.hpp"
 
 namespace op
 {
     // Note: This class is thread-safe, so several GPUs can be running hands and using `updateTracker`, and updateTracker will keep the latest known
     // tracking
-    class HandDetector
+    class OP_API HandDetector
     {
     public:
         explicit HandDetector(const PoseModel poseModel);
 
-        std::vector<std::array<Rectangle<float>, 2>> detectHands(const Array<float>& poseKeypoints, const float scaleInputToOutput) const;
+        std::vector<std::array<Rectangle<float>, 2>> detectHands(const Array<float>& poseKeypoints) const;
 
-        std::vector<std::array<Rectangle<float>, 2>> trackHands(const Array<float>& poseKeypoints, const float scaleInputToOutput);
+        std::vector<std::array<Rectangle<float>, 2>> trackHands(const Array<float>& poseKeypoints);
 
-        void updateTracker(const Array<float>& poseKeypoints, const std::array<Array<float>, 2>& handKeypoints);
+        void updateTracker(const std::array<Array<float>, 2>& handKeypoints, const unsigned long long id);
 
     private:
         enum class PosePart : unsigned int

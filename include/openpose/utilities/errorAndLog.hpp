@@ -6,8 +6,8 @@
 #include <sstream> // std::stringstream
 #include <string>
 #include <vector>
-#include "enumClasses.hpp"
-#include "macros.hpp"
+#include <openpose/core/macros.hpp>
+#include <openpose/utilities/enumClasses.hpp>
 
 namespace op
 {
@@ -23,28 +23,35 @@ namespace op
 
     // Error managment - How to use:
         // error(message, __LINE__, __FUNCTION__, __FILE__);
-    void error(const std::string& message, const int line = -1, const std::string& function = "", const std::string& file = "");
+    OP_API void error(const std::string& message, const int line = -1, const std::string& function = "",
+                      const std::string& file = "");
 
     template<typename T>
-    inline void error(const T& message, const int line = -1, const std::string& function = "", const std::string& file = "")
+    inline void error(const T& message, const int line = -1, const std::string& function = "",
+                      const std::string& file = "")
     {
         error(tToString(message), line, function, file);
     }
 
     // Printing info - How to use:
-        // log(message, desiredPriority, __LINE__, __FUNCTION__, __FILE__);  // It will print info if desiredPriority >= sPriorityThreshold
-    void log(const std::string& message, const Priority priority = Priority::Max, const int line = -1, const std::string& function = "", const std::string& file = "");
+        // It will print info if desiredPriority >= sPriorityThreshold
+        // log(message, desiredPriority, __LINE__, __FUNCTION__, __FILE__);
+    OP_API void log(const std::string& message, const Priority priority = Priority::Max, const int line = -1,
+                    const std::string& function = "", const std::string& file = "");
 
     template<typename T>
-    inline void log(const T& message, const Priority priority = Priority::Max, const int line = -1, const std::string& function = "", const std::string& file = "")
+    inline void log(const T& message, const Priority priority = Priority::Max, const int line = -1,
+                    const std::string& function = "", const std::string& file = "")
     {
         log(tToString(message), priority, line, function, file);
     }
 
     // If only desired on debug mode (no computational cost at all on release mode):
-        // dLog(message, desiredPriority, __LINE__, __FUNCTION__, __FILE__);  // It will print info if desiredPriority >= sPriorityThreshold
+        // It will print info if desiredPriority >= sPriorityThreshold
+        // dLog(message, desiredPriority, __LINE__, __FUNCTION__, __FILE__);
     template<typename T>
-    inline void dLog(const T& message, const Priority priority = Priority::Max, const int line = -1, const std::string& function = "", const std::string& file = "")
+    inline void dLog(const T& message, const Priority priority = Priority::Max, const int line = -1,
+                     const std::string& function = "", const std::string& file = "")
     {
         #ifndef NDEBUG
             log(message, priority, line, function, file);
@@ -58,7 +65,7 @@ namespace op
     }
 
     // This class is thread-safe
-    class ConfigureError
+    class OP_API ConfigureError
     {
     public:
         static std::vector<ErrorMode> getErrorModes();
@@ -67,7 +74,7 @@ namespace op
     };
 
     // This class is thread-safe
-    class ConfigureLog
+    class OP_API ConfigureLog
     {
     public:
         static Priority getPriorityThreshold();

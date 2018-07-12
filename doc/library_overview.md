@@ -1,5 +1,9 @@
-OpenPose Library - Basic Overview
+OpenPose C++ API - Basic Overview
 ====================================
+
+
+
+Note: Read [doc/library_introduction.md](./library_introduction.md) before this page.
 
 
 
@@ -22,7 +26,7 @@ In order to use and/or slightly extend the OpenPose library, we try to explain t
 
 ## Basic Module: `core`
 ### Array<T> - The OpenPose Basic Raw Data Container
-This template class implements a multidimensional data array. It is our basic data container, analogous to `cv::Mat` in OpenCV, Tensor in Torch and TensorFlow or Blob in Caffe. It wraps a `cv::Mat` and a `boost::shared_ptr`, both of them pointing to the same raw data. I.e. they both share the same memory, so we can read this data in both formats, while there is no performance impact. For instance, `op::Datum` has several `op::Array<float>`, for instance the `op::Datum<float> pose` with the pose data.
+This template class implements a multidimensional data array. It is our basic data container, analogous to `cv::Mat` in OpenCV, Tensor in Torch and TensorFlow or Blob in Caffe. It wraps a `cv::Mat` and a `std::shared_ptr`, both of them pointing to the same raw data. I.e. they both share the same memory, so we can read this data in both formats, while there is no performance impact. For instance, `op::Datum` has several `op::Array<float>`, for instance the `op::Datum<float> pose` with the pose data.
 
 #### Construction And Data allocation
 There are 4 different ways to allocate the memory:
@@ -31,7 +35,7 @@ There are 4 different ways to allocate the memory:
 
 2. The constructor `Array(const int size)`, which calls `reset(size)`.
 
-3. The `reset(const std::vector<int>& size)` function: It allocates the memory indicated for size. The allocated memory equals the product of all elements in the size vector. Internally, it is saved as a 1-D boost::shared_ptr<T[]>.
+3. The `reset(const std::vector<int>& size)` function: It allocates the memory indicated for size. The allocated memory equals the product of all elements in the size vector. Internally, it is saved as a 1-D std::shared_ptr<T[]>.
 
 4. The `reset(const int size)` function: equivalent for 1-dimension data (i.e. vector).
 
@@ -44,7 +48,7 @@ The data can be access as a raw pointer, shared pointer or `cv::Mat`. So given y
 
 2. As `const cv::Mat`: `array.getConstCvMat()`. We do not allow to directly modify the `cv::Mat`, since some operations might change the dimensional size of the data. If you want to do so, you can clone this `cv::Mat`, perform any desired operation, and copy it back to the array class with `setFrom()`.
 
-3. As raw pointer: `T* getPtr()` and `const T* const getConstPtr()`. Similar to std:: and boost::shared_ptr::get(). For instance, CUDA code usually requires raw pointers to access its data.
+3. As raw pointer: `T* getPtr()` and `const T* const getConstPtr()`. Similar to std:: and std::shared_ptr::get(). For instance, CUDA code usually requires raw pointers to access its data.
 
 #### Dimensionality Information
 There are several functions to get information about the allocated data:
@@ -66,8 +70,8 @@ The `Datum` class has all the variables that our Workers need to share to each o
 UserDatum : public op::Datum {/* op::Datum + extra variables */}
 
 // Worker and ThreadManager example initialization
-op::WGui<std::vector<UserDatum>> userGUI(/* constructor arguments */);
-op::ThreadManager<std::vector<UserDatum>> userThreadManager;
+op::WGui<std::shared_ptr<std::vector<UserDatum>> userGUI(/* constructor arguments */);
+op::ThreadManager<std::shared_ptr<std::vector<UserDatum>> userThreadManager;
 ```
 
 Since `UserDatum` inherits from `op::Datum`, all the original OpenPose code will compile and run with your inherited version of `op::Datum`.
@@ -143,7 +147,7 @@ Classes starting by the letter `W` + upper case letter (e.g. `WGui`) directly or
 
 The easiest way to create your own Worker is to inherit Worker<T>, and implement the work() function such us it just calls a wrapper to your desired functionality (check the source code of some of our basic Workers). Since the Worker classes are templates, they are always compiled. Therefore, including your desired functionality in a different file will let you compile it only once. Otherwise, it would be compiled any time that any code which uses your worker is compiled.
 
-All OpenPose Workers are templates, i.e. they are not only limited to work with the default std::vector<op::Datum>. However, if you intend to use some of our Workers, your custom `TDatums` class (the one substituting std::vector<op::Datum>) should implement the same variables and functions that those Workers use. The easiest solution is to inherit from `op::Datum` and extend its functionality.
+All OpenPose Workers are templates, i.e. they are not only limited to work with the default op::Datum. However, if you intend to use some of our Workers, your custom `TDatums` class (the one substituting op::Datum) should implement the same variables and functions that those Workers use. The easiest solution is to inherit from `op::Datum` and extend its functionality.
 
 
 ### Creating New Workers
@@ -167,7 +171,7 @@ All Workers wrap and call a non-Worker non-template equivalent which actually pe
 
 By separating functionality and their `Worker<T>` wrappers, we get the good of both points, eliminating the cons. In this way, the user is able to:
 
-1. Change `std::vector<op::Datum>` for a custom class, implementing his own `Worker` templates, but using the already implemented functionality to create new custom `Worker` templates.
+1. Change `std::shared_ptr<std::vector<op::Datum>>` for a custom class, implementing his own `Worker` templates, but using the already implemented functionality to create new custom `Worker` templates.
 
 2. Create a `Worker` which wraps several non-`Worker`s classes.
 

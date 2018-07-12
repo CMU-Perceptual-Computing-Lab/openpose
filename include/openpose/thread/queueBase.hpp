@@ -1,10 +1,10 @@
 #ifndef OPENPOSE_THREAD_QUEUE_BASE_HPP
 #define OPENPOSE_THREAD_QUEUE_BASE_HPP
 
-#include <queue> // std::queue & std::priority_queue
 #include <condition_variable>
 #include <mutex>
-#include <openpose/utilities/macros.hpp>
+#include <queue> // std::queue & std::priority_queue
+#include <openpose/core/common.hpp>
 
 namespace op
 {
@@ -48,6 +48,8 @@ namespace op
 
         bool isRunning() const;
 
+        bool isFull() const;
+
         size_t size() const;
 
         void clear();
@@ -88,12 +90,8 @@ namespace op
 
 
 // Implementation
-#include <memory> // std::shared_ptr
-#include <vector>
 #include <openpose/core/datum.hpp>
-#include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/utilities/fastMath.hpp>
-#include <openpose/utilities/macros.hpp>
 namespace op
 {
     template<typename TDatums, typename TQueue>
@@ -384,6 +382,21 @@ namespace op
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             return true;
+        }
+    }
+
+    template<typename TDatums, typename TQueue>
+    bool QueueBase<TDatums, TQueue>::isFull() const
+    {
+        try
+        {
+            // No mutex required because the size() and getMaxSize() are already thread-safe
+            return size() == getMaxSize();
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return false;
         }
     }
 

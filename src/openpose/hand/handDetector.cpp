@@ -1,6 +1,5 @@
 #include <openpose/pose/poseParameters.hpp>
 #include <openpose/utilities/check.hpp>
-#include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/keypoint.hpp>
 #include <openpose/hand/handDetector.hpp>
@@ -25,8 +24,8 @@ namespace op
                 // pos_hand = pos_wrist + ratio * (pos_wrist - pos_elbox) = (1 + ratio) * pos_wrist - ratio * pos_elbox
                 handRectangle.x = posePtr[wrist*3] + ratioWristElbow * (posePtr[wrist*3] - posePtr[elbow*3]);
                 handRectangle.y = posePtr[wrist*3+1] + ratioWristElbow * (posePtr[wrist*3+1] - posePtr[elbow*3+1]);
-                const auto distanceWristElbow = getDistance(posePtr, wrist, elbow);
-                const auto distanceElbowShoulder = getDistance(posePtr, elbow, shoulder);
+                const auto distanceWristElbow = getDistance(poseKeypoints, person, wrist, elbow);
+                const auto distanceElbowShoulder = getDistance(poseKeypoints, person, elbow, shoulder);
                 handRectangle.width = 1.5f * fastMax(distanceWristElbow, 0.9f * distanceElbowShoulder);
             }
             // height = width
@@ -95,7 +94,7 @@ namespace op
                 // Find closest previous rectangle
                 auto maxIndex = -1;
                 auto maxValue = 0.f;
-                for (auto previous = 0 ; previous < previousHands.size() ; previous++)
+                for (auto previous = 0u ; previous < previousHands.size() ; previous++)
                 {
                     const auto areaRatio = getAreaRatio(currentRectangle, previousHands[previous]);
                     if (maxValue < areaRatio)
@@ -131,7 +130,7 @@ namespace op
     {
     }
 
-    std::vector<std::array<Rectangle<float>, 2>> HandDetector::detectHands(const Array<float>& poseKeypoints, const float scaleInputToOutput) const
+    std::vector<std::array<Rectangle<float>, 2>> HandDetector::detectHands(const Array<float>& poseKeypoints) const
     {
         try
         {
@@ -149,8 +148,6 @@ namespace op
                         mPoseIndexes[(int)PosePart::LShoulder], mPoseIndexes[(int)PosePart::RWrist],
                         mPoseIndexes[(int)PosePart::RElbow], mPoseIndexes[(int)PosePart::RShoulder], threshold
                     );
-                    handRectangles.at(person).at(0) /= scaleInputToOutput;
-                    handRectangles.at(person).at(1) /= scaleInputToOutput;
                 }
             }
             return handRectangles;
@@ -162,19 +159,16 @@ namespace op
         }
     }
 
-    std::vector<std::array<Rectangle<float>, 2>> HandDetector::trackHands(const Array<float>& poseKeypoints, const float scaleInputToOutput)
+    std::vector<std::array<Rectangle<float>, 2>> HandDetector::trackHands(const Array<float>& poseKeypoints)
     {
         try
         {
             std::lock_guard<std::mutex> lock{mMutex};
             // Baseline detectHands
-            auto handRectangles = detectHands(poseKeypoints, scaleInputToOutput);
+            auto handRectangles = detectHands(poseKeypoints);
             // If previous hands saved
-            // for (auto current = 0 ; current < handRectangles.size() ; current++)
             for (auto& handRectangle : handRectangles)
             {
-                // trackHand(handRectangles[current][0], mHandLeftPrevious);
-                // trackHand(handRectangles[current][1], mHandRightPrevious);
                 trackHand(handRectangle[0], mHandLeftPrevious);
                 trackHand(handRectangle[1], mHandRightPrevious);
             }
@@ -188,37 +182,39 @@ namespace op
         }
     }
 
-    void HandDetector::updateTracker(const Array<float>& poseKeypoints, const std::array<Array<float>, 2>& handKeypoints)
+    void HandDetector::updateTracker(const std::array<Array<float>, 2>& handKeypoints, const unsigned long long id)
     {
         try
         {
             std::lock_guard<std::mutex> lock{mMutex};
-            // Security checks
-            if (poseKeypoints.getSize(0) != handKeypoints[0].getSize(0) || poseKeypoints.getSize(0) != handKeypoints[1].getSize(0))
-                error("Number people on poseKeypoints different than in handKeypoints.", __LINE__, __FUNCTION__, __FILE__);
-            // Parameters
-            const auto numberPeople = poseKeypoints.getSize(0);
-            // const auto poseNumberParts = poseKeypoints.getSize(1);
-            const auto handNumberParts = handKeypoints[0].getSize(1);
-            const auto numberChannels = poseKeypoints.getSize(2);
-            const auto thresholdRectangle = 0.25f;
-            // Update pose keypoints and hand rectangles
-            mPoseTrack.resize(numberPeople);
-            mHandLeftPrevious.clear();
-            mHandRightPrevious.clear();
-            for (auto person = 0 ; person < mPoseTrack.size() ; person++)
+            if (mCurrentId < id)
             {
-                const auto offset = person * handNumberParts * numberChannels;
-                // Left hand
-                const auto* handLeftPtr = handKeypoints[0].getConstPtr() + offset;
-                const auto handLeftRectangle = getKeypointsRectangle(handLeftPtr, handNumberParts, thresholdRectangle);
-                if (handLeftRectangle.area() > 0)
-                    mHandLeftPrevious.emplace_back(handLeftRectangle);
-                const auto* handRightPtr = handKeypoints[1].getConstPtr() + offset;
-                // Right hand
-                const auto handRightRectangle = getKeypointsRectangle(handRightPtr, handNumberParts, thresholdRectangle);
-                if (handRightRectangle.area() > 0)
-                    mHandRightPrevious.emplace_back(handRightRectangle);
+                mCurrentId = id;
+                // Parameters
+                const auto numberPeople = handKeypoints.at(0).getSize(0);
+                const auto thresholdRectangle = 0.25f;
+                // Update pose keypoints and hand rectangles
+                mPoseTrack.resize(numberPeople);
+                mHandLeftPrevious.clear();
+                mHandRightPrevious.clear();
+                for (auto person = 0u ; person < mPoseTrack.size() ; person++)
+                {
+                    const auto scoreThreshold = 0.66667f;
+                    // Left hand
+                    if (getAverageScore(handKeypoints[0], person) > scoreThreshold)
+                    {
+                        const auto handLeftRectangle = getKeypointsRectangle(handKeypoints[0], person, thresholdRectangle);
+                        if (handLeftRectangle.area() > 0)
+                            mHandLeftPrevious.emplace_back(handLeftRectangle);
+                    }
+                    // Right hand
+                    if (getAverageScore(handKeypoints[1], person) > scoreThreshold)
+                    {
+                        const auto handRightRectangle = getKeypointsRectangle(handKeypoints[1], person, thresholdRectangle);
+                        if (handRightRectangle.area() > 0)
+                            mHandRightPrevious.emplace_back(handRightRectangle);
+                    }
+                }
             }
         }
         catch (const std::exception& e)
@@ -232,7 +228,7 @@ namespace op
     ) const
     {
         std::array<unsigned int, (int)PosePart::Size> poseKeypoints;
-        for (auto i = 0 ; i < poseKeypoints.size() ; i++)
+        for (auto i = 0u ; i < poseKeypoints.size() ; i++)
             poseKeypoints.at(i) = poseBodyPartMapStringToKey(poseModel, poseStrings.at(i));
         return poseKeypoints;
     }

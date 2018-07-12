@@ -1,9 +1,9 @@
 #ifndef OPENPOSE_FACE_W_FACE_EXTRACTOR_HPP
 #define OPENPOSE_FACE_W_FACE_EXTRACTOR_HPP
 
-#include <memory> // std::shared_ptr
+#include <openpose/core/common.hpp>
+#include <openpose/face/faceRenderer.hpp>
 #include <openpose/thread/worker.hpp>
-#include "faceRenderer.hpp"
 
 namespace op
 {
@@ -29,10 +29,7 @@ namespace op
 
 
 // Implementation
-#include <openpose/utilities/errorAndLog.hpp>
-#include <openpose/utilities/macros.hpp>
 #include <openpose/utilities/pointerContainer.hpp>
-#include <openpose/utilities/profiler.hpp>
 namespace op
 {
     template<typename TDatums>
@@ -59,10 +56,10 @@ namespace op
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                 // Detect people face
                 for (auto& tDatum : *tDatums)
-                    tDatum.faceRectangles = spFaceDetector->detectFaces(tDatum.poseKeypoints, tDatum.scaleInputToOutput);
+                    tDatum.faceRectangles = spFaceDetector->detectFaces(tDatum.poseKeypoints);
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
-                Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__, Profiler::DEFAULT_X);
+                Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);
                 // Debugging log
                 dLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             }

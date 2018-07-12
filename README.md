@@ -1,196 +1,191 @@
-OpenPose
-====================================
+<div align="center">
+    <img src=".github/Logo_main_black.png", width="300">
+</div>
 
-## Latest News
-- Apr 2017: Body released!
-- May 2017: Windows version released!
-- Jun 2017: Face released!
-- Check all the [release notes](doc/release_notes.md).
-- Interested in an internship on CMU as OpenPose programmer? See [this link](https://docs.google.com/document/d/14SygG39NjIRZfx08clewTdFMGwVdtRu2acyCi3TYcHs/edit?usp=sharing) for details.
+-----------------
 
+| **`Linux`** |
+|-------------|
+|[![Build Status](https://travis-ci.org/CMU-Perceptual-Computing-Lab/openpose.svg?branch=master)](https://travis-ci.org/CMU-Perceptual-Computing-Lab/openpose)|
 
+[OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose) represents the **first real-time multi-person system to jointly detect human body, hand, and facial keypoints (in total 135 keypoints) on single images**.
 
-## Introduction
-
-OpenPose is a **library for real-time multi-person keypoint detection and multi-threading written in C++** using OpenCV and Caffe*, authored by [Gines Hidalgo](https://www.linkedin.com/in/gineshidalgo/), [Zhe Cao](http://www.andrew.cmu.edu/user/zhecao), [Tomas Simon](http://www.cs.cmu.edu/~tsimon/), [Shih-En Wei](https://scholar.google.com/citations?user=sFQD3k4AAAAJ&hl=en), [Hanbyul Joo](http://www.cs.cmu.edu/~hanbyulj/) and [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/).
-
-\* It uses Caffe, but the code is ready to be ported to other frameworks (Tensorflow, Torch, etc.). If you implement any of those, feel free to make a pull request!
-
-OpenPose represents the **first real-time system to jointly detect human body, hand and facial keypoints (in total 130 keypoints) on single images**. In addition, the system computational performance on body keypoint estimation is invariant to the number of detected people in the image.
-
-OpenPose is freely available for free non-commercial use, and may be redistributed under these conditions. Please, see the [license](LICENSE) for further details. Contact us for commercial purposes.
-
-
-
-Library main functionality:
-
-* Multi-person 15 or **18-keypoint body pose** estimation and rendering. **Running time invariant to number of people** on the image.
-
-* Multi-person **2x21-keypoint hand** estimation and rendering. Note: In this initial version, **running time** linearly **depends** on the **number of people** on the image. **Coming soon (in around 1-5 weeks)!**
-
-* Multi-person **70-keypoint face** estimation and rendering. Note: In this initial version, **running time** linearly **depends** on the **number of people** on the image.
-
-* Flexible and easy-to-configure **multi-threading** module.
-
-* Image, video, and webcam reader.
-
-* Able to save and load the results in various formats (JSON, XML, PNG, JPG, ...).
-
-* Small display and GUI for simple result visualization.
-
-* All the functionality is wrapped into a **simple-to-use OpenPose Wrapper class**.
-
-The pose estimation work is based on the C++ code from [the ECCV 2016 demo](https://github.com/CMU-Perceptual-Computing-Lab/caffe_rtpose), "Realtime Multiperson Pose Estimation", [Zhe Cao](http://www.andrew.cmu.edu/user/zhecao), [Tomas Simon](http://www.cs.cmu.edu/~tsimon/), [Shih-En Wei](https://scholar.google.com/citations?user=sFQD3k4AAAAJ&hl=en), [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/). The [full project repo](https://github.com/ZheC/Multi-Person-Pose-Estimation) includes Matlab and Python version, as well as training code.
-
-
-
-## Results
-
-### Body Estimation
-<p align="center">
-    <img src="doc/media/dance.gif", width="480">
-</p>
-
-### Body + Face Estimation
-<p align="center">
-    <img src="doc/media/pose_face.gif", width="480">
-</p>
-
-## Coming Soon (But Already Working!)
-
-### Body + Hands + Face Estimation
 <p align="center">
     <img src="doc/media/pose_face_hands.gif", width="480">
 </p>
 
-### Body + Hands
-<p align="center">
-    <img src="doc/media/pose_hands.gif", width="480">
-</p>
+## Features
+- **Functionality**:
+    - **2D real-time multi-person keypoint detection**:
+        - 15 or 18 or **25-keypoint body/foot keypoint estimation**. **Running time invariant to number of detected people**.
+        - **2x21-keypoint hand keypoint estimation**. Currently, **running time depends** on **number of detected people**.
+        - **70-keypoint face keypoint estimation**. Currently, **running time depends** on **number of detected people**.
+    - **3D real-time single-person keypoint detection**:
+        - 3-D triangulation from multiple single views.
+        - Synchronization of Flir cameras handled.
+        - Compatible with Flir/Point Grey cameras, but provided C++ demos to add your custom input.
+    - **Calibration toolbox**:
+        - Easy estimation of distortion, intrinsic, and extrinsic camera parameters.
+- **Input**: Image, video, webcam, Flir/Point Grey and IP camera. Included C++ demos to add your custom input.
+- **Output**: Basic image + keypoint display/saving (PNG, JPG, AVI, ...), keypoint saving (JSON, XML, YML, ...), and/or keypoints as array class.
+- **OS**: Ubuntu (14, 16), Windows (8, 10), Mac OSX, Nvidia TX2.
+- **Others**:
+    - Available: command-line demo, C++ wrapper, and C++ API.
+    - CUDA (Nvidia GPU), OpenCL (AMD GPU), and CPU versions.
+
+
+
+## Latest Features
+- Jun 2018: [**Combined body-foot model released! Faster and more accurate**](doc/installation.md)!
+- Jun 2018: [**Python API**](doc/modules/python_module.md) released!
+- Jun 2018: [**OpenCL/AMD graphic card version**](doc/installation.md) released!
+- Jun 2018: [**Calibration toolbox**](doc/modules/calibration_module.md) released!
+- Jun 2018: [**Mac OSX version (CPU)**](doc/installation.md) released!
+- Mar 2018: [**CPU version**](doc/installation.md#cpu-version)!
+- Mar 2018: [**3-D keypoint reconstruction module**](doc/modules/3d_reconstruction_module.md) (from multiple camera views)!
+- Sep 2017: [**CMake**](doc/installation.md) installer and **IP camera** support!
+- Jul 2017: [**Windows portable binaries and demo**](https://github.com/CMU-Perceptual-Computing-Lab/openpose/releases)!
+- Jul 2017: **Hands** released!
+- Jun 2017: **Face** released!
+
+For further details, check [all released features](doc/released_features.md) and [release notes](doc/release_notes.md).
+
 
 
 ## Contents
-1. [Installation, Reinstallation and Uninstallation](#installation-reinstallation-and-uninstallation)
-2. [Custom Caffe](#custom-caffe)
-3. [Quick Start](#quick-start)
-    1. [Demo](#demo)
-    2. [OpenPose Wrapper](#openpose-wrapper)
-    3. [OpenPose Library](#openpose-library)
-4. [Output](#output)
-5. [OpenPose Benchmark](#openpose-benchmark)
-6. [Send Us Your Feedback!](#send-us-your-feedback)
-7. [Citation](#citation)
-8. [Other Contributors](#other-contributors)
+1. [Latest Features](#latest-features)
+2. [Results](#results)
+3. [Installation, Reinstallation and Uninstallation](#installation-reinstallation-and-uninstallation)
+4. [Quick Start](#quick-start)
+5. [Output](#output)
+6. [Speeding Up OpenPose and Benchmark](#speeding-up-openpose-and-benchmark)
+7. [Send Us Failure Cases and Feedback!](#send-us-failure-cases-and-feedback)
+8. [Authors and Contributors](#authors-and-contributors)
+9. [Citation](#citation)
+10. [License](#license)
+
+
+
+## Results
+### Body-Foot Estimation
+<p align="center">
+    <img src="doc/media/dance_foot.gif", width="360">
+</p>
+
+### Body, Face, and Hands Estimation
+<p align="center">
+    <img src="doc/media/pose_face.gif", width="360">
+</p>
+
+### 3-D Reconstruction Module
+<p align="center">
+    <img src="doc/media/openpose3d.gif", width="360">
+</p>
+
+### Body and Hands Estimation
+<p align="center">
+    <img src="doc/media/pose_hands.gif", width="360">
+</p>
+
+### Body Estimation
+<p align="center">
+    <img src="doc/media/dance.gif", width="360">
+</p>
 
 
 
 ## Installation, Reinstallation and Uninstallation
-You can find the installation, reinstallation and uninstallation steps on: [doc/installation.md](doc/installation.md).
+**Windows portable version**: Simply download and use the latest version from the [Releases](https://github.com/CMU-Perceptual-Computing-Lab/openpose/releases) section.
 
-
-
-## Custom Caffe
-We only modified some Caffe compilation flags and minor details. You can use use your own Caffe distribution, these are the files we added and modified:
-
-1. Added files: `install_caffe.sh`; as well as `Makefile.config.Ubuntu14.example`, `Makefile.config.Ubuntu16.example`, `Makefile.config.Ubuntu14_cuda_7.example` and `Makefile.config.Ubuntu16_cuda_7.example` (extracted from `Makefile.config.example`). Basically, you must enable cuDNN.
-2. Edited file: Makefile. Search for "# OpenPose: " to find the edited code. We basically added the C++11 flag to avoid issues in some old computers.
-3. Optional - deleted Caffe file: `Makefile.config.example`.
-4. In order to link it to OpenPose:
-    1. Run `make all && make distribute` in your Caffe version.
-    2. Open the OpenPose Makefile config file: `./Makefile.config.UbuntuX.example` (where X depends on your OS and CUDA version).
-    3. Modify the Caffe folder directory variable (`CAFFE_DIR`) to your custom Caffe `distribute` folder location in the previous OpenPose Makefile config file.
+Otherwise, check [doc/installation.md](doc/installation.md) for instructions on how to build OpenPose from source.
 
 
 
 ## Quick Start
-Most users cases should not need to dive deep into the library, they might just be able to use the [Demo](#demo) or the simple [OpenPose Wrapper](#openpose-wrapper). So you can most probably skip the library details in [OpenPose Library](#openpose-library).
+Most users do not need the [OpenPose C++ API](#openpose-c-api), but they can simply use the basic [Demo](#demo) and/or [OpenPose Wrapper](#openpose-wrapper).
 
-
-
-#### Demo
-Your case if you just want to process a folder of images or video or webcam and display or save the pose results.
-
-Forget about the OpenPose library details and just read the [doc/demo_overview.md](doc/demo_overview.md) 1-page section.
-
-#### OpenPose Wrapper
-Your case if you want to read a specific format of image source and/or add a specific post-processing function and/or implement your own display/saving.
-
-(Almost) forget about the library, just take a look to the `Wrapper` tutorial on [examples/tutorial_wrapper/](examples/tutorial_wrapper/).
-
-Note: you should not need to modify OpenPose source code or examples, so that you can directly upgrade the OpenPose library anytime in the future without changing your code. You might create your custom code on [examples/user_code/](examples/user_code/) and compile it by using `make all` in the OpenPose folder.
-
-#### OpenPose Library
-Your case if you want to change internal functions and/or extend its functionality. First, take a look at the [Demo](#demo) and [OpenPose Wrapper](#openpose-wrapper). Second, read the 2 following subsections: OpenPose Overview and Extending Functionality.
-
-1. OpenPose Overview: Learn the basics about the library source code in [doc/library_overview.md](doc/library_overview.md).
-
-2. Extending Functionality: Learn how to extend the library in [doc/library_extend_functionality.md](doc/library_extend_functionality.md).
-
-3. Adding An Extra Module: Learn how to add an extra module in [doc/library_add_new_module.md](doc/library_add_new_module.md).
-
-#### Doxygen Documentation Autogeneration
-You can generate the documentation by running the following command. The documentation will be generated in `doc/doxygen/html/index.html`. You can simply open it with double click (your default browser should automatically display it).
+- **Demo**: To easily process images/video/webcam and display/save the results. See [doc/demo_overview.md](doc/demo_overview.md). E.g. run OpenPose in a video with:
 ```
-cd doc/
-doxygen doc_autogeneration.doxygen
+# Ubuntu
+./build/examples/openpose/openpose.bin --video examples/media/video.avi
+:: Windows - Portable Demo
+bin\OpenPoseDemo.exe --video examples\media\video.avi
 ```
+
+- **Calibration toolbox**: To easily calibrate your cameras for 3-D OpenPose or any other stereo vision task. See [doc/modules/calibration_module.md](doc/modules/calibration_module.md).
+
+- **OpenPose Wrapper**: If you want to read a specific input, and/or add your custom post-processing function, and/or implement your own display/saving, check the `Wrapper` tutorial on [examples/tutorial_wrapper/](examples/tutorial_wrapper/). You can create your custom code on [examples/user_code/](examples/user_code/) and quickly compile it with CMake when compiling the whole OpenPose project. Quickly **add your custom code**: See [examples/user_code/README.md](examples/user_code/README.md) for further details.
+
+- **OpenPose C++ API**: See [doc/library_introduction.md](doc/library_introduction.md).
+
+- **Adding an extra module**: Check [doc/library_add_new_module.md](./doc/library_add_new_module.md).
+
+- **Standalone face or hand detector**:
+    - **Face** keypoint detection **without body** keypoint detection: If you want to speed it up (but also reduce amount of detected faces), check the OpenCV-face-detector approach in [doc/standalone_face_or_hand_keypoint_detector.md](doc/standalone_face_or_hand_keypoint_detector.md).
+    - **Use your own face/hand detector**: You can use the hand and/or face keypoint detectors with your own face or hand detectors, rather than using the body detector. E.g. useful for camera views at which the hands are visible but not the body (OpenPose detector would fail). See [doc/standalone_face_or_hand_keypoint_detector.md](doc/standalone_face_or_hand_keypoint_detector.md).
+
+- **Library dependencies**: OpenPose uses default Caffe and OpenCV, as well as any Caffe dependency. The demos additionally use GFlags. It could easily be ported to other deep learning frameworks (Tensorflow, Torch, ...). Feel free to make a pull request if you implement any of those!
 
 
 
 ## Output
-Check the output (format, keypoint index ordering, etc.) in [doc/output.md](doc/output.md).
+Output (format, keypoint index ordering, etc.) in [doc/output.md](doc/output.md).
 
 
 
-## Speed Up OpenPose and Benchmark
-Check the OpenPose Benchmark and some hints to speed up OpenPose on [doc/installation.md#faq](doc/installation.md#faq).
+## Speeding Up OpenPose and Benchmark
+Check the OpenPose Benchmark as well as some hints to speed up and/or reduce the memory requirements for OpenPose on [doc/faq.md#speed-up-memory-reduction-and-benchmark](doc/faq.md#speed-up-memory-reduction-and-benchmark).
 
 
 
-## Send Us Your Feedback!
+## Send Us Failure Cases and Feedback!
 Our library is open source for research purposes, and we want to continuously improve it! So please, let us know if...
 
-1. ... you find any bug (in functionality or speed).
+1. ... you find videos or images where OpenPose does not seems to work well. Feel free to send them to openposecmu@gmail.com (email only for failure cases!), we will use them to improve the quality of the algorithm!
+2. ... you find any bug (in functionality or speed).
+3. ... you added some functionality to some class or some new Worker<T> subclass which we might potentially incorporate.
+4. ... you know how to speed up or improve any part of the library.
+5. ... you have a request about possible functionality.
+6. ... etc.
 
-2. ... you added some functionality to some class or some new Worker<T> subclass which we might potentially incorporate.
+Just comment on GitHub or make a pull request and we will answer as soon as possible! Send us an email if you use the library to make a cool demo or YouTube video!
 
-3. ... you know how to speed up or improve any part of the library.
 
-4. ... you have a request about possible functionality.
 
-5. ... etc.
+## Authors and Contributors
+OpenPose is authored by [Gines Hidalgo](https://www.gineshidalgo.com/), [Zhe Cao](http://www.andrew.cmu.edu/user/zhecao), [Tomas Simon](http://www.cs.cmu.edu/~tsimon/), [Shih-En Wei](https://scholar.google.com/citations?user=sFQD3k4AAAAJ&hl=en), [Hanbyul Joo](http://www.cs.cmu.edu/~hanbyulj/), and [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/). Currently, it is being maintained by [Gines Hidalgo](https://www.gineshidalgo.com/) and [Yaadhav Raaj](https://www.linkedin.com/in/yaadhavraaj). The [original CVPR 2017 repo](https://github.com/ZheC/Multi-Person-Pose-Estimation) includes Matlab and Python versions, as well as the training code. The body pose estimation work is based on [the original ECCV 2016 demo](https://github.com/CMU-Perceptual-Computing-Lab/caffe_rtpose).
 
-Just comment on GibHub or make a pull request and we will answer as soon as possible! Send us an email if you use the library to make a cool demo or YouTube video!
+In addition, OpenPose would not be possible without the [CMU Panoptic Studio dataset](http://domedb.perception.cs.cmu.edu/).
+
+We would also like to thank all the people who helped OpenPose in any way. The main contributors are listed in [doc/contributors.md](doc/contributors.md).
 
 
 
 ## Citation
-Please cite the papers in your publications if it helps your research:
+Please cite these papers in your publications if it helps your research (the face keypoint detector was trained using the same procedure described in [Simon et al. 2017]):
 
     @inproceedings{cao2017realtime,
       author = {Zhe Cao and Tomas Simon and Shih-En Wei and Yaser Sheikh},
       booktitle = {CVPR},
       title = {Realtime Multi-Person 2D Pose Estimation using Part Affinity Fields},
       year = {2017}
-      }
+    }
 
     @inproceedings{simon2017hand,
       author = {Tomas Simon and Hanbyul Joo and Iain Matthews and Yaser Sheikh},
       booktitle = {CVPR},
       title = {Hand Keypoint Detection in Single Images using Multiview Bootstrapping},
       year = {2017}
-      }
+    }
 
     @inproceedings{wei2016cpm,
       author = {Shih-En Wei and Varun Ramakrishna and Takeo Kanade and Yaser Sheikh},
       booktitle = {CVPR},
       title = {Convolutional pose machines},
       year = {2016}
-      }
+    }
 
 
 
-## Other Contributors
-We would like to thank the following people who also contributed to OpenPose:
-
-1. [Helen Medina](https://github.com/helen-medina): For moving OpenPose to Windows (Visual Studio), making it work there and creating the Windows branch.
+## License
+OpenPose is freely available for free non-commercial use, and may be redistributed under these conditions. Please, see the [license](LICENSE) for further details. [Interested in a commercial license? Check this link](https://flintbox.com/public/project/47343/). For commercial queries, contact [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/).

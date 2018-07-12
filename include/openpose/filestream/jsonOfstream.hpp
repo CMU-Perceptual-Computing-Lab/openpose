@@ -2,12 +2,11 @@
 #define OPENPOSE_FILESTREAM_JSON_OFSTREAM_HPP
 
 #include <fstream> // std::ofstream
-#include <string>
-#include <openpose/utilities/macros.hpp>
+#include <openpose/core/common.hpp>
 
 namespace op
 {
-    class JsonOfstream
+    class OP_API JsonOfstream
     {
     public:
         explicit JsonOfstream(const std::string& filePath, const bool humanReadable = true);
@@ -21,6 +20,8 @@ namespace op
         void arrayOpen();
 
         void arrayClose();
+
+        void version(const std::string& version);
 
         void key(const std::string& string);
 

@@ -1,230 +1,411 @@
-OpenPose Library - Compilation and Installation
-====================================
+OpenPose - Installation
+==========================
 
 ## Contents
-1. [Requirements](#requirements)
-2. [Ubuntu](#ubuntu)
-3. [Windows](#windows)
-4. [Quick Start](#quick-start)
-5. [FAQ](#faq)
+1. [Windows Portable Demo](#windows-portable-demo)
+2. [Operating Systems](#operating-systems)
+3. [Requirements](#requirements)
+4. [Clone OpenPose](#clone-openpose)
+5. [Update OpenPose](#update-openpose)
+6. [Installation](#installation)
+7. [Reinstallation](#reinstallation)
+8. [Uninstallation](#uninstallation)
+9. [Optional Settings](#optional-settings)
+    1. [Profiling Speed](#profiling-speed)
+    2. [COCO and MPI Models](#coco-and-mpi-models)
+    3. [Python API](#python-api)
+    4. [CPU Version](#cpu-version)
+    5. [Mac OSX Version](#mac-osx-version)
+    6. [OpenCL Version](#opencl-version)
+    7. [3D Reconstruction Module](#3d-reconstruction-module)
+    8. [Calibration Module](#calibration-module)
+    9. [Compiling without cuDNN](#compiling-without-cudnn)
+    10. [Custom Caffe (Ubuntu Only)](#custom-caffe-ubuntu-only)
+    11. [Custom OpenCV (Ubuntu Only)](#custom-opencv-ubuntu-only)
+    12. [Doxygen Documentation Autogeneration (Ubuntu Only)](#doxygen-documentation-autogeneration-ubuntu-only)
+    13. [CMake Command Line Configuration (Ubuntu Only)](#cmake-command-line-configuration-ubuntu-only)
+
+
+
+## Windows Portable Demo
+This installation section is only intended if you plan to modify the OpenPose code or integrate it with another library or project. If you just want to use the OpenPose demo in Windows, simply use the latest version of the OpenPose binaries which you can find in the [Releases](https://github.com/CMU-Perceptual-Computing-Lab/openpose/releases) section.
+
+**NOTE**: Read the `Instructions.txt` to learn to download the models required by OpenPose (about 500 Mb).
+
+
+
+## Operating Systems
+- **Ubuntu** 14 and 16.
+- **Windows** 8 and 10.
+- **Mac OSX** Mavericks and above (only CPU version).
+- **Nvidia Jetson TX2**, installation instructions in [doc/installation_jetson_tx2.md](./installation_jetson_tx2.md).
+- OpenPose has also been used on **Windows 7**, **CentOS**, and **Nvidia Jetson (TK1 and TX1)** embedded systems. However, we do not officially support them at the moment.
+
+
 
 
 
 ## Requirements
-- Ubuntu (tested on 14 and 16) or Windows (tested on 10). We do not support any other OS but the community has been able to install it on: CentOS, Windows 7, and Windows 8.
-- NVIDIA graphics card with at least 1.6 GB available (the `nvidia-smi` command checks the available GPU memory in Ubuntu).
-- CUDA and cuDNN installed. Note: We found OpenPose working with cuDNN 5.1 ~10% faster than with cuDNN 6.
-- At least 2 GB of free RAM memory.
-- Highly recommended: A CPU with at least 8 cores.
+Requirements for the default configuration (you might need more resources with a greater `--net_resolution` and/or `scale_number` or less resources by reducing the net resolution and/or using the MPI and MPI_4 models):
 
-Note: These requirements assume the default configuration (i.e. `--net_resolution "656x368"` and `num_scales 1`). You might need more (with a greater net resolution and/or number of scales) or less resources (with smaller net resolution and/or using the MPI and MPI_4 models).
-
-
-
-
-
-## Ubuntu
-### Installation - Script Compilation
-**Highly important**: This script only works with CUDA 8 and Ubuntu 14 or 16. Otherwise, check [Manual Compilation](#manual-compilation).
-1. Required: CUDA, cuDNN, OpenCV and Atlas must be already installed on your machine.
-    1. OpenCV can be installed with `apt-get install libopencv-dev`. If you have compiled OpenCV 3 by your own, follow [Manual Compilation](#manual-compilation). After both Makefile.config files have been generated, edit them and uncomment the line `# OPENCV_VERSION := 3`. You might alternatively modify all `Makefile.config.UbuntuXX` files and then run the scripts in step 2.
-    2. In addition, OpenCV 3 does not incorporate the `opencv_contrib` module by default. Assuming you have OpenCV 3 compiled with the contrib module and you want to use it, append `opencv_contrib` at the end of the line `LIBRARIES += opencv_core opencv_highgui opencv_imgproc` in the `Makefile` file.
-    3. Atlas can be installed with `sudo apt-get install libatlas-base-dev`. Instead of Atlas, you can use OpenBLAS or Intel MKL by modifying the line `BLAS := atlas` in the same way as previosuly mentioned for the OpenCV version selection.
-2. Build Caffe & the OpenPose library + download the required Caffe models for Ubuntu 14.04 or 16.04 (auto-detected for the script) and CUDA 8:
-```
-chmod u+x install_caffe_and_openpose.sh
-./install_caffe_and_openpose.sh
-```
-
-
-
-### Installation - Manual Compilation
-Alternatively to the script installation, if you want to use CUDA 7, avoid using sh scripts, change some configuration labels (e.g. OpenCV version), etc., then:
-1. Install the [Caffe prerequisites](http://caffe.berkeleyvision.org/installation.html).
-2. Compile Caffe and OpenPose by running these lines:
-    ```
-    ### Install Caffe ###
-    cd 3rdparty/caffe/
-    # Select your desired Makefile file (run only one of the next 4 commands)
-    cp Makefile.config.Ubuntu14_cuda_7.example Makefile.config # Ubuntu 14, cuda 7
-    cp Makefile.config.Ubuntu14.example Makefile.config # Ubuntu 14, cuda 8
-    cp Makefile.config.Ubuntu16_cuda_7.example Makefile.config # Ubuntu 16, cuda 7
-    cp Makefile.config.Ubuntu16.example Makefile.config # Ubuntu 16, cuda 8
-    # Change any custom flag from the resulting Makefile.config (e.g. OpenCV 3, Atlas/OpenBLAS/MKL, etc.)
-    # Compile Caffe
-    make all -j${number_of_cpus} && make distribute -j${number_of_cpus}
-
-    ### Install OpenPose ###
-    cd ../../models/
-    ./getModels.sh # It just downloads the Caffe trained models
-    cd ..
-    # Same file cp command as the one used for Caffe
-    cp Makefile.config.Ubuntu14_cuda_7.example Makefile.config
-    # Change any custom flag from the resulting Makefile.config (e.g. OpenCV 3, Atlas/OpenBLAS/MKL, etc.)
-    make all -j${number_of_cpus}
-    ```
-
-    NOTE: If you want to use your own Caffe distribution, follow the steps on `Custom Caffe` section and later re-compile the OpenPose library:
-    ```
-    chmod u+x install_openpose.sh
-    ./install_openpose.sh
-    ```
-    Note: These steps only need to be performed once. If you are interested in making changes to the OpenPose library, you can simply recompile it with:
-    ```
-    make clean
-    make all -j$(NUM_CORES)
-    ```
-**Highly important**: There are 2 `Makefile.config.Ubuntu##.example` analogous files, one in the main folder and one in [3rdparty/caffe/](../3rdparty/caffe/), corresponding to OpenPose and Caffe configuration files respectively. Any change must be done to both files (e.g. OpenCV 3 flag, Atlab/OpenBLAS/MKL flag, etc.). E.g. for CUDA 8 and Ubuntu16: [3rdparty/caffe/Makefile.config.Ubuntu16.example](../3rdparty/caffe/Makefile.config.Ubuntu16.example) and [Makefile.config.Ubuntu16.example](../Makefile.config.Ubuntu16.example).
-
-
-
-### Reinstallation
-If you updated some software that our library or 3rdparty use, or you simply want to reinstall it:
-1. Clean the OpenPose and Caffe compilation folders:
-```
-make clean && cd 3rdparty/caffe && make clean
-```
-2. Repeat the [Installation](#installation) steps.
-
-
-
-### Uninstallation
-You just need to remove the OpenPose folder, by default called `openpose/`. E.g. `rm -rf openpose/`.
+- Nvidia GPU version:
+    - NVIDIA graphics card with at least 1.6 GB available (the `nvidia-smi` command checks the available GPU memory in Ubuntu).
+    - At least 2.5 GB of free RAM memory for BODY_25 model or 2 GB for COCO model (assuming cuDNN installed).
+    - Highly recommended: cuDNN.
+ - AMD GPU version:
+    - Vega series graphics card
+    - At least 2 GB of free RAM memory.
+- CPU version:
+    - Around 8GB of free RAM memory.
+- Highly recommended: a CPU with at least 8 cores.
 
 
 
 
 
-## Windows
-### Installation - Demo
-1. Install the pre-requisites:
-    1. [Microsoft Visual C++ 2015 Redistributable](https://www.microsoft.com/en-us/download/details.aspx?id=53587) (lighter) or Microsoft Visual Studio 2015 (in case you intend to install the library).
-    2. [CUDA 8](https://developer.nvidia.com/cuda-downloads): Install it on the default location, C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0. Otherwise, modify the Visual Studio project solution accordingly.
-    3. [cuDNN 5.1](https://developer.nvidia.com/cudnn): Once you have downloaded it, just unzip it and copy (merge) the contents on the CUDA folder, C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0.
-2. Download the portable demo from: [posefs1.perception.cs.cmu.edu/OpenPose/openpose_1.0.0rc2.zip](http://posefs1.perception.cs.cmu.edu/OpenPose/openpose_1.0.0rc2.zip).
+## Clone OpenPose
+The first step is to clone the OpenPose repository.
 
-### Installation - Library
-1. Install the pre-requisites:
-    1. Microsoft Visual Studio (VS) 2015. Install CUDA 8.0 after Visual Studio 2015 is installed to assure that the CUDA installation will generate all necessary files for VS. If CUDA was already installed, re-install it after installing VS!
-    2. Install all the demo pre-requisites.
-    3. [Python 2.4.13 64 bits - Windows x86-64 MSI installer](https://www.python.org/downloads/release/python-2713/).
-        - Install it on C:\Python27 (default) or D:\Programs\Python27. Otherwise, modify the VS solution accordingly.
-        - In addition, open the Windows cmd (Windows button + X, then A), and install some Python libraries with this command: `pip install numpy protobuf hypothesis`.
-    4. [Cmake](https://cmake.org/download/): Select the option to add it to the Windows PATH.
-    5. [Ninja](https://ninja-build.org/): Select the option to add it to the Windows PATH.
-2. Download the `Windows` branch of Openpose by either cliking on `Download ZIP` on [openpose/tree/windows](https://github.com/CMU-Perceptual-Computing-Lab/openpose/tree/windows) or cloning the repository: `git clone https://github.com/CMU-Perceptual-Computing-Lab/openpose/ && cd openpose && git checkout windows`.
-3. Install Caffe on Windows:
-    1. Open the Windows cmd (Windows button + X, then A).
-    2. Go to the Caffe directory, assuming OpenPose has been downloaded on `C:\openpose`: `cd C:\openpose\3rdparty\caffe\caffe-windows`.
-    3. Compile Caffe by running: `scripts\build_win.cmd`. It will take several minutes.
-        - Note: If Caffe asks you: `Does D:\openpose\3rdparty\caffe\caffe-windows\build\..\..\include\caffe specify a file name or directory name on the target (F = file, D = directory)?`, select `D`.
-    4. If you find any problem installing Caffe, check [http://caffe.berkeleyvision.org/](http://caffe.berkeleyvision.org/).
-4. You can now open the Visual Studio sln file located on `{openpose_path}\windows_project\OpenPose.sln`.
-5. In order to verify OpenPose is working, try compiling and executing the demo:
-    1. Right click on `OpenPoseDemo` --> `Set as StartUp Project`.
-    2. Change `Debug` by `Release` mode.
-    3. You can now compile it.
-6. Download the body pose models:
-    1. Download the [COCO model (18 key-points)](http://posefs1.perception.cs.cmu.edu/Users/tsimon/Projects/coco/data/models/coco/pose_iter_440000.caffemodel) as `{openpose_folder}\models\pose\coco\pose_iter_440000.caffemodel`.
-    2. (Optionally) download the [MPI model (15 key-points, faster and less memory than COCO)](http://posefs1.perception.cs.cmu.edu/Users/tsimon/Projects/coco/data/models/mpi/pose_iter_160000.caffemodel) as `{openpose_folder}\models\pose\mpi\pose_iter_160000.caffemodel`.
-7. If you have a webcam connected, you can test it by pressing the F5 key or the green play icon.
-8. Otherwise, check [Quick Start](#quick-start) to verify OpenPose was properly compiled. In order to use the created exe from the command line, you have to:
-    1. Copy all the DLLs located on `{openpose_folder}\3rdparty\caffe\caffe-windows\build\install\bin\` on the exe folder: `{openpose_folder}\windows_project\x64\Release`.
-    2. Copy `opencv_ffmpeg310_64.dll`, `opencv_video310.dll` and `opencv_videoio310.dll` from `{openpose_folder}\3rdparty\caffe\dependencies\libraries_v140_x64_py27_1.1.0\libraries\x64\vc14\bin\` on the exe folder: `{openpose_folder}\windows_project\x64\Release`.
-
-
-
-
-
-## Quick Start
-Check that the library is working properly by using any of the following commands. Note that `examples/media/video.avi` and `examples/media` exist, so you do not need to change the paths. In addition, the following commands assume your terminal (Ubuntu) or cmd (Windows) are located in the OpenPose folder.
-
-**1. Running on Video**
-```
-# Ubuntu
-./build/examples/openpose/openpose.bin --video examples/media/video.avi
-```
-```
-:: Windows - Demo
-bin\OpenPoseDemo.exe --video examples/media/video.avi
-```
-```
-:: Windows - Library
-windows_project\x64\Release\OpenPoseDemo.exe --video examples/media/video.avi
+1. Windows: You might use [GitHub Desktop](https://desktop.github.com/).
+2. Ubuntu:
+```bash
+git clone https://github.com/CMU-Perceptual-Computing-Lab/openpose
 ```
 
-**2. Running on Webcam**
-```
-# Ubuntu
-./build/examples/openpose/openpose.bin
-```
-```
-:: Windows - Demo
-bin\OpenPoseDemo.exe
-```
-```
-:: Windows - Library
-windows_project\x64\Release\OpenPoseDemo.exe
-```
 
-**3. Running on Images**
-```
-# Ubuntu
-./build/examples/openpose/openpose.bin --image_dir examples/media/
-```
-```
-:: Windows - Demo
-bin\OpenPoseDemo.exe --image_dir examples/media/
-```
-```
-:: Windows - Library
-windows_project\x64\Release\OpenPoseDemo.exe --image_dir examples/media/
-```
 
-**4. Body Pose and Face Keypoint Detector (e.g. on Video)**
-```
-# Ubuntu
-./build/examples/openpose/openpose.bin --video examples/media/video.avi --face
-```
-```
-:: Windows - Demo
-bin\OpenPoseDemo.exe --video examples/media/video.avi --face
-```
-```
-:: Windows - Library
-windows_project\x64\Release\OpenPoseDemo.exe --video examples/media/video.avi --face
-```
 
-The visual GUI should show the original image with the poses blended on it, similarly to the pose of this gif:
+
+## Update OpenPose
+OpenPose can be easily updated by:
+
+1. Download the latest changes:
+    1. Windows: Clicking the `synchronization` button at the top-right part in GitHub Desktop in Windows.
+    2. Ubuntu: running `git pull origin master`.
+2. Perform the [Reinstallation](#reinstallation) section described below.
+
+
+
+
+
+## Installation
+The instructions in this section describe the steps to build OpenPose using CMake (GUI). There are 3 main steps:
+
+1. [Prerequisites](#prerequisites)
+2. [OpenPose Configuration](#openpose-configuration)
+3. [OpenPose Building](#openpose-building)
+4. [Run OpenPose](#run-openpose)
+5. [OpenPose from other Projects (Ubuntu and Mac)](#openpose-from-other-projects-ubuntu-and-mac)
+
+
+
+### Prerequisites
+1. Download and install CMake GUI:
+    - Ubuntu: run the command `sudo apt-get install cmake-qt-gui`. Note: If you prefer to use CMake through the command line, see [Cmake Command Line Build](#cmake-command-line-build-ubuntu-only).
+    - Windows: download and install the latest CMake win64-x64 msi installer from the [CMake website](https://cmake.org/download/), called `cmake-X.X.X-win64-x64.msi`.
+    - Mac: `brew cask install cmake`.
+2. Windows - **Microsoft Visual Studio (VS) 2015 Enterprise Update 3**:
+    - If **Visual Studio 2017 Community** is desired, we do not officially support it, but it might be compiled by firstly [enabling CUDA 8.0 in VS2017](https://stackoverflow.com/questions/43745099/using-cuda-with-visual-studio-2017?answertab=active#tab-top) or use **VS2017 with CUDA 9** by checking the `.vcxproj` file and changing the necessary paths from CUDA 8 to 9.
+    - VS 2015 Enterprise Update 1 will give some compiler errors and VS 2015 Community has not been tested.
+3. Nvidia GPU version prerequisites:
+    1. [**CUDA 8**](https://developer.nvidia.com/cuda-80-ga2-download-archive):
+        - Ubuntu: Run `sudo ubuntu/install_cuda.sh` or alternatively download and install it from their website.
+        - Windows: Install CUDA 8.0 after Visual Studio 2015 is installed to assure that the CUDA installation will generate all necessary files for VS. If CUDA was already installed, re-install CUDA after installing VS!
+        - **IMPORTANT**: As of a recent Windows update, you have to download the Nvidia [drivers](http://www.nvidia.com/Download/index.aspx) drivers first, and then install CUDA without the Graphics Driver flag or else your system might hang.
+    2. [**cuDNN 5.1**](https://developer.nvidia.com/cudnn):
+        - Ubuntu: Run `sudo ubuntu/install_cudnn.sh` or alternatively download and install it from their website.
+        - Windows (and Ubuntu if manual installation): In order to manually install it, just unzip it and copy (merge) the contents on the CUDA folder, usually `/usr/local/cuda/` in Ubuntu and `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0` in Windows.
+4. AMD GPU version prerequisites:
+    1. Download official AMD drivers for Windows from [**AMD - Windows**](https://support.amd.com/en-us/download).
+    2. Download 3rd party ROCM driver for Ubuntu from [**AMD - OpenCL**](https://rocm.github.io/ROCmInstall.html).
+    3. Ubuntu only: Install `sudo apt-get install libviennacl-dev`. This comes packaged inside OpenPose for Windows.
+    4. AMD Drivers have not been tested on OSX. Please email us if you wish to test it. This has only been tested on Vega series cards.
+5. Ubuntu - Other prerequisites:
+    - Caffe prerequisites: By default, OpenPose uses Caffe under the hood. If you have not used Caffe previously, install its dependencies by running `sudo bash ./ubuntu/install_cmake.sh`.
+    - OpenCV must be already installed on your machine. It can be installed with `apt-get install libopencv-dev`. You can also use your own compiled OpenCV version.
+6. Windows - **Caffe, OpenCV, and Caffe prerequisites**:
+    - CMake automatically downloads all the Windows DLLs. Alternatively, you might prefer to download them manually:
+        - Models:
+            - [COCO model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/coco/pose_iter_440000.caffemodel): download in `models/pose/coco/`.
+            - [MPI model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/mpi/pose_iter_160000.caffemodel): download in `models/pose/mpi/`.
+            - [Face model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/face/pose_iter_116000.caffemodel): download in `models/face/`.
+            - [Hands model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/hand/pose_iter_102000.caffemodel): download in `models/hand/`.
+        - Dependencies:
+            - Note: Leave the zip files in `3rdparty/windows/` so that CMake does not try to download them again.
+            - [Caffe](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe_2018_01_18.zip): Unzip as `3rdparty/windows/caffe/`.
+            - [Caffe dependencies](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe3rdparty_2017_07_14.zip): Unzip as `3rdparty/windows/caffe3rdparty/`.
+            - [OpenCV 3.1](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/opencv_310.zip): Unzip as `3rdparty/windows/opencv/`.
+7. Mac - **Caffe, OpenCV, and Caffe prerequisites**:
+    - Install deps by running `bash 3rdparty/osx/install_deps.sh` on your terminal.
+8. **Eigen prerequisite**:
+    - Note: This step is optional, only required for some specific extra functionality, such as extrinsic camera calibration.
+    - If you enable the `WITH_EIGEN` flag when running CMake. You can either:
+        1. Do not do anything if you set the `WITH_EIGEN` flag to `BUILD`, CMake will automatically download Eigen. Alternatively, you might prefer to download it manually:
+            - [Eigen3](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/eigen_2018_05_23.zip): Unzip as `3rdparty/eigen/`.
+        2. Run `sudo apt-get install libeigen3-dev` (Ubuntu only) if you prefer to set `WITH_EIGEN` to `APT_GET` (Ubuntu only).
+        3. Use your own version of Eigen by setting `WITH_EIGEN` to `BUILD`, run CMake so that OpenPose downloads the zip file, and then replace the contents of `3rdparty/eigen/` by your own version.
+
+
+
+### OpenPose Configuration
+1. Open CMake GUI and select the OpenPose directory as project source directory, and a non-existing or empty sub-directory (e.g., `build`) where the Makefile files (Ubuntu) or Visual Studio solution (Windows) will be generated. If `build` does not exist, it will ask you whether to create it. Press `Yes`.
 <p align="center">
-    <img src="media/shake.gif", width="720">
+    <img src="media/cmake_installation/im_1.png", width="480">
+    <img src="media/cmake_installation/im_1_windows.png", width="480">
 </p>
 
-If you choose to visualize a body part or a PAF (Part Affinity Field) heat map with the command option `--part_to_show`, the result should be similar to one of the following images:
+2. Press the `Configure` button, keep the generator in `Unix Makefile` (Ubuntu) or set it to `Visual Studio 14 2015 Win64` (Windows), and press `Finish`.
 <p align="center">
-    <img src="media/body_heat_maps.png", width="720">
+    <img src="media/cmake_installation/im_2.png", width="240">
+    <img src="media/cmake_installation/im_2_windows.png", width="240">
 </p>
 
+3. If this step is successful, the `Configuring done` text will appear in the bottom box in the last line. Otherwise, some red text will appear in that same bottom box.
 <p align="center">
-    <img src="media/paf_heat_maps.png", width="720">
+    <img src="media/cmake_installation/im_3.png", width="480">
+    <img src="media/cmake_installation/im_3_windows.png", width="480">
+</p>
+
+4. Press the `Generate` button and proceed to [OpenPose Building](#openpose-building). You can now close CMake.
+
+Note: If you prefer to use your own custom Caffe or OpenCV versions, see [Custom Caffe](#custom-caffe) or [Custom OpenCV](#custom-opencv) respectively.
+
+
+
+### OpenPose Building
+#### Ubuntu and Mac
+Finally, build the project by running the following commands.
+```
+cd build/
+make -j`nproc`
+```
+
+#### Windows
+In order to build the project, open the Visual Studio solution (Windows), called `build/OpenPose.sln`. Then, set the configuration from `Debug` to `Release` and press the green triangle icon (alternatively press <kbd>F5</kbd>).
+
+**VERY IMPORTANT NOTE**: In order to use OpenPose outside Visual Studio, and assuming you have not unchecked the `BUILD_BIN_FOLDER` flag in CMake, copy all DLLs from `{build_directory}/bin` into the folder where the generated `openpose.dll` and `*.exe` demos are, e.g., `{build_directory}x64/Release` for the 64-bit release version.
+
+
+
+### Run OpenPose
+Check OpenPose was properly installed by running it on the default images, video, or webcam: [doc/quick_start.md#quick-start](./quick_start.md#quick-start).
+
+
+
+### OpenPose from other Projects (Ubuntu and Mac)
+If you only intend to use the OpenPose demo, you might skip this step. This step is only recommended if you plan to use the OpenPose API from other projects.
+
+To install the OpenPose headers and libraries into the system environment path (e.g. `/usr/local/` or `/usr/`), run the following command.
+```
+cd build/
+sudo make install
+```
+
+Once the installation is completed, you can use OpenPose in your other project using the `find_package` cmake command. Below, is a small example `CMakeLists.txt`. In order to use this script, you also need to copy `FindGFlags.cmake` and `FindGlog.cmake` into your `<project_root_directory>/cmake/Modules/` (create the directory if necessary).
+```
+cmake_minimum_required(VERSION 2.8.7)
+
+add_definitions(-std=c++11)
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
+
+find_package(GFlags)
+find_package(Glog)
+find_package(OpenCV)
+find_package(OpenPose REQUIRED)
+
+include_directories(${OpenPose_INCLUDE_DIRS} ${GFLAGS_INCLUDE_DIR} ${GLOG_INCLUDE_DIR} ${OpenCV_INCLUDE_DIRS})
+
+add_executable(example.bin example.cpp)
+
+target_link_libraries(example.bin ${OpenPose_LIBS} ${GFLAGS_LIBRARY} ${GLOG_LIBRARY} ${OpenCV_LIBS})
+```
+
+If Caffe was built with OpenPose, it will automatically find it. Otherwise, you will need to link Caffe again as shown below (otherwise, you might get an error like `/usr/bin/ld: cannot find -lcaffe`).
+```
+link_directories(<path_to_caffe_installation>/caffe/build/install/lib)
+```
+
+
+
+## Reinstallation
+In order to re-install OpenPose:
+1. (Ubuntu and Mac) If you ran `sudo make install`, then run `sudo make uninstall` in `build/`.
+2. Delete the `build/` folder.
+3. In CMake GUI, click on `File` --> `Delete Cache`.
+4. Follow the [Installation](#installation) steps again.
+
+
+
+## Uninstallation
+In order to uninstall OpenPose:
+1. (Ubuntu and Mac) If you ran `sudo make install`, then run `sudo make uninstall` in `build/`.
+2. Remove the OpenPose folder.
+
+
+
+### Optional Settings
+#### Profiling Speed
+OpenPose displays the FPS in the basic GUI. However, more complex speed metrics can be obtained from the command line while running OpenPose. In order to obtain those, compile OpenPose with the `PROFILER_ENABLED` flag. OpenPose will automatically display time measurements for each subthread after processing `F` frames (by default `F = 1000`, but it can be modified with the `--profile_speed` flag).
+
+- Time measurement for 1 graphic card: The FPS will be the slowest time displayed in your terminal command line (as OpenPose is multi-threaded). Times are in milliseconds, so `FPS = 1000/millisecond_measurement`.
+- Time measurement for >1 graphic cards: Assuming `n` graphic cards, you will have to wait up to `n` x `F` frames to visualize each graphic card speed (as the frames are splitted among them). In addition, the FPS would be: `FPS = minFPS(speed_per_GPU/n, worst_time_measurement_other_than_GPUs)`. For < 4 GPUs, this is usually `FPS = speed_per_GPU/n`.
+
+
+
+#### COCO and MPI Models
+By default, the body COCO and MPI models are not downloaded. You can download them by turning on the `DOWNLOAD_BODY_COCO_MODEL` or `DOWNLOAD_BODY_MPI_MODEL` flags. It's slightly faster but less accurate and has less keypoints than the COCO body model.
+
+
+
+#### Python API
+To install the Python API, ensure that the `BUILD_PYTHON` flag is turned on while running CMake GUI. Check [doc/modules/python_module.md](./modules/python_module.md) for further details.
+
+
+
+#### CPU Version
+To manually select the CPU Version, open CMake GUI mentioned above, and set the `GPU_MODE` flag to `CPU_ONLY`. **NOTE: Accuracy of the CPU version is ~1% higher than CUDA version, so the results will vary.**
+
+- On Ubuntu, OpenPose will link against the Intel MKL version (Math Kernel Library) of Caffe. Alternatively, the user can choose his own Caffe version, by unselecting `USE_MKL` and selecting his own Caffe path.
+- On Windows, it will use the default version of Caffe or one provided by the user on the CPU.
+
+The default CPU version takes ~0.2 images per second on Ubuntu (~50x slower than GPU) while the MKL version provides a roughly 2x speedup at ~0.4 images per second. As of now OpenPose does not support MKL on Windows but will at a later date. Also, MKL version does not support unfixed resolution. So a folder of images of different resolutions requires a fixed net resolution (e.g., `--net_resolution 656x368`).
+
+The user can configure the environmental variables `MKL_NUM_THREADS` and `OMP_NUM_THREADS`. They are set at an optimum parameter level by default (i.e., to the number of threads of the machine). However, they can be tweak by running the following commands into the terminal window, right before running any OpenPose application. Eg:
+```
+# Optimal number = Number of threads (used by default)
+export MKL_NUM_THREADS="8"
+export OMP_NUM_THREADS="8"
+```
+
+Do note that increasing the number of threads results in more memory use. You can check the [OpenPose benchmark](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/faq.md#speed-up-and-benchmark) for more information about speed and memory requirements in several CPUs and GPUs.
+
+
+
+#### Mac OSX Version
+Note: Current OSX has only been tested with the CPU Version, and hence must be compiled with the `CPU_ONLY` flag, which is set by default for Mac devices. If you want to test our Mac GPU version, email gines@cmu.edu and ryaadhav@andrew.cmu.edu with your Mac model and hardware configuration (OS version, GPU and CPU model, and total RAM memory).
+
+If the default installation fails (i.e., the one explained above), instal Caffe separately and set `BUILD_CAFFE` to false in the CMake config. Steps:
+- Re-create the build folder: `rm -rf build; mkdir build; cd build`.
+- `brew uninstall caffe` to remove the version of Caffe previously installed via cmake.
+- `brew install caffe` to install Caffe separately.
+- Run `cmake-gui` and make the following adjustments to the cmake config:
+    1. `BUILD_CAFFE` set to false.
+    2. `Caffe_INCLUDE_DIRS` set to `/usr/local/include/caffe`.
+    3. `Caffe_LIBS` set to `/usr/local/lib/libcaffe.dylib`.
+    4. Run `Configure` and `Generate` from CMake GUI.
+
+
+
+#### OpenCL Version
+If you have an AMD graphics card, you can compile OpenPose with the OpenCL option. To manually select the OpenCL Version, open CMake GUI mentioned above, and set the `GPU_MODE` flag to `OPENCL`.
+
+The OpenCL version has been tested on Ubuntu and Windows. This has been tested only on AMD Vega series and NVIDIA 10 series graphics cards. Please email us if you have issues with other operating systems or graphics cards.
+
+Lastly, OpenCL version does not support unfixed `--net_resolution`. So a folder of images of different resolutions with OpenPose, requires the `--net_resolution 656x368` flag for example. This should be fixed by the Caffe author in a future patch.
+
+
+
+#### 3D Reconstruction Module
+You can include the 3D reconstruction module by:
+
+1. Install the FLIR camera software, Spinnaker SDK. It is a propietary software, so we cannot provide direct download link. Note: You might skip this step if you intend to use the 3-D OpenPose module with a different camera brand.
+    1. Ubuntu: Get and install the latest Spinnaker SKD version in their default path. OpenPose will automatically find it. Otherwise, set the right path with CMake.
+    2. Windows: Donwload the latest Spinnaker SKD version from [https://www.ptgrey.com/support/downloads](https://www.ptgrey.com/support/downloads).
+        - Copy `{PointGreyParentDirectory}\Point Grey Research\Spinnaker\bin64\vs2015\` as `{OpenPoseDirectory}\3rdparty\windows\spinnaker\bin\`. You can remove all the *.exe files.
+        - Copy `{PointGreyParentDirectory}\Point Grey Research\Spinnaker\include\` as `{OpenPoseDirectory}\3rdparty\windows\spinnaker\include\`.
+        - Copy `Spinnaker_v140.lib` and `Spinnakerd_v140.lib` from `{PointGreyParentDirectory}\Point Grey Research\Spinnaker\lib64\vs2015\` into `{OpenPoseDirectory}\3rdparty\windows\spinnaker\lib\`.
+        - (Optional) Spinnaker SDK overview: [https://www.ptgrey.com/spinnaker-sdk](https://www.ptgrey.com/spinnaker-sdk).
+2. Install the 3D visualizer, FreeGLUT:
+    1. Ubuntu: run `sudo apt-get update && sudo apt-get install build-essential freeglut3 freeglut3-dev libxmu-dev libxi-dev` and reboot your PC.
+    2. Windows:
+        1. It is automatically downloaded by the CMake installer.
+        2. Alternatively, if you prefer to download it yourself, you could either:
+            1. Double click on `3rdparty\windows\getFreeglut.bat`.
+            2. Download [this version from our server](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/freeglut_2018_01_14.zip) and unzip it in `{OpenPoseDirectory}\3rdparty\windows\freeglut\`.
+            3. Download the latest `MSVC Package` from [http://www.transmissionzero.co.uk/software/freeglut-devel/](http://www.transmissionzero.co.uk/software/freeglut-devel/).
+                - Copy `{freeglutParentDirectory}\freeglut\bin\x64\` as `{OpenPoseDirectory}\3rdparty\windows\freeglut\bin\`.
+                - Copy `{freeglutParentDirectory}\freeglut\include\` as `{OpenPoseDirectory}\3rdparty\windows\freeglut\include\`.
+                - Copy `{freeglutParentDirectory}\freeglut\lib\x64\` as `{OpenPoseDirectory}\3rdparty\windows\freeglut\lib\`.
+3. Follow the CMake installation steps. In addition, set the `WITH_FLIR_CAMERA` (only if Spinnaker was installed) and `WITH_3D_RENDERER` options.
+4. Increased accuracy with Ceres solver (Ubuntu only): For extra 3-D reconstruction accuracy, run `sudo apt-get install libeigen3-dev`, install [Ceres solver](http://ceres-solver.org/installation.html), and enable `WITH_CERES` in CMake when installing OpenPose. Ceres is harder to install in Windows, so we have not tested it so far in there. Feel free to make a pull request if you do.
+
+After installation, check the [doc/modules/3d_reconstruction_module.md](./modules/3d_reconstruction_module.md) instructions.
+
+
+
+#### Calibration Module
+The calibration module is included by default, but you must also enable `WITH_EIGEN` if you intend to use the extrinsic camera parameter estimation tool. You can set that flag to 2 different values: `APT_GET` or `BUILD`, check [Requirements](#requirements) for more information.
+
+After installation, check the [doc/modules/calibration_module.md](./modules/calibration_module.md) instructions.
+
+
+
+#### Compiling without cuDNN
+The [cuDNN](https://developer.nvidia.com/cudnn) library is not mandatory, but required for full keypoint detection accuracy. In case your graphics card is not compatible with cuDNN, you can disable it by unchecking `USE_CUDNN` in CMake.
+
+Then, you would have to reduce the `--net_resolution` flag to fit the model into the GPU memory. You can try values like `640x320`, `320x240`, `320x160`, or `160x80` to see your GPU memory capabilities. After finding the maximum approximate resolution that your GPU can handle without throwing an out-of-memory error, adjust the `net_resolution` ratio to your image or video to be processed (see the `--net_resolution` explanation from [doc/demo_overview.md](./demo_overview.md)), or use `-1` (e.g. `--net_resolution -1x320`).
+
+
+
+#### Custom Caffe (Ubuntu Only)
+We only modified some Caffe compilation flags and minor details. You can use your own Caffe distribution, simply specify the Caffe include path and the library as shown below. You will also need to turn off the `BUILD_CAFFE` variable. Note that cuDNN is required in order to get the maximum possible accuracy in OpenPose.
+<p align="center">
+    <img src="media/cmake_installation/im_5.png", width="480">
 </p>
 
 
 
+#### Custom OpenCV (Ubuntu Only)
+If you have built OpenCV from source and OpenPose cannot find it automatically, you can set the `OPENCV_DIR` variable to the directory where you build OpenCV.
 
 
-## FAQ
-**Q: Out of memory error** - I get an error similar to: `Check failed: error == cudaSuccess (2 vs. 0)  out of memory`.
 
-**A**: Most probably cuDNN is not installed/enabled, the default Caffe model uses >12 GB of GPU memory, cuDNN reduces it to ~1.5 GB.
+#### Doxygen Documentation Autogeneration (Ubuntu Only)
+You can generate the documentation by setting the `BUILD_DOCS` flag. The documentation will be generated in `doc/doxygen/html/index.html`. You can simply open it with double-click (your default browser should automatically display it).
 
 
-**Q: Low speed** - OpenPose is quite slow, is it normal? How can I speed it up?
 
-**A**: Check the [OpenPose Benchmark](https://docs.google.com/spreadsheets/d/1-DynFGvoScvfWDA1P4jDInCkbD4lg0IKOYbXgEq0sK0/edit#gid=0) to discover the approximate speed of your graphics card. Some speed tips:
+#### CMake Command Line Configuration (Ubuntu Only)
+Note that this step is unnecessary if you already used the CMake GUI alternative.
 
-    1. Use cuDNN 5.1 (cuDNN 6 is ~10% slower).
-    2. Reduce the `--net_resolution` (e.g. to 320x176) (lower accuracy).
-    3. For face, reduce the `--face_net_resolution`. The resolution 320x320 usually works pretty decently.
-    4. Use the `MPI_4_layers` model (lower accuracy and lower number of parts).
-    5. Change GPU rendering by CPU rendering to get approximately +0.5 FPS (`--render_pose 1`).
+Create a `build` folder in the root OpenPose folder, where you will build the library --
+```bash
+cd openpose
+mkdir build
+cd build
+```
+
+The next step is to generate the Makefiles. Now there can be multiple scenarios based on what the user already has e.x. Caffe might be already installed and the user might be interested in building OpenPose against that version of Caffe instead of requiring OpenPose to build Caffe from scratch.
+
+##### SCENARIO 1 -- Caffe not installed and OpenCV installed using `apt-get`
+In the build directory, run the below command --
+```bash
+cmake ..
+```
+
+##### SCENARIO 2 -- Caffe installed and OpenCV build from source
+In this example, we assume that Caffe and OpenCV are already present. The user needs to supply the paths of the libraries and the include directories to CMake. For OpenCV, specify the include directories and the libraries directory using `OpenCV_INCLUDE_DIRS` and `OpenCV_LIBS_DIR` variables respectively. Alternatively, the user can also specify the path to the `OpenCVConfig.cmake` file by setting the `OpenCV_CONFIG_FILE` variable. For Caffe, specify the include directory and library using the `Caffe_INCLUDE_DIRS` and `Caffe_LIBS` variables. This will be where you installed Caffe. Below is an example of the same.
+```bash
+cmake -DOpenCV_INCLUDE_DIRS=/home/"${USER}"/softwares/opencv/build/install/include \
+  -DOpenCV_LIBS_DIR=/home/"${USER}"/softwares/opencv/build/install/lib \
+  -DCaffe_INCLUDE_DIRS=/home/"${USER}"/softwares/caffe/build/install/include \
+  -DCaffe_LIBS=/home/"${USER}"/softwares/caffe/build/install/lib/libcaffe.so -DBUILD_CAFFE=OFF ..
+```
+
+```bash
+cmake -DOpenCV_CONFIG_FILE=/home/"${USER}"/softwares/opencv/build/install/share/OpenCV/OpenCVConfig.cmake \
+  -DCaffe_INCLUDE_DIRS=/home/"${USER}"/softwares/caffe/build/install/include \
+  -DCaffe_LIBS=/home/"${USER}"/softwares/caffe/build/install/lib/libcaffe.so -DBUILD_CAFFE=OFF ..
+```
+
+##### SCENARIO 3 -- OpenCV already installed
+If Caffe is not already present but OpenCV is, then use the below command.
+```bash
+cmake -DOpenCV_INCLUDE_DIRS=/home/"${USER}"/softwares/opencv/build/install/include \
+  -DOpenCV_LIBS_DIR=/home/"${USER}"/softwares/opencv/build/install/lib ..
+```
+
+```bash
+cmake -DOpenCV_CONFIG_FILE=/home/"${USER}"/softwares/opencv/build/install/share/OpenCV/OpenCVConfig.cmake ..
+```

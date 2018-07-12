@@ -1,9 +1,9 @@
 #ifndef OPENPOSE_THREAD_THREAD_NO_QUEUE_HPP
 #define OPENPOSE_THREAD_THREAD_NO_QUEUE_HPP
 
-#include <vector>
-#include "thread.hpp"
-#include "worker.hpp"
+#include <openpose/core/common.hpp>
+#include <openpose/thread/thread.hpp>
+#include <openpose/thread/worker.hpp>
 
 namespace op
 {
@@ -24,8 +24,6 @@ namespace op
 
 
 // Implementation
-#include <openpose/utilities/errorAndLog.hpp>
-#include <openpose/utilities/macros.hpp>
 namespace op
 {
     template<typename TDatums, typename TWorker>

@@ -1,4 +1,3 @@
-#include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/utilities/fileSystem.hpp>
 #include <openpose/filestream/fileSaver.hpp>
 
@@ -9,7 +8,7 @@ namespace op
     {
         try
         {
-            mkdir(mDirectoryPath);
+            makeDirectory(mDirectoryPath);
         }
         catch (const std::exception& e)
         {

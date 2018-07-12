@@ -1,14 +1,12 @@
 #include <openpose/face/faceParameters.hpp>
-#include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/keypoint.hpp>
 #include <openpose/face/renderFace.hpp>
 
 namespace op
 {
-    const std::vector<float> COLORS{FACE_COLORS_RENDER};
-
-    void renderFaceKeypointsCpu(Array<float>& frameArray, const Array<float>& faceKeypoints)
+    void renderFaceKeypointsCpu(Array<float>& frameArray, const Array<float>& faceKeypoints,
+                                const float renderThreshold)
     {
         try
         {
@@ -18,9 +16,11 @@ namespace op
                 const auto thicknessCircleRatio = 1.f/75.f;
                 const auto thicknessLineRatioWRTCircle = 0.334f;
                 const auto& pairs = FACE_PAIRS_RENDER;
+                const auto& scales = FACE_SCALES_RENDER;
 
                 // Render keypoints
-                renderKeypointsCpu(frameArray, faceKeypoints, pairs, COLORS, thicknessCircleRatio, thicknessLineRatioWRTCircle, FACE_RENDER_THRESHOLD);
+                renderKeypointsCpu(frameArray, faceKeypoints, pairs, FACE_COLORS_RENDER, thicknessCircleRatio,
+                                   thicknessLineRatioWRTCircle, scales, renderThreshold);
             }
         }
         catch (const std::exception& e)

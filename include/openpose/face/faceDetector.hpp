@@ -1,21 +1,17 @@
 #ifndef OPENPOSE_FACE_FACE_DETECTOR_HPP
 #define OPENPOSE_FACE_FACE_DETECTOR_HPP
 
-#include <vector>
-#include <openpose/core/array.hpp>
-#include <openpose/core/rectangle.hpp>
+#include <openpose/core/common.hpp>
 #include <openpose/pose/enumClasses.hpp>
-#include <openpose/utilities/macros.hpp>
-#include "enumClasses.hpp"
 
 namespace op
 {
-    class FaceDetector
+    class OP_API FaceDetector
     {
     public:
         explicit FaceDetector(const PoseModel poseModel);
 
-        std::vector<Rectangle<float>> detectFaces(const Array<float>& poseKeypoints, const float scaleInputToOutput) const;
+        std::vector<Rectangle<float>> detectFaces(const Array<float>& poseKeypoints) const;
 
     private:
         const unsigned int mNeck;

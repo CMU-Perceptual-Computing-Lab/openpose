@@ -1,11 +1,10 @@
 #ifndef OPENPOSE_FILESTREAM_W_FACE_SAVER_HPP
 #define OPENPOSE_FILESTREAM_W_FACE_SAVER_HPP
 
-#include <memory> // std::shared_ptr
-#include <string>
+#include <openpose/core/common.hpp>
+#include <openpose/filestream/enumClasses.hpp>
+#include <openpose/filestream/keypointSaver.hpp>
 #include <openpose/thread/workerConsumer.hpp>
-#include "enumClasses.hpp"
-#include "keypointSaver.hpp"
 
 namespace op
 {
@@ -31,10 +30,7 @@ namespace op
 
 
 // Implementation
-#include <openpose/utilities/errorAndLog.hpp>
-#include <openpose/utilities/macros.hpp>
 #include <openpose/utilities/pointerContainer.hpp>
-#include <openpose/utilities/profiler.hpp>
 namespace op
 {
     template<typename TDatums>
@@ -63,13 +59,13 @@ namespace op
                 auto& tDatumsNoPtr = *tDatums;
                 // Record people face keypoint data
                 std::vector<Array<float>> keypointVector(tDatumsNoPtr.size());
-                for (auto i = 0; i < tDatumsNoPtr.size(); i++)
+                for (auto i = 0u; i < tDatumsNoPtr.size(); i++)
                     keypointVector[i] = tDatumsNoPtr[i].faceKeypoints;
                 const auto fileName = (!tDatumsNoPtr[0].name.empty() ? tDatumsNoPtr[0].name : std::to_string(tDatumsNoPtr[0].id));
                 spKeypointSaver->saveKeypoints(keypointVector, fileName, "face");
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
-                Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__, Profiler::DEFAULT_X);
+                Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);
                 // Debugging log
                 dLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             }

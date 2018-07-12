@@ -1,19 +1,16 @@
 #ifndef OPENPOSE_FILESTREAM_VIDEO_SAVER_HPP
 #define OPENPOSE_FILESTREAM_VIDEO_SAVER_HPP
 
-#include <vector>
 #include <opencv2/core/core.hpp> // cv::Mat
 #include <opencv2/highgui/highgui.hpp> // cv::VideoWriter
-#include <openpose/utilities/macros.hpp>
+#include <openpose/core/common.hpp>
 
 namespace op
 {
-    class VideoSaver
+    class OP_API VideoSaver
     {
     public:
         VideoSaver(const std::string& videoSaverPath, const int cvFourcc, const double fps, const Point<int>& cvSize);
-
-        VideoSaver(const std::vector<std::string>& videoSaverPaths, const int cvFourcc, const double fps, const Point<int>& cvSize);
 
         bool isOpened();
 
@@ -22,7 +19,12 @@ namespace op
         void write(const std::vector<cv::Mat>& cvMats);
 
     private:
-        std::vector<cv::VideoWriter> mVideoWriters;
+        const std::string mVideoSaverPath;
+        const int mCvFourcc;
+        const double mFps;
+        const Point<int> mCvSize;
+        cv::VideoWriter mVideoWriter;
+        unsigned int mNumberImages;
 
         DELETE_COPY(VideoSaver);
     };

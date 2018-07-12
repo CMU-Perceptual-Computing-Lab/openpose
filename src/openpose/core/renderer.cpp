@@ -1,60 +1,29 @@
-#ifndef CPU_ONLY
-    #include <cuda.h>
-    #include <cuda_runtime_api.h>
-#endif
-#include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/core/renderer.hpp>
 
 namespace op
 {
-    Renderer::Renderer(const unsigned long long volume, const float alphaKeypoint, const float alphaHeatMap,
+    Renderer::Renderer(const float renderThreshold, const float alphaKeypoint,
+                       const float alphaHeatMap, const bool blendOriginalFrame,
                        const unsigned int elementToRender, const unsigned int numberElementsToRender) :
-        spGpuMemoryPtr{std::make_shared<float*>()},
+        mRenderThreshold{renderThreshold},
+        mBlendOriginalFrame{blendOriginalFrame},
         spElementToRender{std::make_shared<std::atomic<unsigned int>>(elementToRender)},
         spNumberElementsToRender{std::make_shared<const unsigned int>(numberElementsToRender)},
-        mVolume{volume},
+        mShowGooglyEyes{false},
         mAlphaKeypoint{alphaKeypoint},
-        mAlphaHeatMap{alphaHeatMap},
-        mIsFirstRenderer{true},
-        mIsLastRenderer{true},
-        spGpuMemoryAllocated{std::make_shared<bool>(false)}
+        mAlphaHeatMap{alphaHeatMap}
     {
-    }
-
-    Renderer::~Renderer()
-    {
-        try
-        {
-            #ifndef CPU_ONLY
-                if (mIsLastRenderer)
-                    cudaFree(*spGpuMemoryPtr);
-            #endif
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-        }
-    }
-
-    void Renderer::initializationOnThread()
-    {
-        try
-        {
-            #ifndef CPU_ONLY
-                if (mIsFirstRenderer)
-                    cudaMalloc((void**)(spGpuMemoryPtr.get()), mVolume * sizeof(float));
-            #endif
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-        }
     }
 
     void Renderer::increaseElementToRender(const int increment)
     {
         try
         {
+            // Security checks
+            if (*spNumberElementsToRender == 0)
+                error("Number elements to render cannot be 0 for this function.",
+                      __LINE__, __FUNCTION__, __FILE__);
+            // Get current element to be rendered
             auto elementToRender = (((int)(*spElementToRender) + increment) % (int)(*spNumberElementsToRender));
             // Handling negative increments
             while (elementToRender < 0)
@@ -80,33 +49,20 @@ namespace op
         }
     }
 
-    std::tuple<std::shared_ptr<float*>, std::shared_ptr<bool>, std::shared_ptr<std::atomic<unsigned int>>,
-               std::shared_ptr<const unsigned int>> Renderer::getSharedParameters()
+    void Renderer::setElementToRender(const ElementToRender elementToRender)
     {
         try
         {
-            mIsLastRenderer = false;
-            return std::make_tuple(spGpuMemoryPtr, spGpuMemoryAllocated, spElementToRender, spNumberElementsToRender);
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return std::make_tuple(nullptr, nullptr, nullptr, nullptr);
-        }
-    }
-
-    void Renderer::setSharedParametersAndIfLast(const std::tuple<std::shared_ptr<float*>, std::shared_ptr<bool>,
-                                                                 std::shared_ptr<std::atomic<unsigned int>>,
-                                                                 std::shared_ptr<const unsigned int>>& tuple, const bool isLast)
-    {
-        try
-        {
-            mIsFirstRenderer = false;
-            mIsLastRenderer = isLast;
-            spGpuMemoryPtr = std::get<0>(tuple);
-            spGpuMemoryAllocated = std::get<1>(tuple);
-            spElementToRender = std::get<2>(tuple);
-            spNumberElementsToRender = std::get<3>(tuple);
+            if (elementToRender == ElementToRender::Skeleton)
+                *spElementToRender = 0;
+            else if (elementToRender == ElementToRender::Background)
+                *spElementToRender = 1;
+            else if (elementToRender == ElementToRender::AddKeypoints)
+                *spElementToRender = 2;
+            else if (elementToRender == ElementToRender::AddPAFs)
+                *spElementToRender = 3;
+            else
+                error("Unknown ElementToRender value.", __LINE__, __FUNCTION__, __FILE__);
         }
         catch (const std::exception& e)
         {
@@ -164,20 +120,24 @@ namespace op
         }
     }
 
-    void Renderer::cpuToGpuMemoryIfNotCopiedYet(const float* const cpuMemory)
+    bool Renderer::getBlendOriginalFrame() const
     {
         try
         {
-            #ifndef CPU_ONLY
-                if (!*spGpuMemoryAllocated)
-                {
-                    cudaMemcpy(*spGpuMemoryPtr, cpuMemory, mVolume * sizeof(float), cudaMemcpyHostToDevice);
-                    *spGpuMemoryAllocated = true;
-                }
-            #else
-                error("GPU rendering not available if `CPU_ONLY` is set.", __LINE__, __FUNCTION__, __FILE__);
-                UNUSED(cpuMemory);
-            #endif
+            return mBlendOriginalFrame;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return false;
+        }
+    }
+
+    void Renderer::setBlendOriginalFrame(const bool blendOriginalFrame)
+    {
+        try
+        {
+            mBlendOriginalFrame = blendOriginalFrame;
         }
         catch (const std::exception& e)
         {
@@ -185,20 +145,24 @@ namespace op
         }
     }
 
-    void Renderer::gpuToCpuMemoryIfLastRenderer(float* cpuMemory)
+    bool Renderer::getShowGooglyEyes() const
     {
         try
         {
-            #ifndef CPU_ONLY
-                if (*spGpuMemoryAllocated && mIsLastRenderer)
-                {
-                    cudaMemcpy(cpuMemory, *spGpuMemoryPtr, mVolume * sizeof(float), cudaMemcpyDeviceToHost);
-                    *spGpuMemoryAllocated = false;
-                }
-            #else
-                error("GPU rendering not available if `CPU_ONLY` is set.", __LINE__, __FUNCTION__, __FILE__);
-                UNUSED(cpuMemory);
-            #endif
+            return mShowGooglyEyes;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return false;
+        }
+    }
+
+    void Renderer::setShowGooglyEyes(const bool showGooglyEyes)
+    {
+        try
+        {
+            mShowGooglyEyes = showGooglyEyes;
         }
         catch (const std::exception& e)
         {

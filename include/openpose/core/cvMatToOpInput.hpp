@@ -1,25 +1,23 @@
 #ifndef OPENPOSE_CORE_CV_MAT_TO_OP_INPUT_HPP
 #define OPENPOSE_CORE_CV_MAT_TO_OP_INPUT_HPP
 
-#include <utility> // std::pair
-#include <vector>
 #include <opencv2/core/core.hpp> // cv::Mat
-#include "array.hpp"
-#include "point.hpp"
+#include <openpose/core/common.hpp>
+#include <openpose/pose/enumClasses.hpp>
 
 namespace op
 {
-    class CvMatToOpInput
+    class OP_API CvMatToOpInput
     {
     public:
-        CvMatToOpInput(const Point<int>& netInputResolution, const int scaleNumber = 1, const float scaleGap = 0.25);
+        CvMatToOpInput(const PoseModel poseModel = PoseModel::BODY_25);
 
-        std::pair<Array<float>, std::vector<float>> format(const cv::Mat& cvInputData) const;
+        std::vector<Array<float>> createArray(const cv::Mat& cvInputData,
+                                              const std::vector<double>& scaleInputToNetInputs,
+                                              const std::vector<Point<int>>& netInputSizes) const;
 
     private:
-        const int mScaleNumber;
-        const float mScaleGap;
-        const std::vector<int> mInputNetSize4D;
+        const PoseModel mPoseModel;
     };
 }
 

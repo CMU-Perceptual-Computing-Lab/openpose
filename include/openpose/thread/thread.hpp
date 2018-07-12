@@ -2,12 +2,10 @@
 #define OPENPOSE_THREAD_THREAD_HPP
 
 #include <atomic>
-#include <memory>   // std::shared_ptr
 #include <thread>
-#include <vector>
-#include <openpose/utilities/macros.hpp>
-#include "subThread.hpp"
-#include "worker.hpp"
+#include <openpose/core/common.hpp>
+#include <openpose/thread/subThread.hpp>
+#include <openpose/thread/worker.hpp>
 
 namespace op
 {
@@ -63,7 +61,6 @@ namespace op
 
 
 // Implementation
-#include <openpose/utilities/errorAndLog.hpp>
 namespace op
 {
     template<typename TDatums, typename TWorker>
@@ -168,6 +165,7 @@ namespace op
     {
         try
         {
+            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             for (auto& subThread : mSubThreads)
                 subThread->initializationOnThread();
         }

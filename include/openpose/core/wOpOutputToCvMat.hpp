@@ -1,9 +1,9 @@
 #ifndef OPENPOSE_CORE_W_OP_OUTPUT_TO_CV_MAT_HPP
 #define OPENPOSE_CORE_W_OP_OUTPUT_TO_CV_MAT_HPP
 
-#include <memory> // std::shared_ptr
+#include <openpose/core/common.hpp>
+#include <openpose/core/opOutputToCvMat.hpp>
 #include <openpose/thread/worker.hpp>
-#include "opOutputToCvMat.hpp"
 
 namespace op
 {
@@ -29,11 +29,7 @@ namespace op
 
 
 // Implementation
-#include <vector>
-#include <openpose/utilities/errorAndLog.hpp>
-#include <openpose/utilities/macros.hpp>
 #include <openpose/utilities/pointerContainer.hpp>
-#include <openpose/utilities/profiler.hpp>
 namespace op
 {
     template<typename TDatums>
@@ -63,7 +59,7 @@ namespace op
                     tDatum.cvOutputData = spOpOutputToCvMat->formatToCvMat(tDatum.outputData);
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
-                Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__, Profiler::DEFAULT_X);
+                Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);
                 // Debugging log
                 dLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             }

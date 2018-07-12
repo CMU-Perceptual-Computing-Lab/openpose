@@ -1,33 +1,39 @@
-#include <string>
 #include <opencv2/highgui/highgui.hpp>
-#include <openpose/utilities/errorAndLog.hpp>
-#include <openpose/utilities/fastMath.hpp>
 #include <openpose/producer/webcamReader.hpp>
+#include <openpose/utilities/fastMath.hpp>
 
 namespace op
 {
-    WebcamReader::WebcamReader(const int webcamIndex, const Point<int>& webcamResolution, const double fps) :
-        VideoCaptureReader{webcamIndex},
+    WebcamReader::WebcamReader(const int webcamIndex, const Point<int>& webcamResolution, const double fps,
+                               const bool throwExceptionIfNoOpened) :
+        VideoCaptureReader{webcamIndex, throwExceptionIfNoOpened},
         mFps{fps},
-        mFrameNameCounter{-1}
+        mFrameNameCounter{-1},
+        mThreadOpened{false}
     {
         try
         {
-            if (webcamResolution != Point<int>{})
+            if (isOpened())
             {
-                set(CV_CAP_PROP_FRAME_WIDTH, webcamResolution.x);
-                set(CV_CAP_PROP_FRAME_HEIGHT, webcamResolution.y);
-                if ((int)get(CV_CAP_PROP_FRAME_WIDTH) != webcamResolution.x || (int)get(CV_CAP_PROP_FRAME_HEIGHT) != webcamResolution.y)
+                mFrameNameCounter = 0;
+                if (webcamResolution != Point<int>{})
                 {
-                    const std::string logMessage{ "Desired webcam resolution " + std::to_string(webcamResolution.x) + "x" + std::to_string(webcamResolution.y)
-                                                + " could not being set. Final resolution: " + std::to_string(intRound(get(CV_CAP_PROP_FRAME_WIDTH))) + "x"
-                                                + std::to_string(intRound(get(CV_CAP_PROP_FRAME_HEIGHT))) };
-                    log(logMessage, Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                    set(CV_CAP_PROP_FRAME_WIDTH, webcamResolution.x);
+                    set(CV_CAP_PROP_FRAME_HEIGHT, webcamResolution.y);
+                    if ((int)get(CV_CAP_PROP_FRAME_WIDTH) != webcamResolution.x
+                        || (int)get(CV_CAP_PROP_FRAME_HEIGHT) != webcamResolution.y)
+                    {
+                        const std::string logMessage{ "Desired webcam resolution " + std::to_string(webcamResolution.x)
+                                                      + "x" + std::to_string(webcamResolution.y)
+                                                      + " could not being set. Final resolution: "
+                                                      + std::to_string(intRound(get(CV_CAP_PROP_FRAME_WIDTH))) + "x"
+                                                      + std::to_string(intRound(get(CV_CAP_PROP_FRAME_HEIGHT))) };
+                        log(logMessage, Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                    }
                 }
-
                 // Start buffering thread
-                if (isOpened())
-                    mThread = std::thread{&WebcamReader::bufferingThread, this};
+                mThreadOpened = true;
+                mThread = std::thread{&WebcamReader::bufferingThread, this};
             }
         }
         catch (const std::exception& e)
@@ -41,8 +47,11 @@ namespace op
         try
         {
             // Close and join thread
-            mCloseThread = true;
-            mThread.join();
+            if (mThreadOpened)
+            {
+                mCloseThread = true;
+                mThread.join();
+            }
         }
         catch (const std::exception& e)
         {
@@ -50,11 +59,50 @@ namespace op
         }
     }
 
-    std::string WebcamReader::getFrameName()
+    std::vector<cv::Mat> WebcamReader::getCameraMatrices()
     {
         try
         {
-            return VideoCaptureReader::getFrameName();
+            return {};
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return {};
+        }
+    }
+
+    std::vector<cv::Mat> WebcamReader::getCameraExtrinsics()
+    {
+        try
+        {
+            return {};
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return {};
+        }
+    }
+
+    std::vector<cv::Mat> WebcamReader::getCameraIntrinsics()
+    {
+        try
+        {
+            return {};
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return {};
+        }
+    }
+
+    std::string WebcamReader::getNextFrameName()
+    {
+        try
+        {
+            return VideoCaptureReader::getNextFrameName();
         }
         catch (const std::exception& e)
         {
@@ -129,23 +177,43 @@ namespace op
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return cv::Mat{};
+            return cv::Mat();
+        }
+    }
+
+    std::vector<cv::Mat> WebcamReader::getRawFrames()
+    {
+        try
+        {
+            return std::vector<cv::Mat>{getRawFrame()};
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return {};
         }
     }
 
     void WebcamReader::bufferingThread()
     {
-        mCloseThread = false;
-        while (!mCloseThread)
+        try
         {
-            // Get frame
-            auto cvMat = VideoCaptureReader::getRawFrame();
-            // Move to buffer
-            if (!cvMat.empty())
+            mCloseThread = false;
+            while (!mCloseThread)
             {
-                const std::lock_guard<std::mutex> lock{mBufferMutex};
-                std::swap(mBuffer, cvMat);
+                // Get frame
+                auto cvMat = VideoCaptureReader::getRawFrame();
+                // Move to buffer
+                if (!cvMat.empty())
+                {
+                    const std::lock_guard<std::mutex> lock{mBufferMutex};
+                    std::swap(mBuffer, cvMat);
+                }
             }
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
     }
 }

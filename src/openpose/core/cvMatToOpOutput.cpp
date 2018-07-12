@@ -1,40 +1,34 @@
-#include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/utilities/openCv.hpp>
 #include <openpose/core/cvMatToOpOutput.hpp>
 
 namespace op
 {
-    CvMatToOpOutput::CvMatToOpOutput(const Point<int>& outputResolution, const bool generateOutput) :
-        mGenerateOutput{generateOutput},
-        mOutputSize3D{{3, outputResolution.y, outputResolution.x}}
-    {
-    }
-
-    std::tuple<double, Array<float>> CvMatToOpOutput::format(const cv::Mat& cvInputData) const
+    Array<float> CvMatToOpOutput::createArray(const cv::Mat& cvInputData, const double scaleInputToOutput,
+                                              const Point<int>& outputResolution) const
     {
         try
         {
             // Security checks
             if (cvInputData.empty())
                 error("Wrong input element (empty cvInputData).", __LINE__, __FUNCTION__, __FILE__);
-
+            if (cvInputData.channels() != 3)
+                error("Input images must be 3-channel BGR.", __LINE__, __FUNCTION__, __FILE__);
+            if (cvInputData.cols <= 0 || cvInputData.rows <= 0)
+                error("Input images has 0 area.", __LINE__, __FUNCTION__, __FILE__);
+            if (outputResolution.x <= 0 || outputResolution.y <= 0)
+                error("Output resolution has 0 area.", __LINE__, __FUNCTION__, __FILE__);
             // outputData - Reescale keeping aspect ratio and transform to float the output image
-            const Point<int> outputResolution{mOutputSize3D[2], mOutputSize3D[1]};
-            const double scaleInputToOutput = resizeGetScaleFactor(Point<int>{cvInputData.cols, cvInputData.rows}, outputResolution);
-            const cv::Mat frameWithOutputSize = resizeFixedAspectRatio(cvInputData, scaleInputToOutput, outputResolution);
-            Array<float> outputData;
-            if (mGenerateOutput)
-            {
-                outputData.reset(mOutputSize3D);
-                uCharCvMatToFloatPtr(outputData.getPtr(), frameWithOutputSize, false);
-            }
-
-            return std::make_tuple(scaleInputToOutput, outputData);
+            const cv::Mat frameWithOutputSize = resizeFixedAspectRatio(cvInputData, scaleInputToOutput,
+                                                                       outputResolution);
+            Array<float> outputData({outputResolution.y, outputResolution.x, 3});
+            frameWithOutputSize.convertTo(outputData.getCvMat(), CV_32FC3);
+            // Return result
+            return outputData;
         }
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return std::make_tuple(0., Array<float>{});
+            return Array<float>{};
         }
     }
 }

@@ -1,0 +1,95 @@
+## Refer to http://caffe.berkeleyvision.org/installation.html
+# Contributions simplifying and improving our build system are welcome!
+
+# CPU-only switch (comment to build without GPU support).
+USE_CUDA := 1
+
+# uncomment to disable IO dependencies and corresponding data layers
+# USE_OPENCV := 0
+# USE_LEVELDB := 0
+# USE_LMDB := 0
+
+# uncomment to allow MDB_NOLOCK when reading LMDB files (only if necessary)
+#	You should not set this flag if you will be reading LMDBs with any
+#	possibility of simultaneous read and write
+# ALLOW_LMDB_NOLOCK := 1
+
+# Uncomment if you're using OpenCV 3
+# OPENCV_VERSION := 3
+
+# To customize your choice of compiler, uncomment and set the following.
+# N.B. the default for Linux is g++ and the default for OSX is clang++
+# CUSTOM_CXX := g++
+
+# CUDA directory contains bin/ and lib/ directories that we need.
+CUDA_DIR := /usr/local/cuda
+# On Ubuntu 14.04, if cuda tools are installed via
+# "sudo apt-get install nvidia-cuda-toolkit" then use this instead:
+# CUDA_DIR := /usr
+
+# CUDA architecture setting: going with all of them.
+# For CUDA < 6.0, comment the *_50 through *_61 lines for compatibility.
+# For CUDA < 8.0, comment the *_60 and *_61 lines for compatibility.
+CUDA_ARCH := -gencode arch=compute_30,code=sm_30 \
+		-gencode arch=compute_35,code=sm_35 \
+		-gencode arch=compute_50,code=sm_50 \
+		-gencode arch=compute_52,code=sm_52 \
+		-gencode arch=compute_60,code=sm_60 \
+		-gencode arch=compute_61,code=sm_61 \
+		-gencode arch=compute_61,code=compute_61
+# Deprecated
+# CUDA_ARCH := -gencode arch=compute_20,code=sm_20 \
+# 		-gencode arch=compute_20,code=sm_21 \
+# 		-gencode arch=compute_30,code=sm_30 \
+# 		-gencode arch=compute_35,code=sm_35 \
+# 		-gencode arch=compute_50,code=sm_50 \
+# 		-gencode arch=compute_52,code=sm_52 \
+# 		-gencode arch=compute_60,code=sm_60 \
+# 		-gencode arch=compute_61,code=sm_61 \
+# 		-gencode arch=compute_61,code=compute_61
+
+# Uncomment to enable op::Profiler
+# PROFILER_ENABLED := 1
+
+# DEEP_NET choice:
+# caffe for Caffe (default and only option so far)
+DEEP_NET := caffe
+
+# Caffe directory
+CAFFE_DIR := 3rdparty/caffe/distribute
+
+# Faster GUI display
+# WITH_OPENCV_WITH_OPENGL := 1
+# OpenPose 3-D Reconstruction
+# WITH_3D_RENDERER := 1
+# WITH_CERES := 1
+# WITH_FLIR_CAMERA := 1
+# Eigen directory (Ceres)
+# WITH_EIGEN := 1
+EIGEN_DIR := /usr/include/eigen3/
+# Spinnaker directory
+SPINNAKER_DIR := /usr/include/spinnaker
+
+# Whatever else you find you need goes here.
+INCLUDE_DIRS := /usr/local/include /usr/include/hdf5/serial
+LIBRARY_DIRS := /usr/local/lib /usr/lib /usr/lib/aarch64-linux-gnu /usr/lib/aarch64-linux-gnu/hdf5/serial
+
+# If Homebrew is installed at a non standard location (for example your home directory) and you use it for general dependencies
+# INCLUDE_DIRS += $(shell brew --prefix)/include
+# LIBRARY_DIRS += $(shell brew --prefix)/lib
+
+# Uncomment to use `pkg-config` to specify OpenCV library paths.
+# (Usually not necessary -- OpenCV libraries are normally installed in one of the above $LIBRARY_DIRS.)
+# USE_PKG_CONFIG := 1
+
+BUILD_DIR := build
+DISTRIBUTE_DIR := distribute
+
+# Uncomment for debugging. Does not work on OSX due to https://github.com/BVLC/caffe/issues/171
+# DEBUG := 1
+
+# The ID of the GPU that 'make runtest' will use to run unit tests.
+TEST_GPUID := 0
+
+# enable pretty build (comment to see full commands)
+Q ?= @

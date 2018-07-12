@@ -1,9 +1,9 @@
 #ifndef OPENPOSE_CORE_W_CV_MAT_TO_OP_OUTPUT_HPP
 #define OPENPOSE_CORE_W_CV_MAT_TO_OP_OUTPUT_HPP
 
-#include <memory> // std::shared_ptr
+#include <openpose/core/common.hpp>
+#include <openpose/core/cvMatToOpOutput.hpp>
 #include <openpose/thread/worker.hpp>
-#include "cvMatToOpOutput.hpp"
 
 namespace op
 {
@@ -29,11 +29,8 @@ namespace op
 
 
 // Implementation
-#include <openpose/utilities/errorAndLog.hpp>
-#include <openpose/utilities/macros.hpp>
 #include <openpose/utilities/openCv.hpp>
 #include <openpose/utilities/pointerContainer.hpp>
-#include <openpose/utilities/profiler.hpp>
 namespace op
 {
     template<typename TDatums>
@@ -62,10 +59,11 @@ namespace op
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                 // cv::Mat -> float*
                 for (auto& tDatum : tDatumsNoPtr)
-                    std::tie(tDatum.scaleInputToOutput, tDatum.outputData) = spCvMatToOpOutput->format(tDatum.cvInputData);
+                    tDatum.outputData = spCvMatToOpOutput->createArray(tDatum.cvInputData, tDatum.scaleInputToOutput,
+                                                                       tDatum.netOutputSize);
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
-                Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__, Profiler::DEFAULT_X);
+                Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);
                 // Debugging log
                 dLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             }

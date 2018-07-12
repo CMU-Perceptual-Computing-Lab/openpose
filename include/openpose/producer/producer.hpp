@@ -1,12 +1,11 @@
 #ifndef OPENPOSE_PRODUCER_PRODUCER_HPP
 #define OPENPOSE_PRODUCER_PRODUCER_HPP
 
-#include <array>
 #include <chrono>
 #include <opencv2/core/core.hpp> // cv::Mat
 #include <opencv2/highgui/highgui.hpp> // capProperties of OpenCV
-#include <openpose/utilities/macros.hpp>
-#include "enumClasses.hpp"
+#include <openpose/core/common.hpp>
+#include <openpose/producer/enumClasses.hpp>
 
 namespace op
 {
@@ -14,7 +13,7 @@ namespace op
      * Producer is an abstract class to extract frames from a source (image directory, video file,
      * webcam stream, etc.). It has the basic and common functions (e.g. getFrame, release & isOpened).
      */
-    class Producer
+    class OP_API Producer
     {
     public:
         /**
@@ -32,16 +31,40 @@ namespace op
 
         /**
          * Main function of Producer, it retrieves and returns a new frame from the frames producer.
-         * @return cv::Mat with the new frame. 
+         * @return cv::Mat with the new frame.
          */
         cv::Mat getFrame();
+
+        /**
+         * Analogous to getFrame, but it could return > 1 frame.
+         * @return std::vector<cv::Mat> with the new frame(s).
+         */
+        std::vector<cv::Mat> getFrames();
+
+        /**
+         * It retrieves and returns the camera matrixes from the frames producer.
+         * @return std::vector<cv::Mat> with the camera matrices.
+         */
+        virtual std::vector<cv::Mat> getCameraMatrices() = 0;
+
+        /**
+         * It retrieves and returns the camera extrinsic parameters from the frames producer.
+         * @return std::vector<cv::Mat> with the camera extrinsic parameters.
+         */
+        virtual std::vector<cv::Mat> getCameraExtrinsics() = 0;
+
+        /**
+         * It retrieves and returns the camera intrinsic parameters from the frames producer.
+         * @return std::vector<cv::Mat> with the camera intrinsic parameters.
+         */
+        virtual std::vector<cv::Mat> getCameraIntrinsics() = 0;
 
         /**
          * This function returns a unique frame name (e.g. the frame number for video, the
          * frame counter for webcam, the image name for image directory reader, etc.).
          * @return std::string with an unique frame name.
          */
-        virtual std::string getFrameName() = 0;
+        virtual std::string getNextFrameName() = 0;
 
         /**
          * This function sets whether the producer must keep the original fps frame rate or extract the frames as quick
@@ -68,7 +91,7 @@ namespace op
 
         /**
          * This function releases and closes the Producer. After it is called, no more frames
-         * can be retrieved from Producer::getFrame.
+         * can be retrieved from Producer::getFrames.
          */
         virtual void release() = 0;
 
@@ -90,9 +113,18 @@ namespace op
          */
         virtual void set(const int capProperty, const double value) = 0;
 
-        virtual double get(const ProducerProperty property) = 0;
+        /**
+         * Extra attributes that VideoCapture::get/set do not contain.
+         * @param property ProducerProperty indicating the property to be modified.
+         */
+        double get(const ProducerProperty property);
 
-        virtual void set(const ProducerProperty property, const double value) = 0;
+        /**
+         * Extra attributes that VideoCapture::get/set do not contain.
+         * @param property ProducerProperty indicating the property to be modified.
+         * @param value double indicating the new value to be assigned.
+         */
+        void set(const ProducerProperty property, const double value);
 
     protected:
         /**
@@ -122,9 +154,16 @@ namespace op
 
         /**
          * Function to be defined by its children class. It retrieves and returns a new frame from the frames producer.
-         * @return cv::Mat with the new frame. 
+         * @return cv::Mat with the new frame.
          */
         virtual cv::Mat getRawFrame() = 0;
+
+        /**
+         * Function to be defined by its children class. It retrieves and returns a new frame from the frames producer.
+         * It is equivalent to getRawFrame when more than 1 image can be returned.
+         * @return std::vector<cv::Mat> with the new frames.
+         */
+        virtual std::vector<cv::Mat> getRawFrames() = 0;
 
     private:
         const ProducerType mType;

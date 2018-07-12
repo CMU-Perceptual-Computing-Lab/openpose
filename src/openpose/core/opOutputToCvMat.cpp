@@ -1,14 +1,8 @@
-#include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/utilities/openCv.hpp>
 #include <openpose/core/opOutputToCvMat.hpp>
 
 namespace op
 {
-    OpOutputToCvMat::OpOutputToCvMat(const Point<int>& outputResolution) :
-        mOutputResolution{outputResolution}
-    {
-    }
-
     cv::Mat OpOutputToCvMat::formatToCvMat(const Array<float>& outputData) const
     {
         try
@@ -16,16 +10,16 @@ namespace op
             // Security checks
             if (outputData.empty())
                 error("Wrong input element (empty outputData).", __LINE__, __FUNCTION__, __FILE__);
-
+            // outputData to cvMat
             cv::Mat cvMat;
-            floatPtrToUCharCvMat(cvMat, outputData.getConstPtr(), mOutputResolution, 3);
-
+            outputData.getConstCvMat().convertTo(cvMat, CV_8UC3);
+            // Return cvMat
             return cvMat;
         }
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return cv::Mat{};
+            return cv::Mat();
         }
     }
 }

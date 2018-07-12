@@ -24,7 +24,9 @@ namespace op
      */
     enum class ProducerType : unsigned char
     {
+        FlirCamera,         /**< Stereo FLIR (Point-Grey) camera reader. Based on Spinnaker SDK. */
         ImageDirectory,     /**< An image directory reader. It is able to read images on a folder with a interface similar to the OpenCV cv::VideoCapture. */
+        IPCamera,           /**< An IP camera frames extractor, extending the functionality of cv::VideoCapture. */
         Video,              /**< A video frames extractor, extending the functionality of cv::VideoCapture. */
         Webcam,             /**< A webcam frames extractor, extending the functionality of cv::VideoCapture. */
         None,               /**< No type defined. Default state when no specific Producer has been picked yet. */

@@ -1,11 +1,9 @@
 #ifndef OPENPOSE_FILESTREAM_W_VIDEO_SAVER_HPP
 #define OPENPOSE_FILESTREAM_W_VIDEO_SAVER_HPP
 
-#include <memory> // std::shared_ptr
-#include <string>
-#include <vector>
+#include <openpose/core/common.hpp>
+#include <openpose/filestream/videoSaver.hpp>
 #include <openpose/thread/workerConsumer.hpp>
-#include "videoSaver.hpp"
 
 namespace op
 {
@@ -31,10 +29,7 @@ namespace op
 
 
 // Implementation
-#include <openpose/utilities/errorAndLog.hpp>
-#include <openpose/utilities/macros.hpp>
 #include <openpose/utilities/pointerContainer.hpp>
-#include <openpose/utilities/profiler.hpp>
 namespace op
 {
     template<typename TDatums>
@@ -63,12 +58,12 @@ namespace op
                 auto& tDatumsNoPtr = *tDatums;
                 // Record video(s)
                 std::vector<cv::Mat> cvOutputDatas(tDatumsNoPtr.size());
-                for (auto i = 0 ; i < cvOutputDatas.size() ; i++)
+                for (auto i = 0u ; i < cvOutputDatas.size() ; i++)
                     cvOutputDatas[i] = tDatumsNoPtr[i].cvOutputData;
                 spVideoSaver->write(cvOutputDatas);
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
-                Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__, Profiler::DEFAULT_X);
+                Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);
                 // Debugging log
                 dLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             }

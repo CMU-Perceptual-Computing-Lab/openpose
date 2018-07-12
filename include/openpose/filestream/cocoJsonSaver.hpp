@@ -1,30 +1,34 @@
 #ifndef OPENPOSE_FILESTREAM_POSE_JSON_COCO_SAVER_HPP
 #define OPENPOSE_FILESTREAM_POSE_JSON_COCO_SAVER_HPP
 
-#include <string>
-#include <openpose/core/array.hpp>
-#include <openpose/utilities/macros.hpp>
-#include "jsonOfstream.hpp"
+#include <openpose/core/common.hpp>
+#include <openpose/filestream/enumClasses.hpp>
+#include <openpose/filestream/jsonOfstream.hpp>
 
 namespace op
 {
     /**
-     *  The CocoJsonSaver class creates a COCO validation json file with details about the processed images. It inherits from Recorder.
+     *  The CocoJsonSaver class creates a COCO validation json file with details about the processed images. It
+     * inherits from Recorder.
      */
-    class CocoJsonSaver
+    class OP_API CocoJsonSaver
     {
     public:
         /**
-         * This constructor of CocoJsonSaver extends the Recorder::Recorder(const std::string & filePathToSave) constructor.
-         * @param filePathToSave const std::string parameter with the final file path where the generated json file will be saved.
+         * This constructor of CocoJsonSaver extends the Recorder::Recorder(const std::string & filePathToSave)
+         * constructor.
+         * @param filePathToSave const std::string parameter with the final file path where the generated json file
+         * will be saved.
          */
-        explicit CocoJsonSaver(const std::string& filePathToSave, const bool humanReadable = true);
+        explicit CocoJsonSaver(const std::string& filePathToSave, const bool humanReadable = true,
+                               const CocoJsonFormat cocoJsonFormat = CocoJsonFormat::Body);
 
         ~CocoJsonSaver();
 
-        void record(const Array<float>& poseKeypoints, const unsigned long long imageId);
+        void record(const Array<float>& poseKeypoints, const Array<float>& poseScores, const std::string& imageName);
 
     private:
+        const CocoJsonFormat mCocoJsonFormat;
         JsonOfstream mJsonOfstream;
         bool mFirstElementAdded;
 

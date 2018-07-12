@@ -1,7 +1,8 @@
 #ifndef OPENPOSE_GUI_W_ADD_GUI_INFO_HPP
 #define OPENPOSE_GUI_W_ADD_GUI_INFO_HPP
 
-#include "guiInfoAdder.hpp"
+#include <openpose/core/common.hpp>
+#include <openpose/gui/guiInfoAdder.hpp>
 #include <openpose/thread/worker.hpp>
 
 namespace op
@@ -28,10 +29,7 @@ namespace op
 
 
 // Implementation
-#include <openpose/utilities/errorAndLog.hpp>
-#include <openpose/utilities/macros.hpp>
 #include <openpose/utilities/pointerContainer.hpp>
-#include <openpose/utilities/profiler.hpp>
 namespace op
 {
     template<typename TDatums>
@@ -58,10 +56,13 @@ namespace op
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                 // Add GUI components to frame
                 for (auto& tDatum : *tDatums)
-                    spGuiInfoAdder->addInfo(tDatum.cvOutputData, tDatum.poseKeypoints, tDatum.id, tDatum.elementRendered.second);
+                    spGuiInfoAdder->addInfo(tDatum.cvOutputData, std::max(tDatum.poseKeypoints.getSize(0),
+                                                                          tDatum.faceKeypoints.getSize(0)),
+                                            tDatum.id, tDatum.elementRendered.second, tDatum.frameNumber,
+                                            tDatum.poseIds, tDatum.poseKeypoints);
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
-                Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__, Profiler::DEFAULT_X);
+                Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);
                 // Debugging log
                 dLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             }

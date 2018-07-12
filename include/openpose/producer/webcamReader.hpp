@@ -4,8 +4,8 @@
 #include <atomic>
 #include <mutex>
 #include <thread>
-#include <openpose/core/point.hpp>
-#include "videoCaptureReader.hpp"
+#include <openpose/core/common.hpp>
+#include <openpose/producer/videoCaptureReader.hpp>
 
 namespace op
 {
@@ -13,7 +13,7 @@ namespace op
      *  WebcamReader is a wrapper of the cv::VideoCapture class for webcam. It allows controlling a video (extracting
      * frames, setting resolution & fps, seeking to a particular frame, etc).
      */
-    class WebcamReader : public VideoCaptureReader
+    class OP_API WebcamReader : public VideoCaptureReader
     {
     public:
         /**
@@ -24,11 +24,18 @@ namespace op
          * @param webcamResolution const Point<int> parameter which specifies the desired camera resolution.
          * @param fps Double parameter which specifies the desired camera frame rate.
          */
-        explicit WebcamReader(const int webcamIndex = 0, const Point<int>& webcamResolution = Point<int>{}, const double fps = 30.);
+        explicit WebcamReader(const int webcamIndex = 0, const Point<int>& webcamResolution = Point<int>{},
+                              const double fps = 30., const bool throwExceptionIfNoOpened = true);
 
         ~WebcamReader();
 
-        std::string getFrameName();
+        std::vector<cv::Mat> getCameraMatrices();
+
+        std::vector<cv::Mat> getCameraExtrinsics();
+
+        std::vector<cv::Mat> getCameraIntrinsics();
+
+        std::string getNextFrameName();
 
         double get(const int capProperty);
 
@@ -37,12 +44,15 @@ namespace op
     private:
         double mFps;
         long long mFrameNameCounter;
+        bool mThreadOpened;
         cv::Mat mBuffer;
         std::mutex mBufferMutex;
         std::atomic<bool> mCloseThread;
         std::thread mThread;
 
         cv::Mat getRawFrame();
+
+        std::vector<cv::Mat> getRawFrames();
 
         void bufferingThread();
 
