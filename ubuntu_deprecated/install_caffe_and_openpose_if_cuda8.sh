@@ -25,7 +25,6 @@ function executeShInItsFolder {
     # $3 = folder to go back
     cd $2   
     exitIfError
-    sudo chmod +x $1
     exitIfError
     bash ./$1
     exitIfError

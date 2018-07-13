@@ -138,3 +138,5 @@ html/
 
 ######################### Validation Scripts & Testing #########################
 output*/
+
+cmake-build-debug
