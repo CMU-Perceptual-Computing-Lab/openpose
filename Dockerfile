@@ -7,10 +7,10 @@ RUN apt-get update && apt-get install -y \
     python-numpy \
     python3-numpy \
     sudo \
-    wget
+    wget \
+    python-pip \
+    cmake
 
-RUN apt-get install -y python-pip
-RUN apt-get install -y cmake
 WORKDIR /usr/local
 
 COPY . .

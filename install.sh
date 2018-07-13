@@ -2,7 +2,7 @@
 
 
 
-echo "------------------------- Installing Caffe -------------------------"
+echo "------------------------- Installing CMake -------------------------"
 
 function exitIfError {
     if [[ $? -ne 0 ]] ; then
@@ -16,10 +16,12 @@ function exitIfError {
 
 bash ./ubuntu/install_cmake.sh
 exitIfError
-pip install numpy
-exitIfError
+
+echo "------------------------- Installing OpenCV Python -------------------------"
 pip install opencv-python
 exitIfError
+
+echo "------------------------- Making Caffe and OpenPose -------------------------"
 mkdir build
 pushd build/
 cmake ..
