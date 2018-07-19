@@ -60,6 +60,7 @@ Note: In order to maximize calibration quality, **do not reuse the same video se
 ```
 7. Full example for 4 Flir/Point Grey cameras:
 ```sh
+# Ubuntu and Mac
 # Get images for calibration
 ./build/examples/openpose/openpose.bin --num_gpu 0 --frame_keep_distortion --flir_camera --flir_camera_index 0 --write_images ~/Desktop/intrinsics_0
 ./build/examples/openpose/openpose.bin --num_gpu 0 --frame_keep_distortion --flir_camera --flir_camera_index 1 --write_images ~/Desktop/intrinsics_1
@@ -75,6 +76,10 @@ Note: In order to maximize calibration quality, **do not reuse the same video se
 #     - Camera parameters will be saved on their respective serial number files, so OpenPose will automatically find them
 ./build/examples/openpose/openpose.bin --num_gpu 0 --flir_camera
 ```
+:: Windows
+:: build\x64\Release\calibration.exe with the same flags as above
+```
+```
 
 
 
@@ -88,12 +93,17 @@ Note: In order to maximize calibration quality, **do not reuse the same video se
 	- We assume camera 0 to the right, 1 in the middle-right, 2 in the middle-left, and 3 in the left.
 	- We assume camera 1 as the coordinate origin.
 ```sh
+# Ubuntu and Mac
 ./build/examples/calibration/calibration.bin --mode 2 --grid_square_size_mm 127.0 --grid_number_inner_corners 9x6 --omit_distortion --calibration_image_dir ~/Desktop/extrinsics/ --cam0 1 --cam1 0
 ./build/examples/calibration/calibration.bin --mode 2 --grid_square_size_mm 127.0 --grid_number_inner_corners 9x6 --omit_distortion --calibration_image_dir ~/Desktop/extrinsics/ --cam0 1 --cam1 2
 ./build/examples/calibration/calibration.bin --mode 2 --grid_square_size_mm 127.0 --grid_number_inner_corners 9x6 --omit_distortion --calibration_image_dir ~/Desktop/extrinsics/ --cam0 1 --cam1 3
 # Potentially more accurate equivalent for the calibration between cameras 1 and 3: If camera 3 and 1 are too far from each other and the calibration chessboard is not visible from both cameras at the same time enough times, the calibration can be run between camera 3 and camera 2, which is closer to 3. In that case, the `combine_cam0_extrinsics` flag is required, which tells the calibration toolbox that cam0 is not the global origin (in this case is camera 1).
 # Note: Wait until calibration of camera index 2 with respect to 1 is completed, as information from camera 2 XML calibration file will be used:
 ./build/examples/calibration/calibration.bin --mode 2 --grid_square_size_mm 127.0 --grid_number_inner_corners 9x6 --omit_distortion --calibration_image_dir ~/Desktop/extrinsics/ --cam0 2 --cam1 3 --combine_cam0_extrinsics
+```
+```
+:: Windows
+:: build\x64\Release\calibration.exe with the same flags as above
 ```
 4. Hint to verify extrinsic calibration is successful:
     1. Translation vector - Global distance:

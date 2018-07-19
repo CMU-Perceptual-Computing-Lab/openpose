@@ -17,7 +17,7 @@ Check that the library is working properly by running any of the following comma
 
 ### Running on Video
 ```
-# Ubuntu
+# Ubuntu and Mac
 ./build/examples/openpose/openpose.bin --video examples/media/video.avi
 # With face and hands
 ./build/examples/openpose/openpose.bin --video examples/media/video.avi --face --hand
@@ -39,7 +39,7 @@ build\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi --face --han
 
 ### Running on Webcam
 ```
-# Ubuntu
+# Ubuntu and Mac
 ./build/examples/openpose/openpose.bin
 # With face and hands
 ./build/examples/openpose/openpose.bin --face --hand
@@ -61,7 +61,7 @@ build\x64\Release\OpenPoseDemo.exe --face --hand
 
 ### Running on Images
 ```
-# Ubuntu
+# Ubuntu and Mac
 ./build/examples/openpose/openpose.bin --image_dir examples/media/
 # With face and hands
 ./build/examples/openpose/openpose.bin --image_dir examples/media/ --face --hand
@@ -82,11 +82,11 @@ build\x64\Release\OpenPoseDemo.exe --image_dir examples\media\ --face --hand
 
 
 ### Maximum Accuracy Configuration
-This command provides the most accurate results we have been able to achieve for body, hand and face keypoint detection. However, this command will need around 6.7 GB of GPU memory and runs around 1 FPS on a Titan X for body.
+This command provides the most accurate results we have been able to achieve for body, hand and face keypoint detection. However, this command will need ~10.5 GB of GPU memory (6.7 GB for COCO model) and runs at ~2 FPS on a Titan X for the body-foot model (1 FPS for COCO). **Note: Do not use this configuration for MPII model**, its accuracy might be harmed by this multi-scale setting. This configuration is optimal only for COCO and COCO-extended (e.g., the default BODY_25) models.
 ```
-# Ubuntu: Body
+# Ubuntu and Mac: Body
 ./build/examples/openpose/openpose.bin --net_resolution "1312x736" --scale_number 4 --scale_gap 0.25
-# Ubuntu: Body + Hand + Face
+# Ubuntu and Mac: Body + Hand + Face
 ./build/examples/openpose/openpose.bin --net_resolution "1312x736" --scale_number 4 --scale_gap 0.25 --hand --hand_scale_number 6 --hand_scale_range 0.4 --face
 ```
 ```
@@ -107,7 +107,7 @@ build\x64\Release\OpenPoseDemo.exe --net_resolution "1312x736" --scale_number 4 
 ### 3-D Reconstruction
 1. Real-time demo
 ```
-# Ubuntu
+# Ubuntu and Mac
 ./build/examples/openpose/openpose.bin --flir_camera --3d --number_people_max 1
 # With face and hands
 ./build/examples/openpose/openpose.bin --flir_camera --3d --number_people_max 1 --face --hand
@@ -127,13 +127,13 @@ build\x64\Release\OpenPoseDemo.exe --flir_camera --3d --number_people_max 1 --fa
 
 2. Saving 3-D keypoints
 ```
-# Ubuntu (same flags for Windows version)
+# Ubuntu and Mac (same flags for Windows version)
 ./build/examples/openpose/openpose.bin --flir_camera --3d --number_people_max 1 --write_json output_folder_path/
 ```
 
 3. Fast stereo camera image saving (without keypoint detection) for later post-processing
 ```
-# Ubuntu (same flags for Windows version)
+# Ubuntu and Mac (same flags for Windows version)
 # Saving video
 # Note: saving in PNG rather than JPG will improve image quality, but slow down FPS (depending on hard disk writing speed and camera number)
 ./build/examples/openpose/openpose.bin --flir_camera --num_gpu 0 --write_video output_folder_path/video.avi --camera_fps 5
@@ -144,7 +144,7 @@ build\x64\Release\OpenPoseDemo.exe --flir_camera --3d --number_people_max 1 --fa
 
 4. Reading and processing previouly saved stereo camera images
 ```
-# Ubuntu (same flags for Windows version)
+# Ubuntu and Mac (same flags for Windows version)
 # Optionally add `--face` and/or `--hand` to include face and/or hands
 # Assuming 3 cameras
 # Note: We highly recommend to reduce `--output_resolution`. E.g. for 3 cameras recording at 1920x1080, the resulting image is (3x1920)x1080, so we recommend e.g. 640x360 (x3 reduction).
@@ -156,7 +156,7 @@ build\x64\Release\OpenPoseDemo.exe --flir_camera --3d --number_people_max 1 --fa
 
 5. Reconstruction when at least n visible views
 ```
-# Ubuntu (same flags for Windows version)
+# Ubuntu and Mac (same flags for Windows version)
 # Assuming >=2 cameras and reconstruction when at least 2 visible views
 ./build/examples/openpose/openpose.bin --flir_camera --3d --number_people_max 1 --3d_min_views 2 --output_resolution {desired_output_resolution}
 ```
