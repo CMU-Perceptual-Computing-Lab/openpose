@@ -449,6 +449,34 @@ namespace op
         }
     }
 
+    __global__ void renderDistance(float* targetPtr, const int targetWidth, const int targetHeight,
+                                   const float* const heatMapPtr, const int widthHeatMap, const int heightHeatMap,
+                                   const float scaleToKeepRatio, const int part, const int numberBodyParts,
+                                   const int numberBodyPAFChannels, const float alphaColorToAdd)
+    {
+        const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
+        const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
+
+        if (x < targetWidth && y < targetHeight)
+        {
+            const auto xSource = (x + 0.5f) / scaleToKeepRatio - 0.5f;
+            const auto ySource = (y + 0.5f) / scaleToKeepRatio - 0.5f;
+            const auto heatMapOffset = part * widthHeatMap * heightHeatMap
+                                     + (numberBodyParts+1+numberBodyPAFChannels)*widthHeatMap * heightHeatMap;
+            const auto* const heatMapPtrOffsetted = heatMapPtr + heatMapOffset;
+            const auto interpolatedValue = 0.5f
+                                         + 0.5f * bicubicInterpolate(heatMapPtrOffsetted, xSource, ySource,
+                                                                     widthHeatMap, heightHeatMap, widthHeatMap);
+
+            float rgbColor[3];
+            getColorHeatMap(rgbColor, interpolatedValue, 0.f, 1.f);
+
+            const auto blueIndex = 3*(y * targetWidth + x);
+            addColorWeighted(targetPtr[blueIndex+2], targetPtr[blueIndex+1], targetPtr[blueIndex], rgbColor,
+                             alphaColorToAdd);
+        }
+    }
+
     inline void checkAlpha(const float alphaColorToAdd)
     {
         if (alphaColorToAdd < 0.f || alphaColorToAdd > 1.f)
@@ -500,7 +528,7 @@ namespace op
                 getNumberCudaThreadsAndBlocks(threadsPerBlock, numBlocks, frameSize);
 
                 // Body pose
-                if (poseModel == PoseModel::BODY_25 || poseModel == PoseModel::BODY_25_19)
+                if (poseModel == PoseModel::BODY_25 || poseModel == PoseModel::BODY_25_19 || poseModel == PoseModel::BODY_25D)
                     renderPoseBody25<<<threadsPerBlock, numBlocks>>>(
                         framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
                         blendOriginalFrame, alphaBlending
@@ -632,6 +660,27 @@ namespace op
             const auto numberBodyPartPairs = (int)getPosePartPairs(poseModel).size()/2;
             renderPosePAFGpuAux(framePtr, poseModel, frameSize, heatMapPtr, heatMapSize, scaleToKeepRatio,
                                 getPoseNumberBodyParts(poseModel)+1, numberBodyPartPairs, alphaBlending);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    void renderPoseDistance(float* framePtr, const Point<int>& frameSize, const float* const heatMapPtr,
+                            const Point<int>& heatMapSize, const float scaleToKeepRatio, const int part,
+                            const int numberBodyParts, const int numberBodyPAFChannels, const float alphaBlending)
+    {
+        try
+        {
+            checkAlpha(alphaBlending);
+            dim3 threadsPerBlock;
+            dim3 numBlocks;
+            getNumberCudaThreadsAndBlocks(threadsPerBlock, numBlocks, frameSize);
+            renderDistance<<<threadsPerBlock, numBlocks>>>(
+                framePtr, frameSize.x, frameSize.y, heatMapPtr, heatMapSize.x, heatMapSize.y, scaleToKeepRatio,
+                part, numberBodyParts, numberBodyPAFChannels, alphaBlending);
+            cudaCheck(__LINE__, __FUNCTION__, __FILE__);
         }
         catch (const std::exception& e)
         {

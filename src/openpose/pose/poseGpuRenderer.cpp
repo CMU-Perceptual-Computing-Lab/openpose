@@ -81,6 +81,7 @@ namespace op
                     cudaCheck(__LINE__, __FUNCTION__, __FILE__);
                     const auto numberBodyParts = getPoseNumberBodyParts(mPoseModel);
                     const auto numberBodyPartsPlusBkg = numberBodyParts+1;
+                    const auto numberBodyPAFChannels = getPosePartPairs(mPoseModel).size();
                     const Point<int> frameSize{outputData.getSize(1), outputData.getSize(0)};
                     // Draw poseKeypoints
                     if (elementRendered == 0)
@@ -108,6 +109,7 @@ namespace op
                         // Parameters
                         const auto& heatMapSizes = spPoseExtractorNet->getHeatMapSize();
                         const Point<int> heatMapSize{heatMapSizes[3], heatMapSizes[2]};
+                        const auto lastPAFChannel = numberBodyPartsPlusBkg+2+numberBodyPAFChannels/2;
                         // Add all heatmaps
                         if (elementRendered == 2)
                         // if (elementRendered == numberBodyPartsPlusBkg+1)
@@ -141,16 +143,33 @@ namespace op
                                                  (mBlendOriginalFrame ? getAlphaHeatMap() : 1.f));
                         }
                         // Draw affinity between 2 body parts
-                        else
+                        else if (elementRendered <= lastPAFChannel)
                         {
                             const auto affinityPart = (elementRendered-numberBodyPartsPlusBkg-3)*2;
-                            const auto affinityPartMapped = numberBodyPartsPlusBkg+getPoseMapIndex(mPoseModel).at(affinityPart);
+                            const auto affinityPartMapped = numberBodyPartsPlusBkg
+                                                          + getPoseMapIndex(mPoseModel).at(affinityPart);
                             elementRenderedName = mPartIndexToName.at(affinityPartMapped);
                             elementRenderedName = elementRenderedName.substr(0, elementRenderedName.find("("));
                             renderPosePAFGpu(*spGpuMemory, mPoseModel, frameSize,
                                              spPoseExtractorNet->getHeatMapGpuConstPtr(),
                                              heatMapSize, scaleNetToOutput * scaleInputToOutput, affinityPartMapped,
                                              (mBlendOriginalFrame ? getAlphaHeatMap() : 1.f));
+                        }
+                        // Draw neck-part distance channel
+                        else
+                        {
+                            if (mPoseModel != PoseModel::BODY_25D)
+                                error("Neck-part distance channel only for BODY_25D.",
+                                      __LINE__, __FUNCTION__, __FILE__);
+                            const auto distancePart = (elementRendered - lastPAFChannel - 1)*2;
+                            const auto distancePartMapped = numberBodyPartsPlusBkg + numberBodyPAFChannels
+                                                          + distancePart;
+                            elementRenderedName = mPartIndexToName.at(distancePartMapped);
+                            elementRenderedName = elementRenderedName.substr(0, elementRenderedName.find("("));
+                            renderPoseDistance(*spGpuMemory, frameSize, spPoseExtractorNet->getHeatMapGpuConstPtr(),
+                                               heatMapSize, scaleNetToOutput * scaleInputToOutput, distancePart,
+                                               numberBodyParts, numberBodyPAFChannels,
+                                               (mBlendOriginalFrame ? getAlphaHeatMap() : 1.f));
                         }
                     }
                 }

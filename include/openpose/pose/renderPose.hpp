@@ -37,6 +37,10 @@ namespace op
                                   const float* const heatmapPtr, const Point<int>& heatmapSize,
                                   const float scaleToKeepRatio,
                                   const float alphaBlending = POSE_DEFAULT_ALPHA_HEAT_MAP);
+
+    OP_API void renderPoseDistance(float* framePtr, const Point<int>& frameSize, const float* const heatMapPtr,
+                                   const Point<int>& heatMapSize, const float scaleToKeepRatio, const int part,
+                                   const int numberBodyParts, const int numberBodyPAFs, const float alphaBlending);
 }
 
 #endif // OPENPOSE_POSE_RENDER_POSE_HPP

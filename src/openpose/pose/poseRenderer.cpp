@@ -1,6 +1,7 @@
 #include <openpose/pose/poseParameters.hpp>
 #include <openpose/pose/poseParametersRender.hpp>
 #include <openpose/pose/renderPose.hpp>
+#include <openpose/utilities/fastMath.hpp>
 #include <openpose/pose/poseRenderer.hpp>
 
 namespace op
@@ -12,16 +13,34 @@ namespace op
             auto partToName = getPoseBodyPartMapping(poseModel);
             const auto& bodyPartPairs = getPosePartPairs(poseModel);
             const auto& mapIdx = getPoseMapIndex(poseModel);
-            const auto numberBodyPartsPlusBkg = getPoseNumberBodyParts(poseModel)+1;
+            const auto numberBodyParts = getPoseNumberBodyParts(poseModel);
+            const auto numberBodyPartsPlusBkg = numberBodyParts+1;
 
+            // PAFs
             for (auto bodyPart = 0u; bodyPart < bodyPartPairs.size(); bodyPart+=2)
             {
                 const auto bodyPartPairsA = bodyPartPairs.at(bodyPart);
                 const auto bodyPartPairsB = bodyPartPairs.at(bodyPart+1);
                 const auto mapIdxA = numberBodyPartsPlusBkg + mapIdx.at(bodyPart);
                 const auto mapIdxB = numberBodyPartsPlusBkg + mapIdx.at(bodyPart+1);
-                partToName[mapIdxA] = partToName.at(bodyPartPairsA) + "->" + partToName.at(bodyPartPairsB) + "(X)";
-                partToName[mapIdxB] = partToName.at(bodyPartPairsA) + "->" + partToName.at(bodyPartPairsB) + "(Y)";
+                const auto baseLine = partToName.at(bodyPartPairsA) + "->" + partToName.at(bodyPartPairsB);
+                partToName[mapIdxA] = baseLine + "(X)";
+                partToName[mapIdxB] = baseLine + "(Y)";
+            }
+            // Distance PAFs
+            if (poseModel == PoseModel::BODY_25D)
+            {
+                for (auto bodyPart = 0u; bodyPart < numberBodyParts; bodyPart++)
+                {
+                    if (bodyPart != 1u)
+                    {
+                        const auto mapIdx = numberBodyPartsPlusBkg + bodyPartPairs.size() + 2*bodyPart
+                                          - (bodyPart > 0 ? 2 : 0);
+                        const auto baseLine = partToName.at(1) + "->" + partToName.at(bodyPart);
+                        partToName[mapIdx] = baseLine + "(X)";
+                        partToName[mapIdx+1] = baseLine + "(Y)";
+                    }
+                }
             }
 
             return partToName;

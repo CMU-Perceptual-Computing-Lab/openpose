@@ -91,11 +91,17 @@ OpenPose can be easily updated by:
 ## Installation
 The instructions in this section describe the steps to build OpenPose using CMake (GUI). There are 3 main steps:
 
-1. [Prerequisites](#prerequisites)
-2. [OpenPose Configuration](#openpose-configuration)
-3. [OpenPose Building](#openpose-building)
-4. [Run OpenPose](#run-openpose)
-5. [OpenPose from other Projects (Ubuntu and Mac)](#openpose-from-other-projects-ubuntu-and-mac)
+1. [Problems and Errors Installing](#problems-and-errors-installing)
+2. [Prerequisites](#prerequisites)
+3. [OpenPose Configuration](#openpose-configuration)
+4. [OpenPose Building](#openpose-building)
+5. [Run OpenPose](#run-openpose)
+6. [OpenPose from other Projects (Ubuntu and Mac)](#openpose-from-other-projects-ubuntu-and-mac)
+
+
+
+### Problems and Errors Installing
+Any problem installing OpenPose? Check [doc/faq.md](./faq.md) and/or post a GitHub issue. We will not respond more GitHub issues about Caffe, OpenCV or CUDA errors.
 
 
 
