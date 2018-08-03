@@ -354,6 +354,8 @@ if (UNIX OR APPLE)
 
   # 3D
   if (WITH_3D_RENDERER)
+    # OpenGL
+	find_package(OpenGL REQUIRED)
     # GLUT
     find_package(GLUT REQUIRED)
   endif (WITH_3D_RENDERER)
@@ -782,7 +784,7 @@ if (WITH_3D_ADAM_MODEL)
   include_directories(${EIGEN3_INCLUDE_DIRS})
   include_directories(${IGL_INCLUDE_DIRS})
   include_directories(${LIBIGL_INCLUDE_DIRS})
-  include_directories(${OPENGL_INCLUDE_DIRS} ${GLUT_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS})
+  include_directories(${OPENGL_INCLUDE_DIR} ${GLUT_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS})
 endif (WITH_3D_ADAM_MODEL)
 # Windows includes
 if (WIN32)
@@ -827,7 +829,7 @@ if (WITH_3D_ADAM_MODEL)
       ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} ${GLEW_LIBRARY} ${FREE_IMAGE_LIBRARY})
 endif (WITH_3D_ADAM_MODEL)
 if (WITH_3D_RENDERER)
-  set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries} ${GLUT_LIBRARY})
+  set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries} ${OPENGL_LIBRARIES} ${GLUT_LIBRARY})
 endif (WITH_3D_RENDERER)
 if (WITH_CERES)
   set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries} ${CERES_LIBRARIES})
