@@ -372,7 +372,7 @@ if (UNIX OR APPLE)
   if (WITH_3D_ADAM_MODEL)
     if (NOT WITH_3D_RENDERER)
       message(FATAL_ERROR "WITH_3D_RENDERER is required if WITH_3D_ADAM_MODEL is enabled.")
-    endif (WITH_3D_RENDERER)
+    endif (NOT WITH_3D_RENDERER)
     find_package(PkgConfig)
     pkg_check_modules(EIGEN3 REQUIRED eigen3)
     # Others: sudo apt-get install libglm-dev
