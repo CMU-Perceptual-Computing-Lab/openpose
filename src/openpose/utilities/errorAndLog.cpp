@@ -6,6 +6,33 @@
 
 namespace op
 {
+	// Tianyi's code
+	namespace UnityDebugger {
+		typedef void(__stdcall * DebugCallback) (const char * str, int type);
+		DebugCallback gDebugCallback;
+
+		extern "C" void OP_API OP_RegisterDebugCallback(DebugCallback callback)
+		{
+			if (callback)
+			{
+				gDebugCallback = callback;
+			}
+		}
+
+		void DebugInUnity(std::string message, int type)
+		{
+			if (gDebugCallback)
+			{
+				gDebugCallback(message.c_str(), type);
+			}
+		}
+
+		void log(std::string message) { DebugInUnity(message, 0); }
+		void logWarning(std::string message) { DebugInUnity(message, 1); }
+		void logError(std::string message) { DebugInUnity(message, -1); }
+	}
+
+
     // Private auxiliar functions
     bool checkIfErrorHas(const ErrorMode errorMode)
     {
@@ -135,8 +162,10 @@ namespace op
         }
 
         // std::cerr
-        if (checkIfErrorHas(ErrorMode::StdCerr))
-            std::cerr << errorMessageToPrint << std::endl;
+		if (checkIfErrorHas(ErrorMode::StdCerr)) {
+			std::cerr << errorMessageToPrint << std::endl;
+			UnityDebugger::logError(errorMessageToPrint); // Tianyi's code
+		}
 
         // File logging
         if (checkIfErrorHas(ErrorMode::FileLogging))
@@ -155,8 +184,10 @@ namespace op
             const auto infoMessage = createFullMessage(message, line, function, file);
 
             // std::cout
-            if (checkIfLoggingHas(LogMode::StdCout))
-                std::cout << infoMessage << std::endl;
+			if (checkIfLoggingHas(LogMode::StdCout)) {
+				std::cout << infoMessage << std::endl;
+				UnityDebugger::log(infoMessage); // Tianyi's code
+			}
 
             // File logging
             if (checkIfLoggingHas(LogMode::FileLogging))
