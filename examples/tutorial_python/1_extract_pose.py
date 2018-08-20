@@ -33,14 +33,17 @@ params["num_gpu_start"] = 0
 params["disable_blending"] = False
 # Ensure you point to the correct path where models are located
 params["default_model_folder"] = dir_path + "/../../../models/"
+# Specify resolution of hand network
+params["hand_net_resolution"] = "368x368"
 # Construct OpenPose object allocates GPU memory
 openpose = OpenPose(params)
+
 
 while 1:
     # Read new image
     img = cv2.imread("../../../examples/media/COCO_val2014_000000000192.jpg")
     # Output keypoints and the image with the human skeleton blended on it
-    keypoints, output_image = openpose.forward(img, True)
+    keypoints, output_image, hands = openpose.forward(img, True, True)
     # Print the human pose keypoints, i.e., a [#people x #keypoints x 3]-dimensional numpy object with the keypoints of all the people on that image
     print(keypoints)
     # Display the image

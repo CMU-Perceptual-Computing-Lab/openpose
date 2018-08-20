@@ -36,12 +36,26 @@ class OpenPose(object):
     _libop.forward.argtypes = [
         ct.c_void_p, np.ctypeslib.ndpointer(dtype=np.uint8),
         ct.c_size_t, ct.c_size_t,
-        np.ctypeslib.ndpointer(dtype=np.int32), np.ctypeslib.ndpointer(dtype=np.uint8), ct.c_bool]
+        np.ctypeslib.ndpointer(dtype=np.int32), np.ctypeslib.ndpointer(dtype=np.uint8),
+        ct.c_bool, ct.c_bool
+    ]
     _libop.forward.restype = None
 
     _libop.getOutputs.argtypes = [
         ct.c_void_p, np.ctypeslib.ndpointer(dtype=np.float32)]
     _libop.getOutputs.restype = None
+
+    _libop.getHandSize.argtypes = [
+        ct.c_void_p, np.ctypeslib.ndpointer(dtype=np.int32)
+    ]
+    _libop.getHandSize.restype = None
+
+    _libop.getHandOutputs.argtypes = [
+        ct.c_void_p,
+        np.ctypeslib.ndpointer(dtype=np.float32),
+        np.ctypeslib.ndpointer(dtype=np.float32)
+    ]
+    _libop.getHandOutputs.restype = None
 
     _libop.poseFromHeatmap.argtypes = [
         ct.c_void_p, np.ctypeslib.ndpointer(dtype=np.uint8),
@@ -75,7 +89,8 @@ class OpenPose(object):
                                     params["render_threshold"],
                                     params["num_gpu_start"],
                                     params["disable_blending"],
-                                    self.encode(params["default_model_folder"]))
+                                    self.encode(params["default_model_folder"]),
+                                    self.encode(params["hand_net_resolution"]))
 
     def __del__(self):
         """
@@ -83,7 +98,7 @@ class OpenPose(object):
         """
         self._libop.delOP(self.op)
 
-    def forward(self, image, display = False):
+    def forward(self, image, display=False, hands=False):
         """
         Forward: Takes in an image and returns the human 2D poses, along with drawn image if required
 
@@ -98,13 +113,27 @@ class OpenPose(object):
         displayImage : image for visualization
         """
         shape = image.shape
-        displayImage = np.zeros(shape=(image.shape),dtype=np.uint8)
-        size = np.zeros(shape=(3),dtype=np.int32)
-        self._libop.forward(self.op, image, shape[0], shape[1], size, displayImage, display)
-        array = np.zeros(shape=(size),dtype=np.float32)
+        displayImage = np.zeros(shape=(image.shape), dtype=np.uint8)
+        size = np.zeros(shape=(3), dtype=np.int32)
+        self._libop.forward(self.op, image, shape[0], shape[1], size, displayImage, display, hands)
+
+        array = np.zeros(shape=(size), dtype=np.float32)
         self._libop.getOutputs(self.op, array)
-        if display:
+
+        if hands:
+            hand_size = np.zeros(shape=(3), dtype=np.int32)
+            self._libop.getHandSize(self.op, hand_size)
+
+            hands_array = np.zeros(shape=(2, *hand_size), dtype=np.float32)
+            self._libop.getHandOutputs(self.op, hands_array[0], hands_array[1])
+
+        if display and hands:
+            return array, displayImage, hands_array
+        elif display:
             return array, displayImage
+        elif hands:
+            return array, hands_array
+
         return array
 
     def poseFromHM(self, image, hm, ratios=[1]):
@@ -231,6 +260,7 @@ if __name__ == "__main__":
     params["num_gpu_start"] = 0
     params["disable_blending"] = False
     params["default_model_folder"] = "../../../models/"
+    params["hand_net_resolution"] = "368x368"
     openpose = OpenPose(params)
 
     img = cv2.imread("../../../examples/media/COCO_val2014_000000000192.jpg")
@@ -240,4 +270,3 @@ if __name__ == "__main__":
     while 1:
         cv2.imshow("output", output_image)
         cv2.waitKey(15)
-
