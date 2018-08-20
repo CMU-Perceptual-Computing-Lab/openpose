@@ -106,11 +106,13 @@ class OpenPose(object):
         ----------
         image : color image of type ndarray
         display : If set to true, we return both the pose and an annotated image for visualization
+        hands : If set to true, also predict and return hand keypoints.
 
         Returns
         -------
         array: ndarray of human 2D poses [People * BodyPart * XYConfidence]
         displayImage : image for visualization
+        hands : ndarray of hands correspodning to the poses. [2 * People * HandParts * XYConfidence]
         """
         shape = image.shape
         displayImage = np.zeros(shape=(image.shape), dtype=np.uint8)
