@@ -38,7 +38,7 @@ namespace op
             std::vector<int> validSubsetIndexes;
             validSubsetIndexes.reserve(fastMin((size_t)POSE_MAX_PEOPLE, subsets.size()));
             removeSubsetsBelowThresholds(validSubsetIndexes, numberPeople, subsets, subsetCounterIndex,
-                                         numberBodyParts, minSubsetCnt, minSubsetScore);
+                                         numberBodyParts, minSubsetCnt, minSubsetScore, maxPeaks);
 
             // Fill and return poseKeypoints
             subsetsToPoseKeypointsAndScores(poseKeypoints, poseScores, scaleFactor, subsets, validSubsetIndexes,

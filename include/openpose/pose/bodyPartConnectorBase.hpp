@@ -31,7 +31,7 @@ namespace op
     OP_API void removeSubsetsBelowThresholds(std::vector<int>& validSubsetIndexes, int& numberPeople,
                                              const std::vector<std::pair<std::vector<int>, double>>& subsets,
                                              const unsigned int subsetCounterIndex, const unsigned int numberBodyParts,
-                                             const int minSubsetCnt, const T minSubsetScore);
+                                             const int minSubsetCnt, const T minSubsetScore, const int maxPeaks);
 
     template <typename T>
     OP_API void subsetsToPoseKeypointsAndScores(Array<T>& poseKeypoints, Array<T>& poseScores, const T scaleFactor,
