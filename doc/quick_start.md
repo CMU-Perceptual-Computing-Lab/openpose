@@ -82,7 +82,11 @@ build\x64\Release\OpenPoseDemo.exe --image_dir examples\media\ --face --hand
 
 
 ### Maximum Accuracy Configuration
-This command provides the most accurate results we have been able to achieve for body, hand and face keypoint detection. However, this command will need ~10.5 GB of GPU memory (6.7 GB for COCO model) and runs at ~2 FPS on a Titan X for the body-foot model (1 FPS for COCO). **Note: Do not use this configuration for MPII model**, its accuracy might be harmed by this multi-scale setting. This configuration is optimal only for COCO and COCO-extended (e.g., the default BODY_25) models.
+This command provides the most accurate results we have been able to achieve for body, hand and face keypoint detection. However, this command will need ~10.5 GB of GPU memory (6.7 GB for COCO model) and runs at ~2 FPS on a Titan X for the body-foot model (1 FPS for COCO).
+
+- **Note 1:** Increasing `--net_resolution` will highly reduce the frame rate and increase latency, while it might increase the accuracy. However, this accuracy increase is not guaranteed in all scenarios, required a more detailed analysis for each particular scenario. E.g., it will work better for images with very small people, but usually worse for people taking a big ratio of the image. Thus, we recommend to follow the commands below for maximum accuracy in most cases for both big and small-size people.
+- **Note 2: Do not use this configuration for MPII model**, its accuracy might be harmed by this multi-scale setting. This configuration is optimal only for COCO and COCO-extended (e.g., the default BODY_25) models.
+
 ```
 # Ubuntu and Mac: Body
 ./build/examples/openpose/openpose.bin --net_resolution "1312x736" --scale_number 4 --scale_gap 0.25

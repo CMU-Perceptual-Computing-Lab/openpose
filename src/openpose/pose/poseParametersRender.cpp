@@ -96,7 +96,7 @@ namespace op
             return (unsigned int)(getPoseBodyPartMapping(poseModel).size()
                                   + getPosePartPairs(poseModel).size()/2 + 3
                                   + (poseModel == PoseModel::BODY_25D
-                                     ? getPoseNumberBodyParts(poseModel) - 1 : 0)
+                                     ? 2*(getPoseNumberBodyParts(poseModel) - 1) : 0)
                                   );
         }
         catch (const std::exception& e)

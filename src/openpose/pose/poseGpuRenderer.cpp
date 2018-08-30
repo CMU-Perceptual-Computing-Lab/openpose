@@ -134,9 +134,9 @@ namespace op
                         else if (elementRendered <= numberBodyPartsPlusBkg+2)
                         {
                             const auto realElementRendered = (elementRendered == 1
-                                                                ? numberBodyPartsPlusBkg
-                                                                : elementRendered - 3);
-                            elementRenderedName = mPartIndexToName.at(realElementRendered-1);
+                                                                ? numberBodyParts
+                                                                : elementRendered - 4);
+                            elementRenderedName = mPartIndexToName.at(realElementRendered);
                             renderPoseHeatMapGpu(*spGpuMemory, mPoseModel, frameSize,
                                                  spPoseExtractorNet->getHeatMapGpuConstPtr(),
                                                  heatMapSize, scaleNetToOutput * scaleInputToOutput, realElementRendered,
@@ -161,14 +161,13 @@ namespace op
                             if (mPoseModel != PoseModel::BODY_25D)
                                 error("Neck-part distance channel only for BODY_25D.",
                                       __LINE__, __FUNCTION__, __FILE__);
-                            const auto distancePart = (elementRendered - lastPAFChannel - 1)*2;
+                            const auto distancePart = (elementRendered - lastPAFChannel - 1);
                             const auto distancePartMapped = numberBodyPartsPlusBkg + numberBodyPAFChannels
                                                           + distancePart;
                             elementRenderedName = mPartIndexToName.at(distancePartMapped);
-                            elementRenderedName = elementRenderedName.substr(0, elementRenderedName.find("("));
-                            renderPoseDistance(*spGpuMemory, frameSize, spPoseExtractorNet->getHeatMapGpuConstPtr(),
-                                               heatMapSize, scaleNetToOutput * scaleInputToOutput, distancePart,
-                                               numberBodyParts, numberBodyPAFChannels,
+                            renderPoseDistance(*spGpuMemory, mPoseModel, frameSize,
+                                               spPoseExtractorNet->getHeatMapGpuConstPtr(),
+                                               heatMapSize, scaleNetToOutput * scaleInputToOutput, distancePartMapped,
                                                (mBlendOriginalFrame ? getAlphaHeatMap() : 1.f));
                         }
                     }

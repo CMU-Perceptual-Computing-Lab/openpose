@@ -26,7 +26,7 @@ See [doc/quick_start.md#maximum-accuracy-configuration](./quick_start.md#maximum
 In general, there are 3 ways to reduce the latency (with some drawbacks each one):
 
 - Reducing `--output_resolution`: It will slightly reduce the latency and increase the FPS. But the quality of the displayed image will deteriorate.
-- Reducing `--net_resolution` and/or `--face_net_resolution` and/or `--hand_net_resolution`: It will increase the FPS and reduce the latency. But the accuracy will drop, specially for small people in the image.
+- Reducing `--net_resolution` and/or `--face_net_resolution` and/or `--hand_net_resolution`: It will increase the FPS and reduce the latency. But the accuracy will drop, specially for small people in the image. Note: For maximum accuracy, follow [doc/quick_start.md#maximum-accuracy-configuration](./quick_start.md#maximum-accuracy-configuration).
 - Enabling `--disable_multi_thread`: The latency should be reduced. But the speed will drop to 1-GPU speed (as it will only use 1 GPU). Note that it's practical only for body, if hands and face are also extracted, it's usually not worth it.
 
 

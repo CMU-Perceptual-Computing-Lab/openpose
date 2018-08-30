@@ -368,7 +368,7 @@ namespace op
     __global__ void renderBodyPartHeatMap(float* targetPtr, const int targetWidth, const int targetHeight,
                                           const float* const heatMapPtr, const int widthHeatMap,
                                           const int heightHeatMap, const float scaleToKeepRatio, const int part,
-                                          const int numberBodyParts, const float alphaColorToAdd)
+                                          const float alphaColorToAdd, const bool absValue = false)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -377,13 +377,15 @@ namespace op
         {
             const auto xSource = (x + 0.5f) / scaleToKeepRatio - 0.5f;
             const auto ySource = (y + 0.5f) / scaleToKeepRatio - 0.5f;
-            const auto heatMapOffset = part * widthHeatMap * heightHeatMap;
-            const auto* const heatMapPtrOffsetted = heatMapPtr + heatMapOffset;
+            const auto* const heatMapPtrOffsetted = heatMapPtr + part * widthHeatMap * heightHeatMap;
             const auto interpolatedValue = bicubicInterpolate(heatMapPtrOffsetted, xSource, ySource, widthHeatMap,
                                                               heightHeatMap, widthHeatMap);
 
             float rgbColor[3];
-            getColorHeatMap(rgbColor, interpolatedValue, 0.f, 1.f);
+            if (absValue)
+                getColorHeatMap(rgbColor, fabsf(interpolatedValue), 0.f, 1.f);
+            else
+                getColorHeatMap(rgbColor, interpolatedValue, 0.f, 1.f);
 
             const auto blueIndex = 3*(y * targetWidth + x);
             addColorWeighted(targetPtr[blueIndex+2], targetPtr[blueIndex+1], targetPtr[blueIndex], rgbColor,
@@ -437,6 +439,15 @@ namespace op
                 }
 
                 float3 rgbColor2;
+                // if (forceNorm1)
+                // {
+                //     const auto norm = std::sqrt(valueX*valueX + valueY*valueY);
+                //     if (norm > 0.05f)
+                //         getColorXYAffinity(rgbColor2, valueX/norm, valueY/norm);
+                //     else
+                //         getColorXYAffinity(rgbColor2, valueX, valueY);
+                // }
+                // else
                 getColorXYAffinity(rgbColor2, valueX, valueY);
                 rgbColor[0] += rgbColor2.x;
                 rgbColor[1] += rgbColor2.y;
@@ -594,12 +605,10 @@ namespace op
             dim3 threadsPerBlock;
             dim3 numBlocks;
             getNumberCudaThreadsAndBlocks(threadsPerBlock, numBlocks, frameSize);
-            const auto numberBodyParts = getPoseNumberBodyParts(poseModel);
-            const auto heatMapOffset = numberBodyParts * heatMapSize.area();
 
             renderBodyPartHeatMap<<<threadsPerBlock, numBlocks>>>(
                 framePtr, frameSize.x, frameSize.y, heatMapPtr, heatMapSize.x, heatMapSize.y, scaleToKeepRatio,
-                part-1, numberBodyParts, alphaBlending
+                part, alphaBlending
             );
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
         }
@@ -667,19 +676,29 @@ namespace op
         }
     }
 
-    void renderPoseDistance(float* framePtr, const Point<int>& frameSize, const float* const heatMapPtr,
-                            const Point<int>& heatMapSize, const float scaleToKeepRatio, const int part,
-                            const int numberBodyParts, const int numberBodyPAFChannels, const float alphaBlending)
+    void renderPoseDistance(float* framePtr, const PoseModel poseModel, const Point<int>& frameSize,
+                            const float* const heatMapPtr, const Point<int>& heatMapSize, const float scaleToKeepRatio,
+                            const int part, const float alphaBlending)
     {
         try
         {
+            // // As PAF
+            // const bool forceNorm1 = true;
+            // renderPosePAFGpuAux(framePtr, poseModel, frameSize, heatMapPtr, heatMapSize, scaleToKeepRatio, part, 1,
+            //                     alphaBlending, forceNorm1);
+
+            // As body part
+            // framePtr      =   width * height * 3
+            // heatMapPtr    =   heatMapSize.x * heatMapSize.y * #body parts
             checkAlpha(alphaBlending);
             dim3 threadsPerBlock;
             dim3 numBlocks;
             getNumberCudaThreadsAndBlocks(threadsPerBlock, numBlocks, frameSize);
-            renderDistance<<<threadsPerBlock, numBlocks>>>(
+
+            const auto absValue = true;
+            renderBodyPartHeatMap<<<threadsPerBlock, numBlocks>>>(
                 framePtr, frameSize.x, frameSize.y, heatMapPtr, heatMapSize.x, heatMapSize.y, scaleToKeepRatio,
-                part, numberBodyParts, numberBodyPAFChannels, alphaBlending);
+                part, alphaBlending, absValue);
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
         }
         catch (const std::exception& e)
