@@ -68,7 +68,10 @@ namespace op
                     return workersAreRunning;
                 }
                 else
+                {
+                    std::this_thread::sleep_for(std::chrono::microseconds{100});
                     return true;
+                }
             }
         }
         catch (const std::exception& e)

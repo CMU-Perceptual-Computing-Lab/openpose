@@ -1,5 +1,6 @@
 #ifdef USE_CUDA
     #include <cuda_runtime_api.h>
+    #include <openpose/gpu/cuda.hpp>
 #endif
 #include <openpose/core/enumClasses.hpp>
 #include <openpose/utilities/fastMath.hpp>
@@ -102,6 +103,9 @@ namespace op
             Array<float> heatMaps;
             if (!mHeatMapTypes.empty())
             {
+                #ifdef USE_CUDA
+                    cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+                #endif
                 // Get heatmaps size
                 const auto heatMapSize = getHeatMapSize();
 
@@ -207,6 +211,9 @@ namespace op
                 // cudaMemcpy(heatMaps.getPtr(), getHeatMapGpuConstPtr(), heatMaps.getVolume() * sizeof(float),
                 //            cudaMemcpyDeviceToHost);
             }
+            #ifdef USE_CUDA
+                cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+            #endif
             return heatMaps;
         }
         catch (const std::exception& e)

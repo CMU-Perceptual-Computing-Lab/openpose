@@ -43,7 +43,7 @@ You might select multiple topics, delete the rest:
 2. **General configuration**:
     - **Installation mode**: CMake, sh script, manual Makefile installation, ... (Ubuntu); CMake, ... (Windows); ...?
     - **Operating system** (`lsb_release -a` in Ubuntu):
-    - **Release or Debug mode**? (by defualt: release):
+    - **Release or Debug mode**? (by default: release):
     - Compiler (`gcc --version` in Ubuntu or VS version in Windows): 5.4.0, ... (Ubuntu); VS2015 Enterprise Update 3, VS2017 community, ... (Windows); ...?
 
 3. **Non-default settings**:
@@ -64,8 +64,12 @@ You might select multiple topics, delete the rest:
     - **CPU brand & model**:
     - Total **RAM memory** available:
 
-7. If **Windows** system:
+7. If **Python** API:
+    - **Python version**: 2.7, 3.7, ...?
+    - **Numpy version** (`python -c "import numpy; print numpy.version.version"` in Ubuntu):
+
+8. If **Windows** system:
     - Portable demo or compiled library?
 
-8. If **speed performance** issue:
+9. If **speed performance** issue:
     - Report OpenPose timing speed based on [this link](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/installation.md#profiling-speed).

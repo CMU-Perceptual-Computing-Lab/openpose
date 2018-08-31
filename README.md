@@ -36,7 +36,7 @@
 
 
 ## Latest Features
-- Jun 2018: [**Combined body-foot model released! Faster and more accurate**](doc/installation.md)!
+- Jun 2018: [**Combined body-foot model released! 40% faster and 5% more accurate**](doc/installation.md)!
 - Jun 2018: [**Python API**](doc/modules/python_module.md) released!
 - Jun 2018: [**OpenCL/AMD graphic card version**](doc/installation.md) released!
 - Jun 2018: [**Calibration toolbox**](doc/modules/calibration_module.md) released!

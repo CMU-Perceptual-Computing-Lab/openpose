@@ -141,9 +141,16 @@ The output format is analogous for hand (`hand_left_keypoints`, `hand_right_keyp
 
 
 
-### Pose Output Format
+### Pose Output Format (BODY_25)
 <p align="center">
-    <img src="media/keypoints_pose.png", width="480">
+    <img src="media/keypoints_pose_25.png", width="480">
+</p>
+
+
+
+### Pose Output Format (COCO)
+<p align="center">
+    <img src="media/keypoints_pose_18.png", width="480">
 </p>
 
 

@@ -472,17 +472,17 @@ namespace op
     void removeSubsetsBelowThresholds(std::vector<int>& validSubsetIndexes, int& numberPeople,
                                       const std::vector<std::pair<std::vector<int>, double>>& subsets,
                                       const unsigned int subsetCounterIndex, const unsigned int numberBodyParts,
-                                      const int minSubsetCnt, const T minSubsetScore)
+                                      const int minSubsetCnt, const T minSubsetScore, const int maxPeaks)
     {
         try
         {
             // Delete people below the following thresholds:
                 // a) minSubsetCnt: removed if less than minSubsetCnt body parts
                 // b) minSubsetScore: removed if global score smaller than this
-                // c) POSE_MAX_PEOPLE: keep first POSE_MAX_PEOPLE people above thresholds
+                // c) maxPeaks (POSE_MAX_PEOPLE): keep first maxPeaks people above thresholds
             numberPeople = 0;
             validSubsetIndexes.clear();
-            validSubsetIndexes.reserve(fastMin((size_t)POSE_MAX_PEOPLE, subsets.size()));
+            validSubsetIndexes.reserve(fastMin((size_t)maxPeaks, subsets.size()));
             for (auto index = 0u ; index < subsets.size() ; index++)
             {
                 auto subsetCounter = subsets[index].first[subsetCounterIndex];
@@ -501,7 +501,7 @@ namespace op
                 {
                     numberPeople++;
                     validSubsetIndexes.emplace_back(index);
-                    if (numberPeople == POSE_MAX_PEOPLE)
+                    if (numberPeople == maxPeaks)
                         break;
                 }
                 else if ((subsetCounter < 1 && numberBodyParts != 25) || subsetCounter < 0)
@@ -587,16 +587,122 @@ namespace op
             // Delete people below the following thresholds:
                 // a) minSubsetCnt: removed if less than minSubsetCnt body parts
                 // b) minSubsetScore: removed if global score smaller than this
-                // c) POSE_MAX_PEOPLE: keep first POSE_MAX_PEOPLE people above thresholds
+                // c) maxPeaks (POSE_MAX_PEOPLE): keep first maxPeaks people above thresholds
             int numberPeople;
             std::vector<int> validSubsetIndexes;
-            validSubsetIndexes.reserve(fastMin((size_t)POSE_MAX_PEOPLE, subsets.size()));
+            validSubsetIndexes.reserve(fastMin((size_t)maxPeaks, subsets.size()));
             removeSubsetsBelowThresholds(validSubsetIndexes, numberPeople, subsets, subsetCounterIndex,
-                                         numberBodyParts, minSubsetCnt, minSubsetScore);
+                                         numberBodyParts, minSubsetCnt, minSubsetScore, maxPeaks);
 
             // Fill and return poseKeypoints
             subsetsToPoseKeypointsAndScores(poseKeypoints, poseScores, scaleFactor, subsets, validSubsetIndexes,
                                             peaksPtr, numberPeople, numberBodyParts, numberBodyPartPairs);
+
+            // poseKeypoints from neck-part distances
+            if (poseModel == PoseModel::BODY_25D)
+            {
+// TODO: Get scaleDownFactor as parameter, NOT HARD-CODED!
+                const auto scaleDownFactor = 8;
+                Array<T> poseKeypoints2 = poseKeypoints.clone();
+                const auto rootIndex = 1;
+                const auto rootNumberIndex = rootIndex*(maxPeaks+1)*3;
+                numberPeople = intRound(peaksPtr[rootNumberIndex]);
+                // const auto numberPeople = intRound(peaksPtr[rootNumberIndex]);
+                poseKeypoints.reset({numberPeople, (int)numberBodyParts, 3}, 0);
+                poseScores.reset(numberPeople, 0);
+                const std::vector<float> multiplier{3.99662, 2.83036, 6.70038, 7.98778, 2.83036, 6.6937, 7.98559, 9.03892, // BODY_25D
+                    9.25788, 13.5094, 18.4561, 9.25499, 13.5129, 18.452,
+                    4.45502, 4.45194, 4.06345, 4.0489,
+                    18.452, 18.452, 18.452, 18.4561, 18.4561, 18.4561};
+                // To get ideal distance
+                const auto numberBodyPartsAndBkgAndPAFChannels = numberBodyParts + 1 + bodyPartPairs.size();
+                const auto heatMapOffset = heatMapSize.area();
+                // For each person
+                for (auto p = 0 ; p < numberPeople ; p++)
+                {
+                    // For root (neck) position
+                    // bpOrig == rootIndex
+                    const auto rootXYSIndex = rootNumberIndex+3*(1+p);
+                    // Set (x,y,score)
+                    const auto rootX = scaleFactor*peaksPtr[rootXYSIndex];
+                    const auto rootY = scaleFactor*peaksPtr[rootXYSIndex+1];
+                    poseKeypoints[{p,rootIndex,0}] = rootX;
+                    poseKeypoints[{p,rootIndex,1}] = rootY;
+                    poseKeypoints[{p,rootIndex,2}] = peaksPtr[rootXYSIndex+2];
+                    // For each body part
+                    for (auto bpOrig = 0 ; bpOrig < (int)numberBodyParts ; bpOrig++)
+                    {
+                        if (bpOrig != rootIndex)
+                        {
+                            const auto bpChannel = (bpOrig < rootIndex ? bpOrig : bpOrig-1);
+                            // Get ideal distance
+                            const auto offsetIndex = numberBodyPartsAndBkgAndPAFChannels + 2*bpChannel;
+                            const auto* mapX = heatMapPtr + offsetIndex * heatMapOffset;
+                            const auto* mapY = heatMapPtr + (offsetIndex+1) * heatMapOffset;
+                            const auto increaseRatio = multiplier[bpChannel]*scaleDownFactor*scaleFactor;
+                            // Set (x,y) coordinates from the distance
+                            // const auto index = intRound(rootY/scaleFactor)*heatMapSize.x + intRound(rootX/scaleFactor);
+                            // const Point<T> neckPartDist{increaseRatio*mapX[index], increaseRatio*mapY[index]};
+                            // poseKeypoints[{p,bpOrig,0}] = rootX + neckPartDist.x;
+                            // poseKeypoints[{p,bpOrig,1}] = rootY + neckPartDist.y;
+                            // Refinement
+                            Point<T> neckPartDistRefined{0, 0};
+                            for (auto y = intRound(rootY/scaleFactor) - 3 ; y < intRound(rootY/scaleFactor) + 4 ; y++)
+                            {
+                                for (auto x = intRound(rootX/scaleFactor) - 3 ; x < intRound(rootX/scaleFactor) + 4 ; x++)
+                                {
+                                    const auto index = y*heatMapSize.x + x;
+                                    neckPartDistRefined.x += mapX[index];
+                                    neckPartDistRefined.y += mapY[index];
+                                }
+                            }
+                            neckPartDistRefined *= increaseRatio/49;
+                            const auto partX = rootX + neckPartDistRefined.x;
+                            const auto partY = rootY + neckPartDistRefined.y;
+                            poseKeypoints[{p,bpOrig,0}] = partX;
+                            poseKeypoints[{p,bpOrig,1}] = partY;
+                            // Set (temporary) body part score
+                            poseKeypoints[{p,bpOrig,2}] = T(0.0501);
+                            // Associate estimated keypoint with closest one
+                            const auto candidateNumberIndex = bpOrig*(maxPeaks+1)*3;
+                            const auto numberCandidates = intRound(peaksPtr[candidateNumberIndex]);
+                            int closestIndex = -1;
+                            T closetValue = std::numeric_limits<T>::max();
+                            for (auto i = 0 ; i < numberCandidates ; i++)
+                            {
+                                const auto candidateXYSIndex = candidateNumberIndex+3*(1+i);
+                                const auto diffX = partX-scaleFactor*peaksPtr[candidateXYSIndex];
+                                const auto diffY = partY-scaleFactor*peaksPtr[candidateXYSIndex+1];
+                                const auto dist = (diffX*diffX + diffY*diffY);
+                                if (closetValue > dist)
+                                {
+                                    closetValue = dist;
+                                    closestIndex = candidateXYSIndex;
+                                }
+                            }
+                            if (closestIndex != -1)
+                            {
+                                const auto estimatedDist = neckPartDistRefined.x*neckPartDistRefined.x
+                                                         + neckPartDistRefined.y*neckPartDistRefined.y;
+                                const auto x = scaleFactor*peaksPtr[closestIndex];
+                                const auto y = scaleFactor*peaksPtr[closestIndex+1];
+                                const auto candidateDist = (rootX-x)*(rootX-x)+(rootY-y)*(rootY-y);
+                                if (estimatedDist/candidateDist < 1.1 && estimatedDist/candidateDist > 0.9)
+                                {
+                                    poseKeypoints[{p,bpOrig,0}] = x;
+                                    poseKeypoints[{p,bpOrig,1}] = y;
+                                    // Set body part score
+                                    const auto s = peaksPtr[closestIndex+2];
+                                    // poseKeypoints[{p,bpOrig,2}] = s -;
+                                    poseKeypoints[{p,bpOrig,2}] = s;
+                                }
+                            }
+                            // Set poseScore
+                            poseScores[p] += poseKeypoints[{p,bpOrig,2}];
+                        }
+                    }
+                }
+            }
         }
         catch (const std::exception& e)
         {
