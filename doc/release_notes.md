@@ -211,7 +211,7 @@ OpenPose Library - Release Notes
 
 
 
-## Current version - future OpenPose 2.0.0
+## OpenPose 1.4.0 (Sep 01, 2018)
 1. Main improvements:
     1. Model BODY_25 released, that includes the 17 COCO keypoints + neck + midhip + 6 foot keypoints. It is also about 3% more accurate and 30% faster than the original `COCO` model.
     2. New calibration module: Intrinsic and extrinsic camera calibration toolbox based on OpenCV.
@@ -256,6 +256,13 @@ OpenPose Library - Release Notes
     3. Fixed bug in keepTopNPeople.hpp (`--number_people_max`) that provoked core dumped if lots of values equal to the threshold.
     4. Flir cameras: Cameras sorted by serial number. Video and images recorded from flir cameras were (and are) assigned the camera parameters based on serial number order, so it would fail if the cameras order was not the same than if sorted by serial number.
     5. CPU version working in non-Nvidia Windows machines.
+
+
+
+## Current version - future OpenPose 1.4.1
+1. Main improvements:
+2. Functions or parameters renamed:
+3. Main bugs fixed:
 
 
 
