@@ -294,16 +294,20 @@ namespace op
                 upImpl->spBodyPartConnectorCaffe->setMinSubsetCnt((int)get(PoseProperty::ConnectMinSubsetCnt));
                 upImpl->spBodyPartConnectorCaffe->setMinSubsetScore((float)get(PoseProperty::ConnectMinSubsetScore));
 
+                std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
                 // CUDA version not implemented yet
                 // #ifdef USE_CUDA
                 //     upImpl->spBodyPartConnectorCaffe->Forward_gpu({upImpl->spHeatMapsBlob.get(),
                 //                                                    upImpl->spPeaksBlob.get()},
                 //                                                   mPoseKeypoints, mPoseScores);
                 // #else
-                    upImpl->spBodyPartConnectorCaffe->Forward_cpu({upImpl->spHeatMapsBlob.get(),
+                    upImpl->spBodyPartConnectorCaffe->Forward_gpu({upImpl->spHeatMapsBlob.get(),
                                                                    upImpl->spPeaksBlob.get()},
                                                                   mPoseKeypoints, mPoseScores);
                 // #endif
+                std::chrono::steady_clock::time_point end= std::chrono::steady_clock::now();
+                std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count()/1000. <<std::endl;
+
             #else
                 UNUSED(inputNetData);
                 UNUSED(inputDataSize);

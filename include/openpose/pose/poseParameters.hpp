@@ -11,7 +11,11 @@ namespace op
     // For OpenCL-NMS in Ubuntu, (POSE_MAX_PEOPLE+1)*3(x,y,score) must be divisible by 32. Easy fix:
     // POSE_MAX_PEOPLE = 32n - 1
     // For OpenCL-NMS in Windows, it must be by 64, so 64n - 1
+    #ifdef USE_OPENCL
     const auto POSE_MAX_PEOPLE = 127u;
+    #else
+    const auto POSE_MAX_PEOPLE = 96u;
+    #endif
 
     // Model functions
     OP_API const std::map<unsigned int, std::string>& getPoseBodyPartMapping(const PoseModel poseModel);

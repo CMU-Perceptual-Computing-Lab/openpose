@@ -163,7 +163,7 @@ namespace op
         {
             #if defined USE_CAFFE && defined USE_CUDA
                 const auto heatMapsBlob = bottom.at(0);
-                const auto* const heatMapsPtr = heatMapsBlob->cpu_data();
+                const T* heatMapsPtr = nullptr;
                 const auto* const peaksPtr = bottom.at(1)->cpu_data();
                 const auto* const heatMapsGpuPtr = heatMapsBlob->gpu_data();
                 const auto* const peaksGpuPtr = bottom.at(1)->gpu_data();
