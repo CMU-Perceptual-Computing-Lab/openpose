@@ -125,6 +125,28 @@ namespace op
             bpcKernel<<<numBlocks, threadsPerBlock>>>(finalOutputGpuPtr, heatMapGpuPtr, peaksGpuPtr, peaksGpuPtr, bodyPartPairsGpuPtr, mapIdxGpuPtr, POSE_MAX_PEOPLE, numberBodyParts, numberBodyPartPairs, heatMapSize.x, heatMapSize.y);
             cudaMemcpy(finalOutputCpu.getPtr(), finalOutputGpuPtr, totalComputations * sizeof(float),cudaMemcpyDeviceToHost);
 
+            // Print
+            for(auto i : bodyPartPairs) std::cout << i << std::endl;
+            std::cout << "--" << std::endl;
+            for(auto i : mapIdx) std::cout << i << std::endl;
+            std::cout << "--" << std::endl;
+
+            for(int i=0; i<totalComputations; i++){
+                if(finalOutputCpu.getPtr()[i] >= 0){
+
+                    int m = i / POSE_MAX_PEOPLE / POSE_MAX_PEOPLE;
+                    int n = i / POSE_MAX_PEOPLE % POSE_MAX_PEOPLE;
+                    int k = i % POSE_MAX_PEOPLE;
+
+                    //int count = peaksPtr[m*POSE_MAX_PEOPLE*POSE_MAX_PEOPLE];
+
+                    int pairA = bodyPartPairs[m*2];
+                    int pairB = bodyPartPairs[m*2 + 1];
+
+                    //std::cout << finalOutputCpu.getPtr()[i] << " " << m << " " << n << " " << k  << " (" << bodyPartPairs[m*2] << " " << bodyPartPairs[m*2 +1] << ")" << std::endl;
+                    std::cout << finalOutputCpu.getPtr()[i] << " " << m << " " << n-pairA << " " << k-pairB  << std::endl;
+                }
+            }
 
 //            // std::vector<std::pair<std::vector<int>, double>> refers to:
 //            //     - std::vector<int>: [body parts locations, #body parts found]
