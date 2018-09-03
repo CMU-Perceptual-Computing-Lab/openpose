@@ -664,64 +664,63 @@ namespace op
                             // Refined method
                             const auto constant = 5;
                             Point<T> neckPartDistRefined{0, 0};
-                            for (auto y = intRound(rootY/scaleFactor) - constant;
-                                 y < intRound(rootY/scaleFactor) + constant+1 ; y++)
+                            auto counterRefinements = 0;
+                            // We must keep it inside the image size
+                            for (auto y = fastMax(0, intRound(rootY/scaleFactor) - constant);
+                                 y < fastMin(heatMapSize.y, intRound(rootY/scaleFactor) + constant+1) ; y++)
                             {
-                                for (auto x = intRound(rootX/scaleFactor) - constant;
-                                     x < intRound(rootX/scaleFactor) + constant+1 ; x++)
+                                for (auto x = fastMax(0, intRound(rootX/scaleFactor) - constant);
+                                     x < fastMin(heatMapSize.x, intRound(rootX/scaleFactor) + constant+1) ; x++)
                                 {
                                     const auto index = y*heatMapSize.x + x;
                                     neckPartDistRefined.x += mapX[index];
                                     neckPartDistRefined.y += mapY[index];
+                                    counterRefinements++;
                                 }
                             }
-                            auto sqConst = (constant*2+1);
-                            sqConst *= sqConst;
                             neckPartDistRefined = Point<T>{
-                                neckPartDistRefined.x*sigma[index2]+sqConst*average[index2],
-                                neckPartDistRefined.y*sigma[index2+1]+sqConst*average[index2+1],
+                                neckPartDistRefined.x*sigma[index2]+counterRefinements*average[index2],
+                                neckPartDistRefined.y*sigma[index2+1]+counterRefinements*average[index2+1],
                             };
-                            neckPartDistRefined *= increaseRatio/sqConst;
+                            neckPartDistRefined *= increaseRatio/counterRefinements;
                             const auto partX = rootX + neckPartDistRefined.x;
                             const auto partY = rootY + neckPartDistRefined.y;
                             poseKeypoints[{p,bpOrig,0}] = partX;
                             poseKeypoints[{p,bpOrig,1}] = partY;
                             // Set (temporary) body part score
                             poseKeypoints[{p,bpOrig,2}] = T(0.0501);
-                            // // Associate estimated keypoint with closest one
-                            // const auto candidateNumberIndex = bpOrig*(maxPeaks+1)*3;
-                            // const auto numberCandidates = intRound(peaksPtr[candidateNumberIndex]);
-                            // int closestIndex = -1;
-                            // T closetValue = std::numeric_limits<T>::max();
-                            // for (auto i = 0 ; i < numberCandidates ; i++)
-                            // {
-                            //     const auto candidateXYSIndex = candidateNumberIndex+3*(1+i);
-                            //     const auto diffX = partX-scaleFactor*peaksPtr[candidateXYSIndex];
-                            //     const auto diffY = partY-scaleFactor*peaksPtr[candidateXYSIndex+1];
-                            //     const auto dist = (diffX*diffX + diffY*diffY);
-                            //     if (closetValue > dist)
-                            //     {
-                            //         closetValue = dist;
-                            //         closestIndex = candidateXYSIndex;
-                            //     }
-                            // }
-                            // if (closestIndex != -1)
-                            // {
-                            //     const auto estimatedDist = neckPartDistRefined.x*neckPartDistRefined.x
-                            //                              + neckPartDistRefined.y*neckPartDistRefined.y;
-                            //     const auto x = scaleFactor*peaksPtr[closestIndex];
-                            //     const auto y = scaleFactor*peaksPtr[closestIndex+1];
-                            //     const auto candidateDist = (rootX-x)*(rootX-x)+(rootY-y)*(rootY-y);
-                            //     if (estimatedDist/candidateDist < 1.1 && estimatedDist/candidateDist > 0.9)
-                            //     {
-                            //         poseKeypoints[{p,bpOrig,0}] = x;
-                            //         poseKeypoints[{p,bpOrig,1}] = y;
-                            //         // Set body part score
-                            //         const auto s = peaksPtr[closestIndex+2];
-                            //         // poseKeypoints[{p,bpOrig,2}] = s -;
-                            //         poseKeypoints[{p,bpOrig,2}] = s;
-                            //     }
-                            // }
+                            // Associate estimated keypoint with closest one
+                            const auto xCleaned = fastMax(0, fastMin(heatMapSize.x-1, intRound(partX/scaleFactor)));
+                            const auto yCleaned = fastMax(0, fastMin(heatMapSize.y-1, intRound(partY/scaleFactor)));
+                            const auto partConfidence = heatMapPtr[
+                                bpOrig * heatMapOffset + yCleaned*heatMapSize.x + xCleaned];
+                            // If partConfidence is big enough, it means we are close to a keypoint
+                            if (partConfidence > T(0.05))
+                            {
+                                const auto candidateNumberIndex = bpOrig*(maxPeaks+1)*3;
+                                const auto numberCandidates = intRound(peaksPtr[candidateNumberIndex]);
+                                int closestIndex = -1;
+                                T closetValue = std::numeric_limits<T>::max();
+                                for (auto i = 0 ; i < numberCandidates ; i++)
+                                {
+                                    const auto candidateXYSIndex = candidateNumberIndex+3*(1+i);
+                                    const auto diffX = partX-scaleFactor*peaksPtr[candidateXYSIndex];
+                                    const auto diffY = partY-scaleFactor*peaksPtr[candidateXYSIndex+1];
+                                    const auto dist = (diffX*diffX + diffY*diffY);
+                                    if (closetValue > dist)
+                                    {
+                                        closetValue = dist;
+                                        closestIndex = candidateXYSIndex;
+                                    }
+                                }
+                                if (closestIndex != -1)
+                                {
+                                    poseKeypoints[{p,bpOrig,0}] = scaleFactor*peaksPtr[closestIndex];
+                                    poseKeypoints[{p,bpOrig,1}] = scaleFactor*peaksPtr[closestIndex+1];
+                                    // Set body part score
+                                    poseKeypoints[{p,bpOrig,2}] = peaksPtr[closestIndex+2];
+                                }
+                            }
                             // Set poseScore
                             poseScores[p] += poseKeypoints[{p,bpOrig,2}];
                         }
