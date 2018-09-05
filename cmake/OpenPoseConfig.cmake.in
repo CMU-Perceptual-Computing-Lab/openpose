@@ -5,12 +5,12 @@ get_filename_component(_prefix "${_dir}/../.." ABSOLUTE)
 # Import the targets
 include("${_prefix}/lib/OpenPose/OpenPose.cmake")
 if (@BUILD_CAFFE@)
-  set(Caffe_INCLUDE_DIRS "${_prefix}/include/caffe")
+  set(Caffe_INCLUDE_DIRS "${_prefix}/include/")
   # set(Caffe_LIBS "${_prefix}/lib/libcaffe.so")
 endif (@BUILD_CAFFE@)
 
 # Report other information
-set(OpenPose_INCLUDE_DIRS "${_prefix}/include/openpose")
+set(OpenPose_INCLUDE_DIRS "${_prefix}/include/")
 set(OpenPose_VERSION_MAJOR @OpenPose_VERSION_MAJOR@)
 set(OpenPose_VERSION_MINOR @OpenPose_VERSION_MINOR@)
 set(OpenPose_VERSION_PATCH @OpenPose_VERSION_PATCH@)
