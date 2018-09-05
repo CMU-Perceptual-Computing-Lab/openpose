@@ -8,6 +8,7 @@ OpenPose - Quick Start
     3. [Running on Images](#running-on-images)
     4. [Maximum Accuracy Configuration](#maximum-accuracy-configuration)
     5. [3-D Reconstruction](#3-d-reconstruction)
+    6. [Tracking](#tracking)
 2. [Expected Visual Results](#expected-visual-results)
 
 
@@ -163,6 +164,27 @@ build\x64\Release\OpenPoseDemo.exe --flir_camera --3d --number_people_max 1 --fa
 # Ubuntu and Mac (same flags for Windows version)
 # Assuming >=2 cameras and reconstruction when at least 2 visible views
 ./build/examples/openpose/openpose.bin --flir_camera --3d --number_people_max 1 --3d_min_views 2 --output_resolution {desired_output_resolution}
+```
+
+
+
+### Tracking
+1. Runtime huge speed up by reducing the accuracy:
+```
+# Using OpenPose 1 frame, tracking the following e.g., 5 frames
+./build/examples/openpose/openpose.bin --tracking 5 --number_people_max 1
+```
+
+2. Runtime speed up while keeping most of the accuracy:
+```
+:: Using OpenPose 1 frame and tracking another frame
+./build/examples/openpose/openpose.bin --tracking 1 --number_people_max 1
+```
+
+3. Visual smoothness:
+```
+# Running both OpenPose and tracking on each frame. Note: There is no speed up/slow down
+./build/examples/openpose/openpose.bin --tracking 0 --number_people_max 1
 ```
 
 

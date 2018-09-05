@@ -261,6 +261,7 @@ OpenPose Library - Release Notes
 
 ## Current version - future OpenPose 1.4.1
 1. Main improvements:
+    1. Added initial single-person tracker for further speed up or visual smoothing (`--tracking` flag).
 2. Functions or parameters renamed:
 3. Main bugs fixed:
 

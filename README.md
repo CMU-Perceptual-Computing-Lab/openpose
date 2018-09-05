@@ -26,6 +26,7 @@
         - Compatible with Flir/Point Grey cameras, but provided C++ demos to add your custom input.
     - **Calibration toolbox**:
         - Easy estimation of distortion, intrinsic, and extrinsic camera parameters.
+    - **Single-person tracking** for further speed up or visual smoothing.
 - **Input**: Image, video, webcam, Flir/Point Grey and IP camera. Included C++ demos to add your custom input.
 - **Output**: Basic image + keypoint display/saving (PNG, JPG, AVI, ...), keypoint saving (JSON, XML, YML, ...), and/or keypoints as array class.
 - **OS**: Ubuntu (14, 16), Windows (8, 10), Mac OSX, Nvidia TX2.
@@ -36,6 +37,7 @@
 
 
 ## Latest Features
+- Sep 2018: [**Experimental single-person tracker**](doc/quick_start.md#tracking) for further speed up or visual smoothing!
 - Jun 2018: [**Combined body-foot model released! 40% faster and 5% more accurate**](doc/installation.md)!
 - Jun 2018: [**Python API**](doc/modules/python_module.md) released!
 - Jun 2018: [**OpenCL/AMD graphic card version**](doc/installation.md) released!
@@ -43,10 +45,6 @@
 - Jun 2018: [**Mac OSX version (CPU)**](doc/installation.md) released!
 - Mar 2018: [**CPU version**](doc/installation.md#cpu-version)!
 - Mar 2018: [**3-D keypoint reconstruction module**](doc/modules/3d_reconstruction_module.md) (from multiple camera views)!
-- Sep 2017: [**CMake**](doc/installation.md) installer and **IP camera** support!
-- Jul 2017: [**Windows portable binaries and demo**](https://github.com/CMU-Perceptual-Computing-Lab/openpose/releases)!
-- Jul 2017: **Hands** released!
-- Jun 2017: **Face** released!
 
 For further details, check [all released features](doc/released_features.md) and [release notes](doc/release_notes.md).
 
