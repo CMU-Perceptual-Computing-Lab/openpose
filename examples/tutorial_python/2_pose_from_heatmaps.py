@@ -23,7 +23,7 @@ except:
     raise Exception('Error: OpenPose library could not be found. Did you enable `BUILD_PYTHON` in CMake and have this Python script in the right folder?')
 
 # Params for change
-defRes = 736
+defRes = 288
 scales = [1,0.5]
 class Param:
     caffemodel = dir_path + "/../../models/pose/body_25/pose_iter_584000.caffemodel"
