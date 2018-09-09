@@ -26,8 +26,8 @@ except:
 defRes = 736
 scales = [1,0.5]
 class Param:
-    caffemodel = dir_path + "/../../../models/pose/body_25/pose_iter_584000.caffemodel"
-    prototxt = dir_path + "/../../../models/pose/body_25/pose_deploy.prototxt"
+    caffemodel = dir_path + "/../../models/pose/body_25/pose_iter_584000.caffemodel"
+    prototxt = dir_path + "/../../models/pose/body_25/pose_deploy.prototxt"
 
 # Load OpenPose object and Caffe Nets
 params = dict()
@@ -41,7 +41,7 @@ params["scale_number"] = len(scales)
 params["render_threshold"] = 0.05
 params["num_gpu_start"] = 0
 params["disable_blending"] = False
-params["default_model_folder"] = dir_path + "/../../../models/"
+params["default_model_folder"] = dir_path + "/../../models/"
 openpose = OpenPose(params)
 caffe.set_mode_gpu()
 caffe.set_device(0)
@@ -90,7 +90,7 @@ def func(frame):
     return frame
 
 
-img = cv2.imread(dir_path + "/../../../examples/media/COCO_val2014_000000000192.jpg")
+img = cv2.imread(dir_path + "/../../examples/media/COCO_val2014_000000000192.jpg")
 frame = func(img)
 while 1:
     cv2.imshow("output", frame)
