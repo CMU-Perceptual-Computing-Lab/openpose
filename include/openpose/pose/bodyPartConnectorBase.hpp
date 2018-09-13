@@ -25,7 +25,8 @@ namespace op
         const T* const heatMapPtr, const T* const peaksPtr, const PoseModel poseModel, const Point<int>& heatMapSize,
         const int maxPeaks, const T interThreshold, const T interMinAboveThreshold,
         const std::vector<unsigned int>& bodyPartPairs, const unsigned int numberBodyParts,
-        const unsigned int numberBodyPartPairs, const unsigned int subsetCounterIndex,  const op::Array<T>& precomputedPAFS = op::Array<T>());
+        const unsigned int numberBodyPartPairs, const unsigned int subsetCounterIndex,
+        const op::Array<T>& precomputedPAFS = op::Array<T>());
 
     template <typename T>
     OP_API void removeSubsetsBelowThresholds(std::vector<int>& validSubsetIndexes, int& numberPeople,

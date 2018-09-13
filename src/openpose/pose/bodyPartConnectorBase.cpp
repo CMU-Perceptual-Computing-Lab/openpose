@@ -101,7 +101,8 @@ namespace op
         const T* const heatMapPtr, const T* const peaksPtr, const PoseModel poseModel, const Point<int>& heatMapSize,
         const int maxPeaks, const T interThreshold, const T interMinAboveThreshold,
         const std::vector<unsigned int>& bodyPartPairs, const unsigned int numberBodyParts,
-        const unsigned int numberBodyPartPairs, const unsigned int subsetCounterIndex, const op::Array<T>& precomputedPAFS)
+        const unsigned int numberBodyPartPairs, const unsigned int subsetCounterIndex,
+        const op::Array<T>& precomputedPAFS)
     {
         try
         {
@@ -297,74 +298,76 @@ namespace op
                     std::vector<std::tuple<double, int, int>> allABConnections;
                     // Note: Problem of this function, if no right PAF between A and B, both elements are discarded.
                     // However, they should be added indepently, not discarded
+                    if(heatMapPtr != nullptr)
                     {
-                        if(heatMapPtr != nullptr)
+                        const auto* mapX = heatMapPtr + (numberBodyPartsAndBkg + mapIdx[2*pairIndex]) * heatMapOffset;
+                        const auto* mapY = heatMapPtr + (numberBodyPartsAndBkg + mapIdx[2*pairIndex+1]) * heatMapOffset;
+                        // E.g. neck-nose connection. For each neck
+                        for (auto i = 1; i <= numberA; i++)
                         {
-                            const auto* mapX = heatMapPtr + (numberBodyPartsAndBkg + mapIdx[2*pairIndex]) * heatMapOffset;
-                            const auto* mapY = heatMapPtr + (numberBodyPartsAndBkg + mapIdx[2*pairIndex+1]) * heatMapOffset;
-                            // E.g. neck-nose connection. For each neck
-                            for (auto i = 1; i <= numberA; i++)
+                            // E.g. neck-nose connection. For each nose
+                            for (auto j = 1; j <= numberB; j++)
                             {
-                                // E.g. neck-nose connection. For each nose
-                                for (auto j = 1; j <= numberB; j++)
-                                {
-                                    // Initial PAF
-                                    auto scoreAB = getScoreAB(i, j, candidateAPtr, candidateBPtr, mapX, mapY,
-                                                              heatMapSize, interThreshold, interMinAboveThreshold);
+                                // Initial PAF
+                                auto scoreAB = getScoreAB(i, j, candidateAPtr, candidateBPtr, mapX, mapY,
+                                                          heatMapSize, interThreshold, interMinAboveThreshold);
 
-                                    // Refinement: star-PAF
-                                    if (poseModel == PoseModel::BODY_25E && bodyPartPairsStar[bodyPartB] > -1)
+                                // Refinement: star-PAF
+                                if (poseModel == PoseModel::BODY_25E && bodyPartPairsStar[bodyPartB] > -1)
+                                {
+                                    if (heatMapPtr != nullptr)
                                     {
-                                        if (heatMapPtr != nullptr)
-                                        {
-                                            const auto score0B = getScore0B(
-                                                bodyPart0, candidate0Ptr, i, j, bodyPartA, bodyPartB, candidateBPtr,
-                                                heatMapPtr, heatMapSize, interThreshold, interMinAboveThreshold, peaksOffset,
-                                                heatMapOffset, numberBodyPartsAndBkg, subsets, bodyPartPairsStar);
-                                            // Max
-                                            scoreAB = fastMax(scoreAB, score0B);
-                                            // // Smart average
-                                            // // Both scores --> average
-                                            // if (scoreAB > 0 && score0B > 0)
-                                            // {
-                                            //     const auto ratio0 = T(0.5);
-                                            //     scoreAB = (1-ratio0)*scoreAB
-                                            //             + ratio0 * score0B;
-                                            // }
-                                            // // No scoreAB --> use score0B
-                                            // else if (score0B > 0)
-                                            //     scoreAB = score0B;
-                                            // // Else: No score0B --> use scoreAB
-                                        } else error("HeatMapPtr is null. GPU PAF not implemented for Star", __LINE__, __FUNCTION__, __FILE__);
+                                        const auto score0B = getScore0B(
+                                            bodyPart0, candidate0Ptr, i, j, bodyPartA, bodyPartB, candidateBPtr,
+                                            heatMapPtr, heatMapSize, interThreshold, interMinAboveThreshold, peaksOffset,
+                                            heatMapOffset, numberBodyPartsAndBkg, subsets, bodyPartPairsStar);
+                                        // Max
+                                        scoreAB = fastMax(scoreAB, score0B);
+                                        // // Smart average
+                                        // // Both scores --> average
+                                        // if (scoreAB > 0 && score0B > 0)
+                                        // {
+                                        //     const auto ratio0 = T(0.5);
+                                        //     scoreAB = (1-ratio0)*scoreAB
+                                        //             + ratio0 * score0B;
+                                        // }
+                                        // // No scoreAB --> use score0B
+                                        // else if (score0B > 0)
+                                        //     scoreAB = score0B;
+                                        // // Else: No score0B --> use scoreAB
                                     }
-
-                                    // E.g. neck-nose connection. If possible PAF between neck i, nose j --> add
-                                    // parts score + connection score
-                                    if (scoreAB > 1e-6)
-                                        allABConnections.emplace_back(std::make_tuple(scoreAB, i, j));
+                                    else
+                                        error("HeatMapPtr is null. GPU PAF not implemented for Star",
+                                              __LINE__, __FUNCTION__, __FILE__);
                                 }
+
+                                // E.g. neck-nose connection. If possible PAF between neck i, nose j --> add
+                                // parts score + connection score
+                                if (scoreAB > 1e-6)
+                                    allABConnections.emplace_back(std::make_tuple(scoreAB, i, j));
                             }
-                        }else if(!precomputedPAFS.empty())
+                        }
+                    }
+                    else if(!precomputedPAFS.empty())
+                    {
+                        for (auto i = 1; i <= numberA; i++)
                         {
-                            for (auto i = 1; i <= numberA; i++)
+                            // E.g. neck-nose connection. For each nose
+                            for (auto j = 1; j <= numberB; j++)
                             {
-                                // E.g. neck-nose connection. For each nose
-                                for (auto j = 1; j <= numberB; j++)
-                                {
-                                    T scoreAB = precomputedPAFS.at({(int)pairIndex, i+(int)bodyPartA, j+(int)bodyPartB});
+                                T scoreAB = precomputedPAFS.at({(int)pairIndex, i+(int)bodyPartA, j+(int)bodyPartB});
 
-                                    // E.g. neck-nose connection. If possible PAF between neck i, nose j --> add
-                                    // parts score + connection score
-                                    if (scoreAB > 1e-6)
-                                        allABConnections.emplace_back(std::make_tuple(scoreAB, i, j));
-                                }
+                                // E.g. neck-nose connection. If possible PAF between neck i, nose j --> add
+                                // parts score + connection score
+                                if (scoreAB > 1e-6)
+                                    allABConnections.emplace_back(std::make_tuple(scoreAB, i, j));
                             }
-                            //error("Not implemented", __LINE__, __FUNCTION__, __FILE__);
                         }
-                        else
-                        {
-                            error("Error. Should not reach here" + std::to_string(__LINE__), __LINE__, __FUNCTION__, __FILE__);
-                        }
+                        //error("Not implemented", __LINE__, __FUNCTION__, __FILE__);
+                    }
+                    else
+                    {
+                        error("Error. Should not reach here" + std::to_string(__LINE__), __LINE__, __FUNCTION__, __FILE__);
                     }
 
                     // select the top minAB connection, assuming that each part occur only once
