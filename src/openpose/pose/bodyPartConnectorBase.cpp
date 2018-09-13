@@ -101,8 +101,7 @@ namespace op
         const T* const heatMapPtr, const T* const peaksPtr, const PoseModel poseModel, const Point<int>& heatMapSize,
         const int maxPeaks, const T interThreshold, const T interMinAboveThreshold,
         const std::vector<unsigned int>& bodyPartPairs, const unsigned int numberBodyParts,
-        const unsigned int numberBodyPartPairs, const unsigned int subsetCounterIndex,
-        const op::Array<T>& precomputedPAFS)
+        const unsigned int numberBodyPartPairs, const unsigned int subsetCounterIndex, const Array<T>& precomputedPAFs)
     {
         try
         {
@@ -161,7 +160,7 @@ namespace op
                                     auto maxScoreIndex = -1;
                                     if (poseModel == PoseModel::BODY_25E && bodyPartPairsStar[bodyPartB] > -1)
                                     {
-                                        if(heatMapPtr != nullptr)
+                                        if (heatMapPtr != nullptr)
                                         {
                                             const auto pairIndex2 = bodyPartPairsStar[bodyPartB];
                                             const auto* mapX0 = heatMapPtr + (numberBodyPartsAndBkg + pairIndex2) * heatMapOffset;
@@ -178,7 +177,9 @@ namespace op
                                                 }
                                             }
                                         }
-                                        else error("HeatMapPtr is null. GPU PAF not implemented for Star", __LINE__, __FUNCTION__, __FILE__);
+                                        else
+                                            error("HeatMapPtr is null. GPU PAF not implemented for Star.",
+                                                  __LINE__, __FUNCTION__, __FILE__);
                                     }
                                     // Star-PAF --> found
                                     if (maxScore > 0)
@@ -298,7 +299,7 @@ namespace op
                     std::vector<std::tuple<double, int, int>> allABConnections;
                     // Note: Problem of this function, if no right PAF between A and B, both elements are discarded.
                     // However, they should be added indepently, not discarded
-                    if(heatMapPtr != nullptr)
+                    if (heatMapPtr != nullptr)
                     {
                         const auto* mapX = heatMapPtr + (numberBodyPartsAndBkg + mapIdx[2*pairIndex]) * heatMapOffset;
                         const auto* mapY = heatMapPtr + (numberBodyPartsAndBkg + mapIdx[2*pairIndex+1]) * heatMapOffset;
@@ -348,14 +349,14 @@ namespace op
                             }
                         }
                     }
-                    else if(!precomputedPAFS.empty())
+                    else if (!precomputedPAFs.empty())
                     {
                         for (auto i = 1; i <= numberA; i++)
                         {
                             // E.g. neck-nose connection. For each nose
                             for (auto j = 1; j <= numberB; j++)
                             {
-                                T scoreAB = precomputedPAFS.at({(int)pairIndex, i+(int)bodyPartA, j+(int)bodyPartB});
+                                T scoreAB = precomputedPAFs.at({(int)pairIndex, i+(int)bodyPartA, j+(int)bodyPartB});
 
                                 // E.g. neck-nose connection. If possible PAF between neck i, nose j --> add
                                 // parts score + connection score
@@ -366,9 +367,7 @@ namespace op
                         //error("Not implemented", __LINE__, __FUNCTION__, __FILE__);
                     }
                     else
-                    {
-                        error("Error. Should not reach here" + std::to_string(__LINE__), __LINE__, __FUNCTION__, __FILE__);
-                    }
+                        error("Error. Should not reach here.", __LINE__, __FUNCTION__, __FILE__);
 
                     // select the top minAB connection, assuming that each part occur only once
                     // sort rows in descending order based on parts + connection score

@@ -13,10 +13,12 @@ namespace op
     }
 
     template <typename T>
-    inline __device__  T process(const T* bodyPartA, const T* bodyPartB, const T* mapX, const T* mapY, const int heatmapWidth, const int heatmapHeight, const float interThreshold = 0.05, const float interMinAboveThreshold = 0.95, const float renderThreshold = 0.05)
+    inline __device__  T process(const T* bodyPartA, const T* bodyPartB, const T* mapX, const T* mapY,
+                                 const int heatmapWidth, const int heatmapHeight, const T interThreshold = T(0.05),
+                                 const T interMinAboveThreshold = T(0.95), const T renderThreshold = T(0.05))
     {
         T finalOutput = -1;
-        if(bodyPartA[2] < renderThreshold || bodyPartB[2] < renderThreshold) return finalOutput;
+        if (bodyPartA[2] < renderThreshold || bodyPartB[2] < renderThreshold) return finalOutput;
 
         auto vectorAToBX = bodyPartB[0] - bodyPartA[0];
         auto vectorAToBY = bodyPartB[1] - bodyPartA[1];
@@ -48,9 +50,10 @@ namespace op
                 }
             }
 
-            // L2 Hack
-            //int l2Dist = (int)sqrt(pow(vectorAToBX,2) + pow(vectorAToBY,2));
-            //if(l2Dist <= 2) count = numberPointsInLine;
+            // // L2 Hack
+            // int l2Dist = (int)sqrt(pow(vectorAToBX,2) + pow(vectorAToBY,2));
+            // if (l2Dist <= 2)
+            //     count = numberPointsInLine;
 
             // parts score + connection score
             if (count/(float)numberPointsInLine > interMinAboveThreshold)
@@ -61,45 +64,52 @@ namespace op
     }
 
     template <typename T>
-    __global__ void bpcKernel(T* finalOutputPtr, const T* heatMapPtr, const T* peaksPtrA, const T* peaksPtrB, const unsigned int* bodyPartPairsPtr, const unsigned int* mapIdxPtr, const int POSE_MAX_PEOPLE, const int TOTAL_BODY_PARTS, const int TOTAL_BODY_PAIRS, const int heatmapWidth, const int heatmapHeight)
+    __global__ void bpcKernel(T* finalOutputPtr, const T* const heatMapPtr, const T* const peaksPtrA,
+                              const T* const peaksPtrB, const unsigned int* const bodyPartPairsPtr,
+                              const unsigned int* const mapIdxPtr, const unsigned int poseMaxPeople,
+                              const int TOTAL_BODY_PARTS, const int TOTAL_BODY_PAIRS,
+                              const int heatmapWidth, const int heatmapHeight)
     {
         const auto i = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto j = (blockIdx.y * blockDim.y) + threadIdx.y;
         const auto k = (blockIdx.z * blockDim.z) + threadIdx.z;
 
-        if(i >= TOTAL_BODY_PAIRS) return;
+        if (i < TOTAL_BODY_PAIRS)
+        {
+            int partA = bodyPartPairsPtr[i*2];
+            int partB = bodyPartPairsPtr[i*2 + 1];
+            int mapIdxX = mapIdxPtr[i*2];
+            int mapIdxY = mapIdxPtr[i*2 + 1];
 
-        int partA = bodyPartPairsPtr[i*2];
-        int partB = bodyPartPairsPtr[i*2 + 1];
-        int mapIdxX = mapIdxPtr[i*2];
-        int mapIdxY = mapIdxPtr[i*2 + 1];
+            const T* bodyPartA = peaksPtrA + (partA*poseMaxPeople*3 + j*3);
+            const T* bodyPartB = peaksPtrB + (partB*poseMaxPeople*3 + k*3);
+            const T* mapX = heatMapPtr + mapIdxX*heatmapWidth*heatmapHeight;
+            const T* mapY = heatMapPtr + mapIdxY*heatmapWidth*heatmapHeight;
 
-        const T* bodyPartA = peaksPtrA + (partA*POSE_MAX_PEOPLE*3 + j*3);
-        const T* bodyPartB = peaksPtrB + (partB*POSE_MAX_PEOPLE*3 + k*3);
-        const T* mapX = heatMapPtr + mapIdxX*heatmapWidth*heatmapHeight;
-        const T* mapY = heatMapPtr + mapIdxY*heatmapWidth*heatmapHeight;
-
-        T finalOutput = process(bodyPartA, bodyPartB, mapX, mapY, heatmapWidth, heatmapHeight);
-        finalOutputPtr[i*POSE_MAX_PEOPLE*POSE_MAX_PEOPLE + j*POSE_MAX_PEOPLE + k] = finalOutput;
+            T finalOutput = process(bodyPartA, bodyPartB, mapX, mapY, heatmapWidth, heatmapHeight);
+            finalOutputPtr[i*poseMaxPeople*poseMaxPeople + j*poseMaxPeople + k] = finalOutput;
+        }
     }
 
     template <typename T>
-    void connectBodyPartsGpu(Array<T>& poseKeypoints, Array<T>& poseScores, const T* const heatMapPtr,
+    void connectBodyPartsGpu(Array<T>& poseKeypoints, Array<T>& poseScores, const T* const heatMapGpuPtr,
                              const T* const peaksPtr, const PoseModel poseModel, const Point<int>& heatMapSize,
                              const int maxPeaks, const T interMinAboveThreshold, const T interThreshold,
                              const int minSubsetCnt, const T minSubsetScore, const T scaleFactor,
-                             const T* const heatMapGpuPtr, const T* const peaksGpuPtr)
+                             const T* const peaksGpuPtr)
     {
         try
         {
             // Parts Connection
             const auto& bodyPartPairs = getPosePartPairs(poseModel);
-            const auto& mapIdx_old = getPoseMapIndex(poseModel);
+            const auto& mapIdxOffset = getPoseMapIndex(poseModel);
             const auto numberBodyParts = getPoseNumberBodyParts(poseModel);
             const auto numberBodyPartPairs = bodyPartPairs.size() / 2;
             const auto subsetCounterIndex = numberBodyParts;
-            auto mapIdx(mapIdx_old);
-            for(auto& i : mapIdx) i+=(numberBodyParts+1);
+            // Update mapIdx
+            auto mapIdx = mapIdxOffset;
+            for (auto& i : mapIdx)
+                i += (numberBodyParts+1);
 
             if (numberBodyParts == 0)
                 error("Invalid value of numberBodyParts, it must be positive, not " + std::to_string(numberBodyParts),
@@ -108,31 +118,37 @@ namespace op
             // Upload required data to GPU
             unsigned int* bodyPartPairsGpuPtr;
             cudaMallocHost((void **)&bodyPartPairsGpuPtr, bodyPartPairs.size() * sizeof(unsigned int));
-            cudaMemcpy(bodyPartPairsGpuPtr, &bodyPartPairs[0], bodyPartPairs.size() * sizeof(unsigned int), cudaMemcpyHostToDevice);
+            cudaMemcpy(bodyPartPairsGpuPtr, &bodyPartPairs[0], bodyPartPairs.size() * sizeof(unsigned int),
+                       cudaMemcpyHostToDevice);
             unsigned int* mapIdxGpuPtr;
             cudaMallocHost((void **)&mapIdxGpuPtr, mapIdx.size() * sizeof(unsigned int));
             cudaMemcpy(mapIdxGpuPtr, &mapIdx[0], mapIdx.size() * sizeof(unsigned int), cudaMemcpyHostToDevice);
             T* finalOutputGpuPtr;
-            op::Array<T> finalOutputCpu;
+            Array<T> finalOutputCpu;
             finalOutputCpu.reset({(int)numberBodyPartPairs, (int)POSE_MAX_PEOPLE, (int)POSE_MAX_PEOPLE},-1);
             int totalComputations = numberBodyPartPairs * POSE_MAX_PEOPLE * POSE_MAX_PEOPLE;
             cudaMallocHost((void **)&finalOutputGpuPtr, totalComputations * sizeof(float));
 
             // Run Kernel
             const dim3 threadsPerBlock{4, 6, 6}; //4 is good for BODY_25, 8 for COCO?
-            if(POSE_MAX_PEOPLE % threadsPerBlock.y || POSE_MAX_PEOPLE % threadsPerBlock.z)
-                error("Invalid value of POSE_MAX_PEOPLE, it must be multiple of 16" + std::to_string(POSE_MAX_PEOPLE),
-                      __LINE__, __FUNCTION__, __FILE__);
-            int pairBlocks = std::round((numberBodyPartPairs/threadsPerBlock.x) + 0.5);
-            const dim3 numBlocks{pairBlocks, POSE_MAX_PEOPLE / threadsPerBlock.y, POSE_MAX_PEOPLE / threadsPerBlock.z};
-            bpcKernel<<<numBlocks, threadsPerBlock>>>(finalOutputGpuPtr, heatMapGpuPtr, peaksGpuPtr, peaksGpuPtr, bodyPartPairsGpuPtr, mapIdxGpuPtr, POSE_MAX_PEOPLE, numberBodyParts, numberBodyPartPairs, heatMapSize.x, heatMapSize.y);
-            cudaMemcpy(finalOutputCpu.getPtr(), finalOutputGpuPtr, totalComputations * sizeof(float),cudaMemcpyDeviceToHost);
+            if (POSE_MAX_PEOPLE % threadsPerBlock.y || POSE_MAX_PEOPLE % threadsPerBlock.z)
+                error("Invalid value of POSE_MAX_PEOPLE, it must be multiple of 16, rather than "
+                      + std::to_string(POSE_MAX_PEOPLE), __LINE__, __FUNCTION__, __FILE__);
+            int pairBlocks = intRound((numberBodyPartPairs/threadsPerBlock.x) + 0.5);
+            const dim3 numBlocks{(unsigned int)pairBlocks, POSE_MAX_PEOPLE / threadsPerBlock.y,
+                                 POSE_MAX_PEOPLE / threadsPerBlock.z};
+            bpcKernel<<<numBlocks, threadsPerBlock>>>(
+                finalOutputGpuPtr, heatMapGpuPtr, peaksGpuPtr, peaksGpuPtr, bodyPartPairsGpuPtr, mapIdxGpuPtr,
+                POSE_MAX_PEOPLE, numberBodyParts, numberBodyPartPairs, heatMapSize.x, heatMapSize.y);
+            cudaMemcpy(finalOutputCpu.getPtr(), finalOutputGpuPtr, totalComputations * sizeof(float),
+                       cudaMemcpyDeviceToHost);
 
             // std::vector<std::pair<std::vector<int>, double>> refers to:
             //     - std::vector<int>: [body parts locations, #body parts found]
             //     - double: subset score
+            const T* const tNullptr = nullptr;
             const auto subsets = generateInitialSubsets(
-                heatMapPtr, peaksPtr, poseModel, heatMapSize, maxPeaks, interThreshold, interMinAboveThreshold,
+                tNullptr, peaksPtr, poseModel, heatMapSize, maxPeaks, interThreshold, interMinAboveThreshold,
                 bodyPartPairs, numberBodyParts, numberBodyPartPairs, subsetCounterIndex, finalOutputCpu);
 
             // Delete people below the following thresholds:
@@ -150,8 +166,6 @@ namespace op
                                             peaksPtr, numberPeople, numberBodyParts, numberBodyPartPairs);
 
             // Differences w.r.t. CPU version for now
-            UNUSED(heatMapGpuPtr);
-            UNUSED(peaksGpuPtr);
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
         }
         catch (const std::exception& e)
@@ -161,15 +175,15 @@ namespace op
     }
 
     template void connectBodyPartsGpu(Array<float>& poseKeypoints, Array<float>& poseScores,
-                                      const float* const heatMapPtr, const float* const peaksPtr,
+                                      const float* const heatMapGpuPtr, const float* const peaksPtr,
                                       const PoseModel poseModel, const Point<int>& heatMapSize, const int maxPeaks,
                                       const float interMinAboveThreshold, const float interThreshold,
                                       const int minSubsetCnt, const float minSubsetScore, const float scaleFactor,
-                                      const float* const heatMapGpuPtr, const float* const peaksGpuPtr);
+                                      const float* const peaksGpuPtr);
     template void connectBodyPartsGpu(Array<double>& poseKeypoints, Array<double>& poseScores,
-                                      const double* const heatMapPtr, const double* const peaksPtr,
+                                      const double* const heatMapGpuPtr, const double* const peaksPtr,
                                       const PoseModel poseModel, const Point<int>& heatMapSize, const int maxPeaks,
                                       const double interMinAboveThreshold, const double interThreshold,
                                       const int minSubsetCnt, const double minSubsetScore, const double scaleFactor,
-                                      const double* const heatMapGpuPtr, const double* const peaksGpuPtr);
+                                      const double* const peaksGpuPtr);
 }
