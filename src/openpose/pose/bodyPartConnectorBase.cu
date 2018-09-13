@@ -130,16 +130,16 @@ namespace op
             cudaMallocHost((void **)&finalOutputGpuPtr, totalComputations * sizeof(float));
 
             // Run Kernel
-            const dim3 threadsPerBlock{4, 6, 6}; //4 is good for BODY_25, 8 for COCO?
-            if (POSE_MAX_PEOPLE % threadsPerBlock.y || POSE_MAX_PEOPLE % threadsPerBlock.z)
+            const dim3 threadsPerBlock{4, 8, 8}; //4 is good for BODY_25, 8 for COCO?
+            if ((POSE_MAX_PEOPLE+1) % threadsPerBlock.y || (POSE_MAX_PEOPLE+1) % threadsPerBlock.z)
                 error("Invalid value of POSE_MAX_PEOPLE, it must be multiple of 16, rather than "
                       + std::to_string(POSE_MAX_PEOPLE), __LINE__, __FUNCTION__, __FILE__);
             int pairBlocks = intRound((numberBodyPartPairs/threadsPerBlock.x) + 0.5);
-            const dim3 numBlocks{(unsigned int)pairBlocks, POSE_MAX_PEOPLE / threadsPerBlock.y,
-                                 POSE_MAX_PEOPLE / threadsPerBlock.z};
+            const dim3 numBlocks{(unsigned int)pairBlocks, (POSE_MAX_PEOPLE+1) / threadsPerBlock.y,
+                                 (POSE_MAX_PEOPLE+1) / threadsPerBlock.z};
             bpcKernel<<<numBlocks, threadsPerBlock>>>(
                 finalOutputGpuPtr, heatMapGpuPtr, peaksGpuPtr, peaksGpuPtr, bodyPartPairsGpuPtr, mapIdxGpuPtr,
-                POSE_MAX_PEOPLE, numberBodyParts, numberBodyPartPairs, heatMapSize.x, heatMapSize.y);
+                (POSE_MAX_PEOPLE), numberBodyParts, numberBodyPartPairs, heatMapSize.x, heatMapSize.y);
             cudaMemcpy(finalOutputCpu.getPtr(), finalOutputGpuPtr, totalComputations * sizeof(float),
                        cudaMemcpyDeviceToHost);
 
