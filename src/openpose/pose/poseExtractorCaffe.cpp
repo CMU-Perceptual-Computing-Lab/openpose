@@ -296,7 +296,7 @@ namespace op
 
                 std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
                 #ifdef USE_CUDA
-                upImpl->spBodyPartConnectorCaffe->Forward_gpu({upImpl->spHeatMapsBlob.get(),
+                upImpl->spBodyPartConnectorCaffe->Forward_cpu({upImpl->spHeatMapsBlob.get(),
                                                                upImpl->spPeaksBlob.get()},
                                                               mPoseKeypoints, mPoseScores);
                 #else
