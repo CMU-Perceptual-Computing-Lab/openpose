@@ -13,11 +13,11 @@ namespace op
                                     const int minSubsetCnt, const T minSubsetScore, const T scaleFactor = 1.f);
 
     template <typename T>
-    OP_API void connectBodyPartsGpu(Array<T>& poseKeypoints, Array<T>& poseScores, const T* const heatMapPtr,
+    OP_API void connectBodyPartsGpu(Array<T>& poseKeypoints, Array<T>& poseScores, const T* const heatMapGpuPtr,
                                     const T* const peaksPtr, const PoseModel poseModel, const Point<int>& heatMapSize,
                                     const int maxPeaks, const T interMinAboveThreshold, const T interThreshold,
                                     const int minSubsetCnt, const T minSubsetScore, const T scaleFactor = 1.f,
-                                    const T* const heatMapGpuPtr = nullptr, const T* const peaksGpuPtr = nullptr);
+                                    const T* const peaksGpuPtr = nullptr);
 
     // Private functions used by the 2 above functions
     template <typename T>
@@ -25,7 +25,8 @@ namespace op
         const T* const heatMapPtr, const T* const peaksPtr, const PoseModel poseModel, const Point<int>& heatMapSize,
         const int maxPeaks, const T interThreshold, const T interMinAboveThreshold,
         const std::vector<unsigned int>& bodyPartPairs, const unsigned int numberBodyParts,
-        const unsigned int numberBodyPartPairs, const unsigned int subsetCounterIndex);
+        const unsigned int numberBodyPartPairs, const unsigned int subsetCounterIndex,
+        const Array<T>& precomputedPAFs = Array<T>());
 
     template <typename T>
     OP_API void removeSubsetsBelowThresholds(std::vector<int>& validSubsetIndexes, int& numberPeople,
