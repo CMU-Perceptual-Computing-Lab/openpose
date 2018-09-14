@@ -163,9 +163,9 @@ namespace op
         {
             #if defined USE_CAFFE && defined USE_CUDA
                 const auto heatMapsBlob = bottom.at(0);
+                const auto* const peaksPtr = bottom.at(1)->cpu_data();
                 const auto* const heatMapsGpuPtr = heatMapsBlob->gpu_data();
                 const auto* const peaksGpuPtr = bottom.at(1)->gpu_data();
-                const auto* const peaksPtr = bottom.at(1)->cpu_data();
                 const auto maxPeaks = mTopSize[1];
                 connectBodyPartsGpu(poseKeypoints, poseScores, heatMapsGpuPtr, peaksPtr, mPoseModel,
                                     Point<int>{heatMapsBlob->shape(3), heatMapsBlob->shape(2)},
