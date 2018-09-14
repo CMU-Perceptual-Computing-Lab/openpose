@@ -20,11 +20,11 @@ namespace op
         T finalOutput = -1;
         if (bodyPartA[2] < renderThreshold || bodyPartB[2] < renderThreshold) return finalOutput;
 
-        auto vectorAToBX = bodyPartB[0] - bodyPartA[0];
-        auto vectorAToBY = bodyPartB[1] - bodyPartA[1];
-        auto vectorAToBMax = max(abs(vectorAToBX), abs(vectorAToBY));
-        auto numberPointsInLine = max(5, min(25, intRoundGPU(sqrt(5*vectorAToBMax))));
-        auto vectorNorm = T(sqrt(vectorAToBX*vectorAToBX + vectorAToBY*vectorAToBY));
+        const auto vectorAToBX = bodyPartB[0] - bodyPartA[0];
+        const auto vectorAToBY = bodyPartB[1] - bodyPartA[1];
+        const auto vectorAToBMax = max(abs(vectorAToBX), abs(vectorAToBY));
+        const auto numberPointsInLine = max(5, min(25, intRoundGPU(sqrt(5*vectorAToBMax))));
+        const auto vectorNorm = T(sqrt(vectorAToBX*vectorAToBX + vectorAToBY*vectorAToBY));
 
         if (vectorNorm > 1e-6)
         {
@@ -76,18 +76,18 @@ namespace op
 
         if (i < TOTAL_BODY_PAIRS)
         {
-            int partA = bodyPartPairsPtr[i*2];
-            int partB = bodyPartPairsPtr[i*2 + 1];
-            int mapIdxX = mapIdxPtr[i*2];
-            int mapIdxY = mapIdxPtr[i*2 + 1];
+            const int partA = bodyPartPairsPtr[i*2];
+            const int partB = bodyPartPairsPtr[i*2 + 1];
+            const int mapIdxX = mapIdxPtr[i*2];
+            const int mapIdxY = mapIdxPtr[i*2 + 1];
 
-            const T* bodyPartA = peaksPtrA + (partA*poseMaxPeople*3 + j*3);
-            const T* bodyPartB = peaksPtrB + (partB*poseMaxPeople*3 + k*3);
-            const T* mapX = heatMapPtr + mapIdxX*heatmapWidth*heatmapHeight;
-            const T* mapY = heatMapPtr + mapIdxY*heatmapWidth*heatmapHeight;
+            const T* const bodyPartA = peaksPtrA + (partA*poseMaxPeople*3 + j*3);
+            const T* const bodyPartB = peaksPtrB + (partB*poseMaxPeople*3 + k*3);
+            const T* const mapX = heatMapPtr + mapIdxX*heatmapWidth*heatmapHeight;
+            const T* const mapY = heatMapPtr + mapIdxY*heatmapWidth*heatmapHeight;
 
-            T finalOutput = process(bodyPartA, bodyPartB, mapX, mapY, heatmapWidth, heatmapHeight);
-            finalOutputPtr[i*poseMaxPeople*poseMaxPeople + j*poseMaxPeople + k] = finalOutput;
+            const T finalOutput = process(bodyPartA, bodyPartB, mapX, mapY, heatmapWidth, heatmapHeight);
+            finalOutputPtr[(i*poseMaxPeople+j)*poseMaxPeople + k] = finalOutput;
         }
     }
 
@@ -117,17 +117,17 @@ namespace op
 
             // Upload required data to GPU
             unsigned int* bodyPartPairsGpuPtr;
-            cudaMallocHost((void **)&bodyPartPairsGpuPtr, bodyPartPairs.size() * sizeof(unsigned int));
+            cudaMalloc((void **)&bodyPartPairsGpuPtr, bodyPartPairs.size() * sizeof(unsigned int));
             cudaMemcpy(bodyPartPairsGpuPtr, &bodyPartPairs[0], bodyPartPairs.size() * sizeof(unsigned int),
                        cudaMemcpyHostToDevice);
             unsigned int* mapIdxGpuPtr;
-            cudaMallocHost((void **)&mapIdxGpuPtr, mapIdx.size() * sizeof(unsigned int));
+            cudaMalloc((void **)&mapIdxGpuPtr, mapIdx.size() * sizeof(unsigned int));
             cudaMemcpy(mapIdxGpuPtr, &mapIdx[0], mapIdx.size() * sizeof(unsigned int), cudaMemcpyHostToDevice);
             T* finalOutputGpuPtr;
             Array<T> finalOutputCpu;
             finalOutputCpu.reset({(int)numberBodyPartPairs, (int)POSE_MAX_PEOPLE, (int)POSE_MAX_PEOPLE},-1);
             int totalComputations = numberBodyPartPairs * POSE_MAX_PEOPLE * POSE_MAX_PEOPLE;
-            cudaMallocHost((void **)&finalOutputGpuPtr, totalComputations * sizeof(float));
+            cudaMalloc((void **)&finalOutputGpuPtr, totalComputations * sizeof(float));
 
             // Run Kernel
             const dim3 threadsPerBlock{4, 8, 8}; //4 is good for BODY_25, 8 for COCO?
@@ -166,6 +166,9 @@ namespace op
                                             peaksPtr, numberPeople, numberBodyParts, numberBodyPartPairs);
 
             // Differences w.r.t. CPU version for now
+            cudaFree(bodyPartPairsGpuPtr);
+            cudaFree(mapIdxGpuPtr);
+            cudaFree(finalOutputGpuPtr);
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
         }
         catch (const std::exception& e)
