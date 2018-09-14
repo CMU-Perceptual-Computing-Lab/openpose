@@ -64,25 +64,24 @@ namespace op
     }
 
     template <typename T>
-    __global__ void bpcKernel(T* finalOutputPtr, const T* const heatMapPtr, const T* const peaksPtrA,
-                              const T* const peaksPtrB, const unsigned int* const bodyPartPairsPtr,
-                              const unsigned int* const mapIdxPtr, const unsigned int poseMaxPeople,
-                              const int TOTAL_BODY_PARTS, const int TOTAL_BODY_PAIRS,
-                              const int heatmapWidth, const int heatmapHeight)
+    __global__ void pafScoreKernel(T* finalOutputPtr, const T* const heatMapPtr, const T* const peaksPtr,
+                                   const unsigned int* const bodyPartPairsPtr, const unsigned int* const mapIdxPtr,
+                                   const unsigned int poseMaxPeople, const int numberBodyPartPairs,
+                                   const int heatmapWidth, const int heatmapHeight)
     {
         const auto i = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto j = (blockIdx.y * blockDim.y) + threadIdx.y;
         const auto k = (blockIdx.z * blockDim.z) + threadIdx.z;
 
-        if (i < TOTAL_BODY_PAIRS)
+        if (i < numberBodyPartPairs)
         {
             const int partA = bodyPartPairsPtr[i*2];
             const int partB = bodyPartPairsPtr[i*2 + 1];
             const int mapIdxX = mapIdxPtr[i*2];
             const int mapIdxY = mapIdxPtr[i*2 + 1];
 
-            const T* const bodyPartA = peaksPtrA + (partA*poseMaxPeople*3 + j*3);
-            const T* const bodyPartB = peaksPtrB + (partB*poseMaxPeople*3 + k*3);
+            const T* const bodyPartA = peaksPtr + (partA*poseMaxPeople*3 + j*3);
+            const T* const bodyPartB = peaksPtr + (partB*poseMaxPeople*3 + k*3);
             const T* const mapX = heatMapPtr + mapIdxX*heatmapWidth*heatmapHeight;
             const T* const mapY = heatMapPtr + mapIdxY*heatmapWidth*heatmapHeight;
 
@@ -137,9 +136,9 @@ namespace op
             int pairBlocks = intRound((numberBodyPartPairs/threadsPerBlock.x) + 0.5);
             const dim3 numBlocks{(unsigned int)pairBlocks, (POSE_MAX_PEOPLE+1) / threadsPerBlock.y,
                                  (POSE_MAX_PEOPLE+1) / threadsPerBlock.z};
-            bpcKernel<<<numBlocks, threadsPerBlock>>>(
-                finalOutputGpuPtr, heatMapGpuPtr, peaksGpuPtr, peaksGpuPtr, bodyPartPairsGpuPtr, mapIdxGpuPtr,
-                (POSE_MAX_PEOPLE), numberBodyParts, numberBodyPartPairs, heatMapSize.x, heatMapSize.y);
+            pafScoreKernel<<<numBlocks, threadsPerBlock>>>(
+                finalOutputGpuPtr, heatMapGpuPtr, peaksGpuPtr, bodyPartPairsGpuPtr, mapIdxGpuPtr,
+                POSE_MAX_PEOPLE, numberBodyPartPairs, heatMapSize.x, heatMapSize.y);
             cudaMemcpy(finalOutputCpu.getPtr(), finalOutputGpuPtr, totalComputations * sizeof(float),
                        cudaMemcpyDeviceToHost);
 
