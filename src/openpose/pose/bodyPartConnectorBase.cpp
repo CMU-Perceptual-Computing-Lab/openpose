@@ -160,26 +160,23 @@ namespace op
                                     auto maxScoreIndex = -1;
                                     if (poseModel == PoseModel::BODY_25E && bodyPartPairsStar[bodyPartB] > -1)
                                     {
-                                        if (heatMapPtr != nullptr)
+                                        if (heatMapPtr == nullptr)
+                                            error("HeatMapPtr is null. GPU PAF not implemented for star architecture.",
+                                                  __LINE__, __FUNCTION__, __FILE__);
+                                        const auto pairIndex2 = bodyPartPairsStar[bodyPartB];
+                                        const auto* mapX0 = heatMapPtr + (numberBodyPartsAndBkg + pairIndex2) * heatMapOffset;
+                                        const auto* mapY0 = heatMapPtr + (numberBodyPartsAndBkg + pairIndex2+1) * heatMapOffset;
+                                        for (auto j = 1; j <= number0; j++)
                                         {
-                                            const auto pairIndex2 = bodyPartPairsStar[bodyPartB];
-                                            const auto* mapX0 = heatMapPtr + (numberBodyPartsAndBkg + pairIndex2) * heatMapOffset;
-                                            const auto* mapY0 = heatMapPtr + (numberBodyPartsAndBkg + pairIndex2+1) * heatMapOffset;
-                                            for (auto j = 1; j <= number0; j++)
+                                            const auto score0B = getScoreAB(j, i, candidate0Ptr, candidateBPtr,
+                                                                            mapX0, mapY0, heatMapSize, interThreshold,
+                                                                            interMinAboveThreshold);
+                                            if (maxScore < score0B)
                                             {
-                                                const auto score0B = getScoreAB(j, i, candidate0Ptr, candidateBPtr,
-                                                                                mapX0, mapY0, heatMapSize, interThreshold,
-                                                                                interMinAboveThreshold);
-                                                if (maxScore < score0B)
-                                                {
-                                                    maxScore = score0B;
-                                                    maxScoreIndex = j;
-                                                }
+                                                maxScore = score0B;
+                                                maxScoreIndex = j;
                                             }
                                         }
-                                        else
-                                            error("HeatMapPtr is null. GPU PAF not implemented for Star.",
-                                                  __LINE__, __FUNCTION__, __FILE__);
                                     }
                                     // Star-PAF --> found
                                     if (maxScore > 0)
@@ -316,30 +313,24 @@ namespace op
                                 // Refinement: star-PAF
                                 if (poseModel == PoseModel::BODY_25E && bodyPartPairsStar[bodyPartB] > -1)
                                 {
-                                    if (heatMapPtr != nullptr)
-                                    {
-                                        const auto score0B = getScore0B(
-                                            bodyPart0, candidate0Ptr, i, j, bodyPartA, bodyPartB, candidateBPtr,
-                                            heatMapPtr, heatMapSize, interThreshold, interMinAboveThreshold, peaksOffset,
-                                            heatMapOffset, numberBodyPartsAndBkg, subsets, bodyPartPairsStar);
-                                        // Max
-                                        scoreAB = fastMax(scoreAB, score0B);
-                                        // // Smart average
-                                        // // Both scores --> average
-                                        // if (scoreAB > 0 && score0B > 0)
-                                        // {
-                                        //     const auto ratio0 = T(0.5);
-                                        //     scoreAB = (1-ratio0)*scoreAB
-                                        //             + ratio0 * score0B;
-                                        // }
-                                        // // No scoreAB --> use score0B
-                                        // else if (score0B > 0)
-                                        //     scoreAB = score0B;
-                                        // // Else: No score0B --> use scoreAB
-                                    }
-                                    else
-                                        error("HeatMapPtr is null. GPU PAF not implemented for Star",
-                                              __LINE__, __FUNCTION__, __FILE__);
+                                    const auto score0B = getScore0B(
+                                        bodyPart0, candidate0Ptr, i, j, bodyPartA, bodyPartB, candidateBPtr,
+                                        heatMapPtr, heatMapSize, interThreshold, interMinAboveThreshold, peaksOffset,
+                                        heatMapOffset, numberBodyPartsAndBkg, subsets, bodyPartPairsStar);
+                                    // Max
+                                    scoreAB = fastMax(scoreAB, score0B);
+                                    // // Smart average
+                                    // // Both scores --> average
+                                    // if (scoreAB > 0 && score0B > 0)
+                                    // {
+                                    //     const auto ratio0 = T(0.5);
+                                    //     scoreAB = (1-ratio0)*scoreAB
+                                    //             + ratio0 * score0B;
+                                    // }
+                                    // // No scoreAB --> use score0B
+                                    // else if (score0B > 0)
+                                    //     scoreAB = score0B;
+                                    // // Else: No score0B --> use scoreAB
                                 }
 
                                 // E.g. neck-nose connection. If possible PAF between neck i, nose j --> add
