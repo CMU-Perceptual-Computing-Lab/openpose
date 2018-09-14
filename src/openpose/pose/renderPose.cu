@@ -533,13 +533,17 @@ namespace op
                 if (googlyEyes && (poseModel == PoseModel::MPI_15 || poseModel == PoseModel::MPI_15_4))
                     error("Bool googlyEyes not compatible with MPI models.",
                           __LINE__, __FUNCTION__, __FILE__);
+                if (numberPeople > POSE_MAX_PEOPLE)
+                    error("Rendering assumes that numberPeople <= POSE_MAX_PEOPLE = " + std::to_string(POSE_MAX_PEOPLE)
+                          + ".", __LINE__, __FUNCTION__, __FILE__);
 
                 dim3 threadsPerBlock;
                 dim3 numBlocks;
                 getNumberCudaThreadsAndBlocks(threadsPerBlock, numBlocks, frameSize);
 
                 // Body pose
-                if (poseModel == PoseModel::BODY_25 || poseModel == PoseModel::BODY_25_19 || poseModel == PoseModel::BODY_25D)
+                if (poseModel == PoseModel::BODY_25 || poseModel == PoseModel::BODY_25_19
+                    || poseModel == PoseModel::BODY_25D)
                     renderPoseBody25<<<threadsPerBlock, numBlocks>>>(
                         framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
                         blendOriginalFrame, alphaBlending

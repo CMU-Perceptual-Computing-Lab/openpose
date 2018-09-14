@@ -294,15 +294,23 @@ namespace op
                 upImpl->spBodyPartConnectorCaffe->setMinSubsetCnt((int)get(PoseProperty::ConnectMinSubsetCnt));
                 upImpl->spBodyPartConnectorCaffe->setMinSubsetScore((float)get(PoseProperty::ConnectMinSubsetScore));
 
-                // #ifdef USE_CUDA
-                //     upImpl->spBodyPartConnectorCaffe->Forward_gpu({upImpl->spHeatMapsBlob.get(),
-                //                                                    upImpl->spPeaksBlob.get()},
-                //                                                   mPoseKeypoints, mPoseScores);
-                // #else
+                #ifdef USE_CUDA
+                    // BODY_25D only implemented for CPU version
+                    if (mPoseModel == PoseModel::BODY_25D)
+                        upImpl->spBodyPartConnectorCaffe->Forward_cpu({upImpl->spHeatMapsBlob.get(),
+                                                                       upImpl->spPeaksBlob.get()},
+                                                                      mPoseKeypoints, mPoseScores);
+                    else
+                        upImpl->spBodyPartConnectorCaffe->Forward_gpu({upImpl->spHeatMapsBlob.get(),
+                                                                       upImpl->spPeaksBlob.get()},
+                                                                      mPoseKeypoints, mPoseScores);
+                #else
                     upImpl->spBodyPartConnectorCaffe->Forward_cpu({upImpl->spHeatMapsBlob.get(),
                                                                    upImpl->spPeaksBlob.get()},
                                                                   mPoseKeypoints, mPoseScores);
-                // #endif
+                #endif
+
+                // 5. CUDA sanity check
                 #ifdef USE_CUDA
                     cudaCheck(__LINE__, __FUNCTION__, __FILE__);
                 #endif

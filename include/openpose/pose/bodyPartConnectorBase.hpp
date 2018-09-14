@@ -17,6 +17,9 @@ namespace op
                                     const T* const peaksPtr, const PoseModel poseModel, const Point<int>& heatMapSize,
                                     const int maxPeaks, const T interMinAboveThreshold, const T interThreshold,
                                     const int minSubsetCnt, const T minSubsetScore, const T scaleFactor = 1.f,
+                                    Array<T> finalOutputCpu = Array<T>{}, T* finalOutputGpuPtr = nullptr,
+                                    const unsigned int* const bodyPartPairsGpuPtr = nullptr,
+                                    const unsigned int* const mapIdxGpuPtr = nullptr,
                                     const T* const peaksGpuPtr = nullptr);
 
     // Private functions used by the 2 above functions

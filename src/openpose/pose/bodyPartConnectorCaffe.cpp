@@ -1,19 +1,43 @@
 #ifdef USE_CAFFE
     #include <caffe/blob.hpp>
 #endif
+#ifdef USE_CUDA
+    #include <openpose/gpu/cuda.hpp>
+#endif
 #include <openpose/pose/bodyPartConnectorBase.hpp>
+#include <openpose/pose/poseParameters.hpp>
 #include <openpose/pose/bodyPartConnectorCaffe.hpp>
 
 namespace op
 {
     template <typename T>
-    BodyPartConnectorCaffe<T>::BodyPartConnectorCaffe()
+    BodyPartConnectorCaffe<T>::BodyPartConnectorCaffe() :
+        pBodyPartPairsGpuPtr{nullptr},
+        pMapIdxGpuPtr{nullptr},
+        pFinalOutputGpuPtr{nullptr}
     {
         try
         {
             #ifndef USE_CAFFE
                 error("OpenPose must be compiled with the `USE_CAFFE` macro definition in order to use this"
                       " functionality.", __LINE__, __FUNCTION__, __FILE__);
+            #endif
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    template <typename T>
+    BodyPartConnectorCaffe<T>::~BodyPartConnectorCaffe()
+    {
+        try
+        {
+            #if defined USE_CAFFE && defined USE_CUDA
+                cudaFree(pBodyPartPairsGpuPtr);
+                cudaFree(pMapIdxGpuPtr);
+                cudaFree(pFinalOutputGpuPtr);
             #endif
         }
         catch (const std::exception& e)
@@ -162,15 +186,58 @@ namespace op
         try
         {
             #if defined USE_CAFFE && defined USE_CUDA
+                // Global data
                 const auto heatMapsBlob = bottom.at(0);
-                const auto* const peaksPtr = bottom.at(1)->cpu_data();
                 const auto* const heatMapsGpuPtr = heatMapsBlob->gpu_data();
-                const auto* const peaksGpuPtr = bottom.at(1)->gpu_data();
+                const auto* const peaksPtr = bottom.at(1)->cpu_data();
                 const auto maxPeaks = mTopSize[1];
+                const auto* const peaksGpuPtr = bottom.at(1)->gpu_data();
+
+                // Initialize fixed pointers (1-time task) - It must be done in the same thread than Forward_gpu
+                if (pBodyPartPairsGpuPtr == nullptr || pMapIdxGpuPtr == nullptr)
+                {
+                    // Free previous memory
+                    cudaFree(pBodyPartPairsGpuPtr);
+                    cudaFree(pMapIdxGpuPtr);
+                    // Data
+                    const auto& bodyPartPairs = getPosePartPairs(mPoseModel);
+                    const auto numberBodyParts = getPoseNumberBodyParts(mPoseModel);
+                    const auto& mapIdxOffset = getPoseMapIndex(mPoseModel);
+                    // Update mapIdx
+                    auto mapIdx = mapIdxOffset;
+                    for (auto& i : mapIdx)
+                        i += (numberBodyParts+1);
+                    // Re-allocate memory
+                    cudaMalloc((void **)&pBodyPartPairsGpuPtr, bodyPartPairs.size() * sizeof(unsigned int));
+                    cudaMemcpy(pBodyPartPairsGpuPtr, &bodyPartPairs[0], bodyPartPairs.size() * sizeof(unsigned int),
+                               cudaMemcpyHostToDevice);
+                    cudaMalloc((void **)&pMapIdxGpuPtr, mapIdx.size() * sizeof(unsigned int));
+                    cudaMemcpy(pMapIdxGpuPtr, &mapIdx[0], mapIdx.size() * sizeof(unsigned int),
+                               cudaMemcpyHostToDevice);
+                    // Sanity check
+                    cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+                }
+                // Initialize auxiliary pointers (1-time task)
+                if (mFinalOutputCpu.empty()) // if (pFinalOutputGpuPtr == nullptr)
+                {
+                    // Data
+                    const auto& bodyPartPairs = getPosePartPairs(mPoseModel);
+                    const auto numberBodyPartPairs = bodyPartPairs.size() / 2;
+                    // Allocate memory
+                    mFinalOutputCpu.reset({(int)numberBodyPartPairs, maxPeaks, maxPeaks});
+                    const auto totalComputations = mFinalOutputCpu.getVolume();
+                    if (pFinalOutputGpuPtr == nullptr)
+                        cudaMalloc((void **)&pFinalOutputGpuPtr, totalComputations * sizeof(float));
+                    // Sanity check
+                    cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+                }
+
+                // Run body part connector
                 connectBodyPartsGpu(poseKeypoints, poseScores, heatMapsGpuPtr, peaksPtr, mPoseModel,
                                     Point<int>{heatMapsBlob->shape(3), heatMapsBlob->shape(2)},
                                     maxPeaks, mInterMinAboveThreshold, mInterThreshold,
-                                    mMinSubsetCnt, mMinSubsetScore, mScaleNetToOutput, peaksGpuPtr);
+                                    mMinSubsetCnt, mMinSubsetScore, mScaleNetToOutput, mFinalOutputCpu,
+                                    pFinalOutputGpuPtr, pBodyPartPairsGpuPtr, pMapIdxGpuPtr, peaksGpuPtr);
             #else
                 UNUSED(bottom);
                 UNUSED(poseKeypoints);

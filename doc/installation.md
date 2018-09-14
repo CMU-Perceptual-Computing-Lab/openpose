@@ -106,30 +106,31 @@ Any problem installing OpenPose? Check [doc/faq.md](./faq.md) and/or post a GitH
 
 
 ### Prerequisites
-1. Download and install CMake GUI:
+1. Ubuntu - **Anaconda should not be installed** on your system. Anaconda includes a Protobuf version that is incompatible with Caffe. Either you uninstall anaconda and install protobuf via apt-get, or you compile your own Caffe and link it to OpenPose.
+2. Download and install CMake GUI:
     - Ubuntu: run the command `sudo apt-get install cmake-qt-gui`. Note: If you prefer to use CMake through the command line, see [Cmake Command Line Build](#cmake-command-line-build-ubuntu-only).
     - Windows: download and install the latest CMake win64-x64 msi installer from the [CMake website](https://cmake.org/download/), called `cmake-X.X.X-win64-x64.msi`.
     - Mac: `brew cask install cmake`.
-2. Windows - **Microsoft Visual Studio (VS) 2015 Enterprise Update 3**:
+3. Windows - **Microsoft Visual Studio (VS) 2015 Enterprise Update 3**:
     - If **Visual Studio 2017 Community** is desired, we do not officially support it, but it might be compiled by firstly [enabling CUDA 8.0 in VS2017](https://stackoverflow.com/questions/43745099/using-cuda-with-visual-studio-2017?answertab=active#tab-top) or use **VS2017 with CUDA 9** by checking the `.vcxproj` file and changing the necessary paths from CUDA 8 to 9.
     - VS 2015 Enterprise Update 1 will give some compiler errors and VS 2015 Community has not been tested.
-3. Nvidia GPU version prerequisites:
+4. Nvidia GPU version prerequisites:
     1. [**CUDA 8**](https://developer.nvidia.com/cuda-80-ga2-download-archive):
         - Ubuntu: Run `sudo ubuntu/install_cuda.sh` or alternatively download and install it from their website.
-        - Windows: Install CUDA 8.0 after Visual Studio 2015 is installed to assure that the CUDA installation will generate all necessary files for VS. If CUDA was already installed, re-install CUDA after installing VS!
-        - **IMPORTANT**: As of a recent Windows update, you have to download the Nvidia [drivers](http://www.nvidia.com/Download/index.aspx) drivers first, and then install CUDA without the Graphics Driver flag or else your system might hang.
+        - Windows: Install CUDA 8.0 after Visual Studio 2015 is installed to assure that the CUDA installation will generate all necessary files for VS. If CUDA was already installed, re-install - **IMPORTANT 1/2**: Nvidia V, any Nvidia with Volta architecture, and newer Nvidia model GPUs require at least CUDA 9.
+        - **IMPORTANT 2/2**: As of a recent Windows update, you might want to download the Nvidia [drivers](http://www.nvidia.com/Download/index.aspx) first, and then install CUDA without the Graphics Driver flag or else your system might hang.
     2. [**cuDNN 5.1**](https://developer.nvidia.com/cudnn):
         - Ubuntu: Run `sudo ubuntu/install_cudnn.sh` or alternatively download and install it from their website.
         - Windows (and Ubuntu if manual installation): In order to manually install it, just unzip it and copy (merge) the contents on the CUDA folder, usually `/usr/local/cuda/` in Ubuntu and `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0` in Windows.
-4. AMD GPU version prerequisites:
+5. AMD GPU version prerequisites:
     1. Download official AMD drivers for Windows from [**AMD - Windows**](https://support.amd.com/en-us/download).
     2. Download 3rd party ROCM driver for Ubuntu from [**AMD - OpenCL**](https://rocm.github.io/ROCmInstall.html).
     3. Ubuntu only: Install `sudo apt-get install libviennacl-dev`. This comes packaged inside OpenPose for Windows.
     4. AMD Drivers have not been tested on OSX. Please email us if you wish to test it. This has only been tested on Vega series cards.
-5. Ubuntu - Other prerequisites:
+6. Ubuntu - Other prerequisites:
     - Caffe prerequisites: By default, OpenPose uses Caffe under the hood. If you have not used Caffe previously, install its dependencies by running `sudo bash ./ubuntu/install_cmake.sh`.
     - OpenCV must be already installed on your machine. It can be installed with `apt-get install libopencv-dev`. You can also use your own compiled OpenCV version.
-6. Windows - **Caffe, OpenCV, and Caffe prerequisites**:
+7. Windows - **Caffe, OpenCV, and Caffe prerequisites**:
     - CMake automatically downloads all the Windows DLLs. Alternatively, you might prefer to download them manually:
         - Models:
             - [COCO model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/coco/pose_iter_440000.caffemodel): download in `models/pose/coco/`.
@@ -141,9 +142,9 @@ Any problem installing OpenPose? Check [doc/faq.md](./faq.md) and/or post a GitH
             - [Caffe](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe_2018_01_18.zip): Unzip as `3rdparty/windows/caffe/`.
             - [Caffe dependencies](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe3rdparty_2017_07_14.zip): Unzip as `3rdparty/windows/caffe3rdparty/`.
             - [OpenCV 3.1](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/opencv_310.zip): Unzip as `3rdparty/windows/opencv/`.
-7. Mac - **Caffe, OpenCV, and Caffe prerequisites**:
+8. Mac - **Caffe, OpenCV, and Caffe prerequisites**:
     - Install deps by running `bash 3rdparty/osx/install_deps.sh` on your terminal.
-8. **Eigen prerequisite**:
+9. **Eigen prerequisite**:
     - Note: This step is optional, only required for some specific extra functionality, such as extrinsic camera calibration.
     - If you enable the `WITH_EIGEN` flag when running CMake. You can either:
         1. Do not do anything if you set the `WITH_EIGEN` flag to `BUILD`, CMake will automatically download Eigen. Alternatively, you might prefer to download it manually:

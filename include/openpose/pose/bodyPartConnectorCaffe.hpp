@@ -22,6 +22,8 @@ namespace op
     public:
         explicit BodyPartConnectorCaffe();
 
+        ~BodyPartConnectorCaffe();
+
         virtual void Reshape(const std::vector<caffe::Blob<T>*>& bottom);
 
         virtual inline const char* type() const { return "BodyPartConnector"; }
@@ -60,6 +62,11 @@ namespace op
         std::array<int, 4> mHeatMapsSize;
         std::array<int, 4> mPeaksSize;
         std::array<int, 4> mTopSize;
+        // GPU auxiliary
+        unsigned int* pBodyPartPairsGpuPtr;
+        unsigned int* pMapIdxGpuPtr;
+        Array<T> mFinalOutputCpu;
+        T* pFinalOutputGpuPtr;
 
         DELETE_COPY(BodyPartConnectorCaffe);
     };
