@@ -7,6 +7,38 @@
 namespace op
 {
     #ifdef USE_UNITY_SUPPORT
+        namespace UnityDebugger
+        {
+            typedef void(__stdcall * DebugCallback) (const char* const str, int type);
+            DebugCallback gDebugCallback;
+
+            extern "C" void OP_API OP_RegisterDebugCallback(DebugCallback& debugCallback)
+            {
+                if (debugCallback)
+                    gDebugCallback = debugCallback;
+            }
+
+            void DebugInUnity(const std::string& message, const int type)
+            {
+                if (gDebugCallback)
+                    gDebugCallback(message.c_str(), type);
+            }
+
+            void log(const std::string& message)
+            {
+                DebugInUnity(message, 0);
+            }
+
+            void logWarning(const std::string& message)
+            {
+                DebugInUnity(message, 1);
+            }
+
+            void logError(const std::string& message)
+            {
+                DebugInUnity(message, -1);
+            }
+        }
     #endif
 
     // Private auxiliar functions
@@ -147,6 +179,7 @@ namespace op
 
         // Unity logError
         #ifdef USE_UNITY_SUPPORT
+            UnityDebugger::logError(errorMessageToPrint);
         #endif
 
         // std::runtime_error
@@ -171,6 +204,7 @@ namespace op
 
             // Unity log
             #ifdef USE_UNITY_SUPPORT
+                UnityDebugger::log(infoMessage);
             #endif
         }
     }

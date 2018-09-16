@@ -425,7 +425,6 @@ int openPoseDemo()
         // Start processing
         // Two different ways of running the program on multithread environment
         op::log("Starting thread(s)...", op::Priority::High);
-        // Option a) Recommended - Also using the main thread (this thread) for processing (it saves 1 thread)
         // Start, run & stop threads - it blocks this thread until all others have finished
         opWrapper.exec();
 

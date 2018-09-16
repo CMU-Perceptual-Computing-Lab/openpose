@@ -492,7 +492,6 @@ int openPoseTutorialWrapper2()
 
         op::log("Starting thread(s)...", op::Priority::High);
         // Two different ways of running the program on multithread environment
-        // Option a) Recommended - Also using the main thread (this thread) for processing (it saves 1 thread)
         // Start, run & stop threads - it blocks this thread until all others have finished
         opWrapper.exec();
 
