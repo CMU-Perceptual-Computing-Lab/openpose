@@ -5,30 +5,40 @@
 
 namespace op
 {
-    OP_API float getDistance(const Array<float>& keypoints, const int person, const int elementA, const int elementB);
+    template <typename T>
+    OP_API T getDistance(const Array<T>& keypoints, const int person, const int elementA, const int elementB);
 
-    OP_API void averageKeypoints(Array<float>& keypointsA, const Array<float>& keypointsB, const int personA);
+    template <typename T>
+    OP_API void averageKeypoints(Array<T>& keypointsA, const Array<T>& keypointsB, const int personA);
 
-    OP_API void scaleKeypoints(Array<float>& keypoints, const float scale);
+    template <typename T>
+    OP_API void scaleKeypoints(Array<T>& keypoints, const T scale);
 
-    OP_API void scaleKeypoints2d(Array<float>& keypoints, const float scaleX, const float scaleY);
+    template <typename T>
+    OP_API void scaleKeypoints2d(Array<T>& keypoints, const T scaleX, const T scaleY);
 
-    OP_API void scaleKeypoints2d(Array<float>& keypoints, const float scaleX, const float scaleY, const float offsetX,
-                                 const float offsetY);
+    template <typename T>
+    OP_API void scaleKeypoints2d(Array<T>& keypoints, const T scaleX, const T scaleY, const T offsetX,
+                                 const T offsetY);
 
-    OP_API void renderKeypointsCpu(Array<float>& frameArray, const Array<float>& keypoints,
-                                   const std::vector<unsigned int>& pairs, const std::vector<float> colors,
-                                   const float thicknessCircleRatio, const float thicknessLineRatioWRTCircle,
-                                   const std::vector<float>& poseScales, const float threshold);
+    template <typename T>
+    OP_API void renderKeypointsCpu(Array<T>& frameArray, const Array<T>& keypoints,
+                                   const std::vector<unsigned int>& pairs, const std::vector<T> colors,
+                                   const T thicknessCircleRatio, const T thicknessLineRatioWRTCircle,
+                                   const std::vector<T>& poseScales, const T threshold);
 
-    OP_API Rectangle<float> getKeypointsRectangle(const Array<float>& keypoints, const int person,
-                                                  const float threshold);
+    template <typename T>
+    OP_API Rectangle<T> getKeypointsRectangle(const Array<T>& keypoints, const int person,
+                                              const T threshold);
 
-    OP_API float getAverageScore(const Array<float>& keypoints, const int person);
+    template <typename T>
+    OP_API T getAverageScore(const Array<T>& keypoints, const int person);
 
-    OP_API float getKeypointsArea(const Array<float>& keypoints, const int person, const float threshold);
+    template <typename T>
+    OP_API T getKeypointsArea(const Array<T>& keypoints, const int person, const T threshold);
 
-    OP_API int getBiggestPerson(const Array<float>& keypoints, const float threshold);
+    template <typename T>
+    OP_API int getBiggestPerson(const Array<T>& keypoints, const T threshold);
 }
 
 #endif // OPENPOSE_UTILITIES_KEYPOINT_HPP

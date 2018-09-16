@@ -50,20 +50,6 @@ For further details, check [all released features](doc/released_features.md) and
 
 
 
-## Contents
-1. [Latest Features](#latest-features)
-2. [Results](#results)
-3. [Installation, Reinstallation and Uninstallation](#installation-reinstallation-and-uninstallation)
-4. [Quick Start](#quick-start)
-5. [Output](#output)
-6. [Speeding Up OpenPose and Benchmark](#speeding-up-openpose-and-benchmark)
-7. [Send Us Failure Cases and Feedback!](#send-us-failure-cases-and-feedback)
-8. [Authors and Contributors](#authors-and-contributors)
-9. [Citation](#citation)
-10. [License](#license)
-
-
-
 ## Results
 ### Body-Foot Estimation
 <p align="center">
@@ -89,6 +75,21 @@ For further details, check [all released features](doc/released_features.md) and
 <p align="center">
     <img src="doc/media/dance.gif", width="360">
 </p>
+
+
+
+## Contents
+1. [Features](#features)
+2. [Latest Features](#latest-features)
+3. [Results](#results)
+4. [Installation, Reinstallation and Uninstallation](#installation-reinstallation-and-uninstallation)
+5. [Quick Start](#quick-start)
+6. [Output](#output)
+7. [Speeding Up OpenPose and Benchmark](#speeding-up-openpose-and-benchmark)
+8. [Send Us Failure Cases and Feedback!](#send-us-failure-cases-and-feedback)
+9. [Authors and Contributors](#authors-and-contributors)
+10. [Citation](#citation)
+11. [License](#license)
 
 
 

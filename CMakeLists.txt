@@ -252,7 +252,10 @@ option(BUILD_DOCS "Build OpenPose documentation." OFF)
 option(BUILD_PYTHON "Build OpenPose python." OFF)
 if (WIN32)
   option(BUILD_BIN_FOLDER "Copy all required 3rd-party DLL files into {build_directory}/bin. Disable to save some memory." ON)
-endif ()
+endif (WIN32)
+
+# Unity
+# option(BUILD_UNITY_SUPPORT "Build OpenPose as a Unity plugin." OFF)
 
 # Build as shared library
 option(BUILD_SHARED_LIBS "Build as shared lib." ON)
@@ -309,6 +312,12 @@ if (WITH_TRACKING)
   # OpenPose flags
   add_definitions(-DUSE_TRACKING)
 endif (WITH_TRACKING)
+
+# Unity
+if (BUILD_UNITY_SUPPORT)
+  # OpenPose flags
+  add_definitions(-DUSE_UNITY_SUPPORT)
+endif (BUILD_UNITY_SUPPORT)
 
 # Calibration
 # No Eigen
@@ -547,8 +556,8 @@ if (WIN32)
   if (BUILD_PYTHON)
     if (NOT BUILD_BIN_FOLDER)
       message(FATAL_ERROR "BUILD_BIN_FOLDER must be turned on to as well to build python library")
-    endif ()
-  endif ()
+    endif (NOT BUILD_BIN_FOLDER)
+  endif (BUILD_PYTHON)
 
   # Auto copy DLLs
   if (BUILD_BIN_FOLDER)
@@ -876,8 +885,8 @@ message(STATUS "Models Downloaded.")
 if (Caffe_FOUND)
   if(BUILD_PYTHON)
     add_subdirectory(python)
-  endif ()
-endif()
+  endif (BUILD_PYTHON)
+endif(Caffe_FOUND)
 
 ### GENERATE DOCUMENTATION
 if (UNIX OR APPLE)

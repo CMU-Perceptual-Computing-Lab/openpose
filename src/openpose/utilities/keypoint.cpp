@@ -5,10 +5,11 @@
 
 namespace op
 {
-    const std::string errorMessage = "The Array<float> is not a RGB image or 3-channel keypoint array. This function"
+    const std::string errorMessage = "The Array<T> is not a RGB image or 3-channel keypoint array. This function"
                                      " is only for array of dimension: [sizeA x sizeB x 3].";
 
-    float getDistance(const Array<float>& keypoints, const int person, const int elementA, const int elementB)
+    template <typename T>
+    T getDistance(const Array<T>& keypoints, const int person, const int elementA, const int elementB)
     {
         try
         {
@@ -20,11 +21,16 @@ namespace op
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return -1.f;
+            return T(-1);
         }
     }
+    template float getDistance(const Array<float>& keypoints, const int person, const int elementA,
+                               const int elementB);
+    template double getDistance(const Array<double>& keypoints, const int person, const int elementA,
+                                const int elementB);
 
-    void averageKeypoints(Array<float>& keypointsA, const Array<float>& keypointsB, const int personA)
+    template <typename T>
+    void averageKeypoints(Array<T>& keypointsA, const Array<T>& keypointsB, const int personA)
     {
         try
         {
@@ -41,7 +47,7 @@ namespace op
             {
                 const auto finalIndexA = keypointsA.getSize(2)*(personA*numberParts + part);
                 const auto finalIndexB = keypointsA.getSize(2)*part;
-                if (keypointsB[finalIndexB+2] - keypointsA[finalIndexA+2] > 0.05f)
+                if (keypointsB[finalIndexB+2] - keypointsA[finalIndexA+2] > T(0.05))
                 {
                     keypointsA[finalIndexA] = keypointsB[finalIndexB];
                     keypointsA[finalIndexA+1] = keypointsB[finalIndexB+1];
@@ -54,16 +60,19 @@ namespace op
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
     }
+    template void averageKeypoints(Array<float>& keypointsA, const Array<float>& keypointsB, const int personA);
+    template void averageKeypoints(Array<double>& keypointsA, const Array<double>& keypointsB, const int personA);
 
-    void scaleKeypoints(Array<float>& keypoints, const float scale)
+    template <typename T>
+    void scaleKeypoints(Array<T>& keypoints, const T scale)
     {
         try
         {
-            if (!keypoints.empty() && scale != 1.f)
+            if (!keypoints.empty() && scale != T(1))
             {
                 // Error check
                 if (keypoints.getSize(2) != 3 && keypoints.getSize(2) != 4)
-                    error("The Array<float> is not a (x,y,score) or (x,y,z,score) format array. This"
+                    error("The Array<T> is not a (x,y,score) or (x,y,z,score) format array. This"
                           " function is only for those 2 dimensions: [sizeA x sizeB x 3or4].",
                           __LINE__, __FUNCTION__, __FILE__);
                 // Get #people and #parts
@@ -88,12 +97,15 @@ namespace op
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
     }
+    template void scaleKeypoints(Array<float>& keypoints, const float scale);
+    template void scaleKeypoints(Array<double>& keypoints, const double scale);
 
-    void scaleKeypoints2d(Array<float>& keypoints, const float scaleX, const float scaleY)
+    template <typename T>
+    void scaleKeypoints2d(Array<T>& keypoints, const T scaleX, const T scaleY)
     {
         try
         {
-            if (!keypoints.empty() && scaleX != 1.f && scaleY != 1.f)
+            if (!keypoints.empty() && scaleX != T(1) && scaleY != T(1))
             {
                 // Error check
                 if (keypoints.getSize(2) != 3)
@@ -119,13 +131,15 @@ namespace op
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
     }
+    template void scaleKeypoints2d(Array<float>& keypoints, const float scaleX, const float scaleY);
+    template void scaleKeypoints2d(Array<double>& keypoints, const double scaleX, const double scaleY);
 
-    void scaleKeypoints2d(Array<float>& keypoints, const float scaleX, const float scaleY, const float offsetX,
-                          const float offsetY)
+    template <typename T>
+    void scaleKeypoints2d(Array<T>& keypoints, const T scaleX, const T scaleY, const T offsetX, const T offsetY)
     {
         try
         {
-            if (!keypoints.empty() && scaleX != 1.f && scaleY != 1.f)
+            if (!keypoints.empty() && scaleX != T(1) && scaleY != T(1))
             {
                 // Error check
                 if (keypoints.getSize(2) != 3)
@@ -151,17 +165,21 @@ namespace op
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
     }
+    template void scaleKeypoints2d(Array<float>& keypoints, const float scaleX, const float scaleY,
+                                   const float offsetX, const float offsetY);
+    template void scaleKeypoints2d(Array<double>& keypoints, const double scaleX, const double scaleY,
+                                   const double offsetX, const double offsetY);
 
-    void renderKeypointsCpu(Array<float>& frameArray, const Array<float>& keypoints,
-                            const std::vector<unsigned int>& pairs, const std::vector<float> colors,
-                            const float thicknessCircleRatio, const float thicknessLineRatioWRTCircle,
-                            const std::vector<float>& poseScales, const float threshold)
+    template <typename T>
+    void renderKeypointsCpu(Array<T>& frameArray, const Array<T>& keypoints, const std::vector<unsigned int>& pairs,
+                            const std::vector<T> colors, const T thicknessCircleRatio,
+                            const T thicknessLineRatioWRTCircle, const std::vector<T>& poseScales, const T threshold)
     {
         try
         {
             if (!frameArray.empty())
             {
-                // Array<float> --> cv::Mat
+                // Array<T> --> cv::Mat
                 auto frame = frameArray.getCvMat();
 
                 // Security check
@@ -179,7 +197,7 @@ namespace op
                 const auto shift = 0;
                 const auto numberColors = colors.size();
                 const auto numberScales = poseScales.size();
-                const auto thresholdRectangle = 0.1f;
+                const auto thresholdRectangle = T(0.1);
                 const auto numberKeypoints = keypoints.getSize(1);
 
                 // Keypoints
@@ -188,13 +206,13 @@ namespace op
                     const auto personRectangle = getKeypointsRectangle(keypoints, person, thresholdRectangle);
                     if (personRectangle.area() > 0)
                     {
-                        const auto ratioAreas = fastMin(1.f, fastMax(personRectangle.width/(float)width,
-                                                                     personRectangle.height/(float)height));
+                        const auto ratioAreas = fastMin(T(1), fastMax(personRectangle.width/(T)width,
+                                                                     personRectangle.height/(T)height));
                         // Size-dependent variables
                         const auto thicknessRatio = fastMax(intRound(std::sqrt(area)
                                                                      * thicknessCircleRatio * ratioAreas), 2);
                         // Negative thickness in cv::circle means that a filled circle is to be drawn.
-                        const auto thicknessCircle = fastMax(1, (ratioAreas > 0.05f ? thicknessRatio : -1));
+                        const auto thicknessCircle = fastMax(1, (ratioAreas > T(0.05) ? thicknessRatio : -1));
                         const auto thicknessLine = fastMax(1, intRound(thicknessRatio * thicknessLineRatioWRTCircle));
                         const auto radius = thicknessRatio / 2;
 
@@ -248,21 +266,30 @@ namespace op
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
     }
+    template void renderKeypointsCpu(Array<float>& frameArray, const Array<float>& keypoints,
+                                     const std::vector<unsigned int>& pairs, const std::vector<float> colors,
+                                     const float thicknessCircleRatio, const float thicknessLineRatioWRTCircle,
+                                     const std::vector<float>& poseScales, const float threshold);
+    template void renderKeypointsCpu(Array<double>& frameArray, const Array<double>& keypoints,
+                                     const std::vector<unsigned int>& pairs, const std::vector<double> colors,
+                                     const double thicknessCircleRatio, const double thicknessLineRatioWRTCircle,
+                                     const std::vector<double>& poseScales, const double threshold);
 
-    Rectangle<float> getKeypointsRectangle(const Array<float>& keypoints, const int person, const float threshold)
+    template <typename T>
+    Rectangle<T> getKeypointsRectangle(const Array<T>& keypoints, const int person, const T threshold)
     {
         try
         {
             const auto numberKeypoints = keypoints.getSize(1);
             // Security checks
             if (numberKeypoints < 1)
-                error("Number body parts must be > 0", __LINE__, __FUNCTION__, __FILE__);
+                error("Number body parts must be > 0.", __LINE__, __FUNCTION__, __FILE__);
             // Define keypointPtr
             const auto keypointPtr = keypoints.getConstPtr() + person * keypoints.getSize(1) * keypoints.getSize(2);
-            float minX = std::numeric_limits<float>::max();
-            float maxX = 0.f;
-            float minY = minX;
-            float maxY = maxX;
+            T minX = std::numeric_limits<T>::max();
+            T maxX = std::numeric_limits<T>::lowest();
+            T minY = minX;
+            T maxY = maxX;
             for (auto part = 0 ; part < numberKeypoints ; part++)
             {
                 const auto score = keypointPtr[3*part + 2];
@@ -283,18 +310,23 @@ namespace op
                 }
             }
             if (maxX >= minX && maxY >= minY)
-                return Rectangle<float>{minX, minY, maxX-minX, maxY-minY};
+                return Rectangle<T>{minX, minY, maxX-minX, maxY-minY};
             else
-                return Rectangle<float>{};
+                return Rectangle<T>{};
         }
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return Rectangle<float>{};
+            return Rectangle<T>{};
         }
     }
+    template Rectangle<float> getKeypointsRectangle(const Array<float>& keypoints, const int person,
+                                                    const float threshold);
+    template Rectangle<double> getKeypointsRectangle(const Array<double>& keypoints, const int person,
+                                                     const double threshold);
 
-    float getAverageScore(const Array<float>& keypoints, const int person)
+    template <typename T>
+    T getAverageScore(const Array<T>& keypoints, const int person)
     {
         try
         {
@@ -302,7 +334,7 @@ namespace op
             if (person >= keypoints.getSize(0))
                 error("Person index out of bounds.", __LINE__, __FUNCTION__, __FILE__);
             // Get average score
-            auto score = 0.f;
+            T score = T(0);
             const auto numberKeypoints = keypoints.getSize(1);
             const auto area = numberKeypoints * keypoints.getSize(2);
             const auto personOffset = person * area;
@@ -313,11 +345,14 @@ namespace op
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return 0.f;
+            return T(0);
         }
     }
+    template float getAverageScore(const Array<float>& keypoints, const int person);
+    template double getAverageScore(const Array<double>& keypoints, const int person);
 
-    float getKeypointsArea(const Array<float>& keypoints, const int person, const float threshold)
+    template <typename T>
+    T getKeypointsArea(const Array<T>& keypoints, const int person, const T threshold)
     {
         try
         {
@@ -326,11 +361,14 @@ namespace op
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return 0.f;
+            return T(0);
         }
     }
+    template float getKeypointsArea(const Array<float>& keypoints, const int person, const float threshold);
+    template double getKeypointsArea(const Array<double>& keypoints, const int person, const double threshold);
 
-    int getBiggestPerson(const Array<float>& keypoints, const float threshold)
+    template <typename T>
+    int getBiggestPerson(const Array<T>& keypoints, const T threshold)
     {
         try
         {
@@ -338,7 +376,7 @@ namespace op
             {
                 const auto numberPeople = keypoints.getSize(0);
                 auto biggestPoseIndex = -1;
-                auto biggestArea = -1.f;
+                auto biggestArea = T(-1);
                 for (auto person = 0 ; person < numberPeople ; person++)
                 {
                     const auto newPersonArea = getKeypointsArea(keypoints, person, threshold);
@@ -359,4 +397,6 @@ namespace op
             return -1;
         }
     }
+    template int getBiggestPerson(const Array<float>& keypoints, const float threshold);
+    template int getBiggestPerson(const Array<double>& keypoints, const double threshold);
 }

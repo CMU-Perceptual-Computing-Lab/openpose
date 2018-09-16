@@ -6,6 +6,9 @@
 
 namespace op
 {
+    #ifdef USE_UNITY_SUPPORT
+    #endif
+
     // Private auxiliar functions
     bool checkIfErrorHas(const ErrorMode errorMode)
     {
@@ -142,6 +145,10 @@ namespace op
         if (checkIfErrorHas(ErrorMode::FileLogging))
             fileLogging(errorMessageToPrint);
 
+        // Unity logError
+        #ifdef USE_UNITY_SUPPORT
+        #endif
+
         // std::runtime_error
         if (checkIfErrorHas(ErrorMode::StdRuntimeError))
             throw std::runtime_error{errorMessageToPropagate};
@@ -161,6 +168,10 @@ namespace op
             // File logging
             if (checkIfLoggingHas(LogMode::FileLogging))
                 fileLogging(infoMessage);
+
+            // Unity log
+            #ifdef USE_UNITY_SUPPORT
+            #endif
         }
     }
 
