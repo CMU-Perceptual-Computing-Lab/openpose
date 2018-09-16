@@ -1,3 +1,4 @@
+#ifdef USE_UNITY_SUPPORT
 // ------------------------- OpenPose Library Tutorial - Real Time Pose Estimation -------------------------
 // If the user wants to learn to use the OpenPose library, we highly recommend to start with the `examples/tutorial_*/`
 // folders.
@@ -186,71 +187,81 @@ DEFINE_int32(render_pose,               -1,             "Set to 0 for no renderi
                                                         " (slower but greater functionality, e.g. `alpha_X` flags). If -1, it will pick CPU if"
                                                         " CPU_ONLY is enabled, or GPU if CUDA is enabled. If rendering is enabled, it will render"
                                                         " both `outputData` and `cvOutputData` with the original image and desired body part to be"
-" shown (i.e. keypoints, heat maps or PAFs).");
-DEFINE_double(alpha_pose, 0.6, "Blending factor (range 0-1) for the body part rendering. 1 will show it completely, 0 will"
-	" hide it. Only valid for GPU rendering.");
-DEFINE_double(alpha_heatmap, 0.7, "Blending factor (range 0-1) between heatmap and original frame. 1 will only show the"
-	" heatmap, 0 will only show the frame. Only valid for GPU rendering.");
+                                                        " shown (i.e. keypoints, heat maps or PAFs).");
+DEFINE_double(alpha_pose,               0.6,            "Blending factor (range 0-1) for the body part rendering. 1 will show it completely, 0 will"
+                                                        " hide it. Only valid for GPU rendering.");
+DEFINE_double(alpha_heatmap,            0.7,            "Blending factor (range 0-1) between heatmap and original frame. 1 will only show the"
+                                                        " heatmap, 0 will only show the frame. Only valid for GPU rendering.");
 // OpenPose Rendering Face
-DEFINE_double(face_render_threshold, 0.4, "Analogous to `render_threshold`, but applied to the face keypoints.");
-DEFINE_int32(face_render, -1, "Analogous to `render_pose` but applied to the face. Extra option: -1 to use the same"
-	" configuration that `render_pose` is using.");
-DEFINE_double(face_alpha_pose, 0.6, "Analogous to `alpha_pose` but applied to face.");
-DEFINE_double(face_alpha_heatmap, 0.7, "Analogous to `alpha_heatmap` but applied to face.");
+DEFINE_double(face_render_threshold,    0.4,            "Analogous to `render_threshold`, but applied to the face keypoints.");
+DEFINE_int32(face_render,               -1,             "Analogous to `render_pose` but applied to the face. Extra option: -1 to use the same"
+                                                        " configuration that `render_pose` is using.");
+DEFINE_double(face_alpha_pose,          0.6,            "Analogous to `alpha_pose` but applied to face.");
+DEFINE_double(face_alpha_heatmap,       0.7,            "Analogous to `alpha_heatmap` but applied to face.");
 // OpenPose Rendering Hand
-DEFINE_double(hand_render_threshold, 0.2, "Analogous to `render_threshold`, but applied to the hand keypoints.");
-DEFINE_int32(hand_render, -1, "Analogous to `render_pose` but applied to the hand. Extra option: -1 to use the same"
-	" configuration that `render_pose` is using.");
-DEFINE_double(hand_alpha_pose, 0.6, "Analogous to `alpha_pose` but applied to hand.");
-DEFINE_double(hand_alpha_heatmap, 0.7, "Analogous to `alpha_heatmap` but applied to hand.");
+DEFINE_double(hand_render_threshold,    0.2,            "Analogous to `render_threshold`, but applied to the hand keypoints.");
+DEFINE_int32(hand_render,               -1,             "Analogous to `render_pose` but applied to the hand. Extra option: -1 to use the same"
+                                                        " configuration that `render_pose` is using.");
+DEFINE_double(hand_alpha_pose,          0.6,            "Analogous to `alpha_pose` but applied to hand.");
+DEFINE_double(hand_alpha_heatmap,       0.7,            "Analogous to `alpha_heatmap` but applied to hand.");
 // Display
-DEFINE_bool(fullscreen, false, "Run in full-screen mode (press f during runtime to toggle).");
-DEFINE_bool(no_gui_verbose, false, "Do not write text on output images on GUI (e.g. number of current frame and people). It"
-	" does not affect the pose rendering.");
-DEFINE_int32(display, -1, "Display mode: -1 for automatic selection; 0 for no display (useful if there is no X server"
-	" and/or to slightly speed up the processing if visual output is not required); 2 for 2-D"
-	" display; 3 for 3-D display (if `--3d` enabled); and 1 for both 2-D and 3-D display.");
+DEFINE_bool(fullscreen,                 false,          "Run in full-screen mode (press f during runtime to toggle).");
+DEFINE_bool(no_gui_verbose,             false,          "Do not write text on output images on GUI (e.g. number of current frame and people). It"
+                                                        " does not affect the pose rendering.");
+DEFINE_int32(display,                   -1,             "Display mode: -1 for automatic selection; 0 for no display (useful if there is no X server"
+                                                        " and/or to slightly speed up the processing if visual output is not required); 2 for 2-D"
+                                                        " display; 3 for 3-D display (if `--3d` enabled); and 1 for both 2-D and 3-D display.");
 // Result Saving
-DEFINE_string(write_images, "", "Directory to write rendered frames in `write_images_format` image format.");
-DEFINE_string(write_images_format, "png", "File extension and format for `write_images`, e.g. png, jpg or bmp. Check the OpenCV"
-	" function cv::imwrite for all compatible extensions.");
-DEFINE_string(write_video, "", "Full file path to write rendered frames in motion JPEG video format. It might fail if the"
-	" final path does not finish in `.avi`. It internally uses cv::VideoWriter. Flag"
-	" `camera_fps` controls FPS.");
-DEFINE_string(write_json, "", "Directory to write OpenPose output in JSON format. It includes body, hand, and face pose"
-	" keypoints (2-D and 3-D), as well as pose candidates (if `--part_candidates` enabled).");
-DEFINE_string(write_coco_json, "", "Full file path to write people pose data with JSON COCO validation format.");
-DEFINE_string(write_coco_foot_json, "", "Full file path to write people foot pose data with JSON COCO validation format.");
-DEFINE_string(write_heatmaps, "", "Directory to write body pose heatmaps in PNG format. At least 1 `add_heatmaps_X` flag"
-	" must be enabled.");
-DEFINE_string(write_heatmaps_format, "png", "File extension and format for `write_heatmaps`, analogous to `write_images_format`."
-	" For lossless compression, recommended `png` for integer `heatmaps_scale` and `float` for"
-	" floating values.");
-DEFINE_string(write_keypoint, "", "(Deprecated, use `write_json`) Directory to write the people pose keypoint data. Set format"
-	" with `write_keypoint_format`.");
-DEFINE_string(write_keypoint_format, "yml", "(Deprecated, use `write_json`) File extension and format for `write_keypoint`: json, xml,"
-	" yaml & yml. Json not available for OpenCV < 3.0, use `write_json` instead.");
+DEFINE_string(write_images,             "",             "Directory to write rendered frames in `write_images_format` image format.");
+DEFINE_string(write_images_format,      "png",          "File extension and format for `write_images`, e.g. png, jpg or bmp. Check the OpenCV"
+                                                        " function cv::imwrite for all compatible extensions.");
+DEFINE_string(write_video,              "",             "Full file path to write rendered frames in motion JPEG video format. It might fail if the"
+                                                        " final path does not finish in `.avi`. It internally uses cv::VideoWriter. Flag"
+                                                        " `camera_fps` controls FPS.");
+DEFINE_string(write_json,               "",             "Directory to write OpenPose output in JSON format. It includes body, hand, and face pose"
+                                                        " keypoints (2-D and 3-D), as well as pose candidates (if `--part_candidates` enabled).");
+DEFINE_string(write_coco_json,          "",             "Full file path to write people pose data with JSON COCO validation format.");
+DEFINE_string(write_coco_foot_json,     "",             "Full file path to write people foot pose data with JSON COCO validation format.");
+DEFINE_string(write_heatmaps,           "",             "Directory to write body pose heatmaps in PNG format. At least 1 `add_heatmaps_X` flag"
+                                                        " must be enabled.");
+DEFINE_string(write_heatmaps_format,    "png",          "File extension and format for `write_heatmaps`, analogous to `write_images_format`."
+                                                        " For lossless compression, recommended `png` for integer `heatmaps_scale` and `float` for"
+                                                        " floating values.");
+DEFINE_string(write_keypoint,           "",             "(Deprecated, use `write_json`) Directory to write the people pose keypoint data. Set format"
+                                                        " with `write_keypoint_format`.");
+DEFINE_string(write_keypoint_format,    "yml",          "(Deprecated, use `write_json`) File extension and format for `write_keypoint`: json, xml,"
+                                                        " yaml & yml. Json not available for OpenCV < 3.0, use `write_json` instead.");
 // Result Saving - Extra Algorithms
-DEFINE_string(write_video_adam, "", "Experimental, not available yet. E.g.: `~/Desktop/adamResult.avi`. Flag `camera_fps`"
-	" controls FPS.");
-DEFINE_string(write_bvh, "", "Experimental, not available yet. E.g.: `~/Desktop/mocapResult.bvh`.");
+DEFINE_string(write_video_adam,         "",             "Experimental, not available yet. E.g.: `~/Desktop/adamResult.avi`. Flag `camera_fps`"
+                                                        " controls FPS.");
+DEFINE_string(write_bvh,                "",             "Experimental, not available yet. E.g.: `~/Desktop/mocapResult.bvh`.");
 // UDP communication
-DEFINE_string(udp_host, "", "Experimental, not available yet. IP for UDP communication. E.g., `192.168.0.1`.");
-DEFINE_string(udp_port, "8051", "Experimental, not available yet. Port number for UDP communication.");
+DEFINE_string(udp_host,                 "",             "Experimental, not available yet. IP for UDP communication. E.g., `192.168.0.1`.");
+DEFINE_string(udp_port,                 "8051",         "Experimental, not available yet. Port number for UDP communication.");
 
-void OutputToUnity(std::string message, int type);
-int openPoseDemo();
+// Tianyi's code
+typedef void(__stdcall * OutputCallback) (const char* str, int type);
+
+// Global variables
+std::shared_ptr<UnityPluginUserOutput> spUserOutput;
+OutputCallback gOutputCallback;
+
+void outputToUnity(const std::string& message, const int type)
+{
+    if (gOutputCallback)
+        gOutputCallback(message.c_str(), type);
+}
 
 // If the user needs his own variables, he can inherit the op::Datum struct and add them
 // UserDatum can be directly used by the OpenPose wrapper because it inherits from op::Datum, just define
 // Wrapper<UserDatum> instead of Wrapper<op::Datum>
 struct UserDatum : public op::Datum
 {
-	bool boolThatUserNeedsForSomeReason;
+    bool boolThatUserNeedsForSomeReason;
 
-	UserDatum(const bool boolThatUserNeedsForSomeReason_ = false) :
-		boolThatUserNeedsForSomeReason{ boolThatUserNeedsForSomeReason_ }
-	{}
+    UserDatum(const bool boolThatUserNeedsForSomeReason_ = false) :
+        boolThatUserNeedsForSomeReason{boolThatUserNeedsForSomeReason_}
+    {}
 };
 
 // The W-classes can be implemented either as a template or as simple classes given
@@ -261,156 +272,156 @@ struct UserDatum : public op::Datum
 class UnityPluginUserOutput : public op::WorkerConsumer<std::shared_ptr<std::vector<UserDatum>>>
 {
 public:
-	void initializationOnThread() {}
+    void initializationOnThread() {}
 
-	void terminate() { // Tianyi's code
-		this->stop();
-	}
+    void terminate() { // Tianyi's code
+        this->stop();
+    }
 
-protected: 
-	//const char* keypointsData;
-	//uchar* imageData;
+protected:
+    // const char* keypointsData;
+    // uchar* imageData;
 
-	std::string vectorToJson(float x, float y, float z) {
-		return "{\"x\":" + std::to_string(x) + ",\"y\":" + std::to_string(y) + ",\"z\":" + std::to_string(z) + "}";
-	}
+    std::string vectorToJson(const float x, const float y, const float z) {
+        return "{\"x\":" + std::to_string(x) + ",\"y\":" + std::to_string(y) + ",\"z\":" + std::to_string(z) + "}";
+    }
 
-	std::string vectorToJson(int x, int y, int z) {
-		return "{\"x\":" + std::to_string(x) + ",\"y\":" + std::to_string(y) + ",\"z\":" + std::to_string(z) + "}";
-	}
+    std::string vectorToJson(const int x, const int y, const int z) {
+        return "{\"x\":" + std::to_string(x) + ",\"y\":" + std::to_string(y) + ",\"z\":" + std::to_string(z) + "}";
+    }
 
-	void sendData(const std::shared_ptr<std::vector<UserDatum>>& datumsPtr) { // Tianyi's code
-		const auto& poseKeypoints = datumsPtr->at(0).poseKeypoints;
-		const auto& handKeypoints_L = datumsPtr->at(0).handKeypoints[0];
-		const auto& handKeypoints_R = datumsPtr->at(0).handKeypoints[1];
-		const auto& faceKeypoints = datumsPtr->at(0).faceKeypoints;
-		const auto personCount = poseKeypoints.getSize(0);
+    void sendData(const std::shared_ptr<std::vector<UserDatum>>& datumsPtr) { // Tianyi's code
+        const auto& poseKeypoints = datumsPtr->at(0).poseKeypoints;
+        const auto& handKeypoints_L = datumsPtr->at(0).handKeypoints[0];
+        const auto& handKeypoints_R = datumsPtr->at(0).handKeypoints[1];
+        const auto& faceKeypoints = datumsPtr->at(0).faceKeypoints;
+        const auto personCount = poseKeypoints.getSize(0);
 
-		std::string dataString = "";
+        std::string dataString = "";
 
-		std::string unitsString = "\"units\":[";
-		for (auto person = 0; person < personCount; person++)
-		{
-			// Every person
+        std::string unitsString = "\"units\":[";
+        for (auto person = 0; person < personCount; person++)
+        {
+            // Every person
 
-			// poseKeypoints: 
-			std::string poseKeypointsString = "\"poseKeypoints\":[";
-			for (auto part = 0; part < poseKeypoints.getSize(1); part++)
-			{
-				// Every part
-				std::string partString = "";
-				if (poseKeypoints.getSize(2) == 3) {
-					float x = poseKeypoints[{person, part, 0}],
-						y = poseKeypoints[{person, part, 1}],
-						z = poseKeypoints[{person, part, 2}];
-					partString = vectorToJson(x, y, z);
-				}
-				else {
-					partString = vectorToJson(0.0f, 0.0f, 0.0f);
-				}
-				poseKeypointsString += partString;
-				if (part != poseKeypoints.getSize(1) - 1) poseKeypointsString += ",";
-			}
-			poseKeypointsString += "]";
+            // poseKeypoints:
+            std::string poseKeypointsString = "\"poseKeypoints\":[";
+            for (auto part = 0; part < poseKeypoints.getSize(1); part++)
+            {
+                // Every part
+                std::string partString = "";
+                if (poseKeypoints.getSize(2) == 3) {
+                    float x = poseKeypoints[{person, part, 0}],
+                        y = poseKeypoints[{person, part, 1}],
+                        z = poseKeypoints[{person, part, 2}];
+                    partString = vectorToJson(x, y, z);
+                }
+                else {
+                    partString = vectorToJson(0.0f, 0.0f, 0.0f);
+                }
+                poseKeypointsString += partString;
+                if (part != poseKeypoints.getSize(1) - 1) poseKeypointsString += ",";
+            }
+            poseKeypointsString += "]";
 
-			// handKeypoints_L: 
-			std::string handKeypointsString_L = "\"handKeypoints_L\":[";
-			for (auto part = 0; part < handKeypoints_L.getSize(1); part++)
-			{
-				// Every part
-				std::string partString = "";
-				if (handKeypoints_L.getSize(2) == 3) {
-					float x = handKeypoints_L[{person, part, 0}],
-						y = handKeypoints_L[{person, part, 1}],
-						z = handKeypoints_L[{person, part, 2}];
-					partString = vectorToJson(x, y, z);
-				}
-				else {
-					partString = vectorToJson(0.0f, 0.0f, 0.0f);
-				}
-				handKeypointsString_L += partString;
-				if (part != handKeypoints_L.getSize(1) - 1) handKeypointsString_L += ",";
-			}
-			handKeypointsString_L += "]";
+            // handKeypoints_L:
+            std::string handKeypointsString_L = "\"handKeypoints_L\":[";
+            for (auto part = 0; part < handKeypoints_L.getSize(1); part++)
+            {
+                // Every part
+                std::string partString = "";
+                if (handKeypoints_L.getSize(2) == 3) {
+                    float x = handKeypoints_L[{person, part, 0}],
+                        y = handKeypoints_L[{person, part, 1}],
+                        z = handKeypoints_L[{person, part, 2}];
+                    partString = vectorToJson(x, y, z);
+                }
+                else {
+                    partString = vectorToJson(0.0f, 0.0f, 0.0f);
+                }
+                handKeypointsString_L += partString;
+                if (part != handKeypoints_L.getSize(1) - 1) handKeypointsString_L += ",";
+            }
+            handKeypointsString_L += "]";
 
-			// handKeypoints_R: 
-			std::string handKeypointsString_R = "\"handKeypoints_R\":[";
-			for (auto part = 0; part < handKeypoints_R.getSize(1); part++)
-			{
-				// Every part
-				std::string partString = "";
-				if (handKeypoints_R.getSize(2) == 3) {
-					float x = handKeypoints_R[{person, part, 0}],
-						y = handKeypoints_R[{person, part, 1}],
-						z = handKeypoints_R[{person, part, 2}];
-					partString = vectorToJson(x, y, z);
-				}
-				else {
-					partString = vectorToJson(0.0f, 0.0f, 0.0f);
-				}
-				handKeypointsString_R += partString;
-				if (part != handKeypoints_R.getSize(1) - 1) handKeypointsString_R += ",";
-			}
-			handKeypointsString_R += "]";
+            // handKeypoints_R:
+            std::string handKeypointsString_R = "\"handKeypoints_R\":[";
+            for (auto part = 0; part < handKeypoints_R.getSize(1); part++)
+            {
+                // Every part
+                std::string partString = "";
+                if (handKeypoints_R.getSize(2) == 3) {
+                    float x = handKeypoints_R[{person, part, 0}],
+                        y = handKeypoints_R[{person, part, 1}],
+                        z = handKeypoints_R[{person, part, 2}];
+                    partString = vectorToJson(x, y, z);
+                }
+                else {
+                    partString = vectorToJson(0.0f, 0.0f, 0.0f);
+                }
+                handKeypointsString_R += partString;
+                if (part != handKeypoints_R.getSize(1) - 1) handKeypointsString_R += ",";
+            }
+            handKeypointsString_R += "]";
 
-			// faceKeypoints: 
-			std::string faceKeypointsString = "\"faceKeypoints\":[";
-			for (auto part = 0; part < faceKeypoints.getSize(1); part++)
-			{
-				// Every part
-				std::string partString = "";
-				if (faceKeypoints.getSize(2) == 3) {
-					float x = faceKeypoints[{person, part, 0}],
-						y = faceKeypoints[{person, part, 1}],
-						z = faceKeypoints[{person, part, 2}];
-					partString = vectorToJson(x, y, z);
-				}
-				else {
-					partString = vectorToJson(0.0f, 0.0f, 0.0f);
-				}
-				faceKeypointsString += partString;
-				if (part != faceKeypoints.getSize(1) - 1) faceKeypointsString += ",";
-			}
-			faceKeypointsString += "]";
+            // faceKeypoints:
+            std::string faceKeypointsString = "\"faceKeypoints\":[";
+            for (auto part = 0; part < faceKeypoints.getSize(1); part++)
+            {
+                // Every part
+                std::string partString = "";
+                if (faceKeypoints.getSize(2) == 3) {
+                    float x = faceKeypoints[{person, part, 0}],
+                        y = faceKeypoints[{person, part, 1}],
+                        z = faceKeypoints[{person, part, 2}];
+                    partString = vectorToJson(x, y, z);
+                }
+                else {
+                    partString = vectorToJson(0.0f, 0.0f, 0.0f);
+                }
+                faceKeypointsString += partString;
+                if (part != faceKeypoints.getSize(1) - 1) faceKeypointsString += ",";
+            }
+            faceKeypointsString += "]";
 
-			std::string personString = "{" + poseKeypointsString + "," + handKeypointsString_L + "," + handKeypointsString_R + "," + faceKeypointsString + "}";
+            std::string personString = "{" + poseKeypointsString + "," + handKeypointsString_L + "," + handKeypointsString_R + "," + faceKeypointsString + "}";
 
-			unitsString += personString;
-			if (person != personCount - 1) unitsString += ",";
-		}
-		unitsString += "]";
+            unitsString += personString;
+            if (person != personCount - 1) unitsString += ",";
+        }
+        unitsString += "]";
 
-		dataString = ("{" + unitsString + "}").c_str();
-		OutputToUnity(dataString, 0);
-		//delete dataString;
-	}
+        dataString = ("{" + unitsString + "}").c_str();
+        outputToUnity(dataString, 0);
+        // delete dataString;
+    }
 
-	void sendImage(const std::shared_ptr<std::vector<UserDatum>>& datumsPtr) {
-		const auto& cvOutput = datumsPtr->at(0).cvOutputData;
+    void sendImage(const std::shared_ptr<std::vector<UserDatum>>& datumsPtr) {
+        const auto& cvOutput = datumsPtr->at(0).cvOutputData;
 
-		std::string sizeString = "\"size\":{\"x\":" + std::to_string(cvOutput.cols) + ",\"y\":" + std::to_string(cvOutput.rows) + "}";
-		
-		//imageData = cvOutput.data;
+        std::string sizeString = "\"size\":{\"x\":" + std::to_string(cvOutput.cols) + ",\"y\":" + std::to_string(cvOutput.rows) + "}";
 
-		/*std::string pixelsString = "\"pixels\":[";
-		for (int x = 0; x < cvOutput.cols; x++) {
-			for (int y = 0; y < cvOutput.rows; y++) {
-				int r = 127;// cvOutput.at<uchar>(x, y, 0);
-				int g = 0;// cvOutput.at<uchar>(x, y, 1);
-				int b = 0;// cvOutput.at<uchar>(x, y, 2);
-				std::string vectorString = vectorToJson(r, g, b);
-				pixelsString += vectorString;
-				if (x != cvOutput.cols - 1 || y != cvOutput.rows - 1) {
-					pixelsString += ",";
-				}
-			}
-		}
-		pixelsString += "]";
+        // imageData = cvOutput.data;
 
-		std::string imageString = "{" + sizeString + "," + pixelsString + "}";*/
+        // std::string pixelsString = "\"pixels\":[";
+        // for (int x = 0; x < cvOutput.cols; x++) {
+        //     for (int y = 0; y < cvOutput.rows; y++) {
+        //         int r = 127;// cvOutput.at<uchar>(x, y, 0);
+        //         int g = 0;// cvOutput.at<uchar>(x, y, 1);
+        //         int b = 0;// cvOutput.at<uchar>(x, y, 2);
+        //         std::string vectorString = vectorToJson(r, g, b);
+        //         pixelsString += vectorString;
+        //         if (x != cvOutput.cols - 1 || y != cvOutput.rows - 1) {
+        //             pixelsString += ",";
+        //         }
+        //     }
+        // }
+        // pixelsString += "]";
 
-		//OutputToUnity(imageString, 1);
-	}
+        // std::string imageString = "{" + sizeString + "," + pixelsString + "}";
+
+        // outputToUnity(imageString, 1);
+    }
 
     void workConsumer(const std::shared_ptr<std::vector<UserDatum>>& datumsPtr)
     {
@@ -421,41 +432,41 @@ protected:
                 // datum.poseKeypoints: Array<float> with the estimated pose
             if (datumsPtr != nullptr && !datumsPtr->empty())
             {
-				//op::log("Output");
-				sendData(datumsPtr); // Tianyi's code
-				//sendImage(datumsPtr); // Tianyi's code
-				//OutputToUnity(keypointsData, imageData, 0);
-				/*****
-                // Show in command line the resulting pose keypoints for body, face and hands
-                op::log("\nKeypoints:");
-                // Accesing each element of the keypoints
-                const auto& poseKeypoints = datumsPtr->at(0).poseKeypoints;
-                op::log("Person pose keypoints:");
-                for (auto person = 0 ; person < poseKeypoints.getSize(0) ; person++)
-                {
-                    op::log("Person " + std::to_string(person) + " (x, y, score):");
-                    for (auto bodyPart = 0 ; bodyPart < poseKeypoints.getSize(1) ; bodyPart++)
-                    {
-                        std::string valueToPrint;
-                        for (auto xyscore = 0 ; xyscore < poseKeypoints.getSize(2) ; xyscore++)
-                        {
-                            valueToPrint += std::to_string(   poseKeypoints[{person, bodyPart, xyscore}]   ) + " ";
-                        }
-                        op::log(valueToPrint);
-                    }
-                }
-                op::log(" ");
-                // Alternative: just getting std::string equivalent
-                op::log("Face keypoints: " + datumsPtr->at(0).faceKeypoints.toString());
-                op::log("Left hand keypoints: " + datumsPtr->at(0).handKeypoints[0].toString());
-                op::log("Right hand keypoints: " + datumsPtr->at(0).handKeypoints[1].toString());
-                // Display image and sleeps at least 1 ms (it usually sleeps ~5-10 msec to display the image)
-                const char key = (char)cv::waitKey(1);
-                if (key == 27)
-                    this->stop();
-					*****/
-					// Display rendered output image
-				//cv::imshow("User worker GUI", datumsPtr->at(0).cvOutputData);
+                // op::log("Output");
+                sendData(datumsPtr); // Tianyi's code
+                // sendImage(datumsPtr); // Tianyi's code
+                // outputToUnity(keypointsData, imageData, 0);
+
+                // // Show in command line the resulting pose keypoints for body, face and hands
+                // op::log("\nKeypoints:");
+                // // Accesing each element of the keypoints
+                // const auto& poseKeypoints = datumsPtr->at(0).poseKeypoints;
+                // op::log("Person pose keypoints:");
+                // for (auto person = 0 ; person < poseKeypoints.getSize(0) ; person++)
+                // {
+                //     op::log("Person " + std::to_string(person) + " (x, y, score):");
+                //     for (auto bodyPart = 0 ; bodyPart < poseKeypoints.getSize(1) ; bodyPart++)
+                //     {
+                //         std::string valueToPrint;
+                //         for (auto xyscore = 0 ; xyscore < poseKeypoints.getSize(2) ; xyscore++)
+                //         {
+                //             valueToPrint += std::to_string(   poseKeypoints[{person, bodyPart, xyscore}]   ) + " ";
+                //         }
+                //         op::log(valueToPrint);
+                //     }
+                // }
+                // op::log(" ");
+                // // Alternative: just getting std::string equivalent
+                // op::log("Face keypoints: " + datumsPtr->at(0).faceKeypoints.toString());
+                // op::log("Left hand keypoints: " + datumsPtr->at(0).handKeypoints[0].toString());
+                // op::log("Right hand keypoints: " + datumsPtr->at(0).handKeypoints[1].toString());
+                // // Display image and sleeps at least 1 ms (it usually sleeps ~5-10 msec to display the image)
+                // const char key = (char)cv::waitKey(1);
+                // if (key == 27)
+                //     this->stop();
+
+                // Display rendered output image
+                // cv::imshow("User worker GUI", datumsPtr->at(0).cvOutputData);
             }
         }
         catch (const std::exception& e)
@@ -465,42 +476,6 @@ protected:
         }
     }
 };
-
-// Tianyi's code
-typedef void(__stdcall * OutputCallback) (const char* str, int type);
-
-// Global variables
-std::shared_ptr<UnityPluginUserOutput> mUserOutput;
-OutputCallback gOutputCallback;
-
-void OutputToUnity(std::string message, int type)
-{
-	if (gOutputCallback)
-	{
-		gOutputCallback(message.c_str(), type);
-	}
-}
-
-extern "C" {
-	OP_API int OP_TestFunction() { return 0; }
-	OP_API void OP_RegisterOutputCallback(OutputCallback callback)
-	{
-		if (callback)
-		{
-			gOutputCallback = callback;
-		}
-	}
-	//OP_API void OP_RegisterDebugCallback(op::DebugCallback callback) { UnityDebugger::registerCallback(callback); }
-	OP_API void OP_SetParameters(int argc, char *argv[]) {
-		gflags::ParseCommandLineFlags(&argc, &argv, true);
-	}
-	OP_API void OP_Run() {
-		openPoseDemo();
-	}
-	OP_API void OP_Shutdown() {
-		if (mUserOutput) mUserOutput->terminate();
-	}
-}
 
 int openPoseDemo()
 {
@@ -514,6 +489,11 @@ int openPoseDemo()
                   __LINE__, __FUNCTION__, __FILE__);
         op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
         op::Profiler::setDefaultX(FLAGS_profile_speed);
+        // // For debugging
+        // // Print all logging messages
+        // op::ConfigureLog::setPriorityThreshold(op::Priority::None);
+        // // Print out speed values faster
+        // op::Profiler::setDefaultX(100);
 
         // Applying user defined configuration - Google flags to program variables
         // outputSize
@@ -555,10 +535,10 @@ int openPoseDemo()
 
         // Initializing the user custom classes
         // GUI (Display)
-        mUserOutput = std::make_shared<UnityPluginUserOutput>();
+        spUserOutput = std::make_shared<UnityPluginUserOutput>();
         // Add custom processing
         const auto workerOutputOnNewThread = true;
-        opWrapper.setWorkerOutput(mUserOutput, workerOutputOnNewThread);
+        opWrapper.setWorkerOutput(spUserOutput, workerOutputOnNewThread);
 
         // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
         const op::WrapperStructPose wrapperStructPose{
@@ -581,7 +561,7 @@ int openPoseDemo()
             FLAGS_3d, FLAGS_3d_min_views, FLAGS_identification, FLAGS_tracking, FLAGS_ik_threads};
         // Producer (use default to disable any input)
         const op::WrapperStructInput wrapperStructInput{
-            producerSharedPtr, FLAGS_frame_first, FLAGS_frame_last, FLAGS_process_real_time, FLAGS_frame_flip, 
+            producerSharedPtr, FLAGS_frame_first, FLAGS_frame_last, FLAGS_process_real_time, FLAGS_frame_flip,
             FLAGS_frame_rotate, FLAGS_frames_repeat};
         // Consumer (comment or use default argument to disable any output)
         // const op::WrapperStructOutput wrapperStructOutput{op::flagsToDisplayMode(FLAGS_display, FLAGS_3d),
@@ -605,7 +585,6 @@ int openPoseDemo()
         // Start processing
         // Two different ways of running the program on multithread environment
         op::log("Starting thread(s)...", op::Priority::High);
-        // Option a) Recommended - Also using the main thread (this thread) for processing (it saves 1 thread)
         // Start, run & stop threads - it blocks this thread until all others have finished
         opWrapper.exec();
 
@@ -647,3 +626,26 @@ int openPoseDemo()
         return -1;
     }
 }
+
+// Tianyi's code
+extern "C" {
+    OP_API int OP_TestFunction() { return 0; }
+    OP_API void OP_RegisterOutputCallback(OutputCallback callback)
+    {
+        if (callback)
+        {
+            gOutputCallback = callback;
+        }
+    }
+    //OP_API void OP_RegisterDebugCallback(op::DebugCallback callback) { UnityDebugger::registerCallback(callback); }
+    OP_API void OP_SetParameters(int argc, char *argv[]) {
+        gflags::ParseCommandLineFlags(&argc, &argv, true);
+    }
+    OP_API void OP_Run() {
+        openPoseDemo();
+    }
+    OP_API void OP_Shutdown() {
+        if (spUserOutput) spUserOutput->terminate();
+    }
+}
+#endif

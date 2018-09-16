@@ -416,7 +416,7 @@ int openPoseDemo()
             FLAGS_3d, FLAGS_3d_min_views, FLAGS_identification, FLAGS_tracking, FLAGS_ik_threads};
         // Producer (use default to disable any input)
         const op::WrapperStructInput wrapperStructInput{
-            producerSharedPtr, FLAGS_frame_first, FLAGS_frame_last, FLAGS_process_real_time, FLAGS_frame_flip, 
+            producerSharedPtr, FLAGS_frame_first, FLAGS_frame_last, FLAGS_process_real_time, FLAGS_frame_flip,
             FLAGS_frame_rotate, FLAGS_frames_repeat};
         // Consumer (comment or use default argument to disable any output)
         // const op::WrapperStructOutput wrapperStructOutput{op::flagsToDisplayMode(FLAGS_display, FLAGS_3d),
@@ -440,7 +440,6 @@ int openPoseDemo()
         // Start processing
         // Two different ways of running the program on multithread environment
         op::log("Starting thread(s)...", op::Priority::High);
-        // Option a) Recommended - Also using the main thread (this thread) for processing (it saves 1 thread)
         // Start, run & stop threads - it blocks this thread until all others have finished
         opWrapper.exec();
 
