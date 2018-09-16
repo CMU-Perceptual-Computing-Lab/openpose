@@ -159,8 +159,8 @@ class OpenPose(object):
                 net_res = (16 * int((boxsize * frame.shape[1] / float(frame.shape[0]) / 16) + 0.5), boxsize)
                 base_net_res = net_res
             else:
-                net_res = ((min(base_net_res[0], max(1, int((base_net_res[0] * scale)+0.5)/16*16))),
-                          (min(base_net_res[1], max(1, int((base_net_res[1] * scale)+0.5)/16*16))))
+                net_res = (int(min(base_net_res[0], max(1, int((base_net_res[0] * scale)+0.5)/16*16))),
+                          int(min(base_net_res[1], max(1, int((base_net_res[1] * scale)+0.5)/16*16))))
             input_res = [frame.shape[1], frame.shape[0]]
             scale_factor = min((net_res[0] - 1) / float(input_res[0] - 1), (net_res[1] - 1) / float(input_res[1] - 1))
             warp_matrix = np.array([[scale_factor,0,0],

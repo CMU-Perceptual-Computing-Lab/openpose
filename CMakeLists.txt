@@ -1,6 +1,6 @@
 ### VERSION INFO
 set(OpenPose_VERSION_MAJOR 1)
-set(OpenPose_VERSION_MINOR 3)
+set(OpenPose_VERSION_MINOR 4)
 set(OpenPose_VERSION_PATCH 0)
 set(OpenPose_VERSION ${OpenPose_VERSION_MAJOR}.${OpenPose_VERSION_MINOR}.${OpenPose_VERSION_PATCH})
 
@@ -26,6 +26,12 @@ if (NOT WIN32 AND NOT UNIX AND NOT APPLE)
 endif (NOT WIN32 AND NOT UNIX AND NOT APPLE)
 
 
+### BUILD_TYPE
+# Default: Release
+set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
+set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+
+
 ### FLAGS
 if (WIN32)
   # TODO -- Makeshift solution -- This prevents rerunning build again
@@ -38,7 +44,7 @@ if (WIN32)
   # /GL option causes the code to crash -- fix this
   # sdl flags causes error -- error : unknown attribute \"guard\"
 
-  set(CMAKE_CONFIGURATION_TYPES Debug Release CACHE TYPE INTERNAL FORCE)
+  set(CMAKE_CONFIGURATION_TYPES Release Debug CACHE TYPE INTERNAL FORCE)
 
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
   string(REPLACE "/W3" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
@@ -246,7 +252,10 @@ option(BUILD_DOCS "Build OpenPose documentation." OFF)
 option(BUILD_PYTHON "Build OpenPose python." OFF)
 if (WIN32)
   option(BUILD_BIN_FOLDER "Copy all required 3rd-party DLL files into {build_directory}/bin. Disable to save some memory." ON)
-endif ()
+endif (WIN32)
+
+# Unity
+# option(BUILD_UNITY_SUPPORT "Build OpenPose as a Unity plugin." OFF)
 
 # Build as shared library
 option(BUILD_SHARED_LIBS "Build as shared lib." ON)
@@ -303,6 +312,12 @@ if (WITH_TRACKING)
   # OpenPose flags
   add_definitions(-DUSE_TRACKING)
 endif (WITH_TRACKING)
+
+# Unity
+if (BUILD_UNITY_SUPPORT)
+  # OpenPose flags
+  add_definitions(-DUSE_UNITY_SUPPORT)
+endif (BUILD_UNITY_SUPPORT)
 
 # Calibration
 # No Eigen
@@ -541,8 +556,8 @@ if (WIN32)
   if (BUILD_PYTHON)
     if (NOT BUILD_BIN_FOLDER)
       message(FATAL_ERROR "BUILD_BIN_FOLDER must be turned on to as well to build python library")
-    endif ()
-  endif ()
+    endif (NOT BUILD_BIN_FOLDER)
+  endif (BUILD_PYTHON)
 
   # Auto copy DLLs
   if (BUILD_BIN_FOLDER)
@@ -870,8 +885,8 @@ message(STATUS "Models Downloaded.")
 if (Caffe_FOUND)
   if(BUILD_PYTHON)
     add_subdirectory(python)
-  endif ()
-endif()
+  endif (BUILD_PYTHON)
+endif(Caffe_FOUND)
 
 ### GENERATE DOCUMENTATION
 if (UNIX OR APPLE)

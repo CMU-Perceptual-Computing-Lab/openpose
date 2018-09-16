@@ -145,7 +145,7 @@ namespace op
                           " `CPU_ONLY` version.", __LINE__, __FUNCTION__, __FILE__);
             #endif
             // Net input resolution cannot be reshaped for Caffe OpenCL and MKL versions, only for CUDA version
-            #if defined USE_MKL || defined USE_CPU_ONLY
+            #if defined USE_MKL || defined USE_OPENCL
                 // If image_dir and netInputSize == -1 --> error
                 if ((wrapperStructInput.producerSharedPtr == nullptr
                      || wrapperStructInput.producerSharedPtr->getType() == ProducerType::ImageDirectory)
@@ -154,10 +154,11 @@ namespace op
                 {
                     wrapperStructPose.netInputSize.x = 656;
                     wrapperStructPose.netInputSize.y = 368;
-                    log("The default dynamic `--net_resolution` is not supported in MKL (CPU Caffe) and OpenCL Caffe"
-                        " versions. Please, use a static `net_resolution` (recommended `--net_resolution 656x368`)"
-                        " or use the Caffe CUDA master branch when processing images and/or when using your custom"
-                        " image reader. OpenPose has automatically set the resolution to 656x368.", Priority::High);
+                    log("The default dynamic `--net_resolution` is not supported in MKL (MKL CPU Caffe) and OpenCL"
+                        " Caffe versions. Please, use a static `net_resolution` (recommended"
+                        " `--net_resolution 656x368`) or use the Caffe CUDA master branch when processing images"
+                        " and/or when using your custom image reader. OpenPose has automatically set the resolution"
+                        " to 656x368.", Priority::High);
                 }
             #endif
 

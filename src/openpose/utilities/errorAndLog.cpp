@@ -6,32 +6,40 @@
 
 namespace op
 {
-	// Tianyi's code
-	namespace UnityDebugger {
-		typedef void(__stdcall * DebugCallback) (const char * str, int type);
-		DebugCallback gDebugCallback;
+    #ifdef USE_UNITY_SUPPORT
+        namespace UnityDebugger
+        {
+            typedef void(__stdcall * DebugCallback) (const char* const str, int type);
+            DebugCallback gDebugCallback;
 
-		extern "C" void OP_API OP_RegisterDebugCallback(DebugCallback callback)
-		{
-			if (callback)
-			{
-				gDebugCallback = callback;
-			}
-		}
+            extern "C" void OP_API OP_RegisterDebugCallback(DebugCallback debugCallback)
+            {
+                if (debugCallback)
+                    gDebugCallback = debugCallback;
+            }
 
-		void DebugInUnity(std::string message, int type)
-		{
-			if (gDebugCallback)
-			{
-				gDebugCallback(message.c_str(), type);
-			}
-		}
+            void DebugInUnity(const std::string& message, const int type)
+            {
+                if (gDebugCallback)
+                    gDebugCallback(message.c_str(), type);
+            }
 
-		void log(std::string message) { DebugInUnity(message, 0); }
-		void logWarning(std::string message) { DebugInUnity(message, 1); }
-		void logError(std::string message) { DebugInUnity(message, -1); }
-	}
+            void log(const std::string& message)
+            {
+                DebugInUnity(message, 0);
+            }
 
+            void logWarning(const std::string& message)
+            {
+                DebugInUnity(message, 1);
+            }
+
+            void logError(const std::string& message)
+            {
+                DebugInUnity(message, -1);
+            }
+        }
+    #endif
 
     // Private auxiliar functions
     bool checkIfErrorHas(const ErrorMode errorMode)
@@ -162,14 +170,17 @@ namespace op
         }
 
         // std::cerr
-		if (checkIfErrorHas(ErrorMode::StdCerr)) {
-			std::cerr << errorMessageToPrint << std::endl;
-			UnityDebugger::logError(errorMessageToPrint); // Tianyi's code
-		}
+        if (checkIfErrorHas(ErrorMode::StdCerr))
+            std::cerr << errorMessageToPrint << std::endl;
 
         // File logging
         if (checkIfErrorHas(ErrorMode::FileLogging))
             fileLogging(errorMessageToPrint);
+
+        // Unity logError
+        #ifdef USE_UNITY_SUPPORT
+            UnityDebugger::logError(errorMessageToPrint);
+        #endif
 
         // std::runtime_error
         if (checkIfErrorHas(ErrorMode::StdRuntimeError))
@@ -184,14 +195,17 @@ namespace op
             const auto infoMessage = createFullMessage(message, line, function, file);
 
             // std::cout
-			if (checkIfLoggingHas(LogMode::StdCout)) {
-				std::cout << infoMessage << std::endl;
-				UnityDebugger::log(infoMessage); // Tianyi's code
-			}
+            if (checkIfLoggingHas(LogMode::StdCout))
+                std::cout << infoMessage << std::endl;
 
             // File logging
             if (checkIfLoggingHas(LogMode::FileLogging))
                 fileLogging(infoMessage);
+
+            // Unity log
+            #ifdef USE_UNITY_SUPPORT
+                UnityDebugger::log(infoMessage);
+            #endif
         }
     }
 

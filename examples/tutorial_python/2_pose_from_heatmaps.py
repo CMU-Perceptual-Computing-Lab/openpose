@@ -23,8 +23,12 @@ except:
     raise Exception('Error: OpenPose library could not be found. Did you enable `BUILD_PYTHON` in CMake and have this Python script in the right folder?')
 
 # Params for change
-defRes = 736
-scales = [1,0.5]
+# Single-scale
+defRes = 368
+scales = [1]
+# # Multi-scale
+# defRes = 736
+# scales = [1, 0.75, 0.5, 0.25]
 class Param:
     caffemodel = dir_path + "/../../../models/pose/body_25/pose_iter_584000.caffemodel"
     prototxt = dir_path + "/../../../models/pose/body_25/pose_deploy.prototxt"
@@ -36,7 +40,7 @@ params["output_resolution"] = "-1x-1"
 params["net_resolution"] = "-1x"+str(defRes)
 params["model_pose"] = "BODY_25"
 params["alpha_pose"] = 0.6
-params["scale_gap"] = 0.5
+params["scale_gap"] = 0.25
 params["scale_number"] = len(scales)
 params["render_threshold"] = 0.05
 params["num_gpu_start"] = 0

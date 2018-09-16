@@ -8,7 +8,7 @@
 |-------------|
 |[![Build Status](https://travis-ci.org/CMU-Perceptual-Computing-Lab/openpose.svg?branch=master)](https://travis-ci.org/CMU-Perceptual-Computing-Lab/openpose)|
 
-[OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose) represents the **first real-time multi-person system to jointly detect human body, hand, and facial keypoints (in total 130 keypoints) on single images**.
+[OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose) represents the **first real-time multi-person system to jointly detect human body, hand, and facial keypoints (in total 135 keypoints) on single images**.
 
 <p align="center">
     <img src="doc/media/pose_face_hands.gif", width="480">
@@ -26,43 +26,27 @@
         - Compatible with Flir/Point Grey cameras, but provided C++ demos to add your custom input.
     - **Calibration toolbox**:
         - Easy estimation of distortion, intrinsic, and extrinsic camera parameters.
+    - **Single-person tracking** for further speed up or visual smoothing.
 - **Input**: Image, video, webcam, Flir/Point Grey and IP camera. Included C++ demos to add your custom input.
 - **Output**: Basic image + keypoint display/saving (PNG, JPG, AVI, ...), keypoint saving (JSON, XML, YML, ...), and/or keypoints as array class.
 - **OS**: Ubuntu (14, 16), Windows (8, 10), Mac OSX, Nvidia TX2.
 - **Others**:
     - Available: command-line demo, C++ wrapper, and C++ API.
-    - CUDA (Nvidia GPU) and CPU versions.
+    - CUDA (Nvidia GPU), OpenCL (AMD GPU), and CPU versions.
 
 
 
 ## Latest Features
-- Jun 2018: [**Combined body-foot model released! Faster and more accurate**](doc/installation.md)!
+- Sep 2018: [**Experimental single-person tracker**](doc/quick_start.md#tracking) for further speed up or visual smoothing!
+- Jun 2018: [**Combined body-foot model released! 40% faster and 5% more accurate**](doc/installation.md)!
 - Jun 2018: [**Python API**](doc/modules/python_module.md) released!
 - Jun 2018: [**OpenCL/AMD graphic card version**](doc/installation.md) released!
 - Jun 2018: [**Calibration toolbox**](doc/modules/calibration_module.md) released!
 - Jun 2018: [**Mac OSX version (CPU)**](doc/installation.md) released!
 - Mar 2018: [**CPU version**](doc/installation.md#cpu-version)!
 - Mar 2018: [**3-D keypoint reconstruction module**](doc/modules/3d_reconstruction_module.md) (from multiple camera views)!
-- Sep 2017: [**CMake**](doc/installation.md) installer and **IP camera** support!
-- Jul 2017: [**Windows portable binaries and demo**](https://github.com/CMU-Perceptual-Computing-Lab/openpose/releases)!
-- Jul 2017: **Hands** released!
-- Jun 2017: **Face** released!
 
 For further details, check [all released features](doc/released_features.md) and [release notes](doc/release_notes.md).
-
-
-
-## Contents
-1. [Latest Features](#latest-features)
-2. [Results](#results)
-3. [Installation, Reinstallation and Uninstallation](#installation-reinstallation-and-uninstallation)
-4. [Quick Start](#quick-start)
-5. [Output](#output)
-6. [Speeding Up OpenPose and Benchmark](#speeding-up-openpose-and-benchmark)
-7. [Send Us Failure Cases and Feedback!](#send-us-failure-cases-and-feedback)
-8. [Authors and Contributors](#authors-and-contributors)
-9. [Citation](#citation)
-10. [License](#license)
 
 
 
@@ -91,6 +75,21 @@ For further details, check [all released features](doc/released_features.md) and
 <p align="center">
     <img src="doc/media/dance.gif", width="360">
 </p>
+
+
+
+## Contents
+1. [Features](#features)
+2. [Latest Features](#latest-features)
+3. [Results](#results)
+4. [Installation, Reinstallation and Uninstallation](#installation-reinstallation-and-uninstallation)
+5. [Quick Start](#quick-start)
+6. [Output](#output)
+7. [Speeding Up OpenPose and Benchmark](#speeding-up-openpose-and-benchmark)
+8. [Send Us Failure Cases and Feedback!](#send-us-failure-cases-and-feedback)
+9. [Authors and Contributors](#authors-and-contributors)
+10. [Citation](#citation)
+11. [License](#license)
 
 
 

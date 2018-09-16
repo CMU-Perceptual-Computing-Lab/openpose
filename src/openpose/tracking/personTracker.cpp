@@ -299,23 +299,23 @@ namespace op
         {
             if (personEntries.size() && !poseIds.empty())
             {
-                int dims[] = { (int)personEntries.size(), (int)personEntries.begin()->second.keypoints.size(), 3 };
-                cv::Mat opArrayMat(3,dims,CV_32FC1);
+                poseKeypoints.reset(
+                    {(int)personEntries.size(), (int)personEntries.begin()->second.keypoints.size(), 3});
                 for (auto i=0; i<poseIds.getSize(0); i++)
                 {
                     const int id = poseIds[i];
                     const PersonTrackerEntry& pe = personEntries.at(id);
-                    for (int j=0; j<dims[1]; j++)
+                    const int baseIndexY = i*poseKeypoints.getSize(1)*poseKeypoints.getSize(2);
+                    for (int j=0 ; j<poseKeypoints.getSize(1) ; j++)
                     {
-                        const auto baseIndex = i*dims[1]*dims[2] + j*dims[2];
-                        opArrayMat.at<float>(baseIndex + 0) = pe.keypoints[j].x;
-                        opArrayMat.at<float>(baseIndex + 1) = pe.keypoints[j].y;
-                        opArrayMat.at<float>(baseIndex + 2) = (int)pe.status[j];
+                        const auto baseIndex = baseIndexY + j*poseKeypoints.getSize(2);
+                        poseKeypoints[baseIndex] = pe.keypoints[j].x;
+                        poseKeypoints[baseIndex+1] = pe.keypoints[j].y;
+                        poseKeypoints[baseIndex+2] = (int)pe.status[j];
                         if (pe.keypoints[j].x == 0 && pe.keypoints[j].y == 0)
-                            opArrayMat.at<float>(baseIndex + 2) = 0;
+                            poseKeypoints[baseIndex+2] = 0;
                     }
                 }
-                poseKeypoints.setFrom(opArrayMat);
             }
         }
         catch (const std::exception& e)
@@ -359,8 +359,8 @@ namespace op
     {
         try
         {
-            error("PersonTracker (`tracking` flag) buggy and not working yet, but we are working on it!"
-                  " Coming soon!", __LINE__, __FUNCTION__, __FILE__);
+            log("Person tracking (`tracking` flag) is in experimental phase. Please, let us know if you"
+                " find any bug on this alpha version.", op::Priority::High);
         }
         catch (const std::exception& e)
         {
@@ -377,6 +377,14 @@ namespace op
     {
         try
         {
+            // Sanity Checks
+            if (poseKeypoints.getSize(0) > 1)
+                 error("Person tracking (`--tracking` flag) is in experimental phase and only allows tracking of up"
+                       " to 1 person at the time. Please, also include the `--number_people_max 1` flag when using"
+                       " the `--tracking` flag. Tracking more than one person at the time is not expected as"
+                       " short- nor medium-term goal.",
+                       __LINE__, __FUNCTION__, __FILE__);
+
             /*
              * 1. Get poseKeypoints for all people - Checks
              * 2. If last image is empty or mPersonEntries is empty (& poseKeypoints and poseIds has data or crash it)
