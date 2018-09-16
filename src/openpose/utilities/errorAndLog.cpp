@@ -12,7 +12,7 @@ namespace op
             typedef void(__stdcall * DebugCallback) (const char* const str, int type);
             DebugCallback gDebugCallback;
 
-            extern "C" void OP_API OP_RegisterDebugCallback(DebugCallback debugCallback)
+            extern "C" void OP_API OP_RegisterDebugCallback(DebugCallback& debugCallback)
             {
                 if (debugCallback)
                     gDebugCallback = debugCallback;
