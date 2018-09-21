@@ -36,10 +36,7 @@ namespace op
 
         virtual std::string getNextFrameName() = 0;
 
-        inline bool isOpened() const
-        {
-            return mVideoCapture.isOpened();
-        }
+        virtual bool isOpened() const = 0;
 
         void release();
 
@@ -51,6 +48,8 @@ namespace op
         virtual cv::Mat getRawFrame() = 0;
 
         virtual std::vector<cv::Mat> getRawFrames() = 0;
+
+        void resetWebcam(const int index, const bool throwExceptionIfNoOpened);
 
     private:
         cv::VideoCapture mVideoCapture;

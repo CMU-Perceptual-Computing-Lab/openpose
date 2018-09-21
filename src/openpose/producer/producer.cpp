@@ -184,9 +184,14 @@ namespace op
                 mNumberEmptyFrames = 0;
 
                 if (mType != ProducerType::ImageDirectory
-                      && (frame.cols != get(CV_CAP_PROP_FRAME_WIDTH) || frame.rows != get(CV_CAP_PROP_FRAME_HEIGHT)))
+                      && ((frame.cols != get(CV_CAP_PROP_FRAME_WIDTH) && get(CV_CAP_PROP_FRAME_WIDTH) > 0)
+                          || (frame.rows != get(CV_CAP_PROP_FRAME_HEIGHT)) && get(CV_CAP_PROP_FRAME_HEIGHT) > 0))
                 {
-                    log("Frame size changed. Returning empty frame.", Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                    log("Frame size changed. Returning empty frame.\nExpected vs. received sizes: "
+                        + std::to_string(get(CV_CAP_PROP_FRAME_WIDTH))
+                        + "x" + std::to_string(get(CV_CAP_PROP_FRAME_HEIGHT))
+                        + " vs. " + std::to_string(frame.cols) + "x" + std::to_string(frame.rows),
+                        Priority::Max, __LINE__, __FUNCTION__, __FILE__);
                     frame = cv::Mat();
                 }
             }

@@ -37,11 +37,14 @@ namespace op
 
         std::string getNextFrameName();
 
+        bool isOpened() const;
+
         double get(const int capProperty);
 
         void set(const int capProperty, const double value);
 
     private:
+        const int mIndex;
         double mFps;
         long long mFrameNameCounter;
         bool mThreadOpened;
@@ -49,12 +52,18 @@ namespace op
         std::mutex mBufferMutex;
         std::atomic<bool> mCloseThread;
         std::thread mThread;
+        // Detect camera unplugged
+        double mLastNorm;
+        std::atomic<int> mDisconnectedCounter;
+        Point<int> mResolution;
 
         cv::Mat getRawFrame();
 
         std::vector<cv::Mat> getRawFrames();
 
         void bufferingThread();
+
+        bool reset();
 
         DELETE_COPY(WebcamReader);
     };
