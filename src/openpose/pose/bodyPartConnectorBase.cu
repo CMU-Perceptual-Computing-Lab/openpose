@@ -2,7 +2,6 @@
 #include <openpose/pose/poseParameters.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/pose/bodyPartConnectorBase.hpp>
-#include <iostream>
 
 namespace op
 {

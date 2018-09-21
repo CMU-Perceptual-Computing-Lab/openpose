@@ -36,7 +36,7 @@ namespace op
 
         virtual std::string getNextFrameName() = 0;
 
-        virtual bool isOpened() const = 0;
+        virtual bool isOpened() const;
 
         void release();
 
