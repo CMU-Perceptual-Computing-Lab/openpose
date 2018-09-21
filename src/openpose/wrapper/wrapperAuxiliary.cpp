@@ -163,7 +163,7 @@ namespace op
             #endif
             #ifndef USE_CUDA
                 log("---------------------------------- WARNING ----------------------------------\n"
-                    "We have introduced an additional boost in accuracy of about 0.2% with respect to the official"
+                    "We have introduced an additional boost in accuracy of about 0.5% with respect to the official"
                     " OpenPose 1.4.0 (using default settings). Currently, this increase is only applicable to CUDA"
                     " version, but will eventually be ported to CPU and OpenCL versions. Therefore, CPU and OpenCL"
                     " results might vary. Nevertheless, this accuracy boost is almost insignificant so CPU and"

@@ -48,14 +48,21 @@ namespace op
                 }
             }
 
-            // // L2 Hack
-            // int l2Dist = (int)sqrt(pow(vectorAToBX,2) + pow(vectorAToBY,2));
-            // if (l2Dist <= 2)
-            //     count = numberPointsInLine;
-
-            // parts score + connection score
+            // Return PAF score
             if (count/(float)numberPointsInLine > interMinAboveThreshold)
                 return sum/count;
+            else
+            {
+                // Ideally, if distanceAB = 0, PAF is 0 between A and B, provoking a false negative
+                // To fix it, we consider PAF-connected keypoints very close to have a minimum PAF score, such that:
+                //     1. It will consider very close keypoints (where the PAF is 0)
+                //     2. But it will not automatically connect them (case PAF score = 1), or real PAF might got
+                //        missing
+                const auto l2Dist = sqrtf(vectorAToBX*vectorAToBX + vectorAToBY*vectorAToBY);
+                const auto threshold = sqrtf(heatmapWidth*heatmapHeight)/150; // 3.3 for 368x656, 6.6 for 2x resolution
+                if (l2Dist < threshold)
+                    return T(0.15);
+            }
         }
         return -1;
     }
