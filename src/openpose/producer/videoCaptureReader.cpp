@@ -6,14 +6,11 @@
 namespace op
 {
     VideoCaptureReader::VideoCaptureReader(const int index, const bool throwExceptionIfNoOpened) :
-        Producer{ProducerType::Webcam},
-        mVideoCapture{index}
+        Producer{ProducerType::Webcam}
     {
         try
         {
-            // Make sure video capture was opened
-            if (throwExceptionIfNoOpened && !isOpened())
-                error("VideoCapture (webcam) could not be opened.", __LINE__, __FUNCTION__, __FILE__);
+            resetWebcam(index, throwExceptionIfNoOpened);
         }
         catch (const std::exception& e)
         {
@@ -68,6 +65,19 @@ namespace op
         }
     }
 
+    bool VideoCaptureReader::isOpened() const
+    {
+        try
+        {
+            return mVideoCapture.isOpened();
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return false;
+        }
+    }
+
     cv::Mat VideoCaptureReader::getRawFrame()
     {
         try
@@ -93,6 +103,22 @@ namespace op
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             return {};
+        }
+    }
+
+    void VideoCaptureReader::resetWebcam(const int index, const bool throwExceptionIfNoOpened)
+    {
+        try
+        {
+            // Open webcam
+            mVideoCapture = cv::VideoCapture{index};
+            // Make sure video capture was opened
+            if (throwExceptionIfNoOpened && !isOpened())
+                error("VideoCapture (webcam) could not be opened.", __LINE__, __FUNCTION__, __FILE__);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
     }
 

@@ -266,7 +266,7 @@ By default, the body COCO and MPI models are not downloaded. You can download th
 
 
 #### Python API
-To install the Python API, ensure that the `BUILD_PYTHON` flag is turned on while running CMake GUI. Check [doc/modules/python_module.md](./modules/python_module.md) for further details.
+To install the Python API, ensure that the `BUILD_PYTHON` flag is turned on while running CMake GUI and follow the standard installation steps. After the installation, check [doc/modules/python_module.md](./modules/python_module.md) for further details.
 
 
 

@@ -4,7 +4,7 @@ Adding and Testing Custom Code
 
 
 ## Purpose
-You can quickly add your custom code into this folder so that quick prototypes can be easily tested without having to create a whoel new project just for it.
+You can quickly add your custom code into this folder so that quick prototypes can be easily tested without having to create a whole new project just for it.
 
 
 

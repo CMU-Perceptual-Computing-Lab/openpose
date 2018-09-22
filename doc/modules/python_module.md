@@ -23,7 +23,7 @@ The OpenPose Python module is compatible with both Python 2 and Python 3. In add
 
 
 ## Installation
-Check [doc/installation.md#python-module](./installation.md#python-module) for installation steps.
+Check [doc/installation.md#python-module](../installation.md#python-api) for installation steps.
 
 The Python API requires Numpy for array management, and OpenCV for image loading. They can be installed via:
 

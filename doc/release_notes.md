@@ -262,8 +262,9 @@ OpenPose Library - Release Notes
 ## Current version - future OpenPose 1.4.1
 1. Main improvements:
     1. Added initial single-person tracker for further speed up or visual smoothing (`--tracking` flag).
-    2. Greedy body part connector implemented in CUDA: +~33% speed up in Nvidia (CUDA) version with default flags and +~10% in maximum accuracy configuration.
+    2. Greedy body part connector implemented in CUDA: +~30% speed up in Nvidia (CUDA) version with default flags and +~10% in maximum accuracy configuration. In addition, it provides a small 0.5% boost in accuracy (default flags).
     3. OpenPose can be built as Unity plugin: Added flag `BUILD_UNITY_SUPPORT` and special Unity code.
+    4. If camera is unplugged, OpenPose GUI and command line will display a warning and try to reconnect it.
 2. Functions or parameters renamed:
     1. By default, python example `2_pose_from_heatmaps.py` was using 2 scales starting at -1x736, changed to 1 scale at -1x368.
 3. Main bugs fixed:

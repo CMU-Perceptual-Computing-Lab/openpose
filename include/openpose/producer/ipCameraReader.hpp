@@ -26,6 +26,11 @@ namespace op
 
         std::string getNextFrameName();
 
+        inline bool isOpened() const
+        {
+            return VideoCaptureReader::isOpened();
+        }
+
         inline double get(const int capProperty)
         {
             return VideoCaptureReader::get(capProperty);

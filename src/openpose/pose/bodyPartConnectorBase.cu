@@ -2,7 +2,6 @@
 #include <openpose/pose/poseParameters.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/pose/bodyPartConnectorBase.hpp>
-#include <iostream>
 
 namespace op
 {
@@ -49,20 +48,27 @@ namespace op
                 }
             }
 
-            // // L2 Hack
-            // int l2Dist = (int)sqrt(pow(vectorAToBX,2) + pow(vectorAToBY,2));
-            // if (l2Dist <= 2)
-            //     count = numberPointsInLine;
-
-            // parts score + connection score
+            // Return PAF score
             if (count/(float)numberPointsInLine > interMinAboveThreshold)
                 return sum/count;
+            else
+            {
+                // Ideally, if distanceAB = 0, PAF is 0 between A and B, provoking a false negative
+                // To fix it, we consider PAF-connected keypoints very close to have a minimum PAF score, such that:
+                //     1. It will consider very close keypoints (where the PAF is 0)
+                //     2. But it will not automatically connect them (case PAF score = 1), or real PAF might got
+                //        missing
+                const auto l2Dist = sqrtf(vectorAToBX*vectorAToBX + vectorAToBY*vectorAToBY);
+                const auto threshold = sqrtf(heatmapWidth*heatmapHeight)/150; // 3.3 for 368x656, 6.6 for 2x resolution
+                if (l2Dist < threshold)
+                    return T(0.15);
+            }
         }
         return -1;
     }
 
     template <typename T>
-    __global__ void pafScoreKernel(T* finalOutputPtr, const T* const heatMapPtr, const T* const peaksPtr,
+    __global__ void pafScoreKernel(T* pairScoresPtr, const T* const heatMapPtr, const T* const peaksPtr,
                                    const unsigned int* const bodyPartPairsPtr, const unsigned int* const mapIdxPtr,
                                    const unsigned int maxPeaks, const int numberBodyPartPairs,
                                    const int heatmapWidth, const int heatmapHeight, const T interThreshold,
@@ -91,12 +97,12 @@ namespace op
                 const T* const bodyPartB = peaksPtr + (3*(partB*(maxPeaks+1) + peakB+1));
                 const T* const mapX = heatMapPtr + mapIdxX*heatmapWidth*heatmapHeight;
                 const T* const mapY = heatMapPtr + mapIdxY*heatmapWidth*heatmapHeight;
-                finalOutputPtr[outputIndex] = process(
+                pairScoresPtr[outputIndex] = process(
                     bodyPartA, bodyPartB, mapX, mapY, heatmapWidth, heatmapHeight, interThreshold,
                     interMinAboveThreshold);
             }
             else
-                finalOutputPtr[outputIndex] = -1;
+                pairScoresPtr[outputIndex] = -1;
         }
     }
 
@@ -105,7 +111,7 @@ namespace op
                              const T* const peaksPtr, const PoseModel poseModel, const Point<int>& heatMapSize,
                              const int maxPeaks, const T interMinAboveThreshold, const T interThreshold,
                              const int minSubsetCnt, const T minSubsetScore, const T scaleFactor,
-                             Array<T> finalOutputCpu, T* finalOutputGpuPtr,
+                             Array<T> pairScoresCpu, T* pairScoresGpuPtr,
                              const unsigned int* const bodyPartPairsGpuPtr, const unsigned int* const mapIdxGpuPtr,
                              const T* const peaksGpuPtr)
     {
@@ -115,8 +121,7 @@ namespace op
             const auto& bodyPartPairs = getPosePartPairs(poseModel);
             const auto numberBodyParts = getPoseNumberBodyParts(poseModel);
             const auto numberBodyPartPairs = bodyPartPairs.size() / 2;
-            const auto subsetCounterIndex = numberBodyParts;
-            const auto totalComputations = finalOutputCpu.getVolume();
+            const auto totalComputations = pairScoresCpu.getVolume();
 
             if (numberBodyParts == 0)
                 error("Invalid value of numberBodyParts, it must be positive, not " + std::to_string(numberBodyParts),
@@ -126,26 +131,35 @@ namespace op
                       __LINE__, __FUNCTION__, __FILE__);
 
 
-            // Run Kernel - finalOutputGpu
+            // Run Kernel - pairScoresGpu
             const dim3 numBlocks{
                 getNumberCudaBlocks(numberBodyPartPairs, THREADS_PER_BLOCK.x),
                 getNumberCudaBlocks(maxPeaks, THREADS_PER_BLOCK.y),
                 getNumberCudaBlocks(maxPeaks, THREADS_PER_BLOCK.z)};
             pafScoreKernel<<<numBlocks, THREADS_PER_BLOCK>>>(
-                finalOutputGpuPtr, heatMapGpuPtr, peaksGpuPtr, bodyPartPairsGpuPtr, mapIdxGpuPtr,
+                pairScoresGpuPtr, heatMapGpuPtr, peaksGpuPtr, bodyPartPairsGpuPtr, mapIdxGpuPtr,
                 maxPeaks, numberBodyPartPairs, heatMapSize.x, heatMapSize.y, interThreshold,
                 interMinAboveThreshold);
-            // finalOutputCpu <-- finalOutputGpu
-            cudaMemcpy(finalOutputCpu.getPtr(), finalOutputGpuPtr, totalComputations * sizeof(float),
+            // pairScoresCpu <-- pairScoresGpu
+            cudaMemcpy(pairScoresCpu.getPtr(), pairScoresGpuPtr, totalComputations * sizeof(float),
                        cudaMemcpyDeviceToHost);
 
-            // std::vector<std::pair<std::vector<int>, double>> refers to:
-            //     - std::vector<int>: [body parts locations, #body parts found]
-            //     - double: subset score
-            const T* const tNullptr = nullptr;
-            const auto subsets = generateInitialSubsets(
-                tNullptr, peaksPtr, poseModel, heatMapSize, maxPeaks, interThreshold, interMinAboveThreshold,
-                bodyPartPairs, numberBodyParts, numberBodyPartPairs, subsetCounterIndex, finalOutputCpu);
+            // New code
+            // Get pair connections and their scores
+            const auto pairConnections = pafPtrIntoVector(
+                pairScoresCpu, peaksPtr, maxPeaks, bodyPartPairs, numberBodyPartPairs);
+            const auto peopleVector = pafVectorIntoPeopleVector(
+                pairConnections, peaksPtr, maxPeaks, bodyPartPairs, numberBodyParts);
+
+            // // Old code
+            // // Get pair connections and their scores
+            // // std::vector<std::pair<std::vector<int>, double>> refers to:
+            // //     - std::vector<int>: [body parts locations, #body parts found]
+            // //     - double: person subset score
+            // const T* const tNullptr = nullptr;
+            // const auto peopleVector = createPeopleVector(
+            //     tNullptr, peaksPtr, poseModel, heatMapSize, maxPeaks, interThreshold, interMinAboveThreshold,
+            //     bodyPartPairs, numberBodyParts, numberBodyPartPairs, pairScoresCpu);
 
             // Delete people below the following thresholds:
                 // a) minSubsetCnt: removed if less than minSubsetCnt body parts
@@ -153,13 +167,13 @@ namespace op
                 // c) maxPeaks (POSE_MAX_PEOPLE): keep first maxPeaks people above thresholds
             int numberPeople;
             std::vector<int> validSubsetIndexes;
-            validSubsetIndexes.reserve(fastMin((size_t)maxPeaks, subsets.size()));
-            removeSubsetsBelowThresholds(validSubsetIndexes, numberPeople, subsets, subsetCounterIndex,
-                                         numberBodyParts, minSubsetCnt, minSubsetScore, maxPeaks);
+            validSubsetIndexes.reserve(fastMin((size_t)maxPeaks, peopleVector.size()));
+            removePeopleBelowThresholds(validSubsetIndexes, numberPeople, peopleVector, numberBodyParts, minSubsetCnt,
+                                        minSubsetScore, maxPeaks);
 
             // Fill and return poseKeypoints
-            subsetsToPoseKeypointsAndScores(poseKeypoints, poseScores, scaleFactor, subsets, validSubsetIndexes,
-                                            peaksPtr, numberPeople, numberBodyParts, numberBodyPartPairs);
+            peopleVectorToPeopleArray(poseKeypoints, poseScores, scaleFactor, peopleVector, validSubsetIndexes,
+                                      peaksPtr, numberPeople, numberBodyParts, numberBodyPartPairs);
 
             // Sanity check
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
@@ -175,7 +189,7 @@ namespace op
                                       const PoseModel poseModel, const Point<int>& heatMapSize, const int maxPeaks,
                                       const float interMinAboveThreshold, const float interThreshold,
                                       const int minSubsetCnt, const float minSubsetScore, const float scaleFactor,
-                                      Array<float> finalOutputCpu, float* finalOutputGpuPtr,
+                                      Array<float> pairScoresCpu, float* pairScoresGpuPtr,
                                       const unsigned int* const bodyPartPairsGpuPtr,
                                       const unsigned int* const mapIdxGpuPtr,
                                       const float* const peaksGpuPtr);
@@ -184,7 +198,7 @@ namespace op
                                       const PoseModel poseModel, const Point<int>& heatMapSize, const int maxPeaks,
                                       const double interMinAboveThreshold, const double interThreshold,
                                       const int minSubsetCnt, const double minSubsetScore, const double scaleFactor,
-                                      Array<double> finalOutputCpu, double* finalOutputGpuPtr,
+                                      Array<double> pairScoresCpu, double* pairScoresGpuPtr,
                                       const unsigned int* const bodyPartPairsGpuPtr,
                                       const unsigned int* const mapIdxGpuPtr,
                                       const double* const peaksGpuPtr);

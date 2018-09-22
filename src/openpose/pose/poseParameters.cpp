@@ -236,8 +236,10 @@ namespace op
         },
         // BODY_25E
         std::vector<unsigned int>{
-            0,1, 14,15, 20,21, 16,17, 18,19, 22,23, 24,25, 6,7, 2,3, 4,5, 8,9, 10,11, 12,13, 26,27, 28,29, 32,33, 30,31, 34,35, 36,37,38,39,40,41, 42,43,44,45,46,47
-            // ,48,49,50,51,52,53,54,55,56,57, 58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87
+            // Minimum spanning tree
+            0,1,   2,3,   4,5,   6,7,   8,9,  10,11,  12,13, 14,15, 16,17, 18,19, 20,21, 22,23, 24,25, 26,27, 28,29, 30,31, 32,33, 34,35, 36,37, 38,39, 40,41, 42,43, 44,45, 46,47,
+            // Redundant ones
+            48,49, 50,51, 52,53, 54,55, 56,57, 58,59, 60,61, 62,63, 64,65, 66,67, 68,69, 70,71, 72,73, 74,75
         },
         // BODY_25_19
         std::vector<unsigned int>{
@@ -337,8 +339,13 @@ namespace op
         },
         // BODY_25E
         std::vector<unsigned int>{
-            1,8,   1,2,   1,5,   2,3,   3,4,   5,6,   6,7, 8,9, 9,10,10,11,8,12,12,13,13,14,  1,0,   0,15, 15,17,  0,16, 16,18, 14,19,19,20,14,21, 11,22,22,23,11,24
-           // ,1,3,  1,4,  1,6,  1,7,  1,9,   1,10, 1,11, 1,12, 1,13, 1,14, 1,15, 1,16, 1,17, 1,18, 1,19, 1,20, 1,21, 1,22, 1,23, 1,24
+            // Minimum spanning tree
+            1,8,   1,2, 2,3, 3,4,   1,5, 5,6, 6,7,   8,9, 9,10, 10,11,   8,12, 12,13, 13,14,   1,0, 0,15, 15,17, 0,16, 16,18,
+            // Foot (minimum spanning tree)
+            14,19,19,20,14,21, 11,22,22,23,11,24,
+            // Redundant ones
+            // Ears-shoulders, shoulders-hips, shoulders-wrists, hips-ankles, wrists,  ankles, wrists-hips, small toes-ankles)
+                 2,17, 5,18,        2,9, 5,12,      2,4, 5,7,    9,11, 12,14,   4,7,   11,14,   4,9, 7,12,   11,23, 14,20
         },
         // BODY_25_19
         std::vector<unsigned int>{
@@ -358,25 +365,6 @@ namespace op
         std::vector<unsigned int>{
             1,8,   1,2,   1,5,   2,3,   3,4,   5,6,   6,7,   8,9,   9,10,  10,11, 8,12,  12,13, 13,14,  1,0,   0,15, 15,17,  0,16, 16,18,   2,17,  5,18,   14,19,19,20,14,21, 11,22,22,23,11,24
         },
-    };
-    const std::array<std::vector<int>, (int)PoseModel::Size> POSE_BODY_PART_PAIRS_STAR{
-        std::vector<int>{},    // BODY_25
-        std::vector<int>{},    // COCO
-        std::vector<int>{},    // MPI_15
-        std::vector<int>{},    // MPI_15_4
-        std::vector<int>{},    // BODY_19
-        std::vector<int>{},    // BODY_19_X2
-        std::vector<int>{},    // BODY_59
-        std::vector<int>{},    // BODY_19N
-        std::vector<int>{      // BODY_25E
-            // 1,3,  1,4,  1,6,  1,7,  1,9,   1,10, 1,11, 1,12, 1,13, 1,14, 1,15, 1,16, 1,17, 1,18, 1,19, 1,20, 1,21, 1,22, 1,23, 1,24
-            -1,-1,-1,48,50,-1,52,54,-1,56,   58,   60,   62,   64,   66,   68,   70,   72,   74,   76,   78,   80,   82,   84,   86
-            // 48,49,50,51,52,53,54,55,56,57, 58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87
-        },
-        std::vector<int>{},    // BODY_25_19
-        std::vector<int>{},    // BODY_65
-        std::vector<int>{},    // CAR_12
-        std::vector<int>{},    // BODY_25D
     };
     const std::array<unsigned int, (int)PoseModel::Size> POSE_MAX_PEAKS{
         POSE_MAX_PEOPLE,    // BODY_25
@@ -509,19 +497,6 @@ namespace op
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             return POSE_MAP_INDEX[(int)poseModel];
-        }
-    }
-
-    const std::vector<int>& getPosePartPairsStar(const PoseModel poseModel)
-    {
-        try
-        {
-            return POSE_BODY_PART_PAIRS_STAR.at((int)poseModel);
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return POSE_BODY_PART_PAIRS_STAR[(int)poseModel];
         }
     }
 
