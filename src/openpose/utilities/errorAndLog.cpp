@@ -11,17 +11,23 @@ namespace op
         {
             typedef void(__stdcall * DebugCallback) (const char* const str, int type);
             DebugCallback gDebugCallback;
+			bool gDebugEnabled = true;
 
-            extern "C" void OP_API OP_RegisterDebugCallback(DebugCallback& debugCallback)
+            extern "C" void OP_API OP_RegisterDebugCallback(DebugCallback debugCallback) // Use & doesn't work - by Tianyi
             {
                 if (debugCallback)
                     gDebugCallback = debugCallback;
             }
 
+			extern "C" void OP_API OP_SetDebugEnable(bool enable) {
+				gDebugEnabled = enable;
+			}
+
             void DebugInUnity(const std::string& message, const int type)
             {
-                if (gDebugCallback)
-                    gDebugCallback(message.c_str(), type);
+                if (gDebugEnabled)
+					if (gDebugCallback)
+						gDebugCallback(message.c_str(), type);
             }
 
             void log(const std::string& message)

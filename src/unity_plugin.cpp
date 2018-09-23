@@ -239,18 +239,9 @@ DEFINE_string(write_bvh,                "",             "Experimental, not avail
 DEFINE_string(udp_host,                 "",             "Experimental, not available yet. IP for UDP communication. E.g., `192.168.0.1`.");
 DEFINE_string(udp_port,                 "8051",         "Experimental, not available yet. Port number for UDP communication.");
 
+
 // Tianyi's code
 typedef void(__stdcall * OutputCallback) (const char* str, int type);
-
-// Global variables
-std::shared_ptr<UnityPluginUserOutput> spUserOutput;
-OutputCallback gOutputCallback;
-
-void outputToUnity(const std::string& message, const int type)
-{
-    if (gOutputCallback)
-        gOutputCallback(message.c_str(), type);
-}
 
 // If the user needs his own variables, he can inherit the op::Datum struct and add them
 // UserDatum can be directly used by the OpenPose wrapper because it inherits from op::Datum, just define
@@ -272,9 +263,17 @@ struct UserDatum : public op::Datum
 class UnityPluginUserOutput : public op::WorkerConsumer<std::shared_ptr<std::vector<UserDatum>>>
 {
 public:
+	OutputCallback gOutputCallback;
+	bool gOutputEnabled = true;
+
     void initializationOnThread() {}
 
+	void outputTest() {
+		outputToUnity("test_output", -1);
+	}
+
     void terminate() { // Tianyi's code
+		op::log("OP_End");
         this->stop();
     }
 
@@ -289,6 +288,20 @@ protected:
     std::string vectorToJson(const int x, const int y, const int z) {
         return "{\"x\":" + std::to_string(x) + ",\"y\":" + std::to_string(y) + ",\"z\":" + std::to_string(z) + "}";
     }
+
+	void outputToUnity(const std::string& message, const int type)
+	{
+		if (gOutputCallback) {
+			try {
+				gOutputCallback(message.c_str(), type);
+			}
+			catch (const std::exception& e)
+			{
+				op::log("Output error");
+				op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+			}
+		}
+	}
 
     void sendData(const std::shared_ptr<std::vector<UserDatum>>& datumsPtr) { // Tianyi's code
         const auto& poseKeypoints = datumsPtr->at(0).poseKeypoints;
@@ -427,39 +440,13 @@ protected:
     {
         try
         {
-            // User's displaying/saving/other processing here
-                // datum.cvOutputData: rendered frame with pose or heatmaps
-                // datum.poseKeypoints: Array<float> with the estimated pose
             if (datumsPtr != nullptr && !datumsPtr->empty())
             {
                 // op::log("Output");
-                sendData(datumsPtr); // Tianyi's code
+                if (gOutputEnabled) sendData(datumsPtr); // Tianyi's code
                 // sendImage(datumsPtr); // Tianyi's code
                 // outputToUnity(keypointsData, imageData, 0);
 
-                // // Show in command line the resulting pose keypoints for body, face and hands
-                // op::log("\nKeypoints:");
-                // // Accesing each element of the keypoints
-                // const auto& poseKeypoints = datumsPtr->at(0).poseKeypoints;
-                // op::log("Person pose keypoints:");
-                // for (auto person = 0 ; person < poseKeypoints.getSize(0) ; person++)
-                // {
-                //     op::log("Person " + std::to_string(person) + " (x, y, score):");
-                //     for (auto bodyPart = 0 ; bodyPart < poseKeypoints.getSize(1) ; bodyPart++)
-                //     {
-                //         std::string valueToPrint;
-                //         for (auto xyscore = 0 ; xyscore < poseKeypoints.getSize(2) ; xyscore++)
-                //         {
-                //             valueToPrint += std::to_string(   poseKeypoints[{person, bodyPart, xyscore}]   ) + " ";
-                //         }
-                //         op::log(valueToPrint);
-                //     }
-                // }
-                // op::log(" ");
-                // // Alternative: just getting std::string equivalent
-                // op::log("Face keypoints: " + datumsPtr->at(0).faceKeypoints.toString());
-                // op::log("Left hand keypoints: " + datumsPtr->at(0).handKeypoints[0].toString());
-                // op::log("Right hand keypoints: " + datumsPtr->at(0).handKeypoints[1].toString());
                 // // Display image and sleeps at least 1 ms (it usually sleeps ~5-10 msec to display the image)
                 // const char key = (char)cv::waitKey(1);
                 // if (key == 27)
@@ -471,16 +458,24 @@ protected:
         }
         catch (const std::exception& e)
         {
-            this->stop();
+			// this->stop();
             op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
     }
 };
 
+// Global output instance
+std::shared_ptr<UnityPluginUserOutput> spUserOutput = std::make_shared<UnityPluginUserOutput>();
+
 int openPoseDemo()
 {
     try
     {
+		// USE THESE TO FAKE THE INPUT ARGUMENTS
+		FLAGS_model_folder = "C:\\Users\\tz1\\Documents\\OpenPoseUnityDemo\\OpenPosePlugin\\Assets\\StreamingAssets\\models";
+		//FLAGS_hand = true;
+
+
         op::log("Starting OpenPose demo...", op::Priority::High);
         const auto timerBegin = std::chrono::high_resolution_clock::now();
 
@@ -535,7 +530,7 @@ int openPoseDemo()
 
         // Initializing the user custom classes
         // GUI (Display)
-        spUserOutput = std::make_shared<UnityPluginUserOutput>();
+        //spUserOutput = std::make_shared<UnityPluginUserOutput>();
         // Add custom processing
         const auto workerOutputOnNewThread = true;
         opWrapper.setWorkerOutput(spUserOutput, workerOutputOnNewThread);
@@ -629,17 +624,17 @@ int openPoseDemo()
 
 // Tianyi's code
 extern "C" {
-    OP_API int OP_TestFunction() { return 0; }
-    OP_API void OP_RegisterOutputCallback(OutputCallback callback)
-    {
-        if (callback)
-        {
-            gOutputCallback = callback;
-        }
-    }
+    OP_API void OP_RegisterOutputCallback(OutputCallback callback) { 
+		if (spUserOutput) spUserOutput->gOutputCallback = callback; 
+	}
+
+	OP_API void OP_SetOutputEnable(bool enable) {
+		if (spUserOutput) spUserOutput->gOutputEnabled = enable;
+	}
     //OP_API void OP_RegisterDebugCallback(op::DebugCallback callback) { UnityDebugger::registerCallback(callback); }
     OP_API void OP_SetParameters(int argc, char *argv[]) {
-        gflags::ParseCommandLineFlags(&argc, &argv, true);
+		//op::log(argc);
+		//gflags::ParseCommandLineFlags(&argc, &argv, true); // ---------------------------THIS ONE CRASH IN UNITY
     }
     OP_API void OP_Run() {
         openPoseDemo();
@@ -647,5 +642,8 @@ extern "C" {
     OP_API void OP_Shutdown() {
         if (spUserOutput) spUserOutput->terminate();
     }
+
+	OP_API void OP_LogTest() { op::log("test"); }
+	OP_API void OP_OutputTest() { spUserOutput->outputTest(); }
 }
 #endif
