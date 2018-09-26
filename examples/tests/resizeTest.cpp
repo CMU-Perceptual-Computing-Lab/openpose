@@ -1,14 +1,12 @@
 // ------------------------- OpenPose Resize Layer Testing -------------------------
 
+// Command-line user intraface
+#define OPENPOSE_FLAGS_DISABLE_POSE
+#include <openpose/flags.hpp>
+// OpenPose dependencies
 #include <openpose/headers.hpp>
+
 #ifdef USE_CUDA
-    #include <chrono> // `std::chrono::` functions and classes, e.g. std::chrono::milliseconds
-    // GFlags: DEFINE_bool, _int32, _int64, _uint64, _double, _string
-    #include <gflags/gflags.h>
-    // Allow Google Flags in Ubuntu 14
-    #ifndef GFLAGS_GFLAGS_H_
-    namespace gflags = google;
-    #endif
     #ifdef USE_CAFFE
         #include <caffe/net.hpp>
     #endif

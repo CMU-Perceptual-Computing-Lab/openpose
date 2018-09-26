@@ -21,6 +21,52 @@
 // OpenPose dependencies
 #include <openpose/headers.hpp>
 
+// If the user needs his own variables, he can inherit the op::Datum struct and add them
+// UserDatum can be directly used by the OpenPose wrapper because it inherits from op::Datum, just define
+// Wrapper<UserDatum> instead of Wrapper<op::Datum>
+struct UserDatum : public op::Datum
+{
+    bool boolThatUserNeedsForSomeReason;
+
+    UserDatum(const bool boolThatUserNeedsForSomeReason_ = false) :
+        boolThatUserNeedsForSomeReason{boolThatUserNeedsForSomeReason_}
+    {}
+};
+
+// The W-classes can be implemented either as a template or as simple classes given
+// that the user usually knows which kind of data he will move between the queues,
+// in this case we assume a std::shared_ptr of a std::vector of UserDatum
+
+// This worker will just invert the image
+class WUserPostProcessing : public op::Worker<std::shared_ptr<std::vector<UserDatum>>>
+{
+public:
+    WUserPostProcessing()
+    {
+        // User's constructor here
+    }
+
+    void initializationOnThread() {}
+
+    void work(std::shared_ptr<std::vector<UserDatum>>& datumsPtr)
+    {
+        // User's post-processing (after OpenPose processing & before OpenPose outputs) here
+            // datum.cvOutputData: rendered frame with pose or heatmaps
+            // datum.poseKeypoints: Array<float> with the estimated pose
+        try
+        {
+            if (datumsPtr != nullptr && !datumsPtr->empty())
+                for (auto& datum : *datumsPtr)
+                    cv::bitwise_not(datum.cvOutputData, datum.cvOutputData);
+        }
+        catch (const std::exception& e)
+        {
+            this->stop();
+            op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+};
+
 int openPoseDemo()
 {
     try
@@ -74,7 +120,16 @@ int openPoseDemo()
 
         // OpenPose wrapper
         op::log("Configuring OpenPose wrapper...", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-        op::Wrapper<std::vector<op::Datum>> opWrapper;
+        // op::Wrapper<std::vector<op::Datum>> opWrapper;
+        op::Wrapper<std::vector<UserDatum>> opWrapper;
+
+        // Initializing the user custom classes
+        // Processing
+        auto wUserPostProcessing = std::make_shared<WUserPostProcessing>();
+        // Add custom processing
+        const auto workerProcessingOnNewThread = true;
+        opWrapper.setWorker(op::WorkerType::PostProcessing, wUserPostProcessing, workerProcessingOnNewThread);
+
         // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
         const op::WrapperStructPose wrapperStructPose{
             !FLAGS_body_disable, netInputSize, outputSize, keypointScale, FLAGS_num_gpu, FLAGS_num_gpu_start,
@@ -91,13 +146,13 @@ int openPoseDemo()
             FLAGS_hand, handNetInputSize, FLAGS_hand_scale_number, (float)FLAGS_hand_scale_range, FLAGS_hand_tracking,
             op::flagsToRenderMode(FLAGS_hand_render, multipleView, FLAGS_render_pose), (float)FLAGS_hand_alpha_pose,
             (float)FLAGS_hand_alpha_heatmap, (float)FLAGS_hand_render_threshold};
+        // Producer (use default to disable any input)
+        const op::WrapperStructInput wrapperStructInput{
+            producerSharedPtr, FLAGS_frame_first, FLAGS_frame_last, FLAGS_process_real_time, FLAGS_frame_flip,
+            FLAGS_frame_rotate, FLAGS_frames_repeat};
         // Extra functionality configuration (use op::WrapperStructExtra{} to disable it)
         const op::WrapperStructExtra wrapperStructExtra{
             FLAGS_3d, FLAGS_3d_min_views, FLAGS_identification, FLAGS_tracking, FLAGS_ik_threads};
-        // Producer (use default to disable any input)
-        const op::WrapperStructInput wrapperStructInput{
-            producerSharedPtr, FLAGS_frame_first, FLAGS_frame_last, FLAGS_process_real_time, FLAGS_frame_flip, 
-            FLAGS_frame_rotate, FLAGS_frames_repeat};
         // Consumer (comment or use default argument to disable any output)
         const op::WrapperStructOutput wrapperStructOutput{
             op::flagsToDisplayMode(FLAGS_display, FLAGS_3d), !FLAGS_no_gui_verbose, FLAGS_fullscreen,

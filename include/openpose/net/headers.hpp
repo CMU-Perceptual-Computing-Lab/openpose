@@ -2,6 +2,8 @@
 #define OPENPOSE_NET_HEADERS_HPP
 
 // net module
+#include <openpose/net/bodyPartConnectorBase.hpp>
+#include <openpose/net/bodyPartConnectorCaffe.hpp>
 #include <openpose/net/maximumBase.hpp>
 #include <openpose/net/maximumCaffe.hpp>
 #include <openpose/net/net.hpp>

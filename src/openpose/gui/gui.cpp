@@ -1,5 +1,3 @@
-#include <chrono>
-#include <thread>
 #include <opencv2/highgui/highgui.hpp> // cv::waitKey
 #include <openpose/filestream/fileStream.hpp>
 #include <openpose/utilities/check.hpp>

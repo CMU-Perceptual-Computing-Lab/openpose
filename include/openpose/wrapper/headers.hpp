@@ -2,6 +2,7 @@
 #define OPENPOSE_WRAPPER_HEADERS_HPP
 
 // wrapper module
+#include <openpose/wrapper/enumClasses.hpp>
 #include <openpose/wrapper/wrapper.hpp>
 #include <openpose/wrapper/wrapperAuxiliary.hpp>
 #include <openpose/wrapper/wrapperStructFace.hpp>

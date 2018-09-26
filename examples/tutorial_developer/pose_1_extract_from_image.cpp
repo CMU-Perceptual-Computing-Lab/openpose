@@ -74,7 +74,7 @@ int openPoseTutorialPose1()
                   __LINE__, __FUNCTION__, __FILE__);
         op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
         op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-        // Step 2 - Read Google flags (user defined configuration)
+        // Step 2 - Read GFlags (user defined configuration)
         // outputSize
         const auto outputSize = op::flagsToPoint(FLAGS_output_resolution, "-1x-1");
         // netInputSize

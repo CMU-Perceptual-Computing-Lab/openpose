@@ -2,8 +2,6 @@
 #define OPENPOSE_POSE_HEADERS_HPP
 
 // pose module
-#include <openpose/pose/bodyPartConnectorBase.hpp>
-#include <openpose/pose/bodyPartConnectorCaffe.hpp>
 #include <openpose/pose/enumClasses.hpp>
 #include <openpose/pose/poseCpuRenderer.hpp>
 #include <openpose/pose/poseExtractor.hpp>

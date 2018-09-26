@@ -2,10 +2,10 @@
     #include <caffe/blob.hpp>
 #endif
 #include <openpose/gpu/cuda.hpp>
+#include <openpose/net/bodyPartConnectorCaffe.hpp>
 #include <openpose/net/netCaffe.hpp>
 #include <openpose/net/nmsCaffe.hpp>
 #include <openpose/net/resizeAndMergeCaffe.hpp>
-#include <openpose/pose/bodyPartConnectorCaffe.hpp>
 #include <openpose/pose/poseParameters.hpp>
 #include <openpose/utilities/check.hpp>
 #include <openpose/utilities/fastMath.hpp>

@@ -36,8 +36,6 @@ namespace op
 
 
 // Implementation
-#include <chrono>
-#include <thread>
 namespace op
 {
     template<typename TDatums>

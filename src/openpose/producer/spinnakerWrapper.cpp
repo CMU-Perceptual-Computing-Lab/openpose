@@ -1,6 +1,3 @@
-#ifdef USE_FLIR_CAMERA
-    #include <thread>
-#endif
 #include <opencv2/imgproc/imgproc.hpp> // cv::undistort, cv::initUndistortRectifyMap
 #ifdef USE_FLIR_CAMERA
     #include <Spinnaker.h>

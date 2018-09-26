@@ -1,7 +1,5 @@
-#include <chrono>
 #include <map>
 #include <mutex>
-#include <thread>
 #include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/utilities/profiler.hpp>
 

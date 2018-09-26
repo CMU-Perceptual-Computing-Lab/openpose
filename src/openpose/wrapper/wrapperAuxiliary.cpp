@@ -180,4 +180,17 @@ namespace op
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
     }
+
+    void threadIdPP(unsigned long long& threadId, const bool multiThreadEnabled)
+    {
+        try
+        {
+            if (multiThreadEnabled)
+                threadId++;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
 }

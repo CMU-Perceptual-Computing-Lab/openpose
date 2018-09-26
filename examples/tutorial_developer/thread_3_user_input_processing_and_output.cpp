@@ -1,9 +1,9 @@
-// ------------------------- OpenPose Library Tutorial - Thread - Example 4 - User Input Processing And Output -------------------------
+// ------------------------- OpenPose Library Tutorial - Thread - Example 3 - User Input Processing And Output -------------------------
 // This fourth example shows the user how to:
     // 1. Read folder of images / video / webcam  (`producer` module)
     // 2. Use the processing implemented by the user
     // 3. Display the rendered pose (`gui` module)
-    // Everything in a multi-thread scenario (`thread` module) 
+    // Everything in a multi-thread scenario (`thread` module)
 // In addition to the previous OpenPose modules, we also need to use:
     // 1. `core` module: for the Datum struct that the `thread` module sends between the queues
     // 2. `utilities` module: for the error & logging functions, i.e. op::error & op::log respectively
@@ -39,25 +39,12 @@ DEFINE_string(image_dir,                "examples/media/",      "Process a direc
 // Consumer
 DEFINE_bool(fullscreen,                 false,          "Run in full-screen mode (press f during runtime to toggle).");
 
-
-// If the user needs his own variables, he can inherit the op::Datum struct and add them
-// UserDatum can be directly used by the OpenPose wrapper because it inherits from op::Datum, just define
-// Wrapper<UserDatum> instead of Wrapper<op::Datum>
-struct UserDatum : public op::Datum
-{
-    bool boolThatUserNeedsForSomeReason;
-
-    UserDatum(const bool boolThatUserNeedsForSomeReason_ = false) :
-        boolThatUserNeedsForSomeReason{boolThatUserNeedsForSomeReason_}
-    {}
-};
-
 // The W-classes can be implemented either as a template or as simple classes given
 // that the user usually knows which kind of data he will move between the queues,
-// in this case we assume a std::shared_ptr of a std::vector of UserDatum
+// in this case we assume a std::shared_ptr of a std::vector of op::Datum
 
 // This worker will just read and return all the jpg files in a directory
-class WUserInput : public op::WorkerProducer<std::shared_ptr<std::vector<UserDatum>>>
+class WUserInput : public op::WorkerProducer<std::shared_ptr<std::vector<op::Datum>>>
 {
 public:
     WUserInput(const std::string& directoryPath) :
@@ -72,7 +59,7 @@ public:
 
     void initializationOnThread() {}
 
-    std::shared_ptr<std::vector<UserDatum>> workProducer()
+    std::shared_ptr<std::vector<op::Datum>> workProducer()
     {
         try
         {
@@ -89,7 +76,7 @@ public:
             else
             {
                 // Create new datum
-                auto datumsPtr = std::make_shared<std::vector<UserDatum>>();
+                auto datumsPtr = std::make_shared<std::vector<op::Datum>>();
                 datumsPtr->emplace_back();
                 auto& datum = datumsPtr->at(0);
 
@@ -123,7 +110,7 @@ private:
 };
 
 // This worker will just invert the image
-class WUserPostProcessing : public op::Worker<std::shared_ptr<std::vector<UserDatum>>>
+class WUserPostProcessing : public op::Worker<std::shared_ptr<std::vector<op::Datum>>>
 {
 public:
     WUserPostProcessing()
@@ -133,7 +120,7 @@ public:
 
     void initializationOnThread() {}
 
-    void work(std::shared_ptr<std::vector<UserDatum>>& datumsPtr)
+    void work(std::shared_ptr<std::vector<op::Datum>>& datumsPtr)
     {
         // User's post-processing (after OpenPose processing & before OpenPose outputs) here
             // datum.cvOutputData: rendered frame with pose or heatmaps
@@ -154,12 +141,12 @@ public:
 };
 
 // This worker will just read and return all the jpg files in a directory
-class WUserOutput : public op::WorkerConsumer<std::shared_ptr<std::vector<UserDatum>>>
+class WUserOutput : public op::WorkerConsumer<std::shared_ptr<std::vector<op::Datum>>>
 {
 public:
     void initializationOnThread() {}
 
-    void workConsumer(const std::shared_ptr<std::vector<UserDatum>>& datumsPtr)
+    void workConsumer(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr)
     {
         try
         {
@@ -182,7 +169,7 @@ public:
     }
 };
 
-int openPoseTutorialThread4()
+int openPoseTutorialThread3()
 {
     try
     {
@@ -197,7 +184,7 @@ int openPoseTutorialThread4()
                   __LINE__, __FUNCTION__, __FILE__);
         op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
         // Step 2 - Setting thread workers && manager
-        typedef std::shared_ptr<std::vector<UserDatum>> TypedefDatums;
+        typedef std::shared_ptr<std::vector<op::Datum>> TypedefDatums;
         typedef std::shared_ptr<op::Worker<TypedefDatums>> TypedefWorker;
         op::ThreadManager<TypedefDatums> threadManager;
         // Step 3 - Initializing the worker classes
@@ -264,6 +251,6 @@ int main(int argc, char *argv[])
     // Parsing command line flags
     gflags::ParseCommandLineFlags(&argc, &argv, true);
 
-    // Running openPoseTutorialThread4
-    return openPoseTutorialThread4();
+    // Running openPoseTutorialThread3
+    return openPoseTutorialThread3();
 }

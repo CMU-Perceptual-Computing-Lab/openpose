@@ -17,9 +17,96 @@
 // This file should only be used for the user to take specific examples.
 
 // Command-line user intraface
+#define OPENPOSE_FLAGS_DISABLE_PRODUCER
 #include <openpose/flags.hpp>
 // OpenPose dependencies
 #include <openpose/headers.hpp>
+
+// Custom OpenPose flags
+// Producer
+DEFINE_string(image_dir, "examples/media/",
+    "Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).");
+
+// If the user needs his own variables, he can inherit the op::Datum struct and add them
+// UserDatum can be directly used by the OpenPose wrapper because it inherits from op::Datum, just define
+// Wrapper<UserDatum> instead of Wrapper<op::Datum>
+struct UserDatum : public op::Datum
+{
+    bool boolThatUserNeedsForSomeReason;
+
+    UserDatum(const bool boolThatUserNeedsForSomeReason_ = false) :
+        boolThatUserNeedsForSomeReason{boolThatUserNeedsForSomeReason_}
+    {}
+};
+
+// The W-classes can be implemented either as a template or as simple classes given
+// that the user usually knows which kind of data he will move between the queues,
+// in this case we assume a std::shared_ptr of a std::vector of UserDatum
+
+// This worker will just read and return all the jpg files in a directory
+class WUserInput : public op::WorkerProducer<std::shared_ptr<std::vector<UserDatum>>>
+{
+public:
+    WUserInput(const std::string& directoryPath) :
+        mImageFiles{op::getFilesOnDirectory(directoryPath, "jpg")},
+        // If we want "jpg" + "png" images
+        // mImageFiles{op::getFilesOnDirectory(directoryPath, std::vector<std::string>{"jpg", "png"})},
+        mCounter{0}
+    {
+        if (mImageFiles.empty())
+            op::error("No images found on: " + directoryPath, __LINE__, __FUNCTION__, __FILE__);
+    }
+
+    void initializationOnThread() {}
+
+    std::shared_ptr<std::vector<UserDatum>> workProducer()
+    {
+        try
+        {
+            // Close program when empty frame
+            if (mImageFiles.size() <= mCounter)
+            {
+                op::log("Last frame read and added to queue. Closing program after it is processed.",
+                        op::Priority::High);
+                // This funtion stops this worker, which will eventually stop the whole thread system once all the
+                // frames have been processed
+                this->stop();
+                return nullptr;
+            }
+            else
+            {
+                // Create new datum
+                auto datumsPtr = std::make_shared<std::vector<UserDatum>>();
+                datumsPtr->emplace_back();
+                auto& datum = datumsPtr->at(0);
+
+                // Fill datum
+                datum.cvInputData = cv::imread(mImageFiles.at(mCounter++));
+
+                // If empty frame -> return nullptr
+                if (datum.cvInputData.empty())
+                {
+                    op::log("Empty frame detected on path: " + mImageFiles.at(mCounter-1) + ". Closing program.",
+                        op::Priority::High);
+                    this->stop();
+                    datumsPtr = nullptr;
+                }
+
+                return datumsPtr;
+            }
+        }
+        catch (const std::exception& e)
+        {
+            this->stop();
+            op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return nullptr;
+        }
+    }
+
+private:
+    const std::vector<std::string> mImageFiles;
+    unsigned long long mCounter;
+};
 
 int openPoseDemo()
 {
@@ -48,11 +135,11 @@ int openPoseDemo()
         const auto faceNetInputSize = op::flagsToPoint(FLAGS_face_net_resolution, "368x368 (multiples of 16)");
         // handNetInputSize
         const auto handNetInputSize = op::flagsToPoint(FLAGS_hand_net_resolution, "368x368 (multiples of 16)");
-        // producerType
-        const auto producerSharedPtr = op::flagsToProducer(FLAGS_image_dir, FLAGS_video, FLAGS_ip_camera, FLAGS_camera,
-                                                           FLAGS_flir_camera, FLAGS_camera_resolution, FLAGS_camera_fps,
-                                                           FLAGS_camera_parameter_folder, !FLAGS_frame_keep_distortion,
-                                                           (unsigned int) FLAGS_3d_views, FLAGS_flir_camera_index);
+        // // producerType
+        // const auto producerSharedPtr = op::flagsToProducer(FLAGS_image_dir, FLAGS_video, FLAGS_ip_camera, FLAGS_camera,
+        //                                                    FLAGS_flir_camera, FLAGS_camera_resolution, FLAGS_camera_fps,
+        //                                                    FLAGS_camera_parameter_folder, !FLAGS_frame_keep_distortion,
+        //                                                    (unsigned int) FLAGS_3d_views, FLAGS_flir_camera_index);
         // poseModel
         const auto poseModel = op::flagsToPoseModel(FLAGS_model_pose);
         // JSON saving
@@ -66,7 +153,8 @@ int openPoseDemo()
                                                       FLAGS_heatmaps_add_PAFs);
         const auto heatMapScale = op::flagsToHeatMapScaleMode(FLAGS_heatmaps_scale);
         // >1 camera view?
-        const auto multipleView = (FLAGS_3d || FLAGS_3d_views > 1 || FLAGS_flir_camera);
+        // const auto multipleView = (FLAGS_3d || FLAGS_3d_views > 1 || FLAGS_flir_camera);
+        const auto multipleView = false;
         // Enabling Google Logging
         const bool enableGoogleLogging = true;
         // Logging
@@ -74,7 +162,16 @@ int openPoseDemo()
 
         // OpenPose wrapper
         op::log("Configuring OpenPose wrapper...", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-        op::Wrapper<std::vector<op::Datum>> opWrapper;
+        // op::Wrapper<std::vector<op::Datum>> opWrapper;
+        op::Wrapper<std::vector<UserDatum>> opWrapper;
+
+        // Initializing the user custom classes
+        // Frames producer (e.g. video, webcam, ...)
+        auto wUserInput = std::make_shared<WUserInput>(FLAGS_image_dir);
+        // Add custom processing
+        const auto workerInputOnNewThread = true;
+        opWrapper.setWorker(op::WorkerType::Input, wUserInput, workerInputOnNewThread);
+
         // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
         const op::WrapperStructPose wrapperStructPose{
             !FLAGS_body_disable, netInputSize, outputSize, keypointScale, FLAGS_num_gpu, FLAGS_num_gpu_start,
@@ -95,9 +192,10 @@ int openPoseDemo()
         const op::WrapperStructExtra wrapperStructExtra{
             FLAGS_3d, FLAGS_3d_min_views, FLAGS_identification, FLAGS_tracking, FLAGS_ik_threads};
         // Producer (use default to disable any input)
-        const op::WrapperStructInput wrapperStructInput{
-            producerSharedPtr, FLAGS_frame_first, FLAGS_frame_last, FLAGS_process_real_time, FLAGS_frame_flip, 
-            FLAGS_frame_rotate, FLAGS_frames_repeat};
+        // const op::WrapperStructInput wrapperStructInput{producerSharedPtr, FLAGS_frame_first, FLAGS_frame_last,
+        //                                                 FLAGS_process_real_time, FLAGS_frame_flip, FLAGS_frame_rotate,
+        //                                                 FLAGS_frames_repeat};
+        const op::WrapperStructInput wrapperStructInput;
         // Consumer (comment or use default argument to disable any output)
         const op::WrapperStructOutput wrapperStructOutput{
             op::flagsToDisplayMode(FLAGS_display, FLAGS_3d), !FLAGS_no_gui_verbose, FLAGS_fullscreen,
@@ -106,6 +204,7 @@ int openPoseDemo()
             FLAGS_write_video, FLAGS_camera_fps, FLAGS_write_heatmaps, FLAGS_write_heatmaps_format,
             FLAGS_write_video_adam, FLAGS_write_bvh, FLAGS_udp_host, FLAGS_udp_port};
         // Configure wrapper
+
         opWrapper.configure(wrapperStructPose, wrapperStructFace, wrapperStructHand, wrapperStructExtra,
                             wrapperStructInput, wrapperStructOutput);
         // Set to single-thread (for sequential processing and/or debugging and/or reducing latency)

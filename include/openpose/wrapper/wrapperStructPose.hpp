@@ -173,10 +173,10 @@ namespace op
          * Since all the elements of the struct are public, they can also be manually filled.
          */
         WrapperStructPose(const bool enable = true, const Point<int>& netInputSize = Point<int>{656, 368},
-                          const Point<int>& outputSize = Point<int>{1280, 720},
+                          const Point<int>& outputSize = Point<int>{-1, -1},
                           const ScaleMode keypointScale = ScaleMode::InputResolution,
                           const int gpuNumber = -1, const int gpuNumberStart = 0, const int scalesNumber = 1,
-                          const float scaleGap = 0.15f, const RenderMode renderMode = RenderMode::None,
+                          const float scaleGap = 0.15f, const RenderMode renderMode = RenderMode::Gpu,
                           const PoseModel poseModel = PoseModel::BODY_25, const bool blendOriginalFrame = true,
                           const float alphaKeypoint = POSE_DEFAULT_ALPHA_KEYPOINT,
                           const float alphaHeatMap = POSE_DEFAULT_ALPHA_HEAT_MAP,

@@ -1,4 +1,4 @@
-set(EXAMPLE_FILES 
+set(EXAMPLE_FILES
     openpose.cpp)
 
 foreach(EXAMPLE_FILE ${EXAMPLE_FILES})

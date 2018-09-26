@@ -57,7 +57,7 @@ namespace op
          * Since all the elements of the struct are public, they can also be manually filled.
          */
         WrapperStructFace(const bool enable = false, const Point<int>& netInputSize = Point<int>{368, 368},
-                          const RenderMode renderMode = RenderMode::None,
+                          const RenderMode renderMode = RenderMode::Gpu,
                           const float alphaKeypoint = FACE_DEFAULT_ALPHA_KEYPOINT,
                           const float alphaHeatMap = FACE_DEFAULT_ALPHA_HEAT_MAP,
                           const float renderThreshold = 0.4f);

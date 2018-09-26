@@ -1,19 +1,14 @@
 // ------------------------- OpenPose Library Tutorial - Hand Keypoint Detection from JSON Ground-Truth Data -------------------------
 // Example to test hands accuracy given ground-truth bounding boxes.
 
-#include <chrono> // `std::chrono::` functions and classes, e.g. std::chrono::milliseconds
-// GFlags: DEFINE_bool, _int32, _int64, _uint64, _double, _string
-#include <gflags/gflags.h>
-// Allow Google Flags in Ubuntu 14
-#ifndef GFLAGS_GFLAGS_H_
-    namespace gflags = google;
-#endif
+// Command-line user intraface
+#define OPENPOSE_FLAGS_DISABLE_POSE
+#include <openpose/flags.hpp>
+// OpenPose dependencies
 #include <openpose/headers.hpp>
 #include "wrapperHandFromJsonTest.hpp"
 
 // For info about the flags, check `examples/openpose/openpose.bin`.
-// Debugging/Other
-DEFINE_int32(logging_level,             3,              "");
 // Producer
 DEFINE_string(image_dir,                "", "");
 DEFINE_string(hand_ground_truth,        "", "");
@@ -44,7 +39,7 @@ int handFromJsonTest()
                   __LINE__, __FUNCTION__, __FILE__);
         op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
 
-        // Applying user defined configuration - Google flags to program variables
+        // Applying user defined configuration - GFlags to program variables
         // handNetInputSize
         const auto handNetInputSize = op::flagsToPoint(FLAGS_hand_net_resolution, "368x368 (multiples of 16)");
         // producerType

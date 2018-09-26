@@ -1,4 +1,3 @@
-// #include <thread>
 #include <numeric> // std::accumulate
 #ifdef USE_CERES
     #include <ceres/ceres.h>

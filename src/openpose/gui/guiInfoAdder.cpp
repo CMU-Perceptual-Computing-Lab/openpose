@@ -1,4 +1,3 @@
-#include <chrono>
 #include <cstdio> // std::snprintf
 #include <limits> // std::numeric_limits
 #include <openpose/utilities/fastMath.hpp>

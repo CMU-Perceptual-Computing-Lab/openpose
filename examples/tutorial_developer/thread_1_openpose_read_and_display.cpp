@@ -2,7 +2,7 @@
 // This third example shows the user how to:
     // 1. Read folder of images / video / webcam  (`producer` module)
     // 2. Display the rendered pose (`gui` module)
-    // Everything in a multi-thread scenario (`thread` module) 
+    // Everything in a multi-thread scenario (`thread` module)
 // In addition to the previous OpenPose modules, we also need to use:
     // 1. `core` module: for the Datum struct that the `thread` module sends between the queues
     // 2. `utilities` module: for the error & logging functions, i.e. op::error & op::log respectively
@@ -75,7 +75,7 @@ int openPoseTutorialThread1()
         op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.",
                   __LINE__, __FUNCTION__, __FILE__);
         op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
-        // Step 2 - Read Google flags (user defined configuration)
+        // Step 2 - Read GFlags (user defined configuration)
         // outputSize
         const auto outputSize = op::flagsToPoint(FLAGS_output_resolution, "-1x-1");
         // producerType

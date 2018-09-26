@@ -1,7 +1,4 @@
 set(SOURCES_OP_POSE 
-    bodyPartConnectorBase.cpp
-    bodyPartConnectorBase.cu
-    bodyPartConnectorCaffe.cpp
     defineTemplates.cpp
     poseCpuRenderer.cpp
     poseExtractor.cpp

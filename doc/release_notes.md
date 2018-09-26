@@ -57,7 +57,7 @@ OpenPose Library - Release Notes
     9. WCocoJsonSaver finished and removed its 3599-image limit.
     10. Added `--camera_fps` so generated video will use that frame rate.
     11. Reduced the number of printed information messages. Default logging priority threshold increased to Priority::Max.
-    12. Google flags to OpenPose configuration parameters reader moved from each demo to utilities/flagsToOpenPose.
+    12. GFlags to OpenPose configuration parameters reader moved from each demo to utilities/flagsToOpenPose.
     13. Nms classes do not use `numberParts` for `Reshape`, they deduce the value.
     14. Improved documentation.
 2. Functions or parameters renamed:
@@ -259,15 +259,23 @@ OpenPose Library - Release Notes
 
 
 
-## Current version - future OpenPose 1.4.1
+## Current version - future OpenPose 1.5.0
 1. Main improvements:
     1. Added initial single-person tracker for further speed up or visual smoothing (`--tracking` flag).
     2. Greedy body part connector implemented in CUDA: +~30% speed up in Nvidia (CUDA) version with default flags and +~10% in maximum accuracy configuration. In addition, it provides a small 0.5% boost in accuracy (default flags).
     3. OpenPose can be built as Unity plugin: Added flag `BUILD_UNITY_SUPPORT` and special Unity code.
     4. If camera is unplugged, OpenPose GUI and command line will display a warning and try to reconnect it.
+    5. Wrapper classes simplified and renamed.
+    6. API and examples improved:
+        1. New header file `flags.hpp` that includes all OpenPose flags, removing the need to copy them repeatedly on each OpenPose example file.
+        2. `tutorial_wrapper` renamed as `tutorial_api_cpp` as well as new examples were added.
+        2. `tutorial_python` renamed as `tutorial_api_python` as well as new examples were added.
+        3. `tutorial_pose` and `tutorial_thread` renamed as `tutorial_developer`, not meant to be used by users, but rather for OpenPose developers.
 2. Functions or parameters renamed:
-    1. By default, python example `2_pose_from_heatmaps.py` was using 2 scales starting at -1x736, changed to 1 scale at -1x368.
+    1. By default, python example `tutorial_developer/python_2_pose_from_heatmaps.py` was using 2 scales starting at -1x736, changed to 1 scale at -1x368.
+    2. WrapperStructPose default parameters changed to match those of the OpenPose demo binary.
 3. Main bugs fixed:
+    1. CMake-GUI was forcing to Release mode, allowed Debug modes too.
 
 
 

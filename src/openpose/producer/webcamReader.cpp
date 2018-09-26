@@ -214,7 +214,7 @@ namespace op
         }
     }
 
-    const auto DISCONNETED_THRESHOLD = 15;
+    const auto DISCONNETED_THRESHOLD = 100;
     void WebcamReader::bufferingThread()
     {
         try

@@ -2,7 +2,6 @@
 #define OPENPOSE_POSE_POSE_EXTRACTOR_NET_HPP
 
 #include <atomic>
-#include <thread>
 #include <openpose/core/common.hpp>
 #include <openpose/core/enumClasses.hpp>
 #include <openpose/pose/poseParameters.hpp>
