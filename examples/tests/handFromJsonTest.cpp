@@ -1,4 +1,4 @@
-// ------------------------- OpenPose Library Tutorial - Hand Keypoint Detection from JSON Ground-Truth Data -------------------------
+// ----------------------- OpenPose Tests - Hand Keypoint Detection from JSON Ground-Truth Data -----------------------
 // Example to test hands accuracy given ground-truth bounding boxes.
 
 // Command-line user intraface
@@ -46,11 +46,9 @@ int handFromJsonTest()
         const auto producerSharedPtr = op::flagsToProducer(FLAGS_image_dir, "", "", 0);
         // Enabling Google Logging
         const bool enableGoogleLogging = true;
-        // Logging
-        op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
         // OpenPose wrapper
-        op::log("Configuring OpenPose wrapper...", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+        op::log("Configuring OpenPose...", op::Priority::High);
         op::WrapperHandFromJsonTest<std::vector<op::Datum>> opWrapper;
         // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
         op::WrapperStructPose wrapperStructPose{false, op::flagsToPoint("656x368"), op::flagsToPoint("1280x720"),

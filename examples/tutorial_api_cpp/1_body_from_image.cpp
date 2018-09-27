@@ -63,7 +63,7 @@ void printKeypoints(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr)
         op::log("Nullptr or empty datumsPtr found.", op::Priority::High);
 }
 
-int bodyFromImage()
+int tutorialApiCpp1()
 {
     op::log("Starting OpenPose demo...", op::Priority::High);
 
@@ -98,6 +98,6 @@ int main(int argc, char *argv[])
     // Parsing command line flags
     gflags::ParseCommandLineFlags(&argc, &argv, true);
 
-    // Running bodyFromImage
-    return bodyFromImage();
+    // Running tutorialApiCpp1
+    return tutorialApiCpp1();
 }

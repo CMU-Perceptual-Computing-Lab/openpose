@@ -65,24 +65,10 @@ namespace op
          */
         void setWorker(const WorkerType workerType, const TWorker& worker, const bool workerOnNewThread = true);
 
-        // Configure class. Provide WrapperStruct structs to configure the wrapper, or call without arguments for
-        // default values
-        void configure(const WrapperStructPose& wrapperStructPose = WrapperStructPose{},
-                       // Face (use the default WrapperStructFace{} to disable any face detector)
-                       const WrapperStructFace& wrapperStructFace = WrapperStructFace{},
-                       // Hand (use the default WrapperStructHand{} to disable any hand detector)
-                       const WrapperStructHand& wrapperStructHand = WrapperStructHand{},
-                       // Hand (use the default WrapperStructExtra{} to disable any hand detector)
-                       const WrapperStructExtra& wrapperStructExtra = WrapperStructExtra{},
-                       // Producer: set producerSharedPtr=nullptr or use default WrapperStructInput{} to disable input
-                       const WrapperStructInput& wrapperStructInput = WrapperStructInput{},
-                       // Consumer (keep default values to disable any output)
-                       const WrapperStructOutput& wrapperStructOutput = WrapperStructOutput{});
-
-        // /**
-        //  * Analogous to configure() but applied to only pose (WrapperStructPose)
-        //  */
-        // void configure(const WrapperStructPose& wrapperStructPose);
+        /**
+         * It configures the pose parameters. Do not call for default values.
+         */
+        void configure(const WrapperStructPose& wrapperStructPose);
 
         /**
          * Analogous to configure() but applied to only pose (WrapperStructFace)
@@ -294,40 +280,17 @@ namespace op
     }
 
     template<typename TDatums, typename TDatumsSP, typename TWorker>
-    void WrapperT<TDatums, TDatumsSP, TWorker>::configure(const WrapperStructPose& wrapperStructPose,
-                                                          const WrapperStructFace& wrapperStructFace,
-                                                          const WrapperStructHand& wrapperStructHand,
-                                                          const WrapperStructExtra& wrapperStructExtra,
-                                                          const WrapperStructInput& wrapperStructInput,
-                                                          const WrapperStructOutput& wrapperStructOutput)
+    void WrapperT<TDatums, TDatumsSP, TWorker>::configure(const WrapperStructPose& wrapperStructPose)
     {
         try
         {
             mWrapperStructPose = wrapperStructPose;
-            mWrapperStructFace = wrapperStructFace;
-            mWrapperStructHand = wrapperStructHand;
-            mWrapperStructExtra = wrapperStructExtra;
-            mWrapperStructInput = wrapperStructInput;
-            mWrapperStructOutput = wrapperStructOutput;
         }
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
     }
-
-    // template<typename TDatums, typename TDatumsSP, typename TWorker>
-    // void WrapperT<TDatums, TDatumsSP, TWorker>::configure(const WrapperStructPose& wrapperStructPose)
-    // {
-    //     try
-    //     {
-    //         mWrapperStructPose = wrapperStructPose;
-    //     }
-    //     catch (const std::exception& e)
-    //     {
-    //         error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-    //     }
-    // }
 
     template<typename TDatums, typename TDatumsSP, typename TWorker>
     void WrapperT<TDatums, TDatumsSP, TWorker>::configure(const WrapperStructFace& wrapperStructFace)
@@ -595,7 +558,7 @@ namespace op
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return false;
+            return TDatumsSP{};
         }
     }
 

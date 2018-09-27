@@ -112,7 +112,7 @@ public:
     }
 };
 
-int openPoseTutorialWrapper1()
+int tutorialApiCpp5()
 {
     try
     {
@@ -135,10 +135,10 @@ int openPoseTutorialWrapper1()
         // handNetInputSize
         const auto handNetInputSize = op::flagsToPoint(FLAGS_hand_net_resolution, "368x368 (multiples of 16)");
         // producerType
-        const auto producerSharedPtr = op::flagsToProducer(FLAGS_image_dir, FLAGS_video, FLAGS_ip_camera, FLAGS_camera,
-                                                           FLAGS_flir_camera, FLAGS_camera_resolution, FLAGS_camera_fps,
-                                                           FLAGS_camera_parameter_folder, !FLAGS_frame_keep_distortion,
-                                                           (unsigned int) FLAGS_3d_views, FLAGS_flir_camera_index);
+        const auto producerSharedPtr = op::flagsToProducer(
+            FLAGS_image_dir, FLAGS_video, FLAGS_ip_camera, FLAGS_camera, FLAGS_flir_camera, FLAGS_camera_resolution,
+            FLAGS_camera_fps, FLAGS_camera_parameter_folder, !FLAGS_frame_keep_distortion,
+            (unsigned int) FLAGS_3d_views, FLAGS_flir_camera_index);
         // poseModel
         const auto poseModel = op::flagsToPoseModel(FLAGS_model_pose);
         // JSON saving
@@ -155,11 +155,9 @@ int openPoseTutorialWrapper1()
         const auto multipleView = (FLAGS_3d || FLAGS_3d_views > 1 || FLAGS_flir_camera);
         // Enabling Google Logging
         const bool enableGoogleLogging = true;
-        // Logging
-        op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
-        // Configure OpenPose
-        op::log("Configuring OpenPose wrapper...", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+        // Configuring OpenPose
+        op::log("Configuring OpenPose...", op::Priority::High);
         op::WrapperT<std::vector<UserDatum>> opWrapperT{op::ThreadManagerMode::AsynchronousOut};
         // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
         const op::WrapperStructPose wrapperStructPose{
@@ -168,22 +166,27 @@ int openPoseTutorialWrapper1()
             poseModel, !FLAGS_disable_blending, (float)FLAGS_alpha_pose, (float)FLAGS_alpha_heatmap,
             FLAGS_part_to_show, FLAGS_model_folder, heatMapTypes, heatMapScale, FLAGS_part_candidates,
             (float)FLAGS_render_threshold, FLAGS_number_people_max, enableGoogleLogging};
+        opWrapperT.configure(wrapperStructPose);
         // Face configuration (use op::WrapperStructFace{} to disable it)
         const op::WrapperStructFace wrapperStructFace{
             FLAGS_face, faceNetInputSize, op::flagsToRenderMode(FLAGS_face_render, multipleView, FLAGS_render_pose),
             (float)FLAGS_face_alpha_pose, (float)FLAGS_face_alpha_heatmap, (float)FLAGS_face_render_threshold};
+        opWrapperT.configure(wrapperStructFace);
         // Hand configuration (use op::WrapperStructHand{} to disable it)
         const op::WrapperStructHand wrapperStructHand{
             FLAGS_hand, handNetInputSize, FLAGS_hand_scale_number, (float)FLAGS_hand_scale_range, FLAGS_hand_tracking,
             op::flagsToRenderMode(FLAGS_hand_render, multipleView, FLAGS_render_pose), (float)FLAGS_hand_alpha_pose,
             (float)FLAGS_hand_alpha_heatmap, (float)FLAGS_hand_render_threshold};
+        opWrapperT.configure(wrapperStructHand);
         // Extra functionality configuration (use op::WrapperStructExtra{} to disable it)
         const op::WrapperStructExtra wrapperStructExtra{
             FLAGS_3d, FLAGS_3d_min_views, FLAGS_identification, FLAGS_tracking, FLAGS_ik_threads};
+        opWrapperT.configure(wrapperStructExtra);
         // Producer (use default to disable any input)
         const op::WrapperStructInput wrapperStructInput{
             producerSharedPtr, FLAGS_frame_first, FLAGS_frame_last, FLAGS_process_real_time, FLAGS_frame_flip,
             FLAGS_frame_rotate, FLAGS_frames_repeat};
+        opWrapperT.configure(wrapperStructInput);
         // Consumer (comment or use default argument to disable any output)
         const auto displayMode = op::DisplayMode::NoDisplay;
         const bool guiVerbose = false;
@@ -194,13 +197,12 @@ int openPoseTutorialWrapper1()
             FLAGS_write_coco_foot_json, FLAGS_write_images, FLAGS_write_images_format, FLAGS_write_video,
             FLAGS_camera_fps, FLAGS_write_heatmaps, FLAGS_write_heatmaps_format, FLAGS_write_video_adam,
             FLAGS_write_bvh, FLAGS_udp_host, FLAGS_udp_port};
-        // Configure wrapper
-        opWrapperT.configure(wrapperStructPose, wrapperStructFace, wrapperStructHand, wrapperStructExtra,
-                            wrapperStructInput, wrapperStructOutput);
+        opWrapperT.configure(wrapperStructOutput);
         // Set to single-thread (for sequential processing and/or debugging and/or reducing latency)
         if (FLAGS_disable_multi_thread)
-           opWrapperT.disableMultiThreading();
+            opWrapperT.disableMultiThreading();
 
+        // Start, run, and stop processing - exec() blocks this thread until OpenPose wrapper has finished
         op::log("Starting thread(s)...", op::Priority::High);
         opWrapperT.start();
 
@@ -246,6 +248,6 @@ int main(int argc, char *argv[])
     // Parsing command line flags
     gflags::ParseCommandLineFlags(&argc, &argv, true);
 
-    // Running openPoseTutorialWrapper1
-    return openPoseTutorialWrapper1();
+    // Running tutorialApiCpp5
+    return tutorialApiCpp5();
 }

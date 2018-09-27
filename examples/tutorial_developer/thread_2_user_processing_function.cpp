@@ -95,7 +95,7 @@ public:
     }
 };
 
-int openPoseTutorialThread2()
+int tutorialDeveloperThread2()
 {
     try
     {
@@ -113,10 +113,10 @@ int openPoseTutorialThread2()
         // outputSize
         const auto outputSize = op::flagsToPoint(FLAGS_output_resolution, "-1x-1");
         // producerType
-        const auto producerSharedPtr = op::flagsToProducer(FLAGS_image_dir, FLAGS_video, FLAGS_ip_camera, FLAGS_camera,
-                                                           FLAGS_flir_camera, FLAGS_camera_resolution, FLAGS_camera_fps,
-                                                           FLAGS_camera_parameter_folder, !FLAGS_frame_keep_distortion,
-                                                           (unsigned int) FLAGS_3d_views, FLAGS_flir_camera_index);
+        const auto producerSharedPtr = op::flagsToProducer(
+            FLAGS_image_dir, FLAGS_video, FLAGS_ip_camera, FLAGS_camera, FLAGS_flir_camera, FLAGS_camera_resolution,
+            FLAGS_camera_fps, FLAGS_camera_parameter_folder, !FLAGS_frame_keep_distortion,
+            (unsigned int) FLAGS_3d_views, FLAGS_flir_camera_index);
         const auto displayProducerFpsMode = (FLAGS_process_real_time
                                           ? op::ProducerFpsMode::OriginalFps : op::ProducerFpsMode::RetrievalFps);
         producerSharedPtr->setProducerFpsMode(displayProducerFpsMode);
@@ -215,6 +215,6 @@ int main(int argc, char *argv[])
     // Parsing command line flags
     gflags::ParseCommandLineFlags(&argc, &argv, true);
 
-    // Running openPoseTutorialThread2
-    return openPoseTutorialThread2();
+    // Running tutorialDeveloperThread2
+    return tutorialDeveloperThread2();
 }

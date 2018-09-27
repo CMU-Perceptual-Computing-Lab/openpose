@@ -59,7 +59,7 @@ DEFINE_double(render_threshold,         0.05,           "Only estimated keypoint
 DEFINE_double(alpha_pose,               0.6,            "Blending factor (range 0-1) for the body part rendering. 1 will show it completely, 0 will"
                                                         " hide it. Only valid for GPU rendering.");
 
-int openPoseTutorialPose1()
+int tutorialDeveloperPose1()
 {
     try
     {
@@ -87,8 +87,6 @@ int openPoseTutorialPose1()
         if (FLAGS_scale_gap <= 0. && FLAGS_scale_number > 1)
             op::error("Incompatible flag configuration: scale_gap must be greater than 0 or scale_number = 1.",
                       __LINE__, __FUNCTION__, __FILE__);
-        // Logging
-        op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
         // Step 3 - Initialize all required classes
         op::ScaleAndSizeExtractor scaleAndSizeExtractor(netInputSize, outputSize, FLAGS_scale_number, FLAGS_scale_gap);
         op::CvMatToOpInput cvMatToOpInput{poseModel};
@@ -152,6 +150,6 @@ int main(int argc, char *argv[])
     // Parsing command line flags
     gflags::ParseCommandLineFlags(&argc, &argv, true);
 
-    // Running openPoseTutorialPose1
-    return openPoseTutorialPose1();
+    // Running tutorialDeveloperPose1
+    return tutorialDeveloperPose1();
 }

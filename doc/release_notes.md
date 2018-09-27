@@ -274,6 +274,7 @@ OpenPose Library - Release Notes
 2. Functions or parameters renamed:
     1. By default, python example `tutorial_developer/python_2_pose_from_heatmaps.py` was using 2 scales starting at -1x736, changed to 1 scale at -1x368.
     2. WrapperStructPose default parameters changed to match those of the OpenPose demo binary.
+    3. WrapperT.configure() changed from 1 function that requries all arguments to individual functions that take 1 argument each.
 3. Main bugs fixed:
     1. CMake-GUI was forcing to Release mode, allowed Debug modes too.
 

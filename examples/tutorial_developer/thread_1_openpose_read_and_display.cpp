@@ -61,7 +61,7 @@ DEFINE_int32(3d_views,                  1,              "Complementary option to
 // Consumer
 DEFINE_bool(fullscreen,                 false,          "Run in full-screen mode (press f during runtime to toggle).");
 
-int openPoseTutorialThread1()
+int tutorialDeveloperThread1()
 {
     try
     {
@@ -79,10 +79,10 @@ int openPoseTutorialThread1()
         // outputSize
         const auto outputSize = op::flagsToPoint(FLAGS_output_resolution, "-1x-1");
         // producerType
-        const auto producerSharedPtr = op::flagsToProducer(FLAGS_image_dir, FLAGS_video, FLAGS_ip_camera, FLAGS_camera,
-                                                           FLAGS_flir_camera, FLAGS_camera_resolution, FLAGS_camera_fps,
-                                                           FLAGS_camera_parameter_folder, !FLAGS_frame_keep_distortion,
-                                                           (unsigned int) FLAGS_3d_views, FLAGS_flir_camera_index);
+        const auto producerSharedPtr = op::flagsToProducer(
+            FLAGS_image_dir, FLAGS_video, FLAGS_ip_camera, FLAGS_camera, FLAGS_flir_camera, FLAGS_camera_resolution,
+            FLAGS_camera_fps, FLAGS_camera_parameter_folder, !FLAGS_frame_keep_distortion,
+            (unsigned int) FLAGS_3d_views, FLAGS_flir_camera_index);
         const auto displayProducerFpsMode = (FLAGS_process_real_time
                                           ? op::ProducerFpsMode::OriginalFps : op::ProducerFpsMode::RetrievalFps);
         producerSharedPtr->setProducerFpsMode(displayProducerFpsMode);
@@ -174,6 +174,6 @@ int main(int argc, char *argv[])
     // Parsing command line flags
     gflags::ParseCommandLineFlags(&argc, &argv, true);
 
-    // Running openPoseTutorialThread1
-    return openPoseTutorialThread1();
+    // Running tutorialDeveloperThread1
+    return tutorialDeveloperThread1();
 }
