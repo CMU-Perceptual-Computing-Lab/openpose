@@ -3,13 +3,15 @@ OpenPose - Installation on Nvidia Jetson TX2
 Note that OpenPose for Nvidia Jetson TX2 was developed and it is maintained by the community. The OpenPose authors will not be able to provide official support for it.
 
 
+
 ## Contents
-1. [Requirements](#requirements)
+1. [Requirements and Dependencies](#requirements-and-dependencies)
 2. [Installation](#installation)
 3. [Usage](#usage)
 
 
-## Requirements
+
+## Requirements and Dependencies
 Jetson TX2 just flashed with [JetPack 3.1](https://developer.nvidia.com/embedded/jetpack)
 
 Notes:
@@ -17,6 +19,13 @@ Notes:
 - Installation is similar to Jetson TX1 and you can follow this [video tutorial](https://www.youtube.com/watch?v=RJkOGMC8IrY).
 - If you are installing from a virtual machine host, installation may need to be done in two steps, please refer to [this solution](https://devtalk.nvidia.com/default/topic/1002081/jetson-tx2/jetpack-3-0-install-with-a-vm/).
 - Be sure to complete both OS flashing and CUDA / cuDNN installation parts before installation.
+
+**Dependencies**:
+
+    - OpenCV (all 2.X and 3.X versions are compatible).
+    - Caffe and all its dependencies.
+    - The demo and tutorials additionally use GFlags.
+
 
 
 ## Installation

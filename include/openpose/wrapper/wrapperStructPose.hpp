@@ -12,7 +12,7 @@ namespace op
     /**
      * WrapperStructPose: Pose estimation and rendering configuration struct.
      * WrapperStructPose allows the user to set up the pose estimation and rendering parameters that will be used for
-     * the OpenPose Wrapper class.
+     * the OpenPose WrapperT template and Wrapper class.
      */
     struct OP_API WrapperStructPose
     {

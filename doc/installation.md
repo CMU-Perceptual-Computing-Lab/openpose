@@ -4,7 +4,7 @@ OpenPose - Installation
 ## Contents
 1. [Windows Portable Demo](#windows-portable-demo)
 2. [Operating Systems](#operating-systems)
-3. [Requirements](#requirements)
+3. [Requirements and Dependencies](#requirements-and-dependencies)
 4. [Clone OpenPose](#clone-openpose)
 5. [Update OpenPose](#update-openpose)
 6. [Installation](#installation)
@@ -45,19 +45,23 @@ This installation section is only intended if you plan to modify the OpenPose co
 
 
 
-## Requirements
-Requirements for the default configuration (you might need more resources with a greater `--net_resolution` and/or `scale_number` or less resources by reducing the net resolution and/or using the MPI and MPI_4 models):
+## Requirements and Dependencies
+- **Requirements** for the default configuration (you might need more resources with a greater `--net_resolution` and/or `scale_number` or less resources by reducing the net resolution and/or using the MPI and MPI_4 models):
+    - Nvidia GPU version:
+        - NVIDIA graphics card with at least 1.6 GB available (the `nvidia-smi` command checks the available GPU memory in Ubuntu).
+        - At least 2.5 GB of free RAM memory for BODY_25 model or 2 GB for COCO model (assuming cuDNN installed).
+        - Highly recommended: cuDNN.
+     - AMD GPU version:
+        - Vega series graphics card
+        - At least 2 GB of free RAM memory.
+    - CPU version:
+        - Around 8GB of free RAM memory.
+    - Highly recommended: a CPU with at least 8 cores.
+- **Dependencies**:
+    - OpenCV (all 2.X and 3.X versions are compatible).
+    - Caffe and all its dependencies. Interesting in porting OpenPose to other DL frameworks (Tensorflow, Caffe2, Pytorch, ...)?. Email us (gines@cmu.edu) if you are interesting in joining the OpenPose team to do so or feel free to make a pull request if you implement any of those!
+    - The demo and tutorials additionally use GFlags.
 
-- Nvidia GPU version:
-    - NVIDIA graphics card with at least 1.6 GB available (the `nvidia-smi` command checks the available GPU memory in Ubuntu).
-    - At least 2.5 GB of free RAM memory for BODY_25 model or 2 GB for COCO model (assuming cuDNN installed).
-    - Highly recommended: cuDNN.
- - AMD GPU version:
-    - Vega series graphics card
-    - At least 2 GB of free RAM memory.
-- CPU version:
-    - Around 8GB of free RAM memory.
-- Highly recommended: a CPU with at least 8 cores.
 
 
 
@@ -348,7 +352,7 @@ After installation, check the [doc/modules/3d_reconstruction_module.md](./module
 
 
 #### Calibration Module
-The calibration module is included by default, but you must also enable `WITH_EIGEN` if you intend to use the extrinsic camera parameter estimation tool. You can set that flag to 2 different values: `APT_GET` or `BUILD`, check [Requirements](#requirements) for more information.
+The calibration module is included by default, but you must also enable `WITH_EIGEN` if you intend to use the extrinsic camera parameter estimation tool. You can set that flag to 2 different values: `APT_GET` or `BUILD`, check [Requirements and Dependencies](#requirements-and-dependencies) for more information.
 
 After installation, check the [doc/modules/calibration_module.md](./modules/calibration_module.md) instructions.
 

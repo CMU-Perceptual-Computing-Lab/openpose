@@ -1,4 +1,4 @@
-// ------------------------- OpenPose Library Tutorial - Real Time Pose Estimation -------------------------
+// ------------------------- OpenPose C++ API Tutorial - Example 6 - XXXXXXXXXXXXX -------------------------
 // If the user wants to learn to use the OpenPose library, we highly recommend to start with the
 // examples in `examples/tutorial_api_cpp/`.
 // This example summarizes all the functionality of the OpenPose library:
@@ -21,9 +21,9 @@
 // OpenPose dependencies
 #include <openpose/headers.hpp>
 
-// If the user needs his own variables, he can inherit the op::Datum struct and add them
+// If the user needs his own variables, he can inherit the op::Datum struct and add them in there.
 // UserDatum can be directly used by the OpenPose wrapper because it inherits from op::Datum, just define
-// Wrapper<UserDatum> instead of Wrapper<op::Datum>
+// WrapperT<std::vector<UserDatum>> instead of Wrapper (or equivalently WrapperT<std::vector<UserDatum>>)
 struct UserDatum : public op::Datum
 {
     bool boolThatUserNeedsForSomeReason;
@@ -120,8 +120,7 @@ int openPoseDemo()
 
         // OpenPose wrapper
         op::log("Configuring OpenPose wrapper...", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-        // op::Wrapper<std::vector<op::Datum>> opWrapper;
-        op::Wrapper<std::vector<UserDatum>> opWrapper;
+        op::WrapperT<std::vector<UserDatum>> opWrapper;
 
         // Initializing the user custom classes
         // Processing

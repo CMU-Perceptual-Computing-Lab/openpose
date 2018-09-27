@@ -1,4 +1,4 @@
-// ------------------------- OpenPose Library Tutorial - Wrapper - Example 2 - Synchronous -------------------------
+// ------------------------- OpenPose C++ API Tutorial - Example 9 - XXXXXXXXXXXXX -------------------------
 // Synchronous mode: ideal for performance. The user can add his own frames producer / post-processor / consumer to the OpenPose wrapper or use the
 // default ones.
 
@@ -27,9 +27,9 @@
 DEFINE_string(image_dir, "examples/media/",
     "Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).");
 
-// If the user needs his own variables, he can inherit the op::Datum struct and add them
+// If the user needs his own variables, he can inherit the op::Datum struct and add them in there.
 // UserDatum can be directly used by the OpenPose wrapper because it inherits from op::Datum, just define
-// Wrapper<UserDatum> instead of Wrapper<op::Datum>
+// WrapperT<std::vector<UserDatum>> instead of Wrapper (or equivalently WrapperT<std::vector<UserDatum>>)
 struct UserDatum : public op::Datum
 {
     bool boolThatUserNeedsForSomeReason;
@@ -264,16 +264,16 @@ int openPoseTutorialWrapper2()
         // GUI (Display)
         auto wUserOutput = std::make_shared<WUserOutput>();
 
-        op::Wrapper<std::vector<UserDatum>> opWrapper;
+        op::WrapperT<std::vector<UserDatum>> opWrapperT;
         // Add custom input
         const auto workerInputOnNewThread = false;
-        opWrapper.setWorker(op::WorkerType::Input, wUserInput, workerInputOnNewThread);
+        opWrapperT.setWorker(op::WorkerType::Input, wUserInput, workerInputOnNewThread);
         // Add custom processing
         const auto workerProcessingOnNewThread = false;
-        opWrapper.setWorker(op::WorkerType::PostProcessing, wUserPostProcessing, workerProcessingOnNewThread);
+        opWrapperT.setWorker(op::WorkerType::PostProcessing, wUserPostProcessing, workerProcessingOnNewThread);
         // Add custom output
         const auto workerOutputOnNewThread = true;
-        opWrapper.setWorker(op::WorkerType::Output, wUserOutput, workerOutputOnNewThread);
+        opWrapperT.setWorker(op::WorkerType::Output, wUserOutput, workerOutputOnNewThread);
         // Configure OpenPose
         op::log("Configuring OpenPose wrapper...", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
         const op::WrapperStructPose wrapperStructPose{
@@ -305,34 +305,34 @@ int openPoseTutorialWrapper2()
             FLAGS_camera_fps, FLAGS_write_heatmaps, FLAGS_write_heatmaps_format, FLAGS_write_video_adam,
             FLAGS_write_bvh, FLAGS_udp_host, FLAGS_udp_port};
         // Configure wrapper
-        opWrapper.configure(wrapperStructPose, wrapperStructFace, wrapperStructHand, wrapperStructExtra,
+        opWrapperT.configure(wrapperStructPose, wrapperStructFace, wrapperStructHand, wrapperStructExtra,
                             op::WrapperStructInput{}, wrapperStructOutput);
         // Set to single-thread (for sequential processing and/or debugging and/or reducing latency)
         if (FLAGS_disable_multi_thread)
-            opWrapper.disableMultiThreading();
+            opWrapperT.disableMultiThreading();
 
         op::log("Starting thread(s)...", op::Priority::High);
         // Two different ways of running the program on multithread environment
         // Start, run & stop threads - it blocks this thread until all others have finished
-        opWrapper.exec();
+        opWrapperT.exec();
 
         // Option b) Keeping this thread free in case you want to do something else meanwhile, e.g. profiling the GPU memory
         // // VERY IMPORTANT NOTE: if OpenCV is compiled with Qt support, this option will not work. Qt needs the main
         // // thread to plot visual results, so the final GUI (which uses OpenCV) would return an exception similar to:
         // // `QMetaMethod::invoke: Unable to invoke methods with return values in queued connections`
         // // Start threads
-        // opWrapper.start();
+        // opWrapperT.start();
         // // Profile used GPU memory
         //     // 1: wait ~10sec so the memory has been totally loaded on GPU
         //     // 2: profile the GPU memory
         // std::this_thread::sleep_for(std::chrono::milliseconds{1000});
         // op::log("Random task here...", op::Priority::High);
         // // Keep program alive while running threads
-        // while (opWrapper.isRunning())
+        // while (opWrapperT.isRunning())
         //     std::this_thread::sleep_for(std::chrono::milliseconds{33});
         // // Stop and join threads
         // op::log("Stopping thread(s)", op::Priority::High);
-        // opWrapper.stop();
+        // opWrapperT.stop();
 
         // Measuring total time
         const auto now = std::chrono::high_resolution_clock::now();

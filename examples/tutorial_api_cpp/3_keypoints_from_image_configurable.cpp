@@ -1,4 +1,4 @@
-// ------------------------- OpenPose API Tutorial - Example 3 - Body from image configurable -------------------------
+// ----------------------- OpenPose C++ API Tutorial - Example 3 - Body from image configurable -----------------------
 // It reads an image, process it, and displays it with the pose (and optionally hand and face) keypoints. In addition,
 // it includes all the OpenPose configuration flags (enable/disable hand, face, output saving, etc.).
 
@@ -84,7 +84,7 @@ int wholeBodyFromImage()
 
     // Configuring OpenPose
     op::log("Configuring OpenPose...", op::Priority::High);
-    op::Wrapper<std::vector<op::Datum>> opWrapper{op::ThreadManagerMode::Asynchronous};
+    op::Wrapper opWrapper{op::ThreadManagerMode::Asynchronous};
     // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
     const op::WrapperStructPose wrapperStructPose{
         !FLAGS_body_disable, netInputSize, outputSize, keypointScale, FLAGS_num_gpu, FLAGS_num_gpu_start,

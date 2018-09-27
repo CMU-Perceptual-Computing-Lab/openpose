@@ -14,40 +14,40 @@
 namespace op
 {
     /**
-     * Wrapper: OpenPose all-in-one wrapper template class.
-     * Wrapper allows the user to set up the input (video, webcam, custom input, etc.), pose, face and/or hands
+     * WrapperT: OpenPose all-in-one wrapper template class. Simplified into Wrapper for WrapperT<std::vector<Datum>>
+     * WrapperT allows the user to set up the input (video, webcam, custom input, etc.), pose, face and/or hands
      * estimation and rendering, and output (integrated small GUI, custom output, etc.).
      *
      * This function can be used in 2 ways:
      *     - Synchronous mode: call the full constructor with your desired input and output workers.
-     *     - Asynchronous mode: call the empty constructor Wrapper() + use the emplace and pop functions to push the
+     *     - Asynchronous mode: call the empty constructor WrapperT() + use the emplace and pop functions to push the
      *       original frames and retrieve the processed ones.
      *     - Mix of them:
-     *         - Synchronous input + asynchronous output: call the constructor Wrapper(ThreadManagerMode::Synchronous,
+     *         - Synchronous input + asynchronous output: call the constructor WrapperT(ThreadManagerMode::Synchronous,
      *           workersInput, {}, true)
      *         - Asynchronous input + synchronous output: call the constructor
-     *           Wrapper(ThreadManagerMode::Synchronous, nullptr, workersOutput, irrelevantBoolean, true)
+     *           WrapperT(ThreadManagerMode::Synchronous, nullptr, workersOutput, irrelevantBoolean, true)
      */
-    template<typename TDatums,
+    template<typename TDatums = std::vector<Datum>,
              typename TDatumsSP = std::shared_ptr<TDatums>,
              typename TWorker = std::shared_ptr<Worker<TDatumsSP>>>
-    class Wrapper
+    class WrapperT
     {
     public:
         /**
          * Constructor.
          * @param threadManagerMode Thread syncronization mode. If set to ThreadManagerMode::Synchronous, everything
-         * will run inside the Wrapper. If ThreadManagerMode::Synchronous(In/Out), then input (frames producer) and/or
-         * output (GUI, writing results, etc.) will be controlled outside the Wrapper class by the user. See
+         * will run inside the WrapperT. If ThreadManagerMode::Synchronous(In/Out), then input (frames producer) and/or
+         * output (GUI, writing results, etc.) will be controlled outside the WrapperT class by the user. See
          * ThreadManagerMode for a detailed explanation of when to use each one.
          */
-        explicit Wrapper(const ThreadManagerMode threadManagerMode = ThreadManagerMode::Synchronous);
+        explicit WrapperT(const ThreadManagerMode threadManagerMode = ThreadManagerMode::Synchronous);
 
         /**
          * Destructor.
          * It automatically frees resources.
          */
-        ~Wrapper();
+        ~WrapperT();
 
         /**
          * Disable multi-threading.
@@ -112,7 +112,7 @@ namespace op
         /**
          * Function to start multi-threading.
          * Similar to start(), but exec() blocks the thread that calls the function (it saves 1 thread). Use exec()
-         * instead of start() if the calling thread will otherwise be waiting for the Wrapper to end.
+         * instead of start() if the calling thread will otherwise be waiting for the WrapperT to end.
          */
         void exec();
 
@@ -134,16 +134,16 @@ namespace op
         void stop();
 
         /**
-         * Whether the Wrapper is running.
+         * Whether the WrapperT is running.
          * It will return true after exec() or start() and before stop(), and false otherwise.
-         * @return Boolean specifying whether the Wrapper is running.
+         * @return Boolean specifying whether the WrapperT is running.
          */
         bool isRunning() const;
 
         /**
          * Emplace (move) an element on the first (input) queue.
          * Only valid if ThreadManagerMode::Asynchronous or ThreadManagerMode::AsynchronousIn.
-         * If the input queue is full or the Wrapper was stopped, it will return false and not emplace it.
+         * If the input queue is full or the WrapperT was stopped, it will return false and not emplace it.
          * @param tDatums TDatumsSP element to be emplaced.
          * @return Boolean specifying whether the tDatums could be emplaced.
          */
@@ -153,7 +153,7 @@ namespace op
          * Emplace (move) an element on the first (input) queue.
          * Similar to tryEmplace.
          * However, if the input queue is full, it will wait until it can emplace it.
-         * If the Wrapper class is stopped before adding the element, it will return false and not emplace it.
+         * If the WrapperT class is stopped before adding the element, it will return false and not emplace it.
          * @param tDatums TDatumsSP element to be emplaced.
          * @return Boolean specifying whether the tDatums could be emplaced.
          */
@@ -178,7 +178,7 @@ namespace op
         /**
          * Pop (retrieve) an element from the last (output) queue.
          * Only valid if ThreadManagerMode::Asynchronous or ThreadManagerMode::AsynchronousOut.
-         * If the output queue is empty or the Wrapper was stopped, it will return false and not retrieve it.
+         * If the output queue is empty or the WrapperT was stopped, it will return false and not retrieve it.
          * @param tDatums TDatumsSP element where the retrieved element will be placed.
          * @return Boolean specifying whether the tDatums could be retrieved.
          */
@@ -188,7 +188,7 @@ namespace op
          * Pop (retrieve) an element from the last (output) queue.
          * Similar to tryPop.
          * However, if the output queue is empty, it will wait until it can pop an element.
-         * If the Wrapper class is stopped before popping the element, it will return false and not retrieve it.
+         * If the WrapperT class is stopped before popping the element, it will return false and not retrieve it.
          * @param tDatums TDatumsSP element where the retrieved element will be placed.
          * @return Boolean specifying whether the tDatums could be retrieved.
          */
@@ -219,8 +219,11 @@ namespace op
         std::array<bool, int(WorkerType::Size)> mUserWsOnNewThread;
         std::array<std::vector<TWorker>, int(WorkerType::Size)> mUserWs;
 
-        DELETE_COPY(Wrapper);
+        DELETE_COPY(WrapperT);
     };
+
+    // Type
+    typedef WrapperT<DATUM_BASE_NO_PTR> Wrapper;
 }
 
 
@@ -232,7 +235,7 @@ namespace op
 namespace op
 {
     template<typename TDatums, typename TDatumsSP, typename TWorker>
-    Wrapper<TDatums, TDatumsSP, TWorker>::Wrapper(const ThreadManagerMode threadManagerMode) :
+    WrapperT<TDatums, TDatumsSP, TWorker>::WrapperT(const ThreadManagerMode threadManagerMode) :
         mThreadManagerMode{threadManagerMode},
         mThreadManager{threadManagerMode},
         mMultiThreadEnabled{true}
@@ -240,7 +243,7 @@ namespace op
     }
 
     template<typename TDatums, typename TDatumsSP, typename TWorker>
-    Wrapper<TDatums, TDatumsSP, TWorker>::~Wrapper()
+    WrapperT<TDatums, TDatumsSP, TWorker>::~WrapperT()
     {
         try
         {
@@ -258,7 +261,7 @@ namespace op
     }
 
     template<typename TDatums, typename TDatumsSP, typename TWorker>
-    void Wrapper<TDatums, TDatumsSP, TWorker>::disableMultiThreading()
+    void WrapperT<TDatums, TDatumsSP, TWorker>::disableMultiThreading()
     {
         try
         {
@@ -271,7 +274,7 @@ namespace op
     }
 
     template<typename TDatums, typename TDatumsSP, typename TWorker>
-    void Wrapper<TDatums, TDatumsSP, TWorker>::setWorker(
+    void WrapperT<TDatums, TDatumsSP, TWorker>::setWorker(
         const WorkerType workerType, const TWorker& worker, const bool workerOnNewThread)
     {
         try
@@ -291,12 +294,12 @@ namespace op
     }
 
     template<typename TDatums, typename TDatumsSP, typename TWorker>
-    void Wrapper<TDatums, TDatumsSP, TWorker>::configure(const WrapperStructPose& wrapperStructPose,
-                                                         const WrapperStructFace& wrapperStructFace,
-                                                         const WrapperStructHand& wrapperStructHand,
-                                                         const WrapperStructExtra& wrapperStructExtra,
-                                                         const WrapperStructInput& wrapperStructInput,
-                                                         const WrapperStructOutput& wrapperStructOutput)
+    void WrapperT<TDatums, TDatumsSP, TWorker>::configure(const WrapperStructPose& wrapperStructPose,
+                                                          const WrapperStructFace& wrapperStructFace,
+                                                          const WrapperStructHand& wrapperStructHand,
+                                                          const WrapperStructExtra& wrapperStructExtra,
+                                                          const WrapperStructInput& wrapperStructInput,
+                                                          const WrapperStructOutput& wrapperStructOutput)
     {
         try
         {
@@ -314,7 +317,7 @@ namespace op
     }
 
     // template<typename TDatums, typename TDatumsSP, typename TWorker>
-    // void Wrapper<TDatums, TDatumsSP, TWorker>::configure(const WrapperStructPose& wrapperStructPose)
+    // void WrapperT<TDatums, TDatumsSP, TWorker>::configure(const WrapperStructPose& wrapperStructPose)
     // {
     //     try
     //     {
@@ -327,7 +330,7 @@ namespace op
     // }
 
     template<typename TDatums, typename TDatumsSP, typename TWorker>
-    void Wrapper<TDatums, TDatumsSP, TWorker>::configure(const WrapperStructFace& wrapperStructFace)
+    void WrapperT<TDatums, TDatumsSP, TWorker>::configure(const WrapperStructFace& wrapperStructFace)
     {
         try
         {
@@ -340,7 +343,7 @@ namespace op
     }
 
     template<typename TDatums, typename TDatumsSP, typename TWorker>
-    void Wrapper<TDatums, TDatumsSP, TWorker>::configure(const WrapperStructHand& wrapperStructHand)
+    void WrapperT<TDatums, TDatumsSP, TWorker>::configure(const WrapperStructHand& wrapperStructHand)
     {
         try
         {
@@ -353,7 +356,7 @@ namespace op
     }
 
     template<typename TDatums, typename TDatumsSP, typename TWorker>
-    void Wrapper<TDatums, TDatumsSP, TWorker>::configure(const WrapperStructExtra& wrapperStructExtra)
+    void WrapperT<TDatums, TDatumsSP, TWorker>::configure(const WrapperStructExtra& wrapperStructExtra)
     {
         try
         {
@@ -366,7 +369,7 @@ namespace op
     }
 
     template<typename TDatums, typename TDatumsSP, typename TWorker>
-    void Wrapper<TDatums, TDatumsSP, TWorker>::configure(const WrapperStructInput& wrapperStructInput)
+    void WrapperT<TDatums, TDatumsSP, TWorker>::configure(const WrapperStructInput& wrapperStructInput)
     {
         try
         {
@@ -379,7 +382,7 @@ namespace op
     }
 
     template<typename TDatums, typename TDatumsSP, typename TWorker>
-    void Wrapper<TDatums, TDatumsSP, TWorker>::configure(const WrapperStructOutput& wrapperStructOutput)
+    void WrapperT<TDatums, TDatumsSP, TWorker>::configure(const WrapperStructOutput& wrapperStructOutput)
     {
         try
         {
@@ -392,7 +395,7 @@ namespace op
     }
 
     template<typename TDatums, typename TDatumsSP, typename TWorker>
-    void Wrapper<TDatums, TDatumsSP, TWorker>::exec()
+    void WrapperT<TDatums, TDatumsSP, TWorker>::exec()
     {
         try
         {
@@ -410,7 +413,7 @@ namespace op
     }
 
     template<typename TDatums, typename TDatumsSP, typename TWorker>
-    void Wrapper<TDatums, TDatumsSP, TWorker>::start()
+    void WrapperT<TDatums, TDatumsSP, TWorker>::start()
     {
         try
         {
@@ -428,7 +431,7 @@ namespace op
     }
 
     template<typename TDatums, typename TDatumsSP, typename TWorker>
-    void Wrapper<TDatums, TDatumsSP, TWorker>::stop()
+    void WrapperT<TDatums, TDatumsSP, TWorker>::stop()
     {
         try
         {
@@ -441,7 +444,7 @@ namespace op
     }
 
     template<typename TDatums, typename TDatumsSP, typename TWorker>
-    bool Wrapper<TDatums, TDatumsSP, TWorker>::isRunning() const
+    bool WrapperT<TDatums, TDatumsSP, TWorker>::isRunning() const
     {
         try
         {
@@ -455,7 +458,7 @@ namespace op
     }
 
     template<typename TDatums, typename TDatumsSP, typename TWorker>
-    bool Wrapper<TDatums, TDatumsSP, TWorker>::tryEmplace(TDatumsSP& tDatums)
+    bool WrapperT<TDatums, TDatumsSP, TWorker>::tryEmplace(TDatumsSP& tDatums)
     {
         try
         {
@@ -472,7 +475,7 @@ namespace op
     }
 
     template<typename TDatums, typename TDatumsSP, typename TWorker>
-    bool Wrapper<TDatums, TDatumsSP, TWorker>::waitAndEmplace(TDatumsSP& tDatums)
+    bool WrapperT<TDatums, TDatumsSP, TWorker>::waitAndEmplace(TDatumsSP& tDatums)
     {
         try
         {
@@ -489,7 +492,7 @@ namespace op
     }
 
     template<typename TDatums, typename TDatumsSP, typename TWorker>
-    bool Wrapper<TDatums, TDatumsSP, TWorker>::tryPush(const TDatumsSP& tDatums)
+    bool WrapperT<TDatums, TDatumsSP, TWorker>::tryPush(const TDatumsSP& tDatums)
     {
         try
         {
@@ -506,7 +509,7 @@ namespace op
     }
 
     template<typename TDatums, typename TDatumsSP, typename TWorker>
-    bool Wrapper<TDatums, TDatumsSP, TWorker>::waitAndPush(const TDatumsSP& tDatums)
+    bool WrapperT<TDatums, TDatumsSP, TWorker>::waitAndPush(const TDatumsSP& tDatums)
     {
         try
         {
@@ -523,7 +526,7 @@ namespace op
     }
 
     template<typename TDatums, typename TDatumsSP, typename TWorker>
-    bool Wrapper<TDatums, TDatumsSP, TWorker>::tryPop(TDatumsSP& tDatums)
+    bool WrapperT<TDatums, TDatumsSP, TWorker>::tryPop(TDatumsSP& tDatums)
     {
         try
         {
@@ -540,7 +543,7 @@ namespace op
     }
 
     template<typename TDatums, typename TDatumsSP, typename TWorker>
-    bool Wrapper<TDatums, TDatumsSP, TWorker>::waitAndPop(TDatumsSP& tDatums)
+    bool WrapperT<TDatums, TDatumsSP, TWorker>::waitAndPop(TDatumsSP& tDatums)
     {
         try
         {
@@ -557,7 +560,7 @@ namespace op
     }
 
     template<typename TDatums, typename TDatumsSP, typename TWorker>
-    bool Wrapper<TDatums, TDatumsSP, TWorker>::emplaceAndPop(TDatumsSP& tDatums)
+    bool WrapperT<TDatums, TDatumsSP, TWorker>::emplaceAndPop(TDatumsSP& tDatums)
     {
         try
         {
@@ -574,7 +577,7 @@ namespace op
     }
 
     template<typename TDatums, typename TDatumsSP, typename TWorker>
-    TDatumsSP Wrapper<TDatums, TDatumsSP, TWorker>::emplaceAndPop(const cv::Mat& cvMat)
+    TDatumsSP WrapperT<TDatums, TDatumsSP, TWorker>::emplaceAndPop(const cv::Mat& cvMat)
     {
         try
         {
@@ -596,7 +599,7 @@ namespace op
         }
     }
 
-    extern template class Wrapper<DATUM_BASE_NO_PTR>;
+    extern template class WrapperT<DATUM_BASE_NO_PTR>;
 }
 
 #endif // OPENPOSE_WRAPPER_WRAPPER_HPP

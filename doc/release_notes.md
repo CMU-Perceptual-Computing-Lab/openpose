@@ -265,7 +265,7 @@ OpenPose Library - Release Notes
     2. Greedy body part connector implemented in CUDA: +~30% speed up in Nvidia (CUDA) version with default flags and +~10% in maximum accuracy configuration. In addition, it provides a small 0.5% boost in accuracy (default flags).
     3. OpenPose can be built as Unity plugin: Added flag `BUILD_UNITY_SUPPORT` and special Unity code.
     4. If camera is unplugged, OpenPose GUI and command line will display a warning and try to reconnect it.
-    5. Wrapper classes simplified and renamed.
+    5. Wrapper classes simplified and renamed. Wrapper renamed as WrapperT, and created Wrapper as the non-templated class equivalent.
     6. API and examples improved:
         1. New header file `flags.hpp` that includes all OpenPose flags, removing the need to copy them repeatedly on each OpenPose example file.
         2. `tutorial_wrapper` renamed as `tutorial_api_cpp` as well as new examples were added.

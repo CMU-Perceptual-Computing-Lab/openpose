@@ -1,4 +1,4 @@
-// ------------------------- OpenPose Library Tutorial - Wrapper - Example 1 - Asynchronous -------------------------
+// ------------------------- OpenPose C++ API Tutorial - Example 4 - Custom Input and Output -------------------------
 // Asynchronous mode: ideal for fast prototyping when performance is not an issue. The user emplaces/pushes and pops frames from the OpenPose wrapper
 // when he desires to.
 
@@ -27,9 +27,9 @@
 DEFINE_string(image_dir, "examples/media/",
     "Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).");
 
-// If the user needs his own variables, he can inherit the op::Datum struct and add them
-// UserDatum can be directly used by the OpenPose wrapper because it inherits from op::Datum, just define Wrapper<UserDatum> instead of
-// Wrapper<op::Datum>
+// If the user needs his own variables, he can inherit the op::Datum struct and add them in there.
+// UserDatum can be directly used by the OpenPose wrapper because it inherits from op::Datum, just define
+// WrapperT<std::vector<UserDatum>> instead of Wrapper (or equivalently WrapperT<std::vector<UserDatum>>)
 struct UserDatum : public op::Datum
 {
     bool boolThatUserNeedsForSomeReason;
@@ -176,7 +176,7 @@ public:
     }
 };
 
-int openPoseTutorialWrapper3()
+int example4()
 {
     try
     {
@@ -219,7 +219,7 @@ int openPoseTutorialWrapper3()
 
         // Configure OpenPose
         op::log("Configuring OpenPose wrapper...", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-        op::Wrapper<std::vector<UserDatum>> opWrapper{op::ThreadManagerMode::Asynchronous};
+        op::WrapperT<std::vector<UserDatum>> opWrapperT{op::ThreadManagerMode::Asynchronous};
         // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
         const op::WrapperStructPose wrapperStructPose{
             !FLAGS_body_disable, netInputSize, outputSize, keypointScale, FLAGS_num_gpu, FLAGS_num_gpu_start,
@@ -250,14 +250,14 @@ int openPoseTutorialWrapper3()
             FLAGS_camera_fps, FLAGS_write_heatmaps, FLAGS_write_heatmaps_format, FLAGS_write_video_adam,
             FLAGS_write_bvh, FLAGS_udp_host, FLAGS_udp_port};
         // Configure wrapper
-        opWrapper.configure(wrapperStructPose, wrapperStructFace, wrapperStructHand, wrapperStructExtra,
+        opWrapperT.configure(wrapperStructPose, wrapperStructFace, wrapperStructHand, wrapperStructExtra,
                             op::WrapperStructInput{}, wrapperStructOutput);
         // Set to single-thread (for sequential processing and/or debugging and/or reducing latency)
         if (FLAGS_disable_multi_thread)
-           opWrapper.disableMultiThreading();
+           opWrapperT.disableMultiThreading();
 
         op::log("Starting thread(s)...", op::Priority::High);
-        opWrapper.start();
+        opWrapperT.start();
 
         // User processing
         UserInputClass userInputClass(FLAGS_image_dir);
@@ -269,10 +269,10 @@ int openPoseTutorialWrapper3()
             auto datumToProcess = userInputClass.createDatum();
             if (datumToProcess != nullptr)
             {
-                auto successfullyEmplaced = opWrapper.waitAndEmplace(datumToProcess);
+                auto successfullyEmplaced = opWrapperT.waitAndEmplace(datumToProcess);
                 // Pop frame
                 std::shared_ptr<std::vector<UserDatum>> datumProcessed;
-                if (successfullyEmplaced && opWrapper.waitAndPop(datumProcessed))
+                if (successfullyEmplaced && opWrapperT.waitAndPop(datumProcessed))
                 {
                     userWantsToExit = userOutputClass.display(datumProcessed);
                     userOutputClass.printKeypoints(datumProcessed);
@@ -284,7 +284,7 @@ int openPoseTutorialWrapper3()
         }
 
         op::log("Stopping thread(s)", op::Priority::High);
-        opWrapper.stop();
+        opWrapperT.stop();
 
         // Measuring total time
         const auto now = std::chrono::high_resolution_clock::now();
@@ -309,6 +309,6 @@ int main(int argc, char *argv[])
     // Parsing command line flags
     gflags::ParseCommandLineFlags(&argc, &argv, true);
 
-    // Running openPoseTutorialWrapper3
-    return openPoseTutorialWrapper3();
+    // Running example4
+    return example4();
 }

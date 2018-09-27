@@ -13,7 +13,7 @@
 namespace op
 {
     /**
-     * It checks that no wrong/contradictory flags are enabled for Wrapper
+     * It checks that no wrong/contradictory flags are enabled for Wrapper(T)
      * @param wrapperStructPose
      * @param wrapperStructFace
      * @param wrapperStructHand
@@ -38,7 +38,7 @@ namespace op
      * Thread ID increase (private internal function).
      * If multi-threading mode, it increases the thread ID.
      * If single-threading mode (for debugging), it does not modify it.
-     * Note that mThreadId must be re-initialized to 0 before starting a new Wrapper configuration.
+     * Note that mThreadId must be re-initialized to 0 before starting a new Wrapper(T) configuration.
      * @param threadId unsigned long long element with the current thread id value. I will be edited to the next
      * `desired thread id number.
      */

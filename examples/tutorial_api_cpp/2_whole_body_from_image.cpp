@@ -1,4 +1,4 @@
-// ------------------------- OpenPose API Tutorial - Example 2 - Whole body from image -------------------------
+// -------------------------- OpenPose C++ API Tutorial - Example 2 - Whole body from image --------------------------
 // It reads an image, process it, and displays it with the pose, hand, and face keypoints.
 
 // Command-line user intraface
@@ -48,7 +48,7 @@ int wholeBodyFromImage()
 
     // Configuring OpenPose
     op::log("Configuring OpenPose...", op::Priority::High);
-    op::Wrapper<std::vector<op::Datum>> opWrapper{op::ThreadManagerMode::Asynchronous};
+    op::Wrapper opWrapper{op::ThreadManagerMode::Asynchronous};
     // Add hand and face
     opWrapper.configure(op::WrapperStructFace{true});
     opWrapper.configure(op::WrapperStructHand{true});

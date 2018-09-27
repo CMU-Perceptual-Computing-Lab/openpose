@@ -1,4 +1,4 @@
-// ------------------------- OpenPose API Tutorial - Example 1 - Body from image -------------------------
+// ----------------------------- OpenPose C++ API Tutorial - Example 1 - Body from image -----------------------------
 // It reads an image, process it, and displays it with the pose keypoints.
 
 // Command-line user intraface
@@ -69,7 +69,7 @@ int bodyFromImage()
 
     // Configuring OpenPose
     op::log("Configuring OpenPose...", op::Priority::High);
-    op::Wrapper<std::vector<op::Datum>> opWrapper{op::ThreadManagerMode::Asynchronous};
+    op::Wrapper opWrapper{op::ThreadManagerMode::Asynchronous};
     // Set to single-thread (for sequential processing and/or debugging and/or reducing latency)
     if (FLAGS_disable_multi_thread)
         opWrapper.disableMultiThreading();

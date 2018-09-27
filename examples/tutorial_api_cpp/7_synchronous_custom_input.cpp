@@ -1,4 +1,4 @@
-// ------------------------- OpenPose Library Tutorial - Real Time Pose Estimation -------------------------
+// ------------------------- OpenPose C++ API Tutorial - Example 7 - XXXXXXXXXXXXX -------------------------
 // If the user wants to learn to use the OpenPose library, we highly recommend to start with the
 // examples in `examples/tutorial_api_cpp/`.
 // This example summarizes all the functionality of the OpenPose library:
@@ -27,9 +27,9 @@
 DEFINE_string(image_dir, "examples/media/",
     "Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).");
 
-// If the user needs his own variables, he can inherit the op::Datum struct and add them
+// If the user needs his own variables, he can inherit the op::Datum struct and add them in there.
 // UserDatum can be directly used by the OpenPose wrapper because it inherits from op::Datum, just define
-// Wrapper<UserDatum> instead of Wrapper<op::Datum>
+// WrapperT<std::vector<UserDatum>> instead of Wrapper (or equivalently WrapperT<std::vector<UserDatum>>)
 struct UserDatum : public op::Datum
 {
     bool boolThatUserNeedsForSomeReason;
@@ -162,15 +162,14 @@ int openPoseDemo()
 
         // OpenPose wrapper
         op::log("Configuring OpenPose wrapper...", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-        // op::Wrapper<std::vector<op::Datum>> opWrapper;
-        op::Wrapper<std::vector<UserDatum>> opWrapper;
+        op::WrapperT<std::vector<UserDatum>> opWrapperT;
 
         // Initializing the user custom classes
         // Frames producer (e.g. video, webcam, ...)
         auto wUserInput = std::make_shared<WUserInput>(FLAGS_image_dir);
         // Add custom processing
         const auto workerInputOnNewThread = true;
-        opWrapper.setWorker(op::WorkerType::Input, wUserInput, workerInputOnNewThread);
+        opWrapperT.setWorker(op::WorkerType::Input, wUserInput, workerInputOnNewThread);
 
         // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
         const op::WrapperStructPose wrapperStructPose{
@@ -205,17 +204,17 @@ int openPoseDemo()
             FLAGS_write_video_adam, FLAGS_write_bvh, FLAGS_udp_host, FLAGS_udp_port};
         // Configure wrapper
 
-        opWrapper.configure(wrapperStructPose, wrapperStructFace, wrapperStructHand, wrapperStructExtra,
+        opWrapperT.configure(wrapperStructPose, wrapperStructFace, wrapperStructHand, wrapperStructExtra,
                             wrapperStructInput, wrapperStructOutput);
         // Set to single-thread (for sequential processing and/or debugging and/or reducing latency)
         if (FLAGS_disable_multi_thread)
-            opWrapper.disableMultiThreading();
+            opWrapperT.disableMultiThreading();
 
         // Start processing
         // Two different ways of running the program on multithread environment
         op::log("Starting thread(s)...", op::Priority::High);
         // Start, run & stop threads - it blocks this thread until all others have finished
-        opWrapper.exec();
+        opWrapperT.exec();
 
         // // Option b) Keeping this thread free in case you want to do something else meanwhile, e.g. profiling the GPU
         // memory
@@ -223,20 +222,20 @@ int openPoseDemo()
         // // thread to plot visual results, so the final GUI (which uses OpenCV) would return an exception similar to:
         // // `QMetaMethod::invoke: Unable to invoke methods with return values in queued connections`
         // // Start threads
-        // opWrapper.start();
+        // opWrapperT.start();
         // // Profile used GPU memory
         //     // 1: wait ~10sec so the memory has been totally loaded on GPU
         //     // 2: profile the GPU memory
         // const auto sleepTimeMs = 10;
-        // for (auto i = 0 ; i < 10000/sleepTimeMs && opWrapper.isRunning() ; i++)
+        // for (auto i = 0 ; i < 10000/sleepTimeMs && opWrapperT.isRunning() ; i++)
         //     std::this_thread::sleep_for(std::chrono::milliseconds{sleepTimeMs});
         // op::Profiler::profileGpuMemory(__LINE__, __FUNCTION__, __FILE__);
         // // Keep program alive while running threads
-        // while (opWrapper.isRunning())
+        // while (opWrapperT.isRunning())
         //     std::this_thread::sleep_for(std::chrono::milliseconds{sleepTimeMs});
         // // Stop and join threads
         // op::log("Stopping thread(s)", op::Priority::High);
-        // opWrapper.stop();
+        // opWrapperT.stop();
 
         // Measuring total time
         const auto now = std::chrono::high_resolution_clock::now();

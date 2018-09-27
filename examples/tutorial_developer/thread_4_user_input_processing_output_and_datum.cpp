@@ -40,9 +40,9 @@ DEFINE_string(image_dir,                "examples/media/",      "Process a direc
 DEFINE_bool(fullscreen,                 false,          "Run in full-screen mode (press f during runtime to toggle).");
 
 
-// If the user needs his own variables, he can inherit the op::Datum struct and add them
+// If the user needs his own variables, he can inherit the op::Datum struct and add them in there.
 // UserDatum can be directly used by the OpenPose wrapper because it inherits from op::Datum, just define
-// Wrapper<UserDatum> instead of Wrapper<op::Datum>
+// WrapperT<std::vector<UserDatum>> instead of Wrapper (or equivalently WrapperT<std::vector<UserDatum>>)
 struct UserDatum : public op::Datum
 {
     bool boolThatUserNeedsForSomeReason;

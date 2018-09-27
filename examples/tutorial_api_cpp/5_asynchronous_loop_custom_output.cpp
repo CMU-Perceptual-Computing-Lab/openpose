@@ -1,6 +1,6 @@
-// ------------------------- OpenPose Library Tutorial - Wrapper - Example 3 - Asynchronous Output -------------------------
-// Asynchronous output mode: ideal for fast prototyping when performance is not an issue and user wants to use the output OpenPose format. The user
-// simply gets the processed frames from the OpenPose wrapper when he desires to.
+// ------------------------- OpenPose C++ API Tutorial - Example 5 - XXXXXXXXXXXXX -------------------------
+// Asynchronous output mode: ideal for fast prototyping when performance is not an issue and user wants to use the
+// output OpenPose format. The user simply gets the processed frames from the OpenPose wrapper when he desires to.
 
 // This example shows the user how to use the OpenPose wrapper class:
     // 1. Read folder of images / video / webcam
@@ -21,9 +21,9 @@
 // OpenPose dependencies
 #include <openpose/headers.hpp>
 
-// If the user needs his own variables, he can inherit the op::Datum struct and add them
+// If the user needs his own variables, he can inherit the op::Datum struct and add them in there.
 // UserDatum can be directly used by the OpenPose wrapper because it inherits from op::Datum, just define
-// Wrapper<UserDatum> instead of Wrapper<op::Datum>
+// WrapperT<std::vector<UserDatum>> instead of Wrapper (or equivalently WrapperT<std::vector<UserDatum>>)
 struct UserDatum : public op::Datum
 {
     bool boolThatUserNeedsForSomeReason;
@@ -160,7 +160,7 @@ int openPoseTutorialWrapper1()
 
         // Configure OpenPose
         op::log("Configuring OpenPose wrapper...", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-        op::Wrapper<std::vector<UserDatum>> opWrapper{op::ThreadManagerMode::AsynchronousOut};
+        op::WrapperT<std::vector<UserDatum>> opWrapperT{op::ThreadManagerMode::AsynchronousOut};
         // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
         const op::WrapperStructPose wrapperStructPose{
             !FLAGS_body_disable, netInputSize, outputSize, keypointScale, FLAGS_num_gpu, FLAGS_num_gpu_start,
@@ -195,14 +195,14 @@ int openPoseTutorialWrapper1()
             FLAGS_camera_fps, FLAGS_write_heatmaps, FLAGS_write_heatmaps_format, FLAGS_write_video_adam,
             FLAGS_write_bvh, FLAGS_udp_host, FLAGS_udp_port};
         // Configure wrapper
-        opWrapper.configure(wrapperStructPose, wrapperStructFace, wrapperStructHand, wrapperStructExtra,
+        opWrapperT.configure(wrapperStructPose, wrapperStructFace, wrapperStructHand, wrapperStructExtra,
                             wrapperStructInput, wrapperStructOutput);
         // Set to single-thread (for sequential processing and/or debugging and/or reducing latency)
         if (FLAGS_disable_multi_thread)
-           opWrapper.disableMultiThreading();
+           opWrapperT.disableMultiThreading();
 
         op::log("Starting thread(s)...", op::Priority::High);
-        opWrapper.start();
+        opWrapperT.start();
 
         // User processing
         UserOutputClass userOutputClass;
@@ -211,7 +211,7 @@ int openPoseTutorialWrapper1()
         {
             // Pop frame
             std::shared_ptr<std::vector<UserDatum>> datumProcessed;
-            if (opWrapper.waitAndPop(datumProcessed))
+            if (opWrapperT.waitAndPop(datumProcessed))
             {
                 userWantsToExit = userOutputClass.display(datumProcessed);;
                 userOutputClass.printKeypoints(datumProcessed);
@@ -221,7 +221,7 @@ int openPoseTutorialWrapper1()
         }
 
         op::log("Stopping thread(s)", op::Priority::High);
-        opWrapper.stop();
+        opWrapperT.stop();
 
         // Measuring total time
         const auto now = std::chrono::high_resolution_clock::now();
