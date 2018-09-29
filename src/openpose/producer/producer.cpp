@@ -1,4 +1,3 @@
-#include <thread>
 #include <openpose/utilities/check.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/producer/producer.hpp>

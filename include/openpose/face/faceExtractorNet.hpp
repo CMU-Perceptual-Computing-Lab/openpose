@@ -2,7 +2,6 @@
 #define OPENPOSE_FACE_FACE_EXTRACTOR_HPP
 
 #include <atomic>
-#include <thread>
 #include <opencv2/core/core.hpp> // cv::Mat
 #include <openpose/core/common.hpp>
 #include <openpose/core/enumClasses.hpp>

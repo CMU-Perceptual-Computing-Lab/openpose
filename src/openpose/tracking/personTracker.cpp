@@ -1,5 +1,4 @@
 #include <iostream>
-#include <thread>
 #include <opencv2/imgproc/imgproc.hpp> // cv::resize
 #include <openpose/tracking/personTracker.hpp>
 #include <openpose/utilities/fastMath.hpp>

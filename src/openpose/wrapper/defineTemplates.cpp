@@ -2,5 +2,5 @@
 
 namespace op
 {
-    template class OP_API Wrapper<DATUM_BASE_NO_PTR>;
+    template class OP_API WrapperT<DATUM_BASE_NO_PTR>;
 }

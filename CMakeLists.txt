@@ -26,10 +26,28 @@ if (NOT WIN32 AND NOT UNIX AND NOT APPLE)
 endif (NOT WIN32 AND NOT UNIX AND NOT APPLE)
 
 
-### BUILD_TYPE
+### CMAKE_BUILD_TYPE
 # Default: Release
-set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
-set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+# Bug fixed: By default, it uses something different to Release, that provokes OpenPose to be about 15% slower than
+# it should be.
+# Is CMAKE_BUILD_TYPE "Debug" or "MinSizeRel" or "RelWithDebInfo"?
+set(CMAKE_BUILD_TYPE_KNOWN FALSE)
+if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
+  set(CMAKE_BUILD_TYPE_KNOWN TRUE)
+endif (${CMAKE_BUILD_TYPE} MATCHES "Debug")
+if (${CMAKE_BUILD_TYPE} MATCHES "MinSizeRel")
+  set(CMAKE_BUILD_TYPE_KNOWN TRUE)
+endif (${CMAKE_BUILD_TYPE} MATCHES "MinSizeRel")
+if (${CMAKE_BUILD_TYPE} MATCHES "RelWithDebInfo")
+  set(CMAKE_BUILD_TYPE_KNOWN TRUE)
+endif (${CMAKE_BUILD_TYPE} MATCHES "RelWithDebInfo")
+# Assign proper CMAKE_BUILD_TYPE
+if (${CMAKE_BUILD_TYPE_KNOWN})
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build.")
+else (${CMAKE_BUILD_TYPE_KNOWN})
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
+endif (${CMAKE_BUILD_TYPE_KNOWN})
+set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Release" "Debug" "MinSizeRel" "RelWithDebInfo")
 
 
 ### FLAGS

@@ -1,6 +1,5 @@
 #include <fstream>
 #include <numeric> // std::accumulate
-#include <thread>
 #include <opencv2/core/core.hpp>
 #ifdef USE_EIGEN
     #include <Eigen/Dense>

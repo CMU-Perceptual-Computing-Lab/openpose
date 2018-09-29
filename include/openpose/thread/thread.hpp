@@ -2,7 +2,6 @@
 #define OPENPOSE_THREAD_THREAD_HPP
 
 #include <atomic>
-#include <thread>
 #include <openpose/core/common.hpp>
 #include <openpose/thread/subThread.hpp>
 #include <openpose/thread/worker.hpp>

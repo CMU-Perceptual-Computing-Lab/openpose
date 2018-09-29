@@ -1,9 +1,9 @@
-// ------------------------- OpenPose Library Tutorial - Pose - Example 2 - Extract Pose or Heatmap from Image -------------------------
-// This second example shows the user how to:
+// ------------------------- OpenPose Library Tutorial - Pose - Example 1 - Extract from Image -------------------------
+// This first example shows the user how to:
     // 1. Load an image (`filestream` module)
     // 2. Extract the pose of that image (`pose` module)
-    // 3. Render the pose or heatmap on a resized copy of the input image (`pose` module)
-    // 4. Display the rendered pose or heatmap (`gui` module)
+    // 3. Render the pose on a resized copy of the input image (`pose` module)
+    // 4. Display the rendered pose (`gui` module)
 // In addition to the previous OpenPose modules, we also need to use:
     // 1. `core` module: for the Array<float> class that the `pose` module needs
     // 2. `utilities` module: for the error & logging functions, i.e. op::error & op::log respectively
@@ -49,9 +49,6 @@ DEFINE_double(scale_gap,                0.3,            "Scale gap between scale
                                                         " `net_resolution` by your desired initial scale.");
 DEFINE_int32(scale_number,              1,              "Number of scales to average.");
 // OpenPose Rendering
-DEFINE_int32(part_to_show,              19,             "Prediction channel to visualize (default: 0). 0 for all the body parts, 1-18 for each body"
-                                                        " part heat map, 19 for the background heat map, 20 for all the body part heat maps"
-                                                        " together, 21 for all the PAFs, 22-40 for each body part pair PAF.");
 DEFINE_bool(disable_blending,           false,          "If enabled, it will render the results (keypoint skeletons or heatmaps) on a black"
                                                         " background, instead of being rendered into the original image. Related: `part_to_show`,"
                                                         " `alpha_pose`, and `alpha_pose`.");
@@ -61,10 +58,8 @@ DEFINE_double(render_threshold,         0.05,           "Only estimated keypoint
                                                         " more false positives (i.e. wrong detections).");
 DEFINE_double(alpha_pose,               0.6,            "Blending factor (range 0-1) for the body part rendering. 1 will show it completely, 0 will"
                                                         " hide it. Only valid for GPU rendering.");
-DEFINE_double(alpha_heatmap,            0.7,            "Blending factor (range 0-1) between heatmap and original frame. 1 will only show the"
-                                                        " heatmap, 0 will only show the frame. Only valid for GPU rendering.");
 
-int openPoseTutorialPose2()
+int tutorialDeveloperPose1()
 {
     try
     {
@@ -79,7 +74,7 @@ int openPoseTutorialPose2()
                   __LINE__, __FUNCTION__, __FILE__);
         op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
         op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-        // Step 2 - Read Google flags (user defined configuration)
+        // Step 2 - Read GFlags (user defined configuration)
         // outputSize
         const auto outputSize = op::flagsToPoint(FLAGS_output_resolution, "-1x-1");
         // netInputSize
@@ -92,22 +87,18 @@ int openPoseTutorialPose2()
         if (FLAGS_scale_gap <= 0. && FLAGS_scale_number > 1)
             op::error("Incompatible flag configuration: scale_gap must be greater than 0 or scale_number = 1.",
                       __LINE__, __FUNCTION__, __FILE__);
-        // Logging
-        op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
         // Step 3 - Initialize all required classes
         op::ScaleAndSizeExtractor scaleAndSizeExtractor(netInputSize, outputSize, FLAGS_scale_number, FLAGS_scale_gap);
         op::CvMatToOpInput cvMatToOpInput{poseModel};
         op::CvMatToOpOutput cvMatToOpOutput;
-        auto poseExtractorPtr = std::make_shared<op::PoseExtractorCaffe>(poseModel, FLAGS_model_folder,
-                                                                         FLAGS_num_gpu_start);
-        op::PoseGpuRenderer poseGpuRenderer{poseModel, poseExtractorPtr, (float)FLAGS_render_threshold,
-                                            !FLAGS_disable_blending, (float)FLAGS_alpha_pose, (float)FLAGS_alpha_heatmap};
-        poseGpuRenderer.setElementToRender(FLAGS_part_to_show);
+        op::PoseExtractorCaffe poseExtractorCaffe{poseModel, FLAGS_model_folder, FLAGS_num_gpu_start};
+        op::PoseCpuRenderer poseRenderer{poseModel, (float)FLAGS_render_threshold, !FLAGS_disable_blending,
+                                         (float)FLAGS_alpha_pose};
         op::OpOutputToCvMat opOutputToCvMat;
-        op::FrameDisplayer frameDisplayer{"OpenPose Tutorial - Example 2", outputSize};
+        op::FrameDisplayer frameDisplayer{"OpenPose Tutorial - Example 1", outputSize};
         // Step 4 - Initialize resources on desired thread (in this case single thread, i.e. we init resources here)
-        poseExtractorPtr->initializationOnThread();
-        poseGpuRenderer.initializationOnThread();
+        poseExtractorCaffe.initializationOnThread();
+        poseRenderer.initializationOnThread();
 
         // ------------------------- POSE ESTIMATION AND RENDERING -------------------------
         // Step 1 - Read and load image, error if empty (possibly wrong path)
@@ -127,11 +118,10 @@ int openPoseTutorialPose2()
         const auto netInputArray = cvMatToOpInput.createArray(inputImage, scaleInputToNetInputs, netInputSizes);
         auto outputArray = cvMatToOpOutput.createArray(inputImage, scaleInputToOutput, outputResolution);
         // Step 4 - Estimate poseKeypoints
-        poseExtractorPtr->forwardPass(netInputArray, imageSize, scaleInputToNetInputs);
-        const auto poseKeypoints = poseExtractorPtr->getPoseKeypoints();
-        const auto scaleNetToOutput = poseExtractorPtr->getScaleNetToOutput();
-        // Step 5 - Render pose
-        poseGpuRenderer.renderPose(outputArray, poseKeypoints, scaleInputToOutput, scaleNetToOutput);
+        poseExtractorCaffe.forwardPass(netInputArray, imageSize, scaleInputToNetInputs);
+        const auto poseKeypoints = poseExtractorCaffe.getPoseKeypoints();
+        // Step 5 - Render poseKeypoints
+        poseRenderer.renderPose(outputArray, poseKeypoints, scaleInputToOutput);
         // Step 6 - OpenPose output format to cv::Mat
         auto outputImage = opOutputToCvMat.formatToCvMat(outputArray);
 
@@ -160,6 +150,6 @@ int main(int argc, char *argv[])
     // Parsing command line flags
     gflags::ParseCommandLineFlags(&argc, &argv, true);
 
-    // Running openPoseTutorialPose2
-    return openPoseTutorialPose2();
+    // Running tutorialDeveloperPose1
+    return tutorialDeveloperPose1();
 }

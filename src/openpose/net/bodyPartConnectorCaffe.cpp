@@ -4,9 +4,9 @@
 #ifdef USE_CUDA
     #include <openpose/gpu/cuda.hpp>
 #endif
-#include <openpose/pose/bodyPartConnectorBase.hpp>
+#include <openpose/net/bodyPartConnectorBase.hpp>
 #include <openpose/pose/poseParameters.hpp>
-#include <openpose/pose/bodyPartConnectorCaffe.hpp>
+#include <openpose/net/bodyPartConnectorCaffe.hpp>
 
 namespace op
 {

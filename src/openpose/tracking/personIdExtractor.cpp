@@ -1,4 +1,3 @@
-#include <thread>
 #include <openpose/tracking/pyramidalLK.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/tracking/personIdExtractor.hpp>

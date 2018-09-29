@@ -4,7 +4,7 @@ OpenPose - Installation
 ## Contents
 1. [Windows Portable Demo](#windows-portable-demo)
 2. [Operating Systems](#operating-systems)
-3. [Requirements](#requirements)
+3. [Requirements and Dependencies](#requirements-and-dependencies)
 4. [Clone OpenPose](#clone-openpose)
 5. [Update OpenPose](#update-openpose)
 6. [Installation](#installation)
@@ -45,19 +45,23 @@ This installation section is only intended if you plan to modify the OpenPose co
 
 
 
-## Requirements
-Requirements for the default configuration (you might need more resources with a greater `--net_resolution` and/or `scale_number` or less resources by reducing the net resolution and/or using the MPI and MPI_4 models):
+## Requirements and Dependencies
+- **Requirements** for the default configuration (you might need more resources with a greater `--net_resolution` and/or `scale_number` or less resources by reducing the net resolution and/or using the MPI and MPI_4 models):
+    - Nvidia GPU version:
+        - NVIDIA graphics card with at least 1.6 GB available (the `nvidia-smi` command checks the available GPU memory in Ubuntu).
+        - At least 2.5 GB of free RAM memory for BODY_25 model or 2 GB for COCO model (assuming cuDNN installed).
+        - Highly recommended: cuDNN.
+     - AMD GPU version:
+        - Vega series graphics card
+        - At least 2 GB of free RAM memory.
+    - CPU version:
+        - Around 8GB of free RAM memory.
+    - Highly recommended: a CPU with at least 8 cores.
+- **Dependencies**:
+    - OpenCV (all 2.X and 3.X versions are compatible).
+    - Caffe and all its dependencies. Interesting in porting OpenPose to other DL frameworks (Tensorflow, Caffe2, Pytorch, ...)?. Email us (gines@cmu.edu) if you are interesting in joining the OpenPose team to do so or feel free to make a pull request if you implement any of those!
+    - The demo and tutorials additionally use GFlags.
 
-- Nvidia GPU version:
-    - NVIDIA graphics card with at least 1.6 GB available (the `nvidia-smi` command checks the available GPU memory in Ubuntu).
-    - At least 2.5 GB of free RAM memory for BODY_25 model or 2 GB for COCO model (assuming cuDNN installed).
-    - Highly recommended: cuDNN.
- - AMD GPU version:
-    - Vega series graphics card
-    - At least 2 GB of free RAM memory.
-- CPU version:
-    - Around 8GB of free RAM memory.
-- Highly recommended: a CPU with at least 8 cores.
 
 
 
@@ -112,14 +116,20 @@ Any problem installing OpenPose? Check [doc/faq.md](./faq.md) and/or post a GitH
     - Windows: download and install the latest CMake win64-x64 msi installer from the [CMake website](https://cmake.org/download/), called `cmake-X.X.X-win64-x64.msi`.
     - Mac: `brew cask install cmake`.
 3. Windows - **Microsoft Visual Studio (VS) 2015 Enterprise Update 3**:
-    - If **Visual Studio 2017 Community** is desired, we do not officially support it, but it might be compiled by firstly [enabling CUDA 8.0 in VS2017](https://stackoverflow.com/questions/43745099/using-cuda-with-visual-studio-2017?answertab=active#tab-top) or use **VS2017 with CUDA 9** by checking the `.vcxproj` file and changing the necessary paths from CUDA 8 to 9.
-    - VS 2015 Enterprise Update 1 will give some compiler errors and VS 2015 Community has not been tested.
+    - **IMPORTANT**: Enable all C++-related flags when selecting the components to install.
+    - Different VS versions:
+        - If **Visual Studio 2017 Community** is desired, we do not officially support it, but it might be compiled by firstly [enabling CUDA 8.0 in VS2017](https://stackoverflow.com/questions/43745099/using-cuda-with-visual-studio-2017?answertab=active#tab-top) or use **VS2017 with CUDA 9** by checking the `.vcxproj` file and changing the necessary paths from CUDA 8 to 9.
+        - VS 2015 Enterprise Update 1 will give some compiler errors.
+        - VS 2015 Community has not been tested.
 4. Nvidia GPU version prerequisites:
     1. [**CUDA 8**](https://developer.nvidia.com/cuda-80-ga2-download-archive):
         - Ubuntu: Run `sudo ubuntu/install_cuda.sh` or alternatively download and install it from their website.
-        - Windows: Install CUDA 8.0 after Visual Studio 2015 is installed to assure that the CUDA installation will generate all necessary files for VS. If CUDA was already installed, re-install - **IMPORTANT 1/2**: Nvidia V, any Nvidia with Volta architecture, and newer Nvidia model GPUs require at least CUDA 9.
-        - **IMPORTANT 2/2**: As of a recent Windows update, you might want to download the Nvidia [drivers](http://www.nvidia.com/Download/index.aspx) first, and then install CUDA without the Graphics Driver flag or else your system might hang.
-    2. [**cuDNN 5.1**](https://developer.nvidia.com/cudnn):
+        - Windows: Install CUDA 8.0 after Visual Studio 2015 is installed to assure that the CUDA installation will generate all necessary files for VS. If CUDA was already installed, re-install it.
+        - **Important installation tips**:
+            - New Nvidia model GPUs (e.g., Nvidia V, GTX 2080, any Nvidia with Volta or Turing architecture, etc.) require at least CUDA 9.
+            - (Windows issue, reported Sep 2018): If your computer hangs when installing CUDA drivers, try installing first the [Nvidia drivers](http://www.nvidia.com/Download/index.aspx), and then installing CUDA without the Graphics Driver flag.
+            - (Windows): If CMake returns and error message similar to `CUDA_TOOLKIT_ROOT_DIR not found or specified` or any other CUDA component missing, then: 1) Re-install Visual Studio 2015; 2) Reboot your PC; 3) Re-install CUDA.
+    2. [**cuDNN 5.1**](https://developer.nvidia.com/rdp/cudnn-archive):
         - Ubuntu: Run `sudo ubuntu/install_cudnn.sh` or alternatively download and install it from their website.
         - Windows (and Ubuntu if manual installation): In order to manually install it, just unzip it and copy (merge) the contents on the CUDA folder, usually `/usr/local/cuda/` in Ubuntu and `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0` in Windows.
 5. AMD GPU version prerequisites:
@@ -342,7 +352,7 @@ After installation, check the [doc/modules/3d_reconstruction_module.md](./module
 
 
 #### Calibration Module
-The calibration module is included by default, but you must also enable `WITH_EIGEN` if you intend to use the extrinsic camera parameter estimation tool. You can set that flag to 2 different values: `APT_GET` or `BUILD`, check [Requirements](#requirements) for more information.
+The calibration module is included by default, but you must also enable `WITH_EIGEN` if you intend to use the extrinsic camera parameter estimation tool. You can set that flag to 2 different values: `APT_GET` or `BUILD`, check [Requirements and Dependencies](#requirements-and-dependencies) for more information.
 
 After installation, check the [doc/modules/calibration_module.md](./modules/calibration_module.md) instructions.
 

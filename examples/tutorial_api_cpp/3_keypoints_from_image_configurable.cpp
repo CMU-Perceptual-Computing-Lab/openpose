@@ -1,34 +1,60 @@
-// ------------------------------------------------ OpenPose C++ Demo ------------------------------------------------
-// This example summarizes all the functionality of the OpenPose library. It can...
-    // 1. Read a frames source (images, video, webcam, 3D stereo Flir cameras, etc.).
-    // 2. Extract and render body/hand/face/foot keypoint/heatmap/PAF of that image.
-    // 3. Save the results on disk.
-    // 4. Display the rendered pose.
-// If the user wants to learn to use the OpenPose C++ library, we highly recommend to start with the examples in
-// `examples/tutorial_api_cpp/`.
+// ----------------------- OpenPose C++ API Tutorial - Example 3 - Body from image configurable -----------------------
+// It reads an image, process it, and displays it with the pose (and optionally hand and face) keypoints. In addition,
+// it includes all the OpenPose configuration flags (enable/disable hand, face, output saving, etc.).
 
 // Command-line user intraface
+#define OPENPOSE_FLAGS_DISABLE_PRODUCER
+#define OPENPOSE_FLAGS_DISABLE_DISPLAY
 #include <openpose/flags.hpp>
 // OpenPose dependencies
 #include <openpose/headers.hpp>
 
-int openPoseDemo()
+// Custom OpenPose flags
+// Producer
+DEFINE_string(image_path, "examples/media/COCO_val2014_000000000294.jpg",
+    "Process an image. Read all standard formats (jpg, png, bmp, etc.).");
+
+// This worker will just read and return all the jpg files in a directory
+void display(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr)
+{
+    // User's displaying/saving/other processing here
+        // datum.cvOutputData: rendered frame with pose or heatmaps
+        // datum.poseKeypoints: Array<float> with the estimated pose
+    if (datumsPtr != nullptr && !datumsPtr->empty())
+    {
+        // Display image
+        cv::imshow("User worker GUI", datumsPtr->at(0).cvOutputData);
+        cv::waitKey(0);
+    }
+    else
+        op::log("Nullptr or empty datumsPtr found.", op::Priority::High);
+}
+
+void printKeypoints(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr)
+{
+    // Example: How to use the pose keypoints
+    if (datumsPtr != nullptr && !datumsPtr->empty())
+    {
+        op::log("Body keypoints: " + datumsPtr->at(0).poseKeypoints.toString());
+        op::log("Face keypoints: " + datumsPtr->at(0).faceKeypoints.toString());
+        op::log("Left hand keypoints: " + datumsPtr->at(0).handKeypoints[0].toString());
+        op::log("Right hand keypoints: " + datumsPtr->at(0).handKeypoints[1].toString());
+    }
+    else
+        op::log("Nullptr or empty datumsPtr found.", op::Priority::High);
+}
+
+int tutorialApiCpp3()
 {
     try
     {
         op::log("Starting OpenPose demo...", op::Priority::High);
-        const auto timerBegin = std::chrono::high_resolution_clock::now();
 
         // logging_level
         op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.",
                   __LINE__, __FUNCTION__, __FILE__);
         op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
         op::Profiler::setDefaultX(FLAGS_profile_speed);
-        // // For debugging
-        // // Print all logging messages
-        // op::ConfigureLog::setPriorityThreshold(op::Priority::None);
-        // // Print out speed values faster
-        // op::Profiler::setDefaultX(100);
 
         // Applying user defined configuration - GFlags to program variables
         // outputSize
@@ -39,11 +65,6 @@ int openPoseDemo()
         const auto faceNetInputSize = op::flagsToPoint(FLAGS_face_net_resolution, "368x368 (multiples of 16)");
         // handNetInputSize
         const auto handNetInputSize = op::flagsToPoint(FLAGS_hand_net_resolution, "368x368 (multiples of 16)");
-        // producerType
-        const auto producerSharedPtr = op::flagsToProducer(
-            FLAGS_image_dir, FLAGS_video, FLAGS_ip_camera, FLAGS_camera, FLAGS_flir_camera, FLAGS_camera_resolution,
-            FLAGS_camera_fps, FLAGS_camera_parameter_folder, !FLAGS_frame_keep_distortion,
-            (unsigned int) FLAGS_3d_views, FLAGS_flir_camera_index);
         // poseModel
         const auto poseModel = op::flagsToPoseModel(FLAGS_model_pose);
         // JSON saving
@@ -57,13 +78,13 @@ int openPoseDemo()
                                                       FLAGS_heatmaps_add_PAFs);
         const auto heatMapScale = op::flagsToHeatMapScaleMode(FLAGS_heatmaps_scale);
         // >1 camera view?
-        const auto multipleView = (FLAGS_3d || FLAGS_3d_views > 1 || FLAGS_flir_camera);
+        const auto multipleView = (FLAGS_3d || FLAGS_3d_views > 1);
         // Enabling Google Logging
         const bool enableGoogleLogging = true;
 
         // Configuring OpenPose
         op::log("Configuring OpenPose...", op::Priority::High);
-        op::Wrapper opWrapper;
+        op::Wrapper opWrapper{op::ThreadManagerMode::Asynchronous};
         // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
         const op::WrapperStructPose wrapperStructPose{
             !FLAGS_body_disable, netInputSize, outputSize, keypointScale, FLAGS_num_gpu, FLAGS_num_gpu_start,
@@ -87,36 +108,37 @@ int openPoseDemo()
         const op::WrapperStructExtra wrapperStructExtra{
             FLAGS_3d, FLAGS_3d_min_views, FLAGS_identification, FLAGS_tracking, FLAGS_ik_threads};
         opWrapper.configure(wrapperStructExtra);
-        // Producer (use default to disable any input)
-        const op::WrapperStructInput wrapperStructInput{
-            producerSharedPtr, FLAGS_frame_first, FLAGS_frame_last, FLAGS_process_real_time, FLAGS_frame_flip, 
-            FLAGS_frame_rotate, FLAGS_frames_repeat};
-        opWrapper.configure(wrapperStructInput);
         // Consumer (comment or use default argument to disable any output)
+        const auto displayMode = op::DisplayMode::NoDisplay;
+        const bool guiVerbose = false;
+        const bool fullScreen = false;
         const op::WrapperStructOutput wrapperStructOutput{
-            op::flagsToDisplayMode(FLAGS_display, FLAGS_3d), !FLAGS_no_gui_verbose, FLAGS_fullscreen,
-            FLAGS_write_keypoint, op::stringToDataFormat(FLAGS_write_keypoint_format), FLAGS_write_json,
-            FLAGS_write_coco_json, FLAGS_write_coco_foot_json, FLAGS_write_images, FLAGS_write_images_format,
-            FLAGS_write_video, FLAGS_camera_fps, FLAGS_write_heatmaps, FLAGS_write_heatmaps_format,
-            FLAGS_write_video_adam, FLAGS_write_bvh, FLAGS_udp_host, FLAGS_udp_port};
+            displayMode, guiVerbose, fullScreen, FLAGS_write_keypoint,
+            op::stringToDataFormat(FLAGS_write_keypoint_format), FLAGS_write_json, FLAGS_write_coco_json,
+            FLAGS_write_coco_foot_json, FLAGS_write_images, FLAGS_write_images_format, FLAGS_write_video,
+            FLAGS_camera_fps, FLAGS_write_heatmaps, FLAGS_write_heatmaps_format, FLAGS_write_video_adam,
+            FLAGS_write_bvh, FLAGS_udp_host, FLAGS_udp_port};
         opWrapper.configure(wrapperStructOutput);
         // Set to single-thread (for sequential processing and/or debugging and/or reducing latency)
         if (FLAGS_disable_multi_thread)
             opWrapper.disableMultiThreading();
-
-        // Start, run, and stop processing - exec() blocks this thread until OpenPose wrapper has finished
+        // Starting OpenPose
         op::log("Starting thread(s)...", op::Priority::High);
-        opWrapper.exec();
+        opWrapper.start();
 
-        // Measuring total time
-        const auto now = std::chrono::high_resolution_clock::now();
-        const auto totalTimeSec = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(now-timerBegin).count()
-                                * 1e-9;
-        const auto message = "OpenPose demo successfully finished. Total time: "
-                           + std::to_string(totalTimeSec) + " seconds.";
-        op::log(message, op::Priority::High);
+        // Process and display image
+        const auto imageToProcess = cv::imread(FLAGS_image_path);
+        auto datumProcessed = opWrapper.emplaceAndPop(imageToProcess);
+        if (datumProcessed != nullptr)
+        {
+            printKeypoints(datumProcessed);
+            display(datumProcessed);
+        }
+        else
+            op::log("Image could not be processed.", op::Priority::High);
 
         // Return successful message
+        op::log("Stopping OpenPose...", op::Priority::High);
         return 0;
     }
     catch (const std::exception& e)
@@ -131,6 +153,6 @@ int main(int argc, char *argv[])
     // Parsing command line flags
     gflags::ParseCommandLineFlags(&argc, &argv, true);
 
-    // Running openPoseDemo
-    return openPoseDemo();
+    // Running tutorialApiCpp3
+    return tutorialApiCpp3();
 }

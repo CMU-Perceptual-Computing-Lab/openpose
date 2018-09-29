@@ -3,26 +3,12 @@
 // Implemented on top of OpenCV.
 // It computes and saves the intrinsics parameters of the input images.
 
-// C++ std library dependencies
-#include <chrono> // `std::chrono::` functions and classes, e.g. std::chrono::milliseconds
-#include <thread> // std::this_thread
-// Other 3rdparty dependencies
-// GFlags: DEFINE_bool, _int32, _int64, _uint64, _double, _string
-#include <gflags/gflags.h>
-// Allow Google Flags in Ubuntu 14
-#ifndef GFLAGS_GFLAGS_H_
-    namespace gflags = google;
-#endif
+// Command-line user intraface
+#define OPENPOSE_FLAGS_DISABLE_POSE
+#include <openpose/flags.hpp>
 // OpenPose dependencies
 #include <openpose/headers.hpp>
 
-// See all the available parameter options withe the `--help` flag. E.g. `build/examples/openpose/openpose.bin --help`
-// Note: This command will show you flags for other unnecessary 3rdparty files. Check only the flags for the OpenPose
-// executable. E.g. for `openpose.bin`, look for `Flags from examples/openpose/openpose.cpp:`.
-// Debugging/Other
-DEFINE_int32(logging_level,             3,              "The logging level. Integer in the range [0, 255]. 0 will output any log() message, while"
-                                                        " 255 will not output any. Current OpenPose library messages are in the range 0-4: 1 for"
-                                                        " low priority messages and 4 for important ones.");
 // Calibration
 DEFINE_int32(mode,                      1,              "Select 1 for intrinsic camera parameter calibration, 2 for extrinsic calibration.");
 DEFINE_string(calibration_image_dir,    "images/intrinsics/", "Directory where the images for camera parameter calibration are placed.");

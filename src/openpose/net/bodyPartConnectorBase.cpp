@@ -1,7 +1,7 @@
 #include <openpose/utilities/check.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/pose/poseParameters.hpp>
-#include <openpose/pose/bodyPartConnectorBase.hpp>
+#include <openpose/net/bodyPartConnectorBase.hpp>
 
 namespace op
 {

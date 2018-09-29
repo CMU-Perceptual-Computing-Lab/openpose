@@ -3,7 +3,7 @@
     // 1. Read folder of images / video / webcam  (`producer` module)
     // 2. Use the processing implemented by the user
     // 3. Display the rendered pose (`gui` module)
-    // Everything in a multi-thread scenario (`thread` module) 
+    // Everything in a multi-thread scenario (`thread` module)
 // In addition to the previous OpenPose modules, we also need to use:
     // 1. `core` module: for the Datum struct that the `thread` module sends between the queues
     // 2. `utilities` module: for the error & logging functions, i.e. op::error & op::log respectively

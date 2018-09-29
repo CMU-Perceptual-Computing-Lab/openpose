@@ -1,7 +1,7 @@
 #include <openpose/gpu/cuda.hpp>
 #include <openpose/pose/poseParameters.hpp>
 #include <openpose/utilities/fastMath.hpp>
-#include <openpose/pose/bodyPartConnectorBase.hpp>
+#include <openpose/net/bodyPartConnectorBase.hpp>
 
 namespace op
 {
@@ -31,7 +31,7 @@ namespace op
             const auto vectorAToBNormX = vectorAToBX/vectorNorm;
             const auto vectorAToBNormY = vectorAToBY/vectorNorm;
 
-            auto sum = 0.;
+            auto sum = T(0.);
             auto count = 0;
             const auto vectorAToBXInLine = vectorAToBX/numberPointsInLine;
             const auto vectorAToBYInLine = vectorAToBY/numberPointsInLine;
@@ -49,7 +49,7 @@ namespace op
             }
 
             // Return PAF score
-            if (count/(float)numberPointsInLine > interMinAboveThreshold)
+            if (count/T(numberPointsInLine) > interMinAboveThreshold)
                 return sum/count;
             else
             {
@@ -141,7 +141,7 @@ namespace op
                 maxPeaks, numberBodyPartPairs, heatMapSize.x, heatMapSize.y, interThreshold,
                 interMinAboveThreshold);
             // pairScoresCpu <-- pairScoresGpu
-            cudaMemcpy(pairScoresCpu.getPtr(), pairScoresGpuPtr, totalComputations * sizeof(float),
+            cudaMemcpy(pairScoresCpu.getPtr(), pairScoresGpuPtr, totalComputations * sizeof(T),
                        cudaMemcpyDeviceToHost);
 
             // New code

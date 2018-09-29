@@ -3,7 +3,6 @@
 
 #include <atomic>
 #include <mutex>
-#include <thread>
 #include <openpose/core/common.hpp>
 #include <openpose/producer/videoCaptureReader.hpp>
 

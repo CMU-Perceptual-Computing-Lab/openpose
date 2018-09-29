@@ -1,9 +1,11 @@
 #ifndef OPENPOSE_CORE_MACROS_HPP
 #define OPENPOSE_CORE_MACROS_HPP
 
+#include <chrono> // std::chrono:: functionaligy, e.g., std::chrono::milliseconds
 #include <memory> // std::shared_ptr
 #include <ostream>
 #include <string>
+#include <thread> // std::this_thread
 #include <vector>
 
 // OpenPose name and version
