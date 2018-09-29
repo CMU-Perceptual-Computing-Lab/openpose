@@ -471,11 +471,6 @@ int openPoseDemo()
 {
     try
     {
-		// USE THESE TO FAKE THE INPUT ARGUMENTS
-		FLAGS_model_folder = "C:\\Users\\tz1\\Documents\\OpenPoseUnityDemo\\OpenPosePlugin\\Assets\\StreamingAssets\\models";
-		//FLAGS_hand = true;
-
-
         op::log("Starting OpenPose demo...", op::Priority::High);
         const auto timerBegin = std::chrono::high_resolution_clock::now();
 
@@ -633,7 +628,18 @@ extern "C" {
 	}
     //OP_API void OP_RegisterDebugCallback(op::DebugCallback callback) { UnityDebugger::registerCallback(callback); }
     OP_API void OP_SetParameters(int argc, char *argv[]) {
-		//op::log(argc);
+
+		// USE THESE TO FAKE THE INPUT ARGUMENTS
+		for (int i = 1; i < argc; i++) {
+			std::string s = argv[i];
+			if (s.compare("--hand") == 0) {
+				FLAGS_hand = true;
+			}
+			if (s.compare("--model_folder") == 0) {
+				FLAGS_model_folder = argv[i + 1];
+			}
+		}
+
 		//gflags::ParseCommandLineFlags(&argc, &argv, true); // ---------------------------THIS ONE CRASH IN UNITY
     }
     OP_API void OP_Run() {
