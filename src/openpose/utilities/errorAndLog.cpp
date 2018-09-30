@@ -10,40 +10,25 @@ namespace op
         namespace UnityDebugger
         {
             typedef void(__stdcall * DebugCallback) (const char* const str, int type);
-            DebugCallback gDebugCallback;
-			bool gDebugEnabled = true;
+            DebugCallback unityDebugCallback;
+			bool unityDebugEnabled = true;
 
-            extern "C" void OP_API OP_RegisterDebugCallback(DebugCallback debugCallback) // Use & doesn't work - by Tianyi
-            {
+            extern "C" void OP_API OP_RegisterDebugCallback(DebugCallback debugCallback) {
                 if (debugCallback)
-                    gDebugCallback = debugCallback;
+                    unityDebugCallback = debugCallback;
             }
 
 			extern "C" void OP_API OP_SetDebugEnable(bool enable) {
-				gDebugEnabled = enable;
+				unityDebugEnabled = enable;
 			}
 
-            void DebugInUnity(const std::string& message, const int type)
-            {
-                if (gDebugEnabled)
-					if (gDebugCallback)
-						gDebugCallback(message.c_str(), type);
+            void DebugInUnity(const std::string& message, const int type) {
+                if (unityDebugEnabled) if (unityDebugCallback) unityDebugCallback(message.c_str(), type);
             }
 
-            void log(const std::string& message)
-            {
-                DebugInUnity(message, 0);
-            }
-
-            void logWarning(const std::string& message)
-            {
-                DebugInUnity(message, 1);
-            }
-
-            void logError(const std::string& message)
-            {
-                DebugInUnity(message, -1);
-            }
+            void log(const std::string& message) { DebugInUnity(message, 0); }
+            void logWarning(const std::string& message) { DebugInUnity(message, 1); }
+            void logError(const std::string& message) { DebugInUnity(message, -1); }
         }
     #endif
 
