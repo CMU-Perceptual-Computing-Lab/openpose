@@ -12,7 +12,7 @@ namespace op
     public:
         PoseRenderer(const PoseModel poseModel);
 
-        virtual ~PoseRenderer() = default;
+        virtual ~PoseRenderer();
 
         virtual void initializationOnThread(){};
 

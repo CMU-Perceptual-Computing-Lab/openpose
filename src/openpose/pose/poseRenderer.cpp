@@ -57,4 +57,6 @@ namespace op
         mPartIndexToName{createPartToName(poseModel)}
     {
     }
+
+    PoseRenderer::~PoseRenderer(){}
 }
