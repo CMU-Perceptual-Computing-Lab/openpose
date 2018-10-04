@@ -58,5 +58,7 @@ namespace op
     {
     }
 
-    PoseRenderer::~PoseRenderer(){}
+    PoseRenderer::~PoseRenderer()
+    {
+    }
 }
