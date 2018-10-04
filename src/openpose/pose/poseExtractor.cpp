@@ -180,7 +180,7 @@ namespace op
                 while (spPersonTrackers->size() <= imageViewIndex)
                     spPersonTrackers->emplace_back(std::make_shared<PersonTracker>(
                         (*spPersonTrackers)[0]->getMergeResults()));
-                // Security check
+                // Sanity check
                 if (!poseKeypoints.empty() && poseIds.empty() && mNumberPeopleMax != 1)
                     error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
                 // Reset poseIds if keypoints is empty
@@ -211,7 +211,7 @@ namespace op
                 while (spPersonTrackers->size() <= imageViewIndex)
                     spPersonTrackers->emplace_back(std::make_shared<PersonTracker>(
                         (*spPersonTrackers)[0]->getMergeResults()));
-                // Security check
+                // Sanity check
                 if (!poseKeypoints.empty() && poseIds.empty() && mNumberPeopleMax != 1)
                     error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
                 // Reset poseIds if keypoints is empty

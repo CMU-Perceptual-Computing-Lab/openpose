@@ -22,7 +22,7 @@ namespace op
     public:
         explicit BodyPartConnectorCaffe();
 
-        ~BodyPartConnectorCaffe();
+        virtual ~BodyPartConnectorCaffe();
 
         virtual void Reshape(const std::vector<caffe::Blob<T>*>& bottom);
 

@@ -12,6 +12,7 @@ OpenPose - Frequently Asked Question (FAQ)
     7. [Free Invalid Pointer Error](#free-invalid-pointer-error)
     8. [Source Directory does not Contain CMakeLists.txt (Windows)](#source-directory-does-not-contain-cmakelists.txt-windows)
     9. [How Should I Link my IP Camera?](#how-should-i-link-my-ip-camera)
+    10. [Difference between BODY_25 vs. COCO vs. MPI](#difference-between-body_25-vs.-coco-vs.-mpi)
 
 
 
@@ -89,3 +90,8 @@ Note: OpenPose library is not an executable, but a library. So instead clicking 
 **Q: How Should I Link my IP Camera with http protocol?.**
 
 **A**: Usually with `http://CamIP:PORT_NO./video?x.mjpeg`.
+
+
+
+### Difference between BODY_25 vs. COCO vs. MPI
+COCO model will eventually be removed. BODY_25 model is faster, more accurate, and it includes foot keypoints. However, COCO requires less memory on GPU (being able to fit into 2GB GPUs with the default settings) and it runs faster on CPU-only mode. MPI model is only meant for people requiring the MPI-keypoint structure. It is also slower than BODY_25 and far less accurate.

@@ -9,7 +9,7 @@ namespace op
     {
         try
         {
-            // Security checks
+            // Sanity checks
             if (outputData.empty())
                 error("Empty Array<float> outputData.", __LINE__, __FUNCTION__, __FILE__);
             if (handKeypoints[0].getSize(0) != handKeypoints[1].getSize(0))

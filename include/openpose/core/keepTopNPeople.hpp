@@ -10,6 +10,8 @@ namespace op
     public:
         explicit KeepTopNPeople(const int numberPeopleMax);
 
+        virtual ~KeepTopNPeople();
+
         Array<float> keepTopPeople(const Array<float>& peopleArrays, const Array<float>& poseScores) const;
 
     private:

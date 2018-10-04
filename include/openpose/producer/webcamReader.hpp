@@ -26,7 +26,7 @@ namespace op
         explicit WebcamReader(const int webcamIndex = 0, const Point<int>& webcamResolution = Point<int>{},
                               const double fps = 30., const bool throwExceptionIfNoOpened = true);
 
-        ~WebcamReader();
+        virtual ~WebcamReader();
 
         std::vector<cv::Mat> getCameraMatrices();
 

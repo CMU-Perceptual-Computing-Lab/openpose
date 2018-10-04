@@ -14,6 +14,8 @@ namespace op
     public:
         explicit WBvhSaver(const std::shared_ptr<BvhSaver>& bvhSaver);
 
+        virtual ~WBvhSaver();
+
         void initializationOnThread();
 
         void workConsumer(const TDatums& tDatums);
@@ -36,6 +38,11 @@ namespace op
     template<typename TDatums>
     WBvhSaver<TDatums>::WBvhSaver(const std::shared_ptr<BvhSaver>& bvhSaver) :
         spBvhSaver{bvhSaver}
+    {
+    }
+
+    template<typename TDatums>
+    WBvhSaver<TDatums>::~WBvhSaver()
     {
     }
 

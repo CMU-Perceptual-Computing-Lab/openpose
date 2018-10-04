@@ -22,6 +22,8 @@ namespace op
 
         JointAngleEstimation(const bool returnJacobian);
 
+        virtual ~JointAngleEstimation();
+
         void initializationOnThread();
 
         void adamFastFit(Eigen::Matrix<double, 62, 3, Eigen::RowMajor>& adamPose,

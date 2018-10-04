@@ -34,7 +34,7 @@ namespace op
     {
         try
         {
-            // Security checks
+            // Sanity checks
             if (keypointsA.getNumberDimensions() != keypointsB.getNumberDimensions())
                 error("keypointsA.getNumberDimensions() != keypointsB.getNumberDimensions().",
                       __LINE__, __FUNCTION__, __FILE__);
@@ -182,7 +182,7 @@ namespace op
                 // Array<T> --> cv::Mat
                 auto frame = frameArray.getCvMat();
 
-                // Security check
+                // Sanity check
                 if (frame.channels() != 3)
                     error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
 
@@ -281,7 +281,7 @@ namespace op
         try
         {
             const auto numberKeypoints = keypoints.getSize(1);
-            // Security checks
+            // Sanity check
             if (numberKeypoints < 1)
                 error("Number body parts must be > 0.", __LINE__, __FUNCTION__, __FILE__);
             // Define keypointPtr
@@ -330,7 +330,7 @@ namespace op
     {
         try
         {
-            // Security checks
+            // Sanity check
             if (person >= keypoints.getSize(0))
                 error("Person index out of bounds.", __LINE__, __FUNCTION__, __FILE__);
             // Get average score

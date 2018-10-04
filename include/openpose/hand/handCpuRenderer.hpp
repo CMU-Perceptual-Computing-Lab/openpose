@@ -14,6 +14,8 @@ namespace op
         HandCpuRenderer(const float renderThreshold, const float alphaKeypoint = HAND_DEFAULT_ALPHA_KEYPOINT,
                         const float alphaHeatMap = HAND_DEFAULT_ALPHA_HEAT_MAP);
 
+        virtual ~HandCpuRenderer();
+
         void renderHandInherited(Array<float>& outputData, const std::array<Array<float>, 2>& handKeypoints);
 
         DELETE_COPY(HandCpuRenderer);

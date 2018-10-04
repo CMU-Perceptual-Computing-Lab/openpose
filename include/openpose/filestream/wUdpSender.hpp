@@ -13,6 +13,8 @@ namespace op
     public:
         explicit WUdpSender(const std::shared_ptr<UdpSender>& udpSender);
 
+        virtual ~WUdpSender();
+
         void initializationOnThread();
 
         void workConsumer(const TDatums& tDatums);
@@ -35,6 +37,11 @@ namespace op
     template<typename TDatums>
     WUdpSender<TDatums>::WUdpSender(const std::shared_ptr<UdpSender>& udpSender) :
         spUdpSender{udpSender}
+    {
+    }
+
+    template<typename TDatums>
+    WUdpSender<TDatums>::~WUdpSender()
     {
     }
 

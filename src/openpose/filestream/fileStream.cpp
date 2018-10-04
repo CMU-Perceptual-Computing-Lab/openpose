@@ -22,7 +22,7 @@ namespace op
     {
         try
         {
-            // Security checks
+            // Sanity check
             for (const auto& keypointPair : keypointVector)
                 if (!keypointPair.first.empty() && keypointPair.first.getNumberDimensions() != 3 )
                     error("keypointVector.getNumberDimensions() != 3.", __LINE__, __FUNCTION__, __FILE__);
@@ -209,7 +209,7 @@ namespace op
     {
         try
         {
-            // Security checks
+            // Sanity checks
             if (dataFormat == DataFormat::Json && CV_MAJOR_VERSION < 3)
                 error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
             if (cvMats.size() != cvMatNames.size())
@@ -247,11 +247,12 @@ namespace op
     {
         try
         {
-            // Security checks
+            // Sanity check
             if (dataFormat == DataFormat::Json && CV_MAJOR_VERSION < 3)
                 error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
+            // File name
             const auto fileName = getFullName(fileNameNoExtension, dataFormat);
-            // Security checks
+            // Sanity check
             if (!existFile(fileName))
                 error("File to be read does not exist: " + fileName + ".", __LINE__, __FUNCTION__, __FILE__);
             // Read file
@@ -306,7 +307,7 @@ namespace op
     {
         try
         {
-            // Security checks
+            // Sanity check
             for (const auto& keypointPair : keypointVector)
                 if (!keypointPair.first.empty() && keypointPair.first.getNumberDimensions() != 3 )
                     error("keypointVector.getNumberDimensions() != 3.", __LINE__, __FUNCTION__, __FILE__);

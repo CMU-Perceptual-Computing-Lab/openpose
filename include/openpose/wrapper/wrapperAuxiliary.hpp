@@ -24,15 +24,15 @@ namespace op
      * @param userOutputWsEmpty
      * @param threadManagerMode
      */
-    OP_API void wrapperConfigureSecurityChecks(WrapperStructPose& wrapperStructPose,
-                                               const WrapperStructFace& wrapperStructFace,
-                                               const WrapperStructHand& wrapperStructHand,
-                                               const WrapperStructExtra& wrapperStructExtra,
-                                               const WrapperStructInput& wrapperStructInput,
-                                               const WrapperStructOutput& wrapperStructOutput,
-                                               const bool renderOutput,
-                                               const bool userOutputWsEmpty,
-                                               const ThreadManagerMode threadManagerMode);
+    OP_API void wrapperConfigureSanityChecks(WrapperStructPose& wrapperStructPose,
+                                             const WrapperStructFace& wrapperStructFace,
+                                             const WrapperStructHand& wrapperStructHand,
+                                             const WrapperStructExtra& wrapperStructExtra,
+                                             const WrapperStructInput& wrapperStructInput,
+                                             const WrapperStructOutput& wrapperStructOutput,
+                                             const bool renderOutput,
+                                             const bool userOutputWsEmpty,
+                                             const ThreadManagerMode threadManagerMode);
 
     /**
      * Thread ID increase (private internal function).
@@ -139,9 +139,9 @@ namespace op
 
             // Check no wrong/contradictory flags enabled
             const auto userOutputWsEmpty = userOutputWs.empty();
-            wrapperConfigureSecurityChecks(wrapperStructPose, wrapperStructFace, wrapperStructHand, wrapperStructExtra,
-                                           wrapperStructInput, wrapperStructOutput, renderOutput, userOutputWsEmpty,
-                                           threadManagerMode);
+            wrapperConfigureSanityChecks(wrapperStructPose, wrapperStructFace, wrapperStructHand, wrapperStructExtra,
+                                         wrapperStructInput, wrapperStructOutput, renderOutput, userOutputWsEmpty,
+                                         threadManagerMode);
 
             // Get number threads
             auto numberThreads = wrapperStructPose.gpuNumber;
@@ -174,7 +174,7 @@ namespace op
                         + " GPU(s), using " + std::to_string(numberThreads) + " of them starting at GPU "
                         + std::to_string(gpuNumberStart) + ".", Priority::High);
                 }
-                // Security check
+                // Sanity check
                 if (gpuNumberStart + numberThreads > totalGpuNumber)
                     error("Initial GPU selected (`--number_gpu_start`) + number GPUs to use (`--number_gpu`) must"
                           " be lower or equal than the total number of GPUs in your machine ("
@@ -740,7 +740,7 @@ namespace op
 
             // The less number of queues -> the less threads opened, and potentially the less lag
 
-            // Security checks
+            // Sanity checks
             if ((datumProducerW == nullptr) == (userInputWs.empty())
                 && threadManagerMode != ThreadManagerMode::Asynchronous
                 && threadManagerMode != ThreadManagerMode::AsynchronousIn)

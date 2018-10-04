@@ -24,6 +24,8 @@ namespace op
             const std::vector<std::shared_ptr<Renderer>>& renderers = {},
             const DisplayMode displayMode = DisplayMode::Display2D);
 
+        virtual ~Gui();
+
         virtual void initializationOnThread();
 
         void setImage(const cv::Mat& cvMatOutput);

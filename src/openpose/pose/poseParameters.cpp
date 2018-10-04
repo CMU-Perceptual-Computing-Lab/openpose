@@ -399,7 +399,7 @@ namespace op
 
     // Default Model Parameters
     // They might be modified on running time
-    const auto nmsT = (COCO_CHALLENGE ? 0.04f : 0.05f);
+    const auto nmsT = (COCO_CHALLENGE ? 0.02f : 0.05f);
     const std::array<float, (int)PoseModel::Size>           POSE_DEFAULT_NMS_THRESHOLD{
         nmsT,       nmsT,       0.6f,       0.3f,       nmsT,       nmsT,       nmsT,       nmsT,       nmsT,       nmsT,       nmsT,       nmsT,       nmsT
     };

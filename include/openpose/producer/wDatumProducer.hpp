@@ -15,6 +15,8 @@ namespace op
     public:
         explicit WDatumProducer(const std::shared_ptr<DatumProducer<TDatumsNoPtr>>& datumProducer);
 
+        virtual ~WDatumProducer();
+
         void initializationOnThread();
 
         TDatums workProducer();
@@ -40,6 +42,12 @@ namespace op
         spDatumProducer{datumProducer}
     {
     }
+
+    template<typename TDatums, typename TDatumsNoPtr>
+    WDatumProducer<TDatums, TDatumsNoPtr>::~WDatumProducer()
+    {
+    }
+
 
     template<typename TDatums, typename TDatumsNoPtr>
     void WDatumProducer<TDatums, TDatumsNoPtr>::initializationOnThread()

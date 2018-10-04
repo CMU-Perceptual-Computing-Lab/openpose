@@ -12,6 +12,10 @@ namespace op
     {
     }
 
+    IpCameraReader::~IpCameraReader()
+    {
+    }
+
     std::vector<cv::Mat> IpCameraReader::getCameraMatrices()
     {
         try

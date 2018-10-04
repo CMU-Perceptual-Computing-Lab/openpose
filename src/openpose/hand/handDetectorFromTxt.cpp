@@ -30,6 +30,10 @@ namespace op
     {
     }
 
+    HandDetectorFromTxt::~HandDetectorFromTxt()
+    {
+    }
+
     std::vector<std::array<Rectangle<float>, 2>> HandDetectorFromTxt::detectHands()
     {
         try

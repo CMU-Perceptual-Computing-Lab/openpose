@@ -11,7 +11,7 @@ namespace op
     {
         try
         {
-            // Security checks
+            // Sanity check
             if (filePathToSave.empty())
                 error("Empty path given as output file path for saving COCO JSON format.",
                       __LINE__, __FUNCTION__, __FILE__);
@@ -40,7 +40,7 @@ namespace op
     {
         try
         {
-            // Security checks
+            // Sanity check
             if ((size_t)poseKeypoints.getSize(0) != poseScores.getVolume())
                 error("Dimension mismatch between poseKeypoints and poseScores.", __LINE__, __FUNCTION__, __FILE__);
             const auto numberPeople = poseKeypoints.getSize(0);

@@ -20,6 +20,8 @@ namespace op
                                const std::shared_ptr<std::pair<std::atomic<bool>,
                                                      std::atomic<int>>>& videoSeekSharedPtr = nullptr);
 
+        virtual ~DatumProducer();
+
         std::pair<bool, std::shared_ptr<TDatumsNoPtr>> checkIfRunningAndGetDatum();
 
     private:
@@ -66,6 +68,11 @@ namespace op
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
+    }
+
+    template<typename TDatumsNoPtr>
+    DatumProducer<TDatumsNoPtr>::~DatumProducer()
+    {
     }
 
     template<typename TDatumsNoPtr>

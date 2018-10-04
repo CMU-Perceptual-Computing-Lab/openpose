@@ -13,6 +13,8 @@ namespace op
     public:
         explicit WHandExtractorNet(const std::shared_ptr<HandExtractorNet>& handExtractorNet);
 
+        virtual ~WHandExtractorNet();
+
         void initializationOnThread();
 
         void work(TDatums& tDatums);
@@ -35,6 +37,11 @@ namespace op
     template<typename TDatums>
     WHandExtractorNet<TDatums>::WHandExtractorNet(const std::shared_ptr<HandExtractorNet>& handExtractorNet) :
         spHandExtractorNet{handExtractorNet}
+    {
+    }
+
+    template<typename TDatums>
+    WHandExtractorNet<TDatums>::~WHandExtractorNet()
     {
     }
 

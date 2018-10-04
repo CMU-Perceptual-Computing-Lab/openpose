@@ -13,6 +13,8 @@ namespace op
     public:
         explicit WPoseTriangulation(const std::shared_ptr<PoseTriangulation>& poseTriangulation);
 
+        virtual ~WPoseTriangulation();
+
         void initializationOnThread();
 
         void work(TDatums& tDatums);
@@ -35,6 +37,11 @@ namespace op
     template<typename TDatums>
     WPoseTriangulation<TDatums>::WPoseTriangulation(const std::shared_ptr<PoseTriangulation>& poseTriangulation) :
         spPoseTriangulation{poseTriangulation}
+    {
+    }
+
+    template<typename TDatums>
+    WPoseTriangulation<TDatums>::~WPoseTriangulation()
     {
     }
 

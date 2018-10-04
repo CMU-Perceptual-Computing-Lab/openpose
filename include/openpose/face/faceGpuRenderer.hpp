@@ -15,7 +15,7 @@ namespace op
                         const float alphaKeypoint = FACE_DEFAULT_ALPHA_KEYPOINT,
                         const float alphaHeatMap = FACE_DEFAULT_ALPHA_HEAT_MAP);
 
-        ~FaceGpuRenderer();
+        virtual ~FaceGpuRenderer();
 
         void initializationOnThread();
 

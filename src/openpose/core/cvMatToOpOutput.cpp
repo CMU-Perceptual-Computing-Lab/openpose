@@ -8,7 +8,7 @@ namespace op
     {
         try
         {
-            // Security checks
+            // Sanity checks
             if (cvInputData.empty())
                 error("Wrong input element (empty cvInputData).", __LINE__, __FUNCTION__, __FILE__);
             if (cvInputData.channels() != 3)

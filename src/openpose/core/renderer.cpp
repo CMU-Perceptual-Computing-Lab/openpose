@@ -15,11 +15,15 @@ namespace op
     {
     }
 
+    Renderer::~Renderer()
+    {
+    }
+
     void Renderer::increaseElementToRender(const int increment)
     {
         try
         {
-            // Security checks
+            // Sanity check
             if (*spNumberElementsToRender == 0)
                 error("Number elements to render cannot be 0 for this function.",
                       __LINE__, __FUNCTION__, __FILE__);

@@ -11,6 +11,8 @@ namespace op
     public:
         explicit HandDetectorFromTxt(const std::string& txtDirectoryPath);
 
+        virtual ~HandDetectorFromTxt();
+
         std::vector<std::array<Rectangle<float>, 2>> detectHands();
 
     private:

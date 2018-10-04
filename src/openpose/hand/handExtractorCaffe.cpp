@@ -260,7 +260,7 @@ namespace op
             #if defined USE_CAFFE
                 if (mEnabled && !handRectangles.empty())
                 {
-                    // Security checks
+                    // Sanity check
                     if (cvInputData.empty())
                         error("Empty cvInputData.", __LINE__, __FUNCTION__, __FILE__);
 

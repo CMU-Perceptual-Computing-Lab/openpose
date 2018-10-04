@@ -65,26 +65,24 @@ namespace op
     }
 
     // This class is thread-safe
-    class OP_API ConfigureError
+    namespace ConfigureError
     {
-    public:
-        static std::vector<ErrorMode> getErrorModes();
+        OP_API std::vector<ErrorMode> getErrorModes();
 
-        static void setErrorModes(const std::vector<ErrorMode>& errorModes);
-    };
+        OP_API void setErrorModes(const std::vector<ErrorMode>& errorModes);
+    }
 
     // This class is thread-safe
-    class OP_API ConfigureLog
+    namespace ConfigureLog
     {
-    public:
-        static Priority getPriorityThreshold();
+        OP_API Priority getPriorityThreshold();
 
-        static const std::vector<LogMode>& getLogModes();
+        OP_API const std::vector<LogMode>& getLogModes();
 
-        static void setPriorityThreshold(const Priority priorityThreshold);
+        OP_API void setPriorityThreshold(const Priority priorityThreshold);
 
-        static void setLogModes(const std::vector<LogMode>& loggingModes);
-    };
+        OP_API void setLogModes(const std::vector<LogMode>& loggingModes);
+    }
 }
 
 #endif // OPENPOSE_UTILITIES_ERROR_AND_LOG_HPP

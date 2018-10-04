@@ -4,15 +4,15 @@
 
 namespace op
 {
-    void wrapperConfigureSecurityChecks(WrapperStructPose& wrapperStructPose,
-                                        const WrapperStructFace& wrapperStructFace,
-                                        const WrapperStructHand& wrapperStructHand,
-                                        const WrapperStructExtra& wrapperStructExtra,
-                                        const WrapperStructInput& wrapperStructInput,
-                                        const WrapperStructOutput& wrapperStructOutput,
-                                        const bool renderOutput,
-                                        const bool userOutputWsEmpty,
-                                        const ThreadManagerMode threadManagerMode)
+    void wrapperConfigureSanityChecks(WrapperStructPose& wrapperStructPose,
+                                      const WrapperStructFace& wrapperStructFace,
+                                      const WrapperStructHand& wrapperStructHand,
+                                      const WrapperStructExtra& wrapperStructExtra,
+                                      const WrapperStructInput& wrapperStructInput,
+                                      const WrapperStructOutput& wrapperStructOutput,
+                                      const bool renderOutput,
+                                      const bool userOutputWsEmpty,
+                                      const ThreadManagerMode threadManagerMode)
     {
         try
         {

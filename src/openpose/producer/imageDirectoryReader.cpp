@@ -46,7 +46,7 @@ namespace op
             {
                 // Read camera parameters from SN
                 auto serialNumbers = getFilesOnDirectory(cameraParameterPath, ".xml");
-                // Security check
+                // Sanity check
                 if (serialNumbers.size() != mImageDirectoryStereo && mImageDirectoryStereo > 1)
                     error("Found different number of camera parameter files than the number indicated by"
                           " `--3d_views` ("
@@ -65,6 +65,10 @@ namespace op
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
+    }
+
+    ImageDirectoryReader::~ImageDirectoryReader()
+    {
     }
 
     std::vector<cv::Mat> ImageDirectoryReader::getCameraMatrices()

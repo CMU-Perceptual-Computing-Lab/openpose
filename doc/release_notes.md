@@ -242,7 +242,7 @@ OpenPose Library - Release Notes
     17. Deprecated flag `--write_keypoint_json` removed (`--write_json` is the equivalent since version 1.2.1).
     18. Speed up of cvMatToOpOutput and opOutputToCvMat: op::Datum::outputData is now H x W x C instead of C x H x W, making it much faster to be copied to/from op::Datum::cvOutputData.
     19. Much faster GUI display by adding the `WITH_OPENCV_WITH_OPENGL` flag to tell whether to use OpenGL support for OpenCV.
-    20. Turned security check error into warning when using dynamic `net_resolution` for `image_dir` in CPU/OpenCL versions.
+    20. Turned sanity check error into warning when using dynamic `net_resolution` for `image_dir` in CPU/OpenCL versions.
     21. Minimized CPU usage when queues are empty or full, in order to prevent problems such as general computer slow down, overheating, or excesive power usage.
 2. Functions or parameters renamed:
     1. Removed scale parameter from hand and face rectangle extractor (causing wrong results if custom `--output_resolution`).
@@ -271,6 +271,8 @@ OpenPose Library - Release Notes
         2. `tutorial_wrapper` renamed as `tutorial_api_cpp` as well as new examples were added.
         2. `tutorial_python` renamed as `tutorial_api_python` as well as new examples were added.
         3. `tutorial_pose` and `tutorial_thread` renamed as `tutorial_developer`, not meant to be used by users, but rather for OpenPose developers.
+    7. Added a virtual destructor to almost all clases, so they can be inherited. Exceptions (for performance reasons): Array, Point, Rectangle, CvMatToOpOutput, OpOutputToCvMat.
+    8. Auxiliary classes in errorAndLog turned into namespaces (Profiler must be kept as class to allow static parameters).
 2. Functions or parameters renamed:
     1. By default, python example `tutorial_developer/python_2_pose_from_heatmaps.py` was using 2 scales starting at -1x736, changed to 1 scale at -1x368.
     2. WrapperStructPose default parameters changed to match those of the OpenPose demo binary.

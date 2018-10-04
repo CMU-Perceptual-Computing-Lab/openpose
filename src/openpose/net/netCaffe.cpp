@@ -185,7 +185,7 @@ namespace op
         try
         {
             #ifdef USE_CAFFE
-                // Security checks
+                // Sanity checks
                 if (inputData.empty())
                     error("The Array inputData cannot be empty.", __LINE__, __FUNCTION__, __FILE__);
                 if (inputData.getNumberDimensions() != 4 || inputData.getSize(1) != 3)

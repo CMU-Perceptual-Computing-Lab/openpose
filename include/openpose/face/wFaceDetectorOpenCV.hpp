@@ -13,6 +13,8 @@ namespace op
     public:
         explicit WFaceDetectorOpenCV(const std::shared_ptr<FaceDetectorOpenCV>& faceDetectorOpenCV);
 
+        virtual ~WFaceDetectorOpenCV();
+
         void initializationOnThread();
 
         void work(TDatums& tDatums);
@@ -35,6 +37,11 @@ namespace op
     template<typename TDatums>
     WFaceDetectorOpenCV<TDatums>::WFaceDetectorOpenCV(const std::shared_ptr<FaceDetectorOpenCV>& faceDetectorOpenCV) :
         spFaceDetectorOpenCV{faceDetectorOpenCV}
+    {
+    }
+
+    template<typename TDatums>
+    WFaceDetectorOpenCV<TDatums>::~WFaceDetectorOpenCV()
     {
     }
 
