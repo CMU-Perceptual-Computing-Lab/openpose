@@ -28,10 +28,6 @@ public:
 
     void initializationOnThread() {}
 
-	void outputTest() {
-		outputToUnity("test_output", -1);
-	}
-
     void terminate() {
 		op::log("OP_End");
         this->stop();
@@ -223,6 +219,7 @@ void openpose_main(bool enableOutput, OutputCallback callback);
 extern "C" {
 	OP_API void OP_ConfigurePose(
 		bool body_disable = false,
+		char* model_folder = "models/", int number_people_max = -1, // moved
 		int net_resolution_x = -1, int net_resolution_y = 368, // Point
 		int output_resolution_x = -1, int output_resolution_y = -1, // Point
 		int keypoint_scale = 0, // ScaleMode
@@ -230,10 +227,10 @@ extern "C" {
 		int render_pose = -1, // bool _3d = false, int _3d_views = 1, bool flir_camera = false, // RenderMode
 		char* model_pose = "BODY_25", // PoseModel
 		bool disable_blending = false, float alpha_pose = 0.6f, float alpha_heatmap = 0.7f,
-		int part_to_show = 0, char* model_folder = "models/", // moved
+		int part_to_show = 0,
 		bool heatmaps_add_parts = false, bool heatmaps_add_bkg = false, bool heatmaps_add_PAFs = false, // HeatMapType
 		int heatmaps_scale = 2, // HeatMapScaleMode
-		bool part_candidates = false, float render_threshold = 0.05f, int number_people_max = -1) {
+		bool part_candidates = false, float render_threshold = 0.05f) {
 		try {
 			wrapperStructPose = new op::WrapperStructPose{
 				!body_disable,
