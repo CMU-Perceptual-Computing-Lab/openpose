@@ -6,6 +6,7 @@ import numpy as np
 import ctypes as ct
 import cv2
 import os
+import json
 from sys import platform
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -27,8 +28,7 @@ class OpenPose(object):
             _libop= np.ctypeslib.load_library('_openpose', dir_path+'/Release/_openpose.dll')
         except OSError as e:
             _libop= np.ctypeslib.load_library('_openpose', dir_path+'/Debug/_openpose.dll')
-    _libop.newOP.argtypes = [
-        ct.c_int, ct.c_char_p, ct.c_char_p, ct.c_char_p, ct.c_float, ct.c_float, ct.c_int, ct.c_float, ct.c_int, ct.c_bool, ct.c_char_p]
+    _libop.newOP.argtypes = [ct.c_char_p]
     _libop.newOP.restype = ct.c_void_p
     _libop.delOP.argtypes = [ct.c_void_p]
     _libop.delOP.restype = None
@@ -36,12 +36,22 @@ class OpenPose(object):
     _libop.forward.argtypes = [
         ct.c_void_p, np.ctypeslib.ndpointer(dtype=np.uint8),
         ct.c_size_t, ct.c_size_t,
-        np.ctypeslib.ndpointer(dtype=np.int32), np.ctypeslib.ndpointer(dtype=np.uint8), ct.c_bool]
+        np.ctypeslib.ndpointer(dtype=np.int32), np.ctypeslib.ndpointer(dtype=np.int32), np.ctypeslib.ndpointer(dtype=np.int32), np.ctypeslib.ndpointer(dtype=np.int32),
+        np.ctypeslib.ndpointer(dtype=np.uint8), ct.c_bool]
     _libop.forward.restype = None
 
-    _libop.getOutputs.argtypes = [
+    _libop.getPoseOutputs.argtypes = [
         ct.c_void_p, np.ctypeslib.ndpointer(dtype=np.float32)]
-    _libop.getOutputs.restype = None
+    _libop.getPoseOutputs.restype = None
+    _libop.getLeftHandOutputs.argtypes = [
+        ct.c_void_p, np.ctypeslib.ndpointer(dtype=np.float32)]
+    _libop.getLeftHandOutputs.restype = None
+    _libop.getRightHandOutputs.argtypes = [
+        ct.c_void_p, np.ctypeslib.ndpointer(dtype=np.float32)]
+    _libop.getRightHandOutputs.restype = None
+    _libop.getFaceOutputs.argtypes = [
+        ct.c_void_p, np.ctypeslib.ndpointer(dtype=np.float32)]
+    _libop.getFaceOutputs.restype = None
 
     _libop.poseFromHeatmap.argtypes = [
         ct.c_void_p, np.ctypeslib.ndpointer(dtype=np.uint8),
@@ -65,17 +75,7 @@ class OpenPose(object):
         -------
         outs: OpenPose object
         """
-        self.op = self._libop.newOP(params["logging_level"],
-		                            self.encode(params["output_resolution"]),
-                                    self.encode(params["net_resolution"]),
-                                    self.encode(params["model_pose"]),
-                                    params["alpha_pose"],
-                                    params["scale_gap"],
-                                    params["scale_number"],
-                                    params["render_threshold"],
-                                    params["num_gpu_start"],
-                                    params["disable_blending"],
-                                    self.encode(params["default_model_folder"]))
+        self.op = self._libop.newOP(self.encode(json.dumps(params)))
 
     def __del__(self):
         """
@@ -97,15 +97,35 @@ class OpenPose(object):
         array: ndarray of human 2D poses [People * BodyPart * XYConfidence]
         displayImage : image for visualization
         """
+
+        # Image Setup
         shape = image.shape
         displayImage = np.zeros(shape=(image.shape),dtype=np.uint8)
-        size = np.zeros(shape=(3),dtype=np.int32)
-        self._libop.forward(self.op, image, shape[0], shape[1], size, displayImage, display)
-        array = np.zeros(shape=(size),dtype=np.float32)
-        self._libop.getOutputs(self.op, array)
+
+        # Pose Sizes Setup
+        poseSize = np.zeros(shape=(3),dtype=np.int32)
+        leftHandSize = np.zeros(shape=(3),dtype=np.int32)
+        rightHandSize = np.zeros(shape=(3),dtype=np.int32)
+        faceSize = np.zeros(shape=(3),dtype=np.int32)
+
+        # Run OP
+        self._libop.forward(self.op, image, shape[0], shape[1], poseSize, leftHandSize, rightHandSize, faceSize, displayImage, display)
+
+        # Get outputs
+        poseArray = np.zeros(shape=(poseSize),dtype=np.float32)
+        self._libop.getPoseOutputs(self.op, poseArray)
+        leftHandArray = np.zeros(shape=(leftHandSize),dtype=np.float32)
+        self._libop.getLeftHandOutputs(self.op, leftHandArray)
+        rightHandArray = np.zeros(shape=(rightHandSize),dtype=np.float32)
+        self._libop.getRightHandOutputs(self.op, rightHandArray)
+        faceArray = np.zeros(shape=(faceSize),dtype=np.float32)
+        self._libop.getFaceOutputs(self.op, faceArray)
+        allArray = [poseArray, leftHandArray, rightHandArray, faceArray]
+
+        # Return
         if display:
-            return array, displayImage
-        return array
+            return allArray, displayImage
+        return allArray
 
     def poseFromHM(self, image, hm, ratios=[1]):
         """
@@ -115,11 +135,11 @@ class OpenPose(object):
         ----------
         image : color image of type ndarray
         hm : heatmap of type ndarray with heatmaps and part affinity fields
-        ratios : scaling ration if needed to fuse multiple scales
+        ratios : scaling rate if needed to fuse multiple scales
 
         Returns
         -------
-        array: ndarray of human 2D poses [People * BodyPart * XYConfidence]
+        array of ndarray: [Bodies, LeftHands, RightHands, Faces] of ndarray of human 2D poses [People * BodyPart * XYConfidence]
         displayImage : image for visualization
         """
         if len(ratios) != len(hm):
@@ -230,12 +250,14 @@ if __name__ == "__main__":
     params["render_threshold"] = 0.05
     params["num_gpu_start"] = 0
     params["disable_blending"] = False
-    params["default_model_folder"] = "../../../models/"
+    params["model_folder"] = "../../../models/"
+    params["face"] = True
+    params["hand"] = True
     openpose = OpenPose(params)
 
-    img = cv2.imread("../../../examples/media/COCO_val2014_000000000192.jpg")
-    arr, output_image = openpose.forward(img, True)
-    print(arr)
+    img = cv2.imread("../../../examples/media/COCO_val2014_000000000459.jpg")
+    allArray, output_image = openpose.forward(img, True)
+    print(allArray[0])
 
     while 1:
         cv2.imshow("output", output_image)
