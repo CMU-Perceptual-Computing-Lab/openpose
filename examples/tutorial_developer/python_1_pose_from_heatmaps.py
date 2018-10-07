@@ -45,7 +45,7 @@ params["scale_number"] = len(scales)
 params["render_threshold"] = 0.05
 params["num_gpu_start"] = 0
 params["disable_blending"] = False
-params["default_model_folder"] = dir_path + "/../../../models/"
+params["model_folder"] = dir_path + "/../../../models/"
 openpose = OpenPose(params)
 caffe.set_mode_gpu()
 caffe.set_device(0)

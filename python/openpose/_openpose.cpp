@@ -83,7 +83,6 @@ public:
         if(jsonParams.hasKey("face_alpha_pose")) FLAGS_face_alpha_pose = jsonParams["face_alpha_pose"].ToFloat();
         if(jsonParams.hasKey("face_alpha_heatmap")) FLAGS_face_alpha_heatmap = jsonParams["face_alpha_heatmap"].ToFloat();
         if(jsonParams.hasKey("face_render_threshold")) FLAGS_face_render_threshold = jsonParams["face_render_threshold"].ToFloat();
-
         // Hands
         if(jsonParams.hasKey("hand")) FLAGS_hand = jsonParams["hand"].ToBool();
         if(jsonParams.hasKey("hand_net_resolution")) FLAGS_hand_net_resolution = jsonParams["hand_net_resolution"].ToString();
@@ -93,17 +92,6 @@ public:
         if(jsonParams.hasKey("face_alpha_pose")) FLAGS_face_alpha_pose = jsonParams["face_alpha_pose"].ToFloat();
         if(jsonParams.hasKey("face_alpha_heatmap")) FLAGS_face_alpha_heatmap = jsonParams["face_alpha_heatmap"].ToFloat();
         if(jsonParams.hasKey("face_render_threshold")) FLAGS_face_render_threshold = jsonParams["face_render_threshold"].ToFloat();
-
-
-//        opWrapper.configure(wrapperStructPose);
-//        // Face configuration (use op::WrapperStructFace{} to disable it)
-//        const op::WrapperStructFace wrapperStructFace{
-//        opWrapper.configure(wrapperStructFace);
-//        // Hand configuration (use op::WrapperStructHand{} to disable it)
-//        const op::WrapperStructHand wrapperStructHand{
-//            FLAGS_hand, handNetInputSize, FLAGS_hand_scale_number, (float)FLAGS_hand_scale_range, FLAGS_hand_tracking,
-//            op::flagsToRenderMode(FLAGS_hand_render, multipleView, FLAGS_render_pose), (float)FLAGS_hand_alpha_pose,
-//            (float)FLAGS_hand_alpha_heatmap, (float)FLAGS_hand_render_threshold};
 
         // GPU Setting
         mGpuID = FLAGS_num_gpu_start;
@@ -204,7 +192,7 @@ public:
 
         // Step 4 - Initialize resources on desired thread (in this case single thread, i.e. we init resources here)
         //poseExtractorCaffe->initializationOnThread();
-        //poseRenderer->initializationOnThread();
+        poseRenderer->initializationOnThread();
     }
 
     void forward(const cv::Mat& inputImage,

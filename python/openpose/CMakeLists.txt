@@ -1,6 +1,8 @@
 set(PYTHON_FILES
     openpose.py
     __init__.py
+    ../../examples/tutorial_api_python/1_extract_pose.py
+    ../../examples/tutorial_developer/python_1_pose_from_heatmaps.py
     _openpose.cpp)
 
 add_library(_openpose SHARED ${PYTHON_FILES})

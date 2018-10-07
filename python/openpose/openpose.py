@@ -165,7 +165,7 @@ class OpenPose(object):
 
         self._libop.poseFromHeatmap(self.op, image, shape[0], shape[1], displayImage, hm, size, ratios)
         array = np.zeros(shape=(size[0],size[1],size[2]),dtype=np.float32)
-        self._libop.getOutputs(self.op, array)
+        self._libop.getPoseOutputs(self.op, array)
         return array, displayImage
 
     @staticmethod
