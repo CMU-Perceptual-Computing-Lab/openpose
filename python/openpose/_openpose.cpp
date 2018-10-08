@@ -99,6 +99,7 @@ public:
         caffe::Caffe::set_mode(caffe::Caffe::GPU);
         caffe::Caffe::SetDevice(mGpuID);
         #elif USE_OPENCL
+        FLAGS_render_pose = 1;
         caffe::Caffe::set_mode(caffe::Caffe::GPU);
         std::vector<int> devices;
         const int maxNumberGpu = op::OpenCL::getTotalGPU();
@@ -108,6 +109,7 @@ public:
         caffe::Caffe::SelectDevice(mGpuID, true);
         op::OpenCL::getInstance(mGpuID, CL_DEVICE_TYPE_GPU, true);
         #else
+        FLAGS_render_pose = 1;
         caffe::Caffe::set_mode(caffe::Caffe::CPU);
         #endif
         op::log("OpenPose Library Python Wrapper", op::Priority::High);
