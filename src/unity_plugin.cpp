@@ -5,7 +5,40 @@
 #include <openpose/headers.hpp>
 
 // Output callback register in Unity
-typedef void(__stdcall * OutputCallback) (const char* str, int type);
+typedef void(__stdcall * OutputCallback) (uchar** val, int* sizes, int sizeSize, int valType, int outputType);
+
+// Output type enum
+enum ValType : int{
+	Byte = 0,
+	Int = 1,
+	Long = 2,
+	Float = 3, 
+	String = 4
+};
+
+enum OutputType : int {
+	None = 0, 
+	Ids = 1, 
+	Name = 2, 
+	FrameNumber = 3, 
+	PoseKeypoints = 4, 
+	PoseIds = 5, 
+	PoseScores = 6, 
+	PoseHeatMaps = 7,
+	PoseCandidates = 8, 
+	FaceRectangles = 9, 
+	FaceKeypoints = 10, 
+	FaceHeatMaps = 11, 
+	HandRectangles = 12, 
+	HandKeypoints = 13, 
+	HandHeightMaps = 14, 
+	PoseKeypoints3D = 15, 
+	FaceKeypoints3D = 16, 
+	HandKeypoints3D = 17, 
+	CameraMatrix = 18, 
+	CameraExtrinsics = 19, 
+	CameraIntrinsics = 20
+};
 
 // Global setting structs
 op::WrapperStructPose *wrapperStructPose;
@@ -15,13 +48,12 @@ op::WrapperStructExtra *wrapperStructExtra;
 op::WrapperStructInput *wrapperStructInput;
 op::WrapperStructOutput *wrapperStructOutput;
 
-// Flags
+// Global flags
 bool opStoppingFlag = false;
 bool opRunningFlag = false;
 
 // This worker will just read and return all the jpg files in a directory
-class UnityPluginUserOutput : public op::WorkerConsumer<std::shared_ptr<std::vector<op::Datum>>>
-{
+class UnityPluginUserOutput : public op::WorkerConsumer<std::shared_ptr<std::vector<op::Datum>>> {
 public:
 	OutputCallback unityOutputCallback;
 	bool unityOutputEnabled = true;
@@ -34,46 +66,63 @@ public:
     }
 
 protected:
-	void workConsumer(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr)
-	{
-		try
-		{
-			if (datumsPtr != nullptr && !datumsPtr->empty())
-			{
+	template<class T>
+	void outputValue(T * val, int * sizes, int sizeSize, ValType valType, OutputType outputType) {
+		uchar * bytes = static_cast<uchar*>(static_cast<void*>(val));
+		unityOutputCallback(&bytes, sizes, sizeSize, (int)valType, (int)outputType);
+	}
+
+	void workConsumer(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
+		try	{
+			if (datumsPtr != nullptr && !datumsPtr->empty()) {
 				// op::log("Output");
-				if (unityOutputEnabled) sendData(datumsPtr);
-
-				// // Display image and sleeps at least 1 ms (it usually sleeps ~5-10 msec to display the image)
-				// const char key = (char)cv::waitKey(1);
-				if (opStoppingFlag)
-					this->stop();
-
-				// Display rendered output image
-				// cv::imshow("User worker GUI", datumsPtr->at(0).cvOutputData);
+				if (unityOutputEnabled) {
+					//sendData(datumsPtr);
+					sendPoseKeypoints(datumsPtr);
+					sendHandKeypoints(datumsPtr);
+				}
+				if (opStoppingFlag) this->stop();
 			}
-		}
-		catch (const std::exception& e)
-		{
+		} catch (const std::exception& e) {
 			// this->stop();
 			op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
 		}
 	}
 
-	void outputToUnity(const std::string& message, const int type)
-	{
-		if (unityOutputCallback) {
-			try {
-				unityOutputCallback(message.c_str(), type);
+	void sendPoseKeypoints(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
+		const auto& data = datumsPtr->at(0).poseKeypoints;
+		if (!data.empty()) {
+			auto sizeVector = data.getSize();
+			int sizeSize = sizeVector.size();
+			int * sizes = &sizeVector[0];
+			int volume = data.getVolume();
+			float * val = new float[volume];
+			for (int i = 0; i < volume; i++) {
+				val[i] = data[i]; // Is there a better way to do this?
 			}
-			catch (const std::exception& e)
-			{
-				op::log("Output error");
-				op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-			}
+			outputValue(val, sizes, sizeSize, Float, PoseKeypoints);
+			delete val;
+		}		
+	}
+
+	void sendHandKeypoints(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
+		const auto& data = datumsPtr->at(0).handKeypoints;
+		if (!data.empty()) {
+			int sizeSize = 4;
+			int * sizes = new int[sizeSize] {2, data[0].getSize(0), data[0].getSize(1), data[0].getSize(2)};
+			int volume = sizes[0] * sizes[1] * sizes[2] * sizes[3];
+			float * val = new float[volume];
+			for (int i = 0; i < sizes[0]; i++) {
+				for (int j = 0; j < volume / sizes[0]; j++) {
+					val[i * j] = data[i][j]; // Is there a better way to do this?
+				}
+			}			
+			outputValue(val, sizes, sizeSize, Float, HandKeypoints);
+			delete val;
 		}
 	}
 
-    void sendData(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
+    /*void sendData(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
         const auto& poseKeypoints = datumsPtr->at(0).poseKeypoints;
         const auto& handKeypoints_L = datumsPtr->at(0).handKeypoints[0];
         const auto& handKeypoints_R = datumsPtr->at(0).handKeypoints[1];
@@ -175,7 +224,7 @@ protected:
         unitsString += "]";
 
         dataString = ("{" + unitsString + "}").c_str();
-        outputToUnity(dataString, 0);
+        //outputToUnity(dataString, 0);
     }
 
     void sendImage(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
@@ -209,14 +258,35 @@ protected:
 
 	std::string vectorToJson(const int x, const int y, const int z) {
 		return "{\"x\":" + std::to_string(x) + ",\"y\":" + std::to_string(y) + ",\"z\":" + std::to_string(z) + "}";
-	}
+	}*/
 };
+
+// Global user output
+std::shared_ptr<UnityPluginUserOutput> spUserOutput;
 
 // Title
 void openpose_main(bool enableOutput, OutputCallback callback);
 
 // Unity Interface
 extern "C" {
+	/*OP_API void OPT_RegisterTest(OutputIntTest intTest, OutputFloatTest floatTest, OutputByte byteTest) {
+		unityTestIntArray = intTest;
+		unityTestFloatArray = floatTest;
+		unityTestBytes = byteTest;
+	}
+
+	OP_API void OPT_CallbackTestFunctions() {
+		int* intArr = new int[9]{ 9,8,7,6,5,4,3,2,1 };
+		float* floatArr = new float[9]{ 9.f,8.f,7.f,6.f,5.f,4.f,3.f,2.f,1.f };
+		int* size = new int(9);
+		//unityTestIntArray(&intArr, size);	
+		//unityTestFloatArray(&floatArr, size);
+		uchar * bytes = static_cast<uchar*>(static_cast<void*>(intArr));
+		unityTestBytes(&bytes, size, 0);
+		//bytes = (uchar*)floatArr;
+		//unityTestBytes(bytes, size, 1);
+	}*/
+
 	OP_API void OP_ConfigurePose(
 		bool body_disable = false,
 		char* model_folder = "models/", int number_people_max = -1, // moved
@@ -388,7 +458,7 @@ void openpose_main(bool enableOutput, OutputCallback callback) {
 		auto spWrapper = std::make_shared<op::Wrapper>();
 
 		// Initializing the user custom classes
-		auto spUserOutput = std::make_shared<UnityPluginUserOutput>();
+		spUserOutput = std::make_shared<UnityPluginUserOutput>();
 
 		// Register Unity output callback
 		spUserOutput->unityOutputEnabled = enableOutput;
