@@ -5,6 +5,7 @@
 #include <vector>
 #include <opencv2/core/core.hpp> // cv::Mat
 #include <openpose/core/macros.hpp>
+#include <iostream>
 
 namespace op
 {
@@ -157,6 +158,21 @@ namespace op
         inline bool empty() const
         {
             return (mVolume == 0);
+        }
+
+        inline std::vector<int> getStrides() const
+        {
+            auto currSize = getSize();
+            std::vector<int> strides(currSize.size());
+            for(int i=0; i<strides.size(); i++){
+                strides[i] = sizeof(T);
+                int counter = 0;
+                for(int j=i+1; j<strides.size(); j++){
+                    counter++;
+                    strides[i] *= currSize[counter];
+                }
+            }
+            return strides;
         }
 
         /**

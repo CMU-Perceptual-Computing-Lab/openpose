@@ -866,6 +866,10 @@ endif (WITH_FLIR_CAMERA)
 if (UNIX OR APPLE)
   set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries} pthread)
 endif (UNIX OR APPLE)
+# Python needs Boost11 for some reason
+if (BUILD_PYTHON)
+  find_package(Boost COMPONENTS system REQUIRED)
+endif (BUILD_PYTHON)
 
 set(examples_3rdparty_libraries ${OpenPose_3rdparty_libraries} ${GFLAGS_LIBRARY})
 
@@ -902,6 +906,7 @@ message(STATUS "Models Downloaded.")
 ### PYTHON
 if (Caffe_FOUND)
   if(BUILD_PYTHON)
+    add_subdirectory(3rdparty/pybind11)
     add_subdirectory(python)
   endif (BUILD_PYTHON)
 endif(Caffe_FOUND)
