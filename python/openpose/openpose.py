@@ -1,6 +1,23 @@
 import _openpose as op
 import numpy as np
 import sys
+import cv2
+
+datum = op.getDatum()
+
+img = cv2.imread("/home/raaj/Pictures/Wallpapers/purple_sunset-wallpaper-1920x1080.jpg")
+print img.shape
+
+
+img[:,:,0] = 0
+
+datum.cvInputData = img
+
+op.checkDatum(datum)
+
+sys.exit()
+
+print "----"
 
 datum = op.getDatum()
 

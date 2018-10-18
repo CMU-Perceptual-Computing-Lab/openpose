@@ -24,6 +24,10 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
+#include <pybind11/numpy.h>
+#include <opencv2/core/core.hpp>
+#include <stdexcept>
+
 #ifdef _WIN32
     #define OP_EXPORT __declspec(dllexport)
 #else
@@ -33,32 +37,6 @@
 namespace py = pybind11;
 
 //typdef typename op::Array<float> op::Array_float;
-
-class Matrix {
-public:
-    Matrix(size_t rows, size_t cols) : m_rows(rows), m_cols(cols) {
-        m_data = new float[rows*cols];
-    }
-    float *data() { return m_data; }
-    size_t rows() const { return m_rows; }
-    size_t cols() const { return m_cols; }
-
-    std::string printMat(){
-        std::string finalString = "";
-        for(int i=0; i<rows(); i++){
-            finalString += "[";
-            for(int j=0; j<cols(); j++)
-                finalString += std::to_string(m_data[i*cols() + j]) + ", ";
-            finalString += "]";
-            finalString += "\n";
-        }
-        return finalString;
-    }
-
-private:
-    size_t m_rows, m_cols;
-    float *m_data;
-};
 
 int add(int i, int j) {
     return i + j;
@@ -72,18 +50,30 @@ std::shared_ptr<op::Datum> getDatum(){
 
     std::shared_ptr<op::Datum> datum2 = std::make_shared<op::Datum>();
 
-    datum2->outputData = op::Array<float>({2,2,2});
     return datum2;
 }
 
 void checkDatum(op::Datum* datum){
     std::cout << datum->outputData << std::endl;
+
+    std::cout << datum->cvInputData.size() << std::endl;
+
+    cv::imshow("win",datum->cvInputData);
+
+    cv::waitKey(0);
+
+//    cv::Mat x(rows, cols, CV_8UC3);
+
+    //cv::Mat_<cv::Vec3b> l;
 }
+
 
 //op::Datum getDatum(){
 //    op::Datum datum;
 //    return datum;
 //}
+
+// PROBLEM. CV MAT ALLOWS DIRECT CASTING, BUT OP ARRAY DOES NOT!! NO METHOD TO PASS PTR
 
 PYBIND11_MODULE(_openpose, m) {
     m.def("add", &add, "A function which adds two numbers",
@@ -95,9 +85,18 @@ PYBIND11_MODULE(_openpose, m) {
     py::class_<op::Datum, std::shared_ptr<op::Datum>>(m, "Datum")
         .def(py::init<>())
         .def_readwrite("outputData", &op::Datum::outputData)
+        .def_readwrite("cvInputData", &op::Datum::cvInputData)
         //.def("setName", &Pet::setName)
         //.def("getName", &Pet::getName)
             ;
+
+//    py::class_<cv::Mat>(m, "Mat")
+//        .def(py::init<>())
+//        .def(py::init<const int&, const int&, const int&>(),
+//             py::arg("rows"), py::arg("cols"), py::arg("type")=CV_8UC3)
+//        //.def("setName", &Pet::setName)
+//        //.def("getName", &Pet::getName)
+//            ;
 
     py::class_<op::Array<float>>(m, "Array", py::buffer_protocol())
        .def("__repr__", [](op::Array<float> &a) { return a.toString(); })
@@ -121,6 +120,126 @@ PYBIND11_MODULE(_openpose, m) {
     m.attr("__version__") = "dev";
 #endif
 }
+
+namespace pybind11 { namespace detail {
+
+template <> struct type_caster<cv::Mat> {
+    public:
+        /**
+         * This macro establishes the name 'inty' in
+         * function signatures and declares a local variable
+         * 'value' of type inty
+         */
+        PYBIND11_TYPE_CASTER(cv::Mat, _("numpy.ndarray"));
+
+        /**
+         * Conversion part 1 (Python->C++): convert a PyObject into a inty
+         * instance or return false upon failure. The second argument
+         * indicates whether implicit conversions should be applied.
+         */
+        bool load(handle src, bool)
+        {
+            /* Try a default converting into a Python */
+            array b(src, true);
+            buffer_info info = b.request();
+
+            int ndims = info.ndim;
+
+            decltype(CV_32F) dtype;
+            size_t elemsize;
+            if (info.format == format_descriptor<float>::format()) {
+                if (ndims == 3) {
+                    dtype = CV_32FC3;
+                } else {
+                    dtype = CV_32FC1;
+                }
+                elemsize = sizeof(float);
+            } else if (info.format == format_descriptor<double>::format()) {
+                if (ndims == 3) {
+                    dtype = CV_64FC3;
+                } else {
+                    dtype = CV_64FC1;
+                }
+                elemsize = sizeof(double);
+            } else if (info.format == format_descriptor<unsigned char>::format()) {
+                if (ndims == 3) {
+                    dtype = CV_8UC3;
+                } else {
+                    dtype = CV_8UC1;
+                }
+                elemsize = sizeof(unsigned char);
+            } else {
+                throw std::logic_error("Unsupported type");
+                return false;
+            }
+
+            std::vector<int> shape = {info.shape[0], info.shape[1]};
+
+            value = cv::Mat(cv::Size(shape[1], shape[0]), dtype, info.ptr, cv::Mat::AUTO_STEP);
+            return true;
+        }
+
+        /**
+         * Conversion part 2 (C++ -> Python): convert an inty instance into
+         * a Python object. The second and third arguments are used to
+         * indicate the return value policy and parent object (for
+         * ``return_value_policy::reference_internal``) and are generally
+         * ignored by implicit casters.
+         */
+        static handle cast(const cv::Mat &m, return_value_policy, handle defval)
+        {
+            std::cout << "m.cols : " << m.cols << std::endl;
+            std::cout << "m.rows : " << m.rows << std::endl;
+            std::string format = format_descriptor<unsigned char>::format();
+            size_t elemsize = sizeof(unsigned char);
+            int dim;
+            switch(m.type()) {
+                case CV_8U:
+                    format = format_descriptor<unsigned char>::format();
+                    elemsize = sizeof(unsigned char);
+                    dim = 2;
+                    break;
+                case CV_8UC3:
+                    format = format_descriptor<unsigned char>::format();
+                    elemsize = sizeof(unsigned char);
+                    dim = 3;
+                    break;
+                case CV_32F:
+                    format = format_descriptor<float>::format();
+                    elemsize = sizeof(float);
+                    dim = 2;
+                    break;
+                case CV_64F:
+                    format = format_descriptor<double>::format();
+                    elemsize = sizeof(double);
+                    dim = 2;
+                    break;
+                default:
+                    throw std::logic_error("Unsupported type");
+            }
+
+            std::vector<size_t> bufferdim;
+            std::vector<size_t> strides;
+            if (dim == 2) {
+                bufferdim = {(size_t) m.rows, (size_t) m.cols};
+                strides = {elemsize * (size_t) m.cols, elemsize};
+            } else if (dim == 3) {
+                bufferdim = {(size_t) m.rows, (size_t) m.cols, (size_t) 3};
+                strides = {(size_t) elemsize * m.cols * 3, (size_t) elemsize * 3, (size_t) elemsize};
+            }
+            return array(buffer_info(
+                m.data,         /* Pointer to buffer */
+                elemsize,       /* Size of one scalar */
+                format,         /* Python struct-style format descriptor */
+                dim,            /* Number of dimensions */
+                bufferdim,      /* Buffer dimensions */
+                strides         /* Strides (in bytes) for each index */
+                )).release();
+        }
+
+    };
+}} // namespace pybind11::detail
+
 
 //#define default_logging_level 3
 //#define default_output_resolution "-1x-1"

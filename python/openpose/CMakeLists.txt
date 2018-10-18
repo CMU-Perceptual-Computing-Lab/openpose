@@ -3,7 +3,7 @@ set(PYTHON_FILES
     __init__.py
     _openpose.cpp)
 
-pybind11_add_module(_openpose _openpose.cpp)
+pybind11_add_module(_openpose _openpose.cpp openpose.py)
 
 target_link_libraries(_openpose PRIVATE pybind11::module openpose ${OpenPose_3rdparty_libraries})
 SET_TARGET_PROPERTIES(_openpose PROPERTIES PREFIX "")
