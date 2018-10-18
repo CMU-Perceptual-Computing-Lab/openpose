@@ -1,5 +1,19 @@
 import _openpose as op
 import numpy as np
+import sys
+
+datum = op.getDatum()
+
+print datum
+
+datum_output_np = np.array(datum.outputData, copy=False)
+
+datum_output_np *= 0
+datum_output_np += 100
+
+op.checkDatum(datum)
+
+sys.exit()
 
 # 3D Test
 mat = op.Array([3,3])

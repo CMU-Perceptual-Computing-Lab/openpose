@@ -64,15 +64,43 @@ int add(int i, int j) {
     return i + j;
 
     op::Array<float> xx;
+
+    op::Datum d;
 }
+
+std::shared_ptr<op::Datum> getDatum(){
+
+    std::shared_ptr<op::Datum> datum2 = std::make_shared<op::Datum>();
+
+    datum2->outputData = op::Array<float>({2,2,2});
+    return datum2;
+}
+
+void checkDatum(op::Datum* datum){
+    std::cout << datum->outputData << std::endl;
+}
+
+//op::Datum getDatum(){
+//    op::Datum datum;
+//    return datum;
+//}
 
 PYBIND11_MODULE(_openpose, m) {
     m.def("add", &add, "A function which adds two numbers",
           py::arg("i") = 1, py::arg("j") = 2);
 
+    m.def("getDatum", &getDatum, "");
+    m.def("checkDatum", &checkDatum, "");
+
+    py::class_<op::Datum, std::shared_ptr<op::Datum>>(m, "Datum")
+        .def(py::init<>())
+        .def_readwrite("outputData", &op::Datum::outputData)
+        //.def("setName", &Pet::setName)
+        //.def("getName", &Pet::getName)
+            ;
 
     py::class_<op::Array<float>>(m, "Array", py::buffer_protocol())
-        .def("__repr__", [](op::Array<float> &a) { return a.toString(); })
+       .def("__repr__", [](op::Array<float> &a) { return a.toString(); })
        .def("getSize", [](op::Array<float> &a) { return a.getSize(); })
        .def(py::init<const std::vector<int>&>())
        .def_buffer([](op::Array<float> &m) -> py::buffer_info {
