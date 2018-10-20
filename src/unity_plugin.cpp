@@ -60,10 +60,10 @@ public:
 
     void initializationOnThread() {}
 
-    void terminate() {
-		op::log("OP_End");
-        this->stop();
-    }
+    //void terminate() {
+	//	op::log("OP_End");
+    //    this->stop();
+    //}
 
 protected:
 	template<class T>
@@ -75,13 +75,16 @@ protected:
 	void workConsumer(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
 		try	{
 			if (datumsPtr != nullptr && !datumsPtr->empty()) {
-				// op::log("Output");
+				if (opStoppingFlag) {
+					op::log("Stopping");
+					this->stop();
+					return;
+				}
+				
 				if (unityOutputEnabled) {
-					//sendData(datumsPtr);
 					sendPoseKeypoints(datumsPtr);
 					sendHandKeypoints(datumsPtr);
 				}
-				if (opStoppingFlag) this->stop();
 			}
 		} catch (const std::exception& e) {
 			// this->stop();
@@ -102,7 +105,7 @@ protected:
 			}
 			outputValue(val, sizes, sizeSize, Float, PoseKeypoints);
 			delete val;
-		}		
+		}
 	}
 
 	void sendHandKeypoints(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
@@ -262,7 +265,7 @@ protected:
 };
 
 // Global user output
-std::shared_ptr<UnityPluginUserOutput> spUserOutput;
+//std::shared_ptr<UnityPluginUserOutput> spUserOutput;
 
 // Title
 void openpose_main(bool enableOutput, OutputCallback callback);
@@ -458,7 +461,7 @@ void openpose_main(bool enableOutput, OutputCallback callback) {
 		auto spWrapper = std::make_shared<op::Wrapper>();
 
 		// Initializing the user custom classes
-		spUserOutput = std::make_shared<UnityPluginUserOutput>();
+		auto spUserOutput = std::make_shared<UnityPluginUserOutput>();
 
 		// Register Unity output callback
 		spUserOutput->unityOutputEnabled = enableOutput;
