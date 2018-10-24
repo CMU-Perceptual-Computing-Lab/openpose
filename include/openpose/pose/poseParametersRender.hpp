@@ -110,11 +110,11 @@ namespace op
         170.f,     0.f,   255.f, \
         255.f,     0.f,   255.f, \
          85.f,     0.f,   255.f
-    // BODY_25E
-    #define POSE_BODY_25E_PAIRS_RENDER_GPU \
-        1,8,   1,2,   1,5,   2,3,   3,4,   5,6,   6,7,   8,9,   9,10,  10,11, 8,12,  12,13, 13,14,  1,0,   0,15, 15,17,  0,16, 16,18,   14,19,19,20,14,21, 11,22,22,23,11,24
-    #define POSE_BODY_25E_SCALES_RENDER_GPU 1
-    #define POSE_BODY_25E_COLORS_RENDER_GPU \
+    // BODY_23
+    #define POSE_BODY_23_PAIRS_RENDER_GPU \
+        1,7, 4,10, 0,1,   0,4,   1,2,   2,3,   4,5,   5,6,   7,8,  8,9, 10,11, 11,12,  0,13, 13,15,  0,14, 14,16,   12,17,17,18,12,19, 9,20,20,21,9,22
+    #define POSE_BODY_23_SCALES_RENDER_GPU 1
+    #define POSE_BODY_23_COLORS_RENDER_GPU \
         255.f,     0.f,    85.f, \
         255.f,     0.f,     0.f, \
         255.f,    85.f,     0.f, \

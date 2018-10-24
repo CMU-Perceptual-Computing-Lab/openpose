@@ -14,6 +14,7 @@ namespace op
         AutoRepeat = 0,
         Flip,
         Rotation,
+        FrameStep,
         Size,
     };
 

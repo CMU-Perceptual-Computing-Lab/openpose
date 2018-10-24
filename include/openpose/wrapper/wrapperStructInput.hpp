@@ -1,6 +1,7 @@
 #ifndef OPENPOSE_WRAPPER_WRAPPER_STRUCT_INPUT_HPP
 #define OPENPOSE_WRAPPER_WRAPPER_STRUCT_INPUT_HPP
 
+#include <limits> // std::numeric_limits
 #include <openpose/core/common.hpp>
 #include <openpose/producer/producer.hpp>
 
@@ -14,19 +15,26 @@ namespace op
     {
         /**
          * Producer which will generate the frames.
-         * Set to nullptr to disable the whole input, i.e. if the user is going to use his own frames generator.
+         * Set to nullptr to disable the whole input, i.e., if the user is going to use his own frames generator.
          */
         std::shared_ptr<Producer> producerSharedPtr;
 
         /**
-         * First image to obtain.
+         * First image to process.
          * Default: 0.
          */
         unsigned long long frameFirst;
 
         /**
-         * Last image to obtain.
-         * Default: -1 (i.e. obtain all frames).
+         * Step or gap across processed frames.
+         * Default: 1 (i.e., process all frames).
+         * Example: A value of 5 would mean to process frames 0, 5, 10, etc.
+         */
+        unsigned long long frameStep;
+
+        /**
+         * Last image to process.
+         * Default: -1 (i.e., process all frames).
          */
         unsigned long long frameLast;
 
@@ -57,7 +65,8 @@ namespace op
          * Since all the elements of the struct are public, they can also be manually filled.
          */
         WrapperStructInput(const std::shared_ptr<Producer> producerSharedPtr = nullptr,
-                           const unsigned long long frameFirst = 0, const unsigned long long frameLast = -1,
+                           const unsigned long long frameFirst = 0, const unsigned long long frameStep = 1,
+                           const unsigned long long frameLast = std::numeric_limits<unsigned long long>::max(),
                            const bool realTimeProcessing = false, const bool frameFlip = false,
                            const int frameRotate = 0, const bool framesRepeat = false);
     };

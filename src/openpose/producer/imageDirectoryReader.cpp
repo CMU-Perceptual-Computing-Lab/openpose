@@ -127,7 +127,12 @@ namespace op
     {
         try
         {
+            // Read frame
             auto frame = loadImage(mFilePaths.at(mFrameNameCounter++).c_str(), CV_LOAD_IMAGE_COLOR);
+            // Skip frames if frame step > 1
+            const auto frameStep = Producer::get(ProducerProperty::FrameStep);
+            if (frameStep > 1)
+                set(CV_CAP_PROP_POS_FRAMES, mFrameNameCounter + frameStep-1);
             // Check frame integrity. This function also checks width/height changes. However, if it is performed
             // after setWidth/setHeight this is performed over the new resolution (so they always match).
             checkFrameIntegrity(frame);

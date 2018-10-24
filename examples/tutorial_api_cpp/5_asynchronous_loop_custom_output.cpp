@@ -184,8 +184,8 @@ int tutorialApiCpp5()
         opWrapperT.configure(wrapperStructExtra);
         // Producer (use default to disable any input)
         const op::WrapperStructInput wrapperStructInput{
-            producerSharedPtr, FLAGS_frame_first, FLAGS_frame_last, FLAGS_process_real_time, FLAGS_frame_flip,
-            FLAGS_frame_rotate, FLAGS_frames_repeat};
+            producerSharedPtr, FLAGS_frame_first, FLAGS_frame_step, FLAGS_frame_last, FLAGS_process_real_time,
+            FLAGS_frame_flip, FLAGS_frame_rotate, FLAGS_frames_repeat};
         opWrapperT.configure(wrapperStructInput);
         // Consumer (comment or use default argument to disable any output)
         const auto displayMode = op::DisplayMode::NoDisplay;

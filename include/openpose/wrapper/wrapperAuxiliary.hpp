@@ -217,8 +217,8 @@ namespace op
             if (oPProducer)
             {
                 const auto datumProducer = std::make_shared<DatumProducer<TDatums>>(
-                    wrapperStructInput.producerSharedPtr, wrapperStructInput.frameFirst, wrapperStructInput.frameLast,
-                    spVideoSeek
+                    wrapperStructInput.producerSharedPtr, wrapperStructInput.frameFirst, wrapperStructInput.frameStep,
+                    wrapperStructInput.frameLast, spVideoSeek
                 );
                 datumProducerW = std::make_shared<WDatumProducer<TDatumsSP, TDatums>>(datumProducer);
             }

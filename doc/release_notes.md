@@ -273,6 +273,8 @@ OpenPose Library - Release Notes
         3. `tutorial_pose` and `tutorial_thread` renamed as `tutorial_developer`, not meant to be used by users, but rather for OpenPose developers.
     7. Added a virtual destructor to almost all clases, so they can be inherited. Exceptions (for performance reasons): Array, Point, Rectangle, CvMatToOpOutput, OpOutputToCvMat.
     8. Auxiliary classes in errorAndLog turned into namespaces (Profiler must be kept as class to allow static parameters).
+    9. Added flag `--frame_step` to allow the user to select the step or gap between processed frames. E.g., `--frame_step 5` would read and process frames 0, 5, 10, etc.
+    10. Added sanity checks to avoid `--frame_last` to be smaller than `--frame_first` or higher than the number of total frames.
 2. Functions or parameters renamed:
     1. By default, python example `tutorial_developer/python_2_pose_from_heatmaps.py` was using 2 scales starting at -1x736, changed to 1 scale at -1x368.
     2. WrapperStructPose default parameters changed to match those of the OpenPose demo binary.
