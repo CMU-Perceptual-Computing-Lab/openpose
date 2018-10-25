@@ -24,7 +24,7 @@ namespace op
         /**
          * Array constructor.
          * Equivalent to default constructor + reset(const int size).
-         * @param size Integer with the number of T element to be allocated. E.g. size = 5 is internally similar to
+         * @param size Integer with the number of T element to be allocated. E.g., size = 5 is internally similar to
          * `new T[5]`.
          */
         explicit Array(const int size);
@@ -32,7 +32,7 @@ namespace op
         /**
          * Array constructor.
          * Equivalent to default constructor + reset(const std::vector<int>& size = {}).
-         * @param sizes Vector with the size of each dimension. E.g. size = {3, 5, 2} is internally similar to
+         * @param sizes Vector with the size of each dimension. E.g., size = {3, 5, 2} is internally similar to
          * `new T[3*5*2]`.
          */
         explicit Array(const std::vector<int>& sizes = {});
@@ -40,7 +40,7 @@ namespace op
         /**
          * Array constructor.
          * Equivalent to default constructor + reset(const int size, const T value).
-         * @param size Integer with the number of T element to be allocated. E.g. size = 5 is internally similar to
+         * @param size Integer with the number of T element to be allocated. E.g., size = 5 is internally similar to
          * `new T[5]`.
          * @param value Initial value for each component of the Array.
          */
@@ -49,7 +49,7 @@ namespace op
         /**
          * Array constructor.
          * Equivalent to default constructor + reset(const std::vector<int>& size, const T value).
-         * @param sizes Vector with the size of each dimension. E.g. size = {3, 5, 2} is internally similar to:
+         * @param sizes Vector with the size of each dimension. E.g., size = {3, 5, 2} is internally similar to:
          * `new T[3*5*2]`.
          * @param value Initial value for each component of the Array.
          */
@@ -100,7 +100,7 @@ namespace op
         /**
          * Data allocation function.
          * It allocates the required space for the memory (it does not initialize that memory).
-         * @param size Integer with the number of T element to be allocated. E.g. size = 5 is internally similar to
+         * @param size Integer with the number of T element to be allocated. E.g., size = 5 is internally similar to
          * `new T[5]`.
          */
         void reset(const int size);
@@ -109,7 +109,7 @@ namespace op
          * Data allocation function.
          * Similar to reset(const int size), but it allocates a multi-dimensional array of dimensions each of the
          * values of the argument.
-         * @param sizes Vector with the size of each dimension. E.g. size = {3, 5, 2} is internally similar to
+         * @param sizes Vector with the size of each dimension. E.g., size = {3, 5, 2} is internally similar to
          * `new T[3*5*2]`.
          */
         void reset(const std::vector<int>& sizes = {});
@@ -117,7 +117,7 @@ namespace op
         /**
          * Data allocation function.
          * Similar to reset(const int size), but initializing the data to the value specified by the second argument.
-         * @param size Integer with the number of T element to be allocated. E.g. size = 5 is internally similar to
+         * @param size Integer with the number of T element to be allocated. E.g., size = 5 is internally similar to
          * `new T[5]`.
          * @param value Initial value for each component of the Array.
          */
@@ -127,7 +127,7 @@ namespace op
          * Data allocation function.
          * Similar to reset(const std::vector<int>& size), but initializing the data to the value specified by the
          * second argument.
-         * @param sizes Vector with the size of each dimension. E.g. size = {3, 5, 2} is internally similar to
+         * @param sizes Vector with the size of each dimension. E.g., size = {3, 5, 2} is internally similar to
          * `new T[3*5*2]`.
          * @param value Initial value for each component of the Array.
          */
@@ -170,19 +170,19 @@ namespace op
         }
 
         /**
-         * Return a string with the size of each dimension allocated.
-         * @return A std::stringwith the size of each dimension. If no memory has been allocated, it will return an
-         * empty string.
-         */
-        std::string printSize() const;
-
-        /**
          * Return a vector with the size of the desired dimension.
          * @param index Dimension to check its size.
          * @return Size of the desired dimension. It will return 0 if the requested dimension is higher than the number
          * of dimensions.
          */
         int getSize(const int index) const;
+
+        /**
+         * Return a string with the size of each dimension allocated.
+         * @return A std::stringwith the size of each dimension. If no memory has been allocated, it will return an
+         * empty string.
+         */
+        std::string printSize() const;
 
         /**
          * Return the total number of dimensions, equivalent to getSize().size().
@@ -195,7 +195,7 @@ namespace op
 
         /**
          * Return the total number of elements allocated, equivalent to multiply all the components from getSize().
-         * E.g. for a Array<T> of size = {2,5,3}, the volume or total number of elements is: 2x5x3 = 30.
+         * E.g., for a Array<T> of size = {2,5,3}, the volume or total number of elements is: 2x5x3 = 30.
          * @return The total volume of the allocated data. If no memory is allocated, it returns 0.
          */
         inline size_t getVolume() const
@@ -205,12 +205,25 @@ namespace op
 
         /**
          * Similar to getVolume(), but in this case it just returns the volume between the desired dimensions.
-         * E.g. for a Array<T> of size = {2,5,3}, the volume or total number of elements for getVolume(1,2) is
+         * E.g., for a Array<T> of size = {2,5,3}, the volume or total number of elements for getVolume(1,2) is
          * 5x3 = 15.
          * @return The total volume of the allocated data between the desired dimensions. If the index are out of
          * bounds, it throws an error.
          */
         size_t getVolume(const int indexA, const int indexB) const;
+
+        /**
+         * Return the stride or step size of the array.
+         * E.g., given and Array<T> of size 5x3, getStride() would return the following vector:
+         * {5x3sizeof(T), 3sizeof(T), sizeof(T)}.
+         */
+        std::vector<int> getStride() const;
+
+        /**
+         * Return the stride or step size of the array at the index-th dimension.
+         * E.g., given and Array<T> of size 5x3, getStride(2) would return sizeof(T).
+         */
+        int getStride(const int index) const;
 
 
 
@@ -252,7 +265,7 @@ namespace op
         /**
          * Analogous to getConstCvMat, but in this case it returns a editable cv::Mat.
          * Very important: Only allowed functions which do not provoke data reallocation.
-         * E.g. resizing functions will not work and they would provoke an undefined behaviour and/or execution
+         * E.g., resizing functions will not work and they would provoke an undefined behaviour and/or execution
          * crashes.
          * @return A cv::Mat pointing to the data.
          */
@@ -295,7 +308,7 @@ namespace op
          * [] operator
          * Same functionality as operator[](const int index), but it lets the user introduce the multi-dimensional
          * index.
-         * E.g. given a (10 x 10 x 10) array, array[11] is equivalent to array[{1,1,0}]
+         * E.g., given a (10 x 10 x 10) array, array[11] is equivalent to array[{1,1,0}]
          * @param indexes Vector with the desired memory location.
          * @return A editable reference to the data on the desired index location.
          */
