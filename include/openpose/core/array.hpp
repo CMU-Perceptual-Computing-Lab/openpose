@@ -160,21 +160,6 @@ namespace op
             return (mVolume == 0);
         }
 
-        inline std::vector<int> getStrides() const
-        {
-            auto currSize = getSize();
-            std::vector<int> strides(currSize.size());
-            for(int i=0; i<strides.size(); i++){
-                strides[i] = sizeof(T);
-                int counter = 0;
-                for(int j=i+1; j<strides.size(); j++){
-                    counter++;
-                    strides[i] *= currSize[counter];
-                }
-            }
-            return strides;
-        }
-
         /**
          * Return a vector with the size of each dimension allocated.
          * @return A std::vector<int> with the size of each dimension. If no memory has been allocated, it will return
@@ -407,10 +392,13 @@ namespace op
          */
         const std::string toString() const;
 
+    public:
+        std::shared_ptr<T> spData;
+
     private:
         std::vector<int> mSize;
         size_t mVolume;
-        std::shared_ptr<T> spData;
+
         std::pair<bool, cv::Mat> mCvMatData;
 
         /**

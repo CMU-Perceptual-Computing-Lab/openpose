@@ -5,54 +5,66 @@ import cv2
 
 datum = op.getDatum()
 
-img = cv2.imread("/home/raaj/Pictures/Wallpapers/purple_sunset-wallpaper-1920x1080.jpg")
-print img.shape
+xx = datum.outputData
+
+yy = xx
+
+datum.outputData = yy
+
+xx[0,0] = 0
+
+print xx
+
+#datum = op.getDatum()
+
+#img = cv2.imread("/home/raaj/Pictures/Wallpapers/purple_sunset-wallpaper-1920x1080.jpg")
+#print img.shape
 
 
-img[:,:,0] = 0
+#img[:,:,0] = 0
 
-datum.cvInputData = img
-
-op.checkDatum(datum)
-
-sys.exit()
-
-print "----"
-
-datum = op.getDatum()
-
-print datum
-
-datum_output_np = np.array(datum.outputData, copy=False)
-
-datum_output_np *= 0
-datum_output_np += 100
+#datum.cvInputData = img
 
 op.checkDatum(datum)
 
-sys.exit()
+#sys.exit()
 
-# 3D Test
-mat = op.Array([3,3])
-print mat.getSize()
-num_mat = np.array(mat, copy=False)
-num_mat += 100
-print mat
+#print "----"
 
-print "----"
+#datum = op.getDatum()
 
-# 3D Test
-mat = op.Array([2,3,3])
-print mat.getSize()
-num_mat = np.array(mat, copy=False)
+#print datum
 
-print num_mat.shape
+#datum_output_np = np.array(datum.outputData, copy=False)
 
-num_mat[:,:,:] = 0
-num_mat[:,1,:] = -100
+#datum_output_np *= 0
+#datum_output_np += 100
+
+#op.checkDatum(datum)
+
+#sys.exit()
+
+## 3D Test
+#mat = op.Array([3,3])
+#print mat.getSize()
+#num_mat = np.array(mat, copy=False)
+#num_mat += 100
+#print mat
+
+#print "----"
+
+## 3D Test
+#mat = op.Array([2,3,3])
+#print mat.getSize()
+#num_mat = np.array(mat, copy=False)
+
+#print num_mat.shape
+
+#num_mat[:,:,:] = 0
+#num_mat[:,1,:] = -100
 
 #num_mat += 100
-print mat
+#print mat
 
 # """
 # Wrap the OpenPose library with Python.

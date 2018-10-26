@@ -50,17 +50,21 @@ std::shared_ptr<op::Datum> getDatum(){
 
     std::shared_ptr<op::Datum> datum2 = std::make_shared<op::Datum>();
 
+    datum2->outputData = op::Array<float>({2,2},1);
+
     return datum2;
 }
 
 void checkDatum(op::Datum* datum){
     std::cout << datum->outputData << std::endl;
 
-    std::cout << datum->cvInputData.size() << std::endl;
+    std::cout << datum->outputData.spData.use_count() << std::endl;
 
-    cv::imshow("win",datum->cvInputData);
+//    std::cout << datum->cvInputData.size() << std::endl;
 
-    cv::waitKey(0);
+//    cv::imshow("win",datum->cvInputData);
+
+//    cv::waitKey(0);
 
 //    cv::Mat x(rows, cols, CV_8UC3);
 
@@ -98,21 +102,21 @@ PYBIND11_MODULE(_openpose, m) {
 //        //.def("getName", &Pet::getName)
 //            ;
 
-    py::class_<op::Array<float>>(m, "Array", py::buffer_protocol())
-       .def("__repr__", [](op::Array<float> &a) { return a.toString(); })
-       .def("getSize", [](op::Array<float> &a) { return a.getSize(); })
-       .def(py::init<const std::vector<int>&>())
-       .def_buffer([](op::Array<float> &m) -> py::buffer_info {
-            return py::buffer_info(
-                m.getPtr(),                             /* Pointer to buffer */
-                sizeof(float),                          /* Size of one scalar */
-                py::format_descriptor<float>::format(), /* Python struct-style format descriptor */
-                m.getSize().size(),                     /* Number of dimensions */
-                m.getSize(),                            /* Buffer dimensions */
-                m.getStrides()                          /* Strides (in bytes) for each index */
-            );
-        })
-    ;
+//    py::class_<op::Array<float>>(m, "Array", py::buffer_protocol())
+//       .def("__repr__", [](op::Array<float> &a) { return a.toString(); })
+//       .def("getSize", [](op::Array<float> &a) { return a.getSize(); })
+//       .def(py::init<const std::vector<int>&>())
+//       .def_buffer([](op::Array<float> &m) -> py::buffer_info {
+//            return py::buffer_info(
+//                m.getPtr(),                             /* Pointer to buffer */
+//                sizeof(float),                          /* Size of one scalar */
+//                py::format_descriptor<float>::format(), /* Python struct-style format descriptor */
+//                m.getSize().size(),                     /* Number of dimensions */
+//                m.getSize(),                            /* Buffer dimensions */
+//                m.getStride()                          /* Strides (in bytes) for each index */
+//            );
+//        })
+//    ;
 
 #ifdef VERSION_INFO
     m.attr("__version__") = VERSION_INFO;
@@ -120,6 +124,106 @@ PYBIND11_MODULE(_openpose, m) {
     m.attr("__version__") = "dev";
 #endif
 }
+
+namespace pybind11 { namespace detail {
+
+template <> struct type_caster<op::Array<float>> {
+    public:
+        /**
+         * This macro establishes the name 'inty' in
+         * function signatures and declares a local variable
+         * 'value' of type inty
+         */
+        PYBIND11_TYPE_CASTER(op::Array<float>, _("numpy.ndarray"));
+
+        /**
+         * Conversion part 1 (Python->C++): convert a PyObject into a inty
+         * instance or return false upon failure. The second argument
+         * indicates whether implicit conversions should be applied.
+         */
+        bool load(handle src, bool imp)
+        {
+            std::cout << "opArraay load" << std::endl;
+
+            array b(src, true);
+            buffer_info info = b.request();
+
+            //std::vector<int> a(info.shape);
+            std::vector<int> shape(std::begin(info.shape), std::end(info.shape));
+
+            value = op::Array<float>(shape,0);
+
+            value.spData.reset((float*)info.ptr);
+
+            //memcpy(value.spData.get(), info.ptr, value.getVolume()*sizeof(float));
+
+            return true;
+
+            //exit(-1);
+
+//            /* Try a default converting into a Python */
+//            array b(src, true);
+//            buffer_info info = b.request();
+
+//            int ndims = info.ndim;
+
+//            decltype(CV_32F) dtype;
+//            size_t elemsize;
+//            if (info.format == format_descriptor<float>::format()) {
+//                if (ndims == 3) {
+//                    dtype = CV_32FC3;
+//                } else {
+//                    dtype = CV_32FC1;
+//                }
+//                elemsize = sizeof(float);
+//            } else if (info.format == format_descriptor<double>::format()) {
+//                if (ndims == 3) {
+//                    dtype = CV_64FC3;
+//                } else {
+//                    dtype = CV_64FC1;
+//                }
+//                elemsize = sizeof(double);
+//            } else if (info.format == format_descriptor<unsigned char>::format()) {
+//                if (ndims == 3) {
+//                    dtype = CV_8UC3;
+//                } else {
+//                    dtype = CV_8UC1;
+//                }
+//                elemsize = sizeof(unsigned char);
+//            } else {
+//                throw std::logic_error("Unsupported type");
+//                return false;
+//            }
+
+//            std::vector<int> shape = {info.shape[0], info.shape[1]};
+
+//            value = cv::Mat(cv::Size(shape[1], shape[0]), dtype, info.ptr, cv::Mat::AUTO_STEP);
+//            return true;
+        }
+
+        /**
+         * Conversion part 2 (C++ -> Python): convert an inty instance into
+         * a Python object. The second and third arguments are used to
+         * indicate the return value policy and parent object (for
+         * ``return_value_policy::reference_internal``) and are generally
+         * ignored by implicit casters.
+         */
+        static handle cast(const op::Array<float> &m, return_value_policy, handle defval)
+        {
+            std::string format = format_descriptor<float>::format();
+            return array(buffer_info(
+                m.spData.get(),     /* Pointer to buffer */
+                sizeof(float),       /* Size of one scalar */
+                format,         /* Python struct-style format descriptor */
+                m.getSize().size(),            /* Number of dimensions */
+                m.getSize(),      /* Buffer dimensions */
+                m.getStride()         /* Strides (in bytes) for each index */
+                )).release();
+        }
+
+    };
+}} // namespace pybind11::detail
+
 
 namespace pybind11 { namespace detail {
 
