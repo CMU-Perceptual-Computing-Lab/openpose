@@ -299,6 +299,29 @@ namespace op
     }
 
     template<typename T>
+    std::string Array<T>::printSize() const
+    {
+        try
+        {
+            auto counter = 0u;
+            std::string sizeString = "[ ";
+            for (const auto& i : mSize)
+            {
+                sizeString += std::to_string(i);
+                if (++counter < mSize.size())
+                    sizeString += " x ";
+            }
+            sizeString += " ]";
+            return sizeString;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return "";
+        }
+    }
+
+    template<typename T>
     size_t Array<T>::getVolume(const int indexA, const int indexB) const
     {
         try
@@ -325,6 +348,41 @@ namespace op
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             return 0;
+        }
+    }
+
+    template<typename T>
+    std::vector<int> Array<T>::getStride() const
+    {
+        try
+        {
+            std::vector<int> strides(mSize.size());
+            if (!strides.empty())
+            {
+                strides.back() = sizeof(T);
+                for (auto i = (int)strides.size()-2 ; i > -1 ; i--)
+                    strides[i] = strides[i+1] * mSize[i+1];
+            }
+            return strides;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return {};
+        }
+    }
+
+    template<typename T>
+    int Array<T>::getStride(const int index) const
+    {
+        try
+        {
+            return getStride()[index];
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return -1;
         }
     }
 
@@ -387,29 +445,6 @@ namespace op
             }
             // Return string
             return string;
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return "";
-        }
-    }
-
-    template<typename T>
-    std::string Array<T>::printSize() const
-    {
-        try
-        {
-            auto counter = 0u;
-            std::string sizeString = "[ ";
-            for (const auto& i : mSize)
-            {
-                sizeString += std::to_string(i);
-                if (++counter < mSize.size())
-                    sizeString += " x ";
-            }
-            sizeString += " ]";
-            return sizeString;
         }
         catch (const std::exception& e)
         {

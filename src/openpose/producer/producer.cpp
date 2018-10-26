@@ -155,6 +155,15 @@ namespace op
                           "ProducerProperty::Rotation only implemented for {0, 90, 180, 270} degrees.",
                           __LINE__, __FUNCTION__, __FILE__);
                 }
+                else if (property == ProducerProperty::FrameStep)
+                {
+                    // Sanity check
+                    if (value < 1)
+                    {
+                        const auto message = "The frame step must be greater than 0 (`--frame_step`). Use 1 by default.";
+                        error(message, __LINE__, __FUNCTION__, __FILE__);
+                    }
+                }
 
                 // Common operation
                 mProperties[(unsigned char)property] = value;
