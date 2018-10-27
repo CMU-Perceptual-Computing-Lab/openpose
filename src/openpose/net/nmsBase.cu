@@ -112,8 +112,9 @@ namespace op
                     }
                 }
             }
+            // If index 0 --> Assign number of peaks (truncated to the maximum possible number of peaks)
             else
-                output[0] = kernelPtr[globalIdx]; //number of peaks
+                output[0] = (kernelPtr[globalIdx] < maxPeaks ? kernelPtr[globalIdx] : maxPeaks);
         }
     }
 

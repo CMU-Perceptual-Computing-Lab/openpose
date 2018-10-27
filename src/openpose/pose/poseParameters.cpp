@@ -223,6 +223,31 @@ namespace op
         {11, "BLTop"},
         {12, "Background"},
     };
+    const std::map<unsigned int, std::string> POSE_CAR_22_PARTS {
+        {0,  "FLWheel"},
+        {1,  "BLWheel"},
+        {2,  "FRWheel"},
+        {3,  "BRWheel"},
+        {4,  "FRFogLight"},
+        {5,  "FLFogLight"},
+        {6,  "FRLight"},
+        {7,  "FLLight"},
+        {8,  "Grilles"},
+        {9,  "FBumper"},
+        {10, "LMirror"},
+        {11, "RMirror"},
+        {12, "FRTop"},
+        {13, "FLTop"},
+        {14, "BLTop"},
+        {15, "BRTop"},
+        {16, "BLLight"},
+        {17, "BRLight"},
+        {18, "Trunk"},
+        {19, "BBumper"},
+        {20, "BLCorner"},
+        {21, "BRCorner"},
+        {22, "Background"},
+    };
     const std::array<std::vector<unsigned int>, (int)PoseModel::Size> POSE_MAP_INDEX{
         // BODY_25
         std::vector<unsigned int>{
@@ -294,13 +319,18 @@ namespace op
             // Redundant ones
             44,45, 46,47, 48,49, 50,51, 52,53, 54,55, 56,57, 58,59, 60,61, 62,63, 64,65, 66,67, 68,69, 70,71, 72,73
         },
+        // CAR_22
+        std::vector<unsigned int>{
+            0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,
+            38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63
+        },
     };
     // POSE_BODY_PART_MAPPING on HPP crashes on Windows at dynamic initialization if it's on hpp
     const std::array<std::map<unsigned int, std::string>, (int)PoseModel::Size> POSE_BODY_PART_MAPPING{
         POSE_BODY_25_BODY_PARTS,POSE_COCO_BODY_PARTS,   POSE_MPI_BODY_PARTS,    POSE_MPI_BODY_PARTS,
         POSE_BODY_19_BODY_PARTS,POSE_BODY_19_BODY_PARTS,POSE_BODY_59_BODY_PARTS,POSE_BODY_19_BODY_PARTS,
         POSE_BODY_25_BODY_PARTS,POSE_BODY_25_BODY_PARTS,POSE_BODY_65_BODY_PARTS,POSE_CAR_12_PARTS,
-        POSE_BODY_25_BODY_PARTS,POSE_BODY_23_BODY_PARTS
+        POSE_BODY_25_BODY_PARTS,POSE_BODY_23_BODY_PARTS,POSE_CAR_22_PARTS
     };
 
     const std::array<std::string, (int)PoseModel::Size> POSE_PROTOTXT{
@@ -318,6 +348,7 @@ namespace op
         "car/car_12/pose_deploy.prototxt",
         "pose/body_25d/pose_deploy.prototxt",
         "pose/body_23/pose_deploy.prototxt",
+        "car/car_22/pose_deploy.prototxt",
     };
     const std::array<std::string, (int)PoseModel::Size> POSE_TRAINED_MODEL{
         "pose/body_25/pose_iter_584000.caffemodel",
@@ -334,12 +365,13 @@ namespace op
         "car/car_12/pose_iter_XXXXXX.caffemodel",
         "pose/body_25d/pose_iter_XXXXXX.caffemodel",
         "pose/body_23/pose_iter_XXXXXX.caffemodel",
+        "car/car_22/pose_iter_XXXXXX.caffemodel",
     };
 
     // Constant Array Parameters
     // POSE_NUMBER_BODY_PARTS equivalent to size of std::map POSE_BODY_XX_BODY_PARTS - 1 (removing background)
     const std::array<unsigned int, (int)PoseModel::Size> POSE_NUMBER_BODY_PARTS{
-        25, 18, 15, 15, 19, 19, 59, 19, 25, 25, 65, 12, 25, 23
+        25, 18, 15, 15, 19, 19, 59, 19, 25, 25, 65, 12, 25, 23, 22
     };
     const std::array<std::vector<unsigned int>, (int)PoseModel::Size> POSE_BODY_PART_PAIRS{
         // BODY_25
@@ -408,6 +440,13 @@ namespace op
             // Ears-shoulders,      ears,      shoulders-wrists, hips-ankles, wrists,  ankles, wrists-hips, small toes-ankles, hips)
                 1,15, 4,16,         15,16,        1,3, 4,6,      7,9, 10,12,   3,6,    9,12,    3,7, 6,10,     9,21, 12,18,    7,10
         },
+        // CAR_22
+        std::vector<unsigned int>{
+        //       Wheels                Lights                   Top                       Front                Mirrors
+            0,1,1,3,3,2,2,0,   6,7,7,16,16,17,17,6,   12,13,13,14,14,15,15,12,   6,8,7,8,6,9,7,9,6,4,7,5,   12,11,13,10,
+        //            Back                  Vertical         Back-light replacement
+            16,18,17,18,16,19,17,19,   0,7,3,17,6,12,16,14,   6,21,7,20,3,21,20,14
+        },
     };
     const std::array<unsigned int, (int)PoseModel::Size> POSE_MAX_PEAKS{
         POSE_MAX_PEOPLE,    // BODY_25
@@ -424,6 +463,7 @@ namespace op
         POSE_MAX_PEOPLE,    // CAR_12
         POSE_MAX_PEOPLE,    // BODY_25D
         POSE_MAX_PEOPLE,    // BODY_23
+        POSE_MAX_PEOPLE,    // CAR_22
     };
     const std::array<float, (int)PoseModel::Size> POSE_CCN_DECREASE_FACTOR{
         8.f,    // BODY_25
@@ -440,30 +480,31 @@ namespace op
         8.f,    // CAR_12
         8.f,    // BODY_25D
         8.f,    // BODY_23
+        8.f,    // CAR_22
     };
 
     // Default Model Parameters
     // They might be modified on running time
     const auto nmsT = (COCO_CHALLENGE ? 0.02f : 0.05f);
     const std::array<float, (int)PoseModel::Size>           POSE_DEFAULT_NMS_THRESHOLD{
-        nmsT,       nmsT,       0.6f,       0.3f,       nmsT,       nmsT,       nmsT,       nmsT,       nmsT,       nmsT,       nmsT,       nmsT,       nmsT,       nmsT
+        nmsT,       nmsT,       0.6f,       0.3f,       nmsT,       nmsT,       nmsT,       nmsT,       nmsT,       nmsT,       nmsT,       nmsT,       nmsT,       nmsT,       nmsT
     };
     const auto minAT = (COCO_CHALLENGE ? 0.75f : 0.95f); // Matlab version: 0.85f
     const std::array<float, (int)PoseModel::Size>    POSE_DEFAULT_CONNECT_INTER_MIN_ABOVE_THRESHOLD{
-        minAT,      minAT,      minAT,      minAT,      minAT,      minAT,      minAT,      minAT,      minAT,      minAT,      minAT,      minAT,      minAT,      minAT
+        minAT,      minAT,      minAT,      minAT,      minAT,      minAT,      minAT,      minAT,      minAT,      minAT,      minAT,      minAT,      minAT,      minAT,      minAT
         // 0.85f,      0.85f,      0.85f,      0.85f,      0.85f,      0.85f // Matlab version
     };
     const auto conIT = (COCO_CHALLENGE ? 0.01f : 0.05f);
     const std::array<float, (int)PoseModel::Size>           POSE_DEFAULT_CONNECT_INTER_THRESHOLD{
-        conIT,      conIT,      0.01f,      0.01f,      conIT,      conIT,      conIT,      conIT,      conIT,      conIT,      conIT,      conIT,      conIT,      conIT
+        conIT,      conIT,      0.01f,      0.01f,      conIT,      conIT,      conIT,      conIT,      conIT,      conIT,      conIT,      conIT,      conIT,      conIT,      conIT
     };
     const auto minSC = (COCO_CHALLENGE ? 2 : 3);
     const std::array<unsigned int, (int)PoseModel::Size>    POSE_DEFAULT_CONNECT_MIN_SUBSET_CNT{
-        minSC,      minSC,      minSC,      minSC,      minSC,      minSC,      minSC,      minSC,      minSC,      minSC,      minSC,      minSC,      minSC,      minSC
+        minSC,      minSC,      minSC,      minSC,      minSC,      minSC,      minSC,      minSC,      minSC,      minSC,      minSC,      minSC,      minSC,      minSC,      minSC
     };
     const auto minSS = (COCO_CHALLENGE ? 0.05f : 0.4f);
     const std::array<float, (int)PoseModel::Size>           POSE_DEFAULT_CONNECT_MIN_SUBSET_SCORE{
-        minSS,      minSS,      minSS,      minSS,      minSS,      minSS,      minSS,      minSS,      minSS,      minSS,      minSS,      minSS,      minSS,      minSS
+        minSS,      minSS,      minSS,      minSS,      minSS,      minSS,      minSS,      minSS,      minSS,      minSS,      minSS,      minSS,      minSS,      minSS,      minSS
         // 0.2f,       0.4f,       0.4f,       0.4f,       0.4f,       0.4f // Matlab version
     };
 

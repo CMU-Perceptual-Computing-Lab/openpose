@@ -334,8 +334,8 @@ namespace op
                                         const auto scale = initScale
                                                          + mMultiScaleNumberAndRange.second * i / (numberScales-1.f);
                                         // Process hand
-                                        Array<float> handEstimated({1, handCurrent.getSize(1),
-                                                                    handCurrent.getSize(2)}, 0);
+                                        Array<float> handEstimated(
+                                            {1, handCurrent.getSize(1), handCurrent.getSize(2)}, 0.f);
                                         const auto handRectangleScale = recenter(
                                             handRectangle,
                                             (float)(intRound(handRectangle.width * scale) / 2 * 2),

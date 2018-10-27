@@ -5,7 +5,6 @@
 #include <vector>
 #include <opencv2/core/core.hpp> // cv::Mat
 #include <openpose/core/macros.hpp>
-#include <iostream>
 
 namespace op
 {
@@ -55,6 +54,24 @@ namespace op
          * @param value Initial value for each component of the Array.
          */
         Array(const std::vector<int>& sizes, const T value);
+
+        /**
+         * Array constructor.
+         * Equivalent to default constructor, but it does not allocate memory, but rather use dataPtr.
+         * @param size Integer with the number of T element to be allocated. E.g., size = 5 is internally similar to
+         * `new T[5]`.
+         * @param dataPtr Pointer to the memory to be used by the Array.
+         */
+        Array(const int size, T* const dataPtr);
+
+        /**
+         * Array constructor.
+         * Equivalent to default constructor, but it does not allocate memory, but rather use dataPtr.
+         * @param sizes Vector with the size of each dimension. E.g., size = {3, 5, 2} is internally similar to:
+         * `new T[3*5*2]`.
+         * @param dataPtr Pointer to the memory to be used by the Array.
+         */
+        Array(const std::vector<int>& sizes, T* const dataPtr);
 
         /**
          * Copy constructor.
@@ -237,7 +254,7 @@ namespace op
          */
         inline T* getPtr()
         {
-            return spData.get();
+            return pData; // spData.get()
         }
 
         /**
@@ -246,7 +263,17 @@ namespace op
          */
         inline const T* getConstPtr() const
         {
-            return spData.get();
+            return pData; // spData.get()
+        }
+
+        /**
+         * Similar to getConstPtr(), but it allows the data to be edited.
+         * This function is only implemented for Pybind11 usage.
+         * @return A raw pointer to the data.
+         */
+        inline T* getPybindPtr() const
+        {
+            return pData; // spData.get()
         }
 
         /**
@@ -283,7 +310,7 @@ namespace op
         inline T& operator[](const int index)
         {
             #ifdef NDEBUG
-                return spData.get()[index];
+                return pData[index]; // spData.get()[index]
             #else
                 return at(index);
             #endif
@@ -299,7 +326,7 @@ namespace op
         inline const T& operator[](const int index) const
         {
             #ifdef NDEBUG
-                return spData.get()[index];
+                return pData[index]; // spData.get()[index]
             #else
                 return at(index);
             #endif
@@ -392,13 +419,11 @@ namespace op
          */
         const std::string toString() const;
 
-    public:
-        std::shared_ptr<T> spData;
-
     private:
         std::vector<int> mSize;
         size_t mVolume;
-
+        std::shared_ptr<T> spData;
+        T* pData; // pData is a wrapper of spData. Used for Pybind11 binding.
         std::pair<bool, cv::Mat> mCvMatData;
 
         /**
@@ -426,11 +451,7 @@ namespace op
          */
         T& commonAt(const int index) const;
 
-        /**
-         * Private auxiliar function that sets the cv::Mat wrapper and makes it point to the same data than
-         * std::shared_ptr points to.
-         */
-        void setCvMatFromSharedPtr();
+        void resetAuxiliary(const std::vector<int>& sizes, T* const dataPtr = nullptr);
     };
 
     // Static methods

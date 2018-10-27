@@ -13,6 +13,7 @@ OpenPose - Frequently Asked Question (FAQ)
     8. [Source Directory does not Contain CMakeLists.txt (Windows)](#source-directory-does-not-contain-cmakelists.txt-windows)
     9. [How Should I Link my IP Camera?](#how-should-i-link-my-ip-camera)
     10. [Difference between BODY_25 vs. COCO vs. MPI](#difference-between-body_25-vs.-coco-vs.-mpi)
+    11. [How to Measure the Latency Time?](#how-to-measure-the-latency-time)
 
 
 
@@ -87,7 +88,7 @@ Note: OpenPose library is not an executable, but a library. So instead clicking 
 
 
 ### How Should I Link my IP Camera?
-**Q: How Should I Link my IP Camera with http protocol?.**
+**Q: How Should I Link my IP Camera with http protocol?**
 
 **A**: Usually with `http://CamIP:PORT_NO./video?x.mjpeg`.
 
@@ -95,3 +96,10 @@ Note: OpenPose library is not an executable, but a library. So instead clicking 
 
 ### Difference between BODY_25 vs. COCO vs. MPI
 COCO model will eventually be removed. BODY_25 model is faster, more accurate, and it includes foot keypoints. However, COCO requires less memory on GPU (being able to fit into 2GB GPUs with the default settings) and it runs faster on CPU-only mode. MPI model is only meant for people requiring the MPI-keypoint structure. It is also slower than BODY_25 and far less accurate.
+
+
+
+### How to Measure the Latency Time?
+**Q: How to measure/calculate/estimate the latency/lag time?**
+
+**A**: [Profile](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/installation.md#profiling-speed) the OpenPose speed. For 1-GPU or CPU-only systems (use `--disable_multi_thread` for simplicity in multi-GPU systems for latency measurement), the latency will be roughly the sum of all the reported measurements.
