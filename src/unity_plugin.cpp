@@ -40,10 +40,6 @@ op::WrapperStructExtra *wrapperStructExtra;
 op::WrapperStructInput *wrapperStructInput;
 op::WrapperStructOutput *wrapperStructOutput;
 
-// Global flags
-bool opStoppingFlag = false;
-bool opRunningFlag = false;
-
 // This worker will just read and return all the jpg files in a directory
 class UnityPluginUserOutput : public op::WorkerConsumer<std::shared_ptr<std::vector<op::Datum>>> {
 public:
@@ -52,10 +48,11 @@ public:
 
     void initializationOnThread() {}
 
-    //void terminate() {
-	//	op::log("OP_End");
-    //    this->stop();
-    //}
+    void terminate() {
+		op::log("Stopping...");
+		unityOutputCallback = nullptr;
+        this->stop();
+    }
 
 protected:
 	template<class T>
@@ -66,13 +63,7 @@ protected:
 
 	void workConsumer(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
 		try	{
-			if (datumsPtr != nullptr && !datumsPtr->empty()) {
-				if (opStoppingFlag) {
-					op::log("Stopping");
-					this->stop();
-					return;
-				}
-				
+			if (datumsPtr != nullptr && !datumsPtr->empty()) {				
 				if (unityOutputEnabled) {
 					sendPoseKeypoints(datumsPtr);
 					sendHandKeypoints(datumsPtr);
@@ -111,31 +102,13 @@ protected:
 };
 
 // Global user output
-//std::shared_ptr<UnityPluginUserOutput> spUserOutput;
+UnityPluginUserOutput* ptrUserOutput;
 
 // Title
 void openpose_main(bool enableOutput, OutputCallback callback);
 
 // Unity Interface
 extern "C" {
-	/*OP_API void OPT_RegisterTest(OutputIntTest intTest, OutputFloatTest floatTest, OutputByte byteTest) {
-		unityTestIntArray = intTest;
-		unityTestFloatArray = floatTest;
-		unityTestBytes = byteTest;
-	}
-
-	OP_API void OPT_CallbackTestFunctions() {
-		int* intArr = new int[9]{ 9,8,7,6,5,4,3,2,1 };
-		float* floatArr = new float[9]{ 9.f,8.f,7.f,6.f,5.f,4.f,3.f,2.f,1.f };
-		int* size = new int(9);
-		//unityTestIntArray(&intArr, size);	
-		//unityTestFloatArray(&floatArr, size);
-		uchar * bytes = static_cast<uchar*>(static_cast<void*>(intArr));
-		unityTestBytes(&bytes, size, 0);
-		//bytes = (uchar*)floatArr;
-		//unityTestBytes(bytes, size, 1);
-	}*/
-
 	OP_API void OP_ConfigurePose(
 		bool body_disable = false,
 		char* model_folder = "models/", int number_people_max = -1, // moved
@@ -278,7 +251,8 @@ extern "C" {
 	}
 
 	OP_API void OP_Shutdown() {
-		if (opRunningFlag) opStoppingFlag = true;
+		//if (opRunningFlag) opStoppingFlag = true;
+		if (ptrUserOutput) ptrUserOutput->terminate();
 	}
 
 	//OP_API void OP_RegisterOutputCallback(OutputCallback callback) {
@@ -298,8 +272,7 @@ extern "C" {
 void openpose_main(bool enableOutput, OutputCallback callback) {
 	try {
 		// Starting
-		if (opRunningFlag) return;
-		opRunningFlag = true;
+		if (ptrUserOutput) return;
 		op::log("Starting OpenPose demo...", op::Priority::High);
 		const auto timerBegin = std::chrono::high_resolution_clock::now();
 
@@ -308,6 +281,7 @@ void openpose_main(bool enableOutput, OutputCallback callback) {
 
 		// Initializing the user custom classes
 		auto spUserOutput = std::make_shared<UnityPluginUserOutput>();
+		ptrUserOutput = spUserOutput.get();
 
 		// Register Unity output callback
 		spUserOutput->unityOutputEnabled = enableOutput;
@@ -350,10 +324,8 @@ void openpose_main(bool enableOutput, OutputCallback callback) {
 		delete wrapperStructInput;
 		delete wrapperStructOutput;
 
-		// Reset flags
-		opStoppingFlag = false;
-		opRunningFlag = false;
-
+		// Reset pointer
+		ptrUserOutput = nullptr;
 	}
 	catch (const std::exception& e)
 	{
