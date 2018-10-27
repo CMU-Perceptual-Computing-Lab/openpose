@@ -5,17 +5,9 @@
 #include <openpose/headers.hpp>
 
 // Output callback register in Unity
-typedef void(__stdcall * OutputCallback) (uchar** val, int* sizes, int sizeSize, int valType, int outputType);
+typedef void(__stdcall * OutputCallback) (uchar ** ptrs, int ptrSize, int * sizes, int sizeSize, int outputType);
 
 // Output type enum
-enum ValType : int{
-	Byte = 0,
-	Int = 1,
-	Long = 2,
-	Float = 3, 
-	String = 4
-};
-
 enum OutputType : int {
 	None = 0, 
 	Ids = 1, 
@@ -67,9 +59,9 @@ public:
 
 protected:
 	template<class T>
-	void outputValue(T * val, int * sizes, int sizeSize, ValType valType, OutputType outputType) {
-		uchar * bytes = static_cast<uchar*>(static_cast<void*>(val));
-		unityOutputCallback(&bytes, sizes, sizeSize, (int)valType, (int)outputType);
+	void outputValue(T ** ptrs, int ptrSize, int * sizes, int sizeSize, OutputType outputType) {
+		uchar ** bytePtrs = static_cast<uchar**>(static_cast<void*>(ptrs));
+		unityOutputCallback(bytePtrs, ptrSize, sizes, sizeSize, (int)outputType);
 	}
 
 	void workConsumer(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
@@ -93,175 +85,29 @@ protected:
 	}
 
 	void sendPoseKeypoints(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
-		const auto& data = datumsPtr->at(0).poseKeypoints;
+		auto& data = datumsPtr->at(0).poseKeypoints; // Array<float>
 		if (!data.empty()) {
 			auto sizeVector = data.getSize();
 			int sizeSize = sizeVector.size();
 			int * sizes = &sizeVector[0];
-			int volume = data.getVolume();
-			float * val = new float[volume];
-			for (int i = 0; i < volume; i++) {
-				val[i] = data[i]; // Is there a better way to do this?
-			}
-			outputValue(val, sizes, sizeSize, Float, PoseKeypoints);
-			delete val;
+			float * val = data.getPtr();
+			outputValue(&val, 1, sizes, sizeSize, PoseKeypoints);
 		}
 	}
 
 	void sendHandKeypoints(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
-		const auto& data = datumsPtr->at(0).handKeypoints;
-		if (!data.empty()) {
-			int sizeSize = 4;
-			int * sizes = new int[sizeSize] {2, data[0].getSize(0), data[0].getSize(1), data[0].getSize(2)};
-			int volume = sizes[0] * sizes[1] * sizes[2] * sizes[3];
-			float * val = new float[volume];
-			for (int i = 0; i < sizes[0]; i++) {
-				for (int j = 0; j < volume / sizes[0]; j++) {
-					val[i * j] = data[i][j]; // Is there a better way to do this?
-				}
-			}			
-			outputValue(val, sizes, sizeSize, Float, HandKeypoints);
-			delete val;
+		auto& data = datumsPtr->at(0).handKeypoints; // std::array<Array<float>, 2>
+		if (data.size() == 2 && !data[0].empty()) {
+			auto sizeVector = data[0].getSize();
+			int sizeSize = sizeVector.size();
+			int * sizes = &sizeVector[0];
+			auto ptrs = new float*[2];
+			ptrs[0] = data[0].getPtr();
+			ptrs[1] = data[1].getPtr();	
+			outputValue(ptrs, 2, sizes, sizeSize, HandKeypoints);
+			delete ptrs;
 		}
 	}
-
-    /*void sendData(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
-        const auto& poseKeypoints = datumsPtr->at(0).poseKeypoints;
-        const auto& handKeypoints_L = datumsPtr->at(0).handKeypoints[0];
-        const auto& handKeypoints_R = datumsPtr->at(0).handKeypoints[1];
-        const auto& faceKeypoints = datumsPtr->at(0).faceKeypoints;
-        const auto personCount = poseKeypoints.getSize(0);
-
-        std::string dataString = "";
-
-        std::string unitsString = "\"units\":[";
-        for (auto person = 0; person < personCount; person++)
-        {
-            // Every person
-
-            // poseKeypoints:
-            std::string poseKeypointsString = "\"poseKeypoints\":[";
-            for (auto part = 0; part < poseKeypoints.getSize(1); part++)
-            {
-                // Every part
-                std::string partString = "";
-                if (poseKeypoints.getSize(2) == 3) {
-                    float x = poseKeypoints[{person, part, 0}],
-                        y = poseKeypoints[{person, part, 1}],
-                        z = poseKeypoints[{person, part, 2}];
-                    partString = vectorToJson(x, y, z);
-                }
-                else {
-                    partString = vectorToJson(0.0f, 0.0f, 0.0f);
-                }
-                poseKeypointsString += partString;
-                if (part != poseKeypoints.getSize(1) - 1) poseKeypointsString += ",";
-            }
-            poseKeypointsString += "]";
-
-            // handKeypoints_L:
-            std::string handKeypointsString_L = "\"handKeypoints_L\":[";
-            for (auto part = 0; part < handKeypoints_L.getSize(1); part++)
-            {
-                // Every part
-                std::string partString = "";
-                if (handKeypoints_L.getSize(2) == 3) {
-                    float x = handKeypoints_L[{person, part, 0}],
-                        y = handKeypoints_L[{person, part, 1}],
-                        z = handKeypoints_L[{person, part, 2}];
-                    partString = vectorToJson(x, y, z);
-                }
-                else {
-                    partString = vectorToJson(0.0f, 0.0f, 0.0f);
-                }
-                handKeypointsString_L += partString;
-                if (part != handKeypoints_L.getSize(1) - 1) handKeypointsString_L += ",";
-            }
-            handKeypointsString_L += "]";
-
-            // handKeypoints_R:
-            std::string handKeypointsString_R = "\"handKeypoints_R\":[";
-            for (auto part = 0; part < handKeypoints_R.getSize(1); part++)
-            {
-                // Every part
-                std::string partString = "";
-                if (handKeypoints_R.getSize(2) == 3) {
-                    float x = handKeypoints_R[{person, part, 0}],
-                        y = handKeypoints_R[{person, part, 1}],
-                        z = handKeypoints_R[{person, part, 2}];
-                    partString = vectorToJson(x, y, z);
-                }
-                else {
-                    partString = vectorToJson(0.0f, 0.0f, 0.0f);
-                }
-                handKeypointsString_R += partString;
-                if (part != handKeypoints_R.getSize(1) - 1) handKeypointsString_R += ",";
-            }
-            handKeypointsString_R += "]";
-
-            // faceKeypoints:
-            std::string faceKeypointsString = "\"faceKeypoints\":[";
-            for (auto part = 0; part < faceKeypoints.getSize(1); part++)
-            {
-                // Every part
-                std::string partString = "";
-                if (faceKeypoints.getSize(2) == 3) {
-                    float x = faceKeypoints[{person, part, 0}],
-                        y = faceKeypoints[{person, part, 1}],
-                        z = faceKeypoints[{person, part, 2}];
-                    partString = vectorToJson(x, y, z);
-                }
-                else {
-                    partString = vectorToJson(0.0f, 0.0f, 0.0f);
-                }
-                faceKeypointsString += partString;
-                if (part != faceKeypoints.getSize(1) - 1) faceKeypointsString += ",";
-            }
-            faceKeypointsString += "]";
-
-            std::string personString = "{" + poseKeypointsString + "," + handKeypointsString_L + "," + handKeypointsString_R + "," + faceKeypointsString + "}";
-
-            unitsString += personString;
-            if (person != personCount - 1) unitsString += ",";
-        }
-        unitsString += "]";
-
-        dataString = ("{" + unitsString + "}").c_str();
-        //outputToUnity(dataString, 0);
-    }
-
-    void sendImage(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
-        const auto& cvOutput = datumsPtr->at(0).cvOutputData;
-
-        std::string sizeString = "\"size\":{\"x\":" + std::to_string(cvOutput.cols) + ",\"y\":" + std::to_string(cvOutput.rows) + "}";
-
-        // imageData = cvOutput.data;
-
-        // std::string pixelsString = "\"pixels\":[";
-        // for (int x = 0; x < cvOutput.cols; x++) {
-        //     for (int y = 0; y < cvOutput.rows; y++) {
-        //         int r = 127;// cvOutput.at<uchar>(x, y, 0);
-        //         int g = 0;// cvOutput.at<uchar>(x, y, 1);
-        //         int b = 0;// cvOutput.at<uchar>(x, y, 2);
-        //         std::string vectorString = vectorToJson(r, g, b);
-        //         pixelsString += vectorString;
-        //         if (x != cvOutput.cols - 1 || y != cvOutput.rows - 1) {
-        //             pixelsString += ",";
-        //         }
-        //     }
-        // }
-        // pixelsString += "]";
-
-        // std::string imageString = "{" + sizeString + "," + pixelsString + "}";
-    }
-	
-	std::string vectorToJson(const float x, const float y, const float z) {
-		return "{\"x\":" + std::to_string(x) + ",\"y\":" + std::to_string(y) + ",\"z\":" + std::to_string(z) + "}";
-	}
-
-	std::string vectorToJson(const int x, const int y, const int z) {
-		return "{\"x\":" + std::to_string(x) + ",\"y\":" + std::to_string(y) + ",\"z\":" + std::to_string(z) + "}";
-	}*/
 };
 
 // Global user output
