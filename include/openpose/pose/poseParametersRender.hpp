@@ -322,6 +322,43 @@ namespace op
         255.f,     0.f,   255.f, \
         255.f,     0.f,   255.f
 
+    // CAR_22
+    #define POSE_CAR_22_PAIRS_RENDER_GPU \
+            0,1,1,3,3,2,2,0,   6,7,7,16,16,17,17,6,   12,13,13,14,14,15,15,12,   6,8,7,8,6,9,7,9,6,4,7,5,   12,11,13,10, \
+            16,18,17,18,16,19,17,19,   6,21,7,20
+    #define POSE_CAR_22_SCALES_RENDER_GPU 0.625
+    #define POSE_CAR_22_COLORS_RENDER_GPU \
+        255.f,   128.f,   128.f, \
+        255.f,     0.f,     0.f, \
+         64.f,     0.f,     0.f, \
+        255.f,     0.f,     0.f, \
+        \
+          0.f,   255.f,     0.f, \
+          0.f,   255.f,     0.f, \
+        \
+          0.f,     0.f,    64.f, \
+        128.f,   128.f,   255.f, \
+        \
+          0.f,   255.f,     0.f, \
+          0.f,   255.f,     0.f, \
+        \
+          0.f,   255.f,     0.f, \
+          0.f,   255.f,     0.f, \
+        \
+         64.f,     0.f,     0.f, \
+        255.f,   128.f,   128.f, \
+        255.f,     0.f,     0.f, \
+        255.f,     0.f,     0.f, \
+        \
+          0.f,     0.f,   255.f, \
+          0.f,     0.f,   255.f, \
+        \
+          0.f,   255.f,     0.f, \
+          0.f,   255.f,     0.f, \
+        \
+          0.f,     0.f,   255.f, \
+          0.f,     0.f,    64.f
+
     // Rendering functions
     OP_API const std::vector<float>& getPoseScales(const PoseModel poseModel);
     OP_API const std::vector<float>& getPoseColors(const PoseModel poseModel);

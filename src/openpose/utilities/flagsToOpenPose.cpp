@@ -44,6 +44,8 @@ namespace op
             // Car pose
             else if (poseModeString == "CAR_12")
                 return PoseModel::CAR_12;
+            else if (poseModeString == "CAR_22")
+                return PoseModel::CAR_22;
             // else
             error("String (`" + poseModeString + "`) does not correspond to any model (BODY_25, COCO, MPI,"
                   " MPI_4_layers).", __LINE__, __FUNCTION__, __FILE__);
