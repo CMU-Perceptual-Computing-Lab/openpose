@@ -3,13 +3,16 @@
 #define BOOST_DATE_TIME_NO_LIB
 
 // OpenPose dependencies
-#include <openpose/core/headers.hpp>
-#include <openpose/filestream/headers.hpp>
-#include <openpose/gui/headers.hpp>
-#include <openpose/pose/headers.hpp>
-#include <openpose/utilities/headers.hpp>
-#include <caffe/caffe.hpp>
-#include <stdlib.h>
+//#include <openpose/core/headers.hpp>
+//#include <openpose/filestream/headers.hpp>
+//#include <openpose/gui/headers.hpp>
+//#include <openpose/pose/headers.hpp>
+//#include <openpose/utilities/headers.hpp>
+//#include <caffe/caffe.hpp>
+//#include <stdlib.h>
+
+#include <openpose/flags.hpp>
+#include <openpose/wrapper/headers.hpp>
 
 //#include <openpose/net/bodyPartConnectorCaffe.hpp>
 //#include <openpose/net/nmsCaffe.hpp>
@@ -23,7 +26,6 @@
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-
 #include <pybind11/numpy.h>
 #include <opencv2/core/core.hpp>
 #include <stdexcept>
@@ -58,7 +60,7 @@ std::shared_ptr<op::Datum> getDatum(){
 void checkDatum(op::Datum* datum){
     std::cout << datum->outputData << std::endl;
 
-    std::cout << datum->outputData.spData.use_count() << std::endl;
+    //std::cout << datum->outputData.spData.use_count() << std::endl;
 
 //    std::cout << datum->cvInputData.size() << std::endl;
 
@@ -71,17 +73,34 @@ void checkDatum(op::Datum* datum){
     //cv::Mat_<cv::Vec3b> l;
 }
 
+void parse_gflags(const std::vector<std::string>& argv){
+    std::vector<char*> argv_vec;
+    for(auto& arg : argv) argv_vec.emplace_back((char*)arg.c_str());
+    char** cast = &argv_vec[0];
+    int size = argv_vec.size();
+    gflags::ParseCommandLineFlags(&size, &cast, true);
+}
 
-//op::Datum getDatum(){
-//    op::Datum datum;
-//    return datum;
-//}
+void init(py::dict d){
+    std::vector<std::string> argv;
+    argv.emplace_back("openpose.py");
+    for (auto item : d){
+        argv.emplace_back("--" + std::string(py::str(item.first)));
+        argv.emplace_back(py::str(item.second));
+    }
+    parse_gflags(argv);
+}
 
-// PROBLEM. CV MAT ALLOWS DIRECT CASTING, BUT OP ARRAY DOES NOT!! NO METHOD TO PASS PTR
+void init_argv(std::vector<std::string> argv){
+    parse_gflags(argv);
+}
 
 PYBIND11_MODULE(_openpose, m) {
     m.def("add", &add, "A function which adds two numbers",
           py::arg("i") = 1, py::arg("j") = 2);
+
+    m.def("init", &init, "Init Function");
+    m.def("init_argv", &init_argv, "Init Function");
 
     m.def("getDatum", &getDatum, "");
     m.def("checkDatum", &checkDatum, "");
@@ -102,21 +121,21 @@ PYBIND11_MODULE(_openpose, m) {
 //        //.def("getName", &Pet::getName)
 //            ;
 
-//    py::class_<op::Array<float>>(m, "Array", py::buffer_protocol())
-//       .def("__repr__", [](op::Array<float> &a) { return a.toString(); })
-//       .def("getSize", [](op::Array<float> &a) { return a.getSize(); })
-//       .def(py::init<const std::vector<int>&>())
-//       .def_buffer([](op::Array<float> &m) -> py::buffer_info {
-//            return py::buffer_info(
-//                m.getPtr(),                             /* Pointer to buffer */
-//                sizeof(float),                          /* Size of one scalar */
-//                py::format_descriptor<float>::format(), /* Python struct-style format descriptor */
-//                m.getSize().size(),                     /* Number of dimensions */
-//                m.getSize(),                            /* Buffer dimensions */
-//                m.getStride()                          /* Strides (in bytes) for each index */
-//            );
-//        })
-//    ;
+    py::class_<op::Array<float>>(m, "Array", py::buffer_protocol())
+       .def("__repr__", [](op::Array<float> &a) { return a.toString(); })
+       .def("getSize", [](op::Array<float> &a) { return a.getSize(); })
+       .def(py::init<const std::vector<int>&>())
+       .def_buffer([](op::Array<float> &m) -> py::buffer_info {
+            return py::buffer_info(
+                m.getPtr(),                             /* Pointer to buffer */
+                sizeof(float),                          /* Size of one scalar */
+                py::format_descriptor<float>::format(), /* Python struct-style format descriptor */
+                m.getSize().size(),                     /* Number of dimensions */
+                m.getSize(),                            /* Buffer dimensions */
+                m.getStride()                          /* Strides (in bytes) for each index */
+            );
+        })
+    ;
 
 #ifdef VERSION_INFO
     m.attr("__version__") = VERSION_INFO;
@@ -143,62 +162,19 @@ template <> struct type_caster<op::Array<float>> {
          */
         bool load(handle src, bool imp)
         {
-            std::cout << "opArraay load" << std::endl;
-
             array b(src, true);
             buffer_info info = b.request();
 
             //std::vector<int> a(info.shape);
             std::vector<int> shape(std::begin(info.shape), std::end(info.shape));
 
-            value = op::Array<float>(shape,0);
-
-            value.spData.reset((float*)info.ptr);
-
-            //memcpy(value.spData.get(), info.ptr, value.getVolume()*sizeof(float));
+            // No copy
+            value = op::Array<float>(shape, (float*)info.ptr);
+            // Copy
+            //value = op::Array<float>(shape);
+            //memcpy(value.getPtr(), info.ptr, value.getVolume()*sizeof(float));
 
             return true;
-
-            //exit(-1);
-
-//            /* Try a default converting into a Python */
-//            array b(src, true);
-//            buffer_info info = b.request();
-
-//            int ndims = info.ndim;
-
-//            decltype(CV_32F) dtype;
-//            size_t elemsize;
-//            if (info.format == format_descriptor<float>::format()) {
-//                if (ndims == 3) {
-//                    dtype = CV_32FC3;
-//                } else {
-//                    dtype = CV_32FC1;
-//                }
-//                elemsize = sizeof(float);
-//            } else if (info.format == format_descriptor<double>::format()) {
-//                if (ndims == 3) {
-//                    dtype = CV_64FC3;
-//                } else {
-//                    dtype = CV_64FC1;
-//                }
-//                elemsize = sizeof(double);
-//            } else if (info.format == format_descriptor<unsigned char>::format()) {
-//                if (ndims == 3) {
-//                    dtype = CV_8UC3;
-//                } else {
-//                    dtype = CV_8UC1;
-//                }
-//                elemsize = sizeof(unsigned char);
-//            } else {
-//                throw std::logic_error("Unsupported type");
-//                return false;
-//            }
-
-//            std::vector<int> shape = {info.shape[0], info.shape[1]};
-
-//            value = cv::Mat(cv::Size(shape[1], shape[0]), dtype, info.ptr, cv::Mat::AUTO_STEP);
-//            return true;
         }
 
         /**
@@ -212,7 +188,7 @@ template <> struct type_caster<op::Array<float>> {
         {
             std::string format = format_descriptor<float>::format();
             return array(buffer_info(
-                m.spData.get(),     /* Pointer to buffer */
+                m.getPybindPtr(),     /* Pointer to buffer */
                 sizeof(float),       /* Size of one scalar */
                 format,         /* Python struct-style format descriptor */
                 m.getSize().size(),            /* Number of dimensions */
@@ -277,7 +253,7 @@ template <> struct type_caster<cv::Mat> {
                 return false;
             }
 
-            std::vector<int> shape = {info.shape[0], info.shape[1]};
+            std::vector<int> shape = {(int)info.shape[0], (int)info.shape[1]};
 
             value = cv::Mat(cv::Size(shape[1], shape[0]), dtype, info.ptr, cv::Mat::AUTO_STEP);
             return true;
@@ -345,21 +321,43 @@ template <> struct type_caster<cv::Mat> {
 }} // namespace pybind11::detail
 
 
-//#define default_logging_level 3
-//#define default_output_resolution "-1x-1"
-//#define default_net_resolution "-1x368"
-//#define default_model_pose "COCO"
-//#define default_alpha_pose 0.6
-//#define default_scale_gap 0.3
-//#define default_scale_number 1
-//#define default_render_threshold 0.05
-//#define default_num_gpu_start 0
-//#define default_disable_blending false
-//#define default_model_folder "models/"
+//#ifndef OPENPOSE_PYTHON_HPP
+//#define OPENPOSE_PYTHON_HPP
+//#define BOOST_DATE_TIME_NO_LIB
 
-//// Todo, have GPU Number, handle, OpenCL/CPU Cases
+//// OpenPose dependencies
+//#include <openpose/core/headers.hpp>
+//#include <openpose/filestream/headers.hpp>
+//#include <openpose/gui/headers.hpp>
+//#include <openpose/pose/headers.hpp>
+//#include <openpose/utilities/headers.hpp>
+//#include <caffe/caffe.hpp>
+//#include <stdlib.h>
+
+//#include <openpose/net/bodyPartConnectorCaffe.hpp>
+//#include <openpose/net/nmsCaffe.hpp>
+//#include <openpose/net/resizeAndMergeCaffe.hpp>
+//#include <openpose/pose/poseParameters.hpp>
+//#include <openpose/pose/enumClasses.hpp>
+//#include <openpose/pose/poseExtractor.hpp>
+//#include <openpose/gpu/cuda.hpp>
+//#include <openpose/gpu/opencl.hcl>
+//#include <openpose/core/macros.hpp>
+//#include <openpose/utilities/json.hpp>
+
+//#include <openpose/flags.hpp>
+//#include <openpose/wrapper/headers.hpp>
+
+//#ifdef _WIN32
+//    #define OP_EXPORT __declspec(dllexport)
+//#else
+//    #define OP_EXPORT
+//#endif
+
 //OP_API class OpenPose {
 //public:
+//    std::unique_ptr<op::Wrapper> opWrapper;
+
 //    std::unique_ptr<op::PoseExtractorCaffe> poseExtractorCaffe;
 //    std::unique_ptr<op::PoseCpuRenderer> poseRenderer;
 //    std::unique_ptr<op::FrameDisplayer> frameDisplayer;
@@ -375,23 +373,56 @@ template <> struct type_caster<cv::Mat> {
 //    op::PoseModel poseModel;
 //    int mGpuID;
 
-//    OpenPose(int FLAGS_logging_level = default_logging_level,
-//        std::string FLAGS_output_resolution = default_output_resolution,
-//        std::string FLAGS_net_resolution = default_net_resolution,
-//        std::string FLAGS_model_pose = default_model_pose,
-//        float FLAGS_alpha_pose = default_alpha_pose,
-//        float FLAGS_scale_gap = default_scale_gap,
-//        int FLAGS_scale_number = default_scale_number,
-//        float FLAGS_render_threshold = default_render_threshold,
-//        int FLAGS_num_gpu_start = default_num_gpu_start,
-//        int FLAGS_disable_blending = default_disable_blending,
-//        std::string FLAGS_model_folder = default_model_folder
-//    ) {
+//    OpenPose(json::JSON jsonParams)
+//    {
+//        // Setup variables
+//        if(jsonParams.hasKey("num_gpu")) FLAGS_num_gpu = jsonParams["num_gpu"].ToInt();
+//        if(jsonParams.hasKey("num_gpu_start")) FLAGS_num_gpu_start = jsonParams["num_gpu_start"].ToInt();
+//        if(jsonParams.hasKey("logging_level")) FLAGS_logging_level = jsonParams["logging_level"].ToInt();
+//        if(jsonParams.hasKey("output_resolution")) FLAGS_output_resolution = jsonParams["output_resolution"].ToString();
+//        if(jsonParams.hasKey("net_resolution")) FLAGS_net_resolution = jsonParams["net_resolution"].ToString();
+//        if(jsonParams.hasKey("model_pose")) FLAGS_model_pose = jsonParams["model_pose"].ToString();
+//        if(jsonParams.hasKey("alpha_pose")) FLAGS_alpha_pose = jsonParams["alpha_pose"].ToFloat();
+//        if(jsonParams.hasKey("scale_gap")) FLAGS_scale_gap = jsonParams["scale_gap"].ToFloat();
+//        if(jsonParams.hasKey("scale_number")) FLAGS_scale_number = jsonParams["scale_number"].ToInt();
+//        if(jsonParams.hasKey("render_threshold")) FLAGS_render_threshold = jsonParams["render_threshold"].ToFloat();
+//        if(jsonParams.hasKey("disable_blending")) FLAGS_disable_blending = jsonParams["disable_blending"].ToInt();
+//        if(jsonParams.hasKey("model_folder")) FLAGS_model_folder = jsonParams["model_folder"].ToString();
+//        if(jsonParams.hasKey("body_disable")) FLAGS_body_disable = jsonParams["body_disable"].ToBool();
+//        if(jsonParams.hasKey("keypoint_scale")) FLAGS_keypoint_scale = jsonParams["keypoint_scale"].ToInt();
+//        if(jsonParams.hasKey("render_pose")) FLAGS_render_pose = jsonParams["render_pose"].ToInt();
+//        if(jsonParams.hasKey("alpha_heatmap")) FLAGS_alpha_heatmap = jsonParams["alpha_heatmap"].ToFloat();
+//        if(jsonParams.hasKey("part_to_show")) FLAGS_part_to_show = jsonParams["part_to_show"].ToInt();
+//        if(jsonParams.hasKey("heatmaps_add_parts")) FLAGS_heatmaps_add_parts = jsonParams["heatmaps_add_parts"].ToBool();
+//        if(jsonParams.hasKey("heatmaps_add_bkg")) FLAGS_heatmaps_add_bkg = jsonParams["heatmaps_add_bkg"].ToBool();
+//        if(jsonParams.hasKey("heatmaps_add_PAFs")) FLAGS_heatmaps_add_PAFs = jsonParams["heatmaps_add_PAFs"].ToBool();
+//        if(jsonParams.hasKey("heatmaps_scale")) FLAGS_heatmaps_scale = jsonParams["heatmaps_scale"].ToInt();
+//        if(jsonParams.hasKey("part_candidates")) FLAGS_part_candidates = jsonParams["part_candidates"].ToBool();
+//        if(jsonParams.hasKey("number_people_max")) FLAGS_number_people_max = jsonParams["number_people_max"].ToInt();
+//        // Face
+//        if(jsonParams.hasKey("face")) FLAGS_face = jsonParams["face"].ToBool();
+//        if(jsonParams.hasKey("face_net_resolution")) FLAGS_face_net_resolution = jsonParams["face_net_resolution"].ToString();
+//        if(jsonParams.hasKey("face_render")) FLAGS_face_render = jsonParams["face_render"].ToInt();
+//        if(jsonParams.hasKey("face_alpha_pose")) FLAGS_face_alpha_pose = jsonParams["face_alpha_pose"].ToFloat();
+//        if(jsonParams.hasKey("face_alpha_heatmap")) FLAGS_face_alpha_heatmap = jsonParams["face_alpha_heatmap"].ToFloat();
+//        if(jsonParams.hasKey("face_render_threshold")) FLAGS_face_render_threshold = jsonParams["face_render_threshold"].ToFloat();
+//        // Hands
+//        if(jsonParams.hasKey("hand")) FLAGS_hand = jsonParams["hand"].ToBool();
+//        if(jsonParams.hasKey("hand_net_resolution")) FLAGS_hand_net_resolution = jsonParams["hand_net_resolution"].ToString();
+//        if(jsonParams.hasKey("hand_scale_number")) FLAGS_hand_scale_number = jsonParams["hand_scale_number"].ToInt();
+//        if(jsonParams.hasKey("hand_scale_range")) FLAGS_hand_scale_range = jsonParams["hand_scale_range"].ToFloat();
+//        if(jsonParams.hasKey("face_render")) FLAGS_face_render = jsonParams["face_render"].ToInt();
+//        if(jsonParams.hasKey("face_alpha_pose")) FLAGS_face_alpha_pose = jsonParams["face_alpha_pose"].ToFloat();
+//        if(jsonParams.hasKey("face_alpha_heatmap")) FLAGS_face_alpha_heatmap = jsonParams["face_alpha_heatmap"].ToFloat();
+//        if(jsonParams.hasKey("face_render_threshold")) FLAGS_face_render_threshold = jsonParams["face_render_threshold"].ToFloat();
+
+//        // GPU Setting
 //        mGpuID = FLAGS_num_gpu_start;
-//#ifdef USE_CUDA
+//        #ifdef USE_CUDA
 //        caffe::Caffe::set_mode(caffe::Caffe::GPU);
 //        caffe::Caffe::SetDevice(mGpuID);
-//#elif USE_OPENCL
+//        #elif USE_OPENCL
+//        FLAGS_render_pose = 1;
 //        caffe::Caffe::set_mode(caffe::Caffe::GPU);
 //        std::vector<int> devices;
 //        const int maxNumberGpu = op::OpenCL::getTotalGPU();
@@ -400,34 +431,78 @@ template <> struct type_caster<cv::Mat> {
 //        caffe::Caffe::SetDevices(devices);
 //        caffe::Caffe::SelectDevice(mGpuID, true);
 //        op::OpenCL::getInstance(mGpuID, CL_DEVICE_TYPE_GPU, true);
-//#else
+//        #else
+//        FLAGS_render_pose = 1;
 //        caffe::Caffe::set_mode(caffe::Caffe::CPU);
-//#endif
+//        #endif
 //        op::log("OpenPose Library Python Wrapper", op::Priority::High);
-//        // ------------------------- INITIALIZATION -------------------------
-//        // Step 1 - Set logging level
-//        // - 0 will output all the logging messages
-//        // - 255 will output nothing
+
+//        // Logging_level
+//        op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.",
+//                  __LINE__, __FUNCTION__, __FILE__);
 //        op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
-//        op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-//        // Step 2 - Read GFlags (user defined configuration)
-//        // outputSize
+//        op::Profiler::setDefaultX(FLAGS_profile_speed);
+
+//        // Applying user defined configuration - GFlags to program variables
 //        const auto outputSize = op::flagsToPoint(FLAGS_output_resolution, "-1x-1");
-//        // netInputSize
 //        const auto netInputSize = op::flagsToPoint(FLAGS_net_resolution, "-1x368");
-//        // poseModel
-//        poseModel = op::flagsToPoseModel(FLAGS_model_pose);
-//        // Check no contradictory flags enabled
-//        if (FLAGS_alpha_pose < 0. || FLAGS_alpha_pose > 1.)
-//            op::error("Alpha value for blending must be in the range [0,1].", __LINE__, __FUNCTION__, __FILE__);
-//        if (FLAGS_scale_gap <= 0. && FLAGS_scale_number > 1)
-//            op::error("Incompatible flag configuration: scale_gap must be greater than 0 or scale_number = 1.",
-//                __LINE__, __FUNCTION__, __FILE__);
+//        const auto faceNetInputSize = op::flagsToPoint(FLAGS_face_net_resolution, "368x368 (multiples of 16)");
+//        const auto handNetInputSize = op::flagsToPoint(FLAGS_hand_net_resolution, "368x368 (multiples of 16)");
+//        const auto poseModel = op::flagsToPoseModel(FLAGS_model_pose);
+//        if (!FLAGS_write_keypoint.empty())
+//            op::log("Flag `write_keypoint` is deprecated and will eventually be removed."
+//                    " Please, use `write_json` instead.", op::Priority::Max);
+//        const auto keypointScale = op::flagsToScaleMode(FLAGS_keypoint_scale);
+//        const auto heatMapTypes = op::flagsToHeatMaps(FLAGS_heatmaps_add_parts, FLAGS_heatmaps_add_bkg,
+//                                                      FLAGS_heatmaps_add_PAFs);
+//        const auto heatMapScale = op::flagsToHeatMapScaleMode(FLAGS_heatmaps_scale);
+//        const auto multipleView = (FLAGS_3d || FLAGS_3d_views > 1);
+//        const bool enableGoogleLogging = true;
+
+//        // OP Wrapper Object
+//        opWrapper = std::unique_ptr<op::Wrapper>(new op::Wrapper {op::ThreadManagerMode::Asynchronous});
+
+//        // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
+//        const op::WrapperStructPose wrapperStructPose{
+//            !FLAGS_body_disable, netInputSize, outputSize, keypointScale, FLAGS_num_gpu, FLAGS_num_gpu_start,
+//            FLAGS_scale_number, (float)FLAGS_scale_gap, op::flagsToRenderMode(FLAGS_render_pose, multipleView),
+//            poseModel, !FLAGS_disable_blending, (float)FLAGS_alpha_pose, (float)FLAGS_alpha_heatmap,
+//            FLAGS_part_to_show, FLAGS_model_folder, heatMapTypes, heatMapScale, FLAGS_part_candidates,
+//            (float)FLAGS_render_threshold, FLAGS_number_people_max, enableGoogleLogging};
+//        opWrapper->configure(wrapperStructPose);
+
+//        // Hands configuration
+//        const op::WrapperStructHand wrapperStructHand{
+//            FLAGS_hand, handNetInputSize, FLAGS_hand_scale_number, (float)FLAGS_hand_scale_range, FLAGS_hand_tracking,
+//            op::flagsToRenderMode(FLAGS_hand_render, multipleView, FLAGS_render_pose), (float)FLAGS_hand_alpha_pose,
+//            (float)FLAGS_hand_alpha_heatmap, (float)FLAGS_hand_render_threshold};
+//        if(FLAGS_hand) opWrapper->configure(wrapperStructHand);
+
+//        // Face configuration (use op::WrapperStructFace{} to disable it)
+//        const op::WrapperStructFace wrapperStructFace{
+//            FLAGS_face, faceNetInputSize, op::flagsToRenderMode(FLAGS_face_render, multipleView, FLAGS_render_pose),
+//            (float)FLAGS_face_alpha_pose, (float)FLAGS_face_alpha_heatmap, (float)FLAGS_face_render_threshold};
+//        if(FLAGS_face) opWrapper->configure(wrapperStructFace);
+
+//        // Output configuration
+//        const auto displayMode = op::DisplayMode::NoDisplay;
+//        const bool guiVerbose = false;
+//        const bool fullScreen = false;
+//        const op::WrapperStructOutput wrapperStructOutput{
+//            displayMode, guiVerbose, fullScreen, FLAGS_write_keypoint,
+//            op::stringToDataFormat(FLAGS_write_keypoint_format), FLAGS_write_json, FLAGS_write_coco_json,
+//            FLAGS_write_coco_foot_json, FLAGS_write_images, FLAGS_write_images_format, FLAGS_write_video,
+//            FLAGS_camera_fps, FLAGS_write_heatmaps, FLAGS_write_heatmaps_format, FLAGS_write_video_adam,
+//            FLAGS_write_bvh, FLAGS_udp_host, FLAGS_udp_port};
+//        opWrapper->configure(wrapperStructOutput);
+
+//        // Start wrapper
+//        opWrapper->disableMultiThreading();
+//        opWrapper->start();
+
 //        // Step 3 - Initialize all required classes
 //        scaleAndSizeExtractor = std::unique_ptr<op::ScaleAndSizeExtractor>(new op::ScaleAndSizeExtractor(netInputSize, outputSize, FLAGS_scale_number, FLAGS_scale_gap));
-
 //        poseExtractorCaffe = std::unique_ptr<op::PoseExtractorCaffe>(new op::PoseExtractorCaffe{ poseModel, FLAGS_model_folder, FLAGS_num_gpu_start });
-
 //        poseRenderer = std::unique_ptr<op::PoseCpuRenderer>(new op::PoseCpuRenderer{ poseModel, (float)FLAGS_render_threshold, !FLAGS_disable_blending,
 //            (float)FLAGS_alpha_pose });
 //        frameDisplayer = std::unique_ptr<op::FrameDisplayer>(new op::FrameDisplayer{ "OpenPose Tutorial - Example 1", outputSize });
@@ -441,8 +516,21 @@ template <> struct type_caster<cv::Mat> {
 //        bodyPartConnectorCaffe->setPoseModel(poseModel);
 
 //        // Step 4 - Initialize resources on desired thread (in this case single thread, i.e. we init resources here)
-//        poseExtractorCaffe->initializationOnThread();
+//        //poseExtractorCaffe->initializationOnThread();
 //        poseRenderer->initializationOnThread();
+//    }
+
+//    void forward(const cv::Mat& inputImage,
+//                 op::Array<float>& poseKeypoints, op::Array<float>& leftHandKeypoints,
+//                 op::Array<float>& rightHandKeypoints, op::Array<float>& faceKeypoints,
+//                 cv::Mat& displayImage, bool display = false)
+//    {
+//        auto datumProcessed = opWrapper->emplaceAndPop(inputImage);
+//        displayImage = datumProcessed->at(0).cvOutputData;
+//        poseKeypoints = datumProcessed->at(0).poseKeypoints;
+//        leftHandKeypoints = datumProcessed->at(0).handKeypoints[0];
+//        rightHandKeypoints = datumProcessed->at(0).handKeypoints[1];
+//        faceKeypoints = datumProcessed->at(0).faceKeypoints;
 //    }
 
 //    std::vector<caffe::Blob<float>*> caffeNetSharedToPtr(
@@ -460,36 +548,6 @@ template <> struct type_caster<cv::Mat> {
 //        {
 //            op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
 //            return{};
-//        }
-//    }
-
-//    void forward(const cv::Mat& inputImage, op::Array<float>& poseKeypoints, cv::Mat& displayImage, bool display = false) {
-//        op::OpOutputToCvMat opOutputToCvMat;
-//        op::CvMatToOpInput cvMatToOpInput;
-//        op::CvMatToOpOutput cvMatToOpOutput;
-//        if (inputImage.empty())
-//            op::error("Could not open or find the image: ", __LINE__, __FUNCTION__, __FILE__);
-//        const op::Point<int> imageSize{ inputImage.cols, inputImage.rows };
-//        // Step 2 - Get desired scale sizes
-//        std::vector<double> scaleInputToNetInputs;
-//        std::vector<op::Point<int>> netInputSizes;
-//        double scaleInputToOutput;
-//        op::Point<int> outputResolution;
-//        std::tie(scaleInputToNetInputs, netInputSizes, scaleInputToOutput, outputResolution)
-//            = scaleAndSizeExtractor->extract(imageSize);
-//        // Step 3 - Format input image to OpenPose input and output formats
-//        const auto netInputArray = cvMatToOpInput.createArray(inputImage, scaleInputToNetInputs, netInputSizes);
-
-//        // Step 4 - Estimate poseKeypoints
-//        poseExtractorCaffe->forwardPass(netInputArray, imageSize, scaleInputToNetInputs);
-//        poseKeypoints = poseExtractorCaffe->getPoseKeypoints();
-
-//        if (display) {
-//            auto outputArray = cvMatToOpOutput.createArray(inputImage, scaleInputToOutput, outputResolution);
-//            // Step 5 - Render poseKeypoints
-//            poseRenderer->renderPose(outputArray, poseKeypoints, scaleInputToOutput);
-//            // Step 6 - OpenPose output format to cv::Mat
-//            displayImage = opOutputToCvMat.formatToCvMat(outputArray);
 //        }
 //    }
 
@@ -582,46 +640,52 @@ template <> struct type_caster<cv::Mat> {
 //#ifdef __cplusplus
 //extern "C" {
 //#endif
-
 //    typedef void* c_OP;
-//    op::Array<float> output;
+//    op::Array<float> poseKeypoints, leftHandKeypoints, rightHandKeypoints, faceKeypoints;
 
-//    OP_EXPORT c_OP newOP(int logging_level,
-//        char* output_resolution,
-//        char* net_resolution,
-//        char* model_pose,
-//        float alpha_pose,
-//        float scale_gap,
-//        int scale_number,
-//        float render_threshold,
-//        int num_gpu_start,
-//        bool disable_blending,
-//        char* model_folder
-//    ) {
-//        return new OpenPose(logging_level, output_resolution, net_resolution, model_pose, alpha_pose,
-//            scale_gap, scale_number, render_threshold, num_gpu_start, disable_blending, model_folder);
-//    }
-//    OP_EXPORT void delOP(c_OP op) {
-//        delete (OpenPose *)op;
-//    }
-//    OP_EXPORT void forward(c_OP op, unsigned char* img, size_t rows, size_t cols, int* size, unsigned char* displayImg, bool display) {
-//        OpenPose* openPose = (OpenPose*)op;
-//        cv::Mat image(rows, cols, CV_8UC3, img);
-//        cv::Mat displayImage(rows, cols, CV_8UC3, displayImg);
-//        openPose->forward(image, output, displayImage, display);
-//        if (output.getSize().size()) {
-//            size[0] = output.getSize()[0];
-//            size[1] = output.getSize()[1];
-//            size[2] = output.getSize()[2];
+//    void populateSize(const op::Array<float>& keypoints, int* size){
+//        if (keypoints.getSize().size()) {
+//            size[0] = keypoints.getSize()[0];
+//            size[1] = keypoints.getSize()[1];
+//            size[2] = keypoints.getSize()[2];
 //        }
 //        else {
 //            size[0] = 0; size[1] = 0; size[2] = 0;
 //        }
+//    }
+//    OP_EXPORT c_OP newOP(char* jsonParamsString) {
+//        json::JSON jsonParams = json::JSON::Load(jsonParamsString);
+//        return new OpenPose(jsonParams);
+//    }
+//    OP_EXPORT void delOP(c_OP op) {
+//        delete (OpenPose *)op;
+//    }
+//    OP_EXPORT void forward(c_OP op, unsigned char* img, size_t rows, size_t cols, int* poseSize, int* leftHandSize, int* rightHandSize, int* faceSize, unsigned char* displayImg, bool display) {
+//        OpenPose* openPose = (OpenPose*)op;
+//        cv::Mat image(rows, cols, CV_8UC3, img);
+//        cv::Mat displayImage(rows, cols, CV_8UC3, displayImg);
+//        openPose->forward(image, poseKeypoints, leftHandKeypoints, rightHandKeypoints, faceKeypoints, displayImage, display);
+//        populateSize(poseKeypoints, poseSize);
+//        populateSize(leftHandKeypoints, leftHandSize);
+//        populateSize(rightHandKeypoints, rightHandSize);
+//        populateSize(faceKeypoints, faceSize);
 //        if (display) memcpy(displayImg, displayImage.ptr(), sizeof(unsigned char)*rows*cols * 3);
 //    }
-//    OP_EXPORT void getOutputs(c_OP op, float* array) {
-//        if (output.getSize().size())
-//            memcpy(array, output.getPtr(), output.getSize()[0] * output.getSize()[1] * output.getSize()[2] * sizeof(float));
+//    OP_EXPORT void getPoseOutputs(c_OP op, float* array) {
+//        if (poseKeypoints.getSize().size())
+//            memcpy(array, poseKeypoints.getPtr(), poseKeypoints.getSize()[0] * poseKeypoints.getSize()[1] * poseKeypoints.getSize()[2] * sizeof(float));
+//    }
+//    OP_EXPORT void getLeftHandOutputs(c_OP op, float* array) {
+//        if (leftHandKeypoints.getSize().size())
+//            memcpy(array, leftHandKeypoints.getPtr(), leftHandKeypoints.getSize()[0] * leftHandKeypoints.getSize()[1] * leftHandKeypoints.getSize()[2] * sizeof(float));
+//    }
+//    OP_EXPORT void getRightHandOutputs(c_OP op, float* array) {
+//        if (rightHandKeypoints.getSize().size())
+//            memcpy(array, rightHandKeypoints.getPtr(), rightHandKeypoints.getSize()[0] * rightHandKeypoints.getSize()[1] * rightHandKeypoints.getSize()[2] * sizeof(float));
+//    }
+//    OP_EXPORT void getFaceOutputs(c_OP op, float* array) {
+//        if (faceKeypoints.getSize().size())
+//            memcpy(array, faceKeypoints.getPtr(), faceKeypoints.getSize()[0] * faceKeypoints.getSize()[1] * faceKeypoints.getSize()[2] * sizeof(float));
 //    }
 //    OP_EXPORT void poseFromHeatmap(c_OP op, unsigned char* img, size_t rows, size_t cols, unsigned char* displayImg, float* hm, int* size, float* ratios) {
 //        OpenPose* openPose = (OpenPose*)op;
@@ -652,13 +716,13 @@ template <> struct type_caster<cv::Mat> {
 //            imageSizes.emplace_back(point);
 //        }
 
-//        openPose->poseFromHeatmap(image, caffeNetOutputBlob, output, displayImage, imageSizes);
+//        openPose->poseFromHeatmap(image, caffeNetOutputBlob, poseKeypoints, displayImage, imageSizes);
 //        memcpy(displayImg, displayImage.ptr(), sizeof(unsigned char)*rows*cols * 3);
 //        // Copy back kp size
-//        if (output.getSize().size()) {
-//            size[0] = output.getSize()[0];
-//            size[1] = output.getSize()[1];
-//            size[2] = output.getSize()[2];
+//        if (poseKeypoints.getSize().size()) {
+//            size[0] = poseKeypoints.getSize()[0];
+//            size[1] = poseKeypoints.getSize()[1];
+//            size[2] = poseKeypoints.getSize()[2];
 //        }
 //        else {
 //            size[0] = 0; size[1] = 0; size[2] = 0;
@@ -670,3 +734,6 @@ template <> struct type_caster<cv::Mat> {
 //#endif
 
 #endif
+
+
+//#endif
