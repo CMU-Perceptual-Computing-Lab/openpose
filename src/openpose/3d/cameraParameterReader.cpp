@@ -8,6 +8,10 @@ namespace op
     {
     }
 
+    CameraParameterReader::~CameraParameterReader()
+    {
+    }
+
     CameraParameterReader::CameraParameterReader(const std::string& serialNumber,
                                                  const cv::Mat& cameraIntrinsics,
                                                  const cv::Mat& cameraDistortion,
@@ -15,7 +19,7 @@ namespace op
     {
         try
         {
-            // Security checks
+            // Sanity check
             if (serialNumber.empty() || cameraIntrinsics.empty() || cameraDistortion.empty())
                 error("Camera intrinsics, distortion, and/or serialNumber cannot be empty.",
                       __LINE__, __FUNCTION__, __FILE__);
@@ -118,7 +122,7 @@ namespace op
     {
         try
         {
-            // Security check
+            // Sanity check
             if (mSerialNumbers.size() != mCameraIntrinsics.size() || mSerialNumbers.size() != mCameraDistortions.size()
                 || (mSerialNumbers.size() != mCameraIntrinsics.size() && !mCameraExtrinsics.empty()))
                 error("Arguments must have same size (mSerialNumbers, mCameraIntrinsics, mCameraDistortions,"

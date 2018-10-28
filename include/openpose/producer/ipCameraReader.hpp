@@ -18,6 +18,8 @@ namespace op
          */
         explicit IpCameraReader(const std::string& cameraPath);
 
+        virtual ~IpCameraReader();
+
         std::vector<cv::Mat> getCameraMatrices();
 
         std::vector<cv::Mat> getCameraExtrinsics();

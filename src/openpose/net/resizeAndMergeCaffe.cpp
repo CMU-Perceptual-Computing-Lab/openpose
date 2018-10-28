@@ -29,6 +29,11 @@ namespace op
     }
 
     template <typename T>
+    ResizeAndMergeCaffe<T>::~ResizeAndMergeCaffe()
+    {
+    }
+
+    template <typename T>
     void ResizeAndMergeCaffe<T>::LayerSetUp(const std::vector<caffe::Blob<T>*>& bottom,
                                             const std::vector<caffe::Blob<T>*>& top)
     {
@@ -61,7 +66,7 @@ namespace op
         try
         {
             #ifdef USE_CAFFE
-                // Security checks
+                // Sanity checks
                 if (top.size() != 1)
                     error("top.size() != 1", __LINE__, __FUNCTION__, __FILE__);
                 if (bottom.empty())

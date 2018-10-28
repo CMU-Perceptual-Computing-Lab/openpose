@@ -82,8 +82,25 @@ namespace op
     {
         try
         {
+            // Get frame
             cv::Mat frame;
             mVideoCapture >> frame;
+            // Skip frames if frame step > 1
+            const auto frameStep = Producer::get(ProducerProperty::FrameStep);
+            if (frameStep > 1 && !frame.empty() && get(CV_CAP_PROP_POS_FRAMES) < get(CV_CAP_PROP_FRAME_COUNT)-1)
+            {
+                // Close if end of video
+                if (get(CV_CAP_PROP_POS_FRAMES) + frameStep-1 >= get(CV_CAP_PROP_FRAME_COUNT))
+                    mVideoCapture.release();
+                // Frame step usually more efficient if just reading sequentially
+                else if (frameStep < 51)
+                    for (auto i = 1 ; i < frameStep ; i++)
+                        mVideoCapture >> frame;
+                // Using set(CV_CAP_PROP_POS_FRAMES, value) is efficient only if step is big
+                else
+                    set(CV_CAP_PROP_POS_FRAMES, get(CV_CAP_PROP_POS_FRAMES) + frameStep-1);
+            }
+            // Return frame
             return frame;
         }
         catch (const std::exception& e)

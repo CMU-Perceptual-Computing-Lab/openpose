@@ -14,6 +14,8 @@ namespace op
     public:
         SubThreadQueueIn(const std::vector<TWorker>& tWorkers, const std::shared_ptr<TQueue>& tQueueIn);
 
+        virtual ~SubThreadQueueIn();
+
         bool work();
 
     private:
@@ -37,6 +39,11 @@ namespace op
         spTQueueIn{tQueueIn}
     {
         // spTQueueIn->addPopper();
+    }
+
+    template<typename TDatums, typename TWorker, typename TQueue>
+    SubThreadQueueIn<TDatums, TWorker, TQueue>::~SubThreadQueueIn()
+    {
     }
 
     template<typename TDatums, typename TWorker, typename TQueue>

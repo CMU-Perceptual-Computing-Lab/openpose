@@ -12,6 +12,8 @@ namespace op
         ScaleAndSizeExtractor(const Point<int>& netInputResolution, const Point<int>& outputResolution,
                               const int scaleNumber = 1, const double scaleGap = 0.25);
 
+        virtual ~ScaleAndSizeExtractor();
+
         std::tuple<std::vector<double>, std::vector<Point<int>>, double, Point<int>> extract(
             const Point<int>& inputResolution) const;
 

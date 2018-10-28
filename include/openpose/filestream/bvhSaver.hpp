@@ -16,7 +16,7 @@ namespace op
                  const std::shared_ptr<const TotalModel>& totalModel = nullptr,
                  const double fps = 30.);
 
-        ~BvhSaver();
+        virtual ~BvhSaver();
 
         void initializationOnThread();
 

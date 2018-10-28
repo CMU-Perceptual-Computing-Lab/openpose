@@ -46,7 +46,7 @@ namespace op
             {
                 // Read camera parameters from SN
                 auto serialNumbers = getFilesOnDirectory(cameraParameterPath, ".xml");
-                // Security check
+                // Sanity check
                 if (serialNumbers.size() != mImageDirectoryStereo && mImageDirectoryStereo > 1)
                     error("Found different number of camera parameter files than the number indicated by"
                           " `--3d_views` ("
@@ -65,6 +65,10 @@ namespace op
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
+    }
+
+    ImageDirectoryReader::~ImageDirectoryReader()
+    {
     }
 
     std::vector<cv::Mat> ImageDirectoryReader::getCameraMatrices()
@@ -123,7 +127,12 @@ namespace op
     {
         try
         {
+            // Read frame
             auto frame = loadImage(mFilePaths.at(mFrameNameCounter++).c_str(), CV_LOAD_IMAGE_COLOR);
+            // Skip frames if frame step > 1
+            const auto frameStep = Producer::get(ProducerProperty::FrameStep);
+            if (frameStep > 1)
+                set(CV_CAP_PROP_POS_FRAMES, mFrameNameCounter + frameStep-1);
             // Check frame integrity. This function also checks width/height changes. However, if it is performed
             // after setWidth/setHeight this is performed over the new resolution (so they always match).
             checkFrameIntegrity(frame);

@@ -47,7 +47,7 @@ namespace op
          * Destructor.
          * It automatically frees resources.
          */
-        ~WrapperT();
+        virtual ~WrapperT();
 
         /**
          * Disable multi-threading.
@@ -265,7 +265,7 @@ namespace op
     {
         try
         {
-            // Security check
+            // Sanity check
             if (worker == nullptr)
                 error("Your worker is a nullptr.", __LINE__, __FILE__, __FUNCTION__);
             // Add worker

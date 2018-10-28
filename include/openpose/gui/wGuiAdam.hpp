@@ -14,6 +14,8 @@ namespace op
     public:
         explicit WGuiAdam(const std::shared_ptr<GuiAdam>& guiAdam);
 
+        virtual ~WGuiAdam();
+
         void initializationOnThread();
 
         void workConsumer(const TDatums& tDatums);
@@ -36,6 +38,11 @@ namespace op
     template<typename TDatums>
     WGuiAdam<TDatums>::WGuiAdam(const std::shared_ptr<GuiAdam>& guiAdam) :
         spGuiAdam{guiAdam}
+    {
+    }
+
+    template<typename TDatums>
+    WGuiAdam<TDatums>::~WGuiAdam()
     {
     }
 

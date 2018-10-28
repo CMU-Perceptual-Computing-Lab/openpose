@@ -178,6 +178,15 @@ namespace op
 
         DELETE_COPY(Producer);
     };
+
+    /**
+     * This function returns the desired producer given the input parameters.
+     */
+    OP_API std::shared_ptr<Producer> createProducer(
+        const ProducerType producerType = ProducerType::None, const std::string& producerString = "",
+        const Point<int>& cameraResolution = Point<int>{-1,-1}, const double webcamFps = 30.,
+        const std::string& cameraParameterPath = "models/cameraParameters/", const bool undistortImage = true,
+        const unsigned int imageDirectoryStereo = -1);
 }
 
 #endif // OPENPOSE_PRODUCER_PRODUCER_HPP

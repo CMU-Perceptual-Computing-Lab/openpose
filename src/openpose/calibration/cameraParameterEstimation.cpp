@@ -277,11 +277,9 @@ namespace op
                     // Average(-179, 179) = 180 (not 0!)
                     // Average(90, 270) = 0 || 180??? We will assume outliers and return false
 
-                // Security checks
+                // Sanity check
                 if (angles.empty())
                     error("Variables `angles` is empty.", __LINE__, __FUNCTION__, __FILE__);
-                auto resultIsOK = true;
-                double average = 0;
 
                 // angles in range (-pi, pi]
                 auto anglesNormalized = angles;
@@ -307,6 +305,7 @@ namespace op
                 // If after normalizing range between min and max is still >180 degrees --> there are outliers
                 minElement = *std::min_element(anglesNormalized.begin(), anglesNormalized.end());
                 maxElement = *std::max_element(anglesNormalized.begin(), anglesNormalized.end());
+                auto resultIsOK = true;
                 if (maxElement - minElement >= PI)
                 {
                     resultIsOK = {false};
@@ -318,8 +317,8 @@ namespace op
                 //     - If both have the same signs, i.e. both in range [0, 180] or both in range (-180, 0)
                 //     - If one in range [0, 90] and the other in range [-90, 0]
                 //     - Etc.
-                average = std::accumulate(anglesNormalized.begin(), anglesNormalized.end(), 0.)
-                        / (double)anglesNormalized.size();
+                auto average = std::accumulate(anglesNormalized.begin(), anglesNormalized.end(), 0.)
+                             / (double)anglesNormalized.size();
                 average = setAngleInRangePlusMinusPi(average);
 
                 return std::make_pair(resultIsOK, average);
@@ -566,7 +565,7 @@ namespace op
         {
             try
             {
-                // Security checks
+                // Sanity check
                 if (intrinsics.size() != 2 || distortions.size() != 2 || cameraPaths.size() != 2)
                     error("Found that (intrinsics.size() != 2 || distortions.size() != 2 || cameraPaths.size() != 2).",
                           __LINE__, __FUNCTION__, __FILE__);
@@ -736,7 +735,7 @@ namespace op
     {
         try
         {
-            // Security checks
+            // Sanity check
             if (cameraIndex >= 100)
                 error("Only implemented for up to 99 cameras.", __LINE__, __FUNCTION__, __FILE__);
             // Return result
@@ -763,7 +762,7 @@ namespace op
     {
         try
         {
-            // Security checks
+            // Sanity check
             if (points2DExtrinsicPtr == nullptr || matchIndexesCameraPtr == nullptr)
                 error("Make sure than points2DExtrinsicPtr != nullptr && matchIndexesCameraPtr != nullptr.",
                       __LINE__, __FUNCTION__, __FILE__);
@@ -781,7 +780,7 @@ namespace op
                         + std::to_string(viewIndex+1) + "/" + std::to_string(numberViews),
                         Priority::High);
 
-                // Security check
+                // Sanity check
                 if (imageSize.width != image.cols || imageSize.height != image.rows)
                     error("Detected images with different sizes in `" + imagesFolder + "` All images"
                           " must have the same resolution.", __LINE__, __FUNCTION__, __FILE__);
@@ -886,7 +885,7 @@ namespace op
                 log("\nImage " + std::to_string(i+1) + "/" + std::to_string(imageAndPaths.size()), Priority::High);
                 const auto& image = imageAndPaths.at(i).first;
 
-                // Security check
+                // Sanity check
                 if (imageSize.width != image.cols || imageSize.height != image.rows)
                     error("Detected images with different sizes in `" + imagesFolder + "` All images"
                           " must have the same resolution.", __LINE__, __FUNCTION__, __FILE__);
@@ -1014,7 +1013,7 @@ namespace op
                     + " correspond with the number of cameras recorded in:\n" + extrinsicsImagesFolder + "\n",
                     Priority::High);
                 const auto imagePaths = getImagePaths(extrinsicsImagesFolder);
-                // Security check
+                // Sanity check
                 if (imagePaths.size() % numberCameras != 0)
                     error("You indicated that there are " + std::to_string(numberCameras)
                           + " cameras. However, we found a total of " + std::to_string(imagePaths.size())
@@ -1278,10 +1277,10 @@ namespace op
                 }
             }
             ofstreamMatches.close();
-            // Security check
             log("Number points fully obtained: " + std::to_string(points2DVectorsExtrinsic[0].size()), Priority::High);
             log("Number views fully obtained: " + std::to_string(points2DVectorsExtrinsic[0].size() / numberCorners),
                 Priority::High);
+            // Sanity check
             for (auto i = 1 ; i < numberCameras ; i++)
                 if (points2DVectorsExtrinsic[i].size() != points2DVectorsExtrinsic[0].size())
                     error("Something went wrong. Notify us.", __LINE__, __FUNCTION__, __FILE__);

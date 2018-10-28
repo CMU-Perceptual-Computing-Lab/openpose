@@ -189,7 +189,7 @@ namespace op
                         auto distance = 0.f;
                         auto total_distance = 0.0f;
 
-                        // Security checks
+                        // Sanity checks
                         if (element.status.size() != numberKeypoints)
                             error("element.status.size() != numberKeypoints ||", __LINE__, __FUNCTION__, __FILE__);
                         if (openposePersonEntry.status.size() != numberKeypoints)
@@ -303,7 +303,7 @@ namespace op
     //                     auto inliers = 0;
     //                     auto active = 0;
 
-    //                     // Security checks
+    //                     // Sanity checks
     //                     if (element.status.size() != numberKeypoints)
     //                         error("element.status.size() != numberKeypoints ||", __LINE__, __FUNCTION__, __FILE__);
     //                     if (openposePersonEntry.status.size() != numberKeypoints)
@@ -390,7 +390,7 @@ namespace op
     {
         try
         {
-            // Security check
+            // Sanity check
             if (imageViewIndex > 0)
                 error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
 
@@ -441,7 +441,7 @@ namespace op
     {
         try
         {
-            // Security check
+            // Sanity check
             if (imageViewIndex > 0)
                 error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
             // Wait for desired order

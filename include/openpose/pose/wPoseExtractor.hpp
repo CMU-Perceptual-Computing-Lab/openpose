@@ -13,6 +13,8 @@ namespace op
     public:
         explicit WPoseExtractor(const std::shared_ptr<PoseExtractor>& poseExtractorSharedPtr);
 
+        virtual ~WPoseExtractor();
+
         void initializationOnThread();
 
         void work(TDatums& tDatums);
@@ -35,6 +37,11 @@ namespace op
     template<typename TDatums>
     WPoseExtractor<TDatums>::WPoseExtractor(const std::shared_ptr<PoseExtractor>& poseExtractorSharedPtr) :
         spPoseExtractor{poseExtractorSharedPtr}
+    {
+    }
+
+    template<typename TDatums>
+    WPoseExtractor<TDatums>::~WPoseExtractor()
     {
     }
 

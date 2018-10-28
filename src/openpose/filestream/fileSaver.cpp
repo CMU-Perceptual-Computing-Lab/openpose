@@ -16,6 +16,10 @@ namespace op
         }
     }
 
+    FileSaver::~FileSaver()
+    {
+    }
+
     std::string FileSaver::getNextFileName(const unsigned long long index) const
     {
         try

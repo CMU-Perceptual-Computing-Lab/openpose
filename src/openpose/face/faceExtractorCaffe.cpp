@@ -176,7 +176,7 @@ namespace op
             #ifdef USE_CAFFE
                 if (mEnabled && !faceRectangles.empty())
                 {
-                    // Security checks
+                    // Sanity check
                     if (cvInputData.empty())
                         error("Empty cvInputData.", __LINE__, __FUNCTION__, __FILE__);
 

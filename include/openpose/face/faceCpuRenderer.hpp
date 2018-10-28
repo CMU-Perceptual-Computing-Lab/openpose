@@ -14,6 +14,8 @@ namespace op
         FaceCpuRenderer(const float renderThreshold, const float alphaKeypoint = FACE_DEFAULT_ALPHA_KEYPOINT,
                         const float alphaHeatMap = FACE_DEFAULT_ALPHA_HEAT_MAP);
 
+        virtual ~FaceCpuRenderer();
+
         void renderFaceInherited(Array<float>& outputData, const Array<float>& faceKeypoints);
 
         DELETE_COPY(FaceCpuRenderer);

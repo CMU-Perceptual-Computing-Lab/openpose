@@ -113,7 +113,7 @@ namespace op
     {
         try
         {
-            // Security checks
+            // Sanity checks
             if (sourceSize.empty())
                 error("sourceSize cannot be empty.", __LINE__, __FUNCTION__, __FILE__);
             if (targetSize.empty())

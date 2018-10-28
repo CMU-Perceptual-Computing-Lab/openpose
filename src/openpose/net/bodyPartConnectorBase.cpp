@@ -44,7 +44,7 @@ namespace op
                         count++;
                     }
                 }
-                if (count/(float)numberPointsInLine > interMinAboveThreshold)
+                if (count/T(numberPointsInLine) > interMinAboveThreshold)
                     return sum/count;
             }
             return T(0);
@@ -66,7 +66,7 @@ namespace op
         try
         {
             if (poseModel == PoseModel::BODY_25E)
-                error("BODY_25 not implemented for CPU body connector.", __LINE__, __FUNCTION__, __FILE__);
+                error("BODY_25E not implemented for CPU body connector.", __LINE__, __FUNCTION__, __FILE__);
 
             // std::vector<std::pair<std::vector<int>, double>> refers to:
             //     - std::vector<int>: [body parts locations, #body parts found]
@@ -694,7 +694,7 @@ namespace op
                         poseKeypoints[baseOffset + 2] = peaksPtr[bodyPartIndex];
                     }
                 }
-                poseScores[person] = personPair.second / (float)(numberBodyPartsAndPAFs);
+                poseScores[person] = personPair.second / T(numberBodyPartsAndPAFs);
             }
         }
         catch (const std::exception& e)

@@ -24,6 +24,8 @@ namespace op
         FrameDisplayer(const std::string& windowedName = OPEN_POSE_NAME_AND_VERSION,
                        const Point<int>& initialWindowedSize = Point<int>{}, const bool fullScreen = false);
 
+        virtual ~FrameDisplayer();
+
         // Due to OpenCV visualization issues (all visualization functions must be in the same thread)
         void initializationOnThread();
 

@@ -26,7 +26,7 @@ namespace op
     {
         try
         {
-            // Security checks
+            // Sanity checks
             if (cvSize.x <= 0 || cvSize.y <= 0)
                 error("Desired frame size to save the video is <= 0.", __LINE__, __FUNCTION__, __FILE__);
             if (fps <= 0.)
@@ -47,6 +47,10 @@ namespace op
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
+    }
+
+    VideoSaver::~VideoSaver()
+    {
     }
 
     bool VideoSaver::isOpened()
@@ -78,7 +82,7 @@ namespace op
     {
         try
         {
-            // Security checks
+            // Sanity checks
             if (!isOpened())
                 error("Video to write frames is not opened.", __LINE__, __FUNCTION__, __FILE__);
             if (cvMats.empty())

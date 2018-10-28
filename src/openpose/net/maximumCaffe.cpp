@@ -23,6 +23,11 @@ namespace op
     }
 
     template <typename T>
+    MaximumCaffe<T>::~MaximumCaffe()
+    {
+    }
+
+    template <typename T>
     void MaximumCaffe<T>::LayerSetUp(const std::vector<caffe::Blob<T>*>& bottom,
                                      const std::vector<caffe::Blob<T>*>& top)
     {

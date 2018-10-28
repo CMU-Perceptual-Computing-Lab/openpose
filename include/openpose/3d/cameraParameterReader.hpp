@@ -11,6 +11,8 @@ namespace op
     public:
         explicit CameraParameterReader();
 
+        virtual ~CameraParameterReader();
+
         // cameraExtrinsics is optional
         explicit CameraParameterReader(const std::string& serialNumber,
                                        const cv::Mat& cameraIntrinsics,

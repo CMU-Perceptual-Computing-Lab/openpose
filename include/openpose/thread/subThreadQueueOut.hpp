@@ -14,6 +14,8 @@ namespace op
     public:
         SubThreadQueueOut(const std::vector<TWorker>& tWorkers, const std::shared_ptr<TQueue>& tQueueOut);
 
+        virtual ~SubThreadQueueOut();
+
         bool work();
 
     private:
@@ -37,6 +39,11 @@ namespace op
         spTQueueOut{tQueueOut}
     {
         spTQueueOut->addPusher();
+    }
+
+    template<typename TDatums, typename TWorker, typename TQueue>
+    SubThreadQueueOut<TDatums, TWorker, TQueue>::~SubThreadQueueOut()
+    {
     }
 
     template<typename TDatums, typename TWorker, typename TQueue>

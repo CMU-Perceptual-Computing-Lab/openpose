@@ -110,23 +110,29 @@ int tutorialDeveloperThread2()
                   __LINE__, __FUNCTION__, __FILE__);
         op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
         // Step 2 - Read GFlags (user defined configuration)
+        // cameraSize
+        const auto cameraSize = op::flagsToPoint(FLAGS_camera_resolution, "-1x-1");
         // outputSize
         const auto outputSize = op::flagsToPoint(FLAGS_output_resolution, "-1x-1");
         // producerType
-        const auto producerSharedPtr = op::flagsToProducer(
-            FLAGS_image_dir, FLAGS_video, FLAGS_ip_camera, FLAGS_camera, FLAGS_flir_camera, FLAGS_camera_resolution,
-            FLAGS_camera_fps, FLAGS_camera_parameter_folder, !FLAGS_frame_keep_distortion,
-            (unsigned int) FLAGS_3d_views, FLAGS_flir_camera_index);
+        op::ProducerType producerType;
+        std::string producerString;
+        std::tie(producerType, producerString) = op::flagsToProducer(
+            FLAGS_image_dir, FLAGS_video, FLAGS_ip_camera, FLAGS_camera, FLAGS_flir_camera, FLAGS_flir_camera_index);
         const auto displayProducerFpsMode = (FLAGS_process_real_time
                                           ? op::ProducerFpsMode::OriginalFps : op::ProducerFpsMode::RetrievalFps);
+        auto producerSharedPtr = createProducer(
+            producerType, producerString, cameraSize, FLAGS_camera_fps, FLAGS_camera_parameter_folder,
+            !FLAGS_frame_keep_distortion, (unsigned int) FLAGS_3d_views);
         producerSharedPtr->setProducerFpsMode(displayProducerFpsMode);
         op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
         // Step 3 - Setting producer
         auto videoSeekSharedPtr = std::make_shared<std::pair<std::atomic<bool>, std::atomic<int>>>();
         videoSeekSharedPtr->first = false;
         videoSeekSharedPtr->second = 0;
-        const op::Point<int> producerSize{(int)producerSharedPtr->get(CV_CAP_PROP_FRAME_WIDTH),
-                                    (int)producerSharedPtr->get(CV_CAP_PROP_FRAME_HEIGHT)};
+        const op::Point<int> producerSize{
+            (int)producerSharedPtr->get(CV_CAP_PROP_FRAME_WIDTH),
+            (int)producerSharedPtr->get(CV_CAP_PROP_FRAME_HEIGHT)};
         // Step 4 - Setting thread workers && manager
         typedef std::vector<op::Datum> TypedefDatumsNoPtr;
         typedef std::shared_ptr<TypedefDatumsNoPtr> TypedefDatums;

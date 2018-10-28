@@ -8,6 +8,8 @@ namespace op
     class OP_API HandRenderer
     {
     public:
+        virtual ~HandRenderer(){};
+
         virtual void initializationOnThread(){};
 
         void renderHand(Array<float>& outputData, const std::array<Array<float>, 2>& handKeypoints,

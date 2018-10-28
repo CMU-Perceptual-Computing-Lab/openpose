@@ -65,7 +65,7 @@ namespace op
     {
         try
         {
-            // Security checks
+            // Sanity checks
             if (sourceSizes.empty())
                 error("sourceSizes cannot be empty.", __LINE__, __FUNCTION__, __FILE__);
             if (sourcePtrs.size() != sourceSizes.size() || sourceSizes.size() != scaleInputToNetInputs.size())

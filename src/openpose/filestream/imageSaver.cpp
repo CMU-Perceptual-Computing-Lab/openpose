@@ -18,6 +18,10 @@ namespace op
         }
     }
 
+    ImageSaver::~ImageSaver()
+    {
+    }
+
     void ImageSaver::saveImages(const std::vector<cv::Mat>& cvOutputDatas, const std::string& fileName) const
     {
         try

@@ -12,29 +12,32 @@ namespace op
     __constant__ const unsigned int BODY_25_PAIRS_GPU[] = {POSE_BODY_25_PAIRS_RENDER_GPU};
     __constant__ const unsigned int COCO_PAIRS_GPU[] = {POSE_COCO_PAIRS_RENDER_GPU};
     __constant__ const unsigned int BODY_19_PAIRS_GPU[] = {POSE_BODY_19_PAIRS_RENDER_GPU};
-    __constant__ const unsigned int BODY_25E_PAIRS_GPU[] = {POSE_BODY_25E_PAIRS_RENDER_GPU};
+    __constant__ const unsigned int BODY_23_PAIRS_GPU[] = {POSE_BODY_23_PAIRS_RENDER_GPU};
     __constant__ const unsigned int BODY_59_PAIRS_GPU[] = {POSE_BODY_59_PAIRS_RENDER_GPU};
     __constant__ const unsigned int BODY_65_PAIRS_GPU[] = {POSE_BODY_65_PAIRS_RENDER_GPU};
     __constant__ const unsigned int MPI_PAIRS_GPU[] = {POSE_MPI_PAIRS_RENDER_GPU};
     __constant__ const unsigned int CAR_12_PAIRS_GPU[] = {POSE_CAR_12_PAIRS_RENDER_GPU};
+    __constant__ const unsigned int CAR_22_PAIRS_GPU[] = {POSE_CAR_22_PAIRS_RENDER_GPU};
     // Keypoint scales
     __constant__ const float BODY_25_SCALES[] = {POSE_BODY_25_SCALES_RENDER_GPU};
     __constant__ const float COCO_SCALES[] = {POSE_COCO_SCALES_RENDER_GPU};
     __constant__ const float BODY_19_SCALES[] = {POSE_BODY_19_SCALES_RENDER_GPU};
-    __constant__ const float BODY_25E_SCALES[] = {POSE_BODY_25E_SCALES_RENDER_GPU};
+    __constant__ const float BODY_23_SCALES[] = {POSE_BODY_23_SCALES_RENDER_GPU};
     __constant__ const float BODY_59_SCALES[] = {POSE_BODY_59_SCALES_RENDER_GPU};
     __constant__ const float BODY_65_SCALES[] = {POSE_BODY_65_SCALES_RENDER_GPU};
     __constant__ const float MPI_SCALES[] = {POSE_MPI_SCALES_RENDER_GPU};
     __constant__ const float CAR_12_SCALES[] = {POSE_CAR_12_SCALES_RENDER_GPU};
+    __constant__ const float CAR_22_SCALES[] = {POSE_CAR_22_SCALES_RENDER_GPU};
     // RGB colors
     __constant__ const float BODY_25_COLORS[] = {POSE_BODY_25_COLORS_RENDER_GPU};
     __constant__ const float COCO_COLORS[] = {POSE_COCO_COLORS_RENDER_GPU};
     __constant__ const float BODY_19_COLORS[] = {POSE_BODY_19_COLORS_RENDER_GPU};
-    __constant__ const float BODY_25E_COLORS[] = {POSE_BODY_25E_COLORS_RENDER_GPU};
+    __constant__ const float BODY_23_COLORS[] = {POSE_BODY_23_COLORS_RENDER_GPU};
     __constant__ const float BODY_59_COLORS[] = {POSE_BODY_59_COLORS_RENDER_GPU};
     __constant__ const float BODY_65_COLORS[] = {POSE_BODY_65_COLORS_RENDER_GPU};
     __constant__ const float MPI_COLORS[] = {POSE_MPI_COLORS_RENDER_GPU};
     __constant__ const float CAR_12_COLORS[] = {POSE_CAR_12_COLORS_RENDER_GPU};
+    __constant__ const float CAR_22_COLORS[] = {POSE_CAR_22_COLORS_RENDER_GPU};
 
 
 
@@ -169,9 +172,9 @@ namespace op
                         blendOriginalFrame, (googlyEyes ? 15 : -1), (googlyEyes ? 16 : -1));
     }
 
-    __global__ void renderPoseBody25E(float* targetPtr, const int targetWidth, const int targetHeight,
-                                      const float* const posePtr, const int numberPeople, const float threshold,
-                                      const bool googlyEyes, const bool blendOriginalFrame, const float alphaColorToAdd)
+    __global__ void renderPoseBody23(float* targetPtr, const int targetWidth, const int targetHeight,
+                                     const float* const posePtr, const int numberPeople, const float threshold,
+                                     const bool googlyEyes, const bool blendOriginalFrame, const float alphaColorToAdd)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -183,17 +186,17 @@ namespace op
         __shared__ float sharedScaleF[POSE_MAX_PEOPLE];
 
         // Other parameters
-        const auto numberPartPairs = sizeof(BODY_25E_PAIRS_GPU) / (2*sizeof(BODY_25E_PAIRS_GPU[0]));
-        const auto numberScales = sizeof(BODY_25E_SCALES) / sizeof(BODY_25E_SCALES[0]);
-        const auto numberColors = sizeof(BODY_25E_COLORS) / (3*sizeof(BODY_25E_COLORS[0]));
+        const auto numberPartPairs = sizeof(BODY_23_PAIRS_GPU) / (2*sizeof(BODY_23_PAIRS_GPU[0]));
+        const auto numberScales = sizeof(BODY_23_SCALES) / sizeof(BODY_23_SCALES[0]);
+        const auto numberColors = sizeof(BODY_23_COLORS) / (3*sizeof(BODY_23_COLORS[0]));
         const auto radius = fastMin(targetWidth, targetHeight) / 100.f;
         const auto lineWidth = fastMin(targetWidth, targetHeight) / 120.f;
 
         // Render key points
         renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight,
-                        posePtr, BODY_25E_PAIRS_GPU, numberPeople, 25, numberPartPairs, BODY_25E_COLORS, numberColors,
-                        radius, lineWidth, BODY_25E_SCALES, numberScales, threshold, alphaColorToAdd,
-                        blendOriginalFrame, (googlyEyes ? 15 : -1), (googlyEyes ? 16 : -1));
+                        posePtr, BODY_23_PAIRS_GPU, numberPeople, 23, numberPartPairs, BODY_23_COLORS, numberColors,
+                        radius, lineWidth, BODY_23_SCALES, numberScales, threshold, alphaColorToAdd,
+                        blendOriginalFrame, (googlyEyes ? 13 : -1), (googlyEyes ? 14 : -1));
     }
 
     __global__ void renderPoseBody25(float* targetPtr, const int targetWidth, const int targetHeight,
@@ -328,6 +331,33 @@ namespace op
                         posePtr, CAR_12_PAIRS_GPU, numberPeople, 12, numberPartPairs, CAR_12_COLORS, numberColors,
                         radius, lineWidth, CAR_12_SCALES, numberScales, threshold, alphaColorToAdd,
                         blendOriginalFrame, (googlyEyes ? 4 : -1), (googlyEyes ? 5 : -1));
+    }
+
+    __global__ void renderPoseCar22(float* targetPtr, const int targetWidth, const int targetHeight,
+                                    const float* const posePtr, const int numberPeople, const float threshold,
+                                    const bool googlyEyes, const bool blendOriginalFrame, const float alphaColorToAdd)
+    {
+        const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
+        const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
+        const auto globalIdx = threadIdx.y * blockDim.x + threadIdx.x;
+
+        // Shared parameters
+        __shared__ float2 sharedMins[POSE_MAX_PEOPLE];
+        __shared__ float2 sharedMaxs[POSE_MAX_PEOPLE];
+        __shared__ float sharedScaleF[POSE_MAX_PEOPLE];
+
+        // Other parameters
+        const auto numberPartPairs = sizeof(CAR_22_PAIRS_GPU) / (2*sizeof(CAR_22_PAIRS_GPU[0]));
+        const auto numberScales = sizeof(CAR_22_SCALES) / sizeof(CAR_22_SCALES[0]);
+        const auto numberColors = sizeof(CAR_22_COLORS) / (3*sizeof(CAR_22_COLORS[0]));
+        const auto radius = fastMin(targetWidth, targetHeight) / 100.f;
+        const auto lineWidth = fastMin(targetWidth, targetHeight) / 120.f;
+
+        // Render key points
+        renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight,
+                        posePtr, CAR_22_PAIRS_GPU, numberPeople, 22, numberPartPairs, CAR_22_COLORS, numberColors,
+                        radius, lineWidth, CAR_22_SCALES, numberScales, threshold, alphaColorToAdd,
+                        blendOriginalFrame, (googlyEyes ? 6 : -1), (googlyEyes ? 7 : -1));
     }
 
     __global__ void renderBodyPartHeatMaps(float* targetPtr, const int targetWidth, const int targetHeight,
@@ -543,7 +573,7 @@ namespace op
 
                 // Body pose
                 if (poseModel == PoseModel::BODY_25 || poseModel == PoseModel::BODY_25_19
-                    || poseModel == PoseModel::BODY_25D)
+                    || poseModel == PoseModel::BODY_25D || poseModel == PoseModel::BODY_25E)
                     renderPoseBody25<<<threadsPerBlock, numBlocks>>>(
                         framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
                         blendOriginalFrame, alphaBlending
@@ -559,8 +589,8 @@ namespace op
                         framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
                         blendOriginalFrame, alphaBlending
                     );
-                else if (poseModel == PoseModel::BODY_25E)
-                    renderPoseBody25E<<<threadsPerBlock, numBlocks>>>(
+                else if (poseModel == PoseModel::BODY_23)
+                    renderPoseBody23<<<threadsPerBlock, numBlocks>>>(
                         framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
                         blendOriginalFrame, alphaBlending
                     );
@@ -582,6 +612,11 @@ namespace op
                 // Car pose
                 else if (poseModel == PoseModel::CAR_12)
                     renderPoseCar12<<<threadsPerBlock, numBlocks>>>(
+                        framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
+                        blendOriginalFrame, alphaBlending
+                    );
+                else if (poseModel == PoseModel::CAR_22)
+                    renderPoseCar22<<<threadsPerBlock, numBlocks>>>(
                         framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
                         blendOriginalFrame, alphaBlending
                     );

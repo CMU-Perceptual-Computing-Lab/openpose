@@ -227,7 +227,7 @@ namespace op
     {
         try
         {
-            // Security check
+            // Sanity check
             checkThread();
             // Initialization
             std::vector<std::vector<std::array<float,3>>> candidates;

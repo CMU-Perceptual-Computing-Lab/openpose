@@ -14,6 +14,8 @@ namespace op
     public:
         explicit WJointAngleEstimation(const std::shared_ptr<JointAngleEstimation>& jointAngleEstimation);
 
+        virtual ~WJointAngleEstimation();
+
         void initializationOnThread();
 
         void work(TDatums& tDatums);
@@ -36,6 +38,11 @@ namespace op
     template<typename TDatums>
     WJointAngleEstimation<TDatums>::WJointAngleEstimation(const std::shared_ptr<JointAngleEstimation>& jointAngleEstimation) :
         spJointAngleEstimation{jointAngleEstimation}
+    {
+    }
+
+    template<typename TDatums>
+    WJointAngleEstimation<TDatums>::~WJointAngleEstimation()
     {
     }
 

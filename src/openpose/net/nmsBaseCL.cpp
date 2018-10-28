@@ -152,7 +152,7 @@ namespace op
         try
         {
             #ifdef USE_OPENCL
-                // Security checks
+                // Sanity checks
                 if (sourceSize.empty())
                     error("sourceSize cannot be empty.", __LINE__, __FUNCTION__, __FILE__);
                 if (targetSize.empty())

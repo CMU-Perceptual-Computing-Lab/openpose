@@ -13,6 +13,8 @@ namespace op
     public:
         explicit WKeypointScaler(const std::shared_ptr<KeypointScaler>& keypointScaler);
 
+        virtual ~WKeypointScaler();
+
         void initializationOnThread();
 
         void work(TDatums& tDatums);
@@ -33,6 +35,11 @@ namespace op
     template<typename TDatums>
     WKeypointScaler<TDatums>::WKeypointScaler(const std::shared_ptr<KeypointScaler>& keypointScaler) :
         spKeypointScaler{keypointScaler}
+    {
+    }
+
+    template<typename TDatums>
+    WKeypointScaler<TDatums>::~WKeypointScaler()
     {
     }
 

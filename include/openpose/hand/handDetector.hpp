@@ -14,6 +14,8 @@ namespace op
     public:
         explicit HandDetector(const PoseModel poseModel);
 
+        virtual ~HandDetector();
+
         std::vector<std::array<Rectangle<float>, 2>> detectHands(const Array<float>& poseKeypoints) const;
 
         std::vector<std::array<Rectangle<float>, 2>> trackHands(const Array<float>& poseKeypoints);

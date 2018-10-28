@@ -9,6 +9,10 @@ namespace op
     {
     }
 
+    HandCpuRenderer::~HandCpuRenderer()
+    {
+    }
+
     void HandCpuRenderer::renderHandInherited(Array<float>& outputData,
                                               const std::array<Array<float>, 2>& handKeypoints)
     {
