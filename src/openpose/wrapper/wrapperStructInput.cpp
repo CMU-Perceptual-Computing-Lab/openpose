@@ -2,18 +2,27 @@
 
 namespace op
 {
-    WrapperStructInput::WrapperStructInput(const std::shared_ptr<Producer> producerSharedPtr_,
+    WrapperStructInput::WrapperStructInput(const ProducerType producerType_, const std::string& producerString_,
                                            const unsigned long long frameFirst_, const unsigned long long frameStep_,
                                            const unsigned long long frameLast_, const bool realTimeProcessing_,
-                                           const bool frameFlip_, const int frameRotate_, const bool framesRepeat_) :
-        producerSharedPtr{producerSharedPtr_},
+                                           const bool frameFlip_, const int frameRotate_, const bool framesRepeat_,
+                                           const Point<int>& cameraResolution_, const double webcamFps_,
+                                           const std::string& cameraParameterPath_, const bool undistortImage_,
+                                           const unsigned int imageDirectoryStereo_) :
+        producerType{producerType_},
+        producerString{producerString_},
         frameFirst{frameFirst_},
         frameStep{frameStep_},
         frameLast{frameLast_},
         realTimeProcessing{realTimeProcessing_},
         frameFlip{frameFlip_},
         frameRotate{frameRotate_},
-        framesRepeat{framesRepeat_}
+        framesRepeat{framesRepeat_},
+        cameraResolution{cameraResolution_},
+        webcamFps{webcamFps_},
+        cameraParameterPath{cameraParameterPath_},
+        undistortImage{undistortImage_},
+        imageDirectoryStereo{imageDirectoryStereo_}
     {
     }
 }

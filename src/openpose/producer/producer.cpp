@@ -1,5 +1,6 @@
 #include <openpose/utilities/check.hpp>
 #include <openpose/utilities/fastMath.hpp>
+#include <openpose/producer/headers.hpp>
 #include <openpose/producer/producer.hpp>
 
 namespace op
@@ -347,6 +348,72 @@ namespace op
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    std::shared_ptr<Producer> createProducer(const ProducerType producerType, const std::string& producerString,
+                                             const Point<int>& cameraResolution, const double webcamFps,
+                                             const std::string& cameraParameterPath, const bool undistortImage,
+                                             const unsigned int imageDirectoryStereo)
+    {
+        try
+        {
+            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+
+            // Directory of images
+            if (producerType == ProducerType::ImageDirectory)
+                return std::make_shared<ImageDirectoryReader>(
+                    producerString, imageDirectoryStereo, cameraParameterPath);
+            // Video
+            else if (producerType == ProducerType::Video)
+                return std::make_shared<VideoReader>(
+                    producerString, imageDirectoryStereo, cameraParameterPath);
+            // IP camera
+            else if (producerType == ProducerType::IPCamera)
+                return std::make_shared<IpCameraReader>(producerString);
+            // Flir camera
+            else if (producerType == ProducerType::FlirCamera)
+                return std::make_shared<FlirReader>(
+                    cameraParameterPath, cameraResolution, undistortImage, std::stoi(producerString));
+            // Webcam
+            else if (producerType == ProducerType::Webcam)
+            {
+                const auto webcamIndex = std::stoi(producerString);
+                auto cameraResolutionFinal = cameraResolution;
+                if (cameraResolutionFinal.x < 0 || cameraResolutionFinal.y < 0)
+                    cameraResolutionFinal = Point<int>{1280,720};
+                if (webcamIndex >= 0)
+                {
+                    const auto throwExceptionIfNoOpened = true;
+                    return std::make_shared<WebcamReader>(
+                        webcamIndex, cameraResolutionFinal, webcamFps, throwExceptionIfNoOpened);
+                }
+                else
+                {
+                    const auto throwExceptionIfNoOpened = false;
+                    std::shared_ptr<WebcamReader> webcamReader;
+                    for (auto index = 0 ; index < 10 ; index++)
+                    {
+                        webcamReader = std::make_shared<WebcamReader>(
+                            index, cameraResolutionFinal, webcamFps, throwExceptionIfNoOpened);
+                        if (webcamReader->isOpened())
+                        {
+                            log("Auto-detecting camera index... Detected and opened camera " + std::to_string(index)
+                                + ".", Priority::High);
+                            return webcamReader;
+                        }
+                    }
+                    error("No camera found.", __LINE__, __FUNCTION__, __FILE__);
+                }
+            }
+            // else
+            error("Undefined Producer selected.", __LINE__, __FUNCTION__, __FILE__);
+            return std::shared_ptr<Producer>{};
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return std::shared_ptr<Producer>{};
         }
     }
 }

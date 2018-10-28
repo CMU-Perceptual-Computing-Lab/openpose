@@ -126,6 +126,8 @@ int tutorialApiCpp5()
         op::Profiler::setDefaultX(FLAGS_profile_speed);
 
         // Applying user defined configuration - GFlags to program variables
+        // cameraSize
+        const auto cameraSize = op::flagsToPoint(FLAGS_camera_resolution, "-1x-1");
         // outputSize
         const auto outputSize = op::flagsToPoint(FLAGS_output_resolution, "-1x-1");
         // netInputSize
@@ -135,10 +137,10 @@ int tutorialApiCpp5()
         // handNetInputSize
         const auto handNetInputSize = op::flagsToPoint(FLAGS_hand_net_resolution, "368x368 (multiples of 16)");
         // producerType
-        const auto producerSharedPtr = op::flagsToProducer(
-            FLAGS_image_dir, FLAGS_video, FLAGS_ip_camera, FLAGS_camera, FLAGS_flir_camera, FLAGS_camera_resolution,
-            FLAGS_camera_fps, FLAGS_camera_parameter_folder, !FLAGS_frame_keep_distortion,
-            (unsigned int) FLAGS_3d_views, FLAGS_flir_camera_index);
+        op::ProducerType producerType;
+        std::string producerString;
+        std::tie(producerType, producerString) = op::flagsToProducer(
+            FLAGS_image_dir, FLAGS_video, FLAGS_ip_camera, FLAGS_camera, FLAGS_flir_camera, FLAGS_flir_camera_index);
         // poseModel
         const auto poseModel = op::flagsToPoseModel(FLAGS_model_pose);
         // JSON saving
@@ -184,8 +186,10 @@ int tutorialApiCpp5()
         opWrapperT.configure(wrapperStructExtra);
         // Producer (use default to disable any input)
         const op::WrapperStructInput wrapperStructInput{
-            producerSharedPtr, FLAGS_frame_first, FLAGS_frame_step, FLAGS_frame_last, FLAGS_process_real_time,
-            FLAGS_frame_flip, FLAGS_frame_rotate, FLAGS_frames_repeat};
+            producerType, producerString, FLAGS_frame_first, FLAGS_frame_step, FLAGS_frame_last,
+            FLAGS_process_real_time, FLAGS_frame_flip, FLAGS_frame_rotate, FLAGS_frames_repeat,
+            cameraSize, FLAGS_camera_fps, FLAGS_camera_parameter_folder, !FLAGS_frame_keep_distortion,
+            (unsigned int) FLAGS_3d_views};
         opWrapperT.configure(wrapperStructInput);
         // Consumer (comment or use default argument to disable any output)
         const auto displayMode = op::DisplayMode::NoDisplay;

@@ -45,7 +45,7 @@ namespace op
                 error("Dimension mismatch between poseKeypoints and poseScores.", __LINE__, __FUNCTION__, __FILE__);
             const auto numberPeople = poseKeypoints.getSize(0);
             const auto numberBodyParts = poseKeypoints.getSize(1);
-            const auto imageId = (numberBodyParts != 12 ? getLastNumber(imageName) : 1900000 + getLastNumber(imageName));
+            const auto imageId = getLastNumber(imageName);
             for (auto person = 0 ; person < numberPeople ; person++)
             {
                 // Comma at any moment but first element
@@ -84,14 +84,23 @@ namespace op
                         indexesInCocoOrder = std::vector<int>{0, 16,15,18,17,    5,2,6,3,7,    4,12,9,13,10,    14,11};
                     else if (numberBodyParts == 23)
                         indexesInCocoOrder = std::vector<int>{18,21,19,22,20,    4,1,5,2,6,    3,13,8,14, 9,    15,10};
-                    // Car
-                    else if (numberBodyParts == 12)
-                        indexesInCocoOrder = std::vector<int>{0,1,2,3, 4,5,6,7, 8, 8,9,10,11, 11};
                 }
                 // Foot
                 else if (mCocoJsonFormat == CocoJsonFormat::Foot)
+                {
                     if (numberBodyParts == 25)
                         indexesInCocoOrder = std::vector<int>{19,20,21, 22,23,24};
+                }
+                // Car
+                else if (mCocoJsonFormat == CocoJsonFormat::Car)
+                {
+                    if (numberBodyParts == 12)
+                        indexesInCocoOrder = std::vector<int>{0,1,2,3, 4,5,6,7, 8, 8,9,10,11, 11};
+                    else if (numberBodyParts == 22)
+                        for (auto i = 0 ; i < 22 ; i++)
+                            indexesInCocoOrder.emplace_back(i);
+                }
+                // Sanity check
                 if (indexesInCocoOrder.empty())
                     error("Invalid number of body parts (" + std::to_string(numberBodyParts) + ").",
                           __LINE__, __FUNCTION__, __FILE__);

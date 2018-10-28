@@ -280,6 +280,7 @@ OpenPose Library - Release Notes
         2. Array::getPybindPtr() to get an editable const pointer.
         3. Array::pData as binding of spData.
         4. Array::Array that takes as input a pointer, so it does not re-allocate memory.
+    12. Producer defined inside Wrapper rather than being defined on each example.
 2. Functions or parameters renamed:
     1. By default, python example `tutorial_developer/python_2_pose_from_heatmaps.py` was using 2 scales starting at -1x736, changed to 1 scale at -1x368.
     2. WrapperStructPose default parameters changed to match those of the OpenPose demo binary.
