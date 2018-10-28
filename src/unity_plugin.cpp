@@ -33,12 +33,12 @@ enum OutputType : int {
 };
 
 // Global setting structs
-op::WrapperStructPose *wrapperStructPose;
-op::WrapperStructHand *wrapperStructHand;
-op::WrapperStructFace *wrapperStructFace;
-op::WrapperStructExtra *wrapperStructExtra;
-op::WrapperStructInput *wrapperStructInput;
-op::WrapperStructOutput *wrapperStructOutput;
+std::shared_ptr<op::WrapperStructPose> spWrapperStructPose;
+std::shared_ptr<op::WrapperStructHand> spWrapperStructHand;
+std::shared_ptr<op::WrapperStructFace> spWrapperStructFace;
+std::shared_ptr<op::WrapperStructExtra> spWrapperStructExtra;
+std::shared_ptr<op::WrapperStructInput> spWrapperStructInput;
+std::shared_ptr<op::WrapperStructOutput> spWrapperStructOutput;
 
 // This worker will just read and return all the jpg files in a directory
 class UnityPluginUserOutput : public op::WorkerConsumer<std::shared_ptr<std::vector<op::Datum>>> {
@@ -67,6 +67,7 @@ protected:
 				if (unityOutputEnabled) {
 					sendPoseKeypoints(datumsPtr);
 					sendHandKeypoints(datumsPtr);
+					sendFaceKeypoints(datumsPtr);
 				}
 			}
 		} catch (const std::exception& e) {
@@ -99,6 +100,17 @@ protected:
 			delete ptrs;
 		}
 	}
+
+	void sendFaceKeypoints(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
+		auto& data = datumsPtr->at(0).faceKeypoints; // Array<float>
+		if (!data.empty()) {
+			auto sizeVector = data.getSize();
+			int sizeSize = sizeVector.size();
+			int * sizes = &sizeVector[0];
+			float * val = data.getPtr();
+			outputValue(&val, 1, sizes, sizeSize, FaceKeypoints);
+		}
+	}
 };
 
 // Global user output
@@ -124,7 +136,7 @@ extern "C" {
 		int heatmaps_scale = 2, // HeatMapScaleMode
 		bool part_candidates = false, float render_threshold = 0.05f) {
 		try {
-			wrapperStructPose = new op::WrapperStructPose{
+			spWrapperStructPose = std::make_shared<op::WrapperStructPose>(
 				!body_disable,
 				op::Point<int>{net_resolution_x, net_resolution_y}, // Point
 				op::Point<int>{output_resolution_x, output_resolution_y}, // Point
@@ -136,9 +148,9 @@ extern "C" {
 				part_to_show, model_folder,
 				op::flagsToHeatMaps(heatmaps_add_parts, heatmaps_add_bkg, heatmaps_add_PAFs), // HeatMapType
 				op::flagsToHeatMapScaleMode(heatmaps_scale),
-				part_candidates, render_threshold, number_people_max, true };
+				part_candidates, render_threshold, number_people_max, true);
 
-			//spWrapper->configure(wrapperStructPose);
+			//spWrapper->configure(spWrapperStructPose);
 		}
 		catch (const std::exception& e)
 		{
@@ -150,11 +162,11 @@ extern "C" {
 		int face_renderer = -1, int render_pose = -1,
 		float face_alpha_pose = 0.6f, float face_alpha_heatmap = 0.7f, float face_render_threshold = 0.4f) {
 		try {
-			wrapperStructFace = new op::WrapperStructFace{
+			spWrapperStructFace = std::make_shared<op::WrapperStructFace>(
 				face, op::Point<int>{face_net_resolution_x, face_net_resolution_y},
 				op::flagsToRenderMode(face_renderer, false/*(_3d || _3d_views > 1 || flir_camera)*/, render_pose), // RenderMode
-				face_alpha_pose, face_alpha_heatmap, face_render_threshold };
-			//spWrapper->configure(wrapperStructFace);
+				face_alpha_pose, face_alpha_heatmap, face_render_threshold);
+			//spWrapper->configure(spWrapperStructFace);
 		}
 		catch (const std::exception& e)
 		{
@@ -168,14 +180,14 @@ extern "C" {
 		int hand_render = -1, bool _3d = false, int _3d_views = 1, bool flir_camera = false, int render_pose = -1, // RenderMode
 		float hand_alpha_pose = 0.6f, float hand_alpha_heatmap = 0.7f, float hand_render_threshold = 0.2f) {
 		try {
-			wrapperStructHand = new op::WrapperStructHand{
+			spWrapperStructHand = std::make_shared<op::WrapperStructHand>(
 				hand,
 				op::Point<int>{hand_net_resolution_x, hand_net_resolution_y}, // Point
 				hand_scale_number, hand_scale_range, hand_tracking,
 				op::flagsToRenderMode(hand_render, (_3d || _3d_views > 1 || flir_camera), render_pose),
-				hand_alpha_pose, hand_alpha_heatmap, hand_render_threshold };
+				hand_alpha_pose, hand_alpha_heatmap, hand_render_threshold);
 
-			//spWrapper->configure(wrapperStructHand);
+			//spWrapper->configure(spWrapperStructHand);
 		}
 		catch (const std::exception& e)
 		{
@@ -185,9 +197,9 @@ extern "C" {
 	OP_API void OP_ConfigureExtra(
 		bool _3d = false, int _3d_min_views = -1, bool _identification = false, int _tracking = -1, int _ik_threads = 0) {
 		try {
-			wrapperStructExtra = new op::WrapperStructExtra{
-				_3d, _3d_min_views, _identification, _tracking, _ik_threads };
-			//spWrapper->configure(wrapperStructExtra);
+			spWrapperStructExtra = std::make_shared<op::WrapperStructExtra>(
+				_3d, _3d_min_views, _identification, _tracking, _ik_threads);
+			//spWrapper->configure(spWrapperStructExtra);
 		}
 		catch (const std::exception& e)
 		{
@@ -210,10 +222,10 @@ extern "C" {
 				camera_parameter_folder, !frame_keep_distortion,
 				(unsigned int)_3d_views, flir_camera_index);
 
-			wrapperStructInput = new op::WrapperStructInput{
+			spWrapperStructInput = std::make_shared<op::WrapperStructInput>(
 				producerSharedPtr, (unsigned long long) frame_first, (unsigned long long) frame_last, process_real_time, frame_flip,
-				frame_rotate, frames_repeat };
-			//spWrapper->configure(wrapperStructInput);
+				frame_rotate, frames_repeat);
+			//spWrapper->configure(spWrapperStructInput);
 		}
 		catch (const std::exception& e)
 		{
@@ -231,14 +243,14 @@ extern "C" {
 			const auto displayMode = op::DisplayMode::NoDisplay;
 			const bool guiVerbose = false;
 			const bool fullScreen = false;
-			wrapperStructOutput = new op::WrapperStructOutput{
+			spWrapperStructOutput = std::make_shared<op::WrapperStructOutput>(
 				displayMode, guiVerbose, fullScreen, write_keypoint,
 				op::stringToDataFormat(write_keypoint_format), write_json, write_coco_json,
 				write_coco_foot_json, write_images, write_images_format, write_video,
 				camera_fps,
 				write_heatmaps, write_heatmaps_format, write_video_adam,
-				write_bvh, udp_host, udp_port };
-			//spWrapper->configure(wrapperStructOutput);
+				write_bvh, udp_host, udp_port);
+			//spWrapper->configure(spWrapperStructOutput);
 		}
 		catch (const std::exception& e)
 		{
@@ -295,12 +307,12 @@ void openpose_main(bool enableOutput, OutputCallback callback) {
 		OP_ConfigureInput();
 
 		// Apply configurations
-		spWrapper->configure(*wrapperStructPose);
-		spWrapper->configure(*wrapperStructHand);
-		spWrapper->configure(*wrapperStructFace);
-		spWrapper->configure(*wrapperStructExtra);
-		spWrapper->configure(*wrapperStructInput);
-		spWrapper->configure(*wrapperStructOutput);
+		spWrapper->configure(*spWrapperStructPose);
+		spWrapper->configure(*spWrapperStructHand);
+		spWrapper->configure(*spWrapperStructFace);
+		spWrapper->configure(*spWrapperStructExtra);
+		spWrapper->configure(*spWrapperStructInput);
+		spWrapper->configure(*spWrapperStructOutput);
 
 		// Start processing
 		op::log("Starting thread(s)...", op::Priority::High);
@@ -315,14 +327,6 @@ void openpose_main(bool enableOutput, OutputCallback callback) {
 		const auto message = "OpenPose demo successfully finished. Total time: "
 			+ std::to_string(totalTimeSec) + " seconds.";
 		op::log(message, op::Priority::High);
-
-		// Clean up configs
-		delete wrapperStructPose;
-		delete wrapperStructHand;
-		delete wrapperStructFace;
-		delete wrapperStructExtra;
-		delete wrapperStructInput;
-		delete wrapperStructOutput;
 
 		// Reset pointer
 		ptrUserOutput = nullptr;
