@@ -12,7 +12,10 @@ namespace op
     public:
         KeypointSaver(const std::string& directoryPath, const DataFormat format);
 
-        void saveKeypoints(const std::vector<Array<float>>& keypointVector, const std::string& fileName, const std::string& keypointName) const;
+        virtual ~KeypointSaver();
+
+        void saveKeypoints(const std::vector<Array<float>>& keypointVector, const std::string& fileName,
+                           const std::string& keypointName) const;
 
     private:
         const DataFormat mFormat;

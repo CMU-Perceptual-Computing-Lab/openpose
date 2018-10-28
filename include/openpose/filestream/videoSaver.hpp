@@ -12,6 +12,8 @@ namespace op
     public:
         VideoSaver(const std::string& videoSaverPath, const int cvFourcc, const double fps, const Point<int>& cvSize);
 
+        virtual ~VideoSaver();
+
         bool isOpened();
 
         void write(const cv::Mat& cvMat);

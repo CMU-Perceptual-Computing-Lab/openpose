@@ -13,6 +13,8 @@ namespace op
     public:
         explicit WGuiInfoAdder(const std::shared_ptr<GuiInfoAdder>& guiInfoAdder);
 
+        virtual ~WGuiInfoAdder();
+
         void initializationOnThread();
 
         void work(TDatums& tDatums);
@@ -35,6 +37,11 @@ namespace op
     template<typename TDatums>
     WGuiInfoAdder<TDatums>::WGuiInfoAdder(const std::shared_ptr<GuiInfoAdder>& guiInfoAdder) :
         spGuiInfoAdder{guiInfoAdder}
+    {
+    }
+
+    template<typename TDatums>
+    WGuiInfoAdder<TDatums>::~WGuiInfoAdder()
     {
     }
 

@@ -11,6 +11,8 @@ namespace op
     public:
         explicit KeypointScaler(const ScaleMode scaleMode);
 
+        virtual ~KeypointScaler();
+
         void scale(Array<float>& arrayToScale, const double scaleInputToOutput, const double scaleNetToOutput,
                    const Point<int>& producerSize) const;
 

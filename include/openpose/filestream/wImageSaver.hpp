@@ -13,6 +13,8 @@ namespace op
     public:
         explicit WImageSaver(const std::shared_ptr<ImageSaver>& imageSaver);
 
+        virtual ~WImageSaver();
+
         void initializationOnThread();
 
         void workConsumer(const TDatums& tDatums);
@@ -35,6 +37,11 @@ namespace op
     template<typename TDatums>
     WImageSaver<TDatums>::WImageSaver(const std::shared_ptr<ImageSaver>& imageSaver) :
         spImageSaver{imageSaver}
+    {
+    }
+
+    template<typename TDatums>
+    WImageSaver<TDatums>::~WImageSaver()
     {
     }
 

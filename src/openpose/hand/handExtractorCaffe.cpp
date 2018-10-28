@@ -260,7 +260,7 @@ namespace op
             #if defined USE_CAFFE
                 if (mEnabled && !handRectangles.empty())
                 {
-                    // Security checks
+                    // Sanity check
                     if (cvInputData.empty())
                         error("Empty cvInputData.", __LINE__, __FUNCTION__, __FILE__);
 
@@ -334,8 +334,8 @@ namespace op
                                         const auto scale = initScale
                                                          + mMultiScaleNumberAndRange.second * i / (numberScales-1.f);
                                         // Process hand
-                                        Array<float> handEstimated({1, handCurrent.getSize(1),
-                                                                    handCurrent.getSize(2)}, 0);
+                                        Array<float> handEstimated(
+                                            {1, handCurrent.getSize(1), handCurrent.getSize(2)}, 0.f);
                                         const auto handRectangleScale = recenter(
                                             handRectangle,
                                             (float)(intRound(handRectangle.width * scale) / 2 * 2),

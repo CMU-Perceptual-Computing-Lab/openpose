@@ -238,6 +238,10 @@ namespace op
     {
     }
 
+    Gui::~Gui()
+    {
+    }
+
     void Gui::initializationOnThread()
     {
         mFrameDisplayer.initializationOnThread();

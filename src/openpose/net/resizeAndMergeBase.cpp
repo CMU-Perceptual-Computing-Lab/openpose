@@ -18,7 +18,7 @@ namespace op
             // CPU directly uses sourceWidth/Height and targetWidth/Height
             UNUSED(scaleInputToNetInputs);
 
-            // Security checks
+            // Sanity check
             if (sourceSizes.empty())
                 error("sourceSizes cannot be empty.", __LINE__, __FUNCTION__, __FILE__);
 

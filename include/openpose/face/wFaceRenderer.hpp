@@ -13,6 +13,8 @@ namespace op
     public:
         explicit WFaceRenderer(const std::shared_ptr<FaceRenderer>& faceRenderer);
 
+        virtual ~WFaceRenderer();
+
         void initializationOnThread();
 
         void work(TDatums& tDatums);
@@ -35,6 +37,11 @@ namespace op
     template<typename TDatums>
     WFaceRenderer<TDatums>::WFaceRenderer(const std::shared_ptr<FaceRenderer>& faceRenderer) :
         spFaceRenderer{faceRenderer}
+    {
+    }
+
+    template<typename TDatums>
+    WFaceRenderer<TDatums>::~WFaceRenderer()
     {
     }
 

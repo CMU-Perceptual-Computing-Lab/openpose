@@ -13,6 +13,8 @@ namespace op
     public:
         explicit WGui(const std::shared_ptr<Gui>& gui);
 
+        virtual ~WGui();
+
         void initializationOnThread();
 
         void workConsumer(const TDatums& tDatums);
@@ -35,6 +37,11 @@ namespace op
     template<typename TDatums>
     WGui<TDatums>::WGui(const std::shared_ptr<Gui>& gui) :
         spGui{gui}
+    {
+    }
+
+    template<typename TDatums>
+    WGui<TDatums>::~WGui()
     {
     }
 

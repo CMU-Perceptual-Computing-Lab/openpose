@@ -42,6 +42,11 @@ namespace op
     {
     }
 
+
+    KeypointScaler::~KeypointScaler()
+    {
+    }
+
     void KeypointScaler::scale(Array<float>& arrayToScale, const double scaleInputToOutput,
                                const double scaleNetToOutput, const Point<int>& producerSize) const
     {

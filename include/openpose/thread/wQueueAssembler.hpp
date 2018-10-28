@@ -19,6 +19,8 @@ namespace op
     public:
         explicit WQueueAssembler();
 
+        virtual ~WQueueAssembler();
+
         void initializationOnThread();
 
         void work(TDatums& tDatums);
@@ -43,6 +45,11 @@ namespace op
     }
 
     template<typename TDatums, typename TDatumsNoPtr>
+    WQueueAssembler<TDatums, TDatumsNoPtr>::~WQueueAssembler()
+    {
+    }
+
+    template<typename TDatums, typename TDatumsNoPtr>
     void WQueueAssembler<TDatums, TDatumsNoPtr>::initializationOnThread()
     {
     }
@@ -57,7 +64,7 @@ namespace op
             // Input TDatums -> enqueue it
             if (checkNoNullNorEmpty(tDatums))
             {
-                // Security check
+                // Sanity check
                 if (tDatums->size() > 1)
                     error("This function assumes that WQueueSplitter (inside WDatumProducer)"
                           " was applied in the first place, i.e., that there is only 1 element"

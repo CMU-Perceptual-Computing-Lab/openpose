@@ -14,6 +14,8 @@ namespace op
     public:
         explicit MaximumCaffe();
 
+        virtual ~MaximumCaffe();
+
         virtual void LayerSetUp(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top);
 
         virtual void Reshape(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top);

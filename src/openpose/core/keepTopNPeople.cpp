@@ -8,6 +8,10 @@ namespace op
     {
     }
 
+    KeepTopNPeople::~KeepTopNPeople()
+    {
+    }
+
     Array<float> KeepTopNPeople::keepTopPeople(const Array<float>& peopleArray, const Array<float>& poseScores) const
     {
         try
@@ -15,7 +19,7 @@ namespace op
             // Remove people if #people > mNumberPeopleMax
             if (peopleArray.getVolume() > (unsigned int)mNumberPeopleMax && mNumberPeopleMax > 0)
             {
-                // Security checks
+                // Sanity checks
                 if (poseScores.getVolume() != (unsigned int) poseScores.getSize(0))
                     error("The poseFinalScores variable should be a Nx1 vector, not a multidimensional array.",
                           __LINE__, __FUNCTION__, __FILE__);

@@ -13,6 +13,8 @@ namespace op
     public:
         explicit WPoseExtractorNet(const std::shared_ptr<PoseExtractorNet>& poseExtractorSharedPtr);
 
+        virtual ~WPoseExtractorNet();
+
         void initializationOnThread();
 
         void work(TDatums& tDatums);
@@ -35,6 +37,11 @@ namespace op
     template<typename TDatums>
     WPoseExtractorNet<TDatums>::WPoseExtractorNet(const std::shared_ptr<PoseExtractorNet>& poseExtractorSharedPtr) :
         spPoseExtractorNet{poseExtractorSharedPtr}
+    {
+    }
+
+    template<typename TDatums>
+    WPoseExtractorNet<TDatums>::~WPoseExtractorNet()
     {
     }
 

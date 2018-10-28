@@ -21,6 +21,8 @@ namespace op
     public:
         explicit ResizeAndMergeCaffe();
 
+        virtual ~ResizeAndMergeCaffe();
+
         virtual void LayerSetUp(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top);
 
         virtual void Reshape(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top,

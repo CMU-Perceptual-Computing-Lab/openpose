@@ -11,6 +11,8 @@ namespace op
     public:
         HeatMapSaver(const std::string& directoryPath, const std::string& imageFormat);
 
+        virtual ~HeatMapSaver();
+
         void saveHeatMaps(const std::vector<Array<float>>& heatMaps, const std::string& fileName) const;
 
     private:

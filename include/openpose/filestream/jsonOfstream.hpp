@@ -11,7 +11,7 @@ namespace op
     public:
         explicit JsonOfstream(const std::string& filePath, const bool humanReadable = true);
 
-        ~JsonOfstream();
+        virtual ~JsonOfstream();
 
         void objectOpen();
 

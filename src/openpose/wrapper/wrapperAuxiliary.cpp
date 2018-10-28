@@ -4,15 +4,16 @@
 
 namespace op
 {
-    void wrapperConfigureSecurityChecks(WrapperStructPose& wrapperStructPose,
-                                        const WrapperStructFace& wrapperStructFace,
-                                        const WrapperStructHand& wrapperStructHand,
-                                        const WrapperStructExtra& wrapperStructExtra,
-                                        const WrapperStructInput& wrapperStructInput,
-                                        const WrapperStructOutput& wrapperStructOutput,
-                                        const bool renderOutput,
-                                        const bool userOutputWsEmpty,
-                                        const ThreadManagerMode threadManagerMode)
+    void wrapperConfigureSanityChecks(WrapperStructPose& wrapperStructPose,
+                                      const WrapperStructFace& wrapperStructFace,
+                                      const WrapperStructHand& wrapperStructHand,
+                                      const WrapperStructExtra& wrapperStructExtra,
+                                      const WrapperStructInput& wrapperStructInput,
+                                      const WrapperStructOutput& wrapperStructOutput,
+                                      const bool renderOutput,
+                                      const bool userOutputWsEmpty,
+                                      const std::shared_ptr<Producer>& producerSharedPtr,
+                                      const ThreadManagerMode threadManagerMode)
     {
         try
         {
@@ -104,9 +105,9 @@ namespace op
                     log(message, Priority::High);
                 }
             }
-            if (!wrapperStructOutput.writeVideo.empty() && wrapperStructInput.producerSharedPtr == nullptr)
+            if (!wrapperStructOutput.writeVideo.empty() && producerSharedPtr == nullptr)
                 error("Writting video is only available if the OpenPose producer is used (i.e."
-                      " wrapperStructInput.producerSharedPtr cannot be a nullptr).",
+                      " producerSharedPtr cannot be a nullptr).",
                       __LINE__, __FUNCTION__, __FILE__);
             if (!wrapperStructPose.enable)
             {
@@ -136,7 +137,7 @@ namespace op
                       + std::to_string(wrapperStructPose.outputSize.y) + ").",
                       __LINE__, __FUNCTION__, __FILE__);
             if (wrapperStructOutput.writeVideoFps <= 0
-                && wrapperStructInput.producerSharedPtr->get(CV_CAP_PROP_FPS) > 0)
+                && producerSharedPtr->get(CV_CAP_PROP_FPS) > 0)
                 error("Set `--camera_fps` for this producer, as its frame rate is unknown.",
                       __LINE__, __FUNCTION__, __FILE__);
             #ifdef USE_CPU_ONLY
@@ -147,8 +148,8 @@ namespace op
             // Net input resolution cannot be reshaped for Caffe OpenCL and MKL versions, only for CUDA version
             #if defined USE_MKL || defined USE_OPENCL
                 // If image_dir and netInputSize == -1 --> error
-                if ((wrapperStructInput.producerSharedPtr == nullptr
-                     || wrapperStructInput.producerSharedPtr->getType() == ProducerType::ImageDirectory)
+                if ((producerSharedPtr == nullptr
+                     || producerSharedPtr->getType() == ProducerType::ImageDirectory)
                     // If netInputSize is -1
                     && (wrapperStructPose.netInputSize.x == -1 || wrapperStructPose.netInputSize.y == -1))
                 {

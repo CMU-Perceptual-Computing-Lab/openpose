@@ -6,6 +6,7 @@
 #include <tuple>
 #include <openpose/core/common.hpp>
 #include <openpose/core/datum.hpp>
+#include <openpose/utilities/fastMath.hpp>
 #include <openpose/producer/producer.hpp>
 
 namespace op
@@ -15,10 +16,12 @@ namespace op
     {
     public:
         explicit DatumProducer(const std::shared_ptr<Producer>& producerSharedPtr,
-                               const unsigned long long frameFirst = 0,
+                               const unsigned long long frameFirst = 0, const unsigned long long frameStep = 1,
                                const unsigned long long frameLast = std::numeric_limits<unsigned long long>::max(),
                                const std::shared_ptr<std::pair<std::atomic<bool>,
                                                      std::atomic<int>>>& videoSeekSharedPtr = nullptr);
+
+        virtual ~DatumProducer();
 
         std::pair<bool, std::shared_ptr<TDatumsNoPtr>> checkIfRunningAndGetDatum();
 
@@ -26,6 +29,7 @@ namespace op
         const unsigned long long mNumberFramesToProcess;
         std::shared_ptr<Producer> spProducer;
         unsigned long long mGlobalCounter;
+        unsigned long long mFrameStep;
         unsigned int mNumberConsecutiveEmptyFrames;
         std::shared_ptr<std::pair<std::atomic<bool>, std::atomic<int>>> spVideoSeek;
 
@@ -47,25 +51,50 @@ namespace op
 {
     template<typename TDatumsNoPtr>
     DatumProducer<TDatumsNoPtr>::DatumProducer(const std::shared_ptr<Producer>& producerSharedPtr,
-                                               const unsigned long long frameFirst, const unsigned long long frameLast,
+                                               const unsigned long long frameFirst, const unsigned long long frameStep,
+                                               const unsigned long long frameLast,
                                                const std::shared_ptr<std::pair<std::atomic<bool>,
                                                                                std::atomic<int>>>& videoSeekSharedPtr) :
         mNumberFramesToProcess{(frameLast != std::numeric_limits<unsigned long long>::max()
                                 ? frameLast - frameFirst : frameLast)},
         spProducer{producerSharedPtr},
         mGlobalCounter{0ll},
+        mFrameStep{frameStep},
         mNumberConsecutiveEmptyFrames{0u},
         spVideoSeek{videoSeekSharedPtr}
     {
         try
         {
-            if (spProducer->getType() != ProducerType::Webcam)
+            // Sanity check
+            if (frameLast < frameFirst)
+                error("The desired initial frame must be lower than the last one (flags `--frame_first` vs."
+                      " `--frame_last`). Current: " + std::to_string(frameFirst) + " vs. " + std::to_string(frameLast)
+                      + ".", __LINE__, __FUNCTION__, __FILE__);
+            if (frameLast != std::numeric_limits<unsigned long long>::max()
+                && frameLast > spProducer->get(CV_CAP_PROP_FRAME_COUNT)-1)
+                error("The desired last frame must be lower than the length of the video or the number of images."
+                      " Current: " + std::to_string(frameLast) + " vs. "
+                      + std::to_string(intRound(spProducer->get(CV_CAP_PROP_FRAME_COUNT))-1) + ".",
+                      __LINE__, __FUNCTION__, __FILE__);
+            // Set frame first and step
+            if (spProducer->getType() != ProducerType::FlirCamera && spProducer->getType() != ProducerType::IPCamera
+                && spProducer->getType() != ProducerType::Webcam)
+            {
+                // Frame first
                 spProducer->set(CV_CAP_PROP_POS_FRAMES, (double)frameFirst);
+                // Frame step
+                spProducer->set(ProducerProperty::FrameStep, (double)frameStep);
+            }
         }
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
+    }
+
+    template<typename TDatumsNoPtr>
+    DatumProducer<TDatumsNoPtr>::~DatumProducer()
+    {
     }
 
     template<typename TDatumsNoPtr>
@@ -157,7 +186,7 @@ namespace op
                         datums = nullptr;
                     // Increase counter if successful image
                     if (datums != nullptr)
-                        mGlobalCounter++;
+                        mGlobalCounter += mFrameStep;
                 }
             }
             // Return result

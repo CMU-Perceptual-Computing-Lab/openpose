@@ -10,10 +10,12 @@ namespace op
         Yaml,
         Yml,
     };
-    enum class CocoJsonFormat : bool
+    enum class CocoJsonFormat : unsigned char
     {
         Body,
         Foot,
+        Car,
+        Size,
     };
 }
 

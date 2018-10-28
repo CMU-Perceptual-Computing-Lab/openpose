@@ -8,6 +8,8 @@ namespace op
     class OP_API FaceRenderer
     {
     public:
+        virtual ~FaceRenderer(){};
+
         virtual void initializationOnThread(){};
 
         void renderFace(Array<float>& outputData, const Array<float>& faceKeypoints,

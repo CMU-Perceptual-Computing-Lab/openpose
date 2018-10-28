@@ -17,6 +17,8 @@ namespace op
                         const float alphaHeatMap = POSE_DEFAULT_ALPHA_HEAT_MAP,
                         const unsigned int elementToRender = 0u);
 
+        virtual ~PoseCpuRenderer();
+
         std::pair<int, std::string> renderPose(Array<float>& outputData, const Array<float>& poseKeypoints,
                                                const float scaleInputToOutput,
                                                const float scaleNetToOutput = -1.f);

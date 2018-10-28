@@ -13,6 +13,8 @@ namespace op
     public:
         explicit WFaceDetector(const std::shared_ptr<FaceDetector>& faceDetector);
 
+        virtual ~WFaceDetector();
+
         void initializationOnThread();
 
         void work(TDatums& tDatums);
@@ -35,6 +37,11 @@ namespace op
     template<typename TDatums>
     WFaceDetector<TDatums>::WFaceDetector(const std::shared_ptr<FaceDetector>& faceDetector) :
         spFaceDetector{faceDetector}
+    {
+    }
+
+    template<typename TDatums>
+    WFaceDetector<TDatums>::~WFaceDetector()
     {
     }
 

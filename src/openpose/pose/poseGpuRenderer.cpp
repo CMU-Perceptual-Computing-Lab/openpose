@@ -67,7 +67,7 @@ namespace op
     {
         try
         {
-            // Security checks
+            // Sanity check
             if (outputData.empty())
                 error("Empty Array<float> outputData.", __LINE__, __FUNCTION__, __FILE__);
             // GPU rendering
@@ -102,8 +102,8 @@ namespace op
                     else
                     {
                         // If resized to input resolution: Replace scaleNetToOutput * scaleInputToOutput by
-                        // scaleInputToOutput, and comment the security checks.
-                        // Security checks
+                        // scaleInputToOutput, and comment the sanity check.
+                        // Sanity check
                         if (scaleNetToOutput == -1.f)
                             error("Non valid scaleNetToOutput.", __LINE__, __FUNCTION__, __FILE__);
                         // Parameters

@@ -14,6 +14,8 @@ namespace op
     public:
         explicit WGui3D(const std::shared_ptr<Gui3D>& gui3D);
 
+        virtual ~WGui3D();
+
         void initializationOnThread();
 
         void workConsumer(const TDatums& tDatums);
@@ -36,6 +38,11 @@ namespace op
     template<typename TDatums>
     WGui3D<TDatums>::WGui3D(const std::shared_ptr<Gui3D>& gui3D) :
         spGui3D{gui3D}
+    {
+    }
+
+    template<typename TDatums>
+    WGui3D<TDatums>::~WGui3D()
     {
     }
 

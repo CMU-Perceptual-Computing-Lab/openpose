@@ -19,6 +19,10 @@ namespace op
         }
     }
 
+    HeatMapSaver::~HeatMapSaver()
+    {
+    }
+
     void HeatMapSaver::saveHeatMaps(const std::vector<Array<float>>& heatMaps, const std::string& fileName) const
     {
         try

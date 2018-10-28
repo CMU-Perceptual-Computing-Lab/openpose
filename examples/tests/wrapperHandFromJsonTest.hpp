@@ -310,7 +310,7 @@ namespace op
     {
         try
         {
-            // Security checks
+            // Sanity checks
             if (spWCvMatToOpInput == nullptr)
                 error("Configure the WrapperHandFromJsonTest class before calling `start()`.",
                       __LINE__, __FUNCTION__, __FILE__);

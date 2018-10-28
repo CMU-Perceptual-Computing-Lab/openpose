@@ -9,6 +9,10 @@ namespace op
     {
     }
 
+    KeypointSaver::~KeypointSaver()
+    {
+    }
+
     void KeypointSaver::saveKeypoints(const std::vector<Array<float>>& keypointVector, const std::string& fileName, const std::string& keypointName) const
     {
         try

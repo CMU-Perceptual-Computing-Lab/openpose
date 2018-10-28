@@ -26,6 +26,8 @@ namespace op
         explicit VideoReader(const std::string& videoPath, const unsigned int imageDirectoryStereo = 1,
                              const std::string& cameraParameterPath = "");
 
+        virtual ~VideoReader();
+
         std::vector<cv::Mat> getCameraMatrices();
 
         std::vector<cv::Mat> getCameraExtrinsics();

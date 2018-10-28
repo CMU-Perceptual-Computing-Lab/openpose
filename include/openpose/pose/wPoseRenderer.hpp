@@ -13,6 +13,8 @@ namespace op
     public:
         explicit WPoseRenderer(const std::shared_ptr<PoseRenderer>& poseRendererSharedPtr);
 
+        virtual ~WPoseRenderer();
+
         void initializationOnThread();
 
         void work(TDatums& tDatums);
@@ -35,6 +37,11 @@ namespace op
     template<typename TDatums>
     WPoseRenderer<TDatums>::WPoseRenderer(const std::shared_ptr<PoseRenderer>& poseRendererSharedPtr) :
         spPoseRenderer{poseRendererSharedPtr}
+    {
+    }
+
+    template<typename TDatums>
+    WPoseRenderer<TDatums>::~WPoseRenderer()
     {
     }
 

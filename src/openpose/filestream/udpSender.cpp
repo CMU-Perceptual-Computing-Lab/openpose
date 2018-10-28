@@ -107,6 +107,10 @@ namespace op
         }
     }
 
+    UdpSender::~UdpSender()
+    {
+    }
+
     void UdpSender::sendJointAngles(const double* const adamPosePtr, const int adamPoseRows,
                                     const double* const adamTranslationPtr,
                                     const double* const adamFaceCoeffsExpPtr, const int faceCoeffRows)

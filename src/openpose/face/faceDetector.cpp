@@ -15,6 +15,10 @@ namespace op
     {
     }
 
+    FaceDetector::~FaceDetector()
+    {
+    }
+
     inline Rectangle<float> getFaceFromPoseKeypoints(const Array<float>& poseKeypoints, const unsigned int personIndex,
                                                      const unsigned int neck, const unsigned int headNose,
                                                      const unsigned int lEar, const unsigned int rEar,

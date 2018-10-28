@@ -12,6 +12,8 @@ namespace op
     public:
         PoseRenderer(const PoseModel poseModel);
 
+        virtual ~PoseRenderer();
+
         virtual void initializationOnThread(){};
 
         virtual std::pair<int, std::string> renderPose(Array<float>& outputData, const Array<float>& poseKeypoints,

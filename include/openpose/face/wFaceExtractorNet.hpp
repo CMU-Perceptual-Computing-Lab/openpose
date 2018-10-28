@@ -13,6 +13,8 @@ namespace op
     public:
         explicit WFaceExtractorNet(const std::shared_ptr<FaceExtractorNet>& faceExtractorNet);
 
+        virtual ~WFaceExtractorNet();
+
         void initializationOnThread();
 
         void work(TDatums& tDatums);
@@ -35,6 +37,11 @@ namespace op
     template<typename TDatums>
     WFaceExtractorNet<TDatums>::WFaceExtractorNet(const std::shared_ptr<FaceExtractorNet>& faceExtractorNet) :
         spFaceExtractorNet{faceExtractorNet}
+    {
+    }
+
+    template<typename TDatums>
+    WFaceExtractorNet<TDatums>::~WFaceExtractorNet()
     {
     }
 

@@ -19,6 +19,8 @@ namespace op
         // Completely customizable case
         explicit ThreadManager(const ThreadManagerMode threadManagerMode = ThreadManagerMode::Synchronous);
 
+        virtual ~ThreadManager();
+
         void setDefaultMaxSizeQueues(const long long defaultMaxSizeQueues = -1);
 
         void add(const unsigned long long threadId, const std::vector<TWorker>& tWorkers, const unsigned long long queueInId,
@@ -98,6 +100,11 @@ namespace op
         mThreadManagerMode{threadManagerMode},
         spIsRunning{std::make_shared<std::atomic<bool>>(false)},
         mDefaultMaxSizeQueues{-1ll}
+    {
+    }
+
+    template<typename TDatums, typename TWorker, typename TQueue>
+    ThreadManager<TDatums, TWorker, TQueue>::~ThreadManager()
     {
     }
 

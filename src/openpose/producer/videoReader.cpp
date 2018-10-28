@@ -16,7 +16,7 @@ namespace op
             {
                 // Read camera parameters from SN
                 auto serialNumbers = getFilesOnDirectory(cameraParameterPath, ".xml");
-                // Security check
+                // Sanity check
                 if (serialNumbers.size() != mImageDirectoryStereo && mImageDirectoryStereo > 1)
                     error("Found different number of camera parameter files than the number indicated by"
                           " `--3d_views` ("
@@ -37,6 +37,10 @@ namespace op
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
+    }
+
+    VideoReader::~VideoReader()
+    {
     }
 
     std::vector<cv::Mat> VideoReader::getCameraMatrices()
@@ -153,7 +157,7 @@ namespace op
                                          (int)individualWidth,
                                          (int)cvMatConcatenated.rows}));
             }
-            // Security check
+            // Sanity check
             else if (cvMats.size() != 1 && mImageDirectoryStereo > 1)
                 error("Unexpected error. Notify us (" + std::to_string(mImageDirectoryStereo) + " vs. "
                       + std::to_string(mImageDirectoryStereo) + ").", __LINE__, __FUNCTION__, __FILE__);

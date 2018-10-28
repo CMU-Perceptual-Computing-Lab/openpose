@@ -27,6 +27,8 @@ namespace op
         explicit ImageDirectoryReader(const std::string& imageDirectoryPath, const unsigned int imageDirectoryStereo = 1,
                                       const std::string& cameraParameterPath = "");
 
+        virtual ~ImageDirectoryReader();
+
         std::vector<cv::Mat> getCameraMatrices();
 
         std::vector<cv::Mat> getCameraExtrinsics();

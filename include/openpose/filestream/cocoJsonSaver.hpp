@@ -23,7 +23,7 @@ namespace op
         explicit CocoJsonSaver(const std::string& filePathToSave, const bool humanReadable = true,
                                const CocoJsonFormat cocoJsonFormat = CocoJsonFormat::Body);
 
-        ~CocoJsonSaver();
+        virtual ~CocoJsonSaver();
 
         void record(const Array<float>& poseKeypoints, const Array<float>& poseScores, const std::string& imageName);
 

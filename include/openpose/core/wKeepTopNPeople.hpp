@@ -13,6 +13,8 @@ namespace op
     public:
         explicit WKeepTopNPeople(const std::shared_ptr<KeepTopNPeople>& keepTopNPeople);
 
+        virtual ~WKeepTopNPeople();
+
         void initializationOnThread();
 
         void work(TDatums& tDatums);
@@ -33,6 +35,11 @@ namespace op
     template<typename TDatums>
     WKeepTopNPeople<TDatums>::WKeepTopNPeople(const std::shared_ptr<KeepTopNPeople>& keepTopNPeople) :
         spKeepTopNPeople{keepTopNPeople}
+    {
+    }
+
+    template<typename TDatums>
+    WKeepTopNPeople<TDatums>::~WKeepTopNPeople()
     {
     }
 

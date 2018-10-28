@@ -7,7 +7,7 @@ namespace op
     {
         try
         {
-            // Security checks
+            // Sanity check
             if (outputData.empty())
                 error("Wrong input element (empty outputData).", __LINE__, __FUNCTION__, __FILE__);
             // outputData to cvMat

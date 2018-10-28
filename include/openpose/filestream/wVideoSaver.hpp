@@ -13,6 +13,8 @@ namespace op
     public:
         explicit WVideoSaver(const std::shared_ptr<VideoSaver>& videoSaver);
 
+        virtual ~WVideoSaver();
+
         void initializationOnThread();
 
         void workConsumer(const TDatums& tDatums);
@@ -35,6 +37,11 @@ namespace op
     template<typename TDatums>
     WVideoSaver<TDatums>::WVideoSaver(const std::shared_ptr<VideoSaver>& videoSaver) :
         spVideoSaver{videoSaver}
+    {
+    }
+
+    template<typename TDatums>
+    WVideoSaver<TDatums>::~WVideoSaver()
     {
     }
 

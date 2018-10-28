@@ -9,13 +9,17 @@ namespace op
     {
     }
 
+    CvMatToOpInput::~CvMatToOpInput()
+    {
+    }
+
     std::vector<Array<float>> CvMatToOpInput::createArray(const cv::Mat& cvInputData,
                                                           const std::vector<double>& scaleInputToNetInputs,
                                                           const std::vector<Point<int>>& netInputSizes) const
     {
         try
         {
-            // Security checks
+            // Sanity checks
             if (cvInputData.empty())
                 error("Wrong input element (empty cvInputData).", __LINE__, __FUNCTION__, __FILE__);
             if (cvInputData.channels() != 3)

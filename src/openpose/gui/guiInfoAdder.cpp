@@ -111,13 +111,17 @@ namespace op
     {
     }
 
+    GuiInfoAdder::~GuiInfoAdder()
+    {
+    }
+
     void GuiInfoAdder::addInfo(cv::Mat& cvOutputData, const int numberPeople, const unsigned long long id,
                                const std::string& elementRenderedName, const unsigned long long frameNumber,
                                const Array<long long>& poseIds, const Array<float>& poseKeypoints)
     {
         try
         {
-            // Security checks
+            // Sanity check
             if (cvOutputData.empty())
                 error("Wrong input element (empty cvOutputData).", __LINE__, __FUNCTION__, __FILE__);
             // Size

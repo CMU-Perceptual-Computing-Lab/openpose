@@ -14,6 +14,8 @@ namespace op
                           const bool blendOriginalFrame = true, const unsigned int elementToRender = 0u,
                           const unsigned int numberElementsToRender = 0u);
 
+        virtual ~Renderer();
+
         void increaseElementToRender(const int increment);
 
         void setElementToRender(const int elementToRender);
