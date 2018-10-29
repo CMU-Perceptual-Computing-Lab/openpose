@@ -196,7 +196,7 @@ namespace op
                         && projectionErrorSubset < 1.1 * projectionError)
                     {
                         bestReprojectionIndex = -1;
-                        break;
+                        continue;
                     }
                     // Save maximum
                     if (bestReprojection > projectionErrorSubset)
@@ -212,6 +212,7 @@ namespace op
                     cameraMatricesFinal.erase(cameraMatricesFinal.begin() + bestReprojectionIndex);
                     pointsOnEachCameraFinal.erase(pointsOnEachCameraFinal.begin() + bestReprojectionIndex);
                 }
+		projectionError = bestReprojection; // updates the projection error with the best found after camera removal
             }
 
             #ifdef USE_CERES
