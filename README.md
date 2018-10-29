@@ -185,4 +185,4 @@ Please cite these papers in your publications if it helps your research (the fac
 
 
 ## License
-OpenPose is freely available for free non-commercial use, and may be redistributed under these conditions. Please, see the [license](LICENSE) for further details. Interested in a commercial license? Check this [FlintBox link](https://flintbox.com/public/project/47343/). For commercial queries, check the contact information provided in the [FlintBox link](https://flintbox.com/public/project/47343/) and also cc [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/) in that email.
+OpenPose is freely available for free non-commercial use, and may be redistributed under these conditions. Please, see the [license](LICENSE) for further details. Interested in a commercial license? Check this [FlintBox link](https://flintbox.com/public/project/47343/). For commercial queries, use the `Directly Contact Organization` section from the [FlintBox link](https://flintbox.com/public/project/47343/) and also send a copy of that message to [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/).

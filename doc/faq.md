@@ -14,6 +14,8 @@ OpenPose - Frequently Asked Question (FAQ)
     9. [How Should I Link my IP Camera?](#how-should-i-link-my-ip-camera)
     10. [Difference between BODY_25 vs. COCO vs. MPI](#difference-between-body_25-vs.-coco-vs.-mpi)
     11. [How to Measure the Latency Time?](#how-to-measure-the-latency-time)
+    12. [Zero People Detected](#zero-people-detected)
+    13. [CPU Version Too Slow](#cpu-version-too-slow)
 
 
 
@@ -103,3 +105,17 @@ COCO model will eventually be removed. BODY_25 model is faster, more accurate, a
 **Q: How to measure/calculate/estimate the latency/lag time?**
 
 **A**: [Profile](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/installation.md#profiling-speed) the OpenPose speed. For 1-GPU or CPU-only systems (use `--disable_multi_thread` for simplicity in multi-GPU systems for latency measurement), the latency will be roughly the sum of all the reported measurements.
+
+
+
+### Zero People Detected
+**Q: 0 people detected and displayed in default video and images.**
+
+**A**: This problem occurs when the caffemodel has not been properly downloaded. E.g., if the connection drops when downloading the models. Please, remove the current models in the model folder, and download them manually from the links in [doc/installation.md](./installation.md). Alternatively, remove them and re-run Cmake again.
+
+
+
+### CPU Version Too Slow
+**Q: The CPU version is insanely slow compared to the GPU version.**
+
+**A**: Yes, that is expected. The CPU version runs at about 0.3 FPS on the COCO model, and at about 0.1 FPS (i.e., about 15 sec / frame) on the default BODY_25 model. Switch to COCO model and/or reduce the `net_resolution` as indicated in [Speed Up, Memory Reduction, and Benchmark](#speed-up-memory-reduction-and-benchmark). Contradictory fact: BODY_25 model is about 5x slower than COCO on CPU-only version, but it is about 40% faster on GPU version.

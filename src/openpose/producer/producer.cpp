@@ -406,14 +406,16 @@ namespace op
                     error("No camera found.", __LINE__, __FUNCTION__, __FILE__);
                 }
             }
-            // else
-            error("Undefined Producer selected.", __LINE__, __FUNCTION__, __FILE__);
-            return std::shared_ptr<Producer>{};
+            // Unknown
+            else if (producerType != ProducerType::None)
+                error("Undefined Producer selected.", __LINE__, __FUNCTION__, __FILE__);
+            // None
+            return nullptr;
         }
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return std::shared_ptr<Producer>{};
+            return nullptr;
         }
     }
 }
