@@ -1,5 +1,5 @@
 ### Posting rules
-1. **Duplicated posts will not be answered**. Check the [FAQ](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/faq.md) section, other GitHub issues, and general documentation before posting. E.g. **low-speed, out-of-memory, output format, 0-people detected, installation issues, ...**).
+1. **Duplicated posts will not be answered**. Check the [FAQ](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/faq.md) section, other GitHub issues, and general documentation before posting. E.g., **low-speed, out-of-memory, output format, 0-people detected, installation issues, ...**).
 2. **Fill** the **Your System Configuration section (all of it or it will not be answered!)** if you are facing an error or unexpected behavior. Feature requests or some other type of posts might not require it.
 3. **No questions about training or 3rd party libraries**:
     - OpenPose only implements testing.

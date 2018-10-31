@@ -35,7 +35,7 @@ namespace op
         int scalesNumber;
 
         /**
-         * Total range between smallest and biggest scale. The scales will be centered in ratio 1. E.g. if
+         * Total range between smallest and biggest scale. The scales will be centered in ratio 1. E.g., if
          * scaleRange = 0.4 and scalesNumber = 2, then there will be 2 scales, 0.8 and 1.2.
          */
         float scaleRange;

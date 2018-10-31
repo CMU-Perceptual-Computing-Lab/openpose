@@ -91,7 +91,7 @@ namespace op
                 // Warnings
                 if (guiEnabled && wrapperStructOutput.guiVerbose && !renderOutput)
                 {
-                    const auto message = "No render is enabled (e.g. `--render_pose 0`), so you might also want to"
+                    const auto message = "No render is enabled (e.g., `--render_pose 0`), so you might also want to"
                                          " remove the display (set `--display 0` or `--no_gui_verbose`). If you"
                                          " simply want to use OpenPose to record video/images without keypoints, you"
                                          " only need to set `--num_gpu 0`." + additionalMessage;

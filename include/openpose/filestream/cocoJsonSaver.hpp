@@ -21,7 +21,8 @@ namespace op
          * will be saved.
          */
         explicit CocoJsonSaver(const std::string& filePathToSave, const bool humanReadable = true,
-                               const CocoJsonFormat cocoJsonFormat = CocoJsonFormat::Body);
+                               const CocoJsonFormat cocoJsonFormat = CocoJsonFormat::Body,
+                               const int mCocoJsonVariant = 0);
 
         virtual ~CocoJsonSaver();
 
@@ -29,6 +30,7 @@ namespace op
 
     private:
         const CocoJsonFormat mCocoJsonFormat;
+        const int mCocoJsonVariant;
         JsonOfstream mJsonOfstream;
         bool mFirstElementAdded;
 

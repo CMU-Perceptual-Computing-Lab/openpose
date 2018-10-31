@@ -39,7 +39,7 @@ namespace op
             const auto rEyeScoreAbove = (posePtr[rEye*3+2] > threshold);
 
             auto counter = 0;
-            // Face and neck given (e.g. MPI)
+            // Face and neck given (e.g., MPI)
             if (headNose == lEar && lEar == rEar)
             {
                 if (neckScoreAbove && headNoseScoreAbove)
@@ -49,7 +49,7 @@ namespace op
                     faceSize = 1.33f * getDistance(poseKeypoints, personIndex, neck, headNose);
                 }
             }
-            // Face as average between different body keypoints (e.g. COCO)
+            // Face as average between different body keypoints (e.g., COCO)
             else
             {
                 // factor * dist(neck, headNose)

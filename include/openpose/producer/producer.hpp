@@ -10,7 +10,7 @@ namespace op
 {
     /**
      * Producer is an abstract class to extract frames from a source (image directory, video file,
-     * webcam stream, etc.). It has the basic and common functions (e.g. getFrame, release & isOpened).
+     * webcam stream, etc.). It has the basic and common functions (e.g., getFrame, release & isOpened).
      */
     class OP_API Producer
     {
@@ -59,7 +59,7 @@ namespace op
         virtual std::vector<cv::Mat> getCameraIntrinsics() = 0;
 
         /**
-         * This function returns a unique frame name (e.g. the frame number for video, the
+         * This function returns a unique frame name (e.g., the frame number for video, the
          * frame counter for webcam, the image name for image directory reader, etc.).
          * @return std::string with an unique frame name.
          */

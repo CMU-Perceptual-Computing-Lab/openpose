@@ -163,7 +163,7 @@ int tutorialApiCpp7()
         op::WrapperT<std::vector<UserDatum>> opWrapperT;
 
         // Initializing the user custom classes
-        // Frames producer (e.g. video, webcam, ...)
+        // Frames producer (e.g., video, webcam, ...)
         auto wUserInput = std::make_shared<WUserInput>(FLAGS_image_dir);
         // Add custom processing
         const auto workerInputOnNewThread = true;
@@ -196,9 +196,9 @@ int tutorialApiCpp7()
         const op::WrapperStructOutput wrapperStructOutput{
             op::flagsToDisplayMode(FLAGS_display, FLAGS_3d), !FLAGS_no_gui_verbose, FLAGS_fullscreen,
             FLAGS_write_keypoint, op::stringToDataFormat(FLAGS_write_keypoint_format), FLAGS_write_json,
-            FLAGS_write_coco_json, FLAGS_write_coco_foot_json, FLAGS_write_images, FLAGS_write_images_format,
-            FLAGS_write_video, FLAGS_camera_fps, FLAGS_write_heatmaps, FLAGS_write_heatmaps_format,
-            FLAGS_write_video_adam, FLAGS_write_bvh, FLAGS_udp_host, FLAGS_udp_port};
+            FLAGS_write_coco_json, FLAGS_write_coco_foot_json, FLAGS_write_coco_json_variant, FLAGS_write_images,
+            FLAGS_write_images_format, FLAGS_write_video, FLAGS_camera_fps, FLAGS_write_heatmaps,
+            FLAGS_write_heatmaps_format, FLAGS_write_video_adam, FLAGS_write_bvh, FLAGS_udp_host, FLAGS_udp_port};
         opWrapperT.configure(wrapperStructOutput);
         // Set to single-thread (for sequential processing and/or debugging and/or reducing latency)
         if (FLAGS_disable_multi_thread)

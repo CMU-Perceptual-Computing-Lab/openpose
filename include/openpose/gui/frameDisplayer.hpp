@@ -30,13 +30,13 @@ namespace op
         void initializationOnThread();
 
         /**
-         * This function set the new FrameDisplayer::FullScreenMode (e.g. full screen).
+         * This function set the new FrameDisplayer::FullScreenMode (e.g., full screen).
          * @param fullScreenMode New FrameDisplayer::FullScreenMode state.
          */
         void setFullScreenMode(const FullScreenMode fullScreenMode);
 
         /**
-         * This function switch between full screen and windowed modes (e.g. when double-click on video players or
+         * This function switch between full screen and windowed modes (e.g., when double-click on video players or
          * Ctrt+Enter are presed).
          */
         void switchFullScreenMode();

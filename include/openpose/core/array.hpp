@@ -407,7 +407,7 @@ namespace op
 
         /**
          * It returns a string with the whole array data. Useful for debugging.
-         * The format is: values separated by a space, and a enter for each dimension. E.g.:
+         * The format is: values separated by a space, and a enter for each dimension. E.g.,
          * For the Array{2, 2, 3}, it will print:
          * Array<T>::toString():
          * x1 x2 x3

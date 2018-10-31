@@ -22,9 +22,9 @@
 #include <openpose/thread/headers.hpp>
 #include <openpose/utilities/headers.hpp>
 
-// See all the available parameter options withe the `--help` flag. E.g. `build/examples/openpose/openpose.bin --help`
+// See all the available parameter options withe the `--help` flag. E.g., `build/examples/openpose/openpose.bin --help`
 // Note: This command will show you flags for other unnecessary 3rdparty files. Check only the flags for the OpenPose
-// executable. E.g. for `openpose.bin`, look for `Flags from examples/openpose/openpose.cpp:`.
+// executable. E.g., for `openpose.bin`, look for `Flags from examples/openpose/openpose.cpp:`.
 // Debugging/Other
 DEFINE_int32(logging_level,             3,              "The logging level. Integer in the range [0, 255]. 0 will output any log() message, while"
                                                         " 255 will not output any. Current OpenPose library messages are in the range 0-4: 1 for"
@@ -46,7 +46,7 @@ DEFINE_int32(flir_camera_index,         -1,             "Select -1 (default) to 
                                                         " camera index to run, where 0 corresponds to the detected flir camera with the lowest"
                                                         " serial number, and `n` to the `n`-th lowest serial number camera.");
 DEFINE_string(ip_camera,                "",             "String with the IP camera URL. It supports protocols like RTSP and HTTP.");
-DEFINE_bool(process_real_time,          false,          "Enable to keep the original source frame rate (e.g. for video). If the processing time is"
+DEFINE_bool(process_real_time,          false,          "Enable to keep the original source frame rate (e.g., for video). If the processing time is"
                                                         " too long, it will skip frames. If it is too fast, it will slow it down.");
 DEFINE_string(camera_parameter_folder,  "models/cameraParameters/flir/", "String with the folder where the camera parameters are located.");
 DEFINE_bool(frame_keep_distortion,      false,          "If false (default), it will undistortionate the image based on the"
@@ -138,7 +138,7 @@ int tutorialDeveloperThread2()
         typedef std::shared_ptr<TypedefDatumsNoPtr> TypedefDatums;
         op::ThreadManager<TypedefDatums> threadManager;
         // Step 5 - Initializing the worker classes
-        // Frames producer (e.g. video, webcam, ...)
+        // Frames producer (e.g., video, webcam, ...)
         auto DatumProducer = std::make_shared<op::DatumProducer<TypedefDatumsNoPtr>>(producerSharedPtr);
         auto wDatumProducer = std::make_shared<op::WDatumProducer<TypedefDatums, TypedefDatumsNoPtr>>(DatumProducer);
         // Specific WUserClass

@@ -62,7 +62,7 @@ namespace op
         int frameRotate;
 
         /**
-         * Whether to re-open the producer if it reaches the end (e.g. video or image directory after the last frame).
+         * Whether to re-open the producer if it reaches the end (e.g., video or image directory after the last frame).
          */
         bool framesRepeat;
 

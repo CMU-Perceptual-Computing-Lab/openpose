@@ -109,7 +109,7 @@ Note: In order to maximize calibration quality, **do not reuse the same video se
     1. Translation vector - Global distance:
         1. Manually open each one of the generated XML files from the folder indicated by the flag `--camera_parameter_folder` (or the default one indicated by the `--help` flag if the former was not used).
         2. The field `CameraMatrix` is a 3 x 4 matrix (you can see that the subfield `rows` in that file is 3 and `cols` is 4).
-        3. Order the matrix in that 3 x 4 shape (e.g. by copying in a different text file with the shape of 3 rows and 4 columns).
+        3. Order the matrix in that 3 x 4 shape (e.g., by copying in a different text file with the shape of 3 rows and 4 columns).
         4. The 3 first components of the last column of the `CameraMatrix` field define the global `translation` (in meters) with respect to the global origin (in our case camera 1).
         5. Thus, the distance between that camera and the origin camera 1 should be (approximately) equal to the L2-norm of the `translation` vector.
     2. Translation vector - Relative x-y-z distances:

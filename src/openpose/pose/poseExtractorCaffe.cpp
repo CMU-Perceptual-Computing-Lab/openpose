@@ -230,7 +230,7 @@ namespace op
                     // Reshape blobs if required
                     // Note: In order to resize to input size to have same results as Matlab, uncomment the commented
                     // lines
-                    // Note: For dynamic sizes (e.g. a folder with images of different aspect ratio)
+                    // Note: For dynamic sizes (e.g., a folder with images of different aspect ratio)
                     if (!vectorsAreEqual(upImpl->mNetInput4DSizes.at(i), inputNetData[i].getSize()))
                         // || !vectorsAreEqual(upImpl->mScaleInputToNetInputs, scaleInputToNetInputs))
                     {

@@ -94,7 +94,7 @@ OpenPose Library - Release Notes
     7. Added 3-D reconstruction demo.
     8. Auto-detection of the camera index.
     9. Speed up of ~30% in op::floatPtrToUCharCvMat.
-    10. COCO extractor now extracts image ID from the image name itslef (format "string_%d"). Before, only working with validation test, now applicable to e.g. test sets.
+    10. COCO extractor now extracts image ID from the image name itslef (format "string_%d"). Before, only working with validation test, now applicable to e.g., test sets.
     11. Changed display texts, added `OpenPose` name.
 2. Main bugs fixed:
     1. Pycaffe can now be imported from Python.
@@ -107,7 +107,7 @@ OpenPose Library - Release Notes
     1. Added CMake installer for Ubuntu.
     2. Added how to use keypoint data in `examples/tutorial_wrapper/`.
     3. Added flag for warnings of type `-Wsign-compare` and removed in code.
-    4. Slightly improved accuracy by considering ears-shoulder connection (e.g. +0.4 mAP for 1 scale in validation set).
+    4. Slightly improved accuracy by considering ears-shoulder connection (e.g., +0.4 mAP for 1 scale in validation set).
 2. Main bugs fixed:
     1. Windows version crashing with std::map copy.
 
@@ -115,8 +115,8 @@ OpenPose Library - Release Notes
 
 ## OpenPose 1.2.0 (Nov 3, 2017)
 1. Main improvements:
-    1. Speed increase when processing images with different aspect ratios. E.g. ~20% increase over 3.7k COCO validation images on 1 scale.
-    2. Huge speed increase and memory reduction when processing multi-scale. E.g. over 3.7k COCO validation images on 4 scales: ~40% (~770 to ~450 sec) speed increase, ~25% memory reduction (from ~8.9 to ~6.7 GB / GPU).
+    1. Speed increase when processing images with different aspect ratios. E.g., ~20% increase over 3.7k COCO validation images on 1 scale.
+    2. Huge speed increase and memory reduction when processing multi-scale. E.g., over 3.7k COCO validation images on 4 scales: ~40% (~770 to ~450 sec) speed increase, ~25% memory reduction (from ~8.9 to ~6.7 GB / GPU).
     3. Slightly increase of accuracy given the fixed mini-bugs.
     4. Added IP camera support.
     5. Output images can have the input size, OpenPose able to change its size for each image and not required fixed size anymore.
@@ -130,9 +130,9 @@ OpenPose Library - Release Notes
     10. COCO JSON file outputs 0 as score for non-detected keypoints.
     11. Added example for OpenPose for user asynchronous output and cleaned all `tutorial_wrapper/` examples.
     12. Added `-1` option for `--net_resolution` in order to auto-select the best possible aspect ratio given the user input.
-    13. Net resolution can be dynamically changed (e.g. for images with different size).
+    13. Net resolution can be dynamically changed (e.g., for images with different size).
     14. Added example to add functionality/modules to OpenPose.
-    15. Added `--disable_multi_thread` flag in order to allow debug and/or highly reduce the latency (e.g. when using webcam in real-time).
+    15. Added `--disable_multi_thread` flag in order to allow debug and/or highly reduce the latency (e.g., when using webcam in real-time).
     16. Allowed to output images without any rendering.
 2. Functions or parameters renamed:
     1. OpenPose able to change its size and initial size dynamically:
@@ -157,7 +157,7 @@ OpenPose Library - Release Notes
     2. More efficient non-processing version (i.e., if all keypoint extractors are disabled, and only image extraction and display/saving operations are performed).
     3. Heat maps scaling: Added `--heatmaps_scale` to OpenPoseDemo, added option not to scale the heatmaps, and added custom `float` format to save heatmaps in floating format.
     4. Detector of the number of GPU also considers the initial GPU index given by the user.
-    5. Added `--write_json` as new version of `--write_keypoint_json`. It includes the body part candidates (if enabled), as well as any extra information added in the future (e.g. person ID).
+    5. Added `--write_json` as new version of `--write_keypoint_json`. It includes the body part candidates (if enabled), as well as any extra information added in the future (e.g., person ID).
     6. Body part candidates can be retrieved in op::Datum and saved with `--write_json`.
 2. Functions or parameters renamed:
     1. `PoseParameters` splitted into `PoseParameters` and `PoseParametersRender` and const parameters turned into functions for more clarity.
@@ -189,7 +189,7 @@ OpenPose Library - Release Notes
     17. Flag `--write_json` includes 3-D keypoints.
     18. 3-D reconstruction module can be used with images and videos. Flag `--3d_views` added to allow `--image_dir` and `--video` allow loading stereo images.
     19. Flag `--camera_resolution` applicable to `--flir_camera`.
-    20. Throw error message if requested GPU IDs does not exist (e.g. asking for 2 GPUs starting in ID 1 if there is only 2 GPUs in total).
+    20. Throw error message if requested GPU IDs does not exist (e.g., asking for 2 GPUs starting in ID 1 if there is only 2 GPUs in total).
     21. VideoSaver (`--write_video`) compatible with multi-camera setting. It will save all the different views concatenated.
     22. OpenPose small GUI rescale the verbose text to the displayed image, to avoid the text to be either too big or small.
     23. OpenPose small GUI shows the frame number w.r.t. the original producer, rather than the frame id. E.g., if video is started at frame 30, OpenPose will display 30 rather than 0 in the first frame.

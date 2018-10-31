@@ -4,8 +4,9 @@
 namespace op
 {
     CocoJsonSaver::CocoJsonSaver(const std::string& filePathToSave, const bool humanReadable,
-                                 const CocoJsonFormat cocoJsonFormat) :
+                                 const CocoJsonFormat cocoJsonFormat, const int cocoJsonVariant) :
         mCocoJsonFormat{cocoJsonFormat},
+        mCocoJsonVariant{cocoJsonVariant},
         mJsonOfstream{filePathToSave, humanReadable},
         mFirstElementAdded{false}
     {
@@ -94,11 +95,23 @@ namespace op
                 // Car
                 else if (mCocoJsonFormat == CocoJsonFormat::Car)
                 {
+                    // Car12
                     if (numberBodyParts == 12)
                         indexesInCocoOrder = std::vector<int>{0,1,2,3, 4,5,6,7, 8, 8,9,10,11, 11};
+                    // Car22
                     else if (numberBodyParts == 22)
-                        for (auto i = 0 ; i < 22 ; i++)
-                            indexesInCocoOrder.emplace_back(i);
+                    {
+                        // Dataset 1
+                        if (mCocoJsonVariant == 0)
+                            indexesInCocoOrder = std::vector<int>{0,1,2,3, 6,7, 12,13,14,15, 16,17};
+                        // Dataset 2
+                        else if (mCocoJsonVariant == 1)
+                            indexesInCocoOrder = std::vector<int>{0,1,2,3, 6,7, 12,13,14,15, 20,21};
+                        // Dataset 3
+                        else if (mCocoJsonVariant == 2)
+                            for (auto i = 0 ; i < 20 ; i++)
+                                indexesInCocoOrder.emplace_back(i);
+                    }
                 }
                 // Sanity check
                 if (indexesInCocoOrder.empty())

@@ -35,7 +35,7 @@ OpenPose - Frequently Asked Question (FAQ)
 **A**: Check the [OpenPose Benchmark](https://docs.google.com/spreadsheets/d/1-DynFGvoScvfWDA1P4jDInCkbD4lg0IKOYbXgEq0sK0/edit#gid=0) to discover the approximate speed of your graphics card. Some speed tips:
 
     1. Use cuDNN 5.1 (cuDNN 6 is ~10% slower).
-    2. Reduce the `--net_resolution` (e.g. to 320x176) (lower accuracy). Note: For maximum accuracy, follow [doc/quick_start.md#maximum-accuracy-configuration](./quick_start.md#maximum-accuracy-configuration).
+    2. Reduce the `--net_resolution` (e.g., to 320x176) (lower accuracy). Note: For maximum accuracy, follow [doc/quick_start.md#maximum-accuracy-configuration](./quick_start.md#maximum-accuracy-configuration).
     3. For face, reduce the `--face_net_resolution`. The resolution 320x320 usually works pretty decently.
     4. Use the `MPI_4_layers` model (lower accuracy and lower number of parts).
     5. Change GPU rendering by CPU rendering to get approximately +0.5 FPS (`--render_pose 1`).

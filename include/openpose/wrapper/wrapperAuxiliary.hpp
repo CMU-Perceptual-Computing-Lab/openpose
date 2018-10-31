@@ -527,7 +527,7 @@ namespace op
                             poseTriangulation)};
                     }
                 }
-                // Itermediate workers (e.g. OpenPose format to cv::Mat, json & frames recorder, ...)
+                // Itermediate workers (e.g., OpenPose format to cv::Mat, json & frames recorder, ...)
                 postProcessingWs.clear();
                 // // Person ID identification (when no multi-thread and no dependency on tracking)
                 // if (wrapperStructExtra.identification)
@@ -617,7 +617,8 @@ namespace op
                     wrapperStructOutput.writeCocoJson, humanFormat,
                     (wrapperStructPose.poseModel != PoseModel::CAR_22
                         && wrapperStructPose.poseModel != PoseModel::CAR_12
-                        ? CocoJsonFormat::Body : CocoJsonFormat::Car));
+                        ? CocoJsonFormat::Body : CocoJsonFormat::Car),
+                    wrapperStructOutput.writeCocoJsonVariant);
                 outputWs.emplace_back(std::make_shared<WCocoJsonSaver<TDatumsSP>>(cocoJsonSaver));
             }
             // Write people foot pose data on disk (COCO validation json format for foot data)
@@ -646,10 +647,10 @@ namespace op
             {
                 if (!oPProducer)
                     error("Video file can only be recorded inside `wrapper/wrapper.hpp` if the producer"
-                          " is one of the default ones (e.g. video, webcam, ...).",
+                          " is one of the default ones (e.g., video, webcam, ...).",
                           __LINE__, __FUNCTION__, __FILE__);
                 if (finalOutputSize.x <= 0 || finalOutputSize.y <= 0)
-                    error("Video can only be recorded if outputSize is fixed (e.g. video, webcam, IP camera),"
+                    error("Video can only be recorded if outputSize is fixed (e.g., video, webcam, IP camera),"
                           "but not for a image directory.", __LINE__, __FUNCTION__, __FILE__);
                 const auto videoSaver = std::make_shared<VideoSaver>(
                     wrapperStructOutput.writeVideo, CV_FOURCC('M','J','P','G'), originalVideoFps, finalOutputSize
@@ -836,7 +837,7 @@ namespace op
                 {
                     if (poseExtractorsWs.size() > 1)
                         log("Multi-threading disabled, only 1 thread running. All GPUs have been disabled but the"
-                            " first one, which is defined by gpuNumberStart (e.g. in the OpenPose demo, it is set"
+                            " first one, which is defined by gpuNumberStart (e.g., in the OpenPose demo, it is set"
                             " with the `--num_gpu_start` flag).", Priority::High);
                     log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     threadManager.add(threadId, poseExtractorsWs.at(0), queueIn++, queueOut++);

@@ -57,7 +57,7 @@ namespace op
             if (isOpened())
             {
                 // If ProducerFpsMode::OriginalFps, then force producer to keep the frame rate of the frames producer
-                // sources (e.g. a video)
+                // sources (e.g., a video)
                 keepDesiredFrameRate();
                 // Get frame
                 frames = getRawFrames();

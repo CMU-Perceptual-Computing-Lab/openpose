@@ -77,7 +77,7 @@ namespace op
             const auto vectorSize = numberBodyParts+1;
             const auto peaksOffset = 3*(maxPeaks+1);
             const auto heatMapOffset = heatMapSize.area();
-            // Iterate over it PAF connection, e.g. neck-nose, neck-Lshoulder, etc.
+            // Iterate over it PAF connection, e.g., neck-nose, neck-Lshoulder, etc.
             for (auto pairIndex = 0u; pairIndex < numberBodyPartPairs; pairIndex++)
             {
                 const auto bodyPartA = bodyPartPairs[2*pairIndex];
@@ -87,11 +87,11 @@ namespace op
                 const auto numberPeaksA = intRound(candidateAPtr[0]);
                 const auto numberPeaksB = intRound(candidateBPtr[0]);
 
-                // E.g. neck-nose connection. If one of them is empty (e.g. no noses detected)
+                // E.g., neck-nose connection. If one of them is empty (e.g., no noses detected)
                 // Add the non-empty elements into the peopleVector
                 if (numberPeaksA == 0 || numberPeaksB == 0)
                 {
-                    // E.g. neck-nose connection. If no necks, add all noses
+                    // E.g., neck-nose connection. If no necks, add all noses
                     // Change w.r.t. other
                     if (numberPeaksA == 0) // numberPeaksB == 0 or not
                     {
@@ -140,7 +140,7 @@ namespace op
                             }
                         }
                     }
-                    // E.g. neck-nose connection. If no noses, add all necks
+                    // E.g., neck-nose connection. If no noses, add all necks
                     else // if (numberPeaksA != 0 && numberPeaksB == 0)
                     {
                         // Non-MPI
@@ -189,7 +189,7 @@ namespace op
                         }
                     }
                 }
-                // E.g. neck-nose connection. If necks and noses, look for maximums
+                // E.g., neck-nose connection. If necks and noses, look for maximums
                 else // if (numberPeaksA != 0 && numberPeaksB != 0)
                 {
                     // (score, indexA, indexB). Inverted order for easy std::sort
@@ -202,17 +202,17 @@ namespace op
                                          + (numberBodyPartsAndBkg + mapIdx[2*pairIndex]) * heatMapOffset;
                         const auto* mapY = heatMapPtr
                                          + (numberBodyPartsAndBkg + mapIdx[2*pairIndex+1]) * heatMapOffset;
-                        // E.g. neck-nose connection. For each neck
+                        // E.g., neck-nose connection. For each neck
                         for (auto i = 1; i <= numberPeaksA; i++)
                         {
-                            // E.g. neck-nose connection. For each nose
+                            // E.g., neck-nose connection. For each nose
                             for (auto j = 1; j <= numberPeaksB; j++)
                             {
                                 // Initial PAF
                                 auto scoreAB = getScoreAB(i, j, candidateAPtr, candidateBPtr, mapX, mapY,
                                                           heatMapSize, interThreshold, interMinAboveThreshold);
 
-                                // E.g. neck-nose connection. If possible PAF between neck i, nose j --> add
+                                // E.g., neck-nose connection. If possible PAF between neck i, nose j --> add
                                 // parts score + connection score
                                 if (scoreAB > 1e-6)
                                     allABConnections.emplace_back(std::make_tuple(scoreAB, i, j));
@@ -222,16 +222,16 @@ namespace op
                     else if (!pairScores.empty())
                     {
                         const auto firstIndex = (int)pairIndex*pairScores.getSize(1)*pairScores.getSize(2);
-                        // E.g. neck-nose connection. For each neck
+                        // E.g., neck-nose connection. For each neck
                         for (auto i = 0; i < numberPeaksA; i++)
                         {
                             const auto iIndex = firstIndex + i*pairScores.getSize(2);
-                            // E.g. neck-nose connection. For each nose
+                            // E.g., neck-nose connection. For each nose
                             for (auto j = 0; j < numberPeaksB; j++)
                             {
                                 const auto scoreAB = pairScores[iIndex + j];
 
-                                // E.g. neck-nose connection. If possible PAF between neck i, nose j --> add
+                                // E.g., neck-nose connection. If possible PAF between neck i, nose j --> add
                                 // parts score + connection score
                                 if (scoreAB > 1e-6)
                                     // +1 because peaksPtr starts with counter
@@ -396,16 +396,16 @@ namespace op
                 const auto numberPeaksA = intRound(candidateAPtr[0]);
                 const auto numberPeaksB = intRound(candidateBPtr[0]);
                 const auto firstIndex = (int)pairIndex*pairScores.getSize(1)*pairScores.getSize(2);
-                // E.g. neck-nose connection. For each neck
+                // E.g., neck-nose connection. For each neck
                 for (auto indexA = 0; indexA < numberPeaksA; indexA++)
                 {
                     const auto iIndex = firstIndex + indexA*pairScores.getSize(2);
-                    // E.g. neck-nose connection. For each nose
+                    // E.g., neck-nose connection. For each nose
                     for (auto indexB = 0; indexB < numberPeaksB; indexB++)
                     {
                         const auto scoreAB = pairScores[iIndex + indexB];
 
-                        // E.g. neck-nose connection. If possible PAF between neck indexA, nose indexB --> add
+                        // E.g., neck-nose connection. If possible PAF between neck indexA, nose indexB --> add
                         // parts score + connection score
                         if (scoreAB > 1e-6)
                         {

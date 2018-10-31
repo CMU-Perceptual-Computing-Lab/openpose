@@ -78,8 +78,8 @@ namespace op
                 auto topShape = bottomBlob->shape();
                 topShape[0] = (mergeFirstDimension ? 1 : bottomBlob->shape(0));
                 // -1 and later +1 to take into account that we are using 0-based index
-                // E.g. 100x100 image --> 200x200 --> 0-99 to 0-199 --> scale = 199/99 (not 2!)
-                // E.g. 101x101 image --> 201x201 --> scale = 2
+                // E.g., 100x100 image --> 200x200 --> 0-99 to 0-199 --> scale = 199/99 (not 2!)
+                // E.g., 101x101 image --> 201x201 --> scale = 2
                 // Test: pixel 0 --> 0, pixel 99 (ex 1) --> 199, pixel 100 (ex 2) --> 200
                 topShape[2] = intRound((topShape[2]*netFactor - 1.f) * scaleFactor) + 1;
                 topShape[3] = intRound((topShape[3]*netFactor - 1.f) * scaleFactor) + 1;

@@ -658,7 +658,7 @@ namespace op
         #ifdef USE_FLIR_CAMERA
             try
             {
-                // Clean previous unclosed builds (e.g. if core dumped in the previous code using the cameras)
+                // Clean previous unclosed builds (e.g., if core dumped in the previous code using the cameras)
                 release();
 
                 upImpl->mInitialized = true;

@@ -8,7 +8,7 @@
 namespace op
 {
     /**
-     * VideoReader is a wrapper of the cv::VideoCapture class for video. It allows controlling a video (e.g. extracting
+     * VideoReader is a wrapper of the cv::VideoCapture class for video. It allows controlling a video (e.g., extracting
      * frames, setting resolution & fps, etc).
      */
     class OP_API VideoReader : public VideoCaptureReader

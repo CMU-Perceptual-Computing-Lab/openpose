@@ -10,6 +10,7 @@ namespace op
         Yaml,
         Yml,
     };
+
     enum class CocoJsonFormat : unsigned char
     {
         Body,

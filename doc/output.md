@@ -72,7 +72,7 @@ Both of them follow the keypoint ordering described in the [Keypoint Ordering](#
 
 
 ### Keypoint Ordering
-The body part mapping order of any body model (e.g. COCO, MPI) can be extracted from the C++ API by using the `getPoseBodyPartMapping(const PoseModel poseModel)` function available in [poseParameters.hpp](../include/openpose/pose/poseParameters.hpp):
+The body part mapping order of any body model (e.g., COCO, MPI) can be extracted from the C++ API by using the `getPoseBodyPartMapping(const PoseModel poseModel)` function available in [poseParameters.hpp](../include/openpose/pose/poseParameters.hpp):
 ```
 // C++ API call
 #include <openpose/pose/poseParameters.hpp>

@@ -12,15 +12,15 @@
     namespace gflags = google;
 #endif
 
-// See all the available parameter options withe the `--help` flag. E.g. `build/examples/openpose/openpose.bin --help`
+// See all the available parameter options withe the `--help` flag. E.g., `build/examples/openpose/openpose.bin --help`
 // Note: This command will show you flags for other unnecessary 3rdparty files. Check only the flags for the OpenPose
-// executable. E.g. for `openpose.bin`, look for `Flags from examples/openpose/openpose.cpp:`.
+// executable. E.g., for `openpose.bin`, look for `Flags from examples/openpose/openpose.cpp:`.
 // Debugging/Other
 DEFINE_int32(logging_level,             3,              "The logging level. Integer in the range [0, 255]. 0 will output any log() message, while"
                                                         " 255 will not output any. Current OpenPose library messages are in the range 0-4: 1 for"
                                                         " low priority messages and 4 for important ones.");
 DEFINE_bool(disable_multi_thread,       false,          "It would slightly reduce the frame rate in order to highly reduce the lag. Mainly useful"
-                                                        " for 1) Cases where it is needed a low latency (e.g. webcam in real-time scenarios with"
+                                                        " for 1) Cases where it is needed a low latency (e.g., webcam in real-time scenarios with"
                                                         " low-range GPU devices); and 2) Debugging OpenPose when it is crashing to locate the"
                                                         " error.");
 DEFINE_int32(profile_speed,             1000,           "If PROFILER_ENABLED was set in CMake or Makefile.config files, OpenPose will show some"
@@ -49,12 +49,12 @@ DEFINE_string(ip_camera,                "",             "String with the IP came
 DEFINE_uint64(frame_first,              0,              "Start on desired frame number. Indexes are 0-based, i.e. the first frame has index 0.");
 DEFINE_uint64(frame_step,               1,              "Step or gap between processed frames. E.g., `--frame_step 5` would read and process frames"
                                                         " 0, 5, 10, etc..");
-DEFINE_uint64(frame_last,               -1,             "Finish on desired frame number. Select -1 to disable. Indexes are 0-based, e.g. if set to"
+DEFINE_uint64(frame_last,               -1,             "Finish on desired frame number. Select -1 to disable. Indexes are 0-based, e.g., if set to"
                                                         " 10, it will process 11 frames (0-10).");
-DEFINE_bool(frame_flip,                 false,          "Flip/mirror each frame (e.g. for real time webcam demonstrations).");
+DEFINE_bool(frame_flip,                 false,          "Flip/mirror each frame (e.g., for real time webcam demonstrations).");
 DEFINE_int32(frame_rotate,              0,              "Rotate each frame, 4 possible values: 0, 90, 180, 270.");
 DEFINE_bool(frames_repeat,              false,          "Repeat frames when finished.");
-DEFINE_bool(process_real_time,          false,          "Enable to keep the original source frame rate (e.g. for video). If the processing time is"
+DEFINE_bool(process_real_time,          false,          "Enable to keep the original source frame rate (e.g., for video). If the processing time is"
                                                         " too long, it will skip frames. If it is too fast, it will slow it down.");
 DEFINE_string(camera_parameter_folder,  "models/cameraParameters/flir/", "String with the folder where the camera parameters are located.");
 DEFINE_bool(frame_keep_distortion,      false,          "If false (default), it will undistortionate the image based on the"
@@ -85,14 +85,14 @@ DEFINE_int32(number_people_max,         -1,             "This parameter will lim
 // OpenPose Body Pose
 DEFINE_bool(body_disable,               false,          "Disable body keypoint detection. Option only possible for faster (but less accurate) face"
                                                         " keypoint detection.");
-DEFINE_string(model_pose,               "BODY_25",      "Model to be used. E.g. `COCO` (18 keypoints), `MPI` (15 keypoints, ~10% faster), "
+DEFINE_string(model_pose,               "BODY_25",      "Model to be used. E.g., `COCO` (18 keypoints), `MPI` (15 keypoints, ~10% faster), "
                                                         "`MPI_4_layers` (15 keypoints, even faster but less accurate).");
 DEFINE_string(net_resolution,           "-1x368",       "Multiples of 16. If it is increased, the accuracy potentially increases. If it is"
                                                         " decreased, the speed increases. For maximum speed-accuracy balance, it should keep the"
                                                         " closest aspect ratio possible to the images or videos to be processed. Using `-1` in"
                                                         " any of the dimensions, OP will choose the optimal aspect ratio depending on the user's"
-                                                        " input value. E.g. the default `-1x368` is equivalent to `656x368` in 16:9 resolutions,"
-                                                        " e.g. full HD (1980x1080) and HD (1280x720) resolutions.");
+                                                        " input value. E.g., the default `-1x368` is equivalent to `656x368` in 16:9 resolutions,"
+                                                        " e.g., full HD (1980x1080) and HD (1280x720) resolutions.");
 DEFINE_int32(scale_number,              1,              "Number of scales to average.");
 DEFINE_double(scale_gap,                0.3,            "Scale gap between scales. No effect unless scale_number > 1. Initial scale is always 1."
                                                         " If you want to change the initial scale, you actually want to multiply the"
@@ -134,7 +134,7 @@ DEFINE_string(hand_net_resolution,      "368x368",      "Multiples of 16 and squ
 DEFINE_int32(hand_scale_number,         1,              "Analogous to `scale_number` but applied to the hand keypoint detector. Our best results"
                                                         " were found with `hand_scale_number` = 6 and `hand_scale_range` = 0.4.");
 DEFINE_double(hand_scale_range,         0.4,            "Analogous purpose than `scale_gap` but applied to the hand keypoint detector. Total range"
-                                                        " between smallest and biggest scale. The scales will be centered in ratio 1. E.g. if"
+                                                        " between smallest and biggest scale. The scales will be centered in ratio 1. E.g., if"
                                                         " scaleRange = 0.4 and scalesNumber = 2, then there will be 2 scales, 0.8 and 1.2.");
 DEFINE_bool(hand_tracking,              false,          "Adding hand tracking might improve hand keypoints detection for webcam (if the frame rate"
                                                         " is high enough, i.e. >7 FPS per GPU) and video. This is not person ID tracking, it"
@@ -173,7 +173,7 @@ DEFINE_double(render_threshold,         0.05,           "Only estimated keypoint
                                                         " while small thresholds (~0.1) will also output guessed and occluded keypoints, but also"
                                                         " more false positives (i.e. wrong detections).");
 DEFINE_int32(render_pose,               -1,             "Set to 0 for no rendering, 1 for CPU rendering (slightly faster), and 2 for GPU rendering"
-                                                        " (slower but greater functionality, e.g. `alpha_X` flags). If -1, it will pick CPU if"
+                                                        " (slower but greater functionality, e.g., `alpha_X` flags). If -1, it will pick CPU if"
                                                         " CPU_ONLY is enabled, or GPU if CUDA is enabled. If rendering is enabled, it will render"
                                                         " both `outputData` and `cvOutputData` with the original image and desired body part to be"
                                                         " shown (i.e. keypoints, heat maps or PAFs).");
@@ -196,7 +196,7 @@ DEFINE_double(hand_alpha_heatmap,       0.7,            "Analogous to `alpha_hea
 #ifndef OPENPOSE_FLAGS_DISABLE_DISPLAY
 // Display
 DEFINE_bool(fullscreen,                 false,          "Run in full-screen mode (press f during runtime to toggle).");
-DEFINE_bool(no_gui_verbose,             false,          "Do not write text on output images on GUI (e.g. number of current frame and people). It"
+DEFINE_bool(no_gui_verbose,             false,          "Do not write text on output images on GUI (e.g., number of current frame and people). It"
                                                         " does not affect the pose rendering.");
 DEFINE_int32(display,                   -1,             "Display mode: -1 for automatic selection; 0 for no display (useful if there is no X server"
                                                         " and/or to slightly speed up the processing if visual output is not required); 2 for 2-D"
@@ -204,7 +204,7 @@ DEFINE_int32(display,                   -1,             "Display mode: -1 for au
 #endif // OPENPOSE_FLAGS_DISABLE_DISPLAY
 // Result Saving
 DEFINE_string(write_images,             "",             "Directory to write rendered frames in `write_images_format` image format.");
-DEFINE_string(write_images_format,      "png",          "File extension and format for `write_images`, e.g. png, jpg or bmp. Check the OpenCV"
+DEFINE_string(write_images_format,      "png",          "File extension and format for `write_images`, e.g., png, jpg or bmp. Check the OpenCV"
                                                         " function cv::imwrite for all compatible extensions.");
 DEFINE_string(write_video,              "",             "Full file path to write rendered frames in motion JPEG video format. It might fail if the"
                                                         " final path does not finish in `.avi`. It internally uses cv::VideoWriter. Flag"
@@ -213,6 +213,8 @@ DEFINE_string(write_json,               "",             "Directory to write Open
                                                         " keypoints (2-D and 3-D), as well as pose candidates (if `--part_candidates` enabled).");
 DEFINE_string(write_coco_json,          "",             "Full file path to write people pose data with JSON COCO validation format.");
 DEFINE_string(write_coco_foot_json,     "",             "Full file path to write people foot pose data with JSON COCO validation format.");
+DEFINE_int32(write_coco_json_variant,   0,             "Currently, this option is experimental and only makes effect on car JSON generation. It"
+                                                        " selects the COCO variant for cocoJsonSaver.");
 DEFINE_string(write_heatmaps,           "",             "Directory to write body pose heatmaps in PNG format. At least 1 `add_heatmaps_X` flag"
                                                         " must be enabled.");
 DEFINE_string(write_heatmaps_format,    "png",          "File extension and format for `write_heatmaps`, analogous to `write_images_format`."
@@ -223,9 +225,9 @@ DEFINE_string(write_keypoint,           "",             "(Deprecated, use `write
 DEFINE_string(write_keypoint_format,    "yml",          "(Deprecated, use `write_json`) File extension and format for `write_keypoint`: json, xml,"
                                                         " yaml & yml. Json not available for OpenCV < 3.0, use `write_json` instead.");
 // Result Saving - Extra Algorithms
-DEFINE_string(write_video_adam,         "",             "Experimental, not available yet. E.g.: `~/Desktop/adamResult.avi`. Flag `camera_fps`"
+DEFINE_string(write_video_adam,         "",             "Experimental, not available yet. E.g., `~/Desktop/adamResult.avi`. Flag `camera_fps`"
                                                         " controls FPS.");
-DEFINE_string(write_bvh,                "",             "Experimental, not available yet. E.g.: `~/Desktop/mocapResult.bvh`.");
+DEFINE_string(write_bvh,                "",             "Experimental, not available yet. E.g., `~/Desktop/mocapResult.bvh`.");
 // UDP communication
 DEFINE_string(udp_host,                 "",             "Experimental, not available yet. IP for UDP communication. E.g., `192.168.0.1`.");
 DEFINE_string(udp_port,                 "8051",         "Experimental, not available yet. Port number for UDP communication.");
