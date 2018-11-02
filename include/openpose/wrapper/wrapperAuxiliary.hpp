@@ -51,7 +51,7 @@ namespace op
     template<typename TDatums,
              typename TDatumsSP = std::shared_ptr<TDatums>,
              typename TWorker = std::shared_ptr<Worker<TDatumsSP>>>
-    OP_API void configureThreadManager(
+    void configureThreadManager(
         ThreadManager<TDatumsSP>& threadManager, const bool multiThreadEnabled,
         const ThreadManagerMode threadManagerMode, const WrapperStructPose& wrapperStructPose,
         const WrapperStructFace& wrapperStructFace, const WrapperStructHand& wrapperStructHand,

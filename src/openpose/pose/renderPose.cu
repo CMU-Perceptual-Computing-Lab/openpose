@@ -397,7 +397,7 @@ namespace op
 
     __global__ void renderBodyPartHeatMap(float* targetPtr, const int targetWidth, const int targetHeight,
                                           const float* const heatMapPtr, const int widthHeatMap,
-                                          const int heightHeatMap, const float scaleToKeepRatio, const int part,
+                                          const int heightHeatMap, const float scaleToKeepRatio, const unsigned int part,
                                           const float alphaColorToAdd, const bool absValue = false)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
@@ -632,9 +632,9 @@ namespace op
         }
     }
 
-    void renderPoseHeatMapGpu(float* framePtr, const PoseModel poseModel, const Point<int>& frameSize,
-                              const float* const heatMapPtr, const Point<int>& heatMapSize,
-                              const float scaleToKeepRatio, const int part, const float alphaBlending)
+    void renderPoseHeatMapGpu(float* framePtr, const Point<int>& frameSize, const float* const heatMapPtr,
+                              const Point<int>& heatMapSize, const float scaleToKeepRatio, const unsigned int part,
+                              const float alphaBlending)
     {
         try
         {
@@ -715,9 +715,9 @@ namespace op
         }
     }
 
-    void renderPoseDistance(float* framePtr, const PoseModel poseModel, const Point<int>& frameSize,
-                            const float* const heatMapPtr, const Point<int>& heatMapSize, const float scaleToKeepRatio,
-                            const int part, const float alphaBlending)
+    void renderPoseDistanceGpu(float* framePtr, const Point<int>& frameSize, const float* const heatMapPtr,
+                               const Point<int>& heatMapSize, const float scaleToKeepRatio, const unsigned int part,
+                               const float alphaBlending)
     {
         try
         {

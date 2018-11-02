@@ -125,7 +125,7 @@ namespace op
             {
                 const auto scaleDenseNet = 0.017;
                 const int imageArea = width * height;
-                const std::array<float,3> means{103.94,116.78,123.68};
+                const std::array<float,3> means{103.94f, 116.78f, 123.68f};
                 for (auto i = 0 ; i < 3 ; i++)
                 {
                     cv::Mat floatPtrImageCvWrapper(height, width, CV_32FC1, floatPtrImage + i*imageArea);

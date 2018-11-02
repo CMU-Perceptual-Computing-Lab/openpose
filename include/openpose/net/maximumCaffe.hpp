@@ -9,7 +9,7 @@ namespace op
     // the compatibility with any generic Caffe version, we keep this 'layer' inside our library rather than in the
     // Caffe code.
     template <typename T>
-    class OP_API MaximumCaffe
+    class MaximumCaffe
     {
     public:
         explicit MaximumCaffe();

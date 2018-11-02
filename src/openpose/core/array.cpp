@@ -410,7 +410,8 @@ namespace op
             if (indexA < indexB)
             {
                 if (0 <= indexA && (unsigned int)indexB < mSize.size()) // 0 <= indexA < indexB < mSize.size()
-                    return std::accumulate(mSize.begin()+indexA, mSize.begin()+indexB+1, 1ul, std::multiplies<size_t>());
+                    return std::accumulate(
+                        mSize.begin()+indexA, mSize.begin()+indexB+1, 1ull, std::multiplies<size_t>());
                 else
                 {
                     error("Indexes out of dimension.", __LINE__, __FUNCTION__, __FILE__);
@@ -599,7 +600,7 @@ namespace op
             {
                 // New size & volume
                 mSize = sizes;
-                mVolume = {std::accumulate(sizes.begin(), sizes.end(), 1ul, std::multiplies<size_t>())};
+                mVolume = {std::accumulate(sizes.begin(), sizes.end(), 1ull, std::multiplies<size_t>())};
                 // Prepare shared_ptr
                 if (dataPtr == nullptr)
                 {

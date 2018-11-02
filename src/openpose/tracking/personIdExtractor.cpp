@@ -115,7 +115,7 @@ namespace op
         {
             for (auto p = 0; p < poseKeypoints.getSize(0); p++)
             {
-                const int currentPerson = mNextPersonId++;
+                const auto currentPerson = int(mNextPersonId++);
 
                 // Create person entry in the tracking map
                 auto& personEntry = personEntries[currentPerson];
@@ -258,7 +258,7 @@ namespace op
                 if (poseIds[i] == -1)
                     poseIds[i] = nextPersonId++;
                 const auto& openposePersonEntry = openposePersonEntries.at(i);
-                personEntries[poseIds[i]] = openposePersonEntry;
+                personEntries[(int)poseIds[i]] = openposePersonEntry;
             }
 
             return poseIds;

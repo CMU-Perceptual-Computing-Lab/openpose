@@ -241,7 +241,7 @@ namespace op
                 const auto* candidatesCpuPtr = getCandidatesCpuConstPtr();
                 for (auto part = 0u ; part < numberBodyParts ; part++)
                 {
-                    const auto numberPartCandidates = candidatesCpuPtr[part*peaksArea];
+                    const auto numberPartCandidates = intRound(candidatesCpuPtr[part*peaksArea]);
                     candidates[part].resize(numberPartCandidates);
                     const auto* partCandidatesPtr = &candidatesCpuPtr[part*peaksArea+3];
                     for (auto candidate = 0 ; candidate < numberPartCandidates ; candidate++)

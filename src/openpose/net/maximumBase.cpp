@@ -42,9 +42,9 @@ namespace op
                         double minVal, maxVal;
                         cv::Point minLoc, maxLoc;
                         cv::minMaxLoc(source, &minVal, &maxVal, &minLoc, &maxLoc);
-                        targetPtrOffsetted[0] = maxLoc.x;
-                        targetPtrOffsetted[1] = maxLoc.y;
-                        targetPtrOffsetted[2] = maxVal;
+                        targetPtrOffsetted[0] = T(maxLoc.x);
+                        targetPtrOffsetted[1] = T(maxLoc.y);
+                        targetPtrOffsetted[2] = T(maxVal);
                     }
                 }
             }
@@ -55,8 +55,10 @@ namespace op
         }
     }
 
-    template void maximumCpu(float* targetPtr, const float* const sourcePtr, const std::array<int, 4>& targetSize,
-                             const std::array<int, 4>& sourceSize);
-    template void maximumCpu(double* targetPtr, const double* const sourcePtr, const std::array<int, 4>& targetSize,
-                             const std::array<int, 4>& sourceSize);
+    template OP_API void maximumCpu(
+        float* targetPtr, const float* const sourcePtr, const std::array<int, 4>& targetSize,
+        const std::array<int, 4>& sourceSize);
+    template OP_API void maximumCpu(
+        double* targetPtr, const double* const sourcePtr, const std::array<int, 4>& targetSize,
+        const std::array<int, 4>& sourceSize);
 }

@@ -281,6 +281,7 @@ OpenPose Library - Release Notes
         3. Array::pData as binding of spData.
         4. Array::Array that takes as input a pointer, so it does not re-allocate memory.
     12. Producer defined inside Wrapper rather than being defined on each example.
+    13. Reduced many Visual Studio warnings (e.g., uncontrolled conversions between types).
 2. Functions or parameters renamed:
     1. By default, python example `tutorial_developer/python_2_pose_from_heatmaps.py` was using 2 scales starting at -1x736, changed to 1 scale at -1x368.
     2. WrapperStructPose default parameters changed to match those of the OpenPose demo binary.
@@ -288,6 +289,7 @@ OpenPose Library - Release Notes
 3. Main bugs fixed:
     1. CMake-GUI was forcing to Release mode, allowed Debug modes too.
     2. NMS returns in index 0 the number of found peaks. However, while the number of peaks was truncated to a maximum of 127, this index 0 was saving the real number instead of the truncated one.
+    3. Template functions could not be imported in Windows for projects using the OpenPose library DLL.
 
 
 

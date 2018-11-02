@@ -174,8 +174,8 @@ namespace op
                 const auto baseIndex = (i-1)*patchSize;
                 for (auto j = 1; j <= patchSize; j++)
                 {
-                    ix[baseIndex+j-1] = (patch[i][j+1] - patch[i][j-1])/2.0;
-                    iy[baseIndex+j-1] = (patch[i+1][j] - patch[i-1][j])/2.0;
+                    ix[baseIndex+j-1] = (patch[i][j+1] - patch[i][j-1])/2.f;
+                    iy[baseIndex+j-1] = (patch[i+1][j] - patch[i-1][j])/2.f;
                 }
             }
             // Get `it`
@@ -285,13 +285,13 @@ namespace op
             std::vector<std::vector<float>> patchIt(patchSize, std::vector<float>(patchSize));
 
             status = extractPatch(patch, (int)pointI.x,(int)pointI.y, patchSize + 2, I);
-        //    if (status)
-        //        return result;
+            // if (status)
+            //     return result;
 
-            status = extractPatchIt(patchIt, pointI.x, pointI.y, pointJ.x, pointJ.y, I, J, patchSize);
+            status = extractPatchIt(patchIt, int(pointI.x), int(pointI.y), int(pointJ.x), int(pointJ.y), I, J, patchSize);
 
-        //    if (status)
-        //        return result;
+            // if (status)
+            //     return result;
 
             // Get the Ix, Iy and It vectors
             std::vector<float> ix, iy, it;
@@ -301,8 +301,8 @@ namespace op
             cv::Point2f delta;
             status = computeLK(delta, ix, iy, it);
 
-        //    if (status)
-        //        return result;
+            // if (status)
+            //     return result;
 
             result = pointJ + delta;
 

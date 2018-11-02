@@ -149,8 +149,8 @@ namespace op
                 {
                     // Skeleton / Background / Add keypoints / Add PAFs
                     const std::string key2part = "1234";
-                    const auto newElementToRender = key2part.find(castedKey);
-                    if (newElementToRender != std::string::npos)
+                    const auto keyPressed = key2part.find(castedKey);
+                    if (keyPressed != std::string::npos)
                     {
                         ElementToRender elementToRender;
                         if (castedKey=='1')
@@ -179,7 +179,7 @@ namespace op
                         const auto newElementToRender = key2partHeatmaps.find(castedKey);
                         if (newElementToRender != std::string::npos)
                             for (auto& renderer : renderers)
-                                renderer->setElementToRender((int)newElementToRender+key2part.size());
+                                renderer->setElementToRender(int(newElementToRender+key2part.size()));
                     }
                 }
             }

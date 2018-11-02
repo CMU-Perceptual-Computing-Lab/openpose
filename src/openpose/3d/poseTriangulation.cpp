@@ -351,7 +351,7 @@ namespace op
             if (!detectionMissed)
             {
                 const auto numberBodyParts = keypointsVector.at(0).getSize(1);
-                const auto lastChannelLength = keypointsVector.at(0).getSize(2);
+                const auto channel0Length = keypointsVector.at(0).getSize(2);
                 // Create x-y vector from high score results
                 std::vector<int> indexesUsed;
                 std::vector<std::vector<cv::Point2d>> xyPoints;
@@ -362,7 +362,7 @@ namespace op
                     // auto missedPoint = false;
                     std::vector<cv::Point2d> xyPointsElement;
                     std::vector<cv::Mat> cameraMatricesElement;
-                    const auto baseIndex = part * lastChannelLength;
+                    const auto baseIndex = part * channel0Length;
                     // for (auto& keypoints : keypointsVector)
                     for (auto i = 0u ; i < keypointsVector.size() ; i++)
                     {

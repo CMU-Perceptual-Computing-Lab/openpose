@@ -120,7 +120,7 @@ namespace op
             // Parts Connection
             const auto& bodyPartPairs = getPosePartPairs(poseModel);
             const auto numberBodyParts = getPoseNumberBodyParts(poseModel);
-            const auto numberBodyPartPairs = bodyPartPairs.size() / 2;
+            const auto numberBodyPartPairs = (unsigned int)(bodyPartPairs.size() / 2);
             const auto totalComputations = pairScoresCpu.getVolume();
 
             if (numberBodyParts == 0)
@@ -138,7 +138,7 @@ namespace op
                 getNumberCudaBlocks(maxPeaks, THREADS_PER_BLOCK.z)};
             pafScoreKernel<<<numBlocks, THREADS_PER_BLOCK>>>(
                 pairScoresGpuPtr, heatMapGpuPtr, peaksGpuPtr, bodyPartPairsGpuPtr, mapIdxGpuPtr,
-                maxPeaks, numberBodyPartPairs, heatMapSize.x, heatMapSize.y, interThreshold,
+                maxPeaks, (int)numberBodyPartPairs, heatMapSize.x, heatMapSize.y, interThreshold,
                 interMinAboveThreshold);
             // pairScoresCpu <-- pairScoresGpu
             cudaMemcpy(pairScoresCpu.getPtr(), pairScoresGpuPtr, totalComputations * sizeof(T),
@@ -184,22 +184,18 @@ namespace op
         }
     }
 
-    template void connectBodyPartsGpu(Array<float>& poseKeypoints, Array<float>& poseScores,
-                                      const float* const heatMapGpuPtr, const float* const peaksPtr,
-                                      const PoseModel poseModel, const Point<int>& heatMapSize, const int maxPeaks,
-                                      const float interMinAboveThreshold, const float interThreshold,
-                                      const int minSubsetCnt, const float minSubsetScore, const float scaleFactor,
-                                      Array<float> pairScoresCpu, float* pairScoresGpuPtr,
-                                      const unsigned int* const bodyPartPairsGpuPtr,
-                                      const unsigned int* const mapIdxGpuPtr,
-                                      const float* const peaksGpuPtr);
-    template void connectBodyPartsGpu(Array<double>& poseKeypoints, Array<double>& poseScores,
-                                      const double* const heatMapGpuPtr, const double* const peaksPtr,
-                                      const PoseModel poseModel, const Point<int>& heatMapSize, const int maxPeaks,
-                                      const double interMinAboveThreshold, const double interThreshold,
-                                      const int minSubsetCnt, const double minSubsetScore, const double scaleFactor,
-                                      Array<double> pairScoresCpu, double* pairScoresGpuPtr,
-                                      const unsigned int* const bodyPartPairsGpuPtr,
-                                      const unsigned int* const mapIdxGpuPtr,
-                                      const double* const peaksGpuPtr);
+    template void connectBodyPartsGpu(
+        Array<float>& poseKeypoints, Array<float>& poseScores, const float* const heatMapGpuPtr,
+        const float* const peaksPtr, const PoseModel poseModel, const Point<int>& heatMapSize, const int maxPeaks,
+        const float interMinAboveThreshold, const float interThreshold, const int minSubsetCnt,
+        const float minSubsetScore, const float scaleFactor, Array<float> pairScoresCpu, float* pairScoresGpuPtr,
+        const unsigned int* const bodyPartPairsGpuPtr, const unsigned int* const mapIdxGpuPtr,
+        const float* const peaksGpuPtr);
+    template void connectBodyPartsGpu(
+        Array<double>& poseKeypoints, Array<double>& poseScores, const double* const heatMapGpuPtr,
+        const double* const peaksPtr, const PoseModel poseModel, const Point<int>& heatMapSize, const int maxPeaks,
+        const double interMinAboveThreshold, const double interThreshold, const int minSubsetCnt,
+        const double minSubsetScore, const double scaleFactor, Array<double> pairScoresCpu, double* pairScoresGpuPtr,
+        const unsigned int* const bodyPartPairsGpuPtr, const unsigned int* const mapIdxGpuPtr,
+        const double* const peaksGpuPtr);
 }
