@@ -121,6 +121,8 @@ namespace op
          * std::array<std::vector<std::array<float,3>>, #BP> poseCandidates;
          */
         std::vector<std::vector<std::array<float,3>>> poseCandidates; // .empty()
+		//for (auto& poseCandidate : poseCandidates)
+		//	poseCandidate.insert(poseCandidate.begin(), { (float)poseCandidates.size(), 0, 0 });
 
         /**
          * Face detection locations (x,y,width,height) for each person in the image.

@@ -5,7 +5,7 @@
 #include <openpose/headers.hpp>
 
 // Output callback register in Unity
-typedef void(__stdcall * OutputCallback) (uchar ** ptrs, int ptrSize, int * sizes, int sizeSize, int outputType);
+typedef void(__stdcall * OutputCallback) (uchar ** ptrs, int ptrSize, int * sizes, int sizeSize, uchar outputType);
 
 // Global output callback
 OutputCallback unityOutputCallback;
@@ -14,56 +14,74 @@ bool unityOutputEnabled = true;
 // This worker will just read and return all the jpg files in a directory
 class UnityPluginUserOutput : public op::WorkerConsumer<std::shared_ptr<std::vector<op::Datum>>> {
 public:	
-    void initializationOnThread() {}
+	void initializationOnThread() {}
 
-	// Output type enum
-	enum OutputType : int {
-		None = 0,
-		Ids = 1,
-		Name = 2,
-		FrameNumber = 3,
-		PoseKeypoints = 4,
-		PoseIds = 5,
-		PoseScores = 6,
-		PoseHeatMaps = 7,
-		PoseCandidates = 8,
-		FaceRectangles = 9,
-		FaceKeypoints = 10,
-		FaceHeatMaps = 11,
-		HandRectangles = 12,
-		HandKeypoints = 13,
-		HandHeightMaps = 14,
-		PoseKeypoints3D = 15,
-		FaceKeypoints3D = 16,
-		HandKeypoints3D = 17,
-		CameraMatrix = 18,
-		CameraExtrinsics = 19,
-		CameraIntrinsics = 20
+	enum class OutputType : uchar {
+		None,
+		DatumsInfo,
+		Name,
+		PoseKeypoints,
+		PoseIds,
+		PoseScores,
+		PoseHeatMaps,
+		PoseCandidates,
+		FaceRectangles,
+		FaceKeypoints,
+		FaceHeatMaps,
+		HandRectangles,
+		HandKeypoints,
+		HandHeightMaps,
+		PoseKeypoints3D,
+		FaceKeypoints3D,
+		HandKeypoints3D,
+		CameraMatrix,
+		CameraExtrinsics,
+		CameraIntrinsics
 	};
 
 protected:
-	template<class T>
-	void outputValue(T ** ptrs, int ptrSize, int * sizes, int sizeSize, OutputType outputType) {
-		if (!unityOutputCallback) return;
-		uchar ** bytePtrs = static_cast<uchar**>(static_cast<void*>(ptrs));
-		unityOutputCallback(bytePtrs, ptrSize, sizes, sizeSize, (int)outputType);
-	}
-
 	void workConsumer(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
 		try	{
 			if (datumsPtr != nullptr && !datumsPtr->empty()) {				
-				if (unityOutputEnabled) {
+				/*if (unityOutputEnabled) {
+					sendDatumsInfoAndName(datumsPtr);
 					sendPoseKeypoints(datumsPtr);
-					sendHandKeypoints(datumsPtr);
-					sendFaceKeypoints(datumsPtr);
+					sendPoseIds(datumsPtr);
+					sendPoseScores(datumsPtr);
+					sendPoseHeatMaps(datumsPtr);
+					sendPoseCandidates(datumsPtr);
 					sendFaceRectangles(datumsPtr);
-				}
+					sendFaceKeypoints(datumsPtr);
+					sendFaceHeatMaps(datumsPtr);
+					sendHandRectangles(datumsPtr);
+					sendHandKeypoints(datumsPtr);
+					sendHandHeatMaps(datumsPtr);
+				}*/
 			}
 		} catch (const std::exception& e) {
 			op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
 		}
 	}
 
+private: 
+	template<class T>
+	void outputValue(T ** ptrs, int ptrSize, int * sizes, int sizeSize, OutputType outputType) {
+		if (!unityOutputCallback) return;
+		uchar ** bytePtrs = static_cast<uchar**>(static_cast<void*>(ptrs));
+		unityOutputCallback(bytePtrs, ptrSize, sizes, sizeSize, (uchar)outputType);
+	}
+
+	void sendDatumsInfoAndName(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
+		auto& datum = datumsPtr->at(0);
+		int sizes[] = { 1 };
+		int sizeSize = 1;
+		unsigned long long *val[] = {&(datum.id), &(datum.subId), &(datum.subIdMax), &(datum.frameNumber)};
+		int ptrSize = 4;
+		outputValue(&val[0], ptrSize, &sizes[0], sizeSize, OutputType::DatumsInfo);
+
+		char const *a[] = { datum.name.c_str() };
+		outputValue(&a[0], 1, &sizes[0], sizeSize, OutputType::Name);
+	}
 	void sendPoseKeypoints(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
 		auto& data = datumsPtr->at(0).poseKeypoints; // Array<float>
 		if (!data.empty()) {
@@ -71,36 +89,51 @@ protected:
 			int sizeSize = sizeVector.size();
 			int * sizes = &sizeVector[0];
 			float * val = data.getPtr();
-			outputValue(&val, 1, sizes, sizeSize, PoseKeypoints);
+			outputValue(&val, 1, sizes, sizeSize, OutputType::PoseKeypoints);
 		}
 	}
-
-	void sendHandKeypoints(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
-		auto& data = datumsPtr->at(0).handKeypoints; // std::array<Array<float>, 2>
-		if (data.size() == 2 && !data[0].empty()) {
-			auto sizeVector = data[0].getSize();
+	void sendPoseIds(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
+		auto& data = datumsPtr->at(0).poseIds; // Array<long long>
+		if (!data.empty()) {
+			auto sizeVector = data.getSize();
 			int sizeSize = sizeVector.size();
 			int * sizes = &sizeVector[0];
-			//float ptrs[] = { data[0].getPtr(), data[1].getPtr() };
-			auto ptrs = new float*[2];
-			ptrs[0] = data[0].getPtr();
-			ptrs[1] = data[1].getPtr();	
-			outputValue(ptrs, 2, sizes, sizeSize, HandKeypoints);
-			delete ptrs;
+			long long * val = data.getPtr();
+			outputValue(&val, 1, sizes, sizeSize, OutputType::PoseIds);
 		}
 	}
-
-	void sendFaceKeypoints(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
-		auto& data = datumsPtr->at(0).faceKeypoints; // Array<float>
+	void sendPoseScores(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
+		auto& data = datumsPtr->at(0).poseScores; // Array<float>
 		if (!data.empty()) {
 			auto sizeVector = data.getSize();
 			int sizeSize = sizeVector.size();
 			int * sizes = &sizeVector[0];
 			float * val = data.getPtr();
-			outputValue(&val, 1, sizes, sizeSize, FaceKeypoints);
+			outputValue(&val, 1, sizes, sizeSize, OutputType::PoseScores);
 		}
 	}
-
+	void sendPoseHeatMaps(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
+		auto& data = datumsPtr->at(0).poseHeatMaps; // Array<float>
+		if (!data.empty()) {
+			auto sizeVector = data.getSize();
+			int sizeSize = sizeVector.size();
+			int * sizes = &sizeVector[0];
+			float * val = data.getPtr();
+			outputValue(&val, 1, sizes, sizeSize, OutputType::PoseHeatMaps);
+		}
+	}
+	void sendPoseCandidates(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
+		auto& data = datumsPtr->at(0).poseCandidates; // std::vector<std::vector<std::array<float, 3>>>
+		if (!data.empty()) {
+			// TODO 
+			/*auto a = data[0][0].data();
+			auto sizeVector = data.getSize();
+			int sizeSize = sizeVector.size();
+			int * sizes = &sizeVector[0];
+			long long * val = data.getPtr();
+			outputValue(&val, 1, sizes, sizeSize, OutputType::PoseIds);*/
+		}
+	}	
 	void sendFaceRectangles(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
 		auto& data = datumsPtr->at(0).faceRectangles; // std::vector<Rectangle<float>>
 		if (data.size() > 0) {
@@ -113,7 +146,66 @@ protected:
 				vals[4 * i + 3] = data[i].height;
 			}
 			float * val = &vals[0];
-			outputValue(&val, 1, sizes, 2, FaceRectangles);
+			outputValue(&val, 1, sizes, 2, OutputType::FaceRectangles);
+		}
+	}
+	void sendFaceKeypoints(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
+		auto& data = datumsPtr->at(0).faceKeypoints; // Array<float>
+		if (!data.empty()) {
+			auto sizeVector = data.getSize();
+			int sizeSize = sizeVector.size();
+			int * sizes = &sizeVector[0];
+			float * val = data.getPtr();
+			outputValue(&val, 1, sizes, sizeSize, OutputType::FaceKeypoints);
+		}
+	}
+	void sendFaceHeatMaps(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
+		auto& data = datumsPtr->at(0).faceHeatMaps; // Array<float>
+		if (!data.empty()) {
+			auto sizeVector = data.getSize();
+			int sizeSize = sizeVector.size();
+			int * sizes = &sizeVector[0];
+			float * val = data.getPtr();
+			outputValue(&val, 1, sizes, sizeSize, OutputType::FaceHeatMaps);
+		}
+	}
+	void sendHandRectangles(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
+		auto& data = datumsPtr->at(0).handRectangles; // std::vector<std::array<Rectangle<float>, 2>>
+		if (!data.empty()) {
+			std::vector<float*> valPtrs;
+			for (int i = 0; i < data.size(); i++) {
+				float vals[8];
+				for (int j = 0; j < 2; j++) {
+					vals[4 * j + 0] = data[i][j].x;
+					vals[4 * j + 1] = data[i][j].y;
+					vals[4 * j + 2] = data[i][j].width;
+					vals[4 * j + 3] = data[i][j].height;
+				}
+				valPtrs.push_back(vals);
+			}
+			int sizes[] = {2, 4};
+			int sizeSize = 2;
+			outputValue(valPtrs.data(), valPtrs.size(), sizes, sizeSize, OutputType::HandRectangles);
+		}
+	}
+	void sendHandKeypoints(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
+		auto& data = datumsPtr->at(0).handKeypoints; // std::array<Array<float>, 2>
+		if (data.size() == 2 && !data[0].empty()) {
+			auto sizeVector = data[0].getSize();
+			int sizeSize = sizeVector.size();
+			int * sizes = &sizeVector[0];
+			float * ptrs[] = { data[0].getPtr(), data[1].getPtr() };
+			outputValue(ptrs, 2, sizes, sizeSize, OutputType::HandKeypoints);
+		}
+	}
+	void sendHandHeatMaps(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
+		auto& data = datumsPtr->at(0).handHeatMaps; // std::array<Array<float>, 2>
+		if (data.size() == 2 && !data[0].empty()) {
+			auto sizeVector = data[0].getSize();
+			int sizeSize = sizeVector.size();
+			int * sizes = &sizeVector[0];
+			float * ptrs[] = { data[0].getPtr(), data[1].getPtr() };
+			outputValue(ptrs, 2, sizes, sizeSize, OutputType::HandHeightMaps);
 		}
 	}
 };
@@ -172,9 +264,7 @@ void openpose_main() {
 
 		// Reset pointer
 		ptrUserOutput = nullptr;
-	}
-	catch (const std::exception& e)
-	{
+	} catch (const std::exception& e) {
 		op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
 	}
 }
@@ -203,138 +293,120 @@ extern "C" {
 	}
 	// Configs
 	OP_API void OP_ConfigurePose(
-		bool body_disable = false,
-		char* model_folder = "models/", int number_people_max = -1, // moved
-		int net_resolution_x = -1, int net_resolution_y = 368, // Point
-		int output_resolution_x = -1, int output_resolution_y = -1, // Point
-		int keypoint_scale = 0, // ScaleMode
-		int num_gpu = -1, int num_gpu_start = 0, int scale_number = 1, float scale_gap = 0.3f,
-		int render_pose = -1, // bool _3d = false, int _3d_views = 1, bool flir_camera = false, // RenderMode
-		char* model_pose = "BODY_25", // PoseModel
-		bool disable_blending = false, float alpha_pose = 0.6f, float alpha_heatmap = 0.7f,
-		int part_to_show = 0,
-		bool heatmaps_add_parts = false, bool heatmaps_add_bkg = false, bool heatmaps_add_PAFs = false, // HeatMapType
-		int heatmaps_scale = 2, // HeatMapScaleMode
-		bool part_candidates = false, float render_threshold = 0.05f) {
+		bool body_disable,
+		int net_resolution_x, int net_resolution_y, // Point
+		int output_resolution_x, int output_resolution_y, // Point
+		uchar keypoint_scale_mode, // ScaleMode
+		int num_gpu, int num_gpu_start, int scale_number, float scale_gap,
+		uchar pose_render_mode, // RenderMode
+		uchar model_pose, // PoseModel
+		bool disable_blending, float alpha_pose, float alpha_heatmap, int part_to_show, char* model_folder,
+		bool heatmaps_add_parts, bool heatmaps_add_bkg, bool heatmaps_add_PAFs, // HeatMapType // uchar heatmap_type,
+		uchar heatmap_scale_mode, // ScaleMode
+		bool part_candidates, float render_threshold, int number_people_max) {
+
 		try {
 			spWrapperStructPose = std::make_shared<op::WrapperStructPose>(
 				!body_disable,
-				op::Point<int>{net_resolution_x, net_resolution_y}, // Point
-				op::Point<int>{output_resolution_x, output_resolution_y}, // Point
-				op::flagsToScaleMode(keypoint_scale), // ScaleMode
+				op::Point<int>{ net_resolution_x, net_resolution_y },
+				op::Point<int>{ output_resolution_x, output_resolution_y },
+				(op::ScaleMode) keypoint_scale_mode,
 				num_gpu, num_gpu_start, scale_number, scale_gap,
-				op::flagsToRenderMode(render_pose, false/*(_3d || _3d_views > 1 || flir_camera)*/), // RenderMode
-				op::flagsToPoseModel(model_pose), // PoseModel
-				!disable_blending, alpha_pose, alpha_heatmap,
-				part_to_show, model_folder,
-				op::flagsToHeatMaps(heatmaps_add_parts, heatmaps_add_bkg, heatmaps_add_PAFs), // HeatMapType
-				op::flagsToHeatMapScaleMode(heatmaps_scale),
-				part_candidates, render_threshold, number_people_max, true);
-
-			//spWrapper->configure(spWrapperStructPose);
-		}
-		catch (const std::exception& e)
-		{
-			op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-		}
-	}
-	OP_API void OP_ConfigureFace(
-		bool face = false, int face_net_resolution_x = 368, int face_net_resolution_y = 368,
-		int face_renderer = -1, int render_pose = -1,
-		float face_alpha_pose = 0.6f, float face_alpha_heatmap = 0.7f, float face_render_threshold = 0.4f) {
-		try {
-			spWrapperStructFace = std::make_shared<op::WrapperStructFace>(
-				face, op::Point<int>{face_net_resolution_x, face_net_resolution_y},
-				op::flagsToRenderMode(face_renderer, false/*(_3d || _3d_views > 1 || flir_camera)*/, render_pose), // RenderMode
-				face_alpha_pose, face_alpha_heatmap, face_render_threshold);
-			//spWrapper->configure(spWrapperStructFace);
-		}
-		catch (const std::exception& e)
-		{
+				(op::RenderMode) pose_render_mode, (op::PoseModel) model_pose,
+				!disable_blending, alpha_pose, alpha_heatmap, part_to_show, model_folder,
+				op::flagsToHeatMaps(heatmaps_add_parts, heatmaps_add_bkg, heatmaps_add_PAFs), // HeatMapType // (op::HeatMapType) heatmap_type, 
+				(op::ScaleMode) heatmap_scale_mode,
+				part_candidates, render_threshold, number_people_max, true
+			);
+		} catch (const std::exception& e) {
 			op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
 		}
 	}
 	OP_API void OP_ConfigureHand(
-		bool hand = false,
-		int hand_net_resolution_x = 368, int hand_net_resolution_y = 368, // Point
-		int hand_scale_number = 1, float hand_scale_range = 0.4f, bool hand_tracking = false,
-		int hand_render = -1, bool _3d = false, int _3d_views = 1, bool flir_camera = false, int render_pose = -1, // RenderMode
-		float hand_alpha_pose = 0.6f, float hand_alpha_heatmap = 0.7f, float hand_render_threshold = 0.2f) {
+		bool hand,
+		int hand_net_resolution_x, int hand_net_resolution_y, // Point
+		int hand_scale_number, float hand_scale_range, bool hand_tracking,
+		uchar hand_render_mode, // RenderMode
+		float hand_alpha_pose, float hand_alpha_heatmap, float hand_render_threshold) {
+
 		try {
 			spWrapperStructHand = std::make_shared<op::WrapperStructHand>(
 				hand,
-				op::Point<int>{hand_net_resolution_x, hand_net_resolution_y}, // Point
+				op::Point<int>{ hand_net_resolution_x, hand_net_resolution_y },
 				hand_scale_number, hand_scale_range, hand_tracking,
-				op::flagsToRenderMode(hand_render, (_3d || _3d_views > 1 || flir_camera), render_pose),
-				hand_alpha_pose, hand_alpha_heatmap, hand_render_threshold);
-
-			//spWrapper->configure(spWrapperStructHand);
+				(op::RenderMode) hand_render_mode,
+				hand_alpha_pose, hand_alpha_heatmap, hand_render_threshold
+				);
 		}
-		catch (const std::exception& e)
-		{
+		catch (const std::exception& e) {
+			op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+		}
+	}
+	OP_API void OP_ConfigureFace(
+		bool face, 
+		int face_net_resolution_x, int face_net_resolution_y, // Point
+		uchar face_render_mode, // RenderMode
+		float face_alpha_pose, float face_alpha_heatmap, float face_render_threshold) {
+
+		try {
+			spWrapperStructFace = std::make_shared<op::WrapperStructFace>(
+				face, 
+				op::Point<int>{ face_net_resolution_x, face_net_resolution_y },
+				(op::RenderMode) face_render_mode,
+				face_alpha_pose, face_alpha_heatmap, face_render_threshold
+			);
+		} catch (const std::exception& e) {
 			op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
 		}
 	}
 	OP_API void OP_ConfigureExtra(
-		bool _3d = false, int _3d_min_views = -1, bool _identification = false, int _tracking = -1, int _ik_threads = 0) {
+		bool _3d, int _3d_min_views, bool _identification, int _tracking, int _ik_threads) {
+
 		try {
 			spWrapperStructExtra = std::make_shared<op::WrapperStructExtra>(
-				_3d, _3d_min_views, _identification, _tracking, _ik_threads);
-			//spWrapper->configure(spWrapperStructExtra);
-		}
-		catch (const std::exception& e)
-		{
+				_3d, _3d_min_views, _identification, _tracking, _ik_threads
+			);
+		} catch (const std::exception& e) {
 			op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
 		}
 	}
 	OP_API void OP_ConfigureInput(
-		uchar producerType = 5, char* producerString = "",
-		unsigned long long frame_first = 0, 
-		unsigned long long frame_step = 1, 
-		unsigned long long  frame_last = std::numeric_limits<unsigned long long>::max(),
-		bool process_real_time = false, bool frame_flip = false,
-		int frame_rotate = 0, bool frames_repeat = false, 
-		int camera_resolution_x = -1, int camera_resolution_y = -1, double webcam_fps = 30., 
-		char* camera_parameter_path = "models/cameraParameters/", 
-		bool undistort_image = true, uint image_directory_stereo = 1) {
+		uchar producer_type, char* producer_string, // ProducerType
+		unsigned long long frame_first, unsigned long long frame_step, unsigned long long frame_last,
+		bool process_real_time, bool frame_flip, int frame_rotate, bool frames_repeat, 
+		int camera_resolution_x, int camera_resolution_y, // Point
+		double webcam_fps, char* camera_parameter_path, bool undistort_image, uint image_directory_stereo) {
+
 		try {
 			spWrapperStructInput = std::make_shared<op::WrapperStructInput>(
-				(op::ProducerType) producerType, producerString,
-				frame_first, frame_step, frame_last, 
-				process_real_time, frame_flip,
-				frame_rotate, frames_repeat,
-				op::Point<int>{ camera_resolution_x, camera_resolution_y }, webcam_fps,
-				camera_parameter_path,
-				undistort_image, image_directory_stereo);
-			//spWrapper->configure(spWrapperStructInput);
-		}
-		catch (const std::exception& e)
-		{
+				(op::ProducerType) producer_type, producer_string,
+				frame_first, frame_step, frame_last, process_real_time, frame_flip,	frame_rotate, frames_repeat,
+				op::Point<int>{ camera_resolution_x, camera_resolution_y }, 
+				webcam_fps,	camera_parameter_path, undistort_image, image_directory_stereo
+			);
+		} catch (const std::exception& e) {
 			op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
 		}
 	}
 	OP_API void OP_ConfigureOutput(
-		char* write_keypoint = "",
-		char* write_keypoint_format = "yml", char* write_json = "", char* write_coco_json = "",
-		char* write_coco_foot_json = "", char* write_images = "", char* write_images_format = "png", char* write_video = "",
-		double camera_fps = 30.,
-		char* write_heatmaps = "", char* write_heatmaps_format = "png", char* write_video_adam = "",
-		char* write_bvh = "", char* udp_host = "", char* udp_port = "8051") {
+		ushort display_mode, // DisplayMode
+		bool gui_verbose, bool full_screen, char* write_keypoint,
+		uchar write_keypoint_format, // DataFormat
+		char* write_json, char* write_coco_json, char* write_coco_foot_json, 
+		char* write_images, char* write_images_format, char* write_video,
+		double camera_fps, char* write_heatmaps, char* write_heatmaps_format, 
+		char* write_video_adam, char* write_bvh, char* udp_host, char* udp_port) {
+
 		try {
-			const auto displayMode = op::DisplayMode::NoDisplay;
-			const bool guiVerbose = false;
-			const bool fullScreen = false;
+			//const bool guiVerbose = false;
+			//const bool fullScreen = false;
 			spWrapperStructOutput = std::make_shared<op::WrapperStructOutput>(
-				displayMode, guiVerbose, fullScreen, write_keypoint,
-				op::stringToDataFormat(write_keypoint_format), write_json, write_coco_json,
+				(op::DisplayMode) display_mode, gui_verbose, full_screen, write_keypoint,
+				(op::DataFormat) write_keypoint_format, write_json, write_coco_json,
 				write_coco_foot_json, write_images, write_images_format, write_video,
-				camera_fps,
-				write_heatmaps, write_heatmaps_format, write_video_adam,
-				write_bvh, udp_host, udp_port);
-			//spWrapper->configure(spWrapperStructOutput);
-		}
-		catch (const std::exception& e)
-		{
+				camera_fps, write_heatmaps, write_heatmaps_format, write_video_adam, write_bvh, 
+				udp_host, udp_port);
+		} catch (const std::exception& e) {
 			op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
 		}
 	}
