@@ -57,7 +57,7 @@ namespace op
          * This function returns the hand keypoins. VERY IMPORTANT: use getHandKeypoints().clone() if the keypoints are
          * going to be edited in a different thread.
          * @return A std::array with all the left hand keypoints (index 0) and all the right ones (index 1). Each
-         * Array<float> follows the pose structure, i.e. the first dimension corresponds to all the people in the
+         * Array<float> follows the pose structure, i.e., the first dimension corresponds to all the people in the
          * image, the second to each specific keypoint, and the third one to (x, y, score).
          */
         std::array<Array<float>, 2> getHandKeypoints() const;

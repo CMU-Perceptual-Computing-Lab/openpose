@@ -33,8 +33,8 @@ namespace op
             {
                 inputNetData[i].reset({1, 3, netInputSizes.at(i).y, netInputSizes.at(i).x});
                 std::vector<double> scaleRatios(numberScales, 1.f);
-                const cv::Mat frameWithNetSize = resizeFixedAspectRatio(cvInputData, scaleInputToNetInputs[i],
-                                                                        netInputSizes[i]);
+                cv::Mat frameWithNetSize;
+                resizeFixedAspectRatio(frameWithNetSize, cvInputData, scaleInputToNetInputs[i], netInputSizes[i]);
                 // Fill inputNetData[i]
                 uCharCvMatToFloatPtr(inputNetData[i].getPtr(), frameWithNetSize,
                                      (mPoseModel == PoseModel::BODY_19N ? 2 : 1));

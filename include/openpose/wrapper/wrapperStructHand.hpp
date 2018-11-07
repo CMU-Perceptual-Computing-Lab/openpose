@@ -42,8 +42,8 @@ namespace op
 
         /**
          * Whether to add tracking between frames. Adding hand tracking might improve hand keypoints detection for
-         * webcam (if the frame rate is high enough, i.e. >7 FPS per GPU) and video. This is not person ID tracking, it
-         * simply looks for hands in positions at which hands were located in previous frames, but it does not
+         * webcam (if the frame rate is high enough, i.e., >7 FPS per GPU) and video. This is not person ID tracking,
+         * it simply looks for hands in positions at which hands were located in previous frames, but it does not
          * guarantee the same person id among frames.
          */
         bool tracking;
@@ -70,7 +70,7 @@ namespace op
         /**
          * Rendering threshold. Only estimated keypoints whose score confidences are higher than this value will be
          * rendered. Generally, a high threshold (> 0.5) will only render very clear body parts; while small thresholds
-         * (~0.1) will also output guessed and occluded keypoints, but also more false positives (i.e. wrong
+         * (~0.1) will also output guessed and occluded keypoints, but also more false positives (i.e., wrong
          * detections).
          */
         float renderThreshold;

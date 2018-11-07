@@ -154,6 +154,26 @@ namespace op
     }
 
     template <typename T>
+    void BodyPartConnectorCaffe<T>::Forward(const std::vector<caffe::Blob<T>*>& bottom, Array<T>& poseKeypoints,
+                                            Array<T>& poseScores)
+    {
+        try
+        {
+            // CUDA
+            #ifdef USE_CUDA
+                Forward_gpu(bottom, poseKeypoints, poseScores);
+            // OpenCL or CPU
+            #else
+                Forward_cpu(bottom, poseKeypoints, poseScores);
+            #endif
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    template <typename T>
     void BodyPartConnectorCaffe<T>::Forward_cpu(const std::vector<caffe::Blob<T>*>& bottom, Array<T>& poseKeypoints,
                                                 Array<T>& poseScores)
     {

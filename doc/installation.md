@@ -12,18 +12,19 @@ OpenPose - Installation
 8. [Uninstallation](#uninstallation)
 9. [Optional Settings](#optional-settings)
     1. [Profiling Speed](#profiling-speed)
-    2. [COCO and MPI Models](#coco-and-mpi-models)
-    3. [Python API](#python-api)
-    4. [CPU Version](#cpu-version)
-    5. [Mac OSX Version](#mac-osx-version)
-    6. [OpenCL Version](#opencl-version)
-    7. [3D Reconstruction Module](#3d-reconstruction-module)
-    8. [Calibration Module](#calibration-module)
-    9. [Compiling without cuDNN](#compiling-without-cudnn)
-    10. [Custom Caffe (Ubuntu Only)](#custom-caffe-ubuntu-only)
-    11. [Custom OpenCV (Ubuntu Only)](#custom-opencv-ubuntu-only)
-    12. [Doxygen Documentation Autogeneration (Ubuntu Only)](#doxygen-documentation-autogeneration-ubuntu-only)
-    13. [CMake Command Line Configuration (Ubuntu Only)](#cmake-command-line-configuration-ubuntu-only)
+    2. [Faster GUI Display](#faster-gui-display)
+    3. [COCO and MPI Models](#coco-and-mpi-models)
+    4. [Python API](#python-api)
+    5. [CPU Version](#cpu-version)
+    6. [Mac OSX Version](#mac-osx-version)
+    7. [OpenCL Version](#opencl-version)
+    8. [3D Reconstruction Module](#3d-reconstruction-module)
+    9. [Calibration Module](#calibration-module)
+    10. [Compiling without cuDNN](#compiling-without-cudnn)
+    11. [Custom Caffe (Ubuntu Only)](#custom-caffe-ubuntu-only)
+    12. [Custom OpenCV (Ubuntu Only)](#custom-opencv-ubuntu-only)
+    13. [Doxygen Documentation Autogeneration (Ubuntu Only)](#doxygen-documentation-autogeneration-ubuntu-only)
+    14. [CMake Command Line Configuration (Ubuntu Only)](#cmake-command-line-configuration-ubuntu-only)
 
 
 
@@ -268,6 +269,11 @@ OpenPose displays the FPS in the basic GUI. However, more complex speed metrics 
 
 - Time measurement for 1 graphic card: The FPS will be the slowest time displayed in your terminal command line (as OpenPose is multi-threaded). Times are in milliseconds, so `FPS = 1000/millisecond_measurement`.
 - Time measurement for >1 graphic cards: Assuming `n` graphic cards, you will have to wait up to `n` x `F` frames to visualize each graphic card speed (as the frames are splitted among them). In addition, the FPS would be: `FPS = minFPS(speed_per_GPU/n, worst_time_measurement_other_than_GPUs)`. For < 4 GPUs, this is usually `FPS = speed_per_GPU/n`.
+
+
+
+#### Faster GUI Display
+Reduce the lag and increase the speed of displaying images by enabling the `WITH_OPENCV_WITH_OPENCL` flag. It tells OpenCV to render the images using OpenGL support. This speeds up rendering about 3x. E.g., it reduces from about 30 msec to about 10 msec the display time for HD resolution images. It requires OpenCV to be compiled with OpenGL support and it provokes a visual aspect-ratio artifact when rendering a folder with images of different resolutions.
 
 
 

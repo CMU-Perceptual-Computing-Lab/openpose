@@ -55,7 +55,7 @@ namespace op
                 // factor * dist(neck, headNose)
                 if (neckScoreAbove && headNoseScoreAbove)
                 {
-                    // If profile (i.e. only 1 eye and ear visible) --> avg(headNose, eye & ear position)
+                    // If profile (i.e., only 1 eye and ear visible) --> avg(headNose, eye & ear position)
                     if ((lEyeScoreAbove) == (lEarScoreAbove)
                         && (rEyeScoreAbove) == (rEarScoreAbove)
                         && (lEyeScoreAbove) != (rEyeScoreAbove))

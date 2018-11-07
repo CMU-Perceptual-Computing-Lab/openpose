@@ -45,9 +45,9 @@ namespace op
                         wrapperStructOutput.writeHeatMapsFormat != "float"))
             {
                 const auto message = "In order to save the heatmaps, you must either set"
-                                     " wrapperStructPose.heatMapScale to ScaleMode::UnsignedChar (i.e. range [0, 255])"
-                                     " or `--write_heatmaps_format` to `float` to storage floating numbers in binary"
-                                     " mode.";
+                                     " wrapperStructPose.heatMapScale to ScaleMode::UnsignedChar (i.e., range"
+                                     " [0, 255]) or `--write_heatmaps_format` to `float` to storage floating numbers"
+                                     " in binary mode.";
                 error(message, __LINE__, __FUNCTION__, __FILE__);
             }
             if (userOutputWsEmpty && threadManagerMode != ThreadManagerMode::Asynchronous

@@ -50,7 +50,7 @@ namespace op
         /**
          * This function returns the face keypoins. VERY IMPORTANT: use getFaceKeypoints().clone() if the keypoints are
          * going to be edited in a different thread.
-         * @return A Array with all the face keypoints. It follows the pose structure, i.e. the first dimension
+         * @return A Array with all the face keypoints. It follows the pose structure, i.e., the first dimension
          * corresponds to all the people in the image, the second to each specific keypoint, and the third one to
          * (x, y, score).
          */

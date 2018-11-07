@@ -19,7 +19,7 @@ namespace op
          * part of the window.
          * @param initialWindowedSize const Point<int> with the initial window output resolution (width and height).
          * @param fullScreen bool from which the FrameDisplayer::FullScreenMode property mFullScreenMode will be set,
-         * i.e. specifying the type of initial display (it can be changed later).
+         * i.e., specifying the type of initial display (it can be changed later).
          */
         FrameDisplayer(const std::string& windowedName = OPEN_POSE_NAME_AND_VERSION,
                        const Point<int>& initialWindowedSize = Point<int>{}, const bool fullScreen = false);

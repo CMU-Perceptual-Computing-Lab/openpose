@@ -148,7 +148,7 @@ Note: This installer will not incorporate any new features, we recommend to use 
     2. Change `Debug` by `Release` mode.
     3. Compile it and run it with <kbd>F5</kbd> or the green play icon.
 4. If you have a webcam connected, OpenPose will automatically start after being compiled.
-5. In order to use the created exe file from the command line (i.e. outside Visual Studio), you have to:
+5. In order to use the created exe file from the command line (i.e., outside Visual Studio), you have to:
     1. Copy all the DLLs located on `{openpose_folder}\3rdparty\windows\caffe\bin\` on the exe folder: `{openpose_folder}\windows\x64\Release`.
     2. Copy all the DLLs located on `{openpose_folder}\3rdparty\windows\opencv\x64\vc14\bin\` on the exe folder: `{openpose_folder}\windows\x64\Release`.
     3. Open the Windows cmd (Windows button + <kbd>X</kbd>, then <kbd>A</kbd>).

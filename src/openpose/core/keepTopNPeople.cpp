@@ -17,7 +17,7 @@ namespace op
         try
         {
             // Remove people if #people > mNumberPeopleMax
-            if (peopleArray.getSize(0) > (unsigned int)mNumberPeopleMax && mNumberPeopleMax > 0)
+            if (peopleArray.getSize(0) > mNumberPeopleMax && mNumberPeopleMax > 0)
             {
                 // Sanity checks
                 if (poseScores.getVolume() != (unsigned int) poseScores.getSize(0))

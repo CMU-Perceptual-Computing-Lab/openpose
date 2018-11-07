@@ -6,7 +6,7 @@
     // 4. Display the rendered pose or heatmap (`gui` module)
 // In addition to the previous OpenPose modules, we also need to use:
     // 1. `core` module: for the Array<float> class that the `pose` module needs
-    // 2. `utilities` module: for the error & logging functions, i.e. op::error & op::log respectively
+    // 2. `utilities` module: for the error & logging functions, i.e., op::error & op::log respectively
 
 // 3rdparty dependencies
 // GFlags: DEFINE_bool, _int32, _int64, _uint64, _double, _string
@@ -58,7 +58,7 @@ DEFINE_bool(disable_blending,           false,          "If enabled, it will ren
 DEFINE_double(render_threshold,         0.05,           "Only estimated keypoints whose score confidences are higher than this threshold will be"
                                                         " rendered. Generally, a high threshold (> 0.5) will only render very clear body parts;"
                                                         " while small thresholds (~0.1) will also output guessed and occluded keypoints, but also"
-                                                        " more false positives (i.e. wrong detections).");
+                                                        " more false positives (i.e., wrong detections).");
 DEFINE_double(alpha_pose,               0.6,            "Blending factor (range 0-1) for the body part rendering. 1 will show it completely, 0 will"
                                                         " hide it. Only valid for GPU rendering.");
 DEFINE_double(alpha_heatmap,            0.7,            "Blending factor (range 0-1) between heatmap and original frame. 1 will only show the"
@@ -103,7 +103,7 @@ int tutorialDeveloperPose2()
         poseGpuRenderer.setElementToRender(FLAGS_part_to_show);
         op::OpOutputToCvMat opOutputToCvMat;
         op::FrameDisplayer frameDisplayer{"OpenPose Tutorial - Example 2", outputSize};
-        // Step 4 - Initialize resources on desired thread (in this case single thread, i.e. we init resources here)
+        // Step 4 - Initialize resources on desired thread (in this case single thread, i.e., we init resources here)
         poseExtractorPtr->initializationOnThread();
         poseGpuRenderer.initializationOnThread();
 

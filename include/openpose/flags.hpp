@@ -46,7 +46,7 @@ DEFINE_int32(flir_camera_index,         -1,             "Select -1 (default) to 
                                                         " camera index to run, where 0 corresponds to the detected flir camera with the lowest"
                                                         " serial number, and `n` to the `n`-th lowest serial number camera.");
 DEFINE_string(ip_camera,                "",             "String with the IP camera URL. It supports protocols like RTSP and HTTP.");
-DEFINE_uint64(frame_first,              0,              "Start on desired frame number. Indexes are 0-based, i.e. the first frame has index 0.");
+DEFINE_uint64(frame_first,              0,              "Start on desired frame number. Indexes are 0-based, i.e., the first frame has index 0.");
 DEFINE_uint64(frame_step,               1,              "Step or gap between processed frames. E.g., `--frame_step 5` would read and process frames"
                                                         " 0, 5, 10, etc..");
 DEFINE_uint64(frame_last,               -1,             "Finish on desired frame number. Select -1 to disable. Indexes are 0-based, e.g., if set to"
@@ -68,7 +68,7 @@ DEFINE_string(output_resolution,        "-1x-1",        "The image resolution (d
 DEFINE_int32(num_gpu,                   -1,             "The number of GPU devices to use. If negative, it will use all the available GPUs in your"
                                                         " machine.");
 DEFINE_int32(num_gpu_start,             0,              "GPU device start number.");
-DEFINE_int32(keypoint_scale,            0,              "Scaling of the (x,y) coordinates of the final pose data array, i.e. the scale of the (x,y)"
+DEFINE_int32(keypoint_scale,            0,              "Scaling of the (x,y) coordinates of the final pose data array, i.e., the scale of the (x,y)"
                                                         " coordinates that will be saved with the `write_json` & `write_keypoint` flags."
                                                         " Select `0` to scale it to the original source resolution; `1`to scale it to the net output"
                                                         " size (set with `net_resolution`); `2` to scale it to the final output size (set with"
@@ -113,7 +113,7 @@ DEFINE_int32(heatmaps_scale,            2,              "Set 0 to scale op::Datu
 DEFINE_bool(part_candidates,            false,          "Also enable `write_json` in order to save this information. If true, it will fill the"
                                                         " op::Datum::poseCandidates array with the body part candidates. Candidates refer to all"
                                                         " the detected body parts, before being assembled into people. Note that the number of"
-                                                        " candidates is equal or higher than the number of final body parts (i.e. after being"
+                                                        " candidates is equal or higher than the number of final body parts (i.e., after being"
                                                         " assembled into people). The empty body parts are filled with 0s. Program speed will"
                                                         " slightly decrease. Not required for OpenPose, enable it only if you intend to explicitly"
                                                         " use this information.");
@@ -137,7 +137,7 @@ DEFINE_double(hand_scale_range,         0.4,            "Analogous purpose than 
                                                         " between smallest and biggest scale. The scales will be centered in ratio 1. E.g., if"
                                                         " scaleRange = 0.4 and scalesNumber = 2, then there will be 2 scales, 0.8 and 1.2.");
 DEFINE_bool(hand_tracking,              false,          "Adding hand tracking might improve hand keypoints detection for webcam (if the frame rate"
-                                                        " is high enough, i.e. >7 FPS per GPU) and video. This is not person ID tracking, it"
+                                                        " is high enough, i.e., >7 FPS per GPU) and video. This is not person ID tracking, it"
                                                         " simply looks for hands in positions at which hands were located in previous frames, but"
                                                         " it does not guarantee the same person ID among frames.");
 // OpenPose 3-D Reconstruction
@@ -171,12 +171,12 @@ DEFINE_bool(disable_blending,           false,          "If enabled, it will ren
 DEFINE_double(render_threshold,         0.05,           "Only estimated keypoints whose score confidences are higher than this threshold will be"
                                                         " rendered. Generally, a high threshold (> 0.5) will only render very clear body parts;"
                                                         " while small thresholds (~0.1) will also output guessed and occluded keypoints, but also"
-                                                        " more false positives (i.e. wrong detections).");
+                                                        " more false positives (i.e., wrong detections).");
 DEFINE_int32(render_pose,               -1,             "Set to 0 for no rendering, 1 for CPU rendering (slightly faster), and 2 for GPU rendering"
                                                         " (slower but greater functionality, e.g., `alpha_X` flags). If -1, it will pick CPU if"
                                                         " CPU_ONLY is enabled, or GPU if CUDA is enabled. If rendering is enabled, it will render"
                                                         " both `outputData` and `cvOutputData` with the original image and desired body part to be"
-                                                        " shown (i.e. keypoints, heat maps or PAFs).");
+                                                        " shown (i.e., keypoints, heat maps or PAFs).");
 DEFINE_double(alpha_pose,               0.6,            "Blending factor (range 0-1) for the body part rendering. 1 will show it completely, 0 will"
                                                         " hide it. Only valid for GPU rendering.");
 DEFINE_double(alpha_heatmap,            0.7,            "Blending factor (range 0-1) between heatmap and original frame. 1 will only show the"

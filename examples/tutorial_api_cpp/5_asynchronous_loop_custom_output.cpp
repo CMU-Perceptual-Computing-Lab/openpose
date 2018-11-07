@@ -12,7 +12,7 @@
     // 1. `core` module:
         // For the Array<float> class that the `pose` module needs
         // For the Datum struct that the `thread` module sends between the queues
-    // 2. `utilities` module: for the error & logging functions, i.e. op::error & op::log respectively
+    // 2. `utilities` module: for the error & logging functions, i.e., op::error & op::log respectively
 // This file should only be used for the user to take specific examples.
 
 // Command-line user intraface

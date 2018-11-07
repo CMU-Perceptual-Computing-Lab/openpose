@@ -48,7 +48,7 @@ namespace op
         /**
          * Rendering threshold. Only estimated keypoints whose score confidences are higher than this value will be
          * rendered. Generally, a high threshold (> 0.5) will only render very clear body parts; while small thresholds
-         * (~0.1) will also output guessed and occluded keypoints, but also more false positives (i.e. wrong
+         * (~0.1) will also output guessed and occluded keypoints, but also more false positives (i.e., wrong
          * detections).
          */
         float renderThreshold;

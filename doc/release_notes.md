@@ -76,7 +76,7 @@ OpenPose Library - Release Notes
 
 ## OpenPose 1.0.1 (Jul 11, 2017)
 1. Main improvements:
-    1. Windows library turned into DLL dynamic library (i.e. portable).
+    1. Windows library turned into DLL dynamic library (i.e., portable).
     2. Improved documentation.
 2. Functions or parameters renamed:
     1. `openpose/utilities/macros.hpp` moved to `openpose/utilities/macros.hpp`.
@@ -282,14 +282,20 @@ OpenPose Library - Release Notes
         4. Array::Array that takes as input a pointer, so it does not re-allocate memory.
     12. Producer defined inside Wrapper rather than being defined on each example.
     13. Reduced many Visual Studio warnings (e.g., uncontrolled conversions between types).
+    14. Added new keypoint-related auxiliary functions in `utilities/keypoints.hpp`.
+    15. Function `resizeFixedAspectRatio` can take already allocated memory (e.g., faster if target is an Array<T> object, no intermediate cv::Mat required).
+    16. Added compatibility for OpenCV 4.0, while preserving 2.4.X and 3.X compatibility.
 2. Functions or parameters renamed:
     1. By default, python example `tutorial_developer/python_2_pose_from_heatmaps.py` was using 2 scales starting at -1x736, changed to 1 scale at -1x368.
     2. WrapperStructPose default parameters changed to match those of the OpenPose demo binary.
     3. WrapperT.configure() changed from 1 function that requries all arguments to individual functions that take 1 argument each.
+    4. Added `Forward` to all net classes that automatically selects between CUDA, OpenCL, or CPU-only version depending on the defines.
 3. Main bugs fixed:
     1. CMake-GUI was forcing to Release mode, allowed Debug modes too.
     2. NMS returns in index 0 the number of found peaks. However, while the number of peaks was truncated to a maximum of 127, this index 0 was saving the real number instead of the truncated one.
     3. Template functions could not be imported in Windows for projects using the OpenPose library DLL.
+    4. Function `scaleKeypoints2d` was not working if any of the scales was 1 (e.g., fail if scaleX = 1 but scaleY != 1, or if any offset was not 0).
+    5. Fixed bug in `KeepTopNPeople` that could provoke segmentation fault for `number_people_max` > 1.
 
 
 

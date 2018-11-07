@@ -22,7 +22,7 @@ const std::string OPEN_POSE_NAME_AND_VERSION = OPEN_POSE_NAME_STRING + " " + OPE
     #define OP_API __declspec(dllimport)
 #endif
 
-//Disable some Windows Warnings
+// Disable some Windows Warnings
 #ifdef _WIN32
     #pragma warning ( disable : 4251 ) // XXX needs to have dll-interface to be used by clients of class YYY
     #pragma warning( disable: 4275 ) // non dll-interface structXXX used as base
@@ -83,5 +83,37 @@ namespace boost
 {
     template <typename T> class shared_ptr; // E.g., boost::shared_ptr<caffe::Blob<float>>
 }
+
+// Compabitility for OpenCV 4.0 while preserving 2.4.X and 3.X compatibility
+#if (defined(CV_MAJOR_VERSION) && CV_MAJOR_VERSION == 4)
+    #define CV_BGR2GRAY cv::COLOR_BGR2GRAY
+    #define CV_CALIB_CB_ADAPTIVE_THRESH cv::CALIB_CB_ADAPTIVE_THRESH
+    #define CV_CALIB_CB_NORMALIZE_IMAGE cv::CALIB_CB_NORMALIZE_IMAGE
+    #define CV_CALIB_CB_FILTER_QUADS cv::CALIB_CB_FILTER_QUADS
+    #define CV_CAP_PROP_FPS cv::CAP_PROP_FPS
+    #define CV_CAP_PROP_FRAME_COUNT cv::CAP_PROP_FRAME_COUNT
+    #define CV_CAP_PROP_FRAME_HEIGHT cv::CAP_PROP_FRAME_HEIGHT
+    #define CV_CAP_PROP_FRAME_WIDTH cv::CAP_PROP_FRAME_WIDTH
+    #define CV_CAP_PROP_POS_FRAMES cv::CAP_PROP_POS_FRAMES
+    #define CV_FOURCC cv::VideoWriter::fourcc
+    #define CV_GRAY2BGR cv::COLOR_GRAY2BGR
+    #define CV_HAAR_SCALE_IMAGE cv::CASCADE_SCALE_IMAGE
+    #define CV_IMWRITE_JPEG_QUALITY cv::IMWRITE_JPEG_QUALITY
+    #define CV_IMWRITE_PNG_COMPRESSION cv::IMWRITE_PNG_COMPRESSION
+    #define CV_INTER_CUBIC cv::INTER_CUBIC
+    #define CV_INTER_LINEAR cv::INTER_LINEAR
+    #define CV_L2 cv::NORM_L2
+    #define CV_LOAD_IMAGE_ANYDEPTH cv::IMREAD_ANYDEPTH
+    #define CV_LOAD_IMAGE_COLOR cv::IMREAD_COLOR
+    #define CV_LOAD_IMAGE_GRAYSCALE cv::IMREAD_GRAYSCALE
+    #define CV_TERMCRIT_EPS cv::TermCriteria::Type::EPS
+    #define CV_TERMCRIT_ITER cv::TermCriteria::Type::MAX_ITER
+    #define CV_WARP_INVERSE_MAP cv::WARP_INVERSE_MAP
+    #define CV_WINDOW_FULLSCREEN cv::WINDOW_FULLSCREEN
+    #define CV_WINDOW_KEEPRATIO cv::WINDOW_KEEPRATIO
+    #define CV_WINDOW_NORMAL cv::WINDOW_NORMAL
+    #define CV_WINDOW_OPENGL cv::WINDOW_OPENGL
+    #define CV_WND_PROP_FULLSCREEN cv::WND_PROP_FULLSCREEN
+#endif
 
 #endif // OPENPOSE_CORE_MACROS_HPP

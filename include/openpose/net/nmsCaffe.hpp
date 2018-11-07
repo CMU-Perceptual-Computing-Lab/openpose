@@ -28,6 +28,8 @@ namespace op
         // Empirically gives better results (copied from Matlab original code)
         void setOffset(const Point<T>& offset);
 
+        virtual void Forward(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top);
+
         virtual void Forward_cpu(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top);
 
         virtual void Forward_gpu(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top);

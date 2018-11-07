@@ -37,7 +37,7 @@ There are 4 different ways to allocate the memory:
 
 3. The `reset(const std::vector<int>& size)` function: It allocates the memory indicated for size. The allocated memory equals the product of all elements in the size vector. Internally, it is saved as a 1-D std::shared_ptr<T[]>.
 
-4. The `reset(const int size)` function: equivalent for 1-dimension data (i.e. vector).
+4. The `reset(const int size)` function: equivalent for 1-dimension data (i.e., vector).
 
 5. The `setFrom(const cv::Mat& cvMat)` function: It calls `reset()` and copies the data from `cvMat`.
 
@@ -59,9 +59,9 @@ There are several functions to get information about the allocated data:
 
 3. `int getSize(const int index)`: It returns the size of the `index` dimension.
 
-4. `size_t getNumberDimensions()`: It returns the number of dimensions (i.e. getSize().size()).
+4. `size_t getNumberDimensions()`: It returns the number of dimensions (i.e., getSize().size()).
 
-5. `size_t getVolume()`: It returns the total internal number of T objects, i.e. the product of all dimensions size.
+5. `size_t getVolume()`: It returns the total internal number of T objects, i.e., the product of all dimensions size.
 
 
 ### Datum - The OpenPose Basic Piece of Information Between Threads
@@ -147,17 +147,17 @@ Classes starting by the letter `W` + upper case letter (e.g., `WGui`) directly o
 
 The easiest way to create your own Worker is to inherit Worker<T>, and implement the work() function such us it just calls a wrapper to your desired functionality (check the source code of some of our basic Workers). Since the Worker classes are templates, they are always compiled. Therefore, including your desired functionality in a different file will let you compile it only once. Otherwise, it would be compiled any time that any code which uses your worker is compiled.
 
-All OpenPose Workers are templates, i.e. they are not only limited to work with the default op::Datum. However, if you intend to use some of our Workers, your custom `TDatums` class (the one substituting op::Datum) should implement the same variables and functions that those Workers use. The easiest solution is to inherit from `op::Datum` and extend its functionality.
+All OpenPose Workers are templates, i.e., they are not only limited to work with the default op::Datum. However, if you intend to use some of our Workers, your custom `TDatums` class (the one substituting op::Datum) should implement the same variables and functions that those Workers use. The easiest solution is to inherit from `op::Datum` and extend its functionality.
 
 
 ### Creating New Workers
 Users can directly implement their own `W` from Worker<T> or any other sub-inherited Worker[...]<T> class and add them to `ThreadManager`. For that, they just need to: inherit those classes from...
 
-1. Inherit from `Worker<T>` and implement the functionality `work(T& tDatum)`, i.e. it will use and modify tDatum.
+1. Inherit from `Worker<T>` and implement the functionality `work(T& tDatum)`, i.e., it will use and modify tDatum.
 
-2. Inherit from `WorkerProducer<T>` and implement the functionality `T work()`, i.e. it will create and return tDatum.
+2. Inherit from `WorkerProducer<T>` and implement the functionality `T work()`, i.e., it will create and return tDatum.
 
-3. Inherit from `WorkerConsumer<T>` and implement the functionality `work(const T& tDatum)`, i.e. it will use but will not modify tDatum.
+3. Inherit from `WorkerConsumer<T>` and implement the functionality `work(const T& tDatum)`, i.e., it will use but will not modify tDatum.
 
 We suggest users to also start their inherited `Worker<T>` classes with the `W` letter for code clarity, required if they want to send us a pull request.
 

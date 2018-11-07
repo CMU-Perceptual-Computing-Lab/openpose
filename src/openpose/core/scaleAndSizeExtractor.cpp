@@ -65,7 +65,7 @@ namespace op
             {
                 const auto currentScale = 1. - i*mScaleGap;
                 if (currentScale < 0. || 1. < currentScale)
-                    error("All scales must be in the range [0, 1], i.e. 0 <= 1-scale_number*scale_gap <= 1",
+                    error("All scales must be in the range [0, 1], i.e., 0 <= 1-scale_number*scale_gap <= 1",
                           __LINE__, __FUNCTION__, __FILE__);
 
                 const auto targetWidth = fastTruncate(intRound(poseNetInputSize.x * currentScale) / 16 * 16, 1,

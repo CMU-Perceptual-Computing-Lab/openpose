@@ -14,7 +14,7 @@ OpenPose - Quick Start
 
 
 ## Quick Start
-Check that the library is working properly by running any of the following commands. Make sure that you are in the **root directory of the project** (i.e. in the OpenPose folder, not inside `build/` nor `windows/` nor `bin/`). In addition, `examples/media/video.avi` and `examples/media` do exist, no need to change the paths.
+Check that the library is working properly by running any of the following commands. Make sure that you are in the **root directory of the project** (i.e., in the OpenPose folder, not inside `build/` nor `windows/` nor `bin/`). In addition, `examples/media/video.avi` and `examples/media` do exist, no need to change the paths.
 
 ### Running on Video
 ```

@@ -271,7 +271,7 @@ namespace op
          * This function is only implemented for Pybind11 usage.
          * @return A raw pointer to the data.
          */
-        inline T* getPybindPtr() const
+        inline T* getPseudoConstPtr() const
         {
             return pData; // spData.get()
         }

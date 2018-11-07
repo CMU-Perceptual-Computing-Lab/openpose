@@ -71,7 +71,7 @@ namespace op
                 mJsonOfstream.plainText("1");
                 mJsonOfstream.comma();
 
-                // keypoints - i.e. poseKeypoints
+                // keypoints - i.e., poseKeypoints
                 mJsonOfstream.key("keypoints");
                 mJsonOfstream.arrayOpen();
                 std::vector<int> indexesInCocoOrder;

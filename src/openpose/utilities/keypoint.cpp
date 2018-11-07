@@ -107,7 +107,7 @@ namespace op
     {
         try
         {
-            if (!keypoints.empty() && scaleX != T(1) && scaleY != T(1))
+            if (!keypoints.empty() && (scaleX != T(1) || scaleY != T(1)))
             {
                 // Error check
                 if (keypoints.getSize(2) != 3)
@@ -141,7 +141,7 @@ namespace op
     {
         try
         {
-            if (!keypoints.empty() && scaleX != T(1) && scaleY != T(1))
+            if (!keypoints.empty() && (scaleX != T(1) || scaleY != T(1) || offsetX != T(0) || offsetY != T(0)))
             {
                 // Error check
                 if (keypoints.getSize(2) != 3)
@@ -402,4 +402,168 @@ namespace op
     }
     template OP_API int getBiggestPerson(const Array<float>& keypoints, const float threshold);
     template OP_API int getBiggestPerson(const Array<double>& keypoints, const double threshold);
+
+    template <typename T>
+    int getNonZeroKeypoints(const Array<T>& keypoints, const int person, const T threshold)
+    {
+        try
+        {
+            if (!keypoints.empty())
+            {
+                // Sanity check
+                if (keypoints.getSize(0) <= person)
+                    error("Person index out of range.", __LINE__, __FUNCTION__, __FILE__);
+                // Count keypoints
+                auto nonZeroCounter = 0;
+                const auto baseIndex = person * keypoints.getVolume(1,2);
+                for (auto part = 0 ; part < keypoints.getSize(1) ; part++)
+                    if (keypoints[baseIndex + 3*part + 2] >= threshold)
+                        nonZeroCounter++;
+                return nonZeroCounter;
+            }
+            else
+                return 0;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return 0;
+        }
+    }
+    template OP_API int getNonZeroKeypoints(const Array<float>& keypoints, const int person, const float threshold);
+    template OP_API int getNonZeroKeypoints(const Array<double>& keypoints, const int person, const double threshold);
+
+    template <typename T>
+    T getDistanceAverage(const Array<T>& keypoints, const int personA, const int personB, const T threshold)
+    {
+        try
+        {
+            return getDistanceAverage(keypoints, personA, keypoints, personB, threshold);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return T(0);
+        }
+    }
+    template OP_API float getDistanceAverage(
+        const Array<float>& keypoints, const int personA, const int personB, const float threshold);
+    template OP_API double getDistanceAverage(
+        const Array<double>& keypoints, const int personA, const int personB, const double threshold);
+
+    template <typename T>
+    T getDistanceAverage(const Array<T>& keypointsA, const int personA, const Array<T>& keypointsB, const int personB,
+                         const T threshold)
+    {
+        try
+        {
+            // Sanity checks
+            if (keypointsA.getSize(0) <= personA)
+                error("PersonA index out of range.", __LINE__, __FUNCTION__, __FILE__);
+            if (keypointsB.getSize(0) <= personB)
+                error("PersonB index out of range.", __LINE__, __FUNCTION__, __FILE__);
+            if (keypointsA.getSize(1) != keypointsB.getSize(1))
+                error("Keypoints should have the same number of keypoints.", __LINE__, __FUNCTION__, __FILE__);
+            // Get total distance
+            T totalDistance = 0;
+            int nonZeroCounter = 0;
+            const auto baseIndexA = personA * keypointsA.getVolume(1,2);
+            const auto baseIndexB = personB * keypointsB.getVolume(1,2);
+            for (auto part = 0 ; part < keypointsA.getSize(1) ; part++)
+            {
+                if (keypointsA[baseIndexA+3*part+2] >= threshold && keypointsB[baseIndexB+3*part+2] >= threshold)
+                {
+                    const auto x = keypointsA[baseIndexA+3*part] - keypointsB[baseIndexB+3*part];
+                    const auto y = keypointsA[baseIndexA+3*part+1] - keypointsB[baseIndexB+3*part+1];
+                    totalDistance += T(std::sqrt(x*x+y*y));
+                    nonZeroCounter++;
+                }
+            }
+            // Get distance average
+            return totalDistance / nonZeroCounter;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return T(0);
+        }
+    }
+    template OP_API float getDistanceAverage(
+        const Array<float>& keypointsA, const int personA, const Array<float>& keypointsB, const int personB,
+        const float threshold);
+    template OP_API double getDistanceAverage(
+        const Array<double>& keypointsA, const int personA, const Array<double>& keypointsB, const int personB,
+        const double threshold);
+
+    template <typename T>
+    float getKeypointsROI(const Array<T>& keypoints, const int personA, const int personB, const T threshold)
+    {
+        try
+        {
+            return getKeypointsROI(keypoints, personA, keypoints, personB, threshold);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return 0.f;
+        }
+    }
+    template OP_API float getKeypointsROI(
+        const Array<float>& keypoints, const int personA, const int personB, const float threshold);
+    template OP_API float getKeypointsROI(
+        const Array<double>& keypoints, const int personA, const int personB, const double threshold);
+
+    template <typename T>
+    float getKeypointsROI(const Array<T>& keypointsA, const int personA, const Array<T>& keypointsB, const int personB,
+                          const T threshold)
+    {
+        try
+        {
+            // Sanity checks
+            if (keypointsA.getSize(0) <= personA)
+                error("PersonA index out of range.", __LINE__, __FUNCTION__, __FILE__);
+            if (keypointsB.getSize(0) <= personB)
+                error("PersonB index out of range.", __LINE__, __FUNCTION__, __FILE__);
+            if (keypointsA.getSize(1) != keypointsB.getSize(1))
+                error("Keypoints should have the same number of keypoints.", __LINE__, __FUNCTION__, __FILE__);
+            // Get ROI
+            const auto rectangleA = getKeypointsRectangle(keypointsA, personA, threshold);
+            const auto rectangleB = getKeypointsRectangle(keypointsB, personB, threshold);
+            const Point<T> pointAIntersection{
+                fastMax(rectangleA.x, rectangleB.x),
+                fastMax(rectangleA.y, rectangleB.y)
+            };
+            const Point<T> pointBIntersection{
+                fastMin(rectangleA.x+rectangleA.width, rectangleB.x+rectangleB.width),
+                fastMin(rectangleA.y+rectangleA.height, rectangleB.y+rectangleB.height)
+            };
+            // Make sure there is overlap
+            if (pointAIntersection.x < pointBIntersection.x && pointAIntersection.y < pointBIntersection.y)
+            {
+                const Rectangle<T> rectangleIntersection{
+                    pointAIntersection.x,
+                    pointAIntersection.y,
+                    pointBIntersection.x-pointAIntersection.x,
+                    pointBIntersection.y-pointAIntersection.y
+                };
+                const auto areaA = rectangleA.area();
+                const auto areaB = rectangleB.area();
+                const auto intersection = rectangleIntersection.area();
+                return float(intersection) / float(areaA + areaB - intersection);
+            }
+            // If non overlap --> Return 0
+            return 0.f;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return 0.f;
+        }
+    }
+    template OP_API float getKeypointsROI(
+        const Array<float>& keypointsA, const int personA, const Array<float>& keypointsB, const int personB,
+        const float threshold);
+    template OP_API float getKeypointsROI(
+        const Array<double>& keypointsA, const int personA, const Array<double>& keypointsB, const int personB,
+        const double threshold);
 }

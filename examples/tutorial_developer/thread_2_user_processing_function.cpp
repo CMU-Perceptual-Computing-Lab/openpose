@@ -6,7 +6,7 @@
     // Everything in a multi-thread scenario (`thread` module)
 // In addition to the previous OpenPose modules, we also need to use:
     // 1. `core` module: for the Datum struct that the `thread` module sends between the queues
-    // 2. `utilities` module: for the error & logging functions, i.e. op::error & op::log respectively
+    // 2. `utilities` module: for the error & logging functions, i.e., op::error & op::log respectively
 
 // 3rdparty dependencies
 // GFlags: DEFINE_bool, _int32, _int64, _uint64, _double, _string

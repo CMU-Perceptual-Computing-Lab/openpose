@@ -18,7 +18,7 @@
 // 2. The internal temporary function variable equivalent would be thisIsAVariable.
 // 3. Every line cannot have more than 120 characters.
 // 4. If extra classes and files are required, add those extra files inside the OpenPose include and src folders,
-// under a new folder (i.e. `include/newMethod/` and `src/newMethod/`), including `namespace op` on those files.
+// under a new folder (i.e., `include/newMethod/` and `src/newMethod/`), including `namespace op` on those files.
 
 // This example is a sub-case of `tutorial_api_cpp/6_synchronous_custom_postprocessing.cpp`, where only custom post-processing is
 // considered.

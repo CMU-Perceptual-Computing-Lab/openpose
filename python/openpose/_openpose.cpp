@@ -122,7 +122,7 @@ public:
         peaksBlob = { std::make_shared<caffe::Blob<float>>(1,1,1,1) };
         bodyPartConnectorCaffe->setPoseModel(poseModel);
 
-        // Step 4 - Initialize resources on desired thread (in this case single thread, i.e. we init resources here)
+        // Step 4 - Initialize resources on desired thread (in this case single thread, i.e., we init resources here)
         poseExtractorCaffe->initializationOnThread();
         poseRenderer->initializationOnThread();
     }

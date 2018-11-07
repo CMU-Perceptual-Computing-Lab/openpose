@@ -33,6 +33,9 @@ namespace op
 
         void setScaleNetToOutput(const T scaleNetToOutput);
 
+        virtual void Forward(const std::vector<caffe::Blob<T>*>& bottom, Array<T>& poseKeypoints,
+                             Array<T>& poseScores);
+
         virtual void Forward_cpu(const std::vector<caffe::Blob<T>*>& bottom, Array<T>& poseKeypoints,
                                  Array<T>& poseScores);
 
