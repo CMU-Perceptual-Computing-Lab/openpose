@@ -149,7 +149,7 @@ namespace op
             #ifdef USE_CUDA
                 Forward_gpu(bottom, top);
             // OpenCL
-            #elif USE_OPENCL
+            #elif defined USE_OPENCL
                 Forward_ocl(bottom, top);
             // CPU
             #else

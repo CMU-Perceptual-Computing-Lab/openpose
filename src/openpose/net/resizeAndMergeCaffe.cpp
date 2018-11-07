@@ -1,13 +1,13 @@
 #ifdef USE_CAFFE
     #include <caffe/blob.hpp>
 #endif
-#include <openpose/net/resizeAndMergeBase.hpp>
-#include <openpose/utilities/fastMath.hpp>
-#include <openpose/net/resizeAndMergeCaffe.hpp>
 #ifdef USE_OPENCL
     #include <openpose/gpu/opencl.hcl>
     #include <openpose/gpu/cl2.hpp>
 #endif
+#include <openpose/net/resizeAndMergeBase.hpp>
+#include <openpose/utilities/fastMath.hpp>
+#include <openpose/net/resizeAndMergeCaffe.hpp>
 
 namespace op
 {
@@ -135,7 +135,7 @@ namespace op
             #ifdef USE_CUDA
                 Forward_gpu(bottom, top);
             // OpenCL
-            #elif USE_OPENCL
+            #elif defined USE_OPENCL
                 Forward_ocl(bottom, top);
             // CPU
             #else

@@ -496,11 +496,11 @@ namespace op
         const double threshold);
 
     template <typename T>
-    float getKeypointsROI(const Array<T>& keypoints, const int personA, const int personB, const T threshold)
+    float getKeypointsRoi(const Array<T>& keypoints, const int personA, const int personB, const T threshold)
     {
         try
         {
-            return getKeypointsROI(keypoints, personA, keypoints, personB, threshold);
+            return getKeypointsRoi(keypoints, personA, keypoints, personB, threshold);
         }
         catch (const std::exception& e)
         {
@@ -508,13 +508,13 @@ namespace op
             return 0.f;
         }
     }
-    template OP_API float getKeypointsROI(
+    template OP_API float getKeypointsRoi(
         const Array<float>& keypoints, const int personA, const int personB, const float threshold);
-    template OP_API float getKeypointsROI(
+    template OP_API float getKeypointsRoi(
         const Array<double>& keypoints, const int personA, const int personB, const double threshold);
 
     template <typename T>
-    float getKeypointsROI(const Array<T>& keypointsA, const int personA, const Array<T>& keypointsB, const int personB,
+    float getKeypointsRoi(const Array<T>& keypointsA, const int personA, const Array<T>& keypointsB, const int personB,
                           const T threshold)
     {
         try
@@ -560,10 +560,10 @@ namespace op
             return 0.f;
         }
     }
-    template OP_API float getKeypointsROI(
+    template OP_API float getKeypointsRoi(
         const Array<float>& keypointsA, const int personA, const Array<float>& keypointsB, const int personB,
         const float threshold);
-    template OP_API float getKeypointsROI(
+    template OP_API float getKeypointsRoi(
         const Array<double>& keypointsA, const int personA, const Array<double>& keypointsB, const int personB,
         const double threshold);
 }

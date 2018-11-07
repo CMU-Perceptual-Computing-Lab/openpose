@@ -48,10 +48,10 @@ namespace op
                          const T threshold);
 
     template <typename T>
-    float getKeypointsROI(const Array<T>& keypoints, const int personA, const int personB, const T threshold);
+    float getKeypointsRoi(const Array<T>& keypoints, const int personA, const int personB, const T threshold);
 
     template <typename T>
-    float getKeypointsROI(const Array<T>& keypointsA, const int personA, const Array<T>& keypointsB, const int personB,
+    float getKeypointsRoi(const Array<T>& keypointsA, const int personA, const Array<T>& keypointsB, const int personB,
                           const T threshold);
 }
 

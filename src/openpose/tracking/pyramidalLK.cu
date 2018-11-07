@@ -8,7 +8,7 @@
     #if (defined(CV_VERSION_EPOCH) && CV_VERSION_EPOCH == 2)
         #include <opencv2/gpu/gpu.hpp>
         #define cvCuda cv::gpu
-    // OpenCV 3.X
+    // OpenCV > 2
     #else
         #include <opencv2/core/cuda.hpp>
         #include <opencv2/cudaimgproc.hpp>

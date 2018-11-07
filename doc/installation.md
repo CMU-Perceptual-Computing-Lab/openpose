@@ -113,7 +113,7 @@ Any problem installing OpenPose? Check [doc/faq.md](./faq.md) and/or post a GitH
 ### Prerequisites
 1. Ubuntu - **Anaconda should not be installed** on your system. Anaconda includes a Protobuf version that is incompatible with Caffe. Either you uninstall anaconda and install protobuf via apt-get, or you compile your own Caffe and link it to OpenPose.
 2. Download and install CMake GUI:
-    - Ubuntu: run the command `sudo apt-get install cmake-qt-gui`. Note: If you prefer to use CMake through the command line, see [Cmake Command Line Build](#cmake-command-line-build-ubuntu-only).
+    - Ubuntu: run the command `sudo apt-get install cmake-qt-gui`. Note: If you prefer to use CMake through the command line, see [CMake Command Line Configuration (Ubuntu Only)](#cmake-command-line-configuration-ubuntu-only).
     - Windows: download and install the latest CMake win64-x64 msi installer from the [CMake website](https://cmake.org/download/), called `cmake-X.X.X-win64-x64.msi`.
     - Mac: `brew cask install cmake`.
 3. Windows - **Microsoft Visual Studio (VS) 2015 Enterprise Update 3**:

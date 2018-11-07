@@ -6,6 +6,7 @@
 #include <openpose/net/bodyPartConnectorCaffe.hpp>
 #include <openpose/net/maximumCaffe.hpp>
 #include <openpose/net/netCaffe.hpp>
+#include <openpose/net/netOpenCv.hpp>
 #include <openpose/net/nmsCaffe.hpp>
 #include <openpose/net/resizeAndMergeCaffe.hpp>
 #include <openpose/pose/poseParameters.hpp>
@@ -23,13 +24,13 @@ namespace op
     struct PoseExtractorCaffe::ImplPoseExtractorCaffe
     {
         #ifdef USE_CAFFE
-            // Used when increasing spCaffeNets
+            // Used when increasing spNets
             const PoseModel mPoseModel;
             const int mGpuId;
             const std::string mModelFolder;
             const bool mEnableGoogleLogging;
             // General parameters
-            std::vector<std::shared_ptr<NetCaffe>> spCaffeNets;
+            std::vector<std::shared_ptr<Net>> spNets;
             std::shared_ptr<ResizeAndMergeCaffe<float>> spResizeAndMergeCaffe;
             std::shared_ptr<NmsCaffe<float>> spNmsCaffe;
             std::shared_ptr<BodyPartConnectorCaffe<float>> spBodyPartConnectorCaffe;
@@ -114,7 +115,7 @@ namespace op
             }
         }
 
-        void addCaffeNetOnThread(std::vector<std::shared_ptr<NetCaffe>>& netCaffe,
+        void addCaffeNetOnThread(std::vector<std::shared_ptr<Net>>& net,
                                  std::vector<boost::shared_ptr<caffe::Blob<float>>>& caffeNetOutputBlob,
                                  const PoseModel poseModel, const int gpuId,
                                  const std::string& modelFolder, const bool enableGoogleLogging)
@@ -122,16 +123,23 @@ namespace op
             try
             {
                 // Add Caffe Net
-                netCaffe.emplace_back(
-                    std::make_shared<NetCaffe>(modelFolder + getPoseProtoTxt(poseModel),
-                                               modelFolder + getPoseTrainedModel(poseModel),
-                                               gpuId, enableGoogleLogging)
-                );
+                net.emplace_back(
+                    std::make_shared<NetCaffe>(
+                        modelFolder + getPoseProtoTxt(poseModel),
+                        modelFolder + getPoseTrainedModel(poseModel),
+                        gpuId, enableGoogleLogging));
+                // net.emplace_back(
+                //     std::make_shared<NetOpenCv>(
+                //         modelFolder + getPoseProtoTxt(poseModel),
+                //         modelFolder + getPoseTrainedModel(poseModel),
+                //         gpuId));
+                // UNUSED(enableGoogleLogging);
                 // Initializing them on the thread
-                netCaffe.back()->initializationOnThread();
-                caffeNetOutputBlob.emplace_back(netCaffe.back()->getOutputBlob());
+                net.back()->initializationOnThread();
+                caffeNetOutputBlob.emplace_back(((NetCaffe*)net.back().get())->getOutputBlob());
+                // caffeNetOutputBlob.emplace_back(((NetOpenCv*)net.back().get())->getOutputBlob());
                 // Sanity check
-                if (netCaffe.size() != caffeNetOutputBlob.size())
+                if (net.size() != caffeNetOutputBlob.size())
                     error("Weird error, this should not happen. Notify us.", __LINE__, __FUNCTION__, __FILE__);
                 // Cuda check
                 #ifdef USE_CUDA
@@ -188,7 +196,7 @@ namespace op
                 // Logging
                 log("Starting initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 // Initialize Caffe net
-                addCaffeNetOnThread(upImpl->spCaffeNets, upImpl->spCaffeNetOutputBlobs, upImpl->mPoseModel,
+                addCaffeNetOnThread(upImpl->spNets, upImpl->spCaffeNetOutputBlobs, upImpl->mPoseModel,
                                     upImpl->mGpuId, upImpl->mModelFolder, upImpl->mEnableGoogleLogging);
                 #ifdef USE_CUDA
                     cudaCheck(__LINE__, __FUNCTION__, __FILE__);
@@ -231,8 +239,8 @@ namespace op
                 // Resize std::vectors if required
                 const auto numberScales = inputNetData.size();
                 upImpl->mNetInput4DSizes.resize(numberScales);
-                while (upImpl->spCaffeNets.size() < numberScales)
-                    addCaffeNetOnThread(upImpl->spCaffeNets, upImpl->spCaffeNetOutputBlobs, upImpl->mPoseModel,
+                while (upImpl->spNets.size() < numberScales)
+                    addCaffeNetOnThread(upImpl->spNets, upImpl->spCaffeNetOutputBlobs, upImpl->mPoseModel,
                                         upImpl->mGpuId, upImpl->mModelFolder, false);
 
                 // Process each image
@@ -240,7 +248,7 @@ namespace op
                 {
                     // 1. Caffe deep network
                     // ~80ms
-                    upImpl->spCaffeNets.at(i)->forwardPass(inputNetData[i]);
+                    upImpl->spNets.at(i)->forwardPass(inputNetData[i]);
 
                     // Reshape blobs if required
                     // Note: In order to resize to input size to have same results as Matlab, uncomment the commented
@@ -387,7 +395,7 @@ namespace op
 
                             // Re-Process image
                             // 1. Caffe deep network
-                            upImpl->spCaffeNets.at(0)->forwardPass(inputNetDataRoi);
+                            upImpl->spNets.at(0)->forwardPass(inputNetDataRoi);
                             std::vector<boost::shared_ptr<caffe::Blob<float>>> caffeNetOutputBlob{upImpl->spCaffeNetOutputBlobs[0]};
                             // Reshape blobs
                             if (!vectorsAreEqual(upImpl->mNetInput4DSizes.at(0), inputNetDataRoi.getSize()))
@@ -461,7 +469,7 @@ namespace op
                                 for (auto person2 = 0 ; person2 < poseKeypoints.getSize(0) ; person2++)
                                 {
                                     // Get ROI
-                                    const auto currentRoi = getKeypointsROI(
+                                    const auto currentRoi = getKeypointsRoi(
                                         mPoseKeypoints, person, poseKeypoints, person2, nmsThreshold);
                                     // Update person
                                     if (personRoi < currentRoi
@@ -527,7 +535,7 @@ namespace op
                                         //         if (person != person2)
                                         //         {
                                         //             // Get ROI
-                                        //             const auto currentRoi = getKeypointsROI(
+                                        //             const auto currentRoi = getKeypointsRoi(
                                         //                 mPoseKeypoints, person, person2, nmsThreshold);
                                         //             // Update person
                                         //             if (currentRoi > 0.f)

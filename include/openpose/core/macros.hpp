@@ -7,6 +7,7 @@
 #include <string>
 #include <thread> // std::this_thread
 #include <vector>
+#include <opencv2/core/core.hpp> // cv::Mat, check OpenCV version
 
 // OpenPose name and version
 const std::string OPEN_POSE_NAME_STRING = "OpenPose";
@@ -85,7 +86,16 @@ namespace boost
 }
 
 // Compabitility for OpenCV 4.0 while preserving 2.4.X and 3.X compatibility
-#if (defined(CV_MAJOR_VERSION) && CV_MAJOR_VERSION == 4)
+// Note:
+// - CV_VERSION:         2.4.9.1 | 4.0.0-beta
+// - CV_MAJOR_VERSION:         2 | 4
+// - CV_MINOR_VERSION:         4 | 0
+// - CV_SUBMINOR_VERSION:      9 | 0
+// - CV_VERSION_EPOCH:         2 | Not defined
+#if (defined(CV_MAJOR_VERSION) && CV_MAJOR_VERSION > 3)
+    #define OPEN_CV_IS_4_OR_HIGHER
+#endif
+#ifdef OPEN_CV_IS_4_OR_HIGHER
     #define CV_BGR2GRAY cv::COLOR_BGR2GRAY
     #define CV_CALIB_CB_ADAPTIVE_THRESH cv::CALIB_CB_ADAPTIVE_THRESH
     #define CV_CALIB_CB_NORMALIZE_IMAGE cv::CALIB_CB_NORMALIZE_IMAGE

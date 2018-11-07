@@ -73,7 +73,7 @@ public:
 #ifdef USE_CUDA
         caffe::Caffe::set_mode(caffe::Caffe::GPU);
         caffe::Caffe::SetDevice(mGpuID);
-#elif USE_OPENCL
+#elif defined USE_OPENCL
         caffe::Caffe::set_mode(caffe::Caffe::GPU);
         std::vector<int> devices;
         const int maxNumberGpu = op::OpenCL::getTotalGPU();
@@ -217,7 +217,7 @@ public:
         std::vector<caffe::Blob<float>*> peaksBlobs{ peaksBlob.get() };
 #ifdef USE_CUDA
         resizeAndMergeCaffe->Forward_gpu(caffeNetOutputBlobs, heatMapsBlobs); // ~5ms
-#elif USE_OPENCL
+#elif defined USE_OPENCL
         resizeAndMergeCaffe->Forward_ocl(caffeNetOutputBlobs, heatMapsBlobs); // ~5ms
 #else
         resizeAndMergeCaffe->Forward_cpu(caffeNetOutputBlobs, heatMapsBlobs); // ~5ms
@@ -226,7 +226,7 @@ public:
         nmsCaffe->setThreshold((float)poseExtractorCaffe->get(op::PoseProperty::NMSThreshold));
 #ifdef USE_CUDA
         nmsCaffe->Forward_gpu(heatMapsBlobs, peaksBlobs);// ~2ms
-#elif USE_OPENCL
+#elif defined USE_OPENCL
         nmsCaffe->Forward_ocl(heatMapsBlobs, peaksBlobs);// ~2ms
 #else
         nmsCaffe->Forward_cpu(heatMapsBlobs, peaksBlobs);// ~2ms
