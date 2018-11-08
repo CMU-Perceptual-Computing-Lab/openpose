@@ -496,6 +496,24 @@ namespace op
         const double threshold);
 
     template <typename T>
+    Array<T> getKeypointsPerson(const Array<T>& keypoints, const int person, const bool noCopy)
+    {
+        try
+        {
+            return Array<T>(keypoints, person, noCopy);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return Array<T>{};
+        }
+    }
+    template OP_API Array<float> getKeypointsPerson(
+        const Array<float>& keypoints, const int person, const bool noCopy);
+    template OP_API Array<double> getKeypointsPerson(
+        const Array<double>& keypoints, const int person, const bool noCopy);
+
+    template <typename T>
     float getKeypointsRoi(const Array<T>& keypoints, const int personA, const int personB, const T threshold)
     {
         try

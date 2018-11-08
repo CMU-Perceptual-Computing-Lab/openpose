@@ -285,6 +285,7 @@ OpenPose Library - Release Notes
     14. Added new keypoint-related auxiliary functions in `utilities/keypoints.hpp`.
     15. Function `resizeFixedAspectRatio` can take already allocated memory (e.g., faster if target is an Array<T> object, no intermediate cv::Mat required).
     16. Added compatibility for OpenCV 4.0, while preserving 2.4.X and 3.X compatibility.
+    17. Improved and added several functions to `utilities/keypoints.hpp` and Array to simplify keypoint post-processing.
 2. Functions or parameters renamed:
     1. By default, python example `tutorial_developer/python_2_pose_from_heatmaps.py` was using 2 scales starting at -1x736, changed to 1 scale at -1x368.
     2. WrapperStructPose default parameters changed to match those of the OpenPose demo binary.

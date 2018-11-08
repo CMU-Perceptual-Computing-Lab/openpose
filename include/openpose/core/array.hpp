@@ -74,6 +74,20 @@ namespace op
         Array(const std::vector<int>& sizes, T* const dataPtr);
 
         /**
+         * Array constructor.
+         * @param array Array<T> with the original data array to slice.
+         * @param index indicates the index of the array to extract.
+         * @param noCopy indicates whether to perform a copy. Copy will never go to undefined behavior, however, if
+         * noCopy == true, then:
+         *     1. It is faster, as no data copy is involved, but...
+         *     2. If the Array array goes out of scope, then the resulting Array will provoke an undefined behavior.
+         *     3. If the returned Array is modified, the information in the Array array will also be.
+         * @return Array<T> with the same dimension than array expect the first dimension being 1. E.g., if array
+         * is {p,k,m}, the resulting Array<T> is {1,k,m}.
+         */
+        Array(const Array<T>& array, const int index, const bool noCopy = false);
+
+        /**
          * Copy constructor.
          * It performs `fast copy`: For performance purpose, copying a Array<T> or Datum or cv::Mat just copies the
          * reference, it still shares the same internal data.
@@ -225,10 +239,12 @@ namespace op
          * Similar to getVolume(), but in this case it just returns the volume between the desired dimensions.
          * E.g., for a Array<T> of size = {2,5,3}, the volume or total number of elements for getVolume(1,2) is
          * 5x3 = 15.
+         * @param indexA Dimension where to start.
+         * @param indexB Dimension where to stop. If indexB == -1, then it will take up to the last dimension.
          * @return The total volume of the allocated data between the desired dimensions. If the index are out of
          * bounds, it throws an error.
          */
-        size_t getVolume(const int indexA, const int indexB) const;
+        size_t getVolume(const int indexA, const int indexB = -1) const;
 
         /**
          * Return the stride or step size of the array.
