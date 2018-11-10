@@ -5,7 +5,7 @@
 #include <openpose/headers.hpp>
 
 // Output callback register in Unity
-typedef void(__stdcall * OutputCallback) (uchar ** ptrs, int ptrSize, int * sizes, int sizeSize, uchar outputType);
+typedef void(__stdcall * OutputCallback) (void * ptrs, int ptrSize, int * sizes, int sizeSize, uchar outputType);
 
 // Global output callback
 OutputCallback unityOutputCallback;
@@ -43,7 +43,7 @@ protected:
 	void workConsumer(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
 		try	{
 			if (datumsPtr != nullptr && !datumsPtr->empty()) {				
-				/*if (unityOutputEnabled) {
+				if (unityOutputEnabled) {
 					sendDatumsInfoAndName(datumsPtr);
 					sendPoseKeypoints(datumsPtr);
 					sendPoseIds(datumsPtr);
@@ -56,7 +56,8 @@ protected:
 					sendHandRectangles(datumsPtr);
 					sendHandKeypoints(datumsPtr);
 					sendHandHeatMaps(datumsPtr);
-				}*/
+					sendEndOfFrame();
+				}
 			}
 		} catch (const std::exception& e) {
 			op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
@@ -67,8 +68,7 @@ private:
 	template<class T>
 	void outputValue(T ** ptrs, int ptrSize, int * sizes, int sizeSize, OutputType outputType) {
 		if (!unityOutputCallback) return;
-		uchar ** bytePtrs = static_cast<uchar**>(static_cast<void*>(ptrs));
-		unityOutputCallback(bytePtrs, ptrSize, sizes, sizeSize, (uchar)outputType);
+		unityOutputCallback(static_cast<void*>(ptrs), ptrSize, sizes, sizeSize, (uchar)outputType);
 	}
 
 	void sendDatumsInfoAndName(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
@@ -208,6 +208,9 @@ private:
 			outputValue(ptrs, 2, sizes, sizeSize, OutputType::HandHeightMaps);
 		}
 	}
+	void sendEndOfFrame() {
+		outputValue((void**)nullptr, 0, nullptr, 0, OutputType::None);
+	}
 };
 
 // Global user output
@@ -226,8 +229,7 @@ void openpose_main() {
 	try {
 		// Starting
 		if (ptrUserOutput) return;
-		op::log("Starting OpenPose demo...", op::Priority::High);
-		const auto timerBegin = std::chrono::high_resolution_clock::now();
+		op::log("Starting OpenPose...");
 
 		// OpenPose wrapper
 		auto spWrapper = std::make_shared<op::Wrapper>();
@@ -248,48 +250,54 @@ void openpose_main() {
 		spWrapper->configure(*spWrapperStructInput);
 		spWrapper->configure(*spWrapperStructOutput);
 
-		// Start processing
-		op::log("Starting thread(s)...", op::Priority::High);
+		// Processing...
 		spWrapper->exec();
 
-		// Running ...... Ending
-
-		// Measuring total time
-		const auto now = std::chrono::high_resolution_clock::now();
-		const auto totalTimeSec = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(now - timerBegin).count()
-			* 1e-9;
-		const auto message = "OpenPose demo successfully finished. Total time: "
-			+ std::to_string(totalTimeSec) + " seconds.";
-		op::log(message, op::Priority::High);
-
-		// Reset pointer
+		// Ending
+		op::log("OpenPose finished");
 		ptrUserOutput = nullptr;
 	} catch (const std::exception& e) {
 		op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
 	}
-}
+};
 
 // Functions called from Unity
 extern "C" {
 	// Start openpose safely
 	OP_API void OP_Run() {
-		if (ptrUserOutput == nullptr) 
+		try {
 			openpose_main();
+		} catch (const std::exception& e) {
+			op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+		}
 	}
 	// Stop openpose safely
 	OP_API void OP_Shutdown() {
-		if (ptrUserOutput != nullptr) {
-			op::log("Stopping...");
-			ptrUserOutput->stop();
+		try {
+			if (ptrUserOutput != nullptr) {
+				op::log("Stopping...");
+				ptrUserOutput->stop();
+			}
+		} catch (const std::exception& e) {
+			op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
 		}
 	}
 	// Register Unity output callback function
 	OP_API void OP_RegisterOutputCallback(OutputCallback callback) {
-		unityOutputCallback = callback;
+		try {
+			unityOutputCallback = callback;
+		}
+		catch (const std::exception& e) {
+			op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+		}
 	}
 	// Enable/disable output callback
 	OP_API void OP_SetOutputEnable(bool enable) {
-		unityOutputEnabled = enable;
+		try {
+			unityOutputEnabled = enable;
+		} catch (const std::exception& e) {
+			op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+		}
 	}
 	// Configs
 	OP_API void OP_ConfigurePose(
