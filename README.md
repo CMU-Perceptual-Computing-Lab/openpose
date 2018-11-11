@@ -10,6 +10,8 @@
 
 [OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose) represents the **first real-time multi-person system to jointly detect human body, hand, facial, and foot keypoints (in total 135 keypoints) on single images**.
 
+[README.md简体中文版：Simplified Chinese](CMU-Perceptual-Computing-Lab)
+
 <p align="center">
     <img src="doc/media/pose_face_hands.gif", width="480">
 </p>
