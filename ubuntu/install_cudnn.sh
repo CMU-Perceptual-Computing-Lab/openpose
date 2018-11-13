@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Install cuDNN 5.1
 ubuntu_version="$(lsb_release -r)"
 CUDNN_URL="http://developer.download.nvidia.com/compute/redist/cudnn/v5.1/cudnn-8.0-linux-x64-v5.1.tgz"
