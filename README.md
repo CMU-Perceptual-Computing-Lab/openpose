@@ -159,7 +159,7 @@ We would also like to thank all the people who helped OpenPose in any way. The m
 
 
 ## Citation
-Please cite these papers in your publications if it helps your research (the face keypoint detector was trained using the same procedure described in [Simon et al. 2017]):
+Please cite these papers in your publications if it helps your research (the face keypoint detector was trained using the procedure described in [Simon et al. 2017] for hands):
 
     @inproceedings{cao2017realtime,
       author = {Zhe Cao and Tomas Simon and Shih-En Wei and Yaser Sheikh},
@@ -181,6 +181,12 @@ Please cite these papers in your publications if it helps your research (the fac
       title = {Convolutional pose machines},
       year = {2016}
     }
+
+Links to the papers:
+
+- [Realtime Multi-Person 2D Pose Estimation using Part Affinity Fields](https://arxiv.org/abs/1611.08050)
+- [Hand Keypoint Detection in Single Images using Multiview Bootstrapping](https://arxiv.org/abs/1704.07809)
+- [Convolutional Pose Machines](https://arxiv.org/abs/1602.00134)
 
 
 
