@@ -10,6 +10,7 @@ namespace op
                                       const WrapperStructExtra& wrapperStructExtra,
                                       const WrapperStructInput& wrapperStructInput,
                                       const WrapperStructOutput& wrapperStructOutput,
+                                      const WrapperStructGui& wrapperStructGui,
                                       const bool renderOutput,
                                       const bool userOutputWsEmpty,
                                       const std::shared_ptr<Producer>& producerSharedPtr,
@@ -66,7 +67,7 @@ namespace op
                 const auto savingCvOutput = (
                     !wrapperStructOutput.writeImages.empty() || !wrapperStructOutput.writeVideo.empty()
                 );
-                const bool guiEnabled = (wrapperStructOutput.displayMode != DisplayMode::NoDisplay);
+                const bool guiEnabled = (wrapperStructGui.displayMode != DisplayMode::NoDisplay);
                 if (!guiEnabled && !savingCvOutput && renderOutput)
                 {
                     const auto message = "GUI is not enabled and you are not saving the output frames. You should then"
@@ -89,7 +90,7 @@ namespace op
                     error(message, __LINE__, __FUNCTION__, __FILE__);
                 }
                 // Warnings
-                if (guiEnabled && wrapperStructOutput.guiVerbose && !renderOutput)
+                if (guiEnabled && wrapperStructGui.guiVerbose && !renderOutput)
                 {
                     const auto message = "No render is enabled (e.g., `--render_pose 0`), so you might also want to"
                                          " remove the display (set `--display 0` or `--no_gui_verbose`). If you"

@@ -96,15 +96,14 @@ namespace op
          * It has the recommended and default values we recommend for each element of the struct.
          * Since all the elements of the struct are public, they can also be manually filled.
          */
-        WrapperStructInput(const ProducerType producerType = ProducerType::None,
-                           const std::string& producerString = "", const unsigned long long frameFirst = 0,
-                           const unsigned long long frameStep = 1,
-                           const unsigned long long frameLast = std::numeric_limits<unsigned long long>::max(),
-                           const bool realTimeProcessing = false, const bool frameFlip = false,
-                           const int frameRotate = 0, const bool framesRepeat = false,
-                           const Point<int>& cameraResolution = Point<int>{-1,-1}, const double webcamFps = 30.,
-                           const std::string& cameraParameterPath = "models/cameraParameters/",
-                           const bool undistortImage = true, const unsigned int imageDirectoryStereo = 1);
+        WrapperStructInput(
+            const ProducerType producerType = ProducerType::None, const std::string& producerString = "",
+            const unsigned long long frameFirst = 0, const unsigned long long frameStep = 1,
+            const unsigned long long frameLast = std::numeric_limits<unsigned long long>::max(),
+            const bool realTimeProcessing = false, const bool frameFlip = false, const int frameRotate = 0,
+            const bool framesRepeat = false, const Point<int>& cameraResolution = Point<int>{-1,-1},
+            const double webcamFps = 30., const std::string& cameraParameterPath = "models/cameraParameters/",
+            const bool undistortImage = true, const unsigned int imageDirectoryStereo = 1);
     };
 }
 

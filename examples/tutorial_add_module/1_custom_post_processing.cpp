@@ -109,14 +109,17 @@ int tutorialAddModule1()
             cameraSize, FLAGS_camera_fps, FLAGS_camera_parameter_folder, !FLAGS_frame_keep_distortion,
             (unsigned int) FLAGS_3d_views};
         opWrapperT.configure(wrapperStructInput);
-        // Consumer (comment or use default argument to disable any output)
+        // Output (comment or use default argument to disable any output)
         const op::WrapperStructOutput wrapperStructOutput{
-            op::flagsToDisplayMode(FLAGS_display, FLAGS_3d), !FLAGS_no_gui_verbose, FLAGS_fullscreen,
             FLAGS_write_keypoint, op::stringToDataFormat(FLAGS_write_keypoint_format), FLAGS_write_json,
             FLAGS_write_coco_json, FLAGS_write_coco_foot_json, FLAGS_write_coco_json_variant, FLAGS_write_images,
             FLAGS_write_images_format, FLAGS_write_video, FLAGS_camera_fps, FLAGS_write_heatmaps,
             FLAGS_write_heatmaps_format, FLAGS_write_video_adam, FLAGS_write_bvh, FLAGS_udp_host, FLAGS_udp_port};
         opWrapperT.configure(wrapperStructOutput);
+        // GUI (comment or use default argument to disable any visual output)
+        const op::WrapperStructGui wrapperStructGui{
+            op::flagsToDisplayMode(FLAGS_display, FLAGS_3d), !FLAGS_no_gui_verbose, FLAGS_fullscreen};
+        opWrapperT.configure(wrapperStructGui);
 
         // Custom post-processing
         auto userPostProcessing = std::make_shared<op::UserPostProcessing>(/* Your class arguments here */);

@@ -80,12 +80,11 @@ namespace op
          * It has the recommended and default values we recommend for each element of the struct.
          * Since all the elements of the struct are public, they can also be manually filled.
          */
-        WrapperStructHand(const bool enable = false, const Point<int>& netInputSize = Point<int>{368, 368},
-                          const int scalesNumber = 1, const float scaleRange = 0.4f,
-                          const bool tracking = false, const RenderMode renderMode = RenderMode::Gpu,
-                          const float alphaKeypoint = HAND_DEFAULT_ALPHA_KEYPOINT,
-                          const float alphaHeatMap = HAND_DEFAULT_ALPHA_HEAT_MAP,
-                          const float renderThreshold = 0.2f);
+        WrapperStructHand(
+            const bool enable = false, const Point<int>& netInputSize = Point<int>{368, 368},
+            const int scalesNumber = 1, const float scaleRange = 0.4f, const bool tracking = false,
+            const RenderMode renderMode = RenderMode::Gpu, const float alphaKeypoint = HAND_DEFAULT_ALPHA_KEYPOINT,
+            const float alphaHeatMap = HAND_DEFAULT_ALPHA_HEAT_MAP, const float renderThreshold = 0.2f);
     };
 }
 

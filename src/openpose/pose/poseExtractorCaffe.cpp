@@ -98,7 +98,7 @@ namespace op
                                              getPoseNetDecreaseFactor(poseModel), 1.f/scaleInputToNetInput, true,
                                              gpuID);
                 // Pose extractor blob and layer
-                nmsCaffe->Reshape({heatMapsBlob.get()}, {peaksBlob.get()}, getPoseMaxPeaks(poseModel),
+                nmsCaffe->Reshape({heatMapsBlob.get()}, {peaksBlob.get()}, getPoseMaxPeaks(),
                                   getPoseNumberBodyParts(poseModel), gpuID);
                 // Pose extractor blob and layer
                 bodyPartConnectorCaffe->Reshape({heatMapsBlob.get(), peaksBlob.get()});

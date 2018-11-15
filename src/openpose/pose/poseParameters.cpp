@@ -448,23 +448,6 @@ namespace op
             16,18,17,18,16,19,17,19,   0,7,3,17,6,12,16,14,   6,21,7,20,3,21,20,14
         },
     };
-    const std::array<unsigned int, (int)PoseModel::Size> POSE_MAX_PEAKS{
-        POSE_MAX_PEOPLE,    // BODY_25
-        POSE_MAX_PEOPLE,    // COCO
-        POSE_MAX_PEOPLE,    // MPI_15
-        POSE_MAX_PEOPLE,    // MPI_15_4
-        POSE_MAX_PEOPLE,    // BODY_19
-        POSE_MAX_PEOPLE,    // BODY_19_X2
-        POSE_MAX_PEOPLE,    // BODY_59
-        POSE_MAX_PEOPLE,    // BODY_19N
-        POSE_MAX_PEOPLE,    // BODY_25E
-        POSE_MAX_PEOPLE,    // BODY_25_19
-        POSE_MAX_PEOPLE,    // BODY_65
-        POSE_MAX_PEOPLE,    // CAR_12
-        POSE_MAX_PEOPLE,    // BODY_25D
-        POSE_MAX_PEOPLE,    // BODY_23
-        POSE_MAX_PEOPLE,    // CAR_22
-    };
     const std::array<float, (int)PoseModel::Size> POSE_CCN_DECREASE_FACTOR{
         8.f,    // BODY_25
         8.f,    // COCO
@@ -561,11 +544,11 @@ namespace op
         }
     }
 
-    unsigned int getPoseMaxPeaks(const PoseModel poseModel)
+    unsigned int getPoseMaxPeaks()
     {
         try
         {
-            return POSE_MAX_PEAKS.at((int)poseModel);
+            return POSE_MAX_PEOPLE;
         }
         catch (const std::exception& e)
         {

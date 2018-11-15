@@ -6,6 +6,7 @@
 #include <openpose/wrapper/enumClasses.hpp>
 #include <openpose/wrapper/wrapperStructExtra.hpp>
 #include <openpose/wrapper/wrapperStructFace.hpp>
+#include <openpose/wrapper/wrapperStructGui.hpp>
 #include <openpose/wrapper/wrapperStructHand.hpp>
 #include <openpose/wrapper/wrapperStructInput.hpp>
 #include <openpose/wrapper/wrapperStructOutput.hpp>
@@ -71,29 +72,34 @@ namespace op
         void configure(const WrapperStructPose& wrapperStructPose);
 
         /**
-         * Analogous to configure() but applied to only pose (WrapperStructFace)
+         * Analogous to configure(WrapperStructPose) but applied to face (WrapperStructFace)
          */
         void configure(const WrapperStructFace& wrapperStructFace);
 
         /**
-         * Analogous to configure() but applied to only pose (WrapperStructHand)
+         * Analogous to configure() but applied to hand (WrapperStructHand)
          */
         void configure(const WrapperStructHand& wrapperStructHand);
 
         /**
-         * Analogous to configure() but applied to only pose (WrapperStructExtra)
+         * Analogous to configure() but applied to the extra options (WrapperStructExtra)
          */
         void configure(const WrapperStructExtra& wrapperStructExtra);
 
         /**
-         * Analogous to configure() but applied to only pose (WrapperStructInput)
+         * Analogous to configure() but applied to the input (WrapperStructInput)
          */
         void configure(const WrapperStructInput& wrapperStructInput);
 
         /**
-         * Analogous to configure() but applied to only pose (WrapperStructInput)
+         * Analogous to configure() but applied to the output (WrapperStructOutput)
          */
         void configure(const WrapperStructOutput& wrapperStructOutput);
+
+        /**
+         * Analogous to configure() but applied to the GUI (WrapperStructGui)
+         */
+        void configure(const WrapperStructGui& wrapperStructGui);
 
         /**
          * Function to start multi-threading.
@@ -201,6 +207,7 @@ namespace op
         WrapperStructExtra mWrapperStructExtra;
         WrapperStructInput mWrapperStructInput;
         WrapperStructOutput mWrapperStructOutput;
+        WrapperStructGui mWrapperStructGui;
         // User configurable workers
         std::array<bool, int(WorkerType::Size)> mUserWsOnNewThread;
         std::array<std::vector<TWorker>, int(WorkerType::Size)> mUserWs;
@@ -358,13 +365,26 @@ namespace op
     }
 
     template<typename TDatums, typename TDatumsSP, typename TWorker>
+    void WrapperT<TDatums, TDatumsSP, TWorker>::configure(const WrapperStructGui& wrapperStructGui)
+    {
+        try
+        {
+            mWrapperStructGui = wrapperStructGui;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    template<typename TDatums, typename TDatumsSP, typename TWorker>
     void WrapperT<TDatums, TDatumsSP, TWorker>::exec()
     {
         try
         {
             configureThreadManager<TDatums, TDatumsSP, TWorker>(
                 mThreadManager, mMultiThreadEnabled, mThreadManagerMode, mWrapperStructPose, mWrapperStructFace,
-                mWrapperStructHand, mWrapperStructExtra, mWrapperStructInput, mWrapperStructOutput,
+                mWrapperStructHand, mWrapperStructExtra, mWrapperStructInput, mWrapperStructOutput, mWrapperStructGui,
                 mUserWs, mUserWsOnNewThread);
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             mThreadManager.exec();
@@ -382,7 +402,7 @@ namespace op
         {
             configureThreadManager<TDatums, TDatumsSP, TWorker>(
                 mThreadManager, mMultiThreadEnabled, mThreadManagerMode, mWrapperStructPose, mWrapperStructFace,
-                mWrapperStructHand, mWrapperStructExtra, mWrapperStructInput, mWrapperStructOutput,
+                mWrapperStructHand, mWrapperStructExtra, mWrapperStructInput, mWrapperStructOutput, mWrapperStructGui,
                 mUserWs, mUserWsOnNewThread);
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             mThreadManager.start();

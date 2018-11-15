@@ -294,6 +294,8 @@ OpenPose Library - Release Notes
     3. WrapperT.configure() changed from 1 function that requries all arguments to individual functions that take 1 argument each.
     4. Added `Forward` to all net classes that automatically selects between CUDA, OpenCL, or CPU-only version depending on the defines.
     5. Previously hardcoded `COCO_CHALLENGE` variable turned into user configurable flag `--maximize_positives`.
+    6. Removed old COCO 2014 validation scripts.
+    7. WrapperStructOutput split into WrapperStructOutput and WrapperStructGui.
 3. Main bugs fixed:
     1. CMake-GUI was forcing to Release mode, allowed Debug modes too.
     2. NMS returns in index 0 the number of found peaks. However, while the number of peaks was truncated to a maximum of 127, this index 0 was saving the real number instead of the truncated one.

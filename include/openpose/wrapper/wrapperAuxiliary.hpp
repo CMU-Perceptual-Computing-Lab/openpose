@@ -5,6 +5,7 @@
 #include <openpose/wrapper/enumClasses.hpp>
 #include <openpose/wrapper/wrapperStructExtra.hpp>
 #include <openpose/wrapper/wrapperStructFace.hpp>
+#include <openpose/wrapper/wrapperStructGui.hpp>
 #include <openpose/wrapper/wrapperStructHand.hpp>
 #include <openpose/wrapper/wrapperStructInput.hpp>
 #include <openpose/wrapper/wrapperStructOutput.hpp>
@@ -29,8 +30,8 @@ namespace op
         WrapperStructPose& wrapperStructPose, const WrapperStructFace& wrapperStructFace,
         const WrapperStructHand& wrapperStructHand, const WrapperStructExtra& wrapperStructExtra,
         const WrapperStructInput& wrapperStructInput, const WrapperStructOutput& wrapperStructOutput,
-        const bool renderOutput, const bool userOutputWsEmpty, const std::shared_ptr<Producer>& producerSharedPtr,
-        const ThreadManagerMode threadManagerMode);
+        const WrapperStructGui& wrapperStructGui, const bool renderOutput, const bool userOutputWsEmpty,
+        const std::shared_ptr<Producer>& producerSharedPtr, const ThreadManagerMode threadManagerMode);
 
     /**
      * Thread ID increase (private internal function).
@@ -56,7 +57,7 @@ namespace op
         const ThreadManagerMode threadManagerMode, const WrapperStructPose& wrapperStructPose,
         const WrapperStructFace& wrapperStructFace, const WrapperStructHand& wrapperStructHand,
         const WrapperStructExtra& wrapperStructExtra, const WrapperStructInput& wrapperStructInput,
-        const WrapperStructOutput& wrapperStructOutput,
+        const WrapperStructOutput& wrapperStructOutput, const WrapperStructGui& wrapperStructGui,
         const std::array<std::vector<TWorker>, int(WorkerType::Size)>& userWs,
         const std::array<bool, int(WorkerType::Size)>& userWsOnNewThread);
 }
@@ -86,7 +87,7 @@ namespace op
         const ThreadManagerMode threadManagerMode, const WrapperStructPose& wrapperStructPoseTemp,
         const WrapperStructFace& wrapperStructFace, const WrapperStructHand& wrapperStructHand,
         const WrapperStructExtra& wrapperStructExtra, const WrapperStructInput& wrapperStructInput,
-        const WrapperStructOutput& wrapperStructOutput,
+        const WrapperStructOutput& wrapperStructOutput, const WrapperStructGui& wrapperStructGui,
         const std::array<std::vector<TWorker>, int(WorkerType::Size)>& userWs,
         const std::array<bool, int(WorkerType::Size)>& userWsOnNewThread)
     {
@@ -146,7 +147,8 @@ namespace op
             const auto userOutputWsEmpty = userOutputWs.empty();
             wrapperConfigureSanityChecks(
                 wrapperStructPose, wrapperStructFace, wrapperStructHand, wrapperStructExtra, wrapperStructInput,
-                wrapperStructOutput, renderOutput, userOutputWsEmpty, producerSharedPtr, threadManagerMode);
+                wrapperStructOutput, wrapperStructGui, renderOutput, userOutputWsEmpty, producerSharedPtr,
+                threadManagerMode);
 
             // Get number threads
             auto numberThreads = wrapperStructPose.gpuNumber;
@@ -562,8 +564,8 @@ namespace op
             }
 
             // IK/Adam
-            const auto displayAdam = wrapperStructOutput.displayMode == DisplayMode::DisplayAdam
-                                     || (wrapperStructOutput.displayMode == DisplayMode::DisplayAll
+            const auto displayAdam = wrapperStructGui.displayMode == DisplayMode::DisplayAdam
+                                     || (wrapperStructGui.displayMode == DisplayMode::DisplayAll
                                          && wrapperStructExtra.ikThreads > 0);
             jointAngleEstimationsWs.clear();
 #ifdef USE_3D_ADAM_MODEL
@@ -676,12 +678,12 @@ namespace op
                 outputWs.emplace_back(std::make_shared<WHeatMapSaver<TDatumsSP>>(heatMapSaver));
             }
             // Add frame information for GUI
-            const bool guiEnabled = (wrapperStructOutput.displayMode != DisplayMode::NoDisplay);
+            const bool guiEnabled = (wrapperStructGui.displayMode != DisplayMode::NoDisplay);
             // If this WGuiInfoAdder instance is placed before the WImageSaver or WVideoSaver, then the resulting
             // recorded frames will look exactly as the final displayed image by the GUI
-            if (wrapperStructOutput.guiVerbose && (guiEnabled || !userOutputWs.empty()
-                                                   || threadManagerMode == ThreadManagerMode::Asynchronous
-                                                   || threadManagerMode == ThreadManagerMode::AsynchronousOut))
+            if (wrapperStructGui.guiVerbose && (guiEnabled || !userOutputWs.empty()
+                                                || threadManagerMode == ThreadManagerMode::Asynchronous
+                                                || threadManagerMode == ThreadManagerMode::AsynchronousOut))
             {
                 const auto guiInfoAdder = std::make_shared<GuiInfoAdder>(numberThreads, guiEnabled);
                 outputWs.emplace_back(std::make_shared<WGuiInfoAdder<TDatumsSP>>(guiInfoAdder));
@@ -704,9 +706,9 @@ namespace op
 #ifdef USE_3D_ADAM_MODEL
                     // Gui
                     const auto gui = std::make_shared<GuiAdam>(
-                        finalOutputSize, wrapperStructOutput.fullScreen, threadManager.getIsRunningSharedPtr(),
+                        finalOutputSize, wrapperStructGui.fullScreen, threadManager.getIsRunningSharedPtr(),
                         spVideoSeek, poseExtractorNets, faceExtractorNets, handExtractorNets, renderers,
-                        wrapperStructOutput.displayMode, JointAngleEstimation::getTotalModel(),
+                        wrapperStructGui.displayMode, JointAngleEstimation::getTotalModel(),
                         wrapperStructOutput.writeVideoAdam
                     );
                     // WGui
@@ -714,24 +716,24 @@ namespace op
 #endif
                 }
                 // 3-D (+2-D) display
-                else if (wrapperStructOutput.displayMode == DisplayMode::Display3D
-                    || wrapperStructOutput.displayMode == DisplayMode::DisplayAll)
+                else if (wrapperStructGui.displayMode == DisplayMode::Display3D
+                    || wrapperStructGui.displayMode == DisplayMode::DisplayAll)
                 {
                     // Gui
                     const auto gui = std::make_shared<Gui3D>(
-                        finalOutputSize, wrapperStructOutput.fullScreen, threadManager.getIsRunningSharedPtr(),
+                        finalOutputSize, wrapperStructGui.fullScreen, threadManager.getIsRunningSharedPtr(),
                         spVideoSeek, poseExtractorNets, faceExtractorNets, handExtractorNets, renderers,
-                        wrapperStructPose.poseModel, wrapperStructOutput.displayMode
+                        wrapperStructPose.poseModel, wrapperStructGui.displayMode
                     );
                     // WGui
                     guiW = {std::make_shared<WGui3D<TDatumsSP>>(gui)};
                 }
                 // 2-D display
-                else if (wrapperStructOutput.displayMode == DisplayMode::Display2D)
+                else if (wrapperStructGui.displayMode == DisplayMode::Display2D)
                 {
                     // Gui
                     const auto gui = std::make_shared<Gui>(
-                        finalOutputSize, wrapperStructOutput.fullScreen, threadManager.getIsRunningSharedPtr(),
+                        finalOutputSize, wrapperStructGui.fullScreen, threadManager.getIsRunningSharedPtr(),
                         spVideoSeek, poseExtractorNets, faceExtractorNets, handExtractorNets, renderers
                     );
                     // WGui

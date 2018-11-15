@@ -20,7 +20,7 @@ namespace op
     OP_API unsigned int getPoseNumberBodyParts(const PoseModel poseModel);
     OP_API const std::vector<unsigned int>& getPosePartPairs(const PoseModel poseModel);
     OP_API const std::vector<unsigned int>& getPoseMapIndex(const PoseModel poseModel);
-    OP_API unsigned int getPoseMaxPeaks(const PoseModel poseModel);
+    OP_API unsigned int getPoseMaxPeaks();
     OP_API float getPoseNetDecreaseFactor(const PoseModel poseModel);
     OP_API unsigned int poseBodyPartMapStringToKey(const PoseModel poseModel, const std::string& string);
     OP_API unsigned int poseBodyPartMapStringToKey(const PoseModel poseModel, const std::vector<std::string>& strings);
