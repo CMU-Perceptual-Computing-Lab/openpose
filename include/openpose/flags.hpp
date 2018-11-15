@@ -82,6 +82,8 @@ DEFINE_int32(number_people_max,         -1,             "This parameter will lim
                                                         " number of people in the scene, so it can remove false positives (if all the people have"
                                                         " been detected. However, it might also include false negatives by removing very small or"
                                                         " highly occluded people. -1 will keep them all.");
+DEFINE_bool(maximize_positives,         false,          "It reduces the thresholds to accept a person candidate. It highly increases both false and"
+                                                        " true positives. I.e., it maximizes average recall but could harm average precision.");
 // OpenPose Body Pose
 DEFINE_bool(body_disable,               false,          "Disable body keypoint detection. Option only possible for faster (but less accurate) face"
                                                         " keypoint detection.");

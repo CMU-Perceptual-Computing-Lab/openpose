@@ -159,6 +159,13 @@ namespace op
         int numberPeopleMax;
 
         /**
+         * Whether to maximize the number of positives.
+         * It reduces the thresholds to accept a person candidate. It highly increases both false and true positives.
+         * I.e., it maximizes average recall but could harm average precision.
+         */
+        bool maximizePositives;
+
+        /**
          * Whether to internally enable Google Logging.
          * This option is only applicable if Caffe is used.
          * Only disable it if the user is already calling google::InitGoogleLogging() in his code.
@@ -184,7 +191,7 @@ namespace op
                           const std::vector<HeatMapType>& heatMapTypes = {},
                           const ScaleMode heatMapScale = ScaleMode::ZeroToOne, const bool addPartCandidates = false,
                           const float renderThreshold = 0.05f, const int numberPeopleMax = -1,
-                          const bool enableGoogleLogging = true);
+                          const bool maximizePositives = false, const bool enableGoogleLogging = true);
     };
 }
 

@@ -263,7 +263,8 @@ namespace op
                         poseExtractorNets.emplace_back(std::make_shared<PoseExtractorCaffe>(
                             wrapperStructPose.poseModel, modelFolder, gpuId + gpuNumberStart,
                             wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale,
-                            wrapperStructPose.addPartCandidates, wrapperStructPose.enableGoogleLogging
+                            wrapperStructPose.addPartCandidates, wrapperStructPose.maximizePositives,
+                            wrapperStructPose.enableGoogleLogging
                         ));
 
                     // Pose renderers

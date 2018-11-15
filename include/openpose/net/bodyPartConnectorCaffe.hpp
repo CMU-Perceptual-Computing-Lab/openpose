@@ -23,6 +23,8 @@ namespace op
 
         void setPoseModel(const PoseModel poseModel);
 
+        void setMaximizePositives(const bool maximizePositives);
+
         void setInterMinAboveThreshold(const T interMinAboveThreshold);
 
         void setInterThreshold(const T interThreshold);
@@ -50,6 +52,7 @@ namespace op
 
     private:
         PoseModel mPoseModel;
+        bool mMaximizePositives;
         T mInterMinAboveThreshold;
         T mInterThreshold;
         int mMinSubsetCnt;

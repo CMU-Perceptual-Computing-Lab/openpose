@@ -55,7 +55,7 @@ int handFromJsonTest()
                                                 op::ScaleMode::InputResolution, FLAGS_num_gpu, FLAGS_num_gpu_start,
                                                 1, 0.15f, op::RenderMode::None, op::PoseModel::BODY_25,
                                                 true, 0.f, 0.f, 0, "models/", {}, op::ScaleMode::ZeroToOne, false,
-                                                0.05f, -1, enableGoogleLogging};
+                                                0.05f, -1, false, enableGoogleLogging};
         wrapperStructPose.modelFolder = FLAGS_model_folder;
         // Hand configuration (use op::WrapperStructHand{} to disable it)
         const op::WrapperStructHand wrapperStructHand{FLAGS_hand, handNetInputSize, FLAGS_hand_scale_number,

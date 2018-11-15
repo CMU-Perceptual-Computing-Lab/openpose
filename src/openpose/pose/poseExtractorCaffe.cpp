@@ -156,8 +156,8 @@ namespace op
     PoseExtractorCaffe::PoseExtractorCaffe(const PoseModel poseModel, const std::string& modelFolder,
                                            const int gpuId, const std::vector<HeatMapType>& heatMapTypes,
                                            const ScaleMode heatMapScale, const bool addPartCandidates,
-                                           const bool enableGoogleLogging) :
-        PoseExtractorNet{poseModel, heatMapTypes, heatMapScale, addPartCandidates}
+                                           const bool maximizePositives, const bool enableGoogleLogging) :
+        PoseExtractorNet{poseModel, heatMapTypes, heatMapScale, addPartCandidates, maximizePositives}
         #ifdef USE_CAFFE
         , upImpl{new ImplPoseExtractorCaffe{poseModel, gpuId, modelFolder, enableGoogleLogging}}
         #endif
@@ -167,6 +167,7 @@ namespace op
             #ifdef USE_CAFFE
                 // Layers parameters
                 upImpl->spBodyPartConnectorCaffe->setPoseModel(upImpl->mPoseModel);
+                upImpl->spBodyPartConnectorCaffe->setMaximizePositives(maximizePositives);
             #else
                 UNUSED(poseModel);
                 UNUSED(modelFolder);

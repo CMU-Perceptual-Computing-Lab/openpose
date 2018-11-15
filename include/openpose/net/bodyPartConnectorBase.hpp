@@ -10,7 +10,8 @@ namespace op
     void connectBodyPartsCpu(
         Array<T>& poseKeypoints, Array<T>& poseScores, const T* const heatMapPtr, const T* const peaksPtr,
         const PoseModel poseModel, const Point<int>& heatMapSize, const int maxPeaks, const T interMinAboveThreshold,
-        const T interThreshold, const int minSubsetCnt, const T minSubsetScore, const T scaleFactor = 1.f);
+        const T interThreshold, const int minSubsetCnt, const T minSubsetScore, const T scaleFactor = 1.f,
+        const bool maximizePositives = false);
 
     // Windows: Cuda functions do not include OP_API
     template <typename T>
@@ -18,7 +19,7 @@ namespace op
         Array<T>& poseKeypoints, Array<T>& poseScores, const T* const heatMapGpuPtr, const T* const peaksPtr,
         const PoseModel poseModel, const Point<int>& heatMapSize, const int maxPeaks, const T interMinAboveThreshold,
         const T interThreshold, const int minSubsetCnt, const T minSubsetScore, const T scaleFactor = 1.f,
-        Array<T> pairScoresCpu = Array<T>{}, T* pairScoresGpuPtr = nullptr,
+        const bool maximizePositives = false, Array<T> pairScoresCpu = Array<T>{}, T* pairScoresGpuPtr = nullptr,
         const unsigned int* const bodyPartPairsGpuPtr = nullptr, const unsigned int* const mapIdxGpuPtr = nullptr,
         const T* const peaksGpuPtr = nullptr);
 
@@ -34,7 +35,7 @@ namespace op
     void removePeopleBelowThresholds(std::vector<int>& validSubsetIndexes, int& numberPeople,
                                             const std::vector<std::pair<std::vector<int>, T>>& subsets,
                                             const unsigned int numberBodyParts, const int minSubsetCnt,
-                                            const T minSubsetScore, const int maxPeaks);
+                                            const T minSubsetScore, const int maxPeaks, const bool maximizePositives);
 
     template <typename T>
     void peopleVectorToPeopleArray(Array<T>& poseKeypoints, Array<T>& poseScores, const T scaleFactor,

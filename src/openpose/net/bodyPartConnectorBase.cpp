@@ -617,7 +617,8 @@ namespace op
     void removePeopleBelowThresholds(std::vector<int>& validSubsetIndexes, int& numberPeople,
                                      const std::vector<std::pair<std::vector<int>, T>>& peopleVector,
                                      const unsigned int numberBodyParts, const int minSubsetCnt,
-                                     const T minSubsetScore, const int maxPeaks)
+                                     const T minSubsetScore, const int maxPeaks,
+                                     const bool maximizePositives)
     {
         try
         {
@@ -635,7 +636,7 @@ namespace op
                 // same foot usually appears as both left and right keypoints)
                 // Pros: Removed tons of false positives
                 // Cons: Standalone leg will never be recorded
-                if (!COCO_CHALLENGE && numberBodyParts == 25)
+                if (!maximizePositives && numberBodyParts == 25)
                 {
                     // No consider foot keypoints for that
                     for (auto i = 19 ; i < 25 ; i++)
@@ -1097,7 +1098,8 @@ namespace op
     void connectBodyPartsCpu(Array<T>& poseKeypoints, Array<T>& poseScores, const T* const heatMapPtr,
                              const T* const peaksPtr, const PoseModel poseModel, const Point<int>& heatMapSize,
                              const int maxPeaks, const T interMinAboveThreshold, const T interThreshold,
-                             const int minSubsetCnt, const T minSubsetScore, const T scaleFactor)
+                             const int minSubsetCnt, const T minSubsetScore, const T scaleFactor,
+                             const bool maximizePositives)
     {
         try
         {
@@ -1124,7 +1126,7 @@ namespace op
             std::vector<int> validSubsetIndexes;
             validSubsetIndexes.reserve(fastMin((size_t)maxPeaks, peopleVector.size()));
             removePeopleBelowThresholds(validSubsetIndexes, numberPeople, peopleVector, numberBodyParts, minSubsetCnt,
-                                        minSubsetScore, maxPeaks);
+                                        minSubsetScore, maxPeaks, maximizePositives);
 
             // Fill and return poseKeypoints
             peopleVectorToPeopleArray(poseKeypoints, poseScores, scaleFactor, peopleVector, validSubsetIndexes,
@@ -1148,12 +1150,12 @@ namespace op
         Array<float>& poseKeypoints, Array<float>& poseScores, const float* const heatMapPtr,
         const float* const peaksPtr, const PoseModel poseModel, const Point<int>& heatMapSize, const int maxPeaks,
         const float interMinAboveThreshold, const float interThreshold, const int minSubsetCnt,
-        const float minSubsetScore, const float scaleFactor);
+        const float minSubsetScore, const float scaleFactor, const bool maximizePositives);
     template OP_API void connectBodyPartsCpu(
         Array<double>& poseKeypoints, Array<double>& poseScores, const double* const heatMapPtr,
         const double* const peaksPtr, const PoseModel poseModel, const Point<int>& heatMapSize, const int maxPeaks,
         const double interMinAboveThreshold, const double interThreshold, const int minSubsetCnt,
-        const double minSubsetScore, const double scaleFactor);
+        const double minSubsetScore, const double scaleFactor, const bool maximizePositives);
 
     template OP_API std::vector<std::pair<std::vector<int>, float>> createPeopleVector(
         const float* const heatMapPtr, const float* const peaksPtr, const PoseModel poseModel,
@@ -1172,12 +1174,12 @@ namespace op
         std::vector<int>& validSubsetIndexes, int& numberPeople,
         const std::vector<std::pair<std::vector<int>, float>>& peopleVector,
         const unsigned int numberBodyParts,
-        const int minSubsetCnt, const float minSubsetScore, const int maxPeaks);
+        const int minSubsetCnt, const float minSubsetScore, const int maxPeaks, const bool maximizePositives);
     template OP_API void removePeopleBelowThresholds(
         std::vector<int>& validSubsetIndexes, int& numberPeople,
         const std::vector<std::pair<std::vector<int>, double>>& peopleVector,
         const unsigned int numberBodyParts,
-        const int minSubsetCnt, const double minSubsetScore, const int maxPeaks);
+        const int minSubsetCnt, const double minSubsetScore, const int maxPeaks, const bool maximizePositives);
 
     template OP_API void peopleVectorToPeopleArray(
         Array<float>& poseKeypoints, Array<float>& poseScores, const float scaleFactor,

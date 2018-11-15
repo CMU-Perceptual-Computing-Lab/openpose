@@ -286,11 +286,14 @@ OpenPose Library - Release Notes
     15. Function `resizeFixedAspectRatio` can take already allocated memory (e.g., faster if target is an Array<T> object, no intermediate cv::Mat required).
     16. Added compatibility for OpenCV 4.0, while preserving 2.4.X and 3.X compatibility.
     17. Improved and added several functions to `utilities/keypoints.hpp` and Array to simplify keypoint post-processing.
+    18. Removed warnings from Spinnaker SDK at compiling time.
+    19. All bash scripts incorporate `#!/bin/bash` to tell the terminal that they are bash scripts.
 2. Functions or parameters renamed:
     1. By default, python example `tutorial_developer/python_2_pose_from_heatmaps.py` was using 2 scales starting at -1x736, changed to 1 scale at -1x368.
     2. WrapperStructPose default parameters changed to match those of the OpenPose demo binary.
     3. WrapperT.configure() changed from 1 function that requries all arguments to individual functions that take 1 argument each.
     4. Added `Forward` to all net classes that automatically selects between CUDA, OpenCL, or CPU-only version depending on the defines.
+    5. Previously hardcoded `COCO_CHALLENGE` variable turned into user configurable flag `--maximize_positives`.
 3. Main bugs fixed:
     1. CMake-GUI was forcing to Release mode, allowed Debug modes too.
     2. NMS returns in index 0 the number of found peaks. However, while the number of peaks was truncated to a maximum of 127, this index 0 was saving the real number instead of the truncated one.

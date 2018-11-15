@@ -1,3 +1,7 @@
+#!/bin/bash
+
+
+
 # Disclaimer:
 # Script for internal use. We might make continuous changess on it and we will not answer questions about it.
 
