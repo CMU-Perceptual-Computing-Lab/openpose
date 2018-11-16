@@ -204,6 +204,10 @@ DEFINE_int32(display,                   -1,             "Display mode: -1 for au
                                                         " and/or to slightly speed up the processing if visual output is not required); 2 for 2-D"
                                                         " display; 3 for 3-D display (if `--3d` enabled); and 1 for both 2-D and 3-D display.");
 #endif // OPENPOSE_FLAGS_DISABLE_DISPLAY
+// Command Line Interface Verbose
+DEFINE_double(cli_verbose,              -1.f,           "If -1, it will be disabled (default). If it is a positive integer number, it will print on"
+                                                        " the command line every `verbose` frames. If number in the range (0,1), it will print the"
+                                                        " progress every `verbose` times the total of frames.");
 // Result Saving
 DEFINE_string(write_images,             "",             "Directory to write rendered frames in `write_images_format` image format.");
 DEFINE_string(write_images_format,      "png",          "File extension and format for `write_images`, e.g., png, jpg or bmp. Check the OpenCV"
@@ -230,7 +234,7 @@ DEFINE_string(write_keypoint_format,    "yml",          "(Deprecated, use `write
 DEFINE_string(write_video_adam,         "",             "Experimental, not available yet. E.g., `~/Desktop/adamResult.avi`. Flag `camera_fps`"
                                                         " controls FPS.");
 DEFINE_string(write_bvh,                "",             "Experimental, not available yet. E.g., `~/Desktop/mocapResult.bvh`.");
-// UDP communication
+// UDP Communication
 DEFINE_string(udp_host,                 "",             "Experimental, not available yet. IP for UDP communication. E.g., `192.168.0.1`.");
 DEFINE_string(udp_port,                 "8051",         "Experimental, not available yet. Port number for UDP communication.");
 #endif // OPENPOSE_FLAGS_DISABLE_POSE

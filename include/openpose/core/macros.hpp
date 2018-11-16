@@ -108,14 +108,9 @@ namespace boost
     #define CV_FOURCC cv::VideoWriter::fourcc
     #define CV_GRAY2BGR cv::COLOR_GRAY2BGR
     #define CV_HAAR_SCALE_IMAGE cv::CASCADE_SCALE_IMAGE
-    #define CV_IMWRITE_JPEG_QUALITY cv::IMWRITE_JPEG_QUALITY
-    #define CV_IMWRITE_PNG_COMPRESSION cv::IMWRITE_PNG_COMPRESSION
     #define CV_INTER_CUBIC cv::INTER_CUBIC
     #define CV_INTER_LINEAR cv::INTER_LINEAR
     #define CV_L2 cv::NORM_L2
-    #define CV_LOAD_IMAGE_ANYDEPTH cv::IMREAD_ANYDEPTH
-    #define CV_LOAD_IMAGE_COLOR cv::IMREAD_COLOR
-    #define CV_LOAD_IMAGE_GRAYSCALE cv::IMREAD_GRAYSCALE
     #define CV_TERMCRIT_EPS cv::TermCriteria::Type::EPS
     #define CV_TERMCRIT_ITER cv::TermCriteria::Type::MAX_ITER
     #define CV_WARP_INVERSE_MAP cv::WARP_INVERSE_MAP
@@ -124,6 +119,23 @@ namespace boost
     #define CV_WINDOW_NORMAL cv::WINDOW_NORMAL
     #define CV_WINDOW_OPENGL cv::WINDOW_OPENGL
     #define CV_WND_PROP_FULLSCREEN cv::WND_PROP_FULLSCREEN
+    // Required for alpha and beta versions, but not for rc version
+    #include <opencv2/imgcodecs/imgcodecs.hpp>
+    #ifndef CV_IMWRITE_JPEG_QUALITY
+        #define CV_IMWRITE_JPEG_QUALITY cv::IMWRITE_JPEG_QUALITY
+    #endif
+    #ifndef CV_IMWRITE_PNG_COMPRESSION
+        #define CV_IMWRITE_PNG_COMPRESSION cv::IMWRITE_PNG_COMPRESSION
+    #endif
+    #ifndef CV_LOAD_IMAGE_ANYDEPTH
+        #define CV_LOAD_IMAGE_ANYDEPTH cv::IMREAD_ANYDEPTH
+    #endif
+    #ifndef CV_LOAD_IMAGE_COLOR
+        #define CV_LOAD_IMAGE_COLOR cv::IMREAD_COLOR
+    #endif
+    #ifndef CV_LOAD_IMAGE_GRAYSCALE
+        #define CV_LOAD_IMAGE_GRAYSCALE cv::IMREAD_GRAYSCALE
+    #endif
 #endif
 
 #endif // OPENPOSE_CORE_MACROS_HPP

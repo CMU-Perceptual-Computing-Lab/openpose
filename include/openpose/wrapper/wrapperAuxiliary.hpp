@@ -584,7 +584,15 @@ namespace op
 
             // Output workers
             outputWs.clear();
+            // Print verbose
+            if (wrapperStructOutput.verbose > 0.)
+            {
+                const auto verbosePrinter = std::make_shared<VerbosePrinter>(
+                    wrapperStructOutput.verbose, producerSharedPtr->get(CV_CAP_PROP_FRAME_COUNT));
+                outputWs.emplace_back(std::make_shared<WVerbosePrinter<TDatumsSP>>(verbosePrinter));
+            }
             // Send information (e.g., to Unity) though UDP client-server communication
+
 #ifdef USE_3D_ADAM_MODEL
             if (!wrapperStructOutput.udpHost.empty() && !wrapperStructOutput.udpPort.empty())
             {

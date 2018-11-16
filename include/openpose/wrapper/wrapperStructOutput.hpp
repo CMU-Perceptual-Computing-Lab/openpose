@@ -13,6 +13,14 @@ namespace op
     struct OP_API WrapperStructOutput
     {
         /**
+         * Output verbose in the command line.
+         * If -1, it will be disabled (default). If it is a positive integer number, it will print on"
+         * the command line every `verbose` frames. If number in the range (0,1), it will print the"
+         * progress every `verbose` times the total of frames.
+         */
+        double verbose;
+
+        /**
          * Pose (x, y, score) locations saving folder location.
          * If it is empty (default), it is disabled.
          * Select format with writeKeypointFormat.
@@ -122,14 +130,14 @@ namespace op
          * Since all the elements of the struct are public, they can also be manually filled.
          */
         WrapperStructOutput(
-            const std::string& writeKeypoint = "", const DataFormat writeKeypointFormat = DataFormat::Xml,
-            const std::string& writeJson = "", const std::string& writeCocoJson = "",
-            const std::string& writeCocoFootJson = "", const int writeCocoJsonVariant = 1,
-            const std::string& writeImages = "", const std::string& writeImagesFormat = "",
-            const std::string& writeVideo = "", const double writeVideoFps = 30.,
-            const std::string& writeHeatMaps = "", const std::string& writeHeatMapsFormat = "",
-            const std::string& writeVideoAdam = "", const std::string& writeBvh = "",
-            const std::string& udpHost = "", const std::string& udpPort = "");
+            const double verbose = -1, const std::string& writeKeypoint = "",
+            const DataFormat writeKeypointFormat = DataFormat::Xml, const std::string& writeJson = "",
+            const std::string& writeCocoJson = "", const std::string& writeCocoFootJson = "",
+            const int writeCocoJsonVariant = 1, const std::string& writeImages = "",
+            const std::string& writeImagesFormat = "", const std::string& writeVideo = "",
+            const double writeVideoFps = 30., const std::string& writeHeatMaps = "",
+            const std::string& writeHeatMapsFormat = "", const std::string& writeVideoAdam = "",
+            const std::string& writeBvh = "", const std::string& udpHost = "", const std::string& udpPort = "");
     };
 }
 

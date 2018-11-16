@@ -1,28 +1,28 @@
-#ifndef OPENPOSE_POSE_W_POSE_RENDERER_HPP
-#define OPENPOSE_POSE_W_POSE_RENDERER_HPP
+#ifndef OPENPOSE_CORE_W_VERBOSE_PRINTER_HPP
+#define OPENPOSE_CORE_W_VERBOSE_PRINTER_HPP
 
 #include <openpose/core/common.hpp>
-#include <openpose/pose/poseRenderer.hpp>
+#include <openpose/core/verbosePrinter.hpp>
 #include <openpose/thread/worker.hpp>
 
 namespace op
 {
     template<typename TDatums>
-    class WPoseRenderer : public Worker<TDatums>
+    class WVerbosePrinter : public Worker<TDatums>
     {
     public:
-        explicit WPoseRenderer(const std::shared_ptr<PoseRenderer>& poseRendererSharedPtr);
+        explicit WVerbosePrinter(const std::shared_ptr<VerbosePrinter>& verbosePrinter);
 
-        virtual ~WPoseRenderer();
+        virtual ~WVerbosePrinter();
 
         void initializationOnThread();
 
         void work(TDatums& tDatums);
 
     private:
-        std::shared_ptr<PoseRenderer> spPoseRenderer;
+        const std::shared_ptr<VerbosePrinter> spVerbosePrinter;
 
-        DELETE_COPY(WPoseRenderer);
+        DELETE_COPY(WVerbosePrinter);
     };
 }
 
@@ -35,31 +35,24 @@ namespace op
 namespace op
 {
     template<typename TDatums>
-    WPoseRenderer<TDatums>::WPoseRenderer(const std::shared_ptr<PoseRenderer>& poseRendererSharedPtr) :
-        spPoseRenderer{poseRendererSharedPtr}
+    WVerbosePrinter<TDatums>::WVerbosePrinter(
+        const std::shared_ptr<VerbosePrinter>& verbosePrinter) :
+        spVerbosePrinter{verbosePrinter}
     {
     }
 
     template<typename TDatums>
-    WPoseRenderer<TDatums>::~WPoseRenderer()
+    WVerbosePrinter<TDatums>::~WVerbosePrinter()
     {
     }
 
     template<typename TDatums>
-    void WPoseRenderer<TDatums>::initializationOnThread()
+    void WVerbosePrinter<TDatums>::initializationOnThread()
     {
-        try
-        {
-            spPoseRenderer->initializationOnThread();
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-        }
     }
 
     template<typename TDatums>
-    void WPoseRenderer<TDatums>::work(TDatums& tDatums)
+    void WVerbosePrinter<TDatums>::work(TDatums& tDatums)
     {
         try
         {
@@ -69,11 +62,12 @@ namespace op
                 dLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 // Profiling speed
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
-                // Render people pose
-                for (auto& tDatum : *tDatums)
-                    tDatum.elementRendered = spPoseRenderer->renderPose(
-                        tDatum.outputData, tDatum.poseKeypoints, (float)tDatum.scaleInputToOutput,
-                        (float)tDatum.scaleNetToOutput);
+                // Print verbose
+                if (checkNoNullNorEmpty(tDatums))
+                {
+                    const auto tDatum = (*tDatums)[0];
+                    spVerbosePrinter->printVerbose(tDatum.frameNumber);
+                }
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
                 Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);
@@ -89,7 +83,7 @@ namespace op
         }
     }
 
-    COMPILE_TEMPLATE_DATUM(WPoseRenderer);
+    COMPILE_TEMPLATE_DATUM(WVerbosePrinter);
 }
 
-#endif // OPENPOSE_POSE_W_POSE_RENDERER_HPP
+#endif // OPENPOSE_CORE_W_VERBOSE_PRINTER_HPP
