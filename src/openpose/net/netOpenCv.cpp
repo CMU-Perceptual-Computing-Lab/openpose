@@ -1,12 +1,19 @@
+// TODO: After completely adding the OpenCV DNN module, add this flag to CMake as alternative to USE_CAFFE
+// #define USE_OPEN_CV_DNN
+
 // Note: OpenCV only uses CPU or OpenCL (for Intel GPUs). Used CUDA for following blobs (Resize + NMS)
 #include <openpose/core/macros.hpp> // OPEN_CV_IS_4_OR_HIGHER
 #ifdef USE_CAFFE
     #include <caffe/net.hpp>
 #endif
-#if defined(USE_CAFFE) && defined(USE_CUDA) && defined(OPEN_CV_IS_4_OR_HIGHER)
-    #define OPEN_CV_DNN_AVAILABLE
-    #include <opencv2/opencv.hpp>
-    #include <openpose/gpu/cuda.hpp>
+#ifdef USE_OPEN_CV_DNN
+    #if defined(USE_CAFFE) && defined(USE_CUDA) && defined(OPEN_CV_IS_4_OR_HIGHER)
+        #include <opencv2/opencv.hpp>
+        #include <openpose/gpu/cuda.hpp>
+    #else
+        #error In order to enable OpenCV DNN module in OpenPose, the CMake flags of Caffe and CUDA must be \
+               enabled, and OpenCV version must be at least 4.0.0.
+    #endif
 #endif
 #include <numeric> // std::accumulate
 #include <openpose/utilities/fileSystem.hpp>
@@ -16,7 +23,7 @@ namespace op
 {
     struct NetOpenCv::ImplNetOpenCv
     {
-        #ifdef OPEN_CV_DNN_AVAILABLE
+        #ifdef USE_OPEN_CV_DNN
             // Init with constructor
             const int mGpuId;
             const std::string mCaffeProto;
@@ -60,7 +67,7 @@ namespace op
         #endif
     };
 
-    #ifdef OPEN_CV_DNN_AVAILABLE
+    #ifdef USE_OPEN_CV_DNN
         inline void reshapeNetOpenCv(caffe::Net<float>* caffeNet, const std::vector<int>& dimensions)
         {
             try
@@ -79,13 +86,13 @@ namespace op
     #endif
 
     NetOpenCv::NetOpenCv(const std::string& caffeProto, const std::string& caffeTrainedModel, const int gpuId)
-        #ifdef OPEN_CV_DNN_AVAILABLE
+        #ifdef USE_OPEN_CV_DNN
             : upImpl{new ImplNetOpenCv{caffeProto, caffeTrainedModel, gpuId}}
         #endif
     {
         try
         {
-            #ifndef OPEN_CV_DNN_AVAILABLE
+            #ifndef USE_OPEN_CV_DNN
                 UNUSED(caffeProto);
                 UNUSED(caffeTrainedModel);
                 UNUSED(gpuId);
@@ -111,7 +118,7 @@ namespace op
     {
         try
         {
-            #ifdef OPEN_CV_DNN_AVAILABLE
+            #ifdef USE_OPEN_CV_DNN
                 upImpl->mNet.setInput(inputData.getConstCvMat());
                 upImpl->mNetOutputBlob = upImpl->mNet.forward(); // 99% of the runtime here
                 std::vector<int> outputSize(upImpl->mNetOutputBlob.dims,0);
@@ -136,7 +143,7 @@ namespace op
     {
         try
         {
-            #ifdef OPEN_CV_DNN_AVAILABLE
+            #ifdef USE_OPEN_CV_DNN
                 return upImpl->spOutputBlob;
             #else
                 return nullptr;
