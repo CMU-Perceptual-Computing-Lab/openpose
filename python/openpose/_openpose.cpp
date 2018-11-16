@@ -188,7 +188,7 @@ public:
         resizeAndMergeCaffe->Reshape(caffeNetOutputBlobs, { heatMapsBlob.get() },
             op::getPoseNetDecreaseFactor(poseModel), 1.f / 1.f, true,
             0);
-        nmsCaffe->Reshape({ heatMapsBlob.get() }, { peaksBlob.get() }, op::getPoseMaxPeaks(poseModel),
+        nmsCaffe->Reshape({ heatMapsBlob.get() }, { peaksBlob.get() }, op::getPoseMaxPeaks(),
             op::getPoseNumberBodyParts(poseModel), 0);
         bodyPartConnectorCaffe->Reshape({ heatMapsBlob.get(), peaksBlob.get() });
 
