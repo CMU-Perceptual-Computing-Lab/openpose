@@ -14,11 +14,11 @@
 
 // Syntax rules
 // 1. Class/template variables start by up (unique_ptr), sp (sahred_ptr), p (pointer) or m (non-pointer), and they
-// have no underscores, e.g.: mThisIsAVariable.
+// have no underscores, e.g., mThisIsAVariable.
 // 2. The internal temporary function variable equivalent would be thisIsAVariable.
 // 3. Every line cannot have more than 120 characters.
 // 4. If extra classes and files are required, add those extra files inside the OpenPose include and src folders,
-// under a new folder (i.e. `include/newMethod/` and `src/newMethod/`), including `namespace op` on those files.
+// under a new folder (i.e., `include/newMethod/` and `src/newMethod/`), including `namespace op` on those files.
 
 // This example is a sub-case of `tutorial_api_cpp/6_synchronous_custom_postprocessing.cpp`, where only custom post-processing is
 // considered.
@@ -85,7 +85,7 @@ int tutorialAddModule1()
             FLAGS_scale_number, (float)FLAGS_scale_gap, op::flagsToRenderMode(FLAGS_render_pose, multipleView),
             poseModel, !FLAGS_disable_blending, (float)FLAGS_alpha_pose, (float)FLAGS_alpha_heatmap,
             FLAGS_part_to_show, FLAGS_model_folder, heatMapTypes, heatMapScale, FLAGS_part_candidates,
-            (float)FLAGS_render_threshold, FLAGS_number_people_max, enableGoogleLogging};
+            (float)FLAGS_render_threshold, FLAGS_number_people_max, FLAGS_maximize_positives, enableGoogleLogging};
         opWrapperT.configure(wrapperStructPose);
         // Face configuration (use op::WrapperStructFace{} to disable it)
         const op::WrapperStructFace wrapperStructFace{
@@ -109,14 +109,17 @@ int tutorialAddModule1()
             cameraSize, FLAGS_camera_fps, FLAGS_camera_parameter_folder, !FLAGS_frame_keep_distortion,
             (unsigned int) FLAGS_3d_views};
         opWrapperT.configure(wrapperStructInput);
-        // Consumer (comment or use default argument to disable any output)
+        // Output (comment or use default argument to disable any output)
         const op::WrapperStructOutput wrapperStructOutput{
-            op::flagsToDisplayMode(FLAGS_display, FLAGS_3d), !FLAGS_no_gui_verbose, FLAGS_fullscreen,
-            FLAGS_write_keypoint, op::stringToDataFormat(FLAGS_write_keypoint_format), FLAGS_write_json,
-            FLAGS_write_coco_json, FLAGS_write_coco_foot_json, FLAGS_write_images, FLAGS_write_images_format,
-            FLAGS_write_video, FLAGS_camera_fps, FLAGS_write_heatmaps, FLAGS_write_heatmaps_format,
-            FLAGS_write_video_adam, FLAGS_write_bvh, FLAGS_udp_host, FLAGS_udp_port};
+            FLAGS_cli_verbose, FLAGS_write_keypoint, op::stringToDataFormat(FLAGS_write_keypoint_format),
+            FLAGS_write_json, FLAGS_write_coco_json, FLAGS_write_coco_foot_json, FLAGS_write_coco_json_variant,
+            FLAGS_write_images, FLAGS_write_images_format, FLAGS_write_video, FLAGS_camera_fps, FLAGS_write_heatmaps,
+            FLAGS_write_heatmaps_format, FLAGS_write_video_adam, FLAGS_write_bvh, FLAGS_udp_host, FLAGS_udp_port};
         opWrapperT.configure(wrapperStructOutput);
+        // GUI (comment or use default argument to disable any visual output)
+        const op::WrapperStructGui wrapperStructGui{
+            op::flagsToDisplayMode(FLAGS_display, FLAGS_3d), !FLAGS_no_gui_verbose, FLAGS_fullscreen};
+        opWrapperT.configure(wrapperStructGui);
 
         // Custom post-processing
         auto userPostProcessing = std::make_shared<op::UserPostProcessing>(/* Your class arguments here */);

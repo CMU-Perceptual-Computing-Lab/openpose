@@ -3,6 +3,7 @@ set(SOURCES_OP_WRAPPER
     wrapperAuxiliary.cpp
     wrapperStructExtra.cpp
     wrapperStructFace.cpp
+    wrapperStructGui.cpp
     wrapperStructHand.cpp
     wrapperStructInput.cpp
     wrapperStructOutput.cpp

@@ -115,7 +115,7 @@ namespace op
         try
         {
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-            // Avoid duplicates (e.g. selecting at the time camera & video)
+            // Avoid duplicates (e.g., selecting at the time camera & video)
             if (int(!imageDirectory.empty()) + int(!videoPath.empty()) + int(webcamIndex > 0)
                 + int(flirCamera) + int(!ipCameraPath.empty()) > 1)
                 error("Selected simultaneously"
@@ -275,7 +275,7 @@ namespace op
         {
             Point<int> point;
             const auto nRead = sscanf(pointString.c_str(), "%dx%d", &point.x, &point.y);
-            checkE(nRead, 2, "Invalid resolution format: `" +  pointString + "`, it should be e.g. `" + pointExample
+            checkE(nRead, 2, "Invalid resolution format: `" +  pointString + "`, it should be e.g., `" + pointExample
                    + "`.", __LINE__, __FUNCTION__, __FILE__);
             return point;
         }

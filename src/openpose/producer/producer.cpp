@@ -57,7 +57,7 @@ namespace op
             if (isOpened())
             {
                 // If ProducerFpsMode::OriginalFps, then force producer to keep the frame rate of the frames producer
-                // sources (e.g. a video)
+                // sources (e.g., a video)
                 keepDesiredFrameRate();
                 // Get frame
                 frames = getRawFrames();
@@ -106,7 +106,7 @@ namespace op
             else
             {
                 check(fpsMode == ProducerFpsMode::RetrievalFps || get(CV_CAP_PROP_FPS) > 0,
-                      "Selected to keep the source fps but get(CV_CAP_PROP_FPS) <= 0, i.e. the source did not set"
+                      "Selected to keep the source fps but get(CV_CAP_PROP_FPS) <= 0, i.e., the source did not set"
                       " its fps property.", __LINE__, __FUNCTION__, __FILE__);
                 mProducerFpsMode = {fpsMode};
             }
@@ -263,7 +263,7 @@ namespace op
             if (isOpened())
             {
                 // OpenCV closing issue: OpenCV goes in the range [1, get(CV_CAP_PROP_FRAME_COUNT) - 1] in some
-                // videos (i.e. there is a frame missing), mNumberEmptyFrames allows the program to be properly
+                // videos (i.e., there is a frame missing), mNumberEmptyFrames allows the program to be properly
                 // closed keeping the 0-index frame counting
                 if (mNumberEmptyFrames > 2
                     || (mType != ProducerType::FlirCamera && mType != ProducerType::IPCamera
@@ -406,14 +406,16 @@ namespace op
                     error("No camera found.", __LINE__, __FUNCTION__, __FILE__);
                 }
             }
-            // else
-            error("Undefined Producer selected.", __LINE__, __FUNCTION__, __FILE__);
-            return std::shared_ptr<Producer>{};
+            // Unknown
+            else if (producerType != ProducerType::None)
+                error("Undefined Producer selected.", __LINE__, __FUNCTION__, __FILE__);
+            // None
+            return nullptr;
         }
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return std::shared_ptr<Producer>{};
+            return nullptr;
         }
     }
 }

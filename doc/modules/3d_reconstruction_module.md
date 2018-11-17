@@ -39,7 +39,7 @@ In order to increase the 3-D reconstruction accuracy, OpenPose optionally perfor
 - 3-D reconstruction of body, face, and hands for 1 person.
 - If more than 1 person is detected per camera, the algorithm will just try to match person 0 on each camera, which will potentially correspond to different people in the scene. Thus, the 3-D reconstruction will completely fail.
 - Only points with high threshold with respect to each one of the cameras are reprojected (and later rendered). An alternative for > 4 cameras could potentially do 3-D reprojection and render all points with good views in more than N different cameras (not implemented here).
-- Only Direct linear transformation (DLT) is applied for reconstruction. Non-linear optimization methods (e.g. from Ceres Solver) will potentially improve results (not implemented).
+- Only Direct linear transformation (DLT) is applied for reconstruction. Non-linear optimization methods (e.g., from Ceres Solver) will potentially improve results (not implemented).
 - Basic OpenGL rendering with the `freeglut` library.
 
 

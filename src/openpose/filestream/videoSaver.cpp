@@ -90,7 +90,7 @@ namespace op
             // Re-shape video writer if required
             if (mNumberImages != cvMats.size())
             {
-                mNumberImages = cvMats.size();
+                mNumberImages = (unsigned int)cvMats.size();
                 mVideoWriter = openVideo(mVideoSaverPath, mCvFourcc, mFps, mCvSize, mNumberImages);
             }
             // Concat images

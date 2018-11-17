@@ -34,11 +34,11 @@ namespace op
                 {
                     if (bodyPart != 1u)
                     {
-                        const auto mapIdx = numberBodyPartsPlusBkg + bodyPartPairs.size() + 2*bodyPart
-                                          - (bodyPart > 0 ? 2 : 0);
+                        const auto mapIdxD = (unsigned int)
+                            (numberBodyPartsPlusBkg + bodyPartPairs.size() + 2*bodyPart - (bodyPart > 0 ? 2 : 0));
                         const auto baseLine = partToName.at(1) + "->" + partToName.at(bodyPart);
-                        partToName[mapIdx] = baseLine + "(X)";
-                        partToName[mapIdx+1] = baseLine + "(Y)";
+                        partToName[mapIdxD] = baseLine + "(X)";
+                        partToName[mapIdxD+1] = baseLine + "(Y)";
                     }
                 }
             }

@@ -6,7 +6,7 @@
     // Everything in a multi-thread scenario (`thread` module)
 // In addition to the previous OpenPose modules, we also need to use:
     // 1. `core` module: for the Datum struct that the `thread` module sends between the queues
-    // 2. `utilities` module: for the error & logging functions, i.e. op::error & op::log respectively
+    // 2. `utilities` module: for the error & logging functions, i.e., op::error & op::log respectively
 
 // 3rdparty dependencies
 // GFlags: DEFINE_bool, _int32, _int64, _uint64, _double, _string
@@ -27,9 +27,9 @@
 // #include <openpose/thread/headers.hpp>
 // #include <openpose/utilities/headers.hpp>
 
-// See all the available parameter options withe the `--help` flag. E.g. `build/examples/openpose/openpose.bin --help`
+// See all the available parameter options withe the `--help` flag. E.g., `build/examples/openpose/openpose.bin --help`
 // Note: This command will show you flags for other unnecessary 3rdparty files. Check only the flags for the OpenPose
-// executable. E.g. for `openpose.bin`, look for `Flags from examples/openpose/openpose.cpp:`.
+// executable. E.g., for `openpose.bin`, look for `Flags from examples/openpose/openpose.cpp:`.
 // Debugging/Other
 DEFINE_int32(logging_level,             3,              "The logging level. Integer in the range [0, 255]. 0 will output any log() message, while"
                                                         " 255 will not output any. Current OpenPose library messages are in the range 0-4: 1 for"
@@ -201,7 +201,7 @@ int openPoseTutorialThread4()
         typedef std::shared_ptr<op::Worker<TypedefDatums>> TypedefWorker;
         op::ThreadManager<TypedefDatums> threadManager;
         // Step 3 - Initializing the worker classes
-        // Frames producer (e.g. video, webcam, ...)
+        // Frames producer (e.g., video, webcam, ...)
         TypedefWorker wUserInput = std::make_shared<WUserInput>(FLAGS_image_dir);
         // Processing
         TypedefWorker wUserProcessing = std::make_shared<WUserPostProcessing>();

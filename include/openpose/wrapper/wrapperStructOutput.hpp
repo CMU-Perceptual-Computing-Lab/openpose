@@ -8,33 +8,17 @@
 namespace op
 {
     /**
-     * WrapperStructOutput: Output (small GUI, writing rendered results and/or pose data, etc.) configuration struct.
-     * WrapperStructOutput allows the user to set up the input frames generator.
+     * WrapperStructOutput: Output ( writing rendered results and/or pose data, etc.) configuration struct.
      */
     struct OP_API WrapperStructOutput
     {
         /**
-         * Display mode
-         * a) -1 for automatic selection.
-         * b) 0 for no display. Useful if there is no X server and/or to slightly speed up the processing if visual
-         *    output is not required.
-         * c) 2 for 2-D display in the OpenPose small integrated GUI.
-         * d) 3 for 3-D display, if `--3d` was enabled.
-         * e) 1 for both 2-D and 3-D display.
+         * Output verbose in the command line.
+         * If -1, it will be disabled (default). If it is a positive integer number, it will print on"
+         * the command line every `verbose` frames. If number in the range (0,1), it will print the"
+         * progress every `verbose` times the total of frames.
          */
-        DisplayMode displayMode;
-
-        /**
-         * Whether to add some information to the frame (number of frame, number people detected, etc.) after it is
-         * saved on disk and before it is displayed and/or returned to the user.
-         */
-        bool guiVerbose;
-
-        /**
-         * Whether to display the OpenPose small integrated GUI on fullscreen mode. It can be changed by interacting
-         * with the GUI itself.
-         */
-        bool fullScreen;
+        double verbose;
 
         /**
          * Pose (x, y, score) locations saving folder location.
@@ -72,6 +56,12 @@ namespace op
         std::string writeCocoFootJson;
 
         /**
+         * Experimental option (only makes effect on car JSON generation).
+         * It selects the COCO variant for cocoJsonSaver.
+         */
+        int writeCocoJsonVariant;
+
+        /**
          * Rendered image saving folder.
          * If it is empty (default), it is disabled.
          */
@@ -80,7 +70,7 @@ namespace op
         /**
          * Rendered image saving folder format.
          * Check your OpenCV version documentation for a list of compatible formats.
-         * E.g. png, jpg, etc.
+         * E.g., png, jpg, etc.
          * If writeImages is empty (default), it makes no effect.
          */
         std::string writeImagesFormat;
@@ -139,16 +129,15 @@ namespace op
          * It has the recommended and default values we recommend for each element of the struct.
          * Since all the elements of the struct are public, they can also be manually filled.
          */
-        WrapperStructOutput(const DisplayMode displayMode = DisplayMode::NoDisplay, const bool guiVerbose = false,
-                            const bool fullScreen = false, const std::string& writeKeypoint = "",
-                            const DataFormat writeKeypointFormat = DataFormat::Xml,
-                            const std::string& writeJson = "", const std::string& writeCocoJson = "",
-                            const std::string& writeCocoFootJson = "", const std::string& writeImages = "",
-                            const std::string& writeImagesFormat = "", const std::string& writeVideo = "",
-                            const double writeVideoFps = 30., const std::string& writeHeatMaps = "",
-                            const std::string& writeHeatMapsFormat = "", const std::string& writeVideoAdam = "",
-                            const std::string& writeBvh = "", const std::string& udpHost = "",
-                            const std::string& udpPort = "");
+        WrapperStructOutput(
+            const double verbose = -1, const std::string& writeKeypoint = "",
+            const DataFormat writeKeypointFormat = DataFormat::Xml, const std::string& writeJson = "",
+            const std::string& writeCocoJson = "", const std::string& writeCocoFootJson = "",
+            const int writeCocoJsonVariant = 1, const std::string& writeImages = "",
+            const std::string& writeImagesFormat = "", const std::string& writeVideo = "",
+            const double writeVideoFps = 30., const std::string& writeHeatMaps = "",
+            const std::string& writeHeatMapsFormat = "", const std::string& writeVideoAdam = "",
+            const std::string& writeBvh = "", const std::string& udpHost = "", const std::string& udpPort = "");
     };
 }
 

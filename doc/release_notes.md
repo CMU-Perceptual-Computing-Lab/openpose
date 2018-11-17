@@ -76,7 +76,7 @@ OpenPose Library - Release Notes
 
 ## OpenPose 1.0.1 (Jul 11, 2017)
 1. Main improvements:
-    1. Windows library turned into DLL dynamic library (i.e. portable).
+    1. Windows library turned into DLL dynamic library (i.e., portable).
     2. Improved documentation.
 2. Functions or parameters renamed:
     1. `openpose/utilities/macros.hpp` moved to `openpose/utilities/macros.hpp`.
@@ -94,7 +94,7 @@ OpenPose Library - Release Notes
     7. Added 3-D reconstruction demo.
     8. Auto-detection of the camera index.
     9. Speed up of ~30% in op::floatPtrToUCharCvMat.
-    10. COCO extractor now extracts image ID from the image name itslef (format "string_%d"). Before, only working with validation test, now applicable to e.g. test sets.
+    10. COCO extractor now extracts image ID from the image name itslef (format "string_%d"). Before, only working with validation test, now applicable to e.g., test sets.
     11. Changed display texts, added `OpenPose` name.
 2. Main bugs fixed:
     1. Pycaffe can now be imported from Python.
@@ -107,7 +107,7 @@ OpenPose Library - Release Notes
     1. Added CMake installer for Ubuntu.
     2. Added how to use keypoint data in `examples/tutorial_wrapper/`.
     3. Added flag for warnings of type `-Wsign-compare` and removed in code.
-    4. Slightly improved accuracy by considering ears-shoulder connection (e.g. +0.4 mAP for 1 scale in validation set).
+    4. Slightly improved accuracy by considering ears-shoulder connection (e.g., +0.4 mAP for 1 scale in validation set).
 2. Main bugs fixed:
     1. Windows version crashing with std::map copy.
 
@@ -115,8 +115,8 @@ OpenPose Library - Release Notes
 
 ## OpenPose 1.2.0 (Nov 3, 2017)
 1. Main improvements:
-    1. Speed increase when processing images with different aspect ratios. E.g. ~20% increase over 3.7k COCO validation images on 1 scale.
-    2. Huge speed increase and memory reduction when processing multi-scale. E.g. over 3.7k COCO validation images on 4 scales: ~40% (~770 to ~450 sec) speed increase, ~25% memory reduction (from ~8.9 to ~6.7 GB / GPU).
+    1. Speed increase when processing images with different aspect ratios. E.g., ~20% increase over 3.7k COCO validation images on 1 scale.
+    2. Huge speed increase and memory reduction when processing multi-scale. E.g., over 3.7k COCO validation images on 4 scales: ~40% (~770 to ~450 sec) speed increase, ~25% memory reduction (from ~8.9 to ~6.7 GB / GPU).
     3. Slightly increase of accuracy given the fixed mini-bugs.
     4. Added IP camera support.
     5. Output images can have the input size, OpenPose able to change its size for each image and not required fixed size anymore.
@@ -130,9 +130,9 @@ OpenPose Library - Release Notes
     10. COCO JSON file outputs 0 as score for non-detected keypoints.
     11. Added example for OpenPose for user asynchronous output and cleaned all `tutorial_wrapper/` examples.
     12. Added `-1` option for `--net_resolution` in order to auto-select the best possible aspect ratio given the user input.
-    13. Net resolution can be dynamically changed (e.g. for images with different size).
+    13. Net resolution can be dynamically changed (e.g., for images with different size).
     14. Added example to add functionality/modules to OpenPose.
-    15. Added `--disable_multi_thread` flag in order to allow debug and/or highly reduce the latency (e.g. when using webcam in real-time).
+    15. Added `--disable_multi_thread` flag in order to allow debug and/or highly reduce the latency (e.g., when using webcam in real-time).
     16. Allowed to output images without any rendering.
 2. Functions or parameters renamed:
     1. OpenPose able to change its size and initial size dynamically:
@@ -157,7 +157,7 @@ OpenPose Library - Release Notes
     2. More efficient non-processing version (i.e., if all keypoint extractors are disabled, and only image extraction and display/saving operations are performed).
     3. Heat maps scaling: Added `--heatmaps_scale` to OpenPoseDemo, added option not to scale the heatmaps, and added custom `float` format to save heatmaps in floating format.
     4. Detector of the number of GPU also considers the initial GPU index given by the user.
-    5. Added `--write_json` as new version of `--write_keypoint_json`. It includes the body part candidates (if enabled), as well as any extra information added in the future (e.g. person ID).
+    5. Added `--write_json` as new version of `--write_keypoint_json`. It includes the body part candidates (if enabled), as well as any extra information added in the future (e.g., person ID).
     6. Body part candidates can be retrieved in op::Datum and saved with `--write_json`.
 2. Functions or parameters renamed:
     1. `PoseParameters` splitted into `PoseParameters` and `PoseParametersRender` and const parameters turned into functions for more clarity.
@@ -189,7 +189,7 @@ OpenPose Library - Release Notes
     17. Flag `--write_json` includes 3-D keypoints.
     18. 3-D reconstruction module can be used with images and videos. Flag `--3d_views` added to allow `--image_dir` and `--video` allow loading stereo images.
     19. Flag `--camera_resolution` applicable to `--flir_camera`.
-    20. Throw error message if requested GPU IDs does not exist (e.g. asking for 2 GPUs starting in ID 1 if there is only 2 GPUs in total).
+    20. Throw error message if requested GPU IDs does not exist (e.g., asking for 2 GPUs starting in ID 1 if there is only 2 GPUs in total).
     21. VideoSaver (`--write_video`) compatible with multi-camera setting. It will save all the different views concatenated.
     22. OpenPose small GUI rescale the verbose text to the displayed image, to avoid the text to be either too big or small.
     23. OpenPose small GUI shows the frame number w.r.t. the original producer, rather than the frame id. E.g., if video is started at frame 30, OpenPose will display 30 rather than 0 in the first frame.
@@ -281,13 +281,28 @@ OpenPose Library - Release Notes
         3. Array::pData as binding of spData.
         4. Array::Array that takes as input a pointer, so it does not re-allocate memory.
     12. Producer defined inside Wrapper rather than being defined on each example.
+    13. Reduced many Visual Studio warnings (e.g., uncontrolled conversions between types).
+    14. Added new keypoint-related auxiliary functions in `utilities/keypoints.hpp`.
+    15. Function `resizeFixedAspectRatio` can take already allocated memory (e.g., faster if target is an Array<T> object, no intermediate cv::Mat required).
+    16. Added compatibility for OpenCV 4.0, while preserving 2.4.X and 3.X compatibility.
+    17. Improved and added several functions to `utilities/keypoints.hpp` and Array to simplify keypoint post-processing.
+    18. Removed warnings from Spinnaker SDK at compiling time.
+    19. All bash scripts incorporate `#!/bin/bash` to tell the terminal that they are bash scripts.
+    20. Added flag `--verbose` to plot the progress.
 2. Functions or parameters renamed:
     1. By default, python example `tutorial_developer/python_2_pose_from_heatmaps.py` was using 2 scales starting at -1x736, changed to 1 scale at -1x368.
     2. WrapperStructPose default parameters changed to match those of the OpenPose demo binary.
     3. WrapperT.configure() changed from 1 function that requries all arguments to individual functions that take 1 argument each.
+    4. Added `Forward` to all net classes that automatically selects between CUDA, OpenCL, or CPU-only version depending on the defines.
+    5. Previously hardcoded `COCO_CHALLENGE` variable turned into user configurable flag `--maximize_positives`.
+    6. Removed old COCO 2014 validation scripts.
+    7. WrapperStructOutput split into WrapperStructOutput and WrapperStructGui.
 3. Main bugs fixed:
     1. CMake-GUI was forcing to Release mode, allowed Debug modes too.
     2. NMS returns in index 0 the number of found peaks. However, while the number of peaks was truncated to a maximum of 127, this index 0 was saving the real number instead of the truncated one.
+    3. Template functions could not be imported in Windows for projects using the OpenPose library DLL.
+    4. Function `scaleKeypoints2d` was not working if any of the scales was 1 (e.g., fail if scaleX = 1 but scaleY != 1, or if any offset was not 0).
+    5. Fixed bug in `KeepTopNPeople` that could provoke segmentation fault for `number_people_max` > 1.
 
 
 

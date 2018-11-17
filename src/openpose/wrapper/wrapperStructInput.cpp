@@ -2,13 +2,12 @@
 
 namespace op
 {
-    WrapperStructInput::WrapperStructInput(const ProducerType producerType_, const std::string& producerString_,
-                                           const unsigned long long frameFirst_, const unsigned long long frameStep_,
-                                           const unsigned long long frameLast_, const bool realTimeProcessing_,
-                                           const bool frameFlip_, const int frameRotate_, const bool framesRepeat_,
-                                           const Point<int>& cameraResolution_, const double webcamFps_,
-                                           const std::string& cameraParameterPath_, const bool undistortImage_,
-                                           const unsigned int imageDirectoryStereo_) :
+    WrapperStructInput::WrapperStructInput(
+        const ProducerType producerType_, const std::string& producerString_, const unsigned long long frameFirst_,
+        const unsigned long long frameStep_, const unsigned long long frameLast_, const bool realTimeProcessing_,
+        const bool frameFlip_, const int frameRotate_, const bool framesRepeat_, const Point<int>& cameraResolution_,
+        const double webcamFps_, const std::string& cameraParameterPath_, const bool undistortImage_,
+        const unsigned int imageDirectoryStereo_) :
         producerType{producerType_},
         producerString{producerString_},
         frameFirst{frameFirst_},

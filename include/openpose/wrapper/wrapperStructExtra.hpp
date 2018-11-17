@@ -50,9 +50,9 @@ namespace op
          * It has the recommended and default values we recommend for each element of the struct.
          * Since all the elements of the struct are public, they can also be manually filled.
          */
-        WrapperStructExtra(const bool reconstruct3d = false, const int minViews3d = -1,
-                           const bool identification = false, const int tracking = -1,
-                           const int ikThreads = 0);
+        WrapperStructExtra(
+            const bool reconstruct3d = false, const int minViews3d = -1, const bool identification = false,
+            const int tracking = -1, const int ikThreads = 0);
     };
 }
 

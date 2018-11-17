@@ -699,7 +699,7 @@ if (UNIX OR APPLE)
           CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
           -DMKLDNN_INSTALL_DIR:PATH=<INSTALL_DIR>
           -DUSE_CUDNN=${USE_CUDNN}
-          -DBUILD_python=OFF
+          -DCUDA_ARCH_NAME=${CUDA_ARCH}
           -DCPU_ONLY=${CAFFE_CPU_ONLY}
           -DUSE_MKL2017_AS_DEFAULT_ENGINE=${CAFFE_CPU_ONLY}
           -DCMAKE_BUILD_TYPE=Release
@@ -716,6 +716,7 @@ if (UNIX OR APPLE)
           PREFIX ${CAFFE_PREFIX}
           CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
           -DUSE_CUDNN=${USE_CUDNN}
+          -DCUDA_ARCH_NAME=${CUDA_ARCH}
           -DCPU_ONLY=${CAFFE_CPU_ONLY}
           -DCMAKE_BUILD_TYPE=Release
           -DBUILD_docs=OFF
@@ -801,10 +802,10 @@ if (WITH_CERES)
   include_directories(${CERES_INCLUDE_DIRS})
 endif (WITH_CERES)
 if (WITH_FLIR_CAMERA)
-  include_directories(${SPINNAKER_INCLUDE_DIRS})
+  include_directories(SYSTEM ${SPINNAKER_INCLUDE_DIRS}) # To remove its warnings, equiv. to -isystem
 endif (WITH_FLIR_CAMERA)
 if (WITH_3D_ADAM_MODEL)
-                                    include_directories(include/adam) # TEMPORARY - TO BE REMOVED IN THE FUTURE
+                                    include_directories(include/adam) # TODO: TEMPORARY - TO BE REMOVED IN THE FUTURE
   include_directories(${CERES_INCLUDE_DIRS})
   include_directories(${EIGEN3_INCLUDE_DIRS})
   include_directories(${IGL_INCLUDE_DIRS})

@@ -30,7 +30,7 @@ namespace op
     {
         try
         {
-            // Free CUDA pointers - Note that if pointers are 0 (i.e. nullptr), no operation is performed.
+            // Free CUDA pointers - Note that if pointers are 0 (i.e., nullptr), no operation is performed.
             #ifdef USE_CUDA
                 cudaFree(pGpuPose);
             #endif
@@ -137,10 +137,10 @@ namespace op
                                                                 ? numberBodyParts
                                                                 : elementRendered - 4);
                             elementRenderedName = mPartIndexToName.at(realElementRendered);
-                            renderPoseHeatMapGpu(*spGpuMemory, mPoseModel, frameSize,
-                                                 spPoseExtractorNet->getHeatMapGpuConstPtr(),
-                                                 heatMapSize, scaleNetToOutput * scaleInputToOutput, realElementRendered,
-                                                 (mBlendOriginalFrame ? getAlphaHeatMap() : 1.f));
+                            renderPoseHeatMapGpu(
+                                *spGpuMemory, frameSize, spPoseExtractorNet->getHeatMapGpuConstPtr(), heatMapSize,
+                                scaleNetToOutput * scaleInputToOutput, realElementRendered,
+                                (mBlendOriginalFrame ? getAlphaHeatMap() : 1.f));
                         }
                         // Draw affinity between 2 body parts
                         else if (elementRendered <= lastPAFChannel)
@@ -162,13 +162,13 @@ namespace op
                                 error("Neck-part distance channel only for BODY_25D.",
                                       __LINE__, __FUNCTION__, __FILE__);
                             const auto distancePart = (elementRendered - lastPAFChannel - 1);
-                            const auto distancePartMapped = numberBodyPartsPlusBkg + numberBodyPAFChannels
-                                                          + distancePart;
+                            const auto distancePartMapped = (unsigned int)(
+                                numberBodyPartsPlusBkg + numberBodyPAFChannels + distancePart);
                             elementRenderedName = mPartIndexToName.at(distancePartMapped);
-                            renderPoseDistance(*spGpuMemory, mPoseModel, frameSize,
-                                               spPoseExtractorNet->getHeatMapGpuConstPtr(),
-                                               heatMapSize, scaleNetToOutput * scaleInputToOutput, distancePartMapped,
-                                               (mBlendOriginalFrame ? getAlphaHeatMap() : 1.f));
+                            renderPoseDistanceGpu(
+                                *spGpuMemory, frameSize, spPoseExtractorNet->getHeatMapGpuConstPtr(), heatMapSize,
+                                scaleNetToOutput * scaleInputToOutput, distancePartMapped,
+                                (mBlendOriginalFrame ? getAlphaHeatMap() : 1.f));
                         }
                     }
                 }

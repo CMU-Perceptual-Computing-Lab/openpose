@@ -8,6 +8,7 @@
 #include <openpose/net/maximumCaffe.hpp>
 #include <openpose/net/net.hpp>
 #include <openpose/net/netCaffe.hpp>
+#include <openpose/net/netOpenCv.hpp>
 #include <openpose/net/nmsBase.hpp>
 #include <openpose/net/nmsCaffe.hpp>
 #include <openpose/net/resizeAndMergeBase.hpp>

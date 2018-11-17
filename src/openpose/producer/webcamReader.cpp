@@ -243,7 +243,7 @@ namespace op
                 {
                     cvMat = cv::Mat(mResolution.y, mResolution.x, CV_8UC3, cv::Scalar{0,0,0});
                     putTextOnCvMat(cvMat, "Camera disconnected, reconnecting...", {cvMat.cols/16, cvMat.rows/2},
-                                   cv::Scalar{255, 255, 255}, false, 2.3*cvMat.cols);
+                                   cv::Scalar{255, 255, 255}, false, intRound(2.3*cvMat.cols));
                 }
                 // Move to buffer
                 if (!cvMat.empty())

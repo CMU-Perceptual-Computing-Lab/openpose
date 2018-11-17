@@ -1,7 +1,7 @@
 OpenPose C++ API - Introduction
 ====================================
 
-The C++ API is ideal if you want to e.g. change internal functions and/or extend the OpenPose functionality. In order to learn the basics:
+The C++ API is ideal if you want to e.g., change internal functions and/or extend the OpenPose functionality. In order to learn the basics:
 
 1. Take a look at the [library Quick Start section](../README.md#quick-start) from the README.
 2. OpenPose Overview: Learn the basics about the library source code in [doc/library_overview.md](./library_overview.md).

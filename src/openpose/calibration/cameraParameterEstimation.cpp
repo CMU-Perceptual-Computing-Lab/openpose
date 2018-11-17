@@ -314,7 +314,7 @@ namespace op
 
                 // If the difference between them is <= 180 degrees, then we just return the traditional average.
                 // Examples:
-                //     - If both have the same signs, i.e. both in range [0, 180] or both in range (-180, 0)
+                //     - If both have the same signs, i.e., both in range [0, 180] or both in range (-180, 0)
                 //     - If one in range [0, 90] and the other in range [-90, 0]
                 //     - Etc.
                 auto average = std::accumulate(anglesNormalized.begin(), anglesNormalized.end(), 0.)

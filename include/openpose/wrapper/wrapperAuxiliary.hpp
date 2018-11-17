@@ -5,6 +5,7 @@
 #include <openpose/wrapper/enumClasses.hpp>
 #include <openpose/wrapper/wrapperStructExtra.hpp>
 #include <openpose/wrapper/wrapperStructFace.hpp>
+#include <openpose/wrapper/wrapperStructGui.hpp>
 #include <openpose/wrapper/wrapperStructHand.hpp>
 #include <openpose/wrapper/wrapperStructInput.hpp>
 #include <openpose/wrapper/wrapperStructOutput.hpp>
@@ -29,8 +30,8 @@ namespace op
         WrapperStructPose& wrapperStructPose, const WrapperStructFace& wrapperStructFace,
         const WrapperStructHand& wrapperStructHand, const WrapperStructExtra& wrapperStructExtra,
         const WrapperStructInput& wrapperStructInput, const WrapperStructOutput& wrapperStructOutput,
-        const bool renderOutput, const bool userOutputWsEmpty, const std::shared_ptr<Producer>& producerSharedPtr,
-        const ThreadManagerMode threadManagerMode);
+        const WrapperStructGui& wrapperStructGui, const bool renderOutput, const bool userOutputWsEmpty,
+        const std::shared_ptr<Producer>& producerSharedPtr, const ThreadManagerMode threadManagerMode);
 
     /**
      * Thread ID increase (private internal function).
@@ -51,12 +52,12 @@ namespace op
     template<typename TDatums,
              typename TDatumsSP = std::shared_ptr<TDatums>,
              typename TWorker = std::shared_ptr<Worker<TDatumsSP>>>
-    OP_API void configureThreadManager(
+    void configureThreadManager(
         ThreadManager<TDatumsSP>& threadManager, const bool multiThreadEnabled,
         const ThreadManagerMode threadManagerMode, const WrapperStructPose& wrapperStructPose,
         const WrapperStructFace& wrapperStructFace, const WrapperStructHand& wrapperStructHand,
         const WrapperStructExtra& wrapperStructExtra, const WrapperStructInput& wrapperStructInput,
-        const WrapperStructOutput& wrapperStructOutput,
+        const WrapperStructOutput& wrapperStructOutput, const WrapperStructGui& wrapperStructGui,
         const std::array<std::vector<TWorker>, int(WorkerType::Size)>& userWs,
         const std::array<bool, int(WorkerType::Size)>& userWsOnNewThread);
 }
@@ -86,7 +87,7 @@ namespace op
         const ThreadManagerMode threadManagerMode, const WrapperStructPose& wrapperStructPoseTemp,
         const WrapperStructFace& wrapperStructFace, const WrapperStructHand& wrapperStructHand,
         const WrapperStructExtra& wrapperStructExtra, const WrapperStructInput& wrapperStructInput,
-        const WrapperStructOutput& wrapperStructOutput,
+        const WrapperStructOutput& wrapperStructOutput, const WrapperStructGui& wrapperStructGui,
         const std::array<std::vector<TWorker>, int(WorkerType::Size)>& userWs,
         const std::array<bool, int(WorkerType::Size)>& userWsOnNewThread)
     {
@@ -146,7 +147,8 @@ namespace op
             const auto userOutputWsEmpty = userOutputWs.empty();
             wrapperConfigureSanityChecks(
                 wrapperStructPose, wrapperStructFace, wrapperStructHand, wrapperStructExtra, wrapperStructInput,
-                wrapperStructOutput, renderOutput, userOutputWsEmpty, producerSharedPtr, threadManagerMode);
+                wrapperStructOutput, wrapperStructGui, renderOutput, userOutputWsEmpty, producerSharedPtr,
+                threadManagerMode);
 
             // Get number threads
             auto numberThreads = wrapperStructPose.gpuNumber;
@@ -263,7 +265,8 @@ namespace op
                         poseExtractorNets.emplace_back(std::make_shared<PoseExtractorCaffe>(
                             wrapperStructPose.poseModel, modelFolder, gpuId + gpuNumberStart,
                             wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale,
-                            wrapperStructPose.addPartCandidates, wrapperStructPose.enableGoogleLogging
+                            wrapperStructPose.addPartCandidates, wrapperStructPose.maximizePositives,
+                            wrapperStructPose.enableGoogleLogging
                         ));
 
                     // Pose renderers
@@ -527,7 +530,7 @@ namespace op
                             poseTriangulation)};
                     }
                 }
-                // Itermediate workers (e.g. OpenPose format to cv::Mat, json & frames recorder, ...)
+                // Itermediate workers (e.g., OpenPose format to cv::Mat, json & frames recorder, ...)
                 postProcessingWs.clear();
                 // // Person ID identification (when no multi-thread and no dependency on tracking)
                 // if (wrapperStructExtra.identification)
@@ -561,8 +564,8 @@ namespace op
             }
 
             // IK/Adam
-            const auto displayAdam = wrapperStructOutput.displayMode == DisplayMode::DisplayAdam
-                                     || (wrapperStructOutput.displayMode == DisplayMode::DisplayAll
+            const auto displayAdam = wrapperStructGui.displayMode == DisplayMode::DisplayAdam
+                                     || (wrapperStructGui.displayMode == DisplayMode::DisplayAll
                                          && wrapperStructExtra.ikThreads > 0);
             jointAngleEstimationsWs.clear();
 #ifdef USE_3D_ADAM_MODEL
@@ -581,7 +584,15 @@ namespace op
 
             // Output workers
             outputWs.clear();
+            // Print verbose
+            if (wrapperStructOutput.verbose > 0.)
+            {
+                const auto verbosePrinter = std::make_shared<VerbosePrinter>(
+                    wrapperStructOutput.verbose, producerSharedPtr->get(CV_CAP_PROP_FRAME_COUNT));
+                outputWs.emplace_back(std::make_shared<WVerbosePrinter<TDatumsSP>>(verbosePrinter));
+            }
             // Send information (e.g., to Unity) though UDP client-server communication
+
 #ifdef USE_3D_ADAM_MODEL
             if (!wrapperStructOutput.udpHost.empty() && !wrapperStructOutput.udpPort.empty())
             {
@@ -617,7 +628,8 @@ namespace op
                     wrapperStructOutput.writeCocoJson, humanFormat,
                     (wrapperStructPose.poseModel != PoseModel::CAR_22
                         && wrapperStructPose.poseModel != PoseModel::CAR_12
-                        ? CocoJsonFormat::Body : CocoJsonFormat::Car));
+                        ? CocoJsonFormat::Body : CocoJsonFormat::Car),
+                    wrapperStructOutput.writeCocoJsonVariant);
                 outputWs.emplace_back(std::make_shared<WCocoJsonSaver<TDatumsSP>>(cocoJsonSaver));
             }
             // Write people foot pose data on disk (COCO validation json format for foot data)
@@ -646,10 +658,10 @@ namespace op
             {
                 if (!oPProducer)
                     error("Video file can only be recorded inside `wrapper/wrapper.hpp` if the producer"
-                          " is one of the default ones (e.g. video, webcam, ...).",
+                          " is one of the default ones (e.g., video, webcam, ...).",
                           __LINE__, __FUNCTION__, __FILE__);
                 if (finalOutputSize.x <= 0 || finalOutputSize.y <= 0)
-                    error("Video can only be recorded if outputSize is fixed (e.g. video, webcam, IP camera),"
+                    error("Video can only be recorded if outputSize is fixed (e.g., video, webcam, IP camera),"
                           "but not for a image directory.", __LINE__, __FUNCTION__, __FILE__);
                 const auto videoSaver = std::make_shared<VideoSaver>(
                     wrapperStructOutput.writeVideo, CV_FOURCC('M','J','P','G'), originalVideoFps, finalOutputSize
@@ -674,12 +686,12 @@ namespace op
                 outputWs.emplace_back(std::make_shared<WHeatMapSaver<TDatumsSP>>(heatMapSaver));
             }
             // Add frame information for GUI
-            const bool guiEnabled = (wrapperStructOutput.displayMode != DisplayMode::NoDisplay);
+            const bool guiEnabled = (wrapperStructGui.displayMode != DisplayMode::NoDisplay);
             // If this WGuiInfoAdder instance is placed before the WImageSaver or WVideoSaver, then the resulting
             // recorded frames will look exactly as the final displayed image by the GUI
-            if (wrapperStructOutput.guiVerbose && (guiEnabled || !userOutputWs.empty()
-                                                   || threadManagerMode == ThreadManagerMode::Asynchronous
-                                                   || threadManagerMode == ThreadManagerMode::AsynchronousOut))
+            if (wrapperStructGui.guiVerbose && (guiEnabled || !userOutputWs.empty()
+                                                || threadManagerMode == ThreadManagerMode::Asynchronous
+                                                || threadManagerMode == ThreadManagerMode::AsynchronousOut))
             {
                 const auto guiInfoAdder = std::make_shared<GuiInfoAdder>(numberThreads, guiEnabled);
                 outputWs.emplace_back(std::make_shared<WGuiInfoAdder<TDatumsSP>>(guiInfoAdder));
@@ -702,9 +714,9 @@ namespace op
 #ifdef USE_3D_ADAM_MODEL
                     // Gui
                     const auto gui = std::make_shared<GuiAdam>(
-                        finalOutputSize, wrapperStructOutput.fullScreen, threadManager.getIsRunningSharedPtr(),
+                        finalOutputSize, wrapperStructGui.fullScreen, threadManager.getIsRunningSharedPtr(),
                         spVideoSeek, poseExtractorNets, faceExtractorNets, handExtractorNets, renderers,
-                        wrapperStructOutput.displayMode, JointAngleEstimation::getTotalModel(),
+                        wrapperStructGui.displayMode, JointAngleEstimation::getTotalModel(),
                         wrapperStructOutput.writeVideoAdam
                     );
                     // WGui
@@ -712,24 +724,24 @@ namespace op
 #endif
                 }
                 // 3-D (+2-D) display
-                else if (wrapperStructOutput.displayMode == DisplayMode::Display3D
-                    || wrapperStructOutput.displayMode == DisplayMode::DisplayAll)
+                else if (wrapperStructGui.displayMode == DisplayMode::Display3D
+                    || wrapperStructGui.displayMode == DisplayMode::DisplayAll)
                 {
                     // Gui
                     const auto gui = std::make_shared<Gui3D>(
-                        finalOutputSize, wrapperStructOutput.fullScreen, threadManager.getIsRunningSharedPtr(),
+                        finalOutputSize, wrapperStructGui.fullScreen, threadManager.getIsRunningSharedPtr(),
                         spVideoSeek, poseExtractorNets, faceExtractorNets, handExtractorNets, renderers,
-                        wrapperStructPose.poseModel, wrapperStructOutput.displayMode
+                        wrapperStructPose.poseModel, wrapperStructGui.displayMode
                     );
                     // WGui
                     guiW = {std::make_shared<WGui3D<TDatumsSP>>(gui)};
                 }
                 // 2-D display
-                else if (wrapperStructOutput.displayMode == DisplayMode::Display2D)
+                else if (wrapperStructGui.displayMode == DisplayMode::Display2D)
                 {
                     // Gui
                     const auto gui = std::make_shared<Gui>(
-                        finalOutputSize, wrapperStructOutput.fullScreen, threadManager.getIsRunningSharedPtr(),
+                        finalOutputSize, wrapperStructGui.fullScreen, threadManager.getIsRunningSharedPtr(),
                         spVideoSeek, poseExtractorNets, faceExtractorNets, handExtractorNets, renderers
                     );
                     // WGui
@@ -836,7 +848,7 @@ namespace op
                 {
                     if (poseExtractorsWs.size() > 1)
                         log("Multi-threading disabled, only 1 thread running. All GPUs have been disabled but the"
-                            " first one, which is defined by gpuNumberStart (e.g. in the OpenPose demo, it is set"
+                            " first one, which is defined by gpuNumberStart (e.g., in the OpenPose demo, it is set"
                             " with the `--num_gpu_start` flag).", Priority::High);
                     log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     threadManager.add(threadId, poseExtractorsWs.at(0), queueIn++, queueOut++);

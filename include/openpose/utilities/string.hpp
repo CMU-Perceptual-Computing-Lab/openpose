@@ -15,7 +15,7 @@ namespace op
      * @return std::string with the formatted value.
      */
     template<typename T>
-    OP_API std::string toFixedLengthString(const T number, const unsigned long long stringLength = 0);
+    std::string toFixedLengthString(const T number, const unsigned long long stringLength = 0);
 
     OP_API std::vector<std::string> splitString(const std::string& stringToSplit, const std::string& delimiter);
 

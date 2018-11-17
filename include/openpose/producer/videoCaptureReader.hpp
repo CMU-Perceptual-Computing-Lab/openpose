@@ -10,7 +10,7 @@ namespace op
 {
     /**
      *  VideoCaptureReader is an abstract class to extract frames from a cv::VideoCapture source (video file,
-     * webcam stream, etc.). It has the basic and common functions of the cv::VideoCapture class (e.g. get, set, etc.).
+     * webcam stream, etc.). It has the basic and common functions of the cv::VideoCapture class (e.g., get, set, etc.).
      */
     class OP_API VideoCaptureReader : public Producer
     {

@@ -448,23 +448,6 @@ namespace op
             16,18,17,18,16,19,17,19,   0,7,3,17,6,12,16,14,   6,21,7,20,3,21,20,14
         },
     };
-    const std::array<unsigned int, (int)PoseModel::Size> POSE_MAX_PEAKS{
-        POSE_MAX_PEOPLE,    // BODY_25
-        POSE_MAX_PEOPLE,    // COCO
-        POSE_MAX_PEOPLE,    // MPI_15
-        POSE_MAX_PEOPLE,    // MPI_15_4
-        POSE_MAX_PEOPLE,    // BODY_19
-        POSE_MAX_PEOPLE,    // BODY_19_X2
-        POSE_MAX_PEOPLE,    // BODY_59
-        POSE_MAX_PEOPLE,    // BODY_19N
-        POSE_MAX_PEOPLE,    // BODY_25E
-        POSE_MAX_PEOPLE,    // BODY_25_19
-        POSE_MAX_PEOPLE,    // BODY_65
-        POSE_MAX_PEOPLE,    // CAR_12
-        POSE_MAX_PEOPLE,    // BODY_25D
-        POSE_MAX_PEOPLE,    // BODY_23
-        POSE_MAX_PEOPLE,    // CAR_22
-    };
     const std::array<float, (int)PoseModel::Size> POSE_CCN_DECREASE_FACTOR{
         8.f,    // BODY_25
         8.f,    // COCO
@@ -481,31 +464,6 @@ namespace op
         8.f,    // BODY_25D
         8.f,    // BODY_23
         8.f,    // CAR_22
-    };
-
-    // Default Model Parameters
-    // They might be modified on running time
-    const auto nmsT = (COCO_CHALLENGE ? 0.02f : 0.05f);
-    const std::array<float, (int)PoseModel::Size>           POSE_DEFAULT_NMS_THRESHOLD{
-        nmsT,       nmsT,       0.6f,       0.3f,       nmsT,       nmsT,       nmsT,       nmsT,       nmsT,       nmsT,       nmsT,       nmsT,       nmsT,       nmsT,       nmsT
-    };
-    const auto minAT = (COCO_CHALLENGE ? 0.75f : 0.95f); // Matlab version: 0.85f
-    const std::array<float, (int)PoseModel::Size>    POSE_DEFAULT_CONNECT_INTER_MIN_ABOVE_THRESHOLD{
-        minAT,      minAT,      minAT,      minAT,      minAT,      minAT,      minAT,      minAT,      minAT,      minAT,      minAT,      minAT,      minAT,      minAT,      minAT
-        // 0.85f,      0.85f,      0.85f,      0.85f,      0.85f,      0.85f // Matlab version
-    };
-    const auto conIT = (COCO_CHALLENGE ? 0.01f : 0.05f);
-    const std::array<float, (int)PoseModel::Size>           POSE_DEFAULT_CONNECT_INTER_THRESHOLD{
-        conIT,      conIT,      0.01f,      0.01f,      conIT,      conIT,      conIT,      conIT,      conIT,      conIT,      conIT,      conIT,      conIT,      conIT,      conIT
-    };
-    const auto minSC = (COCO_CHALLENGE ? 2 : 3);
-    const std::array<unsigned int, (int)PoseModel::Size>    POSE_DEFAULT_CONNECT_MIN_SUBSET_CNT{
-        minSC,      minSC,      minSC,      minSC,      minSC,      minSC,      minSC,      minSC,      minSC,      minSC,      minSC,      minSC,      minSC,      minSC,      minSC
-    };
-    const auto minSS = (COCO_CHALLENGE ? 0.05f : 0.4f);
-    const std::array<float, (int)PoseModel::Size>           POSE_DEFAULT_CONNECT_MIN_SUBSET_SCORE{
-        minSS,      minSS,      minSS,      minSS,      minSS,      minSS,      minSS,      minSS,      minSS,      minSS,      minSS,      minSS,      minSS,      minSS,      minSS
-        // 0.2f,       0.4f,       0.4f,       0.4f,       0.4f,       0.4f // Matlab version
     };
 
     const std::map<unsigned int, std::string>& getPoseBodyPartMapping(const PoseModel poseModel)
@@ -586,11 +544,11 @@ namespace op
         }
     }
 
-    unsigned int getPoseMaxPeaks(const PoseModel poseModel)
+    unsigned int getPoseMaxPeaks()
     {
         try
         {
-            return POSE_MAX_PEAKS.at((int)poseModel);
+            return POSE_MAX_PEOPLE;
         }
         catch (const std::exception& e)
         {
@@ -645,11 +603,19 @@ namespace op
     }
 
     // Default Model Parameters
-    float getPoseDefaultNmsThreshold(const PoseModel poseModel)
+    // They might be modified on running time
+    float getPoseDefaultNmsThreshold(const PoseModel poseModel, const bool maximizePositives)
     {
         try
         {
-            return POSE_DEFAULT_NMS_THRESHOLD.at((int)poseModel);
+            // MPI models
+            if (poseModel == PoseModel::MPI_15)
+                return 0.6f;
+            else if (poseModel == PoseModel::MPI_15_4)
+                return 0.3f;
+            // Non-MPI models
+            else
+                return (maximizePositives ? 0.02f : 0.05f);
         }
         catch (const std::exception& e)
         {
@@ -658,11 +624,11 @@ namespace op
         }
     }
 
-    float getPoseDefaultConnectInterMinAboveThreshold(const PoseModel poseModel)
+    float getPoseDefaultConnectInterMinAboveThreshold(const bool maximizePositives)
     {
         try
         {
-            return POSE_DEFAULT_CONNECT_INTER_MIN_ABOVE_THRESHOLD.at((int)poseModel);
+            return (maximizePositives ? 0.75f : 0.95f);
         }
         catch (const std::exception& e)
         {
@@ -671,11 +637,16 @@ namespace op
         }
     }
 
-    float getPoseDefaultConnectInterThreshold(const PoseModel poseModel)
+    float getPoseDefaultConnectInterThreshold(const PoseModel poseModel, const bool maximizePositives)
     {
         try
         {
-            return POSE_DEFAULT_CONNECT_INTER_THRESHOLD.at((int)poseModel);
+            // MPI models
+            if (poseModel == PoseModel::MPI_15 || poseModel == PoseModel::MPI_15_4)
+                return 0.01f;
+            // Non-MPI models
+            else
+                return (maximizePositives ? 0.01f : 0.05f);
         }
         catch (const std::exception& e)
         {
@@ -684,11 +655,11 @@ namespace op
         }
     }
 
-    unsigned int getPoseDefaultMinSubsetCnt(const PoseModel poseModel)
+    unsigned int getPoseDefaultMinSubsetCnt(const bool maximizePositives)
     {
         try
         {
-            return POSE_DEFAULT_CONNECT_MIN_SUBSET_CNT.at((int)poseModel);
+            return (maximizePositives ? 2u : 3u);
         }
         catch (const std::exception& e)
         {
@@ -697,11 +668,11 @@ namespace op
         }
     }
 
-    float getPoseDefaultConnectMinSubsetScore(const PoseModel poseModel)
+    float getPoseDefaultConnectMinSubsetScore(const bool maximizePositives)
     {
         try
         {
-            return POSE_DEFAULT_CONNECT_MIN_SUBSET_SCORE.at((int)poseModel);
+            return (maximizePositives ? 0.05f : 0.4f);
         }
         catch (const std::exception& e)
         {

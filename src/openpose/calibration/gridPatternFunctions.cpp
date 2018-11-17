@@ -36,12 +36,9 @@ namespace op
         {
             std::vector<cv::Point2f> points2DVector;
             // CALIB_CB_FAST_CHECK -> faster but more false negatives
-            const auto chessboardFound = cv::findChessboardCorners(image,
-                                                                   gridInnerCorners,
-                                                                   points2DVector,
-                                                                   CV_CALIB_CB_ADAPTIVE_THRESH
-                                                                    | CV_CALIB_CB_NORMALIZE_IMAGE
-                                                                    | CV_CALIB_CB_FILTER_QUADS);
+            const auto chessboardFound = cv::findChessboardCorners(
+                image, gridInnerCorners, points2DVector,
+                CV_CALIB_CB_ADAPTIVE_THRESH | CV_CALIB_CB_NORMALIZE_IMAGE | CV_CALIB_CB_FILTER_QUADS);
 
             return std::make_pair(chessboardFound, points2DVector);
         }

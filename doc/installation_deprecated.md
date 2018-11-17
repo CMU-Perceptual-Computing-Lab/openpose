@@ -44,7 +44,7 @@ Recommended installation method, it is simpler and offers more customization set
 CUDA, cuDNN, OpenCV and Atlas must be already installed on your machine:
 
     1. [CUDA](https://developer.nvidia.com/cuda-80-ga2-download-archive) must be installed. You should reboot your machine after installing CUDA.
-    2. [cuDNN](https://developer.nvidia.com/cudnn): Once you have downloaded it, just unzip it and copy (merge) the contents on the CUDA folder, e.g. `/usr/local/cuda-8.0/`. Note: We found OpenPose working ~10% faster with cuDNN 5.1 compared to cuDNN 6. Otherwise, check [Compiling without cuDNN](#compiling-without-cudnn).
+    2. [cuDNN](https://developer.nvidia.com/cudnn): Once you have downloaded it, just unzip it and copy (merge) the contents on the CUDA folder, e.g., `/usr/local/cuda-8.0/`. Note: We found OpenPose working ~10% faster with cuDNN 5.1 compared to cuDNN 6. Otherwise, check [Compiling without cuDNN](#compiling-without-cudnn).
     3. OpenCV can be installed with `apt-get install libopencv-dev`. If you have compiled OpenCV 3 by your own, follow [Manual Compilation](#manual-compilation). After both Makefile.config files have been generated, edit them and uncomment the line `# OPENCV_VERSION := 3`. You might alternatively modify all `Makefile.config.UbuntuXX` files and then run the scripts in step 2.
     4. In addition, OpenCV 3 does not incorporate the `opencv_contrib` module by default. Assuming you have OpenCV 3 compiled with the contrib module and you want to use it, append `opencv_contrib` at the end of the line `LIBRARIES += opencv_core opencv_highgui opencv_imgproc` in the `Makefile` file.
     5. Atlas can be installed with `sudo apt-get install libatlas-base-dev`. Instead of Atlas, you can use OpenBLAS or Intel MKL by modifying the line `BLAS := atlas` in the same way as previosuly mentioned for the OpenCV version selection.
@@ -61,7 +61,7 @@ bash ./ubuntu/install_caffe_and_openpose_if_cuda8.sh
 
 
 ### Installation - Manual Compilation
-Alternatively to the script installation, if you want to use CUDA 7, avoid using sh scripts, change some configuration labels (e.g. OpenCV version), etc., then:
+Alternatively to the script installation, if you want to use CUDA 7, avoid using sh scripts, change some configuration labels (e.g., OpenCV version), etc., then:
 1. Install the [Caffe prerequisites](http://caffe.berkeleyvision.org/installation.html).
 2. Compile Caffe and OpenPose by running these lines:
     ```
@@ -73,7 +73,7 @@ Alternatively to the script installation, if you want to use CUDA 7, avoid using
     cp Makefile.config.Ubuntu14_cuda8.example Makefile.config # Ubuntu 14, cuda 8
     cp Makefile.config.Ubuntu16_cuda7.example Makefile.config # Ubuntu 16, cuda 7
     cp Makefile.config.Ubuntu16_cuda8.example Makefile.config # Ubuntu 16, cuda 8
-    # Change any custom flag from the resulting Makefile.config (e.g. OpenCV 3, Atlas/OpenBLAS/MKL, etc.)
+    # Change any custom flag from the resulting Makefile.config (e.g., OpenCV 3, Atlas/OpenBLAS/MKL, etc.)
     # Compile Caffe
     make all -j`nproc` && make distribute -j`nproc`
 
@@ -84,7 +84,7 @@ Alternatively to the script installation, if you want to use CUDA 7, avoid using
     cp ubuntu/Makefile.example Makefile
     # Same file cp command as the one used for Caffe
     cp ubuntu/Makefile.config.Ubuntu14_cuda7.example Makefile.config
-    # Change any custom flag from the resulting Makefile.config (e.g. OpenCV 3, Atlas/OpenBLAS/MKL, etc.)
+    # Change any custom flag from the resulting Makefile.config (e.g., OpenCV 3, Atlas/OpenBLAS/MKL, etc.)
     make all -j`nproc`
     ```
 
@@ -97,7 +97,7 @@ Alternatively to the script installation, if you want to use CUDA 7, avoid using
     make clean
     make all -j$(NUM_CORES)
     ```
-**Highly important**: There are 2 `Makefile.config.Ubuntu##.example` analogous files, one in the main folder and one in [3rdparty/caffe/](../3rdparty/caffe/), corresponding to OpenPose and Caffe configuration files respectively. Any change must be done to both files (e.g. OpenCV 3 flag, Atlab/OpenBLAS/MKL flag, etc.). E.g. for CUDA 8 and Ubuntu16: [3rdparty/caffe/Makefile.config.Ubuntu16_cuda8.example](../3rdparty/caffe/Makefile.config.Ubuntu16.example) and [ubuntu/Makefile.config.Ubuntu16_cuda8.example](../ubuntu/Makefile.config.Ubuntu16_cuda8.example).
+**Highly important**: There are 2 `Makefile.config.Ubuntu##.example` analogous files, one in the main folder and one in [3rdparty/caffe/](../3rdparty/caffe/), corresponding to OpenPose and Caffe configuration files respectively. Any change must be done to both files (e.g., OpenCV 3 flag, Atlab/OpenBLAS/MKL flag, etc.). E.g., for CUDA 8 and Ubuntu16: [3rdparty/caffe/Makefile.config.Ubuntu16_cuda8.example](../3rdparty/caffe/Makefile.config.Ubuntu16.example) and [ubuntu/Makefile.config.Ubuntu16_cuda8.example](../ubuntu/Makefile.config.Ubuntu16_cuda8.example).
 
 
 
@@ -112,7 +112,7 @@ make clean && cd 3rdparty/caffe && make clean
 
 
 ### Uninstallation
-You just need to remove the OpenPose folder, by default called `openpose/`. E.g. `rm -rf openpose/`.
+You just need to remove the OpenPose folder, by default called `openpose/`. E.g., `rm -rf openpose/`.
 
 
 
@@ -148,7 +148,7 @@ Note: This installer will not incorporate any new features, we recommend to use 
     2. Change `Debug` by `Release` mode.
     3. Compile it and run it with <kbd>F5</kbd> or the green play icon.
 4. If you have a webcam connected, OpenPose will automatically start after being compiled.
-5. In order to use the created exe file from the command line (i.e. outside Visual Studio), you have to:
+5. In order to use the created exe file from the command line (i.e., outside Visual Studio), you have to:
     1. Copy all the DLLs located on `{openpose_folder}\3rdparty\windows\caffe\bin\` on the exe folder: `{openpose_folder}\windows\x64\Release`.
     2. Copy all the DLLs located on `{openpose_folder}\3rdparty\windows\opencv\x64\vc14\bin\` on the exe folder: `{openpose_folder}\windows\x64\Release`.
     3. Open the Windows cmd (Windows button + <kbd>X</kbd>, then <kbd>A</kbd>).

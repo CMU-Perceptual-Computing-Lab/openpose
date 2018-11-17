@@ -45,7 +45,8 @@ namespace op
     }
 
     PoseExtractorNet::PoseExtractorNet(const PoseModel poseModel, const std::vector<HeatMapType>& heatMapTypes,
-                                       const ScaleMode heatMapScale, const bool addPartCandidates) :
+                                       const ScaleMode heatMapScale, const bool addPartCandidates,
+                                       const bool maximizePositives) :
         mPoseModel{poseModel},
         mNetOutputSize{0,0},
         mHeatMapTypes{heatMapTypes},
@@ -60,15 +61,18 @@ namespace op
                 error("The ScaleMode heatMapScale must be ZeroToOne, PlusMinusOne, UnsignedChar, or NoScale.",
                       __LINE__, __FUNCTION__, __FILE__);
 
-            // Properties
+            // Properties - Init to 0
             for (auto& property : mProperties)
                 property = 0.;
-            mProperties[(int)PoseProperty::NMSThreshold] = getPoseDefaultNmsThreshold(mPoseModel);
+            // Properties - Fill default values
+            mProperties[(int)PoseProperty::NMSThreshold] = getPoseDefaultNmsThreshold(mPoseModel, maximizePositives);
             mProperties[(int)PoseProperty::ConnectInterMinAboveThreshold]
-                = getPoseDefaultConnectInterMinAboveThreshold(mPoseModel);
-            mProperties[(int)PoseProperty::ConnectInterThreshold] = getPoseDefaultConnectInterThreshold(mPoseModel);
-            mProperties[(int)PoseProperty::ConnectMinSubsetCnt] = getPoseDefaultMinSubsetCnt(mPoseModel);
-            mProperties[(int)PoseProperty::ConnectMinSubsetScore] = getPoseDefaultConnectMinSubsetScore(mPoseModel);
+                = getPoseDefaultConnectInterMinAboveThreshold(maximizePositives);
+            mProperties[(int)PoseProperty::ConnectInterThreshold] = getPoseDefaultConnectInterThreshold(
+                mPoseModel, maximizePositives);
+            mProperties[(int)PoseProperty::ConnectMinSubsetCnt] = getPoseDefaultMinSubsetCnt(maximizePositives);
+            mProperties[(int)PoseProperty::ConnectMinSubsetScore] = getPoseDefaultConnectMinSubsetScore(
+                maximizePositives);
         }
         catch (const std::exception& e)
         {
@@ -241,7 +245,7 @@ namespace op
                 const auto* candidatesCpuPtr = getCandidatesCpuConstPtr();
                 for (auto part = 0u ; part < numberBodyParts ; part++)
                 {
-                    const auto numberPartCandidates = candidatesCpuPtr[part*peaksArea];
+                    const auto numberPartCandidates = intRound(candidatesCpuPtr[part*peaksArea]);
                     candidates[part].resize(numberPartCandidates);
                     const auto* partCandidatesPtr = &candidatesCpuPtr[part*peaksArea+3];
                     for (auto candidate = 0 ; candidate < numberPartCandidates ; candidate++)
