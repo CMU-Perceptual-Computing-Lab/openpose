@@ -10,6 +10,7 @@ typedef void(__stdcall * OutputCallback) (void * ptrs, int ptrSize, int * sizes,
 // Global output callback
 OutputCallback unityOutputCallback;
 bool unityOutputEnabled = true;
+bool imageOutput = false;
 
 // This worker will just read and return all the jpg files in a directory
 class UnityPluginUserOutput : public op::WorkerConsumer<std::shared_ptr<std::vector<op::Datum>>> {
@@ -36,7 +37,8 @@ public:
 		HandKeypoints3D,
 		CameraMatrix,
 		CameraExtrinsics,
-		CameraIntrinsics
+		CameraIntrinsics,
+		Image
 	};
 
 protected:
@@ -56,6 +58,7 @@ protected:
 					sendHandRectangles(datumsPtr);
 					sendHandKeypoints(datumsPtr);
 					sendHandHeatMaps(datumsPtr);
+					if (imageOutput) sendImage(datumsPtr);
 					sendEndOfFrame();
 				}
 			}
@@ -208,6 +211,12 @@ private:
 			outputValue(ptrs, 2, sizes, sizeSize, OutputType::HandHeightMaps);
 		}
 	}
+	void sendImage(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
+		auto& data = datumsPtr->at(0).cvInputData; // cv::Mat
+		if (!data.empty()) {
+			
+		}
+	}
 	void sendEndOfFrame() {
 		outputValue((void**)nullptr, 0, nullptr, 0, OutputType::None);
 	}
@@ -223,6 +232,7 @@ std::shared_ptr<op::WrapperStructFace> spWrapperStructFace;
 std::shared_ptr<op::WrapperStructExtra> spWrapperStructExtra;
 std::shared_ptr<op::WrapperStructInput> spWrapperStructInput;
 std::shared_ptr<op::WrapperStructOutput> spWrapperStructOutput;
+std::shared_ptr<op::WrapperStructGui> spWrapperStructGui;
 
 // Main
 void openpose_main() {
@@ -397,24 +407,32 @@ extern "C" {
 		}
 	}
 	OP_API void OP_ConfigureOutput(
-		ushort display_mode, // DisplayMode
-		bool gui_verbose, bool full_screen, char* write_keypoint,
-		uchar write_keypoint_format, // DataFormat
-		char* write_json, char* write_coco_json, char* write_coco_foot_json, 
+		double verbose, char* write_keypoint, uchar write_keypoint_format, // DataFormat
+		char* write_json, char* write_coco_json, char* write_coco_foot_json, int write_coco_json_variant,
 		char* write_images, char* write_images_format, char* write_video,
 		double camera_fps, char* write_heatmaps, char* write_heatmaps_format, 
 		char* write_video_adam, char* write_bvh, char* udp_host, char* udp_port) {
 
 		try {
-			//const bool guiVerbose = false;
-			//const bool fullScreen = false;
 			spWrapperStructOutput = std::make_shared<op::WrapperStructOutput>(
-				(op::DisplayMode) display_mode, gui_verbose, full_screen, write_keypoint,
+				verbose, write_keypoint,
 				(op::DataFormat) write_keypoint_format, write_json, write_coco_json,
-				write_coco_foot_json, write_images, write_images_format, write_video,
+				write_coco_foot_json, write_coco_json_variant, write_images, write_images_format, write_video,
 				camera_fps, write_heatmaps, write_heatmaps_format, write_video_adam, write_bvh, 
 				udp_host, udp_port);
 		} catch (const std::exception& e) {
+			op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+		}
+	}
+	OP_API void OP_ConfigureGui(
+		ushort display_mode, // DisplayMode
+		bool gui_verbose, bool full_screen) {
+
+		try {
+			spWrapperStructGui = std::make_shared<op::WrapperStructGui>(
+				(op::DisplayMode) display_mode, gui_verbose, full_screen);
+		}
+		catch (const std::exception& e) {
 			op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
 		}
 	}
