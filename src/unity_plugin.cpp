@@ -10,7 +10,7 @@ typedef void(__stdcall * OutputCallback) (void * ptrs, int ptrSize, int * sizes,
 // Global output callback
 OutputCallback unityOutputCallback;
 bool unityOutputEnabled = true;
-bool imageOutput = false;
+bool imageOutput = true;
 
 // This worker will just read and return all the jpg files in a directory
 class UnityPluginUserOutput : public op::WorkerConsumer<std::shared_ptr<std::vector<op::Datum>>> {
@@ -214,7 +214,10 @@ private:
 	void sendImage(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
 		auto& data = datumsPtr->at(0).cvInputData; // cv::Mat
 		if (!data.empty()) {
-			
+			int sizeVector[] = { data.rows, data.cols, 3 };
+			int sizeSize = 3;
+			auto valPtr = data.data;
+			outputValue(&valPtr, 1, sizeVector, sizeSize, OutputType::Image);
 		}
 	}
 	void sendEndOfFrame() {
