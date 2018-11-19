@@ -10,7 +10,7 @@ typedef void(__stdcall * OutputCallback) (void * ptrs, int ptrSize, int * sizes,
 // Global output callback
 OutputCallback unityOutputCallback;
 bool unityOutputEnabled = true;
-bool imageOutput = true;
+bool imageOutput = false;
 
 // This worker will just read and return all the jpg files in a directory
 class UnityPluginUserOutput : public op::WorkerConsumer<std::shared_ptr<std::vector<op::Datum>>> {
@@ -309,6 +309,15 @@ extern "C" {
 		try {
 			unityOutputEnabled = enable;
 		} catch (const std::exception& e) {
+			op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+		}
+	}
+	// Enable/disable image output
+	OP_API void OP_SetImageOutputEnable(bool enable) {
+		try {
+			imageOutput = enable;
+		}
+		catch (const std::exception& e) {
 			op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
 		}
 	}
