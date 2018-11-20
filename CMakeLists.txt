@@ -376,6 +376,9 @@ if (UNIX OR APPLE)
 
   if (OpenCV_CONFIG_FILE)
     include (${OpenCV_CONFIG_FILE})
+  # Allow explicitly setting the OpenCV includes and libs
+  elseif (OpenCV_INCLUDE_DIRS AND OpenCV_LIBS)
+    set(OpenCV_FOUND 1)
   elseif (OpenCV_INCLUDE_DIRS AND OpenCV_LIBS_DIR)
     file(GLOB_RECURSE OpenCV_LIBS "${OpenCV_LIBS_DIR}*.so")
     set(OpenCV_FOUND 1)
