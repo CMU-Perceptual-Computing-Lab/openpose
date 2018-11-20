@@ -368,11 +368,9 @@ if (UNIX OR APPLE)
     include(cmake/Cuda.cmake)
     find_package(CuDNN)
   endif (${GPU_MODE} MATCHES "CUDA")
-  find_package(GFlags)
-  find_package(Glog)
-
-  # Caffe has transitive dependencies on Protobuf
-  find_package(Protobuf REQUIRED)
+  find_package(GFlags) # For Caffe and OpenPose
+  find_package(Glog) # For Caffe
+  find_package(Protobuf REQUIRED) # For Caffe
 
   if (OpenCV_CONFIG_FILE)
     include (${OpenCV_CONFIG_FILE})
