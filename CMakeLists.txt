@@ -370,6 +370,10 @@ if (UNIX OR APPLE)
   endif (${GPU_MODE} MATCHES "CUDA")
   find_package(GFlags)
   find_package(Glog)
+
+  # Caffe has transitive dependencies on Protobuf
+  find_package(Protobuf REQUIRED)
+
   if (OpenCV_CONFIG_FILE)
     include (${OpenCV_CONFIG_FILE})
   elseif (OpenCV_INCLUDE_DIRS AND OpenCV_LIBS_DIR)
@@ -754,6 +758,7 @@ endif (UNIX OR APPLE)
 # Specify the include directories
 include_directories(
   include
+  ${Protobuf_INCLUDE_DIRS}
   ${GFLAGS_INCLUDE_DIR}
   ${GLOG_INCLUDE_DIR}
   ${OpenCV_INCLUDE_DIRS})
