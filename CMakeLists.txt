@@ -368,10 +368,15 @@ if (UNIX OR APPLE)
     include(cmake/Cuda.cmake)
     find_package(CuDNN)
   endif (${GPU_MODE} MATCHES "CUDA")
-  find_package(GFlags)
-  find_package(Glog)
+  find_package(GFlags) # For Caffe and OpenPose
+  find_package(Glog) # For Caffe
+  find_package(Protobuf REQUIRED) # For Caffe
+
   if (OpenCV_CONFIG_FILE)
     include (${OpenCV_CONFIG_FILE})
+  # Allow explicitly setting the OpenCV includes and libs
+  elseif (OpenCV_INCLUDE_DIRS AND OpenCV_LIBS)
+    set(OpenCV_FOUND 1)
   elseif (OpenCV_INCLUDE_DIRS AND OpenCV_LIBS_DIR)
     file(GLOB_RECURSE OpenCV_LIBS "${OpenCV_LIBS_DIR}*.so")
     set(OpenCV_FOUND 1)
@@ -754,6 +759,7 @@ endif (UNIX OR APPLE)
 # Specify the include directories
 include_directories(
   include
+  ${Protobuf_INCLUDE_DIRS}
   ${GFLAGS_INCLUDE_DIR}
   ${GLOG_INCLUDE_DIR}
   ${OpenCV_INCLUDE_DIRS})
