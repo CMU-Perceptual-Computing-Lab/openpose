@@ -19,6 +19,7 @@ namespace op
         std::vector<float>{POSE_BODY_25_SCALES_RENDER_GPU},       // BODY_25D
         std::vector<float>{POSE_BODY_23_SCALES_RENDER_GPU},       // BODY_23
         std::vector<float>{POSE_CAR_22_SCALES_RENDER_GPU},        // CAR_22
+        std::vector<float>{POSE_BODY_19_SCALES_RENDER_GPU},       // BODY_19E
     };
     const std::array<std::vector<float>, (int)PoseModel::Size> POSE_COLORS{
         std::vector<float>{POSE_BODY_25_COLORS_RENDER_GPU},       // BODY_25
@@ -36,6 +37,7 @@ namespace op
         std::vector<float>{POSE_BODY_25_COLORS_RENDER_GPU},       // BODY_25D
         std::vector<float>{POSE_BODY_23_COLORS_RENDER_GPU},       // BODY_23
         std::vector<float>{POSE_CAR_22_COLORS_RENDER_GPU},        // CAR_22
+        std::vector<float>{POSE_BODY_19_COLORS_RENDER_GPU},       // BODY_19E
     };
     const std::array<std::vector<unsigned int>, (int)PoseModel::Size> POSE_BODY_PART_PAIRS_RENDER{
         std::vector<unsigned int>{POSE_BODY_25_PAIRS_RENDER_GPU},       // BODY_25
@@ -53,6 +55,7 @@ namespace op
         std::vector<unsigned int>{POSE_BODY_25_PAIRS_RENDER_GPU},       // BODY_25D
         std::vector<unsigned int>{POSE_BODY_23_PAIRS_RENDER_GPU},       // BODY_23
         std::vector<unsigned int>{POSE_CAR_22_PAIRS_RENDER_GPU},        // CAR_22
+        std::vector<unsigned int>{POSE_BODY_19_PAIRS_RENDER_GPU},       // BODY_19E
     };
 
     // Rendering functions
