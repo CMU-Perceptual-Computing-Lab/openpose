@@ -289,7 +289,8 @@ OpenPose Library - Release Notes
     19. All bash scripts incorporate `#!/bin/bash` to tell the terminal that they are bash scripts.
     20. Added flag `--verbose` to plot the progress.
     21. Added find_package(Protobuf) to allow specific versions of Protobuf.
-    22. Examples do not end in core dumped if an OpenPose exception occurred, but it is rather closed returning -1.
+    22. Examples do not end in core dumped if an OpenPose exception occurred during initialization, but it is rather closed returning -1. However, it will still results in core dumped if the exception occurs during multi-threading execution.
+    23. Video (`--write_video`) can be generated from images (`--image_dir`), as long as they maintain the same resolution.
 2. Functions or parameters renamed:
     1. By default, python example `tutorial_developer/python_2_pose_from_heatmaps.py` was using 2 scales starting at -1x736, changed to 1 scale at -1x368.
     2. WrapperStructPose default parameters changed to match those of the OpenPose demo binary.
