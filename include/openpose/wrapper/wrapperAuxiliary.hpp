@@ -105,18 +105,6 @@ namespace op
             auto wrapperStructPose = wrapperStructPoseTemp;
             auto multiThreadEnabled = multiThreadEnabledTemp;
 
-            // Workers
-            TWorker datumProducerW;
-            TWorker scaleAndSizeExtractorW;
-            TWorker cvMatToOpInputW;
-            TWorker cvMatToOpOutputW;
-            std::vector<std::vector<TWorker>> poseExtractorsWs;
-            std::vector<std::vector<TWorker>> poseTriangulationsWs;
-            std::vector<std::vector<TWorker>> jointAngleEstimationsWs;
-            std::vector<TWorker> postProcessingWs;
-            std::vector<TWorker> outputWs;
-            TWorker guiW;
-
             // User custom workers
             const auto& userInputWs = userWs[int(WorkerType::Input)];
             const auto& userPostProcessingWs = userWs[int(WorkerType::PostProcessing)];
@@ -219,6 +207,7 @@ namespace op
             }
 
             // Producer
+            TWorker datumProducerW;
             if (oPProducer)
             {
                 const auto datumProducer = std::make_shared<DatumProducer<TDatums>>(
@@ -235,6 +224,14 @@ namespace op
             std::vector<std::shared_ptr<HandExtractorNet>> handExtractorNets;
             std::vector<std::shared_ptr<PoseGpuRenderer>> poseGpuRenderers;
             std::shared_ptr<PoseCpuRenderer> poseCpuRenderer;
+            // Workers
+            TWorker scaleAndSizeExtractorW;
+            TWorker cvMatToOpInputW;
+            TWorker cvMatToOpOutputW;
+            std::vector<std::vector<TWorker>> poseExtractorsWs;
+            std::vector<std::vector<TWorker>> poseTriangulationsWs;
+            std::vector<std::vector<TWorker>> jointAngleEstimationsWs;
+            std::vector<TWorker> postProcessingWs;
             if (numberThreads > 0)
             {
                 // Get input scales and sizes
@@ -582,7 +579,7 @@ namespace op
 #endif
 
             // Output workers
-            outputWs.clear();
+            std::vector<TWorker> outputWs;
             // Print verbose
             if (wrapperStructOutput.verbose > 0.)
             {
@@ -700,7 +697,7 @@ namespace op
                 outputWs.emplace_back(std::make_shared<WGuiInfoAdder<TDatumsSP>>(guiInfoAdder));
             }
             // Minimal graphical user interface (GUI)
-            guiW = nullptr;
+            TWorker guiW;
             if (guiEnabled)
             {
                 // PoseRenderers to Renderers
@@ -753,6 +750,10 @@ namespace op
                 else
                     error("Unknown DisplayMode.", __LINE__, __FUNCTION__, __FILE__);
             }
+            // Set FpsMax
+            TWorker wFpsMax;
+            if (wrapperStructPose.fpsMax > 0.)
+                wFpsMax = std::make_shared<WFpsMax<TDatumsSP>>(wrapperStructPose.fpsMax);
             // Set wrapper as configured
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
@@ -986,6 +987,13 @@ namespace op
                 threadIdPP(threadId, multiThreadEnabled);
             }
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            // Setting maximum speed
+            if (wFpsMax != nullptr)
+            {
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                threadManager.add(threadId, wFpsMax, queueIn++, queueOut++);
+                threadIdPP(threadId, multiThreadEnabled);
+            }
         }
         catch (const std::exception& e)
         {

@@ -9,7 +9,8 @@ namespace op
         const bool blendOriginalFrame_, const float alphaKeypoint_, const float alphaHeatMap_,
         const int defaultPartToRender_, const std::string& modelFolder_, const std::vector<HeatMapType>& heatMapTypes_,
         const ScaleMode heatMapScale_, const bool addPartCandidates_, const float renderThreshold_,
-        const int numberPeopleMax_, const bool maximizePositives_, const bool enableGoogleLogging_) :
+        const int numberPeopleMax_, const bool maximizePositives_, const double fpsMax_,
+        const bool enableGoogleLogging_) :
         enable{enable_},
         netInputSize{netInputSize_},
         outputSize{outputSize_},
@@ -31,6 +32,7 @@ namespace op
         renderThreshold{renderThreshold_},
         numberPeopleMax{numberPeopleMax_},
         maximizePositives{maximizePositives_},
+        fpsMax{fpsMax_},
         enableGoogleLogging{enableGoogleLogging_}
     {
     }

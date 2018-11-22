@@ -80,6 +80,9 @@ DEFINE_int32(number_people_max,         -1,             "This parameter will lim
                                                         " highly occluded people. -1 will keep them all.");
 DEFINE_bool(maximize_positives,         false,          "It reduces the thresholds to accept a person candidate. It highly increases both false and"
                                                         " true positives. I.e., it maximizes average recall but could harm average precision.");
+DEFINE_double(fps_max,                  -1.,            "Maximum processing frame rate. By default (-1), OpenPose will process frames as fast as"
+                                                        " possible. Example usage: If OpenPose is displaying images too quickly, this can reduce"
+                                                        " the speed so the user can analyze better each frame from the GUI.");
 // OpenPose Body Pose
 DEFINE_bool(body_disable,               false,          "Disable body keypoint detection. Option only possible for faster (but less accurate) face"
                                                         " keypoint detection.");
