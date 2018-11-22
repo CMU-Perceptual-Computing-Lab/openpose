@@ -35,8 +35,6 @@ DEFINE_int32(camera,                    -1,             "The camera index for cv
 DEFINE_string(camera_resolution,        "-1x-1",        "Set the camera resolution (either `--camera` or `--flir_camera`). `-1x-1` will use the"
                                                         " default 1280x720 for `--camera`, or the maximum flir camera resolution available for"
                                                         " `--flir_camera`");
-DEFINE_double(camera_fps,               30.0,           "Frame rate for the webcam (also used when saving video). Set this value to the minimum"
-                                                        " value between the OpenPose displayed speed and the webcam real frame rate.");
 DEFINE_string(video,                    "",             "Use a video file instead of the camera. Use `examples/media/video.avi` for our default"
                                                         " example video.");
 DEFINE_string(image_dir,                "",             "Process a directory of images. Use `examples/media/` for our default example folder with 20"
@@ -122,8 +120,8 @@ int tutorialDeveloperThread2()
         const auto displayProducerFpsMode = (FLAGS_process_real_time
                                           ? op::ProducerFpsMode::OriginalFps : op::ProducerFpsMode::RetrievalFps);
         auto producerSharedPtr = createProducer(
-            producerType, producerString, cameraSize, FLAGS_camera_fps, FLAGS_camera_parameter_folder,
-            !FLAGS_frame_keep_distortion, (unsigned int) FLAGS_3d_views);
+            producerType, producerString, cameraSize, FLAGS_camera_parameter_folder, !FLAGS_frame_keep_distortion,
+            (unsigned int) FLAGS_3d_views);
         producerSharedPtr->setProducerFpsMode(displayProducerFpsMode);
         op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
         // Step 3 - Setting producer

@@ -352,7 +352,7 @@ namespace op
     }
 
     std::shared_ptr<Producer> createProducer(const ProducerType producerType, const std::string& producerString,
-                                             const Point<int>& cameraResolution, const double webcamFps,
+                                             const Point<int>& cameraResolution,
                                              const std::string& cameraParameterPath, const bool undistortImage,
                                              const unsigned int imageDirectoryStereo)
     {
@@ -386,7 +386,7 @@ namespace op
                 {
                     const auto throwExceptionIfNoOpened = true;
                     return std::make_shared<WebcamReader>(
-                        webcamIndex, cameraResolutionFinal, webcamFps, throwExceptionIfNoOpened);
+                        webcamIndex, cameraResolutionFinal, throwExceptionIfNoOpened);
                 }
                 else
                 {
@@ -395,7 +395,7 @@ namespace op
                     for (auto index = 0 ; index < 10 ; index++)
                     {
                         webcamReader = std::make_shared<WebcamReader>(
-                            index, cameraResolutionFinal, webcamFps, throwExceptionIfNoOpened);
+                            index, cameraResolutionFinal, throwExceptionIfNoOpened);
                         if (webcamReader->isOpened())
                         {
                             log("Auto-detecting camera index... Detected and opened camera " + std::to_string(index)

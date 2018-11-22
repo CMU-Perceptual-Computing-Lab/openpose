@@ -33,10 +33,6 @@ DEFINE_int32(camera,                    -1,             "The camera index for cv
 DEFINE_string(camera_resolution,        "-1x-1",        "Set the camera resolution (either `--camera` or `--flir_camera`). `-1x-1` will use the"
                                                         " default 1280x720 for `--camera`, or the maximum flir camera resolution available for"
                                                         " `--flir_camera`");
-#endif // OPENPOSE_FLAGS_DISABLE_PRODUCER
-DEFINE_double(camera_fps,               30.0,           "Frame rate for the webcam (also used when saving video). Set this value to the minimum"
-                                                        " value between the OpenPose displayed speed and the webcam real frame rate.");
-#ifndef OPENPOSE_FLAGS_DISABLE_PRODUCER
 DEFINE_string(video,                    "",             "Use a video file instead of the camera. Use `examples/media/video.avi` for our default"
                                                         " example video.");
 DEFINE_string(image_dir,                "",             "Process a directory of images. Use `examples/media/` for our default example folder with 20"
@@ -214,7 +210,11 @@ DEFINE_string(write_images_format,      "png",          "File extension and form
                                                         " function cv::imwrite for all compatible extensions.");
 DEFINE_string(write_video,              "",             "Full file path to write rendered frames in motion JPEG video format. It might fail if the"
                                                         " final path does not finish in `.avi`. It internally uses cv::VideoWriter. Flag"
-                                                        " `camera_fps` controls FPS.");
+                                                        " `write_video_fps` controls FPS.");
+DEFINE_double(write_video_fps,          -1.,            "Frame rate for the recorded video. By default, it will try to get the input frames producer"
+                                                        " frame rate (e.g., input video or webcam frame rate). If the input frames producer does not"
+                                                        " have a set FPS (e.g., image_dir or webcam if OpenCV not compiled with its support), set"
+                                                        " this value accordingly (e.g., to the frame rate displayed by the OpenPose GUI).");
 DEFINE_string(write_json,               "",             "Directory to write OpenPose output in JSON format. It includes body, hand, and face pose"
                                                         " keypoints (2-D and 3-D), as well as pose candidates (if `--part_candidates` enabled).");
 DEFINE_string(write_coco_json,          "",             "Full file path to write people pose data with JSON COCO validation format.");
@@ -231,7 +231,7 @@ DEFINE_string(write_keypoint,           "",             "(Deprecated, use `write
 DEFINE_string(write_keypoint_format,    "yml",          "(Deprecated, use `write_json`) File extension and format for `write_keypoint`: json, xml,"
                                                         " yaml & yml. Json not available for OpenCV < 3.0, use `write_json` instead.");
 // Result Saving - Extra Algorithms
-DEFINE_string(write_video_adam,         "",             "Experimental, not available yet. E.g., `~/Desktop/adamResult.avi`. Flag `camera_fps`"
+DEFINE_string(write_video_adam,         "",             "Experimental, not available yet. E.g., `~/Desktop/adamResult.avi`. Flag `write_video_fps`"
                                                         " controls FPS.");
 DEFINE_string(write_bvh,                "",             "Experimental, not available yet. E.g., `~/Desktop/mocapResult.bvh`.");
 // UDP Communication

@@ -98,9 +98,8 @@ namespace op
             // Create producer
             auto producerSharedPtr = createProducer(
                 wrapperStructInput.producerType, wrapperStructInput.producerString,
-                wrapperStructInput.cameraResolution, wrapperStructInput.webcamFps,
-                wrapperStructInput.cameraParameterPath, wrapperStructInput.undistortImage,
-                wrapperStructInput.imageDirectoryStereo);
+                wrapperStructInput.cameraResolution, wrapperStructInput.cameraParameterPath,
+                wrapperStructInput.undistortImage, wrapperStructInput.imageDirectoryStereo);
 
             // Editable arguments
             auto wrapperStructPose = wrapperStructPoseTemp;
@@ -649,35 +648,43 @@ namespace op
                 outputWs.emplace_back(std::make_shared<WImageSaver<TDatumsSP>>(imageSaver));
             }
             // Write frames as *.avi video on hard disk
-            const auto producerFps = (producerSharedPtr == nullptr ?
-                                        0. : producerSharedPtr->get(CV_CAP_PROP_FPS));
-            const auto originalVideoFps = (wrapperStructOutput.writeVideoFps > 0 ?
-                                            wrapperStructOutput.writeVideoFps
-                                            : producerFps);
-            if (!wrapperStructOutput.writeVideo.empty())
+            if (!wrapperStructOutput.writeVideo.empty() || !wrapperStructOutput.writeBvh.empty())
             {
-                if (!oPProducer)
-                    error("Video file can only be recorded inside `wrapper/wrapper.hpp` if the producer"
-                          " is one of the default ones (e.g., video, webcam, ...).",
+                if (wrapperStructOutput.writeVideoFps <= 0
+                    && (producerSharedPtr == nullptr || producerSharedPtr->get(CV_CAP_PROP_FPS) <= 0))
+                    error("The frame rate of the frames producer is unknown. Set `--write_video_fps` to your desired"
+                          " FPS if you wanna record video (`--write_video`). E.g., if it is a folder of images, you"
+                          " will have to know or guess the frame rate; if it is a webcam, you should use the OpenPose"
+                          " displayed FPS as desired value. If you do not care, simply add `--write_video_fps 30`.",
                           __LINE__, __FUNCTION__, __FILE__);
-                if (finalOutputSize.x <= 0 || finalOutputSize.y <= 0)
-                    error("Video can only be recorded if outputSize is fixed (e.g., video, webcam, IP camera),"
-                          "but not for a image directory.", __LINE__, __FUNCTION__, __FILE__);
-                const auto videoSaver = std::make_shared<VideoSaver>(
-                    wrapperStructOutput.writeVideo, CV_FOURCC('M','J','P','G'), originalVideoFps, finalOutputSize
-                );
-                outputWs.emplace_back(std::make_shared<WVideoSaver<TDatumsSP>>(videoSaver));
-            }
-            // Write joint angles as *.bvh file on hard disk
+                const auto originalVideoFps = (
+                    wrapperStructOutput.writeVideoFps > 0 ?
+                    wrapperStructOutput.writeVideoFps : producerSharedPtr->get(CV_CAP_PROP_FPS));
+                if (!wrapperStructOutput.writeVideo.empty())
+                {
+                    if (!oPProducer)
+                        error("Video file can only be recorded inside `wrapper/wrapper.hpp` if the producer"
+                              " is one of the default ones (e.g., video, webcam, ...).",
+                              __LINE__, __FUNCTION__, __FILE__);
+                    if (finalOutputSize.x <= 0 || finalOutputSize.y <= 0)
+                        error("Video can only be recorded if outputSize is fixed (e.g., video, webcam, IP camera),"
+                              " but not for a image directory.", __LINE__, __FUNCTION__, __FILE__);
+                    const auto videoSaver = std::make_shared<VideoSaver>(
+                        wrapperStructOutput.writeVideo, CV_FOURCC('M','J','P','G'), originalVideoFps, finalOutputSize
+                    );
+                    outputWs.emplace_back(std::make_shared<WVideoSaver<TDatumsSP>>(videoSaver));
+                }
+                // Write joint angles as *.bvh file on hard disk
 #ifdef USE_3D_ADAM_MODEL
-            if (!wrapperStructOutput.writeBvh.empty())
-            {
-                const auto bvhSaver = std::make_shared<BvhSaver>(
-                    wrapperStructOutput.writeBvh, JointAngleEstimation::getTotalModel(), originalVideoFps
-                );
-                outputWs.emplace_back(std::make_shared<WBvhSaver<TDatumsSP>>(bvhSaver));
-            }
+                if (!wrapperStructOutput.writeBvh.empty())
+                {
+                    const auto bvhSaver = std::make_shared<BvhSaver>(
+                        wrapperStructOutput.writeBvh, JointAngleEstimation::getTotalModel(), originalVideoFps
+                    );
+                    outputWs.emplace_back(std::make_shared<WBvhSaver<TDatumsSP>>(bvhSaver));
+                }
 #endif
+            }
             // Write heat maps as desired image format on hard disk
             if (!writeHeatMapsCleaned.empty())
             {

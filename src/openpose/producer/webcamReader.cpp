@@ -5,11 +5,10 @@
 
 namespace op
 {
-    WebcamReader::WebcamReader(const int webcamIndex, const Point<int>& webcamResolution, const double fps,
+    WebcamReader::WebcamReader(const int webcamIndex, const Point<int>& webcamResolution,
                                const bool throwExceptionIfNoOpened) :
         VideoCaptureReader{webcamIndex, throwExceptionIfNoOpened},
         mIndex{webcamIndex},
-        mFps{fps},
         mFrameNameCounter{-1},
         mThreadOpened{std::atomic<bool>{false}},
         mResolution{webcamResolution}
@@ -137,8 +136,6 @@ namespace op
         {
             if (capProperty == CV_CAP_PROP_POS_FRAMES)
                 return (double)mFrameNameCounter;
-            else if (capProperty == CV_CAP_PROP_FPS)
-                return mFps;
             else
                 return VideoCaptureReader::get(capProperty);
         }
@@ -153,10 +150,7 @@ namespace op
     {
         try
         {
-            if (capProperty == CV_CAP_PROP_FPS)
-                mFps = value;
-            else
-                VideoCaptureReader::set(capProperty, value);
+            VideoCaptureReader::set(capProperty, value);
         }
         catch (const std::exception& e)
         {

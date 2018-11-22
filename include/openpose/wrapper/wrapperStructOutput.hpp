@@ -97,6 +97,10 @@ namespace op
 
         /**
          * Frame rate of the recorded video.
+         * By default (-1.), it will try to get the input frames producer frame rate (e.g., input video or webcam frame
+         * rate). If the input frames producer does not have a set FPS (e.g., image_dir or webcam if OpenCV not
+         * compiled with its support), set this value accordingly (e.g., to the frame rate displayed by the OpenPose
+         * GUI).
          */
         double writeVideoFps;
 
@@ -135,7 +139,7 @@ namespace op
             const std::string& writeCocoJson = "", const std::string& writeCocoFootJson = "",
             const int writeCocoJsonVariant = 1, const std::string& writeImages = "",
             const std::string& writeImagesFormat = "", const std::string& writeVideo = "",
-            const double writeVideoFps = 30., const std::string& writeHeatMaps = "",
+            const double writeVideoFps = -1., const std::string& writeHeatMaps = "",
             const std::string& writeHeatMapsFormat = "", const std::string& writeVideoAdam = "",
             const std::string& writeBvh = "", const std::string& udpHost = "", const std::string& udpPort = "");
     };
