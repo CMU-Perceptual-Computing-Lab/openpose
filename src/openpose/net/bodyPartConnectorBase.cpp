@@ -65,8 +65,8 @@ namespace op
     {
         try
         {
-            if (poseModel != PoseModel::BODY_25 || poseModel != PoseModel::COCO_18
-                || poseModel != PoseModel::MPI_15 || poseModel != PoseModel::MPI_15_4)
+            if (poseModel != PoseModel::BODY_25 && poseModel != PoseModel::COCO_18
+                && poseModel != PoseModel::MPI_15 && poseModel != PoseModel::MPI_15_4)
                 error("Model not implemented for CPU body connector.", __LINE__, __FUNCTION__, __FILE__);
 
             // std::vector<std::pair<std::vector<int>, double>> refers to:

@@ -55,18 +55,22 @@ namespace op
                 if (mCocoJsonFormat == CocoJsonFormat::Body)
                 {
                     // Body
-                    if (numberBodyParts == 18)
+                    if (numberBodyParts == 23)
+                        indexesInCocoOrder = std::vector<int>{0, 14,13,16,15,    4,1,5,2,6,    3,10,7,11, 8,    12, 9};
+                    else if (numberBodyParts == 18)
                         indexesInCocoOrder = std::vector<int>{0, 15,14,17,16,    5,2,6,3,7,    4,11,8,12, 9,    13,10};
                     else if (numberBodyParts == 19 || numberBodyParts == 25 || numberBodyParts == 59)
                         indexesInCocoOrder = std::vector<int>{0, 16,15,18,17,    5,2,6,3,7,    4,12,9,13,10,    14,11};
-                    else if (numberBodyParts == 23)
-                        indexesInCocoOrder = std::vector<int>{18,21,19,22,20,    4,1,5,2,6,    3,13,8,14, 9,    15,10};
+                    // else if (numberBodyParts == 23)
+                    //     indexesInCocoOrder = std::vector<int>{18,21,19,22,20,    4,1,5,2,6,    3,13,8,14, 9,    15,10};
                 }
                 // Foot
                 else if (mCocoJsonFormat == CocoJsonFormat::Foot)
                 {
                     if (numberBodyParts == 25)
                         indexesInCocoOrder = std::vector<int>{19,20,21, 22,23,24};
+                    else if (numberBodyParts == 23)
+                        indexesInCocoOrder = std::vector<int>{17,18,19, 20,21,22};
                 }
                 // Car
                 else if (mCocoJsonFormat == CocoJsonFormat::Car)
