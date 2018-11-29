@@ -446,8 +446,8 @@ namespace op
             // Minimum spanning tree
             0,1, 1,2, 2,3,   0,4, 4,5, 5,6,   7,8,   8,9,   10,11, 11,12,   0,13, 13,15, 0,14, 14,16,   12,17, 17,18, 12,19,   9,20, 20,21, 9,22,   1,7, 4,10,
             // Redundant ones
-            // Ears-shoulders,      ears,      shoulders-wrists, hips-ankles, wrists,  ankles, wrists-hips, small toes-ankles, hips)
-                1,15, 4,16,         15,16,        1,3, 4,6,      7,9, 10,12,   3,6,    9,12,    3,7, 6,10,     9,21, 12,18,    7,10
+            // Ears-shoulders, ears,  hips, shoulders-wrists, hips-ankles, wrists, ankles, wrists-hips, small toes-ankles)
+                1,15, 4,16,    15,16, 7,10,    1,3, 4,6,      7,9, 10,12,   3,6,   9,12,    3,7, 6,10,     9,21, 12,18
         },
         // CAR_22
         std::vector<unsigned int>{
