@@ -5,17 +5,17 @@ OpenPose - Frequently Asked Question (FAQ)
 1. [FAQ](#faq)
     1. [Out of Memory Error](#out-of-memory-error)
     2. [Speed Up, Memory Reduction, and Benchmark](#speed-up-memory-reduction-and-benchmark)
-    3. [Estimating FPS without Display](#estimating-fps-without-display)
-    4. [Webcam Slower than Images](#webcam-slower-than-images)
-    5. [Video/Webcam Not Working](#videowebcam-not-working)
-    6. [Cannot Find OpenPose.dll Error](#cannot-find-openpose.dll-error-windows)
-    7. [Free Invalid Pointer Error](#free-invalid-pointer-error)
-    8. [Source Directory does not Contain CMakeLists.txt (Windows)](#source-directory-does-not-contain-cmakelists.txt-windows)
-    9. [How Should I Link my IP Camera?](#how-should-i-link-my-ip-camera)
-    10. [Difference between BODY_25 vs. COCO vs. MPI](#difference-between-body_25-vs.-coco-vs.-mpi)
-    11. [How to Measure the Latency Time?](#how-to-measure-the-latency-time)
-    12. [Zero People Detected](#zero-people-detected)
-    13. [CPU Version Too Slow](#cpu-version-too-slow)
+    3. [CPU Version Too Slow](#cpu-version-too-slow)
+    4. [Profiling Speed and Estimating FPS without Display](#profiling-speed-and-estimating-fps-without-display)
+    5. [Webcam Slower than Images](#webcam-slower-than-images)
+    6. [Video/Webcam Not Working](#videowebcam-not-working)
+    7. [Cannot Find OpenPose.dll Error](#cannot-find-openpose.dll-error-windows)
+    8. [Free Invalid Pointer Error](#free-invalid-pointer-error)
+    9. [Source Directory does not Contain CMakeLists.txt (Windows)](#source-directory-does-not-contain-cmakelists.txt-windows)
+    10. [How Should I Link my IP Camera?](#how-should-i-link-my-ip-camera)
+    11. [Difference between BODY_25 vs. COCO vs. MPI](#difference-between-body_25-vs.-coco-vs.-mpi)
+    12. [How to Measure the Latency Time?](#how-to-measure-the-latency-time)
+    13. [Zero People Detected](#zero-people-detected)
 
 
 
@@ -32,18 +32,18 @@ OpenPose - Frequently Asked Question (FAQ)
 ### Speed Up, Memory Reduction, and Benchmark
 **Q: Low speed** - OpenPose is quite slow, is it normal? How can I speed it up?
 
-**A**: Check the [OpenPose Benchmark](https://docs.google.com/spreadsheets/d/1-DynFGvoScvfWDA1P4jDInCkbD4lg0IKOYbXgEq0sK0/edit#gid=0) to discover the approximate speed of your graphics card. Some speed tips:
-
-    1. Use cuDNN 5.1 (cuDNN 6 is ~10% slower).
-    2. Reduce the `--net_resolution` (e.g., to 320x176) (lower accuracy). Note: For maximum accuracy, follow [doc/quick_start.md#maximum-accuracy-configuration](./quick_start.md#maximum-accuracy-configuration).
-    3. For face, reduce the `--face_net_resolution`. The resolution 320x320 usually works pretty decently.
-    4. Use the `MPI_4_layers` model (lower accuracy and lower number of parts).
-    5. Change GPU rendering by CPU rendering to get approximately +0.5 FPS (`--render_pose 1`).
-    6. Points 2-4 will also help reducing GPU memory (or RAM memory for CPU version).
+**A**: Check [doc/speed_up_preserving_accuracy.md](./speed_up_preserving_accuracy.md) to discover the approximate speed of your graphics card and some speed tips.
 
 
 
-### Estimating FPS without Display
+### CPU Version Too Slow
+**Q: The CPU version is insanely slow compared to the GPU version.**
+
+**A**: Check [doc/speed_up_preserving_accuracy.md#cpu-version](./speed_up_preserving_accuracy.md#cpu-version) to discover the approximate speed and some speed tips.
+
+
+
+### Profiling Speed and Estimating FPS without Display
 Check the [doc/installation.md#profiling-speed](./installation.md#profiling-speed) section.
 
 
@@ -112,10 +112,3 @@ COCO model will eventually be removed. BODY_25 model is faster, more accurate, a
 **Q: 0 people detected and displayed in default video and images.**
 
 **A**: This problem occurs when the caffemodel has not been properly downloaded. E.g., if the connection drops when downloading the models. Please, remove the current models in the model folder, and download them manually from the links in [doc/installation.md](./installation.md). Alternatively, remove them and re-run Cmake again.
-
-
-
-### CPU Version Too Slow
-**Q: The CPU version is insanely slow compared to the GPU version.**
-
-**A**: Yes, that is expected. The CPU version runs at about 0.3 FPS on the COCO model, and at about 0.1 FPS (i.e., about 15 sec / frame) on the default BODY_25 model. Switch to COCO model and/or reduce the `net_resolution` as indicated in [Speed Up, Memory Reduction, and Benchmark](#speed-up-memory-reduction-and-benchmark). Contradictory fact: BODY_25 model is about 5x slower than COCO on CPU-only version, but it is about 40% faster on GPU version.

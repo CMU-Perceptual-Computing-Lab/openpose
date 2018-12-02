@@ -10,7 +10,7 @@ namespace op
     class OP_API VideoSaver
     {
     public:
-        VideoSaver(const std::string& videoSaverPath, const int cvFourcc, const double fps, const Point<int>& cvSize);
+        VideoSaver(const std::string& videoSaverPath, const int cvFourcc, const double fps);
 
         virtual ~VideoSaver();
 
@@ -24,7 +24,8 @@ namespace op
         const std::string mVideoSaverPath;
         const int mCvFourcc;
         const double mFps;
-        const Point<int> mCvSize;
+        Point<int> mCvSize;
+        bool mVideoStarted;
         cv::VideoWriter mVideoWriter;
         unsigned int mNumberImages;
 

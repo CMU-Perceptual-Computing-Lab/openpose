@@ -184,7 +184,7 @@ namespace op
      */
     OP_API std::shared_ptr<Producer> createProducer(
         const ProducerType producerType = ProducerType::None, const std::string& producerString = "",
-        const Point<int>& cameraResolution = Point<int>{-1,-1}, const double webcamFps = 30.,
+        const Point<int>& cameraResolution = Point<int>{-1,-1},
         const std::string& cameraParameterPath = "models/cameraParameters/", const bool undistortImage = true,
         const unsigned int imageDirectoryStereo = -1);
 }

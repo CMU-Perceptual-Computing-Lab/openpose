@@ -72,11 +72,6 @@ namespace op
         Point<int> cameraResolution;
 
         /**
-         * Frame rate of the camera (only for some producers).
-         */
-        double webcamFps;
-
-        /**
          * Directory path for the camera parameters (intrinsic and extrinsic parameters).
          */
         std::string cameraParameterPath;
@@ -102,7 +97,7 @@ namespace op
             const unsigned long long frameLast = std::numeric_limits<unsigned long long>::max(),
             const bool realTimeProcessing = false, const bool frameFlip = false, const int frameRotate = 0,
             const bool framesRepeat = false, const Point<int>& cameraResolution = Point<int>{-1,-1},
-            const double webcamFps = 30., const std::string& cameraParameterPath = "models/cameraParameters/",
+            const std::string& cameraParameterPath = "models/cameraParameters/",
             const bool undistortImage = true, const unsigned int imageDirectoryStereo = 1);
     };
 }

@@ -44,35 +44,42 @@ void printKeypoints(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr)
 
 int tutorialApiCpp2()
 {
-    op::log("Starting OpenPose demo...", op::Priority::High);
-
-    // Configuring OpenPose
-    op::log("Configuring OpenPose...", op::Priority::High);
-    op::Wrapper opWrapper{op::ThreadManagerMode::Asynchronous};
-    // Add hand and face
-    opWrapper.configure(op::WrapperStructFace{true});
-    opWrapper.configure(op::WrapperStructHand{true});
-    // Set to single-thread (for sequential processing and/or debugging and/or reducing latency)
-    if (FLAGS_disable_multi_thread)
-        opWrapper.disableMultiThreading();
-    // Starting OpenPose
-    op::log("Starting thread(s)...", op::Priority::High);
-    opWrapper.start();
-
-    // Process and display image
-    const auto imageToProcess = cv::imread(FLAGS_image_path);
-    auto datumProcessed = opWrapper.emplaceAndPop(imageToProcess);
-    if (datumProcessed != nullptr)
+    try
     {
-        printKeypoints(datumProcessed);
-        display(datumProcessed);
-    }
-    else
-        op::log("Image could not be processed.", op::Priority::High);
+        op::log("Starting OpenPose demo...", op::Priority::High);
 
-    // Return successful message
-    op::log("Stopping OpenPose...", op::Priority::High);
-    return 0;
+        // Configuring OpenPose
+        op::log("Configuring OpenPose...", op::Priority::High);
+        op::Wrapper opWrapper{op::ThreadManagerMode::Asynchronous};
+        // Add hand and face
+        opWrapper.configure(op::WrapperStructFace{true});
+        opWrapper.configure(op::WrapperStructHand{true});
+        // Set to single-thread (for sequential processing and/or debugging and/or reducing latency)
+        if (FLAGS_disable_multi_thread)
+            opWrapper.disableMultiThreading();
+        // Starting OpenPose
+        op::log("Starting thread(s)...", op::Priority::High);
+        opWrapper.start();
+
+        // Process and display image
+        const auto imageToProcess = cv::imread(FLAGS_image_path);
+        auto datumProcessed = opWrapper.emplaceAndPop(imageToProcess);
+        if (datumProcessed != nullptr)
+        {
+            printKeypoints(datumProcessed);
+            display(datumProcessed);
+        }
+        else
+            op::log("Image could not be processed.", op::Priority::High);
+
+        // Return successful message
+        op::log("Stopping OpenPose...", op::Priority::High);
+        return 0;
+    }
+    catch (const std::exception& e)
+    {
+        return -1;
+    }
 }
 
 int main(int argc, char *argv[])

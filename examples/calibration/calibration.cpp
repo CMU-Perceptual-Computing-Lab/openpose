@@ -112,7 +112,6 @@ int openPoseDemo()
     }
     catch (const std::exception& e)
     {
-        op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         return -1;
     }
 }

@@ -166,6 +166,14 @@ namespace op
         bool maximizePositives;
 
         /**
+         * Maximum processing frame rate.
+         * By default (-1), OpenPose will process frames as fast as possible.
+         * Example usage: If OpenPose is displaying images too quickly, this can reduce the speed so the user can
+         * analyze better each frame from the GUI.
+         */
+        double fpsMax;
+
+        /**
          * Whether to internally enable Google Logging.
          * This option is only applicable if Caffe is used.
          * Only disable it if the user is already calling google::InitGoogleLogging() in his code.
@@ -190,7 +198,7 @@ namespace op
             const std::string& modelFolder = "models/", const std::vector<HeatMapType>& heatMapTypes = {},
             const ScaleMode heatMapScale = ScaleMode::ZeroToOne, const bool addPartCandidates = false,
             const float renderThreshold = 0.05f, const int numberPeopleMax = -1, const bool maximizePositives = false,
-            const bool enableGoogleLogging = true);
+            const double fpsMax = -1., const bool enableGoogleLogging = true);
     };
 }
 
