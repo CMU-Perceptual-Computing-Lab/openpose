@@ -88,6 +88,7 @@ private:
 	void sendPoseKeypoints(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
 		auto& data = datumsPtr->at(0).poseKeypoints; // Array<float>
 		if (!data.empty()) {
+			op::log(std::to_string(data.getSize(0)));
 			auto sizeVector = data.getSize();
 			int sizeSize = sizeVector.size();
 			int * sizes = &sizeVector[0];
@@ -277,7 +278,7 @@ void openpose_main() {
 // Functions called from Unity
 extern "C" {
 	// Start openpose safely
-	OP_API void OP_Run() {
+	OP_API void _OPRun() {
 		try {
 			openpose_main();
 		} catch (const std::exception& e) {
@@ -285,7 +286,7 @@ extern "C" {
 		}
 	}
 	// Stop openpose safely
-	OP_API void OP_Shutdown() {
+	OP_API void _OPShutdown() {
 		try {
 			if (ptrUserOutput != nullptr) {
 				op::log("Stopping...");
@@ -296,7 +297,7 @@ extern "C" {
 		}
 	}
 	// Register Unity output callback function
-	OP_API void OP_RegisterOutputCallback(OutputCallback callback) {
+	OP_API void _OPRegisterOutputCallback(OutputCallback callback) {
 		try {
 			unityOutputCallback = callback;
 		}
@@ -305,7 +306,7 @@ extern "C" {
 		}
 	}
 	// Enable/disable output callback
-	OP_API void OP_SetOutputEnable(bool enable) {
+	OP_API void _OPSetOutputEnable(bool enable) {
 		try {
 			unityOutputEnabled = enable;
 		} catch (const std::exception& e) {
@@ -313,7 +314,7 @@ extern "C" {
 		}
 	}
 	// Enable/disable image output
-	OP_API void OP_SetImageOutputEnable(bool enable) {
+	OP_API void _OPSetImageOutputEnable(bool enable) {
 		try {
 			imageOutput = enable;
 		}
@@ -322,7 +323,7 @@ extern "C" {
 		}
 	}
 	// Configs
-	OP_API void OP_ConfigurePose(
+	OP_API void _OPConfigurePose(
 		bool body_disable,
 		int net_resolution_x, int net_resolution_y, // Point
 		int output_resolution_x, int output_resolution_y, // Point
@@ -349,10 +350,11 @@ extern "C" {
 				part_candidates, render_threshold, number_people_max, true
 			);
 		} catch (const std::exception& e) {
+			op::log(e.what(), op::Priority::Max, __LINE__, __FUNCTION__, __FILE__);
 			op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
 		}
 	}
-	OP_API void OP_ConfigureHand(
+	OP_API void _OPConfigureHand(
 		bool hand,
 		int hand_net_resolution_x, int hand_net_resolution_y, // Point
 		int hand_scale_number, float hand_scale_range, bool hand_tracking,
@@ -372,7 +374,7 @@ extern "C" {
 			op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
 		}
 	}
-	OP_API void OP_ConfigureFace(
+	OP_API void _OPConfigureFace(
 		bool face, 
 		int face_net_resolution_x, int face_net_resolution_y, // Point
 		uchar face_render_mode, // RenderMode
@@ -389,7 +391,7 @@ extern "C" {
 			op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
 		}
 	}
-	OP_API void OP_ConfigureExtra(
+	OP_API void _OPConfigureExtra(
 		bool _3d, int _3d_min_views, bool _identification, int _tracking, int _ik_threads) {
 
 		try {
@@ -400,25 +402,25 @@ extern "C" {
 			op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
 		}
 	}
-	OP_API void OP_ConfigureInput(
+	OP_API void _OPConfigureInput(
 		uchar producer_type, char* producer_string, // ProducerType
 		unsigned long long frame_first, unsigned long long frame_step, unsigned long long frame_last,
 		bool process_real_time, bool frame_flip, int frame_rotate, bool frames_repeat, 
 		int camera_resolution_x, int camera_resolution_y, // Point
-		double webcam_fps, char* camera_parameter_path, bool undistort_image, uint image_directory_stereo) {
+		char* camera_parameter_path, bool undistort_image, uint image_directory_stereo) {
 
 		try {
 			spWrapperStructInput = std::make_shared<op::WrapperStructInput>(
 				(op::ProducerType) producer_type, producer_string,
 				frame_first, frame_step, frame_last, process_real_time, frame_flip,	frame_rotate, frames_repeat,
 				op::Point<int>{ camera_resolution_x, camera_resolution_y }, 
-				webcam_fps,	camera_parameter_path, undistort_image, image_directory_stereo
+				camera_parameter_path, undistort_image, image_directory_stereo
 			);
 		} catch (const std::exception& e) {
 			op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
 		}
 	}
-	OP_API void OP_ConfigureOutput(
+	OP_API void _OPConfigureOutput(
 		double verbose, char* write_keypoint, uchar write_keypoint_format, // DataFormat
 		char* write_json, char* write_coco_json, char* write_coco_foot_json, int write_coco_json_variant,
 		char* write_images, char* write_images_format, char* write_video,
@@ -436,7 +438,7 @@ extern "C" {
 			op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
 		}
 	}
-	OP_API void OP_ConfigureGui(
+	OP_API void _OPConfigureGui(
 		ushort display_mode, // DisplayMode
 		bool gui_verbose, bool full_screen) {
 

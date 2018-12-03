@@ -13,12 +13,12 @@ namespace op
             DebugCallback unityDebugCallback;
 			bool unityDebugEnabled = true;
 
-            extern "C" void OP_API OP_RegisterDebugCallback(DebugCallback debugCallback) {
+            extern "C" void OP_API _OPRegisterDebugCallback(DebugCallback debugCallback) {
                 if (debugCallback)
                     unityDebugCallback = debugCallback;
             }
 
-			extern "C" void OP_API OP_SetDebugEnable(bool enable) {
+			extern "C" void OP_API _OPSetDebugEnable(bool enable) {
 				unityDebugEnabled = enable;
 			}
 
