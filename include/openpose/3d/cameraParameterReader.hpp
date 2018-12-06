@@ -24,6 +24,10 @@ namespace op
         void readParameters(const std::string& cameraParameterPath,
                             const std::vector<std::string>& serialNumbers = {});
 
+        // It simply calls the previous readParameters with a single element
+        void readParameters(const std::string& cameraParameterPath,
+                            const std::string& serialNumber);
+
         void writeParameters(const std::string& cameraParameterPath) const;
 
         unsigned long long getNumberCameras() const;
@@ -38,13 +42,23 @@ namespace op
 
         const std::vector<cv::Mat>& getCameraDistortions() const;
 
+        bool getUndistortImage() const;
+
+        void setUndistortImage(const bool undistortImage);
+
+        void undistort(cv::Mat& frame, const unsigned int cameraIndex = 0u);
+
     private:
         std::vector<std::string> mSerialNumbers;
-        unsigned long long mNumberCameras;
         std::vector<cv::Mat> mCameraMatrices;
         std::vector<cv::Mat> mCameraExtrinsics;
         std::vector<cv::Mat> mCameraIntrinsics;
         std::vector<cv::Mat> mCameraDistortions;
+
+        // Undistortion (optional)
+        bool mUndistortImage;
+        std::vector<cv::Mat> mRemoveDistortionMaps1;
+        std::vector<cv::Mat> mRemoveDistortionMaps2;
 
         DELETE_COPY(CameraParameterReader);
     };

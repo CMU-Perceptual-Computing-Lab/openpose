@@ -292,6 +292,7 @@ OpenPose Library - Release Notes
     22. Examples do not end in core dumped if an OpenPose exception occurred during initialization, but it is rather closed returning -1. However, it will still results in core dumped if the exception occurs during multi-threading execution.
     23. Video (`--write_video`) can be generated from images (`--image_dir`), as long as they maintain the same resolution.
     24. Added `--fps_max` flag to limit the maximum processing frame rate of OpenPose (useful to display results at a maximum desired speed).
+    25. Frame undistortion can be applied not only to FLIR cameras, but also to all other input sources (image, webcam, video, etc.).
 2. Functions or parameters renamed:
     1. By default, python example `tutorial_developer/python_2_pose_from_heatmaps.py` was using 2 scales starting at -1x736, changed to 1 scale at -1x368.
     2. WrapperStructPose default parameters changed to match those of the OpenPose demo binary.
@@ -301,6 +302,8 @@ OpenPose Library - Release Notes
     6. Removed old COCO 2014 validation scripts.
     7. WrapperStructOutput split into WrapperStructOutput and WrapperStructGui.
     8. Replaced `--camera_fps` flag by `--write_video_fps`, given that it was a confusing name: It did not affect the webcam FPS, but only the FPS of the output video. In addition, default value changed from 30 to -1.
+    9. Renamed `--frame_keep_distortion` as `--frame_undistort`, which performs the opposite operation (the default value has been also changed to the opposite).
+    10. Renamed `--camera_parameter_folder` as `--camera_parameter_path` because it could also take a whole XML file path rather than its parent folder.
 3. Main bugs fixed:
     1. CMake-GUI was forcing to Release mode, allowed Debug modes too.
     2. NMS returns in index 0 the number of found peaks. However, while the number of peaks was truncated to a maximum of 127, this index 0 was saving the real number instead of the truncated one.

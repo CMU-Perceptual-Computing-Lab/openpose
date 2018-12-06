@@ -1,10 +1,12 @@
-﻿#include <openpose/filestream/fileStream.hpp>
+﻿#include <opencv2/imgproc/imgproc.hpp> // cv::undistort, cv::initUndistortRectifyMap
+#include <openpose/filestream/fileStream.hpp>
 #include <openpose/utilities/fileSystem.hpp>
 #include <openpose/3d/cameraParameterReader.hpp>
 
 namespace op
 {
-    CameraParameterReader::CameraParameterReader()
+    CameraParameterReader::CameraParameterReader() :
+        mUndistortImage{false}
     {
     }
 
@@ -15,7 +17,8 @@ namespace op
     CameraParameterReader::CameraParameterReader(const std::string& serialNumber,
                                                  const cv::Mat& cameraIntrinsics,
                                                  const cv::Mat& cameraDistortion,
-                                                 const cv::Mat& cameraExtrinsics)
+                                                 const cv::Mat& cameraExtrinsics) :
+        mUndistortImage{false}
     {
         try
         {
@@ -34,6 +37,9 @@ namespace op
             else
                 mCameraExtrinsics.emplace_back(cv::Mat::eye(3, 4, cameraIntrinsics.type()));
             mCameraMatrices.emplace_back(mCameraIntrinsics.back() * mCameraExtrinsics.back());
+            // Undistortion cv::Mats
+            mRemoveDistortionMaps1.resize(getNumberCameras());
+            mRemoveDistortionMaps2.resize(getNumberCameras());
         }
         catch (const std::exception& e)
         {
@@ -99,6 +105,9 @@ namespace op
                 mCameraMatrices.emplace_back(mCameraIntrinsics.back() * mCameraExtrinsics.back());
                 // log(cameraParameters.at(0));
             }
+            // Undistortion cv::Mats
+            mRemoveDistortionMaps1.resize(getNumberCameras());
+            mRemoveDistortionMaps2.resize(getNumberCameras());
             // // mCameraMatrices
             // log("\nFull camera matrices:");
             // for (const auto& cvMat : mCameraMatrices)
@@ -111,6 +120,19 @@ namespace op
             // log("\nCamera distortion parameters:");
             // for (const auto& cvMat : mCameraDistortions)
             //     log(cvMat);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    void CameraParameterReader::readParameters(const std::string& cameraParameterPath,
+                                               const std::string& serialNumber)
+    {
+        try
+        {
+            readParameters(cameraParameterPath, std::vector<std::string>{serialNumber});
         }
         catch (const std::exception& e)
         {
@@ -223,6 +245,89 @@ namespace op
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             return mCameraDistortions;
+        }
+    }
+
+    bool CameraParameterReader::getUndistortImage() const
+    {
+        try
+        {
+            return mUndistortImage;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return false;
+        }
+    }
+
+    void CameraParameterReader::setUndistortImage(const bool undistortImage)
+    {
+        try
+        {
+            mUndistortImage = undistortImage;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    void CameraParameterReader::undistort(cv::Mat& frame, const unsigned int cameraIndex)
+    {
+        try
+        {
+            if (mUndistortImage)
+            {
+                // Sanity check
+                if (mRemoveDistortionMaps1.size() <= cameraIndex || mRemoveDistortionMaps2.size() <= cameraIndex)
+                {
+                    error("Variable cameraIndex is out of bounds, it should be smaller than mRemoveDistortionMapsX.",
+                          __LINE__, __FUNCTION__, __FILE__);
+                }
+                // Only first time
+                if (mRemoveDistortionMaps1[cameraIndex].empty() || mRemoveDistortionMaps2[cameraIndex].empty())
+                {
+                    const auto cameraIntrinsics = mCameraIntrinsics.at(0);
+                    const auto cameraDistorsions = mCameraDistortions.at(0);
+                    const auto imageSize = frame.size();
+                    // // Option a - 80 ms / 3 images
+                    // // http://docs.opencv.org/2.4/modules/imgproc/doc/geometric_transformations.html#undistort
+                    // cv::undistort(cvMatDistorted, mCvMats[i], cameraIntrinsics, cameraDistorsions);
+                    // // In OpenCV 2.4, cv::undistort is exactly equal than cv::initUndistortRectifyMap
+                    // (with CV_16SC2) + cv::remap (with LINEAR). I.e., log(cv::norm(cvMatMethod1-cvMatMethod2)) = 0.
+                    // Option b - 15 ms / 3 images (LINEAR) or 25 ms (CUBIC)
+                    // Distorsion removal - not required and more expensive (applied to the whole image instead of
+                    // only to our interest points)
+                    cv::initUndistortRectifyMap(
+                        cameraIntrinsics, cameraDistorsions, cv::Mat(),
+                        // cameraIntrinsics instead of cv::getOptimalNewCameraMatrix to
+                        // avoid black borders
+                        cameraIntrinsics,
+                        // #include <opencv2/calib3d/calib3d.hpp> for next line
+                        // cv::getOptimalNewCameraMatrix(cameraIntrinsics,
+                        //                               cameraDistorsions,
+                        //                               imageSize, 1,
+                        //                               imageSize, 0),
+                        imageSize,
+                        CV_16SC2, // Faster, less memory
+                        // CV_32FC1, // More accurate
+                        mRemoveDistortionMaps1[cameraIndex],
+                        mRemoveDistortionMaps2[cameraIndex]);
+                }
+                cv::Mat undistortedCvMat;
+                cv::remap(frame, undistortedCvMat,
+                          mRemoveDistortionMaps1[cameraIndex], mRemoveDistortionMaps2[cameraIndex],
+                          // cv::INTER_NEAREST);
+                          cv::INTER_LINEAR);
+                          // cv::INTER_CUBIC);
+                          // cv::INTER_LANCZOS4); // Smoother, but we do not need this quality & its >>expensive
+                std::swap(undistortedCvMat, frame);
+            }
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
     }
 }

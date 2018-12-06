@@ -52,10 +52,11 @@ DEFINE_int32(frame_rotate,              0,              "Rotate each frame, 4 po
 DEFINE_bool(frames_repeat,              false,          "Repeat frames when finished.");
 DEFINE_bool(process_real_time,          false,          "Enable to keep the original source frame rate (e.g., for video). If the processing time is"
                                                         " too long, it will skip frames. If it is too fast, it will slow it down.");
-DEFINE_string(camera_parameter_folder,  "models/cameraParameters/flir/", "String with the folder where the camera parameters are located.");
-DEFINE_bool(frame_keep_distortion,      false,          "If false (default), it will undistortionate the image based on the"
-                                                        " `camera_parameter_folder` camera parameters; if true, it will not undistortionate, i.e.,"
-                                                        " it will leave it as it is.");
+DEFINE_string(camera_parameter_path,    "models/cameraParameters/flir/", "String with the folder where the camera parameters are located. If there"
+                                                        " is only 1 XML file (for single video, webcam, or images from the same camera), you must"
+                                                        " specify the whole XML file path (ending in .xml).");
+DEFINE_bool(frame_undistort,            false,          "If false (default), it will not undistort the image, if true, it will undistortionate them"
+                                                        " based on the camera parameters found in `camera_parameter_path`");
 #endif // OPENPOSE_FLAGS_DISABLE_PRODUCER
 // OpenPose
 DEFINE_string(model_folder,             "models/",      "Folder path (absolute or relative) where the models (pose, face, ...) are located.");
@@ -148,9 +149,9 @@ DEFINE_bool(3d,                         false,          "Running OpenPose 3-D re
                                                         " fail.");
 DEFINE_int32(3d_min_views,              -1,             "Minimum number of views required to reconstruct each keypoint. By default (-1), it will"
                                                         " require all the cameras to see the keypoint in order to reconstruct it.");
-DEFINE_int32(3d_views,                  1,              "Complementary option to `--image_dir` or `--video`. OpenPose will read as many images per"
+DEFINE_int32(3d_views,                  -1,             "Complementary option for `--image_dir` or `--video`. OpenPose will read as many images per"
                                                         " iteration, allowing tasks such as stereo camera processing (`--3d`). Note that"
-                                                        " `--camera_parameters_folder` must be set. OpenPose must find as many `xml` files in the"
+                                                        " `--camera_parameter_path` must be set. OpenPose must find as many `xml` files in the"
                                                         " parameter folder as this number indicates.");
 // Extra algorithms
 DEFINE_bool(identification,             false,          "Experimental, not available yet. Whether to enable people identification across frames.");

@@ -15,6 +15,10 @@ namespace op
             const auto& mapIdx = getPoseMapIndex(poseModel);
             const auto numberBodyParts = getPoseNumberBodyParts(poseModel);
             const auto numberBodyPartsPlusBkg = numberBodyParts+1;
+            // Sanity check
+            if (bodyPartPairs.size() != mapIdx.size())
+                error("The variables bodyPartPairs and mapIdx should have the same size.",
+                      __LINE__, __FUNCTION__, __FILE__);
 
             // PAFs
             for (auto bodyPart = 0u; bodyPart < bodyPartPairs.size(); bodyPart+=2)

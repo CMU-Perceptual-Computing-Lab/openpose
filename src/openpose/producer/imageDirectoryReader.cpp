@@ -31,83 +31,18 @@ namespace op
     }
 
     ImageDirectoryReader::ImageDirectoryReader(const std::string& imageDirectoryPath,
-                                               const unsigned int imageDirectoryStereo,
-                                               const std::string& cameraParameterPath) :
-        Producer{ProducerType::ImageDirectory},
+                                               const std::string& cameraParameterPath,
+                                               const bool undistortImage,
+                                               const int numberViews) :
+        Producer{ProducerType::ImageDirectory, cameraParameterPath, undistortImage, numberViews},
         mImageDirectoryPath{imageDirectoryPath},
-        mImageDirectoryStereo{imageDirectoryStereo},
         mFilePaths{getImagePathsOnDirectory(imageDirectoryPath)},
         mFrameNameCounter{0ll}
     {
-        try
-        {
-            // If stereo setting --> load camera parameters
-            if (imageDirectoryStereo > 1)
-            {
-                // Read camera parameters from SN
-                auto serialNumbers = getFilesOnDirectory(cameraParameterPath, ".xml");
-                // Sanity check
-                if (serialNumbers.size() != mImageDirectoryStereo && mImageDirectoryStereo > 1)
-                    error("Found different number of camera parameter files than the number indicated by"
-                          " `--3d_views` ("
-                          + std::to_string(serialNumbers.size()) + " vs. "
-                          + std::to_string(mImageDirectoryStereo) + "). Make them equal or add"
-                          + " `--3d_views 1`",
-                          __LINE__, __FUNCTION__, __FILE__);
-                // Get serial numbers
-                for (auto& serialNumber : serialNumbers)
-                    serialNumber = getFileNameNoExtension(serialNumber);
-                // Get camera paremeters
-                mCameraParameterReader.readParameters(cameraParameterPath, serialNumbers);
-            }
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-        }
     }
 
     ImageDirectoryReader::~ImageDirectoryReader()
     {
-    }
-
-    std::vector<cv::Mat> ImageDirectoryReader::getCameraMatrices()
-    {
-        try
-        {
-            return mCameraParameterReader.getCameraMatrices();
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return {};
-        }
-    }
-
-    std::vector<cv::Mat> ImageDirectoryReader::getCameraExtrinsics()
-    {
-        try
-        {
-            return mCameraParameterReader.getCameraExtrinsics();
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return {};
-        }
-    }
-
-    std::vector<cv::Mat> ImageDirectoryReader::getCameraIntrinsics()
-    {
-        try
-        {
-            return mCameraParameterReader.getCameraIntrinsics();
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return {};
-        }
     }
 
     std::string ImageDirectoryReader::getNextFrameName()
@@ -138,6 +73,7 @@ namespace op
             checkFrameIntegrity(frame);
             // Update size, since images might have different size between each one of them
             mResolution = Point<int>{frame.cols, frame.rows};
+            // Return final frame
             return frame;
         }
         catch (const std::exception& e)
@@ -152,7 +88,7 @@ namespace op
         try
         {
             std::vector<cv::Mat> rawFrames;
-            for (auto i = 0u ; i < mImageDirectoryStereo ; i++)
+            for (auto i = 0 ; i < intRound(Producer::get(ProducerProperty::NumberViews)) ; i++)
                 rawFrames.emplace_back(getRawFrame());
             return rawFrames;
         }

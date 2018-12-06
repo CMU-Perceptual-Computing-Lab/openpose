@@ -57,10 +57,11 @@ int openPoseDemo()
             // const auto saveImagesWithCorners = false;
             const auto saveImagesWithCorners = true;
             // Run camera calibration code
-            op::estimateAndSaveIntrinsics(gridInnerCorners, FLAGS_grid_square_size_mm, flags,
-                                          op::formatAsDirectory(FLAGS_camera_parameter_folder),
-                                          op::formatAsDirectory(FLAGS_calibration_image_dir),
-                                          FLAGS_camera_serial_number, saveImagesWithCorners);
+            op::estimateAndSaveIntrinsics(
+                gridInnerCorners, FLAGS_grid_square_size_mm, flags,
+                op::formatAsDirectory(FLAGS_camera_parameter_folder),
+                op::formatAsDirectory(FLAGS_calibration_image_dir),
+                FLAGS_camera_serial_number, saveImagesWithCorners);
             op::log("Intrinsic calibration completed!", op::Priority::High);
         }
 
@@ -69,15 +70,10 @@ int openPoseDemo()
         {
             op::log("Running calibration (extrinsic parameters)...", op::Priority::High);
             // Parameters
-            op::estimateAndSaveExtrinsics(FLAGS_camera_parameter_folder,
-                                          op::formatAsDirectory(FLAGS_calibration_image_dir),
-                                          op::flagsToPoint(FLAGS_grid_number_inner_corners, "12x7"),
-                                          FLAGS_grid_square_size_mm,
-                                          FLAGS_cam0,
-                                          FLAGS_cam1,
-                                          FLAGS_omit_distortion,
-                                          FLAGS_combine_cam0_extrinsics);
-
+            op::estimateAndSaveExtrinsics(
+                FLAGS_camera_parameter_folder, op::formatAsDirectory(FLAGS_calibration_image_dir),
+                op::flagsToPoint(FLAGS_grid_number_inner_corners, "12x7"), FLAGS_grid_square_size_mm, FLAGS_cam0,
+                FLAGS_cam1, FLAGS_omit_distortion, FLAGS_combine_cam0_extrinsics);
             op::log("Extrinsic calibration completed!", op::Priority::High);
         }
 

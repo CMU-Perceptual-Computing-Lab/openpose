@@ -4,10 +4,10 @@
 
 namespace op
 {
-    FlirReader::FlirReader(const std::string& cameraParametersPath, const Point<int>& cameraResolution,
+    FlirReader::FlirReader(const std::string& cameraParameterPath, const Point<int>& cameraResolution,
                            const bool undistortImage, const int cameraIndex) :
-        Producer{ProducerType::FlirCamera},
-        mSpinnakerWrapper{cameraParametersPath, cameraResolution, undistortImage, cameraIndex},
+        Producer{ProducerType::FlirCamera, cameraParameterPath, undistortImage, -1},
+        mSpinnakerWrapper{cameraParameterPath, cameraResolution, undistortImage, cameraIndex},
         mFrameNameCounter{0}
     {
         try

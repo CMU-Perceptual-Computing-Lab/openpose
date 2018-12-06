@@ -14,13 +14,13 @@ namespace op
                 // cv::cvtColor(image, imageGray, CV_BGR2GRAY);
                 const auto winSize = std::max(5,
                     (int)std::round(cv::norm(cv::Mat(points2DVector.at(0) - points2DVector.at(1)), cv::NORM_INF) / 4));
-                cv::cornerSubPix(image,
-                                 points2DVector,
-                                 cv::Size{winSize, winSize}, // Depending on the chessboard size;
-                                 // cv::Size{11,11}, // Default in code I got, used above one
-                                 cv::Size{-1,-1},
-                                 cv::TermCriteria{ CV_TERMCRIT_EPS+CV_TERMCRIT_ITER, 1000, 1e-9 });
-                                 // cv::TermCriteria{ CV_TERMCRIT_EPS+CV_TERMCRIT_ITER, 30, 0.1 });  // Default
+                cv::cornerSubPix(
+                    image, points2DVector,
+                    cv::Size{winSize, winSize}, // Depending on the chessboard size;
+                    // cv::Size{11,11}, // Default in code I got, used above one
+                    cv::Size{-1,-1},
+                    cv::TermCriteria{ CV_TERMCRIT_EPS+CV_TERMCRIT_ITER, 1000, 1e-9 });
+                    // cv::TermCriteria{ CV_TERMCRIT_EPS+CV_TERMCRIT_ITER, 30, 0.1 });  // Default
             }
         }
         catch (const std::exception& e)
@@ -29,8 +29,8 @@ namespace op
         }
     }
 
-    std::pair<bool, std::vector<cv::Point2f>> lightlyTryToFindGridCorners(const cv::Mat& image,
-                                                                          const cv::Size& gridInnerCorners)
+    std::pair<bool, std::vector<cv::Point2f>> tryToFindGridCorners(const cv::Mat& image,
+                                                                   const cv::Size& gridInnerCorners)
     {
         try
         {
@@ -59,21 +59,20 @@ namespace op
 
             if (!image.empty())
             {
-                std::tie(chessboardFound, points2DVector) = lightlyTryToFindGridCorners(image, gridInnerCorners);
+                std::tie(chessboardFound, points2DVector) = tryToFindGridCorners(image, gridInnerCorners);
 
                 if (!chessboardFound)
                 {
-                    std::tie(chessboardFound, points2DVector) = lightlyTryToFindGridCorners(image, gridInnerCorners);
+                    std::tie(chessboardFound, points2DVector) = tryToFindGridCorners(image, gridInnerCorners);
                     if (!chessboardFound)
                     {
                         // If not chessboardFound -> try sharpening the image
-                        // std::cerr << "Grid not found, trying sharpening" << std::endl;
                         cv::Mat sharperedImage;
                         // hardcoded filter size, to be tested on 50 mm lens
                         cv::GaussianBlur(image, sharperedImage, cv::Size{0,0}, 105);
                         // hardcoded weight, to be tested.
                         cv::addWeighted(image, 1.8, sharperedImage, -0.8, 0, sharperedImage);
-                        std::tie(chessboardFound, points2DVector) = lightlyTryToFindGridCorners(
+                        std::tie(chessboardFound, points2DVector) = tryToFindGridCorners(
                             sharperedImage, gridInnerCorners);
                     }
                 }
@@ -104,14 +103,13 @@ namespace op
                 if (!chessboardFound)
                 {
                     cv::Mat tempImage;
-                    while (!chessboardFound) // 71 x 71 > 5000
+                    auto counter = 0;
+                    while (!chessboardFound && counter <= 2) // 3 pyrdown max
                     {
-                        if (!tempImage.empty())
-                            cv::pyrDown(tempImage, tempImage);
-                        else
-                            cv::pyrDown(image, tempImage);
+                        cv::pyrDown((!tempImage.empty() ? tempImage : image), tempImage);
                         std::tie(chessboardFound, points2DVector) = mediumlyTryToFindGridCorners(
                             tempImage, gridInnerCorners);
+                        counter++;
 
                         // After next pyrDown if will be area > 5000 < 71 x 71 px image
                         if (tempImage.size().area() <= 20e3)
@@ -119,7 +117,8 @@ namespace op
                     }
                     if (chessboardFound && image.size().width != tempImage.size().width)
                     {
-                        std::cerr << "Chessboard found at lower resolution: " << tempImage.size() << "px" << std::endl;
+                        log("Chessboard found at lower resolution (" + std::to_string(tempImage.cols) + "x"
+                            + std::to_string(tempImage.rows) + ".", Priority::High);
                         for (auto& point : points2DVector)
                             point *= (image.size().width / tempImage.size().width);
                     }
@@ -207,8 +206,8 @@ namespace op
 
 
     // Public functions
-    std::pair<bool, std::vector<cv::Point2f>> findAccurateGridCorners(const cv::Mat& image,
-                                                                      const cv::Size& gridInnerCorners)
+    std::pair<bool, std::vector<cv::Point2f>> findAccurateGridCorners(
+        const cv::Mat& image, const cv::Size& gridInnerCorners)
     {
         try
         {
@@ -233,8 +232,8 @@ namespace op
         }
     }
 
-    std::vector<cv::Point3f> getObjects3DVector(const cv::Size& gridInnerCorners,
-                                                const float gridSquareSizeMm)
+    std::vector<cv::Point3f> getObjects3DVector(
+        const cv::Size& gridInnerCorners, const float gridSquareSizeMm)
     {
         try
         {
@@ -284,8 +283,8 @@ namespace op
         }
     }
 
-    std::array<unsigned int, 4> getOutterCornerIndices(const std::vector<cv::Point2f>& points2DVector,
-                                                       const cv::Size& gridInnerCorners)
+    std::array<unsigned int, 4> getOutterCornerIndices(
+        const std::vector<cv::Point2f>& points2DVector, const cv::Size& gridInnerCorners)
     {
         try
         {
@@ -310,8 +309,7 @@ namespace op
         }
     }
 
-    void reorderPoints(std::vector<cv::Point2f>& points2DVector,
-                       const cv::Size& gridInnerCorners,
+    void reorderPoints(std::vector<cv::Point2f>& points2DVector, const cv::Size& gridInnerCorners,
                        const Points2DOrigin points2DOriginDesired)
     {
         try
@@ -352,10 +350,9 @@ namespace op
         }
     }
 
-    void plotGridCorners(const cv::Size& gridInnerCorners,
-                         const std::vector<cv::Point2f>& points2DVector,
-                         const std::string& imagePath,
-                         const cv::Mat& image)
+    void plotGridCorners(
+        const cv::Size& gridInnerCorners, const std::vector<cv::Point2f>& points2DVector,
+        const std::string& imagePath, const cv::Mat& image)
     {
         try
         {

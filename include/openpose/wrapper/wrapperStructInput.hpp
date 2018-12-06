@@ -72,7 +72,8 @@ namespace op
         Point<int> cameraResolution;
 
         /**
-         * Directory path for the camera parameters (intrinsic and extrinsic parameters).
+         * Directory path for the camera parameters (intrinsic and extrinsic parameters) or optionally XML file
+         * full path (if only 1 view).
          */
         std::string cameraParameterPath;
 
@@ -82,9 +83,13 @@ namespace op
         bool undistortImage;
 
         /**
-         * Number of camera views recorded (only for prerecorded produced sources, such as video and image directory).
+         * Number of camera views.
+         * Complementary option for `--image_dir` or `--video`
+         * It is -1 for Flir cameras (# cameras detected at runtime), as well as for any other frames source (-1 and 1
+         * are equivalent for those). It could be greater than 1 only for prerecorded produced sources, such as video
+         * and image directory.
          */
-        unsigned int imageDirectoryStereo;
+        int numberViews;
 
         /**
          * Constructor of the struct.
@@ -98,7 +103,7 @@ namespace op
             const bool realTimeProcessing = false, const bool frameFlip = false, const int frameRotate = 0,
             const bool framesRepeat = false, const Point<int>& cameraResolution = Point<int>{-1,-1},
             const std::string& cameraParameterPath = "models/cameraParameters/",
-            const bool undistortImage = true, const unsigned int imageDirectoryStereo = 1);
+            const bool undistortImage = false, const int numberViews = -1);
     };
 }
 

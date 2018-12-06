@@ -77,7 +77,7 @@ For further details, check [all released features](doc/released_features.md) and
 </p>
 
 ### Runtime Analysis
-Inference time comparison between the 3 available pose estimation libraries: OpenPose, Mask R-CNN, and Alpha-Pose (fast Pytorch version):
+Inference time comparison between the 3 available pose estimation libraries: OpenPose, Alpha-Pose (fast Pytorch version), and Mask R-CNN:
 <p align="center">
     <img src="doc/media/openpose_vs_competition.png", width="360">
 </p>

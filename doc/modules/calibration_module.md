@@ -37,7 +37,7 @@ Note: In order to maximize calibration quality, **do not reuse the same video se
 
 ### Step 1 - Distortion and Intrinsic Parameter Calibration
 1. Run OpenPose and save images for your desired camera. Use a grid (chessboard) pattern and move around all the image area. Depending on the images source:
-    1. Webcam calibration: `./build/examples/openpose/openpose.bin --num_gpu 0 --frame_keep_distortion --write_images {intrinsic_images_folder_path}`.
+    1. Webcam calibration: `./build/examples/openpose/openpose.bin --num_gpu 0 --write_images {intrinsic_images_folder_path}`.
     2. Flir camera calibration: Add the flags `--flir_camera --flir_camera_index 0` (or the desired flir camera index) to the webcam command.
     3. Calibration from video sequence: Add the flag `--video {video_path}` to the webcam command.
     4. Any other camera brand: Simply save your images in `{intrinsic_images_folder_path}`, file names are not relevant.
@@ -51,21 +51,43 @@ Note: In order to maximize calibration quality, **do not reuse the same video se
 ```
 4. In this case, the intrinsic parameters would have been generated as `{intrinsic_images_folder_path}/18079958.xml`.
 5. Run steps 1-4 for each one of your cameras.
-6. After you calibrate the camera intrinsics, when you run OpenPose with those cameras, you should see the lines in real-life to be (almost) perfect lines in the image. Otherwise, the calibration was not good. Try checking straight patterns such us wall corners or ceilings:
+6. After you calibrate the camera intrinsics, when you run OpenPose with those cameras, you should see the lines in real-life to be (almost) perfect lines in the image. Otherwise, the calibration was not good. Try checking straight patterns such us wall or ceiling edges:
 ```sh
-# With distortion (lines might seem with a more circular shape)
-./build/examples/openpose/openpose.bin --num_gpu 0 --flir_camera --flir_camera_index 0 --frame_keep_distortion
-# Without distortion (lines should look as lines)
+# With distortion (straight lines might not look as straight lines but rather with a more circular shape)
 ./build/examples/openpose/openpose.bin --num_gpu 0 --flir_camera --flir_camera_index 0
+# Without distortion (straight lines should look as straight lines)
+./build/examples/openpose/openpose.bin --num_gpu 0 --flir_camera --flir_camera_index 0 --frame_undistort
 ```
-7. Full example for 4 Flir/Point Grey cameras:
+
+Examples:
+
+1. Full example for a folder of images, a video, webcam streaming, etc.:
+```sh
+# Ubuntu and Mac
+# Get images for calibration (only if target is not `--image_dir`)
+    # If video
+./build/examples/openpose/openpose.bin --num_gpu 0 --video examples/media/video_chessboard.avi --write_images ~/Desktop/Calib_intrinsics
+    # If webcam
+./build/examples/openpose/openpose.bin --num_gpu 0 --webcam --write_images ~/Desktop/Calib_intrinsics
+# Run calibration
+./build/examples/calibration/calibration.bin --mode 1 --grid_square_size_mm 30.0 --grid_number_inner_corners "8x6" --calibration_image_dir ~/Desktop/Calib_intrinsics/ --camera_parameter_folder models/cameraParameters/ --camera_serial_number frame_intrinsics
+# Output: {OpenPose path}/models/cameraParameters/frame_intrinsics.xml
+# Visualize undistorted images
+./build/examples/openpose/openpose.bin --num_gpu 0 --image_dir ~/Desktop/Calib_intrinsics/ --frame_undistort --camera_parameter_path "models/cameraParameters/frame_intrinsics.xml"
+# If video
+./build/examples/openpose/openpose.bin --num_gpu 0 --video examples/media/video_chessboard.avi --frame_undistort --camera_parameter_path "models/cameraParameters/frame_intrinsics.xml"
+# If webcam
+./build/examples/openpose/openpose.bin --num_gpu 0 --webcam --frame_undistort --camera_parameter_path "models/cameraParameters/frame_intrinsics.xml"
+```
+
+2. Full example for 4-view Flir/Point Grey camera system:
 ```sh
 # Ubuntu and Mac
 # Get images for calibration
-./build/examples/openpose/openpose.bin --num_gpu 0 --frame_keep_distortion --flir_camera --flir_camera_index 0 --write_images ~/Desktop/intrinsics_0
-./build/examples/openpose/openpose.bin --num_gpu 0 --frame_keep_distortion --flir_camera --flir_camera_index 1 --write_images ~/Desktop/intrinsics_1
-./build/examples/openpose/openpose.bin --num_gpu 0 --frame_keep_distortion --flir_camera --flir_camera_index 2 --write_images ~/Desktop/intrinsics_2
-./build/examples/openpose/openpose.bin --num_gpu 0 --frame_keep_distortion --flir_camera --flir_camera_index 3 --write_images ~/Desktop/intrinsics_3
+./build/examples/openpose/openpose.bin --num_gpu 0 --flir_camera --flir_camera_index 0 --write_images ~/Desktop/intrinsics_0
+./build/examples/openpose/openpose.bin --num_gpu 0 --flir_camera --flir_camera_index 1 --write_images ~/Desktop/intrinsics_1
+./build/examples/openpose/openpose.bin --num_gpu 0 --flir_camera --flir_camera_index 2 --write_images ~/Desktop/intrinsics_2
+./build/examples/openpose/openpose.bin --num_gpu 0 --flir_camera --flir_camera_index 3 --write_images ~/Desktop/intrinsics_3
 # Run calibration
 #     - Note: If your computer has enough RAM memory, you can run all of them at the same time in order to speed up the time (they are not internally multi-threaded).
 ./build/examples/calibration/calibration.bin --mode 1 --grid_square_size_mm 127.0 --grid_number_inner_corners "9x6" --camera_serial_number 17012332 --calibration_image_dir ~/Desktop/intrinsics_0
@@ -74,12 +96,10 @@ Note: In order to maximize calibration quality, **do not reuse the same video se
 ./build/examples/calibration/calibration.bin --mode 1 --grid_square_size_mm 127.0 --grid_number_inner_corners "9x6" --camera_serial_number 18079957 --calibration_image_dir ~/Desktop/intrinsics_3
 # Visualize undistorted images
 #     - Camera parameters will be saved on their respective serial number files, so OpenPose will automatically find them
-./build/examples/openpose/openpose.bin --num_gpu 0 --flir_camera
+./build/examples/openpose/openpose.bin --num_gpu 0 --flir_camera --frame_undistort
 ```
-:: Windows
-:: build\x64\Release\calibration.exe with the same flags as above
-```
-```
+
+3. For Windows, simply run `build\x64\Release\calibration.exe` (or the one from the binary portable demo) with the same flags as above.
 
 
 
@@ -107,7 +127,7 @@ Note: In order to maximize calibration quality, **do not reuse the same video se
 ```
 4. Hint to verify extrinsic calibration is successful:
     1. Translation vector - Global distance:
-        1. Manually open each one of the generated XML files from the folder indicated by the flag `--camera_parameter_folder` (or the default one indicated by the `--help` flag if the former was not used).
+        1. Manually open each one of the generated XML files from the folder indicated by the flag `--camera_parameter_path` (or the default one indicated by the `--help` flag if the former was not used).
         2. The field `CameraMatrix` is a 3 x 4 matrix (you can see that the subfield `rows` in that file is 3 and `cols` is 4).
         3. Order the matrix in that 3 x 4 shape (e.g., by copying in a different text file with the shape of 3 rows and 4 columns).
         4. The 3 first components of the last column of the `CameraMatrix` field define the global `translation` (in meters) with respect to the global origin (in our case camera 1).

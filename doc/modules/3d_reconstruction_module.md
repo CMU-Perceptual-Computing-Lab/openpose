@@ -66,7 +66,7 @@ This demo assumes n arbitrary stereo cameras from the FLIR company (formerly Poi
 
 
 ## Camera Calibration
-The user must manually get the intrinsic and extrinsic parameters of the stereo-cameras. Note, we will assume `Flir` cameras, which is specified by default with the flag `--camera_parameter_folder "models/cameraParameters/flir/"`. Otherwise, change the path to your camera name accordingly.
+The user must manually get the intrinsic and extrinsic parameters of the stereo-cameras. Note, we will assume `Flir` cameras, which is specified by default with the flag `--camera_parameter_path "models/cameraParameters/flir/"`. Otherwise, change the path to your camera name accordingly.
 
 There are 2 alternatives to calibrate the cameras:
 

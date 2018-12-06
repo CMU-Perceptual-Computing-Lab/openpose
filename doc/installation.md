@@ -289,6 +289,13 @@ Note: Check the differences between these models in [doc/faq.md#difference-betwe
 #### Python API
 To install the Python API, ensure that the `BUILD_PYTHON` flag is turned on while running CMake GUI and follow the standard installation steps. After the installation, check [doc/modules/python_module.md](./modules/python_module.md) for further details.
 
+Note: If you are in Windows, and you fail to install the required third party Python libraries, it might print an error similar to: `Exception: Error: OpenPose library could not be found. Did you enable BUILD_PYTHON in CMake and have this Python script in the right folder?`. From GitHub issue #941:
+```
+I had a similar issue with Visual Studio (VS). I am pretty sure that the issue is that while you are compiling OpenPose in VS, it tries to import cv2 (python-opencv) and it fails. So make sure that if you open cmd.exe and run python, you can actually import cv2 without errors. I could not, but I had cv2 installed in a IPython environment (Anaconda), so I activated that environment, and then ran (change this to adapt it to your VS version and location of OpenPose.sln):
+
+C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\MSBuild.exe C:\path\to\OpenPose.sln
+```
+
 
 
 #### CPU Version

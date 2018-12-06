@@ -1,6 +1,7 @@
+#include <openpose/producer/headers.hpp>
 #include <openpose/utilities/check.hpp>
 #include <openpose/utilities/fastMath.hpp>
-#include <openpose/producer/headers.hpp>
+#include <openpose/utilities/fileSystem.hpp>
 #include <openpose/producer/producer.hpp>
 
 namespace op
@@ -20,15 +21,54 @@ namespace op
         }
     }
 
-    Producer::Producer(const ProducerType type) :
+    Producer::Producer(const ProducerType type, const std::string& cameraParameterPath, const bool undistortImage,
+                       const int numberViews) :
         mType{type},
         mProducerFpsMode{ProducerFpsMode::RetrievalFps},
         mNumberEmptyFrames{0},
         mTrackingFps{false}
     {
-        mProperties[(unsigned char)ProducerProperty::AutoRepeat] = (double) false;
-        mProperties[(unsigned char)ProducerProperty::Flip] = (double) false;
-        mProperties[(unsigned char)ProducerProperty::Rotation] = 0.;
+        // Basic properties
+        mProperties[(unsigned int)ProducerProperty::AutoRepeat] = (double) false;
+        mProperties[(unsigned int)ProducerProperty::Flip] = (double) false;
+        mProperties[(unsigned int)ProducerProperty::Rotation] = 0.;
+        mProperties[(unsigned int)ProducerProperty::NumberViews] = numberViews;
+        auto& mNumberViews = mProperties[(unsigned int)ProducerProperty::NumberViews];
+        // Camera (distortion, intrinsic, and extrinsic) parameters
+        if (mType != ProducerType::FlirCamera)
+        {
+            // Undistort image?
+            mCameraParameterReader.setUndistortImage(undistortImage);
+            // If no stereo --> Set to 1
+            if (mNumberViews <= 0)
+                mNumberViews = 1;
+            // Get camera paremeters
+            if (mNumberViews > 1 || undistortImage)
+            {
+                const auto extension = getFileExtension(cameraParameterPath);
+                // Get camera paremeters
+                if (extension == "xml" || extension == "XML")
+                    mCameraParameterReader.readParameters(
+                        getFileParentFolderPath(cameraParameterPath), getFileNameNoExtension(cameraParameterPath));
+                else // if (mNumberViews > 1)
+                {
+                    // Read camera parameters from SN
+                    auto serialNumbers = getFilesOnDirectory(cameraParameterPath, ".xml");
+                    // Get serial numbers
+                    for (auto& serialNumber : serialNumbers)
+                        serialNumber = getFileNameNoExtension(serialNumber);
+                    // Get camera paremeters
+                    mCameraParameterReader.readParameters(cameraParameterPath, serialNumbers);
+                }
+                // Sanity check
+                if ((int)mCameraParameterReader.getNumberCameras() != mNumberViews)
+                    error("Found different number of camera parameter files than the number indicated by"
+                          " `--3d_views` ("
+                          + std::to_string(mCameraParameterReader.getNumberCameras()) + " vs. "
+                          + std::to_string(mNumberViews) + "). Make sure they are the same number of files.",
+                          __LINE__, __FUNCTION__, __FILE__);
+            }
+        }
     }
 
     Producer::~Producer(){}
@@ -61,6 +101,12 @@ namespace op
                 keepDesiredFrameRate();
                 // Get frame
                 frames = getRawFrames();
+                // Undistort frames
+                // TODO: Multi-thread if > 1 frame
+                for (auto i = 0u ; i < frames.size() ; i++)
+                    if (!frames[i].empty() && mCameraParameterReader.getUndistortImage())
+                        mCameraParameterReader.undistort(frames[i], i);
+                // Post-process frames
                 for (auto& frame : frames)
                 {
                     // Flip + rotate frame
@@ -78,6 +124,45 @@ namespace op
                 ifEndedResetOrRelease();
             }
             return frames;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return {};
+        }
+    }
+
+    std::vector<cv::Mat> Producer::getCameraMatrices()
+    {
+        try
+        {
+            return mCameraParameterReader.getCameraMatrices();
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return {};
+        }
+    }
+
+    std::vector<cv::Mat> Producer::getCameraExtrinsics()
+    {
+        try
+        {
+            return mCameraParameterReader.getCameraExtrinsics();
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return {};
+        }
+    }
+
+    std::vector<cv::Mat> Producer::getCameraIntrinsics()
+    {
+        try
+        {
+            return mCameraParameterReader.getCameraIntrinsics();
         }
         catch (const std::exception& e)
         {
@@ -197,8 +282,8 @@ namespace op
                           || (frame.rows != get(CV_CAP_PROP_FRAME_HEIGHT) && get(CV_CAP_PROP_FRAME_HEIGHT) > 0)))
                 {
                     log("Frame size changed. Returning empty frame.\nExpected vs. received sizes: "
-                        + std::to_string(get(CV_CAP_PROP_FRAME_WIDTH))
-                        + "x" + std::to_string(get(CV_CAP_PROP_FRAME_HEIGHT))
+                        + std::to_string(intRound(get(CV_CAP_PROP_FRAME_WIDTH)))
+                        + "x" + std::to_string(intRound(get(CV_CAP_PROP_FRAME_HEIGHT)))
                         + " vs. " + std::to_string(frame.cols) + "x" + std::to_string(frame.rows),
                         Priority::Max, __LINE__, __FUNCTION__, __FILE__);
                     frame = cv::Mat();
@@ -354,7 +439,7 @@ namespace op
     std::shared_ptr<Producer> createProducer(const ProducerType producerType, const std::string& producerString,
                                              const Point<int>& cameraResolution,
                                              const std::string& cameraParameterPath, const bool undistortImage,
-                                             const unsigned int imageDirectoryStereo)
+                                             const int numberViews)
     {
         try
         {
@@ -363,14 +448,14 @@ namespace op
             // Directory of images
             if (producerType == ProducerType::ImageDirectory)
                 return std::make_shared<ImageDirectoryReader>(
-                    producerString, imageDirectoryStereo, cameraParameterPath);
+                    producerString, cameraParameterPath, undistortImage, numberViews);
             // Video
             else if (producerType == ProducerType::Video)
                 return std::make_shared<VideoReader>(
-                    producerString, imageDirectoryStereo, cameraParameterPath);
+                    producerString, cameraParameterPath, undistortImage, numberViews);
             // IP camera
             else if (producerType == ProducerType::IPCamera)
-                return std::make_shared<IpCameraReader>(producerString);
+                return std::make_shared<IpCameraReader>(producerString, cameraParameterPath, undistortImage);
             // Flir camera
             else if (producerType == ProducerType::FlirCamera)
                 return std::make_shared<FlirReader>(
@@ -386,7 +471,8 @@ namespace op
                 {
                     const auto throwExceptionIfNoOpened = true;
                     return std::make_shared<WebcamReader>(
-                        webcamIndex, cameraResolutionFinal, throwExceptionIfNoOpened);
+                        webcamIndex, cameraResolutionFinal, throwExceptionIfNoOpened, cameraParameterPath,
+                        undistortImage);
                 }
                 else
                 {
@@ -395,7 +481,8 @@ namespace op
                     for (auto index = 0 ; index < 10 ; index++)
                     {
                         webcamReader = std::make_shared<WebcamReader>(
-                            index, cameraResolutionFinal, throwExceptionIfNoOpened);
+                            index, cameraResolutionFinal, throwExceptionIfNoOpened, cameraParameterPath,
+                            undistortImage);
                         if (webcamReader->isOpened())
                         {
                             log("Auto-detecting camera index... Detected and opened camera " + std::to_string(index)

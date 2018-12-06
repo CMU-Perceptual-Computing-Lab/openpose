@@ -108,11 +108,10 @@ namespace op
         }
     }
 
-    std::pair<double, std::vector<double>> calcReprojectionErrors(const std::vector<std::vector<cv::Point3f>>& objects3DVectors,
-                                                                  const std::vector<std::vector<cv::Point2f>>& points2DVectors,
-                                                                  const std::vector<cv::Mat>& rVecs,
-                                                                  const std::vector<cv::Mat>& tVecs,
-                                                                  const Intrinsics& intrinsics)
+    std::pair<double, std::vector<double>> calcReprojectionErrors(
+        const std::vector<std::vector<cv::Point3f>>& objects3DVectors,
+        const std::vector<std::vector<cv::Point2f>>& points2DVectors, const std::vector<cv::Mat>& rVecs,
+        const std::vector<cv::Mat>& tVecs, const Intrinsics& intrinsics)
     {
         try
         {
@@ -125,12 +124,9 @@ namespace op
 
             for (auto i = 0ull; i < objects3DVectors.size(); ++i )
             {
-                cv::projectPoints(cv::Mat(objects3DVectors.at(i)),
-                                  rVecs.at(i),
-                                  tVecs.at(i),
-                                  intrinsics.cameraMatrix,
-                                  intrinsics.distortionCoefficients,
-                                  points2DVectors2);
+                cv::projectPoints(
+                    cv::Mat(objects3DVectors.at(i)), rVecs.at(i), tVecs.at(i), intrinsics.cameraMatrix,
+                    intrinsics.distortionCoefficients, points2DVectors2);
                 const auto err = cv::norm(cv::Mat(points2DVectors.at(i)), cv::Mat(points2DVectors2), CV_L2);
 
                 const auto n = objects3DVectors.at(i).size();
@@ -150,10 +146,9 @@ namespace op
         }
     }
 
-    Intrinsics calcIntrinsicParameters(const cv::Size& imageSize,
-                                       const std::vector<std::vector<cv::Point2f>>& points2DVectors,
-                                       const std::vector<std::vector<cv::Point3f>>& objects3DVectors,
-                                       const int calibrateCameraFlags)
+    Intrinsics calcIntrinsicParameters(
+        const cv::Size& imageSize, const std::vector<std::vector<cv::Point2f>>& points2DVectors,
+        const std::vector<std::vector<cv::Point3f>>& objects3DVectors, const int calibrateCameraFlags)
     {
         try
         {
@@ -164,9 +159,9 @@ namespace op
             Intrinsics intrinsics;
             std::vector<cv::Mat> rVecs;
             std::vector<cv::Mat> tVecs;
-            const auto rms = cv::calibrateCamera(objects3DVectors, points2DVectors, imageSize, intrinsics.cameraMatrix,
-                                                 intrinsics.distortionCoefficients, rVecs, tVecs,
-                                                 calibrateCameraFlags);
+            const auto rms = cv::calibrateCamera(
+                objects3DVectors, points2DVectors, imageSize, intrinsics.cameraMatrix,
+                intrinsics.distortionCoefficients, rVecs, tVecs, calibrateCameraFlags);
 
             // cv::checkRange checks that every array element is neither NaN nor infinite
             const auto calibrationIsCorrect = cv::checkRange(intrinsics.cameraMatrix)
@@ -176,8 +171,8 @@ namespace op
 
             double totalAvgErr;
             std::vector<double> reprojectionErrors;
-            std::tie(totalAvgErr, reprojectionErrors) = calcReprojectionErrors(objects3DVectors, points2DVectors,
-                                                                               rVecs, tVecs, intrinsics);
+            std::tie(totalAvgErr, reprojectionErrors) = calcReprojectionErrors(
+                objects3DVectors, points2DVectors, rVecs, tVecs, intrinsics);
 
             log("\nIntrinsics:", Priority::High);
             log("Re-projection error - cv::calibrateCamera vs. calcReprojectionErrors:\t" + std::to_string(rms)
@@ -441,10 +436,9 @@ namespace op
                 return Eigen::Matrix4d{};
             }
         }
-        std::pair<cv::Mat, cv::Mat> solveCorrespondences2D3D(const cv::Mat& cameraMatrix,
-                                                             const cv::Mat& distortionCoefficients,
-                                                             const std::vector<cv::Point3f>& objects3DVector,
-                                                             const std::vector<cv::Point2f>& points2DVector)
+        std::pair<cv::Mat, cv::Mat> solveCorrespondences2D3D(
+            const cv::Mat& cameraMatrix, const cv::Mat& distortionCoefficients,
+            const std::vector<cv::Point3f>& objects3DVector, const std::vector<cv::Point2f>& points2DVector)
         {
             try
             {
@@ -487,11 +481,9 @@ namespace op
             }
         }
 
-        std::tuple<cv::Mat, cv::Mat, std::vector<cv::Point2f>, std::vector<cv::Point3f>> calcExtrinsicParametersOpenCV(const cv::Mat& image,
-                                                                                                                       const cv::Mat& cameraMatrix,
-                                                                                                                       const cv::Mat& distortionCoefficients,
-                                                                                                                       const cv::Size& gridInnerCorners,
-                                                                                                                       const float gridSquareSizeMm)
+        std::tuple<cv::Mat, cv::Mat, std::vector<cv::Point2f>, std::vector<cv::Point3f>> calcExtrinsicParametersOpenCV(
+            const cv::Mat& image, const cv::Mat& cameraMatrix, const cv::Mat& distortionCoefficients,
+            const cv::Size& gridInnerCorners, const float gridSquareSizeMm)
         {
             try
             {
@@ -556,12 +548,9 @@ namespace op
             }
         }
 
-        std::tuple<bool, Eigen::Matrix3d, Eigen::Vector3d, Eigen::Matrix3d, Eigen::Vector3d> getExtrinsicParameters(const std::vector<std::string>& cameraPaths,
-                                                                                                                    const cv::Size& gridInnerCorners,
-                                                                                                                    const float gridSquareSizeMm,
-                                                                                                                    const bool coutAndPlotGridCorners,
-                                                                                                                    const std::vector<cv::Mat>& intrinsics,
-                                                                                                                    const std::vector<cv::Mat>& distortions)
+        std::tuple<bool, Eigen::Matrix3d, Eigen::Vector3d, Eigen::Matrix3d, Eigen::Vector3d> getExtrinsicParameters(
+            const std::vector<std::string>& cameraPaths, const cv::Size& gridInnerCorners, const float gridSquareSizeMm,
+            const bool coutAndPlotGridCorners, const std::vector<cv::Mat>& intrinsics, const std::vector<cv::Mat>& distortions)
         {
             try
             {
@@ -857,13 +846,10 @@ namespace op
 
 
     // Public functions
-    void estimateAndSaveIntrinsics(const Point<int>& gridInnerCorners,
-                                   const float gridSquareSizeMm,
-                                   const int flags,
-                                   const std::string& outputParameterFolder,
-                                   const std::string& imagesFolder,
-                                   const std::string& serialNumber,
-                                   const bool saveImagesWithCorners)
+    void estimateAndSaveIntrinsics(
+        const Point<int>& gridInnerCorners, const float gridSquareSizeMm, const int flags,
+        const std::string& outputParameterFolder, const std::string& imagesFolder, const std::string& serialNumber,
+        const bool saveImagesWithCorners)
     {
         try
         {
@@ -873,11 +859,11 @@ namespace op
 
             // Read images in folder
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-            std::vector<std::vector<cv::Point2f>> points2DVectors;
             const auto imageAndPaths = getImageAndPaths(imagesFolder);
 
             // Get 2D grid corners of each image
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            std::vector<std::vector<cv::Point2f>> points2DVectors;
             std::vector<cv::Mat> imagesWithCorners;
             const auto imageSize = imageAndPaths.at(0).first.size();
             for (auto i = 0u ; i < imageAndPaths.size() ; i++)
@@ -902,9 +888,9 @@ namespace op
                     points2DVectors.emplace_back(points2DVector);
                 }
                 else
-                    std::cerr << "Chessboard not found in this image." << std::endl;
+                    log("Chessboard not found in image " + imageAndPaths.at(i).second + ".", Priority::High);
 
-                // Show image (with chessboard corners if found)
+                // Debugging (optional) - Show image (with chessboard corners if found)
                 if (saveImagesWithCorners)
                 {
                     cv::Mat imageToPlot = image.clone();
@@ -920,18 +906,17 @@ namespace op
             // Run calibration
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             // objects3DVector is the same one for each image
-            const std::vector<std::vector<cv::Point3f>> objects3DVectors(points2DVectors.size(),
-                                                                         getObjects3DVector(gridInnerCornersCvSize,
-                                                                                            gridSquareSizeMm));
+            const std::vector<std::vector<cv::Point3f>> objects3DVectors(
+                points2DVectors.size(), getObjects3DVector(gridInnerCornersCvSize, gridSquareSizeMm));
             const auto intrinsics = calcIntrinsicParameters(imageSize, points2DVectors, objects3DVectors, flags);
 
             // Save intrinsics/results
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-            CameraParameterReader cameraParameterReader{serialNumber, intrinsics.cameraMatrix,
-                                                        intrinsics.distortionCoefficients};
+            CameraParameterReader cameraParameterReader{
+                serialNumber, intrinsics.cameraMatrix, intrinsics.distortionCoefficients};
             cameraParameterReader.writeParameters(outputParameterFolder);
 
-            // Save images with corners
+            // Debugging (optional) - Save images with corners
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             if (saveImagesWithCorners)
             {

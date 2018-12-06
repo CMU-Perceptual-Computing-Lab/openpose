@@ -99,7 +99,7 @@ namespace op
             auto producerSharedPtr = createProducer(
                 wrapperStructInput.producerType, wrapperStructInput.producerString,
                 wrapperStructInput.cameraResolution, wrapperStructInput.cameraParameterPath,
-                wrapperStructInput.undistortImage, wrapperStructInput.imageDirectoryStereo);
+                wrapperStructInput.undistortImage, wrapperStructInput.numberViews);
 
             // Editable arguments
             auto wrapperStructPose = wrapperStructPoseTemp;
@@ -708,13 +708,17 @@ namespace op
                     for (const auto& poseGpuRenderer : poseGpuRenderers)
                         renderers.emplace_back(std::static_pointer_cast<Renderer>(poseGpuRenderer));
                 // Display
+                const auto numberViews = (intRound(producerSharedPtr->get(ProducerProperty::NumberViews)));
+                auto finalOutputSizeGui = finalOutputSize;
+                if (numberViews > 1 && finalOutputSizeGui.x > 0)
+                    finalOutputSizeGui.x *= numberViews;
                 // Adam (+3-D/2-D) display
                 if (displayAdam)
                 {
 #ifdef USE_3D_ADAM_MODEL
                     // Gui
                     const auto gui = std::make_shared<GuiAdam>(
-                        finalOutputSize, wrapperStructGui.fullScreen, threadManager.getIsRunningSharedPtr(),
+                        finalOutputSizeGui, wrapperStructGui.fullScreen, threadManager.getIsRunningSharedPtr(),
                         spVideoSeek, poseExtractorNets, faceExtractorNets, handExtractorNets, renderers,
                         wrapperStructGui.displayMode, JointAngleEstimation::getTotalModel(),
                         wrapperStructOutput.writeVideoAdam
@@ -729,7 +733,7 @@ namespace op
                 {
                     // Gui
                     const auto gui = std::make_shared<Gui3D>(
-                        finalOutputSize, wrapperStructGui.fullScreen, threadManager.getIsRunningSharedPtr(),
+                        finalOutputSizeGui, wrapperStructGui.fullScreen, threadManager.getIsRunningSharedPtr(),
                         spVideoSeek, poseExtractorNets, faceExtractorNets, handExtractorNets, renderers,
                         wrapperStructPose.poseModel, wrapperStructGui.displayMode
                     );
@@ -741,7 +745,7 @@ namespace op
                 {
                     // Gui
                     const auto gui = std::make_shared<Gui>(
-                        finalOutputSize, wrapperStructGui.fullScreen, threadManager.getIsRunningSharedPtr(),
+                        finalOutputSizeGui, wrapperStructGui.fullScreen, threadManager.getIsRunningSharedPtr(),
                         spVideoSeek, poseExtractorNets, faceExtractorNets, handExtractorNets, renderers
                     );
                     // WGui

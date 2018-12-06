@@ -107,7 +107,7 @@ int tutorialAddModule1()
         const op::WrapperStructInput wrapperStructInput{
             producerType, producerString, FLAGS_frame_first, FLAGS_frame_step, FLAGS_frame_last,
             FLAGS_process_real_time, FLAGS_frame_flip, FLAGS_frame_rotate, FLAGS_frames_repeat,
-            cameraSize, FLAGS_camera_parameter_folder, !FLAGS_frame_keep_distortion, (unsigned int) FLAGS_3d_views};
+            cameraSize, FLAGS_camera_parameter_path, FLAGS_frame_undistort, FLAGS_3d_views};
         opWrapperT.configure(wrapperStructInput);
         // Output (comment or use default argument to disable any output)
         const op::WrapperStructOutput wrapperStructOutput{

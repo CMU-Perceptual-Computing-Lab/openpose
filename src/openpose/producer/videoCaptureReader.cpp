@@ -5,8 +5,10 @@
 
 namespace op
 {
-    VideoCaptureReader::VideoCaptureReader(const int index, const bool throwExceptionIfNoOpened) :
-        Producer{ProducerType::Webcam}
+    VideoCaptureReader::VideoCaptureReader(const int index, const bool throwExceptionIfNoOpened,
+                                           const std::string& cameraParameterPath, const bool undistortImage,
+                                           const int numberViews) :
+        Producer{ProducerType::Webcam, cameraParameterPath, undistortImage, numberViews}
     {
         try
         {
@@ -18,8 +20,10 @@ namespace op
         }
     }
 
-    VideoCaptureReader::VideoCaptureReader(const std::string& path, const ProducerType producerType) :
-        Producer{producerType},
+    VideoCaptureReader::VideoCaptureReader(const std::string& path, const ProducerType producerType,
+                                           const std::string& cameraParameterPath, const bool undistortImage,
+                                           const int numberViews) :
+        Producer{producerType, cameraParameterPath, undistortImage, numberViews},
         mVideoCapture{path}
     {
         try
