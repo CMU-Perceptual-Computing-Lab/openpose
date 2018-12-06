@@ -26,8 +26,8 @@ DEFINE_int32(cam0,                      1,              "Baseline camera for ext
                                                         " world coordinate origin.");
 DEFINE_int32(cam1,                      0,              "Target camera to estimate its extrinsic parameters, it will be calibrated assuming cam0"
                                                         " as the world coordinate origin.");
-// // Mode 3
-// DEFINE_int32(number_cameras,            4,              "Number of cameras.");
+// // Modes 3-4
+// DEFINE_int32(number_cameras,            4,              "Number of cameras (for mode 3-4).");
 // Producer
 DEFINE_string(camera_parameter_folder,  "models/cameraParameters/flir/", "String with the folder where the camera parameters are or will be"
                                                         " located.");
@@ -36,7 +36,7 @@ int openPoseDemo()
 {
     try
     {
-        op::log("Starting OpenPose demo...", op::Priority::High);
+        op::log("Starting OpenPose calibration toolbox...", op::Priority::High);
         const auto timerBegin = std::chrono::high_resolution_clock::now();
 
         // logging_level
@@ -44,24 +44,26 @@ int openPoseDemo()
                   __LINE__, __FUNCTION__, __FILE__);
         op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
 
+        // Common parameters
+        const auto gridInnerCorners = op::flagsToPoint(FLAGS_grid_number_inner_corners, "12x7");
+        const auto calibrationImageDir = op::formatAsDirectory(FLAGS_calibration_image_dir);
+
         // Calibration - Intrinsics
         if (FLAGS_mode == 1)
         {
             op::log("Running calibration (intrinsic parameters)...", op::Priority::High);
-            // Obtain & save intrinsics
-            const auto gridInnerCorners = op::flagsToPoint(FLAGS_grid_number_inner_corners, "12x7");
+            // Parameters
             // const auto flags = 0;                                                                   // 5 parameters
             const auto flags = cv::CALIB_RATIONAL_MODEL;                                            // 8 parameters
             // const auto flags = cv::CALIB_RATIONAL_MODEL | cv::CALIB_THIN_PRISM_MODEL;               // 12 parameters
             // const auto flags = cv::CALIB_RATIONAL_MODEL | cv::CALIB_THIN_PRISM_MODEL | cv::CALIB_TILTED_MODEL; // 14
             // const auto saveImagesWithCorners = false;
             const auto saveImagesWithCorners = true;
-            // Run camera calibration code
+            // Run calibration
             op::estimateAndSaveIntrinsics(
                 gridInnerCorners, FLAGS_grid_square_size_mm, flags,
-                op::formatAsDirectory(FLAGS_camera_parameter_folder),
-                op::formatAsDirectory(FLAGS_calibration_image_dir),
-                FLAGS_camera_serial_number, saveImagesWithCorners);
+                op::formatAsDirectory(FLAGS_camera_parameter_folder), calibrationImageDir, FLAGS_camera_serial_number,
+                saveImagesWithCorners);
             op::log("Intrinsic calibration completed!", op::Priority::High);
         }
 
@@ -69,27 +71,42 @@ int openPoseDemo()
         else if (FLAGS_mode == 2)
         {
             op::log("Running calibration (extrinsic parameters)...", op::Priority::High);
-            // Parameters
+            // Run calibration
             op::estimateAndSaveExtrinsics(
-                FLAGS_camera_parameter_folder, op::formatAsDirectory(FLAGS_calibration_image_dir),
-                op::flagsToPoint(FLAGS_grid_number_inner_corners, "12x7"), FLAGS_grid_square_size_mm, FLAGS_cam0,
-                FLAGS_cam1, FLAGS_omit_distortion, FLAGS_combine_cam0_extrinsics);
+                FLAGS_camera_parameter_folder, calibrationImageDir, gridInnerCorners, FLAGS_grid_square_size_mm,
+                FLAGS_cam0, FLAGS_cam1, FLAGS_omit_distortion, FLAGS_combine_cam0_extrinsics);
+            // Logging
             op::log("Extrinsic calibration completed!", op::Priority::High);
         }
 
-        // // Calibration - Extrinsics Refinement with Visual SFM
+        // // Calibration - Extrinsics - Bundle Adjustment (BA)
         // else if (FLAGS_mode == 3)
+        // {
+        //     op::log("Running calibration (bundle adjustment over extrinsic parameters)...", op::Priority::High);
+        //     // Sanity check
+        //     if (!FLAGS_omit_distortion)
+        //         op::error("This mode assumes that the images are already undistorted (add flag `--omit_distortion`.",
+        //                   __LINE__, __FUNCTION__, __FILE__);
+        //     // Parameters
+        //     const auto saveImagesWithCorners = false;
+        //     // Run calibration
+        //     op::refineAndSaveExtrinsics(
+        //         FLAGS_camera_parameter_folder, calibrationImageDir, gridInnerCorners, FLAGS_grid_square_size_mm,
+        //         FLAGS_number_cameras, FLAGS_omit_distortion, saveImagesWithCorners);
+        //     // Logging
+        //     op::log("Extrinsic calibration (bundle adjustment) completed!", op::Priority::High);
+        // }
+
+        // // Calibration - Extrinsics Refinement with Visual SFM
+        // else if (FLAGS_mode == 4)
         // {
         //     op::log("Running calibration (intrinsic parameters)...", op::Priority::High);
         //     // Obtain & save intrinsics
-        //     const auto gridInnerCorners = op::flagsToPoint(FLAGS_grid_number_inner_corners, "12x7");
         //     const auto saveImagesWithCorners = false;
         //     // const auto saveImagesWithCorners = true;
         //     // Run camera calibration code
-        //     op::estimateAndSaveSiftFile(gridInnerCorners,
-        //                                 op::formatAsDirectory(FLAGS_calibration_image_dir),
-        //                                 FLAGS_number_cameras,
-        //                                 saveImagesWithCorners);
+        //     op::estimateAndSaveSiftFile(
+        //         gridInnerCorners, calibrationImageDir, FLAGS_number_cameras, saveImagesWithCorners);
         //     op::log("Intrinsic calibration completed!", op::Priority::High);
         // }
 
@@ -100,7 +117,7 @@ int openPoseDemo()
         const auto now = std::chrono::high_resolution_clock::now();
         const auto totalTimeSec = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(now-timerBegin).count()
                                 * 1e-9;
-        const auto message = "OpenPose demo successfully finished. Total time: "
+        const auto message = "OpenPose calibration toolbox successfully finished. Total time: "
                            + std::to_string(totalTimeSec) + " seconds.";
         op::log(message, op::Priority::High);
 

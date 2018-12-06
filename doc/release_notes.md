@@ -310,6 +310,7 @@ OpenPose Library - Release Notes
     3. Template functions could not be imported in Windows for projects using the OpenPose library DLL.
     4. Function `scaleKeypoints2d` was not working if any of the scales was 1 (e.g., fail if scaleX = 1 but scaleY != 1, or if any offset was not 0).
     5. Fixed bug in `KeepTopNPeople` that could provoke segmentation fault for `number_people_max` > 1.
+    6. Camera parameter reader can now take folder paths even if they are not finished in `/` (e.g., `~/Desktop/` worked but `~/Desktop` did not).
 
 
 

@@ -15,16 +15,21 @@ namespace op
      */
     OP_API void estimateAndSaveIntrinsics(
         const Point<int>& gridInnerCorners, const float gridSquareSizeMm, const int flags,
-        const std::string& outputParameterFolder, const std::string& imagesFolder, const std::string& serialNumber,
+        const std::string& outputParameterFolder, const std::string& imageFolder, const std::string& serialNumber,
         const bool saveImagesWithCorners = false);
 
     OP_API void estimateAndSaveExtrinsics(
-        const std::string& intrinsicsFolder, const std::string& extrinsicsImagesFolder,
-        const Point<int>& gridInnerCorners, const float gridSquareSizeMm, const int index0, const int index1,
-        const bool imagesAreUndistorted, const bool combineCam0Extrinsics);
+        const std::string& parameterFolder, const std::string& imageFolder, const Point<int>& gridInnerCorners,
+        const float gridSquareSizeMm, const int index0, const int index1, const bool imagesAreUndistorted,
+        const bool combineCam0Extrinsics);
+
+    OP_API void refineAndSaveExtrinsics(
+        const std::string& parameterFolder, const std::string& imageFolder, const Point<int>& gridInnerCorners,
+        const float gridSquareSizeMm, const int numberCameras, const bool imagesAreUndistorted,
+        const bool saveImagesWithCorners = false);
 
     OP_API void estimateAndSaveSiftFile(
-        const Point<int>& gridInnerCorners, const std::string& imagesFolder, const int numberCameras,
+        const Point<int>& gridInnerCorners, const std::string& imageFolder, const int numberCameras,
         const bool saveImagesWithCorners = false);
 }
 

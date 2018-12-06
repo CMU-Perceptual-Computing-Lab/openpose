@@ -28,46 +28,54 @@ namespace op
         mNumberEmptyFrames{0},
         mTrackingFps{false}
     {
-        // Basic properties
-        mProperties[(unsigned int)ProducerProperty::AutoRepeat] = (double) false;
-        mProperties[(unsigned int)ProducerProperty::Flip] = (double) false;
-        mProperties[(unsigned int)ProducerProperty::Rotation] = 0.;
-        mProperties[(unsigned int)ProducerProperty::NumberViews] = numberViews;
-        auto& mNumberViews = mProperties[(unsigned int)ProducerProperty::NumberViews];
-        // Camera (distortion, intrinsic, and extrinsic) parameters
-        if (mType != ProducerType::FlirCamera)
+        try
         {
-            // Undistort image?
-            mCameraParameterReader.setUndistortImage(undistortImage);
-            // If no stereo --> Set to 1
-            if (mNumberViews <= 0)
-                mNumberViews = 1;
-            // Get camera paremeters
-            if (mNumberViews > 1 || undistortImage)
+            // Basic properties
+            mProperties[(unsigned int)ProducerProperty::AutoRepeat] = (double) false;
+            mProperties[(unsigned int)ProducerProperty::Flip] = (double) false;
+            mProperties[(unsigned int)ProducerProperty::Rotation] = 0.;
+            mProperties[(unsigned int)ProducerProperty::NumberViews] = numberViews;
+            auto& mNumberViews = mProperties[(unsigned int)ProducerProperty::NumberViews];
+            // Camera (distortion, intrinsic, and extrinsic) parameters
+            if (mType != ProducerType::FlirCamera)
             {
-                const auto extension = getFileExtension(cameraParameterPath);
+                // Undistort image?
+                mCameraParameterReader.setUndistortImage(undistortImage);
+                // If no stereo --> Set to 1
+                if (mNumberViews <= 0)
+                    mNumberViews = 1;
                 // Get camera paremeters
-                if (extension == "xml" || extension == "XML")
-                    mCameraParameterReader.readParameters(
-                        getFileParentFolderPath(cameraParameterPath), getFileNameNoExtension(cameraParameterPath));
-                else // if (mNumberViews > 1)
+                if (mNumberViews > 1 || undistortImage)
                 {
-                    // Read camera parameters from SN
-                    auto serialNumbers = getFilesOnDirectory(cameraParameterPath, ".xml");
-                    // Get serial numbers
-                    for (auto& serialNumber : serialNumbers)
-                        serialNumber = getFileNameNoExtension(serialNumber);
+                    const auto extension = getFileExtension(cameraParameterPath);
                     // Get camera paremeters
-                    mCameraParameterReader.readParameters(cameraParameterPath, serialNumbers);
+                    if (extension == "xml" || extension == "XML")
+                        mCameraParameterReader.readParameters(
+                            getFileParentFolderPath(cameraParameterPath), getFileNameNoExtension(cameraParameterPath));
+                    else // if (mNumberViews > 1)
+                    {
+                        const auto cameraParameterPathCleaned = formatAsDirectory(cameraParameterPath);
+                        // Read camera parameters from SN
+                        auto serialNumbers = getFilesOnDirectory(cameraParameterPathCleaned, ".xml");
+                        // Get serial numbers
+                        for (auto& serialNumber : serialNumbers)
+                            serialNumber = getFileNameNoExtension(serialNumber);
+                        // Get camera paremeters
+                        mCameraParameterReader.readParameters(cameraParameterPathCleaned, serialNumbers);
+                    }
+                    // Sanity check
+                    if ((int)mCameraParameterReader.getNumberCameras() != mNumberViews)
+                        error("Found different number of camera parameter files than the number indicated by"
+                              " `--3d_views` ("
+                              + std::to_string(mCameraParameterReader.getNumberCameras()) + " vs. "
+                              + std::to_string(mNumberViews) + "). Make sure they are the same number of files.",
+                              __LINE__, __FUNCTION__, __FILE__);
                 }
-                // Sanity check
-                if ((int)mCameraParameterReader.getNumberCameras() != mNumberViews)
-                    error("Found different number of camera parameter files than the number indicated by"
-                          " `--3d_views` ("
-                          + std::to_string(mCameraParameterReader.getNumberCameras()) + " vs. "
-                          + std::to_string(mNumberViews) + "). Make sure they are the same number of files.",
-                          __LINE__, __FUNCTION__, __FILE__);
             }
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
     }
 
