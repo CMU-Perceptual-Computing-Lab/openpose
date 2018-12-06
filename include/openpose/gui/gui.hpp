@@ -5,9 +5,10 @@
 #include <opencv2/core/core.hpp> // cv::Mat
 #include <openpose/core/common.hpp>
 #include <openpose/core/renderer.hpp>
-#include <openpose/gui/enumClasses.hpp>
 #include <openpose/gui/frameDisplayer.hpp>
-#include <openpose/pose/poseExtractor.hpp>
+#include <openpose/pose/poseExtractorNet.hpp>
+#include <openpose/face/faceExtractorNet.hpp>
+#include <openpose/hand/handExtractorNet.hpp>
 
 namespace op
 {
@@ -17,20 +18,35 @@ namespace op
         Gui(const Point<int>& outputSize, const bool fullScreen,
             const std::shared_ptr<std::atomic<bool>>& isRunningSharedPtr,
             const std::shared_ptr<std::pair<std::atomic<bool>, std::atomic<int>>>& videoSeekSharedPtr = nullptr,
-            const std::vector<std::shared_ptr<PoseExtractor>>& poseExtractors = {},
-            const std::vector<std::shared_ptr<Renderer>>& renderers = {});
+            const std::vector<std::shared_ptr<PoseExtractorNet>>& poseExtractorNets = {},
+            const std::vector<std::shared_ptr<FaceExtractorNet>>& faceExtractorNets = {},
+            const std::vector<std::shared_ptr<HandExtractorNet>>& handExtractorNets = {},
+            const std::vector<std::shared_ptr<Renderer>>& renderers = {},
+            const DisplayMode displayMode = DisplayMode::Display2D);
 
-        void initializationOnThread();
+        virtual ~Gui();
 
-        void update(const cv::Mat& cvOutputData = cv::Mat());
+        virtual void initializationOnThread();
+
+        void setImage(const cv::Mat& cvMatOutput);
+
+        void setImage(const std::vector<cv::Mat>& cvMatOutputs);
+
+        virtual void update();
+
+    protected:
+        std::shared_ptr<std::atomic<bool>> spIsRunning;
+        DisplayMode mDisplayMode;
+        DisplayMode mDisplayModeOriginal;
 
     private:
         // Frames display
         FrameDisplayer mFrameDisplayer;
         // Other variables
-        std::vector<std::shared_ptr<PoseExtractor>> mPoseExtractors;
+        std::vector<std::shared_ptr<PoseExtractorNet>> mPoseExtractorNets;
+        std::vector<std::shared_ptr<FaceExtractorNet>> mFaceExtractorNets;
+        std::vector<std::shared_ptr<HandExtractorNet>> mHandExtractorNets;
         std::vector<std::shared_ptr<Renderer>> mRenderers;
-        std::shared_ptr<std::atomic<bool>> spIsRunning;
         std::shared_ptr<std::pair<std::atomic<bool>, std::atomic<int>>> spVideoSeek;
     };
 }

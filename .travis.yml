@@ -35,7 +35,7 @@ script:
   - pip install --upgrade numpy
   - mkdir build
   - cd build
-  - cmake -DBUILD_CAFFE=ON -DDOWNLOAD_COCO_MODEL=OFF -DDOWNLOAD_FACE_MODEL=OFF -DDOWNLOAD_HAND_MODEL=OFF -DDOWNLOAD_MPI_MODEL=OFF ..
+  - cmake -DBUILD_CAFFE=ON -DDOWNLOAD_BODY_25_MODEL=OFF -DDOWNLOAD_BODY_COCO_MODEL=OFF -DDOWNLOAD_FACE_MODEL=OFF -DDOWNLOAD_HAND_MODEL=OFF -DDOWNLOAD_BODY_MPI_MODEL=OFF ..
   - no_cores=`cat /proc/cpuinfo | grep processor | wc -l`
   - make -j${no_cores}
 

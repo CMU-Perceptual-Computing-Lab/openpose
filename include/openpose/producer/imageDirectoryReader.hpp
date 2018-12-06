@@ -15,13 +15,21 @@ namespace op
     {
     public:
         /**
-         * Constructor of ImageDirectoryReader. It sets the image directory path from which the images will be loaded and
-         * generates a std::vector<std::string> with the list of images on that directory.
+         * Constructor of ImageDirectoryReader. It sets the image directory path from which the images will be loaded
+         * and generates a std::vector<std::string> with the list of images on that directory.
          * @param imageDirectoryPath const std::string parameter with the folder path containing the images.
+         * @param cameraParameterPath const std::string parameter with the folder path containing the camera
+         * parameters (only required if imageDirectorystereo > 1).
+         * @param numberViews const int parameter with the number of images per iteration (>1 would represent
+         * stereo processing).
          */
-        explicit ImageDirectoryReader(const std::string& imageDirectoryPath);
+        explicit ImageDirectoryReader(
+            const std::string& imageDirectoryPath, const std::string& cameraParameterPath = "",
+            const bool undistortImage = false, const int numberViews = -1);
 
-        std::string getFrameName();
+        virtual ~ImageDirectoryReader();
+
+        std::string getNextFrameName();
 
         inline bool isOpened() const
         {
@@ -37,16 +45,6 @@ namespace op
 
         void set(const int capProperty, const double value);
 
-        inline double get(const ProducerProperty property)
-        {
-            return Producer::get(property);
-        }
-
-        inline void set(const ProducerProperty property, const double value)
-        {
-            Producer::set(property, value);
-        }
-
     private:
         const std::string mImageDirectoryPath;
         const std::vector<std::string> mFilePaths;
@@ -54,6 +52,8 @@ namespace op
         long long mFrameNameCounter;
 
         cv::Mat getRawFrame();
+
+        std::vector<cv::Mat> getRawFrames();
 
         DELETE_COPY(ImageDirectoryReader);
     };

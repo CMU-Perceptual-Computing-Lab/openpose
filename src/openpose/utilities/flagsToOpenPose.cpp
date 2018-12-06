@@ -1,8 +1,4 @@
 #include <cstdio> // sscanf
-#include <openpose/producer/imageDirectoryReader.hpp>
-#include <openpose/producer/ipCameraReader.hpp>
-#include <openpose/producer/videoReader.hpp>
-#include <openpose/producer/webcamReader.hpp>
 #include <openpose/utilities/check.hpp>
 #include <openpose/utilities/flagsToOpenPose.hpp>
 
@@ -13,29 +9,49 @@ namespace op
         try
         {
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-            if (poseModeString == "COCO")
+            // Body pose
+            if (poseModeString == "BODY_25")
+                return PoseModel::BODY_25;
+            else if (poseModeString == "COCO")
                 return PoseModel::COCO_18;
             else if (poseModeString == "MPI")
                 return PoseModel::MPI_15;
             else if (poseModeString == "MPI_4_layers")
                 return PoseModel::MPI_15_4;
-            else if (poseModeString == "BODY_18")
-                return PoseModel::BODY_18;
             else if (poseModeString == "BODY_19")
                 return PoseModel::BODY_19;
+            else if (poseModeString == "BODY_19E")
+                return PoseModel::BODY_19E;
             else if (poseModeString == "BODY_23")
                 return PoseModel::BODY_23;
+            else if (poseModeString == "BODY_25E")
+                return PoseModel::BODY_25E;
+            else if (poseModeString == "BODY_19N")
+                return PoseModel::BODY_19N;
+            else if (poseModeString == "BODY_19_X2")
+                return PoseModel::BODY_19_X2;
+            else if (poseModeString == "BODY_25_19")
+                return PoseModel::BODY_25_19;
             else if (poseModeString == "BODY_59")
                 return PoseModel::BODY_59;
+            else if (poseModeString == "BODY_65")
+                return PoseModel::BODY_65;
+            else if (poseModeString == "BODY_25D")
+                return PoseModel::BODY_25D;
+            // Car pose
+            else if (poseModeString == "CAR_12")
+                return PoseModel::CAR_12;
+            else if (poseModeString == "CAR_22")
+                return PoseModel::CAR_22;
             // else
-            error("String does not correspond to any model (COCO, MPI, MPI_4_layers)",
-                  __LINE__, __FUNCTION__, __FILE__);
-            return PoseModel::COCO_18;
+            error("String (`" + poseModeString + "`) does not correspond to any model (BODY_25, COCO, MPI,"
+                  " MPI_4_layers).", __LINE__, __FUNCTION__, __FILE__);
+            return PoseModel::BODY_25;
         }
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return PoseModel::COCO_18;
+            return PoseModel::BODY_25;
         }
     }
 
@@ -95,24 +111,22 @@ namespace op
     }
 
     ProducerType flagsToProducerType(const std::string& imageDirectory, const std::string& videoPath,
-                                     const std::string& ipCameraPath, const int webcamIndex)
+                                     const std::string& ipCameraPath, const int webcamIndex,
+                                     const bool flirCamera)
     {
         try
         {
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-            // Avoid duplicates (e.g. selecting at the time camera & video)
-            if (int(!imageDirectory.empty()) + int(!videoPath.empty()) + int(!ipCameraPath.empty()) > 1)
-                error("Selected simultaneously image directory, video and/or IP camera. Please, select only one.",
-                      __LINE__, __FUNCTION__, __FILE__);
-            else if (!imageDirectory.empty() && webcamIndex > 0)
-                error("Selected simultaneously image directory and webcam. Please, select only one.",
-                      __LINE__, __FUNCTION__, __FILE__);
-            else if (!videoPath.empty() && webcamIndex > 0)
-                error("Selected simultaneously video and webcam. Please, select only one.",
-                      __LINE__, __FUNCTION__, __FILE__);
-            else if (!ipCameraPath.empty() && webcamIndex > 0)
-                error("Selected simultaneously IP camera and webcam. Please, select only one.",
-                      __LINE__, __FUNCTION__, __FILE__);
+            // Avoid duplicates (e.g., selecting at the time camera & video)
+            if (int(!imageDirectory.empty()) + int(!videoPath.empty()) + int(webcamIndex > 0)
+                + int(flirCamera) + int(!ipCameraPath.empty()) > 1)
+                error("Selected simultaneously"
+                      " image directory (seletected: " + (imageDirectory.empty() ? "no" : imageDirectory) + "),"
+                      " video (seletected: " + (videoPath.empty() ? "no" : videoPath) + "),"
+                      " camera (selected: " + (webcamIndex > 0 ? std::to_string(webcamIndex) : "no") + "),"
+                      " flirCamera (selected: " + (flirCamera ? "yes" : "no") + ","
+                      " and/or IP camera (selected: " + (ipCameraPath.empty() ? "no" : ipCameraPath) + ")."
+                      " Please, select only one.", __LINE__, __FUNCTION__, __FILE__);
 
             // Get desired ProducerType
             if (!imageDirectory.empty())
@@ -121,6 +135,8 @@ namespace op
                 return ProducerType::Video;
             else if (!ipCameraPath.empty())
                 return ProducerType::IPCamera;
+            else if (flirCamera)
+                return ProducerType::FlirCamera;
             else
                 return ProducerType::Webcam;
         }
@@ -131,57 +147,35 @@ namespace op
         }
     }
 
-    std::shared_ptr<Producer> flagsToProducer(const std::string& imageDirectory, const std::string& videoPath,
-                                              const std::string& ipCameraPath, const int webcamIndex,
-                                              const std::string& webcamResolution, const double webcamFps)
+    std::pair<ProducerType, std::string> flagsToProducer(
+        const std::string& imageDirectory, const std::string& videoPath, const std::string& ipCameraPath,
+        const int webcamIndex, const bool flirCamera, const int flirCameraIndex)
     {
         try
         {
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-            const auto type = flagsToProducerType(imageDirectory, videoPath, ipCameraPath, webcamIndex);
+            const auto type = flagsToProducerType(imageDirectory, videoPath, ipCameraPath, webcamIndex, flirCamera);
 
             if (type == ProducerType::ImageDirectory)
-                return std::make_shared<ImageDirectoryReader>(imageDirectory);
+                return std::make_pair(ProducerType::ImageDirectory, imageDirectory);
             else if (type == ProducerType::Video)
-                return std::make_shared<VideoReader>(videoPath);
+                return std::make_pair(ProducerType::Video, videoPath);
             else if (type == ProducerType::IPCamera)
-                return std::make_shared<IpCameraReader>(ipCameraPath);
+                return std::make_pair(ProducerType::IPCamera, ipCameraPath);
+            // Flir camera
+            else if (type == ProducerType::FlirCamera)
+                return std::make_pair(ProducerType::FlirCamera, std::to_string(flirCameraIndex));
+            // Webcam
             else if (type == ProducerType::Webcam)
-            {
-                // cameraFrameSize
-                const auto webcamFrameSize = op::flagsToPoint(webcamResolution, "1280x720");
-                if (webcamIndex >= 0)
-                {
-                    const auto throwExceptionIfNoOpened = true;
-                    return std::make_shared<WebcamReader>(webcamIndex, webcamFrameSize, webcamFps,
-                                                          throwExceptionIfNoOpened);
-                }
-                else
-                {
-                    const auto throwExceptionIfNoOpened = false;
-                    std::shared_ptr<WebcamReader> webcamReader;
-                    for (auto index = 0 ; index < 10 ; index++)
-                    {
-                        webcamReader = std::make_shared<WebcamReader>(index, webcamFrameSize, webcamFps,
-                                                                      throwExceptionIfNoOpened);
-                        if (webcamReader->isOpened())
-                        {
-                            log("Auto-detecting camera index... Detected and opened camera " + std::to_string(index)
-                                + ".", Priority::High);
-                            return webcamReader;
-                        }
-                    }
-                    error("No camera found.", __LINE__, __FUNCTION__, __FILE__);
-                }
-            }
+                return std::make_pair(ProducerType::Webcam, std::to_string(webcamIndex));
             // else
             error("Undefined Producer selected.", __LINE__, __FUNCTION__, __FILE__);
-            return std::shared_ptr<Producer>{};
+            return std::make_pair(ProducerType::None, "");
         }
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return std::shared_ptr<Producer>{};
+            return std::make_pair(ProducerType::None, "");
         }
     }
 
@@ -206,7 +200,7 @@ namespace op
         }
     }
 
-    RenderMode flagsToRenderMode(const int renderFlag, const int renderPoseFlag)
+    RenderMode flagsToRenderMode(const int renderFlag, const bool gpuBuggy, const int renderPoseFlag)
     {
         try
         {
@@ -214,14 +208,14 @@ namespace op
             if (renderFlag == -1 && renderPoseFlag == -2)
             {
                 #ifdef USE_CUDA
-                    return RenderMode::Gpu;
+                    return (gpuBuggy ? RenderMode::Cpu : RenderMode::Gpu);
                 #else
                     return RenderMode::Cpu;
                 #endif
             }
             // Face and hand: to pick same than body
             else if (renderFlag == -1 && renderPoseFlag != -2)
-                return flagsToRenderMode(renderPoseFlag, -2);
+                return flagsToRenderMode(renderPoseFlag, gpuBuggy, -2);
             // No render
             else if (renderFlag == 0)
                 return RenderMode::None;
@@ -242,13 +236,48 @@ namespace op
         }
     }
 
+    DisplayMode flagsToDisplayMode(const int display, const bool enabled3d)
+    {
+        try
+        {
+            // Automatic --> All if 3d enabled, 2d otherwise
+            if (display == -1)
+            {
+                if (enabled3d)
+                    return DisplayMode::DisplayAll;
+                else
+                    return DisplayMode::Display2D;
+            }
+            // No render
+            else if (display == 0)
+                return DisplayMode::NoDisplay;
+            // All (2-D + 3-D)
+            else if (display == 1)
+                return DisplayMode::DisplayAll;
+            // 2-D
+            else if (display == 2)
+                return DisplayMode::Display2D;
+            // 3-D
+            else if (display == 3)
+                return DisplayMode::Display3D;
+            // else
+            error("Undefined RenderMode selected.", __LINE__, __FUNCTION__, __FILE__);
+            return DisplayMode::NoDisplay;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return DisplayMode::NoDisplay;
+        }
+    }
+
     Point<int> flagsToPoint(const std::string& pointString, const std::string& pointExample)
     {
         try
         {
             Point<int> point;
             const auto nRead = sscanf(pointString.c_str(), "%dx%d", &point.x, &point.y);
-            checkE(nRead, 2, "Invalid resolution format: `" +  pointString + "`, it should be e.g. `" + pointExample
+            checkE(nRead, 2, "Invalid resolution format: `" +  pointString + "`, it should be e.g., `" + pointExample
                    + "`.", __LINE__, __FUNCTION__, __FILE__);
             return point;
         }

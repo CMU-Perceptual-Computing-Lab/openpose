@@ -3,7 +3,7 @@
     #include <cuda_runtime_api.h>
 #endif
 #include <openpose/face/renderFace.hpp>
-#include <openpose/utilities/cuda.hpp>
+#include <openpose/gpu/cuda.hpp>
 #include <openpose/face/faceGpuRenderer.hpp>
 
 namespace op
@@ -18,7 +18,7 @@ namespace op
     {
         try
         {
-            // Free CUDA pointers - Note that if pointers are 0 (i.e. nullptr), no operation is performed.
+            // Free CUDA pointers - Note that if pointers are 0 (i.e., nullptr), no operation is performed.
             #ifdef USE_CUDA
                 cudaFree(pGpuFace);
             #endif
@@ -46,22 +46,20 @@ namespace op
         }
     }
 
-    void FaceGpuRenderer::renderFace(Array<float>& outputData, const Array<float>& faceKeypoints)
+    void FaceGpuRenderer::renderFaceInherited(Array<float>& outputData, const Array<float>& faceKeypoints)
     {
         try
         {
-            // Security checks
-            if (outputData.empty())
-                error("Empty Array<float> outputData.", __LINE__, __FUNCTION__, __FILE__);
             // GPU rendering
             #ifdef USE_CUDA
-                const auto elementRendered = spElementToRender->load(); // I prefer std::round(T&) over intRound(T) for std::atomic
+                // I prefer std::round(T&) over intRound(T) for std::atomic
+                const auto elementRendered = spElementToRender->load();
                 const auto numberPeople = faceKeypoints.getSize(0);
-                const Point<int> frameSize{outputData.getSize(2), outputData.getSize(1)};
+                const Point<int> frameSize{outputData.getSize(1), outputData.getSize(0)};
                 if (numberPeople > 0 && elementRendered == 0)
                 {
-                    cpuToGpuMemoryIfNotCopiedYet(outputData.getPtr(), outputData.getVolume());
                     // Draw faceKeypoints
+                    cpuToGpuMemoryIfNotCopiedYet(outputData.getPtr(), outputData.getVolume());
                     cudaMemcpy(pGpuFace, faceKeypoints.getConstPtr(),
                                faceKeypoints.getSize(0) * FACE_NUMBER_PARTS * 3 * sizeof(float),
                                cudaMemcpyHostToDevice);

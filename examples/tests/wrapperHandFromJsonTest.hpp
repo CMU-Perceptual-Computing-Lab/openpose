@@ -27,7 +27,7 @@ namespace op
                        const std::shared_ptr<Producer>& producerSharedPtr,
                        const std::string& handGroundTruth,
                        const std::string& writeJson,
-                       const bool displayGui = false);
+                       const DisplayMode displayMode = DisplayMode::NoDisplay);
 
         /**
          * Function to start multi-threading.
@@ -87,10 +87,10 @@ namespace op
 #include <openpose/face/headers.hpp>
 #include <openpose/filestream/headers.hpp>
 #include <openpose/gui/headers.hpp>
+#include <openpose/gpu/gpu.hpp>
 #include <openpose/hand/headers.hpp>
 #include <openpose/pose/headers.hpp>
 #include <openpose/producer/headers.hpp>
-#include <openpose/utilities/cuda.hpp>
 #include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/utilities/fileSystem.hpp>
 namespace op
@@ -120,7 +120,7 @@ namespace op
                                                                       const std::shared_ptr<Producer>& producerSharedPtr,
                                                                       const std::string& handGroundTruth,
                                                                       const std::string& writeJson,
-                                                                      const bool displayGui)
+                                                                      const DisplayMode displayMode)
     {
         try
         {
@@ -131,13 +131,15 @@ namespace op
 
             // Check no wrong/contradictory flags enabled
             if (wrapperStructPose.scaleGap <= 0.f && wrapperStructPose.scalesNumber > 1)
-                error("The scale gap must be greater than 0 (it has no effect if the number of scales is 1).", __LINE__, __FUNCTION__, __FILE__);
-            const std::string additionalMessage = " You could also set mThreadManagerMode = mThreadManagerMode::Asynchronous(Out) and/or add your own"
-                                                  " output worker class before calling this function.";
+                error("The scale gap must be greater than 0 (it has no effect if the number of scales is 1).",
+                      __LINE__, __FUNCTION__, __FILE__);
+            const std::string additionalMessage = " You could also set mThreadManagerMode = mThreadManagerMode::Asynchronous(Out)"
+                                                  " and/or add your own output worker class before calling this function.";
             const auto savingSomething = !writeJson.empty();
+            const auto displayGui = (displayMode != DisplayMode::NoDisplay);
             if (!displayGui && !savingSomething)
             {
-                const auto message = "No output is selected (`no_display`) and no results are generated (no `write_X` flags enabled). Thus,"
+                const auto message = "No output is selected (`--display 0`) and no results are generated (no `write_X` flags enabled). Thus,"
                                      " no output would be generated." + additionalMessage;
                 error(message, __LINE__, __FUNCTION__, __FILE__);
             }
@@ -181,7 +183,7 @@ namespace op
             spWScaleAndSizeExtractor = std::make_shared<WScaleAndSizeExtractor<TDatumsPtr>>(scaleAndSizeExtractor);
 
             // Input cvMat to OpenPose format
-            const auto cvMatToOpInput = std::make_shared<CvMatToOpInput>();
+            const auto cvMatToOpInput = std::make_shared<CvMatToOpInput>(wrapperStructPose.poseModel);
             spWCvMatToOpInput = std::make_shared<WCvMatToOpInput<TDatumsPtr>>(cvMatToOpInput);
             if (displayGui)
             {
@@ -209,7 +211,7 @@ namespace op
                         wrapperStructHand.netInputSize, netOutputSize, wrapperStructPose.modelFolder,
                         gpuId + gpuNumberStart, wrapperStructHand.scalesNumber, wrapperStructHand.scaleRange
                     );
-                    spWPoses.at(gpuId).emplace_back(std::make_shared<WHandExtractor<TDatumsPtr>>(handExtractor));
+                    spWPoses.at(gpuId).emplace_back(std::make_shared<WHandExtractorNet<TDatumsPtr>>(handExtractor));
                 }
             }
 
@@ -225,7 +227,7 @@ namespace op
                 cpuRenderers.emplace_back(std::make_shared<WHandRenderer<TDatumsPtr>>(handRenderer));
             }
 
-            // Itermediate workers (e.g. OpenPose format to cv::Mat, json & frames recorder, ...)
+            // Itermediate workers (e.g., OpenPose format to cv::Mat, json & frames recorder, ...)
             mPostProcessingWs.clear();
             // Frame buffer and ordering
             if (spWPoses.size() > 1)
@@ -308,7 +310,7 @@ namespace op
     {
         try
         {
-            // Security checks
+            // Sanity checks
             if (spWCvMatToOpInput == nullptr)
                 error("Configure the WrapperHandFromJsonTest class before calling `start()`.",
                       __LINE__, __FUNCTION__, __FILE__);

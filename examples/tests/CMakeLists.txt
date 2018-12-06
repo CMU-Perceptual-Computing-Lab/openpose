@@ -1,11 +1,12 @@
 set(EXAMPLE_FILES
-    handFromJsonTest.cpp)
+    handFromJsonTest.cpp
+    resizeTest.cpp)
 
 foreach(EXAMPLE_FILE ${EXAMPLE_FILES})
 
   get_filename_component(SOURCE_NAME ${EXAMPLE_FILE} NAME_WE)
-  
-  if (UNIX AND NOT APPLE)
+
+  if (UNIX OR APPLE)
     set(EXE_NAME "${SOURCE_NAME}.bin")
   elseif (WIN32)
     set(EXE_NAME "${SOURCE_NAME}")
@@ -13,11 +14,11 @@ foreach(EXAMPLE_FILE ${EXAMPLE_FILES})
 
   message(STATUS "Adding Example ${EXE_NAME}")
   add_executable(${EXE_NAME} ${EXAMPLE_FILE})
-  target_link_libraries( ${EXE_NAME} openpose ${GLOG_LIBRARY} ${GFLAGS_LIBRARY} ${Caffe_LIBS} ${MKL_LIBS} ${GLUT_LIBRARY} ${SPINNAKER_LIB})
-  
+  target_link_libraries(${EXE_NAME} openpose ${examples_3rdparty_libraries})
+
   if (WIN32)
     set_property(TARGET ${EXE_NAME} PROPERTY FOLDER "Examples/Tutorial/Tests")
-    configure_file(${CMAKE_SOURCE_DIR}/cmake/OpenPose.vcxproj.user
+    configure_file(${CMAKE_SOURCE_DIR}/cmake/OpenPose${VCXPROJ_FILE_GPU_MODE}.vcxproj.user
         ${CMAKE_CURRENT_BINARY_DIR}/${EXE_NAME}.vcxproj.user @ONLY)
     # Properties->General->Output Directory
     set_property(TARGET ${EXE_NAME} PROPERTY RUNTIME_OUTPUT_DIRECTORY_RELEASE ${PROJECT_BINARY_DIR}/$(Platform)/$(Configuration))
@@ -25,4 +26,3 @@ foreach(EXAMPLE_FILE ${EXAMPLE_FILES})
   endif (WIN32)
 
 endforeach()
-

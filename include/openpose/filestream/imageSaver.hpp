@@ -12,6 +12,8 @@ namespace op
     public:
         ImageSaver(const std::string& directoryPath, const std::string& imageFormat);
 
+        virtual ~ImageSaver();
+
         void saveImages(const std::vector<cv::Mat>& cvOutputDatas, const std::string& fileName) const;
 
     private:

@@ -48,6 +48,8 @@ namespace op
 
         bool isRunning() const;
 
+        bool isFull() const;
+
         size_t size() const;
 
         void clear();
@@ -380,6 +382,21 @@ namespace op
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             return true;
+        }
+    }
+
+    template<typename TDatums, typename TQueue>
+    bool QueueBase<TDatums, TQueue>::isFull() const
+    {
+        try
+        {
+            // No mutex required because the size() and getMaxSize() are already thread-safe
+            return size() == getMaxSize();
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return false;
         }
     }
 

@@ -3,31 +3,22 @@
 
 #include <openpose/core/common.hpp>
 #include <openpose/filestream/enumClasses.hpp>
+#include <openpose/gui/enumClasses.hpp>
 
 namespace op
 {
     /**
-     * WrapperStructOutput: Output (small GUI, writing rendered results and/or pose data, etc.) configuration struct.
-     * WrapperStructOutput allows the user to set up the input frames generator.
+     * WrapperStructOutput: Output ( writing rendered results and/or pose data, etc.) configuration struct.
      */
     struct OP_API WrapperStructOutput
     {
         /**
-         * Whether to display the OpenPose small integrated GUI.
+         * Output verbose in the command line.
+         * If -1, it will be disabled (default). If it is a positive integer number, it will print on"
+         * the command line every `verbose` frames. If number in the range (0,1), it will print the"
+         * progress every `verbose` times the total of frames.
          */
-        bool displayGui;
-
-        /**
-         * Whether to add some information to the frame (number of frame, number people detected, etc.) after it is
-         * saved on disk and before it is displayed and/or returned to the user.
-         */
-        bool guiVerbose;
-
-        /**
-         * Whether to display the OpenPose small integrated GUI on fullscreen mode. It can be changed by interacting
-         * with the GUI itself.
-         */
-        bool fullScreen;
+        double verbose;
 
         /**
          * Pose (x, y, score) locations saving folder location.
@@ -60,6 +51,17 @@ namespace op
         std::string writeCocoJson;
 
         /**
+         * Analogous to writeCocoJson but for foot keypoints.
+         */
+        std::string writeCocoFootJson;
+
+        /**
+         * Experimental option (only makes effect on car JSON generation).
+         * It selects the COCO variant for cocoJsonSaver.
+         */
+        int writeCocoJsonVariant;
+
+        /**
          * Rendered image saving folder.
          * If it is empty (default), it is disabled.
          */
@@ -68,7 +70,7 @@ namespace op
         /**
          * Rendered image saving folder format.
          * Check your OpenCV version documentation for a list of compatible formats.
-         * E.g. png, jpg, etc.
+         * E.g., png, jpg, etc.
          * If writeImages is empty (default), it makes no effect.
          */
         std::string writeImagesFormat;
@@ -94,17 +96,52 @@ namespace op
         std::string writeHeatMapsFormat;
 
         /**
+         * Frame rate of the recorded video.
+         * By default (-1.), it will try to get the input frames producer frame rate (e.g., input video or webcam frame
+         * rate). If the input frames producer does not have a set FPS (e.g., image_dir or webcam if OpenCV not
+         * compiled with its support), set this value accordingly (e.g., to the frame rate displayed by the OpenPose
+         * GUI).
+         */
+        double writeVideoFps;
+
+        /**
+         * Rendered Adam images saving video path.
+         * Please, use *.avi format.
+         * If it is empty (default), it is disabled.
+         */
+        std::string writeVideoAdam;
+
+        /**
+         * Path to save a 3-D joint angle BVH file.
+         * Please, use *.bvh format.
+         * If it is empty (default), it is disabled.
+         */
+        std::string writeBvh;
+
+        /**
+         * Target server IP address for UDP client-server communication.
+         */
+        std::string udpHost;
+
+        /**
+         * Target server IP port for UDP client-server communication.
+         */
+        std::string udpPort;
+
+        /**
          * Constructor of the struct.
          * It has the recommended and default values we recommend for each element of the struct.
          * Since all the elements of the struct are public, they can also be manually filled.
          */
-        WrapperStructOutput(const bool displayGui = false, const bool guiVerbose = false,
-                            const bool fullScreen = false, const std::string& writeKeypoint = "",
-                            const DataFormat writeKeypointFormat = DataFormat::Xml,
-                            const std::string& writeJson = "", const std::string& writeCocoJson = "",
-                            const std::string& writeImages = "", const std::string& writeImagesFormat = "",
-                            const std::string& writeVideo = "", const std::string& writeHeatMaps = "",
-                            const std::string& writeHeatMapsFormat = "");
+        WrapperStructOutput(
+            const double verbose = -1, const std::string& writeKeypoint = "",
+            const DataFormat writeKeypointFormat = DataFormat::Xml, const std::string& writeJson = "",
+            const std::string& writeCocoJson = "", const std::string& writeCocoFootJson = "",
+            const int writeCocoJsonVariant = 1, const std::string& writeImages = "",
+            const std::string& writeImagesFormat = "", const std::string& writeVideo = "",
+            const double writeVideoFps = -1., const std::string& writeHeatMaps = "",
+            const std::string& writeHeatMapsFormat = "", const std::string& writeVideoAdam = "",
+            const std::string& writeBvh = "", const std::string& udpHost = "", const std::string& udpPort = "");
     };
 }
 

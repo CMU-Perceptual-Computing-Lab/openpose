@@ -9,13 +9,14 @@ namespace op
     {
     }
 
-    void FaceCpuRenderer::renderFace(Array<float>& outputData, const Array<float>& faceKeypoints)
+    FaceCpuRenderer::~FaceCpuRenderer()
+    {
+    }
+
+    void FaceCpuRenderer::renderFaceInherited(Array<float>& outputData, const Array<float>& faceKeypoints)
     {
         try
         {
-            // Security checks
-            if (outputData.empty())
-                error("Empty Array<float> outputData.", __LINE__, __FUNCTION__, __FILE__);
             // CPU rendering
             renderFaceKeypointsCpu(outputData, faceKeypoints, mRenderThreshold);
         }

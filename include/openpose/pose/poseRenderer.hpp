@@ -1,6 +1,7 @@
 #ifndef OPENPOSE_POSE_POSE_RENDERER_HPP
 #define OPENPOSE_POSE_POSE_RENDERER_HPP
 
+#include <map>
 #include <openpose/core/common.hpp>
 #include <openpose/pose/enumClasses.hpp>
 
@@ -10,6 +11,8 @@ namespace op
     {
     public:
         PoseRenderer(const PoseModel poseModel);
+
+        virtual ~PoseRenderer();
 
         virtual void initializationOnThread(){};
 

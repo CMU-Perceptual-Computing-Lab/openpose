@@ -6,6 +6,7 @@
 #include <tuple>
 #include <openpose/core/common.hpp>
 #include <openpose/core/datum.hpp>
+#include <openpose/utilities/fastMath.hpp>
 #include <openpose/producer/producer.hpp>
 
 namespace op
@@ -15,9 +16,12 @@ namespace op
     {
     public:
         explicit DatumProducer(const std::shared_ptr<Producer>& producerSharedPtr,
-                               const unsigned long long frameFirst = 0,
+                               const unsigned long long frameFirst = 0, const unsigned long long frameStep = 1,
                                const unsigned long long frameLast = std::numeric_limits<unsigned long long>::max(),
-                               const std::shared_ptr<std::pair<std::atomic<bool>, std::atomic<int>>>& videoSeekSharedPtr = nullptr);
+                               const std::shared_ptr<std::pair<std::atomic<bool>,
+                                                     std::atomic<int>>>& videoSeekSharedPtr = nullptr);
+
+        virtual ~DatumProducer();
 
         std::pair<bool, std::shared_ptr<TDatumsNoPtr>> checkIfRunningAndGetDatum();
 
@@ -25,6 +29,7 @@ namespace op
         const unsigned long long mNumberFramesToProcess;
         std::shared_ptr<Producer> spProducer;
         unsigned long long mGlobalCounter;
+        unsigned long long mFrameStep;
         unsigned int mNumberConsecutiveEmptyFrames;
         std::shared_ptr<std::pair<std::atomic<bool>, std::atomic<int>>> spVideoSeek;
 
@@ -46,19 +51,40 @@ namespace op
 {
     template<typename TDatumsNoPtr>
     DatumProducer<TDatumsNoPtr>::DatumProducer(const std::shared_ptr<Producer>& producerSharedPtr,
-                                               const unsigned long long frameFirst, const unsigned long long frameLast,
-                                               const std::shared_ptr<std::pair<std::atomic<bool>, std::atomic<int>>>& videoSeekSharedPtr) :
+                                               const unsigned long long frameFirst, const unsigned long long frameStep,
+                                               const unsigned long long frameLast,
+                                               const std::shared_ptr<std::pair<std::atomic<bool>,
+                                                                               std::atomic<int>>>& videoSeekSharedPtr) :
         mNumberFramesToProcess{(frameLast != std::numeric_limits<unsigned long long>::max()
                                 ? frameLast - frameFirst : frameLast)},
         spProducer{producerSharedPtr},
         mGlobalCounter{0ll},
+        mFrameStep{frameStep},
         mNumberConsecutiveEmptyFrames{0u},
         spVideoSeek{videoSeekSharedPtr}
     {
         try
         {
-            if (spProducer->getType() != ProducerType::Webcam)
+            // Sanity check
+            if (frameLast < frameFirst)
+                error("The desired initial frame must be lower than the last one (flags `--frame_first` vs."
+                      " `--frame_last`). Current: " + std::to_string(frameFirst) + " vs. " + std::to_string(frameLast)
+                      + ".", __LINE__, __FUNCTION__, __FILE__);
+            if (frameLast != std::numeric_limits<unsigned long long>::max()
+                && frameLast > spProducer->get(CV_CAP_PROP_FRAME_COUNT)-1)
+                error("The desired last frame must be lower than the length of the video or the number of images."
+                      " Current: " + std::to_string(frameLast) + " vs. "
+                      + std::to_string(intRound(spProducer->get(CV_CAP_PROP_FRAME_COUNT))-1) + ".",
+                      __LINE__, __FUNCTION__, __FILE__);
+            // Set frame first and step
+            if (spProducer->getType() != ProducerType::FlirCamera && spProducer->getType() != ProducerType::IPCamera
+                && spProducer->getType() != ProducerType::Webcam)
+            {
+                // Frame first
                 spProducer->set(CV_CAP_PROP_POS_FRAMES, (double)frameFirst);
+                // Frame step
+                spProducer->set(ProducerProperty::FrameStep, (double)frameStep);
+            }
         }
         catch (const std::exception& e)
         {
@@ -67,10 +93,16 @@ namespace op
     }
 
     template<typename TDatumsNoPtr>
+    DatumProducer<TDatumsNoPtr>::~DatumProducer()
+    {
+    }
+
+    template<typename TDatumsNoPtr>
     std::pair<bool, std::shared_ptr<TDatumsNoPtr>> DatumProducer<TDatumsNoPtr>::checkIfRunningAndGetDatum()
     {
         try
         {
+            auto datums = std::make_shared<TDatumsNoPtr>();
             // Check last desired frame has not been reached
             if (mNumberFramesToProcess != std::numeric_limits<unsigned long long>::max()
                 && mGlobalCounter > mNumberFramesToProcess)
@@ -79,47 +111,84 @@ namespace op
             }
             // If producer released -> it sends an empty cv::Mat + a datumProducerRunning signal
             const bool datumProducerRunning = spProducer->isOpened();
-            auto datums = std::make_shared<TDatumsNoPtr>(1);
-            auto& datum = (*datums)[0];
-            // Check producer device is open
+            // If device is open
             if (datumProducerRunning)
             {
                 // Fast forward/backward - Seek to specific frame index desired
                 if (spVideoSeek != nullptr)
                 {
                     // Fake pause vs. normal mode
-                    const auto increment = spVideoSeek->second  + (spVideoSeek->first ? 1 : 0);
+                    const auto increment = spVideoSeek->second - (spVideoSeek->first ? 1 : 0);
                     // Normal mode
                     if (increment != 0)
-                    {
                         spProducer->set(CV_CAP_PROP_POS_FRAMES, spProducer->get(CV_CAP_PROP_POS_FRAMES) + increment);
-                        spVideoSeek->second = 0;
-                    }
+                    // It must be always reset or bug in fake pause
+                    spVideoSeek->second = 0;
                 }
-                // Get cv::Mat
-                datum.name = spProducer->getFrameName();
-                datum.cvInputData = spProducer->getFrame();
-                if (datum.cvInputData.channels() != 3)
-                {
-                    const std::string commonMessage{"Input images must be 3-channel BGR."};
-                    if (datum.cvInputData.channels() == 1)
-                    {
-                        log(commonMessage + " Converting grey image into BGR.", Priority::High);
-                        cv::cvtColor(datum.cvInputData, datum.cvInputData, CV_GRAY2BGR);
-                    }
-                    else
-                        error(commonMessage, __LINE__, __FUNCTION__, __FILE__);
-                }
-                datum.cvOutputData = datum.cvInputData;
+                auto nextFrameName = spProducer->getNextFrameName();
+                const auto nextFrameNumber = (unsigned long long)spProducer->get(CV_CAP_PROP_POS_FRAMES);
+                const auto cvMats = spProducer->getFrames();
+                const auto cameraMatrices = spProducer->getCameraMatrices();
+                auto cameraExtrinsics = spProducer->getCameraExtrinsics();
+                auto cameraIntrinsics = spProducer->getCameraIntrinsics();
                 // Check frames are not empty
-                checkIfTooManyConsecutiveEmptyFrames(mNumberConsecutiveEmptyFrames, datum.cvInputData.empty());
+                checkIfTooManyConsecutiveEmptyFrames(mNumberConsecutiveEmptyFrames, cvMats.empty() || cvMats[0].empty());
+                if (!cvMats.empty())
+                {
+                    datums->resize(cvMats.size());
+                    // Datum cannot be assigned before resize()
+                    auto& datum = (*datums)[0];
+                    // Filling first element
+                    std::swap(datum.name, nextFrameName);
+                    datum.frameNumber = nextFrameNumber;
+                    datum.cvInputData = cvMats[0];
+                    if (!cameraMatrices.empty())
+                    {
+                        datum.cameraMatrix = cameraMatrices[0];
+                        datum.cameraExtrinsics = cameraExtrinsics[0];
+                        datum.cameraIntrinsics = cameraIntrinsics[0];
+                    }
+                    // Image integrity
+                    if (datum.cvInputData.channels() != 3)
+                    {
+                        const std::string commonMessage{"Input images must be 3-channel BGR."};
+                        // Grey to RGB if required
+                        if (datum.cvInputData.channels() == 1)
+                        {
+                            log(commonMessage + " Converting grey image into BGR.", Priority::High);
+                            cv::cvtColor(datum.cvInputData, datum.cvInputData, CV_GRAY2BGR);
+                        }
+                        else
+                            error(commonMessage, __LINE__, __FUNCTION__, __FILE__);
+                    }
+                    datum.cvOutputData = datum.cvInputData;
+                    // Resize if it's stereo-system
+                    if (datums->size() > 1)
+                    {
+                        // Stereo-system: Assign all cv::Mat
+                        for (auto i = 1u ; i < datums->size() ; i++)
+                        {
+                            auto& datumI = (*datums)[i];
+                            datumI.name = datum.name;
+                            datumI.frameNumber = datum.frameNumber;
+                            datumI.cvInputData = cvMats[i];
+                            datumI.cvOutputData = datumI.cvInputData;
+                            if (cameraMatrices.size() > i)
+                            {
+                                datumI.cameraMatrix = cameraMatrices[i];
+                                datumI.cameraExtrinsics = cameraExtrinsics[i];
+                                datumI.cameraIntrinsics = cameraIntrinsics[i];
+                            }
+                        }
+                    }
+                    // Check producer is running
+                    if (!datumProducerRunning || (*datums)[0].cvInputData.empty())
+                        datums = nullptr;
+                    // Increase counter if successful image
+                    if (datums != nullptr)
+                        mGlobalCounter += mFrameStep;
+                }
             }
-            // Check producer is running
-            if (!datumProducerRunning || datum.cvInputData.empty())
-                datums = nullptr;
-            // Increase counter if successful image
-            if (datums != nullptr)
-                mGlobalCounter++;
             // Return result
             return std::make_pair(datumProducerRunning, datums);
         }

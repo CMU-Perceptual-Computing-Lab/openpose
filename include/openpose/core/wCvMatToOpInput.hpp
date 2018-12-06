@@ -13,6 +13,8 @@ namespace op
     public:
         explicit WCvMatToOpInput(const std::shared_ptr<CvMatToOpInput>& cvMatToOpInput);
 
+        virtual ~WCvMatToOpInput();
+
         void initializationOnThread();
 
         void work(TDatums& tDatums);
@@ -35,6 +37,11 @@ namespace op
     template<typename TDatums>
     WCvMatToOpInput<TDatums>::WCvMatToOpInput(const std::shared_ptr<CvMatToOpInput>& cvMatToOpInput) :
         spCvMatToOpInput{cvMatToOpInput}
+    {
+    }
+
+    template<typename TDatums>
+    WCvMatToOpInput<TDatums>::~WCvMatToOpInput()
     {
     }
 

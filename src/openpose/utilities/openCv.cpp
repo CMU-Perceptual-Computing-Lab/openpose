@@ -4,15 +4,16 @@
 namespace op
 {
     void putTextOnCvMat(cv::Mat& cvMat, const std::string& textToDisplay, const Point<int>& position,
-                        const cv::Scalar& color, const bool normalizeWidth)
+                        const cv::Scalar& color, const bool normalizeWidth, const int imageWidth)
     {
         try
         {
             const auto font = cv::FONT_HERSHEY_SIMPLEX;
+            const auto ratio = imageWidth/1280.;
             // const auto fontScale = 0.75;
-            const auto fontScale = 0.8;
-            const auto fontThickness = 2;
-            const auto shadowOffset = 2;
+            const auto fontScale = 0.8 * ratio;
+            const auto fontThickness = std::max(1, intRound(2*ratio));
+            const auto shadowOffset = std::max(1, intRound(2*ratio));
             int baseline = 0;
             const auto textSize = cv::getTextSize(textToDisplay, font, fontScale, fontThickness, &baseline);
             const cv::Size finalPosition{position.x - (normalizeWidth ? textSize.width : 0),
@@ -21,46 +22,6 @@ namespace op
                         cv::Size{finalPosition.width + shadowOffset, finalPosition.height + shadowOffset},
                         font, fontScale, cv::Scalar{0,0,0}, fontThickness);
             cv::putText(cvMat, textToDisplay, finalPosition, font, fontScale, color, fontThickness);
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-        }
-    }
-
-    void floatPtrToUCharCvMat(cv::Mat& uCharCvMat, const float* const floatPtrImage,
-                              const std::array<int, 3> resolutionSize)
-    {
-        try
-        {
-            // Info:
-                // float* (deep net format): C x H x W
-                // cv::Mat (OpenCV format): H x W x C
-            // Allocate cv::Mat if it was not initialized yet
-            if (uCharCvMat.empty() || uCharCvMat.rows != resolutionSize[1]
-                || uCharCvMat.cols != resolutionSize[0] || uCharCvMat.type() != CV_8UC3)
-                uCharCvMat = cv::Mat(resolutionSize[1], resolutionSize[0], CV_8UC3);
-            // Fill uCharCvMat from floatPtrImage
-            auto* uCharPtrCvMat = (unsigned char*)(uCharCvMat.data);
-            const auto offsetBetweenChannels = resolutionSize[0] * resolutionSize[1];
-            const auto stepSize = uCharCvMat.step; // step = cols * channels
-            for (auto c = 0; c < resolutionSize[2]; c++)
-            {
-                const auto offsetChannelC = c*offsetBetweenChannels;
-                for (auto y = 0; y < resolutionSize[1]; y++)
-                {
-                    const auto yOffset = y * stepSize;
-                    const auto floatPtrImageOffsetY = offsetChannelC + y*resolutionSize[0];
-                    for (auto x = 0; x < resolutionSize[0]; x++)
-                    {
-                        const auto value = uchar(
-                            fastTruncate(intRound(floatPtrImage[floatPtrImageOffsetY + x]), 0, 255)
-                        );
-                        uCharPtrCvMat[yOffset + x * resolutionSize[2] + c] = value;
-                        // *(uCharCvMat.ptr<uchar>(y, x) + c) = value; // Slower but safer and cleaner equivalent
-                    }
-                }
-            }
         }
         catch (const std::exception& e)
         {
@@ -114,12 +75,12 @@ namespace op
         }
     }
 
-    void uCharCvMatToFloatPtr(float* floatPtrImage, const cv::Mat& cvImage, const bool normalize)
+    void uCharCvMatToFloatPtr(float* floatPtrImage, const cv::Mat& cvImage, const int normalize)
     {
         try
         {
             // float* (deep net format): C x H x W
-            // cv::Mat (OpenCV format): H x W x C 
+            // cv::Mat (OpenCV format): H x W x C
             const int width = cvImage.cols;
             const int height = cvImage.rows;
             const int channels = cvImage.channels();
@@ -142,11 +103,39 @@ namespace op
                 // Empirically tested - OpenCV is more efficient normalizing a whole matrix/image (it uses AVX and
                 // other optimized instruction sets).
                 // In addition, the following if statement does not copy the pointer to a cv::Mat, just wrapps it.
-            if (normalize)
+            // VGG
+            if (normalize == 1)
             {
                 cv::Mat floatPtrImageCvWrapper(height, width, CV_32FC3, floatPtrImage);
                 floatPtrImageCvWrapper = floatPtrImageCvWrapper/256.f - 0.5f;
             }
+            // // ResNet
+            // else if (normalize == 2)
+            // {
+            //     const int imageArea = width * height;
+            //     const std::array<float,3> means{102.9801, 115.9465, 122.7717};
+            //     for (auto i = 0 ; i < 3 ; i++)
+            //     {
+            //         cv::Mat floatPtrImageCvWrapper(height, width, CV_32FC1, floatPtrImage + i*imageArea);
+            //         floatPtrImageCvWrapper = floatPtrImageCvWrapper - means[i];
+            //     }
+            // }
+            // DenseNet
+            else if (normalize == 2)
+            {
+                const auto scaleDenseNet = 0.017;
+                const int imageArea = width * height;
+                const std::array<float,3> means{103.94f, 116.78f, 123.68f};
+                for (auto i = 0 ; i < 3 ; i++)
+                {
+                    cv::Mat floatPtrImageCvWrapper(height, width, CV_32FC1, floatPtrImage + i*imageArea);
+                    floatPtrImageCvWrapper = scaleDenseNet*(floatPtrImageCvWrapper - means[i]);
+                }
+            }
+            // Unknown
+            else if (normalize != 0)
+                error("Unknown normalization value (" + std::to_string(normalize) + ").",
+                      __LINE__, __FUNCTION__, __FILE__);
         }
         catch (const std::exception& e)
         {
@@ -169,27 +158,54 @@ namespace op
         }
     }
 
-    cv::Mat resizeFixedAspectRatio(const cv::Mat& cvMat, const double scaleFactor, const Point<int>& targetSize,
-                                   const int borderMode, const cv::Scalar& borderValue)
+    void resizeFixedAspectRatio(cv::Mat& resizedCvMat, const cv::Mat& cvMat, const double scaleFactor,
+                                const Point<int>& targetSize, const int borderMode, const cv::Scalar& borderValue)
     {
         try
         {
             const cv::Size cvTargetSize{targetSize.x, targetSize.y};
-            cv::Mat resultingCvMat;
             cv::Mat M = cv::Mat::eye(2,3,CV_64F);
             M.at<double>(0,0) = scaleFactor;
             M.at<double>(1,1) = scaleFactor;
             if (scaleFactor != 1. || cvTargetSize != cvMat.size())
-                cv::warpAffine(cvMat, resultingCvMat, M, cvTargetSize,
-                               (scaleFactor < 1. ? cv::INTER_AREA : cv::INTER_CUBIC), borderMode, borderValue);
+                cv::warpAffine(cvMat, resizedCvMat, M, cvTargetSize,
+                               (scaleFactor > 1. ? cv::INTER_CUBIC : cv::INTER_AREA), borderMode, borderValue);
             else
-                resultingCvMat = cvMat.clone();
-            return resultingCvMat;
+                cvMat.copyTo(resizedCvMat);
         }
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return cv::Mat();
+        }
+    }
+
+    void keepRoiInside(cv::Rect& roi, const int imageWidth, const int imageHeight)
+    {
+        try
+        {
+            // x,y < 0
+            if (roi.x < 0)
+            {
+                roi.width += roi.x;
+                roi.x = 0;
+            }
+            if (roi.y < 0)
+            {
+                roi.height += roi.y;
+                roi.y = 0;
+            }
+            // Bigger than image
+            if (roi.width + roi.x >= imageWidth)
+                roi.width = imageWidth - 1 - roi.x;
+            if (roi.height + roi.y >= imageHeight)
+                roi.height = imageHeight - 1 - roi.y;
+            // Width/height negative
+            roi.width = fastMax(0, roi.width);
+            roi.height = fastMax(0, roi.height);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
     }
 }

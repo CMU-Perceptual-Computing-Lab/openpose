@@ -13,6 +13,8 @@ namespace op
     public:
         explicit WFaceDetector(const std::shared_ptr<FaceDetector>& faceDetector);
 
+        virtual ~WFaceDetector();
+
         void initializationOnThread();
 
         void work(TDatums& tDatums);
@@ -39,6 +41,11 @@ namespace op
     }
 
     template<typename TDatums>
+    WFaceDetector<TDatums>::~WFaceDetector()
+    {
+    }
+
+    template<typename TDatums>
     void WFaceDetector<TDatums>::initializationOnThread()
     {
     }
@@ -56,7 +63,7 @@ namespace op
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                 // Detect people face
                 for (auto& tDatum : *tDatums)
-                    tDatum.faceRectangles = spFaceDetector->detectFaces(tDatum.poseKeypoints, tDatum.scaleInputToOutput);
+                    tDatum.faceRectangles = spFaceDetector->detectFaces(tDatum.poseKeypoints);
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
                 Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);

@@ -4,7 +4,6 @@
 #include <openpose/core/common.hpp>
 #include <openpose/core/renderer.hpp>
 #include <openpose/pose/enumClasses.hpp>
-#include <openpose/pose/poseExtractor.hpp>
 #include <openpose/pose/poseParametersRender.hpp>
 #include <openpose/pose/poseRenderer.hpp>
 
@@ -17,6 +16,8 @@ namespace op
                         const float alphaKeypoint = POSE_DEFAULT_ALPHA_KEYPOINT,
                         const float alphaHeatMap = POSE_DEFAULT_ALPHA_HEAT_MAP,
                         const unsigned int elementToRender = 0u);
+
+        virtual ~PoseCpuRenderer();
 
         std::pair<int, std::string> renderPose(Array<float>& outputData, const Array<float>& poseKeypoints,
                                                const float scaleInputToOutput,

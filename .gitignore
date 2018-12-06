@@ -57,6 +57,7 @@ MANIFEST-*
 
 # OSX dir files
 .DS_Store
+._.DS_Store
 
 # Vim files
 cscope.*
@@ -74,12 +75,6 @@ tags
 ######################### Windows (Visual Studio) Folders and Compressed files #########################
 *.vs/
 *x64/
-3rdparty/windows/caffe/
-3rdparty/windows/caffe3rdparty/
-3rdparty/windows/opencv/
-3rdparty/windows/freeglut/
-3rdparty/windows/spinnaker/
-3rdparty/windows/*zip
 # Allowing this file (removed *.user for Qt)
 !*.vcxproj.user
 
@@ -91,8 +86,6 @@ Makefile.config
 # Data and models are either
 	# 1. reference, and not casually committed
 	# 2. custom, and live on their own unless they're deliberated contributed
-3rdparty/caffe/.git
-3rdparty/caffe/.github
 distribute/
 *.caffemodel
 *.caffemodel.h5
@@ -101,6 +94,24 @@ distribute/
 *.binaryproto
 *leveldb
 *lmdb
+
+# Camera parameters
+*.xml
+
+######################### 3rd-party Folders and Zip Files #########################
+3rdparty/caffe/.git
+3rdparty/caffe/.github
+3rdparty/asio/
+3rdparty/eigen/
+3rdparty/windows/caffe/
+3rdparty/windows/caffe_cpu/
+3rdparty/windows/caffe_opencl/
+3rdparty/windows/caffe3rdparty/
+3rdparty/windows/opencv/
+3rdparty/windows/freeglut/
+3rdparty/windows/spinnaker/
+3rdparty/*zip
+3rdparty/windows/*zip
 
 ######################### Compilation (build, distribute & bins) Files / Folders #########################
 *.bin

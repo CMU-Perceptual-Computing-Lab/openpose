@@ -13,6 +13,8 @@ namespace op
     public:
         explicit WPoseRenderer(const std::shared_ptr<PoseRenderer>& poseRendererSharedPtr);
 
+        virtual ~WPoseRenderer();
+
         void initializationOnThread();
 
         void work(TDatums& tDatums);
@@ -39,9 +41,21 @@ namespace op
     }
 
     template<typename TDatums>
+    WPoseRenderer<TDatums>::~WPoseRenderer()
+    {
+    }
+
+    template<typename TDatums>
     void WPoseRenderer<TDatums>::initializationOnThread()
     {
-        spPoseRenderer->initializationOnThread();
+        try
+        {
+            spPoseRenderer->initializationOnThread();
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
     }
 
     template<typename TDatums>
@@ -57,9 +71,9 @@ namespace op
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                 // Render people pose
                 for (auto& tDatum : *tDatums)
-                    tDatum.elementRendered = spPoseRenderer->renderPose(tDatum.outputData, tDatum.poseKeypoints,
-                                                                        (float)tDatum.scaleInputToOutput,
-                                                                        (float)tDatum.scaleNetToOutput);
+                    tDatum.elementRendered = spPoseRenderer->renderPose(
+                        tDatum.outputData, tDatum.poseKeypoints, (float)tDatum.scaleInputToOutput,
+                        (float)tDatum.scaleNetToOutput);
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
                 Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);

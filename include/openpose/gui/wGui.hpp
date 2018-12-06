@@ -2,7 +2,6 @@
 #define OPENPOSE_GUI_W_GUI_HPP
 
 #include <openpose/core/common.hpp>
-#include <openpose/gui/enumClasses.hpp>
 #include <openpose/gui/gui.hpp>
 #include <openpose/thread/workerConsumer.hpp>
 
@@ -13,6 +12,8 @@ namespace op
     {
     public:
         explicit WGui(const std::shared_ptr<Gui>& gui);
+
+        virtual ~WGui();
 
         void initializationOnThread();
 
@@ -40,6 +41,11 @@ namespace op
     }
 
     template<typename TDatums>
+    WGui<TDatums>::~WGui()
+    {
+    }
+
+    template<typename TDatums>
     void WGui<TDatums>::initializationOnThread()
     {
         try
@@ -57,22 +63,25 @@ namespace op
     {
         try
         {
+            // tDatums might be empty but we still wanna update the GUI
             if (tDatums != nullptr)
             {
-                // Check tDatums->size() == 1
-                if (tDatums->size() > 1)
-                    error("Only implemented for tDatums->size() == 1", __LINE__, __FUNCTION__, __FILE__);
                 // Debugging log
                 dLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 // Profiling speed
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
-                // T* to T
-                auto& tDatumsNoPtr = *tDatums;
-                // Refresh GUI
-                const auto cvOutputData = (!tDatumsNoPtr.empty() ? tDatumsNoPtr[0].cvOutputData : cv::Mat());
-                spGui->update(cvOutputData);
+                // Update cvMat
+                if (!tDatums->empty())
+                {
+                    std::vector<cv::Mat> cvOutputDatas;
+                    for (auto& tDatum : *tDatums)
+                        cvOutputDatas.emplace_back(tDatum.cvOutputData);
+                    spGui->setImage(cvOutputDatas);
+                }
+                // Refresh/update GUI
+                spGui->update();
                 // Profiling speed
-                if (!tDatumsNoPtr.empty())
+                if (!tDatums->empty())
                 {
                     Profiler::timerEnd(profilerKey);
                     Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);

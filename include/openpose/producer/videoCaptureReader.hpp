@@ -10,7 +10,7 @@ namespace op
 {
     /**
      *  VideoCaptureReader is an abstract class to extract frames from a cv::VideoCapture source (video file,
-     * webcam stream, etc.). It has the basic and common functions of the cv::VideoCapture class (e.g. get, set, etc.).
+     * webcam stream, etc.). It has the basic and common functions of the cv::VideoCapture class (e.g., get, set, etc.).
      */
     class OP_API VideoCaptureReader : public Producer
     {
@@ -19,14 +19,18 @@ namespace op
          * This constructor of VideoCaptureReader wraps cv::VideoCapture(const int).
          * @param index const int indicating the cv::VideoCapture constructor int argument, in the range [0, 9].
          */
-        explicit VideoCaptureReader(const int index, const bool throwExceptionIfNoOpened);
+        explicit VideoCaptureReader(const int index, const bool throwExceptionIfNoOpened,
+                                    const std::string& cameraParameterPath, const bool undistortImage,
+                                    const int numberViews);
 
         /**
          * This constructor of VideoCaptureReader wraps cv::VideoCapture(const std::string).
          * @param path const std::string indicating the cv::VideoCapture constructor string argument.
          * @param producerType const std::string indicating whether the frame source is an IP camera or video.
          */
-        explicit VideoCaptureReader(const std::string& path, const ProducerType producerType);
+        explicit VideoCaptureReader(const std::string& path, const ProducerType producerType,
+                                    const std::string& cameraParameterPath, const bool undistortImage,
+                                    const int numberViews);
 
         /**
          * Destructor of VideoCaptureReader. It releases the cv::VideoCapture member. It is virtual so that
@@ -34,12 +38,9 @@ namespace op
          */
         virtual ~VideoCaptureReader();
 
-        virtual std::string getFrameName() = 0;
+        virtual std::string getNextFrameName() = 0;
 
-        inline bool isOpened() const
-        {
-            return mVideoCapture.isOpened();
-        }
+        virtual bool isOpened() const;
 
         void release();
 
@@ -47,18 +48,12 @@ namespace op
 
         virtual void set(const int capProperty, const double value) = 0;
 
-        inline double get(const ProducerProperty property)
-        {
-            return Producer::get(property);
-        }
-
-        inline void set(const ProducerProperty property, const double value)
-        {
-            Producer::set(property, value);
-        }
-
     protected:
         virtual cv::Mat getRawFrame() = 0;
+
+        virtual std::vector<cv::Mat> getRawFrames() = 0;
+
+        void resetWebcam(const int index, const bool throwExceptionIfNoOpened);
 
     private:
         cv::VideoCapture mVideoCapture;

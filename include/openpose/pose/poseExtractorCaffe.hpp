@@ -3,17 +3,18 @@
 
 #include <openpose/core/common.hpp>
 #include <openpose/pose/enumClasses.hpp>
-#include <openpose/pose/poseExtractor.hpp>
+#include <openpose/pose/poseExtractorNet.hpp>
 
 namespace op
 {
-    class OP_API PoseExtractorCaffe : public PoseExtractor
+    class OP_API PoseExtractorCaffe : public PoseExtractorNet
     {
     public:
         PoseExtractorCaffe(const PoseModel poseModel, const std::string& modelFolder, const int gpuId,
                            const std::vector<HeatMapType>& heatMapTypes = {},
                            const ScaleMode heatMapScale = ScaleMode::ZeroToOne,
                            const bool addPartCandidates = false,
+                           const bool maximizePositives = false,
                            const bool enableGoogleLogging = true);
 
         virtual ~PoseExtractorCaffe();

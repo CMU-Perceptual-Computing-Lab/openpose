@@ -13,6 +13,8 @@ namespace op
     public:
         explicit WPeopleJsonSaver(const std::shared_ptr<PeopleJsonSaver>& peopleJsonSaver);
 
+        virtual ~WPeopleJsonSaver();
+
         void initializationOnThread();
 
         void workConsumer(const TDatums& tDatums);
@@ -35,6 +37,11 @@ namespace op
     template<typename TDatums>
     WPeopleJsonSaver<TDatums>::WPeopleJsonSaver(const std::shared_ptr<PeopleJsonSaver>& peopleJsonSaver) :
         spPeopleJsonSaver{peopleJsonSaver}
+    {
+    }
+
+    template<typename TDatums>
+    WPeopleJsonSaver<TDatums>::~WPeopleJsonSaver()
     {
     }
 
@@ -66,10 +73,16 @@ namespace op
                     const auto fileName = baseFileName + (i != 0 ? "_" + std::to_string(i) : "");
 
                     const std::vector<std::pair<Array<float>, std::string>> keypointVector{
-                        std::make_pair(tDatum.poseKeypoints, "pose_keypoints"),
-                        std::make_pair(tDatum.faceKeypoints, "face_keypoints"),
-                        std::make_pair(tDatum.handKeypoints[0], "hand_left_keypoints"),
-                        std::make_pair(tDatum.handKeypoints[1], "hand_right_keypoints")
+                        // 2D
+                        std::make_pair(tDatum.poseKeypoints, "pose_keypoints_2d"),
+                        std::make_pair(tDatum.faceKeypoints, "face_keypoints_2d"),
+                        std::make_pair(tDatum.handKeypoints[0], "hand_left_keypoints_2d"),
+                        std::make_pair(tDatum.handKeypoints[1], "hand_right_keypoints_2d"),
+                        // 3D
+                        std::make_pair(tDatum.poseKeypoints3D, "pose_keypoints_3d"),
+                        std::make_pair(tDatum.faceKeypoints3D, "face_keypoints_3d"),
+                        std::make_pair(tDatum.handKeypoints3D[0], "hand_left_keypoints_3d"),
+                        std::make_pair(tDatum.handKeypoints3D[1], "hand_right_keypoints_3d")
                     };
                     // Save keypoints
                     spPeopleJsonSaver->save(keypointVector, tDatum.poseCandidates, fileName, humanReadable);

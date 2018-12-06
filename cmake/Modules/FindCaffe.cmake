@@ -12,14 +12,15 @@ find_path(Caffe_INCLUDE_DIRS NAMES
     caffe/proto/caffe.pb.h
     caffe/util/io.hpp
     HINTS
-    /usr/local/include
-    ${CMAKE_BINARY_DIR}/caffe/include)
+    ${CMAKE_BINARY_DIR}/caffe/include
+    NO_DEFAULT_PATH)
+    
 
 find_library(Caffe_LIBS NAMES caffe
     HINTS
-    /usr/local/lib
     ${CMAKE_BINARY_DIR}/caffe/lib
-    ${CMAKE_BINARY_DIR}/caffe/lib/x86_64-linux-gnu)
+    ${CMAKE_BINARY_DIR}/caffe/lib/x86_64-linux-gnu
+    NO_DEFAULT_PATH)
 
 if (Caffe_LIBS AND Caffe_INCLUDE_DIRS)
   set(Caffe_FOUND 1)

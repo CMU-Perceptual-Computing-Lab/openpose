@@ -11,6 +11,8 @@ namespace op
     protected:
         explicit FileSaver(const std::string& directoryPath);
 
+        virtual ~FileSaver();
+
         std::string getNextFileName(const unsigned long long index) const;
 
         std::string getNextFileName(const std::string& fileNameNoExtension) const;

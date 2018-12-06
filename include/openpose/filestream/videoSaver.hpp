@@ -10,9 +10,9 @@ namespace op
     class OP_API VideoSaver
     {
     public:
-        VideoSaver(const std::string& videoSaverPath, const int cvFourcc, const double fps, const Point<int>& cvSize);
+        VideoSaver(const std::string& videoSaverPath, const int cvFourcc, const double fps);
 
-        VideoSaver(const std::vector<std::string>& videoSaverPaths, const int cvFourcc, const double fps, const Point<int>& cvSize);
+        virtual ~VideoSaver();
 
         bool isOpened();
 
@@ -21,7 +21,13 @@ namespace op
         void write(const std::vector<cv::Mat>& cvMats);
 
     private:
-        std::vector<cv::VideoWriter> mVideoWriters;
+        const std::string mVideoSaverPath;
+        const int mCvFourcc;
+        const double mFps;
+        Point<int> mCvSize;
+        bool mVideoStarted;
+        cv::VideoWriter mVideoWriter;
+        unsigned int mNumberImages;
 
         DELETE_COPY(VideoSaver);
     };

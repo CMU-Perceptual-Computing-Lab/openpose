@@ -20,18 +20,23 @@ OpenPose Demo - Output
 There are 2 alternatives to save the OpenPose output.
 
 1. The `write_json` flag saves the people pose data using a custom JSON writer. Each JSON file has a `people` array of objects, where each object has:
-    1. An array `pose_keypoints` containing the body part locations and detection confidence formatted as `x1,y1,c1,x2,y2,c2,...`. The coordinates `x` and `y` can be normalized to the range [0,1], [-1,1], [0, source size], [0, output size], etc., depending on the flag `keypoint_scale`, while `c` is the confidence score in the range [0,1].
-    2. The arrays `face_keypoints`, `hand_left_keypoints`, and `hand_right_keypoints`, analogous to `pose_keypoints`.
-    3. The body part candidates before being assembled into people (if `--part_candidates` is enabled).
+    1. An array `pose_keypoints_2d` containing the body part locations and detection confidence formatted as `x1,y1,c1,x2,y2,c2,...`. The coordinates `x` and `y` can be normalized to the range [0,1], [-1,1], [0, source size], [0, output size], etc., depending on the flag `keypoint_scale` (see flag for more information), while `c` is the confidence score in the range [0,1].
+    2. The arrays `face_keypoints_2d`, `hand_left_keypoints_2d`, and `hand_right_keypoints_2d`, analogous to `pose_keypoints_2d`.
+    3. The analogous 3-D arrays `body_keypoints_3d`, `face_keypoints_3d`, `hand_left_keypoints_2d`, and `hand_right_keypoints_2d` (if `--3d` is enabled, otherwise they will be empty). Instead of `x1,y1,c1,x2,y2,c2,...`, their format is `x1,y1,z1,c1,x2,y2,z2,c2,...`, where `c` is simply 1 or 0 depending on whether the 3-D reconstruction was successful or not.
+    4. The body part candidates before being assembled into people (if `--part_candidates` is enabled).
 ```
 {
     "version":1.1,
     "people":[
         {
-            "pose_keypoints":[582.349,507.866,0.845918,746.975,631.307,0.587007,...],
-            "face_keypoints":[468.725,715.636,0.189116,554.963,652.863,0.665039,...],
-            "hand_left_keypoints":[746.975,631.307,0.587007,615.659,617.567,0.377899,...],
-            "hand_right_keypoints":[617.581,472.65,0.797508,0,0,0,723.431,462.783,0.88765,...]
+            "pose_keypoints_2d":[582.349,507.866,0.845918,746.975,631.307,0.587007,...],
+            "face_keypoints_2d":[468.725,715.636,0.189116,554.963,652.863,0.665039,...],
+            "hand_left_keypoints_2d":[746.975,631.307,0.587007,615.659,617.567,0.377899,...],
+            "hand_right_keypoints_2d":[617.581,472.65,0.797508,0,0,0,723.431,462.783,0.88765,...]
+            "pose_keypoints_3d":[582.349,507.866,507.866,0.845918,507.866,746.975,631.307,0.587007,...],
+            "face_keypoints_3d":[468.725,715.636,715.636,0.189116,715.636,554.963,652.863,0.665039,...],
+            "hand_left_keypoints_3d":[746.975,631.307,631.307,0.587007,631.307,615.659,617.567,0.377899,...],
+            "hand_right_keypoints_3d":[617.581,472.65,472.65,0.797508,472.65,0,0,0,723.431,462.783,0.88765,...]
         }
     ],
     // If `--part_candidates` enabled
@@ -60,20 +65,23 @@ There are 2 alternatives to save the OpenPose output.
 }
 ```
 
-2. (Deprecated) The `write_keypoint` flag uses the OpenCV cv::FileStorage default formats, i.e. JSON (available after OpenCV 3.0), XML, and YML. Note that it does not include any other information othern than keypoints.
+2. (Deprecated) The `write_keypoint` flag uses the OpenCV cv::FileStorage default formats, i.e., JSON (available after OpenCV 3.0), XML, and YML. Note that it does not include any other information othern than keypoints.
+
+Both of them follow the keypoint ordering described in the [Keypoint Ordering](#keypoint-ordering) section.
 
 
 
 ### Keypoint Ordering
-The body part mapping order of any body model (e.g. COCO, MPI) can be extracted from the C++ API by using the `getPoseBodyPartMapping(const PoseModel poseModel)` function available in [poseParameters.hpp](../include/openpose/pose/poseParameters.hpp):
+The body part mapping order of any body model (e.g., COCO, MPI) can be extracted from the C++ API by using the `getPoseBodyPartMapping(const PoseModel poseModel)` function available in [poseParameters.hpp](../include/openpose/pose/poseParameters.hpp):
 ```
 // C++ API call
 #include <openpose/pose/poseParameters.hpp>
+const auto& poseBodyPartMappingBody25 = getPoseBodyPartMapping(PoseModel::BODY_25);
 const auto& poseBodyPartMappingCoco = getPoseBodyPartMapping(PoseModel::COCO_18);
 const auto& poseBodyPartMappingMpi = getPoseBodyPartMapping(PoseModel::MPI_15);
 
-// Result for COCO (18 body parts)
-// POSE_COCO_BODY_PARTS {
+// Result for BODY_25 (25 body parts consisting of COCO + foot)
+// const std::map<unsigned int, std::string> POSE_BODY_25_BODY_PARTS {
 //     {0,  "Nose"},
 //     {1,  "Neck"},
 //     {2,  "RShoulder"},
@@ -82,18 +90,25 @@ const auto& poseBodyPartMappingMpi = getPoseBodyPartMapping(PoseModel::MPI_15);
 //     {5,  "LShoulder"},
 //     {6,  "LElbow"},
 //     {7,  "LWrist"},
-//     {8,  "RHip"},
-//     {9,  "RKnee"},
-//     {10, "RAnkle"},
-//     {11, "LHip"},
-//     {12, "LKnee"},
-//     {13, "LAnkle"},
-//     {14, "REye"},
-//     {15, "LEye"},
-//     {16, "REar"},
-//     {17, "LEar"},
-//     {18, "Background"},
-// }
+//     {8,  "MidHip"},
+//     {9,  "RHip"},
+//     {10, "RKnee"},
+//     {11, "RAnkle"},
+//     {12, "LHip"},
+//     {13, "LKnee"},
+//     {14, "LAnkle"},
+//     {15, "REye"},
+//     {16, "LEye"},
+//     {17, "REar"},
+//     {18, "LEar"},
+//     {19, "LBigToe"},
+//     {20, "LSmallToe"},
+//     {21, "LHeel"},
+//     {22, "RBigToe"},
+//     {23, "RSmallToe"},
+//     {24, "RHeel"},
+//     {25, "Background"}
+// };
 ```
 
 
@@ -101,16 +116,22 @@ const auto& poseBodyPartMappingMpi = getPoseBodyPartMapping(PoseModel::MPI_15);
 ### Heatmap Ordering
 For the **heat maps storing format**, instead of saving each of the 67 heatmaps (18 body parts + background + 2 x 19 PAFs) individually, the library concatenates them into a huge (width x #heat maps) x (height) matrix (i.e., concatenated by columns). E.g., columns [0, individual heat map width] contains the first heat map, columns [individual heat map width + 1, 2 * individual heat map width] contains the second heat map, etc. Note that some image viewers are not able to display the resulting images due to the size. However, Chrome and Firefox are able to properly open them.
 
-The saving order is body parts + background + PAFs. Any of them can be disabled with program flags. If background is disabled, then the final image will be body parts + PAFs. The body parts and background follow the order of `getPoseBodyPartMapping(const PoseModel poseModel)`, while the PAFs follow the order specified on `getPosePartPairs(const PoseModel poseModel)`:
+The saving order is body parts + background + PAFs. Any of them can be disabled with program flags. If background is disabled, then the final image will be body parts + PAFs. The body parts and background follow the order of `getPoseBodyPartMapping(const PoseModel poseModel)`.
+
+The PAFs follow the order specified on `getPosePartPairs(const PoseModel poseModel)` together with `getPoseMapIndex(const PoseModel poseModel)`. E.g., assuming COCO (see example code below), the PAF channels in COCO start in 19 (smallest number in `getPoseMapIndex`, equal to #body parts + 1), and end up in 56 (highest one). Then, we can match its value from `getPosePartPairs`. For instance, 19 (x-channel) and 20 (y-channel) in `getPoseMapIndex` correspond to PAF from body part 1 to 8; 21 and 22 correspond to x,y channels in the joint from body part 8 to 9, etc. Note that if the smallest channel is odd (19), then all the x-channels are odd, and all the y-channels even. If the smallest channel is even, then the opposite will happen.
 ```
 // C++ API call
 #include <openpose/pose/poseParameters.hpp>
+const auto& posePartPairsBody25 = getPosePartPairs(PoseModel::BODY_25);
 const auto& posePartPairsCoco = getPosePartPairs(PoseModel::COCO_18);
 const auto& posePartPairsMpi = getPosePartPairs(PoseModel::MPI_15);
 
-// POSE_COCO_PAIRS
+// getPosePartPairs(PoseModel::BODY_25) result
 // Each index is the key value corresponding to each body part in `getPoseBodyPartMapping`. E.g., 1 for "Neck", 2 for "RShoulder", etc.
-// 1,2,   1,5,   2,3,   3,4,   5,6,   6,7,   1,8,   8,9,   9,10,  1,11,  11,12, 12,13,  1,0,   0,14, 14,16,  0,15, 15,17,  2,16,  5,17
+// 1,8,   1,2,   1,5,   2,3,   3,4,   5,6,   6,7,   8,9,   9,10,  10,11, 8,12,  12,13, 13,14,  1,0,   0,15, 15,17,  0,16, 16,18,   2,17,  5,18,   14,19,19,20,14,21, 11,22,22,23,11,24
+
+// getPoseMapIndex(PoseModel::BODY_25) result
+// 0,1, 14,15, 22,23, 16,17, 18,19, 24,25, 26,27, 6,7, 2,3, 4,5, 8,9, 10,11, 12,13, 30,31, 32,33, 36,37, 34,35, 38,39, 20,21, 28,29, 40,41,42,43,44,45, 46,47,48,49,50,51
 ```
 
 
@@ -120,9 +141,16 @@ The output format is analogous for hand (`hand_left_keypoints`, `hand_right_keyp
 
 
 
-### Pose Output Format
+### Pose Output Format (BODY_25)
 <p align="center">
-    <img src="media/keypoints_pose.png", width="480">
+    <img src="media/keypoints_pose_25.png", width="480">
+</p>
+
+
+
+### Pose Output Format (COCO)
+<p align="center">
+    <img src="media/keypoints_pose_18.png", width="480">
 </p>
 
 

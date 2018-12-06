@@ -14,6 +14,8 @@ namespace op
     public:
         SubThreadQueueOut(const std::vector<TWorker>& tWorkers, const std::shared_ptr<TQueue>& tQueueOut);
 
+        virtual ~SubThreadQueueOut();
+
         bool work();
 
     private:
@@ -40,6 +42,11 @@ namespace op
     }
 
     template<typename TDatums, typename TWorker, typename TQueue>
+    SubThreadQueueOut<TDatums, TWorker, TQueue>::~SubThreadQueueOut()
+    {
+    }
+
+    template<typename TDatums, typename TWorker, typename TQueue>
     bool SubThreadQueueOut<TDatums, TWorker, TQueue>::work()
     {
         try
@@ -49,19 +56,29 @@ namespace op
                 return false;
             else
             {
-                // Process TDatums
-                TDatums tDatums;
-                const auto workersAreRunning = this->workTWorkers(tDatums, true);
-                // Push/emplace tDatums if successfully processed
-                if (workersAreRunning)
+                // Don't work until next queue is not full
+                // This reduces latency to half
+                if (!spTQueueOut->isFull())
                 {
-                    if (tDatums != nullptr)
-                        spTQueueOut->waitAndEmplace(tDatums);
+                    // Process TDatums
+                    TDatums tDatums;
+                    const auto workersAreRunning = this->workTWorkers(tDatums, true);
+                    // Push/emplace tDatums if successfully processed
+                    if (workersAreRunning)
+                    {
+                        if (tDatums != nullptr)
+                            spTQueueOut->waitAndEmplace(tDatums);
+                    }
+                    // Close queue otherwise
+                    else
+                        spTQueueOut->stopPusher();
+                    return workersAreRunning;
                 }
-                // Close queue otherwise
                 else
-                    spTQueueOut->stopPusher();
-                return workersAreRunning;
+                {
+                    std::this_thread::sleep_for(std::chrono::microseconds{100});
+                    return true;
+                }
             }
         }
         catch (const std::exception& e)

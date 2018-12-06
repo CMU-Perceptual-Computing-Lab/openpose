@@ -13,6 +13,8 @@ namespace op
     public:
         explicit SubThreadNoQueue(const std::vector<TWorker>& tWorkers);
 
+        virtual ~SubThreadNoQueue();
+
         bool work();
 
         DELETE_COPY(SubThreadNoQueue);
@@ -29,7 +31,13 @@ namespace op
     template<typename TDatums, typename TWorker>
     SubThreadNoQueue<TDatums, TWorker>::SubThreadNoQueue(const std::vector<TWorker>& tWorkers) :
         SubThread<TDatums, TWorker>{tWorkers}
-    {}
+    {
+    }
+
+    template<typename TDatums, typename TWorker>
+    SubThreadNoQueue<TDatums, TWorker>::~SubThreadNoQueue()
+    {
+    }
 
     template<typename TDatums, typename TWorker>
     bool SubThreadNoQueue<TDatums, TWorker>::work()

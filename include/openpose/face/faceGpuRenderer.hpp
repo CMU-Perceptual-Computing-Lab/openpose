@@ -15,11 +15,11 @@ namespace op
                         const float alphaKeypoint = FACE_DEFAULT_ALPHA_KEYPOINT,
                         const float alphaHeatMap = FACE_DEFAULT_ALPHA_HEAT_MAP);
 
-        ~FaceGpuRenderer();
+        virtual ~FaceGpuRenderer();
 
         void initializationOnThread();
 
-        void renderFace(Array<float>& outputData, const Array<float>& faceKeypoints);
+        void renderFaceInherited(Array<float>& outputData, const Array<float>& faceKeypoints);
 
     private:
         float* pGpuFace; // GPU aux memory

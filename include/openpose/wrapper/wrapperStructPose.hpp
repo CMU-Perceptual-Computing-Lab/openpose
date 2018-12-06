@@ -12,7 +12,7 @@ namespace op
     /**
      * WrapperStructPose: Pose estimation and rendering configuration struct.
      * WrapperStructPose allows the user to set up the pose estimation and rendering parameters that will be used for
-     * the OpenPose Wrapper class.
+     * the OpenPose WrapperT template and Wrapper class.
      */
     struct OP_API WrapperStructPose
     {
@@ -82,8 +82,8 @@ namespace op
 
         /**
          * Pose model, it affects the number of body parts to render
-         * Select PoseModel::COCO_18 for 18 body-part COCO, PoseModel::MPI_15 for 15 body-part MPI, PoseModel::MPI_15_4
-         * for faster version of MPI, etc.).
+         * Select PoseModel::BODY_25 for 25 body-part COCO + foot model; PoseModel::COCO_18 for 18 body-part COCO;
+         * PoseModel::MPI_15 for 15 body-part MPI; PoseModel::MPI_15_4 for faster version of MPI; etc..
          */
         PoseModel poseModel;
 
@@ -143,10 +143,35 @@ namespace op
         /**
          * Rendering threshold. Only estimated keypoints whose score confidences are higher than this value will be
          * rendered. Generally, a high threshold (> 0.5) will only render very clear body parts; while small thresholds
-         * (~0.1) will also output guessed and occluded keypoints, but also more false positives (i.e. wrong
+         * (~0.1) will also output guessed and occluded keypoints, but also more false positives (i.e., wrong
          * detections).
          */
         float renderThreshold;
+
+        /**
+         * Maximum number of people to be detected.
+         * This parameter will limit the maximum number of people detected, by keeping the people with the
+         * `numberPeopleMax` top scores.
+         * Useful if you know the exact number of people in the scene, so it can remove false positives (if all the
+         * people have been detected.
+         * However, it might also include false negatives by removing very small or highly occluded people.
+         */
+        int numberPeopleMax;
+
+        /**
+         * Whether to maximize the number of positives.
+         * It reduces the thresholds to accept a person candidate. It highly increases both false and true positives.
+         * I.e., it maximizes average recall but could harm average precision.
+         */
+        bool maximizePositives;
+
+        /**
+         * Maximum processing frame rate.
+         * By default (-1), OpenPose will process frames as fast as possible.
+         * Example usage: If OpenPose is displaying images too quickly, this can reduce the speed so the user can
+         * analyze better each frame from the GUI.
+         */
+        double fpsMax;
 
         /**
          * Whether to internally enable Google Logging.
@@ -158,28 +183,22 @@ namespace op
         bool enableGoogleLogging;
 
         /**
-         * Whether to return a person ID for each body skeleton, providing temporal consistency.
-         */
-        bool identification;
-
-        /**
          * Constructor of the struct.
          * It has the recommended and default values we recommend for each element of the struct.
          * Since all the elements of the struct are public, they can also be manually filled.
          */
-        WrapperStructPose(const bool enable = true, const Point<int>& netInputSize = Point<int>{656, 368},
-                          const Point<int>& outputSize = Point<int>{1280, 720},
-                          const ScaleMode keypointScale = ScaleMode::InputResolution,
-                          const int gpuNumber = -1, const int gpuNumberStart = 0, const int scalesNumber = 1,
-                          const float scaleGap = 0.15f, const RenderMode renderMode = RenderMode::None,
-                          const PoseModel poseModel = PoseModel::COCO_18, const bool blendOriginalFrame = true,
-                          const float alphaKeypoint = POSE_DEFAULT_ALPHA_KEYPOINT,
-                          const float alphaHeatMap = POSE_DEFAULT_ALPHA_HEAT_MAP,
-                          const int defaultPartToRender = 0, const std::string& modelFolder = "models/",
-                          const std::vector<HeatMapType>& heatMapTypes = {},
-                          const ScaleMode heatMapScale = ScaleMode::ZeroToOne, const bool addPartCandidates = false,
-                          const float renderThreshold = 0.05f, const bool enableGoogleLogging = true,
-                          const bool identification = false);
+        WrapperStructPose(
+            const bool enable = true, const Point<int>& netInputSize = Point<int>{656, 368},
+            const Point<int>& outputSize = Point<int>{-1, -1},
+            const ScaleMode keypointScale = ScaleMode::InputResolution, const int gpuNumber = -1,
+            const int gpuNumberStart = 0, const int scalesNumber = 1, const float scaleGap = 0.15f,
+            const RenderMode renderMode = RenderMode::Gpu, const PoseModel poseModel = PoseModel::BODY_25,
+            const bool blendOriginalFrame = true, const float alphaKeypoint = POSE_DEFAULT_ALPHA_KEYPOINT,
+            const float alphaHeatMap = POSE_DEFAULT_ALPHA_HEAT_MAP, const int defaultPartToRender = 0,
+            const std::string& modelFolder = "models/", const std::vector<HeatMapType>& heatMapTypes = {},
+            const ScaleMode heatMapScale = ScaleMode::ZeroToOne, const bool addPartCandidates = false,
+            const float renderThreshold = 0.05f, const int numberPeopleMax = -1, const bool maximizePositives = false,
+            const double fpsMax = -1., const bool enableGoogleLogging = true);
     };
 }
 

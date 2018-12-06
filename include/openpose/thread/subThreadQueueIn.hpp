@@ -14,6 +14,8 @@ namespace op
     public:
         SubThreadQueueIn(const std::vector<TWorker>& tWorkers, const std::shared_ptr<TQueue>& tQueueIn);
 
+        virtual ~SubThreadQueueIn();
+
         bool work();
 
     private:
@@ -31,11 +33,17 @@ namespace op
 namespace op
 {
     template<typename TDatums, typename TWorker, typename TQueue>
-    SubThreadQueueIn<TDatums, TWorker, TQueue>::SubThreadQueueIn(const std::vector<TWorker>& tWorkers, const std::shared_ptr<TQueue>& tQueueIn) :
+    SubThreadQueueIn<TDatums, TWorker, TQueue>::SubThreadQueueIn(const std::vector<TWorker>& tWorkers,
+                                                                 const std::shared_ptr<TQueue>& tQueueIn) :
         SubThread<TDatums, TWorker>{tWorkers},
         spTQueueIn{tQueueIn}
     {
         // spTQueueIn->addPopper();
+    }
+
+    template<typename TDatums, typename TWorker, typename TQueue>
+    SubThreadQueueIn<TDatums, TWorker, TQueue>::~SubThreadQueueIn()
+    {
     }
 
     template<typename TDatums, typename TWorker, typename TQueue>
@@ -44,6 +52,8 @@ namespace op
         try
         {
             // Pop TDatums
+            if (spTQueueIn->empty())
+                std::this_thread::sleep_for(std::chrono::microseconds{100});
             TDatums tDatums;
             bool queueIsRunning = spTQueueIn->tryPop(tDatums);
             // Check queue not empty

@@ -13,6 +13,10 @@ namespace op
     {
     }
 
+    PoseCpuRenderer::~PoseCpuRenderer()
+    {
+    }
+
     std::pair<int, std::string> PoseCpuRenderer::renderPose(Array<float>& outputData,
                                                             const Array<float>& poseKeypoints,
                                                             const float scaleInputToOutput,
@@ -20,7 +24,7 @@ namespace op
     {
         try
         {
-            // Security checks
+            // Sanity check
             if (outputData.empty())
                 error("Empty Array<float> outputData.", __LINE__, __FUNCTION__, __FILE__);
             // CPU rendering

@@ -1,11 +1,14 @@
 #ifndef OPENPOSE_HEADERS_HPP
 #define OPENPOSE_HEADERS_HPP
 
+// 3d module
+#include <openpose/3d/headers.hpp>
+
+// calibration module
+#include <openpose/calibration/headers.hpp>
+
 // core module
 #include <openpose/core/headers.hpp>
-
-// experimental module
-#include <openpose/experimental/headers.hpp>
 
 // face module
 #include <openpose/face/headers.hpp>
@@ -19,6 +22,9 @@
 // hand module
 #include <openpose/hand/headers.hpp>
 
+// net module
+#include <openpose/net/headers.hpp>
+
 // pose module
 #include <openpose/pose/headers.hpp>
 
@@ -27,6 +33,9 @@
 
 // threading module
 #include <openpose/thread/headers.hpp>
+
+// tracking module
+#include <openpose/tracking/headers.hpp>
 
 // utilities module
 #include <openpose/utilities/headers.hpp>

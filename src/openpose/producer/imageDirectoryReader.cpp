@@ -10,8 +10,11 @@ namespace op
         try
         {
             // Get files on directory with the desired extensions
-            const std::vector<std::string> extensions{"bmp", "dib", "pbm", "pgm", "ppm", "sr", "ras",   // Completely supported by OpenCV
-                                                      "jpg", "jpeg", "png"};                            // Most of them supported by OpenCV
+            const std::vector<std::string> extensions{
+                // Completely supported by OpenCV
+                "bmp", "dib", "pbm", "pgm", "ppm", "sr", "ras",
+                // Most of them supported by OpenCV
+                "jpg", "jpeg", "png"};
             const auto imagePaths = getFilesOnDirectory(imageDirectoryPath, extensions);
 
             // Check #files > 0
@@ -27,28 +30,50 @@ namespace op
         }
     }
 
-    ImageDirectoryReader::ImageDirectoryReader(const std::string& imageDirectoryPath) :
-        Producer{ProducerType::ImageDirectory},
+    ImageDirectoryReader::ImageDirectoryReader(const std::string& imageDirectoryPath,
+                                               const std::string& cameraParameterPath,
+                                               const bool undistortImage,
+                                               const int numberViews) :
+        Producer{ProducerType::ImageDirectory, cameraParameterPath, undistortImage, numberViews},
         mImageDirectoryPath{imageDirectoryPath},
         mFilePaths{getImagePathsOnDirectory(imageDirectoryPath)},
-        mFrameNameCounter{0}
+        mFrameNameCounter{0ll}
     {
     }
 
-    std::string ImageDirectoryReader::getFrameName()
+    ImageDirectoryReader::~ImageDirectoryReader()
     {
-        return getFileNameNoExtension(mFilePaths.at(mFrameNameCounter));
+    }
+
+    std::string ImageDirectoryReader::getNextFrameName()
+    {
+        try
+        {
+            return getFileNameNoExtension(mFilePaths.at(mFrameNameCounter));
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return "";
+        }
     }
 
     cv::Mat ImageDirectoryReader::getRawFrame()
     {
         try
         {
+            // Read frame
             auto frame = loadImage(mFilePaths.at(mFrameNameCounter++).c_str(), CV_LOAD_IMAGE_COLOR);
-            // Check frame integrity. This function also checks width/height changes. However, if it is performed after setWidth/setHeight this is performed over the new resolution (so they always match).
+            // Skip frames if frame step > 1
+            const auto frameStep = Producer::get(ProducerProperty::FrameStep);
+            if (frameStep > 1)
+                set(CV_CAP_PROP_POS_FRAMES, mFrameNameCounter + frameStep-1);
+            // Check frame integrity. This function also checks width/height changes. However, if it is performed
+            // after setWidth/setHeight this is performed over the new resolution (so they always match).
             checkFrameIntegrity(frame);
             // Update size, since images might have different size between each one of them
             mResolution = Point<int>{frame.cols, frame.rows};
+            // Return final frame
             return frame;
         }
         catch (const std::exception& e)
@@ -58,20 +83,38 @@ namespace op
         }
     }
 
+    std::vector<cv::Mat> ImageDirectoryReader::getRawFrames()
+    {
+        try
+        {
+            std::vector<cv::Mat> rawFrames;
+            for (auto i = 0 ; i < intRound(Producer::get(ProducerProperty::NumberViews)) ; i++)
+                rawFrames.emplace_back(getRawFrame());
+            return rawFrames;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return {};
+        }
+    }
+
     double ImageDirectoryReader::get(const int capProperty)
     {
         try
         {
             if (capProperty == CV_CAP_PROP_FRAME_WIDTH)
             {
-                if (get(ProducerProperty::Rotation) == 0. || get(ProducerProperty::Rotation) == 180.)
+                if (Producer::get(ProducerProperty::Rotation) == 0.
+                    || Producer::get(ProducerProperty::Rotation) == 180.)
                     return mResolution.x;
                 else
                     return mResolution.y;
             }
             else if (capProperty == CV_CAP_PROP_FRAME_HEIGHT)
             {
-                if (get(ProducerProperty::Rotation) == 0. || get(ProducerProperty::Rotation) == 180.)
+                if (Producer::get(ProducerProperty::Rotation) == 0.
+                    || Producer::get(ProducerProperty::Rotation) == 180.)
                     return mResolution.y;
                 else
                     return mResolution.x;

@@ -4,14 +4,14 @@
 #include <opencv2/core/core.hpp> // cv::Mat
 #include <openpose/core/common.hpp>
 #include <openpose/core/enumClasses.hpp>
-#include <openpose/face/faceExtractor.hpp>
+#include <openpose/face/faceExtractorNet.hpp>
 
 namespace op
 {
     /**
      * Face keypoint extractor class for Caffe framework.
      */
-    class OP_API FaceExtractorCaffe : public FaceExtractor
+    class OP_API FaceExtractorCaffe : public FaceExtractorNet
     {
     public:
         /**
@@ -38,13 +38,10 @@ namespace op
          * @param faceRectangles location of the faces in the image. It is a length-variable std::vector, where
          * each index corresponds to a different person in the image. Internally, a op::Rectangle<float>
          * (similar to cv::Rect for floating values) with the position of that face (or 0,0,0,0 if
-         * some face is missing, e.g. if a specific person has only half of the body inside the image).
+         * some face is missing, e.g., if a specific person has only half of the body inside the image).
          * @param cvInputData Original image in cv::Mat format and BGR format.
-         * @param scaleInputToOutput Desired scale of the final keypoints. Set to 1 if the desired size is the
-         * cvInputData size.
          */
-        void forwardPass(const std::vector<Rectangle<float>>& faceRectangles, const cv::Mat& cvInputData,
-                         const double scaleInputToOutput);
+        void forwardPass(const std::vector<Rectangle<float>>& faceRectangles, const cv::Mat& cvInputData);
 
     private:
         // PIMPL idiom
