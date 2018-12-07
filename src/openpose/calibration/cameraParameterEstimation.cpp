@@ -1267,6 +1267,55 @@ namespace op
         return true;
     }
 
+    struct bundleAdjustmentUnit
+    {
+        bundleAdjustmentUnit(const cv::Point2f& pt2d, const cv::Mat& intrinsics): pt2d(pt2d), intrinsics(intrinsics)
+        {
+            if (intrinsics.cols != 3 || intrinsics.rows != 3)
+                op::error("Intrinsics passed in are not 3 x 3.",
+                    __LINE__, __FUNCTION__, __FILE__);
+            if (intrinsics.type() != CV_64FC1)
+                op::error("Intrinsics passed in must be in double.",
+                    __LINE__, __FUNCTION__, __FILE__);
+        }
+        const cv::Point2f& pt2d;
+        const cv::Mat& intrinsics;
+
+        template <typename T>
+        bool operator()(const T* camera, const T* point, T* residuals) const
+        {
+            // camera (6): angle axis + translation 
+            // point (3): X, Y, Z
+            // residuals (2): x, y
+            T P[3];
+            ceres::AngleAxisRotatePoint(camera, point, P);
+            P[0] += camera[3]; P[1] += camera[4]; P[2] += camera[5];
+
+            T KP[3];
+            KP[0] = P[0] * T(intrinsics.at<double>(0, 0)) + P[1] * T(intrinsics.at<double>(0, 1)) + P[2] * T(intrinsics.at<double>(0, 2));
+            KP[1] = P[0] * T(intrinsics.at<double>(1, 0)) + P[1] * T(intrinsics.at<double>(1, 1)) + P[2] * T(intrinsics.at<double>(1, 2));
+            KP[2] = P[0] * T(intrinsics.at<double>(2, 0)) + P[1] * T(intrinsics.at<double>(2, 1)) + P[2] * T(intrinsics.at<double>(2, 2));
+
+            residuals[0] = KP[0] / KP[2] - T(pt2d.x);
+            residuals[1] = KP[1] / KP[2] - T(pt2d.y);
+            return true;
+        }
+
+        template <typename T>
+        bool operator()(const T* point, T* residuals) const
+        {
+            // point (3): X, Y, Z
+            // residuals (2): x, y
+            T KP[3];
+            KP[0] = point[0] * T(intrinsics.at<double>(0, 0)) + point[1] * T(intrinsics.at<double>(0, 1)) + point[2] * T(intrinsics.at<double>(0, 2));
+            KP[1] = point[0] * T(intrinsics.at<double>(1, 0)) + point[1] * T(intrinsics.at<double>(1, 1)) + point[2] * T(intrinsics.at<double>(1, 2));
+            KP[2] = point[0] * T(intrinsics.at<double>(2, 0)) + point[1] * T(intrinsics.at<double>(2, 1)) + point[2] * T(intrinsics.at<double>(2, 2));
+
+            residuals[0] = KP[0] / KP[2] - T(pt2d.x);
+            residuals[1] = KP[1] / KP[2] - T(pt2d.y);
+            return true;
+        }
+    };
 
     void refineAndSaveExtrinsics(
         const std::string& parameterFolder, const std::string& imageFolder, const Point<int>& gridInnerCorners,
@@ -1403,13 +1452,6 @@ namespace op
                 std::cout << i << "\n" << points2DVectorsExtrinsic[i].size() << std::endl;
             }
 
-            // manually remove some points for testing
-            // points2DVectorsExtrinsic[0][55].x = -1;
-            // points2DVectorsExtrinsic[0][55].y = -1;
-            // points2DVectorsExtrinsic[1][55].x = -1;
-            // points2DVectorsExtrinsic[1][55].y = -1;
-            // matchIndexes[0].erase(matchIndexes[0].begin() + 55);
-            // matchIndexes[1].erase(matchIndexes[1].begin() + 55);   
             std::cout << "---------------------------\n";
 
             // compute the initial camera matrices
@@ -1467,20 +1509,45 @@ namespace op
                         rotation(x, y) = cameraExtrinsics[cameraIndex].at<double>(x, y);
                 ceres::RotationMatrixToAngleAxis(rotation.data(), cameraRt.data() + 6 * cameraIndex);
             }
+
+            ceres::Problem problem;
+            ceres::Solver::Options options;
+            // options.linear_solver_type = ceres::SPARSE_NORMAL_CHOLESKY;
+            // options.linear_solver_type = ceres::DENSE_QR;
+            options.linear_solver_type = ceres::DENSE_SCHUR;
+            options.use_nonmonotonic_steps = true;
+            options.minimizer_progress_to_stdout = true;
+            options.num_threads = 10;
+            // computing things together
+            /*
             bundleAdjustmentCost* ptr_BA = new bundleAdjustmentCost(points2DVectorsExtrinsic, cameraIntrinsics, BAValid);
             ceres::DynamicAutoDiffCostFunction<bundleAdjustmentCost>* costFunction = new ceres::DynamicAutoDiffCostFunction<bundleAdjustmentCost>(ptr_BA);
             costFunction->AddParameterBlock(6 * (numberCameras - 1));  // R + t
             costFunction->AddParameterBlock(3 * points2DVectorsExtrinsic[0].size());
             costFunction->SetNumResiduals(numResiduals);
-
-            ceres::Problem problem;
             problem.AddResidualBlock(costFunction, new ceres::HuberLoss(2.0), cameraRt.data() + 6, points3D.data());
-            ceres::Solver::Options options;
-            // options.linear_solver_type = ceres::SPARSE_NORMAL_CHOLESKY;
-            options.linear_solver_type = ceres::DENSE_QR;
-            options.use_nonmonotonic_steps = true;
-            options.minimizer_progress_to_stdout = true;
-            options.num_threads = 10;
+            */
+
+            // computing things separately
+            for (auto cameraIndex = 0; cameraIndex < numberCameras; cameraIndex++)
+            {
+                if (cameraIndex != 0u)
+                    for (auto i = 0u; i < points2DVectorsExtrinsic[cameraIndex].size(); i++)
+                    {
+                        if (!BAValid(cameraIndex, i)) continue;
+                        bundleAdjustmentUnit* ptr_BA = new bundleAdjustmentUnit(points2DVectorsExtrinsic[cameraIndex][i], cameraIntrinsics[cameraIndex]);
+                        ceres::CostFunction* costFunction = new ceres::AutoDiffCostFunction<bundleAdjustmentUnit, 2, 6, 3>(ptr_BA);
+                        problem.AddResidualBlock(costFunction, new ceres::HuberLoss(2.0), cameraRt.data() + 6 * cameraIndex, points3D.data() + 3 * i);
+                    }
+                else
+                    for (auto i = 0u; i < points2DVectorsExtrinsic[cameraIndex].size(); i++)
+                    {
+                        if (!BAValid(cameraIndex, i)) continue;
+                        bundleAdjustmentUnit* ptr_BA = new bundleAdjustmentUnit(points2DVectorsExtrinsic[cameraIndex][i], cameraIntrinsics[cameraIndex]);
+                        ceres::CostFunction* costFunction = new ceres::AutoDiffCostFunction<bundleAdjustmentUnit, 2, 3>(ptr_BA);
+                        problem.AddResidualBlock(costFunction, new ceres::HuberLoss(2.0), points3D.data() + 3 * i);
+                    }
+            }
             ceres::Solver::Summary summary;
             ceres::Solve(options, &problem, &summary);
             std::cout << summary.FullReport() << std::endl;
