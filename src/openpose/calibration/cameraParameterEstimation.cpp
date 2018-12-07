@@ -10,6 +10,9 @@
 #include <openpose/filestream/fileStream.hpp>
 #include <openpose/utilities/fileSystem.hpp>
 #include <openpose/calibration/cameraParameterEstimation.hpp>
+#include <openpose/3d/poseTriangulation.hpp>
+#include <ceres/ceres.h>
+#include <ceres/rotation.h>
 
 namespace op
 {
@@ -1190,6 +1193,81 @@ namespace op
         }
     }
 
+    struct bundleAdjustmentCost
+    {
+        bundleAdjustmentCost(const std::vector<std::vector<cv::Point2f>>& points2DVectorsExtrinsic, const std::vector<cv::Mat>& cameraIntrinsicsCvMat,
+            const Eigen::MatrixXd& BAValid)
+            :points2DVectorsExtrinsic(points2DVectorsExtrinsic), BAValid(BAValid)
+        {
+            numberCameras = cameraIntrinsicsCvMat.size();
+            if (points2DVectorsExtrinsic.size() != numberCameras)
+            {
+                op::error("#view of points != #camera intrinsics.",
+                          __LINE__, __FUNCTION__, __FILE__);
+            }
+            numberPoints = points2DVectorsExtrinsic[0].size();
+            numberProjection = BAValid.sum();
+            for (auto cameraIndex = 0u; cameraIndex < numberCameras; cameraIndex++)
+            {
+                if (cameraIntrinsicsCvMat[cameraIndex].cols != 3 || cameraIntrinsicsCvMat[cameraIndex].rows != 3)
+                    op::error("Intrinsics passed in are not 3 x 3.",
+                              __LINE__, __FUNCTION__, __FILE__);
+                cameraIntrinsics.resize(numberCameras);
+                for (auto x = 0; x < 3; x++)
+                    for (auto y = 0; y < 3; y++)
+                        cameraIntrinsics[cameraIndex](x, y) = cameraIntrinsicsCvMat[cameraIndex].at<double>(x, y);
+            }
+        }
+
+        template <typename T>
+        bool operator()(T const* const* parameters, T* residuals) const;
+
+        const std::vector<std::vector<cv::Point2f>>& points2DVectorsExtrinsic;
+        const Eigen::MatrixXd& BAValid;
+        std::vector<Eigen::Matrix<double, 3, 3>> cameraIntrinsics;
+        uint numberCameras, numberPoints, numberProjection;
+    };
+
+    template <typename T>
+    bool bundleAdjustmentCost::operator()(T const* const* parameters, T* residuals) const
+    {
+        // cameraExtrinsics: angle axis + translation (6 x (#Cam - 1)), camera 0 is always [I | 0]
+        // pt3D: 3D points (3 x #Points)
+        const T* cameraExtrinsics = parameters[0];
+        const T* pt3D = parameters[1];
+        const Eigen::Map< const Eigen::Matrix<T, 3, Eigen::Dynamic> > pt3DWorld(pt3D, 3, numberPoints);
+        uint countProjection = 0u;
+        for (auto cameraIndex = 0u; cameraIndex < numberCameras; cameraIndex++)
+        {
+            Eigen::Matrix<T, 3, Eigen::Dynamic> pt3DCamera = pt3DWorld;
+            if (cameraIndex > 0u)
+            {
+                const Eigen::Map< const Eigen::Matrix<T, 3, 1> > translation(cameraExtrinsics + 6 * (cameraIndex - 1) + 3);  // minus 1!
+                Eigen::Matrix<T, 3, 3> rotation;
+                ceres::AngleAxisToRotationMatrix(cameraExtrinsics + 6 * (cameraIndex - 1), rotation.data());  // minus 1!
+                pt3DCamera = rotation * pt3DCamera;
+                pt3DCamera.colwise() += translation;
+            }
+            const Eigen::Matrix<T, 3, Eigen::Dynamic> pt2DHomogeneous = cameraIntrinsics[cameraIndex].cast<T>() * pt3DCamera;
+            const Eigen::Matrix<T, 1, Eigen::Dynamic> ptx = pt2DHomogeneous.row(0).cwiseQuotient(pt2DHomogeneous.row(2));
+            const Eigen::Matrix<T, 1, Eigen::Dynamic> pty = pt2DHomogeneous.row(1).cwiseQuotient(pt2DHomogeneous.row(2));
+            for (auto i = 0u; i < numberPoints; i++)
+            {
+                if (!BAValid(cameraIndex, i))   // no data for this point
+                    continue;
+                residuals[2 * countProjection + 0] = ptx(0, i) - T(points2DVectorsExtrinsic[cameraIndex][i].x);
+                residuals[2 * countProjection + 1] = pty(0, i) - T(points2DVectorsExtrinsic[cameraIndex][i].y);
+                countProjection++;
+            }
+        }
+        // sanity check
+        if (countProjection != numberProjection)
+            op::error("Wrong number of constraints in bundle adjustment",
+                      __LINE__, __FUNCTION__, __FILE__);
+        return true;
+    }
+
+
     void refineAndSaveExtrinsics(
         const std::string& parameterFolder, const std::string& imageFolder, const Point<int>& gridInnerCorners,
         const float gridSquareSizeMm, const int numberCameras, const bool imagesAreUndistorted,
@@ -1310,6 +1388,130 @@ namespace op
             // (note that *.sift files are actually in binary format, so quite hard to read.)
             log("3D square size:");
             log(gridSquareSizeMm); // Just temporary to avoid warning of unused variable
+
+            // print out things
+            for (auto i = 0u; i < cameraExtrinsics.size(); i++)
+            {
+                std::cout << i << "\n" << cameraExtrinsics[i] << std::endl;
+            }
+            for (auto i = 0u; i < cameraIntrinsics.size(); i++)
+            {
+                std::cout << i << "\n" << cameraIntrinsics[i] << std::endl;
+            }
+            for (auto i = 0u; i < points2DVectorsExtrinsic.size(); i++)
+            {
+                std::cout << i << "\n" << points2DVectorsExtrinsic[i].size() << std::endl;
+            }
+
+            // manually remove some points for testing
+            // points2DVectorsExtrinsic[0][55].x = -1;
+            // points2DVectorsExtrinsic[0][55].y = -1;
+            // points2DVectorsExtrinsic[1][55].x = -1;
+            // points2DVectorsExtrinsic[1][55].y = -1;
+            // matchIndexes[0].erase(matchIndexes[0].begin() + 55);
+            // matchIndexes[1].erase(matchIndexes[1].begin() + 55);   
+            std::cout << "---------------------------\n";
+
+            // compute the initial camera matrices
+            std::vector<cv::Mat> cameraMatrices(numberCameras);
+            for (auto cameraIndex = 0 ; cameraIndex < numberCameras ; cameraIndex++)
+                cameraMatrices[cameraIndex] = cameraIntrinsics[cameraIndex] * cameraExtrinsics[cameraIndex];
+            // Run triangulation to obtain the initial 3D points
+            Eigen::MatrixXd BAValid = Eigen::MatrixXd::Zero(numberCameras, points2DVectorsExtrinsic[0].size());  // this is a valid reprojection term
+            Eigen::Matrix<double, 3, Eigen::Dynamic> initialPoints3D(3, points2DVectorsExtrinsic[0].size());
+            initialPoints3D.setZero();
+            const auto imageRatio = std::sqrt(imageSize.area() / 1310720.);
+            const auto reprojectionMaxAcceptable = 25 * imageRatio;
+            for (auto i = 0u; i < points2DVectorsExtrinsic[0].size(); i++)
+            {
+                std::vector<cv::Mat> pointCameraMatrices;
+                std::vector<cv::Point2d> pointsOnEachCamera;
+                for (auto cameraIndex = 0 ; cameraIndex < numberCameras ; cameraIndex++)
+                {
+                    if (points2DVectorsExtrinsic[cameraIndex][i].x >= 0)  // visible in this camera
+                    {
+                        pointCameraMatrices.emplace_back(cameraMatrices[cameraIndex]);
+                        pointsOnEachCamera.emplace_back(points2DVectorsExtrinsic[cameraIndex][i]);
+                    }
+                }
+                if (pointCameraMatrices.size() < 2u)  // if visible in one camera, no triangulation and not used in bundle adjustment.
+                    continue;
+                for (auto cameraIndex = 0 ; cameraIndex < numberCameras ; cameraIndex++)
+                {
+                    if (points2DVectorsExtrinsic[cameraIndex][i].x >= 0)  // this 2D term is used for optimization
+                        BAValid(cameraIndex, i) = 1;
+                }
+                cv::Mat reconstructedPoint;
+                const float reprojectionError = op::triangulateWithOptimization(reconstructedPoint, pointCameraMatrices, pointsOnEachCamera, reprojectionMaxAcceptable);
+                UNUSED(reprojectionError);
+                initialPoints3D.data()[3 * i + 0] = reconstructedPoint.at<double>(0, 0) / reconstructedPoint.at<double>(3, 0);
+                initialPoints3D.data()[3 * i + 1] = reconstructedPoint.at<double>(1, 0) / reconstructedPoint.at<double>(3, 0);
+                initialPoints3D.data()[3 * i + 2] = reconstructedPoint.at<double>(2, 0) / reconstructedPoint.at<double>(3, 0);
+            }
+            // std::cout << initialPoints3D << std::endl;
+            // std::cout << visibility << std::endl;
+
+            // Start bundle adjustment.
+            const int numResiduals = 2 * BAValid.sum();  // x and y
+            Eigen::Matrix<double, 3, Eigen::Dynamic> points3D = initialPoints3D;
+            Eigen::Matrix<double, 6, Eigen::Dynamic> cameraRt(6, numberCameras);   // angle axis + translation
+            // prepare the camera intrinsics
+            for (auto cameraIndex = 0 ; cameraIndex < numberCameras ; cameraIndex++)
+            {
+                cameraRt.data()[6 * cameraIndex + 3] = cameraExtrinsics[cameraIndex].at<double>(0, 3);
+                cameraRt.data()[6 * cameraIndex + 4] = cameraExtrinsics[cameraIndex].at<double>(1, 3);
+                cameraRt.data()[6 * cameraIndex + 5] = cameraExtrinsics[cameraIndex].at<double>(2, 3);
+                Eigen::Matrix<double, 3, 3> rotation;   // column major!
+                for (auto x = 0; x < 3; x++)
+                    for (auto y = 0; y < 3; y++)
+                        rotation(x, y) = cameraExtrinsics[cameraIndex].at<double>(x, y);
+                ceres::RotationMatrixToAngleAxis(rotation.data(), cameraRt.data() + 6 * cameraIndex);
+            }
+            bundleAdjustmentCost* ptr_BA = new bundleAdjustmentCost(points2DVectorsExtrinsic, cameraIntrinsics, BAValid);
+            ceres::DynamicAutoDiffCostFunction<bundleAdjustmentCost>* costFunction = new ceres::DynamicAutoDiffCostFunction<bundleAdjustmentCost>(ptr_BA);
+            costFunction->AddParameterBlock(6 * (numberCameras - 1));  // R + t
+            costFunction->AddParameterBlock(3 * points2DVectorsExtrinsic[0].size());
+            costFunction->SetNumResiduals(numResiduals);
+
+            ceres::Problem problem;
+            problem.AddResidualBlock(costFunction, new ceres::HuberLoss(2.0), cameraRt.data() + 6, points3D.data());
+            ceres::Solver::Options options;
+            // options.linear_solver_type = ceres::SPARSE_NORMAL_CHOLESKY;
+            options.linear_solver_type = ceres::DENSE_QR;
+            options.use_nonmonotonic_steps = true;
+            options.minimizer_progress_to_stdout = true;
+            options.num_threads = 10;
+            ceres::Solver::Summary summary;
+            ceres::Solve(options, &problem, &summary);
+            std::cout << summary.FullReport() << std::endl;
+
+            std::vector<cv::Mat> refinedExtrinsics(numberCameras);
+            refinedExtrinsics[0] = cameraExtrinsics[0];
+            for (auto cameraIndex = 1; cameraIndex < numberCameras; cameraIndex++)   // the first one is always [I | 0]
+            {
+                cv::Mat ext(3, 4, CV_64FC1);
+                ext.at<double>(0, 3) = cameraRt.data()[6 * cameraIndex + 3];
+                ext.at<double>(1, 3) = cameraRt.data()[6 * cameraIndex + 4];
+                ext.at<double>(2, 3) = cameraRt.data()[6 * cameraIndex + 5];
+                Eigen::Matrix<double, 3, 3> rotation;
+                ceres::AngleAxisToRotationMatrix(cameraRt.data() + 6 * cameraIndex, rotation.data());
+                for (auto x = 0; x < 3; x++)
+                    for (auto y = 0; y < 3; y++)
+                        ext.at<double>(x, y) = rotation(x, y);
+                refinedExtrinsics[cameraIndex] = ext;
+            }
+            // no need to delete ptr_BA or costFunction; Ceres::Problem takes care of them.
+            std::cout << "Output: -----------------------------------" << std::endl;
+            for (auto cameraIndex = 0; cameraIndex < numberCameras; cameraIndex++)
+            {
+                std::cout << cameraIndex << " ::::::" << std::endl;
+                std::cout << refinedExtrinsics[cameraIndex] << std::endl;
+            }
+// Eigen::Matrix<double, 2, Eigen::Dynamic> residuals(2, int(BAValid.sum()));
+// (*ptr_BA)(ptrParameters, residuals.data());
+// std::cout << residuals << std::endl;
+// delete ptr_BA;
+// delete costFunction;
         }
         catch (const std::exception& e)
         {
