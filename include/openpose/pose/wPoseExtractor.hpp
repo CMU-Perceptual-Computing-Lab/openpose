@@ -13,6 +13,8 @@ namespace op
     public:
         explicit WPoseExtractor(const std::shared_ptr<PoseExtractor>& poseExtractorSharedPtr);
 
+        virtual ~WPoseExtractor();
+
         void initializationOnThread();
 
         void work(TDatums& tDatums);
@@ -35,6 +37,11 @@ namespace op
     template<typename TDatums>
     WPoseExtractor<TDatums>::WPoseExtractor(const std::shared_ptr<PoseExtractor>& poseExtractorSharedPtr) :
         spPoseExtractor{poseExtractorSharedPtr}
+    {
+    }
+
+    template<typename TDatums>
+    WPoseExtractor<TDatums>::~WPoseExtractor()
     {
     }
 
@@ -80,11 +87,11 @@ namespace op
                     // Keep desired top N people
                     spPoseExtractor->keepTopPeople(tDatum.poseKeypoints, tDatum.poseScores);
                     // ID extractor (experimental)
-                    tDatum.poseIds = spPoseExtractor->extractIdsLockThread(tDatum.poseKeypoints, tDatum.cvInputData,
-                                                                           i, tDatum.id);
+                    tDatum.poseIds = spPoseExtractor->extractIdsLockThread(
+                        tDatum.poseKeypoints, tDatum.cvInputData, i, tDatum.id);
                     // Tracking (experimental)
-                    spPoseExtractor->trackLockThread(tDatum.poseKeypoints, tDatum.poseIds, tDatum.cvInputData, i,
-                                                     tDatum.id);
+                    spPoseExtractor->trackLockThread(
+                        tDatum.poseKeypoints, tDatum.poseIds, tDatum.cvInputData, i, tDatum.id);
                 }
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);

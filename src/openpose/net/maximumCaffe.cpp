@@ -23,6 +23,11 @@ namespace op
     }
 
     template <typename T>
+    MaximumCaffe<T>::~MaximumCaffe()
+    {
+    }
+
+    template <typename T>
     void MaximumCaffe<T>::LayerSetUp(const std::vector<caffe::Blob<T>*>& bottom,
                                      const std::vector<caffe::Blob<T>*>& top)
     {
@@ -73,6 +78,28 @@ namespace op
                 UNUSED(bottom);
                 UNUSED(top);
             #endif
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    template <typename T>
+    void MaximumCaffe<T>::Forward(const std::vector<caffe::Blob<T>*>& bottom,
+                                  const std::vector<caffe::Blob<T>*>& top)
+    {
+        try
+        {
+            // CUDA
+            #ifdef USE_CUDA
+                Forward_gpu(bottom, top);
+            // OpenCL or CPU
+            #else
+                // CPU Version is already very fast (4ms)
+                Forward_cpu(bottom, top);
+            #endif
+
         }
         catch (const std::exception& e)
         {

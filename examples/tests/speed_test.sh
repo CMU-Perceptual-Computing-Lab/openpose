@@ -1,3 +1,7 @@
+#!/bin/bash
+
+
+
 # Script for internal use. We might completely change it continuously and we will not answer questions about it.
 
 # USAGE EXAMPLE

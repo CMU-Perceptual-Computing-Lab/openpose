@@ -227,7 +227,7 @@ namespace op
                 cpuRenderers.emplace_back(std::make_shared<WHandRenderer<TDatumsPtr>>(handRenderer));
             }
 
-            // Itermediate workers (e.g. OpenPose format to cv::Mat, json & frames recorder, ...)
+            // Itermediate workers (e.g., OpenPose format to cv::Mat, json & frames recorder, ...)
             mPostProcessingWs.clear();
             // Frame buffer and ordering
             if (spWPoses.size() > 1)
@@ -310,7 +310,7 @@ namespace op
     {
         try
         {
-            // Security checks
+            // Sanity checks
             if (spWCvMatToOpInput == nullptr)
                 error("Configure the WrapperHandFromJsonTest class before calling `start()`.",
                       __LINE__, __FUNCTION__, __FILE__);

@@ -1,3 +1,7 @@
+#!/bin/bash
+
+
+
 # Disclaimer:
 # Script for internal use. We might make continuous changess on it and we will not answer questions about it.
 
@@ -11,7 +15,7 @@
         # Read that script for details about all the paths and change them for your own paths.
 
         # Careful:
-        # If you are using the NAS, please do not override my files, i.e. please change the output paths (corresponding to the ones indicated by `--write_json`, which is ).
+        # If you are using the NAS, please do not override my files, i.e., please change the output paths (corresponding to the ones indicated by `--write_json`, which is ).
 
         # In order to generate the JSON output:
         # Uncomment the commented lines starting by `--write_json` and `--display 0`

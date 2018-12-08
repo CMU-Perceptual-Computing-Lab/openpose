@@ -203,6 +203,10 @@ namespace op
         }
     }
 
+    void JointAngleEstimation::~JointAngleEstimation()
+    {
+    }
+
     void JointAngleEstimation::initializationOnThread()
     {
     }
@@ -218,7 +222,7 @@ namespace op
     {
         try
         {
-            // Security checks
+            // Sanity check
             if (!poseKeypoints3D.empty() && poseKeypoints3D.getSize(1) != 19 && poseKeypoints3D.getSize(1) != 25
                  && poseKeypoints3D.getSize(1) != 65)
                 error("Only working for BODY_19 or BODY_25/BODY_25_19 or BODY_65 (#parts = "

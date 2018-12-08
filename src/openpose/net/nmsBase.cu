@@ -112,10 +112,49 @@ namespace op
                     }
                 }
             }
+            // If index 0 --> Assign number of peaks (truncated to the maximum possible number of peaks)
             else
-                output[0] = kernelPtr[globalIdx]; //number of peaks
+                output[0] = (kernelPtr[globalIdx] < maxPeaks ? kernelPtr[globalIdx] : maxPeaks);
         }
     }
+
+    // template <typename T>
+    // __global__ void sortKernel(T* targetPtr, const int channels, const int offsetTarget)
+    // {
+    //     const auto globalIdx = blockIdx.x * blockDim.x + threadIdx.x;
+
+    //     if (globalIdx < channels)
+    //     {
+    //         const auto totalOffset = globalIdx * offsetTarget;
+    //         const int nonZeroElementsPlus1 = targetPtr[totalOffset]+1;
+    //         for (auto i = 1 ; i < nonZeroElementsPlus1 ; i++)
+    //         {
+    //             // Find new maximum
+    //             const auto iIndex = totalOffset+3*i;
+    //             int maxIndex = i;
+    //             T maxIndexValue = targetPtr[iIndex+2];
+    //             for (auto j = i+1 ; j < nonZeroElementsPlus1 ; j++)
+    //             {
+    //                 if (maxIndexValue < targetPtr[totalOffset+3*j+2])
+    //                 {
+    //                     maxIndex = j;
+    //                     maxIndexValue = targetPtr[totalOffset+3*j+2];
+    //                 }
+    //             }
+    //             // Swap
+    //             const auto jIndex = totalOffset+3*maxIndex;
+    //             const T temp [3] = {targetPtr[iIndex],
+    //                                 targetPtr[iIndex+1],
+    //                                 targetPtr[iIndex+2]};
+    //             targetPtr[iIndex] = targetPtr[jIndex];
+    //             targetPtr[iIndex+1] = targetPtr[jIndex+1];
+    //             targetPtr[iIndex+2] = targetPtr[jIndex+2];
+    //             targetPtr[jIndex] = temp[0];
+    //             targetPtr[jIndex+1] = temp[1];
+    //             targetPtr[jIndex+2] = temp[2];
+    //         }
+    //     }
+    // }
 
     template <typename T>
     void nmsGpu(T* targetPtr, int* kernelPtr, const T* const sourcePtr, const T threshold,
@@ -137,14 +176,16 @@ namespace op
                                    getNumberCudaBlocks(height, threadsPerBlock2D.y)};
             const dim3 threadsPerBlock1D{THREADS_PER_BLOCK};
             const dim3 numBlocks1D{getNumberCudaBlocks(imageOffset, threadsPerBlock1D.x)};
-            // log("num_b: " + std::to_string(bottom->shape(0)));       // = 1
-            // log("channel_b: " + std::to_string(bottom->shape(1)));   // = 57 = 18 body parts + bkg + 19x2 PAFs
-            // log("height_b: " + std::to_string(bottom->shape(2)));    // = 368 = height
-            // log("width_b: " + std::to_string(bottom->shape(3)));     // = 656 = width
-            // log("num_t: " + std::to_string(top->shape(0)));       // = 1
-            // log("channel_t: " + std::to_string(top->shape(1)));   // = 18 = numberParts
-            // log("height_t: " + std::to_string(top->shape(2)));    // = 97 = maxPeople + 1
-            // log("width_t: " + std::to_string(top->shape(3)));     // = 3 = [x, y, score]
+            // const dim3 threadsPerBlockSort{128};
+            // const dim3 numBlocksSort{getNumberCudaBlocks(channels, threadsPerBlockSort.x)};
+            // log("num_b: " + std::to_string(sourceSize[0]));       // = 1
+            // log("channel_b: " + std::to_string(sourceSize[1]));   // = 57 = 18 body parts + bkg + 19x2 PAFs
+            // log("height_b: " + std::to_string(sourceSize[2]));    // = 368 = height
+            // log("width_b: " + std::to_string(sourceSize[3]));     // = 656 = width
+            // log("num_t: " + std::to_string(targetSize[0]));       // = 1
+            // log("channel_t: " + std::to_string(targetSize[1]));   // = 18 = numberParts
+            // log("height_t: " + std::to_string(targetSize[2]));    // = 128 = maxPeople + 1
+            // log("width_t: " + std::to_string(targetSize[3]));     // = 3 = [x, y, score]
             // log("");
 
             for (auto n = 0; n < num; n++)
@@ -157,15 +198,19 @@ namespace op
                     const auto* const sourcePtrOffsetted = sourcePtr + offsetChannel * imageOffset;
                     auto* targetPtrOffsetted = targetPtr + offsetChannel * offsetTarget;
 
-                    // This returns kernelPtrOffsetted, a binary array with 0s & 1s. 1s in the local maximum positions (size = size(sourcePtrOffsetted))
-                    nmsRegisterKernel<<<numBlocks2D, threadsPerBlock2D>>>(kernelPtrOffsetted, sourcePtrOffsetted, width, height, threshold); //[0,0,0,0,1,0,0,0,0,1,0,0,0,0]
+                    // This returns kernelPtrOffsetted, a binary array with 0s & 1s. 1s in the local maximum
+                    // positions (size = size(sourcePtrOffsetted))
+                    // Example result: [0,0,0,0,1,0,0,0,0,1,0,0,0,0]
+                    nmsRegisterKernel<<<numBlocks2D, threadsPerBlock2D>>>(
+                        kernelPtrOffsetted, sourcePtrOffsetted, width, height, threshold);
                     // // Debug
                     // if (c==3)
                     // {
                     //     char filename[50];
                     //     sprintf(filename, "work%02d.txt", c);
                     //     std::ofstream fout(filename);
-                    //     int* kernelPtrOffsetted_local = mKernelBlob.mutable_cpu_data() + n * parts_num * imageOffset + c * imageOffset;
+                    //     int* kernelPtrOffsetted_local = mKernelBlob.mutable_cpu_data()
+                    //                                   + n * parts_num * imageOffset + c * imageOffset;
                     //     for (int y = 0; y < height; y++){
                     //         for (int x = 0; x < width; x++)
                     //             fout << kernelPtrOffsetted_local[y*width + x] << "\t";
@@ -175,14 +220,21 @@ namespace op
                     // }
                     auto kernelThrustPtr = thrust::device_pointer_cast(kernelPtrOffsetted);
 
-                    // This modifies kernelPtrOffsetted, now it indicates the local maximum indexes. Format: 0,0,0,1,1,1,1,2,2,2,... First maximum at index 2, second at 6, etc...
-                    thrust::exclusive_scan(kernelThrustPtr, kernelThrustPtr + imageOffset, kernelThrustPtr); //[0,0,0,0,0,1,1,1,1,1,2,2,2,2]
+                    // This modifies kernelPtrOffsetted, now it indicates the local maximum indexes
+                    // Format: 0,0,0,1,1,1,1,2,2,2,... First maximum at index 2, second at 6, etc...
+                    // Example result: [0,0,0,0,0,1,1,1,1,1,2,2,2,2]
+                    thrust::exclusive_scan(kernelThrustPtr, kernelThrustPtr + imageOffset, kernelThrustPtr);
 
                     // This returns targetPtrOffsetted, with the NMS applied over it
                     writeResultKernel<<<numBlocks1D, threadsPerBlock1D>>>(targetPtrOffsetted, imageOffset,
                                                                           kernelPtrOffsetted, sourcePtrOffsetted,
                                                                           width, height, maxPeaks, offset.x, offset.y);
+
                 }
+                // // Sort based on score
+                // // Commented because it doesn't change accuracy
+                // // TODO: If finally used, implement for CPU/CL versions
+                // sortKernel<<<numBlocksSort, threadsPerBlockSort>>>(targetPtr, channels, offsetTarget);
             }
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
         }
@@ -192,10 +244,10 @@ namespace op
         }
     }
 
-    template void nmsGpu(float* targetPtr, int* kernelPtr, const float* const sourcePtr, const float threshold,
-                         const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize,
-                         const Point<float>& offset);
-    template void nmsGpu(double* targetPtr, int* kernelPtr, const double* const sourcePtr, const double threshold,
-                         const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize,
-                         const Point<double>& offset);
+    template void nmsGpu(
+        float* targetPtr, int* kernelPtr, const float* const sourcePtr, const float threshold,
+        const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize, const Point<float>& offset);
+    template void nmsGpu(
+        double* targetPtr, int* kernelPtr, const double* const sourcePtr, const double threshold,
+        const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize, const Point<double>& offset);
 }

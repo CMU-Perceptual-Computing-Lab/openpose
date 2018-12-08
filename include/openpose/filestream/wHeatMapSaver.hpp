@@ -13,6 +13,8 @@ namespace op
     public:
         explicit WHeatMapSaver(const std::shared_ptr<HeatMapSaver>& heatMapSaver);
 
+        virtual ~WHeatMapSaver();
+
         void initializationOnThread();
 
         void workConsumer(const TDatums& tDatums);
@@ -35,6 +37,11 @@ namespace op
     template<typename TDatums>
     WHeatMapSaver<TDatums>::WHeatMapSaver(const std::shared_ptr<HeatMapSaver>& heatMapSaver) :
         spHeatMapSaver{heatMapSaver}
+    {
+    }
+
+    template<typename TDatums>
+    WHeatMapSaver<TDatums>::~WHeatMapSaver()
     {
     }
 

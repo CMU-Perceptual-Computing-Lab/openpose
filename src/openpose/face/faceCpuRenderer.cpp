@@ -9,6 +9,10 @@ namespace op
     {
     }
 
+    FaceCpuRenderer::~FaceCpuRenderer()
+    {
+    }
+
     void FaceCpuRenderer::renderFaceInherited(Array<float>& outputData, const Array<float>& faceKeypoints)
     {
         try

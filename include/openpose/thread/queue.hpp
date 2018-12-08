@@ -13,6 +13,8 @@ namespace op
     public:
         explicit Queue(const long long maxSize);
 
+        virtual ~Queue();
+
         TDatums front() const;
 
     private:
@@ -38,6 +40,11 @@ namespace op
         typedef typename TQueue::value_type underlyingValueType;
         static_assert(std::is_same<TDatums, underlyingValueType>::value,
                       "Error: The type of the queue must be the same as the type of the container");
+    }
+
+    template<typename TDatums, typename TQueue>
+    Queue<TDatums, TQueue>::~Queue()
+    {
     }
 
     template<typename TDatums, typename TQueue>

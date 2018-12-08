@@ -7,7 +7,8 @@
 namespace op
 {
     template <typename T>
-    __global__ void fillTargetPtrPart(T* targetPtrOffsetted, const T* sourcePtrOffsetted, const int sourceIndex, const int x, const int y)
+    __global__ void fillTargetPtrPart(T* targetPtrOffsetted, const T* sourcePtrOffsetted, const int sourceIndex,
+                                      const int x, const int y)
     {
         targetPtrOffsetted[0] = x;
         targetPtrOffsetted[1] = y;
@@ -15,11 +16,13 @@ namespace op
     }
 
     // template <typename T>
-    // __global__ void fillTargetPtrChannel(T* targetPtrOffsetted, const T* sourcePtrOffsetted, const int width, const int imageOffset)
+    // __global__ void fillTargetPtrChannel(T* targetPtrOffsetted, const T* sourcePtrOffsetted, const int width,
+    //                                      const int imageOffset)
     // {
     //     const auto sourceThrustPtr = thrust::device_pointer_cast(sourcePtrOffsetted);
     //     // Ideal option (not working for CUDA < 8)
-    //     // const auto sourceIndexIterator = thrust::max_element(thrust::device, sourceThrustPtr, sourceThrustPtr + imageOffset);
+    //     // const auto sourceIndexIterator = thrust::max_element(
+    //     //     thrust::device, sourceThrustPtr, sourceThrustPtr + imageOffset);
     //     // Workaround to make it work for CUDA 7.5
     //     const auto sourceIndexIterator = thrust::max_element(sourceThrustPtr, sourceThrustPtr + imageOffset);
     //     const auto sourceIndex = (int)(sourceIndexIterator - sourceThrustPtr);
@@ -29,7 +32,8 @@ namespace op
     // }
 
     // template <typename T>
-    // __global__ void fillTargetPtr(T* targetPtr, const T* sourcePtr, const int width, const int imageOffset, const int numberSubparts, const int offsetChannel)
+    // __global__ void fillTargetPtr(T* targetPtr, const T* sourcePtr, const int width, const int imageOffset,
+    //                               const int numberSubparts, const int offsetChannel)
     // {
     //     // get pixel location (x,y)
     //     const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
@@ -41,9 +45,11 @@ namespace op
     //         auto* targetPtrOffsetted = targetPtr + (offsetChannel + part) * numberSubparts;
     //         const auto* const sourcePtrOffsetted = sourcePtr + (offsetChannel + part) * imageOffset;
     //         auto sourceThrustPtr = thrust::device_pointer_cast(sourcePtrOffsetted);
-    //         const auto sourceIndexIterator = thrust::max_element(thrust::device, sourceThrustPtr, sourceThrustPtr + imageOffset);
+    //         const auto sourceIndexIterator = thrust::max_element(thrust::device, sourceThrustPtr,
+    //                                                              sourceThrustPtr + imageOffset);
     //         // Ideal option (not working for CUDA < 8)
-    //         // const auto sourceIndexIterator = thrust::max_element(thrust::device, sourceThrustPtr, sourceThrustPtr + imageOffset);
+    //         // const auto sourceIndexIterator = thrust::max_element(
+    //         //     thrust::device, sourceThrustPtr, sourceThrustPtr + imageOffset);
     //         // Workaround to make it work for CUDA 7.5
     //         const auto sourceIndexIterator = thrust::max_element(sourceThrustPtr, sourceThrustPtr + imageOffset);
     //         const auto sourceIndex = (int)(sourceIndexIterator - sourceThrustPtr);
@@ -54,7 +60,8 @@ namespace op
     // }
 
     template <typename T>
-    void maximumGpu(T* targetPtr, const T* const sourcePtr, const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize)
+    void maximumGpu(T* targetPtr, const T* const sourcePtr, const std::array<int, 4>& targetSize,
+                    const std::array<int, 4>& sourceSize)
     {
         try
         {
@@ -67,7 +74,7 @@ namespace op
             const auto numberSubparts = targetSize[3];
 
             // log("sourceSize[0]: " + std::to_string(sourceSize[0]));  // = 1
-            // log("sourceSize[1]: " + std::to_string(sourceSize[1]));  // = #body parts + bck = 22 (hands) or 71 (face) 
+            // log("sourceSize[1]: " + std::to_string(sourceSize[1]));  // = #BodyParts + bkg = 22 (hands) or 71 (face)
             // log("sourceSize[2]: " + std::to_string(sourceSize[2]));  // = 368 = height
             // log("sourceSize[3]: " + std::to_string(sourceSize[3]));  // = 368 = width
             // log("targetSize[0]: " + std::to_string(targetSize[0]));  // = 1
@@ -88,16 +95,20 @@ namespace op
                         // Option a - 6.3 fps
                         const auto sourceThrustPtr = thrust::device_pointer_cast(sourcePtrOffsetted);
                         // Ideal option (not working for CUDA < 8)
-                        // const auto sourceIndexIterator = thrust::max_element(thrust::device, sourceThrustPtr, sourceThrustPtr + imageOffset);
+                        // const auto sourceIndexIterator = thrust::max_element(
+                        //     thrust::device, sourceThrustPtr, sourceThrustPtr + imageOffset);
                         // Workaround to make it work for CUDA 7.5
-                        const auto sourceIndexIterator = thrust::max_element(sourceThrustPtr, sourceThrustPtr + imageOffset);
+                        const auto sourceIndexIterator = thrust::max_element(
+                            sourceThrustPtr, sourceThrustPtr + imageOffset);
                         const auto sourceIndex = (int)(sourceIndexIterator - sourceThrustPtr);
-                        fillTargetPtrPart<<<1, 1>>>(targetPtrOffsetted, sourcePtrOffsetted, sourceIndex, sourceIndex % width, sourceIndex / width);
+                        fillTargetPtrPart<<<1, 1>>>(targetPtrOffsetted, sourcePtrOffsetted, sourceIndex,
+                                                    sourceIndex % width, sourceIndex / width);
                         // // Option b - <1 fps
                         // fillTargetPtrChannel<<<1, 1>>>(targetPtrOffsetted, sourcePtrOffsetted, width, imageOffset);
                     }
                     // Option c - 4.9 fps
-                    // fillTargetPtr<<<1, numberParts>>>(targetPtr, sourcePtr, width, imageOffset, numberSubparts, offsetChannel);
+                    // fillTargetPtr<<<1, numberParts>>>(targetPtr, sourcePtr, width, imageOffset, numberSubparts,
+                    //                                   offsetChannel);
                 }
             }
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
@@ -108,6 +119,10 @@ namespace op
         }
     }
 
-    template void maximumGpu(float* targetPtr, const float* const sourcePtr, const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize);
-    template void maximumGpu(double* targetPtr, const double* const sourcePtr, const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize);
+    template void maximumGpu(
+        float* targetPtr, const float* const sourcePtr, const std::array<int, 4>& targetSize,
+        const std::array<int, 4>& sourceSize);
+    template void maximumGpu(
+        double* targetPtr, const double* const sourcePtr, const std::array<int, 4>& targetSize,
+        const std::array<int, 4>& sourceSize);
 }

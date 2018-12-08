@@ -14,6 +14,8 @@ namespace op
     public:
         explicit WIdGenerator();
 
+        virtual ~WIdGenerator();
+
         void initializationOnThread();
 
         void work(TDatums& tDatums);
@@ -36,6 +38,11 @@ namespace op
     template<typename TDatums>
     WIdGenerator<TDatums>::WIdGenerator() :
         mGlobalCounter{0ull}
+    {
+    }
+
+    template<typename TDatums>
+    WIdGenerator<TDatums>::~WIdGenerator()
     {
     }
 

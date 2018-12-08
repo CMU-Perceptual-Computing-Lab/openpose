@@ -1,4 +1,4 @@
-set(EXAMPLE_FILES 
+set(EXAMPLE_FILES
     calibration.cpp)
 
 foreach(EXAMPLE_FILE ${EXAMPLE_FILES})

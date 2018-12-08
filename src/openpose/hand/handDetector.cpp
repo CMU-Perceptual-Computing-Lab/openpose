@@ -130,6 +130,10 @@ namespace op
     {
     }
 
+    HandDetector::~HandDetector()
+    {
+    }
+
     std::vector<std::array<Rectangle<float>, 2>> HandDetector::detectHands(const Array<float>& poseKeypoints) const
     {
         try

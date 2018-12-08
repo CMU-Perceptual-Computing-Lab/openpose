@@ -176,7 +176,7 @@ namespace op
             #ifdef USE_CAFFE
                 if (mEnabled && !faceRectangles.empty())
                 {
-                    // Security checks
+                    // Sanity check
                     if (cvInputData.empty())
                         error("Empty cvInputData.", __LINE__, __FUNCTION__, __FILE__);
 
@@ -251,30 +251,12 @@ namespace op
                             }
 
                             // 2. Resize heat maps + merge different scales
-                            #ifdef USE_CUDA
-                                upImpl->spResizeAndMergeCaffe->Forward_gpu({upImpl->spCaffeNetOutputBlob.get()},
-                                                                           {upImpl->spHeatMapsBlob.get()});
-                                cudaCheck(__LINE__, __FUNCTION__, __FILE__);
-                            #elif USE_OPENCL
-                                upImpl->spResizeAndMergeCaffe->Forward_ocl({upImpl->spCaffeNetOutputBlob.get()},
-                                                                           {upImpl->spHeatMapsBlob.get()});
-                            #else
-                                upImpl->spResizeAndMergeCaffe->Forward_cpu({upImpl->spCaffeNetOutputBlob.get()},
-                                                                           {upImpl->spHeatMapsBlob.get()});
-                            #endif
+                            upImpl->spResizeAndMergeCaffe->Forward(
+                                {upImpl->spCaffeNetOutputBlob.get()}, {upImpl->spHeatMapsBlob.get()});
 
                             // 3. Get peaks by Non-Maximum Suppression
-                            #ifdef USE_CUDA
-                                upImpl->spMaximumCaffe->Forward_gpu({upImpl->spHeatMapsBlob.get()},
-                                                                    {upImpl->spPeaksBlob.get()});
-                                cudaCheck(__LINE__, __FUNCTION__, __FILE__);
-                            #elif USE_OPENCL
-                                // CPU Version is already very fast (4ms) and data is sent to connectKeypoints as CPU for now anyway
-                                upImpl->spMaximumCaffe->Forward_cpu({upImpl->spHeatMapsBlob.get()}, {upImpl->spPeaksBlob.get()});
-                            #else
-                                upImpl->spMaximumCaffe->Forward_cpu({upImpl->spHeatMapsBlob.get()},
-                                                                    {upImpl->spPeaksBlob.get()});
-                            #endif
+                            upImpl->spMaximumCaffe->Forward(
+                                {upImpl->spHeatMapsBlob.get()}, {upImpl->spPeaksBlob.get()});
 
                             const auto* facePeaksPtr = upImpl->spPeaksBlob->mutable_cpu_data();
                             for (auto part = 0 ; part < mFaceKeypoints.getSize(1) ; part++)
@@ -294,14 +276,16 @@ namespace op
                                 mFaceKeypoints[baseIndex+2] = score;
                             }
                             // HeatMaps: storing
-                            if (!mHeatMapTypes.empty()){
-                                #ifdef USE_CUDA
-                                    updateFaceHeatMapsForPerson(mHeatMaps, person, mHeatMapScaleMode,
-                                                                upImpl->spHeatMapsBlob->gpu_data());
-                                #else
-                                    updateFaceHeatMapsForPerson(mHeatMaps, person, mHeatMapScaleMode,
-                                                                upImpl->spHeatMapsBlob->cpu_data());
-                                #endif
+                            if (!mHeatMapTypes.empty())
+                            {
+                                updateFaceHeatMapsForPerson(
+                                    mHeatMaps, person, mHeatMapScaleMode,
+                                    #ifdef USE_CUDA
+                                        upImpl->spHeatMapsBlob->gpu_data()
+                                    #else
+                                        upImpl->spHeatMapsBlob->cpu_data()
+                                    #endif
+                                );
                             }
                         }
                     }
@@ -310,6 +294,11 @@ namespace op
                 }
                 else
                     mFaceKeypoints.reset();
+
+                // 5. CUDA sanity check
+                #ifdef USE_CUDA
+                    cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+                #endif
             #else
                 UNUSED(faceRectangles);
                 UNUSED(cvInputData);

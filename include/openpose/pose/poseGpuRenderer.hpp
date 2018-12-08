@@ -19,7 +19,7 @@ namespace op
                         const float alphaHeatMap = POSE_DEFAULT_ALPHA_HEAT_MAP,
                         const unsigned int elementToRender = 0u);
 
-        ~PoseGpuRenderer();
+        virtual ~PoseGpuRenderer();
 
         void initializationOnThread();
 

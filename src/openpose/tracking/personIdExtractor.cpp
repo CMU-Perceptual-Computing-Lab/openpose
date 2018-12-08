@@ -1,4 +1,3 @@
-#include <thread>
 #include <openpose/tracking/pyramidalLK.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/tracking/personIdExtractor.hpp>
@@ -116,7 +115,7 @@ namespace op
         {
             for (auto p = 0; p < poseKeypoints.getSize(0); p++)
             {
-                const int currentPerson = mNextPersonId++;
+                const auto currentPerson = int(mNextPersonId++);
 
                 // Create person entry in the tracking map
                 auto& personEntry = personEntries[currentPerson];
@@ -190,7 +189,7 @@ namespace op
                         auto distance = 0.f;
                         auto total_distance = 0.0f;
 
-                        // Security checks
+                        // Sanity checks
                         if (element.status.size() != numberKeypoints)
                             error("element.status.size() != numberKeypoints ||", __LINE__, __FUNCTION__, __FILE__);
                         if (openposePersonEntry.status.size() != numberKeypoints)
@@ -259,7 +258,7 @@ namespace op
                 if (poseIds[i] == -1)
                     poseIds[i] = nextPersonId++;
                 const auto& openposePersonEntry = openposePersonEntries.at(i);
-                personEntries[poseIds[i]] = openposePersonEntry;
+                personEntries[(int)poseIds[i]] = openposePersonEntry;
             }
 
             return poseIds;
@@ -304,7 +303,7 @@ namespace op
     //                     auto inliers = 0;
     //                     auto active = 0;
 
-    //                     // Security checks
+    //                     // Sanity checks
     //                     if (element.status.size() != numberKeypoints)
     //                         error("element.status.size() != numberKeypoints ||", __LINE__, __FUNCTION__, __FILE__);
     //                     if (openposePersonEntry.status.size() != numberKeypoints)
@@ -391,7 +390,7 @@ namespace op
     {
         try
         {
-            // Security check
+            // Sanity check
             if (imageViewIndex > 0)
                 error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
 
@@ -442,7 +441,7 @@ namespace op
     {
         try
         {
-            // Security check
+            // Sanity check
             if (imageViewIndex > 0)
                 error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
             // Wait for desired order

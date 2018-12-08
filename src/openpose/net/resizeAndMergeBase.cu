@@ -65,7 +65,7 @@ namespace op
     {
         try
         {
-            // Security checks
+            // Sanity checks
             if (sourceSizes.empty())
                 error("sourceSizes cannot be empty.", __LINE__, __FUNCTION__, __FILE__);
             if (sourcePtrs.size() != sourceSizes.size() || sourceSizes.size() != scaleInputToNetInputs.size())
@@ -113,7 +113,7 @@ namespace op
             else
             {
                 const auto targetChannelOffset = targetWidth * targetHeight;
-                cudaMemset(targetPtr, 0.f, channels*targetChannelOffset * sizeof(T));
+                cudaMemset(targetPtr, 0, channels*targetChannelOffset * sizeof(T));
                 const auto scaleToMainScaleWidth = targetWidth / T(sourceWidth);
                 const auto scaleToMainScaleHeight = targetHeight / T(sourceHeight);
 
@@ -146,7 +146,7 @@ namespace op
                             resizeKernelAndAverage<<<numBlocks, threadsPerBlock>>>(
                                 targetPtr + c * targetChannelOffset, sourcePtrs[i] + c * sourceChannelOffset,
                                 scaleWidth, scaleHeight, currentWidth, currentHeight, targetWidth,
-                                targetHeight, sourceSizes.size()
+                                targetHeight, (int)sourceSizes.size()
                             );
                         }
                     }
@@ -161,12 +161,10 @@ namespace op
         }
     }
 
-    template void resizeAndMergeGpu(float* targetPtr, const std::vector<const float*>& sourcePtrs,
-                                    const std::array<int, 4>& targetSize,
-                                    const std::vector<std::array<int, 4>>& sourceSizes,
-                                    const std::vector<float>& scaleInputToNetInputs);
-    template void resizeAndMergeGpu(double* targetPtr, const std::vector<const double*>& sourcePtrs,
-                                    const std::array<int, 4>& targetSize,
-                                    const std::vector<std::array<int, 4>>& sourceSizes,
-                                    const std::vector<double>& scaleInputToNetInputs);
+    template void resizeAndMergeGpu(
+        float* targetPtr, const std::vector<const float*>& sourcePtrs, const std::array<int, 4>& targetSize,
+        const std::vector<std::array<int, 4>>& sourceSizes, const std::vector<float>& scaleInputToNetInputs);
+    template void resizeAndMergeGpu(
+        double* targetPtr, const std::vector<const double*>& sourcePtrs, const std::array<int, 4>& targetSize,
+        const std::vector<std::array<int, 4>>& sourceSizes, const std::vector<double>& scaleInputToNetInputs);
 }

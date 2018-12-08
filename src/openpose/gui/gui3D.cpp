@@ -498,10 +498,10 @@ namespace op
                         gKeypoints3D.rightHandKeypoints = rightHandKeypoints3D;
                         gKeypoints3D.validKeypoints = true;
                         // From m to mm
-                        scaleKeypoints(gKeypoints3D.poseKeypoints, 1e3);
-                        scaleKeypoints(gKeypoints3D.faceKeypoints, 1e3);
-                        scaleKeypoints(gKeypoints3D.leftHandKeypoints, 1e3);
-                        scaleKeypoints(gKeypoints3D.rightHandKeypoints, 1e3);
+                        scaleKeypoints(gKeypoints3D.poseKeypoints, 1e3f);
+                        scaleKeypoints(gKeypoints3D.faceKeypoints, 1e3f);
+                        scaleKeypoints(gKeypoints3D.leftHandKeypoints, 1e3f);
+                        scaleKeypoints(gKeypoints3D.rightHandKeypoints, 1e3f);
                         // Unlock mutex
                         lock.unlock();
                     }

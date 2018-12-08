@@ -19,22 +19,24 @@ namespace op
          * part of the window.
          * @param initialWindowedSize const Point<int> with the initial window output resolution (width and height).
          * @param fullScreen bool from which the FrameDisplayer::FullScreenMode property mFullScreenMode will be set,
-         * i.e. specifying the type of initial display (it can be changed later).
+         * i.e., specifying the type of initial display (it can be changed later).
          */
         FrameDisplayer(const std::string& windowedName = OPEN_POSE_NAME_AND_VERSION,
                        const Point<int>& initialWindowedSize = Point<int>{}, const bool fullScreen = false);
+
+        virtual ~FrameDisplayer();
 
         // Due to OpenCV visualization issues (all visualization functions must be in the same thread)
         void initializationOnThread();
 
         /**
-         * This function set the new FrameDisplayer::FullScreenMode (e.g. full screen).
+         * This function set the new FrameDisplayer::FullScreenMode (e.g., full screen).
          * @param fullScreenMode New FrameDisplayer::FullScreenMode state.
          */
         void setFullScreenMode(const FullScreenMode fullScreenMode);
 
         /**
-         * This function switch between full screen and windowed modes (e.g. when double-click on video players or
+         * This function switch between full screen and windowed modes (e.g., when double-click on video players or
          * Ctrt+Enter are presed).
          */
         void switchFullScreenMode();

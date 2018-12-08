@@ -1,3 +1,5 @@
+#!/bin/bash
+
 ubuntu_version="$(lsb_release -r)"
 sudo apt-get update && sudo apt-get install wget -y --no-install-recommends
 if [[ $ubuntu_version == *"14."* ]]; then

@@ -16,6 +16,66 @@
 
 namespace op
 {
+    /**
+     * Private auxiliar function that sets the cv::Mat wrapper and makes it point to the same data than
+     * std::shared_ptr points to.
+     */
+    template<typename T>
+    void setCvMatFromPtr(std::pair<bool, cv::Mat>& cvMatData, T* const dataPtr, const std::vector<int>& sizes)
+    {
+        try
+        {
+            cvMatData.first = true;
+            cvMatData.second = cv::Mat();
+            // BGR image
+            if (sizes.size() == 3 && sizes[2] == 3)
+            {
+                // Prepare cv::Mat
+                auto cvFormat = CV_32FC3;
+                if (typeid(T) == typeid(float))
+                    cvFormat = CV_32FC3;
+                else if (typeid(T) == typeid(double))
+                    cvFormat = CV_64FC3;
+                else if (typeid(T) == typeid(unsigned char))
+                    cvFormat = CV_8UC3;
+                else if (typeid(T) == typeid(signed char))
+                    cvFormat = CV_8SC3;
+                else if (typeid(T) == typeid(int))
+                    cvFormat = CV_32SC3;
+                else
+                    cvMatData.first = false;
+
+                if (cvMatData.first)
+                    cvMatData.second = cv::Mat(sizes[0], sizes[1], cvFormat, dataPtr);
+            }
+            // Any other type
+            else
+            {
+                // Prepare cv::Mat
+                auto cvFormat = CV_32FC1;
+                if (typeid(T) == typeid(float))
+                    cvFormat = CV_32FC1;
+                else if (typeid(T) == typeid(double))
+                    cvFormat = CV_64FC1;
+                else if (typeid(T) == typeid(unsigned char))
+                    cvFormat = CV_8UC1;
+                else if (typeid(T) == typeid(signed char))
+                    cvFormat = CV_8SC1;
+                else if (typeid(T) == typeid(int))
+                    cvFormat = CV_32SC1;
+                else
+                    cvMatData.first = false;
+
+                if (cvMatData.first)
+                    cvMatData.second = cv::Mat((int)sizes.size(), sizes.data(), cvFormat, dataPtr);
+            }
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
     template<typename T>
     Array<T>::Array(const int size)
     {
@@ -69,10 +129,74 @@ namespace op
     }
 
     template<typename T>
+    Array<T>::Array(const int size, T* const dataPtr)
+    {
+        try
+        {
+            if (size > 0)
+                resetAuxiliary(std::vector<int>{size}, dataPtr);
+            else
+                error("Size cannot be less than 1.", __LINE__, __FUNCTION__, __FILE__);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    template<typename T>
+    Array<T>::Array(const std::vector<int>& sizes, T* const dataPtr)
+    {
+        try
+        {
+            if (!sizes.empty())
+                resetAuxiliary(sizes, dataPtr);
+            else
+                error("Size cannot be empty or less than 1.", __LINE__, __FUNCTION__, __FILE__);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    template<typename T>
+    Array<T>::Array(const Array<T>& array, const int index, const bool noCopy)
+    {
+        try
+        {
+            // Sanity check
+            if (array.getSize(0) <= index)
+                error("Index out of range.", __LINE__, __FUNCTION__, __FILE__);
+            // Define new size
+            auto sizes = array.getSize();
+            sizes[0] = 1;
+            // Move --> Temporary Array<T> as long as `array` is in scope
+            if (noCopy)
+                resetAuxiliary(sizes, array.getPseudoConstPtr() + index*array.getVolume(1));
+            // Copy --> Slower but it will always stay in scope
+            else
+            {
+                // Allocate memory
+                reset(sizes);
+                // Copy desired index
+                const auto arrayArea = array.getVolume(1);
+                const auto keypointsIndex = index*arrayArea;
+                std::copy(&array[keypointsIndex], &array[keypointsIndex]+arrayArea, pData);
+            }
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    template<typename T>
     Array<T>::Array(const Array<T>& array) :
         mSize{array.mSize},
         mVolume{array.mVolume},
         spData{array.spData},
+        pData{array.pData},
         mCvMatData{array.mCvMatData}
     {
     }
@@ -85,6 +209,7 @@ namespace op
             mSize = array.mSize;
             mVolume = array.mVolume;
             spData = array.spData;
+            pData = array.pData;
             mCvMatData = array.mCvMatData;
             // Return
             return *this;
@@ -104,6 +229,7 @@ namespace op
         try
         {
             std::swap(spData, array.spData);
+            std::swap(pData, array.pData);
             std::swap(mCvMatData, array.mCvMatData);
         }
         catch (const std::exception& e)
@@ -120,6 +246,7 @@ namespace op
             mSize = array.mSize;
             mVolume = array.mVolume;
             std::swap(spData, array.spData);
+            std::swap(pData, array.pData);
             std::swap(mCvMatData, array.mCvMatData);
             // Return
             return *this;
@@ -139,7 +266,8 @@ namespace op
             // Constructor
             Array<T> array{mSize};
             // Clone data
-            std::copy(spData.get(), spData.get() + mVolume, array.spData.get());
+            // Equivalent: std::copy(spData.get(), spData.get() + mVolume, array.spData.get());
+            std::copy(pData, pData + mVolume, array.pData);
             // Return
             return std::move(array);
         }
@@ -171,23 +299,7 @@ namespace op
     {
         try
         {
-            if (!sizes.empty())
-            {
-                // New size & volume
-                mSize = sizes;
-                mVolume = {std::accumulate(sizes.begin(), sizes.end(), 1ul, std::multiplies<size_t>())};
-                // Prepare shared_ptr
-                spData.reset(new T[mVolume], std::default_delete<T[]>());
-                setCvMatFromSharedPtr();
-            }
-            else
-            {
-                mSize = {};
-                mVolume = 0ul;
-                spData.reset();
-                // cv::Mat available but empty
-                mCvMatData = std::make_pair(true, cv::Mat());
-            }
+            resetAuxiliary(sizes);
         }
         catch (const std::exception& e)
         {
@@ -299,23 +411,49 @@ namespace op
     }
 
     template<typename T>
+    std::string Array<T>::printSize() const
+    {
+        try
+        {
+            auto counter = 0u;
+            std::string sizeString = "[ ";
+            for (const auto& i : mSize)
+            {
+                sizeString += std::to_string(i);
+                if (++counter < mSize.size())
+                    sizeString += " x ";
+            }
+            sizeString += " ]";
+            return sizeString;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return "";
+        }
+    }
+
+    template<typename T>
     size_t Array<T>::getVolume(const int indexA, const int indexB) const
     {
         try
         {
-            if (indexA < indexB)
+            const auto indexBFinal = (indexB != -1 ? indexB : (int)mSize.size()-1);
+            if (indexA < indexBFinal)
             {
-                if (0 <= indexA && (unsigned int)indexB < mSize.size()) // 0 <= indexA < indexB < mSize.size()
-                    return std::accumulate(mSize.begin()+indexA, mSize.begin()+indexB+1, 1ul, std::multiplies<size_t>());
+                // 0 <= indexA < indexBFinal < mSize.size()
+                if (0 <= indexA && (unsigned int)indexBFinal < mSize.size())
+                    return std::accumulate(
+                        mSize.begin()+indexA, mSize.begin()+indexBFinal+1, 1ull, std::multiplies<size_t>());
                 else
                 {
                     error("Indexes out of dimension.", __LINE__, __FUNCTION__, __FILE__);
                     return 0;
                 }
             }
-            else if (indexA == indexB)
+            else if (indexA == indexBFinal)
                 return mSize.at(indexA);
-            else // if (indexA > indexB)
+            else // if (indexA > indexBFinal)
             {
                 error("indexA > indexB.", __LINE__, __FUNCTION__, __FILE__);
                 return 0;
@@ -325,6 +463,41 @@ namespace op
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             return 0;
+        }
+    }
+
+    template<typename T>
+    std::vector<int> Array<T>::getStride() const
+    {
+        try
+        {
+            std::vector<int> strides(mSize.size());
+            if (!strides.empty())
+            {
+                strides.back() = sizeof(T);
+                for (auto i = (int)strides.size()-2 ; i > -1 ; i--)
+                    strides[i] = strides[i+1] * mSize[i+1];
+            }
+            return strides;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return {};
+        }
+    }
+
+    template<typename T>
+    int Array<T>::getStride(const int index) const
+    {
+        try
+        {
+            return getStride()[index];
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return -1;
         }
     }
 
@@ -370,11 +543,10 @@ namespace op
             // Initial value
             std::string string{"Array<T>::toString():\n"};
             // Add each element
-            const auto* dataPtr = spData.get();
             for (auto i = 0u ; i < mVolume ; i++)
             {
                 // Adding element separated by a space
-                string += std::to_string(dataPtr[i]) + " ";
+                string += std::to_string(pData[i]) + " ";
                 // Introduce an enter for each dimension change
                 // If comented, all values will be printed in the same line
                 auto multiplier = 1;
@@ -387,29 +559,6 @@ namespace op
             }
             // Return string
             return string;
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return "";
-        }
-    }
-
-    template<typename T>
-    std::string Array<T>::printSize() const
-    {
-        try
-        {
-            auto counter = 0u;
-            std::string sizeString = "[ ";
-            for (const auto& i : mSize)
-            {
-                sizeString += std::to_string(i);
-                if (++counter < mSize.size())
-                    sizeString += " x ";
-            }
-            sizeString += " ]";
-            return sizeString;
         }
         catch (const std::exception& e)
         {
@@ -461,68 +610,51 @@ namespace op
         try
         {
             if (0 <= index && (size_t)index < mVolume)
-                return spData.get()[index];
+                return pData[index]; // spData.get()[index]
             else
             {
                 error("Index out of bounds: 0 <= index && index < mVolume", __LINE__, __FUNCTION__, __FILE__);
-                return spData.get()[0];
+                return pData[0]; // spData.get()[0]
             }
         }
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return spData.get()[0];
+            return pData[0]; // spData.get()[0]
         }
     }
 
     template<typename T>
-    void Array<T>::setCvMatFromSharedPtr()
+    void Array<T>::resetAuxiliary(const std::vector<int>& sizes, T* const dataPtr)
     {
         try
         {
-            mCvMatData.first = true;
-            mCvMatData.second = cv::Mat();
-            // BGR image
-            if (mSize.size() == 3 && mSize[2] == 3)
+            if (!sizes.empty())
             {
-                // Prepare cv::Mat
-                auto cvFormat = CV_32FC3;
-                if (typeid(T) == typeid(float))
-                    cvFormat = CV_32FC3;
-                else if (typeid(T) == typeid(double))
-                    cvFormat = CV_64FC3;
-                else if (typeid(T) == typeid(unsigned char))
-                    cvFormat = CV_8UC3;
-                else if (typeid(T) == typeid(signed char))
-                    cvFormat = CV_8SC3;
-                else if (typeid(T) == typeid(int))
-                    cvFormat = CV_32SC3;
+                // New size & volume
+                mSize = sizes;
+                mVolume = {std::accumulate(sizes.begin(), sizes.end(), 1ull, std::multiplies<size_t>())};
+                // Prepare shared_ptr
+                if (dataPtr == nullptr)
+                {
+                    spData.reset(new T[mVolume], std::default_delete<T[]>());
+                    pData = spData.get();
+                }
                 else
-                    mCvMatData.first = false;
-
-                if (mCvMatData.first)
-                    mCvMatData.second = cv::Mat(mSize[0], mSize[1], cvFormat, spData.get());
+                {
+                    spData.reset();
+                    pData = dataPtr;
+                }
+                setCvMatFromPtr(mCvMatData, pData, mSize); // spData.get()
             }
-            // Any other type
             else
             {
-                // Prepare cv::Mat
-                auto cvFormat = CV_32FC1;
-                if (typeid(T) == typeid(float))
-                    cvFormat = CV_32FC1;
-                else if (typeid(T) == typeid(double))
-                    cvFormat = CV_64FC1;
-                else if (typeid(T) == typeid(unsigned char))
-                    cvFormat = CV_8UC1;
-                else if (typeid(T) == typeid(signed char))
-                    cvFormat = CV_8SC1;
-                else if (typeid(T) == typeid(int))
-                    cvFormat = CV_32SC1;
-                else
-                    mCvMatData.first = false;
-
-                if (mCvMatData.first)
-                    mCvMatData.second = cv::Mat((int)mSize.size(), mSize.data(), cvFormat, spData.get());
+                mSize = {};
+                mVolume = 0ul;
+                spData.reset();
+                pData = nullptr;
+                // cv::Mat available but empty
+                mCvMatData = std::make_pair(true, cv::Mat());
             }
         }
         catch (const std::exception& e)

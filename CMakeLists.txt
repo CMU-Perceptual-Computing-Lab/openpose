@@ -1,6 +1,6 @@
 ### VERSION INFO
 set(OpenPose_VERSION_MAJOR 1)
-set(OpenPose_VERSION_MINOR 3)
+set(OpenPose_VERSION_MINOR 4)
 set(OpenPose_VERSION_PATCH 0)
 set(OpenPose_VERSION ${OpenPose_VERSION_MAJOR}.${OpenPose_VERSION_MINOR}.${OpenPose_VERSION_PATCH})
 
@@ -26,10 +26,28 @@ if (NOT WIN32 AND NOT UNIX AND NOT APPLE)
 endif (NOT WIN32 AND NOT UNIX AND NOT APPLE)
 
 
-### BUILD_TYPE
+### CMAKE_BUILD_TYPE
 # Default: Release
-set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
-set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+# Bug fixed: By default, it uses something different to Release, that provokes OpenPose to be about 15% slower than
+# it should be.
+# Is CMAKE_BUILD_TYPE "Debug" or "MinSizeRel" or "RelWithDebInfo"?
+set(CMAKE_BUILD_TYPE_KNOWN FALSE)
+if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
+  set(CMAKE_BUILD_TYPE_KNOWN TRUE)
+endif (${CMAKE_BUILD_TYPE} MATCHES "Debug")
+if (${CMAKE_BUILD_TYPE} MATCHES "MinSizeRel")
+  set(CMAKE_BUILD_TYPE_KNOWN TRUE)
+endif (${CMAKE_BUILD_TYPE} MATCHES "MinSizeRel")
+if (${CMAKE_BUILD_TYPE} MATCHES "RelWithDebInfo")
+  set(CMAKE_BUILD_TYPE_KNOWN TRUE)
+endif (${CMAKE_BUILD_TYPE} MATCHES "RelWithDebInfo")
+# Assign proper CMAKE_BUILD_TYPE
+if (${CMAKE_BUILD_TYPE_KNOWN})
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build.")
+else (${CMAKE_BUILD_TYPE_KNOWN})
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
+endif (${CMAKE_BUILD_TYPE_KNOWN})
+set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Release" "Debug" "MinSizeRel" "RelWithDebInfo")
 
 
 ### FLAGS
@@ -252,7 +270,10 @@ option(BUILD_DOCS "Build OpenPose documentation." OFF)
 option(BUILD_PYTHON "Build OpenPose python." OFF)
 if (WIN32)
   option(BUILD_BIN_FOLDER "Copy all required 3rd-party DLL files into {build_directory}/bin. Disable to save some memory." ON)
-endif ()
+endif (WIN32)
+
+# Unity
+# option(BUILD_UNITY_SUPPORT "Build OpenPose as a Unity plugin." OFF)
 
 # Build as shared library
 option(BUILD_SHARED_LIBS "Build as shared lib." ON)
@@ -310,6 +331,12 @@ if (WITH_TRACKING)
   add_definitions(-DUSE_TRACKING)
 endif (WITH_TRACKING)
 
+# Unity
+if (BUILD_UNITY_SUPPORT)
+  # OpenPose flags
+  add_definitions(-DUSE_UNITY_SUPPORT)
+endif (BUILD_UNITY_SUPPORT)
+
 # Calibration
 # No Eigen
 if (${WITH_EIGEN} MATCHES "NONE")
@@ -341,10 +368,15 @@ if (UNIX OR APPLE)
     include(cmake/Cuda.cmake)
     find_package(CuDNN)
   endif (${GPU_MODE} MATCHES "CUDA")
-  find_package(GFlags)
-  find_package(Glog)
+  find_package(GFlags) # For Caffe and OpenPose
+  find_package(Glog) # For Caffe
+  find_package(Protobuf REQUIRED) # For Caffe
+
   if (OpenCV_CONFIG_FILE)
     include (${OpenCV_CONFIG_FILE})
+  # Allow explicitly setting the OpenCV includes and libs
+  elseif (OpenCV_INCLUDE_DIRS AND OpenCV_LIBS)
+    set(OpenCV_FOUND 1)
   elseif (OpenCV_INCLUDE_DIRS AND OpenCV_LIBS_DIR)
     file(GLOB_RECURSE OpenCV_LIBS "${OpenCV_LIBS_DIR}*.so")
     set(OpenCV_FOUND 1)
@@ -547,8 +579,8 @@ if (WIN32)
   if (BUILD_PYTHON)
     if (NOT BUILD_BIN_FOLDER)
       message(FATAL_ERROR "BUILD_BIN_FOLDER must be turned on to as well to build python library")
-    endif ()
-  endif ()
+    endif (NOT BUILD_BIN_FOLDER)
+  endif (BUILD_PYTHON)
 
   # Auto copy DLLs
   if (BUILD_BIN_FOLDER)
@@ -672,7 +704,7 @@ if (UNIX OR APPLE)
           CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
           -DMKLDNN_INSTALL_DIR:PATH=<INSTALL_DIR>
           -DUSE_CUDNN=${USE_CUDNN}
-          -DBUILD_python=OFF
+          -DCUDA_ARCH_NAME=${CUDA_ARCH}
           -DCPU_ONLY=${CAFFE_CPU_ONLY}
           -DUSE_MKL2017_AS_DEFAULT_ENGINE=${CAFFE_CPU_ONLY}
           -DCMAKE_BUILD_TYPE=Release
@@ -689,6 +721,7 @@ if (UNIX OR APPLE)
           PREFIX ${CAFFE_PREFIX}
           CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
           -DUSE_CUDNN=${USE_CUDNN}
+          -DCUDA_ARCH_NAME=${CUDA_ARCH}
           -DCPU_ONLY=${CAFFE_CPU_ONLY}
           -DCMAKE_BUILD_TYPE=Release
           -DBUILD_docs=OFF
@@ -726,6 +759,7 @@ endif (UNIX OR APPLE)
 # Specify the include directories
 include_directories(
   include
+  ${Protobuf_INCLUDE_DIRS}
   ${GFLAGS_INCLUDE_DIR}
   ${GLOG_INCLUDE_DIR}
   ${OpenCV_INCLUDE_DIRS})
@@ -774,10 +808,10 @@ if (WITH_CERES)
   include_directories(${CERES_INCLUDE_DIRS})
 endif (WITH_CERES)
 if (WITH_FLIR_CAMERA)
-  include_directories(${SPINNAKER_INCLUDE_DIRS})
+  include_directories(SYSTEM ${SPINNAKER_INCLUDE_DIRS}) # To remove its warnings, equiv. to -isystem
 endif (WITH_FLIR_CAMERA)
 if (WITH_3D_ADAM_MODEL)
-                                    include_directories(include/adam) # TEMPORARY - TO BE REMOVED IN THE FUTURE
+                                    include_directories(include/adam) # TODO: TEMPORARY - TO BE REMOVED IN THE FUTURE
   include_directories(${CERES_INCLUDE_DIRS})
   include_directories(${EIGEN3_INCLUDE_DIRS})
   include_directories(${IGL_INCLUDE_DIRS})
@@ -876,8 +910,8 @@ message(STATUS "Models Downloaded.")
 if (Caffe_FOUND)
   if(BUILD_PYTHON)
     add_subdirectory(python)
-  endif ()
-endif()
+  endif (BUILD_PYTHON)
+endif(Caffe_FOUND)
 
 ### GENERATE DOCUMENTATION
 if (UNIX OR APPLE)

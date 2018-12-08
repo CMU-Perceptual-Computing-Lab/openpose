@@ -6,24 +6,22 @@
 namespace op
 {
     template <typename T>
-    OP_API void resizeAndMergeCpu(T* targetPtr, const std::vector<const T*>& sourcePtrs,
-                                  const std::array<int, 4>& targetSize,
-                                  const std::vector<std::array<int, 4>>& sourceSizes,
-                                  const std::vector<T>& scaleInputToNetInputs = {1.f});
+    void resizeAndMergeCpu(
+        T* targetPtr, const std::vector<const T*>& sourcePtrs, const std::array<int, 4>& targetSize,
+        const std::vector<std::array<int, 4>>& sourceSizes, const std::vector<T>& scaleInputToNetInputs = {1.f});
 
+    // Windows: Cuda functions do not include OP_API
     template <typename T>
-    OP_API void resizeAndMergeGpu(T* targetPtr, const std::vector<const T*>& sourcePtrs,
-                                  const std::array<int, 4>& targetSize,
-                                  const std::vector<std::array<int, 4>>& sourceSizes,
-                                  const std::vector<T>& scaleInputToNetInputs = {1.f});
+    void resizeAndMergeGpu(
+        T* targetPtr, const std::vector<const T*>& sourcePtrs, const std::array<int, 4>& targetSize,
+        const std::vector<std::array<int, 4>>& sourceSizes, const std::vector<T>& scaleInputToNetInputs = {1.f});
 
+    // Windows: OpenCL functions do not include OP_API
     template <typename T>
-    OP_API void resizeAndMergeOcl(T* targetPtr, const std::vector<const T*>& sourcePtrs,
-                                  std::vector<T*>& sourceTempPtrs,
-                                  const std::array<int, 4>& targetSize,
-                                  const std::vector<std::array<int, 4>>& sourceSizes,
-                                  const std::vector<T>& scaleInputToNetInputs = {1.f},
-                                  const int gpuID = 0);
+    void resizeAndMergeOcl(
+        T* targetPtr, const std::vector<const T*>& sourcePtrs, std::vector<T*>& sourceTempPtrs,
+        const std::array<int, 4>& targetSize, const std::vector<std::array<int, 4>>& sourceSizes,
+        const std::vector<T>& scaleInputToNetInputs = {1.f}, const int gpuID = 0);
 }
 
 #endif // OPENPOSE_NET_RESIZE_AND_MERGE_BASE_HPP

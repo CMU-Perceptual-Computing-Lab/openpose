@@ -260,7 +260,7 @@ namespace op
             #if defined USE_CAFFE
                 if (mEnabled && !handRectangles.empty())
                 {
-                    // Security checks
+                    // Sanity check
                     if (cvInputData.empty())
                         error("Empty cvInputData.", __LINE__, __FUNCTION__, __FILE__);
 
@@ -334,8 +334,8 @@ namespace op
                                         const auto scale = initScale
                                                          + mMultiScaleNumberAndRange.second * i / (numberScales-1.f);
                                         // Process hand
-                                        Array<float> handEstimated({1, handCurrent.getSize(1),
-                                                                    handCurrent.getSize(2)}, 0);
+                                        Array<float> handEstimated(
+                                            {1, handCurrent.getSize(1), handCurrent.getSize(2)}, 0.f);
                                         const auto handRectangleScale = recenter(
                                             handRectangle,
                                             (float)(intRound(handRectangle.width * scale) / 2 * 2),
@@ -414,32 +414,20 @@ namespace op
                 }
 
                 // 2. Resize heat maps + merge different scales
-                #ifdef USE_CUDA
-                    upImpl->spResizeAndMergeCaffe->Forward_gpu({upImpl->spCaffeNetOutputBlob.get()},
-                                                               {upImpl->spHeatMapsBlob.get()});
-                    cudaCheck(__LINE__, __FUNCTION__, __FILE__);
-                #elif USE_OPENCL
-                    upImpl->spResizeAndMergeCaffe->Forward_ocl({upImpl->spCaffeNetOutputBlob.get()},
-                                                               {upImpl->spHeatMapsBlob.get()});
-                #else
-                    upImpl->spResizeAndMergeCaffe->Forward_cpu({upImpl->spCaffeNetOutputBlob.get()},
-                                                               {upImpl->spHeatMapsBlob.get()});
-                #endif
+                upImpl->spResizeAndMergeCaffe->Forward(
+                    {upImpl->spCaffeNetOutputBlob.get()}, {upImpl->spHeatMapsBlob.get()});
 
                 // 3. Get peaks by Non-Maximum Suppression
-                #ifdef USE_CUDA
-                    upImpl->spMaximumCaffe->Forward_gpu({upImpl->spHeatMapsBlob.get()}, {upImpl->spPeaksBlob.get()});
-                    cudaCheck(__LINE__, __FUNCTION__, __FILE__);
-                #elif USE_OPENCL
-                    // CPU Version is already very fast (4ms) and data is sent to connectKeypoints as CPU for now anyway
-                    upImpl->spMaximumCaffe->Forward_cpu({upImpl->spHeatMapsBlob.get()}, {upImpl->spPeaksBlob.get()});
-                #else
-                    upImpl->spMaximumCaffe->Forward_cpu({upImpl->spHeatMapsBlob.get()}, {upImpl->spPeaksBlob.get()});
-                #endif
+                upImpl->spMaximumCaffe->Forward({upImpl->spHeatMapsBlob.get()}, {upImpl->spPeaksBlob.get()});
 
                 // Estimate keypoint locations
                 connectKeypoints(handCurrent, person, affineMatrix,
                                  upImpl->spPeaksBlob->mutable_cpu_data());
+
+                // 5. CUDA sanity check
+                #ifdef USE_CUDA
+                    cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+                #endif
             #else
                 UNUSED(handCurrent);
                 UNUSED(person);

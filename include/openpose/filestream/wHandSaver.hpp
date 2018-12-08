@@ -14,6 +14,8 @@ namespace op
     public:
         explicit WHandSaver(const std::shared_ptr<KeypointSaver>& keypointSaver);
 
+        virtual ~WHandSaver();
+
         void initializationOnThread();
 
         void workConsumer(const TDatums& tDatums);
@@ -36,6 +38,11 @@ namespace op
     template<typename TDatums>
     WHandSaver<TDatums>::WHandSaver(const std::shared_ptr<KeypointSaver>& keypointSaver) :
         spKeypointSaver{keypointSaver}
+    {
+    }
+
+    template<typename TDatums>
+    WHandSaver<TDatums>::~WHandSaver()
     {
     }
 

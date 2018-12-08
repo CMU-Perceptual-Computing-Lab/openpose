@@ -13,6 +13,8 @@ namespace op
     public:
         explicit WHandDetector(const std::shared_ptr<HandDetector>& handDetector);
 
+        virtual ~WHandDetector();
+
         void initializationOnThread();
 
         void work(TDatums& tDatums);
@@ -35,6 +37,11 @@ namespace op
     template<typename TDatums>
     WHandDetector<TDatums>::WHandDetector(const std::shared_ptr<HandDetector>& handDetector) :
         spHandDetector{handDetector}
+    {
+    }
+
+    template<typename TDatums>
+    WHandDetector<TDatums>::~WHandDetector()
     {
     }
 

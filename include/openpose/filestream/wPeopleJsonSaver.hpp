@@ -13,6 +13,8 @@ namespace op
     public:
         explicit WPeopleJsonSaver(const std::shared_ptr<PeopleJsonSaver>& peopleJsonSaver);
 
+        virtual ~WPeopleJsonSaver();
+
         void initializationOnThread();
 
         void workConsumer(const TDatums& tDatums);
@@ -35,6 +37,11 @@ namespace op
     template<typename TDatums>
     WPeopleJsonSaver<TDatums>::WPeopleJsonSaver(const std::shared_ptr<PeopleJsonSaver>& peopleJsonSaver) :
         spPeopleJsonSaver{peopleJsonSaver}
+    {
+    }
+
+    template<typename TDatums>
+    WPeopleJsonSaver<TDatums>::~WPeopleJsonSaver()
     {
     }
 

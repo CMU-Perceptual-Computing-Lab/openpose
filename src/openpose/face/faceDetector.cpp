@@ -15,6 +15,10 @@ namespace op
     {
     }
 
+    FaceDetector::~FaceDetector()
+    {
+    }
+
     inline Rectangle<float> getFaceFromPoseKeypoints(const Array<float>& poseKeypoints, const unsigned int personIndex,
                                                      const unsigned int neck, const unsigned int headNose,
                                                      const unsigned int lEar, const unsigned int rEar,
@@ -35,7 +39,7 @@ namespace op
             const auto rEyeScoreAbove = (posePtr[rEye*3+2] > threshold);
 
             auto counter = 0;
-            // Face and neck given (e.g. MPI)
+            // Face and neck given (e.g., MPI)
             if (headNose == lEar && lEar == rEar)
             {
                 if (neckScoreAbove && headNoseScoreAbove)
@@ -45,13 +49,13 @@ namespace op
                     faceSize = 1.33f * getDistance(poseKeypoints, personIndex, neck, headNose);
                 }
             }
-            // Face as average between different body keypoints (e.g. COCO)
+            // Face as average between different body keypoints (e.g., COCO)
             else
             {
                 // factor * dist(neck, headNose)
                 if (neckScoreAbove && headNoseScoreAbove)
                 {
-                    // If profile (i.e. only 1 eye and ear visible) --> avg(headNose, eye & ear position)
+                    // If profile (i.e., only 1 eye and ear visible) --> avg(headNose, eye & ear position)
                     if ((lEyeScoreAbove) == (lEarScoreAbove)
                         && (rEyeScoreAbove) == (rEarScoreAbove)
                         && (lEyeScoreAbove) != (rEyeScoreAbove))

@@ -14,6 +14,8 @@ namespace op
     public:
         explicit WPoseSaver(const std::shared_ptr<KeypointSaver>& keypointSaver);
 
+        virtual ~WPoseSaver();
+
         void initializationOnThread();
 
         void workConsumer(const TDatums& tDatums);
@@ -36,6 +38,11 @@ namespace op
     template<typename TDatums>
     WPoseSaver<TDatums>::WPoseSaver(const std::shared_ptr<KeypointSaver>& keypointSaver) :
         spKeypointSaver{keypointSaver}
+    {
+    }
+
+    template<typename TDatums>
+    WPoseSaver<TDatums>::~WPoseSaver()
     {
     }
 

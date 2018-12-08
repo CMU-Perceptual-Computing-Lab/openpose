@@ -13,6 +13,8 @@ namespace op
     public:
         explicit WCvMatToOpOutput(const std::shared_ptr<CvMatToOpOutput>& cvMatToOpOutput);
 
+        virtual ~WCvMatToOpOutput();
+
         void initializationOnThread();
 
         void work(TDatums& tDatums);
@@ -36,6 +38,11 @@ namespace op
     template<typename TDatums>
     WCvMatToOpOutput<TDatums>::WCvMatToOpOutput(const std::shared_ptr<CvMatToOpOutput>& cvMatToOpOutput) :
         spCvMatToOpOutput{cvMatToOpOutput}
+    {
+    }
+
+    template<typename TDatums>
+    WCvMatToOpOutput<TDatums>::~WCvMatToOpOutput()
     {
     }
 

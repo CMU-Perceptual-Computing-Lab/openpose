@@ -13,6 +13,8 @@ namespace op
     public:
         explicit WOpOutputToCvMat(const std::shared_ptr<OpOutputToCvMat>& opOutputToCvMat);
 
+        virtual ~WOpOutputToCvMat();
+
         void initializationOnThread();
 
         void work(TDatums& tDatums);
@@ -35,6 +37,11 @@ namespace op
     template<typename TDatums>
     WOpOutputToCvMat<TDatums>::WOpOutputToCvMat(const std::shared_ptr<OpOutputToCvMat>& opOutputToCvMat) :
         spOpOutputToCvMat{opOutputToCvMat}
+    {
+    }
+
+    template<typename TDatums>
+    WOpOutputToCvMat<TDatums>::~WOpOutputToCvMat()
     {
     }
 

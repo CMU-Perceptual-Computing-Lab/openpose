@@ -20,21 +20,17 @@ namespace op
     OP_API unsigned int getPoseNumberBodyParts(const PoseModel poseModel);
     OP_API const std::vector<unsigned int>& getPosePartPairs(const PoseModel poseModel);
     OP_API const std::vector<unsigned int>& getPoseMapIndex(const PoseModel poseModel);
-    OP_API const std::vector<int>& getPosePartPairsStar(const PoseModel poseModel);
-    OP_API unsigned int getPoseMaxPeaks(const PoseModel poseModel);
+    OP_API unsigned int getPoseMaxPeaks();
     OP_API float getPoseNetDecreaseFactor(const PoseModel poseModel);
     OP_API unsigned int poseBodyPartMapStringToKey(const PoseModel poseModel, const std::string& string);
     OP_API unsigned int poseBodyPartMapStringToKey(const PoseModel poseModel, const std::vector<std::string>& strings);
 
     // Default NSM and body connector parameters
-    OP_API float getPoseDefaultNmsThreshold(const PoseModel poseModel);
-    OP_API float getPoseDefaultConnectInterMinAboveThreshold(const PoseModel poseModel);
-    OP_API float getPoseDefaultConnectInterThreshold(const PoseModel poseModel);
-    OP_API unsigned int getPoseDefaultMinSubsetCnt(const PoseModel poseModel);
-    OP_API float getPoseDefaultConnectMinSubsetScore(const PoseModel poseModel);
-
-    // const bool COCO_CHALLENGE = true;
-    const bool COCO_CHALLENGE = false;
+    OP_API float getPoseDefaultNmsThreshold(const PoseModel poseModel, const bool maximizePositives = false);
+    OP_API float getPoseDefaultConnectInterMinAboveThreshold(const bool maximizePositives = false);
+    OP_API float getPoseDefaultConnectInterThreshold(const PoseModel poseModel, const bool maximizePositives = false);
+    OP_API unsigned int getPoseDefaultMinSubsetCnt(const bool maximizePositives = false);
+    OP_API float getPoseDefaultConnectMinSubsetScore(const bool maximizePositives = false);
 }
 
 #endif // OPENPOSE_POSE_POSE_PARAMETERS_HPP

@@ -1,36 +1,43 @@
 #include <opencv2/highgui/highgui.hpp>
-#include <openpose/producer/webcamReader.hpp>
 #include <openpose/utilities/fastMath.hpp>
+#include <openpose/utilities/openCv.hpp>
+#include <openpose/producer/webcamReader.hpp>
 
 namespace op
 {
-    WebcamReader::WebcamReader(const int webcamIndex, const Point<int>& webcamResolution, const double fps,
-                               const bool throwExceptionIfNoOpened) :
-        VideoCaptureReader{webcamIndex, throwExceptionIfNoOpened},
-        mFps{fps},
+    WebcamReader::WebcamReader(const int webcamIndex, const Point<int>& webcamResolution,
+                               const bool throwExceptionIfNoOpened, const std::string& cameraParameterPath,
+                               const bool undistortImage) :
+        VideoCaptureReader{webcamIndex, throwExceptionIfNoOpened, cameraParameterPath, undistortImage, 1},
+        mIndex{webcamIndex},
         mFrameNameCounter{-1},
-        mThreadOpened{false}
+        mThreadOpened{std::atomic<bool>{false}},
+        mResolution{webcamResolution}
     {
         try
         {
             if (isOpened())
             {
                 mFrameNameCounter = 0;
-                if (webcamResolution != Point<int>{})
+                if (mResolution != Point<int>{})
                 {
-                    set(CV_CAP_PROP_FRAME_WIDTH, webcamResolution.x);
-                    set(CV_CAP_PROP_FRAME_HEIGHT, webcamResolution.y);
-                    if ((int)get(CV_CAP_PROP_FRAME_WIDTH) != webcamResolution.x
-                        || (int)get(CV_CAP_PROP_FRAME_HEIGHT) != webcamResolution.y)
+                    set(CV_CAP_PROP_FRAME_WIDTH, mResolution.x);
+                    set(CV_CAP_PROP_FRAME_HEIGHT, mResolution.y);
+                    if ((int)get(CV_CAP_PROP_FRAME_WIDTH) != mResolution.x
+                        || (int)get(CV_CAP_PROP_FRAME_HEIGHT) != mResolution.y)
                     {
-                        const std::string logMessage{ "Desired webcam resolution " + std::to_string(webcamResolution.x)
-                                                      + "x" + std::to_string(webcamResolution.y)
-                                                      + " could not being set. Final resolution: "
-                                                      + std::to_string(intRound(get(CV_CAP_PROP_FRAME_WIDTH))) + "x"
-                                                      + std::to_string(intRound(get(CV_CAP_PROP_FRAME_HEIGHT))) };
+                        const std::string logMessage{
+                            "Desired webcam resolution " + std::to_string(mResolution.x) + "x"
+                            + std::to_string(mResolution.y) + " could not being set. Final resolution: "
+                            + std::to_string(intRound(get(CV_CAP_PROP_FRAME_WIDTH))) + "x"
+                            + std::to_string(intRound(get(CV_CAP_PROP_FRAME_HEIGHT))) };
                         log(logMessage, Priority::Max, __LINE__, __FUNCTION__, __FILE__);
                     }
                 }
+                // Set resolution
+                mResolution = Point<int>{
+                    intRound(get(CV_CAP_PROP_FRAME_WIDTH)),
+                    intRound(get(CV_CAP_PROP_FRAME_HEIGHT))};
                 // Start buffering thread
                 mThreadOpened = true;
                 mThread = std::thread{&WebcamReader::bufferingThread, this};
@@ -59,45 +66,6 @@ namespace op
         }
     }
 
-    std::vector<cv::Mat> WebcamReader::getCameraMatrices()
-    {
-        try
-        {
-            return {};
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return {};
-        }
-    }
-
-    std::vector<cv::Mat> WebcamReader::getCameraExtrinsics()
-    {
-        try
-        {
-            return {};
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return {};
-        }
-    }
-
-    std::vector<cv::Mat> WebcamReader::getCameraIntrinsics()
-    {
-        try
-        {
-            return {};
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return {};
-        }
-    }
-
     std::string WebcamReader::getNextFrameName()
     {
         try
@@ -111,14 +79,25 @@ namespace op
         }
     }
 
+    bool WebcamReader::isOpened() const
+    {
+        try
+        {
+            return (VideoCaptureReader::isOpened() || mDisconnectedCounter > 0);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return false;
+        }
+    }
+
     double WebcamReader::get(const int capProperty)
     {
         try
         {
             if (capProperty == CV_CAP_PROP_POS_FRAMES)
                 return (double)mFrameNameCounter;
-            else if (capProperty == CV_CAP_PROP_FPS)
-                return mFps;
             else
                 return VideoCaptureReader::get(capProperty);
         }
@@ -133,10 +112,7 @@ namespace op
     {
         try
         {
-            if (capProperty == CV_CAP_PROP_FPS)
-                mFps = value;
-            else
-                VideoCaptureReader::set(capProperty, value);
+            VideoCaptureReader::set(capProperty, value);
         }
         catch (const std::exception& e)
         {
@@ -194,6 +170,7 @@ namespace op
         }
     }
 
+    const auto DISCONNETED_THRESHOLD = 100;
     void WebcamReader::bufferingThread()
     {
         try
@@ -201,8 +178,29 @@ namespace op
             mCloseThread = false;
             while (!mCloseThread)
             {
+                // Reset camera if disconnected
+                bool cameraConnected = true;
+                if (mDisconnectedCounter > DISCONNETED_THRESHOLD)
+                    cameraConnected = reset();
                 // Get frame
                 auto cvMat = VideoCaptureReader::getRawFrame();
+                // Detect whether camera is connected
+                const auto newNorm = (
+                    cvMat.empty() ? mLastNorm : cv::norm(cvMat.row(cvMat.rows/2)));
+                if (mLastNorm == newNorm)
+                    mDisconnectedCounter++;
+                else
+                {
+                    mLastNorm = newNorm;
+                    mDisconnectedCounter = 0;
+                }
+                // Camera disconnected: black image
+                if (!cameraConnected || cvMat.empty())
+                {
+                    cvMat = cv::Mat(mResolution.y, mResolution.x, CV_8UC3, cv::Scalar{0,0,0});
+                    putTextOnCvMat(cvMat, "Camera disconnected, reconnecting...", {cvMat.cols/16, cvMat.rows/2},
+                                   cv::Scalar{255, 255, 255}, false, intRound(2.3*cvMat.cols));
+                }
                 // Move to buffer
                 if (!cvMat.empty())
                 {
@@ -214,6 +212,35 @@ namespace op
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    bool WebcamReader::reset()
+    {
+        try
+        {
+            // If unplugged
+            log("Webcam was unplugged, trying to reconnect it.", Priority::Max,
+                __LINE__, __FUNCTION__, __FUNCTION__);
+            // Sleep
+            std::this_thread::sleep_for(std::chrono::milliseconds{1000});
+            // Reset camera
+            VideoCaptureReader::resetWebcam(mIndex, false);
+            // Re-set resolution
+            if (isOpened())
+            {
+                set(CV_CAP_PROP_FRAME_WIDTH, mResolution.x);
+                set(CV_CAP_PROP_FRAME_HEIGHT, mResolution.y);
+            }
+            // Camera replugged?
+            return (!isOpened()
+                    && (mResolution.x != intRound(get(CV_CAP_PROP_FRAME_WIDTH))
+                        || mResolution.y != intRound(get(CV_CAP_PROP_FRAME_HEIGHT))));
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return false;
         }
     }
 }

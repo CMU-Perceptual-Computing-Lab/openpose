@@ -1,6 +1,3 @@
-#ifdef USE_FLIR_CAMERA
-    #include <thread>
-#endif
 #include <opencv2/imgproc/imgproc.hpp> // cv::undistort, cv::initUndistortRectifyMap
 #ifdef USE_FLIR_CAMERA
     #include <Spinnaker.h>
@@ -403,7 +400,7 @@ namespace op
                     // Undistort
                     if (mUndistortImage)
                     {
-                        // Security check
+                        // Sanity check
                         if (cameraIntrinsics.empty() || cameraDistorsions.empty())
                             error("Camera intrinsics/distortions were empty.", __LINE__, __FUNCTION__, __FILE__);
                         // // Option a - 80 ms / 3 images
@@ -619,7 +616,7 @@ namespace op
                         // Only 1 camera
                         else
                         {
-                            // Security checks
+                            // Sanity check
                             if ((unsigned int)cameraIndex >= imagePtrs.size())
                                 error("There are only " + std::to_string(imagePtrs.size())
                                       + " cameras, but you asked for the "
@@ -661,7 +658,7 @@ namespace op
         #ifdef USE_FLIR_CAMERA
             try
             {
-                // Clean previous unclosed builds (e.g. if core dumped in the previous code using the cameras)
+                // Clean previous unclosed builds (e.g., if core dumped in the previous code using the cameras)
                 release();
 
                 upImpl->mInitialized = true;
@@ -881,14 +878,13 @@ namespace op
                 upImpl->mThreadOpened = true;
                 upImpl->mThread = std::thread{&SpinnakerWrapper::ImplSpinnakerWrapper::bufferingThread, this->upImpl};
 
-                // Get resolution + security checks
+                // Get resolution
                 const auto cvMats = getRawFrames();
-                // Security checks
+                // Sanity check
                 if (cvMats.empty())
                     error("Cameras could not be opened.", __LINE__, __FUNCTION__, __FILE__);
                 // Get resolution
-                else
-                    upImpl->mResolution = Point<int>{cvMats[0].cols, cvMats[0].rows};
+                upImpl->mResolution = Point<int>{cvMats[0].cols, cvMats[0].rows};
 
                 const std::string numberCameras = std::to_string(upImpl->mCameraIndex < 0 ? serialNumbers.size() : 1);
                 log("\nRunning for " + numberCameras + " out of " + std::to_string(serialNumbers.size())
@@ -930,12 +926,13 @@ namespace op
             #ifdef USE_FLIR_CAMERA
                 try
                 {
-                    // Security checks
+                    // Sanity check
                     if (upImpl->mUndistortImage &&
                         (unsigned long long) upImpl->mCameraList.GetSize()
                             != upImpl->mCameraParameterReader.getNumberCameras())
                         error("The number of cameras must be the same as the INTRINSICS vector size.",
                           __LINE__, __FUNCTION__, __FILE__);
+                    // Return frames
                     return upImpl->acquireImages(upImpl->mCameraParameterReader.getCameraIntrinsics(),
                                                  upImpl->mCameraParameterReader.getCameraDistortions(),
                                                  upImpl->mCameraIndex);

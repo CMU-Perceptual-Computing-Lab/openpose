@@ -12,6 +12,8 @@ namespace op
     public:
         explicit FaceDetectorOpenCV(const std::string& modelFolder);
 
+        virtual ~FaceDetectorOpenCV();
+
         // No thread-save
         std::vector<Rectangle<float>> detectFaces(const cv::Mat& cvInputData);
 

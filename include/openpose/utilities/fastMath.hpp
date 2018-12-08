@@ -3,8 +3,10 @@
 
 namespace op
 {
-    // Use op::round/max/min for basic types (int, char, long, float, double, etc). Never with classes! std:: alternatives uses 'const T&' instead of 'const T' as argument.
-    // E.g. std::round is really slow (~300 ms vs ~10 ms when I individually apply it to each element of a whole image array (e.g. in floatPtrToUCharCvMat)
+    // Use op::round/max/min for basic types (int, char, long, float, double, etc). Never with classes!
+    // `std::` alternatives uses 'const T&' instead of 'const T' as argument.
+    // E.g., std::round is really slow (~300 ms vs ~10 ms when I individually apply it to each element of a whole
+    // image array
 
     // Round functions
     // Signed

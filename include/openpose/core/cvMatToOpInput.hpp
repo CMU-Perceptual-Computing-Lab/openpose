@@ -12,6 +12,8 @@ namespace op
     public:
         CvMatToOpInput(const PoseModel poseModel = PoseModel::BODY_25);
 
+        virtual ~CvMatToOpInput();
+
         std::vector<Array<float>> createArray(const cv::Mat& cvInputData,
                                               const std::vector<double>& scaleInputToNetInputs,
                                               const std::vector<Point<int>>& netInputSizes) const;

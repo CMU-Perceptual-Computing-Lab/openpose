@@ -65,14 +65,14 @@ There are 2 alternatives to save the OpenPose output.
 }
 ```
 
-2. (Deprecated) The `write_keypoint` flag uses the OpenCV cv::FileStorage default formats, i.e. JSON (available after OpenCV 3.0), XML, and YML. Note that it does not include any other information othern than keypoints.
+2. (Deprecated) The `write_keypoint` flag uses the OpenCV cv::FileStorage default formats, i.e., JSON (available after OpenCV 3.0), XML, and YML. Note that it does not include any other information othern than keypoints.
 
 Both of them follow the keypoint ordering described in the [Keypoint Ordering](#keypoint-ordering) section.
 
 
 
 ### Keypoint Ordering
-The body part mapping order of any body model (e.g. COCO, MPI) can be extracted from the C++ API by using the `getPoseBodyPartMapping(const PoseModel poseModel)` function available in [poseParameters.hpp](../include/openpose/pose/poseParameters.hpp):
+The body part mapping order of any body model (e.g., COCO, MPI) can be extracted from the C++ API by using the `getPoseBodyPartMapping(const PoseModel poseModel)` function available in [poseParameters.hpp](../include/openpose/pose/poseParameters.hpp):
 ```
 // C++ API call
 #include <openpose/pose/poseParameters.hpp>

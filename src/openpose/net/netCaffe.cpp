@@ -185,7 +185,7 @@ namespace op
         try
         {
             #ifdef USE_CAFFE
-                // Security checks
+                // Sanity checks
                 if (inputData.empty())
                     error("The Array inputData cannot be empty.", __LINE__, __FUNCTION__, __FILE__);
                 if (inputData.getNumberDimensions() != 4 || inputData.getSize(1) != 3)
@@ -205,9 +205,8 @@ namespace op
                 #elif defined USE_OPENCL
                     auto* gpuImagePtr = upImpl->upCaffeNet->blobs().at(0)->mutable_gpu_data();
                     cl::Buffer imageBuffer = cl::Buffer((cl_mem)gpuImagePtr, true);
-                    OpenCL::getInstance(upImpl->mGpuId)->getQueue().enqueueWriteBuffer(imageBuffer, true, 0,
-                                                                                       inputData.getVolume() * sizeof(float),
-                                                                                       inputData.getConstPtr());
+                    OpenCL::getInstance(upImpl->mGpuId)->getQueue().enqueueWriteBuffer(
+                        imageBuffer, true, 0, inputData.getVolume() * sizeof(float), inputData.getConstPtr());
                 #else
                     auto* cpuImagePtr = upImpl->upCaffeNet->blobs().at(0)->mutable_cpu_data();
                     std::copy(inputData.getConstPtr(), inputData.getConstPtr() + inputData.getVolume(), cpuImagePtr);

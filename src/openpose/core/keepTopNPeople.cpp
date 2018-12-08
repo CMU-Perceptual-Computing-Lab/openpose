@@ -8,14 +8,18 @@ namespace op
     {
     }
 
+    KeepTopNPeople::~KeepTopNPeople()
+    {
+    }
+
     Array<float> KeepTopNPeople::keepTopPeople(const Array<float>& peopleArray, const Array<float>& poseScores) const
     {
         try
         {
             // Remove people if #people > mNumberPeopleMax
-            if (peopleArray.getVolume() > (unsigned int)mNumberPeopleMax && mNumberPeopleMax > 0)
+            if (peopleArray.getSize(0) > mNumberPeopleMax && mNumberPeopleMax > 0)
             {
-                // Security checks
+                // Sanity checks
                 if (poseScores.getVolume() != (unsigned int) poseScores.getSize(0))
                     error("The poseFinalScores variable should be a Nx1 vector, not a multidimensional array.",
                           __LINE__, __FUNCTION__, __FILE__);
@@ -48,7 +52,7 @@ namespace op
                 // Naively, we could accidentally keep the first 2x 0.5 and remove the 1.0 threshold.
                 // Our method keeps the first 0.5 and 1.0.
                 Array<float> topPeopleArray({mNumberPeopleMax, peopleArray.getSize(1), peopleArray.getSize(2)});
-                const auto personArea = peopleArray.getSize(1) * peopleArray.getSize(2);
+                const auto personArea = peopleArray.getVolume(1, 2);
                 auto assignedPeopleOnThreshold = 0;
                 auto nextPersonIndex = 0;
                 const auto numberPeopleOnThresholdToBeAdded = mNumberPeopleMax - numberPeopleAboveThreshold;

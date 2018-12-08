@@ -152,7 +152,7 @@ namespace op
         try
         {
             #ifdef USE_OPENCL
-                // Security checks
+                // Sanity checks
                 if (sourceSize.empty())
                     error("sourceSize cannot be empty.", __LINE__, __FUNCTION__, __FILE__);
                 if (targetSize.empty())
@@ -262,10 +262,12 @@ namespace op
         }
     }
 
-    template void nmsOcl(float* targetPtr, int* kernelPtr, const float* const sourcePtr, const float threshold,
-                         const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize,
-                         const Point<float>& offset, const int gpuID);
-    template void nmsOcl(double* targetPtr, int* kernelPtr, const double* const sourcePtr, const double threshold,
-                         const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize,
-                         const Point<double>& offset, const int gpuID);
+    template void nmsOcl(
+        float* targetPtr, int* kernelPtr, const float* const sourcePtr, const float threshold,
+        const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize, const Point<float>& offset,
+        const int gpuID);
+    template void nmsOcl(
+        double* targetPtr, int* kernelPtr, const double* const sourcePtr, const double threshold,
+        const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize, const Point<double>& offset,
+        const int gpuID);
 }

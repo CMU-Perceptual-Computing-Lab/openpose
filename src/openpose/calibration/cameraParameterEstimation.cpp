@@ -1,6 +1,5 @@
 #include <fstream>
 #include <numeric> // std::accumulate
-#include <thread>
 #include <opencv2/core/core.hpp>
 #ifdef USE_EIGEN
     #include <Eigen/Dense>
@@ -109,11 +108,10 @@ namespace op
         }
     }
 
-    std::pair<double, std::vector<double>> calcReprojectionErrors(const std::vector<std::vector<cv::Point3f>>& objects3DVectors,
-                                                                  const std::vector<std::vector<cv::Point2f>>& points2DVectors,
-                                                                  const std::vector<cv::Mat>& rVecs,
-                                                                  const std::vector<cv::Mat>& tVecs,
-                                                                  const Intrinsics& intrinsics)
+    std::pair<double, std::vector<double>> calcReprojectionErrors(
+        const std::vector<std::vector<cv::Point3f>>& objects3DVectors,
+        const std::vector<std::vector<cv::Point2f>>& points2DVectors, const std::vector<cv::Mat>& rVecs,
+        const std::vector<cv::Mat>& tVecs, const Intrinsics& intrinsics)
     {
         try
         {
@@ -126,12 +124,9 @@ namespace op
 
             for (auto i = 0ull; i < objects3DVectors.size(); ++i )
             {
-                cv::projectPoints(cv::Mat(objects3DVectors.at(i)),
-                                  rVecs.at(i),
-                                  tVecs.at(i),
-                                  intrinsics.cameraMatrix,
-                                  intrinsics.distortionCoefficients,
-                                  points2DVectors2);
+                cv::projectPoints(
+                    cv::Mat(objects3DVectors.at(i)), rVecs.at(i), tVecs.at(i), intrinsics.cameraMatrix,
+                    intrinsics.distortionCoefficients, points2DVectors2);
                 const auto err = cv::norm(cv::Mat(points2DVectors.at(i)), cv::Mat(points2DVectors2), CV_L2);
 
                 const auto n = objects3DVectors.at(i).size();
@@ -151,10 +146,9 @@ namespace op
         }
     }
 
-    Intrinsics calcIntrinsicParameters(const cv::Size& imageSize,
-                                       const std::vector<std::vector<cv::Point2f>>& points2DVectors,
-                                       const std::vector<std::vector<cv::Point3f>>& objects3DVectors,
-                                       const int calibrateCameraFlags)
+    Intrinsics calcIntrinsicParameters(
+        const cv::Size& imageSize, const std::vector<std::vector<cv::Point2f>>& points2DVectors,
+        const std::vector<std::vector<cv::Point3f>>& objects3DVectors, const int calibrateCameraFlags)
     {
         try
         {
@@ -165,9 +159,9 @@ namespace op
             Intrinsics intrinsics;
             std::vector<cv::Mat> rVecs;
             std::vector<cv::Mat> tVecs;
-            const auto rms = cv::calibrateCamera(objects3DVectors, points2DVectors, imageSize, intrinsics.cameraMatrix,
-                                                 intrinsics.distortionCoefficients, rVecs, tVecs,
-                                                 calibrateCameraFlags);
+            const auto rms = cv::calibrateCamera(
+                objects3DVectors, points2DVectors, imageSize, intrinsics.cameraMatrix,
+                intrinsics.distortionCoefficients, rVecs, tVecs, calibrateCameraFlags);
 
             // cv::checkRange checks that every array element is neither NaN nor infinite
             const auto calibrationIsCorrect = cv::checkRange(intrinsics.cameraMatrix)
@@ -177,8 +171,8 @@ namespace op
 
             double totalAvgErr;
             std::vector<double> reprojectionErrors;
-            std::tie(totalAvgErr, reprojectionErrors) = calcReprojectionErrors(objects3DVectors, points2DVectors,
-                                                                               rVecs, tVecs, intrinsics);
+            std::tie(totalAvgErr, reprojectionErrors) = calcReprojectionErrors(
+                objects3DVectors, points2DVectors, rVecs, tVecs, intrinsics);
 
             log("\nIntrinsics:", Priority::High);
             log("Re-projection error - cv::calibrateCamera vs. calcReprojectionErrors:\t" + std::to_string(rms)
@@ -278,11 +272,9 @@ namespace op
                     // Average(-179, 179) = 180 (not 0!)
                     // Average(90, 270) = 0 || 180??? We will assume outliers and return false
 
-                // Security checks
+                // Sanity check
                 if (angles.empty())
                     error("Variables `angles` is empty.", __LINE__, __FUNCTION__, __FILE__);
-                auto resultIsOK = true;
-                double average = 0;
 
                 // angles in range (-pi, pi]
                 auto anglesNormalized = angles;
@@ -308,6 +300,7 @@ namespace op
                 // If after normalizing range between min and max is still >180 degrees --> there are outliers
                 minElement = *std::min_element(anglesNormalized.begin(), anglesNormalized.end());
                 maxElement = *std::max_element(anglesNormalized.begin(), anglesNormalized.end());
+                auto resultIsOK = true;
                 if (maxElement - minElement >= PI)
                 {
                     resultIsOK = {false};
@@ -316,11 +309,11 @@ namespace op
 
                 // If the difference between them is <= 180 degrees, then we just return the traditional average.
                 // Examples:
-                //     - If both have the same signs, i.e. both in range [0, 180] or both in range (-180, 0)
+                //     - If both have the same signs, i.e., both in range [0, 180] or both in range (-180, 0)
                 //     - If one in range [0, 90] and the other in range [-90, 0]
                 //     - Etc.
-                average = std::accumulate(anglesNormalized.begin(), anglesNormalized.end(), 0.)
-                        / (double)anglesNormalized.size();
+                auto average = std::accumulate(anglesNormalized.begin(), anglesNormalized.end(), 0.)
+                             / (double)anglesNormalized.size();
                 average = setAngleInRangePlusMinusPi(average);
 
                 return std::make_pair(resultIsOK, average);
@@ -443,10 +436,9 @@ namespace op
                 return Eigen::Matrix4d{};
             }
         }
-        std::pair<cv::Mat, cv::Mat> solveCorrespondences2D3D(const cv::Mat& cameraMatrix,
-                                                             const cv::Mat& distortionCoefficients,
-                                                             const std::vector<cv::Point3f>& objects3DVector,
-                                                             const std::vector<cv::Point2f>& points2DVector)
+        std::pair<cv::Mat, cv::Mat> solveCorrespondences2D3D(
+            const cv::Mat& cameraMatrix, const cv::Mat& distortionCoefficients,
+            const std::vector<cv::Point3f>& objects3DVector, const std::vector<cv::Point2f>& points2DVector)
         {
             try
             {
@@ -489,11 +481,9 @@ namespace op
             }
         }
 
-        std::tuple<cv::Mat, cv::Mat, std::vector<cv::Point2f>, std::vector<cv::Point3f>> calcExtrinsicParametersOpenCV(const cv::Mat& image,
-                                                                                                                       const cv::Mat& cameraMatrix,
-                                                                                                                       const cv::Mat& distortionCoefficients,
-                                                                                                                       const cv::Size& gridInnerCorners,
-                                                                                                                       const float gridSquareSizeMm)
+        std::tuple<cv::Mat, cv::Mat, std::vector<cv::Point2f>, std::vector<cv::Point3f>> calcExtrinsicParametersOpenCV(
+            const cv::Mat& image, const cv::Mat& cameraMatrix, const cv::Mat& distortionCoefficients,
+            const cv::Size& gridInnerCorners, const float gridSquareSizeMm)
         {
             try
             {
@@ -558,16 +548,13 @@ namespace op
             }
         }
 
-        std::tuple<bool, Eigen::Matrix3d, Eigen::Vector3d, Eigen::Matrix3d, Eigen::Vector3d> getExtrinsicParameters(const std::vector<std::string>& cameraPaths,
-                                                                                                                    const cv::Size& gridInnerCorners,
-                                                                                                                    const float gridSquareSizeMm,
-                                                                                                                    const bool coutAndPlotGridCorners,
-                                                                                                                    const std::vector<cv::Mat>& intrinsics,
-                                                                                                                    const std::vector<cv::Mat>& distortions)
+        std::tuple<bool, Eigen::Matrix3d, Eigen::Vector3d, Eigen::Matrix3d, Eigen::Vector3d> getExtrinsicParameters(
+            const std::vector<std::string>& cameraPaths, const cv::Size& gridInnerCorners, const float gridSquareSizeMm,
+            const bool coutAndPlotGridCorners, const std::vector<cv::Mat>& intrinsics, const std::vector<cv::Mat>& distortions)
         {
             try
             {
-                // Security checks
+                // Sanity check
                 if (intrinsics.size() != 2 || distortions.size() != 2 || cameraPaths.size() != 2)
                     error("Found that (intrinsics.size() != 2 || distortions.size() != 2 || cameraPaths.size() != 2).",
                           __LINE__, __FUNCTION__, __FILE__);
@@ -589,10 +576,7 @@ namespace op
                         return std::make_tuple(false, Eigen::Matrix3d{}, Eigen::Vector3d{}, Eigen::Matrix3d{},
                                                Eigen::Vector3d{});
                     if (coutAndPlotGridCorners)
-                    {
-                        plotGridCorners(gridInnerCorners, extrinsicss[i].points2DVector,
-                                        cameraPaths[i], image);
-                    }
+                        plotGridCorners(gridInnerCorners, extrinsicss[i].points2DVector, cameraPaths[i], image);
                 }
 
                 return std::make_tuple(
@@ -606,7 +590,8 @@ namespace op
             catch (const std::exception& e)
             {
                 error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-                return std::make_tuple(false, Eigen::Matrix3d{}, Eigen::Vector3d{}, Eigen::Matrix3d{}, Eigen::Vector3d{});
+                return std::make_tuple(
+                    false, Eigen::Matrix3d{}, Eigen::Vector3d{}, Eigen::Matrix3d{}, Eigen::Vector3d{});
             }
         }
 
@@ -737,7 +722,7 @@ namespace op
     {
         try
         {
-            // Security checks
+            // Sanity check
             if (cameraIndex >= 100)
                 error("Only implemented for up to 99 cameras.", __LINE__, __FUNCTION__, __FILE__);
             // Return result
@@ -750,24 +735,23 @@ namespace op
         }
     }
 
-    void estimateAndSaveSiftFileSubThread(std::vector<cv::Point2f>* points2DExtrinsicPtr,
-                                          std::vector<unsigned int>* matchIndexesCameraPtr,
-                                          const int cameraIndex,
-                                          const int numberCameras,
-                                          const int numberCorners,
-                                          const unsigned int numberViews,
-                                          const bool saveImagesWithCorners,
-                                          const std::string& imagesFolder,
-                                          const cv::Size& gridInnerCornersCvSize,
-                                          const cv::Size& imageSize,
-                                          const std::vector<std::pair<cv::Mat, std::string>>& imageAndPaths)
+    void estimateAndSaveSiftFileSubThread(
+        std::vector<cv::Point2f>* points2DExtrinsicPtr, std::vector<unsigned int>* matchIndexesCameraPtr,
+        const int cameraIndex, const int numberCameras, const int numberCorners, const unsigned int numberViews,
+        const bool saveImagesWithCorners, const std::string& imageFolder, const cv::Size& gridInnerCornersCvSize,
+        const cv::Size& imageSize, const std::vector<std::pair<cv::Mat, std::string>>& imageAndPaths,
+        const bool saveSIFTFile)
     {
         try
         {
-            // Security checks
+            // Sanity checks
             if (points2DExtrinsicPtr == nullptr || matchIndexesCameraPtr == nullptr)
                 error("Make sure than points2DExtrinsicPtr != nullptr && matchIndexesCameraPtr != nullptr.",
                       __LINE__, __FUNCTION__, __FILE__);
+            if (!points2DExtrinsicPtr->empty() || !matchIndexesCameraPtr->empty())
+                error("Variables points2DExtrinsicPtr and matchIndexesCameraPtr must be empty.",
+                      __LINE__, __FUNCTION__, __FILE__);
+            // Estimate and save SIFT file
             std::vector<cv::Point2f>& points2DExtrinsic = *points2DExtrinsicPtr;
             std::vector<unsigned int>& matchIndexesCamera = *matchIndexesCameraPtr;
             std::vector<cv::Mat> imagesWithCorners;
@@ -782,9 +766,9 @@ namespace op
                         + std::to_string(viewIndex+1) + "/" + std::to_string(numberViews),
                         Priority::High);
 
-                // Security check
+                // Sanity check
                 if (imageSize.width != image.cols || imageSize.height != image.rows)
-                    error("Detected images with different sizes in `" + imagesFolder + "` All images"
+                    error("Detected images with different sizes in `" + imageFolder + "` All images"
                           " must have the same resolution.", __LINE__, __FUNCTION__, __FILE__);
 
                 // Find grid corners
@@ -820,15 +804,18 @@ namespace op
             }
 
             // Save *.sift file for camera
-            // const auto fileName = getFullFilePathNoExtension(imageAndPaths.at(cameraIndex).second) + ".sift";
-            const auto fileName = getFileParentFolderPath(imageAndPaths.at(cameraIndex).second)
-                                + getFileNameFromCameraIndex(cameraIndex) + ".sift";
-            writeVisualSFMSiftGPU(fileName, points2DExtrinsic);
+            if (saveSIFTFile)
+            {
+                // const auto fileName = getFullFilePathNoExtension(imageAndPaths.at(cameraIndex).second) + ".sift";
+                const auto fileName = getFileParentFolderPath(imageAndPaths.at(cameraIndex).second)
+                                    + getFileNameFromCameraIndex(cameraIndex) + ".sift";
+                writeVisualSFMSiftGPU(fileName, points2DExtrinsic);
+            }
 
             // Save images with corners
             if (saveImagesWithCorners)
             {
-                const auto folderWhereSavingImages = imagesFolder + "images_with_corners/";
+                const auto folderWhereSavingImages = imageFolder + "images_with_corners/";
                 // Create directory in case it did not exist
                 makeDirectory(folderWhereSavingImages);
                 const auto pathWhereSavingImages = folderWhereSavingImages + std::to_string(cameraIndex) + "_";
@@ -859,13 +846,10 @@ namespace op
 
 
     // Public functions
-    void estimateAndSaveIntrinsics(const Point<int>& gridInnerCorners,
-                                   const float gridSquareSizeMm,
-                                   const int flags,
-                                   const std::string& outputParameterFolder,
-                                   const std::string& imagesFolder,
-                                   const std::string& serialNumber,
-                                   const bool saveImagesWithCorners)
+    void estimateAndSaveIntrinsics(
+        const Point<int>& gridInnerCorners, const float gridSquareSizeMm, const int flags,
+        const std::string& outputParameterFolder, const std::string& imageFolder, const std::string& serialNumber,
+        const bool saveImagesWithCorners)
     {
         try
         {
@@ -875,11 +859,11 @@ namespace op
 
             // Read images in folder
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-            std::vector<std::vector<cv::Point2f>> points2DVectors;
-            const auto imageAndPaths = getImageAndPaths(imagesFolder);
+            const auto imageAndPaths = getImageAndPaths(imageFolder);
 
             // Get 2D grid corners of each image
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            std::vector<std::vector<cv::Point2f>> points2DVectors;
             std::vector<cv::Mat> imagesWithCorners;
             const auto imageSize = imageAndPaths.at(0).first.size();
             for (auto i = 0u ; i < imageAndPaths.size() ; i++)
@@ -887,9 +871,9 @@ namespace op
                 log("\nImage " + std::to_string(i+1) + "/" + std::to_string(imageAndPaths.size()), Priority::High);
                 const auto& image = imageAndPaths.at(i).first;
 
-                // Security check
+                // Sanity check
                 if (imageSize.width != image.cols || imageSize.height != image.rows)
-                    error("Detected images with different sizes in `" + imagesFolder + "` All images"
+                    error("Detected images with different sizes in `" + imageFolder + "` All images"
                           " must have the same resolution.", __LINE__, __FUNCTION__, __FILE__);
 
                 // Find grid corners
@@ -904,9 +888,9 @@ namespace op
                     points2DVectors.emplace_back(points2DVector);
                 }
                 else
-                    std::cerr << "Chessboard not found in this image." << std::endl;
+                    log("Chessboard not found in image " + imageAndPaths.at(i).second + ".", Priority::High);
 
-                // Show image (with chessboard corners if found)
+                // Debugging (optional) - Show image (with chessboard corners if found)
                 if (saveImagesWithCorners)
                 {
                     cv::Mat imageToPlot = image.clone();
@@ -922,22 +906,21 @@ namespace op
             // Run calibration
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             // objects3DVector is the same one for each image
-            const std::vector<std::vector<cv::Point3f>> objects3DVectors(points2DVectors.size(),
-                                                                         getObjects3DVector(gridInnerCornersCvSize,
-                                                                                            gridSquareSizeMm));
+            const std::vector<std::vector<cv::Point3f>> objects3DVectors(
+                points2DVectors.size(), getObjects3DVector(gridInnerCornersCvSize, gridSquareSizeMm));
             const auto intrinsics = calcIntrinsicParameters(imageSize, points2DVectors, objects3DVectors, flags);
 
             // Save intrinsics/results
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-            CameraParameterReader cameraParameterReader{serialNumber, intrinsics.cameraMatrix,
-                                                        intrinsics.distortionCoefficients};
+            CameraParameterReader cameraParameterReader{
+                serialNumber, intrinsics.cameraMatrix, intrinsics.distortionCoefficients};
             cameraParameterReader.writeParameters(outputParameterFolder);
 
-            // Save images with corners
+            // Debugging (optional) - Save images with corners
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             if (saveImagesWithCorners)
             {
-                const auto folderWhereSavingImages = imagesFolder + "images_with_corners/";
+                const auto folderWhereSavingImages = imageFolder + "images_with_corners/";
                 // Create directory in case it did not exist
                 makeDirectory(folderWhereSavingImages);
                 // Save new images
@@ -962,8 +945,8 @@ namespace op
         }
     }
 
-    void estimateAndSaveExtrinsics(const std::string& intrinsicsFolder,
-                                   const std::string& extrinsicsImagesFolder,
+    void estimateAndSaveExtrinsics(const std::string& parameterFolder,
+                                   const std::string& imageFolder,
                                    const Point<int>& gridInnerCorners,
                                    const float gridSquareSizeMm,
                                    const int index0,
@@ -986,7 +969,7 @@ namespace op
                 // Load intrinsic parameters
                 log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 CameraParameterReader cameraParameterReader;
-                cameraParameterReader.readParameters(intrinsicsFolder);
+                cameraParameterReader.readParameters(parameterFolder);
                 const auto cameraSerialNumbers = cameraParameterReader.getCameraSerialNumbers();
                 const auto realCameraDistortions = cameraParameterReader.getCameraDistortions();
                 auto cameraIntrinsicsSubset = cameraParameterReader.getCameraIntrinsics();
@@ -1011,11 +994,11 @@ namespace op
                 log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 const auto numberCameras = cameraParameterReader.getNumberCameras();
                 log("\nDetected " + std::to_string(numberCameras) + " cameras from your XML files on:\n"
-                    + intrinsicsFolder + "\nRemove wrong/extra XML files if this number of cameras does not"
-                    + " correspond with the number of cameras recorded in:\n" + extrinsicsImagesFolder + "\n",
+                    + parameterFolder + "\nRemove wrong/extra XML files if this number of cameras does not"
+                    + " correspond with the number of cameras recorded in:\n" + imageFolder + "\n",
                     Priority::High);
-                const auto imagePaths = getImagePaths(extrinsicsImagesFolder);
-                // Security check
+                const auto imagePaths = getImagePaths(imageFolder);
+                // Sanity check
                 if (imagePaths.size() % numberCameras != 0)
                     error("You indicated that there are " + std::to_string(numberCameras)
                           + " cameras. However, we found a total of " + std::to_string(imagePaths.size())
@@ -1183,15 +1166,15 @@ namespace op
                     cameraIntrinsicsSubset.at(1),
                     realCameraDistortions.at(index1),
                     cvMatExtrinsics};
-                camera2ParameterReader.writeParameters(intrinsicsFolder);
+                camera2ParameterReader.writeParameters(parameterFolder);
 
                 // Let the rendered image to be displayed
                 log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 if (coutAndImshowVerbose)
                     cv::waitKey(0);
             #else
-                UNUSED(intrinsicsFolder);
-                UNUSED(extrinsicsImagesFolder);
+                UNUSED(parameterFolder);
+                UNUSED(imageFolder);
                 UNUSED(gridInnerCorners);
                 UNUSED(gridSquareSizeMm);
                 UNUSED(index0);
@@ -1207,15 +1190,140 @@ namespace op
         }
     }
 
-    void estimateAndSaveSiftFile(const Point<int>& gridInnerCorners,
-                                 const std::string& imagesFolder,
-                                 const int numberCameras,
-                                 const bool saveImagesWithCorners)
+    void refineAndSaveExtrinsics(
+        const std::string& parameterFolder, const std::string& imageFolder, const Point<int>& gridInnerCorners,
+        const float gridSquareSizeMm, const int numberCameras, const bool imagesAreUndistorted,
+        const bool saveImagesWithCorners)
+    {
+        try
+        {
+            // Sanity check
+            if (!imagesAreUndistorted)
+                op::error("This mode assumes that the images are already undistorted (add flag `--omit_distortion`).",
+                          __LINE__, __FUNCTION__, __FILE__);
+
+            log("Loading images...", Priority::High);
+            const auto imageAndPaths = getImageAndPaths(imageFolder);
+            log("Images loaded.", Priority::High);
+
+            // Point<int> --> cv::Size
+            const cv::Size gridInnerCornersCvSize{gridInnerCorners.x, gridInnerCorners.y};
+
+            // Load intrinsic parameters
+            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            CameraParameterReader cameraParameterReader;
+            cameraParameterReader.readParameters(parameterFolder);
+            // const auto cameraSerialNumbers = cameraParameterReader.getCameraSerialNumbers();
+            const auto cameraExtrinsics = cameraParameterReader.getCameraExtrinsics();
+            const auto cameraIntrinsics = cameraParameterReader.getCameraIntrinsics();
+            const auto cameraDistortions = (
+                imagesAreUndistorted
+                ? std::vector<cv::Mat>{cameraIntrinsics.size()} : cameraParameterReader.getCameraDistortions());
+
+            // Read images in folder
+            const auto numberCorners = gridInnerCorners.area();
+            std::vector<std::vector<cv::Point2f>> points2DVectorsExtrinsic(numberCameras); // camera - keypoints
+            std::vector<std::vector<unsigned int>> matchIndexes(numberCameras); // camera - indixes found
+            if (imageAndPaths.empty())
+                error("imageAndPaths.empty()!.", __LINE__, __FUNCTION__, __FILE__);
+
+            // Debugging
+            // const auto saveVisualSFMFiles = false;
+            const auto saveVisualSFMFiles = true;
+            // Get 2D grid corners of each image
+            std::vector<cv::Mat> imagesWithCorners;
+            const auto imageSize = imageAndPaths.at(0).first.size();
+            const auto numberViews = imageAndPaths.size() / numberCameras;
+            log("Processing cameras...", Priority::High);
+            std::vector<std::thread> threads;
+            for (auto cameraIndex = 0 ; cameraIndex < numberCameras ; cameraIndex++)
+            {
+                auto* points2DExtrinsic = &points2DVectorsExtrinsic[cameraIndex];
+                auto* matchIndexesCamera = &matchIndexes[cameraIndex];
+                // Threaded version
+                threads.emplace_back(estimateAndSaveSiftFileSubThread, points2DExtrinsic,
+                                     matchIndexesCamera, cameraIndex, numberCameras,
+                                     numberCorners, numberViews, saveImagesWithCorners, imageFolder,
+                                     gridInnerCornersCvSize, imageSize, imageAndPaths, saveVisualSFMFiles);
+                // // Non-threaded version
+                // estimateAndSaveSiftFileSubThread(points2DExtrinsic, matchIndexesCamera, cameraIndex, numberCameras,
+                //                                  numberCorners, numberViews, saveImagesWithCorners, imageFolder,
+                //                                  gridInnerCornersCvSize, imageSize, imageAndPaths,
+                //                                  saveVisualSFMFiles);
+            }
+            // Threaded version
+            for (auto& thread : threads)
+                if (thread.joinable())
+                    thread.join();
+
+            // Matching file
+            if (saveVisualSFMFiles)
+            {
+                std::ofstream ofstreamMatches{getFileParentFolderPath(imageAndPaths.at(0).second) + "FeatureMatches.txt"};
+                for (auto cameraIndex = 0 ; cameraIndex < numberCameras ; cameraIndex++)
+                {
+                    for (auto cameraIndex2 = cameraIndex+1 ; cameraIndex2 < numberCameras ; cameraIndex2++)
+                    {
+                        std::vector<unsigned int> matchIndexesIntersection;
+                        std::set_intersection(matchIndexes[cameraIndex].begin(), matchIndexes[cameraIndex].end(),
+                                              matchIndexes[cameraIndex2].begin(), matchIndexes[cameraIndex2].end(),
+                                              std::back_inserter(matchIndexesIntersection));
+
+                        ofstreamMatches << getFileNameFromCameraIndex(cameraIndex) << ".jpg"
+                                        << " " << getFileNameFromCameraIndex(cameraIndex2) << ".jpg"
+                        // ofstreamMatches << getFileNameAndExtension(imageAndPaths.at(cameraIndex).second)
+                        //                 << " " << getFileNameAndExtension(imageAndPaths.at(cameraIndex2).second)
+                                        << " " << matchIndexesIntersection.size() << "\n";
+                        for (auto reps = 0 ; reps < 2 ; reps++)
+                        {
+                            for (auto i = 0u ; i < matchIndexesIntersection.size() ; i++)
+                                ofstreamMatches << matchIndexesIntersection[i] << " ";
+                            ofstreamMatches << "\n";
+                        }
+                        ofstreamMatches << "\n";
+                    }
+                }
+            }
+            // ofstreamMatches.close();
+            log("Number points fully obtained: " + std::to_string(points2DVectorsExtrinsic[0].size()), Priority::High);
+            log("Number views fully obtained: " + std::to_string(points2DVectorsExtrinsic[0].size() / numberCorners),
+                Priority::High);
+            // Sanity check
+            for (auto i = 1 ; i < numberCameras ; i++)
+                if (points2DVectorsExtrinsic[i].size() != points2DVectorsExtrinsic[0].size())
+                    error("Something went wrong. Notify us.", __LINE__, __FUNCTION__, __FILE__);
+
+            // Note:
+            // Extrinsics for each camera: std::vector<cv::Mat> cameraExtrinsics (translation in meters)
+            // Intrinsics for each camera: std::vector<cv::Mat> cameraIntrinsics
+            // Distortions assumed to be 0 (for now...)
+            // 3D coordinates: gridSquareSizeMm (in mm not meters!) is the size of each chessboard square side
+            // 2D coordinates:
+            //     - matchIndexes[cameraIndex] are the coordinates matched (so found) in camera cameraIndex.
+            //     - matchIndexesIntersection shows you how to get the intersection of 2 pair of cameras.
+            //     - points2DVectorsExtrinsic[cameraIndex] has the 2D coordinates of the chessboard for camera cameraIndex.
+            // Please, do not make changes to the code above this line (unless you ask me first), given that this code
+            // is the same than VisualSFM uses, so we can easily compare results with both of them. If you wanna
+            // re-write the 2D matching format, just modify it or duplicate it, but do not remove or edit
+            // `matchIndexesIntersection`.
+            // Last note: For quick debugging, set saveVisualSFMFiles = true and check the generated FeatureMatches.txt
+            // (note that *.sift files are actually in binary format, so quite hard to read.)
+            log("3D square size:");
+            log(gridSquareSizeMm); // Just temporary to avoid warning of unused variable
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    void estimateAndSaveSiftFile(const Point<int>& gridInnerCorners, const std::string& imageFolder,
+                                 const int numberCameras, const bool saveImagesWithCorners)
     {
         try
         {
             log("Loading images...", Priority::High);
-            const auto imageAndPaths = getImageAndPaths(imagesFolder);
+            const auto imageAndPaths = getImageAndPaths(imageFolder);
             log("Images loaded.", Priority::High);
 
             // Point<int> --> cv::Size
@@ -1239,14 +1347,15 @@ namespace op
                 auto* points2DExtrinsic = &points2DVectorsExtrinsic[cameraIndex];
                 auto* matchIndexesCamera = &matchIndexes[cameraIndex];
                 // Threaded version
+                const auto saveSIFTFile = true;
                 threads.emplace_back(estimateAndSaveSiftFileSubThread, points2DExtrinsic,
                                      matchIndexesCamera, cameraIndex, numberCameras,
-                                     numberCorners, numberViews, saveImagesWithCorners, imagesFolder,
-                                     gridInnerCornersCvSize, imageSize, imageAndPaths);
+                                     numberCorners, numberViews, saveImagesWithCorners, imageFolder,
+                                     gridInnerCornersCvSize, imageSize, imageAndPaths, saveSIFTFile);
                 // // Non-threaded version
                 // estimateAndSaveSiftFileSubThread(points2DExtrinsic, matchIndexesCamera, cameraIndex, numberCameras,
-                //                                  numberCorners, numberViews, saveImagesWithCorners, imagesFolder,
-                //                                  gridInnerCornersCvSize, imageSize, imageAndPaths);
+                //                                  numberCorners, numberViews, saveImagesWithCorners, imageFolder,
+                //                                  gridInnerCornersCvSize, imageSize, imageAndPaths, saveSIFTFile);
             }
             // Threaded version
             for (auto& thread : threads)
@@ -1279,10 +1388,10 @@ namespace op
                 }
             }
             ofstreamMatches.close();
-            // Security check
             log("Number points fully obtained: " + std::to_string(points2DVectorsExtrinsic[0].size()), Priority::High);
             log("Number views fully obtained: " + std::to_string(points2DVectorsExtrinsic[0].size() / numberCorners),
                 Priority::High);
+            // Sanity check
             for (auto i = 1 ; i < numberCameras ; i++)
                 if (points2DVectorsExtrinsic[i].size() != points2DVectorsExtrinsic[0].size())
                     error("Something went wrong. Notify us.", __LINE__, __FUNCTION__, __FILE__);

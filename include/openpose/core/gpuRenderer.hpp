@@ -15,7 +15,7 @@ namespace op
                              const float alphaHeatMap, const bool blendOriginalFrame = true,
                              const unsigned int elementToRender = 0u, const unsigned int numberElementsToRender = 0u);
 
-        ~GpuRenderer();
+        virtual ~GpuRenderer();
 
         std::tuple<std::shared_ptr<float*>, std::shared_ptr<bool>, std::shared_ptr<std::atomic<unsigned int>>,
                    std::shared_ptr<std::atomic<unsigned long long>>, std::shared_ptr<const unsigned int>>

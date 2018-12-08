@@ -21,14 +21,16 @@ namespace op
          * will be saved.
          */
         explicit CocoJsonSaver(const std::string& filePathToSave, const bool humanReadable = true,
-                               const CocoJsonFormat cocoJsonFormat = CocoJsonFormat::Body);
+                               const CocoJsonFormat cocoJsonFormat = CocoJsonFormat::Body,
+                               const int mCocoJsonVariant = 0);
 
-        ~CocoJsonSaver();
+        virtual ~CocoJsonSaver();
 
         void record(const Array<float>& poseKeypoints, const Array<float>& poseScores, const std::string& imageName);
 
     private:
         const CocoJsonFormat mCocoJsonFormat;
+        const int mCocoJsonVariant;
         JsonOfstream mJsonOfstream;
         bool mFirstElementAdded;
 

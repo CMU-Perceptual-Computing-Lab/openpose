@@ -9,16 +9,20 @@ namespace op
     // the compatibility with any generic Caffe version, we keep this 'layer' inside our library rather than in the
     // Caffe code.
     template <typename T>
-    class OP_API MaximumCaffe
+    class MaximumCaffe
     {
     public:
         explicit MaximumCaffe();
+
+        virtual ~MaximumCaffe();
 
         virtual void LayerSetUp(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top);
 
         virtual void Reshape(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top);
 
         virtual inline const char* type() const { return "Maximum"; }
+
+        virtual void Forward(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top);
 
         virtual void Forward_cpu(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top);
 

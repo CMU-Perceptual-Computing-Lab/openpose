@@ -5,13 +5,17 @@ OpenPose - Frequently Asked Question (FAQ)
 1. [FAQ](#faq)
     1. [Out of Memory Error](#out-of-memory-error)
     2. [Speed Up, Memory Reduction, and Benchmark](#speed-up-memory-reduction-and-benchmark)
-    3. [Estimating FPS without Display](#estimating-fps-without-display)
-    4. [Webcam Slower than Images](#webcam-slower-than-images)
-    5. [Video/Webcam Not Working](#videowebcam-not-working)
-    6. [Cannot Find OpenPose.dll Error](#cannot-find-openpose.dll-error-windows)
-    7. [Free Invalid Pointer Error](#free-invalid-pointer-error)
-    8. [Source Directory does not Contain CMakeLists.txt (Windows)](#source-directory-does-not-contain-cmakelists.txt-windows)
-    9. [How Should I Link my IP Camera?](#how-should-i-link-my-ip-camera)
+    3. [CPU Version Too Slow](#cpu-version-too-slow)
+    4. [Profiling Speed and Estimating FPS without Display](#profiling-speed-and-estimating-fps-without-display)
+    5. [Webcam Slower than Images](#webcam-slower-than-images)
+    6. [Video/Webcam Not Working](#videowebcam-not-working)
+    7. [Cannot Find OpenPose.dll Error](#cannot-find-openpose.dll-error-windows)
+    8. [Free Invalid Pointer Error](#free-invalid-pointer-error)
+    9. [Source Directory does not Contain CMakeLists.txt (Windows)](#source-directory-does-not-contain-cmakelists.txt-windows)
+    10. [How Should I Link my IP Camera?](#how-should-i-link-my-ip-camera)
+    11. [Difference between BODY_25 vs. COCO vs. MPI](#difference-between-body_25-vs.-coco-vs.-mpi)
+    12. [How to Measure the Latency Time?](#how-to-measure-the-latency-time)
+    13. [Zero People Detected](#zero-people-detected)
 
 
 
@@ -28,18 +32,18 @@ OpenPose - Frequently Asked Question (FAQ)
 ### Speed Up, Memory Reduction, and Benchmark
 **Q: Low speed** - OpenPose is quite slow, is it normal? How can I speed it up?
 
-**A**: Check the [OpenPose Benchmark](https://docs.google.com/spreadsheets/d/1-DynFGvoScvfWDA1P4jDInCkbD4lg0IKOYbXgEq0sK0/edit#gid=0) to discover the approximate speed of your graphics card. Some speed tips:
-
-    1. Use cuDNN 5.1 (cuDNN 6 is ~10% slower).
-    2. Reduce the `--net_resolution` (e.g. to 320x176) (lower accuracy).
-    3. For face, reduce the `--face_net_resolution`. The resolution 320x320 usually works pretty decently.
-    4. Use the `MPI_4_layers` model (lower accuracy and lower number of parts).
-    5. Change GPU rendering by CPU rendering to get approximately +0.5 FPS (`--render_pose 1`).
-    6. Points 2-4 will also help reducing GPU memory (or RAM memory for CPU version).
+**A**: Check [doc/speed_up_preserving_accuracy.md](./speed_up_preserving_accuracy.md) to discover the approximate speed of your graphics card and some speed tips.
 
 
 
-### Estimating FPS without Display
+### CPU Version Too Slow
+**Q: The CPU version is insanely slow compared to the GPU version.**
+
+**A**: Check [doc/speed_up_preserving_accuracy.md#cpu-version](./speed_up_preserving_accuracy.md#cpu-version) to discover the approximate speed and some speed tips.
+
+
+
+### Profiling Speed and Estimating FPS without Display
 Check the [doc/installation.md#profiling-speed](./installation.md#profiling-speed) section.
 
 
@@ -86,6 +90,25 @@ Note: OpenPose library is not an executable, but a library. So instead clicking 
 
 
 ### How Should I Link my IP Camera?
-**Q: How Should I Link my IP Camera with http protocol?.**
+**Q: How Should I Link my IP Camera with http protocol?**
 
 **A**: Usually with `http://CamIP:PORT_NO./video?x.mjpeg`.
+
+
+
+### Difference between BODY_25 vs. COCO vs. MPI
+COCO model will eventually be removed. BODY_25 model is faster, more accurate, and it includes foot keypoints. However, COCO requires less memory on GPU (being able to fit into 2GB GPUs with the default settings) and it runs faster on CPU-only mode. MPI model is only meant for people requiring the MPI-keypoint structure. It is also slower than BODY_25 and far less accurate.
+
+
+
+### How to Measure the Latency Time?
+**Q: How to measure/calculate/estimate the latency/lag time?**
+
+**A**: [Profile](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/installation.md#profiling-speed) the OpenPose speed. For 1-GPU or CPU-only systems (use `--disable_multi_thread` for simplicity in multi-GPU systems for latency measurement), the latency will be roughly the sum of all the reported measurements.
+
+
+
+### Zero People Detected
+**Q: 0 people detected and displayed in default video and images.**
+
+**A**: This problem occurs when the caffemodel has not been properly downloaded. E.g., if the connection drops when downloading the models. Please, remove the current models in the model folder, and download them manually from the links in [doc/installation.md](./installation.md). Alternatively, remove them and re-run Cmake again.

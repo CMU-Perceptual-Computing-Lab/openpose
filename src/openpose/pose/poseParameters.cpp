@@ -93,6 +93,32 @@ namespace op
         {18, "LEar"},
         {19, "Background"}
     };
+    const std::map<unsigned int, std::string> POSE_BODY_23_BODY_PARTS {
+        {0,  "Nose"},
+        {1,  "RShoulder"},
+        {2,  "RElbow"},
+        {3,  "RWrist"},
+        {4,  "LShoulder"},
+        {5,  "LElbow"},
+        {6,  "LWrist"},
+        {7,  "RHip"},
+        {8,  "RKnee"},
+        {9,  "RAnkle"},
+        {10, "LHip"},
+        {11, "LKnee"},
+        {12, "LAnkle"},
+        {13, "REye"},
+        {14, "LEye"},
+        {15, "REar"},
+        {16, "LEar"},
+        {17, "LBigToe"},
+        {18, "LSmallToe"},
+        {19, "LHeel"},
+        {20, "RBigToe"},
+        {21, "RSmallToe"},
+        {22, "RHeel"},
+        {23, "Background"}
+    };
     const std::map<unsigned int, std::string> POSE_BODY_59_BODY_PARTS {
         // Body
         {0,  "Nose"},
@@ -197,6 +223,31 @@ namespace op
         {11, "BLTop"},
         {12, "Background"},
     };
+    const std::map<unsigned int, std::string> POSE_CAR_22_PARTS {
+        {0,  "FLWheel"},
+        {1,  "BLWheel"},
+        {2,  "FRWheel"},
+        {3,  "BRWheel"},
+        {4,  "FRFogLight"},
+        {5,  "FLFogLight"},
+        {6,  "FRLight"},
+        {7,  "FLLight"},
+        {8,  "Grilles"},
+        {9,  "FBumper"},
+        {10, "LMirror"},
+        {11, "RMirror"},
+        {12, "FRTop"},
+        {13, "FLTop"},
+        {14, "BLTop"},
+        {15, "BRTop"},
+        {16, "BLLight"},
+        {17, "BRLight"},
+        {18, "Trunk"},
+        {19, "BBumper"},
+        {20, "BLCorner"},
+        {21, "BRCorner"},
+        {22, "Background"},
+    };
     const std::array<std::vector<unsigned int>, (int)PoseModel::Size> POSE_MAP_INDEX{
         // BODY_25
         std::vector<unsigned int>{
@@ -236,8 +287,10 @@ namespace op
         },
         // BODY_25E
         std::vector<unsigned int>{
-            0,1, 14,15, 20,21, 16,17, 18,19, 22,23, 24,25, 6,7, 2,3, 4,5, 8,9, 10,11, 12,13, 26,27, 28,29, 32,33, 30,31, 34,35, 36,37,38,39,40,41, 42,43,44,45,46,47
-            // ,48,49,50,51,52,53,54,55,56,57, 58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87
+            // Minimum spanning tree
+            0,1,   2,3,   4,5,   6,7,   8,9,  10,11,  12,13, 14,15, 16,17, 18,19, 20,21, 22,23, 24,25, 26,27, 28,29, 30,31, 32,33, 34,35, 36,37, 38,39, 40,41, 42,43, 44,45, 46,47,
+            // Redundant ones
+            48,49, 50,51, 52,53, 54,55, 56,57, 58,59, 60,61, 62,63, 64,65, 66,67, 68,69, 70,71, 72,73, 74,75
         },
         // BODY_25_19
         std::vector<unsigned int>{
@@ -259,13 +312,32 @@ namespace op
         std::vector<unsigned int>{
             0,1, 14,15, 22,23, 16,17, 18,19, 24,25, 26,27, 6,7, 2,3, 4,5, 8,9, 10,11, 12,13, 30,31, 32,33, 36,37, 34,35, 38,39, 20,21, 28,29, 40,41,42,43,44,45, 46,47,48,49,50,51
         },
+        // BODY_23
+        std::vector<unsigned int>{
+            // Minimum spanning tree
+            0,1, 2,3, 4,5, 6,7, 8,9, 10,11, 12,13, 14,15, 16,17, 18,19, 20,21, 22,23, 24,25, 26,27, 28,29, 30,31, 32,33, 34,35, 36,37, 38,39, 40,41, 42,43,
+            // Redundant ones
+               44,45,46,47,    48,49,50,51,  52,53,54,55,    56,57,58,59,  60,61, 62,63,  64,65,66,67,    68,69, 70,71
+        },
+        // CAR_22
+        std::vector<unsigned int>{
+            0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,
+            38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63
+        },
+        // BODY_19E
+        std::vector<unsigned int>{
+            // Minimum spanning tree
+            0,1,   2,3,   4,5,   6,7,   8,9,  10,11,  12,13, 14,15, 16,17, 18,19, 20,21, 22,23, 24,25, 26,27, 28,29, 30,31, 32,33, 34,35, 36,37,
+            // Redundant ones
+            38,39, 40,41, 42,43, 44,45, 46,47, 48,49, 50,51, 52,53, 54,55, 56,57, 58,59, 60,61
+        },
     };
     // POSE_BODY_PART_MAPPING on HPP crashes on Windows at dynamic initialization if it's on hpp
     const std::array<std::map<unsigned int, std::string>, (int)PoseModel::Size> POSE_BODY_PART_MAPPING{
         POSE_BODY_25_BODY_PARTS,POSE_COCO_BODY_PARTS,   POSE_MPI_BODY_PARTS,    POSE_MPI_BODY_PARTS,
         POSE_BODY_19_BODY_PARTS,POSE_BODY_19_BODY_PARTS,POSE_BODY_59_BODY_PARTS,POSE_BODY_19_BODY_PARTS,
         POSE_BODY_25_BODY_PARTS,POSE_BODY_25_BODY_PARTS,POSE_BODY_65_BODY_PARTS,POSE_CAR_12_PARTS,
-        POSE_BODY_25_BODY_PARTS
+        POSE_BODY_25_BODY_PARTS,POSE_BODY_23_BODY_PARTS,POSE_CAR_22_PARTS,      POSE_BODY_19_BODY_PARTS
     };
 
     const std::array<std::string, (int)PoseModel::Size> POSE_PROTOTXT{
@@ -282,6 +354,9 @@ namespace op
         "pose/body_65/pose_deploy.prototxt",
         "car/car_12/pose_deploy.prototxt",
         "pose/body_25d/pose_deploy.prototxt",
+        "pose/body_23/pose_deploy.prototxt",
+        "car/car_22/pose_deploy.prototxt",
+        "pose/body_19e/pose_deploy.prototxt",
     };
     const std::array<std::string, (int)PoseModel::Size> POSE_TRAINED_MODEL{
         "pose/body_25/pose_iter_584000.caffemodel",
@@ -297,12 +372,15 @@ namespace op
         "pose/body_65/pose_iter_XXXXXX.caffemodel",
         "car/car_12/pose_iter_XXXXXX.caffemodel",
         "pose/body_25d/pose_iter_XXXXXX.caffemodel",
+        "pose/body_23/pose_iter_XXXXXX.caffemodel",
+        "car/car_22/pose_iter_XXXXXX.caffemodel",
+        "pose/body_19e/pose_iter_XXXXXX.caffemodel",
     };
 
     // Constant Array Parameters
     // POSE_NUMBER_BODY_PARTS equivalent to size of std::map POSE_BODY_XX_BODY_PARTS - 1 (removing background)
     const std::array<unsigned int, (int)PoseModel::Size> POSE_NUMBER_BODY_PARTS{
-        25, 18, 15, 15, 19, 19, 59, 19, 25, 25, 65, 12, 25
+        25, 18, 15, 15, 19, 19, 59, 19, 25, 25, 65, 12, 25, 23, 22, 19
     };
     const std::array<std::vector<unsigned int>, (int)PoseModel::Size> POSE_BODY_PART_PAIRS{
         // BODY_25
@@ -337,8 +415,13 @@ namespace op
         },
         // BODY_25E
         std::vector<unsigned int>{
-            1,8,   1,2,   1,5,   2,3,   3,4,   5,6,   6,7, 8,9, 9,10,10,11,8,12,12,13,13,14,  1,0,   0,15, 15,17,  0,16, 16,18, 14,19,19,20,14,21, 11,22,22,23,11,24
-           // ,1,3,  1,4,  1,6,  1,7,  1,9,   1,10, 1,11, 1,12, 1,13, 1,14, 1,15, 1,16, 1,17, 1,18, 1,19, 1,20, 1,21, 1,22, 1,23, 1,24
+            // Minimum spanning tree
+            1,8,   1,2, 2,3, 3,4,   1,5, 5,6, 6,7,   8,9, 9,10, 10,11,   8,12, 12,13, 13,14,   1,0, 0,15, 15,17, 0,16, 16,18,
+            // Foot (minimum spanning tree)
+            14,19,19,20,14,21, 11,22,22,23,11,24,
+            // Redundant ones
+            // Ears-shoulders, shoulders-hips, shoulders-wrists, hips-ankles, wrists,  ankles, wrists-hips, small toes-ankles)
+                 2,17, 5,18,        2,9, 5,12,      2,4, 5,7,    9,11, 12,14,   4,7,   11,14,   4,9, 7,12,   11,23, 14,20
         },
         // BODY_25_19
         std::vector<unsigned int>{
@@ -358,40 +441,30 @@ namespace op
         std::vector<unsigned int>{
             1,8,   1,2,   1,5,   2,3,   3,4,   5,6,   6,7,   8,9,   9,10,  10,11, 8,12,  12,13, 13,14,  1,0,   0,15, 15,17,  0,16, 16,18,   2,17,  5,18,   14,19,19,20,14,21, 11,22,22,23,11,24
         },
-    };
-    const std::array<std::vector<int>, (int)PoseModel::Size> POSE_BODY_PART_PAIRS_STAR{
-        std::vector<int>{},    // BODY_25
-        std::vector<int>{},    // COCO
-        std::vector<int>{},    // MPI_15
-        std::vector<int>{},    // MPI_15_4
-        std::vector<int>{},    // BODY_19
-        std::vector<int>{},    // BODY_19_X2
-        std::vector<int>{},    // BODY_59
-        std::vector<int>{},    // BODY_19N
-        std::vector<int>{      // BODY_25E
-            // 1,3,  1,4,  1,6,  1,7,  1,9,   1,10, 1,11, 1,12, 1,13, 1,14, 1,15, 1,16, 1,17, 1,18, 1,19, 1,20, 1,21, 1,22, 1,23, 1,24
-            -1,-1,-1,48,50,-1,52,54,-1,56,   58,   60,   62,   64,   66,   68,   70,   72,   74,   76,   78,   80,   82,   84,   86
-            // 48,49,50,51,52,53,54,55,56,57, 58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87
+        // BODY_23
+        std::vector<unsigned int>{
+            // Minimum spanning tree
+            0,1, 1,2, 2,3, 0,4, 4,5,  5,6,   7,8,   8,9,  10,11, 11,12,  0,13, 13,15,  0,14, 14,16, 12,17, 17,18, 12,19,  9,20, 20,21,  9,22,  1,7,   4,10,
+            // Redundant ones
+            // Ears-shoulders, ears,  hips, shoulders-wrists, hips-ankles, wrists, ankles, wrists-hips, small toes-ankles)
+            //     +2.4%       +0.2%  +0.3%      +0.1%       -0.1% (bad!)  +0.2%   +0.2%      +0.1%       -0.1% (bad!)
+                1,15, 4,16,    15,16, 7,10,    1,3, 4,6,      7,9, 10,12,   3,6,   9,12,    3,7, 6,10,     9,21, 12,18
         },
-        std::vector<int>{},    // BODY_25_19
-        std::vector<int>{},    // BODY_65
-        std::vector<int>{},    // CAR_12
-        std::vector<int>{},    // BODY_25D
-    };
-    const std::array<unsigned int, (int)PoseModel::Size> POSE_MAX_PEAKS{
-        POSE_MAX_PEOPLE,    // BODY_25
-        POSE_MAX_PEOPLE,    // COCO
-        POSE_MAX_PEOPLE,    // MPI_15
-        POSE_MAX_PEOPLE,    // MPI_15_4
-        POSE_MAX_PEOPLE,    // BODY_19
-        POSE_MAX_PEOPLE,    // BODY_19_X2
-        POSE_MAX_PEOPLE,    // BODY_59
-        POSE_MAX_PEOPLE,    // BODY_19N
-        POSE_MAX_PEOPLE,    // BODY_25E
-        POSE_MAX_PEOPLE,    // BODY_25_19
-        POSE_MAX_PEOPLE,    // BODY_65
-        POSE_MAX_PEOPLE,    // CAR_12
-        POSE_MAX_PEOPLE,    // BODY_25D
+        // CAR_22
+        std::vector<unsigned int>{
+        //       Wheels                Lights                   Top                       Front                Mirrors
+            0,1,1,3,3,2,2,0,   6,7,7,16,16,17,17,6,   12,13,13,14,14,15,15,12,   6,8,7,8,6,9,7,9,6,4,7,5,   12,11,13,10,
+        //            Back                  Vertical         Back-light replacement
+            16,18,17,18,16,19,17,19,   0,7,3,17,6,12,16,14,   6,21,7,20,3,21,20,14
+        },
+        // BODY_19E
+        std::vector<unsigned int>{
+            // Minimum spanning tree
+            1,8,   1,2, 2,3, 3,4,   1,5, 5,6, 6,7,   8,9, 9,10, 10,11,   8,12, 12,13, 13,14,   1,0, 0,15, 15,17, 0,16, 16,18,
+            // Redundant ones
+            // Ears-shoulders, shoulders-hips, shoulders-wrists, hips-ankles, wrists,  ankles, wrists-hips, small toes-ankles)
+                 2,17, 5,18,        2,9, 5,12,      2,4, 5,7,    9,11, 12,14,   4,7,   11,14,   4,9, 7,12//,   11,23, 14,20
+        },
     };
     const std::array<float, (int)PoseModel::Size> POSE_CCN_DECREASE_FACTOR{
         8.f,    // BODY_25
@@ -407,31 +480,9 @@ namespace op
         8.f,    // BODY_65
         8.f,    // CAR_12
         8.f,    // BODY_25D
-    };
-
-    // Default Model Parameters
-    // They might be modified on running time
-    const auto nmsT = (COCO_CHALLENGE ? 0.04f : 0.05f);
-    const std::array<float, (int)PoseModel::Size>           POSE_DEFAULT_NMS_THRESHOLD{
-        nmsT,       nmsT,       0.6f,       0.3f,       nmsT,       nmsT,       nmsT,       nmsT,       nmsT,       nmsT,       nmsT,       nmsT,       nmsT
-    };
-    const auto minAT = (COCO_CHALLENGE ? 0.75f : 0.95f); // Matlab version: 0.85f
-    const std::array<float, (int)PoseModel::Size>    POSE_DEFAULT_CONNECT_INTER_MIN_ABOVE_THRESHOLD{
-        minAT,      minAT,      minAT,      minAT,      minAT,      minAT,      minAT,      minAT,      minAT,      minAT,      minAT,      minAT,      minAT
-        // 0.85f,      0.85f,      0.85f,      0.85f,      0.85f,      0.85f // Matlab version
-    };
-    const auto conIT = (COCO_CHALLENGE ? 0.01f : 0.05f);
-    const std::array<float, (int)PoseModel::Size>           POSE_DEFAULT_CONNECT_INTER_THRESHOLD{
-        conIT,      conIT,      0.01f,      0.01f,      conIT,      conIT,      conIT,      conIT,      conIT,      conIT,      conIT,      conIT,      conIT
-    };
-    const auto minSC = (COCO_CHALLENGE ? 2 : 3);
-    const std::array<unsigned int, (int)PoseModel::Size>    POSE_DEFAULT_CONNECT_MIN_SUBSET_CNT{
-        minSC,      minSC,      minSC,      minSC,      minSC,      minSC,      minSC,      minSC,      minSC,      minSC,      minSC,      minSC,      minSC
-    };
-    const auto minSS = (COCO_CHALLENGE ? 0.05f : 0.4f);
-    const std::array<float, (int)PoseModel::Size>           POSE_DEFAULT_CONNECT_MIN_SUBSET_SCORE{
-        minSS,      minSS,      minSS,      minSS,      minSS,      minSS,      minSS,      minSS,      minSS,      minSS,      minSS,      minSS,      minSS
-        // 0.2f,       0.4f,       0.4f,       0.4f,       0.4f,       0.4f // Matlab version
+        8.f,    // BODY_23
+        8.f,    // CAR_22
+        8.f,    // BODY_19E
     };
 
     const std::map<unsigned int, std::string>& getPoseBodyPartMapping(const PoseModel poseModel)
@@ -512,24 +563,11 @@ namespace op
         }
     }
 
-    const std::vector<int>& getPosePartPairsStar(const PoseModel poseModel)
+    unsigned int getPoseMaxPeaks()
     {
         try
         {
-            return POSE_BODY_PART_PAIRS_STAR.at((int)poseModel);
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return POSE_BODY_PART_PAIRS_STAR[(int)poseModel];
-        }
-    }
-
-    unsigned int getPoseMaxPeaks(const PoseModel poseModel)
-    {
-        try
-        {
-            return POSE_MAX_PEAKS.at((int)poseModel);
+            return POSE_MAX_PEOPLE;
         }
         catch (const std::exception& e)
         {
@@ -584,11 +622,19 @@ namespace op
     }
 
     // Default Model Parameters
-    float getPoseDefaultNmsThreshold(const PoseModel poseModel)
+    // They might be modified on running time
+    float getPoseDefaultNmsThreshold(const PoseModel poseModel, const bool maximizePositives)
     {
         try
         {
-            return POSE_DEFAULT_NMS_THRESHOLD.at((int)poseModel);
+            // MPI models
+            if (poseModel == PoseModel::MPI_15)
+                return 0.6f;
+            else if (poseModel == PoseModel::MPI_15_4)
+                return 0.3f;
+            // Non-MPI models
+            else
+                return (maximizePositives ? 0.02f : 0.05f);
         }
         catch (const std::exception& e)
         {
@@ -597,11 +643,11 @@ namespace op
         }
     }
 
-    float getPoseDefaultConnectInterMinAboveThreshold(const PoseModel poseModel)
+    float getPoseDefaultConnectInterMinAboveThreshold(const bool maximizePositives)
     {
         try
         {
-            return POSE_DEFAULT_CONNECT_INTER_MIN_ABOVE_THRESHOLD.at((int)poseModel);
+            return (maximizePositives ? 0.75f : 0.95f);
         }
         catch (const std::exception& e)
         {
@@ -610,11 +656,16 @@ namespace op
         }
     }
 
-    float getPoseDefaultConnectInterThreshold(const PoseModel poseModel)
+    float getPoseDefaultConnectInterThreshold(const PoseModel poseModel, const bool maximizePositives)
     {
         try
         {
-            return POSE_DEFAULT_CONNECT_INTER_THRESHOLD.at((int)poseModel);
+            // MPI models
+            if (poseModel == PoseModel::MPI_15 || poseModel == PoseModel::MPI_15_4)
+                return 0.01f;
+            // Non-MPI models
+            else
+                return (maximizePositives ? 0.01f : 0.05f);
         }
         catch (const std::exception& e)
         {
@@ -623,11 +674,11 @@ namespace op
         }
     }
 
-    unsigned int getPoseDefaultMinSubsetCnt(const PoseModel poseModel)
+    unsigned int getPoseDefaultMinSubsetCnt(const bool maximizePositives)
     {
         try
         {
-            return POSE_DEFAULT_CONNECT_MIN_SUBSET_CNT.at((int)poseModel);
+            return (maximizePositives ? 2u : 3u);
         }
         catch (const std::exception& e)
         {
@@ -636,11 +687,11 @@ namespace op
         }
     }
 
-    float getPoseDefaultConnectMinSubsetScore(const PoseModel poseModel)
+    float getPoseDefaultConnectMinSubsetScore(const bool maximizePositives)
     {
         try
         {
-            return POSE_DEFAULT_CONNECT_MIN_SUBSET_SCORE.at((int)poseModel);
+            return (maximizePositives ? 0.05f : 0.4f);
         }
         catch (const std::exception& e)
         {

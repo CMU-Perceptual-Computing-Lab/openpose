@@ -1,19 +1,14 @@
 // ------------------------- OpenPose Resize Layer Testing -------------------------
 
+// Command-line user intraface
+#define OPENPOSE_FLAGS_DISABLE_POSE
+#include <openpose/flags.hpp>
+// OpenPose dependencies
 #include <openpose/headers.hpp>
+// OpenCL dependencies
 #ifdef USE_OPENCL
 #include <openpose/gpu/opencl.hcl>
 #include <openpose/gpu/cl2.hpp>
-#include <chrono> // `std::chrono::` functions and classes, e.g. std::chrono::milliseconds
-// GFlags: DEFINE_bool, _int32, _int64, _uint64, _double, _string
-#include <gflags/gflags.h>
-// Allow Google Flags in Ubuntu 14
-#ifndef GFLAGS_GFLAGS_H_
-namespace gflags = google;
-#endif
-#ifdef USE_CAFFE
-#include <caffe/net.hpp>
-#endif
 
 DEFINE_string(image_path,               "examples/media/COCO_val2014_000000000192.jpg",     "Process the desired image.");
 

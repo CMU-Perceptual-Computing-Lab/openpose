@@ -1,5 +1,4 @@
 #include <iostream>
-#include <thread>
 #include <opencv2/imgproc/imgproc.hpp> // cv::resize
 #include <openpose/tracking/personTracker.hpp>
 #include <openpose/utilities/fastMath.hpp>
@@ -19,7 +18,7 @@ namespace op
         return numToRound + multiple - remainder;
     }
 
-    float computePersonScale(const PersonTrackerEntry& personEntry, const cv::Mat& imageCurrent)
+    int computePersonScale(const PersonTrackerEntry& personEntry, const cv::Mat& imageCurrent)
     {
         int layerCount = 0;
         if (personEntry.status[0] || personEntry.status[14] ||
@@ -34,10 +33,10 @@ namespace op
             personEntry.status[12] || personEntry.status[13])
             layerCount++;
 
-        float minX = imageCurrent.size().width;
-        float maxX = 0;
-        float minY = imageCurrent.size().height;
-        float maxY = 0;
+        float minX = (float)imageCurrent.size().width;
+        float maxX = 0.f;
+        float minY = (float)imageCurrent.size().height;
+        float maxY = 0.f;
         int totalKp = 0;
         for (size_t i=0; i<personEntry.keypoints.size(); i++)
         {
@@ -62,9 +61,7 @@ namespace op
             maxDist = (xDist)*(4/layerCount);
         else
             maxDist = (yDist)*(4/layerCount);
-        const float lkSize = roundUp(int(maxDist / 10.), 3);
-        // std::cout << lkSize << std::endl;
-        return lkSize;
+        return roundUp(int(maxDist / 10.), 3);
     }
 
     void updateLK(std::unordered_map<int,PersonTrackerEntry>& personEntries,
@@ -151,7 +148,7 @@ namespace op
             personEntries.clear();
             for (int i=0; i<poseKeypoints.getSize(0); i++)
             {
-                const auto id = poseIds[i];
+                const auto id = int(poseIds[i]);
                 personEntries[id] = PersonTrackerEntry();
                 personEntries[id].keypoints.resize(poseKeypoints.getSize(1));
                 personEntries[id].status.resize(poseKeypoints.getSize(1));
@@ -206,7 +203,7 @@ namespace op
                 // Update or Add
                 for (int i=0; i<poseIds.getSize(0); i++)
                 {
-                    const auto id = poseIds[i];
+                    const auto id = int(poseIds[i]);
 
                     // Update
                     if (personEntries.count(id) && mergeResults)
@@ -224,14 +221,14 @@ namespace op
                                     i*poseKeypoints.getSize(1)*poseKeypoints.getSize(2) +
                                     j*poseKeypoints.getSize(2) + 2];
                             const cv::Point lkPoint = personEntry.keypoints[j];
-                            const cv::Point opPoint = cv::Point(x,y);
+                            const cv::Point opPoint{intRound(x), intRound(y)};
 
                             if (prob < confidenceThreshold)
                                 personEntries[id].status[j] = 0;
                             else
                             {
                                 personEntries[id].status[j] = 1;
-                                float distance = sqrt(pow(lkPoint.x-opPoint.x,2)+pow(lkPoint.y-opPoint.y,2));
+                                const auto distance = sqrt(pow(lkPoint.x-opPoint.x,2)+pow(lkPoint.y-opPoint.y,2));
                                 if (distance < 5)
                                     personEntries[id].keypoints[j] = lkPoint;
                                 else if (distance < 10)
@@ -299,23 +296,23 @@ namespace op
         {
             if (personEntries.size() && !poseIds.empty())
             {
-                int dims[] = { (int)personEntries.size(), (int)personEntries.begin()->second.keypoints.size(), 3 };
-                cv::Mat opArrayMat(3,dims,CV_32FC1);
+                poseKeypoints.reset(
+                    {(int)personEntries.size(), (int)personEntries.begin()->second.keypoints.size(), 3});
                 for (auto i=0; i<poseIds.getSize(0); i++)
                 {
-                    const int id = poseIds[i];
+                    const auto id = int(poseIds[i]);
                     const PersonTrackerEntry& pe = personEntries.at(id);
-                    for (int j=0; j<dims[1]; j++)
+                    const int baseIndexY = i*poseKeypoints.getSize(1)*poseKeypoints.getSize(2);
+                    for (int j=0 ; j<poseKeypoints.getSize(1) ; j++)
                     {
-                        const auto baseIndex = i*dims[1]*dims[2] + j*dims[2];
-                        opArrayMat.at<float>(baseIndex + 0) = pe.keypoints[j].x;
-                        opArrayMat.at<float>(baseIndex + 1) = pe.keypoints[j].y;
-                        opArrayMat.at<float>(baseIndex + 2) = (int)pe.status[j];
+                        const auto baseIndex = baseIndexY + j*poseKeypoints.getSize(2);
+                        poseKeypoints[baseIndex] = pe.keypoints[j].x;
+                        poseKeypoints[baseIndex+1] = pe.keypoints[j].y;
+                        poseKeypoints[baseIndex+2] = float(int(pe.status[j]));
                         if (pe.keypoints[j].x == 0 && pe.keypoints[j].y == 0)
-                            opArrayMat.at<float>(baseIndex + 2) = 0;
+                            poseKeypoints[baseIndex+2] = 0;
                     }
                 }
-                poseKeypoints.setFrom(opArrayMat);
             }
         }
         catch (const std::exception& e)
@@ -359,8 +356,8 @@ namespace op
     {
         try
         {
-            error("PersonTracker (`tracking` flag) buggy and not working yet, but we are working on it!"
-                  " Coming soon!", __LINE__, __FUNCTION__, __FILE__);
+            log("Person tracking (`tracking` flag) is in experimental phase. Please, let us know if you"
+                " find any bug on this alpha version.", op::Priority::High);
         }
         catch (const std::exception& e)
         {
@@ -377,6 +374,14 @@ namespace op
     {
         try
         {
+            // Sanity Checks
+            if (poseKeypoints.getSize(0) > 1)
+                 error("Person tracking (`--tracking` flag) is in experimental phase and only allows tracking of up"
+                       " to 1 person at the time. Please, also include the `--number_people_max 1` flag when using"
+                       " the `--tracking` flag. Tracking more than one person at the time is not expected as"
+                       " short- nor medium-term goal.",
+                       __LINE__, __FUNCTION__, __FILE__);
+
             /*
              * 1. Get poseKeypoints for all people - Checks
              * 2. If last image is empty or mPersonEntries is empty (& poseKeypoints and poseIds has data or crash it)
@@ -414,7 +419,8 @@ namespace op
                 // Rescale
                 if (mRescale)
                 {
-                    cv::Size rescaleSize(mRescale,mImagePrevious.size().height/(mImagePrevious.size().width/mRescale));
+                    cv::Size rescaleSize{
+						intRound(mRescale), intRound(mImagePrevious.size().height/(mImagePrevious.size().width/mRescale))};
                     cv::resize(mImagePrevious, mImagePrevious, rescaleSize, 0, 0, cv::INTER_CUBIC);
                 }
                 // Save Last Ids
@@ -433,12 +439,13 @@ namespace op
                     float xScale = 1., yScale = 1.;
                     if (mRescale)
                     {
-                        cv::Size rescaleSize(mRescale,imageCurrent.size().height/(imageCurrent.size().width/mRescale));
-                        xScale = (float)imageCurrent.size().width / (float)rescaleSize.width;
-                        yScale = (float)imageCurrent.size().height / (float)rescaleSize.height;
+                        cv::Size rescaleSize{
+							intRound(mRescale), intRound(imageCurrent.size().height/(imageCurrent.size().width/mRescale))};
+                        xScale = imageCurrent.size().width / (float)rescaleSize.width;
+                        yScale = imageCurrent.size().height / (float)rescaleSize.height;
                         cv::resize(imageCurrent, imageCurrent, rescaleSize, 0, 0, cv::INTER_CUBIC);
                     }
-                    scaleKeypoints(mPersonEntries, 1./xScale, 1./yScale);
+                    scaleKeypoints(mPersonEntries, 1.f/xScale, 1.f/yScale);
                     updateLK(mPersonEntries, mPyramidImagesPrevious, pyramidImagesCurrent, mImagePrevious,
                              imageCurrent, mLevels, mPatchSize, mTrackVelocity, mScaleVarying);
                     scaleKeypoints(mPersonEntries, xScale, yScale);

@@ -18,6 +18,10 @@ namespace op
         }
     }
 
+    FaceDetectorOpenCV::~FaceDetectorOpenCV()
+    {
+    }
+
     std::vector<Rectangle<float>> FaceDetectorOpenCV::detectFaces(const cv::Mat& cvInputData)
     {
         try

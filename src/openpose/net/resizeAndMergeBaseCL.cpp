@@ -56,8 +56,8 @@ namespace op
                 // return v1 + 0.5f * dx * (v2 - v0 + dx * (2.f * v0 - 5.f * v1 + 4.f * v2 - v3 + dx * (3.f * (v1 - v2) + v3 - v0)));
             }
 
-            Type bicubicInterpolate(__global const Type* sourcePtr, const Type xSource, const Type ySource, const int widthSource,
-                                                   const int heightSource, const int widthSourcePtr)
+            Type bicubicInterpolate(__global const Type* sourcePtr, const Type xSource, const Type ySource,
+                                    const int widthSource, const int heightSource, const int widthSourcePtr)
             {
                 int xIntArray[4];
                 int yIntArray[4];
@@ -220,7 +220,7 @@ namespace op
         try
         {
             #ifdef USE_OPENCL
-                // Security checks
+                // Sanity checks
                 if (sourceSizes.empty())
                     error("sourceSizes cannot be empty.", __LINE__, __FUNCTION__, __FILE__);
                 if (sourcePtrs.size() != sourceSizes.size() || sourceSizes.size() != scaleInputToNetInputs.size())
@@ -232,7 +232,8 @@ namespace op
                 cl::Buffer targetPtrBuffer = cl::Buffer((cl_mem)(targetPtr), true);
                 auto resizeAndMergeFullKernel = op::OpenCL::getInstance(gpuID)->getKernelFunctorFromManager
                         <op::ResizeAndMergeFullFunctor, T>(
-                            "resizeAndMergeFullKernel",op::resizeAndMergeOclCommonFunctions+op::resizeAndMergeFullKernel);
+                            "resizeAndMergeFullKernel",
+                            op::resizeAndMergeOclCommonFunctions+op::resizeAndMergeFullKernel);
                 auto resizeAndMergeKernel = op::OpenCL::getInstance(gpuID)->getKernelFunctorFromManager
                         <op::ResizeAndMergeFunctor, T>(
                             "resizeAndMergeKernel",op::resizeAndMergeOclCommonFunctions+op::resizeAndMergeKernel);
@@ -274,8 +275,9 @@ namespace op
                         {
                             // Allocate memory on GPU once
                             if(sourceTempPtrs[0] == nullptr){
-                                cl::Buffer* sourcePtrBufferIdealX = new cl::Buffer(op::OpenCL::getInstance(gpuID)->getContext(), CL_MEM_READ_WRITE,
-                                                                      sizeof(float) * channels * sourceWidthIdeal * sourceHeightIdeal);
+                                cl::Buffer* sourcePtrBufferIdealX = new cl::Buffer(
+                                    op::OpenCL::getInstance(gpuID)->getContext(), CL_MEM_READ_WRITE,
+                                    sizeof(float) * channels * sourceWidthIdeal * sourceHeightIdeal);
                                 sourceTempPtrs[0] = (T*)sourcePtrBufferIdealX->get();
                             }
                             cl::Buffer sourcePtrBufferIdeal = cl::Buffer((cl_mem)(sourceTempPtrs[0]), true);
@@ -291,14 +293,14 @@ namespace op
                             {
                                 const auto offset = offsetBase + c;
                                 cl_buffer_region targerRegion, sourceRegion;
-                                OpenCL::getBufferRegion<T>(targerRegion, offset * targetChannelOffset, targetChannelOffset);
-                                cl::Buffer targetBuffer = targetPtrBuffer.createSubBuffer(CL_MEM_READ_WRITE,
-                                                                                          CL_BUFFER_CREATE_TYPE_REGION,
-                                                                                          &targerRegion);
-                                op::OpenCL::getBufferRegion<T>(sourceRegion, offset * sourceChannelOffsetIdeal, sourceChannelOffsetIdeal);
-                                cl::Buffer sourceBuffer = sourcePtrBufferIdeal.createSubBuffer(CL_MEM_READ_ONLY,
-                                                                                               CL_BUFFER_CREATE_TYPE_REGION,
-                                                                                               &sourceRegion);
+                                OpenCL::getBufferRegion<T>(
+                                    targerRegion, offset * targetChannelOffset, targetChannelOffset);
+                                cl::Buffer targetBuffer = targetPtrBuffer.createSubBuffer(
+                                    CL_MEM_READ_WRITE, CL_BUFFER_CREATE_TYPE_REGION, &targerRegion);
+                                op::OpenCL::getBufferRegion<T>(
+                                    sourceRegion, offset * sourceChannelOffsetIdeal, sourceChannelOffsetIdeal);
+                                cl::Buffer sourceBuffer = sourcePtrBufferIdeal.createSubBuffer(
+                                    CL_MEM_READ_ONLY, CL_BUFFER_CREATE_TYPE_REGION, &sourceRegion);
                                 resizeAndMergeKernel(cl::EnqueueArgs(op::OpenCL::getInstance(gpuID)->getQueue(),
                                                      cl::NDRange(targetWidth, targetHeight)),
                                                      targetBuffer, sourceBuffer,
@@ -309,7 +311,8 @@ namespace op
                     }
                     // Old inefficient multi-scale merging
                     else
-                        error("It should never reache this point. Notify us otherwise.", __LINE__, __FUNCTION__, __FILE__);
+                        error("It should never reache this point. Notify us otherwise.",
+                              __LINE__, __FUNCTION__, __FILE__);
                 }
                 // Multi-scaling merging
                 else
@@ -339,8 +342,9 @@ namespace op
 
                         // Allocate memory on GPU once
                         if(sourceTempPtrs[i] == nullptr){
-                            cl::Buffer* sourcePtrBufferIdealX = new cl::Buffer(op::OpenCL::getInstance(gpuID)->getContext(), CL_MEM_READ_WRITE,
-                                                                  sizeof(float) * channels * currentWidthIdeal * currentHeightIdeal);
+                            cl::Buffer* sourcePtrBufferIdealX = new cl::Buffer(
+                                op::OpenCL::getInstance(gpuID)->getContext(), CL_MEM_READ_WRITE,
+                                sizeof(float) * channels * currentWidthIdeal * currentHeightIdeal);
                             sourceTempPtrs[i] = (T*)sourcePtrBufferIdealX->get();
                         }
                         cl::Buffer sourcePtrBufferIdeal = cl::Buffer((cl_mem)(sourceTempPtrs[i]), true);
@@ -357,21 +361,19 @@ namespace op
                             for (auto c = 0 ; c < channels ; c++)
                             {
                                 cl_buffer_region targerRegion, sourceRegion;
-                                op::OpenCL::getBufferRegion<T>(targerRegion, c * targetChannelOffset, targetChannelOffset);
-                                op::OpenCL::getBufferRegion<T>(sourceRegion, c * sourceChannelOffsetIdeal, sourceChannelOffsetIdeal);
-                                cl::Buffer targetBuffer = targetPtrBuffer.createSubBuffer(CL_MEM_READ_WRITE,
-                                                                                          CL_BUFFER_CREATE_TYPE_REGION,
-                                                                                          &targerRegion);
-                                cl::Buffer sourceBuffer = sourcePtrBufferIdeal.createSubBuffer(CL_MEM_READ_WRITE,
-                                                                                          CL_BUFFER_CREATE_TYPE_REGION,
-                                                                                          &sourceRegion);
-                                resizeAndAddKernel(cl::EnqueueArgs(OpenCL::getInstance(gpuID)->getQueue(),
-                                                                   cl::NDRange(targetWidth, targetHeight)),
-                                                                   targetBuffer, sourceBuffer,
-                                                                   scaleWidth, scaleHeight,
-                                                                   currentWidthIdeal, currentHeightIdeal,
-                                                                   targetWidth, targetHeight,
-                                                                   (currentWidthIdeal-currentWidth), (currentHeightIdeal-currentHeight));
+                                op::OpenCL::getBufferRegion<T>(
+                                    targerRegion, c * targetChannelOffset, targetChannelOffset);
+                                op::OpenCL::getBufferRegion<T>(
+                                    sourceRegion, c * sourceChannelOffsetIdeal, sourceChannelOffsetIdeal);
+                                cl::Buffer targetBuffer = targetPtrBuffer.createSubBuffer(
+                                    CL_MEM_READ_WRITE, CL_BUFFER_CREATE_TYPE_REGION, &targerRegion);
+                                cl::Buffer sourceBuffer = sourcePtrBufferIdeal.createSubBuffer(
+                                    CL_MEM_READ_WRITE, CL_BUFFER_CREATE_TYPE_REGION, &sourceRegion);
+                                resizeAndAddKernel(cl::EnqueueArgs(
+                                    OpenCL::getInstance(gpuID)->getQueue(), cl::NDRange(targetWidth, targetHeight)),
+                                    targetBuffer, sourceBuffer, scaleWidth, scaleHeight, currentWidthIdeal,
+                                    currentHeightIdeal, targetWidth, targetHeight, (currentWidthIdeal-currentWidth),
+                                    (currentHeightIdeal-currentHeight));
                             }
                         }
                         // Last image --> average all
@@ -380,22 +382,19 @@ namespace op
                             for (auto c = 0 ; c < channels ; c++)
                             {
                                 cl_buffer_region targerRegion, sourceRegion;
-                                op::OpenCL::getBufferRegion<T>(targerRegion, c * targetChannelOffset, targetChannelOffset);
-                                op::OpenCL::getBufferRegion<T>(sourceRegion, c * sourceChannelOffsetIdeal, sourceChannelOffsetIdeal);
-                                cl::Buffer targetBuffer = targetPtrBuffer.createSubBuffer(CL_MEM_READ_WRITE,
-                                                                                          CL_BUFFER_CREATE_TYPE_REGION,
-                                                                                          &targerRegion);
-                                cl::Buffer sourceBuffer = sourcePtrBufferIdeal.createSubBuffer(CL_MEM_READ_WRITE,
-                                                                                          CL_BUFFER_CREATE_TYPE_REGION,
-                                                                                          &sourceRegion);
-                                resizeAndAverageKernel(cl::EnqueueArgs(OpenCL::getInstance(gpuID)->getQueue(),
-                                                                       cl::NDRange(targetWidth, targetHeight)),
-                                                                       targetBuffer, sourceBuffer,
-                                                                       scaleWidth, scaleHeight,
-                                                                       currentWidthIdeal, currentHeightIdeal,
-                                                                       targetWidth, targetHeight,
-                                                                       (currentWidthIdeal-currentWidth), (currentHeightIdeal-currentHeight),
-                                                                       (int)sourceSizes.size());
+                                op::OpenCL::getBufferRegion<T>(
+                                    targerRegion, c * targetChannelOffset, targetChannelOffset);
+                                op::OpenCL::getBufferRegion<T>(
+                                    sourceRegion, c * sourceChannelOffsetIdeal, sourceChannelOffsetIdeal);
+                                cl::Buffer targetBuffer = targetPtrBuffer.createSubBuffer(
+                                    CL_MEM_READ_WRITE, CL_BUFFER_CREATE_TYPE_REGION, &targerRegion);
+                                cl::Buffer sourceBuffer = sourcePtrBufferIdeal.createSubBuffer(
+                                    CL_MEM_READ_WRITE, CL_BUFFER_CREATE_TYPE_REGION, &sourceRegion);
+                                resizeAndAverageKernel(cl::EnqueueArgs(
+                                    OpenCL::getInstance(gpuID)->getQueue(), cl::NDRange(targetWidth, targetHeight)),
+                                    targetBuffer, sourceBuffer, scaleWidth, scaleHeight, currentWidthIdeal,
+                                    currentHeightIdeal, targetWidth, targetHeight, (currentWidthIdeal-currentWidth),
+                                    (currentHeightIdeal-currentHeight), (int)sourceSizes.size());
                             }
                         }
                     }
@@ -425,17 +424,13 @@ namespace op
         }
     }
 
-    template void resizeAndMergeOcl(float* targetPtr, const std::vector<const float*>& sourcePtrs,
-                                    std::vector<float*>& sourceTempPtrs,
-                                    const std::array<int, 4>& targetSize,
-                                    const std::vector<std::array<int, 4>>& sourceSizes,
-                                    const std::vector<float>& scaleInputToNetInputs,
-                                    int gpuID);
+    template void resizeAndMergeOcl(
+        float* targetPtr, const std::vector<const float*>& sourcePtrs, std::vector<float*>& sourceTempPtrs,
+        const std::array<int, 4>& targetSize, const std::vector<std::array<int, 4>>& sourceSizes,
+        const std::vector<float>& scaleInputToNetInputs, const int gpuID);
 
-    template void resizeAndMergeOcl(double* targetPtr, const std::vector<const double*>& sourcePtrs,
-                                    std::vector<double*>& sourceTempPtrs,
-                                    const std::array<int, 4>& targetSize,
-                                    const std::vector<std::array<int, 4>>& sourceSizes,
-                                    const std::vector<double>& scaleInputToNetInputs,
-                                    int gpuID);
+    template void resizeAndMergeOcl(
+        double* targetPtr, const std::vector<const double*>& sourcePtrs, std::vector<double*>& sourceTempPtrs,
+        const std::array<int, 4>& targetSize, const std::vector<std::array<int, 4>>& sourceSizes,
+        const std::vector<double>& scaleInputToNetInputs, const int gpuID);
 }

@@ -10,6 +10,8 @@ namespace op
     public:
         UdpSender(const std::string& udpHost, const std::string& udpPort);
 
+        virtual ~UdpSender();
+
         void sendJointAngles(const double* const adamPosePtr, const int adamPoseRows,
                              const double* const adamTranslationPtr,
                              const double* const adamFaceCoeffsExpPtr, const int faceCoeffRows);

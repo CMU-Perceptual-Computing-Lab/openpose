@@ -25,7 +25,7 @@ namespace op
         unsigned long long subIdMax; /**< Datum maximum sub-ID. Used to sort the Datums if multi-threading is used. */
 
         /**
-         * Name used when saving the data to disk (e.g. `write_images` or `write_keypoint` flags in the demo).
+         * Name used when saving the data to disk (e.g., `write_images` or `write_keypoint` flags in the demo).
          */
         std::string name;
 
@@ -57,14 +57,14 @@ namespace op
         /**
          * Rendered image in Array<float> format.
          * It consists of a blending of the cvInputData and the pose/body part(s) heatmap/PAF(s).
-         * If rendering is disabled (e.g. `no_render_pose` flag in the demo), outputData will be empty.
+         * If rendering is disabled (e.g., `no_render_pose` flag in the demo), outputData will be empty.
          * Size: 3 x output_net_height x output_net_width
          */
         Array<float> outputData;
 
         /**
          * Rendered image in cv::Mat uchar format.
-         * It has been resized to the desired output resolution (e.g. `resolution` flag in the demo).
+         * It has been resized to the desired output resolution (e.g., `resolution` flag in the demo).
          * If outputData is empty, cvOutputData will also be empty.
          * Size: (output_height x output_width) x 3 channels
          */
@@ -73,8 +73,8 @@ namespace op
         // ------------------------------ Resulting Array<float> data parameters ------------------------------ //
         /**
          * Body pose (x,y,score) locations for each person in the image.
-         * It has been resized to the desired output resolution (e.g. `resolution` flag in the demo).
-         * Size: #people x #body parts (e.g. 18 for COCO or 15 for MPI) x 3 ((x,y) coordinates + score)
+         * It has been resized to the desired output resolution (e.g., `resolution` flag in the demo).
+         * Size: #people x #body parts (e.g., 18 for COCO or 15 for MPI) x 3 ((x,y) coordinates + score)
          */
         Array<float> poseKeypoints;
 
@@ -91,7 +91,7 @@ namespace op
          * Body pose global confidence/score for each person in the image.
          * It does not only consider the score of each body keypoint, but also the score of each PAF association.
          * Optimized for COCO evaluation metric.
-         * It will highly penalyze people with missing body parts (e.g. cropped people on the borders of the image).
+         * It will highly penalyze people with missing body parts (e.g., cropped people on the borders of the image).
          * If poseKeypoints is empty, poseScores will also be empty.
          * Size: #people
          */
@@ -106,7 +106,7 @@ namespace op
          * Order heatmaps: body parts + background (as appears in POSE_BODY_PART_MAPPING) + (x,y) channel of each PAF
          * (sorted as appears in POSE_BODY_PART_PAIRS). See `pose/poseParameters.hpp`.
          * The user can choose the heatmaps normalization: ranges [0, 1], [-1, 1] or [0, 255]. Check the
-         * `heatmaps_scale` flag in the examples/tutorial_wrapper/ for more details.
+         * `heatmaps_scale` flag in {OpenPose_path}doc/demo_overview.md for more details.
          * Size: #heatmaps x output_net_height x output_net_width
          */
         Array<float> poseHeatMaps;
@@ -168,7 +168,7 @@ namespace op
         // ---------------------------------------- 3-D Reconstruction parameters ---------------------------------------- //
         /**
          * Body pose (x,y,z,score) locations for each person in the image.
-         * Size: #people x #body parts (e.g. 18 for COCO or 15 for MPI) x 4 ((x,y,z) coordinates + score)
+         * Size: #people x #body parts (e.g., 18 for COCO or 15 for MPI) x 4 ((x,y,z) coordinates + score)
          */
         Array<float> poseKeypoints3D;
 
@@ -387,7 +387,7 @@ namespace op
     #define DATUM_BASE_NO_PTR std::vector<Datum>
     #define DATUM_BASE std::shared_ptr<DATUM_BASE_NO_PTR>
     #define DEFINE_TEMPLATE_DATUM(templateName) template class OP_API templateName<DATUM_BASE>
-    #define COMPILE_TEMPLATE_DATUM(templateName) extern DEFINE_TEMPLATE_DATUM(templateName)
+    #define COMPILE_TEMPLATE_DATUM(templateName) extern template class templateName<DATUM_BASE>
 }
 
 #endif // OPENPOSE_CORE_DATUM_HPP

@@ -19,7 +19,7 @@ namespace op
         explicit SpinnakerWrapper(const std::string& cameraParameterPath, const Point<int>& cameraResolution,
                                   const bool undistortImage, const int cameraIndex = -1);
 
-        ~SpinnakerWrapper();
+        virtual ~SpinnakerWrapper();
 
         std::vector<cv::Mat> getRawFrames();
 

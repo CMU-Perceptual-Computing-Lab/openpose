@@ -13,6 +13,8 @@ namespace op
     public:
         explicit WHandRenderer(const std::shared_ptr<HandRenderer>& handRenderer);
 
+        virtual ~WHandRenderer();
+
         void initializationOnThread();
 
         void work(TDatums& tDatums);
@@ -35,6 +37,11 @@ namespace op
     template<typename TDatums>
     WHandRenderer<TDatums>::WHandRenderer(const std::shared_ptr<HandRenderer>& handRenderer) :
         spHandRenderer{handRenderer}
+    {
+    }
+
+    template<typename TDatums>
+    WHandRenderer<TDatums>::~WHandRenderer()
     {
     }
 

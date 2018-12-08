@@ -30,7 +30,7 @@ namespace op
     {
         try
         {
-            // Free CUDA pointers - Note that if pointers are 0 (i.e. nullptr), no operation is performed.
+            // Free CUDA pointers - Note that if pointers are 0 (i.e., nullptr), no operation is performed.
             #ifdef USE_CUDA
                 cudaFree(pGpuPose);
             #endif
@@ -67,7 +67,7 @@ namespace op
     {
         try
         {
-            // Security checks
+            // Sanity check
             if (outputData.empty())
                 error("Empty Array<float> outputData.", __LINE__, __FUNCTION__, __FILE__);
             // GPU rendering
@@ -102,8 +102,8 @@ namespace op
                     else
                     {
                         // If resized to input resolution: Replace scaleNetToOutput * scaleInputToOutput by
-                        // scaleInputToOutput, and comment the security checks.
-                        // Security checks
+                        // scaleInputToOutput, and comment the sanity check.
+                        // Sanity check
                         if (scaleNetToOutput == -1.f)
                             error("Non valid scaleNetToOutput.", __LINE__, __FUNCTION__, __FILE__);
                         // Parameters
@@ -134,13 +134,13 @@ namespace op
                         else if (elementRendered <= numberBodyPartsPlusBkg+2)
                         {
                             const auto realElementRendered = (elementRendered == 1
-                                                                ? numberBodyPartsPlusBkg
-                                                                : elementRendered - 3);
-                            elementRenderedName = mPartIndexToName.at(realElementRendered-1);
-                            renderPoseHeatMapGpu(*spGpuMemory, mPoseModel, frameSize,
-                                                 spPoseExtractorNet->getHeatMapGpuConstPtr(),
-                                                 heatMapSize, scaleNetToOutput * scaleInputToOutput, realElementRendered,
-                                                 (mBlendOriginalFrame ? getAlphaHeatMap() : 1.f));
+                                                                ? numberBodyParts
+                                                                : elementRendered - 4);
+                            elementRenderedName = mPartIndexToName.at(realElementRendered);
+                            renderPoseHeatMapGpu(
+                                *spGpuMemory, frameSize, spPoseExtractorNet->getHeatMapGpuConstPtr(), heatMapSize,
+                                scaleNetToOutput * scaleInputToOutput, realElementRendered,
+                                (mBlendOriginalFrame ? getAlphaHeatMap() : 1.f));
                         }
                         // Draw affinity between 2 body parts
                         else if (elementRendered <= lastPAFChannel)
@@ -161,15 +161,14 @@ namespace op
                             if (mPoseModel != PoseModel::BODY_25D)
                                 error("Neck-part distance channel only for BODY_25D.",
                                       __LINE__, __FUNCTION__, __FILE__);
-                            const auto distancePart = (elementRendered - lastPAFChannel - 1)*2;
-                            const auto distancePartMapped = numberBodyPartsPlusBkg + numberBodyPAFChannels
-                                                          + distancePart;
+                            const auto distancePart = (elementRendered - lastPAFChannel - 1);
+                            const auto distancePartMapped = (unsigned int)(
+                                numberBodyPartsPlusBkg + numberBodyPAFChannels + distancePart);
                             elementRenderedName = mPartIndexToName.at(distancePartMapped);
-                            elementRenderedName = elementRenderedName.substr(0, elementRenderedName.find("("));
-                            renderPoseDistance(*spGpuMemory, frameSize, spPoseExtractorNet->getHeatMapGpuConstPtr(),
-                                               heatMapSize, scaleNetToOutput * scaleInputToOutput, distancePart,
-                                               numberBodyParts, numberBodyPAFChannels,
-                                               (mBlendOriginalFrame ? getAlphaHeatMap() : 1.f));
+                            renderPoseDistanceGpu(
+                                *spGpuMemory, frameSize, spPoseExtractorNet->getHeatMapGpuConstPtr(), heatMapSize,
+                                scaleNetToOutput * scaleInputToOutput, distancePartMapped,
+                                (mBlendOriginalFrame ? getAlphaHeatMap() : 1.f));
                         }
                     }
                 }

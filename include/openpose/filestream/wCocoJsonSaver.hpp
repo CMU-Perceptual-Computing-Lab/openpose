@@ -13,6 +13,8 @@ namespace op
     public:
         explicit WCocoJsonSaver(const std::shared_ptr<CocoJsonSaver>& cocoJsonSaver);
 
+        virtual ~WCocoJsonSaver();
+
         void initializationOnThread();
 
         void workConsumer(const TDatums& tDatums);
@@ -35,6 +37,11 @@ namespace op
     template<typename TDatums>
     WCocoJsonSaver<TDatums>::WCocoJsonSaver(const std::shared_ptr<CocoJsonSaver>& cocoJsonSaver) :
         spCocoJsonSaver{cocoJsonSaver}
+    {
+    }
+
+    template<typename TDatums>
+    WCocoJsonSaver<TDatums>::~WCocoJsonSaver()
     {
     }
 

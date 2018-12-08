@@ -14,6 +14,8 @@ namespace op
     public:
         explicit WQueueOrderer(const unsigned int maxBufferSize = 64u);
 
+        virtual ~WQueueOrderer();
+
         void initializationOnThread();
 
         void work(TDatums& tDatums);
@@ -36,8 +38,6 @@ namespace op
 
 
 // Implementation
-#include <chrono>
-#include <thread>
 namespace op
 {
     template<typename TDatums>
@@ -46,6 +46,11 @@ namespace op
         mStopWhenEmpty{false},
         mNextExpectedId{0},
         mNextExpectedSubId{0}
+    {
+    }
+
+    template<typename TDatums>
+    WQueueOrderer<TDatums>::~WQueueOrderer()
     {
     }
 
