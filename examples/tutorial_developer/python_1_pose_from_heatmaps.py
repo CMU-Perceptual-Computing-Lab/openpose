@@ -45,9 +45,7 @@ params["default_model_folder"] = dir_path + "/../../../models/"
 openpose = OpenPose(params)
 caffe.set_mode_gpu()
 caffe.set_device(0)
-nets = []
-for scale in scales:
-    nets.append(caffe.Net(Param.prototxt, Param.caffemodel, caffe.TEST))
+nets = [caffe.Net(Param.prototxt, Param.caffemodel, caffe.TEST) for _ in scales]
 print("Net loaded")
 
 # Test Function
