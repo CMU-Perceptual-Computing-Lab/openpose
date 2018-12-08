@@ -183,7 +183,6 @@ class OpenPose(object):
     @staticmethod
     def draw_all(imageForNet, heatmaps, currIndex, div=4., norm=False):
         netDecreaseFactor = float(imageForNet.shape[0]) / float(heatmaps.shape[2]) # 8
-        resized_heatmaps = np.zeros(shape=(heatmaps.shape[0], heatmaps.shape[1], imageForNet.shape[0], imageForNet.shape[1]))
         num_maps = heatmaps.shape[1]
         combined = None
         for i in range(0, num_maps):
