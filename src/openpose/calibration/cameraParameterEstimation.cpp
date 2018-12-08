@@ -1193,6 +1193,7 @@ namespace op
         }
     }
 
+    // defined by Donglai
     struct bundleAdjustmentCost
     {
         bundleAdjustmentCost(const std::vector<std::vector<cv::Point2f>>& points2DVectorsExtrinsic, const std::vector<cv::Mat>& cameraIntrinsicsCvMat,
@@ -1228,6 +1229,7 @@ namespace op
         uint numberCameras, numberPoints, numberProjection;
     };
 
+    // defined by Donglai
     template <typename T>
     bool bundleAdjustmentCost::operator()(T const* const* parameters, T* residuals) const
     {
@@ -1267,6 +1269,7 @@ namespace op
         return true;
     }
 
+    // defined by Donglai
     struct bundleAdjustmentUnit
     {
         bundleAdjustmentUnit(const cv::Point2f& pt2d, const cv::Mat& intrinsics): pt2d(pt2d), intrinsics(intrinsics)
@@ -1316,6 +1319,51 @@ namespace op
             return true;
         }
     };
+
+    // defined by Donglai
+    double computeReprojectionError(const std::vector<std::vector<cv::Point2f>>& points2DVectorsExtrinsic,
+                                    const std::vector<cv::Mat> cameraExtrinsics,
+                                    const std::vector<cv::Mat> cameraIntrinsics,
+                                    const Eigen::Matrix<double, 3, Eigen::Dynamic>& points3D,
+                                    const Eigen::MatrixXd& BAValid)
+    {
+        // compute the average reprojection error
+        const int numberCameras = cameraIntrinsics.size();
+        const int numberPoints = points2DVectorsExtrinsic[0].size();
+        double sumError = 0;
+        int sumPoint = 0;
+        double maxError = 0;
+        int maxCamIdx = -1;
+        int maxPtIdx = -1;
+        for (auto cameraIndex = 0; cameraIndex < numberCameras; cameraIndex++)
+        {
+            const cv::Mat cameraMatrix = cameraIntrinsics[cameraIndex] * cameraExtrinsics[cameraIndex];
+            for (auto i = 0; i < numberPoints; i++)
+            {
+                if (!BAValid(cameraIndex, i)) continue;
+                const double KX = cameraMatrix.at<double>(0, 0) * points3D.data()[3 * i + 0] + cameraMatrix.at<double>(0, 1) * points3D.data()[3 * i + 1] + cameraMatrix.at<double>(0, 2) * points3D.data()[3 * i + 2] + cameraMatrix.at<double>(0, 3);
+                const double KY = cameraMatrix.at<double>(1, 0) * points3D.data()[3 * i + 0] + cameraMatrix.at<double>(1, 1) * points3D.data()[3 * i + 1] + cameraMatrix.at<double>(1, 2) * points3D.data()[3 * i + 2] + cameraMatrix.at<double>(1, 3);
+                const double KZ = cameraMatrix.at<double>(2, 0) * points3D.data()[3 * i + 0] + cameraMatrix.at<double>(2, 1) * points3D.data()[3 * i + 1] + cameraMatrix.at<double>(2, 2) * points3D.data()[3 * i + 2] + cameraMatrix.at<double>(2, 3);
+                const double x = KX / KZ;
+                const double y = KY / KZ;
+                const double error = sqrt((x - points2DVectorsExtrinsic[cameraIndex][i].x) * (x - points2DVectorsExtrinsic[cameraIndex][i].x) +
+                                          (y - points2DVectorsExtrinsic[cameraIndex][i].y) * (y - points2DVectorsExtrinsic[cameraIndex][i].y));
+                sumError += error;
+                sumPoint++;
+                if (error > maxError)
+                {
+                    maxError = error;
+                    maxPtIdx = i;
+                    maxCamIdx = cameraIndex;
+                }
+            }
+        }
+        // std::cout << "Max error: " << maxError << std::endl;
+        // std::cout << "Max error cam idx: " << maxCamIdx << std::endl;
+        // std::cout << "Max error pt idx: " << maxPtIdx << std::endl;
+        // std::cout << "Max error pt 2D: " << points2DVectorsExtrinsic[maxCamIdx][maxPtIdx].x << " " << points2DVectorsExtrinsic[maxCamIdx][maxPtIdx].y << std::endl;
+        return sumError / sumPoint;
+    }
 
     void refineAndSaveExtrinsics(
         const std::string& parameterFolder, const std::string& imageFolder, const Point<int>& gridInnerCorners,
@@ -1490,11 +1538,21 @@ namespace op
                 initialPoints3D.data()[3 * i + 1] = reconstructedPoint.at<double>(1, 0) / reconstructedPoint.at<double>(3, 0);
                 initialPoints3D.data()[3 * i + 2] = reconstructedPoint.at<double>(2, 0) / reconstructedPoint.at<double>(3, 0);
             }
-            // std::cout << initialPoints3D << std::endl;
-            // std::cout << visibility << std::endl;
+            // std::cout << "---------------------------------" << std::endl;
+            // for (int x = 432; x < 432 + 54; x++)
+            //     std::cout << points2DVectorsExtrinsic[0][x].x << " " << points2DVectorsExtrinsic[0][x].y << std::endl;
+            // std::cout << "---------------------------------" << std::endl;
+            // for (int x = 432; x < 432 + 54; x++)
+            //     std::cout << points2DVectorsExtrinsic[1][x].x << " " << points2DVectorsExtrinsic[1][x].y << std::endl;
+            // std::cout << "---------------------------------" << std::endl;
+            // for (int x = 432; x < 432 + 54; x++)
+            //     std::cout << points2DVectorsExtrinsic[2][x].x << " " << points2DVectorsExtrinsic[2][x].y << std::endl;
+            // std::cout << "---------------------------------" << std::endl;
+            // for (int x = 432; x < 432 + 54; x++)
+            //     std::cout << points2DVectorsExtrinsic[3][x].x << " " << points2DVectorsExtrinsic[3][x].y << std::endl;
+            std::cout << "Initial Reprojection Error: " << computeReprojectionError(points2DVectorsExtrinsic, cameraExtrinsics, cameraIntrinsics, initialPoints3D, BAValid) << std::endl;
 
             // Start bundle adjustment.
-            const int numResiduals = 2 * BAValid.sum();  // x and y
             Eigen::Matrix<double, 3, Eigen::Dynamic> points3D = initialPoints3D;
             Eigen::Matrix<double, 6, Eigen::Dynamic> cameraRt(6, numberCameras);   // angle axis + translation
             // prepare the camera intrinsics
@@ -1520,6 +1578,7 @@ namespace op
             options.num_threads = 10;
             // computing things together
             /*
+            const int numResiduals = 2 * BAValid.sum();  // x and y
             bundleAdjustmentCost* ptr_BA = new bundleAdjustmentCost(points2DVectorsExtrinsic, cameraIntrinsics, BAValid);
             ceres::DynamicAutoDiffCostFunction<bundleAdjustmentCost>* costFunction = new ceres::DynamicAutoDiffCostFunction<bundleAdjustmentCost>(ptr_BA);
             costFunction->AddParameterBlock(6 * (numberCameras - 1));  // R + t
@@ -1567,7 +1626,72 @@ namespace op
                         ext.at<double>(x, y) = rotation(x, y);
                 refinedExtrinsics[cameraIndex] = ext;
             }
+            std::cout << "After Bundle Adjustment Reprojection Error: " << computeReprojectionError(points2DVectorsExtrinsic, refinedExtrinsics, cameraIntrinsics, points3D, BAValid) << std::endl;
             // no need to delete ptr_BA or costFunction; Ceres::Problem takes care of them.
+
+            // rescale the 3D points and translation based on the grid size
+            if (points2DVectorsExtrinsic[0].size() % numberCorners != 0)
+                error("The number of points should be divided by number of corners in the image.", __LINE__, __FUNCTION__, __FILE__);
+            const int numTimeStep = points2DVectorsExtrinsic[0].size() / numberCorners;
+            double sumLength = 0.;
+            double sumSquareLength = 0.;
+            double maxLength = -1;
+            double minLength = 99999999.;
+            for (auto t = 0; t < numTimeStep; t++)
+            {
+                // horizontal edges
+                for (auto x = 0; x < gridInnerCorners.x - 1; x++)
+                    for (auto y = 0; y < gridInnerCorners.y; y++)
+                    {
+                        const int startPerFrame = x + y * gridInnerCorners.x;
+                        const int startIndex = startPerFrame + t * numberCorners;
+                        const int endPerFrame = x + 1 + y * gridInnerCorners.x;
+                        const int endIndex = endPerFrame + t * numberCorners;
+                        if (BAValid.col(startIndex).any() && BAValid.col(endIndex).any())   // These points are used for BA, must have been constructed.
+                        {
+                            const double length = (points3D.col(startIndex) - points3D.col(endIndex)).norm();
+                            sumSquareLength += length * length;
+                            sumLength += length;
+                            if (length < minLength)
+                                minLength = length;
+                            if (length > maxLength)
+                                maxLength = length;
+                        }
+                    }
+
+                // vertical edges
+                for (auto x = 0; x < gridInnerCorners.x; x++)
+                    for (auto y = 0; y < gridInnerCorners.y - 1; y++)
+                    {
+                        const int startPerFrame = x + y * gridInnerCorners.x;
+                        const int startIndex = startPerFrame + t * numberCorners;
+                        const int endPerFrame = x + (y + 1) * gridInnerCorners.x;
+                        const int endIndex = endPerFrame + t * numberCorners;
+                        if (BAValid.col(startIndex).any() && BAValid.col(endIndex).any())   // These points are used for BA, must have been constructed.
+                        {
+                            const double length = (points3D.col(startIndex) - points3D.col(endIndex)).norm();
+                            sumSquareLength += length * length;
+                            sumLength += length;
+                            if (length < minLength)
+                                minLength = length;
+                            if (length > maxLength)
+                                maxLength = length;
+                        }
+                    }
+            }
+            const double scalingFactor = 0.001 * gridSquareSizeMm * sumLength / sumSquareLength;
+            std::cout << "Max grid length: " << maxLength << std::endl << "Min grid length: " << minLength << std::endl;
+            std::cout << "Scaling: " << scalingFactor << std::endl;
+
+            for (auto cameraIndex = 1; cameraIndex < numberCameras; cameraIndex++) // scale the translation (and the 3D point)
+            {
+                refinedExtrinsics[cameraIndex].at<double>(0, 3) *= scalingFactor;
+                refinedExtrinsics[cameraIndex].at<double>(1, 3) *= scalingFactor;
+                refinedExtrinsics[cameraIndex].at<double>(2, 3) *= scalingFactor;
+            }
+            points3D *= scalingFactor;
+            std::cout << "After Rescaling Reprojection Error: " << computeReprojectionError(points2DVectorsExtrinsic, refinedExtrinsics, cameraIntrinsics, points3D, BAValid) << std::endl;
+
             std::cout << "Output: -----------------------------------" << std::endl;
             for (auto cameraIndex = 0; cameraIndex < numberCameras; cameraIndex++)
             {
