@@ -9,6 +9,7 @@
 #include <openpose/calibration/gridPatternFunctions.hpp>
 #include <openpose/filestream/fileStream.hpp>
 #include <openpose/utilities/fileSystem.hpp>
+#include <openpose/utilities/fastMath.hpp>
 #include <openpose/calibration/cameraParameterEstimation.hpp>
 #include <openpose/3d/poseTriangulation.hpp>
 #include <ceres/ceres.h>
@@ -1202,17 +1203,13 @@ namespace op
         {
             numberCameras = cameraIntrinsicsCvMat.size();
             if (points2DVectorsExtrinsic.size() != numberCameras)
-            {
-                op::error("#view of points != #camera intrinsics.",
-                          __LINE__, __FUNCTION__, __FILE__);
-            }
+                error("#view of points != #camera intrinsics.", __LINE__, __FUNCTION__, __FILE__);
             numberPoints = points2DVectorsExtrinsic[0].size();
             numberProjection = BAValid.sum();
             for (auto cameraIndex = 0u; cameraIndex < numberCameras; cameraIndex++)
             {
                 if (cameraIntrinsicsCvMat[cameraIndex].cols != 3 || cameraIntrinsicsCvMat[cameraIndex].rows != 3)
-                    op::error("Intrinsics passed in are not 3 x 3.",
-                              __LINE__, __FUNCTION__, __FILE__);
+                    error("Intrinsics passed in are not 3 x 3.", __LINE__, __FUNCTION__, __FILE__);
                 cameraIntrinsics.resize(numberCameras);
                 for (auto x = 0; x < 3; x++)
                     for (auto y = 0; y < 3; y++)
@@ -1264,8 +1261,7 @@ namespace op
         }
         // sanity check
         if (countProjection != numberProjection)
-            op::error("Wrong number of constraints in bundle adjustment",
-                      __LINE__, __FUNCTION__, __FILE__);
+            error("Wrong number of constraints in bundle adjustment", __LINE__, __FUNCTION__, __FILE__);
         return true;
     }
 
@@ -1275,11 +1271,9 @@ namespace op
         bundleAdjustmentUnit(const cv::Point2f& pt2d, const cv::Mat& intrinsics): pt2d(pt2d), intrinsics(intrinsics)
         {
             if (intrinsics.cols != 3 || intrinsics.rows != 3)
-                op::error("Intrinsics passed in are not 3 x 3.",
-                    __LINE__, __FUNCTION__, __FILE__);
+                error("Intrinsics passed in are not 3 x 3.", __LINE__, __FUNCTION__, __FILE__);
             if (intrinsics.type() != CV_64FC1)
-                op::error("Intrinsics passed in must be in double.",
-                    __LINE__, __FUNCTION__, __FILE__);
+                error("Intrinsics passed in must be in double.", __LINE__, __FUNCTION__, __FILE__);
         }
         const cv::Point2f& pt2d;
         const cv::Mat& intrinsics;
@@ -1321,48 +1315,150 @@ namespace op
     };
 
     // defined by Donglai
-    double computeReprojectionError(const std::vector<std::vector<cv::Point2f>>& points2DVectorsExtrinsic,
-                                    const std::vector<cv::Mat> cameraExtrinsics,
-                                    const std::vector<cv::Mat> cameraIntrinsics,
-                                    const Eigen::Matrix<double, 3, Eigen::Dynamic>& points3D,
-                                    const Eigen::MatrixXd& BAValid)
+    double computeReprojectionError(
+        const std::vector<std::vector<cv::Point2f>>& points2DVectorsExtrinsic,
+        const Eigen::Matrix<double, 3, Eigen::Dynamic>& points3D,
+        const Eigen::MatrixXd& BAValid, const std::vector<cv::Mat> cameraExtrinsics,
+        const std::vector<cv::Mat> cameraIntrinsics)
     {
-        // compute the average reprojection error
-        const int numberCameras = cameraIntrinsics.size();
-        const int numberPoints = points2DVectorsExtrinsic[0].size();
-        double sumError = 0;
-        int sumPoint = 0;
-        double maxError = 0;
-        int maxCamIdx = -1;
-        int maxPtIdx = -1;
-        for (auto cameraIndex = 0; cameraIndex < numberCameras; cameraIndex++)
+        try
         {
-            const cv::Mat cameraMatrix = cameraIntrinsics[cameraIndex] * cameraExtrinsics[cameraIndex];
-            for (auto i = 0; i < numberPoints; i++)
+            // compute the average reprojection error
+            const unsigned int numberCameras = cameraIntrinsics.size();
+            const unsigned int numberPoints = points2DVectorsExtrinsic[0].size();
+            double sumError = 0;
+            int sumPoint = 0;
+            double maxError = 0;
+            int maxCamIdx = -1;
+            int maxPtIdx = -1;
+            for (auto cameraIndex = 0u; cameraIndex < numberCameras; cameraIndex++)
             {
-                if (!BAValid(cameraIndex, i)) continue;
-                const double KX = cameraMatrix.at<double>(0, 0) * points3D.data()[3 * i + 0] + cameraMatrix.at<double>(0, 1) * points3D.data()[3 * i + 1] + cameraMatrix.at<double>(0, 2) * points3D.data()[3 * i + 2] + cameraMatrix.at<double>(0, 3);
-                const double KY = cameraMatrix.at<double>(1, 0) * points3D.data()[3 * i + 0] + cameraMatrix.at<double>(1, 1) * points3D.data()[3 * i + 1] + cameraMatrix.at<double>(1, 2) * points3D.data()[3 * i + 2] + cameraMatrix.at<double>(1, 3);
-                const double KZ = cameraMatrix.at<double>(2, 0) * points3D.data()[3 * i + 0] + cameraMatrix.at<double>(2, 1) * points3D.data()[3 * i + 1] + cameraMatrix.at<double>(2, 2) * points3D.data()[3 * i + 2] + cameraMatrix.at<double>(2, 3);
-                const double x = KX / KZ;
-                const double y = KY / KZ;
-                const double error = sqrt((x - points2DVectorsExtrinsic[cameraIndex][i].x) * (x - points2DVectorsExtrinsic[cameraIndex][i].x) +
-                                          (y - points2DVectorsExtrinsic[cameraIndex][i].y) * (y - points2DVectorsExtrinsic[cameraIndex][i].y));
-                sumError += error;
-                sumPoint++;
-                if (error > maxError)
+                const cv::Mat cameraMatrix = cameraIntrinsics[cameraIndex] * cameraExtrinsics[cameraIndex];
+                for (auto i = 0u; i < numberPoints; i++)
                 {
-                    maxError = error;
-                    maxPtIdx = i;
-                    maxCamIdx = cameraIndex;
+                    if (!BAValid(cameraIndex, i))
+                        continue;
+                    const auto& point3d = &points3D.data()[3*i];
+                    const double KX = cameraMatrix.at<double>(0, 0) * point3d[0] + cameraMatrix.at<double>(0, 1) * point3d[1] + cameraMatrix.at<double>(0, 2) * point3d[2] + cameraMatrix.at<double>(0, 3);
+                    const double KY = cameraMatrix.at<double>(1, 0) * point3d[0] + cameraMatrix.at<double>(1, 1) * point3d[1] + cameraMatrix.at<double>(1, 2) * point3d[2] + cameraMatrix.at<double>(1, 3);
+                    const double KZ = cameraMatrix.at<double>(2, 0) * point3d[0] + cameraMatrix.at<double>(2, 1) * point3d[1] + cameraMatrix.at<double>(2, 2) * point3d[2] + cameraMatrix.at<double>(2, 3);
+                    const double xDiff = KX / KZ - points2DVectorsExtrinsic[cameraIndex][i].x;
+                    const double yDiff = KY / KZ - points2DVectorsExtrinsic[cameraIndex][i].y;
+                    const double error = sqrt(xDiff*xDiff + yDiff*yDiff);
+                    sumError += error;
+                    sumPoint++;
+                    if (error > maxError)
+                    {
+                        maxError = error;
+                        maxPtIdx = i;
+                        maxCamIdx = cameraIndex;
+                    }
                 }
             }
+            if (sumPoint == 0)
+                error("Number of inlier points is 0 (with " + std::to_string(numberCameras)
+                      + " cameras and " + std::to_string(numberPoints) + " total points).",
+                      __LINE__, __FUNCTION__, __FILE__);
+            std::cout << "Max error: " << maxError << ";\t in cam idx " << maxCamIdx
+                      << ";\t with pt idx: " << maxPtIdx
+                      << ";\t and pt 2D: " << points2DVectorsExtrinsic[maxCamIdx][maxPtIdx].x
+                            << " " << points2DVectorsExtrinsic[maxCamIdx][maxPtIdx].y << std::endl;
+            return sumError / sumPoint;
         }
-        // std::cout << "Max error: " << maxError << std::endl;
-        // std::cout << "Max error cam idx: " << maxCamIdx << std::endl;
-        // std::cout << "Max error pt idx: " << maxPtIdx << std::endl;
-        // std::cout << "Max error pt 2D: " << points2DVectorsExtrinsic[maxCamIdx][maxPtIdx].x << " " << points2DVectorsExtrinsic[maxCamIdx][maxPtIdx].y << std::endl;
-        return sumError / sumPoint;
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return -1;
+        }
+    }
+
+    void removeOutliersReprojectionError(
+        std::vector<std::vector<cv::Point2f>>& points2DVectorsExtrinsic,
+        Eigen::Matrix<double, 3, Eigen::Dynamic>& points3D,
+        Eigen::MatrixXd& BAValid, const std::vector<cv::Mat> cameraExtrinsics,
+        const std::vector<cv::Mat> cameraIntrinsics, const double errorThreshold = 10)
+    {
+        try
+        {
+            std::vector<unsigned int> indexesToRemove;
+            const unsigned int numberCameras = cameraIntrinsics.size();
+            const unsigned int numberPoints = points2DVectorsExtrinsic[0].size();
+            for (auto cameraIndex = 0u; cameraIndex < numberCameras; cameraIndex++)
+            {
+                const cv::Mat cameraMatrix = cameraIntrinsics[cameraIndex] * cameraExtrinsics[cameraIndex];
+                for (auto i = 0u; i < numberPoints; i++)
+                {
+                    if (!BAValid(cameraIndex, i))
+                        continue;
+                    const auto& point3d = &points3D.data()[3*i];
+                    const double KX = cameraMatrix.at<double>(0, 0) * point3d[0] + cameraMatrix.at<double>(0, 1) * point3d[1] + cameraMatrix.at<double>(0, 2) * point3d[2] + cameraMatrix.at<double>(0, 3);
+                    const double KY = cameraMatrix.at<double>(1, 0) * point3d[0] + cameraMatrix.at<double>(1, 1) * point3d[1] + cameraMatrix.at<double>(1, 2) * point3d[2] + cameraMatrix.at<double>(1, 3);
+                    const double KZ = cameraMatrix.at<double>(2, 0) * point3d[0] + cameraMatrix.at<double>(2, 1) * point3d[1] + cameraMatrix.at<double>(2, 2) * point3d[2] + cameraMatrix.at<double>(2, 3);
+                    const double xDiff = KX / KZ - points2DVectorsExtrinsic[cameraIndex][i].x;
+                    const double yDiff = KY / KZ - points2DVectorsExtrinsic[cameraIndex][i].y;
+                    const double error = sqrt(xDiff*xDiff + yDiff*yDiff);
+                    if (error > errorThreshold)
+                    {
+                        indexesToRemove.emplace_back(i);
+                        BAValid(cameraIndex, i) = 0;
+                    }
+                }
+            }
+            // Sort + Remove duplicates
+            std::sort(indexesToRemove.begin(), indexesToRemove.end());
+            indexesToRemove.erase(
+                std::unique(indexesToRemove.begin(), indexesToRemove.end()), indexesToRemove.end());
+            // Sanity check
+            if (numberPoints <= indexesToRemove.size())
+                error("All samples are considered outliers, no images left ("
+                      + std::to_string(numberPoints) + " total points vs. " + std::to_string(indexesToRemove.size())
+                      + " outliers).", __LINE__, __FUNCTION__, __FILE__);
+            // Pros / cons:
+            // - Pros: It reduces the size of points (faster).
+            // - Cons: Scaling does not work.
+            // // Remove outliers (if any)
+            // if (!indexesToRemove.empty())
+            // {
+            //     const unsigned int numberPointsRansac = numberPoints - indexesToRemove.size();
+            //     std::vector<std::vector<cv::Point2f>> points2DVectorsExtrinsicRansac(
+            //         numberCameras, std::vector<cv::Point2f>(numberPointsRansac));
+            //     Eigen::Matrix<double, 3, Eigen::Dynamic> points3DRansac(3, numberPointsRansac);
+            //     Eigen::MatrixXd BAValidRansac = Eigen::MatrixXd::Zero(numberCameras, numberPointsRansac);
+            //     auto counterRansac = 0u;
+            //     for (auto i = 0u ; i < indexesToRemove.size()+1 ; i++)
+            //     {
+            //         // Otherwise, it would not get the points after the last outlier
+            //         const auto& indexToRemove = (i < indexesToRemove.size() ? indexesToRemove[i] : numberPoints);
+            //         while (counterRansac < indexToRemove && counterRansac < numberPoints)
+            //         {
+            //             // Fill 2D coordinate
+            //             for (auto cameraIndex = 0u; cameraIndex < numberCameras; cameraIndex++)
+            //                 points2DVectorsExtrinsicRansac[cameraIndex][counterRansac-i]
+            //                     = points2DVectorsExtrinsic[cameraIndex][counterRansac];
+            //                 // points2DVectorsExtrinsicRansac.at(cameraIndex).at(counterRansac-i) = points2DVectorsExtrinsic.at(cameraIndex).at(counterRansac);
+            //             // Fill 3D coordinate
+            //             const auto* const point3D = &points3D.data()[3*counterRansac];
+            //             auto* point3DRansac = &points3DRansac.data()[3*(counterRansac-i)];
+            //             point3DRansac[0] = point3D[0];
+            //             point3DRansac[1] = point3D[1];
+            //             point3DRansac[2] = point3D[2];
+            //             // Fill BAValidRansac
+            //             BAValidRansac.col(counterRansac-i) = BAValid.col(counterRansac);
+            //             // Update counter
+            //             counterRansac++;
+            //         }
+            //         counterRansac++;
+            //     }
+            //     // Asign back
+            //     std::swap(points2DVectorsExtrinsic, points2DVectorsExtrinsicRansac);
+            //     std::swap(points3D, points3DRansac);
+            //     std::swap(BAValid, BAValidRansac);
+            // }
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
     }
 
     void refineAndSaveExtrinsics(
@@ -1374,8 +1470,7 @@ namespace op
         {
             // Sanity check
             if (!imagesAreUndistorted)
-                op::error("This mode assumes that the images are already undistorted (add flag `--omit_distortion`).",
-                          __LINE__, __FUNCTION__, __FILE__);
+                error("This mode assumes that the images are already undistorted (add flag `--omit_distortion`).", __LINE__, __FUNCTION__, __FILE__);
 
             log("Loading images...", Priority::High);
             const auto imageAndPaths = getImageAndPaths(imageFolder);
@@ -1521,18 +1616,18 @@ namespace op
                     if (points2DVectorsExtrinsic[cameraIndex][i].x >= 0)  // visible in this camera
                     {
                         pointCameraMatrices.emplace_back(cameraMatrices[cameraIndex]);
-                        pointsOnEachCamera.emplace_back(points2DVectorsExtrinsic[cameraIndex][i]);
+                        const auto& point2D = points2DVectorsExtrinsic[cameraIndex][i];
+                        pointsOnEachCamera.emplace_back(cv::Point2d{point2D.x, point2D.y}); // cv::Point2f --> cv::Point2d
                     }
                 }
                 if (pointCameraMatrices.size() < 2u)  // if visible in one camera, no triangulation and not used in bundle adjustment.
                     continue;
                 for (auto cameraIndex = 0 ; cameraIndex < numberCameras ; cameraIndex++)
-                {
                     if (points2DVectorsExtrinsic[cameraIndex][i].x >= 0)  // this 2D term is used for optimization
                         BAValid(cameraIndex, i) = 1;
-                }
                 cv::Mat reconstructedPoint;
-                const float reprojectionError = op::triangulateWithOptimization(reconstructedPoint, pointCameraMatrices, pointsOnEachCamera, reprojectionMaxAcceptable);
+                const float reprojectionError = triangulateWithOptimization(
+                    reconstructedPoint, pointCameraMatrices, pointsOnEachCamera, reprojectionMaxAcceptable);
                 UNUSED(reprojectionError);
                 initialPoints3D.data()[3 * i + 0] = reconstructedPoint.at<double>(0, 0) / reconstructedPoint.at<double>(3, 0);
                 initialPoints3D.data()[3 * i + 1] = reconstructedPoint.at<double>(1, 0) / reconstructedPoint.at<double>(3, 0);
@@ -1550,7 +1645,33 @@ namespace op
             // std::cout << "---------------------------------" << std::endl;
             // for (int x = 432; x < 432 + 54; x++)
             //     std::cout << points2DVectorsExtrinsic[3][x].x << " " << points2DVectorsExtrinsic[3][x].y << std::endl;
-            std::cout << "Initial Reprojection Error: " << computeReprojectionError(points2DVectorsExtrinsic, cameraExtrinsics, cameraIntrinsics, initialPoints3D, BAValid) << std::endl;
+            auto reprojectionError = computeReprojectionError(
+                points2DVectorsExtrinsic, initialPoints3D, BAValid, cameraExtrinsics, cameraIntrinsics);
+            std::cout << "Initial Reprojection Error: " << reprojectionError << std::endl;
+
+            // RANSAC
+            auto reprojectionErrorPrevious = reprojectionError+1;
+            const auto numberPointsInitial = initialPoints3D.size();
+            while (reprojectionError != reprojectionErrorPrevious)
+            {
+                reprojectionErrorPrevious = reprojectionError;
+                // 10 pixels is a lot for full HD images...
+                const auto errorThreshold = fastMax(2*reprojectionError, 1.);
+                std::cout << "Error threshold (RANSAC): " << errorThreshold << std::endl;
+                removeOutliersReprojectionError(
+                    points2DVectorsExtrinsic, initialPoints3D, BAValid, cameraExtrinsics, cameraIntrinsics,
+                    errorThreshold);
+                reprojectionError = computeReprojectionError(
+                    points2DVectorsExtrinsic, initialPoints3D, BAValid, cameraExtrinsics, cameraIntrinsics);
+                std::cout << "New reprojection error (after RANSAC iteration): "
+                          << computeReprojectionError(
+                            points2DVectorsExtrinsic, initialPoints3D, BAValid, cameraExtrinsics, cameraIntrinsics)
+                          << std::endl;
+            }
+            std::cout << "Reprojection Error (after RANSAC): " << computeReprojectionError(
+                points2DVectorsExtrinsic, initialPoints3D, BAValid, cameraExtrinsics, cameraIntrinsics) << std::endl;
+            std::cout << "Number of points reduced from " << numberPointsInitial
+                      << " to " << initialPoints3D.size() << std::endl;
 
             // Start bundle adjustment.
             Eigen::Matrix<double, 3, Eigen::Dynamic> points3D = initialPoints3D;
@@ -1626,7 +1747,8 @@ namespace op
                         ext.at<double>(x, y) = rotation(x, y);
                 refinedExtrinsics[cameraIndex] = ext;
             }
-            std::cout << "After Bundle Adjustment Reprojection Error: " << computeReprojectionError(points2DVectorsExtrinsic, refinedExtrinsics, cameraIntrinsics, points3D, BAValid) << std::endl;
+            std::cout << "After Bundle Adjustment Reprojection Error: "
+                      << computeReprojectionError(points2DVectorsExtrinsic, points3D, BAValid, refinedExtrinsics, cameraIntrinsics) << std::endl;
             // no need to delete ptr_BA or costFunction; Ceres::Problem takes care of them.
 
             // rescale the 3D points and translation based on the grid size
@@ -1636,7 +1758,7 @@ namespace op
             double sumLength = 0.;
             double sumSquareLength = 0.;
             double maxLength = -1;
-            double minLength = 99999999.;
+            double minLength = std::numeric_limits<double>::max();
             for (auto t = 0; t < numTimeStep; t++)
             {
                 // horizontal edges
@@ -1690,7 +1812,8 @@ namespace op
                 refinedExtrinsics[cameraIndex].at<double>(2, 3) *= scalingFactor;
             }
             points3D *= scalingFactor;
-            std::cout << "After Rescaling Reprojection Error: " << computeReprojectionError(points2DVectorsExtrinsic, refinedExtrinsics, cameraIntrinsics, points3D, BAValid) << std::endl;
+            std::cout << "After Rescaling Reprojection Error: "
+                      << computeReprojectionError(points2DVectorsExtrinsic, points3D, BAValid, refinedExtrinsics, cameraIntrinsics) << std::endl;
 
             std::cout << "Output: -----------------------------------" << std::endl;
             for (auto cameraIndex = 0; cameraIndex < numberCameras; cameraIndex++)
