@@ -1,4 +1,3 @@
-from sys import platform
 import sys
 try:
     import caffe
@@ -11,9 +10,6 @@ import os
 os.environ["GLOG_minloglevel"] = "1"
 import caffe
 import cv2
-import numpy as np
-import sys
-import time
 dir_path = os.path.dirname(os.path.realpath(__file__))
 sys.path.append('../../python')
 dir_path + "/../../models/"
