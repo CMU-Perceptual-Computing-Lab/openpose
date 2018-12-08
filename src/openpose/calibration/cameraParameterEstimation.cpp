@@ -1194,6 +1194,97 @@ namespace op
         }
     }
 
+    // defined by Donglai, compute the Jacobian of rotation matrix w.r.t angle axis (rotation matrix in row major order)
+    void AngleAxisToRotationMatrixDerivative(const double* pose, double* dR_data, const int idj=0, const int numberColumns=3)
+    {
+        Eigen::Map< Eigen::Matrix<double, 9, Eigen::Dynamic, Eigen::RowMajor> > dR(dR_data, 9, numberColumns);
+        std::fill(dR_data, dR_data + 9 * numberColumns, 0.0);
+        const double theta2 = pose[0] * pose[0] + pose[1] * pose[1] + pose[2] * pose[2];
+        if (theta2 > std::numeric_limits<double>::epsilon())
+        {
+            const double theta = sqrt(theta2);
+            const double s = sin(theta);
+            const double c = cos(theta);
+            const Eigen::Map< const Eigen::Matrix<double, 3, 1> > u(pose);
+            Eigen::VectorXd e(3);
+            e[0] = pose[0] / theta; e[1] = pose[1] / theta; e[2] = pose[2] / theta;
+
+            // dR / dtheta
+            Eigen::Matrix<double, 9, 1> dRdth(9, 1);
+            Eigen::Map< Eigen::Matrix<double, 3, 3, Eigen::RowMajor> > dRdth_(dRdth.data());
+            // skew symmetric
+            dRdth_ << 0.0, -e[2], e[1],
+                      e[2], 0.0, -e[0],
+                      -e[1], e[0], 0.0;
+            // dRdth_ = dRdth_ * c - Matrix<double, 3, 3>::Identity() * s + s * e * e.transpose();
+            dRdth_ = - dRdth_ * c - Eigen::Matrix<double, 3, 3>::Identity() * s + s * e * e.transpose();
+
+            // dR / de
+            Eigen::Matrix<double, 9, 3, Eigen::RowMajor> dRde(9, 3);
+            // d(ee^T) / de
+            dRde <<
+                2 * e[0], 0., 0.,
+                e[1], e[0], 0.,
+                e[2], 0., e[0],
+                e[1], e[0], 0.,
+                0., 2 * e[1], 0.,
+                0., e[2], e[1],
+                e[2], 0., e[0],
+                0., e[2], e[1],
+                0., 0., 2 * e[2];
+            Eigen::Matrix<double, 9, 3, Eigen::RowMajor> dexde(9, 3);
+            dexde <<
+                0, 0, 0,
+                0, 0, -1,
+                0, 1, 0,
+                0, 0, 1,
+                0, 0, 0,
+                -1, 0, 0,
+                0, -1, 0,
+                1, 0, 0,
+                0, 0, 0;
+            // dRde = dRde * (1. - c) + c * dexde;
+            dRde = dRde * (1. - c) - s * dexde;
+            Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> dedu = Eigen::Matrix<double, 3, 3>::Identity() / theta - u * u.transpose() / theta2 / theta;
+
+            dR.block(0, 3 * idj, 9, 3) = dRdth * e.transpose() + dRde * dedu;
+        }
+        else
+        {
+            dR(1, 3 * idj + 2) = 1;
+            dR(2, 3 * idj + 1) = -1;
+            dR(3, 3 * idj + 2) = -1;
+            dR(5, 3 * idj) = 1;
+            dR(6, 3 * idj + 1) = 1;
+            dR(7, 3 * idj) = -1;
+        }
+    }
+
+    // compute the derivative w.r.t AB from dA
+    void SparseProductDerivative(const double* const dA_data, const double* const B_data,
+                             const std::vector<int>& parentIndexes, double* dAB_data, const int numberColumns=3)
+    {
+        // d(AB) = AdB + (dA)B
+        // Sparse for loop form
+        std::fill(dAB_data, dAB_data + 3 * numberColumns, 0.0);
+        for (int r = 0; r < 3; r++)
+        {
+            const int baseIndex = 3*r;
+            for (const auto& parentIndex : parentIndexes)
+            {
+                const auto parentOffset = 3*parentIndex;
+                for (int subIndex = 0; subIndex < 3; subIndex++)
+                {
+                    const auto finalOffset = parentOffset + subIndex;
+                    dAB_data[numberColumns*r + finalOffset] +=
+                        B_data[0] * dA_data[numberColumns*baseIndex + finalOffset]
+                        + B_data[1] * dA_data[numberColumns*(baseIndex+1) + finalOffset]
+                        + B_data[2] * dA_data[numberColumns*(baseIndex+2) + finalOffset];
+                }
+            }
+        }
+    }
+
     // defined by Donglai
     struct bundleAdjustmentCost
     {
@@ -1274,9 +1365,17 @@ namespace op
                 error("Intrinsics passed in are not 3 x 3.", __LINE__, __FUNCTION__, __FILE__);
             if (intrinsics.type() != CV_64FC1)
                 error("Intrinsics passed in must be in double.", __LINE__, __FUNCTION__, __FILE__);
+            cv::Mat pt2DHomogeneous(3, 1, CV_64FC1);
+            pt2DHomogeneous.at<double>(0, 0) = pt2d.x;
+            pt2DHomogeneous.at<double>(1, 0) = pt2d.y;
+            pt2DHomogeneous.at<double>(2, 0) = 1;
+            const cv::Mat calibrated = intrinsics.inv() * pt2DHomogeneous;
+            pt2dCalibrated.x = calibrated.at<double>(0, 0) / calibrated.at<double>(2, 0);
+            pt2dCalibrated.y = calibrated.at<double>(1, 0) / calibrated.at<double>(2, 0);
         }
         const cv::Point2f& pt2d;
         const cv::Mat& intrinsics;
+        cv::Point2f pt2dCalibrated;
 
         template <typename T>
         bool operator()(const T* camera, const T* point, T* residuals) const
@@ -1286,15 +1385,13 @@ namespace op
             // residuals (2): x, y
             T P[3];
             ceres::AngleAxisRotatePoint(camera, point, P);
+            // std::cout << "P\n" << P[0] << std::endl << P[1] << std::endl << P[2] << std::endl;
             P[0] += camera[3]; P[1] += camera[4]; P[2] += camera[5];
 
-            T KP[3];
-            KP[0] = P[0] * T(intrinsics.at<double>(0, 0)) + P[1] * T(intrinsics.at<double>(0, 1)) + P[2] * T(intrinsics.at<double>(0, 2));
-            KP[1] = P[0] * T(intrinsics.at<double>(1, 0)) + P[1] * T(intrinsics.at<double>(1, 1)) + P[2] * T(intrinsics.at<double>(1, 2));
-            KP[2] = P[0] * T(intrinsics.at<double>(2, 0)) + P[1] * T(intrinsics.at<double>(2, 1)) + P[2] * T(intrinsics.at<double>(2, 2));
-
-            residuals[0] = KP[0] / KP[2] - T(pt2d.x);
-            residuals[1] = KP[1] / KP[2] - T(pt2d.y);
+            residuals[0] = P[0] / P[2] - T(pt2dCalibrated.x);
+            residuals[1] = P[1] / P[2] - T(pt2dCalibrated.y);
+            // std::cout << "res\n" << residuals[0] << std::endl << residuals[1] << std::endl;
+            // exit(0);
             return true;
         }
 
@@ -1303,18 +1400,108 @@ namespace op
         {
             // point (3): X, Y, Z
             // residuals (2): x, y
-            T KP[3];
-            KP[0] = point[0] * T(intrinsics.at<double>(0, 0)) + point[1] * T(intrinsics.at<double>(0, 1)) + point[2] * T(intrinsics.at<double>(0, 2));
-            KP[1] = point[0] * T(intrinsics.at<double>(1, 0)) + point[1] * T(intrinsics.at<double>(1, 1)) + point[2] * T(intrinsics.at<double>(1, 2));
-            KP[2] = point[0] * T(intrinsics.at<double>(2, 0)) + point[1] * T(intrinsics.at<double>(2, 1)) + point[2] * T(intrinsics.at<double>(2, 2));
 
-            residuals[0] = KP[0] / KP[2] - T(pt2d.x);
-            residuals[1] = KP[1] / KP[2] - T(pt2d.y);
+            residuals[0] = point[0] / point[2] - T(pt2dCalibrated.x);
+            residuals[1] = point[1] / point[2] - T(pt2dCalibrated.y);
             return true;
         }
     };
 
     // defined by Donglai
+    class bundleAdjustmentUnitJacobian: public ceres::CostFunction
+    {
+    public:
+        bundleAdjustmentUnitJacobian(const cv::Point2f& pt2d, const cv::Mat& intrinsics, const bool solveExt): pt2d(pt2d), intrinsics(intrinsics), solveExt(solveExt)
+        {
+            if (intrinsics.cols != 3 || intrinsics.rows != 3)
+                error("Intrinsics passed in are not 3 x 3.", __LINE__, __FUNCTION__, __FILE__);
+            if (intrinsics.type() != CV_64FC1)
+                error("Intrinsics passed in must be in double.", __LINE__, __FUNCTION__, __FILE__);
+
+            cv::Mat pt2DHomogeneous(3, 1, CV_64FC1);
+            pt2DHomogeneous.at<double>(0, 0) = pt2d.x;
+            pt2DHomogeneous.at<double>(1, 0) = pt2d.y;
+            pt2DHomogeneous.at<double>(2, 0) = 1;
+            const cv::Mat calibrated = intrinsics.inv() * pt2DHomogeneous;
+            pt2dCalibrated.x = calibrated.at<double>(0, 0) / calibrated.at<double>(2, 0);
+            pt2dCalibrated.y = calibrated.at<double>(1, 0) / calibrated.at<double>(2, 0);
+
+            CostFunction::set_num_residuals(2);
+            auto parameter_block_sizes = CostFunction::mutable_parameter_block_sizes();
+            parameter_block_sizes->clear();
+            if (solveExt) parameter_block_sizes->push_back(6); // camera extrinsics
+            parameter_block_sizes->push_back(3);  // 3D points
+        }
+
+        virtual bool Evaluate(double const* const* parameters, double* residuals, double** jacobians) const
+        {
+            double P[3];
+            const double* ptr = solveExt ? P : parameters[0];
+            if (solveExt)
+            {
+                const double* camera = parameters[0];
+                ceres::AngleAxisRotatePoint(camera, parameters[1], P);
+                P[0] += camera[3]; P[1] += camera[4]; P[2] += camera[5];
+            }
+
+            residuals[0] = ptr[0] / ptr[2] - pt2dCalibrated.x;
+            residuals[1] = ptr[1] / ptr[2] - pt2dCalibrated.y;
+
+            if (jacobians)
+            {
+                // Q = RP + t, L = [Lx ; Ly], Lx = Qx / Qz, Ly = Qy / Qz
+                Eigen::Matrix<double, 2, 3, Eigen::RowMajor> dQ;
+                // x = X / Z -> dx/dX = 1/Z, dx/dY = 0, dx/dZ = -X / Z^2;
+                dQ.data()[0] = 1 / ptr[2];
+                dQ.data()[1] = 0;
+                dQ.data()[2] = -ptr[0] / ptr[2] / ptr[2];
+                // y = Y / Z -> dy/dX = 0, dy/dY = 1/Z, dy/dZ = -Y / Z^2;
+                dQ.data()[3] = 0;
+                dQ.data()[4] = 1 / ptr[2];
+                dQ.data()[5] = -ptr[1] / ptr[2] / ptr[2];
+
+                if (solveExt)
+                {
+                    if (jacobians[0])   // Jacobian of output [x, y] w.r.t. input [angle axis, translation]
+                    {
+                        Eigen::Map< Eigen::Matrix<double, 2, 6, Eigen::RowMajor> > dRt(jacobians[0]);
+                        // dt
+                        dRt.block<2, 3>(0, 3) = dQ;
+                        // dL/dR = dL/dQ * dQ/dR * dR/d(\theta)
+                        Eigen::Matrix<double, 9, 3, Eigen::RowMajor> dRdtheta;
+                        AngleAxisToRotationMatrixDerivative(parameters[0], dRdtheta.data());
+                        Eigen::Matrix<double, 3, 3, Eigen::RowMajor> dQdtheta;
+                        SparseProductDerivative(dRdtheta.data(), parameters[1], std::vector<int>(1, 0), dQdtheta.data());
+                        // std::cout << "dQdtheta\n" << dQdtheta << std::endl;
+                        dRt.block<2, 3>(0, 0) = dQ * dQdtheta;
+                        // std::cout << "dRt\n" << dRt << std::endl;
+                    }
+                    if (jacobians[1])   // Jacobian of output [x, y] w.r.t input [X, Y, Z]
+                    {
+                        // dL/dP = dL/dQ * dQ/dP = dL/dQ * R
+                        Eigen::Matrix<double, 3, 3> R;
+                        ceres::AngleAxisToRotationMatrix(parameters[0], R.data());
+                        Eigen::Map< Eigen::Matrix<double, 2, 3, Eigen::RowMajor> > dP(jacobians[1]);
+                        dP = dQ * R;
+                        // std::cout << "dP\n" << dP << std::endl;
+                        // exit(0);
+                    }
+                }
+                else
+                {
+                    if (jacobians[0])   // Jacobian of output [x, y] w.r.t input [X, Y, Z]
+                        std::copy(dQ.data(), dQ.data() + 6, jacobians[0]);
+                }
+            }
+            return true;
+        }
+    private:
+        const cv::Point2f& pt2d;
+        cv::Point2f pt2dCalibrated;
+        const cv::Mat& intrinsics;
+        const bool solveExt;
+    };
+
     double computeReprojectionError(
         const std::vector<std::vector<cv::Point2f>>& points2DVectorsExtrinsic,
         const Eigen::Matrix<double, 3, Eigen::Dynamic>& points3D,
@@ -1359,9 +1546,9 @@ namespace op
                 error("Number of inlier points is 0 (with " + std::to_string(numberCameras)
                       + " cameras and " + std::to_string(numberPoints) + " total points).",
                       __LINE__, __FUNCTION__, __FILE__);
-            std::cout << "Max error: " << maxError << ";\t in cam idx " << maxCamIdx
-                      << ";\t with pt idx: " << maxPtIdx
-                      << ";\t and pt 2D: " << points2DVectorsExtrinsic[maxCamIdx][maxPtIdx].x
+            std::cout << "\tReprojection Error info: Max error: " << maxError << ";\t in cam idx " << maxCamIdx
+                      << " with pt idx: " << maxPtIdx
+                      << " & pt 2D: " << points2DVectorsExtrinsic[maxCamIdx][maxPtIdx].x
                             << " " << points2DVectorsExtrinsic[maxCamIdx][maxPtIdx].y << std::endl;
             return sumError / sumPoint;
         }
@@ -1647,31 +1834,26 @@ namespace op
             //     std::cout << points2DVectorsExtrinsic[3][x].x << " " << points2DVectorsExtrinsic[3][x].y << std::endl;
             auto reprojectionError = computeReprojectionError(
                 points2DVectorsExtrinsic, initialPoints3D, BAValid, cameraExtrinsics, cameraIntrinsics);
-            std::cout << "Initial Reprojection Error: " << reprojectionError << std::endl;
+            std::cout << "Reprojection Error (initial): " << reprojectionError << std::endl;
 
-            // RANSAC
+            // Outlier removal
             auto reprojectionErrorPrevious = reprojectionError+1;
-            const auto numberPointsInitial = initialPoints3D.size();
             while (reprojectionError != reprojectionErrorPrevious)
             {
                 reprojectionErrorPrevious = reprojectionError;
                 // 10 pixels is a lot for full HD images...
                 const auto errorThreshold = fastMax(2*reprojectionError, 1.);
-                std::cout << "Error threshold (RANSAC): " << errorThreshold << std::endl;
                 removeOutliersReprojectionError(
                     points2DVectorsExtrinsic, initialPoints3D, BAValid, cameraExtrinsics, cameraIntrinsics,
                     errorThreshold);
                 reprojectionError = computeReprojectionError(
                     points2DVectorsExtrinsic, initialPoints3D, BAValid, cameraExtrinsics, cameraIntrinsics);
-                std::cout << "New reprojection error (after RANSAC iteration): "
-                          << computeReprojectionError(
-                            points2DVectorsExtrinsic, initialPoints3D, BAValid, cameraExtrinsics, cameraIntrinsics)
-                          << std::endl;
+                std::cout << "Reprojection Error (after outlier removal iteration): " << reprojectionError
+                          << ",\twith error threshold of " << errorThreshold << std::endl;
             }
-            std::cout << "Reprojection Error (after RANSAC): " << computeReprojectionError(
+            std::cout << "Reprojection Error (after outlier removal): " << computeReprojectionError(
                 points2DVectorsExtrinsic, initialPoints3D, BAValid, cameraExtrinsics, cameraIntrinsics) << std::endl;
-            std::cout << "Number of points reduced from " << numberPointsInitial
-                      << " to " << initialPoints3D.size() << std::endl;
+            std::cout << "Number of total 3D points " << initialPoints3D.size() << std::endl;
 
             // Start bundle adjustment.
             Eigen::Matrix<double, 3, Eigen::Dynamic> points3D = initialPoints3D;
@@ -1696,7 +1878,7 @@ namespace op
             options.linear_solver_type = ceres::DENSE_SCHUR;
             options.use_nonmonotonic_steps = true;
             options.minimizer_progress_to_stdout = true;
-            options.num_threads = 10;
+            options.num_threads = 1;
             // computing things together
             /*
             const int numResiduals = 2 * BAValid.sum();  // x and y
@@ -1708,7 +1890,7 @@ namespace op
             problem.AddResidualBlock(costFunction, new ceres::HuberLoss(2.0), cameraRt.data() + 6, points3D.data());
             */
 
-            // computing things separately
+            // computing things separately  (automatic differentiation)
             for (auto cameraIndex = 0; cameraIndex < numberCameras; cameraIndex++)
             {
                 if (cameraIndex != 0u)
@@ -1728,6 +1910,25 @@ namespace op
                         problem.AddResidualBlock(costFunction, new ceres::HuberLoss(2.0), points3D.data() + 3 * i);
                     }
             }
+
+            // computing things separately (manual differentiation)
+            // for (auto cameraIndex = 0; cameraIndex < numberCameras; cameraIndex++)
+            // {
+            //     if (cameraIndex != 0u)
+            //         for (auto i = 0u; i < points2DVectorsExtrinsic[cameraIndex].size(); i++)
+            //         {
+            //             if (!BAValid(cameraIndex, i)) continue;
+            //             ceres::CostFunction* costFunction = new bundleAdjustmentUnitJacobian(points2DVectorsExtrinsic[cameraIndex][i], cameraIntrinsics[cameraIndex], true);
+            //             problem.AddResidualBlock(costFunction, new ceres::HuberLoss(2.0), cameraRt.data() + 6 * cameraIndex, points3D.data() + 3 * i);
+            //         }
+            //     else
+            //         for (auto i = 0u; i < points2DVectorsExtrinsic[cameraIndex].size(); i++)
+            //         {
+            //             if (!BAValid(cameraIndex, i)) continue;
+            //             ceres::CostFunction* costFunction = new bundleAdjustmentUnitJacobian(points2DVectorsExtrinsic[cameraIndex][i], cameraIntrinsics[cameraIndex], false);
+            //             problem.AddResidualBlock(costFunction, new ceres::HuberLoss(2.0), points3D.data() + 3 * i);
+            //         }
+            // }
             ceres::Solver::Summary summary;
             ceres::Solve(options, &problem, &summary);
             std::cout << summary.FullReport() << std::endl;
@@ -1747,7 +1948,7 @@ namespace op
                         ext.at<double>(x, y) = rotation(x, y);
                 refinedExtrinsics[cameraIndex] = ext;
             }
-            std::cout << "After Bundle Adjustment Reprojection Error: "
+            std::cout << "Reprojection Error (after Bundle Adjustment): "
                       << computeReprojectionError(points2DVectorsExtrinsic, points3D, BAValid, refinedExtrinsics, cameraIntrinsics) << std::endl;
             // no need to delete ptr_BA or costFunction; Ceres::Problem takes care of them.
 
@@ -1812,7 +2013,7 @@ namespace op
                 refinedExtrinsics[cameraIndex].at<double>(2, 3) *= scalingFactor;
             }
             points3D *= scalingFactor;
-            std::cout << "After Rescaling Reprojection Error: "
+            std::cout << "Reprojection Error (after rescaling): "
                       << computeReprojectionError(points2DVectorsExtrinsic, points3D, BAValid, refinedExtrinsics, cameraIntrinsics) << std::endl;
 
             std::cout << "Output: -----------------------------------" << std::endl;
