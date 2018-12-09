@@ -1194,7 +1194,7 @@ namespace op
         }
     }
 
-    // defined by Donglai, compute the Jacobian of rotation matrix w.r.t angle axis (rotation matrix in row major order)
+    // defined by Donglai, compute the Jacobian of rotation matrix w.r.t angle axis (rotation matrix in column major order)
     void AngleAxisToRotationMatrixDerivative(const double* pose, double* dR_data, const int idj=0, const int numberColumns=3)
     {
         Eigen::Map< Eigen::Matrix<double, 9, Eigen::Dynamic, Eigen::RowMajor> > dR(dR_data, 9, numberColumns);
@@ -1385,13 +1385,11 @@ namespace op
             // residuals (2): x, y
             T P[3];
             ceres::AngleAxisRotatePoint(camera, point, P);
-            // std::cout << "P\n" << P[0] << std::endl << P[1] << std::endl << P[2] << std::endl;
+            Eigen::Matrix<T, 3, 3, Eigen::ColMajor> R;
             P[0] += camera[3]; P[1] += camera[4]; P[2] += camera[5];
 
             residuals[0] = P[0] / P[2] - T(pt2dCalibrated.x);
             residuals[1] = P[1] / P[2] - T(pt2dCalibrated.y);
-            // std::cout << "res\n" << residuals[0] << std::endl << residuals[1] << std::endl;
-            // exit(0);
             return true;
         }
 
@@ -1470,11 +1468,19 @@ namespace op
                         // dL/dR = dL/dQ * dQ/dR * dR/d(\theta)
                         Eigen::Matrix<double, 9, 3, Eigen::RowMajor> dRdtheta;
                         AngleAxisToRotationMatrixDerivative(parameters[0], dRdtheta.data());
+                        // switch from column major (R) to row major
+                        Eigen::Matrix<double, 1, 3> tmp = dRdtheta.row(1);
+                        dRdtheta.row(1) = dRdtheta.row(3);
+                        dRdtheta.row(3) = tmp;
+                        tmp = dRdtheta.row(2);
+                        dRdtheta.row(2) = dRdtheta.row(6);
+                        dRdtheta.row(6) = tmp;
+                        tmp = dRdtheta.row(5);
+                        dRdtheta.row(5) = dRdtheta.row(7);
+                        dRdtheta.row(7) = tmp;
                         Eigen::Matrix<double, 3, 3, Eigen::RowMajor> dQdtheta;
                         SparseProductDerivative(dRdtheta.data(), parameters[1], std::vector<int>(1, 0), dQdtheta.data());
-                        // std::cout << "dQdtheta\n" << dQdtheta << std::endl;
                         dRt.block<2, 3>(0, 0) = dQ * dQdtheta;
-                        // std::cout << "dRt\n" << dRt << std::endl;
                     }
                     if (jacobians[1])   // Jacobian of output [x, y] w.r.t input [X, Y, Z]
                     {
@@ -1483,8 +1489,6 @@ namespace op
                         ceres::AngleAxisToRotationMatrix(parameters[0], R.data());
                         Eigen::Map< Eigen::Matrix<double, 2, 3, Eigen::RowMajor> > dP(jacobians[1]);
                         dP = dQ * R;
-                        // std::cout << "dP\n" << dP << std::endl;
-                        // exit(0);
                     }
                 }
                 else
