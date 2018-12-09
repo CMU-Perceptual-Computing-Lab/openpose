@@ -1984,21 +1984,33 @@ namespace op
                 // 10 pixels is a lot for full HD images...
                 const auto errorThreshold = fastMax(2*reprojectionError, 0.5);
                 removeOutliersReprojectionError(
-                    points2DVectorsExtrinsic, initialPoints3D, BAValid, cameraExtrinsics, cameraIntrinsics,
+                    points2DVectorsExtrinsic, points3D, BAValid, refinedExtrinsics, cameraIntrinsics,
                     errorThreshold);
                 reprojectionError = computeReprojectionError(
-                    points2DVectorsExtrinsic, initialPoints3D, BAValid, cameraExtrinsics, cameraIntrinsics);
+                    points2DVectorsExtrinsic, points3D, BAValid, refinedExtrinsics, cameraIntrinsics);
                 std::cout << "Reprojection Error (after outlier removal iteration): " << reprojectionError
                           << ",\twith error threshold of " << errorThreshold << std::endl;
             }
             std::cout << "Reprojection Error (after outlier removal): " << computeReprojectionError(
-                points2DVectorsExtrinsic, initialPoints3D, BAValid, cameraExtrinsics, cameraIntrinsics) << std::endl;
-            std::cout << "Number of total 3D points " << initialPoints3D.size() << std::endl;
+                points2DVectorsExtrinsic, points3D, BAValid, refinedExtrinsics, cameraIntrinsics) << std::endl;
+            std::cout << "Number of total 3D points " << points3D.size() << std::endl;
 
             // final bundle adjustment
             const bool finalBundleAdjustment = true;
             if (finalBundleAdjustment)
             {
+                // prepare the camera intrinsics
+                for (auto cameraIndex = 0 ; cameraIndex < numberCameras ; cameraIndex++)
+                {
+                    cameraRt.data()[6 * cameraIndex + 3] = refinedExtrinsics[cameraIndex].at<double>(0, 3);
+                    cameraRt.data()[6 * cameraIndex + 4] = refinedExtrinsics[cameraIndex].at<double>(1, 3);
+                    cameraRt.data()[6 * cameraIndex + 5] = refinedExtrinsics[cameraIndex].at<double>(2, 3);
+                    Eigen::Matrix<double, 3, 3> rotation;   // column major!
+                    for (auto x = 0; x < 3; x++)
+                        for (auto y = 0; y < 3; y++)
+                            rotation(x, y) = refinedExtrinsics[cameraIndex].at<double>(x, y);
+                    ceres::RotationMatrixToAngleAxis(rotation.data(), cameraRt.data() + 6 * cameraIndex);
+                }
                 ceres::Problem problem;
                 ceres::Solver::Options options;
                 // options.linear_solver_type = ceres::SPARSE_NORMAL_CHOLESKY;
@@ -2062,7 +2074,6 @@ namespace op
                 ceres::Solve(options, &problem, &summary);
                 std::cout << summary.FullReport() << std::endl;
 
-                std::vector<cv::Mat> refinedExtrinsics(numberCameras);
                 refinedExtrinsics[0] = cameraExtrinsics[0];
                 for (auto cameraIndex = 1; cameraIndex < numberCameras; cameraIndex++)   // the first one is always [I | 0]
                 {
