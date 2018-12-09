@@ -1167,12 +1167,12 @@ namespace op
 
                 // Save result
                 log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-                CameraParameterReader camera2ParameterReader{
+                CameraParameterReader cameraParameterReaderFinal{
                     cameraSerialNumbers.at(index1),
                     cameraIntrinsicsSubset.at(1),
                     realCameraDistortions.at(index1),
                     cvMatExtrinsics};
-                camera2ParameterReader.writeParameters(parameterFolder);
+                cameraParameterReaderFinal.writeParameters(parameterFolder);
 
                 // Let the rendered image to be displayed
                 log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
@@ -1676,8 +1676,18 @@ namespace op
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             CameraParameterReader cameraParameterReader;
             cameraParameterReader.readParameters(parameterFolder);
-            // const auto cameraSerialNumbers = cameraParameterReader.getCameraSerialNumbers();
-            const auto cameraExtrinsics = cameraParameterReader.getCameraExtrinsics();
+            const auto cameraExtrinsicsInitial = cameraParameterReader.getCameraExtrinsicsInitial();
+            bool initialEmpty = false;
+            for (const auto& cameraExtrinsicInitial : cameraExtrinsicsInitial)
+            {
+                if (cameraExtrinsicInitial.empty())
+                {
+                    initialEmpty = true;
+                    break;
+                }
+            }
+            const auto cameraExtrinsics = (initialEmpty
+                ? cameraParameterReader.getCameraExtrinsics() : cameraExtrinsicsInitial);
             const auto cameraIntrinsics = cameraParameterReader.getCameraIntrinsics();
             const auto cameraDistortions = (
                 imagesAreUndistorted
@@ -2033,6 +2043,21 @@ namespace op
 // std::cout << residuals << std::endl;
 // delete ptr_BA;
 // delete costFunction;
+
+            // Save new extrinsics
+            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            const auto cameraSerialNumbers = cameraParameterReader.getCameraSerialNumbers();
+            const auto realCameraDistortions = cameraParameterReader.getCameraDistortions();
+            for (auto i = 0 ; i < numberCameras ; i++)
+            {
+                CameraParameterReader cameraParameterReaderFinal{
+                    cameraSerialNumbers.at(i),
+                    cameraIntrinsics.at(i),
+                    realCameraDistortions.at(i),
+                    refinedExtrinsics.at(i),
+                    (initialEmpty ? cameraExtrinsics.at(i) : cameraExtrinsicsInitial.at(i))};
+                cameraParameterReaderFinal.writeParameters(parameterFolder);
+            }
         }
         catch (const std::exception& e)
         {
