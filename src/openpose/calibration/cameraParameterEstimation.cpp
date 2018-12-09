@@ -1958,6 +1958,40 @@ namespace op
             // no need to delete ptr_BA or costFunction; Ceres::Problem takes care of them.
 
             // update outliers again
+            BAValid = Eigen::MatrixXd::Zero(numberCameras, points2DVectorsExtrinsic[0].size());  // this is a valid reprojection term
+            for (auto i = 0u; i < points2DVectorsExtrinsic[0].size(); i++)
+            {
+                std::vector<cv::Mat> pointCameraMatrices;
+                for (auto cameraIndex = 0 ; cameraIndex < numberCameras ; cameraIndex++)
+                {
+                    if (points2DVectorsExtrinsic[cameraIndex][i].x >= 0)  // visible in this camera
+                    {
+                        pointCameraMatrices.emplace_back(cameraMatrices[cameraIndex]);
+                    }
+                }
+                if (pointCameraMatrices.size() < 2u)  // if visible in one camera, no triangulation and not used in bundle adjustment.
+                    continue;
+                for (auto cameraIndex = 0 ; cameraIndex < numberCameras ; cameraIndex++)
+                    if (points2DVectorsExtrinsic[cameraIndex][i].x >= 0)  // this 2D term is used for optimization
+                        BAValid(cameraIndex, i) = 1;
+            }
+            reprojectionErrorPrevious = reprojectionError+1;
+            while (reprojectionError != reprojectionErrorPrevious)
+            {
+                reprojectionErrorPrevious = reprojectionError;
+                // 10 pixels is a lot for full HD images...
+                const auto errorThreshold = fastMax(2*reprojectionError, 0.5);
+                removeOutliersReprojectionError(
+                    points2DVectorsExtrinsic, initialPoints3D, BAValid, cameraExtrinsics, cameraIntrinsics,
+                    errorThreshold);
+                reprojectionError = computeReprojectionError(
+                    points2DVectorsExtrinsic, initialPoints3D, BAValid, cameraExtrinsics, cameraIntrinsics);
+                std::cout << "Reprojection Error (after outlier removal iteration): " << reprojectionError
+                          << ",\twith error threshold of " << errorThreshold << std::endl;
+            }
+            std::cout << "Reprojection Error (after outlier removal): " << computeReprojectionError(
+                points2DVectorsExtrinsic, initialPoints3D, BAValid, cameraExtrinsics, cameraIntrinsics) << std::endl;
+            std::cout << "Number of total 3D points " << initialPoints3D.size() << std::endl;
 
             // final bundle adjustment
             const bool finalBundleAdjustment = true;
