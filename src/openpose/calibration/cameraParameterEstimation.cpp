@@ -497,7 +497,7 @@ namespace op
 
                 // Reordering points2DVector to have the first point at the top left position (top right in
                 // case the chessboard is mirrored)
-                reorderPoints(points2DVector, gridInnerCorners, Points2DOrigin::TopLeft);
+                reorderPoints(points2DVector, gridInnerCorners, image);
 
                 // Generate objects3DVector from gridSquareSizeMm
                 const auto objects3DVector = getObjects3DVector(gridInnerCorners, gridSquareSizeMm);
@@ -779,7 +779,7 @@ namespace op
                 // Reorder & save 2D pixels points
                 if (found)
                 {
-                    reorderPoints(points2DVector, gridInnerCornersCvSize, Points2DOrigin::TopLeft);
+                    reorderPoints(points2DVector, gridInnerCornersCvSize, image);
                     for (auto i = 0 ; i < numberCorners ; i++)
                         matchIndexesCamera.emplace_back(viewIndex * numberCorners + i);
                 }
@@ -884,7 +884,9 @@ namespace op
                 // Reorder & save 2D pixels points
                 if (found)
                 {
-                    reorderPoints(points2DVector, gridInnerCornersCvSize, Points2DOrigin::TopLeft);
+                    // For intrinsics order is irrelevant, so I do not care if it fails
+                    const auto showWarning = false;
+                    reorderPoints(points2DVector, gridInnerCornersCvSize, image, showWarning);
                     points2DVectors.emplace_back(points2DVector);
                 }
                 else

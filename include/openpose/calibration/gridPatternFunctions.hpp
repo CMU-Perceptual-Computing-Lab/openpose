@@ -27,7 +27,7 @@ namespace op
         const std::vector<cv::Point2f>& points2DVector, const cv::Size& gridInnerCorners);
 
     OP_API void reorderPoints(std::vector<cv::Point2f>& points2DVector, const cv::Size& gridInnerCorners,
-                              const Points2DOrigin points2DOriginDesired);
+                              const cv::Mat& image, const bool showWarning = true);
 
     OP_API void plotGridCorners(
         const cv::Size& gridInnerCorners, const std::vector<cv::Point2f>& points2DVector,

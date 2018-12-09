@@ -22,22 +22,20 @@ namespace op
                 return PoseModel::BODY_19;
             else if (poseModeString == "BODY_19E")
                 return PoseModel::BODY_19E;
-            else if (poseModeString == "BODY_23")
-                return PoseModel::BODY_23;
-            else if (poseModeString == "BODY_25E")
-                return PoseModel::BODY_25E;
             else if (poseModeString == "BODY_19N")
                 return PoseModel::BODY_19N;
             else if (poseModeString == "BODY_19_X2")
                 return PoseModel::BODY_19_X2;
-            else if (poseModeString == "BODY_25_19")
-                return PoseModel::BODY_25_19;
-            else if (poseModeString == "BODY_59")
-                return PoseModel::BODY_59;
-            else if (poseModeString == "BODY_65")
-                return PoseModel::BODY_65;
+            else if (poseModeString == "BODY_23")
+                return PoseModel::BODY_23;
+            else if (poseModeString == "BODY_25B")
+                return PoseModel::BODY_25B;
             else if (poseModeString == "BODY_25D")
                 return PoseModel::BODY_25D;
+            else if (poseModeString == "BODY_25E")
+                return PoseModel::BODY_25E;
+            else if (poseModeString == "BODY_65")
+                return PoseModel::BODY_65;
             // Car pose
             else if (poseModeString == "CAR_12")
                 return PoseModel::CAR_12;
