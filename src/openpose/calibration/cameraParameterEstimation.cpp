@@ -765,7 +765,7 @@ namespace op
                 const auto& imageAndPath = imageAndPaths.at(viewIndex * numberCameras + cameraIndex);
                 const auto& image = imageAndPath.first;
 
-                if (viewIndex % std::max(1, int(numberViews/6)) == 0)
+                if (viewIndex % std::max(1, int(numberViews/4)) == 0)
                     log("Camera " + std::to_string(cameraIndex) + " - Image view "
                         + std::to_string(viewIndex+1) + "/" + std::to_string(numberViews),
                         Priority::High);
@@ -1737,9 +1737,14 @@ namespace op
     {
         try
         {
+            // Debugging
+            const auto saveVisualSFMFiles = false;
+            // const auto saveVisualSFMFiles = true;
+
             // Sanity check
             if (!imagesAreUndistorted)
-                error("This mode assumes that the images are already undistorted (add flag `--omit_distortion`).", __LINE__, __FUNCTION__, __FILE__);
+                error("This mode assumes that the images are already undistorted (add flag `--omit_distortion`).",
+                      __LINE__, __FUNCTION__, __FILE__);
 
             log("Loading images...", Priority::High);
             const auto imageAndPaths = getImageAndPaths(imageFolder);
@@ -1748,7 +1753,7 @@ namespace op
             // Point<int> --> cv::Size
             const cv::Size gridInnerCornersCvSize{gridInnerCorners.x, gridInnerCorners.y};
 
-            // Load intrinsic parameters
+            // Load parameters (distortion, intrinsics, initial extrinsics)
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             CameraParameterReader cameraParameterReader;
             cameraParameterReader.readParameters(parameterFolder);
@@ -1776,9 +1781,6 @@ namespace op
             if (imageAndPaths.empty())
                 error("imageAndPaths.empty()!.", __LINE__, __FUNCTION__, __FILE__);
 
-            // Debugging
-            // const auto saveVisualSFMFiles = false;
-            const auto saveVisualSFMFiles = true;
             // Get 2D grid corners of each image
             std::vector<cv::Mat> imagesWithCorners;
             const auto imageSize = imageAndPaths.at(0).first.size();
@@ -1834,13 +1836,18 @@ namespace op
                 }
             }
             // ofstreamMatches.close();
-            log("Number points fully obtained: " + std::to_string(points2DVectorsExtrinsic[0].size()), Priority::High);
-            log("Number views fully obtained: " + std::to_string(points2DVectorsExtrinsic[0].size() / numberCorners),
-                Priority::High);
+            log("Number points (i.e., timestamps) fully obtained: "
+                + std::to_string(points2DVectorsExtrinsic[0].size()), Priority::High);
+            log("Number views (i.e., cameras) fully obtained: "
+                + std::to_string(points2DVectorsExtrinsic[0].size() / numberCorners), Priority::High);
+            log(" ", Priority::High);
+
             // Sanity check
             for (auto i = 1 ; i < numberCameras ; i++)
                 if (points2DVectorsExtrinsic[i].size() != points2DVectorsExtrinsic[0].size())
-                    error("Something went wrong. Notify us.", __LINE__, __FUNCTION__, __FILE__);
+                    error("Something went wrong. Notify us:"
+                          " points2DVectorsExtrinsic[i].size() != points2DVectorsExtrinsic[0].size().",
+                          __LINE__, __FUNCTION__, __FILE__);
 
             // Note:
             // Extrinsics for each camera: std::vector<cv::Mat> cameraExtrinsics (translation in meters)
@@ -1873,6 +1880,7 @@ namespace op
             for (auto cameraIndex = 0 ; cameraIndex < numberCameras ; cameraIndex++)
                 cameraMatrices[cameraIndex] = cameraIntrinsics[cameraIndex] * cameraExtrinsics[cameraIndex];
 
+// TODO: Combine this function and the one in 3d OP
             // Run triangulation to obtain the initial 3D points
             Eigen::Matrix<double, 3, Eigen::Dynamic> initialPoints3D(3, points2DVectorsExtrinsic[0].size());
             initialPoints3D.setZero();
@@ -1905,18 +1913,8 @@ namespace op
             // Update inliers & outliers
             auto BAValid = getInlierAndOutliers(points2DVectorsExtrinsic);
 
-            // std::cout << "---------------------------------" << std::endl;
-            // for (int x = 432; x < 432 + 54; x++)
-            //     std::cout << points2DVectorsExtrinsic[0][x].x << " " << points2DVectorsExtrinsic[0][x].y << std::endl;
-            // std::cout << "---------------------------------" << std::endl;
-            // for (int x = 432; x < 432 + 54; x++)
-            //     std::cout << points2DVectorsExtrinsic[1][x].x << " " << points2DVectorsExtrinsic[1][x].y << std::endl;
-            // std::cout << "---------------------------------" << std::endl;
-            // for (int x = 432; x < 432 + 54; x++)
-            //     std::cout << points2DVectorsExtrinsic[2][x].x << " " << points2DVectorsExtrinsic[2][x].y << std::endl;
-            // std::cout << "---------------------------------" << std::endl;
-            // for (int x = 432; x < 432 + 54; x++)
-            //     std::cout << points2DVectorsExtrinsic[3][x].x << " " << points2DVectorsExtrinsic[3][x].y << std::endl;
+            // Initial reprojection error
+            log("Estimating initial reprojection error...", Priority::High);
             auto reprojectionError = computeReprojectionError(
                 points2DVectorsExtrinsic, initialPoints3D, BAValid, cameraExtrinsics, cameraIntrinsics);
             std::cout << "Reprojection Error (initial): " << reprojectionError << std::endl;
