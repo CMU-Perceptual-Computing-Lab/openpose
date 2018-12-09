@@ -196,7 +196,7 @@ namespace op
         {
             #ifdef USE_CAFFE
                 const auto heatMapsBlob = bottom.at(0);
-                const auto* const heatMapsPtr = heatMapsBlob->cpu_data();                 // ~8.5 ms COCO, 27ms BODY_59
+                const auto* const heatMapsPtr = heatMapsBlob->cpu_data();                 // ~8.5 ms COCO, ~27ms BODY_65
                 const auto* const peaksPtr = bottom.at(1)->cpu_data();                    // ~0.02ms
                 const auto maxPeaks = mTopSize[1];
                 connectBodyPartsCpu(poseKeypoints, poseScores, heatMapsPtr, peaksPtr, mPoseModel,
@@ -239,9 +239,10 @@ namespace op
                     const auto numberBodyParts = getPoseNumberBodyParts(mPoseModel);
                     const auto& mapIdxOffset = getPoseMapIndex(mPoseModel);
                     // Update mapIdx
+                    const auto offset = (mPoseModel != PoseModel::BODY_25B ? 1 : 0);
                     auto mapIdx = mapIdxOffset;
                     for (auto& i : mapIdx)
-                        i += (numberBodyParts+1);
+                        i += (numberBodyParts+offset);
                     // Re-allocate memory
                     cudaMalloc((void **)&pBodyPartPairsGpuPtr, bodyPartPairs.size() * sizeof(unsigned int));
                     cudaMemcpy(pBodyPartPairsGpuPtr, &bodyPartPairs[0], bodyPartPairs.size() * sizeof(unsigned int),

@@ -44,7 +44,7 @@ SUFFIX="_${SCALES}"
 HAND_RESULTS_FOLDER_BASE=${PEOPLE_JSON_FOLDER}"hand_keypoints_estimated"
 HAND_RESULTS_FOLDER_NO_BB=${HAND_RESULTS_FOLDER_BASE}"_old"${SUFFIX}
 HAND_RESULTS_FOLDER_BB=${HAND_RESULTS_FOLDER_BASE}"_BBox"${SUFFIX}
-HAND_RESULTS_FOLDER_BODY_59=${HAND_RESULTS_FOLDER_BASE}"_BODY_59"
+HAND_RESULTS_FOLDER_BODY_65=${HAND_RESULTS_FOLDER_BASE}"_BODY_65"
 
 
 
@@ -74,12 +74,12 @@ rm -rf $HAND_RESULTS_FOLDER_NO_BB
 
 
 
-# No bounding box BODY_59
-echo "Output on ${HAND_RESULTS_FOLDER_BODY_59}"
-rm -rf $HAND_RESULTS_FOLDER_BODY_59
+# No bounding box BODY_65
+echo "Output on ${HAND_RESULTS_FOLDER_BODY_65}"
+rm -rf $HAND_RESULTS_FOLDER_BODY_65
 # 1 scale
 ./build/examples/openpose/openpose.bin \
-    --model_pose BODY_59 \
+    --model_pose BODY_65 \
     --image_dir ${IMAGES_FOLDER} \
-    --write_json $HAND_RESULTS_FOLDER_BODY_59 \
+    --write_json $HAND_RESULTS_FOLDER_BODY_65 \
     --display 0
