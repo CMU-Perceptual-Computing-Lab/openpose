@@ -1945,6 +1945,7 @@ namespace op
             //             problem.AddResidualBlock(costFunction, new ceres::HuberLoss(2.0), points3D.data() + 3 * i);
             //         }
             // }
+
             ceres::Solver::Summary summary;
             ceres::Solve(options, &problem, &summary);
             std::cout << summary.FullReport() << std::endl;
@@ -1967,6 +1968,139 @@ namespace op
             std::cout << "Reprojection Error (after Bundle Adjustment): "
                       << computeReprojectionError(points2DVectorsExtrinsic, points3D, BAValid, refinedExtrinsics, cameraIntrinsics) << std::endl;
             // no need to delete ptr_BA or costFunction; Ceres::Problem takes care of them.
+
+            // update outliers again
+            BAValid = Eigen::MatrixXd::Zero(numberCameras, points2DVectorsExtrinsic[0].size());  // this is a valid reprojection term
+            for (auto i = 0u; i < points2DVectorsExtrinsic[0].size(); i++)
+            {
+                std::vector<cv::Mat> pointCameraMatrices;
+                for (auto cameraIndex = 0 ; cameraIndex < numberCameras ; cameraIndex++)
+                {
+                    if (points2DVectorsExtrinsic[cameraIndex][i].x >= 0)  // visible in this camera
+                    {
+                        pointCameraMatrices.emplace_back(cameraMatrices[cameraIndex]);
+                    }
+                }
+                if (pointCameraMatrices.size() < 2u)  // if visible in one camera, no triangulation and not used in bundle adjustment.
+                    continue;
+                for (auto cameraIndex = 0 ; cameraIndex < numberCameras ; cameraIndex++)
+                    if (points2DVectorsExtrinsic[cameraIndex][i].x >= 0)  // this 2D term is used for optimization
+                        BAValid(cameraIndex, i) = 1;
+            }
+            reprojectionErrorPrevious = reprojectionError+1;
+            while (reprojectionError != reprojectionErrorPrevious)
+            {
+                reprojectionErrorPrevious = reprojectionError;
+                // 10 pixels is a lot for full HD images...
+                const auto errorThreshold = fastMax(2*reprojectionError, 0.5);
+                removeOutliersReprojectionError(
+                    points2DVectorsExtrinsic, points3D, BAValid, refinedExtrinsics, cameraIntrinsics,
+                    errorThreshold);
+                reprojectionError = computeReprojectionError(
+                    points2DVectorsExtrinsic, points3D, BAValid, refinedExtrinsics, cameraIntrinsics);
+                std::cout << "Reprojection Error (after outlier removal iteration): " << reprojectionError
+                          << ",\twith error threshold of " << errorThreshold << std::endl;
+            }
+            std::cout << "Reprojection Error (after outlier removal): " << computeReprojectionError(
+                points2DVectorsExtrinsic, points3D, BAValid, refinedExtrinsics, cameraIntrinsics) << std::endl;
+            std::cout << "Number of total 3D points " << points3D.size() << std::endl;
+
+            // final bundle adjustment
+            const bool finalBundleAdjustment = true;
+            if (finalBundleAdjustment)
+            {
+                // prepare the camera intrinsics
+                for (auto cameraIndex = 0 ; cameraIndex < numberCameras ; cameraIndex++)
+                {
+                    cameraRt.data()[6 * cameraIndex + 3] = refinedExtrinsics[cameraIndex].at<double>(0, 3);
+                    cameraRt.data()[6 * cameraIndex + 4] = refinedExtrinsics[cameraIndex].at<double>(1, 3);
+                    cameraRt.data()[6 * cameraIndex + 5] = refinedExtrinsics[cameraIndex].at<double>(2, 3);
+                    Eigen::Matrix<double, 3, 3> rotation;   // column major!
+                    for (auto x = 0; x < 3; x++)
+                        for (auto y = 0; y < 3; y++)
+                            rotation(x, y) = refinedExtrinsics[cameraIndex].at<double>(x, y);
+                    ceres::RotationMatrixToAngleAxis(rotation.data(), cameraRt.data() + 6 * cameraIndex);
+                }
+                ceres::Problem problem;
+                ceres::Solver::Options options;
+                // options.linear_solver_type = ceres::SPARSE_NORMAL_CHOLESKY;
+                // options.linear_solver_type = ceres::DENSE_QR;
+                options.linear_solver_type = ceres::DENSE_SCHUR;
+                options.use_nonmonotonic_steps = true;
+                options.minimizer_progress_to_stdout = true;
+                options.num_threads = 1;
+                // computing things together
+                /*
+                const int numResiduals = 2 * BAValid.sum();  // x and y
+                bundleAdjustmentCost* ptr_BA = new bundleAdjustmentCost(points2DVectorsExtrinsic, cameraIntrinsics, BAValid);
+                ceres::DynamicAutoDiffCostFunction<bundleAdjustmentCost>* costFunction = new ceres::DynamicAutoDiffCostFunction<bundleAdjustmentCost>(ptr_BA);
+                costFunction->AddParameterBlock(6 * (numberCameras - 1));  // R + t
+                costFunction->AddParameterBlock(3 * points2DVectorsExtrinsic[0].size());
+                costFunction->SetNumResiduals(numResiduals);
+                problem.AddResidualBlock(costFunction, new ceres::HuberLoss(2.0), cameraRt.data() + 6, points3D.data());
+                */
+
+                // computing things separately  (automatic differentiation)
+                for (auto cameraIndex = 0; cameraIndex < numberCameras; cameraIndex++)
+                {
+                    if (cameraIndex != 0u)
+                        for (auto i = 0u; i < points2DVectorsExtrinsic[cameraIndex].size(); i++)
+                        {
+                            if (!BAValid(cameraIndex, i)) continue;
+                            bundleAdjustmentUnit* ptr_BA = new bundleAdjustmentUnit(points2DVectorsExtrinsic[cameraIndex][i], cameraIntrinsics[cameraIndex]);
+                            ceres::CostFunction* costFunction = new ceres::AutoDiffCostFunction<bundleAdjustmentUnit, 2, 6, 3>(ptr_BA);
+                            problem.AddResidualBlock(costFunction, new ceres::HuberLoss(2.0), cameraRt.data() + 6 * cameraIndex, points3D.data() + 3 * i);
+                        }
+                    else
+                        for (auto i = 0u; i < points2DVectorsExtrinsic[cameraIndex].size(); i++)
+                        {
+                            if (!BAValid(cameraIndex, i)) continue;
+                            bundleAdjustmentUnit* ptr_BA = new bundleAdjustmentUnit(points2DVectorsExtrinsic[cameraIndex][i], cameraIntrinsics[cameraIndex]);
+                            ceres::CostFunction* costFunction = new ceres::AutoDiffCostFunction<bundleAdjustmentUnit, 2, 3>(ptr_BA);
+                            problem.AddResidualBlock(costFunction, new ceres::HuberLoss(2.0), points3D.data() + 3 * i);
+                        }
+                }
+
+                // computing things separately (manual differentiation)
+                // for (auto cameraIndex = 0; cameraIndex < numberCameras; cameraIndex++)
+                // {
+                //     if (cameraIndex != 0u)
+                //         for (auto i = 0u; i < points2DVectorsExtrinsic[cameraIndex].size(); i++)
+                //         {
+                //             if (!BAValid(cameraIndex, i)) continue;
+                //             ceres::CostFunction* costFunction = new bundleAdjustmentUnitJacobian(points2DVectorsExtrinsic[cameraIndex][i], cameraIntrinsics[cameraIndex], true);
+                //             problem.AddResidualBlock(costFunction, new ceres::HuberLoss(2.0), cameraRt.data() + 6 * cameraIndex, points3D.data() + 3 * i);
+                //         }
+                //     else
+                //         for (auto i = 0u; i < points2DVectorsExtrinsic[cameraIndex].size(); i++)
+                //         {
+                //             if (!BAValid(cameraIndex, i)) continue;
+                //             ceres::CostFunction* costFunction = new bundleAdjustmentUnitJacobian(points2DVectorsExtrinsic[cameraIndex][i], cameraIntrinsics[cameraIndex], false);
+                //             problem.AddResidualBlock(costFunction, new ceres::HuberLoss(2.0), points3D.data() + 3 * i);
+                //         }
+                // }
+
+                ceres::Solver::Summary summary;
+                ceres::Solve(options, &problem, &summary);
+                std::cout << summary.FullReport() << std::endl;
+
+                refinedExtrinsics[0] = cameraExtrinsics[0];
+                for (auto cameraIndex = 1; cameraIndex < numberCameras; cameraIndex++)   // the first one is always [I | 0]
+                {
+                    cv::Mat ext(3, 4, CV_64FC1);
+                    ext.at<double>(0, 3) = cameraRt.data()[6 * cameraIndex + 3];
+                    ext.at<double>(1, 3) = cameraRt.data()[6 * cameraIndex + 4];
+                    ext.at<double>(2, 3) = cameraRt.data()[6 * cameraIndex + 5];
+                    Eigen::Matrix<double, 3, 3> rotation;
+                    ceres::AngleAxisToRotationMatrix(cameraRt.data() + 6 * cameraIndex, rotation.data());
+                    for (auto x = 0; x < 3; x++)
+                        for (auto y = 0; y < 3; y++)
+                            ext.at<double>(x, y) = rotation(x, y);
+                    refinedExtrinsics[cameraIndex] = ext;
+                }
+                std::cout << "Reprojection Error (after Bundle Adjustment): "
+                          << computeReprojectionError(points2DVectorsExtrinsic, points3D, BAValid, refinedExtrinsics, cameraIntrinsics) << std::endl;
+            }
 
             // rescale the 3D points and translation based on the grid size
             if (points2DVectorsExtrinsic[0].size() % numberCorners != 0)
