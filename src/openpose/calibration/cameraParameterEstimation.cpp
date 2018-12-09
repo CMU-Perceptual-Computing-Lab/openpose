@@ -1654,38 +1654,42 @@ namespace op
         }
     }
 
-// // TODO: NExt: Test this function and replace for redundant code
-// // TODO: NExt: Do the same with the BA code.
-//     void updateInlierAndOutliers(
-//         Eigen::MatrixXd& BAValid, const std::vector<std::vector<cv::Point2f>>& points2DVectorsExtrinsic,
-//         const std::vector<cv::Mat> cameraMatrices)
-//     {
-//         try
-//         {
-//             const auto numberCameras = points2DVectorsExtrinsic.size();
-// assert(numberCameras == 4);
-//             // Update inliers / outliers
-//             // This is a valid reprojection term
-//             BAValid = Eigen::MatrixXd::Zero(numberCameras, points2DVectorsExtrinsic[0].size());
-//             for (auto i = 0u; i < points2DVectorsExtrinsic[0].size(); i++)
-//             {
-//                 std::vector<cv::Mat> pointCameraMatrices;
-//                 for (auto cameraIndex = 0u ; cameraIndex < numberCameras ; cameraIndex++)
-//                     if (points2DVectorsExtrinsic[cameraIndex][i].x >= 0)  // visible in this camera
-//                         pointCameraMatrices.emplace_back(cameraMatrices[cameraIndex]);
-//                 // If visible in one camera, no triangulation and not used in bundle adjustment.
-//                 if (pointCameraMatrices.size() > 1u)
-//                     for (auto cameraIndex = 0u ; cameraIndex < numberCameras ; cameraIndex++)
-//                         // This 2D term is used for optimization
-//                         if (points2DVectorsExtrinsic[cameraIndex][i].x >= 0)
-//                             BAValid(cameraIndex, i) = 1;
-//             }
-//         }
-//         catch (const std::exception& e)
-//         {
-//             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-//         }
-//     }
+    Eigen::MatrixXd getInlierAndOutliers(
+        const std::vector<std::vector<cv::Point2f>>& points2DVectorsExtrinsic)
+    {
+        try
+        {
+            const auto numberCameras = points2DVectorsExtrinsic.size();
+            // Update inliers & outliers
+            // This is a valid reprojection term
+            Eigen::MatrixXd BAValid = Eigen::MatrixXd::Zero(numberCameras, points2DVectorsExtrinsic[0].size());
+            for (auto i = 0u; i < points2DVectorsExtrinsic[0].size(); i++)
+            {
+                auto visibleViewCounter = 0u;
+                // std::vector<cv::Mat> pointCameraMatrices;
+                for (auto cameraIndex = 0u ; cameraIndex < numberCameras ; cameraIndex++)
+                {
+                    if (points2DVectorsExtrinsic[cameraIndex][i].x >= 0)  // visible in this camera
+                    {
+                        visibleViewCounter++;
+                        if (visibleViewCounter > 1u)
+                            break;
+                    }
+                }
+                // If visible in >1 camera, point used in bundle adjustment
+                if (visibleViewCounter > 1u)
+                    for (auto cameraIndex = 0u ; cameraIndex < numberCameras ; cameraIndex++)
+                        if (points2DVectorsExtrinsic[cameraIndex][i].x >= 0)
+                            BAValid(cameraIndex, i) = 1;
+            }
+            return BAValid;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return Eigen::MatrixXd{};
+        }
+    }
 
     void removeOutliersReprojectionErrorIterative(
         std::vector<std::vector<cv::Point2f>>& points2DVectorsExtrinsic,
@@ -1853,31 +1857,23 @@ namespace op
             // `matchIndexesIntersection`.
             // Last note: For quick debugging, set saveVisualSFMFiles = true and check the generated FeatureMatches.txt
             // (note that *.sift files are actually in binary format, so quite hard to read.)
-            log("3D square size:");
-            log(gridSquareSizeMm); // Just temporary to avoid warning of unused variable
 
-            // print out things
-            for (auto i = 0u; i < cameraExtrinsics.size(); i++)
-            {
-                std::cout << i << "\n" << cameraExtrinsics[i] << std::endl;
-            }
-            for (auto i = 0u; i < cameraIntrinsics.size(); i++)
-            {
-                std::cout << i << "\n" << cameraIntrinsics[i] << std::endl;
-            }
-            for (auto i = 0u; i < points2DVectorsExtrinsic.size(); i++)
-            {
-                std::cout << i << "\n" << points2DVectorsExtrinsic[i].size() << std::endl;
-            }
+            // // Debugging
+            // for (auto i = 0u; i < cameraExtrinsics.size(); i++)
+            //     std::cout << i << "\n" << cameraExtrinsics[i] << std::endl;
+            // for (auto i = 0u; i < cameraIntrinsics.size(); i++)
+            //     std::cout << i << "\n" << cameraIntrinsics[i] << std::endl;
+            // for (auto i = 0u; i < points2DVectorsExtrinsic.size(); i++)
+            //     std::cout << i << "\n" << points2DVectorsExtrinsic[i].size() << std::endl;
+            // std::cout << "---------------------------\n";
 
-            std::cout << "---------------------------\n";
-
-            // compute the initial camera matrices
+// TODO: NExt: Avoid redundancy in the BA code
+            // Compute the initial camera matrices
             std::vector<cv::Mat> cameraMatrices(numberCameras);
             for (auto cameraIndex = 0 ; cameraIndex < numberCameras ; cameraIndex++)
                 cameraMatrices[cameraIndex] = cameraIntrinsics[cameraIndex] * cameraExtrinsics[cameraIndex];
+
             // Run triangulation to obtain the initial 3D points
-            Eigen::MatrixXd BAValid = Eigen::MatrixXd::Zero(numberCameras, points2DVectorsExtrinsic[0].size());  // this is a valid reprojection term
             Eigen::Matrix<double, 3, Eigen::Dynamic> initialPoints3D(3, points2DVectorsExtrinsic[0].size());
             initialPoints3D.setZero();
             const auto imageRatio = std::sqrt(imageSize.area() / 1310720.);
@@ -1897,9 +1893,6 @@ namespace op
                 }
                 if (pointCameraMatrices.size() < 2u)  // if visible in one camera, no triangulation and not used in bundle adjustment.
                     continue;
-                for (auto cameraIndex = 0 ; cameraIndex < numberCameras ; cameraIndex++)
-                    if (points2DVectorsExtrinsic[cameraIndex][i].x >= 0)  // this 2D term is used for optimization
-                        BAValid(cameraIndex, i) = 1;
                 cv::Mat reconstructedPoint;
                 const float reprojectionError = triangulateWithOptimization(
                     reconstructedPoint, pointCameraMatrices, pointsOnEachCamera, reprojectionMaxAcceptable);
@@ -1908,6 +1901,10 @@ namespace op
                 initialPoints3D.data()[3 * i + 1] = reconstructedPoint.at<double>(1, 0) / reconstructedPoint.at<double>(3, 0);
                 initialPoints3D.data()[3 * i + 2] = reconstructedPoint.at<double>(2, 0) / reconstructedPoint.at<double>(3, 0);
             }
+
+            // Update inliers & outliers
+            auto BAValid = getInlierAndOutliers(points2DVectorsExtrinsic);
+
             // std::cout << "---------------------------------" << std::endl;
             // for (int x = 432; x < 432 + 54; x++)
             //     std::cout << points2DVectorsExtrinsic[0][x].x << " " << points2DVectorsExtrinsic[0][x].y << std::endl;
@@ -1930,10 +1927,10 @@ namespace op
                 points2DVectorsExtrinsic, initialPoints3D, BAValid, cameraExtrinsics, cameraIntrinsics,
                 errorThresholdRelative, reprojectionError);
 
-            // Start bundle adjustment.
+            // Start bundle adjustment
             Eigen::Matrix<double, 3, Eigen::Dynamic> points3D = initialPoints3D;
             Eigen::Matrix<double, 6, Eigen::Dynamic> cameraRt(6, numberCameras);   // angle axis + translation
-            // prepare the camera intrinsics
+            // Prepare the camera extrinsics
             for (auto cameraIndex = 0 ; cameraIndex < numberCameras ; cameraIndex++)
             {
                 cameraRt.data()[6 * cameraIndex + 3] = cameraExtrinsics[cameraIndex].at<double>(0, 3);
@@ -1969,6 +1966,7 @@ namespace op
             for (auto cameraIndex = 0; cameraIndex < numberCameras; cameraIndex++)
             {
                 if (cameraIndex != 0u)
+                {
                     for (auto i = 0u; i < points2DVectorsExtrinsic[cameraIndex].size(); i++)
                     {
                         if (!BAValid(cameraIndex, i)) continue;
@@ -1976,7 +1974,9 @@ namespace op
                         ceres::CostFunction* costFunction = new ceres::AutoDiffCostFunction<bundleAdjustmentUnit, 2, 6, 3>(ptr_BA);
                         problem.AddResidualBlock(costFunction, new ceres::HuberLoss(2.0), cameraRt.data() + 6 * cameraIndex, points3D.data() + 3 * i);
                     }
+                }
                 else
+                {
                     for (auto i = 0u; i < points2DVectorsExtrinsic[cameraIndex].size(); i++)
                     {
                         if (!BAValid(cameraIndex, i)) continue;
@@ -1984,6 +1984,7 @@ namespace op
                         ceres::CostFunction* costFunction = new ceres::AutoDiffCostFunction<bundleAdjustmentUnit, 2, 3>(ptr_BA);
                         problem.AddResidualBlock(costFunction, new ceres::HuberLoss(2.0), points3D.data() + 3 * i);
                     }
+                }
             }
 
             // computing things separately (manual differentiation)
@@ -2028,24 +2029,8 @@ namespace op
                       << computeReprojectionError(points2DVectorsExtrinsic, points3D, BAValid, refinedExtrinsics, cameraIntrinsics) << std::endl;
             // no need to delete ptr_BA or costFunction; Ceres::Problem takes care of them.
 
-            // update outliers again
-            BAValid = Eigen::MatrixXd::Zero(numberCameras, points2DVectorsExtrinsic[0].size());  // this is a valid reprojection term
-            for (auto i = 0u; i < points2DVectorsExtrinsic[0].size(); i++)
-            {
-                std::vector<cv::Mat> pointCameraMatrices;
-                for (auto cameraIndex = 0 ; cameraIndex < numberCameras ; cameraIndex++)
-                {
-                    if (points2DVectorsExtrinsic[cameraIndex][i].x >= 0)  // visible in this camera
-                    {
-                        pointCameraMatrices.emplace_back(cameraMatrices[cameraIndex]);
-                    }
-                }
-                if (pointCameraMatrices.size() < 2u)  // if visible in one camera, no triangulation and not used in bundle adjustment.
-                    continue;
-                for (auto cameraIndex = 0 ; cameraIndex < numberCameras ; cameraIndex++)
-                    if (points2DVectorsExtrinsic[cameraIndex][i].x >= 0)  // this 2D term is used for optimization
-                        BAValid(cameraIndex, i) = 1;
-            }
+            // Update inliers & outliers
+            BAValid = getInlierAndOutliers(points2DVectorsExtrinsic);
 
             // Outlier removal
             removeOutliersReprojectionErrorIterative(
@@ -2091,6 +2076,7 @@ namespace op
                 for (auto cameraIndex = 0; cameraIndex < numberCameras; cameraIndex++)
                 {
                     if (cameraIndex != 0u)
+                    {
                         for (auto i = 0u; i < points2DVectorsExtrinsic[cameraIndex].size(); i++)
                         {
                             if (!BAValid(cameraIndex, i)) continue;
@@ -2098,7 +2084,9 @@ namespace op
                             ceres::CostFunction* costFunction = new ceres::AutoDiffCostFunction<bundleAdjustmentUnit, 2, 6, 3>(ptr_BA);
                             problem.AddResidualBlock(costFunction, new ceres::HuberLoss(2.0), cameraRt.data() + 6 * cameraIndex, points3D.data() + 3 * i);
                         }
+                    }
                     else
+                    {
                         for (auto i = 0u; i < points2DVectorsExtrinsic[cameraIndex].size(); i++)
                         {
                             if (!BAValid(cameraIndex, i)) continue;
@@ -2106,6 +2094,7 @@ namespace op
                             ceres::CostFunction* costFunction = new ceres::AutoDiffCostFunction<bundleAdjustmentUnit, 2, 3>(ptr_BA);
                             problem.AddResidualBlock(costFunction, new ceres::HuberLoss(2.0), points3D.data() + 3 * i);
                         }
+                    }
                 }
 
                 // computing things separately (manual differentiation)
