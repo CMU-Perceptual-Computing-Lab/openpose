@@ -1569,7 +1569,7 @@ namespace op
         std::vector<std::vector<cv::Point2f>>& points2DVectorsExtrinsic,
         Eigen::Matrix<double, 3, Eigen::Dynamic>& points3D,
         Eigen::MatrixXd& BAValid, const std::vector<cv::Mat> cameraExtrinsics,
-        const std::vector<cv::Mat> cameraIntrinsics, const double errorThreshold = 10)
+        const std::vector<cv::Mat> cameraIntrinsics, const double errorThreshold = 5.)
     {
         try
         {
@@ -1647,6 +1647,78 @@ namespace op
             //     std::swap(points3D, points3DRansac);
             //     std::swap(BAValid, BAValidRansac);
             // }
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+// // TODO: NExt: Test this function and replace for redundant code
+// // TODO: NExt: Do the same with the BA code.
+//     void updateInlierAndOutliers(
+//         Eigen::MatrixXd& BAValid, const std::vector<std::vector<cv::Point2f>>& points2DVectorsExtrinsic,
+//         const std::vector<cv::Mat> cameraMatrices)
+//     {
+//         try
+//         {
+//             const auto numberCameras = points2DVectorsExtrinsic.size();
+// assert(numberCameras == 4);
+//             // Update inliers / outliers
+//             // This is a valid reprojection term
+//             BAValid = Eigen::MatrixXd::Zero(numberCameras, points2DVectorsExtrinsic[0].size());
+//             for (auto i = 0u; i < points2DVectorsExtrinsic[0].size(); i++)
+//             {
+//                 std::vector<cv::Mat> pointCameraMatrices;
+//                 for (auto cameraIndex = 0u ; cameraIndex < numberCameras ; cameraIndex++)
+//                     if (points2DVectorsExtrinsic[cameraIndex][i].x >= 0)  // visible in this camera
+//                         pointCameraMatrices.emplace_back(cameraMatrices[cameraIndex]);
+//                 // If visible in one camera, no triangulation and not used in bundle adjustment.
+//                 if (pointCameraMatrices.size() > 1u)
+//                     for (auto cameraIndex = 0u ; cameraIndex < numberCameras ; cameraIndex++)
+//                         // This 2D term is used for optimization
+//                         if (points2DVectorsExtrinsic[cameraIndex][i].x >= 0)
+//                             BAValid(cameraIndex, i) = 1;
+//             }
+//         }
+//         catch (const std::exception& e)
+//         {
+//             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+//         }
+//     }
+
+    void removeOutliersReprojectionErrorIterative(
+        std::vector<std::vector<cv::Point2f>>& points2DVectorsExtrinsic,
+        Eigen::Matrix<double, 3, Eigen::Dynamic>& points3D,
+        Eigen::MatrixXd& BAValid, const std::vector<cv::Mat> cameraExtrinsics,
+        const std::vector<cv::Mat> cameraIntrinsics, const double errorThresholdRelative = 5.,
+        const double reprojectionErrorCurrent = -1.)
+    {
+        try
+        {
+            // Outlier removal
+            auto reprojectionError = reprojectionErrorCurrent;
+            if (reprojectionError < 0)
+                reprojectionError = computeReprojectionError(
+                    points2DVectorsExtrinsic, points3D, BAValid, cameraExtrinsics, cameraIntrinsics);
+            auto reprojectionErrorPrevious = reprojectionError+1;
+            while (reprojectionError != reprojectionErrorPrevious)
+            {
+                reprojectionErrorPrevious = reprojectionError;
+                // 10 pixels is a lot for full HD images...
+                const auto errorThreshold = fastMax(2*reprojectionError, errorThresholdRelative);
+                removeOutliersReprojectionError(
+                    points2DVectorsExtrinsic, points3D, BAValid, cameraExtrinsics, cameraIntrinsics,
+                    errorThreshold);
+                reprojectionError = computeReprojectionError(
+                    points2DVectorsExtrinsic, points3D, BAValid, cameraExtrinsics, cameraIntrinsics);
+                // Verbose
+                if (reprojectionError != reprojectionErrorPrevious)
+                    std::cout << "Reprojection Error (after outlier removal iteration): " << reprojectionError
+                              << ",\twith error threshold of " << errorThreshold << std::endl;
+            }
+            std::cout << "Reprojection Error (after outlier removal): " << computeReprojectionError(
+                points2DVectorsExtrinsic, points3D, BAValid, cameraExtrinsics, cameraIntrinsics) << std::endl;
         }
         catch (const std::exception& e)
         {
@@ -1853,23 +1925,10 @@ namespace op
             std::cout << "Reprojection Error (initial): " << reprojectionError << std::endl;
 
             // Outlier removal
-            auto reprojectionErrorPrevious = reprojectionError+1;
-            while (reprojectionError != reprojectionErrorPrevious)
-            {
-                reprojectionErrorPrevious = reprojectionError;
-                // 10 pixels is a lot for full HD images...
-                const auto errorThreshold = fastMax(2*reprojectionError, 1.);
-                removeOutliersReprojectionError(
-                    points2DVectorsExtrinsic, initialPoints3D, BAValid, cameraExtrinsics, cameraIntrinsics,
-                    errorThreshold);
-                reprojectionError = computeReprojectionError(
-                    points2DVectorsExtrinsic, initialPoints3D, BAValid, cameraExtrinsics, cameraIntrinsics);
-                std::cout << "Reprojection Error (after outlier removal iteration): " << reprojectionError
-                          << ",\twith error threshold of " << errorThreshold << std::endl;
-            }
-            std::cout << "Reprojection Error (after outlier removal): " << computeReprojectionError(
-                points2DVectorsExtrinsic, initialPoints3D, BAValid, cameraExtrinsics, cameraIntrinsics) << std::endl;
-            std::cout << "Number of total 3D points " << initialPoints3D.size() << std::endl;
+            const auto errorThresholdRelative = 1.;
+            removeOutliersReprojectionErrorIterative(
+                points2DVectorsExtrinsic, initialPoints3D, BAValid, cameraExtrinsics, cameraIntrinsics,
+                errorThresholdRelative, reprojectionError);
 
             // Start bundle adjustment.
             Eigen::Matrix<double, 3, Eigen::Dynamic> points3D = initialPoints3D;
@@ -1987,23 +2046,11 @@ namespace op
                     if (points2DVectorsExtrinsic[cameraIndex][i].x >= 0)  // this 2D term is used for optimization
                         BAValid(cameraIndex, i) = 1;
             }
-            reprojectionErrorPrevious = reprojectionError+1;
-            while (reprojectionError != reprojectionErrorPrevious)
-            {
-                reprojectionErrorPrevious = reprojectionError;
-                // 10 pixels is a lot for full HD images...
-                const auto errorThreshold = fastMax(2*reprojectionError, 0.5);
-                removeOutliersReprojectionError(
-                    points2DVectorsExtrinsic, points3D, BAValid, refinedExtrinsics, cameraIntrinsics,
-                    errorThreshold);
-                reprojectionError = computeReprojectionError(
-                    points2DVectorsExtrinsic, points3D, BAValid, refinedExtrinsics, cameraIntrinsics);
-                std::cout << "Reprojection Error (after outlier removal iteration): " << reprojectionError
-                          << ",\twith error threshold of " << errorThreshold << std::endl;
-            }
-            std::cout << "Reprojection Error (after outlier removal): " << computeReprojectionError(
-                points2DVectorsExtrinsic, points3D, BAValid, refinedExtrinsics, cameraIntrinsics) << std::endl;
-            std::cout << "Number of total 3D points " << points3D.size() << std::endl;
+
+            // Outlier removal
+            removeOutliersReprojectionErrorIterative(
+                points2DVectorsExtrinsic, points3D, BAValid, refinedExtrinsics, cameraIntrinsics,
+                0.5, reprojectionError);
 
             // final bundle adjustment
             const bool finalBundleAdjustment = true;
