@@ -716,7 +716,6 @@ if (UNIX OR APPLE)
           -DUSE_OPENCV=OFF)
           # -DOpenCV_DIR=${OpenCV_DIR})
       else (USE_MKL)
-        message("*******************${CMAKE_CXX_FLAGS}*************************")
         ExternalProject_Add(openpose_caffe
           SOURCE_DIR ${CAFFE_URL}
           PREFIX ${CAFFE_PREFIX}
