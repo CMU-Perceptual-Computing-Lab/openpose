@@ -716,11 +716,13 @@ if (UNIX OR APPLE)
           -DUSE_OPENCV=OFF)
           # -DOpenCV_DIR=${OpenCV_DIR})
       else (USE_MKL)
+        message("*******************${CMAKE_CXX_FLAGS}*************************")
         ExternalProject_Add(openpose_caffe
           SOURCE_DIR ${CAFFE_URL}
           PREFIX ${CAFFE_PREFIX}
           CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
           -DUSE_CUDNN=${USE_CUDNN}
+          -DCMAKE_CXX_FLAGS="-std=c++11"
           -DCUDA_ARCH_NAME=${CUDA_ARCH}
           -DCPU_ONLY=${CAFFE_CPU_ONLY}
           -DCMAKE_BUILD_TYPE=Release
