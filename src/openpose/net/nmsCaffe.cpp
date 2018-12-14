@@ -3,6 +3,10 @@
 #endif
 #include <openpose/net/nmsBase.hpp>
 #include <openpose/net/nmsCaffe.hpp>
+#ifdef USE_OPENCL
+    #include <openpose/gpu/opencl.hcl>
+    #include <openpose/gpu/cl2.hpp>
+#endif
 
 namespace op
 {
@@ -15,7 +19,8 @@ namespace op
             std::array<int, 4> mTopSize;
             // Special Kernel for OpenCL NMS
             #ifdef USE_OPENCL
-                std::shared_ptr<caffe::Blob<int>> mKernelBlobT;
+                //std::shared_ptr<caffe::Blob<uint8_t>> mKernelBlobT;
+                uint8_t* mKernelBlobT;
             #endif
         #endif
 
@@ -90,8 +95,7 @@ namespace op
 
                 // Special Kernel for OpenCL NMS
                 #ifdef USE_OPENCL
-                    upImpl->mKernelBlobT = {std::make_shared<caffe::Blob<int>>(1,1,1,1)};
-                    upImpl->mKernelBlobT->Reshape(bottomShape);
+                    upImpl->mKernelBlobT = (uint8_t*)clCreateBuffer(OpenCL::getInstance(gpuID)->getContext().operator()(), CL_MEM_READ_WRITE, sizeof(uint8_t) * bottomShape[0] * bottomShape[1] * bottomShape[2] * bottomShape[3], NULL, NULL);
                     // GPU ID
                     mGpuID = gpuID;
                 #else
@@ -208,7 +212,7 @@ namespace op
         try
         {
             #if defined USE_CAFFE && defined USE_OPENCL
-                nmsOcl(top.at(0)->mutable_gpu_data(), upImpl->mKernelBlobT->mutable_gpu_data(),
+                nmsOcl(top.at(0)->mutable_gpu_data(), upImpl->mKernelBlobT,
                        bottom.at(0)->gpu_data(), mThreshold, upImpl->mTopSize, upImpl->mBottomSize, mOffset,
                        mGpuID);
             #else

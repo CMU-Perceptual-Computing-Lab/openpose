@@ -88,7 +88,7 @@ namespace op
 
         typedef cl::KernelFunctor<cl::Buffer, cl::Buffer, int, int, float, int> NMSFullRegisterKernelFunctor;
         const std::string nmsFullRegisterKernel = MULTI_LINE_STRING(
-            __kernel void nmsFullRegisterKernel(__global int* kernelFullPtr, __global const Type* sourceFullPtr,
+            __kernel void nmsFullRegisterKernel(__global uchar* kernelFullPtr, __global const Type* sourceFullPtr,
                                                const int w, const int h, const Type threshold, const int debug)
             {
                 int c = get_global_id(0);
@@ -96,7 +96,7 @@ namespace op
                 int y = get_global_id(2);
 
                 __global const Type* sourcePtr = sourceFullPtr + (c*w*h);
-                __global int* kernelPtr = kernelFullPtr + (c*w*h);
+                __global uchar* kernelPtr = kernelFullPtr + (c*w*h);
                 int index = y*w + x;
 
                 if (0 < x && x < (w-1) && 0 < y && y < (h-1))
@@ -215,7 +215,7 @@ namespace op
 
         typedef cl::KernelFunctor<cl::Buffer, cl::Buffer, cl::Buffer, int, int, int, int, float, float> NMSFullWriteKernelFunctor;
         const std::string nmsFullWriteKernel = MULTI_LINE_STRING(
-            __kernel void nmsFullWriteKernel(__global Type* targetPtrFull, __global int* kernelPtrFull, __global const Type* sourcePtrFull,
+            __kernel void nmsFullWriteKernel(__global Type* targetPtrFull, __global uchar* kernelPtrFull, __global const Type* sourcePtrFull,
                                          const int w, const int h, const int maxPeaks, const int debug,
                                          const Type offsetX, const Type offsetY)
             {
@@ -224,14 +224,14 @@ namespace op
                 int y = get_global_id(2);
 
                 __global Type* targetPtr = targetPtrFull + c*(maxPeaks+1)*3;
-                __global int* kernelPtr = kernelPtrFull + c*w*h;
+                __global uchar* kernelPtr = kernelPtrFull + c*w*h;
                 __global const Type* sourcePtr = sourcePtrFull + c*w*h;
 
                 int index = y*w + x;
 
                 if (index != 0){
-                    int prev = kernelPtr[index-1];
-                    int curr = kernelPtr[index];
+                    uchar prev = kernelPtr[index-1];
+                    uchar curr = kernelPtr[index];
                     if (curr < maxPeaks)
                     {
                         if (prev - curr)
@@ -262,7 +262,7 @@ namespace op
     #endif
 
     template <typename T>
-    void nmsOcl(T* targetPtr, int* kernelPtr, const T* const sourcePtr, const T threshold,
+    void nmsOcl(T* targetPtr, uint8_t* kernelPtr, const T* const sourcePtr, const T threshold,
                 const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize, const Point<T>& offset,
                 const int gpuID)
     {
@@ -331,21 +331,23 @@ namespace op
                     nmsFullRegisterKernel(cl::EnqueueArgs(OpenCL::getInstance(gpuID)->getQueue(), cl::NDRange((int)channels, (int)width, (int)height)),
                                       kernelPtrBuffer, sourcePtrBuffer, width, height, (float)threshold, false);
 
-                    std::vector<int> kernelCPU(channels*imageOffset);
+
+                    static std::vector<uint8_t> kernelCPU(channels*imageOffset); // FIGURE THIS OUT
 
                     OpenCL::getInstance(gpuID)->getQueue().enqueueReadBuffer(kernelPtrBuffer, CL_TRUE, 0,
-                                                                                 sizeof(int) * channels * imageOffset, &kernelCPU[0]);
+                                                                                 sizeof(uint8_t) * channels * imageOffset, &kernelCPU[0]);
 
                     for(int c=0; c<channels; c++){
-                        int* currPtr = kernelCPU.data() + c*imageOffset;
+                        uint8_t* currPtr = kernelCPU.data() + c*imageOffset;
                         std::partial_sum(currPtr,currPtr + imageOffset,currPtr);
                     }
 
                     OpenCL::getInstance(gpuID)->getQueue().enqueueWriteBuffer(kernelPtrBuffer, CL_TRUE, 0,
-                                                                                  sizeof(int) * channels * imageOffset, &kernelCPU[0]);
+                                                                                  sizeof(uint8_t) * channels * imageOffset, &kernelCPU[0]);
 
-//                    partialSumKernel(cl::EnqueueArgs(OpenCL::getInstance(gpuID)->getQueue(), cl::NDRange(channels)),
-//                                      kernelPtrBuffer, width, height);
+                    //return;
+
+
 
                     nmsFullWriteKernel(cl::EnqueueArgs(OpenCL::getInstance(gpuID)->getQueue(), cl::NDRange(channels, width, height)),
                                       targetPtrBuffer, kernelPtrBuffer, sourcePtrBuffer, width, height, targetPeaks-1, false,
@@ -383,11 +385,11 @@ namespace op
     }
 
     template void nmsOcl(
-        float* targetPtr, int* kernelPtr, const float* const sourcePtr, const float threshold,
+        float* targetPtr, uint8_t* kernelPtr, const float* const sourcePtr, const float threshold,
         const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize, const Point<float>& offset,
         const int gpuID);
     template void nmsOcl(
-        double* targetPtr, int* kernelPtr, const double* const sourcePtr, const double threshold,
+        double* targetPtr, uint8_t* kernelPtr, const double* const sourcePtr, const double threshold,
         const std::array<int, 4>& targetSize, const std::array<int, 4>& sourceSize, const Point<double>& offset,
         const int gpuID);
 }
