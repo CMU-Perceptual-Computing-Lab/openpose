@@ -294,16 +294,11 @@ namespace op
                 // mScaleNetToOutput = 1.f;
                 // 3. Get peaks by Non-Maximum Suppression
                 // ~2ms (GPU) / ~7ms (CPU)
-                OpenCL::getInstance(0)->getQueue().finish();
-                std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
                 const auto nmsThreshold = (float)get(PoseProperty::NMSThreshold);
                 upImpl->spNmsCaffe->setThreshold(nmsThreshold);
                 const auto nmsOffset = float(0.5/double(mScaleNetToOutput));
                 upImpl->spNmsCaffe->setOffset(Point<float>{nmsOffset, nmsOffset});
                 upImpl->spNmsCaffe->Forward({upImpl->spHeatMapsBlob.get()}, {upImpl->spPeaksBlob.get()});
-                OpenCL::getInstance(0)->getQueue().finish();
-                std::chrono::steady_clock::time_point end= std::chrono::steady_clock::now();
-                std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count()/1000. <<std::endl;
 
                 // 4. Connecting body parts
                 upImpl->spBodyPartConnectorCaffe->setScaleNetToOutput(mScaleNetToOutput);
