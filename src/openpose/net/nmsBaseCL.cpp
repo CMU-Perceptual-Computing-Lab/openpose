@@ -62,6 +62,74 @@ namespace op
             };
         );
 
+        typedef cl::KernelFunctor<cl::Buffer, int, int> PartialSumKernelFunctor;
+        const std::string partialSumKernel = MULTI_LINE_STRING(
+            __kernel void partialSumKernel(__global int* kernelFullPtr,
+                                               const int w, const int h)
+            {
+                int c = get_global_id(0);
+                //int x = get_global_id(1);
+                //int y = get_global_id(2);
+
+                int* kernelPtr = kernelFullPtr + (c*w*h);
+
+
+                int incr = 0;
+                for(int y=0; y<h; y++){
+                    for(int x=0; x<w; x++){
+                        int index = y*w + x;
+                        if(kernelPtr[index]) incr += 1;
+                        kernelPtr[index] = incr;
+                    }
+                }
+
+            }
+        );
+
+        typedef cl::KernelFunctor<cl::Buffer, cl::Buffer, int, int, float, int> NMSFullRegisterKernelFunctor;
+        const std::string nmsFullRegisterKernel = MULTI_LINE_STRING(
+            __kernel void nmsFullRegisterKernel(__global int* kernelFullPtr, __global const Type* sourceFullPtr,
+                                               const int w, const int h, const Type threshold, const int debug)
+            {
+                int c = get_global_id(0);
+                int x = get_global_id(1);
+                int y = get_global_id(2);
+
+                Type* sourcePtr = sourceFullPtr + (c*w*h);
+                int* kernelPtr = kernelFullPtr + (c*w*h);
+                int index = y*w + x;
+
+                if (0 < x && x < (w-1) && 0 < y && y < (h-1))
+                {
+                    const Type value = sourcePtr[index];
+                    if (value > threshold)
+                    {
+                        const Type topLeft     = sourcePtr[(y-1)*w + x-1];
+                        const Type top         = sourcePtr[(y-1)*w + x];
+                        const Type topRight    = sourcePtr[(y-1)*w + x+1];
+                        const Type left        = sourcePtr[    y*w + x-1];
+                        const Type right       = sourcePtr[    y*w + x+1];
+                        const Type bottomLeft  = sourcePtr[(y+1)*w + x-1];
+                        const Type bottom      = sourcePtr[(y+1)*w + x];
+                        const Type bottomRight = sourcePtr[(y+1)*w + x+1];
+
+                        if (value > topLeft && value > top && value > topRight
+                            && value > left && value > right
+                            && value > bottomLeft && value > bottom && value > bottomRight)
+                        {
+                            kernelPtr[index] = 1;
+                        }
+                        else
+                            kernelPtr[index] = 0;
+                    }
+                    else
+                        kernelPtr[index] = 0;
+                }
+                else if (x == 0 || x == (w-1) || y == 0 || y == (h-1))
+                    kernelPtr[index] = 0;
+            }
+        );
+
         typedef cl::KernelFunctor<cl::Buffer, cl::Buffer, int, int, float, int> NMSRegisterKernelFunctor;
         const std::string nmsRegisterKernel = MULTI_LINE_STRING(
             __kernel void nmsRegisterKernel(__global int* kernelPtr, __global const Type* sourcePtr,
@@ -177,9 +245,17 @@ namespace op
                 auto nmsRegisterKernel = OpenCL::getInstance(gpuID)->getKernelFunctorFromManager
                         <NMSRegisterKernelFunctor, T>(
                          "nmsRegisterKernel", op::nmsOclCommonFunctions + op::nmsRegisterKernel);
+                auto nmsFullRegisterKernel = OpenCL::getInstance(gpuID)->getKernelFunctorFromManager
+                        <NMSFullRegisterKernelFunctor, T>(
+                         "nmsFullRegisterKernel", op::nmsOclCommonFunctions + op::nmsFullRegisterKernel);
                 auto nmsWriteKernel = OpenCL::getInstance(gpuID)->getKernelFunctorFromManager
                         <NMSWriteKernelFunctor, T>(
                          "nmsWriteKernel", op::nmsOclCommonFunctions + op::nmsWriteKernel);
+
+                auto partialSumKernel = OpenCL::getInstance(gpuID)->getKernelFunctorFromManager
+                        <PartialSumKernelFunctor, T>(
+                         "partialSumKernel", op::nmsOclCommonFunctions + op::partialSumKernel);
+
 
                 // log("num_b: " + std::to_string(bottom->shape(0)));       // = 1
                 // log("channel_b: " + std::to_string(bottom->shape(1)));   // = 57 = 18 body parts + bkg + 19x2 PAFs
@@ -196,6 +272,15 @@ namespace op
                 std::vector<int> kernelCPU(imageOffset);
                 for (auto n = 0; n < num; n++)
                 {
+
+//                    nmsFullRegisterKernel(cl::EnqueueArgs(OpenCL::getInstance(gpuID)->getQueue(), cl::NDRange(channels, width, height)),
+//                                      kernelPtrBuffer, sourcePtrBuffer, width, height, threshold, false);
+
+//                    partialSumKernel(cl::EnqueueArgs(OpenCL::getInstance(gpuID)->getQueue(), cl::NDRange(channels)),
+//                                      kernelPtrBuffer, width, height);
+
+//                    continue;
+
                     for (auto c = 0; c < channels; c++)
                     {
                         // log("channel: " + std::to_string(c));
@@ -230,9 +315,10 @@ namespace op
                         // Reupload to GPU
                         OpenCL::getInstance(gpuID)->getQueue().enqueueWriteBuffer(kernelBuffer, CL_TRUE, 0,
                                                                                       sizeof(int) *  width * height, &kernelCPU[0]);
+
                         // Write Kernel
                         nmsWriteKernel(cl::EnqueueArgs(OpenCL::getInstance(gpuID)->getQueue(), cl::NDRange(width, height)),
-                                          targetBuffer, kernelBuffer, sourceBuffer, width, height, targetPeaks-1, debug,
+                                          targetBuffer, kernelBuffer, sourceBuffer, width, height, targetPeaks-1, false,
                                           offset.x, offset.y);
                     }
                 }
