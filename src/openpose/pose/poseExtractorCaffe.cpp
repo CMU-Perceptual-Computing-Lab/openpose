@@ -105,7 +105,7 @@ namespace op
                 nmsCaffe->Reshape({heatMapsBlob.get()}, {peaksBlob.get()}, getPoseMaxPeaks(),
                                   getPoseNumberBodyParts(poseModel), gpuID);
                 // Pose extractor blob and layer
-                bodyPartConnectorCaffe->Reshape({heatMapsBlob.get(), peaksBlob.get()});
+                bodyPartConnectorCaffe->Reshape({heatMapsBlob.get(), peaksBlob.get()}, gpuID);
                 if (TOP_DOWN_REFINEMENT)
                     maximumCaffe->Reshape({heatMapsBlob.get()}, {maximumPeaksBlob.get()});
                 // Cuda check
