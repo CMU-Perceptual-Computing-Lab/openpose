@@ -439,8 +439,8 @@ namespace op
                             " detection from 4 cameras is about 2-3 pixels. It might be simply a wrong OpenPose"
                             " detection. If this message appears very frequently, your calibration parameters"
                             " might be wrong.", Priority::High);
+                    // log("Reprojection error: " + std::to_string(reprojectionErrorTotal)); // To debug reprojection error
                 }
-                // log("Reprojection error: " + std::to_string(reprojectionErrorTotal)); // To debug reprojection error
             }
         }
         catch (const std::exception& e)

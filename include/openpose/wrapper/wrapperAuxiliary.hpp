@@ -621,7 +621,7 @@ namespace op
                 // If humanFormat: bigger size (& maybe slower to process), but easier for user to read it
                 const auto humanFormat = true;
                 const auto cocoJsonSaver = std::make_shared<CocoJsonSaver>(
-                    wrapperStructOutput.writeCocoJson, humanFormat,
+                    wrapperStructOutput.writeCocoJson, wrapperStructPose.poseModel, humanFormat,
                     (wrapperStructPose.poseModel != PoseModel::CAR_22
                         && wrapperStructPose.poseModel != PoseModel::CAR_12
                         ? CocoJsonFormat::Body : CocoJsonFormat::Car),
@@ -633,8 +633,9 @@ namespace op
             {
                 // If humanFormat: bigger size (& maybe slower to process), but easier for user to read it
                 const auto humanFormat = true;
-                const auto cocoJsonSaver = std::make_shared<CocoJsonSaver>(wrapperStructOutput.writeCocoFootJson,
-                                                                           humanFormat, CocoJsonFormat::Foot);
+                const auto cocoJsonSaver = std::make_shared<CocoJsonSaver>(
+                    wrapperStructOutput.writeCocoFootJson, wrapperStructPose.poseModel, humanFormat,
+                    CocoJsonFormat::Foot);
                 outputWs.emplace_back(std::make_shared<WCocoJsonSaver<TDatumsSP>>(cocoJsonSaver));
             }
             // Write frames as desired image format on hard disk
