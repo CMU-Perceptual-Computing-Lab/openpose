@@ -9,6 +9,7 @@ typedef void(__stdcall * OutputCallback) (void * ptrs, int ptrSize, int * sizes,
 
 // Global output callback
 OutputCallback unityOutputCallback;
+bool multiThreadEnabled = true;
 bool unityOutputEnabled = true;
 bool imageOutput = false;
 
@@ -63,7 +64,7 @@ protected:
 				}
 			}
 		} catch (const std::exception& e) {
-			op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+			op::log(e.what(), op::Priority::Max, __LINE__, __FUNCTION__, __FILE__);
 		}
 	}
 
@@ -88,7 +89,6 @@ private:
 	void sendPoseKeypoints(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
 		auto& data = datumsPtr->at(0).poseKeypoints; // Array<float>
 		if (!data.empty()) {
-			op::log(std::to_string(data.getSize(0)));
 			auto sizeVector = data.getSize();
 			int sizeSize = sizeVector.size();
 			int * sizes = &sizeVector[0];
@@ -242,7 +242,6 @@ std::shared_ptr<op::WrapperStructGui> spWrapperStructGui;
 void openpose_main() {
 	try {
 		// Starting
-		if (ptrUserOutput) return;
 		op::log("Starting OpenPose...");
 
 		// OpenPose wrapper
@@ -264,14 +263,16 @@ void openpose_main() {
 		spWrapper->configure(*spWrapperStructInput);
 		spWrapper->configure(*spWrapperStructOutput);
 
+		// Multi-threading
+		if (!multiThreadEnabled) spWrapper->disableMultiThreading();
+
 		// Processing...
 		spWrapper->exec();
 
 		// Ending
 		op::log("OpenPose finished");
-		ptrUserOutput = nullptr;
 	} catch (const std::exception& e) {
-		op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+		op::log(e.what(), op::Priority::Max, __LINE__, __FUNCTION__, __FILE__);
 	}
 };
 
@@ -282,7 +283,7 @@ extern "C" {
 		try {
 			openpose_main();
 		} catch (const std::exception& e) {
-			op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+			op::log(e.what(), op::Priority::Max, __LINE__, __FUNCTION__, __FILE__);
 		}
 	}
 	// Stop openpose safely
@@ -293,7 +294,7 @@ extern "C" {
 				ptrUserOutput->stop();
 			}
 		} catch (const std::exception& e) {
-			op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+			op::log(e.what(), op::Priority::Max, __LINE__, __FUNCTION__, __FILE__);
 		}
 	}
 	// Register Unity output callback function
@@ -302,7 +303,16 @@ extern "C" {
 			unityOutputCallback = callback;
 		}
 		catch (const std::exception& e) {
-			op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+			op::log(e.what(), op::Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+		}
+	}
+	// Enable/disable multi-threading
+	OP_API void _OPSetMultiThreadEnable(bool enable) {
+		try {
+			multiThreadEnabled = enable;
+		}
+		catch (const std::exception& e) {
+			op::log(e.what(), op::Priority::Max, __LINE__, __FUNCTION__, __FILE__);
 		}
 	}
 	// Enable/disable output callback
@@ -310,7 +320,7 @@ extern "C" {
 		try {
 			unityOutputEnabled = enable;
 		} catch (const std::exception& e) {
-			op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+			op::log(e.what(), op::Priority::Max, __LINE__, __FUNCTION__, __FILE__);
 		}
 	}
 	// Enable/disable image output
@@ -319,7 +329,7 @@ extern "C" {
 			imageOutput = enable;
 		}
 		catch (const std::exception& e) {
-			op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+			op::log(e.what(), op::Priority::Max, __LINE__, __FUNCTION__, __FILE__);
 		}
 	}
 	// Configs
@@ -334,7 +344,8 @@ extern "C" {
 		bool disable_blending, float alpha_pose, float alpha_heatmap, int part_to_show, char* model_folder,
 		bool heatmaps_add_parts, bool heatmaps_add_bkg, bool heatmaps_add_PAFs, // HeatMapType // uchar heatmap_type,
 		uchar heatmap_scale_mode, // ScaleMode
-		bool part_candidates, float render_threshold, int number_people_max) {
+		bool part_candidates, float render_threshold, int number_people_max, 
+		bool maximize_positives, double fps_max) {
 
 		try {
 			spWrapperStructPose = std::make_shared<op::WrapperStructPose>(
@@ -347,11 +358,10 @@ extern "C" {
 				!disable_blending, alpha_pose, alpha_heatmap, part_to_show, model_folder,
 				op::flagsToHeatMaps(heatmaps_add_parts, heatmaps_add_bkg, heatmaps_add_PAFs), // HeatMapType // (op::HeatMapType) heatmap_type, 
 				(op::ScaleMode) heatmap_scale_mode,
-				part_candidates, render_threshold, number_people_max, true
+				part_candidates, render_threshold, number_people_max, maximize_positives, fps_max, true
 			);
 		} catch (const std::exception& e) {
 			op::log(e.what(), op::Priority::Max, __LINE__, __FUNCTION__, __FILE__);
-			op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
 		}
 	}
 	OP_API void _OPConfigureHand(
@@ -371,7 +381,7 @@ extern "C" {
 				);
 		}
 		catch (const std::exception& e) {
-			op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+			op::log(e.what(), op::Priority::Max, __LINE__, __FUNCTION__, __FILE__);
 		}
 	}
 	OP_API void _OPConfigureFace(
@@ -388,7 +398,7 @@ extern "C" {
 				face_alpha_pose, face_alpha_heatmap, face_render_threshold
 			);
 		} catch (const std::exception& e) {
-			op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+			op::log(e.what(), op::Priority::Max, __LINE__, __FUNCTION__, __FILE__);
 		}
 	}
 	OP_API void _OPConfigureExtra(
@@ -399,7 +409,7 @@ extern "C" {
 				_3d, _3d_min_views, _identification, _tracking, _ik_threads
 			);
 		} catch (const std::exception& e) {
-			op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+			op::log(e.what(), op::Priority::Max, __LINE__, __FUNCTION__, __FILE__);
 		}
 	}
 	OP_API void _OPConfigureInput(
@@ -417,7 +427,7 @@ extern "C" {
 				camera_parameter_path, undistort_image, image_directory_stereo
 			);
 		} catch (const std::exception& e) {
-			op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+			op::log(e.what(), op::Priority::Max, __LINE__, __FUNCTION__, __FILE__);
 		}
 	}
 	OP_API void _OPConfigureOutput(
@@ -435,7 +445,7 @@ extern "C" {
 				camera_fps, write_heatmaps, write_heatmaps_format, write_video_adam, write_bvh, 
 				udp_host, udp_port);
 		} catch (const std::exception& e) {
-			op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+			op::log(e.what(), op::Priority::Max, __LINE__, __FUNCTION__, __FILE__);
 		}
 	}
 	OP_API void _OPConfigureGui(
@@ -447,7 +457,7 @@ extern "C" {
 				(op::DisplayMode) display_mode, gui_verbose, full_screen);
 		}
 		catch (const std::exception& e) {
-			op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+			op::log(e.what(), op::Priority::Max, __LINE__, __FUNCTION__, __FILE__);
 		}
 	}
 }
