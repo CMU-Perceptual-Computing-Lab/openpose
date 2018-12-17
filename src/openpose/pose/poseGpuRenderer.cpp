@@ -80,7 +80,7 @@ namespace op
                     cpuToGpuMemoryIfNotCopiedYet(outputData.getPtr(), outputData.getVolume());
                     cudaCheck(__LINE__, __FUNCTION__, __FILE__);
                     const auto numberBodyParts = getPoseNumberBodyParts(mPoseModel);
-                    const auto hasBkg = (mPoseModel != PoseModel::BODY_25B);
+                    const auto hasBkg = addBkgChannel(mPoseModel);
                     const auto numberBodyPartsPlusBkg = numberBodyParts + (hasBkg ? 1 : 0);
                     const auto numberBodyPAFChannels = getPosePartPairs(mPoseModel).size();
                     const Point<int> frameSize{outputData.getSize(1), outputData.getSize(0)};

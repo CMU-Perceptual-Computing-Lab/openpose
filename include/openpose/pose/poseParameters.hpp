@@ -31,6 +31,7 @@ namespace op
     OP_API float getPoseDefaultConnectInterThreshold(const PoseModel poseModel, const bool maximizePositives = false);
     OP_API unsigned int getPoseDefaultMinSubsetCnt(const bool maximizePositives = false);
     OP_API float getPoseDefaultConnectMinSubsetScore(const bool maximizePositives = false);
+    OP_API bool addBkgChannel(const PoseModel poseModel);
 }
 
 #endif // OPENPOSE_POSE_POSE_PARAMETERS_HPP

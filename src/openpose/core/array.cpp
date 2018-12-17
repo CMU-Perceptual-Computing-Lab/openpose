@@ -633,7 +633,7 @@ namespace op
             {
                 // New size & volume
                 mSize = sizes;
-                mVolume = {std::accumulate(sizes.begin(), sizes.end(), 1ull, std::multiplies<size_t>())};
+                mVolume = {std::accumulate(sizes.begin(), sizes.end(), std::size_t(1), std::multiplies<size_t>())};
                 // Prepare shared_ptr
                 if (dataPtr == nullptr)
                 {

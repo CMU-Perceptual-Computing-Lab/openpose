@@ -16,6 +16,7 @@ OpenPose - Frequently Asked Question (FAQ)
     11. [Difference between BODY_25 vs. COCO vs. MPI](#difference-between-body_25-vs.-coco-vs.-mpi)
     12. [How to Measure the Latency Time?](#how-to-measure-the-latency-time)
     13. [Zero People Detected](#zero-people-detected)
+    14. [3D OpenPose Returning Wrong Results: 0, NaN, Infinity, etc.](#3d-openpose-returning-wrong-results-0-nan-infinity-etc)
 
 
 
@@ -112,3 +113,10 @@ COCO model will eventually be removed. BODY_25 model is faster, more accurate, a
 **Q: 0 people detected and displayed in default video and images.**
 
 **A**: This problem occurs when the caffemodel has not been properly downloaded. E.g., if the connection drops when downloading the models. Please, remove the current models in the model folder, and download them manually from the links in [doc/installation.md](./installation.md). Alternatively, remove them and re-run Cmake again.
+
+
+
+### 3D OpenPose Returning Wrong Results: 0, NaN, Infinity, etc.
+**Q: 3D OpenPose is returning wrong results.**
+
+**A**: 99.99% of the cases, this is due to wrong or poor calibration. Repeat the calibration making sure that the final reprojection error is about or less than 0.1 pixels.
