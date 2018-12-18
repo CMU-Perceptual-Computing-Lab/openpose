@@ -1,4 +1,6 @@
-﻿#include <opencv2/imgproc/imgproc.hpp> // cv::undistort, cv::initUndistortRectifyMap
+﻿
+#include <opencv2/calib3d.hpp> // cv::initUndistortRectifyMap in OpenCV 4
+#include <opencv2/imgproc/imgproc.hpp> // cv::undistort, cv::initUndistortRectifyMap (in OpenCV 3)
 #include <openpose/filestream/fileStream.hpp>
 #include <openpose/utilities/fileSystem.hpp>
 #include <openpose/3d/cameraParameterReader.hpp>
