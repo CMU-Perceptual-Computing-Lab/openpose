@@ -639,16 +639,14 @@ if (UNIX OR APPLE)
       file(GLOB CAFFE_DIR_VALID ${CMAKE_SOURCE_DIR}/3rdparty/caffe/*)
       list(LENGTH CAFFE_DIR_VALID CAFFE_DIR_VALID_LENGTH)
       if (CAFFE_DIR_VALID_LENGTH EQUAL 0)
-        execute_process(COMMAND git submodule update --init --recursive)
+        execute_process(COMMAND git submodule update --init --recursive) # This checks out the desired version of caffe
       else (CAFFE_DIR_VALID_LENGTH EQUAL 0)
         message(STATUS "Caffe has already been downloaded.")
       endif (CAFFE_DIR_VALID_LENGTH EQUAL 0)
 
       # Build Process
       set(CAFFE_CPU_ONLY OFF)
-      if (${GPU_MODE} MATCHES "CUDA")
-        execute_process(COMMAND git checkout master WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
-      elseif (${GPU_MODE} MATCHES "CPU_ONLY")
+      if (${GPU_MODE} MATCHES "CPU_ONLY")
         if (USE_MKL)
           #execute_process(COMMAND git checkout intel WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
           execute_process(COMMAND git checkout b6712ce WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
