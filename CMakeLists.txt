@@ -687,7 +687,7 @@ if (UNIX OR APPLE)
       elseif (${GPU_MODE} MATCHES "OPENCL")
         execute_process(COMMAND git checkout opencl WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
         set(USE_CUDNN OFF)
-      endif (${GPU_MODE} MATCHES "CUDA")
+      endif (${GPU_MODE} MATCHES "CPU_ONLY")
 
       # Build Caffe
       message(STATUS "Caffe will be built from source now.")
