@@ -1896,18 +1896,21 @@ namespace op
                     {
                         pointCameraMatrices.emplace_back(cameraMatrices[cameraIndex]);
                         const auto& point2D = points2DVectorsExtrinsic[cameraIndex][i];
-                        pointsOnEachCamera.emplace_back(cv::Point2d{point2D.x, point2D.y}); // cv::Point2f --> cv::Point2d
+                        // cv::Point2f --> cv::Point2d
+                        pointsOnEachCamera.emplace_back(cv::Point2d{point2D.x, point2D.y});
                     }
                 }
-                if (pointCameraMatrices.size() < 2u)  // if visible in one camera, no triangulation and not used in bundle adjustment.
-                    continue;
-                cv::Mat reconstructedPoint;
-                const float reprojectionError = triangulateWithOptimization(
-                    reconstructedPoint, pointCameraMatrices, pointsOnEachCamera, reprojectionMaxAcceptable);
-                UNUSED(reprojectionError);
-                initialPoints3D.data()[3 * i + 0] = reconstructedPoint.at<double>(0, 0) / reconstructedPoint.at<double>(3, 0);
-                initialPoints3D.data()[3 * i + 1] = reconstructedPoint.at<double>(1, 0) / reconstructedPoint.at<double>(3, 0);
-                initialPoints3D.data()[3 * i + 2] = reconstructedPoint.at<double>(2, 0) / reconstructedPoint.at<double>(3, 0);
+                // if visible in one camera, no triangulation and not used in bundle adjustment.
+                if (pointCameraMatrices.size() > 1u)
+                {
+                    cv::Mat reconstructedPoint;
+                    triangulateWithOptimization(
+                        reconstructedPoint, pointCameraMatrices, pointsOnEachCamera, reprojectionMaxAcceptable);
+                    auto* initialPoints3DPtr = initialPoints3D.data()[3*i];
+                    initialPoints3DPtr[0] = reconstructedPoint.at<double>(0, 0) / reconstructedPoint.at<double>(3, 0);
+                    initialPoints3DPtr[1] = reconstructedPoint.at<double>(1, 0) / reconstructedPoint.at<double>(3, 0);
+                    initialPoints3DPtr[2] = reconstructedPoint.at<double>(2, 0) / reconstructedPoint.at<double>(3, 0);
+                }
             }
 
             // Update inliers & outliers

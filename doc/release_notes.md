@@ -295,6 +295,9 @@ OpenPose Library - Release Notes
     25. Frame undistortion can be applied not only to FLIR cameras, but also to all other input sources (image, webcam, video, etc.).
     26. Calibration improvements:
         1. Improved chessboard orientation detection, more robust and less errors.
+        2. Triangulation functions (triangulate and triangulateWithOptimization) public, so calibration can use them for bundle adjustment.
+        3. Bundle adjustment refinement added for camera calibration.
+        4. Added `CameraMatrixInitial` field into the XML calibration files to keep the information of the original camera extrinsic parameters when bundle adjustment is run.
     27. Video with the 3D output can be saved with the new `--write_video_3d` flag.
 2. Functions or parameters renamed:
     1. By default, python example `tutorial_developer/python_2_pose_from_heatmaps.py` was using 2 scales starting at -1x736, changed to 1 scale at -1x368.

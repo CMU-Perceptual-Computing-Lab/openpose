@@ -26,7 +26,7 @@ DEFINE_int32(cam0,                      1,              "Baseline camera for ext
                                                         " world coordinate origin.");
 DEFINE_int32(cam1,                      0,              "Target camera to estimate its extrinsic parameters, it will be calibrated assuming cam0"
                                                         " as the world coordinate origin.");
-// // Modes 3-4
+// Modes 3-4
 DEFINE_int32(number_cameras,            4,              "Number of cameras (for mode 3-4).");
 // Producer
 DEFINE_string(camera_parameter_folder,  "models/cameraParameters/flir/", "String with the folder where the camera parameters are or will be"

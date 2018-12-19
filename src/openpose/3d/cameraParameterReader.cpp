@@ -83,6 +83,7 @@ namespace op
             mCameraMatrices.clear();
             mCameraDistortions.clear();
             mCameraIntrinsics.clear();
+            mCameraExtrinsics.clear();
             mCameraExtrinsicsInitial.clear();
             // log("Camera matrices:");
             for (auto i = 0ull ; i < mSerialNumbers.size() ; i++)
