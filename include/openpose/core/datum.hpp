@@ -70,6 +70,11 @@ namespace op
          */
         cv::Mat cvOutputData;
 
+        /**
+         * Rendered 3D image in cv::Mat uchar format.
+         */
+        cv::Mat cvOutputData3D;
+
         // ------------------------------ Resulting Array<float> data parameters ------------------------------ //
         /**
          * Body pose (x,y,score) locations for each person in the image.

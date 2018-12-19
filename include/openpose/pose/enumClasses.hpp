@@ -26,6 +26,7 @@ namespace op
         CAR_22,         /**< Experimental. Do not use. */
         BODY_19E,       /**< Experimental. Do not use. */
         BODY_25B,       /**< Experimental. Do not use. */
+        BODY_95,        /**< Experimental. Do not use. */
         Size,
     };
 

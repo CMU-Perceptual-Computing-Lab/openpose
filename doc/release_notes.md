@@ -295,6 +295,7 @@ OpenPose Library - Release Notes
     25. Frame undistortion can be applied not only to FLIR cameras, but also to all other input sources (image, webcam, video, etc.).
     26. Calibration improvements:
         1. Improved chessboard orientation detection, more robust and less errors.
+    27. Video with the 3D output can be saved with the new `--write_video_3d` flag.
 2. Functions or parameters renamed:
     1. By default, python example `tutorial_developer/python_2_pose_from_heatmaps.py` was using 2 scales starting at -1x736, changed to 1 scale at -1x368.
     2. WrapperStructPose default parameters changed to match those of the OpenPose demo binary.
@@ -313,6 +314,7 @@ OpenPose Library - Release Notes
     4. Function `scaleKeypoints2d` was not working if any of the scales was 1 (e.g., fail if scaleX = 1 but scaleY != 1, or if any offset was not 0).
     5. Fixed bug in `KeepTopNPeople` that could provoke segmentation fault for `number_people_max` > 1.
     6. Camera parameter reader can now take folder paths even if they are not finished in `/` (e.g., `~/Desktop/` worked but `~/Desktop` did not).
+    7. 3D module: If the image area was smaller than HD resolution image area, the 3D keypoints were not properly estimated.
 
 
 

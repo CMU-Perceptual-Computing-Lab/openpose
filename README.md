@@ -37,6 +37,7 @@
 
 
 ## Latest Features
+- Dec 2018: [**Foot dataset and new paper released**](https://cmu-perceptual-computing-lab.github.io/foot_keypoint_dataset/)!
 - Sep 2018: [**Experimental single-person tracker**](doc/quick_start.md#tracking) for further speed up or visual smoothing!
 - Jun 2018: [**Combined body-foot model released! 40% faster and 5% more accurate**](doc/installation.md)!
 - Jun 2018: [**Python API**](doc/modules/python_module.md) released!
@@ -93,10 +94,11 @@ This analysis was performed using the same images for each algorithm and a batch
 5. [Quick Start](#quick-start)
 6. [Output](#output)
 7. [Speeding Up OpenPose and Benchmark](#speeding-up-openpose-and-benchmark)
-8. [Send Us Failure Cases and Feedback!](#send-us-failure-cases-and-feedback)
-9. [Authors and Contributors](#authors-and-contributors)
-10. [Citation](#citation)
-11. [License](#license)
+8. [Foot Dataset](#foot-dataset)
+9. [Send Us Failure Cases and Feedback!](#send-us-failure-cases-and-feedback)
+10. [Authors and Contributors](#authors-and-contributors)
+11. [Citation](#citation)
+12. [License](#license)
 
 
 
@@ -142,6 +144,11 @@ Check the OpenPose Benchmark as well as some hints to speed up and/or reduce the
 
 
 
+## Foot Dataset
+Check the [foot dataset website](https://cmu-perceptual-computing-lab.github.io/foot_keypoint_dataset/) and new OpenPose paper for more information.
+
+
+
 ## Send Us Failure Cases and Feedback!
 Our library is open source for research purposes, and we want to continuously improve it! So please, let us know if...
 
@@ -167,6 +174,13 @@ We would also like to thank all the people who helped OpenPose in any way. The m
 
 ## Citation
 Please cite these papers in your publications if it helps your research (the face keypoint detector was trained using the procedure described in [Simon et al. 2017] for hands):
+
+    @inproceedings{cao2018openpose,
+      author = {Zhe Cao and Gines Hidalgo and Tomas Simon and Shih-En Wei and Yaser Sheikh},
+      booktitle = {Arxiv},
+      title = {Open{P}ose: realtime multi-person 2{D} pose estimation using {P}art {A}ffinity {F}ields},
+      year = {2018}
+    }
 
     @inproceedings{cao2017realtime,
       author = {Zhe Cao and Tomas Simon and Shih-En Wei and Yaser Sheikh},

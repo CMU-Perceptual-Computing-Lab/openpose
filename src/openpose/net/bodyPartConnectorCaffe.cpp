@@ -239,7 +239,7 @@ namespace op
                     const auto numberBodyParts = getPoseNumberBodyParts(mPoseModel);
                     const auto& mapIdxOffset = getPoseMapIndex(mPoseModel);
                     // Update mapIdx
-                    const auto offset = (mPoseModel != PoseModel::BODY_25B ? 1 : 0);
+                    const auto offset = (addBkgChannel(mPoseModel) ? 1 : 0);
                     auto mapIdx = mapIdxOffset;
                     for (auto& i : mapIdx)
                         i += (numberBodyParts+offset);

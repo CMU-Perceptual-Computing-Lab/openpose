@@ -1,6 +1,7 @@
 OpenPose Library - All Released Features
 ====================================
 
+- Dec 2018: [**Foot dataset and new paper released**](https://cmu-perceptual-computing-lab.github.io/foot_keypoint_dataset/)!
 - Sep 2018: [**Experimental tracker**](./quick_start.md#tracking)!
 - Jun 2018: [**Combined body-foot model released! 40% faster and 5% more accurate**](./installation.md)!
 - Jun 2018: [**Python API**](./modules/python_module.md) released!

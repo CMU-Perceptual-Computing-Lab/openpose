@@ -85,6 +85,9 @@ namespace op
             // Sanity check
             if (cvMats.empty())
                 error("The image(s) to be saved cannot be empty.", __LINE__, __FUNCTION__, __FILE__);
+            for (const auto& cvMat : cvMats)
+                if (cvMat.empty())
+                    error("The image(s) to be saved cannot be empty.", __LINE__, __FUNCTION__, __FILE__);
             // Open video (1st frame)
             // Done here and not in the constructor to handle cases where the resolution is not known (e.g.,
             // reading images or multiple cameras)
