@@ -17,6 +17,7 @@ OpenPose - Frequently Asked Question (FAQ)
     12. [How to Measure the Latency Time?](#how-to-measure-the-latency-time)
     13. [Zero People Detected](#zero-people-detected)
     14. [3D OpenPose Returning Wrong Results: 0, NaN, Infinity, etc.](#3d-openpose-returning-wrong-results-0-nan-infinity-etc)
+    15. [Protobuf Clip Param Caffe Error](#protobuf-clip-param-caffe-error)
 
 
 
@@ -120,3 +121,16 @@ COCO model will eventually be removed. BODY_25 model is faster, more accurate, a
 **Q: 3D OpenPose is returning wrong results.**
 
 **A**: 99.99% of the cases, this is due to wrong or poor calibration. Repeat the calibration making sure that the final reprojection error is about or less than 0.1 pixels.
+
+
+
+### Protobuf Clip Param Caffe Error
+**Q: Runtime error similar to:**
+```
+[libprotobuf ERROR google/protobuf/message_lite.cc:123] Can't parse message of type "caffe.NetParameter" because it is missing required fields: layer[0].clip_param.min, layer[0].clip_param.max
+F0821 14:26:29.665053 22812 upgrade_proto.cpp:97] Check failed: ReadProtoFromBinaryFile(param_file, param) Failed to parse NetParameter file: models/pose/body_25/pose_iter_584000.caffemodel
+```
+
+**A**: This error only happens in some Ubuntu machines. Following #787, compile your own Caffe with an older version of it. The hacky (quick but not recommended way) is to follow [#787#issuecomment-415476837](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/787#issuecomment-415476837), the elegant way (compatible with future OpenPose versions) is to build your own Caffe independently, following [doc/installation.md#custom-caffe-ubuntu-only](./installation.md#custom-caffe-ubuntu-only).
+
+Note that OpenPose uses a [custom fork of Caffe](https://github.com/CMU-Perceptual-Computing-Lab/caffe) (rather than the official Caffe master), which it is only updated if it works on our machines. Currently, this version works on a newly formatted machine (Ubuntu 16.04 LTS) and in all our machines (CUDA 8 and 10 tested). The default GPU version is the master branch, which it is also compatible with CUDA 10 without changes (official Caffe version requires some changes for it). We also use the OpenCL and CPU tags if their CMake flags are selected.

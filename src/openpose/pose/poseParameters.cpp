@@ -786,7 +786,7 @@ namespace op
     {
         try
         {
-            return (poseModel != PoseModel::BODY_25B && poseModel != PoseModel::BODY_95);
+            return (POSE_BODY_PART_MAPPING[(int)poseModel].size() != POSE_NUMBER_BODY_PARTS[(int)poseModel]);
         }
         catch (const std::exception& e)
         {

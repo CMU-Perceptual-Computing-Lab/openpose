@@ -385,7 +385,7 @@ namespace op
                     }
                 }
                 // 3D reconstruction
-                const auto imageRatio = std::sqrt(imageSizes[0].x * imageSizes[0].y / 1310720);
+                const auto imageRatio = std::sqrt(imageSizes[0].x * imageSizes[0].y / 1310720.);
                 const auto reprojectionMaxAcceptable = 25 * imageRatio;
                 std::vector<double> reprojectionErrors(xyPoints.size());
                 keypoints3D.reset({ 1, numberBodyParts, 4 }, 0);
