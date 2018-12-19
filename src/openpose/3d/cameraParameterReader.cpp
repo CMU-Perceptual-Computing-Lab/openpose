@@ -21,15 +21,19 @@ namespace op
     CameraParameterReader::CameraParameterReader(const std::string& serialNumber,
                                                  const cv::Mat& cameraIntrinsics,
                                                  const cv::Mat& cameraDistortion,
-                                                 const cv::Mat& cameraExtrinsics) :
+                                                 const cv::Mat& cameraExtrinsics,
+                                                 const cv::Mat& cameraExtrinsicsInitial) :
         mUndistortImage{false}
     {
         try
         {
-            // Sanity check
-            if (serialNumber.empty() || cameraIntrinsics.empty() || cameraDistortion.empty())
-                error("Camera intrinsics, distortion, and/or serialNumber cannot be empty.",
-                      __LINE__, __FUNCTION__, __FILE__);
+            // Sanity checks
+            if (serialNumber.empty())
+                error("Camera serialNumber cannot be empty.", __LINE__, __FUNCTION__, __FILE__);
+            if (cameraIntrinsics.empty())
+                error("Camera intrinsics cannot be empty.", __LINE__, __FUNCTION__, __FILE__);
+            if (cameraDistortion.empty())
+                error("Camera distortion cannot be empty.", __LINE__, __FUNCTION__, __FILE__);
             // Add new matrices
             mSerialNumbers.emplace_back(serialNumber);
             mCameraIntrinsics.emplace_back(cameraIntrinsics.clone());
@@ -37,6 +41,9 @@ namespace op
             // Add extrinsics if not empty
             if (!cameraExtrinsics.empty())
                 mCameraExtrinsics.emplace_back(cameraExtrinsics.clone());
+            // Add extrinsics (initial) if not empty
+            if (!cameraExtrinsicsInitial.empty())
+                mCameraExtrinsicsInitial.emplace_back(cameraExtrinsicsInitial.clone());
             // Otherwise, add cv::eye
             else
                 mCameraExtrinsics.emplace_back(cv::Mat::eye(3, 4, cameraIntrinsics.type()));
@@ -69,14 +76,15 @@ namespace op
             // Commong saving/loading
             const auto dataFormat = DataFormat::Xml;
             const std::vector<std::string> cvMatNames {
-                "CameraMatrix", "Intrinsics", "Distortion"
+                "CameraMatrix", "Intrinsics", "Distortion", "CameraMatrixInitial"
             };
 
             // Load parameters
             mCameraMatrices.clear();
-            mCameraExtrinsics.clear();
-            mCameraIntrinsics.clear();
             mCameraDistortions.clear();
+            mCameraIntrinsics.clear();
+            mCameraExtrinsics.clear();
+            mCameraExtrinsicsInitial.clear();
             // log("Camera matrices:");
             for (auto i = 0ull ; i < mSerialNumbers.size() ; i++)
             {
@@ -84,7 +92,8 @@ namespace op
                 const auto cameraParameters = loadData(cvMatNames, parameterPath, dataFormat);
                 // Error if empty element
                 if (cameraParameters.empty() || cameraParameters.at(0).empty()
-                    || cameraParameters.at(1).empty() || cameraParameters.at(2).empty())
+                    || cameraParameters.at(1).empty() || cameraParameters.at(2).empty()
+                    || cameraParameters.at(3).empty())
                 {
                     const std::string errorMessage = " of the camera with serial number `" + mSerialNumbers[i]
                                                    + "` (file: " + parameterPath + "." + dataFormatToString(dataFormat)
@@ -102,10 +111,15 @@ namespace op
                     if (cameraParameters.at(2).empty())
                         error("Error at reading the camera distortion parameters" + errorMessage,
                               __LINE__, __FUNCTION__, __FILE__);
+                    // Commented for back-compatibility
+                    // if (cameraParameters.at(3).empty())
+                    //     error("Error at reading the camera distortion parameters" + errorMessage,
+                    //           __LINE__, __FUNCTION__, __FILE__);
                 }
                 mCameraExtrinsics.emplace_back(cameraParameters.at(0));
                 mCameraIntrinsics.emplace_back(cameraParameters.at(1));
                 mCameraDistortions.emplace_back(cameraParameters.at(2));
+                mCameraExtrinsicsInitial.emplace_back(cameraParameters.at(3));
                 mCameraMatrices.emplace_back(mCameraIntrinsics.back() * mCameraExtrinsics.back());
                 // log(cameraParameters.at(0));
             }
@@ -156,7 +170,7 @@ namespace op
             // Commong saving/loading
             const auto dataFormat = DataFormat::Xml;
             const std::vector<std::string> cvMatNames {
-                "CameraMatrix", "Intrinsics", "Distortion"
+                "CameraMatrix", "Intrinsics", "Distortion", "CameraMatrixInitial"
             };
             // Saving
             for (auto i = 0ull ; i < mSerialNumbers.size() ; i++)
@@ -165,6 +179,7 @@ namespace op
                 cameraParameters.emplace_back(mCameraExtrinsics[i]);
                 cameraParameters.emplace_back(mCameraIntrinsics[i]);
                 cameraParameters.emplace_back(mCameraDistortions[i]);
+                cameraParameters.emplace_back(mCameraExtrinsicsInitial[i]);
                 saveData(cameraParameters, cvMatNames, cameraParameterPath + mSerialNumbers[i], dataFormat);
             }
         }
@@ -213,16 +228,16 @@ namespace op
         }
     }
 
-    const std::vector<cv::Mat>& CameraParameterReader::getCameraExtrinsics() const
+    const std::vector<cv::Mat>& CameraParameterReader::getCameraDistortions() const
     {
         try
         {
-            return mCameraExtrinsics;
+            return mCameraDistortions;
         }
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return mCameraExtrinsics;
+            return mCameraDistortions;
         }
     }
 
@@ -239,16 +254,29 @@ namespace op
         }
     }
 
-    const std::vector<cv::Mat>& CameraParameterReader::getCameraDistortions() const
+    const std::vector<cv::Mat>& CameraParameterReader::getCameraExtrinsics() const
     {
         try
         {
-            return mCameraDistortions;
+            return mCameraExtrinsics;
         }
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return mCameraDistortions;
+            return mCameraExtrinsics;
+        }
+    }
+
+    const std::vector<cv::Mat>& CameraParameterReader::getCameraExtrinsicsInitial() const
+    {
+        try
+        {
+            return mCameraExtrinsicsInitial;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return mCameraExtrinsicsInitial;
         }
     }
 
