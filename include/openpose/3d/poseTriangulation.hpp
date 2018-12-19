@@ -44,10 +44,6 @@ namespace op
     private:
         const int mMinViews3d;
     };
-
-    double triangulateWithOptimization(cv::Mat& reconstructedPoint, const std::vector<cv::Mat>& cameraMatrices,
-                                   const std::vector<cv::Point2d>& pointsOnEachCamera,
-                                   const double reprojectionMaxAcceptable);
 }
 
 #endif // OPENPOSE_3D_POSE_TRIANGULATION_HPP

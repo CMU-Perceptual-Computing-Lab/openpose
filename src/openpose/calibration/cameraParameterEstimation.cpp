@@ -1906,7 +1906,7 @@ namespace op
                     cv::Mat reconstructedPoint;
                     triangulateWithOptimization(
                         reconstructedPoint, pointCameraMatrices, pointsOnEachCamera, reprojectionMaxAcceptable);
-                    auto* initialPoints3DPtr = initialPoints3D.data()[3*i];
+                    auto* initialPoints3DPtr = &initialPoints3D.data()[3*i];
                     initialPoints3DPtr[0] = reconstructedPoint.at<double>(0, 0) / reconstructedPoint.at<double>(3, 0);
                     initialPoints3DPtr[1] = reconstructedPoint.at<double>(1, 0) / reconstructedPoint.at<double>(3, 0);
                     initialPoints3DPtr[2] = reconstructedPoint.at<double>(2, 0) / reconstructedPoint.at<double>(3, 0);
