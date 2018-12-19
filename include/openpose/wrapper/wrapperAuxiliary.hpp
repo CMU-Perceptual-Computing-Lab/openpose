@@ -645,8 +645,9 @@ namespace op
                                                                      wrapperStructOutput.writeImagesFormat);
                 outputWs.emplace_back(std::make_shared<WImageSaver<TDatumsSP>>(imageSaver));
             }
-            // Write frames as *.avi video on hard disk
-            if (!wrapperStructOutput.writeVideo.empty() || !wrapperStructOutput.writeBvh.empty())
+            auto originalVideoFps = 0.;
+            if (!wrapperStructOutput.writeVideo.empty() || !wrapperStructOutput.writeVideo3D.empty()
+                || !wrapperStructOutput.writeBvh.empty())
             {
                 if (wrapperStructOutput.writeVideoFps <= 0
                     && (!oPProducer || producerSharedPtr->get(CV_CAP_PROP_FPS) <= 0))
@@ -655,35 +656,36 @@ namespace op
                           " will have to know or guess the frame rate; if it is a webcam, you should use the OpenPose"
                           " displayed FPS as desired value. If you do not care, simply add `--write_video_fps 30`.",
                           __LINE__, __FUNCTION__, __FILE__);
-                const auto originalVideoFps = (
+                originalVideoFps = (
                     wrapperStructOutput.writeVideoFps > 0 ?
                     wrapperStructOutput.writeVideoFps : producerSharedPtr->get(CV_CAP_PROP_FPS));
-                if (!wrapperStructOutput.writeVideo.empty())
-                {
-                    if (!oPProducer)
-                        error("Video file can only be recorded inside `wrapper/wrapper.hpp` if the producer"
-                              " is one of the default ones (e.g., video, webcam, ...).",
-                              __LINE__, __FUNCTION__, __FILE__);
-                    const auto videoSaver = std::make_shared<VideoSaver>(
-                        wrapperStructOutput.writeVideo, CV_FOURCC('M','J','P','G'), originalVideoFps);
-                    outputWs.emplace_back(std::make_shared<WVideoSaver<TDatumsSP>>(videoSaver));
-                }
-                // Write joint angles as *.bvh file on hard disk
-#ifdef USE_3D_ADAM_MODEL
-                if (!wrapperStructOutput.writeBvh.empty())
-                {
-                    const auto bvhSaver = std::make_shared<BvhSaver>(
-                        wrapperStructOutput.writeBvh, JointAngleEstimation::getTotalModel(), originalVideoFps
-                    );
-                    outputWs.emplace_back(std::make_shared<WBvhSaver<TDatumsSP>>(bvhSaver));
-                }
-#endif
             }
+            // Write frames as *.avi video on hard disk
+            if (!wrapperStructOutput.writeVideo.empty())
+            {
+                if (!oPProducer)
+                    error("Video file can only be recorded inside `wrapper/wrapper.hpp` if the producer"
+                          " is one of the default ones (e.g., video, webcam, ...).",
+                          __LINE__, __FUNCTION__, __FILE__);
+                const auto videoSaver = std::make_shared<VideoSaver>(
+                    wrapperStructOutput.writeVideo, CV_FOURCC('M','J','P','G'), originalVideoFps);
+                outputWs.emplace_back(std::make_shared<WVideoSaver<TDatumsSP>>(videoSaver));
+            }
+            // Write joint angles as *.bvh file on hard disk
+#ifdef USE_3D_ADAM_MODEL
+            if (!wrapperStructOutput.writeBvh.empty())
+            {
+                const auto bvhSaver = std::make_shared<BvhSaver>(
+                    wrapperStructOutput.writeBvh, JointAngleEstimation::getTotalModel(), originalVideoFps
+                );
+                outputWs.emplace_back(std::make_shared<WBvhSaver<TDatumsSP>>(bvhSaver));
+            }
+#endif
             // Write heat maps as desired image format on hard disk
             if (!writeHeatMapsCleaned.empty())
             {
-                const auto heatMapSaver = std::make_shared<HeatMapSaver>(writeHeatMapsCleaned,
-                                                                         wrapperStructOutput.writeHeatMapsFormat);
+                const auto heatMapSaver = std::make_shared<HeatMapSaver>(
+                    writeHeatMapsCleaned, wrapperStructOutput.writeHeatMapsFormat);
                 outputWs.emplace_back(std::make_shared<WHeatMapSaver<TDatumsSP>>(heatMapSaver));
             }
             // Add frame information for GUI
@@ -699,6 +701,7 @@ namespace op
             }
             // Minimal graphical user interface (GUI)
             TWorker guiW;
+            TWorker videoSaver3DW;
             if (guiEnabled)
             {
                 // PoseRenderers to Renderers
@@ -726,6 +729,10 @@ namespace op
                     );
                     // WGui
                     guiW = {std::make_shared<WGuiAdam<TDatumsSP>>(gui)};
+                    // Write 3D frames as *.avi video on hard disk
+                    if (!wrapperStructOutput.writeVideo3D.empty())
+                        error("3D video can only be recorded if 3D render is enabled.",
+                              __LINE__, __FUNCTION__, __FILE__);
 #endif
                 }
                 // 3-D (+2-D) display
@@ -736,10 +743,18 @@ namespace op
                     const auto gui = std::make_shared<Gui3D>(
                         finalOutputSizeGui, wrapperStructGui.fullScreen, threadManager.getIsRunningSharedPtr(),
                         spVideoSeek, poseExtractorNets, faceExtractorNets, handExtractorNets, renderers,
-                        wrapperStructPose.poseModel, wrapperStructGui.displayMode
+                        wrapperStructPose.poseModel, wrapperStructGui.displayMode,
+                        !wrapperStructOutput.writeVideo3D.empty()
                     );
                     // WGui
                     guiW = {std::make_shared<WGui3D<TDatumsSP>>(gui)};
+                    // Write 3D frames as *.avi video on hard disk
+                    if (!wrapperStructOutput.writeVideo3D.empty())
+                    {
+                        const auto videoSaver = std::make_shared<VideoSaver>(
+                            wrapperStructOutput.writeVideo3D, CV_FOURCC('M','J','P','G'), originalVideoFps);
+                        videoSaver3DW = std::make_shared<WVideoSaver3D<TDatumsSP>>(videoSaver);
+                    }
                 }
                 // 2-D display
                 else if (wrapperStructGui.displayMode == DisplayMode::Display2D)
@@ -751,6 +766,10 @@ namespace op
                     );
                     // WGui
                     guiW = {std::make_shared<WGui<TDatumsSP>>(gui)};
+                    // Write 3D frames as *.avi video on hard disk
+                    if (!wrapperStructOutput.writeVideo3D.empty())
+                        error("3D video can only be recorded if 3D render is enabled.",
+                              __LINE__, __FUNCTION__, __FILE__);
                 }
                 else
                     error("Unknown DisplayMode.", __LINE__, __FUNCTION__, __FILE__);
@@ -989,6 +1008,9 @@ namespace op
                 // Thread Y+1, queues Q+1 -> Q+2
                 log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 threadManager.add(threadId, guiW, queueIn++, queueOut++);
+                // Saving 3D output
+                if (videoSaver3DW != nullptr)
+                    threadManager.add(threadId, videoSaver3DW, queueIn++, queueOut++);
                 threadIdPP(threadId, multiThreadEnabled);
             }
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);

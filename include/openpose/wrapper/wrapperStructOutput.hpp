@@ -105,6 +105,13 @@ namespace op
         double writeVideoFps;
 
         /**
+         * Rendered 3D images saving video path.
+         * Please, use *.avi format.
+         * If it is empty (default), it is disabled.
+         */
+        std::string writeVideo3D;
+
+        /**
          * Rendered Adam images saving video path.
          * Please, use *.avi format.
          * If it is empty (default), it is disabled.
@@ -140,8 +147,9 @@ namespace op
             const int writeCocoJsonVariant = 1, const std::string& writeImages = "",
             const std::string& writeImagesFormat = "", const std::string& writeVideo = "",
             const double writeVideoFps = -1., const std::string& writeHeatMaps = "",
-            const std::string& writeHeatMapsFormat = "", const std::string& writeVideoAdam = "",
-            const std::string& writeBvh = "", const std::string& udpHost = "", const std::string& udpPort = "");
+            const std::string& writeHeatMapsFormat = "", const std::string& writeVideo3D = "",
+            const std::string& writeVideoAdam = "", const std::string& writeBvh = "",
+            const std::string& udpHost = "", const std::string& udpPort = "");
     };
 }
 
