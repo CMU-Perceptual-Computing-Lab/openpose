@@ -32,7 +32,7 @@
 #define default_net_resolution "-1x368"
 #define default_model_pose "COCO"
 #define default_alpha_pose 0.6
-#define default_scale_gap 0.3
+#define default_scale_gap 0.25
 #define default_scale_number 1
 #define default_render_threshold 0.05
 #define default_num_gpu_start 0

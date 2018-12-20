@@ -96,7 +96,7 @@ DEFINE_string(net_resolution,           "-1x368",       "Multiples of 16. If it 
                                                         " input value. E.g., the default `-1x368` is equivalent to `656x368` in 16:9 resolutions,"
                                                         " e.g., full HD (1980x1080) and HD (1280x720) resolutions.");
 DEFINE_int32(scale_number,              1,              "Number of scales to average.");
-DEFINE_double(scale_gap,                0.3,            "Scale gap between scales. No effect unless scale_number > 1. Initial scale is always 1."
+DEFINE_double(scale_gap,                0.25,           "Scale gap between scales. No effect unless scale_number > 1. Initial scale is always 1."
                                                         " If you want to change the initial scale, you actually want to multiply the"
                                                         " `net_resolution` by your desired initial scale.");
 // OpenPose Body Pose Heatmaps and Part Candidates

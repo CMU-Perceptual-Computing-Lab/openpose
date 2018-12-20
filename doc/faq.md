@@ -16,8 +16,9 @@ OpenPose - Frequently Asked Question (FAQ)
     11. [Difference between BODY_25 vs. COCO vs. MPI](#difference-between-body_25-vs.-coco-vs.-mpi)
     12. [How to Measure the Latency Time?](#how-to-measure-the-latency-time)
     13. [Zero People Detected](#zero-people-detected)
-    14. [3D OpenPose Returning Wrong Results: 0, NaN, Infinity, etc.](#3d-openpose-returning-wrong-results-0-nan-infinity-etc)
-    15. [Protobuf Clip Param Caffe Error](#protobuf-clip-param-caffe-error)
+    14. [Check Failed for ReadProtoFromBinaryFile (Failed to Parse NetParameter File)](#check-failed-for-readprotofrombinaryfile-failed-to-parse-netparameter-file)
+    15. [3D OpenPose Returning Wrong Results: 0, NaN, Infinity, etc.](#3d-openpose-returning-wrong-results-0-nan-infinity-etc)
+    16. [Protobuf Clip Param Caffe Error](#protobuf-clip-param-caffe-error)
 
 
 
@@ -113,7 +114,18 @@ COCO model will eventually be removed. BODY_25 model is faster, more accurate, a
 ### Zero People Detected
 **Q: 0 people detected and displayed in default video and images.**
 
-**A**: This problem occurs when the caffemodel has not been properly downloaded. E.g., if the connection drops when downloading the models. Please, remove the current models in the model folder, and download them manually from the links in [doc/installation.md](./installation.md). Alternatively, remove them and re-run Cmake again.
+**A**: This problem usually occurs when the caffemodel has not been properly downloaded. E.g., if the connection drops when downloading the models. Try the following solutions (in this order):
+
+1. Assuming that default OpenPose (i.e., BODY_25 model) failed, try with `--model_pose COCO` and `--model_pose MPII` models. If any of them work, the `caffemodel` files of the other models were corrupted while being downloaded. Otherwise, it will most probably be a Caffe/protobuf issue.
+2. Assuming that the model is corrupted, remove the current models in the model folder, and download them manually from the links in [doc/installation.md](./installation.md). Alternatively, remove them and re-run Cmake again. If this does not work, try downloading the COCO_25 model from the browser following the download link on this [Dropbox link](https://www.dropbox.com/s/03r8pa8sikrqv62/pose_iter_584000.caffemodel).
+3. If none of the OpenPose models are working, make sure Caffe is working properly and that you can run the Caffe examples with other caffemodel / prototxt files.
+
+
+
+### Check Failed for ReadProtoFromBinaryFile (Failed to Parse NetParameter File)
+**Q: I am facing an error similar to:** `Check failed: ReadProtoFromBinaryFile(param_file, param) Failed to parse NetParameter file: models/pose/body_25/pose_iter_584000.caffemodel`
+
+**A**: Same answer than for [Zero People Detected](#zero-people-detected).
 
 
 

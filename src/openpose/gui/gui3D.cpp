@@ -561,8 +561,8 @@ namespace op
         try
         {
             // 3-D rendering
+            cv::Mat image;
             #ifdef USE_3D_RENDERER
-                cv::Mat image;
                 if (mDisplayMode == DisplayMode::DisplayAll || mDisplayMode == DisplayMode::Display3D)
                 {
                     // Save/display 3D display in OpenCV window
@@ -573,8 +573,8 @@ namespace op
                         cv::flip(image, image, 0);
                     }
                 }
-                return image;
             #endif
+            return image;
         }
         catch (const std::exception& e)
         {

@@ -296,7 +296,7 @@ OpenPose Library - Release Notes
     26. Calibration improvements:
         1. Improved chessboard orientation detection, more robust and less errors.
         2. Triangulation functions (triangulate and triangulateWithOptimization) public, so calibration can use them for bundle adjustment.
-        3. Bundle adjustment refinement added for camera calibration.
+        3. Added bundle adjustment refinement for camera extrinsic calibration.
         4. Added `CameraMatrixInitial` field into the XML calibration files to keep the information of the original camera extrinsic parameters when bundle adjustment is run.
     27. Video with the 3D output can be saved with the new `--write_video_3d` flag.
 2. Functions or parameters renamed:
@@ -310,6 +310,7 @@ OpenPose Library - Release Notes
     8. Replaced `--camera_fps` flag by `--write_video_fps`, given that it was a confusing name: It did not affect the webcam FPS, but only the FPS of the output video. In addition, default value changed from 30 to -1.
     9. Renamed `--frame_keep_distortion` as `--frame_undistort`, which performs the opposite operation (the default value has been also changed to the opposite).
     10. Renamed `--camera_parameter_folder` as `--camera_parameter_path` because it could also take a whole XML file path rather than its parent folder.
+    11. Default value of flag `--scale_gap` changed from 0.3 to 0.25.
 3. Main bugs fixed:
     1. CMake-GUI was forcing to Release mode, allowed Debug modes too.
     2. NMS returns in index 0 the number of found peaks. However, while the number of peaks was truncated to a maximum of 127, this index 0 was saving the real number instead of the truncated one.

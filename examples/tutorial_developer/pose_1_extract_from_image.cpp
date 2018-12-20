@@ -44,7 +44,7 @@ DEFINE_string(net_resolution,           "-1x368",       "Multiples of 16. If it 
 DEFINE_string(output_resolution,        "-1x-1",        "The image resolution (display and output). Use \"-1x-1\" to force the program to use the"
                                                         " input image resolution.");
 DEFINE_int32(num_gpu_start,             0,              "GPU device start number.");
-DEFINE_double(scale_gap,                0.3,            "Scale gap between scales. No effect unless scale_number > 1. Initial scale is always 1."
+DEFINE_double(scale_gap,                0.25,           "Scale gap between scales. No effect unless scale_number > 1. Initial scale is always 1."
                                                         " If you want to change the initial scale, you actually want to multiply the"
                                                         " `net_resolution` by your desired initial scale.");
 DEFINE_int32(scale_number,              1,              "Number of scales to average.");
