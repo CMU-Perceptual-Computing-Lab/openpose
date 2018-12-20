@@ -1811,6 +1811,12 @@ namespace op
         {
             try
             {
+                // Sanity check
+                auto normCam0Identity = cv::norm(
+                    refinedExtrinsics[0] - cv::Mat::eye(3, 4, refinedExtrinsics[0].type()));
+                if (normCam0Identity > 1e-9) // std::cout prints exactly 0
+                    error("Camera 0 should be [I, 0] for this algorithm to run. Norm cam0-[I,0] = "
+                          + std::to_string(normCam0Identity), __LINE__, __FUNCTION__, __FILE__);
                 // Prepare the camera extrinsics
                 Eigen::Matrix<double, 6, Eigen::Dynamic> cameraRt(6, numberCameras); // Angle axis + translation
                 for (auto cameraIndex = 0 ; cameraIndex < numberCameras ; cameraIndex++)
@@ -1895,13 +1901,18 @@ namespace op
                 //             problem.AddResidualBlock(costFunction, new ceres::HuberLoss(2.0), points3D.data() + 3 * i);
                 //         }
                 // }
-
+                // Ceres verbose
                 ceres::Solver::Summary summary;
                 ceres::Solve(options, &problem, &summary);
                 log(summary.FullReport(), Priority::High);
-
-                // The first one should be [I | 0], but we would enforce this at the end
-                for (auto cameraIndex = 0 ; cameraIndex < numberCameras ; cameraIndex++)
+                // Sanity check
+                normCam0Identity = cv::norm(
+                    refinedExtrinsics[0] - cv::Mat::eye(3, 4, refinedExtrinsics[0].type()));
+                if (normCam0Identity > 1e-9) // std::cout prints exactly 0
+                    error("Camera 0 should not be modified by our implementation of bundle adjustment, notify us!"
+                          " Norm: " + std::to_string(normCam0Identity), __LINE__, __FUNCTION__, __FILE__);
+                // The first one should be [I | 0] and it is not modified by our Ceres optimization
+                for (auto cameraIndex = 1 ; cameraIndex < numberCameras ; cameraIndex++)
                 {
                     cv::Mat extrinsics(3, 4, refinedExtrinsics[0].type());
                     extrinsics.at<double>(0, 3) = cameraRt.data()[6 * cameraIndex + 3];
@@ -2044,6 +2055,27 @@ namespace op
                 error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             }
         }
+
+        void cameraXAsOrigin(
+            std::vector<cv::Mat>& cameraExtrinsics, cv::Mat& cameraOriginInv, const cv::Mat& cameraOrigin)
+        {
+            try
+            {
+                // Extrinsics = cameraOrigin will turn into [I | 0]
+                // All the others are transformed accordingly by multiplying them by inv(cameraOrigin)
+                cameraOriginInv = cv::Mat::eye(4, 4, cameraOrigin.type());
+                for (auto i = 0 ; i < 3 ; i++)
+                    for (auto j = 0 ; j < 4 ; j++)
+                        cameraOriginInv.at<double>(i, j) = cameraOrigin.at<double>(i, j);
+                cameraOriginInv = cameraOriginInv.inv();
+                for (auto& cameraExtrinsic : cameraExtrinsics)
+                    cameraExtrinsic = cameraExtrinsic * cameraOriginInv;
+            }
+            catch (const std::exception& e)
+            {
+                error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            }
+        }
     #endif
 
     void refineAndSaveExtrinsics(
@@ -2084,8 +2116,14 @@ namespace op
                         break;
                     }
                 }
-                const auto cameraExtrinsics = (initialEmpty
+                // Camera extrinsics
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                auto cameraExtrinsics = (initialEmpty
                     ? cameraParameterReader.getCameraExtrinsics() : cameraExtrinsicsInitial);
+                // The first one should be [I | 0]: Multiply them all by inv(camera 0 extrinsics)
+                cv::Mat cameraOriginInv;
+                cameraXAsOrigin(cameraExtrinsics, cameraOriginInv, cameraExtrinsics.at(0).clone());
+                // Camera intrinsics and distortion
                 const auto cameraIntrinsics = cameraParameterReader.getCameraIntrinsics();
                 const auto cameraDistortions = (
                     imagesAreUndistorted
@@ -2203,21 +2241,21 @@ namespace op
                     refinedExtrinsics, points3D, points2DVectorsExtrinsic, BAValid, cameraIntrinsics,
                     numberCameras, 0.5, false);
 
-                // The first one should be [I | 0]: Multiply them all by inv(camera 0 extrinsics)
-                // Note: Given that camera 0 will have 0 translation, rescaling will not affect it
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-                cv::Mat extrinsicsCam0Inv = cv::Mat::eye(4, 4, refinedExtrinsics[0].type());
-                for (auto i = 0 ; i < 3 ; i++)
-                    for (auto j = 0 ; j < 3 ; j++)
-                        extrinsicsCam0Inv.at<double>(i, j) = refinedExtrinsics[0].at<double>(i, j);
-                extrinsicsCam0Inv = extrinsicsCam0Inv.inv();
-                for (auto& refinedExtrinsic : refinedExtrinsics)
-                    refinedExtrinsic = refinedExtrinsic * extrinsicsCam0Inv;
-
                 // Rescale the 3D points and translation based on the grid size
                 rescaleExtrinsicsAndPoints3D(
                     refinedExtrinsics, points3D, points2DVectorsExtrinsic, BAValid, cameraIntrinsics, numberCameras,
                     numberCorners, gridSquareSizeMm, gridInnerCorners);
+
+                // Revert back to refinedExtrinsics[0] = cameraExtrinsics[0] (rather than [I,0])
+                // Note: Given that inv([R,t;0,1]) is another [R',t';0,1], scaling is maintained
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                cv::Mat cameraOriginInv2;
+                cameraXAsOrigin(refinedExtrinsics, cameraOriginInv2, cameraOriginInv);
+                // Sanity check
+                auto normCam0Identity = cv::norm(refinedExtrinsics[0] - cameraExtrinsics[0]);
+                if (normCam0Identity > 1e-9) // std::cout prints exactly 0
+                    error("Unexpected error, notify us. Norm difference: "
+                          + std::to_string(normCam0Identity), __LINE__, __FUNCTION__, __FILE__);
 
                 // Final projection matrix
                 log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);

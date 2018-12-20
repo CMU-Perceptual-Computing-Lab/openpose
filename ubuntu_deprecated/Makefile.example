@@ -96,6 +96,14 @@ ifneq ($(WITH_CERES), 0)
 	# Ceres
 	LIBRARIES += ceres
 	INCLUDE_DIRS += $(EIGEN_DIR)
+	# If Ceres was built with Suitesparse:
+	LIBRARIES += lapack camd amd ccolamd colamd cholmod
+	# If Ceres was built with CXSparse:
+	LIBRARIES += cxsparse
+	# If Ceres was built with OpenMP:
+	LIBRARIES += pthread gomp m
+	CXXFLAGS += -fopenmp
+	LINKFLAGS += -fopenmp
 endif
 # Eigen support
 WITH_EIGEN ?= 0
