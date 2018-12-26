@@ -30,7 +30,7 @@ namespace op
         const T interThreshold, const int minSubsetCnt, const T minSubsetScore, const T scaleFactor = 1.f,
         const bool maximizePositives = false, Array<T> pairScoresCpu = Array<T>{}, T* pairScoresGpuPtr = nullptr,
         const unsigned int* const bodyPartPairsGpuPtr = nullptr, const unsigned int* const mapIdxGpuPtr = nullptr,
-        const T* const peaksGpuPtr = nullptr);
+        const T* const peaksGpuPtr = nullptr, const int gpuID = 0);
 
     // Private functions used by the 2 above functions
     template <typename T>

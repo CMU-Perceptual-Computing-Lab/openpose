@@ -10,6 +10,135 @@
 
 namespace op
 {
+    #ifdef USE_OPENCL
+
+//    template<typename T>
+//    inline __device__ int intRoundGPU(const T a)
+//    {
+//        return int(a+T(0.5));
+//    }
+
+
+//__global Type* pairScoresPtr, __global const Type* const heatMapPtr, __global const Type* const peaksPtr,
+//                                     __global const unsigned int* const bodyPartPairsPtr, __global const unsigned int* const mapIdxPtr,
+//                                     const unsigned int maxPeaks, const int numberBodyPartPairs,
+//                                     const int heatmapWidth, const int heatmapHeight, const Type interThreshold,
+//                                     const Type interMinAboveThreshold
+
+    typedef cl::KernelFunctor<cl::Buffer, cl::Buffer, cl::Buffer, cl::Buffer, cl::Buffer, unsigned int, int, int, int, float, float> PAFScoreKernelFunctor;
+    const std::string pafScoreKernel = MULTI_LINE_STRING(
+
+
+        int intRoundGPU(const Type a)
+        {
+            return int(a+0.5);
+        }
+
+        Type process(const Type* bodyPartA, const Type* bodyPartB, const Type* mapX, const Type* mapY,
+                                     const int heatmapWidth, const int heatmapHeight, const Type interThreshold,
+                                     const Type interMinAboveThreshold)
+        {
+            const Type vectorAToBX = bodyPartB[0] - bodyPartA[0];
+            const Type vectorAToBY = bodyPartB[1] - bodyPartA[1];
+            const Type vectorAToBMax = max(fabs(vectorAToBX), fabs(vectorAToBY));
+            const Type numberPointsInLine = max(5, min(25, intRoundGPU(sqrt(5*vectorAToBMax))));
+            const Type vectorNorm = Type(sqrt(vectorAToBX*vectorAToBX + vectorAToBY*vectorAToBY));
+
+//            if (vectorNorm > 1e-6)
+//            {
+//                const auto sX = bodyPartA[0];
+//                const auto sY = bodyPartA[1];
+//                const auto vectorAToBNormX = vectorAToBX/vectorNorm;
+//                const auto vectorAToBNormY = vectorAToBY/vectorNorm;
+
+//                auto sum = T(0.);
+//                auto count = 0;
+//                const auto vectorAToBXInLine = vectorAToBX/numberPointsInLine;
+//                const auto vectorAToBYInLine = vectorAToBY/numberPointsInLine;
+//                for (auto lm = 0; lm < numberPointsInLine; lm++)
+//                {
+//                    const auto mX = min(heatmapWidth-1, intRoundGPU(sX + lm*vectorAToBXInLine));
+//                    const auto mY = min(heatmapHeight-1, intRoundGPU(sY + lm*vectorAToBYInLine));
+//                    const auto idx = mY * heatmapWidth + mX;
+//                    const auto score = (vectorAToBNormX*mapX[idx] + vectorAToBNormY*mapY[idx]);
+//                    if (score > interThreshold)
+//                    {
+//                        sum += score;
+//                        count++;
+//                    }
+//                }
+
+//                // Return PAF score
+//                if (count/T(numberPointsInLine) > interMinAboveThreshold)
+//                    return sum/count;
+//                else
+//                {
+//                    // Ideally, if distanceAB = 0, PAF is 0 between A and B, provoking a false negative
+//                    // To fix it, we consider PAF-connected keypoints very close to have a minimum PAF score, such that:
+//                    //     1. It will consider very close keypoints (where the PAF is 0)
+//                    //     2. But it will not automatically connect them (case PAF score = 1), or real PAF might got
+//                    //        missing
+//                    const auto l2Dist = sqrtf(vectorAToBX*vectorAToBX + vectorAToBY*vectorAToBY);
+//                    const auto threshold = sqrtf(heatmapWidth*heatmapHeight)/150; // 3.3 for 368x656, 6.6 for 2x resolution
+//                    if (l2Dist < threshold)
+//                        return T(0.15);
+//                }
+//            }
+            return -1;
+        }
+
+        __kernel void pafScoreKernel(__global Type* pairScoresPtr, __global const Type* const heatMapPtr, __global const Type* const peaksPtr,
+                                     __global const unsigned int* const bodyPartPairsPtr, __global const unsigned int* const mapIdxPtr,
+                                     const unsigned int maxPeaks, const int numberBodyPartPairs,
+                                     const int heatmapWidth, const int heatmapHeight, const Type interThreshold,
+                                     const Type interMinAboveThreshold)
+        {
+            int pairIndex = get_global_id(0);
+            int peakA = get_global_id(1);
+            int peakB = get_global_id(2);
+
+            if (pairIndex < numberBodyPartPairs && peakA < maxPeaks && peakB < maxPeaks)
+            {
+                int baseIndex = 2*pairIndex;
+                int partA = bodyPartPairsPtr[baseIndex];
+                int partB = bodyPartPairsPtr[baseIndex + 1];
+
+                const Type numberPeaksA = peaksPtr[3*partA*(maxPeaks+1)];
+                const Type numberPeaksB = peaksPtr[3*partB*(maxPeaks+1)];
+
+                const int outputIndex = (pairIndex*maxPeaks+peakA)*maxPeaks + peakB;
+                if (peakA < numberPeaksA && peakB < numberPeaksB)
+                {
+                    const int mapIdxX = mapIdxPtr[baseIndex];
+                    const int mapIdxY = mapIdxPtr[baseIndex + 1];
+
+                    __global const Type* bodyPartA = peaksPtr + (3*(partA*(maxPeaks+1) + peakA+1));
+                    __global const Type* bodyPartB = peaksPtr + (3*(partB*(maxPeaks+1) + peakB+1));
+                    __global const Type* mapX = heatMapPtr + mapIdxX*heatmapWidth*heatmapHeight;
+                    __global const Type* mapY = heatMapPtr + mapIdxY*heatmapWidth*heatmapHeight;
+
+                            printf("x\n");
+
+//                    pairScoresPtr[outputIndex] = process(
+//                        bodyPartA, bodyPartB, mapX, mapY, heatmapWidth, heatmapHeight, interThreshold,
+//                        interMinAboveThreshold);
+                }
+                else
+                    pairScoresPtr[outputIndex] = -1;
+            }
+
+        }
+    );
+
+//        __global__ void pafScoreKernel(T* pairScoresPtr, const T* const heatMapPtr, const T* const peaksPtr,
+//                                       const unsigned int* const bodyPartPairsPtr, const unsigned int* const mapIdxPtr,
+//                                       const unsigned int maxPeaks, const int numberBodyPartPairs,
+//                                       const int heatmapWidth, const int heatmapHeight, const T interThreshold,
+//                                       const T interMinAboveThreshold)
+//        {
+
+    #endif
+
 //    const dim3 THREADS_PER_BLOCK{4, 16, 16};
 
 //    template<typename T>
@@ -118,22 +247,49 @@ namespace op
                              const int minSubsetCnt, const T minSubsetScore, const T scaleFactor,
                              const bool maximizePositives, Array<T> pairScoresCpu, T* pairScoresGpuPtr,
                              const unsigned int* const bodyPartPairsGpuPtr, const unsigned int* const mapIdxGpuPtr,
-                             const T* const peaksGpuPtr)
+                             const T* const peaksGpuPtr, const int gpuID)
     {
-//        try
-//        {
-//            // Parts Connection
-//            const auto& bodyPartPairs = getPosePartPairs(poseModel);
-//            const auto numberBodyParts = getPoseNumberBodyParts(poseModel);
-//            const auto numberBodyPartPairs = (unsigned int)(bodyPartPairs.size() / 2);
-//            const auto totalComputations = pairScoresCpu.getVolume();
+        try
+        {
+            // Parts Connection
+            const auto& bodyPartPairs = getPosePartPairs(poseModel);
+            const auto numberBodyParts = getPoseNumberBodyParts(poseModel);
+            const auto numberBodyPartPairs = (unsigned int)(bodyPartPairs.size() / 2);
+            const auto totalComputations = pairScoresCpu.getVolume();
 
-//            if (numberBodyParts == 0)
-//                error("Invalid value of numberBodyParts, it must be positive, not " + std::to_string(numberBodyParts),
-//                      __LINE__, __FUNCTION__, __FILE__);
-//            if (bodyPartPairsGpuPtr == nullptr || mapIdxGpuPtr == nullptr)
-//                error("The pointers bodyPartPairsGpuPtr and mapIdxGpuPtr cannot be nullptr.",
-//                      __LINE__, __FUNCTION__, __FILE__);
+            if (numberBodyParts == 0)
+                error("Invalid value of numberBodyParts, it must be positive, not " + std::to_string(numberBodyParts),
+                      __LINE__, __FUNCTION__, __FILE__);
+            if (bodyPartPairsGpuPtr == nullptr || mapIdxGpuPtr == nullptr)
+                error("The pointers bodyPartPairsGpuPtr and mapIdxGpuPtr cannot be nullptr.",
+                      __LINE__, __FUNCTION__, __FILE__);
+
+            auto pafScoreKernel = OpenCL::getInstance(gpuID)->getKernelFunctorFromManager
+                    <PAFScoreKernelFunctor, T>(
+                     "pafScoreKernel", op::pafScoreKernel);
+
+
+            cl::Buffer pairScoresGpuPtrBuffer = cl::Buffer((cl_mem)(pairScoresGpuPtr), true);
+            cl::Buffer heatMapGpuPtrBuffer = cl::Buffer((cl_mem)(heatMapGpuPtr), true);
+
+            cl::Buffer peaksGpuPtrBuffer = cl::Buffer((cl_mem)(peaksGpuPtr), true);
+
+            cl::Buffer bodyPartPairsGpuPtrBuffer = cl::Buffer((cl_mem)(bodyPartPairsGpuPtr), true);
+
+            cl::Buffer mapIdxGpuPtrBuffer = cl::Buffer((cl_mem)(mapIdxGpuPtr), true);
+
+
+            pafScoreKernel(
+                cl::EnqueueArgs(OpenCL::getInstance(gpuID)->getQueue(), cl::NDRange(numberBodyPartPairs,maxPeaks,maxPeaks)),
+                pairScoresGpuPtrBuffer, heatMapGpuPtrBuffer, peaksGpuPtrBuffer, bodyPartPairsGpuPtrBuffer, mapIdxGpuPtrBuffer,
+                maxPeaks, (int)numberBodyPartPairs, heatMapSize.x, heatMapSize.y, interThreshold,
+                interMinAboveThreshold);
+
+            OpenCL::getInstance(gpuID)->getQueue().finish();
+
+            op::log("OK");
+            exit(-1);
+
 
 //            // Run Kernel - pairScoresGpu
 //            const dim3 numBlocks{
@@ -181,11 +337,11 @@ namespace op
 
 //            // Sanity check
 //            cudaCheck(__LINE__, __FUNCTION__, __FILE__);
-//        }
-//        catch (const std::exception& e)
-//        {
-//            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-//        }
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
     }
 
     template void connectBodyPartsOcl(
@@ -194,12 +350,12 @@ namespace op
         const float interMinAboveThreshold, const float interThreshold, const int minSubsetCnt,
         const float minSubsetScore, const float scaleFactor, const bool maximizePositives,
         Array<float> pairScoresCpu, float* pairScoresGpuPtr, const unsigned int* const bodyPartPairsGpuPtr,
-        const unsigned int* const mapIdxGpuPtr, const float* const peaksGpuPtr);
+        const unsigned int* const mapIdxGpuPtr, const float* const peaksGpuPtr, const int gpuID);
     template void connectBodyPartsOcl(
         Array<double>& poseKeypoints, Array<double>& poseScores, const double* const heatMapGpuPtr,
         const double* const peaksPtr, const PoseModel poseModel, const Point<int>& heatMapSize, const int maxPeaks,
         const double interMinAboveThreshold, const double interThreshold, const int minSubsetCnt,
         const double minSubsetScore, const double scaleFactor, const bool maximizePositives,
         Array<double> pairScoresCpu, double* pairScoresGpuPtr, const unsigned int* const bodyPartPairsGpuPtr,
-        const unsigned int* const mapIdxGpuPtr, const double* const peaksGpuPtr);
+        const unsigned int* const mapIdxGpuPtr, const double* const peaksGpuPtr, const int gpuID);
 }
