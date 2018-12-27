@@ -274,7 +274,9 @@ namespace op
                     mFinalOutputCpu.reset({(int)numberBodyPartPairs, maxPeaks, maxPeaks});
                     const auto totalComputations = mFinalOutputCpu.getVolume();
                     if (pFinalOutputGpuPtr == nullptr)
-                        pFinalOutputGpuPtr = (T*)clCreateBuffer(OpenCL::getInstance(mGpuID)->getContext().operator()(), CL_MEM_READ_WRITE, totalComputations * sizeof(T), NULL, NULL);
+                        pFinalOutputGpuPtr = (T*)clCreateBuffer(
+                            OpenCL::getInstance(mGpuID)->getContext().operator()(), CL_MEM_READ_WRITE,
+                            totalComputations * sizeof(T), NULL, NULL);
                 }
 
                 // Run body part connector
