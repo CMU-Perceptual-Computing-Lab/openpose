@@ -460,8 +460,9 @@ namespace op
                 // Special Case for Apple which has CPU OpenCL Device too
                 int cpu_device_count = 0;
                 #ifdef __APPLE__
-                type = platforms[0].getDevices(CL_DEVICE_TYPE_CPU, &devices);
-                if (type == CL_SUCCESS) cpu_device_count = devices.size();
+                    type = platforms[0].getDevices(CL_DEVICE_TYPE_CPU, &devices);
+                    if (type == CL_SUCCESS)
+                        cpu_device_count = devices.size();
                 #endif
 
                 type = platforms[0].getDevices(CL_DEVICE_TYPE_GPU, &devices);
