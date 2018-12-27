@@ -96,7 +96,7 @@ DEFINE_string(net_resolution,           "-1x368",       "Multiples of 16. If it 
                                                         " input value. E.g., the default `-1x368` is equivalent to `656x368` in 16:9 resolutions,"
                                                         " e.g., full HD (1980x1080) and HD (1280x720) resolutions.");
 DEFINE_int32(scale_number,              1,              "Number of scales to average.");
-DEFINE_double(scale_gap,                0.3,            "Scale gap between scales. No effect unless scale_number > 1. Initial scale is always 1."
+DEFINE_double(scale_gap,                0.25,           "Scale gap between scales. No effect unless scale_number > 1. Initial scale is always 1."
                                                         " If you want to change the initial scale, you actually want to multiply the"
                                                         " `net_resolution` by your desired initial scale.");
 // OpenPose Body Pose Heatmaps and Part Candidates
@@ -219,6 +219,8 @@ DEFINE_double(write_video_fps,          -1.,            "Frame rate for the reco
                                                         " frame rate (e.g., input video or webcam frame rate). If the input frames producer does not"
                                                         " have a set FPS (e.g., image_dir or webcam if OpenCV not compiled with its support), set"
                                                         " this value accordingly (e.g., to the frame rate displayed by the OpenPose GUI).");
+DEFINE_string(write_video_3d,           "",             "Analogous to `--write_video`, but applied to the 3D output.");
+DEFINE_string(write_video_adam,         "",             "Experimental, not available yet. Analogous to `--write_video`, but applied to Adam model.");
 DEFINE_string(write_json,               "",             "Directory to write OpenPose output in JSON format. It includes body, hand, and face pose"
                                                         " keypoints (2-D and 3-D), as well as pose candidates (if `--part_candidates` enabled).");
 DEFINE_string(write_coco_json,          "",             "Full file path to write people pose data with JSON COCO validation format.");
@@ -235,8 +237,6 @@ DEFINE_string(write_keypoint,           "",             "(Deprecated, use `write
 DEFINE_string(write_keypoint_format,    "yml",          "(Deprecated, use `write_json`) File extension and format for `write_keypoint`: json, xml,"
                                                         " yaml & yml. Json not available for OpenCV < 3.0, use `write_json` instead.");
 // Result Saving - Extra Algorithms
-DEFINE_string(write_video_adam,         "",             "Experimental, not available yet. E.g., `~/Desktop/adamResult.avi`. Flag `write_video_fps`"
-                                                        " controls FPS.");
 DEFINE_string(write_bvh,                "",             "Experimental, not available yet. E.g., `~/Desktop/mocapResult.bvh`.");
 // UDP Communication
 DEFINE_string(udp_host,                 "",             "Experimental, not available yet. IP for UDP communication. E.g., `192.168.0.1`.");

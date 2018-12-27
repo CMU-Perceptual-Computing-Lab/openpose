@@ -24,5 +24,6 @@
 #include <openpose/filestream/wPoseSaver.hpp>
 #include <openpose/filestream/wUdpSender.hpp>
 #include <openpose/filestream/wVideoSaver.hpp>
+#include <openpose/filestream/wVideoSaver3D.hpp>
 
 #endif // OPENPOSE_FILESTREAM_HEADERS_HPP

@@ -104,7 +104,7 @@ Examples:
 
 
 ### Step 2 - Extrinsic Parameter Calibration
-1. **VERY IMPORTANT NOTE**: If you want to re-run the extrinsic parameter calibration over the same intrinsic XML files (e.g., if you move the camera location, but you know the instrinsics are the same), you must manually re-set to `1 0 0 0  0 1 0 0  0 0 1 0` the camera matrix of each XML file.
+1. **VERY IMPORTANT NOTE**: If you want to re-run the extrinsic parameter calibration over the same intrinsic XML files (e.g., if you move the camera location, but you know the instrinsics are the same), you must manually re-set to `1 0 0 0  0 1 0 0  0 0 1 0` the camera matrix of each XML file that will be used for `--combine_cam0_extrinsics`.
 2. After intrinsics calibration, save undirtoted images for all the camera views:
 ```sh
 ./build/examples/openpose/openpose.bin --num_gpu 0 --flir_camera --write_images ~/Desktop/extrinsics
@@ -125,7 +125,16 @@ Examples:
 :: Windows
 :: build\x64\Release\calibration.exe with the same flags as above
 ```
-4. Hint to verify extrinsic calibration is successful:
+4. If you use Ceres solver (`WITH_CERES` flag in CMake), you can improve the calibration results by performing an additional Bundle Adjustment refinement step on top of the previous results. We use camera 0 as the baseline for the internal computation, so try to avoid weird camera configurations in which camera 0 is completely isolated from the other cameras. Ideally, camera 0 should physically be the closest to all other cameras (i.e., the one more centered). But in practice, the accuracy improvement is almost none (as long as it is not too far from the others). To perform this bundle adjustment refinement for the example above, simply run the following line:
+```
+# Ubuntu and Mac
+./build/examples/calibration/calibration.bin --mode 3 --grid_square_size_mm 127.0 --grid_number_inner_corners 9x6 --omit_distortion --calibration_image_dir ~/Desktop/extrinsics/ --number_cameras 4
+```
+```
+:: Windows
+:: Ceres-compatible version not implemented for Windows yet. Make a pull request if you have a working version in Windows.
+```
+5. Hint to verify extrinsic calibration is successful:
     1. Translation vector - Global distance:
         1. Manually open each one of the generated XML files from the folder indicated by the flag `--camera_parameter_path` (or the default one indicated by the `--help` flag if the former was not used).
         2. The field `CameraMatrix` is a 3 x 4 matrix (you can see that the subfield `rows` in that file is 3 and `cols` is 4).

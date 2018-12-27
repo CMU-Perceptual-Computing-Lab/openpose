@@ -74,7 +74,7 @@ namespace op
             //     - double: person subset score
             std::vector<std::pair<std::vector<int>, T>> peopleVector;
             const auto& mapIdx = getPoseMapIndex(poseModel);
-            const auto numberBodyPartsAndBkg = numberBodyParts + (poseModel != PoseModel::BODY_25B ? 1 : 0);
+            const auto numberBodyPartsAndBkg = numberBodyParts + (addBkgChannel(poseModel) ? 1 : 0);
             const auto vectorSize = numberBodyParts+1;
             const auto peaksOffset = 3*(maxPeaks+1);
             const auto heatMapOffset = heatMapSize.area();

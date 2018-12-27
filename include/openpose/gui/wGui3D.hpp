@@ -86,6 +86,12 @@ namespace op
                 }
                 // Refresh/update GUI
                 spGui3D->update();
+                // Read OpenCV mat equivalent
+                if (!tDatums->empty())
+                {
+                    auto& tDatum = (*tDatums)[0];
+                    tDatum.cvOutputData3D = spGui3D->readCvMat();
+                }
                 // Profiling speed
                 if (!tDatums->empty())
                 {
