@@ -7,6 +7,7 @@ set(SOURCES_OP_NET
     maximumBase.cu
     maximumCaffe.cpp
     netCaffe.cpp
+    netOpenCv.cpp
     nmsBase.cpp
     nmsBase.cu
     nmsBaseCL.cpp

@@ -368,10 +368,15 @@ if (UNIX OR APPLE)
     include(cmake/Cuda.cmake)
     find_package(CuDNN)
   endif (${GPU_MODE} MATCHES "CUDA")
-  find_package(GFlags)
-  find_package(Glog)
+  find_package(GFlags) # For Caffe and OpenPose
+  find_package(Glog) # For Caffe
+  find_package(Protobuf REQUIRED) # For Caffe
+
   if (OpenCV_CONFIG_FILE)
     include (${OpenCV_CONFIG_FILE})
+  # Allow explicitly setting the OpenCV includes and libs
+  elseif (OpenCV_INCLUDE_DIRS AND OpenCV_LIBS)
+    set(OpenCV_FOUND 1)
   elseif (OpenCV_INCLUDE_DIRS AND OpenCV_LIBS_DIR)
     file(GLOB_RECURSE OpenCV_LIBS "${OpenCV_LIBS_DIR}*.so")
     set(OpenCV_FOUND 1)
@@ -383,6 +388,8 @@ if (UNIX OR APPLE)
   if (WITH_3D_RENDERER)
     # GLUT
     find_package(GLUT REQUIRED)
+    # OpenGL
+    find_package(OpenGL REQUIRED)
   endif (WITH_3D_RENDERER)
   if (WITH_CERES)
     # Eigen + Ceres
@@ -399,7 +406,7 @@ if (UNIX OR APPLE)
   if (WITH_3D_ADAM_MODEL)
     if (NOT WITH_3D_RENDERER)
       message(FATAL_ERROR "WITH_3D_RENDERER is required if WITH_3D_ADAM_MODEL is enabled.")
-    endif (WITH_3D_RENDERER)
+    endif (NOT WITH_3D_RENDERER)
     find_package(PkgConfig)
     pkg_check_modules(EIGEN3 REQUIRED eigen3)
     # Others: sudo apt-get install libglm-dev
@@ -699,7 +706,7 @@ if (UNIX OR APPLE)
           CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
           -DMKLDNN_INSTALL_DIR:PATH=<INSTALL_DIR>
           -DUSE_CUDNN=${USE_CUDNN}
-          -DBUILD_python=OFF
+          -DCUDA_ARCH_NAME=${CUDA_ARCH}
           -DCPU_ONLY=${CAFFE_CPU_ONLY}
           -DUSE_MKL2017_AS_DEFAULT_ENGINE=${CAFFE_CPU_ONLY}
           -DCMAKE_BUILD_TYPE=Release
@@ -716,6 +723,7 @@ if (UNIX OR APPLE)
           PREFIX ${CAFFE_PREFIX}
           CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
           -DUSE_CUDNN=${USE_CUDNN}
+          -DCUDA_ARCH_NAME=${CUDA_ARCH}
           -DCPU_ONLY=${CAFFE_CPU_ONLY}
           -DCMAKE_BUILD_TYPE=Release
           -DBUILD_docs=OFF
@@ -753,6 +761,7 @@ endif (UNIX OR APPLE)
 # Specify the include directories
 include_directories(
   include
+  ${Protobuf_INCLUDE_DIRS}
   ${GFLAGS_INCLUDE_DIR}
   ${GLOG_INCLUDE_DIR}
   ${OpenCV_INCLUDE_DIRS})
@@ -801,15 +810,15 @@ if (WITH_CERES)
   include_directories(${CERES_INCLUDE_DIRS})
 endif (WITH_CERES)
 if (WITH_FLIR_CAMERA)
-  include_directories(${SPINNAKER_INCLUDE_DIRS})
+  include_directories(SYSTEM ${SPINNAKER_INCLUDE_DIRS}) # To remove its warnings, equiv. to -isystem
 endif (WITH_FLIR_CAMERA)
 if (WITH_3D_ADAM_MODEL)
-                                    include_directories(include/adam) # TEMPORARY - TO BE REMOVED IN THE FUTURE
+                                    include_directories(include/adam) # TODO: TEMPORARY - TO BE REMOVED IN THE FUTURE
   include_directories(${CERES_INCLUDE_DIRS})
   include_directories(${EIGEN3_INCLUDE_DIRS})
   include_directories(${IGL_INCLUDE_DIRS})
   include_directories(${LIBIGL_INCLUDE_DIRS})
-  include_directories(${OPENGL_INCLUDE_DIRS} ${GLUT_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS})
+  include_directories(${GLUT_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIR})
 endif (WITH_3D_ADAM_MODEL)
 # Windows includes
 if (WIN32)
@@ -854,7 +863,7 @@ if (WITH_3D_ADAM_MODEL)
       ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} ${GLEW_LIBRARY} ${FREE_IMAGE_LIBRARY})
 endif (WITH_3D_ADAM_MODEL)
 if (WITH_3D_RENDERER)
-  set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries} ${GLUT_LIBRARY})
+  set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries} ${GLUT_LIBRARY} ${OPENGL_LIBRARIES})
 endif (WITH_3D_RENDERER)
 if (WITH_CERES)
   set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries} ${CERES_LIBRARIES})
@@ -906,6 +915,7 @@ message(STATUS "Models Downloaded.")
 ### PYTHON
 if (Caffe_FOUND)
   if(BUILD_PYTHON)
+    execute_process(COMMAND git submodule update --init ../3rdparty/pybind11/)
     add_subdirectory(3rdparty/pybind11)
     add_subdirectory(python)
   endif (BUILD_PYTHON)

@@ -48,6 +48,20 @@ namespace op
         }
     }
 
+    // Signed
+    template OP_API std::string toFixedLengthString<char>(const char number, const unsigned long long stringLength);
+    template OP_API std::string toFixedLengthString<signed char>(const signed char number, const unsigned long long stringLength);
+    template OP_API std::string toFixedLengthString<short>(const short number, const unsigned long long stringLength);
+    template OP_API std::string toFixedLengthString<int>(const int number, const unsigned long long stringLength);
+    template OP_API std::string toFixedLengthString<long>(const long number, const unsigned long long stringLength);
+    template OP_API std::string toFixedLengthString<long long>(const long long number, const unsigned long long stringLength);
+    // Unsigned
+    template OP_API std::string toFixedLengthString<unsigned char>(const unsigned char number, const unsigned long long stringLength);
+    template OP_API std::string toFixedLengthString<unsigned short>(const unsigned short number, const unsigned long long stringLength);
+    template OP_API std::string toFixedLengthString<unsigned int>(const unsigned int number, const unsigned long long stringLength);
+    template OP_API std::string toFixedLengthString<unsigned long>(const unsigned long number, const unsigned long long stringLength);
+    template OP_API std::string toFixedLengthString<unsigned long long>(const unsigned long long number, const unsigned long long stringLength);
+
     std::vector<std::string> splitString(const std::string& stringToSplit, const std::string& delimiter)
     {
         try
@@ -99,19 +113,4 @@ namespace op
             return "";
         }
     }
-
-
-    // Signed
-    template std::string toFixedLengthString<char>(const char number, const unsigned long long stringLength);
-    template std::string toFixedLengthString<signed char>(const signed char number, const unsigned long long stringLength);
-    template std::string toFixedLengthString<short>(const short number, const unsigned long long stringLength);
-    template std::string toFixedLengthString<int>(const int number, const unsigned long long stringLength);
-    template std::string toFixedLengthString<long>(const long number, const unsigned long long stringLength);
-    template std::string toFixedLengthString<long long>(const long long number, const unsigned long long stringLength);
-    // Unsigned
-    template std::string toFixedLengthString<unsigned char>(const unsigned char number, const unsigned long long stringLength);
-    template std::string toFixedLengthString<unsigned short>(const unsigned short number, const unsigned long long stringLength);
-    template std::string toFixedLengthString<unsigned int>(const unsigned int number, const unsigned long long stringLength);
-    template std::string toFixedLengthString<unsigned long>(const unsigned long number, const unsigned long long stringLength);
-    template std::string toFixedLengthString<unsigned long long>(const unsigned long long number, const unsigned long long stringLength);
 }

@@ -16,9 +16,11 @@ namespace op
 
     OP_API double resizeGetScaleFactor(const Point<int>& initialSize, const Point<int>& targetSize);
 
-    OP_API cv::Mat resizeFixedAspectRatio(const cv::Mat& cvMat, const double scaleFactor, const Point<int>& targetSize,
-                                          const int borderMode = cv::BORDER_CONSTANT,
-                                          const cv::Scalar& borderValue = cv::Scalar{0,0,0});
+    OP_API void resizeFixedAspectRatio(
+        cv::Mat& resizedCvMat, const cv::Mat& cvMat, const double scaleFactor, const Point<int>& targetSize,
+        const int borderMode = cv::BORDER_CONSTANT, const cv::Scalar& borderValue = cv::Scalar{0,0,0});
+
+    OP_API void keepRoiInside(cv::Rect& roi, const int imageWidth, const int imageHeight);
 }
 
 #endif // OPENPOSE_UTILITIES_OPEN_CV_HPP

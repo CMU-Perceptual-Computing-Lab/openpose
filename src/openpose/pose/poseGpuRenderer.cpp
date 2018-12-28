@@ -30,7 +30,7 @@ namespace op
     {
         try
         {
-            // Free CUDA pointers - Note that if pointers are 0 (i.e. nullptr), no operation is performed.
+            // Free CUDA pointers - Note that if pointers are 0 (i.e., nullptr), no operation is performed.
             #ifdef USE_CUDA
                 cudaFree(pGpuPose);
             #endif
@@ -80,7 +80,8 @@ namespace op
                     cpuToGpuMemoryIfNotCopiedYet(outputData.getPtr(), outputData.getVolume());
                     cudaCheck(__LINE__, __FUNCTION__, __FILE__);
                     const auto numberBodyParts = getPoseNumberBodyParts(mPoseModel);
-                    const auto numberBodyPartsPlusBkg = numberBodyParts+1;
+                    const auto hasBkg = addBkgChannel(mPoseModel);
+                    const auto numberBodyPartsPlusBkg = numberBodyParts + (hasBkg ? 1 : 0);
                     const auto numberBodyPAFChannels = getPosePartPairs(mPoseModel).size();
                     const Point<int> frameSize{outputData.getSize(1), outputData.getSize(0)};
                     // Draw poseKeypoints
@@ -134,13 +135,13 @@ namespace op
                         else if (elementRendered <= numberBodyPartsPlusBkg+2)
                         {
                             const auto realElementRendered = (elementRendered == 1
-                                                                ? numberBodyParts
-                                                                : elementRendered - 4);
+                                                                ? (hasBkg ? numberBodyParts : 0)
+                                                                : elementRendered - 3 - (hasBkg ? 1:0));
                             elementRenderedName = mPartIndexToName.at(realElementRendered);
-                            renderPoseHeatMapGpu(*spGpuMemory, mPoseModel, frameSize,
-                                                 spPoseExtractorNet->getHeatMapGpuConstPtr(),
-                                                 heatMapSize, scaleNetToOutput * scaleInputToOutput, realElementRendered,
-                                                 (mBlendOriginalFrame ? getAlphaHeatMap() : 1.f));
+                            renderPoseHeatMapGpu(
+                                *spGpuMemory, frameSize, spPoseExtractorNet->getHeatMapGpuConstPtr(), heatMapSize,
+                                scaleNetToOutput * scaleInputToOutput, realElementRendered,
+                                (mBlendOriginalFrame ? getAlphaHeatMap() : 1.f));
                         }
                         // Draw affinity between 2 body parts
                         else if (elementRendered <= lastPAFChannel)
@@ -162,13 +163,13 @@ namespace op
                                 error("Neck-part distance channel only for BODY_25D.",
                                       __LINE__, __FUNCTION__, __FILE__);
                             const auto distancePart = (elementRendered - lastPAFChannel - 1);
-                            const auto distancePartMapped = numberBodyPartsPlusBkg + numberBodyPAFChannels
-                                                          + distancePart;
+                            const auto distancePartMapped = (unsigned int)(
+                                numberBodyPartsPlusBkg + numberBodyPAFChannels + distancePart);
                             elementRenderedName = mPartIndexToName.at(distancePartMapped);
-                            renderPoseDistance(*spGpuMemory, mPoseModel, frameSize,
-                                               spPoseExtractorNet->getHeatMapGpuConstPtr(),
-                                               heatMapSize, scaleNetToOutput * scaleInputToOutput, distancePartMapped,
-                                               (mBlendOriginalFrame ? getAlphaHeatMap() : 1.f));
+                            renderPoseDistanceGpu(
+                                *spGpuMemory, frameSize, spPoseExtractorNet->getHeatMapGpuConstPtr(), heatMapSize,
+                                scaleNetToOutput * scaleInputToOutput, distancePartMapped,
+                                (mBlendOriginalFrame ? getAlphaHeatMap() : 1.f));
                         }
                     }
                 }

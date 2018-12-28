@@ -16,6 +16,7 @@
 #include <openpose/thread/worker.hpp>
 #include <openpose/thread/workerProducer.hpp>
 #include <openpose/thread/workerConsumer.hpp>
+#include <openpose/thread/wFpsMax.hpp>
 #include <openpose/thread/wIdGenerator.hpp>
 #include <openpose/thread/wQueueAssembler.hpp>
 #include <openpose/thread/wQueueOrderer.hpp>

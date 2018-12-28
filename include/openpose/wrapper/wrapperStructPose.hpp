@@ -143,7 +143,7 @@ namespace op
         /**
          * Rendering threshold. Only estimated keypoints whose score confidences are higher than this value will be
          * rendered. Generally, a high threshold (> 0.5) will only render very clear body parts; while small thresholds
-         * (~0.1) will also output guessed and occluded keypoints, but also more false positives (i.e. wrong
+         * (~0.1) will also output guessed and occluded keypoints, but also more false positives (i.e., wrong
          * detections).
          */
         float renderThreshold;
@@ -159,6 +159,21 @@ namespace op
         int numberPeopleMax;
 
         /**
+         * Whether to maximize the number of positives.
+         * It reduces the thresholds to accept a person candidate. It highly increases both false and true positives.
+         * I.e., it maximizes average recall but could harm average precision.
+         */
+        bool maximizePositives;
+
+        /**
+         * Maximum processing frame rate.
+         * By default (-1), OpenPose will process frames as fast as possible.
+         * Example usage: If OpenPose is displaying images too quickly, this can reduce the speed so the user can
+         * analyze better each frame from the GUI.
+         */
+        double fpsMax;
+
+        /**
          * Whether to internally enable Google Logging.
          * This option is only applicable if Caffe is used.
          * Only disable it if the user is already calling google::InitGoogleLogging() in his code.
@@ -172,19 +187,18 @@ namespace op
          * It has the recommended and default values we recommend for each element of the struct.
          * Since all the elements of the struct are public, they can also be manually filled.
          */
-        WrapperStructPose(const bool enable = true, const Point<int>& netInputSize = Point<int>{656, 368},
-                          const Point<int>& outputSize = Point<int>{-1, -1},
-                          const ScaleMode keypointScale = ScaleMode::InputResolution,
-                          const int gpuNumber = -1, const int gpuNumberStart = 0, const int scalesNumber = 1,
-                          const float scaleGap = 0.15f, const RenderMode renderMode = RenderMode::Gpu,
-                          const PoseModel poseModel = PoseModel::BODY_25, const bool blendOriginalFrame = true,
-                          const float alphaKeypoint = POSE_DEFAULT_ALPHA_KEYPOINT,
-                          const float alphaHeatMap = POSE_DEFAULT_ALPHA_HEAT_MAP,
-                          const int defaultPartToRender = 0, const std::string& modelFolder = "models/",
-                          const std::vector<HeatMapType>& heatMapTypes = {},
-                          const ScaleMode heatMapScale = ScaleMode::ZeroToOne, const bool addPartCandidates = false,
-                          const float renderThreshold = 0.05f, const int numberPeopleMax = -1,
-                          const bool enableGoogleLogging = true);
+        WrapperStructPose(
+            const bool enable = true, const Point<int>& netInputSize = Point<int>{656, 368},
+            const Point<int>& outputSize = Point<int>{-1, -1},
+            const ScaleMode keypointScale = ScaleMode::InputResolution, const int gpuNumber = -1,
+            const int gpuNumberStart = 0, const int scalesNumber = 1, const float scaleGap = 0.15f,
+            const RenderMode renderMode = RenderMode::Gpu, const PoseModel poseModel = PoseModel::BODY_25,
+            const bool blendOriginalFrame = true, const float alphaKeypoint = POSE_DEFAULT_ALPHA_KEYPOINT,
+            const float alphaHeatMap = POSE_DEFAULT_ALPHA_HEAT_MAP, const int defaultPartToRender = 0,
+            const std::string& modelFolder = "models/", const std::vector<HeatMapType>& heatMapTypes = {},
+            const ScaleMode heatMapScale = ScaleMode::ZeroToOne, const bool addPartCandidates = false,
+            const float renderThreshold = 0.05f, const int numberPeopleMax = -1, const bool maximizePositives = false,
+            const double fpsMax = -1., const bool enableGoogleLogging = true);
     };
 }
 

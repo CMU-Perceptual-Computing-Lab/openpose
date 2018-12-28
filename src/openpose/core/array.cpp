@@ -161,6 +161,37 @@ namespace op
     }
 
     template<typename T>
+    Array<T>::Array(const Array<T>& array, const int index, const bool noCopy)
+    {
+        try
+        {
+            // Sanity check
+            if (array.getSize(0) <= index)
+                error("Index out of range.", __LINE__, __FUNCTION__, __FILE__);
+            // Define new size
+            auto sizes = array.getSize();
+            sizes[0] = 1;
+            // Move --> Temporary Array<T> as long as `array` is in scope
+            if (noCopy)
+                resetAuxiliary(sizes, array.getPseudoConstPtr() + index*array.getVolume(1));
+            // Copy --> Slower but it will always stay in scope
+            else
+            {
+                // Allocate memory
+                reset(sizes);
+                // Copy desired index
+                const auto arrayArea = array.getVolume(1);
+                const auto keypointsIndex = index*arrayArea;
+                std::copy(&array[keypointsIndex], &array[keypointsIndex]+arrayArea, pData);
+            }
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    template<typename T>
     Array<T>::Array(const Array<T>& array) :
         mSize{array.mSize},
         mVolume{array.mVolume},
@@ -407,19 +438,22 @@ namespace op
     {
         try
         {
-            if (indexA < indexB)
+            const auto indexBFinal = (indexB != -1 ? indexB : (int)mSize.size()-1);
+            if (indexA < indexBFinal)
             {
-                if (0 <= indexA && (unsigned int)indexB < mSize.size()) // 0 <= indexA < indexB < mSize.size()
-                    return std::accumulate(mSize.begin()+indexA, mSize.begin()+indexB+1, 1ul, std::multiplies<size_t>());
+                // 0 <= indexA < indexBFinal < mSize.size()
+                if (0 <= indexA && (unsigned int)indexBFinal < mSize.size())
+                    return std::accumulate(
+                        mSize.begin()+indexA, mSize.begin()+indexBFinal+1, 1ull, std::multiplies<size_t>());
                 else
                 {
                     error("Indexes out of dimension.", __LINE__, __FUNCTION__, __FILE__);
                     return 0;
                 }
             }
-            else if (indexA == indexB)
+            else if (indexA == indexBFinal)
                 return mSize.at(indexA);
-            else // if (indexA > indexB)
+            else // if (indexA > indexBFinal)
             {
                 error("indexA > indexB.", __LINE__, __FUNCTION__, __FILE__);
                 return 0;
@@ -599,7 +633,7 @@ namespace op
             {
                 // New size & volume
                 mSize = sizes;
-                mVolume = {std::accumulate(sizes.begin(), sizes.end(), 1ul, std::multiplies<size_t>())};
+                mVolume = {std::accumulate(sizes.begin(), sizes.end(), std::size_t(1), std::multiplies<size_t>())};
                 // Prepare shared_ptr
                 if (dataPtr == nullptr)
                 {

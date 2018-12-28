@@ -125,7 +125,7 @@ namespace op
             {
                 const auto scaleDenseNet = 0.017;
                 const int imageArea = width * height;
-                const std::array<float,3> means{103.94,116.78,123.68};
+                const std::array<float,3> means{103.94f, 116.78f, 123.68f};
                 for (auto i = 0 ; i < 3 ; i++)
                 {
                     cv::Mat floatPtrImageCvWrapper(height, width, CV_32FC1, floatPtrImage + i*imageArea);
@@ -158,27 +158,54 @@ namespace op
         }
     }
 
-    cv::Mat resizeFixedAspectRatio(const cv::Mat& cvMat, const double scaleFactor, const Point<int>& targetSize,
-                                   const int borderMode, const cv::Scalar& borderValue)
+    void resizeFixedAspectRatio(cv::Mat& resizedCvMat, const cv::Mat& cvMat, const double scaleFactor,
+                                const Point<int>& targetSize, const int borderMode, const cv::Scalar& borderValue)
     {
         try
         {
             const cv::Size cvTargetSize{targetSize.x, targetSize.y};
-            cv::Mat resultingCvMat;
             cv::Mat M = cv::Mat::eye(2,3,CV_64F);
             M.at<double>(0,0) = scaleFactor;
             M.at<double>(1,1) = scaleFactor;
             if (scaleFactor != 1. || cvTargetSize != cvMat.size())
-                cv::warpAffine(cvMat, resultingCvMat, M, cvTargetSize,
-                               (scaleFactor < 1. ? cv::INTER_AREA : cv::INTER_CUBIC), borderMode, borderValue);
+                cv::warpAffine(cvMat, resizedCvMat, M, cvTargetSize,
+                               (scaleFactor > 1. ? cv::INTER_CUBIC : cv::INTER_AREA), borderMode, borderValue);
             else
-                resultingCvMat = cvMat.clone();
-            return resultingCvMat;
+                cvMat.copyTo(resizedCvMat);
         }
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return cv::Mat();
+        }
+    }
+
+    void keepRoiInside(cv::Rect& roi, const int imageWidth, const int imageHeight)
+    {
+        try
+        {
+            // x,y < 0
+            if (roi.x < 0)
+            {
+                roi.width += roi.x;
+                roi.x = 0;
+            }
+            if (roi.y < 0)
+            {
+                roi.height += roi.y;
+                roi.y = 0;
+            }
+            // Bigger than image
+            if (roi.width + roi.x >= imageWidth)
+                roi.width = imageWidth - 1 - roi.x;
+            if (roi.height + roi.y >= imageHeight)
+                roi.height = imageHeight - 1 - roi.y;
+            // Width/height negative
+            roi.width = fastMax(0, roi.width);
+            roi.height = fastMax(0, roi.height);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
     }
 }

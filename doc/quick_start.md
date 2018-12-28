@@ -14,7 +14,7 @@ OpenPose - Quick Start
 
 
 ## Quick Start
-Check that the library is working properly by running any of the following commands. Make sure that you are in the **root directory of the project** (i.e. in the OpenPose folder, not inside `build/` nor `windows/` nor `bin/`). In addition, `examples/media/video.avi` and `examples/media` do exist, no need to change the paths.
+Check that the library is working properly by running any of the following commands. Make sure that you are in the **root directory of the project** (i.e., in the OpenPose folder, not inside `build/` nor `windows/` nor `bin/`). In addition, `examples/media/video.avi` and `examples/media` do exist, no need to change the paths.
 
 ### Running on Video
 ```
@@ -130,10 +130,10 @@ build\x64\Release\OpenPoseDemo.exe --flir_camera --3d --number_people_max 1
 build\x64\Release\OpenPoseDemo.exe --flir_camera --3d --number_people_max 1 --face --hand
 ```
 
-2. Saving 3-D keypoints
+2. Saving 3-D keypoints and video
 ```
 # Ubuntu and Mac (same flags for Windows version)
-./build/examples/openpose/openpose.bin --flir_camera --3d --number_people_max 1 --write_json output_folder_path/
+./build/examples/openpose/openpose.bin --flir_camera --3d --number_people_max 1 --write_json output_folder_path/ --write_video_3d output_folder_path/video_3d.avi
 ```
 
 3. Fast stereo camera image saving (without keypoint detection) for later post-processing
@@ -141,7 +141,7 @@ build\x64\Release\OpenPoseDemo.exe --flir_camera --3d --number_people_max 1 --fa
 # Ubuntu and Mac (same flags for Windows version)
 # Saving video
 # Note: saving in PNG rather than JPG will improve image quality, but slow down FPS (depending on hard disk writing speed and camera number)
-./build/examples/openpose/openpose.bin --flir_camera --num_gpu 0 --write_video output_folder_path/video.avi --camera_fps 5
+./build/examples/openpose/openpose.bin --flir_camera --num_gpu 0 --write_video output_folder_path/video.avi --write_video_fps 5
 # Saving images
 # Note: saving in PNG rather than JPG will improve image quality, but slow down FPS (depending on hard disk writing speed and camera number)
 ./build/examples/openpose/openpose.bin --flir_camera --num_gpu 0 --write_images output_folder_path/ --write_images_format jpg
@@ -152,7 +152,7 @@ build\x64\Release\OpenPoseDemo.exe --flir_camera --3d --number_people_max 1 --fa
 # Ubuntu and Mac (same flags for Windows version)
 # Optionally add `--face` and/or `--hand` to include face and/or hands
 # Assuming 3 cameras
-# Note: We highly recommend to reduce `--output_resolution`. E.g. for 3 cameras recording at 1920x1080, the resulting image is (3x1920)x1080, so we recommend e.g. 640x360 (x3 reduction).
+# Note: We highly recommend to reduce `--output_resolution`. E.g., for 3 cameras recording at 1920x1080, the resulting image is (3x1920)x1080, so we recommend e.g. 640x360 (x3 reduction).
 # Video
 ./build/examples/openpose/openpose.bin --video output_folder_path/video.avi --3d_views 3 --3d --number_people_max 1 --output_resolution {desired_output_resolution}
 # Images

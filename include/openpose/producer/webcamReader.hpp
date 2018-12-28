@@ -21,18 +21,14 @@ namespace op
          * @param webcamIndex const int indicating the camera source (see the OpenCV documentation about
          * cv::VideoCapture for more details), in the range [0, 9].
          * @param webcamResolution const Point<int> parameter which specifies the desired camera resolution.
-         * @param fps Double parameter which specifies the desired camera frame rate.
+         * @param throwExceptionIfNoOpened Bool parameter which specifies whether to throw an exception if the camera
+         * cannot be opened.
          */
         explicit WebcamReader(const int webcamIndex = 0, const Point<int>& webcamResolution = Point<int>{},
-                              const double fps = 30., const bool throwExceptionIfNoOpened = true);
+                              const bool throwExceptionIfNoOpened = true, const std::string& cameraParameterPath = "",
+                              const bool undistortImage = false);
 
         virtual ~WebcamReader();
-
-        std::vector<cv::Mat> getCameraMatrices();
-
-        std::vector<cv::Mat> getCameraExtrinsics();
-
-        std::vector<cv::Mat> getCameraIntrinsics();
 
         std::string getNextFrameName();
 
@@ -44,7 +40,6 @@ namespace op
 
     private:
         const int mIndex;
-        double mFps;
         long long mFrameNameCounter;
         bool mThreadOpened;
         cv::Mat mBuffer;

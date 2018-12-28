@@ -5,6 +5,7 @@
 #include <openpose/wrapper/enumClasses.hpp>
 #include <openpose/wrapper/wrapperStructExtra.hpp>
 #include <openpose/wrapper/wrapperStructFace.hpp>
+#include <openpose/wrapper/wrapperStructGui.hpp>
 #include <openpose/wrapper/wrapperStructHand.hpp>
 #include <openpose/wrapper/wrapperStructInput.hpp>
 #include <openpose/wrapper/wrapperStructOutput.hpp>
@@ -22,17 +23,15 @@ namespace op
      * @param wrapperStructOutput
      * @param renderOutput
      * @param userOutputWsEmpty
+     * @param producerSharedPtr
      * @param threadManagerMode
      */
-    OP_API void wrapperConfigureSanityChecks(WrapperStructPose& wrapperStructPose,
-                                             const WrapperStructFace& wrapperStructFace,
-                                             const WrapperStructHand& wrapperStructHand,
-                                             const WrapperStructExtra& wrapperStructExtra,
-                                             const WrapperStructInput& wrapperStructInput,
-                                             const WrapperStructOutput& wrapperStructOutput,
-                                             const bool renderOutput,
-                                             const bool userOutputWsEmpty,
-                                             const ThreadManagerMode threadManagerMode);
+    OP_API void wrapperConfigureSanityChecks(
+        WrapperStructPose& wrapperStructPose, const WrapperStructFace& wrapperStructFace,
+        const WrapperStructHand& wrapperStructHand, const WrapperStructExtra& wrapperStructExtra,
+        const WrapperStructInput& wrapperStructInput, const WrapperStructOutput& wrapperStructOutput,
+        const WrapperStructGui& wrapperStructGui, const bool renderOutput, const bool userOutputWsEmpty,
+        const std::shared_ptr<Producer>& producerSharedPtr, const ThreadManagerMode threadManagerMode);
 
     /**
      * Thread ID increase (private internal function).
@@ -53,12 +52,12 @@ namespace op
     template<typename TDatums,
              typename TDatumsSP = std::shared_ptr<TDatums>,
              typename TWorker = std::shared_ptr<Worker<TDatumsSP>>>
-    OP_API void configureThreadManager(
+    void configureThreadManager(
         ThreadManager<TDatumsSP>& threadManager, const bool multiThreadEnabled,
         const ThreadManagerMode threadManagerMode, const WrapperStructPose& wrapperStructPose,
         const WrapperStructFace& wrapperStructFace, const WrapperStructHand& wrapperStructHand,
         const WrapperStructExtra& wrapperStructExtra, const WrapperStructInput& wrapperStructInput,
-        const WrapperStructOutput& wrapperStructOutput,
+        const WrapperStructOutput& wrapperStructOutput, const WrapperStructGui& wrapperStructGui,
         const std::array<std::vector<TWorker>, int(WorkerType::Size)>& userWs,
         const std::array<bool, int(WorkerType::Size)>& userWsOnNewThread);
 }
@@ -88,7 +87,7 @@ namespace op
         const ThreadManagerMode threadManagerMode, const WrapperStructPose& wrapperStructPoseTemp,
         const WrapperStructFace& wrapperStructFace, const WrapperStructHand& wrapperStructHand,
         const WrapperStructExtra& wrapperStructExtra, const WrapperStructInput& wrapperStructInput,
-        const WrapperStructOutput& wrapperStructOutput,
+        const WrapperStructOutput& wrapperStructOutput, const WrapperStructGui& wrapperStructGui,
         const std::array<std::vector<TWorker>, int(WorkerType::Size)>& userWs,
         const std::array<bool, int(WorkerType::Size)>& userWsOnNewThread)
     {
@@ -96,21 +95,15 @@ namespace op
         {
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
+            // Create producer
+            auto producerSharedPtr = createProducer(
+                wrapperStructInput.producerType, wrapperStructInput.producerString,
+                wrapperStructInput.cameraResolution, wrapperStructInput.cameraParameterPath,
+                wrapperStructInput.undistortImage, wrapperStructInput.numberViews);
+
             // Editable arguments
             auto wrapperStructPose = wrapperStructPoseTemp;
             auto multiThreadEnabled = multiThreadEnabledTemp;
-
-            // Workers
-            TWorker datumProducerW;
-            TWorker scaleAndSizeExtractorW;
-            TWorker cvMatToOpInputW;
-            TWorker cvMatToOpOutputW;
-            std::vector<std::vector<TWorker>> poseExtractorsWs;
-            std::vector<std::vector<TWorker>> poseTriangulationsWs;
-            std::vector<std::vector<TWorker>> jointAngleEstimationsWs;
-            std::vector<TWorker> postProcessingWs;
-            std::vector<TWorker> outputWs;
-            TWorker guiW;
 
             // User custom workers
             const auto& userInputWs = userWs[int(WorkerType::Input)];
@@ -139,9 +132,10 @@ namespace op
 
             // Check no wrong/contradictory flags enabled
             const auto userOutputWsEmpty = userOutputWs.empty();
-            wrapperConfigureSanityChecks(wrapperStructPose, wrapperStructFace, wrapperStructHand, wrapperStructExtra,
-                                         wrapperStructInput, wrapperStructOutput, renderOutput, userOutputWsEmpty,
-                                         threadManagerMode);
+            wrapperConfigureSanityChecks(
+                wrapperStructPose, wrapperStructFace, wrapperStructHand, wrapperStructExtra, wrapperStructInput,
+                wrapperStructOutput, wrapperStructGui, renderOutput, userOutputWsEmpty, producerSharedPtr,
+                threadManagerMode);
 
             // Get number threads
             auto numberThreads = wrapperStructPose.gpuNumber;
@@ -194,30 +188,30 @@ namespace op
             // Common parameters
             auto finalOutputSize = wrapperStructPose.outputSize;
             Point<int> producerSize{-1,-1};
-            const auto oPProducer = (wrapperStructInput.producerSharedPtr != nullptr);
+            const auto oPProducer = (producerSharedPtr != nullptr);
             if (oPProducer)
             {
                 // 1. Set producer properties
                 const auto displayProducerFpsMode = (wrapperStructInput.realTimeProcessing
                                                       ? ProducerFpsMode::OriginalFps : ProducerFpsMode::RetrievalFps);
-                wrapperStructInput.producerSharedPtr->setProducerFpsMode(displayProducerFpsMode);
-                wrapperStructInput.producerSharedPtr->set(ProducerProperty::Flip, wrapperStructInput.frameFlip);
-                wrapperStructInput.producerSharedPtr->set(ProducerProperty::Rotation, wrapperStructInput.frameRotate);
-                wrapperStructInput.producerSharedPtr->set(ProducerProperty::AutoRepeat,
-                                                          wrapperStructInput.framesRepeat);
+                producerSharedPtr->setProducerFpsMode(displayProducerFpsMode);
+                producerSharedPtr->set(ProducerProperty::Flip, wrapperStructInput.frameFlip);
+                producerSharedPtr->set(ProducerProperty::Rotation, wrapperStructInput.frameRotate);
+                producerSharedPtr->set(ProducerProperty::AutoRepeat, wrapperStructInput.framesRepeat);
                 // 2. Set finalOutputSize
-                producerSize = Point<int>{(int)wrapperStructInput.producerSharedPtr->get(CV_CAP_PROP_FRAME_WIDTH),
-                                          (int)wrapperStructInput.producerSharedPtr->get(CV_CAP_PROP_FRAME_HEIGHT)};
+                producerSize = Point<int>{(int)producerSharedPtr->get(CV_CAP_PROP_FRAME_WIDTH),
+                                          (int)producerSharedPtr->get(CV_CAP_PROP_FRAME_HEIGHT)};
                 // Set finalOutputSize to input size if desired
                 if (finalOutputSize.x == -1 || finalOutputSize.y == -1)
                     finalOutputSize = producerSize;
             }
 
             // Producer
+            TWorker datumProducerW;
             if (oPProducer)
             {
                 const auto datumProducer = std::make_shared<DatumProducer<TDatums>>(
-                    wrapperStructInput.producerSharedPtr, wrapperStructInput.frameFirst, wrapperStructInput.frameStep,
+                    producerSharedPtr, wrapperStructInput.frameFirst, wrapperStructInput.frameStep,
                     wrapperStructInput.frameLast, spVideoSeek
                 );
                 datumProducerW = std::make_shared<WDatumProducer<TDatumsSP, TDatums>>(datumProducer);
@@ -230,6 +224,14 @@ namespace op
             std::vector<std::shared_ptr<HandExtractorNet>> handExtractorNets;
             std::vector<std::shared_ptr<PoseGpuRenderer>> poseGpuRenderers;
             std::shared_ptr<PoseCpuRenderer> poseCpuRenderer;
+            // Workers
+            TWorker scaleAndSizeExtractorW;
+            TWorker cvMatToOpInputW;
+            TWorker cvMatToOpOutputW;
+            std::vector<std::vector<TWorker>> poseExtractorsWs;
+            std::vector<std::vector<TWorker>> poseTriangulationsWs;
+            std::vector<std::vector<TWorker>> jointAngleEstimationsWs;
+            std::vector<TWorker> postProcessingWs;
             if (numberThreads > 0)
             {
                 // Get input scales and sizes
@@ -259,7 +261,8 @@ namespace op
                         poseExtractorNets.emplace_back(std::make_shared<PoseExtractorCaffe>(
                             wrapperStructPose.poseModel, modelFolder, gpuId + gpuNumberStart,
                             wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale,
-                            wrapperStructPose.addPartCandidates, wrapperStructPose.enableGoogleLogging
+                            wrapperStructPose.addPartCandidates, wrapperStructPose.maximizePositives,
+                            wrapperStructPose.enableGoogleLogging
                         ));
 
                     // Pose renderers
@@ -523,7 +526,7 @@ namespace op
                             poseTriangulation)};
                     }
                 }
-                // Itermediate workers (e.g. OpenPose format to cv::Mat, json & frames recorder, ...)
+                // Itermediate workers (e.g., OpenPose format to cv::Mat, json & frames recorder, ...)
                 postProcessingWs.clear();
                 // // Person ID identification (when no multi-thread and no dependency on tracking)
                 // if (wrapperStructExtra.identification)
@@ -557,8 +560,8 @@ namespace op
             }
 
             // IK/Adam
-            const auto displayAdam = wrapperStructOutput.displayMode == DisplayMode::DisplayAdam
-                                     || (wrapperStructOutput.displayMode == DisplayMode::DisplayAll
+            const auto displayAdam = wrapperStructGui.displayMode == DisplayMode::DisplayAdam
+                                     || (wrapperStructGui.displayMode == DisplayMode::DisplayAll
                                          && wrapperStructExtra.ikThreads > 0);
             jointAngleEstimationsWs.clear();
 #ifdef USE_3D_ADAM_MODEL
@@ -576,8 +579,16 @@ namespace op
 #endif
 
             // Output workers
-            outputWs.clear();
+            std::vector<TWorker> outputWs;
+            // Print verbose
+            if (wrapperStructOutput.verbose > 0.)
+            {
+                const auto verbosePrinter = std::make_shared<VerbosePrinter>(
+                    wrapperStructOutput.verbose, producerSharedPtr->get(CV_CAP_PROP_FRAME_COUNT));
+                outputWs.emplace_back(std::make_shared<WVerbosePrinter<TDatumsSP>>(verbosePrinter));
+            }
             // Send information (e.g., to Unity) though UDP client-server communication
+
 #ifdef USE_3D_ADAM_MODEL
             if (!wrapperStructOutput.udpHost.empty() && !wrapperStructOutput.udpPort.empty())
             {
@@ -609,8 +620,12 @@ namespace op
             {
                 // If humanFormat: bigger size (& maybe slower to process), but easier for user to read it
                 const auto humanFormat = true;
-                const auto cocoJsonSaver = std::make_shared<CocoJsonSaver>(wrapperStructOutput.writeCocoJson,
-                                                                           humanFormat, CocoJsonFormat::Body);
+                const auto cocoJsonSaver = std::make_shared<CocoJsonSaver>(
+                    wrapperStructOutput.writeCocoJson, wrapperStructPose.poseModel, humanFormat,
+                    (wrapperStructPose.poseModel != PoseModel::CAR_22
+                        && wrapperStructPose.poseModel != PoseModel::CAR_12
+                        ? CocoJsonFormat::Body : CocoJsonFormat::Car),
+                    wrapperStructOutput.writeCocoJsonVariant);
                 outputWs.emplace_back(std::make_shared<WCocoJsonSaver<TDatumsSP>>(cocoJsonSaver));
             }
             // Write people foot pose data on disk (COCO validation json format for foot data)
@@ -618,8 +633,9 @@ namespace op
             {
                 // If humanFormat: bigger size (& maybe slower to process), but easier for user to read it
                 const auto humanFormat = true;
-                const auto cocoJsonSaver = std::make_shared<CocoJsonSaver>(wrapperStructOutput.writeCocoFootJson,
-                                                                           humanFormat, CocoJsonFormat::Foot);
+                const auto cocoJsonSaver = std::make_shared<CocoJsonSaver>(
+                    wrapperStructOutput.writeCocoFootJson, wrapperStructPose.poseModel, humanFormat,
+                    CocoJsonFormat::Foot);
                 outputWs.emplace_back(std::make_shared<WCocoJsonSaver<TDatumsSP>>(cocoJsonSaver));
             }
             // Write frames as desired image format on hard disk
@@ -629,24 +645,30 @@ namespace op
                                                                      wrapperStructOutput.writeImagesFormat);
                 outputWs.emplace_back(std::make_shared<WImageSaver<TDatumsSP>>(imageSaver));
             }
+            auto originalVideoFps = 0.;
+            if (!wrapperStructOutput.writeVideo.empty() || !wrapperStructOutput.writeVideo3D.empty()
+                || !wrapperStructOutput.writeBvh.empty())
+            {
+                if (wrapperStructOutput.writeVideoFps <= 0
+                    && (!oPProducer || producerSharedPtr->get(CV_CAP_PROP_FPS) <= 0))
+                    error("The frame rate of the frames producer is unknown. Set `--write_video_fps` to your desired"
+                          " FPS if you wanna record video (`--write_video`). E.g., if it is a folder of images, you"
+                          " will have to know or guess the frame rate; if it is a webcam, you should use the OpenPose"
+                          " displayed FPS as desired value. If you do not care, simply add `--write_video_fps 30`.",
+                          __LINE__, __FUNCTION__, __FILE__);
+                originalVideoFps = (
+                    wrapperStructOutput.writeVideoFps > 0 ?
+                    wrapperStructOutput.writeVideoFps : producerSharedPtr->get(CV_CAP_PROP_FPS));
+            }
             // Write frames as *.avi video on hard disk
-            const auto producerFps = (wrapperStructInput.producerSharedPtr == nullptr ?
-                                        0. : wrapperStructInput.producerSharedPtr->get(CV_CAP_PROP_FPS));
-            const auto originalVideoFps = (wrapperStructOutput.writeVideoFps > 0 ?
-                                            wrapperStructOutput.writeVideoFps
-                                            : producerFps);
             if (!wrapperStructOutput.writeVideo.empty())
             {
                 if (!oPProducer)
                     error("Video file can only be recorded inside `wrapper/wrapper.hpp` if the producer"
-                          " is one of the default ones (e.g. video, webcam, ...).",
+                          " is one of the default ones (e.g., video, webcam, ...).",
                           __LINE__, __FUNCTION__, __FILE__);
-                if (finalOutputSize.x <= 0 || finalOutputSize.y <= 0)
-                    error("Video can only be recorded if outputSize is fixed (e.g. video, webcam, IP camera),"
-                          "but not for a image directory.", __LINE__, __FUNCTION__, __FILE__);
                 const auto videoSaver = std::make_shared<VideoSaver>(
-                    wrapperStructOutput.writeVideo, CV_FOURCC('M','J','P','G'), originalVideoFps, finalOutputSize
-                );
+                    wrapperStructOutput.writeVideo, CV_FOURCC('M','J','P','G'), originalVideoFps);
                 outputWs.emplace_back(std::make_shared<WVideoSaver<TDatumsSP>>(videoSaver));
             }
             // Write joint angles as *.bvh file on hard disk
@@ -662,23 +684,24 @@ namespace op
             // Write heat maps as desired image format on hard disk
             if (!writeHeatMapsCleaned.empty())
             {
-                const auto heatMapSaver = std::make_shared<HeatMapSaver>(writeHeatMapsCleaned,
-                                                                         wrapperStructOutput.writeHeatMapsFormat);
+                const auto heatMapSaver = std::make_shared<HeatMapSaver>(
+                    writeHeatMapsCleaned, wrapperStructOutput.writeHeatMapsFormat);
                 outputWs.emplace_back(std::make_shared<WHeatMapSaver<TDatumsSP>>(heatMapSaver));
             }
             // Add frame information for GUI
-            const bool guiEnabled = (wrapperStructOutput.displayMode != DisplayMode::NoDisplay);
+            const bool guiEnabled = (wrapperStructGui.displayMode != DisplayMode::NoDisplay);
             // If this WGuiInfoAdder instance is placed before the WImageSaver or WVideoSaver, then the resulting
             // recorded frames will look exactly as the final displayed image by the GUI
-            if (wrapperStructOutput.guiVerbose && (guiEnabled || !userOutputWs.empty()
-                                                   || threadManagerMode == ThreadManagerMode::Asynchronous
-                                                   || threadManagerMode == ThreadManagerMode::AsynchronousOut))
+            if (wrapperStructGui.guiVerbose && (guiEnabled || !userOutputWs.empty()
+                                                || threadManagerMode == ThreadManagerMode::Asynchronous
+                                                || threadManagerMode == ThreadManagerMode::AsynchronousOut))
             {
                 const auto guiInfoAdder = std::make_shared<GuiInfoAdder>(numberThreads, guiEnabled);
                 outputWs.emplace_back(std::make_shared<WGuiInfoAdder<TDatumsSP>>(guiInfoAdder));
             }
             // Minimal graphical user interface (GUI)
-            guiW = nullptr;
+            TWorker guiW;
+            TWorker videoSaver3DW;
             if (guiEnabled)
             {
                 // PoseRenderers to Renderers
@@ -689,48 +712,72 @@ namespace op
                     for (const auto& poseGpuRenderer : poseGpuRenderers)
                         renderers.emplace_back(std::static_pointer_cast<Renderer>(poseGpuRenderer));
                 // Display
+                const auto numberViews = (intRound(producerSharedPtr->get(ProducerProperty::NumberViews)));
+                auto finalOutputSizeGui = finalOutputSize;
+                if (numberViews > 1 && finalOutputSizeGui.x > 0)
+                    finalOutputSizeGui.x *= numberViews;
                 // Adam (+3-D/2-D) display
                 if (displayAdam)
                 {
 #ifdef USE_3D_ADAM_MODEL
                     // Gui
                     const auto gui = std::make_shared<GuiAdam>(
-                        finalOutputSize, wrapperStructOutput.fullScreen, threadManager.getIsRunningSharedPtr(),
+                        finalOutputSizeGui, wrapperStructGui.fullScreen, threadManager.getIsRunningSharedPtr(),
                         spVideoSeek, poseExtractorNets, faceExtractorNets, handExtractorNets, renderers,
-                        wrapperStructOutput.displayMode, JointAngleEstimation::getTotalModel(),
+                        wrapperStructGui.displayMode, JointAngleEstimation::getTotalModel(),
                         wrapperStructOutput.writeVideoAdam
                     );
                     // WGui
                     guiW = {std::make_shared<WGuiAdam<TDatumsSP>>(gui)};
+                    // Write 3D frames as *.avi video on hard disk
+                    if (!wrapperStructOutput.writeVideo3D.empty())
+                        error("3D video can only be recorded if 3D render is enabled.",
+                              __LINE__, __FUNCTION__, __FILE__);
 #endif
                 }
                 // 3-D (+2-D) display
-                else if (wrapperStructOutput.displayMode == DisplayMode::Display3D
-                    || wrapperStructOutput.displayMode == DisplayMode::DisplayAll)
+                else if (wrapperStructGui.displayMode == DisplayMode::Display3D
+                    || wrapperStructGui.displayMode == DisplayMode::DisplayAll)
                 {
                     // Gui
                     const auto gui = std::make_shared<Gui3D>(
-                        finalOutputSize, wrapperStructOutput.fullScreen, threadManager.getIsRunningSharedPtr(),
+                        finalOutputSizeGui, wrapperStructGui.fullScreen, threadManager.getIsRunningSharedPtr(),
                         spVideoSeek, poseExtractorNets, faceExtractorNets, handExtractorNets, renderers,
-                        wrapperStructPose.poseModel, wrapperStructOutput.displayMode
+                        wrapperStructPose.poseModel, wrapperStructGui.displayMode,
+                        !wrapperStructOutput.writeVideo3D.empty()
                     );
                     // WGui
                     guiW = {std::make_shared<WGui3D<TDatumsSP>>(gui)};
+                    // Write 3D frames as *.avi video on hard disk
+                    if (!wrapperStructOutput.writeVideo3D.empty())
+                    {
+                        const auto videoSaver = std::make_shared<VideoSaver>(
+                            wrapperStructOutput.writeVideo3D, CV_FOURCC('M','J','P','G'), originalVideoFps);
+                        videoSaver3DW = std::make_shared<WVideoSaver3D<TDatumsSP>>(videoSaver);
+                    }
                 }
                 // 2-D display
-                else if (wrapperStructOutput.displayMode == DisplayMode::Display2D)
+                else if (wrapperStructGui.displayMode == DisplayMode::Display2D)
                 {
                     // Gui
                     const auto gui = std::make_shared<Gui>(
-                        finalOutputSize, wrapperStructOutput.fullScreen, threadManager.getIsRunningSharedPtr(),
+                        finalOutputSizeGui, wrapperStructGui.fullScreen, threadManager.getIsRunningSharedPtr(),
                         spVideoSeek, poseExtractorNets, faceExtractorNets, handExtractorNets, renderers
                     );
                     // WGui
                     guiW = {std::make_shared<WGui<TDatumsSP>>(gui)};
+                    // Write 3D frames as *.avi video on hard disk
+                    if (!wrapperStructOutput.writeVideo3D.empty())
+                        error("3D video can only be recorded if 3D render is enabled.",
+                              __LINE__, __FUNCTION__, __FILE__);
                 }
                 else
                     error("Unknown DisplayMode.", __LINE__, __FUNCTION__, __FILE__);
             }
+            // Set FpsMax
+            TWorker wFpsMax;
+            if (wrapperStructPose.fpsMax > 0.)
+                wFpsMax = std::make_shared<WFpsMax<TDatumsSP>>(wrapperStructPose.fpsMax);
             // Set wrapper as configured
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
@@ -829,7 +876,7 @@ namespace op
                 {
                     if (poseExtractorsWs.size() > 1)
                         log("Multi-threading disabled, only 1 thread running. All GPUs have been disabled but the"
-                            " first one, which is defined by gpuNumberStart (e.g. in the OpenPose demo, it is set"
+                            " first one, which is defined by gpuNumberStart (e.g., in the OpenPose demo, it is set"
                             " with the `--num_gpu_start` flag).", Priority::High);
                     log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     threadManager.add(threadId, poseExtractorsWs.at(0), queueIn++, queueOut++);
@@ -961,9 +1008,19 @@ namespace op
                 // Thread Y+1, queues Q+1 -> Q+2
                 log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 threadManager.add(threadId, guiW, queueIn++, queueOut++);
+                // Saving 3D output
+                if (videoSaver3DW != nullptr)
+                    threadManager.add(threadId, videoSaver3DW, queueIn++, queueOut++);
                 threadIdPP(threadId, multiThreadEnabled);
             }
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            // Setting maximum speed
+            if (wFpsMax != nullptr)
+            {
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                threadManager.add(threadId, wFpsMax, queueIn++, queueOut++);
+                threadIdPP(threadId, multiThreadEnabled);
+            }
         }
         catch (const std::exception& e)
         {

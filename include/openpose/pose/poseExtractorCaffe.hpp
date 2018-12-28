@@ -14,6 +14,7 @@ namespace op
                            const std::vector<HeatMapType>& heatMapTypes = {},
                            const ScaleMode heatMapScale = ScaleMode::ZeroToOne,
                            const bool addPartCandidates = false,
+                           const bool maximizePositives = false,
                            const bool enableGoogleLogging = true);
 
         virtual ~PoseExtractorCaffe();

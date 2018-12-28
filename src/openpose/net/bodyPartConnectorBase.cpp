@@ -65,19 +65,20 @@ namespace op
     {
         try
         {
-            if (poseModel == PoseModel::BODY_25E)
-                error("BODY_25E not implemented for CPU body connector.", __LINE__, __FUNCTION__, __FILE__);
+            if (poseModel != PoseModel::BODY_25 && poseModel != PoseModel::COCO_18
+                && poseModel != PoseModel::MPI_15 && poseModel != PoseModel::MPI_15_4)
+                error("Model not implemented for CPU body connector.", __LINE__, __FUNCTION__, __FILE__);
 
             // std::vector<std::pair<std::vector<int>, double>> refers to:
             //     - std::vector<int>: [body parts locations, #body parts found]
             //     - double: person subset score
             std::vector<std::pair<std::vector<int>, T>> peopleVector;
             const auto& mapIdx = getPoseMapIndex(poseModel);
-            const auto numberBodyPartsAndBkg = numberBodyParts + 1;
+            const auto numberBodyPartsAndBkg = numberBodyParts + (addBkgChannel(poseModel) ? 1 : 0);
             const auto vectorSize = numberBodyParts+1;
             const auto peaksOffset = 3*(maxPeaks+1);
             const auto heatMapOffset = heatMapSize.area();
-            // Iterate over it PAF connection, e.g. neck-nose, neck-Lshoulder, etc.
+            // Iterate over it PAF connection, e.g., neck-nose, neck-Lshoulder, etc.
             for (auto pairIndex = 0u; pairIndex < numberBodyPartPairs; pairIndex++)
             {
                 const auto bodyPartA = bodyPartPairs[2*pairIndex];
@@ -87,11 +88,11 @@ namespace op
                 const auto numberPeaksA = intRound(candidateAPtr[0]);
                 const auto numberPeaksB = intRound(candidateBPtr[0]);
 
-                // E.g. neck-nose connection. If one of them is empty (e.g. no noses detected)
+                // E.g., neck-nose connection. If one of them is empty (e.g., no noses detected)
                 // Add the non-empty elements into the peopleVector
                 if (numberPeaksA == 0 || numberPeaksB == 0)
                 {
-                    // E.g. neck-nose connection. If no necks, add all noses
+                    // E.g., neck-nose connection. If no necks, add all noses
                     // Change w.r.t. other
                     if (numberPeaksA == 0) // numberPeaksB == 0 or not
                     {
@@ -140,7 +141,7 @@ namespace op
                             }
                         }
                     }
-                    // E.g. neck-nose connection. If no noses, add all necks
+                    // E.g., neck-nose connection. If no noses, add all necks
                     else // if (numberPeaksA != 0 && numberPeaksB == 0)
                     {
                         // Non-MPI
@@ -189,7 +190,7 @@ namespace op
                         }
                     }
                 }
-                // E.g. neck-nose connection. If necks and noses, look for maximums
+                // E.g., neck-nose connection. If necks and noses, look for maximums
                 else // if (numberPeaksA != 0 && numberPeaksB != 0)
                 {
                     // (score, indexA, indexB). Inverted order for easy std::sort
@@ -202,17 +203,17 @@ namespace op
                                          + (numberBodyPartsAndBkg + mapIdx[2*pairIndex]) * heatMapOffset;
                         const auto* mapY = heatMapPtr
                                          + (numberBodyPartsAndBkg + mapIdx[2*pairIndex+1]) * heatMapOffset;
-                        // E.g. neck-nose connection. For each neck
+                        // E.g., neck-nose connection. For each neck
                         for (auto i = 1; i <= numberPeaksA; i++)
                         {
-                            // E.g. neck-nose connection. For each nose
+                            // E.g., neck-nose connection. For each nose
                             for (auto j = 1; j <= numberPeaksB; j++)
                             {
                                 // Initial PAF
                                 auto scoreAB = getScoreAB(i, j, candidateAPtr, candidateBPtr, mapX, mapY,
                                                           heatMapSize, interThreshold, interMinAboveThreshold);
 
-                                // E.g. neck-nose connection. If possible PAF between neck i, nose j --> add
+                                // E.g., neck-nose connection. If possible PAF between neck i, nose j --> add
                                 // parts score + connection score
                                 if (scoreAB > 1e-6)
                                     allABConnections.emplace_back(std::make_tuple(scoreAB, i, j));
@@ -222,16 +223,16 @@ namespace op
                     else if (!pairScores.empty())
                     {
                         const auto firstIndex = (int)pairIndex*pairScores.getSize(1)*pairScores.getSize(2);
-                        // E.g. neck-nose connection. For each neck
+                        // E.g., neck-nose connection. For each neck
                         for (auto i = 0; i < numberPeaksA; i++)
                         {
                             const auto iIndex = firstIndex + i*pairScores.getSize(2);
-                            // E.g. neck-nose connection. For each nose
+                            // E.g., neck-nose connection. For each nose
                             for (auto j = 0; j < numberPeaksB; j++)
                             {
                                 const auto scoreAB = pairScores[iIndex + j];
 
-                                // E.g. neck-nose connection. If possible PAF between neck i, nose j --> add
+                                // E.g., neck-nose connection. If possible PAF between neck i, nose j --> add
                                 // parts score + connection score
                                 if (scoreAB > 1e-6)
                                     // +1 because peaksPtr starts with counter
@@ -335,7 +336,7 @@ namespace op
                             {
                                 const auto indexA = std::get<0>(abConnection);
                                 const auto indexB = std::get<1>(abConnection);
-                                const auto score = std::get<2>(abConnection);
+                                const auto score = T(std::get<2>(abConnection));
                                 bool found = false;
                                 for (auto& personVector : peopleVector)
                                 {
@@ -396,16 +397,16 @@ namespace op
                 const auto numberPeaksA = intRound(candidateAPtr[0]);
                 const auto numberPeaksB = intRound(candidateBPtr[0]);
                 const auto firstIndex = (int)pairIndex*pairScores.getSize(1)*pairScores.getSize(2);
-                // E.g. neck-nose connection. For each neck
+                // E.g., neck-nose connection. For each neck
                 for (auto indexA = 0; indexA < numberPeaksA; indexA++)
                 {
                     const auto iIndex = firstIndex + indexA*pairScores.getSize(2);
-                    // E.g. neck-nose connection. For each nose
+                    // E.g., neck-nose connection. For each nose
                     for (auto indexB = 0; indexB < numberPeaksB; indexB++)
                     {
                         const auto scoreAB = pairScores[iIndex + indexB];
 
-                        // E.g. neck-nose connection. If possible PAF between neck indexA, nose indexB --> add
+                        // E.g., neck-nose connection. If possible PAF between neck indexA, nose indexB --> add
                         // parts score + connection score
                         if (scoreAB > 1e-6)
                         {
@@ -508,7 +509,7 @@ namespace op
                     // Score
                     const auto personScore = peaksPtr[indexScoreA] + peaksPtr[indexScoreB] + pafScore;
                     // Set associated personAssigned as assigned
-                    aAssigned = peopleVector.size();
+                    aAssigned = (int)peopleVector.size();
                     bAssigned = aAssigned;
                     // Create new personVector
                     peopleVector.emplace_back(std::make_pair(rowVector, personScore));
@@ -568,6 +569,8 @@ namespace op
                     auto& person1 = peopleVector[assigned1].first;
                     const auto& person2 = peopleVector[assigned2].first;
                     // Check if complementary
+                    // Defining found keypoint indexes in personA as kA, and analogously kB
+                    // Complementary if and only if kA intersection kB = empty. I.e., no common keypoints
                     bool complementary = true;
                     for (auto part = 0u ; part < numberBodyParts ; part++)
                     {
@@ -615,7 +618,8 @@ namespace op
     void removePeopleBelowThresholds(std::vector<int>& validSubsetIndexes, int& numberPeople,
                                      const std::vector<std::pair<std::vector<int>, T>>& peopleVector,
                                      const unsigned int numberBodyParts, const int minSubsetCnt,
-                                     const T minSubsetScore, const int maxPeaks)
+                                     const T minSubsetScore, const int maxPeaks,
+                                     const bool maximizePositives)
     {
         try
         {
@@ -633,7 +637,7 @@ namespace op
                 // same foot usually appears as both left and right keypoints)
                 // Pros: Removed tons of false positives
                 // Cons: Standalone leg will never be recorded
-                if (!COCO_CHALLENGE && numberBodyParts == 25)
+                if (!maximizePositives && numberBodyParts == 25)
                 {
                     // No consider foot keypoints for that
                     for (auto i = 19 ; i < 25 ; i++)
@@ -1095,14 +1099,15 @@ namespace op
     void connectBodyPartsCpu(Array<T>& poseKeypoints, Array<T>& poseScores, const T* const heatMapPtr,
                              const T* const peaksPtr, const PoseModel poseModel, const Point<int>& heatMapSize,
                              const int maxPeaks, const T interMinAboveThreshold, const T interThreshold,
-                             const int minSubsetCnt, const T minSubsetScore, const T scaleFactor)
+                             const int minSubsetCnt, const T minSubsetScore, const T scaleFactor,
+                             const bool maximizePositives)
     {
         try
         {
             // Parts Connection
             const auto& bodyPartPairs = getPosePartPairs(poseModel);
             const auto numberBodyParts = getPoseNumberBodyParts(poseModel);
-            const auto numberBodyPartPairs = bodyPartPairs.size() / 2;
+            const auto numberBodyPartPairs = (unsigned int)(bodyPartPairs.size() / 2);
             if (numberBodyParts == 0)
                 error("Invalid value of numberBodyParts, it must be positive, not " + std::to_string(numberBodyParts),
                       __LINE__, __FUNCTION__, __FILE__);
@@ -1122,7 +1127,7 @@ namespace op
             std::vector<int> validSubsetIndexes;
             validSubsetIndexes.reserve(fastMin((size_t)maxPeaks, peopleVector.size()));
             removePeopleBelowThresholds(validSubsetIndexes, numberPeople, peopleVector, numberBodyParts, minSubsetCnt,
-                                        minSubsetScore, maxPeaks);
+                                        minSubsetScore, maxPeaks, maximizePositives);
 
             // Fill and return poseKeypoints
             peopleVectorToPeopleArray(poseKeypoints, poseScores, scaleFactor, peopleVector, validSubsetIndexes,
@@ -1142,68 +1147,66 @@ namespace op
         }
     }
 
-    template void connectBodyPartsCpu(Array<float>& poseKeypoints, Array<float>& poseScores,
-                                      const float* const heatMapPtr, const float* const peaksPtr,
-                                      const PoseModel poseModel, const Point<int>& heatMapSize,
-                                      const int maxPeaks, const float interMinAboveThreshold,
-                                      const float interThreshold, const int minSubsetCnt,
-                                      const float minSubsetScore, const float scaleFactor);
-    template void connectBodyPartsCpu(Array<double>& poseKeypoints, Array<double>& poseScores,
-                                      const double* const heatMapPtr, const double* const peaksPtr,
-                                      const PoseModel poseModel, const Point<int>& heatMapSize,
-                                      const int maxPeaks, const double interMinAboveThreshold,
-                                      const double interThreshold, const int minSubsetCnt,
-                                      const double minSubsetScore, const double scaleFactor);
+    template OP_API void connectBodyPartsCpu(
+        Array<float>& poseKeypoints, Array<float>& poseScores, const float* const heatMapPtr,
+        const float* const peaksPtr, const PoseModel poseModel, const Point<int>& heatMapSize, const int maxPeaks,
+        const float interMinAboveThreshold, const float interThreshold, const int minSubsetCnt,
+        const float minSubsetScore, const float scaleFactor, const bool maximizePositives);
+    template OP_API void connectBodyPartsCpu(
+        Array<double>& poseKeypoints, Array<double>& poseScores, const double* const heatMapPtr,
+        const double* const peaksPtr, const PoseModel poseModel, const Point<int>& heatMapSize, const int maxPeaks,
+        const double interMinAboveThreshold, const double interThreshold, const int minSubsetCnt,
+        const double minSubsetScore, const double scaleFactor, const bool maximizePositives);
 
-    template std::vector<std::pair<std::vector<int>, float>> createPeopleVector(
+    template OP_API std::vector<std::pair<std::vector<int>, float>> createPeopleVector(
         const float* const heatMapPtr, const float* const peaksPtr, const PoseModel poseModel,
         const Point<int>& heatMapSize, const int maxPeaks, const float interThreshold,
         const float interMinAboveThreshold, const std::vector<unsigned int>& bodyPartPairs,
         const unsigned int numberBodyParts, const unsigned int numberBodyPartPairs,
         const Array<float>& precomputedPAFs);
-    template std::vector<std::pair<std::vector<int>, double>> createPeopleVector(
+    template OP_API std::vector<std::pair<std::vector<int>, double>> createPeopleVector(
         const double* const heatMapPtr, const double* const peaksPtr, const PoseModel poseModel,
         const Point<int>& heatMapSize, const int maxPeaks, const double interThreshold,
         const double interMinAboveThreshold, const std::vector<unsigned int>& bodyPartPairs,
         const unsigned int numberBodyParts, const unsigned int numberBodyPartPairs,
         const Array<double>& precomputedPAFs);
 
-    template void removePeopleBelowThresholds(
+    template OP_API void removePeopleBelowThresholds(
         std::vector<int>& validSubsetIndexes, int& numberPeople,
         const std::vector<std::pair<std::vector<int>, float>>& peopleVector,
         const unsigned int numberBodyParts,
-        const int minSubsetCnt, const float minSubsetScore, const int maxPeaks);
-    template void removePeopleBelowThresholds(
+        const int minSubsetCnt, const float minSubsetScore, const int maxPeaks, const bool maximizePositives);
+    template OP_API void removePeopleBelowThresholds(
         std::vector<int>& validSubsetIndexes, int& numberPeople,
         const std::vector<std::pair<std::vector<int>, double>>& peopleVector,
         const unsigned int numberBodyParts,
-        const int minSubsetCnt, const double minSubsetScore, const int maxPeaks);
+        const int minSubsetCnt, const double minSubsetScore, const int maxPeaks, const bool maximizePositives);
 
-    template void peopleVectorToPeopleArray(
+    template OP_API void peopleVectorToPeopleArray(
         Array<float>& poseKeypoints, Array<float>& poseScores, const float scaleFactor,
         const std::vector<std::pair<std::vector<int>, float>>& peopleVector,
         const std::vector<int>& validSubsetIndexes, const float* const peaksPtr,
         const int numberPeople, const unsigned int numberBodyParts,
         const unsigned int numberBodyPartPairs);
-    template void peopleVectorToPeopleArray(
+    template OP_API void peopleVectorToPeopleArray(
         Array<double>& poseKeypoints, Array<double>& poseScores, const double scaleFactor,
         const std::vector<std::pair<std::vector<int>, double>>& peopleVector,
         const std::vector<int>& validSubsetIndexes, const double* const peaksPtr,
         const int numberPeople, const unsigned int numberBodyParts,
         const unsigned int numberBodyPartPairs);
 
-    template std::vector<std::tuple<float, float, int, int, int>> pafPtrIntoVector(
+    template OP_API std::vector<std::tuple<float, float, int, int, int>> pafPtrIntoVector(
         const Array<float>& pairScores, const float* const peaksPtr, const int maxPeaks,
         const std::vector<unsigned int>& bodyPartPairs, const unsigned int numberBodyPartPairs);
-    template std::vector<std::tuple<double, double, int, int, int>> pafPtrIntoVector(
+    template OP_API std::vector<std::tuple<double, double, int, int, int>> pafPtrIntoVector(
         const Array<double>& pairScores, const double* const peaksPtr, const int maxPeaks,
         const std::vector<unsigned int>& bodyPartPairs, const unsigned int numberBodyPartPairs);
 
-    template std::vector<std::pair<std::vector<int>, float>> pafVectorIntoPeopleVector(
+    template OP_API std::vector<std::pair<std::vector<int>, float>> pafVectorIntoPeopleVector(
         const std::vector<std::tuple<float, float, int, int, int>>& pairConnections,
         const float* const peaksPtr, const int maxPeaks, const std::vector<unsigned int>& bodyPartPairs,
         const unsigned int numberBodyParts);
-    template std::vector<std::pair<std::vector<int>, double>> pafVectorIntoPeopleVector(
+    template OP_API std::vector<std::pair<std::vector<int>, double>> pafVectorIntoPeopleVector(
         const std::vector<std::tuple<double, double, int, int, int>>& pairConnections,
         const double* const peaksPtr, const int maxPeaks, const std::vector<unsigned int>& bodyPartPairs,
         const unsigned int numberBodyParts);

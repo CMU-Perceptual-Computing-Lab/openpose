@@ -1,4 +1,3 @@
-// #include <opencv2/opencv.hpp> // cv::imshow, cv::waitKey, cv::namedWindow, cv::setWindowProperty
 #include <opencv2/highgui/highgui.hpp> // cv::imshow, cv::waitKey, cv::namedWindow, cv::setWindowProperty
 #include <openpose/gui/frameDisplayer.hpp>
 

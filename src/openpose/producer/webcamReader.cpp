@@ -5,11 +5,11 @@
 
 namespace op
 {
-    WebcamReader::WebcamReader(const int webcamIndex, const Point<int>& webcamResolution, const double fps,
-                               const bool throwExceptionIfNoOpened) :
-        VideoCaptureReader{webcamIndex, throwExceptionIfNoOpened},
+    WebcamReader::WebcamReader(const int webcamIndex, const Point<int>& webcamResolution,
+                               const bool throwExceptionIfNoOpened, const std::string& cameraParameterPath,
+                               const bool undistortImage) :
+        VideoCaptureReader{webcamIndex, throwExceptionIfNoOpened, cameraParameterPath, undistortImage, 1},
         mIndex{webcamIndex},
-        mFps{fps},
         mFrameNameCounter{-1},
         mThreadOpened{std::atomic<bool>{false}},
         mResolution{webcamResolution}
@@ -66,45 +66,6 @@ namespace op
         }
     }
 
-    std::vector<cv::Mat> WebcamReader::getCameraMatrices()
-    {
-        try
-        {
-            return {};
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return {};
-        }
-    }
-
-    std::vector<cv::Mat> WebcamReader::getCameraExtrinsics()
-    {
-        try
-        {
-            return {};
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return {};
-        }
-    }
-
-    std::vector<cv::Mat> WebcamReader::getCameraIntrinsics()
-    {
-        try
-        {
-            return {};
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return {};
-        }
-    }
-
     std::string WebcamReader::getNextFrameName()
     {
         try
@@ -137,8 +98,6 @@ namespace op
         {
             if (capProperty == CV_CAP_PROP_POS_FRAMES)
                 return (double)mFrameNameCounter;
-            else if (capProperty == CV_CAP_PROP_FPS)
-                return mFps;
             else
                 return VideoCaptureReader::get(capProperty);
         }
@@ -153,10 +112,7 @@ namespace op
     {
         try
         {
-            if (capProperty == CV_CAP_PROP_FPS)
-                mFps = value;
-            else
-                VideoCaptureReader::set(capProperty, value);
+            VideoCaptureReader::set(capProperty, value);
         }
         catch (const std::exception& e)
         {
@@ -243,7 +199,7 @@ namespace op
                 {
                     cvMat = cv::Mat(mResolution.y, mResolution.x, CV_8UC3, cv::Scalar{0,0,0});
                     putTextOnCvMat(cvMat, "Camera disconnected, reconnecting...", {cvMat.cols/16, cvMat.rows/2},
-                                   cv::Scalar{255, 255, 255}, false, 2.3*cvMat.cols);
+                                   cv::Scalar{255, 255, 255}, false, intRound(2.3*cvMat.cols));
                 }
                 // Move to buffer
                 if (!cvMat.empty())

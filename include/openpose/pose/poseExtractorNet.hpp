@@ -14,7 +14,8 @@ namespace op
         PoseExtractorNet(const PoseModel poseModel,
                          const std::vector<HeatMapType>& heatMapTypes = {},
                          const ScaleMode heatMapScale = ScaleMode::ZeroToOne,
-                         const bool addPartCandidates = false);
+                         const bool addPartCandidates = false,
+                         const bool maximizePositives = false);
 
         virtual ~PoseExtractorNet();
 

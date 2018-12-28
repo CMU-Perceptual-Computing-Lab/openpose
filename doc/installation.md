@@ -12,18 +12,19 @@ OpenPose - Installation
 8. [Uninstallation](#uninstallation)
 9. [Optional Settings](#optional-settings)
     1. [Profiling Speed](#profiling-speed)
-    2. [COCO and MPI Models](#coco-and-mpi-models)
-    3. [Python API](#python-api)
-    4. [CPU Version](#cpu-version)
-    5. [Mac OSX Version](#mac-osx-version)
-    6. [OpenCL Version](#opencl-version)
-    7. [3D Reconstruction Module](#3d-reconstruction-module)
-    8. [Calibration Module](#calibration-module)
-    9. [Compiling without cuDNN](#compiling-without-cudnn)
-    10. [Custom Caffe (Ubuntu Only)](#custom-caffe-ubuntu-only)
-    11. [Custom OpenCV (Ubuntu Only)](#custom-opencv-ubuntu-only)
-    12. [Doxygen Documentation Autogeneration (Ubuntu Only)](#doxygen-documentation-autogeneration-ubuntu-only)
-    13. [CMake Command Line Configuration (Ubuntu Only)](#cmake-command-line-configuration-ubuntu-only)
+    2. [Faster GUI Display](#faster-gui-display)
+    3. [COCO and MPI Models](#coco-and-mpi-models)
+    4. [Python API](#python-api)
+    5. [CPU Version](#cpu-version)
+    6. [Mac OSX Version](#mac-osx-version)
+    7. [OpenCL Version](#opencl-version)
+    8. [3D Reconstruction Module](#3d-reconstruction-module)
+    9. [Calibration Module](#calibration-module)
+    10. [Compiling without cuDNN](#compiling-without-cudnn)
+    11. [Custom Caffe (Ubuntu Only)](#custom-caffe-ubuntu-only)
+    12. [Custom OpenCV (Ubuntu Only)](#custom-opencv-ubuntu-only)
+    13. [Doxygen Documentation Autogeneration (Ubuntu Only)](#doxygen-documentation-autogeneration-ubuntu-only)
+    14. [CMake Command Line Configuration (Ubuntu Only)](#cmake-command-line-configuration-ubuntu-only)
 
 
 
@@ -112,7 +113,7 @@ Any problem installing OpenPose? Check [doc/faq.md](./faq.md) and/or post a GitH
 ### Prerequisites
 1. Ubuntu - **Anaconda should not be installed** on your system. Anaconda includes a Protobuf version that is incompatible with Caffe. Either you uninstall anaconda and install protobuf via apt-get, or you compile your own Caffe and link it to OpenPose.
 2. Download and install CMake GUI:
-    - Ubuntu: run the command `sudo apt-get install cmake-qt-gui`. Note: If you prefer to use CMake through the command line, see [Cmake Command Line Build](#cmake-command-line-build-ubuntu-only).
+    - Ubuntu: run the command `sudo apt-get install cmake-qt-gui`. Note: If you prefer to use CMake through the command line, see [CMake Command Line Configuration (Ubuntu Only)](#cmake-command-line-configuration-ubuntu-only).
     - Windows: download and install the latest CMake win64-x64 msi installer from the [CMake website](https://cmake.org/download/), called `cmake-X.X.X-win64-x64.msi`.
     - Mac: `brew cask install cmake`.
 3. Windows - **Microsoft Visual Studio (VS) 2015 Enterprise Update 3**:
@@ -213,7 +214,7 @@ Check OpenPose was properly installed by running it on the default images, video
 ### OpenPose from other Projects (Ubuntu and Mac)
 If you only intend to use the OpenPose demo, you might skip this step. This step is only recommended if you plan to use the OpenPose API from other projects.
 
-To install the OpenPose headers and libraries into the system environment path (e.g. `/usr/local/` or `/usr/`), run the following command.
+To install the OpenPose headers and libraries into the system environment path (e.g., `/usr/local/` or `/usr/`), run the following command.
 ```
 cd build/
 sudo make install
@@ -269,6 +270,13 @@ OpenPose displays the FPS in the basic GUI. However, more complex speed metrics 
 - Time measurement for 1 graphic card: The FPS will be the slowest time displayed in your terminal command line (as OpenPose is multi-threaded). Times are in milliseconds, so `FPS = 1000/millisecond_measurement`.
 - Time measurement for >1 graphic cards: Assuming `n` graphic cards, you will have to wait up to `n` x `F` frames to visualize each graphic card speed (as the frames are splitted among them). In addition, the FPS would be: `FPS = minFPS(speed_per_GPU/n, worst_time_measurement_other_than_GPUs)`. For < 4 GPUs, this is usually `FPS = speed_per_GPU/n`.
 
+Make sure that `wPoseExtractor` time is the slowest timing. Otherwise the input producer (video/webcam codecs issues with OpenCV, images too big, etc.) or the GUI display (use OpenGL support as detailed in [doc/speed_up_preserving_accuracy.md](./speed_up_preserving_accuracy.md)) might not be optimized.
+
+
+
+#### Faster GUI Display
+Reduce the lag and increase the speed of displaying images by enabling the `WITH_OPENCV_WITH_OPENCL` flag. It tells OpenCV to render the images using OpenGL support. This speeds up rendering about 3x. E.g., it reduces from about 30 msec to about 10 msec the display time for HD resolution images. It requires OpenCV to be compiled with OpenGL support and it provokes a visual aspect-ratio artifact when rendering a folder with images of different resolutions.
+
 
 
 #### COCO and MPI Models
@@ -280,6 +288,13 @@ Note: Check the differences between these models in [doc/faq.md#difference-betwe
 
 #### Python API
 To install the Python API, ensure that the `BUILD_PYTHON` flag is turned on while running CMake GUI and follow the standard installation steps. After the installation, check [doc/modules/python_module.md](./modules/python_module.md) for further details.
+
+Note: If you are in Windows, and you fail to install the required third party Python libraries, it might print an error similar to: `Exception: Error: OpenPose library could not be found. Did you enable BUILD_PYTHON in CMake and have this Python script in the right folder?`. From GitHub issue #941:
+```
+I had a similar issue with Visual Studio (VS). I am pretty sure that the issue is that while you are compiling OpenPose in VS, it tries to import cv2 (python-opencv) and it fails. So make sure that if you open cmd.exe and run python, you can actually import cv2 without errors. I could not, but I had cv2 installed in a IPython environment (Anaconda), so I activated that environment, and then ran (change this to adapt it to your VS version and location of OpenPose.sln):
+
+C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\MSBuild.exe C:\path\to\OpenPose.sln
+```
 
 
 
@@ -298,7 +313,7 @@ export MKL_NUM_THREADS="8"
 export OMP_NUM_THREADS="8"
 ```
 
-Do note that increasing the number of threads results in more memory use. You can check the [doc/faq.md#speed-up-memory-reduction-and-benchmark](./faq.md#speed-up-memory-reduction-and-benchmark) for more information about speed and memory requirements in several CPUs and GPUs.
+Do note that increasing the number of threads results in more memory use. You can check the [doc/speed_up_preserving_accuracy.md](./speed_up_preserving_accuracy.md) for more information about speed and memory requirements in several CPUs and GPUs.
 
 
 
@@ -318,7 +333,7 @@ If the default installation fails (i.e., the one explained above), instal Caffe 
 
 
 #### OpenCL Version
-If you have an AMD graphics card, you can compile OpenPose with the OpenCL option. To manually select the OpenCL Version, open CMake GUI mentioned above, and set the `GPU_MODE` flag to `OPENCL`.
+If you have an AMD graphics card, you can compile OpenPose with the OpenCL option. To manually select the OpenCL Version, open CMake GUI mentioned above, and set the `GPU_MODE` flag to `OPENCL`. **Very important:** If you compiled previously the CPU-only or CUDA versions on that same OpenPose folder, you will have to manually delete de `build` directory and run the installation steps from scratch. Otherwise, many weird errors will appear.
 
 The OpenCL version has been tested on Ubuntu and Windows. This has been tested only on AMD Vega series and NVIDIA 10 series graphics cards. Please email us if you have issues with other operating systems or graphics cards.
 
@@ -364,7 +379,7 @@ After installation, check the [doc/modules/calibration_module.md](./modules/cali
 #### Compiling without cuDNN
 The [cuDNN](https://developer.nvidia.com/cudnn) library is not mandatory, but required for full keypoint detection accuracy. In case your graphics card is not compatible with cuDNN, you can disable it by unchecking `USE_CUDNN` in CMake.
 
-Then, you would have to reduce the `--net_resolution` flag to fit the model into the GPU memory. You can try values like `640x320`, `320x240`, `320x160`, or `160x80` to see your GPU memory capabilities. After finding the maximum approximate resolution that your GPU can handle without throwing an out-of-memory error, adjust the `net_resolution` ratio to your image or video to be processed (see the `--net_resolution` explanation from [doc/demo_overview.md](./demo_overview.md)), or use `-1` (e.g. `--net_resolution -1x320`).
+Then, you would have to reduce the `--net_resolution` flag to fit the model into the GPU memory. You can try values like `640x320`, `320x240`, `320x160`, or `160x80` to see your GPU memory capabilities. After finding the maximum approximate resolution that your GPU can handle without throwing an out-of-memory error, adjust the `net_resolution` ratio to your image or video to be processed (see the `--net_resolution` explanation from [doc/demo_overview.md](./demo_overview.md)), or use `-1` (e.g., `--net_resolution -1x320`).
 
 
 

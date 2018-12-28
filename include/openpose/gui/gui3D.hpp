@@ -20,7 +20,8 @@ namespace op
               const std::vector<std::shared_ptr<HandExtractorNet>>& handExtractorNets = {},
               const std::vector<std::shared_ptr<Renderer>>& renderers = {},
               const PoseModel poseModel = PoseModel::BODY_25,
-              const DisplayMode displayMode = DisplayMode::DisplayAll);
+              const DisplayMode displayMode = DisplayMode::DisplayAll,
+              const bool copyGlToCvMat = false);
 
         virtual ~Gui3D();
 
@@ -30,6 +31,11 @@ namespace op
                           const Array<float>& leftHandKeypoints3D, const Array<float>& rightHandKeypoints3D);
 
         virtual void update();
+
+        virtual cv::Mat readCvMat();
+
+    private:
+        const bool mCopyGlToCvMat;
     };
 }
 

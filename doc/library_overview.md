@@ -37,7 +37,7 @@ There are 4 different ways to allocate the memory:
 
 3. The `reset(const std::vector<int>& size)` function: It allocates the memory indicated for size. The allocated memory equals the product of all elements in the size vector. Internally, it is saved as a 1-D std::shared_ptr<T[]>.
 
-4. The `reset(const int size)` function: equivalent for 1-dimension data (i.e. vector).
+4. The `reset(const int size)` function: equivalent for 1-dimension data (i.e., vector).
 
 5. The `setFrom(const cv::Mat& cvMat)` function: It calls `reset()` and copies the data from `cvMat`.
 
@@ -59,13 +59,13 @@ There are several functions to get information about the allocated data:
 
 3. `int getSize(const int index)`: It returns the size of the `index` dimension.
 
-4. `size_t getNumberDimensions()`: It returns the number of dimensions (i.e. getSize().size()).
+4. `size_t getNumberDimensions()`: It returns the number of dimensions (i.e., getSize().size()).
 
-5. `size_t getVolume()`: It returns the total internal number of T objects, i.e. the product of all dimensions size.
+5. `size_t getVolume()`: It returns the total internal number of T objects, i.e., the product of all dimensions size.
 
 
 ### Datum - The OpenPose Basic Piece of Information Between Threads
-The `Datum` class has all the variables that our Workers need to share to each other. The user can inherit from `op::Datum` in order to add extra functionality (e.g. if he want to add new Workers and they require extra information between them). We highly recommend not to modify the `op::Datum` source code. Instead, just inherit it and tell the Workers and `ThreadManager` to use your inherited class. No changes are needed in the OpenPose source code for this task.
+The `Datum` class has all the variables that our Workers need to share to each other. The user can inherit from `op::Datum` in order to add extra functionality (e.g., if he want to add new Workers and they require extra information between them). We highly recommend not to modify the `op::Datum` source code. Instead, just inherit it and tell the Workers and `ThreadManager` to use your inherited class. No changes are needed in the OpenPose source code for this task.
 ```
 UserDatum : public op::Datum {/* op::Datum + extra variables */}
 
@@ -120,7 +120,7 @@ There are 3 basic configuration modes: single-threading, multi-threading and sma
     threadManager.add(threadId++, wPose, queueIn++, queueOut++);                                // Thread 2, queues 3 -> 3
     ```
 
-3. Smart multi-threading: Some classes are much more faster than others (e.g. pose estimation takes ~100 ms while extracting frames from a video only ~10 ms). In addition, any machine has a limited number of threads. Therefore, the library allows the user to merge the faster threads in order to potentially speed up the code. Check the [real-time pose demo](../examples/openpose/openpose.cpp) too see a more complete example.
+3. Smart multi-threading: Some classes are much more faster than others (e.g., pose estimation takes ~100 ms while extracting frames from a video only ~10 ms). In addition, any machine has a limited number of threads. Therefore, the library allows the user to merge the faster threads in order to potentially speed up the code. Check the [real-time pose demo](../examples/openpose/openpose.cpp) too see a more complete example.
     ```
     auto threadId = 0;
     auto queueIn = 0;
@@ -132,40 +132,40 @@ There are 3 basic configuration modes: single-threading, multi-threading and sma
 #### Thread Id:
 In order to have X different threads, you just need X different thread ids in the `add()` function. There should not be any missing thread or queue id. I.e., when `start` is called, all the thread ids from 0 to max_thread_id must have been added with the `add()` function, as well as all queue ids from 0 to the maximum queue id introduced.
 
-The threads will be started following the thread id order (first the lowest id, last the highest one). In practice, thread id ordering might negatively affect the program execution by adding some lag. I.e., if the thread ids are assigned in complete opposite order to the temporal order of the Workers (e.g. first the GUI and lastly the webcam reader), then during the first few iterations the GUI Worker will have an empty queue until all other Workers have processed at least one frame.
+The threads will be started following the thread id order (first the lowest id, last the highest one). In practice, thread id ordering might negatively affect the program execution by adding some lag. I.e., if the thread ids are assigned in complete opposite order to the temporal order of the Workers (e.g., first the GUI and lastly the webcam reader), then during the first few iterations the GUI Worker will have an empty queue until all other Workers have processed at least one frame.
 
 Within each thread, the Workers are executed in the order that they have been added to `ThreadManager` by the `add()` function.
 
 #### Queue Id:
 In addition, each queue id is forced to be the input and output of at least 1 Worker sequence. Special cases are the queue id 0 (only forced to be input of >= 1 Workers) and max_queue_id (forced to be output of >=1 Workers). This prevent users from accidentally forgetting connecting some queue ids.
 
-Recursive queuing is allowed. E.g. a Worker might work from queue 0 to 1, another one from 1 to 2, and a third one from 2 to 1, creating a recursive queue/threading. However, the index 0 is reserved for the first queue, and the maximum index for the last one.
+Recursive queuing is allowed. E.g., a Worker might work from queue 0 to 1, another one from 1 to 2, and a third one from 2 to 1, creating a recursive queue/threading. However, the index 0 is reserved for the first queue, and the maximum index for the last one.
 
 
 ### The Worker<T>  Template Class - The Parent Class of All Workers
-Classes starting by the letter `W` + upper case letter (e.g. `WGui`) directly or indirectly inherit from Worker<T>. They can be directly added to the `ThreadManager` class so they can access and/or modify the data as well as be parallelized automatically.
+Classes starting by the letter `W` + upper case letter (e.g., `WGui`) directly or indirectly inherit from Worker<T>. They can be directly added to the `ThreadManager` class so they can access and/or modify the data as well as be parallelized automatically.
 
 The easiest way to create your own Worker is to inherit Worker<T>, and implement the work() function such us it just calls a wrapper to your desired functionality (check the source code of some of our basic Workers). Since the Worker classes are templates, they are always compiled. Therefore, including your desired functionality in a different file will let you compile it only once. Otherwise, it would be compiled any time that any code which uses your worker is compiled.
 
-All OpenPose Workers are templates, i.e. they are not only limited to work with the default op::Datum. However, if you intend to use some of our Workers, your custom `TDatums` class (the one substituting op::Datum) should implement the same variables and functions that those Workers use. The easiest solution is to inherit from `op::Datum` and extend its functionality.
+All OpenPose Workers are templates, i.e., they are not only limited to work with the default op::Datum. However, if you intend to use some of our Workers, your custom `TDatums` class (the one substituting op::Datum) should implement the same variables and functions that those Workers use. The easiest solution is to inherit from `op::Datum` and extend its functionality.
 
 
 ### Creating New Workers
 Users can directly implement their own `W` from Worker<T> or any other sub-inherited Worker[...]<T> class and add them to `ThreadManager`. For that, they just need to: inherit those classes from...
 
-1. Inherit from `Worker<T>` and implement the functionality `work(T& tDatum)`, i.e. it will use and modify tDatum.
+1. Inherit from `Worker<T>` and implement the functionality `work(T& tDatum)`, i.e., it will use and modify tDatum.
 
-2. Inherit from `WorkerProducer<T>` and implement the functionality `T work()`, i.e. it will create and return tDatum.
+2. Inherit from `WorkerProducer<T>` and implement the functionality `T work()`, i.e., it will create and return tDatum.
 
-3. Inherit from `WorkerConsumer<T>` and implement the functionality `work(const T& tDatum)`, i.e. it will use but will not modify tDatum.
+3. Inherit from `WorkerConsumer<T>` and implement the functionality `work(const T& tDatum)`, i.e., it will use but will not modify tDatum.
 
 We suggest users to also start their inherited `Worker<T>` classes with the `W` letter for code clarity, required if they want to send us a pull request.
 
 
 ### All Workers Wrap a Non-Worker Class
-All Workers wrap and call a non-Worker non-template equivalent which actually performs their functionality. E.g. `WPoseExtractor<T>` and `PoseExtractor`. In this way, threading and functionality are completely decoupled. This gives us the best of templates and normal classes:
+All Workers wrap and call a non-Worker non-template equivalent which actually performs their functionality. E.g., `WPoseExtractor<T>` and `PoseExtractor`. In this way, threading and functionality are completely decoupled. This gives us the best of templates and normal classes:
 
-1. Templates allow us to use different classes, e.g. the user could use his own specific equivalent to `op::Datum`. However, they must be compiled any time that any function that uses them changes.
+1. Templates allow us to use different classes, e.g., the user could use his own specific equivalent to `op::Datum`. However, they must be compiled any time that any function that uses them changes.
 
 2. Classes can be compiled only once, and later the algorithm just use them. However, they can only be used with specific arguments. 
 
@@ -181,7 +181,7 @@ By separating functionality and their `Worker<T>` wrappers, we get the good of b
 The human body pose detection is wrapped into the `WPoseExtractor<T>` worker and its equivalent non-template PoseExtractor. In addition, it can be rendered and/or blended into the original frame with `(W)PoseRenderer` class.
 
 ### PoseExtractor Class
-Currently, only `PoseExtractorCaffe` is implemented, which uses the Caffe framework. We might add other famous frameworks later (e.g. Torch or TensorFlow). If you compile our library with any other framework, please email us or make a pull request! We are really interested in adding any other Deep Net framework, and the code is mostly prepared for it. Just create the equivalent `PoseExtractorDesiredFramework` and make the pull request!
+Currently, only `PoseExtractorCaffe` is implemented, which uses the Caffe framework. We might add other famous frameworks later (e.g., Torch or TensorFlow). If you compile our library with any other framework, please email us or make a pull request! We are really interested in adding any other Deep Net framework, and the code is mostly prepared for it. Just create the equivalent `PoseExtractorDesiredFramework` and make the pull request!
 
 #### Constructor
 In order to be initialized, `PoseExtractorCaffe` has the following constructor and parameters: `PoseExtractorCaffe(const Point<int>& netInputSize, const Point<int>& netOutputSize, const Point<int>& outputSize, const int scaleNumber, const double scaleGap, const PoseModel poseModel, const std::string& modelsFolder, const int gpuId)`.
@@ -194,7 +194,7 @@ In order to be initialized, `PoseExtractorCaffe` has the following constructor a
 
 4. `scaleNumber` and `scaleGap` specify the multi-scale parameters. Explained in the [README.md](../README.md), in the demo section.
 
-5. `poseModel` specifies the model to load (e.g. COCO or MPI).
+5. `poseModel` specifies the model to load (e.g., COCO or MPI).
 
 6. `modelsFolder` is the resolution of the last layer of the deep net. I.e., the resulting heat-maps will have this size.
 
@@ -234,4 +234,4 @@ In order to render the detected human pose, run `std::pair<int, std::string> ren
 
 3. `scaleNetToOutput` is given by `PoseExtractor::getScaleNetToOutput()`.
 
-4. The resulting std::pair has the element rendered id, and its name. E.g. <0, "Nose"> or <19, "Part Affinity Fields">.
+4. The resulting std::pair has the element rendered id, and its name. E.g., <0, "Nose"> or <19, "Part Affinity Fields">.

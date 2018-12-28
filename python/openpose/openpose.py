@@ -11,7 +11,7 @@ if __name__ == "__main__":
     params["net_resolution"] = "-1x368"
     params["model_pose"] = "COCO"
     params["alpha_pose"] = 0.6
-    params["scale_gap"] = 0.3
+    params["scale_gap"] = 0.25
     params["scale_number"] = 1
     params["render_threshold"] = 0.05
     params["num_gpu_start"] = 0
@@ -20,16 +20,21 @@ if __name__ == "__main__":
     params["face"] = True
     params["hand"] = True
 
-    print sys.argv
-
-    print sys.argv
-
-
     #op.init_argv(sys.argv)
 
     op.init(params)
 
 #datum = op.getDatum()
+
+#print(datum.outputData)
+
+#od = datum.outputData
+#od[:,0] = 5
+#datum.outputData = od;
+
+##datum.outputData[:,0] = 5;
+
+#op.checkDatum(datum)
 
 #xx = datum.outputData
 

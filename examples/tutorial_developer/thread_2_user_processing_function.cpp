@@ -6,7 +6,7 @@
     // Everything in a multi-thread scenario (`thread` module)
 // In addition to the previous OpenPose modules, we also need to use:
     // 1. `core` module: for the Datum struct that the `thread` module sends between the queues
-    // 2. `utilities` module: for the error & logging functions, i.e. op::error & op::log respectively
+    // 2. `utilities` module: for the error & logging functions, i.e., op::error & op::log respectively
 
 // 3rdparty dependencies
 // GFlags: DEFINE_bool, _int32, _int64, _uint64, _double, _string
@@ -22,9 +22,9 @@
 #include <openpose/thread/headers.hpp>
 #include <openpose/utilities/headers.hpp>
 
-// See all the available parameter options withe the `--help` flag. E.g. `build/examples/openpose/openpose.bin --help`
+// See all the available parameter options withe the `--help` flag. E.g., `build/examples/openpose/openpose.bin --help`
 // Note: This command will show you flags for other unnecessary 3rdparty files. Check only the flags for the OpenPose
-// executable. E.g. for `openpose.bin`, look for `Flags from examples/openpose/openpose.cpp:`.
+// executable. E.g., for `openpose.bin`, look for `Flags from examples/openpose/openpose.cpp:`.
 // Debugging/Other
 DEFINE_int32(logging_level,             3,              "The logging level. Integer in the range [0, 255]. 0 will output any log() message, while"
                                                         " 255 will not output any. Current OpenPose library messages are in the range 0-4: 1 for"
@@ -35,8 +35,6 @@ DEFINE_int32(camera,                    -1,             "The camera index for cv
 DEFINE_string(camera_resolution,        "-1x-1",        "Set the camera resolution (either `--camera` or `--flir_camera`). `-1x-1` will use the"
                                                         " default 1280x720 for `--camera`, or the maximum flir camera resolution available for"
                                                         " `--flir_camera`");
-DEFINE_double(camera_fps,               30.0,           "Frame rate for the webcam (also used when saving video). Set this value to the minimum"
-                                                        " value between the OpenPose displayed speed and the webcam real frame rate.");
 DEFINE_string(video,                    "",             "Use a video file instead of the camera. Use `examples/media/video.avi` for our default"
                                                         " example video.");
 DEFINE_string(image_dir,                "",             "Process a directory of images. Use `examples/media/` for our default example folder with 20"
@@ -46,18 +44,19 @@ DEFINE_int32(flir_camera_index,         -1,             "Select -1 (default) to 
                                                         " camera index to run, where 0 corresponds to the detected flir camera with the lowest"
                                                         " serial number, and `n` to the `n`-th lowest serial number camera.");
 DEFINE_string(ip_camera,                "",             "String with the IP camera URL. It supports protocols like RTSP and HTTP.");
-DEFINE_bool(process_real_time,          false,          "Enable to keep the original source frame rate (e.g. for video). If the processing time is"
+DEFINE_bool(process_real_time,          false,          "Enable to keep the original source frame rate (e.g., for video). If the processing time is"
                                                         " too long, it will skip frames. If it is too fast, it will slow it down.");
-DEFINE_string(camera_parameter_folder,  "models/cameraParameters/flir/", "String with the folder where the camera parameters are located.");
-DEFINE_bool(frame_keep_distortion,      false,          "If false (default), it will undistortionate the image based on the"
-                                                        " `camera_parameter_folder` camera parameters; if true, it will not undistortionate, i.e.,"
-                                                        " it will leave it as it is.");
+DEFINE_string(camera_parameter_path,    "models/cameraParameters/flir/", "String with the folder where the camera parameters are located. If there"
+                                                        " is only 1 XML file (for single video, webcam, or images from the same camera), you must"
+                                                        " specify the whole XML file path (ending in .xml).");
+DEFINE_bool(frame_undistort,            false,          "If false (default), it will not undistort the image, if true, it will undistortionate them"
+                                                        " based on the camera parameters found in `camera_parameter_path`");
 // OpenPose
 DEFINE_string(output_resolution,        "-1x-1",        "The image resolution (display and output). Use \"-1x-1\" to force the program to use the"
                                                         " input image resolution.");
 DEFINE_int32(3d_views,                  1,              "Complementary option to `--image_dir` or `--video`. OpenPose will read as many images per"
                                                         " iteration, allowing tasks such as stereo camera processing (`--3d`). Note that"
-                                                        " `--camera_parameters_folder` must be set. OpenPose must find as many `xml` files in the"
+                                                        " `--camera_parameter_path` must be set. OpenPose must find as many `xml` files in the"
                                                         " parameter folder as this number indicates.");
 // Consumer
 DEFINE_bool(fullscreen,                 false,          "Run in full-screen mode (press f during runtime to toggle).");
@@ -110,29 +109,35 @@ int tutorialDeveloperThread2()
                   __LINE__, __FUNCTION__, __FILE__);
         op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
         // Step 2 - Read GFlags (user defined configuration)
+        // cameraSize
+        const auto cameraSize = op::flagsToPoint(FLAGS_camera_resolution, "-1x-1");
         // outputSize
         const auto outputSize = op::flagsToPoint(FLAGS_output_resolution, "-1x-1");
         // producerType
-        const auto producerSharedPtr = op::flagsToProducer(
-            FLAGS_image_dir, FLAGS_video, FLAGS_ip_camera, FLAGS_camera, FLAGS_flir_camera, FLAGS_camera_resolution,
-            FLAGS_camera_fps, FLAGS_camera_parameter_folder, !FLAGS_frame_keep_distortion,
-            (unsigned int) FLAGS_3d_views, FLAGS_flir_camera_index);
+        op::ProducerType producerType;
+        std::string producerString;
+        std::tie(producerType, producerString) = op::flagsToProducer(
+            FLAGS_image_dir, FLAGS_video, FLAGS_ip_camera, FLAGS_camera, FLAGS_flir_camera, FLAGS_flir_camera_index);
         const auto displayProducerFpsMode = (FLAGS_process_real_time
                                           ? op::ProducerFpsMode::OriginalFps : op::ProducerFpsMode::RetrievalFps);
+        auto producerSharedPtr = createProducer(
+            producerType, producerString, cameraSize, FLAGS_camera_parameter_path, FLAGS_frame_undistort,
+            FLAGS_3d_views);
         producerSharedPtr->setProducerFpsMode(displayProducerFpsMode);
         op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
         // Step 3 - Setting producer
         auto videoSeekSharedPtr = std::make_shared<std::pair<std::atomic<bool>, std::atomic<int>>>();
         videoSeekSharedPtr->first = false;
         videoSeekSharedPtr->second = 0;
-        const op::Point<int> producerSize{(int)producerSharedPtr->get(CV_CAP_PROP_FRAME_WIDTH),
-                                    (int)producerSharedPtr->get(CV_CAP_PROP_FRAME_HEIGHT)};
+        const op::Point<int> producerSize{
+            (int)producerSharedPtr->get(CV_CAP_PROP_FRAME_WIDTH),
+            (int)producerSharedPtr->get(CV_CAP_PROP_FRAME_HEIGHT)};
         // Step 4 - Setting thread workers && manager
         typedef std::vector<op::Datum> TypedefDatumsNoPtr;
         typedef std::shared_ptr<TypedefDatumsNoPtr> TypedefDatums;
         op::ThreadManager<TypedefDatums> threadManager;
         // Step 5 - Initializing the worker classes
-        // Frames producer (e.g. video, webcam, ...)
+        // Frames producer (e.g., video, webcam, ...)
         auto DatumProducer = std::make_shared<op::DatumProducer<TypedefDatumsNoPtr>>(producerSharedPtr);
         auto wDatumProducer = std::make_shared<op::WDatumProducer<TypedefDatums, TypedefDatumsNoPtr>>(DatumProducer);
         // Specific WUserClass

@@ -2,27 +2,9 @@
 #define OPENPOSE_PYTHON_HPP
 #define BOOST_DATE_TIME_NO_LIB
 
-// OpenPose dependencies
-//#include <openpose/core/headers.hpp>
-//#include <openpose/filestream/headers.hpp>
-//#include <openpose/gui/headers.hpp>
-//#include <openpose/pose/headers.hpp>
-//#include <openpose/utilities/headers.hpp>
-//#include <caffe/caffe.hpp>
-//#include <stdlib.h>
-
 #include <openpose/flags.hpp>
+#include <openpose/headers.hpp>
 #include <openpose/wrapper/headers.hpp>
-
-//#include <openpose/net/bodyPartConnectorCaffe.hpp>
-//#include <openpose/net/nmsCaffe.hpp>
-//#include <openpose/net/resizeAndMergeCaffe.hpp>
-//#include <openpose/pose/poseParameters.hpp>
-//#include <openpose/pose/enumClasses.hpp>
-//#include <openpose/pose/poseExtractor.hpp>
-//#include <openpose/gpu/cuda.hpp>
-//#include <openpose/gpu/opencl.hcl>
-//#include <openpose/core/macros.hpp>
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -38,39 +20,107 @@
 
 namespace py = pybind11;
 
-//typdef typename op::Array<float> op::Array_float;
+class OpenposePython{
+public:
+    std::unique_ptr<op::Wrapper> opWrapper;
 
-int add(int i, int j) {
-    return i + j;
+    OpenposePython(){
+        op::log("Starting OpenPose demo...", op::Priority::High);
 
-    op::Array<float> xx;
+        // logging_level
+        op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.",
+                  __LINE__, __FUNCTION__, __FILE__);
+        op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
+        op::Profiler::setDefaultX(FLAGS_profile_speed);
 
-    op::Datum d;
-}
+        // Applying user defined configuration - GFlags to program variables
+        // outputSize
+        const auto outputSize = op::flagsToPoint(FLAGS_output_resolution, "-1x-1");
+        // netInputSize
+        const auto netInputSize = op::flagsToPoint(FLAGS_net_resolution, "-1x368");
+        // faceNetInputSize
+        const auto faceNetInputSize = op::flagsToPoint(FLAGS_face_net_resolution, "368x368 (multiples of 16)");
+        // handNetInputSize
+        const auto handNetInputSize = op::flagsToPoint(FLAGS_hand_net_resolution, "368x368 (multiples of 16)");
+        // poseModel
+        const auto poseModel = op::flagsToPoseModel(FLAGS_model_pose);
+        // JSON saving
+        if (!FLAGS_write_keypoint.empty())
+            op::log("Flag `write_keypoint` is deprecated and will eventually be removed."
+                    " Please, use `write_json` instead.", op::Priority::Max);
+        // keypointScale
+        const auto keypointScale = op::flagsToScaleMode(FLAGS_keypoint_scale);
+        // heatmaps to add
+        const auto heatMapTypes = op::flagsToHeatMaps(FLAGS_heatmaps_add_parts, FLAGS_heatmaps_add_bkg,
+                                                      FLAGS_heatmaps_add_PAFs);
+        const auto heatMapScale = op::flagsToHeatMapScaleMode(FLAGS_heatmaps_scale);
+        // >1 camera view?
+        const auto multipleView = (FLAGS_3d || FLAGS_3d_views > 1);
+        // Enabling Google Logging
+        const bool enableGoogleLogging = true;
+
+        // Configuring OpenPose
+        op::log("Configuring OpenPose...", op::Priority::High);
+        opWrapper = std::unique_ptr<op::Wrapper>(new op::Wrapper());
+        // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
+        const op::WrapperStructPose wrapperStructPose{
+            !FLAGS_body_disable, netInputSize, outputSize, keypointScale, FLAGS_num_gpu, FLAGS_num_gpu_start,
+            FLAGS_scale_number, (float)FLAGS_scale_gap, op::flagsToRenderMode(FLAGS_render_pose, multipleView),
+            poseModel, !FLAGS_disable_blending, (float)FLAGS_alpha_pose, (float)FLAGS_alpha_heatmap,
+            FLAGS_part_to_show, FLAGS_model_folder, heatMapTypes, heatMapScale, FLAGS_part_candidates,
+            (float)FLAGS_render_threshold, FLAGS_number_people_max, FLAGS_maximize_positives, FLAGS_fps_max,
+            enableGoogleLogging};
+        opWrapper->configure(wrapperStructPose);
+        // Face configuration (use op::WrapperStructFace{} to disable it)
+        const op::WrapperStructFace wrapperStructFace{
+            FLAGS_face, faceNetInputSize, op::flagsToRenderMode(FLAGS_face_render, multipleView, FLAGS_render_pose),
+            (float)FLAGS_face_alpha_pose, (float)FLAGS_face_alpha_heatmap, (float)FLAGS_face_render_threshold};
+        opWrapper->configure(wrapperStructFace);
+        // Hand configuration (use op::WrapperStructHand{} to disable it)
+        const op::WrapperStructHand wrapperStructHand{
+            FLAGS_hand, handNetInputSize, FLAGS_hand_scale_number, (float)FLAGS_hand_scale_range, FLAGS_hand_tracking,
+            op::flagsToRenderMode(FLAGS_hand_render, multipleView, FLAGS_render_pose), (float)FLAGS_hand_alpha_pose,
+            (float)FLAGS_hand_alpha_heatmap, (float)FLAGS_hand_render_threshold};
+        opWrapper->configure(wrapperStructHand);
+        // Extra functionality configuration (use op::WrapperStructExtra{} to disable it)
+        const op::WrapperStructExtra wrapperStructExtra{
+            FLAGS_3d, FLAGS_3d_min_views, FLAGS_identification, FLAGS_tracking, FLAGS_ik_threads};
+        opWrapper->configure(wrapperStructExtra);
+        // Output (comment or use default argument to disable any output)
+        const op::WrapperStructOutput wrapperStructOutput{
+            FLAGS_cli_verbose, FLAGS_write_keypoint, op::stringToDataFormat(FLAGS_write_keypoint_format),
+            FLAGS_write_json, FLAGS_write_coco_json, FLAGS_write_coco_foot_json, FLAGS_write_coco_json_variant,
+            FLAGS_write_images, FLAGS_write_images_format, FLAGS_write_video, FLAGS_write_video_fps,
+            FLAGS_write_heatmaps, FLAGS_write_heatmaps_format, FLAGS_write_video_3d, FLAGS_write_video_adam,
+            FLAGS_write_bvh, FLAGS_udp_host, FLAGS_udp_port};
+        opWrapper->configure(wrapperStructOutput);
+        // No GUI. Equivalent to: opWrapper.configure(op::WrapperStructGui{});
+        // Set to single-thread (for sequential processing and/or debugging and/or reducing latency)
+        opWrapper->disableMultiThreading();
+        // Starting OpenPose
+        op::log("Starting thread(s)...", op::Priority::High);
+        opWrapper->start();
+
+        //op::Datum* datum;
+
+        std::shared_ptr<std::vector<op::Datum>> datum;
+        //std::vector<std::shared_ptr<op::Datum>> datums = {datum};
+        opWrapper->emplaceAndPop(datum);
+
+    }
+};
 
 std::shared_ptr<op::Datum> getDatum(){
-
     std::shared_ptr<op::Datum> datum2 = std::make_shared<op::Datum>();
-
-    datum2->outputData = op::Array<float>({2,2},1);
-
+    std::cout << "try" << std::endl;
+    std::vector<int> sizes = {2,2};
+    datum2->outputData = op::Array<float>(sizes, 1);
+    std::cout << "end" << std::endl;
     return datum2;
 }
 
 void checkDatum(op::Datum* datum){
     std::cout << datum->outputData << std::endl;
-
-    //std::cout << datum->outputData.spData.use_count() << std::endl;
-
-//    std::cout << datum->cvInputData.size() << std::endl;
-
-//    cv::imshow("win",datum->cvInputData);
-
-//    cv::waitKey(0);
-
-//    cv::Mat x(rows, cols, CV_8UC3);
-
-    //cv::Mat_<cv::Vec3b> l;
 }
 
 void parse_gflags(const std::vector<std::string>& argv){
@@ -96,30 +146,23 @@ void init_argv(std::vector<std::string> argv){
 }
 
 PYBIND11_MODULE(_openpose, m) {
-    m.def("add", &add, "A function which adds two numbers",
-          py::arg("i") = 1, py::arg("j") = 2);
 
+    // Functions for Init Params
     m.def("init", &init, "Init Function");
     m.def("init_argv", &init_argv, "Init Function");
 
+    // Internal Test Functions
     m.def("getDatum", &getDatum, "");
     m.def("checkDatum", &checkDatum, "");
 
+    // Datum Object
     py::class_<op::Datum, std::shared_ptr<op::Datum>>(m, "Datum")
         .def(py::init<>())
         .def_readwrite("outputData", &op::Datum::outputData)
         .def_readwrite("cvInputData", &op::Datum::cvInputData)
         //.def("setName", &Pet::setName)
         //.def("getName", &Pet::getName)
-            ;
-
-//    py::class_<cv::Mat>(m, "Mat")
-//        .def(py::init<>())
-//        .def(py::init<const int&, const int&, const int&>(),
-//             py::arg("rows"), py::arg("cols"), py::arg("type")=CV_8UC3)
-//        //.def("setName", &Pet::setName)
-//        //.def("getName", &Pet::getName)
-//            ;
+        ;
 
     py::class_<op::Array<float>>(m, "Array", py::buffer_protocol())
        .def("__repr__", [](op::Array<float> &a) { return a.toString(); })
@@ -188,7 +231,7 @@ template <> struct type_caster<op::Array<float>> {
         {
             std::string format = format_descriptor<float>::format();
             return array(buffer_info(
-                m.getPybindPtr(),     /* Pointer to buffer */
+                m.getPseudoConstPtr(),     /* Pointer to buffer */
                 sizeof(float),       /* Size of one scalar */
                 format,         /* Python struct-style format descriptor */
                 m.getSize().size(),            /* Number of dimensions */

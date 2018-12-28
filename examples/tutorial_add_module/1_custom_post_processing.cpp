@@ -14,11 +14,11 @@
 
 // Syntax rules
 // 1. Class/template variables start by up (unique_ptr), sp (sahred_ptr), p (pointer) or m (non-pointer), and they
-// have no underscores, e.g.: mThisIsAVariable.
+// have no underscores, e.g., mThisIsAVariable.
 // 2. The internal temporary function variable equivalent would be thisIsAVariable.
 // 3. Every line cannot have more than 120 characters.
 // 4. If extra classes and files are required, add those extra files inside the OpenPose include and src folders,
-// under a new folder (i.e. `include/newMethod/` and `src/newMethod/`), including `namespace op` on those files.
+// under a new folder (i.e., `include/newMethod/` and `src/newMethod/`), including `namespace op` on those files.
 
 // This example is a sub-case of `tutorial_api_cpp/6_synchronous_custom_postprocessing.cpp`, where only custom post-processing is
 // considered.
@@ -44,6 +44,8 @@ int tutorialAddModule1()
         op::Profiler::setDefaultX(FLAGS_profile_speed);
 
         // Applying user defined configuration - GFlags to program variables
+        // cameraSize
+        const auto cameraSize = op::flagsToPoint(FLAGS_camera_resolution, "-1x-1");
         // outputSize
         const auto outputSize = op::flagsToPoint(FLAGS_output_resolution, "-1x-1");
         // netInputSize
@@ -53,10 +55,10 @@ int tutorialAddModule1()
         // handNetInputSize
         const auto handNetInputSize = op::flagsToPoint(FLAGS_hand_net_resolution, "368x368 (multiples of 16)");
         // producerType
-        const auto producerSharedPtr = op::flagsToProducer(
-            FLAGS_image_dir, FLAGS_video, FLAGS_ip_camera, FLAGS_camera, FLAGS_flir_camera, FLAGS_camera_resolution,
-            FLAGS_camera_fps, FLAGS_camera_parameter_folder, !FLAGS_frame_keep_distortion,
-            (unsigned int) FLAGS_3d_views, FLAGS_flir_camera_index);
+        op::ProducerType producerType;
+        std::string producerString;
+        std::tie(producerType, producerString) = op::flagsToProducer(
+            FLAGS_image_dir, FLAGS_video, FLAGS_ip_camera, FLAGS_camera, FLAGS_flir_camera, FLAGS_flir_camera_index);
         // poseModel
         const auto poseModel = op::flagsToPoseModel(FLAGS_model_pose);
         // JSON saving
@@ -83,7 +85,8 @@ int tutorialAddModule1()
             FLAGS_scale_number, (float)FLAGS_scale_gap, op::flagsToRenderMode(FLAGS_render_pose, multipleView),
             poseModel, !FLAGS_disable_blending, (float)FLAGS_alpha_pose, (float)FLAGS_alpha_heatmap,
             FLAGS_part_to_show, FLAGS_model_folder, heatMapTypes, heatMapScale, FLAGS_part_candidates,
-            (float)FLAGS_render_threshold, FLAGS_number_people_max, enableGoogleLogging};
+            (float)FLAGS_render_threshold, FLAGS_number_people_max, FLAGS_maximize_positives, FLAGS_fps_max,
+            enableGoogleLogging};
         opWrapperT.configure(wrapperStructPose);
         // Face configuration (use op::WrapperStructFace{} to disable it)
         const op::WrapperStructFace wrapperStructFace{
@@ -102,17 +105,22 @@ int tutorialAddModule1()
         opWrapperT.configure(wrapperStructExtra);
         // Producer (use default to disable any input)
         const op::WrapperStructInput wrapperStructInput{
-            producerSharedPtr, FLAGS_frame_first, FLAGS_frame_step, FLAGS_frame_last, FLAGS_process_real_time,
-            FLAGS_frame_flip, FLAGS_frame_rotate, FLAGS_frames_repeat};
+            producerType, producerString, FLAGS_frame_first, FLAGS_frame_step, FLAGS_frame_last,
+            FLAGS_process_real_time, FLAGS_frame_flip, FLAGS_frame_rotate, FLAGS_frames_repeat,
+            cameraSize, FLAGS_camera_parameter_path, FLAGS_frame_undistort, FLAGS_3d_views};
         opWrapperT.configure(wrapperStructInput);
-        // Consumer (comment or use default argument to disable any output)
+        // Output (comment or use default argument to disable any output)
         const op::WrapperStructOutput wrapperStructOutput{
-            op::flagsToDisplayMode(FLAGS_display, FLAGS_3d), !FLAGS_no_gui_verbose, FLAGS_fullscreen,
-            FLAGS_write_keypoint, op::stringToDataFormat(FLAGS_write_keypoint_format), FLAGS_write_json,
-            FLAGS_write_coco_json, FLAGS_write_coco_foot_json, FLAGS_write_images, FLAGS_write_images_format,
-            FLAGS_write_video, FLAGS_camera_fps, FLAGS_write_heatmaps, FLAGS_write_heatmaps_format,
-            FLAGS_write_video_adam, FLAGS_write_bvh, FLAGS_udp_host, FLAGS_udp_port};
+            FLAGS_cli_verbose, FLAGS_write_keypoint, op::stringToDataFormat(FLAGS_write_keypoint_format),
+            FLAGS_write_json, FLAGS_write_coco_json, FLAGS_write_coco_foot_json, FLAGS_write_coco_json_variant,
+            FLAGS_write_images, FLAGS_write_images_format, FLAGS_write_video, FLAGS_write_video_fps,
+            FLAGS_write_heatmaps, FLAGS_write_heatmaps_format, FLAGS_write_video_3d, FLAGS_write_video_adam,
+            FLAGS_write_bvh, FLAGS_udp_host, FLAGS_udp_port};
         opWrapperT.configure(wrapperStructOutput);
+        // GUI (comment or use default argument to disable any visual output)
+        const op::WrapperStructGui wrapperStructGui{
+            op::flagsToDisplayMode(FLAGS_display, FLAGS_3d), !FLAGS_no_gui_verbose, FLAGS_fullscreen};
+        opWrapperT.configure(wrapperStructGui);
 
         // Custom post-processing
         auto userPostProcessing = std::make_shared<op::UserPostProcessing>(/* Your class arguments here */);
@@ -144,7 +152,6 @@ int tutorialAddModule1()
     }
     catch (const std::exception& e)
     {
-        op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         return -1;
     }
 }

@@ -12,6 +12,8 @@ namespace op
 {
     template <typename T>
     BodyPartConnectorCaffe<T>::BodyPartConnectorCaffe() :
+        mPoseModel{PoseModel::Size},
+        mMaximizePositives{false},
         pBodyPartPairsGpuPtr{nullptr},
         pMapIdxGpuPtr{nullptr},
         pFinalOutputGpuPtr{nullptr}
@@ -61,10 +63,10 @@ namespace op
 
                 // Array sizes
                 mTopSize = std::array<int, 4>{1, maxPeaks, numberBodyParts, 3};
-                mHeatMapsSize = std::array<int, 4>{heatMapsBlob->shape(0), heatMapsBlob->shape(1),
-                                                   heatMapsBlob->shape(2), heatMapsBlob->shape(3)};
-                mPeaksSize = std::array<int, 4>{peaksBlob->shape(0), peaksBlob->shape(1), peaksBlob->shape(2),
-                                                peaksBlob->shape(3)};
+                mHeatMapsSize = std::array<int, 4>{
+                    heatMapsBlob->shape(0), heatMapsBlob->shape(1), heatMapsBlob->shape(2), heatMapsBlob->shape(3)};
+                mPeaksSize = std::array<int, 4>{
+                    peaksBlob->shape(0), peaksBlob->shape(1), peaksBlob->shape(2), peaksBlob->shape(3)};
             #else
                 UNUSED(bottom);
             #endif
@@ -81,6 +83,19 @@ namespace op
         try
         {
             mPoseModel = {poseModel};
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    template <typename T>
+    void BodyPartConnectorCaffe<T>::setMaximizePositives(const bool maximizePositives)
+    {
+        try
+        {
+            mMaximizePositives = {maximizePositives};
         }
         catch (const std::exception& e)
         {
@@ -154,6 +169,26 @@ namespace op
     }
 
     template <typename T>
+    void BodyPartConnectorCaffe<T>::Forward(const std::vector<caffe::Blob<T>*>& bottom, Array<T>& poseKeypoints,
+                                            Array<T>& poseScores)
+    {
+        try
+        {
+            // CUDA
+            #ifdef USE_CUDA
+                Forward_gpu(bottom, poseKeypoints, poseScores);
+            // OpenCL or CPU
+            #else
+                Forward_cpu(bottom, poseKeypoints, poseScores);
+            #endif
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    template <typename T>
     void BodyPartConnectorCaffe<T>::Forward_cpu(const std::vector<caffe::Blob<T>*>& bottom, Array<T>& poseKeypoints,
                                                 Array<T>& poseScores)
     {
@@ -161,13 +196,13 @@ namespace op
         {
             #ifdef USE_CAFFE
                 const auto heatMapsBlob = bottom.at(0);
-                const auto* const heatMapsPtr = heatMapsBlob->cpu_data();                 // ~8.5 ms COCO, 27ms BODY_59
+                const auto* const heatMapsPtr = heatMapsBlob->cpu_data();                 // ~8.5 ms COCO, ~27ms BODY_65
                 const auto* const peaksPtr = bottom.at(1)->cpu_data();                    // ~0.02ms
                 const auto maxPeaks = mTopSize[1];
                 connectBodyPartsCpu(poseKeypoints, poseScores, heatMapsPtr, peaksPtr, mPoseModel,
                                     Point<int>{heatMapsBlob->shape(3), heatMapsBlob->shape(2)},
                                     maxPeaks, mInterMinAboveThreshold, mInterThreshold,
-                                    mMinSubsetCnt, mMinSubsetScore, mScaleNetToOutput);
+                                    mMinSubsetCnt, mMinSubsetScore, mScaleNetToOutput, mMaximizePositives);
             #else
                 UNUSED(bottom);
                 UNUSED(poseKeypoints);
@@ -204,9 +239,10 @@ namespace op
                     const auto numberBodyParts = getPoseNumberBodyParts(mPoseModel);
                     const auto& mapIdxOffset = getPoseMapIndex(mPoseModel);
                     // Update mapIdx
+                    const auto offset = (addBkgChannel(mPoseModel) ? 1 : 0);
                     auto mapIdx = mapIdxOffset;
                     for (auto& i : mapIdx)
-                        i += (numberBodyParts+1);
+                        i += (numberBodyParts+offset);
                     // Re-allocate memory
                     cudaMalloc((void **)&pBodyPartPairsGpuPtr, bodyPartPairs.size() * sizeof(unsigned int));
                     cudaMemcpy(pBodyPartPairsGpuPtr, &bodyPartPairs[0], bodyPartPairs.size() * sizeof(unsigned int),
@@ -236,8 +272,9 @@ namespace op
                 connectBodyPartsGpu(poseKeypoints, poseScores, heatMapsGpuPtr, peaksPtr, mPoseModel,
                                     Point<int>{heatMapsBlob->shape(3), heatMapsBlob->shape(2)},
                                     maxPeaks, mInterMinAboveThreshold, mInterThreshold,
-                                    mMinSubsetCnt, mMinSubsetScore, mScaleNetToOutput, mFinalOutputCpu,
-                                    pFinalOutputGpuPtr, pBodyPartPairsGpuPtr, pMapIdxGpuPtr, peaksGpuPtr);
+                                    mMinSubsetCnt, mMinSubsetScore, mScaleNetToOutput, mMaximizePositives,
+                                    mFinalOutputCpu, pFinalOutputGpuPtr, pBodyPartPairsGpuPtr, pMapIdxGpuPtr,
+                                    peaksGpuPtr);
             #else
                 UNUSED(bottom);
                 UNUSED(poseKeypoints);

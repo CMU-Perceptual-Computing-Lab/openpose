@@ -48,7 +48,7 @@ namespace op
         /**
          * Rendering threshold. Only estimated keypoints whose score confidences are higher than this value will be
          * rendered. Generally, a high threshold (> 0.5) will only render very clear body parts; while small thresholds
-         * (~0.1) will also output guessed and occluded keypoints, but also more false positives (i.e. wrong
+         * (~0.1) will also output guessed and occluded keypoints, but also more false positives (i.e., wrong
          * detections).
          */
         float renderThreshold;
@@ -58,11 +58,10 @@ namespace op
          * It has the recommended and default values we recommend for each element of the struct.
          * Since all the elements of the struct are public, they can also be manually filled.
          */
-        WrapperStructFace(const bool enable = false, const Point<int>& netInputSize = Point<int>{368, 368},
-                          const RenderMode renderMode = RenderMode::Gpu,
-                          const float alphaKeypoint = FACE_DEFAULT_ALPHA_KEYPOINT,
-                          const float alphaHeatMap = FACE_DEFAULT_ALPHA_HEAT_MAP,
-                          const float renderThreshold = 0.4f);
+        WrapperStructFace(
+            const bool enable = false, const Point<int>& netInputSize = Point<int>{368, 368},
+            const RenderMode renderMode = RenderMode::Gpu, const float alphaKeypoint = FACE_DEFAULT_ALPHA_KEYPOINT,
+            const float alphaHeatMap = FACE_DEFAULT_ALPHA_HEAT_MAP, const float renderThreshold = 0.4f);
     };
 }
 
