@@ -155,6 +155,7 @@ Any problem installing OpenPose? Check [doc/faq.md](./faq.md) and/or post a GitH
             - [Caffe dependencies](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe3rdparty_2017_07_14.zip): Unzip as `3rdparty/windows/caffe3rdparty/`.
             - [OpenCV 3.1](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/opencv_310.zip): Unzip as `3rdparty/windows/opencv/`.
 8. Mac - **Caffe, OpenCV, and Caffe prerequisites**:
+    - If you don't have `brew`, install it with `bash 3rdparty/osx/install_brew.sh` on your terminal.
     - Install deps by running `bash 3rdparty/osx/install_deps.sh` on your terminal.
 9. **Eigen prerequisite**:
     - Note: This step is optional, only required for some specific extra functionality, such as extrinsic camera calibration.
