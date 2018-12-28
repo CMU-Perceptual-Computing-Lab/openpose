@@ -251,10 +251,18 @@ namespace op
                     for (auto& i : mapIdx)
                         i += (numberBodyParts+offset);
                     // Re-allocate memory
-                    pBodyPartPairsGpuPtr = (unsigned int*)clCreateBuffer(OpenCL::getInstance(mGpuID)->getContext().operator()(), CL_MEM_READ_WRITE, bodyPartPairs.size() * sizeof(unsigned int), NULL, NULL);
-                    clEnqueueWriteBuffer(OpenCL::getInstance(mGpuID)->getQueue().operator()(), (cl_mem)pBodyPartPairsGpuPtr, CL_TRUE, 0, bodyPartPairs.size() * sizeof(unsigned int), &bodyPartPairs[0], NULL, NULL, NULL);
-                    pMapIdxGpuPtr = (unsigned int*)clCreateBuffer(OpenCL::getInstance(mGpuID)->getContext().operator()(), CL_MEM_READ_WRITE, mapIdx.size() * sizeof(unsigned int), NULL, NULL);
-                    clEnqueueWriteBuffer(OpenCL::getInstance(mGpuID)->getQueue().operator()(), (cl_mem)pMapIdxGpuPtr, CL_TRUE, 0, mapIdx.size() * sizeof(unsigned int), &mapIdx[0], NULL, NULL, NULL);
+                    pBodyPartPairsGpuPtr = (unsigned int*)clCreateBuffer(
+                        OpenCL::getInstance(mGpuID)->getContext().operator()(), CL_MEM_READ_WRITE,
+                        bodyPartPairs.size() * sizeof(unsigned int), NULL, NULL);
+                    clEnqueueWriteBuffer(
+                        OpenCL::getInstance(mGpuID)->getQueue().operator()(), (cl_mem)pBodyPartPairsGpuPtr, CL_TRUE,
+                        0, bodyPartPairs.size() * sizeof(unsigned int), &bodyPartPairs[0], NULL, NULL, NULL);
+                    pMapIdxGpuPtr = (unsigned int*)clCreateBuffer(
+                        OpenCL::getInstance(mGpuID)->getContext().operator()(), CL_MEM_READ_WRITE,
+                        mapIdx.size() * sizeof(unsigned int), NULL, NULL);
+                    clEnqueueWriteBuffer(
+                        OpenCL::getInstance(mGpuID)->getQueue().operator()(), (cl_mem)pMapIdxGpuPtr, CL_TRUE,
+                        0, mapIdx.size() * sizeof(unsigned int), &mapIdx[0], NULL, NULL, NULL);
                 }
                 // Initialize auxiliary pointers (1-time task)
                 if (mFinalOutputCpu.empty()) // if (pFinalOutputGpuPtr == nullptr)
@@ -266,7 +274,9 @@ namespace op
                     mFinalOutputCpu.reset({(int)numberBodyPartPairs, maxPeaks, maxPeaks});
                     const auto totalComputations = mFinalOutputCpu.getVolume();
                     if (pFinalOutputGpuPtr == nullptr)
-                        pFinalOutputGpuPtr = (T*)clCreateBuffer(OpenCL::getInstance(mGpuID)->getContext().operator()(), CL_MEM_READ_WRITE, totalComputations * sizeof(T), NULL, NULL);
+                        pFinalOutputGpuPtr = (T*)clCreateBuffer(
+                            OpenCL::getInstance(mGpuID)->getContext().operator()(), CL_MEM_READ_WRITE,
+                            totalComputations * sizeof(T), NULL, NULL);
                 }
 
                 // Run body part connector
