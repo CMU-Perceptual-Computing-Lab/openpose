@@ -29,7 +29,7 @@ addons:
 
 # Build your code e.g. by calling make
 script:
-  - ./ubuntu/install_cmake.sh
+  - ./3rdparty/ubuntu/install_ubuntu_deps_and_cuda.sh
   - sudo apt-get -y install libatlas-base-dev
   - sudo apt-get -y install libopencv-dev
   - pip install --upgrade numpy

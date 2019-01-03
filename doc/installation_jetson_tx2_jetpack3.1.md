@@ -31,7 +31,7 @@ Notes:
 ## Installation
 Use the following script for installation of both caffe and OpenPose: 
 ```
-./ubuntu/install_caffe_and_openpose_JetsonTX2_JetPack3.1.sh
+./3rdparty/ubuntu/install_caffe_and_openpose_JetsonTX2_JetPack3.1.sh
 ```
 
 
@@ -45,4 +45,4 @@ To activate hand or face resolution please complete this command with the follow
 ```
 --hand -hand_net_resolution 256x256
 --face -face_net_resolution 256x256
-``` 
+```

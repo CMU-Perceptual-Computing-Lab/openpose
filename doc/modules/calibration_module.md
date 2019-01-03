@@ -135,13 +135,14 @@ Examples:
 :: Ceres-compatible version not implemented for Windows yet. Make a pull request if you have a working version in Windows.
 ```
 5. Hint to verify extrinsic calibration is successful:
-    1. Translation vector - Global distance:
+    1. Our final reprojection error (after rescaling) for the bundle adjustment step is usually about 0.1-0.15 pixels.
+    2. Translation vector - Global distance:
         1. Manually open each one of the generated XML files from the folder indicated by the flag `--camera_parameter_path` (or the default one indicated by the `--help` flag if the former was not used).
         2. The field `CameraMatrix` is a 3 x 4 matrix (you can see that the subfield `rows` in that file is 3 and `cols` is 4).
         3. Order the matrix in that 3 x 4 shape (e.g., by copying in a different text file with the shape of 3 rows and 4 columns).
         4. The 3 first components of the last column of the `CameraMatrix` field define the global `translation` (in meters) with respect to the global origin (in our case camera 1).
         5. Thus, the distance between that camera and the origin camera 1 should be (approximately) equal to the L2-norm of the `translation` vector.
-    2. Translation vector - Relative x-y-z distances:
+    3. Translation vector - Relative x-y-z distances:
         1. The 3x1 `translation` vector represents the `x`, `y`, and `z` distances to the origin camera, respectively. The camera is looking along the positive `z` axis, the `y` axis is down, and the `x` axis is right. This should match the real distance between both cameras.
 
 

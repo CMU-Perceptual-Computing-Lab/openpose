@@ -3,7 +3,9 @@
 
 
 echo "------------------------- Installing OpenPose -------------------------"
-echo "NOTE: This script assumes that just flashed JetPack 3.1 : Ubuntu 16, CUDA 8, cuDNN 6 and OpenCV are already installed on your machine. Otherwise, it might fail."
+echo "NOTE: This script assumes that CUDA and cuDNN are already installed on your machine. Otherwise, it might fail."
+
+
 
 function exitIfError {
     if [[ $? -ne 0 ]] ; then
@@ -34,7 +36,17 @@ function executeShInItsFolder {
 
 
 echo "------------------------- Checking Ubuntu Version -------------------------"
-# If you respected the installation assumptions, nothing to do. 
+ubuntu_version="$(lsb_release -r)"
+echo "Ubuntu $ubuntu_version"
+if [[ $ubuntu_version == *"14."* ]]; then
+    ubuntu_le_14=true
+elif [[ $ubuntu_version == *"16."* || $ubuntu_version == *"15."* || $ubuntu_version == *"17."* || $ubuntu_version == *"18."* ]]; then
+    ubuntu_le_14=false
+else
+    echo "Ubuntu release older than version 14. This installation script might fail."
+    ubuntu_le_14=true
+fi
+exitIfError
 echo "------------------------- Ubuntu Version Checked -------------------------"
 echo ""
 
@@ -51,10 +63,14 @@ echo ""
 
 echo "------------------------- Compiling OpenPose -------------------------"
 # Go back to main folder
-cd ..
+cd ../..
 # Copy Makefile & Makefile.config
-cp ubuntu/Makefile.example_openpose Makefile
-cp ubuntu/Makefile.config.Ubuntu16_cuda9_JetsonTX2_openpose Makefile.config
+cp 3rdparty/ubuntu/Makefile.example Makefile
+if [[ $ubuntu_le_14 == true ]]; then
+    cp 3rdparty/ubuntu_deprecated/Makefile.config.Ubuntu14_cuda8.example Makefile.config
+else
+    cp 3rdparty/ubuntu_deprecated/Makefile.config.Ubuntu16_cuda8.example Makefile.config
+fi
 # Compile OpenPose
 make all -j$NUM_CORES
 exitIfError

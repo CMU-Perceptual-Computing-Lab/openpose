@@ -212,7 +212,9 @@ ifeq ($(USE_OPENCV), 1)
 	LIBRARIES += opencv_core opencv_highgui opencv_imgproc opencv_objdetect opencv_video opencv_calib3d
 
 	ifeq ($(OPENCV_VERSION), 3)
-		LIBRARIES += opencv_imgcodecs opencv_videoio opencv_cudawarping
+		LIBRARIES += opencv_imgcodecs opencv_videoio
+		# Cuda warping removed for TX2 compatibility (PR #989)
+		# LIBRARIES += opencv_imgcodecs opencv_videoio opencv_cudawarping
 	else
 		LIBRARIES += opencv_contrib opencv_gpu
 	endif

@@ -299,6 +299,8 @@ OpenPose Library - Release Notes
         3. Added bundle adjustment refinement for camera extrinsic calibration.
         4. Added `CameraMatrixInitial` field into the XML calibration files to keep the information of the original camera extrinsic parameters when bundle adjustment is run.
     27. Video with the 3D output can be saved with the new `--write_video_3d` flag.
+    28. Added Mac OpenCL compatibility.
+    29. Added documentation for Nvidia TX2 with JetPack 3.3.
 2. Functions or parameters renamed:
     1. By default, python example `tutorial_developer/python_2_pose_from_heatmaps.py` was using 2 scales starting at -1x736, changed to 1 scale at -1x368.
     2. WrapperStructPose default parameters changed to match those of the OpenPose demo binary.
@@ -319,6 +321,7 @@ OpenPose Library - Release Notes
     5. Fixed bug in `KeepTopNPeople` that could provoke segmentation fault for `number_people_max` > 1.
     6. Camera parameter reader can now take folder paths even if they are not finished in `/` (e.g., `~/Desktop/` worked but `~/Desktop` did not).
     7. 3D module: If the image area was smaller than HD resolution image area, the 3D keypoints were not properly estimated.
+    8. OpenCL fixes.
 
 
 

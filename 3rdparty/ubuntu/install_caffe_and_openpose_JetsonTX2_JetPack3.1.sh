@@ -23,7 +23,7 @@ function executeShInItsFolder {
     # $1 = sh file name
     # $2 = folder where the sh file is
     # $3 = folder to go back
-    cd $2   
+    cd $2
     exitIfError
     sudo chmod +x $1
     exitIfError
@@ -41,7 +41,7 @@ exitIfError
 
 
 
-executeShInItsFolder "install_openpose_JetsonTX2_JetPack3.1.sh" "./ubuntu" "./"
+executeShInItsFolder "install_openpose_JetsonTX2_JetPack3.1.sh" "./3rdparty/ubuntu/" "./"
 exitIfError
 
 
