@@ -126,71 +126,93 @@ namespace op
     {
         try
         {
-            // Parts Connection
-            const auto& bodyPartPairs = getPosePartPairs(poseModel);
-            const auto numberBodyParts = getPoseNumberBodyParts(poseModel);
-            const auto numberBodyPartPairs = (unsigned int)(bodyPartPairs.size() / 2);
-            const auto totalComputations = pairScoresCpu.getVolume();
+            #ifdef USE_OPENCL
+                // Parts Connection
+                const auto& bodyPartPairs = getPosePartPairs(poseModel);
+                const auto numberBodyParts = getPoseNumberBodyParts(poseModel);
+                const auto numberBodyPartPairs = (unsigned int)(bodyPartPairs.size() / 2);
+                const auto totalComputations = pairScoresCpu.getVolume();
 
-            if (numberBodyParts == 0)
-                error("Invalid value of numberBodyParts, it must be positive, not " + std::to_string(numberBodyParts),
-                      __LINE__, __FUNCTION__, __FILE__);
-            if (bodyPartPairsGpuPtr == nullptr || mapIdxGpuPtr == nullptr)
-                error("The pointers bodyPartPairsGpuPtr and mapIdxGpuPtr cannot be nullptr.",
-                      __LINE__, __FUNCTION__, __FILE__);
+                if (numberBodyParts == 0)
+                    error("Invalid value of numberBodyParts, it must be positive, not " + std::to_string(numberBodyParts),
+                          __LINE__, __FUNCTION__, __FILE__);
+                if (bodyPartPairsGpuPtr == nullptr || mapIdxGpuPtr == nullptr)
+                    error("The pointers bodyPartPairsGpuPtr and mapIdxGpuPtr cannot be nullptr.",
+                          __LINE__, __FUNCTION__, __FILE__);
 
-            auto pafScoreKernel = OpenCL::getInstance(gpuID)->getKernelFunctorFromManager
-                    <PAFScoreKernelFunctor, T>(
-                     "pafScoreKernel", op::pafScoreKernel);
+                auto pafScoreKernel = OpenCL::getInstance(gpuID)->getKernelFunctorFromManager
+                        <PAFScoreKernelFunctor, T>(
+                         "pafScoreKernel", op::pafScoreKernel);
 
-            cl::Buffer pairScoresGpuPtrBuffer = cl::Buffer((cl_mem)(pairScoresGpuPtr), true);
-            cl::Buffer heatMapGpuPtrBuffer = cl::Buffer((cl_mem)(heatMapGpuPtr), true);
-            cl::Buffer peaksGpuPtrBuffer = cl::Buffer((cl_mem)(peaksGpuPtr), true);
-            cl::Buffer bodyPartPairsGpuPtrBuffer = cl::Buffer((cl_mem)(bodyPartPairsGpuPtr), true);
-            cl::Buffer mapIdxGpuPtrBuffer = cl::Buffer((cl_mem)(mapIdxGpuPtr), true);
+                cl::Buffer pairScoresGpuPtrBuffer = cl::Buffer((cl_mem)(pairScoresGpuPtr), true);
+                cl::Buffer heatMapGpuPtrBuffer = cl::Buffer((cl_mem)(heatMapGpuPtr), true);
+                cl::Buffer peaksGpuPtrBuffer = cl::Buffer((cl_mem)(peaksGpuPtr), true);
+                cl::Buffer bodyPartPairsGpuPtrBuffer = cl::Buffer((cl_mem)(bodyPartPairsGpuPtr), true);
+                cl::Buffer mapIdxGpuPtrBuffer = cl::Buffer((cl_mem)(mapIdxGpuPtr), true);
 
-            // PAF Kernel Runtime
-            pafScoreKernel(
-                cl::EnqueueArgs(OpenCL::getInstance(gpuID)->getQueue(), cl::NDRange(numberBodyPartPairs,maxPeaks,maxPeaks)),
-                pairScoresGpuPtrBuffer, heatMapGpuPtrBuffer, peaksGpuPtrBuffer, bodyPartPairsGpuPtrBuffer, mapIdxGpuPtrBuffer,
-                maxPeaks, (int)numberBodyPartPairs, heatMapSize.x, heatMapSize.y, interThreshold,
-                interMinAboveThreshold);
-            OpenCL::getInstance(gpuID)->getQueue().enqueueReadBuffer(pairScoresGpuPtrBuffer, CL_TRUE, 0,
-                                                                      totalComputations * sizeof(T), pairScoresCpu.getPtr());
+                // PAF Kernel Runtime
+                pafScoreKernel(
+                    cl::EnqueueArgs(OpenCL::getInstance(gpuID)->getQueue(), cl::NDRange(numberBodyPartPairs,maxPeaks,maxPeaks)),
+                    pairScoresGpuPtrBuffer, heatMapGpuPtrBuffer, peaksGpuPtrBuffer, bodyPartPairsGpuPtrBuffer, mapIdxGpuPtrBuffer,
+                    maxPeaks, (int)numberBodyPartPairs, heatMapSize.x, heatMapSize.y, interThreshold,
+                    interMinAboveThreshold);
+                OpenCL::getInstance(gpuID)->getQueue().enqueueReadBuffer(pairScoresGpuPtrBuffer, CL_TRUE, 0,
+                                                                          totalComputations * sizeof(T), pairScoresCpu.getPtr());
 
-            // New code
-            // Get pair connections and their scores
-            const auto pairConnections = pafPtrIntoVector(
-                pairScoresCpu, peaksPtr, maxPeaks, bodyPartPairs, numberBodyPartPairs);
-            const auto peopleVector = pafVectorIntoPeopleVector(
-                pairConnections, peaksPtr, maxPeaks, bodyPartPairs, numberBodyParts);
+                // New code
+                // Get pair connections and their scores
+                const auto pairConnections = pafPtrIntoVector(
+                    pairScoresCpu, peaksPtr, maxPeaks, bodyPartPairs, numberBodyPartPairs);
+                const auto peopleVector = pafVectorIntoPeopleVector(
+                    pairConnections, peaksPtr, maxPeaks, bodyPartPairs, numberBodyParts);
 
-//            // // Old code
-//            // // Get pair connections and their scores
-//            // // std::vector<std::pair<std::vector<int>, double>> refers to:
-//            // //     - std::vector<int>: [body parts locations, #body parts found]
-//            // //     - double: person subset score
-//            // const T* const tNullptr = nullptr;
-//            // const auto peopleVector = createPeopleVector(
-//            //     tNullptr, peaksPtr, poseModel, heatMapSize, maxPeaks, interThreshold, interMinAboveThreshold,
-//            //     bodyPartPairs, numberBodyParts, numberBodyPartPairs, pairScoresCpu);
+               // // Old code
+               // // Get pair connections and their scores
+               // // std::vector<std::pair<std::vector<int>, double>> refers to:
+               // //     - std::vector<int>: [body parts locations, #body parts found]
+               // //     - double: person subset score
+               // const T* const tNullptr = nullptr;
+               // const auto peopleVector = createPeopleVector(
+               //     tNullptr, peaksPtr, poseModel, heatMapSize, maxPeaks, interThreshold, interMinAboveThreshold,
+               //     bodyPartPairs, numberBodyParts, numberBodyPartPairs, pairScoresCpu);
 
-            // Delete people below the following thresholds:
-                // a) minSubsetCnt: removed if less than minSubsetCnt body parts
-                // b) minSubsetScore: removed if global score smaller than this
-                // c) maxPeaks (POSE_MAX_PEOPLE): keep first maxPeaks people above thresholds
-            int numberPeople;
-            std::vector<int> validSubsetIndexes;
-            validSubsetIndexes.reserve(fastMin((size_t)maxPeaks, peopleVector.size()));
-            removePeopleBelowThresholds(validSubsetIndexes, numberPeople, peopleVector, numberBodyParts, minSubsetCnt,
-                                        minSubsetScore, maxPeaks, maximizePositives);
+                // Delete people below the following thresholds:
+                    // a) minSubsetCnt: removed if less than minSubsetCnt body parts
+                    // b) minSubsetScore: removed if global score smaller than this
+                    // c) maxPeaks (POSE_MAX_PEOPLE): keep first maxPeaks people above thresholds
+                int numberPeople;
+                std::vector<int> validSubsetIndexes;
+                validSubsetIndexes.reserve(fastMin((size_t)maxPeaks, peopleVector.size()));
+                removePeopleBelowThresholds(validSubsetIndexes, numberPeople, peopleVector, numberBodyParts, minSubsetCnt,
+                                            minSubsetScore, maxPeaks, maximizePositives);
 
-            // Fill and return poseKeypoints
-            peopleVectorToPeopleArray(poseKeypoints, poseScores, scaleFactor, peopleVector, validSubsetIndexes,
-                                      peaksPtr, numberPeople, numberBodyParts, numberBodyPartPairs);
+                // Fill and return poseKeypoints
+                peopleVectorToPeopleArray(poseKeypoints, poseScores, scaleFactor, peopleVector, validSubsetIndexes,
+                                          peaksPtr, numberPeople, numberBodyParts, numberBodyPartPairs);
 
-//            // Sanity check
-//            cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+               // // Sanity check
+               // cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+            #else
+                UNUSED(poseKeypoints);
+                UNUSED(poseScores);
+                UNUSED(heatMapGpuPtr);
+                UNUSED(peaksPtr);
+                UNUSED(poseModel);
+                UNUSED(heatMapSize);
+                UNUSED(maxPeaks);
+                UNUSED(interMinAboveThreshold);
+                UNUSED(interThreshold);
+                UNUSED(minSubsetCnt);
+                UNUSED(minSubsetScore);
+                UNUSED(scaleFactor);
+                UNUSED(maximizePositives);
+                UNUSED(pairScoresCpu);
+                UNUSED(pairScoresGpuPtr);
+                UNUSED(bodyPartPairsGpuPtr);
+                UNUSED(mapIdxGpuPtr);
+                UNUSED(peaksGpuPtr);
+                UNUSED(gpuID);
+            #endif
         }
         catch (const std::exception& e)
         {

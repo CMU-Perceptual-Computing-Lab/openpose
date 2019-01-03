@@ -325,7 +325,8 @@ namespace op
                 }
             #else
                 UNUSED(targetPtr);
-                UNUSED(kernelPtr);
+                UNUSED(kernelGpuPtr);
+                UNUSED(kernelCpuPtr);
                 UNUSED(sourcePtr);
                 UNUSED(threshold);
                 UNUSED(targetSize);
