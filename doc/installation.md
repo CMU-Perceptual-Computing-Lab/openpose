@@ -39,7 +39,7 @@ This installation section is only intended if you plan to modify the OpenPose co
 - **Ubuntu** 14 and 16.
 - **Windows** 8 and 10.
 - **Mac OSX** Mavericks and above.
-- **Nvidia Jetson TX2**, installation instructions in [doc/installation_jetson_tx2_jetpack3.1.md](./installation_jetson_tx2_jetpack3.1.md) and [doc/installation_jetson_tx2_jetpack3.3.md](./installation_jetson_tx2_jetpack3.3.md).
+- **Nvidia Jetson TX2** (for JetPack 3.1 or 3.3), installation instructions in [doc/installation_jetson_tx2_jetpack3.1.md](./installation_jetson_tx2_jetpack3.1.md) and [doc/installation_jetson_tx2_jetpack3.3.md](./installation_jetson_tx2_jetpack3.3.md) respectively.
 - OpenPose has also been used on **Windows 7**, **CentOS**, and **Nvidia Jetson (TK1 and TX1)** embedded systems. However, we do not officially support them at the moment.
 
 

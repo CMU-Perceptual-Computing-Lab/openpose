@@ -12,12 +12,25 @@ sudo: required
 # Environment variables
 env:
   global:
+    # - NUM_THREADS=4
     - GH_REPO_NAME: openpose
     - DOXYFILE: $TRAVIS_BUILD_DIR/doc/doc_autogeneration.doxygen
     # Set this in Environment Variables on travis-ci.org
     # - GH_REPO_REF: github.com/<user_name>/openpose.git
+  matrix:
+    # Use a build matrix to test many builds in parallel
+    # envvar defaults:
+    #   WITH_CMAKE: true
+    #   WITH_PYTHON3: false
+    #   WITH_CUDA: true
+    #   WITH_CUDNN: true
+    - BUILD_NAME="default-cmake-cuda8"
+    # - BUILD_NAME="default-make-cuda8" WITH_CMAKE=false
+    # - BUILD_NAME="default-cmake-cpu" WITH_CUDA=false
+    # - BUILD_NAME="python3-cmake-cuda8" WITH_PYTHON3=true
+    # - BUILD_NAME="default-make-cuda8_nocudnn" WITH_CUDNN=false
 
-# Install dependencies
+# Install apt dependencies
 addons:
   apt:
     packages:
@@ -27,17 +40,26 @@ addons:
       - doxygen-gui
       - graphviz
 
-# Build your code e.g. by calling make
-script:
-  - ./3rdparty/ubuntu/install_ubuntu_deps_and_cuda.sh
+# Install Caffe and OP dependencies
+install:
+  - sudo bash ./3rdparty/ubuntu/install_ubuntu_deps_and_cuda.sh
   - sudo apt-get -y install libatlas-base-dev
   - sudo apt-get -y install libopencv-dev
   - pip install --upgrade numpy
+
+# Running CMake
+before_script:
   - mkdir build
   - cd build
   - cmake -DBUILD_CAFFE=ON -DDOWNLOAD_BODY_25_MODEL=OFF -DDOWNLOAD_BODY_COCO_MODEL=OFF -DDOWNLOAD_FACE_MODEL=OFF -DDOWNLOAD_HAND_MODEL=OFF -DDOWNLOAD_BODY_MPI_MODEL=OFF ..
-  - no_cores=`cat /proc/cpuinfo | grep processor | wc -l`
-  - make -j${no_cores}
+
+# Build your code e.g., by calling make
+script:
+  - make -j`nproc`
+  # - bash ./cmake/travis/build.sh
+# Equivalent to make -j`nproc`
+#   - no_cores=`cat /proc/cpuinfo | grep processor | wc -l`
+#   - make -j${no_cores}
 
 # Generate and deploy documentation
 after_success:
