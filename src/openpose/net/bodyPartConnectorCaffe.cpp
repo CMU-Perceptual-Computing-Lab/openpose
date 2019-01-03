@@ -4,13 +4,13 @@
 #ifdef USE_CUDA
     #include <openpose/gpu/cuda.hpp>
 #endif
-#include <openpose/net/bodyPartConnectorBase.hpp>
-#include <openpose/pose/poseParameters.hpp>
-#include <openpose/net/bodyPartConnectorCaffe.hpp>
 #ifdef USE_OPENCL
     #include <openpose/gpu/opencl.hcl>
     #include <openpose/gpu/cl2.hpp>
 #endif
+#include <openpose/net/bodyPartConnectorBase.hpp>
+#include <openpose/pose/poseParameters.hpp>
+#include <openpose/net/bodyPartConnectorCaffe.hpp>
 
 namespace op
 {
@@ -60,18 +60,15 @@ namespace op
             #ifdef USE_CAFFE
                 auto heatMapsBlob = bottom.at(0);
                 auto peaksBlob = bottom.at(1);
-
                 // Top shape
                 const auto maxPeaks = peaksBlob->shape(2) - 1;
                 const auto numberBodyParts = peaksBlob->shape(1);
-
                 // Array sizes
                 mTopSize = std::array<int, 4>{1, maxPeaks, numberBodyParts, 3};
                 mHeatMapsSize = std::array<int, 4>{
                     heatMapsBlob->shape(0), heatMapsBlob->shape(1), heatMapsBlob->shape(2), heatMapsBlob->shape(3)};
                 mPeaksSize = std::array<int, 4>{
                     peaksBlob->shape(0), peaksBlob->shape(1), peaksBlob->shape(2), peaksBlob->shape(3)};
-
                 // GPU ID
                 mGpuID = gpuID;
             #else

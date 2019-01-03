@@ -329,7 +329,7 @@ Lastly, OpenCL version does not support unfixed `--net_resolution`. So a folder 
 
 
 #### Mac OSX Version
-Mac OSX Version compiles similarly to the Ubuntu version. Take a look at the prerequisites section. For GPU acceleration, OpenPose may be built with `GPU_MODE=OPENCL`. If you have a Mac with an inbuilt AMD graphics card, you have to manually select your AMD GPU. To do that, first note which device your Graphics card is set under:
+Mac OSX Version compiles similarly to the Ubuntu version. Take a look at the prerequisites section. For GPU acceleration, OpenPose may be built with OpenCL support (check [OpenCL Version](#opencl-version) or add in CMake`GPU_MODE=OPENCL`). If you have a Mac with an inbuilt AMD graphics card, you have to manually select your AMD GPU. To do that, first note which device your Graphics card is set under:
 
 ```
 clinfo
@@ -339,6 +339,12 @@ Most likely, your AMD device will be under device 2. Then run openpose with the 
 
 ```
 build/examples/openpose/openpose.bin --num_gpu 1 --num_gpu_start 2
+```
+
+If you only have an integrated Intel Graphics card, then it will most probably be the device 1:
+
+```
+build/examples/openpose/openpose.bin --num_gpu 1 --num_gpu_start 1
 ```
 
 Also as a side note, if the default installation fails (i.e., the one explained above), instal Caffe separately and set `BUILD_CAFFE` to false in the CMake config. Steps:

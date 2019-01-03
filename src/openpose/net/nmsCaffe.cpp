@@ -1,12 +1,12 @@
 #ifdef USE_CAFFE
     #include <caffe/blob.hpp>
 #endif
-#include <openpose/net/nmsBase.hpp>
-#include <openpose/net/nmsCaffe.hpp>
 #ifdef USE_OPENCL
     #include <openpose/gpu/opencl.hcl>
     #include <openpose/gpu/cl2.hpp>
 #endif
+#include <openpose/net/nmsBase.hpp>
+#include <openpose/net/nmsCaffe.hpp>
 
 namespace op
 {
@@ -18,7 +18,7 @@ namespace op
             std::array<int, 4> mBottomSize;
             std::array<int, 4> mTopSize;
             // Special Kernel for OpenCL NMS
-            #ifdef USE_OPENCL
+            #if defined USE_CAFFE && defined USE_OPENCL
                 //std::shared_ptr<caffe::Blob<uint8_t>> mKernelBlobT;
                 uint8_t* mKernelGpuPtr;
                 uint8_t* mKernelCpuPtr;
@@ -27,7 +27,7 @@ namespace op
 
         ImplNmsCaffe()
         {
-            #ifdef USE_OPENCL
+            #if defined USE_CAFFE && defined USE_OPENCL
                 mKernelGpuPtr = nullptr;
                 mKernelCpuPtr = nullptr;
             #endif
@@ -35,7 +35,7 @@ namespace op
 
         ~ImplNmsCaffe()
         {
-            #ifdef USE_OPENCL
+            #if defined USE_CAFFE && defined USE_OPENCL
                 if(mKernelGpuPtr != nullptr) clReleaseMemObject((cl_mem)mKernelGpuPtr);
                 if(mKernelCpuPtr != nullptr) delete mKernelCpuPtr;
             #endif
@@ -107,9 +107,11 @@ namespace op
                 upImpl->mKernelBlob.Reshape(bottomShape);
 
                 // Special Kernel for OpenCL NMS
-                #ifdef USE_OPENCL
+                #if defined USE_CAFFE && defined USE_OPENCL
                     int bottomShapeVolume = bottomShape[0] * bottomShape[1] * bottomShape[2] * bottomShape[3];
-                    upImpl->mKernelGpuPtr = (uint8_t*)clCreateBuffer(OpenCL::getInstance(gpuID)->getContext().operator()(), CL_MEM_READ_WRITE, sizeof(uint8_t) * bottomShapeVolume, NULL, NULL);
+                    upImpl->mKernelGpuPtr = (uint8_t*)clCreateBuffer(
+                        OpenCL::getInstance(gpuID)->getContext().operator()(), CL_MEM_READ_WRITE,
+                        sizeof(uint8_t) * bottomShapeVolume, NULL, NULL);
                     upImpl->mKernelCpuPtr = new uint8_t[bottomShapeVolume];
                     // GPU ID
                     mGpuID = gpuID;

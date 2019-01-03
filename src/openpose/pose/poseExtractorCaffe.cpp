@@ -3,6 +3,10 @@
     #include <caffe/blob.hpp>
 #endif
 #include <openpose/gpu/cuda.hpp>
+#ifdef USE_OPENCL
+    #include <openpose/gpu/opencl.hcl>
+    #include <openpose/gpu/cl2.hpp>
+#endif
 #include <openpose/net/bodyPartConnectorCaffe.hpp>
 #include <openpose/net/maximumCaffe.hpp>
 #include <openpose/net/netCaffe.hpp>
@@ -16,10 +20,6 @@
 #include <openpose/utilities/openCv.hpp>
 #include <openpose/utilities/standard.hpp>
 #include <openpose/pose/poseExtractorCaffe.hpp>
-#ifdef USE_OPENCL
-    #include <openpose/gpu/opencl.hcl>
-    #include <openpose/gpu/cl2.hpp>
-#endif
 
 namespace op
 {
@@ -278,7 +278,6 @@ namespace op
                         mNetOutputSize = Point<int>{upImpl->mNetInput4DSizes[0][3],
                                                     upImpl->mNetInput4DSizes[0][2]};
                 }
-
                 // 2. Resize heat maps + merge different scales
                 // ~5ms (GPU) / ~20ms (CPU)
                 const auto caffeNetOutputBlobs = caffeNetSharedToPtr(upImpl->spCaffeNetOutputBlobs);
@@ -299,7 +298,6 @@ namespace op
                 const auto nmsOffset = float(0.5/double(mScaleNetToOutput));
                 upImpl->spNmsCaffe->setOffset(Point<float>{nmsOffset, nmsOffset});
                 upImpl->spNmsCaffe->Forward({upImpl->spHeatMapsBlob.get()}, {upImpl->spPeaksBlob.get()});
-
                 // 4. Connecting body parts
                 upImpl->spBodyPartConnectorCaffe->setScaleNetToOutput(mScaleNetToOutput);
                 upImpl->spBodyPartConnectorCaffe->setInterMinAboveThreshold(
