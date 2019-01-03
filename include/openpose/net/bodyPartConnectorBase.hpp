@@ -23,6 +23,15 @@ namespace op
         const unsigned int* const bodyPartPairsGpuPtr = nullptr, const unsigned int* const mapIdxGpuPtr = nullptr,
         const T* const peaksGpuPtr = nullptr);
 
+    template <typename T>
+    void connectBodyPartsOcl(
+        Array<T>& poseKeypoints, Array<T>& poseScores, const T* const heatMapGpuPtr, const T* const peaksPtr,
+        const PoseModel poseModel, const Point<int>& heatMapSize, const int maxPeaks, const T interMinAboveThreshold,
+        const T interThreshold, const int minSubsetCnt, const T minSubsetScore, const T scaleFactor = 1.f,
+        const bool maximizePositives = false, Array<T> pairScoresCpu = Array<T>{}, T* pairScoresGpuPtr = nullptr,
+        const unsigned int* const bodyPartPairsGpuPtr = nullptr, const unsigned int* const mapIdxGpuPtr = nullptr,
+        const T* const peaksGpuPtr = nullptr, const int gpuID = 0);
+
     // Private functions used by the 2 above functions
     template <typename T>
     std::vector<std::pair<std::vector<int>, T>> createPeopleVector(

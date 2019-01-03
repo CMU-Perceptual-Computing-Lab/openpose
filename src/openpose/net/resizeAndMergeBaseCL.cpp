@@ -86,7 +86,7 @@ namespace op
                 int y = get_global_id(1);
                 int x = get_global_id(2);
 
-                Type* targetPtrC = &targetPtr[c*targetWidth*targetHeight];
+                __global Type* targetPtrC = &targetPtr[c*targetWidth*targetHeight];
                 const __global Type* sourcePtrC = &sourcePtr[c*sourceWidth*sourceHeight];
 
                 if (x < targetWidth && y < targetHeight)
