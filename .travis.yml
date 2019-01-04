@@ -44,7 +44,7 @@ env:
     #   WITH_CUDNN: true
     # - BUILD_NAME="default-cmake-cuda8"
     # # - BUILD_NAME="default-make-cuda8" WITH_CMAKE=false
-    - BUILD_NAME="default-cmake-cpu" WITH_CUDA=false
+    # - BUILD_NAME="default-cmake-cpu" WITH_CUDA=false
     # # - BUILD_NAME="python3-cmake-cuda8" WITH_PYTHON3=true
     # # - BUILD_NAME="default-make-cuda8_nocudnn" WITH_CUDNN=false
     include:
@@ -52,11 +52,12 @@ env:
     - os: linux
       dist: xenial
       sudo: required
-      # BUILD_NAME="default-cmake-cuda8"
+      BUILD_NAME="default-cmake-cpu" WITH_CUDA=false
     # Ubuntu 14.04
     - os: linux
       dist: trusty
       sudo: required
+      BUILD_NAME="default-cmake-cpu" WITH_CUDA=false
     # # Ubuntu 12.04
     # - os: linux
     #   dist: precise # 12.04
@@ -65,6 +66,7 @@ env:
     - os: osx
       osx_image: xcode7.2
       sudo: required
+      BUILD_NAME="default-cmake-cpu" WITH_CUDA=false
 
     # - os: linux
     #   sudo: required
