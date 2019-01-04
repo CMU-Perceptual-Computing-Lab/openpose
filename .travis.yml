@@ -21,12 +21,13 @@ sudo: required
 #       # dist: precise # 12.04
 #     - os: osx
 #       osx_image: xcode7.2
-- os: linux
-  dist: xenial # 16.04
-  dist: trusty # 14.04
-  # dist: precise # 12.04
-- os: osx
-  osx_image: xcode7.2
+os:
+  - linux
+    dist: xenial # 16.04
+    dist: trusty # 14.04
+    # dist: precise # 12.04
+  - osx
+    osx_image: xcode7.2
 
 # Environment variables
 env:
