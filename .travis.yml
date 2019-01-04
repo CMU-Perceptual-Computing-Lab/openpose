@@ -26,6 +26,11 @@ matrix:
   #   dist: xenial
   #   env: NAME="default-cmake-cuda8"
   #   sudo: required
+  #   # Generate and deploy documentation
+  #   after_success:
+  #     - cd $TRAVIS_BUILD_DIR
+  #     - chmod +x .github/generate_gh_pages.sh
+  #     - ./.github/generate_gh_pages.sh
   # # Ubuntu 16.04 - Default - CMake - CPU
   # - os: linux
   #   dist: xenial
@@ -120,9 +125,3 @@ before_script:
 # Build your code e.g., by calling make
 script:
   - bash ./scripts/travis/run_make.sh
-
-# Generate and deploy documentation
-after_success:
-  - cd $TRAVIS_BUILD_DIR
-  - chmod +x .github/generate_gh_pages.sh
-  - ./.github/generate_gh_pages.sh
