@@ -1,5 +1,6 @@
 #!/bin/bash
-# build the project
+
+# Build the project
 
 BASEDIR=$(dirname $0)
 source $BASEDIR/defaults.sh

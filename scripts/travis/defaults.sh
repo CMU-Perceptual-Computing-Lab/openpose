@@ -1,5 +1,6 @@
 #!/bin/bash
-# set default environment variables
+
+# Set default environment variables
 
 set -e
 

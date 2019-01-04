@@ -1,5 +1,6 @@
 #!/bin/bash
-# configure the project
+
+# Configure the project
 
 BASEDIR=$(dirname $0)
 source $BASEDIR/defaults.sh

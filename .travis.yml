@@ -41,77 +41,9 @@ matrix:
   #   sudo: required
   # Mac OSX - Default - CMake - CPU
   - os: osx
-    osx_image: xcode7.2
+    osx_image: xcode10.1 # Versions: https://docs.travis-ci.com/user/languages/objective-c#supported-xcode-versions
     env: BUILD_NAME="default-cmake-cpu" WITH_CUDA=false
     sudo: required
-
-  # - os: linux
-  #   sudo: required
-  #   dist: precise
-  #   group: edge
-  #   before_script: "gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3"
-  # - os: linux
-  #   before_script:
-  #     - 'echo -e "gem-wrappers\nrubygems-bundler\nbundler\nrake\nrvm\n" >> ~/.rvm/gemsets/global.gems'
-  #     - "gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3"
-  #     - "sudo apt-get install haveged"
-  #     - "sudo service haveged start"
-  #   services: docker
-  # - os: linux
-  #   dist: xenial
-  #   language: generic
-  #   before_install:
-  #     - |
-  #        sudo systemctl stop apt-daily.service &&
-  #        sudo systemctl kill --kill-who=all apt-daily.service &&
-  #        while ! (systemctl list-units --all apt-daily.service | fgrep -q dead) ; do
-  #          sleep 1
-  #        done
-  #   before_script:
-  #     - 'echo -e "gem-wrappers\nrubygems-bundler\nbundler\nrake\nrvm\n" >> ~/.rvm/gemsets/global.gems'
-  #     - "gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3"
-  #     - "sudo apt-get install haveged"
-  #     - "sudo service haveged start"
-  # - os: osx
-  #   before_install:
-  #     - sw_vers
-  #     - unset -f cd
-  #   install:
-  #     - unset -f pushd
-  #     - unset -f popd
-  #   osx_image: xcode6.4
-  #   cache: &osx_cache
-  #     ccache: true
-  #     directories:
-  #       - /usr/local/Cellar/python
-  #       - /usr/local/opt/python
-  # - os: osx
-  #   before_install:
-  #     - sw_vers
-  #     - unset -f cd
-  #   install:
-  #     - unset -f pushd
-  #     - unset -f popd
-  #   osx_image: xcode7.3 # macOS 10.11
-  #   cache: *osx_cache
-  # - os: osx
-  #   before_install:
-  #     - sw_vers
-  #     - unset -f cd
-  #   install:
-  #     - unset -f pushd
-  #     - unset -f popd
-  #   osx_image: xcode8.3 # macOS 10.12
-  #   cache: *osx_cache
-  # - os: osx
-  #   before_install:
-  #     - sw_vers
-  #   osx_image: xcode9.4 # macOS 10.13
-  #   cache: *osx_cache
-  # - arch: ppc64le
-  #   dist: xenial
-  #   language: bash
-  #   group: edge
 
 # Install apt dependencies
 addons:
@@ -125,7 +57,6 @@ addons:
 
 # Install Caffe and OP dependencies
 install:
-  - sudo bash ./scripts/travis/install_deps.sh
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo bash ./scripts/travis/install_deps_ubuntu.sh ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo bash ./scripts/travis/install_deps_osx.sh ; fi
   - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then exit 99 ; fi

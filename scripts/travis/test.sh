@@ -1,5 +1,6 @@
 #!/bin/bash
-# test the project
+
+# Test the project
 
 BASEDIR=$(dirname $0)
 source $BASEDIR/defaults.sh
