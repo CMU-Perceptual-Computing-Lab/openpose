@@ -33,7 +33,8 @@ matrix:
     sudo: required
   # Ubuntu 16.04 - Default - CMake - CUDA - no cuDNN
   - os: linux
-    dist: xenial
+    # dist: xenial
+    dist: trusty
     env: BUILD_NAME="default-cmake-cuda8-nocudnn" WITH_CUDNN=false
     sudo: required
   # Ubuntu 16.04 - Default - CMake - CPU
@@ -44,12 +45,17 @@ matrix:
   # Ubuntu 16.04 - Default - Make - CUDA
   - os: linux
     dist: xenial
-    env: BUILD_NAME="default-make-cuda8"
+    env: BUILD_NAME="default-make-cuda8" WITH_CMAKE=false
     sudo: required
   # Ubuntu 16.04 - Python - CMake - CUDA
   - os: linux
     dist: xenial
     env: BUILD_NAME="python-cmake-cuda8" WITH_PYTHON=true
+    sudo: required
+  # Ubuntu 16.04 - Python - CMake - CPU
+  - os: linux
+    dist: xenial
+    env: BUILD_NAME="python-cmake-cpu" WITH_PYTHON=true WITH_CUDA=false
     sudo: required
 
   # # Ubuntu 14.04
