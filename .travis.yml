@@ -5,31 +5,7 @@ branches:
   only:
     - master
 
-# # Enable sudo
-# sudo: required
-
-# OS
-# os:
-#   - linux
-#   - osx
-# dist: trusty
-# matrix:
-#   include:
-#     - os: linux
-#       dist: xenial # 16.04
-#       dist: trusty # 14.04
-#       # dist: precise # 12.04
-#     - os: osx
-#       osx_image: xcode7.2
-# os:
-#   - linux
-#     # dist: xenial # 16.04
-#     # dist: trusty # 14.04
-#     # dist: precise # 12.04
-#   - osx
-#     # osx_image: xcode7.2
-# Environment variables
-# env:
+# Environment variables + OS + other parameters
 global:
   - GH_REPO_NAME: openpose
   - DOXYFILE: $TRAVIS_BUILD_DIR/doc/doc_autogeneration.doxygen
@@ -43,30 +19,31 @@ matrix:
   #   WITH_CUDA: true
   #   WITH_CUDNN: true
   # - BUILD_NAME="default-cmake-cuda8"
-  # # - BUILD_NAME="default-make-cuda8" WITH_CMAKE=false
+  # - BUILD_NAME="default-make-cuda8" WITH_CMAKE=false
   # - BUILD_NAME="default-cmake-cpu" WITH_CUDA=false
-  # # - BUILD_NAME="python3-cmake-cuda8" WITH_PYTHON3=true
-  # # - BUILD_NAME="default-make-cuda8_nocudnn" WITH_CUDNN=false
+  # - BUILD_NAME="python3-cmake-cuda8" WITH_PYTHON3=true
+  # - BUILD_NAME="default-make-cuda8_nocudnn" WITH_CUDNN=false
   include:
-  # Ubuntu 16.04
+  # Ubuntu 16.04 - Default - CMake - CPU
   - os: linux
     dist: xenial
-    sudo: required
     env: BUILD_NAME="default-cmake-cpu" WITH_CUDA=false
-  # Ubuntu 14.04
+    sudo: required
+  # Ubuntu 14.04 - Default - CMake - CPU
   - os: linux
     dist: trusty
-    sudo: required
     env: BUILD_NAME="default-cmake-cpu" WITH_CUDA=false
-  # # Ubuntu 12.04
+    sudo: required
+  # # Ubuntu 12.04 - Default - CMake - CPU
   # - os: linux
   #   dist: precise # 12.04
+  #   env: BUILD_NAME="default-cmake-cpu" WITH_CUDA=false
   #   sudo: required
-  # Mac OSX
+  # Mac OSX - Default - CMake - CPU
   - os: osx
     osx_image: xcode7.2
-    sudo: required
     env: BUILD_NAME="default-cmake-cpu" WITH_CUDA=false
+    sudo: required
 
   # - os: linux
   #   sudo: required
@@ -148,17 +125,11 @@ addons:
 
 # Install Caffe and OP dependencies
 install:
-  - sudo bash ./3rdparty/ubuntu/install_ubuntu_deps_and_cuda.sh
-  - sudo apt-get -y install libatlas-base-dev
-  - sudo apt-get -y install libopencv-dev
+  - sudo bash ./scripts/travis/install_deps.sh
 
 # Running CMake
 before_script:
   - bash ./scripts/travis/configure.sh
-  # Equivalent for CMake
-  # - mkdir build
-  # - cd build
-  # - cmake -DBUILD_CAFFE=ON -DDOWNLOAD_BODY_25_MODEL=OFF -DDOWNLOAD_BODY_COCO_MODEL=OFF -DDOWNLOAD_FACE_MODEL=OFF -DDOWNLOAD_HAND_MODEL=OFF -DDOWNLOAD_BODY_MPI_MODEL=OFF ..
 
 # Build your code e.g., by calling make
 script:
