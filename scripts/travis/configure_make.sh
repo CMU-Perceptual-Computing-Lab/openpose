@@ -6,7 +6,8 @@ LINE () {
   echo "$@" >> Makefile.config
 }
 
-cp Makefile.config.example Makefile.config
+# cp Makefile.config.example Makefile.config
+bash 3rdparty/ubuntu_deprecated/install_caffe_and_openpose_if_cuda8.sh
 
 if $WITH_PYTHON ; then
   # TODO(lukeyeager) this path is currently disabled because of test errors like:
