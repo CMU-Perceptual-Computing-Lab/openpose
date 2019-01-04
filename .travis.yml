@@ -5,9 +5,22 @@ branches:
   only:
     - master
 
-# OS
-dist: trusty 
+# Enable sudo
 sudo: required
+
+# OS
+# os:
+#   - linux
+#   - osx
+# dist: trusty
+matrix:
+  include:
+    - os: linux
+      dist: xenial # 16.04
+      dist: trusty # 14.04
+      # dist: precise # 12.04
+    - os: osx
+      osx_image: xcode7.2
 
 # Environment variables
 env:
@@ -48,7 +61,7 @@ install:
 
 # Running CMake
 before_script:
-  - bash ./cmake/travis/configure.sh
+  - bash ./scripts/travis/configure.sh
   # Equivalent for CMake
   # - mkdir build
   # - cd build
@@ -56,11 +69,7 @@ before_script:
 
 # Build your code e.g., by calling make
 script:
-  - bash ./cmake/travis/run_make.sh
-  # - make -j`nproc`
-# Equivalent to make -j`nproc`
-#   - no_cores=`cat /proc/cpuinfo | grep processor | wc -l`
-#   - make -j${no_cores}
+  - bash ./scripts/travis/run_make.sh
 
 # Generate and deploy documentation
 after_success:
