@@ -24,64 +24,64 @@ matrix:
   # # Ubuntu 16.04 - Default - CMake - CUDA
   # - os: linux
   #   dist: xenial
-  #   env: BUILD_NAME="default-cmake-cuda8"
+  #   env: NAME="default-cmake-cuda8"
   #   sudo: required
   # # Ubuntu 16.04 - Default - CMake - CPU
   # - os: linux
   #   dist: xenial
-  #   env: BUILD_NAME="default-cmake-cpu" WITH_CUDA=false
+  #   env: NAME="default-cmake-cpu" WITH_CUDA=false
   #   sudo: required
   # Ubuntu 16.04 - Default - CMake - CUDA - no cuDNN
   - os: linux
     # dist: xenial
     dist: trusty
-    env: BUILD_NAME="default-cmake-cuda8-nocudnn" WITH_CUDNN=false
+    env: NAME="default-cmake-cuda8-nocudnn" WITH_CUDNN=false
     sudo: required
   # # Ubuntu 16.04 - Default - CMake - CPU MKL
   # - os: linux
   #   dist: xenial
-  #   env: BUILD_NAME="default-cmake-cpu-mkl" WITH_CUDA=false WITH_MKL=true
+  #   env: NAME="default-cmake-cpu-mkl" WITH_CUDA=false WITH_MKL=true
   #   sudo: required
-  # Ubuntu 16.04 - Default - Make - CUDA
-  - os: linux
-    dist: xenial
-    env: BUILD_NAME="default-make-cuda8" WITH_CMAKE=false
-    sudo: required
+  # # Ubuntu 16.04 - Default - Make - CUDA
+  # - os: linux
+  #   dist: xenial
+  #   env: NAME="default-make-cuda8" WITH_CMAKE=false
+  #   sudo: required
   # # Ubuntu 16.04 - Python - CMake - CUDA
   # - os: linux
   #   dist: xenial
-  #   env: BUILD_NAME="python-cmake-cuda8" WITH_PYTHON=true
+  #   env: NAME="python-cmake-cuda8" WITH_PYTHON=true
   #   sudo: required
   # # Ubuntu 16.04 - Python - CMake - CPU
   # - os: linux
   #   dist: xenial
-  #   env: BUILD_NAME="python-cmake-cpu" WITH_PYTHON=true WITH_CUDA=false
+  #   env: NAME="python-cmake-cpu" WITH_PYTHON=true WITH_CUDA=false
   #   sudo: required
 
   # # Ubuntu 14.04
   # # Ubuntu 14.04 - Default - CMake - CUDA
   # - os: linux
   #   dist: trusty
-  #   env: BUILD_NAME="default-cmake-cuda8"
+  #   env: NAME="default-cmake-cuda8"
   #   sudo: required
   # # Ubuntu 14.04 - Default - CMake - CPU
   # - os: linux
   #   dist: trusty
-  #   env: BUILD_NAME="default-cmake-cpu" WITH_CUDA=false
+  #   env: NAME="default-cmake-cpu" WITH_CUDA=false
   #   sudo: required
 
   # # Ubuntu 12.04
   # # Ubuntu 12.04 - Default - CMake - CPU
   # - os: linux
   #   dist: precise
-  #   env: BUILD_NAME="default-cmake-cpu" WITH_CUDA=false
+  #   env: NAME="default-cmake-cpu" WITH_CUDA=false
   #   sudo: required
 
   # # Mac OSX
   # # Mac OSX - Default - CMake - CPU
   # - os: osx
   #   osx_image: xcode10.1 # Versions: https://docs.travis-ci.com/user/languages/objective-c#supported-xcode-versions
-  #   env: BUILD_NAME="default-cmake-cpu" WITH_CUDA=false
+  #   env: NAME="default-cmake-cpu" WITH_CUDA=false
   #   sudo: required
 
 # Install apt dependencies
