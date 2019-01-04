@@ -4,7 +4,7 @@
 echo "Running on OS ${TRAVIS_OS_NAME}."
 
 # Ubuntu
-if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
+if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
   BASEDIR=$(dirname $0)
   source $BASEDIR/defaults.sh
 
