@@ -120,9 +120,9 @@ install:
 
 # Running CMake
 before_script:
-  - bash ./scripts/travis/configure.sh
+  - bash scripts/travis/configure.sh
 
 # Build your code e.g., by calling make
 script:
-  - bash ./scripts/travis/run_make.sh
-  - bash ./scripts/travis/run_tests.sh
+  - bash scripts/travis/run_make.sh
+  - bash scripts/travis/run_tests.sh

@@ -21,7 +21,7 @@ cd ../..
 
 # Generate Makefile files for OpenPose
 cd ./3rdparty/ubuntu_deprecated/
-bash ./3rdparty/ubuntu_deprecated/copy_makefile_files.sh
+bash 3rdparty/ubuntu_deprecated/copy_makefile_files.sh
 # bash ./3rdparty/ubuntu_deprecated/install_openpose_if_cuda8.sh
 
 # Modifying Makefile.config file
