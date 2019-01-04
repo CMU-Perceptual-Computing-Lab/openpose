@@ -52,12 +52,12 @@ env:
     - os: linux
       dist: xenial
       sudo: required
-      BUILD_NAME="default-cmake-cpu" WITH_CUDA=false
+      env: BUILD_NAME="default-cmake-cpu" WITH_CUDA=false
     # Ubuntu 14.04
     - os: linux
       dist: trusty
       sudo: required
-      BUILD_NAME="default-cmake-cpu" WITH_CUDA=false
+      env: BUILD_NAME="default-cmake-cpu" WITH_CUDA=false
     # # Ubuntu 12.04
     # - os: linux
     #   dist: precise # 12.04
@@ -66,7 +66,7 @@ env:
     - os: osx
       osx_image: xcode7.2
       sudo: required
-      BUILD_NAME="default-cmake-cpu" WITH_CUDA=false
+      env: BUILD_NAME="default-cmake-cpu" WITH_CUDA=false
 
     # - os: linux
     #   sudo: required
