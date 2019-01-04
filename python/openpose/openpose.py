@@ -8,12 +8,14 @@ if __name__ == "__main__":
     params = dict()
     params["logging_level"] = 3
     params["output_resolution"] = "-1x-1"
-    params["net_resolution"] = "-1x368"
+    params["net_resolution"] = "-1x160"
     params["model_pose"] = "COCO"
     params["alpha_pose"] = 0.6
     params["scale_gap"] = 0.25
     params["scale_number"] = 1
     params["render_threshold"] = 0.05
+    params["render_pose"] = 0
+    params["display"] = 0
     params["num_gpu_start"] = 0
     params["disable_blending"] = False
     params["model_folder"] = "../../../models/"
@@ -23,6 +25,25 @@ if __name__ == "__main__":
     #op.init_argv(sys.argv)
 
     op.init(params)
+
+oppython = op.OpenposePython()
+
+datum = oppython.datum()
+
+img = cv2.imread("/Users/raaj/openpose_pybind/examples/media/COCO_val2014_000000000192.jpg")
+#datum.cvInputData = cv2.imread("/Users/raaj/openpose_pybind/examples/media/COCO_val2014_000000000192.jpg")
+datum.cvInputData = img
+
+#while 1:
+#    cv2.imshow("win", img)
+#    #cv2.imshow("win",datum.cvInputData)
+#    cv2.waitKey(15)
+
+print(datum.outputData.shape)
+
+oppython.run(datum)
+
+print(datum.outputData.shape)
 
 #datum = op.getDatum()
 

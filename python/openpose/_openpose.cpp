@@ -61,7 +61,7 @@ public:
 
         // Configuring OpenPose
         op::log("Configuring OpenPose...", op::Priority::High);
-        opWrapper = std::unique_ptr<op::Wrapper>(new op::Wrapper());
+        opWrapper = std::unique_ptr<op::Wrapper>(new op::Wrapper(op::ThreadManagerMode::Asynchronous));
         // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
         const op::WrapperStructPose wrapperStructPose{
             !FLAGS_body_disable, netInputSize, outputSize, keypointScale, FLAGS_num_gpu, FLAGS_num_gpu_start,
@@ -99,29 +99,42 @@ public:
         opWrapper->disableMultiThreading();
         // Starting OpenPose
         op::log("Starting thread(s)...", op::Priority::High);
+
+        // Start OP
         opWrapper->start();
+    }
 
-        //op::Datum* datum;
+    void run(op::Datum* datum){
+        std::vector<op::Datum> datums = {*datum};
+        std::shared_ptr<std::vector<op::Datum>> d = std::make_shared<std::vector<op::Datum>>(datums);
 
-        std::shared_ptr<std::vector<op::Datum>> datum;
-        //std::vector<std::shared_ptr<op::Datum>> datums = {datum};
-        opWrapper->emplaceAndPop(datum);
+        //std::cout << "run" << std::endl;
+        //std::cout << d->operator[](0).cvInputData.size() << std::endl;
 
+        datum->cvInputData = cv::imread("/Users/raaj/openpose_pybind/examples/media/COCO_val2014_000000000192.jpg");
+
+        opWrapper->emplaceAndPop(d);
+
+        std::cout << datum->outputData.printSize() << std::endl;
+    }
+
+    std::shared_ptr<op::Datum> datum(){
+        return std::make_shared<op::Datum>();
     }
 };
 
-std::shared_ptr<op::Datum> getDatum(){
-    std::shared_ptr<op::Datum> datum2 = std::make_shared<op::Datum>();
-    std::cout << "try" << std::endl;
-    std::vector<int> sizes = {2,2};
-    datum2->outputData = op::Array<float>(sizes, 1);
-    std::cout << "end" << std::endl;
-    return datum2;
-}
+//std::shared_ptr<op::Datum> getDatum(){
+//    std::shared_ptr<op::Datum> datum2 = std::make_shared<op::Datum>();
+//    std::cout << "try" << std::endl;
+//    std::vector<int> sizes = {2,2};
+//    datum2->outputData = op::Array<float>(sizes, 1);
+//    std::cout << "end" << std::endl;
+//    return datum2;
+//}
 
-void checkDatum(op::Datum* datum){
-    std::cout << datum->outputData << std::endl;
-}
+//void checkDatum(op::Datum* datum){
+//    std::cout << datum->outputData << std::endl;
+//}
 
 void parse_gflags(const std::vector<std::string>& argv){
     std::vector<char*> argv_vec;
@@ -152,8 +165,15 @@ PYBIND11_MODULE(_openpose, m) {
     m.def("init_argv", &init_argv, "Init Function");
 
     // Internal Test Functions
-    m.def("getDatum", &getDatum, "");
-    m.def("checkDatum", &checkDatum, "");
+    // m.def("getDatum", &getDatum, "");
+    // m.def("checkDatum", &checkDatum, "");
+
+    // OpenposePython
+    py::class_<OpenposePython>(m, "OpenposePython")
+        .def(py::init<>())
+        .def("run", &OpenposePython::run)
+        .def("datum", &OpenposePython::datum)
+        ;
 
     // Datum Object
     py::class_<op::Datum, std::shared_ptr<op::Datum>>(m, "Datum")
@@ -164,6 +184,7 @@ PYBIND11_MODULE(_openpose, m) {
         //.def("getName", &Pet::getName)
         ;
 
+    // Array Object
     py::class_<op::Array<float>>(m, "Array", py::buffer_protocol())
        .def("__repr__", [](op::Array<float> &a) { return a.toString(); })
        .def("getSize", [](op::Array<float> &a) { return a.getSize(); })
@@ -175,7 +196,7 @@ PYBIND11_MODULE(_openpose, m) {
                 py::format_descriptor<float>::format(), /* Python struct-style format descriptor */
                 m.getSize().size(),                     /* Number of dimensions */
                 m.getSize(),                            /* Buffer dimensions */
-                m.getStride()                          /* Strides (in bytes) for each index */
+                m.getStride()                           /* Strides (in bytes) for each index */
             );
         })
     ;
