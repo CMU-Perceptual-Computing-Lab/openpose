@@ -36,6 +36,16 @@ matrix:
     dist: xenial
     env: NAME="default-cmake-cpu" WITH_CUDA=false
     sudo: required
+  # Ubuntu 16.04 - Default - Make - CUDA
+  - os: linux
+    dist: xenial
+    env: NAME="default-make-cuda8" WITH_CMAKE=false
+    sudo: required
+  # # # Ubuntu 16.04 - Default - CMake - OpenCL
+  # # - os: linux
+  # #   dist: xenial
+  # #   env: NAME="default-cmake-opencl" WITH_CUDA=false WITH_OPEN_CL=true
+  # #   sudo: required
   # # Ubuntu 16.04 - Default - CMake - CUDA - no cuDNN
   # - os: linux
   #   # dist: xenial
@@ -47,16 +57,6 @@ matrix:
   #   dist: xenial
   #   env: NAME="default-cmake-cpu-mkl" WITH_CUDA=false WITH_MKL=true
   #   sudo: required
-  # # Ubuntu 16.04 - Default - Make - CUDA
-  # - os: linux
-  #   dist: xenial
-  #   env: NAME="default-make-cuda8" WITH_CMAKE=false
-  #   sudo: required
-  # # # Ubuntu 16.04 - Default - CMake - OpenCL
-  # # - os: linux
-  # #   dist: xenial
-  # #   env: NAME="default-cmake-opencl" WITH_CUDA=false WITH_OPEN_CL=true
-  # #   sudo: required
   # # Ubuntu 16.04 - Python - CMake - CUDA
   # - os: linux
   #   dist: xenial
@@ -67,11 +67,11 @@ matrix:
   #   dist: xenial
   #   env: NAME="python-cmake-cpu" WITH_PYTHON=true WITH_CUDA=false
   #   sudo: required
-  # # Ubuntu 16.04 - Python - CMake - OpenCL
-  # - os: linux
-  #   dist: xenial
-  #   env: NAME="python-cmake-opencl" WITH_PYTHON=true WITH_CUDA=false WITH_OPEN_CL=true
-  #   sudo: required
+  # # # Ubuntu 16.04 - Python - CMake - OpenCL
+  # # - os: linux
+  # #   dist: xenial
+  # #   env: NAME="python-cmake-opencl" WITH_PYTHON=true WITH_CUDA=false WITH_OPEN_CL=true
+  # #   sudo: required
 
   # # Ubuntu 14.04
   # # Ubuntu 14.04 - Default - CMake - CUDA
