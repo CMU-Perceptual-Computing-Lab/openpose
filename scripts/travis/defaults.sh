@@ -9,4 +9,8 @@ WITH_CUDNN=${WITH_CUDNN:-true}
 WITH_OPEN_CL=${WITH_OPEN_CL:-false}
 WITH_MKL=${WITH_MKL:-false}
 
-RUN_EXAMPLES=$WITH_CMAKE && ! $WITH_PYTHON && ! $WITH_CUDA && ! $WITH_OPEN_CL && ! $WITH_MKL
+if [ $WITH_CMAKE ] && [! $WITH_PYTHON ] && [! $WITH_CUDA ] && [! $WITH_OPEN_CL ] && [! $WITH_MKL ]; then
+  RUN_EXAMPLES=true
+else
+  RUN_EXAMPLES=false
+fi
