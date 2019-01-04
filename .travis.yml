@@ -21,21 +21,21 @@ matrix:
   #   WITH_MKL: false
   include:
   # Ubuntu 16.04
-  # # Ubuntu 16.04 - Default - CMake - CUDA
-  # - os: linux
-  #   dist: xenial
-  #   env: NAME="default-cmake-cuda8"
-  #   sudo: required
-  #   # Generate and deploy documentation
-  #   after_success:
-  #     - cd $TRAVIS_BUILD_DIR
-  #     - chmod +x .github/generate_gh_pages.sh
-  #     - ./.github/generate_gh_pages.sh
-  # # Ubuntu 16.04 - Default - CMake - CPU
-  # - os: linux
-  #   dist: xenial
-  #   env: NAME="default-cmake-cpu" WITH_CUDA=false
-  #   sudo: required
+  # Ubuntu 16.04 - Default - CMake - CUDA
+  - os: linux
+    dist: xenial
+    env: NAME="default-cmake-cuda8"
+    sudo: required
+    # Generate and deploy documentation
+    after_success:
+      - cd $TRAVIS_BUILD_DIR
+      - chmod +x .github/generate_gh_pages.sh
+      - ./.github/generate_gh_pages.sh
+  # Ubuntu 16.04 - Default - CMake - CPU
+  - os: linux
+    dist: xenial
+    env: NAME="default-cmake-cpu" WITH_CUDA=false
+    sudo: required
   # # Ubuntu 16.04 - Default - CMake - CUDA - no cuDNN
   # - os: linux
   #   # dist: xenial
@@ -47,11 +47,11 @@ matrix:
   #   dist: xenial
   #   env: NAME="default-cmake-cpu-mkl" WITH_CUDA=false WITH_MKL=true
   #   sudo: required
-  # Ubuntu 16.04 - Default - Make - CUDA
-  - os: linux
-    dist: xenial
-    env: NAME="default-make-cuda8" WITH_CMAKE=false
-    sudo: required
+  # # Ubuntu 16.04 - Default - Make - CUDA
+  # - os: linux
+  #   dist: xenial
+  #   env: NAME="default-make-cuda8" WITH_CMAKE=false
+  #   sudo: required
   # # # Ubuntu 16.04 - Default - CMake - OpenCL
   # # - os: linux
   # #   dist: xenial
@@ -125,3 +125,4 @@ before_script:
 # Build your code e.g., by calling make
 script:
   - bash ./scripts/travis/run_make.sh
+  - bash ./scripts/travis/run_tests.sh
