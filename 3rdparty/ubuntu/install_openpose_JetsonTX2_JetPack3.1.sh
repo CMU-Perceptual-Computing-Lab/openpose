@@ -25,7 +25,7 @@ function executeShInItsFolder {
     exitIfError
     sudo chmod +x $1
     exitIfError
-    ./$1
+    bash ./$1
     exitIfError
     cd $3
     exitIfError

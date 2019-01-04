@@ -26,7 +26,7 @@ function executeShInItsFolder {
     exitIfError
     sudo chmod +x $1
     exitIfError
-    ./$1
+    bash ./$1
     exitIfError
     cd $3
     exitIfError
@@ -34,7 +34,7 @@ function executeShInItsFolder {
 
 
 
-executeShInItsFolder "copy_makefile_files.sh" "./3rdparty/ubuntu_deprecated/" "../.."
+executeShInItsFolder "copy_makefile_files.sh" "./" "./"
 
 
 
