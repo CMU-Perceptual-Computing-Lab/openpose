@@ -10,7 +10,7 @@ WITH_OPEN_CL=${WITH_OPEN_CL:-false}
 WITH_MKL=${WITH_MKL:-false}
 
 # Examples should be run (Travis not compatible with GPU code)
-if [ $WITH_CMAKE ] && [! $WITH_PYTHON ] && [! $WITH_CUDA ] && [! $WITH_OPEN_CL ] && [! $WITH_MKL ]; then
+if [ $WITH_CMAKE ] && [ ! $WITH_PYTHON ] && [ ! $WITH_CUDA ] && [ ! $WITH_OPEN_CL ] && [ ! $WITH_MKL ]; then
   RUN_EXAMPLES=true
 else
   RUN_EXAMPLES=false
