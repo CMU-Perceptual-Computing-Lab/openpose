@@ -1,9 +1,17 @@
 #!/bin/bash
 
 # Raw Makefile configuration
+# # All in one line
+# bash 3rdparty/ubuntu_deprecated/install_caffe_and_openpose_if_cuda8.sh
+
+if ! $MAKE_CONFIG_COMPATIBLE ; then
+  echo "Configuration not compatible for Makefile."
+  exit 99
+fi
 
 LINE () {
   echo "$@" >> Makefile.config
+  echo "$@" >> 3rdparty/caffe/Makefile.config
 }
 
 # Install Caffe
@@ -11,7 +19,7 @@ cd ./3rdparty/caffe
 bash install_caffe_if_cuda8.sh
 cd ../..
 
-# Install OpenPose
+# Generate Makefile files for OpenPose
 cd ./3rdparty/ubuntu_deprecated/
 bash ./3rdparty/ubuntu_deprecated/copy_makefile_files.sh
 # bash ./3rdparty/ubuntu_deprecated/install_openpose_if_cuda8.sh
@@ -35,8 +43,3 @@ fi
 if $WITH_CUDNN ; then
   LINE "USE_CUDNN := 1"
 fi
-
-
-
-# # All in one
-# bash 3rdparty/ubuntu_deprecated/install_caffe_and_openpose_if_cuda8.sh
