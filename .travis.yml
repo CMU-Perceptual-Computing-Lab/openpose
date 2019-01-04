@@ -26,7 +26,7 @@ env:
     #   WITH_CUDNN: true
     - BUILD_NAME="default-cmake-cuda8"
     # - BUILD_NAME="default-make-cuda8" WITH_CMAKE=false
-    # - BUILD_NAME="default-cmake-cpu" WITH_CUDA=false
+    - BUILD_NAME="default-cmake-cpu" WITH_CUDA=false
     # - BUILD_NAME="python3-cmake-cuda8" WITH_PYTHON3=true
     # - BUILD_NAME="default-make-cuda8_nocudnn" WITH_CUDNN=false
 
@@ -45,18 +45,19 @@ install:
   - sudo bash ./3rdparty/ubuntu/install_ubuntu_deps_and_cuda.sh
   - sudo apt-get -y install libatlas-base-dev
   - sudo apt-get -y install libopencv-dev
-  - pip install --upgrade numpy
 
 # Running CMake
 before_script:
-  - mkdir build
-  - cd build
-  - cmake -DBUILD_CAFFE=ON -DDOWNLOAD_BODY_25_MODEL=OFF -DDOWNLOAD_BODY_COCO_MODEL=OFF -DDOWNLOAD_FACE_MODEL=OFF -DDOWNLOAD_HAND_MODEL=OFF -DDOWNLOAD_BODY_MPI_MODEL=OFF ..
+  - bash ./cmake/travis/configure.sh
+  # Equivalent for CMake
+  # - mkdir build
+  # - cd build
+  # - cmake -DBUILD_CAFFE=ON -DDOWNLOAD_BODY_25_MODEL=OFF -DDOWNLOAD_BODY_COCO_MODEL=OFF -DDOWNLOAD_FACE_MODEL=OFF -DDOWNLOAD_HAND_MODEL=OFF -DDOWNLOAD_BODY_MPI_MODEL=OFF ..
 
 # Build your code e.g., by calling make
 script:
-  - make -j`nproc`
-  # - bash ./cmake/travis/build.sh
+  - bash ./cmake/travis/run_make.sh
+  # - make -j`nproc`
 # Equivalent to make -j`nproc`
 #   - no_cores=`cat /proc/cpuinfo | grep processor | wc -l`
 #   - make -j${no_cores}
