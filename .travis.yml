@@ -26,11 +26,11 @@ matrix:
   #   dist: xenial
   #   env: BUILD_NAME="default-cmake-cuda8"
   #   sudo: required
-  # Ubuntu 16.04 - Default - CMake - CPU
-  - os: linux
-    dist: xenial
-    env: BUILD_NAME="default-cmake-cpu" WITH_CUDA=false
-    sudo: required
+  # # Ubuntu 16.04 - Default - CMake - CPU
+  # - os: linux
+  #   dist: xenial
+  #   env: BUILD_NAME="default-cmake-cpu" WITH_CUDA=false
+  #   sudo: required
   # Ubuntu 16.04 - Default - CMake - CUDA - no cuDNN
   - os: linux
     # dist: xenial
