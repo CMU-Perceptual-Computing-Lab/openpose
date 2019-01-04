@@ -126,6 +126,9 @@ addons:
 # Install Caffe and OP dependencies
 install:
   - sudo bash ./scripts/travis/install_deps.sh
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo bash ./scripts/travis/install_deps_ubuntu.sh ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo bash ./scripts/travis/install_deps_osx.sh ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then exit 99 ; fi
 
 # Running CMake
 before_script:
