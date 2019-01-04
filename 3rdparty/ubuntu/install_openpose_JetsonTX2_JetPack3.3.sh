@@ -40,15 +40,6 @@ echo ""
 
 
 
-echo "------------------------- Checking Number of Processors -------------------------"
-NUM_CORES=$(grep -c ^processor /proc/cpuinfo 2>/dev/null || sysctl -n hw.ncpu)
-echo "$NUM_CORES cores"
-exitIfError
-echo "------------------------- Number of Processors Checked -------------------------"
-echo ""
-
-
-
 echo "------------------------- Compiling OpenPose -------------------------"
 # Go back to main folder
 cd ../..
@@ -56,7 +47,7 @@ cd ../..
 cp 3rdparty/ubuntu/Makefile.example_openpose Makefile
 cp 3rdparty/ubuntu/Makefile.config.Ubuntu16_cuda9_JetsonTX2_openpose Makefile.config
 # Compile OpenPose
-make all -j$NUM_CORES
+make all -j`nproc`
 exitIfError
 echo "------------------------- OpenPose Compiled -------------------------"
 echo ""

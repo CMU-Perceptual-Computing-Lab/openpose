@@ -3,7 +3,6 @@
 
 
 echo "------------------------- Installing OpenPose -------------------------"
-echo "NOTE: This script assumes that CUDA and cuDNN are already installed on your machine. Otherwise, it might fail."
 
 
 
@@ -35,44 +34,12 @@ function executeShInItsFolder {
 
 
 
-echo "------------------------- Checking Ubuntu Version -------------------------"
-ubuntu_version="$(lsb_release -r)"
-echo "Ubuntu $ubuntu_version"
-if [[ $ubuntu_version == *"14."* ]]; then
-    ubuntu_le_14=true
-elif [[ $ubuntu_version == *"16."* || $ubuntu_version == *"15."* || $ubuntu_version == *"17."* || $ubuntu_version == *"18."* ]]; then
-    ubuntu_le_14=false
-else
-    echo "Ubuntu release older than version 14. This installation script might fail."
-    ubuntu_le_14=true
-fi
-exitIfError
-echo "------------------------- Ubuntu Version Checked -------------------------"
-echo ""
-
-
-
-echo "------------------------- Checking Number of Processors -------------------------"
-NUM_CORES=$(grep -c ^processor /proc/cpuinfo 2>/dev/null || sysctl -n hw.ncpu)
-echo "$NUM_CORES cores"
-exitIfError
-echo "------------------------- Number of Processors Checked -------------------------"
-echo ""
+executeShInItsFolder "copy_makefile_files.sh" "./3rdparty/ubuntu_deprecated/" "../.."
 
 
 
 echo "------------------------- Compiling OpenPose -------------------------"
-# Go back to main folder
-cd ../..
-# Copy Makefile & Makefile.config
-cp 3rdparty/ubuntu/Makefile.example Makefile
-if [[ $ubuntu_le_14 == true ]]; then
-    cp 3rdparty/ubuntu_deprecated/Makefile.config.Ubuntu14_cuda8.example Makefile.config
-else
-    cp 3rdparty/ubuntu_deprecated/Makefile.config.Ubuntu16_cuda8.example Makefile.config
-fi
-# Compile OpenPose
-make all -j$NUM_CORES
+make all -j`nproc`
 exitIfError
 echo "------------------------- OpenPose Compiled -------------------------"
 echo ""

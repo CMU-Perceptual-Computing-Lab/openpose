@@ -16,6 +16,10 @@ fi
 if $WITH_CUDA ; then
   # Only build SM50
   ARGS="$ARGS -DGPU_MODE=CUDA -DCUDA_ARCH=Manual -DCUDA_ARCH_BIN=\"52\" -DCUDA_ARCH_PTX=\"50\""
+# OpenCL version
+elif $WITH_OPEN_CL ; then
+  echo "OpenCL version not implemented for Travis Build yet."
+  exit 99
 # CPU version
 else
   ARGS="$ARGS -DGPU_MODE=CPU_ONLY"

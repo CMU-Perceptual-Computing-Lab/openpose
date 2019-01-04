@@ -6,9 +6,17 @@ LINE () {
   echo "$@" >> Makefile.config
 }
 
-# cp Makefile.config.example Makefile.config
-bash 3rdparty/ubuntu_deprecated/install_caffe_and_openpose_if_cuda8.sh
+# Install Caffe
+cd ./3rdparty/caffe
+bash install_caffe_if_cuda8.sh
+cd ../..
 
+# Install OpenPose
+cd ./3rdparty/ubuntu_deprecated/
+bash ./3rdparty/ubuntu_deprecated/copy_makefile_files.sh
+# bash ./3rdparty/ubuntu_deprecated/install_openpose_if_cuda8.sh
+
+# Modifying Makefile.config file
 if $WITH_PYTHON ; then
   # TODO(lukeyeager) this path is currently disabled because of test errors like:
   #   ImportError: dynamic module does not define init function (PyInit__caffe)
@@ -27,3 +35,8 @@ fi
 if $WITH_CUDNN ; then
   LINE "USE_CUDNN := 1"
 fi
+
+
+
+# # All in one
+# bash 3rdparty/ubuntu_deprecated/install_caffe_and_openpose_if_cuda8.sh

@@ -95,7 +95,7 @@ Alternatively to the script installation, if you want to use CUDA 7, avoid using
     Note: These steps only need to be performed once. If you are interested in making changes to the OpenPose library, you can simply recompile it with:
     ```
     make clean
-    make all -j$(NUM_CORES)
+    make all -j`nproc`
     ```
 **Highly important**: There are 2 `Makefile.config.Ubuntu##.example` analogous files, one in the main folder and one in [3rdparty/caffe/](../3rdparty/caffe/), corresponding to OpenPose and Caffe configuration files respectively. Any change must be done to both files (e.g., OpenCV 3 flag, Atlab/OpenBLAS/MKL flag, etc.). E.g., for CUDA 8 and Ubuntu16: [3rdparty/caffe/Makefile.config.Ubuntu16_cuda8.example](../3rdparty/caffe/Makefile.config.Ubuntu16.example) and [3rdparty/ubuntu_deprecated/Makefile.config.Ubuntu16_cuda8.example](../3rdparty/ubuntu_deprecated/Makefile.config.Ubuntu16_cuda8.example).
 
