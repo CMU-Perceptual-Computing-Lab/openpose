@@ -5,8 +5,8 @@ branches:
   only:
     - master
 
-# Enable sudo
-sudo: required
+# # Enable sudo
+# sudo: required
 
 # OS
 # os:
@@ -21,18 +21,16 @@ sudo: required
 #       # dist: precise # 12.04
 #     - os: osx
 #       osx_image: xcode7.2
-os:
-  - linux
-    # dist: xenial # 16.04
-    # dist: trusty # 14.04
-    # dist: precise # 12.04
-  - osx
-    # osx_image: xcode7.2
-
+# os:
+#   - linux
+#     # dist: xenial # 16.04
+#     # dist: trusty # 14.04
+#     # dist: precise # 12.04
+#   - osx
+#     # osx_image: xcode7.2
 # Environment variables
 env:
   global:
-    # - NUM_THREADS=4
     - GH_REPO_NAME: openpose
     - DOXYFILE: $TRAVIS_BUILD_DIR/doc/doc_autogeneration.doxygen
     # Set this in Environment Variables on travis-ci.org
@@ -44,11 +42,97 @@ env:
     #   WITH_PYTHON3: false
     #   WITH_CUDA: true
     #   WITH_CUDNN: true
-    - BUILD_NAME="default-cmake-cuda8"
-    # - BUILD_NAME="default-make-cuda8" WITH_CMAKE=false
-    - BUILD_NAME="default-cmake-cpu" WITH_CUDA=false
-    # - BUILD_NAME="python3-cmake-cuda8" WITH_PYTHON3=true
-    # - BUILD_NAME="default-make-cuda8_nocudnn" WITH_CUDNN=false
+    # - BUILD_NAME="default-cmake-cuda8"
+    # # - BUILD_NAME="default-make-cuda8" WITH_CMAKE=false
+    # - BUILD_NAME="default-cmake-cpu" WITH_CUDA=false
+    # # - BUILD_NAME="python3-cmake-cuda8" WITH_PYTHON3=true
+    # # - BUILD_NAME="default-make-cuda8_nocudnn" WITH_CUDNN=false
+    include:
+    # Ubuntu 16.04
+    - os: linux
+      dist: xenial
+      sudo: required
+      # BUILD_NAME="default-cmake-cuda8"
+    # Ubuntu 14.04
+    - os: linux
+      dist: trusty
+      sudo: required
+    # # Ubuntu 12.04
+    # - os: linux
+    #   dist: precise # 12.04
+    #   sudo: required
+    # Mac OSX
+    - os: osx
+      osx_image: xcode7.2
+      sudo: required
+
+    # - os: linux
+    #   sudo: required
+    #   dist: precise
+    #   group: edge
+    #   before_script: "gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3"
+    # - os: linux
+    #   before_script:
+    #     - 'echo -e "gem-wrappers\nrubygems-bundler\nbundler\nrake\nrvm\n" >> ~/.rvm/gemsets/global.gems'
+    #     - "gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3"
+    #     - "sudo apt-get install haveged"
+    #     - "sudo service haveged start"
+    #   services: docker
+    # - os: linux
+    #   dist: xenial
+    #   language: generic
+    #   before_install:
+    #     - |
+    #        sudo systemctl stop apt-daily.service &&
+    #        sudo systemctl kill --kill-who=all apt-daily.service &&
+    #        while ! (systemctl list-units --all apt-daily.service | fgrep -q dead) ; do
+    #          sleep 1
+    #        done
+    #   before_script:
+    #     - 'echo -e "gem-wrappers\nrubygems-bundler\nbundler\nrake\nrvm\n" >> ~/.rvm/gemsets/global.gems'
+    #     - "gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3"
+    #     - "sudo apt-get install haveged"
+    #     - "sudo service haveged start"
+    # - os: osx
+    #   before_install:
+    #     - sw_vers
+    #     - unset -f cd
+    #   install:
+    #     - unset -f pushd
+    #     - unset -f popd
+    #   osx_image: xcode6.4
+    #   cache: &osx_cache
+    #     ccache: true
+    #     directories:
+    #       - /usr/local/Cellar/python
+    #       - /usr/local/opt/python
+    # - os: osx
+    #   before_install:
+    #     - sw_vers
+    #     - unset -f cd
+    #   install:
+    #     - unset -f pushd
+    #     - unset -f popd
+    #   osx_image: xcode7.3 # macOS 10.11
+    #   cache: *osx_cache
+    # - os: osx
+    #   before_install:
+    #     - sw_vers
+    #     - unset -f cd
+    #   install:
+    #     - unset -f pushd
+    #     - unset -f popd
+    #   osx_image: xcode8.3 # macOS 10.12
+    #   cache: *osx_cache
+    # - os: osx
+    #   before_install:
+    #     - sw_vers
+    #   osx_image: xcode9.4 # macOS 10.13
+    #   cache: *osx_cache
+    # - arch: ppc64le
+    #   dist: xenial
+    #   language: bash
+    #   group: edge
 
 # Install apt dependencies
 addons:
