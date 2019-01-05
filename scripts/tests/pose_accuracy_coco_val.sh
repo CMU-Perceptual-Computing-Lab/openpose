@@ -3,7 +3,7 @@
 
 
 # USAGE EXAMPLE
-# clear && clear && make all -j`nproc` && bash ./examples/tests/pose_accuracy_coco_val.sh
+# clear && clear && make all -j`nproc` && bash ./scripts/tests/pose_accuracy_coco_val.sh
 
 # Script for internal use. We might completely change it continuously and we will not answer questions about it.
 
