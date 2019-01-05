@@ -23,6 +23,7 @@ cd ../..
 bash 3rdparty/ubuntu_deprecated/copy_makefile_files.sh
 
 # Modifying Makefile.config file
+echo "WITH_PYTHON = ${WITH_PYTHON}."
 if [[ $WITH_PYTHON == true ]] ; then
   # TODO(lukeyeager) this path is currently disabled because of test errors like:
   #   ImportError: dynamic module does not define init function (PyInit__caffe)
@@ -31,6 +32,7 @@ if [[ $WITH_PYTHON == true ]] ; then
   LINE "INCLUDE_DIRS := \$(INCLUDE_DIRS) \$(PYTHON_INCLUDE)"
 fi
 
+echo "WITH_CUDA = ${WITH_CUDA}."
 if [[ $WITH_CUDA == true ]] ; then
   # Only build SM50
   LINE "CUDA_ARCH := -gencode arch=compute_50,code=sm_50"
@@ -38,6 +40,7 @@ else
   LINE "CPU_ONLY := 1"
 fi
 
+echo "WITH_CUDNN = ${WITH_CUDNN}."
 if [[ $WITH_CUDNN == true ]] ; then
   LINE "USE_CUDNN := 1"
 fi

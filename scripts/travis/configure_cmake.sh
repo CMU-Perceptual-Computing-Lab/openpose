@@ -5,6 +5,7 @@
 mkdir build
 cd build
 
+echo "RUN_EXAMPLES = ${RUN_EXAMPLES}."
 if [[ $RUN_EXAMPLES == true ]] ; then
   ARGS="-DDOWNLOAD_FACE_MODEL=OFF -DDOWNLOAD_HAND_MODEL=OFF"
 else
@@ -12,11 +13,15 @@ else
   # ARGS="-DBUILD_CAFFE=ON -DDOWNLOAD_BODY_25_MODEL=OFF -DDOWNLOAD_BODY_COCO_MODEL=OFF -DDOWNLOAD_FACE_MODEL=OFF -DDOWNLOAD_HAND_MODEL=OFF -DDOWNLOAD_BODY_MPI_MODEL=OFF"
 fi
 
+echo "WITH_PYTHON = ${WITH_PYTHON}."
 if [[ $WITH_PYTHON == true ]] ; then
   ARGS="$ARGS -DBUILD_PYTHON=On"
 fi
 
 # CUDA version
+echo "WITH_CUDA = ${WITH_CUDA}."
+echo "WITH_OPEN_CL = ${WITH_OPEN_CL}."
+echo "WITH_MKL = ${WITH_MKL}."
 if [[ $WITH_CUDA == true ]] ; then
   # Only build SM50
   ARGS="$ARGS -DGPU_MODE=CUDA -DCUDA_ARCH=Manual -DCUDA_ARCH_BIN=\"52\" -DCUDA_ARCH_PTX=\"50\""
@@ -35,6 +40,7 @@ else
   fi
 fi
 
+echo "WITH_CUDNN = ${WITH_CUDNN}."
 if [[ $WITH_CUDNN == true ]] ; then
   ARGS="$ARGS -DUSE_CUDNN=On"
 else

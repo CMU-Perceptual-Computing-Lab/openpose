@@ -15,6 +15,7 @@ if [[ $WITH_CMAKE == true ]] && [[ $WITH_PYTHON == false ]] && [[ $WITH_CUDA == 
 else
   RUN_EXAMPLES=false
 fi
+echo "RUN_EXAMPLES = ${RUN_EXAMPLES}."
 
 # Makefile configuration compatible
 if [[ $WITH_PYTHON == false ]] ; then
@@ -22,3 +23,4 @@ if [[ $WITH_PYTHON == false ]] ; then
 else
   MAKE_CONFIG_COMPATIBLE=false
 fi
+echo "MAKE_CONFIG_COMPATIBLE = ${MAKE_CONFIG_COMPATIBLE}."
