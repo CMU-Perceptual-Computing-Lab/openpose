@@ -15,11 +15,13 @@ LINE () {
 }
 
 # Install Caffe
+echo "Installing Caffe..."
 cd ./3rdparty/caffe
 bash install_caffe_if_cuda8.sh
 cd ../..
 
 # Generate Makefile files for OpenPose
+echo "Generating Makefile files for OpenPose..."
 bash 3rdparty/ubuntu_deprecated/copy_makefile_files.sh
 
 # Modifying Makefile.config file

@@ -37,8 +37,6 @@ echo ""
 
 
 echo "------------------------- Copying Required Files -------------------------"
-# Go back to main folder
-cd ../..
 # Copy Makefile & Makefile.config
 cp 3rdparty/ubuntu/Makefile.example Makefile
 if [[ $ubuntu_le_14 == true ]]; then
