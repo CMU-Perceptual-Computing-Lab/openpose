@@ -34,8 +34,7 @@ matrix:
       - ./.github/generate_gh_pages.sh
   # Ubuntu 16.04 - Default - CMake - CUDA - no cuDNN
   - os: linux
-    # dist: xenial
-    dist: trusty
+    dist: xenial
     env: NAME="default-cmake-cuda8-nocudnn" WITH_CUDNN=false
     sudo: required
   # Ubuntu 16.04 - Python - CMake - CUDA
