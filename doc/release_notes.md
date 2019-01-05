@@ -324,7 +324,7 @@ OpenPose Library - Release Notes
     6. Camera parameter reader can now take folder paths even if they are not finished in `/` (e.g., `~/Desktop/` worked but `~/Desktop` did not).
     7. 3D module: If the image area was smaller than HD resolution image area, the 3D keypoints were not properly estimated.
     8. OpenCL fixes.
-    9. If manual CUDA architectures are set in CMake, they are also set for Caffe rather than only OpenPose.
+    9. If manual CUDA architectures are set in CMake, they are also set for Caffe rather than only for OpenPose.
 
 
 
