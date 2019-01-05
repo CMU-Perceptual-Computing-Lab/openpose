@@ -31,7 +31,7 @@ Notes:
 ## Installation
 Use the following script for installation of both caffe and OpenPose: 
 ```
-./3rdparty/ubuntu/install_caffe_and_openpose_JetsonTX2_JetPack3.3.sh
+./scripts/ubuntu/install_caffe_and_openpose_JetsonTX2_JetPack3.3.sh
 ```
 
 

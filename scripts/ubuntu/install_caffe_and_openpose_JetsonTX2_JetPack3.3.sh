@@ -3,7 +3,7 @@
 
 
 echo "------------------------- Installing Caffe and OpenPose -------------------------"
-echo "NOTE: This script assumes that just flashed JetPack 3.1 : Ubuntu 16, CUDA 8, cuDNN 6 and OpenCV are already installed on your machine. Otherwise, it might fail."
+echo "NOTE: This script assumes that just flashed JetPack 3.3 : Ubuntu 16, CUDA 9, cuDNN 7 and OpenCV are already installed on your machine. Otherwise, it might fail."
 
 
 
@@ -34,14 +34,16 @@ function executeShInItsFolder {
 }
 
 
-
+rm -r ./3rdparty/caffe
 git submodule update --init --recursive
-executeShInItsFolder "install_caffe_JetsonTX2_JetPack3.1.sh" "./3rdparty/caffe" "../.."
+mv ./scripts/ubuntu/install_caffe_JetsonTX2_JetPack3.3.sh ./3rdparty/caffe/install_caffe_JetsonTX2_JetPack3.3.sh
+mv ./scripts/ubuntu/Makefile.config.Ubuntu16_cuda9_JetsonTX2_caffe ./3rdparty/caffe/Makefile.config.Ubuntu16_cuda9_JetsonTX2_caffe
+executeShInItsFolder "install_caffe_JetsonTX2_JetPack3.3.sh" "./3rdparty/caffe" "../.."
 exitIfError
 
 
 
-executeShInItsFolder "install_openpose_JetsonTX2_JetPack3.1.sh" "./3rdparty/ubuntu/" "./"
+executeShInItsFolder "install_openpose_JetsonTX2_JetPack3.3.sh" "./scripts/ubuntu/" "./"
 exitIfError
 
 

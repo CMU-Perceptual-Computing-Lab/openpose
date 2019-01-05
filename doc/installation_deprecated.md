@@ -54,7 +54,7 @@ CUDA, cuDNN, OpenCV and Atlas must be already installed on your machine:
 ### Installation - Script Compilation
 Build Caffe & the OpenPose library + download the required Caffe models for Ubuntu 14.04 or 16.04 (auto-detected for the script) and CUDA 8:
 ```bash
-bash ./3rdparty/ubuntu_deprecated/install_caffe_and_openpose_if_cuda8.sh
+bash scripts/ubuntu_deprecated/install_caffe_and_openpose_if_cuda8.sh
 ```
 **Highly important**: This script only works with CUDA 8 and Ubuntu 14 or 16. Otherwise, see [doc/installation.md](installation.md) or [Installation - Manual Compilation](#installation---manual-compilation).
 
@@ -81,9 +81,9 @@ Alternatively to the script installation, if you want to use CUDA 7, avoid using
     cd ../../models/
     bash ./getModels.sh # It just downloads the Caffe trained models
     cd ..
-    cp 3rdparty/ubuntu/Makefile.example Makefile
+    cp scripts/ubuntu/Makefile.example Makefile
     # Same file cp command as the one used for Caffe
-    cp 3rdparty/ubuntu_deprecated/Makefile.config.Ubuntu14_cuda7.example Makefile.config
+    cp scripts/ubuntu_deprecated/Makefile.config.Ubuntu14_cuda7.example Makefile.config
     # Change any custom flag from the resulting Makefile.config (e.g., OpenCV 3, Atlas/OpenBLAS/MKL, etc.)
     make all -j`nproc`
     ```
@@ -95,9 +95,9 @@ Alternatively to the script installation, if you want to use CUDA 7, avoid using
     Note: These steps only need to be performed once. If you are interested in making changes to the OpenPose library, you can simply recompile it with:
     ```
     make clean
-    make all -j$(NUM_CORES)
+    make all -j`nproc`
     ```
-**Highly important**: There are 2 `Makefile.config.Ubuntu##.example` analogous files, one in the main folder and one in [3rdparty/caffe/](../3rdparty/caffe/), corresponding to OpenPose and Caffe configuration files respectively. Any change must be done to both files (e.g., OpenCV 3 flag, Atlab/OpenBLAS/MKL flag, etc.). E.g., for CUDA 8 and Ubuntu16: [3rdparty/caffe/Makefile.config.Ubuntu16_cuda8.example](../3rdparty/caffe/Makefile.config.Ubuntu16.example) and [3rdparty/ubuntu_deprecated/Makefile.config.Ubuntu16_cuda8.example](../3rdparty/ubuntu_deprecated/Makefile.config.Ubuntu16_cuda8.example).
+**Highly important**: There are 2 `Makefile.config.Ubuntu##.example` analogous files, one in the main folder and one in [3rdparty/caffe/](../3rdparty/caffe/), corresponding to OpenPose and Caffe configuration files respectively. Any change must be done to both files (e.g., OpenCV 3 flag, Atlab/OpenBLAS/MKL flag, etc.). E.g., for CUDA 8 and Ubuntu16: [3rdparty/caffe/Makefile.config.Ubuntu16_cuda8.example](../3rdparty/caffe/Makefile.config.Ubuntu16.example) and [scripts/ubuntu_deprecated/Makefile.config.Ubuntu16_cuda8.example](../scripts/ubuntu_deprecated/Makefile.config.Ubuntu16_cuda8.example).
 
 
 

@@ -26,15 +26,6 @@ echo ""
 
 
 
-echo "------------------------- Checking Number of Processors -------------------------"
-NUM_CORES=$(grep -c ^processor /proc/cpuinfo 2>/dev/null || sysctl -n hw.ncpu)
-echo "$NUM_CORES cores"
-exitIfError
-echo "------------------------- Number of Processors Checked -------------------------"
-echo ""
-
-
-
 echo "------------------------- Installing some Caffe Dependencies -------------------------"
 # Basic
 sudo apt-get --assume-yes update
@@ -56,9 +47,9 @@ echo ""
 
 echo "------------------------- Compiling Caffe -------------------------"
 cp Makefile.config.Ubuntu16_cuda9_JetsonTX2_caffe Makefile.config
-make all -j$NUM_CORES && make distribute -j$NUM_CORES
-# make test -j$NUM_CORES
-# make runtest -j$NUM_CORES
+make all -j`nproc` && make distribute -j`nproc`
+# make test -j`nproc`
+# make runtest -j`nproc`
 exitIfError
 echo "------------------------- Caffe Compiled -------------------------"
 echo ""

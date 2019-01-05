@@ -3,7 +3,8 @@
 
 
 echo "------------------------- Installing OpenPose -------------------------"
-echo "NOTE: This script assumes that just flashed JetPack 3.1 : Ubuntu 16, CUDA 8, cuDNN 6 and OpenCV are already installed on your machine. Otherwise, it might fail."
+
+
 
 function exitIfError {
     if [[ $? -ne 0 ]] ; then
@@ -25,7 +26,7 @@ function executeShInItsFolder {
     exitIfError
     sudo chmod +x $1
     exitIfError
-    ./$1
+    bash ./$1
     exitIfError
     cd $3
     exitIfError
@@ -33,30 +34,12 @@ function executeShInItsFolder {
 
 
 
-echo "------------------------- Checking Ubuntu Version -------------------------"
-# If you respected the installation assumptions, nothing to do. 
-echo "------------------------- Ubuntu Version Checked -------------------------"
-echo ""
-
-
-
-echo "------------------------- Checking Number of Processors -------------------------"
-NUM_CORES=$(grep -c ^processor /proc/cpuinfo 2>/dev/null || sysctl -n hw.ncpu)
-echo "$NUM_CORES cores"
-exitIfError
-echo "------------------------- Number of Processors Checked -------------------------"
-echo ""
+executeShInItsFolder "scripts/ubuntu_deprecated/copy_makefile_files.sh" "../.." "./"
 
 
 
 echo "------------------------- Compiling OpenPose -------------------------"
-# Go back to main folder
-cd ../..
-# Copy Makefile & Makefile.config
-cp 3rdparty/ubuntu/Makefile.example Makefile
-cp 3rdparty/ubuntu/Makefile.config.Ubuntu16_cuda8_JetsonTX2 Makefile.config
-# Compile OpenPose
-make all -j$NUM_CORES
+make all -j`nproc`
 exitIfError
 echo "------------------------- OpenPose Compiled -------------------------"
 echo ""

@@ -7,7 +7,7 @@
 clear && clear
 
 # USAGE EXAMPLE
-# clear && clear && make all -j`nproc` && bash ./examples/tests/pose_accuracy_coco_test.sh
+# clear && clear && make all -j`nproc` && bash ./scripts/tests/pose_accuracy_coco_test.sh
 
 # # Go back to main folder
 # cd ../../
