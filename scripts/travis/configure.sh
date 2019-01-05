@@ -9,7 +9,7 @@ echo "WITH_CMAKE = ${WITH_CMAKE}."
 if [[ $WITH_CMAKE == true ]] ; then
   echo "Running CMake configuration..."
   source $BASEDIR/configure_cmake.sh
-else # if ! $WITH_CMAKE ; then
+else
   echo "Running Makefile configuration..."
   source $BASEDIR/configure_make.sh
 fi
