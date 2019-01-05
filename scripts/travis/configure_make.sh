@@ -4,7 +4,7 @@
 # # All in one line
 # bash 3rdparty/ubuntu_deprecated/install_caffe_and_openpose_if_cuda8.sh
 
-if ! $MAKE_CONFIG_COMPATIBLE ; then
+if [[ ! $MAKE_CONFIG_COMPATIBLE ]] ; then
   echo "Configuration not compatible for Makefile."
   exit 99
 fi
@@ -23,7 +23,7 @@ cd ../..
 bash 3rdparty/ubuntu_deprecated/copy_makefile_files.sh
 
 # Modifying Makefile.config file
-if $WITH_PYTHON ; then
+if [[ $WITH_PYTHON ]] ; then
   # TODO(lukeyeager) this path is currently disabled because of test errors like:
   #   ImportError: dynamic module does not define init function (PyInit__caffe)
   LINE "PYTHON_LIBRARIES := python3.4m boost_python-py34"
@@ -31,13 +31,13 @@ if $WITH_PYTHON ; then
   LINE "INCLUDE_DIRS := \$(INCLUDE_DIRS) \$(PYTHON_INCLUDE)"
 fi
 
-if $WITH_CUDA ; then
+if [[ $WITH_CUDA ]] ; then
   # Only build SM50
   LINE "CUDA_ARCH := -gencode arch=compute_50,code=sm_50"
 else
   LINE "CPU_ONLY := 1"
 fi
 
-if $WITH_CUDNN ; then
+if [[ $WITH_CUDNN ]] ; then
   LINE "USE_CUDNN := 1"
 fi

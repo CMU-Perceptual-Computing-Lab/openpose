@@ -6,7 +6,7 @@ BASEDIR=$(dirname $0)
 source $BASEDIR/defaults.sh
 
 # Only for NAME="default-cmake-cpu" WITH_CUDA=false
-if $RUN_EXAMPLES ; then
+if [[ $RUN_EXAMPLES ]] ; then
   echo "Running demos and tutorials..."
 
   echo "OpenPose demo..."
