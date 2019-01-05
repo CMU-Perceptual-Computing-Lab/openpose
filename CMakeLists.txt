@@ -640,11 +640,6 @@ if (UNIX OR APPLE)
       list(LENGTH CAFFE_DIR_VALID CAFFE_DIR_VALID_LENGTH)
       if (CAFFE_DIR_VALID_LENGTH EQUAL 0)
         execute_process(COMMAND git submodule update --init --recursive)
-        # Temporary hack to problem #880: Clip layer creating errors in Travis build
-        # Error:
-        # missing required fields: layer[0].clip_param.min, layer[0].clip_param.max
-        execute_process(COMMAND cd 3rdparty/caffe && git reset --hard 974172cd6b3b61163354b7c072f039fadc4c1339)
-        execute_process(COMMAND cd 3rdparty/caffe && git revert -m 1 dc6d3303a45e8c5a0fe7249881ca6bd8387c9203)
       else (CAFFE_DIR_VALID_LENGTH EQUAL 0)
         message(STATUS "Caffe has already been downloaded.")
       endif (CAFFE_DIR_VALID_LENGTH EQUAL 0)

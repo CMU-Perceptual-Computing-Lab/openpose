@@ -31,16 +31,16 @@ matrix:
       - cd $TRAVIS_BUILD_DIR
       - chmod +x .github/generate_gh_pages.sh
       - ./.github/generate_gh_pages.sh
-  # Ubuntu 16.04 - Default - CMake - CPU
-  - os: linux
-    dist: xenial
-    env: NAME="default-cmake-cpu" WITH_CUDA=false
-    sudo: required
-  # Ubuntu 16.04 - Default - Make - CUDA
-  - os: linux
-    dist: xenial
-    env: NAME="default-make-cuda8" WITH_CMAKE=false
-    sudo: required
+  # # Ubuntu 16.04 - Default - CMake - CPU
+  # - os: linux
+  #   dist: xenial
+  #   env: NAME="default-cmake-cpu" WITH_CUDA=false
+  #   sudo: required
+  # # Ubuntu 16.04 - Default - Make - CUDA
+  # - os: linux
+  #   dist: xenial
+  #   env: NAME="default-make-cuda8" WITH_CMAKE=false
+  #   sudo: required
   # # # Ubuntu 16.04 - Default - CMake - OpenCL
   # # - os: linux
   # #   dist: xenial
@@ -62,16 +62,16 @@ matrix:
   #   dist: xenial
   #   env: NAME="python-cmake-cuda8" WITH_PYTHON=true
   #   sudo: required
-  # # Ubuntu 16.04 - Python - CMake - CPU
+  # Ubuntu 16.04 - Python - CMake - CPU
+  - os: linux
+    dist: xenial
+    env: NAME="python-cmake-cpu" WITH_PYTHON=true WITH_CUDA=false
+    sudo: required
+  # # Ubuntu 16.04 - Python - CMake - OpenCL
   # - os: linux
   #   dist: xenial
-  #   env: NAME="python-cmake-cpu" WITH_PYTHON=true WITH_CUDA=false
+  #   env: NAME="python-cmake-opencl" WITH_PYTHON=true WITH_CUDA=false WITH_OPEN_CL=true
   #   sudo: required
-  # # # Ubuntu 16.04 - Python - CMake - OpenCL
-  # # - os: linux
-  # #   dist: xenial
-  # #   env: NAME="python-cmake-opencl" WITH_PYTHON=true WITH_CUDA=false WITH_OPEN_CL=true
-  # #   sudo: required
 
   # # Ubuntu 14.04
   # # Ubuntu 14.04 - Default - CMake - CUDA
