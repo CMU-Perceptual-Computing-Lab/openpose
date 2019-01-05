@@ -7,9 +7,9 @@ BASEDIR=$(dirname $0)
 source $BASEDIR/defaults.sh
 
 if [[ $WITH_CUDA == true ]] ; then
-  sudo bash ./3rdparty/ubuntu/install_ubuntu_deps_and_cuda.sh
+  sudo bash scripts/ubuntu/install_ubuntu_deps_and_cuda.sh
 else # if ! $WITH_CUDA ; then
-  sudo bash ./3rdparty/ubuntu/install_ubuntu_deps.sh
+  sudo bash scripts/ubuntu/install_ubuntu_deps.sh
 fi
 sudo apt-get -y install libatlas-base-dev
 sudo apt-get -y install libopencv-dev

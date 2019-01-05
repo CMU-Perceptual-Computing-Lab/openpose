@@ -44,8 +44,8 @@ echo "------------------------- Compiling OpenPose -------------------------"
 # Go back to main folder
 cd ../..
 # Copy Makefile & Makefile.config
-cp 3rdparty/ubuntu/Makefile.example_openpose Makefile
-cp 3rdparty/ubuntu/Makefile.config.Ubuntu16_cuda9_JetsonTX2_openpose Makefile.config
+cp scripts/ubuntu/Makefile.example_openpose Makefile
+cp scripts/ubuntu/Makefile.config.Ubuntu16_cuda9_JetsonTX2_openpose Makefile.config
 # Compile OpenPose
 make all -j`nproc`
 exitIfError

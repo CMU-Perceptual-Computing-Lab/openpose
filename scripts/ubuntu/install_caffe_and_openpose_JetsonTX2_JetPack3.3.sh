@@ -36,14 +36,14 @@ function executeShInItsFolder {
 
 rm -r ./3rdparty/caffe
 git submodule update --init --recursive
-mv ./3rdparty/ubuntu/install_caffe_JetsonTX2_JetPack3.3.sh ./3rdparty/caffe/install_caffe_JetsonTX2_JetPack3.3.sh
-mv ./3rdparty/ubuntu/Makefile.config.Ubuntu16_cuda9_JetsonTX2_caffe ./3rdparty/caffe/Makefile.config.Ubuntu16_cuda9_JetsonTX2_caffe
+mv ./scripts/ubuntu/install_caffe_JetsonTX2_JetPack3.3.sh ./3rdparty/caffe/install_caffe_JetsonTX2_JetPack3.3.sh
+mv ./scripts/ubuntu/Makefile.config.Ubuntu16_cuda9_JetsonTX2_caffe ./3rdparty/caffe/Makefile.config.Ubuntu16_cuda9_JetsonTX2_caffe
 executeShInItsFolder "install_caffe_JetsonTX2_JetPack3.3.sh" "./3rdparty/caffe" "../.."
 exitIfError
 
 
 
-executeShInItsFolder "install_openpose_JetsonTX2_JetPack3.3.sh" "./3rdparty/ubuntu/" "./"
+executeShInItsFolder "install_openpose_JetsonTX2_JetPack3.3.sh" "./scripts/ubuntu/" "./"
 exitIfError
 
 

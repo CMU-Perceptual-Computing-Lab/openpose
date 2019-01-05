@@ -30,8 +30,8 @@ matrix:
     # Generate and deploy documentation
     after_success:
       - cd $TRAVIS_BUILD_DIR
-      - chmod +x .github/generate_gh_pages.sh
-      - ./.github/generate_gh_pages.sh
+      - chmod +x scripts/generate_gh_pages.sh
+      - ./scripts/generate_gh_pages.sh
   # Ubuntu 16.04 - Default - CMake - CUDA - no cuDNN
   - os: linux
     dist: xenial
@@ -114,8 +114,8 @@ addons:
 
 # Install Caffe and OP dependencies
 install:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo bash ./scripts/travis/install_deps_ubuntu.sh ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo bash ./scripts/travis/install_deps_osx.sh ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo bash scripts/travis/install_deps_ubuntu.sh ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo bash scripts/travis/install_deps_osx.sh ; fi
   - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then exit 99 ; fi
 
 # Running CMake

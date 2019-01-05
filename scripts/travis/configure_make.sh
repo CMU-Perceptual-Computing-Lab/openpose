@@ -2,7 +2,7 @@
 
 # Raw Makefile configuration
 # # All in one line
-# bash 3rdparty/ubuntu_deprecated/install_caffe_and_openpose_if_cuda8.sh
+# bash scripts/ubuntu_deprecated/install_caffe_and_openpose_if_cuda8.sh
 
 if [[ $MAKE_CONFIG_COMPATIBLE == false ]] ; then
   echo "Configuration not compatible for Makefile."
@@ -22,7 +22,7 @@ cd ../..
 
 # Generate Makefile files for OpenPose
 echo "Generating Makefile files for OpenPose..."
-bash 3rdparty/ubuntu_deprecated/copy_makefile_files.sh
+bash scripts/ubuntu_deprecated/copy_makefile_files.sh
 
 # Modifying Makefile.config file
 echo "WITH_PYTHON = ${WITH_PYTHON}."

@@ -38,11 +38,11 @@ echo ""
 
 echo "------------------------- Copying Required Files -------------------------"
 # Copy Makefile & Makefile.config
-cp 3rdparty/ubuntu/Makefile.example Makefile
+cp scripts/ubuntu/Makefile.example Makefile
 if [[ $ubuntu_le_14 == true ]]; then
-    cp 3rdparty/ubuntu_deprecated/Makefile.config.Ubuntu14_cuda8.example Makefile.config
+    cp scripts/ubuntu_deprecated/Makefile.config.Ubuntu14_cuda8.example Makefile.config
 else
-    cp 3rdparty/ubuntu_deprecated/Makefile.config.Ubuntu16_cuda8.example Makefile.config
+    cp scripts/ubuntu_deprecated/Makefile.config.Ubuntu16_cuda8.example Makefile.config
 fi
 exitIfError
 echo "------------------------- Required Files Copied -------------------------"
