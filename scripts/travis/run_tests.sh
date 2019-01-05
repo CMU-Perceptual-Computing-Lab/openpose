@@ -36,10 +36,6 @@ if [[ $RUN_EXAMPLES == true ]] ; then
   ./build/examples/tutorial_api_cpp/7_synchronous_custom_input.bin --net_resolution -1x32 --image_dir examples/media/ --write_json output/ --display 0 --render_pose 0
   echo " "
 
-  echo "Tutorial API C++: Example 9..."
-  ./build/examples/tutorial_api_cpp/9_synchronous_custom_all.bin --net_resolution -1x32 --image_dir examples/media/ --write_json output/ --display 0 --render_pose 0
-  echo " "
-
   # echo "Python API C++: Example 1..."
   # # TODO: Add Python examples in here
   # echo " "
