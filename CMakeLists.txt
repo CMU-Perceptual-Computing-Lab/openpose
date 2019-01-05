@@ -643,8 +643,8 @@ if (UNIX OR APPLE)
         # Temporary hack to problem #880: Clip layer creating errors in Travis build
         # Error:
         # missing required fields: layer[0].clip_param.min, layer[0].clip_param.max
-        execute_process(COMMAND git reset --hard 974172cd6b3b61163354b7c072f039fadc4c1339)
-        execute_process(COMMAND git revert -m 1 dc6d3303a45e8c5a0fe7249881ca6bd8387c9203)
+        execute_process(COMMAND cd 3rdparty/caffe && git reset --hard 974172cd6b3b61163354b7c072f039fadc4c1339)
+        execute_process(COMMAND cd 3rdparty/caffe && git revert -m 1 dc6d3303a45e8c5a0fe7249881ca6bd8387c9203)
       else (CAFFE_DIR_VALID_LENGTH EQUAL 0)
         message(STATUS "Caffe has already been downloaded.")
       endif (CAFFE_DIR_VALID_LENGTH EQUAL 0)
@@ -710,10 +710,12 @@ if (UNIX OR APPLE)
           PREFIX ${CAFFE_PREFIX}
           CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
           -DMKLDNN_INSTALL_DIR:PATH=<INSTALL_DIR>
+          -DUSE_MKL2017_AS_DEFAULT_ENGINE=${CAFFE_CPU_ONLY}
           -DUSE_CUDNN=${USE_CUDNN}
           -DCUDA_ARCH_NAME=${CUDA_ARCH}
+          -DCUDA_ARCH_BIN=${CUDA_ARCH_BIN}
+          -DCUDA_ARCH_PTX=${CUDA_ARCH_PTX}
           -DCPU_ONLY=${CAFFE_CPU_ONLY}
-          -DUSE_MKL2017_AS_DEFAULT_ENGINE=${CAFFE_CPU_ONLY}
           -DCMAKE_BUILD_TYPE=Release
           -DBUILD_docs=OFF
           -DBUILD_python=OFF
@@ -729,6 +731,8 @@ if (UNIX OR APPLE)
           CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
           -DUSE_CUDNN=${USE_CUDNN}
           -DCUDA_ARCH_NAME=${CUDA_ARCH}
+          -DCUDA_ARCH_BIN=${CUDA_ARCH_BIN}
+          -DCUDA_ARCH_PTX=${CUDA_ARCH_PTX}
           -DCPU_ONLY=${CAFFE_CPU_ONLY}
           -DCMAKE_BUILD_TYPE=Release
           -DBUILD_docs=OFF
