@@ -6,7 +6,7 @@ echo "Running on ${TRAVIS_OS_NAME} OS."
 BASEDIR=$(dirname $0)
 source $BASEDIR/defaults.sh
 
-if [[ $WITH_CUDA = true ]] ; then
+if [[ $WITH_CUDA == true ]] ; then
   sudo bash ./3rdparty/ubuntu/install_ubuntu_deps_and_cuda.sh
 else # if ! $WITH_CUDA ; then
   sudo bash ./3rdparty/ubuntu/install_ubuntu_deps.sh
