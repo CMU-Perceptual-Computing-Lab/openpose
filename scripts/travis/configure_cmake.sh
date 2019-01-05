@@ -24,7 +24,7 @@ echo "WITH_OPEN_CL = ${WITH_OPEN_CL}."
 echo "WITH_MKL = ${WITH_MKL}."
 if [[ $WITH_CUDA == true ]] ; then
   # Only build SM50
-  ARGS="$ARGS -DGPU_MODE=CUDA -DCUDA_ARCH=Manual -DCUDA_ARCH_BIN=\"52\" -DCUDA_ARCH_PTX=\"50\""
+  ARGS="$ARGS -DGPU_MODE=CUDA -DCUDA_ARCH=Manual -DCUDA_ARCH_BIN=\"52\" -DCUDA_ARCH_PTX=\"\""
 # OpenCL version
 elif [[ $WITH_OPEN_CL == true ]] ; then
   echo "OpenCL version not implemented for Travis Build yet."
@@ -46,5 +46,7 @@ if [[ $WITH_CUDNN == true ]] ; then
 else
   ARGS="$ARGS -DUSE_CUDNN=Off"
 fi
+
+echo "ARGS = ${ARGS}."
 
 cmake .. $ARGS
