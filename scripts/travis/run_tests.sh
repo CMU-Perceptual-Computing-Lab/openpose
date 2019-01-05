@@ -36,14 +36,17 @@ if [[ $RUN_EXAMPLES == true ]] ; then
   ./build/examples/tutorial_api_cpp/7_synchronous_custom_input.bin --net_resolution -1x32 --image_dir examples/media/ --write_json output/ --display 0 --render_pose 0
   echo " "
 
-  # echo "Python API C++: Example 1..."
-  # # TODO: Add Python examples in here
-  # echo " "
+  # Python examples
+  if [[ $WITH_PYTHON == true ]] ; then
+    # echo "Python API C++: Example 1..."
+    # # TODO: Add Python examples in here
+    # echo " "
+  fi
 
   echo "Demos and tutorials successfully finished!"
 
 # Disable examples for all other Travis Build configurations
 else
-  echo "Skipping tests for non python-cmake-cpu version."
+  echo "Skipping tests for non CPU-only versions."
   exit 0
 fi
