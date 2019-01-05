@@ -17,6 +17,7 @@
 // This file should only be used for the user to take specific examples.
 
 // Command-line user intraface
+#define OPENPOSE_FLAGS_DISABLE_DISPLAY
 #include <openpose/flags.hpp>
 // OpenPose dependencies
 #include <openpose/headers.hpp>
