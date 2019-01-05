@@ -24,16 +24,6 @@ cd ../..
 echo "Generating Makefile files for OpenPose..."
 bash scripts/ubuntu_deprecated/copy_makefile_files.sh
 
-# Modifying Makefile.config file
-echo "WITH_PYTHON = ${WITH_PYTHON}."
-if [[ $WITH_PYTHON == true ]] ; then
-  # TODO(lukeyeager) this path is currently disabled because of test errors like:
-  #   ImportError: dynamic module does not define init function (PyInit__caffe)
-  LINE "PYTHON_LIBRARIES := python3.4m boost_python-py34"
-  LINE "PYTHON_INCLUDE := /usr/include/python3.4 /usr/lib/python3/dist-packages/numpy/core/include"
-  LINE "INCLUDE_DIRS := \$(INCLUDE_DIRS) \$(PYTHON_INCLUDE)"
-fi
-
 echo "WITH_CUDA = ${WITH_CUDA}."
 if [[ $WITH_CUDA == true ]] ; then
   # Only build SM50
