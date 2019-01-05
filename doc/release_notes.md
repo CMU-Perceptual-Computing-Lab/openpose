@@ -301,6 +301,7 @@ OpenPose Library - Release Notes
     27. Video with the 3D output can be saved with the new `--write_video_3d` flag.
     28. Added Mac OpenCL compatibility.
     29. Added documentation for Nvidia TX2 with JetPack 3.3.
+    30. Added Travis build check for several configurations: Ubuntu (14/16)/Mac/Windows and CPU/CUDA/OpenCL and with/without Python.
 2. Functions or parameters renamed:
     1. By default, python example `tutorial_developer/python_2_pose_from_heatmaps.py` was using 2 scales starting at -1x736, changed to 1 scale at -1x368.
     2. WrapperStructPose default parameters changed to match those of the OpenPose demo binary.
@@ -313,6 +314,7 @@ OpenPose Library - Release Notes
     9. Renamed `--frame_keep_distortion` as `--frame_undistort`, which performs the opposite operation (the default value has been also changed to the opposite).
     10. Renamed `--camera_parameter_folder` as `--camera_parameter_path` because it could also take a whole XML file path rather than its parent folder.
     11. Default value of flag `--scale_gap` changed from 0.3 to 0.25.
+    12. Moved most sh scripts into the `scripts/` folder. Only models/getModels.sh and the *.bat files are kept under `models/` and `3rdparty/windows`.
 3. Main bugs fixed:
     1. CMake-GUI was forcing to Release mode, allowed Debug modes too.
     2. NMS returns in index 0 the number of found peaks. However, while the number of peaks was truncated to a maximum of 127, this index 0 was saving the real number instead of the truncated one.
