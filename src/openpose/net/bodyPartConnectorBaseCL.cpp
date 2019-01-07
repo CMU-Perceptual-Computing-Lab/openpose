@@ -16,7 +16,7 @@ namespace op
 
             int intRoundGPU(const Type a)
             {
-                return int(a+0.5);
+                return (int)(a+0.5);
             }
 
             Type process(__global const Type* bodyPartA, __global const Type* bodyPartB, __global const Type* mapX, __global const Type* mapY,
@@ -27,7 +27,7 @@ namespace op
                 const Type vectorAToBY = bodyPartB[1] - bodyPartA[1];
                 const Type vectorAToBMax = max(fabs(vectorAToBX), fabs(vectorAToBY));
                 const int numberPointsInLine = max(5, min(25, intRoundGPU(sqrt(5*vectorAToBMax))));
-                const Type vectorNorm = Type(sqrt(vectorAToBX*vectorAToBX + vectorAToBY*vectorAToBY));
+                const Type vectorNorm = (Type)(sqrt(vectorAToBX*vectorAToBX + vectorAToBY*vectorAToBY));
                 Type rval = -1;
 
                 if (vectorNorm > 1e-6)
@@ -37,7 +37,7 @@ namespace op
                     const Type vectorAToBNormX = vectorAToBX/vectorNorm;
                     const Type vectorAToBNormY = vectorAToBY/vectorNorm;
 
-                    Type sum = Type(0.);
+                    Type sum = (Type)(0.);
                     int count = 0;
                     const Type vectorAToBXInLine = vectorAToBX/numberPointsInLine;
                     const Type vectorAToBYInLine = vectorAToBY/numberPointsInLine;
@@ -55,8 +55,8 @@ namespace op
                     }
 
                     // Return PAF score
-                    if (count/Type(numberPointsInLine) > interMinAboveThreshold)
-                        return Type(sum)/Type(count);
+                    if (count/(Type)(numberPointsInLine) > interMinAboveThreshold)
+                        return (Type)(sum)/(Type)(count);
                     else
                     {
                         // Ideally, if distanceAB = 0, PAF is 0 between A and B, provoking a false negative
@@ -64,8 +64,8 @@ namespace op
                         //     1. It will consider very close keypoints (where the PAF is 0)
                         //     2. But it will not automatically connect them (case PAF score = 1), or real PAF might got
                         //        missing
-                        const Type l2Dist = sqrt(Type(vectorAToBX*vectorAToBX + vectorAToBY*vectorAToBY));
-                        const Type threshold = sqrt(Type(heatmapWidth*heatmapHeight))/150; // 3.3 for 368x656, 6.6 for 2x resolution
+                        const Type l2Dist = sqrt((Type)(vectorAToBX*vectorAToBX + vectorAToBY*vectorAToBY));
+                        const Type threshold = sqrt((Type)(heatmapWidth*heatmapHeight))/150; // 3.3 for 368x656, 6.6 for 2x resolution
                         if (l2Dist < threshold)
                             return 0.15;
                     }
