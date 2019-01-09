@@ -65,8 +65,8 @@ namespace op
                 // Print verbose
                 if (checkNoNullNorEmpty(tDatums))
                 {
-                    const auto tDatum = (*tDatums)[0];
-                    spVerbosePrinter->printVerbose(tDatum.frameNumber);
+                    const auto tDatumPtr = (*tDatums)[0];
+                    spVerbosePrinter->printVerbose(tDatumPtr->frameNumber);
                 }
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);

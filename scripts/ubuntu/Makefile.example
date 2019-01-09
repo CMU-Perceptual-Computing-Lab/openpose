@@ -109,6 +109,7 @@ endif
 WITH_EIGEN ?= 0
 ifneq ($(WITH_EIGEN), 0)
 	COMMON_FLAGS += -DUSE_EIGEN
+	INCLUDE_DIRS += $(EIGEN_DIR)
 endif
 # Spinnaker SDK
 WITH_FLIR_CAMERA ?= 0

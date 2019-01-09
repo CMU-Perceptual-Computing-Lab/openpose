@@ -62,30 +62,30 @@ namespace op
                 // Profiling speed
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                 // Save body/face/hand keypoints to JSON file
-                const auto& tDatumFirst = (*tDatums)[0];
-                const auto baseFileName = (!tDatumFirst.name.empty() ? tDatumFirst.name
-                                            : std::to_string(tDatumFirst.id)) + "_keypoints";
+                const auto& tDatumFirstPtr = (*tDatums)[0];
+                const auto baseFileName = (!tDatumFirstPtr->name.empty() ? tDatumFirstPtr->name
+                                            : std::to_string(tDatumFirstPtr->id)) + "_keypoints";
                 const bool humanReadable = false;
                 for (auto i = 0u ; i < tDatums->size() ; i++)
                 {
-                    const auto& tDatum = (*tDatums)[i];
+                    const auto& tDatumPtr = (*tDatums)[i];
                     // const auto fileName = baseFileName;
                     const auto fileName = baseFileName + (i != 0 ? "_" + std::to_string(i) : "");
 
                     const std::vector<std::pair<Array<float>, std::string>> keypointVector{
                         // 2D
-                        std::make_pair(tDatum.poseKeypoints, "pose_keypoints_2d"),
-                        std::make_pair(tDatum.faceKeypoints, "face_keypoints_2d"),
-                        std::make_pair(tDatum.handKeypoints[0], "hand_left_keypoints_2d"),
-                        std::make_pair(tDatum.handKeypoints[1], "hand_right_keypoints_2d"),
+                        std::make_pair(tDatumPtr->poseKeypoints, "pose_keypoints_2d"),
+                        std::make_pair(tDatumPtr->faceKeypoints, "face_keypoints_2d"),
+                        std::make_pair(tDatumPtr->handKeypoints[0], "hand_left_keypoints_2d"),
+                        std::make_pair(tDatumPtr->handKeypoints[1], "hand_right_keypoints_2d"),
                         // 3D
-                        std::make_pair(tDatum.poseKeypoints3D, "pose_keypoints_3d"),
-                        std::make_pair(tDatum.faceKeypoints3D, "face_keypoints_3d"),
-                        std::make_pair(tDatum.handKeypoints3D[0], "hand_left_keypoints_3d"),
-                        std::make_pair(tDatum.handKeypoints3D[1], "hand_right_keypoints_3d")
+                        std::make_pair(tDatumPtr->poseKeypoints3D, "pose_keypoints_3d"),
+                        std::make_pair(tDatumPtr->faceKeypoints3D, "face_keypoints_3d"),
+                        std::make_pair(tDatumPtr->handKeypoints3D[0], "hand_left_keypoints_3d"),
+                        std::make_pair(tDatumPtr->handKeypoints3D[1], "hand_right_keypoints_3d")
                     };
                     // Save keypoints
-                    spPeopleJsonSaver->save(keypointVector, tDatum.poseCandidates, fileName, humanReadable);
+                    spPeopleJsonSaver->save(keypointVector, tDatumPtr->poseCandidates, fileName, humanReadable);
                 }
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);

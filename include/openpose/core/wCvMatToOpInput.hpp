@@ -62,10 +62,9 @@ namespace op
                 // Profiling speed
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                 // cv::Mat -> float*
-                for (auto& tDatum : *tDatums)
-                    tDatum.inputNetData = spCvMatToOpInput->createArray(tDatum.cvInputData,
-                                                                        tDatum.scaleInputToNetInputs,
-                                                                        tDatum.netInputSizes);
+                for (auto& tDatumPtr : *tDatums)
+                    tDatumPtr->inputNetData = spCvMatToOpInput->createArray(
+                        tDatumPtr->cvInputData, tDatumPtr->scaleInputToNetInputs, tDatumPtr->netInputSizes);
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
                 Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);

@@ -71,14 +71,14 @@ namespace op
                 // Profiling speed
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                 // Input
-                auto& datum = tDatums->at(0);
-                const auto& poseKeypoints3D = datum.poseKeypoints3D;
-                const auto& faceKeypoints3D = datum.faceKeypoints3D;
-                const auto& handKeypoints3D = datum.handKeypoints3D;
+                auto& tDatumPtr = tDatums->at(0);
+                const auto& poseKeypoints3D = tDatumPtr->poseKeypoints3D;
+                const auto& faceKeypoints3D = tDatumPtr->faceKeypoints3D;
+                const auto& handKeypoints3D = tDatumPtr->handKeypoints3D;
                 // Running Adam model
                 spJointAngleEstimation->adamFastFit(
-                    datum.adamPose, datum.adamTranslation, datum.vtVec, datum.j0Vec,
-                    datum.adamFaceCoeffsExp, poseKeypoints3D, faceKeypoints3D, handKeypoints3D);
+                    tDatumPtr->adamPose, tDatumPtr->adamTranslation, tDatumPtr->vtVec, tDatumPtr->j0Vec,
+                    tDatumPtr->adamFaceCoeffsExp, poseKeypoints3D, faceKeypoints3D, handKeypoints3D);
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
                 Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);

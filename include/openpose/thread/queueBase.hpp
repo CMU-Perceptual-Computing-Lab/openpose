@@ -514,8 +514,11 @@ namespace op
         }
     }
 
-    extern template class QueueBase<DATUM_BASE, std::queue<DATUM_BASE>>;
-    extern template class QueueBase<DATUM_BASE, std::priority_queue<DATUM_BASE, std::vector<DATUM_BASE>, std::greater<DATUM_BASE>>>;
+    extern template class QueueBase<BASE_DATUMS_SH, std::queue<BASE_DATUMS_SH>>;
+    extern template class QueueBase<
+        BASE_DATUMS_SH,
+        std::priority_queue<BASE_DATUMS_SH, std::vector<BASE_DATUMS_SH>,
+        std::greater<BASE_DATUMS_SH>>>;
 }
 
 #endif // OPENPOSE_THREAD_QUEUE_BASE_HPP

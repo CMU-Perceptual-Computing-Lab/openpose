@@ -49,7 +49,8 @@ namespace op
      * and adds them.
      * Common code for start() and exec().
      */
-    template<typename TDatums,
+    template<typename TDatum,
+             typename TDatums = std::vector<std::shared_ptr<TDatum>>,
              typename TDatumsSP = std::shared_ptr<TDatums>,
              typename TWorker = std::shared_ptr<Worker<TDatumsSP>>>
     void configureThreadManager(
@@ -81,7 +82,7 @@ namespace op
 #include <openpose/utilities/standard.hpp>
 namespace op
 {
-    template<typename TDatums, typename TDatumsSP, typename TWorker>
+    template<typename TDatum, typename TDatums, typename TDatumsSP, typename TWorker>
     void configureThreadManager(
         ThreadManager<TDatumsSP>& threadManager, const bool multiThreadEnabledTemp,
         const ThreadManagerMode threadManagerMode, const WrapperStructPose& wrapperStructPoseTemp,
@@ -210,11 +211,11 @@ namespace op
             TWorker datumProducerW;
             if (oPProducer)
             {
-                const auto datumProducer = std::make_shared<DatumProducer<TDatums>>(
+                const auto datumProducer = std::make_shared<DatumProducer<TDatum>>(
                     producerSharedPtr, wrapperStructInput.frameFirst, wrapperStructInput.frameStep,
                     wrapperStructInput.frameLast, spVideoSeek
                 );
-                datumProducerW = std::make_shared<WDatumProducer<TDatumsSP, TDatums>>(datumProducer);
+                datumProducerW = std::make_shared<WDatumProducer<TDatum>>(datumProducer);
             }
             else
                 datumProducerW = nullptr;
@@ -931,7 +932,7 @@ namespace op
                 }
             }
             // Assemble all frames from same time instant (3-D module)
-            const auto wQueueAssembler = std::make_shared<WQueueAssembler<TDatumsSP, TDatums>>();
+            const auto wQueueAssembler = std::make_shared<WQueueAssembler<TDatums>>();
             // 3-D reconstruction
             if (!poseTriangulationsWs.empty())
             {

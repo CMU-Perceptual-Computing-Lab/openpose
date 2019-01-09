@@ -389,10 +389,11 @@ namespace op
     };
 
     // Defines for Datum. Added here rather than in `macros.hpp` to avoid circular dependencies
-    #define DATUM_BASE_NO_PTR std::vector<Datum>
-    #define DATUM_BASE std::shared_ptr<DATUM_BASE_NO_PTR>
-    #define DEFINE_TEMPLATE_DATUM(templateName) template class OP_API templateName<DATUM_BASE>
-    #define COMPILE_TEMPLATE_DATUM(templateName) extern template class templateName<DATUM_BASE>
+    #define BASE_DATUM Datum
+    #define BASE_DATUMS std::vector<std::shared_ptr<BASE_DATUM>>
+    #define BASE_DATUMS_SH std::shared_ptr<BASE_DATUMS>
+    #define DEFINE_TEMPLATE_DATUM(templateName) template class OP_API templateName<BASE_DATUMS_SH>
+    #define COMPILE_TEMPLATE_DATUM(templateName) extern template class templateName<BASE_DATUMS_SH>
 }
 
 #endif // OPENPOSE_CORE_DATUM_HPP

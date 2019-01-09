@@ -13,7 +13,7 @@ DEFINE_string(image_path, "examples/media/COCO_val2014_000000000192.jpg",
     "Process an image. Read all standard formats (jpg, png, bmp, etc.).");
 
 // This worker will just read and return all the jpg files in a directory
-void display(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr)
+void display(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& datumsPtr)
 {
     // User's displaying/saving/other processing here
         // datum.cvOutputData: rendered frame with pose or heatmaps
@@ -21,20 +21,20 @@ void display(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr)
     if (datumsPtr != nullptr && !datumsPtr->empty())
     {
         // Display image
-        cv::imshow("User worker GUI", datumsPtr->at(0).cvOutputData);
+        cv::imshow("User worker GUI", datumsPtr->at(0)->cvOutputData);
         cv::waitKey(0);
     }
     else
         op::log("Nullptr or empty datumsPtr found.", op::Priority::High);
 }
 
-void printKeypoints(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr)
+void printKeypoints(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& datumsPtr)
 {
     // Example: How to use the pose keypoints
     if (datumsPtr != nullptr && !datumsPtr->empty())
     {
         // Alternative 1
-        op::log("Body keypoints: " + datumsPtr->at(0).poseKeypoints.toString());
+        op::log("Body keypoints: " + datumsPtr->at(0)->poseKeypoints.toString());
 
         // // Alternative 2
         // op::log(datumsPtr->at(0).poseKeypoints);

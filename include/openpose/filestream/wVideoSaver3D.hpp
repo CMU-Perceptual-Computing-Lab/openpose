@@ -65,7 +65,7 @@ namespace op
                 auto& tDatumsNoPtr = *tDatums;
                 // Record video(s)
                 if (!tDatumsNoPtr.empty())
-                    spVideoSaver->write(tDatumsNoPtr[0].cvOutputData3D);
+                    spVideoSaver->write(tDatumsNoPtr[0]->cvOutputData3D);
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
                 Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);

@@ -5,8 +5,11 @@ namespace op
     // Queues
     DEFINE_TEMPLATE_DATUM(PriorityQueue);
     DEFINE_TEMPLATE_DATUM(Queue);
-    template class OP_API QueueBase<DATUM_BASE, std::queue<DATUM_BASE>>;
-    template class OP_API QueueBase<DATUM_BASE, std::priority_queue<DATUM_BASE, std::vector<DATUM_BASE>, std::greater<DATUM_BASE>>>;
+    template class OP_API QueueBase<BASE_DATUMS_SH, std::queue<BASE_DATUMS_SH>>;
+    template class OP_API QueueBase<
+        BASE_DATUMS_SH,
+        std::priority_queue<BASE_DATUMS_SH, std::vector<BASE_DATUMS_SH>,
+        std::greater<BASE_DATUMS_SH>>>;
     // Subthread
     DEFINE_TEMPLATE_DATUM(SubThread);
     DEFINE_TEMPLATE_DATUM(SubThreadNoQueue);
@@ -23,6 +26,6 @@ namespace op
     // W-classes
     DEFINE_TEMPLATE_DATUM(WFpsMax);
     DEFINE_TEMPLATE_DATUM(WIdGenerator);
-    template class OP_API WQueueAssembler<DATUM_BASE, DATUM_BASE_NO_PTR>;
+    template class OP_API WQueueAssembler<BASE_DATUMS>;
     DEFINE_TEMPLATE_DATUM(WQueueOrderer);
 }

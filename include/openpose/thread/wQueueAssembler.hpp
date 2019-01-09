@@ -13,8 +13,8 @@ namespace op
     // with the same GPU. In this way, this work is parallelized over GPUs (1 view for each).
     // Pros: Latency highly recuded, same speed
     // Cons: Requires these extra 2 classes and proper threads for them
-    template<typename TDatums, typename TDatumsNoPtr>
-    class WQueueAssembler : public Worker<TDatums>
+    template<typename TDatums>
+    class WQueueAssembler : public Worker<std::shared_ptr<TDatums>>
     {
     public:
         explicit WQueueAssembler();
@@ -23,10 +23,10 @@ namespace op
 
         void initializationOnThread();
 
-        void work(TDatums& tDatums);
+        void work(std::shared_ptr<TDatums>& tDatums);
 
     private:
-        TDatums mNextTDatums;
+        std::shared_ptr<TDatums> mNextTDatums;
 
         DELETE_COPY(WQueueAssembler);
     };
@@ -39,23 +39,23 @@ namespace op
 // Implementation
 namespace op
 {
-    template<typename TDatums, typename TDatumsNoPtr>
-    WQueueAssembler<TDatums, TDatumsNoPtr>::WQueueAssembler()
+    template<typename TDatums>
+    WQueueAssembler<TDatums>::WQueueAssembler()
     {
     }
 
-    template<typename TDatums, typename TDatumsNoPtr>
-    WQueueAssembler<TDatums, TDatumsNoPtr>::~WQueueAssembler()
+    template<typename TDatums>
+    WQueueAssembler<TDatums>::~WQueueAssembler()
     {
     }
 
-    template<typename TDatums, typename TDatumsNoPtr>
-    void WQueueAssembler<TDatums, TDatumsNoPtr>::initializationOnThread()
+    template<typename TDatums>
+    void WQueueAssembler<TDatums>::initializationOnThread()
     {
     }
 
-    template<typename TDatums, typename TDatumsNoPtr>
-    void WQueueAssembler<TDatums, TDatumsNoPtr>::work(TDatums& tDatums)
+    template<typename TDatums>
+    void WQueueAssembler<TDatums>::work(std::shared_ptr<TDatums>& tDatums)
     {
         try
         {
@@ -70,17 +70,17 @@ namespace op
                           " was applied in the first place, i.e., that there is only 1 element"
                           " per TDatums (size = " + std::to_string(tDatums->size()) + ").",
                           __LINE__, __FUNCTION__, __FILE__);
-                auto tDatum = (*tDatums)[0];
+                auto tDatumPtr = (*tDatums)[0];
                 // Single view --> Return
-                if (tDatum.subIdMax == 0)
+                if (tDatumPtr->subIdMax == 0)
                     return;
                 // Multiple view --> Merge views into different TDatums (1st frame)
                 if (mNextTDatums == nullptr)
-                    mNextTDatums = std::make_shared<TDatumsNoPtr>();
+                    mNextTDatums = std::make_shared<TDatums>();
                 // Multiple view --> Merge views into different TDatums
-                mNextTDatums->emplace_back(tDatum);
+                mNextTDatums->emplace_back(tDatumPtr);
                 // Last view - Return frame
-                if (mNextTDatums->back().subId == mNextTDatums->back().subIdMax)
+                if (mNextTDatums->back()->subId == mNextTDatums->back()->subIdMax)
                 {
                     tDatums = mNextTDatums;
                     mNextTDatums = nullptr;
@@ -106,7 +106,7 @@ namespace op
         }
     }
 
-    extern template class WQueueAssembler<DATUM_BASE, DATUM_BASE_NO_PTR>;
+    extern template class WQueueAssembler<BASE_DATUMS>;
 }
 
 #endif // OPENPOSE_THREAD_W_QUEUE_ASSEMBLER_HPP

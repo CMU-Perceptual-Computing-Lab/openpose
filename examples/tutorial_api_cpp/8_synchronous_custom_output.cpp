@@ -24,7 +24,8 @@
 
 // If the user needs his own variables, he can inherit the op::Datum struct and add them in there.
 // UserDatum can be directly used by the OpenPose wrapper because it inherits from op::Datum, just define
-// WrapperT<std::vector<UserDatum>> instead of Wrapper (or equivalently WrapperT<std::vector<UserDatum>>)
+// WrapperT<std::vector<std::shared_ptr<UserDatum>>> instead of Wrapper
+// (or equivalently WrapperT<std::vector<std::shared_ptr<UserDatum>>>)
 struct UserDatum : public op::Datum
 {
     bool boolThatUserNeedsForSomeReason;
@@ -39,24 +40,24 @@ struct UserDatum : public op::Datum
 // in this case we assume a std::shared_ptr of a std::vector of UserDatum
 
 // This worker will just read and return all the jpg files in a directory
-class WUserOutput : public op::WorkerConsumer<std::shared_ptr<std::vector<UserDatum>>>
+class WUserOutput : public op::WorkerConsumer<std::shared_ptr<std::vector<std::shared_ptr<UserDatum>>>>
 {
 public:
     void initializationOnThread() {}
 
-    void workConsumer(const std::shared_ptr<std::vector<UserDatum>>& datumsPtr)
+    void workConsumer(const std::shared_ptr<std::vector<std::shared_ptr<UserDatum>>>& datumsPtr)
     {
         try
         {
             // User's displaying/saving/other processing here
-                // datum.cvOutputData: rendered frame with pose or heatmaps
-                // datum.poseKeypoints: Array<float> with the estimated pose
+                // datumPtr->cvOutputData: rendered frame with pose or heatmaps
+                // datumPtr->poseKeypoints: Array<float> with the estimated pose
             if (datumsPtr != nullptr && !datumsPtr->empty())
             {
                 // Show in command line the resulting pose keypoints for body, face and hands
                 op::log("\nKeypoints:");
                 // Accesing each element of the keypoints
-                const auto& poseKeypoints = datumsPtr->at(0).poseKeypoints;
+                const auto& poseKeypoints = datumsPtr->at(0)->poseKeypoints;
                 op::log("Person pose keypoints:");
                 for (auto person = 0 ; person < poseKeypoints.getSize(0) ; person++)
                 {
@@ -73,22 +74,22 @@ public:
                 }
                 op::log(" ");
                 // Alternative: just getting std::string equivalent
-                op::log("Face keypoints: " + datumsPtr->at(0).faceKeypoints.toString());
-                op::log("Left hand keypoints: " + datumsPtr->at(0).handKeypoints[0].toString());
-                op::log("Right hand keypoints: " + datumsPtr->at(0).handKeypoints[1].toString());
+                op::log("Face keypoints: " + datumsPtr->at(0)->faceKeypoints.toString());
+                op::log("Left hand keypoints: " + datumsPtr->at(0)->handKeypoints[0].toString());
+                op::log("Right hand keypoints: " + datumsPtr->at(0)->handKeypoints[1].toString());
                 // Heatmaps
-                const auto& poseHeatMaps = datumsPtr->at(0).poseHeatMaps;
+                const auto& poseHeatMaps = datumsPtr->at(0)->poseHeatMaps;
                 if (!poseHeatMaps.empty())
                 {
                     op::log("Pose heatmaps size: [" + std::to_string(poseHeatMaps.getSize(0)) + ", "
                             + std::to_string(poseHeatMaps.getSize(1)) + ", "
                             + std::to_string(poseHeatMaps.getSize(2)) + "]");
-                    const auto& faceHeatMaps = datumsPtr->at(0).faceHeatMaps;
+                    const auto& faceHeatMaps = datumsPtr->at(0)->faceHeatMaps;
                     op::log("Face heatmaps size: [" + std::to_string(faceHeatMaps.getSize(0)) + ", "
                             + std::to_string(faceHeatMaps.getSize(1)) + ", "
                             + std::to_string(faceHeatMaps.getSize(2)) + ", "
                             + std::to_string(faceHeatMaps.getSize(3)) + "]");
-                    const auto& handHeatMaps = datumsPtr->at(0).handHeatMaps;
+                    const auto& handHeatMaps = datumsPtr->at(0)->handHeatMaps;
                     op::log("Left hand heatmaps size: [" + std::to_string(handHeatMaps[0].getSize(0)) + ", "
                             + std::to_string(handHeatMaps[0].getSize(1)) + ", "
                             + std::to_string(handHeatMaps[0].getSize(2)) + ", "
@@ -100,7 +101,7 @@ public:
                 }
 
                 // Display rendered output image
-                cv::imshow("User worker GUI", datumsPtr->at(0).cvOutputData);
+                cv::imshow("User worker GUI", datumsPtr->at(0)->cvOutputData);
                 // Display image and sleeps at least 1 ms (it usually sleeps ~5-10 msec to display the image)
                 const char key = (char)cv::waitKey(1);
                 if (key == 27)
@@ -168,7 +169,7 @@ int tutorialApiCpp8()
 
         // OpenPose wrapper
         op::log("Configuring OpenPose...", op::Priority::High);
-        op::WrapperT<std::vector<UserDatum>> opWrapperT;
+        op::WrapperT<UserDatum> opWrapperT;
 
         // Initializing the user custom classes
         // GUI (Display)

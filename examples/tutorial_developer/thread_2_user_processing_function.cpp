@@ -64,7 +64,7 @@ DEFINE_bool(fullscreen,                 false,          "Run in full-screen mode
 // This class can be implemented either as a template or as a simple class given
 // that the user usually knows which kind of data he will move between the queues,
 // in this case we assume a std::shared_ptr of a std::vector of op::Datum
-class WUserClass : public op::Worker<std::shared_ptr<std::vector<op::Datum>>>
+class WUserClass : public op::Worker<std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>>
 {
 public:
     WUserClass()
@@ -74,16 +74,16 @@ public:
 
     void initializationOnThread() {}
 
-    void work(std::shared_ptr<std::vector<op::Datum>>& datumsPtr)
+    void work(std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& datumsPtr)
     {
         try
         {
             // User's processing here
-                // datum.cvInputData: initial cv::Mat obtained from the frames producer (video, webcam, etc.)
-                // datum.cvOutputData: final cv::Mat to be displayed
+                // datumPtr->cvInputData: initial cv::Mat obtained from the frames producer (video, webcam, etc.)
+                // datumPtr->cvOutputData: final cv::Mat to be displayed
             if (datumsPtr != nullptr)
-                for (auto& datum : *datumsPtr)
-                    cv::bitwise_not(datum.cvInputData, datum.cvOutputData);
+                for (auto& datumPtr : *datumsPtr)
+                    cv::bitwise_not(datumPtr->cvInputData, datumPtr->cvOutputData);
         }
         catch (const std::exception& e)
         {
@@ -133,18 +133,18 @@ int tutorialDeveloperThread2()
             (int)producerSharedPtr->get(CV_CAP_PROP_FRAME_WIDTH),
             (int)producerSharedPtr->get(CV_CAP_PROP_FRAME_HEIGHT)};
         // Step 4 - Setting thread workers && manager
-        typedef std::vector<op::Datum> TypedefDatumsNoPtr;
-        typedef std::shared_ptr<TypedefDatumsNoPtr> TypedefDatums;
-        op::ThreadManager<TypedefDatums> threadManager;
+        typedef op::Datum TypedefDatum;
+        typedef std::shared_ptr<std::vector<std::shared_ptr<TypedefDatum>>> TypedefDatumsSP;
+        op::ThreadManager<TypedefDatumsSP> threadManager;
         // Step 5 - Initializing the worker classes
         // Frames producer (e.g., video, webcam, ...)
-        auto DatumProducer = std::make_shared<op::DatumProducer<TypedefDatumsNoPtr>>(producerSharedPtr);
-        auto wDatumProducer = std::make_shared<op::WDatumProducer<TypedefDatums, TypedefDatumsNoPtr>>(DatumProducer);
+        auto DatumProducer = std::make_shared<op::DatumProducer<TypedefDatum>>(producerSharedPtr);
+        auto wDatumProducer = std::make_shared<op::WDatumProducer<TypedefDatum>>(DatumProducer);
         // Specific WUserClass
         auto wUserClass = std::make_shared<WUserClass>();
         // GUI (Display)
         auto gui = std::make_shared<op::Gui>(outputSize, FLAGS_fullscreen, threadManager.getIsRunningSharedPtr());
-        auto wGui = std::make_shared<op::WGui<TypedefDatums>>(gui);
+        auto wGui = std::make_shared<op::WGui<TypedefDatumsSP>>(gui);
 
         // ------------------------- CONFIGURING THREADING -------------------------
         // In this simple multi-thread example, we will do the following:

@@ -70,10 +70,10 @@ namespace op
                 // Profiling speed
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                 // Render people pose
-                for (auto& tDatum : *tDatums)
-                    tDatum.elementRendered = spPoseRenderer->renderPose(
-                        tDatum.outputData, tDatum.poseKeypoints, (float)tDatum.scaleInputToOutput,
-                        (float)tDatum.scaleNetToOutput);
+                for (auto& tDatumPtr : *tDatums)
+                    tDatumPtr->elementRendered = spPoseRenderer->renderPose(
+                        tDatumPtr->outputData, tDatumPtr->poseKeypoints, (float)tDatumPtr->scaleInputToOutput,
+                        (float)tDatumPtr->scaleNetToOutput);
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
                 Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);

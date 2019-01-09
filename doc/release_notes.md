@@ -316,6 +316,7 @@ OpenPose Library - Release Notes
     10. Renamed `--camera_parameter_folder` as `--camera_parameter_path` because it could also take a whole XML file path rather than its parent folder.
     11. Default value of flag `--scale_gap` changed from 0.3 to 0.25.
     12. Moved most sh scripts into the `scripts/` folder. Only models/getModels.sh and the *.bat files are kept under `models/` and `3rdparty/windows`.
+    13. For Python compatibility and scalability increase, template `TDatums` used for `include/openpose/wrapper/wrapper.hpp` has changed from `std::vector<Datum>` to `std::vector<std::shared_ptr<Datum>>`, including the respective changes in all the worker classes. In addition, some template classes have been simplified to only take 1 template parameter for user simplicity.
 3. Main bugs fixed:
     1. CMake-GUI was forcing to Release mode, allowed Debug modes too.
     2. NMS returns in index 0 the number of found peaks. However, while the number of peaks was truncated to a maximum of 127, this index 0 was saving the real number instead of the truncated one.

@@ -78,7 +78,7 @@ int tutorialAddModule1()
 
         // OpenPose wrapper
         op::log("Configuring OpenPose...", op::Priority::High);
-        op::WrapperT<std::vector<op::UserDatum>> opWrapperT;
+        op::WrapperT<op::UserDatum> opWrapperT;
         // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
         const op::WrapperStructPose wrapperStructPose{
             !FLAGS_body_disable, netInputSize, outputSize, keypointScale, FLAGS_num_gpu, FLAGS_num_gpu_start,
@@ -124,7 +124,7 @@ int tutorialAddModule1()
 
         // Custom post-processing
         auto userPostProcessing = std::make_shared<op::UserPostProcessing>(/* Your class arguments here */);
-        auto wUserPostProcessing = std::make_shared<op::WUserPostProcessing<std::shared_ptr<std::vector<op::UserDatum>>>>(
+        auto wUserPostProcessing = std::make_shared<op::WUserPostProcessing<std::shared_ptr<std::vector<std::shared_ptr<op::UserDatum>>>>>(
             userPostProcessing
         );
         // Add custom processing
