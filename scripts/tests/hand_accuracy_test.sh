@@ -9,7 +9,7 @@
     # Step 1 - Getting JSON output
         # Running it:
         # Run it from OpenPose main folder with the following command:
-        # clear && clear && make all -j`nproc` && bash ./examples/tests/hand_accuracy_test.sh
+        # clear && clear && make all -j`nproc` && bash ./scripts/tests/hand_accuracy_test.sh
 
         # Image paths:
         # Read that script for details about all the paths and change them for your own paths.

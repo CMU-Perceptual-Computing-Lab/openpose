@@ -70,16 +70,16 @@ namespace op
                 // Profiling speed
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                 // Extract people pose
-                for (auto& tDatum : *tDatums)
+                for (auto& tDatumPtr : *tDatums)
                 {
-                    spPoseExtractorNet->forwardPass(tDatum.inputNetData,
-                                                 Point<int>{tDatum.cvInputData.cols, tDatum.cvInputData.rows},
-                                                 tDatum.scaleInputToNetInputs);
-                    tDatum.poseCandidates = spPoseExtractorNet->getCandidatesCopy();
-                    tDatum.poseHeatMaps = spPoseExtractorNet->getHeatMapsCopy();
-                    tDatum.poseKeypoints = spPoseExtractorNet->getPoseKeypoints().clone();
-                    tDatum.poseScores = spPoseExtractorNet->getPoseScores().clone();
-                    tDatum.scaleNetToOutput = spPoseExtractorNet->getScaleNetToOutput();
+                    spPoseExtractorNet->forwardPass(
+                        tDatumPtr->inputNetData, Point<int>{tDatumPtr->cvInputData.cols, tDatumPtr->cvInputData.rows},
+                        tDatumPtr->scaleInputToNetInputs);
+                    tDatumPtr->poseCandidates = spPoseExtractorNet->getCandidatesCopy();
+                    tDatumPtr->poseHeatMaps = spPoseExtractorNet->getHeatMapsCopy();
+                    tDatumPtr->poseKeypoints = spPoseExtractorNet->getPoseKeypoints().clone();
+                    tDatumPtr->poseScores = spPoseExtractorNet->getPoseScores().clone();
+                    tDatumPtr->scaleNetToOutput = spPoseExtractorNet->getScaleNetToOutput();
                 }
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);

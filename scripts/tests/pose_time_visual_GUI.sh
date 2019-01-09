@@ -8,7 +8,7 @@
 # cd ../../
 
 # Re-build
-clear && clear && make all -j12
+clear && clear && make all -j`nproc`
 
 # Performance results (~1400)
 ./build/examples/openpose/openpose.bin --video soccer.mp4 --frame_last 1500

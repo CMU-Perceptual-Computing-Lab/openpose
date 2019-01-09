@@ -23,7 +23,8 @@
 
 // If the user needs his own variables, he can inherit the op::Datum struct and add them in there.
 // UserDatum can be directly used by the OpenPose wrapper because it inherits from op::Datum, just define
-// WrapperT<std::vector<UserDatum>> instead of Wrapper (or equivalently WrapperT<std::vector<UserDatum>>)
+// WrapperT<std::vector<std::shared_ptr<UserDatum>>> instead of Wrapper
+// (or equivalently WrapperT<std::vector<std::shared_ptr<UserDatum>>>)
 struct UserDatum : public op::Datum
 {
     bool boolThatUserNeedsForSomeReason;
@@ -38,7 +39,7 @@ struct UserDatum : public op::Datum
 // in this case we assume a std::shared_ptr of a std::vector of UserDatum
 
 // This worker will just invert the image
-class WUserPostProcessing : public op::Worker<std::shared_ptr<std::vector<UserDatum>>>
+class WUserPostProcessing : public op::Worker<std::shared_ptr<std::vector<std::shared_ptr<UserDatum>>>>
 {
 public:
     WUserPostProcessing()
@@ -48,16 +49,16 @@ public:
 
     void initializationOnThread() {}
 
-    void work(std::shared_ptr<std::vector<UserDatum>>& datumsPtr)
+    void work(std::shared_ptr<std::vector<std::shared_ptr<UserDatum>>>& datumsPtr)
     {
         // User's post-processing (after OpenPose processing & before OpenPose outputs) here
-            // datum.cvOutputData: rendered frame with pose or heatmaps
-            // datum.poseKeypoints: Array<float> with the estimated pose
+            // datumPtr->cvOutputData: rendered frame with pose or heatmaps
+            // datumPtr->poseKeypoints: Array<float> with the estimated pose
         try
         {
             if (datumsPtr != nullptr && !datumsPtr->empty())
-                for (auto& datum : *datumsPtr)
-                    cv::bitwise_not(datum.cvOutputData, datum.cvOutputData);
+                for (auto& datumPtr : *datumsPtr)
+                    cv::bitwise_not(datumPtr->cvOutputData, datumPtr->cvOutputData);
         }
         catch (const std::exception& e)
         {
@@ -120,7 +121,7 @@ int tutorialApiCpp6()
 
         // OpenPose wrapper
         op::log("Configuring OpenPose...", op::Priority::High);
-        op::WrapperT<std::vector<UserDatum>> opWrapperT;
+        op::WrapperT<UserDatum> opWrapperT;
 
         // Initializing the user custom classes
         // Processing

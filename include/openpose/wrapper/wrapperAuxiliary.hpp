@@ -49,7 +49,8 @@ namespace op
      * and adds them.
      * Common code for start() and exec().
      */
-    template<typename TDatums,
+    template<typename TDatum,
+             typename TDatums = std::vector<std::shared_ptr<TDatum>>,
              typename TDatumsSP = std::shared_ptr<TDatums>,
              typename TWorker = std::shared_ptr<Worker<TDatumsSP>>>
     void configureThreadManager(
@@ -81,7 +82,7 @@ namespace op
 #include <openpose/utilities/standard.hpp>
 namespace op
 {
-    template<typename TDatums, typename TDatumsSP, typename TWorker>
+    template<typename TDatum, typename TDatums, typename TDatumsSP, typename TWorker>
     void configureThreadManager(
         ThreadManager<TDatumsSP>& threadManager, const bool multiThreadEnabledTemp,
         const ThreadManagerMode threadManagerMode, const WrapperStructPose& wrapperStructPoseTemp,
@@ -210,11 +211,11 @@ namespace op
             TWorker datumProducerW;
             if (oPProducer)
             {
-                const auto datumProducer = std::make_shared<DatumProducer<TDatums>>(
+                const auto datumProducer = std::make_shared<DatumProducer<TDatum>>(
                     producerSharedPtr, wrapperStructInput.frameFirst, wrapperStructInput.frameStep,
                     wrapperStructInput.frameLast, spVideoSeek
                 );
-                datumProducerW = std::make_shared<WDatumProducer<TDatumsSP, TDatums>>(datumProducer);
+                datumProducerW = std::make_shared<WDatumProducer<TDatum>>(datumProducer);
             }
             else
                 datumProducerW = nullptr;
@@ -342,11 +343,12 @@ namespace op
                     //         wPose.emplace_back(std::make_shared<WKeepTopNPeople<TDatumsSP>>(keepTopNPeople));
                     // }
                 }
-
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
                 // Face extractor(s)
                 if (wrapperStructFace.enable)
                 {
+                    log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     // Face detector
                     // OpenPose face detector
                     if (wrapperStructPose.enable)
@@ -384,10 +386,12 @@ namespace op
                             std::make_shared<WFaceExtractorNet<TDatumsSP>>(faceExtractorNet));
                     }
                 }
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
                 // Hand extractor(s)
                 if (wrapperStructHand.enable)
                 {
+                    log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     const auto handDetector = std::make_shared<HandDetector>(wrapperStructPose.poseModel);
                     for (auto gpu = 0u; gpu < poseExtractorsWs.size(); gpu++)
                     {
@@ -420,17 +424,23 @@ namespace op
                             );
                     }
                 }
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
                 // Pose renderer(s)
                 if (!poseGpuRenderers.empty())
+                {
+                    log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     for (auto i = 0u; i < poseExtractorsWs.size(); i++)
                         poseExtractorsWs.at(i).emplace_back(std::make_shared<WPoseRenderer<TDatumsSP>>(
                             poseGpuRenderers.at(i)
                         ));
+                }
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
                 // Face renderer(s)
                 if (renderFace)
                 {
+                    log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     // CPU rendering
                     if (wrapperStructFace.renderMode == RenderMode::Cpu)
                     {
@@ -469,10 +479,12 @@ namespace op
                     else
                         error("Unknown RenderMode.", __LINE__, __FUNCTION__, __FILE__);
                 }
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
                 // Hand renderer(s)
                 if (renderHand)
                 {
+                    log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     // CPU rendering
                     if (wrapperStructHand.renderMode == RenderMode::Cpu)
                     {
@@ -511,11 +523,13 @@ namespace op
                     else
                         error("Unknown RenderMode.", __LINE__, __FUNCTION__, __FILE__);
                 }
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
                 // 3-D reconstruction
                 poseTriangulationsWs.clear();
                 if (wrapperStructExtra.reconstruct3d)
                 {
+                    log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     // For all (body/face/hands): PoseTriangulations ~30 msec, 8 GPUS ~30 msec for keypoint estimation
                     poseTriangulationsWs.resize(fastMax(1, int(poseExtractorsWs.size() / 4)));
                     for (auto i = 0u ; i < poseTriangulationsWs.size() ; i++)
@@ -526,6 +540,7 @@ namespace op
                             poseTriangulation)};
                     }
                 }
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 // Itermediate workers (e.g., OpenPose format to cv::Mat, json & frames recorder, ...)
                 postProcessingWs.clear();
                 // // Person ID identification (when no multi-thread and no dependency on tracking)
@@ -539,10 +554,12 @@ namespace op
                 // Frames processor (OpenPose format -> cv::Mat format)
                 if (renderOutput)
                 {
+                    log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     postProcessingWs = mergeVectors(postProcessingWs, cpuRenderers);
                     const auto opOutputToCvMat = std::make_shared<OpOutputToCvMat>();
                     postProcessingWs.emplace_back(std::make_shared<WOpOutputToCvMat<TDatumsSP>>(opOutputToCvMat));
                 }
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 // Re-scale pose if desired
                 // If desired scale is not the current input
                 if (wrapperStructPose.keypointScale != ScaleMode::InputResolution
@@ -558,6 +575,7 @@ namespace op
                     postProcessingWs.emplace_back(std::make_shared<WKeypointScaler<TDatumsSP>>(keypointScaler));
                 }
             }
+            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
             // IK/Adam
             const auto displayAdam = wrapperStructGui.displayMode == DisplayMode::DisplayAdam
@@ -567,6 +585,7 @@ namespace op
 #ifdef USE_3D_ADAM_MODEL
             if (wrapperStructExtra.ikThreads > 0)
             {
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 jointAngleEstimationsWs.resize(wrapperStructExtra.ikThreads);
                 // Pose extractor(s)
                 for (auto i = 0u; i < jointAngleEstimationsWs.size(); i++)
@@ -576,6 +595,7 @@ namespace op
                         jointAngleEstimation)};
                 }
             }
+            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 #endif
 
             // Output workers
@@ -583,23 +603,28 @@ namespace op
             // Print verbose
             if (wrapperStructOutput.verbose > 0.)
             {
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 const auto verbosePrinter = std::make_shared<VerbosePrinter>(
                     wrapperStructOutput.verbose, producerSharedPtr->get(CV_CAP_PROP_FRAME_COUNT));
                 outputWs.emplace_back(std::make_shared<WVerbosePrinter<TDatumsSP>>(verbosePrinter));
             }
+            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             // Send information (e.g., to Unity) though UDP client-server communication
 
 #ifdef USE_3D_ADAM_MODEL
             if (!wrapperStructOutput.udpHost.empty() && !wrapperStructOutput.udpPort.empty())
             {
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 const auto udpSender = std::make_shared<UdpSender>(wrapperStructOutput.udpHost,
                                                                    wrapperStructOutput.udpPort);
                 outputWs.emplace_back(std::make_shared<WUdpSender<TDatumsSP>>(udpSender));
             }
+            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 #endif
             // Write people pose data on disk (json for OpenCV >= 3, xml, yml...)
             if (!writeKeypointCleaned.empty())
             {
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 const auto keypointSaver = std::make_shared<KeypointSaver>(writeKeypointCleaned,
                                                                            wrapperStructOutput.writeKeypointFormat);
                 outputWs.emplace_back(std::make_shared<WPoseSaver<TDatumsSP>>(keypointSaver));
@@ -608,16 +633,20 @@ namespace op
                 if (wrapperStructHand.enable)
                     outputWs.emplace_back(std::make_shared<WHandSaver<TDatumsSP>>(keypointSaver));
             }
+            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             // Write OpenPose output data on disk in json format (body/hand/face keypoints, body part locations if
             // enabled, etc.)
             if (!writeJsonCleaned.empty())
             {
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 const auto peopleJsonSaver = std::make_shared<PeopleJsonSaver>(writeJsonCleaned);
                 outputWs.emplace_back(std::make_shared<WPeopleJsonSaver<TDatumsSP>>(peopleJsonSaver));
             }
+            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             // Write people pose data on disk (COCO validation json format)
             if (!wrapperStructOutput.writeCocoJson.empty())
             {
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 // If humanFormat: bigger size (& maybe slower to process), but easier for user to read it
                 const auto humanFormat = true;
                 const auto cocoJsonSaver = std::make_shared<CocoJsonSaver>(
@@ -628,6 +657,7 @@ namespace op
                     wrapperStructOutput.writeCocoJsonVariant);
                 outputWs.emplace_back(std::make_shared<WCocoJsonSaver<TDatumsSP>>(cocoJsonSaver));
             }
+            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             // Write people foot pose data on disk (COCO validation json format for foot data)
             if (!wrapperStructOutput.writeCocoFootJson.empty())
             {
@@ -638,17 +668,21 @@ namespace op
                     CocoJsonFormat::Foot);
                 outputWs.emplace_back(std::make_shared<WCocoJsonSaver<TDatumsSP>>(cocoJsonSaver));
             }
+            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             // Write frames as desired image format on hard disk
             if (!writeImagesCleaned.empty())
             {
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 const auto imageSaver = std::make_shared<ImageSaver>(writeImagesCleaned,
                                                                      wrapperStructOutput.writeImagesFormat);
                 outputWs.emplace_back(std::make_shared<WImageSaver<TDatumsSP>>(imageSaver));
             }
+            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             auto originalVideoFps = 0.;
             if (!wrapperStructOutput.writeVideo.empty() || !wrapperStructOutput.writeVideo3D.empty()
                 || !wrapperStructOutput.writeBvh.empty())
             {
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 if (wrapperStructOutput.writeVideoFps <= 0
                     && (!oPProducer || producerSharedPtr->get(CV_CAP_PROP_FPS) <= 0))
                     error("The frame rate of the frames producer is unknown. Set `--write_video_fps` to your desired"
@@ -660,9 +694,11 @@ namespace op
                     wrapperStructOutput.writeVideoFps > 0 ?
                     wrapperStructOutput.writeVideoFps : producerSharedPtr->get(CV_CAP_PROP_FPS));
             }
+            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             // Write frames as *.avi video on hard disk
             if (!wrapperStructOutput.writeVideo.empty())
             {
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 if (!oPProducer)
                     error("Video file can only be recorded inside `wrapper/wrapper.hpp` if the producer"
                           " is one of the default ones (e.g., video, webcam, ...).",
@@ -671,23 +707,28 @@ namespace op
                     wrapperStructOutput.writeVideo, CV_FOURCC('M','J','P','G'), originalVideoFps);
                 outputWs.emplace_back(std::make_shared<WVideoSaver<TDatumsSP>>(videoSaver));
             }
+            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             // Write joint angles as *.bvh file on hard disk
 #ifdef USE_3D_ADAM_MODEL
             if (!wrapperStructOutput.writeBvh.empty())
             {
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 const auto bvhSaver = std::make_shared<BvhSaver>(
                     wrapperStructOutput.writeBvh, JointAngleEstimation::getTotalModel(), originalVideoFps
                 );
                 outputWs.emplace_back(std::make_shared<WBvhSaver<TDatumsSP>>(bvhSaver));
             }
+            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 #endif
             // Write heat maps as desired image format on hard disk
             if (!writeHeatMapsCleaned.empty())
             {
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 const auto heatMapSaver = std::make_shared<HeatMapSaver>(
                     writeHeatMapsCleaned, wrapperStructOutput.writeHeatMapsFormat);
                 outputWs.emplace_back(std::make_shared<WHeatMapSaver<TDatumsSP>>(heatMapSaver));
             }
+            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             // Add frame information for GUI
             const bool guiEnabled = (wrapperStructGui.displayMode != DisplayMode::NoDisplay);
             // If this WGuiInfoAdder instance is placed before the WImageSaver or WVideoSaver, then the resulting
@@ -696,14 +737,17 @@ namespace op
                                                 || threadManagerMode == ThreadManagerMode::Asynchronous
                                                 || threadManagerMode == ThreadManagerMode::AsynchronousOut))
             {
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 const auto guiInfoAdder = std::make_shared<GuiInfoAdder>(numberThreads, guiEnabled);
                 outputWs.emplace_back(std::make_shared<WGuiInfoAdder<TDatumsSP>>(guiInfoAdder));
             }
+            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             // Minimal graphical user interface (GUI)
             TWorker guiW;
             TWorker videoSaver3DW;
             if (guiEnabled)
             {
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 // PoseRenderers to Renderers
                 std::vector<std::shared_ptr<Renderer>> renderers;
                 if (wrapperStructPose.renderMode == RenderMode::Cpu)
@@ -712,7 +756,8 @@ namespace op
                     for (const auto& poseGpuRenderer : poseGpuRenderers)
                         renderers.emplace_back(std::static_pointer_cast<Renderer>(poseGpuRenderer));
                 // Display
-                const auto numberViews = (intRound(producerSharedPtr->get(ProducerProperty::NumberViews)));
+                const auto numberViews = (producerSharedPtr != nullptr
+                    ? intRound(producerSharedPtr->get(ProducerProperty::NumberViews)) : 1);
                 auto finalOutputSizeGui = finalOutputSize;
                 if (numberViews > 1 && finalOutputSizeGui.x > 0)
                     finalOutputSizeGui.x *= numberViews;
@@ -720,6 +765,7 @@ namespace op
                 if (displayAdam)
                 {
 #ifdef USE_3D_ADAM_MODEL
+                    log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     // Gui
                     const auto gui = std::make_shared<GuiAdam>(
                         finalOutputSizeGui, wrapperStructGui.fullScreen, threadManager.getIsRunningSharedPtr(),
@@ -739,6 +785,7 @@ namespace op
                 else if (wrapperStructGui.displayMode == DisplayMode::Display3D
                     || wrapperStructGui.displayMode == DisplayMode::DisplayAll)
                 {
+                    log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     // Gui
                     const auto gui = std::make_shared<Gui3D>(
                         finalOutputSizeGui, wrapperStructGui.fullScreen, threadManager.getIsRunningSharedPtr(),
@@ -759,6 +806,7 @@ namespace op
                 // 2-D display
                 else if (wrapperStructGui.displayMode == DisplayMode::Display2D)
                 {
+                    log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     // Gui
                     const auto gui = std::make_shared<Gui>(
                         finalOutputSizeGui, wrapperStructGui.fullScreen, threadManager.getIsRunningSharedPtr(),
@@ -774,6 +822,7 @@ namespace op
                 else
                     error("Unknown DisplayMode.", __LINE__, __FUNCTION__, __FILE__);
             }
+            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             // Set FpsMax
             TWorker wFpsMax;
             if (wrapperStructPose.fpsMax > 0.)
@@ -883,7 +932,7 @@ namespace op
                 }
             }
             // Assemble all frames from same time instant (3-D module)
-            const auto wQueueAssembler = std::make_shared<WQueueAssembler<TDatumsSP, TDatums>>();
+            const auto wQueueAssembler = std::make_shared<WQueueAssembler<TDatums>>();
             // 3-D reconstruction
             if (!poseTriangulationsWs.empty())
             {

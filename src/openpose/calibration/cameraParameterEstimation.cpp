@@ -1193,7 +1193,7 @@ namespace op
     }
 
     #if defined(USE_CERES) && defined(USE_EIGEN)
-        double computeReprojectionError(
+        double computeReprojectionErrorInPixels(
             const std::vector<std::vector<cv::Point2f>>& points2DVectorsExtrinsic, const Eigen::MatrixXd& BAValid,
             const Eigen::Matrix<double, 3, Eigen::Dynamic>& points3D, const std::vector<cv::Mat> cameraExtrinsics,
             const std::vector<cv::Mat> cameraIntrinsics, const bool verbose = true)
@@ -1405,7 +1405,7 @@ namespace op
             try
             {
                 // Outlier removal
-                auto reprojectionError = computeReprojectionError(
+                auto reprojectionError = computeReprojectionErrorInPixels(
                     points2DVectorsExtrinsic, BAValid, points3D, cameraExtrinsics, cameraIntrinsics, false);
                 auto reprojectionErrorPrevious = reprojectionError+1;
                 while (reprojectionError != reprojectionErrorPrevious)
@@ -1416,12 +1416,12 @@ namespace op
                     removeOutliersReprojectionError(
                         points2DVectorsExtrinsic, BAValid, points3D, cameraExtrinsics, cameraIntrinsics,
                         errorThreshold);
-                    reprojectionError = computeReprojectionError(
+                    reprojectionError = computeReprojectionErrorInPixels(
                         points2DVectorsExtrinsic, BAValid, points3D, cameraExtrinsics, cameraIntrinsics);
                     // Verbose
                     log("Reprojection Error (after outlier removal iteration): "
-                        + std::to_string(reprojectionError) + ",\twith error threshold of "
-                        + std::to_string(errorThreshold) + ".", Priority::High);
+                        + std::to_string(reprojectionError) + " pixels,\twith error threshold of "
+                        + std::to_string(errorThreshold) + " pixels.", Priority::High);
                 }
             }
             catch (const std::exception& e)
@@ -1925,10 +1925,10 @@ namespace op
                             extrinsics.at<double>(x, y) = rotation(x, y);
                     refinedExtrinsics[cameraIndex] = extrinsics;
                 }
-                const auto reprojectionError = computeReprojectionError(
+                const auto reprojectionError = computeReprojectionErrorInPixels(
                     points2DVectorsExtrinsic, BAValid, points3D, refinedExtrinsics, cameraIntrinsics);
-                log("Reprojection Error (after Bundle Adjustment): " + std::to_string(reprojectionError),
-                    Priority::High);
+                log("Reprojection Error (after Bundle Adjustment): " + std::to_string(reprojectionError)
+                    + " pixels.", Priority::High);
             }
             catch (const std::exception& e)
             {
@@ -1963,7 +1963,8 @@ namespace op
                             const int startIndex = startPerFrame + t * numberCorners;
                             const int endPerFrame = x + 1 + y * gridInnerCorners.x;
                             const int endIndex = endPerFrame + t * numberCorners;
-                            if (BAValid.col(startIndex).any() && BAValid.col(endIndex).any())   // These points are used for BA, must have been constructed.
+                            // These points are used for BA, must have been constructed.
+                            if (BAValid.col(startIndex).any() && BAValid.col(endIndex).any())
                             {
                                 const double length = (points3D.col(startIndex) - points3D.col(endIndex)).norm();
                                 sumSquareLength += length * length;
@@ -1983,7 +1984,8 @@ namespace op
                             const int startIndex = startPerFrame + t * numberCorners;
                             const int endPerFrame = x + (y + 1) * gridInnerCorners.x;
                             const int endIndex = endPerFrame + t * numberCorners;
-                            if (BAValid.col(startIndex).any() && BAValid.col(endIndex).any())   // These points are used for BA, must have been constructed.
+                            // These points are used for BA, must have been constructed.
+                            if (BAValid.col(startIndex).any() && BAValid.col(endIndex).any())
                             {
                                 const double length = (points3D.col(startIndex) - points3D.col(endIndex)).norm();
                                 sumSquareLength += length * length;
@@ -1996,10 +1998,10 @@ namespace op
                         }
                 }
                 const double scalingFactor = 0.001f * gridSquareSizeMm * sumLength / sumSquareLength;
-                log("Scaling factor: " + std::to_string(scalingFactor) + ",\tMin grid length: " + std::to_string(minLength)
-                    + ",\tMax grid length: " + std::to_string(maxLength), Priority::High);
-                // Scale extrinsics
-                for (auto cameraIndex = 1; cameraIndex < numberCameras; cameraIndex++) // scale the translation (and the 3D point)
+                log("Scaling factor: " + std::to_string(scalingFactor) + ",\tMin grid length: "
+                    + std::to_string(minLength) + ",\tMax grid length: " + std::to_string(maxLength), Priority::High);
+                // Scale extrinsics: Scale the translation (and the 3D point)
+                for (auto cameraIndex = 1; cameraIndex < numberCameras; cameraIndex++)
                 {
                     refinedExtrinsics[cameraIndex].at<double>(0, 3) *= scalingFactor;
                     refinedExtrinsics[cameraIndex].at<double>(1, 3) *= scalingFactor;
@@ -2008,9 +2010,10 @@ namespace op
                 // Scale 3D points
                 points3D *= scalingFactor;
                 // Final reprojection error
-                const auto reprojectionError = computeReprojectionError(
+                const auto reprojectionError = computeReprojectionErrorInPixels(
                     points2DVectorsExtrinsic, BAValid, points3D, refinedExtrinsics, cameraIntrinsics);
-                log("Reprojection Error (after rescaling): " + std::to_string(reprojectionError), Priority::High);
+                log("Reprojection Error (after rescaling): " + std::to_string(reprojectionError) + " pixels.",
+                    Priority::High);
             }
             catch (const std::exception& e)
             {
@@ -2032,7 +2035,7 @@ namespace op
                 // Initial reprojection error
                 if (printInitialReprojection)
                 {
-                    const auto reprojectionError = computeReprojectionError(
+                    const auto reprojectionError = computeReprojectionErrorInPixels(
                         points2DVectorsExtrinsic, BAValid, points3D, refinedExtrinsics, cameraIntrinsics);
                     log("Reprojection Error (initial): " + std::to_string(reprojectionError), Priority::High);
                     log(" ", Priority::High);

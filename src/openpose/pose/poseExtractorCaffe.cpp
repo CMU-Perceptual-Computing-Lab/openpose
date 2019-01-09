@@ -3,6 +3,10 @@
     #include <caffe/blob.hpp>
 #endif
 #include <openpose/gpu/cuda.hpp>
+#ifdef USE_OPENCL
+    #include <openpose/gpu/opencl.hcl>
+    #include <openpose/gpu/cl2.hpp>
+#endif
 #include <openpose/net/bodyPartConnectorCaffe.hpp>
 #include <openpose/net/maximumCaffe.hpp>
 #include <openpose/net/netCaffe.hpp>
@@ -101,7 +105,7 @@ namespace op
                 nmsCaffe->Reshape({heatMapsBlob.get()}, {peaksBlob.get()}, getPoseMaxPeaks(),
                                   getPoseNumberBodyParts(poseModel), gpuID);
                 // Pose extractor blob and layer
-                bodyPartConnectorCaffe->Reshape({heatMapsBlob.get(), peaksBlob.get()});
+                bodyPartConnectorCaffe->Reshape({heatMapsBlob.get(), peaksBlob.get()}, gpuID);
                 if (TOP_DOWN_REFINEMENT)
                     maximumCaffe->Reshape({heatMapsBlob.get()}, {maximumPeaksBlob.get()});
                 // Cuda check

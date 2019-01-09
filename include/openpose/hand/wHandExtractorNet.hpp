@@ -63,13 +63,13 @@ namespace op
                 // Profiling speed
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                 // Extract people hands
-                for (auto& tDatum : *tDatums)
+                for (auto& tDatumPtr : *tDatums)
                 {
-                    spHandExtractorNet->forwardPass(tDatum.handRectangles, tDatum.cvInputData);
+                    spHandExtractorNet->forwardPass(tDatumPtr->handRectangles, tDatumPtr->cvInputData);
                     for (auto hand = 0 ; hand < 2 ; hand++)
                     {
-                        tDatum.handHeatMaps[hand] = spHandExtractorNet->getHeatMaps()[hand].clone();
-                        tDatum.handKeypoints[hand] = spHandExtractorNet->getHandKeypoints()[hand].clone();
+                        tDatumPtr->handHeatMaps[hand] = spHandExtractorNet->getHeatMaps()[hand].clone();
+                        tDatumPtr->handKeypoints[hand] = spHandExtractorNet->getHandKeypoints()[hand].clone();
                     }
                 }
                 // Profiling speed

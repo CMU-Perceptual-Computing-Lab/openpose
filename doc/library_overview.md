@@ -70,8 +70,8 @@ The `Datum` class has all the variables that our Workers need to share to each o
 UserDatum : public op::Datum {/* op::Datum + extra variables */}
 
 // Worker and ThreadManager example initialization
-op::WGui<std::shared_ptr<std::vector<UserDatum>> userGUI(/* constructor arguments */);
-op::ThreadManager<std::shared_ptr<std::vector<UserDatum>> userThreadManager;
+op::WGui<std::shared_ptr<std::vector<std::shared_ptr<UserDatum>>> userGUI(/* constructor arguments */);
+op::ThreadManager<std::shared_ptr<std::vector<std::shared_ptr<UserDatum>>> userThreadManager;
 ```
 
 Since `UserDatum` inherits from `op::Datum`, all the original OpenPose code will compile and run with your inherited version of `op::Datum`.
@@ -83,7 +83,7 @@ Since `UserDatum` inherits from `op::Datum`, all the original OpenPose code will
 It manages and automates the multi-threading configuration and execution. The user just needs to add the desired Worker<T> classes to be executed and the parallelization mode, and this class will take care of it.
 
 #### Constructor
-Just call `op::ThreadManager<TypedefDatums> threadManager`.
+Just call `op::ThreadManager<TypedefDatumsSP> threadManager`.
 
 #### Adding a Worker Sequence
 There are 4 ways to add sequence of workers:
@@ -171,7 +171,7 @@ All Workers wrap and call a non-Worker non-template equivalent which actually pe
 
 By separating functionality and their `Worker<T>` wrappers, we get the good of both points, eliminating the cons. In this way, the user is able to:
 
-1. Change `std::shared_ptr<std::vector<op::Datum>>` for a custom class, implementing his own `Worker` templates, but using the already implemented functionality to create new custom `Worker` templates.
+1. Change `std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>` for a custom class, implementing his own `Worker` templates, but using the already implemented functionality to create new custom `Worker` templates.
 
 2. Create a `Worker` which wraps several non-`Worker`s classes.
 

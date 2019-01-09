@@ -443,13 +443,13 @@ if (UNIX OR APPLE)
 
     if (NOT CUDA_FOUND)
       message(STATUS "CUDA not found.")
-      execute_process(COMMAND cat install_cuda.sh WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/ubuntu)
+      execute_process(COMMAND cat install_cuda.sh WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/scripts/ubuntu)
       message(FATAL_ERROR "Install CUDA using the above commands.")
     endif (NOT CUDA_FOUND)
 
     if (USE_CUDNN AND NOT CUDNN_FOUND)
       message(STATUS "cuDNN not found.")
-      execute_process(COMMAND cat install_cudnn.sh WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/ubuntu)
+      execute_process(COMMAND cat install_cudnn.sh WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/scripts/ubuntu)
       message(FATAL_ERROR "Install cuDNN using the above commands. or turn off cuDNN by setting USE_CUDNN to OFF.")
     endif (USE_CUDNN AND NOT CUDNN_FOUND)
   endif (${GPU_MODE} MATCHES "CUDA")
@@ -705,10 +705,12 @@ if (UNIX OR APPLE)
           PREFIX ${CAFFE_PREFIX}
           CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
           -DMKLDNN_INSTALL_DIR:PATH=<INSTALL_DIR>
+          -DUSE_MKL2017_AS_DEFAULT_ENGINE=${CAFFE_CPU_ONLY}
           -DUSE_CUDNN=${USE_CUDNN}
           -DCUDA_ARCH_NAME=${CUDA_ARCH}
+          -DCUDA_ARCH_BIN=${CUDA_ARCH_BIN}
+          -DCUDA_ARCH_PTX=${CUDA_ARCH_PTX}
           -DCPU_ONLY=${CAFFE_CPU_ONLY}
-          -DUSE_MKL2017_AS_DEFAULT_ENGINE=${CAFFE_CPU_ONLY}
           -DCMAKE_BUILD_TYPE=Release
           -DBUILD_docs=OFF
           -DBUILD_python=OFF
@@ -724,6 +726,8 @@ if (UNIX OR APPLE)
           CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
           -DUSE_CUDNN=${USE_CUDNN}
           -DCUDA_ARCH_NAME=${CUDA_ARCH}
+          -DCUDA_ARCH_BIN=${CUDA_ARCH_BIN}
+          -DCUDA_ARCH_PTX=${CUDA_ARCH_PTX}
           -DCPU_ONLY=${CAFFE_CPU_ONLY}
           -DCMAKE_BUILD_TYPE=Release
           -DBUILD_docs=OFF

@@ -8,7 +8,7 @@
 # sudo apt-get install graphviz
 
 # USAGE EXAMPLE
-# clear && clear && make all -j24 && bash ./examples/tests/speed_test.sh
+# clear && clear && make all -j`nproc` && bash ./scripts/tests/speed_test.sh
 
 # # Go back to main folder
 # cd ../../

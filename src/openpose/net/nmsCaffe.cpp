@@ -1,6 +1,10 @@
 #ifdef USE_CAFFE
     #include <caffe/blob.hpp>
 #endif
+#ifdef USE_OPENCL
+    #include <openpose/gpu/opencl.hcl>
+    #include <openpose/gpu/cl2.hpp>
+#endif
 #include <openpose/net/nmsBase.hpp>
 #include <openpose/net/nmsCaffe.hpp>
 
@@ -14,13 +18,27 @@ namespace op
             std::array<int, 4> mBottomSize;
             std::array<int, 4> mTopSize;
             // Special Kernel for OpenCL NMS
-            #ifdef USE_OPENCL
-                std::shared_ptr<caffe::Blob<int>> mKernelBlobT;
+            #if defined USE_CAFFE && defined USE_OPENCL
+                //std::shared_ptr<caffe::Blob<uint8_t>> mKernelBlobT;
+                uint8_t* mKernelGpuPtr;
+                uint8_t* mKernelCpuPtr;
             #endif
         #endif
 
         ImplNmsCaffe()
         {
+            #if defined USE_CAFFE && defined USE_OPENCL
+                mKernelGpuPtr = nullptr;
+                mKernelCpuPtr = nullptr;
+            #endif
+        }
+
+        ~ImplNmsCaffe()
+        {
+            #if defined USE_CAFFE && defined USE_OPENCL
+                if(mKernelGpuPtr != nullptr) clReleaseMemObject((cl_mem)mKernelGpuPtr);
+                if(mKernelCpuPtr != nullptr) delete mKernelCpuPtr;
+            #endif
         }
     };
 
@@ -89,9 +107,12 @@ namespace op
                 upImpl->mKernelBlob.Reshape(bottomShape);
 
                 // Special Kernel for OpenCL NMS
-                #ifdef USE_OPENCL
-                    upImpl->mKernelBlobT = {std::make_shared<caffe::Blob<int>>(1,1,1,1)};
-                    upImpl->mKernelBlobT->Reshape(bottomShape);
+                #if defined USE_CAFFE && defined USE_OPENCL
+                    int bottomShapeVolume = bottomShape[0] * bottomShape[1] * bottomShape[2] * bottomShape[3];
+                    upImpl->mKernelGpuPtr = (uint8_t*)clCreateBuffer(
+                        OpenCL::getInstance(gpuID)->getContext().operator()(), CL_MEM_READ_WRITE,
+                        sizeof(uint8_t) * bottomShapeVolume, NULL, NULL);
+                    upImpl->mKernelCpuPtr = new uint8_t[bottomShapeVolume];
                     // GPU ID
                     mGpuID = gpuID;
                 #else
@@ -208,7 +229,7 @@ namespace op
         try
         {
             #if defined USE_CAFFE && defined USE_OPENCL
-                nmsOcl(top.at(0)->mutable_gpu_data(), upImpl->mKernelBlobT->mutable_gpu_data(),
+                nmsOcl(top.at(0)->mutable_gpu_data(), upImpl->mKernelGpuPtr, upImpl->mKernelCpuPtr,
                        bottom.at(0)->gpu_data(), mThreshold, upImpl->mTopSize, upImpl->mBottomSize, mOffset,
                        mGpuID);
             #else

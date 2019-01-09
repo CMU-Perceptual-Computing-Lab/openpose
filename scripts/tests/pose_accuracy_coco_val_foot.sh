@@ -7,7 +7,7 @@
 clear && clear
 
 # USAGE EXAMPLE
-# See ./examples/tests/pose_accuracy_coco_test.sh
+# See ./scripts/tests/pose_accuracy_coco_test.sh
 
 # Parameters
 IMAGE_FOLDER=/home/gines/devel/images/val2017/

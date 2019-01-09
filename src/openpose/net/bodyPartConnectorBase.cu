@@ -130,7 +130,6 @@ namespace op
                 error("The pointers bodyPartPairsGpuPtr and mapIdxGpuPtr cannot be nullptr.",
                       __LINE__, __FUNCTION__, __FILE__);
 
-
             // Run Kernel - pairScoresGpu
             const dim3 numBlocks{
                 getNumberCudaBlocks(numberBodyPartPairs, THREADS_PER_BLOCK.x),
