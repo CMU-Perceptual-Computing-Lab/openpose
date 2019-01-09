@@ -76,6 +76,7 @@ public:
             auto datumsPtr = std::make_shared<std::vector<std::shared_ptr<UserDatum>>>();
             datumsPtr->emplace_back();
             auto& datumPtr = datumsPtr->at(0);
+            datumPtr = std::make_shared<UserDatum>();
 
             // Fill datum
             datumPtr->cvInputData = cv::imread(mImageFiles.at(mCounter++));
