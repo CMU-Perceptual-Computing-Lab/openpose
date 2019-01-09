@@ -104,37 +104,128 @@ public:
         opWrapper->start();
     }
 
-    void run(op::Datum* datum){
-        std::vector<op::Datum> datums = {*datum};
-        std::shared_ptr<std::vector<op::Datum>> d = std::make_shared<std::vector<op::Datum>>(datums);
+//    void run(op::Datum& datum){
 
-        //std::cout << "run" << std::endl;
-        //std::cout << d->operator[](0).cvInputData.size() << std::endl;
+//    void run(std::vector<op::Datum>& datum){
 
-        datum->cvInputData = cv::imread("/Users/raaj/openpose_pybind/examples/media/COCO_val2014_000000000192.jpg");
+    void run(std::vector<std::shared_ptr<op::Datum>>& l){
 
-        opWrapper->emplaceAndPop(d);
 
-        std::cout << datum->outputData.printSize() << std::endl;
+
+        std::vector<op::Datum> dlist;
+
+        for(auto& item : l){
+            op::Datum& d = *item;
+
+            dlist.emplace_back(d);
+
+            //dlist.back().outputData.reset({2,2},1.);
+
+            //std::cout << &d << std::endl;
+            //std::cout << &dlist.back() << std::endl;
+
+            d.outputData.reset({2,2},1.);
+        }
+
+//        std::cout << l.size() << std::endl;
+
+//        auto datumsPtr = std::make_shared<std::vector<op::Datum>>();
+
+//        for (auto item : l){
+//            op::Datum* d = item.cast<op::Datum*>();
+
+//            datumsPtr->emplace_back(*d);
+
+//            d->outputData.reset({2,2},1.);
+
+//            //std::cout << d->cvInputData.size() << std::endl;
+//        }
+
+        //datumsPtr->at(0).outputData.reset({2,2},1.);
+
+//        datum.outputData.reset({2,2},1.);
+//        return;
+
+//        std::cout << datum.at(0).cvInputData.size() << std::endl;
+
+        //datum.at(0).outputData.reset({2,2},1.);
+
+//        std::cout << datum.at(0).outputData.printSize() << std::endl;
+
+//        return;
+
+//        // Process and display image
+//        const auto imageToProcess = cv::imread("/Users/raaj/openpose_pybind/examples/media/COCO_val2014_000000000294.jpg");
+//        auto datumProcessed = opWrapper->emplaceAndPop(imageToProcess);
+//        std::cout << datumProcessed->at(0).poseKeypoints.printSize() << std::endl;
+
+//        return;
+//        tutorialApiCpp3();
+//        return;
+
+
+////        //std::vector<op::Datum> datums;
+////        //op::Datum& d = *datum;
+//        auto datumsPtr = std::make_shared<std::vector<op::Datum>>(datum);
+//        auto& datum2 = datumsPtr->at(0);
+
+//        std::cout << &datum << std::endl;
+//        std::cout << datumsPtr.get() << std::endl;
+
+
+////        datum2.cvInputData = cv::imread("/Users/raaj/openpose_pybind/examples/media/COCO_val2014_000000000294.jpg");
+//        opWrapper->emplaceAndPop(datumsPtr);
+//        std::cout << datum2.poseKeypoints.printSize() << std::endl;
+
+//        std::cout << datum[0].poseKeypoints.printSize() << std::endl;
+
+//        std::cout << datum->poseKeypoints.printSize() << std::endl;
+
+//        auto datumsPtr = std::make_shared<TDatums>();
+//        datumsPtr->emplace_back();
+//        auto& datum = datumsPtr->at(0);
+
+//        std::vector<op::Datum> datums = {*datum};
+//        std::shared_ptr<std::vector<op::Datum>> d = std::make_shared<std::vector<op::Datum>>(datums);
+
+//        datum->cvInputData = cv::imread("/Users/raaj/openpose_pybind/examples/media/COCO_val2014_000000000294.jpg");
+//        opWrapper->emplaceAndPop(d);
+//        std::cout << datum->poseKeypoints.printSize() << std::endl;
     }
+
+//    std::shared_ptr<op::Datum> datum(){
+//        return std::make_shared<op::Datum>();
+//    }
 
     std::shared_ptr<op::Datum> datum(){
         return std::make_shared<op::Datum>();
     }
 };
 
-//std::shared_ptr<op::Datum> getDatum(){
-//    std::shared_ptr<op::Datum> datum2 = std::make_shared<op::Datum>();
-//    std::cout << "try" << std::endl;
-//    std::vector<int> sizes = {2,2};
-//    datum2->outputData = op::Array<float>(sizes, 1);
-//    std::cout << "end" << std::endl;
-//    return datum2;
-//}
+std::shared_ptr<op::Datum> getDatum(){
+    std::shared_ptr<op::Datum> datum2 = std::make_shared<op::Datum>();
+    std::cout << "try" << std::endl;
+    std::vector<int> sizes = {2,2};
+    datum2->outputData = op::Array<float>(sizes, 0.);
+    std::cout << "end" << std::endl;
+    return datum2;
+}
 
-//void checkDatum(op::Datum* datum){
-//    std::cout << datum->outputData << std::endl;
-//}
+void checkDatum(op::Datum* datum){
+    std::cout << datum->outputData << std::endl;
+    std::cout << datum->cvInputData << std::endl;
+}
+
+void checkDatumImage(op::Datum* datum){
+    cv::imshow("win", datum->cvInputData);
+    while(1)
+    cv::waitKey(15);
+    //std::cout << datum->cvInputData << std::endl;
+}
+
+void checkArray(op::Array<float>* array){
+    std::cout << *array << std::endl;
+}
 
 void parse_gflags(const std::vector<std::string>& argv){
     std::vector<char*> argv_vec;
@@ -165,8 +256,10 @@ PYBIND11_MODULE(_openpose, m) {
     m.def("init_argv", &init_argv, "Init Function");
 
     // Internal Test Functions
-    // m.def("getDatum", &getDatum, "");
-    // m.def("checkDatum", &checkDatum, "");
+    m.def("getDatum", &getDatum, "");
+    m.def("checkDatum", &checkDatum, "");
+    m.def("checkDatumImage", &checkDatumImage, "");
+    m.def("checkArray", &checkArray, "");
 
     // OpenposePython
     py::class_<OpenposePython>(m, "OpenposePython")
@@ -184,22 +277,23 @@ PYBIND11_MODULE(_openpose, m) {
         //.def("getName", &Pet::getName)
         ;
 
-    // Array Object
-    py::class_<op::Array<float>>(m, "Array", py::buffer_protocol())
-       .def("__repr__", [](op::Array<float> &a) { return a.toString(); })
-       .def("getSize", [](op::Array<float> &a) { return a.getSize(); })
-       .def(py::init<const std::vector<int>&>())
-       .def_buffer([](op::Array<float> &m) -> py::buffer_info {
-            return py::buffer_info(
-                m.getPtr(),                             /* Pointer to buffer */
-                sizeof(float),                          /* Size of one scalar */
-                py::format_descriptor<float>::format(), /* Python struct-style format descriptor */
-                m.getSize().size(),                     /* Number of dimensions */
-                m.getSize(),                            /* Buffer dimensions */
-                m.getStride()                           /* Strides (in bytes) for each index */
-            );
-        })
-    ;
+//    // Array Object
+//    py::class_<op::Array<float>>(m, "Array", py::buffer_protocol())
+//       .def("__repr__", [](op::Array<float> &a) { return a.toString(); })
+//       .def("getSize", [](op::Array<float> &a) { return a.getSize(); })
+//       .def(py::init<const std::vector<int>&>())
+//       .def(py::init<>())
+//       .def_buffer([](op::Array<float> &m) -> py::buffer_info {
+//            return py::buffer_info(
+//                m.getPtr(),                             /* Pointer to buffer */
+//                sizeof(float),                          /* Size of one scalar */
+//                py::format_descriptor<float>::format(), /* Python struct-style format descriptor */
+//                m.getSize().size(),                     /* Number of dimensions */
+//                m.getSize(),                            /* Buffer dimensions */
+//                m.getStride()                           /* Strides (in bytes) for each index */
+//            );
+//        })
+//    ;
 
 #ifdef VERSION_INFO
     m.attr("__version__") = VERSION_INFO;
@@ -228,6 +322,10 @@ template <> struct type_caster<op::Array<float>> {
         {
             array b(src, true);
             buffer_info info = b.request();
+
+            if (info.format != format_descriptor<float>::format())
+                throw std::runtime_error("op::Array only supports float32 now");
+
 
             //std::vector<int> a(info.shape);
             std::vector<int> shape(std::begin(info.shape), std::end(info.shape));

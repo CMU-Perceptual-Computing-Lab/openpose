@@ -6,42 +6,100 @@ import cv2
 if __name__ == "__main__":
 
     params = dict()
-    params["logging_level"] = 3
-    params["output_resolution"] = "-1x-1"
+#    params["logging_level"] = 3
+#    params["output_resolution"] = "-1x-1"
     params["net_resolution"] = "-1x160"
     params["model_pose"] = "COCO"
-    params["alpha_pose"] = 0.6
-    params["scale_gap"] = 0.25
-    params["scale_number"] = 1
-    params["render_threshold"] = 0.05
-    params["render_pose"] = 0
-    params["display"] = 0
-    params["num_gpu_start"] = 0
-    params["disable_blending"] = False
+#    params["alpha_pose"] = 0.6
+#    params["scale_gap"] = 0.25
+#    params["scale_number"] = 1
+#    params["render_threshold"] = 0.05
+#    params["render_pose"] = 0
+#    params["display"] = 0
+#    params["num_gpu_start"] = 0
+#    params["disable_blending"] = False
     params["model_folder"] = "../../../models/"
-    params["face"] = True
-    params["hand"] = True
+#    params["face"] = True
+#    params["hand"] = True
 
     #op.init_argv(sys.argv)
 
     op.init(params)
 
-oppython = op.OpenposePython()
 
+#oppython = op.OpenposePython()
+#datum = oppython.datum()
+
+
+## Image Test (Works)
+#img = cv2.imread("/Users/raaj/openpose_pybind/examples/media/COCO_val2014_000000000192.jpg")
+##datum.cvInputData = cv2.imread("/Users/raaj/openpose_pybind/examples/media/COCO_val2014_000000000192.jpg")
+#datum.cvInputData = img
+#op.checkDatumImage(datum)
+
+## NP Test (Works)
+#datum.cvInputData = np.ones((200,200))
+#op.checkDatumImage(datum)
+
+## NP Test for other
+#datum.outputData = np.ones((5,5), dtype=np.float32)
+#datum.outputData[0,:] = 3
+#datum.cvInputData = np.ones((5,5))
+#op.checkDatum(datum)
+
+#stop
+
+## Type1
+
+#npobj = np.ones((2,2), dtype=np.float)
+
+## Create from scratch
+#outputData = op.Array()
+##outputData = np.ones((2,2), dtype=np.float)
+#op.checkArray(outputData)
+
+#print("------")
+
+##datum.outputData = op.Array()
+##datum.outputData = np.ones((2,2), dtype=np.float)
+##datum.outputData[0,:] = 5
+##datum.outputData = outputData
+##print(datum.outputData)
+
+
+
+
+#datum = oppython.datum()
+
+
+
+#datum = op.getDatum()
+
+##od = datum.outputData
+##od = np.ones((2,2))
+
+##datum.outputData = od
+
+##print(od)
+#print(datum.outputData)
+
+#stop
+
+##############
+
+oppython = op.OpenposePython()
 datum = oppython.datum()
+
 
 img = cv2.imread("/Users/raaj/openpose_pybind/examples/media/COCO_val2014_000000000192.jpg")
 #datum.cvInputData = cv2.imread("/Users/raaj/openpose_pybind/examples/media/COCO_val2014_000000000192.jpg")
 datum.cvInputData = img
 
-#while 1:
-#    cv2.imshow("win", img)
-#    #cv2.imshow("win",datum.cvInputData)
-#    cv2.waitKey(15)
 
-print(datum.outputData.shape)
+storage = [datum]
 
-oppython.run(datum)
+
+oppython.run(storage)
 
 print(datum.outputData.shape)
 
