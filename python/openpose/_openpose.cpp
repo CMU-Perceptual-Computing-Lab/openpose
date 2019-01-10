@@ -143,10 +143,6 @@ public:
         auto datumsPtr = std::make_shared<std::vector<std::shared_ptr<op::Datum>>>(l);
         opWrapper->emplaceAndPop(datumsPtr);
     }
-
-//    std::shared_ptr<op::Datum> datum(){
-//        return std::make_shared<op::Datum>();
-//    }
 };
 
 PYBIND11_MODULE(_openpose, m) {
@@ -177,6 +173,7 @@ PYBIND11_MODULE(_openpose, m) {
         .def_readwrite("handKeypoints", &op::Datum::handKeypoints)
         .def_readwrite("poseScores", &op::Datum::poseScores)
         .def_readwrite("poseHeatMaps", &op::Datum::poseHeatMaps)
+        .def_readwrite("inputNetData", &op::Datum::inputNetData)
         ;
 
     // Rectangle

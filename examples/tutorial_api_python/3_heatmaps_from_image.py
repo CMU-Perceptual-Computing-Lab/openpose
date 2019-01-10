@@ -5,6 +5,7 @@ import cv2
 import os
 from sys import platform
 import argparse
+import numpy as np
 
 # Import Openpose (Windows/Ubuntu/OSX)
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -33,6 +34,7 @@ args = parser.parse_known_args()
 params = dict()
 params["model_folder"] = "../../../models/"
 params["heatmaps_add_parts"] = True
+params["heatmaps_add_PAFs"] = True
 
 # Add others in path?
 for i in range(0,len(args[1]),2):
@@ -54,12 +56,22 @@ imageToProcess = cv2.imread(args[0].image_path)
 datum.cvInputData = imageToProcess
 opWrapper.emplaceAndPop([datum])
 
-print(datum.poseHeatMaps.shape)
-print(datum.cvOutputData.shape)
-stop
+# Process outputs
+outputImageF = (datum.inputNetData[0].copy())[0,:,:,:] + 0.5
+outputImageF = cv2.merge([outputImageF[0,:,:], outputImageF[1,:,:], outputImageF[2,:,:]])
+outputImageF = (outputImageF*255.).astype(dtype='uint8')
+heatmaps = datum.poseHeatMaps.copy()
+heatmaps = np.abs(heatmaps)
+heatmaps = (heatmaps*255.).astype(dtype='uint8')
 
 # Display Image
-print("Body keypoints: \n" + str(datum.poseKeypoints))
+counter = 0
 while 1:
-    cv2.imshow("win", datum.cvOutputData)
-    cv2.waitKey(15)
+    num_maps = heatmaps.shape[0]
+    heatmap = heatmaps[counter, :, :].copy()
+    heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
+    combined = cv2.addWeighted(outputImageF, 0.5, heatmap, 0.5, 0)
+    cv2.imshow("win", combined)
+    cv2.waitKey(-1)
+    counter += 1
+    counter = counter % num_maps
