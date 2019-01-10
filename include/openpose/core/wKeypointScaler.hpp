@@ -60,15 +60,18 @@ namespace op
                 // Profiling speed
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                 // Rescale pose data
-                for (auto& tDatum : *tDatums)
+                for (auto& tDatumPtr : *tDatums)
                 {
-                    std::vector<Array<float>> arraysToScale{tDatum.poseKeypoints, tDatum.handKeypoints[0],
-                                                            tDatum.handKeypoints[1], tDatum.faceKeypoints};
-                    spKeypointScaler->scale(arraysToScale, tDatum.scaleInputToOutput, tDatum.scaleNetToOutput,
-                                            Point<int>{tDatum.cvInputData.cols, tDatum.cvInputData.rows});
+                    std::vector<Array<float>> arraysToScale{
+                        tDatumPtr->poseKeypoints, tDatumPtr->handKeypoints[0],
+                        tDatumPtr->handKeypoints[1], tDatumPtr->faceKeypoints};
+                    spKeypointScaler->scale(
+                        arraysToScale, tDatumPtr->scaleInputToOutput, tDatumPtr->scaleNetToOutput,
+                        Point<int>{tDatumPtr->cvInputData.cols, tDatumPtr->cvInputData.rows});
                     // Rescale part candidates
-                    spKeypointScaler->scale(tDatum.poseCandidates, tDatum.scaleInputToOutput, tDatum.scaleNetToOutput,
-                                            Point<int>{tDatum.cvInputData.cols, tDatum.cvInputData.rows});
+                    spKeypointScaler->scale(
+                        tDatumPtr->poseCandidates, tDatumPtr->scaleInputToOutput, tDatumPtr->scaleNetToOutput,
+                        Point<int>{tDatumPtr->cvInputData.cols, tDatumPtr->cvInputData.rows});
                 }
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);

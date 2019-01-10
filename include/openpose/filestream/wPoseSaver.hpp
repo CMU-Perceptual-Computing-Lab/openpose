@@ -67,8 +67,9 @@ namespace op
                 // Record people pose keypoint data
                 std::vector<Array<float>> keypointVector(tDatumsNoPtr.size());
                 for (auto i = 0u; i < tDatumsNoPtr.size(); i++)
-                    keypointVector[i] = tDatumsNoPtr[i].poseKeypoints;
-                const auto fileName = (!tDatumsNoPtr[0].name.empty() ? tDatumsNoPtr[0].name : std::to_string(tDatumsNoPtr[0].id));
+                    keypointVector[i] = tDatumsNoPtr[i]->poseKeypoints;
+                const auto fileName = (!tDatumsNoPtr[0]->name.empty()
+                    ? tDatumsNoPtr[0]->name : std::to_string(tDatumsNoPtr[0]->id));
                 spKeypointSaver->saveKeypoints(keypointVector, fileName, "pose");
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);

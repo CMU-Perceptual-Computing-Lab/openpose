@@ -63,13 +63,13 @@ namespace op
                 // Profiling speed
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                 // Add ID
-                for (auto& tDatum : *tDatums)
+                for (auto& tDatumPtr : *tDatums)
                     // To avoid overwritting ID if e.g., custom input has already filled it
-                    if (tDatum.id == std::numeric_limits<unsigned long long>::max())
-                        tDatum.id = mGlobalCounter;
+                    if (tDatumPtr->id == std::numeric_limits<unsigned long long>::max())
+                        tDatumPtr->id = mGlobalCounter;
                 // Increase ID
-                const auto& tDatum = (*tDatums)[0];
-                if (tDatum.subId == tDatum.subIdMax)
+                const auto& tDatumPtr = (*tDatums)[0];
+                if (tDatumPtr->subId == tDatumPtr->subIdMax)
                     mGlobalCounter++;
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);

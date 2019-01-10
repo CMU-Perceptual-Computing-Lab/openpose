@@ -388,6 +388,8 @@ if (UNIX OR APPLE)
   if (WITH_3D_RENDERER)
     # GLUT
     find_package(GLUT REQUIRED)
+    # OpenGL
+    find_package(OpenGL REQUIRED)
   endif (WITH_3D_RENDERER)
   if (WITH_CERES)
     # Eigen + Ceres
@@ -404,7 +406,7 @@ if (UNIX OR APPLE)
   if (WITH_3D_ADAM_MODEL)
     if (NOT WITH_3D_RENDERER)
       message(FATAL_ERROR "WITH_3D_RENDERER is required if WITH_3D_ADAM_MODEL is enabled.")
-    endif (WITH_3D_RENDERER)
+    endif (NOT WITH_3D_RENDERER)
     find_package(PkgConfig)
     pkg_check_modules(EIGEN3 REQUIRED eigen3)
     # Others: sudo apt-get install libglm-dev
@@ -441,13 +443,13 @@ if (UNIX OR APPLE)
 
     if (NOT CUDA_FOUND)
       message(STATUS "CUDA not found.")
-      execute_process(COMMAND cat install_cuda.sh WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/ubuntu)
+      execute_process(COMMAND cat install_cuda.sh WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/scripts/ubuntu)
       message(FATAL_ERROR "Install CUDA using the above commands.")
     endif (NOT CUDA_FOUND)
 
     if (USE_CUDNN AND NOT CUDNN_FOUND)
       message(STATUS "cuDNN not found.")
-      execute_process(COMMAND cat install_cudnn.sh WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/ubuntu)
+      execute_process(COMMAND cat install_cudnn.sh WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/scripts/ubuntu)
       message(FATAL_ERROR "Install cuDNN using the above commands. or turn off cuDNN by setting USE_CUDNN to OFF.")
     endif (USE_CUDNN AND NOT CUDNN_FOUND)
   endif (${GPU_MODE} MATCHES "CUDA")
@@ -703,13 +705,15 @@ if (UNIX OR APPLE)
           PREFIX ${CAFFE_PREFIX}
           CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
           -DMKLDNN_INSTALL_DIR:PATH=<INSTALL_DIR>
+          -DUSE_MKL2017_AS_DEFAULT_ENGINE=${CAFFE_CPU_ONLY}
           -DUSE_CUDNN=${USE_CUDNN}
           -DCUDA_ARCH_NAME=${CUDA_ARCH}
+          -DCUDA_ARCH_BIN=${CUDA_ARCH_BIN}
+          -DCUDA_ARCH_PTX=${CUDA_ARCH_PTX}
           -DCPU_ONLY=${CAFFE_CPU_ONLY}
-          -DUSE_MKL2017_AS_DEFAULT_ENGINE=${CAFFE_CPU_ONLY}
           -DCMAKE_BUILD_TYPE=Release
           -DBUILD_docs=OFF
-          -DBUILD_python=OFF
+          -DBUILD_python=${BUILD_PYTHON}
           -DBUILD_python_layer=OFF
           -DUSE_LEVELDB=OFF
           -DUSE_LMDB=OFF
@@ -722,10 +726,12 @@ if (UNIX OR APPLE)
           CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
           -DUSE_CUDNN=${USE_CUDNN}
           -DCUDA_ARCH_NAME=${CUDA_ARCH}
+          -DCUDA_ARCH_BIN=${CUDA_ARCH_BIN}
+          -DCUDA_ARCH_PTX=${CUDA_ARCH_PTX}
           -DCPU_ONLY=${CAFFE_CPU_ONLY}
           -DCMAKE_BUILD_TYPE=Release
           -DBUILD_docs=OFF
-          -DBUILD_python=OFF
+          -DBUILD_python=${BUILD_PYTHON}
           -DBUILD_python_layer=OFF
           -DUSE_LEVELDB=OFF
           -DUSE_LMDB=OFF
@@ -816,7 +822,7 @@ if (WITH_3D_ADAM_MODEL)
   include_directories(${EIGEN3_INCLUDE_DIRS})
   include_directories(${IGL_INCLUDE_DIRS})
   include_directories(${LIBIGL_INCLUDE_DIRS})
-  include_directories(${OPENGL_INCLUDE_DIRS} ${GLUT_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS})
+  include_directories(${GLUT_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIR})
 endif (WITH_3D_ADAM_MODEL)
 # Windows includes
 if (WIN32)
@@ -861,7 +867,7 @@ if (WITH_3D_ADAM_MODEL)
       ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} ${GLEW_LIBRARY} ${FREE_IMAGE_LIBRARY})
 endif (WITH_3D_ADAM_MODEL)
 if (WITH_3D_RENDERER)
-  set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries} ${GLUT_LIBRARY})
+  set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries} ${GLUT_LIBRARY} ${OPENGL_LIBRARIES})
 endif (WITH_3D_RENDERER)
 if (WITH_CERES)
   set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries} ${CERES_LIBRARIES})

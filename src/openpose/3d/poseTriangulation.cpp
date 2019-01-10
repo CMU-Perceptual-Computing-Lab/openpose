@@ -189,8 +189,8 @@ namespace op
                     cameraMatricesSubset.erase(cameraMatricesSubset.begin() + i);
                     pointsOnEachCameraSubset.erase(pointsOnEachCameraSubset.begin() + i);
                     // Remove camera i
-                    const auto projectionErrorSubset = triangulate(reconstructedPoint, cameraMatricesSubset,
-                                                                   pointsOnEachCameraSubset);
+                    const auto projectionErrorSubset = triangulate(
+                        reconstructedPoint, cameraMatricesSubset, pointsOnEachCameraSubset);
                     // If projection doesn't change much, it usually means all points are bad.
                     if (projectionErrorSubset > 0.9 * projectionError
                         && projectionErrorSubset < 1.1 * projectionError)
@@ -278,6 +278,7 @@ namespace op
             #else
                 UNUSED(reprojectionMaxAcceptable);
             #endif
+            // // This value is always 1
             // assert(reconstructedPoint.at<double>(3) == 1.);
 
             // // Check that our implementation gives similar result than OpenCV
@@ -385,7 +386,7 @@ namespace op
                     }
                 }
                 // 3D reconstruction
-                const auto imageRatio = std::sqrt(imageSizes[0].x * imageSizes[0].y / 1310720);
+                const auto imageRatio = std::sqrt(imageSizes[0].x * imageSizes[0].y / 1310720.);
                 const auto reprojectionMaxAcceptable = 25 * imageRatio;
                 std::vector<double> reprojectionErrors(xyPoints.size());
                 keypoints3D.reset({ 1, numberBodyParts, 4 }, 0);
@@ -396,13 +397,10 @@ namespace op
                     for (auto i = 0u; i < xyPoints.size(); i++)
                     {
                         cv::Mat reconstructedPoint;
-                        reprojectionErrors[i] = triangulateWithOptimization(reconstructedPoint,
-                                                                            cameraMatricesPerPoint[i],
-                                                                            xyPoints[i],
-                                                                            reprojectionMaxAcceptable);
+                        reprojectionErrors[i] = triangulateWithOptimization(
+                            reconstructedPoint, cameraMatricesPerPoint[i], xyPoints[i], reprojectionMaxAcceptable);
                         xyzPoints[i] = cv::Point3d{
-                            reconstructedPoint.at<double>(0),
-                            reconstructedPoint.at<double>(1),
+                            reconstructedPoint.at<double>(0), reconstructedPoint.at<double>(1),
                             reconstructedPoint.at<double>(2)};
                     }
                     const auto reprojectionErrorTotal = std::accumulate(
@@ -439,8 +437,8 @@ namespace op
                             " detection from 4 cameras is about 2-3 pixels. It might be simply a wrong OpenPose"
                             " detection. If this message appears very frequently, your calibration parameters"
                             " might be wrong.", Priority::High);
+                    // log("Reprojection error: " + std::to_string(reprojectionErrorTotal)); // To debug reprojection error
                 }
-                // log("Reprojection error: " + std::to_string(reprojectionErrorTotal)); // To debug reprojection error
             }
         }
         catch (const std::exception& e)

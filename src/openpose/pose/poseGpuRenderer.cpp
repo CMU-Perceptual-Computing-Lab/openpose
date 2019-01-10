@@ -80,7 +80,8 @@ namespace op
                     cpuToGpuMemoryIfNotCopiedYet(outputData.getPtr(), outputData.getVolume());
                     cudaCheck(__LINE__, __FUNCTION__, __FILE__);
                     const auto numberBodyParts = getPoseNumberBodyParts(mPoseModel);
-                    const auto numberBodyPartsPlusBkg = numberBodyParts+1;
+                    const auto hasBkg = addBkgChannel(mPoseModel);
+                    const auto numberBodyPartsPlusBkg = numberBodyParts + (hasBkg ? 1 : 0);
                     const auto numberBodyPAFChannels = getPosePartPairs(mPoseModel).size();
                     const Point<int> frameSize{outputData.getSize(1), outputData.getSize(0)};
                     // Draw poseKeypoints
@@ -134,8 +135,8 @@ namespace op
                         else if (elementRendered <= numberBodyPartsPlusBkg+2)
                         {
                             const auto realElementRendered = (elementRendered == 1
-                                                                ? numberBodyParts
-                                                                : elementRendered - 4);
+                                                                ? (hasBkg ? numberBodyParts : 0)
+                                                                : elementRendered - 3 - (hasBkg ? 1:0));
                             elementRenderedName = mPartIndexToName.at(realElementRendered);
                             renderPoseHeatMapGpu(
                                 *spGpuMemory, frameSize, spPoseExtractorNet->getHeatMapGpuConstPtr(), heatMapSize,

@@ -150,11 +150,13 @@ Each flag is divided into flag name, default value, and description.
 - DEFINE_int32(frame_rotate,              0,              "Rotate each frame, 4 possible values: 0, 90, 180, 270.");
 - DEFINE_bool(frames_repeat,              false,          "Repeat frames when finished.");
 - DEFINE_bool(process_real_time,          false,          "Enable to keep the original source frame rate (e.g., for video). If the processing time is too long, it will skip frames. If it is too fast, it will slow it down.");
-- DEFINE_string(camera_parameter_folder,  "models/cameraParameters/flir/", "String with the folder where the camera parameters are located.");
-- DEFINE_bool(frame_keep_distortion,      false,          "If false (default), it will undistortionate the image based on the `camera_parameter_folder` camera parameters; if true, it will not undistortionate, i.e., it will leave it as it is.");
+- DEFINE_string(camera_parameter_path,    "models/cameraParameters/flir", "String with the folder where the camera parameters are located. If there is only 1 XML file (for single video, webcam, or images from the same camera), you must specify the whole XML file path (ending in .xml).");
+- DEFINE_bool(frame_undistort,            false,          "If false (default), it will not undistort the image, if true, it will undistortionate them based on the camera parameters found in `camera_parameter_path`");
 
 3. OpenPose
 - DEFINE_string(model_folder,             "models/",      "Folder path (absolute or relative) where the models (pose, face, ...) are located.");
+- DEFINE_string(prototxt_path,            "",             "The combination `--model_folder` + `--prototxt_path` represents the whole path to the prototxt file. If empty, it will use the default OpenPose ProtoTxt file.");
+- DEFINE_string(caffemodel_path,          "",             "The combination `--model_folder` + `--caffemodel_path` represents the whole path to the caffemodel file. If empty, it will use the default OpenPose CaffeModel file.");
 - DEFINE_string(output_resolution,        "-1x-1",        "The image resolution (display and output). Use \"-1x-1\" to force the program to use the input image resolution.");
 - DEFINE_int32(num_gpu,                   -1,             "The number of GPU devices to use. If negative, it will use all the available GPUs in your machine.");
 - DEFINE_int32(num_gpu_start,             0,              "GPU device start number.");
@@ -168,7 +170,7 @@ Each flag is divided into flag name, default value, and description.
 - DEFINE_string(model_pose,               "BODY_25",      "Model to be used. E.g., `COCO` (18 keypoints), `MPI` (15 keypoints, ~10% faster), `MPI_4_layers` (15 keypoints, even faster but less accurate).");
 - DEFINE_string(net_resolution,           "-1x368",       "Multiples of 16. If it is increased, the accuracy potentially increases. If it is decreased, the speed increases. For maximum speed-accuracy balance, it should keep the closest aspect ratio possible to the images or videos to be processed. Using `-1` in any of the dimensions, OP will choose the optimal aspect ratio depending on the user's input value. E.g., the default `-1x368` is equivalent to `656x368` in 16:9 resolutions, e.g., full HD (1980x1080) and HD (1280x720) resolutions.");
 - DEFINE_int32(scale_number,              1,              "Number of scales to average.");
-- DEFINE_double(scale_gap,                0.3,            "Scale gap between scales. No effect unless scale_number > 1. Initial scale is always 1. If you want to change the initial scale, you actually want to multiply the `net_resolution` by your desired initial scale.");
+- DEFINE_double(scale_gap,                0.25,           "Scale gap between scales. No effect unless scale_number > 1. Initial scale is always 1. If you want to change the initial scale, you actually want to multiply the `net_resolution` by your desired initial scale.");
 
 5. OpenPose Body Pose Heatmaps and Part Candidates
 - DEFINE_bool(heatmaps_add_parts,         false,          "If true, it will fill op::Datum::poseHeatMaps array with the body part heatmaps, and analogously face & hand heatmaps to op::Datum::faceHeatMaps & op::Datum::handHeatMaps. If more than one `add_heatmaps_X` flag is enabled, it will place then in sequential memory order: body parts + bkg + PAFs. It will follow the order on POSE_BODY_PART_MAPPING in `src/openpose/pose/poseParameters.cpp`. Program speed will considerably decrease. Not required for OpenPose, enable it only if you intend to explicitly use this information later.");
@@ -191,7 +193,7 @@ Each flag is divided into flag name, default value, and description.
 8. OpenPose 3-D Reconstruction
 - DEFINE_bool(3d,                         false,          "Running OpenPose 3-D reconstruction demo: 1) Reading from a stereo camera system. 2) Performing 3-D reconstruction from the multiple views. 3) Displaying 3-D reconstruction results. Note that it will only display 1 person. If multiple people is present, it will fail.");
 - DEFINE_int32(3d_min_views,              -1,             "Minimum number of views required to reconstruct each keypoint. By default (-1), it will require all the cameras to see the keypoint in order to reconstruct it.");
-- DEFINE_int32(3d_views,                  1,              "Complementary option to `--image_dir` or `--video`. OpenPose will read as many images per iteration, allowing tasks such as stereo camera processing (`--3d`). Note that `--camera_parameters_folder` must be set. OpenPose must find as many `xml` files in the parameter folder as this number indicates.");
+- DEFINE_int32(3d_views,                  -1,             "Complementary option for `--image_dir` or `--video`. OpenPose will read as many images per iteration, allowing tasks such as stereo camera processing (`--3d`). Note that `--camera_parameter_path` must be set. OpenPose must find as many `xml` files in the parameter folder as this number indicates.");
 
 9. Extra algorithms
 - DEFINE_bool(identification,             false,          "Experimental, not available yet. Whether to enable people identification across frames.");
@@ -233,6 +235,8 @@ Each flag is divided into flag name, default value, and description.
 - DEFINE_string(write_images_format,      "png",          "File extension and format for `write_images`, e.g., png, jpg or bmp. Check the OpenCV function cv::imwrite for all compatible extensions.");
 - DEFINE_string(write_video,              "",             "Full file path to write rendered frames in motion JPEG video format. It might fail if the final path does not finish in `.avi`. It internally uses cv::VideoWriter. Flag `write_video_fps` controls FPS.");
 - DEFINE_double(write_video_fps,          -1.,            "Frame rate for the recorded video. By default, it will try to get the input frames producer frame rate (e.g., input video or webcam frame rate). If the input frames producer does not have a set FPS (e.g., image_dir or webcam if OpenCV not compiled with its support), set this value accordingly (e.g., to the frame rate displayed by the OpenPose GUI).");
+- DEFINE_string(write_video_3d,           "",             "Analogous to `--write_video`, but applied to the 3D output.");
+- DEFINE_string(write_video_adam,         "",             "Experimental, not available yet. Analogous to `--write_video`, but applied to Adam model.");
 - DEFINE_string(write_json,               "",             "Directory to write OpenPose output in JSON format. It includes body, hand, and face pose keypoints (2-D and 3-D), as well as pose candidates (if `--part_candidates` enabled).");
 - DEFINE_string(write_coco_json,          "",             "Full file path to write people pose data with JSON COCO validation format.");
 - DEFINE_string(write_coco_foot_json,     "",             "Full file path to write people foot pose data with JSON COCO validation format.");
@@ -243,7 +247,6 @@ Each flag is divided into flag name, default value, and description.
 - DEFINE_string(write_keypoint_format,    "yml",          "(Deprecated, use `write_json`) File extension and format for `write_keypoint`: json, xml, yaml & yml. Json not available for OpenCV < 3.0, use `write_json` instead.");
 
 17. Result Saving - Extra Algorithms
-- DEFINE_string(write_video_adam,         "",             "Experimental, not available yet. E.g., `~/Desktop/adamResult.avi`. Flag `write_video_fps` controls FPS.");
 - DEFINE_string(write_bvh,                "",             "Experimental, not available yet. E.g., `~/Desktop/mocapResult.bvh`.");
 
 18. UDP Communication

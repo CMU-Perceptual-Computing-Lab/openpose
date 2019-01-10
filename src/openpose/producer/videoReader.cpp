@@ -1,85 +1,18 @@
+#include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/fileSystem.hpp>
 #include <openpose/producer/videoReader.hpp>
 
 namespace op
 {
-    VideoReader::VideoReader(const std::string & videoPath, const unsigned int imageDirectoryStereo,
-                             const std::string& cameraParameterPath) :
-        VideoCaptureReader{videoPath, ProducerType::Video},
-        mImageDirectoryStereo{imageDirectoryStereo},
+    VideoReader::VideoReader(const std::string& videoPath, const std::string& cameraParameterPath,
+                             const bool undistortImage, const int numberViews) :
+        VideoCaptureReader{videoPath, ProducerType::Video, cameraParameterPath, undistortImage, numberViews},
         mPathName{getFileNameNoExtension(videoPath)}
     {
-        try
-        {
-            // If stereo setting --> load camera parameters
-            if (imageDirectoryStereo > 1)
-            {
-                // Read camera parameters from SN
-                auto serialNumbers = getFilesOnDirectory(cameraParameterPath, ".xml");
-                // Sanity check
-                if (serialNumbers.size() != mImageDirectoryStereo && mImageDirectoryStereo > 1)
-                    error("Found different number of camera parameter files than the number indicated by"
-                          " `--3d_views` ("
-                          + std::to_string(serialNumbers.size()) + " vs. "
-                          + std::to_string(mImageDirectoryStereo) + "). Make them equal or add"
-                          + " `--3d_views 1`",
-                          __LINE__, __FUNCTION__, __FILE__);
-                // Get serial numbers
-                for (auto& serialNumber : serialNumbers)
-                    serialNumber = getFileNameNoExtension(serialNumber);
-                // Get camera paremeters
-                mCameraParameterReader.readParameters(cameraParameterPath, serialNumbers);
-                // Set video size
-                set(CV_CAP_PROP_FRAME_WIDTH, get(CV_CAP_PROP_FRAME_WIDTH)/mImageDirectoryStereo);
-            }
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-        }
     }
 
     VideoReader::~VideoReader()
     {
-    }
-
-    std::vector<cv::Mat> VideoReader::getCameraMatrices()
-    {
-        try
-        {
-            return mCameraParameterReader.getCameraMatrices();
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return {};
-        }
-    }
-
-    std::vector<cv::Mat> VideoReader::getCameraExtrinsics()
-    {
-        try
-        {
-            return mCameraParameterReader.getCameraExtrinsics();
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return {};
-        }
-    }
-
-    std::vector<cv::Mat> VideoReader::getCameraIntrinsics()
-    {
-        try
-        {
-            return mCameraParameterReader.getCameraIntrinsics();
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return {};
-        }
     }
 
     std::string VideoReader::getNextFrameName()
@@ -100,7 +33,7 @@ namespace op
         try
         {
             if (capProperty == CV_CAP_PROP_FRAME_WIDTH)
-                return VideoCaptureReader::get(capProperty) / mImageDirectoryStereo;
+                return VideoCaptureReader::get(capProperty) / intRound(Producer::get(ProducerProperty::NumberViews));
             else
                 return VideoCaptureReader::get(capProperty);
         }
@@ -115,10 +48,7 @@ namespace op
     {
         try
         {
-            if (capProperty == CV_CAP_PROP_FRAME_WIDTH)
-                return VideoCaptureReader::set(capProperty, value * mImageDirectoryStereo);
-            else
-                VideoCaptureReader::set(capProperty, value);
+            VideoCaptureReader::set(capProperty, value);
         }
         catch (const std::exception& e)
         {
@@ -143,14 +73,15 @@ namespace op
     {
         try
         {
+            const auto numberViews = intRound(Producer::get(ProducerProperty::NumberViews));
             auto cvMats = VideoCaptureReader::getRawFrames();
             // Split image
-            if (cvMats.size() == 1 && mImageDirectoryStereo > 1)
+            if (cvMats.size() == 1 && numberViews > 1)
             {
                 cv::Mat cvMatConcatenated = cvMats.at(0);
                 cvMats.clear();
-                const auto individualWidth = cvMatConcatenated.cols/mImageDirectoryStereo;
-                for (auto i = 0u ; i < mImageDirectoryStereo ; i++)
+                const auto individualWidth = cvMatConcatenated.cols/numberViews;
+                for (auto i = 0 ; i < numberViews ; i++)
                     cvMats.emplace_back(
                         cv::Mat(cvMatConcatenated,
                                 cv::Rect{(int)(i*individualWidth), 0,
@@ -158,9 +89,9 @@ namespace op
                                          (int)cvMatConcatenated.rows}));
             }
             // Sanity check
-            else if (cvMats.size() != 1 && mImageDirectoryStereo > 1)
-                error("Unexpected error. Notify us (" + std::to_string(mImageDirectoryStereo) + " vs. "
-                      + std::to_string(mImageDirectoryStereo) + ").", __LINE__, __FUNCTION__, __FILE__);
+            else if (cvMats.size() != 1u && numberViews > 1)
+                error("Unexpected error. Notify us (" + std::to_string(numberViews) + " vs. "
+                      + std::to_string(numberViews) + ").", __LINE__, __FUNCTION__, __FILE__);
             // Return images
             return cvMats;
         }

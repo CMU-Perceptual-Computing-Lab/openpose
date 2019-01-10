@@ -76,27 +76,27 @@ namespace op
                 std::vector<Array<float>> leftHandKeypointVector;
                 std::vector<Array<float>> rightHandKeypointVector;
                 std::vector<Point<int>> imageSizes;
-                for (auto& datumsElement : *tDatums)
+                for (auto& tDatumPtr : *tDatums)
                 {
-                    poseKeypointVector.emplace_back(datumsElement.poseKeypoints);
-                    faceKeypointVector.emplace_back(datumsElement.faceKeypoints);
-                    leftHandKeypointVector.emplace_back(datumsElement.handKeypoints[0]);
-                    rightHandKeypointVector.emplace_back(datumsElement.handKeypoints[1]);
-                    cameraMatrices.emplace_back(datumsElement.cameraMatrix);
-                    imageSizes.emplace_back(Point<int>{datumsElement.cvInputData.cols,
-                                                       datumsElement.cvInputData.rows});
+                    poseKeypointVector.emplace_back(tDatumPtr->poseKeypoints);
+                    faceKeypointVector.emplace_back(tDatumPtr->faceKeypoints);
+                    leftHandKeypointVector.emplace_back(tDatumPtr->handKeypoints[0]);
+                    rightHandKeypointVector.emplace_back(tDatumPtr->handKeypoints[1]);
+                    cameraMatrices.emplace_back(tDatumPtr->cameraMatrix);
+                    imageSizes.emplace_back(
+                        Point<int>{tDatumPtr->cvInputData.cols, tDatumPtr->cvInputData.rows});
                 }
                 // Pose 3-D reconstruction
                 auto poseKeypoints3Ds = spPoseTriangulation->reconstructArray(
                     {poseKeypointVector, faceKeypointVector, leftHandKeypointVector, rightHandKeypointVector},
                     cameraMatrices, imageSizes);
                 // Assign to all tDatums
-                for (auto& datumsElement : *tDatums)
+                for (auto& tDatumPtr : *tDatums)
                 {
-                    datumsElement.poseKeypoints3D = poseKeypoints3Ds[0];
-                    datumsElement.faceKeypoints3D = poseKeypoints3Ds[1];
-                    datumsElement.handKeypoints3D[0] = poseKeypoints3Ds[2];
-                    datumsElement.handKeypoints3D[1] = poseKeypoints3Ds[3];
+                    tDatumPtr->poseKeypoints3D = poseKeypoints3Ds[0];
+                    tDatumPtr->faceKeypoints3D = poseKeypoints3Ds[1];
+                    tDatumPtr->handKeypoints3D[0] = poseKeypoints3Ds[2];
+                    tDatumPtr->handKeypoints3D[1] = poseKeypoints3Ds[3];
                 }
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);

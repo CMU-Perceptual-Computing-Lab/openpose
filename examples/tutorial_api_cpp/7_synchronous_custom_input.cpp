@@ -29,7 +29,8 @@ DEFINE_string(image_dir, "examples/media/",
 
 // If the user needs his own variables, he can inherit the op::Datum struct and add them in there.
 // UserDatum can be directly used by the OpenPose wrapper because it inherits from op::Datum, just define
-// WrapperT<std::vector<UserDatum>> instead of Wrapper (or equivalently WrapperT<std::vector<UserDatum>>)
+// WrapperT<std::vector<std::shared_ptr<UserDatum>>> instead of Wrapper
+// (or equivalently WrapperT<std::vector<std::shared_ptr<UserDatum>>>)
 struct UserDatum : public op::Datum
 {
     bool boolThatUserNeedsForSomeReason;
@@ -44,7 +45,7 @@ struct UserDatum : public op::Datum
 // in this case we assume a std::shared_ptr of a std::vector of UserDatum
 
 // This worker will just read and return all the jpg files in a directory
-class WUserInput : public op::WorkerProducer<std::shared_ptr<std::vector<UserDatum>>>
+class WUserInput : public op::WorkerProducer<std::shared_ptr<std::vector<std::shared_ptr<UserDatum>>>>
 {
 public:
     WUserInput(const std::string& directoryPath) :
@@ -59,7 +60,7 @@ public:
 
     void initializationOnThread() {}
 
-    std::shared_ptr<std::vector<UserDatum>> workProducer()
+    std::shared_ptr<std::vector<std::shared_ptr<UserDatum>>> workProducer()
     {
         try
         {
@@ -76,15 +77,16 @@ public:
             else
             {
                 // Create new datum
-                auto datumsPtr = std::make_shared<std::vector<UserDatum>>();
+                auto datumsPtr = std::make_shared<std::vector<std::shared_ptr<UserDatum>>>();
                 datumsPtr->emplace_back();
-                auto& datum = datumsPtr->at(0);
+                auto& datumPtr = datumsPtr->at(0);
+                datumPtr = std::make_shared<UserDatum>();
 
                 // Fill datum
-                datum.cvInputData = cv::imread(mImageFiles.at(mCounter++));
+                datumPtr->cvInputData = cv::imread(mImageFiles.at(mCounter++));
 
                 // If empty frame -> return nullptr
-                if (datum.cvInputData.empty())
+                if (datumPtr->cvInputData.empty())
                 {
                     op::log("Empty frame detected on path: " + mImageFiles.at(mCounter-1) + ". Closing program.",
                         op::Priority::High);
@@ -155,7 +157,7 @@ int tutorialApiCpp7()
 
         // OpenPose wrapper
         op::log("Configuring OpenPose...", op::Priority::High);
-        op::WrapperT<std::vector<UserDatum>> opWrapperT;
+        op::WrapperT<UserDatum> opWrapperT;
 
         // Initializing the user custom classes
         // Frames producer (e.g., video, webcam, ...)
@@ -171,7 +173,7 @@ int tutorialApiCpp7()
             poseModel, !FLAGS_disable_blending, (float)FLAGS_alpha_pose, (float)FLAGS_alpha_heatmap,
             FLAGS_part_to_show, FLAGS_model_folder, heatMapTypes, heatMapScale, FLAGS_part_candidates,
             (float)FLAGS_render_threshold, FLAGS_number_people_max, FLAGS_maximize_positives, FLAGS_fps_max,
-            enableGoogleLogging};
+            FLAGS_prototxt_path, FLAGS_caffemodel_path, enableGoogleLogging};
         opWrapperT.configure(wrapperStructPose);
         // Face configuration (use op::WrapperStructFace{} to disable it)
         const op::WrapperStructFace wrapperStructFace{
@@ -193,8 +195,8 @@ int tutorialApiCpp7()
             FLAGS_cli_verbose, FLAGS_write_keypoint, op::stringToDataFormat(FLAGS_write_keypoint_format),
             FLAGS_write_json, FLAGS_write_coco_json, FLAGS_write_coco_foot_json, FLAGS_write_coco_json_variant,
             FLAGS_write_images, FLAGS_write_images_format, FLAGS_write_video, FLAGS_write_video_fps,
-            FLAGS_write_heatmaps, FLAGS_write_heatmaps_format, FLAGS_write_video_adam, FLAGS_write_bvh, FLAGS_udp_host,
-            FLAGS_udp_port};
+            FLAGS_write_heatmaps, FLAGS_write_heatmaps_format, FLAGS_write_video_3d, FLAGS_write_video_adam,
+            FLAGS_write_bvh, FLAGS_udp_host, FLAGS_udp_port};
         opWrapperT.configure(wrapperStructOutput);
         // GUI (comment or use default argument to disable any visual output)
         const op::WrapperStructGui wrapperStructGui{

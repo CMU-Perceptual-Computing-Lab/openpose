@@ -49,7 +49,7 @@ int handFromJsonTest()
 
         // OpenPose wrapper
         op::log("Configuring OpenPose...", op::Priority::High);
-        op::WrapperHandFromJsonTest<std::vector<op::Datum>> opWrapper;
+        op::WrapperHandFromJsonTest<op::Datum> opWrapper;
         // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
         op::WrapperStructPose wrapperStructPose{false, op::flagsToPoint("656x368"), op::flagsToPoint("1280x720"),
                                                 op::ScaleMode::InputResolution, FLAGS_num_gpu, FLAGS_num_gpu_start,

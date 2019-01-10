@@ -292,6 +292,18 @@ OpenPose Library - Release Notes
     22. Examples do not end in core dumped if an OpenPose exception occurred during initialization, but it is rather closed returning -1. However, it will still results in core dumped if the exception occurs during multi-threading execution.
     23. Video (`--write_video`) can be generated from images (`--image_dir`), as long as they maintain the same resolution.
     24. Added `--fps_max` flag to limit the maximum processing frame rate of OpenPose (useful to display results at a maximum desired speed).
+    25. Frame undistortion can be applied not only to FLIR cameras, but also to all other input sources (image, webcam, video, etc.).
+    26. Calibration improvements:
+        1. Improved chessboard orientation detection, more robust and less errors.
+        2. Triangulation functions (triangulate and triangulateWithOptimization) public, so calibration can use them for bundle adjustment.
+        3. Added bundle adjustment refinement for camera extrinsic calibration.
+        4. Added `CameraMatrixInitial` field into the XML calibration files to keep the information of the original camera extrinsic parameters when bundle adjustment is run.
+    27. Video with the 3D output can be saved with the new `--write_video_3d` flag.
+    28. Added Mac OpenCL compatibility.
+    29. Added documentation for Nvidia TX2 with JetPack 3.3.
+    30. Added Travis build check for several configurations: Ubuntu (14/16)/Mac/Windows and CPU/CUDA/OpenCL and with/without Python.
+    31. Assigned 755 access to all sh scripts (some of them were only 644).
+    32. Added the flags `--prototxt_path` and `--caffemodel_path` to allow custom ProtoTxt and CaffeModel paths.
 2. Functions or parameters renamed:
     1. By default, python example `tutorial_developer/python_2_pose_from_heatmaps.py` was using 2 scales starting at -1x736, changed to 1 scale at -1x368.
     2. WrapperStructPose default parameters changed to match those of the OpenPose demo binary.
@@ -301,12 +313,21 @@ OpenPose Library - Release Notes
     6. Removed old COCO 2014 validation scripts.
     7. WrapperStructOutput split into WrapperStructOutput and WrapperStructGui.
     8. Replaced `--camera_fps` flag by `--write_video_fps`, given that it was a confusing name: It did not affect the webcam FPS, but only the FPS of the output video. In addition, default value changed from 30 to -1.
+    9. Renamed `--frame_keep_distortion` as `--frame_undistort`, which performs the opposite operation (the default value has been also changed to the opposite).
+    10. Renamed `--camera_parameter_folder` as `--camera_parameter_path` because it could also take a whole XML file path rather than its parent folder.
+    11. Default value of flag `--scale_gap` changed from 0.3 to 0.25.
+    12. Moved most sh scripts into the `scripts/` folder. Only models/getModels.sh and the *.bat files are kept under `models/` and `3rdparty/windows`.
+    13. For Python compatibility and scalability increase, template `TDatums` used for `include/openpose/wrapper/wrapper.hpp` has changed from `std::vector<Datum>` to `std::vector<std::shared_ptr<Datum>>`, including the respective changes in all the worker classes. In addition, some template classes have been simplified to only take 1 template parameter for user simplicity.
 3. Main bugs fixed:
     1. CMake-GUI was forcing to Release mode, allowed Debug modes too.
     2. NMS returns in index 0 the number of found peaks. However, while the number of peaks was truncated to a maximum of 127, this index 0 was saving the real number instead of the truncated one.
     3. Template functions could not be imported in Windows for projects using the OpenPose library DLL.
     4. Function `scaleKeypoints2d` was not working if any of the scales was 1 (e.g., fail if scaleX = 1 but scaleY != 1, or if any offset was not 0).
     5. Fixed bug in `KeepTopNPeople` that could provoke segmentation fault for `number_people_max` > 1.
+    6. Camera parameter reader can now take folder paths even if they are not finished in `/` (e.g., `~/Desktop/` worked but `~/Desktop` did not).
+    7. 3D module: If the image area was smaller than HD resolution image area, the 3D keypoints were not properly estimated.
+    8. OpenCL fixes.
+    9. If manual CUDA architectures are set in CMake, they are also set for Caffe rather than only for OpenPose.
 
 
 

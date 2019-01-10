@@ -225,7 +225,7 @@ if __name__ == "__main__":
     params["net_resolution"] = "-1x368"
     params["model_pose"] = "BODY_25"
     params["alpha_pose"] = 0.6
-    params["scale_gap"] = 0.3
+    params["scale_gap"] = 0.25
     params["scale_number"] = 1
     params["render_threshold"] = 0.05
     params["num_gpu_start"] = 0

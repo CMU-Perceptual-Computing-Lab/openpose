@@ -17,6 +17,7 @@ namespace op
         Flip,
         Rotation,
         FrameStep,
+        NumberViews,
         Size,
     };
 

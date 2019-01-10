@@ -46,16 +46,17 @@ DEFINE_int32(flir_camera_index,         -1,             "Select -1 (default) to 
 DEFINE_string(ip_camera,                "",             "String with the IP camera URL. It supports protocols like RTSP and HTTP.");
 DEFINE_bool(process_real_time,          false,          "Enable to keep the original source frame rate (e.g., for video). If the processing time is"
                                                         " too long, it will skip frames. If it is too fast, it will slow it down.");
-DEFINE_string(camera_parameter_folder,  "models/cameraParameters/flir/", "String with the folder where the camera parameters are located.");
-DEFINE_bool(frame_keep_distortion,      false,          "If false (default), it will undistortionate the image based on the"
-                                                        " `camera_parameter_folder` camera parameters; if true, it will not undistortionate, i.e.,"
-                                                        " it will leave it as it is.");
+DEFINE_string(camera_parameter_path,    "models/cameraParameters/flir/", "String with the folder where the camera parameters are located. If there"
+                                                        " is only 1 XML file (for single video, webcam, or images from the same camera), you must"
+                                                        " specify the whole XML file path (ending in .xml).");
+DEFINE_bool(frame_undistort,            false,          "If false (default), it will not undistort the image, if true, it will undistortionate them"
+                                                        " based on the camera parameters found in `camera_parameter_path`");
 // OpenPose
 DEFINE_string(output_resolution,        "-1x-1",        "The image resolution (display and output). Use \"-1x-1\" to force the program to use the"
                                                         " input image resolution.");
 DEFINE_int32(3d_views,                  1,              "Complementary option to `--image_dir` or `--video`. OpenPose will read as many images per"
                                                         " iteration, allowing tasks such as stereo camera processing (`--3d`). Note that"
-                                                        " `--camera_parameters_folder` must be set. OpenPose must find as many `xml` files in the"
+                                                        " `--camera_parameter_path` must be set. OpenPose must find as many `xml` files in the"
                                                         " parameter folder as this number indicates.");
 // Consumer
 DEFINE_bool(fullscreen,                 false,          "Run in full-screen mode (press f during runtime to toggle).");
@@ -63,7 +64,7 @@ DEFINE_bool(fullscreen,                 false,          "Run in full-screen mode
 // This class can be implemented either as a template or as a simple class given
 // that the user usually knows which kind of data he will move between the queues,
 // in this case we assume a std::shared_ptr of a std::vector of op::Datum
-class WUserClass : public op::Worker<std::shared_ptr<std::vector<op::Datum>>>
+class WUserClass : public op::Worker<std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>>
 {
 public:
     WUserClass()
@@ -73,16 +74,16 @@ public:
 
     void initializationOnThread() {}
 
-    void work(std::shared_ptr<std::vector<op::Datum>>& datumsPtr)
+    void work(std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& datumsPtr)
     {
         try
         {
             // User's processing here
-                // datum.cvInputData: initial cv::Mat obtained from the frames producer (video, webcam, etc.)
-                // datum.cvOutputData: final cv::Mat to be displayed
+                // datumPtr->cvInputData: initial cv::Mat obtained from the frames producer (video, webcam, etc.)
+                // datumPtr->cvOutputData: final cv::Mat to be displayed
             if (datumsPtr != nullptr)
-                for (auto& datum : *datumsPtr)
-                    cv::bitwise_not(datum.cvInputData, datum.cvOutputData);
+                for (auto& datumPtr : *datumsPtr)
+                    cv::bitwise_not(datumPtr->cvInputData, datumPtr->cvOutputData);
         }
         catch (const std::exception& e)
         {
@@ -120,8 +121,8 @@ int tutorialDeveloperThread2()
         const auto displayProducerFpsMode = (FLAGS_process_real_time
                                           ? op::ProducerFpsMode::OriginalFps : op::ProducerFpsMode::RetrievalFps);
         auto producerSharedPtr = createProducer(
-            producerType, producerString, cameraSize, FLAGS_camera_parameter_folder, !FLAGS_frame_keep_distortion,
-            (unsigned int) FLAGS_3d_views);
+            producerType, producerString, cameraSize, FLAGS_camera_parameter_path, FLAGS_frame_undistort,
+            FLAGS_3d_views);
         producerSharedPtr->setProducerFpsMode(displayProducerFpsMode);
         op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
         // Step 3 - Setting producer
@@ -132,18 +133,18 @@ int tutorialDeveloperThread2()
             (int)producerSharedPtr->get(CV_CAP_PROP_FRAME_WIDTH),
             (int)producerSharedPtr->get(CV_CAP_PROP_FRAME_HEIGHT)};
         // Step 4 - Setting thread workers && manager
-        typedef std::vector<op::Datum> TypedefDatumsNoPtr;
-        typedef std::shared_ptr<TypedefDatumsNoPtr> TypedefDatums;
-        op::ThreadManager<TypedefDatums> threadManager;
+        typedef op::Datum TypedefDatum;
+        typedef std::shared_ptr<std::vector<std::shared_ptr<TypedefDatum>>> TypedefDatumsSP;
+        op::ThreadManager<TypedefDatumsSP> threadManager;
         // Step 5 - Initializing the worker classes
         // Frames producer (e.g., video, webcam, ...)
-        auto DatumProducer = std::make_shared<op::DatumProducer<TypedefDatumsNoPtr>>(producerSharedPtr);
-        auto wDatumProducer = std::make_shared<op::WDatumProducer<TypedefDatums, TypedefDatumsNoPtr>>(DatumProducer);
+        auto DatumProducer = std::make_shared<op::DatumProducer<TypedefDatum>>(producerSharedPtr);
+        auto wDatumProducer = std::make_shared<op::WDatumProducer<TypedefDatum>>(DatumProducer);
         // Specific WUserClass
         auto wUserClass = std::make_shared<WUserClass>();
         // GUI (Display)
         auto gui = std::make_shared<op::Gui>(outputSize, FLAGS_fullscreen, threadManager.getIsRunningSharedPtr());
-        auto wGui = std::make_shared<op::WGui<TypedefDatums>>(gui);
+        auto wGui = std::make_shared<op::WGui<TypedefDatumsSP>>(gui);
 
         // ------------------------- CONFIGURING THREADING -------------------------
         // In this simple multi-thread example, we will do the following:

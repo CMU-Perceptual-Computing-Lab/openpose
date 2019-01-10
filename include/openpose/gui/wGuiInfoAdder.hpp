@@ -62,11 +62,12 @@ namespace op
                 // Profiling speed
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                 // Add GUI components to frame
-                for (auto& tDatum : *tDatums)
-                    spGuiInfoAdder->addInfo(tDatum.cvOutputData, std::max(tDatum.poseKeypoints.getSize(0),
-                                                                          tDatum.faceKeypoints.getSize(0)),
-                                            tDatum.id, tDatum.elementRendered.second, tDatum.frameNumber,
-                                            tDatum.poseIds, tDatum.poseKeypoints);
+                for (auto& tDatumPtr : *tDatums)
+                    spGuiInfoAdder->addInfo(
+                        tDatumPtr->cvOutputData,
+                        std::max(tDatumPtr->poseKeypoints.getSize(0), tDatumPtr->faceKeypoints.getSize(0)),
+                        tDatumPtr->id, tDatumPtr->elementRendered.second, tDatumPtr->frameNumber,
+                        tDatumPtr->poseIds, tDatumPtr->poseKeypoints);
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
                 Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);

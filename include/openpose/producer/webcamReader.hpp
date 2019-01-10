@@ -25,15 +25,10 @@ namespace op
          * cannot be opened.
          */
         explicit WebcamReader(const int webcamIndex = 0, const Point<int>& webcamResolution = Point<int>{},
-                              const bool throwExceptionIfNoOpened = true);
+                              const bool throwExceptionIfNoOpened = true, const std::string& cameraParameterPath = "",
+                              const bool undistortImage = false);
 
         virtual ~WebcamReader();
-
-        std::vector<cv::Mat> getCameraMatrices();
-
-        std::vector<cv::Mat> getCameraExtrinsics();
-
-        std::vector<cv::Mat> getCameraIntrinsics();
 
         std::string getNextFrameName();
 

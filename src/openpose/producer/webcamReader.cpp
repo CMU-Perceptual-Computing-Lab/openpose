@@ -6,8 +6,9 @@
 namespace op
 {
     WebcamReader::WebcamReader(const int webcamIndex, const Point<int>& webcamResolution,
-                               const bool throwExceptionIfNoOpened) :
-        VideoCaptureReader{webcamIndex, throwExceptionIfNoOpened},
+                               const bool throwExceptionIfNoOpened, const std::string& cameraParameterPath,
+                               const bool undistortImage) :
+        VideoCaptureReader{webcamIndex, throwExceptionIfNoOpened, cameraParameterPath, undistortImage, 1},
         mIndex{webcamIndex},
         mFrameNameCounter{-1},
         mThreadOpened{std::atomic<bool>{false}},
@@ -62,45 +63,6 @@ namespace op
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-        }
-    }
-
-    std::vector<cv::Mat> WebcamReader::getCameraMatrices()
-    {
-        try
-        {
-            return {};
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return {};
-        }
-    }
-
-    std::vector<cv::Mat> WebcamReader::getCameraExtrinsics()
-    {
-        try
-        {
-            return {};
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return {};
-        }
-    }
-
-    std::vector<cv::Mat> WebcamReader::getCameraIntrinsics()
-    {
-        try
-        {
-            return {};
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return {};
         }
     }
 

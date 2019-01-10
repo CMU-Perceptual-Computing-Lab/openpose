@@ -25,7 +25,7 @@ params["output_resolution"] = "-1x-1"
 params["net_resolution"] = "-1x368"
 params["model_pose"] = "BODY_25"
 params["alpha_pose"] = 0.6
-params["scale_gap"] = 0.3
+params["scale_gap"] = 0.25
 params["scale_number"] = 1
 params["render_threshold"] = 0.05
 # If GPU version is built, and multiple GPUs are available, set the ID here

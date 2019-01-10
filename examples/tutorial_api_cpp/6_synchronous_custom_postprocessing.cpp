@@ -23,7 +23,8 @@
 
 // If the user needs his own variables, he can inherit the op::Datum struct and add them in there.
 // UserDatum can be directly used by the OpenPose wrapper because it inherits from op::Datum, just define
-// WrapperT<std::vector<UserDatum>> instead of Wrapper (or equivalently WrapperT<std::vector<UserDatum>>)
+// WrapperT<std::vector<std::shared_ptr<UserDatum>>> instead of Wrapper
+// (or equivalently WrapperT<std::vector<std::shared_ptr<UserDatum>>>)
 struct UserDatum : public op::Datum
 {
     bool boolThatUserNeedsForSomeReason;
@@ -38,7 +39,7 @@ struct UserDatum : public op::Datum
 // in this case we assume a std::shared_ptr of a std::vector of UserDatum
 
 // This worker will just invert the image
-class WUserPostProcessing : public op::Worker<std::shared_ptr<std::vector<UserDatum>>>
+class WUserPostProcessing : public op::Worker<std::shared_ptr<std::vector<std::shared_ptr<UserDatum>>>>
 {
 public:
     WUserPostProcessing()
@@ -48,16 +49,16 @@ public:
 
     void initializationOnThread() {}
 
-    void work(std::shared_ptr<std::vector<UserDatum>>& datumsPtr)
+    void work(std::shared_ptr<std::vector<std::shared_ptr<UserDatum>>>& datumsPtr)
     {
         // User's post-processing (after OpenPose processing & before OpenPose outputs) here
-            // datum.cvOutputData: rendered frame with pose or heatmaps
-            // datum.poseKeypoints: Array<float> with the estimated pose
+            // datumPtr->cvOutputData: rendered frame with pose or heatmaps
+            // datumPtr->poseKeypoints: Array<float> with the estimated pose
         try
         {
             if (datumsPtr != nullptr && !datumsPtr->empty())
-                for (auto& datum : *datumsPtr)
-                    cv::bitwise_not(datum.cvOutputData, datum.cvOutputData);
+                for (auto& datumPtr : *datumsPtr)
+                    cv::bitwise_not(datumPtr->cvOutputData, datumPtr->cvOutputData);
         }
         catch (const std::exception& e)
         {
@@ -120,7 +121,7 @@ int tutorialApiCpp6()
 
         // OpenPose wrapper
         op::log("Configuring OpenPose...", op::Priority::High);
-        op::WrapperT<std::vector<UserDatum>> opWrapperT;
+        op::WrapperT<UserDatum> opWrapperT;
 
         // Initializing the user custom classes
         // Processing
@@ -136,7 +137,7 @@ int tutorialApiCpp6()
             poseModel, !FLAGS_disable_blending, (float)FLAGS_alpha_pose, (float)FLAGS_alpha_heatmap,
             FLAGS_part_to_show, FLAGS_model_folder, heatMapTypes, heatMapScale, FLAGS_part_candidates,
             (float)FLAGS_render_threshold, FLAGS_number_people_max, FLAGS_maximize_positives, FLAGS_fps_max,
-            enableGoogleLogging};
+            FLAGS_prototxt_path, FLAGS_caffemodel_path, enableGoogleLogging};
         opWrapperT.configure(wrapperStructPose);
         // Face configuration (use op::WrapperStructFace{} to disable it)
         const op::WrapperStructFace wrapperStructFace{
@@ -157,15 +158,15 @@ int tutorialApiCpp6()
         const op::WrapperStructInput wrapperStructInput{
             producerType, producerString, FLAGS_frame_first, FLAGS_frame_step, FLAGS_frame_last,
             FLAGS_process_real_time, FLAGS_frame_flip, FLAGS_frame_rotate, FLAGS_frames_repeat,
-            cameraSize, FLAGS_camera_parameter_folder, !FLAGS_frame_keep_distortion, (unsigned int) FLAGS_3d_views};
+            cameraSize, FLAGS_camera_parameter_path, FLAGS_frame_undistort, FLAGS_3d_views};
         opWrapperT.configure(wrapperStructInput);
         // Output (comment or use default argument to disable any output)
         const op::WrapperStructOutput wrapperStructOutput{
             FLAGS_cli_verbose, FLAGS_write_keypoint, op::stringToDataFormat(FLAGS_write_keypoint_format),
             FLAGS_write_json, FLAGS_write_coco_json, FLAGS_write_coco_foot_json, FLAGS_write_coco_json_variant,
             FLAGS_write_images, FLAGS_write_images_format, FLAGS_write_video, FLAGS_write_video_fps,
-            FLAGS_write_heatmaps, FLAGS_write_heatmaps_format, FLAGS_write_video_adam, FLAGS_write_bvh, FLAGS_udp_host,
-            FLAGS_udp_port};
+            FLAGS_write_heatmaps, FLAGS_write_heatmaps_format, FLAGS_write_video_3d, FLAGS_write_video_adam,
+            FLAGS_write_bvh, FLAGS_udp_host, FLAGS_udp_port};
         opWrapperT.configure(wrapperStructOutput);
         // GUI (comment or use default argument to disable any visual output)
         const op::WrapperStructGui wrapperStructGui{

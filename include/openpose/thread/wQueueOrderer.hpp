@@ -73,16 +73,16 @@ namespace op
                 // T* to T
                 auto& tDatumsNoPtr = *tDatums;
                 // tDatums is the next expected, update counter
-                if (tDatumsNoPtr[0].id == mNextExpectedId && tDatumsNoPtr[0].subId == mNextExpectedSubId)
+                if (tDatumsNoPtr[0]->id == mNextExpectedId && tDatumsNoPtr[0]->subId == mNextExpectedSubId)
                 {
                     // If single-view
-                    if (tDatumsNoPtr[0].subIdMax == 0)
+                    if (tDatumsNoPtr[0]->subIdMax == 0)
                         mNextExpectedId++;
                     // If muilti-view system
                     else
                     {
                         mNextExpectedSubId++;
-                        if (mNextExpectedSubId > tDatumsNoPtr[0].subIdMax)
+                        if (mNextExpectedSubId > tDatumsNoPtr[0]->subIdMax)
                         {
                             mNextExpectedSubId = 0;
                             mNextExpectedId++;
@@ -109,8 +109,8 @@ namespace op
                 // Retrieve frame if next is desired frame or if we want to stop this worker
                 if (!mPriorityQueueBuffer.empty()
                     && (mStopWhenEmpty ||
-                        ((*mPriorityQueueBuffer.top())[0].id == mNextExpectedId
-                          && (*mPriorityQueueBuffer.top())[0].subId == mNextExpectedSubId)))
+                        ((*mPriorityQueueBuffer.top())[0]->id == mNextExpectedId
+                          && (*mPriorityQueueBuffer.top())[0]->subId == mNextExpectedSubId)))
                 {
                     tDatums = { mPriorityQueueBuffer.top() };
                     mPriorityQueueBuffer.pop();
@@ -121,16 +121,16 @@ namespace op
             {
                 const auto& tDatumsNoPtr = *tDatums;
                 // If single-view
-                if (tDatumsNoPtr[0].subIdMax == 0)
-                    mNextExpectedId = tDatumsNoPtr[0].id + 1;
+                if (tDatumsNoPtr[0]->subIdMax == 0)
+                    mNextExpectedId = tDatumsNoPtr[0]->id + 1;
                 // If muilti-view system
                 else
                 {
-                    mNextExpectedSubId = tDatumsNoPtr[0].subId + 1;
-                    if (mNextExpectedSubId > tDatumsNoPtr[0].subIdMax)
+                    mNextExpectedSubId = tDatumsNoPtr[0]->subId + 1;
+                    if (mNextExpectedSubId > tDatumsNoPtr[0]->subIdMax)
                     {
                         mNextExpectedSubId = 0;
-                        mNextExpectedId = tDatumsNoPtr[0].id + 1;
+                        mNextExpectedId = tDatumsNoPtr[0]->id + 1;
                     }
                 }
             }

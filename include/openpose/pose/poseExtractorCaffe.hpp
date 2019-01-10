@@ -10,12 +10,13 @@ namespace op
     class OP_API PoseExtractorCaffe : public PoseExtractorNet
     {
     public:
-        PoseExtractorCaffe(const PoseModel poseModel, const std::string& modelFolder, const int gpuId,
-                           const std::vector<HeatMapType>& heatMapTypes = {},
-                           const ScaleMode heatMapScale = ScaleMode::ZeroToOne,
-                           const bool addPartCandidates = false,
-                           const bool maximizePositives = false,
-                           const bool enableGoogleLogging = true);
+        PoseExtractorCaffe(
+            const PoseModel poseModel, const std::string& modelFolder, const int gpuId,
+            const std::vector<HeatMapType>& heatMapTypes = {},
+            const ScaleMode heatMapScale = ScaleMode::ZeroToOne,
+            const bool addPartCandidates = false, const bool maximizePositives = false,
+            const std::string& protoTxtPath = "", const std::string& caffeModelPath = "",
+            const bool enableGoogleLogging = true);
 
         virtual ~PoseExtractorCaffe();
 
