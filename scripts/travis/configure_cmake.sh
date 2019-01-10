@@ -15,7 +15,7 @@ fi
 
 echo "WITH_PYTHON = ${WITH_PYTHON}."
 if [[ $WITH_PYTHON == true ]] ; then
-  ARGS="$ARGS -DBUILD_PYTHON=On"
+  ARGS="$ARGS -DBUILD_PYTHON=On -DPYTHON_EXECUTABLE=/usr/bin/python3.5 -DPYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython3.5m.so"
 fi
 
 # CUDA version

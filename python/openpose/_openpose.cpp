@@ -245,7 +245,8 @@ template <> struct type_caster<op::Array<float>> {
         // Cast numpy to op::Array<float>
         bool load(handle src, bool imp)
         {
-            array b(src, true);
+            // array b(src, true);
+            array b = reinterpret_borrow<array>(src);
             buffer_info info = b.request();
 
             if (info.format != format_descriptor<float>::format())
@@ -292,7 +293,8 @@ template <> struct type_caster<cv::Mat> {
         bool load(handle src, bool)
         {
             /* Try a default converting into a Python */
-            array b(src, true);
+            //array b(src, true);
+            array b = reinterpret_borrow<array>(src);
             buffer_info info = b.request();
 
             int ndims = info.ndim;
