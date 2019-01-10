@@ -44,7 +44,7 @@ DEFINE_bool(fullscreen,                 false,          "Run in full-screen mode
 // in this case we assume a std::shared_ptr of a std::vector of op::Datum
 
 // This worker will just read and return all the jpg files in a directory
-class WUserInput : public op::WorkerProducer<std::shared_ptr<std::vector<op::Datum>>>
+class WUserInput : public op::WorkerProducer<std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>>
 {
 public:
     WUserInput(const std::string& directoryPath) :
@@ -59,7 +59,7 @@ public:
 
     void initializationOnThread() {}
 
-    std::shared_ptr<std::vector<op::Datum>> workProducer()
+    std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>> workProducer()
     {
         try
         {
@@ -76,15 +76,15 @@ public:
             else
             {
                 // Create new datum
-                auto datumsPtr = std::make_shared<std::vector<op::Datum>>();
+                auto datumsPtr = std::make_shared<std::vector<std::shared_ptr<op::Datum>>>();
                 datumsPtr->emplace_back();
-                auto& datum = datumsPtr->at(0);
+                auto& datumPtr = datumsPtr->at(0);
 
                 // Fill datum
-                datum.cvInputData = cv::imread(mImageFiles.at(mCounter++));
+                datumPtr->cvInputData = cv::imread(mImageFiles.at(mCounter++));
 
                 // If empty frame -> return nullptr
-                if (datum.cvInputData.empty())
+                if (datumPtr->cvInputData.empty())
                 {
                     op::log("Empty frame detected on path: " + mImageFiles.at(mCounter-1) + ". Closing program.",
                         op::Priority::High);
@@ -110,7 +110,7 @@ private:
 };
 
 // This worker will just invert the image
-class WUserPostProcessing : public op::Worker<std::shared_ptr<std::vector<op::Datum>>>
+class WUserPostProcessing : public op::Worker<std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>>
 {
 public:
     WUserPostProcessing()
@@ -120,16 +120,16 @@ public:
 
     void initializationOnThread() {}
 
-    void work(std::shared_ptr<std::vector<op::Datum>>& datumsPtr)
+    void work(std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& datumsPtr)
     {
         // User's post-processing (after OpenPose processing & before OpenPose outputs) here
-            // datum.cvOutputData: rendered frame with pose or heatmaps
-            // datum.poseKeypoints: Array<float> with the estimated pose
+            // datumPtr->cvOutputData: rendered frame with pose or heatmaps
+            // datumPtr->poseKeypoints: Array<float> with the estimated pose
         try
         {
             if (datumsPtr != nullptr && !datumsPtr->empty())
-                for (auto& datum : *datumsPtr)
-                    cv::bitwise_not(datum.cvInputData, datum.cvOutputData);
+                for (auto& datumPtr : *datumsPtr)
+                    cv::bitwise_not(datumPtr->cvInputData, datumPtr->cvOutputData);
         }
         catch (const std::exception& e)
         {
@@ -141,21 +141,21 @@ public:
 };
 
 // This worker will just read and return all the jpg files in a directory
-class WUserOutput : public op::WorkerConsumer<std::shared_ptr<std::vector<op::Datum>>>
+class WUserOutput : public op::WorkerConsumer<std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>>
 {
 public:
     void initializationOnThread() {}
 
-    void workConsumer(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr)
+    void workConsumer(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& datumsPtr)
     {
         try
         {
             // User's displaying/saving/other processing here
-                // datum.cvOutputData: rendered frame with pose or heatmaps
-                // datum.poseKeypoints: Array<float> with the estimated pose
+                // datumPtr->cvOutputData: rendered frame with pose or heatmaps
+                // datumPtr->poseKeypoints: Array<float> with the estimated pose
             if (datumsPtr != nullptr && !datumsPtr->empty())
             {
-                cv::imshow("User worker GUI", datumsPtr->at(0).cvOutputData);
+                cv::imshow("User worker GUI", datumsPtr->at(0)->cvOutputData);
                 // It displays the image and sleeps at least 1 ms (it usually sleeps ~5-10 msec to display the image)
                 cv::waitKey(1);
             }
@@ -184,9 +184,9 @@ int openPoseTutorialThread3()
                   __LINE__, __FUNCTION__, __FILE__);
         op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
         // Step 2 - Setting thread workers && manager
-        typedef std::shared_ptr<std::vector<op::Datum>> TypedefDatums;
-        typedef std::shared_ptr<op::Worker<TypedefDatums>> TypedefWorker;
-        op::ThreadManager<TypedefDatums> threadManager;
+        typedef std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>> TypedefDatumsSP;
+        typedef std::shared_ptr<op::Worker<TypedefDatumsSP>> TypedefWorker;
+        op::ThreadManager<TypedefDatumsSP> threadManager;
         // Step 3 - Initializing the worker classes
         // Frames producer (e.g., video, webcam, ...)
         TypedefWorker wUserInput = std::make_shared<WUserInput>(FLAGS_image_dir);

@@ -66,8 +66,9 @@ namespace op
                 // Record image(s) on disk
                 std::vector<cv::Mat> cvOutputDatas(tDatumsNoPtr.size());
                 for (auto i = 0u; i < tDatumsNoPtr.size(); i++)
-                    cvOutputDatas[i] = tDatumsNoPtr[i].cvOutputData;
-                const auto fileName = (!tDatumsNoPtr[0].name.empty() ? tDatumsNoPtr[0].name : std::to_string(tDatumsNoPtr[0].id));
+                    cvOutputDatas[i] = tDatumsNoPtr[i]->cvOutputData;
+                const auto fileName = (!tDatumsNoPtr[0]->name.empty()
+                    ? tDatumsNoPtr[0]->name : std::to_string(tDatumsNoPtr[0]->id));
                 spImageSaver->saveImages(cvOutputDatas, fileName);
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);

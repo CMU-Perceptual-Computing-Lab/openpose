@@ -99,16 +99,16 @@ int tutorialDeveloperThread1()
             (int)producerSharedPtr->get(CV_CAP_PROP_FRAME_WIDTH),
             (int)producerSharedPtr->get(CV_CAP_PROP_FRAME_HEIGHT)};
         // Step 4 - Setting thread workers && manager
-        typedef std::vector<op::Datum> TypedefDatumsNoPtr;
-        typedef std::shared_ptr<TypedefDatumsNoPtr> TypedefDatums;
-        op::ThreadManager<TypedefDatums> threadManager;
+        typedef op::Datum TypedefDatum;
+        typedef std::shared_ptr<std::vector<std::shared_ptr<TypedefDatum>>> TypedefDatumsSP;
+        op::ThreadManager<TypedefDatumsSP> threadManager;
         // Step 5 - Initializing the worker classes
         // Frames producer (e.g., video, webcam, ...)
-        auto DatumProducer = std::make_shared<op::DatumProducer<TypedefDatumsNoPtr>>(producerSharedPtr);
-        auto wDatumProducer = std::make_shared<op::WDatumProducer<TypedefDatums, TypedefDatumsNoPtr>>(DatumProducer);
+        auto DatumProducer = std::make_shared<op::DatumProducer<TypedefDatum>>(producerSharedPtr);
+        auto wDatumProducer = std::make_shared<op::WDatumProducer<TypedefDatum>>(DatumProducer);
         // GUI (Display)
         auto gui = std::make_shared<op::Gui>(outputSize, FLAGS_fullscreen, threadManager.getIsRunningSharedPtr());
-        auto wGui = std::make_shared<op::WGui<TypedefDatums>>(gui);
+        auto wGui = std::make_shared<op::WGui<TypedefDatumsSP>>(gui);
 
         // ------------------------- CONFIGURING THREADING -------------------------
         // In this simple multi-thread example, we will do the following:

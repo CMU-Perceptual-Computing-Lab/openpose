@@ -63,24 +63,24 @@ namespace op
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                 // Send though UDP communication
 #ifdef USE_3D_ADAM_MODEL
-                const auto& tDatum = (*tDatums)[0];
-                if (!tDatum.poseKeypoints3D.empty())
+                const auto& tDatumPtr = (*tDatums)[0];
+                if (!tDatumPtr->poseKeypoints3D.empty())
                 {
-                    const auto& adamPose = tDatum.adamPose; // Eigen::Matrix<double, 62, 3, Eigen::RowMajor>
-                    const auto& adamTranslation = tDatum.adamTranslation; // Eigen::Vector3d(3, 1)
-                    const auto adamFaceCoeffsExp = tDatum.adamFaceCoeffsExp; // Eigen::VectorXd resized to (200, 1)
-                    //const float mouth_open = tDatum.mouthOpening; // tDatum.mouth_open;
-                    //const float leye_open = tDatum.rightEyeOpening; // tDatum.leye_open;
-                    //const float reye_open = tDatum.leftEyeOpening; // tDatum.reye_open;
-                    //const float dist_root_foot = Datum.distanceRootFoot; // tDatum.dist_root_foot;
+                    const auto& adamPose = tDatumPtr->adamPose; // Eigen::Matrix<double, 62, 3, Eigen::RowMajor>
+                    const auto& adamTranslation = tDatumPtr->adamTranslation; // Eigen::Vector3d(3, 1)
+                    const auto adamFaceCoeffsExp = tDatumPtr->adamFaceCoeffsExp; // Eigen::VectorXd resized to (200, 1)
+                    //const float mouth_open = tDatumPtr->mouthOpening; // tDatumPtr->mouth_open;
+                    //const float leye_open = tDatumPtr->rightEyeOpening; // tDatumPtr->leye_open;
+                    //const float reye_open = tDatumPtr->leftEyeOpening; // tDatumPtr->reye_open;
+                    //const float dist_root_foot = Datum.distanceRootFoot; // tDatumPtr->dist_root_foot;
                     // m_adam_t:
                     //     1. Total translation (centimeters) of the root in camera/global coordinate representation.
                     // m_adam_pose:
                     //     1. First row is global rotation, in AngleAxis representation. Radians (not degrees!)
                     //     2. Rest are joint-angles in Euler-Angle representation. Degrees.
-                    spUdpSender->sendJointAngles(adamPose.data(), adamPose.rows(),
-                                                 adamTranslation.data(),
-                                                 adamFaceCoeffsExp.data(), adamFaceCoeffsExp.rows());
+                    spUdpSender->sendJointAngles(
+                        adamPose.data(), adamPose.rows(), adamTranslation.data(), adamFaceCoeffsExp.data(),
+                        adamFaceCoeffsExp.rows());
                 }
 #endif
                 // Profiling speed

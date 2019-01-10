@@ -66,7 +66,7 @@ namespace op
                 // Record video(s)
                 std::vector<cv::Mat> cvOutputDatas(tDatumsNoPtr.size());
                 for (auto i = 0u ; i < cvOutputDatas.size() ; i++)
-                    cvOutputDatas[i] = tDatumsNoPtr[i].cvOutputData;
+                    cvOutputDatas[i] = tDatumsNoPtr[i]->cvOutputData;
                 spVideoSaver->write(cvOutputDatas);
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);

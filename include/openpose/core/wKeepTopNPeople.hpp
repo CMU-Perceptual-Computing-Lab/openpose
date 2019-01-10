@@ -60,14 +60,16 @@ namespace op
                 // Profiling speed
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                 // Rescale pose data
-                for (auto& tDatum : *tDatums)
+                for (auto& tDatumPtr : *tDatums)
                 {
-                    tDatum.poseKeypoints = spKeepTopNPeople->keepTopPeople(tDatum.poseKeypoints, tDatum.poseScores);
-                    tDatum.faceKeypoints = spKeepTopNPeople->keepTopPeople(tDatum.faceKeypoints, tDatum.poseScores);
-                    tDatum.handKeypoints[0] = spKeepTopNPeople->keepTopPeople(tDatum.handKeypoints[0],
-                                                                              tDatum.poseScores);
-                    tDatum.handKeypoints[1] = spKeepTopNPeople->keepTopPeople(tDatum.handKeypoints[1],
-                                                                              tDatum.poseScores);
+                    tDatumPtr->poseKeypoints = spKeepTopNPeople->keepTopPeople(
+                        tDatumPtr->poseKeypoints, tDatumPtr->poseScores);
+                    tDatumPtr->faceKeypoints = spKeepTopNPeople->keepTopPeople(
+                        tDatumPtr->faceKeypoints, tDatumPtr->poseScores);
+                    tDatumPtr->handKeypoints[0] = spKeepTopNPeople->keepTopPeople(
+                        tDatumPtr->handKeypoints[0], tDatumPtr->poseScores);
+                    tDatumPtr->handKeypoints[1] = spKeepTopNPeople->keepTopPeople(
+                        tDatumPtr->handKeypoints[1], tDatumPtr->poseScores);
                 }
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);

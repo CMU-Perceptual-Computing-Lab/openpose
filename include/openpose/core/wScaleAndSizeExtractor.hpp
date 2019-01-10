@@ -63,11 +63,11 @@ namespace op
                 // Profiling speed
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                 // cv::Mat -> float*
-                for (auto& tDatum : *tDatums)
+                for (auto& tDatumPtr : *tDatums)
                 {
-                    const Point<int> inputSize{tDatum.cvInputData.cols, tDatum.cvInputData.rows};
-                    std::tie(tDatum.scaleInputToNetInputs, tDatum.netInputSizes, tDatum.scaleInputToOutput,
-                        tDatum.netOutputSize) = spScaleAndSizeExtractor->extract(inputSize);
+                    const Point<int> inputSize{tDatumPtr->cvInputData.cols, tDatumPtr->cvInputData.rows};
+                    std::tie(tDatumPtr->scaleInputToNetInputs, tDatumPtr->netInputSizes, tDatumPtr->scaleInputToOutput,
+                        tDatumPtr->netOutputSize) = spScaleAndSizeExtractor->extract(inputSize);
                 }
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);

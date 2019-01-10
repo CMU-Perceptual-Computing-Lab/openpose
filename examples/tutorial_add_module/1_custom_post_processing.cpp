@@ -78,7 +78,7 @@ int tutorialAddModule1()
 
         // OpenPose wrapper
         op::log("Configuring OpenPose...", op::Priority::High);
-        op::WrapperT<std::vector<op::UserDatum>> opWrapperT;
+        op::WrapperT<op::UserDatum> opWrapperT;
         // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
         const op::WrapperStructPose wrapperStructPose{
             !FLAGS_body_disable, netInputSize, outputSize, keypointScale, FLAGS_num_gpu, FLAGS_num_gpu_start,
@@ -86,7 +86,7 @@ int tutorialAddModule1()
             poseModel, !FLAGS_disable_blending, (float)FLAGS_alpha_pose, (float)FLAGS_alpha_heatmap,
             FLAGS_part_to_show, FLAGS_model_folder, heatMapTypes, heatMapScale, FLAGS_part_candidates,
             (float)FLAGS_render_threshold, FLAGS_number_people_max, FLAGS_maximize_positives, FLAGS_fps_max,
-            enableGoogleLogging};
+            FLAGS_prototxt_path, FLAGS_caffemodel_path, enableGoogleLogging};
         opWrapperT.configure(wrapperStructPose);
         // Face configuration (use op::WrapperStructFace{} to disable it)
         const op::WrapperStructFace wrapperStructFace{
@@ -114,8 +114,8 @@ int tutorialAddModule1()
             FLAGS_cli_verbose, FLAGS_write_keypoint, op::stringToDataFormat(FLAGS_write_keypoint_format),
             FLAGS_write_json, FLAGS_write_coco_json, FLAGS_write_coco_foot_json, FLAGS_write_coco_json_variant,
             FLAGS_write_images, FLAGS_write_images_format, FLAGS_write_video, FLAGS_write_video_fps,
-            FLAGS_write_heatmaps, FLAGS_write_heatmaps_format, FLAGS_write_video_adam, FLAGS_write_bvh, FLAGS_udp_host,
-            FLAGS_udp_port};
+            FLAGS_write_heatmaps, FLAGS_write_heatmaps_format, FLAGS_write_video_3d, FLAGS_write_video_adam,
+            FLAGS_write_bvh, FLAGS_udp_host, FLAGS_udp_port};
         opWrapperT.configure(wrapperStructOutput);
         // GUI (comment or use default argument to disable any visual output)
         const op::WrapperStructGui wrapperStructGui{
@@ -124,7 +124,7 @@ int tutorialAddModule1()
 
         // Custom post-processing
         auto userPostProcessing = std::make_shared<op::UserPostProcessing>(/* Your class arguments here */);
-        auto wUserPostProcessing = std::make_shared<op::WUserPostProcessing<std::shared_ptr<std::vector<op::UserDatum>>>>(
+        auto wUserPostProcessing = std::make_shared<op::WUserPostProcessing<std::shared_ptr<std::vector<std::shared_ptr<op::UserDatum>>>>>(
             userPostProcessing
         );
         // Add custom processing

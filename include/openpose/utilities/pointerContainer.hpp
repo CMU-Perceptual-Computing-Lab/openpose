@@ -9,33 +9,33 @@ namespace op
         return (tPointerContainer != nullptr && tPointerContainer->size() > 0);
     }
 
-    template<typename TDatums>
+    template<typename TDatumsSP>
     class PointerContainerGreater
     {
     public:
-        bool operator() (TDatums& a, TDatums& b)
+        bool operator() (const TDatumsSP& a, const TDatumsSP& b)
         {
             if (!b || b->empty())
                 return true;
             else if (!a || a->empty())
                 return false;
             else
-                return (*a)[0] > (*b)[0];
+                return *(*a)[0] > *(*b)[0];
         }
     };
 
-    template<typename TDatums>
+    template<typename TDatumsSP>
     class PointerContainerLess
     {
     public:
-        bool operator() (TDatums& a, TDatums& b)
+        bool operator() (const TDatumsSP& a, const TDatumsSP& b)
         {
             if (!b || b->empty())
                 return false;
             else if (!a || a->empty())
                 return true;
             else
-                return (*a)[0] < (*b)[0];
+                return *(*a)[0] < *(*b)[0];
         }
     };
 }

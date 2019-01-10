@@ -62,8 +62,8 @@ namespace op
                 // Profiling speed
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                 // Detect people face
-                for (auto& tDatum : *tDatums)
-                    tDatum.faceRectangles = spFaceDetector->detectFaces(tDatum.poseKeypoints);
+                for (auto& tDatumPtr : *tDatums)
+                    tDatumPtr->faceRectangles = spFaceDetector->detectFaces(tDatumPtr->poseKeypoints);
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
                 Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);

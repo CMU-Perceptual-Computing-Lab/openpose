@@ -63,11 +63,11 @@ namespace op
                 // Profiling speed
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                 // Extract people face
-                for (auto& tDatum : *tDatums)
+                for (auto& tDatumPtr : *tDatums)
                 {
-                    spFaceExtractorNet->forwardPass(tDatum.faceRectangles, tDatum.cvInputData);
-                    tDatum.faceHeatMaps = spFaceExtractorNet->getHeatMaps().clone();
-                    tDatum.faceKeypoints = spFaceExtractorNet->getFaceKeypoints().clone();
+                    spFaceExtractorNet->forwardPass(tDatumPtr->faceRectangles, tDatumPtr->cvInputData);
+                    tDatumPtr->faceHeatMaps = spFaceExtractorNet->getHeatMaps().clone();
+                    tDatumPtr->faceKeypoints = spFaceExtractorNet->getFaceKeypoints().clone();
                 }
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);

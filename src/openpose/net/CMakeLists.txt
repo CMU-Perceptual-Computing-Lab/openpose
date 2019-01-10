@@ -2,6 +2,7 @@ set(CMAKE_CXX_SOURCE_FILE_EXTENSIONS C;M;c++;cc;cpp;cxx;mm;CPP;cl)
 set(SOURCES_OP_NET
     bodyPartConnectorBase.cpp
     bodyPartConnectorBase.cu
+    bodyPartConnectorBaseCL.cpp
     bodyPartConnectorCaffe.cpp
     maximumBase.cpp
     maximumBase.cu

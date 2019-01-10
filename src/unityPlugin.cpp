@@ -14,7 +14,7 @@ bool unityOutputEnabled = true;
 bool imageOutput = false;
 
 // This worker will just read and return all the jpg files in a directory
-class UnityPluginUserOutput : public op::WorkerConsumer<std::shared_ptr<std::vector<op::Datum>>> {
+class UnityPluginUserOutput : public op::WorkerConsumer<std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>> {
 public:	
 	void initializationOnThread() {}
 
@@ -43,7 +43,7 @@ public:
 	};
 
 protected:
-	void workConsumer(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
+	void workConsumer(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& datumsPtr) {
 		try	{
 			if (datumsPtr != nullptr && !datumsPtr->empty()) {				
 				if (unityOutputEnabled) {
@@ -75,19 +75,19 @@ private:
 		unityOutputCallback(static_cast<void*>(ptrs), ptrSize, sizes, sizeSize, (uchar)outputType);
 	}
 
-	void sendDatumsInfoAndName(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
+	void sendDatumsInfoAndName(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& datumsPtr) {
 		auto& datum = datumsPtr->at(0);
 		int sizes[] = { 1 };
 		int sizeSize = 1;
-		unsigned long long *val[] = {&(datum.id), &(datum.subId), &(datum.subIdMax), &(datum.frameNumber)};
+		unsigned long long *val[] = {&(datum->id), &(datum->subId), &(datum->subIdMax), &(datum->frameNumber)};
 		int ptrSize = 4;
 		outputValue(&val[0], ptrSize, &sizes[0], sizeSize, OutputType::DatumsInfo);
 
-		char const *a[] = { datum.name.c_str() };
+		char const *a[] = { datum->name.c_str() };
 		outputValue(&a[0], 1, &sizes[0], sizeSize, OutputType::Name);
 	}
-	void sendPoseKeypoints(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
-		auto& data = datumsPtr->at(0).poseKeypoints; // Array<float>
+	void sendPoseKeypoints(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& datumsPtr) {
+		auto& data = datumsPtr->at(0)->poseKeypoints; // Array<float>
 		if (!data.empty()) {
 			auto sizeVector = data.getSize();
 			int sizeSize = sizeVector.size();
@@ -96,8 +96,8 @@ private:
 			outputValue(&val, 1, sizes, sizeSize, OutputType::PoseKeypoints);
 		}
 	}
-	void sendPoseIds(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
-		auto& data = datumsPtr->at(0).poseIds; // Array<long long>
+	void sendPoseIds(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& datumsPtr) {
+		auto& data = datumsPtr->at(0)->poseIds; // Array<long long>
 		if (!data.empty()) {
 			auto sizeVector = data.getSize();
 			int sizeSize = sizeVector.size();
@@ -106,8 +106,8 @@ private:
 			outputValue(&val, 1, sizes, sizeSize, OutputType::PoseIds);
 		}
 	}
-	void sendPoseScores(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
-		auto& data = datumsPtr->at(0).poseScores; // Array<float>
+	void sendPoseScores(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& datumsPtr) {
+		auto& data = datumsPtr->at(0)->poseScores; // Array<float>
 		if (!data.empty()) {
 			auto sizeVector = data.getSize();
 			int sizeSize = sizeVector.size();
@@ -116,8 +116,8 @@ private:
 			outputValue(&val, 1, sizes, sizeSize, OutputType::PoseScores);
 		}
 	}
-	void sendPoseHeatMaps(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
-		auto& data = datumsPtr->at(0).poseHeatMaps; // Array<float>
+	void sendPoseHeatMaps(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& datumsPtr) {
+		auto& data = datumsPtr->at(0)->poseHeatMaps; // Array<float>
 		if (!data.empty()) {
 			auto sizeVector = data.getSize();
 			int sizeSize = sizeVector.size();
@@ -126,8 +126,8 @@ private:
 			outputValue(&val, 1, sizes, sizeSize, OutputType::PoseHeatMaps);
 		}
 	}
-	void sendPoseCandidates(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
-		auto& data = datumsPtr->at(0).poseCandidates; // std::vector<std::vector<std::array<float, 3>>>
+	void sendPoseCandidates(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& datumsPtr) {
+		auto& data = datumsPtr->at(0)->poseCandidates; // std::vector<std::vector<std::array<float, 3>>>
 		if (!data.empty()) {
 			// TODO 
 			/*auto a = data[0][0].data();
@@ -138,8 +138,8 @@ private:
 			outputValue(&val, 1, sizes, sizeSize, OutputType::PoseIds);*/
 		}
 	}	
-	void sendFaceRectangles(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
-		auto& data = datumsPtr->at(0).faceRectangles; // std::vector<Rectangle<float>>
+	void sendFaceRectangles(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& datumsPtr) {
+		auto& data = datumsPtr->at(0)->faceRectangles; // std::vector<Rectangle<float>>
 		if (data.size() > 0) {
 			int sizes[] = { data.size(), 4 };
 			std::vector<float> vals(data.size() * 4);
@@ -153,8 +153,8 @@ private:
 			outputValue(&val, 1, sizes, 2, OutputType::FaceRectangles);
 		}
 	}
-	void sendFaceKeypoints(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
-		auto& data = datumsPtr->at(0).faceKeypoints; // Array<float>
+	void sendFaceKeypoints(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& datumsPtr) {
+		auto& data = datumsPtr->at(0)->faceKeypoints; // Array<float>
 		if (!data.empty()) {
 			auto sizeVector = data.getSize();
 			int sizeSize = sizeVector.size();
@@ -163,8 +163,8 @@ private:
 			outputValue(&val, 1, sizes, sizeSize, OutputType::FaceKeypoints);
 		}
 	}
-	void sendFaceHeatMaps(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
-		auto& data = datumsPtr->at(0).faceHeatMaps; // Array<float>
+	void sendFaceHeatMaps(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& datumsPtr) {
+		auto& data = datumsPtr->at(0)->faceHeatMaps; // Array<float>
 		if (!data.empty()) {
 			auto sizeVector = data.getSize();
 			int sizeSize = sizeVector.size();
@@ -173,8 +173,8 @@ private:
 			outputValue(&val, 1, sizes, sizeSize, OutputType::FaceHeatMaps);
 		}
 	}
-	void sendHandRectangles(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
-		auto& data = datumsPtr->at(0).handRectangles; // std::vector<std::array<Rectangle<float>, 2>>
+	void sendHandRectangles(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& datumsPtr) {
+		auto& data = datumsPtr->at(0)->handRectangles; // std::vector<std::array<Rectangle<float>, 2>>
 		if (!data.empty()) {
 			std::vector<float*> valPtrs;
 			for (int i = 0; i < data.size(); i++) {
@@ -192,8 +192,8 @@ private:
 			outputValue(valPtrs.data(), valPtrs.size(), sizes, sizeSize, OutputType::HandRectangles);
 		}
 	}
-	void sendHandKeypoints(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
-		auto& data = datumsPtr->at(0).handKeypoints; // std::array<Array<float>, 2>
+	void sendHandKeypoints(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& datumsPtr) {
+		auto& data = datumsPtr->at(0)->handKeypoints; // std::array<Array<float>, 2>
 		if (data.size() == 2 && !data[0].empty()) {
 			auto sizeVector = data[0].getSize();
 			int sizeSize = sizeVector.size();
@@ -202,8 +202,8 @@ private:
 			outputValue(ptrs, 2, sizes, sizeSize, OutputType::HandKeypoints);
 		}
 	}
-	void sendHandHeatMaps(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
-		auto& data = datumsPtr->at(0).handHeatMaps; // std::array<Array<float>, 2>
+	void sendHandHeatMaps(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& datumsPtr) {
+		auto& data = datumsPtr->at(0)->handHeatMaps; // std::array<Array<float>, 2>
 		if (data.size() == 2 && !data[0].empty()) {
 			auto sizeVector = data[0].getSize();
 			int sizeSize = sizeVector.size();
@@ -212,8 +212,8 @@ private:
 			outputValue(ptrs, 2, sizes, sizeSize, OutputType::HandHeightMaps);
 		}
 	}
-	void sendImage(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr) {
-		auto& data = datumsPtr->at(0).cvInputData; // cv::Mat
+	void sendImage(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& datumsPtr) {
+		auto& data = datumsPtr->at(0)->cvInputData; // cv::Mat
 		if (!data.empty()) {
 			int sizeVector[] = { data.rows, data.cols, 3 };
 			int sizeSize = 3;
@@ -345,7 +345,7 @@ extern "C" {
 		bool heatmaps_add_parts, bool heatmaps_add_bkg, bool heatmaps_add_PAFs, // HeatMapType // uchar heatmap_type,
 		uchar heatmap_scale_mode, // ScaleMode
 		bool part_candidates, float render_threshold, int number_people_max, 
-		bool maximize_positives, double fps_max) {
+		bool maximize_positives, double fps_max, char* proto_txt_path, char* caffe_model_path) {
 
 		try {
 			spWrapperStructPose = std::make_shared<op::WrapperStructPose>(
@@ -358,7 +358,8 @@ extern "C" {
 				!disable_blending, alpha_pose, alpha_heatmap, part_to_show, model_folder,
 				op::flagsToHeatMaps(heatmaps_add_parts, heatmaps_add_bkg, heatmaps_add_PAFs), // HeatMapType // (op::HeatMapType) heatmap_type, 
 				(op::ScaleMode) heatmap_scale_mode,
-				part_candidates, render_threshold, number_people_max, maximize_positives, fps_max, true
+				part_candidates, render_threshold, number_people_max, maximize_positives, fps_max, 
+				proto_txt_path, caffe_model_path, true
 			);
 		} catch (const std::exception& e) {
 			op::log(e.what(), op::Priority::Max, __LINE__, __FUNCTION__, __FILE__);
@@ -417,7 +418,7 @@ extern "C" {
 		unsigned long long frame_first, unsigned long long frame_step, unsigned long long frame_last,
 		bool process_real_time, bool frame_flip, int frame_rotate, bool frames_repeat, 
 		int camera_resolution_x, int camera_resolution_y, // Point
-		char* camera_parameter_path, bool undistort_image, uint image_directory_stereo) {
+		char* camera_parameter_path, bool undistort_image, int image_directory_stereo) {
 
 		try {
 			spWrapperStructInput = std::make_shared<op::WrapperStructInput>(

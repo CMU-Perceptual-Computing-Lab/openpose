@@ -8,7 +8,7 @@ In order to add a new module, these are the recommended steps in order to develo
 2. Implement all the functionality in one `Worker`. I.e., inherit from `Worker` and implement all the functionality on that class (copy the examples from any Worker subclass).
     1. The first letter of the class name should be `W` (e.g., `WHairExtractor`).
     2. To initially simplify development:
-        1. Optionally (higher debug info), you might initially create the Worker as a non-templated class, assuming it uses std::shared_ptr<std::vector<op::Datum>> instead of directly using a template class (following the `examples/tutorial_api_cpp` synchronous examples). While developing, templates provide more confusing debugging info. Turn the class into a template after being initially developed.
+        1. Optionally (higher debug info), you might initially create the Worker as a non-templated class, assuming it uses std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>> instead of directly using a template class (following the `examples/tutorial_api_cpp` synchronous examples). While developing, templates provide more confusing debugging info. Turn the class into a template after being initially developed.
         2. Optionally (for development speed), use op::Datum as unique argument of your auxiliary functions within that worker.
         3. Use the OpenPose Wrapper class in ThreadManagerMode::SingleThread mode (e.g., it allows you to directly use cv::imshow).
         4. If you are using your own custom Caffe -> initially change the Caffe for your version. It should directly work.

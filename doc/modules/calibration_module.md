@@ -104,7 +104,7 @@ Examples:
 
 
 ### Step 2 - Extrinsic Parameter Calibration
-1. **VERY IMPORTANT NOTE**: If you want to re-run the extrinsic parameter calibration over the same intrinsic XML files (e.g., if you move the camera location, but you know the instrinsics are the same), you must manually re-set to `1 0 0 0  0 1 0 0  0 0 1 0` the camera matrix of each XML file.
+1. **VERY IMPORTANT NOTE**: If you want to re-run the extrinsic parameter calibration over the same intrinsic XML files (e.g., if you move the camera location, but you know the instrinsics are the same), you must manually re-set to `1 0 0 0  0 1 0 0  0 0 1 0` the camera matrix of each XML file that will be used for `--combine_cam0_extrinsics`.
 2. After intrinsics calibration, save undirtoted images for all the camera views:
 ```sh
 ./build/examples/openpose/openpose.bin --num_gpu 0 --flir_camera --write_images ~/Desktop/extrinsics
@@ -125,14 +125,24 @@ Examples:
 :: Windows
 :: build\x64\Release\calibration.exe with the same flags as above
 ```
-4. Hint to verify extrinsic calibration is successful:
-    1. Translation vector - Global distance:
+4. If you use Ceres solver (`WITH_CERES` flag in CMake), you can improve the calibration results by performing an additional Bundle Adjustment refinement step on top of the previous results. We use camera 0 as the baseline for the internal computation, so try to avoid weird camera configurations in which camera 0 is completely isolated from the other cameras. Ideally, camera 0 should physically be the closest to all other cameras (i.e., the one more centered). But in practice, the accuracy improvement is almost none (as long as it is not too far from the others). To perform this bundle adjustment refinement for the example above, simply run the following line:
+```
+# Ubuntu and Mac
+./build/examples/calibration/calibration.bin --mode 3 --grid_square_size_mm 127.0 --grid_number_inner_corners 9x6 --omit_distortion --calibration_image_dir ~/Desktop/extrinsics/ --number_cameras 4
+```
+```
+:: Windows
+:: Ceres-compatible version not implemented for Windows yet. Make a pull request if you have a working version in Windows.
+```
+5. Hint to verify extrinsic calibration is successful:
+    1. Our final reprojection error (after rescaling) for the bundle adjustment step is usually about 0.1-0.15 pixels.
+    2. Translation vector - Global distance:
         1. Manually open each one of the generated XML files from the folder indicated by the flag `--camera_parameter_path` (or the default one indicated by the `--help` flag if the former was not used).
         2. The field `CameraMatrix` is a 3 x 4 matrix (you can see that the subfield `rows` in that file is 3 and `cols` is 4).
         3. Order the matrix in that 3 x 4 shape (e.g., by copying in a different text file with the shape of 3 rows and 4 columns).
         4. The 3 first components of the last column of the `CameraMatrix` field define the global `translation` (in meters) with respect to the global origin (in our case camera 1).
         5. Thus, the distance between that camera and the origin camera 1 should be (approximately) equal to the L2-norm of the `translation` vector.
-    2. Translation vector - Relative x-y-z distances:
+    3. Translation vector - Relative x-y-z distances:
         1. The 3x1 `translation` vector represents the `x`, `y`, and `z` distances to the origin camera, respectively. The camera is looking along the positive `z` axis, the `y` axis is down, and the `x` axis is right. This should match the real distance between both cameras.
 
 

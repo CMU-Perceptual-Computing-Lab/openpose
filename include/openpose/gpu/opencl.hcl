@@ -5,9 +5,7 @@
 
 #define MULTI_LINE_STRING(ARG) #ARG
 
-#ifndef __APPLE__
-    #define CL_HPP_ENABLE_EXCEPTIONS
-#endif
+#define CL_HPP_ENABLE_EXCEPTIONS
 
 #ifdef LOWER_CL_VERSION
     #define CL_HPP_MINIMUM_OPENCL_VERSION 120

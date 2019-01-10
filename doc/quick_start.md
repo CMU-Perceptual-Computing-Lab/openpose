@@ -130,10 +130,10 @@ build\x64\Release\OpenPoseDemo.exe --flir_camera --3d --number_people_max 1
 build\x64\Release\OpenPoseDemo.exe --flir_camera --3d --number_people_max 1 --face --hand
 ```
 
-2. Saving 3-D keypoints
+2. Saving 3-D keypoints and video
 ```
 # Ubuntu and Mac (same flags for Windows version)
-./build/examples/openpose/openpose.bin --flir_camera --3d --number_people_max 1 --write_json output_folder_path/
+./build/examples/openpose/openpose.bin --flir_camera --3d --number_people_max 1 --write_json output_folder_path/ --write_video_3d output_folder_path/video_3d.avi
 ```
 
 3. Fast stereo camera image saving (without keypoint detection) for later post-processing

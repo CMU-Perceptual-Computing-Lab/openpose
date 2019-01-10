@@ -1,11 +1,11 @@
-# ------------------------- BODY, FACE AND HAND MODELS -------------------------
+# ------------------------- BODY, FOOT, FACE, AND HAND MODELS -------------------------
 # Downloading body pose (COCO and MPI), face and hand models
 OPENPOSE_URL="http://posefs1.perception.cs.cmu.edu/OpenPose/models/"
 POSE_FOLDER="pose/"
 FACE_FOLDER="face/"
 HAND_FOLDER="hand/"
 
-# ------------------------- POSE MODELS -------------------------
+# ------------------------- POSE (BODY+FOOT) MODELS -------------------------
 # Body (BODY_25)
 BODY_25_FOLDER=${POSE_FOLDER}"body_25/"
 BODY_25_MODEL=${BODY_25_FOLDER}"pose_iter_584000.caffemodel"

@@ -15,7 +15,7 @@ DEFINE_string(image_path, "examples/media/COCO_val2014_000000000294.jpg",
     "Process an image. Read all standard formats (jpg, png, bmp, etc.).");
 
 // This worker will just read and return all the jpg files in a directory
-void display(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr)
+void display(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& datumsPtr)
 {
     // User's displaying/saving/other processing here
         // datum.cvOutputData: rendered frame with pose or heatmaps
@@ -23,22 +23,22 @@ void display(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr)
     if (datumsPtr != nullptr && !datumsPtr->empty())
     {
         // Display image
-        cv::imshow("User worker GUI", datumsPtr->at(0).cvOutputData);
+        cv::imshow("User worker GUI", datumsPtr->at(0)->cvOutputData);
         cv::waitKey(0);
     }
     else
         op::log("Nullptr or empty datumsPtr found.", op::Priority::High);
 }
 
-void printKeypoints(const std::shared_ptr<std::vector<op::Datum>>& datumsPtr)
+void printKeypoints(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& datumsPtr)
 {
     // Example: How to use the pose keypoints
     if (datumsPtr != nullptr && !datumsPtr->empty())
     {
-        op::log("Body keypoints: " + datumsPtr->at(0).poseKeypoints.toString());
-        op::log("Face keypoints: " + datumsPtr->at(0).faceKeypoints.toString());
-        op::log("Left hand keypoints: " + datumsPtr->at(0).handKeypoints[0].toString());
-        op::log("Right hand keypoints: " + datumsPtr->at(0).handKeypoints[1].toString());
+        op::log("Body keypoints: " + datumsPtr->at(0)->poseKeypoints.toString());
+        op::log("Face keypoints: " + datumsPtr->at(0)->faceKeypoints.toString());
+        op::log("Left hand keypoints: " + datumsPtr->at(0)->handKeypoints[0].toString());
+        op::log("Right hand keypoints: " + datumsPtr->at(0)->handKeypoints[1].toString());
     }
     else
         op::log("Nullptr or empty datumsPtr found.", op::Priority::High);
@@ -92,7 +92,7 @@ int tutorialApiCpp3()
             poseModel, !FLAGS_disable_blending, (float)FLAGS_alpha_pose, (float)FLAGS_alpha_heatmap,
             FLAGS_part_to_show, FLAGS_model_folder, heatMapTypes, heatMapScale, FLAGS_part_candidates,
             (float)FLAGS_render_threshold, FLAGS_number_people_max, FLAGS_maximize_positives, FLAGS_fps_max,
-            enableGoogleLogging};
+            FLAGS_prototxt_path, FLAGS_caffemodel_path, enableGoogleLogging};
         opWrapper.configure(wrapperStructPose);
         // Face configuration (use op::WrapperStructFace{} to disable it)
         const op::WrapperStructFace wrapperStructFace{
@@ -114,8 +114,8 @@ int tutorialApiCpp3()
             FLAGS_cli_verbose, FLAGS_write_keypoint, op::stringToDataFormat(FLAGS_write_keypoint_format),
             FLAGS_write_json, FLAGS_write_coco_json, FLAGS_write_coco_foot_json, FLAGS_write_coco_json_variant,
             FLAGS_write_images, FLAGS_write_images_format, FLAGS_write_video, FLAGS_write_video_fps,
-            FLAGS_write_heatmaps, FLAGS_write_heatmaps_format, FLAGS_write_video_adam, FLAGS_write_bvh, FLAGS_udp_host,
-            FLAGS_udp_port};
+            FLAGS_write_heatmaps, FLAGS_write_heatmaps_format, FLAGS_write_video_3d, FLAGS_write_video_adam,
+            FLAGS_write_bvh, FLAGS_udp_host, FLAGS_udp_port};
         opWrapper.configure(wrapperStructOutput);
         // No GUI. Equivalent to: opWrapper.configure(op::WrapperStructGui{});
         // Set to single-thread (for sequential processing and/or debugging and/or reducing latency)

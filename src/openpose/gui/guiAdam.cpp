@@ -234,7 +234,7 @@ namespace op
                     spImpl->spRender->RenderAndRead(); // read the image into read_buffer
                     // spImpl->spRender->Display();
 
-                    // Save/display Adam display in opencv window
+                    // Save/display Adam display in OpenCV window
                     if (!spImpl->mWriteAdamRenderAsVideo.empty())
                     {
                         // img is y-flipped, and in RGB order
@@ -247,7 +247,7 @@ namespace op
                             const auto originalVideoFps = 30;
                             spImpl->spVideoSaver = std::make_shared<VideoSaver>(
                                 spImpl->mWriteAdamRenderAsVideo, CV_FOURCC('M','J','P','G'),
-                                originalVideoFps, Point<int>{img.cols, img.rows}
+                                originalVideoFps
                             );
                         }
                         spImpl->spVideoSaver->write(img);

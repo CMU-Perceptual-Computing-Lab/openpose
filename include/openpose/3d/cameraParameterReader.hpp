@@ -17,7 +17,8 @@ namespace op
         explicit CameraParameterReader(const std::string& serialNumber,
                                        const cv::Mat& cameraIntrinsics,
                                        const cv::Mat& cameraDistortion,
-                                       const cv::Mat& cameraExtrinsics = cv::Mat());
+                                       const cv::Mat& cameraExtrinsics = cv::Mat(),
+                                       const cv::Mat& cameraExtrinsicsInitial = cv::Mat());
 
         // serialNumbers is optional. If empty, it will load all the XML files available in the
         // cameraParameterPath folder
@@ -36,11 +37,13 @@ namespace op
 
         const std::vector<cv::Mat>& getCameraMatrices() const;
 
-        const std::vector<cv::Mat>& getCameraExtrinsics() const;
+        const std::vector<cv::Mat>& getCameraDistortions() const;
 
         const std::vector<cv::Mat>& getCameraIntrinsics() const;
 
-        const std::vector<cv::Mat>& getCameraDistortions() const;
+        const std::vector<cv::Mat>& getCameraExtrinsics() const;
+
+        const std::vector<cv::Mat>& getCameraExtrinsicsInitial() const;
 
         bool getUndistortImage() const;
 
@@ -51,9 +54,10 @@ namespace op
     private:
         std::vector<std::string> mSerialNumbers;
         std::vector<cv::Mat> mCameraMatrices;
-        std::vector<cv::Mat> mCameraExtrinsics;
-        std::vector<cv::Mat> mCameraIntrinsics;
         std::vector<cv::Mat> mCameraDistortions;
+        std::vector<cv::Mat> mCameraIntrinsics;
+        std::vector<cv::Mat> mCameraExtrinsics;
+        std::vector<cv::Mat> mCameraExtrinsicsInitial;
 
         // Undistortion (optional)
         bool mUndistortImage;

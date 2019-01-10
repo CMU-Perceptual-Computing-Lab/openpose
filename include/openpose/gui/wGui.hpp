@@ -74,8 +74,8 @@ namespace op
                 if (!tDatums->empty())
                 {
                     std::vector<cv::Mat> cvOutputDatas;
-                    for (auto& tDatum : *tDatums)
-                        cvOutputDatas.emplace_back(tDatum.cvOutputData);
+                    for (auto& tDatumPtr : *tDatums)
+                        cvOutputDatas.emplace_back(tDatumPtr->cvOutputData);
                     spGui->setImage(cvOutputDatas);
                 }
                 // Refresh/update GUI

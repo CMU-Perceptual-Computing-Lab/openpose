@@ -17,7 +17,7 @@ namespace op
 
         virtual ~BodyPartConnectorCaffe();
 
-        virtual void Reshape(const std::vector<caffe::Blob<T>*>& bottom);
+        virtual void Reshape(const std::vector<caffe::Blob<T>*>& bottom, const int gpuID = 0);
 
         virtual inline const char* type() const { return "BodyPartConnector"; }
 
@@ -44,6 +44,9 @@ namespace op
         virtual void Forward_gpu(const std::vector<caffe::Blob<T>*>& bottom, Array<T>& poseKeypoints,
                                  Array<T>& poseScores);
 
+        virtual void Forward_ocl(const std::vector<caffe::Blob<T>*>& bottom, Array<T>& poseKeypoints,
+                                 Array<T>& poseScores);
+
         virtual void Backward_cpu(const std::vector<caffe::Blob<T>*>& top, const std::vector<bool>& propagate_down,
                                   const std::vector<caffe::Blob<T>*>& bottom);
 
@@ -66,6 +69,7 @@ namespace op
         unsigned int* pMapIdxGpuPtr;
         Array<T> mFinalOutputCpu;
         T* pFinalOutputGpuPtr;
+        int mGpuID;
 
         DELETE_COPY(BodyPartConnectorCaffe);
     };

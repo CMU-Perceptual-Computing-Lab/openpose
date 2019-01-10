@@ -12,17 +12,17 @@ Note that OpenPose for Nvidia Jetson TX2 was developed and it is maintained by t
 
 
 ## Requirements and Dependencies
-Jetson TX2 just flashed with [JetPack 3.1](https://developer.nvidia.com/embedded/jetpack)
+Jetson TX2 just flashed with [JetPack 3.3](https://developer.nvidia.com/embedded/jetpack)
 
 Notes:
 
-- Installation is similar to Jetson TX1 and you can follow this [video tutorial](https://www.youtube.com/watch?v=RJkOGMC8IrY).
+- Installation is similar to Jetson TX1 and you can follow this [step by step tutorial](https://docs.nvidia.com/jetson/archives/jetpack-archived/jetpack-33/index.html#jetpack/3.3/install.htm%3FTocPath%3D_____3).
 - If you are installing from a virtual machine host, installation may need to be done in two steps, please refer to [this solution](https://devtalk.nvidia.com/default/topic/1002081/jetson-tx2/jetpack-3-0-install-with-a-vm/).
-- Be sure to complete both OS flashing and CUDA / cuDNN installation parts before installation.
+- Be sure to complete both OS flashing and CUDA / cuDNN installation parts before installation.
 
 **Dependencies**:
 
-    - OpenCV (all 2.X and 3.X versions are compatible).
+    - OpenCV (3.X versions are compatible).
     - Caffe and all its dependencies.
     - The demo and tutorials additionally use GFlags.
 
@@ -31,7 +31,7 @@ Notes:
 ## Installation
 Use the following script for installation of both caffe and OpenPose: 
 ```
-./ubuntu/install_caffe_and_openpose_JetsonTX2_JetPack3.1.sh
+./scripts/ubuntu/install_caffe_and_openpose_JetsonTX2_JetPack3.3.sh
 ```
 
 
@@ -45,4 +45,4 @@ To activate hand or face resolution please complete this command with the follow
 ```
 --hand -hand_net_resolution 256x256
 --face -face_net_resolution 256x256
-``` 
+```

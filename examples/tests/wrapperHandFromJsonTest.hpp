@@ -5,7 +5,8 @@
 
 namespace op
 {
-    template<typename TDatums,
+    template<typename TDatum,
+             typename TDatums = std::vector<std::shared_ptr<TDatum>>,
              typename TWorker = std::shared_ptr<Worker<std::shared_ptr<TDatums>>>,
              typename TQueue = Queue<std::shared_ptr<TDatums>>>
     class WrapperHandFromJsonTest
@@ -95,13 +96,13 @@ namespace op
 #include <openpose/utilities/fileSystem.hpp>
 namespace op
 {
-    template<typename TDatums, typename TWorker, typename TQueue>
-    WrapperHandFromJsonTest<TDatums, TWorker, TQueue>::WrapperHandFromJsonTest()
+    template<typename TDatum, typename TDatums, typename TWorker, typename TQueue>
+    WrapperHandFromJsonTest<TDatum, TDatums, TWorker, TQueue>::WrapperHandFromJsonTest()
     {
     }
 
-    template<typename TDatums, typename TWorker, typename TQueue>
-    WrapperHandFromJsonTest<TDatums, TWorker, TQueue>::~WrapperHandFromJsonTest()
+    template<typename TDatum, typename TDatums, typename TWorker, typename TQueue>
+    WrapperHandFromJsonTest<TDatum, TDatums, TWorker, TQueue>::~WrapperHandFromJsonTest()
     {
         try
         {
@@ -114,13 +115,14 @@ namespace op
         }
     }
 
-    template<typename TDatums, typename TWorker, typename TQueue>
-    void WrapperHandFromJsonTest<TDatums, TWorker, TQueue>::configure(const WrapperStructPose& wrapperStructPose,
-                                                                      const WrapperStructHand& wrapperStructHand,
-                                                                      const std::shared_ptr<Producer>& producerSharedPtr,
-                                                                      const std::string& handGroundTruth,
-                                                                      const std::string& writeJson,
-                                                                      const DisplayMode displayMode)
+    template<typename TDatum, typename TDatums, typename TWorker, typename TQueue>
+    void WrapperHandFromJsonTest<TDatum, TDatums, TWorker, TQueue>::configure(
+        const WrapperStructPose& wrapperStructPose,
+        const WrapperStructHand& wrapperStructHand,
+        const std::shared_ptr<Producer>& producerSharedPtr,
+        const std::string& handGroundTruth,
+        const std::string& writeJson,
+        const DisplayMode displayMode)
     {
         try
         {
@@ -172,8 +174,8 @@ namespace op
             }
 
             // Producer
-            const auto datumProducer = std::make_shared<DatumProducer<TDatums>>(producerSharedPtr);
-            wDatumProducer = std::make_shared<WDatumProducer<TDatumsPtr, TDatums>>(datumProducer);
+            const auto datumProducer = std::make_shared<DatumProducer<TDatum>>(producerSharedPtr);
+            wDatumProducer = std::make_shared<WDatumProducer<TDatum>>(datumProducer);
 
             // Get input scales and sizes
             const auto scaleAndSizeExtractor = std::make_shared<ScaleAndSizeExtractor>(
@@ -269,8 +271,8 @@ namespace op
         }
     }
 
-    template<typename TDatums, typename TWorker, typename TQueue>
-    void WrapperHandFromJsonTest<TDatums, TWorker, TQueue>::exec()
+    template<typename TDatum, typename TDatums, typename TWorker, typename TQueue>
+    void WrapperHandFromJsonTest<TDatum, TDatums, TWorker, TQueue>::exec()
     {
         try
         {
@@ -283,8 +285,8 @@ namespace op
         }
     }
 
-    template<typename TDatums, typename TWorker, typename TQueue>
-    void WrapperHandFromJsonTest<TDatums, TWorker, TQueue>::reset()
+    template<typename TDatum, typename TDatums, typename TWorker, typename TQueue>
+    void WrapperHandFromJsonTest<TDatum, TDatums, TWorker, TQueue>::reset()
     {
         try
         {
@@ -305,8 +307,8 @@ namespace op
         }
     }
 
-    template<typename TDatums, typename TWorker, typename TQueue>
-    void WrapperHandFromJsonTest<TDatums, TWorker, TQueue>::configureThreadManager()
+    template<typename TDatum, typename TDatums, typename TWorker, typename TQueue>
+    void WrapperHandFromJsonTest<TDatum, TDatums, TWorker, TQueue>::configureThreadManager()
     {
         try
         {
@@ -365,8 +367,8 @@ namespace op
         }
     }
 
-    template<typename TDatums, typename TWorker, typename TQueue>
-    std::vector<TWorker> WrapperHandFromJsonTest<TDatums, TWorker, TQueue>::mergeWorkers(const std::vector<TWorker>& workersA, const std::vector<TWorker>& workersB)
+    template<typename TDatum, typename TDatums, typename TWorker, typename TQueue>
+    std::vector<TWorker> WrapperHandFromJsonTest<TDatum, TDatums, TWorker, TQueue>::mergeWorkers(const std::vector<TWorker>& workersA, const std::vector<TWorker>& workersB)
     {
         try
         {
