@@ -303,6 +303,7 @@ OpenPose Library - Release Notes
     29. Added documentation for Nvidia TX2 with JetPack 3.3.
     30. Added Travis build check for several configurations: Ubuntu (14/16)/Mac/Windows and CPU/CUDA/OpenCL and with/without Python.
     31. Assigned 755 access to all sh scripts (some of them were only 644).
+    32. Added the flags `--prototxt_path` and `--caffemodel_path` to allow custom ProtoTxt and CaffeModel paths.
 2. Functions or parameters renamed:
     1. By default, python example `tutorial_developer/python_2_pose_from_heatmaps.py` was using 2 scales starting at -1x736, changed to 1 scale at -1x368.
     2. WrapperStructPose default parameters changed to match those of the OpenPose demo binary.

@@ -713,7 +713,7 @@ if (UNIX OR APPLE)
           -DCPU_ONLY=${CAFFE_CPU_ONLY}
           -DCMAKE_BUILD_TYPE=Release
           -DBUILD_docs=OFF
-          -DBUILD_python=OFF
+          -DBUILD_python=${BUILD_PYTHON}
           -DBUILD_python_layer=OFF
           -DUSE_LEVELDB=OFF
           -DUSE_LMDB=OFF
@@ -731,7 +731,7 @@ if (UNIX OR APPLE)
           -DCPU_ONLY=${CAFFE_CPU_ONLY}
           -DCMAKE_BUILD_TYPE=Release
           -DBUILD_docs=OFF
-          -DBUILD_python=OFF
+          -DBUILD_python=${BUILD_PYTHON}
           -DBUILD_python_layer=OFF
           -DUSE_LEVELDB=OFF
           -DUSE_LMDB=OFF

@@ -263,6 +263,7 @@ namespace op
                             wrapperStructPose.poseModel, modelFolder, gpuId + gpuNumberStart,
                             wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale,
                             wrapperStructPose.addPartCandidates, wrapperStructPose.maximizePositives,
+                            wrapperStructPose.protoTxtPath, wrapperStructPose.caffeModelPath,
                             wrapperStructPose.enableGoogleLogging
                         ));
 
