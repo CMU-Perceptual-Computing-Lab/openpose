@@ -22,7 +22,8 @@ namespace op{
 
 namespace py = pybind11;
 
-void parse_gflags(const std::vector<std::string>& argv){
+void parse_gflags(const std::vector<std::string>& argv)
+{
     std::vector<char*> argv_vec;
     for(auto& arg : argv) argv_vec.emplace_back((char*)arg.c_str());
     char** cast = &argv_vec[0];
@@ -30,7 +31,8 @@ void parse_gflags(const std::vector<std::string>& argv){
     gflags::ParseCommandLineFlags(&size, &cast, true);
 }
 
-void init_int(py::dict d){
+void init_int(py::dict d)
+{
     std::vector<std::string> argv;
     argv.emplace_back("openpose.py");
     for (auto item : d){
@@ -40,7 +42,8 @@ void init_int(py::dict d){
     parse_gflags(argv);
 }
 
-void init_argv(std::vector<std::string> argv){
+void init_argv(std::vector<std::string> argv)
+{
     argv.insert(argv.begin(), "openpose.py");
     parse_gflags(argv);
 }
@@ -49,7 +52,8 @@ class WrapperPython{
 public:
     std::unique_ptr<op::Wrapper> opWrapper;
 
-    WrapperPython(py::dict params = py::dict()){
+    WrapperPython(py::dict params = py::dict())
+    {
         op::log("Starting OpenPose Python Wrapper...", op::Priority::High);
 
         // Construct opWrapper
@@ -59,7 +63,8 @@ public:
         if(params.size()) configure(params);
     }
 
-    void configure(py::dict params = py::dict()){
+    void configure(py::dict params = py::dict())
+    {
         if(params.size()) init_int(params);
 
         // logging_level
@@ -139,7 +144,8 @@ public:
         opWrapper->stop();
     }
 
-    void emplaceAndPop(std::vector<std::shared_ptr<op::Datum>>& l){
+    void emplaceAndPop(std::vector<std::shared_ptr<op::Datum>>& l)
+    {
         auto datumsPtr = std::make_shared<std::vector<std::shared_ptr<op::Datum>>>(l);
         opWrapper->emplaceAndPop(datumsPtr);
     }
@@ -159,7 +165,6 @@ PYBIND11_MODULE(_openpose, m) {
         .def("start", &WrapperPython::start)
         .def("stop", &WrapperPython::stop)
         .def("emplaceAndPop", &WrapperPython::emplaceAndPop)
-        //.def("datum", &WrapperPython::datum)
         ;
 
     // Datum Object
@@ -220,49 +225,24 @@ PYBIND11_MODULE(_openpose, m) {
         .def_readwrite("y", &op::Point<int>::y)
         ;
 
-    //    // Array Object
-    //    py::class_<op::Array<float>>(m, "Array", py::buffer_protocol())
-    //       .def("__repr__", [](op::Array<float> &a) { return a.toString(); })
-    //       .def("getSize", [](op::Array<float> &a) { return a.getSize(); })
-    //       .def(py::init<const std::vector<int>&>())
-    //       .def(py::init<>())
-    //       .def_buffer([](op::Array<float> &m) -> py::buffer_info {
-    //            return py::buffer_info(
-    //                m.getPtr(),                             /* Pointer to buffer */
-    //                sizeof(float),                          /* Size of one scalar */
-    //                py::format_descriptor<float>::format(), /* Python struct-style format descriptor */
-    //                m.getSize().size(),                     /* Number of dimensions */
-    //                m.getSize(),                            /* Buffer dimensions */
-    //                m.getStride()                           /* Strides (in bytes) for each index */
-    //            );
-    //        })
-    //    ;
-
-#ifdef VERSION_INFO
-    m.attr("__version__") = VERSION_INFO;
-#else
-    m.attr("__version__") = "dev";
-#endif
+    #ifdef VERSION_INFO
+        m.attr("__version__") = VERSION_INFO;
+    #else
+        m.attr("__version__") = "dev";
+    #endif
 }
 
 }
 
+// Numpy - op::Array<float> interop
 namespace pybind11 { namespace detail {
 
 template <> struct type_caster<op::Array<float>> {
     public:
-        /**
-         * This macro establishes the name 'inty' in
-         * function signatures and declares a local variable
-         * 'value' of type inty
-         */
+
         PYBIND11_TYPE_CASTER(op::Array<float>, _("numpy.ndarray"));
 
-        /**
-         * Conversion part 1 (Python->C++): convert a PyObject into a inty
-         * instance or return false upon failure. The second argument
-         * indicates whether implicit conversions should be applied.
-         */
+        // Cast numpy to op::Array<float>
         bool load(handle src, bool imp)
         {
             array b(src, true);
@@ -283,22 +263,16 @@ template <> struct type_caster<op::Array<float>> {
             return true;
         }
 
-        /**
-         * Conversion part 2 (C++ -> Python): convert an inty instance into
-         * a Python object. The second and third arguments are used to
-         * indicate the return value policy and parent object (for
-         * ``return_value_policy::reference_internal``) and are generally
-         * ignored by implicit casters.
-         */
+        // Cast op::Array<float> to numpy
         static handle cast(const op::Array<float> &m, return_value_policy, handle defval)
         {
             std::string format = format_descriptor<float>::format();
             return array(buffer_info(
-                m.getPseudoConstPtr(),     /* Pointer to buffer */
-                sizeof(float),       /* Size of one scalar */
-                format,         /* Python struct-style format descriptor */
-                m.getSize().size(),            /* Number of dimensions */
-                m.getSize(),      /* Buffer dimensions */
+                m.getPseudoConstPtr(),/* Pointer to buffer */
+                sizeof(float),        /* Size of one scalar */
+                format,               /* Python struct-style format descriptor */
+                m.getSize().size(),   /* Number of dimensions */
+                m.getSize(),          /* Buffer dimensions */
                 m.getStride()         /* Strides (in bytes) for each index */
                 )).release();
         }
@@ -306,23 +280,15 @@ template <> struct type_caster<op::Array<float>> {
     };
 }} // namespace pybind11::detail
 
-
+// Numpy - cv::Mat interop
 namespace pybind11 { namespace detail {
 
 template <> struct type_caster<cv::Mat> {
     public:
-        /**
-         * This macro establishes the name 'inty' in
-         * function signatures and declares a local variable
-         * 'value' of type inty
-         */
+
         PYBIND11_TYPE_CASTER(cv::Mat, _("numpy.ndarray"));
 
-        /**
-         * Conversion part 1 (Python->C++): convert a PyObject into a inty
-         * instance or return false upon failure. The second argument
-         * indicates whether implicit conversions should be applied.
-         */
+        // Cast numpy to cv::Mat
         bool load(handle src, bool)
         {
             /* Try a default converting into a Python */
@@ -365,13 +331,7 @@ template <> struct type_caster<cv::Mat> {
             return true;
         }
 
-        /**
-         * Conversion part 2 (C++ -> Python): convert an inty instance into
-         * a Python object. The second and third arguments are used to
-         * indicate the return value policy and parent object (for
-         * ``return_value_policy::reference_internal``) and are generally
-         * ignored by implicit casters.
-         */
+        // Cast cv::Mat to numpy
         static handle cast(const cv::Mat &m, return_value_policy, handle defval)
         {
             std::string format = format_descriptor<unsigned char>::format();
