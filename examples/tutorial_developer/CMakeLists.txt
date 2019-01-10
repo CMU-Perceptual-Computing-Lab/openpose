@@ -30,6 +30,3 @@ foreach(EXAMPLE_FILE ${EXAMPLE_FILES})
   endif (WIN32)
 
 endforeach()
-
-### Add Python files
-configure_file(python_1_pose_from_heatmaps.py python_1_pose_from_heatmaps.py)

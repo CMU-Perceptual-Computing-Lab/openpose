@@ -879,10 +879,6 @@ endif (WITH_FLIR_CAMERA)
 if (UNIX OR APPLE)
   set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries} pthread)
 endif (UNIX OR APPLE)
-# Python needs Boost11 for some reason
-#if (BUILD_PYTHON)
-#  find_package(Boost COMPONENTS system REQUIRED)
-#endif (BUILD_PYTHON)
 
 set(examples_3rdparty_libraries ${OpenPose_3rdparty_libraries} ${GFLAGS_LIBRARY})
 
@@ -917,18 +913,19 @@ download_model("hand" ${DOWNLOAD_HAND_MODEL} hand/pose_iter_102000.caffemodel
 message(STATUS "Models Downloaded.")
 
 ### PYTHON
-#if (Caffe_FOUND)
-  if(BUILD_PYTHON)
-    if (WIN32)
-      execute_process(COMMAND cmd /c cd ${CMAKE_SOURCE_DIR} & git submodule update --init 3rdparty/pybind11/)
-    endif (WIN32)
-    if (UNIX OR APPLE)
-      execute_process(COMMAND cd ${CMAKE_SOURCE_DIR} & git submodule update --init 3rdparty/pybind11/)
-    endif (UNIX OR APPLE)
+if (WIN32 AND BUILD_PYTHON)
+  execute_process(COMMAND cmd /c cd ${CMAKE_SOURCE_DIR} & git submodule update --init 3rdparty/pybind11/)
+  add_subdirectory(3rdparty/pybind11)
+  add_subdirectory(python)
+endif (WIN32 AND BUILD_PYTHON)
+if (UNIX OR APPLE)
+  if (Caffe_FOUND)
+    execute_process(COMMAND cd ${CMAKE_SOURCE_DIR} & git submodule update --init 3rdparty/pybind11/)
     add_subdirectory(3rdparty/pybind11)
     add_subdirectory(python)
-  endif (BUILD_PYTHON)
-#endif(Caffe_FOUND)
+  endif (Caffe_FOUND)
+endif (UNIX OR APPLE)
+
 
 ### GENERATE DOCUMENTATION
 if (UNIX OR APPLE)
