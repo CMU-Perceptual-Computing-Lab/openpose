@@ -33,6 +33,8 @@ args = parser.parse_known_args()
 params = dict()
 params["model_folder"] = "../../../models/"
 
+# Point people to the C++ example and show how to do this flags.hpp
+
 # Add others in path?
 for i in range(0,len(args[1]),2):
     key = args[1][i].replace('-','')

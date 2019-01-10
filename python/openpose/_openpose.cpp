@@ -176,6 +176,8 @@ PYBIND11_MODULE(_openpose, m) {
         .def_readwrite("inputNetData", &op::Datum::inputNetData)
         ;
 
+    //Expose all these
+
     // Rectangle
     py::class_<op::Rectangle<float>>(m, "Rectangle")
         .def("__repr__", [](op::Rectangle<float> &a) { return a.toString(); })

@@ -61,7 +61,7 @@ outputImageF = (datum.inputNetData[0].copy())[0,:,:,:] + 0.5
 outputImageF = cv2.merge([outputImageF[0,:,:], outputImageF[1,:,:], outputImageF[2,:,:]])
 outputImageF = (outputImageF*255.).astype(dtype='uint8')
 heatmaps = datum.poseHeatMaps.copy()
-heatmaps = np.abs(heatmaps)
+#heatmaps = np.abs(heatmaps)
 heatmaps = (heatmaps*255.).astype(dtype='uint8')
 
 # Display Image
