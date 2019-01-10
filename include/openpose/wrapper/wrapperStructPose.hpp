@@ -174,6 +174,20 @@ namespace op
         double fpsMax;
 
         /**
+         * Final path where the pose Caffe ProtoTxt file is located.
+         * The combination modelFolder + protoTxtPath represents the whole path to the prototxt file.
+         * If empty, it will use the default OpenPose ProtoTxt file.
+         */
+        std::string protoTxtPath;
+
+        /**
+         * Final path where the pose Caffe CaffeModel is located.
+         * The combination modelFolder + caffeModelPath represents the whole path to the caffemodel file.
+         * If empty, it will use the default OpenPose CaffeModel file.
+         */
+        std::string caffeModelPath;
+
+        /**
          * Whether to internally enable Google Logging.
          * This option is only applicable if Caffe is used.
          * Only disable it if the user is already calling google::InitGoogleLogging() in his code.
@@ -198,7 +212,8 @@ namespace op
             const std::string& modelFolder = "models/", const std::vector<HeatMapType>& heatMapTypes = {},
             const ScaleMode heatMapScale = ScaleMode::ZeroToOne, const bool addPartCandidates = false,
             const float renderThreshold = 0.05f, const int numberPeopleMax = -1, const bool maximizePositives = false,
-            const double fpsMax = -1., const bool enableGoogleLogging = true);
+            const double fpsMax = -1., const std::string& protoTxtPath = "",
+            const std::string& caffeModelPath = "", const bool enableGoogleLogging = true);
     };
 }
 

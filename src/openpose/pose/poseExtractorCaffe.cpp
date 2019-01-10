@@ -32,6 +32,8 @@ namespace op
             const PoseModel mPoseModel;
             const int mGpuId;
             const std::string mModelFolder;
+            const std::string mProtoTxtPath;
+            const std::string mCaffeModelPath;
             const bool mEnableGoogleLogging;
             // General parameters
             std::vector<std::shared_ptr<Net>> spNets;
@@ -47,11 +49,15 @@ namespace op
             std::shared_ptr<caffe::Blob<float>> spPeaksBlob;
             std::shared_ptr<caffe::Blob<float>> spMaximumPeaksBlob;
 
-            ImplPoseExtractorCaffe(const PoseModel poseModel, const int gpuId,
-                                   const std::string& modelFolder, const bool enableGoogleLogging) :
+            ImplPoseExtractorCaffe(
+                const PoseModel poseModel, const int gpuId, const std::string& modelFolder,
+                const std::string& protoTxtPath, const std::string& caffeModelPath,
+                const bool enableGoogleLogging) :
                 mPoseModel{poseModel},
                 mGpuId{gpuId},
                 mModelFolder{modelFolder},
+                mProtoTxtPath{protoTxtPath},
+                mCaffeModelPath{caffeModelPath},
                 mEnableGoogleLogging{enableGoogleLogging},
                 spResizeAndMergeCaffe{std::make_shared<ResizeAndMergeCaffe<float>>()},
                 spNmsCaffe{std::make_shared<NmsCaffe<float>>()},
@@ -119,23 +125,24 @@ namespace op
             }
         }
 
-        void addCaffeNetOnThread(std::vector<std::shared_ptr<Net>>& net,
-                                 std::vector<boost::shared_ptr<caffe::Blob<float>>>& caffeNetOutputBlob,
-                                 const PoseModel poseModel, const int gpuId,
-                                 const std::string& modelFolder, const bool enableGoogleLogging)
+        void addCaffeNetOnThread(
+            std::vector<std::shared_ptr<Net>>& net,
+            std::vector<boost::shared_ptr<caffe::Blob<float>>>& caffeNetOutputBlob,
+            const PoseModel poseModel, const int gpuId, const std::string& modelFolder,
+            const std::string& protoTxtPath, const std::string& caffeModelPath, const bool enableGoogleLogging)
         {
             try
             {
                 // Add Caffe Net
                 net.emplace_back(
                     std::make_shared<NetCaffe>(
-                        modelFolder + getPoseProtoTxt(poseModel),
-                        modelFolder + getPoseTrainedModel(poseModel),
+                        modelFolder + (protoTxtPath.empty() ? getPoseProtoTxt(poseModel) : protoTxtPath),
+                        modelFolder + (caffeModelPath.empty() ? getPoseTrainedModel(poseModel) : caffeModelPath),
                         gpuId, enableGoogleLogging));
                 // net.emplace_back(
                 //     std::make_shared<NetOpenCv>(
-                //         modelFolder + getPoseProtoTxt(poseModel),
-                //         modelFolder + getPoseTrainedModel(poseModel),
+                //         modelFolder + (protoTxtPath.empty() ? getPoseProtoTxt(poseModel) : protoTxtPath),
+                //         modelFolder + (caffeModelPath.empty() ? getPoseTrainedModel(poseModel) : caffeModelPath),
                 //         gpuId));
                 // UNUSED(enableGoogleLogging);
                 // Initializing them on the thread
@@ -157,13 +164,15 @@ namespace op
         }
     #endif
 
-    PoseExtractorCaffe::PoseExtractorCaffe(const PoseModel poseModel, const std::string& modelFolder,
-                                           const int gpuId, const std::vector<HeatMapType>& heatMapTypes,
-                                           const ScaleMode heatMapScale, const bool addPartCandidates,
-                                           const bool maximizePositives, const bool enableGoogleLogging) :
+    PoseExtractorCaffe::PoseExtractorCaffe(
+        const PoseModel poseModel, const std::string& modelFolder, const int gpuId,
+        const std::vector<HeatMapType>& heatMapTypes, const ScaleMode heatMapScale, const bool addPartCandidates,
+        const bool maximizePositives, const std::string& protoTxtPath, const std::string& caffeModelPath,
+        const bool enableGoogleLogging) :
         PoseExtractorNet{poseModel, heatMapTypes, heatMapScale, addPartCandidates, maximizePositives}
         #ifdef USE_CAFFE
-        , upImpl{new ImplPoseExtractorCaffe{poseModel, gpuId, modelFolder, enableGoogleLogging}}
+        , upImpl{new ImplPoseExtractorCaffe{poseModel, gpuId, modelFolder, protoTxtPath, caffeModelPath,
+                 enableGoogleLogging}}
         #endif
     {
         try
@@ -201,8 +210,9 @@ namespace op
                 // Logging
                 log("Starting initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 // Initialize Caffe net
-                addCaffeNetOnThread(upImpl->spNets, upImpl->spCaffeNetOutputBlobs, upImpl->mPoseModel,
-                                    upImpl->mGpuId, upImpl->mModelFolder, upImpl->mEnableGoogleLogging);
+                addCaffeNetOnThread(
+                    upImpl->spNets, upImpl->spCaffeNetOutputBlobs, upImpl->mPoseModel, upImpl->mGpuId,
+                    upImpl->mModelFolder, upImpl->mProtoTxtPath, upImpl->mCaffeModelPath, upImpl->mEnableGoogleLogging);
                 #ifdef USE_CUDA
                     cudaCheck(__LINE__, __FUNCTION__, __FILE__);
                 #endif
@@ -245,8 +255,9 @@ namespace op
                 const auto numberScales = inputNetData.size();
                 upImpl->mNetInput4DSizes.resize(numberScales);
                 while (upImpl->spNets.size() < numberScales)
-                    addCaffeNetOnThread(upImpl->spNets, upImpl->spCaffeNetOutputBlobs, upImpl->mPoseModel,
-                                        upImpl->mGpuId, upImpl->mModelFolder, false);
+                    addCaffeNetOnThread(
+                        upImpl->spNets, upImpl->spCaffeNetOutputBlobs, upImpl->mPoseModel, upImpl->mGpuId,
+                        upImpl->mModelFolder, upImpl->mProtoTxtPath, upImpl->mCaffeModelPath, false);
 
                 // Process each image
                 for (auto i = 0u ; i < inputNetData.size(); i++)

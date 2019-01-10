@@ -10,7 +10,7 @@ namespace op
         const int defaultPartToRender_, const std::string& modelFolder_, const std::vector<HeatMapType>& heatMapTypes_,
         const ScaleMode heatMapScale_, const bool addPartCandidates_, const float renderThreshold_,
         const int numberPeopleMax_, const bool maximizePositives_, const double fpsMax_,
-        const bool enableGoogleLogging_) :
+        const std::string& protoTxtPath_, const std::string& caffeModelPath_, const bool enableGoogleLogging_) :
         enable{enable_},
         netInputSize{netInputSize_},
         outputSize{outputSize_},
@@ -33,6 +33,8 @@ namespace op
         numberPeopleMax{numberPeopleMax_},
         maximizePositives{maximizePositives_},
         fpsMax{fpsMax_},
+        protoTxtPath{protoTxtPath_},
+        caffeModelPath{caffeModelPath_},
         enableGoogleLogging{enableGoogleLogging_}
     {
     }
