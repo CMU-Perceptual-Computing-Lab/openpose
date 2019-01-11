@@ -13,3 +13,5 @@ else
 fi
 sudo apt-get -y install libatlas-base-dev
 sudo apt-get -y install libopencv-dev
+sudo pip3 install numpy
+sudo pip3 install opencv-python
