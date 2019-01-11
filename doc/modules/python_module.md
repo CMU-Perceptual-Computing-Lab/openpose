@@ -11,12 +11,12 @@ OpenPose Python Module and Demo
 
 
 ## Introduction
-This module exposes a Python API for OpenPose. It is effectively a wrapper that replicates most of the functionality of the `op::Wrapper` [class](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/include/openpose/wrapper/wrapper.hpp) and allows you to populate and retrieve data from the `op::Datum` [class](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/include/openpose/core/datum.hpp) using standard Python and Numpy constructs. 
+This module exposes a Python API for OpenPose. It is effectively a wrapper that replicates most of the functionality of the [op::Wrapper class](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/include/openpose/wrapper/wrapper.hpp) and allows you to populate and retrieve data from the [op::Datum class](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/include/openpose/core/datum.hpp) using standard Python and Numpy constructs.
 
 
 
 ## Compatibility
-The OpenPose Python module is compatible with both Python 2 and Python 3. In addition, it will also run in all OpenPose compatible operating systems. It uses [Pybind11](https://github.com/pybind/pybind11) for mapping between C++ and Python datatypes. 
+The OpenPose Python module is compatible with both Python 2 and Python 3. In addition, it will also run in all OpenPose compatible operating systems. It uses [Pybind11](https://github.com/pybind/pybind11) for mapping between C++ and Python datatypes.
 
 To compile, enable `BUILD_PYTHON` in cmake. Pybind selects the latest version of Python by default (Python 3). To use Python 2, change `PYTHON_EXECUTABLE` and `PYTHON_LIBRARY` flags in cmake to your desired python version.
 
@@ -28,14 +28,13 @@ Check [doc/installation.md#python-module](../installation.md#python-api) for ins
 The Python API requires Numpy for array management, and OpenCV for image loading. They can be installed via:
 
 ```
-pip install numpy
-pip install opencv-python
+pip install numpy opencv-python
 ```
 
 
 
 ## Testing
-Three examples can be found in `build/examples/tutorial_api_python` in your build folder. Navigate directly to this path to run examples.
+All the Python examples from the Tutorial API Python module can be found in `build/examples/tutorial_api_python` in your build folder. Navigate directly to this path to run examples.
 
 ```
 # From command line

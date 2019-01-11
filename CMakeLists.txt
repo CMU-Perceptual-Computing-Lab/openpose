@@ -912,19 +912,23 @@ download_model("hand" ${DOWNLOAD_HAND_MODEL} hand/pose_iter_102000.caffemodel
 
 message(STATUS "Models Downloaded.")
 
+
 ### PYTHON
-if (WIN32 AND BUILD_PYTHON)
-  execute_process(COMMAND cmd /c cd ${CMAKE_SOURCE_DIR} & git submodule update --init 3rdparty/pybind11/)
-  add_subdirectory(3rdparty/pybind11)
-  add_subdirectory(python)
-endif (WIN32 AND BUILD_PYTHON)
-if ((UNIX OR APPLE) AND BUILD_PYTHON)
-  if (Caffe_FOUND)
-    execute_process(COMMAND cd ${CMAKE_SOURCE_DIR} & git submodule update --init 3rdparty/pybind11/)
+if (BUILD_PYTHON)
+  if (WIN32)
+    execute_process(COMMAND cmd /c cd ${CMAKE_SOURCE_DIR} & git submodule update --init 3rdparty/pybind11/)
     add_subdirectory(3rdparty/pybind11)
     add_subdirectory(python)
-  endif (Caffe_FOUND)
-endif (UNIX OR APPLE)
+  elseif (UNIX OR APPLE)
+    if (Caffe_FOUND)
+      execute_process(COMMAND cd ${CMAKE_SOURCE_DIR} & git submodule update --init 3rdparty/pybind11/)
+      add_subdirectory(3rdparty/pybind11)
+      add_subdirectory(python)
+    endif (Caffe_FOUND)
+  else (WIN32)
+    message(FATAL_ERROR "Unknown OS.")
+  endif (WIN32)
+endif (BUILD_PYTHON)
 
 
 ### GENERATE DOCUMENTATION
