@@ -133,7 +133,8 @@ public:
         opWrapper->configure(wrapperStructOutput);
         // No GUI. Equivalent to: opWrapper.configure(op::WrapperStructGui{});
         // Set to single-thread (for sequential processing and/or debugging and/or reducing latency)
-        opWrapper->disableMultiThreading();
+        if (FLAGS_disable_multi_thread)
+            opWrapper->disableMultiThreading();
     }
 
     void start(){
@@ -142,6 +143,25 @@ public:
 
     void stop(){
         opWrapper->stop();
+    }
+
+    void exec(){
+        const auto cameraSize = op::flagsToPoint(FLAGS_camera_resolution, "-1x-1");
+        op::ProducerType producerType;
+        std::string producerString;
+        std::tie(producerType, producerString) = op::flagsToProducer(
+            FLAGS_image_dir, FLAGS_video, FLAGS_ip_camera, FLAGS_camera, FLAGS_flir_camera, FLAGS_flir_camera_index);
+        // Producer (use default to disable any input)
+        const op::WrapperStructInput wrapperStructInput{
+            producerType, producerString, FLAGS_frame_first, FLAGS_frame_step, FLAGS_frame_last,
+            FLAGS_process_real_time, FLAGS_frame_flip, FLAGS_frame_rotate, FLAGS_frames_repeat,
+            cameraSize, FLAGS_camera_parameter_path, FLAGS_frame_undistort, FLAGS_3d_views};
+        opWrapper->configure(wrapperStructInput);
+        // GUI (comment or use default argument to disable any visual output)
+        const op::WrapperStructGui wrapperStructGui{
+            op::flagsToDisplayMode(FLAGS_display, FLAGS_3d), !FLAGS_no_gui_verbose, FLAGS_fullscreen};
+        opWrapper->configure(wrapperStructGui);
+        opWrapper->exec();
     }
 
     void emplaceAndPop(std::vector<std::shared_ptr<op::Datum>>& l)
@@ -164,6 +184,7 @@ PYBIND11_MODULE(_openpose, m) {
         .def("configure", &WrapperPython::configure)
         .def("start", &WrapperPython::start)
         .def("stop", &WrapperPython::stop)
+        .def("exec", &WrapperPython::exec)
         .def("emplaceAndPop", &WrapperPython::emplaceAndPop)
         ;
 
