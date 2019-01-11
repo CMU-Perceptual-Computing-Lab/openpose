@@ -35,7 +35,7 @@ if (UNIX OR APPLE)
   endif (APPLE)
 
   if (BUILD_CAFFE)
-    add_dependencies(openpose_core openpose_caffe)
+    add_dependencies(openpose_core openpose)
   endif (BUILD_CAFFE)
 
   install(TARGETS openpose_core

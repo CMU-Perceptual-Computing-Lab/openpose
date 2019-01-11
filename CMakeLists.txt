@@ -700,7 +700,7 @@ if (UNIX OR APPLE)
 
       # One for Intel Branch and one for Master
       if (USE_MKL)
-        ExternalProject_Add(openpose_caffe
+        ExternalProject_Add(openpose
           SOURCE_DIR ${CAFFE_URL}
           PREFIX ${CAFFE_PREFIX}
           CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
@@ -720,7 +720,7 @@ if (UNIX OR APPLE)
           -DUSE_OPENCV=OFF)
           # -DOpenCV_DIR=${OpenCV_DIR})
       else (USE_MKL)
-        ExternalProject_Add(openpose_caffe
+        ExternalProject_Add(openpose
           SOURCE_DIR ${CAFFE_URL}
           PREFIX ${CAFFE_PREFIX}
           CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
@@ -739,10 +739,10 @@ if (UNIX OR APPLE)
           # -DOpenCV_DIR=${OpenCV_DIR})
       endif (USE_MKL)
 
-      ExternalProject_Get_Property(openpose_caffe install_dir)
+      ExternalProject_Get_Property(openpose install_dir)
 
       if (NOT Caffe_FOUND)
-        add_custom_command(TARGET openpose_caffe
+        add_custom_command(TARGET openpose
             POST_BUILD
             COMMAND ${CMAKE_COMMAND} ${CMAKE_SOURCE_DIR}
             COMMAND $(MAKE)

@@ -65,10 +65,11 @@ namespace op
                     }
                     // Sanity check
                     if ((int)mCameraParameterReader.getNumberCameras() != mNumberViews)
-                        error("Found different number of camera parameter files than the number indicated by"
+                        error("Found a different number of camera parameter files than the number indicated by"
                               " `--3d_views` ("
                               + std::to_string(mCameraParameterReader.getNumberCameras()) + " vs. "
-                              + std::to_string(mNumberViews) + "). Make sure they are the same number of files.",
+                              + std::to_string(mNumberViews) + "). Make sure they are the same number of files and/or"
+                              + " set `--frame_undistort` to false.",
                               __LINE__, __FUNCTION__, __FILE__);
                 }
             }

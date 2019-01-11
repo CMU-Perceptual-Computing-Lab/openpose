@@ -14,7 +14,7 @@ if [[ $RUN_EXAMPLES == true ]] ; then
   ./build/examples/openpose/openpose.bin --net_resolution -1x32 --image_dir examples/media/ --write_json output/ --display 0 --render_pose 0
   echo " "
 
-  echo "Tutorial Add Moduel: Example 1..."
+  echo "Tutorial Add Module: Example 1..."
   ./build/examples/tutorial_add_module/1_custom_post_processing.bin --net_resolution -1x32 --image_dir examples/media/ --write_json output/ --display 0 --render_pose 0
   echo " "
 
