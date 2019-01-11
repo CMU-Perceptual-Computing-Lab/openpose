@@ -52,15 +52,12 @@ class WrapperPython{
 public:
     std::unique_ptr<op::Wrapper> opWrapper;
 
-    WrapperPython(py::dict params = py::dict())
+    WrapperPython(int mode = 0)
     {
         op::log("Starting OpenPose Python Wrapper...", op::Priority::High);
 
         // Construct opWrapper
-        opWrapper = std::unique_ptr<op::Wrapper>(new op::Wrapper(op::ThreadManagerMode::Asynchronous));
-
-        // Configure
-        if(params.size()) configure(params);
+        opWrapper = std::unique_ptr<op::Wrapper>(new op::Wrapper(static_cast<op::ThreadManagerMode>(mode)));
     }
 
     void configure(py::dict params = py::dict())
@@ -180,7 +177,7 @@ PYBIND11_MODULE(_openpose, m) {
     // OpenposePython
     py::class_<WrapperPython>(m, "WrapperPython")
         .def(py::init<>())
-        .def(py::init<py::dict>())
+        .def(py::init<int>())
         .def("configure", &WrapperPython::configure)
         .def("start", &WrapperPython::start)
         .def("stop", &WrapperPython::stop)

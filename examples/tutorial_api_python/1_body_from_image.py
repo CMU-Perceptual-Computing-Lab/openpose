@@ -34,9 +34,16 @@ params = dict()
 params["model_folder"] = "../../../models/"
 
 # Add others in path?
-for i in range(0,len(args[1]),2):
-    key = args[1][i].replace('-','')
-    if key not in params: params[args[1][i].replace('-','')] = args[1][i+1]
+for i in range(0, len(args[1])):
+    curr_item = args[1][i]
+    if i != len(args[1])-1: next_item = args[1][i+1]
+    else: next_item = "1"
+    if "--" in curr_item and "--" in next_item:
+        key = curr_item.replace('-','')
+        if key not in params:  params[key] = "1"
+    elif "--" in curr_item and "--" not in next_item:
+        key = curr_item.replace('-','')
+        if key not in params: params[key] = next_item
 
 # Construct it from system arguments
 # op.init_argv(args[1])
