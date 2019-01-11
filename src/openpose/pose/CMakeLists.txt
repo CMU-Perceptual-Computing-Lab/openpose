@@ -1,4 +1,4 @@
-set(SOURCES_OP_POSE 
+set(SOURCES_OP_POSE
     defineTemplates.cpp
     poseCpuRenderer.cpp
     poseExtractor.cpp

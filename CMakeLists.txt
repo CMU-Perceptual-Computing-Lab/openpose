@@ -273,7 +273,7 @@ if (WIN32)
 endif (WIN32)
 
 # Unity
-# option(BUILD_UNITY_SUPPORT "Build OpenPose as a Unity plugin." OFF)
+option(BUILD_UNITY_SUPPORT "Build OpenPose as a Unity plugin." OFF)
 
 # Build as shared library
 option(BUILD_SHARED_LIBS "Build as shared lib." ON)
