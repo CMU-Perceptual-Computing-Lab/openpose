@@ -37,6 +37,9 @@
 // tracking module
 #include <openpose/tracking/headers.hpp>
 
+// unity module
+#include <openpose/unity/headers.hpp>
+
 // utilities module
 #include <openpose/utilities/headers.hpp>
 
