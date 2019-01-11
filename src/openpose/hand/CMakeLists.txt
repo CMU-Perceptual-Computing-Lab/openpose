@@ -25,7 +25,7 @@ if (UNIX OR APPLE)
   target_link_libraries(openpose_hand openpose_core)
   
   if (BUILD_CAFFE)
-    add_dependencies(openpose_hand openpose_caffe)
+    add_dependencies(openpose_hand openpose)
   endif (BUILD_CAFFE)
 
   install(TARGETS openpose_hand

@@ -13,7 +13,7 @@ foreach(EXAMPLE_FILE ${EXAMPLE_FILES})
 
   message(STATUS "Adding Example ${EXE_NAME}")
   add_executable(${EXE_NAME} ${EXAMPLE_FILE})
-  target_link_libraries(${EXE_NAME} openpose ${examples_3rdparty_libraries})
+  target_link_libraries(${EXE_NAME} openpose_src ${examples_3rdparty_libraries})
 
   if (WIN32)
     set_property(TARGET ${EXE_NAME} PROPERTY FOLDER "Examples")
