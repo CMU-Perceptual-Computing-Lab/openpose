@@ -181,7 +181,7 @@ PYBIND11_MODULE(_openpose, m) {
         .def("configure", &WrapperPython::configure)
         .def("start", &WrapperPython::start)
         .def("stop", &WrapperPython::stop)
-        .def("exec", &WrapperPython::exec)
+        .def("execute", &WrapperPython::exec)
         .def("emplaceAndPop", &WrapperPython::emplaceAndPop)
         ;
 

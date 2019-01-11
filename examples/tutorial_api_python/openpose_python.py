@@ -52,4 +52,4 @@ for i in range(0, len(args[1])):
 # Starting OpenPose
 opWrapper = op.WrapperPython(3)
 opWrapper.configure(params)
-opWrapper.exec()
+opWrapper.execute()
