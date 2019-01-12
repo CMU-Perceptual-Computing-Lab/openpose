@@ -15,7 +15,7 @@ fi
 
 echo "WITH_PYTHON = ${WITH_PYTHON}."
 if [[ $WITH_PYTHON == true ]] ; then
-  ARGS="$ARGS -DBUILD_PYTHON=On"
+  ARGS="$ARGS -DBUILD_PYTHON=On -DPYTHON_EXECUTABLE=/usr/bin/python2.7 -DPYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython2.7m.so"
 fi
 
 # CUDA version
@@ -50,3 +50,8 @@ fi
 echo "ARGS = ${ARGS}."
 
 cmake .. $ARGS
+
+# Run Cmake twice for pybind to register
+if [[ $WITH_PYTHON == true ]] ; then
+  cmake .. $ARGS
+fi

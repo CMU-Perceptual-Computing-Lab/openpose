@@ -1,1 +1,1 @@
-from openpose import *
+from . import _openpose as openpose

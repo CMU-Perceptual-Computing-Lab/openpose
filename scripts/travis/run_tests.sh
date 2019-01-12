@@ -39,7 +39,7 @@ if [[ $RUN_EXAMPLES == true ]] ; then
   # Python examples
   if [[ $WITH_PYTHON == true ]] ; then
     echo "Python API C++: Example 1..."
-    echo "TODO: Add Python examples in here..."
+    cd build/examples/tutorial_api_python; python openpose_python.py --net_resolution -1x32 --image_dir ../../../examples/media/ --write_json output/ --display 0 --render_pose 0
     echo " "
   fi
 

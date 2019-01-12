@@ -13,6 +13,8 @@ sudo apt-get --assume-yes install libgflags-dev libgoogle-glog-dev liblmdb-dev
 # Python libs
 sudo apt-get install python-setuptools python-dev build-essential
 sudo easy_install pip
-sudo -H pip install --upgrade numpy protobuf
+sudo -H pip install --upgrade numpy protobuf opencv-python
+sudo apt-get --assume-yes install python3-pip
+sudo -H pip3 install --upgrade numpy protobuf opencv-python
 # OpenCV 2.4 -> Added as option
 # sudo apt-get --assume-yes install libopencv-dev

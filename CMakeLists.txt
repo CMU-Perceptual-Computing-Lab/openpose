@@ -639,7 +639,7 @@ if (UNIX OR APPLE)
       file(GLOB CAFFE_DIR_VALID ${CMAKE_SOURCE_DIR}/3rdparty/caffe/*)
       list(LENGTH CAFFE_DIR_VALID CAFFE_DIR_VALID_LENGTH)
       if (CAFFE_DIR_VALID_LENGTH EQUAL 0)
-        execute_process(COMMAND git submodule update --init --recursive)
+        execute_process(COMMAND git submodule update --init ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
       else (CAFFE_DIR_VALID_LENGTH EQUAL 0)
         message(STATUS "Caffe has already been downloaded.")
       endif (CAFFE_DIR_VALID_LENGTH EQUAL 0)
@@ -713,7 +713,7 @@ if (UNIX OR APPLE)
           -DCPU_ONLY=${CAFFE_CPU_ONLY}
           -DCMAKE_BUILD_TYPE=Release
           -DBUILD_docs=OFF
-          -DBUILD_python=${BUILD_PYTHON}
+          -DBUILD_python=OFF
           -DBUILD_python_layer=OFF
           -DUSE_LEVELDB=OFF
           -DUSE_LMDB=OFF
@@ -731,7 +731,7 @@ if (UNIX OR APPLE)
           -DCPU_ONLY=${CAFFE_CPU_ONLY}
           -DCMAKE_BUILD_TYPE=Release
           -DBUILD_docs=OFF
-          -DBUILD_python=${BUILD_PYTHON}
+          -DBUILD_python=OFF
           -DBUILD_python_layer=OFF
           -DUSE_LEVELDB=OFF
           -DUSE_LMDB=OFF
@@ -912,12 +912,24 @@ download_model("hand" ${DOWNLOAD_HAND_MODEL} hand/pose_iter_102000.caffemodel
 
 message(STATUS "Models Downloaded.")
 
+
 ### PYTHON
-if (Caffe_FOUND)
-  if(BUILD_PYTHON)
+if (BUILD_PYTHON)
+  if (WIN32)
+    execute_process(COMMAND cmd /c cd ${CMAKE_SOURCE_DIR} & git submodule update --init 3rdparty/pybind11/)
+    add_subdirectory(3rdparty/pybind11)
     add_subdirectory(python)
-  endif (BUILD_PYTHON)
-endif(Caffe_FOUND)
+  elseif (UNIX OR APPLE)
+    if (Caffe_FOUND)
+      execute_process(COMMAND git submodule update --init ${CMAKE_SOURCE_DIR}/3rdparty/pybind11/)
+      add_subdirectory(3rdparty/pybind11)
+      add_subdirectory(python)
+    endif (Caffe_FOUND)
+  else (WIN32)
+    message(FATAL_ERROR "Unknown OS.")
+  endif (WIN32)
+endif (BUILD_PYTHON)
+
 
 ### GENERATE DOCUMENTATION
 if (UNIX OR APPLE)

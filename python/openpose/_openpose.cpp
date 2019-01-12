@@ -2,24 +2,15 @@
 #define OPENPOSE_PYTHON_HPP
 #define BOOST_DATE_TIME_NO_LIB
 
-// OpenPose dependencies
-#include <openpose/core/headers.hpp>
-#include <openpose/filestream/headers.hpp>
-#include <openpose/gui/headers.hpp>
-#include <openpose/pose/headers.hpp>
-#include <openpose/utilities/headers.hpp>
-#include <caffe/caffe.hpp>
-#include <stdlib.h>
+#include <openpose/flags.hpp>
+#include <openpose/headers.hpp>
+#include <openpose/wrapper/headers.hpp>
 
-#include <openpose/net/bodyPartConnectorCaffe.hpp>
-#include <openpose/net/nmsCaffe.hpp>
-#include <openpose/net/resizeAndMergeCaffe.hpp>
-#include <openpose/pose/poseParameters.hpp>
-#include <openpose/pose/enumClasses.hpp>
-#include <openpose/pose/poseExtractor.hpp>
-#include <openpose/gpu/cuda.hpp>
-#include <openpose/gpu/opencl.hcl>
-#include <openpose/core/macros.hpp>
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+#include <pybind11/numpy.h>
+#include <opencv2/core/core.hpp>
+#include <stdexcept>
 
 #ifdef _WIN32
     #define OP_EXPORT __declspec(dllexport)
@@ -27,328 +18,391 @@
     #define OP_EXPORT
 #endif
 
-#define default_logging_level 3
-#define default_output_resolution "-1x-1"
-#define default_net_resolution "-1x368"
-#define default_model_pose "COCO"
-#define default_alpha_pose 0.6
-#define default_scale_gap 0.25
-#define default_scale_number 1
-#define default_render_threshold 0.05
-#define default_num_gpu_start 0
-#define default_disable_blending false
-#define default_model_folder "models/"
+namespace op{
 
-// Todo, have GPU Number, handle, OpenCL/CPU Cases
-OP_API class OpenPose {
+namespace py = pybind11;
+
+void parse_gflags(const std::vector<std::string>& argv)
+{
+    std::vector<char*> argv_vec;
+    for(auto& arg : argv) argv_vec.emplace_back((char*)arg.c_str());
+    char** cast = &argv_vec[0];
+    int size = argv_vec.size();
+    gflags::ParseCommandLineFlags(&size, &cast, true);
+}
+
+void init_int(py::dict d)
+{
+    std::vector<std::string> argv;
+    argv.emplace_back("openpose.py");
+    for (auto item : d){
+        argv.emplace_back("--" + std::string(py::str(item.first)));
+        argv.emplace_back(py::str(item.second));
+    }
+    parse_gflags(argv);
+}
+
+void init_argv(std::vector<std::string> argv)
+{
+    argv.insert(argv.begin(), "openpose.py");
+    parse_gflags(argv);
+}
+
+class WrapperPython{
 public:
-    std::unique_ptr<op::PoseExtractorCaffe> poseExtractorCaffe;
-    std::unique_ptr<op::PoseCpuRenderer> poseRenderer;
-    std::unique_ptr<op::FrameDisplayer> frameDisplayer;
-    std::unique_ptr<op::ScaleAndSizeExtractor> scaleAndSizeExtractor;
+    std::unique_ptr<op::Wrapper> opWrapper;
 
-    std::unique_ptr<op::ResizeAndMergeCaffe<float>> resizeAndMergeCaffe;
-    std::unique_ptr<op::NmsCaffe<float>> nmsCaffe;
-    std::unique_ptr<op::BodyPartConnectorCaffe<float>> bodyPartConnectorCaffe;
-    std::shared_ptr<caffe::Blob<float>> heatMapsBlob;
-    std::shared_ptr<caffe::Blob<float>> peaksBlob;
-    op::Array<float> mPoseKeypoints;
-    op::Array<float> mPoseScores;
-    op::PoseModel poseModel;
-    int mGpuID;
+    WrapperPython(int mode = 0)
+    {
+        op::log("Starting OpenPose Python Wrapper...", op::Priority::High);
 
-    OpenPose(int FLAGS_logging_level = default_logging_level,
-        std::string FLAGS_output_resolution = default_output_resolution,
-        std::string FLAGS_net_resolution = default_net_resolution,
-        std::string FLAGS_model_pose = default_model_pose,
-        float FLAGS_alpha_pose = default_alpha_pose,
-        float FLAGS_scale_gap = default_scale_gap,
-        int FLAGS_scale_number = default_scale_number,
-        float FLAGS_render_threshold = default_render_threshold,
-        int FLAGS_num_gpu_start = default_num_gpu_start,
-        int FLAGS_disable_blending = default_disable_blending,
-        std::string FLAGS_model_folder = default_model_folder
-    ) {
-        mGpuID = FLAGS_num_gpu_start;
-#ifdef USE_CUDA
-        caffe::Caffe::set_mode(caffe::Caffe::GPU);
-        caffe::Caffe::SetDevice(mGpuID);
-#elif defined USE_OPENCL
-        caffe::Caffe::set_mode(caffe::Caffe::GPU);
-        std::vector<int> devices;
-        const int maxNumberGpu = op::OpenCL::getTotalGPU();
-        for (auto i = 0; i < maxNumberGpu; i++)
-            devices.emplace_back(i);
-        caffe::Caffe::SetDevices(devices);
-        caffe::Caffe::SelectDevice(mGpuID, true);
-        op::OpenCL::getInstance(mGpuID, CL_DEVICE_TYPE_GPU, true);
-#else
-        caffe::Caffe::set_mode(caffe::Caffe::CPU);
-#endif
-        op::log("OpenPose Library Python Wrapper", op::Priority::High);
-        // ------------------------- INITIALIZATION -------------------------
-        // Step 1 - Set logging level
-        // - 0 will output all the logging messages
-        // - 255 will output nothing
+        // Construct opWrapper
+        opWrapper = std::unique_ptr<op::Wrapper>(new op::Wrapper(static_cast<op::ThreadManagerMode>(mode)));
+    }
+
+    void configure(py::dict params = py::dict())
+    {
+        if(params.size()) init_int(params);
+
+        // logging_level
+        op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.",
+                  __LINE__, __FUNCTION__, __FILE__);
         op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
-        op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-        // Step 2 - Read GFlags (user defined configuration)
+        op::Profiler::setDefaultX(FLAGS_profile_speed);
+
+        // Applying user defined configuration - GFlags to program variables
         // outputSize
         const auto outputSize = op::flagsToPoint(FLAGS_output_resolution, "-1x-1");
         // netInputSize
         const auto netInputSize = op::flagsToPoint(FLAGS_net_resolution, "-1x368");
+        // faceNetInputSize
+        const auto faceNetInputSize = op::flagsToPoint(FLAGS_face_net_resolution, "368x368 (multiples of 16)");
+        // handNetInputSize
+        const auto handNetInputSize = op::flagsToPoint(FLAGS_hand_net_resolution, "368x368 (multiples of 16)");
         // poseModel
-        poseModel = op::flagsToPoseModel(FLAGS_model_pose);
-        // Check no contradictory flags enabled
-        if (FLAGS_alpha_pose < 0. || FLAGS_alpha_pose > 1.)
-            op::error("Alpha value for blending must be in the range [0,1].", __LINE__, __FUNCTION__, __FILE__);
-        if (FLAGS_scale_gap <= 0. && FLAGS_scale_number > 1)
-            op::error("Incompatible flag configuration: scale_gap must be greater than 0 or scale_number = 1.",
-                __LINE__, __FUNCTION__, __FILE__);
-        // Step 3 - Initialize all required classes
-        scaleAndSizeExtractor = std::unique_ptr<op::ScaleAndSizeExtractor>(new op::ScaleAndSizeExtractor(netInputSize, outputSize, FLAGS_scale_number, FLAGS_scale_gap));
+        const auto poseModel = op::flagsToPoseModel(FLAGS_model_pose);
+        // JSON saving
+        if (!FLAGS_write_keypoint.empty())
+            op::log("Flag `write_keypoint` is deprecated and will eventually be removed."
+                    " Please, use `write_json` instead.", op::Priority::Max);
+        // keypointScale
+        const auto keypointScale = op::flagsToScaleMode(FLAGS_keypoint_scale);
+        // heatmaps to add
+        const auto heatMapTypes = op::flagsToHeatMaps(FLAGS_heatmaps_add_parts, FLAGS_heatmaps_add_bkg,
+                                                      FLAGS_heatmaps_add_PAFs);
+        const auto heatMapScale = op::flagsToHeatMapScaleMode(FLAGS_heatmaps_scale);
+        // >1 camera view?
+        const auto multipleView = (FLAGS_3d || FLAGS_3d_views > 1);
+        // Enabling Google Logging
+        const bool enableGoogleLogging = true;
 
-        poseExtractorCaffe = std::unique_ptr<op::PoseExtractorCaffe>(new op::PoseExtractorCaffe{ poseModel, FLAGS_model_folder, FLAGS_num_gpu_start });
-
-        poseRenderer = std::unique_ptr<op::PoseCpuRenderer>(new op::PoseCpuRenderer{ poseModel, (float)FLAGS_render_threshold, !FLAGS_disable_blending,
-            (float)FLAGS_alpha_pose });
-        frameDisplayer = std::unique_ptr<op::FrameDisplayer>(new op::FrameDisplayer{ "OpenPose Tutorial - Example 1", outputSize });
-
-        // Custom
-        resizeAndMergeCaffe = std::unique_ptr<op::ResizeAndMergeCaffe<float>>(new op::ResizeAndMergeCaffe<float>{});
-        nmsCaffe = std::unique_ptr<op::NmsCaffe<float>>(new op::NmsCaffe<float>{});
-        bodyPartConnectorCaffe = std::unique_ptr<op::BodyPartConnectorCaffe<float>>(new op::BodyPartConnectorCaffe<float>{});
-        heatMapsBlob = { std::make_shared<caffe::Blob<float>>(1,1,1,1) };
-        peaksBlob = { std::make_shared<caffe::Blob<float>>(1,1,1,1) };
-        bodyPartConnectorCaffe->setPoseModel(poseModel);
-
-        // Step 4 - Initialize resources on desired thread (in this case single thread, i.e., we init resources here)
-        poseExtractorCaffe->initializationOnThread();
-        poseRenderer->initializationOnThread();
+        // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
+        const op::WrapperStructPose wrapperStructPose{
+            !FLAGS_body_disable, netInputSize, outputSize, keypointScale, FLAGS_num_gpu, FLAGS_num_gpu_start,
+            FLAGS_scale_number, (float)FLAGS_scale_gap, op::flagsToRenderMode(FLAGS_render_pose, multipleView),
+            poseModel, !FLAGS_disable_blending, (float)FLAGS_alpha_pose, (float)FLAGS_alpha_heatmap,
+            FLAGS_part_to_show, FLAGS_model_folder, heatMapTypes, heatMapScale, FLAGS_part_candidates,
+            (float)FLAGS_render_threshold, FLAGS_number_people_max, FLAGS_maximize_positives, FLAGS_fps_max,
+            FLAGS_prototxt_path, FLAGS_caffemodel_path, enableGoogleLogging};
+        opWrapper->configure(wrapperStructPose);
+        // Face configuration (use op::WrapperStructFace{} to disable it)
+        const op::WrapperStructFace wrapperStructFace{
+            FLAGS_face, faceNetInputSize, op::flagsToRenderMode(FLAGS_face_render, multipleView, FLAGS_render_pose),
+            (float)FLAGS_face_alpha_pose, (float)FLAGS_face_alpha_heatmap, (float)FLAGS_face_render_threshold};
+        opWrapper->configure(wrapperStructFace);
+        // Hand configuration (use op::WrapperStructHand{} to disable it)
+        const op::WrapperStructHand wrapperStructHand{
+            FLAGS_hand, handNetInputSize, FLAGS_hand_scale_number, (float)FLAGS_hand_scale_range, FLAGS_hand_tracking,
+            op::flagsToRenderMode(FLAGS_hand_render, multipleView, FLAGS_render_pose), (float)FLAGS_hand_alpha_pose,
+            (float)FLAGS_hand_alpha_heatmap, (float)FLAGS_hand_render_threshold};
+        opWrapper->configure(wrapperStructHand);
+        // Extra functionality configuration (use op::WrapperStructExtra{} to disable it)
+        const op::WrapperStructExtra wrapperStructExtra{
+            FLAGS_3d, FLAGS_3d_min_views, FLAGS_identification, FLAGS_tracking, FLAGS_ik_threads};
+        opWrapper->configure(wrapperStructExtra);
+        // Output (comment or use default argument to disable any output)
+        const op::WrapperStructOutput wrapperStructOutput{
+            FLAGS_cli_verbose, FLAGS_write_keypoint, op::stringToDataFormat(FLAGS_write_keypoint_format),
+            FLAGS_write_json, FLAGS_write_coco_json, FLAGS_write_coco_foot_json, FLAGS_write_coco_json_variant,
+            FLAGS_write_images, FLAGS_write_images_format, FLAGS_write_video, FLAGS_write_video_fps,
+            FLAGS_write_heatmaps, FLAGS_write_heatmaps_format, FLAGS_write_video_3d, FLAGS_write_video_adam,
+            FLAGS_write_bvh, FLAGS_udp_host, FLAGS_udp_port};
+        opWrapper->configure(wrapperStructOutput);
+        // No GUI. Equivalent to: opWrapper.configure(op::WrapperStructGui{});
+        // Set to single-thread (for sequential processing and/or debugging and/or reducing latency)
+        if (FLAGS_disable_multi_thread)
+            opWrapper->disableMultiThreading();
     }
 
-    std::vector<caffe::Blob<float>*> caffeNetSharedToPtr(
-        std::vector<boost::shared_ptr<caffe::Blob<float>>>& caffeNetOutputBlob)
+    void start(){
+        opWrapper->start();
+    }
+
+    void stop(){
+        opWrapper->stop();
+    }
+
+    void exec(){
+        const auto cameraSize = op::flagsToPoint(FLAGS_camera_resolution, "-1x-1");
+        op::ProducerType producerType;
+        std::string producerString;
+        std::tie(producerType, producerString) = op::flagsToProducer(
+            FLAGS_image_dir, FLAGS_video, FLAGS_ip_camera, FLAGS_camera, FLAGS_flir_camera, FLAGS_flir_camera_index);
+        // Producer (use default to disable any input)
+        const op::WrapperStructInput wrapperStructInput{
+            producerType, producerString, FLAGS_frame_first, FLAGS_frame_step, FLAGS_frame_last,
+            FLAGS_process_real_time, FLAGS_frame_flip, FLAGS_frame_rotate, FLAGS_frames_repeat,
+            cameraSize, FLAGS_camera_parameter_path, FLAGS_frame_undistort, FLAGS_3d_views};
+        opWrapper->configure(wrapperStructInput);
+        // GUI (comment or use default argument to disable any visual output)
+        const op::WrapperStructGui wrapperStructGui{
+            op::flagsToDisplayMode(FLAGS_display, FLAGS_3d), !FLAGS_no_gui_verbose, FLAGS_fullscreen};
+        opWrapper->configure(wrapperStructGui);
+        opWrapper->exec();
+    }
+
+    void emplaceAndPop(std::vector<std::shared_ptr<op::Datum>>& l)
     {
-        try
-        {
-            // Prepare spCaffeNetOutputBlobss
-            std::vector<caffe::Blob<float>*> caffeNetOutputBlobs(caffeNetOutputBlob.size());
-            for (auto i = 0u; i < caffeNetOutputBlobs.size(); i++)
-                caffeNetOutputBlobs[i] = caffeNetOutputBlob[i].get();
-            return caffeNetOutputBlobs;
-        }
-        catch (const std::exception& e)
-        {
-            op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return{};
-        }
-    }
-
-    void forward(const cv::Mat& inputImage, op::Array<float>& poseKeypoints, cv::Mat& displayImage, bool display = false) {
-        op::OpOutputToCvMat opOutputToCvMat;
-        op::CvMatToOpInput cvMatToOpInput;
-        op::CvMatToOpOutput cvMatToOpOutput;
-        if (inputImage.empty())
-            op::error("Could not open or find the image: ", __LINE__, __FUNCTION__, __FILE__);
-        const op::Point<int> imageSize{ inputImage.cols, inputImage.rows };
-        // Step 2 - Get desired scale sizes
-        std::vector<double> scaleInputToNetInputs;
-        std::vector<op::Point<int>> netInputSizes;
-        double scaleInputToOutput;
-        op::Point<int> outputResolution;
-        std::tie(scaleInputToNetInputs, netInputSizes, scaleInputToOutput, outputResolution)
-            = scaleAndSizeExtractor->extract(imageSize);
-        // Step 3 - Format input image to OpenPose input and output formats
-        const auto netInputArray = cvMatToOpInput.createArray(inputImage, scaleInputToNetInputs, netInputSizes);
-
-        // Step 4 - Estimate poseKeypoints
-        poseExtractorCaffe->forwardPass(netInputArray, imageSize, scaleInputToNetInputs);
-        poseKeypoints = poseExtractorCaffe->getPoseKeypoints();
-
-        if (display) {
-            auto outputArray = cvMatToOpOutput.createArray(inputImage, scaleInputToOutput, outputResolution);
-            // Step 5 - Render poseKeypoints
-            poseRenderer->renderPose(outputArray, poseKeypoints, scaleInputToOutput);
-            // Step 6 - OpenPose output format to cv::Mat
-            displayImage = opOutputToCvMat.formatToCvMat(outputArray);
-        }
-    }
-
-    void poseFromHeatmap(const cv::Mat& inputImage, std::vector<boost::shared_ptr<caffe::Blob<float>>>& caffeNetOutputBlob, op::Array<float>& poseKeypoints, cv::Mat& displayImage, std::vector<op::Point<int>>& imageSizes) {
-        // Get Scale
-        const op::Point<int> inputDataSize{ inputImage.cols, inputImage.rows };
-
-        // Convert to Ptr
-        //std::vector<boost::shared_ptr<caffe::Blob<float>>> a;
-        //caffeNetOutputBlob.emplace_back(caffeHmPtr);
-        const auto caffeNetOutputBlobs = caffeNetSharedToPtr(caffeNetOutputBlob);
-
-        // To be called once only
-        resizeAndMergeCaffe->Reshape(caffeNetOutputBlobs, { heatMapsBlob.get() },
-            op::getPoseNetDecreaseFactor(poseModel), 1.f / 1.f, true,
-            0);
-        nmsCaffe->Reshape({ heatMapsBlob.get() }, { peaksBlob.get() }, op::getPoseMaxPeaks(),
-            op::getPoseNumberBodyParts(poseModel), 0);
-        bodyPartConnectorCaffe->Reshape({ heatMapsBlob.get(), peaksBlob.get() });
-
-        // Normal
-        op::OpOutputToCvMat opOutputToCvMat;
-        op::CvMatToOpInput cvMatToOpInput;
-        op::CvMatToOpOutput cvMatToOpOutput;
-        if (inputImage.empty())
-            op::error("Could not open or find the image: ", __LINE__, __FUNCTION__, __FILE__);
-        const op::Point<int> imageSize{ inputImage.cols, inputImage.rows };
-        // Step 2 - Get desired scale sizes
-        std::vector<double> scaleInputToNetInputs;
-        std::vector<op::Point<int>> netInputSizes;
-        double scaleInputToOutput;
-        op::Point<int> outputResolution;
-
-        std::tie(scaleInputToNetInputs, netInputSizes, scaleInputToOutput, outputResolution)
-            = scaleAndSizeExtractor->extract(imageSize);
-
-        const auto netInputArray = cvMatToOpInput.createArray(inputImage, scaleInputToNetInputs, netInputSizes);
-
-        // Run the modes
-        const std::vector<float> floatScaleRatios(scaleInputToNetInputs.begin(), scaleInputToNetInputs.end());
-        resizeAndMergeCaffe->setScaleRatios(floatScaleRatios);
-        std::vector<caffe::Blob<float>*> heatMapsBlobs{ heatMapsBlob.get() };
-        std::vector<caffe::Blob<float>*> peaksBlobs{ peaksBlob.get() };
-#ifdef USE_CUDA
-        resizeAndMergeCaffe->Forward_gpu(caffeNetOutputBlobs, heatMapsBlobs); // ~5ms
-#elif defined USE_OPENCL
-        resizeAndMergeCaffe->Forward_ocl(caffeNetOutputBlobs, heatMapsBlobs); // ~5ms
-#else
-        resizeAndMergeCaffe->Forward_cpu(caffeNetOutputBlobs, heatMapsBlobs); // ~5ms
-#endif
-
-        nmsCaffe->setThreshold((float)poseExtractorCaffe->get(op::PoseProperty::NMSThreshold));
-#ifdef USE_CUDA
-        nmsCaffe->Forward_gpu(heatMapsBlobs, peaksBlobs);// ~2ms
-#elif defined USE_OPENCL
-        nmsCaffe->Forward_ocl(heatMapsBlobs, peaksBlobs);// ~2ms
-#else
-        nmsCaffe->Forward_cpu(heatMapsBlobs, peaksBlobs);// ~2ms
-#endif
-        op::cudaCheck(__LINE__, __FUNCTION__, __FILE__);
-
-        float mScaleNetToOutput = 1. / scaleInputToNetInputs[0];
-        bodyPartConnectorCaffe->setScaleNetToOutput(mScaleNetToOutput);
-        bodyPartConnectorCaffe->setInterMinAboveThreshold(
-            (float)poseExtractorCaffe->get(op::PoseProperty::ConnectInterMinAboveThreshold)
-        );
-        bodyPartConnectorCaffe->setInterThreshold((float)poseExtractorCaffe->get(op::PoseProperty::ConnectInterThreshold));
-        bodyPartConnectorCaffe->setMinSubsetCnt((int)poseExtractorCaffe->get(op::PoseProperty::ConnectMinSubsetCnt));
-        bodyPartConnectorCaffe->setMinSubsetScore((float)poseExtractorCaffe->get(op::PoseProperty::ConnectMinSubsetScore));
-
-#ifdef USE_CUDA
-        bodyPartConnectorCaffe->Forward_gpu({ heatMapsBlob.get(),
-            peaksBlob.get() },
-            mPoseKeypoints, mPoseScores);
-#else
-        bodyPartConnectorCaffe->Forward_cpu({ heatMapsBlob.get(),
-            peaksBlob.get() },
-            mPoseKeypoints, mPoseScores);
-#endif
-        poseKeypoints = mPoseKeypoints;
-
-        auto outputArray = cvMatToOpOutput.createArray(inputImage, scaleInputToOutput, outputResolution);
-        // Step 5 - Render poseKeypoints
-        poseRenderer->renderPose(outputArray, mPoseKeypoints, scaleInputToOutput);
-        // Step 6 - OpenPose output format to cv::Mat
-        displayImage = opOutputToCvMat.formatToCvMat(outputArray);
+        auto datumsPtr = std::make_shared<std::vector<std::shared_ptr<op::Datum>>>(l);
+        opWrapper->emplaceAndPop(datumsPtr);
     }
 };
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+PYBIND11_MODULE(_openpose, m) {
 
-    typedef void* c_OP;
-    op::Array<float> output;
+    // Functions for Init Params
+    m.def("init_int", &init_int, "Init Function");
+    m.def("init_argv", &init_argv, "Init Function");
 
-    OP_EXPORT c_OP newOP(int logging_level,
-        char* output_resolution,
-        char* net_resolution,
-        char* model_pose,
-        float alpha_pose,
-        float scale_gap,
-        int scale_number,
-        float render_threshold,
-        int num_gpu_start,
-        bool disable_blending,
-        char* model_folder
-    ) {
-        return new OpenPose(logging_level, output_resolution, net_resolution, model_pose, alpha_pose,
-            scale_gap, scale_number, render_threshold, num_gpu_start, disable_blending, model_folder);
-    }
-    OP_EXPORT void delOP(c_OP op) {
-        delete (OpenPose *)op;
-    }
-    OP_EXPORT void forward(c_OP op, unsigned char* img, size_t rows, size_t cols, int* size, unsigned char* displayImg, bool display) {
-        OpenPose* openPose = (OpenPose*)op;
-        cv::Mat image(rows, cols, CV_8UC3, img);
-        cv::Mat displayImage(rows, cols, CV_8UC3, displayImg);
-        openPose->forward(image, output, displayImage, display);
-        if (output.getSize().size()) {
-            size[0] = output.getSize()[0];
-            size[1] = output.getSize()[1];
-            size[2] = output.getSize()[2];
-        }
-        else {
-            size[0] = 0; size[1] = 0; size[2] = 0;
-        }
-        if (display) memcpy(displayImg, displayImage.ptr(), sizeof(unsigned char)*rows*cols * 3);
-    }
-    OP_EXPORT void getOutputs(c_OP op, float* array) {
-        if (output.getSize().size())
-            memcpy(array, output.getPtr(), output.getSize()[0] * output.getSize()[1] * output.getSize()[2] * sizeof(float));
-    }
-    OP_EXPORT void poseFromHeatmap(c_OP op, unsigned char* img, size_t rows, size_t cols, unsigned char* displayImg, float* hm, int* size, float* ratios) {
-        OpenPose* openPose = (OpenPose*)op;
-        cv::Mat image(rows, cols, CV_8UC3, img);
-        cv::Mat displayImage(rows, cols, CV_8UC3, displayImg);
+    // OpenposePython
+    py::class_<WrapperPython>(m, "WrapperPython")
+        .def(py::init<>())
+        .def(py::init<int>())
+        .def("configure", &WrapperPython::configure)
+        .def("start", &WrapperPython::start)
+        .def("stop", &WrapperPython::stop)
+        .def("execute", &WrapperPython::exec)
+        .def("emplaceAndPop", &WrapperPython::emplaceAndPop)
+        ;
 
-        std::vector<boost::shared_ptr<caffe::Blob<float>>> caffeNetOutputBlob;
+    // Datum Object
+    py::class_<op::Datum, std::shared_ptr<op::Datum>>(m, "Datum")
+        .def(py::init<>())
+        .def_readwrite("id", &op::Datum::id)
+        .def_readwrite("subId", &op::Datum::subId)
+        .def_readwrite("subIdMax", &op::Datum::subIdMax)
+        .def_readwrite("name", &op::Datum::name)
+        .def_readwrite("frameNumber", &op::Datum::frameNumber)
+        .def_readwrite("cvInputData", &op::Datum::cvInputData)
+        .def_readwrite("inputNetData", &op::Datum::inputNetData)
+        .def_readwrite("outputData", &op::Datum::outputData)
+        .def_readwrite("cvOutputData", &op::Datum::cvOutputData)
+        .def_readwrite("cvOutputData3D", &op::Datum::cvOutputData3D)
+        .def_readwrite("poseKeypoints", &op::Datum::poseKeypoints)
+        .def_readwrite("poseIds", &op::Datum::poseIds)
+        .def_readwrite("poseScores", &op::Datum::poseScores)
+        .def_readwrite("poseHeatMaps", &op::Datum::poseHeatMaps)
+        .def_readwrite("poseCandidates", &op::Datum::poseCandidates)
+        .def_readwrite("faceRectangles", &op::Datum::faceRectangles)
+        .def_readwrite("faceKeypoints", &op::Datum::faceKeypoints)
+        .def_readwrite("faceHeatMaps", &op::Datum::faceHeatMaps)
+        .def_readwrite("handRectangles", &op::Datum::handRectangles)
+        .def_readwrite("handKeypoints", &op::Datum::handKeypoints)
+        .def_readwrite("handHeatMaps", &op::Datum::handHeatMaps)
+        .def_readwrite("poseKeypoints3D", &op::Datum::poseKeypoints3D)
+        .def_readwrite("faceKeypoints3D", &op::Datum::faceKeypoints3D)
+        .def_readwrite("handKeypoints3D", &op::Datum::handKeypoints3D)
+        .def_readwrite("cameraMatrix", &op::Datum::cameraMatrix)
+        .def_readwrite("cameraExtrinsics", &op::Datum::cameraExtrinsics)
+        .def_readwrite("cameraIntrinsics", &op::Datum::cameraIntrinsics)
+        .def_readwrite("scaleInputToNetInputs", &op::Datum::scaleInputToNetInputs)
+        .def_readwrite("netInputSizes", &op::Datum::netInputSizes)
+        .def_readwrite("scaleInputToOutput", &op::Datum::scaleInputToOutput)
+        .def_readwrite("netOutputSize", &op::Datum::netOutputSize)
+        .def_readwrite("scaleNetToOutput", &op::Datum::scaleNetToOutput)
+        .def_readwrite("elementRendered", &op::Datum::elementRendered)
+        ;
 
-        for (int i = 0; i<size[0]; i++) {
-            boost::shared_ptr<caffe::Blob<float>> caffeHmPtr(new caffe::Blob<float>());
-            caffeHmPtr->Reshape(1, size[1], size[2] * ((float)ratios[i] / (float)ratios[0]), size[3] * ((float)ratios[i] / (float)ratios[0]));
-            float* startIndex = &hm[i*size[1] * size[2] * size[3]];
-            for (int d = 0; d<caffeHmPtr->shape()[1]; d++) {
-                for (int r = 0; r<caffeHmPtr->shape()[2]; r++) {
-                    for (int c = 0; c<caffeHmPtr->shape()[3]; c++) {
-                        int toI = d*caffeHmPtr->shape()[2] * caffeHmPtr->shape()[3] + r*caffeHmPtr->shape()[3] + c;
-                        int fromI = d*size[2] * size[3] + r*size[3] + c;
-                        caffeHmPtr->mutable_cpu_data()[toI] = startIndex[fromI];
-                    }
-                }
-            }
-            caffeNetOutputBlob.emplace_back(caffeHmPtr);
-        }
+    // Rectangle
+    py::class_<op::Rectangle<float>>(m, "Rectangle")
+        .def("__repr__", [](op::Rectangle<float> &a) { return a.toString(); })
+        .def(py::init<>())
+        .def(py::init<float, float, float, float>())
+        .def_readwrite("x", &op::Rectangle<float>::x)
+        .def_readwrite("y", &op::Rectangle<float>::y)
+        .def_readwrite("width", &op::Rectangle<float>::width)
+        .def_readwrite("height", &op::Rectangle<float>::height)
+        ;
 
-        std::vector<op::Point<int>> imageSizes;
-        for (int i = 0; i<size[0]; i++) {
-            op::Point<int> point(cols*ratios[i], rows*ratios[i]);
-            imageSizes.emplace_back(point);
-        }
+    // Point
+    py::class_<op::Point<int>>(m, "Point")
+        .def("__repr__", [](op::Point<int> &a) { return a.toString(); })
+        .def(py::init<>())
+        .def(py::init<int, int>())
+        .def_readwrite("x", &op::Point<int>::x)
+        .def_readwrite("y", &op::Point<int>::y)
+        ;
 
-        openPose->poseFromHeatmap(image, caffeNetOutputBlob, output, displayImage, imageSizes);
-        memcpy(displayImg, displayImage.ptr(), sizeof(unsigned char)*rows*cols * 3);
-        // Copy back kp size
-        if (output.getSize().size()) {
-            size[0] = output.getSize()[0];
-            size[1] = output.getSize()[1];
-            size[2] = output.getSize()[2];
-        }
-        else {
-            size[0] = 0; size[1] = 0; size[2] = 0;
-        }
-    }
-
-#ifdef __cplusplus
+    #ifdef VERSION_INFO
+        m.attr("__version__") = VERSION_INFO;
+    #else
+        m.attr("__version__") = "dev";
+    #endif
 }
-#endif
+
+}
+
+// Numpy - op::Array<float> interop
+namespace pybind11 { namespace detail {
+
+template <> struct type_caster<op::Array<float>> {
+    public:
+
+        PYBIND11_TYPE_CASTER(op::Array<float>, _("numpy.ndarray"));
+
+        // Cast numpy to op::Array<float>
+        bool load(handle src, bool imp)
+        {
+            // array b(src, true);
+            array b = reinterpret_borrow<array>(src);
+            buffer_info info = b.request();
+
+            if (info.format != format_descriptor<float>::format())
+                throw std::runtime_error("op::Array only supports float32 now");
+
+            //std::vector<int> a(info.shape);
+            std::vector<int> shape(std::begin(info.shape), std::end(info.shape));
+
+            // No copy
+            value = op::Array<float>(shape, (float*)info.ptr);
+            // Copy
+            //value = op::Array<float>(shape);
+            //memcpy(value.getPtr(), info.ptr, value.getVolume()*sizeof(float));
+
+            return true;
+        }
+
+        // Cast op::Array<float> to numpy
+        static handle cast(const op::Array<float> &m, return_value_policy, handle defval)
+        {
+            std::string format = format_descriptor<float>::format();
+            return array(buffer_info(
+                m.getPseudoConstPtr(),/* Pointer to buffer */
+                sizeof(float),        /* Size of one scalar */
+                format,               /* Python struct-style format descriptor */
+                m.getSize().size(),   /* Number of dimensions */
+                m.getSize(),          /* Buffer dimensions */
+                m.getStride()         /* Strides (in bytes) for each index */
+                )).release();
+        }
+
+    };
+}} // namespace pybind11::detail
+
+// Numpy - cv::Mat interop
+namespace pybind11 { namespace detail {
+
+template <> struct type_caster<cv::Mat> {
+    public:
+
+        PYBIND11_TYPE_CASTER(cv::Mat, _("numpy.ndarray"));
+
+        // Cast numpy to cv::Mat
+        bool load(handle src, bool)
+        {
+            /* Try a default converting into a Python */
+            //array b(src, true);
+            array b = reinterpret_borrow<array>(src);
+            buffer_info info = b.request();
+
+            int ndims = info.ndim;
+
+            decltype(CV_32F) dtype;
+            size_t elemsize;
+            if (info.format == format_descriptor<float>::format()) {
+                if (ndims == 3) {
+                    dtype = CV_32FC3;
+                } else {
+                    dtype = CV_32FC1;
+                }
+                elemsize = sizeof(float);
+            } else if (info.format == format_descriptor<double>::format()) {
+                if (ndims == 3) {
+                    dtype = CV_64FC3;
+                } else {
+                    dtype = CV_64FC1;
+                }
+                elemsize = sizeof(double);
+            } else if (info.format == format_descriptor<unsigned char>::format()) {
+                if (ndims == 3) {
+                    dtype = CV_8UC3;
+                } else {
+                    dtype = CV_8UC1;
+                }
+                elemsize = sizeof(unsigned char);
+            } else {
+                throw std::logic_error("Unsupported type");
+                return false;
+            }
+
+            std::vector<int> shape = {(int)info.shape[0], (int)info.shape[1]};
+
+            value = cv::Mat(cv::Size(shape[1], shape[0]), dtype, info.ptr, cv::Mat::AUTO_STEP);
+            return true;
+        }
+
+        // Cast cv::Mat to numpy
+        static handle cast(const cv::Mat &m, return_value_policy, handle defval)
+        {
+            std::string format = format_descriptor<unsigned char>::format();
+            size_t elemsize = sizeof(unsigned char);
+            int dim;
+            switch(m.type()) {
+                case CV_8U:
+                    format = format_descriptor<unsigned char>::format();
+                    elemsize = sizeof(unsigned char);
+                    dim = 2;
+                    break;
+                case CV_8UC3:
+                    format = format_descriptor<unsigned char>::format();
+                    elemsize = sizeof(unsigned char);
+                    dim = 3;
+                    break;
+                case CV_32F:
+                    format = format_descriptor<float>::format();
+                    elemsize = sizeof(float);
+                    dim = 2;
+                    break;
+                case CV_64F:
+                    format = format_descriptor<double>::format();
+                    elemsize = sizeof(double);
+                    dim = 2;
+                    break;
+                default:
+                    throw std::logic_error("Unsupported type");
+            }
+
+            std::vector<size_t> bufferdim;
+            std::vector<size_t> strides;
+            if (dim == 2) {
+                bufferdim = {(size_t) m.rows, (size_t) m.cols};
+                strides = {elemsize * (size_t) m.cols, elemsize};
+            } else if (dim == 3) {
+                bufferdim = {(size_t) m.rows, (size_t) m.cols, (size_t) 3};
+                strides = {(size_t) elemsize * m.cols * 3, (size_t) elemsize * 3, (size_t) elemsize};
+            }
+            return array(buffer_info(
+                m.data,         /* Pointer to buffer */
+                elemsize,       /* Size of one scalar */
+                format,         /* Python struct-style format descriptor */
+                dim,            /* Number of dimensions */
+                bufferdim,      /* Buffer dimensions */
+                strides         /* Strides (in bytes) for each index */
+                )).release();
+        }
+
+    };
+}} // namespace pybind11::detail
 
 #endif
+
