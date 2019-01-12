@@ -32,15 +32,18 @@
 - **OS**: Ubuntu (14, 16), Windows (8, 10), Mac OSX, Nvidia TX2.
 - **Others**:
     - Available: command-line demo, C++ wrapper, and C++ API.
+    - [**Python API**](doc/modules/python_module.md).
+    - [**Unity Plugin**](https://github.com/CMU-Perceptual-Computing-Lab/openpose_unity_plugin).
     - CUDA (Nvidia GPU), OpenCL (AMD GPU), and CPU versions.
 
 
 
 ## Latest Features
-- Dec 2018: [**Foot dataset**](https://cmu-perceptual-computing-lab.github.io/foot_keypoint_dataset) [**and new paper released**](https://arxiv.org/abs/1812.08008)!
+- Jan 2018: [**Unity plugin released**](https://github.com/CMU-Perceptual-Computing-Lab/openpose_unity_plugin)!
+- Jan 2018: [**Improved Python API**](doc/modules/python_module.md) released! Including body, face, hands, and all the functionality of the C++ API!
+- Dec 2018: [**Foot dataset**](https://cmu-perceptual-computing-lab.github.io/foot_keypoint_dataset) and [**new paper released**](https://arxiv.org/abs/1812.08008)!
 - Sep 2018: [**Experimental single-person tracker**](doc/quick_start.md#tracking) for further speed up or visual smoothing!
 - Jun 2018: [**Combined body-foot model released! 40% faster and 5% more accurate**](doc/installation.md)!
-- Jun 2018: [**Python API**](doc/modules/python_module.md) released!
 - Jun 2018: [**OpenCL/AMD graphic card version**](doc/installation.md) released!
 - Jun 2018: [**Calibration toolbox**](doc/modules/calibration_module.md) released!
 
@@ -49,29 +52,27 @@ For further details, check [all released features](doc/released_features.md) and
 
 
 ## Results
-### Body-Foot Estimation
+### Body and Foot Estimation
 <p align="center">
     <img src="doc/media/dance_foot.gif", width="360">
 </p>
 
-### Body, Face, and Hands Estimation
-<p align="center">
-    <img src="doc/media/pose_face.gif", width="360">
-</p>
-
-### 3-D Reconstruction Module
+### 3-D Reconstruction Module (Body, Foot, Face, and Hands)
 <p align="center">
     <img src="doc/media/openpose3d.gif", width="360">
 </p>
 
-### Body and Hands Estimation
+### Body, Foot, Face, and Hands Estimation
 <p align="center">
+    <img src="doc/media/pose_face.gif", width="360">
     <img src="doc/media/pose_hands.gif", width="360">
 </p>
 
-### Body Estimation
+### Unity Plugin
 <p align="center">
-    <img src="doc/media/dance.gif", width="360">
+    <img src="doc/media/unity_main.png", width="240">
+    <img src="doc/media/unity_body_foot.png", width="240">
+    <img src="doc/media/unity_hand_face.png", width="240">
 </p>
 
 ### Runtime Analysis

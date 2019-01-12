@@ -11,9 +11,9 @@ namespace op
 {
     OP_API PoseModel flagsToPoseModel(const std::string& poseModeString);
 
-    OP_API ScaleMode flagsToScaleMode(const int keypointScale);
+    OP_API ScaleMode flagsToScaleMode(const int keypointScaleMode);
 
-    OP_API ScaleMode flagsToHeatMapScaleMode(const int heatMapScale);
+    OP_API ScaleMode flagsToHeatMapScaleMode(const int heatMapScaleMode);
 
     // Determine type of frame source
     OP_API ProducerType flagsToProducerType(const std::string& imageDirectory, const std::string& videoPath,

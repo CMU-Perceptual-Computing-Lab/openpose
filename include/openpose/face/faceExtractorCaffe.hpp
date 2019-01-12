@@ -22,7 +22,7 @@ namespace op
         FaceExtractorCaffe(const Point<int>& netInputSize, const Point<int>& netOutputSize,
                            const std::string& modelFolder, const int gpuId,
                            const std::vector<HeatMapType>& heatMapTypes = {},
-                           const ScaleMode heatMapScale = ScaleMode::ZeroToOne,
+                           const ScaleMode heatMapScaleMode = ScaleMode::ZeroToOne,
                            const bool enableGoogleLogging = true);
 
         virtual ~FaceExtractorCaffe();

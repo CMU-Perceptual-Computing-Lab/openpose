@@ -106,8 +106,8 @@ namespace op
     FaceExtractorCaffe::FaceExtractorCaffe(const Point<int>& netInputSize, const Point<int>& netOutputSize,
                                            const std::string& modelFolder, const int gpuId,
                                            const std::vector<HeatMapType>& heatMapTypes,
-                                           const ScaleMode heatMapScale, const bool enableGoogleLogging) :
-        FaceExtractorNet{netInputSize, netOutputSize, heatMapTypes, heatMapScale}
+                                           const ScaleMode heatMapScaleMode, const bool enableGoogleLogging) :
+        FaceExtractorNet{netInputSize, netOutputSize, heatMapTypes, heatMapScaleMode}
         #ifdef USE_CAFFE
         , upImpl{new ImplFaceExtractorCaffe{modelFolder, gpuId, enableGoogleLogging}}
         #endif
@@ -120,7 +120,8 @@ namespace op
                 UNUSED(modelFolder);
                 UNUSED(gpuId);
                 UNUSED(heatMapTypes);
-                UNUSED(heatMapScale);
+                UNUSED(heatMapScaleMode);
+                UNUSED(enableGoogleLogging);
                 error("OpenPose must be compiled with the `USE_CAFFE` & `USE_CUDA` macro definitions in order to run"
                       " this functionality.", __LINE__, __FUNCTION__, __FILE__);
             #endif

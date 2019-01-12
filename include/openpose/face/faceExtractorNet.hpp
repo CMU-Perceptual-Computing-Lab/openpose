@@ -21,7 +21,7 @@ namespace op
          */
         explicit FaceExtractorNet(const Point<int>& netInputSize, const Point<int>& netOutputSize,
                                   const std::vector<HeatMapType>& heatMapTypes = {},
-                                  const ScaleMode heatMapScale = ScaleMode::ZeroToOne);
+                                  const ScaleMode heatMapScaleMode = ScaleMode::ZeroToOne);
 
         /**
          * Virtual destructor of the HandExtractor class.

@@ -242,8 +242,9 @@ namespace op
                 mPostProcessingWs.emplace_back(std::make_shared<WOpOutputToCvMat<TDatumsPtr>>(opOutputToCvMat));
             }
             // Re-scale pose if desired
-            if (wrapperStructPose.keypointScale != ScaleMode::InputResolution)
-                error("Only wrapperStructPose.keypointScale == ScaleMode::InputResolution.", __LINE__, __FUNCTION__, __FILE__);
+            if (wrapperStructPose.keypointScaleMode != ScaleMode::InputResolution)
+                error("Only wrapperStructPose.keypointScaleMode == ScaleMode::InputResolution.",
+                      __LINE__, __FUNCTION__, __FILE__);
 
             mOutputWs.clear();
             // Write people pose data on disk (json format)

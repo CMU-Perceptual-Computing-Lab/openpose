@@ -4,10 +4,11 @@
 namespace op
 {
     FaceExtractorNet::FaceExtractorNet(const Point<int>& netInputSize, const Point<int>& netOutputSize,
-                                       const std::vector<HeatMapType>& heatMapTypes, const ScaleMode heatMapScale) :
+                                       const std::vector<HeatMapType>& heatMapTypes,
+                                       const ScaleMode heatMapScaleMode) :
         mNetOutputSize{netOutputSize},
         mFaceImageCrop{{1, 3, mNetOutputSize.y, mNetOutputSize.x}},
-        mHeatMapScaleMode{heatMapScale},
+        mHeatMapScaleMode{heatMapScaleMode},
         mHeatMapTypes{heatMapTypes},
         mEnabled{true}
     {
@@ -16,7 +17,7 @@ namespace op
             // Error check
             if (mHeatMapScaleMode != ScaleMode::ZeroToOne && mHeatMapScaleMode != ScaleMode::PlusMinusOne
                 && mHeatMapScaleMode != ScaleMode::UnsignedChar)
-                error("The ScaleMode heatMapScale must be ZeroToOne, PlusMinusOne or UnsignedChar.",
+                error("The ScaleMode heatMapScaleMode must be ZeroToOne, PlusMinusOne or UnsignedChar.",
                       __LINE__, __FUNCTION__, __FILE__);
             checkE(netOutputSize.x, netInputSize.x, "Net input and output size must be equal.",
                    __LINE__, __FUNCTION__, __FILE__);

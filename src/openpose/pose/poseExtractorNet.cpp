@@ -45,12 +45,12 @@ namespace op
     }
 
     PoseExtractorNet::PoseExtractorNet(const PoseModel poseModel, const std::vector<HeatMapType>& heatMapTypes,
-                                       const ScaleMode heatMapScale, const bool addPartCandidates,
+                                       const ScaleMode heatMapScaleMode, const bool addPartCandidates,
                                        const bool maximizePositives) :
         mPoseModel{poseModel},
         mNetOutputSize{0,0},
         mHeatMapTypes{heatMapTypes},
-        mHeatMapScaleMode{heatMapScale},
+        mHeatMapScaleMode{heatMapScaleMode},
         mAddPartCandidates{addPartCandidates}
     {
         try
@@ -58,7 +58,7 @@ namespace op
             // Error check
             if (mHeatMapScaleMode != ScaleMode::ZeroToOne && mHeatMapScaleMode != ScaleMode::PlusMinusOne
                 && mHeatMapScaleMode != ScaleMode::UnsignedChar && mHeatMapScaleMode != ScaleMode::NoScale)
-                error("The ScaleMode heatMapScale must be ZeroToOne, PlusMinusOne, UnsignedChar, or NoScale.",
+                error("The ScaleMode heatMapScaleMode must be ZeroToOne, PlusMinusOne, UnsignedChar, or NoScale.",
                       __LINE__, __FUNCTION__, __FILE__);
 
             // Properties - Init to 0

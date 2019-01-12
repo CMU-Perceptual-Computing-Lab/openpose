@@ -55,20 +55,20 @@ namespace op
         }
     }
 
-    ScaleMode flagsToScaleMode(const int keypointScale)
+    ScaleMode flagsToScaleMode(const int keypointScaleMode)
     {
         try
         {
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-            if (keypointScale == 0)
+            if (keypointScaleMode == 0)
                 return ScaleMode::InputResolution;
-            else if (keypointScale == 1)
+            else if (keypointScaleMode == 1)
                 return ScaleMode::NetOutputResolution;
-            else if (keypointScale == 2)
+            else if (keypointScaleMode == 2)
                 return ScaleMode::OutputResolution;
-            else if (keypointScale == 3)
+            else if (keypointScaleMode == 3)
                 return ScaleMode::ZeroToOne;
-            else if (keypointScale == 4)
+            else if (keypointScaleMode == 4)
                 return ScaleMode::PlusMinusOne;
             // else
             const std::string message = "Integer does not correspond to any scale mode: (0, 1, 2, 3, 4) for"
@@ -84,18 +84,18 @@ namespace op
         }
     }
 
-    ScaleMode flagsToHeatMapScaleMode(const int heatMapScale)
+    ScaleMode flagsToHeatMapScaleMode(const int heatMapScaleMode)
     {
         try
         {
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-            if (heatMapScale == 0)
+            if (heatMapScaleMode == 0)
                 return ScaleMode::PlusMinusOne;
-            else if (heatMapScale == 1)
+            else if (heatMapScaleMode == 1)
                 return ScaleMode::ZeroToOne;
-            else if (heatMapScale == 2)
+            else if (heatMapScaleMode == 2)
                 return ScaleMode::UnsignedChar;
-            else if (heatMapScale == 3)
+            else if (heatMapScaleMode == 3)
                 return ScaleMode::NoScale;
             // else
             const std::string message = "Integer does not correspond to any scale mode: (0, 1, 2, 3) for"

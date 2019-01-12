@@ -32,36 +32,32 @@ matrix:
       - cd $TRAVIS_BUILD_DIR
       - chmod +x scripts/generate_gh_pages.sh
       - ./scripts/generate_gh_pages.sh
-  # Ubuntu 16.04 - Default - CMake - CUDA - no cuDNN
-  - os: linux
-    dist: xenial
-    env: NAME="U16-default-cmake-cuda8-nocudnn" WITH_CUDNN=false
-    sudo: required
   # Ubuntu 16.04 - Python - CMake - CUDA
   - os: linux
     dist: xenial
     env: NAME="U16-python-cmake-cuda8" WITH_PYTHON=true
-    sudo: required
-  # Ubuntu 16.04 - Default - Make - CUDA
-  - os: linux
-    dist: xenial
-    env: NAME="U16-default-make-cuda8" WITH_CMAKE=false
     sudo: required
   # Ubuntu 16.04 - Default - CMake - CPU
   - os: linux
     dist: xenial
     env: NAME="U16-default-cmake-cpu" WITH_CUDA=false
     sudo: required
-  # # Ubuntu 16.04 - Default - CMake - CPU MKL
-  # - os: linux
-  #   dist: xenial
-  #   env: NAME="U16-default-cmake-cpu-mkl" WITH_CUDA=false WITH_MKL=true
-  #   sudo: required
   # Ubuntu 16.04 - Python - CMake - CPU
   - os: linux
     dist: xenial
     env: NAME="U16-python-cmake-cpu" WITH_PYTHON=true WITH_CUDA=false
     sudo: required
+  # Ubuntu 16.04 - Default - Make - CUDA
+  - os: linux
+    dist: xenial
+    env: NAME="U16-default-make-cuda8" WITH_CMAKE=false
+    sudo: required
+  # # TO-DO: To be implemented
+  # # Ubuntu 16.04 - Default - CMake - CPU MKL
+  # - os: linux
+  #   dist: xenial
+  #   env: NAME="U16-default-cmake-cpu-mkl" WITH_CUDA=false WITH_MKL=true
+  #   sudo: required
   # # Ubuntu 16.04 - Default - CMake - OpenCL
   # - os: linux
   #   dist: xenial
@@ -72,13 +68,14 @@ matrix:
   #   dist: xenial
   #   env: NAME="U16-python-cmake-opencl" WITH_PYTHON=true WITH_CUDA=false WITH_OPEN_CL=true
   #   sudo: required
+  # # Unnecessary/redundant ones
+  # # Ubuntu 16.04 - Default - CMake - CUDA - no cuDNN
+  # - os: linux
+  #   dist: xenial
+  #   env: NAME="U16-default-cmake-cuda8-nocudnn" WITH_CUDNN=false
+  #   sudo: required
 
   # Ubuntu 14.04
-  # Ubuntu 14.04 - Default - CMake - CUDA
-  - os: linux
-    dist: trusty
-    env: NAME="U14-default-cmake-cuda8"
-    sudo: required
   # Ubuntu 14.04 - Default - CMake - CPU
   - os: linux
     dist: trusty
@@ -89,12 +86,20 @@ matrix:
     dist: trusty
     env: NAME="U14-default-make-cuda8" WITH_CMAKE=false
     sudo: required
+  # # Unnecessary/redundant ones
+  # # Ubuntu 14.04 - Default - CMake - CUDA
+  # - os: linux
+  #   dist: trusty
+  #   env: NAME="U14-default-cmake-cuda8"
+  #   sudo: required
 
+  # # TO-DO: To be implemented
   # # Windows
   # # Windows - Default - CMake - CUDA
   # - os: windows
   #   env: NAME="W10-default-cmake-cuda8"
 
+  # # TO-DO: To be implemented
   # # Mac OSX
   # # Mac OSX - Default - CMake - CPU
   # - os: osx

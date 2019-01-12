@@ -245,12 +245,12 @@ int tutorialApiCpp9()
         if (!FLAGS_write_keypoint.empty())
             op::log("Flag `write_keypoint` is deprecated and will eventually be removed."
                     " Please, use `write_json` instead.", op::Priority::Max);
-        // keypointScale
-        const auto keypointScale = op::flagsToScaleMode(FLAGS_keypoint_scale);
+        // keypointScaleMode
+        const auto keypointScaleMode = op::flagsToScaleMode(FLAGS_keypoint_scale);
         // heatmaps to add
         const auto heatMapTypes = op::flagsToHeatMaps(FLAGS_heatmaps_add_parts, FLAGS_heatmaps_add_bkg,
                                                       FLAGS_heatmaps_add_PAFs);
-        const auto heatMapScale = op::flagsToHeatMapScaleMode(FLAGS_heatmaps_scale);
+        const auto heatMapScaleMode = op::flagsToHeatMapScaleMode(FLAGS_heatmaps_scale);
         // >1 camera view?
         const auto multipleView = (FLAGS_3d || FLAGS_3d_views > 1);
         // Enabling Google Logging
@@ -279,10 +279,10 @@ int tutorialApiCpp9()
 
         // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
         const op::WrapperStructPose wrapperStructPose{
-            !FLAGS_body_disable, netInputSize, outputSize, keypointScale, FLAGS_num_gpu, FLAGS_num_gpu_start,
+            !FLAGS_body_disable, netInputSize, outputSize, keypointScaleMode, FLAGS_num_gpu, FLAGS_num_gpu_start,
             FLAGS_scale_number, (float)FLAGS_scale_gap, op::flagsToRenderMode(FLAGS_render_pose, multipleView),
             poseModel, !FLAGS_disable_blending, (float)FLAGS_alpha_pose, (float)FLAGS_alpha_heatmap,
-            FLAGS_part_to_show, FLAGS_model_folder, heatMapTypes, heatMapScale, FLAGS_part_candidates,
+            FLAGS_part_to_show, FLAGS_model_folder, heatMapTypes, heatMapScaleMode, FLAGS_part_candidates,
             (float)FLAGS_render_threshold, FLAGS_number_people_max, FLAGS_maximize_positives, FLAGS_fps_max,
             FLAGS_prototxt_path, FLAGS_caffemodel_path, enableGoogleLogging};
         opWrapperT.configure(wrapperStructPose);

@@ -166,10 +166,10 @@ namespace op
 
     PoseExtractorCaffe::PoseExtractorCaffe(
         const PoseModel poseModel, const std::string& modelFolder, const int gpuId,
-        const std::vector<HeatMapType>& heatMapTypes, const ScaleMode heatMapScale, const bool addPartCandidates,
+        const std::vector<HeatMapType>& heatMapTypes, const ScaleMode heatMapScaleMode, const bool addPartCandidates,
         const bool maximizePositives, const std::string& protoTxtPath, const std::string& caffeModelPath,
         const bool enableGoogleLogging) :
-        PoseExtractorNet{poseModel, heatMapTypes, heatMapScale, addPartCandidates, maximizePositives}
+        PoseExtractorNet{poseModel, heatMapTypes, heatMapScaleMode, addPartCandidates, maximizePositives}
         #ifdef USE_CAFFE
         , upImpl{new ImplPoseExtractorCaffe{poseModel, gpuId, modelFolder, protoTxtPath, caffeModelPath,
                  enableGoogleLogging}}
@@ -186,8 +186,12 @@ namespace op
                 UNUSED(modelFolder);
                 UNUSED(gpuId);
                 UNUSED(heatMapTypes);
-                UNUSED(heatMapScale);
+                UNUSED(heatMapScaleMode);
                 UNUSED(addPartCandidates);
+                UNUSED(maximizePositives);
+                UNUSED(protoTxtPath);
+                UNUSED(caffeModelPath);
+                UNUSED(enableGoogleLogging);
                 error("OpenPose must be compiled with the `USE_CAFFE` macro definition in order to use this"
                       " functionality.", __LINE__, __FUNCTION__, __FILE__);
             #endif

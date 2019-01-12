@@ -9,4 +9,4 @@ bash scripts/ubuntu/install_cuda.sh
 bash scripts/ubuntu/install_cudnn.sh
 
 # Caffe prerequisites
-bash scripts/ubuntu/install_ubuntu_deps.sh
+bash scripts/ubuntu/install_deps.sh

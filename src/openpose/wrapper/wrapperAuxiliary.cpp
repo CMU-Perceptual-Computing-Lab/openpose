@@ -42,11 +42,11 @@ namespace op
                 error(message, __LINE__, __FUNCTION__, __FILE__);
             }
             if (!wrapperStructOutput.writeHeatMaps.empty()
-                && (wrapperStructPose.heatMapScale != ScaleMode::UnsignedChar &&
+                && (wrapperStructPose.heatMapScaleMode != ScaleMode::UnsignedChar &&
                         wrapperStructOutput.writeHeatMapsFormat != "float"))
             {
                 const auto message = "In order to save the heatmaps, you must either set"
-                                     " wrapperStructPose.heatMapScale to ScaleMode::UnsignedChar (i.e., range"
+                                     " wrapperStructPose.heatMapScaleMode to ScaleMode::UnsignedChar (i.e., range"
                                      " [0, 255]) or `--write_heatmaps_format` to `float` to storage floating numbers"
                                      " in binary mode.";
                 error(message, __LINE__, __FUNCTION__, __FILE__);

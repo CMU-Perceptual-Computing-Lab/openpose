@@ -33,7 +33,7 @@ namespace op
         /**
          * Output size of the final rendered image.
          * It barely affects performance compared to netInputSize.
-         * The final Datum.poseKeypoints can be scaled with respect to outputSize if `keypointScale` is set to
+         * The final Datum.poseKeypoints can be scaled with respect to outputSize if `keypointScaleMode` is set to
          * ScaleMode::OutputResolution, even if the rendering is disabled.
          */
         Point<int> outputSize;
@@ -44,7 +44,7 @@ namespace op
          * output size (ScaleMode::NetOutputResolution), output rendering size (ScaleMode::OutputResolution), from 0 to
          * 1 (ScaleMode::ZeroToOne), and -1 to 1 (ScaleMode::PlusMinusOne).
          */
-        ScaleMode keypointScale;
+        ScaleMode keypointScaleMode;
 
         /**
          * Number of GPUs processing in parallel.
@@ -132,7 +132,7 @@ namespace op
          * for [0, 255].
          * If heatMapTypes.empty(), then this parameters makes no effect.
          */
-        ScaleMode heatMapScale;
+        ScaleMode heatMapScaleMode;
 
         /**
          * Whether to add the body part candidates.
@@ -204,13 +204,13 @@ namespace op
         WrapperStructPose(
             const bool enable = true, const Point<int>& netInputSize = Point<int>{656, 368},
             const Point<int>& outputSize = Point<int>{-1, -1},
-            const ScaleMode keypointScale = ScaleMode::InputResolution, const int gpuNumber = -1,
+            const ScaleMode keypointScaleMode = ScaleMode::InputResolution, const int gpuNumber = -1,
             const int gpuNumberStart = 0, const int scalesNumber = 1, const float scaleGap = 0.15f,
             const RenderMode renderMode = RenderMode::Gpu, const PoseModel poseModel = PoseModel::BODY_25,
             const bool blendOriginalFrame = true, const float alphaKeypoint = POSE_DEFAULT_ALPHA_KEYPOINT,
             const float alphaHeatMap = POSE_DEFAULT_ALPHA_HEAT_MAP, const int defaultPartToRender = 0,
             const std::string& modelFolder = "models/", const std::vector<HeatMapType>& heatMapTypes = {},
-            const ScaleMode heatMapScale = ScaleMode::ZeroToOne, const bool addPartCandidates = false,
+            const ScaleMode heatMapScaleMode = ScaleMode::ZeroToOne, const bool addPartCandidates = false,
             const float renderThreshold = 0.05f, const int numberPeopleMax = -1, const bool maximizePositives = false,
             const double fpsMax = -1., const std::string& protoTxtPath = "",
             const std::string& caffeModelPath = "", const bool enableGoogleLogging = true);

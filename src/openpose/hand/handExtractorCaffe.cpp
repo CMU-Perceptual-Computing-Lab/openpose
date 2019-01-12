@@ -191,9 +191,9 @@ namespace op
                                            const std::string& modelFolder, const int gpuId,
                                            const unsigned short numberScales,
                                            const float rangeScales, const std::vector<HeatMapType>& heatMapTypes,
-                                           const ScaleMode heatMapScale,
+                                           const ScaleMode heatMapScaleMode,
                                            const bool enableGoogleLogging) :
-        HandExtractorNet{netInputSize, netOutputSize, numberScales, rangeScales, heatMapTypes, heatMapScale}
+        HandExtractorNet{netInputSize, netOutputSize, numberScales, rangeScales, heatMapTypes, heatMapScaleMode}
         #if defined USE_CAFFE
         , upImpl{new ImplHandExtractorCaffe{modelFolder, gpuId, enableGoogleLogging}}
         #endif
@@ -208,7 +208,8 @@ namespace op
                 UNUSED(numberScales);
                 UNUSED(rangeScales);
                 UNUSED(heatMapTypes);
-                UNUSED(heatMapScale);
+                UNUSED(heatMapScaleMode);
+                UNUSED(enableGoogleLogging);
                 error("OpenPose must be compiled with the `USE_CAFFE` & `USE_CUDA` macro definitions in order to run"
                       " this functionality.", __LINE__, __FUNCTION__, __FILE__);
             #endif

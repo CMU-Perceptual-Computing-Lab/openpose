@@ -28,7 +28,10 @@ Check [doc/installation.md#python-module](../installation.md#python-api) for ins
 The Python API requires Numpy for array management, and OpenCV for image loading. They can be installed via:
 
 ```
-pip install numpy opencv-python
+# Python 2
+sudo pip install numpy opencv-python
+# Python 3 (recommended)
+sudo pip3 install numpy opencv-python
 ```
 
 
@@ -39,7 +42,16 @@ All the Python examples from the Tutorial API Python module can be found in `bui
 ```
 # From command line
 cd build/examples/tutorial_api_python
+
+# Python 2
+python2 1_body_from_image.py
+python2 2_whole_body_from_image.py
+# python2 [any_other_example.py]
+
+# Python 3 (recommended)
 python3 1_body_from_image.py
+python3 2_whole_body_from_image.py
+# python3 [any_other_example.py]
 ```
 
 

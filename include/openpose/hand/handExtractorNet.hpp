@@ -23,9 +23,9 @@ namespace op
          * @param rangeScales The range between the smaller and bigger scale.
          */
         explicit HandExtractorNet(const Point<int>& netInputSize, const Point<int>& netOutputSize,
-                               const unsigned short numberScales = 1, const float rangeScales = 0.4f,
-                               const std::vector<HeatMapType>& heatMapTypes = {},
-                               const ScaleMode heatMapScale = ScaleMode::ZeroToOne);
+                                  const unsigned short numberScales = 1, const float rangeScales = 0.4f,
+                                  const std::vector<HeatMapType>& heatMapTypes = {},
+                                  const ScaleMode heatMapScaleMode = ScaleMode::ZeroToOne);
 
         /**
          * Virtual destructor of the HandExtractorNet class.

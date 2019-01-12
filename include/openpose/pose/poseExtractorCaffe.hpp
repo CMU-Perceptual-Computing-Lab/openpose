@@ -13,7 +13,7 @@ namespace op
         PoseExtractorCaffe(
             const PoseModel poseModel, const std::string& modelFolder, const int gpuId,
             const std::vector<HeatMapType>& heatMapTypes = {},
-            const ScaleMode heatMapScale = ScaleMode::ZeroToOne,
+            const ScaleMode heatMapScaleMode = ScaleMode::ZeroToOne,
             const bool addPartCandidates = false, const bool maximizePositives = false,
             const std::string& protoTxtPath = "", const std::string& caffeModelPath = "",
             const bool enableGoogleLogging = true);

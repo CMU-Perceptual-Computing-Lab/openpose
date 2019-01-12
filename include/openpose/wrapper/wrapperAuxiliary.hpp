@@ -261,7 +261,7 @@ namespace op
                     for (auto gpuId = 0; gpuId < numberThreads; gpuId++)
                         poseExtractorNets.emplace_back(std::make_shared<PoseExtractorCaffe>(
                             wrapperStructPose.poseModel, modelFolder, gpuId + gpuNumberStart,
-                            wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale,
+                            wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScaleMode,
                             wrapperStructPose.addPartCandidates, wrapperStructPose.maximizePositives,
                             wrapperStructPose.protoTxtPath, wrapperStructPose.caffeModelPath,
                             wrapperStructPose.enableGoogleLogging
@@ -379,7 +379,7 @@ namespace op
                         const auto netOutputSize = wrapperStructFace.netInputSize;
                         const auto faceExtractorNet = std::make_shared<FaceExtractorCaffe>(
                             wrapperStructFace.netInputSize, netOutputSize, modelFolder,
-                            gpu + gpuNumberStart, wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale,
+                            gpu + gpuNumberStart, wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScaleMode,
                             wrapperStructPose.enableGoogleLogging
                         );
                         faceExtractorNets.emplace_back(faceExtractorNet);
@@ -411,7 +411,7 @@ namespace op
                         const auto handExtractorNet = std::make_shared<HandExtractorCaffe>(
                             wrapperStructHand.netInputSize, netOutputSize, modelFolder,
                             gpu + gpuNumberStart, wrapperStructHand.scalesNumber, wrapperStructHand.scaleRange,
-                            wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScale,
+                            wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScaleMode,
                             wrapperStructPose.enableGoogleLogging
                         );
                         handExtractorNets.emplace_back(handExtractorNet);
@@ -563,16 +563,16 @@ namespace op
                 log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 // Re-scale pose if desired
                 // If desired scale is not the current input
-                if (wrapperStructPose.keypointScale != ScaleMode::InputResolution
+                if (wrapperStructPose.keypointScaleMode != ScaleMode::InputResolution
                     // and desired scale is not output when size(input) = size(output)
-                    && !(wrapperStructPose.keypointScale == ScaleMode::OutputResolution &&
+                    && !(wrapperStructPose.keypointScaleMode == ScaleMode::OutputResolution &&
                          (finalOutputSize == producerSize || finalOutputSize.x <= 0 || finalOutputSize.y <= 0))
                     // and desired scale is not net output when size(input) = size(net output)
-                    && !(wrapperStructPose.keypointScale == ScaleMode::NetOutputResolution
+                    && !(wrapperStructPose.keypointScaleMode == ScaleMode::NetOutputResolution
                          && producerSize == wrapperStructPose.netInputSize))
                 {
                     // Then we must rescale the keypoints
-                    auto keypointScaler = std::make_shared<KeypointScaler>(wrapperStructPose.keypointScale);
+                    auto keypointScaler = std::make_shared<KeypointScaler>(wrapperStructPose.keypointScaleMode);
                     postProcessingWs.emplace_back(std::make_shared<WKeypointScaler<TDatumsSP>>(keypointScaler));
                 }
             }

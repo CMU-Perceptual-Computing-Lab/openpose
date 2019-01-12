@@ -321,7 +321,8 @@ namespace op
             spWrapper->configure(*spWrapperStructOutput);
 
             // Multi-threading
-            if (!sMultiThreadEnabled) spWrapper->disableMultiThreading();
+            if (!sMultiThreadEnabled)
+                spWrapper->disableMultiThreading();
 
             // Processing...
             spWrapper->exec();
@@ -421,35 +422,31 @@ namespace op
 
         // Configs
         OP_API void _OPConfigurePose(
-            bool body_disable,
-            int net_resolution_x, int net_resolution_y, // Point
-            int output_resolution_x, int output_resolution_y, // Point
-            uchar keypoint_scale_mode, // ScaleMode
-            int num_gpu, int num_gpu_start, int scale_number, float scale_gap,
-            uchar pose_render_mode, // RenderMode
-            uchar model_pose, // PoseModel
-            bool disable_blending, float alpha_pose, float alpha_heatmap, int part_to_show, char* model_folder,
-            bool heatmaps_add_parts, bool heatmaps_add_bkg, bool heatmaps_add_PAFs, // HeatMapType // uchar heatmap_type,
-            uchar heatmap_scale_mode, // ScaleMode
-            bool part_candidates, float render_threshold, int number_people_max,
-            bool maximize_positives, double fps_max, char* proto_txt_path, char* caffe_model_path)
+            bool enable,
+            int netInputSizeX, int netInputSizeY, // Point
+            int outputSizeX, int outputSizeY, // Point
+            uchar keypointScaleMode, // ScaleMode
+            int gpuNumber, int gpuNumberStart, int scalesNumber, float scaleGap,
+            uchar renderMode, // RenderMode
+            uchar poseModel, // PoseModel
+            bool blendOriginalFrame, float alphaKeypoint, float alphaHeatMap, int defaultPartToRender,
+            char* modelFolder, bool heatMapAddParts, bool heatMapAddBkg,
+            bool heatMapAddPAFs, // HeatMapType // uchar heatmap_type,
+            uchar heatMapScaleMode, // ScaleMode
+            bool addPartCandidates, float renderThreshold, int numberPeopleMax,
+            bool maximizePositives, double fpsMax, char* protoTxtPath, char* caffeModelPath)
         {
-
             try
             {
                 spWrapperStructPose = std::make_shared<WrapperStructPose>(
-                    !body_disable,
-                    Point<int>{ net_resolution_x, net_resolution_y },
-                    Point<int>{ output_resolution_x, output_resolution_y },
-                    (ScaleMode) keypoint_scale_mode,
-                    num_gpu, num_gpu_start, scale_number, scale_gap,
-                    (RenderMode) pose_render_mode, (PoseModel) model_pose,
-                    !disable_blending, alpha_pose, alpha_heatmap, part_to_show, model_folder,
+                    enable, Point<int>{netInputSizeX, netInputSizeY}, Point<int>{outputSizeX, outputSizeY},
+                    (ScaleMode) keypointScaleMode, gpuNumber, gpuNumberStart, scalesNumber, scaleGap,
+                    (RenderMode) renderMode, (PoseModel) poseModel, blendOriginalFrame, alphaKeypoint, alphaHeatMap,
+                    defaultPartToRender, modelFolder,
                     // HeatMapType // (HeatMapType) heatmap_type,
-                    flagsToHeatMaps(heatmaps_add_parts, heatmaps_add_bkg, heatmaps_add_PAFs),
-                    (ScaleMode) heatmap_scale_mode,
-                    part_candidates, render_threshold, number_people_max, maximize_positives, fps_max,
-                    proto_txt_path, caffe_model_path, true
+                    flagsToHeatMaps(heatMapAddParts, heatMapAddBkg, heatMapAddPAFs),
+                    (ScaleMode) heatMapScaleMode, addPartCandidates, renderThreshold, numberPeopleMax,
+                    maximizePositives, fpsMax, protoTxtPath, caffeModelPath, true
                 );
             }
             catch (const std::exception& e)
@@ -459,22 +456,16 @@ namespace op
         }
 
         OP_API void _OPConfigureHand(
-            bool hand,
-            int hand_net_resolution_x, int hand_net_resolution_y, // Point
-            int hand_scale_number, float hand_scale_range, bool hand_tracking,
-            uchar hand_render_mode, // RenderMode
-            float hand_alpha_pose, float hand_alpha_heatmap, float hand_render_threshold)
+            bool enable, int netInputSizeX, int netInputSizeY, // Point
+            int scalesNumber, float scaleRange, bool tracking,
+            uchar renderMode, // RenderMode
+            float alphaKeypoint, float alphaHeatMap, float renderThreshold)
         {
-
             try
             {
                 spWrapperStructHand = std::make_shared<WrapperStructHand>(
-                    hand,
-                    Point<int>{ hand_net_resolution_x, hand_net_resolution_y },
-                    hand_scale_number, hand_scale_range, hand_tracking,
-                    (RenderMode) hand_render_mode,
-                    hand_alpha_pose, hand_alpha_heatmap, hand_render_threshold
-                    );
+                    enable, Point<int>{ netInputSizeX, netInputSizeY }, scalesNumber, scaleRange, tracking,
+                    (RenderMode) renderMode, alphaKeypoint, alphaHeatMap, renderThreshold);
             }
             catch (const std::exception& e)
             {
@@ -483,19 +474,15 @@ namespace op
         }
 
         OP_API void _OPConfigureFace(
-            bool face,
-            int face_net_resolution_x, int face_net_resolution_y, // Point
-            uchar face_render_mode, // RenderMode
-            float face_alpha_pose, float face_alpha_heatmap, float face_render_threshold)
+            bool enable, int netInputSizeX, int netInputSizeY, // Point
+            uchar renderMode, // RenderMode
+            float alphaKeypoint, float alphaHeatMap, float renderThreshold)
         {
-
             try
             {
                 spWrapperStructFace = std::make_shared<WrapperStructFace>(
-                    face,
-                    Point<int>{ face_net_resolution_x, face_net_resolution_y },
-                    (RenderMode) face_render_mode,
-                    face_alpha_pose, face_alpha_heatmap, face_render_threshold
+                    enable, Point<int>{ netInputSizeX, netInputSizeY }, (RenderMode) renderMode, alphaKeypoint,
+                    alphaHeatMap, renderThreshold
                 );
             }
             catch (const std::exception& e)
@@ -505,13 +492,12 @@ namespace op
         }
 
         OP_API void _OPConfigureExtra(
-            bool _3d, int _3d_min_views, bool _identification, int _tracking, int _ik_threads)
+            bool reconstruct3d, int minViews3d, bool identification, int tracking, int ikThreads)
         {
-
             try
             {
                 spWrapperStructExtra = std::make_shared<WrapperStructExtra>(
-                    _3d, _3d_min_views, _identification, _tracking, _ik_threads
+                    reconstruct3d, minViews3d, identification, tracking, ikThreads
                 );
             }
             catch (const std::exception& e)
@@ -521,20 +507,18 @@ namespace op
         }
 
         OP_API void _OPConfigureInput(
-            uchar producer_type, char* producer_string, // ProducerType
-            unsigned long long frame_first, unsigned long long frame_step, unsigned long long frame_last,
-            bool process_real_time, bool frame_flip, int frame_rotate, bool frames_repeat,
-            int camera_resolution_x, int camera_resolution_y, // Point
-            char* camera_parameter_path, bool undistort_image, int image_directory_stereo)
+            uchar producerType, char* producerString, // ProducerType
+            unsigned long long frameFirst, unsigned long long frameStep, unsigned long long frameLast,
+            bool realTimeProcessing, bool frameFlip, int frameRotate, bool framesRepeat,
+            int cameraResolutionX, int cameraResolutionY, // Point
+            char* cameraParameterPath, bool undistortImage, int numberViews)
         {
-
             try
             {
                 spWrapperStructInput = std::make_shared<WrapperStructInput>(
-                    (ProducerType) producer_type, producer_string,
-                    frame_first, frame_step, frame_last, process_real_time, frame_flip, frame_rotate, frames_repeat,
-                    Point<int>{ camera_resolution_x, camera_resolution_y },
-                    camera_parameter_path, undistort_image, image_directory_stereo
+                    (ProducerType) producerType, producerString, frameFirst, frameStep, frameLast, realTimeProcessing,
+                    frameFlip, frameRotate, framesRepeat, Point<int>{ cameraResolutionX, cameraResolutionY },
+                    cameraParameterPath, undistortImage, numberViews
                 );
             }
             catch (const std::exception& e)
@@ -544,21 +528,18 @@ namespace op
         }
 
         OP_API void _OPConfigureOutput(
-            double verbose, char* write_keypoint, uchar write_keypoint_format, // DataFormat
-            char* write_json, char* write_coco_json, char* write_coco_foot_json, int write_coco_json_variant,
-            char* write_images, char* write_images_format, char* write_video,
-            double camera_fps, char* write_heatmaps, char* write_heatmaps_format,
-            char* write_video_adam, char* write_bvh, char* udp_host, char* udp_port)
+            double verbose, char* writeKeypoint, uchar writeKeypointFormat, // DataFormat
+            char* writeJson, char* writeCocoJson, char* writeCocoFootJson, int writeCocoJsonVariant, char* writeImages,
+            char* writeImagesFormat, char* writeVideo, double writeVideoFps, char* writeHeatMaps,
+            char* writeHeatMapsFormat, char* writeVideo3D, char* writeVideoAdam, char* writeBvh, char* udpHost,
+            char* udpPort)
         {
-
             try
             {
                 spWrapperStructOutput = std::make_shared<WrapperStructOutput>(
-                    verbose, write_keypoint,
-                    (DataFormat) write_keypoint_format, write_json, write_coco_json,
-                    write_coco_foot_json, write_coco_json_variant, write_images, write_images_format, write_video,
-                    camera_fps, write_heatmaps, write_heatmaps_format, write_video_adam, write_bvh,
-                    udp_host, udp_port);
+                    verbose, writeKeypoint, (DataFormat) writeKeypointFormat, writeJson, writeCocoJson,
+                    writeCocoFootJson, writeCocoJsonVariant, writeImages, writeImagesFormat, writeVideo, writeVideoFps,
+                    writeHeatMaps, writeHeatMapsFormat, writeVideo3D, writeVideoAdam, writeBvh, udpHost, udpPort);
             }
             catch (const std::exception& e)
             {
@@ -567,14 +548,13 @@ namespace op
         }
 
         OP_API void _OPConfigureGui(
-            ushort display_mode, // DisplayMode
-            bool gui_verbose, bool full_screen)
+            ushort displayMode, // DisplayMode
+            bool guiVerbose, bool fullScreen)
         {
-
             try
             {
                 spWrapperStructGui = std::make_shared<WrapperStructGui>(
-                    (DisplayMode) display_mode, gui_verbose, full_screen);
+                    (DisplayMode) displayMode, guiVerbose, fullScreen);
             }
             catch (const std::exception& e)
             {
