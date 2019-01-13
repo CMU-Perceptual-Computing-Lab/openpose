@@ -1,1 +1,1 @@
-from . import _openpose as openpose
+from . import openpose_python as openpose_python
