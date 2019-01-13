@@ -168,7 +168,7 @@ public:
     }
 };
 
-PYBIND11_MODULE(_openpose, m) {
+PYBIND11_MODULE(openpose_python, m) {
 
     // Functions for Init Params
     m.def("init_int", &init_int, "Init Function");
