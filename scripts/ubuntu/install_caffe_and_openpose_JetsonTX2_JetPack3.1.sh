@@ -35,7 +35,7 @@ function executeShInItsFolder {
 
 
 
-git submodule update --init --recursive
+git submodule update --init --recursive --remote
 executeShInItsFolder "install_caffe_JetsonTX2_JetPack3.1.sh" "./3rdparty/caffe" "../.."
 exitIfError
 

@@ -41,8 +41,6 @@ echo ""
 
 
 echo "------------------------- Compiling OpenPose -------------------------"
-# Go back to main folder
-cd ../..
 # Copy Makefile & Makefile.config
 cp scripts/ubuntu/Makefile.example Makefile
 cp scripts/ubuntu/Makefile.config.Ubuntu16_cuda8_JetsonTX2 Makefile.config

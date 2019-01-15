@@ -640,7 +640,7 @@ if (UNIX OR APPLE)
       list(LENGTH CAFFE_DIR_VALID CAFFE_DIR_VALID_LENGTH)
       if (CAFFE_DIR_VALID_LENGTH EQUAL 0)
         execute_process(COMMAND git submodule update --init ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
-        # execute_process(COMMAND git submodule update --init --recursive) # This would initialize them all
+        # execute_process(COMMAND git submodule update --init --recursive --remote) # This would initialize them all
       else (CAFFE_DIR_VALID_LENGTH EQUAL 0)
         message(STATUS "Caffe has already been downloaded.")
       endif (CAFFE_DIR_VALID_LENGTH EQUAL 0)
@@ -923,7 +923,7 @@ if (BUILD_PYTHON)
   elseif (UNIX OR APPLE)
     if (Caffe_FOUND)
       execute_process(COMMAND git submodule update --init ${CMAKE_SOURCE_DIR}/3rdparty/pybind11/)
-      # execute_process(COMMAND git submodule update --init --recursive) # This would initialize them all
+      # execute_process(COMMAND git submodule update --init --recursive --remote) # This would initialize them all
       add_subdirectory(3rdparty/pybind11)
       add_subdirectory(python)
     endif (Caffe_FOUND)

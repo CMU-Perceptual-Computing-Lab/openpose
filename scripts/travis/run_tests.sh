@@ -40,7 +40,7 @@ if [[ $RUN_EXAMPLES == true ]] ; then
   if [[ $WITH_PYTHON == true ]] ; then
     echo "Python API C++: OpenPose demo..."
     cd build/examples/tutorial_api_python
-    python openpose_test.py --net_resolution -1x32 --image_dir ../../../examples/media/ --write_json output/ --display 0 --render_pose 0
+    python openpose_python.py --net_resolution -1x32 --image_dir ../../../examples/media/ --write_json output/ --display 0 --render_pose 0
     echo " "
     # Note: All Python examples require GUI
   fi

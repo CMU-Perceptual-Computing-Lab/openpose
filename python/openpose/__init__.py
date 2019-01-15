@@ -1,1 +1,1 @@
-from . import openpose_python as openpose_python
+from . import pyopenpose as pyopenpose

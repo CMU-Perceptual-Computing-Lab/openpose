@@ -3,7 +3,7 @@
 
 
 echo "------------------------- Installing OpenPose -------------------------"
-echo "NOTE: This script assumes that just flashed JetPack 3.1 : Ubuntu 16, CUDA 8, cuDNN 6 and OpenCV are already installed on your machine. Otherwise, it might fail."
+echo "NOTE: This script assumes that just flashed JetPack 3.3 : Ubuntu 16, CUDA 9, cuDNN 7 and OpenCV are already installed on your machine. Otherwise, it might fail."
 
 function exitIfError {
     if [[ $? -ne 0 ]] ; then
@@ -41,11 +41,9 @@ echo ""
 
 
 echo "------------------------- Compiling OpenPose -------------------------"
-# Go back to main folder
-cd ../..
 # Copy Makefile & Makefile.config
 cp scripts/ubuntu/Makefile.example_openpose Makefile
-cp scripts/ubuntu/Makefile.config.Ubuntu16_cuda9_JetsonTX2_openpose Makefile.config
+cp scripts/ubuntu/Makefile.config.Ubuntu16_cuda9_JetsonTX2_JetPack33 Makefile.config
 # Compile OpenPose
 make all -j`nproc`
 exitIfError
