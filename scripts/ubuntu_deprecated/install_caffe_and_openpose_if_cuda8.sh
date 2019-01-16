@@ -41,7 +41,7 @@ exitIfError
 
 
 
-executeShInItsFolder "install_openpose_if_cuda8.sh" "./scripts/ubuntu_deprecated/" "./"
+executeShInItsFolder "./scripts/ubuntu_deprecated/install_openpose_if_cuda8.sh" "./" "./"
 exitIfError
 
 

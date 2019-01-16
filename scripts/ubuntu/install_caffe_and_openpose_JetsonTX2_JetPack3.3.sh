@@ -42,7 +42,7 @@ exitIfError
 
 
 
-executeShInItsFolder "install_openpose_JetsonTX2_JetPack3.3.sh" "./scripts/ubuntu/" "./"
+executeShInItsFolder "./scripts/ubuntu/install_openpose_JetsonTX2_JetPack3.3.sh" "./" "./"
 exitIfError
 
 

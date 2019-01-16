@@ -33,16 +33,9 @@ function executeShInItsFolder {
 
 
 
-echo "------------------------- Checking Ubuntu Version -------------------------"
-# If you respected the installation assumptions, nothing to do. 
-echo "------------------------- Ubuntu Version Checked -------------------------"
-echo ""
-
-
-
 echo "------------------------- Compiling OpenPose -------------------------"
 # Copy Makefile & Makefile.config
-cp scripts/ubuntu/Makefile.example_openpose Makefile
+cp scripts/ubuntu/Makefile.example Makefile
 cp scripts/ubuntu/Makefile.config.Ubuntu16_cuda9_JetsonTX2_JetPack33 Makefile.config
 # Compile OpenPose
 make all -j`nproc`

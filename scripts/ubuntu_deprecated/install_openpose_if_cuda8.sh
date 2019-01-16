@@ -34,7 +34,7 @@ function executeShInItsFolder {
 
 
 
-executeShInItsFolder "scripts/ubuntu_deprecated/copy_makefile_files.sh" "../.." "./"
+executeShInItsFolder "scripts/ubuntu_deprecated/copy_makefile_files.sh" "./" "./"
 
 
 

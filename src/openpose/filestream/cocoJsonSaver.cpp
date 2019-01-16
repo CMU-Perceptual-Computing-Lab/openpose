@@ -61,7 +61,8 @@ namespace op
                         indexesInCocoOrder = std::vector<int>{0, 14,13,16,15,    4,1,5,2,6,    3,10,7,11, 8,    12, 9};
                     else if (numberBodyParts == 18)
                         indexesInCocoOrder = std::vector<int>{0, 15,14,17,16,    5,2,6,3,7,    4,11,8,12, 9,    13,10};
-                    else if (mPoseModel == PoseModel::BODY_25B || mPoseModel == PoseModel::BODY_95)
+                    else if (mPoseModel == PoseModel::BODY_25B || mPoseModel == PoseModel::BODY_95
+                        || mPoseModel == PoseModel::BODY_135)
                         indexesInCocoOrder = std::vector<int>{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
                     else if (numberBodyParts == 19 || numberBodyParts == 25 || numberBodyParts == 59)
                         indexesInCocoOrder = std::vector<int>{0, 16,15,18,17,    5,2,6,3,7,    4,12,9,13,10,    14,11};

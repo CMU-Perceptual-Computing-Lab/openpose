@@ -240,6 +240,59 @@ namespace op
         {F95+60, "IMouth0"}, {F95+61, "IMouth1"}, {F95+62, "IMouth2"}, {F95+63, "IMouth3"}, {F95+64, "IMouth4"}, {F95+65, "IMouth5"}, {F95+66, "IMouth6"}, {F95+67, "IMouth7"}, // Inner mouth
         {F95+68, "RPupil"}, {F95+69, "LPupil"}, // Pupils
     };
+    const std::map<unsigned int, std::string> POSE_BODY_135_BODY_PARTS {
+        {0,  "Nose"},
+        {1,  "LEye"},
+        {2,  "REye"},
+        {3,  "LEar"},
+        {4,  "REar"},
+        {5,  "LShoulder"},
+        {6,  "RShoulder"},
+        {7,  "LElbow"},
+        {8,  "RElbow"},
+        {9,  "LWrist"},
+        {10, "RWrist"},
+        {11, "LHip"},
+        {12, "RHip"},
+        {13, "LKnee"},
+        {14, "RKnee"},
+        {15, "LAnkle"},
+        {16, "RAnkle"},
+        {17, "UpperNeck"},
+        {18, "HeadTop"},
+        {19, "LBigToe"},
+        {20, "LSmallToe"},
+        {21, "LHeel"},
+        {22, "RBigToe"},
+        {23, "RSmallToe"},
+        {24, "RHeel"},
+        // Left hand
+        {H135+0, "LThumb1CMC"},       {H135+1, "LThumb2Knuckles"}, {H135+2, "LThumb3IP"},   {H135+3, "LThumb4FingerTip"},
+        {H135+4, "LIndex1Knuckles"},  {H135+5, "LIndex2PIP"},      {H135+6, "LIndex3DIP"},  {H135+7, "LIndex4FingerTip"},
+        {H135+8, "LMiddle1Knuckles"}, {H135+9, "LMiddle2PIP"},     {H135+10, "LMiddle3DIP"},{H135+11, "LMiddle4FingerTip"},
+        {H135+12, "LRing1Knuckles"},  {H135+13, "LRing2PIP"},      {H135+14, "LRing3DIP"},  {H135+15, "LRing4FingerTip"},
+        {H135+16, "LPinky1Knuckles"}, {H135+17, "LPinky2PIP"},     {H135+18, "LPinky3DIP"}, {H135+19, "LPinky4FingerTip"},
+        // Right hand
+        {H135+20, "RThumb1CMC"},      {H135+21, "RThumb2Knuckles"},{H135+22, "RThumb3IP"},  {H135+23, "RThumb4FingerTip"},
+        {H135+24, "RIndex1Knuckles"}, {H135+25, "RIndex2PIP"},     {H135+26, "RIndex3DIP"}, {H135+27, "RIndex4FingerTip"},
+        {H135+28, "RMiddle1Knuckles"},{H135+29, "RMiddle2PIP"},    {H135+30, "RMiddle3DIP"},{H135+31, "RMiddle4FingerTip"},
+        {H135+32, "RRing1Knuckles"},  {H135+33, "RRing2PIP"},      {H135+34, "RRing3DIP"},  {H135+35, "RRing4FingerTip"},
+        {H135+36, "RPinky1Knuckles"}, {H135+37, "RPinky2PIP"},     {H135+38, "RPinky3DIP"}, {H135+39, "RPinky4FingerTip"},
+        // Face
+        {F135+0, "FaceContour0"},   {F135+1, "FaceContour1"},   {F135+2, "FaceContour2"},   {F135+3, "FaceContour3"},   {F135+4, "FaceContour4"},   {F135+5, "FaceContour5"},   // Contour 1/3
+        {F135+6, "FaceContour6"},   {F135+7, "FaceContour7"},   {F135+8, "FaceContour8"},   {F135+9, "FaceContour9"},   {F135+10, "FaceContour10"}, {F135+11, "FaceContour11"}, // Contour 2/3
+        {F135+12, "FaceContour12"}, {F135+13, "FaceContour13"}, {F135+14, "FaceContour14"}, {F135+15, "FaceContour15"}, {F135+16, "FaceContour16"},                             // Contour 3/3
+        {F135+17, "REyeBrow0"},  {F135+18, "REyeBrow1"},  {F135+19, "REyeBrow2"},  {F135+20, "REyeBrow3"},  {F135+21, "REyeBrow4"}, // Right eyebrow
+        {F135+22, "LEyeBrow4"},  {F135+23, "LEyeBrow3"},  {F135+24, "LEyeBrow2"},  {F135+25, "LEyeBrow1"},  {F135+26, "LEyeBrow0"}, // Left eyebrow
+        {F135+27, "NoseUpper0"}, {F135+28, "NoseUpper1"}, {F135+29, "NoseUpper2"}, {F135+30, "NoseUpper3"}, // Upper nose
+        {F135+31, "NoseLower0"}, {F135+32, "NoseLower1"}, {F135+33, "NoseLower2"}, {F135+34, "NoseLower3"}, {F135+35, "NoseLower4"}, // Lower nose
+        {F135+36, "REye0"}, {F135+37, "REye1"}, {F135+38, "REye2"}, {F135+39, "REye3"}, {F135+40, "REye4"}, {F135+41, "REye5"}, // Right eye
+        {F135+42, "LEye0"}, {F135+43, "LEye1"}, {F135+44, "LEye2"}, {F135+45, "LEye3"}, {F135+46, "LEye4"}, {F135+47, "LEye5"}, // Left eye
+        {F135+48, "OMouth0"}, {F135+49, "OMouth1"}, {F135+50, "OMouth2"}, {F135+51, "OMouth3"}, {F135+52, "OMouth4"}, {F135+53, "OMouth5"}, // Outer mouth 1/2
+        {F135+54, "OMouth6"}, {F135+55, "OMouth7"}, {F135+56, "OMouth8"}, {F135+57, "OMouth9"}, {F135+58, "OMouth10"}, {F135+59, "OMouth11"}, // Outer mouth 2/2
+        {F135+60, "IMouth0"}, {F135+61, "IMouth1"}, {F135+62, "IMouth2"}, {F135+63, "IMouth3"}, {F135+64, "IMouth4"}, {F135+65, "IMouth5"}, {F135+66, "IMouth6"}, {F135+67, "IMouth7"}, // Inner mouth
+        {F135+68, "RPupil"}, {F135+69, "LPupil"}, // Pupils
+    };
     const std::map<unsigned int, std::string> POSE_CAR_12_PARTS {
         {0,  "FRWheel"},
         {1,  "FLWheel"},
@@ -395,13 +448,53 @@ namespace op
             // // Eyes-Pupils
             //    218,219, 220,221, 222,223, 224,225
         },
+        // BODY_135
+        std::vector<unsigned int>{
+            // Minimum spanning tree
+            // |------------------------------------------- COCO Body -------------------------------------------|
+            0,1, 2,3, 4,5, 6,7,   8,9,10,11, 12,13,14,15,16,17,18,19, 20,21, 22,23,  24,25, 26,27,   28,29, 30,31,
+            // Redundant ones
+            // |------------------ Foot ------------------| |-- MPII --|
+               32,33, 34,35, 36,37,   38,39, 40,41, 42,43,  44,45, 46,47,
+            // Redundant ones
+            // MPII redundant, ears, ears-shoulders, shoulders-wrists, wrists, wrists-hips, hips, ankles)
+                   48,49,     50,51,  52,53, 54,55,    56,57, 58,59,   60,61, 62,63, 64,65, 66,67, 68,69,
+            // Hand
+            // Left Hand
+                70,71, 72,73, 74,75, 76,77, 78,79,   80,81, 82,83, 84,85, 86,87, 88,89,
+                90,91, 92,93, 94,95, 96,97, 98,99,   100,101, 102,103, 104,105, 106,107, 108,109,
+            // Right Hand
+                110,111, 112,113, 114,115, 116,117, 118,119,   120,121, 122,123, 124,125, 126,127, 128,129,
+                130,131, 132,133, 134,135, 136,137, 138,139,   140,141, 142,143, 144,145, 146,147, 148,149,
+            // Face
+            // COCO-Face
+               150,151, 152,153, 154,155,
+            // Contour
+               156,157, 158,159, 160,161, 162,163, 164,165, 166,167, 168,169, 170,171, 172,173, 174,175, 176,177, 178,179, 180,181,
+               182,183, 184,185, 186,187,
+            // Countour-Eyebrow + Eyebrows
+               188,189, 190,191, 192,193, 194,195, 196,197, 198,199, 200,201, 202,203, 204,205, 206,207, 208,209,
+            // Eyebrow-Nose + Nose
+               210,211, 212,213, 214,215, 216,217, 218,219, 220,221, 222,223, 224,225, 226,227, 228,229,
+            // Nose-Eyes + Eyes
+               230,231, 232,233, 234,235, 236,237, 238,239, 240,241, 242,243, 244,245, 246,247, 248,249, 250,251,
+               252,253,
+            // Nose-Mouth + Outer Mouth
+               254,255, 256,257, 258,259, 260,261, 262,263, 264,265, 266,267, 268,269, 270,271, 272,273, 274,275,
+               276,277,
+            // Outer-Inner + Inner Mouth
+               278,279, 280,281, 282,283, 284,285, 286,287, 288,289, 290,291, 292,293, 294,295//,
+            // // Eyes-Pupils
+            //    296,297, 298,299, 300,301, 302,303
+        },
     };
     // POSE_BODY_PART_MAPPING on HPP crashes on Windows at dynamic initialization if it's on hpp
     const std::array<std::map<unsigned int, std::string>, (int)PoseModel::Size> POSE_BODY_PART_MAPPING{
         POSE_BODY_25_BODY_PARTS,POSE_COCO_BODY_PARTS,   POSE_MPI_BODY_PARTS,    POSE_MPI_BODY_PARTS,
         POSE_BODY_19_BODY_PARTS,POSE_BODY_19_BODY_PARTS,POSE_BODY_19_BODY_PARTS,POSE_BODY_25_BODY_PARTS,
         POSE_BODY_65_BODY_PARTS,POSE_CAR_12_PARTS,      POSE_BODY_25_BODY_PARTS,POSE_BODY_23_BODY_PARTS,
-        POSE_CAR_22_PARTS,      POSE_BODY_19_BODY_PARTS,POSE_BODY_25B_BODY_PARTS,POSE_BODY_95_BODY_PARTS
+        POSE_CAR_22_PARTS,      POSE_BODY_19_BODY_PARTS,POSE_BODY_25B_BODY_PARTS,POSE_BODY_95_BODY_PARTS,
+        POSE_BODY_135_BODY_PARTS
     };
 
     const std::array<std::string, (int)PoseModel::Size> POSE_PROTOTXT{
@@ -421,6 +514,7 @@ namespace op
         "pose/body_19e/pose_deploy.prototxt",
         "pose/body_25b/pose_deploy.prototxt",
         "pose/body_95/pose_deploy.prototxt",
+        "pose/body_135/pose_deploy.prototxt",
     };
     const std::array<std::string, (int)PoseModel::Size> POSE_TRAINED_MODEL{
         "pose/body_25/pose_iter_584000.caffemodel",
@@ -439,12 +533,13 @@ namespace op
         "pose/body_19e/pose_iter_XXXXXX.caffemodel",
         "pose/body_25b/pose_iter_XXXXXX.caffemodel",
         "pose/body_95/pose_iter_XXXXXX.caffemodel",
+        "pose/body_135/pose_iter_XXXXXX.caffemodel",
     };
 
     // Constant Array Parameters
     // POSE_NUMBER_BODY_PARTS equivalent to size of std::map POSE_BODY_XX_BODY_PARTS - 1 (removing background)
     const std::array<unsigned int, (int)PoseModel::Size> POSE_NUMBER_BODY_PARTS{
-        25, 18, 15, 15, 19, 19, 19, 25, 65, 12, 25, 23, 22, 19, 25, 95
+        25, 18, 15, 15, 19, 19, 19, 25, 65, 12, 25, 23, 22, 19, 25, 95, 135
     };
     const std::array<std::vector<unsigned int>, (int)PoseModel::Size> POSE_BODY_PART_PAIRS{
         // BODY_25
@@ -540,9 +635,9 @@ namespace op
             // Redundant ones
             // MPII redundant, ears, ears-shoulders, shoulders-wrists, wrists, wrists-hips, hips, ankles)
                  6,17, 6,18,   3,4,     3,5, 4,6,        5,9, 6,10,     9,10,  9,11, 10,12, 11,12, 15,16,
+            // Face
             // COCO-Face
             0,F95+30, 2,F95+39,1,F95+42,
-            // Face
             // Contour
                F95+0,F95+1, F95+1,F95+2, F95+2,F95+3, F95+3,F95+4, F95+4,F95+5, F95+5,F95+6, F95+6,F95+7, F95+7,F95+8,
                F95+8,F95+9, F95+9,F95+10, F95+10,F95+11, F95+11,F95+12, F95+12,F95+13, F95+13,F95+14, F95+14,F95+15,
@@ -564,6 +659,49 @@ namespace op
                F95+65,F95+66, F95+66,F95+67//,
             // // Eyes-Pupils
             //    F95+36,F95+68, F95+39,F95+68, F95+42,F95+69, F95+45,F95+69
+        },
+        // BODY_135
+        std::vector<unsigned int>{
+            // Minimum spanning tree
+            // |------------------------------------------- COCO Body -------------------------------------------|
+            0,1, 0,2, 1,3, 2,4,   0,5, 0,6,   5,7, 6,8,   7,9, 8,10,   5,11, 6,12,   11,13, 12,14,   13,15, 14,16,
+            // |------------------ Foot ------------------| |-- MPII --|
+               15,19, 19,20, 15,21,   16,22, 22,23, 16,24,   5,17,17,18,
+            // Redundant ones
+            // MPII redundant, ears, ears-shoulders, shoulders-wrists, wrists, wrists-hips, hips, ankles)
+                    6,17,      3,4,     3,5, 4,6,        5,9, 6,10,     9,10,  9,11, 10,12, 11,12, 15,16,
+            // Left Hand
+               9,H135+0, H135+0,H135+1, H135+1,H135+2, H135+2,H135+3,           9,H135+4, H135+4,H135+5, H135+5,H135+6, H135+6,H135+7,
+               9,H135+8, H135+8,H135+9, H135+9,H135+10, H135+10,H135+11,        9,H135+12, H135+12,H135+13, H135+13,H135+14, H135+14,H135+15,
+               9,H135+16, H135+16,H135+17, H135+17,H135+18, H135+18,H135+19,
+            // Right Hand
+               10,H135+20, H135+20,H135+21, H135+21,H135+22, H135+22,H135+23,   10,H135+24, H135+24,H135+25, H135+25,H135+26, H135+26,H135+27,
+               10,H135+28, H135+28,H135+29, H135+29,H135+30, H135+30,H135+31,   10,H135+32, H135+32,H135+33, H135+33,H135+34, H135+34,H135+35,
+               10,H135+36, H135+36,H135+37, H135+37,H135+38, H135+38,H135+39,
+            // Face
+            // COCO-Face
+            0,F135+30, 2,F135+39,1,F135+42,
+            // Contour
+               F135+0,F135+1, F135+1,F135+2, F135+2,F135+3, F135+3,F135+4, F135+4,F135+5, F135+5,F135+6, F135+6,F135+7, F135+7,F135+8,
+               F135+8,F135+9, F135+9,F135+10, F135+10,F135+11, F135+11,F135+12, F135+12,F135+13, F135+13,F135+14, F135+14,F135+15,
+               F135+15,F135+16,
+            // Countour-Eyebrow + Eyebrows
+               F135+0,F135+17, F135+16,F135+26, F135+17,F135+18, F135+18,F135+19, F135+19,F135+20, F135+20,F135+21, F135+21,F135+22,
+               F135+22,F135+23, F135+23,F135+24, F135+24,F135+25, F135+25,F135+26,
+            // Eyebrow-Nose + Nose
+               F135+21,F135+27, F135+22,F135+27, F135+27,F135+28, F135+28,F135+29, F135+29,F135+30, F135+30,F135+33, F135+33,F135+32,
+               F135+32,F135+31, F135+33,F135+34, F135+34,F135+35,
+            // Nose-Eyes + Eyes
+               F135+27,F135+39, F135+27,F135+42, F135+36,F135+37, F135+37,F135+38, F135+38,F135+39, F135+39,F135+40, F135+40,F135+41,
+               F135+42,F135+43, F135+43,F135+44, F135+44,F135+45, F135+45,F135+46, F135+46,F135+47,
+            // Nose-Mouth + Outer Mouth
+               F135+33,F135+51, F135+48,F135+49, F135+49,F135+50, F135+50,F135+51, F135+51,F135+52, F135+52,F135+53, F135+53,F135+54,
+               F135+54,F135+55, F135+55,F135+56, F135+56,F135+57, F135+57,F135+58, F135+58,F135+59,
+            // Outer-Inner + Inner Mouth
+               F135+48,F135+60, F135+54,F135+64, F135+60,F135+61, F135+61,F135+62, F135+62,F135+63, F135+63,F135+64, F135+64,F135+65,
+               F135+65,F135+66, F135+66,F135+67//,
+            // // Eyes-Pupils
+            //    F135+36,F135+68, F135+39,F135+68, F135+42,F135+69, F135+45,F135+69
         }
     };
 

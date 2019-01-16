@@ -16,6 +16,7 @@ namespace op
     __constant__ const unsigned int BODY_25B_PAIRS_GPU[] = {POSE_BODY_25B_PAIRS_RENDER_GPU};
     __constant__ const unsigned int BODY_65_PAIRS_GPU[] = {POSE_BODY_65_PAIRS_RENDER_GPU};
     __constant__ const unsigned int BODY_95_PAIRS_GPU[] = {POSE_BODY_95_PAIRS_RENDER_GPU};
+    __constant__ const unsigned int BODY_135_PAIRS_GPU[] = {POSE_BODY_135_PAIRS_RENDER_GPU};
     __constant__ const unsigned int MPI_PAIRS_GPU[] = {POSE_MPI_PAIRS_RENDER_GPU};
     __constant__ const unsigned int CAR_12_PAIRS_GPU[] = {POSE_CAR_12_PAIRS_RENDER_GPU};
     __constant__ const unsigned int CAR_22_PAIRS_GPU[] = {POSE_CAR_22_PAIRS_RENDER_GPU};
@@ -27,6 +28,7 @@ namespace op
     __constant__ const float BODY_25B_SCALES[] = {POSE_BODY_25B_SCALES_RENDER_GPU};
     __constant__ const float BODY_65_SCALES[] = {POSE_BODY_65_SCALES_RENDER_GPU};
     __constant__ const float BODY_95_SCALES[] = {POSE_BODY_95_SCALES_RENDER_GPU};
+    __constant__ const float BODY_135_SCALES[] = {POSE_BODY_135_SCALES_RENDER_GPU};
     __constant__ const float MPI_SCALES[] = {POSE_MPI_SCALES_RENDER_GPU};
     __constant__ const float CAR_12_SCALES[] = {POSE_CAR_12_SCALES_RENDER_GPU};
     __constant__ const float CAR_22_SCALES[] = {POSE_CAR_22_SCALES_RENDER_GPU};
@@ -38,6 +40,7 @@ namespace op
     __constant__ const float BODY_25B_COLORS[] = {POSE_BODY_25B_COLORS_RENDER_GPU};
     __constant__ const float BODY_65_COLORS[] = {POSE_BODY_65_COLORS_RENDER_GPU};
     __constant__ const float BODY_95_COLORS[] = {POSE_BODY_95_COLORS_RENDER_GPU};
+    __constant__ const float BODY_135_COLORS[] = {POSE_BODY_135_COLORS_RENDER_GPU};
     __constant__ const float MPI_COLORS[] = {POSE_MPI_COLORS_RENDER_GPU};
     __constant__ const float CAR_12_COLORS[] = {POSE_CAR_12_COLORS_RENDER_GPU};
     __constant__ const float CAR_22_COLORS[] = {POSE_CAR_22_COLORS_RENDER_GPU};
@@ -121,9 +124,10 @@ namespace op
         colorPtr.z *= rad;
     }
 
-    __global__ void renderPoseCoco(float* targetPtr, const int targetWidth, const int targetHeight,
-                                   const float* const posePtr, const int numberPeople, const float threshold,
-                                   const bool googlyEyes, const bool blendOriginalFrame, const float alphaColorToAdd)
+    __global__ void renderPoseCoco(
+        float* targetPtr, const int targetWidth, const int targetHeight, const float* const posePtr,
+        const int numberPeople, const float threshold, const bool googlyEyes, const bool blendOriginalFrame,
+        const float alphaColorToAdd)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -148,9 +152,10 @@ namespace op
                         blendOriginalFrame, (googlyEyes ? 14 : -1), (googlyEyes ? 15 : -1));
     }
 
-    __global__ void renderPoseBody19(float* targetPtr, const int targetWidth, const int targetHeight,
-                                     const float* const posePtr, const int numberPeople, const float threshold,
-                                     const bool googlyEyes, const bool blendOriginalFrame, const float alphaColorToAdd)
+    __global__ void renderPoseBody19(
+        float* targetPtr, const int targetWidth, const int targetHeight, const float* const posePtr,
+        const int numberPeople, const float threshold, const bool googlyEyes, const bool blendOriginalFrame,
+        const float alphaColorToAdd)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -175,9 +180,10 @@ namespace op
                         blendOriginalFrame, (googlyEyes ? 15 : -1), (googlyEyes ? 16 : -1));
     }
 
-    __global__ void renderPoseBody23(float* targetPtr, const int targetWidth, const int targetHeight,
-                                     const float* const posePtr, const int numberPeople, const float threshold,
-                                     const bool googlyEyes, const bool blendOriginalFrame, const float alphaColorToAdd)
+    __global__ void renderPoseBody23(
+        float* targetPtr, const int targetWidth, const int targetHeight, const float* const posePtr,
+        const int numberPeople, const float threshold, const bool googlyEyes, const bool blendOriginalFrame,
+        const float alphaColorToAdd)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -202,9 +208,10 @@ namespace op
                         blendOriginalFrame, (googlyEyes ? 13 : -1), (googlyEyes ? 14 : -1));
     }
 
-    __global__ void renderPoseBody25(float* targetPtr, const int targetWidth, const int targetHeight,
-                                     const float* const posePtr, const int numberPeople, const float threshold,
-                                     const bool googlyEyes, const bool blendOriginalFrame, const float alphaColorToAdd)
+    __global__ void renderPoseBody25(
+        float* targetPtr, const int targetWidth, const int targetHeight, const float* const posePtr,
+        const int numberPeople, const float threshold, const bool googlyEyes, const bool blendOriginalFrame,
+        const float alphaColorToAdd)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -229,9 +236,10 @@ namespace op
                         blendOriginalFrame, (googlyEyes ? 15 : -1), (googlyEyes ? 16 : -1));
     }
 
-    __global__ void renderPoseBody25b(float* targetPtr, const int targetWidth, const int targetHeight,
-                                      const float* const posePtr, const int numberPeople, const float threshold,
-                                      const bool googlyEyes, const bool blendOriginalFrame, const float alphaColorToAdd)
+    __global__ void renderPoseBody25b(
+        float* targetPtr, const int targetWidth, const int targetHeight, const float* const posePtr,
+        const int numberPeople, const float threshold, const bool googlyEyes, const bool blendOriginalFrame,
+        const float alphaColorToAdd)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -256,9 +264,10 @@ namespace op
                         blendOriginalFrame, (googlyEyes ? 1 : -1), (googlyEyes ? 2 : -1));
     }
 
-    __global__ void renderPoseBody65(float* targetPtr, const int targetWidth, const int targetHeight,
-                                     const float* const posePtr, const int numberPeople, const float threshold,
-                                     const bool googlyEyes, const bool blendOriginalFrame, const float alphaColorToAdd)
+    __global__ void renderPoseBody65(
+        float* targetPtr, const int targetWidth, const int targetHeight, const float* const posePtr,
+        const int numberPeople, const float threshold, const bool googlyEyes, const bool blendOriginalFrame,
+        const float alphaColorToAdd)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -283,9 +292,10 @@ namespace op
                         blendOriginalFrame, (googlyEyes ? 15 : -1), (googlyEyes ? 16 : -1));
     }
 
-    __global__ void renderPoseBody95(float* targetPtr, const int targetWidth, const int targetHeight,
-                                     const float* const posePtr, const int numberPeople, const float threshold,
-                                     const bool googlyEyes, const bool blendOriginalFrame, const float alphaColorToAdd)
+    __global__ void renderPoseBody95(
+        float* targetPtr, const int targetWidth, const int targetHeight, const float* const posePtr,
+        const int numberPeople, const float threshold, const bool googlyEyes, const bool blendOriginalFrame,
+        const float alphaColorToAdd)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -310,9 +320,37 @@ namespace op
                         blendOriginalFrame, (googlyEyes ? 1 : -1), (googlyEyes ? 2 : -1));
     }
 
-    __global__ void renderPoseMpi29Parts(float* targetPtr, const int targetWidth, const int targetHeight,
-                                         const float* const posePtr, const int numberPeople, const float threshold,
-                                         const bool blendOriginalFrame, const float alphaColorToAdd)
+    __global__ void renderPoseBody135(
+        float* targetPtr, const int targetWidth, const int targetHeight, const float* const posePtr,
+        const int numberPeople, const float threshold, const bool googlyEyes, const bool blendOriginalFrame,
+        const float alphaColorToAdd)
+    {
+        const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
+        const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
+        const auto globalIdx = threadIdx.y * blockDim.x + threadIdx.x;
+
+        // Shared parameters
+        __shared__ float2 sharedMins[POSE_MAX_PEOPLE];
+        __shared__ float2 sharedMaxs[POSE_MAX_PEOPLE];
+        __shared__ float sharedScaleF[POSE_MAX_PEOPLE];
+
+        // Other parameters
+        const auto numberPartPairs = sizeof(BODY_135_PAIRS_GPU) / (2*sizeof(BODY_135_PAIRS_GPU[0]));
+        const auto numberScales = sizeof(BODY_135_SCALES) / sizeof(BODY_135_SCALES[0]);
+        const auto numberColors = sizeof(BODY_135_COLORS) / (3*sizeof(BODY_135_COLORS[0]));
+        const auto radius = fastMin(targetWidth, targetHeight) / 100.f;
+        const auto lineWidth = fastMin(targetWidth, targetHeight) / 120.f;
+
+        // Render key points
+        renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight,
+                        posePtr, BODY_135_PAIRS_GPU, numberPeople, 135, numberPartPairs, BODY_135_COLORS, numberColors,
+                        radius, lineWidth, BODY_135_SCALES, numberScales, threshold, alphaColorToAdd,
+                        blendOriginalFrame, (googlyEyes ? 1 : -1), (googlyEyes ? 2 : -1));
+    }
+
+    __global__ void renderPoseMpi29Parts(
+        float* targetPtr, const int targetWidth, const int targetHeight, const float* const posePtr,
+        const int numberPeople, const float threshold, const bool blendOriginalFrame, const float alphaColorToAdd)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -336,9 +374,10 @@ namespace op
                         radius, lineWidth, COCO_SCALES, numberScales, threshold, alphaColorToAdd, blendOriginalFrame);
     }
 
-    __global__ void renderPoseCar12(float* targetPtr, const int targetWidth, const int targetHeight,
-                                    const float* const posePtr, const int numberPeople, const float threshold,
-                                    const bool googlyEyes, const bool blendOriginalFrame, const float alphaColorToAdd)
+    __global__ void renderPoseCar12(
+        float* targetPtr, const int targetWidth, const int targetHeight, const float* const posePtr,
+        const int numberPeople, const float threshold, const bool googlyEyes, const bool blendOriginalFrame,
+        const float alphaColorToAdd)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -363,9 +402,10 @@ namespace op
                         blendOriginalFrame, (googlyEyes ? 4 : -1), (googlyEyes ? 5 : -1));
     }
 
-    __global__ void renderPoseCar22(float* targetPtr, const int targetWidth, const int targetHeight,
-                                    const float* const posePtr, const int numberPeople, const float threshold,
-                                    const bool googlyEyes, const bool blendOriginalFrame, const float alphaColorToAdd)
+    __global__ void renderPoseCar22(
+        float* targetPtr, const int targetWidth, const int targetHeight, const float* const posePtr,
+        const int numberPeople, const float threshold, const bool googlyEyes, const bool blendOriginalFrame,
+        const float alphaColorToAdd)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -636,6 +676,11 @@ namespace op
                     );
                 else if (poseModel == PoseModel::BODY_95)
                     renderPoseBody95<<<threadsPerBlock, numBlocks>>>(
+                        framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
+                        blendOriginalFrame, alphaBlending
+                    );
+                else if (poseModel == PoseModel::BODY_135)
+                    renderPoseBody135<<<threadsPerBlock, numBlocks>>>(
                         framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
                         blendOriginalFrame, alphaBlending
                     );
