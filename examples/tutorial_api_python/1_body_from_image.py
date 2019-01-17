@@ -64,4 +64,7 @@ opWrapper.emplaceAndPop([datum])
 print("Body keypoints: \n" + str(datum.poseKeypoints))
 while 1:
     cv2.imshow("win", datum.cvOutputData)
-    cv2.waitKey(15)
+    if cv2.waitKey(15) & 0xFF == ord('q'):
+        break
+
+cv2.destroyAllWindows()

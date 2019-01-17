@@ -69,4 +69,7 @@ print("Left hand keypoints: \n" + str(datum.handKeypoints[0]))
 print("Right hand keypoints: \n" + str(datum.handKeypoints[1]))
 while 1:
     cv2.imshow("win", datum.cvOutputData)
-    cv2.waitKey(15)
+    if cv2.waitKey(15) & 0xFF == ord('q'):
+        break
+
+cv2.destroyAllWindows()

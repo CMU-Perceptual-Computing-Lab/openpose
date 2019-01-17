@@ -78,6 +78,9 @@ while 1:
     heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
     combined = cv2.addWeighted(outputImageF, 0.5, heatmap, 0.5, 0)
     cv2.imshow("win", combined)
-    cv2.waitKey(-1)
+    if cv2.waitKey(-1) & 0xFF == ord('q'):
+        break
     counter += 1
     counter = counter % num_maps
+
+cv2.destroyAllWindows()
