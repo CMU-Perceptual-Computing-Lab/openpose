@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Install dependencies for Ubuntu
+# Install dependencies for Mac OS
 echo "Running on Mac OS."
 
 BASEDIR=$(dirname $0)
