@@ -615,11 +615,10 @@ namespace op
     }
 
     template <typename T>
-    void removePeopleBelowThresholds(std::vector<int>& validSubsetIndexes, int& numberPeople,
-                                     const std::vector<std::pair<std::vector<int>, T>>& peopleVector,
-                                     const unsigned int numberBodyParts, const int minSubsetCnt,
-                                     const T minSubsetScore, const int maxPeaks,
-                                     const bool maximizePositives)
+    void removePeopleBelowThresholds(
+        std::vector<int>& validSubsetIndexes, int& numberPeople,
+        const std::vector<std::pair<std::vector<int>, T>>& peopleVector, const unsigned int numberBodyParts,
+        const int minSubsetCnt, const T minSubsetScore, const int maxPeaks, const bool maximizePositives)
     {
         try
         {
@@ -637,11 +636,15 @@ namespace op
                 // same foot usually appears as both left and right keypoints)
                 // Pros: Removed tons of false positives
                 // Cons: Standalone leg will never be recorded
-                if (!maximizePositives && numberBodyParts == 25)
+                if (!maximizePositives && (numberBodyParts == 25 || numberBodyParts > 70))
                 {
                     // No consider foot keypoints for that
                     for (auto i = 19 ; i < 25 ; i++)
                         personCounter -= (peopleVector[index].first.at(i) > 0);
+                    // No consider hand keypoints for that
+                    if (numberBodyParts > 70)
+                        for (auto i = 25 ; i < 65 ; i++)
+                            personCounter -= (peopleVector[index].first.at(i) > 0);
                 }
                 const auto personScore = peopleVector[index].second;
                 if (personCounter >= minSubsetCnt && (personScore/personCounter) >= minSubsetScore)
@@ -651,7 +654,7 @@ namespace op
                     if (numberPeople == maxPeaks)
                         break;
                 }
-                else if ((personCounter < 1 && numberBodyParts != 25) || personCounter < 0)
+                else if ((personCounter < 1 && numberBodyParts != 25 && numberBodyParts < 70) || personCounter < 0)
                     error("Bad personCounter (" + std::to_string(personCounter) + "). Bug in this"
                           " function if this happens.", __LINE__, __FUNCTION__, __FILE__);
             }
@@ -1126,8 +1129,9 @@ namespace op
             int numberPeople;
             std::vector<int> validSubsetIndexes;
             validSubsetIndexes.reserve(fastMin((size_t)maxPeaks, peopleVector.size()));
-            removePeopleBelowThresholds(validSubsetIndexes, numberPeople, peopleVector, numberBodyParts, minSubsetCnt,
-                                        minSubsetScore, maxPeaks, maximizePositives);
+            removePeopleBelowThresholds(
+                validSubsetIndexes, numberPeople, peopleVector, numberBodyParts, minSubsetCnt, minSubsetScore,
+                maxPeaks, maximizePositives);
 
             // Fill and return poseKeypoints
             peopleVectorToPeopleArray(poseKeypoints, poseScores, scaleFactor, peopleVector, validSubsetIndexes,

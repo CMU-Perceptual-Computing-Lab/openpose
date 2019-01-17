@@ -14,6 +14,8 @@ namespace op
 
         virtual ~ImageSaver();
 
+        void saveImages(const cv::Mat& cvOutputData, const std::string& fileName) const;
+
         void saveImages(const std::vector<cv::Mat>& cvOutputDatas, const std::string& fileName) const;
 
     private:

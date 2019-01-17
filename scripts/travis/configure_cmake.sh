@@ -52,6 +52,11 @@ else
   ARGS="$ARGS -DUSE_CUDNN=Off"
 fi
 
+echo "WITH_DEBUG = ${WITH_DEBUG}."
+if [[ $WITH_DEBUG == true ]] ; then
+  ARGS="$ARGS -DCMAKE_BUILD_TYPE=Debug"
+fi
+
 echo "ARGS = ${ARGS}."
 
 cmake .. $ARGS

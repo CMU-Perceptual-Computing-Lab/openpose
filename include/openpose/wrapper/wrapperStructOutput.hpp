@@ -83,6 +83,20 @@ namespace op
         std::string writeVideo;
 
         /**
+         * Frame rate of the recorded video.
+         * By default (-1.), it will try to get the input frames producer frame rate (e.g., input video or webcam frame
+         * rate). If the input frames producer does not have a set FPS (e.g., image_dir or webcam if OpenCV not
+         * compiled with its support), set this value accordingly (e.g., to the frame rate displayed by the OpenPose
+         * GUI).
+         */
+        double writeVideoFps;
+
+        /**
+         * Whether to save the output video with audio. The input producer must be a video too.
+         */
+        bool writeVideoWithAudio;
+
+        /**
          * Rendered heat maps saving folder.
          * In order to save the heatmaps, WrapperStructPose.heatMapTypes must also be filled.
          * If it is empty (default), it is disabled.
@@ -94,15 +108,6 @@ namespace op
          * Analogous to writeImagesFormat.
          */
         std::string writeHeatMapsFormat;
-
-        /**
-         * Frame rate of the recorded video.
-         * By default (-1.), it will try to get the input frames producer frame rate (e.g., input video or webcam frame
-         * rate). If the input frames producer does not have a set FPS (e.g., image_dir or webcam if OpenCV not
-         * compiled with its support), set this value accordingly (e.g., to the frame rate displayed by the OpenPose
-         * GUI).
-         */
-        double writeVideoFps;
 
         /**
          * Rendered 3D images saving video path.
@@ -146,10 +151,11 @@ namespace op
             const std::string& writeCocoJson = "", const std::string& writeCocoFootJson = "",
             const int writeCocoJsonVariant = 1, const std::string& writeImages = "",
             const std::string& writeImagesFormat = "", const std::string& writeVideo = "",
-            const double writeVideoFps = -1., const std::string& writeHeatMaps = "",
-            const std::string& writeHeatMapsFormat = "", const std::string& writeVideo3D = "",
-            const std::string& writeVideoAdam = "", const std::string& writeBvh = "",
-            const std::string& udpHost = "", const std::string& udpPort = "");
+            const double writeVideoFps = -1., const bool writeVideoWithAudio = false,
+            const std::string& writeHeatMaps = "", const std::string& writeHeatMapsFormat = "",
+            const std::string& writeVideo3D = "", const std::string& writeVideoAdam = "",
+            const std::string& writeBvh = "", const std::string& udpHost = "",
+            const std::string& udpPort = "");
     };
 }
 

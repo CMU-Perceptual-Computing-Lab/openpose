@@ -700,12 +700,19 @@ namespace op
             if (!wrapperStructOutput.writeVideo.empty())
             {
                 log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                // Sanity checks
                 if (!oPProducer)
                     error("Video file can only be recorded inside `wrapper/wrapper.hpp` if the producer"
                           " is one of the default ones (e.g., video, webcam, ...).",
                           __LINE__, __FUNCTION__, __FILE__);
+                if (wrapperStructOutput.writeVideoWithAudio && producerSharedPtr->getType() != ProducerType::Video)
+                    error("Audio can only be added to the output saved video if the input is also a video (either"
+                          " disable `--write_video_with_audio` or use a video as input with `--video`).",
+                          __LINE__, __FUNCTION__, __FILE__);
+                // Create video saver worker
                 const auto videoSaver = std::make_shared<VideoSaver>(
-                    wrapperStructOutput.writeVideo, CV_FOURCC('M','J','P','G'), originalVideoFps);
+                    wrapperStructOutput.writeVideo, CV_FOURCC('M','J','P','G'), originalVideoFps,
+                    (wrapperStructOutput.writeVideoWithAudio ? wrapperStructInput.producerString : ""));
                 outputWs.emplace_back(std::make_shared<WVideoSaver<TDatumsSP>>(videoSaver));
             }
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
@@ -800,7 +807,7 @@ namespace op
                     if (!wrapperStructOutput.writeVideo3D.empty())
                     {
                         const auto videoSaver = std::make_shared<VideoSaver>(
-                            wrapperStructOutput.writeVideo3D, CV_FOURCC('M','J','P','G'), originalVideoFps);
+                            wrapperStructOutput.writeVideo3D, CV_FOURCC('M','J','P','G'), originalVideoFps, "");
                         videoSaver3DW = std::make_shared<WVideoSaver3D<TDatumsSP>>(videoSaver);
                     }
                 }

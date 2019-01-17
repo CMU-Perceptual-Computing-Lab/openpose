@@ -22,31 +22,61 @@ matrix:
   #   WITH_MKL: false
   include:
   # Ubuntu 16.04
-  # Ubuntu 16.04 - Default - CMake - CUDA
+  # Ubuntu 16.04 - Python - CMake - CUDA
   - os: linux
     dist: xenial
-    env: NAME="U16-default-cmake-cuda8"
+    env: NAME="U16-python-cmake-cuda8" WITH_PYTHON=true
     sudo: required
     # Generate and deploy documentation
     after_success:
       - cd $TRAVIS_BUILD_DIR
       - chmod +x scripts/generate_gh_pages.sh
       - ./scripts/generate_gh_pages.sh
-  # Ubuntu 16.04 - Python - CMake - CUDA
+  # Ubuntu 16.04 - Python - CMake - CPU
   - os: linux
     dist: xenial
-    env: NAME="U16-python-cmake-cuda8" WITH_PYTHON=true
+    env: NAME="U16-python-cmake-cpu" WITH_PYTHON=true WITH_CUDA=false
+    sudo: required
+  # Ubuntu 16.04 - Default - CMake - CUDA
+  - os: linux
+    dist: xenial
+    env: NAME="U16-default-cmake-cuda8"
     sudo: required
   # Ubuntu 16.04 - Default - CMake - CPU
   - os: linux
     dist: xenial
     env: NAME="U16-default-cmake-cpu" WITH_CUDA=false
     sudo: required
-  # Ubuntu 16.04 - Python - CMake - CPU
+  # Ubuntu 16.04 - Python - CMake - CPU - Debug
   - os: linux
     dist: xenial
-    env: NAME="U16-python-cmake-cpu" WITH_PYTHON=true WITH_CUDA=false
+    env: NAME="U16-python-cmake-cpu-debug" WITH_PYTHON=true WITH_CUDA=false WITH_DEBUG=true
     sudo: required
+
+  # Mac OSX
+  # Mac OSX - Python - CMake - CPU
+  - os: osx
+    osx_image: xcode9.4 # xcode10.1 does not work with Python # Versions: https://docs.travis-ci.com/user/languages/objective-c#supported-xcode-versions
+    env: NAME="OSX-python-cmake-cpu" WITH_CUDA=false WITH_PYTHON=true
+    sudo: required
+  # Mac OSX - Default - CMake - CPU
+  - os: osx
+    osx_image: xcode10.1 # Versions: https://docs.travis-ci.com/user/languages/objective-c#supported-xcode-versions
+    env: NAME="OSX-default-cmake-cpu" WITH_CUDA=false
+    sudo: required
+  # Mac OSX - Python - CMake - CPU - Debug
+  - os: osx
+    osx_image: xcode9.4 # xcode10.1 does not work with Python # Versions: https://docs.travis-ci.com/user/languages/objective-c#supported-xcode-versions
+    env: NAME="OSX-python-cmake-cpu" WITH_CUDA=false WITH_PYTHON=true WITH_DEBUG=true
+    sudo: required
+
+  # # TO-DO: To be implemented
+  # # Windows
+  # # Windows - Default - CMake - CUDA
+  # - os: windows
+  #   env: NAME="W10-default-cmake-cuda8"
+
+  # Ubuntu (others)
   # Ubuntu 16.04 - Default - Make - CUDA
   - os: linux
     dist: xenial
@@ -74,8 +104,6 @@ matrix:
   #   dist: xenial
   #   env: NAME="U16-default-cmake-cuda8-nocudnn" WITH_CUDNN=false
   #   sudo: required
-
-  # Ubuntu 14.04
   # Ubuntu 14.04 - Default - CMake - CPU
   - os: linux
     dist: trusty
@@ -92,24 +120,6 @@ matrix:
   #   dist: trusty
   #   env: NAME="U14-default-cmake-cuda8"
   #   sudo: required
-
-  # # TO-DO: To be implemented
-  # # Windows
-  # # Windows - Default - CMake - CUDA
-  # - os: windows
-  #   env: NAME="W10-default-cmake-cuda8"
-
-  # Mac OSX
-  # Mac OSX - Default - CMake - CPU
-  - os: osx
-    osx_image: xcode10.1 # Versions: https://docs.travis-ci.com/user/languages/objective-c#supported-xcode-versions
-    env: NAME="OSX-default-cmake-cpu" WITH_CUDA=false
-    sudo: required
-
-  - os: osx
-    osx_image: xcode9.4 # xcode10.1 does not work with Python # Versions: https://docs.travis-ci.com/user/languages/objective-c#supported-xcode-versions
-    env: NAME="OSX-python-cmake-cpu" WITH_CUDA=false WITH_PYTHON=true
-    sudo: required
 
 # Install apt dependencies
 addons:

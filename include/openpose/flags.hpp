@@ -218,11 +218,19 @@ DEFINE_string(write_images_format,      "png",          "File extension and form
                                                         " function cv::imwrite for all compatible extensions.");
 DEFINE_string(write_video,              "",             "Full file path to write rendered frames in motion JPEG video format. It might fail if the"
                                                         " final path does not finish in `.avi`. It internally uses cv::VideoWriter. Flag"
-                                                        " `write_video_fps` controls FPS.");
+                                                        " `write_video_fps` controls FPS. Alternatively, the video extension can be `.mp4`,"
+                                                        " resulting in a file with a much smaller size and allowing `--write_video_with_audio`."
+                                                        " However, that would require: 1) Ubuntu or Mac system, 2) FFmpeg library installed"
+                                                        " (`sudo apt-get install ffmpeg`), 3) the creation temporarily of a folder with the same"
+                                                        " file path than the final video (without the extension) to storage the intermediate frames"
+                                                        " that will later be used to generate the final MP4 video.");
 DEFINE_double(write_video_fps,          -1.,            "Frame rate for the recorded video. By default, it will try to get the input frames producer"
                                                         " frame rate (e.g., input video or webcam frame rate). If the input frames producer does not"
                                                         " have a set FPS (e.g., image_dir or webcam if OpenCV not compiled with its support), set"
                                                         " this value accordingly (e.g., to the frame rate displayed by the OpenPose GUI).");
+DEFINE_bool(write_video_with_audio,     false,          "If the input is video and the output is so too, it will save the video with audio. It"
+                                                        " requires the output video file path finishing in `.mp4` format (see `write_video` for"
+                                                        " details).");
 DEFINE_string(write_video_3d,           "",             "Analogous to `--write_video`, but applied to the 3D output.");
 DEFINE_string(write_video_adam,         "",             "Experimental, not available yet. Analogous to `--write_video`, but applied to Adam model.");
 DEFINE_string(write_json,               "",             "Directory to write OpenPose output in JSON format. It includes body, hand, and face pose"

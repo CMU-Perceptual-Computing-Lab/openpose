@@ -247,7 +247,7 @@ namespace op
                             const auto originalVideoFps = 30;
                             spImpl->spVideoSaver = std::make_shared<VideoSaver>(
                                 spImpl->mWriteAdamRenderAsVideo, CV_FOURCC('M','J','P','G'),
-                                originalVideoFps
+                                originalVideoFps, ""
                             );
                         }
                         spImpl->spVideoSaver->write(img);

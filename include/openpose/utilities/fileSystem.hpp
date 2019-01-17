@@ -35,6 +35,7 @@ namespace op
 
     /**
      * This function extracts the extension from a full path.
+     * E.g., if fullPath is `/media/document.txt`, output will be `txt`
      * @param fullPath std::string with the full path.
      * @return std::string with the file extension.
      */
