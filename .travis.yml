@@ -107,7 +107,7 @@ matrix:
     sudo: required
 
   - os: osx
-    osx_image: xcode10.1 # Versions: https://docs.travis-ci.com/user/languages/objective-c#supported-xcode-versions
+    osx_image: xcode9.4 # xcode10.1 does not work with Python # Versions: https://docs.travis-ci.com/user/languages/objective-c#supported-xcode-versions
     env: NAME="OSX-python-cmake-cpu" WITH_CUDA=false WITH_PYTHON=true
     sudo: required
 
