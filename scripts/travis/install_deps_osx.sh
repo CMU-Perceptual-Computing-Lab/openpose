@@ -1,7 +1,10 @@
 #!/bin/bash
 
-# Install dependencies for Mac OSX
-echo "Running on Mac OSX."
+# Install dependencies for Mac OS
+echo "Running on Mac OS."
 
-echo "Mac OSX version not implemented for Travis Build testing."
-exit 99
+BASEDIR=$(dirname $0)
+source $BASEDIR/defaults.sh
+
+bash scripts/osx/install_brew.sh
+bash scripts/osx/install_deps.sh

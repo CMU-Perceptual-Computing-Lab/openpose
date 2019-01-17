@@ -15,7 +15,12 @@ fi
 
 echo "WITH_PYTHON = ${WITH_PYTHON}."
 if [[ $WITH_PYTHON == true ]] ; then
-  ARGS="$ARGS -DBUILD_PYTHON=On -DPYTHON_EXECUTABLE=/usr/bin/python2.7 -DPYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython2.7m.so"
+  if [[ "$TRAVIS_OS_NAME" == "linux" ]] ; then
+    ARGS="$ARGS -DBUILD_PYTHON=On -DPYTHON_EXECUTABLE=/usr/bin/python2.7 -DPYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython2.7m.so"
+  fi
+  if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then
+    ARGS="$ARGS -DBUILD_PYTHON=On -DPYTHON_EXECUTABLE=/usr/local/bin/python2.7 -DPYTHON_LIBRARY=/usr/local/opt/python/Frameworks/Python.framework/Versions/2.7/lib/libpython2.7m.dylib"
+  fi
 fi
 
 # CUDA version

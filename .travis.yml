@@ -99,13 +99,17 @@ matrix:
   # - os: windows
   #   env: NAME="W10-default-cmake-cuda8"
 
-  # # TO-DO: To be implemented
-  # # Mac OSX
-  # # Mac OSX - Default - CMake - CPU
-  # - os: osx
-  #   osx_image: xcode10.1 # Versions: https://docs.travis-ci.com/user/languages/objective-c#supported-xcode-versions
-  #   env: NAME="OSX-default-cmake-cpu" WITH_CUDA=false
-  #   sudo: required
+  # Mac OSX
+  # Mac OSX - Default - CMake - CPU
+  - os: osx
+    osx_image: xcode10.1 # Versions: https://docs.travis-ci.com/user/languages/objective-c#supported-xcode-versions
+    env: NAME="OSX-default-cmake-cpu" WITH_CUDA=false
+    sudo: required
+
+  - os: osx
+    osx_image: xcode9.4 # xcode10.1 does not work with Python # Versions: https://docs.travis-ci.com/user/languages/objective-c#supported-xcode-versions
+    env: NAME="OSX-python-cmake-cpu" WITH_CUDA=false WITH_PYTHON=true
+    sudo: required
 
 # Install apt dependencies
 addons:
@@ -120,7 +124,7 @@ addons:
 # Install Caffe and OP dependencies
 install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo bash scripts/travis/install_deps_ubuntu.sh ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo bash scripts/travis/install_deps_osx.sh ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then bash scripts/travis/install_deps_osx.sh ; fi
   - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then exit 99 ; fi
 
 # Running CMake

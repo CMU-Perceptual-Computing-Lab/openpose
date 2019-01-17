@@ -7,7 +7,9 @@ source $BASEDIR/defaults.sh
 
 if [[ $WITH_CMAKE == true ]] ; then
   cd build
-  make -j`nproc`
+  if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then make -j`nproc` ; fi
+  if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then make -j1 ; fi
 else
-  make all -j`nproc`
+  if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then make all -j`nproc` ; fi
+  if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then make all -j1 ; fi
 fi

@@ -10,6 +10,5 @@ brew install hdf5 opencv
 brew install protobuf boost
 brew install cmake
 brew install viennacl
-# Python dependencies
-sudo pip install numpy opencv-python
-sudo pip3 install numpy opencv-python
+sudo pip install numpy
+sudo pip install opencv-python
