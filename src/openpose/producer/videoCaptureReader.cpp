@@ -60,7 +60,7 @@ namespace op
         try
         {
             const auto stringLength = 12u;
-            return toFixedLengthString(   fastMax(0ll, longLongRound(get(CV_CAP_PROP_POS_FRAMES))),   stringLength);
+            return toFixedLengthString(   fastMax(0ull, uLongLongRound(get(CV_CAP_PROP_POS_FRAMES))),   stringLength);
         }
         catch (const std::exception& e)
         {

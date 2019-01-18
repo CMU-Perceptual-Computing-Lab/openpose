@@ -765,7 +765,7 @@ namespace op
                         renderers.emplace_back(std::static_pointer_cast<Renderer>(poseGpuRenderer));
                 // Display
                 const auto numberViews = (producerSharedPtr != nullptr
-                    ? intRound(producerSharedPtr->get(ProducerProperty::NumberViews)) : 1);
+                    ? positiveIntRound(producerSharedPtr->get(ProducerProperty::NumberViews)) : 1);
                 auto finalOutputSizeGui = finalOutputSize;
                 if (numberViews > 1 && finalOutputSizeGui.x > 0)
                     finalOutputSizeGui.x *= numberViews;

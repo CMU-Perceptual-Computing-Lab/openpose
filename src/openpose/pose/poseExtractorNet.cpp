@@ -141,7 +141,7 @@ namespace op
                         // [0, 255]
                         else if (mHeatMapScaleMode == ScaleMode::UnsignedChar)
                             for (auto i = 0u ; i < volumeBodyParts ; i++)
-                                heatMaps[i] = (float)intRound(fastTruncate(heatMaps[i]) * 255.f);
+                                heatMaps[i] = (float)positiveIntRound(fastTruncate(heatMaps[i]) * 255.f);
                         // Avoid values outside original range
                         else
                             for (auto i = 0u ; i < volumeBodyParts ; i++)
@@ -170,7 +170,7 @@ namespace op
                         // [0, 255]
                         else if (mHeatMapScaleMode == ScaleMode::UnsignedChar)
                             for (auto i = 0u ; i < channelOffset ; i++)
-                                heatMapsPtr[i] = (float)intRound(fastTruncate(heatMapsPtr[i]) * 255.f);
+                                heatMapsPtr[i] = (float)positiveIntRound(fastTruncate(heatMapsPtr[i]) * 255.f);
                         // Avoid values outside original range
                         else
                             for (auto i = 0u ; i < channelOffset ; i++)
@@ -201,7 +201,7 @@ namespace op
                         // [0, 255]
                         else if (mHeatMapScaleMode == ScaleMode::UnsignedChar)
                             for (auto i = 0u ; i < volumePAFs ; i++)
-                                heatMapsPtr[i] = (float)intRound(
+                                heatMapsPtr[i] = (float)positiveIntRound(
                                     fastTruncate(heatMapsPtr[i], -1.f) * 128.5f + 128.5f
                                 );
                         // Avoid values outside original range
@@ -245,7 +245,7 @@ namespace op
                 const auto* candidatesCpuPtr = getCandidatesCpuConstPtr();
                 for (auto part = 0u ; part < numberBodyParts ; part++)
                 {
-                    const auto numberPartCandidates = intRound(candidatesCpuPtr[part*peaksArea]);
+                    const auto numberPartCandidates = (int)std::round(candidatesCpuPtr[part*peaksArea]);
                     candidates[part].resize(numberPartCandidates);
                     const auto* partCandidatesPtr = &candidatesCpuPtr[part*peaksArea+3];
                     for (auto candidate = 0 ; candidate < numberPartCandidates ; candidate++)

@@ -212,11 +212,12 @@ namespace op
                         const auto ratioAreas = fastMin(T(1), fastMax(personRectangle.width/(T)width,
                                                                      personRectangle.height/(T)height));
                         // Size-dependent variables
-                        const auto thicknessRatio = fastMax(intRound(std::sqrt(area)
-                                                                     * thicknessCircleRatio * ratioAreas), 2);
+                        const auto thicknessRatio = fastMax(
+                            positiveIntRound(std::sqrt(area)* thicknessCircleRatio * ratioAreas), 2);
                         // Negative thickness in cv::circle means that a filled circle is to be drawn.
                         const auto thicknessCircle = fastMax(1, (ratioAreas > T(0.05) ? thicknessRatio : -1));
-                        const auto thicknessLine = fastMax(1, intRound(thicknessRatio * thicknessLineRatioWRTCircle));
+                        const auto thicknessLine = fastMax(
+                            1, positiveIntRound(thicknessRatio * thicknessLineRatioWRTCircle));
                         const auto radius = thicknessRatio / 2;
 
                         // Draw lines
@@ -226,7 +227,7 @@ namespace op
                             const auto index2 = (person * numberKeypoints + pairs[pair+1]) * keypoints.getSize(2);
                             if (keypoints[index1+2] > threshold && keypoints[index2+2] > threshold)
                             {
-                                const auto thicknessLineScaled = intRound(
+                                const auto thicknessLineScaled = positiveIntRound(
                                     thicknessLine * poseScales[pairs[pair+1] % numberScales]);
                                 const auto colorIndex = pairs[pair+1]*3; // Before: colorIndex = pair/2*3;
                                 const cv::Scalar color{
@@ -234,8 +235,10 @@ namespace op
                                     colors[(colorIndex+1) % numberColors],
                                     colors[colorIndex % numberColors]
                                 };
-                                const cv::Point keypoint1{intRound(keypoints[index1]), intRound(keypoints[index1+1])};
-                                const cv::Point keypoint2{intRound(keypoints[index2]), intRound(keypoints[index2+1])};
+                                const cv::Point keypoint1{
+                                    positiveIntRound(keypoints[index1]), positiveIntRound(keypoints[index1+1])};
+                                const cv::Point keypoint2{
+                                    positiveIntRound(keypoints[index2]), positiveIntRound(keypoints[index2+1])};
                                 cv::line(frameBGR, keypoint1, keypoint2, color, thicknessLineScaled, lineType, shift);
                             }
                         }
@@ -246,16 +249,17 @@ namespace op
                             const auto faceIndex = (person * numberKeypoints + part) * keypoints.getSize(2);
                             if (keypoints[faceIndex+2] > threshold)
                             {
-                                const auto radiusScaled = intRound(radius * poseScales[part % numberScales]);
-                                const auto thicknessCircleScaled = intRound(thicknessCircle * poseScales[part % numberScales]);
+                                const auto radiusScaled = positiveIntRound(radius * poseScales[part % numberScales]);
+                                const auto thicknessCircleScaled = positiveIntRound(
+                                    thicknessCircle * poseScales[part % numberScales]);
                                 const auto colorIndex = part*3;
                                 const cv::Scalar color{
                                     colors[(colorIndex+2) % numberColors],
                                     colors[(colorIndex+1) % numberColors],
                                     colors[colorIndex % numberColors]
                                 };
-                                const cv::Point center{intRound(keypoints[faceIndex]),
-                                                       intRound(keypoints[faceIndex+1])};
+                                const cv::Point center{positiveIntRound(keypoints[faceIndex]),
+                                                       positiveIntRound(keypoints[faceIndex+1])};
                                 cv::circle(frameBGR, center, radiusScaled, color, thicknessCircleScaled, lineType,
                                            shift);
                             }

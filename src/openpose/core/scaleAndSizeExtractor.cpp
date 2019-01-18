@@ -50,11 +50,11 @@ namespace op
                     error("Only 1 of the dimensions of net input resolution can be <= 0.",
                           __LINE__, __FUNCTION__, __FILE__);
                 if (poseNetInputSize.x <= 0)
-                    poseNetInputSize.x = 16 * intRound(
+                    poseNetInputSize.x = 16 * positiveIntRound(
                         poseNetInputSize.y * inputResolution.x / (float) inputResolution.y / 16.f
                     );
                 else // if (poseNetInputSize.y <= 0)
-                    poseNetInputSize.y = 16 * intRound(
+                    poseNetInputSize.y = 16 * positiveIntRound(
                         poseNetInputSize.x * inputResolution.y / (float) inputResolution.x / 16.f
                     );
             }
@@ -68,10 +68,10 @@ namespace op
                     error("All scales must be in the range [0, 1], i.e., 0 <= 1-scale_number*scale_gap <= 1",
                           __LINE__, __FUNCTION__, __FILE__);
 
-                const auto targetWidth = fastTruncate(intRound(poseNetInputSize.x * currentScale) / 16 * 16, 1,
-                                                      poseNetInputSize.x);
-                const auto targetHeight = fastTruncate(intRound(poseNetInputSize.y * currentScale) / 16 * 16, 1,
-                                                       poseNetInputSize.y);
+                const auto targetWidth = fastTruncate(
+                    positiveIntRound(poseNetInputSize.x * currentScale) / 16 * 16, 1, poseNetInputSize.x);
+                const auto targetHeight = fastTruncate(
+                    positiveIntRound(poseNetInputSize.y * currentScale) / 16 * 16, 1, poseNetInputSize.y);
                 const Point<int> targetSize{targetWidth, targetHeight};
                 scaleInputToNetInputs[i] = resizeGetScaleFactor(inputResolution, targetSize);
                 netInputSizes[i] = targetSize;

@@ -302,8 +302,9 @@ namespace op
                 // Get scale net to output (i.e., image input)
                 // Note: In order to resize to input size, (un)comment the following lines
                 const auto scaleProducerToNetInput = resizeGetScaleFactor(inputDataSize, mNetOutputSize);
-                const Point<int> netSize{intRound(scaleProducerToNetInput*inputDataSize.x),
-                                         intRound(scaleProducerToNetInput*inputDataSize.y)};
+                const Point<int> netSize{
+                    (int)std::round(scaleProducerToNetInput*inputDataSize.x),
+                    (int)std::round(scaleProducerToNetInput*inputDataSize.y)};
                 mScaleNetToOutput = {(float)resizeGetScaleFactor(netSize, inputDataSize)};
                 // mScaleNetToOutput = 1.f;
                 // 3. Get peaks by Non-Maximum Suppression
@@ -334,10 +335,10 @@ namespace op
                                               / mScaleNetToOutput;
                         // Make rectangle bigger to make sure the whole body is inside
                         cv::Rect cvRectangle{
-                            intRound(rectangleF.x - 0.2*rectangleF.width),
-                            intRound(rectangleF.y - 0.2*rectangleF.height),
-                            intRound(rectangleF.width*1.4),
-                            intRound(rectangleF.height*1.4)
+                            positiveIntRound(rectangleF.x - 0.2*rectangleF.width),
+                            positiveIntRound(rectangleF.y - 0.2*rectangleF.height),
+                            positiveIntRound(rectangleF.width*1.4),
+                            positiveIntRound(rectangleF.height*1.4)
                         };
                         keepRoiInside(cvRectangle, inputNetData[0].getSize(3), inputNetData[0].getSize(2));
                         // Input size
@@ -372,8 +373,8 @@ namespace op
                         /*const*/ auto scaleNetToRoi = resizeGetScaleFactor(inputSizeInit, targetSize);
                         // Update rectangle to avoid black padding and instead take full advantage of the network area
                         const auto padding = Point<int>{
-                            intRound((targetSize.x-1) / scaleNetToRoi + 1 - inputSizeInit.x),
-                            intRound((targetSize.y-1) / scaleNetToRoi + 1 - inputSizeInit.y)
+                            (int)std::round((targetSize.x-1) / scaleNetToRoi + 1 - inputSizeInit.x),
+                            (int)std::round((targetSize.y-1) / scaleNetToRoi + 1 - inputSizeInit.y)
                         };
                         // Width requires padding
                         if (padding.x > 2 || padding.y > 2) // 2 pixels as threshold

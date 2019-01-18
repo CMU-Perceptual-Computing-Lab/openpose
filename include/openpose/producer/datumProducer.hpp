@@ -74,7 +74,7 @@ namespace op
                 && frameLast > spProducer->get(CV_CAP_PROP_FRAME_COUNT)-1)
                 error("The desired last frame must be lower than the length of the video or the number of images."
                       " Current: " + std::to_string(frameLast) + " vs. "
-                      + std::to_string(intRound(spProducer->get(CV_CAP_PROP_FRAME_COUNT))-1) + ".",
+                      + std::to_string(positiveIntRound(spProducer->get(CV_CAP_PROP_FRAME_COUNT))-1) + ".",
                       __LINE__, __FUNCTION__, __FILE__);
             // Set frame first and step
             if (spProducer->getType() != ProducerType::FlirCamera && spProducer->getType() != ProducerType::IPCamera

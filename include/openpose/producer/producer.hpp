@@ -138,12 +138,6 @@ namespace op
         void checkFrameIntegrity(cv::Mat& frame);
 
         /**
-         * It performs flipping and rotation over the desired cv::Mat.
-         * @param cvMat cv::Mat with the frame matrix to be flipped and/or rotated.
-         */
-        void flipAndRotate(cv::Mat& cvMat) const;
-
-        /**
          * Protected function which checks that the frame producer has ended. If so, if resets
          * or releases the producer according to mRepeatWhenFinished.
          */

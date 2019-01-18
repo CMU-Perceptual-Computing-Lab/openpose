@@ -145,7 +145,7 @@ OpenPose Library - Release Notes
         1. Changed several functions on `core/`, `pose/`, `face/`, and `hand/` modules.
     3. `CPU_ONLY` changed by `USE_CUDA` to keep format.
 3. Main bugs fixed:
-    1. Scaling resize issue fixed: ~1-pixel offset due to not considering 0-based indexes.
+    1. Scaling resize issue fixed: approximately 1-pixel offset due to not considering 0-based indexes.
     2. Ubuntu installer script now works even if Python pip was not installed previously.
     3. Flags to set first and last frame as well as jumping frames backward and forward now works on image directory reader.
 
@@ -203,7 +203,7 @@ OpenPose Library - Release Notes
     4. CvMatToOpInput requires PoseModel to know the normalization to be performed.
     5. Created `net/` module in order to reduce `core/` number of classes and files and for future scalability.
 3. Main bugs fixed:
-    1. Slight speed up (~1%) for performing the non-maximum suppression stage only in the body part heatmaps channels, and not also in the PAF channels.
+    1. Slight speed up (around 1%) for performing the non-maximum suppression stage only in the body part heatmaps channels, and not also in the PAF channels.
     2. Fixed core-dumped in PoseRenderer with GUI when changed element to be rendered to something else than skeleton.
     3. 3-D visualizer does not crash on exit anymore.
     4. Fake pause ('m' key pressed) works again.
@@ -320,8 +320,9 @@ OpenPose Library - Release Notes
     9. Renamed `--frame_keep_distortion` as `--frame_undistort`, which performs the opposite operation (the default value has been also changed to the opposite).
     10. Renamed `--camera_parameter_folder` as `--camera_parameter_path` because it could also take a whole XML file path rather than its parent folder.
     11. Default value of flag `--scale_gap` changed from 0.3 to 0.25.
-    12. Moved most sh scripts into the `scripts/` folder. Only models/getModels.sh and the *.bat files are kept under `models/` and `3rdparty/windows`.
+    12. Moved most sh scripts into the `scripts/` folder. Only models/getModels.sh and the `*.bat` files are kept under `models/` and `3rdparty/windows`.
     13. For Python compatibility and scalability increase, template `TDatums` used for `include/openpose/wrapper/wrapper.hpp` has changed from `std::vector<Datum>` to `std::vector<std::shared_ptr<Datum>>`, including the respective changes in all the worker classes. In addition, some template classes have been simplified to only take 1 template parameter for user simplicity.
+    14. Renamed intRound, charRound, etc. by positiveIntRound, positiveCharRound, etc. so that people can realize it is not safe for negative numbers.
 3. Main bugs fixed:
     1. CMake-GUI was forcing to Release mode, allowed Debug modes too.
     2. NMS returns in index 0 the number of found peaks. However, while the number of peaks was truncated to a maximum of 127, this index 0 was saving the real number instead of the truncated one.

@@ -63,7 +63,7 @@ namespace op
                 // [0, 255]
                 else if (heatMapScaleMode == ScaleMode::UnsignedChar)
                     for (auto i = 0u ; i < volumeBodyParts ; i++)
-                        heatMapsPtr[i] = (float)intRound(fastTruncate(heatMapsPtr[i]) * 255.f);
+                        heatMapsPtr[i] = (float)positiveIntRound(fastTruncate(heatMapsPtr[i]) * 255.f);
                 // Avoid values outside original range
                 else
                     for (auto i = 0u ; i < volumeBodyParts ; i++)

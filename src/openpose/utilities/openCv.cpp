@@ -12,8 +12,8 @@ namespace op
             const auto ratio = imageWidth/1280.;
             // const auto fontScale = 0.75;
             const auto fontScale = 0.8 * ratio;
-            const auto fontThickness = std::max(1, intRound(2*ratio));
-            const auto shadowOffset = std::max(1, intRound(2*ratio));
+            const auto fontThickness = std::max(1, positiveIntRound(2*ratio));
+            const auto shadowOffset = std::max(1, positiveIntRound(2*ratio));
             int baseline = 0;
             const auto textSize = cv::getTextSize(textToDisplay, font, fontScale, fontThickness, &baseline);
             const cv::Size finalPosition{position.x - (normalizeWidth ? textSize.width : 0),
@@ -60,7 +60,8 @@ namespace op
                         const auto offsetHeight = y * width;
                         for (auto x = 0 ; x < width ; x++)
                         {
-                            const auto value = uchar( fastTruncate(intRound(arrayPtr[offsetHeight + x]), 0, 255) );
+                            const auto value = uchar(
+                                fastTruncate(positiveIntRound(arrayPtr[offsetHeight + x]), 0, 255));
                             cvMatROIPtr[x] = (unsigned char)(value);
                         }
                     }
@@ -202,6 +203,50 @@ namespace op
             // Width/height negative
             roi.width = fastMax(0, roi.width);
             roi.height = fastMax(0, roi.height);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    void rotateAndFlipFrame(cv::Mat& frame, const double rotationAngle, const bool flipFrame)
+    {
+        try
+        {
+            if (!frame.empty())
+            {
+                const auto rotationAngleInt = (int)std::round(rotationAngle) % 360;
+                if (rotationAngleInt == 0 || rotationAngleInt == 360)
+                {
+                    if (flipFrame)
+                        cv::flip(frame, frame, 1);
+                }
+                else if (rotationAngleInt == 90 || rotationAngleInt == -270)
+                {
+                    cv::transpose(frame, frame);
+                    if (!flipFrame)
+                        cv::flip(frame, frame, 0);
+                }
+                else if (rotationAngleInt == 180 || rotationAngleInt == -180)
+                {
+                    if (flipFrame)
+                        cv::flip(frame, frame, 0);
+                    else
+                        cv::flip(frame, frame, -1);
+                }
+                else if (rotationAngleInt == 270 || rotationAngleInt == -90)
+                {
+                    cv::transpose(frame, frame);
+                    if (flipFrame)
+                        cv::flip(frame, frame, -1);
+                    else
+                        cv::flip(frame, frame, 1);
+                }
+                else
+                    error("Rotation angle = " + std::to_string(rotationAngleInt)
+                          + " != {0, 90, 180, 270} degrees.", __LINE__, __FUNCTION__, __FILE__);
+            }
         }
         catch (const std::exception& e)
         {

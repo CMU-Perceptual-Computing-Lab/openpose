@@ -147,7 +147,7 @@ namespace op
                 // [0, 255]
                 else if (heatMapScaleMode == ScaleMode::UnsignedChar)
                     for (auto i = 0u ; i < volumeBodyParts ; i++)
-                        heatMapsPtr[i] = (float)intRound(fastTruncate(heatMapsPtr[i]) * 255.f);
+                        heatMapsPtr[i] = (float)positiveIntRound(fastTruncate(heatMapsPtr[i]) * 255.f);
                 // Avoid values outside original range
                 else
                     for (auto i = 0u ; i < volumeBodyParts ; i++)
@@ -295,11 +295,13 @@ namespace op
                             const auto minHandSize = fastMin(handRectangle.width, handRectangle.height);
                             // // Debugging -> red rectangle
                             // if (handRectangle.width > 0)
-                            //     cv::rectangle(cvInputDataCopied,
-                            //                   cv::Point{intRound(handRectangle.x), intRound(handRectangle.y)},
-                            //                   cv::Point{intRound(handRectangle.x + handRectangle.width),
-                            //                             intRound(handRectangle.y + handRectangle.height)},
-                            //                   cv::Scalar{(hand * 255.f),0.f,255.f}, 2);
+                            //     cv::rectangle(
+                            //         cvInputDataCopied,
+                            //         cv::Point{positiveIntRound(handRectangle.x),
+                            //                   positiveIntRound(handRectangle.y)},
+                            //         cv::Point{positiveIntRound(handRectangle.x + handRectangle.width),
+                            //                   positiveIntRound(handRectangle.y + handRectangle.height)},
+                            //         cv::Scalar{(hand * 255.f),0.f,255.f}, 2);
                             // Get parts
                             if (minHandSize > 1 && handRectangle.area() > 10)
                             {
@@ -308,12 +310,13 @@ namespace op
                                 {
                                     // // Debugging -> green rectangle overwriting red one
                                     // if (handRectangle.width > 0)
-                                    //     cv::rectangle(cvInputDataCopied,
-                                    //                   cv::Point{intRound(handRectangle.x),
-                                    //                             intRound(handRectangle.y)},
-                                    //                   cv::Point{intRound(handRectangle.x + handRectangle.width),
-                                    //                             intRound(handRectangle.y + handRectangle.height)},
-                                    //                   cv::Scalar{(hand * 255.f),255.f,0.f}, 2);
+                                    //     cv::rectangle(
+                                    //         cvInputDataCopied,
+                                    //         cv::Point{positiveIntRound(handRectangle.x),
+                                    //                   positiveIntRound(handRectangle.y)},
+                                    //         cv::Point{positiveIntRound(handRectangle.x + handRectangle.width),
+                                    //                   positiveIntRound(handRectangle.y + handRectangle.height)},
+                                    //         cv::Scalar{(hand * 255.f),255.f,0.f}, 2);
                                     // Parameters
                                     cv::Mat affineMatrix;
                                     // Resize image to hands positions + cv::Mat -> float*
@@ -339,16 +342,16 @@ namespace op
                                             {1, handCurrent.getSize(1), handCurrent.getSize(2)}, 0.f);
                                         const auto handRectangleScale = recenter(
                                             handRectangle,
-                                            (float)(intRound(handRectangle.width * scale) / 2 * 2),
-                                            (float)(intRound(handRectangle.height * scale) / 2 * 2)
+                                            (float)(positiveIntRound(handRectangle.width * scale) / 2 * 2),
+                                            (float)(positiveIntRound(handRectangle.height * scale) / 2 * 2)
                                         );
                                         // // Debugging -> blue rectangle
                                         // cv::rectangle(cvInputDataCopied,
-                                        //               cv::Point{intRound(handRectangleScale.x),
-                                        //                         intRound(handRectangleScale.y)},
-                                        //               cv::Point{intRound(handRectangleScale.x
+                                        //               cv::Point{positiveIntRound(handRectangleScale.x),
+                                        //                         positiveIntRound(handRectangleScale.y)},
+                                        //               cv::Point{positiveIntRound(handRectangleScale.x
                                         //                                  + handRectangleScale.width),
-                                        //                         intRound(handRectangleScale.y
+                                        //                         positiveIntRound(handRectangleScale.y
                                         //                                  + handRectangleScale.height)},
                                         //               cv::Scalar{255,0,0}, 2);
                                         // Parameters

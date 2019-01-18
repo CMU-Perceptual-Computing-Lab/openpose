@@ -33,7 +33,8 @@ namespace op
         try
         {
             if (capProperty == CV_CAP_PROP_FRAME_WIDTH)
-                return VideoCaptureReader::get(capProperty) / intRound(Producer::get(ProducerProperty::NumberViews));
+                return VideoCaptureReader::get(capProperty)
+                    / positiveIntRound(Producer::get(ProducerProperty::NumberViews));
             else
                 return VideoCaptureReader::get(capProperty);
         }
@@ -73,7 +74,7 @@ namespace op
     {
         try
         {
-            const auto numberViews = intRound(Producer::get(ProducerProperty::NumberViews));
+            const auto numberViews = positiveIntRound(Producer::get(ProducerProperty::NumberViews));
             auto cvMats = VideoCaptureReader::getRawFrames();
             // Split image
             if (cvMats.size() == 1 && numberViews > 1)

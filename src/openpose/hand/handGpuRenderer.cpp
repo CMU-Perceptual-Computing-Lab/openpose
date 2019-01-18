@@ -46,14 +46,14 @@ namespace op
         }
     }
 
-    void HandGpuRenderer::renderHandInherited(Array<float>& outputData,
-                                              const std::array<Array<float>, 2>& handKeypoints)
+    void HandGpuRenderer::renderHandInherited(
+        Array<float>& outputData, const std::array<Array<float>, 2>& handKeypoints)
     {
         try
         {
             // GPU rendering
             #ifdef USE_CUDA
-                // I prefer std::round(T&) over intRound(T) for std::atomic
+                // I prefer std::round(T&) over positiveIntRound(T) for std::atomic
                 const auto elementRendered = spElementToRender->load();
                 const auto numberPeople = handKeypoints[0].getSize(0);
                 const Point<int> frameSize{outputData.getSize(1), outputData.getSize(0)};

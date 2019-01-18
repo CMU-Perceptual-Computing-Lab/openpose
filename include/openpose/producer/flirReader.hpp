@@ -42,7 +42,7 @@ namespace op
     private:
         SpinnakerWrapper mSpinnakerWrapper;
         Point<int> mResolution;
-        long long mFrameNameCounter;
+        unsigned long long mFrameNameCounter;
 
         cv::Mat getRawFrame();
 

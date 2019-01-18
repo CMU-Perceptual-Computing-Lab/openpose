@@ -88,7 +88,7 @@ namespace op
         try
         {
             std::vector<cv::Mat> rawFrames;
-            for (auto i = 0 ; i < intRound(Producer::get(ProducerProperty::NumberViews)) ; i++)
+            for (auto i = 0 ; i < positiveIntRound(Producer::get(ProducerProperty::NumberViews)) ; i++)
                 rawFrames.emplace_back(getRawFrame());
             return rawFrames;
         }

@@ -3,34 +3,37 @@
 
 namespace op
 {
+    // VERY IMPORTANT: These fast functions does NOT work for negative integer numbers.
+    // E.g., positiveIntRound(-180.f) = -179.
+
     // Round functions
     // Signed
     template<typename T>
-    inline __device__ char charRound(const T a)
+    inline __device__ char positiveCharRound(const T a)
     {
         return char(a+0.5f);
     }
 
     template<typename T>
-    inline __device__ signed char sCharRound(const T a)
+    inline __device__ signed char positiveSCharRound(const T a)
     {
         return (signed char)(a+0.5f);
     }
 
     template<typename T>
-    inline __device__ int intRound(const T a)
+    inline __device__ int positiveIntRound(const T a)
     {
         return int(a+0.5f);
     }
 
     template<typename T>
-    inline __device__ long longRound(const T a)
+    inline __device__ long positiveLongRound(const T a)
     {
         return long(a+0.5f);
     }
 
     template<typename T>
-    inline __device__ long long longLongRound(const T a)
+    inline __device__ long long positiveLongLongRound(const T a)
     {
         return (long long)(a+0.5f);
     }

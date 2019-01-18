@@ -52,7 +52,7 @@ namespace op
         {
             // GPU rendering
             #ifdef USE_CUDA
-                // I prefer std::round(T&) over intRound(T) for std::atomic
+                // I prefer std::round(T&) over positiveIntRound(T) for std::atomic
                 const auto elementRendered = spElementToRender->load();
                 const auto numberPeople = faceKeypoints.getSize(0);
                 const Point<int> frameSize{outputData.getSize(1), outputData.getSize(0)};

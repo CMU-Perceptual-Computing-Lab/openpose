@@ -448,9 +448,11 @@ namespace op
                     for (auto lm = 0; lm < numberPointsInLine; lm++)
                     {
                         const auto mX = fastMax(
-                            0, fastMin(imageSize.width-1, intRound(fourPointsVector[i].x + lm*pointDirection[i].x)));
+                            0, fastMin(
+                                imageSize.width-1, positiveIntRound(fourPointsVector[i].x + lm*pointDirection[i].x)));
                         const auto mY = fastMax(
-                            0, fastMin(imageSize.height-1, intRound(fourPointsVector[i].y + lm*pointDirection[i].y)));
+                            0, fastMin(
+                                imageSize.height-1, positiveIntRound(fourPointsVector[i].y + lm*pointDirection[i].y)));
                         const cv::Vec3b bgrValue = image.at<cv::Vec3b>(mY, mX);
                         sum += (bgrValue.val[0] + bgrValue.val[1] + bgrValue.val[2])/3;
                         count++;

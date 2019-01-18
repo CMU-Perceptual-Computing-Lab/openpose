@@ -8,34 +8,37 @@ namespace op
     // E.g., std::round is really slow (~300 ms vs ~10 ms when I individually apply it to each element of a whole
     // image array
 
+    // VERY IMPORTANT: These fast functions does NOT work for negative integer numbers.
+    // E.g., positiveIntRound(-180.f) = -179.
+
     // Round functions
     // Signed
     template<typename T>
-    inline char charRound(const T a)
+    inline char positiveCharRound(const T a)
     {
         return char(a+0.5f);
     }
 
     template<typename T>
-    inline signed char sCharRound(const T a)
+    inline signed char positiveSCharRound(const T a)
     {
         return (signed char)(a+0.5f);
     }
 
     template<typename T>
-    inline int intRound(const T a)
+    inline int positiveIntRound(const T a)
     {
         return int(a+0.5f);
     }
 
     template<typename T>
-    inline long longRound(const T a)
+    inline long positiveLongRound(const T a)
     {
         return long(a+0.5f);
     }
 
     template<typename T>
-    inline long long longLongRound(const T a)
+    inline long long positiveLongLongRound(const T a)
     {
         return (long long)(a+0.5f);
     }

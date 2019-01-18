@@ -221,7 +221,7 @@ namespace op
                                     i*poseKeypoints.getSize(1)*poseKeypoints.getSize(2) +
                                     j*poseKeypoints.getSize(2) + 2];
                             const cv::Point lkPoint = personEntry.keypoints[j];
-                            const cv::Point opPoint{intRound(x), intRound(y)};
+                            const cv::Point opPoint{positiveIntRound(x), positiveIntRound(y)};
 
                             if (prob < confidenceThreshold)
                                 personEntries[id].status[j] = 0;
@@ -232,8 +232,9 @@ namespace op
                                 if (distance < 5)
                                     personEntries[id].keypoints[j] = lkPoint;
                                 else if (distance < 10)
-                                    personEntries[id].keypoints[j] = cv::Point{intRound((lkPoint.x+opPoint.x)/2.),
-                                                                               intRound((lkPoint.y+opPoint.y)/2.)};
+                                    personEntries[id].keypoints[j] = cv::Point{
+                                        positiveIntRound((lkPoint.x+opPoint.x)/2.),
+                                        positiveIntRound((lkPoint.y+opPoint.y)/2.)};
                                 else
                                     personEntries[id].keypoints[j] = opPoint;
                             }
@@ -420,7 +421,8 @@ namespace op
                 if (mRescale)
                 {
                     cv::Size rescaleSize{
-						intRound(mRescale), intRound(mImagePrevious.size().height/(mImagePrevious.size().width/mRescale))};
+                        positiveIntRound(mRescale),
+                        positiveIntRound(mImagePrevious.size().height/(mImagePrevious.size().width/mRescale))};
                     cv::resize(mImagePrevious, mImagePrevious, rescaleSize, 0, 0, cv::INTER_CUBIC);
                 }
                 // Save Last Ids
@@ -440,7 +442,8 @@ namespace op
                     if (mRescale)
                     {
                         cv::Size rescaleSize{
-							intRound(mRescale), intRound(imageCurrent.size().height/(imageCurrent.size().width/mRescale))};
+                            positiveIntRound(mRescale),
+                            positiveIntRound(imageCurrent.size().height/(imageCurrent.size().width/mRescale))};
                         xScale = imageCurrent.size().width / (float)rescaleSize.width;
                         yScale = imageCurrent.size().height / (float)rescaleSize.height;
                         cv::resize(imageCurrent, imageCurrent, rescaleSize, 0, 0, cv::INTER_CUBIC);

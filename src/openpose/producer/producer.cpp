@@ -2,6 +2,7 @@
 #include <openpose/utilities/check.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/fileSystem.hpp>
+#include <openpose/utilities/openCv.hpp>
 #include <openpose/producer/producer.hpp>
 
 namespace op
@@ -119,7 +120,9 @@ namespace op
                 for (auto& frame : frames)
                 {
                     // Flip + rotate frame
-                    flipAndRotate(frame);
+                    const auto rotationAngle = mProperties[(unsigned char)ProducerProperty::Rotation];
+                    const auto flipFrame = (mProperties[(unsigned char)ProducerProperty::Flip] == 1.);
+                    rotateAndFlipFrame(frame, rotationAngle, flipFrame);
                     // Check frame integrity
                     checkFrameIntegrity(frame);
                     // If any frame invalid --> exit
@@ -291,57 +294,12 @@ namespace op
                           || (frame.rows != get(CV_CAP_PROP_FRAME_HEIGHT) && get(CV_CAP_PROP_FRAME_HEIGHT) > 0)))
                 {
                     log("Frame size changed. Returning empty frame.\nExpected vs. received sizes: "
-                        + std::to_string(intRound(get(CV_CAP_PROP_FRAME_WIDTH)))
-                        + "x" + std::to_string(intRound(get(CV_CAP_PROP_FRAME_HEIGHT)))
+                        + std::to_string(positiveIntRound(get(CV_CAP_PROP_FRAME_WIDTH)))
+                        + "x" + std::to_string(positiveIntRound(get(CV_CAP_PROP_FRAME_HEIGHT)))
                         + " vs. " + std::to_string(frame.cols) + "x" + std::to_string(frame.rows),
                         Priority::Max, __LINE__, __FUNCTION__, __FILE__);
                     frame = cv::Mat();
                 }
-            }
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-        }
-    }
-
-    void Producer::flipAndRotate(cv::Mat& frame) const
-    {
-        try
-        {
-            if (!frame.empty())
-            {
-                // Rotate it if desired
-                const auto rotationAngle = mProperties[(unsigned char)ProducerProperty::Rotation];
-                const auto flipFrame = (mProperties[(unsigned char)ProducerProperty::Flip] == 1.);
-                if (rotationAngle == 0.)
-                {
-                    if (flipFrame)
-                        cv::flip(frame, frame, 1);
-                }
-                else if (rotationAngle == 90.)
-                {
-                    cv::transpose(frame, frame);
-                    if (!flipFrame)
-                        cv::flip(frame, frame, 0);
-                }
-                else if (rotationAngle == 180.)
-                {
-                    if (flipFrame)
-                        cv::flip(frame, frame, 0);
-                    else
-                        cv::flip(frame, frame, -1);
-                }
-                else if (rotationAngle == 270.)
-                {
-                    cv::transpose(frame, frame);
-                    if (flipFrame)
-                        cv::flip(frame, frame, -1);
-                    else
-                        cv::flip(frame, frame, 1);
-                }
-                else
-                    error("Rotation angle != {0, 90, 180, 270} degrees.", __LINE__, __FUNCTION__, __FILE__);
             }
         }
         catch (const std::exception& e)
@@ -424,7 +382,7 @@ namespace op
                         // set(frames, X) sets to frame X+delta, due to codecs issues)
                         else if (difference < -0.45 && mNumberSetPositionTrackingFps < numberSetPositionThreshold)
                         {
-                            const auto sleepMs = intRound( (-difference*nsPerFrame*1e-6)*0.99 );
+                            const auto sleepMs = positiveIntRound( (-difference*nsPerFrame*1e-6)*0.99 );
                             std::this_thread::sleep_for(std::chrono::milliseconds{sleepMs});
                         }
                     }
