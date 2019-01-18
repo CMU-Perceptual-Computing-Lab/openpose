@@ -12,23 +12,17 @@
 // OpenPose dependencies
 #include <openpose/headers.hpp>
 
-int openPoseDemo()
+void configureWrapper(op::Wrapper& opWrapper)
 {
     try
     {
-        op::log("Starting OpenPose demo...", op::Priority::High);
-        const auto timerBegin = std::chrono::high_resolution_clock::now();
+        // Configuring OpenPose
 
         // logging_level
         op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.",
                   __LINE__, __FUNCTION__, __FILE__);
         op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
         op::Profiler::setDefaultX(FLAGS_profile_speed);
-        // // For debugging
-        // // Print all logging messages
-        // op::ConfigureLog::setPriorityThreshold(op::Priority::None);
-        // // Print out speed values faster
-        // op::Profiler::setDefaultX(100);
 
         // Applying user defined configuration - GFlags to program variables
         // cameraSize
@@ -63,9 +57,6 @@ int openPoseDemo()
         // Enabling Google Logging
         const bool enableGoogleLogging = true;
 
-        // Configuring OpenPose
-        op::log("Configuring OpenPose...", op::Priority::High);
-        op::Wrapper opWrapper;
         // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
         const op::WrapperStructPose wrapperStructPose{
             !FLAGS_body_disable, netInputSize, outputSize, keypointScaleMode, FLAGS_num_gpu, FLAGS_num_gpu_start,
@@ -111,6 +102,24 @@ int openPoseDemo()
         // Set to single-thread (for sequential processing and/or debugging and/or reducing latency)
         if (FLAGS_disable_multi_thread)
             opWrapper.disableMultiThreading();
+    }
+    catch (const std::exception& e)
+    {
+        op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+    }
+}
+
+int openPoseDemo()
+{
+    try
+    {
+        op::log("Starting OpenPose demo...", op::Priority::High);
+        const auto timerBegin = std::chrono::high_resolution_clock::now();
+
+        // Configure OpenPose
+        op::log("Configuring OpenPose...", op::Priority::High);
+        op::Wrapper opWrapper;
+        configureWrapper(opWrapper);
 
         // Start, run, and stop processing - exec() blocks this thread until OpenPose wrapper has finished
         op::log("Starting thread(s)...", op::Priority::High);

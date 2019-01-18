@@ -62,8 +62,8 @@ namespace op
      * @param extensions std::vector<std::string> with the extensions of the desired files.
      * @return std::vector<std::string> with the existing file names.
      */
-    OP_API std::vector<std::string> getFilesOnDirectory(const std::string& directoryPath,
-                                                        const std::vector<std::string>& extensions = {});
+    OP_API std::vector<std::string> getFilesOnDirectory(
+        const std::string& directoryPath, const std::vector<std::string>& extensions = {});
 
     /**
      * Analogous to getFilesOnDirectory(const std::string& directoryPath, const std::vector<std::string>& extensions)
@@ -72,8 +72,18 @@ namespace op
      * @param extension std::string with the extension of the desired files.
      * @return std::vector<std::string> with the existing file names.
      */
-    OP_API std::vector<std::string> getFilesOnDirectory(const std::string& directoryPath,
-                                                        const std::string& extension);
+    OP_API std::vector<std::string> getFilesOnDirectory(
+        const std::string& directoryPath, const std::string& extension);
+
+    /**
+     * This function extracts all the files in a directory path with the desired
+     * group of extensions (e.g., Extensions::Images).
+     * @param directoryPath std::string with the directory path.
+     * @param extensions Extensions with the kind of extensions desired (e.g., Extensions:Images).
+     * @return std::vector<std::string> with the existing file names.
+     */
+    OP_API std::vector<std::string> getFilesOnDirectory(
+        const std::string& directoryPath, const Extensions extensions);
 
     OP_API std::string removeSpecialsCharacters(const std::string& stringToVariate);
 

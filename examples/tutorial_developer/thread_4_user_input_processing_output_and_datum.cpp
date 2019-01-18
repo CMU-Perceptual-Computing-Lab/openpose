@@ -57,13 +57,13 @@ struct UserDatum : public op::Datum
 // that the user usually knows which kind of data he will move between the queues,
 // in this case we assume a std::shared_ptr of a std::vector of UserDatum
 
-// This worker will just read and return all the jpg files in a directory
+// This worker will just read and return all the basic image file formats in a directory
 class WUserInput : public op::WorkerProducer<std::shared_ptr<std::vector<std::shared_ptr<UserDatum>>>>
 {
 public:
     WUserInput(const std::string& directoryPath) :
-        mImageFiles{op::getFilesOnDirectory(directoryPath, "jpg")},
-        // If we want "jpg" + "png" images
+        mImageFiles{op::getFilesOnDirectory(directoryPath, op::Extensions::Images)}, // For all basic image formats
+        // If we want only e.g., "jpg" + "png" images
         // mImageFiles{op::getFilesOnDirectory(directoryPath, std::vector<std::string>{"jpg", "png"})},
         mCounter{0}
     {

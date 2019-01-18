@@ -262,7 +262,7 @@ OpenPose Library - Release Notes
 1. Main improvements:
     1. Added initial single-person tracker for further speed up or visual smoothing (`--tracking` flag).
     2. Greedy body part connector implemented in CUDA: +~30% speed up in Nvidia (CUDA) version with default flags and +~10% in maximum accuracy configuration. In addition, it provides a small 0.5% boost in accuracy (default flags).
-    3. OpenPose can be built as Unity plugin: Added flag `BUILD_UNITY_SUPPORT` and special Unity code.
+    3. Unity binding of OpenPose released. OpenPose adds the flag `BUILD_UNITY_SUPPORT` on CMake, which enables special Unity code so it can be built as a Unity plugin.
     4. If camera is unplugged, OpenPose GUI and command line will display a warning and try to reconnect it.
     5. Wrapper classes simplified and renamed. Wrapper renamed as WrapperT, and created Wrapper as the non-templated class equivalent.
     6. API and examples improved:
@@ -270,6 +270,10 @@ OpenPose Library - Release Notes
         2. `tutorial_wrapper` renamed as `tutorial_api_cpp` as well as new examples were added.
         2. `tutorial_python` renamed as `tutorial_api_python` as well as new examples were added.
         3. `tutorial_pose` and `tutorial_thread` renamed as `tutorial_developer`, not meant to be used by users, but rather for OpenPose developers.
+        4. Examples do not end in core dumped if an OpenPose exception occurred during initialization, but they are rather closed returning -1. However, it will still results in core dumped if the exception occurs during multi-threading execution.
+        5. Added new examples, including examples to extract face and/or hand from images.
+        6. Added `--no_display` flag for the examples that does not use OpenPose output.
+        7. Given that display can be disabled in all examples, they all have been added to the Travis build so they can be tested.
     7. Added a virtual destructor to almost all clases, so they can be inherited. Exceptions (for performance reasons): Array, Point, Rectangle, CvMatToOpOutput, OpOutputToCvMat.
     8. Auxiliary classes in errorAndLog turned into namespaces (Profiler must be kept as class to allow static parameters).
     9. Added flag `--frame_step` to allow the user to select the step or gap between processed frames. E.g., `--frame_step 5` would read and process frames 0, 5, 10, etc.
@@ -289,25 +293,25 @@ OpenPose Library - Release Notes
     19. All bash scripts incorporate `#!/bin/bash` to tell the terminal that they are bash scripts.
     20. Added flag `--verbose` to plot the progress.
     21. Added find_package(Protobuf) to allow specific versions of Protobuf.
-    22. Examples do not end in core dumped if an OpenPose exception occurred during initialization, but it is rather closed returning -1. However, it will still results in core dumped if the exception occurs during multi-threading execution.
-    23. Video saving improvements:
+    22. Video saving improvements:
         1. Video (`--write_video`) can be generated from images (`--image_dir`), as long as they maintain the same resolution.
         2. Video with the 3D output can be saved with the new `--write_video_3d` flag.
         3. Added the capability of saving videos in MP4 format (by using the ffmpeg library).
         4. Added the flag `write_video_with_audio` to enable saving these output MP4 videos with audio.
-    24. Added `--fps_max` flag to limit the maximum processing frame rate of OpenPose (useful to display results at a maximum desired speed).
-    25. Frame undistortion can be applied not only to FLIR cameras, but also to all other input sources (image, webcam, video, etc.).
-    26. Calibration improvements:
+    23. Added `--fps_max` flag to limit the maximum processing frame rate of OpenPose (useful to display results at a maximum desired speed).
+    24. Frame undistortion can be applied not only to FLIR cameras, but also to all other input sources (image, webcam, video, etc.).
+    25. Calibration improvements:
         1. Improved chessboard orientation detection, more robust and less errors.
         2. Triangulation functions (triangulate and triangulateWithOptimization) public, so calibration can use them for bundle adjustment.
         3. Added bundle adjustment refinement for camera extrinsic calibration.
         4. Added `CameraMatrixInitial` field into the XML calibration files to keep the information of the original camera extrinsic parameters when bundle adjustment is run.
-    27. Added Mac OpenCL compatibility.
-    28. Added documentation for Nvidia TX2 with JetPack 3.3.
-    29. Added Travis build check for several configurations: Ubuntu (14/16)/Mac/Windows, CPU/CUDA/OpenCL, with/without Python, and Release/Debug.
-    30. Assigned 755 access to all sh scripts (some of them were only 644).
-    31. Added the flags `--prototxt_path` and `--caffemodel_path` to allow custom ProtoTxt and CaffeModel paths.
-    32. Replaced the old Python wrapper for an updated Pybind11 wrapper version, that includes all the functionality of the C++ API.
+    26. Added Mac OpenCL compatibility.
+    27. Added documentation for Nvidia TX2 with JetPack 3.3.
+    28. Added Travis build check for several configurations: Ubuntu (14/16)/Mac/Windows, CPU/CUDA/OpenCL, with/without Python, and Release/Debug.
+    29. Assigned 755 access to all sh scripts (some of them were only 644).
+    30. Added the flags `--prototxt_path` and `--caffemodel_path` to allow custom ProtoTxt and CaffeModel paths.
+    31. Replaced the old Python wrapper for an updated Pybind11 wrapper version, that includes all the functionality of the C++ API.
+    32. Function getFilesOnDirectory() can extra all basic image file types at once without requiring to manually enumerate them.
 2. Functions or parameters renamed:
     1. By default, python example `tutorial_developer/python_2_pose_from_heatmaps.py` was using 2 scales starting at -1x736, changed to 1 scale at -1x368.
     2. WrapperStructPose default parameters changed to match those of the OpenPose demo binary.

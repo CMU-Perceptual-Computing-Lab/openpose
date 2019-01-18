@@ -346,6 +346,35 @@ namespace op
         }
     }
 
+    std::vector<std::string> getFilesOnDirectory(const std::string& directoryPath, const Extensions extensions)
+    {
+        try
+        {
+            // Get files on directory with the desired extensions
+            if (extensions == Extensions::Images)
+            {
+                const std::vector<std::string> extensions{
+                    // Completely supported by OpenCV
+                    "bmp", "dib", "pbm", "pgm", "ppm", "sr", "ras",
+                    // Most of them supported by OpenCV
+                    "jpg", "jpeg", "png"};
+                return getFilesOnDirectory(directoryPath, extensions);
+            }
+            // Unknown kind of extensions
+            else
+            {
+                error("Unknown kind of extensions (id = " + std::to_string(int(extensions))
+                      + "). Notify us of this error.", __LINE__, __FUNCTION__, __FILE__);
+                return {};
+            }
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return {};
+        }
+    }
+
     std::string removeSpecialsCharacters(const std::string& stringToVariate)
     {
         try

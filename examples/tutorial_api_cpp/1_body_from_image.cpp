@@ -11,56 +11,73 @@
 // Producer
 DEFINE_string(image_path, "examples/media/COCO_val2014_000000000192.jpg",
     "Process an image. Read all standard formats (jpg, png, bmp, etc.).");
+// Display
+DEFINE_bool(no_display,                 false,
+    "Enable to disable the visual display.");
 
 // This worker will just read and return all the jpg files in a directory
 void display(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& datumsPtr)
 {
-    // User's displaying/saving/other processing here
-        // datum.cvOutputData: rendered frame with pose or heatmaps
-        // datum.poseKeypoints: Array<float> with the estimated pose
-    if (datumsPtr != nullptr && !datumsPtr->empty())
+    try
     {
-        // Display image
-        cv::imshow("User worker GUI", datumsPtr->at(0)->cvOutputData);
-        cv::waitKey(0);
+        // User's displaying/saving/other processing here
+            // datum.cvOutputData: rendered frame with pose or heatmaps
+            // datum.poseKeypoints: Array<float> with the estimated pose
+        if (datumsPtr != nullptr && !datumsPtr->empty())
+        {
+            // Display image
+            cv::imshow("User worker GUI", datumsPtr->at(0)->cvOutputData);
+            cv::waitKey(0);
+        }
+        else
+            op::log("Nullptr or empty datumsPtr found.", op::Priority::High);
     }
-    else
-        op::log("Nullptr or empty datumsPtr found.", op::Priority::High);
+    catch (const std::exception& e)
+    {
+        op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+    }
 }
 
 void printKeypoints(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& datumsPtr)
 {
-    // Example: How to use the pose keypoints
-    if (datumsPtr != nullptr && !datumsPtr->empty())
+    try
     {
-        // Alternative 1
-        op::log("Body keypoints: " + datumsPtr->at(0)->poseKeypoints.toString());
+        // Example: How to use the pose keypoints
+        if (datumsPtr != nullptr && !datumsPtr->empty())
+        {
+            // Alternative 1
+            op::log("Body keypoints: " + datumsPtr->at(0)->poseKeypoints.toString());
 
-        // // Alternative 2
-        // op::log(datumsPtr->at(0).poseKeypoints);
+            // // Alternative 2
+            // op::log(datumsPtr->at(0).poseKeypoints);
 
-        // // Alternative 3
-        // std::cout << datumsPtr->at(0).poseKeypoints << std::endl;
+            // // Alternative 3
+            // std::cout << datumsPtr->at(0).poseKeypoints << std::endl;
 
-        // // Alternative 4 - Accesing each element of the keypoints
-        // op::log("\nKeypoints:");
-        // const auto& poseKeypoints = datumsPtr->at(0).poseKeypoints;
-        // op::log("Person pose keypoints:");
-        // for (auto person = 0 ; person < poseKeypoints.getSize(0) ; person++)
-        // {
-        //     op::log("Person " + std::to_string(person) + " (x, y, score):");
-        //     for (auto bodyPart = 0 ; bodyPart < poseKeypoints.getSize(1) ; bodyPart++)
-        //     {
-        //         std::string valueToPrint;
-        //         for (auto xyscore = 0 ; xyscore < poseKeypoints.getSize(2) ; xyscore++)
-        //             valueToPrint += std::to_string(   poseKeypoints[{person, bodyPart, xyscore}]   ) + " ";
-        //         op::log(valueToPrint);
-        //     }
-        // }
-        // op::log(" ");
+            // // Alternative 4 - Accesing each element of the keypoints
+            // op::log("\nKeypoints:");
+            // const auto& poseKeypoints = datumsPtr->at(0).poseKeypoints;
+            // op::log("Person pose keypoints:");
+            // for (auto person = 0 ; person < poseKeypoints.getSize(0) ; person++)
+            // {
+            //     op::log("Person " + std::to_string(person) + " (x, y, score):");
+            //     for (auto bodyPart = 0 ; bodyPart < poseKeypoints.getSize(1) ; bodyPart++)
+            //     {
+            //         std::string valueToPrint;
+            //         for (auto xyscore = 0 ; xyscore < poseKeypoints.getSize(2) ; xyscore++)
+            //             valueToPrint += std::to_string(   poseKeypoints[{person, bodyPart, xyscore}]   ) + " ";
+            //         op::log(valueToPrint);
+            //     }
+            // }
+            // op::log(" ");
+        }
+        else
+            op::log("Nullptr or empty datumsPtr found.", op::Priority::High);
     }
-    else
-        op::log("Nullptr or empty datumsPtr found.", op::Priority::High);
+    catch (const std::exception& e)
+    {
+        op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+    }
 }
 
 int tutorialApiCpp1()
@@ -75,6 +92,7 @@ int tutorialApiCpp1()
         // Set to single-thread (for sequential processing and/or debugging and/or reducing latency)
         if (FLAGS_disable_multi_thread)
             opWrapper.disableMultiThreading();
+
         // Starting OpenPose
         op::log("Starting thread(s)...", op::Priority::High);
         opWrapper.start();
@@ -85,7 +103,8 @@ int tutorialApiCpp1()
         if (datumProcessed != nullptr)
         {
             printKeypoints(datumProcessed);
-            display(datumProcessed);
+            if (!FLAGS_no_display)
+                display(datumProcessed);
         }
         else
             op::log("Image could not be processed.", op::Priority::High);

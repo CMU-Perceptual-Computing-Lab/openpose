@@ -26,6 +26,9 @@
 // Producer
 DEFINE_string(image_dir, "examples/media/",
     "Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).");
+// Display
+DEFINE_bool(no_display,                 false,
+    "Enable to disable the visual display.");
 
 // If the user needs his own variables, he can inherit the op::Datum struct and add them in there.
 // UserDatum can be directly used by the OpenPose wrapper because it inherits from op::Datum, just define
@@ -44,13 +47,13 @@ struct UserDatum : public op::Datum
 // that the user usually knows which kind of data he will move between the queues,
 // in this case we assume a std::shared_ptr of a std::vector of UserDatum
 
-// This worker will just read and return all the jpg files in a directory
+// This worker will just read and return all the basic image file formats in a directory
 class UserInputClass
 {
 public:
     UserInputClass(const std::string& directoryPath) :
-        mImageFiles{op::getFilesOnDirectory(directoryPath, "jpg")},
-        // If we want "jpg" + "png" images
+        mImageFiles{op::getFilesOnDirectory(directoryPath, op::Extensions::Images)}, // For all basic image formats
+        // If we want only e.g., "jpg" + "png" images
         // mImageFiles{op::getFilesOnDirectory(directoryPath, std::vector<std::string>{"jpg", "png"})},
         mCounter{0},
         mClosed{false}
@@ -276,7 +279,8 @@ int tutorialApiCpp4()
                 std::shared_ptr<std::vector<std::shared_ptr<UserDatum>>> datumProcessed;
                 if (successfullyEmplaced && opWrapperT.waitAndPop(datumProcessed))
                 {
-                    userWantsToExit = userOutputClass.display(datumProcessed);
+                    if (!FLAGS_no_display)
+                        userWantsToExit = userOutputClass.display(datumProcessed);
                     userOutputClass.printKeypoints(datumProcessed);
                 }
                 else

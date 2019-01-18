@@ -11,35 +11,52 @@
 // Producer
 DEFINE_string(image_path, "examples/media/COCO_val2014_000000000241.jpg",
     "Process an image. Read all standard formats (jpg, png, bmp, etc.).");
+// Display
+DEFINE_bool(no_display,                 false,
+    "Enable to disable the visual display.");
 
 // This worker will just read and return all the jpg files in a directory
 void display(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& datumsPtr)
 {
-    // User's displaying/saving/other processing here
-        // datum.cvOutputData: rendered frame with pose or heatmaps
-        // datum.poseKeypoints: Array<float> with the estimated pose
-    if (datumsPtr != nullptr && !datumsPtr->empty())
+    try
     {
-        // Display image
-        cv::imshow("User worker GUI", datumsPtr->at(0)->cvOutputData);
-        cv::waitKey(0);
+        // User's displaying/saving/other processing here
+            // datum.cvOutputData: rendered frame with pose or heatmaps
+            // datum.poseKeypoints: Array<float> with the estimated pose
+        if (datumsPtr != nullptr && !datumsPtr->empty())
+        {
+            // Display image
+            cv::imshow("User worker GUI", datumsPtr->at(0)->cvOutputData);
+            cv::waitKey(0);
+        }
+        else
+            op::log("Nullptr or empty datumsPtr found.", op::Priority::High);
     }
-    else
-        op::log("Nullptr or empty datumsPtr found.", op::Priority::High);
+    catch (const std::exception& e)
+    {
+        op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+    }
 }
 
 void printKeypoints(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& datumsPtr)
 {
-    // Example: How to use the pose keypoints
-    if (datumsPtr != nullptr && !datumsPtr->empty())
+    try
     {
-        op::log("Body keypoints: " + datumsPtr->at(0)->poseKeypoints.toString());
-        op::log("Face keypoints: " + datumsPtr->at(0)->faceKeypoints.toString());
-        op::log("Left hand keypoints: " + datumsPtr->at(0)->handKeypoints[0].toString());
-        op::log("Right hand keypoints: " + datumsPtr->at(0)->handKeypoints[1].toString());
+        // Example: How to use the pose keypoints
+        if (datumsPtr != nullptr && !datumsPtr->empty())
+        {
+            op::log("Body keypoints: " + datumsPtr->at(0)->poseKeypoints.toString());
+            op::log("Face keypoints: " + datumsPtr->at(0)->faceKeypoints.toString());
+            op::log("Left hand keypoints: " + datumsPtr->at(0)->handKeypoints[0].toString());
+            op::log("Right hand keypoints: " + datumsPtr->at(0)->handKeypoints[1].toString());
+        }
+        else
+            op::log("Nullptr or empty datumsPtr found.", op::Priority::High);
     }
-    else
-        op::log("Nullptr or empty datumsPtr found.", op::Priority::High);
+    catch (const std::exception& e)
+    {
+        op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+    }
 }
 
 int tutorialApiCpp2()
@@ -57,6 +74,7 @@ int tutorialApiCpp2()
         // Set to single-thread (for sequential processing and/or debugging and/or reducing latency)
         if (FLAGS_disable_multi_thread)
             opWrapper.disableMultiThreading();
+
         // Starting OpenPose
         op::log("Starting thread(s)...", op::Priority::High);
         opWrapper.start();
@@ -67,7 +85,8 @@ int tutorialApiCpp2()
         if (datumProcessed != nullptr)
         {
             printKeypoints(datumProcessed);
-            display(datumProcessed);
+            if (!FLAGS_no_display)
+                display(datumProcessed);
         }
         else
             op::log("Image could not be processed.", op::Priority::High);

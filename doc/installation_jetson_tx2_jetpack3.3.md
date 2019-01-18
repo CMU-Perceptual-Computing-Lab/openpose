@@ -38,7 +38,7 @@ bash ./scripts/ubuntu/install_caffe_and_openpose_JetsonTX2_JetPack3.3.sh
 ## Usage
 It is for now recommended to use an external camera with the demo. To get to decent FPS you need to lower the net resolution:
 ```
-./build/openpose/openpose.bin -camera_resolution 640x480 -net_resolution 128x96
+./build/examples/openpose/openpose.bin -camera_resolution 640x480 -net_resolution 128x96
 ```
 
 To activate hand or face resolution please complete this command with the following options (warning, both simultaneously will cause out of memory error):

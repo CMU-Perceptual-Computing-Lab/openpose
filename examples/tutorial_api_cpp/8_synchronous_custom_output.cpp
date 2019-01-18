@@ -22,6 +22,11 @@
 // OpenPose dependencies
 #include <openpose/headers.hpp>
 
+// Custom OpenPose flags
+// Display
+DEFINE_bool(no_display,                 false,
+    "Enable to disable the visual display.");
+
 // If the user needs his own variables, he can inherit the op::Datum struct and add them in there.
 // UserDatum can be directly used by the OpenPose wrapper because it inherits from op::Datum, just define
 // WrapperT<std::vector<std::shared_ptr<UserDatum>>> instead of Wrapper
@@ -100,12 +105,16 @@ public:
                             + std::to_string(handHeatMaps[1].getSize(3)) + "]");
                 }
 
-                // Display rendered output image
-                cv::imshow("User worker GUI", datumsPtr->at(0)->cvOutputData);
-                // Display image and sleeps at least 1 ms (it usually sleeps ~5-10 msec to display the image)
-                const char key = (char)cv::waitKey(1);
-                if (key == 27)
-                    this->stop();
+                // Display results (if enabled)
+                if (!FLAGS_no_display)
+                {
+                    // Display rendered output image
+                    cv::imshow("User worker GUI", datumsPtr->at(0)->cvOutputData);
+                    // Display image and sleeps at least 1 ms (it usually sleeps ~5-10 msec to display the image)
+                    const char key = (char)cv::waitKey(1);
+                    if (key == 27)
+                        this->stop();
+                }
             }
         }
         catch (const std::exception& e)

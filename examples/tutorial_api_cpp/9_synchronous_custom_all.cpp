@@ -26,6 +26,9 @@
 // Producer
 DEFINE_string(image_dir, "examples/media/",
     "Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).");
+// Display
+DEFINE_bool(no_display,                 false,
+    "Enable to disable the visual display.");
 
 // If the user needs his own variables, he can inherit the op::Datum struct and add them in there.
 // UserDatum can be directly used by the OpenPose wrapper because it inherits from op::Datum, just define
@@ -44,13 +47,13 @@ struct UserDatum : public op::Datum
 // that the user usually knows which kind of data he will move between the queues,
 // in this case we assume a std::shared_ptr of a std::vector of UserDatum
 
-// This worker will just read and return all the jpg files in a directory
+// This worker will just read and return all the basic image file formats in a directory
 class WUserInput : public op::WorkerProducer<std::shared_ptr<std::vector<std::shared_ptr<UserDatum>>>>
 {
 public:
     WUserInput(const std::string& directoryPath) :
-        mImageFiles{op::getFilesOnDirectory(directoryPath, "jpg")},
-        // If we want "jpg" + "png" images
+        mImageFiles{op::getFilesOnDirectory(directoryPath, op::Extensions::Images)}, // For all basic image formats
+        // If we want only e.g., "jpg" + "png" images
         // mImageFiles{op::getFilesOnDirectory(directoryPath, std::vector<std::string>{"jpg", "png"})},
         mCounter{0}
     {
@@ -201,12 +204,16 @@ public:
                             + std::to_string(handHeatMaps[1].getSize(3)) + "]");
                 }
 
-                // Display rendered output image
-                cv::imshow("User worker GUI", datumsPtr->at(0)->cvOutputData);
-                // Display image and sleeps at least 1 ms (it usually sleeps ~5-10 msec to display the image)
-                const char key = (char)cv::waitKey(1);
-                if (key == 27)
-                    this->stop();
+                // Display results (if enabled)
+                if (!FLAGS_no_display)
+                {
+                    // Display rendered output image
+                    cv::imshow("User worker GUI", datumsPtr->at(0)->cvOutputData);
+                    // Display image and sleeps at least 1 ms (it usually sleeps ~5-10 msec to display the image)
+                    const char key = (char)cv::waitKey(1);
+                    if (key == 27)
+                        this->stop();
+                }
             }
         }
         catch (const std::exception& e)

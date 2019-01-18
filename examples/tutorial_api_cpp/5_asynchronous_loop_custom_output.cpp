@@ -21,6 +21,11 @@
 // OpenPose dependencies
 #include <openpose/headers.hpp>
 
+// Custom OpenPose flags
+// Display
+DEFINE_bool(no_display,                 false,
+    "Enable to disable the visual display.");
+
 // If the user needs his own variables, he can inherit the op::Datum struct and add them in there.
 // UserDatum can be directly used by the OpenPose wrapper because it inherits from op::Datum, just define
 // WrapperT<std::vector<std::shared_ptr<UserDatum>>> instead of Wrapper
@@ -218,9 +223,14 @@ int tutorialApiCpp5()
             std::shared_ptr<std::vector<std::shared_ptr<UserDatum>>> datumProcessed;
             if (opWrapperT.waitAndPop(datumProcessed))
             {
-                userWantsToExit = userOutputClass.display(datumProcessed);;
+                if (!FLAGS_no_display)
+                    userWantsToExit = userOutputClass.display(datumProcessed);;
                 userOutputClass.printKeypoints(datumProcessed);
             }
+            // If OpenPose finished reading images
+            else if (!opWrapperT.isRunning())
+                break;
+            // Something else happened
             else
                 op::log("Processed datum could not be emplaced.", op::Priority::High, __LINE__, __FUNCTION__, __FILE__);
         }
