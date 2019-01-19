@@ -202,7 +202,7 @@ namespace op
                 {
                     // Hand detector
                     // If tracking
-                    if (wrapperStructHand.tracking)
+                    if (wrapperStructHand.detector == Detector::BodyWithTracking)
                         error("Tracking not valid for hand detector from JSON files.", __LINE__, __FUNCTION__, __FILE__);
                     // If detection
                     else

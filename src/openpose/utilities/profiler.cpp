@@ -10,6 +10,50 @@ namespace op
 {
     unsigned long long Profiler::DEFAULT_X = 1000;
 
+    std::chrono::time_point<std::chrono::high_resolution_clock> getTimerInit()
+    {
+        try
+        {
+            return std::chrono::high_resolution_clock::now();
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return std::chrono::high_resolution_clock::now();
+        }
+    }
+
+    double getTimeSeconds(const std::chrono::time_point<std::chrono::high_resolution_clock>& timerInit)
+    {
+        try
+        {
+            const auto now = std::chrono::high_resolution_clock::now();
+            const auto totalTimeSec = double(
+                std::chrono::duration_cast<std::chrono::nanoseconds>(now-timerInit).count() * 1e-9);
+            return totalTimeSec;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return -1.;
+        }
+    }
+
+    void printTime(
+        const std::chrono::time_point<std::chrono::high_resolution_clock>& timerInit, const std::string& firstMessage,
+        const std::string& secondMessage, const Priority priority)
+    {
+        try
+        {
+            const auto message = firstMessage + std::to_string(getTimeSeconds(timerInit)) + secondMessage;
+            op::log(message, priority);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
     #ifdef PROFILER_ENABLED
 
         std::map<std::string, std::tuple<double, unsigned long long, std::chrono::high_resolution_clock::time_point>> sProfilerTuple{
@@ -27,7 +71,7 @@ namespace op
         void printAveragedTimeMsCommon(const double timePast, const unsigned long long timeCounter, const int line,
                                        const std::string& function, const std::string& file)
         {
-            const auto stringMessage = std::to_string(   timePast / timeCounter / 1e6   ) + " msec at";
+            const auto stringMessage = std::to_string(   timePast / timeCounter / 1e6   ) + " msec";
             log(stringMessage, Priority::Max, line, function, file);
         }
     #endif

@@ -1,13 +1,14 @@
-// ------------------------- OpenPose C++ API Tutorial - Example 5 - XXXXXXXXXXXXX -------------------------
-// Asynchronous output mode: ideal for fast prototyping when performance is not an issue and user wants to use the
-// output OpenPose format. The user simply gets the processed frames from the OpenPose wrapper when he desires to.
-
-// This example shows the user how to use the OpenPose wrapper class:
-    // 1. Read folder of images / video / webcam
-    // 2. Extract and render keypoint / heatmap / PAF of that image
-    // 3. Save the results on disk
-    // 4. User displays the rendered pose
-    // Everything in a multi-thread scenario
+// ------------------------- OpenPose C++ API Tutorial - Example 8 - XXXXXXXXXXXXX -------------------------
+// If the user wants to learn to use the OpenPose library, we highly recommend to start with the
+// examples in `examples/tutorial_api_cpp/`.
+// This example summarizes all the functionality of the OpenPose library:
+    // 1. Read folder of images / video / webcam  (`producer` module)
+    // 2. Extract and render body keypoint / heatmap / PAF of that image (`pose` module)
+    // 3. Extract and render face keypoint / heatmap / PAF of that image (`face` module)
+    // 4. Save the results on disk (`filestream` module)
+    // 5. Display the rendered pose (`gui` module)
+    // Everything in a multi-thread scenario (`thread` module)
+    // Points 2 to 5 are included in the `wrapper` module
 // In addition to the previous OpenPose modules, we also need to use:
     // 1. `core` module:
         // For the Array<float> class that the `pose` module needs
@@ -44,81 +45,87 @@ struct UserDatum : public op::Datum
 // in this case we assume a std::shared_ptr of a std::vector of UserDatum
 
 // This worker will just read and return all the jpg files in a directory
-class UserOutputClass
+class WUserOutput : public op::WorkerConsumer<std::shared_ptr<std::vector<std::shared_ptr<UserDatum>>>>
 {
 public:
-    bool display(const std::shared_ptr<std::vector<std::shared_ptr<UserDatum>>>& datumsPtr)
+    void initializationOnThread() {}
+
+    void workConsumer(const std::shared_ptr<std::vector<std::shared_ptr<UserDatum>>>& datumsPtr)
     {
-        // User's displaying/saving/other processing here
-            // datumPtr->cvOutputData: rendered frame with pose or heatmaps
-            // datumPtr->poseKeypoints: Array<float> with the estimated pose
-        char key = ' ';
-        if (datumsPtr != nullptr && !datumsPtr->empty())
+        try
         {
-            cv::imshow("User worker GUI", datumsPtr->at(0)->cvOutputData);
-            // Display image and sleeps at least 1 ms (it usually sleeps ~5-10 msec to display the image)
-            key = (char)cv::waitKey(1);
-        }
-        else
-            op::log("Nullptr or empty datumsPtr found.", op::Priority::High, __LINE__, __FUNCTION__, __FILE__);
-        return (key == 27);
-    }
-    void printKeypoints(const std::shared_ptr<std::vector<std::shared_ptr<UserDatum>>>& datumsPtr)
-    {
-        // Example: How to use the pose keypoints
-        if (datumsPtr != nullptr && !datumsPtr->empty())
-        {
-            op::log("\nKeypoints:");
-            // Accesing each element of the keypoints
-            const auto& poseKeypoints = datumsPtr->at(0)->poseKeypoints;
-            op::log("Person pose keypoints:");
-            for (auto person = 0 ; person < poseKeypoints.getSize(0) ; person++)
+            // User's displaying/saving/other processing here
+                // datumPtr->cvOutputData: rendered frame with pose or heatmaps
+                // datumPtr->poseKeypoints: Array<float> with the estimated pose
+            if (datumsPtr != nullptr && !datumsPtr->empty())
             {
-                op::log("Person " + std::to_string(person) + " (x, y, score):");
-                for (auto bodyPart = 0 ; bodyPart < poseKeypoints.getSize(1) ; bodyPart++)
+                // Show in command line the resulting pose keypoints for body, face and hands
+                op::log("\nKeypoints:");
+                // Accesing each element of the keypoints
+                const auto& poseKeypoints = datumsPtr->at(0)->poseKeypoints;
+                op::log("Person pose keypoints:");
+                for (auto person = 0 ; person < poseKeypoints.getSize(0) ; person++)
                 {
-                    std::string valueToPrint;
-                    for (auto xyscore = 0 ; xyscore < poseKeypoints.getSize(2) ; xyscore++)
+                    op::log("Person " + std::to_string(person) + " (x, y, score):");
+                    for (auto bodyPart = 0 ; bodyPart < poseKeypoints.getSize(1) ; bodyPart++)
                     {
-                        valueToPrint += std::to_string(   poseKeypoints[{person, bodyPart, xyscore}]   ) + " ";
+                        std::string valueToPrint;
+                        for (auto xyscore = 0 ; xyscore < poseKeypoints.getSize(2) ; xyscore++)
+                        {
+                            valueToPrint += std::to_string(   poseKeypoints[{person, bodyPart, xyscore}]   ) + " ";
+                        }
+                        op::log(valueToPrint);
                     }
-                    op::log(valueToPrint);
+                }
+                op::log(" ");
+                // Alternative: just getting std::string equivalent
+                op::log("Face keypoints: " + datumsPtr->at(0)->faceKeypoints.toString());
+                op::log("Left hand keypoints: " + datumsPtr->at(0)->handKeypoints[0].toString());
+                op::log("Right hand keypoints: " + datumsPtr->at(0)->handKeypoints[1].toString());
+                // Heatmaps
+                const auto& poseHeatMaps = datumsPtr->at(0)->poseHeatMaps;
+                if (!poseHeatMaps.empty())
+                {
+                    op::log("Pose heatmaps size: [" + std::to_string(poseHeatMaps.getSize(0)) + ", "
+                            + std::to_string(poseHeatMaps.getSize(1)) + ", "
+                            + std::to_string(poseHeatMaps.getSize(2)) + "]");
+                    const auto& faceHeatMaps = datumsPtr->at(0)->faceHeatMaps;
+                    op::log("Face heatmaps size: [" + std::to_string(faceHeatMaps.getSize(0)) + ", "
+                            + std::to_string(faceHeatMaps.getSize(1)) + ", "
+                            + std::to_string(faceHeatMaps.getSize(2)) + ", "
+                            + std::to_string(faceHeatMaps.getSize(3)) + "]");
+                    const auto& handHeatMaps = datumsPtr->at(0)->handHeatMaps;
+                    op::log("Left hand heatmaps size: [" + std::to_string(handHeatMaps[0].getSize(0)) + ", "
+                            + std::to_string(handHeatMaps[0].getSize(1)) + ", "
+                            + std::to_string(handHeatMaps[0].getSize(2)) + ", "
+                            + std::to_string(handHeatMaps[0].getSize(3)) + "]");
+                    op::log("Right hand heatmaps size: [" + std::to_string(handHeatMaps[1].getSize(0)) + ", "
+                            + std::to_string(handHeatMaps[1].getSize(1)) + ", "
+                            + std::to_string(handHeatMaps[1].getSize(2)) + ", "
+                            + std::to_string(handHeatMaps[1].getSize(3)) + "]");
+                }
+
+                // Display results (if enabled)
+                if (!FLAGS_no_display)
+                {
+                    // Display rendered output image
+                    cv::imshow("User worker GUI", datumsPtr->at(0)->cvOutputData);
+                    // Display image and sleeps at least 1 ms (it usually sleeps ~5-10 msec to display the image)
+                    const char key = (char)cv::waitKey(1);
+                    if (key == 27)
+                        this->stop();
                 }
             }
-            op::log(" ");
-            // Alternative: just getting std::string equivalent
-            op::log("Face keypoints: " + datumsPtr->at(0)->faceKeypoints.toString());
-            op::log("Left hand keypoints: " + datumsPtr->at(0)->handKeypoints[0].toString());
-            op::log("Right hand keypoints: " + datumsPtr->at(0)->handKeypoints[1].toString());
-            // Heatmaps
-            const auto& poseHeatMaps = datumsPtr->at(0)->poseHeatMaps;
-            if (!poseHeatMaps.empty())
-            {
-                op::log("Pose heatmaps size: [" + std::to_string(poseHeatMaps.getSize(0)) + ", "
-                        + std::to_string(poseHeatMaps.getSize(1)) + ", "
-                        + std::to_string(poseHeatMaps.getSize(2)) + "]");
-                const auto& faceHeatMaps = datumsPtr->at(0)->faceHeatMaps;
-                op::log("Face heatmaps size: [" + std::to_string(faceHeatMaps.getSize(0)) + ", "
-                        + std::to_string(faceHeatMaps.getSize(1)) + ", "
-                        + std::to_string(faceHeatMaps.getSize(2)) + ", "
-                        + std::to_string(faceHeatMaps.getSize(3)) + "]");
-                const auto& handHeatMaps = datumsPtr->at(0)->handHeatMaps;
-                op::log("Left hand heatmaps size: [" + std::to_string(handHeatMaps[0].getSize(0)) + ", "
-                        + std::to_string(handHeatMaps[0].getSize(1)) + ", "
-                        + std::to_string(handHeatMaps[0].getSize(2)) + ", "
-                        + std::to_string(handHeatMaps[0].getSize(3)) + "]");
-                op::log("Right hand heatmaps size: [" + std::to_string(handHeatMaps[1].getSize(0)) + ", "
-                        + std::to_string(handHeatMaps[1].getSize(1)) + ", "
-                        + std::to_string(handHeatMaps[1].getSize(2)) + ", "
-                        + std::to_string(handHeatMaps[1].getSize(3)) + "]");
-            }
         }
-        else
-            op::log("Nullptr or empty datumsPtr found.", op::Priority::High, __LINE__, __FUNCTION__, __FILE__);
+        catch (const std::exception& e)
+        {
+            this->stop();
+            op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
     }
 };
 
-int tutorialApiCpp5()
+int tutorialApiCpp()
 {
     try
     {
@@ -130,8 +137,18 @@ int tutorialApiCpp5()
                   __LINE__, __FUNCTION__, __FILE__);
         op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
         op::Profiler::setDefaultX(FLAGS_profile_speed);
+        // // For debugging
+        // // Print all logging messages
+        // op::ConfigureLog::setPriorityThreshold(op::Priority::None);
+        // // Print out speed values faster
+        // op::Profiler::setDefaultX(100);
 
         // Applying user defined configuration - GFlags to program variables
+        // producerType
+        op::ProducerType producerType;
+        std::string producerString;
+        std::tie(producerType, producerString) = op::flagsToProducer(
+            FLAGS_image_dir, FLAGS_video, FLAGS_ip_camera, FLAGS_camera, FLAGS_flir_camera, FLAGS_flir_camera_index);
         // cameraSize
         const auto cameraSize = op::flagsToPoint(FLAGS_camera_resolution, "-1x-1");
         // outputSize
@@ -142,11 +159,6 @@ int tutorialApiCpp5()
         const auto faceNetInputSize = op::flagsToPoint(FLAGS_face_net_resolution, "368x368 (multiples of 16)");
         // handNetInputSize
         const auto handNetInputSize = op::flagsToPoint(FLAGS_hand_net_resolution, "368x368 (multiples of 16)");
-        // producerType
-        op::ProducerType producerType;
-        std::string producerString;
-        std::tie(producerType, producerString) = op::flagsToProducer(
-            FLAGS_image_dir, FLAGS_video, FLAGS_ip_camera, FLAGS_camera, FLAGS_flir_camera, FLAGS_flir_camera_index);
         // poseModel
         const auto poseModel = op::flagsToPoseModel(FLAGS_model_pose);
         // JSON saving
@@ -161,12 +173,23 @@ int tutorialApiCpp5()
         const auto heatMapScaleMode = op::flagsToHeatMapScaleMode(FLAGS_heatmaps_scale);
         // >1 camera view?
         const auto multipleView = (FLAGS_3d || FLAGS_3d_views > 1 || FLAGS_flir_camera);
+        // Face and hand detectors
+        const auto faceDetector = op::flagsToDetector(FLAGS_face_detector);
+        const auto handDetector = op::flagsToDetector(FLAGS_hand_detector);
         // Enabling Google Logging
         const bool enableGoogleLogging = true;
 
-        // Configuring OpenPose
+        // OpenPose wrapper
         op::log("Configuring OpenPose...", op::Priority::High);
-        op::WrapperT<UserDatum> opWrapperT{op::ThreadManagerMode::AsynchronousOut};
+        op::WrapperT<UserDatum> opWrapperT;
+
+        // Initializing the user custom classes
+        // GUI (Display)
+        auto wUserOutput = std::make_shared<WUserOutput>();
+        // Add custom processing
+        const auto workerOutputOnNewThread = true;
+        opWrapperT.setWorker(op::WorkerType::Output, wUserOutput, workerOutputOnNewThread);
+
         // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
         const op::WrapperStructPose wrapperStructPose{
             !FLAGS_body_disable, netInputSize, outputSize, keypointScaleMode, FLAGS_num_gpu, FLAGS_num_gpu_start,
@@ -178,12 +201,13 @@ int tutorialApiCpp5()
         opWrapperT.configure(wrapperStructPose);
         // Face configuration (use op::WrapperStructFace{} to disable it)
         const op::WrapperStructFace wrapperStructFace{
-            FLAGS_face, faceNetInputSize, op::flagsToRenderMode(FLAGS_face_render, multipleView, FLAGS_render_pose),
+            FLAGS_face, faceDetector, faceNetInputSize,
+            op::flagsToRenderMode(FLAGS_face_render, multipleView, FLAGS_render_pose),
             (float)FLAGS_face_alpha_pose, (float)FLAGS_face_alpha_heatmap, (float)FLAGS_face_render_threshold};
         opWrapperT.configure(wrapperStructFace);
         // Hand configuration (use op::WrapperStructHand{} to disable it)
         const op::WrapperStructHand wrapperStructHand{
-            FLAGS_hand, handNetInputSize, FLAGS_hand_scale_number, (float)FLAGS_hand_scale_range, FLAGS_hand_tracking,
+            FLAGS_hand, handDetector, handNetInputSize, FLAGS_hand_scale_number, (float)FLAGS_hand_scale_range,
             op::flagsToRenderMode(FLAGS_hand_render, multipleView, FLAGS_render_pose), (float)FLAGS_hand_alpha_pose,
             (float)FLAGS_hand_alpha_heatmap, (float)FLAGS_hand_render_threshold};
         opWrapperT.configure(wrapperStructHand);
@@ -212,36 +236,12 @@ int tutorialApiCpp5()
 
         // Start, run, and stop processing - exec() blocks this thread until OpenPose wrapper has finished
         op::log("Starting thread(s)...", op::Priority::High);
-        opWrapperT.start();
-
-        // User processing
-        UserOutputClass userOutputClass;
-        bool userWantsToExit = false;
-        while (!userWantsToExit)
-        {
-            // Pop frame
-            std::shared_ptr<std::vector<std::shared_ptr<UserDatum>>> datumProcessed;
-            if (opWrapperT.waitAndPop(datumProcessed))
-            {
-                if (!FLAGS_no_display)
-                    userWantsToExit = userOutputClass.display(datumProcessed);;
-                userOutputClass.printKeypoints(datumProcessed);
-            }
-            // If OpenPose finished reading images
-            else if (!opWrapperT.isRunning())
-                break;
-            // Something else happened
-            else
-                op::log("Processed datum could not be emplaced.", op::Priority::High, __LINE__, __FUNCTION__, __FILE__);
-        }
-
-        op::log("Stopping thread(s)", op::Priority::High);
-        opWrapperT.stop();
+        opWrapperT.exec();
 
         // Measuring total time
         const auto now = std::chrono::high_resolution_clock::now();
-        const auto totalTimeSec = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(now-timerBegin).count()
-                                * 1e-9;
+        const auto totalTimeSec = double(
+            std::chrono::duration_cast<std::chrono::nanoseconds>(now-timerBegin).count()* 1e-9);
         const auto message = "OpenPose demo successfully finished. Total time: "
                            + std::to_string(totalTimeSec) + " seconds.";
         op::log(message, op::Priority::High);
@@ -260,6 +260,6 @@ int main(int argc, char *argv[])
     // Parsing command line flags
     gflags::ParseCommandLineFlags(&argc, &argv, true);
 
-    // Running tutorialApiCpp5
-    return tutorialApiCpp5();
+    // Running tutorialApiCpp
+    return tutorialApiCpp();
 }

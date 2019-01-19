@@ -128,6 +128,13 @@ DEFINE_bool(face,                       false,          "Enables face keypoint d
                                                         " `model_folder`. Note that this will considerable slow down the performance and increse"
                                                         " the required GPU memory. In addition, the greater number of people on the image, the"
                                                         " slower OpenPose will be.");
+DEFINE_int32(face_detector,             0,              "Kind of face rectangle detector. Select 0 (default) to select OpenPose body detector (most"
+                                                        " accurate one and fastest one if body is enabled), 1 to select OpenCV face detector (not"
+                                                        " implemented for hands), 2 to indicate that it will be provided by the user, or 3 to"
+                                                        " also apply hand tracking (only for hand). Hand tracking might improve hand keypoint"
+                                                        " detection for webcam (if the frame rate is high enough, i.e., >7 FPS per GPU) and video."
+                                                        " This is not person ID tracking, it simply looks for hands in positions at which hands were"
+                                                        " located in previous frames, but it does not guarantee the same person ID among frames.");
 DEFINE_string(face_net_resolution,      "368x368",      "Multiples of 16 and squared. Analogous to `net_resolution` but applied to the face keypoint"
                                                         " detector. 320x320 usually works fine while giving a substantial speed up when multiple"
                                                         " faces on the image.");
@@ -135,6 +142,7 @@ DEFINE_string(face_net_resolution,      "368x368",      "Multiples of 16 and squ
 DEFINE_bool(hand,                       false,          "Enables hand keypoint detection. It will share some parameters from the body pose, e.g."
                                                         " `model_folder`. Analogously to `--face`, it will also slow down the performance, increase"
                                                         " the required GPU memory and its speed depends on the number of people.");
+DEFINE_int32(hand_detector,             0,              "Kind of hand rectangle detector. Analogous to `--face_detector`.");
 DEFINE_string(hand_net_resolution,      "368x368",      "Multiples of 16 and squared. Analogous to `net_resolution` but applied to the hand keypoint"
                                                         " detector.");
 DEFINE_int32(hand_scale_number,         1,              "Analogous to `scale_number` but applied to the hand keypoint detector. Our best results"
@@ -142,10 +150,6 @@ DEFINE_int32(hand_scale_number,         1,              "Analogous to `scale_num
 DEFINE_double(hand_scale_range,         0.4,            "Analogous purpose than `scale_gap` but applied to the hand keypoint detector. Total range"
                                                         " between smallest and biggest scale. The scales will be centered in ratio 1. E.g., if"
                                                         " scaleRange = 0.4 and scalesNumber = 2, then there will be 2 scales, 0.8 and 1.2.");
-DEFINE_bool(hand_tracking,              false,          "Adding hand tracking might improve hand keypoints detection for webcam (if the frame rate"
-                                                        " is high enough, i.e., >7 FPS per GPU) and video. This is not person ID tracking, it"
-                                                        " simply looks for hands in positions at which hands were located in previous frames, but"
-                                                        " it does not guarantee the same person ID among frames.");
 // OpenPose 3-D Reconstruction
 DEFINE_bool(3d,                         false,          "Running OpenPose 3-D reconstruction demo: 1) Reading from a stereo camera system."
                                                         " 2) Performing 3-D reconstruction from the multiple views. 3) Displaying 3-D reconstruction"

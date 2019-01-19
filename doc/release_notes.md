@@ -267,13 +267,14 @@ OpenPose Library - Release Notes
     5. Wrapper classes simplified and renamed. Wrapper renamed as WrapperT, and created Wrapper as the non-templated class equivalent.
     6. API and examples improved:
         1. New header file `flags.hpp` that includes all OpenPose flags, removing the need to copy them repeatedly on each OpenPose example file.
-        2. `tutorial_wrapper` renamed as `tutorial_api_cpp` as well as new examples were added.
-        2. `tutorial_python` renamed as `tutorial_api_python` as well as new examples were added.
-        3. `tutorial_pose` and `tutorial_thread` renamed as `tutorial_developer`, not meant to be used by users, but rather for OpenPose developers.
-        4. Examples do not end in core dumped if an OpenPose exception occurred during initialization, but they are rather closed returning -1. However, it will still results in core dumped if the exception occurs during multi-threading execution.
-        5. Added new examples, including examples to extract face and/or hand from images.
-        6. Added `--no_display` flag for the examples that does not use OpenPose output.
-        7. Given that display can be disabled in all examples, they all have been added to the Travis build so they can be tested.
+        2. Renamed `tutorial_wrapper` as `tutorial_api_cpp` as well as new examples were added.
+        2. Renamed `tutorial_python` as `tutorial_api_python` as well as new examples were added.
+        3. Renamed `tutorial_thread` as `tutorial_api_thread`, focused in the multi-thread mechanism.
+        4. Removed `tutorial_pose`, the folder `tutorial_api_cpp` includes much cleaner and commented examples.
+        5. Examples do not end in core dumped if an OpenPose exception occurred during initialization, but they are rather closed returning -1. However, it will still results in core dumped if the exception occurs during multi-threading execution.
+        6. Added new examples, including examples to extract face and/or hand from images.
+        7. Added `--no_display` flag for the examples that does not use OpenPose output.
+        8. Given that display can be disabled in all examples, they all have been added to the Travis build so they can be tested.
     7. Added a virtual destructor to almost all clases, so they can be inherited. Exceptions (for performance reasons): Array, Point, Rectangle, CvMatToOpOutput, OpOutputToCvMat.
     8. Auxiliary classes in errorAndLog turned into namespaces (Profiler must be kept as class to allow static parameters).
     9. Added flag `--frame_step` to allow the user to select the step or gap between processed frames. E.g., `--frame_step 5` would read and process frames 0, 5, 10, etc.
@@ -312,6 +313,7 @@ OpenPose Library - Release Notes
     30. Added the flags `--prototxt_path` and `--caffemodel_path` to allow custom ProtoTxt and CaffeModel paths.
     31. Replaced the old Python wrapper for an updated Pybind11 wrapper version, that includes all the functionality of the C++ API.
     32. Function getFilesOnDirectory() can extra all basic image file types at once without requiring to manually enumerate them.
+    33. Added the flags `--face_detector` and `--hand_detector`, that enable the user to select the face/hand rectangle detector that is used for the later face/hand keypoint detection. It includes OpenCV (for face), and also allows the user to provide its own input. Flag `--hand_tracking` is removed and integrated into this flag too.
 2. Functions or parameters renamed:
     1. By default, python example `tutorial_developer/python_2_pose_from_heatmaps.py` was using 2 scales starting at -1x736, changed to 1 scale at -1x368.
     2. WrapperStructPose default parameters changed to match those of the OpenPose demo binary.
@@ -327,6 +329,7 @@ OpenPose Library - Release Notes
     12. Moved most sh scripts into the `scripts/` folder. Only models/getModels.sh and the `*.bat` files are kept under `models/` and `3rdparty/windows`.
     13. For Python compatibility and scalability increase, template `TDatums` used for `include/openpose/wrapper/wrapper.hpp` has changed from `std::vector<Datum>` to `std::vector<std::shared_ptr<Datum>>`, including the respective changes in all the worker classes. In addition, some template classes have been simplified to only take 1 template parameter for user simplicity.
     14. Renamed intRound, charRound, etc. by positiveIntRound, positiveCharRound, etc. so that people can realize it is not safe for negative numbers.
+    15. Flag `--hand_tracking` is a subcase of `--hand_detector`, so it has been removed and incorporated as `--hand_detector 3`.
 3. Main bugs fixed:
     1. CMake-GUI was forcing to Release mode, allowed Debug modes too.
     2. NMS returns in index 0 the number of found peaks. However, while the number of peaks was truncated to a maximum of 127, this index 0 was saving the real number instead of the truncated one.

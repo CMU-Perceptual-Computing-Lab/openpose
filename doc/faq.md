@@ -20,6 +20,7 @@ OpenPose - Frequently Asked Question (FAQ)
     15. [3D OpenPose Returning Wrong Results: 0, NaN, Infinity, etc.](#3d-openpose-returning-wrong-results-0-nan-infinity-etc)
     16. [Protobuf Clip Param Caffe Error](#protobuf-clip-param-caffe-error)
     17. [The Human Skeleton Looks like Dotted Lines Rather than Solid Lines](#the-human-skeleton-looks-like-dotted-lines-rather-than-solid-lines)
+    18. [Huge RAM Usage](#huge-ram-usage)
 
 
 
@@ -151,6 +152,13 @@ If you wanna use your custom Caffe and it has this error: This error only happen
 
 
 ### The Human Skeleton Looks like Dotted Lines Rather than Solid Lines
-**Q:** When I use the demo to handle my images，the skeletons are dotted lines. I want to know how to make them to be solid lines.
+**Q**: When I use the demo to handle my images，the skeletons are dotted lines. I want to know how to make them to be solid lines.
 
 **A**: The reason is that your input image size is too small. You can either 1) manually rescale your images up or 2) use a bigger `--output_resolution` so OpenPose will resize them up.
+
+
+
+### Huge RAM Usage
+**Q**: During the execution of the demo, the CPU usage oscillates between 50 and 99%, but the RAM is almost at 100%.
+
+**A**: Highly reducing the `--net_resolution` and following the tips in the [Speed Up, Memory Reduction, and Benchmark](#speed-up-memory-reduction-and-benchmark) section are the only way to reduce the RAM usage. Alternatively, you can disable `USE_MKL` in CMake, which will highly reduce the RAM usage of the Caffe version, but it might also reduce the program speed.

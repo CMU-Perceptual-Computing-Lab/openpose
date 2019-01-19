@@ -1,4 +1,4 @@
-// ------------------------- OpenPose Library Tutorial - Thread - Example 3 - User Input Processing And Output -------------------------
+// ------------------------- OpenPose Library Tutorial - Thread - Example 2 - User Input Processing And Output -------------------------
 // This fourth example shows the user how to:
     // 1. Read folder of images / video / webcam  (`producer` module)
     // 2. Use the processing implemented by the user
@@ -16,16 +16,7 @@
     namespace gflags = google;
 #endif
 // OpenPose dependencies
-// Option a) Importing all modules
 #include <openpose/headers.hpp>
-// Option b) Manually importing the desired modules. Recommended if you only intend to use a few modules.
-// #include <openpose/core/headers.hpp>
-// #include <openpose/filestream/headers.hpp>
-// #include <openpose/gui/headers.hpp>
-// #include <openpose/pose/headers.hpp>
-// #include <openpose/producer/headers.hpp>
-// #include <openpose/thread/headers.hpp>
-// #include <openpose/utilities/headers.hpp>
 
 // See all the available parameter options withe the `--help` flag. E.g., `build/examples/openpose/openpose.bin --help`
 // Note: This command will show you flags for other unnecessary 3rdparty files. Check only the flags for the OpenPose
@@ -39,12 +30,25 @@ DEFINE_string(image_dir,                "examples/media/",      "Process a direc
 // Consumer
 DEFINE_bool(fullscreen,                 false,          "Run in full-screen mode (press f during runtime to toggle).");
 
+// If the user needs his own variables, he can inherit the op::Datum struct and add them in there.
+// UserDatum can be directly used by the OpenPose wrapper because it inherits from op::Datum, just define
+// WrapperT<std::vector<std::shared_ptr<UserDatum>>> instead of Wrapper
+// (or equivalently WrapperT<std::vector<std::shared_ptr<UserDatum>>>)
+struct UserDatum : public op::Datum
+{
+    bool boolThatUserNeedsForSomeReason;
+
+    UserDatum(const bool boolThatUserNeedsForSomeReason_ = false) :
+        boolThatUserNeedsForSomeReason{boolThatUserNeedsForSomeReason_}
+    {}
+};
+
 // The W-classes can be implemented either as a template or as simple classes given
 // that the user usually knows which kind of data he will move between the queues,
-// in this case we assume a std::shared_ptr of a std::vector of op::Datum
+// in this case we assume a std::shared_ptr of a std::vector of UserDatum
 
 // This worker will just read and return all the basic image file formats in a directory
-class WUserInput : public op::WorkerProducer<std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>>
+class WUserInput : public op::WorkerProducer<std::shared_ptr<std::vector<std::shared_ptr<UserDatum>>>>
 {
 public:
     WUserInput(const std::string& directoryPath) :
@@ -59,7 +63,7 @@ public:
 
     void initializationOnThread() {}
 
-    std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>> workProducer()
+    std::shared_ptr<std::vector<std::shared_ptr<UserDatum>>> workProducer()
     {
         try
         {
@@ -76,7 +80,7 @@ public:
             else
             {
                 // Create new datum
-                auto datumsPtr = std::make_shared<std::vector<std::shared_ptr<op::Datum>>>();
+                auto datumsPtr = std::make_shared<std::vector<std::shared_ptr<UserDatum>>>();
                 datumsPtr->emplace_back();
                 auto& datumPtr = datumsPtr->at(0);
 
@@ -110,7 +114,7 @@ private:
 };
 
 // This worker will just invert the image
-class WUserPostProcessing : public op::Worker<std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>>
+class WUserPostProcessing : public op::Worker<std::shared_ptr<std::vector<std::shared_ptr<UserDatum>>>>
 {
 public:
     WUserPostProcessing()
@@ -120,7 +124,7 @@ public:
 
     void initializationOnThread() {}
 
-    void work(std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& datumsPtr)
+    void work(std::shared_ptr<std::vector<std::shared_ptr<UserDatum>>>& datumsPtr)
     {
         // User's post-processing (after OpenPose processing & before OpenPose outputs) here
             // datumPtr->cvOutputData: rendered frame with pose or heatmaps
@@ -141,12 +145,12 @@ public:
 };
 
 // This worker will just read and return all the jpg files in a directory
-class WUserOutput : public op::WorkerConsumer<std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>>
+class WUserOutput : public op::WorkerConsumer<std::shared_ptr<std::vector<std::shared_ptr<UserDatum>>>>
 {
 public:
     void initializationOnThread() {}
 
-    void workConsumer(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& datumsPtr)
+    void workConsumer(const std::shared_ptr<std::vector<std::shared_ptr<UserDatum>>>& datumsPtr)
     {
         try
         {
@@ -169,12 +173,12 @@ public:
     }
 };
 
-int openPoseTutorialThread3()
+int openPoseTutorialThread2()
 {
     try
     {
         op::log("Starting OpenPose demo...", op::Priority::High);
-        const auto timerBegin = std::chrono::high_resolution_clock::now();
+        const auto opTimer = op::getTimerInit();
 
         // ------------------------- INITIALIZATION -------------------------
         // Step 1 - Set logging level
@@ -184,7 +188,7 @@ int openPoseTutorialThread3()
                   __LINE__, __FUNCTION__, __FILE__);
         op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
         // Step 2 - Setting thread workers && manager
-        typedef std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>> TypedefDatumsSP;
+        typedef std::shared_ptr<std::vector<std::shared_ptr<UserDatum>>> TypedefDatumsSP;
         typedef std::shared_ptr<op::Worker<TypedefDatumsSP>> TypedefWorker;
         op::ThreadManager<TypedefDatumsSP> threadManager;
         // Step 3 - Initializing the worker classes
@@ -228,15 +232,10 @@ int openPoseTutorialThread3()
         // op::log("Stopping thread(s)", op::Priority::High);
         // threadManager.stop();
 
-        // ------------------------- CLOSING -------------------------
         // Measuring total time
-        const auto now = std::chrono::high_resolution_clock::now();
-        const auto totalTimeSec = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(now-timerBegin).count()
-                                * 1e-9;
-        const auto message = "OpenPose demo successfully finished. Total time: "
-                           + std::to_string(totalTimeSec) + " seconds.";
-        op::log(message, op::Priority::High);
-        // Return successful message
+        op::printTime(opTimer, "OpenPose demo successfully finished. Total time: ", " seconds.", op::Priority::High);
+
+        // Return
         return 0;
     }
     catch (const std::exception& e)
@@ -251,6 +250,6 @@ int main(int argc, char *argv[])
     // Parsing command line flags
     gflags::ParseCommandLineFlags(&argc, &argv, true);
 
-    // Running openPoseTutorialThread3
-    return openPoseTutorialThread3();
+    // Running openPoseTutorialThread2
+    return openPoseTutorialThread2();
 }

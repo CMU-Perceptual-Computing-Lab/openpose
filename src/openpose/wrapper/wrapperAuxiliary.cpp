@@ -110,14 +110,10 @@ namespace op
                 error("Writting video is only available if the OpenPose producer is used (i.e."
                       " producerSharedPtr cannot be a nullptr).",
                       __LINE__, __FUNCTION__, __FILE__);
-            if (!wrapperStructPose.enable)
-            {
-                if (!wrapperStructFace.enable)
-                    error("Body keypoint detection must be enabled.", __LINE__, __FUNCTION__, __FILE__);
-                if (wrapperStructHand.enable)
-                    error("Body keypoint detection must be enabled in order to run hand keypoint detection.",
-                          __LINE__, __FUNCTION__, __FILE__);
-            }
+            if (!wrapperStructPose.enable && !wrapperStructFace.enable && !wrapperStructHand.enable)
+                error("Body, face, and hand keypoint detectors are disabled. You must enable at least one (i.e,"
+                      " unselect `--body_disable`, select `--face`, or select `--hand`.",
+                      __LINE__, __FUNCTION__, __FILE__);
             // If 3-D module, 1 person is the maximum
             if (wrapperStructExtra.reconstruct3d && wrapperStructPose.numberPeopleMax != 1)
             {

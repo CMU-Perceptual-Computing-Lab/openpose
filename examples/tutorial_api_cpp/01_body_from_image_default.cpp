@@ -1,5 +1,5 @@
-// -------------------------- OpenPose C++ API Tutorial - Example 2 - Whole body from image --------------------------
-// It reads an image, process it, and displays it with the pose, hand, and face keypoints.
+// ----------------------------- OpenPose C++ API Tutorial - Example 1 - Body from image -----------------------------
+// It reads an image, process it, and displays it with the pose keypoints.
 
 // Command-line user intraface
 #define OPENPOSE_FLAGS_DISABLE_POSE
@@ -9,7 +9,7 @@
 
 // Custom OpenPose flags
 // Producer
-DEFINE_string(image_path, "examples/media/COCO_val2014_000000000241.jpg",
+DEFINE_string(image_path, "examples/media/COCO_val2014_000000000192.jpg",
     "Process an image. Read all standard formats (jpg, png, bmp, etc.).");
 // Display
 DEFINE_bool(no_display,                 false,
@@ -45,10 +45,31 @@ void printKeypoints(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>
         // Example: How to use the pose keypoints
         if (datumsPtr != nullptr && !datumsPtr->empty())
         {
+            // Alternative 1
             op::log("Body keypoints: " + datumsPtr->at(0)->poseKeypoints.toString());
-            op::log("Face keypoints: " + datumsPtr->at(0)->faceKeypoints.toString());
-            op::log("Left hand keypoints: " + datumsPtr->at(0)->handKeypoints[0].toString());
-            op::log("Right hand keypoints: " + datumsPtr->at(0)->handKeypoints[1].toString());
+
+            // // Alternative 2
+            // op::log(datumsPtr->at(0).poseKeypoints);
+
+            // // Alternative 3
+            // std::cout << datumsPtr->at(0).poseKeypoints << std::endl;
+
+            // // Alternative 4 - Accesing each element of the keypoints
+            // op::log("\nKeypoints:");
+            // const auto& poseKeypoints = datumsPtr->at(0).poseKeypoints;
+            // op::log("Person pose keypoints:");
+            // for (auto person = 0 ; person < poseKeypoints.getSize(0) ; person++)
+            // {
+            //     op::log("Person " + std::to_string(person) + " (x, y, score):");
+            //     for (auto bodyPart = 0 ; bodyPart < poseKeypoints.getSize(1) ; bodyPart++)
+            //     {
+            //         std::string valueToPrint;
+            //         for (auto xyscore = 0 ; xyscore < poseKeypoints.getSize(2) ; xyscore++)
+            //             valueToPrint += std::to_string(   poseKeypoints[{person, bodyPart, xyscore}]   ) + " ";
+            //         op::log(valueToPrint);
+            //     }
+            // }
+            // op::log(" ");
         }
         else
             op::log("Nullptr or empty datumsPtr found.", op::Priority::High);
@@ -59,18 +80,16 @@ void printKeypoints(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>
     }
 }
 
-int tutorialApiCpp2()
+int tutorialApiCpp()
 {
     try
     {
         op::log("Starting OpenPose demo...", op::Priority::High);
+        const auto opTimer = op::getTimerInit();
 
         // Configuring OpenPose
         op::log("Configuring OpenPose...", op::Priority::High);
         op::Wrapper opWrapper{op::ThreadManagerMode::Asynchronous};
-        // Add hand and face
-        opWrapper.configure(op::WrapperStructFace{true});
-        opWrapper.configure(op::WrapperStructHand{true});
         // Set to single-thread (for sequential processing and/or debugging and/or reducing latency)
         if (FLAGS_disable_multi_thread)
             opWrapper.disableMultiThreading();
@@ -91,8 +110,10 @@ int tutorialApiCpp2()
         else
             op::log("Image could not be processed.", op::Priority::High);
 
-        // Return successful message
-        op::log("Stopping OpenPose...", op::Priority::High);
+        // Measuring total time
+        op::printTime(opTimer, "OpenPose demo successfully finished. Total time: ", " seconds.", op::Priority::High);
+
+        // Return
         return 0;
     }
     catch (const std::exception& e)
@@ -106,6 +127,6 @@ int main(int argc, char *argv[])
     // Parsing command line flags
     gflags::ParseCommandLineFlags(&argc, &argv, true);
 
-    // Running tutorialApiCpp2
-    return tutorialApiCpp2();
+    // Running tutorialApiCpp
+    return tutorialApiCpp();
 }

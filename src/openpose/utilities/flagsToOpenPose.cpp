@@ -112,6 +112,27 @@ namespace op
         }
     }
 
+    Detector flagsToDetector(const int detector)
+    {
+        try
+        {
+            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            if (detector >= 0 && detector < (int)Detector::Size)
+                return (Detector)detector;
+            else
+            {
+                error("Value (" + std::to_string(detector) + ") does not correspond with any Detector.",
+                      __LINE__, __FUNCTION__, __FILE__);
+                return Detector::Body;
+            }
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return Detector::Body;
+        }
+    }
+
     ProducerType flagsToProducerType(const std::string& imageDirectory, const std::string& videoPath,
                                      const std::string& ipCameraPath, const int webcamIndex,
                                      const bool flirCamera)

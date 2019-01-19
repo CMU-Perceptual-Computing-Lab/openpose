@@ -1,4 +1,4 @@
-// ------------------------- OpenPose Library Tutorial - Thread - Example 2 - User Processing Function -------------------------
+// ------------------------- OpenPose Library Tutorial - Thread - Example 1 - User Processing Function -------------------------
 // This fourth example shows the user how to:
     // 1. Read folder of images / video / webcam  (`producer` module)
     // 2. Use the processing implemented by the user
@@ -8,58 +8,10 @@
     // 1. `core` module: for the Datum struct that the `thread` module sends between the queues
     // 2. `utilities` module: for the error & logging functions, i.e., op::error & op::log respectively
 
-// 3rdparty dependencies
-// GFlags: DEFINE_bool, _int32, _int64, _uint64, _double, _string
-#include <gflags/gflags.h>
-// Allow Google Flags in Ubuntu 14
-#ifndef GFLAGS_GFLAGS_H_
-    namespace gflags = google;
-#endif
+// Command-line user intraface
+#include <openpose/flags.hpp>
 // OpenPose dependencies
-#include <openpose/core/headers.hpp>
-#include <openpose/gui/headers.hpp>
-#include <openpose/producer/headers.hpp>
-#include <openpose/thread/headers.hpp>
-#include <openpose/utilities/headers.hpp>
-
-// See all the available parameter options withe the `--help` flag. E.g., `build/examples/openpose/openpose.bin --help`
-// Note: This command will show you flags for other unnecessary 3rdparty files. Check only the flags for the OpenPose
-// executable. E.g., for `openpose.bin`, look for `Flags from examples/openpose/openpose.cpp:`.
-// Debugging/Other
-DEFINE_int32(logging_level,             3,              "The logging level. Integer in the range [0, 255]. 0 will output any log() message, while"
-                                                        " 255 will not output any. Current OpenPose library messages are in the range 0-4: 1 for"
-                                                        " low priority messages and 4 for important ones.");
-// Producer
-DEFINE_int32(camera,                    -1,             "The camera index for cv::VideoCapture. Integer in the range [0, 9]. Select a negative"
-                                                        " number (by default), to auto-detect and open the first available camera.");
-DEFINE_string(camera_resolution,        "-1x-1",        "Set the camera resolution (either `--camera` or `--flir_camera`). `-1x-1` will use the"
-                                                        " default 1280x720 for `--camera`, or the maximum flir camera resolution available for"
-                                                        " `--flir_camera`");
-DEFINE_string(video,                    "",             "Use a video file instead of the camera. Use `examples/media/video.avi` for our default"
-                                                        " example video.");
-DEFINE_string(image_dir,                "",             "Process a directory of images. Use `examples/media/` for our default example folder with 20"
-                                                        " images. Read all standard formats (jpg, png, bmp, etc.).");
-DEFINE_bool(flir_camera,                false,          "Whether to use FLIR (Point-Grey) stereo camera.");
-DEFINE_int32(flir_camera_index,         -1,             "Select -1 (default) to run on all detected flir cameras at once. Otherwise, select the flir"
-                                                        " camera index to run, where 0 corresponds to the detected flir camera with the lowest"
-                                                        " serial number, and `n` to the `n`-th lowest serial number camera.");
-DEFINE_string(ip_camera,                "",             "String with the IP camera URL. It supports protocols like RTSP and HTTP.");
-DEFINE_bool(process_real_time,          false,          "Enable to keep the original source frame rate (e.g., for video). If the processing time is"
-                                                        " too long, it will skip frames. If it is too fast, it will slow it down.");
-DEFINE_string(camera_parameter_path,    "models/cameraParameters/flir/", "String with the folder where the camera parameters are located. If there"
-                                                        " is only 1 XML file (for single video, webcam, or images from the same camera), you must"
-                                                        " specify the whole XML file path (ending in .xml).");
-DEFINE_bool(frame_undistort,            false,          "If false (default), it will not undistort the image, if true, it will undistortionate them"
-                                                        " based on the camera parameters found in `camera_parameter_path`");
-// OpenPose
-DEFINE_string(output_resolution,        "-1x-1",        "The image resolution (display and output). Use \"-1x-1\" to force the program to use the"
-                                                        " input image resolution.");
-DEFINE_int32(3d_views,                  1,              "Complementary option to `--image_dir` or `--video`. OpenPose will read as many images per"
-                                                        " iteration, allowing tasks such as stereo camera processing (`--3d`). Note that"
-                                                        " `--camera_parameter_path` must be set. OpenPose must find as many `xml` files in the"
-                                                        " parameter folder as this number indicates.");
-// Consumer
-DEFINE_bool(fullscreen,                 false,          "Run in full-screen mode (press f during runtime to toggle).");
+#include <openpose/headers.hpp>
 
 // This class can be implemented either as a template or as a simple class given
 // that the user usually knows which kind of data he will move between the queues,
@@ -94,12 +46,12 @@ public:
     }
 };
 
-int tutorialDeveloperThread2()
+int openPoseTutorialThread1()
 {
     try
     {
         op::log("Starting OpenPose demo...", op::Priority::High);
-        const auto timerBegin = std::chrono::high_resolution_clock::now();
+        const auto opTimer = op::getTimerInit();
 
         // ------------------------- INITIALIZATION -------------------------
         // Step 1 - Set logging level
@@ -133,13 +85,12 @@ int tutorialDeveloperThread2()
             (int)producerSharedPtr->get(CV_CAP_PROP_FRAME_WIDTH),
             (int)producerSharedPtr->get(CV_CAP_PROP_FRAME_HEIGHT)};
         // Step 4 - Setting thread workers && manager
-        typedef op::Datum TypedefDatum;
-        typedef std::shared_ptr<std::vector<std::shared_ptr<TypedefDatum>>> TypedefDatumsSP;
+        typedef std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>> TypedefDatumsSP;
         op::ThreadManager<TypedefDatumsSP> threadManager;
         // Step 5 - Initializing the worker classes
         // Frames producer (e.g., video, webcam, ...)
-        auto DatumProducer = std::make_shared<op::DatumProducer<TypedefDatum>>(producerSharedPtr);
-        auto wDatumProducer = std::make_shared<op::WDatumProducer<TypedefDatum>>(DatumProducer);
+        auto DatumProducer = std::make_shared<op::DatumProducer<op::Datum>>(producerSharedPtr);
+        auto wDatumProducer = std::make_shared<op::WDatumProducer<op::Datum>>(DatumProducer);
         // Specific WUserClass
         auto wUserClass = std::make_shared<WUserClass>();
         // GUI (Display)
@@ -197,15 +148,10 @@ int tutorialDeveloperThread2()
         // op::log("Stopping thread(s)", op::Priority::High);
         // threadManager.stop();
 
-        // ------------------------- CLOSING -------------------------
         // Measuring total time
-        const auto now = std::chrono::high_resolution_clock::now();
-        const auto totalTimeSec = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(now-timerBegin).count()
-                                * 1e-9;
-        const auto message = "OpenPose demo successfully finished. Total time: "
-                           + std::to_string(totalTimeSec) + " seconds.";
-        op::log(message, op::Priority::High);
-        // Return successful message
+        op::printTime(opTimer, "OpenPose demo successfully finished. Total time: ", " seconds.", op::Priority::High);
+
+        // Return
         return 0;
     }
     catch (const std::exception& e)
@@ -220,6 +166,6 @@ int main(int argc, char *argv[])
     // Parsing command line flags
     gflags::ParseCommandLineFlags(&argc, &argv, true);
 
-    // Running tutorialDeveloperThread2
-    return tutorialDeveloperThread2();
+    // Running openPoseTutorialThread1
+    return openPoseTutorialThread1();
 }

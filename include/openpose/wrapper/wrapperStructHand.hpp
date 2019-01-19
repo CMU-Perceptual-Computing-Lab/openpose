@@ -4,6 +4,7 @@
 #include <openpose/core/common.hpp>
 #include <openpose/core/enumClasses.hpp>
 #include <openpose/hand/handParameters.hpp>
+#include <openpose/wrapper/enumClasses.hpp>
 
 namespace op
 {
@@ -18,6 +19,17 @@ namespace op
          * Whether to extract hand.
          */
         bool enable;
+
+        /**
+         * Kind of hand rectangle detector. Recommended Detector::Body (fastest one if body is enabled and most
+         * accurate one), which is based on the OpenPose body keypoint detector.
+         * For hand, there is the alternative of Detector::BodyWithTracking. If selected, it will add tracking
+         * between frames. Adding hand tracking might improve hand keypoints detection for webcam (if the frame
+         * rate is high enough, i.e., >7 FPS per GPU) and video. This is not person ID tracking, it simply looks
+         * for hands in positions at which hands were located in previous frames, but it does not guarantee the
+         * same person id among frames.
+         */
+        Detector detector;
 
         /**
          * CCN (Conv Net) input size.
@@ -39,14 +51,6 @@ namespace op
          * scaleRange = 0.4 and scalesNumber = 2, then there will be 2 scales, 0.8 and 1.2.
          */
         float scaleRange;
-
-        /**
-         * Whether to add tracking between frames. Adding hand tracking might improve hand keypoints detection for
-         * webcam (if the frame rate is high enough, i.e., >7 FPS per GPU) and video. This is not person ID tracking,
-         * it simply looks for hands in positions at which hands were located in previous frames, but it does not
-         * guarantee the same person id among frames.
-         */
-        bool tracking;
 
         /**
          * Whether to render the output (pose locations, body, background or PAF heat maps) with CPU or GPU.
@@ -81,9 +85,10 @@ namespace op
          * Since all the elements of the struct are public, they can also be manually filled.
          */
         WrapperStructHand(
-            const bool enable = false, const Point<int>& netInputSize = Point<int>{368, 368},
-            const int scalesNumber = 1, const float scaleRange = 0.4f, const bool tracking = false,
-            const RenderMode renderMode = RenderMode::Gpu, const float alphaKeypoint = HAND_DEFAULT_ALPHA_KEYPOINT,
+            const bool enable = false, const Detector detector = Detector::Body,
+            const Point<int>& netInputSize = Point<int>{368, 368}, const int scalesNumber = 1,
+            const float scaleRange = 0.4f, const RenderMode renderMode = RenderMode::Gpu,
+            const float alphaKeypoint = HAND_DEFAULT_ALPHA_KEYPOINT,
             const float alphaHeatMap = HAND_DEFAULT_ALPHA_HEAT_MAP, const float renderThreshold = 0.2f);
     };
 }

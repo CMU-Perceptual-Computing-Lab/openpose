@@ -153,6 +153,13 @@ namespace op
         bool waitAndEmplace(TDatumsSP& tDatums);
 
         /**
+         * Similar to waitAndEmplace(const TDatumsSP& tDatums), but it takes a cv::Mat as input.
+         * @param cvMat cv::Mat with the image to be processed.
+         * @return Boolean specifying whether the tDatums could be emplaced.
+         */
+        bool waitAndEmplace(cv::Mat& cvMat);
+
+        /**
          * Push (copy) an element on the first (input) queue.
          * Same as tryEmplace, but it copies the data instead of moving it.
          * @param tDatums TDatumsSP element to be pushed.
@@ -167,6 +174,13 @@ namespace op
          * @return Boolean specifying whether the tDatums could be pushed.
          */
         bool waitAndPush(const TDatumsSP& tDatums);
+
+        /**
+         * Similar to waitAndPush(const TDatumsSP& tDatums), but it takes a cv::Mat as input.
+         * @param cvMat cv::Mat with the image to be processed.
+         * @return Boolean specifying whether the tDatums could be pushed.
+         */
+        bool waitAndPush(const cv::Mat& cvMat);
 
         /**
          * Pop (retrieve) an element from the last (output) queue.
@@ -188,12 +202,16 @@ namespace op
         bool waitAndPop(TDatumsSP& tDatums);
 
         /**
-         * Runs both waitAndEmplace and waitAndPop
+         * Runs both waitAndEmplace and waitAndPop.
+         * @param tDatums TDatumsSP element where the retrieved element will be placed.
+         * @return Boolean specifying whether the tDatums could be retrieved.
          */
         bool emplaceAndPop(TDatumsSP& tDatums);
 
         /**
-         * Runs both waitAndEmplace and waitAndPop
+         * Similar to emplaceAndPop(TDatumsSP& tDatums), but it takes a cv::Mat as input.
+         * @param cvMat cv::Mat with the image to be processed.
+         * @return TDatumsSP element where the processed information will be placed.
          */
         TDatumsSP emplaceAndPop(const cv::Mat& cvMat);
 
@@ -476,6 +494,28 @@ namespace op
     }
 
     template<typename TDatum, typename TDatums, typename TDatumsSP, typename TWorker>
+    bool WrapperT<TDatum, TDatums, TDatumsSP, TWorker>::waitAndEmplace(cv::Mat& cvMat)
+    {
+        try
+        {
+            // Create new datum
+            auto datumsPtr = std::make_shared<std::vector<std::shared_ptr<TDatum>>>();
+            datumsPtr->emplace_back();
+            auto& tDatumPtr = datumsPtr->at(0);
+            tDatumPtr = std::make_shared<TDatum>();
+            // Fill datum
+            std::swap(tDatumPtr->cvInputData, cvMat);
+            // Return result
+            return waitAndEmplace(datumsPtr);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return false;
+        }
+    }
+
+    template<typename TDatum, typename TDatums, typename TDatumsSP, typename TWorker>
     bool WrapperT<TDatum, TDatums, TDatumsSP, TWorker>::tryPush(const TDatumsSP& tDatums)
     {
         try
@@ -501,6 +541,28 @@ namespace op
                 error("Push cannot be called if an input worker was already selected.",
                       __LINE__, __FUNCTION__, __FILE__);
             return mThreadManager.waitAndPush(tDatums);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return false;
+        }
+    }
+
+    template<typename TDatum, typename TDatums, typename TDatumsSP, typename TWorker>
+    bool WrapperT<TDatum, TDatums, TDatumsSP, TWorker>::waitAndPush(const cv::Mat& cvMat)
+    {
+        try
+        {
+            // Create new datum
+            auto datumsPtr = std::make_shared<std::vector<std::shared_ptr<TDatum>>>();
+            datumsPtr->emplace_back();
+            auto& tDatumPtr = datumsPtr->at(0);
+            tDatumPtr = std::make_shared<TDatum>();
+            // Fill datum
+            tDatumPtr->cvInputData = cvMat.clone();
+            // Return result
+            return waitAndEmplace(datumsPtr);
         }
         catch (const std::exception& e)
         {

@@ -3,6 +3,15 @@
 
 namespace op
 {
+    enum class Detector : unsigned char
+    {
+        Body = 0,
+        OpenCV,
+        Provided,
+        BodyWithTracking,
+        Size,
+    };
+
     enum class WorkerType : unsigned char
     {
         Input = 0,

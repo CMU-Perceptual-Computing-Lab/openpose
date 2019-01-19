@@ -4,6 +4,7 @@
 #include <openpose/core/common.hpp>
 #include <openpose/core/enumClasses.hpp>
 #include <openpose/face/faceParameters.hpp>
+#include <openpose/wrapper/enumClasses.hpp>
 
 namespace op
 {
@@ -18,6 +19,12 @@ namespace op
          * Whether to extract face.
          */
         bool enable;
+
+        /**
+         * Kind of face rectangle detector. Recommended Detector::Body (fastest one if body is enabled and most
+         * accurate one), which is based on the OpenPose body keypoint detector.
+         */
+        Detector detector;
 
         /**
          * CCN (Conv Net) input size.
@@ -59,8 +66,9 @@ namespace op
          * Since all the elements of the struct are public, they can also be manually filled.
          */
         WrapperStructFace(
-            const bool enable = false, const Point<int>& netInputSize = Point<int>{368, 368},
-            const RenderMode renderMode = RenderMode::Gpu, const float alphaKeypoint = FACE_DEFAULT_ALPHA_KEYPOINT,
+            const bool enable = false, const Detector detector = Detector::Body,
+            const Point<int>& netInputSize = Point<int>{368, 368}, const RenderMode renderMode = RenderMode::Gpu,
+            const float alphaKeypoint = FACE_DEFAULT_ALPHA_KEYPOINT,
             const float alphaHeatMap = FACE_DEFAULT_ALPHA_HEAT_MAP, const float renderThreshold = 0.4f);
     };
 }

@@ -351,15 +351,21 @@ namespace op
                 {
                     log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     // Face detector
-                    // OpenPose face detector
-                    if (wrapperStructPose.enable)
+                    // OpenPose body-based face detector
+                    if (wrapperStructFace.detector == Detector::Body)
                     {
+                        // Sanity check
+                        if (!wrapperStructPose.enable)
+                            error("Body keypoint detection is disabled but face Detector is set to Body. Either"
+                                  " re-enable OpenPose body or select a different face Detector (`--face_detector`).",
+                                  __LINE__, __FUNCTION__, __FILE__);
+                        // Constructors
                         const auto faceDetector = std::make_shared<FaceDetector>(wrapperStructPose.poseModel);
                         for (auto& wPose : poseExtractorsWs)
                             wPose.emplace_back(std::make_shared<WFaceDetector<TDatumsSP>>(faceDetector));
                     }
                     // OpenCV face detector
-                    else
+                    else if (wrapperStructFace.detector == Detector::OpenCV)
                     {
                         log("Body keypoint detection is disabled. Hence, using OpenCV face detector (much less"
                             " accurate but faster).", Priority::High);
@@ -372,6 +378,11 @@ namespace op
                             );
                         }
                     }
+                    // If provided by user: We do not need to create a FaceDetector
+                    // Unknown face Detector
+                    else if (wrapperStructFace.detector != Detector::Provided)
+                        error("Unknown face Detector. Select a valid face Detector (`--face_detector`).",
+                              __LINE__, __FUNCTION__, __FILE__);
                     // Face keypoint extractor
                     for (auto gpu = 0u; gpu < poseExtractorsWs.size(); gpu++)
                     {
@@ -396,16 +407,32 @@ namespace op
                     const auto handDetector = std::make_shared<HandDetector>(wrapperStructPose.poseModel);
                     for (auto gpu = 0u; gpu < poseExtractorsWs.size(); gpu++)
                     {
+                        // Sanity check
+                        if ((wrapperStructHand.detector == Detector::BodyWithTracking
+                             || wrapperStructHand.detector == Detector::Body)
+                            && !wrapperStructPose.enable)
+                            error("Body keypoint detection is disabled but hand Detector is set to Body. Either"
+                                  " re-enable OpenPose body or select a different hand Detector (`--hand_detector`).",
+                                  __LINE__, __FUNCTION__, __FILE__);
                         // Hand detector
-                        // If tracking
-                        if (wrapperStructHand.tracking)
+                        // OpenPose body-based hand detector with tracking
+                        if (wrapperStructHand.detector == Detector::BodyWithTracking)
+                        {
                             poseExtractorsWs.at(gpu).emplace_back(
                                 std::make_shared<WHandDetectorTracking<TDatumsSP>>(handDetector)
                             );
-                        // If detection
-                        else
+                        }
+                        // OpenPose body-based hand detector
+                        else if (wrapperStructHand.detector == Detector::Body)
+                        {
                             poseExtractorsWs.at(gpu).emplace_back(
                                 std::make_shared<WHandDetector<TDatumsSP>>(handDetector));
+                        }
+                        // If provided by user: We do not need to create a FaceDetector
+                        // Unknown hand Detector
+                        else if (wrapperStructHand.detector != Detector::Provided)
+                            error("Unknown hand Detector. Select a valid hand Detector (`--hand_detector`).",
+                                  __LINE__, __FUNCTION__, __FILE__);
                         // Hand keypoint extractor
                         const auto netOutputSize = wrapperStructHand.netInputSize;
                         const auto handExtractorNet = std::make_shared<HandExtractorCaffe>(
@@ -418,8 +445,8 @@ namespace op
                         poseExtractorsWs.at(gpu).emplace_back(
                             std::make_shared<WHandExtractorNet<TDatumsSP>>(handExtractorNet)
                             );
-                        // If tracking
-                        if (wrapperStructHand.tracking)
+                        // If OpenPose body-based hand detector with tracking
+                        if (wrapperStructHand.detector == Detector::BodyWithTracking)
                             poseExtractorsWs.at(gpu).emplace_back(
                                 std::make_shared<WHandDetectorUpdate<TDatumsSP>>(handDetector)
                             );

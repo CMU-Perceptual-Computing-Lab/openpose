@@ -37,7 +37,7 @@ int openPoseDemo()
     try
     {
         op::log("Starting OpenPose calibration toolbox...", op::Priority::High);
-        const auto timerBegin = std::chrono::high_resolution_clock::now();
+        const auto opTimer = op::getTimerInit();
 
         // logging_level
         op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.",
@@ -114,12 +114,9 @@ int openPoseDemo()
             op::error("Unknown `--mode " + std::to_string(FLAGS_mode) + "`.", __LINE__, __FUNCTION__, __FILE__);
 
         // Measuring total time
-        const auto now = std::chrono::high_resolution_clock::now();
-        const auto totalTimeSec = (double)std::chrono::duration_cast<std::chrono::nanoseconds>(now-timerBegin).count()
-                                * 1e-9;
-        const auto message = "OpenPose calibration toolbox successfully finished. Total time: "
-                           + std::to_string(totalTimeSec) + " seconds.";
-        op::log(message, op::Priority::High);
+        op::printTime(
+            opTimer, "OpenPose calibration toolbox successfully finished. Total time: ", " seconds.",
+            op::Priority::High);
 
         return 0;
     }

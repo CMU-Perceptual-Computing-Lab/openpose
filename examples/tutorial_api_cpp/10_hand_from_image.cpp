@@ -1,16 +1,68 @@
-// ------------------------------------------------ OpenPose C++ Demo ------------------------------------------------
-// This example summarizes all the functionality of the OpenPose library. It can...
-    // 1. Read a frames source (images, video, webcam, 3D stereo Flir cameras, etc.).
-    // 2. Extract and render body/hand/face/foot keypoint/heatmap/PAF of that image.
-    // 3. Save the results on disk.
-    // 4. Display the rendered pose.
-// If the user wants to learn to use the OpenPose C++ library, we highly recommend to start with the examples in
-// `examples/tutorial_api_cpp/`.
+// ----------------------------- OpenPose C++ API Tutorial - Example 9 - Face from Image -----------------------------
+// It reads an image and the hand location, process it, and displays the hand keypoints. In addition,
+// it includes all the OpenPose configuration flags.
+// Input: An image and the hand rectangle locations.
+// Output: OpenPose hand keypoint detection.
+// NOTE: This demo is auto-selecting the following flags: `--body_disable --hand --hand_detector 2`
 
 // Command-line user intraface
+#define OPENPOSE_FLAGS_DISABLE_PRODUCER
+#define OPENPOSE_FLAGS_DISABLE_DISPLAY
 #include <openpose/flags.hpp>
 // OpenPose dependencies
 #include <openpose/headers.hpp>
+
+// Custom OpenPose flags
+// Producer
+DEFINE_string(image_path, "examples/media/COCO_val2014_000000000241.jpg",
+    "Process an image. Read all standard formats (jpg, png, bmp, etc.).");
+// Display
+DEFINE_bool(no_display,                 false,
+    "Enable to disable the visual display.");
+
+// This worker will just read and return all the jpg files in a directory
+void display(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& datumsPtr)
+{
+    try
+    {
+        // User's displaying/saving/other processing here
+            // datum.cvOutputData: rendered frame with pose or heatmaps
+            // datum.poseKeypoints: Array<float> with the estimated pose
+        if (datumsPtr != nullptr && !datumsPtr->empty())
+        {
+            // Display image
+            cv::imshow("User worker GUI", datumsPtr->at(0)->cvOutputData);
+            cv::waitKey(0);
+        }
+        else
+            op::log("Nullptr or empty datumsPtr found.", op::Priority::High);
+    }
+    catch (const std::exception& e)
+    {
+        op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+    }
+}
+
+void printKeypoints(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& datumsPtr)
+{
+    try
+    {
+        // Example: How to use the pose keypoints
+        if (datumsPtr != nullptr && !datumsPtr->empty())
+        {
+            op::log("Body keypoints: " + datumsPtr->at(0)->poseKeypoints.toString());
+            op::log("Face keypoints: " + datumsPtr->at(0)->faceKeypoints.toString());
+            op::log("Left hand keypoints: " + datumsPtr->at(0)->handKeypoints[0].toString());
+            op::log("Right hand keypoints: " + datumsPtr->at(0)->handKeypoints[1].toString());
+        }
+        else
+            op::log("Nullptr or empty datumsPtr found.", op::Priority::High);
+    }
+    catch (const std::exception& e)
+    {
+        op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+    }
+}
 
 void configureWrapper(op::Wrapper& opWrapper)
 {
@@ -25,13 +77,6 @@ void configureWrapper(op::Wrapper& opWrapper)
         op::Profiler::setDefaultX(FLAGS_profile_speed);
 
         // Applying user defined configuration - GFlags to program variables
-        // producerType
-        op::ProducerType producerType;
-        std::string producerString;
-        std::tie(producerType, producerString) = op::flagsToProducer(
-            FLAGS_image_dir, FLAGS_video, FLAGS_ip_camera, FLAGS_camera, FLAGS_flir_camera, FLAGS_flir_camera_index);
-        // cameraSize
-        const auto cameraSize = op::flagsToPoint(FLAGS_camera_resolution, "-1x-1");
         // outputSize
         const auto outputSize = op::flagsToPoint(FLAGS_output_resolution, "-1x-1");
         // netInputSize
@@ -53,16 +98,17 @@ void configureWrapper(op::Wrapper& opWrapper)
                                                       FLAGS_heatmaps_add_PAFs);
         const auto heatMapScaleMode = op::flagsToHeatMapScaleMode(FLAGS_heatmaps_scale);
         // >1 camera view?
-        const auto multipleView = (FLAGS_3d || FLAGS_3d_views > 1 || FLAGS_flir_camera);
+        const auto multipleView = (FLAGS_3d || FLAGS_3d_views > 1);
         // Face and hand detectors
         const auto faceDetector = op::flagsToDetector(FLAGS_face_detector);
-        const auto handDetector = op::flagsToDetector(FLAGS_hand_detector);
+        const auto handDetector = op::Detector::Provided;
         // Enabling Google Logging
         const bool enableGoogleLogging = true;
 
         // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
+        const auto bodyEnable = false;
         const op::WrapperStructPose wrapperStructPose{
-            !FLAGS_body_disable, netInputSize, outputSize, keypointScaleMode, FLAGS_num_gpu, FLAGS_num_gpu_start,
+            bodyEnable, netInputSize, outputSize, keypointScaleMode, FLAGS_num_gpu, FLAGS_num_gpu_start,
             FLAGS_scale_number, (float)FLAGS_scale_gap, op::flagsToRenderMode(FLAGS_render_pose, multipleView),
             poseModel, !FLAGS_disable_blending, (float)FLAGS_alpha_pose, (float)FLAGS_alpha_heatmap,
             FLAGS_part_to_show, FLAGS_model_folder, heatMapTypes, heatMapScaleMode, FLAGS_part_candidates,
@@ -76,8 +122,9 @@ void configureWrapper(op::Wrapper& opWrapper)
             (float)FLAGS_face_alpha_pose, (float)FLAGS_face_alpha_heatmap, (float)FLAGS_face_render_threshold};
         opWrapper.configure(wrapperStructFace);
         // Hand configuration (use op::WrapperStructHand{} to disable it)
+        const auto hand = true;
         const op::WrapperStructHand wrapperStructHand{
-            FLAGS_hand, handDetector, handNetInputSize, FLAGS_hand_scale_number, (float)FLAGS_hand_scale_range,
+            hand, handDetector, handNetInputSize, FLAGS_hand_scale_number, (float)FLAGS_hand_scale_range,
             op::flagsToRenderMode(FLAGS_hand_render, multipleView, FLAGS_render_pose), (float)FLAGS_hand_alpha_pose,
             (float)FLAGS_hand_alpha_heatmap, (float)FLAGS_hand_render_threshold};
         opWrapper.configure(wrapperStructHand);
@@ -85,12 +132,6 @@ void configureWrapper(op::Wrapper& opWrapper)
         const op::WrapperStructExtra wrapperStructExtra{
             FLAGS_3d, FLAGS_3d_min_views, FLAGS_identification, FLAGS_tracking, FLAGS_ik_threads};
         opWrapper.configure(wrapperStructExtra);
-        // Producer (use default to disable any input)
-        const op::WrapperStructInput wrapperStructInput{
-            producerType, producerString, FLAGS_frame_first, FLAGS_frame_step, FLAGS_frame_last,
-            FLAGS_process_real_time, FLAGS_frame_flip, FLAGS_frame_rotate, FLAGS_frames_repeat,
-            cameraSize, FLAGS_camera_parameter_path, FLAGS_frame_undistort, FLAGS_3d_views};
-        opWrapper.configure(wrapperStructInput);
         // Output (comment or use default argument to disable any output)
         const op::WrapperStructOutput wrapperStructOutput{
             FLAGS_cli_verbose, FLAGS_write_keypoint, op::stringToDataFormat(FLAGS_write_keypoint_format),
@@ -99,10 +140,7 @@ void configureWrapper(op::Wrapper& opWrapper)
             FLAGS_write_video_with_audio, FLAGS_write_heatmaps, FLAGS_write_heatmaps_format, FLAGS_write_video_3d,
             FLAGS_write_video_adam, FLAGS_write_bvh, FLAGS_udp_host, FLAGS_udp_port};
         opWrapper.configure(wrapperStructOutput);
-        // GUI (comment or use default argument to disable any visual output)
-        const op::WrapperStructGui wrapperStructGui{
-            op::flagsToDisplayMode(FLAGS_display, FLAGS_3d), !FLAGS_no_gui_verbose, FLAGS_fullscreen};
-        opWrapper.configure(wrapperStructGui);
+        // No GUI. Equivalent to: opWrapper.configure(op::WrapperStructGui{});
         // Set to single-thread (for sequential processing and/or debugging and/or reducing latency)
         if (FLAGS_disable_multi_thread)
             opWrapper.disableMultiThreading();
@@ -113,26 +151,67 @@ void configureWrapper(op::Wrapper& opWrapper)
     }
 }
 
-int openPoseDemo()
+int tutorialApiCpp()
 {
     try
     {
         op::log("Starting OpenPose demo...", op::Priority::High);
         const auto opTimer = op::getTimerInit();
 
-        // Configure OpenPose
+        // Configuring OpenPose
         op::log("Configuring OpenPose...", op::Priority::High);
-        op::Wrapper opWrapper;
+        op::Wrapper opWrapper{op::ThreadManagerMode::Asynchronous};
         configureWrapper(opWrapper);
 
-        // Start, run, and stop processing - exec() blocks this thread until OpenPose wrapper has finished
+        // Starting OpenPose
         op::log("Starting thread(s)...", op::Priority::High);
-        opWrapper.exec();
+        opWrapper.start();
+
+        // Read image and hand rectangle locations
+        const auto imageToProcess = cv::imread(FLAGS_image_path);
+        const std::vector<std::array<op::Rectangle<float>, 2>> handRectangles{
+            // Left/Right hands person 0
+            std::array<op::Rectangle<float>, 2>{
+                op::Rectangle<float>{320.035889f, 377.675049f, 69.300949f, 69.300949f},
+                op::Rectangle<float>{0.f, 0.f, 0.f, 0.f}},
+            // Left/Right hands person 1
+            std::array<op::Rectangle<float>, 2>{
+                op::Rectangle<float>{80.155792f, 407.673492f, 80.812706f, 80.812706f},
+                op::Rectangle<float>{46.449715f, 404.559753f, 98.898178f, 98.898178f}},
+            // Left/Right hands person 2
+            std::array<op::Rectangle<float>, 2>{
+                op::Rectangle<float>{185.692673f, 303.112244f, 157.587555f, 157.587555f},
+                op::Rectangle<float>{88.984360f, 268.866547f, 117.818230f, 117.818230f}}
+        };
+
+        // Create new datum
+        auto datumsPtr = std::make_shared<std::vector<std::shared_ptr<op::Datum>>>();
+        datumsPtr->emplace_back();
+        auto& datumPtr = datumsPtr->at(0);
+        datumPtr = std::make_shared<op::Datum>();
+        // Fill datum with image and handRectangles
+        datumPtr->cvInputData = imageToProcess;
+        datumPtr->handRectangles = handRectangles;
+
+        // Process and display image
+        opWrapper.emplaceAndPop(datumsPtr);
+        if (datumsPtr != nullptr)
+        {
+            printKeypoints(datumsPtr);
+            if (!FLAGS_no_display)
+                display(datumsPtr);
+        }
+        else
+            op::log("Image could not be processed.", op::Priority::High);
+
+        // Info
+        op::log("NOTE: In addition with the user flags, this demo has auto-selected the following flags:"
+                " `--body_disable --hand --hand_detector 2`", op::Priority::High);
 
         // Measuring total time
         op::printTime(opTimer, "OpenPose demo successfully finished. Total time: ", " seconds.", op::Priority::High);
 
-        // Return successful message
+        // Return
         return 0;
     }
     catch (const std::exception& e)
@@ -146,6 +225,6 @@ int main(int argc, char *argv[])
     // Parsing command line flags
     gflags::ParseCommandLineFlags(&argc, &argv, true);
 
-    // Running openPoseDemo
-    return openPoseDemo();
+    // Running tutorialApiCpp
+    return tutorialApiCpp();
 }

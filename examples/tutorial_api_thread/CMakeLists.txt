@@ -1,10 +1,6 @@
 set(EXAMPLE_FILES
-  pose_1_extract_from_image.cpp
-  pose_2_extract_pose_or_heatmat_from_image.cpp
-  thread_1_openpose_read_and_display.cpp
-  thread_2_user_processing_function.cpp
-  thread_3_user_input_processing_and_output.cpp
-  thread_4_user_input_processing_output_and_datum.cpp)
+  1_thread_user_processing_function.cpp
+  2_thread_user_input_processing_output_and_datum.cpp)
 
 foreach(EXAMPLE_FILE ${EXAMPLE_FILES})
 
@@ -21,7 +17,7 @@ foreach(EXAMPLE_FILE ${EXAMPLE_FILES})
   target_link_libraries(${EXE_NAME} openpose ${examples_3rdparty_libraries})
 
   if (WIN32)
-    set_property(TARGET ${EXE_NAME} PROPERTY FOLDER "Examples/Tutorial/Developer Examples")
+    set_property(TARGET ${EXE_NAME} PROPERTY FOLDER "Examples/Tutorial/Thread API")
     configure_file(${CMAKE_SOURCE_DIR}/cmake/OpenPose${VCXPROJ_FILE_GPU_MODE}.vcxproj.user
         ${CMAKE_CURRENT_BINARY_DIR}/${EXE_NAME}.vcxproj.user @ONLY)
     # Properties->General->Output Directory
