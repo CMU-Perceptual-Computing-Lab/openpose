@@ -30,8 +30,9 @@ namespace op
         WrapperStructPose& wrapperStructPose, const WrapperStructFace& wrapperStructFace,
         const WrapperStructHand& wrapperStructHand, const WrapperStructExtra& wrapperStructExtra,
         const WrapperStructInput& wrapperStructInput, const WrapperStructOutput& wrapperStructOutput,
-        const WrapperStructGui& wrapperStructGui, const bool renderOutput, const bool userOutputWsEmpty,
-        const std::shared_ptr<Producer>& producerSharedPtr, const ThreadManagerMode threadManagerMode);
+        const WrapperStructGui& wrapperStructGui, const bool renderOutput, const bool userInputAndPreprocessingWsEmpty,
+        const bool userOutputWsEmpty, const std::shared_ptr<Producer>& producerSharedPtr,
+        const ThreadManagerMode threadManagerMode);
 
     /**
      * Thread ID increase (private internal function).
@@ -132,11 +133,12 @@ namespace op
             const auto renderHandGpu = wrapperStructHand.enable && wrapperStructHand.renderMode == RenderMode::Gpu;
 
             // Check no wrong/contradictory flags enabled
+            const auto userInputAndPreprocessingWsEmpty = userInputWs.empty();
             const auto userOutputWsEmpty = userOutputWs.empty();
             wrapperConfigureSanityChecks(
                 wrapperStructPose, wrapperStructFace, wrapperStructHand, wrapperStructExtra, wrapperStructInput,
-                wrapperStructOutput, wrapperStructGui, renderOutput, userOutputWsEmpty, producerSharedPtr,
-                threadManagerMode);
+                wrapperStructOutput, wrapperStructGui, renderOutput, userInputAndPreprocessingWsEmpty,
+                userOutputWsEmpty, producerSharedPtr, threadManagerMode);
 
             // Get number threads
             auto numberThreads = wrapperStructPose.gpuNumber;

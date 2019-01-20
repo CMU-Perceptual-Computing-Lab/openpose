@@ -170,9 +170,9 @@ int tutorialApiCpp()
         // Read image and face rectangle locations
         const auto imageToProcess = cv::imread(FLAGS_image_path);
         const std::vector<op::Rectangle<float>> faceRectangles{
-            op::Rectangle<float>{330.119385f, 277.532715f, 48.717274f, 48.717274f}, // Face 0
-            op::Rectangle<float>{24.036991f, 267.918793f, 65.175171f, 65.175171f},  // Face 1
-            op::Rectangle<float>{151.803436f, 32.477852f, 108.295761f, 108.295761f} // Face 2
+            op::Rectangle<float>{330.119385f, 277.532715f, 48.717274f, 48.717274f}, // Face of person 0
+            op::Rectangle<float>{24.036991f, 267.918793f, 65.175171f, 65.175171f},  // Face of person 1
+            op::Rectangle<float>{151.803436f, 32.477852f, 108.295761f, 108.295761f} // Face of person 2
         };
 
         // Create new datum

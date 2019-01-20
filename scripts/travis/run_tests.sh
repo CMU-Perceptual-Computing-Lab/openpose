@@ -11,11 +11,11 @@ if [[ $RUN_EXAMPLES == true ]] ; then
   echo " "
 
   echo "OpenPose demo..."
-  ./build/examples/openpose/openpose.bin --net_resolution -1x32 --image_dir examples/media/ --write_json output/ --write_images output/ --display 0
+  ./build/examples/openpose/openpose.bin --net_resolution -1x32 --image_dir examples/media/ --write_json output/ --write_images output/ --display 0 --render_pose 1
   echo " "
 
   echo "Tutorial Add Module: Example 1..."
-  ./build/examples/tutorial_add_module/1_custom_post_processing.bin --net_resolution -1x32 --image_dir examples/media/ --write_json output/ --write_images output/ --display 0
+  ./build/examples/tutorial_add_module/1_custom_post_processing.bin --net_resolution -1x32 --image_dir examples/media/ --write_json output/ --write_images output/ --display 0 --render_pose 1
   echo " "
 
   # # Note: Examples 1-2 require the whole OpenPose resolution (too much RAM memory) and the GUI
@@ -37,7 +37,7 @@ if [[ $RUN_EXAMPLES == true ]] ; then
   echo " "
 
   echo "Tutorial API C++: Example 6..."
-  ./build/examples/tutorial_api_cpp/06_asynchronous_custom_input.bin --net_resolution -1x32 --image_dir examples/media/ --write_json output/ --write_images output/ --display 0
+  ./build/examples/tutorial_api_cpp/06_asynchronous_custom_input.bin --net_resolution -1x32 --image_dir examples/media/ --write_json output/ --write_images output/ --display 0 --render_pose 1
   echo " "
 
   echo "Tutorial API C++: Example 7..."
@@ -57,11 +57,11 @@ if [[ $RUN_EXAMPLES == true ]] ; then
   echo " "
 
   echo "Tutorial API C++: Example 11..."
-  ./build/examples/tutorial_api_cpp/11_synchronous_custom_input.bin --net_resolution -1x32 --image_dir examples/media/ --write_json output/ --write_images output/ --display 0
+  ./build/examples/tutorial_api_cpp/11_synchronous_custom_input.bin --net_resolution -1x32 --image_dir examples/media/ --write_json output/ --write_images output/ --display 0 --render_pose 1
   echo " "
 
   echo "Tutorial API C++: Example 13..."
-  ./build/examples/tutorial_api_cpp/13_synchronous_custom_postprocessing.bin --net_resolution -1x32 --image_dir examples/media/ --write_json output/ --write_images output/ --display 0
+  ./build/examples/tutorial_api_cpp/13_synchronous_custom_postprocessing.bin --net_resolution -1x32 --image_dir examples/media/ --write_json output/ --write_images output/ --display 0 --render_pose 1
   echo " "
 
   echo "Tutorial API C++: Example 14..."
@@ -76,7 +76,7 @@ if [[ $RUN_EXAMPLES == true ]] ; then
   if [[ $WITH_PYTHON == true ]] ; then
     echo "Tutorial API Python: OpenPose demo..."
     cd build/examples/tutorial_api_python
-    python openpose_python.py --net_resolution -1x32 --image_dir ../../../examples/media/ --write_json output/ --write_images output/ --display 0
+    python openpose_python.py --net_resolution -1x32 --image_dir ../../../examples/media/ --write_json output/ --write_images output/ --display 0 --render_pose 1
     echo " "
     # Note: All Python examples require GUI
   fi

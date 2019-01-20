@@ -170,18 +170,18 @@ int tutorialApiCpp()
         // Read image and hand rectangle locations
         const auto imageToProcess = cv::imread(FLAGS_image_path);
         const std::vector<std::array<op::Rectangle<float>, 2>> handRectangles{
-            // Left/Right hands person 0
+            // Left/Right hands of person 0
             std::array<op::Rectangle<float>, 2>{
-                op::Rectangle<float>{320.035889f, 377.675049f, 69.300949f, 69.300949f},
-                op::Rectangle<float>{0.f, 0.f, 0.f, 0.f}},
-            // Left/Right hands person 1
+                op::Rectangle<float>{320.035889f, 377.675049f, 69.300949f, 69.300949f}, // Left hand
+                op::Rectangle<float>{0.f, 0.f, 0.f, 0.f}},                              // Right hand
+            // Left/Right hands of person 1
             std::array<op::Rectangle<float>, 2>{
-                op::Rectangle<float>{80.155792f, 407.673492f, 80.812706f, 80.812706f},
-                op::Rectangle<float>{46.449715f, 404.559753f, 98.898178f, 98.898178f}},
-            // Left/Right hands person 2
+                op::Rectangle<float>{80.155792f, 407.673492f, 80.812706f, 80.812706f},  // Left hand
+                op::Rectangle<float>{46.449715f, 404.559753f, 98.898178f, 98.898178f}}, // Right hand
+            // Left/Right hands of person 2
             std::array<op::Rectangle<float>, 2>{
-                op::Rectangle<float>{185.692673f, 303.112244f, 157.587555f, 157.587555f},
-                op::Rectangle<float>{88.984360f, 268.866547f, 117.818230f, 117.818230f}}
+                op::Rectangle<float>{185.692673f, 303.112244f, 157.587555f, 157.587555f},// Left hand
+                op::Rectangle<float>{88.984360f, 268.866547f, 117.818230f, 117.818230f}} // Right hand
         };
 
         // Create new datum

@@ -39,8 +39,8 @@ namespace op
     };
 
     #ifdef USE_CAFFE
-        void updateFaceHeatMapsForPerson(Array<float>& heatMaps, const int person, const ScaleMode heatMapScaleMode,
-                                         const float* heatMapsGpuPtr)
+        void updateFaceHeatMapsForPerson(
+            Array<float>& heatMaps, const int person, const ScaleMode heatMapScaleMode, const float* heatMapsGpuPtr)
         {
             try
             {
@@ -198,6 +198,11 @@ namespace op
                     for (auto person = 0 ; person < numberPeople ; person++)
                     {
                         const auto& faceRectangle = faceRectangles.at(person);
+                        // Sanity check
+                        if (faceRectangle.width != faceRectangle.height)
+                            error("Face rectangle for face keypoint estimation must be squared, i.e.,"
+                                  " width = height (" + std::to_string(faceRectangle.width) + " vs. "
+                                  + std::to_string(faceRectangle.height) + ").", __LINE__, __FUNCTION__, __FILE__);
                         // Only consider faces with a minimum pixel area
                         const auto minFaceSize = fastMin(faceRectangle.width, faceRectangle.height);
                         // // Debugging -> red rectangle
@@ -246,9 +251,10 @@ namespace op
                             if (!upImpl->netInitialized)
                             {
                                 upImpl->netInitialized = true;
-                                reshapeFaceExtractorCaffe(upImpl->spResizeAndMergeCaffe, upImpl->spMaximumCaffe,
-                                                          upImpl->spCaffeNetOutputBlob, upImpl->spHeatMapsBlob,
-                                                          upImpl->spPeaksBlob, upImpl->mGpuId);
+                                reshapeFaceExtractorCaffe(
+                                    upImpl->spResizeAndMergeCaffe, upImpl->spMaximumCaffe,
+                                    upImpl->spCaffeNetOutputBlob, upImpl->spHeatMapsBlob,
+                                    upImpl->spPeaksBlob, upImpl->mGpuId);
                             }
 
                             // 2. Resize heat maps + merge different scales
@@ -268,12 +274,12 @@ namespace op
                                 const auto score = facePeaksPtr[xyIndex + 2];
                                 const auto baseIndex = mFaceKeypoints.getSize(2)
                                                      * (part + person * mFaceKeypoints.getSize(1));
-                                mFaceKeypoints[baseIndex] = (float)(Mscaling.at<double>(0,0) * x
-                                                                    + Mscaling.at<double>(0,1) * y
-                                                                    + Mscaling.at<double>(0,2));
-                                mFaceKeypoints[baseIndex+1] = (float)(Mscaling.at<double>(1,0) * x
-                                                                      + Mscaling.at<double>(1,1) * y
-                                                                      + Mscaling.at<double>(1,2));
+                                mFaceKeypoints[baseIndex] = float(
+                                    Mscaling.at<double>(0,0) * x + Mscaling.at<double>(0,1) * y
+                                    + Mscaling.at<double>(0,2));
+                                mFaceKeypoints[baseIndex+1] = float(
+                                    Mscaling.at<double>(1,0) * x + Mscaling.at<double>(1,1) * y
+                                    + Mscaling.at<double>(1,2));
                                 mFaceKeypoints[baseIndex+2] = score;
                             }
                             // HeatMaps: storing
