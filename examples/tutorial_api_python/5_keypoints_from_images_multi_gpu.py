@@ -95,7 +95,7 @@ for imageBaseId in range(0, len(imagePaths), numberGPUs):
             print("Body keypoints: \n" + str(datum.poseKeypoints))
 
             if not args[0].no_display:
-                cv2.imshow("win", datum.cvOutputData)
+                cv2.imshow("OpenPose 1.4.0 - Tutorial Python API", datum.cvOutputData)
                 key = cv2.waitKey(15)
                 if key == 27: break
 

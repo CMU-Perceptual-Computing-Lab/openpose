@@ -75,5 +75,5 @@ datum.faceRectangles = faceRectangles
 # Process and display image
 opWrapper.emplaceAndPop([datum])
 print("Face keypoints: \n" + str(datum.faceKeypoints))
-cv2.imshow("win", datum.cvOutputData)
+cv2.imshow("OpenPose 1.4.0 - Tutorial Python API", datum.cvOutputData)
 cv2.waitKey(0)

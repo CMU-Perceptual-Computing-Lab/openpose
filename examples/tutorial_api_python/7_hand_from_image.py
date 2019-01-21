@@ -88,5 +88,5 @@ datum.handRectangles = handRectangles
 opWrapper.emplaceAndPop([datum])
 print("Left hand keypoints: \n" + str(datum.handKeypoints[0]))
 print("Right hand keypoints: \n" + str(datum.handKeypoints[1]))
-cv2.imshow("win", datum.cvOutputData)
+cv2.imshow("OpenPose 1.4.0 - Tutorial Python API", datum.cvOutputData)
 cv2.waitKey(0)
