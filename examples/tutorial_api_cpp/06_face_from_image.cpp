@@ -1,83 +1,68 @@
-// ------------------------- OpenPose C++ API Tutorial - Example 6 - Custom Input -------------------------
-// Asynchronous mode: ideal for fast prototyping when performance is not an issue.
-// In this function, the user can implement its own way to create frames (e.g., reading his own folder of images)
-// and emplaces/pushes the frames to OpenPose.
+// ----------------------------- OpenPose C++ API Tutorial - Example 6 - Face from Image -----------------------------
+// It reads an image and the face location, process it, and displays the face keypoints. In addition,
+// it includes all the OpenPose configuration flags.
+// Input: An image and the face rectangle locations.
+// Output: OpenPose face keypoint detection.
+// NOTE: This demo is auto-selecting the following flags: `--body_disable --face --face_detector 2`
 
 // Command-line user intraface
 #define OPENPOSE_FLAGS_DISABLE_PRODUCER
+#define OPENPOSE_FLAGS_DISABLE_DISPLAY
 #include <openpose/flags.hpp>
 // OpenPose dependencies
 #include <openpose/headers.hpp>
 
 // Custom OpenPose flags
 // Producer
-DEFINE_string(image_dir, "examples/media/",
-    "Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).");
+DEFINE_string(image_path, "examples/media/COCO_val2014_000000000241.jpg",
+    "Process an image. Read all standard formats (jpg, png, bmp, etc.).");
+// Display
+DEFINE_bool(no_display,                 false,
+    "Enable to disable the visual display.");
 
-// The W-classes can be implemented either as a template or as simple classes given
-// that the user usually knows which kind of data he will move between the queues,
-// in this case we assume a std::shared_ptr of a std::vector of op::Datum
-
-// This worker will just read and return all the basic image file formats in a directory
-class UserInputClass
+// This worker will just read and return all the jpg files in a directory
+void display(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& datumsPtr)
 {
-public:
-    UserInputClass(const std::string& directoryPath) :
-        mImageFiles{op::getFilesOnDirectory(directoryPath, op::Extensions::Images)}, // For all basic image formats
-        // If we want only e.g., "jpg" + "png" images
-        // mImageFiles{op::getFilesOnDirectory(directoryPath, std::vector<std::string>{"jpg", "png"})},
-        mCounter{0},
-        mClosed{false}
+    try
     {
-        if (mImageFiles.empty())
-            op::error("No images found on: " + directoryPath, __LINE__, __FUNCTION__, __FILE__);
-    }
-
-    std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>> createDatum()
-    {
-        // Close program when empty frame
-        if (mClosed || mImageFiles.size() <= mCounter)
+        // User's displaying/saving/other processing here
+            // datum.cvOutputData: rendered frame with pose or heatmaps
+            // datum.poseKeypoints: Array<float> with the estimated pose
+        if (datumsPtr != nullptr && !datumsPtr->empty())
         {
-            op::log("Last frame read and added to queue. Closing program after it is processed.", op::Priority::High);
-            // This funtion stops this worker, which will eventually stop the whole thread system once all the frames
-            // have been processed
-            mClosed = true;
-            return nullptr;
+            // Display image
+            cv::imshow(OPEN_POSE_NAME_AND_VERSION + " - Tutorial C++ API", datumsPtr->at(0)->cvOutputData);
+            cv::waitKey(0);
         }
-        else // if (!mClosed)
-        {
-            // Create new datum
-            auto datumsPtr = std::make_shared<std::vector<std::shared_ptr<op::Datum>>>();
-            datumsPtr->emplace_back();
-            auto& datumPtr = datumsPtr->at(0);
-            datumPtr = std::make_shared<op::Datum>();
-
-            // Fill datum
-            datumPtr->cvInputData = cv::imread(mImageFiles.at(mCounter++));
-
-            // If empty frame -> return nullptr
-            if (datumPtr->cvInputData.empty())
-            {
-                op::log("Empty frame detected on path: " + mImageFiles.at(mCounter-1) + ". Closing program.",
-                        op::Priority::High);
-                mClosed = true;
-                datumsPtr = nullptr;
-            }
-
-            return datumsPtr;
-        }
+        else
+            op::log("Nullptr or empty datumsPtr found.", op::Priority::High);
     }
-
-    bool isFinished() const
+    catch (const std::exception& e)
     {
-        return mClosed;
+        op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
     }
+}
 
-private:
-    const std::vector<std::string> mImageFiles;
-    unsigned long long mCounter;
-    bool mClosed;
-};
+void printKeypoints(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& datumsPtr)
+{
+    try
+    {
+        // Example: How to use the pose keypoints
+        if (datumsPtr != nullptr && !datumsPtr->empty())
+        {
+            op::log("Body keypoints: " + datumsPtr->at(0)->poseKeypoints.toString());
+            op::log("Face keypoints: " + datumsPtr->at(0)->faceKeypoints.toString());
+            op::log("Left hand keypoints: " + datumsPtr->at(0)->handKeypoints[0].toString());
+            op::log("Right hand keypoints: " + datumsPtr->at(0)->handKeypoints[1].toString());
+        }
+        else
+            op::log("Nullptr or empty datumsPtr found.", op::Priority::High);
+    }
+    catch (const std::exception& e)
+    {
+        op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+    }
+}
 
 void configureWrapper(op::Wrapper& opWrapper)
 {
@@ -115,14 +100,15 @@ void configureWrapper(op::Wrapper& opWrapper)
         // >1 camera view?
         const auto multipleView = (FLAGS_3d || FLAGS_3d_views > 1);
         // Face and hand detectors
-        const auto faceDetector = op::flagsToDetector(FLAGS_face_detector);
+        const auto faceDetector = op::Detector::Provided;
         const auto handDetector = op::flagsToDetector(FLAGS_hand_detector);
         // Enabling Google Logging
         const bool enableGoogleLogging = true;
 
         // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
+        const auto bodyEnable = false;
         const op::WrapperStructPose wrapperStructPose{
-            !FLAGS_body_disable, netInputSize, outputSize, keypointScaleMode, FLAGS_num_gpu, FLAGS_num_gpu_start,
+            bodyEnable, netInputSize, outputSize, keypointScaleMode, FLAGS_num_gpu, FLAGS_num_gpu_start,
             FLAGS_scale_number, (float)FLAGS_scale_gap, op::flagsToRenderMode(FLAGS_render_pose, multipleView),
             poseModel, !FLAGS_disable_blending, (float)FLAGS_alpha_pose, (float)FLAGS_alpha_heatmap,
             FLAGS_part_to_show, FLAGS_model_folder, heatMapTypes, heatMapScaleMode, FLAGS_part_candidates,
@@ -130,8 +116,9 @@ void configureWrapper(op::Wrapper& opWrapper)
             FLAGS_prototxt_path, FLAGS_caffemodel_path, enableGoogleLogging};
         opWrapper.configure(wrapperStructPose);
         // Face configuration (use op::WrapperStructFace{} to disable it)
+        const auto face = true;
         const op::WrapperStructFace wrapperStructFace{
-            FLAGS_face, faceDetector, faceNetInputSize,
+            face, faceDetector, faceNetInputSize,
             op::flagsToRenderMode(FLAGS_face_render, multipleView, FLAGS_render_pose),
             (float)FLAGS_face_alpha_pose, (float)FLAGS_face_alpha_heatmap, (float)FLAGS_face_render_threshold};
         opWrapper.configure(wrapperStructFace);
@@ -153,10 +140,7 @@ void configureWrapper(op::Wrapper& opWrapper)
             FLAGS_write_video_with_audio, FLAGS_write_heatmaps, FLAGS_write_heatmaps_format, FLAGS_write_video_3d,
             FLAGS_write_video_adam, FLAGS_write_bvh, FLAGS_udp_host, FLAGS_udp_port};
         opWrapper.configure(wrapperStructOutput);
-        // GUI (comment or use default argument to disable any visual output)
-        const op::WrapperStructGui wrapperStructGui{
-            op::flagsToDisplayMode(FLAGS_display, FLAGS_3d), !FLAGS_no_gui_verbose, FLAGS_fullscreen};
-        opWrapper.configure(wrapperStructGui);
+        // No GUI. Equivalent to: opWrapper.configure(op::WrapperStructGui{});
         // Set to single-thread (for sequential processing and/or debugging and/or reducing latency)
         if (FLAGS_disable_multi_thread)
             opWrapper.disableMultiThreading();
@@ -176,30 +160,44 @@ int tutorialApiCpp()
 
         // Configuring OpenPose
         op::log("Configuring OpenPose...", op::Priority::High);
-        op::Wrapper opWrapper{op::ThreadManagerMode::AsynchronousIn};
+        op::Wrapper opWrapper{op::ThreadManagerMode::Asynchronous};
         configureWrapper(opWrapper);
 
-        // Start, run, and stop processing - exec() blocks this thread until OpenPose wrapper has finished
+        // Starting OpenPose
         op::log("Starting thread(s)...", op::Priority::High);
         opWrapper.start();
 
-        // User processing
-        UserInputClass userInputClass(FLAGS_image_dir);
-        bool userWantsToExit = false;
-        while (!userWantsToExit && !userInputClass.isFinished())
-        {
-            // Push frame
-            auto datumToProcess = userInputClass.createDatum();
-            if (datumToProcess != nullptr)
-            {
-                auto successfullyEmplaced = opWrapper.waitAndEmplace(datumToProcess);
-                if (!successfullyEmplaced)
-                    op::log("Processed datum could not be emplaced.", op::Priority::High);
-            }
-        }
+        // Read image and face rectangle locations
+        const auto imageToProcess = cv::imread(FLAGS_image_path);
+        const std::vector<op::Rectangle<float>> faceRectangles{
+            op::Rectangle<float>{330.119385f, 277.532715f, 48.717274f, 48.717274f}, // Face of person 0
+            op::Rectangle<float>{24.036991f, 267.918793f, 65.175171f, 65.175171f},  // Face of person 1
+            op::Rectangle<float>{151.803436f, 32.477852f, 108.295761f, 108.295761f} // Face of person 2
+        };
 
-        op::log("Stopping thread(s)", op::Priority::High);
-        opWrapper.stop();
+        // Create new datum
+        auto datumsPtr = std::make_shared<std::vector<std::shared_ptr<op::Datum>>>();
+        datumsPtr->emplace_back();
+        auto& datumPtr = datumsPtr->at(0);
+        datumPtr = std::make_shared<op::Datum>();
+        // Fill datum with image and faceRectangles
+        datumPtr->cvInputData = imageToProcess;
+        datumPtr->faceRectangles = faceRectangles;
+
+        // Process and display image
+        opWrapper.emplaceAndPop(datumsPtr);
+        if (datumsPtr != nullptr)
+        {
+            printKeypoints(datumsPtr);
+            if (!FLAGS_no_display)
+                display(datumsPtr);
+        }
+        else
+            op::log("Image could not be processed.", op::Priority::High);
+
+        // Info
+        op::log("NOTE: In addition with the user flags, this demo has auto-selected the following flags:"
+                " `--body_disable --face --face_detector 2`", op::Priority::High);
 
         // Measuring total time
         op::printTime(opTimer, "OpenPose demo successfully finished. Total time: ", " seconds.", op::Priority::High);

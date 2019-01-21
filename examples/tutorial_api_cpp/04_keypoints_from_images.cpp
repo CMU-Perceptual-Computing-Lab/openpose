@@ -11,7 +11,7 @@
 
 // Custom OpenPose flags
 // Producer
-DEFINE_string(image_dir, "examples/media/",
+DEFINE_string(image_dir,                "examples/media/",
     "Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).");
 // Display
 DEFINE_bool(no_display,                 false,
@@ -29,7 +29,7 @@ bool display(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& dat
         if (datumsPtr != nullptr && !datumsPtr->empty())
         {
             // Display image and sleeps at least 1 ms (it usually sleeps ~5-10 msec to display the image)
-            cv::imshow("User worker GUI", datumsPtr->at(0)->cvOutputData);
+            cv::imshow(OPEN_POSE_NAME_AND_VERSION + " - Tutorial C++ API", datumsPtr->at(0)->cvOutputData);
             key = (char)cv::waitKey(1);
         }
         else

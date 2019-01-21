@@ -11,8 +11,14 @@
 
 // Custom OpenPose flags
 // Producer
-DEFINE_string(image_dir, "examples/media/",
+DEFINE_string(image_dir,                "examples/media/",
     "Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).");
+// OpenPose
+DEFINE_bool(latency_is_irrelevant_and_computer_with_lots_of_ram, false,
+    "If false, it will read and then then process images right away. If true, it will first store all the frames and"
+    " later process them (slightly faster). However: 1) Latency will hugely increase (no frames will be processed"
+    " until they have all been read). And 2) The program might go out of RAM memory with long videos or folders with"
+    " many images (so the computer might freeze).");
 // Display
 DEFINE_bool(no_display,                 false,
     "Enable to disable the visual display.");
@@ -29,7 +35,7 @@ bool display(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& dat
         if (datumsPtr != nullptr && !datumsPtr->empty())
         {
             // Display image and sleeps at least 1 ms (it usually sleeps ~5-10 msec to display the image)
-            cv::imshow("User worker GUI", datumsPtr->at(0)->cvOutputData);
+            cv::imshow(OPEN_POSE_NAME_AND_VERSION + " - Tutorial C++ API", datumsPtr->at(0)->cvOutputData);
             key = (char)cv::waitKey(1);
         }
         else
@@ -160,6 +166,9 @@ int tutorialApiCpp()
         op::log("Configuring OpenPose...", op::Priority::High);
         op::Wrapper opWrapper{op::ThreadManagerMode::Asynchronous};
         configureWrapper(opWrapper);
+        // Increase maximum wrapper queue size
+        if (FLAGS_latency_is_irrelevant_and_computer_with_lots_of_ram)
+            opWrapper.setDefaultMaxSizeQueues(std::numeric_limits<long long>::max());
 
         // Starting OpenPose
         op::log("Starting thread(s)...", op::Priority::High);
@@ -177,12 +186,63 @@ int tutorialApiCpp()
         //     1. One pushing images to OpenPose all the time.
         //     2. A second one retrieving those frames.
         // Option b) Much easier and faster to implement but slightly slower runtime performance
-        for (auto imageId = 0u ; imageId < imagePaths.size() ; imageId+=numberGPUs)
+        if (!FLAGS_latency_is_irrelevant_and_computer_with_lots_of_ram)
         {
-            // Read and push images into OpenPose wrapper
-            for (auto gpuId = 0 ; gpuId < numberGPUs ; gpuId++)
+            for (auto imageBaseId = 0u ; imageBaseId < imagePaths.size() ; imageBaseId+=numberGPUs)
             {
-                const auto& imagePath = imagePaths.at(imageId+gpuId);
+                // Read and push images into OpenPose wrapper
+                for (auto gpuId = 0 ; gpuId < numberGPUs ; gpuId++)
+                {
+                    const auto imageId = imageBaseId+gpuId;
+                    if (imageId < imagePaths.size())
+                    {
+                        const auto& imagePath = imagePaths.at(imageId);
+                        // Faster alternative that moves imageToProcess
+                        auto imageToProcess = cv::imread(imagePath);
+                        opWrapper.waitAndEmplace(imageToProcess);
+                        // // Slower but safer alternative that copies imageToProcess
+                        // const auto imageToProcess = cv::imread(imagePath);
+                        // opWrapper.waitAndPush(imageToProcess);
+                    }
+                }
+                // Retrieve processed results from OpenPose wrapper
+                for (auto gpuId = 0 ; gpuId < numberGPUs ; gpuId++)
+                {
+                    const auto imageId = imageBaseId+gpuId;
+                    if (imageId < imagePaths.size())
+                    {
+                        std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>> datumProcessed;
+                        const auto status = opWrapper.waitAndPop(datumProcessed);
+                        if (status && datumProcessed != nullptr)
+                        {
+                            printKeypoints(datumProcessed);
+                            if (!FLAGS_no_display)
+                            {
+                                const auto userWantsToExit = display(datumProcessed);
+                                if (userWantsToExit)
+                                {
+                                    op::log("User pressed Esc to exit demo.", op::Priority::High);
+                                    break;
+                                }
+                            }
+                        }
+                        else
+                            op::log("Image could not be processed.", op::Priority::High);
+                    }
+                }
+            }
+        }
+        // Option c) Even easier and faster to implement than option b. In addition, its runtime performance should
+        // be slightly faster too, but:
+        //  - Latency will hugely increase (no frames will be processed until they have all been read).
+        //  - The program might go out of RAM memory with long videos or folders with many images (so the computer
+        //    might freeze).
+        else
+        {
+            // Read and push all images into OpenPose wrapper
+            op::log("Loading images into OpenPose wrapper...", op::Priority::High);
+            for (const auto& imagePath : imagePaths)
+            {
                 // Faster alternative that moves imageToProcess
                 auto imageToProcess = cv::imread(imagePath);
                 opWrapper.waitAndEmplace(imageToProcess);
@@ -191,7 +251,8 @@ int tutorialApiCpp()
                 // opWrapper.waitAndPush(imageToProcess);
             }
             // Retrieve processed results from OpenPose wrapper
-            for (auto gpuId = 0 ; gpuId < numberGPUs ; gpuId++)
+            op::log("Retrieving results from OpenPose wrapper...", op::Priority::High);
+            for (auto imageId = 0u ; imageId < imagePaths.size() ; imageId++)
             {
                 std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>> datumProcessed;
                 const auto status = opWrapper.waitAndPop(datumProcessed);

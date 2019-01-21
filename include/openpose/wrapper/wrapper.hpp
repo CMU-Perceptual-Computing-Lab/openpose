@@ -134,6 +134,17 @@ namespace op
         bool isRunning() const;
 
         /**
+         * It sets the maximum number of elements in the queue.
+         * For maximum speed, set to a very large number, but the trade-off would be:
+         *  - Latency will hugely increase.
+         *  - The program might go out of RAM memory (so the computer might freeze).
+         * For minimum latency while keeping an optimal speed, set to -1, that will automatically
+         * detect the ideal number based on how many elements are connected to that queue.
+         * @param defaultMaxSizeQueues long long element with the maximum number of elements on the queue.
+         */
+        void setDefaultMaxSizeQueues(const long long defaultMaxSizeQueues = -1);
+
+        /**
          * Emplace (move) an element on the first (input) queue.
          * Only valid if ThreadManagerMode::Asynchronous or ThreadManagerMode::AsynchronousIn.
          * If the input queue is full or the WrapperT was stopped, it will return false and not emplace it.
@@ -456,6 +467,19 @@ namespace op
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             return false;
+        }
+    }
+
+    template<typename TDatum, typename TDatums, typename TDatumsSP, typename TWorker>
+    void WrapperT<TDatum, TDatums, TDatumsSP, TWorker>::setDefaultMaxSizeQueues(const long long defaultMaxSizeQueues)
+    {
+        try
+        {
+            mThreadManager.setDefaultMaxSizeQueues(defaultMaxSizeQueues);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
     }
 
