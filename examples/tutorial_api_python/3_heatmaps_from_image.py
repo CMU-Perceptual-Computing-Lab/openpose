@@ -35,9 +35,9 @@ args = parser.parse_known_args()
 params = dict()
 params["model_folder"] = "../../../models/"
 params["heatmaps_add_parts"] = True
+params["heatmaps_add_bkg"] = True
 params["heatmaps_add_PAFs"] = True
 params["heatmaps_scale"] = 2
-params["heatmaps_add_bkg"] = True
 
 # Add others in path?
 for i in range(0, len(args[1])):
