@@ -10,14 +10,14 @@ Note that this method will be faster than the current system if there is few peo
 ```
 
 ## Custom Standalone Face or Hand Keypoint Detector
-Check the examples in `examples/tutorial_api_cpp/`, in particular [examples/tutorial_api_cpp/09_face_from_image.cpp](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/examples/tutorial_api_cpp/09_face_from_image.cpp) and [examples/tutorial_api_cpp/10_hand_from_image.cpp](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/examples/tutorial_api_cpp/10_hand_from_image.cpp). The provide examples of face and/or hand keypoint detection given a known bounding box or rectangle for the face and/or hand locations. These examples are equivalent to use the following flags:
+Check the examples in `examples/tutorial_api_cpp/`, in particular [examples/tutorial_api_cpp/06_face_from_image.cpp](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/examples/tutorial_api_cpp/06_face_from_image.cpp) and [examples/tutorial_api_cpp/07_hand_from_image.cpp](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/examples/tutorial_api_cpp/07_hand_from_image.cpp). The provide examples of face and/or hand keypoint detection given a known bounding box or rectangle for the face and/or hand locations. These examples are equivalent to use the following flags:
 ```
 # Face
-examples/tutorial_api_cpp/09_face_from_image.cpp --body_disable --face --face_detector 2
+examples/tutorial_api_cpp/06_face_from_image.cpp --body_disable --face --face_detector 2
 # Hands
-examples/tutorial_api_cpp/10_hand_from_image.cpp --body_disable --hand --hand_detector 2
+examples/tutorial_api_cpp/07_hand_from_image.cpp --body_disable --hand --hand_detector 2
 ```
 
 Note: both `FaceExtractor` and `HandExtractor` classes requires as input **squared rectangles**.
 
-Advance solution: If you wanna use the whole OpenPose framework, you can use the synchronous examples of the `tutorial_api_cpp` folder with the configuration used for [examples/tutorial_api_cpp/09_face_from_image.cpp](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/examples/tutorial_api_cpp/09_face_from_image.cpp) and [examples/tutorial_api_cpp/10_hand_from_image.cpp](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/examples/tutorial_api_cpp/10_hand_from_image.cpp).
+Advance solution: If you wanna use the whole OpenPose framework, you can use the synchronous examples of the `tutorial_api_cpp` folder with the configuration used for [examples/tutorial_api_cpp/06_face_from_image.cpp](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/examples/tutorial_api_cpp/06_face_from_image.cpp) and [examples/tutorial_api_cpp/07_hand_from_image.cpp](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/examples/tutorial_api_cpp/07_hand_from_image.cpp).

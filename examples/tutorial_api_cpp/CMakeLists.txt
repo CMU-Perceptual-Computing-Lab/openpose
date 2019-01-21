@@ -6,7 +6,7 @@ set(EXAMPLE_FILES
     05_keypoints_from_images_multi_gpu.cpp
     06_face_from_image.cpp
     07_hand_from_image.cpp
-    # 08_heatmaps_from_image.cpp
+    08_heatmaps_from_image.cpp
     09_asynchronous_custom_input.cpp
     10_asynchronous_custom_output.cpp
     11_asynchronous_custom_input_output_and_datum.cpp

@@ -1,4 +1,4 @@
-// ----------------------- OpenPose C++ API Tutorial - Example 3 - Body from image configurable -----------------------
+// ----------------------- OpenPose C++ API Tutorial - Example 3 - Body from image -----------------------
 // It reads an image, process it, and displays it with the pose (and optionally hand and face) keypoints. In addition,
 // it includes all the OpenPose configuration flags (enable/disable hand, face, output saving, etc.).
 
@@ -47,10 +47,10 @@ void printKeypoints(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>
         // Example: How to use the pose keypoints
         if (datumsPtr != nullptr && !datumsPtr->empty())
         {
-            op::log("Body keypoints: " + datumsPtr->at(0)->poseKeypoints.toString());
-            op::log("Face keypoints: " + datumsPtr->at(0)->faceKeypoints.toString());
-            op::log("Left hand keypoints: " + datumsPtr->at(0)->handKeypoints[0].toString());
-            op::log("Right hand keypoints: " + datumsPtr->at(0)->handKeypoints[1].toString());
+            op::log("Body keypoints: " + datumsPtr->at(0)->poseKeypoints.toString(), op::Priority::High);
+            op::log("Face keypoints: " + datumsPtr->at(0)->faceKeypoints.toString(), op::Priority::High);
+            op::log("Left hand keypoints: " + datumsPtr->at(0)->handKeypoints[0].toString(), op::Priority::High);
+            op::log("Right hand keypoints: " + datumsPtr->at(0)->handKeypoints[1].toString(), op::Priority::High);
         }
         else
             op::log("Nullptr or empty datumsPtr found.", op::Priority::High);

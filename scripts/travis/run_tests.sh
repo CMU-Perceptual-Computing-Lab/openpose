@@ -33,8 +33,9 @@ if [[ $RUN_EXAMPLES == true ]] ; then
   echo " "
 
   echo "Tutorial API C++: Example 5..."
-  ./build/examples/tutorial_api_cpp/05_keypoints_from_images_multi_gpu.bin --net_resolution -1x32 --write_json output/ --write_images output/ --no_display
   ./build/examples/tutorial_api_cpp/05_keypoints_from_images_multi_gpu.bin --net_resolution -1x32 --write_json output/ --write_images output/ --no_display --latency_is_irrelevant_and_computer_with_lots_of_ram
+  # Default configuration of this demo requires getGpuNumber(), which is not implement for CPU-only mode
+  # ./build/examples/tutorial_api_cpp/05_keypoints_from_images_multi_gpu.bin --net_resolution -1x32 --write_json output/ --write_images output/ --no_display
   echo " "
 
   echo "Tutorial API C++: Example 6..."
@@ -45,9 +46,9 @@ if [[ $RUN_EXAMPLES == true ]] ; then
   ./build/examples/tutorial_api_cpp/07_hand_from_image.bin --hand_net_resolution 32x32 --write_json output/ --write_images output/ --no_display
   echo " "
 
-  # echo "Tutorial API C++: Example 8..."
-  # ./build/examples/tutorial_api_cpp/08_heatmaps_from_image.bin --hand_net_resolution 32x32 --write_json output/ --write_images output/ --no_display
-  # echo " "
+  echo "Tutorial API C++: Example 8..."
+  ./build/examples/tutorial_api_cpp/08_heatmaps_from_image.bin --hand_net_resolution 32x32 --write_json output/ --write_images output/ --no_display
+  echo " "
 
   echo "Tutorial API C++: Example 9..."
   ./build/examples/tutorial_api_cpp/09_asynchronous_custom_input.bin --image_dir examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --display 0

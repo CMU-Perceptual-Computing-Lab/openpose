@@ -103,15 +103,14 @@ public:
             // User's displaying/saving/other processing here
                 // datumPtr->cvOutputData: rendered frame with pose or heatmaps
                 // datumPtr->poseKeypoints: Array<float> with the estimated pose
-            char key = ' ';
             if (datumsPtr != nullptr && !datumsPtr->empty())
             {
                 // Display image and sleeps at least 1 ms (it usually sleeps ~5-10 msec to display the image)
                 cv::imshow(OPEN_POSE_NAME_AND_VERSION + " - Tutorial C++ API", datumsPtr->at(0)->cvOutputData);
-                key = (char)cv::waitKey(1);
             }
             else
                 op::log("Nullptr or empty datumsPtr found.", op::Priority::High);
+            const auto key = (char)cv::waitKey(1);
             return (key == 27);
         }
         catch (const std::exception& e)
@@ -142,9 +141,9 @@ public:
             }
             op::log(" ");
             // Alternative: just getting std::string equivalent
-            op::log("Face keypoints: " + datumsPtr->at(0)->faceKeypoints.toString());
-            op::log("Left hand keypoints: " + datumsPtr->at(0)->handKeypoints[0].toString());
-            op::log("Right hand keypoints: " + datumsPtr->at(0)->handKeypoints[1].toString());
+            op::log("Face keypoints: " + datumsPtr->at(0)->faceKeypoints.toString(), op::Priority::High);
+            op::log("Left hand keypoints: " + datumsPtr->at(0)->handKeypoints[0].toString(), op::Priority::High);
+            op::log("Right hand keypoints: " + datumsPtr->at(0)->handKeypoints[1].toString(), op::Priority::High);
             // Heatmaps
             const auto& poseHeatMaps = datumsPtr->at(0)->poseHeatMaps;
             if (!poseHeatMaps.empty())

@@ -1,4 +1,4 @@
-// ----------------------- OpenPose C++ API Tutorial - Example 4 - Body from images configurable ----------------------
+// ----------------------- OpenPose C++ API Tutorial - Example 4 - Body from images ----------------------
 // It reads images, process them, and display them with the pose (and optionally hand and face) keypoints. In addition,
 // it includes all the OpenPose configuration flags (enable/disable hand, face, output saving, etc.).
 
@@ -25,15 +25,14 @@ bool display(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& dat
         // User's displaying/saving/other processing here
             // datum.cvOutputData: rendered frame with pose or heatmaps
             // datum.poseKeypoints: Array<float> with the estimated pose
-        char key = ' ';
         if (datumsPtr != nullptr && !datumsPtr->empty())
         {
             // Display image and sleeps at least 1 ms (it usually sleeps ~5-10 msec to display the image)
             cv::imshow(OPEN_POSE_NAME_AND_VERSION + " - Tutorial C++ API", datumsPtr->at(0)->cvOutputData);
-            key = (char)cv::waitKey(1);
         }
         else
             op::log("Nullptr or empty datumsPtr found.", op::Priority::High);
+        const auto key = (char)cv::waitKey(1);
         return (key == 27);
     }
     catch (const std::exception& e)
@@ -50,10 +49,10 @@ void printKeypoints(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>
         // Example: How to use the pose keypoints
         if (datumsPtr != nullptr && !datumsPtr->empty())
         {
-            op::log("Body keypoints: " + datumsPtr->at(0)->poseKeypoints.toString());
-            op::log("Face keypoints: " + datumsPtr->at(0)->faceKeypoints.toString());
-            op::log("Left hand keypoints: " + datumsPtr->at(0)->handKeypoints[0].toString());
-            op::log("Right hand keypoints: " + datumsPtr->at(0)->handKeypoints[1].toString());
+            op::log("Body keypoints: " + datumsPtr->at(0)->poseKeypoints.toString(), op::Priority::High);
+            op::log("Face keypoints: " + datumsPtr->at(0)->faceKeypoints.toString(), op::Priority::High);
+            op::log("Left hand keypoints: " + datumsPtr->at(0)->handKeypoints[0].toString(), op::Priority::High);
+            op::log("Right hand keypoints: " + datumsPtr->at(0)->handKeypoints[1].toString(), op::Priority::High);
         }
         else
             op::log("Nullptr or empty datumsPtr found.", op::Priority::High);

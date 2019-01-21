@@ -1,9 +1,6 @@
-// ----------------------------- OpenPose C++ API Tutorial - Example 6 - Face from Image -----------------------------
-// It reads an image and the face location, process it, and displays the face keypoints. In addition,
-// it includes all the OpenPose configuration flags.
-// Input: An image and the face rectangle locations.
-// Output: OpenPose face keypoint detection.
-// NOTE: This demo is auto-selecting the following flags: `--body_disable --face --face_detector 2`
+// ----------------------- OpenPose C++ API Tutorial - Example 8 - Heatmaps from image -----------------------
+// It reads an image, process it, and displays it with the body heatmaps. In addition, it includes all the
+// OpenPose configuration flags (enable/disable hand, face, output saving, etc.).
 
 // Command-line user intraface
 #define OPENPOSE_FLAGS_DISABLE_PRODUCER
@@ -14,32 +11,61 @@
 
 // Custom OpenPose flags
 // Producer
-DEFINE_string(image_path, "examples/media/COCO_val2014_000000000241.jpg",
+DEFINE_string(image_path, "examples/media/COCO_val2014_000000000294.jpg",
     "Process an image. Read all standard formats (jpg, png, bmp, etc.).");
 // Display
 DEFINE_bool(no_display,                 false,
     "Enable to disable the visual display.");
 
 // This worker will just read and return all the jpg files in a directory
-void display(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& datumsPtr)
+bool display(
+    const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& datumsPtr, const int desiredChannel = 0)
 {
     try
     {
-        // User's displaying/saving/other processing here
-            // datum.cvOutputData: rendered frame with pose or heatmaps
-            // datum.poseKeypoints: Array<float> with the estimated pose
         if (datumsPtr != nullptr && !datumsPtr->empty())
         {
+            // Note: Heatmaps are in net_resolution size, which does not necessarily match the final image size
+            // Read heatmaps
+            auto& poseHeatMaps = datumsPtr->at(0)->poseHeatMaps;
+            // Read desired channel
+            const auto numberChannels = poseHeatMaps.getSize(0);
+            const auto height = poseHeatMaps.getSize(1);
+            const auto width = poseHeatMaps.getSize(2);
+            const cv::Mat desiredChannelHeatMap(
+                height, width, CV_32F, &poseHeatMaps.getPtr()[desiredChannel % numberChannels*height*width]);
+            // Read image used from OpenPose body network (same resolution than heatmaps)
+            auto& inputNetData = datumsPtr->at(0)->inputNetData[0];
+            const cv::Mat inputNetDataB(
+                height, width, CV_32F, &inputNetData.getPtr()[0]);
+            const cv::Mat inputNetDataG(
+                height, width, CV_32F, &inputNetData.getPtr()[height*width]);
+            const cv::Mat inputNetDataR(
+                height, width, CV_32F, &inputNetData.getPtr()[2*height*width]);
+            cv::Mat netInputImage;
+            cv::merge({inputNetDataB, inputNetDataG, inputNetDataR}, netInputImage);
+            netInputImage = (netInputImage+0.5)*255;
+            // Turn into uint8 cv::Mat
+            cv::Mat netInputImageUint8;
+            netInputImage.convertTo(netInputImageUint8, CV_8UC1);
+            cv::Mat desiredChannelHeatMapUint8;
+            desiredChannelHeatMap.convertTo(desiredChannelHeatMapUint8, CV_8UC1);
+            // Combining both images
+            cv::Mat imageToRender;
+            cv::applyColorMap(desiredChannelHeatMapUint8, desiredChannelHeatMapUint8, cv::COLORMAP_JET);
+            cv::addWeighted(netInputImageUint8, 0.5, desiredChannelHeatMapUint8, 0.5, 0., imageToRender);
             // Display image
-            cv::imshow(OPEN_POSE_NAME_AND_VERSION + " - Tutorial C++ API", datumsPtr->at(0)->cvOutputData);
-            cv::waitKey(0);
+            cv::imshow(OPEN_POSE_NAME_AND_VERSION + " - Tutorial C++ API", imageToRender);
         }
         else
             op::log("Nullptr or empty datumsPtr found.", op::Priority::High);
+        const auto key = (char)cv::waitKey(1);
+        return (key == 27);
     }
     catch (const std::exception& e)
     {
         op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        return true;
     }
 }
 
@@ -50,10 +76,13 @@ void printKeypoints(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>
         // Example: How to use the pose keypoints
         if (datumsPtr != nullptr && !datumsPtr->empty())
         {
-            op::log("Body keypoints: " + datumsPtr->at(0)->poseKeypoints.toString(), op::Priority::High);
-            op::log("Face keypoints: " + datumsPtr->at(0)->faceKeypoints.toString(), op::Priority::High);
-            op::log("Left hand keypoints: " + datumsPtr->at(0)->handKeypoints[0].toString(), op::Priority::High);
-            op::log("Right hand keypoints: " + datumsPtr->at(0)->handKeypoints[1].toString(), op::Priority::High);
+            const auto& poseHeatMaps = datumsPtr->at(0)->poseHeatMaps;
+            const auto numberChannels = poseHeatMaps.getSize(0);
+            const auto height = poseHeatMaps.getSize(1);
+            const auto width = poseHeatMaps.getSize(2);
+            op::log("Body heatmaps has " + std::to_string(numberChannels) + " channels, and each channel has a"
+                    " dimension of " + std::to_string(width) + " x " + std::to_string(height) + " pixels.",
+                    op::Priority::High);
         }
         else
             op::log("Nullptr or empty datumsPtr found.", op::Priority::High);
@@ -157,9 +186,10 @@ int tutorialApiCpp()
         const auto opTimer = op::getTimerInit();
 
         // Required flags to enable heatmaps
-        FLAGS_body_disable = true;
-        FLAGS_face = true;
-        FLAGS_face_detector = 2;
+        FLAGS_heatmaps_add_parts = true;
+        FLAGS_heatmaps_add_bkg = true;
+        FLAGS_heatmaps_add_PAFs = true;
+        FLAGS_heatmaps_scale = 2;
 
         // Configuring OpenPose
         op::log("Configuring OpenPose...", op::Priority::High);
@@ -170,37 +200,27 @@ int tutorialApiCpp()
         op::log("Starting thread(s)...", op::Priority::High);
         opWrapper.start();
 
-        // Read image and face rectangle locations
-        const auto imageToProcess = cv::imread(FLAGS_image_path);
-        const std::vector<op::Rectangle<float>> faceRectangles{
-            op::Rectangle<float>{330.119385f, 277.532715f, 48.717274f, 48.717274f}, // Face of person 0
-            op::Rectangle<float>{24.036991f, 267.918793f, 65.175171f, 65.175171f},  // Face of person 1
-            op::Rectangle<float>{151.803436f, 32.477852f, 108.295761f, 108.295761f} // Face of person 2
-        };
-
-        // Create new datum
-        auto datumsPtr = std::make_shared<std::vector<std::shared_ptr<op::Datum>>>();
-        datumsPtr->emplace_back();
-        auto& datumPtr = datumsPtr->at(0);
-        datumPtr = std::make_shared<op::Datum>();
-        // Fill datum with image and faceRectangles
-        datumPtr->cvInputData = imageToProcess;
-        datumPtr->faceRectangles = faceRectangles;
-
         // Process and display image
-        opWrapper.emplaceAndPop(datumsPtr);
-        if (datumsPtr != nullptr)
+        const auto imageToProcess = cv::imread(FLAGS_image_path);
+        auto datumProcessed = opWrapper.emplaceAndPop(imageToProcess);
+        if (datumProcessed != nullptr)
         {
-            printKeypoints(datumsPtr);
+            printKeypoints(datumProcessed);
             if (!FLAGS_no_display)
-                display(datumsPtr);
+            {
+                const auto numberChannels = datumProcessed->at(0)->poseHeatMaps.getSize(0);
+                for (auto desiredChannel = 0 ; desiredChannel < numberChannels ; desiredChannel++)
+                    if (display(datumProcessed, desiredChannel))
+                        break;
+            }
         }
         else
             op::log("Image could not be processed.", op::Priority::High);
 
         // Info
         op::log("NOTE: In addition with the user flags, this demo has auto-selected the following flags:\n"
-                " `--body_disable --face --face_detector 2`", op::Priority::High);
+                " `--heatmaps_add_parts --heatmaps_add_bkg --heatmaps_add_PAFs`",
+                op::Priority::High);
 
         // Measuring total time
         op::printTime(opTimer, "OpenPose demo successfully finished. Total time: ", " seconds.", op::Priority::High);
