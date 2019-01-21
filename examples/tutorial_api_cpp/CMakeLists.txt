@@ -11,7 +11,7 @@ set(EXAMPLE_FILES
     10_asynchronous_custom_output.cpp
     11_asynchronous_custom_input_output_and_datum.cpp
     12_synchronous_custom_input.cpp
-    # 13_synchronous_custom_preprocessing.cpp
+    13_synchronous_custom_preprocessing.cpp
     14_synchronous_custom_postprocessing.cpp
     15_synchronous_custom_output.cpp
     16_synchronous_custom_all_and_datum.cpp)

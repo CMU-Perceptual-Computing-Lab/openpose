@@ -97,6 +97,7 @@ namespace boost
 #endif
 #ifdef OPEN_CV_IS_4_OR_HIGHER
     #define CV_BGR2GRAY cv::COLOR_BGR2GRAY
+    #define CV_BGR2RGB cv::COLOR_BGR2RGB
     #define CV_CALIB_CB_ADAPTIVE_THRESH cv::CALIB_CB_ADAPTIVE_THRESH
     #define CV_CALIB_CB_NORMALIZE_IMAGE cv::CALIB_CB_NORMALIZE_IMAGE
     #define CV_CALIB_CB_FILTER_QUADS cv::CALIB_CB_FILTER_QUADS
@@ -111,6 +112,7 @@ namespace boost
     #define CV_INTER_CUBIC cv::INTER_CUBIC
     #define CV_INTER_LINEAR cv::INTER_LINEAR
     #define CV_L2 cv::NORM_L2
+    #define CV_RGB2BGR cv::COLOR_RGB2BGR
     #define CV_TERMCRIT_EPS cv::TermCriteria::Type::EPS
     #define CV_TERMCRIT_ITER cv::TermCriteria::Type::MAX_ITER
     #define CV_WARP_INVERSE_MAP cv::WARP_INVERSE_MAP

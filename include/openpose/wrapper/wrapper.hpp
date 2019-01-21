@@ -60,7 +60,7 @@ namespace op
 
         /**
          * Add an user-defined extra Worker for a desired task (input, output, ...).
-         * @param workerType WorkerType to configure (e.g., Input, PostProcessing, Output).
+         * @param workerType WorkerType to configure (e.g., Input, PreProcessing, PostProcessing, Output).
          * @param worker TWorker to be added.
          * @param workerOnNewThread Whether to add this TWorker on a new thread (if it is computationally demanding) or
          * simply reuse existing threads (for light functions). Set to true if the performance time is unknown.

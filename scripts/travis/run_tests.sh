@@ -66,9 +66,9 @@ if [[ $RUN_EXAMPLES == true ]] ; then
   ./build/examples/tutorial_api_cpp/12_synchronous_custom_input.bin --image_dir examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --display 0
   echo " "
 
-  # echo "Tutorial API C++: Example 13..."
-  # ./build/examples/tutorial_api_cpp/13_synchronous_custom_preprocessing.bin --image_dir examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --display 0
-  # echo " "
+  echo "Tutorial API C++: Example 13..."
+  ./build/examples/tutorial_api_cpp/13_synchronous_custom_preprocessing.bin --image_dir examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --display 0
+  echo " "
 
   echo "Tutorial API C++: Example 14..."
   ./build/examples/tutorial_api_cpp/14_synchronous_custom_postprocessing.bin --image_dir examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --display 0

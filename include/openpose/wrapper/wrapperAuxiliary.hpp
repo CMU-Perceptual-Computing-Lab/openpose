@@ -109,9 +109,11 @@ namespace op
 
             // User custom workers
             const auto& userInputWs = userWs[int(WorkerType::Input)];
+            const auto& userPreProcessingWs = userWs[int(WorkerType::PreProcessing)];
             const auto& userPostProcessingWs = userWs[int(WorkerType::PostProcessing)];
             const auto& userOutputWs = userWs[int(WorkerType::Output)];
             const auto userInputWsOnNewThread = userWsOnNewThread[int(WorkerType::Input)];
+            const auto userPreProcessingWsOnNewThread = userWsOnNewThread[int(WorkerType::PreProcessing)];
             const auto userPostProcessingWsOnNewThread = userWsOnNewThread[int(WorkerType::PostProcessing)];
             const auto userOutputWsOnNewThread = userWsOnNewThread[int(WorkerType::Output)];
 
@@ -900,7 +902,18 @@ namespace op
             // After producer
             // ID generator (before any multi-threading or any function that requires the ID)
             const auto wIdGenerator = std::make_shared<WIdGenerator<TDatumsSP>>();
-            std::vector<TWorker> workersAux{wIdGenerator};
+            // If custom user Worker and uses its own thread
+            std::vector<TWorker> workersAux;
+            if (!userPreProcessingWs.empty())
+            {
+                // If custom user Worker in its own thread
+                if (userPreProcessingWsOnNewThread)
+                    log("You chose to add your pre-processing function in a new thread. However, OpenPose will"
+                        " add it in the same thread than the input frame producer.",
+                        Priority::High, __LINE__, __FUNCTION__, __FILE__);
+                workersAux = mergeVectors(workersAux, {userPreProcessingWs});
+            }
+            workersAux = mergeVectors(workersAux, {wIdGenerator});
             // Scale & cv::Mat to OP format
             if (scaleAndSizeExtractorW != nullptr)
                 workersAux = mergeVectors(workersAux, {scaleAndSizeExtractorW});
@@ -927,7 +940,7 @@ namespace op
                 workersAux = mergeVectors({datumProducerW}, workersAux);
             // Otherwise
             else if (threadManagerMode != ThreadManagerMode::Asynchronous
-                        && threadManagerMode != ThreadManagerMode::AsynchronousIn)
+                     && threadManagerMode != ThreadManagerMode::AsynchronousIn)
                 error("No input selected.", __LINE__, __FUNCTION__, __FILE__);
             // Thread 0 or 1, queues 0 -> 1
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
