@@ -36,6 +36,8 @@ params = dict()
 params["model_folder"] = "../../../models/"
 params["heatmaps_add_parts"] = True
 params["heatmaps_add_PAFs"] = True
+params["heatmaps_scale"] = 2
+params["heatmaps_add_bkg"] = True
 
 # Add others in path?
 for i in range(0, len(args[1])):
@@ -69,7 +71,7 @@ outputImageF = (datum.inputNetData[0].copy())[0,:,:,:] + 0.5
 outputImageF = cv2.merge([outputImageF[0,:,:], outputImageF[1,:,:], outputImageF[2,:,:]])
 outputImageF = (outputImageF*255.).astype(dtype='uint8')
 heatmaps = datum.poseHeatMaps.copy()
-heatmaps = (heatmaps*255.).astype(dtype='uint8')
+heatmaps = (heatmaps).astype(dtype='uint8')
 
 # Display Image
 counter = 0
