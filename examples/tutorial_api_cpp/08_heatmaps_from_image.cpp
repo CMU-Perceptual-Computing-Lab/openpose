@@ -44,7 +44,7 @@ bool display(
                 height, width, CV_32F, &inputNetData.getPtr()[2*height*width]);
             cv::Mat netInputImage;
             std::vector<cv::Mat> imageChannels = {inputNetDataB, inputNetDataG, inputNetDataR};
-            cv::merge(imageChannels, netInputImage);
+            cv::merge(std::vector<cv::Mat>{inputNetDataB, inputNetDataG, inputNetDataR}, netInputImage);
             netInputImage = (netInputImage+0.5)*255;
             // Turn into uint8 cv::Mat
             cv::Mat netInputImageUint8;
