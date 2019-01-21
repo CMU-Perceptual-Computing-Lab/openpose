@@ -21,10 +21,19 @@ namespace op
 
         virtual ~ThreadManager();
 
+        /**
+         * It sets the maximum number of elements in the queue.
+         * For maximum speed, set to a very large number, but the trade-off would be:
+         *  - Latency will hugely increase.
+         *  - The program might go out of RAM memory (so the computer might freeze).
+         * For minimum latency while keeping an optimal speed, set to -1, that will automatically
+         * detect the ideal number based on how many elements are connected to that queue.
+         * @param defaultMaxSizeQueues long long element with the maximum number of elements on the queue.
+         */
         void setDefaultMaxSizeQueues(const long long defaultMaxSizeQueues = -1);
 
-        void add(const unsigned long long threadId, const std::vector<TWorker>& tWorkers, const unsigned long long queueInId,
-                 const unsigned long long queueOutId);
+        void add(const unsigned long long threadId, const std::vector<TWorker>& tWorkers,
+                 const unsigned long long queueInId, const unsigned long long queueOutId);
 
         void add(const unsigned long long threadId, const TWorker& tWorker, const unsigned long long queueInId,
                  const unsigned long long queueOutId);

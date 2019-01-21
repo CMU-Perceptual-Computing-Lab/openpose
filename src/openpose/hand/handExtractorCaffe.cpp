@@ -291,6 +291,11 @@ namespace op
                         for (auto person = 0 ; person < numberPeople ; person++)
                         {
                             const auto& handRectangle = handRectangles.at(person).at(hand);
+                            // Sanity check
+                            if (handRectangle.width != handRectangle.height)
+                                error("Hand rectangle for hand keypoint estimation must be squared, i.e.,"
+                                      " width = height (" + std::to_string(handRectangle.width) + " vs. "
+                                      + std::to_string(handRectangle.height) + ").", __LINE__, __FUNCTION__, __FILE__);
                             // Only consider faces with a minimum pixel area
                             const auto minHandSize = fastMin(handRectangle.width, handRectangle.height);
                             // // Debugging -> red rectangle

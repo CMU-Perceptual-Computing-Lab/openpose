@@ -159,7 +159,7 @@ public:
                 // datumPtr->poseKeypoints: Array<float> with the estimated pose
             if (datumsPtr != nullptr && !datumsPtr->empty())
             {
-                cv::imshow("User worker GUI", datumsPtr->at(0)->cvOutputData);
+                cv::imshow(OPEN_POSE_NAME_AND_VERSION + " - Tutorial Thread API", datumsPtr->at(0)->cvOutputData);
                 // It displays the image and sleeps at least 1 ms (it usually sleeps ~5-10 msec to display the image)
                 cv::waitKey(1);
             }

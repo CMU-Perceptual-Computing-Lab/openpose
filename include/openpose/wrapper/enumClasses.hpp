@@ -15,7 +15,7 @@ namespace op
     enum class WorkerType : unsigned char
     {
         Input = 0,
-        // PreProcessing,
+        PreProcessing,
         PostProcessing,
         Output,
         Size,

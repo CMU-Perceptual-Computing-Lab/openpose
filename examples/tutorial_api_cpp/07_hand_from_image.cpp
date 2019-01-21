@@ -1,4 +1,4 @@
-// ----------------------------- OpenPose C++ API Tutorial - Example 9 - Face from Image -----------------------------
+// ----------------------------- OpenPose C++ API Tutorial - Example 7 - Face from Image -----------------------------
 // It reads an image and the hand location, process it, and displays the hand keypoints. In addition,
 // it includes all the OpenPose configuration flags.
 // Input: An image and the hand rectangle locations.
@@ -31,7 +31,7 @@ void display(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& dat
         if (datumsPtr != nullptr && !datumsPtr->empty())
         {
             // Display image
-            cv::imshow("User worker GUI", datumsPtr->at(0)->cvOutputData);
+            cv::imshow(OPEN_POSE_NAME_AND_VERSION + " - Tutorial C++ API", datumsPtr->at(0)->cvOutputData);
             cv::waitKey(0);
         }
         else
@@ -50,10 +50,10 @@ void printKeypoints(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>
         // Example: How to use the pose keypoints
         if (datumsPtr != nullptr && !datumsPtr->empty())
         {
-            op::log("Body keypoints: " + datumsPtr->at(0)->poseKeypoints.toString());
-            op::log("Face keypoints: " + datumsPtr->at(0)->faceKeypoints.toString());
-            op::log("Left hand keypoints: " + datumsPtr->at(0)->handKeypoints[0].toString());
-            op::log("Right hand keypoints: " + datumsPtr->at(0)->handKeypoints[1].toString());
+            op::log("Body keypoints: " + datumsPtr->at(0)->poseKeypoints.toString(), op::Priority::High);
+            op::log("Face keypoints: " + datumsPtr->at(0)->faceKeypoints.toString(), op::Priority::High);
+            op::log("Left hand keypoints: " + datumsPtr->at(0)->handKeypoints[0].toString(), op::Priority::High);
+            op::log("Right hand keypoints: " + datumsPtr->at(0)->handKeypoints[1].toString(), op::Priority::High);
         }
         else
             op::log("Nullptr or empty datumsPtr found.", op::Priority::High);
@@ -101,14 +101,13 @@ void configureWrapper(op::Wrapper& opWrapper)
         const auto multipleView = (FLAGS_3d || FLAGS_3d_views > 1);
         // Face and hand detectors
         const auto faceDetector = op::flagsToDetector(FLAGS_face_detector);
-        const auto handDetector = op::Detector::Provided;
+        const auto handDetector = op::flagsToDetector(FLAGS_hand_detector);
         // Enabling Google Logging
         const bool enableGoogleLogging = true;
 
         // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
-        const auto bodyEnable = false;
         const op::WrapperStructPose wrapperStructPose{
-            bodyEnable, netInputSize, outputSize, keypointScaleMode, FLAGS_num_gpu, FLAGS_num_gpu_start,
+            !FLAGS_body_disable, netInputSize, outputSize, keypointScaleMode, FLAGS_num_gpu, FLAGS_num_gpu_start,
             FLAGS_scale_number, (float)FLAGS_scale_gap, op::flagsToRenderMode(FLAGS_render_pose, multipleView),
             poseModel, !FLAGS_disable_blending, (float)FLAGS_alpha_pose, (float)FLAGS_alpha_heatmap,
             FLAGS_part_to_show, FLAGS_model_folder, heatMapTypes, heatMapScaleMode, FLAGS_part_candidates,
@@ -122,9 +121,8 @@ void configureWrapper(op::Wrapper& opWrapper)
             (float)FLAGS_face_alpha_pose, (float)FLAGS_face_alpha_heatmap, (float)FLAGS_face_render_threshold};
         opWrapper.configure(wrapperStructFace);
         // Hand configuration (use op::WrapperStructHand{} to disable it)
-        const auto hand = true;
         const op::WrapperStructHand wrapperStructHand{
-            hand, handDetector, handNetInputSize, FLAGS_hand_scale_number, (float)FLAGS_hand_scale_range,
+            FLAGS_hand, handDetector, handNetInputSize, FLAGS_hand_scale_number, (float)FLAGS_hand_scale_range,
             op::flagsToRenderMode(FLAGS_hand_render, multipleView, FLAGS_render_pose), (float)FLAGS_hand_alpha_pose,
             (float)FLAGS_hand_alpha_heatmap, (float)FLAGS_hand_render_threshold};
         opWrapper.configure(wrapperStructHand);
@@ -158,6 +156,11 @@ int tutorialApiCpp()
         op::log("Starting OpenPose demo...", op::Priority::High);
         const auto opTimer = op::getTimerInit();
 
+        // Required flags to enable heatmaps
+        FLAGS_body_disable = true;
+        FLAGS_hand = true;
+        FLAGS_hand_detector = 2;
+
         // Configuring OpenPose
         op::log("Configuring OpenPose...", op::Priority::High);
         op::Wrapper opWrapper{op::ThreadManagerMode::Asynchronous};
@@ -170,18 +173,18 @@ int tutorialApiCpp()
         // Read image and hand rectangle locations
         const auto imageToProcess = cv::imread(FLAGS_image_path);
         const std::vector<std::array<op::Rectangle<float>, 2>> handRectangles{
-            // Left/Right hands person 0
+            // Left/Right hands of person 0
             std::array<op::Rectangle<float>, 2>{
-                op::Rectangle<float>{320.035889f, 377.675049f, 69.300949f, 69.300949f},
-                op::Rectangle<float>{0.f, 0.f, 0.f, 0.f}},
-            // Left/Right hands person 1
+                op::Rectangle<float>{320.035889f, 377.675049f, 69.300949f, 69.300949f}, // Left hand
+                op::Rectangle<float>{0.f, 0.f, 0.f, 0.f}},                              // Right hand
+            // Left/Right hands of person 1
             std::array<op::Rectangle<float>, 2>{
-                op::Rectangle<float>{80.155792f, 407.673492f, 80.812706f, 80.812706f},
-                op::Rectangle<float>{46.449715f, 404.559753f, 98.898178f, 98.898178f}},
-            // Left/Right hands person 2
+                op::Rectangle<float>{80.155792f, 407.673492f, 80.812706f, 80.812706f},  // Left hand
+                op::Rectangle<float>{46.449715f, 404.559753f, 98.898178f, 98.898178f}}, // Right hand
+            // Left/Right hands of person 2
             std::array<op::Rectangle<float>, 2>{
-                op::Rectangle<float>{185.692673f, 303.112244f, 157.587555f, 157.587555f},
-                op::Rectangle<float>{88.984360f, 268.866547f, 117.818230f, 117.818230f}}
+                op::Rectangle<float>{185.692673f, 303.112244f, 157.587555f, 157.587555f},// Left hand
+                op::Rectangle<float>{88.984360f, 268.866547f, 117.818230f, 117.818230f}} // Right hand
         };
 
         // Create new datum
@@ -205,7 +208,7 @@ int tutorialApiCpp()
             op::log("Image could not be processed.", op::Priority::High);
 
         // Info
-        op::log("NOTE: In addition with the user flags, this demo has auto-selected the following flags:"
+        op::log("NOTE: In addition with the user flags, this demo has auto-selected the following flags:\n"
                 " `--body_disable --hand --hand_detector 2`", op::Priority::High);
 
         // Measuring total time
