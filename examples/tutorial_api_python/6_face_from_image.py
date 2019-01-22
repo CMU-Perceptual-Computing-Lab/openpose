@@ -5,19 +5,19 @@ import cv2
 import os
 from sys import platform
 import argparse
-import numpy as np
+import time
 
 # Import Openpose (Windows/Ubuntu/OSX)
 dir_path = os.path.dirname(os.path.realpath(__file__))
 try:
     # Windows Import
     if platform == "win32":
-        # Change these variables to point to the correct folder (Release/x64 etc.) 
+        # Change these variables to point to the correct folder (Release/x64 etc.)
         sys.path.append(dir_path + '/../../python/openpose/Release');
         os.environ['PATH']  = os.environ['PATH'] + ';' + dir_path + '/../../x64/Release;' +  dir_path + '/../../bin;'
         import pyopenpose as op
     else:
-        # Change these variables to point to the correct folder (Release/x64 etc.) 
+        # Change these variables to point to the correct folder (Release/x64 etc.)
         sys.path.append('../../python');
         # If you run `make install` (default path is `/usr/local/python` for Ubuntu), you can also access the OpenPose/python module from there. This will install OpenPose and the python library at your desired installation path. Ensure that this is in your python path in order to use it.
         # sys.path.append('/usr/local/python')
@@ -28,16 +28,15 @@ except ImportError as e:
 
 # Flags
 parser = argparse.ArgumentParser()
-parser.add_argument("--image_path", default="../../../examples/media/COCO_val2014_000000000192.jpg", help="Process an image. Read all standard formats (jpg, png, bmp, etc.).")
+parser.add_argument("--image_path", default="../../../examples/media/COCO_val2014_000000000241.jpg", help="Process an image. Read all standard formats (jpg, png, bmp, etc.).")
 args = parser.parse_known_args()
 
 # Custom Params (refer to include/openpose/flags.hpp for more parameters)
 params = dict()
 params["model_folder"] = "../../../models/"
-params["heatmaps_add_parts"] = True
-params["heatmaps_add_bkg"] = True
-params["heatmaps_add_PAFs"] = True
-params["heatmaps_scale"] = 2
+params["face"] = True
+params["face_detector"] = 2
+params["body_disable"] = True
 
 # Add others in path?
 for i in range(0, len(args[1])):
@@ -60,29 +59,21 @@ opWrapper = op.WrapperPython()
 opWrapper.configure(params)
 opWrapper.start()
 
-# Process Image
-datum = op.Datum()
+# Read image and face rectangle locations
 imageToProcess = cv2.imread(args[0].image_path)
+faceRectangles = [
+    op.Rectangle(330.119385, 277.532715, 48.717274, 48.717274),
+    op.Rectangle(24.036991, 267.918793, 65.175171, 65.175171),
+    op.Rectangle(151.803436, 32.477852, 108.295761, 108.295761),
+]
+
+# Create new datum
+datum = op.Datum()
 datum.cvInputData = imageToProcess
+datum.faceRectangles = faceRectangles
+
+# Process and display image
 opWrapper.emplaceAndPop([datum])
-
-# Process outputs
-outputImageF = (datum.inputNetData[0].copy())[0,:,:,:] + 0.5
-outputImageF = cv2.merge([outputImageF[0,:,:], outputImageF[1,:,:], outputImageF[2,:,:]])
-outputImageF = (outputImageF*255.).astype(dtype='uint8')
-heatmaps = datum.poseHeatMaps.copy()
-heatmaps = (heatmaps).astype(dtype='uint8')
-
-# Display Image
-counter = 0
-while 1:
-    num_maps = heatmaps.shape[0]
-    heatmap = heatmaps[counter, :, :].copy()
-    heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
-    combined = cv2.addWeighted(outputImageF, 0.5, heatmap, 0.5, 0)
-    cv2.imshow("OpenPose 1.4.0 - Tutorial Python API", combined)
-    key = cv2.waitKey(-1)
-    if key == 27:
-        break
-    counter += 1
-    counter = counter % num_maps
+print("Face keypoints: \n" + str(datum.faceKeypoints))
+cv2.imshow("OpenPose 1.4.0 - Tutorial Python API", datum.cvOutputData)
+cv2.waitKey(0)

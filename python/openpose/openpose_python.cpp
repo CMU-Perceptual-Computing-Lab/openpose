@@ -170,13 +170,32 @@ public:
         auto datumsPtr = std::make_shared<std::vector<std::shared_ptr<op::Datum>>>(l);
         opWrapper->emplaceAndPop(datumsPtr);
     }
+
+    void waitAndEmplace(std::vector<std::shared_ptr<op::Datum>>& l)
+    {
+        auto datumsPtr = std::make_shared<std::vector<std::shared_ptr<op::Datum>>>(l);
+        opWrapper->waitAndEmplace(datumsPtr);
+    }
+
+    bool waitAndPop(std::vector<std::shared_ptr<op::Datum>>& l)
+    {
+        auto datumsPtr = std::make_shared<std::vector<std::shared_ptr<op::Datum>>>(l);
+        return opWrapper->waitAndPop(datumsPtr);
+    }
 };
+
+std::vector<std::string> getImagesFromDirectory(const std::string& directoryPath)
+{
+    return op::getFilesOnDirectory(directoryPath, op::Extensions::Images);
+}
 
 PYBIND11_MODULE(pyopenpose, m) {
 
     // Functions for Init Params
     m.def("init_int", &init_int, "Init Function");
     m.def("init_argv", &init_argv, "Init Function");
+    m.def("get_gpu_number", &op::getGpuNumber, "Get Total GPU");
+    m.def("get_images_on_directory", &op::getImagesFromDirectory, "Get Images On Directory");
 
     // OpenposePython
     py::class_<WrapperPython>(m, "WrapperPython")
@@ -187,6 +206,8 @@ PYBIND11_MODULE(pyopenpose, m) {
         .def("stop", &WrapperPython::stop)
         .def("execute", &WrapperPython::exec)
         .def("emplaceAndPop", &WrapperPython::emplaceAndPop)
+        .def("waitAndEmplace", &WrapperPython::waitAndEmplace)
+        .def("waitAndPop", &WrapperPython::waitAndPop)
         ;
 
     // Datum Object

@@ -63,6 +63,5 @@ opWrapper.emplaceAndPop([datum])
 
 # Display Image
 print("Body keypoints: \n" + str(datum.poseKeypoints))
-while 1:
-    cv2.imshow("win", datum.cvOutputData)
-    cv2.waitKey(15)
+cv2.imshow("OpenPose 1.4.0 - Tutorial Python API", datum.cvOutputData)
+cv2.waitKey(0)
