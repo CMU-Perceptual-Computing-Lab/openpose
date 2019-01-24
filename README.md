@@ -13,10 +13,17 @@
 Note: Currently using [travis-matrix-badges](https://github.com/bjfish/travis-matrix-badges) vs. traditional [![Build Status](https://travis-ci.org/CMU-Perceptual-Computing-Lab/openpose.svg?branch=master)](https://travis-ci.org/CMU-Perceptual-Computing-Lab/openpose)
 -->
 
-[OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose) represents the **first real-time multi-person system to jointly detect human body, hand, facial, and foot keypoints (in total 135 keypoints) on single images**.
+[**OpenPose**](https://github.com/CMU-Perceptual-Computing-Lab/openpose) represents the **first real-time multi-person system to jointly detect human body, hand, facial, and foot keypoints (in total 135 keypoints) on single images**.
+
+It is **authored by [Gines Hidalgo](https://www.gineshidalgo.com), [Zhe Cao](https://people.eecs.berkeley.edu/~zhecao), [Tomas Simon](http://www.cs.cmu.edu/~tsimon), [Shih-En Wei](https://scholar.google.com/citations?user=sFQD3k4AAAAJ&hl=en), [Hanbyul Joo](https://jhugestar.github.io), and [Yaser Sheikh](http://www.cs.cmu.edu/~yaser)**. Currently, it is being **maintained by [Gines Hidalgo](https://www.gineshidalgo.com) and [Yaadhav Raaj](https://www.linkedin.com/in/yaadhavraaj)**. In addition, OpenPose would not be possible without the [**CMU Panoptic Studio dataset**](http://domedb.perception.cs.cmu.edu). We would also like to thank all the people who helped OpenPose in any way. The main contributors are listed in [doc/contributors.md](doc/contributors.md).
+
+<!-- The [original CVPR 2017 repo](https://github.com/ZheC/Multi-Person-Pose-Estimation) includes Matlab and Python versions, as well as the training code. The body pose estimation work is based on [the original ECCV 2016 demo](https://github.com/CMU-Perceptual-Computing-Lab/caffe_rtpose). -->
+
 
 <p align="center">
     <img src="doc/media/pose_face_hands.gif", width="480">
+    <br>
+    <sup>Authors <a href="https://www.gineshidalgo.com" target="_blank">Gines Hidalgo</a> (left) and <a href="https://jhugestar.github.io" target="_blank">Hanbyul Joo</a> (right) in front of the <a href="http://domedb.perception.cs.cmu.edu" target="_blank">CMU Panoptic Studio</a></sup>
 </p>
 
 ## Features
@@ -40,6 +47,7 @@ Note: Currently using [travis-matrix-badges](https://github.com/bjfish/travis-ma
     - [**Python API**](doc/modules/python_module.md).
     - [**Unity Plugin**](https://github.com/CMU-Perceptual-Computing-Lab/openpose_unity_plugin).
     - CUDA (Nvidia GPU), OpenCL (AMD GPU), and CPU versions.
+    - Training code included in the [**original CVPR 2017 GitHub repository**](https://github.com/ZheC/Multi-Person-Pose-Estimation).
 
 
 
@@ -60,17 +68,23 @@ For further details, check [all released features](doc/released_features.md) and
 ### Body and Foot Estimation
 <p align="center">
     <img src="doc/media/dance_foot.gif", width="360">
+    <br>
+    <sup>Testing the <a href="https://www.youtube.com/watch?v=2DiQUX11YaY" target="_blank"><i>Crazy Uptown Funk flashmob in Sydney</i></a> video sequence with OpenPose</sup>
 </p>
 
 ### 3-D Reconstruction Module (Body, Foot, Face, and Hands)
 <p align="center">
     <img src="doc/media/openpose3d.gif", width="360">
+    <br>
+    <sup>Testing the 3D Reconstruction Module of OpenPose</sup>
 </p>
 
 ### Body, Foot, Face, and Hands Estimation
 <p align="center">
     <img src="doc/media/pose_face.gif", width="360">
     <img src="doc/media/pose_hands.gif", width="360">
+    <br>
+    <sup>Authors <a href="https://www.gineshidalgo.com" target="_blank">Gines Hidalgo</a> (left image) and <a href="http://www.cs.cmu.edu/~tsimon" target="_blank">Tomas Simon</a> (right image) testing OpenPose</sup>
 </p>
 
 ### Unity Plugin
@@ -78,6 +92,8 @@ For further details, check [all released features](doc/released_features.md) and
     <img src="doc/media/unity_main.png", width="240">
     <img src="doc/media/unity_body_foot.png", width="240">
     <img src="doc/media/unity_hand_face.png", width="240">
+    <br>
+    <sup><a href="http://tianyizhao.com" target="_blank">Tianyi Zhao</a> and <a href="https://www.gineshidalgo.com" target="_blank">Gines Hidalgo</a> testing their <a href="https://github.com/CMU-Perceptual-Computing-Lab/openpose_unity_plugin" target="_blank">OpenPose Unity Plugin</a></sup>
 </p>
 
 ### Runtime Analysis
@@ -99,9 +115,8 @@ This analysis was performed using the same images for each algorithm and a batch
 7. [Speeding Up OpenPose and Benchmark](#speeding-up-openpose-and-benchmark)
 8. [Foot Dataset](#foot-dataset)
 9. [Send Us Failure Cases and Feedback!](#send-us-failure-cases-and-feedback)
-10. [Authors and Contributors](#authors-and-contributors)
-11. [Citation](#citation)
-12. [License](#license)
+10. [Citation](#citation)
+11. [License](#license)
 
 
 
@@ -163,15 +178,6 @@ Our library is open source for research purposes, and we want to continuously im
 6. ... etc.
 
 Just comment on GitHub or make a pull request and we will answer as soon as possible! Send us an email if you use the library to make a cool demo or YouTube video!
-
-
-
-## Authors and Contributors
-OpenPose is authored by [Gines Hidalgo](https://www.gineshidalgo.com/), [Zhe Cao](http://www.andrew.cmu.edu/user/zhecao), [Tomas Simon](http://www.cs.cmu.edu/~tsimon), [Shih-En Wei](https://scholar.google.com/citations?user=sFQD3k4AAAAJ&hl=en), [Hanbyul Joo](http://www.cs.cmu.edu/~hanbyulj), and [Yaser Sheikh](http://www.cs.cmu.edu/~yaser). Currently, it is being maintained by [Gines Hidalgo](https://www.gineshidalgo.com/) and [Yaadhav Raaj](https://www.linkedin.com/in/yaadhavraaj). The [original CVPR 2017 repo](https://github.com/ZheC/Multi-Person-Pose-Estimation) includes Matlab and Python versions, as well as the training code. The body pose estimation work is based on [the original ECCV 2016 demo](https://github.com/CMU-Perceptual-Computing-Lab/caffe_rtpose).
-
-In addition, OpenPose would not be possible without the [CMU Panoptic Studio dataset](http://domedb.perception.cs.cmu.edu/).
-
-We would also like to thank all the people who helped OpenPose in any way. The main contributors are listed in [doc/contributors.md](doc/contributors.md).
 
 
 

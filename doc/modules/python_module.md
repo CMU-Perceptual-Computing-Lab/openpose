@@ -6,6 +6,7 @@
 3. [Installation](#installation)
 4. [Testing](#testing)
 5. [Exporting Python OpenPose](#exporting-python-openpose)
+6. [Common Issues](#common-issues)
 
 
 
@@ -15,31 +16,30 @@ This module exposes a Python API for OpenPose. It is effectively a wrapper that 
 
 
 ## Compatibility
-The OpenPose Python module is compatible with both Python 2 and Python 3. In addition, it will also run in all OpenPose compatible operating systems. It uses [Pybind11](https://github.com/pybind/pybind11) for mapping between C++ and Python datatypes.
+The OpenPose Python module is compatible with both Python 2 and Python 3 (default and recommended). In addition, it will also run in all OpenPose compatible operating systems. It uses [Pybind11](https://github.com/pybind/pybind11) for mapping between C++ and Python datatypes.
 
-To compile, enable `BUILD_PYTHON` in cmake. Pybind selects the latest version of Python by default (Python 3). To use Python 2, change `PYTHON_EXECUTABLE` and `PYTHON_LIBRARY` flags in cmake-gui to your desired python version. 
+To compile, enable `BUILD_PYTHON` in CMake-gui. In Windows, make sure you compile the whole solution (clicking the green play button does not compile the whole solution!). You can do that by right-click on the OpenPose project solution, and clicking in `Build solution`.
 
-Ubuntu Eg:
+Pybind selects the latest version of Python by default (Python 3). To use Python 2, change `PYTHON_EXECUTABLE` and `PYTHON_LIBRARY` flags in CMake-gui to your desired Python version.
 
 ```
-PYTHON_EXECUTABLE=/usr/bin/python2.7 
+# Ubuntu
+PYTHON_EXECUTABLE=/usr/bin/python2.7
 PYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython2.7m.so
 ```
 
-Mac OSX Eg:
+```
+# Mac OSX
+PYTHON_EXECUTABLE=/usr/local/bin/python2.7
+PYTHON_LIBRARY=/usr/local/opt/python/Frameworks/Python.framework/Versions/2.7/lib/libpython2.7m.dylib
+```
 
 ```
-PYTHON_EXECUTABLE=/usr/local/bin/python2.7 
-PYTHON_LIBRARY=/usr/local/opt/python/Frameworks/Python.framework/Versions/2.7/lib/libpython2.7m.dylib 
-```
-
-Windows Eg:
-
-```
+:: Windows
 PYTHON_EXECUTABLE=C:/Users/user/AppData/Local/Programs/Python/Python27/python.exe
 ```
 
-If run via the command line, you may need to run cmake twice in order for this change to take effect. 
+If run via the command line, you may need to run cmake twice in order for this change to take effect.
 
 
 
@@ -49,12 +49,13 @@ Check [doc/installation.md#python-module](../installation.md#python-api) for ins
 The Python API requires python-dev, Numpy (for array management), and OpenCV (for image loading). They can be installed via:
 
 ```
+# Python 3 (default and recommended)
+sudo apt-get install python3-dev
+sudo pip3 install numpy opencv-python
+
 # Python 2
 sudo apt-get install python-dev
 sudo pip install numpy opencv-python
-# Python 3 (recommended)
-sudo apt-get install python3-dev
-sudo pip3 install numpy opencv-python
 ```
 
 
@@ -66,15 +67,15 @@ All the Python examples from the Tutorial API Python module can be found in `bui
 # From command line
 cd build/examples/tutorial_api_python
 
+# Python 3 (default version)
+python3 1_body_from_image.py
+python3 2_whole_body_from_image.py
+# python3 [any_other_example.py]
+
 # Python 2
 python2 1_body_from_image.py
 python2 2_whole_body_from_image.py
 # python2 [any_other_example.py]
-
-# Python 3 (recommended)
-python3 1_body_from_image.py
-python3 2_whole_body_from_image.py
-# python3 [any_other_example.py]
 ```
 
 
@@ -96,10 +97,10 @@ Windows:
   os.environ['PATH']  = os.environ['PATH'] + ';' + dir_path + '/../../{x86/x64}/Release;' +  dir_path + '/../../bin;'
   ```
 
-  
 
-#### Common Issues
-The error in general is that openpose cannot be found. Ensure first that `BUILD_PYTHON` flag is set to ON. If the error persists, check the following:
+
+## Common Issues
+The error in general is that PyOpenPose cannot be found (an error similar to: `ImportError: cannot import name pyopenpose`). Ensure first that `BUILD_PYTHON` flag is set to ON. If the error persists, check the following:
 
 In the script you are running, check for the following line, and run the following command in the same location as where the file is
 
@@ -118,11 +119,18 @@ pyopenpose.cpython-35m-x86_64-linux-gnu.so
 pyopenpose.so
 ```
 
-If you do not have any one of those, you may not have compiled openpose successfully, or you may be running the examples, not from the build folder but the source folder. If you have the first one, you have compiled pyopenpose for python 3, and have to run the scripts with python3, and vice versa for the 2nd one. Follow the testing examples above for exact commands.
+If you do not have any one of those, you may not have compiled openpose successfully, or you may be running the examples, not from the build folder but the source folder. If you have the first one, you have compiled PyOpenPose for Python 3, and have to run the scripts with `python3`, and vice versa for the 2nd one. Follow the testing examples above for exact commands.
 
 **Windows:**
 
-Python for Openpose needs to be compiled in Release mode for now. This can be done in [Visual Studio](https://cdn.stereolabs.com/docs/getting-started/images/release_mode.png). Once that is done check this line:
+Problem 1: If you are in Windows, and you fail to install the required third party Python libraries, it might print an error similar to: `Exception: Error: OpenPose library could not be found. Did you enable BUILD_PYTHON in CMake and have this Python script in the right folder?`. From GitHub issue #941:
+```
+I had a similar issue with Visual Studio (VS). I am pretty sure that the issue is that while you are compiling OpenPose in VS, it tries to import cv2 (python-opencv) and it fails. So make sure that if you open cmd.exe and run Python, you can actually import cv2 without errors. I could not, but I had cv2 installed in a IPython environment (Anaconda), so I activated that environment, and then ran (change this to adapt it to your VS version and location of OpenPose.sln):
+
+C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\MSBuild.exe C:\path\to\OpenPose.sln
+```
+
+Problem 2: Python for Openpose needs to be compiled in Release mode for now. This can be done in [Visual Studio](https://cdn.stereolabs.com/docs/getting-started/images/release_mode.png). Once that is done check this line:
 
 `sys.path.append(dir_path + '/../../python/openpose/Release');`
 
@@ -137,7 +145,7 @@ pyopenpose.cp36-win_amd64.pyd
 pyopenpose.pyd
 ```
 
-If such a folder does not exist, you need to compile in Release mode as seen above. If you have the first one, you have compiled pyopenpose for python 3, and have to run the scripts with python3, and vice versa for the 2nd one. Follow the testing examples above for exact commands. If that still does not work, check this line:
+If such a folder does not exist, you need to compile in Release mode as seen above. If you have the first one, you have compiled PyOpenPose for Python 3, and have to run the scripts with `python3`, and vice versa for the 2nd one. Follow the testing examples above for exact commands. If that still does not work, check this line:
 
 `os.environ['PATH']  = os.environ['PATH'] + ';' + dir_path + '/../../x64/Release;' +  dir_path + '/../../bin;'`
 
@@ -146,5 +154,4 @@ dir ../../x64/Release
 dir ../../bin
 ```
 
-Ensure that both of these paths exist, as pyopenpose needs to reference those libraries. If they don't exist, change the path so that they point to the correct location in your build folder
-
+Ensure that both of these paths exist, as PyOpenPose needs to reference those libraries. If they don't exist, change the path so that they point to the correct location in your build folder.
