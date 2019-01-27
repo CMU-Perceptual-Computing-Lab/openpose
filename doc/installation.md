@@ -125,14 +125,14 @@ Any problem installing OpenPose? Check [doc/faq.md](./faq.md) and/or post a GitH
 4. Nvidia GPU version prerequisites:
     1. **Note: OpenPose has been tested extensively with CUDA 8.0 and cuDNN 5.1**. We highly recommend using those versions to minimize potential installation issues. Other versions should also work, but we do not provide support about any CUDA/cuDNN installation/compilation issue, as well as problems relate dto their integration into OpenPose.
     2. [**CUDA 8**](https://developer.nvidia.com/cuda-80-ga2-download-archive):
-        - Ubuntu: Run `sudo 3rdparty/scripts/ubuntu/install_cuda.sh` (if Ubuntu 16 or 14 and for Graphic cards up to 10XX) or alternatively download and install it from their website.
+        - Ubuntu: Run `sudo ./scripts/ubuntu/install_cuda.sh` (if Ubuntu 16 or 14 and for Graphic cards up to 10XX) or alternatively download and install it from their website.
         - Windows: Install CUDA 8.0 after Visual Studio 2015 is installed to assure that the CUDA installation will generate all necessary files for VS. If CUDA was already installed, re-install it.
         - **Important installation tips**:
             - New Nvidia model GPUs (e.g., Nvidia V, GTX 2080, any Nvidia with Volta or Turing architecture, etc.) require at least CUDA 9.
             - (Windows issue, reported Sep 2018): If your computer hangs when installing CUDA drivers, try installing first the [Nvidia drivers](http://www.nvidia.com/Download/index.aspx), and then installing CUDA without the Graphics Driver flag.
             - (Windows): If CMake returns and error message similar to `CUDA_TOOLKIT_ROOT_DIR not found or specified` or any other CUDA component missing, then: 1) Re-install Visual Studio 2015; 2) Reboot your PC; 3) Re-install CUDA.
     3. [**cuDNN 5.1**](https://developer.nvidia.com/rdp/cudnn-archive):
-        - Ubuntu: Run `sudo 3rdparty/scripts/ubuntu/install_cudnn.sh` (if Ubuntu 16 or 14 and for Graphic cards up to 10XX) or alternatively download and install it from their website.
+        - Ubuntu: Run `sudo ./scripts/ubuntu/install_cudnn.sh` (if Ubuntu 16 or 14 and for Graphic cards up to 10XX) or alternatively download and install it from their website.
         - Windows (and Ubuntu if manual installation): In order to manually install it, just unzip it and copy (merge) the contents on the CUDA folder, usually `/usr/local/cuda/` in Ubuntu and `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0` in Windows.
 5. AMD GPU version prerequisites:
     1. Download official AMD drivers for Windows from [**AMD - Windows**](https://support.amd.com/en-us/download).
