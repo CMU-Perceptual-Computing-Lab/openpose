@@ -27,6 +27,7 @@ namespace op
         void forwardPass(const std::vector<Array<float>>& inputNetData,
                          const Point<int>& inputDataSize,
                          const std::vector<double>& scaleRatios,
+                         const Array<float>& poseNetOutput = Array<float>{},
                          const long long frameId = -1ll);
 
         // PoseExtractorNet functions

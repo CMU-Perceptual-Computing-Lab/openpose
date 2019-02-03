@@ -249,9 +249,10 @@ namespace op
                     candidates[part].resize(numberPartCandidates);
                     const auto* partCandidatesPtr = &candidatesCpuPtr[part*peaksArea+3];
                     for (auto candidate = 0 ; candidate < numberPartCandidates ; candidate++)
-                        candidates[part][candidate] = {partCandidatesPtr[3*candidate] * mScaleNetToOutput,
-                                                       partCandidatesPtr[3*candidate+1] * mScaleNetToOutput,
-                                                       partCandidatesPtr[3*candidate+2]};
+                        candidates[part][candidate] = {
+                            partCandidatesPtr[3*candidate] * mScaleNetToOutput,
+                            partCandidatesPtr[3*candidate+1] * mScaleNetToOutput,
+                            partCandidatesPtr[3*candidate+2]};
                 }
             }
             // Return

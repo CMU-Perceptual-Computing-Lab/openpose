@@ -38,12 +38,13 @@ namespace op
     void PoseExtractor::forwardPass(const std::vector<Array<float>>& inputNetData,
                                     const Point<int>& inputDataSize,
                                     const std::vector<double>& scaleInputToNetInputs,
+                                    const Array<float>& poseNetOutput,
                                     const long long frameId)
     {
         try
         {
             if (mTracking < 1 || frameId % (mTracking+1) == 0)
-                spPoseExtractorNet->forwardPass(inputNetData, inputDataSize, scaleInputToNetInputs);
+                spPoseExtractorNet->forwardPass(inputNetData, inputDataSize, scaleInputToNetInputs, poseNetOutput);
             else
                 spPoseExtractorNet->clear();
         }

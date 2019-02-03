@@ -23,6 +23,7 @@ namespace op
         try
         {
             #ifdef USE_CAFFE
+                // Construct spImpl
                 spImpl.reset(new ImplArrayCpuGpu{});
                 spImpl->upCaffeBlobT.reset(new caffe::Blob<T>{});
                 spImpl->pCaffeBlobT = spImpl->upCaffeBlobT.get();
@@ -42,10 +43,44 @@ namespace op
         try
         {
             #ifdef USE_CAFFE
+                // Construct spImpl
                 spImpl.reset(new ImplArrayCpuGpu{});
                 spImpl->pCaffeBlobT = (caffe::Blob<T>*)caffeBlobTPtr;
             #else
                 UNUSED(caffeBlobTPtr);
+                error(constructorErrorMessage, __LINE__, __FUNCTION__, __FILE__);
+            #endif
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    template<typename T>
+    ArrayCpuGpu<T>::ArrayCpuGpu(const Array<T>& array, const bool copyFromGpu)
+    {
+        try
+        {
+            #ifdef USE_CAFFE
+                // Construct spImpl
+                spImpl.reset(new ImplArrayCpuGpu{});
+                spImpl->upCaffeBlobT.reset(new caffe::Blob<T>{array.getSize()});
+                spImpl->pCaffeBlobT = spImpl->upCaffeBlobT.get();
+                // Copy data
+                // CPU copy
+                if (!copyFromGpu)
+                {
+                    const auto* const arrayPtr = array.getConstPtr();
+                    std::copy(arrayPtr, arrayPtr + array.getVolume(), spImpl->pCaffeBlobT->mutable_cpu_data());
+                }
+                // GPU copy
+                else
+                    error("Not implemented yet. Let us know you are interested on this function.",
+                          __LINE__, __FUNCTION__, __FILE__);
+            #else
+                UNUSED(array);
+                UNUSED(copyFromGpu);
                 error(constructorErrorMessage, __LINE__, __FUNCTION__, __FILE__);
             #endif
         }
@@ -61,6 +96,7 @@ namespace op
         try
         {
             #ifdef USE_CAFFE
+                // Construct spImpl
                 spImpl.reset(new ImplArrayCpuGpu{});
                 spImpl->upCaffeBlobT.reset(new caffe::Blob<T>{num, channels, height, width});
                 spImpl->pCaffeBlobT = spImpl->upCaffeBlobT.get();
@@ -283,6 +319,138 @@ namespace op
             return -1;
         }
     }
+
+    template<typename T>
+    int ArrayCpuGpu<T>::num() const
+    {
+        try
+        {
+            #ifdef USE_CAFFE
+                return spImpl->pCaffeBlobT->num();
+            #else
+                return -1;
+            #endif
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return -1;
+        }
+    }
+
+    template<typename T>
+    int ArrayCpuGpu<T>::channels() const
+    {
+        try
+        {
+            #ifdef USE_CAFFE
+                return spImpl->pCaffeBlobT->channels();
+            #else
+                return -1;
+            #endif
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return -1;
+        }
+    }
+
+    template<typename T>
+    int ArrayCpuGpu<T>::height() const
+    {
+        try
+        {
+            #ifdef USE_CAFFE
+                return spImpl->pCaffeBlobT->height();
+            #else
+                return -1;
+            #endif
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return -1;
+        }
+    }
+
+    template<typename T>
+    int ArrayCpuGpu<T>::width() const
+    {
+        try
+        {
+            #ifdef USE_CAFFE
+                return spImpl->pCaffeBlobT->width();
+            #else
+                return -1;
+            #endif
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return -1;
+        }
+    }
+
+    template<typename T>
+    int ArrayCpuGpu<T>::LegacyShape(const int index) const
+    {
+        try
+        {
+            #ifdef USE_CAFFE
+                return spImpl->pCaffeBlobT->LegacyShape(index);
+            #else
+                UNUSED(index);
+                return -1;
+            #endif
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return -1;
+        }
+    }
+
+    template<typename T>
+    int ArrayCpuGpu<T>::offset(const int n, const int c, const int h, const int w) const
+    {
+        try
+        {
+            #ifdef USE_CAFFE
+                return spImpl->pCaffeBlobT->offset(n, c, h, w);
+            #else
+                UNUSED(n);
+                UNUSED(c);
+                UNUSED(h);
+                UNUSED(w);
+                return -1;
+            #endif
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return -1;
+        }
+    }
+
+    // template<typename T>
+    // int ArrayCpuGpu<T>::offset(const std::vector<int>& indices) const
+    // {
+    //     try
+    //     {
+    //         #ifdef USE_CAFFE
+    //             return spImpl->pCaffeBlobT->offset(indices);
+    //         #else
+    //             UNUSED(indices);
+    //             return -1;
+    //         #endif
+    //     }
+    //     catch (const std::exception& e)
+    //     {
+    //         error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+    //         return -1;
+    //     }
+    // }
 
     template<typename T>
     T ArrayCpuGpu<T>::data_at(const int n, const int c, const int h, const int w) const
@@ -569,6 +737,112 @@ namespace op
         {
             #ifdef USE_CAFFE
                 spImpl->pCaffeBlobT->Update();
+            #endif
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    template<typename T>
+    T ArrayCpuGpu<T>::asum_data() const
+    {
+        try
+        {
+            #ifdef USE_CAFFE
+                return spImpl->pCaffeBlobT->asum_data();
+            #else
+                return T{0};
+            #endif
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return T{0};
+        }
+    }
+
+    template<typename T>
+    T ArrayCpuGpu<T>::asum_diff() const
+    {
+        try
+        {
+            #ifdef USE_CAFFE
+                return spImpl->pCaffeBlobT->asum_data();
+            #else
+                return T{0};
+            #endif
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return T{0};
+        }
+    }
+
+    template<typename T>
+    T ArrayCpuGpu<T>::sumsq_data() const
+    {
+        try
+        {
+            #ifdef USE_CAFFE
+                return spImpl->pCaffeBlobT->asum_data();
+            #else
+                return T{0};
+            #endif
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return T{0};
+        }
+    }
+
+    template<typename T>
+    T ArrayCpuGpu<T>::sumsq_diff() const
+    {
+        try
+        {
+            #ifdef USE_CAFFE
+                return spImpl->pCaffeBlobT->asum_data();
+            #else
+                return T{0};
+            #endif
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return T{0};
+        }
+    }
+
+    template<typename T>
+    void ArrayCpuGpu<T>::scale_data(const T scale_factor)
+    {
+        try
+        {
+            #ifdef USE_CAFFE
+                spImpl->pCaffeBlobT->scale_data(scale_factor);
+            #else
+                UNUSED(scale_factor);
+            #endif
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    template<typename T>
+    void ArrayCpuGpu<T>::scale_diff(const T scale_factor)
+    {
+        try
+        {
+            #ifdef USE_CAFFE
+                spImpl->pCaffeBlobT->scale_diff(scale_factor);
+            #else
+                UNUSED(scale_factor);
             #endif
         }
         catch (const std::exception& e)

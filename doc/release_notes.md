@@ -93,7 +93,7 @@ OpenPose Library - Release Notes
     6. Replaced all double quotes by angle brackets in include statements (issue #61).
     7. Added 3-D reconstruction demo.
     8. Auto-detection of the camera index.
-    9. Speed up of ~30% in op::floatPtrToUCharCvMat.
+    9. Speed up of ~30% in floatPtrToUCharCvMat.
     10. COCO extractor now extracts image ID from the image name itslef (format "string_%d"). Before, only working with validation test, now applicable to e.g., test sets.
     11. Changed display texts, added `OpenPose` name.
 2. Main bugs fixed:
@@ -158,7 +158,7 @@ OpenPose Library - Release Notes
     3. Heat maps scaling: Added `--heatmaps_scale` to OpenPoseDemo, added option not to scale the heatmaps, and added custom `float` format to save heatmaps in floating format.
     4. Detector of the number of GPU also considers the initial GPU index given by the user.
     5. Added `--write_json` as new version of `--write_keypoint_json`. It includes the body part candidates (if enabled), as well as any extra information added in the future (e.g., person ID).
-    6. Body part candidates can be retrieved in op::Datum and saved with `--write_json`.
+    6. Body part candidates can be retrieved in Datum and saved with `--write_json`.
 2. Functions or parameters renamed:
     1. `PoseParameters` splitted into `PoseParameters` and `PoseParametersRender` and const parameters turned into functions for more clarity.
 3. Main bugs fixed:
@@ -239,7 +239,7 @@ OpenPose Library - Release Notes
     15. GUI includes the capability of dynamically enable/disable the face, hand, and 3-D rendering, as well as more clear visualization for skeleton, background, heatmap addition, and PAF addition channels.
     16. When GUI changes some parameter from PoseExtractorNet, there is a log to notify the user of the change.
     17. Deprecated flag `--write_keypoint_json` removed (`--write_json` is the equivalent since version 1.2.1).
-    18. Speed up of cvMatToOpOutput and opOutputToCvMat: op::Datum::outputData is now H x W x C instead of C x H x W, making it much faster to be copied to/from op::Datum::cvOutputData.
+    18. Speed up of cvMatToOpOutput and opOutputToCvMat: Datum::outputData is now H x W x C instead of C x H x W, making it much faster to be copied to/from Datum::cvOutputData.
     19. Much faster GUI display by adding the `WITH_OPENCV_WITH_OPENGL` flag to tell whether to use OpenGL support for OpenCV.
     20. Turned sanity check error into warning when using dynamic `net_resolution` for `image_dir` in CPU/OpenCL versions.
     21. Minimized CPU usage when queues are empty or full, in order to prevent problems such as general computer slow down, overheating, or excesive power usage.
@@ -317,6 +317,7 @@ OpenPose Library - Release Notes
     34. Maximum queue size per OpenPose thread is configurable through the Wrapper class.
     35. Added pre-processing capabilities to Wrapper (WorkerType::PreProcessing), which will be run right after the image has been read.
     36. Removed boost::shared_ptr and caffe::Blob dependencies from the headers. No 3rdparty dependencies left on headers (except dim3 for CUDA).
+    37. Added `poseNetOutput` to Datum so that user can introduce his custom network output.
 2. Functions or parameters renamed:
     1. By default, python example `tutorial_developer/python_2_pose_from_heatmaps.py` was using 2 scales starting at -1x736, changed to 1 scale at -1x368.
     2. WrapperStructPose default parameters changed to match those of the OpenPose demo binary.

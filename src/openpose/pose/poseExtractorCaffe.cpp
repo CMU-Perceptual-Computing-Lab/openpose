@@ -216,7 +216,8 @@ namespace op
                 // Initialize Caffe net
                 addCaffeNetOnThread(
                     upImpl->spNets, upImpl->spCaffeNetOutputBlobs, upImpl->mPoseModel, upImpl->mGpuId,
-                    upImpl->mModelFolder, upImpl->mProtoTxtPath, upImpl->mCaffeModelPath, upImpl->mEnableGoogleLogging);
+                    upImpl->mModelFolder, upImpl->mProtoTxtPath, upImpl->mCaffeModelPath,
+                    upImpl->mEnableGoogleLogging);
                 #ifdef USE_CUDA
                     cudaCheck(__LINE__, __FUNCTION__, __FILE__);
                 #endif
@@ -238,9 +239,9 @@ namespace op
         }
     }
 
-    void PoseExtractorCaffe::forwardPass(const std::vector<Array<float>>& inputNetData,
-                                         const Point<int>& inputDataSize,
-                                         const std::vector<double>& scaleInputToNetInputs)
+    void PoseExtractorCaffe::forwardPass(
+        const std::vector<Array<float>>& inputNetData, const Point<int>& inputDataSize,
+        const std::vector<double>& scaleInputToNetInputs, const Array<float>& poseNetOutput)
     {
         try
         {
@@ -264,34 +265,45 @@ namespace op
                         upImpl->mModelFolder, upImpl->mProtoTxtPath, upImpl->mCaffeModelPath, false);
 
                 // Process each image
-                for (auto i = 0u ; i < inputNetData.size(); i++)
+                if (poseNetOutput.empty())
                 {
-                    // 1. Caffe deep network
-                    // ~80ms
-                    upImpl->spNets.at(i)->forwardPass(inputNetData[i]);
-
-                    // Reshape blobs if required
-                    // Note: In order to resize to input size to have same results as Matlab, uncomment the commented
-                    // lines
-                    // Note: For dynamic sizes (e.g., a folder with images of different aspect ratio)
-                    const auto changedVectors = !vectorsAreEqual(
-                        upImpl->mNetInput4DSizes.at(i), inputNetData[i].getSize());
-                    if (changedVectors)
-                        // || !vectorsAreEqual(upImpl->mScaleInputToNetInputs, scaleInputToNetInputs))
+                    for (auto i = 0u ; i < inputNetData.size(); i++)
                     {
-                        upImpl->mNetInput4DSizes.at(i) = inputNetData[i].getSize();
-                        // upImpl->mScaleInputToNetInputs = scaleInputToNetInputs;
-                        reshapePoseExtractorCaffe(upImpl->spResizeAndMergeCaffe, upImpl->spNmsCaffe,
-                                                  upImpl->spBodyPartConnectorCaffe, upImpl->spMaximumCaffe,
-                                                  upImpl->spCaffeNetOutputBlobs, upImpl->spHeatMapsBlob,
-                                                  upImpl->spPeaksBlob, upImpl->spMaximumPeaksBlob,
-                                                  1.f, upImpl->mPoseModel, upImpl->mGpuId);
-                                                  // scaleInputToNetInputs[i] vs. 1.f
+                        // 1. Caffe deep network
+                        // ~80ms
+                        upImpl->spNets.at(i)->forwardPass(inputNetData[i]);
+
+                        // Reshape blobs if required
+                        // Note: In order to resize to input size to have same results as Matlab, uncomment the
+                        // commented lines
+                        // Note: For dynamic sizes (e.g., a folder with images of different aspect ratio)
+                        const auto changedVectors = !vectorsAreEqual(
+                            upImpl->mNetInput4DSizes.at(i), inputNetData[i].getSize());
+                        if (changedVectors)
+                            // || !vectorsAreEqual(upImpl->mScaleInputToNetInputs, scaleInputToNetInputs))
+                        {
+                            upImpl->mNetInput4DSizes.at(i) = inputNetData[i].getSize();
+                            // upImpl->mScaleInputToNetInputs = scaleInputToNetInputs;
+                            reshapePoseExtractorCaffe(upImpl->spResizeAndMergeCaffe, upImpl->spNmsCaffe,
+                                                      upImpl->spBodyPartConnectorCaffe, upImpl->spMaximumCaffe,
+                                                      upImpl->spCaffeNetOutputBlobs, upImpl->spHeatMapsBlob,
+                                                      upImpl->spPeaksBlob, upImpl->spMaximumPeaksBlob,
+                                                      1.f, upImpl->mPoseModel, upImpl->mGpuId);
+                                                      // scaleInputToNetInputs[i] vs. 1.f
+                        }
+                        // Get scale net to output (i.e., image input)
+                        if (changedVectors || TOP_DOWN_REFINEMENT)
+                            mNetOutputSize = Point<int>{upImpl->mNetInput4DSizes[0][3],
+                                                        upImpl->mNetInput4DSizes[0][2]};
                     }
-                    // Get scale net to output (i.e., image input)
-                    if (changedVectors || TOP_DOWN_REFINEMENT)
-                        mNetOutputSize = Point<int>{upImpl->mNetInput4DSizes[0][3],
-                                                    upImpl->mNetInput4DSizes[0][2]};
+                }
+                // If custom network output
+                else
+                {
+                    upImpl->spCaffeNetOutputBlobs.clear();
+                    const bool copyFromGpu = false;
+                    upImpl->spCaffeNetOutputBlobs.emplace_back(
+                        std::make_shared<ArrayCpuGpu<float>>(poseNetOutput, copyFromGpu));
                 }
                 // 2. Resize heat maps + merge different scales
                 // ~5ms (GPU) / ~20ms (CPU)
