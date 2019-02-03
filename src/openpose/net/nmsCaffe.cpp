@@ -14,12 +14,12 @@ namespace op
     struct NmsCaffe<T>::ImplNmsCaffe
     {
         #ifdef USE_CAFFE
-            caffe::Blob<int> mKernelBlob;
+            ArrayCpuGpu<int> mKernelBlob;
             std::array<int, 4> mBottomSize;
             std::array<int, 4> mTopSize;
             // Special Kernel for OpenCL NMS
             #if defined USE_CAFFE && defined USE_OPENCL
-                //std::shared_ptr<caffe::Blob<uint8_t>> mKernelBlobT;
+                //std::shared_ptr<ArrayCpuGpu<uint8_t>> mKernelBlobT;
                 uint8_t* mKernelGpuPtr;
                 uint8_t* mKernelCpuPtr;
             #endif
@@ -65,7 +65,7 @@ namespace op
     }
 
     template <typename T>
-    void NmsCaffe<T>::LayerSetUp(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top)
+    void NmsCaffe<T>::LayerSetUp(const std::vector<ArrayCpuGpu<T>*>& bottom, const std::vector<ArrayCpuGpu<T>*>& top)
     {
         try
         {
@@ -86,7 +86,7 @@ namespace op
     }
 
     template <typename T>
-    void NmsCaffe<T>::Reshape(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top,
+    void NmsCaffe<T>::Reshape(const std::vector<ArrayCpuGpu<T>*>& bottom, const std::vector<ArrayCpuGpu<T>*>& top,
                               const int maxPeaks, const int outputChannels, const int gpuID)
     {
         try
@@ -127,6 +127,8 @@ namespace op
                 UNUSED(bottom);
                 UNUSED(top);
                 UNUSED(maxPeaks);
+                UNUSED(outputChannels);
+                UNUSED(gpuID);
             #endif
         }
         catch (const std::exception& e)
@@ -162,7 +164,7 @@ namespace op
     }
 
     template <typename T>
-    void NmsCaffe<T>::Forward(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top)
+    void NmsCaffe<T>::Forward(const std::vector<ArrayCpuGpu<T>*>& bottom, const std::vector<ArrayCpuGpu<T>*>& top)
     {
         try
         {
@@ -184,7 +186,7 @@ namespace op
     }
 
     template <typename T>
-    void NmsCaffe<T>::Forward_cpu(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top)
+    void NmsCaffe<T>::Forward_cpu(const std::vector<ArrayCpuGpu<T>*>& bottom, const std::vector<ArrayCpuGpu<T>*>& top)
     {
         try
         {
@@ -203,7 +205,7 @@ namespace op
     }
 
     template <typename T>
-    void NmsCaffe<T>::Forward_gpu(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top)
+    void NmsCaffe<T>::Forward_gpu(const std::vector<ArrayCpuGpu<T>*>& bottom, const std::vector<ArrayCpuGpu<T>*>& top)
     {
         try
         {
@@ -224,7 +226,7 @@ namespace op
     }
 
     template <typename T>
-    void NmsCaffe<T>::Forward_ocl(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top)
+    void NmsCaffe<T>::Forward_ocl(const std::vector<ArrayCpuGpu<T>*>& bottom, const std::vector<ArrayCpuGpu<T>*>& top)
     {
         try
         {
@@ -246,8 +248,8 @@ namespace op
     }
 
     template <typename T>
-    void NmsCaffe<T>::Backward_cpu(const std::vector<caffe::Blob<T>*>& top, const std::vector<bool>& propagate_down,
-                                   const std::vector<caffe::Blob<T>*>& bottom)
+    void NmsCaffe<T>::Backward_cpu(const std::vector<ArrayCpuGpu<T>*>& top, const std::vector<bool>& propagate_down,
+                                   const std::vector<ArrayCpuGpu<T>*>& bottom)
     {
         try
         {
@@ -265,8 +267,8 @@ namespace op
     }
 
     template <typename T>
-    void NmsCaffe<T>::Backward_gpu(const std::vector<caffe::Blob<T>*>& top, const std::vector<bool>& propagate_down,
-                                   const std::vector<caffe::Blob<T>*>& bottom)
+    void NmsCaffe<T>::Backward_gpu(const std::vector<ArrayCpuGpu<T>*>& top, const std::vector<bool>& propagate_down,
+                                   const std::vector<ArrayCpuGpu<T>*>& bottom)
     {
         try
         {

@@ -5,6 +5,10 @@
 #include <openpose/flags.hpp>
 // OpenPose dependencies
 #include <openpose/headers.hpp>
+// Caffe dependencies
+#ifdef USE_CAFFE
+    #include <caffe/blob.hpp>
+#endif
 // OpenCL dependencies
 #ifdef USE_OPENCL
 #include <openpose/gpu/opencl.hcl>
@@ -72,7 +76,8 @@ DEFINE_string(image_path,               "examples/media/COCO_val2014_00000000019
 
 typedef cl::KernelFunctor<cl::Buffer, int, int, float> ScaleFunctor;
 const std::string scaleKernelString = MULTI_LINE_STRING(
-            __kernel void scaleKernel(__global float* targetPtr, const int targetWidth, const int targetHeight, const float scale)
+            __kernel void scaleKernel(__global float* targetPtr, const int targetWidth, const int targetHeight,
+                                      const float scale)
 {
                 int x = get_global_id(0);
                 int y = get_global_id(1);
@@ -111,7 +116,8 @@ int clTest()
         std::unique_ptr<caffe::Net<float>> upCaffeNet;
         caffe::Caffe::set_mode(caffe::Caffe::GPU);
         caffe::Caffe::SelectDevice(0, true);
-        upCaffeNet.reset(new caffe::Net<float>{"models/pose/coco/pose_deploy_linevec.prototxt", caffe::TEST, caffe::Caffe::GetDefaultDevice()});
+        upCaffeNet.reset(new caffe::Net<float>{
+            "models/pose/coco/pose_deploy_linevec.prototxt", caffe::TEST, caffe::Caffe::GetDefaultDevice()});
         upCaffeNet->CopyTrainedLayersFrom("models/pose/coco/pose_iter_440000.caffemodel");
         op::OpenCL::getInstance(0, CL_DEVICE_TYPE_GPU, true);
 
@@ -125,19 +131,16 @@ int clTest()
         blob_proto.set_height(imgResize.size().width);
         blob_proto.set_width(imgResize.size().height);
         blob_proto.clear_data();
-        for (int c = 0; c < 3; ++c) {
-            for (int h = 0; h < imgResize.size().height; ++h) {
-                for (int w = 0; w < imgResize.size().width; ++w) {
+        for (int c = 0; c < 3; ++c)
+            for (int h = 0; h < imgResize.size().height; ++h)
+                for (int w = 0; w < imgResize.size().width; ++w)
                     blob_proto.add_data(imgResize.at<cv::Vec3f>(h, w)[c]);
-                }
-            }
-        }
         blob_proto.set_num(1);
         caffe::Blob<float>* input_layer = upCaffeNet->input_blobs()[0];
         input_layer->FromProto(blob_proto);
         upCaffeNet->Forward(0);
 
-        boost::shared_ptr<caffe::Blob<float> > output_blob = upCaffeNet->blob_by_name("net_output");
+        boost::shared_ptr<caffe::Blob<float>> output_blob = upCaffeNet->blob_by_name("net_output");
 
         // Test
         cl::Device& device = op::OpenCL::getInstance(0)->getDevice();
@@ -156,8 +159,9 @@ int clTest()
             // Read it
             // Read back image to GPU
             float* heatmaps = new float[output_blob->shape()[1] * output_blob->shape()[2] * output_blob->shape()[3]];
-            op::OpenCL::getInstance(0)->getQueue().enqueueReadBuffer(outputBuffer, CL_TRUE, 0,
-                                                                     output_blob->shape()[1] * output_blob->shape()[2] * output_blob->shape()[3] * sizeof(float), heatmaps);
+            op::OpenCL::getInstance(0)->getQueue().enqueueReadBuffer(
+                outputBuffer, CL_TRUE, 0,
+                output_blob->shape()[1] * output_blob->shape()[2] * output_blob->shape()[3] * sizeof(float), heatmaps);
 
             int heatmapChannels = output_blob->shape()[1];
             int shape = output_blob->shape()[2] * output_blob->shape()[3];
@@ -172,11 +176,11 @@ int clTest()
             }
         }
         #if defined(USE_OPENCL) && defined(CL_HPP_ENABLE_EXCEPTIONS)
-        catch (const cl::Error& e)
-        {
-            op::error(std::string(e.what()) + " : " + op::OpenCL::clErrorToString(e.err()) + " ID: " +
-                      std::to_string(0), __LINE__, __FUNCTION__, __FILE__);
-        }
+            catch (const cl::Error& e)
+            {
+                op::error(std::string(e.what()) + " : " + op::OpenCL::clErrorToString(e.err()) + " ID: " +
+                          std::to_string(0), __LINE__, __FUNCTION__, __FILE__);
+            }
         #endif
         catch (const std::exception& e)
         {
@@ -223,6 +227,6 @@ int main()
 #else
     op::error("OpenPose must be compiled with the `USE_CAFFE` & `USE_OPENCL` macro definitions in order to run"
               " this functionality.", __LINE__, __FUNCTION__, __FILE__);
-    return 0;
+    return -1;
 #endif
 }

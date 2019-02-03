@@ -44,43 +44,50 @@ namespace op
                 mCaffeTrainedModel{caffeTrainedModel},
                 mLastBlobName{lastBlobName}
             {
-                const std::string message{".\nPossible causes:\n\t1. Not downloading the OpenPose trained models."
-                                          "\n\t2. Not running OpenPose from the same directory where the `model`"
-                                          " folder is located.\n\t3. Using paths with spaces."};
-                if (!existFile(mCaffeProto))
-                    error("Prototxt file not found: " + mCaffeProto + message, __LINE__, __FUNCTION__, __FILE__);
-                if (!existFile(mCaffeTrainedModel))
-                    error("Caffe trained model file not found: " + mCaffeTrainedModel + message,
-                          __LINE__, __FUNCTION__, __FILE__);
-                // Double if condition in order to speed up the program if it is called several times
-                if (enableGoogleLogging && !sGoogleLoggingInitialized)
+                try
                 {
-                    std::lock_guard<std::mutex> lock{sMutexNetCaffe};
+                    const std::string message{".\nPossible causes:\n\t1. Not downloading the OpenPose trained models."
+                                              "\n\t2. Not running OpenPose from the same directory where the `model`"
+                                              " folder is located.\n\t3. Using paths with spaces."};
+                    if (!existFile(mCaffeProto))
+                        error("Prototxt file not found: " + mCaffeProto + message, __LINE__, __FUNCTION__, __FILE__);
+                    if (!existFile(mCaffeTrainedModel))
+                        error("Caffe trained model file not found: " + mCaffeTrainedModel + message,
+                              __LINE__, __FUNCTION__, __FILE__);
+                    // Double if condition in order to speed up the program if it is called several times
                     if (enableGoogleLogging && !sGoogleLoggingInitialized)
                     {
-                        google::InitGoogleLogging("OpenPose");
-                        sGoogleLoggingInitialized = true;
-                    }
-                }
-                #ifdef USE_OPENCL
-                    // Initialize OpenCL
-                    if (!sOpenCLInitialized)
-                    {
                         std::lock_guard<std::mutex> lock{sMutexNetCaffe};
-                        if (!sOpenCLInitialized)
+                        if (enableGoogleLogging && !sGoogleLoggingInitialized)
                         {
-                            caffe::Caffe::set_mode(caffe::Caffe::GPU);
-                            std::vector<int> devices;
-                            const int maxNumberGpu = OpenCL::getTotalGPU();
-                            for (auto i = 0; i < maxNumberGpu; i++)
-                                devices.emplace_back(i);
-                            caffe::Caffe::SetDevices(devices);
-                            if (mGpuId >= maxNumberGpu)
-                                error("Unexpected error. Please, notify us.", __LINE__, __FUNCTION__, __FILE__);
-                            sOpenCLInitialized = true;
+                            google::InitGoogleLogging("OpenPose");
+                            sGoogleLoggingInitialized = true;
                         }
                     }
-                #endif
+                    #ifdef USE_OPENCL
+                        // Initialize OpenCL
+                        if (!sOpenCLInitialized)
+                        {
+                            std::lock_guard<std::mutex> lock{sMutexNetCaffe};
+                            if (!sOpenCLInitialized)
+                            {
+                                caffe::Caffe::set_mode(caffe::Caffe::GPU);
+                                std::vector<int> devices;
+                                const int maxNumberGpu = OpenCL::getTotalGPU();
+                                for (auto i = 0; i < maxNumberGpu; i++)
+                                    devices.emplace_back(i);
+                                caffe::Caffe::SetDevices(devices);
+                                if (mGpuId >= maxNumberGpu)
+                                    error("Unexpected error. Please, notify us.", __LINE__, __FUNCTION__, __FILE__);
+                                sOpenCLInitialized = true;
+                            }
+                        }
+                    #endif
+                }
+                catch (const std::exception& e)
+                {
+                    error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+                }
             }
         #endif
     };
@@ -113,10 +120,10 @@ namespace op
         try
         {
             #ifndef USE_CAFFE
-                UNUSED(netInputSize4D);
                 UNUSED(caffeProto);
                 UNUSED(caffeTrainedModel);
                 UNUSED(gpuId);
+                UNUSED(enableGoogleLogging);
                 UNUSED(lastBlobName);
                 error("OpenPose must be compiled with the `USE_CAFFE` macro definition in order to use this"
                       " functionality.", __LINE__, __FUNCTION__, __FILE__);
@@ -166,6 +173,7 @@ namespace op
                 #endif
                 // Set spOutputBlob
                 upImpl->spOutputBlob = upImpl->upCaffeNet->blob_by_name(upImpl->mLastBlobName);
+                // Sanity check
                 if (upImpl->spOutputBlob == nullptr)
                     error("The output blob is a nullptr. Did you use the same name than the prototxt? (Used: "
                           + upImpl->mLastBlobName + ").", __LINE__, __FUNCTION__, __FILE__);
@@ -227,12 +235,12 @@ namespace op
         }
     }
 
-    boost::shared_ptr<caffe::Blob<float>> NetCaffe::getOutputBlob() const
+    std::shared_ptr<ArrayCpuGpu<float>> NetCaffe::getOutputBlobArray() const
     {
         try
         {
             #ifdef USE_CAFFE
-                return upImpl->spOutputBlob;
+                return std::make_shared<ArrayCpuGpu<float>>(upImpl->spOutputBlob.get());
             #else
                 return nullptr;
             #endif

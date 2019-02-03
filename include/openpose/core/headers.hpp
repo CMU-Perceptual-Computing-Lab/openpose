@@ -3,6 +3,7 @@
 
 // core module
 #include <openpose/core/array.hpp>
+#include <openpose/core/arrayCpuGpu.hpp>
 #include <openpose/core/common.hpp>
 #include <openpose/core/cvMatToOpInput.hpp>
 #include <openpose/core/cvMatToOpOutput.hpp>

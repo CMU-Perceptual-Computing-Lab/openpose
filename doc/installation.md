@@ -48,14 +48,14 @@ This installation section is only intended if you plan to modify the OpenPose co
 
 ## Requirements and Dependencies
 - **Requirements** for the default configuration (you might need more resources with a greater `--net_resolution` and/or `scale_number` or less resources by reducing the net resolution and/or using the MPI and MPI_4 models):
-    - Nvidia GPU version:
+    - CUDA (Nvidia GPU) version:
         - NVIDIA graphics card with at least 1.6 GB available (the `nvidia-smi` command checks the available GPU memory in Ubuntu).
         - At least 2.5 GB of free RAM memory for BODY_25 model or 2 GB for COCO model (assuming cuDNN installed).
         - Highly recommended: cuDNN.
-    - AMD GPU version:
+    - OpenCL (AMD GPU) version:
         - Vega series graphics card
         - At least 2 GB of free RAM memory.
-    - CPU version:
+    - CPU-only (no GPU) version:
         - Around 8GB of free RAM memory.
     - Highly recommended: a CPU with at least 8 cores.
 - **Dependencies**:

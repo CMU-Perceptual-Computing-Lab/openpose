@@ -4,8 +4,8 @@
 
 -----------------
 
-|                 | `Python (CUDA GPU)` | `Python (CPU)` | `CUDA GPU` | `CPU`  | `Debug mode` |
-| :---:           | :---:               | :---:          | :---:      |:---:   | :---:        |
+|                 | `Python (CUDA GPU)` | `Python (CPU)` | `CUDA GPU` | `CPU` | `Debug mode` |
+| :---:           | :---:               | :---:          | :---:      |:---:  | :---:        |
 | **`Linux`**     | [![Status](https://travis-matrix-badges.herokuapp.com/repos/CMU-Perceptual-Computing-Lab/openpose/branches/master/1)](https://travis-ci.org/CMU-Perceptual-Computing-Lab/openpose) | [![Status](https://travis-matrix-badges.herokuapp.com/repos/CMU-Perceptual-Computing-Lab/openpose/branches/master/2)](https://travis-ci.org/CMU-Perceptual-Computing-Lab/openpose) | [![Status](https://travis-matrix-badges.herokuapp.com/repos/CMU-Perceptual-Computing-Lab/openpose/branches/master/3)](https://travis-ci.org/CMU-Perceptual-Computing-Lab/openpose) | [![Status](https://travis-matrix-badges.herokuapp.com/repos/CMU-Perceptual-Computing-Lab/openpose/branches/master/4)](https://travis-ci.org/CMU-Perceptual-Computing-Lab/openpose) | [![Status](https://travis-matrix-badges.herokuapp.com/repos/CMU-Perceptual-Computing-Lab/openpose/branches/master/5)](https://travis-ci.org/CMU-Perceptual-Computing-Lab/openpose) |
 | **`MacOS`**     | | [![Status](https://travis-matrix-badges.herokuapp.com/repos/CMU-Perceptual-Computing-Lab/openpose/branches/master/6)](https://travis-ci.org/CMU-Perceptual-Computing-Lab/openpose) | | [![Status](https://travis-matrix-badges.herokuapp.com/repos/CMU-Perceptual-Computing-Lab/openpose/branches/master/7)](https://travis-ci.org/CMU-Perceptual-Computing-Lab/openpose) | [![Status](https://travis-matrix-badges.herokuapp.com/repos/CMU-Perceptual-Computing-Lab/openpose/branches/master/8)](https://travis-ci.org/CMU-Perceptual-Computing-Lab/openpose) |
 <!-- | **`Windows`**   | | | | | | -->
@@ -46,7 +46,7 @@ It is **authored by [Gines Hidalgo](https://www.gineshidalgo.com), [Zhe Cao](htt
     - Available: command-line demo, C++ wrapper, and C++ API.
     - [**Python API**](doc/modules/python_module.md).
     - [**Unity Plugin**](https://github.com/CMU-Perceptual-Computing-Lab/openpose_unity_plugin).
-    - CUDA (Nvidia GPU), OpenCL (AMD GPU), and CPU versions.
+    - CUDA (Nvidia GPU), OpenCL (AMD GPU), and CPU-only (no GPU) versions.
     - Training code included in the [**original CVPR 2017 GitHub repository**](https://github.com/ZheC/Multi-Person-Pose-Estimation).
 
 

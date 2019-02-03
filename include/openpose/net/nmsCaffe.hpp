@@ -16,9 +16,9 @@ namespace op
 
         virtual ~NmsCaffe();
 
-        virtual void LayerSetUp(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top);
+        virtual void LayerSetUp(const std::vector<ArrayCpuGpu<T>*>& bottom, const std::vector<ArrayCpuGpu<T>*>& top);
 
-        virtual void Reshape(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top,
+        virtual void Reshape(const std::vector<ArrayCpuGpu<T>*>& bottom, const std::vector<ArrayCpuGpu<T>*>& top,
                              const int maxPeaks, const int outputChannels = -1, const int gpuID = 0);
 
         virtual inline const char* type() const { return "Nms"; }
@@ -28,19 +28,19 @@ namespace op
         // Empirically gives better results (copied from Matlab original code)
         void setOffset(const Point<T>& offset);
 
-        virtual void Forward(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top);
+        virtual void Forward(const std::vector<ArrayCpuGpu<T>*>& bottom, const std::vector<ArrayCpuGpu<T>*>& top);
 
-        virtual void Forward_cpu(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top);
+        virtual void Forward_cpu(const std::vector<ArrayCpuGpu<T>*>& bottom, const std::vector<ArrayCpuGpu<T>*>& top);
 
-        virtual void Forward_gpu(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top);
+        virtual void Forward_gpu(const std::vector<ArrayCpuGpu<T>*>& bottom, const std::vector<ArrayCpuGpu<T>*>& top);
 
-        virtual void Forward_ocl(const std::vector<caffe::Blob<T>*>& bottom, const std::vector<caffe::Blob<T>*>& top);
+        virtual void Forward_ocl(const std::vector<ArrayCpuGpu<T>*>& bottom, const std::vector<ArrayCpuGpu<T>*>& top);
 
-        virtual void Backward_cpu(const std::vector<caffe::Blob<T>*>& top, const std::vector<bool>& propagate_down,
-                                  const std::vector<caffe::Blob<T>*>& bottom);
+        virtual void Backward_cpu(const std::vector<ArrayCpuGpu<T>*>& top, const std::vector<bool>& propagate_down,
+                                  const std::vector<ArrayCpuGpu<T>*>& bottom);
 
-        virtual void Backward_gpu(const std::vector<caffe::Blob<T>*>& top, const std::vector<bool>& propagate_down,
-                                  const std::vector<caffe::Blob<T>*>& bottom);
+        virtual void Backward_gpu(const std::vector<ArrayCpuGpu<T>*>& top, const std::vector<bool>& propagate_down,
+                                  const std::vector<ArrayCpuGpu<T>*>& bottom);
 
     private:
         T mThreshold;

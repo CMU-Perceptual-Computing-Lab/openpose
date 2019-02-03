@@ -18,7 +18,7 @@ This module exposes a Python API for OpenPose. It is effectively a wrapper that 
 ## Compatibility
 The OpenPose Python module is compatible with both Python 2 and Python 3 (default and recommended). In addition, it will also run in all OpenPose compatible operating systems. It uses [Pybind11](https://github.com/pybind/pybind11) for mapping between C++ and Python datatypes.
 
-To compile, enable `BUILD_PYTHON` in CMake-gui. In Windows, make sure you compile the whole solution (clicking the green play button does not compile the whole solution!). You can do that by right-click on the OpenPose project solution, and clicking in `Build solution`.
+To compile, enable `BUILD_PYTHON` in CMake-gui. In Windows, make sure you compile the whole solution (clicking the green play button does not compile the whole solution!). You can do that by right-click on the OpenPose project solution, and clicking in `Build Solution` (or individually building the PyOpenPose module).
 
 Pybind selects the latest version of Python by default (Python 3). To use Python 2, change `PYTHON_EXECUTABLE` and `PYTHON_LIBRARY` flags in CMake-gui to your desired Python version.
 

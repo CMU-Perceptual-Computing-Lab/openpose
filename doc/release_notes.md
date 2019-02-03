@@ -316,6 +316,7 @@ OpenPose Library - Release Notes
     33. Added the flags `--face_detector` and `--hand_detector`, that enable the user to select the face/hand rectangle detector that is used for the later face/hand keypoint detection. It includes OpenCV (for face), and also allows the user to provide its own input. Flag `--hand_tracking` is removed and integrated into this flag too.
     34. Maximum queue size per OpenPose thread is configurable through the Wrapper class.
     35. Added pre-processing capabilities to Wrapper (WorkerType::PreProcessing), which will be run right after the image has been read.
+    36. Removed boost::shared_ptr and caffe::Blob dependencies from the headers. No 3rdparty dependencies left on headers (except dim3 for CUDA).
 2. Functions or parameters renamed:
     1. By default, python example `tutorial_developer/python_2_pose_from_heatmaps.py` was using 2 scales starting at -1x736, changed to 1 scale at -1x368.
     2. WrapperStructPose default parameters changed to match those of the OpenPose demo binary.

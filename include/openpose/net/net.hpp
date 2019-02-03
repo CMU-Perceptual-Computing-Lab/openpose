@@ -13,6 +13,8 @@ namespace op
         virtual void initializationOnThread() = 0;
 
         virtual void forwardPass(const Array<float>& inputData) const = 0;
+
+        virtual std::shared_ptr<ArrayCpuGpu<float>> getOutputBlobArray() const = 0;
     };
 }
 

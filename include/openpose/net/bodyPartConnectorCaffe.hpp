@@ -17,7 +17,7 @@ namespace op
 
         virtual ~BodyPartConnectorCaffe();
 
-        virtual void Reshape(const std::vector<caffe::Blob<T>*>& bottom, const int gpuID = 0);
+        virtual void Reshape(const std::vector<ArrayCpuGpu<T>*>& bottom, const int gpuID = 0);
 
         virtual inline const char* type() const { return "BodyPartConnector"; }
 
@@ -35,23 +35,23 @@ namespace op
 
         void setScaleNetToOutput(const T scaleNetToOutput);
 
-        virtual void Forward(const std::vector<caffe::Blob<T>*>& bottom, Array<T>& poseKeypoints,
+        virtual void Forward(const std::vector<ArrayCpuGpu<T>*>& bottom, Array<T>& poseKeypoints,
                              Array<T>& poseScores);
 
-        virtual void Forward_cpu(const std::vector<caffe::Blob<T>*>& bottom, Array<T>& poseKeypoints,
+        virtual void Forward_cpu(const std::vector<ArrayCpuGpu<T>*>& bottom, Array<T>& poseKeypoints,
                                  Array<T>& poseScores);
 
-        virtual void Forward_gpu(const std::vector<caffe::Blob<T>*>& bottom, Array<T>& poseKeypoints,
+        virtual void Forward_gpu(const std::vector<ArrayCpuGpu<T>*>& bottom, Array<T>& poseKeypoints,
                                  Array<T>& poseScores);
 
-        virtual void Forward_ocl(const std::vector<caffe::Blob<T>*>& bottom, Array<T>& poseKeypoints,
+        virtual void Forward_ocl(const std::vector<ArrayCpuGpu<T>*>& bottom, Array<T>& poseKeypoints,
                                  Array<T>& poseScores);
 
-        virtual void Backward_cpu(const std::vector<caffe::Blob<T>*>& top, const std::vector<bool>& propagate_down,
-                                  const std::vector<caffe::Blob<T>*>& bottom);
+        virtual void Backward_cpu(const std::vector<ArrayCpuGpu<T>*>& top, const std::vector<bool>& propagate_down,
+                                  const std::vector<ArrayCpuGpu<T>*>& bottom);
 
-        virtual void Backward_gpu(const std::vector<caffe::Blob<T>*>& top, const std::vector<bool>& propagate_down,
-                                  const std::vector<caffe::Blob<T>*>& bottom);
+        virtual void Backward_gpu(const std::vector<ArrayCpuGpu<T>*>& top, const std::vector<bool>& propagate_down,
+                                  const std::vector<ArrayCpuGpu<T>*>& bottom);
 
     private:
         PoseModel mPoseModel;

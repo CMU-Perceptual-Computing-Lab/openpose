@@ -15,7 +15,7 @@
 
     cv::Mat gpuResize(cv::Mat& img, const cv::Size& newSize)
     {
-        #ifdef USE_CUDA
+        #if defined USE_CAFFE && defined USE_CUDA
             // Upload to Source to GPU
             float* cpuPtr = &img.at<float>(0);
             float* gpuPtr;
@@ -49,6 +49,7 @@
             UNUSED(newSize);
             op::error("OpenPose must be compiled with the `USE_CAFFE` & `USE_CUDA` macro definitions in order to run"
                   " this functionality.", __LINE__, __FUNCTION__, __FILE__);
+            return cv::Mat();
         #endif
     }
 
