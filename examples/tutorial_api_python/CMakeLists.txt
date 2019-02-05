@@ -7,3 +7,4 @@ configure_file(4_keypoints_from_images_multi_gpu.py 4_keypoints_from_images_mult
 configure_file(5_heatmaps_from_image.py 5_heatmaps_from_image.py)
 configure_file(6_face_from_image.py 6_face_from_image.py)
 configure_file(7_hand_from_image.py 7_hand_from_image.py)
+configure_file(8_heatmaps_to_pose.py 8_heatmaps_to_pose.py)

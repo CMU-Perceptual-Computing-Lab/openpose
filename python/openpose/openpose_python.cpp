@@ -201,7 +201,7 @@ PYBIND11_MODULE(pyopenpose, m) {
     py::class_<WrapperPython>(m, "WrapperPython")
         .def(py::init<>())
         .def(py::init<int>())
-        .def("configure", &WrapperPython::configure)
+        .def("configure", &WrapperPython::configure,"A function")
         .def("start", &WrapperPython::start)
         .def("stop", &WrapperPython::stop)
         .def("execute", &WrapperPython::exec)
@@ -246,6 +246,7 @@ PYBIND11_MODULE(pyopenpose, m) {
         .def_readwrite("netOutputSize", &op::Datum::netOutputSize)
         .def_readwrite("scaleNetToOutput", &op::Datum::scaleNetToOutput)
         .def_readwrite("elementRendered", &op::Datum::elementRendered)
+        .def_readwrite("poseNetOutput", &op::Datum::poseNetOutput)
         ;
 
     // Rectangle
