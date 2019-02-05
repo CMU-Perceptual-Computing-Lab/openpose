@@ -56,9 +56,10 @@ def get_sample_heatmaps():
     opWrapper.stop()
 
     # Convert to OP Format with Stride 8
-    poseHeatMapsResized = np.zeros((78, 46,62), dtype=np.float32)
+    poseHeatMapsResized = np.zeros((poseHeatMaps.shape[0], int(poseHeatMaps.shape[1]/8), int(poseHeatMaps.shape[2]/8)), dtype=np.float32)
+    print(poseHeatMapsResized.shape)
     for i in range(0, poseHeatMaps.shape[0]):
-        poseHeatMapsResized[i,:,:] = cv2.resize(poseHeatMaps[i,:,:], (62,46))
+        poseHeatMapsResized[i,:,:] = cv2.resize(poseHeatMaps[i,:,:], (int(poseHeatMaps.shape[2]/8),int(poseHeatMaps.shape[1]/8)))
     poseHeatMaps = poseHeatMapsResized
     poseHeatMaps = poseHeatMaps.reshape((1, poseHeatMaps.shape[0], poseHeatMaps.shape[1], poseHeatMaps.shape[2]))
     print(poseHeatMaps.shape)
@@ -71,13 +72,13 @@ poseHeatMaps = get_sample_heatmaps()
 params = dict()
 params["model_folder"] = "../../../models/"
 opWrapper = op.WrapperPython()
-opWrapper.configure(params2)
+opWrapper.configure(params)
 opWrapper.start()
 
 datum = op.Datum()
 datum.cvInputData = imageToProcess
 datum.poseNetOutput = poseHeatMaps
-opWrapper.emplaceAndPop([datum2])
+opWrapper.emplaceAndPop([datum])
 
 # Display Image
 print("Body keypoints: \n" + str(datum.poseKeypoints))
