@@ -538,8 +538,9 @@ namespace op
             {
                 spWrapperStructOutput = std::make_shared<WrapperStructOutput>(
                     verbose, writeKeypoint, (DataFormat) writeKeypointFormat, writeJson, writeCocoJson,
-                    writeCocoFootJson, writeCocoJsonVariant, writeImages, writeImagesFormat, writeVideo, writeVideoFps, writeVideoWithAudio,
-                    writeHeatMaps, writeHeatMapsFormat, writeVideo3D, writeVideoAdam, writeBvh, udpHost, udpPort);
+                    writeCocoFootJson, writeCocoJsonVariant, writeImages, writeImagesFormat, writeVideo, writeVideoFps,
+                    writeVideoWithAudio, writeHeatMaps, writeHeatMapsFormat, writeVideo3D, writeVideoAdam, writeBvh,
+                    udpHost, udpPort);
             }
             catch (const std::exception& e)
             {
