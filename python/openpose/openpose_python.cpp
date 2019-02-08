@@ -203,7 +203,7 @@ PYBIND11_MODULE(pyopenpose, m) {
     py::class_<WrapperPython>(m, "WrapperPython")
         .def(py::init<>())
         .def(py::init<int>())
-        .def("configure", &WrapperPython::configure,"A function")
+        .def("configure", &WrapperPython::configure)
         .def("start", &WrapperPython::start)
         .def("stop", &WrapperPython::stop)
         .def("execute", &WrapperPython::exec)
@@ -242,14 +242,13 @@ PYBIND11_MODULE(pyopenpose, m) {
         .def_readwrite("cameraMatrix", &op::Datum::cameraMatrix)
         .def_readwrite("cameraExtrinsics", &op::Datum::cameraExtrinsics)
         .def_readwrite("cameraIntrinsics", &op::Datum::cameraIntrinsics)
-        .def_readwrite("poseNetOutput", &op::Datum::elementRendered)
+        .def_readwrite("poseNetOutput", &op::Datum::poseNetOutput)
         .def_readwrite("scaleInputToNetInputs", &op::Datum::scaleInputToNetInputs)
         .def_readwrite("netInputSizes", &op::Datum::netInputSizes)
         .def_readwrite("scaleInputToOutput", &op::Datum::scaleInputToOutput)
         .def_readwrite("netOutputSize", &op::Datum::netOutputSize)
         .def_readwrite("scaleNetToOutput", &op::Datum::scaleNetToOutput)
         .def_readwrite("elementRendered", &op::Datum::elementRendered)
-        .def_readwrite("poseNetOutput", &op::Datum::poseNetOutput)
         ;
 
     // Rectangle
