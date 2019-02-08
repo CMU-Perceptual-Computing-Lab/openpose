@@ -242,7 +242,7 @@ PYBIND11_MODULE(pyopenpose, m) {
         .def_readwrite("cameraMatrix", &op::Datum::cameraMatrix)
         .def_readwrite("cameraExtrinsics", &op::Datum::cameraExtrinsics)
         .def_readwrite("cameraIntrinsics", &op::Datum::cameraIntrinsics)
-        .def_readwrite("poseNetOutput", &op::Datum::elementRendered)
+        .def_readwrite("poseNetOutput", &op::Datum::poseNetOutput)
         .def_readwrite("scaleInputToNetInputs", &op::Datum::scaleInputToNetInputs)
         .def_readwrite("netInputSizes", &op::Datum::netInputSizes)
         .def_readwrite("scaleInputToOutput", &op::Datum::scaleInputToOutput)
