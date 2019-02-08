@@ -28,7 +28,7 @@ except ImportError as e:
 
 # Flags
 parser = argparse.ArgumentParser()
-parser.add_argument("--image_path", default="../../../examples/media/COCO_val2014_000000000192.jpg", help="Process an image. Read all standard formats (jpg, png, bmp, etc.).")
+parser.add_argument("--image_path", default="../../../examples/media/COCO_val2014_000000000294.jpg", help="Process an image. Read all standard formats (jpg, png, bmp, etc.).")
 args = parser.parse_known_args()
 
 # Load image
@@ -41,6 +41,8 @@ def get_sample_heatmaps():
     params["heatmaps_add_bkg"] = True
     params["heatmaps_add_PAFs"] = True
     params["heatmaps_scale"] = 3
+    params["upsampling_ratio"] = 1
+    params["body"] = 1
 
     # Starting OpenPose
     opWrapper = op.WrapperPython()
@@ -55,14 +57,6 @@ def get_sample_heatmaps():
     poseHeatMaps = datum.poseHeatMaps.copy()
     opWrapper.stop()
 
-    # Convert to OP Format with Stride 8
-    poseHeatMapsResized = np.zeros((poseHeatMaps.shape[0], int(poseHeatMaps.shape[1]/8), int(poseHeatMaps.shape[2]/8)), dtype=np.float32)
-    print(poseHeatMapsResized.shape)
-    for i in range(0, poseHeatMaps.shape[0]):
-        poseHeatMapsResized[i,:,:] = cv2.resize(poseHeatMaps[i,:,:], (int(poseHeatMaps.shape[2]/8),int(poseHeatMaps.shape[1]/8)))
-    poseHeatMaps = poseHeatMapsResized
-    poseHeatMaps = poseHeatMaps.reshape((1, poseHeatMaps.shape[0], poseHeatMaps.shape[1], poseHeatMaps.shape[2]))
-    print(poseHeatMaps.shape)
     return poseHeatMaps
 
 # Get Heatmap
@@ -71,10 +65,12 @@ poseHeatMaps = get_sample_heatmaps()
 # Starting OpenPose
 params = dict()
 params["model_folder"] = "../../../models/"
+params["body"] = 2  # Disable OP Network
 opWrapper = op.WrapperPython()
 opWrapper.configure(params)
 opWrapper.start()
 
+# Pass Heatmap and Run OP
 datum = op.Datum()
 datum.cvInputData = imageToProcess
 datum.poseNetOutput = poseHeatMaps
