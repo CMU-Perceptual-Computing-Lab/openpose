@@ -292,8 +292,9 @@ namespace op
                 {
                     // Sanity check
                     if (inputNetData.size() != 1u)
-                        error("Size(inputNetData) must be provided heatmaps (" + std::to_string(inputNetData.size())
-                              + " vs. " + std::to_string(1) + ").", __LINE__, __FUNCTION__, __FILE__);
+                        error("Size(inputNetData) must match the provided heatmaps batch size ("
+                              + std::to_string(inputNetData.size()) + " vs. " + std::to_string(1) + ").",
+                              __LINE__, __FUNCTION__, __FILE__);
                     // Copy heatmap information
                     upImpl->spCaffeNetOutputBlobs.clear();
                     const bool copyFromGpu = false;

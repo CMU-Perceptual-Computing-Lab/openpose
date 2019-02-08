@@ -578,23 +578,23 @@ namespace op
         }
     }
 
-    template<typename T>
-    const int* ArrayCpuGpu<T>::gpu_shape() const
-    {
-        try
-        {
-            #ifdef USE_CAFFE
-                return spImpl->pCaffeBlobT->gpu_shape();
-            #else
-                return nullptr;
-            #endif
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return nullptr;
-        }
-    }
+    // template<typename T>
+    // const int* ArrayCpuGpu<T>::gpu_shape() const
+    // {
+    //     try
+    //     {
+    //         #ifdef USE_CAFFE
+    //             return spImpl->pCaffeBlobT->gpu_shape();
+    //         #else
+    //             return nullptr;
+    //         #endif
+    //     }
+    //     catch (const std::exception& e)
+    //     {
+    //         error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+    //         return nullptr;
+    //     }
+    // }
 
     template<typename T>
     const T* ArrayCpuGpu<T>::gpu_data() const

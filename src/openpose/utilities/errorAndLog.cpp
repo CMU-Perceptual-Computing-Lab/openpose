@@ -9,21 +9,36 @@ namespace op
     #ifdef USE_UNITY_SUPPORT
         namespace UnityDebugger
         {
-            typedef void(__stdcall * DebugCallback) (const char* const str, int type);
-            DebugCallback unityDebugCallback;
-			bool unityDebugEnabled = true;
+            #ifdef _WIN32
+                typedef void(__stdcall * DebugCallback) (const char* const str, int type);
+                DebugCallback unityDebugCallback;
+            #endif
+            bool unityDebugEnabled = true;
 
-            extern "C" void OP_API _OPRegisterDebugCallback(DebugCallback debugCallback) {
-                if (debugCallback)
+            #ifdef _WIN32
+                extern "C" void OP_API _OPRegisterDebugCallback(DebugCallback debugCallback)
+                {
+                    if (debugCallback)
                     unityDebugCallback = debugCallback;
-            }
+                }
 
-			extern "C" void OP_API _OPSetDebugEnable(bool enable) {
-				unityDebugEnabled = enable;
-			}
+                extern "C" void OP_API _OPSetDebugEnable(bool enable)
+                {
+                    unityDebugEnabled = enable;
+                }
+            #endif
 
-            void DebugInUnity(const std::string& message, const int type) {
-                if (unityDebugEnabled) if (unityDebugCallback) unityDebugCallback(message.c_str(), type);
+            void DebugInUnity(const std::string& message, const int type)
+            {
+                #ifdef _WIN32
+                    if (unityDebugEnabled)
+                        if (unityDebugCallback)
+                            unityDebugCallback(message.c_str(), type);
+                #else
+                    UNUSED(message);
+                    UNUSED(type);
+                    error("Unity plugin only available on Windows.", __LINE__, __FUNCTION__, __FILE__);
+                #endif
             }
 
             void log(const std::string& message) { DebugInUnity(message, 0); }

@@ -6,11 +6,15 @@
 
 namespace op
 {
-    // Output callback register in Unity
-    typedef void(__stdcall * OutputCallback) (void * ptrs, int ptrSize, int * sizes, int sizeSize, uchar outputType);
+    #ifdef _WIN32
+        // Output callback register in Unity
+        typedef void(__stdcall * OutputCallback) (void * ptrs, int ptrSize, int * sizes, int sizeSize,
+                                                  uchar outputType);
+        // Global output callback
+        OutputCallback sUnityOutputCallback;
+    #endif
 
-    // Global output callback
-    OutputCallback sUnityOutputCallback;
+    // Other global parameters
     bool sMultiThreadEnabled = true;
     bool sUnityOutputEnabled = true;
     bool sImageOutput = false;
@@ -84,200 +88,314 @@ namespace op
         template<class T>
         void outputValue(T ** ptrs, int ptrSize, int * sizes, int sizeSize, OutputType outputType)
         {
-            if (sUnityOutputCallback)
-                sUnityOutputCallback(static_cast<void*>(ptrs), ptrSize, sizes, sizeSize, (uchar)outputType);
+            try
+            {
+                #ifdef _WIN32
+                    if (sUnityOutputCallback)
+                        sUnityOutputCallback(static_cast<void*>(ptrs), ptrSize, sizes, sizeSize, (uchar)outputType);
+                #else
+                    UNUSED(ptrs);
+                    UNUSED(ptrSize);
+                    UNUSED(sizes);
+                    UNUSED(sizeSize);
+                    UNUSED(outputType);
+                    error("Function only available on Windows.", __LINE__, __FUNCTION__, __FILE__);
+                #endif
+            }
+            catch (const std::exception& e)
+            {
+                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+            }
         }
 
         void sendDatumsInfoAndName(const std::shared_ptr<std::vector<std::shared_ptr<Datum>>>& datumsPtr)
         {
-            auto& datum = datumsPtr->at(0);
-            int sizes[] = { 1 };
-            int sizeSize = 1;
-            unsigned long long *val[] = {&(datum->id), &(datum->subId), &(datum->subIdMax), &(datum->frameNumber)};
-            int ptrSize = 4;
-            outputValue(&val[0], ptrSize, &sizes[0], sizeSize, OutputType::DatumsInfo);
+            try
+            {
+                auto& datum = datumsPtr->at(0);
+                int sizes[] = { 1 };
+                int sizeSize = 1;
+                unsigned long long *val[] = {&(datum->id), &(datum->subId), &(datum->subIdMax), &(datum->frameNumber)};
+                int ptrSize = 4;
+                outputValue(&val[0], ptrSize, &sizes[0], sizeSize, OutputType::DatumsInfo);
 
-            char const *a[] = { datum->name.c_str() };
-            outputValue(&a[0], 1, &sizes[0], sizeSize, OutputType::Name);
+                char const *a[] = { datum->name.c_str() };
+                outputValue(&a[0], 1, &sizes[0], sizeSize, OutputType::Name);
+            }
+            catch (const std::exception& e)
+            {
+                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+            }
         }
 
         void sendPoseKeypoints(const std::shared_ptr<std::vector<std::shared_ptr<Datum>>>& datumsPtr)
         {
-            auto& data = datumsPtr->at(0)->poseKeypoints; // Array<float>
-            if (!data.empty())
+            try
             {
-                auto sizeVector = data.getSize();
-                int sizeSize = sizeVector.size();
-                int * sizes = &sizeVector[0];
-                float * val = data.getPtr();
-                outputValue(&val, 1, sizes, sizeSize, OutputType::PoseKeypoints);
+                auto& data = datumsPtr->at(0)->poseKeypoints; // Array<float>
+                if (!data.empty())
+                {
+                    auto sizeVector = data.getSize();
+                    int sizeSize = sizeVector.size();
+                    int * sizes = &sizeVector[0];
+                    float * val = data.getPtr();
+                    outputValue(&val, 1, sizes, sizeSize, OutputType::PoseKeypoints);
+                }
+            }
+            catch (const std::exception& e)
+            {
+                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
             }
         }
 
         void sendPoseIds(const std::shared_ptr<std::vector<std::shared_ptr<Datum>>>& datumsPtr)
         {
-            auto& data = datumsPtr->at(0)->poseIds; // Array<long long>
-            if (!data.empty())
+            try
             {
-                auto sizeVector = data.getSize();
-                int sizeSize = sizeVector.size();
-                int * sizes = &sizeVector[0];
-                long long * val = data.getPtr();
-                outputValue(&val, 1, sizes, sizeSize, OutputType::PoseIds);
+                auto& data = datumsPtr->at(0)->poseIds; // Array<long long>
+                if (!data.empty())
+                {
+                    auto sizeVector = data.getSize();
+                    int sizeSize = sizeVector.size();
+                    int * sizes = &sizeVector[0];
+                    long long * val = data.getPtr();
+                    outputValue(&val, 1, sizes, sizeSize, OutputType::PoseIds);
+                }
+            }
+            catch (const std::exception& e)
+            {
+                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
             }
         }
 
         void sendPoseScores(const std::shared_ptr<std::vector<std::shared_ptr<Datum>>>& datumsPtr)
         {
-            auto& data = datumsPtr->at(0)->poseScores; // Array<float>
-            if (!data.empty())
+            try
             {
-                auto sizeVector = data.getSize();
-                int sizeSize = sizeVector.size();
-                int * sizes = &sizeVector[0];
-                float * val = data.getPtr();
-                outputValue(&val, 1, sizes, sizeSize, OutputType::PoseScores);
+                auto& data = datumsPtr->at(0)->poseScores; // Array<float>
+                if (!data.empty())
+                {
+                    auto sizeVector = data.getSize();
+                    int sizeSize = sizeVector.size();
+                    int * sizes = &sizeVector[0];
+                    float * val = data.getPtr();
+                    outputValue(&val, 1, sizes, sizeSize, OutputType::PoseScores);
+                }
+            }
+            catch (const std::exception& e)
+            {
+                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
             }
         }
 
         void sendPoseHeatMaps(const std::shared_ptr<std::vector<std::shared_ptr<Datum>>>& datumsPtr)
         {
-            auto& data = datumsPtr->at(0)->poseHeatMaps; // Array<float>
-            if (!data.empty())
+            try
             {
-                auto sizeVector = data.getSize();
-                int sizeSize = sizeVector.size();
-                int * sizes = &sizeVector[0];
-                float * val = data.getPtr();
-                outputValue(&val, 1, sizes, sizeSize, OutputType::PoseHeatMaps);
+                auto& data = datumsPtr->at(0)->poseHeatMaps; // Array<float>
+                if (!data.empty())
+                {
+                    auto sizeVector = data.getSize();
+                    int sizeSize = sizeVector.size();
+                    int * sizes = &sizeVector[0];
+                    float * val = data.getPtr();
+                    outputValue(&val, 1, sizes, sizeSize, OutputType::PoseHeatMaps);
+                }
+            }
+            catch (const std::exception& e)
+            {
+                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
             }
         }
 
         void sendPoseCandidates(const std::shared_ptr<std::vector<std::shared_ptr<Datum>>>& datumsPtr)
         {
-            auto& data = datumsPtr->at(0)->poseCandidates; // std::vector<std::vector<std::array<float, 3>>>
-            if (!data.empty())
+            try
             {
-                // TODO
-                /*auto a = data[0][0].data();
-                auto sizeVector = data.getSize();
-                int sizeSize = sizeVector.size();
-                int * sizes = &sizeVector[0];
-                long long * val = data.getPtr();
-                outputValue(&val, 1, sizes, sizeSize, OutputType::PoseIds);*/
+                auto& data = datumsPtr->at(0)->poseCandidates; // std::vector<std::vector<std::array<float, 3>>>
+                if (!data.empty())
+                {
+                    // TODO
+                    /*auto a = data[0][0].data();
+                    auto sizeVector = data.getSize();
+                    int sizeSize = sizeVector.size();
+                    int * sizes = &sizeVector[0];
+                    long long * val = data.getPtr();
+                    outputValue(&val, 1, sizes, sizeSize, OutputType::PoseIds);*/
+                }
+            }
+            catch (const std::exception& e)
+            {
+                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
             }
         }
 
         void sendFaceRectangles(const std::shared_ptr<std::vector<std::shared_ptr<Datum>>>& datumsPtr)
         {
-            auto& data = datumsPtr->at(0)->faceRectangles; // std::vector<Rectangle<float>>
-            if (data.size() > 0)
+            try
             {
-                int sizes[] = { data.size(), 4 };
-                std::vector<float> vals(data.size() * 4);
-                for (int i = 0; i < data.size(); i++)
+                auto& data = datumsPtr->at(0)->faceRectangles; // std::vector<Rectangle<float>>
+                if (data.size() > 0)
                 {
-                    vals[4 * i + 0] = data[i].x;
-                    vals[4 * i + 1] = data[i].y;
-                    vals[4 * i + 2] = data[i].width;
-                    vals[4 * i + 3] = data[i].height;
+                    int sizes[] = { (int)data.size(), 4 };
+                    std::vector<float> vals(data.size() * 4);
+                    for (auto i = 0u; i < data.size(); i++)
+                    {
+                        vals[4 * i + 0] = data[i].x;
+                        vals[4 * i + 1] = data[i].y;
+                        vals[4 * i + 2] = data[i].width;
+                        vals[4 * i + 3] = data[i].height;
+                    }
+                    float * val = &vals[0];
+                    outputValue(&val, 1, sizes, 2, OutputType::FaceRectangles);
                 }
-                float * val = &vals[0];
-                outputValue(&val, 1, sizes, 2, OutputType::FaceRectangles);
+            }
+            catch (const std::exception& e)
+            {
+                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
             }
         }
 
         void sendFaceKeypoints(const std::shared_ptr<std::vector<std::shared_ptr<Datum>>>& datumsPtr)
         {
-            auto& data = datumsPtr->at(0)->faceKeypoints; // Array<float>
-            if (!data.empty())
+            try
             {
-                auto sizeVector = data.getSize();
-                int sizeSize = sizeVector.size();
-                int * sizes = &sizeVector[0];
-                float * val = data.getPtr();
-                outputValue(&val, 1, sizes, sizeSize, OutputType::FaceKeypoints);
+                auto& data = datumsPtr->at(0)->faceKeypoints; // Array<float>
+                if (!data.empty())
+                {
+                    auto sizeVector = data.getSize();
+                    int sizeSize = sizeVector.size();
+                    int * sizes = &sizeVector[0];
+                    float * val = data.getPtr();
+                    outputValue(&val, 1, sizes, sizeSize, OutputType::FaceKeypoints);
+                }
+            }
+            catch (const std::exception& e)
+            {
+                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
             }
         }
 
         void sendFaceHeatMaps(const std::shared_ptr<std::vector<std::shared_ptr<Datum>>>& datumsPtr)
         {
-            auto& data = datumsPtr->at(0)->faceHeatMaps; // Array<float>
-            if (!data.empty())
+            try
             {
-                auto sizeVector = data.getSize();
-                int sizeSize = sizeVector.size();
-                int * sizes = &sizeVector[0];
-                float * val = data.getPtr();
-                outputValue(&val, 1, sizes, sizeSize, OutputType::FaceHeatMaps);
+                auto& data = datumsPtr->at(0)->faceHeatMaps; // Array<float>
+                if (!data.empty())
+                {
+                    auto sizeVector = data.getSize();
+                    int sizeSize = sizeVector.size();
+                    int * sizes = &sizeVector[0];
+                    float * val = data.getPtr();
+                    outputValue(&val, 1, sizes, sizeSize, OutputType::FaceHeatMaps);
+                }
+            }
+            catch (const std::exception& e)
+            {
+                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
             }
         }
 
         void sendHandRectangles(const std::shared_ptr<std::vector<std::shared_ptr<Datum>>>& datumsPtr)
         {
-            auto& data = datumsPtr->at(0)->handRectangles; // std::vector<std::array<Rectangle<float>, 2>>
-            if (!data.empty())
+            try
             {
-                std::vector<float*> valPtrs;
-                for (int i = 0; i < data.size(); i++)
+                auto& data = datumsPtr->at(0)->handRectangles; // std::vector<std::array<Rectangle<float>, 2>>
+                if (!data.empty())
                 {
-                    float vals[8];
-                    for (int j = 0; j < 2; j++)
+                    std::vector<float*> valPtrs;
+                    for (auto i = 0u; i < data.size(); i++)
                     {
-                        vals[4 * j + 0] = data[i][j].x;
-                        vals[4 * j + 1] = data[i][j].y;
-                        vals[4 * j + 2] = data[i][j].width;
-                        vals[4 * j + 3] = data[i][j].height;
+                        float vals[8];
+                        for (auto j = 0; j < 2; j++)
+                        {
+                            vals[4 * j + 0] = data[i][j].x;
+                            vals[4 * j + 1] = data[i][j].y;
+                            vals[4 * j + 2] = data[i][j].width;
+                            vals[4 * j + 3] = data[i][j].height;
+                        }
+                        valPtrs.push_back(vals);
                     }
-                    valPtrs.push_back(vals);
+                    int sizes[] = {2, 4};
+                    int sizeSize = 2;
+                    outputValue(valPtrs.data(), valPtrs.size(), sizes, sizeSize, OutputType::HandRectangles);
                 }
-                int sizes[] = {2, 4};
-                int sizeSize = 2;
-                outputValue(valPtrs.data(), valPtrs.size(), sizes, sizeSize, OutputType::HandRectangles);
+            }
+            catch (const std::exception& e)
+            {
+                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
             }
         }
 
         void sendHandKeypoints(const std::shared_ptr<std::vector<std::shared_ptr<Datum>>>& datumsPtr)
         {
-            auto& data = datumsPtr->at(0)->handKeypoints; // std::array<Array<float>, 2>
-            if (data.size() == 2 && !data[0].empty())
+            try
             {
-                auto sizeVector = data[0].getSize();
-                int sizeSize = sizeVector.size();
-                int * sizes = &sizeVector[0];
-                float * ptrs[] = { data[0].getPtr(), data[1].getPtr() };
-                outputValue(ptrs, 2, sizes, sizeSize, OutputType::HandKeypoints);
+                auto& data = datumsPtr->at(0)->handKeypoints; // std::array<Array<float>, 2>
+                if (data.size() == 2 && !data[0].empty())
+                {
+                    auto sizeVector = data[0].getSize();
+                    int sizeSize = sizeVector.size();
+                    int * sizes = &sizeVector[0];
+                    float * ptrs[] = { data[0].getPtr(), data[1].getPtr() };
+                    outputValue(ptrs, 2, sizes, sizeSize, OutputType::HandKeypoints);
+                }
+            }
+            catch (const std::exception& e)
+            {
+                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
             }
         }
 
         void sendHandHeatMaps(const std::shared_ptr<std::vector<std::shared_ptr<Datum>>>& datumsPtr)
         {
-            auto& data = datumsPtr->at(0)->handHeatMaps; // std::array<Array<float>, 2>
-            if (data.size() == 2 && !data[0].empty())
+            try
             {
-                auto sizeVector = data[0].getSize();
-                int sizeSize = sizeVector.size();
-                int * sizes = &sizeVector[0];
-                float * ptrs[] = { data[0].getPtr(), data[1].getPtr() };
-                outputValue(ptrs, 2, sizes, sizeSize, OutputType::HandHeightMaps);
+                auto& data = datumsPtr->at(0)->handHeatMaps; // std::array<Array<float>, 2>
+                if (data.size() == 2 && !data[0].empty())
+                {
+                    auto sizeVector = data[0].getSize();
+                    int sizeSize = sizeVector.size();
+                    int * sizes = &sizeVector[0];
+                    float * ptrs[] = { data[0].getPtr(), data[1].getPtr() };
+                    outputValue(ptrs, 2, sizes, sizeSize, OutputType::HandHeightMaps);
+                }
+            }
+            catch (const std::exception& e)
+            {
+                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
             }
         }
 
         void sendImage(const std::shared_ptr<std::vector<std::shared_ptr<Datum>>>& datumsPtr)
         {
-            auto& data = datumsPtr->at(0)->cvInputData; // cv::Mat
-            if (!data.empty())
+            try
             {
-                int sizeVector[] = { data.rows, data.cols, 3 };
-                int sizeSize = 3;
-                auto valPtr = data.data;
-                outputValue(&valPtr, 1, sizeVector, sizeSize, OutputType::Image);
+                auto& data = datumsPtr->at(0)->cvInputData; // cv::Mat
+                if (!data.empty())
+                {
+                    int sizeVector[] = { data.rows, data.cols, 3 };
+                    int sizeSize = 3;
+                    auto valPtr = data.data;
+                    outputValue(&valPtr, 1, sizeVector, sizeSize, OutputType::Image);
+                }
+            }
+            catch (const std::exception& e)
+            {
+                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
             }
         }
 
         void sendEndOfFrame()
         {
-            outputValue((void**)nullptr, 0, nullptr, 0, OutputType::None);
+            try
+            {
+                outputValue((void**)nullptr, 0, nullptr, 0, OutputType::None);
+            }
+            catch (const std::exception& e)
+            {
+                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+            }
         }
     };
 
@@ -334,7 +452,7 @@ namespace op
         {
             log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
         }
-    };
+    }
 
     // Functions called from Unity
     extern "C" {
@@ -369,17 +487,19 @@ namespace op
         }
 
         // Register Unity output callback function
-        OP_API void _OPRegisterOutputCallback(OutputCallback callback)
-        {
-            try
+        #ifdef _WIN32
+            OP_API void _OPRegisterOutputCallback(OutputCallback callback)
             {
-                sUnityOutputCallback = callback;
+                try
+                {
+                    sUnityOutputCallback = callback;
+                }
+                catch (const std::exception& e)
+                {
+                    log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                }
             }
-            catch (const std::exception& e)
-            {
-                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
-            }
-        }
+        #endif
 
         // Enable/disable multi-threading
         OP_API void _OPSetMultiThreadEnable(bool enable)
@@ -422,7 +542,7 @@ namespace op
 
         // Configs
         OP_API void _OPConfigurePose(
-            bool enable,
+            uchar poseMode,
             int netInputSizeX, int netInputSizeY, // Point
             int outputSizeX, int outputSizeY, // Point
             uchar keypointScaleMode, // ScaleMode
@@ -434,19 +554,19 @@ namespace op
             bool heatMapAddPAFs, // HeatMapType // uchar heatmap_type,
             uchar heatMapScaleMode, // ScaleMode
             bool addPartCandidates, float renderThreshold, int numberPeopleMax,
-            bool maximizePositives, double fpsMax, char* protoTxtPath, char* caffeModelPath)
+            bool maximizePositives, double fpsMax, char* protoTxtPath, float upsamplingRatio, char* caffeModelPath)
         {
             try
             {
                 spWrapperStructPose = std::make_shared<WrapperStructPose>(
-                    enable, Point<int>{netInputSizeX, netInputSizeY}, Point<int>{outputSizeX, outputSizeY},
+                    (PoseMode)poseMode, Point<int>{netInputSizeX, netInputSizeY}, Point<int>{outputSizeX, outputSizeY},
                     (ScaleMode) keypointScaleMode, gpuNumber, gpuNumberStart, scalesNumber, scaleGap,
                     (RenderMode) renderMode, (PoseModel) poseModel, blendOriginalFrame, alphaKeypoint, alphaHeatMap,
                     defaultPartToRender, modelFolder,
                     // HeatMapType // (HeatMapType) heatmap_type,
                     flagsToHeatMaps(heatMapAddParts, heatMapAddBkg, heatMapAddPAFs),
                     (ScaleMode) heatMapScaleMode, addPartCandidates, renderThreshold, numberPeopleMax,
-                    maximizePositives, fpsMax, protoTxtPath, caffeModelPath, true
+                    maximizePositives, fpsMax, protoTxtPath, caffeModelPath, upsamplingRatio, true
                 );
             }
             catch (const std::exception& e)
@@ -481,8 +601,8 @@ namespace op
             try
             {
                 spWrapperStructFace = std::make_shared<WrapperStructFace>(
-                    enable, (Detector) detector, Point<int>{ netInputSizeX, netInputSizeY }, (RenderMode) renderMode, alphaKeypoint,
-                    alphaHeatMap, renderThreshold
+                    enable, (Detector) detector, Point<int>{ netInputSizeX, netInputSizeY }, (RenderMode) renderMode,
+                    alphaKeypoint, alphaHeatMap, renderThreshold
                 );
             }
             catch (const std::exception& e)
@@ -530,9 +650,9 @@ namespace op
         OP_API void _OPConfigureOutput(
             double verbose, char* writeKeypoint, uchar writeKeypointFormat, // DataFormat
             char* writeJson, char* writeCocoJson, char* writeCocoFootJson, int writeCocoJsonVariant, char* writeImages,
-            char* writeImagesFormat, char* writeVideo, double writeVideoFps, bool writeVideoWithAudio, char* writeHeatMaps,
-            char* writeHeatMapsFormat, char* writeVideo3D, char* writeVideoAdam, char* writeBvh, char* udpHost,
-            char* udpPort)
+            char* writeImagesFormat, char* writeVideo, double writeVideoFps, bool writeVideoWithAudio,
+            char* writeHeatMaps, char* writeHeatMapsFormat, char* writeVideo3D, char* writeVideoAdam, char* writeBvh,
+            char* udpHost, char* udpPort)
         {
             try
             {
