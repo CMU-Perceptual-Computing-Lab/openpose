@@ -16,6 +16,7 @@ namespace op
             const ScaleMode heatMapScaleMode = ScaleMode::ZeroToOne,
             const bool addPartCandidates = false, const bool maximizePositives = false,
             const std::string& protoTxtPath = "", const std::string& caffeModelPath = "",
+            const float upsamplingRatio = 0.f, const bool enableNet = true,
             const bool enableGoogleLogging = true);
 
         virtual ~PoseExtractorCaffe();
@@ -26,7 +27,7 @@ namespace op
          * @param poseNetOutput If it is not empty, OpenPose will not run its internal body pose estimation network
          * and will instead use this data as the substitute of its network. The size of this element must match the
          * size of the output of its internal network, or it will lead to core dumped (segmentation) errors. You can
-         * modify the pose estimation flags to match the dimension of both element (e.g., `--net_resolution`,
+         * modify the pose estimation flags to match the dimension of both elements (e.g., `--net_resolution`,
          * `--scale_number`, etc.).
          */
         void forwardPass(

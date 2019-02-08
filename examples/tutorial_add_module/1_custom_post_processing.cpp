@@ -20,7 +20,7 @@
 // 4. If extra classes and files are required, add those extra files inside the OpenPose include and src folders,
 // under a new folder (i.e., `include/newMethod/` and `src/newMethod/`), including `namespace op` on those files.
 
-// This example is a sub-case of `tutorial_api_cpp/6_synchronous_custom_postprocessing.cpp`, where only custom post-processing is
+// This example is a sub-case of `tutorial_api_cpp/15_synchronous_custom_postprocessing.cpp`, where only custom post-processing is
 // considered.
 
 // Command-line user intraface
@@ -58,6 +58,8 @@ void configureWrapper(op::WrapperT<op::UserDatum>& opWrapperT)
         const auto faceNetInputSize = op::flagsToPoint(FLAGS_face_net_resolution, "368x368 (multiples of 16)");
         // handNetInputSize
         const auto handNetInputSize = op::flagsToPoint(FLAGS_hand_net_resolution, "368x368 (multiples of 16)");
+        // poseMode
+        const auto poseMode = op::flagsToPoseMode(FLAGS_body);
         // poseModel
         const auto poseModel = op::flagsToPoseModel(FLAGS_model_pose);
         // JSON saving
@@ -80,12 +82,12 @@ void configureWrapper(op::WrapperT<op::UserDatum>& opWrapperT)
 
         // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
         const op::WrapperStructPose wrapperStructPose{
-            !FLAGS_body_disable, netInputSize, outputSize, keypointScaleMode, FLAGS_num_gpu, FLAGS_num_gpu_start,
+            poseMode, netInputSize, outputSize, keypointScaleMode, FLAGS_num_gpu, FLAGS_num_gpu_start,
             FLAGS_scale_number, (float)FLAGS_scale_gap, op::flagsToRenderMode(FLAGS_render_pose, multipleView),
             poseModel, !FLAGS_disable_blending, (float)FLAGS_alpha_pose, (float)FLAGS_alpha_heatmap,
             FLAGS_part_to_show, FLAGS_model_folder, heatMapTypes, heatMapScaleMode, FLAGS_part_candidates,
             (float)FLAGS_render_threshold, FLAGS_number_people_max, FLAGS_maximize_positives, FLAGS_fps_max,
-            FLAGS_prototxt_path, FLAGS_caffemodel_path, enableGoogleLogging};
+            FLAGS_prototxt_path, FLAGS_caffemodel_path, (float)FLAGS_upsampling_ratio, enableGoogleLogging};
         opWrapperT.configure(wrapperStructPose);
         // Face configuration (use op::WrapperStructFace{} to disable it)
         const op::WrapperStructFace wrapperStructFace{

@@ -211,7 +211,7 @@ namespace op
          * If it is not empty, OpenPose will not run its internal body pose estimation network and will instead use
          * this data as the substitute of its network. The size of this element must match the size of the output of
          * its internal network, or it will lead to core dumped (segmentation) errors. You can modify the pose
-         * estimation flags to match the dimension of both element (e.g., `--net_resolution`, `--scale_number`, etc.).
+         * estimation flags to match the dimension of both elements (e.g., `--net_resolution`, `--scale_number`, etc.).
          */
         Array<float> poseNetOutput;
 

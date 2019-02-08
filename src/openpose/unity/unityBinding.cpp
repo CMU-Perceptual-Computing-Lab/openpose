@@ -456,15 +456,15 @@ namespace op
         }
 
         OP_API void _OPConfigureHand(
-            bool enable, int netInputSizeX, int netInputSizeY, // Point
-            int scalesNumber, float scaleRange, bool tracking,
+            bool enable, uchar detector, int netInputSizeX, int netInputSizeY, // Point
+            int scalesNumber, float scaleRange,
             uchar renderMode, // RenderMode
             float alphaKeypoint, float alphaHeatMap, float renderThreshold)
         {
             try
             {
                 spWrapperStructHand = std::make_shared<WrapperStructHand>(
-                    enable, Point<int>{ netInputSizeX, netInputSizeY }, scalesNumber, scaleRange, tracking,
+                    enable, (Detector) detector, Point<int>{ netInputSizeX, netInputSizeY }, scalesNumber, scaleRange,
                     (RenderMode) renderMode, alphaKeypoint, alphaHeatMap, renderThreshold);
             }
             catch (const std::exception& e)
@@ -474,14 +474,14 @@ namespace op
         }
 
         OP_API void _OPConfigureFace(
-            bool enable, int netInputSizeX, int netInputSizeY, // Point
+            bool enable, uchar detector, int netInputSizeX, int netInputSizeY, // Point
             uchar renderMode, // RenderMode
             float alphaKeypoint, float alphaHeatMap, float renderThreshold)
         {
             try
             {
                 spWrapperStructFace = std::make_shared<WrapperStructFace>(
-                    enable, Point<int>{ netInputSizeX, netInputSizeY }, (RenderMode) renderMode, alphaKeypoint,
+                    enable, (Detector) detector, Point<int>{ netInputSizeX, netInputSizeY }, (RenderMode) renderMode, alphaKeypoint,
                     alphaHeatMap, renderThreshold
                 );
             }
@@ -530,7 +530,7 @@ namespace op
         OP_API void _OPConfigureOutput(
             double verbose, char* writeKeypoint, uchar writeKeypointFormat, // DataFormat
             char* writeJson, char* writeCocoJson, char* writeCocoFootJson, int writeCocoJsonVariant, char* writeImages,
-            char* writeImagesFormat, char* writeVideo, double writeVideoFps, char* writeHeatMaps,
+            char* writeImagesFormat, char* writeVideo, double writeVideoFps, bool writeVideoWithAudio, char* writeHeatMaps,
             char* writeHeatMapsFormat, char* writeVideo3D, char* writeVideoAdam, char* writeBvh, char* udpHost,
             char* udpPort)
         {
@@ -539,7 +539,8 @@ namespace op
                 spWrapperStructOutput = std::make_shared<WrapperStructOutput>(
                     verbose, writeKeypoint, (DataFormat) writeKeypointFormat, writeJson, writeCocoJson,
                     writeCocoFootJson, writeCocoJsonVariant, writeImages, writeImagesFormat, writeVideo, writeVideoFps,
-                    writeHeatMaps, writeHeatMapsFormat, writeVideo3D, writeVideoAdam, writeBvh, udpHost, udpPort);
+                    writeVideoWithAudio, writeHeatMaps, writeHeatMapsFormat, writeVideo3D, writeVideoAdam, writeBvh,
+                    udpHost, udpPort);
             }
             catch (const std::exception& e)
             {

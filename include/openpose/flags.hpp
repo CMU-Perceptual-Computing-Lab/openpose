@@ -89,8 +89,10 @@ DEFINE_double(fps_max,                  -1.,            "Maximum processing fram
                                                         " possible. Example usage: If OpenPose is displaying images too quickly, this can reduce"
                                                         " the speed so the user can analyze better each frame from the GUI.");
 // OpenPose Body Pose
-DEFINE_bool(body_disable,               false,          "Disable body keypoint detection. Option only possible for faster (but less accurate) face"
-                                                        " keypoint detection.");
+DEFINE_int32(body,                      1,              "Select 0 to disable body keypoint detection (e.g., for faster but less accurate face"
+                                                        " keypoint detection, custom hand detector, etc.), 1 (default) for body keypoint"
+                                                        " estimation, and 2 to disable its internal body pose estimation network but still"
+                                                        " still run the greedy association parsing algorithm");
 DEFINE_string(model_pose,               "BODY_25",      "Model to be used. E.g., `COCO` (18 keypoints), `MPI` (15 keypoints, ~10% faster), "
                                                         "`MPI_4_layers` (15 keypoints, even faster but less accurate).");
 DEFINE_string(net_resolution,           "-1x368",       "Multiples of 16. If it is increased, the accuracy potentially increases. If it is"
@@ -123,6 +125,8 @@ DEFINE_bool(part_candidates,            false,          "Also enable `write_json
                                                         " assembled into people). The empty body parts are filled with 0s. Program speed will"
                                                         " slightly decrease. Not required for OpenPose, enable it only if you intend to explicitly"
                                                         " use this information.");
+DEFINE_double(upsampling_ratio,         0.,             "Upsampling ratio between the `net_resolution` and the output net results. A value less"
+                                                        " or equal than 0 (default) will use the network default value (recommended).");
 // OpenPose Face
 DEFINE_bool(face,                       false,          "Enables face keypoint detection. It will share some parameters from the body pose, e.g."
                                                         " `model_folder`. Note that this will considerable slow down the performance and increse"

@@ -3,6 +3,14 @@
 
 namespace op
 {
+    enum class PoseMode : unsigned char
+    {
+        Disabled = 0,
+        Enabled,
+        NoNetwork,
+        Size,
+    };
+
     enum class Detector : unsigned char
     {
         Body = 0,

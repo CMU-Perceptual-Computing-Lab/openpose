@@ -106,7 +106,8 @@ namespace op
                 error("Writting video is only available if the OpenPose producer is used (i.e."
                       " producerSharedPtr cannot be a nullptr).",
                       __LINE__, __FUNCTION__, __FILE__);
-            if (!wrapperStructPose.enable && !wrapperStructFace.enable && !wrapperStructHand.enable)
+            if (wrapperStructPose.poseMode == PoseMode::Disabled && !wrapperStructFace.enable
+                && !wrapperStructHand.enable)
                 error("Body, face, and hand keypoint detectors are disabled. You must enable at least one (i.e,"
                       " unselect `--body_disable`, select `--face`, or select `--hand`.",
                       __LINE__, __FUNCTION__, __FILE__);
@@ -122,7 +123,7 @@ namespace op
                       " `examples/tutorial_api_cpp/` examples, or change the value of `--face_detector` and/or"
                       " `--hand_detector`.", __LINE__, __FUNCTION__, __FILE__);
             // Warning
-            if (ownDetectorProvided && wrapperStructPose.enable)
+            if (ownDetectorProvided && wrapperStructPose.poseMode != PoseMode::Disabled)
                 log("Warning: Body keypoint estimation is enabled while you have also selected to provide your own"
                     " face and/or hand rectangle detections (`face_detector 2` and/or `hand_detector 2`). Therefore,"
                     " OpenPose will not detect face and/or hand keypoints based on the body keypoints. Are you sure"
