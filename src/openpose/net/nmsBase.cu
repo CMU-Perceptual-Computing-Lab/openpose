@@ -47,9 +47,9 @@ namespace op
     }
 
     template <typename T>
-    __global__ void writeResultKernel(T* output, const int length, const int* const kernelPtr,
-                                      const T* const sourcePtr, const int width, const int height, const int maxPeaks,
-                                      const T offsetX, const T offsetY)
+    __global__ void writeResultKernel(
+        T* output, const int length, const int* const kernelPtr, const T* const sourcePtr, const int width,
+        const int height, const int maxPeaks, const T offsetX, const T offsetY)
     {
         __shared__ int local[THREADS_PER_BLOCK+1]; // one more
         const auto globalIdx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -226,9 +226,9 @@ namespace op
                     thrust::exclusive_scan(kernelThrustPtr, kernelThrustPtr + imageOffset, kernelThrustPtr);
 
                     // This returns targetPtrOffsetted, with the NMS applied over it
-                    writeResultKernel<<<numBlocks1D, threadsPerBlock1D>>>(targetPtrOffsetted, imageOffset,
-                                                                          kernelPtrOffsetted, sourcePtrOffsetted,
-                                                                          width, height, maxPeaks, offset.x, offset.y);
+                    writeResultKernel<<<numBlocks1D, threadsPerBlock1D>>>(
+                        targetPtrOffsetted, imageOffset, kernelPtrOffsetted, sourcePtrOffsetted, width, height,
+                        maxPeaks, offset.x, offset.y);
 
                 }
                 // // Sort based on score
