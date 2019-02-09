@@ -235,6 +235,8 @@ namespace op
             for (auto& thread : mThreads)
                 thread->stopAndJoin();
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            checkWorkerErrors();
+            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
         }
         catch (const std::exception& e)
         {
@@ -396,6 +398,9 @@ namespace op
         {
             if (!mThreadWorkerQueues.empty())
             {
+                // This avoids extra std::cout if errors occur on different threads
+                setMainThread();
+
                 // Check threads
                 checkAndCreateEmptyThreads();
 

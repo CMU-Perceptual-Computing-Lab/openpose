@@ -322,6 +322,7 @@ OpenPose Library - Release Notes
     30. Added pre-processing capabilities to Wrapper (WorkerType::PreProcessing), which will be run right after the image has been read.
     31. Removed boost::shared_ptr and caffe::Blob dependencies from the headers. No 3rdparty dependencies left on headers (except dim3 for CUDA).
     32. Added Array `poseNetOutput` to Datum so that user can introduce his custom network output.
+    33. OpenPose will never provoke a core dumped or crash. Exceptions in threads (`errorWorker()` instead of `error()`) lead to stopping the threads and reporting the error from the main thread, while exceptions in destructors (`errorDestructor()` instead of `error()`) are reported with std::cerr but not thrown as std::exceptions.
 2. Functions or parameters renamed:
     1. By default, python example `tutorial_developer/python_2_pose_from_heatmaps.py` was using 2 scales starting at -1x736, changed to 1 scale at -1x368.
     2. WrapperStructPose default parameters changed to match those of the OpenPose demo binary.

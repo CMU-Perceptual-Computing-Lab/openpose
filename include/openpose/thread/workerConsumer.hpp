@@ -12,10 +12,7 @@ namespace op
     public:
         virtual ~WorkerConsumer();
 
-        inline void work(TDatums& tDatums)
-        {
-            workConsumer(tDatums);
-        }
+        void work(TDatums& tDatums);
 
     protected:
         virtual void workConsumer(const TDatums& tDatums) = 0;
@@ -32,6 +29,20 @@ namespace op
     template<typename TDatums>
     WorkerConsumer<TDatums>::~WorkerConsumer()
     {
+    }
+
+    template<typename TDatums>
+    void WorkerConsumer<TDatums>::work(TDatums& tDatums)
+    {
+        try
+        {
+            workConsumer(tDatums);
+        }
+        catch (const std::exception& e)
+        {
+            this->stop();
+            errorWorker(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
     }
 
     COMPILE_TEMPLATE_DATUM(WorkerConsumer);

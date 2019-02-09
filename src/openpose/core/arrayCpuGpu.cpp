@@ -578,32 +578,34 @@ namespace op
         }
     }
 
-    // template<typename T>
-    // const int* ArrayCpuGpu<T>::gpu_shape() const
-    // {
-    //     try
-    //     {
-    //         #ifdef USE_CAFFE
-    //             return spImpl->pCaffeBlobT->gpu_shape();
-    //         #else
-    //             return nullptr;
-    //         #endif
-    //     }
-    //     catch (const std::exception& e)
-    //     {
-    //         error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-    //         return nullptr;
-    //     }
-    // }
+    template<typename T>
+    const int* ArrayCpuGpu<T>::gpu_shape() const
+    {
+        try
+        {
+            #if defined(USE_CAFFE) && defined(USE_CUDA)
+                return spImpl->pCaffeBlobT->gpu_shape();
+            #else
+                error("Required `USE_CAFFE` and `USE_CUDA` flags enabled.", __LINE__, __FUNCTION__, __FILE__);
+                return nullptr;
+            #endif
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return nullptr;
+        }
+    }
 
     template<typename T>
     const T* ArrayCpuGpu<T>::gpu_data() const
     {
         try
         {
-            #ifdef USE_CAFFE
+            #if defined(USE_CAFFE) && defined(USE_CUDA)
                 return spImpl->pCaffeBlobT->gpu_data();
             #else
+                error("Required `USE_CAFFE` and `USE_CUDA` flags enabled.", __LINE__, __FUNCTION__, __FILE__);
                 return nullptr;
             #endif
         }
@@ -619,10 +621,11 @@ namespace op
     {
         try
         {
-            #ifdef USE_CAFFE
+            #if defined(USE_CAFFE) && defined(USE_CUDA)
                 spImpl->pCaffeBlobT->set_gpu_data(data);
             #else
                 UNUSED(data);
+                error("Required `USE_CAFFE` and `USE_CUDA` flags enabled.", __LINE__, __FUNCTION__, __FILE__);
             #endif
         }
         catch (const std::exception& e)
@@ -654,9 +657,10 @@ namespace op
     {
         try
         {
-            #ifdef USE_CAFFE
+            #if defined(USE_CAFFE) && defined(USE_CUDA)
                 return spImpl->pCaffeBlobT->gpu_diff();
             #else
+                error("Required `USE_CAFFE` and `USE_CUDA` flags enabled.", __LINE__, __FUNCTION__, __FILE__);
                 return nullptr;
             #endif
         }
@@ -690,9 +694,10 @@ namespace op
     {
         try
         {
-            #ifdef USE_CAFFE
+            #if defined(USE_CAFFE) && defined(USE_CUDA)
                 return spImpl->pCaffeBlobT->mutable_gpu_data();
             #else
+                error("Required `USE_CAFFE` and `USE_CUDA` flags enabled.", __LINE__, __FUNCTION__, __FILE__);
                 return nullptr;
             #endif
         }
@@ -726,9 +731,10 @@ namespace op
     {
         try
         {
-            #ifdef USE_CAFFE
+            #if defined(USE_CAFFE) && defined(USE_CUDA)
                 return spImpl->pCaffeBlobT->mutable_gpu_diff();
             #else
+                error("Required `USE_CAFFE` and `USE_CUDA` flags enabled.", __LINE__, __FUNCTION__, __FILE__);
                 return nullptr;
             #endif
         }

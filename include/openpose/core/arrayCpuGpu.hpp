@@ -68,7 +68,7 @@ namespace op
 
         const T* cpu_data() const;
         void set_cpu_data(T* data);
-        // const int* gpu_shape() const; // Disabled because it produces compiler errors for some users
+        const int* gpu_shape() const;
         const T* gpu_data() const;
         void set_gpu_data(T* data);
         const T* cpu_diff() const;

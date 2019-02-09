@@ -63,9 +63,7 @@ namespace op
 
         std::string getKey(const int line, const std::string& function, const std::string& file)
         {
-            std::stringstream threadId;
-            threadId << std::this_thread::get_id();
-            return file + function + std::to_string(line) + threadId.str();
+            return file + function + std::to_string(line) + getThreadId();
         }
 
         void printAveragedTimeMsCommon(const double timePast, const unsigned long long timeCounter, const int line,
