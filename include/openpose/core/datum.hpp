@@ -207,6 +207,14 @@ namespace op
          */
         cv::Mat cameraIntrinsics;
 
+        /**
+         * If it is not empty, OpenPose will not run its internal body pose estimation network and will instead use
+         * this data as the substitute of its network. The size of this element must match the size of the output of
+         * its internal network, or it will lead to core dumped (segmentation) errors. You can modify the pose
+         * estimation flags to match the dimension of both elements (e.g., `--net_resolution`, `--scale_number`, etc.).
+         */
+        Array<float> poseNetOutput;
+
         // ---------------------------------------- Other (internal) parameters ---------------------------------------- //
         /**
          * Scale ratio between the input Datum::cvInputData and the net input size.
@@ -240,25 +248,27 @@ namespace op
          */
         std::pair<int, std::string> elementRendered;
 
-        // 3D/Adam parameters
-        // Adam/Unity params
-        std::vector<double> adamPosePtr;
-        int adamPoseRows;
-        std::vector<double> adamTranslationPtr;
-        std::vector<double> vtVecPtr;
-        int vtVecRows;
-        std::vector<double> j0VecPtr;
-        int j0VecRows;
-        std::vector<double> adamFaceCoeffsExpPtr;
-        int adamFaceCoeffsExpRows;
-        #ifdef USE_EIGEN
+        // 3D/Adam parameters (experimental code not meant to be publicly used)
+        #ifdef USE_3D_ADAM_MODEL
             // Adam/Unity params
-            Eigen::Matrix<double, 62, 3, Eigen::RowMajor> adamPose;
-            Eigen::Vector3d adamTranslation;
-            // Adam params (Jacobians)
-            Eigen::Matrix<double, Eigen::Dynamic, 1> vtVec;
-            Eigen::Matrix<double, Eigen::Dynamic, 1> j0Vec;
-            Eigen::VectorXd adamFaceCoeffsExp;
+            std::vector<double> adamPosePtr;
+            int adamPoseRows;
+            std::vector<double> adamTranslationPtr;
+            std::vector<double> vtVecPtr;
+            int vtVecRows;
+            std::vector<double> j0VecPtr;
+            int j0VecRows;
+            std::vector<double> adamFaceCoeffsExpPtr;
+            int adamFaceCoeffsExpRows;
+            #ifdef USE_EIGEN
+                // Adam/Unity params
+                Eigen::Matrix<double, 62, 3, Eigen::RowMajor> adamPose;
+                Eigen::Vector3d adamTranslation;
+                // Adam params (Jacobians)
+                Eigen::Matrix<double, Eigen::Dynamic, 1> vtVec;
+                Eigen::Matrix<double, Eigen::Dynamic, 1> j0Vec;
+                Eigen::VectorXd adamFaceCoeffsExp;
+            #endif
         #endif
 
 

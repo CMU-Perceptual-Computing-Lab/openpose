@@ -31,7 +31,6 @@ namespace op
             // OpenCV DNN
             cv::dnn::Net mNet;
             cv::Mat mNetOutputBlob;
-            // std::shared_ptr<caffe::Blob<float>> spOutputBlob;
             boost::shared_ptr<caffe::Blob<float>> spOutputBlob;
 
             ImplNetOpenCv(const std::string& caffeProto, const std::string& caffeTrainedModel, const int gpuId) :
@@ -39,7 +38,6 @@ namespace op
                 mCaffeProto{caffeProto},
                 mCaffeTrainedModel{caffeTrainedModel},
                 mNet{cv::dnn::readNetFromCaffe(caffeProto, caffeTrainedModel)},
-                // spOutputBlob{std::make_shared<caffe::Blob<float>>(1,1,1,1)}
                 spOutputBlob{new caffe::Blob<float>(1,1,1,1)}
             {
                 const std::string message{".\nPossible causes:\n\t1. Not downloading the OpenPose trained models."
@@ -139,12 +137,12 @@ namespace op
         }
     }
 
-    boost::shared_ptr<caffe::Blob<float>> NetOpenCv::getOutputBlob() const
+    std::shared_ptr<ArrayCpuGpu<float>> NetOpenCv::getOutputBlobArray() const
     {
         try
         {
             #ifdef USE_OPEN_CV_DNN
-                return upImpl->spOutputBlob;
+                return std::make_shared<ArrayCpuGpu<float>>(upImpl->spOutputBlob.get());
             #else
                 return nullptr;
             #endif

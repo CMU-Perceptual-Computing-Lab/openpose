@@ -53,7 +53,7 @@ namespace op
     }
 
     template <typename T>
-    void BodyPartConnectorCaffe<T>::Reshape(const std::vector<caffe::Blob<T>*>& bottom, const int gpuID)
+    void BodyPartConnectorCaffe<T>::Reshape(const std::vector<ArrayCpuGpu<T>*>& bottom, const int gpuID)
     {
         try
         {
@@ -73,6 +73,7 @@ namespace op
                 mGpuID = gpuID;
             #else
                 UNUSED(bottom);
+                UNUSED(gpuID);
             #endif
         }
         catch (const std::exception& e)
@@ -173,7 +174,7 @@ namespace op
     }
 
     template <typename T>
-    void BodyPartConnectorCaffe<T>::Forward(const std::vector<caffe::Blob<T>*>& bottom, Array<T>& poseKeypoints,
+    void BodyPartConnectorCaffe<T>::Forward(const std::vector<ArrayCpuGpu<T>*>& bottom, Array<T>& poseKeypoints,
                                             Array<T>& poseScores)
     {
         try
@@ -196,7 +197,7 @@ namespace op
     }
 
     template <typename T>
-    void BodyPartConnectorCaffe<T>::Forward_cpu(const std::vector<caffe::Blob<T>*>& bottom, Array<T>& poseKeypoints,
+    void BodyPartConnectorCaffe<T>::Forward_cpu(const std::vector<ArrayCpuGpu<T>*>& bottom, Array<T>& poseKeypoints,
                                                 Array<T>& poseScores)
     {
         try
@@ -213,6 +214,7 @@ namespace op
             #else
                 UNUSED(bottom);
                 UNUSED(poseKeypoints);
+                UNUSED(poseScores);
             #endif
         }
         catch (const std::exception& e)
@@ -222,7 +224,7 @@ namespace op
     }
 
     template <typename T>
-    void BodyPartConnectorCaffe<T>::Forward_ocl(const std::vector<caffe::Blob<T>*>& bottom, Array<T>& poseKeypoints,
+    void BodyPartConnectorCaffe<T>::Forward_ocl(const std::vector<ArrayCpuGpu<T>*>& bottom, Array<T>& poseKeypoints,
                                                 Array<T>& poseScores)
     {
         try
@@ -298,7 +300,7 @@ namespace op
     }
 
     template <typename T>
-    void BodyPartConnectorCaffe<T>::Forward_gpu(const std::vector<caffe::Blob<T>*>& bottom, Array<T>& poseKeypoints,
+    void BodyPartConnectorCaffe<T>::Forward_gpu(const std::vector<ArrayCpuGpu<T>*>& bottom, Array<T>& poseKeypoints,
                                                 Array<T>& poseScores)
     {
         try
@@ -373,9 +375,9 @@ namespace op
     }
 
     template <typename T>
-    void BodyPartConnectorCaffe<T>::Backward_cpu(const std::vector<caffe::Blob<T>*>& top,
+    void BodyPartConnectorCaffe<T>::Backward_cpu(const std::vector<ArrayCpuGpu<T>*>& top,
                                                  const std::vector<bool>& propagate_down,
-                                                 const std::vector<caffe::Blob<T>*>& bottom)
+                                                 const std::vector<ArrayCpuGpu<T>*>& bottom)
     {
         try
         {
@@ -393,9 +395,9 @@ namespace op
     }
 
     template <typename T>
-    void BodyPartConnectorCaffe<T>::Backward_gpu(const std::vector<caffe::Blob<T>*>& top,
+    void BodyPartConnectorCaffe<T>::Backward_gpu(const std::vector<ArrayCpuGpu<T>*>& top,
                                                  const std::vector<bool>& propagate_down,
-                                                 const std::vector<caffe::Blob<T>*>& bottom)
+                                                 const std::vector<ArrayCpuGpu<T>*>& bottom)
     {
         try
         {

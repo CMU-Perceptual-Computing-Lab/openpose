@@ -43,17 +43,15 @@ int handFromJsonTest()
         const auto handNetInputSize = op::flagsToPoint(FLAGS_hand_net_resolution, "368x368 (multiples of 16)");
         // producerType
         const auto producerSharedPtr = op::createProducer(op::ProducerType::ImageDirectory, FLAGS_image_dir);
-        // Enabling Google Logging
-        const bool enableGoogleLogging = true;
 
         // OpenPose wrapper
         op::log("Configuring OpenPose...", op::Priority::High);
         op::WrapperHandFromJsonTest<op::Datum> opWrapper;
         // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
         op::WrapperStructPose wrapperStructPose{
-            false, op::flagsToPoint("656x368"), op::flagsToPoint("1280x720"), op::ScaleMode::InputResolution,
+            op::PoseMode::Disabled, op::flagsToPoint("656x368"), op::flagsToPoint("1280x720"), op::ScaleMode::InputResolution,
             FLAGS_num_gpu, FLAGS_num_gpu_start, 1, 0.15f, op::RenderMode::None, op::PoseModel::BODY_25, true, 0.f, 0.f,
-            0, "models/", {}, op::ScaleMode::ZeroToOne, false, 0.05f, -1, false, enableGoogleLogging};
+            0, "models/", {}, op::ScaleMode::ZeroToOne, false, 0.05f, -1, false};
         wrapperStructPose.modelFolder = FLAGS_model_folder;
         // Hand configuration (use op::WrapperStructHand{} to disable it)
         const op::WrapperStructHand wrapperStructHand{

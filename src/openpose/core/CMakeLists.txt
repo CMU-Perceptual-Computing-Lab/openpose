@@ -1,6 +1,7 @@
 set(CMAKE_CXX_SOURCE_FILE_EXTENSIONS C;M;c++;cc;cpp;cxx;mm;CPP;cl)
 set(SOURCES_OP_CORE
     array.cpp
+    arrayCpuGpu.cpp
     cvMatToOpInput.cpp
     cvMatToOpOutput.cpp
     datum.cpp

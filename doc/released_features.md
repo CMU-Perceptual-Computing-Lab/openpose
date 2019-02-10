@@ -1,8 +1,8 @@
 OpenPose Library - All Released Features
 ====================================
 
-- Jan 2018: [**Unity plugin released**](https://github.com/CMU-Perceptual-Computing-Lab/openpose_unity_plugin)!
-- Jan 2018: [**Improved Python API**](doc/modules/python_module.md) released! Including body, face, hands, and all the functionality of the C++ API!
+- Jan 2019: [**Unity plugin released**](https://github.com/CMU-Perceptual-Computing-Lab/openpose_unity_plugin)!
+- Jan 2019: [**Improved Python API**](doc/modules/python_module.md) released! Including body, face, hands, and all the functionality of the C++ API!
 - Dec 2018: [**Foot dataset**](https://cmu-perceptual-computing-lab.github.io/foot_keypoint_dataset) and [**new paper released**](https://arxiv.org/abs/1812.08008)!
 - Sep 2018: [**Experimental tracker**](./quick_start.md#tracking)!
 - Jun 2018: [**Combined body-foot model released! 40% faster and 5% more accurate**](./installation.md)!

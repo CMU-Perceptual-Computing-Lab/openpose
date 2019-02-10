@@ -22,9 +22,9 @@ namespace op
             std::shared_ptr<ResizeAndMergeCaffe<float>> spResizeAndMergeCaffe;
             std::shared_ptr<MaximumCaffe<float>> spMaximumCaffe;
             // Init with thread
-            boost::shared_ptr<caffe::Blob<float>> spCaffeNetOutputBlob;
-            std::shared_ptr<caffe::Blob<float>> spHeatMapsBlob;
-            std::shared_ptr<caffe::Blob<float>> spPeaksBlob;
+            std::shared_ptr<ArrayCpuGpu<float>> spCaffeNetOutputBlob;
+            std::shared_ptr<ArrayCpuGpu<float>> spHeatMapsBlob;
+            std::shared_ptr<ArrayCpuGpu<float>> spPeaksBlob;
 
             ImplFaceExtractorCaffe(const std::string& modelFolder, const int gpuId, const bool enableGoogleLogging) :
                 netInitialized{false},
@@ -78,17 +78,19 @@ namespace op
 
         inline void reshapeFaceExtractorCaffe(std::shared_ptr<ResizeAndMergeCaffe<float>>& resizeAndMergeCaffe,
                                               std::shared_ptr<MaximumCaffe<float>>& maximumCaffe,
-                                              boost::shared_ptr<caffe::Blob<float>>& caffeNetOutputBlob,
-                                              std::shared_ptr<caffe::Blob<float>>& heatMapsBlob,
-                                              std::shared_ptr<caffe::Blob<float>>& peaksBlob,
+                                              std::shared_ptr<ArrayCpuGpu<float>>& caffeNetOutputBlob,
+                                              std::shared_ptr<ArrayCpuGpu<float>>& heatMapsBlob,
+                                              std::shared_ptr<ArrayCpuGpu<float>>& peaksBlob,
                                               const int gpuID)
         {
             try
             {
                 // HeatMaps extractor blob and layer
                 const bool mergeFirstDimension = true;
-                resizeAndMergeCaffe->Reshape({caffeNetOutputBlob.get()}, {heatMapsBlob.get()},
-                                             FACE_CCN_DECREASE_FACTOR, 1.f, mergeFirstDimension, gpuID);
+                resizeAndMergeCaffe->Reshape(
+                    std::vector<ArrayCpuGpu<float>*>{caffeNetOutputBlob.get()},
+                    std::vector<ArrayCpuGpu<float>*>{heatMapsBlob.get()},
+                    FACE_CCN_DECREASE_FACTOR, 1.f, mergeFirstDimension, gpuID);
                 // Pose extractor blob and layer
                 maximumCaffe->Reshape({heatMapsBlob.get()}, {peaksBlob.get()});
                 // Cuda check
@@ -153,9 +155,9 @@ namespace op
                     cudaCheck(__LINE__, __FUNCTION__, __FILE__);
                 #endif
                 // Initialize blobs
-                upImpl->spCaffeNetOutputBlob = upImpl->spNetCaffe->getOutputBlob();
-                upImpl->spHeatMapsBlob = {std::make_shared<caffe::Blob<float>>(1,1,1,1)};
-                upImpl->spPeaksBlob = {std::make_shared<caffe::Blob<float>>(1,1,1,1)};
+                upImpl->spCaffeNetOutputBlob = upImpl->spNetCaffe->getOutputBlobArray();
+                upImpl->spHeatMapsBlob = {std::make_shared<ArrayCpuGpu<float>>(1,1,1,1)};
+                upImpl->spPeaksBlob = {std::make_shared<ArrayCpuGpu<float>>(1,1,1,1)};
                 #ifdef USE_CUDA
                     cudaCheck(__LINE__, __FUNCTION__, __FILE__);
                 #endif

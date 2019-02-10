@@ -79,6 +79,8 @@ public:
         const auto faceNetInputSize = op::flagsToPoint(FLAGS_face_net_resolution, "368x368 (multiples of 16)");
         // handNetInputSize
         const auto handNetInputSize = op::flagsToPoint(FLAGS_hand_net_resolution, "368x368 (multiples of 16)");
+        // poseMode
+        const auto poseMode = op::flagsToPoseMode(FLAGS_body);
         // poseModel
         const auto poseModel = op::flagsToPoseModel(FLAGS_model_pose);
         // JSON saving
@@ -101,12 +103,12 @@ public:
 
         // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
         const op::WrapperStructPose wrapperStructPose{
-            !FLAGS_body_disable, netInputSize, outputSize, keypointScaleMode, FLAGS_num_gpu, FLAGS_num_gpu_start,
+            poseMode, netInputSize, outputSize, keypointScaleMode, FLAGS_num_gpu, FLAGS_num_gpu_start,
             FLAGS_scale_number, (float)FLAGS_scale_gap, op::flagsToRenderMode(FLAGS_render_pose, multipleView),
             poseModel, !FLAGS_disable_blending, (float)FLAGS_alpha_pose, (float)FLAGS_alpha_heatmap,
             FLAGS_part_to_show, FLAGS_model_folder, heatMapTypes, heatMapScaleMode, FLAGS_part_candidates,
             (float)FLAGS_render_threshold, FLAGS_number_people_max, FLAGS_maximize_positives, FLAGS_fps_max,
-            FLAGS_prototxt_path, FLAGS_caffemodel_path, enableGoogleLogging};
+            FLAGS_prototxt_path, FLAGS_caffemodel_path, (float)FLAGS_upsampling_ratio, enableGoogleLogging};
         opWrapper->configure(wrapperStructPose);
         // Face configuration (use op::WrapperStructFace{} to disable it)
         const op::WrapperStructFace wrapperStructFace{
@@ -240,6 +242,7 @@ PYBIND11_MODULE(pyopenpose, m) {
         .def_readwrite("cameraMatrix", &op::Datum::cameraMatrix)
         .def_readwrite("cameraExtrinsics", &op::Datum::cameraExtrinsics)
         .def_readwrite("cameraIntrinsics", &op::Datum::cameraIntrinsics)
+        .def_readwrite("poseNetOutput", &op::Datum::poseNetOutput)
         .def_readwrite("scaleInputToNetInputs", &op::Datum::scaleInputToNetInputs)
         .def_readwrite("netInputSizes", &op::Datum::netInputSizes)
         .def_readwrite("scaleInputToOutput", &op::Datum::scaleInputToOutput)
@@ -430,4 +433,3 @@ template <> struct type_caster<cv::Mat> {
 }} // namespace pybind11::detail
 
 #endif
-

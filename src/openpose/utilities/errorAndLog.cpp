@@ -1,3 +1,5 @@
+#include <atomic>
+#include <mutex>
 #include <ctime> // std::tm, std::time_t
 #include <fstream> // std::ifstream, std::ofstream
 #include <iostream> // std::cout, std::endl
@@ -6,24 +8,44 @@
 
 namespace op
 {
+    std::atomic<bool> sThreadErrors;
+    std::mutex sMutex;
+    std::vector<std::string> sThreadErrorMessages;
+    std::string sMainThreadId;
+
     #ifdef USE_UNITY_SUPPORT
         namespace UnityDebugger
         {
-            typedef void(__stdcall * DebugCallback) (const char* const str, int type);
-            DebugCallback unityDebugCallback;
-			bool unityDebugEnabled = true;
+            #ifdef _WIN32
+                typedef void(__stdcall * DebugCallback) (const char* const str, int type);
+                DebugCallback unityDebugCallback;
+            #endif
+            bool unityDebugEnabled = true;
 
-            extern "C" void OP_API _OPRegisterDebugCallback(DebugCallback debugCallback) {
-                if (debugCallback)
+            #ifdef _WIN32
+                extern "C" void OP_API _OPRegisterDebugCallback(DebugCallback debugCallback)
+                {
+                    if (debugCallback)
                     unityDebugCallback = debugCallback;
-            }
+                }
 
-			extern "C" void OP_API _OPSetDebugEnable(bool enable) {
-				unityDebugEnabled = enable;
-			}
+                extern "C" void OP_API _OPSetDebugEnable(bool enable)
+                {
+                    unityDebugEnabled = enable;
+                }
+            #endif
 
-            void DebugInUnity(const std::string& message, const int type) {
-                if (unityDebugEnabled) if (unityDebugCallback) unityDebugCallback(message.c_str(), type);
+            void DebugInUnity(const std::string& message, const int type)
+            {
+                #ifdef _WIN32
+                    if (unityDebugEnabled)
+                        if (unityDebugCallback)
+                            unityDebugCallback(message.c_str(), type);
+                #else
+                    UNUSED(message);
+                    UNUSED(type);
+                    error("Unity plugin only available on Windows.", __LINE__, __FUNCTION__, __FILE__);
+                #endif
             }
 
             void log(const std::string& message) { DebugInUnity(message, 0); }
@@ -49,6 +71,7 @@ namespace op
         return false;
     }
 
+    // Note: createFullMessage(message) = message
     std::string createFullMessage(const std::string& message, const int line = -1, const std::string& function = "",
                                   const std::string& file = "")
     {
@@ -120,8 +143,8 @@ namespace op
 
         // Continue at the end of the file or delete it and re-write it (according to current file size)
         const auto maxLogSize = 15 * 1024 * 1024; // 15 MB
-        std::ofstream loggingFile{fileToOpen,
-                                  (currentSizeBytes < maxLogSize ? std::ios_base::app : std::ios_base::trunc)};
+        std::ofstream loggingFile{
+            fileToOpen, (currentSizeBytes < maxLogSize ? std::ios_base::app : std::ios_base::trunc)};
 
         // Message to write
         loggingFile << getTime();
@@ -132,21 +155,25 @@ namespace op
         loggingFile.close();
     }
 
-
-
-
-
-    // Public functions
-    void error(const std::string& message, const int line, const std::string& function, const std::string& file)
+    void errorAux(
+        const int errorMode, const std::string& message, const int line, const std::string& function,
+        const std::string& file)
     {
-        const std::string errorInit = "\nError:\n";
+        // errorMode:
+        // 0: error
+        // 1: errorWorker
+        // 2: checkWorkerErrors
+        // 3: errorDestructor
+
+        const std::string errorInitBase = "\nError";
+        const std::string errorInit = errorInitBase + ":\n";
         const std::string errorEnum = "- ";
 
         // Compose error message
         std::string errorMessageToPropagate;
         std::string errorMessageToPrint;
         // If first error
-        if (message.size() < errorInit.size() || message.substr(0, errorInit.size()) != errorInit)
+        if (message.size() < errorInitBase.size() || message.substr(0, errorInitBase.size()) != errorInitBase)
         {
             errorMessageToPrint = errorInit + createFullMessage(message) + "\n\nComing from:\n" + errorEnum
                                 + createFullMessage("", line, function, file);
@@ -156,13 +183,32 @@ namespace op
         else
         {
             errorMessageToPrint = errorEnum + createFullMessage("", line, function, file);
-            errorMessageToPropagate = createFullMessage(message.substr(0, message.size()-1)) + "\n"
-                                    + errorMessageToPrint + "\n";
+            if (errorMode == 2)
+            {
+                const std::string errorThreadLine =
+                    "[All threads closed and control returned to main thread]";
+                errorMessageToPrint = errorEnum + errorThreadLine + "\n" + errorMessageToPrint;
+            }
+            else if (errorMode == 3)
+                errorMessageToPrint += "\n" + errorEnum + "[Error occurred in a destructor, so no std::exception"
+                    " has been thrown. Returning with exit status 0]";
+            errorMessageToPropagate = createFullMessage(message) + errorMessageToPrint + "\n";
+            if (errorMode == 1)
+            {
+                errorMessageToPropagate = errorInitBase + " occurred on a thread. OpenPose closed all its"
+                    " threads and then propagated the error to the main thread:\n"
+                    + errorMessageToPropagate.substr(errorInit.size(), errorMessageToPropagate.size()-1);
+            }
+            if (errorMode == 2)
+                errorMessageToPrint = errorMessageToPropagate.substr(0, errorMessageToPropagate.size()-1);
         }
 
         // std::cerr
         if (checkIfErrorHas(ErrorMode::StdCerr))
-            std::cerr << errorMessageToPrint << std::endl;
+            #ifdef NDEBUG
+            if (!getIfNotInMainThreadOrEmpty())
+            #endif
+                std::cerr << errorMessageToPrint << std::endl;
 
         // File logging
         if (checkIfErrorHas(ErrorMode::FileLogging))
@@ -174,8 +220,76 @@ namespace op
         #endif
 
         // std::runtime_error
-        if (checkIfErrorHas(ErrorMode::StdRuntimeError))
-            throw std::runtime_error{errorMessageToPropagate};
+        if (errorMode == 1)
+        {
+            sThreadErrors = true;
+            std::lock_guard<std::mutex> lock{sMutex};
+            sThreadErrorMessages.emplace_back(errorMessageToPropagate);
+        }
+        else
+            if (checkIfErrorHas(ErrorMode::StdRuntimeError) && errorMode != 3)
+                throw std::runtime_error{errorMessageToPropagate};
+    }
+
+
+
+
+
+    // Public functions
+    void setMainThread()
+    {
+        std::lock_guard<std::mutex> lock{sMutex};
+        sMainThreadId = getThreadId();
+    }
+
+    std::string getThreadId()
+    {
+        std::stringstream threadId;
+        threadId << std::this_thread::get_id();
+        return threadId.str();
+    }
+
+    bool getIfInMainThreadOrEmpty()
+    {
+        std::lock_guard<std::mutex> lock{sMutex};
+        return (!sMainThreadId.empty() && sMainThreadId == getThreadId());
+    }
+
+    bool getIfNotInMainThreadOrEmpty()
+    {
+        std::lock_guard<std::mutex> lock{sMutex};
+        return (!sMainThreadId.empty() && sMainThreadId != getThreadId());
+    }
+
+    void error(const std::string& message, const int line, const std::string& function, const std::string& file)
+    {
+        errorAux(0, message, line, function, file);
+    }
+
+    void checkWorkerErrors()
+    {
+        if (sThreadErrors)
+        {
+            std::unique_lock<std::mutex> lock{sMutex};
+            std::string fullMessage = sThreadErrorMessages.at(0);
+            lock.unlock();
+            sThreadErrors = false; // Avoid infinity loop throwing the same error over and over.
+            errorAux(2, fullMessage, __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    void errorWorker(const std::string& message, const int line, const std::string& function, const std::string& file)
+    {
+        // If we are 100% sure that we are in main thread, then normal error.
+        // Otherwise, worker error
+        errorAux((getIfInMainThreadOrEmpty() ? 0 : 1), message, line, function, file);
+    }
+
+    void errorDestructor(const std::string& message, const int line, const std::string& function, const std::string& file)
+    {
+        // If we are 100% sure that we are in main thread, then normal error.
+        // Otherwise, worker error
+        errorAux(3, message, line, function, file);
     }
 
     void log(const std::string& message, const Priority priority, const int line, const std::string& function,

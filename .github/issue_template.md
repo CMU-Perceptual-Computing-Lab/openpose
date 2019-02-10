@@ -48,6 +48,7 @@ You might select multiple topics, delete the rest:
 3. **General configuration**:
     - **Installation mode**: CMake, sh script, manual Makefile installation, ... (Ubuntu); CMake, ... (Windows); ...?
     - **Operating system** (`lsb_release -a` in Ubuntu):
+    - **Operating system version** (e.g., Ubuntu 16, Windows 10, ...):
     - **Release or Debug mode**? (by default: release):
     - Compiler (`gcc --version` in Ubuntu or VS version in Windows): 5.4.0, ... (Ubuntu); VS2015 Enterprise Update 3, VS2017 community, ... (Windows); ...?
 

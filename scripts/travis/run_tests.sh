@@ -47,39 +47,43 @@ if [[ $RUN_EXAMPLES == true ]] ; then
   echo " "
 
   echo "Tutorial API C++: Example 8..."
-  ./build/examples/tutorial_api_cpp/08_heatmaps_from_image.bin --hand_net_resolution 32x32 --write_json output/ --write_images output/ --no_display
+  ./build/examples/tutorial_api_cpp/08_heatmaps_from_image.bin --net_resolution -1x32 --write_json output/ --write_images output/ --no_display
   echo " "
 
   echo "Tutorial API C++: Example 9..."
-  ./build/examples/tutorial_api_cpp/09_asynchronous_custom_input.bin --image_dir examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --display 0
+  ./build/examples/tutorial_api_cpp/09_keypoints_from_heatmaps.bin --net_resolution -1x32 --write_json output/ --write_images output/ --no_display
   echo " "
 
   echo "Tutorial API C++: Example 10..."
-  ./build/examples/tutorial_api_cpp/10_asynchronous_custom_output.bin --image_dir examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --no_display
+  ./build/examples/tutorial_api_cpp/10_asynchronous_custom_input.bin --image_dir examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --display 0
   echo " "
 
   echo "Tutorial API C++: Example 11..."
-  ./build/examples/tutorial_api_cpp/11_asynchronous_custom_input_output_and_datum.bin --image_dir examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --no_display
+  ./build/examples/tutorial_api_cpp/11_asynchronous_custom_output.bin --image_dir examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --no_display
   echo " "
 
   echo "Tutorial API C++: Example 12..."
-  ./build/examples/tutorial_api_cpp/12_synchronous_custom_input.bin --image_dir examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --display 0
+  ./build/examples/tutorial_api_cpp/12_asynchronous_custom_input_output_and_datum.bin --image_dir examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --no_display
   echo " "
 
   echo "Tutorial API C++: Example 13..."
-  ./build/examples/tutorial_api_cpp/13_synchronous_custom_preprocessing.bin --image_dir examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --display 0
+  ./build/examples/tutorial_api_cpp/13_synchronous_custom_input.bin --image_dir examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --display 0
   echo " "
 
   echo "Tutorial API C++: Example 14..."
-  ./build/examples/tutorial_api_cpp/14_synchronous_custom_postprocessing.bin --image_dir examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --display 0
+  ./build/examples/tutorial_api_cpp/14_synchronous_custom_preprocessing.bin --image_dir examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --display 0
   echo " "
 
   echo "Tutorial API C++: Example 15..."
-  ./build/examples/tutorial_api_cpp/15_synchronous_custom_output.bin --image_dir examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --no_display
+  ./build/examples/tutorial_api_cpp/15_synchronous_custom_postprocessing.bin --image_dir examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --display 0
   echo " "
 
   echo "Tutorial API C++: Example 16..."
-  ./build/examples/tutorial_api_cpp/16_synchronous_custom_all_and_datum.bin --image_dir examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --no_display
+  ./build/examples/tutorial_api_cpp/16_synchronous_custom_output.bin --image_dir examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --no_display
+  echo " "
+
+  echo "Tutorial API C++: Example 17..."
+  ./build/examples/tutorial_api_cpp/17_synchronous_custom_all_and_datum.bin --image_dir examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --no_display
   echo " "
 
   # Python examples

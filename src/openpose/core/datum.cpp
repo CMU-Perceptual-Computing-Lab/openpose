@@ -46,28 +46,31 @@ namespace op
         netInputSizes{datum.netInputSizes},
         scaleInputToOutput{datum.scaleInputToOutput},
         scaleNetToOutput{datum.scaleNetToOutput},
-        elementRendered{datum.elementRendered},
+        elementRendered{datum.elementRendered}
         // 3D/Adam parameters
-        // Adam/Unity params
-        adamPosePtr{datum.adamPosePtr},
-        adamPoseRows{datum.adamPoseRows},
-        adamTranslationPtr{datum.adamTranslationPtr},
-        // Adam params (Jacobians)
-        vtVecPtr{datum.vtVecPtr},
-        vtVecRows{datum.vtVecRows},
-        j0VecPtr{datum.j0VecPtr},
-        j0VecRows{datum.j0VecRows},
-        adamFaceCoeffsExpPtr{datum.adamFaceCoeffsExpPtr},
-        adamFaceCoeffsExpRows{datum.adamFaceCoeffsExpRows}
-        #ifdef USE_EIGEN
+        #ifdef USE_3D_ADAM_MODEL
             ,
             // Adam/Unity params
-            adamPose{datum.adamPose},
-            adamTranslation{datum.adamTranslation},
+            adamPosePtr{datum.adamPosePtr},
+            adamPoseRows{datum.adamPoseRows},
+            adamTranslationPtr{datum.adamTranslationPtr},
             // Adam params (Jacobians)
-            vtVec{datum.vtVec},
-            j0Vec{datum.j0Vec},
-            adamFaceCoeffsExp{datum.adamFaceCoeffsExp}
+            vtVecPtr{datum.vtVecPtr},
+            vtVecRows{datum.vtVecRows},
+            j0VecPtr{datum.j0VecPtr},
+            j0VecRows{datum.j0VecRows},
+            adamFaceCoeffsExpPtr{datum.adamFaceCoeffsExpPtr},
+            adamFaceCoeffsExpRows{datum.adamFaceCoeffsExpRows}
+            #ifdef USE_EIGEN
+                ,
+                // Adam/Unity params
+                adamPose{datum.adamPose},
+                adamTranslation{datum.adamTranslation},
+                // Adam params (Jacobians)
+                vtVec{datum.vtVec},
+                j0Vec{datum.j0Vec},
+                adamFaceCoeffsExp{datum.adamFaceCoeffsExp}
+            #endif
         #endif
     {
     }
@@ -112,25 +115,27 @@ namespace op
             scaleNetToOutput = datum.scaleNetToOutput;
             elementRendered = datum.elementRendered;
             // 3D/Adam parameters
-            // Adam/Unity params
-            adamPosePtr = datum.adamPosePtr;
-            adamPoseRows = datum.adamPoseRows;
-            adamTranslationPtr = datum.adamTranslationPtr;
-            // Adam params (Jacobians)
-            vtVecPtr = datum.vtVecPtr;
-            vtVecRows = datum.vtVecRows;
-            j0VecPtr = datum.j0VecPtr;
-            j0VecRows = datum.j0VecRows;
-            adamFaceCoeffsExpPtr = datum.adamFaceCoeffsExpPtr;
-            adamFaceCoeffsExpRows = datum.adamFaceCoeffsExpRows;
-            #ifdef USE_EIGEN
+            #ifdef USE_3D_ADAM_MODEL
                 // Adam/Unity params
-                adamPose = datum.adamPose;
-                adamTranslation = datum.adamTranslation;
+                adamPosePtr = datum.adamPosePtr;
+                adamPoseRows = datum.adamPoseRows;
+                adamTranslationPtr = datum.adamTranslationPtr;
                 // Adam params (Jacobians)
-                vtVec = datum.vtVec;
-                j0Vec = datum.j0Vec;
-                adamFaceCoeffsExp = datum.adamFaceCoeffsExp;
+                vtVecPtr = datum.vtVecPtr;
+                vtVecRows = datum.vtVecRows;
+                j0VecPtr = datum.j0VecPtr;
+                j0VecRows = datum.j0VecRows;
+                adamFaceCoeffsExpPtr = datum.adamFaceCoeffsExpPtr;
+                adamFaceCoeffsExpRows = datum.adamFaceCoeffsExpRows;
+                #ifdef USE_EIGEN
+                    // Adam/Unity params
+                    adamPose = datum.adamPose;
+                    adamTranslation = datum.adamTranslation;
+                    // Adam params (Jacobians)
+                    vtVec = datum.vtVec;
+                    j0Vec = datum.j0Vec;
+                    adamFaceCoeffsExp = datum.adamFaceCoeffsExp;
+                #endif
             #endif
             // Return
             return *this;
@@ -184,25 +189,27 @@ namespace op
             std::swap(netInputSizes, datum.netInputSizes);
             std::swap(elementRendered, datum.elementRendered);
             // 3D/Adam parameters
-            // Adam/Unity params
-            std::swap(adamPosePtr, datum.adamPosePtr);
-            adamPoseRows = datum.adamPoseRows;
-            std::swap(adamTranslationPtr, datum.adamTranslationPtr);
-            // Adam params (Jacobians)
-            std::swap(vtVecPtr, datum.vtVecPtr);
-            vtVecRows = datum.vtVecRows;
-            std::swap(j0VecPtr, datum.j0VecPtr);
-            j0VecRows = datum.j0VecRows;
-            std::swap(adamFaceCoeffsExpPtr, datum.adamFaceCoeffsExpPtr);
-            adamFaceCoeffsExpRows = datum.adamFaceCoeffsExpRows;
-            #ifdef USE_EIGEN
+            #ifdef USE_3D_ADAM_MODEL
                 // Adam/Unity params
-                std::swap(adamPose, datum.adamPose);
-                std::swap(adamTranslation, datum.adamTranslation);
+                std::swap(adamPosePtr, datum.adamPosePtr);
+                adamPoseRows = datum.adamPoseRows;
+                std::swap(adamTranslationPtr, datum.adamTranslationPtr);
                 // Adam params (Jacobians)
-                std::swap(vtVec, datum.vtVec);
-                std::swap(j0Vec, datum.j0Vec);
-                std::swap(adamFaceCoeffsExp, datum.adamFaceCoeffsExp);
+                std::swap(vtVecPtr, datum.vtVecPtr);
+                vtVecRows = datum.vtVecRows;
+                std::swap(j0VecPtr, datum.j0VecPtr);
+                j0VecRows = datum.j0VecRows;
+                std::swap(adamFaceCoeffsExpPtr, datum.adamFaceCoeffsExpPtr);
+                adamFaceCoeffsExpRows = datum.adamFaceCoeffsExpRows;
+                #ifdef USE_EIGEN
+                    // Adam/Unity params
+                    std::swap(adamPose, datum.adamPose);
+                    std::swap(adamTranslation, datum.adamTranslation);
+                    // Adam params (Jacobians)
+                    std::swap(vtVec, datum.vtVec);
+                    std::swap(j0Vec, datum.j0Vec);
+                    std::swap(adamFaceCoeffsExp, datum.adamFaceCoeffsExp);
+                #endif
             #endif
         }
         catch (const std::exception& e)
@@ -249,25 +256,27 @@ namespace op
             std::swap(netInputSizes, datum.netInputSizes);
             std::swap(elementRendered, datum.elementRendered);
             // 3D/Adam parameters
-            // Adam/Unity params
-            std::swap(adamPosePtr, datum.adamPosePtr);
-            adamPoseRows = datum.adamPoseRows;
-            std::swap(adamTranslationPtr, datum.adamTranslationPtr);
-            // Adam params (Jacobians)
-            std::swap(vtVecPtr, datum.vtVecPtr);
-            vtVecRows = datum.vtVecRows;
-            std::swap(j0VecPtr, datum.j0VecPtr);
-            j0VecRows = datum.j0VecRows;
-            std::swap(adamFaceCoeffsExpPtr, datum.adamFaceCoeffsExpPtr);
-            adamFaceCoeffsExpRows = datum.adamFaceCoeffsExpRows;
-            #ifdef USE_EIGEN
+            #ifdef USE_3D_ADAM_MODEL
                 // Adam/Unity params
-                std::swap(adamPose, datum.adamPose);
-                std::swap(adamTranslation, datum.adamTranslation);
+                std::swap(adamPosePtr, datum.adamPosePtr);
+                adamPoseRows = datum.adamPoseRows;
+                std::swap(adamTranslationPtr, datum.adamTranslationPtr);
                 // Adam params (Jacobians)
-                std::swap(vtVec, datum.vtVec);
-                std::swap(j0Vec, datum.j0Vec);
-                std::swap(adamFaceCoeffsExp, datum.adamFaceCoeffsExp);
+                std::swap(vtVecPtr, datum.vtVecPtr);
+                vtVecRows = datum.vtVecRows;
+                std::swap(j0VecPtr, datum.j0VecPtr);
+                j0VecRows = datum.j0VecRows;
+                std::swap(adamFaceCoeffsExpPtr, datum.adamFaceCoeffsExpPtr);
+                adamFaceCoeffsExpRows = datum.adamFaceCoeffsExpRows;
+                #ifdef USE_EIGEN
+                    // Adam/Unity params
+                    std::swap(adamPose, datum.adamPose);
+                    std::swap(adamTranslation, datum.adamTranslation);
+                    // Adam params (Jacobians)
+                    std::swap(vtVec, datum.vtVec);
+                    std::swap(j0Vec, datum.j0Vec);
+                    std::swap(adamFaceCoeffsExp, datum.adamFaceCoeffsExp);
+                #endif
             #endif
             // Return
             return *this;
@@ -329,25 +338,27 @@ namespace op
             datum.scaleNetToOutput = scaleNetToOutput;
             datum.elementRendered = elementRendered;
             // 3D/Adam parameters
-            // Adam/Unity params
-            datum.adamPosePtr = adamPosePtr;
-            datum.adamPoseRows = adamPoseRows;
-            datum.adamTranslationPtr = adamTranslationPtr;
-            // Adam params (Jacobians)
-            datum.vtVecPtr = vtVecPtr;
-            datum.vtVecRows = vtVecRows;
-            datum.j0VecPtr = j0VecPtr;
-            datum.j0VecRows = j0VecRows;
-            datum.adamFaceCoeffsExpPtr = adamFaceCoeffsExpPtr;
-            datum.adamFaceCoeffsExpRows = adamFaceCoeffsExpRows;
-            #ifdef USE_EIGEN
+            #ifdef USE_3D_ADAM_MODEL
                 // Adam/Unity params
-                datum.adamPose = adamPose;
-                datum.adamTranslation = adamTranslation;
+                datum.adamPosePtr = adamPosePtr;
+                datum.adamPoseRows = adamPoseRows;
+                datum.adamTranslationPtr = adamTranslationPtr;
                 // Adam params (Jacobians)
-                datum.vtVec = vtVec;
-                datum.j0Vec = j0Vec;
-                datum.adamFaceCoeffsExp = adamFaceCoeffsExp;
+                datum.vtVecPtr = vtVecPtr;
+                datum.vtVecRows = vtVecRows;
+                datum.j0VecPtr = j0VecPtr;
+                datum.j0VecRows = j0VecRows;
+                datum.adamFaceCoeffsExpPtr = adamFaceCoeffsExpPtr;
+                datum.adamFaceCoeffsExpRows = adamFaceCoeffsExpRows;
+                #ifdef USE_EIGEN
+                    // Adam/Unity params
+                    datum.adamPose = adamPose;
+                    datum.adamTranslation = adamTranslation;
+                    // Adam params (Jacobians)
+                    datum.vtVec = vtVec;
+                    datum.j0Vec = j0Vec;
+                    datum.adamFaceCoeffsExp = adamFaceCoeffsExp;
+                #endif
             #endif
             // Return
             return std::move(datum);

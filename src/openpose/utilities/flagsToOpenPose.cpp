@@ -4,6 +4,27 @@
 
 namespace op
 {
+    PoseMode flagsToPoseMode(const int poseModeInt)
+    {
+        try
+        {
+            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            if (poseModeInt >= 0 && poseModeInt < (int)PoseMode::Size)
+                return (PoseMode)poseModeInt;
+            else
+            {
+                error("Value (" + std::to_string(poseModeInt) + ") does not correspond with any PoseMode.",
+                      __LINE__, __FUNCTION__, __FILE__);
+                return PoseMode::Enabled;
+            }
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return PoseMode::Enabled;
+        }
+    }
+
     PoseModel flagsToPoseModel(const std::string& poseModeString)
     {
         try

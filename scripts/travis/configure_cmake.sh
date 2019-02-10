@@ -50,6 +50,11 @@ else
   ARGS="$ARGS -DUSE_CUDNN=Off"
 fi
 
+echo "WITH_UNITY = ${WITH_UNITY}."
+if [[ $WITH_UNITY == true ]] ; then
+  ARGS="$ARGS -DBUILD_UNITY_SUPPORT=On"
+fi
+
 echo "WITH_DEBUG = ${WITH_DEBUG}."
 if [[ $WITH_DEBUG == true ]] ; then
   ARGS="$ARGS -DCMAKE_BUILD_TYPE=Debug"

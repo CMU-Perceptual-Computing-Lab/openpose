@@ -18,7 +18,7 @@ namespace op
 
         void forwardPass(const Array<float>& inputNetData) const;
 
-        boost::shared_ptr<caffe::Blob<float>> getOutputBlob() const;
+        std::shared_ptr<ArrayCpuGpu<float>> getOutputBlobArray() const;
 
     private:
         // PIMPL idiom

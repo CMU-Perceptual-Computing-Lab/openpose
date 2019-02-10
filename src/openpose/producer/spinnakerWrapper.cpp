@@ -1,3 +1,5 @@
+#include <atomic>
+#include <mutex>
 #include <opencv2/imgproc/imgproc.hpp> // cv::undistort, cv::initUndistortRectifyMap
 #ifdef USE_FLIR_CAMERA
     #include <Spinnaker.h>
@@ -915,7 +917,7 @@ namespace op
         }
         catch (const std::exception& e)
         {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
     }
 

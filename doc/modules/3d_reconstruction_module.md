@@ -109,7 +109,7 @@ It should be similar to the following image.
 You can copy and modify the OpenPose 3-D demo to use any camera brand by:
 
 1. You can optionally turn off the `WITH_FLIR_CAMERA` while compiling CMake.
-2. Copy `examples/tutorial_api_cpp/7_synchronous_custom_input.cpp` (or 9_synchronous_custom_all.cpp).
+2. Copy `examples/tutorial_api_cpp/13_synchronous_custom_input.cpp` (or `17_synchronous_custom_all_and_datum.cpp`).
 3. Modify `WUserInput` and add your custom code there. Your code should fill `Datum::name`, `Datum::cameraMatrix`, `Datum::cvInputData`, and `Datum::cvOutputData` (fill cvOutputData = cvInputData).
 4. Remove `WUserPostProcessing` and `WUserOutput` (unless you want to have your custom post-processing and/or output).
 
