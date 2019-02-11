@@ -15,7 +15,7 @@ namespace op
     #endif
 
     // Other global parameters
-    bool sMultiThreadEnabled = true;
+    bool sMultiThreadDisabled = false;
     bool sUnityOutputEnabled = true;
     bool sImageOutput = false;
 
@@ -439,7 +439,7 @@ namespace op
             spWrapper->configure(*spWrapperStructOutput);
 
             // Multi-threading
-            if (!sMultiThreadEnabled)
+            if (sMultiThreadDisabled)
                 spWrapper->disableMultiThreading();
 
             // Processing...
@@ -501,19 +501,6 @@ namespace op
             }
         #endif
 
-        // Enable/disable multi-threading
-        OP_API void _OPSetMultiThreadEnable(bool enable)
-        {
-            try
-            {
-                sMultiThreadEnabled = enable;
-            }
-            catch (const std::exception& e)
-            {
-                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
-            }
-        }
-
         // Enable/disable output callback
         OP_API void _OPSetOutputEnable(bool enable)
         {
@@ -554,7 +541,7 @@ namespace op
             bool heatMapAddPAFs, // HeatMapType // uchar heatmap_type,
             uchar heatMapScaleMode, // ScaleMode
             bool addPartCandidates, float renderThreshold, int numberPeopleMax,
-            bool maximizePositives, double fpsMax, char* protoTxtPath, float upsamplingRatio, char* caffeModelPath)
+            bool maximizePositives, double fpsMax, char* protoTxtPath, char* caffeModelPath, float upsamplingRatio)
         {
             try
             {
@@ -682,6 +669,23 @@ namespace op
                 log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
             }
         }
+
+		OP_API void _OPConfigureDebugging(
+			uchar loggingLevel, // Priority
+			bool disableMultiThread, 
+			unsigned long long profileSpeed)
+		{
+			try
+			{
+				ConfigureLog::setPriorityThreshold((Priority)loggingLevel);
+				sMultiThreadDisabled = disableMultiThread;
+				Profiler::setDefaultX(profileSpeed);
+			}
+			catch (const std::exception& e)
+			{
+				log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+			}
+		}
     }
 }
 #endif
