@@ -28,16 +28,32 @@ namespace op
         ImplNmsCaffe()
         {
             #if defined USE_CAFFE && defined USE_OPENCL
-                mKernelGpuPtr = nullptr;
-                mKernelCpuPtr = nullptr;
+                try
+                {
+                    mKernelGpuPtr = nullptr;
+                    mKernelCpuPtr = nullptr;
+                }
+                catch (const std::exception& e)
+                {
+                    error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+                }
             #endif
         }
 
         ~ImplNmsCaffe()
         {
             #if defined USE_CAFFE && defined USE_OPENCL
-                if(mKernelGpuPtr != nullptr) clReleaseMemObject((cl_mem)mKernelGpuPtr);
-                if(mKernelCpuPtr != nullptr) delete mKernelCpuPtr;
+                try
+                {
+                    if(mKernelGpuPtr != nullptr)
+                        clReleaseMemObject((cl_mem)mKernelGpuPtr);
+                    if(mKernelCpuPtr != nullptr)
+                        delete mKernelCpuPtr;
+                }
+                catch (const std::exception& e)
+                {
+                    errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
+                }
             #endif
         }
     };

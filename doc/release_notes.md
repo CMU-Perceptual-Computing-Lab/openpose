@@ -277,63 +277,68 @@ OpenPose Library - Release Notes
         8. Given that display can be disabled in all examples, they all have been added to the Travis build so they can be tested.
     7. Added a virtual destructor to almost all clases, so they can be inherited. Exceptions (for performance reasons): Array, Point, Rectangle, CvMatToOpOutput, OpOutputToCvMat.
     8. Auxiliary classes in errorAndLog turned into namespaces (Profiler must be kept as class to allow static parameters).
-    9. Added flag `--frame_step` to allow the user to select the step or gap between processed frames. E.g., `--frame_step 5` would read and process frames 0, 5, 10, etc.
-    10. Added sanity checks to avoid `--frame_last` to be smaller than `--frame_first` or higher than the number of total frames.
-    11. Array improvements for Pybind11 compatibility:
+    9. Added flags:
+        1. Added flag `--frame_step` to allow the user to select the step or gap between processed frames. E.g., `--frame_step 5` would read and process frames 0, 5, 10, etc.
+        2. Previously hardcoded `COCO_CHALLENGE` variable turned into user configurable flag `--maximize_positives`.
+        3. Added flag `--verbose` to plot the progress.
+        4. Added flag `--fps_max` to limit the maximum processing frame rate of OpenPose (useful to display results at a maximum desired speed).
+        5. Added sanit30. Added the flags `--prototxt_path` and `--caffemodel_path` to allow custom ProtoTxt and CaffeModel paths.
+        6. Added the flags `--face_detector` and `--hand_detector`, that enable the user to select the face/hand rectangle detector that is used for the later face/hand keypoint detection. It includes OpenCV (for face), and also allows the user to provide its own input. Flag `--hand_tracking` is removed and integrated into this flag too.
+        y checks to avoid `--frame_last` to be smaller than `--frame_first` or higher than the number of total frames.
+        7. Added the flag `--upsampling_ratio`, which controls the upsampling than OpenPose will perform to the frame before the greedy association parsing algorithm.
+        8. Added the flag `--body` (replacing `--body_disable`), which adds the possibility of disabling the OpenPose pose network but still running the greedy association parsing algorithm (on top of the user heatmaps, see the associated `tutorial_api_cpp` example).
+    10. Array improvements for Pybind11 compatibility:
         1. Array::getStride() to get step size of each dimension of the array.
         2. Array::getPybindPtr() to get an editable const pointer.
         3. Array::pData as binding of spData.
         4. Array::Array that takes as input a pointer, so it does not re-allocate memory.
-    12. Producer defined inside Wrapper rather than being defined on each example.
-    13. Reduced many Visual Studio warnings (e.g., uncontrolled conversions between types).
-    14. Added new keypoint-related auxiliary functions in `utilities/keypoints.hpp`.
-    15. Function `resizeFixedAspectRatio` can take already allocated memory (e.g., faster if target is an Array<T> object, no intermediate cv::Mat required).
-    16. Added compatibility for OpenCV 4.0, while preserving 2.4.X and 3.X compatibility.
-    17. Improved and added several functions to `utilities/keypoints.hpp` and Array to simplify keypoint post-processing.
-    18. Removed warnings from Spinnaker SDK at compiling time.
-    19. All bash scripts incorporate `#!/bin/bash` to tell the terminal that they are bash scripts.
-    20. Added flag `--verbose` to plot the progress.
-    21. Added find_package(Protobuf) to allow specific versions of Protobuf.
-    22. Video saving improvements:
+    11. Producer defined inside Wrapper rather than being defined on each example.
+    12. Reduced many Visual Studio warnings (e.g., uncontrolled conversions between types).
+    13. Added new keypoint-related auxiliary functions in `utilities/keypoints.hpp`.
+    14. Function `resizeFixedAspectRatio` can take already allocated memory (e.g., faster if target is an Array<T> object, no intermediate cv::Mat required).
+    15. Added compatibility for OpenCV 4.0, while preserving 2.4.X and 3.X compatibility.
+    16. Improved and added several functions to `utilities/keypoints.hpp` and Array to simplify keypoint post-processing.
+    17. Removed warnings from Spinnaker SDK at compiling time.
+    18. All bash scripts incorporate `#!/bin/bash` to tell the terminal that they are bash scripts.
+    19. Added find_package(Protobuf) to allow specific versions of Protobuf.
+    20. Video saving improvements:
         1. Video (`--write_video`) can be generated from images (`--image_dir`), as long as they maintain the same resolution.
         2. Video with the 3D output can be saved with the new `--write_video_3d` flag.
         3. Added the capability of saving videos in MP4 format (by using the ffmpeg library).
         4. Added the flag `write_video_with_audio` to enable saving these output MP4 videos with audio.
-    23. Added `--fps_max` flag to limit the maximum processing frame rate of OpenPose (useful to display results at a maximum desired speed).
-    24. Frame undistortion can be applied not only to FLIR cameras, but also to all other input sources (image, webcam, video, etc.).
-    25. Calibration improvements:
+    21. Frame undistortion can be applied not only to FLIR cameras, but also to all other input sources (image, webcam, video, etc.).
+    22. Calibration improvements:
         1. Improved chessboard orientation detection, more robust and less errors.
         2. Triangulation functions (triangulate and triangulateWithOptimization) public, so calibration can use them for bundle adjustment.
         3. Added bundle adjustment refinement for camera extrinsic calibration.
         4. Added `CameraMatrixInitial` field into the XML calibration files to keep the information of the original camera extrinsic parameters when bundle adjustment is run.
-    26. Added Mac OpenCL compatibility.
-    27. Added documentation for Nvidia TX2 with JetPack 3.3.
-    28. Added Travis build check for several configurations: Ubuntu (14/16)/Mac/Windows, CPU/CUDA/OpenCL, with/without Python, and Release/Debug.
-    29. Assigned 755 access to all sh scripts (some of them were only 644).
-    30. Added the flags `--prototxt_path` and `--caffemodel_path` to allow custom ProtoTxt and CaffeModel paths.
-    31. Replaced the old Python wrapper for an updated Pybind11 wrapper version, that includes all the functionality of the C++ API.
-    32. Function getFilesOnDirectory() can extra all basic image file types at once without requiring to manually enumerate them.
-    33. Added the flags `--face_detector` and `--hand_detector`, that enable the user to select the face/hand rectangle detector that is used for the later face/hand keypoint detection. It includes OpenCV (for face), and also allows the user to provide its own input. Flag `--hand_tracking` is removed and integrated into this flag too.
-    34. Maximum queue size per OpenPose thread is configurable through the Wrapper class.
-    35. Added pre-processing capabilities to Wrapper (WorkerType::PreProcessing), which will be run right after the image has been read.
-    36. Removed boost::shared_ptr and caffe::Blob dependencies from the headers. No 3rdparty dependencies left on headers (except dim3 for CUDA).
-    37. Added `poseNetOutput` to Datum so that user can introduce his custom network output.
+    23. Added Mac OpenCL compatibility.
+    24. Added documentation for Nvidia TX2 with JetPack 3.3.
+    25. Added Travis build check for several configurations: Ubuntu (14/16)/Mac/Windows, CPU/CUDA/OpenCL, with/without Python, and Release/Debug.
+    26. Assigned 755 access to all sh scripts (some of them were only 644).
+    27. Replaced the old Python wrapper for an updated Pybind11 wrapper version, that includes all the functionality of the C++ API.
+    28. Function getFilesOnDirectory() can extra all basic image file types at once without requiring to manually enumerate them.
+    29. Maximum queue size per OpenPose thread is configurable through the Wrapper class.
+    30. Added pre-processing capabilities to Wrapper (WorkerType::PreProcessing), which will be run right after the image has been read.
+    31. Removed boost::shared_ptr and caffe::Blob dependencies from the headers. No 3rdparty dependencies left on headers (except dim3 for CUDA).
+    32. Added Array `poseNetOutput` to Datum so that user can introduce his custom network output.
+    33. OpenPose will never provoke a core dumped or crash. Exceptions in threads (`errorWorker()` instead of `error()`) lead to stopping the threads and reporting the error from the main thread, while exceptions in destructors (`errorDestructor()` instead of `error()`) are reported with std::cerr but not thrown as std::exceptions.
 2. Functions or parameters renamed:
     1. By default, python example `tutorial_developer/python_2_pose_from_heatmaps.py` was using 2 scales starting at -1x736, changed to 1 scale at -1x368.
     2. WrapperStructPose default parameters changed to match those of the OpenPose demo binary.
     3. WrapperT.configure() changed from 1 function that requries all arguments to individual functions that take 1 argument each.
     4. Added `Forward` to all net classes that automatically selects between CUDA, OpenCL, or CPU-only version depending on the defines.
-    5. Previously hardcoded `COCO_CHALLENGE` variable turned into user configurable flag `--maximize_positives`.
-    6. Removed old COCO 2014 validation scripts.
-    7. WrapperStructOutput split into WrapperStructOutput and WrapperStructGui.
-    8. Replaced `--camera_fps` flag by `--write_video_fps`, given that it was a confusing name: It did not affect the webcam FPS, but only the FPS of the output video. In addition, default value changed from 30 to -1.
-    9. Renamed `--frame_keep_distortion` as `--frame_undistort`, which performs the opposite operation (the default value has been also changed to the opposite).
-    10. Renamed `--camera_parameter_folder` as `--camera_parameter_path` because it could also take a whole XML file path rather than its parent folder.
-    11. Default value of flag `--scale_gap` changed from 0.3 to 0.25.
-    12. Moved most sh scripts into the `scripts/` folder. Only models/getModels.sh and the `*.bat` files are kept under `models/` and `3rdparty/windows`.
-    13. For Python compatibility and scalability increase, template `TDatums` used for `include/openpose/wrapper/wrapper.hpp` has changed from `std::vector<Datum>` to `std::vector<std::shared_ptr<Datum>>`, including the respective changes in all the worker classes. In addition, some template classes have been simplified to only take 1 template parameter for user simplicity.
-    14. Renamed intRound, charRound, etc. by positiveIntRound, positiveCharRound, etc. so that people can realize it is not safe for negative numbers.
-    15. Flag `--hand_tracking` is a subcase of `--hand_detector`, so it has been removed and incorporated as `--hand_detector 3`.
+    5. Removed old COCO 2014 validation scripts.
+    6. WrapperStructOutput split into WrapperStructOutput and WrapperStructGui.
+    7. Replaced flags:
+        1. Replaced `--camera_fps` flag by `--write_video_fps`, given that it was a confusing name: It did not affect the webcam FPS, but only the FPS of the output video. In addition, default value changed from 30 to -1.
+        2. Flag `--hand_tracking` is a subcase of `--hand_detector`, so it has been removed and incorporated as `--hand_detector 3`.
+    8. Renamed `--frame_keep_distortion` as `--frame_undistort`, which performs the opposite operation (the default value has been also changed to the opposite).
+    9. Renamed `--camera_parameter_folder` as `--camera_parameter_path` because it could also take a whole XML file path rather than its parent folder.
+    10. Default value of flag `--scale_gap` changed from 0.3 to 0.25.
+    11. Moved most sh scripts into the `scripts/` folder. Only models/getModels.sh and the `*.bat` files are kept under `models/` and `3rdparty/windows`.
+    12. For Python compatibility and scalability increase, template `TDatums` used for `include/openpose/wrapper/wrapper.hpp` has changed from `std::vector<Datum>` to `std::vector<std::shared_ptr<Datum>>`, including the respective changes in all the worker classes. In addition, some template classes have been simplified to only take 1 template parameter for user simplicity.
+    13. Renamed intRound, charRound, etc. by positiveIntRound, positiveCharRound, etc. so that people can realize it is not safe for negative numbers.
 3. Main bugs fixed:
     1. CMake-GUI was forcing to Release mode, allowed Debug modes too.
     2. NMS returns in index 0 the number of found peaks. However, while the number of peaks was truncated to a maximum of 127, this index 0 was saving the real number instead of the truncated one.

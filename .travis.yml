@@ -52,6 +52,11 @@ matrix:
     dist: xenial
     env: NAME="U16-python-cmake-cpu-debug" WITH_PYTHON=true WITH_CUDA=false WITH_DEBUG=true
     sudo: required
+  # Ubuntu 16.04 - Python - CMake - CPU - Unity
+  - os: linux
+    dist: xenial
+    env: NAME="U16-python-cmake-cpu-unity" WITH_PYTHON=true WITH_UNITY=true WITH_CUDA=false
+    sudo: required
 
   # Mac OSX
   # Mac OSX - Python - CMake - CPU
@@ -67,7 +72,12 @@ matrix:
   # Mac OSX - Python - CMake - CPU - Debug
   - os: osx
     osx_image: xcode9.4 # xcode10.1 does not work with Python # Versions: https://docs.travis-ci.com/user/languages/objective-c#supported-xcode-versions
-    env: NAME="OSX-python-cmake-cpu" WITH_CUDA=false WITH_PYTHON=true WITH_DEBUG=true
+    env: NAME="OSX-python-cmake-cpu-debug" WITH_CUDA=false WITH_PYTHON=true WITH_DEBUG=true
+    sudo: required
+  # Mac OSX - Python - CMake - CPU - Unity
+  - os: osx
+    osx_image: xcode9.4 # xcode10.1 does not work with Python # Versions: https://docs.travis-ci.com/user/languages/objective-c#supported-xcode-versions
+    env: NAME="OSX-python-cmake-cpu-unity" WITH_CUDA=false WITH_PYTHON=true WITH_UNITY=true
     sudo: required
 
   # # TO-DO: To be implemented

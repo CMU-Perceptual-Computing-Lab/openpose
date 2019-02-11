@@ -11,7 +11,7 @@ set(SOURCES_OPENPOSE ${SOURCES_OPENPOSE} ${SOURCES_OP_UNITY_WITH_CP} PARENT_SCOP
 
 if (UNIX OR APPLE)
   add_library(openpose_unity ${SOURCES_OP_UNITY})
-  # target_link_libraries(openpose_unity openpose_pose ${OpenCV_LIBS})
+  target_link_libraries(openpose_unity openpose_pose ${OpenPose_3rdparty_libraries})
 
   install(TARGETS openpose_unity
       EXPORT OpenPose

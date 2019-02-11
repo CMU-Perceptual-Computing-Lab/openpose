@@ -259,7 +259,7 @@ namespace op
                 std::vector<TWorker> cpuRenderers;
                 poseExtractorsWs.clear();
                 poseExtractorsWs.resize(numberThreads);
-                if (wrapperStructPose.enable)
+                if (wrapperStructPose.poseMode != PoseMode::Disabled)
                 {
                     // Pose estimators
                     for (auto gpuId = 0; gpuId < numberThreads; gpuId++)
@@ -268,6 +268,7 @@ namespace op
                             wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScaleMode,
                             wrapperStructPose.addPartCandidates, wrapperStructPose.maximizePositives,
                             wrapperStructPose.protoTxtPath, wrapperStructPose.caffeModelPath,
+                            wrapperStructPose.upsamplingRatio, wrapperStructPose.poseMode == PoseMode::Enabled,
                             wrapperStructPose.enableGoogleLogging
                         ));
 
@@ -359,7 +360,7 @@ namespace op
                     if (wrapperStructFace.detector == Detector::Body)
                     {
                         // Sanity check
-                        if (!wrapperStructPose.enable)
+                        if (wrapperStructPose.poseMode == PoseMode::Disabled)
                             error("Body keypoint detection is disabled but face Detector is set to Body. Either"
                                   " re-enable OpenPose body or select a different face Detector (`--face_detector`).",
                                   __LINE__, __FUNCTION__, __FILE__);
@@ -414,7 +415,7 @@ namespace op
                         // Sanity check
                         if ((wrapperStructHand.detector == Detector::BodyWithTracking
                              || wrapperStructHand.detector == Detector::Body)
-                            && !wrapperStructPose.enable)
+                            && wrapperStructPose.poseMode == PoseMode::Disabled)
                             error("Body keypoint detection is disabled but hand Detector is set to Body. Either"
                                   " re-enable OpenPose body or select a different hand Detector (`--hand_detector`).",
                                   __LINE__, __FUNCTION__, __FILE__);

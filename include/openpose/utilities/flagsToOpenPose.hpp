@@ -10,6 +10,8 @@
 
 namespace op
 {
+    OP_API PoseMode flagsToPoseMode(const int poseModeInt);
+
     OP_API PoseModel flagsToPoseModel(const std::string& poseModeString);
 
     OP_API ScaleMode flagsToScaleMode(const int keypointScaleMode);

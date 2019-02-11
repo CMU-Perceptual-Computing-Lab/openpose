@@ -143,7 +143,7 @@ namespace op
         try
         {
             for (auto& tWorker : mTWorkers)
-                tWorker->initializationOnThread();
+                tWorker->initializationOnThreadNoException();
         }
         catch (const std::exception& e)
         {

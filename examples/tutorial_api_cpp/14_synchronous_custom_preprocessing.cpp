@@ -1,8 +1,8 @@
-// ------------------------- OpenPose C++ API Tutorial - Example 14 - Custom Post-processing -------------------------
+// ------------------------- OpenPose C++ API Tutorial - Example 14 - Custom Pre-processing -------------------------
 // Synchronous mode: ideal for production integration. It provides the fastest results with respect to runtime
 // performance.
-// In this function, the user can implement its own post-processing, i.e., his function will be called after OpenPose
-// has processed the frames but before saving or visualizing any result.
+// In this function, the user can implement its own pre-processing, i.e., his function will be called after the image
+// has been read by OpenPose but before OpenPose processes the frames.
 
 // Command-line user intraface
 #include <openpose/flags.hpp>
@@ -10,10 +10,10 @@
 #include <openpose/headers.hpp>
 
 // This worker will just invert the image
-class WUserPostProcessing : public op::Worker<std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>>
+class WUserPreProcessing : public op::Worker<std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>>
 {
 public:
-    WUserPostProcessing()
+    WUserPreProcessing()
     {
         // User's constructor here
     }
@@ -22,9 +22,8 @@ public:
 
     void work(std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& datumsPtr)
     {
-        // User's post-processing (after OpenPose processing & before OpenPose outputs) here
-            // datumPtr->cvOutputData: rendered frame with pose or heatmaps
-            // datumPtr->poseKeypoints: Array<float> with the estimated pose
+        // User's pre-processing (after OpenPose read the input image & before OpenPose processing) here
+            // datumPtr->cvInputData: input frame
         try
         {
             if (datumsPtr != nullptr && !datumsPtr->empty())
@@ -67,6 +66,8 @@ void configureWrapper(op::Wrapper& opWrapper)
         const auto faceNetInputSize = op::flagsToPoint(FLAGS_face_net_resolution, "368x368 (multiples of 16)");
         // handNetInputSize
         const auto handNetInputSize = op::flagsToPoint(FLAGS_hand_net_resolution, "368x368 (multiples of 16)");
+        // poseMode
+        const auto poseMode = op::flagsToPoseMode(FLAGS_body);
         // poseModel
         const auto poseModel = op::flagsToPoseModel(FLAGS_model_pose);
         // JSON saving
@@ -89,19 +90,19 @@ void configureWrapper(op::Wrapper& opWrapper)
 
         // Initializing the user custom classes
         // Processing
-        auto wUserPostProcessing = std::make_shared<WUserPostProcessing>();
+        auto wUserPreProcessing = std::make_shared<WUserPreProcessing>();
         // Add custom processing
         const auto workerProcessingOnNewThread = true;
-        opWrapper.setWorker(op::WorkerType::PostProcessing, wUserPostProcessing, workerProcessingOnNewThread);
+        opWrapper.setWorker(op::WorkerType::PreProcessing, wUserPreProcessing, workerProcessingOnNewThread);
 
         // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
         const op::WrapperStructPose wrapperStructPose{
-            !FLAGS_body_disable, netInputSize, outputSize, keypointScaleMode, FLAGS_num_gpu, FLAGS_num_gpu_start,
+            poseMode, netInputSize, outputSize, keypointScaleMode, FLAGS_num_gpu, FLAGS_num_gpu_start,
             FLAGS_scale_number, (float)FLAGS_scale_gap, op::flagsToRenderMode(FLAGS_render_pose, multipleView),
             poseModel, !FLAGS_disable_blending, (float)FLAGS_alpha_pose, (float)FLAGS_alpha_heatmap,
             FLAGS_part_to_show, FLAGS_model_folder, heatMapTypes, heatMapScaleMode, FLAGS_part_candidates,
             (float)FLAGS_render_threshold, FLAGS_number_people_max, FLAGS_maximize_positives, FLAGS_fps_max,
-            FLAGS_prototxt_path, FLAGS_caffemodel_path, enableGoogleLogging};
+            FLAGS_prototxt_path, FLAGS_caffemodel_path, (float)FLAGS_upsampling_ratio, enableGoogleLogging};
         opWrapper.configure(wrapperStructPose);
         // Face configuration (use op::WrapperStructFace{} to disable it)
         const op::WrapperStructFace wrapperStructFace{
