@@ -690,7 +690,7 @@ if (UNIX OR APPLE)
         set(CAFFE_CPU_ONLY ON)
         set(USE_CUDNN OFF)
       elseif (${GPU_MODE} MATCHES "OPENCL")
-        execute_process(COMMAND git checkout opencl WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
+        execute_process(COMMAND git checkout fe2a1102 WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
         set(USE_CUDNN OFF)
       endif (${GPU_MODE} MATCHES "CUDA")
 

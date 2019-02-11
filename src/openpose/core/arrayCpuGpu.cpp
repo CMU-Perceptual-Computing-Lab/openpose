@@ -63,9 +63,18 @@ namespace op
         try
         {
             #ifdef USE_CAFFE
+                // Get updated size
+                std::vector<int> arraySize;
+                // If batch size = 1 --> E.g., array.getSize() == {78, 368, 368}
+                if (array.getNumberDimensions() == 3)
+                    // Add 1: arraySize = {1}
+                    arraySize.emplace_back(1);
+                // Add {78, 368, 368}: arraySize = {1, 78, 368, 368}
+                for (const auto& sizeI : array.getSize())
+                    arraySize.emplace_back(sizeI);
                 // Construct spImpl
                 spImpl.reset(new ImplArrayCpuGpu{});
-                spImpl->upCaffeBlobT.reset(new caffe::Blob<T>{array.getSize()});
+                spImpl->upCaffeBlobT.reset(new caffe::Blob<T>{arraySize});
                 spImpl->pCaffeBlobT = spImpl->upCaffeBlobT.get();
                 // Copy data
                 // CPU copy
@@ -574,9 +583,10 @@ namespace op
     {
         try
         {
-            #ifdef USE_CAFFE
+            #if defined(USE_CAFFE) && (defined(USE_CUDA) || defined(USE_OPENCL))
                 return spImpl->pCaffeBlobT->gpu_shape();
             #else
+                error("Required `USE_CAFFE` and `USE_CUDA` flags enabled.", __LINE__, __FUNCTION__, __FILE__);
                 return nullptr;
             #endif
         }
@@ -592,9 +602,10 @@ namespace op
     {
         try
         {
-            #ifdef USE_CAFFE
+            #if defined(USE_CAFFE) && (defined(USE_CUDA) || defined(USE_OPENCL))
                 return spImpl->pCaffeBlobT->gpu_data();
             #else
+                error("Required `USE_CAFFE` and `USE_CUDA` flags enabled.", __LINE__, __FUNCTION__, __FILE__);
                 return nullptr;
             #endif
         }
@@ -610,10 +621,11 @@ namespace op
     {
         try
         {
-            #ifdef USE_CAFFE
+            #if defined(USE_CAFFE) && (defined(USE_CUDA) || defined(USE_OPENCL))
                 spImpl->pCaffeBlobT->set_gpu_data(data);
             #else
                 UNUSED(data);
+                error("Required `USE_CAFFE` and `USE_CUDA` flags enabled.", __LINE__, __FUNCTION__, __FILE__);
             #endif
         }
         catch (const std::exception& e)
@@ -645,9 +657,10 @@ namespace op
     {
         try
         {
-            #ifdef USE_CAFFE
+            #if defined(USE_CAFFE) && (defined(USE_CUDA) || defined(USE_OPENCL))
                 return spImpl->pCaffeBlobT->gpu_diff();
             #else
+                error("Required `USE_CAFFE` and `USE_CUDA` flags enabled.", __LINE__, __FUNCTION__, __FILE__);
                 return nullptr;
             #endif
         }
@@ -681,9 +694,10 @@ namespace op
     {
         try
         {
-            #ifdef USE_CAFFE
+            #if defined(USE_CAFFE) && (defined(USE_CUDA) || defined(USE_OPENCL))
                 return spImpl->pCaffeBlobT->mutable_gpu_data();
             #else
+                error("Required `USE_CAFFE` and `USE_CUDA` flags enabled.", __LINE__, __FUNCTION__, __FILE__);
                 return nullptr;
             #endif
         }
@@ -717,9 +731,10 @@ namespace op
     {
         try
         {
-            #ifdef USE_CAFFE
+            #if defined(USE_CAFFE) && (defined(USE_CUDA) || defined(USE_OPENCL))
                 return spImpl->pCaffeBlobT->mutable_gpu_diff();
             #else
+                error("Required `USE_CAFFE` and `USE_CUDA` flags enabled.", __LINE__, __FUNCTION__, __FILE__);
                 return nullptr;
             #endif
         }
