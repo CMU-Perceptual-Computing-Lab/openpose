@@ -583,7 +583,7 @@ namespace op
     {
         try
         {
-            #if defined(USE_CAFFE) && defined(USE_CUDA)
+            #if defined(USE_CAFFE) && (defined(USE_CUDA) || defined(USE_OPENCL))
                 return spImpl->pCaffeBlobT->gpu_shape();
             #else
                 error("Required `USE_CAFFE` and `USE_CUDA` flags enabled.", __LINE__, __FUNCTION__, __FILE__);
@@ -602,7 +602,7 @@ namespace op
     {
         try
         {
-            #if defined(USE_CAFFE) && defined(USE_CUDA)
+            #if defined(USE_CAFFE) && (defined(USE_CUDA) || defined(USE_OPENCL))
                 return spImpl->pCaffeBlobT->gpu_data();
             #else
                 error("Required `USE_CAFFE` and `USE_CUDA` flags enabled.", __LINE__, __FUNCTION__, __FILE__);
@@ -621,7 +621,7 @@ namespace op
     {
         try
         {
-            #if defined(USE_CAFFE) && defined(USE_CUDA)
+            #if defined(USE_CAFFE) && (defined(USE_CUDA) || defined(USE_OPENCL))
                 spImpl->pCaffeBlobT->set_gpu_data(data);
             #else
                 UNUSED(data);
@@ -657,7 +657,7 @@ namespace op
     {
         try
         {
-            #if defined(USE_CAFFE) && defined(USE_CUDA)
+            #if defined(USE_CAFFE) && (defined(USE_CUDA) || defined(USE_OPENCL))
                 return spImpl->pCaffeBlobT->gpu_diff();
             #else
                 error("Required `USE_CAFFE` and `USE_CUDA` flags enabled.", __LINE__, __FUNCTION__, __FILE__);
@@ -694,7 +694,7 @@ namespace op
     {
         try
         {
-            #if defined(USE_CAFFE) && defined(USE_CUDA)
+            #if defined(USE_CAFFE) && (defined(USE_CUDA) || defined(USE_OPENCL))
                 return spImpl->pCaffeBlobT->mutable_gpu_data();
             #else
                 error("Required `USE_CAFFE` and `USE_CUDA` flags enabled.", __LINE__, __FUNCTION__, __FILE__);
@@ -731,7 +731,7 @@ namespace op
     {
         try
         {
-            #if defined(USE_CAFFE) && defined(USE_CUDA)
+            #if defined(USE_CAFFE) && (defined(USE_CUDA) || defined(USE_OPENCL))
                 return spImpl->pCaffeBlobT->mutable_gpu_diff();
             #else
                 error("Required `USE_CAFFE` and `USE_CUDA` flags enabled.", __LINE__, __FUNCTION__, __FILE__);

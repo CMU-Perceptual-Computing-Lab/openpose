@@ -1,0 +1,37 @@
+diff --git a/cmake/Modules/FindvecLib.cmake b/cmake/Modules/FindvecLib.cmake
+index 7459f623..9c5ee818 100644
+--- a/cmake/Modules/FindvecLib.cmake
++++ b/cmake/Modules/FindvecLib.cmake
+@@ -12,13 +12,17 @@ endif()
+ 
+ set(__veclib_include_suffix "Frameworks/vecLib.framework/Versions/Current/Headers")
+ 
+-find_path(vecLib_INCLUDE_DIR vecLibTypes.h
++exec_program(xcode-select ARGS -print-path OUTPUT_VARIABLE CMAKE_XCODE_DEVELOPER_DIR)
++find_path(vecLib_INCLUDE_DIR vecLib.h
+           DOC "vecLib include directory"
+           PATHS /System/Library/Frameworks/Accelerate.framework/Versions/Current/${__veclib_include_suffix}
+                 /System/Library/${__veclib_include_suffix}
+-                /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Accelerate.framework/Versions/Current/Frameworks/vecLib.framework/Headers/
++                ${CMAKE_XCODE_DEVELOPER_DIR}/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Accelerate.framework/Versions/Current/Frameworks/vecLib.framework/Headers/
+           NO_DEFAULT_PATH)
+ 
++
++set(vecLib_INCLUDE_DIR "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/Headers/")
++
+ include(FindPackageHandleStandardArgs)
+ find_package_handle_standard_args(vecLib DEFAULT_MSG vecLib_INCLUDE_DIR)
+ 
+diff --git a/src/caffe/layers/malis_loss_layer.cpp b/src/caffe/layers/malis_loss_layer.cpp
+index dae3c7d1..68e8323a 100644
+--- a/src/caffe/layers/malis_loss_layer.cpp
++++ b/src/caffe/layers/malis_loss_layer.cpp
+@@ -1,6 +1,6 @@
+ #include <boost/pending/disjoint_sets.hpp>
+-#include <opencv2/highgui/highgui.hpp>
+-#include <opencv2/imgproc/imgproc.hpp>
++//#include <opencv2/highgui/highgui.hpp>
++//#include <opencv2/imgproc/imgproc.hpp>
+ 
+ #include <algorithm>
+ #include <cfloat>
