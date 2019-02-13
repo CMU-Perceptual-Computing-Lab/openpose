@@ -10,6 +10,7 @@ WITH_OPEN_CL=${WITH_OPEN_CL:-false}
 WITH_MKL=${WITH_MKL:-false}
 WITH_UNITY=${WITH_UNITY:-false}
 WITH_DEBUG=${WITH_DEBUG:-false}
+TRAVIS_OS_NAME=${TRAVIS_OS_NAME}
 
 # Examples should be run (Travis not compatible with GPU code)
 # if [[ $WITH_CMAKE == true ]] && [[ $WITH_PYTHON == true ]] && [[ $WITH_CUDA == false ]] && [[ $WITH_OPEN_CL == false ]] && [[ $WITH_MKL == false ]]; then

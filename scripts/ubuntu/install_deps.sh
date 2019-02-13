@@ -20,3 +20,6 @@ sudo apt-get --assume-yes install python3-pip
 sudo -H pip3 install --upgrade numpy protobuf opencv-python
 # OpenCV 2.4 -> Added as option
 # # sudo apt-get --assume-yes install libopencv-dev
+# OpenCL Generic
+sudo apt-get --assume-yes install opencl-headers ocl-icd-opencl-dev
+sudo apt-get --assume-yes install libviennacl-dev

@@ -79,6 +79,11 @@ matrix:
     osx_image: xcode9.4 # xcode10.1 does not work with Python # Versions: https://docs.travis-ci.com/user/languages/objective-c#supported-xcode-versions
     env: NAME="OSX-python-cmake-cpu-unity" WITH_CUDA=false WITH_PYTHON=true WITH_UNITY=true
     sudo: required
+  # Mac OSX - Default - CMake - OpenCL
+  - os: osx
+    osx_image: xcode10.1 # Versions: https://docs.travis-ci.com/user/languages/objective-c#supported-xcode-versions
+    env: NAME="OSX-default-cmake-opencl" WITH_CUDA=false WITH_OPEN_CL=true
+    sudo: required
 
   # # TO-DO: To be implemented
   # # Windows
@@ -98,11 +103,11 @@ matrix:
   #   dist: xenial
   #   env: NAME="U16-default-cmake-cpu-mkl" WITH_CUDA=false WITH_MKL=true
   #   sudo: required
-  # # Ubuntu 16.04 - Default - CMake - OpenCL
-  # - os: linux
-  #   dist: xenial
-  #   env: NAME="U16-default-cmake-opencl" WITH_CUDA=false WITH_OPEN_CL=true
-  #   sudo: required
+  # Ubuntu 16.04 - Default - CMake - OpenCL
+  - os: linux
+    dist: xenial
+    env: NAME="U16-default-cmake-opencl" WITH_CUDA=false WITH_OPEN_CL=true
+    sudo: required
   # # Ubuntu 16.04 - Python - CMake - OpenCL
   # - os: linux
   #   dist: xenial
