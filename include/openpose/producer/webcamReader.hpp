@@ -40,6 +40,7 @@ namespace op
 
     private:
         const int mIndex;
+        const bool mWebcamStarted;
         long long mFrameNameCounter;
         bool mThreadOpened;
         cv::Mat mBuffer;
