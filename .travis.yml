@@ -22,6 +22,11 @@ matrix:
   #   WITH_MKL: false
   include:
   # Ubuntu 16.04
+  # Ubuntu 16.04 - Default - CMake - CUDA
+  - os: linux
+    dist: xenial
+    env: NAME="U16-default-cmake-cuda8"
+    sudo: required
   # Ubuntu 16.04 - Python - CMake - CUDA
   - os: linux
     dist: xenial
@@ -37,15 +42,10 @@ matrix:
     dist: xenial
     env: NAME="U16-python-cmake-cpu" WITH_PYTHON=true WITH_CUDA=false
     sudo: required
-  # Ubuntu 16.04 - Default - CMake - CUDA
+  # Ubuntu 16.04 - Python - CMake - OpenCL
   - os: linux
     dist: xenial
-    env: NAME="U16-default-cmake-cuda8"
-    sudo: required
-  # Ubuntu 16.04 - Default - CMake - CPU
-  - os: linux
-    dist: xenial
-    env: NAME="U16-default-cmake-cpu" WITH_CUDA=false
+    env: NAME="U16-python-cmake-opencl" WITH_PYTHON=true WITH_CUDA=false WITH_OPEN_CL=true
     sudo: required
   # Ubuntu 16.04 - Python - CMake - CPU - Debug
   - os: linux
@@ -64,10 +64,10 @@ matrix:
     osx_image: xcode9.4 # xcode10.1 does not work with Python # Versions: https://docs.travis-ci.com/user/languages/objective-c#supported-xcode-versions
     env: NAME="OSX-python-cmake-cpu" WITH_CUDA=false WITH_PYTHON=true
     sudo: required
-  # Mac OSX - Default - CMake - CPU
+  # Mac OSX - Python - CMake - OpenCL
   - os: osx
     osx_image: xcode10.1 # Versions: https://docs.travis-ci.com/user/languages/objective-c#supported-xcode-versions
-    env: NAME="OSX-default-cmake-cpu" WITH_CUDA=false
+    env: NAME="OSX-default-cmake-opencl" WITH_CUDA=false WITH_OPEN_CL=true
     sudo: required
   # Mac OSX - Python - CMake - CPU - Debug
   - os: osx
@@ -79,10 +79,10 @@ matrix:
     osx_image: xcode9.4 # xcode10.1 does not work with Python # Versions: https://docs.travis-ci.com/user/languages/objective-c#supported-xcode-versions
     env: NAME="OSX-python-cmake-cpu-unity" WITH_CUDA=false WITH_PYTHON=true WITH_UNITY=true
     sudo: required
-  # Mac OSX - Default - CMake - OpenCL
+  # Mac OSX - Default - CMake - CPU
   - os: osx
     osx_image: xcode10.1 # Versions: https://docs.travis-ci.com/user/languages/objective-c#supported-xcode-versions
-    env: NAME="OSX-default-cmake-opencl" WITH_CUDA=false WITH_OPEN_CL=true
+    env: NAME="OSX-default-cmake-cpu" WITH_CUDA=false
     sudo: required
 
   # # TO-DO: To be implemented
@@ -92,6 +92,11 @@ matrix:
   #   env: NAME="W10-default-cmake-cuda8"
 
   # Ubuntu (others)
+  # Ubuntu 16.04 - Default - CMake - CPU
+  - os: linux
+    dist: xenial
+    env: NAME="U16-default-cmake-cpu" WITH_CUDA=false
+    sudo: required
   # Ubuntu 16.04 - Default - Make - CUDA
   - os: linux
     dist: xenial
@@ -103,11 +108,6 @@ matrix:
   #   dist: xenial
   #   env: NAME="U16-default-cmake-cpu-mkl" WITH_CUDA=false WITH_MKL=true
   #   sudo: required
-  # Ubuntu 16.04 - Default - CMake - OpenCL
-  - os: linux
-    dist: xenial
-    env: NAME="U16-default-cmake-opencl" WITH_CUDA=false WITH_OPEN_CL=true
-    sudo: required
   # # Ubuntu 16.04 - Python - CMake - OpenCL
   # - os: linux
   #   dist: xenial
