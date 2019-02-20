@@ -221,17 +221,17 @@ namespace op
             std::lock_guard<std::mutex> lock{sMutex};
             sThreadErrorMessages.emplace_back(errorMessageToPropagate);
         }
-		else
+        else
 		{
-			// Unity logError
-			#ifdef USE_UNITY_SUPPORT
-				if (errorMode == 3)
-					UnityDebugger::logError(errorMessageToPropagate);
-			#endif
+            // Unity logError
+            #ifdef USE_UNITY_SUPPORT
+                if (errorMode == 3)
+                    UnityDebugger::logError(errorMessageToPropagate);
+            #endif
 
             if (checkIfErrorHas(ErrorMode::StdRuntimeError) && errorMode != 3)
                 throw std::runtime_error{errorMessageToPropagate};
-		}
+        }
     }
 
 
