@@ -190,8 +190,8 @@ namespace op
                 errorMessageToPrint = errorEnum + errorThreadLine + "\n" + errorMessageToPrint;
             }
             else if (errorMode == 3)
-                errorMessageToPrint += "\n" + errorEnum + "[Error occurred in a destructor, so no std::exception"
-                    " has been thrown. Returning with exit status 0]";
+                errorMessageToPrint += "\n" + errorEnum + "[Error occurred in a destructor or in the OpenPose"
+                    " Unity Plugin, so no std::exception has been thrown. Returning with exit status 0]";
             errorMessageToPropagate = createFullMessage(message) + errorMessageToPrint + "\n";
             if (errorMode == 1)
             {
@@ -214,11 +214,6 @@ namespace op
         if (checkIfErrorHas(ErrorMode::FileLogging))
             fileLogging(errorMessageToPrint);
 
-        // Unity logError
-        #ifdef USE_UNITY_SUPPORT
-            UnityDebugger::logError(errorMessageToPrint);
-        #endif
-
         // std::runtime_error
         if (errorMode == 1)
         {
@@ -227,8 +222,16 @@ namespace op
             sThreadErrorMessages.emplace_back(errorMessageToPropagate);
         }
         else
+        {
+            // Unity logError
+            #ifdef USE_UNITY_SUPPORT
+                if (errorMode == 3)
+                    UnityDebugger::logError(errorMessageToPropagate);
+            #endif
+
             if (checkIfErrorHas(ErrorMode::StdRuntimeError) && errorMode != 3)
                 throw std::runtime_error{errorMessageToPropagate};
+        }
     }
 
 

@@ -80,7 +80,7 @@ namespace op
             }
             catch (const std::exception& e)
             {
-                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
             }
         }
 
@@ -104,7 +104,7 @@ namespace op
             }
             catch (const std::exception& e)
             {
-                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
             }
         }
 
@@ -124,7 +124,7 @@ namespace op
             }
             catch (const std::exception& e)
             {
-                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
             }
         }
 
@@ -144,7 +144,7 @@ namespace op
             }
             catch (const std::exception& e)
             {
-                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
             }
         }
 
@@ -164,7 +164,7 @@ namespace op
             }
             catch (const std::exception& e)
             {
-                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
             }
         }
 
@@ -184,7 +184,7 @@ namespace op
             }
             catch (const std::exception& e)
             {
-                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
             }
         }
 
@@ -204,7 +204,7 @@ namespace op
             }
             catch (const std::exception& e)
             {
-                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
             }
         }
 
@@ -226,7 +226,7 @@ namespace op
             }
             catch (const std::exception& e)
             {
-                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
             }
         }
 
@@ -252,7 +252,7 @@ namespace op
             }
             catch (const std::exception& e)
             {
-                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
             }
         }
 
@@ -272,7 +272,7 @@ namespace op
             }
             catch (const std::exception& e)
             {
-                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
             }
         }
 
@@ -292,7 +292,7 @@ namespace op
             }
             catch (const std::exception& e)
             {
-                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
             }
         }
 
@@ -323,7 +323,7 @@ namespace op
             }
             catch (const std::exception& e)
             {
-                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
             }
         }
 
@@ -343,7 +343,7 @@ namespace op
             }
             catch (const std::exception& e)
             {
-                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
             }
         }
 
@@ -363,7 +363,7 @@ namespace op
             }
             catch (const std::exception& e)
             {
-                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
             }
         }
 
@@ -382,7 +382,7 @@ namespace op
             }
             catch (const std::exception& e)
             {
-                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
             }
         }
 
@@ -394,7 +394,7 @@ namespace op
             }
             catch (const std::exception& e)
             {
-                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
             }
         }
     };
@@ -450,7 +450,7 @@ namespace op
         }
         catch (const std::exception& e)
         {
-            log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+            errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
     }
 
@@ -465,7 +465,7 @@ namespace op
             }
             catch (const std::exception& e)
             {
-                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
             }
         }
 
@@ -482,7 +482,7 @@ namespace op
             }
             catch (const std::exception& e)
             {
-                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
             }
         }
 
@@ -496,7 +496,7 @@ namespace op
                 }
                 catch (const std::exception& e)
                 {
-                    log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                    errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
                 }
             }
         #endif
@@ -510,7 +510,7 @@ namespace op
             }
             catch (const std::exception& e)
             {
-                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
             }
         }
 
@@ -523,7 +523,7 @@ namespace op
             }
             catch (const std::exception& e)
             {
-                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
             }
         }
 
@@ -558,7 +558,7 @@ namespace op
             }
             catch (const std::exception& e)
             {
-                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
             }
         }
 
@@ -576,7 +576,7 @@ namespace op
             }
             catch (const std::exception& e)
             {
-                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
             }
         }
 
@@ -594,7 +594,7 @@ namespace op
             }
             catch (const std::exception& e)
             {
-                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
             }
         }
 
@@ -609,7 +609,7 @@ namespace op
             }
             catch (const std::exception& e)
             {
-                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
             }
         }
 
@@ -630,7 +630,7 @@ namespace op
             }
             catch (const std::exception& e)
             {
-                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
             }
         }
 
@@ -651,7 +651,7 @@ namespace op
             }
             catch (const std::exception& e)
             {
-                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
             }
         }
 
@@ -666,7 +666,7 @@ namespace op
             }
             catch (const std::exception& e)
             {
-                log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
             }
         }
 
@@ -683,7 +683,7 @@ namespace op
 			}
 			catch (const std::exception& e)
 			{
-				log(e.what(), Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+				errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
 			}
 		}
     }
