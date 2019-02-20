@@ -222,7 +222,7 @@ namespace op
             sThreadErrorMessages.emplace_back(errorMessageToPropagate);
         }
         else
-		{
+        {
             // Unity logError
             #ifdef USE_UNITY_SUPPORT
                 if (errorMode == 3)
