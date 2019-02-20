@@ -10,8 +10,10 @@ namespace op
                                const bool undistortImage) :
         VideoCaptureReader{webcamIndex, throwExceptionIfNoOpened, cameraParameterPath, undistortImage, 1},
         mIndex{webcamIndex},
+        mWebcamStarted{VideoCaptureReader::isOpened()},
         mFrameNameCounter{-1},
         mThreadOpened{std::atomic<bool>{false}},
+        mDisconnectedCounter{0},
         mResolution{webcamResolution}
     {
         try
@@ -83,7 +85,7 @@ namespace op
     {
         try
         {
-            return (VideoCaptureReader::isOpened() || mDisconnectedCounter > 0);
+            return (VideoCaptureReader::isOpened() || (mDisconnectedCounter > 0 && mWebcamStarted));
         }
         catch (const std::exception& e)
         {

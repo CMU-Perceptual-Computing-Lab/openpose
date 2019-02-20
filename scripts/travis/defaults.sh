@@ -2,6 +2,7 @@
 
 # Set default environment variables
 set -e
+TRAVIS_OS_NAME=${TRAVIS_OS_NAME}
 WITH_CMAKE=${WITH_CMAKE:-true}
 WITH_PYTHON=${WITH_PYTHON:-false}
 WITH_CUDA=${WITH_CUDA:-true}

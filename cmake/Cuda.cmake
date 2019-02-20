@@ -29,7 +29,7 @@ set(MAXWELL "50 52 53")
 # Pascal (CUDA >= 8)
 set(PASCAL "60 61 62")
 # Volta (CUDA >= 9)
-set(VOLTA "70 71 72")
+set(VOLTA "70") # set(VOLTA "70 71 72") # This crashes with CUDA 10
 # Turing (CUDA >= 10)
 set(TURING "75")
 if (UNIX AND NOT APPLE)
